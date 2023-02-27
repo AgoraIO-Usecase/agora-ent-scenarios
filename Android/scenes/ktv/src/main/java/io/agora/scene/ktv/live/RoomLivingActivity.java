@@ -665,9 +665,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     private void showMusicSettingDialog() {
-        if (musicSettingDialog == null) {
+        //if (musicSettingDialog == null) {
             musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting);
-        }
+        //}
         musicSettingDialog.show(getSupportFragmentManager(), MusicSettingDialog.TAG);
     }
 
