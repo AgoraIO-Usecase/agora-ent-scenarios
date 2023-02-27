@@ -609,8 +609,28 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             @Override
             public void onMusicChartsResult(String requestId, int status, MusicChartInfo[] list) {
                 LinkedHashMap<Integer, String> types = new LinkedHashMap<>();
+                //for (MusicChartInfo musicChartInfo : list) {
+                //    types.put(musicChartInfo.type, musicChartInfo.name);
+                //}
+                // 重新排序 ----> 按照（嗨唱推荐、抖音热歌、热门新歌、KTV必唱）这个顺序进行怕苦
+                for (int i = 0; i < 4; i++) {
+                    for (MusicChartInfo musicChartInfo : list) {
+                        if ((i == 0 && musicChartInfo.type == 3) || // 嗨唱推荐
+                                // 抖音热歌
+                                (i == 1 && musicChartInfo.type == 4) ||
+                                // 热门新歌
+                                (i == 2 && musicChartInfo.type == 2) ||
+                                // KTV必唱
+                                (i == 3 && musicChartInfo.type == 6)) {
+                            types.put(musicChartInfo.type, musicChartInfo.name);
+                        }
+                    }
+                }
+                // 将剩余的插到尾部
                 for (MusicChartInfo musicChartInfo : list) {
-                    types.put(musicChartInfo.type, musicChartInfo.name);
+                    if (!types.containsKey(musicChartInfo.type)) {
+                        types.put(musicChartInfo.type, musicChartInfo.name);
+                    }
                 }
                 liveData.postValue(types);
             }
