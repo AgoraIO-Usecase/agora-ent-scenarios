@@ -552,7 +552,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private LinkedHashMap<Integer, String> filterSongTypeMap(LinkedHashMap<Integer, String> typeMap) {
         // 0 -> "项目热歌榜单"
         // 1 -> "声网热歌榜"
-        // 2 -> "新歌榜"
+        // 2 -> "新歌榜" ("热门新歌")
         // 3 -> "嗨唱推荐"
         // 4 -> "抖音热歌"
         // 5 -> "古风热歌"
@@ -665,9 +665,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     private void showMusicSettingDialog() {
-        if (musicSettingDialog == null) {
+        //if (musicSettingDialog == null) {
             musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting);
-        }
+        //}
         musicSettingDialog.show(getSupportFragmentManager(), MusicSettingDialog.TAG);
     }
 

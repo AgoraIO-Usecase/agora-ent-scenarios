@@ -47,12 +47,12 @@ ext {
             gson              : 'com.google.code.gson:gson:2.9.0',
             autosize          : 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1',
 
-            rtc               : 'io.agora.rtc:agora-special-full:4.0.1.4',
-            rtc_special_voice : 'io.agora.rtc:agora-special-voice:4.0.1.4',
-            rtc_screen_sharing: 'io.agora.rtc:full-screen-sharing:4.0.1.4',
+            rtc               : 'io.agora.rtc:agora-special-full:4.0.0.130',
+            rtc_special_voice : 'io.agora.rtc:agora-special-voice:4.0.1.130',
+            rtc_screen_sharing: 'io.agora.rtc:full-screen-sharing:4.0.0.130',
             rtm               : 'com.github.agorabuilder:rtm-sdk:1.4.10',
             syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.3',
-            lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.0-beta.16',
+            lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.0-beta.19',
 
             // android native libraries
             core_ktx           : "androidx.core:core-ktx:1.7.0",
