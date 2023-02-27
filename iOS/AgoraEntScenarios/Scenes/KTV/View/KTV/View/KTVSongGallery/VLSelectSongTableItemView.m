@@ -147,14 +147,6 @@ AgoraMusicContentCenterEventDelegate
                                                               jsonOption:extra];
         
     }];
-
-    NSArray* chartIds = @[@(3), @(4), @(2), @(6)];
-    NSInteger chartId = [[chartIds objectAtIndex:MIN(pageType - 1, chartIds.count - 1)] intValue];
-    self.requestId =
-    [[AppContext shared].agoraMcc getMusicCollectionWithMusicChartId:chartId
-                                                                page:self.page
-                                                            pageSize:50
-                                                          jsonOption:nil];
 }
 
 #pragma mark -- UITableViewDataSource UITableViewDelegate

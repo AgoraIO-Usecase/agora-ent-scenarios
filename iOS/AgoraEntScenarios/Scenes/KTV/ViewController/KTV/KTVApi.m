@@ -137,7 +137,7 @@ AgoraLrcDownloadDelegate
         return;
     }
     kWeakSelf(self)
-    self.timer = [NSTimer scheduledTimerWithTimeInterval: 0.05 block:^(NSTimer * _Nonnull timer) {
+    self.timer = [NSTimer scheduledTimerWithTimeInterval: 0.02 block:^(NSTimer * _Nonnull timer) {
         NSInteger current = [weakself getPlayerCurrentTime];
         printf("recv1 current:   %ld  %ld %ld\n", current, self.playerState, self.config.songCode);
         [self setProgressWith:current];
