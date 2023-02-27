@@ -54,7 +54,9 @@ typedef enum : NSUInteger {
 
 //歌词组件的滚动
 -(void)didlrcViewDidScrolledWithCumulativeScore:(NSInteger)score totalScore:(NSInteger)totalScore;
--(void)didlrcViewDidScrollFinishedWithCumulativeScore:(NSInteger)score totalScore:(NSInteger)totalScore;
+-(void)didlrcViewDidScrollFinishedWithCumulativeScore:(NSInteger)score
+                                           totalScore:(NSInteger)totalScore
+                                            lineScore:(NSInteger)score;
 
 -(void)didSongLoadedWith:(LyricModel *)model;
 -(void)didSkipViewShowPreludeEndPosition;//前奏结束
