@@ -12,6 +12,7 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.beauty.IBeautyProcessor
 import io.agora.scene.show.beauty.sensetime.BeautySenseTimeImpl
 import io.agora.scene.show.debugSettings.DebugSettingModel
+import java.util.concurrent.Executors
 
 object RtcEngineInstance {
 
@@ -25,6 +26,8 @@ object RtcEngineInstance {
         followEncodeDimensionRatio = false
     }
     val debugSettingModel = DebugSettingModel().apply {  }
+
+    private val workingExecutor = Executors.newSingleThreadExecutor()
 
     private var innerBeautyProcessor: IBeautyProcessor? = null
     val beautyProcessor: IBeautyProcessor
@@ -73,7 +76,7 @@ object RtcEngineInstance {
             innerVideoSwitcher = null
         }
         innerRtcEngine?.let {
-            RtcEngine.destroy()
+            workingExecutor.execute { RtcEngine.destroy() }
             innerRtcEngine = null
         }
         innerBeautyProcessor?.let { processor ->

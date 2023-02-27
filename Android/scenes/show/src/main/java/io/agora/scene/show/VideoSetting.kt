@@ -25,7 +25,7 @@ object VideoSetting {
         V_1080P(1920, 1080),
         V_720P(1280, 720),
         V_540P(960, 540),
-        V_480P(854, 480),
+        V_480P(856, 480),
         V_360P(640, 360),
         V_240P(360, 240)
     }
@@ -242,6 +242,14 @@ object VideoSetting {
     // 超分开关
     private var currAudienceEnhanceSwitch = SPUtil.getBoolean(Constant.CURR_AUDIENCE_ENHANCE_SWITCH, true)
 
+    // 是否在pk 模式中，pk 中观众不开启超分
+    @Volatile
+    private var isPkMode: Boolean = false
+
+    fun setIsPkMode(isPkMode:Boolean){
+        this.isPkMode = isPkMode
+    }
+
     fun getCurrAudienceSetting(): AudienceSetting {
         //
         val jsonStr = SPUtil.getString(Constant.CURR_AUDIENCE_SETTING, "")
@@ -294,6 +302,12 @@ object VideoSetting {
     fun setCurrAudienceEnhanceSwitch(currAudienceEnhanceSwitch: Boolean) {
         this.currAudienceEnhanceSwitch = currAudienceEnhanceSwitch
         SPUtil.putBoolean(Constant.CURR_AUDIENCE_ENHANCE_SWITCH, currAudienceEnhanceSwitch)
+    }
+
+    fun resetAudienceSetting() {
+        isPkMode = false
+        val result = AudienceSetting(AudienceSetting.Video(SuperResolution.SR_NONE))
+        setCurrAudienceSetting(result)
     }
 
     fun resetBroadcastSetting() {
@@ -459,22 +473,25 @@ object VideoSetting {
         isJoinedRoom: Boolean, SR: SuperResolution? = null) {
         val rtcEngine = RtcEngineInstance.rtcEngine
         SR?.let {
-            // 超分开关
-            rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":${currAudienceEnhanceSwitch}, \"mode\": 2}}")
-            if (!currAudienceEnhanceSwitch) {
-                return
+            // pk 中关闭超分
+            val enableSR = currAudienceEnhanceSwitch && SR != SuperResolution.SR_NONE && !isPkMode
+            ShowLogger.d("VideoSetting", "SR_Config -- enable=$enableSR sr_type=$SR currAudienceEnhanceSwitch=$currAudienceEnhanceSwitch")
+
+            if (enableSR) {
+                // 设置最大分辨率
+                rtcEngine.setParameters("{\"rtc.video.sr_max_wh\":921600}")
+                /**
+                 * 超分倍数选项
+                 * 1倍：      n=6
+                 * 1.33倍:   n=7
+                 * 1.5倍：   n=8
+                 * 2倍：     n=3
+                 * 锐化：    n=10(android是10，iOS是11)
+                 */
+                rtcEngine.setParameters("{\"rtc.video.sr_type\":${SR.value}}")
             }
-            // 设置最大分辨率
-            rtcEngine.setParameters("{\"rtc.video.sr_max_wh\":921600}")
-            /**
-             * 超分倍数选项
-             * 1倍：      n=6
-             * 1.33倍:   n=7
-             * 1.5倍：   n=8
-             * 2倍：     n=3
-             * 锐化：    n=10(android是10，iOS是11)
-             */
-            rtcEngine.setParameters("{\"rtc.video.sr_type\":${SR.value}}")
+            // 超分开关
+            rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":$enableSR, \"mode\": 2}}")
         }
     }
 
