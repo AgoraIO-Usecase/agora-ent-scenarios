@@ -107,7 +107,7 @@
     <string name="ktv_song_ordering_person_chorus">合唱：</string>
     <string name="ktv_people">人</string>
     <string name="ktv_music_menu_dialog_mv">MV</string>
-    <string name="ktv_score_formatter" translatable="false">%.2f分</string>
+    <string name="ktv_score_formatter">%s分</string>
     <string name="ktv_beauty_voice">美声</string>
     <string name="ktv_voice_effect">音效</string>
     <string name="ktv_camera">摄像头</string>
