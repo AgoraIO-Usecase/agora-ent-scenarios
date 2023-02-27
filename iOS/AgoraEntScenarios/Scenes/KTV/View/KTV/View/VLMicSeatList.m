@@ -37,13 +37,13 @@
     flowLayOut.scrollDirection = UICollectionViewScrollDirectionVertical;
     
     CGFloat itemW = VLREALVALUE_WIDTH(54);
-    CGFloat middleMargin = (SCREEN_WIDTH-2*27-4*itemW)/3.0;
+    CGFloat middleMargin = (SCREEN_WIDTH - 40 - 2*27 - 4*itemW)/3.0;
     CGFloat itemH = VLREALVALUE_WIDTH(54)+33;
     flowLayOut.itemSize = CGSizeMake(itemW, itemH);
     flowLayOut.minimumInteritemSpacing = middleMargin;
     flowLayOut.minimumLineSpacing = 15;
     
-    self.personCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, itemH*2+15) collectionViewLayout:flowLayOut];
+    self.personCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(20, 0, SCREEN_WIDTH - 40, itemH*2+15) collectionViewLayout:flowLayOut];
     self.personCollectionView.dataSource = self;
     self.personCollectionView.delegate = self;
     self.personCollectionView.alwaysBounceVertical = true;
@@ -51,7 +51,6 @@
     self.personCollectionView.showsVerticalScrollIndicator = false;
     self.personCollectionView.backgroundColor = UIColorClear;
     self.personCollectionView.scrollEnabled = NO;
-    self.personCollectionView.contentInset = UIEdgeInsetsMake(0, 27, 0, 27);
     if (@available(iOS 11, *)) {
         self.personCollectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     }
