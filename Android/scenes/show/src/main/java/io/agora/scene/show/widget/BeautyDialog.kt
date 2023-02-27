@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
@@ -333,10 +334,31 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
 
         mTopBinding.mSwitchMaterial.setOnCheckedChangeListener { btn, isChecked ->
             Log.e("liu0208", "OnCheckedChange    $isChecked")
-            beautyProcessor?.setGreenScreen(isChecked)
-            mGroupList[mBottomBinding.tabLayout.selectedTabPosition].apply {
-                onItemSelected(GROUP_ID_VIRTUAL_BG, itemList[selectedIndex].id)
+            if (isChecked) {
+                AlertDialog.Builder(context, R.style.show_alert_dialog).apply {
+                    setCancelable(false)
+                    setTitle(R.string.show_tip)
+                    setMessage(R.string.show_beauty_green_screen_tip)
+                    setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
+                        changeGreenScreenSwitch(true)
+                        dialog.dismiss()
+                    }
+                    setNegativeButton(R.string.show_setting_cancel) { dialog, _ ->
+                        mTopBinding.mSwitchMaterial.isChecked = false
+                        dialog.dismiss()
+                    }
+                }.create().show()
+                return@setOnCheckedChangeListener
             }
+            changeGreenScreenSwitch(isChecked);
+        }
+    }
+
+    // 修改绿幕开关
+    private fun changeGreenScreenSwitch(isChecked: Boolean) {
+        beautyProcessor?.setGreenScreen(isChecked)
+        mGroupList[mBottomBinding.tabLayout.selectedTabPosition].apply {
+            onItemSelected(GROUP_ID_VIRTUAL_BG, itemList[selectedIndex].id)
         }
     }
 
