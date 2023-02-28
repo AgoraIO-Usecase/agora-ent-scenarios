@@ -623,7 +623,7 @@ class RoomObservableViewDelegate constructor(
                 }
             } else {
                 ainsDialog.updateAnisSoundsAdapter(position, false)
-                onBotMicClick(activity.getString(R.string.voice_chatroom_open_bot_to_sound_effect), finishBack = {})
+                ToastTools.show(activity, activity.getString(R.string.voice_chatroom_open_bot_first))
             }
         }
 
@@ -1019,7 +1019,10 @@ class RoomObservableViewDelegate constructor(
 
     // 更新公告
     fun updateAnnouncement(announcement: String?) {
-        voiceRoomModel.announcement = announcement ?: ""
+        if (voiceRoomModel.announcement != announcement) {
+            voiceRoomModel.announcement = announcement ?: ""
+            ToastTools.show(activity, activity.getString(R.string.voice_chatroom_notice_changed))
+        }
     }
 
     fun onSeatUpdated(attributeMap: Map<String, String>) {

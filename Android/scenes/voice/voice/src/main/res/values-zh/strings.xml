@@ -95,6 +95,7 @@
     <!-- mic -->
     <string name="voice_chatroom_mic_submit_sent">你的请求已提交,等待房主确认</string>
     <string name="voice_chatroom_open_bot_to_sound_effect">添加机器人试听音效？</string>
+    <string name="voice_chatroom_open_bot_first">请房主先激活机器人</string>
     <string name="voice_chatroom_end_live">结束直播？</string>
     <string name="voice_chatroom_end_live_tips">在你离开后房间将会关闭。</string>
     <string name="voice_chatroom_time_up_tips">房间体验时间已耗尽。</string>
@@ -128,6 +129,7 @@
     <string name="voice_chatroom_notice_edit_limit">最多140个字符。</string>
     <string name="voice_chatroom_notice_post">发布</string>
     <string name="voice_chatroom_notice_posted">发布成功</string>
+    <string name="voice_chatroom_notice_changed">房间公告已更新！</string>
     <string name="voice_chatroom_notice_posted_error">发布失败</string>
     <string name="voice_chatroom_join_room_success">已加入语聊房</string>
     <string name="voice_chatroom_join_room_failed">加入语聊房失败</string>
