@@ -1561,6 +1561,8 @@ class LiveDetailFragment : Fragment() {
                 mBinding.videoLinkingAudienceLayout.videoContainer.setOnClickListener {
                     showLinkSettingsDialog()
                 }
+                // 重新连麦，恢复摄像头开启状态
+                mSettingDialog.setItemActivated(SettingDialog.ITEM_ID_VIDEO, true)
                 enableLocalAudio(true)
                 val channelMediaOptions = ChannelMediaOptions()
                 channelMediaOptions.publishCameraTrack = true
