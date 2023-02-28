@@ -377,7 +377,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             if (palette == null) {
                 return;
             }
-            int defaultColor = ContextCompat.getColor(getContext(), R.color.yellow_60);
+            int defaultColor = ContextCompat.getColor(getContext(), R.color.pink_b4);
             mBinding.ilActive.lyricsView.setCurrentHighlightedTextColor(defaultColor);
 
             defaultColor = ContextCompat.getColor(getContext(), R.color.white);

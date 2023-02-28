@@ -30,7 +30,7 @@
         android:paddingTop="4dp"
         android:paddingEnd="10dp"
         android:paddingBottom="10dp"
-        app:currentHighlightedTextColor="#FFE960"
+        app:currentHighlightedTextColor="@color/pink_b4"
         app:currentTextColor="@color/white"
         app:currentTextSize="16sp"
         app:defaultTextSize="14sp"
