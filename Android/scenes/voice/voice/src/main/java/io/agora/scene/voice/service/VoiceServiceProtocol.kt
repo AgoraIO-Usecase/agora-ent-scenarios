@@ -85,9 +85,16 @@ interface VoiceServiceProtocol {
     fun fetchGiftContribute(completion: (error: Int, result: List<VoiceRankUserModel>?) -> Unit)
 
     /**
+     * 获取邀请用户列表
+     */
+    fun fetchRoomInvitedMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit)
+
+    /**
      * 获取用户列表
      */
     fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit)
+
+    fun kickMemberOutOfRoom(chatUidList: MutableList<String>,completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 更新用户列表

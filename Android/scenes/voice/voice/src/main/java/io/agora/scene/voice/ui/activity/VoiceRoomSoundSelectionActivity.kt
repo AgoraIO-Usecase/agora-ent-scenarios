@@ -211,6 +211,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
     private fun goVoiceRoom() {
         curVoiceRoomModel?.let {
             dismissLoading()
+            "apex-wt VoiceRoomSoundSelectionActivity :${it.memberCount}".logD()
             ChatroomLiveActivity.startActivity(this, it)
             // todo 优化
             finishCreateActivity()

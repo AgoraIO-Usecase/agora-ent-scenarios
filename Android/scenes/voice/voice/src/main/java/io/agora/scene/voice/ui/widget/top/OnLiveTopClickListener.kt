@@ -12,7 +12,7 @@ interface OnLiveTopClickListener {
     /**
      * 排行榜
      */
-    fun onClickRank(view: View)
+    fun onClickRank(view: View,pageIndex:Int = 0)
 
     /**
      * 公告
@@ -24,8 +24,4 @@ interface OnLiveTopClickListener {
      */
     fun onClickSoundSocial(view: View)
 
-    /**
-     * 成员数
-     */
-    fun onClickMemberCount(view:View)
 }
