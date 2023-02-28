@@ -1,6 +1,7 @@
 package io.agora.scene.ktv.widget.song;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.scwang.smart.refresh.layout.api.RefreshLayout;
 
 import java.util.List;
 
+import io.agora.scene.base.utils.GsonUtil;
 import io.agora.scene.ktv.R;
 
 /**
@@ -33,15 +35,25 @@ public class ScreenSlidePageFragment extends Fragment {
     private SmartRefreshLayout smartRefreshLayout;
     private RecyclerView rvRankList;
     private OnScreenSlidePageFragmentCallBack callBack;
+    private int position;
     private final SongChooseViewAdapter mRankListAdapter = new SongChooseViewAdapter() {
         @Override
         void onSongChosen(SongItem song, int position) {
+            if (callBack == null) {
+                return;
+            }
             callBack.onClickSongItem(song);
         }
     };
 
-    public ScreenSlidePageFragment(OnScreenSlidePageFragmentCallBack callBack) {
+    public ScreenSlidePageFragment() {
+
+    }
+
+    public ScreenSlidePageFragment setCallBack(OnScreenSlidePageFragmentCallBack callBack, int position) {
         this.callBack = callBack;
+        this.position = position;
+        return this;
     }
 
     @Nullable
@@ -57,9 +69,15 @@ public class ScreenSlidePageFragment extends Fragment {
         rvRankList = view.findViewById(R.id.rvRankList);
         rvRankList.setAdapter(mRankListAdapter);
         smartRefreshLayout.setOnRefreshListener(refreshLayout -> {
+            if (callBack == null) {
+                return;
+            }
             callBack.onRefresh(refreshLayout);
         });
         smartRefreshLayout.setOnLoadMoreListener(refreshLayout -> {
+            if (callBack == null) {
+                return;
+            }
             callBack.onLoadMore(refreshLayout);
         });
     }
@@ -84,6 +102,7 @@ public class ScreenSlidePageFragment extends Fragment {
     }
 
     public void setSongItemStatus(SongItem songItem, boolean isChosen) {
+        Log.e("liu0228", "setSongItemStatus    songItem = " + GsonUtil.getInstance().toJson(songItem) + "    isChosen = " + isChosen);
         int itemCount = mRankListAdapter.getItemCount();
         for (int i = 0; i < itemCount; i++) {
             SongItem item = mRankListAdapter.getItem(i);
@@ -110,5 +129,15 @@ public class ScreenSlidePageFragment extends Fragment {
 
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.e("liu0228", "onDestroyView    " + position);
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.e("liu0228", "onDestroy    " + position);
+    }
 }
