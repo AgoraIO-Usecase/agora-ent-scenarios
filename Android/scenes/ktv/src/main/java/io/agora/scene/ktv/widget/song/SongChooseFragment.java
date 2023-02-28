@@ -58,7 +58,9 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 int position = tab.getPosition();
-                fragments[position].onTabSelected(position);
+                if (fragments[position] != null) {
+                    fragments[position].onTabSelected(position);
+                }
                 onSongsRefreshing(position);
             }
 
@@ -89,12 +91,22 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
             }
 
         };
-        fragments[0] = new ScreenSlidePageFragment(callBack);
-        fragments[1] = new ScreenSlidePageFragment(callBack);
-        fragments[2] = new ScreenSlidePageFragment(callBack);
-        fragments[3] = new ScreenSlidePageFragment(callBack);
-        ScreenSlidePagerAdapter adapter = new ScreenSlidePagerAdapter(getActivity());
-        getBinding().mViewPager2.setAdapter(adapter);
+        getBinding().mViewPager2.setAdapter(new FragmentStateAdapter(getActivity()) {
+            @NonNull
+            @Override
+            public Fragment createFragment(int position) {
+                if (fragments[position] == null) {
+                    fragments[position] = new ScreenSlidePageFragment();
+                }
+                fragments[position].setCallBack(callBack, position);
+                return fragments[position];
+            }
+
+            @Override
+            public int getItemCount() {
+                return fragments.length;
+            }
+        });
         getBinding().mViewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
@@ -112,7 +124,7 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         getBinding().recyclerSearchResult.setAdapter(mSearchAdapter);
 
         Iterator<Runnable> iterator = pendingViewCreatedRuns.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             Runnable next = iterator.next();
             next.run();
         }
@@ -169,17 +181,17 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         getBinding().iBtnClear.setOnClickListener(view -> getBinding().etSearch.setText(""));
     }
 
-    private void runOnViewCreated(Runnable runnable){
+    private void runOnViewCreated(Runnable runnable) {
         View view = getView();
-        if(view == null){
+        if (view == null) {
             pendingViewCreatedRuns.add(runnable);
-        }else{
+        } else {
             runnable.run();
         }
     }
 
-    int getCurrentTabIndex(){
-        if(getView() == null){
+    int getCurrentTabIndex() {
+        if (getView() == null) {
             return 0;
         }
         return getBinding().tabLayout.getSelectedTabPosition();
@@ -194,7 +206,6 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
             if (tabAt != null) {
                 getBinding().tabLayout.selectTab(tabAt);
             }
-
 
 
         });
@@ -213,6 +224,9 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
             }
         } else {
             for (ScreenSlidePageFragment fragment : fragments) {
+                if (fragment == null) {
+                    continue;
+                }
                 fragment.setSongItemStatus(songItem, isChosen);
             }
         }
@@ -233,18 +247,22 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         } else {
             getBinding().llEmpty.setVisibility(View.GONE);
         }
-        fragments[index].setRefreshingResult(list);
+        if (fragments[index] != null) {
+            fragments[index].setRefreshingResult(list);
+        }
         enableTabLayoutClick(true);
     }
 
     void setLoadMoreResult(List<SongItem> list, boolean hasMore, int index) {
-        fragments[index].setLoadMoreResult(list, hasMore);
+        if (fragments[index] != null) {
+            fragments[index].setLoadMoreResult(list, hasMore);
+        }
         enableTabLayoutClick(true);
     }
 
-    private void enableTabLayoutClick(boolean enable){
+    private void enableTabLayoutClick(boolean enable) {
         KtvFragmentSongListBinding binding = getBinding();
-        if(binding == null){
+        if (binding == null) {
             return;
         }
         TabLayout tabLayout = binding.tabLayout;
@@ -254,14 +272,14 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
     }
 
 
-    private void onSongItemChosen(@NonNull SongItem songItem){
-        if(listener != null){
+    private void onSongItemChosen(@NonNull SongItem songItem) {
+        if (listener != null) {
             listener.onSongItemChosen(songItem);
         }
     }
 
-    private void onSongsSearching(String condition){
-        if(listener != null){
+    private void onSongsSearching(String condition) {
+        if (listener != null) {
             listener.onSongsSearching(condition);
         }
     }
@@ -274,9 +292,9 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         getBinding().mViewPager2.setCurrentItem(tagIndex);
     }
 
-    private void onSongsLoadMore(int tagIndex){
+    private void onSongsLoadMore(int tagIndex) {
         enableTabLayoutClick(false);
-        if(listener != null){
+        if (listener != null) {
             listener.onSongsLoadMore(tagIndex);
         }
     }
@@ -287,29 +305,11 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
 
     interface Listener {
         void onSongItemChosen(@NonNull SongItem songItem);
+
         void onSongsSearching(String condition);
+
         void onSongsRefreshing(int tagIndex);
+
         void onSongsLoadMore(int tagIndex);
     }
-
-    private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
-
-        public ScreenSlidePagerAdapter(FragmentActivity fragmentActivity) {
-            super(fragmentActivity);
-        }
-
-        @Override
-        public Fragment createFragment(int position) {
-            if (fragments[position] == null) {
-
-            }
-            return fragments[position];
-        }
-
-        @Override
-        public int getItemCount() {
-            return fragments.length;
-        }
-    }
-
 }
