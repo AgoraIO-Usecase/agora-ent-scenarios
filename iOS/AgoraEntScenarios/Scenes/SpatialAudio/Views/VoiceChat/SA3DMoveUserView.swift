@@ -124,7 +124,7 @@ class SA3DMoveUserView: UIView {
 
     public var tapClickBlock:(() -> Void)?
     
-    var angle: Double = 270 {
+    var angle: Double = 180 {
         didSet {
             let value = (angle - 90) / 180.0 * Double.pi
             UIView.animate(withDuration: 0.25, delay: 0, options: .curveLinear) {

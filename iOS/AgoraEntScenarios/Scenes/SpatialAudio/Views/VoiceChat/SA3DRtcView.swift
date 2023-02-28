@@ -435,14 +435,14 @@ extension SA3DRtcView {
                 
             default:
                 if info.member?.uid == VLUserCenter.user.id {
-                    rtcKit?.updateSpetialPostion(position: info.pos ?? [0, 0, 0],
-                                                 axisForward: info.forward ?? [0, 1, 0],
-                                                 axisRight: info.right ?? [1, 0, 0],
+                    rtcKit?.updateSpetialPostion(position: info.pos ?? [0 ,0 ,0],
+                                                 axisForward: info.forward ?? [1, 0, 0],
+                                                 axisRight: info.right ?? [0, 1, 0],
                                                  axisUp: info.up)
                 } else {
                     rtcKit?.updateRemoteSpetialPostion(uid: info.member?.uid,
-                                                       position: info.pos ??  [0, 0, 0],
-                                                       forward: info.forward ?? [0, 1, 0])
+                                                       position: info.pos ?? [0, 0, 0],
+                                                       forward: info.forward ?? [1, 0, 0])
                 }
             }
         })
@@ -647,6 +647,7 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
     func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         if state == .playing {
             updateSpatialPos()
+            updateCenterUserPosition()
         }
     }
 }
