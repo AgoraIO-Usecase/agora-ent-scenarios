@@ -17,6 +17,12 @@ public enum MicRequestStatus: Int, ConvertibleEnum {
     case ended      // 已结束
 }
 
+public enum UserMicStatus: Int, ConvertibleEnum {
+    case none = -1
+    case unMute = 0
+    case mute = 1
+}
+
 @objcMembers open class SAUser: NSObject, Convertible {
     public var uid: String?
     public var chat_uid: String?
@@ -28,6 +34,7 @@ public enum MicRequestStatus: Int, ConvertibleEnum {
     public var mic_index: Int?
     public var rtc_uid: String?
     public var volume: Int = 0 // 麦克风音量
+    public var mic_status: UserMicStatus = .none // -1: None 0:正常状态 1:闭麦
     
     public var objectId: String?
     public var status: MicRequestStatus = .idle

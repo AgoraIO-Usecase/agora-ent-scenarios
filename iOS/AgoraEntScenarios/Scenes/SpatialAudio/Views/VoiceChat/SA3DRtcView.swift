@@ -8,12 +8,6 @@
 import UIKit
 import AgoraRtcKit
 
-private enum SATouchState {
-    case began
-    case moved
-    case ended
-}
-
 class SA3DRtcView: UIView {
     private var collectionView: UICollectionView!
     private let vIdentifier = "3D"
@@ -24,10 +18,7 @@ class SA3DRtcView: UIView {
     private var lastPrePoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275~)
     private var lastCenterPoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275~)
     private var lastMovedPoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275~)
-    private var touchState: SATouchState = .began
-    
-//    private var redMediaPlayer: AgoraRtcMediaPlayerProtocol?
-//    private var blueMediaPlayer: AgoraRtcMediaPlayerProtocol?
+
     private var panGesture: UIPanGestureRecognizer?
     private var lastTime: CFAbsoluteTime = CFAbsoluteTimeGetCurrent()
     private lazy var redSpatialParams = AgoraSpatialAudioParams()
@@ -143,7 +134,7 @@ class SA3DRtcView: UIView {
         let indexPath = IndexPath(item: realIndex, section: 0)
         if realIndex != 3 {
             DispatchQueue.main.async {[weak self] in
-                guard let cell: SA3DUserCollectionViewCell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
+                guard let cell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
                 cell.refreshUser(with: mic)
             }
         } else {
@@ -205,7 +196,6 @@ class SA3DRtcView: UIView {
                                                position: pos,
                                                forward: realPosition.0)
         }
-        print("pos == \(pos)  forward == \(realPosition.0) right == \(realPosition.1) angle == \(rtcUserView.angle)")
         return realPosition.0.map({ $0.doubleValue })
     }
     
@@ -339,7 +329,7 @@ extension SA3DRtcView {
         rtcUserView.center = CGPoint(x: moveCenter.x, y: moveCenter.y)
         pan.setTranslation(.zero, in: self)
         
-        let forward = self.updateCenterUserPosition()
+        let forward = updateCenterUserPosition()
         let pos = viewCenterPostion(view: rtcUserView)
         DispatchQueue.global().async {
             let currentTime = CFAbsoluteTimeGetCurrent()
