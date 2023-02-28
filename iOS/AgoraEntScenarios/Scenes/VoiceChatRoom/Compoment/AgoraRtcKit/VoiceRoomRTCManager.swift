@@ -472,7 +472,8 @@ public let kMPK_RTC_UID: UInt = 1
         } else if type == .ainsOff {
             path = AgoraConfig.NoneSound[index]
         }
-        path = path.replacingOccurrences(of: "CN", with: LanguageManager.localValue(key: "Lau"))
+        let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized() : "EN"
+        path = path.replacingOccurrences(of: "CN", with: lanuagePath)
         rtcKit.startAudioMixing(path, loopback: false, cycle: 1)
     }
 
