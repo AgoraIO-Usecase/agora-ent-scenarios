@@ -7,8 +7,6 @@ import android.widget.CompoundButton
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
-import io.agora.ValueCallBack
-import io.agora.chat.ChatRoom
 import io.agora.scene.voice.R
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.bean.ChatMessageData
@@ -26,7 +24,6 @@ import io.agora.scene.voice.ui.dialog.*
 import io.agora.scene.voice.ui.dialog.common.CommonFragmentAlertDialog
 import io.agora.scene.voice.ui.dialog.common.CommonFragmentContentDialog
 import io.agora.scene.voice.ui.dialog.common.CommonSheetAlertDialog
-import io.agora.scene.voice.ui.dialog.common.CommonSheetSingleDialog
 import io.agora.scene.voice.ui.widget.mic.IRoomMicView
 import io.agora.scene.voice.ui.widget.primary.ChatPrimaryMenuView
 import io.agora.scene.voice.ui.widget.top.IRoomLiveTopView
@@ -38,7 +35,6 @@ import io.agora.voice.common.net.Resource
 import io.agora.voice.common.ui.IParserSource
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.LogTools.e
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
@@ -1014,6 +1010,15 @@ class RoomObservableViewDelegate constructor(
                 }
                 ThreadManager.getInstance().runOnMainThread {
                     iRoomTopView.onRankMember(rankUsers)
+                }
+            }
+        } else if(attributeMap.containsKey("member_list")){
+            val memberList = GsonTools.toList(attributeMap["member_list"], VoiceMemberModel::class.java)
+            memberList?.let { members ->
+                members.forEach { member ->
+                    if (!member.chatUid.equals(voiceRoomModel.owner?.chatUid)){
+                        ChatroomCacheManager.cacheManager.setMemberList(member)
+                    }
                 }
             }
         } else {
