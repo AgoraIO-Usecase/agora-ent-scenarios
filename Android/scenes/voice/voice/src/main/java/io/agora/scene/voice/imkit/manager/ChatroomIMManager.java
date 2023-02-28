@@ -44,6 +44,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     private static ChatroomIMManager instance;
     private ChatroomIMManager(){}
     private String chatroomId;
+    private boolean isOwner;
     private ArrayList<ChatMessageData> data = new ArrayList<>();
     public OnChatroomEventReceiveListener chatroomEventListener;
     public OnChatroomConnectionListener chatroomConnectionListener;
@@ -66,8 +67,9 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * 需要在详情页时候初始化，防止chatroomId为空或不正确
      * @param chatroomId
      */
-    public void init(String chatroomId) {
+    public void init(String chatroomId,boolean isOwner) {
         this.chatroomId = chatroomId;
+        this.isOwner = isOwner;
         //设置消息监听
         setCustomMsgListener();
         //设置聊天室状态变化监听
@@ -81,7 +83,9 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         clearCache();
     }
 
-
+    public boolean isOwner(){
+        return this.isOwner;
+    }
     public String getCurrentRoomId() {
         return this.chatroomId;
     }
