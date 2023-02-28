@@ -108,7 +108,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     func onUserBeKicked(roomId: String, reason: ChatRoomServiceKickedReason) {
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
         let message = reason.errorDesc()
-        self.view.window?.makeToast(message)
+        if !self.isOwner {
+            self.view.window?.makeToast(message)
+        }
         if reason == .destroyed {
             NotificationCenter.default.post(name: NSNotification.Name("refreshList"), object: nil)
         }

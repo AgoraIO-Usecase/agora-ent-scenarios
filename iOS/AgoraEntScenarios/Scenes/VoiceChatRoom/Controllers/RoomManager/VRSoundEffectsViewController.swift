@@ -68,7 +68,7 @@ public class VRSoundEffectsViewController: VRBaseViewController {
             if room_id.isEmpty {
                 SVProgressHUD.dismiss()
                 self.view.window?.isUserInteractionEnabled = true
-                self.view.window?.makeToast("Create chatroom failed!Please input compliant name.")
+                self.view.window?.makeToast("illegal check".localized())
                 ChatRoomServiceImp.getSharedInstance().leaveRoom(entity.room_id ?? "") { error, value in
                 }
                 self.backAction()

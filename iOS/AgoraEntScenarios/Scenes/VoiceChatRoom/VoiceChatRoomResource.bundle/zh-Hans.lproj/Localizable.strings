@@ -78,7 +78,7 @@
 "Crown"="皇冠";
 "Rocket"="火箭";
 "Wand"="魔法棒";
-"4 Digit Password Required"="需要4位数密码";
+"4 Digit Password Required"="请输入4位数密码";
 "Incorrect Password"="密码错误，请重试";
 "Room Created"="已创建";
 "Notice Posted"="已发布";
@@ -234,3 +234,7 @@
 "Close Bot" = "关闭机器人";
 "Other Settings" = "其他设置";
 "Welcome" = "欢迎";
+"You were kicked off from the room" = "您已被移出房间";
+"This room has been dissolved by the host" = "本房间已被房主解散";
+"you were offline!" = "您已离线";
+"illegal check" = "不能有违反相关法律法规和政策的内容，请重新编辑";
