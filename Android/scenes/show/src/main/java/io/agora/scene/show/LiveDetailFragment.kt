@@ -722,13 +722,13 @@ class LiveDetailFragment : Fragment() {
                     mRtcVideoSwitcher.stopAudioMixing(mMainRtcConnection)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY -> {
-                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/happy.wav", false, -1)
+                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/happy.mp3", false, -1)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_ROMANTIC -> {
-                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/romantic.wav", false, -1)
+                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/romantic.mp3", false, -1)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY2 -> {
-                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/relax.wav", false, -1)
+                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/relax.mp3", false, -1)
                 }
 
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_ORIGINAL -> {
