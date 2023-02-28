@@ -125,7 +125,7 @@ class ShowBeautySettingVC: UIViewController {
                 self.slider.isHidden = isShowSegSwitch ? !ShowAgoraKitManager.isOpenGreen : isHiddenValue
                 self.compareButton.isHidden = isShowSegSwitch ? true : isHiddenValue
                 self.segSwitch.isHidden = !isShowSegSwitch
-                self.segSwitch.isOn = isShowSegSwitch == false ? false : self.segSwitch.isOn
+                self.segSwitch.isOn = isShowSegSwitch == false ? ShowAgoraKitManager.isOpenGreen : self.segSwitch.isOn
                 self.segLabel.isHidden = !isShowSegSwitch
                 self.slider.setValue(Float(value), animated: true)
             }

@@ -715,6 +715,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _onStartInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
+            self.muteLocalVideo = false
+            self.muteLocalAudio = false
             let interactionRoomId = interaction.roomId
             if interactionRoomId.isEmpty { return }
             if roomId != interaction.roomId {
@@ -739,6 +741,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             }
         case .onSeat:
+            self.muteLocalVideo = false
+            self.muteLocalAudio = false
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             let role: AgoraClientRole = (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : .audience
@@ -1042,7 +1046,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
 extension ShowLiveViewController {
     
     private func resetRealTimeIfNeeded() {
-        if role == .broadcaster && interactionStatus != .pking {
+        if role == .broadcaster && interactionStatus != .pking && interactionStatus != .onSeat {
             realTimeView.cleanRemoteDescription()
         }
     }
