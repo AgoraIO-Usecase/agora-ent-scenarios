@@ -1,5 +1,6 @@
 package io.agora.scene.show
 
+import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.*
 import io.agora.scene.base.Constant
 import io.agora.scene.base.utils.GsonUtil
@@ -234,19 +235,26 @@ object VideoSetting {
     private var currBroadcastSetting: BroadcastSetting = getCurrBroadcastSetting()
 
     // 当前观众设备等级（高、中、低）
-    private var currAudienceDeviceLevel: DeviceLevel = DeviceLevel.valueOf(SPUtil.getString(Constant.CURR_AUDIENCE_DEVICE_LEVEL, DeviceLevel.Low.toString()))
+    private var currAudienceDeviceLevel: DeviceLevel = DeviceLevel.valueOf(
+        SPUtil.getString(
+            Constant.CURR_AUDIENCE_DEVICE_LEVEL,
+            DeviceLevel.Low.toString()
+        )
+    )
 
     // 观众看播设置
-    private var currAudiencePlaySetting: Int = SPUtil.getInt(Constant.CURR_AUDIENCE_PLAY_SETTING, AudiencePlaySetting.BASE_LOW)
+    private var currAudiencePlaySetting: Int =
+        SPUtil.getInt(Constant.CURR_AUDIENCE_PLAY_SETTING, AudiencePlaySetting.BASE_LOW)
 
     // 超分开关
-    private var currAudienceEnhanceSwitch = SPUtil.getBoolean(Constant.CURR_AUDIENCE_ENHANCE_SWITCH, true)
+    private var currAudienceEnhanceSwitch =
+        SPUtil.getBoolean(Constant.CURR_AUDIENCE_ENHANCE_SWITCH, true)
 
     // 是否在pk 模式中，pk 中观众不开启超分
     @Volatile
     private var isPkMode: Boolean = false
 
-    fun setIsPkMode(isPkMode:Boolean){
+    fun setIsPkMode(isPkMode: Boolean) {
         this.isPkMode = isPkMode
     }
 
@@ -255,8 +263,7 @@ object VideoSetting {
         val jsonStr = SPUtil.getString(Constant.CURR_AUDIENCE_SETTING, "")
         try {
             return GsonUtil.getInstance().fromJson(jsonStr, AudienceSetting::class.java)
-        }
-        catch (e: java.lang.Exception) {
+        } catch (e: java.lang.Exception) {
             val result = AudienceSetting(AudienceSetting.Video(SuperResolution.SR_NONE))
             setCurrAudienceSetting(result)
             return result
@@ -267,8 +274,7 @@ object VideoSetting {
         val jsonStr = SPUtil.getString(Constant.CURR_BROADCAST_SETTING, "")
         try {
             return GsonUtil.getInstance().fromJson(jsonStr, BroadcastSetting::class.java)
-        }
-        catch (e: java.lang.Exception) {
+        } catch (e: java.lang.Exception) {
             val result = RecommendBroadcastSetting.LowDevice1v1
             setCurrBroadcastSetting(result)
             return result
@@ -285,7 +291,10 @@ object VideoSetting {
     }
 
     fun setCurrBroadcastSetting(broadcastSetting: BroadcastSetting) {
-        SPUtil.putString(Constant.CURR_BROADCAST_SETTING, GsonUtil.instance.toJson(broadcastSetting))
+        SPUtil.putString(
+            Constant.CURR_BROADCAST_SETTING,
+            GsonUtil.instance.toJson(broadcastSetting)
+        )
         currBroadcastSetting = broadcastSetting
     }
 
@@ -311,11 +320,13 @@ object VideoSetting {
     }
 
     fun resetBroadcastSetting() {
-        setCurrBroadcastSetting(when (currAudienceDeviceLevel) {
-            DeviceLevel.Low -> RecommendBroadcastSetting.LowDevice1v1
-            DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevice1v1
-            DeviceLevel.High -> RecommendBroadcastSetting.HighDevice1v1
-        })
+        setCurrBroadcastSetting(
+            when (currAudienceDeviceLevel) {
+                DeviceLevel.Low -> RecommendBroadcastSetting.LowDevice1v1
+                DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevice1v1
+                DeviceLevel.High -> RecommendBroadcastSetting.HighDevice1v1
+            }
+        )
     }
 
     fun updateAudienceSetting(
@@ -327,11 +338,21 @@ object VideoSetting {
     }
 
     fun updateAudioSetting(isJoinedRoom: Boolean = false, SR: SuperResolution? = null) {
-        setCurrAudienceSetting(AudienceSetting(AudienceSetting.Video(SR ?: currAudienceSetting.video.SR)))
+        setCurrAudienceSetting(
+            AudienceSetting(
+                AudienceSetting.Video(
+                    SR ?: currAudienceSetting.video.SR
+                )
+            )
+        )
         updateRTCAudioSetting(isJoinedRoom, SR)
     }
 
-    fun updateBroadcastSetting(deviceLevel: DeviceLevel, isJoinedRoom: Boolean = false, isByAudience: Boolean = false) {
+    fun updateBroadcastSetting(
+        deviceLevel: DeviceLevel,
+        isJoinedRoom: Boolean = false,
+        isByAudience: Boolean = false
+    ) {
         var liveMode = LiveMode.OneVOne
         if (isByAudience) {
             setCurrAudienceDeviceLevel(deviceLevel)
@@ -360,7 +381,11 @@ object VideoSetting {
         )
     }
 
-    fun updateBroadcastSetting(liveMode: LiveMode, isJoinedRoom: Boolean = true) {
+    fun updateBroadcastSetting(
+        liveMode: LiveMode,
+        isJoinedRoom: Boolean = true,
+        rtcConnection: RtcConnection? = null
+    ) {
         val deviceLevel = when (currBroadcastSetting) {
             RecommendBroadcastSetting.LowDevice1v1, RecommendBroadcastSetting.LowDevicePK -> DeviceLevel.Low
             RecommendBroadcastSetting.MediumDevice1v1, RecommendBroadcastSetting.MediumDevicePK -> DeviceLevel.Medium
@@ -381,13 +406,19 @@ object VideoSetting {
                     DeviceLevel.High -> RecommendBroadcastSetting.HighDevicePK
                 }
             },
-            isJoinedRoom
+            isJoinedRoom,
+            rtcConnection
         )
     }
 
-    private fun updateBroadcastSetting(recommendSetting: BroadcastSetting, isJoinedRoom: Boolean) {
+    private fun updateBroadcastSetting(
+        recommendSetting: BroadcastSetting,
+        isJoinedRoom: Boolean,
+        rtcConnection: RtcConnection? = null
+    ) {
         setCurrBroadcastSetting(recommendSetting)
         updateRTCBroadcastSetting(
+            rtcConnection,
             isJoinedRoom,
             currBroadcastSetting.video.H265,
             currBroadcastSetting.video.colorEnhance,
@@ -406,6 +437,7 @@ object VideoSetting {
     }
 
     fun updateBroadcastSetting(
+        rtcConnection: RtcConnection? = null,
         isJoinedRoom: Boolean = true,
 
         h265: Boolean? = null,
@@ -422,26 +454,29 @@ object VideoSetting {
         recordingSignalVolume: Int? = null,
         audioMixingVolume: Int? = null
     ) {
-        setCurrBroadcastSetting(BroadcastSetting(
-            BroadcastSetting.Video(
-                h265 ?: currBroadcastSetting.video.H265,
-                colorEnhance ?: currBroadcastSetting.video.colorEnhance,
-                lowLightEnhance ?: currBroadcastSetting.video.lowLightEnhance,
-                videoDenoiser ?: currBroadcastSetting.video.videoDenoiser,
-                PVC ?: currBroadcastSetting.video.PVC,
-                captureResolution ?: currBroadcastSetting.video.captureResolution,
-                encoderResolution ?: currBroadcastSetting.video.encodeResolution,
-                frameRate ?: currBroadcastSetting.video.frameRate,
-                bitRate ?: currBroadcastSetting.video.bitRate
-            ),
-            BroadcastSetting.Audio(
-                inEarMonitoring ?: currBroadcastSetting.audio.inEarMonitoring,
-                recordingSignalVolume ?: currBroadcastSetting.audio.recordingSignalVolume,
-                audioMixingVolume ?: currBroadcastSetting.audio.audioMixingVolume
+        setCurrBroadcastSetting(
+            BroadcastSetting(
+                BroadcastSetting.Video(
+                    h265 ?: currBroadcastSetting.video.H265,
+                    colorEnhance ?: currBroadcastSetting.video.colorEnhance,
+                    lowLightEnhance ?: currBroadcastSetting.video.lowLightEnhance,
+                    videoDenoiser ?: currBroadcastSetting.video.videoDenoiser,
+                    PVC ?: currBroadcastSetting.video.PVC,
+                    captureResolution ?: currBroadcastSetting.video.captureResolution,
+                    encoderResolution ?: currBroadcastSetting.video.encodeResolution,
+                    frameRate ?: currBroadcastSetting.video.frameRate,
+                    bitRate ?: currBroadcastSetting.video.bitRate
+                ),
+                BroadcastSetting.Audio(
+                    inEarMonitoring ?: currBroadcastSetting.audio.inEarMonitoring,
+                    recordingSignalVolume ?: currBroadcastSetting.audio.recordingSignalVolume,
+                    audioMixingVolume ?: currBroadcastSetting.audio.audioMixingVolume
+                )
             )
-        ))
+        )
 
         updateRTCBroadcastSetting(
+            rtcConnection,
             isJoinedRoom,
             h265,
             colorEnhance,
@@ -470,12 +505,16 @@ object VideoSetting {
 
 
     private fun updateRTCAudioSetting(
-        isJoinedRoom: Boolean, SR: SuperResolution? = null) {
+        isJoinedRoom: Boolean, SR: SuperResolution? = null
+    ) {
         val rtcEngine = RtcEngineInstance.rtcEngine
         SR?.let {
             // pk 中关闭超分
             val enableSR = currAudienceEnhanceSwitch && SR != SuperResolution.SR_NONE && !isPkMode
-            ShowLogger.d("VideoSetting", "SR_Config -- enable=$enableSR sr_type=$SR currAudienceEnhanceSwitch=$currAudienceEnhanceSwitch")
+            ShowLogger.d(
+                "VideoSetting",
+                "SR_Config -- enable=$enableSR sr_type=$SR currAudienceEnhanceSwitch=$currAudienceEnhanceSwitch"
+            )
 
             if (enableSR) {
                 // 设置最大分辨率
@@ -497,6 +536,7 @@ object VideoSetting {
 
 
     private fun updateRTCBroadcastSetting(
+        rtcConnection: RtcConnection? = null,
         isJoinedRoom: Boolean,
 
         h265: Boolean? = null,
@@ -546,15 +586,27 @@ object VideoSetting {
         encoderResolution?.let {
             videoEncoderConfiguration.dimensions =
                 VideoEncoderConfiguration.VideoDimensions(it.width, it.height)
-            rtcEngine.setVideoEncoderConfiguration(videoEncoderConfiguration)
+            if (rtcConnection != null) {
+                rtcEngine.setVideoEncoderConfigurationEx(videoEncoderConfiguration, rtcConnection)
+            } else {
+                rtcEngine.setVideoEncoderConfiguration(videoEncoderConfiguration)
+            }
         }
         frameRate?.let {
             videoEncoderConfiguration.frameRate = it.fps
-            rtcEngine.setVideoEncoderConfiguration(videoEncoderConfiguration)
+            if (rtcConnection != null) {
+                rtcEngine.setVideoEncoderConfigurationEx(videoEncoderConfiguration, rtcConnection)
+            } else {
+                rtcEngine.setVideoEncoderConfiguration(videoEncoderConfiguration)
+            }
         }
         bitRate?.let {
             videoEncoderConfiguration.bitrate = it
-            rtcEngine.setVideoEncoderConfiguration(videoEncoderConfiguration)
+            if (rtcConnection != null) {
+                rtcEngine.setVideoEncoderConfigurationEx(videoEncoderConfiguration, rtcConnection)
+            } else {
+                rtcEngine.setVideoEncoderConfiguration(videoEncoderConfiguration)
+            }
         }
 
         inEarMonitoring?.let {
