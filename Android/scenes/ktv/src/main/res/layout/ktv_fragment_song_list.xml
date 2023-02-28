@@ -64,30 +64,12 @@
 
     </LinearLayout>
 
-    <com.scwang.smart.refresh.layout.SmartRefreshLayout
-        android:id="@+id/smart_refresh_layout"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/mViewPager2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/hScrollView">
-
-        <com.scwang.smart.refresh.header.ClassicsHeader
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvRankList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:overScrollMode="never"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            app:spanCount="1"
-            tools:listitem="@layout/ktv_item_choose_song_list" />
-
-        <com.scwang.smart.refresh.footer.ClassicsFooter
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
+        app:layout_constraintTop_toBottomOf="@id/hScrollView" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerSearchResult"
