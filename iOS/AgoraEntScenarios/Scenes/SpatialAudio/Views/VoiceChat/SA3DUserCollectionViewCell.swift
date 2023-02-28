@@ -31,7 +31,11 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
     }
 
     public func refreshUser(with mic: SARoomMic) {
-        let status = mic.status
+        var status = mic.status
+        let user_mic_status = mic.member?.mic_status ?? .none
+        if user_mic_status == .mute {
+            status = 1
+        }
         var bgIcon = ""
         switch status {
         case -1:

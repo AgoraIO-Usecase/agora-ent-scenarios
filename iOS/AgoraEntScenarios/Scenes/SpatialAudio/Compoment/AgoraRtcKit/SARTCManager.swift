@@ -857,6 +857,8 @@ extension SARTCManager: AgoraRtcMediaPlayerDelegate {
                 baseMusicCount += 1
             }
         }
-        playerDelegate?.didMPKChangedTo?(playerKit, state: state, error: error)
+        DispatchQueue.main.async {
+            self.playerDelegate?.didMPKChangedTo?(playerKit, state: state, error: error)
+        }
     }
 }

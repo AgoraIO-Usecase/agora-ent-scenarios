@@ -245,15 +245,12 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
             sRtcView.updateUser(last)
         } else {
             if let first = mics.first {
-                let status = first.status
+                let status = first.member?.mic_status == .mute ? 1 : first.status
                 let mic_index = first.mic_index
                 //刷新底部✋🏻状态
-                if !isOwner {
+                if !isOwner && status < 1 {
                     refreshHandsUp(status: status)
                 }
-                //                if fromId != self.roomInfo?.room?.owner?.chat_uid ?? "",!isOwner {
-                //                    refreshHandsUp(status: status)
-                //                }
                 //将userList中的上麦用户做标记，便于后续过滤
                 var micUser = AppContext.saTmpServiceImp().userList.first(where: {
                     $0.chat_uid ?? "" == fromId

@@ -490,10 +490,11 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         guard let mic = self.mics[safe: mic_index] else {
             return
         }
-        mic.status = 1
+//        mic.status = 1
+        mic.member?.mic_status = .mute
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
             if error == nil {
-                self.mics[safe: mic_index]?.status = 1
+                self.mics[safe: mic_index]?.member?.mic_status = .mute
             }
             completion(error, mic)
         }
@@ -503,10 +504,11 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         guard let mic = self.mics[safe: mic_index] else {
             return
         }
-        mic.status = 0
+//        mic.status = 0
+        mic.member?.mic_status = .unMute
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
             if error == nil {
-                self.mics[safe: mic_index]?.status = 0
+                self.mics[safe: mic_index]?.member?.mic_status = .unMute
             }
             completion(error, mic)
         }
@@ -531,10 +533,10 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         old_mic.mic_index = old_index
         
         let new_mic = SARoomMic()
-        new_mic.objectId = self.mics[new_index].objectId
-        switch self.mics[new_index].status {
+        new_mic.objectId = mics[new_index].objectId
+        switch mics[new_index].status {
         case 2:
-            new_mic.status = self.mics[new_index].status
+            new_mic.status = 2
         case 3,4:
             completion(SAErrorType.unknown("changeMic", "new_mic idx[\(new_index)] status = 3/4").error(), nil)
             return
@@ -542,7 +544,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             new_mic.status = 0
         }
         new_mic.mic_index = new_index
-        new_mic.member = SAUserInfo.shared.user
+        new_mic.member = mics[old_index].member
         
         let impGroup = DispatchGroup()
         impGroup.enter()
