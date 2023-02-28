@@ -88,9 +88,8 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
             parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
                 override fun onSuccess(data: List<VoiceMemberModel>?) {
                     finishRefresh()
-                    val total = data?.size ?: 0
-                    adapter?.data = data ?: mutableListOf()
-                    onFragmentListener?.getItemCount(total)
+                    adapter?.data = data?.filter { it.micIndex == -1 }
+                    onFragmentListener?.getItemCount(adapter?.data?.size ?: 0)
                     isRefreshing = false
                     adapter?.data?.let {
                         for (datum in it) {

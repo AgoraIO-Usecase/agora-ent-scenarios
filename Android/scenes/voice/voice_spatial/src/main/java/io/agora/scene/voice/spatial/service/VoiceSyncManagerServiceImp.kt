@@ -500,7 +500,7 @@ class VoiceSyncManagerServiceImp(
         val index = micIndex ?: return
         userInfo.micIndex = index
         userInfo.status = MicRequestStatus.waitting.value
-        innerUpdateUserRoomRequestStatus(userInfo, {
+        innerUpdateUserInfo(userInfo, {
             completion.invoke(VoiceServiceProtocol.ERR_OK, true)
         }, {})
     }
@@ -511,10 +511,11 @@ class VoiceSyncManagerServiceImp(
     override fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         val userInfo = userMap[VoiceBuddyFactory.get().getVoiceBuddy().userId()] ?: return
         userInfo.status = MicRequestStatus.accepted.value
-        innerUpdateUserRoomRequestStatus(userInfo, {
-            val micIndex = selectEmptySeat(userInfo.micIndex)
+        val micIndex = selectEmptySeat(userInfo.micIndex)
+        userInfo.micIndex = micIndex
+        innerUpdateUserInfo(userInfo, {
             if (micSeatMap.containsKey(micIndex.toString()) && micSeatMap[micIndex.toString()]?.member != null) {
-                return@innerUpdateUserRoomRequestStatus
+                return@innerUpdateUserInfo
             }
             val targetSeatInfo = innerGenerateDefaultSeatInfo(micIndex,
                 userInfo.userId!!
@@ -535,7 +536,7 @@ class VoiceSyncManagerServiceImp(
     override fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit) {
         val userInfo = userMap[VoiceBuddyFactory.get().getVoiceBuddy().userId()] ?: return
         userInfo.status = MicRequestStatus.idle.value
-        innerUpdateUserRoomRequestStatus(userInfo, {
+        innerUpdateUserInfo(userInfo, {
             completion.invoke(VoiceServiceProtocol.ERR_OK, true)
         }, {})
     }
@@ -772,7 +773,7 @@ class VoiceSyncManagerServiceImp(
                         val userInfo = originInfo.member ?: return@innerUpdateSeat
                         userInfo.micIndex = -1
                         userInfo.status = MicRequestStatus.idle.value
-                        innerUpdateUserRoomRequestStatus(userInfo, {
+                        innerUpdateUserInfo(userInfo, {
                             completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
                         }, {
                             completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
@@ -805,7 +806,7 @@ class VoiceSyncManagerServiceImp(
                         val userInfo = originInfo.member ?: return@innerUpdateSeat
                         userInfo.micIndex = -1
                         userInfo.status = MicRequestStatus.idle.value
-                        innerUpdateUserRoomRequestStatus(userInfo, {
+                        innerUpdateUserInfo(userInfo, {
                             completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
                         }, {
                             completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
@@ -830,8 +831,7 @@ class VoiceSyncManagerServiceImp(
     ) {
         if (micSeatMap.containsKey(oldIndex.toString())) {
             val originInfo = micSeatMap[oldIndex.toString()]
-            if (originInfo?.member != null) {
-                // 麦上有人
+            if (originInfo?.member != null) { // 麦上有人
                 val oldSeatInfo = VoiceMicInfoModel().apply {
                     this.micIndex = oldIndex
                     member = null
@@ -850,6 +850,9 @@ class VoiceSyncManagerServiceImp(
                             } else {
                                 completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                             }
+                        }
+                        newSeatInfo.member?.let { m ->
+                            innerUpdateUserInfo(m, {}, {})
                         }
                     } else {
                         completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
@@ -1074,7 +1077,7 @@ class VoiceSyncManagerServiceImp(
             })
     }
 
-    private fun innerUpdateUserRoomRequestStatus(
+    private fun innerUpdateUserInfo(
         user: VoiceMemberModel,
         success: () -> Unit,
         error: (Exception) -> Unit
@@ -1086,7 +1089,6 @@ class VoiceSyncManagerServiceImp(
                 override fun onSuccess() {
                     success.invoke()
                 }
-
                 override fun onFail(exception: SyncManagerException?) {
                     error.invoke(exception!!)
                 }
@@ -1271,13 +1273,13 @@ class VoiceSyncManagerServiceImp(
 
     // ----------------------------- 麦位状态 -----------------------------
     private fun innerGenerateDefaultSeatInfo(index: Int, uid: String) : VoiceMicInfoModel {
-        val oldSeatInfo = micSeatMap[index.toString()]
+        val seatInfo = micSeatMap[index.toString()]
         var mem: VoiceMemberModel? = null
         var micState = MicStatus.Idle
         if (userMap.containsKey(uid)) {
             mem = userMap[uid]
             mem?.micIndex = index
-            micState = oldSeatInfo?.micStatus ?: MicStatus.Normal
+            micState = seatInfo?.micStatus ?: MicStatus.Normal
         }
         return VoiceMicInfoModel().apply {
             micIndex = index
