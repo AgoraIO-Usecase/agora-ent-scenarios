@@ -1,7 +1,6 @@
 package io.agora.scene.voice.model.constructor
 
 import android.content.Context
-import io.agora.voice.common.constant.ConfigConstants
 import io.agora.scene.voice.R
 import io.agora.scene.voice.model.BotMicInfoBean
 import io.agora.scene.voice.model.MicManagerBean
@@ -9,6 +8,7 @@ import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.annotation.MicClickAction
 import io.agora.scene.voice.model.annotation.MicStatus
+import io.agora.voice.common.constant.ConfigConstants
 
 internal object RoomMicConstructor {
 
@@ -84,11 +84,19 @@ internal object RoomMicConstructor {
             // 正常
             MicStatus.Normal -> {
                 if (isMyself) {
-                    mutableListOf(MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.Mute))
+                    if(micInfo.member?.micStatus == 0) {
+                        mutableListOf(MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnMute))
+                    } else{
+                        mutableListOf(MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.Mute))
+                    }
                 } else {
                     mutableListOf(
                         MicManagerBean(context.getString(R.string.voice_room_kickoff), true, MicClickAction.KickOff),
-                        MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.ForbidMic),
+                        if(micInfo.member?.micStatus == 0){
+                            MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnMute)
+                        }else{
+                            MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.Mute)
+                        },
                         MicManagerBean(context.getString(R.string.voice_room_block), true, MicClickAction.Lock)
                     )
                 }
@@ -159,7 +167,11 @@ internal object RoomMicConstructor {
             // 有⼈-正常
             MicStatus.Normal -> {
                 mutableListOf(
-                    MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.Mute),
+                    if(micInfo.member?.micStatus == 0){
+                        MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnMute)
+                    }else{
+                        MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.Mute)
+                    },
                     MicManagerBean(context.getString(R.string.voice_room_off_stage), true, MicClickAction.OffStage)
                 )
             }
