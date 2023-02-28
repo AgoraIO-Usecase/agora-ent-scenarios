@@ -608,6 +608,16 @@ AgoraLrcDownloadDelegate
     
     double pitch = speakers.firstObject.voicePitch;
     self.voicePitch = pitch;
+    // todo 判断是否是主线程
+    kWeakSelf(self)
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakself.karaokeView setPitchWithPitch:pitch progress:[self getPlayerCurrentTime]];
+    });
+    
+    if (self.config.role != KTVSingRoleMainSinger) {
+       return;
+    }
+    
     NSDictionary *dict = @{
         @"cmd":@"setVoicePitch",
         @"pitch":@(pitch),
@@ -615,23 +625,6 @@ AgoraLrcDownloadDelegate
     };
     [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
     }];
-    kWeakSelf(self)
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [weakself.karaokeView setPitchWithPitch:pitch progress:[self getPlayerCurrentTime]];
-    });
-//   // [self.lrcView setVoicePitch:@[@(pitch)]];
-//
-//    if (self.config.role != KTVSingRoleMainSinger) {
-//        return;
-//    }
-//
-//    NSDictionary *dict = @{
-//        @"cmd":@"setVoicePitch",
-//        @"pitch":@(pitch),
-//        @"time": @([self getPlayerCurrentTime])
-//    };
-//    [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
-//    }];
 }
 
 
