@@ -80,9 +80,17 @@ public class GradeView extends View {
         }
     }
 
+    private boolean isCanvasNotReady() {
+        return mWidth <= 0 && mHeight <= 0;
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        if (isCanvasNotReady()) { // Fail fast
+            return;
+        }
 
         mGradeSeparatorIndicatorPaint.setShader(null);
         mGradeSeparatorIndicatorPaint.setAntiAlias(true);
