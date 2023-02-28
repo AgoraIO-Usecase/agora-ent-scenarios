@@ -36,7 +36,7 @@ public class ScreenSlidePageFragment extends Fragment {
     private final SongChooseViewAdapter mRankListAdapter = new SongChooseViewAdapter() {
         @Override
         void onSongChosen(SongItem song, int position) {
-            //onSongItemChosen(song);
+            callBack.onClickSongItem(song);
         }
     };
 
@@ -99,6 +99,8 @@ public class ScreenSlidePageFragment extends Fragment {
         void onRefresh(@NonNull RefreshLayout refreshLayout);
 
         void onLoadMore(@NonNull RefreshLayout refreshLayout);
+
+        void onClickSongItem(SongItem songItem);
 
     }
 }
