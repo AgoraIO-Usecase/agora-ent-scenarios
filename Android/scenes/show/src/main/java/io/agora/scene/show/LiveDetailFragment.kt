@@ -637,7 +637,14 @@ class LiveDetailFragment : Fragment() {
                 when (itemId) {
                     SettingDialog.ITEM_ID_CAMERA -> mRtcEngine.switchCamera()
                     SettingDialog.ITEM_ID_QUALITY -> showPictureQualityDialog(this)
-                    SettingDialog.ITEM_ID_VIDEO -> mRtcEngine.muteLocalVideoStreamEx(!activated, mMainRtcConnection)
+                    SettingDialog.ITEM_ID_VIDEO -> {
+                        mRtcEngine.muteLocalVideoStreamEx(!activated, mMainRtcConnection)
+                        if (activated) {
+                            mRtcEngine.startPreview()
+                        } else {
+                            mRtcEngine.stopPreview()
+                        }
+                    }
                     SettingDialog.ITEM_ID_MIC -> {
                         if (!isRoomOwner) {
                             mService.muteAudio(mRoomInfo.roomId, !activated, interactionInfo!!.userId)
@@ -952,7 +959,14 @@ class LiveDetailFragment : Fragment() {
             resetSettingsItem(interactionInfo!!.ownerMuteAudio)
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
-                    LivePKSettingsDialog.ITEM_ID_CAMERA -> mRtcEngine.muteLocalVideoStreamEx(!activated, mMainRtcConnection)
+                    LivePKSettingsDialog.ITEM_ID_CAMERA -> {
+                        mRtcEngine.muteLocalVideoStreamEx(!activated, mMainRtcConnection)
+                        if (activated) {
+                            mRtcEngine.startPreview()
+                        } else {
+                            mRtcEngine.stopPreview()
+                        }
+                    }
                     LivePKSettingsDialog.ITEM_ID_SWITCH_CAMERA -> mRtcEngine.switchCamera()
                     LivePKSettingsDialog.ITEM_ID_MIC -> {
                         mService.muteAudio(mRoomInfo.roomId, !activated, mRoomInfo.ownerId)
