@@ -227,7 +227,12 @@ class KTVSyncManagerServiceImp(
                                     }
 
                                     // 定时删除房间
-                                    mainHandler.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
+                                    if (cacheRoom.creatorNo == UserManager.getInstance().user.id.toString()) {
+                                        // 房主
+                                        mainHandler.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
+                                    } else {
+                                        mainHandler.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - cacheRoom.createdAt.toLong()))
+                                    }
                                 }
 
                             }
