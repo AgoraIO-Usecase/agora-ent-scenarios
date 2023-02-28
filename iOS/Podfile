@@ -18,7 +18,7 @@ def all_pods
   pod 'SDWebImage', '5.0.6'
   # Model
   pod 'YYModel', '1.0.4'
-  pod 'YYCache', '1.0.4'
+#  pod 'YYCache', '1.0.4'
   pod 'YYCategories', '1.0.4'
   # 键盘
   pod 'IQKeyboardManager', '6.5.10'

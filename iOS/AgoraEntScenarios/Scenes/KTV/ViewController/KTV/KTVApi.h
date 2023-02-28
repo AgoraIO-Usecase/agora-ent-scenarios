@@ -27,11 +27,11 @@ typedef enum : NSUInteger {
     KTVPlayerTrackAcc = 1
 } KTVPlayerTrackMode;
 typedef enum : NSUInteger {
+    KTVLoadSongStateIdle = 0,
     KTVLoadSongStateOK,
     KTVLoadSongStateInProgress,
     KTVLoadSongStateNoLyricUrl,
     KTVLoadSongStatePreloadFail,
-    KTVLoadSongStateIdle
 } KTVLoadSongState;
 
 @interface KTVSongConfiguration : NSObject
