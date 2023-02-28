@@ -130,13 +130,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     private void initListener() {
         mBinding.ilChorus.btChorus.setOnClickListener(this);
         mBinding.ilActive.switchOriginal.setOnClickListener(this);
-        mBinding.ilActive.switchOriginal.setOnCheckedChangeListener((compoundButton, b) -> {
-            if (b) {
-                mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
-            } else {
-                mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_accompany);
-            }
-        });
         mBinding.ilActive.ivMusicMenu.setOnClickListener(this);
         mBinding.ilActive.ivMusicStart.setOnClickListener(this);
         mBinding.ilActive.ivChangeSong.setOnClickListener(this);
@@ -285,7 +278,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.clActive.setBackgroundResource(backgroundResId);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
-        mBinding.ilActive.ivMusicStart.setImageResource(R.mipmap.ktv_ic_pause);
+
+        mBinding.ilActive.ivMusicStart.setIconResource(R.mipmap.ktv_ic_pause);
+        mBinding.ilActive.ivMusicStart.setText(R.string.ktv_room_player_pause);
     }
 
     private boolean mNeedToShowComboView;
@@ -308,7 +303,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
 
-        mBinding.ilActive.ivMusicStart.setImageResource(R.drawable.ktv_ic_play);
+        mBinding.ilActive.ivMusicStart.setIconResource(R.drawable.ktv_ic_play);
+        mBinding.ilActive.ivMusicStart.setText(R.string.ktv_room_player_play);
     }
 
     public void onIdleStatus() {
@@ -565,11 +561,13 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     }
 
-
     @Override
     public void onClick(View v) {
         if (v == mBinding.ilActive.switchOriginal) {
             mOnKaraokeActionListener.onSwitchOriginalClick();
+
+            boolean withOriginal = mBinding.ilActive.switchOriginal.isChecked();
+            mBinding.ilActive.switchOriginal.setIconResource(withOriginal ? R.mipmap.ic_play_original_on : R.mipmap.ic_play_original_off);
         } else if (v == mBinding.ilActive.ivMusicMenu) {
             mOnKaraokeActionListener.onMenuClick();
         } else if (v == mBinding.ilActive.ivMusicStart) {
