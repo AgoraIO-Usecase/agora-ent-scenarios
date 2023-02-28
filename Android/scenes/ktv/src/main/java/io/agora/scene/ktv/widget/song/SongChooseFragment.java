@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 
@@ -75,6 +76,20 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
 
         PageAdapter adapter = new PageAdapter();
         getBinding().mViewPager2.setAdapter(adapter);
+        getBinding().mViewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                if (getBinding().tabLayout.getSelectedTabPosition() == position) {
+                    return;
+                }
+                TabLayout.Tab tabAt = getBinding().tabLayout.getTabAt(position);
+                if (tabAt == null) {
+                    return;
+                }
+                getBinding().tabLayout.selectTab(tabAt);
+            }
+        });
         getBinding().recyclerSearchResult.setAdapter(mSearchAdapter);
 
         Iterator<Runnable> iterator = pendingViewCreatedRuns.iterator();
