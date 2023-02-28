@@ -35,7 +35,7 @@
             android:layout_marginStart="28dp"
             android:button="@null"
             android:gravity="center"
-            android:text="@string/ktv_room_choosed_song"
+            android:text="@string/ktv_room_chosen_song_list"
             android:textColor="@color/grey_to_white"
             android:textSize="16sp" />
     </RadioGroup>

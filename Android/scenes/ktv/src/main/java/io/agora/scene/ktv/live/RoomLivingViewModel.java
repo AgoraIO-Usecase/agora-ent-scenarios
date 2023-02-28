@@ -1269,6 +1269,10 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         return false;
     }
 
+    public boolean isOriginalMode() {
+        return mAudioTrackMode == KTVPlayerTrackMode.KTVPlayerTrackOrigin;
+    }
+
     // ------------------ 暂停/播放 ------------------
     public void musicToggleStart() {
         if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
