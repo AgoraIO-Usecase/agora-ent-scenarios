@@ -63,10 +63,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     protected KaraokeView mKaraokeView;
 
-    protected int mCumulativeScore;
+    protected int mCumulativeScoreInPercentage;
 
-    public int getCumulativeScore() {
-        return mCumulativeScore;
+    public int getCumulativeScoreInPercentage() {
+        return mCumulativeScoreInPercentage;
     }
 
     protected ComboControl mComboControl;
@@ -387,11 +387,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     }
 
     public void updateScore(double score, double cumulativeScore, double perfectScore) {
-        mCumulativeScore = (int) cumulativeScore;
+        mCumulativeScoreInPercentage = (int) ((cumulativeScore / perfectScore) * 100);
 
         mBinding.gradeView.setScore((int) score, (int) cumulativeScore, (int) perfectScore);
 
-        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "" + mCumulativeScore));
+        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "" + (int) cumulativeScore));
         int gradeDrawable = mBinding.gradeView.getCumulativeDrawable();
         if (gradeDrawable == 0) {
             mBinding.ivCumulativeScoreGrade.setVisibility(INVISIBLE);
