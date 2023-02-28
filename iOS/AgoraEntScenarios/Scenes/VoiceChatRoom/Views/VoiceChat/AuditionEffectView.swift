@@ -84,7 +84,12 @@ final class AuditionEffectView: UIView {
         VoiceRoomRTCManager.getSharedInstance().stopMixingClosure = {
             self.beforeAnimation.image = self.beforePlaceHolderImage
             self.afterAnimation.image = self.afterPlaceHolderImage
-            
+            if self.afterPlay.isSelected {
+                self.afterPlay.setImage(UIImage("play2"), for: .normal)
+            }
+            if self.beforePlay.isSelected {
+                self.beforePlay.setImage(UIImage("play2"), for: .normal)
+            }
         }
     }
     
@@ -109,13 +114,18 @@ final class AuditionEffectView: UIView {
         self.title.text = text
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+    }
+    
     @objc private func playAnimation(sender: UIButton) {
         var resourceName = "2xAIAEC_"
-        var wavName = self.title.text?.components(separatedBy: " ").first ?? ""
+        var wavName = "AIAEC"
         var type = "m4a"
         if self.type == .AGC {
             resourceName = "2xAGC_"
             type = "WAV"
+            wavName = "AGC"
         }
         if sender.tag == 11 {
             self.beforePlay.isSelected = !self.beforePlay.isSelected

@@ -224,6 +224,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     
     func unsubscribeEvent() {
         VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
+        VoiceRoomIMManager.shared?.removeListener()
         self.roomServiceDelegate = nil
     }
     
@@ -509,6 +510,8 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             completion(self.normalError(),nil)
             return
         }
+        new_mic?.status = 0
+        old_mic?.status = -1
         guard old_index != new_index else { return }
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(old_index)": old_mic?.kj.JSONString() ?? "",
                                                                        "mic_\(new_index)": new_mic?.kj.JSONString() ?? ""],
@@ -854,10 +857,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.member = VRUser()
         mic.member?.uid = VLUserCenter.user.id
         mic.member?.name = VLUserCenter.user.name
-        mic.member?.chat_uid = ""
+        mic.member?.chat_uid = VLUserCenter.user.id
         mic.member?.mic_index = 0
         mic.member?.name = VLUserCenter.user.name
-        mic.member?.portrait = VoiceRoomUserInfo.shared.currentRoomOwner?.portrait
+        mic.member?.portrait = VLUserCenter.user.headUrl
         mic.member?.rtc_uid = VLUserCenter.user.id
         mic.member?.channel_id = ""
         mics.append(mic)

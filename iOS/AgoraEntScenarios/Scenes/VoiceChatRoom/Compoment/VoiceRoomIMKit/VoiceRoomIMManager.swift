@@ -60,6 +60,10 @@ fileprivate let once = VoiceRoomIMManager()
     @objc public static var shared: VoiceRoomIMManager? = once
 
     @objc public weak var delegate: VoiceRoomIMDelegate?
+    
+    var isLogin: Bool {
+        AgoraChatClient.shared().isLoggedIn
+    }
 
     @objc public func configIM(appkey: String) -> AgoraChatError? {
         let options = AgoraChatOptions(appkey: appkey.isEmpty ? "easemob-demo#easeim" : appkey)
@@ -88,6 +92,10 @@ fileprivate let once = VoiceRoomIMManager()
         AgoraChatClient.shared().add(self, delegateQueue: .main)
         AgoraChatClient.shared().chatManager?.add(self, delegateQueue: .main)
         AgoraChatClient.shared().roomManager?.add(self, delegateQueue: .main)
+    }
+    
+    func announcement(completion:@escaping ((AgoraChatroom?,AgoraChatError?) -> Void)) {
+        AgoraChatClient.shared().roomManager?.getChatroomSpecificationFromServer(withId: self.currentRoomId, fetchMembers: false,completion: completion)
     }
     
 
@@ -174,6 +182,10 @@ public extension VoiceRoomIMManager {
     }
 
     // MARK: - AgoraChatroomManagerDelegate
+    func userDidJoin(_ aChatroom: AgoraChatroom, user aUsername: String) {
+        
+    }
+    
     func chatroomAnnouncementDidUpdate(_ aChatroom: AgoraChatroom, announcement aAnnouncement: String?) {
         if delegate != nil, delegate!.responds(to: #selector(VoiceRoomIMDelegate.announcementChanged(roomId:content:))) {
             if let roomId = aChatroom.chatroomId, let announcement = aAnnouncement, roomId == self.currentRoomId {
@@ -242,15 +254,12 @@ public extension VoiceRoomIMManager {
     @objc func userQuitRoom(completion: ((AgoraChatError?) -> Void)?) {
         AgoraChatClient.shared().roomManager?.leaveChatroom(currentRoomId, completion: { error in
             if error == nil {
-                AgoraChatClient.shared().roomManager?.remove(self)
-                AgoraChatClient.shared().chatManager?.remove(self)
                 self.currentRoomId = ""
             }
             if completion != nil {
                 completion!(error)
             }
         })
-        self.removeListener()
     }
     
     func userDestroyedChatroom() {
