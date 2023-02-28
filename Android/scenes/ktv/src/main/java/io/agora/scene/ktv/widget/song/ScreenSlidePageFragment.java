@@ -36,7 +36,7 @@ public class ScreenSlidePageFragment extends Fragment {
     private final SongChooseViewAdapter mRankListAdapter = new SongChooseViewAdapter() {
         @Override
         void onSongChosen(SongItem song, int position) {
-            //onSongItemChosen(song);
+            callBack.onClickSongItem(song);
         }
     };
 
@@ -67,12 +67,18 @@ public class ScreenSlidePageFragment extends Fragment {
     public void setRefreshingResult(List<SongItem> list) {
         mRankListAdapter.resetAll(list);
 
+        if (smartRefreshLayout == null) {
+            return;
+        }
         smartRefreshLayout.setEnableLoadMore(true);
         smartRefreshLayout.finishRefresh();
     }
 
     public void setLoadMoreResult(List<SongItem> list, boolean hasMore) {
         mRankListAdapter.insertAll(list);
+        if (smartRefreshLayout == null) {
+            return;
+        }
         smartRefreshLayout.finishLoadMore();
         smartRefreshLayout.setEnableLoadMore(hasMore);
     }
@@ -100,5 +106,9 @@ public class ScreenSlidePageFragment extends Fragment {
 
         void onLoadMore(@NonNull RefreshLayout refreshLayout);
 
+        void onClickSongItem(SongItem songItem);
+
     }
+
+
 }
