@@ -1446,7 +1446,8 @@ class LiveDetailFragment : Fragment() {
                 when (interactionInfo?.interactStatus) {
                     ShowInteractionStatus.pking.value -> VideoSetting.LiveMode.PK
                     else -> VideoSetting.LiveMode.OneVOne
-                }
+                },
+                rtcConnection = mMainRtcConnection
             )
         } else {
             VideoSetting.updateAudienceSetting()
