@@ -192,7 +192,8 @@ class VoiceSyncManagerServiceImp(
      */
     override fun joinRoom(roomId: String, completion: (error: Int, result: VoiceRoomModel?) -> Unit) {
         initScene {
-            Sync.Instance().joinScene(roomId, object : Sync.JoinSceneCallback {
+            val isRoomOwner = roomMap[roomId]?.owner?.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId()
+            Sync.Instance().joinScene(isRoomOwner, true, roomId, object : JoinSceneCallback {
                 override fun onSuccess(sceneReference: SceneReference?) {
                     "syncManager joinScene onSuccess ${sceneReference?.id}".logD()
                     mSceneReference = sceneReference
