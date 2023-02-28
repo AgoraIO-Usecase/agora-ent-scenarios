@@ -503,6 +503,7 @@ extension SARoomViewController {
     }
 
     func showInviteMicAlert() {
+        dismiss(animated: false)
         var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 75, height: 200))
         compent.destination = .center
         let micAlert = SAApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 75, height: 200), content: "Anchor Invited You On-Stage", cancel: "Decline", confirm: "Accept", position: .center).cornerRadius(16).backgroundColor(.white)
