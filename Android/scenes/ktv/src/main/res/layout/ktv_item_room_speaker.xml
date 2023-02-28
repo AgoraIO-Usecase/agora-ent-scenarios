@@ -31,18 +31,6 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="SmallSp" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivMute"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/bg_round_black_t30"
-        android:padding="15dp"
-        android:src="@mipmap/ic_has_mute"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/avatar_item_room_speaker"
-        app:layout_constraintEnd_toEndOf="@id/avatar_item_room_speaker"
-        app:layout_constraintStart_toStartOf="@id/avatar_item_room_speaker"
-        app:layout_constraintTop_toTopOf="@id/avatar_item_room_speaker" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvUserName"
@@ -80,5 +68,19 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearance="@style/ktv_roundStyle"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivMute"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_round_black_t30"
+        android:padding="15dp"
+        android:src="@mipmap/ic_has_mute"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/avatar_item_room_speaker"
+        app:layout_constraintEnd_toEndOf="@id/avatar_item_room_speaker"
+        app:layout_constraintStart_toStartOf="@id/avatar_item_room_speaker"
+        app:layout_constraintTop_toTopOf="@id/avatar_item_room_speaker" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -35,6 +35,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString *authorization;
 @property (nonatomic) BOOL hasVoiceRoomUserInfo;
 
+//给各个场景保留的扩展字段
+@property (nonatomic, strong, readonly) NSMutableDictionary* extraDic;
+
 + (UInt32)mediaPlayerUidWithUid:(NSString*)uid;
 @end
 
