@@ -82,6 +82,12 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
             public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
                 onSongsLoadMore(getBinding().tabLayout.getSelectedTabPosition());
             }
+
+            @Override
+            public void onClickSongItem(SongItem songItem) {
+                onSongItemChosen(songItem);
+            }
+
         };
         fragments[0] = new ScreenSlidePageFragment(callBack);
         fragments[1] = new ScreenSlidePageFragment(callBack);
