@@ -31,12 +31,13 @@
     <string name="ktv_room_sing1">演唱中</string>
     <string name="ktv_room_sing1_1">合唱中</string>
     <string name="ktv_room_original">原唱</string>
-    <string name="ktv_room_accompany">伴奏</string>
     <string name="ktv_room_change_song">切歌</string>
     <string name="ktv_room_seat_off">下麦</string>
-    <string name="ktv_room_cut_off_song">切歌</string>
+    <string name="ktv_room_player_pause">暂停</string>
+    <string name="ktv_room_player_play">播放</string>
+    <string name="ktv_room_player_tweak">调音</string>
     <string name="ktv_room_choose_song">点歌</string>
-    <string name="ktv_room_choosed_song">已点</string>
+    <string name="ktv_room_chosen_song_list">已点</string>
     <string name="ktv_room_sing2">演唱中</string>
     <string name="ktv_room_no_sing">当前无人演唱\n点击“点歌”一展歌喉</string>
     <string name="ktv_dialog_migu_tip" />
