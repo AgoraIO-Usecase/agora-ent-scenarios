@@ -664,7 +664,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
     
     func refuseInvite(chat_uid: String, completion: @escaping (Error?, Bool) -> Void) {
-        guard let user = self.userList.first(where: { $0.uid == chat_uid }) else {
+        guard let user = userList.first(where: { $0.uid == chat_uid }) else {
             agoraAssert("startMicSeatInvitation not found")
             completion(SAErrorType.unknown("startMicSeatInvitation", "user not found").error(), false)
             return
