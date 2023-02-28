@@ -64,7 +64,7 @@ pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 #  pod 'Fastboard'
   pod 'Agora-Scene-Utils', '~> 1.1.0'
   
-  pod 'AgoraSyncManager', '1.1.8'
+  pod 'AgoraSyncManager', '2.0.1'
   
   
   #歌词组件
