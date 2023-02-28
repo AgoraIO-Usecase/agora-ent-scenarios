@@ -1,19 +1,22 @@
 package io.agora.scene.ktv.widget.song;
 
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
+import com.scwang.smart.refresh.layout.api.RefreshLayout;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -22,7 +25,6 @@ import java.util.Objects;
 
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnItemClickListener;
-import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvFragmentSongListBinding;
 
 /**
@@ -34,18 +36,14 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
     private Listener listener;
     private final List<Runnable> pendingViewCreatedRuns = new ArrayList<>();
 
-    //private final SongChooseViewAdapter mRankListAdapter = new SongChooseViewAdapter() {
-    //    @Override
-    //    void onSongChosen(SongItem song, int position) {
-    //        onSongItemChosen(song);
-    //    }
-    //};
     private final SongChooseViewAdapter mSearchAdapter = new SongChooseViewAdapter() {
         @Override
         void onSongChosen(SongItem song, int position) {
             onSongItemChosen(song);
         }
     };
+
+    private ScreenSlidePageFragment[] fragments = new ScreenSlidePageFragment[4];
 
 
     @NonNull
@@ -59,8 +57,9 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         getBinding().tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                //mRankListAdapter.resetAll(null);
-                onSongsRefreshing(tab.getPosition());
+                int position = tab.getPosition();
+                fragments[position].onTabSelected(position);
+                onSongsRefreshing(position);
             }
 
             @Override
@@ -73,8 +72,22 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
 
             }
         });
+        ScreenSlidePageFragment.OnScreenSlidePageFragmentCallBack callBack = new ScreenSlidePageFragment.OnScreenSlidePageFragmentCallBack() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                onSongsRefreshing(getBinding().tabLayout.getSelectedTabPosition());
+            }
 
-        PageAdapter adapter = new PageAdapter();
+            @Override
+            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
+                onSongsLoadMore(getBinding().tabLayout.getSelectedTabPosition());
+            }
+        };
+        fragments[0] = new ScreenSlidePageFragment(callBack);
+        fragments[1] = new ScreenSlidePageFragment(callBack);
+        fragments[2] = new ScreenSlidePageFragment(callBack);
+        fragments[3] = new ScreenSlidePageFragment(callBack);
+        ScreenSlidePagerAdapter adapter = new ScreenSlidePagerAdapter(getActivity());
         getBinding().mViewPager2.setAdapter(adapter);
         getBinding().mViewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
@@ -148,12 +161,6 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
             }
         });
         getBinding().iBtnClear.setOnClickListener(view -> getBinding().etSearch.setText(""));
-        //getBinding().smartRefreshLayout.setOnRefreshListener(refreshLayout -> {
-        //    onSongsRefreshing(getBinding().tabLayout.getSelectedTabPosition());
-        //});
-        //getBinding().smartRefreshLayout.setOnLoadMoreListener(refreshLayout -> {
-        //    onSongsLoadMore(getBinding().tabLayout.getSelectedTabPosition());
-        //});
     }
 
     private void runOnViewCreated(Runnable runnable){
@@ -172,7 +179,7 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         return getBinding().tabLayout.getSelectedTabPosition();
     }
 
-    void setSongTagsTitle(List<String> titles, int defaultIndex) {
+    void setSongTagsTitle(List<String> titles, List<Integer> types, int defaultIndex) {
         runOnViewCreated(() -> {
             for (String title : titles) {
                 getBinding().tabLayout.addTab(getBinding().tabLayout.newTab().setText(title));
@@ -181,6 +188,9 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
             if (tabAt != null) {
                 getBinding().tabLayout.selectTab(tabAt);
             }
+
+
+
         });
     }
 
@@ -196,15 +206,9 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
                 }
             }
         } else {
-            //int itemCount = mRankListAdapter.getItemCount();
-            //for (int i = 0; i < itemCount; i++) {
-            //    SongItem item = mRankListAdapter.getItem(i);
-            //    if (item.songNo.equals(songItem.songNo)) {
-            //        item.isChosen = isChosen;
-            //        mRankListAdapter.notifyItemChanged(i);
-            //        break;
-            //    }
-            //}
+            for (ScreenSlidePageFragment fragment : fragments) {
+                fragment.setSongItemStatus(songItem, isChosen);
+            }
         }
     }
 
@@ -217,23 +221,18 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         mSearchAdapter.resetAll(list);
     }
 
-    void setRefreshingResult(List<SongItem> list) {
+    void setRefreshingResult(List<SongItem> list, int index) {
         if (list == null || list.isEmpty()) {
             getBinding().llEmpty.setVisibility(View.VISIBLE);
         } else {
             getBinding().llEmpty.setVisibility(View.GONE);
         }
-        //mRankListAdapter.resetAll(list);
-        //
-        //getBinding().smartRefreshLayout.setEnableLoadMore(true);
-        //getBinding().smartRefreshLayout.finishRefresh();
+        fragments[index].setRefreshingResult(list);
         enableTabLayoutClick(true);
     }
 
-    void setLoadMoreResult(List<SongItem> list, boolean hasMore) {
-        //mRankListAdapter.insertAll(list);
-        //getBinding().smartRefreshLayout.finishLoadMore();
-        //getBinding().smartRefreshLayout.setEnableLoadMore(hasMore);
+    void setLoadMoreResult(List<SongItem> list, boolean hasMore, int index) {
+        fragments[index].setLoadMoreResult(list, hasMore);
         enableTabLayoutClick(true);
     }
 
@@ -287,44 +286,24 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         void onSongsLoadMore(int tagIndex);
     }
 
+    private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
 
-    static class PageAdapter extends RecyclerView.Adapter<PageAdapter.MainHolder> {
-
-        private List<Object> list = new ArrayList<>();
-
-        public PageAdapter() {
-            list.add("");
-            list.add("");
-            list.add("");
-            list.add("");
-        }
-
-        @NonNull
-        @Override
-        public MainHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new MainHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_page, parent, false));
+        public ScreenSlidePagerAdapter(FragmentActivity fragmentActivity) {
+            super(fragmentActivity);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull MainHolder holder, int position) {
-            holder.tvTitle.setText(String.valueOf(position));
+        public Fragment createFragment(int position) {
+            if (fragments[position] == null) {
+
+            }
+            return fragments[position];
         }
 
         @Override
         public int getItemCount() {
-            return list.size();
+            return fragments.length;
         }
-
-        class MainHolder extends RecyclerView.ViewHolder {
-
-            private TextView tvTitle;
-
-            public MainHolder(@NonNull View itemView) {
-                super(itemView);
-                tvTitle = itemView.findViewById(R.id.tvTitle);
-            }
-        }
-
     }
 
 }
