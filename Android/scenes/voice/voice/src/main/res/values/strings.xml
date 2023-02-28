@@ -95,6 +95,7 @@
     <!-- mic -->
     <string name="voice_chatroom_mic_submit_sent">Your request has been sent,please wait for reply</string>
     <string name="voice_chatroom_open_bot_to_sound_effect">Add bot to listen to sound effect?</string>
+    <string name="voice_chatroom_open_bot_first">Please activate the robot first</string>
     <string name="voice_chatroom_end_live">End Live?</string>
     <string name="voice_chatroom_end_live_tips">The room will close after you leave.</string>
     <string name="voice_chatroom_time_up_tips">The room experience time has been exhausted.</string>
@@ -128,6 +129,7 @@
     <string name="voice_chatroom_notice_edit_limit">140 character limit.</string>
     <string name="voice_chatroom_notice_post">Post</string>
     <string name="voice_chatroom_notice_posted">Notice Posted</string>
+    <string name="voice_chatroom_notice_changed">Voice room announcement changed!</string>
     <string name="voice_chatroom_notice_posted_error">Post Failed</string>
     <string name="voice_chatroom_join_room_success">Joined Success</string>
     <string name="voice_chatroom_join_room_failed">Joined Failed</string>
