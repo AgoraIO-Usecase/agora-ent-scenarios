@@ -34,7 +34,7 @@ public struct SAPresentedViewComponent {
     public var keyboardTranslationType: SAKeyboardTranslationType = .unabgeschirmt(compress: true)
 
     /// 键盘间隔，默认20
-    public var keyboardPadding: CGFloat = 20
+    public var keyboardPadding: CGFloat = 0
 
     /// 初始化方法
     ///

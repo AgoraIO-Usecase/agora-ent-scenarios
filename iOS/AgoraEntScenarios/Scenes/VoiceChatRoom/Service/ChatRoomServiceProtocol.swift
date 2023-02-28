@@ -24,11 +24,11 @@ public enum updateRoomState {
     func errorDesc() -> String {
         switch self {
         case .removed:
-            return "you are removed by owner!"
+            return "You were kicked off from the room"
         case .destroyed:
-            return "VoiceRoom was destroyed!"
+            return "This room has been dissolved by the host"
         case .offLined:
-            return "you are offline!"
+            return "you were offline!"
         default:
             return ""
         }

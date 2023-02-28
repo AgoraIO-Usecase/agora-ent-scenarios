@@ -67,7 +67,6 @@ let page_size = 15
     
     deinit {
         print("\(self.swiftClassName ?? "") is destroyed!")
-        VoiceRoomIMManager.shared?.logoutIM()
         VoiceRoomIMManager.shared = nil
         ChatRoomServiceImp._sharedInstance = nil
         VoiceRoomUserInfo.shared.user = nil
@@ -87,7 +86,9 @@ extension VRRoomsViewController {
             SVProgressHUD.dismiss()
             if let userId = uid,let im_token = token {
                 if self?.initialError == nil {
+                    self?.view.isUserInteractionEnabled = false
                     VoiceRoomIMManager.shared?.loginIM(userName: userId, token: im_token, completion: { userName, error in
+                        self?.view.isUserInteractionEnabled = true
                         if error == nil {
                             if (completion != nil) {
                                 completion!(error == nil)
