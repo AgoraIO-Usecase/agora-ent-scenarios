@@ -35,7 +35,7 @@ class LivePKRequestMessageFragment : BaseFragment() {
         binding.smartRefreshLayout.setOnRefreshListener {
             mListener.onRequestRefreshing()
         }
-        binding.iBtnStopPKText.setOnClickListener {
+        binding.iBtnStopPK.setOnClickListener {
             mListener.onStopPKingChosen()
         }
         binding.smartRefreshLayout.autoRefresh()
@@ -83,10 +83,10 @@ class LivePKRequestMessageFragment : BaseFragment() {
     private fun updateUI(userName: String, status: Int?) {
         if (status == ShowInteractionStatus.pking.value) {
             binding.textPking.isVisible = true
-            binding.iBtnStopPKText.isVisible = true
+            binding.iBtnStopPK.isVisible = true
             binding.textPking.text = "与主播 $userName PK中"
         } else if (status == null) {
-            binding.iBtnStopPKText.isVisible = false
+            binding.iBtnStopPK.isVisible = false
             binding.textPking.isVisible = false
         }
     }

@@ -42,25 +42,15 @@
         app:layout_constraintTop_toTopOf="@id/textLinking" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/iBtnStopLinkText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="6dp"
-        android:text="@string/show_stop_linking"
-        android:textColor="@drawable/show_purple"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@id/textLinking"
-        app:layout_constraintEnd_toStartOf="@id/iBtnStopLink"
-        app:layout_constraintTop_toTopOf="@id/textLinking" />
-
-    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/iBtnStopLink"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:background="@mipmap/show_stop_link_or_pk_btn"
-        android:src="@mipmap/show_stop_link_or_pk_btn"
+        android:text="@string/show_stop_linking"
+        android:drawablePadding="6dp"
+        android:textColor="@drawable/show_purple"
         android:visibility="invisible"
+        android:drawableEnd="@mipmap/show_stop_link_or_pk_btn"
         app:layout_constraintBottom_toBottomOf="@id/textLinking"
         app:layout_constraintEnd_toEndOf="@id/textLinking"
         app:layout_constraintTop_toTopOf="@id/textLinking" />

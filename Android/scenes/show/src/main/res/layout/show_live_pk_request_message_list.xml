@@ -28,14 +28,14 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/iBtnStopPKText"
+        android:id="@+id/iBtnStopPK"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:text="@string/show_stop_pking"
+        android:drawablePadding="6dp"
         android:textColor="@drawable/show_purple"
         android:visibility="gone"
-        android:drawablePadding="6dp"
         app:layout_constraintBottom_toBottomOf="@id/textPking"
         app:layout_constraintEnd_toEndOf="@id/textPking"
         app:layout_constraintTop_toTopOf="@id/textPking"
