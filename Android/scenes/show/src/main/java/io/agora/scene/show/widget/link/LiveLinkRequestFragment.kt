@@ -36,7 +36,7 @@ class LiveLinkRequestFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.linkRequestList.adapter = linkRequestViewAdapter
-        binding.iBtnStopLinkText.setOnClickListener {
+        binding.iBtnStopLink.setOnClickListener {
             // 主播停止连麦
             mListener?.onStopLinkingChosen()
         }
@@ -57,11 +57,11 @@ class LiveLinkRequestFragment : BaseFragment() {
     fun setOnSeatStatus(userName: String, status: Int?) {
         if (mBinding == null) return
         if (status == null) {
-            binding.iBtnStopLinkText.isVisible = false
+            binding.iBtnStopLink.isVisible = false
             binding.textLinking.isVisible = false
         } else if (status == ShowInteractionStatus.onSeat.value) {
             binding.textLinking.isVisible = true
-            binding.iBtnStopLinkText.isVisible = true
+            binding.iBtnStopLink.isVisible = true
             binding.textLinking.text = "与观众 $userName 连麦中"
         }
     }
@@ -124,10 +124,10 @@ class LiveLinkRequestFragment : BaseFragment() {
     private fun updateUI(userName: String, status: Int?) {
         if (status == ShowInteractionStatus.onSeat.value) {
             binding.textLinking.isVisible = true
-            binding.iBtnStopLinkText.isVisible = true
+            binding.iBtnStopLink.isVisible = true
             binding.textLinking.text = "与观众 $userName 连麦中"
         } else if (status == null) {
-            binding.iBtnStopLinkText.isVisible = false
+            binding.iBtnStopLink.isVisible = false
             binding.textLinking.isVisible = false
         }
     }
