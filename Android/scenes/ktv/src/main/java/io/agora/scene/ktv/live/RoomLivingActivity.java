@@ -586,12 +586,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             LiveDataUtils.observerThenRemove(this,
                     roomLivingViewModel.getSongTypes(), typeMap -> {
 
-                        SongActionListenerImpl chooseSongListener =
-                                new SongActionListenerImpl(this,
-                                        roomLivingViewModel, filterSongTypeMap(typeMap), true);
-                        mChorusSongDialog.setChooseSongTabsTitle(
-                                chooseSongListener.getSongTypeTitles(this),
-                                0);
+                        SongActionListenerImpl chooseSongListener = new SongActionListenerImpl(this, roomLivingViewModel, filterSongTypeMap(typeMap), true);
+                        mChorusSongDialog.setChooseSongTabsTitle(chooseSongListener.getSongTypeTitles(this), chooseSongListener.getSongTypeList(), 0);
                         mChorusSongDialog.setChooseSongListener(chooseSongListener);
                         hideLoadingView();
 
@@ -625,25 +621,20 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             mChooseSongDialog = new SongDialog();
             mChooseSongDialog.setChosenControllable(roomLivingViewModel.isRoomOwner());
             showLoadingView();
-            LiveDataUtils.observerThenRemove(this,
-                    roomLivingViewModel.getSongTypes(), typeMap -> {
+            LiveDataUtils.observerThenRemove(this, roomLivingViewModel.getSongTypes(), typeMap -> {
 
-                        SongActionListenerImpl chooseSongListener =
-                                new SongActionListenerImpl(this,
-                                        roomLivingViewModel, filterSongTypeMap(typeMap), false);
-                        mChooseSongDialog.setChooseSongTabsTitle(
-                                chooseSongListener.getSongTypeTitles(this),
-                                0);
-                        mChooseSongDialog.setChooseSongListener(chooseSongListener);
-                        hideLoadingView();
+                SongActionListenerImpl chooseSongListener = new SongActionListenerImpl(this, roomLivingViewModel, filterSongTypeMap(typeMap), false);
+                mChooseSongDialog.setChooseSongTabsTitle(chooseSongListener.getSongTypeTitles(this), chooseSongListener.getSongTypeList(), 0);
+                mChooseSongDialog.setChooseSongListener(chooseSongListener);
+                hideLoadingView();
 
-                        if (!mChooseSongDialog.isAdded()) {
-                            roomLivingViewModel.getSongChosenList();
-                            mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
-                        }
+                if (!mChooseSongDialog.isAdded()) {
+                    roomLivingViewModel.getSongChosenList();
+                    mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
+                }
 
-                        getBinding().getRoot().post(() -> showChooseSongDialogTag = false);
-                    });
+                getBinding().getRoot().post(() -> showChooseSongDialogTag = false);
+            });
             return;
         }
 

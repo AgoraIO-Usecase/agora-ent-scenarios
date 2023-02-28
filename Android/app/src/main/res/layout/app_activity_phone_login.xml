@@ -1,181 +1,188 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/bg_app_def_white">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvAppName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="101dp"
-        android:text="@string/app_welcome_experience"
-        android:textColor="@color/def_text_color_040"
-        android:textSize="26sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="50dp">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/app_mobile_number"
-        android:textColor="@color/def_text_grey_979"
-        android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="@id/tvAppName"
-        app:layout_constraintTop_toBottomOf="@id/tvAppName" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvAppName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="101dp"
+            android:text="@string/app_welcome_experience"
+            android:textColor="@color/def_text_color_040"
+            android:textSize="26sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/etAccounts"
-        style="@style/def_et_input"
-        android:layout_marginHorizontal="30dp"
-        android:layout_marginTop="49dp"
-        android:hint="@string/app_please_input_account"
-        android:inputType="phone"
-        android:paddingStart="83dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvAppName"
-        tools:ignore="RtlSymmetry"
-        tools:text="12345678901" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/app_mobile_number"
+            android:textColor="@color/def_text_grey_979"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@id/tvAppName"
+            app:layout_constraintTop_toBottomOf="@id/tvAppName" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/plus86"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:drawableEnd="@mipmap/ic_arrow_down"
-        android:elevation="2dp"
-        android:text="@string/app_plus_86"
-        android:textColor="@color/def_text_color_040"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="@id/etAccounts"
-        app:layout_constraintStart_toStartOf="@id/etAccounts"
-        app:layout_constraintTop_toTopOf="@id/etAccounts" />
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etAccounts"
+            style="@style/def_et_input"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="49dp"
+            android:hint="@string/app_please_input_account"
+            android:inputType="phone"
+            android:paddingStart="83dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvAppName"
+            tools:ignore="RtlSymmetry"
+            tools:text="12345678901" />
 
-    <View
-        android:layout_width="1dp"
-        android:layout_height="15dp"
-        android:layout_marginStart="10dp"
-        android:background="#8A8B9B"
-        android:elevation="2dp"
-        app:layout_constraintBottom_toBottomOf="@id/plus86"
-        app:layout_constraintStart_toEndOf="@id/plus86"
-        app:layout_constraintTop_toTopOf="@id/plus86" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/plus86"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:drawableEnd="@mipmap/ic_arrow_down"
+            android:elevation="2dp"
+            android:text="@string/app_plus_86"
+            android:textColor="@color/def_text_color_040"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="@id/etAccounts"
+            app:layout_constraintStart_toStartOf="@id/etAccounts"
+            app:layout_constraintTop_toTopOf="@id/etAccounts" />
 
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/iBtnClearAccount"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginEnd="20dp"
-        android:background="@null"
-        android:elevation="6dp"
-        android:src="@mipmap/close"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/etAccounts"
-        app:layout_constraintEnd_toEndOf="@id/etAccounts"
-        app:layout_constraintTop_toTopOf="@id/etAccounts"
-        tools:visibility="visible" />
+        <View
+            android:layout_width="1dp"
+            android:layout_height="15dp"
+            android:layout_marginStart="10dp"
+            android:background="#8A8B9B"
+            android:elevation="2dp"
+            app:layout_constraintBottom_toBottomOf="@id/plus86"
+            app:layout_constraintStart_toEndOf="@id/plus86"
+            app:layout_constraintTop_toTopOf="@id/plus86" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/app_v_code"
-        android:textColor="@color/def_text_grey_979"
-        android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="@id/etAccounts"
-        app:layout_constraintTop_toBottomOf="@id/etAccounts" />
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/iBtnClearAccount"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginEnd="20dp"
+            android:background="@null"
+            android:elevation="6dp"
+            android:src="@mipmap/close"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/etAccounts"
+            app:layout_constraintEnd_toEndOf="@id/etAccounts"
+            app:layout_constraintTop_toTopOf="@id/etAccounts"
+            tools:visibility="visible" />
 
-    <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/etVCode"
-        style="@style/def_et_input"
-        android:layout_marginTop="49dp"
-        android:hint="@string/app_please_input_v_code"
-        android:inputType="phone"
-        android:maxLength="6"
-        app:layout_constraintEnd_toEndOf="@id/etAccounts"
-        app:layout_constraintStart_toStartOf="@id/etAccounts"
-        app:layout_constraintTop_toBottomOf="@id/etAccounts" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/app_v_code"
+            android:textColor="@color/def_text_grey_979"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@id/etAccounts"
+            app:layout_constraintTop_toBottomOf="@id/etAccounts" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvSendVCode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:elevation="2dp"
-        android:text="@string/send_v_code"
-        android:textColor="@color/blue_9F"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="@id/etVCode"
-        app:layout_constraintEnd_toEndOf="@id/etVCode"
-        app:layout_constraintTop_toTopOf="@id/etVCode" />
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etVCode"
+            style="@style/def_et_input"
+            android:layout_marginTop="49dp"
+            android:hint="@string/app_please_input_v_code"
+            android:inputType="phone"
+            android:maxLength="6"
+            app:layout_constraintEnd_toEndOf="@id/etAccounts"
+            app:layout_constraintStart_toStartOf="@id/etAccounts"
+            app:layout_constraintTop_toBottomOf="@id/etAccounts" />
 
-    <androidx.appcompat.widget.AppCompatCheckBox
-        android:id="@+id/cvIAgree"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:button="@drawable/bg_cb_check_status_def"
-        android:text="@string/i_agree"
-        android:textColor="@color/def_text_grey_6c7"
-        android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="@id/etVCode"
-        app:layout_constraintTop_toBottomOf="@id/etVCode" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSendVCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:elevation="2dp"
+            android:text="@string/send_v_code"
+            android:textColor="@color/blue_9F"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@id/etVCode"
+            app:layout_constraintEnd_toEndOf="@id/etVCode"
+            app:layout_constraintTop_toTopOf="@id/etVCode" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvUserAgreement"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:text="@string/app_user_agreement"
-        android:textColor="@color/blue_9F"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@id/cvIAgree"
-        app:layout_constraintStart_toEndOf="@id/cvIAgree"
-        app:layout_constraintTop_toTopOf="@id/cvIAgree" />
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/cvIAgree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:button="@drawable/bg_cb_check_status_def"
+            android:text="@string/i_agree"
+            android:textColor="@color/def_text_grey_6c7"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@id/etVCode"
+            app:layout_constraintTop_toBottomOf="@id/etVCode" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvAnd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:button="@drawable/bg_cb_check_status_def"
-        android:text="@string/app_and"
-        android:textColor="@color/def_text_grey_6c7"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@id/tvUserAgreement"
-        app:layout_constraintStart_toEndOf="@id/tvUserAgreement"
-        app:layout_constraintTop_toTopOf="@id/tvUserAgreement" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvUserAgreement"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="@string/app_user_agreement"
+            android:textColor="@color/blue_9F"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@id/cvIAgree"
+            app:layout_constraintStart_toEndOf="@id/cvIAgree"
+            app:layout_constraintTop_toTopOf="@id/cvIAgree" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvPrivacyAgreement"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:text="@string/app_privacy_agreement"
-        android:textColor="@color/blue_9F"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@id/tvAnd"
-        app:layout_constraintStart_toEndOf="@id/tvAnd"
-        app:layout_constraintTop_toTopOf="@id/tvAnd" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvAnd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:button="@drawable/bg_cb_check_status_def"
+            android:text="@string/app_and"
+            android:textColor="@color/def_text_grey_6c7"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@id/tvUserAgreement"
+            app:layout_constraintStart_toEndOf="@id/tvUserAgreement"
+            app:layout_constraintTop_toTopOf="@id/tvUserAgreement" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnLogin"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginHorizontal="30dp"
-        android:layout_marginTop="23dp"
-        android:background="@drawable/bg_def_button_solid"
-        android:text="@string/app_login"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cvIAgree" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPrivacyAgreement"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="@string/app_privacy_agreement"
+            android:textColor="@color/blue_9F"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@id/tvAnd"
+            app:layout_constraintStart_toEndOf="@id/tvAnd"
+            app:layout_constraintTop_toTopOf="@id/tvAnd" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnLogin"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="23dp"
+            android:background="@drawable/bg_def_button_solid"
+            android:text="@string/app_login"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cvIAgree" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>
