@@ -82,6 +82,7 @@ AgoraLrcDownloadDelegate
 @property (assign, nonatomic) double voicePitch;
 
 @property (nonatomic, strong) NSString *currentLoadUrl;//当前正在请求的歌词url
+@property (nonatomic, assign) AgoraAudioScenario audioScenario;
 @end
 
 @implementation KTVApi
@@ -110,7 +111,8 @@ AgoraLrcDownloadDelegate
         
         //为了 尽量不超时 设置了1000ms
         [self.engine setParameters:@"{\"rtc.ntp_delay_drop_threshold\":1000}"];
-        [self.engine setParameters:@"{\"che.audio.agc.enable\": true}"];
+        [self.engine setParameters:@"{\"rtc.enable_nasa2\": false}"];
+//        [self.engine setParameters:@"{\"che.audio.agc.enable\": true}"];
         [self.engine setParameters:@"{\"rtc.video.enable_sync_render_ntp\": true}"];
         [self.engine setParameters:@"{\"rtc.net.maxS2LDelay\": 800}"];
         //        [self.engine setParameters:@"{\"che.audio.custom_bitrate\":128000}"];
@@ -307,6 +309,7 @@ AgoraLrcDownloadDelegate
             state = KTVLoadSongStateOK;
             return block(songCode, [self cachedLyricUrl:songCode], role, state);
         }
+        
         return block(songCode, [self cachedLyricUrl:songCode], role, state);
     });
 }
@@ -317,13 +320,18 @@ AgoraLrcDownloadDelegate
     KTVSongType type = self.config.type;
     if(type == KTVSongTypeSolo) {
         if(role == KTVSingRoleMainSinger) {
-            [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
             options.autoSubscribeVideo = YES;
             options.publishMediaPlayerId = [self.rtcMediaPlayer getMediaPlayerId];
             options.publishMediaPlayerAudioTrack = YES;
             [self.engine updateChannelWithMediaOptions:options];
+            self.audioScenario = AgoraAudioScenarioChorus;
+            
+            KTVLogInfo(@"loadSong open music1 %ld", songCode);
+            [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
+            [self.rtcMediaPlayer adjustPlayoutVolume:50];
+            [self.rtcMediaPlayer adjustPublishSignalVolume:50];
         } else {
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
@@ -333,7 +341,6 @@ AgoraLrcDownloadDelegate
         }
     } else {
         if(role == KTVSingRoleMainSinger) {
-            [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
             options.autoSubscribeVideo = YES;
@@ -343,10 +350,12 @@ AgoraLrcDownloadDelegate
             options.enableAudioRecordingOrPlayout = YES;
             [self.engine updateChannelWithMediaOptions:options];
             [self joinChorus2ndChannel];
+            
+            KTVLogInfo(@"loadSong open music2 %ld", songCode);
+            [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             [self.rtcMediaPlayer adjustPlayoutVolume:50];
             [self.rtcMediaPlayer adjustPublishSignalVolume:50];
         } else if(role == KTVSingRoleCoSinger) {
-            [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
             options.autoSubscribeVideo = YES;
@@ -358,6 +367,9 @@ AgoraLrcDownloadDelegate
             
             //mute main Singer player audio
             [self.engine muteRemoteAudioStream:self.config.mainSingerUid mute:YES];
+            
+            KTVLogInfo(@"loadSong open music3 %ld", songCode);
+            [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             [self.rtcMediaPlayer adjustPlayoutVolume:50];
             [self.rtcMediaPlayer adjustPublishSignalVolume:50];
         } else {
@@ -372,8 +384,6 @@ AgoraLrcDownloadDelegate
 
 -(void)resumePlay
 {
-    //只在特殊情况(播放等)调用getPosition(会耗时)
-    self.localPlayerPosition = uptime() - [self.rtcMediaPlayer getPosition];
     if ([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePaused) {
         [self.rtcMediaPlayer resume];
     } else {
@@ -398,6 +408,7 @@ AgoraLrcDownloadDelegate
     [self.karaokeView reset];
     self.config = nil;
     [self.engine setAudioScenario:AgoraAudioScenarioGameStreaming];
+    self.audioScenario = AgoraAudioScenarioGameStreaming;
 }
 
 -(void)Skip {
@@ -468,7 +479,7 @@ AgoraLrcDownloadDelegate
 }
 
 - (void)updateRemotePlayBackVolumeIfNeed {
-    if (self.config.type != KTVSongTypeChorus || self.config.role == KTVSingRoleAudience) {
+    if (self.config.role == KTVSongTypeUnknown || self.config.role == KTVSingRoleAudience) {
         KTVLogInfo(@"updateRemotePlayBackVolumeIfNeed: %d, role: %ld", 100, self.config.role);
         [self.engine adjustPlaybackSignalVolume:100];
         return;
@@ -515,6 +526,13 @@ AgoraLrcDownloadDelegate
 
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine receiveStreamMessageFromUid:(NSUInteger)uid streamId:(NSInteger)streamId data:(NSData *)data
 {
+    NSNumber* loadHistory = [self.loadDict objectForKey:[self songCodeString:self.config.songCode]];
+    KTVLoadSongState state = [loadHistory intValue];
+    if (KTVLoadSongStateOK != state) {
+        KTVLogWarn(@"recv data break, load song state: %ld", state);
+        return;
+    }
+    
     NSDictionary *dict = [VLGlobalHelper dictionaryForJsonData:data];
     if (self.config.role == KTVSingRoleMainSinger) {
         KTVLogWarn(@"recv %@ cmd invalid", dict[@"cmd"]);
@@ -532,6 +550,7 @@ AgoraLrcDownloadDelegate
             [self updateCosingerPlayerStatusIfNeed];
             [self.delegate controller:self song:self.config.songCode didChangedToState:state local:NO];
         }
+
         self.remotePlayerPosition = uptime() - position;
         self.remotePlayerDuration = duration;
         //        KTVLogInfo(@"setLrcTime: %ld / %ld", self.remotePlayerPosition, self.remotePlayerDuration);
@@ -562,36 +581,46 @@ AgoraLrcDownloadDelegate
         
     } else if([dict[@"cmd"] isEqualToString:@"setVoicePitch"]) {
 //        int pitch = [dict[@"pitch"] intValue];
-//        NSInteger time = [dict[@"time"] integerValue];
-//        kWeakSelf(self)
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            [weakself.karaokeView setPitchWithPitch:pitch progress:time];
-//        });
-//        KTVLogInfo(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
+        //伴唱显示自己分数
+        if (self.config.type == KTVSongTypeChorus
+            && self.config.role == KTVSingRoleCoSinger) {
+            return;
+        }
+        int pitch = [dict[@"pitch"] intValue];
+        NSInteger time = [dict[@"time"] integerValue];
+        kWeakSelf(self)
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakself.karaokeView setPitchWithPitch:pitch progress:time];
+        });
+        KTVLogInfo(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
     }
 }
 
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers totalVolume:(NSInteger)totalVolume
 {
-    if (self.config.role != KTVSingRoleMainSinger
-        || self.playerState != AgoraMediaPlayerStatePlaying) {
+    if (self.playerState != AgoraMediaPlayerStatePlaying) {
+        return;
+    }
+    
+    if (self.config.role == KTVSingRoleAudience) {
         return;
     }
     
     double pitch = speakers.firstObject.voicePitch;
     self.voicePitch = pitch;
-//    NSDictionary *dict = @{
-//        @"cmd":@"setVoicePitch",
-//        @"pitch":@(pitch),
-//        @"time": @([self getPlayerCurrentTime])
-//    };
-//    [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
-//    }];
-//    kWeakSelf(self)
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        [weakself.karaokeView setPitchWithPitch:pitch progress:[self getPlayerCurrentTime]];
-//    });
+    [self.karaokeView setPitchWithPitch:pitch progress:[self getPlayerCurrentTime]];
     
+    if (self.config.role != KTVSingRoleMainSinger) {
+       return;
+    }
+    
+    NSDictionary *dict = @{
+        @"cmd":@"setVoicePitch",
+        @"pitch":@(pitch),
+        @"time": @([self getPlayerCurrentTime])
+    };
+    [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
+    }];
 }
 
 
@@ -653,6 +682,12 @@ AgoraLrcDownloadDelegate
     });
 }
 
+- (void)setAudioScenario:(AgoraAudioScenario)audioScenario {
+    _audioScenario = audioScenario;
+    [self.engine setAudioScenario:audioScenario];
+    KTVLogInfo(@"setAudioScenario: %ld", audioScenario);
+}
+
 #pragma mark - AgoraAudioFrameDelegate
 - (BOOL)onRecordAudioFrame:(AgoraAudioFrame *)frame channelId:(NSString *)channelId
 {
@@ -680,13 +715,12 @@ AgoraLrcDownloadDelegate
 -(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error
 {
     if (state == AgoraMediaPlayerStateOpenCompleted) {
+        KTVLogInfo(@"loadSong play completed %ld", self.config.songCode);
         self.localPlayerPosition = uptime();
         self.playerDuration = 0;
         if (self.config.role == KTVSingRoleMainSinger) {
-            //TODO: 目前不delay直接play会有大概率对不齐的情况，具体delay的时间或者把delay放在回调里的策略需要修改
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [playerKit play];
-            });
+            //主唱播放，通过同步消息“setLrcTime”通知伴唱play
+            [playerKit play];
         }
     } else if (state == AgoraMediaPlayerStateStopped) {
         self.localPlayerPosition = uptime();
@@ -696,6 +730,11 @@ AgoraLrcDownloadDelegate
         self.localPlayerPosition = uptime() - [self.rtcMediaPlayer getPosition];
         self.playerDuration = 0;
     } else if (state == AgoraMediaPlayerStatePaused) {
+        self.remotePlayerPosition = uptime();
+    } else if (state == AgoraMediaPlayerStatePlaying) {
+        self.localPlayerPosition = uptime() - [self.rtcMediaPlayer getPosition];
+        self.playerDuration = 0;
+        self.remotePlayerPosition = uptime();
     }
     if (self.config.role == KTVSingRoleMainSinger) {
         [self syncPlayState:state];
@@ -828,10 +867,10 @@ AgoraLrcDownloadDelegate
 //    [self.engine setAudioScenario:AgoraAudioScenarioChorus];
 //}
 
--(void)rtcEngine:(AgoraRtcEngineKit *)engine didLeaveChannelWithStats:(AgoraChannelStats *)stats
-{
-    [self.engine setAudioScenario:AgoraAudioScenarioGameStreaming];
-}
+//-(void)rtcEngine:(AgoraRtcEngineKit *)engine didLeaveChannelWithStats:(AgoraChannelStats *)stats
+//{
+//    self.audioScenario = AgoraAudioScenarioGameStreaming;
+//}
 
 #pragma private apis
 //发送流消息
@@ -896,7 +935,7 @@ AgoraLrcDownloadDelegate
     VL(weakSelf);
     [self.engine setDirectExternalAudioSource:YES];
     [self.engine setAudioFrameDelegate:self];
-    [self.engine setAudioScenario:AgoraAudioScenarioChorus];
+    self.audioScenario = AgoraAudioScenarioChorus;
     int ret =
     [self.engine joinChannelExByToken:VLUserCenter.user.agoraPlayerRTCToken connection:connection delegate:self mediaOptions:options joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
         KTVLogInfo(@"joinChannelExByToken success: channel: %@, uid: %ld", channel, uid);
@@ -1005,6 +1044,8 @@ AgoraLrcDownloadDelegate
     else {
         return (int)(self.totalScore / self.totalLines);
     }
+//    KTVLogInfo(@"setLrcLyric: %@", url);
+//    [self.lrcView setLrcUrlWithUrl:url];
 }
 
 - (NSString*)cachedLyricUrl:(NSInteger)songCode
