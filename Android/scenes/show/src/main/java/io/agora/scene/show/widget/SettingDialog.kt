@@ -193,6 +193,7 @@ class SettingDialog(context: Context) : BottomDarkDialog(context) {
             mAdapter.getItem(i)?.let {
                 if (it.itemId == itemId) {
                     it.activated = activate
+                    if (itemId == ITEM_ID_VIDEO) isVideoActivated = activate
                     mAdapter.notifyItemChanged(i)
                     return
                 }
