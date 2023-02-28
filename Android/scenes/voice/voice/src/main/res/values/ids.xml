@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- extend menu ids -->
+    <!-- gift -->
+    <item name="voice_extend_item_gift" type="id"/>
+    <!-- EQ -->
+    <item name="voice_extend_item_eq" type="id"/>
+    <!-- hand_up -->
+    <item name="voice_extend_item_hand_up" type="id"/>
+    <!-- mic -->
+    <item name="voice_extend_item_mic" type="id"/>
+    <!-- hand_up_status -->
+    <item name="voice_extend_item_hand_up_status" type="id"/>
+</resources>

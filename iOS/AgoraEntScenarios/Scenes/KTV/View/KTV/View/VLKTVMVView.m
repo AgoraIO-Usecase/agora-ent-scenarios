@@ -399,14 +399,17 @@
     }
 }
 
-#pragma mark private method
-- (void)_startLrc {
-    [_lrcView start];
-    self.totalLines = 0;
-    self.totalScore = 0.0f;
-    KTVLogInfo(@"VLKTVMVView _startLrc %@", self.musicTitleLabel.text);
-}
-
+//<<<<<<< HEAD
+//#pragma mark private method
+//- (void)_startLrc {
+//    [_lrcView start];
+//    self.totalLines = 0;
+//    self.totalScore = 0.0f;
+//    KTVLogInfo(@"VLKTVMVView _startLrc %@", self.musicTitleLabel.text);
+//}
+//
+//=======
+//>>>>>>> origin/main
 
 #pragma mark -
 
