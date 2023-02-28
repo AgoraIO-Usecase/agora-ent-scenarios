@@ -45,18 +45,18 @@ public class SAInviteCell: UITableViewCell {
         userName.text = item?.name
 //        item?.invited = (item?.mic_index ?? 0 != -1)
         avatar.sd_setImage(with: URL(string: item?.portrait ?? "")!, placeholderImage: nil)
-        operation.setTitle(item?.invited == true ? sceneLocalized("Invited") : sceneLocalized("Invite"), for: .normal)
-        operation.setBackgroundImage(item?.invited == true ? nil : UIImage.sceneImage(name: "blue_btn_bg"), for: .normal)
+        operation.setTitle((item?.invited == true || item?.status == .waitting) ? sceneLocalized("Invited") : sceneLocalized("Invite"), for: .normal)
+        operation.setBackgroundImage((item?.invited == true || item?.status == .waitting) ? nil : UIImage.sceneImage(name: "blue_btn_bg"), for: .normal)
         var color = UIColor.white
-        if item?.invited == true {
+        if item?.invited == true || item?.status == .waitting {
             color = UIColor(0x979CBB)
         }
         operation.setTitleColor(color, for: .normal)
     }
 
     @objc func invite() {
-        if inviteClosure != nil, user?.status == .idle, user?.invited ?? false == false {
-            inviteClosure!(user)
+        if inviteClosure != nil, user?.status != .waitting, user?.status != .accepted, user?.invited ?? false == false {
+            inviteClosure?(user)
         }
     }
 }
