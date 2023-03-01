@@ -8,7 +8,6 @@ import androidx.annotation.StringRes
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowWidgetSettingDialogBinding
 import io.agora.scene.show.databinding.ShowWidgetSettingDialogItemBinding
-import io.agora.scene.show.widget.link.LiveLinkAudienceSettingsDialog
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 
@@ -193,7 +192,27 @@ class SettingDialog(context: Context) : BottomDarkDialog(context) {
             mAdapter.getItem(i)?.let {
                 if (it.itemId == itemId) {
                     it.activated = activate
-                    if (itemId == ITEM_ID_VIDEO) isVideoActivated = activate
+                    mAdapter.notifyItemChanged(i)
+                    return
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 观众设置按钮在连麦和非连麦时候item 个数不同
+     * fix:观众连麦中关闭摄像头后结束连麦，再打开设置弹框，item 个数只有2个
+     */
+    fun resetItemStatus(@ItemId itemId: Int, activate: Boolean) {
+        when (itemId) {
+            ITEM_ID_VIDEO -> isVideoActivated = activate
+            else -> {}
+        }
+        for (i in 0..mAdapter.itemCount) {
+            mAdapter.getItem(i)?.let {
+                if (it.itemId == itemId) {
+                    it.activated = activate
                     mAdapter.notifyItemChanged(i)
                     return
                 }
