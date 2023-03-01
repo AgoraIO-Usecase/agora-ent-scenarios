@@ -1859,7 +1859,7 @@ class ShowSyncManagerServiceImpl(
                 runOnMainThread {
                     roomInfoController.micPKInvitationSubscriber?.invoke(
                         ShowServiceProtocol.ShowSubscribeStatus.deleted,
-                        null
+                        invitation
                     )
                 }
             }
