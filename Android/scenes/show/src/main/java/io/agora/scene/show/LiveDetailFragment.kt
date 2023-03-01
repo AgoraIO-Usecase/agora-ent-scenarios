@@ -638,12 +638,9 @@ class LiveDetailFragment : Fragment() {
                     SettingDialog.ITEM_ID_CAMERA -> mRtcEngine.switchCamera()
                     SettingDialog.ITEM_ID_QUALITY -> showPictureQualityDialog(this)
                     SettingDialog.ITEM_ID_VIDEO -> {
-                        mRtcEngine.muteLocalVideoStreamEx(!activated, mMainRtcConnection)
-                        if (activated) {
-                            mRtcEngine.startPreview()
-                        } else {
-                            mRtcEngine.stopPreview()
-                        }
+                        // 设置弹框设置摄像头，需要同步到PK 弹框中摄像头状态，后续需要统一获取
+                        enableLocalVideo(activated)
+                        mPKSettingsDialog.resetItemStatus(LivePKSettingsDialog.ITEM_ID_CAMERA, activated)
                     }
                     SettingDialog.ITEM_ID_MIC -> {
                         if (!isRoomOwner) {
@@ -960,12 +957,9 @@ class LiveDetailFragment : Fragment() {
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
                     LivePKSettingsDialog.ITEM_ID_CAMERA -> {
-                        mRtcEngine.muteLocalVideoStreamEx(!activated, mMainRtcConnection)
-                        if (activated) {
-                            mRtcEngine.startPreview()
-                        } else {
-                            mRtcEngine.stopPreview()
-                        }
+                        enableLocalVideo(activated)
+                        // pk 弹框设置摄像头，需要同步到设置弹框中摄像头状态，后续需要统一获取
+                        mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, activated)
                     }
                     LivePKSettingsDialog.ITEM_ID_SWITCH_CAMERA -> mRtcEngine.switchCamera()
                     LivePKSettingsDialog.ITEM_ID_MIC -> {
@@ -1425,6 +1419,15 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
+    private fun enableLocalVideo(enable: Boolean){
+        mRtcEngine.muteLocalVideoStreamEx(!enable, mMainRtcConnection)
+        if (enable) {
+            mRtcEngine.startPreview()
+        } else {
+            mRtcEngine.stopPreview()
+        }
+    }
+
     private fun joinChannel(eventListener: VideoSwitcher.IChannelEventListener) {
         val rtcConnection = mMainRtcConnection
         val uid = UserManager.getInstance().user.id
@@ -1540,6 +1543,10 @@ class LiveDetailFragment : Fragment() {
                 showLinkSettingsDialog()
             }
             enableLocalAudio(true)
+            // pk摄像头默认开启 todo 统一入口获取摄像头状态
+            mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, true)
+            mPKSettingsDialog.resetItemStatus(LivePKSettingsDialog.ITEM_ID_CAMERA, true)
+            enableLocalVideo(true)
             mRtcVideoSwitcher.setupLocalVideo(
                 VideoSwitcher.VideoCanvasContainer(
                     requireActivity(),
@@ -1654,7 +1661,12 @@ class LiveDetailFragment : Fragment() {
             }
             mRtcVideoSwitcher.setupLocalVideo(VideoSwitcher.VideoCanvasContainer(requireActivity(), mBinding.videoPKLayout.iBroadcasterAView, 0, viewIndex = 0))
             enableLocalAudio(true)
-            mRtcEngine.enableLocalVideo(true)
+            if (isRoomOwner){
+                // 连麦摄像头默认开启 todo 统一入口获取摄像头状态
+                mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, true)
+                mPKSettingsDialog.resetItemStatus(LivePKSettingsDialog.ITEM_ID_CAMERA, true)
+                enableLocalVideo(true)
+            }
             val channelMediaOptions = ChannelMediaOptions()
             channelMediaOptions.publishCameraTrack = false
             channelMediaOptions.publishMicrophoneTrack = false
