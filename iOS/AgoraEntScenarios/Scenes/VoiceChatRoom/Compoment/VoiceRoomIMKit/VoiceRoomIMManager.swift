@@ -280,6 +280,13 @@ public extension VoiceRoomIMManager {
     
     func fetchChatroomAttributes(keys:[String],completion: ((AgoraChatError?,[String:String]?) -> ())?) {
         AgoraChatClient.shared().roomManager?.fetchChatroomAttributes(self.currentRoomId, keys: keys,completion: completion)
+        
+    }
+    
+    func fetchChatroomAnnouncement(completion: @escaping (String) -> Void) {
+        AgoraChatClient.shared().roomManager?.getChatroomAnnouncement(withId: self.currentRoomId, completion: { content, error in
+            completion(content ?? "")
+        })
     }
     
     func updateAnnouncement(content: String,completion: @escaping (Bool) -> Void) {
