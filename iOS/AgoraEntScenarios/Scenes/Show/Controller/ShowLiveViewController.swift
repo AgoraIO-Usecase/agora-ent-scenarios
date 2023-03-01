@@ -787,6 +787,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         case .onSeat:
             self.muteLocalVideo = false
             self.muteLocalAudio = false
+            agoraKitManager.updateVideoProfileForMode(.single)
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             liveView.canvasView.canvasType = .none
             liveView.bottomBar.linkButton.isShowRedDot = false
@@ -1054,6 +1055,9 @@ extension ShowLiveViewController {
     private func resetRealTimeIfNeeded() {
         if role == .broadcaster && interactionStatus != .pking && interactionStatus != .onSeat {
             realTimeView.cleanRemoteDescription()
+        }
+        if role == .audience && interactionStatus != .pking && interactionStatus != .onSeat {
+            realTimeView.cleanLocalDescription()
         }
     }
     
