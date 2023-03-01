@@ -22,6 +22,7 @@ import io.agora.scene.ktv.bean.EffectVoiceBean;
 import io.agora.scene.ktv.databinding.FragmentEffectVoice2Binding;
 import io.agora.scene.ktv.databinding.FragmentEffectVoiceBinding;
 import io.agora.scene.ktv.databinding.KtvItemEffectvoiceBinding;
+import io.agora.scene.ktv.live.RoomLivingViewModel;
 import io.agora.scene.ktv.live.holder.EffectVoiceHolder;
 import io.agora.scene.ktv.live.holder.MVHolder;
 import io.agora.scene.ktv.widget.MusicSettingBean;
@@ -65,14 +66,15 @@ public class EffectVoiceFragment2 extends BaseViewBindingFragment<FragmentEffect
         list.add(new EffectVoiceBean(0, R.color.red_e0, "原声"));
         list.add(new EffectVoiceBean(1, R.color.red_e0, "KTV"));
         list.add(new EffectVoiceBean(2, R.color.red_e0, "演唱会"));
-
         list.add(new EffectVoiceBean(3, R.color.red_e0, "录音棚"));
         list.add(new EffectVoiceBean(4, R.color.red_e0, "留声机"));
         list.add(new EffectVoiceBean(5, R.color.red_e0, "空旷"));
-
         list.add(new EffectVoiceBean(6, R.color.red_e0, "空灵"));
         list.add(new EffectVoiceBean(7, R.color.red_e0, "流行"));
         list.add(new EffectVoiceBean(8, R.color.red_e0, "R&B"));
+        for (EffectVoiceBean item : list) {
+            item.setSelect(mSetting.getEffect() == item.getId());
+        }
 
         adapter = new BaseRecyclerViewAdapter<>(list, this, EffectVoiceHolder.class);
         getBinding().mRecyclerView.setAdapter(adapter);
@@ -92,17 +94,10 @@ public class EffectVoiceFragment2 extends BaseViewBindingFragment<FragmentEffect
         Log.e("liu0223", "onItemClick    " + position);
 
         for (int i = 0; i < adapter.dataList.size(); i++) {
-            //EffectVoiceBean item = adapter.dataList.get(i);
-
-
             adapter.dataList.get(i).setSelect(i == position);
             adapter.notifyItemChanged(i);
         }
-
-
-
-
-
+        mSetting.setEffect(data.getId());
     }
 
 
