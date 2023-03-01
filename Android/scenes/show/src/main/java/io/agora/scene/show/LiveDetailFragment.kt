@@ -1113,7 +1113,9 @@ class LiveDetailFragment : Fragment() {
                     showPKInvitationDialog(info.fromName)
                 }
             } else {
-                if (info != null && info.userId == UserManager.getInstance().user.id.toString()) {
+                // 被邀请者结束pk
+                val curUserId = UserManager.getInstance().user.id.toString()
+                if (info != null && (info.userId == curUserId || info.fromUserId == curUserId)) {
                     deletedPKInvitation = info
                     if (interactionInfo != null) {
                         mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!, {
