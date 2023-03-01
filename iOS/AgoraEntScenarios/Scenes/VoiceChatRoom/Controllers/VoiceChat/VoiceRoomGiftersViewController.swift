@@ -68,12 +68,12 @@ extension VoiceRoomGiftersViewController {
     @objc private func fetchList() {
         ChatRoomServiceImp.getSharedInstance().fetchGiftContribute { error, users in
             if error == nil, users != nil {
-                self.tableView.refreshControl?.endRefreshing()
                 if users?.count ?? 0 > 0 {
                     self.dataSource = users
                     self.tableView.reloadData()
                 }
             }
+            self.tableView.refreshControl?.endRefreshing()
         }
     }
 }
