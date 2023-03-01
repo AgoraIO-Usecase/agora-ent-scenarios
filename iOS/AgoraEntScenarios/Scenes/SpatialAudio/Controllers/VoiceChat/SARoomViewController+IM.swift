@@ -129,11 +129,6 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
         self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
     }
     
-    func onAnnouncementChanged(roomId: String, content: String) {
-        self.view.makeToast("Voice room announcement changed!", point: toastPoint, title: nil, image: nil, completion: nil)
-        self.roomInfo?.room?.announcement = content
-    }
-    
     func onRobotVolumeUpdated(roomId: String, volume: String) {
 //        roomInfo?.room?.robot_volume = UInt(volume)
     }
