@@ -41,7 +41,7 @@ class VoiceRoomViewController: VRBaseViewController {
     lazy var inputBar: VoiceRoomInputBar = .init(frame: CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 60)).backgroundColor(.white)
 
     var preView: VMPresentView!
-    var noticeView: VMNoticeView!
+    private lazy var noticeView = VMNoticeView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 230))
     var isShowPreSentView: Bool = false
     var rtckit: VoiceRoomRTCManager = VoiceRoomRTCManager.getSharedInstance()
     var isOwner: Bool = false
@@ -466,7 +466,6 @@ extension VoiceRoomViewController {
     }
 
     func showNoticeView(with role: ROLE_TYPE) {
-        let noticeView = VMNoticeView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 230))
         noticeView.roleType = role
         noticeView.noticeStr = roomInfo?.room?.announcement ?? ""
         noticeView.resBlock = { [weak self] flag, str in
