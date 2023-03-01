@@ -390,17 +390,19 @@ extension ShowLiveViewController {
     }
     
     func updateVideoCavans() {
-        if self.role == .audience {
+        if role == .audience {
             let uid: UInt = UInt(room?.ownerId ?? "")!
-            self.agoraKitManager.setupRemoteVideo(channelId: roomId,
+            agoraKitManager.setupRemoteVideo(channelId: roomId,
                                                   uid: uid,
-                                                  canvasView: self.liveView.canvasView.localView)
+                                                  canvasView: liveView.canvasView.localView)
             if let targetRoomId = currentInteraction?.roomId, targetRoomId != roomId {
                 let uid = UInt(currentInteraction?.userId ?? "")!
-                self.agoraKitManager.setupRemoteVideo(channelId: targetRoomId,
+                agoraKitManager.setupRemoteVideo(channelId: targetRoomId,
                                                 uid: uid,
-                                                canvasView: self.liveView.canvasView.remoteView)
+                                                canvasView: liveView.canvasView.remoteView)
             }
+            guard let audiencePresetType = audiencePresetType else { return }
+            agoraKitManager.setDefaultSuperResolutionForAudienceType(presetType: audiencePresetType)
         }
     }
 }
@@ -768,6 +770,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _onStopInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
+            self.muteLocalVideo = false
+            self.muteLocalAudio = false
             agoraKitManager.updateVideoProfileForMode(.single)
             agoraKitManager.leaveChannelEx(roomId: self.roomId, channelId: interaction.roomId)
             liveView.canvasView.canvasType = .none
@@ -781,6 +785,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
 //                self.muteLocalVideo = true
 //            }
         case .onSeat:
+            self.muteLocalVideo = false
+            self.muteLocalAudio = false
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             liveView.canvasView.canvasType = .none
             liveView.bottomBar.linkButton.isShowRedDot = false
