@@ -859,7 +859,6 @@ extension SpatialAudioSyncSerciceImp {
                            agoraPrint("imp room subscribe onUpdated...")
                            if origRoom?.announcement != room.announcement {
                                origRoom?.announcement = room.announcement
-                               self.subscribeDelegate?.onAnnouncementChanged(roomId: channelName, content: room.announcement ?? "")
                            } /*else if origRoom?.use_robot != room.use_robot {
                                origRoom?.use_robot = room.use_robot
                                self.subscribeDelegate?.onRobotSwitch(roomId: channelName, enable: room.use_robot ?? false, from: room.owner?.name ?? "")
