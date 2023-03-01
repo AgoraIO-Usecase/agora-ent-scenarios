@@ -107,6 +107,17 @@ extension ShowAgoraKitManager {
         showLogger.info("----- setSuperResolutionOn\(ShowSettingKey.SR.boolValue)  srType: \(srType)")
     }
     
+    func setDefaultSuperResolutionForAudienceType(presetType: ShowPresetType) {
+        var srType = SRType.none
+        switch presetType {
+        case .quality_medium, .quality_high:
+            srType = .x1_5
+        default:
+            break
+        }
+        setSuperResolutionOn(ShowSettingKey.SR.boolValue, srType: srType)
+    }
+    
     /// 设置超分倍数
     /// - Parameters:
     ///   - presetType: 预设类型
