@@ -336,7 +336,8 @@ class ShowLiveViewController: UIViewController {
                 }
             }
         }
-        liveView.canvasView.setLocalUserInfo(name: VLUserCenter.user.name, img: VLUserCenter.user.headUrl)
+        
+        liveView.canvasView.setLocalUserInfo(name: room?.ownerName ?? "", img: room?.ownerAvatar ?? "")
         
         self.muteLocalVideo = false
         self.muteLocalAudio = false

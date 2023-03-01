@@ -294,6 +294,8 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.setupLocalVideo(canvas)
         agoraKit.enableVideo()
         agoraKit.startPreview()
+        // 设置镜像
+        agoraKit.setLocalRenderMode(.hidden, mirror: .enabled)
     }
     
     /// 切换摄像头
@@ -547,9 +549,9 @@ extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
         .readWrite
     }
     
-    func getMirrorApplied() -> Bool {
-        true
-    }
+//    func getMirrorApplied() -> Bool {
+//        true
+//    }
     
     func getRotationApplied() -> Bool {
         false

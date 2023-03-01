@@ -379,7 +379,7 @@ extension ShowAgoraKitManager {
         case .mirror, .renderMode:
             let index = ShowSettingKey.renderMode.intValue % renderModeItems.count
             let mirrorIsOn = ShowSettingKey.mirror.boolValue
-            agoraKit.setLocalRenderMode(renderModeItems[index], mirror: mirrorIsOn == false ? .enabled : .disabled)
+            agoraKit.setLocalRenderMode(renderModeItems[index], mirror: mirrorIsOn ? .enabled : .disabled)
             showLogger.info("***Debug*** setLocalRenderMode  mirror = \(mirrorIsOn ? AgoraVideoMirrorMode.enabled : AgoraVideoMirrorMode.disabled), rendermode = \(renderModeItems[index])")
         case .debugSR, .debugSrType:
             let srIsOn = ShowSettingKey.debugSR.boolValue
