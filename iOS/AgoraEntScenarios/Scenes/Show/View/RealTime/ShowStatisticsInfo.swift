@@ -131,6 +131,22 @@ struct ShowStatisticsInfo {
         return (leftInfo, rightInfo)
     }
     
+    mutating func cleanLocalDescription() -> (String, String){
+        let sendTitle = "发送\n".show_localized
+        let videoSize = "编码分辨率"+": 0 x 0"
+        let videoSend = "发送码率".show_localized+": 0 kbps"
+        let uplink = "上行网络".show_localized+": \(uplink) KB/s"
+        
+        let fps = "编码帧率".show_localized+": 0 fps"
+        let vSendLoss = "上行丢包率".show_localized+": 0 %"
+        
+        let leftInfo =  [sendTitle, videoSize, videoSend,   uplink ].joined(separator: "\n\n")
+        let rightInfo = [" \n",     fps,       vSendLoss,   " " ].joined(separator: "\n\n")
+
+        return (leftInfo, rightInfo)
+
+    }
+    
     func description(audioOnly: Bool) -> (String, String) {
         switch type {
         case .local(let info):  return localDescription(info: info, audioOnly: audioOnly)
