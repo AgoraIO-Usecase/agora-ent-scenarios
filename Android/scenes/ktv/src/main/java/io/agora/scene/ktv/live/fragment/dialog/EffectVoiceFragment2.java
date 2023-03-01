@@ -63,15 +63,15 @@ public class EffectVoiceFragment2 extends BaseViewBindingFragment<FragmentEffect
         List<EffectVoiceBean> list = new ArrayList<>();
 
 
-        list.add(new EffectVoiceBean(0, R.color.red_e0, "原声"));
-        list.add(new EffectVoiceBean(1, R.color.red_e0, "KTV"));
-        list.add(new EffectVoiceBean(2, R.color.red_e0, "演唱会"));
-        list.add(new EffectVoiceBean(3, R.color.red_e0, "录音棚"));
-        list.add(new EffectVoiceBean(4, R.color.red_e0, "留声机"));
-        list.add(new EffectVoiceBean(5, R.color.red_e0, "空旷"));
-        list.add(new EffectVoiceBean(6, R.color.red_e0, "空灵"));
-        list.add(new EffectVoiceBean(7, R.color.red_e0, "流行"));
-        list.add(new EffectVoiceBean(8, R.color.red_e0, "R&B"));
+        list.add(new EffectVoiceBean(0, R.mipmap.bg_sound_mode_1, "原声"));
+        list.add(new EffectVoiceBean(1, R.mipmap.bg_sound_mode_2, "KTV"));
+        list.add(new EffectVoiceBean(2, R.mipmap.bg_sound_mode_3, "演唱会"));
+        list.add(new EffectVoiceBean(3, R.mipmap.bg_sound_mode_4, "录音棚"));
+        list.add(new EffectVoiceBean(4, R.mipmap.bg_sound_mode_1, "留声机"));
+        list.add(new EffectVoiceBean(5, R.mipmap.bg_sound_mode_2, "空旷"));
+        list.add(new EffectVoiceBean(6, R.mipmap.bg_sound_mode_3, "空灵"));
+        list.add(new EffectVoiceBean(7, R.mipmap.bg_sound_mode_4, "流行"));
+        list.add(new EffectVoiceBean(8, R.mipmap.bg_sound_mode_1, "R&B"));
         for (EffectVoiceBean item : list) {
             item.setSelect(mSetting.getEffect() == item.getId());
         }
