@@ -184,6 +184,22 @@ class LivePKSettingsDialog(context: Context) : BottomDarkDialog(context) {
         mAdapter.resetAll(itemList)
     }
 
+    fun resetItemStatus(@ItemId itemId: Int, activate: Boolean) {
+        when (itemId) {
+            ITEM_ID_CAMERA -> isVideoActivated = activate
+            else -> {}
+        }
+        for (i in 0..mAdapter.itemCount) {
+            mAdapter.getItem(i)?.let {
+                if (it.itemId == itemId) {
+                    it.activated = activate
+                    mAdapter.notifyItemChanged(i)
+                    return
+                }
+            }
+        }
+    }
+
     fun setOnItemActivateChangedListener(listener: (dialog: LivePKSettingsDialog, itemId: Int, activated: Boolean)->Unit) {
         this.onItemActivatedChangeListener = listener
     }
