@@ -58,11 +58,11 @@ extension SARoomViewController {
             .sectionHeader(iconName: "new", title: "Agora Blue Bot".localized_spatial(), desc: "Host Only".localized_spatial())
             .sliderCell(title: "Attenuation factor volume".localized_spatial(), value: robotInfo.blue_robot_attenuation, isEnable: isOwner)
             .switchCell(title: "Air Absorb".localized_spatial(), isOn: robotInfo.blue_robot_absorb, isEnabel: isOwner)
-            .switchCell(title: "Voice Blur".localized_spatial(), isOn: robotInfo.blue_robot_blur, isEnabel: isOwner)
+//            .switchCell(title: "Voice Blur".localized_spatial(), isOn: robotInfo.blue_robot_blur, isEnabel: isOwner)
             .sectionHeader(iconName: "new", title: "Agora Red Bot".localized_spatial(), desc: "Host Only".localized_spatial())
             .sliderCell(title: "Attenuation factor volume".localized_spatial(), value: robotInfo.red_robot_attenuation, isEnable: isOwner)
             .switchCell(title: "Air Absorb".localized_spatial(), isOn: robotInfo.red_robot_absorb, isEnabel: isOwner)
-            .switchCell(title: "Voice Blur".localized_spatial(), isOn: robotInfo.red_robot_blur, isEnabel: isOwner)
+//            .switchCell(title: "Voice Blur".localized_spatial(), isOn: robotInfo.red_robot_blur, isEnabel: isOwner)
             .config()
         actionView.didSwitchValueChangeClosure = { [weak self] indexPath, isOn in
             guard let self = self else { return }
