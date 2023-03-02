@@ -1135,9 +1135,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
             @Override
             public void onEffectChanged(int effect) {
-                if (mRtcEngine != null) {
-                    mRtcEngine.setAudioEffectPreset(getEffectIndex(effect));
-                }
+                setAudioEffectPreset(getEffectIndex(effect));
             }
 
             @Override
@@ -1206,29 +1204,46 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         ktvApiProtocol.initWithRtcEngine(mRtcEngine, roomInfoLiveData.getValue().getRoomNo(), iAgoraMusicContentCenter, mPlayer, streamId, this);
     }
 
+    private void setAudioEffectPreset(int effect) {
+        if (mRtcEngine == null) {
+            return;
+        }
+        int result = mRtcEngine.setAudioEffectPreset(effect);
+    }
+
     // ======================= settings =======================
     // ------------------ 音效调整 ------------------
     private int getEffectIndex(int index) {
         switch (index) {
+            // 原声
             case 0:
                 return Constants.AUDIO_EFFECT_OFF;
+            // KTV
             case 1:
                 return Constants.ROOM_ACOUSTICS_KTV;
+            // 演唱会
             case 2:
                 return Constants.ROOM_ACOUSTICS_VOCAL_CONCERT;
+            // 录音棚
             case 3:
                 return Constants.ROOM_ACOUSTICS_STUDIO;
+            // 留声机
             case 4:
                 return Constants.ROOM_ACOUSTICS_PHONOGRAPH;
+            // 空旷
             case 5:
                 return Constants.ROOM_ACOUSTICS_SPACIAL;
+            // 空灵
             case 6:
                 return Constants.ROOM_ACOUSTICS_ETHEREAL;
+            // 流行
             case 7:
                 return Constants.STYLE_TRANSFORMATION_POPULAR;
+            // R&B
             case 8:
                 return Constants.STYLE_TRANSFORMATION_RNB;
         }
+        // 原声
         return Constants.AUDIO_EFFECT_OFF;
     }
 
