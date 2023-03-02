@@ -601,6 +601,7 @@ extension VoiceRoomViewController {
     }
 
     func showInviteMicAlert() {
+        VoiceRoomPresentView.shared.dismiss()
         inputBar.hiddenInputBar()
         var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 75, height: 200))
         compent.destination = .center
