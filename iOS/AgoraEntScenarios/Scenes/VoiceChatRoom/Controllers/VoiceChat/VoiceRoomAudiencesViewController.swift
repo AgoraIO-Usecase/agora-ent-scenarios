@@ -52,12 +52,18 @@ extension VoiceRoomAudiencesViewController {
     @objc private func refresh() {
         ChatRoomServiceImp.getSharedInstance().fetchRoomMembers { error, users in
             if error == nil {
+                self.refreshEnd()
                 self.datas?.removeAll()
                 self.datas = users
                 self.empty.isHidden = ((self.datas?.count ?? 0) > 0)
                 self.tableView.reloadData()
             }
         }
+    }
+    
+    private func refreshEnd() {
+        self.tableView.refreshControl?.endRefreshing()
+        self.tableView.reloadData()
     }
     
     private func removeUser(user: VRUser) {
