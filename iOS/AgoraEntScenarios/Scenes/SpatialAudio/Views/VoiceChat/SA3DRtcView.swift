@@ -37,7 +37,6 @@ class SA3DRtcView: UIView {
             collectionView.reloadData()
             
             guard let mic = micInfos?.first else { return }
-            rtcUserView.cellType = getCellTypeWithStatus(mic.status)
             rtcUserView.user = mic.member
             panGesture?.isEnabled = mic.member?.uid == VLUserCenter.user.id
         }
@@ -92,7 +91,6 @@ class SA3DRtcView: UIView {
                 } else {
                     //更新可移动view的数据
                     let micInfo = micInfos[0]
-                    rtcUserView.cellType = getCellTypeWithStatus(micInfo.status)
                     rtcUserView.tag = 200
                     rtcUserView.user = micInfo.member
                 }
@@ -112,8 +110,8 @@ class SA3DRtcView: UIView {
                 guard let micInfos = self?.micInfos else { return }
                 let micInfo = micInfos[0]
                 micInfo.member?.volume = vol
-                self?.rtcUserView.cellType = self?.getCellTypeWithStatus(micInfo.status) ?? .AgoraChatRoomBaseUserCellTypeAdd
-                self?.rtcUserView.user = micInfo.member
+//                self?.rtcUserView.cellType = self?.getCellTypeWithStatus(micInfo.status) ?? .AgoraChatRoomBaseUserCellTypeAdd
+                self?.rtcUserView.volume = vol
             }
         }
     }
@@ -139,7 +137,6 @@ class SA3DRtcView: UIView {
             }
         } else {
             //更新可移动view的数据
-            rtcUserView.cellType = getCellTypeWithStatus(mic.status)
             rtcUserView.user = mic.member
             panGesture?.isEnabled = mic.member?.uid == VLUserCenter.user.id
 //            if mic.member == nil {
