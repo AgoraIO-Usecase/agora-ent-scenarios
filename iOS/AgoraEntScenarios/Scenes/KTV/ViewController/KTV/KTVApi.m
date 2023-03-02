@@ -83,6 +83,7 @@ AgoraLrcDownloadDelegate
 
 @property (nonatomic, strong) NSString *currentLoadUrl;//当前正在请求的歌词url
 @property (nonatomic, assign) AgoraAudioScenario audioScenario;
+@property (nonatomic, assign) NSInteger lastAudienceUpTime;
 @end
 
 @implementation KTVApi
@@ -139,9 +140,12 @@ AgoraLrcDownloadDelegate
         return;
     }
     kWeakSelf(self)
-    self.timer = [NSTimer scheduledTimerWithTimeInterval: 0.02 block:^(NSTimer * _Nonnull timer) {
+    self.timer = [NSTimer timerWithTimeInterval:0.02 block:^(NSTimer * _Nonnull timer) {
         NSInteger current = [weakself getPlayerCurrentTime];
-        printf("recv1 current:   %ld  %ld %ld\n", current, self.playerState, self.config.songCode);
+        if(self.config.role == KTVSingRoleAudience && (uptime() - self.lastAudienceUpTime > 1000)){
+            return;
+        }
+        NSLog(@"current:\(%ld)", current);
         [self setProgressWith:current];
         if(self.config.role == KTVSingRoleMainSinger){
             //如果超过前奏时间 自动隐藏前奏View
@@ -159,11 +163,11 @@ AgoraLrcDownloadDelegate
             }
         }
     } repeats:true];
-    
 }
 
 -(void)startTimer {
     if(self.isPause == false){
+        [[NSRunLoop currentRunLoop] addTimer:self.timer  forMode: NSRunLoopCommonModes];
         [self.timer fire];
         NSLog(@"timer: startTimer---%ld", self.playerState);
     } else {
@@ -432,6 +436,7 @@ AgoraLrcDownloadDelegate
 -(void)setProgressWith:(NSInteger)progress {
     kWeakSelf(self)
     dispatch_async(dispatch_get_main_queue(), ^{
+        //如果当前是闭麦状态，不再上报pitch
         [weakself.karaokeView setPitchWithPitch:self.voicePitch progress:progress];
     });
 }
@@ -553,6 +558,10 @@ AgoraLrcDownloadDelegate
 
         self.remotePlayerPosition = uptime() - position;
         self.remotePlayerDuration = duration;
+        if(self.config.role == KTVSingRoleAudience){
+            self.lastAudienceUpTime = uptime();
+        }
+        //同时保存uptime和 self.remotePlayerPosition 用来记录观众的时间更新
         //        KTVLogInfo(@"setLrcTime: %ld / %ld", self.remotePlayerPosition, self.remotePlayerDuration);
         if(self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
             if([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePlaying) {
@@ -606,21 +615,22 @@ AgoraLrcDownloadDelegate
         return;
     }
     
-    double pitch = speakers.firstObject.voicePitch;
-    self.voicePitch = pitch;
+    double pitch = self.micMuted ? 0 : speakers.firstObject.voicePitch;
+    self.voicePitch = pitch ;
+    //如果当前是闭麦状态，不再上报pitch
     [self.karaokeView setPitchWithPitch:pitch progress:[self getPlayerCurrentTime]];
     
     if (self.config.role != KTVSingRoleMainSinger) {
        return;
     }
     
-    NSDictionary *dict = @{
-        @"cmd":@"setVoicePitch",
-        @"pitch":@(pitch),
-        @"time": @([self getPlayerCurrentTime])
-    };
-    [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
-    }];
+//    NSDictionary *dict = @{
+//        @"cmd":@"setVoicePitch",
+//        @"pitch":@(pitch),
+//        @"time": @([self getPlayerCurrentTime])
+//    };
+//    [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
+//    }];
 }
 
 

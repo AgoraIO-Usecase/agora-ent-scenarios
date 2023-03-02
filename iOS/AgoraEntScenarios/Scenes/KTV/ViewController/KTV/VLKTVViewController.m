@@ -321,6 +321,7 @@ KTVApiDelegate
 //            [VLToast toast:[NSString stringWithFormat:@"network changed: %ld", status]];
             return;
         }
+        [weakSelf subscribeServiceEvent];
         [weakSelf _fetchServiceAllData];
     }];
     
@@ -866,6 +867,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     self.ktvApi = [[KTVApi alloc] initWithRtcEngine:self.RTCkit channel:self.roomModel.roomNo musicCenter:self.AgoraMcc player:self.rtcMediaPlayer dataStreamId:ktvApiStreamId delegate:self];
     self.ktvApi.karaokeView = self.MVView.karaokeView;
+    self.ktvApi.micMuted = self.isNowMicMuted;
     VL(weakSelf);
     KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
     int ret =
@@ -1035,6 +1037,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             break;
         case VLKTVBottomBtnClickTypeAudio:
             self.isNowMicMuted = !self.isNowMicMuted;
+            self.ktvApi.micMuted = self.isNowMicMuted;
             [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
                                                                 completion:^(NSError * error) {
             }];

@@ -68,6 +68,7 @@ typedef enum : NSUInteger {
 @property(nonatomic, weak)id<KTVApiDelegate> delegate;
 @property(nonatomic, weak) KaraokeView* karaokeView;
 @property (nonatomic, assign) NSInteger last;
+@property (nonatomic, assign) BOOL micMuted;
 
 -(id)initWithRtcEngine:(AgoraRtcEngineKit *)engine channel:(NSString*)channelName musicCenter:(AgoraMusicContentCenter*)musicCenter player:(nonnull id<AgoraMusicPlayerProtocol>)rtcMediaPlayer dataStreamId:(NSInteger)streamId delegate:(id<KTVApiDelegate>)delegate;
 -(void)loadSong:(NSInteger)songCode withConfig:(KTVSongConfiguration*)config withCallback:(void (^ _Nullable)(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state))block;
