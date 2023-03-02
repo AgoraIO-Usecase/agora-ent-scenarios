@@ -43,6 +43,7 @@ import io.agora.base.TextureBufferHelper;
 import io.agora.base.VideoFrame;
 import io.agora.base.internal.video.EglBase;
 import io.agora.base.internal.video.YuvHelper;
+import io.agora.scene.show.ShowLogger;
 import io.agora.scene.show.beauty.BeautyCache;
 import io.agora.scene.show.beauty.IBeautyProcessor;
 
@@ -78,7 +79,11 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
                 unInitST();
                 return null;
             });
-            textureBufferHelper.dispose();
+            try {
+                textureBufferHelper.dispose();
+            } catch (Exception e) {
+                ShowLogger.e("IBeautyProcessor", e, "");
+            }
             textureBufferHelper = null;
         }
         sdkIsInit = false;
@@ -141,6 +146,9 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
             });
         }
 
+        if (isReleased){
+            return true;
+        }
         int texture = textureBufferHelper.invoke(() ->
                 mSTRenderer.preProcess(buffer.getWidth(), buffer.getHeight(), videoFrame.getRotation(), mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21));
         Matrix transformMatrix = new Matrix();
@@ -156,6 +164,9 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
             return true;
         }
 
+        if (isReleased){
+            return true;
+        }
         VideoFrame.TextureBuffer newBuffer = textureBufferHelper.wrapTextureBuffer(
                 buffer.getWidth(),
                 buffer.getHeight(),
