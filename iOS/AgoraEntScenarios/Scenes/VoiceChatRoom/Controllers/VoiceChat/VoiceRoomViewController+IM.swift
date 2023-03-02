@@ -243,7 +243,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                         self.micMuteManager(mic: first)
                     }
                 } else {
-                    self.view.makeToast("You were removed from stage".localized())
+                    if !self.isOwner,status == -1,first.member == nil {
+                        self.view.makeToast("You were removed from stage".localized())
+                    }
                     if local_index == nil || mic_index == local_index {
                         rtckit.setClientRole(role: .audience)
                         rtckit.muteLocalAudioStream(mute: true)
