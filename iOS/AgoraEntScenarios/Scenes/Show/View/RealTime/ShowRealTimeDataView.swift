@@ -59,6 +59,15 @@ class ShowRealTimeDataView: UIView {
         rightInfoLabel.text = [localRightStr, remoteRightStr].joined(separator: "\n\n")
     }
     
+    func cleanLocalDescription(){
+        let localLeftStr = sendStatsInfo?.cleanLocalDescription().0 ?? ""
+        let localRightStr = sendStatsInfo?.cleanLocalDescription().1 ?? ""
+        let remoteLeftStr = receiveStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
+        let remoteRightStr = receiveStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
+        leftInfoLabel.text = [localLeftStr, remoteLeftStr].joined(separator: "\n\n")
+        rightInfoLabel.text = [localRightStr, remoteRightStr].joined(separator: "\n\n")
+    }
+    
     private func updateStatistisInfo(){
         let localLeftStr = sendStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
         let localRightStr = sendStatsInfo?.description(audioOnly: audioOnly).1 ?? ""

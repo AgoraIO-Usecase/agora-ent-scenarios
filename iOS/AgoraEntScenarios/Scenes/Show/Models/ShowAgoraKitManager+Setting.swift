@@ -107,6 +107,17 @@ extension ShowAgoraKitManager {
         showLogger.info("----- setSuperResolutionOn\(ShowSettingKey.SR.boolValue)  srType: \(srType)")
     }
     
+    func setDefaultSuperResolutionForAudienceType(presetType: ShowPresetType) {
+        var srType = SRType.none
+        switch presetType {
+        case .quality_medium, .quality_high:
+            srType = .x1_5
+        default:
+            break
+        }
+        setSuperResolutionOn(ShowSettingKey.SR.boolValue, srType: srType)
+    }
+    
     /// 设置超分倍数
     /// - Parameters:
     ///   - presetType: 预设类型
@@ -368,7 +379,7 @@ extension ShowAgoraKitManager {
         case .mirror, .renderMode:
             let index = ShowSettingKey.renderMode.intValue % renderModeItems.count
             let mirrorIsOn = ShowSettingKey.mirror.boolValue
-            agoraKit.setLocalRenderMode(renderModeItems[index], mirror: mirrorIsOn == false ? .enabled : .disabled)
+            agoraKit.setLocalRenderMode(renderModeItems[index], mirror: mirrorIsOn ? .enabled : .disabled)
             showLogger.info("***Debug*** setLocalRenderMode  mirror = \(mirrorIsOn ? AgoraVideoMirrorMode.enabled : AgoraVideoMirrorMode.disabled), rendermode = \(renderModeItems[index])")
         case .debugSR, .debugSrType:
             let srIsOn = ShowSettingKey.debugSR.boolValue

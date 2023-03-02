@@ -131,12 +131,11 @@ class ShowAgoraKitManager: NSObject {
     
     override init() {
         super.init()
-        setupContentInspectConfig()
         showLogger.info("init-- ShowAgoraKitManager")
     }
     
     //MARK: private
-    private func setupContentInspectConfig() {
+    private func setupContentInspectConfig(_ enable: Bool) {
         let config = AgoraContentInspectConfig()
         let dic: [String: String] = [
             "id": VLUserCenter.user.id,
@@ -153,7 +152,7 @@ class ShowAgoraKitManager: NSObject {
         module.interval = 30
         module.type = .moderation
         config.modules = [module]
-        let ret = agoraKit.enableContentInspect(true, config: config)
+        let ret = agoraKit.enableContentInspect(enable, config: config)
         showLogger.info("setupContentInspectConfig: \(ret)")
     }
     
@@ -200,6 +199,7 @@ class ShowAgoraKitManager: NSObject {
 //                updateCameraCaptureConfiguration()
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }
+            setupContentInspectConfig(true)
         
             let connection = AgoraRtcConnection()
             connection.channelId = targetChannelId
@@ -294,6 +294,8 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.setupLocalVideo(canvas)
         agoraKit.enableVideo()
         agoraKit.startPreview()
+        // 设置镜像
+        agoraKit.setLocalRenderMode(.hidden, mirror: .enabled)
     }
     
     /// 切换摄像头
@@ -396,6 +398,7 @@ class ShowAgoraKitManager: NSObject {
     
     func cleanCapture() {
 //        ByteBeautyManager.shareManager.destroy()
+        setupContentInspectConfig(false)
         agoraKit.stopPreview()
         agoraKit.setVideoFrameDelegate(nil)
     }
@@ -546,9 +549,9 @@ extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
         .readWrite
     }
     
-    func getMirrorApplied() -> Bool {
-        true
-    }
+//    func getMirrorApplied() -> Bool {
+//        true
+//    }
     
     func getRotationApplied() -> Bool {
         false
