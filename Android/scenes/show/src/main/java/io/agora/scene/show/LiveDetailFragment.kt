@@ -419,8 +419,8 @@ class LiveDetailFragment : Fragment() {
                 // 连麦状态
                 if (isMeLinking()) {
                     // 连麦中的一方
-                    bottomLayout.ivMusic.isVisible = true
-                    bottomLayout.ivBeauty.isVisible = true
+                    bottomLayout.ivMusic.isVisible = false
+                    bottomLayout.ivBeauty.isVisible = false
 
                     bottomLayout.flLinking.isVisible = true
                     bottomLayout.ivLinking.imageTintList = null
