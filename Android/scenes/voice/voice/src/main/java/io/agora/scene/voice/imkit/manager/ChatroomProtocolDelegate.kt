@@ -79,6 +79,13 @@ class ChatroomProtocolDelegate constructor(
         this.ownerBean = voiceRoomModel.owner ?: VoiceMemberModel()
         val voiceRoomInfo = VoiceRoomInfo()
         voiceRoomInfo.roomInfo = voiceRoomModel
+        roomManager.asyncFetchChatRoomAnnouncement(roomId, object : ValueCallBack<String> {
+            override fun onSuccess(value: String?) {
+                voiceRoomModel.announcement = value ?: ""
+            }
+            override fun onError(error: Int, errorMsg: String?) {
+            }
+        })
         roomManager.asyncFetchChatroomAttributesFromServer(roomId, keyList,
             object : ValueCallBack<Map<String, String>> {
                 override fun onSuccess(result: Map<String, String>) {

@@ -6,10 +6,7 @@ import androidx.lifecycle.ViewModel
 import io.agora.ValueCallBack
 import io.agora.chat.ChatRoom
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
-import io.agora.scene.voice.spatial.model.RoomKitBean
-import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
-import io.agora.scene.voice.spatial.model.VoiceRoomInfo
-import io.agora.scene.voice.spatial.model.VoiceRoomModel
+import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.spatial.viewmodel.repositories.VoiceRoomLivingRepository
 import io.agora.voice.common.net.Resource
@@ -61,9 +58,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
     private val _redRobotAttenuationObservable: SingleSourceLiveData<Resource<Pair<Double, Boolean>>> =
         SingleSourceLiveData()
 
-    private val _muteMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> =
-        SingleSourceLiveData()
-    private val _unMuteMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> =
+    private val _muteMicObservable: SingleSourceLiveData<Resource<VoiceMemberModel>> =
         SingleSourceLiveData()
     private val _leaveMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> =
         SingleSourceLiveData()
@@ -129,10 +124,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
     fun redRobotAttenuationObservable(): LiveData<Resource<Pair<Double, Boolean>>> = _redRobotAttenuationObservable
 
     /**本地禁麦*/
-    fun muteMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _muteMicObservable
-
-    /**取消本地禁麦*/
-    fun unMuteMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _unMuteMicObservable
+    fun muteMicObservable(): LiveData<Resource<VoiceMemberModel>> = _muteMicObservable
 
     /**下麦*/
     fun leaveMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _leaveMicObservable
@@ -273,13 +265,8 @@ class VoiceRoomLivingViewModel : ViewModel() {
     }
 
     // 本地禁麦
-    fun muteLocal(micIndex: Int) {
-        _muteMicObservable.setSource(mRepository.muteLocal(micIndex))
-    }
-
-    // 本地取消禁麦
-    fun unMuteLocal(micIndex: Int) {
-        _unMuteMicObservable.setSource(mRepository.unMuteLocal(micIndex))
+    fun muteLocal(mute: Boolean) {
+        _muteMicObservable.setSource(mRepository.muteLocal(mute))
     }
 
     // 下麦

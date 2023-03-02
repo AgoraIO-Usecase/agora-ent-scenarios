@@ -447,15 +447,21 @@ class VoiceSyncManagerServiceImp(
                             // 麦上有人
                             return@forEach
                         }
-                        val targetSeatInfo = innerGenerateDefaultSeatInfo(micIndex,
-                            it.member?.userId!!
-                        )
-                        innerUpdateSeat(targetSeatInfo) { e ->
-                            if (e == null) {
-                                completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
-                            } else {
-                                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+                        val member = userMap[userId]
+                        val toSeat = micSeatMap[micIndex.toString()]
+                        if (member != null && toSeat != null) {
+                            member.micIndex = toSeat.micIndex
+                            seatDownMember(toSeat, member)
+                            innerUpdateUserInfo(member, {}, {})
+                            innerUpdateSeat(toSeat) { e ->
+                                if (e == null) {
+                                    completion.invoke(VoiceServiceProtocol.ERR_OK, toSeat)
+                                } else {
+                                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+                                }
                             }
+                        } else {
+                            completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                         }
                     }
                 }
@@ -540,74 +546,32 @@ class VoiceSyncManagerServiceImp(
             completion.invoke(VoiceServiceProtocol.ERR_OK, true)
         }, {})
     }
-
     /**
      * mute
-     * @param micIndex 麦位index
+     * @param mute on / off
      */
-    override fun muteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        val targetSeatInfo = if (micSeatMap.containsKey(micIndex.toString())) {
-            val originInfo = micSeatMap[micIndex.toString()]
-            VoiceMicInfoModel().apply {
-                this.micIndex = micIndex
-                member = originInfo?.member
-                ownerTag = originInfo?.ownerTag!!
-                micStatus = MicStatus.Mute
-            }
-        } else {
-            VoiceMicInfoModel().apply {
-                this.micIndex = micIndex
-                ownerTag = false
-                micStatus = MicStatus.Mute
+    override fun muteLocal(mute: Boolean, completion: (error: Int, result: VoiceMemberModel?) -> Unit) {
+        var user: VoiceMemberModel? = null
+        userMap.forEach { (_, model) ->
+            if (model.rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+                model.micStatus = if (mute) MicStatus.Mute else MicStatus.Normal
+                user = model
             }
         }
-
-        innerUpdateSeat(targetSeatInfo) {
-            if (it == null) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
-            } else {
+        val userInfo = user
+        if (userInfo != null) {
+            innerUpdateUserInfo(userInfo, {
+                completion.invoke(VoiceServiceProtocol.ERR_OK, userInfo)
+            }) {
                 completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
             }
-        }
-    }
-
-    /**
-     * unMute
-     * @param micIndex 麦位index
-     */
-    override fun unMuteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        val targetSeatInfo = if (micSeatMap.containsKey(micIndex.toString())) {
-            val originInfo = micSeatMap[micIndex.toString()]
-            if (originInfo?.member == null) {
-                // 麦上没人
-                VoiceMicInfoModel().apply {
-                    this.micIndex = micIndex
-                    member = originInfo?.member
-                    ownerTag = originInfo?.ownerTag!!
-                    micStatus = MicStatus.Idle
-                }
-            } else {
-                // 麦上有人
-                VoiceMicInfoModel().apply {
-                    this.micIndex = micIndex
-                    member = originInfo.member
-                    ownerTag = originInfo.ownerTag
-                    micStatus = MicStatus.Normal
-                }
-            }
         } else {
-            VoiceMicInfoModel().apply {
-                this.micIndex = micIndex
-                ownerTag = false
-                micStatus = MicStatus.Idle
-            }
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
         }
-
-        innerUpdateSeat(targetSeatInfo) {
-            if (it == null) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
-            } else {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+        if (user?.micIndex != -1) {
+            micSeatMap[user?.micIndex.toString()]?.let {
+                seatDownMember(it, user)
+                innerUpdateSeat(it) {}
             }
         }
     }
@@ -647,39 +611,18 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun unForbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        val targetSeatInfo = if (micSeatMap.containsKey(micIndex.toString())) {
-            val originInfo = micSeatMap[micIndex.toString()]
-            if (originInfo?.member == null) {
-                // 麦上没人
-                VoiceMicInfoModel().apply {
-                    this.micIndex = micIndex
-                    member = originInfo?.member
-                    ownerTag = originInfo?.ownerTag!!
-                    micStatus = MicStatus.Idle
-                }
-            } else {
-                // 麦上有人
-                VoiceMicInfoModel().apply {
-                    this.micIndex = micIndex
-                    member = originInfo.member
-                    ownerTag = originInfo.ownerTag
-                    micStatus = MicStatus.Normal
+        val seatInfo = micSeatMap[micIndex.toString()]
+        if (seatInfo != null) {
+            seatInfo.micStatus = MicStatus.Normal
+            innerUpdateSeat(seatInfo) {
+                if (it == null) {
+                    completion.invoke(VoiceServiceProtocol.ERR_OK, seatInfo)
+                } else {
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                 }
             }
         } else {
-            VoiceMicInfoModel().apply {
-                this.micIndex = micIndex
-                ownerTag = false
-                micStatus = MicStatus.Idle
-            }
-        }
-
-        innerUpdateSeat(targetSeatInfo) {
-            if (it == null) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
-            } else {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
-            }
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
         }
     }
 
@@ -717,39 +660,18 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun unLockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        val targetSeatInfo = if (micSeatMap.containsKey(micIndex.toString())) {
-            val originInfo = micSeatMap[micIndex.toString()]
-            if (originInfo?.member == null) {
-                // 麦上没人
-                VoiceMicInfoModel().apply {
-                    this.micIndex = micIndex
-                    member = originInfo?.member
-                    ownerTag = originInfo?.ownerTag!!
-                    micStatus = MicStatus.Idle
-                }
-            } else {
-                // 麦上有人
-                VoiceMicInfoModel().apply {
-                    this.micIndex = micIndex
-                    member = originInfo.member
-                    ownerTag = originInfo.ownerTag
-                    micStatus = MicStatus.Normal
+        val seatInfo = micSeatMap[micIndex.toString()]
+        if (seatInfo != null) {
+            seatInfo.micStatus = MicStatus.Idle
+            innerUpdateSeat(seatInfo) {
+                if (it == null) {
+                    completion.invoke(VoiceServiceProtocol.ERR_OK, seatInfo)
+                } else {
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                 }
             }
         } else {
-            VoiceMicInfoModel().apply {
-                this.micIndex = micIndex
-                ownerTag = false
-                micStatus = MicStatus.Idle
-            }
-        }
-
-        innerUpdateSeat(targetSeatInfo) {
-            if (it == null) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
-            } else {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
-            }
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
         }
     }
 
@@ -759,22 +681,17 @@ class VoiceSyncManagerServiceImp(
      */
     override fun kickOff(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         if (micSeatMap.containsKey(micIndex.toString())) {
-            val originInfo = micSeatMap[micIndex.toString()]
-            if (originInfo?.member != null) {
-                // 麦上有人
-                val targetSeatInfo = VoiceMicInfoModel().apply {
-                    this.micIndex = micIndex
-                    member = null
-                    micStatus = MicStatus.Idle
-                }
-                innerUpdateSeat(targetSeatInfo) {
+            val seatInfo = micSeatMap[micIndex.toString()]
+            val member = userMap[seatInfo?.member?.userId]
+            if (seatInfo != null && member != null) {// 麦上有人
+                seatDownMember(seatInfo, null)
+                innerUpdateSeat(seatInfo) {
                     if (it == null) {
                         // 重制用户信息
-                        val userInfo = originInfo.member ?: return@innerUpdateSeat
-                        userInfo.micIndex = -1
-                        userInfo.status = MicRequestStatus.idle.value
-                        innerUpdateUserInfo(userInfo, {
-                            completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
+                        member.micIndex = -1
+                        member.status = MicRequestStatus.idle.value
+                        innerUpdateUserInfo(member, {
+                            completion.invoke(VoiceServiceProtocol.ERR_OK, seatInfo)
                         }, {
                             completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                         })
@@ -792,22 +709,17 @@ class VoiceSyncManagerServiceImp(
      */
     override fun leaveMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         if (micSeatMap.containsKey(micIndex.toString())) {
-            val originInfo = micSeatMap[micIndex.toString()]
-            if (originInfo?.member != null) {
-                // 麦上有人
-                val targetSeatInfo = VoiceMicInfoModel().apply {
-                    this.micIndex = micIndex
-                    member = null
-                    micStatus = MicStatus.Idle
-                }
-                innerUpdateSeat(targetSeatInfo) {
+            val seatInfo = micSeatMap[micIndex.toString()]
+            val member = userMap[seatInfo?.member?.userId]
+            if (seatInfo != null && member != null) {// 麦上有人
+                seatDownMember(seatInfo, null)
+                innerUpdateSeat(seatInfo) {
                     if (it == null) {
                         // 重制用户信息
-                        val userInfo = originInfo.member ?: return@innerUpdateSeat
-                        userInfo.micIndex = -1
-                        userInfo.status = MicRequestStatus.idle.value
-                        innerUpdateUserInfo(userInfo, {
-                            completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
+                        member.micIndex = -1
+                        member.status = MicRequestStatus.idle.value
+                        innerUpdateUserInfo(member, {
+                            completion.invoke(VoiceServiceProtocol.ERR_OK, seatInfo)
                         }, {
                             completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                         })
@@ -830,30 +742,25 @@ class VoiceSyncManagerServiceImp(
         completion: (error: Int, result: Map<Int, VoiceMicInfoModel>?) -> Unit
     ) {
         if (micSeatMap.containsKey(oldIndex.toString())) {
-            val originInfo = micSeatMap[oldIndex.toString()]
-            if (originInfo?.member != null) { // 麦上有人
-                val oldSeatInfo = VoiceMicInfoModel().apply {
-                    this.micIndex = oldIndex
-                    member = null
-                    micStatus = MicStatus.Idle
-                }
-                innerUpdateSeat(oldSeatInfo) {
-                    if (it == null) {
-                        val newSeatInfo = innerGenerateDefaultSeatInfo(newIndex,
-                            originInfo.member?.userId!!
-                        )
-                        innerUpdateSeat(newSeatInfo) { e ->
+            val fromSeat = micSeatMap[oldIndex.toString()]
+            val toSeat = micSeatMap[newIndex.toString()]
+            val member = userMap[fromSeat?.member?.userId]
+            if (fromSeat != null && member != null) { // 麦上有人
+                seatDownMember(fromSeat, null)
+                innerUpdateSeat(fromSeat) {
+                    if (it == null && toSeat != null) {
+                        member.micIndex = newIndex
+                        seatDownMember(toSeat, member)
+                        innerUpdateSeat(toSeat) { e ->
                             if (e == null) {
                                 val micMap = hashMapOf<Int, VoiceMicInfoModel>()
-                                micMap[newIndex] = newSeatInfo
+                                micMap[newIndex] = toSeat
                                 completion.invoke(VoiceServiceProtocol.ERR_OK, micMap)
                             } else {
                                 completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                             }
                         }
-                        newSeatInfo.member?.let { m ->
-                            innerUpdateUserInfo(m, {}, {})
-                        }
+                        innerUpdateUserInfo(member, {}, {})
                     } else {
                         completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                     }
@@ -1272,6 +1179,15 @@ class VoiceSyncManagerServiceImp(
     }
 
     // ----------------------------- 麦位状态 -----------------------------
+    private fun seatDownMember(seat: VoiceMicInfoModel, member: VoiceMemberModel?) {
+        seat.member = member
+        if (member != null) {
+            seat.micStatus = if (seat.micStatus == MicStatus.Idle) MicStatus.Normal else seat.micStatus
+        } else {
+            seat.micStatus = if (seat.micStatus == MicStatus.Normal) MicStatus.Idle else seat.micStatus
+        }
+    }
+
     private fun innerGenerateDefaultSeatInfo(index: Int, uid: String) : VoiceMicInfoModel {
         val seatInfo = micSeatMap[index.toString()]
         var mem: VoiceMemberModel? = null

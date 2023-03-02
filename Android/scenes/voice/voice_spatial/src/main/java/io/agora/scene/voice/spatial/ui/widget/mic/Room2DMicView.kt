@@ -98,12 +98,16 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                             ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
                         }
                         else -> {
-                            ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open0)
+                            if (micInfo.member?.micStatus == MicStatus.Normal) {
+                                ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open0)
+                            } else {
+                                ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
+                            }
                         }
                     }
                 }
             }
-            if (micInfo.member != null && micInfo.micStatus == MicStatus.Normal || micInfo.micStatus == MicStatus.BotActivated) {
+            if (micInfo.member != null && micInfo.micStatus == MicStatus.Normal && micInfo.member?.micStatus == MicStatus.Normal || micInfo.micStatus == MicStatus.BotActivated) {
                 // 用户音量
                 when (micInfo.audioVolumeType) {
                     ConfigConstants.VolumeType.Volume_None -> {

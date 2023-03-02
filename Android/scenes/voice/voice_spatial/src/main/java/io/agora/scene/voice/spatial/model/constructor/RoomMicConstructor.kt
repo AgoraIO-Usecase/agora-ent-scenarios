@@ -80,108 +80,95 @@ internal object RoomMicConstructor {
     fun builderOwnerMicMangerList(
         context: Context, micInfo: VoiceMicInfoModel, isMyself: Boolean
     ): MutableList<MicManagerBean> {
-        return when (micInfo.micStatus) {
-            // 正常
-            MicStatus.Normal -> {
-                if (isMyself) {
-                    mutableListOf(MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.Mute))
-                } else {
-                    mutableListOf(
-                        MicManagerBean(context.getString(R.string.voice_room_kickoff), true, MicClickAction.KickOff),
-                        MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.ForbidMic),
-                        MicManagerBean(context.getString(R.string.voice_room_block), true, MicClickAction.Lock)
+        var temp = mutableListOf<MicManagerBean>()
+        if (isMyself) { // 自己作为一类行为
+            if (micInfo.member?.micStatus == MicStatus.Normal) {
+                temp.add(
+                    MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.Mute)
+                )
+            } else {
+                temp.add(
+                    MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnMute)
+                )
+            }
+            return temp
+        }
+        // 非自己作为一类行为
+        // 第一项：邀请、踢出
+        if (micInfo.member == null) { // 无人：邀请, 被锁麦则无法邀请
+            when (micInfo.micStatus) {
+                MicStatus.Lock,
+                MicStatus.LockForceMute, -> {
+                    temp.add(
+                        MicManagerBean(context.getString(R.string.voice_room_invite), false, MicClickAction.Invite),
                     )
                 }
-            }
-            // 闭麦
-            MicStatus.Mute -> {
-                if (isMyself) {
-                    mutableListOf(
-                        MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnMute)
-                    )
-                } else {
-                    mutableListOf(
-                        MicManagerBean(context.getString(R.string.voice_room_kickoff), true, MicClickAction.KickOff),
-                        MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnForbidMic),
-                        MicManagerBean(context.getString(R.string.voice_room_block), true, MicClickAction.Lock)
-                    )
-                }
-            }
-            // 禁言 :有人、没人
-            MicStatus.ForceMute -> {
-                if (micInfo.member == null) {
-                    mutableListOf(
+                else -> {
+                    temp.add(
                         MicManagerBean(context.getString(R.string.voice_room_invite), true, MicClickAction.Invite),
-                        MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnForbidMic),
-                        MicManagerBean(context.getString(R.string.voice_room_block), true, MicClickAction.Lock)
-                    )
-                } else {
-                    mutableListOf(
-                        MicManagerBean(context.getString(R.string.voice_room_kickoff), true, MicClickAction.KickOff),
-                        MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnForbidMic),
-                        MicManagerBean(context.getString(R.string.voice_room_block), true, MicClickAction.Lock)
                     )
                 }
             }
-            // 锁麦
-            MicStatus.Lock -> {
-                mutableListOf(
-                    MicManagerBean(context.getString(R.string.voice_room_invite), false, MicClickAction.Invite),
+        } else {// 有人：踢出
+            temp.add(
+                MicManagerBean(context.getString(R.string.voice_room_kickoff), true, MicClickAction.KickOff)
+            )
+        }
+        // 第二项：是否静麦
+        when (micInfo.micStatus) {
+            MicStatus.Mute,
+            MicStatus.ForceMute,
+            MicStatus.LockForceMute, -> {
+                temp.add(
+                    MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnForbidMic)
+                )
+            }
+            else -> {
+                temp.add(
                     MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.ForbidMic),
+                )
+            }
+        }
+        // 第三项：是否锁麦
+        when (micInfo.micStatus) {
+            MicStatus.Lock,
+            MicStatus.LockForceMute, -> {
+                temp.add(
                     MicManagerBean(context.getString(R.string.voice_room_unblock), true, MicClickAction.UnLock)
                 )
             }
-            // 锁麦和禁言
-            MicStatus.LockForceMute -> {
-                mutableListOf(
-                    MicManagerBean(context.getString(R.string.voice_room_invite), false, MicClickAction.Invite),
-                    MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnForbidMic),
-                    MicManagerBean(context.getString(R.string.voice_room_unblock), true, MicClickAction.UnLock)
-                )
-            }
-            // 空闲
-            MicStatus.Idle -> {
-                mutableListOf(
-                    MicManagerBean(context.getString(R.string.voice_room_invite), true, MicClickAction.Invite),
-                    MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.ForbidMic),
+            else -> {
+                temp.add(
                     MicManagerBean(context.getString(R.string.voice_room_block), true, MicClickAction.Lock)
                 )
             }
-            else -> mutableListOf()
         }
+        return temp
     }
 
     /**
      * 嘉宾点击麦位管理
      */
     fun builderGuestMicMangerList(context: Context, micInfo: VoiceMicInfoModel): MutableList<MicManagerBean> {
-        return when (micInfo.micStatus) {
-            // 有⼈-正常
+        return when (micInfo.member?.micStatus) {
             MicStatus.Normal -> {
                 mutableListOf(
-                    MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.Mute),
-                    MicManagerBean(context.getString(R.string.voice_room_off_stage), true, MicClickAction.OffStage)
+                    MicManagerBean(context.getString(R.string.voice_room_off_stage), true, MicClickAction.OffStage),
+                    MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.Mute)
                 )
             }
-            // 有⼈-关麦
             MicStatus.Mute -> {
                 mutableListOf(
-                    MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnMute),
-                    MicManagerBean(context.getString(R.string.voice_room_off_stage), true, MicClickAction.OffStage)
+                    MicManagerBean(context.getString(R.string.voice_room_off_stage), true, MicClickAction.OffStage),
+                    MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnMute)
                 )
             }
-            // 有⼈-禁麦（被房主强制静音）
-            MicStatus.ForceMute -> {
-                mutableListOf(
-                    MicManagerBean(context.getString(R.string.voice_room_unmute), false, MicClickAction.UnForbidMic),
-                    MicManagerBean(context.getString(R.string.voice_room_off_stage), true, MicClickAction.OffStage)
-                )
-            }
-            // 其他情况 nothing
             else -> {
-                mutableListOf()
+                mutableListOf(
+                    MicManagerBean(context.getString(R.string.voice_room_off_stage), true, MicClickAction.OffStage),
+                    MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.Mute)
+                )
             }
-
         }
     }
 }

@@ -2,10 +2,7 @@ package io.agora.scene.voice.spatial.viewmodel.repositories
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import io.agora.scene.voice.spatial.model.RobotSpatialAudioModel
-import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
-import io.agora.scene.voice.spatial.model.VoiceRoomInfo
-import io.agora.scene.voice.spatial.model.VoiceRoomModel
+import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.voice.common.net.Resource
 import io.agora.voice.common.net.callback.ResultCallBack
@@ -229,36 +226,18 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     /**
-     * 本地禁麦
+     * 本地禁麦 on / off
      */
-    fun muteLocal(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
-        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
-                voiceServiceProtocol.muteLocal(micIndex, completion = { error, result ->
+    fun muteLocal(mute: Boolean): LiveData<Resource<VoiceMemberModel>> {
+        val resource = object : NetworkOnlyResource<VoiceMemberModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMemberModel>>) {
+                voiceServiceProtocol.muteLocal(mute) { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
-                })
-            }
-        }
-        return resource.asLiveData()
-    }
-
-    /**
-     * 取消本地禁麦
-     */
-    fun unMuteLocal(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
-        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
-                voiceServiceProtocol.unMuteLocal(micIndex, completion = { error, result ->
-                    if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
-                    } else {
-                        callBack.onError(error)
-                    }
-                })
+                }
             }
         }
         return resource.asLiveData()

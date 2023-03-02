@@ -385,9 +385,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
 
             override fun onClickSoundSocial(view: View) {
                 roomObservableDelegate.showRoom3DWelcomeSheetDialog()
-                roomObservableDelegate.onClickSoundSocial(roomKitBean.soundEffect, finishBack = {
-                    finish()
-                })
             }
         })
         binding.chatBottom.setMenuItemOnClickListener(object :

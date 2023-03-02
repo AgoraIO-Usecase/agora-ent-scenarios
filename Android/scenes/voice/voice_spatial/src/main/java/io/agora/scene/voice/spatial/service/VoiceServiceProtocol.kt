@@ -125,15 +125,9 @@ interface VoiceServiceProtocol {
 
     /**
      * mute
-     * @param micIndex 麦位index
+     * @param mute
      */
-    fun muteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
-
-    /**
-     * unMute
-     * @param micIndex 麦位index
-     */
-    fun unMuteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
+    fun muteLocal(mute: Boolean, completion: (error: Int, result: VoiceMemberModel?) -> Unit)
 
     /**
      * 禁言指定麦位置
