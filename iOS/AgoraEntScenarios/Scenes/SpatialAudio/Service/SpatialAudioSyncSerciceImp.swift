@@ -1190,7 +1190,7 @@ extension SpatialAudioSyncSerciceImp {
                            guard let self = self,
                                  let jsonStr = object.toJson() else { return }
                            let user = model(from: jsonStr.z.jsonToDictionary(), SAUser.self)
-                           if self.userList.contains(where: { $0.uid == user.uid }) {
+                           if VLUserCenter.user.id == user.uid {
                                if user.status == .waitting {
                                    self.subscribeDelegate?.onReceiveSeatInvitation(roomId: self.roomId!, user: user)
                                } else if user.status == .rejected {
