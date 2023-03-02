@@ -270,9 +270,6 @@ extension VoiceRoomViewController {
             self.roomInfo?.room?.use_robot = enable
             self.roomInfo?.mic_info![6] = mic_info
             self.rtcView.updateAlien(mic_info.status)
-            if enable {
-                self.rtckit.playMusic(with: .alien)
-            }
         }
     }
     
