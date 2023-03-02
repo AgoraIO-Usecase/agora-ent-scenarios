@@ -194,12 +194,12 @@ class ShowAgoraKitManager: NSObject {
             // 极速直播
             if role == .audience {
                 mediaOptions.audienceLatencyLevel = .lowLatency
-                agoraKit.setVideoFrameDelegate(self)
+//                agoraKit.setVideoFrameDelegate(self)
             }else{
 //                updateCameraCaptureConfiguration()
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }
-            setupContentInspectConfig(true)
+//            setupContentInspectConfig(true)
         
             let connection = AgoraRtcConnection()
             connection.channelId = targetChannelId
@@ -295,7 +295,7 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.enableVideo()
         agoraKit.startPreview()
         // 设置镜像
-        agoraKit.setLocalRenderMode(.hidden, mirror: .enabled)
+//        agoraKit.setLocalRenderMode(.hidden, mirror: .enabled)
     }
     
     /// 切换摄像头
@@ -398,7 +398,7 @@ class ShowAgoraKitManager: NSObject {
     
     func cleanCapture() {
 //        ByteBeautyManager.shareManager.destroy()
-        setupContentInspectConfig(false)
+//        setupContentInspectConfig(false)
         agoraKit.stopPreview()
         agoraKit.setVideoFrameDelegate(nil)
     }
@@ -549,9 +549,9 @@ extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
         .readWrite
     }
     
-//    func getMirrorApplied() -> Bool {
-//        true
-//    }
+    func getMirrorApplied() -> Bool {
+        true
+    }
     
     func getRotationApplied() -> Bool {
         false

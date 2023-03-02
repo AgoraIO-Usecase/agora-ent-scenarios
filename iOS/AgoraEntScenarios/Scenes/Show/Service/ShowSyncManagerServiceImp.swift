@@ -948,6 +948,7 @@ extension ShowSyncManagerServiceImp {
                            defer{
                                self._updateUserCount { error in
                                }
+                               self.subscribeDelegate?.onUserCountChanged(userCount: self.userList.count)
                            }
                            if self.userList.contains(where: { $0.userId == model.userId }) {
                                self.subscribeDelegate?.onMicSeatInvitationUpdated(invitation: model)
@@ -1468,7 +1469,7 @@ extension ShowSyncManagerServiceImp {
     private func _recvPKRejected(invitation: ShowPKInvitation) {
         guard roomId == invitation.fromRoomId else { return }
         let pkRoomId = invitation.roomId
-        if pkRoomId != roomId {
+        if pkRoomId == roomId {
             return
         }
         _unsubscribePKInvitationChanged(roomId: pkRoomId)
