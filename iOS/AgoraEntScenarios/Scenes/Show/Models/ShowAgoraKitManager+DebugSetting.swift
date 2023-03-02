@@ -51,7 +51,7 @@ extension ShowAgoraKitManager {
     func debugDefaultBroadcastorSetting() {
         captureConfig.dimensions = CGSize(width: 720, height: 1280)
         captureConfig.frameRate = 15
-        agoraKit.setCameraCapturerConfiguration(captureConfig)
+        updateCameraCaptureConfiguration()
         
         videoEncoderConfig.dimensions = CGSize(width: 720, height: 1280)
         videoEncoderConfig.frameRate = .fps15
@@ -60,7 +60,7 @@ extension ShowAgoraKitManager {
         
         setExposureRange()
         setColorSpace()
-        
+        ShowSettingKey.mirror.writeValue(true)
         updateSettingForkey(.debugPVC)
         updateSettingForkey(.focusFace)
         updateSettingForkey(.encode)
@@ -111,7 +111,7 @@ extension ShowAgoraKitManager {
                 text1 = "\(videoFullrangeExt)"
             }
             if let matrixCoefficientsExt = matrixCoefficientsExt {
-                text2 = "\(matrixCoefficientsExt)"                
+                text2 = "\(matrixCoefficientsExt)"
             }
         }
         return ShowDebug2TFModel(title: key.rawValue, tf1Text: text1, tf2Text: text2, separatorText: key.separator)
@@ -127,7 +127,7 @@ extension ShowAgoraKitManager {
                 return
             }
             captureConfig.frameRate = value
-            agoraKit.setCameraCapturerConfiguration(captureConfig)
+            updateCameraCaptureConfiguration()
             showLogger.info("***Debug*** setCameraCapturerConfiguration.captureFrameRate = \(captureConfig.frameRate) ")
         case .encodeFrameRate:
             guard let value = Int(text), let fps = AgoraVideoFrameRate(rawValue: value) else {
@@ -155,10 +155,8 @@ extension ShowAgoraKitManager {
         guard value1 > 0, value2 > 0 else { return }
         switch key {
         case .captureVideoSize:
-            agoraKit.disableVideo()
             captureConfig.dimensions = CGSize(width: value1, height: value2)
-            agoraKit.setCameraCapturerConfiguration(captureConfig)
-            agoraKit.enableVideo()
+            updateCameraCaptureConfiguration()
             showLogger.info("***Debug*** setCameraCapturerConfiguration.captureVideoSize = \(captureConfig.dimensions) ")
         case .encodeVideoSize:
             videoEncoderConfig.dimensions = CGSize(width: value1, height: value2)

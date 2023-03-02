@@ -5,6 +5,7 @@
 //  Created by zhaoyongqiang on 2021/11/19.
 //
 import UIKit
+//import YYCategories
 
 @objc
 class NetworkManager:NSObject {
@@ -340,7 +341,9 @@ class NetworkManager:NSObject {
                                                            options: .sortedKeys) // convertParams(params: params).data(using: .utf8)
         }
         let curl = request.cURL(pretty: true)
+        #if DEBUG
         debugPrint("curl == \(curl)")
+        #endif
         return request
     }
 
@@ -391,5 +394,40 @@ public extension URLRequest {
         cURL += method + url + header + data
 
         return cURL
+    }
+}
+
+//event report
+extension NetworkManager {
+    @objc public func reportSceneClick(sceneName: String) {
+        let src: String = "agora_ent_demo"
+        let ts: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
+        let params = ["pts": [["m": "event",
+                              "ls": [
+                                "name": "entryScene",
+                                "project": sceneName,
+                                "version": UIApplication.shared.appVersion ?? "",
+                                "platform": "iOS",
+                                "model": UIDevice.current.machineModel ?? ""
+                              ],
+                              "vs": ["count": 1]
+                             ]],
+                      "src": src,
+                      "ts": ts,
+                      "sign": "src=\(src)&ts=\(ts)".md5Encrypt] as [String: Any]
+//        ToastView.showWait(text: "loading...", view: nil)
+        let url = "https://report-ad.agoralab.co/v1/report"
+        NetworkManager.shared.postRequest(urlString: url,
+                                          params: params,
+                                          success: { response in
+            let data = response["data"] as? [String: String]
+            print(response)
+//            success(token)
+//            ToastView.hidden()
+        }, failure: { error in
+//            print(error)
+//            success(nil)
+//            ToastView.hidden()
+        })
     }
 }

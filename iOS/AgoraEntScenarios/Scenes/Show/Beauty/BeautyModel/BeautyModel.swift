@@ -39,7 +39,6 @@ class BeautyModel: BeautyBaseModel {
         var model = BeautyModel()
         model.name = "无"
         model.icon = "show_beauty_none"
-        model.path = ""
         dataArray.append(model)
         
         model = BeautyModel()
@@ -396,7 +395,6 @@ class BeautyModel: BeautyBaseModel {
             model.name = "无"
             model.icon = "show_beauty_none"
             model.isSelected = true
-            model.path = ""
             dataArray.append(model)
             
             model = BeautyModel()

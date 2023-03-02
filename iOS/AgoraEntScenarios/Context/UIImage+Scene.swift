@@ -18,6 +18,11 @@ extension UIImage {
             assertionFailure("sceneImageBundleName == nil")
             return nil
         }
+        
+        let cacheName = "\(name)__\(bundleName)"
+        if let image = AppContext.shared.imageCahe[cacheName] as? UIImage {
+            return image
+        }
 
         guard let bundlePath = Bundle.main.path(forResource: bundleName, ofType: "bundle"),
               let bundle = Bundle(path: bundlePath)
@@ -39,6 +44,7 @@ extension UIImage {
             if let path = bundle.path(forResource: imageName, ofType: suffix) {
                 let image = UIImage(contentsOfFile: path)
                 assert(image != nil, "image == nil \(path)")
+                AppContext.shared.imageCahe[cacheName] = image
                 return image
             }
         }
