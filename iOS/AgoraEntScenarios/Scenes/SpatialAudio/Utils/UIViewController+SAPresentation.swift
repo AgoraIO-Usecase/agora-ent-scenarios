@@ -14,6 +14,7 @@ public typealias SAPresentationNavigationController = UINavigationController & S
 public extension SABaseViewController {
     /// 自定义present方法
     func sa_presentViewController(_ viewController: SAPresentationViewController, animated: Bool = true) {
+        dismiss(animated: false)
         viewController.modalPresentationStyle = .custom
         viewController.transitioningDelegate = self
         present(viewController, animated: animated, completion: nil)
