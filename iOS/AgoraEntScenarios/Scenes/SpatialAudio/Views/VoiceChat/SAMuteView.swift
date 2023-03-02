@@ -162,7 +162,10 @@ class SAMuteView: UIView {
             return
         }
 
-        let m_type = micInfo.status
+        var m_type = micInfo.status
+        if micInfo.member != nil {
+            m_type = micInfo.member?.mic_status == .mute ? 1 : 0
+        }
         if sender.tag == 400 {
             state = .leave
         } else {
