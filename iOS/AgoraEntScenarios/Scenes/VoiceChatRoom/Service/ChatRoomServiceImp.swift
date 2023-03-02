@@ -520,8 +520,8 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             completion(self.normalError(),nil)
             return
         }
-        new_mic?.status = 0
-        old_mic?.status = -1
+        new_mic?.status = (new_mic!.status != 2 ? 0:2)
+        old_mic?.status = (old_mic!.status != 2 ? -1:2)
         guard old_index != new_index else { return }
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(old_index)": old_mic?.kj.JSONString() ?? "",
                                                                        "mic_\(new_index)": new_mic?.kj.JSONString() ?? ""],
