@@ -57,7 +57,7 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     moreBtn.tag = VLKTVBottomBtnClickTypeMore;
     [moreBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:moreBtn];
-    moreBtn.alpha = 0;
+   // moreBtn.alpha = 0;
     
     VLHotSpotBtn *dianGeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(self.width-20-70, (self.height-32)*0.5, 70, 32)];
     [dianGeBtn setImage:[UIImage sceneImageWithName:@"ktv_diange_icon"] forState:UIControlStateNormal];
