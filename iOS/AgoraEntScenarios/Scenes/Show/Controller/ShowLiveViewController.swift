@@ -485,7 +485,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     //MARK: ShowSubscribeServiceProtocol
     func onConnectStateChanged(state: ShowServiceConnectState) {
         guard state == .open else {
-            ToastView.show(text: "net work error: \(state)")
+//            ToastView.show(text: "net work error: \(state)")
             return
         }
         
