@@ -110,14 +110,6 @@ class VoiceRoomViewController: VRBaseViewController {
         UIApplication.shared.isIdleTimerDisabled = false
     }
 
-    deinit {
-        print("\(String(describing: self.swiftClassName)) is destroyed!")
-        VoiceRoomUserInfo.shared.currentRoomOwner = nil
-        VoiceRoomUserInfo.shared.user?.amount = 0
-        ChatRoomServiceImp.getSharedInstance().cleanCache()
-        ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
-        self.rtckit.stopPlayMusic()
-    }
 }
 
 extension VoiceRoomViewController {
@@ -593,6 +585,11 @@ extension VoiceRoomViewController {
                 self?.notifySeverLeave()
                 self?.rtckit.leaveChannel()
                 // giveupStage()
+                VoiceRoomUserInfo.shared.currentRoomOwner = nil
+                VoiceRoomUserInfo.shared.user?.amount = 0
+                ChatRoomServiceImp.getSharedInstance().cleanCache()
+                ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
+                self?.rtckit.stopPlayMusic()
                 self?.ownerBack()
             }
         }
