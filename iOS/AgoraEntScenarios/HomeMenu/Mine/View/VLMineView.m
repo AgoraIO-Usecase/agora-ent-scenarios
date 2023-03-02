@@ -59,7 +59,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
     self.dataArray = [self.itemsArray mutableCopy];
     BOOL developIsOn = [AppContext shared].isDebugMode;
     if (developIsOn) {
-        VLMineCellModel *model = [VLMineCellModel modelWithItemImg:@"mine_quit_icon" title:AGLocalizedString(@"开发者模式") style:VLMineCellStyleSwitch];
+        VLMineCellModel *model = [VLMineCellModel modelWithItemImg:@"mine_debug_icon" title:AGLocalizedString(@"开发者模式") style:VLMineCellStyleSwitch];
         [self.dataArray addObject:model];
     }
     _mineTable.frame = CGRectMake(20, _mineTopView.bottom+VLREALVALUE_WIDTH(15), SCREEN_WIDTH-40, VLREALVALUE_WIDTH(58)* self.dataArray.count + 10);
@@ -94,6 +94,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     VLMineCellModel *model = self.dataArray[indexPath.row];
+    /*
     if (model.style == VLMineCellStyleSwitch) {
         VLMineSwitchCell *switchCell = [tableView dequeueReusableCellWithIdentifier:kSwitchCellID forIndexPath:indexPath];
         BOOL developIsOn = [AppContext shared].isDebugMode;
@@ -106,6 +107,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
         }];
         return switchCell;
     }
+     */
     
     VLMineTCell *cell = [tableView dequeueReusableCellWithIdentifier:kDefaultCellID forIndexPath:indexPath];
     [cell setIconImageName:model.itemImgStr title:model.titleStr];

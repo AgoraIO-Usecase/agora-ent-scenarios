@@ -72,9 +72,9 @@ enum ShowAgoraCodeCType: String, CaseIterable {
 
 enum ShowAgoraVideoDimensions: String, CaseIterable {
     
-//    case _240x360 = "240x360"
+    case _240x360 = "240x360"
     case _360x640 = "360x640"
-    case _480x854 = "480x854"
+    case _480x856 = "480x856"
     case _540x960 = "540x960"
     case _720x1280 = "720x1280"
 //    case _1080x1920 = "1080x1920"

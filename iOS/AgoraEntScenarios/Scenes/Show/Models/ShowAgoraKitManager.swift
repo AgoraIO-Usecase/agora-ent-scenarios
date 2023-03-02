@@ -131,12 +131,11 @@ class ShowAgoraKitManager: NSObject {
     
     override init() {
         super.init()
-        setupContentInspectConfig()
         showLogger.info("init-- ShowAgoraKitManager")
     }
     
     //MARK: private
-    private func setupContentInspectConfig() {
+    private func setupContentInspectConfig(_ enable: Bool) {
         let config = AgoraContentInspectConfig()
         let dic: [String: String] = [
             "id": VLUserCenter.user.id,
@@ -153,7 +152,7 @@ class ShowAgoraKitManager: NSObject {
         module.interval = 30
         module.type = .moderation
         config.modules = [module]
-        let ret = agoraKit.enableContentInspect(true, config: config)
+        let ret = agoraKit.enableContentInspect(enable, config: config)
         showLogger.info("setupContentInspectConfig: \(ret)")
     }
     
@@ -195,25 +194,29 @@ class ShowAgoraKitManager: NSObject {
             // 极速直播
             if role == .audience {
                 mediaOptions.audienceLatencyLevel = .lowLatency
+//                agoraKit.setVideoFrameDelegate(self)
             }else{
-                agoraKit.setCameraCapturerConfiguration(captureConfig)
+//                updateCameraCaptureConfiguration()
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }
+//            setupContentInspectConfig(true)
         
             let connection = AgoraRtcConnection()
             connection.channelId = targetChannelId
             connection.localUid = UInt(VLUserCenter.user.id) ?? 0
             
             //TODO: retain cycle in joinChannelEx
-            let proxy = ShowAgoraExProxy(delegate: delegateMap[currentChannelId])
+//            let proxy = ShowAgoraExProxy(delegate: delegateMap[currentChannelId])
+            let proxy = delegateMap[currentChannelId]
             let date = Date()
+            showLogger.info("try to join room[\(connection.channelId)] ex uid: \(connection.localUid)", context: kShowLogBaseContext)
             let ret =
             agoraKit.joinChannelEx(byToken: token,
                                    connection: connection,
                                    delegate: proxy,
                                    mediaOptions: mediaOptions) { channelName, uid, elapsed in
                 let cost = Int(-date.timeIntervalSinceNow * 1000)
-                showLogger.info("join room[\(channelName)] ex success \(uid) cost \(cost) ms", context: kShowLogBaseContext)
+                showLogger.info("join room[\(channelName)] ex success uid: \(uid) cost \(cost) ms", context: kShowLogBaseContext)
             }
             agoraKit.updateChannelEx(with: mediaOptions, connection: connection)
             exConnectionMap[targetChannelId] = connection
@@ -239,10 +242,14 @@ class ShowAgoraKitManager: NSObject {
     //MARK: public method
     func setRtcDelegate(delegate: AgoraRtcEngineDelegate?, roomId: String) {
         guard let delegate = delegate else {
-            delegateMap[roomId] = nil
+            delegateMap[roomId]?.delegate = nil
             return
         }
-        let proxy = ShowAgoraExProxy(delegate:delegate)
+        var proxy = delegateMap[roomId]
+        if proxy == nil {
+            proxy = ShowAgoraExProxy(delegate: delegate)
+        }
+        proxy?.delegate = delegate
         
         delegateMap[roomId] = proxy
     }
@@ -261,7 +268,7 @@ class ShowAgoraKitManager: NSObject {
         NetworkManager.shared.generateToken(channelName: channelId,
                                             uid: UserInfo.userId,
                                             tokenType: .token007,
-                                            type: .rtc) { token in
+                                            type: .rtc) {[weak self] token in
             guard let token = token else {
                 showLogger.error("renewToken fail: token is empty")
                 return
@@ -269,7 +276,7 @@ class ShowAgoraKitManager: NSObject {
             let option = AgoraRtcChannelMediaOptions()
             option.token = token
             AppContext.shared.rtcTokenMap?[channelId] = token
-            self.updateChannelEx(channelId: channelId, options: option)
+            self?.updateChannelEx(channelId: channelId, options: option)
         }
     }
     
@@ -287,6 +294,8 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.setupLocalVideo(canvas)
         agoraKit.enableVideo()
         agoraKit.startPreview()
+        // 设置镜像
+//        agoraKit.setLocalRenderMode(.hidden, mirror: .enabled)
     }
     
     /// 切换摄像头
@@ -358,11 +367,19 @@ class ShowAgoraKitManager: NSObject {
     /// 设置采集分辨率
     /// - Parameter size: 分辨率
     func setCaptureVideoDimensions(_ size: CGSize){
-        agoraKit.disableVideo()
         captureConfig.dimensions = CGSize(width: size.width, height: size.height)
+        updateCameraCaptureConfiguration()
+    }
+    
+    /// 更新采集参数
+    /// - Returns:
+    func updateCameraCaptureConfiguration() {
+//        agoraKit.disableVideo()
+        agoraKit.stopPreview()
         let ret = agoraKit.setCameraCapturerConfiguration(captureConfig)
-        agoraKit.enableVideo()
-        showLogger.info("setCaptureVideoDimensions width = \(size.width), height = \(size.height), ret = \(ret)")
+//        agoraKit.enableVideo()
+        agoraKit.startPreview()
+        showLogger.info("setCaptureVideoDimensions = \(captureConfig.dimensions), framerate = \(captureConfig.frameRate)  ret = \(ret)")
     }
     
     /// 设置编码分辨率
@@ -380,8 +397,10 @@ class ShowAgoraKitManager: NSObject {
     }
     
     func cleanCapture() {
-        ByteBeautyManager.shareManager.destroy()
+//        ByteBeautyManager.shareManager.destroy()
+//        setupContentInspectConfig(false)
         agoraKit.stopPreview()
+        agoraKit.setVideoFrameDelegate(nil)
     }
     
     func leaveChannelEx(roomId: String, channelId: String) {
@@ -512,7 +531,9 @@ class ShowAgoraKitManager: NSObject {
 extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
     
     func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
+//        print("aaa onCapture1 w:\(CVPixelBufferGetWidth(videoFrame.pixelBuffer!)) h:\(CVPixelBufferGetHeight(videoFrame.pixelBuffer!))")
         videoFrame.pixelBuffer = BeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
+//        print("aaa onCapture2 w:\(CVPixelBufferGetWidth(videoFrame.pixelBuffer!)) h:\(CVPixelBufferGetHeight(videoFrame.pixelBuffer!))")
         return true
     }
     
@@ -605,4 +626,36 @@ extension ShowAgoraKitManager {
 //            agoraKit.setParameters("{\"che.video.vpr.enable\":false}") // off
 //        }
 //    }
+}
+
+extension ShowAgoraKitManager {
+    func setOffMediaOptionsVideo(roomid: String) {
+        guard let connection = exConnectionMap[roomid] else {
+            showLogger.info("setOffMediaOptionsVideo  connection 不存在 \(roomid)")
+            return
+        }
+        showLogger.info("setOffMediaOptionsVideo  count = \(exConnectionMap.count), roomid = \(roomid)")
+        let mediaOptions = AgoraRtcChannelMediaOptions()
+        mediaOptions.autoSubscribeVideo = false
+        agoraKit.updateChannelEx(with: mediaOptions, connection: connection)
+//        exConnectionMap.forEach { key, connention in
+//            if key != roomid {
+//                let mediaOptions = AgoraRtcChannelMediaOptions()
+//                mediaOptions.autoSubscribeVideo = false
+//                agoraKit.updateChannelEx(with: mediaOptions, connection: connention)
+//            }
+//        }
+    }
+    
+    func setOffMediaOptionsAudio() {
+        exConnectionMap.forEach { _, connention in
+            let mediaOptions = AgoraRtcChannelMediaOptions()
+            mediaOptions.autoSubscribeAudio = false
+            agoraKit.updateChannelEx(with: mediaOptions, connection: connention)
+        }
+    }
+    
+    func setOffSuperResolution() {
+        setSuperResolutionOn(false)
+    }
 }

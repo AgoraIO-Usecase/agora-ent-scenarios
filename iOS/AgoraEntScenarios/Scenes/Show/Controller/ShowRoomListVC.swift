@@ -15,6 +15,8 @@ class ShowRoomListVC: UIViewController {
     private var roomListView: ShowRoomListView!
     private var roomList: [ShowRoomListModel]?
     
+    private var previewConfig: ShowAgoraPreviewConfig?
+    
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
     
@@ -60,7 +62,12 @@ class ShowRoomListVC: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        getPreViewPreset()
         getRoomList()
+    }
+    
+    private func getPreViewPreset(){
+        previewConfig = ShowAgoraKitManager.previewPreset()
     }
     
     private func setUpUI(){
@@ -130,6 +137,7 @@ class ShowRoomListVC: UIViewController {
     // 创建房间
     private func createRoom(){
         let preVC = ShowCreateLiveVC()
+        preVC.previewSet = previewConfig
         let preNC = UINavigationController(rootViewController: preVC)
         preNC.navigationBar.setBackgroundImage(UIImage(), for: .default)
         preNC.modalPresentationStyle = .fullScreen
@@ -145,7 +153,7 @@ class ShowRoomListVC: UIViewController {
         let nc = UINavigationController(rootViewController: vc)
         nc.modalPresentationStyle = .fullScreen
         if room.ownerId == VLUserCenter.user.id {
-            AppContext.showServiceImp(room.roomId!).joinRoom(room: room) {[weak self] error, model in
+            AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, model in
                 if let error = error {
                     ToastView.show(text: error.localizedDescription)
                     return
@@ -163,11 +171,15 @@ class ShowRoomListVC: UIViewController {
     
     private func getRoomList() {
         AppContext.showServiceImp("").getRoomList(page: 1) { [weak self] error, roomList in
-            if let list = roomList {
-                self?.roomListView.roomList = list
-                self?.roomList = list
+            guard let self = self else {return}
+            self.roomListView.collectionView.mj_header?.endRefreshing()
+            if let error = error {
+                ToastView.show(text: error.localizedDescription)
+                return
             }
-            self?.roomListView.collectionView.mj_header?.endRefreshing()
+            let list = roomList ?? []
+            self.roomListView.roomList = list
+            self.roomList = list
         }
     }
     
