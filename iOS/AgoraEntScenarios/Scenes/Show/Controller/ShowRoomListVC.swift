@@ -42,7 +42,6 @@ class ShowRoomListVC: UIViewController {
         setUpUI()
         setUpNaviBar()
         addRefresh()
-        getPreViewPreset()
     }
     
     @objc private func didClickSettingButton(){
@@ -63,6 +62,7 @@ class ShowRoomListVC: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        getPreViewPreset()
         getRoomList()
     }
     
