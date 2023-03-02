@@ -74,7 +74,7 @@ extension SpatialAudioSyncSerciceImp {
             completion()
             return
         }
-
+        SyncUtil.reset()
         SyncUtil.initSyncManager(sceneId: cSceneId) {
         }
         

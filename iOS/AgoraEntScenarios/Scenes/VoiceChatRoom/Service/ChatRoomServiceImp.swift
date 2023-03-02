@@ -674,7 +674,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             completion()
             return
         }
-
+        SyncUtil.reset()
         SyncUtil.initSyncManager(sceneId: cSceneId) {
 //            guard let self = self else {
 //                return
