@@ -133,9 +133,6 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialD
         /**机器人音量*/
         fun onBotVolumeChange(progress: Int)
 
-        /**最佳音效*/
-        fun onSoundEffect(soundSelectionType: Int, isEnable: Boolean)
-
         /**空间音频*/
         fun onSpatialAudio(isOpen: Boolean, isEnable: Boolean)
     }

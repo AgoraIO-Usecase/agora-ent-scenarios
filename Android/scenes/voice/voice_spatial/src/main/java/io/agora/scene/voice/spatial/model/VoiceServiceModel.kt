@@ -36,6 +36,8 @@ data class VoiceMemberModel constructor(
     // 这里用的是user.id
     @SerializedName("rtc_uid") var rtcUid: Int = 0,
     @SerializedName("mic_index") var micIndex: Int = -1,
+    // -1: none, 0: un mute, 1: mute
+    @SerializedName("mic_status") var micStatus: Int = -1,
     @SerializedName("status") var status: Int = MicRequestStatus.idle.value
 ) : BaseRoomBean
 

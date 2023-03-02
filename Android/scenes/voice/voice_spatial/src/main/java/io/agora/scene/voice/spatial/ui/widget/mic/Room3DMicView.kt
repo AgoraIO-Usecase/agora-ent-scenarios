@@ -98,7 +98,12 @@ class Room3DMicView : ConstraintLayout, IRoomMicBinding {
                         ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
                     }
                     else -> {
-                        ivMicTag.isVisible = false
+                        if (micInfo.member?.micStatus == MicStatus.Normal) {
+                            ivMicTag.isVisible = false
+                        } else {
+                            ivMicTag.isVisible = true
+                            ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
+                        }
                     }
                 }
             }

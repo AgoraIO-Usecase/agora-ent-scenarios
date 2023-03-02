@@ -4,7 +4,8 @@
 
 ##### 1.1 概述
 
-项目名称：空间音频语聊房
+项目名称：空间音频语聊房  
+
 空间音频语聊房项目是声网空间音频场景的开源代码，开发者可以获取并添加到您的APP工程里，本源码会伴随声动语聊Demo同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
 
 ##### 1.2 功能介绍
@@ -57,16 +58,15 @@
 
 ### 3.1 重要类介绍
 
-AgoraRtc管理类：[AgoraRtcEngineController](src/main/java/io/agora/scene/voice/spatial/service/VoiceSyncManagerServiceImp.kt)
-房间成员空间参数设置类：[RoomObservableViewDelegate](src/main/java/io/agora/scene/voice/spatial/ui/RoomObservableViewDelegate.kt)
-空间位置坐标计算类：[Room3DMicLayout](src/main/java/io/agora/scene/voice/spatial/ui/widget/mic/Room3DMicLayout.kt)
+AgoraRtc管理类：[AgoraRtcEngineController](src/main/java/io/agora/scene/voice/spatial/service/VoiceSyncManagerServiceImp.kt)  
+
+房间成员空间参数设置类：[RoomObservableViewDelegate](src/main/java/io/agora/scene/voice/spatial/ui/RoomObservableViewDelegate.kt)  
+
+空间位置坐标计算类：[Room3DMicLayout](src/main/java/io/agora/scene/voice/spatial/ui/widget/mic/Room3DMicLayout.kt)  
 
 ### 4.FAQ
 - 如何获取声网和环信APPID：
   - 声网APPID申请：https://www.agora.io/cn/
-  - 环信APPID申请：https://www.easemob.com/
-- 语聊房中的弹幕组件使用的是哪家？是否可以自己选择供应商？
-  声动语聊源码使用的是环信AgoraChat的IM和信令服务，您也可以使用自己的服务。
 - 集成遇到困难，该如何联系声网获取协助
   - 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
   - 方案2：发送邮件给support@agora.io咨询。

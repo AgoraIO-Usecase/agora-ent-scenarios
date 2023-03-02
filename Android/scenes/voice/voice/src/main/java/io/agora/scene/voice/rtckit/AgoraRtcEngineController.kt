@@ -78,6 +78,7 @@ class AgoraRtcEngineController {
                 override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                     super.onJoinChannelSuccess(channel, uid, elapsed)
                     "voice rtc onJoinChannelSuccess channel:$channel,uid:$uid".logD(TAG)
+                    rtcEngine?.setEnableSpeakerphone(true)
                     // 默认开启降噪
                     deNoise(VoiceBuddyFactory.get().rtcChannelTemp.AINSMode)
                     joinCallback?.onSuccess(true)
