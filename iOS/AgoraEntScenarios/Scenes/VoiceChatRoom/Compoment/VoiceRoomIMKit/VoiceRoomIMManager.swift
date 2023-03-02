@@ -104,9 +104,6 @@ fileprivate let once = VoiceRoomIMManager()
         AgoraChatClient.shared().chatManager?.remove(self)
     }
 
-    deinit {
-        self.removeListener()
-    }
 }
 
 public extension VoiceRoomIMManager {
@@ -208,7 +205,6 @@ public extension VoiceRoomIMManager {
         default:
             break
         }
-        removeListener()
     }
 
     func chatroomAttributesDidUpdated(_ roomId: String, attributeMap: [String: String]?, from fromId: String) {

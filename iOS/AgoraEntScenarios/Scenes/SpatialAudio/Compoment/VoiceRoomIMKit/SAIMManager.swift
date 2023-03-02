@@ -95,10 +95,6 @@ fileprivate let once = SAIMManager()
         AgoraChatClient.shared().roomManager?.remove(self)
         AgoraChatClient.shared().chatManager?.remove(self)
     }
-
-    deinit {
-        self.removeListener()
-    }
 }
 
 public extension SAIMManager {

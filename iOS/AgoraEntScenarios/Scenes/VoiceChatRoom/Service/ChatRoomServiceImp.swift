@@ -448,11 +448,11 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.mic_index = mic_index
         mic.status = oldMic.status == 2 ? 2:-1
         self.cleanUserMicIndex(mic: self.mics[mic_index])
-        VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
-            if error == nil {
-                self.mics[mic_index] = mic
+        VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { [weak self] error in
+            if error == nil,self?.mics.count ?? 0 > 0 {
+                self?.mics[mic_index] = mic
             }
-            completion(self.convertError(error: error),mic)
+            completion(self?.convertError(error: error),mic)
         })
     }
     
