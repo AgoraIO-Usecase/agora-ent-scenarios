@@ -1297,6 +1297,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
     // ------------------ 倒计时 ------------------
     public void musicCountDown(int time) {
+        if (mRtcEngine == null) return;
         playerMusicCountDownLiveData.postValue(time);
         Map<String, Object> msg = new HashMap<>();
         msg.put("cmd", "countdown");
@@ -1361,7 +1362,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                             needRePreload = true;
                             rePreloadConfig = new KTVSongConfiguration(type, role, songCode, mainSingerUid, coSingerUid);
                         }
-                        changeMusic();
                     }
                     return null;
                 }
@@ -1410,7 +1410,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                                     needRePreload = true;
                                     rePreloadConfig = config;
                                 }
-                                changeMusic();
                             }
                             return null;
                         }
