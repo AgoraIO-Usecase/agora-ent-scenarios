@@ -31,7 +31,8 @@ enum ShowPKInviteStatus: CaseIterable {
 
     var bgImage: UIImage? {
         switch self {
-        case .invite, .waitting: return UIImage.show_sceneImage(name: "show_invite_btn_bg")
+        case .invite: return UIImage.show_sceneImage(name: "show_invite_btn_bg")
+        case .waitting: return UIImage.show_sceneImage(name: "show_invite_btn_bg")
         default: return nil
         }
     }
@@ -131,6 +132,7 @@ class ShowPKInviteViewCell: ShowInviteCell {
             statusButton.setTitle(pkStatus.title, for: .normal)
             statusButton.setTitleColor(pkStatus.titleColor, for: .normal)
             statusButton.setBackgroundImage(pkStatus.bgImage, for: .normal)
+            statusButton.isEnabled = pkStatus != .waitting
         }
     }
     
