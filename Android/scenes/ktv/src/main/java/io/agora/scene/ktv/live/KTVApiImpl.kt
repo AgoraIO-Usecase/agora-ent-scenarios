@@ -649,7 +649,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         audioPlayoutDelay = audioState.audioPlayoutDelay
     }
 
-    // ------------------------ AgoraRtcMediaPlayerDelegate ------------------------
+    // ------------------------ AgoraMusicContentCenterEventDelegate  ------------------------
     override fun onPreLoadEvent(
         songCode: Long,
         percent: Int,
@@ -692,7 +692,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         callback(lyricUrl)
     }
 
-    // ------------------------ AgoraMusicContentCenterEventDelegate ------------------------
+    // ------------------------ AgoraRtcMediaPlayerDelegate ------------------------
     private var duration: Long = 0
     override fun onPlayerStateChanged(
         state: Constants.MediaPlayerState?,
