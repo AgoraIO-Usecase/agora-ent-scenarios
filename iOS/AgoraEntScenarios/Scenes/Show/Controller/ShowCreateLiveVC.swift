@@ -26,15 +26,15 @@ class ShowCreateLiveVC: UIViewController {
         if AppContext.shared.isDebugMode {
             manager.debugDefaultBroadcastorSetting()
         }else{
-//            manager.defaultSetting()
-            guard let previewSet = previewSet else {
-                return manager
-            }
-            manager.videoEncoderConfig.frameRate = previewSet.0.frameRate
-            manager.videoEncoderConfig.dimensions = previewSet.0.dimensions
-            manager.videoEncoderConfig.bitrate = previewSet.0.bitrate
-            manager.captureConfig.dimensions = previewSet.1.dimensions
-            manager.captureConfig.frameRate = previewSet.1.frameRate
+            manager.defaultSetting()
+//            guard let previewSet = previewSet else {
+//                return manager
+//            }
+//            manager.videoEncoderConfig.frameRate = previewSet.0.frameRate
+//            manager.videoEncoderConfig.dimensions = previewSet.0.dimensions
+//            manager.videoEncoderConfig.bitrate = previewSet.0.bitrate
+//            manager.captureConfig.dimensions = previewSet.1.dimensions
+//            manager.captureConfig.frameRate = previewSet.1.frameRate
         }
         return manager
     }()
@@ -130,8 +130,9 @@ class ShowCreateLiveVC: UIViewController {
         present(vc, animated: true)
     }
     
-    @objc private func didClickCancelButton(){
+    @objc func didClickCancelButton(){
         BeautyManager.shareManager.destroy()
+        agoraKitManager.cleanCapture()
         dismiss(animated: true)
     }
 }
