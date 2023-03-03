@@ -312,7 +312,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 }
             }
             let list = self.userList?.filter({
-                mics_id.z.rangeOfString($0.chat_uid ?? "").length <= 0
+                mics_id.z.rangeOfString($0.chat_uid ?? "").length >= 0
             })
             completion(nil,list)
 

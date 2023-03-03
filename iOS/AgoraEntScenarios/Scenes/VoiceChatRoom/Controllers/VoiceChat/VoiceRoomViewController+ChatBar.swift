@@ -254,7 +254,13 @@ extension VoiceRoomViewController {
     }
 
     func showUsers(position: VoiceRoomSwitchBarDirection) {
-        let contributes = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [VoiceRoomGiftersViewController(roomId: roomInfo?.room?.room_id ?? ""),VoiceRoomAudiencesViewController()], titles: ["Contribution List".localized(),"Audience".localized()], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
+        let audience = VoiceRoomAudiencesViewController()
+        let contributes = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [VoiceRoomGiftersViewController(roomId: roomInfo?.room?.room_id ?? ""),audience], titles: ["Contribution List".localized(),"Audience".localized()], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
+        audience.kickClosure = { [weak self] user,mic in
+            if mic != nil{
+                self?.rtcView.updateUser(mic!)
+            }
+        }
         let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 420)), custom: contributes)
         presentViewController(vc)
     }
