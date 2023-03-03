@@ -106,6 +106,10 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             if (i == index) {
                 continue
             }
+            // workaround
+            if (size == 0) {
+                return
+            }
             val realIndex = (if (i < 0) size + i else i) % size
             if (realIndex < 0 || realIndex >= size) {
                 continue
