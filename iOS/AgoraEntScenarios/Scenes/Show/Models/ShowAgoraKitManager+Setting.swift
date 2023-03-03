@@ -62,8 +62,6 @@ extension ShowAgoraKitManager {
         // 默认音量设置
         ShowSettingKey.recordingSignalVolume.writeValue(80)
         ShowSettingKey.musincVolume.writeValue(30)
-//        agoraKit.enableExtension("agora_video_filters_super_resolution", "super_resolution")
-//        ShowSettingKey.SR.writeValue(false) // 默认关闭sr
         let hasOpened = UserDefaults.standard.bool(forKey: hasOpenedKey)
         // 第一次进入房间的时候设置
         if hasOpened == false {
@@ -166,8 +164,8 @@ extension ShowAgoraKitManager {
     /// 选择采集分辨率
     /// - Parameter index: 索引
     func selectCaptureVideoDimensions(index: Int) {
-        setCaptureVideoDimensions(captureDimensionsItems[index])
-        ShowSettingKey.captureVideoSize.writeValue(index)
+//        setCaptureVideoDimensions(captureDimensionsItems[index])
+//        ShowSettingKey.captureVideoSize.writeValue(index)
     }
     
     // 预设模式
@@ -192,14 +190,13 @@ extension ShowAgoraKitManager {
             updateSettingForkey(.videoDenoiser)
             updateSettingForkey(.PVC)
             updateSettingForkey(.captureVideoSize)
+            updateCameraCaptureConfiguration()
         }else {
             videoEncoderConfig.dimensions = encodeSize.sizeValue
             videoEncoderConfig.frameRate = fps
             videoEncoderConfig.bitrate = Int(bitRate)
             captureConfig.dimensions = captureSize.sizeValue
             captureConfig.frameRate = Int32(fps.rawValue)
-//            agoraKit.setCameraCapturerConfiguration(captureConfig)
-            updateCameraCaptureConfiguration()
             agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
             setH265On(h265On)
         }
@@ -217,6 +214,14 @@ extension ShowAgoraKitManager {
 //        setSuperResolutionOn(isOn, srType: srType)
         ShowSettingKey.SR.writeValue(isOn)
     }
+    
+    private func _resetPresetValues() {
+        updateSettingForkey(.videoEncodeSize)
+        updateSettingForkey(.videoBitRate)
+        updateSettingForkey(.FPS)
+        updateSettingForkey(.captureVideoSize)
+    }
+
     
     func updatePresetForType(_ type: ShowPresetType, mode: ShowMode,uid: UInt? = nil) {
         switch type {
@@ -272,7 +277,7 @@ extension ShowAgoraKitManager {
         case .low:
             switch mode {
             case .single:
-                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 1461, h265On: false, captureSize: ._1080P, cache: false)
+                _resetPresetValues()
             case .pk:
                 _presetValuesWith(encodeSize: ._360x640, fps: .fps15, bitRate: 700, h265On: false, captureSize: ._720P, cache: false)
             }
@@ -280,7 +285,7 @@ extension ShowAgoraKitManager {
         case .medium:
             switch mode {
             case .single:
-                _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 1800, h265On: true, captureSize: ._720P, cache: false)
+                _resetPresetValues()
             case .pk:
                 _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P, cache: false)
             }
@@ -288,7 +293,7 @@ extension ShowAgoraKitManager {
         case .high:
             switch mode {
             case .single:
-                _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 2099, h265On: true, captureSize: ._720P, cache: false)
+                _resetPresetValues()
             case .pk:
                 _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P, cache: false)
             }
@@ -345,7 +350,7 @@ extension ShowAgoraKitManager {
             // 采集帧率
             captureConfig.frameRate = Int32(fpsItems[index].rawValue)
 //            agoraKit.setCameraCapturerConfiguration(captureConfig)
-            updateCameraCaptureConfiguration()
+//            updateCameraCaptureConfiguration()
             
         case .H265:
             setH265On(isOn)
@@ -359,7 +364,7 @@ extension ShowAgoraKitManager {
             break
         case .captureVideoSize:
             let index = indexValue % captureDimensionsItems.count
-            setCaptureVideoDimensions(captureDimensionsItems[index])
+            captureConfig.dimensions = captureDimensionsItems[index]
         case .captureFrameRate:
             let index = indexValue % fpsItems.count
             captureConfig.frameRate = Int32(fpsItems[index].rawValue)
