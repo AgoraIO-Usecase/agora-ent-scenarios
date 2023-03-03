@@ -16,7 +16,6 @@ import java.util.concurrent.TimeoutException;
 import io.agora.scene.base.Constant;
 import io.agora.scene.base.api.base.BaseResponse;
 import io.agora.scene.base.event.UserLogoutEvent;
-import io.agora.scene.base.utils.LogUtils;
 import io.agora.scene.base.utils.SPUtil;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -58,7 +57,6 @@ public abstract class ApiSubscriber<T> implements Observer<T> {
 
     @Override
     public void onError(@NonNull Throwable t) {
-        LogUtils.INSTANCE.d(TAG, t.toString());
         if (t instanceof ConnectException || t instanceof SocketTimeoutException
                 || t instanceof TimeoutException || t instanceof UnknownHostException) {
             onFailure(wrapException(t));
@@ -81,11 +79,9 @@ public abstract class ApiSubscriber<T> implements Observer<T> {
         String errorMsg = null;
         if (e instanceof ConnectException || e instanceof SocketTimeoutException
                 || e instanceof TimeoutException || e instanceof UnknownHostException) {//网络超时
-            LogUtils.INSTANCE.e(TAG, "网络连接异常: " + e.getMessage());
             errorMsg = "网络连接异常";
             errorCode = ErrorCode.NETWORK_ERROR;
         } else if (e instanceof JsonParseException || e instanceof JSONException || e instanceof ParseException) {   //均视为解析错误
-            LogUtils.INSTANCE.e(TAG, "数据解析异常: " + e.getMessage());
             errorMsg = "数据解析异常";
             errorCode = ErrorCode.SERVER_ERROR;
         } else if (e instanceof ResultException) {//服务器返回的错误信息
@@ -104,11 +100,6 @@ public abstract class ApiSubscriber<T> implements Observer<T> {
                 errorMsg = "错误 : errorCode = " + ((HttpException) e).code() + " ; errorMsg = " + e.getMessage();
             }
         } else {//未知错误
-            try {
-                LogUtils.INSTANCE.e(TAG, "错误: " + e.getMessage());
-            } catch (Exception e1) {
-                LogUtils.INSTANCE.e(TAG, "未知错误Debug调试 ");
-            }
             errorMsg = "系统错误,稍后再试";
             errorCode = ErrorCode.UNKNOWN_ERROR;
         }

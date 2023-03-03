@@ -19,6 +19,10 @@ extension NSString {
 ///   - bundleName: <#bundleName description#>
 /// - Returns: <#description#>
 func sceneLocalized(_ string: String, bundleName: String? = nil) -> String {
+    //TODO: remove localize string of root menu from ktv resource
+    if AppContext.shared.sceneLocalizeBundleName == nil {
+        AppContext.shared.sceneLocalizeBundleName = "KtvResource"
+    }
     guard let bundleName = bundleName ?? AppContext.shared.sceneLocalizeBundleName else {
         assertionFailure("localizeFolder = nil")
         return string

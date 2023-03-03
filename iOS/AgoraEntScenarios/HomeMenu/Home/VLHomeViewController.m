@@ -7,7 +7,7 @@
 #import "VLHomeView.h"
 #import "VLOnLineListVC.h"
 #import "VLMacroDefine.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "MenuUtils.h"
 
 @interface VLHomeViewController ()<VLHomeViewDelegate>
 
@@ -18,7 +18,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setBackgroundImage:@"home_bg_image"];
-    [self setNaviTitleName:NSLocalizedString(@"声网", nil)];
+    [self setNaviTitleName:AGLocalizedString(@"声网")];
     
     [self setUpUI];
 }
@@ -31,12 +31,12 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    self.hidesBottomBarWhenPushed = YES;
+//    self.hidesBottomBarWhenPushed = YES;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    self.hidesBottomBarWhenPushed = NO;
+//    self.hidesBottomBarWhenPushed = NO;
 }
 
 
@@ -52,13 +52,13 @@
 - (void)itemClickAction:(int)tagValue {
     switch (tagValue) {
         case 0:
-//        {
-//            VRRoomsViewController *roomVc = [[VRRoomsViewController alloc] initWithUser:VLUserCenter.user];
-//            roomVc.hidesBottomBarWhenPushed = YES;
-//            [self.navigationController pushViewController:roomVc animated:YES];
-//        }
-//            break;
-//        case 1:
+        {
+            VRRoomsViewController *roomVc = [[VRRoomsViewController alloc] initWithUser:VLUserCenter.user];
+            roomVc.hidesBottomBarWhenPushed = YES;
+            [self.navigationController pushViewController:roomVc animated:YES];
+        }
+            break;
+        case 1:
         {
             VLOnLineListVC *listVC = [[VLOnLineListVC alloc]init];
             [self.navigationController pushViewController:listVC animated:YES];

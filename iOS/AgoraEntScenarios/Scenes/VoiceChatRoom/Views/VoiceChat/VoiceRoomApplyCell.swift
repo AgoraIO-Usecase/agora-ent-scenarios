@@ -7,6 +7,7 @@
 
 import UIKit
 import ZSwiftBaseLib
+import SDWebImage
 
 public class VoiceRoomApplyCell: UITableViewCell {
     var agreeClosure: ((VoiceRoomApply?) -> Void)?
@@ -42,7 +43,7 @@ public class VoiceRoomApplyCell: UITableViewCell {
     func refresh(item: VoiceRoomApply?) {
         user = item
         userName.text = item?.member?.name
-        avatar.image = UIImage(item?.member?.portrait ?? "")
+        avatar.sd_setImage(with: URL(string: item?.member?.portrait ?? "")!, placeholderImage: UIImage(named: "mine_avatar_placeHolder"), context: nil)
         operation.setTitle(item?.member?.invited == true ? LanguageManager.localValue(key: "Accepted") : LanguageManager.localValue(key: "Accept"), for: .normal)
         operation.setBackgroundImage(UIImage(item?.member?.invited == true ? "" : "blue_btn_bg"), for: .normal)
         var color = UIColor.white
@@ -53,7 +54,7 @@ public class VoiceRoomApplyCell: UITableViewCell {
     }
 
     @objc func apply() {
-        if agreeClosure != nil, user?.member?.mic_index ?? 0 < 1, user?.member?.invited ?? false == false {
+        if agreeClosure != nil, user?.member?.invited ?? false == false {
             agreeClosure!(user)
         }
     }

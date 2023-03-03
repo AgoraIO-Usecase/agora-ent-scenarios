@@ -1,0 +1,10 @@
+/* 
+  InfoPlist.strings
+  AgoraEntScenarios
+
+  Created by CP on 2022/11/28.
+  
+*/
+
+CFBundleDisplayName = "AgoraEntertainment";
+NSMicrophoneUsageDescription = "When you are chatting/singing/live broadcasting, Agora Entertainment needs to apply for microphone access";
