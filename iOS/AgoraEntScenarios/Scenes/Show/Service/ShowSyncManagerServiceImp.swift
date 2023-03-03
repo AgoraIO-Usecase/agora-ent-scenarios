@@ -401,6 +401,16 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func cancelMicSeatApply(completion: @escaping (NSError?) -> Void) {
+        // 房主移除所有accept
+        if room?.ownerId == VLUserCenter.user.id {
+            self.seatApplyList.forEach { apply in
+                if apply.status == .accepted {
+                    _removeMicSeatApply(apply: apply, completion: completion)
+                }
+            }
+            return
+        }
+  
         guard let apply = self.seatApplyList.filter({ $0.userId == VLUserCenter.user.id }).first else {
 //            agoraAssert("cancel apply not found")
             return
