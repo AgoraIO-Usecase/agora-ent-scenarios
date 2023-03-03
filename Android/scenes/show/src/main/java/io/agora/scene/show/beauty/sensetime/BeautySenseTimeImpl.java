@@ -74,7 +74,6 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
     @Override
     public void release() {
         super.release();
-        mEglBaseContext = null;
         isReleased = true;
         if (textureBufferHelper != null) {
             textureBufferHelper.invoke(() -> {
@@ -89,6 +88,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
             textureBufferHelper = null;
         }
         sdkIsInit = false;
+        mEglBaseContext = null;
     }
 
     private void initST() {
@@ -158,7 +158,11 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
                     unInitST();
                     return null;
                 });
-                textureBufferHelper.dispose();
+                try {
+                    textureBufferHelper.dispose();
+                } catch (Exception e) {
+                    ShowLogger.e("IBeautyProcessor", e, "");
+                }
                 textureBufferHelper = null;
                 return false;
             }
