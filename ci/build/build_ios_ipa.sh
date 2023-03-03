@@ -23,7 +23,7 @@ KEYCENTER_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/KeyCenter.swift"
 cp $KEYCENTER_PATH.bak $KEYCENTER_PATH
 
 # 打包环境
-CONFIGURATION=Development
+CONFIGURATION=app-store
 
 #工程文件路径
 APP_PATH="${PROJECT_PATH}/${TARGET_NAME}.xcworkspace"
@@ -50,6 +50,7 @@ echo PROJECT_PATH: $PROJECT_PATH
 echo TARGET_NAME: $TARGET_NAME
 echo KEYCENTER_PATH: $KEYCENTER_PATH
 echo APP_PATH: $APP_PATH
+echo method: $method
 
 #修改Keycenter文件
 python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 0
