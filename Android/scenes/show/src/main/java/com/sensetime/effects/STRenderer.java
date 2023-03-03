@@ -277,10 +277,6 @@ public class STRenderer {
 
         int imageWidth = width;
         int imageHeight = height;
-//        if (orientation == 90 || orientation == 270) {
-//            imageWidth = height;
-//            imageHeight = width;
-//        }
         boolean imageSizeChange = mImageDataBuffer == null || mImageDataBuffer.length != cameraPixel.length;
         if (imageSizeChange) {
             mImageDataBuffer = new byte[cameraPixel.length];
@@ -313,7 +309,13 @@ public class STRenderer {
         if (mTextureOutId == null) {
             mTextureOutId = new int[2];
             GlUtil.initEffectTexture(imageWidth, imageHeight, mTextureOutId, GLES20.GL_TEXTURE_2D);
-        }else if(imageSizeChange){
+        }
+        else if(mTextureOutId.length < 2){
+            GLES20.glDeleteTextures(mTextureOutId.length, mTextureOutId, 0);
+            mTextureOutId = null;
+            return -1;
+        }
+        else if (imageSizeChange) {
             GLES20.glDeleteTextures(mTextureOutId.length, mTextureOutId, 0);
             mTextureOutId = null;
             return -1;
@@ -383,11 +385,16 @@ public class STRenderer {
 
         int imageWidth = width;
         int imageHeight = height;
+        boolean imageSizeChange = mImageDataBuffer == null || mImageDataBuffer.length != cameraPixel.length;
 
         // >>>>>> 1. translate oes texture to 2d
         if (mTextureOutId == null) {
             mTextureOutId = new int[1];
             GlUtil.initEffectTexture(imageWidth, imageHeight, mTextureOutId, GLES20.GL_TEXTURE_2D);
+        } else if (imageSizeChange) {
+            GLES20.glDeleteTextures(mTextureOutId.length, mTextureOutId, 0);
+            mTextureOutId = null;
+            return -1;
         }
 
         int textureId = cameraTextureId;
@@ -398,7 +405,7 @@ public class STRenderer {
 
         // >>>>>> 2. detect human point info using cameraData
         if (mIsCreateHumanActionHandleSucceeded) {
-            if (mImageDataBuffer == null || mImageDataBuffer.length != cameraPixel.length) {
+            if (imageSizeChange) {
                 mImageDataBuffer = new byte[cameraPixel.length];
             }
             System.arraycopy(cameraPixel, 0, mImageDataBuffer, 0, cameraPixel.length);
