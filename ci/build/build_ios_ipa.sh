@@ -78,7 +78,7 @@ PLIST_PATH="${PROJECT_PATH}/ExportOptions_${method}.plist"
 echo PLIST_PATH: $PLIST_PATH
 
 # archive 这边使用的工作区间 也可以使用project
-xcodebuild archive -workspace "${APP_PATH}" -scheme "${TARGET_NAME}" -configuration "${CONFIGURATION}" -archivePath "${ARCHIVE_PATH}" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -destination 'generic/platform=iOS' -quiet
+xcodebuild CODE_SIGN_STYLE="Manual" archive -workspace "${APP_PATH}" -scheme "${TARGET_NAME}" -configuration "${CONFIGURATION}" -archivePath "${ARCHIVE_PATH}" clean CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -destination 'generic/platform=iOS' -quiet
 
 # 导出ipa
 xcodebuild -exportArchive -archivePath "${ARCHIVE_PATH}" -exportPath "${EXPORT_PATH}" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -exportOptionsPlist "${PLIST_PATH}" -quiet
