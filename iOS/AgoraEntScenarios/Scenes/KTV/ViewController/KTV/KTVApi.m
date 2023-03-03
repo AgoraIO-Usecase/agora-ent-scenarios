@@ -145,7 +145,6 @@ AgoraLrcDownloadDelegate
         if(self.config.role == KTVSingRoleAudience && (uptime() - self.lastAudienceUpTime > 1000)){
             return;
         }
-        NSLog(@"current:\(%ld)", current);
         [self setProgressWith:current];
         if(self.config.role == KTVSingRoleMainSinger){
             //如果超过前奏时间 自动隐藏前奏View
@@ -169,7 +168,6 @@ AgoraLrcDownloadDelegate
     if(self.isPause == false){
         [[NSRunLoop currentRunLoop] addTimer:self.timer  forMode: NSRunLoopCommonModes];
         [self.timer fire];
-        NSLog(@"timer: startTimer---%ld", self.playerState);
     } else {
         [self resumeTimer];
     }
@@ -180,7 +178,6 @@ AgoraLrcDownloadDelegate
     if(self.isPause == false){return;};
     self.isPause = false;
     [self.timer setFireDate:[NSDate date]];
-    NSLog(@"timer: resumeTimer---%ld", self.playerState);
 }
 
 //暂停定时器
@@ -188,7 +185,6 @@ AgoraLrcDownloadDelegate
     if(self.isPause){return;};
     self.isPause = true;
     [self.timer setFireDate:[NSDate distantFuture]];
-    NSLog(@"timer: pauserTimer---%ld", self.playerState);
 }
 
 //释放定时器
@@ -615,7 +611,7 @@ AgoraLrcDownloadDelegate
         return;
     }
     
-    double pitch = self.micMuted ? 0 : speakers.firstObject.voicePitch;
+    double pitch = self.isNowMicMuted ? 0 : speakers.firstObject.voicePitch;
     self.voicePitch = pitch ;
     //如果当前是闭麦状态，不再上报pitch
     [self.karaokeView setPitchWithPitch:pitch progress:[self getPlayerCurrentTime]];
@@ -672,7 +668,6 @@ AgoraLrcDownloadDelegate
 }
 
 -(void)updateTimeWithState:(AgoraMediaPlayerState)playerState {
-    NSLog(@"playerState: %ld", playerState);
     VL(weakSelf);
     dispatch_async(dispatch_get_main_queue(), ^{
         switch (playerState) {
