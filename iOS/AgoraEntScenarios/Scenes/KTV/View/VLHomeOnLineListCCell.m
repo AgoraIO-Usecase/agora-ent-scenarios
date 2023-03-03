@@ -87,7 +87,7 @@
 - (void)setListModel:(VLRoomListModel *)listModel {
     _listModel = listModel;
     self.bgImgView.image = [UIImage sceneImageWithName:@"online_list_itemBgIcon"];
-    NSString* iconName = [NSString stringWithFormat:@"icon_room_cover%d.jpg", [listModel.icon intValue] + 1];
+    NSString* iconName = [NSString stringWithFormat:@"icon_room_cover%d.jpg", MAX([listModel.icon intValue], 1)];
     self.iconImgView.image = [UIImage sceneImageWithName:iconName];
     if (listModel.isPrivate) {
         self.lockImgView.hidden = NO;

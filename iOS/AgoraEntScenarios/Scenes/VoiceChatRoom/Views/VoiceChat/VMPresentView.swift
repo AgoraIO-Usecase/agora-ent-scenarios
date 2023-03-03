@@ -66,7 +66,7 @@ class VMPresentView: UIView {
         eqView.frame = CGRect(x: screenSize.width, y: 0, width: screenSize.width, height: bounds.size.height)
         eqView.isTouchAble = isTouchAble
         eqView.isAudience = isAudience
-        eqView.soundEffect = roomInfo?.room?.sound_effect ?? LanguageManager.localValue(key: "Social Chat")
+        eqView.soundEffect = roomInfo?.room?.sound_effect ?? 1
         eqView.resBlock = { [weak self] type in
             self?.eqView.settingType = type
         }

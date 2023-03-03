@@ -33,6 +33,6 @@ public class VoiceRoomChatCell: UITableViewCell {
         content.attributedText = chat.attributeContent
         content.preferredMaxLayoutWidth = container.frame.width - 24
         content.frame = CGRect(x: 12, y: 7, width: container.frame.width - 24, height: container.frame.height - 16)
-        container.image = (chat.joined == true ? UIImage("joined_msg_bg")! : UIImage("chatBg")!)
+        container.image = (chat.joined == true ? UIImage("joined_msg_bg")!.resizableImage(withCapInsets: UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12), resizingMode: .stretch) : UIImage("chatBg")!)
     }
 }

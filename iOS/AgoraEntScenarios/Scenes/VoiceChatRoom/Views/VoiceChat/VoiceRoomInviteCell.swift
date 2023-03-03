@@ -7,6 +7,7 @@
 
 import UIKit
 import ZSwiftBaseLib
+import SDWebImage
 
 public class VoiceRoomInviteCell: UITableViewCell {
     var inviteClosure: ((VRUser?) -> Void)?
@@ -42,10 +43,8 @@ public class VoiceRoomInviteCell: UITableViewCell {
     func refresh(item: VRUser?) {
         user = item
         userName.text = item?.name
-        if item?.invited == false {
-            item?.invited = (item?.mic_index ?? 0 != -1)
-        }
-        avatar.image = UIImage(item?.portrait ?? "")
+        item?.invited = (item?.mic_index ?? 0 != -1)
+        avatar.sd_setImage(with: URL(string: item?.portrait ?? "")!, placeholderImage: UIImage(named: "mine_avatar_placeHolder"), context: nil)
         operation.setTitle(item?.invited == true ? LanguageManager.localValue(key: "Invited") : LanguageManager.localValue(key: "Invite"), for: .normal)
         operation.setBackgroundImage(UIImage(item?.invited == true ? "" : "blue_btn_bg"), for: .normal)
         var color = UIColor.white

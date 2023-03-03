@@ -10,7 +10,7 @@ import UIKit
 import ZSwiftBaseLib
 
 public class VRSoundEffectsList: UITableView, UITableViewDelegate, UITableViewDataSource {
-    var type = "Social Chat"
+    var type: Int = 1
 
     static var heightMap = [String: CGFloat]()
 
@@ -53,7 +53,7 @@ public class VRSoundEffectsList: UITableView, UITableViewDelegate, UITableViewDa
         tableView.deselectRow(at: indexPath, animated: false)
         for item in datas { item.selected = false }
         datas[safe: indexPath.row]?.selected = true
-        type = datas[safe: indexPath.row]?.soundType ?? ""
+        type = datas[safe: indexPath.row]?.soundType ?? 0
         reloadData()
     }
 }

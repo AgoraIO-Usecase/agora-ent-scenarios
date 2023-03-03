@@ -24,13 +24,13 @@ class VMSoundView: UIView {
     private var iconBgView: UIView = .init()
     private var lineImgView: UIImageView = .init()
 
-    private var soundEffect: String = ""
+    private var soundEffect: Int = 1
     private var typeStr: String = ""
     private var detailStr: String = ""
     private var images = [["wangyi", "momo", "pipi", "yinyu"], ["wangyi", "jiamian", "yinyu", "paipaivoice", "wanba", "qingtian", "skr", "soul"], ["yalla-ludo", "jiamian"], ["qingmang", "cowLive", "yuwan", "weibo"]]
     private var iconImgs: [String]?
 
-    public init(frame: CGRect, soundEffect: String) {
+    public init(frame: CGRect, soundEffect: Int) {
         super.init(frame: frame)
         setSoundEffect(soundEffect)
         layoutUI()
@@ -86,11 +86,11 @@ class VMSoundView: UIView {
         }
         var basetag = 0
         switch soundEffect {
-        case "Social Chat":
+        case 1:
             basetag = 110
-        case "Karaoke":
+        case 2:
             basetag = 120
-        case "Gaming Buddy":
+        case 3:
             basetag = 130
         default:
             basetag = 140
@@ -117,7 +117,7 @@ class VMSoundView: UIView {
             if view.isKind(of: UIImageView.self) {
                 if view.tag >= 110 && view.tag <= 150 {
                     let index = view.tag % 10
-                    view.frame = CGRect(x: 30~ + 30~ * CGFloat(index), y: bounds.size.height - 65~, width: 20~, height: 20~)
+                    view.frame = CGRect(x: 30~ + 30~ * CGFloat(index), y: bounds.size.height - 65, width: 20~, height: 20)
                 }
             }
         }
@@ -127,22 +127,25 @@ class VMSoundView: UIView {
         return text.boundingRect(with: CGSize(width: width, height: CGFloat(MAXFLOAT)), options: .usesLineFragmentOrigin, attributes: [.font: UIFont.systemFont(ofSize: fontSize)], context: nil).size.height + 5
     }
 
-    private func setSoundEffect(_ effect: String) {
+    private func setSoundEffect(_ effect: Int) {
         soundEffect = effect
-        typeStr = effect.localized()
         switch effect {
-        case "Social Chat":
+        case 1:
             detailStr = "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat.".localized()
             iconImgs = images[0]
-        case "Karaoke":
+            typeStr = "Social Chat".localized()
+        case 2:
             detailStr = "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful.".localized()
             iconImgs = images[1]
-        case "Gaming Buddy":
+            typeStr = "Karaoke".localized()
+        case 3:
             detailStr = "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. ".localized()
             iconImgs = images[2]
+            typeStr = "Gaming Buddy".localized()
         default:
             detailStr = "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ".localized()
             iconImgs = images[3]
+            typeStr = "Professional Podcaster".localized()
         }
         cellHeight = textHeight(text: detailStr, fontSize: 13, width: bounds.size.width - 40~)
     }
