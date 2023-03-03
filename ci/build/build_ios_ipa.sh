@@ -76,7 +76,13 @@ echo PLIST_PATH: $PLIST_PATH
 xcodebuild archive -workspace "${APP_PATH}" -scheme "${TARGET_NAME}" -configuration "${CONFIGURATION}" -archivePath "${ARCHIVE_PATH}" -destination 'generic/platform=iOS' -quiet
 
 # 导出ipa
-xcodebuild -exportArchive -archivePath "${ARCHIVE_PATH}" -exportPath "${EXPORT_PATH}" -exportOptionsPlist "${PLIST_PATH}" -quiet
+xcodebuild -exportArchive -archivePath "${ARCHIVE_PATH}" -exportPath "${EXPORT_PATH}" -exportOptionsPlist "${PLIST_PATH}" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -quiet
+
+# 给ipa包签名
+echo "============Sign IPA Begin============"
+sh ${WORKSPACE}/sign "${EXPORT_PATH}"
+
+mv *.ipa ${EXPORT_PATH}
 
 # 上传IPA
 7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r "${EXPORT_PATH}/${TARGET_NAME}.ipa"
