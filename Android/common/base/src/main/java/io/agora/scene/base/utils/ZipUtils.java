@@ -1,7 +1,6 @@
 package io.agora.scene.base.utils;
 
 import android.os.Looper;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,6 +15,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import io.agora.scene.base.CommonBaseLogger;
 
 public final class ZipUtils {
     private static final String TAG = ZipUtils.class.getSimpleName();
@@ -46,7 +47,7 @@ public final class ZipUtils {
                                          boolean reserve) throws Exception {
         File zipFile = new File(zipFilePath);
         if (!zipFile.exists()) {
-            Log.w(TAG, "File " + zipFile + " not found");
+            CommonBaseLogger.w(TAG, "File " + zipFile + " not found");
             throw new FileNotFoundException(zipFilePath);
         }
 

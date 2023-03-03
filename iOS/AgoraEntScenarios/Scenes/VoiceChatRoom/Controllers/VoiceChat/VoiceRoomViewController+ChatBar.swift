@@ -7,6 +7,8 @@
 
 import Foundation
 import SVGAPlayer
+import KakaJSON
+import ZSwiftBaseLib
 
 extension VoiceRoomViewController {
     func showEQView() {
@@ -66,8 +68,7 @@ extension VoiceRoomViewController {
                 self?.showExitRoomView()
                 return
             }
-            guard let effect = self?.roomInfo?.room?.sound_effect else { return }
-            self?.rtckit.playMusic(with: self?.getSceneType(effect) ?? .social)
+            self?.rtckit.playMusic(with: self?.getSceneType(self?.roomInfo?.room?.sound_effect ?? 1) ?? .social)
         }
         preView.eqView.soundBlock = { [weak self] index in
             if self?.isOwner == false {
@@ -101,7 +102,12 @@ extension VoiceRoomViewController {
     }
 
     func applyMembersAlert(position: VoiceRoomSwitchBarDirection) {
-        let userAlert = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [VoiceRoomApplyUsersViewController(roomId: roomInfo?.room?.room_id ?? ""), VoiceRoomInviteUsersController(roomId: roomInfo?.room?.room_id ?? "", mic_index: nil)], titles: [LanguageManager.localValue(key: "Raised Hands"), LanguageManager.localValue(key: "Invite On-Stage")], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
+        let apply = VoiceRoomApplyUsersViewController(roomId: roomInfo?.room?.room_id ?? "")
+        apply.agreeApply = {
+            self.rtcView.updateUser($0)
+        }
+        let invite = VoiceRoomInviteUsersController(roomId: roomInfo?.room?.room_id ?? "", mic_index:nil)
+        let userAlert = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [apply, invite], titles: [LanguageManager.localValue(key: "Raised Hands"), LanguageManager.localValue(key: "Invite On-Stage")], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
         let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 420)), custom: userAlert)
         presentViewController(vc)
     }
@@ -122,41 +128,55 @@ extension VoiceRoomViewController {
     func sendGift(gift: VoiceRoomGiftEntity) {
         gift.userName = VoiceRoomUserInfo.shared.user?.name ?? ""
         gift.portrait = VoiceRoomUserInfo.shared.user?.portrait ?? userAvatar
-        if let chatroom_id = roomInfo?.room?.chatroom_id, let uid = roomInfo?.room?.owner?.uid, let id = gift.gift_id, let name = gift.gift_name, let value = gift.gift_price, let count = gift.gift_count {
-            notifyServerGiftInfo(id: id, count: count, uid: uid) {
-                VoiceRoomIMManager.shared?.sendCustomMessage(roomId: chatroom_id, event: VoiceRoomGift, customExt: ["gift_id": id, "gift_name": name, "gift_price": value, "gift_count": count, "userName": VoiceRoomUserInfo.shared.user?.name ?? "", "portrait": VoiceRoomUserInfo.shared.user?.portrait ?? self.userAvatar], completion: { [weak self] message, error in
-                    guard let self = self else { return }
-                    if error == nil, message != nil {
-                        var giftList: VoiceRoomGiftView? = self.view.viewWithTag(1111) as? VoiceRoomGiftView
-                        if giftList == nil {
-                            giftList = self.giftList()
-                            self.view.addSubview(giftList!)
-                        }
-                        giftList?.gifts.append(gift)
-                        giftList?.cellAnimation()
-                        if let c = Int(count), let v = Int(value), var amount = VoiceRoomUserInfo.shared.user?.amount {
-                            amount += c * v
-                            VoiceRoomUserInfo.shared.user?.amount = amount
-                        }
-                    } else {
-                        self.view.makeToast("Send failed \(error?.errorDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
+        if let chatroom_id = roomInfo?.room?.chatroom_id, let id = gift.gift_id, let name = gift.gift_name, let value = gift.gift_price, let count = gift.gift_count {
+            VoiceRoomIMManager.shared?.sendCustomMessage(roomId: chatroom_id, event: VoiceRoomGift, customExt: ["gift_id": id, "gift_name": name, "gift_price": value, "gift_count": count, "userName": VoiceRoomUserInfo.shared.user?.name ?? "", "portrait": VoiceRoomUserInfo.shared.user?.portrait ?? self.userAvatar], completion: { [weak self] message, error in
+                guard let self = self else { return }
+                if error == nil, message != nil {
+                    let amount = Int(gift.gift_price ?? "1")!*Int(gift.gift_count ?? "1")!
+                    if var currentAmount = VoiceRoomUserInfo.shared.user?.amount {
+                        currentAmount += amount
+                        VoiceRoomUserInfo.shared.user?.amount = currentAmount
                     }
-                })
-            }
-        }
-    }
-
-    func notifyServerGiftInfo(id: String, count: String, uid: String, completion: @escaping () -> Void) {
-        if let roomId = roomInfo?.room?.room_id {
-            VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .giftTo(roomId: roomId), params: ["gift_id": id, "num": Int(count) ?? 1, "to_uid": uid]) { dic, error in
-                if let result = dic?["result"] as? Bool, error == nil, result {
-                    debugPrint("result:\(result)")
-                    self.requestRankList()
-                    completion()
+                    if var room_amount = self.roomInfo?.room?.gift_amount {
+                        room_amount += amount
+                        self.roomInfo?.room?.gift_amount = room_amount
+                        if self.isOwner {
+                            VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["gift_amount":"\(room_amount)"], completion: { error in })
+                            
+                        }
+                    }
+                    if self.roomInfo?.room?.ranking_list == nil {
+                        self.roomInfo?.room?.ranking_list = [VRUser]()
+                    }
+                    if (VoiceRoomUserInfo.shared.user?.chat_uid ?? "").isEmpty {
+                        VoiceRoomUserInfo.shared.user?.chat_uid = VLUserCenter.user.chat_uid
+                    }
+                    let ranker = self.roomInfo?.room?.ranking_list?.first(where: { $0.chat_uid ?? "" == VoiceRoomUserInfo.shared.user?.chat_uid ?? ""
+                    })
+                    if ranker == nil {
+                        self.roomInfo?.room?.ranking_list?.append(VoiceRoomUserInfo.shared.user!)
+                    } else {
+                        ranker?.amount = VoiceRoomUserInfo.shared.user?.amount
+                    }
+                    VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["ranking_list":self.roomInfo?.room?.ranking_list?.kj.JSONString() ?? ""], completion: { error in
+                        if error != nil {
+                            self.view.makeToast("update ranking_list failed!\(error?.errorDescription ?? "")")
+                        } else {
+                            self.requestRankList()
+                        }
+                    })
+                    var giftList: VoiceRoomGiftView? = self.view.viewWithTag(1111) as? VoiceRoomGiftView
+                    if giftList == nil {
+                        giftList = self.giftList()
+                        self.view.addSubview(giftList!)
+                    }
+                    giftList?.gifts.append(gift)
+                    giftList?.cellAnimation()
+                    
                 } else {
-                    self.view.makeToast("Send failed!", point: self.toastPoint, title: nil, image: nil, completion: nil)
+                    self.view.makeToast("Send failed \(error?.errorDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
                 }
-            }
+            })
         }
     }
 
@@ -169,8 +189,9 @@ extension VoiceRoomViewController {
         player.tag(199)
         view.addSubview(player)
         let parser = SVGAParser()
-        parser.parse(withNamed: "rocket", in: .main) { entitiy in
-            player.videoItem = entitiy
+        guard let path = Bundle.voiceRoomBundle.path(forResource: "rocket", ofType: "svga") else { return }
+        parser.parse(with: URL(fileURLWithPath: path)) { entity in
+            player.videoItem = entity
             player.startAnimation()
         } failureBlock: { error in
             player.removeFromSuperview()
@@ -192,11 +213,11 @@ extension VoiceRoomViewController {
 
     func changeMicState() {
         guard let idx = local_index else {
-            view.makeToast("you have no wheat slots!", point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("you have no wheat slots!".localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
         if !isOwner, idx == 0 {
-            view.makeToast("you have no wheat slots!", point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("you have no wheat slots!".localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
         chatBar.micState = !chatBar.micState
@@ -215,7 +236,7 @@ extension VoiceRoomViewController {
     func showApplyAlert(_ index: Int) {
         let isHairScreen = SwiftyFitsize.isFullScreen
         let manageView = VMManagerView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34))
-        guard let mic_info = roomInfo?.mic_info?[index] else { return }
+        let mic_info = ChatRoomServiceImp.getSharedInstance().mics[safe: index]
         manageView.micInfo = mic_info
         manageView.resBlock = { [weak self] state, flag in
             self?.dismiss(animated: true)
@@ -270,33 +291,27 @@ extension VoiceRoomViewController {
     }
 
     func requestSpeak(index: Int?) {
-        guard let roomId = roomInfo?.room?.room_id else { return }
-        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .submitApply(roomId: roomId), params: index != nil ? ["mic_index": index ?? 2] : [:]) { dic, error in
-            if error == nil, dic != nil, let result = dic?["result"] as? Bool {
-                if result {
+        ChatRoomServiceImp.getSharedInstance().startMicSeatApply(index: index) { error, flag in
+            if error == nil {
+                if flag {
                     self.chatBar.refresh(event: .handsUp, state: .selected, asCreator: false)
                     self.view.makeToast("Apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 } else {
                     self.view.makeToast("Apply failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 }
             } else {
-//                self.view.makeToast("\(error?.localizedDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
+                
             }
         }
     }
 
     func cancelRequestSpeak(index: Int?) {
-        guard let roomId = roomInfo?.room?.room_id else { return }
-        VoiceRoomBusinessRequest.shared.sendDELETERequest(api: .cancelApply(roomId: roomId), params: [:]) { dic, error in
-            if error == nil, dic != nil, let result = dic?["result"] as? Bool {
-                if result {
-                    self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
-                    self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
-                } else {
-                    self.view.makeToast("Cancel apply failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
-                }
+        ChatRoomServiceImp.getSharedInstance().cancelMicSeatApply(chat_uid: self.roomInfo?.room?.owner?.chat_uid ?? "") { error, flag in
+            if error == nil {
+                self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+                self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
             } else {
-//                self.view.makeToast("\(error?.localizedDescription ?? "")",point: self.toastPoint, title: nil, image: nil, completion: nil)
+                self.view.makeToast("Cancel apply failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
             }
         }
     }
@@ -325,5 +340,25 @@ extension VoiceRoomViewController {
             }
         }
         presentViewController(vc)
+    }
+    
+    func giftList() -> VoiceRoomGiftView {
+        VoiceRoomGiftView(frame: CGRect(x: 10, y: chatView.frame.minY - (ScreenWidth / 9.0 * 2), width: ScreenWidth / 3.0 * 2 + 20, height: ScreenWidth / 9.0 * 1.8)).backgroundColor(.clear).tag(1111)
+    }
+
+    func startMessage() -> VoiceRoomChatEntity {
+        VoiceRoomUserInfo.shared.currentRoomOwner = roomInfo?.room?.owner
+        let entity = VoiceRoomChatEntity()
+        entity.userName = roomInfo?.room?.owner?.name
+        entity.content = "Welcome to the voice chat room! Pornography, gambling or violence is strictly prohibited in the room.".localized()
+        entity.attributeContent = entity.attributeContent
+        entity.uid = roomInfo?.room?.owner?.uid
+        entity.width = entity.width
+        entity.height = entity.height
+        return entity
+    }
+
+    @objc func resignKeyboard() {
+        inputBar.hiddenInputBar()
     }
 }

@@ -50,6 +50,7 @@ import KakaJSON
 }
 
 @objc public class VoiceRoomApply: NSObject, Convertible {
+    
     var index: Int?
 
     var member: VRUser?

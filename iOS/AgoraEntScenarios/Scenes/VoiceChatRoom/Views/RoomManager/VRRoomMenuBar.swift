@@ -13,7 +13,7 @@ public final class VRRoomMenuBar: UIView {
 
     static let menusMap = [["title": LanguageManager.localValue(key: "All"), "detail": "", "selected": true, "soundType": ""], ["title": LanguageManager.localValue(key: "Standard"), "detail": "", "selected": false, "soundType": ""], ["title": LanguageManager.localValue(key: "Spatial Audio"), "detail": "", "selected": false, "soundType": ""]]
 
-    static let menusMap1 = [["title": LanguageManager.localValue(key: "Chat Room"), "detail": "", "selected": false, "soundType": ""], ["title": LanguageManager.localValue(key: "Spatial Audio Mode Room"), "detail": "", "selected": false, "soundType": ""]]
+    static let menusMap1 = [["title": LanguageManager.localValue(key: "Chat Room"), "detail": "", "selected": false, "soundType": 0], ["title": LanguageManager.localValue(key: "Spatial Audio Mode Room"), "detail": "", "selected": false, "soundType": 0]]
 
     private var indicatorImage = UIImage()
 

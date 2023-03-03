@@ -6,7 +6,6 @@ import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPE
 import android.content.Context;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
@@ -47,6 +46,8 @@ import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.NetWorkEvent;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
+import io.agora.scene.base.utils.ZipUtils;
+import io.agora.scene.ktv.KTVLogger;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.service.ChangeMVCoverInputModel;
 import io.agora.scene.ktv.service.ChooseSongInputModel;
@@ -206,11 +207,11 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
         ktvServiceProtocol.subscribeRoomStatus((ktvSubscribe, vlRoomListModel) -> {
             if (ktvSubscribe == KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted) {
-                Log.d(TAG, "subscribeRoomStatus KTVSubscribeDeleted");
+                KTVLogger.d(TAG, "subscribeRoomStatus KTVSubscribeDeleted");
                 roomDeleteLiveData.postValue(true);
             } else if (ktvSubscribe == KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated) {
                 // 当房间内状态发生改变时触发
-                Log.d(TAG, "subscribeRoomStatus KTVSubscribeUpdated");
+                KTVLogger.d(TAG, "subscribeRoomStatus KTVSubscribeUpdated");
                 JoinRoomOutputModel _rroomInfo = roomInfoLiveData.getValue();
                 if (!vlRoomListModel.getBgOption().equals(_rroomInfo.getBgOption())) {
                     roomInfoLiveData.postValue(new JoinRoomOutputModel(
@@ -244,16 +245,16 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      * 退出房间
      */
     public void exitRoom() {
-        Log.d(TAG, "RoomLivingViewModel.exitRoom() called");
+        KTVLogger.d(TAG, "RoomLivingViewModel.exitRoom() called");
         ktvServiceProtocol.leaveRoom(e -> {
             if (e == null) {
                 // success
-                Log.d(TAG, "RoomLivingViewModel.exitRoom() success");
+                KTVLogger.d(TAG, "RoomLivingViewModel.exitRoom() success");
                 roomDeleteLiveData.postValue(false);
                 roomTimeUpLiveData.postValue(false);
             } else {
                 // failure
-                Log.e(TAG, "RoomLivingViewModel.exitRoom() failed: " + e.getMessage());
+                KTVLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed: " + e.getMessage());
                 ToastUtils.showToast(e.getMessage());
             }
             return null;
@@ -264,17 +265,17 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      * 设置背景
      */
     public void setMV_BG(int bgPosition) {
-        Log.d(TAG, "RoomLivingViewModel.setMV_BG() called: " + bgPosition);
+        KTVLogger.d(TAG, "RoomLivingViewModel.setMV_BG() called: " + bgPosition);
         ktvServiceProtocol.changeMVCover(new ChangeMVCoverInputModel(bgPosition), new Function1<Exception, Unit>() {
             @Override
             public Unit invoke(Exception e) {
                 if (e == null) {
                     // success
                     // do nothing for the subscriber will callback the new room info.
-                    Log.e(TAG, "RoomLivingViewModel.setMV_BG() success");
+                    KTVLogger.e(TAG, "RoomLivingViewModel.setMV_BG() success");
                 } else {
                     // failure
-                    Log.e(TAG, "RoomLivingViewModel.setMV_BG() failed: " + e.getMessage());
+                    KTVLogger.e(TAG, "RoomLivingViewModel.setMV_BG() failed: " + e.getMessage());
                     ToastUtils.showToast(e.getMessage());
                 }
                 return null;
@@ -317,7 +318,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
         ktvServiceProtocol.subscribeSeatList((ktvSubscribe, roomSeatModel) -> {
             if (ktvSubscribe == KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated) {
-                Log.d(TAG, "subscribeRoomStatus KTVSubscribeCreated");
+                KTVLogger.d(TAG, "subscribeRoomStatus KTVSubscribeCreated");
                 List<RoomSeatModel> oValue = seatListLiveData.getValue();
                 if (oValue == null) {
                     return null;
@@ -332,7 +333,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 }
 
             } else if (ktvSubscribe == KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated) {
-                Log.d(TAG, "subscribeRoomStatus KTVSubscribeUpdated");
+                KTVLogger.d(TAG, "subscribeRoomStatus KTVSubscribeUpdated");
                 List<RoomSeatModel> oValue = seatListLiveData.getValue();
                 if (oValue == null) {
                     return null;
@@ -357,7 +358,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 }
 
             } else if (ktvSubscribe == KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted) {
-                Log.d(TAG, "subscribeRoomStatus KTVSubscribeDeleted");
+                KTVLogger.d(TAG, "subscribeRoomStatus KTVSubscribeDeleted");
                 List<RoomSeatModel> oValue = seatListLiveData.getValue();
                 if (oValue == null) {
                     return null;
@@ -422,10 +423,10 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Log.d(TAG, "getSeatStatusList: call");
+                KTVLogger.d(TAG, "getSeatStatusList: call");
                 ktvServiceProtocol.getSeatStatusList((e, data) -> {
                     if (e == null && data != null) {
-                        Log.d(TAG, "getSeatStatusList: return" + data);
+                        KTVLogger.d(TAG, "getSeatStatusList: return" + data);
                         seatListLiveData.setValue(data);
                         try {
                             mReLinkThread.join();
@@ -444,13 +445,13 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      * 上麦
      */
     public void haveSeat(int onSeatIndex) {
-        Log.d(TAG, "RoomLivingViewModel.haveSeat() called: " + onSeatIndex);
+        KTVLogger.d(TAG, "RoomLivingViewModel.haveSeat() called: " + onSeatIndex);
         ktvServiceProtocol.onSeat(new OnSeatInputModel(onSeatIndex), new Function1<Exception, Unit>() {
             @Override
             public Unit invoke(Exception e) {
                 if (e == null) {
                     // success
-                    Log.d(TAG, "RoomLivingViewModel.haveSeat() success");
+                    KTVLogger.d(TAG, "RoomLivingViewModel.haveSeat() success");
                     isOnSeat = true;
                     if (mRtcEngine != null) {
                         mainChannelMediaOption.publishCameraTrack = false;
@@ -465,7 +466,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                     toggleMic(false);
                 } else {
                     // failure
-                    Log.e(TAG, "RoomLivingViewModel.haveSeat() failed: " + e.getMessage());
+                    KTVLogger.e(TAG, "RoomLivingViewModel.haveSeat() failed: " + e.getMessage());
                     ToastUtils.showToast(e.getMessage());
                 }
                 return null;
@@ -477,7 +478,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      * 离开麦位
      */
     public void leaveSeat(RoomSeatModel seatModel) {
-        Log.d(TAG, "RoomLivingViewModel.leaveSeat() called");
+        KTVLogger.d(TAG, "RoomLivingViewModel.leaveSeat() called");
         ktvServiceProtocol.outSeat(
                 new OutSeatInputModel(
                         seatModel.getUserNo(),
@@ -489,7 +490,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 e -> {
                     if (e == null) {
                         // success
-                        Log.d(TAG, "RoomLivingViewModel.leaveSeat() success");
+                        KTVLogger.d(TAG, "RoomLivingViewModel.leaveSeat() success");
                         if (seatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
                             if (seatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                                 isOnSeat = false;
@@ -508,7 +509,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                         }
                     } else {
                         // failure
-                        Log.e(TAG, "RoomLivingViewModel.leaveSeat() failed: " + e.getMessage());
+                        KTVLogger.e(TAG, "RoomLivingViewModel.leaveSeat() failed: " + e.getMessage());
                         ToastUtils.showToast(e.getMessage());
                     }
                     return null;
@@ -520,18 +521,18 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      */
     boolean isCameraOpened = false;
     public void toggleSelfVideo(boolean isOpen) {
-        Log.d(TAG, "RoomLivingViewModel.toggleSelfVideo() called：" + isOpen);
+        KTVLogger.d(TAG, "RoomLivingViewModel.toggleSelfVideo() called：" + isOpen);
         ktvServiceProtocol.updateSeatVideoMuteStatus(!isOpen, e -> {
             if (e == null) {
                 // success
-                Log.d(TAG, "RoomLivingViewModel.toggleSelfVideo() success");
+                KTVLogger.d(TAG, "RoomLivingViewModel.toggleSelfVideo() success");
                 isCameraOpened = isOpen;
                 mRtcEngine.enableLocalVideo(isOpen);
                 mainChannelMediaOption.publishCameraTrack = isOpen;
                 mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
             } else {
                 // failure
-                Log.e(TAG, "RoomLivingViewModel.toggleSelfVideo() failed: " + e.getMessage());
+                KTVLogger.e(TAG, "RoomLivingViewModel.toggleSelfVideo() failed: " + e.getMessage());
                 ToastUtils.showToast(e.getMessage());
             }
             return null;
@@ -542,15 +543,15 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      * 静音
      */
     public void toggleMic(boolean isUnMute) {
-        Log.d(TAG, "RoomLivingViewModel.toggleMic() called：" + isUnMute);
+        KTVLogger.d(TAG, "RoomLivingViewModel.toggleMic() called：" + isUnMute);
         ktvServiceProtocol.updateSeatAudioMuteStatus(!isUnMute, e -> {
             if (e == null) {
                 // success
-                Log.d(TAG, "RoomLivingViewModel.toggleMic() success");
+                KTVLogger.d(TAG, "RoomLivingViewModel.toggleMic() success");
                 updateVolumeStatus(isUnMute);
             } else {
                 // failure
-                Log.e(TAG, "RoomLivingViewModel.toggleMic() failed: " + e.getMessage());
+                KTVLogger.e(TAG, "RoomLivingViewModel.toggleMic() failed: " + e.getMessage());
                 ToastUtils.showToast(e.getMessage());
             }
             return null;
@@ -580,7 +581,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     public void initSongs() {
         ktvServiceProtocol.subscribeChooseSong((ktvSubscribe, songModel) -> {
             // 歌曲信息发生变化时，重新获取歌曲列表动作
-            Log.d(TAG, "subscribeChooseSong updateSongs");
+            KTVLogger.d(TAG, "subscribeChooseSong updateSongs");
             getSongChosenList();
             return null;
         });
@@ -594,7 +595,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      * @return map key: 类型名称，value: 类型值
      */
     public LiveData<LinkedHashMap<Integer, String>> getSongTypes() {
-        Log.d(TAG, "RoomLivingViewModel.getSongTypes() called");
+        KTVLogger.d(TAG, "RoomLivingViewModel.getSongTypes() called");
         MutableLiveData<LinkedHashMap<Integer, String>> liveData = new MutableLiveData<>();
 
         String requestId = iAgoraMusicContentCenter.getMusicCharts();
@@ -632,7 +633,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      */
     public LiveData<List<RoomSelSongModel>> getSongList(int type, int page) {
         // 从RTC中获取歌曲列表
-        Log.d(TAG, "RoomLivingViewModel.getSongList() called, type:" + type + " page:" + page);
+        KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() called, type:" + type + " page:" + page);
         MutableLiveData<List<RoomSelSongModel>> liveData = new MutableLiveData<>();
         String requestId = iAgoraMusicContentCenter.getMusicCollectionByMusicChartId(type, page, 30);
         rtcMusicHandlerMap.put(requestId, new IMusicContentCenterEventHandler() {
@@ -700,7 +701,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      */
     public LiveData<List<RoomSelSongModel>> searchSong(String condition) {
         // 从RTC中搜索歌曲
-        Log.d(TAG, "RoomLivingViewModel.searchSong() called, condition:" + condition);
+        KTVLogger.d(TAG, "RoomLivingViewModel.searchSong() called, condition:" + condition);
         MutableLiveData<List<RoomSelSongModel>> liveData = new MutableLiveData<>();
 
         String requestId = iAgoraMusicContentCenter.searchMusic(condition, 0, 50);
@@ -768,7 +769,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      * 点歌
      */
     public LiveData<Boolean> chooseSong(RoomSelSongModel songModel, boolean isChorus) {
-        Log.d(TAG, "RoomLivingViewModel.chooseSong() called, name:" + songModel.getName() + " isChorus:" + isChorus);
+        KTVLogger.d(TAG, "RoomLivingViewModel.chooseSong() called, name:" + songModel.getName() + " isChorus:" + isChorus);
         MutableLiveData<Boolean> liveData = new MutableLiveData<>();
         if(songModel == null){
             return liveData;
@@ -782,11 +783,11 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 e -> {
                     if (e == null) {
                         // success
-                        Log.d(TAG, "RoomLivingViewModel.chooseSong() success");
+                        KTVLogger.d(TAG, "RoomLivingViewModel.chooseSong() success");
                         liveData.postValue(true);
                     } else {
                         // failure
-                        Log.e(TAG, "RoomLivingViewModel.chooseSong() failed: " + e.getMessage());
+                        KTVLogger.e(TAG, "RoomLivingViewModel.chooseSong() failed: " + e.getMessage());
                         ToastUtils.showToast(e.getMessage());
                         liveData.postValue(false);
                     }
@@ -800,7 +801,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      * 删歌
      */
     public void deleteSong(RoomSelSongModel songModel) {
-        Log.d(TAG, "RoomLivingViewModel.deleteSong() called, name:" + songModel.getName());
+        KTVLogger.d(TAG, "RoomLivingViewModel.deleteSong() called, name:" + songModel.getName());
         if(songModel == null){
             return;
         }
@@ -809,10 +810,10 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 e -> {
                     if (e == null) {
                         // success: do nothing for subscriber dealing with the event already
-                        Log.d(TAG, "RoomLivingViewModel.deleteSong() success");
+                        KTVLogger.d(TAG, "RoomLivingViewModel.deleteSong() success");
                     } else {
                         // failure
-                        Log.e(TAG, "RoomLivingViewModel.deleteSong() failed: " + e.getMessage());
+                        KTVLogger.e(TAG, "RoomLivingViewModel.deleteSong() failed: " + e.getMessage());
                         ToastUtils.showToast(e.getMessage());
                     }
                     return null;
@@ -824,16 +825,16 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      * 置顶歌曲
      */
     public void topUpSong(RoomSelSongModel songModel){
-        Log.d(TAG, "RoomLivingViewModel.topUpSong() called, name:" + songModel.getName());
+        KTVLogger.d(TAG, "RoomLivingViewModel.topUpSong() called, name:" + songModel.getName());
         ktvServiceProtocol.makeSongTop(new MakeSongTopInputModel(
                 songModel.getSongNo()
         ), e -> {
             if(e == null){
                 // success: do nothing for subscriber dealing with the event already
-                Log.d(TAG, "RoomLivingViewModel.topUpSong() success");
+                KTVLogger.d(TAG, "RoomLivingViewModel.topUpSong() success");
             }else{
                 // failure
-                Log.e(TAG, "RoomLivingViewModel.topUpSong() failed: " + e.getMessage());
+                KTVLogger.e(TAG, "RoomLivingViewModel.topUpSong() failed: " + e.getMessage());
                 ToastUtils.showToast(e.getMessage());
             }
             return null;
@@ -844,11 +845,11 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      * 获取已点列表
      */
     public void getSongChosenList() {
-        Log.d(TAG, "RoomLivingViewModel.getSongChosenList() called");
+        KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() called");
         ktvServiceProtocol.getChoosedSongsList((e, data) -> {
             if (e == null && data != null) {
                 // success
-                Log.d(TAG, "RoomLivingViewModel.getSongChosenList() success");
+                KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() success");
                 songsOrderedLiveData.postValue(data);
 
                 if (data.size() > 0){
@@ -857,25 +858,25 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
                     if (value == null) {
                         // 无已点歌曲， 直接将列表第一个设置为当前播放歌曲
-                        Log.d(TAG, "RoomLivingViewModel.getSongChosenList() chosen song list is empty");
+                        KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() chosen song list is empty");
                         songPlayingLiveData.postValue(songPlaying);
                     } else {
                         // 当前有已点歌曲, 且更新歌曲和之前歌曲非同一首
                         if (!value.getSongNo().equals(songPlaying.getSongNo())) {
-                            Log.d(TAG, "RoomLivingViewModel.getSongChosenList() single or first chorus");
+                            KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() single or first chorus");
                             songPlayingLiveData.postValue(songPlaying);
                         } else {
                             if ((value.isChorus() && !songPlaying.isChorus())) {
                                 // 取消合唱
-                                Log.d(TAG, "RoomLivingViewModel.getSongChosenList() become solo");
+                                KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() become solo");
                                 songPlayingLiveData.postValue(songPlaying);
                             } else if (value.isChorus() && value.getChorusNo() == null && songPlaying.getChorusNo() != null) {
                                 // 加入合唱
-                                Log.d(TAG, "RoomLivingViewModel.getSongChosenList() partner joined");
+                                KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() partner joined");
                                 songPlayingLiveData.postValue(songPlaying);
                             } else if (value.isChorus() && value.getChorusNo() != null && songPlaying.getChorusNo() != null && songPlaying.getChorusNo().equals("0")) {
                                 // 伴唱退出合唱
-                                Log.d(TAG, "RoomLivingViewModel.getSongChosenList() partner exited");
+                                KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() partner exited");
                                 if (value.getChorusNo().equals(UserManager.getInstance().getUser().id.toString())) {
                                     ktvApiProtocol.stopSong();
                                     ktvApiProtocol.loadSong(Long.parseLong(songPlaying.getSongNo()), new KTVSongConfiguration(KTVSongType.KTVSongTypeChorus, KTVSingRole.KTVSingRoleAudience, Long.parseLong(songPlaying.getSongNo()), Integer.parseInt(songPlaying.getUserNo()), 0),
@@ -895,7 +896,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                         }
                     }
                 } else {
-                    Log.d(TAG, "RoomLivingViewModel.getSongChosenList() return is emptyList");
+                    KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() return is emptyList");
                     songPlayingLiveData.postValue(null);
                 }
                 _loadingDialogVisible.postValue(false);
@@ -903,7 +904,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             } else {
                 // failed
                 if (e != null) {
-                    Log.e(TAG, "RoomLivingViewModel.getSongChosenList() failed: " + e.getMessage());
+                    KTVLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed: " + e.getMessage());
                     ToastUtils.showToast(e.getMessage());
                 }
             }
@@ -916,7 +917,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      * 点击加入合唱
      */
     public void joinChorus() {
-        Log.d(TAG, "RoomLivingViewModel.joinChorus() called");
+        KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus() called");
         if (!isOnSeat) {
             ToastUtils.showToast(R.string.ktv_onseat_toast);
             return;
@@ -932,10 +933,10 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         ktvServiceProtocol.joinChorus(new JoinChorusInputModel(musicModel.getSongNo()), e -> {
             if (e == null) {
                 // success
-                Log.d(TAG, "RoomLivingViewModel.joinChorus() success");
+                KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus() success");
             } else {
                 // failure
-                Log.e(TAG, "RoomLivingViewModel.joinChorus() failed: " + e.getMessage());
+                KTVLogger.e(TAG, "RoomLivingViewModel.joinChorus() failed: " + e.getMessage());
                 ToastUtils.showToast(e.getMessage());
             }
             return null;
@@ -946,7 +947,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      * 退出合唱
      */
     public void leaveChorus() {
-        Log.d(TAG, "RoomLivingViewModel.leaveChorus() called");
+        KTVLogger.d(TAG, "RoomLivingViewModel.leaveChorus() called");
         ktvServiceProtocol.becomeSolo();
     }
 
@@ -954,7 +955,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      * 开始切歌
      */
     public void changeMusic() {
-        Log.d(TAG, "RoomLivingViewModel.changeMusic() called");
+        KTVLogger.d(TAG, "RoomLivingViewModel.changeMusic() called");
         RoomSelSongModel musicModel = songPlayingLiveData.getValue();
         if (musicModel == null) return;
 
@@ -967,10 +968,10 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         ), e -> {
             if (e == null) {
                 // success do nothing for dealing in song subscriber
-                Log.d(TAG, "RoomLivingViewModel.changeMusic() success");
+                KTVLogger.d(TAG, "RoomLivingViewModel.changeMusic() success");
             } else {
                 // failed
-                Log.e(TAG, "RoomLivingViewModel.changeMusic() failed: " + e.getMessage());
+                KTVLogger.e(TAG, "RoomLivingViewModel.changeMusic() failed: " + e.getMessage());
                 _loadingDialogVisible.postValue(false);
                 ToastUtils.showToast(e.getMessage());
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_END);
@@ -1011,7 +1012,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                         playerMusicCountDownLiveData.postValue(time);
                     }
                 } catch (JSONException exp) {
-                    Log.e(TAG, "onStreamMessage:" + exp.toString());
+                    KTVLogger.e(TAG, "onStreamMessage:" + exp.toString());
                 }
             }
             @Override
@@ -1042,7 +1043,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             mRtcEngine = (RtcEngineEx) RtcEngine.create(config);
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG, "RtcEngine.create() called error: " + e);
+            KTVLogger.e(TAG, "RtcEngine.create() called error: " + e);
         }
         mRtcEngine.loadExtensionProvider("agora_drm_loader");
 
@@ -1064,7 +1065,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 UserManager.getInstance().getUser().id.intValue()
         );
         if (ret != Constants.ERR_OK) {
-            Log.e(TAG, "joinRTC() called error: " + ret);
+            KTVLogger.e(TAG, "joinRTC() called error: " + ret);
         }
 
         // ------------------ 开启鉴黄服务 ------------------
@@ -1084,7 +1085,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             contentInspectConfig.moduleCount = 2;
             mRtcEngine.enableContentInspect(true, contentInspectConfig);
         } catch (JSONException e) {
-            Log.e(TAG, e.toString());
+            KTVLogger.e(TAG, e.toString());
         }
 
         // ------------------ 初始化内容中心 ------------------
@@ -1236,10 +1237,10 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         int isMuted = value == null ? RoomSeatModel.Companion.getMUTED_VALUE_TRUE() : value.isAudioMuted();
         if (isMuted == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
             micOldVolume = v;
-            Log.d(TAG, "muted! setMicVolume: " + v);
+            KTVLogger.d(TAG, "muted! setMicVolume: " + v);
             return;
         }
-        Log.d(TAG, "unmute! setMicVolume: " + v);
+        KTVLogger.d(TAG, "unmute! setMicVolume: " + v);
         micVolume = v;
         if (mRtcEngine != null) {
             mRtcEngine.adjustRecordingSignalVolume(v);
@@ -1293,7 +1294,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
     // ------------------ 歌曲开始播放 ------------------
     public void musicStartPlay(Context context, @NonNull RoomSelSongModel music) {
-        Log.d(TAG, "RoomLivingViewModel.musicStartPlay() called");
+        KTVLogger.d(TAG, "RoomLivingViewModel.musicStartPlay() called");
         chorusPlayingLiveData.setValue(null);
         ktvApiProtocol.stopSong();
         mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
@@ -1339,7 +1340,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                         }
                         ktvApiProtocol.playSong(song);
                     } else if (singState == KTVLoadSongState.KTVLoadSongStatePreloadFail) {
-                        Log.e(TAG, "KTVLoadSongState.KTVLoadSongStatePreloadFail");
+                        KTVLogger.e(TAG, "KTVLoadSongState.KTVLoadSongStatePreloadFail");
                     }
                     return null;
                 }
@@ -1363,7 +1364,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
     // ------------------ 歌曲结束播放 ------------------
     public void musicStop() {
-        Log.d(TAG, "RoomLivingViewModel.musicStop() called");
+        KTVLogger.d(TAG, "RoomLivingViewModel.musicStop() called");
         // 列表中无歌曲， 还原状态
         chorusPlayingLiveData.setValue(null);
         ktvApiProtocol.stopSong();

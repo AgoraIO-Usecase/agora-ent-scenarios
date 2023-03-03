@@ -57,7 +57,7 @@ def all_pods
   pod 'Agora-Scene-Utils', '~> 1.0.8'
   
   #歌词组件
-  pod 'AgoraLyricsScore', '~> 1.0.8.6'
+  pod 'AgoraLyricsScore', '1.0.8.8'
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'f0613f7a8e11aa4e333f1dba2cfb2516d1140367'
   pod 'AgoraRtm_iOS'
   
@@ -65,15 +65,14 @@ def all_pods
   # Swift Code Formatter
 #  pod 'SwiftFormat/CLI'
   #VoiceChatRoom rely
-  pod 'ZSwiftBaseLib','0.1.5'
+  pod 'ZSwiftBaseLib', '0.1.6.1'
   pod 'SnapKit'
   pod 'SVGAPlayer'
   pod 'KakaJSON'
-  pod 'Agora_Chat_iOS'
+  pod 'Agora_Chat_iOS', '1.0.8'
   
-  
-  # debug
-  pod 'Bugly'
+  #bugly
+  pod 'Bugly','2.5.93'
 end
 
 target 'AgoraEntScenarios' do

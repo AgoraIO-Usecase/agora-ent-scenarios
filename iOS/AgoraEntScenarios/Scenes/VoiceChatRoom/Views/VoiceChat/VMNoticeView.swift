@@ -127,9 +127,8 @@ class VMNoticeView: UIView {
         editBtn.setTitle(LanguageManager.localValue(key: "Edit"), for: .normal)
         editBtn.font(UIFont.systemFont(ofSize: 16))
         editBtn.setTitleColor(.white, for: .normal)
-        editBtn.layer.cornerRadius = 24
-        editBtn.layer.masksToBounds = true
-        editBtn.setBackgroundImage(UIImage("blue_btn_bg"), for: .normal)
+        let image = UIImage("blue_btn_bg")?.resizableImage(withCapInsets: UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16), resizingMode: .stretch)
+        editBtn.setBackgroundImage(image, for: .normal)
         editBtn.addTargetFor(self, action: #selector(edit), for: .touchUpInside)
         addSubview(editBtn)
     }

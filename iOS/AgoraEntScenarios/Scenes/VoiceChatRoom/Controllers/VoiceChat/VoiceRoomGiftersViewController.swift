@@ -12,8 +12,8 @@ import ZSwiftBaseLib
 public class VoiceRoomGiftersViewController: UITableViewController {
     private var room_id = ""
 
-    private var dataSource = VoiceRoomContributions()
-
+   // private var dataSource = VoiceRoomContributions()
+    private var dataSource: [VRUser]?
     override public func viewDidLoad() {
         super.viewDidLoad()
         tableView.tableFooterView(UIView()).registerCell(VoiceRoomGifterCell.self, forCellReuseIdentifier: "VoiceRoomGifterCell").rowHeight(73).backgroundColor(.white).separatorInset(edge: UIEdgeInsets(top: 72, left: 15, bottom: 0, right: 15)).separatorColor(UIColor(0xF2F2F2)).showsVerticalScrollIndicator(false)
@@ -43,7 +43,8 @@ public class VoiceRoomGiftersViewController: UITableViewController {
     }
 
     override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        dataSource.ranking_list?.count ?? 0
+        //dataSource.ranking_list?.count ?? 0
+        dataSource?.count ?? 0
     }
 
     override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -51,7 +52,7 @@ public class VoiceRoomGiftersViewController: UITableViewController {
         if cell == nil {
             cell = VoiceRoomGifterCell(style: .default, reuseIdentifier: "VoiceRoomGifterCell")
         }
-        cell?.refresh(item: dataSource.ranking_list?[safe: indexPath.row])
+        cell?.refresh(item: dataSource?[safe: indexPath.row])
         cell?.index = indexPath.row
         // Configure the cell...
         cell?.selectionStyle = .none
@@ -65,11 +66,13 @@ extension VoiceRoomGiftersViewController {
     }
 
     @objc private func fetchList() {
-        VoiceRoomBusinessRequest.shared.sendGETRequest(api: .fetchGiftContribute(roomId: room_id), params: [:], classType: VoiceRoomContributions.self) { contributions, error in
-            self.tableView.refreshControl?.endRefreshing()
-            if error == nil, contributions != nil, contributions?.ranking_list?.count ?? 0 > 0 {
-                self.dataSource = contributions!
-                self.tableView.reloadData()
+        ChatRoomServiceImp.getSharedInstance().fetchGiftContribute { error, users in
+            if error == nil, users != nil {
+                self.tableView.refreshControl?.endRefreshing()
+                if users?.count ?? 0 > 0 {
+                    self.dataSource = users
+                    self.tableView.reloadData()
+                }
             }
         }
     }
