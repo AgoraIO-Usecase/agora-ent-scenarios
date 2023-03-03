@@ -23,7 +23,12 @@ KEYCENTER_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/KeyCenter.swift"
 cp $KEYCENTER_PATH.bak $KEYCENTER_PATH
 
 # 打包环境
-CONFIGURATION=app-store
+set CONFIGURATION='Release'
+result=$(echo $path | grep "development")
+if [ -z "$result" ]
+then
+    CONFIGURATION='Debug'
+fi
 
 #工程文件路径
 APP_PATH="${PROJECT_PATH}/${TARGET_NAME}.xcworkspace"
@@ -34,13 +39,13 @@ echo PBXPROJ_PATH: $PBXPROJ_PATH
 
 # 主项目工程配置
 # Debug
-/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:CODE_SIGN_STYLE 'Manual'" $PBXPROJ_PATH
-/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:DEVELOPMENT_TEAM 'GM72UGLGZW'" $PBXPROJ_PATH
-/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'App'" $PBXPROJ_PATH
+# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:CODE_SIGN_STYLE 'Manual'" $PBXPROJ_PATH
+# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:DEVELOPMENT_TEAM 'GM72UGLGZW'" $PBXPROJ_PATH
+# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'App'" $PBXPROJ_PATH
 # Release
-/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:CODE_SIGN_STYLE 'Manual'" $PBXPROJ_PATH
-/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:DEVELOPMENT_TEAM 'GM72UGLGZW'" $PBXPROJ_PATH
-/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'App'" $PBXPROJ_PATH
+# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:CODE_SIGN_STYLE 'Manual'" $PBXPROJ_PATH
+# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:DEVELOPMENT_TEAM 'GM72UGLGZW'" $PBXPROJ_PATH
+# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'App'" $PBXPROJ_PATH
 
 # 读取APPID环境变量
 echo AGORA_APP_ID:$APP_ID
@@ -69,7 +74,7 @@ ARCHIVE_PATH="${PROJECT_PATH}/${TARGET_NAME} ${CURRENT_TIME}/${TARGET_NAME}_${BU
 EXPORT_PATH="${PROJECT_PATH}/${TARGET_NAME} ${CURRENT_TIME}"
 
 # plist路径
-PLIST_PATH="${PROJECT_PATH}/ExportOptions.plist"
+PLIST_PATH="${PROJECT_PATH}/ExportOptions_${method}.plist"
 
 echo PLIST_PATH: $PLIST_PATH
 
