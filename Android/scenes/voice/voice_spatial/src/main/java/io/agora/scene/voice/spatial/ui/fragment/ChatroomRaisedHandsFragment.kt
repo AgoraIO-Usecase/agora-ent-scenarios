@@ -101,7 +101,6 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
                                 }
                             }
                         }
-
                     }
 
                     override fun onError(code: Int, message: String) {

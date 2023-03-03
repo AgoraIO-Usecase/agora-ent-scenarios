@@ -314,7 +314,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                     if (roomKitBean.isOwner) {
                         finish()
                     } else {
-                        roomObservableDelegate.checkUserLeaveMic()
+                        roomObservableDelegate.handleBeforeExitRoom()
                         finish()
                     }
                 })
@@ -488,7 +488,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                     finish()
                 })
         } else {
-            roomObservableDelegate.checkUserLeaveMic()
+            roomObservableDelegate.handleBeforeExitRoom()
             finish()
         }
     }

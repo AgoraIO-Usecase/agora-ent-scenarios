@@ -567,7 +567,7 @@ class RoomObservableViewDelegate constructor(
         }
         ainsDialog.anisSoundCallback = { position, ainsSoundBean ->
             "onAINSDialog anisSoundCallback：$ainsSoundBean".logD(TAG)
-            if (voiceRoomModel.useRobot) {
+            val playSound = {
                 ainsDialog.updateAnisSoundsAdapter(position, true)
                 RoomSoundAudioConstructor.AINSSoundMap[ainsSoundBean.soundType]?.let { soundAudioBean ->
                     val audioUrl =
@@ -576,9 +576,21 @@ class RoomObservableViewDelegate constructor(
                     AgoraRtcEngineController.get()
                         .playMusic(soundAudioBean.soundId, audioUrl, soundAudioBean.speakerType)
                 }
+            }
+            if (voiceRoomModel.useRobot) {
+                playSound.invoke()
             } else {
-                ainsDialog.updateAnisSoundsAdapter(position, false)
-                ToastTools.show(activity, activity.getString(R.string.voice_chatroom_open_bot_first))
+                CommonFragmentAlertDialog().titleText(activity.getString(R.string.voice_chatroom_prompt))
+                    .contentText(activity.getString(R.string.voice_chatroom_open_bot_to_sound_effect))
+                    .leftText(activity.getString(R.string.voice_room_cancel))
+                    .rightText(activity.getString(R.string.voice_room_confirm))
+                    .setOnClickListener(object : CommonFragmentAlertDialog.OnClickBottomListener {
+                        override fun onConfirmClick() {
+                            VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot = false
+                            roomLivingViewModel.enableRobot(true)
+                            playSound.invoke()
+                        }
+                    }).show(activity.supportFragmentManager, "botActivatedDialog")
             }
         }
 
