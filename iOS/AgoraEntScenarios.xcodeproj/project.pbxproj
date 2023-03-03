@@ -316,6 +316,7 @@
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
 		E3AE704829ACB0E500266344 /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3AE704729ACB0E500266344 /* KeyCenter.swift */; };
+		E3AE704B29B1D14D00266344 /* VLEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3AE704A29B1D14D00266344 /* VLEffectView.m */; };
 		E3D1D83C298CAA5400BDBAC2 /* AgoraRequestTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D837298CAA5400BDBAC2 /* AgoraRequestTask.swift */; };
 		E3D1D83D298CAA5400BDBAC2 /* AgoraCacheFileHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D838298CAA5400BDBAC2 /* AgoraCacheFileHandle.swift */; };
 		E3D1D83E298CAA5400BDBAC2 /* AgoraStringExtention.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D839298CAA5400BDBAC2 /* AgoraStringExtention.swift */; };
@@ -791,6 +792,8 @@
 		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
 		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
 		E3AE704729ACB0E500266344 /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
+		E3AE704929B1D14D00266344 /* VLEffectView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLEffectView.h; sourceTree = "<group>"; };
+		E3AE704A29B1D14D00266344 /* VLEffectView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLEffectView.m; sourceTree = "<group>"; };
 		E3D1D837298CAA5400BDBAC2 /* AgoraRequestTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraRequestTask.swift; sourceTree = "<group>"; };
 		E3D1D838298CAA5400BDBAC2 /* AgoraCacheFileHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraCacheFileHandle.swift; sourceTree = "<group>"; };
 		E3D1D839298CAA5400BDBAC2 /* AgoraStringExtention.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraStringExtention.swift; sourceTree = "<group>"; };
@@ -974,6 +977,8 @@
 				DD0292A7295BF0DC00485225 /* VLKTVMVView.h */,
 				DD0292A8295BF0DC00485225 /* VLKTVTopView.m */,
 				DD0292A9295BF0DC00485225 /* VLKTVBottomToolbar.h */,
+				E3AE704929B1D14D00266344 /* VLEffectView.h */,
+				E3AE704A29B1D14D00266344 /* VLEffectView.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2459,6 +2464,7 @@
 				DDA19A0528FFE579009D3E61 /* NSObject+JKAppInfo.m in Sources */,
 				DD220B17295B332C00F57F30 /* VoiceRoomPasswordAlert.swift in Sources */,
 				DD5EBDC6299F230100F36349 /* KTVDebugViewController.m in Sources */,
+				E3AE704B29B1D14D00266344 /* VLEffectView.m in Sources */,
 				DD220B7F295B332C00F57F30 /* HorizontalCardView.swift in Sources */,
 				E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */,
 				DD0292D0295BF0DC00485225 /* VLSongList.m in Sources */,

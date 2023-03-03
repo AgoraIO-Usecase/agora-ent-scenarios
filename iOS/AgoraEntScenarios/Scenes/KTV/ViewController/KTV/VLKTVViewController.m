@@ -64,7 +64,7 @@ VLDropOnLineViewDelegate,
 VLAudienceIndicatorDelegate,
 VLAudioEffectPickerDelegate,
 VLPopSongListDelegate,
-VLsoundEffectViewDelegate,
+VLEffectViewDelegate,
 VLKTVSettingViewDelegate,
 VLBadNetWorkViewDelegate,
 AgoraRtcMediaPlayerDelegate,
@@ -83,7 +83,7 @@ KTVApiDelegate
 @property (nonatomic, strong) VLMicSeatList *roomPersonView; //房间麦位视图
 @property (nonatomic, strong) VLAudienceIndicator *requestOnLineView;//空位上麦
 @property (nonatomic, strong) VLPopSongList *chooseSongView; //点歌视图
-@property (nonatomic, strong) VLSoundEffectView *soundEffectView; // 音效视图
+@property (nonatomic, strong) VLEffectView *effectView; // 音效视图
 
 @property (nonatomic, strong) id<AgoraMusicPlayerProtocol> rtcMediaPlayer;
 @property (nonatomic, strong) AgoraMusicContentCenter *AgoraMcc;
@@ -321,6 +321,7 @@ KTVApiDelegate
 //            [VLToast toast:[NSString stringWithFormat:@"network changed: %ld", status]];
             return;
         }
+        [weakSelf subscribeServiceEvent];
         [weakSelf _fetchServiceAllData];
     }];
     
@@ -387,9 +388,9 @@ KTVApiDelegate
 - (void)popSetSoundEffectView {
     LSTPopView* popView = 
     [LSTPopView popSetSoundEffectViewWithParentView:self.view
-                                          soundView:self.soundEffectView
+                                          soundView:self.effectView
                                        withDelegate:self];
-    self.soundEffectView = (VLSoundEffectView*)popView.currCustomView;
+    self.effectView = (VLEffectView*)popView.currCustomView;
 }
 
 //网络差视图
@@ -866,6 +867,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     self.ktvApi = [[KTVApi alloc] initWithRtcEngine:self.RTCkit channel:self.roomModel.roomNo musicCenter:self.AgoraMcc player:self.rtcMediaPlayer dataStreamId:ktvApiStreamId delegate:self];
     self.ktvApi.karaokeView = self.MVView.karaokeView;
+    self.ktvApi.isNowMicMuted = self.isNowMicMuted;
     VL(weakSelf);
     KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
     int ret =
@@ -1035,6 +1037,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             break;
         case VLKTVBottomBtnClickTypeAudio:
             self.isNowMicMuted = !self.isNowMicMuted;
+            self.ktvApi.isNowMicMuted = self.isNowMicMuted;
             [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
                                                                 completion:^(NSError * error) {
             }];
@@ -1272,18 +1275,31 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 //音效设置
-- (void)soundEffectItemClickAction:(VLKTVSoundEffectType)effectType {
-    if (effectType == VLKTVSoundEffectTypeHeFeng) {
-        [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:3 param2:4];
-    } else if (effectType == VLKTVSoundEffectTypeXiaoDiao){
-        [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:2 param2:4];
-    } else if (effectType == VLKTVSoundEffectTypeDaDiao){
-        [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:1 param2:4];
-    } else if (effectType == VLKTVSoundEffectTypeNone) {
-        [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:0 param2:4];
-    }
-    KTVLogInfo(@"Agora - Setting effect type to %lu", effectType);
+- (void)effectItemClickAction:(NSInteger)effect {
+    NSArray *effects = @[@(AgoraAudioEffectPresetOff),
+                         @(AgoraAudioEffectPresetRoomAcousticsKTV),
+                         @(AgoraAudioEffectPresetRoomAcousVocalConcer),
+                         @(AgoraAudioEffectPresetRoomAcousStudio),
+                         @(AgoraAudioEffectPresetRoomAcousPhonograph),
+                         @(AgoraAudioEffectPresetRoomAcousSpatial),
+                         @(AgoraAudioEffectPresetRoomAcousEthereal),
+                         @(AgoraAudioEffectPresetStyleTransformationPopular),
+                         @(AgoraAudioEffectPresetStyleTransformationRnb)];
+   [self.RTCkit setAudioEffectPreset: (AgoraAudioEffectPreset)effects[effect]];
 }
+//- (void)soundEffectItemClickAction:(VLKTVSoundEffectType)effectType {
+//    if (effectType == VLKTVSoundEffectTypeHeFeng) {
+//        [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:3 param2:4];
+//    } else if (effectType == VLKTVSoundEffectTypeXiaoDiao){
+//        [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:2 param2:4];
+//    } else if (effectType == VLKTVSoundEffectTypeDaDiao){
+//        [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:1 param2:4];
+//    } else if (effectType == VLKTVSoundEffectTypeNone) {
+//        [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:0 param2:4];
+//    }
+//    KTVLogInfo(@"Agora - Setting effect type to %lu", effectType);
+//}
+
 
 #pragma mark --
 - (void)_fetchServiceAllData {
