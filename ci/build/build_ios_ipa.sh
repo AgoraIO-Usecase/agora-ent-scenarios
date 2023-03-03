@@ -24,7 +24,7 @@ cp $KEYCENTER_PATH.bak $KEYCENTER_PATH
 
 # 打包环境
 set CONFIGURATION='Release'
-result=$(echo $path | grep "development")
+result=$(echo ${method} | grep "development")
 if [ -z "$result" ]
 then
     CONFIGURATION='Debug'
@@ -55,7 +55,6 @@ echo PROJECT_PATH: $PROJECT_PATH
 echo TARGET_NAME: $TARGET_NAME
 echo KEYCENTER_PATH: $KEYCENTER_PATH
 echo APP_PATH: $APP_PATH
-echo method: $method
 
 #修改Keycenter文件
 python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 0
