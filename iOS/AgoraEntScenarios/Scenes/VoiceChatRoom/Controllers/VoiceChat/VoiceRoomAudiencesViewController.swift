@@ -11,6 +11,8 @@ import ZSwiftBaseLib
 public final class VoiceRoomAudiencesViewController: UITableViewController {
     
     var datas: [VRUser]?
+    
+    var kickClosure: ((VRUser?,VRRoomMic?) -> ())?
 
     lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "No audience yet", image: nil)
 
@@ -69,15 +71,43 @@ extension VoiceRoomAudiencesViewController {
     private func removeUser(user: VRUser) {
         VoiceRoomIMManager.shared?.kickUser(chat_uid: user.chat_uid ?? "", completion: { success in
             if success {
-                ChatRoomServiceImp.getSharedInstance().userList = ChatRoomServiceImp.getSharedInstance().userList?.filter({ $0.chat_uid ?? "" != user.chat_uid ?? ""
-                })
-                ChatRoomServiceImp.getSharedInstance().updateRoomMembers { error in
-                    if error == nil {
-                        self.view.makeToast("remove successful!")
-                        self.refresh()
+                var index = -1
+                for mic in ChatRoomServiceImp.getSharedInstance().mics {
+                    if mic.member?.chat_uid ?? "" == user.chat_uid ?? "" {
+                        index = mic.mic_index
+                        break
+                    }
+                }
+                if index > 0,let mic = ChatRoomServiceImp.getSharedInstance().mics[safe: index]  {
+                    mic.member = nil
+                    VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(index)":mic.kj.JSONString()], completion: { error in
+                        if error == nil {
+                            self.removeUserFromUserList(user: user)
+                            if self.kickClosure != nil  {
+                                self.kickClosure!(user,mic)
+                            }
+                        } else {
+                            self.view.makeToast("kick failed!")
+                        }
+                    })
+                } else {
+                    self.removeUserFromUserList(user: user)
+                    if self.kickClosure != nil  {
+                        self.kickClosure!(user,nil)
                     }
                 }
             }
         })
+    }
+    
+    private func removeUserFromUserList(user: VRUser) {
+        ChatRoomServiceImp.getSharedInstance().userList = ChatRoomServiceImp.getSharedInstance().userList?.filter({ $0.chat_uid ?? "" != user.chat_uid ?? ""
+        })
+        ChatRoomServiceImp.getSharedInstance().updateRoomMembers { error in
+            if error == nil {
+                self.view.makeToast("kick successful!")
+                self.refresh()
+            }
+        }
     }
 }
