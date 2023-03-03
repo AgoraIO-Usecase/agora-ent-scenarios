@@ -103,9 +103,7 @@
         NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"取消"),KTVLocalizedString(@"确认"), nil];
         VL(weakSelf);
         [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:KTVLocalizedString(@"输入密码") message:@"" placeHolder:KTVLocalizedString(@"请输入房间密码") type:ALERTYPETEXTFIELD buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
-            if(text.length == 4  && flag == true){
-                [weakSelf joinInRoomWithModel:listModel withInPutText:text];
-            }
+            [weakSelf joinInRoomWithModel:listModel withInPutText:text];
             [[VLAlert shared] dismiss];
         }];
     }else{
