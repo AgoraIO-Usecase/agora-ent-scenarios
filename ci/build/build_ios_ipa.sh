@@ -39,13 +39,13 @@ echo PBXPROJ_PATH: $PBXPROJ_PATH
 
 # 主项目工程配置
 # Debug
-# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:CODE_SIGN_STYLE 'Manual'" $PBXPROJ_PATH
-# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:DEVELOPMENT_TEAM 'GM72UGLGZW'" $PBXPROJ_PATH
-# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'App'" $PBXPROJ_PATH
+/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:CODE_SIGN_STYLE 'Manual'" $PBXPROJ_PATH
+/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:DEVELOPMENT_TEAM 'YS397FG5PA'" $PBXPROJ_PATH
+/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'App'" $PBXPROJ_PATH
 # Release
-# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:CODE_SIGN_STYLE 'Manual'" $PBXPROJ_PATH
-# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:DEVELOPMENT_TEAM 'GM72UGLGZW'" $PBXPROJ_PATH
-# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'App'" $PBXPROJ_PATH
+/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:CODE_SIGN_STYLE 'Manual'" $PBXPROJ_PATH
+/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:DEVELOPMENT_TEAM 'YS397FG5PA'" $PBXPROJ_PATH
+/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'App'" $PBXPROJ_PATH
 
 # 读取APPID环境变量
 echo AGORA_APP_ID:$APP_ID
