@@ -30,6 +30,8 @@ import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_NONE;
 
 import android.content.Context;
 import android.graphics.Matrix;
+import android.opengl.GLES11Ext;
+import android.opengl.GLES20;
 
 import com.sensetime.effects.STRenderer;
 import com.sensetime.effects.utils.FileUtils;
@@ -115,11 +117,12 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
             }
             return true;
         }
-
         VideoFrame.Buffer buffer = videoFrame.getBuffer();
-
         // 获取NV21数据
         VideoFrame.I420Buffer i420Buffer = buffer.toI420();
+        if (i420Buffer == null) {
+            return false;
+        }
         int nv21Size = (buffer.getWidth() * buffer.getHeight() * 3 + 1) / 2;
         if (mNV21Buffer == null || mNV21Buffer.capacity() != nv21Size) {
             mNV21Buffer = ByteBuffer.allocateDirect(nv21Size);
@@ -137,22 +140,57 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         mNV21Buffer.get(mNV21ByteArray);
         i420Buffer.release();
 
-        if (textureBufferHelper == null) {
-            mEglBaseContext = null;
-            textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", null);
-            textureBufferHelper.invoke(() -> {
-                initST();
-                return null;
-            });
-        }
+        int texture;
+        Matrix transformMatrix;
+        if (buffer instanceof VideoFrame.TextureBuffer) {
+            // 使用双输入处理
+            VideoFrame.TextureBuffer textureBuffer = (VideoFrame.TextureBuffer) buffer;
 
-        if (isReleased){
-            return true;
+            if (textureBufferHelper == null) {
+                mEglBaseContext = textureBuffer.getEglBaseContext();
+                textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", mEglBaseContext);
+                textureBufferHelper.invoke(() -> {
+                    initST();
+                    return null;
+                });
+            } else if (mEglBaseContext == null) {
+                textureBufferHelper.invoke(() -> {
+                    unInitST();
+                    return null;
+                });
+                textureBufferHelper.dispose();
+                textureBufferHelper = null;
+                return false;
+            }
+
+            texture = textureBufferHelper.invoke(() ->
+                    mSTRenderer.preProcess(buffer.getWidth(), buffer.getHeight(), videoFrame.getRotation(),
+                            mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21,
+                            textureBuffer.getTextureId(),
+                            textureBuffer.getType() == VideoFrame.TextureBuffer.Type.RGB ? GLES20.GL_TEXTURE_2D : GLES11Ext.GL_TEXTURE_EXTERNAL_OES));
+            transformMatrix = textureBuffer.getTransformMatrix();
+            if (shouldMirror) {
+                shouldMirror = false;
+                return false;
+            }
+        } else {
+            // 使用单输入处理
+            if (textureBufferHelper == null) {
+                mEglBaseContext = null;
+                textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", mEglBaseContext);
+                textureBufferHelper.invoke(() -> {
+                    initST();
+                    return null;
+                });
+            }
+            texture = textureBufferHelper.invoke(() ->
+                    mSTRenderer.preProcess(buffer.getWidth(), buffer.getHeight(), videoFrame.getRotation(), mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21));
+            transformMatrix = new Matrix();
+            if(!shouldMirror){
+                shouldMirror = true;
+                return false;
+            }
         }
-        int texture = textureBufferHelper.invoke(() ->
-                mSTRenderer.preProcess(buffer.getWidth(), buffer.getHeight(), videoFrame.getRotation(), mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21));
-        Matrix transformMatrix = new Matrix();
-        shouldMirror = true;
 
         boolean isFront = videoFrame.getRotation() == 270;
         if (isFrontCamera != isFront) {
@@ -161,11 +199,11 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         }
 
         if (texture < 0) {
-            return true;
+            return false;
         }
 
-        if (isReleased){
-            return true;
+        if (isReleased) {
+            return false;
         }
         VideoFrame.TextureBuffer newBuffer = textureBufferHelper.wrapTextureBuffer(
                 buffer.getWidth(),
