@@ -188,18 +188,13 @@ class ShowAgoraKitManager: NSObject {
             let mediaOptions = AgoraRtcChannelMediaOptions()
             mediaOptions.autoSubscribeAudio = subscribeStatus
             mediaOptions.autoSubscribeVideo = subscribeStatus
-//            mediaOptions.publishCameraTrack = false
-//            mediaOptions.publishMicrophoneTrack = options.publishMicrophoneTrack//role == .broadcaster
             mediaOptions.clientRoleType = role
             // 极速直播
             if role == .audience {
                 mediaOptions.audienceLatencyLevel = .lowLatency
-//                agoraKit.setVideoFrameDelegate(self)
             }else{
-//                updateCameraCaptureConfiguration()
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }
-//            setupContentInspectConfig(true)
         
             let connection = AgoraRtcConnection()
             connection.channelId = targetChannelId
@@ -374,10 +369,8 @@ class ShowAgoraKitManager: NSObject {
     /// 更新采集参数
     /// - Returns:
     func updateCameraCaptureConfiguration() {
-//        agoraKit.disableVideo()
         agoraKit.stopPreview()
         let ret = agoraKit.setCameraCapturerConfiguration(captureConfig)
-//        agoraKit.enableVideo()
         agoraKit.startPreview()
         showLogger.info("setCaptureVideoDimensions = \(captureConfig.dimensions), framerate = \(captureConfig.frameRate)  ret = \(ret)")
     }
