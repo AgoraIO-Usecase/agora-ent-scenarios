@@ -49,7 +49,7 @@ ext {
 
             rtc               : 'io.agora.rtc:full-sdk:4.1.1',
             rtm               : 'com.github.agorabuilder:rtm-sdk:1.4.10',
-            syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.3',
+            syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.4',
             lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.0.20',
 
             // android native libraries
