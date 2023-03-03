@@ -81,8 +81,4 @@
         app:layout_constraintStart_toStartOf="@id/avatar_item_room_speaker"
         app:layout_constraintTop_toTopOf="@id/avatar_item_room_speaker" />
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin
 </androidx.constraintlayout.widget.ConstraintLayout>
