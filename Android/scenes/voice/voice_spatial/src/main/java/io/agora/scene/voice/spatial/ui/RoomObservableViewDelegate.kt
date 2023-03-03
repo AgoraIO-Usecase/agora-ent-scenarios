@@ -1042,17 +1042,15 @@ class RoomObservableViewDelegate constructor(
         }
     }
 
-    fun checkUserLeaveMic() {
-        val localUserIndex = localUserIndex()
+    fun handleBeforeExitRoom() {
         // 普通用户离开
+        val localUserIndex = localUserIndex()
         if (localUserIndex >= 0) {
             roomLivingViewModel.leaveMic(localUserIndex)
         }
-    }
-
-    fun checkUserLeaveMic(index:Int){
-        if (index > 0) {
-            roomLivingViewModel.leaveMic(index)
+        // 取消自己的上麦申请
+        if (isRequesting) {
+            roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().userId())
         }
     }
 }

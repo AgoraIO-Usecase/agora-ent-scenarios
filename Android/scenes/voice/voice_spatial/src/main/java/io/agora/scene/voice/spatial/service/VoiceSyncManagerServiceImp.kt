@@ -1180,11 +1180,13 @@ class VoiceSyncManagerServiceImp(
 
     // ----------------------------- 麦位状态 -----------------------------
     private fun seatDownMember(seat: VoiceMicInfoModel, member: VoiceMemberModel?) {
+        val oldMember = seat.member
         seat.member = member
-        if (member != null) {
+        if (member != null) { // 落座
             seat.micStatus = if (seat.micStatus == MicStatus.Idle) MicStatus.Normal else seat.micStatus
-        } else {
+        } else { // 离座
             seat.micStatus = if (seat.micStatus == MicStatus.Normal) MicStatus.Idle else seat.micStatus
+
         }
     }
 

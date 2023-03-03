@@ -137,6 +137,7 @@
                 style="@style/voice_bottom_sheet_divider_style"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
+                android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/mtBlueBotAirAbsorb" />
@@ -146,6 +147,7 @@
                 style="@style/voice_bottom_sheet_text_style"
                 android:paddingStart="20dp"
                 android:text="@string/voice_chatroom_voice_blur"
+                android:visibility="invisible"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/mtBlueBotAirAbsorb" />
 
@@ -154,7 +156,7 @@
                 style="@style/voice_bottom_sheet_checkbox"
                 android:alpha="1"
                 android:checked="false"
-
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@+id/mtBlueBotVoiceBlur"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/mtBlueBotVoiceBlur" />
@@ -166,7 +168,7 @@
                 android:text="@string/voice_chatroom_agora_red_bot"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/mtBlueBotVoiceBlur" />
+                app:layout_constraintTop_toBottomOf="@+id/mtBlueBotAirAbsorb" />
 
 <!--            <com.google.android.material.textview.MaterialTextView-->
 <!--                android:id="@+id/mtRedBotSpatialAudio"-->
@@ -240,6 +242,7 @@
                 style="@style/voice_bottom_sheet_divider_style"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
+                android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/mtRedBotAirAbsorb" />
@@ -250,6 +253,7 @@
                 android:layout_marginTop="1dp"
                 android:layout_marginBottom="15dp"
                 android:paddingStart="20dp"
+                android:visibility="invisible"
                 android:text="@string/voice_chatroom_voice_blur"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -259,6 +263,7 @@
                 android:id="@+id/mcbRedBotVoiceBlur"
                 style="@style/voice_bottom_sheet_checkbox"
                 android:checked="false"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@+id/mtRedBotVoiceBlur"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/mtRedBotVoiceBlur" />
