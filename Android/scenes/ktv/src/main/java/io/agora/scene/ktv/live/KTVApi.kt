@@ -8,12 +8,8 @@ import io.agora.musiccontentcenter.MusicChartInfo
 import io.agora.rtc2.RtcEngine
 import io.agora.scene.ktv.widget.LrcControlView
 
-enum class KTVSongType {
-    KTVSongTypeSolo, KTVSongTypeChorus
-}
-
 enum class KTVSingRole {
-    KTVSingRoleMainSinger, KTVSingRoleCoSinger, KTVSingRoleAudience
+    KTVSingRoleMainSinger, KTVSingRoleCoSinger, KTVSingRoleFollowSinger, KTVSingRoleAudience
 }
 
 enum class KTVPlayerTrackMode {
@@ -24,47 +20,85 @@ enum class KTVLoadSongState {
     KTVLoadSongStateOK, KTVLoadSongStateInProgress, KTVLoadSongStateNoLyricUrl, KTVLoadSongStatePreloadFail, KTVLoadSongStateIdle
 }
 
+enum class JOIN_STATES(val value: Int) {
+    SUCCESS(0), FAIL(1)
+};
 
-data class KTVSongConfiguration(
-    val type: KTVSongType,
-    val role: KTVSingRole,
-    val songCode: Long,
-    val mainSingerUid: Int,
-    val coSingerUid: Int
-)
+enum class REASON_TYPE(val value: Int) {
+    MUSIC_PRELOAD_FAIL(0), MUSIC_OPEN_FAIL(1), JOIN_CHANNEL_FAIL(2)
+}
 
+abstract class KTVApiEventHandler {
+    open fun onPlayerStateChanged(
+        songCode: Long, state: Constants.MediaPlayerState, isLocal: Boolean
+    ) {
+    }
 
-interface KTVApi {
+    open fun onMusicCollectionResult(
+        requestId: String?,
+        status: Int,
+        page: Int,
+        pageSize: Int,
+        total: Int,
+        list: Array<out Music>?
+    ) {
+    }
 
-    interface KTVApiEventHandler {
-        fun onPlayerStateChanged(controller: KTVApi, songCode: Long, state: Constants.MediaPlayerState, isLocal: Boolean)
-        fun onSingingScoreResult(score: Float)
-        fun onMusicCollectionResult(
-            requestId: String?,
-            status: Int,
-            page: Int,
-            pageSize: Int,
-            total: Int,
-            list: Array<out Music>?
-        )
-        fun onMusicChartsResult(
-            requestId: String?,
-            status: Int,
-            list: Array<out MusicChartInfo>?
-        )
+    open fun onMusicChartsResult(
+        requestId: String?, status: Int, list: Array<out MusicChartInfo>?
+    ) {
     }
 
     /**
-     * 初始化内部变量/缓存数据，并注册相应的监听
+     * 用来同步歌词进度的回调
+     * mainSinger 和 coSinger:
+     *  通过本地播放的 MPK position 获取到进度
+     *
+     *
+     * 观众：
+     * 1：
+     *
      */
-    fun initWithRtcEngine(
-        engine: RtcEngine,
-        channelName: String,
-        musicCenter: IAgoraMusicContentCenter,
-        player: IAgoraMusicPlayer,
-        streamId: Int,
-        ktvApiEventHandler: KTVApiEventHandler
-    )
+    open fun onSyncMusicPosition(position: Float) {}
+
+    open fun onMusicLoaded(songCode: Long, lyricUrl: String, role: KTVSingRole, state: KTVLoadSongState) {}
+
+    open fun onJoinChorusStates(status: JOIN_STATES, reason: REASON_TYPE) {}
+
+    open fun onSingingScoreResult(score: Float) {}
+}
+
+/**
+ * @param engine, RtcEngine instance
+ * @param channelName, Your rtc channel
+ * @param streamId, Datastream id,create by createDataStream
+ * @param localUid
+ */
+
+data class KTVApiConfig(
+    val engine: RtcEngine,
+    val channelName: String,
+    val streamId: Int,
+    val localUid: Int,
+    val musicCenter: IAgoraMusicContentCenter,
+    val player: IAgoraMusicPlayer,
+    val ktvApiEventHandler: KTVApiEventHandler,
+);
+
+
+data class KTVSongConfiguration(
+    val role: KTVSingRole,
+    val songCode: Long,
+    val mainSingerUid: Int,
+);
+
+
+interface KTVApi {
+    /**
+     * 初始化内部变量/缓存数据，并注册相应的监听
+     * @param config
+     */
+    fun initialize(config: KTVApiConfig)
 
     /**
      * 清空内部变量/缓存，取消在initWithRtcEngine时的监听，以及取消网络请求等
@@ -75,40 +109,48 @@ interface KTVApi {
      * 加载歌曲
      */
     fun loadSong(
-        songCode: Long,
-        config: KTVSongConfiguration,
-        onLoaded: (songCode: Long, lyricUrl: String, role: KTVSingRole, state: KTVLoadSongState) -> Unit
+        config: KTVSongConfiguration
     )
 
     /**
      * 播放歌曲
      */
-    fun playSong(songCode: Long)
+    fun startSing(startPos: Long)
+
+    /**
+     * 加入合唱
+     */
+    fun joinChorus(token: String, config: KTVSongConfiguration)
+
+    /**
+     * 离开合唱
+     */
+    fun leaveChorus()
 
     /**
      * 停止播放歌曲
      */
-    fun stopSong()
+    fun stopSing()
 
     /**
      * 恢复播放
      */
-    fun resumePlay()
+    fun resumePlayer()
 
     /**
      * 暂停播放
      */
-    fun pausePlay()
+    fun pausePlayer()
 
     /**
      * 调整进度
      */
-    fun seek(time: Long)
+    fun seekPlayer(time: Long)
 
     /**
      * 选择音轨，原唱、伴唱
      */
-    fun selectTrackMode(mode: KTVPlayerTrackMode)
+    fun selectPlayerTrackMode(mode: KTVPlayerTrackMode)
 
     /**
      * 设置歌词组件，在任意时机设置都可以生效

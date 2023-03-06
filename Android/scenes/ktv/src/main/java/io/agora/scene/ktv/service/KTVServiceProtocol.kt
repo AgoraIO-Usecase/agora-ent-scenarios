@@ -164,18 +164,15 @@ interface KTVServiceProtocol {
      * 加入合唱
      */
     fun joinChorus(
-        inputModel: JoinChorusInputModel, completion: (error: Exception?) -> Unit
+        completion: (error: Exception?) -> Unit
     )
 
     /**
      * 合唱者离开合唱
      */
-    fun leaveChorus()
-
-    /**
-     * 当前歌曲合唱改为独唱
-     */
-    fun becomeSolo()
+    fun leaveChorus(
+        completion: (error: Exception?) -> Unit
+    )
 
     /**
      * song did changed

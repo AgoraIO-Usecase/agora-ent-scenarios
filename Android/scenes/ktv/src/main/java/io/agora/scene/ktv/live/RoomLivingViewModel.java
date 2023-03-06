@@ -40,6 +40,7 @@ import io.agora.rtc2.RtcEngineEx;
 import io.agora.rtc2.video.ContentInspectConfig;
 import io.agora.rtc2.video.VideoCanvas;
 import io.agora.scene.base.BuildConfig;
+import io.agora.scene.base.TokenGenerator;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.NetWorkEvent;
 import io.agora.scene.base.manager.UserManager;
@@ -61,9 +62,9 @@ import io.agora.scene.ktv.widget.LrcControlView;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
 
-public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEventHandler {
+public class RoomLivingViewModel extends ViewModel {
 
-    private final String TAG = "KTV Scene LOG";
+    private final String TAG = "KTV_Scene_LOG";
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
     private final KTVApi ktvApiProtocol = new KTVApiImpl();
 
@@ -91,7 +92,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      */
     final MutableLiveData<List<RoomSelSongModel>> songsOrderedLiveData = new MutableLiveData<>();
     final MutableLiveData<RoomSelSongModel> songPlayingLiveData = new MutableLiveData<>();
-    final MutableLiveData<RoomSelSongModel> chorusPlayingLiveData = new MutableLiveData<>();
 
     /**
      * Player/RTC信息
@@ -100,8 +100,8 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
     enum PlayerMusicStatus {
         ON_PREPARE,
-        ON_WAIT_CHORUS,
-        ON_CHORUS_JOINED,
+        ON_JOIN_CHORUS,
+        ON_LEAVE_CHORUS,
         ON_PLAYING,
         ON_PAUSE,
         ON_LRC_RESET,
@@ -430,12 +430,13 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                         return null;
                     }
 
-                    // 合唱相关逻辑
-                    if (UserManager.getInstance().getUser().id.toString().equals(songPlayingLiveData.getValue().getChorusNo())) {
-                        //我是合唱
-                        getSongChosenList();
-                        ktvServiceProtocol.leaveChorus();
-                    }
+                    // TODO
+//                    // 合唱相关逻辑
+//                    if (UserManager.getInstance().getUser().id.toString().equals(songPlayingLiveData.getValue().getChorusNo())) {
+//                        //我是合唱
+//                        getSongChosenList();
+//                        ktvServiceProtocol.leaveChorus();
+//                    }
                 }
             }
             return null;
@@ -687,8 +688,13 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                                         String.valueOf(music.songCode),
                                         music.singer,
                                         music.poster,
-
-                                        "", "", "", false, 0, 0, 0, 0
+                                        "",
+                                        "",
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0
                                 );
                             }
                             songs.add(songItem);
@@ -756,8 +762,13 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                                         String.valueOf(music.songCode),
                                         music.singer,
                                         music.poster,
-
-                                        "", "", "", false, 0, 0, 0, 0
+                                        "",
+                                        "",
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0
                                 );
                             }
 
@@ -793,7 +804,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         KTVLogger.d(TAG, "RoomLivingViewModel.chooseSong() called, name:" + songModel.getName() + " isChorus:" + isChorus);
         MutableLiveData<Boolean> liveData = new MutableLiveData<>();
         ktvServiceProtocol.chooseSong(
-                new ChooseSongInputModel(isChorus ? 1 : 0,
+                new ChooseSongInputModel(
                         songModel.getSongName(),
                         songModel.getSongNo(),
                         songModel.getSinger(),
@@ -859,6 +870,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     /**
      * 获取已点列表
      */
+    private int chorusNum = 0;
     public void getSongChosenList() {
         KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() called");
         ktvServiceProtocol.getChoosedSongsList((e, data) -> {
@@ -875,46 +887,33 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                         // 无已点歌曲， 直接将列表第一个设置为当前播放歌曲
                         KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() chosen song list is empty");
                         songPlayingLiveData.postValue(songPlaying);
-                    } else {
+                    } else if (!value.getSongNo().equals(songPlaying.getSongNo())) {
                         // 当前有已点歌曲, 且更新歌曲和之前歌曲非同一首
-                        if (!value.getSongNo().equals(songPlaying.getSongNo())) {
-                            KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() single or first chorus");
-                            songPlayingLiveData.postValue(songPlaying);
-                        } else {
-                            if ((value.isChorus() && !songPlaying.isChorus())) {
-                                // 取消合唱
-                                KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() become solo");
-                                songPlayingLiveData.postValue(songPlaying);
-                            } else if (value.isChorus() && value.getChorusNo() == null && songPlaying.getChorusNo() != null) {
-                                // 加入合唱
-                                KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() partner joined");
-                                songPlayingLiveData.postValue(songPlaying);
-                            } else if (value.isChorus() && value.getChorusNo() != null && songPlaying.getChorusNo() != null && songPlaying.getChorusNo().equals("0")) {
-                                // 伴唱退出合唱
-                                KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() partner exited");
-                                if (value.getChorusNo().equals(UserManager.getInstance().getUser().id.toString())) {
-                                    ktvApiProtocol.stopSong();
-                                    ktvApiProtocol.loadSong(Long.parseLong(songPlaying.getSongNo()), new KTVSongConfiguration(KTVSongType.KTVSongTypeChorus, KTVSingRole.KTVSingRoleAudience, Long.parseLong(songPlaying.getSongNo()), Integer.parseInt(songPlaying.getUserNo()), 0),
-                                            (song, lyricUrl, singRole, singState) -> {
-                                                if (singState == KTVLoadSongState.KTVLoadSongStateOK) {
-                                                    if (singRole == KTVSingRole.KTVSingRoleAudience) {
-                                                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                                                    }
-                                                    ktvApiProtocol.playSong(song);
-                                                }
-                                                return null;
-                                            }
-                                    );
-                                }
-                                chorusPlayingLiveData.setValue(songPlaying);
-                            }
+                        KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() single or first chorus");
+                        songPlayingLiveData.postValue(songPlaying);
+                    } else if ((chorusNum != songPlaying.getChorusNum()) && value.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
+                        KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() chorus num changed: new:" + songPlaying.getChorusNum() + " old:" + chorusNum);
+                        if (songPlaying.getChorusNum() > 0) {
+                            TokenGenerator.INSTANCE.generateToken(
+                                    roomInfoLiveData.getValue().getRoomNo() + "_ex",
+                                    UserManager.getInstance().getUser().id.toString(),
+                                    TokenGenerator.TokenGeneratorType.token006,
+                                    TokenGenerator.AgoraTokenType.rtc,
+                                    ret -> {
+                                        ktvApiProtocol.joinChorus(ret, new KTVSongConfiguration(KTVSingRole.KTVSingRoleMainSinger, Long.parseLong(songPlaying.getSongNo()), Integer.parseInt(songPlaying.getUserNo())));
+                                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_JOIN_CHORUS);
+                                        return null;
+                                    }, null
+                            );
+                        } else if (songPlaying.getChorusNum() == 0) {
+                            ktvApiProtocol.leaveChorus();
                         }
+                        chorusNum = songPlaying.getChorusNum();
                     }
                 } else {
                     KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() return is emptyList");
                     songPlayingLiveData.postValue(null);
                 }
-                _loadingDialogVisible.postValue(false);
 
             } else {
                 // failed
@@ -941,14 +940,29 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         if (musicModel == null) {
             return;
         }
-        if (!TextUtils.isEmpty(musicModel.getChorusNo())) {
-            return;
-        }
 
-        ktvServiceProtocol.joinChorus(new JoinChorusInputModel(musicModel.getSongNo()), e -> {
+        ktvServiceProtocol.joinChorus(e -> {
             if (e == null) {
                 // success
                 KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus() success");
+
+                KTVSingRole role =  KTVSingRole.KTVSingRoleCoSinger;
+                RoomSelSongModel music = songPlayingLiveData.getValue();
+                int mainSingerUid = music.getUserNo() == null ? 0 : Integer.parseInt(music.getUserNo());
+                int coSingerUid = UserManager.getInstance().getUser().id.intValue();
+                Long songCode = Long.parseLong(music.getSongNo());
+
+                TokenGenerator.INSTANCE.generateToken(
+                        roomInfoLiveData.getValue().getRoomNo() + "_ex",
+                        UserManager.getInstance().getUser().id.toString(),
+                        TokenGenerator.TokenGeneratorType.token006,
+                        TokenGenerator.AgoraTokenType.rtc,
+                        ret -> {
+                            ktvApiProtocol.joinChorus(ret, new KTVSongConfiguration(role, songCode, mainSingerUid));
+                            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_JOIN_CHORUS);
+                            return null;
+                        }, null
+                );
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.joinChorus() failed: " + e.getMessage());
@@ -963,7 +977,19 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      */
     public void leaveChorus() {
         KTVLogger.d(TAG, "RoomLivingViewModel.leaveChorus() called");
-        ktvServiceProtocol.becomeSolo();
+        ktvServiceProtocol.leaveChorus(e -> {
+            if (e == null) {
+                // success
+                KTVLogger.d(TAG, "RoomLivingViewModel.leaveChorus() called");
+                ktvApiProtocol.leaveChorus();
+                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LEAVE_CHORUS);
+            } else {
+                // failure
+                KTVLogger.e(TAG, "RoomLivingViewModel.leaveChorus() failed: " + e.getMessage());
+                ToastUtils.showToast(e.getMessage());
+            }
+            return null;
+        });
     }
 
     /**
@@ -972,22 +998,24 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     public void changeMusic() {
         KTVLogger.d(TAG, "RoomLivingViewModel.changeMusic() called");
         RoomSelSongModel musicModel = songPlayingLiveData.getValue();
-        if (musicModel == null) return;
+        if (musicModel == null) {
+            KTVLogger.e(TAG, "RoomLivingViewModel.changeMusic() failed, no song is playing now!");
+            return;
+        }
 
-        ktvApiProtocol.stopSong();
+        ktvApiProtocol.stopSing();
 
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_START);
-        _loadingDialogVisible.postValue(true);
         ktvServiceProtocol.removeSong(new RemoveSongInputModel(
                 musicModel.getSongNo()
         ), e -> {
             if (e == null) {
                 // success do nothing for dealing in song subscriber
                 KTVLogger.d(TAG, "RoomLivingViewModel.changeMusic() success");
+                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_END);
             } else {
                 // failed
                 KTVLogger.e(TAG, "RoomLivingViewModel.changeMusic() failed: " + e.getMessage());
-                _loadingDialogVisible.postValue(false);
                 ToastUtils.showToast(e.getMessage());
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_END);
             }
@@ -1201,14 +1229,91 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             streamId = mRtcEngine.createDataStream(cfg);
         }
 
-        ktvApiProtocol.initWithRtcEngine(mRtcEngine, roomInfoLiveData.getValue().getRoomNo(), iAgoraMusicContentCenter, mPlayer, streamId, this);
+        ktvApiProtocol.initialize(new KTVApiConfig(
+                mRtcEngine,
+                roomInfoLiveData.getValue().getRoomNo(),
+                streamId,
+                UserManager.getInstance().getUser().id.intValue(),
+                iAgoraMusicContentCenter,
+                mPlayer,
+                new KTVApiEventHandler() {
+                    @Override
+                    public void onPlayerStateChanged(long songCode, @NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, boolean isLocal) {
+                        switch (state) {
+                            case PLAYER_STATE_OPEN_COMPLETED:
+                                playerMusicOpenDurationLiveData.postValue(mPlayer.getDuration());
+                                break;
+                            case PLAYER_STATE_PLAYING:
+                                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                                break;
+                            case PLAYER_STATE_PAUSED:
+                                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
+                                break;
+                            case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
+                                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
+                                changeMusic();
+                                break;
+                            default:
+                        }
+                    }
+
+                    @Override
+                    public void onSingingScoreResult(float score) {
+                        playerMusicPlayCompleteLiveData.postValue((int)score);
+                    }
+
+                    @Override
+                    public void onMusicCollectionResult(@Nullable String requestId, int status, int page, int pageSize, int total, @Nullable Music[] list) {
+                        IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
+                        if(handler != null){
+                            handler.onMusicCollectionResult(requestId, status, page, pageSize, total, list);
+                            rtcMusicHandlerMap.remove(requestId);
+                        }
+                    }
+
+                    @Override
+                    public void onMusicChartsResult(@Nullable String requestId, int status, @Nullable MusicChartInfo[] list) {
+                        IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
+                        if(handler != null){
+                            handler.onMusicChartsResult(requestId, status, list);
+                            rtcMusicHandlerMap.remove(requestId);
+                        }
+                    }
+
+                    @Override
+                    public void onMusicLoaded(long songCode, @NonNull String lyricUrl, @NonNull KTVSingRole role, @NonNull KTVLoadSongState state) {
+                        if (state == KTVLoadSongState.KTVLoadSongStateOK) {
+                            // 歌曲load成功
+                            if (role == KTVSingRole.KTVSingRoleAudience) {
+                                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                            } else if (role == KTVSingRole.KTVSingRoleCoSinger) {
+                                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                            }
+
+                            // 重置settings
+                            mSetting.setVolMic(100);
+                            mSetting.setVolMusic(50);
+
+                            // 播放歌曲
+                            ktvApiProtocol.startSing(0);
+                        } else {
+                            KTVLogger.e(TAG, "ktvApiProtocol.loadSong failed：" + state);
+                            if (state == KTVLoadSongState.KTVLoadSongStatePreloadFail) {
+//                                needRePreload = true;
+//                                int mainSingerUid = music.getUserNo() == null ? 0 : Integer.parseInt(music.getUserNo());
+//                                rePreloadConfig = new KTVSongConfiguration(role, songCode, mainSingerUid);
+                            }
+                        }
+                    }
+                }
+        ));
     }
 
     private void setAudioEffectPreset(int effect) {
         if (mRtcEngine == null) {
             return;
         }
-        int result = mRtcEngine.setAudioEffectPreset(effect);
+        mRtcEngine.setAudioEffectPreset(effect);
     }
 
     // ======================= settings =======================
@@ -1275,10 +1380,10 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     protected KTVPlayerTrackMode mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
     public boolean musicToggleOriginal() {
         if (mAudioTrackMode == KTVPlayerTrackMode.KTVPlayerTrackOrigin) {
-            ktvApiProtocol.selectTrackMode(KTVPlayerTrackMode.KTVPlayerTrackAcc);
+            ktvApiProtocol.selectPlayerTrackMode(KTVPlayerTrackMode.KTVPlayerTrackAcc);
             mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
         } else {
-            ktvApiProtocol.selectTrackMode(KTVPlayerTrackMode.KTVPlayerTrackOrigin);
+            ktvApiProtocol.selectPlayerTrackMode(KTVPlayerTrackMode.KTVPlayerTrackOrigin);
             mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackOrigin;
         }
         return false;
@@ -1291,9 +1396,9 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     // ------------------ 暂停/播放 ------------------
     public void musicToggleStart() {
         if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
-            ktvApiProtocol.pausePlay();
+            ktvApiProtocol.pausePlayer();
         } else if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PAUSE) {
-            ktvApiProtocol.resumePlay();
+            ktvApiProtocol.resumePlayer();
         }
     }
 
@@ -1324,63 +1429,17 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     // ------------------ 歌曲开始播放 ------------------
     public void musicStartPlay(@NonNull RoomSelSongModel music) {
         KTVLogger.d(TAG, "RoomLivingViewModel.musicStartPlay() called");
-        chorusPlayingLiveData.setValue(null);
-        ktvApiProtocol.stopSong();
+        chorusNum = 0;
         mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
 
         boolean isOwnSong = Objects.equals(music.getUserNo(), UserManager.getInstance().getUser().id.toString());
-        boolean isChorus = music.isChorus();
-        boolean isChorusMem = false;
-        if (isChorus && music.getChorusNo() != null) {
-            isChorusMem = music.getChorusNo().equals(UserManager.getInstance().getUser().id.toString());
-        }
         Long songCode = Long.parseLong(music.getSongNo());
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
 
-        KTVSongType type = isChorus ? KTVSongType.KTVSongTypeChorus : KTVSongType.KTVSongTypeSolo;
-        KTVSingRole role =  isOwnSong ? KTVSingRole.KTVSingRoleMainSinger : (isChorusMem ? KTVSingRole.KTVSingRoleCoSinger : KTVSingRole.KTVSingRoleAudience);
+        KTVSingRole role = isOwnSong ? KTVSingRole.KTVSingRoleMainSinger : KTVSingRole.KTVSingRoleAudience;
         int mainSingerUid = music.getUserNo() == null ? 0 : Integer.parseInt(music.getUserNo());
-        int coSingerUid = music.getChorusNo() == null ? 0 : Integer.parseInt(music.getChorusNo());
 
-        if (isChorus) {
-            if (music.getChorusNo() == null) {
-                // 没有合唱者加入时， 播放等待动画
-                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_WAIT_CHORUS);
-                return;
-            } else if (isOwnSong) {
-                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHORUS_JOINED);
-            }
-        }
-        ktvApiProtocol.loadSong(songCode, new KTVSongConfiguration(type, role, songCode, mainSingerUid, coSingerUid),
-                (song, lyricUrl, singRole, singState) -> {
-                    if (singState == KTVLoadSongState.KTVLoadSongStateOK) {
-                        // 歌曲load成功
-                        if (singRole == KTVSingRole.KTVSingRoleAudience) {
-                            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                        } else if (singRole == KTVSingRole.KTVSingRoleCoSinger) {
-                            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                        }
-
-                        // 重置settings
-                        mSetting.setVolMic(100);
-                        if (type == KTVSongType.KTVSongTypeSolo) {
-                            mSetting.setVolMusic(100);
-                        } else {
-                            mSetting.setVolMusic(50);
-                        }
-
-                        // 播放歌曲
-                        ktvApiProtocol.playSong(song);
-                    } else {
-                        KTVLogger.e(TAG, "ktvApiProtocol.loadSong failed：" + singState);
-                        if (singState == KTVLoadSongState.KTVLoadSongStatePreloadFail) {
-                            needRePreload = true;
-                            rePreloadConfig = new KTVSongConfiguration(type, role, songCode, mainSingerUid, coSingerUid);
-                        }
-                    }
-                    return null;
-                }
-        );
+        ktvApiProtocol.loadSong(new KTVSongConfiguration(role, songCode, mainSingerUid));
         ktvServiceProtocol.makeSongDidPlay(music, e -> {
             if (e != null) {
                 // failure
@@ -1397,45 +1456,15 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             @Override
             public void run() {
                 KTVLogger.e(TAG, "ktvApiProtocol.rePreloadSong called");
-                ktvApiProtocol.loadSong(config.getSongCode(), new KTVSongConfiguration(
-                                config.getType(), config.getRole(), config.getSongCode(), config.getMainSingerUid(), config.getCoSingerUid()),
-                        (song, lyricUrl, singRole, singState) -> {
-                            if (singState == KTVLoadSongState.KTVLoadSongStateOK) {
-                                // 歌曲load成功
-                                needRePreload = false;
-                                if (singRole == KTVSingRole.KTVSingRoleAudience) {
-                                    playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                                } else if (singRole == KTVSingRole.KTVSingRoleCoSinger) {
-                                    playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                                }
-
-                                // 重置settings
-                                mSetting.setVolMic(100);
-                                if (config.getType() == KTVSongType.KTVSongTypeSolo) {
-                                    mSetting.setVolMusic(100);
-                                } else {
-                                    mSetting.setVolMusic(50);
-                                }
-
-                                // 播放歌曲
-                                ktvApiProtocol.playSong(song);
-                            } else {
-                                KTVLogger.e(TAG, "ktvApiProtocol.loadSong failed：" + singState);
-                                if (singState == KTVLoadSongState.KTVLoadSongStatePreloadFail) {
-                                    needRePreload = true;
-                                    rePreloadConfig = config;
-                                }
-                            }
-                            return null;
-                        }
-                );
+                ktvApiProtocol.loadSong(new KTVSongConfiguration(
+                                config.getRole(), config.getSongCode(), config.getMainSingerUid()));
             }
         };
     }
 
     // ------------------ 歌曲seek ------------------
     public void musicSeek(long time) {
-        ktvApiProtocol.seek(time);
+        ktvApiProtocol.seekPlayer(time);
     }
 
     public Long getSongDuration() {
@@ -1447,8 +1476,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     public void musicStop() {
         KTVLogger.d(TAG, "RoomLivingViewModel.musicStop() called");
         // 列表中无歌曲， 还原状态
-        chorusPlayingLiveData.setValue(null);
-        ktvApiProtocol.stopSong();
+        ktvApiProtocol.stopSing();
         mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
         needRePreload = false;
         if (mRtcEngine == null) {
@@ -1489,51 +1517,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     public void onStop() {
         if (mPlayer != null && isBackPlay) {
             mPlayer.mute(true);
-        }
-    }
-
-    // ------------------ KTVApiEvent ------------------
-
-    @Override
-    public void onPlayerStateChanged(@NonNull KTVApi controller, long songCode, @NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, boolean isLocal) {
-        switch (state) {
-            case PLAYER_STATE_OPEN_COMPLETED:
-                playerMusicOpenDurationLiveData.postValue(mPlayer.getDuration());
-                break;
-            case PLAYER_STATE_PLAYING:
-                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                break;
-            case PLAYER_STATE_PAUSED:
-                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
-                break;
-            case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
-                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
-                changeMusic();
-                break;
-            default:
-        }
-    }
-
-    @Override
-    public void onSingingScoreResult(float score) {
-        playerMusicPlayCompleteLiveData.postValue((int)score);
-    }
-
-    @Override
-    public void onMusicCollectionResult(@Nullable String requestId, int status, int page, int pageSize, int total, @Nullable Music[] list) {
-        IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
-        if(handler != null){
-            handler.onMusicCollectionResult(requestId, status, page, pageSize, total, list);
-            rtcMusicHandlerMap.remove(requestId);
-        }
-    }
-
-    @Override
-    public void onMusicChartsResult(@Nullable String requestId, int status, @Nullable MusicChartInfo[] list) {
-        IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
-        if(handler != null){
-            handler.onMusicChartsResult(requestId, status, list);
-            rtcMusicHandlerMap.remove(requestId);
         }
     }
 }
