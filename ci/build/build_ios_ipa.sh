@@ -63,10 +63,10 @@ python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCE
 xcodebuild clean -workspace "${APP_PATH}" -configuration "${CONFIGURATION}" -scheme "${TARGET_NAME}" -quiet
 
 # 时间戳
-CURRENT_TIME=$(date "+%Y-%m-%d %H-%M-%S")
+CURRENT_TIME=$(date "+%Y-%m-%d_%H-%M-%S")
 
 # 归档路径
-ARCHIVE_PATH="${PROJECT_PATH}/${TARGET_NAME} ${CURRENT_TIME}/${TARGET_NAME}_${BUILD_NUMBER}.xcarchive"
+ARCHIVE_PATH="${PROJECT_PATH}/${TARGET_NAME}_${CURRENT_TIME}/${TARGET_NAME}_${BUILD_NUMBER}.xcarchive"
 # 编译环境
 
 # 导出路径
