@@ -8,7 +8,6 @@
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
 #import "KTVMacro.h"
-@import QMUIKit;
 @import Masonry;
 
 @interface VLPopScoreView ()

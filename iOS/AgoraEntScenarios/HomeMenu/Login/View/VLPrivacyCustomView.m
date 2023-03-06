@@ -7,17 +7,14 @@
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
 #import "MenuUtils.h"
-@import YYText;
+#import "AttributedTextView.h"
 @import Masonry;
-@import QMUIKit;
+#import "KTVMacro.h"
 
-@interface VLPrivacyCustomView()
-
-@property (nonatomic, strong) UIScrollView *scrollView;
-@property (nonatomic, strong) YYLabel *label;
+@interface VLPrivacyCustomView()<UITextViewDelegate>
 @property (nonatomic, strong) UIButton *disButton;
 @property (nonatomic, strong) UIButton *agreeButton;
-
+@property (nonatomic, strong) AttributedTextView *textView;
 @end
 
 @implementation VLPrivacyCustomView
@@ -32,15 +29,13 @@
 }
 
 - (void)initSubViews {
-    [self addSubview:self.scrollView];
-    [self.scrollView addSubview:self.label];
-    
+    [self addSubview:self.textView];
     [self addSubview:self.disButton];
     [self addSubview:self.agreeButton];
 }
 
 - (void)addSubViewConstraints {
-    [self.scrollView mas_makeConstraints:^(MASConstraintMaker *make) {
+    [self.textView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.left.right.mas_equalTo(self);
         if(_pass == 0) {
             make.height.mas_greaterThanOrEqualTo(200);
@@ -50,21 +45,17 @@
         }
     }];
     
-    [self.label mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.mas_equalTo(self.scrollView);
-    }];
-    
     [self.disButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(self.scrollView.mas_bottom).offset(20);
+        make.top.mas_equalTo(self.textView.mas_bottom).offset(20);
         make.left.mas_equalTo(0);
         make.width.mas_equalTo(115);
         make.height.mas_equalTo(40);
     }];
-    
+
     [self.agreeButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.width.mas_equalTo(115);
         make.height.mas_equalTo(40);
-        make.top.mas_equalTo(self.scrollView.mas_bottom).offset(20);
+        make.top.mas_equalTo(self.textView.mas_bottom).offset(20);
         make.right.mas_equalTo(0);
     }];
 }
@@ -82,74 +73,24 @@
 }
 
 #pragma mark - Lazy
-
-- (UIScrollView *)scrollView {
-    if (!_scrollView) {
-        _scrollView = [[UIScrollView alloc] init];
+-(AttributedTextView *)textView {
+    if(!_textView){
+        
+        NSString *textString = @"声动互娱软件是一款用于向声网客户展示产品使用效果的测试产品，仅用于测试产品的功能、性能和可用性，而非提供给大众使用的正式产品。\n1.我们将依据《用户协议》及《隐私政策》来帮助您了解我们在收集、使用、存储您个人信息的情况以及您享有的相关权利。\n2.在您使用本测试软件时，我们将收集您的设备信息、日志信息等，同时根据不同使用场景，你可以授予我们获取您设备的麦克风权限、摄像头权限等信息。\n\n您可通过阅读完整的《用户协议》及《隐私政策》来了解详细信息。";
+        NSRange range1 = NSMakeRange(72, 4);
+        NSRange range2 = NSMakeRange(79, 4);
+        NSRange range3 = NSMakeRange(203, 4);
+        NSRange range4 = NSMakeRange(210, 4);
+        NSArray *array = [[NSArray alloc]initWithObjects:@"用户协议",@"隐私政策",@"用户协议",@"隐私政策", nil];
+        NSMutableArray *ranges = [[NSMutableArray alloc]init];
+        [ranges addObject:[NSValue valueWithRange:range1]];
+        [ranges addObject:[NSValue valueWithRange:range2]];
+        [ranges addObject:[NSValue valueWithRange:range3]];
+        [ranges addObject:[NSValue valueWithRange:range4]];
+        _textView = [[AttributedTextView alloc]initWithFrame:CGRectZero text: textString AttributedStringS:array ranges:ranges textColor:UIColorMakeWithHex(@"#6C7192") attributeTextColor:UIColorMakeWithHex(@"#009FFF")];
+        _textView .delegate = self;
     }
-    return _scrollView;
-}
-
-- (YYLabel *)label {
-    if (!_label) {
-        _label = [[YYLabel alloc] init];
-        _label.numberOfLines = 0;
-        _label.textColor = UIColorMakeWithHex(@"#6C7192");
-        _label.font = VLUIFontMake(12);
-        _label.preferredMaxLayoutWidth = 250;
-        NSString *_str4Total = nil;
-        if(_pass == 0) {
-            _str4Total = AGLocalizedString(@"声动互娱软件是一款用于向声网客户展示产品使用效果的测试产品，仅用于测试产品的功能、性能和可用性，而非提供给大众使用的正式产品。\n1.我们将依据《用户协议》及《隐私政策》来帮助您了解我们在收集、使用、存储您个人信息的情况以及您享有的相关权利。\n2.在您使用本测试软件时，我们将收集您的设备信息、日志信息等，同时根据不同使用场景，你可以授予我们获取您设备的麦克风权限、摄像头权限等信息。\n\n您可通过阅读完整的《用户协议》及《隐私政策》来了解详细信息。");
-        }
-        else {
-            _str4Total = AGLocalizedString(@"同意 用户协议 及 隐私政策 后，声动互娱才能为您提供协作服务。");
-        }
-        
-        NSString *_str4Highlight1 = AGLocalizedString(@"用户协议");
-        NSString *_str4Highlight2 = AGLocalizedString(@"隐私政策");
-        NSMutableAttributedString *_mattrStr = [NSMutableAttributedString new];
-        
-        [_mattrStr appendAttributedString:[[NSAttributedString alloc] initWithString:_str4Total attributes:@{NSFontAttributeName : VLUIFontMake(12), NSForegroundColorAttributeName : UIColorMakeWithHex(@"#6C7192")}]];
-        _mattrStr.yy_lineSpacing = 6;
-        
-        NSArray *array = [_str4Total componentsSeparatedByString:_str4Highlight1];
-        int d=0;
-        for(int i=0; i<array.count-1; i++) {
-            NSString *subString = array[i];
-            NSNumber *number = [NSNumber numberWithInt:d += subString.length];
-            d += _str4Highlight1.length;
-            
-            NSRange range1 = NSMakeRange([number intValue], _str4Highlight1.length);
-            [_mattrStr addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range1];
-            kWeakSelf(self)
-            [_mattrStr yy_setTextHighlightRange:range1 color:UIColorMakeWithHex(@"#009FFF") backgroundColor:[UIColor clearColor] tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
-                if ([weakself.delegate respondsToSelector:@selector(privacyCustomViewDidClick:)]) {
-                    [weakself.delegate privacyCustomViewDidClick:VLPrivacyClickTypeUserAgreement];
-                }
-            }];
-        }
-        
-        NSArray *array2 = [_str4Total componentsSeparatedByString:_str4Highlight2];
-        d=0;
-        for(int i=0; i<array.count-1; i++) {
-            NSString *subString = array2[i];
-            NSNumber *number = [NSNumber numberWithInt:d += subString.length];
-            d += _str4Highlight2.length;
-            
-            NSRange range2 = NSMakeRange([number intValue], _str4Highlight2.length);
-            [_mattrStr addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range2];
-            kWeakSelf(self)
-            [_mattrStr yy_setTextHighlightRange:range2 color:UIColorMakeWithHex(@"#009FFF") backgroundColor:[UIColor clearColor] tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
-                if ([weakself.delegate respondsToSelector:@selector(privacyCustomViewDidClick:)]) {
-                    [weakself.delegate privacyCustomViewDidClick:VLPrivacyClickTypePrivacy];
-                }
-            }];
-        }
-        
-        _label.lineBreakMode = NSLineBreakByWordWrapping;
-        _label.attributedText = _mattrStr;
-    }
-    return _label;
+    return _textView;
 }
 
 - (UIButton *)disButton {
@@ -206,4 +147,19 @@
     return _agreeButton;
 }
 
+-(BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange{
+    //NSString *scheme = URL ;
+    NSURL *url = [NSURL URLWithString:@"0"];
+    NSURL *url2 = [NSURL URLWithString:@"2"];
+    if([url isEqual:URL] || [url2 isEqual:URL]){
+        if ([self.delegate respondsToSelector:@selector(privacyCustomViewDidClick:)]) {
+            [self.delegate privacyCustomViewDidClick:VLPrivacyClickTypeUserAgreement];
+        }
+    } else {
+        if ([self.delegate respondsToSelector:@selector(privacyCustomViewDidClick:)]) {
+            [self.delegate privacyCustomViewDidClick:VLPrivacyClickTypePrivacy];
+        }
+    }
+    return YES;
+}
 @end

@@ -6,7 +6,7 @@
 //
 
 import UIKit
-// import AgoraSyncManager
+import AgoraSyncManager
 
 class SyncUtil: NSObject {
     private static var manager: AgoraSyncManager?
@@ -40,13 +40,14 @@ class SyncUtil: NSObject {
 
     class func joinScene(id: String,
                          userId: String,
+                         isOwner: Bool,
                          property: [String: Any]?,
                          success: SuccessBlockObj? = nil,
                          fail: FailBlock? = nil)
     {
         guard let manager = manager else { return }
         let jsonString = JSONObject.toJsonString(dict: property) ?? ""
-        let scene = Scene(id: id, userId: userId, property: property)
+        let scene = Scene(id: id, userId: userId, isOwner: isOwner, property: property)
         manager.createScene(scene: scene, success: {
             manager.joinScene(sceneId: id) { sceneRef in
                 sceneRefs[id] = sceneRef
