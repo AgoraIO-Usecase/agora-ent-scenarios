@@ -79,14 +79,15 @@ extension VoiceRoomAudiencesViewController {
                         break
                     }
                 }
-                if index > 0,let mic = ChatRoomServiceImp.getSharedInstance().mics[safe: index]  {
+                if index > 0,var mic = ChatRoomServiceImp.getSharedInstance().mics[safe: index]  {
+                    mic.status = -1
                     mic.member = nil
                     VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(index)":mic.kj.JSONString()], completion: { error in
                         if error == nil {
-                            self.removeUserFromUserList(user: user)
                             if self.kickClosure != nil  {
                                 self.kickClosure!(user,mic)
                             }
+                            self.removeUserFromUserList(user: user)
                         } else {
                             self.view.makeToast("kick failed!")
                         }

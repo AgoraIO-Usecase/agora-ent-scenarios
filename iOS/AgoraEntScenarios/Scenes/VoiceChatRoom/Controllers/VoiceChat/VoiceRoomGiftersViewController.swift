@@ -11,11 +11,14 @@ import ZSwiftBaseLib
 
 public class VoiceRoomGiftersViewController: UITableViewController {
     private var room_id = ""
-
+    
+    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "Contribution empty", image: nil)
+    
    // private var dataSource = VoiceRoomContributions()
     private var dataSource: [VRUser]?
     override public func viewDidLoad() {
         super.viewDidLoad()
+        view.insertSubview(empty, belowSubview: tableView)
         tableView.tableFooterView(UIView()).registerCell(VoiceRoomGifterCell.self, forCellReuseIdentifier: "VoiceRoomGifterCell").rowHeight(73).backgroundColor(.white).separatorInset(edge: UIEdgeInsets(top: 72, left: 15, bottom: 0, right: 15)).separatorColor(UIColor(0xF2F2F2)).showsVerticalScrollIndicator(false)
         tableView.refreshControl = UIRefreshControl()
         tableView.refreshControl?.addTarget(self, action: #selector(refresh), for: .valueChanged)
@@ -72,6 +75,7 @@ extension VoiceRoomGiftersViewController {
                     self.dataSource = users
                     self.tableView.reloadData()
                 }
+                self.empty.isHidden = ((self.dataSource?.count ?? 0) > 0)
             }
             self.tableView.refreshControl?.endRefreshing()
         }
