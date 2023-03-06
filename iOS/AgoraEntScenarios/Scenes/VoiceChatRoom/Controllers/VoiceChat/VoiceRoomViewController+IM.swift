@@ -50,7 +50,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         let string = NSAttributedString {
             AttributedText("\(gift.userName ?? "" ) ").font(.systemFont(ofSize: 12, weight: .semibold)).foregroundColor(Color(white: 1, alpha: 0.74))
             AttributedText("gifts".localized()).font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(.white)
-            AttributedText(" \(VoiceRoomUserInfo.shared.user?.name ?? "") ").font(.systemFont(ofSize: 12, weight: .semibold)).foregroundColor(Color(white: 1, alpha: 0.74))
+            AttributedText(" \(VoiceRoomUserInfo.shared.currentRoomOwner?.name ?? "") ").font(.systemFont(ofSize: 12, weight: .semibold)).foregroundColor(Color(white: 1, alpha: 0.74))
             AttributedText("a rocket".localized()).font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(.white)
         }
         
