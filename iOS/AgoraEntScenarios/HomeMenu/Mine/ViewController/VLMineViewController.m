@@ -106,7 +106,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 
 - (void)about {
     AboutAgoraEntertainmentViewController *VC = [[AboutAgoraEntertainmentViewController alloc] init];
-    [self.navigationController pushViewController:vc animated:YES];
+    [self.navigationController pushViewController:VC animated:YES];
 }
 
 - (void)userLogout {
