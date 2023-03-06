@@ -85,7 +85,7 @@ xcodebuild -exportArchive -archivePath "${ARCHIVE_PATH}" -exportPath "${EXPORT_P
 
 # 给ipa包签名
 echo "============Sign IPA Begin============"
-sh ${WORKSPACE}/sign "${EXPORT_PATH}"
+sh ${WORKSPACE}/sign "${EXPORT_PATH}/${TARGET_NAME}.ipa"
 
 mv *.ipa ${EXPORT_PATH}
 
@@ -98,8 +98,8 @@ python3 $WORKSPACE/artifactory_utils.py --action=upload_file --file="${PROJECT_P
 python3 $WORKSPACE/artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/dsym_${BUILD_NUMBER}.zip" --project
 
 # 删除IPA文件夹
-rm -rf "${EXPORT_PATH}"
-cd ${PROJECT_PATH} && rm -rf "*.zip"
+# rm -rf "${EXPORT_PATH}"
+# cd ${PROJECT_PATH} && rm -rf "*.zip"
 
 #复原Keycenter文件
 python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 1
