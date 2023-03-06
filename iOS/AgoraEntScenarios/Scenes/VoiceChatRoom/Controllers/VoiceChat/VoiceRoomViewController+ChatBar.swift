@@ -85,7 +85,17 @@ extension VoiceRoomViewController {
             }
             if let use_robot = self?.roomInfo?.room?.use_robot {
                 if use_robot == false {
-                    self?.view.makeToast("Active First".localized())
+                    let applyAlert = VoiceRoomApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: (205 / 375.0) * ScreenWidth), content:"Add Bot", cancel: "Cancel", confirm: "Confirm", position: .bottom).backgroundColor(.white).cornerRadius(20, [.topLeft, .topRight], .clear, 0)
+                    let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: (205 / 375.0) * ScreenWidth)), custom: applyAlert)
+                    applyAlert.actionEvents = { [weak self] in
+                        if $0 == 31 {
+                            self?.activeAlien(true)
+                            self?.roomInfo?.room?.use_robot = true
+                            self?.rtckit.playMusic(with: .alien)
+                        }
+                        vc.dismiss(animated: true)
+                    }
+                    self?.presentViewController(vc,animated: true)
                     return
                 }
             }
