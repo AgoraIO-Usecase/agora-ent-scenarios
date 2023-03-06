@@ -53,7 +53,7 @@ public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListe
 
     @Override
     public void onCountTime(int time) {
-        mViewModel.musicCountDown(time);
+        //mViewModel.musicCountDown(time);
     }
 
     @Override

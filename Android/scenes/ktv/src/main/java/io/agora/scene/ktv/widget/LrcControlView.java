@@ -231,6 +231,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     }
 
     public void onSelfJoinedChorus() {
+        mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
         mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
         mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
     }
