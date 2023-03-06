@@ -8,9 +8,7 @@
 #import "VLMacroDefine.h"
 #import "AgoraEntScenarios-Swift.h"
 #import "KTVMacro.h"
-@import QMUIKit;
 @import Masonry;
-@import YYCategories;
 
 @interface VLPopMoreSelView ()
 

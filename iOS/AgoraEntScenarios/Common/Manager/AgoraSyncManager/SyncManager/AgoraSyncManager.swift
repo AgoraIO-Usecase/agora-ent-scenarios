@@ -84,7 +84,7 @@ public class AgoraSyncManager: NSObject {
     /// - Parameters:
     ///   - documentRef: `Document`类型实体
     ///   - key: 键值
-    func get(documentRef: DocumentReference,
+    public func get(documentRef: DocumentReference,
              key: String,
              success: SuccessBlockObjOptional?,
              fail: FailBlock?)
@@ -98,7 +98,7 @@ public class AgoraSyncManager: NSObject {
     /// 获取所有数据（Collection）
     /// - Parameters:
     ///   - collectionRef: `Collection`类型实体
-    func get(collectionRef: CollectionReference,
+    public func get(collectionRef: CollectionReference,
              success: SuccessBlock?,
              fail: FailBlock?)
     {
@@ -111,7 +111,7 @@ public class AgoraSyncManager: NSObject {
     /// - Parameters:
     ///   - reference: `Collection`类型实体
     ///   - data: 数据
-    func add(reference: CollectionReference,
+    public func add(reference: CollectionReference,
              data: [String: Any?],
              success: SuccessBlockObj?,
              fail: FailBlock?)
@@ -122,7 +122,7 @@ public class AgoraSyncManager: NSObject {
                   fail: fail)
     }
 
-    func update(reference: CollectionReference,
+    public func update(reference: CollectionReference,
                 id: String,
                 data: [String: Any?],
                 success: SuccessBlockVoid?,
@@ -135,7 +135,7 @@ public class AgoraSyncManager: NSObject {
                      fail: fail)
     }
 
-    func delete(reference: CollectionReference,
+    public func delete(reference: CollectionReference,
                 id: String,
                 success: SuccessBlockVoid?,
                 fail: FailBlock?)
@@ -151,7 +151,7 @@ public class AgoraSyncManager: NSObject {
     ///   - reference: `Document`类型实体
     ///   - key: 键值
     ///   - data: 数据
-    func update(reference: DocumentReference,
+    public func update(reference: DocumentReference,
                 key: String,
                 data: [String: Any?],
                 success: SuccessBlock?,
@@ -167,7 +167,7 @@ public class AgoraSyncManager: NSObject {
     /// 删除一个document
     /// - Parameters:
     ///   - documentRef: 要删除的`Document`
-    func delete(documentRef: DocumentReference,
+    public func delete(documentRef: DocumentReference,
                 success: SuccessBlock?,
                 fail: FailBlock?)
     {
@@ -179,7 +179,7 @@ public class AgoraSyncManager: NSObject {
     /// 删除一个Collection
     /// - Parameters:
     ///   - collectionRef: 要删除的`Collection`
-    func delete(collectionRef: CollectionReference,
+    public func delete(collectionRef: CollectionReference,
                 success: SuccessBlock?,
                 fail: FailBlock?)
     {
@@ -192,7 +192,7 @@ public class AgoraSyncManager: NSObject {
     /// - Parameters:
     ///   - reference: `Document`类型
     ///   - key: 键值
-    func subscribe(reference: DocumentReference,
+    public func subscribe(reference: DocumentReference,
                    key: String?,
                    onCreated: OnSubscribeBlock?,
                    onUpdated: OnSubscribeBlock?,
@@ -214,13 +214,13 @@ public class AgoraSyncManager: NSObject {
     /// - Parameters:
     ///   - reference: `Document`类型
     ///   - key: 键值
-    func unsubscribe(reference: DocumentReference,
+    public func unsubscribe(reference: DocumentReference,
                      key: String)
     {
         proxy.unsubscribe(reference: reference, key: key)
     }
 
-    func subscribeScene(reference: SceneReference,
+    public func subscribeScene(reference: SceneReference,
                         onUpdated: OnSubscribeBlock?,
                         onDeleted: OnSubscribeBlock? = nil,
                         fail: FailBlock? = nil)
@@ -231,11 +231,11 @@ public class AgoraSyncManager: NSObject {
                              fail: fail)
     }
 
-    func unsubscribeScene(reference: SceneReference, fail: FailBlock? = nil) {
+    public func unsubscribeScene(reference: SceneReference, fail: FailBlock? = nil) {
         proxy.unsubscribeScene(reference: reference, fail: fail)
     }
     
-    func subscribeConnectState(state: @escaping ConnectBlockState) {
+    public func subscribeConnectState(state: @escaping ConnectBlockState) {
         proxy.subscribeConnectState(state: state)
     }
 }

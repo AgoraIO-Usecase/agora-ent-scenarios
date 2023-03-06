@@ -6,7 +6,7 @@
 #import "VLKTVSwitcherView.h"
 #import "VLFontUtils.h"
 @import Masonry;
-@import QMUIKit;
+#import "KTVMacro.h"
 
 @interface VLKTVSwitcherView()
 
