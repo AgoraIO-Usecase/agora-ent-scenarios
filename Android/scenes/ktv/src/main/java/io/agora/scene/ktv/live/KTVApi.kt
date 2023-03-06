@@ -1,8 +1,8 @@
 package io.agora.scene.ktv.live
 
 import io.agora.mediaplayer.Constants
+import io.agora.mediaplayer.IMediaPlayer
 import io.agora.musiccontentcenter.IAgoraMusicContentCenter
-import io.agora.musiccontentcenter.IAgoraMusicPlayer
 import io.agora.musiccontentcenter.Music
 import io.agora.musiccontentcenter.MusicChartInfo
 import io.agora.rtc2.RtcEngine
@@ -30,7 +30,7 @@ enum class REASON_TYPE(val value: Int) {
 
 abstract class KTVApiEventHandler {
     open fun onPlayerStateChanged(
-        songCode: Long, state: Constants.MediaPlayerState, isLocal: Boolean
+        state: Constants.MediaPlayerState, error: Constants.MediaPlayerError, isLocal: Boolean
     ) {
     }
 
@@ -49,19 +49,15 @@ abstract class KTVApiEventHandler {
     ) {
     }
 
-    /**
-     * 用来同步歌词进度的回调
-     * mainSinger 和 coSinger:
-     *  通过本地播放的 MPK position 获取到进度
-     *
-     *
-     * 观众：
-     * 1：
-     *
-     */
     open fun onSyncMusicPosition(position: Float) {}
 
-    open fun onMusicLoaded(songCode: Long, lyricUrl: String, role: KTVSingRole, state: KTVLoadSongState) {}
+    open fun onMusicLoaded(
+        songCode: Long,
+        lyricUrl: String,
+        role: KTVSingRole,
+        state: KTVLoadSongState
+    ) {
+    }
 
     open fun onJoinChorusStates(status: JOIN_STATES, reason: REASON_TYPE) {}
 
@@ -76,13 +72,15 @@ abstract class KTVApiEventHandler {
  */
 
 data class KTVApiConfig(
+    val appId: String,
+    val rtmToken: String,
     val engine: RtcEngine,
     val channelName: String,
-    val streamId: Int,
+    val dataStreamId: Int,
     val localUid: Int,
-    val musicCenter: IAgoraMusicContentCenter,
-    val player: IAgoraMusicPlayer,
     val ktvApiEventHandler: KTVApiEventHandler,
+    val defaultMediaPlayerVolume: Int = 50,
+    val defaultChorusRemoteUserVolume: Int = 15
 );
 
 
@@ -101,9 +99,39 @@ interface KTVApi {
     fun initialize(config: KTVApiConfig)
 
     /**
+     * 订阅KTVApi事件
+     */
+    fun addEventHandler(ktvApiEventHandler: KTVApiEventHandler)
+
+    /**
+     * 取消订阅KTVApi事件
+     */
+    fun removeEventHandler(ktvApiEventHandler: KTVApiEventHandler)
+
+    /**
      * 清空内部变量/缓存，取消在initWithRtcEngine时的监听，以及取消网络请求等
      */
     fun release()
+
+    /**
+     * 获取歌曲类型
+     */
+    fun getMusicCharts(): String
+
+    /**
+     * 根据歌曲类型拉取歌单
+     */
+    fun getMusicCollectionByMusicChartId(
+        musicChartId: Int,
+        page: Int,
+        pageSize: Int,
+        jsonOption: String
+    ): String
+
+    /**
+     * 搜索歌曲
+     */
+    fun searchMusic(keyword: String, page: Int, pageSize: Int, jsonOption: String): String
 
     /**
      * 加载歌曲
@@ -120,7 +148,7 @@ interface KTVApi {
     /**
      * 加入合唱
      */
-    fun joinChorus(token: String, config: KTVSongConfiguration)
+    fun joinChorus(token: String, role: KTVSingRole)
 
     /**
      * 离开合唱
@@ -163,7 +191,17 @@ interface KTVApi {
     fun adjustRemoteVolume(volume: Int)
 
     /**
-     * 设置听到播放的所有音频的音量
+     * 设置当前mic开关状态
      */
     fun setIsMicOpen(isOnMicOpen: Boolean)
+
+    /**
+     * 获取mpk实例
+     */
+    fun getMediaPlayer(): IMediaPlayer
+
+    /**
+     * 获取mcc实例
+     */
+    fun getMusicCenter(): IAgoraMusicContentCenter
 }

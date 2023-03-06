@@ -385,6 +385,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.setEnabled(false);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_END) {
                 getBinding().lrcControlView.setEnabled(true);
+            } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_STOP) {
+                getBinding().iBtnJoinChorus.setVisibility(View.INVISIBLE);
             }
         });
         roomLivingViewModel.playerMusicOpenDurationLiveData.observe(this, duration -> {
@@ -534,10 +536,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().lrcControlView.setMusic(music);
         if (UserManager.getInstance().getUser().id.toString().equals(music.getUserNo())) {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Singer);
-        } else if (UserManager.getInstance().getUser().id.toString().equals("TODO")) {
-            getBinding().lrcControlView.setRole(LrcControlView.Role.Partner);
+            getBinding().iBtnJoinChorus.setVisibility(View.INVISIBLE);
         } else {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
+            getBinding().iBtnJoinChorus.setVisibility(View.VISIBLE);
         }
         roomLivingViewModel.musicStartPlay(music);
         mRoomSpeakerAdapter.notifyDataSetChanged();
