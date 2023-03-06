@@ -43,7 +43,7 @@ public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListe
 
     @Override
     public void onJoinChorus() {
-        mViewModel.joinChorus();
+        //mViewModel.joinChorus();
     }
 
     @Override

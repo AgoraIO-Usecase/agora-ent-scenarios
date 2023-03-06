@@ -230,6 +230,16 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         stopTimer();
     }
 
+    public void onSelfJoinedChorus() {
+        mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
+        mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
+    }
+
+    public void onSelfLeavedChorus() {
+        mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
+        mBinding.ilActive.ivMusicMenu.setVisibility(View.INVISIBLE);
+    }
+
     public void onPrepareStatus(boolean isMineOwner) {
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
@@ -287,10 +297,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     private boolean mNeedToShowComboView;
 
     public void setScoreControlView(RoomSelSongModel songPlaying) {
-        if (songPlaying != null && songPlaying.isChorus()) {
+        if (songPlaying != null) {
             mNeedToShowComboView = UserManager.getInstance().getUser().id.toString().equals(songPlaying.getUserNo());
-        } else if (songPlaying != null && !songPlaying.isChorus()) {
-            mNeedToShowComboView = true;
         } else {
             mNeedToShowComboView = false;
         }
