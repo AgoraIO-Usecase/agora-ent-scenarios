@@ -85,7 +85,7 @@ xcodebuild -exportArchive -archivePath "${ARCHIVE_PATH}" -exportPath "${EXPORT_P
 
 # 给ipa包签名
 echo "============Sign IPA Begin============"
-cd ${PROJECT_PATH}
+cd "${WORKSPACE}/iOS/${TARGET_NAME}"
 pushd ${WORKSPACE}
 sh sign "${EXPORT_PATH}/${TARGET_NAME}.ipa"
 popd 
