@@ -19,6 +19,7 @@
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
 #import <Photos/Photos.h>
+#import "AgoraEntScenarios-Swift.h"
 @import AgoraRtcKit;
 @import Masonry;
 @import LEEAlert;
@@ -74,7 +75,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
             [self pushWebView:kURLPathH5Privacy];
             break;
         case VLMineViewClickTypeAboutUS:
-            [self pushWebView:kURLPathH5AboutUS];
+            [self about];
             break;
         case VLMineViewClickTypeLogout:
             [self loadLogoutUserRequest];
@@ -101,6 +102,11 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     VLCommonWebViewController *webVC = [[VLCommonWebViewController alloc] init];
     webVC.urlString = string;
     [self.navigationController pushViewController:webVC animated:YES];
+}
+
+- (void)about {
+    AboutAgoraEntertainmentViewController *VC = [[AboutAgoraEntertainmentViewController alloc] init];
+    [self.navigationController pushViewController:VC animated:YES];
 }
 
 - (void)userLogout {
