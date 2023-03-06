@@ -11,21 +11,18 @@
 #import "VLURLPathConfig.h"
 #import "KTVMacro.h"
 #import "AppContext+KTV.h"
-@import QMUIKit;
-@import MJRefresh;
-@import YYCategories;
 
 @interface VLHomeOnLineListView ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
 @property(nonatomic, weak) id <VLHomeOnLineListViewDelegate>delegate;
 
 @property (nonatomic, strong) NSMutableArray *roomListModeArray;
-@property (nonatomic, strong) QMUIButton *createBtn;
+@property (nonatomic, strong) UIButton *createBtn;
 //@property (nonatomic, strong) NSArray *roomListArray;
 
 @property (nonatomic, assign) NSInteger        page;
 @property (nonatomic, strong) VLListEmptyView *emptyView;
-
+@property (nonatomic, strong) UIRefreshControl *refreshControl;
 @end
 
 @implementation VLHomeOnLineListView
@@ -44,13 +41,15 @@
     [self addSubview:self.listCollectionView];
     [self addSubview:self.createBtn];
     
-    self.listCollectionView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        [weakSelf getRoomListIfRefresh:YES];
-    }];
-    
-    self.listCollectionView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
-        [weakSelf getRoomListIfRefresh:NO];
-    }];
+    _refreshControl = [[UIRefreshControl alloc]init];
+    self.listCollectionView.refreshControl = _refreshControl;
+    [_refreshControl addTarget:self action:@selector(loadData) forControlEvents:UIControlEventValueChanged];
+
+}
+
+-(void)loadData {
+    [self.listCollectionView.refreshControl beginRefreshing];
+    [self getRoomListIfRefresh:YES];
 }
 
 - (void)getRoomListIfRefresh:(BOOL)ifRefresh {
@@ -59,35 +58,23 @@
     [[AppContext ktvServiceImp] getRoomListWithPage:self.page
                                          completion:^(NSError * error, NSArray<VLRoomListModel *> * roomArray) {
         if (error != nil) {
-            [self.listCollectionView.mj_header endRefreshing];
-            [self.listCollectionView.mj_footer endRefreshing];
+            [self.listCollectionView.refreshControl endRefreshing];
             return;
         }
         
-        [self.listCollectionView.mj_header endRefreshing];
+        [self.listCollectionView.refreshControl endRefreshing];
         self.page += 1;
         NSArray *array = roomArray;
         
         if (ifRefresh) {
             [self.roomListModeArray removeAllObjects];
             self.roomListModeArray = array.mutableCopy;
-            if (array.count > 0) {
-                self.listCollectionView.mj_footer.hidden = NO;
-            }else{
-                self.listCollectionView.mj_footer.hidden = YES;
-            }
         }else{
             for (VLRoomListModel *model in array) {
                 [self.roomListModeArray addObject:model];
             }
         }
         [self.listCollectionView reloadData];
-        if (array.count < 10) {
-            [self.listCollectionView.mj_footer endRefreshing];
-            self.listCollectionView.mj_footer.hidden = YES;
-        }else{
-            [self.listCollectionView.mj_footer endRefreshing];
-        }
         if(self.roomListModeArray.count > 0) {
             self.emptyView.hidden = YES;
         }
@@ -158,20 +145,23 @@
     return _listCollectionView;
 }
 
-- (QMUIButton *)createBtn {
+- (UIButton *)createBtn {
     if (!_createBtn) {
         
-        _createBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_list_addIcon"]
-                                                      title:KTVLocalizedString(@"创建房间")];
+//        _createBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_list_addIcon"]
+//                                                      title:KTVLocalizedString(@"创建房间")];
+        _createBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_createBtn setTitle:KTVLocalizedString(@"创建房间") forState:UIControlStateNormal];
+        [_createBtn setImage:[UIImage sceneImageWithName:@"online_list_addIcon"] forState:UIControlStateNormal];
         _createBtn.frame = CGRectMake((SCREEN_WIDTH-195)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-48-kTopNavHeight, 195, 48);
         _createBtn.layer.cornerRadius = 24;
         _createBtn.layer.masksToBounds = YES;
-        _createBtn.imagePosition = QMUIButtonImagePositionLeft;
+//        _createBtn.imagePosition = QMUIButtonImagePositionLeft;
         _createBtn.spacingBetweenImageAndTitle = 7;
         _createBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
         [_createBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
         _createBtn.titleLabel.font = UIFontBoldMake(16.0);
-        _createBtn.adjustsButtonWhenHighlighted = NO;
+//        _createBtn.adjustsButtonWhenHighlighted = NO;
         [_createBtn addTarget:self action:@selector(createBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
         _createBtn.backgroundColor = UIColorMakeWithHex(@"#2753FF");
     }

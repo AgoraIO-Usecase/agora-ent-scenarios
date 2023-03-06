@@ -10,9 +10,8 @@
 #import "VLMacroDefine.h"
 #import "UIView+VL.h"
 #import "MenuUtils.h"
+#import "KTVMacro.h"
 @import SDWebImage;
-@import QMUIKit;
-@import YYCategories;
 
 @interface VLMineView ()<UITableViewDelegate,UITableViewDataSource>
 
