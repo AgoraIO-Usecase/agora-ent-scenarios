@@ -99,7 +99,9 @@ class VoiceRoomViewController: VRBaseViewController {
         SyncUtil.scene(id: self.roomInfo?.room?.room_id ?? "")?.subscribe(key: "",onDeleted: { _ in
             if self.isHeaderBack == false {
                 self.view.window?.makeToast("Time limit desc".localized())
-                self.backAction()
+                self.rtckit.leaveChannel()
+                self.isOwner ? self.ownerBack():self.backAction()
+                self.leaveRoom()
             }
         })
     }
