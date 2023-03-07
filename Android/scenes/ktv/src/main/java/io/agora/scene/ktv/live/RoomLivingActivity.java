@@ -30,6 +30,7 @@ import java.util.Map;
 
 import io.agora.rtc2.Constants;
 import io.agora.scene.base.GlideApp;
+import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.base.manager.UserManager;
@@ -39,6 +40,7 @@ import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvActivityRoomLivingBinding;
 import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding;
+import io.agora.scene.ktv.debugSettings.KTVDebugSettingsDialog;
 import io.agora.scene.ktv.live.fragment.dialog.MVFragment;
 import io.agora.scene.ktv.live.listener.LrcActionListenerImpl;
 import io.agora.scene.ktv.live.listener.SongActionListenerImpl;
@@ -211,6 +213,16 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             setPlayerBgFromMsg(0);
         }
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
+
+        if (AgoraApplication.the().isDebugModeOpen()) {
+            getBinding().btnDebug.setVisibility(View.VISIBLE);
+        } else {
+            getBinding().btnDebug.setVisibility(View.INVISIBLE);
+        }
+        getBinding().btnDebug.setOnClickListener(v -> {
+            KTVDebugSettingsDialog dialog = new KTVDebugSettingsDialog(roomLivingViewModel.mDebugSetting);
+            dialog.show(getSupportFragmentManager(), "debugSettings");
+        });
     }
 
     @Override

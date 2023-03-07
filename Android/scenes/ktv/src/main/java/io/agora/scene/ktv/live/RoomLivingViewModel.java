@@ -47,6 +47,8 @@ import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.KTVLogger;
 import io.agora.scene.ktv.R;
+import io.agora.scene.ktv.debugSettings.KTVDebugSettingBean;
+import io.agora.scene.ktv.debugSettings.KTVDebugSettingsDialog;
 import io.agora.scene.ktv.service.ChangeMVCoverInputModel;
 import io.agora.scene.ktv.service.ChooseSongInputModel;
 import io.agora.scene.ktv.service.JoinRoomOutputModel;
@@ -127,6 +129,8 @@ public class RoomLivingViewModel extends ViewModel {
      * 播放器配置
      */
     MusicSettingBean mSetting;
+
+    KTVDebugSettingBean mDebugSetting;
     /**
      * 是否开启后台播放
      */
@@ -1080,6 +1084,18 @@ public class RoomLivingViewModel extends ViewModel {
         }
 
         // ------------------ 初始化音乐播放设置面版 ------------------
+        mDebugSetting = new KTVDebugSettingBean(new KTVDebugSettingsDialog.Callback() {
+            @Override
+            public void onAudioDumpEnable(boolean enable) {
+                if (enable) {
+                    mRtcEngine.setParameters("{\"rtc.debug.enable\": true}");
+                    mRtcEngine.setParameters("{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}");
+                } else {
+                    mRtcEngine.setParameters("{\"rtc.debug.enable\": false}");
+                }
+            }
+        });
+
         mSetting = new MusicSettingBean(false, 100, 50, 0, new MusicSettingDialog.Callback() {
             @Override
             public void onEarChanged(boolean isEar) {
@@ -1144,17 +1160,7 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void onRemoteVolumeChanged(int volume) {
-                ktvApiProtocol.adjustRemoteVolume(volume);
-            }
-
-            @Override
-            public void onAudioDumpEnable(boolean enable) {
-                if (enable) {
-                    mRtcEngine.setParameters("{\"rtc.debug.enable\": true}");
-                    mRtcEngine.setParameters("{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}");
-                } else {
-                    mRtcEngine.setParameters("{\"rtc.debug.enable\": false}");
-                }
+                ktvApiProtocol.adjustPlaybackVolume(volume);
             }
         });
 
@@ -1171,91 +1177,95 @@ public class RoomLivingViewModel extends ViewModel {
                 mRtcEngine,
                 roomInfoLiveData.getValue().getRoomNo(),
                 streamId,
-                UserManager.getInstance().getUser().id.intValue(),
-                new KTVApiEventHandler() {
-                    @Override
-                    public void onPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, io.agora.mediaplayer.Constants.MediaPlayerError error,  boolean isLocal) {
-                        switch (state) {
-                            case PLAYER_STATE_OPEN_COMPLETED:
-                                playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
-                                break;
-                            case PLAYER_STATE_PLAYING:
-                                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                                break;
-                            case PLAYER_STATE_PAUSED:
-                                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
-                                break;
-                            case PLAYER_STATE_STOPPED:
-                                if (!isLocal) {
-                                    playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_STOP);
-                                }
-                                break;
-                            case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
-                                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
-                                changeMusic();
-                                break;
-                            default:
-                        }
-                    }
+                UserManager.getInstance().getUser().id.intValue()
+                )
+        );
+        ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
+                   @Override
+                   public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, io.agora.mediaplayer.Constants.MediaPlayerError error,  boolean isLocal) {
+                       switch (state) {
+                           case PLAYER_STATE_OPEN_COMPLETED:
+                               playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
+                               break;
+                           case PLAYER_STATE_PLAYING:
+                               playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                               break;
+                           case PLAYER_STATE_PAUSED:
+                               playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
+                               break;
+                           case PLAYER_STATE_STOPPED:
+                               if (!isLocal) {
+                                   playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_STOP);
+                               }
+                               break;
+                           case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
+                               playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
+                               changeMusic();
+                               break;
+                           default:
+                       }
+                   }
 
-                    @Override
-                    public void onSingingScoreResult(float score) {
-                        playerMusicPlayCompleteLiveData.postValue((int)score);
-                    }
+                   @Override
+                   public void onSingingScoreResult(float score) {
+                       playerMusicPlayCompleteLiveData.postValue((int)score);
+                   }
 
-                    @Override
-                    public void onMusicCollectionResult(@Nullable String requestId, int status, int page, int pageSize, int total, @Nullable Music[] list) {
-                        IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
-                        if(handler != null){
-                            handler.onMusicCollectionResult(requestId, status, page, pageSize, total, list);
-                            rtcMusicHandlerMap.remove(requestId);
-                        }
-                    }
+                   @Override
+                   public void onMusicCollectionResult(@Nullable String requestId, int status, int page, int pageSize, int total, @Nullable Music[] list) {
+                       IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
+                       if(handler != null){
+                           handler.onMusicCollectionResult(requestId, status, page, pageSize, total, list);
+                           rtcMusicHandlerMap.remove(requestId);
+                       }
+                   }
 
-                    @Override
-                    public void onMusicChartsResult(@Nullable String requestId, int status, @Nullable MusicChartInfo[] list) {
-                        IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
-                        if(handler != null){
-                            handler.onMusicChartsResult(requestId, status, list);
-                            rtcMusicHandlerMap.remove(requestId);
-                        }
-                    }
+                   @Override
+                   public void onMusicChartsResult(@Nullable String requestId, int status, @Nullable MusicChartInfo[] list) {
+                       IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
+                       if(handler != null){
+                           handler.onMusicChartsResult(requestId, status, list);
+                           rtcMusicHandlerMap.remove(requestId);
+                       }
+                   }
 
-                    @Override
-                    public void onMusicLoaded(long songCode, @NonNull String lyricUrl, @NonNull KTVSingRole role, @NonNull KTVLoadSongState state) {
-                        if (state == KTVLoadSongState.KTVLoadSongStateOK) {
-                            // 歌曲load成功
-                            if (role == KTVSingRole.KTVSingRoleMainSinger || role == KTVSingRole.KTVSingRoleAudience) {
-                                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                                // 重置settings
-                                mSetting.setVolMic(100);
-                                mSetting.setVolMusic(50);
-                                // 播放歌曲
-                                ktvApiProtocol.startSing(0);
-                            } else {
-                                TokenGenerator.INSTANCE.generateToken(
-                                        roomInfoLiveData.getValue().getRoomNo() + "_ex",
-                                        UserManager.getInstance().getUser().id.toString(),
-                                        TokenGenerator.TokenGeneratorType.token006,
-                                        TokenGenerator.AgoraTokenType.rtc,
-                                        ret -> {
-                                            ktvApiProtocol.joinChorus(ret, role);
-                                            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_JOIN_CHORUS);
-                                            return null;
-                                        }, null
-                                );
-                            }
-                        } else {
-                            KTVLogger.e(TAG, "ktvApiProtocol.loadSong failed：" + state);
-                            if (state == KTVLoadSongState.KTVLoadSongStatePreloadFail) {
+                   @Override
+                   public void onMusicLoadStateChanged(long songCode, @NonNull String lyricUrl, @NonNull KTVSingRole role, @NonNull KTVLoadSongState state) {
+                       if (state == KTVLoadSongState.KTVLoadSongStateOK) {
+                           // 歌曲load成功
+                           if (role == KTVSingRole.KTVSingRoleMainSinger || role == KTVSingRole.KTVSingRoleAudience) {
+                               playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                               // 重置settings
+                               mSetting.setVolMic(100);
+                               mSetting.setVolMusic(50);
+                               // 播放歌曲
+                               ktvApiProtocol.startSing(0);
+                           } else {
+                               TokenGenerator.INSTANCE.generateToken(
+                                       roomInfoLiveData.getValue().getRoomNo() + "_ex",
+                                       UserManager.getInstance().getUser().id.toString(),
+                                       TokenGenerator.TokenGeneratorType.token006,
+                                       TokenGenerator.AgoraTokenType.rtc,
+                                       ret -> {
+                                           ktvApiProtocol.joinChorus(ret, role);
+                                           playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_JOIN_CHORUS);
+                                           return null;
+                                       }, null
+                               );
+                           }
+                       } else {
+                           KTVLogger.e(TAG, "ktvApiProtocol.loadSong failed：" + state);
+                           if (state == KTVLoadSongState.KTVLoadSongStatePreloadFail) {
 //                                needRePreload = true;
 //                                int mainSingerUid = music.getUserNo() == null ? 0 : Integer.parseInt(music.getUserNo());
 //                                rePreloadConfig = new KTVSongConfiguration(role, songCode, mainSingerUid);
-                            }
-                        }
-                    }
-                }, 50, 15
-        ));
+                           }
+                       }
+                   }
+               }
+        );
+        ktvApiProtocol.adjustMusicPlayerPlayoutVolume(50);
+        ktvApiProtocol.adjustMusicPlayerPublishVolume(50);
     }
 
     private void setAudioEffectPreset(int effect) {
@@ -1345,9 +1355,9 @@ public class RoomLivingViewModel extends ViewModel {
     // ------------------ 暂停/播放 ------------------
     public void musicToggleStart() {
         if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
-            ktvApiProtocol.pausePlayer();
+            ktvApiProtocol.pauseMusicPlayer();
         } else if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PAUSE) {
-            ktvApiProtocol.resumePlayer();
+            ktvApiProtocol.resumeMusicPlayer();
         }
     }
 
@@ -1402,7 +1412,7 @@ public class RoomLivingViewModel extends ViewModel {
 
     // ------------------ 歌曲seek ------------------
     public void musicSeek(long time) {
-        ktvApiProtocol.seekPlayer(time);
+        ktvApiProtocol.seekMusicPlayer(time);
     }
 
     public Long getSongDuration() {
