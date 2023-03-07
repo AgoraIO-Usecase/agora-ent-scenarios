@@ -37,6 +37,19 @@
         app:layout_constraintTop_toBottomOf="@+id/ivUser" />
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btLeaveChorus"
+        style="@style/def_btn_full"
+        android:layout_width="102dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginStart="60dp"
+        android:insetTop="2dp"
+        android:insetBottom="2dp"
+        android:text="@string/ktv_leave_chorus"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvName" />
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btSeatoff"
         style="@style/def_btn_full"
         android:layout_width="102dp"
@@ -46,7 +59,7 @@
         android:insetBottom="2dp"
         android:text="@string/ktv_room_seat_off"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btLeaveChorus"
         app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
     <View

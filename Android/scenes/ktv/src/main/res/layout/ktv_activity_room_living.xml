@@ -185,14 +185,15 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/iBtnChorus"
+        android:id="@+id/iBtnJoinChorus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="150dp"
+        android:layout_marginBottom="70dp"
         android:src="@mipmap/ic_hechuang"
-        app:layout_constraintBottom_toBottomOf="@id/iBtnChooseSong"
-        app:layout_constraintEnd_toStartOf="@id/iBtnChooseSong"
-        app:layout_constraintTop_toTopOf="@id/iBtnChooseSong" />
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivResultBg"
@@ -290,7 +291,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="iBtnChorus,iBtnChooseSong,cbMic,cbVideo"
+        app:constraint_referenced_ids="iBtnChooseSong,cbMic,cbVideo, btnMenu"
         tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.Group
@@ -300,4 +301,17 @@
         android:visibility="gone"
         app:constraint_referenced_ids="ivNotOnMic, tvNotOnMic"
         tools:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnDebug"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:text="Debug"
+        android:textSize="@dimen/ktv_space_small"
+        android:visibility="visible"
+        android:textAllCaps="false"
+        android:layout_marginBottom="70dp"
+        android:background="@drawable/bg_def_btn_selector"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
