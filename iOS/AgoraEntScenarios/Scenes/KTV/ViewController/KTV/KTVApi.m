@@ -516,7 +516,7 @@ time_t uptime(void) {
 
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine localAudioStats:(AgoraRtcLocalAudioStats *)stats {
     if([stats respondsToSelector:@selector(audioPlayoutDelay)]) {
-        self.audioPlayoutDelay = [[stats performSelector:@selector(audioPlayoutDelay)] intValue];
+        self.audioPlayoutDelay = (NSInteger)[stats performSelector:@selector(audioPlayoutDelay)];
     }
 }
 
