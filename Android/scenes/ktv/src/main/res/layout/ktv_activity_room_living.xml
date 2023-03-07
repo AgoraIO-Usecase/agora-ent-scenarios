@@ -301,4 +301,17 @@
         android:visibility="gone"
         app:constraint_referenced_ids="ivNotOnMic, tvNotOnMic"
         tools:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnDebug"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:text="Debug"
+        android:textSize="@dimen/ktv_space_small"
+        android:visibility="visible"
+        android:textAllCaps="false"
+        android:layout_marginBottom="70dp"
+        android:background="@drawable/bg_def_btn_selector"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

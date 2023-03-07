@@ -53,12 +53,14 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private var mLastReceivedPlayPosTime: Long? = null
 
     // event
-    private var ktvApiEventHandler: KTVApiEventHandler? = null
+    private var ktvApiEventHandler: IKTVApiEventHandler? = null
     private var mainSingerHasJoinChannelEx: Boolean = false
 
     // 合唱校准
     private var audioPlayoutDelay = 0
     private var remoteVolume: Int = 15 // 远端音频
+    private var mpkPlayoutVolume: Int = 50
+    private var mpkPublishVolume: Int = 50
 
     // 音高
     private var pitch = 0.0
@@ -74,7 +76,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         this.channelName = config.channelName
         this.dataStreamId = config.dataStreamId
         this.localUid = config.localUid
-        this.ktvApiEventHandler = config.ktvApiEventHandler
 
         // ------------------ 初始化内容中心 ------------------
         val contentCenterConfiguration = MusicContentCenterConfiguration()
@@ -93,16 +94,16 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mMusicCenter.registerEventHandler(this)
 
         // 音量最佳实践调整
-        mPlayer.adjustPlayoutVolume(config.defaultMediaPlayerVolume)
-        mPlayer.adjustPublishSignalVolume(config.defaultMediaPlayerVolume)
-        remoteVolume = config.defaultChorusRemoteUserVolume
+//        mPlayer.adjustPlayoutVolume(config.defaultMediaPlayerVolume)
+//        mPlayer.adjustPublishSignalVolume(config.defaultMediaPlayerVolume)
+//        remoteVolume = config.defaultChorusRemoteUserVolume
     }
 
-    override fun addEventHandler(ktvApiEventHandler: KTVApiEventHandler) {
-        //TODO("Not yet implemented")
+    override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
+        this.ktvApiEventHandler = ktvApiEventHandler
     }
 
-    override fun removeEventHandler(ktvApiEventHandler: KTVApiEventHandler) {
+    override fun removeEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
         //TODO("Not yet implemented")
     }
 
@@ -157,16 +158,17 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         val role = config.role
         val songCode = config.songCode
 
+        // TODO 验证下
         // 已经loadSong过的歌曲
         if (loadSongMap.containsKey(songCode.toString())) {
             when (val state = loadSongMap[songCode.toString()]) {
                 KTVLoadSongState.KTVLoadSongStateOK -> {
                     val url = lyricUrlMap[songCode.toString()] ?: return
-                    ktvApiEventHandler?.onMusicLoaded(songCode, url, role, state)
+                    ktvApiEventHandler?.onMusicLoadStateChanged(songCode, url, role, state)
                     return
                 }
                 KTVLoadSongState.KTVLoadSongStateInProgress -> {
-                    ktvApiEventHandler?.onMusicLoaded(songCode, "", role, state)
+                    ktvApiEventHandler?.onMusicLoadStateChanged(songCode, "", role, state)
                     return
                 }
                 else -> {}
@@ -175,7 +177,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         // 没有loadSong的歌曲
         loadSongMap[songCode.toString()] = KTVLoadSongState.KTVLoadSongStateInProgress
-        ktvApiEventHandler?.onMusicLoaded(songCode, "", role, KTVLoadSongState.KTVLoadSongStateInProgress)
+        ktvApiEventHandler?.onMusicLoadStateChanged(songCode, "", role, KTVLoadSongState.KTVLoadSongStateInProgress)
 
         var state = KTVLoadSongState.KTVLoadSongStateInProgress
         val countDownLatch = CountDownLatch(2)
@@ -254,9 +256,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             if (state == KTVLoadSongState.KTVLoadSongStateInProgress) {
                 loadSongMap[songCode.toString()] = KTVLoadSongState.KTVLoadSongStateOK
                 state = KTVLoadSongState.KTVLoadSongStateOK
-                ktvApiEventHandler?.onMusicLoaded(songCode, url, role, state)
+                ktvApiEventHandler?.onMusicLoadStateChanged(songCode, url, role, state)
             } else {
-                ktvApiEventHandler?.onMusicLoaded(songCode, url, role, state)
+                ktvApiEventHandler?.onMusicLoadStateChanged(songCode, url, role, state)
             }
         }.start()
     }
@@ -435,20 +437,35 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         }.start()
     }
 
-    override fun resumePlayer() {
+    override fun resumeMusicPlayer() {
         KTVLogger.d(TAG, "resumePlay called")
         mPlayer.resume()
     }
 
-    override fun pausePlayer() {
+    override fun pauseMusicPlayer() {
         KTVLogger.d(TAG, "pausePlay called")
         mPlayer.pause()
     }
 
-    override fun seekPlayer(time: Long) {
+    override fun seekMusicPlayer(time: Long) {
         KTVLogger.d(TAG, "seek called")
         mPlayer.seek(time)
         syncPlayProgress(time)
+    }
+
+    override fun adjustMusicPlayerPlayoutVolume(volume: Int) {
+        this.mpkPlayoutVolume = volume
+        mPlayer.adjustPlayoutVolume(volume)
+    }
+
+    override fun adjustMusicPlayerPublishVolume(volume: Int) {
+        this.mpkPublishVolume = volume
+        mPlayer.adjustPublishSignalVolume(volume)
+    }
+
+    override fun adjustPlaybackVolume(volume: Int) {
+        remoteVolume = volume
+        mRtcEngine.adjustPlaybackSignalVolume(volume)
     }
 
     override fun selectPlayerTrackMode(mode: KTVPlayerTrackMode) {
@@ -460,13 +477,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     override fun setLycView(view: LrcControlView) {
         KTVLogger.d(TAG, "setLycView called")
         this.lrcView = view
-    }
-
-    override fun adjustRemoteVolume(volume: Int) {
-        remoteVolume = volume
-        if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
-            mRtcEngine.adjustPlaybackSignalVolume(volume)
-        }
     }
 
     override fun setIsMicOpen(isOnMicOpen: Boolean) {
@@ -756,7 +766,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         else -> {}
                     }
                 }
-                ktvApiEventHandler?.onPlayerStateChanged(
+                ktvApiEventHandler?.onMusicPlayerStateChanged(
                     Constants.MediaPlayerState.getStateByValue(state),
                     Constants.MediaPlayerError.getErrorByValue(error),
                     false
@@ -777,6 +787,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     override fun onAudioVolumeIndication(speakers: Array<out AudioVolumeInfo>?, totalVolume: Int) {
         super.onAudioVolumeIndication(speakers, totalVolume)
         val allSpeakers = speakers ?: return
+        for (info in allSpeakers) {
+            KTVLogger.d(TAG, "onAudioVolumeIndication info: uid:${info.uid}, volume:${info.volume}")
+        }
         // VideoPitch 回调, 用于同步各端音准
         val config = songConfig ?: return
         if (config.role != KTVSingRole.KTVSingRoleAudience) {
@@ -884,7 +897,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             else -> {}
         }
         syncPlayState(mediaPlayerState, mediaPlayerError)
-        ktvApiEventHandler?.onPlayerStateChanged(mediaPlayerState, mediaPlayerError, true)
+        ktvApiEventHandler?.onMusicPlayerStateChanged(mediaPlayerState, mediaPlayerError, true)
     }
 
     // 同步播放进度
