@@ -442,8 +442,11 @@ class RoomObservableViewDelegate constructor(
                 }
             }
         }
-        val isLocalAudioMute = (localUserMicInfo?.member?.micStatus != MicStatus.Normal)
-        chatPrimaryMenuView.showMicVisible(isLocalAudioMute, localUserIndex() >= 0)
+        val micIsOn = (
+                localUserMicInfo?.member?.micStatus == MicStatus.Normal &&
+                localUserMicInfo?.micStatus == MicStatus.Normal
+        )
+        chatPrimaryMenuView.showMicVisible(micIsOn, localUserIndex() >= 0)
     }
 
     /**
@@ -761,6 +764,9 @@ class RoomObservableViewDelegate constructor(
             .rightText(activity.getString(R.string.voice_room_accept))
             .setOnClickListener(object : CommonFragmentAlertDialog.OnClickBottomListener {
                 override fun onConfirmClick() {
+                    if (isRequesting) { // 如果自己在申请上麦，就取消申请
+                        roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().userId())
+                    }
                     roomLivingViewModel.acceptMicSeatInvitation()
                 }
 
@@ -1004,8 +1010,10 @@ class RoomObservableViewDelegate constructor(
         iRoomMicView.onSeatUpdated(newMicMap) {
             updateSpatialPosition(newMicMap.values)
         }
-        val isLocalAudioMute = (localUserMicInfo?.member?.micStatus != MicStatus.Normal)
-        chatPrimaryMenuView.showMicVisible(isLocalAudioMute, localUserIndex() >= 0)
+        val micIsOn = (
+                localUserMicInfo?.member?.micStatus == MicStatus.Normal &&
+                localUserMicInfo?.micStatus == MicStatus.Normal)
+        chatPrimaryMenuView.showMicVisible(micIsOn, localUserIndex() >= 0)
         if (roomKitBean.isOwner) {
             val handsCheckMap = mutableMapOf<Int, String>()
             newMicMap.forEach { (t, u) ->

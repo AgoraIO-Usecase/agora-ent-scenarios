@@ -323,10 +323,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 ThreadManager.getInstance().runOnMainThread {
                     if (reason == VoiceRoomServiceKickedReason.destroyed) {
                         ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
-                        finish()
+                        leaveRoom()
                     } else if (reason == VoiceRoomServiceKickedReason.removed) {
                         ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_kick_member))
-                        finish()
+                        leaveRoom()
                     }
                 }
             }
@@ -384,10 +384,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             roomObservableDelegate.onTimeUpExitRoom(
                 getString(R.string.voice_chatroom_time_up_tips), finishBack = {
                     if (roomKitBean.isOwner) {
-                        finish()
+                        leaveRoom()
                     } else {
                         roomObservableDelegate.checkUserLeaveMic()
-                        finish()
+                        leaveRoom()
                     }
                 })
         }
@@ -421,8 +421,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 object :
                     OnItemClickListener<VoiceMicInfoModel> {
                     override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt)
-                        ) { finish() }
+                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt)) {
+                            finish()
+                        }
                     }
                 }
             ).setUpInitAdapter()
@@ -450,8 +451,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 object :
                     OnItemClickListener<VoiceMicInfoModel> {
                     override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt),
-                            { finish() })
+                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt)) {
+                            finish()
+                        }
                     }
                 },
             ).setUpInitMicInfoMap()
@@ -587,19 +589,15 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             roomObservableDelegate.onExitRoom(
                 getString(R.string.voice_chatroom_end_live),
                 getString(R.string.voice_chatroom_end_live_tips), finishBack = {
-                    finish()
+                    leaveRoom()
                 })
         } else {
             roomObservableDelegate.checkUserLeaveMic()
-            finish()
+            leaveRoom()
         }
     }
 
-    override fun finish() {
-        binding.chatroomGiftView.clear()
-        roomObservableDelegate.destroy()
-        voiceServiceProtocol.unsubscribeEvent()
-        ChatroomIMManager.getInstance().clearCache()
+    private fun leaveRoom() {
         if (roomKitBean.isOwner) {
             ChatroomIMManager.getInstance().asyncDestroyChatRoom(roomKitBean.chatroomId, object :
                 CallBack {
@@ -610,6 +608,14 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         }
         ChatroomIMManager.getInstance().leaveChatRoom(roomKitBean.chatroomId)
         roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId, isRoomOwnerLeave)
+        finish()
+    }
+
+    override fun finish() {
+        binding.chatroomGiftView.clear()
+        roomObservableDelegate.destroy()
+        voiceServiceProtocol.unsubscribeEvent()
+        ChatroomIMManager.getInstance().clearCache()
         isRoomOwnerLeave = false
         binding.subtitle.clearTask()
         dialogFragments.clear()

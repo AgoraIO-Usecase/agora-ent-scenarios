@@ -448,6 +448,11 @@ class VoiceSyncManagerServiceImp(
                             return@forEach
                         }
                         val member = userMap[userId]
+                        if (member?.micIndex != -1) {
+                            val toSeat = micSeatMap[member?.micIndex.toString()]
+                            completion.invoke(VoiceServiceProtocol.ERR_OK, toSeat)
+                            return@forEach
+                        }
                         val toSeat = micSeatMap[micIndex.toString()]
                         if (member != null && toSeat != null) {
                             member.micIndex = toSeat.micIndex
