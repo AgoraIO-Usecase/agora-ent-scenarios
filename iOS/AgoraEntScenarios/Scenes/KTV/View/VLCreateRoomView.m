@@ -11,8 +11,6 @@
 #import "MenuUtils.h"
 #import "AgoraEntScenarios-Swift.h"
 
-@import IQKeyboardManager;
-
 @interface VLCreateRoomView ()
 
 @property(nonatomic, weak) id <VLCreateRoomViewDelegate>delegate;
@@ -133,9 +131,6 @@
         weakSelf.addRoomModel.password = pwd;
     };
     [self.screatView addSubview:pwdView];
-    
-    IQKeyboardManager *iqMagager = [IQKeyboardManager sharedManager];
-    iqMagager.keyboardDistanceFromTextField = 85;
 
     UILabel *setLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 55+12, 150, 17)];
     setLabel.font = UIFontMake(12);
