@@ -110,7 +110,6 @@ class SA3DRtcView: UIView {
                 guard let micInfos = self?.micInfos else { return }
                 let micInfo = micInfos[0]
                 micInfo.member?.volume = vol
-//                self?.rtcUserView.cellType = self?.getCellTypeWithStatus(micInfo.status) ?? .AgoraChatRoomBaseUserCellTypeAdd
                 self?.rtcUserView.volume = vol
             }
         }
@@ -319,7 +318,6 @@ extension SA3DRtcView {
         
         moveCenter = checkEdgeRange(point: moveCenter)
         let angle = getAngle(rtcUserView.center, preP: lastCenterPoint)
-        
         rtcUserView.angle = angle
         lastCenterPoint = rtcUserView.center
         
@@ -330,7 +328,7 @@ extension SA3DRtcView {
         let pos = viewCenterPostion(view: rtcUserView)
         DispatchQueue.global().async {
             let currentTime = CFAbsoluteTimeGetCurrent()
-            if currentTime - 0.2 < self.lastTime { return }
+            if currentTime - 0.05 < self.lastTime { return }
             if let user = self.micInfos?.first?.member {
                 var info = SAPositionInfo()
                 info.uid = Int(user.uid ?? "0") ?? 0
@@ -356,14 +354,13 @@ extension SA3DRtcView {
     }
     
     private func calcuRealPositon(angle: Double) -> ([NSNumber], [NSNumber])  {
-        let angle = angle < 0 ? 90 : angle == 90 ? 270 : angle
         let fx = cos(angle)
         let fy = sin(angle)
         let forward = [NSNumber(value: Double(fx)),
                        NSNumber(value: Double(fy)),
                        NSNumber(0.0)]
-        let right = [NSNumber(value: Double(-fy)),
-                     NSNumber(value: Double(fx)),
+        let right = [NSNumber(value: Double(fy)),
+                     NSNumber(value: Double(-fx)),
                      NSNumber(0.0)]
         return (forward, right)
     }
