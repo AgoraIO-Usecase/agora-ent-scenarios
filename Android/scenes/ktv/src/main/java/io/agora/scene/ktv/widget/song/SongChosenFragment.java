@@ -71,11 +71,13 @@ public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmen
                     binding.ivToDel.setVisibility(View.GONE);
                     binding.ivToTop.setVisibility(View.GONE);
                 }
-                if (item.isChorus) {
-                    binding.tvChorus.setText(getString(R.string.ktv_song_ordering_person_chorus));
-                } else {
-                    binding.tvChorus.setText(getString(R.string.ktv_song_ordering_person));
-                }
+
+                binding.tvChorus.setText(getString(R.string.ktv_song_ordering_person));
+//                if (item.isChorus) {
+//                    binding.tvChorus.setText(getString(R.string.ktv_song_ordering_person_chorus));
+//                } else {
+//                    binding.tvChorus.setText(getString(R.string.ktv_song_ordering_person));
+//                }
             }
         }
     };

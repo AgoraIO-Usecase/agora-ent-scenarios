@@ -4,10 +4,10 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import com.alibaba.android.arouter.utils.MapUtils.isNotEmpty
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.ktv.KTVLogger
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.*
 import kotlin.random.Random
@@ -22,7 +22,8 @@ class KTVSyncManagerServiceImp(
     private val context: Context,
     private val errorHandler: ((Exception?) -> Unit)?
 ) : KTVServiceProtocol {
-    private val kSceneId = "scene_ktv_2.2.0"
+    private val TAG = "KTV_Service_LOG"
+    private val kSceneId = "scene_ktv_3.0.0"
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"
     private val kCollectionIdUser = "userCollection"
@@ -70,6 +71,7 @@ class KTVSyncManagerServiceImp(
     private val ROOM_AVAILABLE_DURATION : Long = 20 * 60 * 1000 // 20min
     private val timerRoomEndRun = Runnable {
         runOnMainThread {
+            KTVLogger.d(TAG, "time up exit room!")
             roomTimeUpSubscriber?.invoke()
         }
     }
@@ -227,12 +229,9 @@ class KTVSyncManagerServiceImp(
                                     }
 
                                     // 定时删除房间
-                                    if (cacheRoom.creatorNo == UserManager.getInstance().user.id.toString()) {
-                                        // 房主
-                                        mainHandler.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
-                                    } else {
-                                        mainHandler.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - cacheRoom.createdAt.toLong()))
-                                    }
+                                    val expireLeftTime = ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - cacheRoom.createdAt.toLong())
+                                    KTVLogger.d(TAG, "expireLeftTime: $expireLeftTime")
+                                    mainHandler.postDelayed(timerRoomEndRun, expireLeftTime)
                                 }
 
                             }
@@ -483,7 +482,6 @@ class KTVSyncManagerServiceImp(
             inputModel.singer,
             inputModel.imageUrl,
 
-            isChorus = inputModel.isChorus > 0,
             userNo = UserManager.getInstance().user.id.toString(),
             name = UserManager.getInstance().user.name,
 
@@ -526,8 +524,6 @@ class KTVSyncManagerServiceImp(
 
             userNo = targetSong.userNo,
             name = targetSong.name,
-            chorusNo = targetSong.chorusNo,
-            isChorus = targetSong.isChorus,
             isOriginal = targetSong.isOriginal,
 
             status = targetSong.status,
@@ -570,8 +566,6 @@ class KTVSyncManagerServiceImp(
 
             userNo = targetSong.userNo,
             name = targetSong.name,
-            chorusNo = targetSong.chorusNo,
-            isChorus = targetSong.isChorus,
             isOriginal = targetSong.isOriginal,
 
             status = RoomSelSongModel.STATUS_PLAYING,
@@ -612,89 +606,56 @@ class KTVSyncManagerServiceImp(
     }
 
     override fun joinChorus(
-        inputModel: JoinChorusInputModel,
         completion: (error: Exception?) -> Unit
     ) {
-        // set the chorus user to the first chosen song
-        if (songChosenList.size <= 0) {
-            completion.invoke(RuntimeException("The chosen song list is empty!"))
-            return
-        }
-        val targetSong = innerSortChooseSongList()[0]
-        val indexOf = songChosenList.indexOf(targetSong)
-        if (!TextUtils.isEmpty(targetSong.chorusNo)) {
-            completion.invoke(RuntimeException("The song has chorus user already!"))
-            return
-        }
-        val newSong = RoomSelSongModel(
-            targetSong.songName,
-            targetSong.songNo,
-            targetSong.singer,
-            targetSong.imageUrl,
-
-            isChorus = targetSong.isChorus,
-            userNo = targetSong.userNo,
-            name = targetSong.name,
-            isOriginal = targetSong.isOriginal,
-            chorusNo = UserManager.getInstance().user.id.toString(),
-
-            status = targetSong.status,
-            createAt = targetSong.createAt,
-            pinAt = targetSong.pinAt
-        )
-        songChosenList[indexOf] = newSong
-
-        //net request and notify others
-        innerUpdateChooseSong(
-            objIdOfSongNo[indexOf],
-            newSong
-        ) {
-            chooseSongSubscriber?.invoke(
-                KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
-                newSong
-            )
-            completion.invoke(it)
+        seatMap.forEach {
+            if (it.value?.userNo == UserManager.getInstance().user.id.toString()) {
+                val originSeatInfo = it.value
+                if (originSeatInfo != null) {
+                    val seatInfo = RoomSeatModel(
+                        originSeatInfo.isMaster,
+                        originSeatInfo.headUrl,
+                        originSeatInfo.userNo,
+                        originSeatInfo.rtcUid,
+                        originSeatInfo.name,
+                        originSeatInfo.seatIndex,
+                        true,
+                        originSeatInfo.isAudioMuted,
+                        originSeatInfo.isVideoMuted
+                    )
+                    updateChorusMemberNum(true)
+                    innerUpdateSeat(seatInfo, completion)
+                }
+            }
         }
     }
 
-    override fun leaveChorus() {
-        if (songChosenList.size <= 0) {
-            return
-        }
-
-        val targetSong = innerSortChooseSongList()[0]
-        val indexOf = songChosenList.indexOf(targetSong)
-        val newSong = RoomSelSongModel(
-            targetSong.songName,
-            targetSong.songNo,
-            targetSong.singer,
-            targetSong.imageUrl,
-
-            isChorus = targetSong.isChorus,
-            userNo = targetSong.userNo,
-            chorusNo = "0",
-            name = targetSong.name,
-            isOriginal = targetSong.isOriginal,
-
-            status = targetSong.status,
-            createAt = targetSong.createAt,
-            pinAt = targetSong.pinAt
-        )
-        songChosenList[indexOf] = newSong
-
-        //net request and notify others
-        innerUpdateChooseSong(
-            objIdOfSongNo[indexOf],
-            newSong
-        ) {
-            chooseSongSubscriber?.invoke(
-                KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
-                newSong
-            )
+    override fun leaveChorus(
+        completion: (error: Exception?) -> Unit
+    ) {
+        seatMap.forEach {
+            if (it.value?.userNo == UserManager.getInstance().user.id.toString()) {
+                val originSeatInfo = it.value
+                if (originSeatInfo != null) {
+                    val seatInfo = RoomSeatModel(
+                        originSeatInfo.isMaster,
+                        originSeatInfo.headUrl,
+                        originSeatInfo.userNo,
+                        originSeatInfo.rtcUid,
+                        originSeatInfo.name,
+                        originSeatInfo.seatIndex,
+                        false,
+                        originSeatInfo.isAudioMuted,
+                        originSeatInfo.isVideoMuted
+                    )
+                    updateChorusMemberNum(false)
+                    innerUpdateSeat(seatInfo, completion)
+                }
+            }
         }
     }
 
-    override fun becomeSolo() {
+     private fun updateChorusMemberNum(isJoin: Boolean) {
         // unset the chorus user to the first chosen song
         if (songChosenList.size <= 0) {
             return
@@ -707,8 +668,7 @@ class KTVSyncManagerServiceImp(
             targetSong.songNo,
             targetSong.singer,
             targetSong.imageUrl,
-
-            isChorus = false,
+            chorusNum = if (isJoin) targetSong.chorusNum + 1 else targetSong.chorusNum - 1,
             userNo = targetSong.userNo,
             name = targetSong.name,
             isOriginal = targetSong.isOriginal,
@@ -1058,11 +1018,11 @@ class KTVSyncManagerServiceImp(
         mSceneReference?.collection(kCollectionIdSeatInfo)
             ?.update(objectId, seatInfo, object : Callback {
                 override fun onSuccess() {
-                    runOnMainThread { completion.invoke(null) }
+                    completion.invoke(null)
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
-                    runOnMainThread { completion.invoke(exception) }
+                    completion.invoke(exception)
                 }
             })
     }
@@ -1222,11 +1182,11 @@ class KTVSyncManagerServiceImp(
                 objIdOfSongNo.addAll(retObjId)
 
                 val sortList = innerSortChooseSongList()
-                runOnMainThread { completion.invoke(null, sortList) }
+                completion.invoke(null, sortList)
             }
 
             override fun onFail(exception: SyncManagerException?) {
-                runOnMainThread { completion.invoke(exception, null) }
+                completion.invoke(exception, null)
             }
         })
     }

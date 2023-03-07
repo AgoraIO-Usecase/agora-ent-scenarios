@@ -122,8 +122,7 @@ data class RoomSelSongModel(
     // 获取已点歌记返回的歌词信息，同时也包含上面信息
     val userNo: String? = null,// 点歌人No
     val name: String? = null,// 点歌人昵称
-    val chorusNo: String? = null, // 合唱者userNo
-    val isChorus: Boolean = false, // 是否合唱
+    val chorusNum: Int = 0, // 合唱者个数
     val isOriginal: Int = 0, //是否原唱
 
     // 排序字段
@@ -143,7 +142,6 @@ data class JoinChorusInputModel(
 )
 
 data class ChooseSongInputModel(
-    val isChorus: Int,
     val songName: String,
     val songNo: String,
     val singer: String,
