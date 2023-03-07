@@ -12,10 +12,9 @@
 #import "MenuUtils.h"
 #import "VLMineCellModel.h"
 #import "AgoraEntScenarios-Bridging-Header.h"
+#import "KTVMacro.h"
 
 @import SDWebImage;
-@import QMUIKit;
-@import YYCategories;
 
 static NSString * const kSwitchCellID = @"switchCellID";
 static NSString * const kDefaultCellID = @"kDefaultCellID";

@@ -47,10 +47,15 @@ import SwiftyBeaver
         return log
     }
     
-    @objc static func logsDir() ->String {
+    @objc static func cacheDir() ->String {
         let dir = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.cachesDirectory,
                                                       FileManager.SearchPathDomainMask.userDomainMask, true).first
-        let logDir = "\(dir ?? "")/agora_ent_logs"
+        return dir ?? ""
+    }
+    
+    @objc static func logsDir() ->String {
+        let dir = cacheDir()
+        let logDir = "\(dir)/agora_ent_logs"
         try? FileManager.default.createDirectory(at: URL(fileURLWithPath: logDir), withIntermediateDirectories: true)
         
         return logDir

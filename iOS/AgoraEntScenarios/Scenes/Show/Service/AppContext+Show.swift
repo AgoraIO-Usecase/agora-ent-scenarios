@@ -8,7 +8,7 @@
 import Foundation
 
 let kShowLogBaseContext = "AgoraKit"
-let showLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "Show"))
+let showLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig(sceneName: "Show"))
 
 private let kShowRoomListKey = "kShowRoomListKey"
 private let kRtcTokenMapKey = "kRtcTokenMapKey"

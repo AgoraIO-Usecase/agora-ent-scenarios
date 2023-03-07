@@ -6,7 +6,7 @@
 //
 
 import UIKit
- import AgoraSyncManager
+import AgoraSyncManager
 
 class SyncUtil: NSObject {
     private static var manager: AgoraSyncManager?
