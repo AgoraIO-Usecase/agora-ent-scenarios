@@ -1233,11 +1233,14 @@ public class RoomLivingViewModel extends ViewModel {
                    public void onMusicLoadStateChanged(long songCode, @NonNull String lyricUrl, @NonNull KTVSingRole role, @NonNull KTVLoadSongState state) {
                        if (state == KTVLoadSongState.KTVLoadSongStateOK) {
                            // 歌曲load成功
+                           // 重置settings
+                           mSetting.setVolMic(100);
+                           mSetting.setVolMusic(50);
+                           ktvApiProtocol.adjustMusicPlayerPlayoutVolume(50);
+                           ktvApiProtocol.adjustMusicPlayerPublishVolume(50);
+
                            if (role == KTVSingRole.KTVSingRoleMainSinger || role == KTVSingRole.KTVSingRoleAudience) {
                                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                               // 重置settings
-                               mSetting.setVolMic(100);
-                               mSetting.setVolMusic(50);
                                // 播放歌曲
                                ktvApiProtocol.startSing(0);
                            } else {
@@ -1316,8 +1319,8 @@ public class RoomLivingViewModel extends ViewModel {
     private int micOldVolume = 100;
 
     private void setMusicVolume(int v) {
-        ktvApiProtocol.getMediaPlayer().adjustPlayoutVolume(v);
-        ktvApiProtocol.getMediaPlayer().adjustPublishSignalVolume(v);
+        ktvApiProtocol.adjustMusicPlayerPlayoutVolume(v);
+        ktvApiProtocol.adjustMusicPlayerPublishVolume(v);
     }
 
     private void setMicVolume(int v) {
