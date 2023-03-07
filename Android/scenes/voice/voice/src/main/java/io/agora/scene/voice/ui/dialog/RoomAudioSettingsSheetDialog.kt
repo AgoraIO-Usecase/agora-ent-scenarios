@@ -3,6 +3,7 @@ package io.agora.scene.voice.ui.dialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -63,7 +64,6 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             mcbAgoraBot.isEnabled = audioSettingsInfo.enable
             pbAgoraBotVolume.isEnabled = audioSettingsInfo.enable
 
-            mcbAgoraBot.isChecked = audioSettingsInfo.botOpen
             pbAgoraBotVolume.progress = audioSettingsInfo.botVolume
             mtAgoraBotVolumeValue.text = audioSettingsInfo.botVolume.toString()
             mtBestSoundEffectArrow.text =
@@ -73,8 +73,10 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             updateAINSView()
             updateAIAECView()
             updateAIAGCView()
+            updateBotStateView()
 
             mcbAgoraBot.setOnCheckedChangeListener { button, isChecked ->
+                if (!button.isPressed) return@setOnCheckedChangeListener
                 "isChecked：$isChecked".logD("mcbAgoraBot")
                 audioSettingsListener?.onBotCheckedChanged(button, isChecked)
                 mcbAgoraBot.isEnabled = false
@@ -151,10 +153,10 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
     /**
      * 更新机器人ui
      */
-    fun updateBoxCheckBoxView(openBot: Boolean) {
-        if (audioSettingsInfo.botOpen == openBot) return
-        audioSettingsInfo.botOpen = openBot
-        binding?.mcbAgoraBot?.isChecked = audioSettingsInfo.botOpen
+    fun updateBotStateView() {
+        binding?.mcbAgoraBot?.post {
+            binding?.mcbAgoraBot?.isChecked = audioSettingsInfo.botOpen
+        }
     }
 
     override fun dismiss() {
