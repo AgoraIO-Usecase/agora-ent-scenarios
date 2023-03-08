@@ -15,7 +15,6 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnItemClickListener;
@@ -77,14 +76,6 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         while (iterator.hasNext()){
             Runnable next = iterator.next();
             next.run();
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (!Objects.requireNonNull(getBinding().etSearch.getText()).toString().equals("")) {
-            onSongsSearching(getBinding().etSearch.getText().toString());
         }
     }
 
