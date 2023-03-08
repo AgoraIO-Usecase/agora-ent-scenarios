@@ -4,8 +4,9 @@
 //
 
 #import "VLKTVTonesView.h"
-#import "KTVMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 @import Masonry;
+@import QMUIKit;
 
 @interface VLKTVTonesView()
 

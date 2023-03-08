@@ -7,13 +7,12 @@
 @class VLKTVSettingModel;
 
 typedef enum : NSUInteger {
-    VLKTVValueDidChangedTypeEar = 0,      // 耳返
-    VLKTVValueDidChangedTypeMV,           // MV
-    VLKTVValueDidChangedRiseFall,         // 升降调
-    VLKTVValueDidChangedTypeSound,        // 声音
-    VLKTVValueDidChangedTypeAcc,          // 伴奏
-    VLKTVValueDidChangedTypeRemoteValue,  //远端音量
-    VLKTVValueDidChangedTypeListItem      // 列表
+    VLKTVValueDidChangedTypeEar = 0, // 耳返
+    VLKTVValueDidChangedTypeMV,    // MV
+    VLKTVValueDidChangedRiseFall,  // 升降调
+    VLKTVValueDidChangedTypeSound, // 声音
+    VLKTVValueDidChangedTypeAcc, // 伴奏
+    VLKTVValueDidChangedTypeListItem // 列表
 } VLKTVValueDidChangedType;
 
 @protocol VLKTVSettingViewDelegate <NSObject>
@@ -28,8 +27,7 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, weak) id <VLKTVSettingViewDelegate> delegate;
 
-- (void)setIsEarOn:(BOOL)isEarOn;
-- (void)setAccValue:(float)accValue;
+-(void)setIsEarOn:(BOOL)isEarOn;
 
 @end
 
@@ -43,7 +41,6 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) float soundValue;
 @property (nonatomic, assign) float accValue;
 @property (nonatomic, assign) NSInteger toneValue;
-@property (nonatomic, assign) int remoteVolume;
 
 /// list选项
 @property (nonatomic, assign) NSInteger kindIndex;

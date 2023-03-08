@@ -7,8 +7,7 @@
 
 #import "LSTPopView+KTVModal.h"
 #import "VLMacroDefine.h"
-#import "KTVMacro.h"
-#import "UIView+VL.h"
+@import QMUIKit;
 
 @implementation LSTPopView (KTVModal)
 
@@ -97,9 +96,9 @@
 //弹出美声视图
 + (LSTPopView*)popBelcantoViewWithParentView:(UIView*)parentView
                            withBelcantoModel:(VLBelcantoModel *)belcantoModel
-                                withDelegate:(id<VLAudioEffectPickerDelegate>)delegate {
+                                withDelegate:(id<VLChooseBelcantoViewDelegate>)delegate {
     CGFloat popViewH = 175 + kSafeAreaBottomHeight;
-    VLAudioEffectPicker *belcantoView = [[VLAudioEffectPicker alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
+    VLChooseBelcantoView *belcantoView = [[VLChooseBelcantoView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
                                                                         withDelegate:delegate];
     belcantoView.selBelcantoModel = belcantoModel;
     LSTPopView* popView = [self _createKTVPopContainerWithContentView:belcantoView
@@ -114,9 +113,9 @@
                                         isChorus:(BOOL)isChorus
                                  chooseSongArray: (NSArray*)chooseSongArray
                                       withRoomNo:(NSString*)roomNo
-                                    withDelegate:(id<VLPopSongListDelegate>)delegate {
+                                    withDelegate:(id<VLPopChooseSongViewDelegate>)delegate {
     CGFloat popViewH = SCREEN_HEIGHT * 0.7;
-    VLPopSongList *chooseSongView = [[VLPopSongList alloc]
+    VLPopChooseSongView *chooseSongView = [[VLPopChooseSongView alloc]
                                            initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
                                            withDelegate:delegate
                                            withRoomNo:roomNo
@@ -133,11 +132,10 @@
 
 //弹出音效
 + (LSTPopView*)popSetSoundEffectViewWithParentView:(UIView*)parentView
-                                         soundView:(VLSoundEffectView*)soundView
                                       withDelegate:(id<VLsoundEffectViewDelegate>)delegate {
     CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;
-    VLSoundEffectView* soundEffectView = soundView ? soundView : [[VLSoundEffectView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
-                                                                                            withDelegate:delegate];
+    VLsoundEffectView* soundEffectView = [[VLsoundEffectView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
+                                                                    withDelegate:delegate];
     
     LSTPopView* popView = [self _createKTVPopContainerWithContentView:soundEffectView
                                                        withParentView:parentView];
@@ -163,24 +161,6 @@
     popView.cornerRadius = 20;
     popView.isClickFeedback = NO;
     
-    [popView pop];
-    
-    return popView;
-}
-
-//控制台
-+ (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
-                               settingView:(VLKTVSettingView*)settingView
-                               withDelegate:(id<VLKTVSettingViewDelegate>)delegate {
-    VLKTVSettingView* _settingView = settingView ? settingView : [[VLKTVSettingView alloc] initWithSetting:nil];
-    _settingView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 300);
-    _settingView.backgroundColor = UIColorMakeWithHex(@"#152164");
-    [_settingView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
-    _settingView.delegate = delegate;
-    
-    LSTPopView* popView = [self _createKTVPopContainerWithContentView:_settingView
-                                                       withParentView:parentView];
-    popView.isAvoidKeyboard = NO;
     [popView pop];
     
     return popView;

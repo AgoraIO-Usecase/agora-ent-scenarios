@@ -69,7 +69,7 @@
     intputModel.name = [NSString stringWithFormat:@"%@",roomModel.name];
     intputModel.password = roomModel.password.length > 0 ? [NSString stringWithFormat:@"%@",roomModel.password] : @"";
     intputModel.soundEffect = @"0";
-//    intputModel.userNo = VLUserCenter.user.id;
+//    intputModel.userNo = VLUserCenter.user.userNo;
     VL(weakSelf);
     self.view.userInteractionEnabled = NO;
     [[AppContext ktvServiceImp] createRoomWithInput:intputModel
@@ -92,7 +92,7 @@
         listModel.roomNo = outputModel.roomNo;
         listModel.name = outputModel.name;
         listModel.bgOption = 0;
-        listModel.creatorNo = VLUserCenter.user.id;
+        listModel.creatorNo = VLUserCenter.user.userNo;
         VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
         ktvVC.roomModel = listModel;
         ktvVC.seatsArray = outputModel.seatsArray;
