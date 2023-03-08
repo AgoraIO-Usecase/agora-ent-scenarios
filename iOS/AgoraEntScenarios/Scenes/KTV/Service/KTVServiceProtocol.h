@@ -8,7 +8,6 @@
 #import <Foundation/Foundation.h>
 #import "KTVServiceModel.h"
 #import "VLRoomListModel.h"
-#import "VLLoginModel.h"
 @import AgoraRtmKit;
 
 typedef enum : NSUInteger {
@@ -128,11 +127,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)joinChorusWithInput:(KTVJoinChorusInputModel*)inputModel
                  completion:(void(^)(NSError* _Nullable))completion;
 
-
-/// 伴唱取消合唱
-/// @param completion <#completion description#>
-- (void)coSingerLeaveChorusWithCompletion:(void(^)(NSError* _Nullable))completion;
-
 /// 当前歌曲合唱改为独唱
 - (void)enterSoloMode;
 
@@ -153,10 +147,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeUserListCountChangedWithBlock:(void(^)(NSUInteger))changedBlock;
 
-/// 用户属性变化
-/// @param changedBlock <#changedBlock description#>
-- (void)subscribeUserChangedWithBlock:(void(^)(NSUInteger, VLLoginModel*))changedBlock;
-
 /// 订阅麦位变化
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeSeatListChangedWithBlock:(void (^)(NSUInteger, VLRoomSeatModel*))changedBlock;
@@ -167,7 +157,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 订阅选中歌曲变化
 /// @param changedBlock <#changedBlock description#>
-- (void)subscribeChooseSongChangedWithBlock:(void (^)(NSUInteger, VLRoomSelSongModel*, NSArray<VLRoomSelSongModel*>*))changedBlock;
+- (void)subscribeChooseSongChangedWithBlock:(void (^)(NSUInteger, VLRoomSelSongModel*))changedBlock;
 
 /// 订阅歌曲评分变化
 /// @param changedBlock <#changedBlock description#>

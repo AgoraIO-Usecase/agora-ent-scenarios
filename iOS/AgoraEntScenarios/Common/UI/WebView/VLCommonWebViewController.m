@@ -118,8 +118,8 @@ NSString *const USBaseWebViewController_KVO_Title = @"title";
 //            NSNumber *new = (NSNumber *)change[@"new"];
 //            _popButton.customView.hidden = !new.boolValue;
         }else if ([keyPath isEqualToString:USBaseWebViewController_KVO_Title]) {
-//            self.navigationItem.title = _webView.title;
-            [self setNaviTitleName:_webView.title];
+            self.navigationItem.title = _webView.title;
+//            [self setNaviTitleName:_webView.title];
         }
     }
 }

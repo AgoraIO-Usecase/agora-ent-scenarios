@@ -3,10 +3,10 @@
 //  VoiceOnLine
 //
 
-#import <UIKit/UIKit.h>
+#import "QMUIKit.h"
 NS_ASSUME_NONNULL_BEGIN
 
-@interface BaseNavigationController : UINavigationController
+@interface BaseNavigationController : QMUINavigationController
 @end
 
 NS_ASSUME_NONNULL_END

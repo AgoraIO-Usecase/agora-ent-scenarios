@@ -6,7 +6,7 @@
 #import "UITextField+Font.h"
 #import "VLFontUtils.h"
 #import <objc/runtime.h>
-#import "QMUICommonDefines.h"
+@import QMUIKit;
 
 @implementation UITextField (Font)
 
