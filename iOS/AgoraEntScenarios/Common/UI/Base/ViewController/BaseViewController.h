@@ -3,7 +3,7 @@
 //  VoiceOnLine
 //
 
-#import <UIKit/UIKit.h>
+#import "QMUIKit.h"
 #import "VLEmptyView.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -14,7 +14,7 @@ typedef NS_ENUM(NSInteger, VLNavigationBarStatus) {
     VLNavigationBarStatusRight
 };
 
-@interface BaseViewController : UIViewController
+@interface BaseViewController : QMUICommonViewController
 @property (nonatomic, strong) VLEmptyView *vlEmptyView;
 @property (nonatomic, assign, readwrite) BOOL statusBarHidden;
 

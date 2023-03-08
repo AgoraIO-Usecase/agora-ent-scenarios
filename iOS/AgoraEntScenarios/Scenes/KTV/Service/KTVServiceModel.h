@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Join room output parameter
 @interface KTVJoinRoomOutputModel : NSObject
-@property (nonatomic, copy) NSString* creatorNo;
+@property (nonatomic, copy) NSString* creator;
 @property (nonatomic, strong) NSArray<VLRoomSeatModel*>* seatsArray;
 @end
 
@@ -79,7 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// join chorus input parameter
 @interface KTVJoinChorusInputModel : NSObject
-@property (nonatomic, assign) BOOL isChorus;
+@property (nonatomic, copy) NSString* isChorus;
 @property (nonatomic, copy) NSString* songNo;
 @end
 

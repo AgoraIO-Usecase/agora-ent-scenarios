@@ -7,6 +7,7 @@
 #import "VLKTVKindsCell.h"
 #import "KTVMacro.h"
 @import Masonry;
+@import QMUIKit;
 
 @interface VLKTVKindsView() <UICollectionViewDataSource,UICollectionViewDelegate>
 

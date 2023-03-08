@@ -20,6 +20,7 @@
 #import "MenuUtils.h"
 #import "KTVMacro.h"
 #import <Photos/Photos.h>
+@import AgoraRtcKit;
 @import Masonry;
 @import LEEAlert;
 
@@ -483,17 +484,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         _versionLabel.textColor = UIColorMakeWithHex(@"#6C7192");
     }
     return _versionLabel;
-}
-
-#pragma mark for debug
-
-- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
-    [super motionEnded:motion withEvent:event];
-    
-    UIActivityViewController *controller = [[UIActivityViewController alloc] initWithActivityItems:@[[NSURL fileURLWithPath:[AgoraEntLog cacheDir]]]
-                                                                             applicationActivities:nil];
-
-    [self presentViewController:controller animated:YES completion:nil];
 }
 
 @end

@@ -8,6 +8,8 @@
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
 #import "KTVMacro.h"
+@import QMUIKit;
+@import YYCategories;
 
 @interface VLPopSelBgView ()<UICollectionViewDataSource,UICollectionViewDelegate>
 

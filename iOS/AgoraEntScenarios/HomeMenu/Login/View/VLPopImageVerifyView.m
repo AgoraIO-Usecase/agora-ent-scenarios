@@ -8,7 +8,7 @@
 #import "VLMacroDefine.h"
 #import "VLHotSpotBtn.h"
 #import "MenuUtils.h"
-#import "KTVMacro.h"
+@import QMUIKit;
 @import YYCategories;
 
 @interface VLPopImageVerifyView ()

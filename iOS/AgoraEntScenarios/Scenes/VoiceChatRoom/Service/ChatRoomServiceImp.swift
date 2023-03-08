@@ -9,7 +9,6 @@ import Foundation
 import KakaJSON
 import ZSwiftBaseLib
 import AgoraChat.AgoraChatError
-import AgoraSyncManager
 
 private let cSceneId = "scene_chatRoom"
 
@@ -686,7 +685,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let owner: VRUser = VRUser()
         owner.rtc_uid = VLUserCenter.user.id
         owner.name = VLUserCenter.user.name
-        owner.uid = VLUserCenter.user.id
+        owner.uid = VLUserCenter.user.userNo
         owner.mic_index = 0
         owner.portrait = VLUserCenter.user.headUrl
         
@@ -694,8 +693,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let params = room.kj.JSONObject()
         self.initScene {
             SyncUtil.joinScene(id: room.room_id ?? "",
-                               userId: VLUserCenter.user.id,
-                               isOwner: true,
+                               userId:VLUserCenter.user.userNo,
                                property: params) { result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
                 completion(nil,model)
@@ -740,26 +738,18 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                         completion(nil, updateRoom)
                     }
                     
-                    initScene {
-                        let isOwner = VLUserCenter.user.id == room.owner?.uid ? true : false
-                        SyncUtil.joinScene(id: room.room_id ?? "",
-                                           userId: VLUserCenter.user.id,
-                                           isOwner: isOwner,
-                                           property: params) { result in
-                            SyncUtil
-                                .scene(id: roomId)?
-                                .update(key: "",
-                                        data: params,
-                                        success: { obj in
-                                    print("updateUserCount success")
-                                },
-                                        fail: { error in
-                                    print("updateUserCount fail")
-                                    completion(error, nil)
-                                })
-                        } fail: { error in
-                            completion(error, nil)
-                        }
+                    initScene{
+                        SyncUtil
+                            .scene(id: roomId)?
+                            .update(key: "",
+                                    data: params,
+                                    success: { obj in
+                                print("updateUserCount success")
+                            },
+                                    fail: { error in
+                                print("updateUserCount fail")
+                                completion(error, nil)
+                            })
                     }
                     break
                 }
@@ -782,7 +772,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 if room.room_id == roomId {
                     var isOwner = false
                     if let owner_uid = room.owner?.uid {
-                        isOwner = owner_uid == VLUserCenter.user.id
+                        isOwner = owner_uid == VLUserCenter.user.userNo
                     }
                     if isOwner {
                         self.roomList?.remove(at: index)
@@ -816,7 +806,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.mic_index = 0
         mic.status = 0
         mic.member = VRUser()
-        mic.member?.uid = VLUserCenter.user.id
+        mic.member?.uid = VLUserCenter.user.userNo
         mic.member?.name = VLUserCenter.user.name
         mic.member?.chat_uid = ""
         mic.member?.mic_index = 0
