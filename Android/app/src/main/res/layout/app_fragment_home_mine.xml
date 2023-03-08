@@ -143,16 +143,6 @@
             android:text="@string/app_logoff_account"
             app:layout_constraintTop_toBottomOf="@id/tvLogout"
             tools:ignore="MissingConstraints" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvDebugMode"
-            style="@style/app_tv_mine_style"
-            android:layout_marginTop="1dp"
-            android:drawableStart="@mipmap/ic_user_center6"
-            android:text="@string/app_debug_mode"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/tvLogoffAccount"
-            tools:ignore="MissingConstraints" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.appcompat.widget.AppCompatTextView

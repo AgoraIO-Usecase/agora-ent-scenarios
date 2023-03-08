@@ -29,7 +29,6 @@
     <string name="app_plus_86">+86</string>
     <string name="app_logout">退出登录</string>
     <string name="app_logoff_account">注销账号</string>
-    <string name="app_debug_mode">开发者模式</string>
     <string name="app_logoff">注销</string>
 
     <string name="app_voice_chat">语聊房</string>
