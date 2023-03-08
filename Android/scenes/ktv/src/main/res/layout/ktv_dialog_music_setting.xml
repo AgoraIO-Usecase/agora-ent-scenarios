@@ -76,7 +76,6 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:gravity="center"
-        android:visibility="gone"
         android:orientation="horizontal">
 
         <TextView
@@ -173,66 +172,10 @@
             android:thumb="@mipmap/ic_seekbar_btn" />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="20dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:focusable="false"
-            android:text="@string/ktv_music_menu_dialog_remote_volume"
-            android:textColor="#9BA2AB" />
-
-        <ImageButton
-            android:id="@+id/btn_remote_volume_down_dialog_setting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:background="@null"
-            android:contentDescription="@string/ktv_remote_volume_down"
-            android:padding="6dp"
-            android:src="@drawable/ic_tone_down" />
-
-        <EditText
-            android:id="@+id/text_remote_volume"
-            style="@style/ktvBeautyInputStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="15"
-            android:textSize="16sp"
-            android:textColor="#9BA2AB"
-            android:autofillHints=""
-            android:inputType="" />
-
-        <ImageButton
-            android:id="@+id/btn_remote_volume_up_dialog_setting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:contentDescription="@string/ktv_remote_volume_up"
-            android:padding="6dp"
-            android:src="@drawable/ic_tone_up" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="@string/ktv_input_remote_volume"
-            android:textColor="@color/def_text_grey_6c7" />
-    </LinearLayout>
-
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:overScrollMode="never"
-        android:visibility="gone"
         android:scrollbars="none">
 
         <RadioGroup

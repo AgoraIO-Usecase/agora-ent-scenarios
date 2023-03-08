@@ -18,7 +18,6 @@
     <string name="ktv_empty_search">未找到相关结果</string>
     <string name="ktv_song_and_singer" translatable="false">%s - %s</string>
     <string name="ktv_please_use_headset">请插入耳机使用耳返功能</string>
-    <string name="ktv_input_remote_volume">请输入0到100的正整数</string>
     <string name="ktv_mv">MV</string>
     <string name="ktv_song_background">歌词背景</string>
     <string name="ktv_more_actions">更多操作</string>
@@ -61,7 +60,6 @@
     <string name="ktv_music_menu_dialog_title">控制台</string>
     <string name="ktv_music_menu_dialog_ear">耳返</string>
     <string name="ktv_music_menu_dialog_tone">升降调</string>
-    <string name="ktv_music_menu_dialog_remote_volume">远端音量</string>
     <string name="ktv_music_menu_dialog_vol1">音量</string>
     <string name="ktv_music_menu_dialog_vol2">伴奏</string>
     <string name="ktv_music_menu_dialog_effect">效果</string>
@@ -120,8 +118,6 @@
     <string name="ktv_random_room_name">随机生成一个房间名称</string>
     <string name="ktv_tone_down">点击调低音调</string>
     <string name="ktv_tone_up">点击调高音调</string>
-    <string name="ktv_remote_volume_down">点击调低远端音量</string>
-    <string name="ktv_remote_volume_up">点击调高远端音量</string>
     <string name="ktv_ok">好的</string>
     <string name="ktv_done">完成</string>
     <string name="ktv_search">搜索</string>
@@ -138,6 +134,4 @@
     <string name="ktv_permission_refused">运行此功能需要的必要权限未被授予。</string>
     <string name="ktv_network_unavailable">未检测到可用网络，确认继续？</string>
     <string name="ktv_no_lrc">暂无歌词 </string>
-    <string name="ktv_content">监测到当前内容存在违规行为</string>
-    <string name="ktv_onseat_toast">加入合唱前，您需要先上麦</string>
 </resources>
