@@ -1,39 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <resources>
     <string name="voice_app_name">Agora Chat Room</string>
     <string name="voice_app_agora_chatroom">Agora Chat Room</string>
     <string name="voice_app_agora_chatroom_copy_right">Powered by Agora.io</string>
     <string name="voice_agora_chat_room_create">Create Room</string>
-
     <string name="voice_room_list_title_name">Agora Chat Room</string>
-    <string name="voice_spatial_room_list_title_name">Spatial Audio Chat Mode Room</string>
+    <string name="voice_spatial_room_list_title_name">Spatial Audio Mode Room</string>
     <string name="voice_tab_layout_all">All</string>
     <string name="voice_tab_layout_chat_room">Chat Room</string>
-    <string name="voice_tab_layout_audio_room">Spatial Audio Room</string>
+    <string name="voice_tab_layout_audio_room">Spatial Audio Mode Room</string>
     <string name="voice_tab_layout_karaoke_room">Karaoke</string>
-
     <string name="voice_room_disclaimer">Disclaimer for demo</string>
     <string name="voice_room_sound_selection">Sound Selection</string>
     <string name="voice_room_current_customer_usage">Current Customer Usage</string>
-
     <string name="voice_room_create_empty_name">No Room Name</string>
     <string name="voice_room_create_room_name">Room Name</string>
     <string name="voice_room_create_hint_room_name">Set Room Name</string>
     <string name="voice_room_create_random_name">Random</string>
-    <string name="voice_room_create_encrypt">Room Access?</string>
+    <string name="voice_room_create_encrypt">Room Access</string>
     <string name="voice_room_create_private">Private</string>
     <string name="voice_room_create_public">Public</string>
     <string name="voice_room_create_next">Next</string>
     <string name="voice_room_create_go_live">Go Live</string>
     <string name="voice_room_create_chat_room">Chat Room</string>
-    <string name="voice_room_create_chat_3d_room">Spatial Audio</string>
+    <string name="voice_room_create_chat_3d_room">Spatial Audio Mode Room</string>
     <string name="voice_room_create_chat_room_desc">Multi-audio chat scenario where anyone can unmute their mic and speak \nCo-Watch / Team Chat / Gaming Buddy Chat</string>
     <string name="voice_room_create_3d_room">Spatial Audio Mode Room</string>
     <string name="voice_room_create_3d_room_desc">Power natural conversations that make people feel like they\'re \"in the room\" together</string>
-    <string name="voice_room_create_ktv_room">KTV</string>
+    <string name="voice_room_create_ktv_room">Karaoke</string>
     <string name="voice_room_create_tips">Enter 4 Digit PassWord</string>
     <string name="voice_room_check_password">Incorrect Password</string>
     <string name="voice_room_create_error">Create Room Error</string>
-
     <string name="voice_room_empty_data">No Chat Room Yet</string>
     <string name="voice_room_list_title_private">Private</string>
     <string name="voice_room_list_item_enter">Enter</string>
@@ -41,16 +39,13 @@
     <string name="voice_room_tab_layout_count">(%1$s)</string>
     <string name="voice_room_profile_update_name_fail">Change Failed</string>
     <string name="voice_room_profile_update_name_suc">Change Success</string>
-
     <string name="voice_empty_invite_hands">No audience yet</string>
     <string name="voice_empty_raised_hands">No one raised hands yet</string>
     <string name="voice_room_profile">Profile</string>
     <string name="voice_room_close">Room Closed</string>
     <string name="voice_room_kick_member">You were kicked off from the room</string>
-
     <string name="voice_room_welcome">Welcome to the voice chat room! Pornography, gambling or violence is strictly prohibited in the room.</string>
     <string name="voice_chatroom_time_up_tips">The experience limit has been reached. This room has been closed</string>
-
     <!-- gift -->
     <string name="voice_gift_default_name_1">Sweet Heart</string>
     <string name="voice_gift_default_name_2">Flower</string>
@@ -64,13 +59,11 @@
     <string name="voice_dialog_gift_total_count">Contribution Total:%1$s</string>
     <string name="voice_chatroom_gift_title">Gifts</string>
     <string name="voice_chatroom_gift_dialog_send">Send</string>
-    <string name="voice_gift_sent">sent </string>
-
-    <string name="voice_chatroom_send_gift_fail">Gift Sent Failed</string>
+    <string name="voice_gift_sent">Sent</string>
+    <string name="voice_chatroom_send_gift_fail">Gift sent failed</string>
     <string name="voice_chatroom_create_tip1">This product is for testing only, not for commerce.</string>
     <string name="voice_chatroom_create_tip2">Every room will be maintained for 10 minutes.</string>
     <string name="voice_chatroom_profile_change_picture">Change Profile Picture</string>
-
     <string name="voice_room_agree_success">Agree success!</string>
     <string name="voice_room_agree_fail">Agree failed!</string>
     <string name="voice_room_send_invited_fail">Invited failed!</string>
@@ -81,8 +74,8 @@
     <string name="voice_room_accept">Accept</string>
     <string name="voice_room_decline">Decline</string>
     <string name="voice_room_accepted">Accepted</string>
-    <string name="voice_chatroom_request_speak">Request to Speak?</string>
-    <string name="voice_chatroom_cancel_request_speak">Cancel Request to Speak?</string>
+    <string name="voice_chatroom_request_speak">Request to speak?</string>
+    <string name="voice_chatroom_cancel_request_speak">Cancel request to speak?</string>
     <string name="voice_chatroom_prompt">Prompt</string>
     <string name="voice_room_confirm">Confirm</string>
     <string name="voice_room_cancel">Cancel</string>
@@ -90,7 +83,6 @@
     <string name="voice_chatroom_mic_apply_fail">Apply failed!</string>
     <string name="voice_chatroom_mic_cancel_apply_success">Cancel apply success!</string>
     <string name="voice_chatroom_mic_cancel_apply_fail">Cancel apply failed!</string>
-
     <!-- mic -->
     <string name="voice_chatroom_mic_submit_sent">Your request has been sent,please wait for reply</string>
     <string name="voice_chatroom_open_bot_to_sound_effect">Add bot to listen to sound effect?</string>
@@ -130,12 +122,10 @@
     <string name="voice_chatroom_join_room_success">Joined Success</string>
     <string name="voice_chatroom_join_room_failed">Joined Failed</string>
     <string name="voice_chatroom_host_invitation_sent">Invitation sent!</string>
-
     <string name="voice_room_disclaimer_content_1">[Agora Chat Room Demo] (this "Product") is a test product provided by Agora. This Product is available for our current and potential customers only, and for them to test the functionality and quality of this Product. This Product is provided neither for commercial nor for public use. Agora enjoys the copyright and ownership of this product. You shall not modify, consolidate, compile, adjust, reverse engineer, sub-license, transfer, sell this Product or infringe the legitimate interests of Agora in any way.</string>
     <string name="voice_room_disclaimer_content_2">If you’d like to test this Product, you’re welcome to download, install and use it. Agora hereby grants you a world-wide and royalty-free license to use this Product. This product is provided "as is" without any express or implicit warranty, including but not limited to guarantees of suitability, suitability for specific purposes, and non-infringement. Whether it is due to any contract, infringement or other forms of conduct related to this Product or the use of this Product or otherwise, Agora shall not be liable for any claims, damages or liabilities arising out of or related to your use of this Product.</string>
     <string name="voice_room_disclaimer_content_3">It’s your freedom to choose to test this Product or not. But if you decide to do so, and if you download, install, or use this Product, it means that you confirm and agree that under no circumstances shall Agora be liable for any form of loss or injury caused to yourself or others when you use this Product for any reason, in any manner.</string>
     <string name="voice_room_disclaimer_email">If you have any query, please feel free to contact support@agora.io</string>
-
     <string name="voice_chatroom_beginner_guide">Beginner\'s Guide</string>
     <string name="voice_chatroom_welcome">How to use 3D Spatial Audio Seat</string>
     <string name="voice_chatroom_welcome_tip1">Put on headsets</string>
@@ -146,21 +136,21 @@
     <string name="voice_chatroom_own_audio_settings">Personal Audio Settings</string>
     <string name="voice_chatroom_audio_settings">Audio Settings</string>
     <string name="voice_chatroom_bot_settings">Bot Settings</string>
-    <string name="voice_chatroom_agora_bot">Agora Blue &#038; Red Bot</string>
+    <string name="voice_chatroom_agora_bot">Agora Blue &amp; Red Bot</string>
     <string name="voice_chatroom_bot_volume">Bot Volume</string>
     <string name="voice_chatroom_room_audio_settings">Room Audio Settings</string>
-    <string name="voice_chatroom_best_sound_effect">Best Agora Sound</string>
+    <string name="voice_chatroom_best_sound_effect">Sound Selection</string>
     <string name="voice_chatroom_noise_suppression">Noise Suppression</string>
     <string name="voice_chatroom_aiaec">AIAEC</string>
     <string name="voice_chatroom_aiagc">AGC</string>
     <string name="voice_chatroom_turnon_aiaec">Turn on AIAEC</string>
-    <string name="voice_chatroom_aiaec_introduce">&#160;&#160;&#160;&#160;When you turn on accompaniment singing, AIAEC can greatly improve your singing effect. It is strongly recommended that you turn it on when singing</string>
+    <string name="voice_chatroom_aiaec_introduce">When you turn on accompaniment singing, AIAEC can greatly improve your singing effect. It is strongly recommended that you turn it on when singing</string>
     <string name="voice_chatroom_turnon_aiagc">Turn on AGC</string>
-    <string name="voice_chatroom_aiagc_introduce">&#160;&#160;&#160;&#160;After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing</string>
+    <string name="voice_chatroom_aiagc_introduce">After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing</string>
     <string name="voice_chatroom_spatial_audio">Spatial Audio</string>
     <string name="voice_chatroom_only_host_can_change_robot">Only host can change the robot settings</string>
-    <string name="voice_chatroom_agora_blue">Agora Blue</string>
-    <string name="voice_chatroom_agora_red">Agora Red</string>
+    <string name="voice_chatroom_agora_blue">Agora Blue Bot</string>
+    <string name="voice_chatroom_agora_red">Agora Red Bot</string>
     <string name="voice_chatroom_agora_blue_bot">Agora Blue Bot</string>
     <string name="voice_chatroom_agora_red_bot">Agora Red Bot</string>
     <string name="voice_chatroom_attenuation_factor">Attenuation factor</string>
@@ -172,14 +162,14 @@
     <string name="voice_chatroom_current_sound_selection">Current Sound Selection</string>
     <string name="voice_chatroom_other_sound_selection">Other Sound Selection</string>
     <string name="voice_chatroom_social_chat">Social Chat</string>
-    <string name="voice_chatroom_social_chat_introduce">This sound effect focuses on solving the voice call problem of Social Chat scene, including noise cancellation and echo suppression of the anchor&#180;s voice. It can enable users of different network environments and models to enjoy ultra-low delay, clear and beautiful voice in multi person chat.</string>
+    <string name="voice_chatroom_social_chat_introduce">This sound effect focuses on solving the voice call problem of Social Chat scene, including noise cancellation and echo suppression of the anchor´s voice. It can enable users of different network environments and models to enjoy ultra-low delay, clear and beautiful voice in multi person chat.</string>
     <string name="voice_chatroom_karaoke">Karaoke</string>
-    <string name="voice_chatroom_karaoke_introduce">This sound effect focuses on solving all kinds of problems in the Karaoke scene of single person or multi person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi person chorus, etc. It can make the scenes of Karaoke more realistic and the singers&#180; songs more beautiful.</string>
+    <string name="voice_chatroom_karaoke_introduce">This sound effect focuses on solving all kinds of problems in the Karaoke scene of single person or multi person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi person chorus, etc. It can make the scenes of Karaoke more realistic and the singers´ songs more beautiful.</string>
     <string name="voice_chatroom_gaming_buddy">Gaming Buddy</string>
     <string name="voice_chatroom_gaming_buddy_introduce">This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice.</string>
     <string name="voice_chatroom_professional_broadcaster">Professional podcaster</string>
-    <string name="voice_chatroom_professional_broadcaster_introduce">This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market.</string>
-    <string name="voice_chatroom_sound_selection_more">Need more Agora Sound Selection or custom sound. Visit <![CDATA[<font color=\'#3C4267\'><strong><u>www.agora.io.</u></strong></font>]]></string>
+    <string name="voice_chatroom_professional_broadcaster_introduce">This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The Agora stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market.</string>
+    <string name="voice_chatroom_sound_selection_more">Need more Agora Sound Selection or custom sound. Visit &lt;font color=\'#3C4267\'&gt;&lt;strong&gt;&lt;u&gt;www.agora.io.&lt;/u&gt;&lt;/strong&gt;&lt;/font&gt;<![CDATA[]]></string>
     <string name="voice_chatroom_ains_settings">AINS Settings</string>
     <string name="voice_chatroom_your_ains">Your AINS</string>
     <string name="voice_chatroom_agora_blue_bot_ains">Agora Blue Bot AINS</string>
@@ -221,7 +211,7 @@
     <string name="voice_room_off_stage">Off-Stage</string>
     <string name="voice_room_host">Host</string>
     <string name="voice_room_active">active</string>
-    <string name="voice_room_ask_upstage">Ask Upstage</string>
+    <string name="voice_room_ask_upstage">Raised Hands</string>
     <string name="voice_room_submit">Submit</string>
     <string name="voice_room_cancel_request">Cancel Request</string>
     <string name="voice_room_social_chat_following_customers">The following customers are using it</string>
@@ -234,8 +224,7 @@
     <string name="voice_room_audience_list">Audience List</string>
     <string name="voice_room_contribution_value">Contribution Value</string>
     <string name="voice_room_contribution_empty">No data</string>
-
-    <string name="voice_room_input_chat_title">Let\'s Chat</string>
+    <string name="voice_room_input_chat_title">Let's Chat</string>
     <string name="voice_room_system_msg_member_add">Joined</string>
     <string name="voice_room_login_exception">Login exception</string>
     <string name="voice_room_unavailable_tip">The room does not exist, refresh and try again</string>
