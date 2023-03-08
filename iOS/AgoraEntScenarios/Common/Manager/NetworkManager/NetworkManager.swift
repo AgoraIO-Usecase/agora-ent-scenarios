@@ -25,32 +25,32 @@ class NetworkManager:NSObject {
     }
     
     @objc enum SceneType: Int {
-        case show = 0
-        case voice = 1
-        case ktv = 2
+            case show = 0
+            case voice = 1
+            case ktv = 2
 
-        func desc() ->String {
-            switch self {
-            case .show:
-                return "show"
-            case .voice:
-                return "voice_chat"
-            case .ktv:
-                return "ktv"
-            default:
-                break
+            func desc() ->String {
+                switch self {
+                case .show:
+                    return "show"
+                case .voice:
+                    return "voice_chat"
+                case .ktv:
+                    return "ktv"
+                default:
+                    break
+                }
+
+                return "unknown"
             }
-
-            return "unknown"
         }
-    }
 
     var gameToken: String = ""
 
     typealias SuccessClosure = ([String: Any]) -> Void
     typealias FailClosure = (String) -> Void
 
-    private var sessionConfig: URLSessionConfiguration = {
+    private lazy var sessionConfig: URLSessionConfiguration = {
         let config = URLSessionConfiguration.default
         config.httpAdditionalHeaders = ["Content-Type": "application/json",
                                         "X-LC-Id": "fkUjxadPMmvYF3F3BI4uvmjo-gzGzoHsz",
@@ -204,11 +204,11 @@ class NetworkManager:NSObject {
         })
     }
     
-    @objc func voiceIdentify(channelName: String,
-                             channelType: Int,
-                             sceneType: SceneType,
-                             success: @escaping (String?) -> Void) {
-        let payload: String = getPlayloadWithSceneType(sceneType) ?? ""
+    func voiceIdentify(channelName: String,
+                       channelType: Int,
+                       sceneType: SceneType,
+                       success: @escaping (String?) -> Void) {
+        let payload: String = getPlayloadWithSceneType(.voice) ?? ""
         let params = ["appId": KeyCenter.AppId,
                       "channelName": channelName,
                       "channelType": channelType,
@@ -229,6 +229,7 @@ class NetworkManager:NSObject {
     }
     
     func getPlayloadWithSceneType(_ type: SceneType) -> String? {
+    
         let userInfo: [String: Any] = [
             "id": VLUserCenter.user.id,     //用户id
             "sceneName": type.desc()

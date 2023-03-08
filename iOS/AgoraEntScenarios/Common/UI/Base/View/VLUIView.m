@@ -4,6 +4,7 @@
 //
 
 #import "VLUIView.h"
+@import QMUIKit;
 
 @interface VLUIView ()
 
@@ -23,10 +24,10 @@
     }
     return nil;
 }
--(UITableView *)vj_parentTableView {
+-(QMUITableView *)vj_parentTableView {
     id responder = self;
     while (responder){
-        if ([responder isKindOfClass:[UITableView class]]){
+        if ([responder isKindOfClass:[QMUITableView class]]){
             return responder;
         }
         responder = [responder nextResponder];

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import AgoraSyncManager
 
 protocol TemplateServiceProtocol: NSObjectProtocol {
     /// 加入房间
