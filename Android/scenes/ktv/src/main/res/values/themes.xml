@@ -64,21 +64,4 @@
         <item name="android:textSize">12sp</item>
     </style>
 
-    <style name="ktvBeautyInputStyle">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="android:drawablePadding">15dp</item>
-        <item name="android:paddingStart">20dp</item>
-        <item name="android:paddingEnd">20dp</item>
-        <item name="android:elevation">1dp</item>
-        <item name="android:maxLines">1</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:maxLength">11</item>
-        <item name="android:textColorHint">#C7C7C7</item>
-        <item name="android:background">@drawable/bg_full_grey_r50</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:textSize">18sp</item>
-    </style>
-
 </resources>
