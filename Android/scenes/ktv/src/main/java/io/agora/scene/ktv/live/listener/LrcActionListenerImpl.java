@@ -37,7 +37,7 @@ public class LrcActionListenerImpl implements LrcControlView.OnLrcActionListener
 
     @Override
     public void onStartSing() {
-        mViewModel.leaveChorus();
+        mViewModel.leaveChorus(mContext);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class LrcActionListenerImpl implements LrcControlView.OnLrcActionListener
 
     @Override
     public void onWaitTimeOut() {
-        mViewModel.leaveChorus();
+        mViewModel.leaveChorus(mContext);
     }
 
     @Override
