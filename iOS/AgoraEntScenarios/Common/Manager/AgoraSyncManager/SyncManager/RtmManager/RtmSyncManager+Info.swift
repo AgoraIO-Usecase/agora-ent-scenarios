@@ -6,7 +6,7 @@
 //
 
 // import AgoraRtmKit
-//import AgoraRtcKit
+import AgoraRtcKit
 import Foundation
 
 extension RtmSyncManager {

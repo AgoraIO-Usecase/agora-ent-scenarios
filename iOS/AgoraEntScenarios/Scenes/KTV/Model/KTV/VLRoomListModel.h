@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, assign) BOOL isPrivate;
 @property (nonatomic, copy) NSString *password;
-@property (nonatomic, copy) NSString *creatorNo;
+@property (nonatomic, copy) NSString *creator;
 @property (nonatomic, copy) NSString *roomNo;
 @property (nonatomic, copy) NSString *isChorus;
 @property (nonatomic, assign) NSInteger bgOption;
@@ -25,6 +25,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *deletedAt;
 @property (nonatomic, copy) NSString *roomPeopleNum;
 @property (nonatomic, copy) NSString *icon;
+
+///新加字段 当前房间的创建者
+@property (nonatomic, copy) NSString *creatorNo;
 
 @property (nonatomic, copy) NSString* objectId;
 

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import AgoraSyncManager
 
 private let cSceneId = "scene_ChatRoom"
 

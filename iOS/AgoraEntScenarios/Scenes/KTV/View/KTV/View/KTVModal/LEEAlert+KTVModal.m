@@ -7,6 +7,7 @@
 
 #import "LEEAlert+KTVModal.h"
 #import "KTVMacro.h"
+@import QMUIKit;
 
 @implementation LEEAlert (KTVModal)
 + (void)popForceLeaveRoomDialogWithCompletion:(void(^)(void))completion {

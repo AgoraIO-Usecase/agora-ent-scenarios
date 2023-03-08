@@ -7,8 +7,8 @@
 #import "VLMacroDefine.h"
 #import "VLFontUtils.h"
 #import "MenuUtils.h"
-#import "KTVMacro.h"
 @import Masonry;
+@import QMUIKit;
 
 @interface VLLoginInputVerifyCodeView()
 
