@@ -1,19 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <resources>
     <string name="voice_app_name">声网语聊房</string>
     <string name="voice_app_agora_chatroom">声网语聊房</string>
     <string name="voice_app_agora_chatroom_copy_right">Powered by Agora.io</string>
     <string name="voice_agora_chat_room_create">创建聊天室</string>
-
     <string name="voice_room_list_title_name">声网语聊房</string>
     <string name="voice_tab_layout_all">全部</string>
     <string name="voice_tab_layout_chat_room">语聊房</string>
     <string name="voice_tab_layout_audio_room">空间音频房</string>
     <string name="voice_tab_layout_karaoke_room">KTV</string>
-
     <string name="voice_room_disclaimer">免责声明</string>
     <string name="voice_room_sound_selection">最佳音效</string>
     <string name="voice_room_current_customer_usage">以下客户都在用</string>
-
     <string name="voice_room_create_empty_name">房间名不能为空</string>
     <string name="voice_room_create_room_name">房间名称</string>
     <string name="voice_room_create_hint_room_name">设置房间名称</string>
@@ -32,7 +31,6 @@
     <string name="voice_room_create_tips">请输入4位数密码</string>
     <string name="voice_room_check_password">密码错误，请重试</string>
     <string name="voice_room_create_error">创建房间失败</string>
-
     <string name="voice_room_empty_data">暂无房间</string>
     <string name="voice_room_list_title_private">私密</string>
     <string name="voice_room_list_item_enter">进入</string>
@@ -40,16 +38,13 @@
     <string name="voice_room_tab_layout_count">(%1$s)</string>
     <string name="voice_room_profile_update_name_fail">修改失败</string>
     <string name="voice_room_profile_update_name_suc">修改成功</string>
-
     <string name="voice_empty_invite_hands">暂无听众</string>
     <string name="voice_empty_raised_hands">暂无上麦请求</string>
     <string name="voice_room_profile">个人信息</string>
     <string name="voice_room_close">房间销毁</string>
     <string name="voice_room_kick_member">已踢出房间</string>
     <string name="voice_member_count_action_kick">踢出</string>
-
     <string name="voice_room_welcome">欢迎来到声网语聊房！房间内严禁色情、赌博或暴力内容。</string>
-
     <!-- gift -->
     <string name="voice_gift_default_name_1">甜心</string>
     <string name="voice_gift_default_name_2">鲜花</string>
@@ -65,12 +60,10 @@
     <string name="voice_chatroom_gift_dialog_send">发送</string>
     <string name="voice_gift_sent">赠送 </string>
     <string name="voice_chatroom_gift_notice"> %1$s 送给 %2$s 一发火箭</string>
-
     <string name="voice_chatroom_send_gift_fail">礼物发送失败</string>
     <string name="voice_chatroom_create_tip1">本应用为测试产品，请勿商用</string>
     <string name="voice_chatroom_create_tip2">单次语聊房最长20分钟，过时房间将自动解散</string>
     <string name="voice_chatroom_profile_change_picture">更换头像</string>
-
     <string name="voice_room_agree_success">同意上麦成功!</string>
     <string name="voice_room_agree_fail">同意上麦失败!</string>
     <string name="voice_room_send_invited_fail">邀请失败!</string>
@@ -91,7 +84,6 @@
     <string name="voice_chatroom_mic_apply_fail">申请失败!</string>
     <string name="voice_chatroom_mic_cancel_apply_success">取消申请成功!</string>
     <string name="voice_chatroom_mic_cancel_apply_fail">取消申请失败!</string>
-
     <!-- mic -->
     <string name="voice_chatroom_mic_submit_sent">你的请求已提交,等待房主确认</string>
     <string name="voice_chatroom_open_bot_to_sound_effect">添加机器人试听音效？</string>
@@ -134,12 +126,10 @@
     <string name="voice_chatroom_join_room_success">已加入语聊房</string>
     <string name="voice_chatroom_join_room_failed">加入语聊房失败</string>
     <string name="voice_chatroom_host_invitation_sent">邀请已发送</string>
-
     <string name="voice_room_disclaimer_content_1">【声动语聊Demo】（“本产品”）是由声⽹提供的⼀款测试产品，主要⽤于向声⽹客户展示内嵌声⽹SDK后可以实现的效果。本产品仅为测试效果之⽬的提供给现有或潜在客户使⽤，⽽⾮提供给⼤众使⽤的正式产品。声⽹享有本产品的著作权和所有权，任何⼈不得对本产品进⾏修改、合并、调整、逆向⼯程、再许可和/或出售该软件的副本以及做出其他损害声⽹合法权益的⾏为。</string>
     <string name="voice_room_disclaimer_content_2">若您想试⽤本产品，欢迎您下载、安装并使⽤，声⽹特此授权您在全球范围内免费使⽤本产品的权利。本产品按“现状”提供，没有任何形式的明示或暗示担保，包括但不限于对适配性、特定⽬的的适⽤性和⾮侵权性的担保。⽆论是由于与本产品或本产品的使⽤或其他⽅式有关的任何合同、侵权或其他形式的⾏为，声⽹均不对任何索赔、损害或其他责任负责。</string>
     <string name="voice_room_disclaimer_content_3">如果您下载、安装、使⽤本产品，即表明您确认并同意声⽹对因任何原因在试⽤本产品时可能对您⾃身或他⼈造成的任何形式的损失和伤害不承担任何责任。</string>
     <string name="voice_room_disclaimer_email">若您有任何疑问，请联系support@agora.io</string>
-
     <string name="voice_chatroom_notice">公告</string>
     <string name="voice_chatroom_settings_host_only">仅房主可操作</string>
     <string name="voice_chatroom_own_audio_settings">个人音效设置</string>
@@ -237,7 +227,6 @@
     <string name="voice_room_audience_list">观众列表</string>
     <string name="voice_room_contribution_value">贡献值</string>
     <string name="voice_room_contribution_empty">没有数据</string>
-
     <string name="voice_room_input_chat_title">⼀起语聊吧</string>
     <string name="voice_room_system_msg_member_add">加入</string>
     <string name="voice_room_login_exception">登录异常</string>
@@ -245,8 +234,6 @@
     <string name="voice_room_content_prohibited">内容禁止发送</string>
     <string name="voice_room_send_tip">发送</string>
     <string name="voice_room_name_rule">房间名不合规</string>
-
     <string name="voice_room_robot_left">关闭机器人</string>
     <string name="voice_room_robot_right">音效设置</string>
-
 </resources>

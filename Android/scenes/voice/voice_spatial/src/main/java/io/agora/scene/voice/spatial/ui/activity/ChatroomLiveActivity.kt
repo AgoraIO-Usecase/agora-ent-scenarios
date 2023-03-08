@@ -462,7 +462,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                             AgoraRtcEngineController.get().sendSelfPosition(it)
                         }
                     }
-                }, 0, 100)
+                }, 0, 50)
             }
         } else if (oldValue != null && info == null) {
             spatialTimer?.cancel()

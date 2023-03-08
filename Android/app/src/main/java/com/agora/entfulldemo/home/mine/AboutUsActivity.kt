@@ -32,18 +32,18 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         binding.tvVersion.text = "20230110-2.1.0-4.1.1"
         binding.tvServiceNumber.text = servicePhone
         binding.tvHomeWebSite.text = webSite
-        binding.tvChatRoomVersion.text = "2.1.0-YL-1.2"
-        binding.tvSpaceVoiceVersion.text = "2.1.0-YLKJ-1.2"
-        binding.tvOnlineKTVVersion.text = "2.1.0-KTV-2.1.1"
+        binding.tvChatRoomVersion.text = "YL-2.1.0"
+        binding.tvSpaceVoiceVersion.text = "YLSA-2.1.0"
+        binding.tvOnlineKTVVersion.text = "KTV-2.1.0"
     }
 
-    fun setupClickWebAction() {
+    private fun setupClickWebAction() {
         binding.vHomeWebPage.setOnClickListener {
             PagePilotManager.pageWebView(webSite)
         }
     }
 
-    fun setupClickPhoneAction() {
+    private fun setupClickPhoneAction() {
         binding.vServicePhone.setOnClickListener {
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CALL_PHONE),1)
