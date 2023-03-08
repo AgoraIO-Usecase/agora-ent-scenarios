@@ -4,9 +4,13 @@
 //
 
 #import "VLMineTCell.h"
-#import "KTVMacro.h"
+@import QMUIKit;
+@import YYCategories;
 
 @interface VLMineTCell ()
+
+
+
 @end
 
 @implementation VLMineTCell

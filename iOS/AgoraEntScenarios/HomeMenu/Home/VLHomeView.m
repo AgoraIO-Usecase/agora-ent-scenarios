@@ -8,7 +8,7 @@
 #import "VLHomeItemModel.h"
 #import "VLMacroDefine.h"
 #import "MenuUtils.h"
-#import "KTVMacro.h"
+@import QMUIKit;
 @import YYCategories;
 
 @interface VLHomeView ()<UICollectionViewDelegate,UICollectionViewDataSource>
@@ -84,8 +84,8 @@
             @{
                 @"bgImgStr":@"home_talk_bg",
                 @"iconImgStr":@"home_talk_icon",
-                @"titleStr":AGLocalizedString(@"ChatRoom"),
-                @"subTitleStr":@""
+                @"titleStr":AGLocalizedString(@"语聊房"),
+                @"subTitleStr":AGLocalizedString(@"")
             },
             @{
                 @"bgImgStr":@"home_KTV_bg",

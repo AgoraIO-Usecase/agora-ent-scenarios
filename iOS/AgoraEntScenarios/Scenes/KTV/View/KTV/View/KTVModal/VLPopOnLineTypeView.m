@@ -8,13 +8,14 @@
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
 #import "KTVMacro.h"
+@import QMUIKit;
 @import YYCategories;
 
 @interface VLPopOnLineTypeView ()
 
 @property(nonatomic, weak) id <VLPopOnLineTypeViewDelegate>delegate;
-@property (nonatomic, strong) UIButton *audioBtn;
-@property (nonatomic, strong) UIButton *videoBtn;
+@property (nonatomic, strong) QMUIButton *audioBtn;
+@property (nonatomic, strong) QMUIButton *videoBtn;
 @property (nonatomic, strong) UIImageView *audioSelImgView;
 @property (nonatomic, strong) UIImageView *videoSelImgView;
 
@@ -48,13 +49,10 @@
     CGFloat margin = VLREALVALUE_WIDTH(20);
     CGFloat itemW = (SCREEN_WIDTH-3*margin)/2.0;
     
-//    QMUIButton *audioBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"]
-//                                                            title:KTVLocalizedString(@"音频上麦")];
-    UIButton *audioBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [audioBtn setTitle:KTVLocalizedString(@"音频上麦") forState:UIControlStateNormal];
-    [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"] forState:UIControlStateNormal];
+    QMUIButton *audioBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"]
+                                                            title:KTVLocalizedString(@"音频上麦")];
     audioBtn.frame = CGRectMake(margin, titleLabel.bottom+26, itemW, VLREALVALUE_WIDTH(72));
-//    audioBtn.imagePosition = QMUIButtonImagePositionLeft;
+    audioBtn.imagePosition = QMUIButtonImagePositionLeft;
     audioBtn.spacingBetweenImageAndTitle = 16;
     audioBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [audioBtn setTitleColor:UIColorMakeWithHex(@"#C6C4DE") forState:UIControlStateNormal];
@@ -63,7 +61,7 @@
     audioBtn.layer.masksToBounds = YES;
     audioBtn.tag = 0;
     self.audioBtn = audioBtn;
-//    self.audioBtn.adjustsButtonWhenHighlighted = NO;
+    self.audioBtn.adjustsButtonWhenHighlighted = NO;
     self.audioBtn.layer.borderWidth = 1.5f;
     self.audioSelImgView.hidden = YES;
     [audioBtn addTarget:self action:@selector(typeBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
@@ -75,13 +73,10 @@
     self.audioSelImgView.hidden = YES;
     [self addSubview:self.audioSelImgView];
     
-//    QMUIButton *videoBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"]
-//                                                            title:KTVLocalizedString(@"视频上麦")];
-    UIButton *videoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [audioBtn setTitle:KTVLocalizedString(@"视频上麦") forState:UIControlStateNormal];
-    [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"] forState:UIControlStateNormal];
+    QMUIButton *videoBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"]
+                                                            title:KTVLocalizedString(@"视频上麦")];
     videoBtn.frame = CGRectMake(audioBtn.right+margin, audioBtn.top, itemW, VLREALVALUE_WIDTH(72));
-//    videoBtn.imagePosition = QMUIButtonImagePositionLeft;
+    videoBtn.imagePosition = QMUIButtonImagePositionLeft;
     videoBtn.spacingBetweenImageAndTitle = 16;
     videoBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [videoBtn setTitleColor:UIColorMakeWithHex(@"#C6C4DE") forState:UIControlStateNormal];
@@ -91,7 +86,7 @@
     videoBtn.tag = 1;
     self.videoBtn = videoBtn;
     self.videoBtn.layer.borderWidth = 1.5f;
-//    self.videoBtn.adjustsButtonWhenHighlighted = NO;
+    self.videoBtn.adjustsButtonWhenHighlighted = NO;
     [videoBtn addTarget:self action:@selector(typeBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [videoBtn setBackgroundColor:UIColorMakeWithHex(@"#000000")];
     [self addSubview:videoBtn];
@@ -102,7 +97,7 @@
     [self addSubview:self.videoSelImgView];
 }
 
-- (void)typeBtnClickEvent:(UIButton *)sender {
+- (void)typeBtnClickEvent:(QMUIButton *)sender {
     if (sender.tag == 0) {
         self.audioBtn.layer.borderColor = UIColorMakeWithHex(@"#009FFF").CGColor;
         self.videoBtn.layer.borderColor = UIColorClear.CGColor;

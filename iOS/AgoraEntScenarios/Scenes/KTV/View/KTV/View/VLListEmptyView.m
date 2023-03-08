@@ -6,6 +6,8 @@
 #import "VLListEmptyView.h"
 #import "VLMacroDefine.h"
 #import "KTVMacro.h"
+@import QMUIKit;
+@import YYCategories;
 
 @implementation VLListEmptyView
 

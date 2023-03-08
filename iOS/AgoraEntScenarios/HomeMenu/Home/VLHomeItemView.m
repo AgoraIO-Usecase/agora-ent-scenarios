@@ -6,7 +6,8 @@
 #import "VLHomeItemView.h"
 #import "VLHomeItemModel.h"
 #import "VLMacroDefine.h"
-#import "KTVMacro.h"
+@import YYCategories;
+@import QMUIKit;
 
 @interface VLHomeItemView ()
 

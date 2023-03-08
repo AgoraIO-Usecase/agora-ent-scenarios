@@ -56,35 +56,35 @@ public struct Scene: Codable {
 }
 
 /* key 是对象存储中的id, 在rtm中是channelAttribute的key, value在对象存储中是一条记录, 在rtm中是一个json字符串 */
-open class Attribute: IObject, Equatable {
+class Attribute: IObject, Equatable {
     var object: String
     var key: String
-    public func getId() -> String {
+    func getId() -> String {
         return key
     }
     
-    public func getPropertyWith(key: String, type: Any.Type) -> Any? {
+    func getPropertyWith(key: String, type: Any.Type) -> Any? {
         let dict = Utils.getDict(text: object)
         return dict?[key]
     }
     
-    public func toJson() -> String? {
+    func toJson() -> String? {
         var dict = Utils.toDictionary(jsonString: object)
         dict["objectId"] = key
         return Utils.toJsonString(dict: dict)
     }
     
-    public init(key: String, value: String) {
+    init(key: String, value: String) {
         self.key = key
         self.object = value
     }
     
-    public static func == (lhs: Attribute, rhs: Attribute) -> Bool {
+    static func == (lhs: Attribute, rhs: Attribute) -> Bool {
         return lhs.object == rhs.object &&
         lhs.key == rhs.key
     }
     
-    public func toObject<T>() throws -> T? where T : Decodable {
+    func toObject<T>() throws -> T? where T : Decodable {
         let jsonDecoder = JSONDecoder()
         if let data = object.data(using: .utf8) {
             return try jsonDecoder.decode(T.self, from: data)

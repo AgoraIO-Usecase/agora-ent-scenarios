@@ -4,13 +4,14 @@
 //
 
 #import <UIKit/UIKit.h>
+@import QMUIKit;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLUIView : UIView
 
 -(UIViewController *)vj_viewController;
--(UITableView *)vj_parentTableView;
+-(QMUITableView *)vj_parentTableView;
 
 @end
 
