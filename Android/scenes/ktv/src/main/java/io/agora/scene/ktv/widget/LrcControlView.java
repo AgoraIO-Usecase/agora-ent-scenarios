@@ -172,6 +172,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
         mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.INVISIBLE);
         mBinding.ilActive.ivLeaveChorus.setVisibility(View.VISIBLE);
+        mBinding.ilActive.ivJoinChorusLoading.setVisibility(INVISIBLE);
     }
 
     public void onSelfLeavedChorus() {
@@ -519,6 +520,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.ivSkipPostlude.setVisibility(INVISIBLE);
         } else if (v == mBinding.ilActive.ivJoinChorusBtn) {
             mOnKaraokeActionListener.onJoinChorus();
+            mBinding.ilActive.ivJoinChorusLoading.setVisibility(VISIBLE);
         } else if (v == mBinding.ilActive.ivLeaveChorus) {
             mOnKaraokeActionListener.onLeaveChorus();
         }
