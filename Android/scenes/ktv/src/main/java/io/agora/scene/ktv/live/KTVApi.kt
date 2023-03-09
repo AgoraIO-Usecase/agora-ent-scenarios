@@ -15,7 +15,11 @@ import io.agora.scene.ktv.widget.LrcControlView
  * KTVSingRoleAudience 观众
  */
 enum class KTVSingRole(val value: Int) {
-    KTVSingRoleMainSinger(0), KTVSingRoleCoSinger(1), KTVSingRoleFollowSinger(2), KTVSingRoleAudience(3)
+    KTVSingRoleMainSinger(0),
+    KTVSingRoleCoSinger(1),
+    KTVSingRoleFollowSinger(2),
+    KTVSingRoleAudience(3),
+    KTVSingRoleChorusMainSinger(4)
 }
 
 /**
@@ -34,16 +38,36 @@ enum class KTVPlayerTrackMode(val value: Int) {
  *
  */
 enum class KTVLoadSongState(val value: Int) {
-    KTVLoadSongStateOK(0), KTVLoadSongStateInProgress(1), KTVLoadSongStateNoLyricUrl(2), KTVLoadSongStatePreloadFail(3), KTVLoadSongStateIdle(4)
+    KTVLoadSongStateOK(0),
+    KTVLoadSongStateFailed(1),
+    KTVLoadSongStateInProgress(2),
+    KTVLoadSongStateIdle(3)
+}
+
+enum class KTVLoadSongFailReason(val value: Int) {
+    NONE(0),
+    KTVLoadSongStateNoLyricUrl(1),
+    KTVLoadSongStatePreloadFail(2),
+    KTVLoadSongStatePreloadFailAndNoLyricUrl(3)
+}
+
+
+enum class SwitchRoleState(val value: Int) {
+    KTVSwitchRoleStateSuccess(0),
+    KTVSwitchRoleStateJoinChannelFailed(1),
+    KTVSwitchRoleStatePreloadFail(2),
+    KTVSwitchRoleStatePreloadFailAndJoinChannelFailed(3),
+    KTVSwitchRoleStateErrorNewRole(4)
 }
 
 /**
  * SUCCESS 加入合唱成功
  * FAIL 加入合唱失败
  */
-enum class KTVJoinState(val value: Int) {
-    SUCCESS(0), FAIL(1)
-};
+enum class KTVJoinChorusState(val value: Int) {
+    SUCCESS(0),
+    FAIL(1)
+}
 
 /**
  * MUSIC_PRELOAD_FAIL 歌曲预加载失败
@@ -51,7 +75,25 @@ enum class KTVJoinState(val value: Int) {
  * JOIN_CHANNEL_FAIL 加入 RTC 频道失败
  */
 enum class KTVJoinFailReasonType(val value: Int) {
-    MUSIC_PRELOAD_FAIL(0), MUSIC_OPEN_FAIL(1), JOIN_CHANNEL_FAIL(2)
+    NONE(0),
+    MUSIC_PRELOAD_FAIL(1),
+    MUSIC_OPEN_FAIL(2),
+    JOIN_CHANNEL_FAIL(3),
+}
+
+interface OnMusicLoadStateListener {
+    fun onMusicLoadSuccess(
+        songCode: Long, lyricUrl: String
+    )
+
+    fun onMusicLoadFail(
+        songCode: Long, lyricUrl: String, reason: KTVLoadSongFailReason
+    )
+}
+
+interface OnJoinChorusStateListener {
+    fun onJoinChorusSuccess()
+    fun onJoinChorusFail(reason: KTVJoinFailReasonType)
 }
 
 abstract class IKTVApiEventHandler {
@@ -66,46 +108,11 @@ abstract class IKTVApiEventHandler {
     }
 
     /**
-     * Mcc 歌曲列表信息
-     */
-    open fun onMusicCollectionResult(
-        requestId: String?,
-        status: Int,
-        page: Int,
-        pageSize: Int,
-        total: Int,
-        list: Array<out Music>?
-    ) {
-    }
-
-    /**
-     * Mcc 榜单信息
-     */
-    open fun onMusicChartsResult(
-        requestId: String?, status: Int, list: Array<out MusicChartInfo>?
-    ) {
-    }
-
-    /**
-     * 歌曲加载状态信息
-     */
-    open fun onMusicLoadStateChanged(
-        songCode: Long,
-        lyricUrl: String,
-        role: KTVSingRole,
-        state: KTVLoadSongState
-    ) {
-    }
-
-    /**
-     * 加入合唱状态信息
-     */
-    open fun onJoinChorusStateChanged(status: KTVJoinState, reason: KTVJoinFailReasonType) {}
-
-    /**
      *
      */
     open fun onSingingScoreResult(score: Float) {}
+
+    open fun onSingerRoleChanged(oldRole: KTVSingRole, newRole: KTVSingRole) {}
 }
 
 /**
@@ -128,7 +135,7 @@ data class KTVApiConfig(
     val channelName: String,
     val dataStreamId: Int,
     val localUid: Int
-);
+)
 
 /**
  * @param role 唱歌的角色
@@ -136,10 +143,10 @@ data class KTVApiConfig(
  * @param mainSingerUid 主唱的 Uid，如果是伴唱，伴唱需要根据这个信息 mute 主频道主唱的声音
  */
 data class KTVSongConfiguration(
-    val role: KTVSingRole,
+    val autoPlay: Boolean,
     val songCode: Long,
-    val mainSingerUid: Int,
-);
+    val mainSingerUid: Int
+)
 
 
 interface KTVApi {
@@ -165,31 +172,51 @@ interface KTVApi {
     fun release()
 
     /**
-     * 获取歌曲类型
+     * 获取歌曲榜单
      */
-    fun getMusicCharts(): String
+    fun fetchMusicCharts(onMusicChartResultListener: (requestId: String?, status: Int, list: Array<out MusicChartInfo>?) -> Unit)
 
     /**
-     * 根据歌曲类型拉取歌单
+     * 根据歌曲榜单类型拉取歌单
      */
-    fun getMusicCollectionByMusicChartId(
+    fun searchMusicByMusicChartId(
         musicChartId: Int,
         page: Int,
         pageSize: Int,
-        jsonOption: String
-    ): String
+        jsonOption: String,
+        onMusicCollectionResultListener: (requestId: String?,
+                                          status: Int,
+                                          page: Int,
+                                          pageSize: Int,
+                                          total: Int,
+                                          list: Array<out Music>?) -> Unit
+    )
 
     /**
      * 搜索歌曲
      */
-    fun searchMusic(keyword: String, page: Int, pageSize: Int, jsonOption: String): String
+    fun searchMusicByKeyword(
+        keyword: String,
+        page: Int, pageSize: Int,
+        jsonOption: String,
+        onMusicCollectionResultListener: (requestId: String?,
+                                          status: Int,
+                                          page: Int,
+                                          pageSize: Int,
+                                          total: Int,
+                                          list: Array<out Music>?) -> Unit
+    )
+
 
     /**
      * 加载歌曲
      */
-    fun loadSong(
-        config: KTVSongConfiguration
-    )
+    fun loadMusic(config: KTVSongConfiguration, onMusicLoadStateListener: OnMusicLoadStateListener)
+
+    /**
+     * 切换演唱身份
+     */
+    fun switchSingerRole(newRole: KTVSingRole, token: String, onSwitchRoleState: (state: SwitchRoleState) -> Unit)
 
     /**
      * 播放歌曲
@@ -197,72 +224,33 @@ interface KTVApi {
     fun startSing(startPos: Long)
 
     /**
-     * 停止播放歌曲
-     */
-    fun stopSing()
-
-    /**
-     * 加入合唱
-     */
-    fun joinChorus(token: String, role: KTVSingRole)
-
-    /**
-     * 离开合唱
-     */
-    fun leaveChorus()
-
-    /**
      * 恢复播放
      */
-    fun resumeMusicPlayer()
+    fun resumeSing()
 
     /**
      * 暂停播放
      */
-    fun pauseMusicPlayer()
+    fun pauseSing()
 
     /**
      * 调整进度
      */
-    fun seekMusicPlayer(time: Long)
-
-    /**
-     * 调整音乐本地播放的声音 （主唱&&伴唱都可以调节）
-     */
-    fun adjustMusicPlayerPlayoutVolume(volume: Int)
-
-    /**
-     * 调整音乐推送到远端的声音大小 （主唱调整）
-     */
-    fun adjustMusicPlayerPublishVolume(volume: Int)
-
-    /**
-     * 调整本地播放远端伴唱人声音量的大小（主唱 && 伴唱都可以调整）
-     * 观众调整的是远端所有音乐 + 人声的音量大小
-     */
-    fun adjustPlaybackVolume(volume: Int)
-    /**
-     * 选择音轨，原唱、伴唱
-     */
-    fun selectPlayerTrackMode(mode: KTVPlayerTrackMode)
+    fun seekSing(time: Long)
 
     /**
      * 设置歌词组件，在任意时机设置都可以生效
      */
-    fun setLycView(view: LrcControlView)
+    fun setLrcView(view: LrcControlView)
 
     /**
      * 设置当前mic开关状态
+     * 目前关麦调用 adjustRecordSignalVolume(0) 后 onAudioVolumeIndication 仍然会执行， ktvApi需要增加一个变量判断当前是否关麦， 如果关麦把设置给歌词组件的pitch改为0
      */
-    fun setIsMicOpen(isOnMicOpen: Boolean)
+    fun setMicStatus(isOnMicOpen: Boolean)
 
     /**
      * 获取mpk实例
      */
     fun getMediaPlayer(): IMediaPlayer
-
-    /**
-     * 获取mcc实例
-     */
-    fun getMusicCenter(): IAgoraMusicContentCenter
 }

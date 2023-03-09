@@ -608,10 +608,12 @@ class KTVSyncManagerServiceImp(
     override fun joinChorus(
         completion: (error: Exception?) -> Unit
     ) {
+        //加入合唱
         seatMap.forEach {
             if (it.value?.userNo == UserManager.getInstance().user.id.toString()) {
                 val originSeatInfo = it.value
                 if (originSeatInfo != null) {
+                    // 座位 joinSing -> true
                     val seatInfo = RoomSeatModel(
                         originSeatInfo.isMaster,
                         originSeatInfo.headUrl,
@@ -623,6 +625,7 @@ class KTVSyncManagerServiceImp(
                         originSeatInfo.isAudioMuted,
                         originSeatInfo.isVideoMuted
                     )
+                    // songModel chorusNum + 1
                     updateChorusMemberNum(true)
                     innerUpdateSeat(seatInfo, completion)
                 }
