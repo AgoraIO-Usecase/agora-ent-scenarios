@@ -43,17 +43,12 @@ public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListe
 
     @Override
     public void onJoinChorus() {
-        //mViewModel.joinChorus();
+        mViewModel.joinChorus();
     }
 
     @Override
-    public void onWaitTimeOut() {
+    public void onLeaveChorus() {
         mViewModel.leaveChorus();
-    }
-
-    @Override
-    public void onCountTime(int time) {
-        //mViewModel.musicCountDown(time);
     }
 
     @Override

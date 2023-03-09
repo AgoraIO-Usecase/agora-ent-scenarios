@@ -267,7 +267,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
             roomLivingViewModel.toggleMic(b);
         });
-        getBinding().iBtnJoinChorus.setOnClickListener(v -> onClickJoinChorus());
         getBinding().iBtnChooseSong.setOnClickListener(v -> showChooseSongDialog());
         getBinding().btnMenu.setOnClickListener(this::showMoreDialog);
         getBinding().btnOK.setOnClickListener(view -> getBinding().groupResult.setVisibility(View.GONE));
@@ -383,10 +382,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.onPrepareStatus(roomLivingViewModel.isRoomOwner());
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_JOIN_CHORUS) {
                 getBinding().lrcControlView.onSelfJoinedChorus();
-                getBinding().iBtnJoinChorus.setVisibility(View.INVISIBLE);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_LEAVE_CHORUS) {
                 getBinding().lrcControlView.onSelfLeavedChorus();
-                getBinding().iBtnJoinChorus.setVisibility(View.VISIBLE);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PLAYING) {
                 getBinding().lrcControlView.onPlayStatus(roomLivingViewModel.songPlayingLiveData.getValue());
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE) {
@@ -398,7 +395,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_END) {
                 getBinding().lrcControlView.setEnabled(true);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_STOP) {
-                getBinding().iBtnJoinChorus.setVisibility(View.INVISIBLE);
+
             }
         });
         roomLivingViewModel.playerMusicOpenDurationLiveData.observe(this, duration -> {
@@ -548,10 +545,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().lrcControlView.setMusic(music);
         if (UserManager.getInstance().getUser().id.toString().equals(music.getUserNo())) {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Singer);
-            getBinding().iBtnJoinChorus.setVisibility(View.INVISIBLE);
         } else {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
-            getBinding().iBtnJoinChorus.setVisibility(View.VISIBLE);
         }
         roomLivingViewModel.musicStartPlay(music);
         mRoomSpeakerAdapter.notifyDataSetChanged();
