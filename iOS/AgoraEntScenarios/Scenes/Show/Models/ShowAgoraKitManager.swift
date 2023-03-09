@@ -49,33 +49,10 @@ class ShowAgoraExProxy: ShowAgoraProxy, AgoraRtcEngineDelegate {
 }
 
 class ShowAgoraKitManager: NSObject {
-    /*
-    lazy var musicDataArray: [ShowMusicConfigData] = {
-        return [musicBg, beautyVoice, mixVoice]
-    }()
-    
-    // 背景音乐
-    lazy var musicBg: ShowMusicConfigData = {
-        return musicBgConfigData()
-    }()
-    
-    // 美声
-    lazy var beautyVoice: ShowMusicConfigData = {
-        return beautyVoiceConfigData()
-    }()
-    
-    // 混响
-    lazy var mixVoice: ShowMusicConfigData = {
-        return mixVoiceConfigData()
-    }()
-    */
     
     // 是否开启绿幕功能
     static var isOpenGreen: Bool = false
     static var isBlur: Bool = false
-    
-    // 预设类型
-    var presetType: ShowPresetType?
     
     var srIsOn = false
     var srType: SRType = .x1_33
@@ -631,13 +608,6 @@ extension ShowAgoraKitManager {
         let mediaOptions = AgoraRtcChannelMediaOptions()
         mediaOptions.autoSubscribeVideo = false
         agoraKit.updateChannelEx(with: mediaOptions, connection: connection)
-//        exConnectionMap.forEach { key, connention in
-//            if key != roomid {
-//                let mediaOptions = AgoraRtcChannelMediaOptions()
-//                mediaOptions.autoSubscribeVideo = false
-//                agoraKit.updateChannelEx(with: mediaOptions, connection: connention)
-//            }
-//        }
     }
     
     func setOffMediaOptionsAudio() {
