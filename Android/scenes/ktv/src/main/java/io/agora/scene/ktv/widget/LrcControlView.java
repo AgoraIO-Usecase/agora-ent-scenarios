@@ -266,27 +266,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     public void setRole(@NonNull Role mRole) {
         this.mRole = mRole;
-//        if (this.mRole == Role.Singer) {
-//            mBinding.ilActive.lyricsView.enableDragging(true);
-//            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
-//            mBinding.ilActive.switchOriginal.setChecked(false);
-//            mBinding.ilActive.ivSkipPostlude.setVisibility(View.INVISIBLE);
-//            mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.INVISIBLE);
-//            mBinding.ilActive.ivLeaveChorus.setVisibility(View.INVISIBLE);
-//        } else if (this.mRole == Role.Partner) {
-//            mBinding.ilActive.switchOriginal.setChecked(false);
-//            mBinding.ilActive.lyricsView.enableDragging(false);
-//            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
-//            mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
-//            mBinding.ilActive.ivChangeSong.setVisibility(View.INVISIBLE);
-//            mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
-//            mBinding.ilActive.ivSkipPrelude.setVisibility(View.INVISIBLE);
-//            mBinding.ilActive.ivSkipPostlude.setVisibility(View.INVISIBLE);
-//        } else if (this.mRole == Role.Listener) {
-//            mBinding.ilActive.lyricsView.enableDragging(false);
-//            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.INVISIBLE);
-//            mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.VISIBLE);
-//        }
     }
 
     public void setMusic(@NonNull RoomSelSongModel mMusic) {
