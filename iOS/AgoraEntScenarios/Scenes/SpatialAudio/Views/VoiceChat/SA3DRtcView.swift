@@ -23,6 +23,7 @@ class SA3DRtcView: UIView {
     private var lastTime: CFAbsoluteTime = CFAbsoluteTimeGetCurrent()
     private lazy var redSpatialParams = AgoraSpatialAudioParams()
     private lazy var blueSpatialParams = AgoraSpatialAudioParams()
+    private var isPlaying: Bool = false
     
     public var clickBlock: ((SABaseUserCellType, Int) -> Void)?
     public var activeBlock: ((SABaseUserCellType) -> Void)?
@@ -419,13 +420,13 @@ extension SA3DRtcView {
                 setMediaPlayerPosition(pos: info.pos ?? [],
                                        forward: info.forward,
                                        playerId: Int(rtcKit?.redMediaPlayer?.getMediaPlayerId() ?? 0))
-                rtcKit?.redMediaPlayer?.setSpatialAudioParams(redSpatialParams)
+//                rtcKit?.redMediaPlayer?.setSpatialAudioParams(redSpatialParams)
                 
             case 3: // blue robot
                 setMediaPlayerPosition(pos: info.pos ?? [],
                                        forward: info.forward,
                                        playerId: Int(rtcKit?.blueMediaPlayer?.getMediaPlayerId() ?? 0))
-                rtcKit?.blueMediaPlayer?.setSpatialAudioParams(blueSpatialParams)
+//                rtcKit?.blueMediaPlayer?.setSpatialAudioParams(blueSpatialParams)
                 
             default:
                 if info.member?.uid == VLUserCenter.user.id {
@@ -639,9 +640,10 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
     }
     
     func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
-        if state == .playing {
+        if state == .playing && isPlaying == false {
             updateSpatialPos()
             updateCenterUserPosition()
         }
+        isPlaying = state == .playing
     }
 }
