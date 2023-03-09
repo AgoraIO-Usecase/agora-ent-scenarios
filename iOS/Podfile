@@ -68,7 +68,7 @@ def all_pods
   
   
   #need to remove
-  pod 'MJRefresh'
+#  pod 'MJRefresh'
 end
 
 target 'AgoraEntScenarios' do

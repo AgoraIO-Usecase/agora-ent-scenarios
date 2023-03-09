@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import MJRefresh
 
 private let kAudienceShowPresetType = "kAudienceShowPresetType"
 
@@ -14,7 +13,6 @@ class ShowRoomListVC: UIViewController {
 
     private var roomListView: ShowRoomListView!
     private var roomList: [ShowRoomListModel]?
-    
     private var previewConfig: ShowAgoraPreviewConfig?
     
     // 自定义导航栏
@@ -41,7 +39,7 @@ class ShowRoomListVC: UIViewController {
         super.viewDidLoad()
         setUpUI()
         setUpNaviBar()
-        addRefresh()
+//        addRefresh()
     }
     
     @objc private func didClickSettingButton(){
@@ -102,6 +100,10 @@ class ShowRoomListVC: UIViewController {
                 wSelf.joinRoom(room)
             }
         }
+        roomListView.refreshValueChanged = { [weak self] in
+            self?.getRoomList()
+        }
+        
         view.addSubview(roomListView)
         roomListView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -172,7 +174,8 @@ class ShowRoomListVC: UIViewController {
     private func getRoomList() {
         AppContext.showServiceImp("").getRoomList(page: 1) { [weak self] error, roomList in
             guard let self = self else {return}
-            self.roomListView.collectionView.mj_header?.endRefreshing()
+//            self.roomListView.collectionView.mj_header?.endRefreshing()
+            self.roomListView.endRefrshing()
             if let error = error {
                 ToastView.show(text: error.localizedDescription)
                 return
@@ -181,13 +184,6 @@ class ShowRoomListVC: UIViewController {
             self.roomListView.roomList = list
             self.roomList = list
         }
-    }
-    
-    // 下拉刷新
-    private func addRefresh(){
-        roomListView.collectionView.mj_header = MJRefreshNormalHeader(refreshingBlock: { [weak self] in
-            self?.getRoomList()
-        })
     }
 }
 
