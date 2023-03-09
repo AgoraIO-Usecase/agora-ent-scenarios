@@ -46,7 +46,7 @@
     <View
         android:id="@+id/bgd_control_layout_lrc"
         android:layout_width="match_parent"
-        android:layout_height="22dp"
+        android:layout_height="40dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent" />
 
@@ -133,8 +133,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@mipmap/ic_hechuang"
-        android:layout_marginBottom="20dp"
+        android:background="@mipmap/ic_join_chorus"
+        android:layout_marginBottom="10dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+        android:id="@+id/ivJoinChorusLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@mipmap/ic_join_chorus_loading"
+        android:layout_marginBottom="10dp"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
