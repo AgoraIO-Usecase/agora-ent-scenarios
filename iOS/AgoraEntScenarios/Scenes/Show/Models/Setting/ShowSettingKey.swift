@@ -157,15 +157,6 @@ enum ShowSettingKey: String, CaseIterable {
     case musincVolume           // 音乐音量
     case audioBitRate           // 音频码率
     case captureVideoSize       // 采集分辨率
-    case captureFrameRate       // 采集码率
-    case focusFace              // 人脸对焦
-    case encode                 // 硬编/软编
-    case codeCType                // 编码器
-    case mirror                 // 镜像
-    case renderMode             // 模式
-    case debugSrType            // 超分倍数
-    case debugSR                // debug超分开关
-    case debugPVC               // pvc
     
     var title: String {
         switch self {
@@ -201,24 +192,6 @@ enum ShowSettingKey: String, CaseIterable {
             return "show_advance_setting_audio_bitRate_title".show_localized
         case .captureVideoSize:
             return ""
-        case .captureFrameRate:
-            return ""
-        case .focusFace:
-            return "人脸对焦"
-        case .encode:
-            return "硬编/软编"
-        case .codeCType:
-            return "编码器"
-        case .mirror:
-            return "镜像"
-        case .renderMode:
-            return "fit/hidden"
-        case .debugSrType:
-            return "超分倍数"
-        case .debugSR:
-            return "超分开关"
-        case .debugPVC:
-            return "PVC"
         }
     }
     
@@ -257,24 +230,6 @@ enum ShowSettingKey: String, CaseIterable {
             return .label
         case .captureVideoSize:
             return .label
-        case .captureFrameRate:
-            return .label
-        case .focusFace:
-            return .aSwitch
-        case .encode:
-            return .label
-        case .codeCType:
-            return .label
-        case .mirror:
-            return .aSwitch
-        case .renderMode:
-            return .label
-        case .debugSrType:
-            return .label
-        case .debugSR:
-            return .aSwitch
-        case .debugPVC:
-            return .aSwitch
         }
     }
     
@@ -321,7 +276,7 @@ enum ShowSettingKey: String, CaseIterable {
         switch self {
         case .videoEncodeSize:
             return ShowAgoraVideoDimensions.allCases.map({ $0.rawValue })
-        case .FPS, .captureFrameRate:
+        case .FPS:
             return [AgoraVideoFrameRate.fps1.stringValue(),
                     AgoraVideoFrameRate.fps7.stringValue(),
                     AgoraVideoFrameRate.fps10.stringValue(),
@@ -332,14 +287,6 @@ enum ShowSettingKey: String, CaseIterable {
             return ["2","3","5"]
         case .captureVideoSize:
             return ShowAgoraCaptureVideoDimensions.allCases.map({ "\($0.rawValue)P" })
-        case .encode:
-            return ShowAgoraEncode.allCases.map({$0.rawValue})
-        case .codeCType:
-            return ShowAgoraCodeCType.allCases.map({$0.rawValue})
-        case .renderMode:
-            return ShowAgoraRenderMode.allCases.map({$0.rawValue})
-        case .debugSrType:
-            return ShowAgoraSRType.allCases.map({$0.rawValue})
         default:
             return []
         }
