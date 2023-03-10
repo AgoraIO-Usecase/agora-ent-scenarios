@@ -1,3 +1,4 @@
+#coding=utf-8
 import os, sys
 
 def modfiy(path, beauty_type):
@@ -5,13 +6,13 @@ def modfiy(path, beauty_type):
         contents = []
         for num, line in enumerate(file):
             line = line.strip()
-            if beauty_type == '字节':
+            if beauty_type == '字节' and 'bytedEffect' in line:
                 line = "pod 'bytedEffect', :path => 'bytedEffect.podspec'"
 
-            elif beauty_type == '相芯' in line:
+            elif beauty_type == '相芯' and 'fuLib' in line:
                 line = "pod 'fuLib', :path => 'fu.podspec'"
 
-            elif beauty_type == '商汤' in line:
+            elif beauty_type == '商汤' and 'senseLib' in line:
                 line = "pod 'senseLib', :path => 'sense.podspec'"
 
             contents.append(line)
