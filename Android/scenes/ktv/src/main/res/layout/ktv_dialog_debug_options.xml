@@ -46,13 +46,59 @@
     </LinearLayout>
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="打分难度"
+            android:textColor="@color/def_text_grey_979" />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/scoring_level_tune"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:max="100"
+            android:min="0"
+            android:progress="10" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="打分补偿"
+            android:textColor="@color/def_text_grey_979" />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/scoring_offset_tune"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:max="100"
+            android:min="-100"
+            android:progress="0" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:visibility="gone"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="wrap_content"
@@ -76,8 +122,8 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:gravity="center"
-        android:visibility="gone"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="wrap_content"
@@ -120,8 +166,8 @@
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:overScrollMode="never"
-        android:visibility="gone"
-        android:scrollbars="none">
+        android:scrollbars="none"
+        android:visibility="gone">
 
         <RadioGroup
             android:id="@+id/radioGroup"

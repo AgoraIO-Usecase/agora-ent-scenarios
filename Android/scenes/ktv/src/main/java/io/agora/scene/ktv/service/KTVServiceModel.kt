@@ -155,3 +155,8 @@ data class MakeSongTopInputModel(
 data class UpdateSingingScoreInputModel(
     val score: Double
 )
+
+data class ScoringAlgoControlModel(
+    val level: Int,
+    val offset: Int
+)

@@ -3,6 +3,7 @@ package io.agora.scene.ktv.debugSettings;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,9 +42,47 @@ public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvDia
                 mSetting.enableAudioDump(isChecked);
             }
         });
+
+        mBinding.scoringLevelTune.setProgress(mSetting.getScoringLevel());
+        mBinding.scoringLevelTune.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    mSetting.setScoringControl(progress, mSetting.getScoringOffset());
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        mBinding.scoringOffsetTune.setProgress(mSetting.getScoringOffset());
+        mBinding.scoringOffsetTune.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    mSetting.setScoringControl(mSetting.getScoringLevel(), progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
     }
 
     public interface Callback {
         void onAudioDumpEnable(boolean enable);
+
+        void onScoringControl(int level, int offset);
     }
 }
