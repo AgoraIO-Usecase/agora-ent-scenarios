@@ -65,7 +65,7 @@ class NetworkManager:NSObject {
 
     @objc static let shared = NetworkManager()
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
-    private let baseServerUrl: String = KeyCenter.onlineBaseServerUrl ?? ""
+    private let baseServerUrl: String = "https://toolbox.bj2.agoralab.co/v1/"
     
     /// get tokens
     /// - Parameters:
@@ -107,7 +107,7 @@ class NetworkManager:NSObject {
                        type: AgoraTokenType,
                        success: @escaping (String?) -> Void)
     {
-        let params = ["appCertificate": KeyCenter.Certificate,
+        let params = ["appCertificate": KeyCenter.Certificate ?? "",
                       "appId": KeyCenter.AppId,
                       "channelName": channelName,
                       "expire": 1500,
@@ -420,7 +420,7 @@ extension NetworkManager {
         NetworkManager.shared.postRequest(urlString: url,
                                           params: params,
                                           success: { response in
-            let data = response["data"] as? [String: String]
+//            let data = response["data"] as? [String: String]
             print(response)
 //            success(token)
 //            ToastView.hidden()

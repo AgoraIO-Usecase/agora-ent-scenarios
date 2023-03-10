@@ -36,11 +36,14 @@ struct KeyCenter {
      注意：如果项目没有开启证书鉴权，这个字段留空。
      */
     static let Certificate: String? = <#Your Certificate#>
-    
 
     /**
      声网用户中心域名地址
      Agora提供的用户注册、登录、修改用户信息等的域名地址，只用于Demo展示，不可作为上线的版本使用。
     */
-    static var HostUrl: String = "https://gateway-fulldemo-staging.agoralab.co"
+    static var HostUrl: String = "https://ad-fulldemo-gateway-prod.bj2.agoralab.co"
+    
+    static var IMAppKey: String? = nil
+    static var IMClientId: String? = nil
+    static var IMClientSecret: String? = nil
 }

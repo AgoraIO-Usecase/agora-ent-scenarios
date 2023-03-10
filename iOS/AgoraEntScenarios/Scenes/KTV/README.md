@@ -50,7 +50,7 @@
 AppId：声网appid
 Certificate：声网Certificate
 ```
-- 在集成的同时，需要去声网与环信的官网注册好对应的账号，同时开通对应的权限从而快速开始你的体验
+- 在集成的同时，需要去声网的官网注册好对应的账号，同时开通对应的权限从而快速开始你的体验
 - 然后pod install成功之后，打开项目即可开始您的体验
 
 配置好这些参数之后。就可以快速开始体验了
@@ -58,9 +58,8 @@ Certificate：声网Certificate
 
 # 4.FAQ
 
-## 4.1 如何获取声网和环信APPID：
+## 4.1 如何获取声网APPID：
 - 声网APPID申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
-- 环信APPID申请：[https://www.easemob.com/](https://www.easemob.com/)
 ## 4.2 程序运行后，歌曲列表为空：
 - 需要联系销售给 appId 开通 K 歌权限
 ## 4.3 K歌房中的歌曲资源使用的是哪家？是否可以自己选择供应商？
