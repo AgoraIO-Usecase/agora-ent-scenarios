@@ -30,6 +30,7 @@ class KTVSyncManagerServiceImp(
 
     private data class VLLoginModel(
         val userNo: String,
+        //val isWaitAutoOnSeat: Boolean = false
     )
 
     @Volatile
@@ -400,6 +401,27 @@ class KTVSyncManagerServiceImp(
         innerAddSeatInfo(seatInfo, completion)
     }
 
+    override fun autoOnSeat(completion: (error: Exception?) -> Unit) {
+        val list = mutableListOf<Int>(0, 1, 2, 3, 4, 5, 6, 7)
+        seatMap.forEach {
+            it.value?.let { seat ->
+                list.removeIf { index ->
+                    index == seat.seatIndex
+                }
+                if (seat.userNo == UserManager.getInstance().user.id.toString()) {
+                    completion.invoke(null)
+                    return
+                }
+            }
+        }
+        if (list.isEmpty()) {
+            completion.invoke(java.lang.Exception("list is full"))
+        } else {
+            val seatInfo = innerGenUserSeatInfo(list[0])
+            innerAddSeatInfo(seatInfo, completion)
+        }
+    }
+
     override fun outSeat(
         inputModel: OutSeatInputModel,
         completion: (error: Exception?) -> Unit
@@ -609,25 +631,26 @@ class KTVSyncManagerServiceImp(
         completion: (error: Exception?) -> Unit
     ) {
         //加入合唱
-        seatMap.forEach {
-            if (it.value?.userNo == UserManager.getInstance().user.id.toString()) {
-                val originSeatInfo = it.value
-                if (originSeatInfo != null) {
-                    // 座位 joinSing -> true
-                    val seatInfo = RoomSeatModel(
-                        originSeatInfo.isMaster,
-                        originSeatInfo.headUrl,
-                        originSeatInfo.userNo,
-                        originSeatInfo.rtcUid,
-                        originSeatInfo.name,
-                        originSeatInfo.seatIndex,
-                        true,
-                        originSeatInfo.isAudioMuted,
-                        originSeatInfo.isVideoMuted
-                    )
-                    // songModel chorusNum + 1
-                    updateChorusMemberNum(true)
-                    innerUpdateSeat(seatInfo, completion)
+        innerGetSeatInfo { err, list ->
+            if (err == null && list != null) {
+                list.forEach { seat ->
+                    if (seat.userNo == UserManager.getInstance().user.id.toString()) {
+                        // 座位 joinSing -> true
+                        val seatInfo = RoomSeatModel(
+                            seat.isMaster,
+                            seat.headUrl,
+                            seat.userNo,
+                            seat.rtcUid,
+                            seat.name,
+                            seat.seatIndex,
+                            true,
+                            seat.isAudioMuted,
+                            seat.isVideoMuted
+                        )
+                        // songModel chorusNum + 1
+                        updateChorusMemberNum(true)
+                        innerUpdateSeat(seatInfo, completion)
+                    }
                 }
             }
         }
@@ -845,6 +868,20 @@ class KTVSyncManagerServiceImp(
 
                 override fun onFail(exception: SyncManagerException?) {
                     runOnMainThread { completion.invoke() }
+                }
+            })
+    }
+
+    private fun innerUpdateUserInfo(user: VLLoginModel, completion: (exception: SyncManagerException?) -> Unit) {
+        val objectId = objIdOfUserNo[user.userNo] ?: return
+        mSceneReference?.collection(kCollectionIdUser)
+            ?.update(objectId, user, object : Callback {
+                override fun onSuccess() {
+                    completion.invoke(null)
+                }
+
+                override fun onFail(exception: SyncManagerException?) {
+                    completion.invoke(exception)
                 }
             })
     }

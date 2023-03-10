@@ -137,6 +137,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     binding.avatarItemRoomSpeaker.setImageResource(R.mipmap.ktv_ic_seat);
                     binding.avatarItemRoomSpeaker.setVisibility(View.VISIBLE);
                     binding.tvZC.setVisibility(View.GONE);
+                    binding.tvHC.setVisibility(View.GONE);
                     binding.tvRoomOwner.setVisibility(View.GONE);
                     binding.ivMute.setVisibility(View.GONE);
                     binding.tvUserName.setText(String.valueOf(position + 1));
@@ -185,10 +186,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                             binding.tvZC.setText("主唱");
                             binding.tvZC.setVisibility(View.VISIBLE);
                         } else if (item.getJoinSing()) {
-                            binding.tvZC.setText("合唱");
-                            binding.tvZC.setVisibility(View.VISIBLE);
+                            binding.tvHC.setText("合唱");
+                            binding.tvHC.setVisibility(View.VISIBLE);
                         } else {
                             binding.tvZC.setVisibility(View.GONE);
+                            binding.tvHC.setVisibility(View.GONE);
                         }
                     }
                 }

@@ -46,6 +46,7 @@
         android:insetTop="2dp"
         android:insetBottom="2dp"
         android:text="@string/ktv_leave_chorus"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvName" />
 

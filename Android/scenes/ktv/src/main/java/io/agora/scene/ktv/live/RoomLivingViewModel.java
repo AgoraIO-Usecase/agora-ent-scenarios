@@ -492,6 +492,10 @@ public class RoomLivingViewModel extends ViewModel {
                                 updateVolumeStatus(false);
                             }
                         }
+
+                        if (seatModel.getJoinSing()) {
+                            leaveChorus();
+                        }
                     } else {
                         // failure
                         KTVLogger.e(TAG, "RoomLivingViewModel.leaveSeat() failed: " + e.getMessage());
@@ -868,39 +872,44 @@ public class RoomLivingViewModel extends ViewModel {
     public void joinChorus() {
         KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus() called");
         if (!isOnSeat) {
-            ToastUtils.showToast(R.string.ktv_onseat_toast);
-            return;
-        }
-        RoomSelSongModel musicModel = songPlayingLiveData.getValue();
-        if (musicModel == null) {
-            return;
-        }
+            ktvServiceProtocol.autoOnSeat(err -> {
+                if (err == null) {
+                    RoomSelSongModel musicModel = songPlayingLiveData.getValue();
+                    if (musicModel == null) {
+                        return null;
+                    }
 
-        ktvServiceProtocol.joinChorus(e -> {
-            if (e == null) {
-                // success
-                KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus() success");
+                    ktvServiceProtocol.joinChorus(e -> {
+                        if (e == null) {
+                            // success
+                            KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus() success");
 
-                TokenGenerator.INSTANCE.generateToken(
-                        roomInfoLiveData.getValue().getRoomNo() + "_ex",
-                        UserManager.getInstance().getUser().id.toString(),
-                        TokenGenerator.TokenGeneratorType.token006,
-                        TokenGenerator.AgoraTokenType.rtc,
-                        ret -> {
-                            ktvApiProtocol.switchSingerRole(KTVSingRole.KTVSingRoleCoSinger, ret, (state) -> {
-                                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_JOIN_CHORUS);
-                                return null;
-                            });
-                            return null;
-                        }, null
-                );
-            } else {
-                // failure
-                KTVLogger.e(TAG, "RoomLivingViewModel.joinChorus() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
-            }
-            return null;
-        });
+                            TokenGenerator.INSTANCE.generateToken(
+                                    roomInfoLiveData.getValue().getRoomNo() + "_ex",
+                                    UserManager.getInstance().getUser().id.toString(),
+                                    TokenGenerator.TokenGeneratorType.token006,
+                                    TokenGenerator.AgoraTokenType.rtc,
+                                    ret -> {
+                                        ktvApiProtocol.switchSingerRole(KTVSingRole.KTVSingRoleCoSinger, ret, (state) -> {
+                                            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_JOIN_CHORUS);
+                                            return null;
+                                        });
+                                        return null;
+                                    }, null
+                            );
+                        } else {
+                            // failure
+                            KTVLogger.e(TAG, "RoomLivingViewModel.joinChorus() failed: " + e.getMessage());
+                            ToastUtils.showToast(e.getMessage());
+                        }
+                        return null;
+                    });
+                } else {
+                    ToastUtils.showToast(err.getMessage());
+                }
+                return null;
+            });
+        }
     }
 
     /**
