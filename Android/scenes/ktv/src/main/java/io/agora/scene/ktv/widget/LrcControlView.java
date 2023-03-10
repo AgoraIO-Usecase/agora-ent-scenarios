@@ -182,13 +182,33 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilActive.ivLeaveChorus.setVisibility(View.INVISIBLE);
     }
 
+    private boolean isMineOwner = false;
     public void onPrepareStatus(boolean isMineOwner) {
+        this.isMineOwner = isMineOwner;
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
         mBinding.ilChorus.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setBackgroundResource(backgroundResId);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
+
+        changeViewByRole();
+    }
+
+    public void onPlayStatus(RoomSelSongModel songPlaying) {
+        mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
+        mBinding.clActive.setVisibility(View.VISIBLE);
+        setScoreControlView(songPlaying);
+        mBinding.ilChorus.getRoot().setVisibility(View.GONE);
+        mBinding.clActive.setBackgroundResource(backgroundResId);
+        mPrepareBinding.statusPrepareViewLrc.setVisibility(View.GONE);
+        mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
+
+        mBinding.ilActive.ivMusicStart.setIconResource(R.mipmap.ktv_ic_pause);
+        mBinding.ilActive.ivMusicStart.setText(R.string.ktv_room_player_pause);
+    }
+
+    private void changeViewByRole() {
         if (this.mRole == Role.Singer) {
             mBinding.ilActive.lyricsView.enableDragging(true);
             mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
@@ -204,6 +224,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.lyricsView.enableDragging(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
             mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.VISIBLE);
+            mBinding.ilActive.ivLeaveChorus.setVisibility(View.INVISIBLE);
         }
         if (isMineOwner) {
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
@@ -219,19 +240,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
                 mBinding.ilActive.ivSkipPrelude.setVisibility(View.INVISIBLE);
             }
         }
-    }
-
-    public void onPlayStatus(RoomSelSongModel songPlaying) {
-        mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
-        mBinding.clActive.setVisibility(View.VISIBLE);
-        setScoreControlView(songPlaying);
-        mBinding.ilChorus.getRoot().setVisibility(View.GONE);
-        mBinding.clActive.setBackgroundResource(backgroundResId);
-        mPrepareBinding.statusPrepareViewLrc.setVisibility(View.GONE);
-        mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
-
-        mBinding.ilActive.ivMusicStart.setIconResource(R.mipmap.ktv_ic_pause);
-        mBinding.ilActive.ivMusicStart.setText(R.string.ktv_room_player_pause);
     }
 
     private boolean mNeedToShowComboView;
@@ -267,6 +275,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     public void setRole(@NonNull Role mRole) {
         this.mRole = mRole;
+        changeViewByRole();
     }
 
     public void setMusic(@NonNull RoomSelSongModel mMusic) {

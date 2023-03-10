@@ -97,6 +97,10 @@ interface KTVServiceProtocol {
         completion: (error: Exception?) -> Unit
     )
 
+    fun autoOnSeat(
+        completion: (error: Exception?) -> Unit
+    )
+
     /**
      * 下麦
      */
