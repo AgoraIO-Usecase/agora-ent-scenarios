@@ -30,5 +30,5 @@ def modfiy(path, beauty_type):
 if __name__ == '__main__':
     print(f'argv === {sys.argv[1:]}')
     path = sys.argv[1:][0]
-    beauty_type = eval(sys.argv[1:][1])
+    beauty_type = sys.argv[1:][1]
     modfiy(path.strip(), beauty_type)
