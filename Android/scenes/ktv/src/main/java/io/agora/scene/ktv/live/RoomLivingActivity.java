@@ -184,9 +184,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     if (songModel != null) {
                         if (item.getUserNo().equals(songModel.getUserNo())) {
                             binding.tvZC.setText("主唱");
+                            binding.tvHC.setVisibility(View.GONE);
                             binding.tvZC.setVisibility(View.VISIBLE);
-                        } else if (item.getJoinSing()) {
+                        } else if (!item.getUserNo().equals(songModel.getUserNo()) && item.getJoinSing()) {
                             binding.tvHC.setText("合唱");
+                            binding.tvZC.setVisibility(View.GONE);
                             binding.tvHC.setVisibility(View.VISIBLE);
                         } else {
                             binding.tvZC.setVisibility(View.GONE);
@@ -383,8 +385,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PREPARE) {
                 getBinding().lrcControlView.onPrepareStatus(roomLivingViewModel.isRoomOwner());
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_JOIN_CHORUS) {
+                getBinding().cbMic.setChecked(true);
                 getBinding().lrcControlView.onSelfJoinedChorus();
+            } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_JOIN_FAILED) {
+                getBinding().lrcControlView.onSelfJoinedChorusFailed();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_LEAVE_CHORUS) {
+                getBinding().cbMic.setChecked(false);
                 getBinding().lrcControlView.onSelfLeavedChorus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PLAYING) {
                 getBinding().lrcControlView.onPlayStatus(roomLivingViewModel.songPlayingLiveData.getValue());

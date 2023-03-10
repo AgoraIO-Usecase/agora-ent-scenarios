@@ -142,7 +142,7 @@ interface KTVServiceProtocol {
      * 删除歌曲
      */
     fun removeSong(
-        inputModel: RemoveSongInputModel, completion: (error: Exception?) -> Unit
+        isSingingSong: Boolean, inputModel: RemoveSongInputModel, completion: (error: Exception?) -> Unit
     )
 
     /**

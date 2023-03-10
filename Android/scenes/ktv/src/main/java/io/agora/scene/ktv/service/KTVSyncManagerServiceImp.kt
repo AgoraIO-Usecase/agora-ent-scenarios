@@ -604,6 +604,7 @@ class KTVSyncManagerServiceImp(
     }
 
     override fun removeSong(
+        isSingingSong: Boolean,
         inputModel: RemoveSongInputModel,
         completion: (error: Exception?) -> Unit
     ) {
@@ -621,6 +622,27 @@ class KTVSyncManagerServiceImp(
         songChosenList.removeAt(indexOf)
         val removeAt = objIdOfSongNo.removeAt(indexOf)
 
+        if (isSingingSong) {
+            seatMap.forEach {
+                val originSeatInfo = it.value
+                if (originSeatInfo != null) {
+                    val seatInfo = RoomSeatModel(
+                        originSeatInfo.isMaster,
+                        originSeatInfo.headUrl,
+                        originSeatInfo.userNo,
+                        originSeatInfo.rtcUid,
+                        originSeatInfo.name,
+                        originSeatInfo.seatIndex,
+                        false,
+                        originSeatInfo.isAudioMuted,
+                        originSeatInfo.isVideoMuted
+                    )
+                    updateChorusMemberNum(false)
+                    innerUpdateSeat(seatInfo, completion)
+                }
+            }
+        }
+
         //net request and notify others
         innerRemoveChooseSong(removeAt) {
             completion.invoke(it)
@@ -630,11 +652,13 @@ class KTVSyncManagerServiceImp(
     override fun joinChorus(
         completion: (error: Exception?) -> Unit
     ) {
+        KTVLogger.d("hugo", "11111111")
         //加入合唱
         innerGetSeatInfo { err, list ->
             if (err == null && list != null) {
                 list.forEach { seat ->
                     if (seat.userNo == UserManager.getInstance().user.id.toString()) {
+                        KTVLogger.d("hugo", "2222222")
                         // 座位 joinSing -> true
                         val seatInfo = RoomSeatModel(
                             seat.isMaster,
@@ -644,7 +668,7 @@ class KTVSyncManagerServiceImp(
                             seat.name,
                             seat.seatIndex,
                             true,
-                            seat.isAudioMuted,
+                            RoomSeatModel.MUTED_VALUE_FALSE,
                             seat.isVideoMuted
                         )
                         // songModel chorusNum + 1
@@ -671,7 +695,7 @@ class KTVSyncManagerServiceImp(
                         originSeatInfo.name,
                         originSeatInfo.seatIndex,
                         false,
-                        originSeatInfo.isAudioMuted,
+                        RoomSeatModel.MUTED_VALUE_TRUE,
                         originSeatInfo.isVideoMuted
                     )
                     updateChorusMemberNum(false)
