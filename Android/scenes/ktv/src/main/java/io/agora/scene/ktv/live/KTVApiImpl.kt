@@ -158,6 +158,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             // 1、KTVSingRoleAudience -》KTVSingRoleMainSinger
             this.singerRole = newRole
 
+            // 主唱进入合唱模式
+            mRtcEngine.setAudioScenario(AUDIO_SCENARIO_CHORUS)
+
             val channelMediaOption = ChannelMediaOptions()
             channelMediaOption.autoSubscribeAudio = true
             channelMediaOption.autoSubscribeVideo = true
@@ -375,7 +378,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private fun joinChorus(token: String, onJoinChorusStateListener: OnJoinChorusStateListener) {
         Log.d(TAG, "joinChorus: $singerRole")
         when (this.singerRole) {
-            KTVSingRole.KTVSingRoleMainSinger -> {
+            KTVSingRole.KTVSingRoleChorusMainSinger -> {
                 joinChorus2ndChannel(token, mainSingerUid) { joinStatus ->
                     if (joinStatus == 0) {
                         onJoinChorusStateListener.onJoinChorusSuccess()
@@ -434,7 +437,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 }
                 val channelMediaOption = ChannelMediaOptions()
                 channelMediaOption.autoSubscribeAudio = true
-                channelMediaOption.autoSubscribeVideo = false
+                channelMediaOption.autoSubscribeVideo = true
                 channelMediaOption.publishMediaPlayerAudioTrack = false
                 mRtcEngine.updateChannelMediaOptions(channelMediaOption)
                 leaveChorus2ndChannel()
@@ -452,7 +455,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         val channelMediaOption = ChannelMediaOptions()
         channelMediaOption.autoSubscribeAudio = true
-        channelMediaOption.autoSubscribeVideo = false
+        channelMediaOption.autoSubscribeVideo = true
         channelMediaOption.publishMediaPlayerAudioTrack = false
         mRtcEngine.updateChannelMediaOptions(channelMediaOption)
 
@@ -589,7 +592,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     Log.d(TAG, "onLeaveChannel2")
                     if (isRelease) return
                     super.onLeaveChannel(stats)
-                    mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
+                    //mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
                     if (singerRole == KTVSingRole.KTVSingRoleChorusMainSinger) {
                         mainSingerHasJoinChannelEx = false
                     }
@@ -731,11 +734,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     // 本地BGM校准逻辑
                     if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
                         val delta = getNtpTimeInMs() - remoteNtp
-                        mPlayer.play()
                         val expectPosition = position + delta + audioPlayoutDelay
                         if (expectPosition in 1 until duration) {
                             mPlayer.seek(expectPosition)
                         }
+                        mPlayer.play()
                     } else if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
                         val localNtpTime = getNtpTimeInMs()
                         val currentSystemTime = System.currentTimeMillis()
@@ -747,6 +750,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         if ((diff > 40 || diff < -40) && expectPosition < duration) { //设置阈值为40ms，避免频繁seek
                             mPlayer.seek(expectPosition)
                         }
+                    } else {
+                        mLastReceivedPlayPosTime = System.currentTimeMillis()
+                        mReceivedPlayPosition = position
+                        this.pitch = pitch
                     }
                 } else {
                     // 独唱观众
