@@ -40,7 +40,7 @@ def all_pods
 #pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
 #  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
 #  pod 'sdk', :path => 'sdk.podspec'
-#  pod 'senseLib', :path => 'sense.podspec'
+
 #  pod 'AgoraAudio_Special_iOS', '4.0.0.9'
 
   #ThirdParty
