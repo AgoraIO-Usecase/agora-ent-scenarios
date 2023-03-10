@@ -531,11 +531,11 @@ class LiveDetailFragment : Fragment() {
         if (topBinding.tvStatisticDownBitrate.text.isEmpty()) topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_down_bitrate, "--")
         // 上行网络
         topBinding.tvStatisticUpNet.isVisible = !isAudioOnlyMode
-        upLinkBps?.let { topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, (it / 1000).toString()) }
+        upLinkBps?.let { topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, (it / 8192).toString()) }
         if (topBinding.tvStatisticUpNet.text.isEmpty()) topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, "--")
         // 下行网络
         topBinding.tvStatisticDownNet.isVisible = !isAudioOnlyMode
-        downLinkBps?.let { topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, (it / 1000).toString()) }
+        downLinkBps?.let { topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, (it / 8192).toString()) }
         if (topBinding.tvStatisticDownNet.text.isEmpty()) topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, "--")
     }
 
@@ -1282,7 +1282,7 @@ class LiveDetailFragment : Fragment() {
             onUplinkNetworkInfoUpdated = { info ->
                 runOnUiThread {
                     refreshStatisticInfo(
-                        upLinkBps = (info.video_encoder_target_bitrate_bps)
+                        upLinkBps = info.video_encoder_target_bitrate_bps
                     )
                 }
             },
