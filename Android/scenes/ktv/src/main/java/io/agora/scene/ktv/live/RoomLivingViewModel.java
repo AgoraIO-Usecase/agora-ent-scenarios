@@ -836,8 +836,8 @@ public class RoomLivingViewModel extends ViewModel {
                                     TokenGenerator.TokenGeneratorType.token006,
                                     TokenGenerator.AgoraTokenType.rtc,
                                     ret -> {
-                                        ktvApiProtocol.switchSingerRole(KTVSingRole.KTVSingRoleChorusMainSinger, ret, (state) -> {
-                                            if (state == SwitchRoleState.KTVSwitchRoleStateSuccess) {
+                                        ktvApiProtocol.switchSingerRole(KTVSingRole.LeadSinger, ret, (state, reason) -> {
+                                            if (state == SwitchRoleState.SUCCESS) {
                                                 //playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_JOIN_CHORUS);
                                             } else {
                                                 //playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_JOIN_FAILED);
@@ -848,7 +848,7 @@ public class RoomLivingViewModel extends ViewModel {
                                     }, null
                             );
                         } else if (songPlaying.getChorusNum() == 0) {
-                            ktvApiProtocol.switchSingerRole(KTVSingRole.KTVSingRoleMainSinger, "", (state) -> {
+                            ktvApiProtocol.switchSingerRole(KTVSingRole.SoloSinger, "", (state, reason) -> {
                                 return null;
                             });
                         }
@@ -906,8 +906,8 @@ public class RoomLivingViewModel extends ViewModel {
                 TokenGenerator.TokenGeneratorType.token006,
                 TokenGenerator.AgoraTokenType.rtc,
                 ret -> {
-                    ktvApiProtocol.switchSingerRole(KTVSingRole.KTVSingRoleCoSinger, ret, (state) -> {
-                        if (state == SwitchRoleState.KTVSwitchRoleStateSuccess) {
+                    ktvApiProtocol.switchSingerRole(KTVSingRole.CoSinger, ret, (state, reason) -> {
+                        if (state == SwitchRoleState.SUCCESS) {
                             // 成为合唱成功
                             playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_JOIN_CHORUS);
 
@@ -949,7 +949,7 @@ public class RoomLivingViewModel extends ViewModel {
             if (e == null) {
                 // success
                 KTVLogger.d(TAG, "RoomLivingViewModel.leaveChorus() called");
-                ktvApiProtocol.switchSingerRole(KTVSingRole.KTVSingRoleAudience, "", (state) -> null);
+                ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, "", (state, reason) -> null);
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LEAVE_CHORUS);
             } else {
                 // failure
@@ -971,7 +971,7 @@ public class RoomLivingViewModel extends ViewModel {
             return;
         }
 
-        ktvApiProtocol.switchSingerRole(KTVSingRole.KTVSingRoleAudience, "", (state) -> null);
+        ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, "", (state, reason) -> null);
         //ktvApiProtocol.stopSing();
 
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_START);
@@ -1277,20 +1277,20 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     // ------------------ 原唱/伴奏 ------------------
-    protected KTVPlayerTrackMode mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
+    protected KTVPlayerTrackMode mAudioTrackMode = KTVPlayerTrackMode.Acc;
     public boolean musicToggleOriginal() {
-        if (mAudioTrackMode == KTVPlayerTrackMode.KTVPlayerTrackOrigin) {
-            ktvApiProtocol.getMediaPlayer().selectAudioTrack(KTVPlayerTrackMode.KTVPlayerTrackAcc.getValue());
-            mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
+        if (mAudioTrackMode == KTVPlayerTrackMode.Origin) {
+            ktvApiProtocol.getMediaPlayer().selectAudioTrack(KTVPlayerTrackMode.Acc.getValue());
+            mAudioTrackMode = KTVPlayerTrackMode.Acc;
         } else {
-            ktvApiProtocol.getMediaPlayer().selectAudioTrack(KTVPlayerTrackMode.KTVPlayerTrackOrigin.getValue());
-            mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackOrigin;
+            ktvApiProtocol.getMediaPlayer().selectAudioTrack(KTVPlayerTrackMode.Origin.getValue());
+            mAudioTrackMode = KTVPlayerTrackMode.Origin;
         }
         return false;
     }
 
     public boolean isOriginalMode() {
-        return mAudioTrackMode == KTVPlayerTrackMode.KTVPlayerTrackOrigin;
+        return mAudioTrackMode == KTVPlayerTrackMode.Origin;
     }
 
     // ------------------ 暂停/播放 ------------------
@@ -1319,15 +1319,15 @@ public class RoomLivingViewModel extends ViewModel {
     public void musicStartPlay(@NonNull RoomSelSongModel music) {
         KTVLogger.d(TAG, "RoomLivingViewModel.musicStartPlay() called");
         chorusNum = 0;
-        mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
+        mAudioTrackMode = KTVPlayerTrackMode.Acc;
 
         boolean isOwnSong = Objects.equals(music.getUserNo(), UserManager.getInstance().getUser().id.toString());
         long songCode = Long.parseLong(music.getSongNo());
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
 
         if (isOwnSong) {
-            ktvApiProtocol.switchSingerRole(KTVSingRole.KTVSingRoleAudience, "", (state) -> null);
-            ktvApiProtocol.switchSingerRole(KTVSingRole.KTVSingRoleMainSinger, "", (state) -> null);
+            ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, "", (state, reason) -> null);
+            ktvApiProtocol.switchSingerRole(KTVSingRole.SoloSinger, "", (state, reason) -> null);
         }
         ktvApiProtocol.loadMusic(new KTVSongConfiguration(true, songCode, Integer.parseInt(music.getUserNo())), new OnMusicLoadStateListener() {
             @Override
@@ -1380,9 +1380,9 @@ public class RoomLivingViewModel extends ViewModel {
     public void musicStop() {
         KTVLogger.d(TAG, "RoomLivingViewModel.musicStop() called");
         // 列表中无歌曲， 还原状态
-        ktvApiProtocol.switchSingerRole(KTVSingRole.KTVSingRoleAudience, "", (state) -> null);
+        ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, "", (state, reason) -> null);
         //ktvApiProtocol.stopSing();
-        mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
+        mAudioTrackMode = KTVPlayerTrackMode.Acc;
         needRePreload = false;
         if (mRtcEngine == null) {
             return;

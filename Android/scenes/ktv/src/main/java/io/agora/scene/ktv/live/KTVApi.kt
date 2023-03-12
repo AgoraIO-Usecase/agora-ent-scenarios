@@ -2,32 +2,32 @@ package io.agora.scene.ktv.live
 
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayer
-import io.agora.musiccontentcenter.IAgoraMusicContentCenter
 import io.agora.musiccontentcenter.Music
 import io.agora.musiccontentcenter.MusicChartInfo
 import io.agora.rtc2.RtcEngine
 import io.agora.scene.ktv.widget.LrcControlView
 
 /**
- * KTVSingRoleMainSinger 主唱
- * KTVSingRoleCoSinger 合唱者
- * KTVSingRoleFollowSinger 跟唱者
- * KTVSingRoleAudience 观众
+ * SoloSinger 独唱
+ * CoSinger 合唱者
+ * FollowSinger 跟唱者
+ * Audience 观众
+ * LeadSinger 主唱
  */
 enum class KTVSingRole(val value: Int) {
-    KTVSingRoleMainSinger(0),
-    KTVSingRoleCoSinger(1),
-    KTVSingRoleFollowSinger(2),
-    KTVSingRoleAudience(3),
-    KTVSingRoleChorusMainSinger(4)
+    SoloSinger(0),
+    CoSinger(1),
+    LeadSinger(2),
+    Audience(3),
+    FollowSinger(4)
 }
 
 /**
- * KTVPlayerTrackOrigin 原唱
- * KTVPlayerTrackAcc 伴唱
+ * Origin 原唱
+ * Acc 伴唱
  */
 enum class KTVPlayerTrackMode(val value: Int) {
-    KTVPlayerTrackOrigin(0), KTVPlayerTrackAcc(1)
+    Origin(0), Acc(1)
 }
 
 /**
@@ -38,26 +38,32 @@ enum class KTVPlayerTrackMode(val value: Int) {
  *
  */
 enum class KTVLoadSongState(val value: Int) {
-    KTVLoadSongStateOK(0),
-    KTVLoadSongStateFailed(1),
-    KTVLoadSongStateInProgress(2),
-    KTVLoadSongStateIdle(3)
+    OK(0),
+    FAILED(1),
+    IN_PROGRESS(2),
+    IDLE(3)
 }
 
 enum class KTVLoadSongFailReason(val value: Int) {
     NONE(0),
-    KTVLoadSongStateNoLyricUrl(1),
-    KTVLoadSongStatePreloadFail(2),
-    KTVLoadSongStatePreloadFailAndNoLyricUrl(3)
+    NO_LYRIC_URL(1),
+    MUSIC_PRELOAD_FAIL(2),
+    MUSIC_PRELOAD_FAIL_AND_JOIN_CHANNEL_FAIL(3)
 }
 
 
 enum class SwitchRoleState(val value: Int) {
-    KTVSwitchRoleStateSuccess(0),
-    KTVSwitchRoleStateJoinChannelFailed(1),
-    KTVSwitchRoleStatePreloadFail(2),
-    KTVSwitchRoleStatePreloadFailAndJoinChannelFailed(3),
-    KTVSwitchRoleStateErrorNewRole(4)
+    SUCCESS(0),
+    FAIL(1)
+}
+
+
+enum class SwitchRoleFailReason(val value: Int) {
+    NONE(0),
+    JOIN_CHANNEL_FAIL(1),
+    MUSIC_PRELOAD_FAIL(2),
+    MUSIC_PRELOAD_FAIL_AND_JOIN_CHANNEL_FAIL(3),
+    NO_PERMISSION(4)
 }
 
 /**
@@ -74,7 +80,7 @@ enum class KTVJoinChorusState(val value: Int) {
  * MUSIC_OPEN_FAIL 歌曲 open 失败
  * JOIN_CHANNEL_FAIL 加入 RTC 频道失败
  */
-enum class KTVJoinFailReasonType(val value: Int) {
+enum class KTVJoinChorusFailReason(val value: Int) {
     NONE(0),
     MUSIC_PRELOAD_FAIL(1),
     MUSIC_OPEN_FAIL(2),
@@ -93,7 +99,7 @@ interface OnMusicLoadStateListener {
 
 interface OnJoinChorusStateListener {
     fun onJoinChorusSuccess()
-    fun onJoinChorusFail(reason: KTVJoinFailReasonType)
+    fun onJoinChorusFail(reason: KTVJoinChorusFailReason)
 }
 
 abstract class IKTVApiEventHandler {
@@ -177,7 +183,7 @@ interface KTVApi {
     fun fetchMusicCharts(onMusicChartResultListener: (requestId: String?, status: Int, list: Array<out MusicChartInfo>?) -> Unit)
 
     /**
-     * 根据歌曲榜单类型拉取歌单
+     * 根据歌曲榜单类型搜索歌单
      */
     fun searchMusicByMusicChartId(
         musicChartId: Int,
@@ -193,7 +199,7 @@ interface KTVApi {
     )
 
     /**
-     * 搜索歌曲
+     * 根据关键字搜索歌曲
      */
     fun searchMusicByKeyword(
         keyword: String,
@@ -216,7 +222,7 @@ interface KTVApi {
     /**
      * 切换演唱身份
      */
-    fun switchSingerRole(newRole: KTVSingRole, token: String, onSwitchRoleState: (state: SwitchRoleState) -> Unit)
+    fun switchSingerRole(newRole: KTVSingRole, token: String, onSwitchRoleState: (state: SwitchRoleState, reason: SwitchRoleFailReason) -> Unit)
 
     /**
      * 播放歌曲
