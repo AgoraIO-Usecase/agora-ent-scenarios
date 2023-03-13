@@ -28,33 +28,16 @@ enum class KTVPlayerTrackMode(val value: Int) {
     Origin(0), Acc(1)
 }
 
-/**
- * KTVLoadSongStateOK 加载成功
- * KTVLoadSongStateInProgress 正在加载中
- * KTVLoadSongStateNoLyricUrl 没有歌词
- * KTVLoadSongStatePreloadFail Mcc 预加载歌曲失败
- *
- */
-enum class KTVLoadSongState(val value: Int) {
-    OK(0),
-    FAILED(1),
-    IN_PROGRESS(2),
-    IDLE(3)
-}
-
 enum class KTVLoadSongFailReason(val value: Int) {
-    NONE(0),
-    NO_LYRIC_URL(1),
-    MUSIC_PRELOAD_FAIL(2),
-    MUSIC_PRELOAD_FAIL_AND_JOIN_CHANNEL_FAIL(3)
+    NO_LYRIC_URL(0),
+    MUSIC_PRELOAD_FAIL(1),
+    MUSIC_PRELOAD_FAIL_AND_JOIN_CHANNEL_FAIL(2)
 }
-
 
 enum class SwitchRoleState(val value: Int) {
     SUCCESS(0),
     FAIL(1)
 }
-
 
 enum class SwitchRoleFailReason(val value: Int) {
     NONE(0),
@@ -65,24 +48,14 @@ enum class SwitchRoleFailReason(val value: Int) {
 }
 
 /**
- * SUCCESS 加入合唱成功
- * FAIL 加入合唱失败
- */
-enum class KTVJoinChorusState(val value: Int) {
-    SUCCESS(0),
-    FAIL(1)
-}
-
-/**
  * MUSIC_PRELOAD_FAIL 歌曲预加载失败
  * MUSIC_OPEN_FAIL 歌曲 open 失败
  * JOIN_CHANNEL_FAIL 加入 RTC 频道失败
  */
 enum class KTVJoinChorusFailReason(val value: Int) {
-    NONE(0),
-    MUSIC_PRELOAD_FAIL(1),
-    MUSIC_OPEN_FAIL(2),
-    JOIN_CHANNEL_FAIL(3),
+    MUSIC_PRELOAD_FAIL(0),
+    MUSIC_OPEN_FAIL(1),
+    JOIN_CHANNEL_FAIL(2)
 }
 
 interface OnMusicLoadStateListener {
