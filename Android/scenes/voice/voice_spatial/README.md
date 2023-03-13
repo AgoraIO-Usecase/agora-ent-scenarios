@@ -41,21 +41,6 @@
 		AGORA_APP_CERTIFICATE=（从声网console获取）
     ```
 
-- 在voice模块下 创建voice_gradle.properties文件 可支持配置生产环境和开发环境。
-
-    ```
-	voice_gradle.properties：(配置参数从环信IM Console获取)
-	isBuildTypesTest=true 开发环境：
-		IM_APP_KEY_TEST="开发环境 IM APPKEY"
-    IM_APP_CLIENT_ID_TEST="开发环境 IM Client ID"
-    IM_APP_CLIENT_SECRET_TEST="开发环境 IM ClientSecret"
-
-	isBuildTypesTest=false 生产环境
-		IM_APP_KEY_RELEASE="生产环境 IM APPKEY"	
-    IM_APP_CLIENT_ID_RELEASE="生产环境 IM Client ID"
-    IM_APP_CLIENT_SECRET_RELEASE="生产环境 IM ClientSecret"
-    ```
-
 ### 3.1 重要类介绍
 
 AgoraRtc管理类：[AgoraRtcEngineController](src/main/java/io/agora/scene/voice/spatial/service/VoiceSyncManagerServiceImp.kt)  
@@ -65,8 +50,8 @@ AgoraRtc管理类：[AgoraRtcEngineController](src/main/java/io/agora/scene/voic
 空间位置坐标计算类：[Room3DMicLayout](src/main/java/io/agora/scene/voice/spatial/ui/widget/mic/Room3DMicLayout.kt)  
 
 ### 4.FAQ
-- 如何获取声网和环信APPID：
-  - 声网APPID申请：https://www.agora.io/cn/
+- 如何获取声网的APP ID：
+  - 声网APP ID申请：https://www.agora.io/cn/
 - 集成遇到困难，该如何联系声网获取协助
   - 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
   - 方案2：发送邮件给support@agora.io咨询。
