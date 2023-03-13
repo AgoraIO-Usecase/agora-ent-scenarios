@@ -10,7 +10,6 @@ import io.agora.scene.ktv.widget.LrcControlView
 /**
  * SoloSinger 独唱
  * CoSinger 合唱者
- * FollowSinger 跟唱者
  * Audience 观众
  * LeadSinger 主唱
  */
@@ -18,8 +17,7 @@ enum class KTVSingRole(val value: Int) {
     SoloSinger(0),
     CoSinger(1),
     LeadSinger(2),
-    Audience(3),
-    FollowSinger(4)
+    Audience(3)
 }
 
 /**
