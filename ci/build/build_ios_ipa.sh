@@ -23,7 +23,12 @@ KEYCENTER_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/KeyCenter.swift"
 cp $KEYCENTER_PATH.bak $KEYCENTER_PATH
 
 # 打包环境
-CONFIGURATION=Development
+CONFIGURATION='Release'
+result=$(echo ${method} | grep "development")
+if [ -z "$result" ]
+then
+    CONFIGURATION='Debug'
+fi
 
 #工程文件路径
 APP_PATH="${PROJECT_PATH}/${TARGET_NAME}.xcworkspace"
@@ -34,13 +39,17 @@ echo PBXPROJ_PATH: $PBXPROJ_PATH
 
 # 主项目工程配置
 # Debug
-/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:CODE_SIGN_STYLE 'Manual'" $PBXPROJ_PATH
-/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:DEVELOPMENT_TEAM 'GM72UGLGZW'" $PBXPROJ_PATH
-/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'App'" $PBXPROJ_PATH
+# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:CODE_SIGN_STYLE 'Manual'" $PBXPROJ_PATH
+# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:DEVELOPMENT_TEAM 'YS397FG5PA'" $PBXPROJ_PATH
+# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'App'" $PBXPROJ_PATH
+/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:CURRENT_PROJECT_VERSION ${BUILD_NUMBER}" $PBXPROJ_PATH
+/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:PRODUCT_BUNDLE_IDENTIFIER ${packageName}" $PBXPROJ_PATH
 # Release
-/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:CODE_SIGN_STYLE 'Manual'" $PBXPROJ_PATH
-/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:DEVELOPMENT_TEAM 'GM72UGLGZW'" $PBXPROJ_PATH
-/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'App'" $PBXPROJ_PATH
+# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:CODE_SIGN_STYLE 'Manual'" $PBXPROJ_PATH
+# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:DEVELOPMENT_TEAM 'YS397FG5PA'" $PBXPROJ_PATH
+# /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'App'" $PBXPROJ_PATH
+/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:CURRENT_PROJECT_VERSION ${BUILD_NUMBER}" $PBXPROJ_PATH
+/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:PRODUCT_BUNDLE_IDENTIFIER ${packageName}" $PBXPROJ_PATH
 
 # 读取APPID环境变量
 echo AGORA_APP_ID:$APP_ID
@@ -58,37 +67,59 @@ python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCE
 xcodebuild clean -workspace "${APP_PATH}" -configuration "${CONFIGURATION}" -scheme "${TARGET_NAME}" -quiet
 
 # 时间戳
-CURRENT_TIME=$(date "+%Y-%m-%d %H-%M-%S")
+CURRENT_TIME=$(date "+%Y-%m-%d_%H-%M-%S")
 
 # 归档路径
-ARCHIVE_PATH="${PROJECT_PATH}/${TARGET_NAME} ${CURRENT_TIME}/${TARGET_NAME}_${BUILD_NUMBER}.xcarchive"
+ARCHIVE_PATH="${PROJECT_PATH}/${TARGET_NAME}_${CURRENT_TIME}/${TARGET_NAME}_${BUILD_NUMBER}.xcarchive"
 # 编译环境
 
 # 导出路径
-EXPORT_PATH="${PROJECT_PATH}/${TARGET_NAME} ${CURRENT_TIME}"
+EXPORT_PATH="${PROJECT_PATH}/${TARGET_NAME}_${CURRENT_TIME}"
 
 # plist路径
-PLIST_PATH="${PROJECT_PATH}/ExportOptions.plist"
+PLIST_PATH="${PROJECT_PATH}/ExportOptions_${method}.plist"
 
 echo PLIST_PATH: $PLIST_PATH
 
 # archive 这边使用的工作区间 也可以使用project
-xcodebuild archive -workspace "${APP_PATH}" -scheme "${TARGET_NAME}" -configuration "${CONFIGURATION}" -archivePath "${ARCHIVE_PATH}" -destination 'generic/platform=iOS' -quiet
+xcodebuild CODE_SIGN_STYLE="Manual" -workspace "${APP_PATH}" -scheme "${TARGET_NAME}" clean CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -configuration "${CONFIGURATION}" archive -archivePath "${ARCHIVE_PATH}" -destination 'generic/platform=iOS' -quiet
 
 # 导出ipa
-xcodebuild -exportArchive -archivePath "${ARCHIVE_PATH}" -exportPath "${EXPORT_PATH}" -exportOptionsPlist "${PLIST_PATH}" -quiet
+xcodebuild -exportArchive -archivePath "${ARCHIVE_PATH}" -exportPath "${EXPORT_PATH}" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -exportOptionsPlist "${PLIST_PATH}" -quiet
 
-# 上传IPA
-7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r "${EXPORT_PATH}/${TARGET_NAME}.ipa"
-python3 $WORKSPACE/artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
+if [ $isSign = true ]; then
+    echo "true"
+    # 给ipa包签名
+    echo "============Sign IPA Begin============"
+    pushd ${WORKSPACE}
+    sh sign "${EXPORT_PATH}/${TARGET_NAME}.ipa"
+    mv *.ipa "${TARGET_NAME}.ipa"
+    popd
 
-# 上传符号表
-7za a -tzip dsym_${BUILD_NUMBER}.zip -r "${ARCHIVE_PATH}/dSYMs/${TARGET_NAME}.app.dSYM"
-python3 $WORKSPACE/artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/dsym_${BUILD_NUMBER}.zip" --project
+    cd ${WORKSPACE}
+
+    # 上传IPA
+    7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r "${TARGET_NAME}.ipa"
+    python3 artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
+
+    # 上传符号表
+    7za a -tzip dsym_${BUILD_NUMBER}.zip -r "${ARCHIVE_PATH}/dSYMs/${TARGET_NAME}.app.dSYM"
+    python3 artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/dsym_${BUILD_NUMBER}.zip" --project
+
+else 
+    # 上传IPA
+    7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r "${EXPORT_PATH}/${TARGET_NAME}.ipa"
+    python3 $WORKSPACE/artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
+
+    # 上传符号表
+    7za a -tzip dsym_${BUILD_NUMBER}.zip -r "${ARCHIVE_PATH}/dSYMs/${TARGET_NAME}.app.dSYM"
+    python3 $WORKSPACE/artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/dsym_${BUILD_NUMBER}.zip" --project
+
+fi
 
 # 删除IPA文件夹
-rm -rf "${EXPORT_PATH}"
-cd ${PROJECT_PATH} && rm -rf "*.zip"
+# rm -rf "${EXPORT_PATH}"
+# cd ${PROJECT_PATH} && rm -rf "*.zip"
 
 #复原Keycenter文件
 python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 1

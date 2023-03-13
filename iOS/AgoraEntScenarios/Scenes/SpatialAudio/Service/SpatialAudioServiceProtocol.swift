@@ -84,12 +84,6 @@ public enum SAUpdateRoomState {
     ///   - ext: 用户jsonobject信息
     func onUserJoinedRoom(roomId: String, user: SAUser)
     
-    /// Description 聊天室公告发生变化
-    /// - Parameters:
-    ///   - roomId: 环信IMSDK聊天室id
-    ///   - content: 公告变化内容
-    func onAnnouncementChanged(roomId: String, content: String)
-    
     /// Description 用户被踢
     /// - Parameters:
     ///   - roomId: 环信IMSDK聊天室id

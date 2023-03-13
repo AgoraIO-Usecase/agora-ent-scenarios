@@ -9,62 +9,12 @@ import SnapKit
 import SVGAPlayer
 import UIKit
 class SA3DMoveUserView: UIView {
-    public var cellType: SABaseUserCellType = .AgoraChatRoomBaseUserCellTypeAdd {
-        didSet {
-            if cellType == .AgoraChatRoomBaseUserCellTypeAlienActive || cellType == .AgoraChatRoomBaseUserCellTypeAlienNonActive {
-                bgColor = .white
-            } else {
-                bgColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)
-            }
-
-            switch cellType {
-            case .AgoraChatRoomBaseUserCellTypeAdd:
-                avatarImageView.isHidden = true
-                micView.isHidden = true
-                bgIconView.image = UIImage("icons／solid／add")
-            case .AgoraChatRoomBaseUserCellTypeMute:
-                avatarImageView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.forbidden)
-            case .AgoraChatRoomBaseUserCellTypeForbidden:
-                avatarImageView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.forbidden)
-            case .AgoraChatRoomBaseUserCellTypeLock:
-                avatarImageView.isHidden = true
-                micView.isHidden = true
-                bgIconView.image = UIImage("icons／solid／lock")
-            case .AgoraChatRoomBaseUserCellTypeNormalUser:
-                avatarImageView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.on)
-                nameBtn.setImage(UIImage(named: ""), for: .normal)
-            case .AgoraChatRoomBaseUserCellTypeMuteAndLock:
-                avatarImageView.isHidden = true
-                micView.isHidden = false
-                micView.setState(.forbidden)
-                bgIconView.image = UIImage("icons／solid／lock")
-            case .AgoraChatRoomBaseUserCellTypeAlienNonActive:
-                avatarImageView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.on)
-                micView.isHidden = true
-                nameBtn.setImage(UIImage("guanfang"), for: .normal)
-                activeButton.isHidden = false
-            case .AgoraChatRoomBaseUserCellTypeAlienActive:
-                avatarImageView.isHidden = false
-                micView.isHidden = false
-                nameBtn.setImage(UIImage("guanfang"), for: .normal)
-                activeButton.isHidden = true
-            }
-        }
-    }
-
     public var user: SAUser? {
         didSet {
             iconImgUrl = user?.portrait ?? ""
             nameStr = user?.name ?? "\(tag - 200)"
             volume = user?.volume ?? 0
+            micView.setState(user?.mic_status == .mute ? .off : .on)
         }
     }
 
@@ -124,7 +74,7 @@ class SA3DMoveUserView: UIView {
 
     public var tapClickBlock:(() -> Void)?
     
-    var angle: Double = 270 {
+    var angle: Double = 180 {
         didSet {
             let value = (angle - 90) / 180.0 * Double.pi
             UIView.animate(withDuration: 0.25, delay: 0, options: .curveLinear) {
@@ -151,7 +101,7 @@ class SA3DMoveUserView: UIView {
         
         bgView.layer.cornerRadius = 40~
         bgView.layer.masksToBounds = true
-        bgView.backgroundColor = UIColor(red: 104 / 255.0, green: 128 / 255.0, blue: 1, alpha: 1)
+        bgView.backgroundColor = UIColor(white: 1, alpha: 0.3)
         addSubview(bgView)
     
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapClick))

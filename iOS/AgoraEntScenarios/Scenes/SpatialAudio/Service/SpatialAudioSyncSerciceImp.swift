@@ -74,7 +74,7 @@ extension SpatialAudioSyncSerciceImp {
             completion()
             return
         }
-
+        SyncUtil.reset()
         SyncUtil.initSyncManager(sceneId: cSceneId) {
         }
         
@@ -490,10 +490,11 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         guard let mic = self.mics[safe: mic_index] else {
             return
         }
-        mic.status = 1
+//        mic.status = 1
+        mic.member?.mic_status = .mute
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
             if error == nil {
-                self.mics[safe: mic_index]?.status = 1
+                self.mics[safe: mic_index]?.member?.mic_status = .mute
             }
             completion(error, mic)
         }
@@ -503,10 +504,11 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         guard let mic = self.mics[safe: mic_index] else {
             return
         }
-        mic.status = 0
+//        mic.status = 0
+        mic.member?.mic_status = .unMute
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
             if error == nil {
-                self.mics[safe: mic_index]?.status = 0
+                self.mics[safe: mic_index]?.member?.mic_status = .unMute
             }
             completion(error, mic)
         }
@@ -531,10 +533,10 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         old_mic.mic_index = old_index
         
         let new_mic = SARoomMic()
-        new_mic.objectId = self.mics[new_index].objectId
-        switch self.mics[new_index].status {
+        new_mic.objectId = mics[new_index].objectId
+        switch mics[new_index].status {
         case 2:
-            new_mic.status = self.mics[new_index].status
+            new_mic.status = 2
         case 3,4:
             completion(SAErrorType.unknown("changeMic", "new_mic idx[\(new_index)] status = 3/4").error(), nil)
             return
@@ -542,7 +544,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             new_mic.status = 0
         }
         new_mic.mic_index = new_index
-        new_mic.member = SAUserInfo.shared.user
+        new_mic.member = mics[old_index].member
         
         let impGroup = DispatchGroup()
         impGroup.enter()
@@ -662,7 +664,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
     
     func refuseInvite(chat_uid: String, completion: @escaping (Error?, Bool) -> Void) {
-        guard let user = self.userList.first(where: { $0.uid == chat_uid }) else {
+        guard let user = userList.first(where: { $0.uid == chat_uid }) else {
             agoraAssert("startMicSeatInvitation not found")
             completion(SAErrorType.unknown("startMicSeatInvitation", "user not found").error(), false)
             return
@@ -857,7 +859,6 @@ extension SpatialAudioSyncSerciceImp {
                            agoraPrint("imp room subscribe onUpdated...")
                            if origRoom?.announcement != room.announcement {
                                origRoom?.announcement = room.announcement
-                               self.subscribeDelegate?.onAnnouncementChanged(roomId: channelName, content: room.announcement ?? "")
                            } /*else if origRoom?.use_robot != room.use_robot {
                                origRoom?.use_robot = room.use_robot
                                self.subscribeDelegate?.onRobotSwitch(roomId: channelName, enable: room.use_robot ?? false, from: room.owner?.name ?? "")
@@ -1189,7 +1190,7 @@ extension SpatialAudioSyncSerciceImp {
                            guard let self = self,
                                  let jsonStr = object.toJson() else { return }
                            let user = model(from: jsonStr.z.jsonToDictionary(), SAUser.self)
-                           if self.userList.contains(where: { $0.uid == user.uid }) {
+                           if VLUserCenter.user.id == user.uid {
                                if user.status == .waitting {
                                    self.subscribeDelegate?.onReceiveSeatInvitation(roomId: self.roomId!, user: user)
                                } else if user.status == .rejected {

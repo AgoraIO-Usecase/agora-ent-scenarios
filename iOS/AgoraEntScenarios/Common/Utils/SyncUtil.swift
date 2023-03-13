@@ -77,4 +77,10 @@ class SyncUtil: NSObject {
     class func subscribeConnectState(state: @escaping ConnectBlockState) {
         manager?.subscribeConnectState(state: state)
     }
+    
+    class func reset() {
+        manager = nil
+        sceneRefs.forEach({ $0.value.unsubscribe(key: $0.key) })
+        sceneRefs.removeAll()
+    }
 }

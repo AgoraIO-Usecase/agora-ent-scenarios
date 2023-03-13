@@ -8,12 +8,6 @@
 import UIKit
 import AgoraRtcKit
 
-private enum SATouchState {
-    case began
-    case moved
-    case ended
-}
-
 class SA3DRtcView: UIView {
     private var collectionView: UICollectionView!
     private let vIdentifier = "3D"
@@ -24,14 +18,12 @@ class SA3DRtcView: UIView {
     private var lastPrePoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275~)
     private var lastCenterPoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275~)
     private var lastMovedPoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275~)
-    private var touchState: SATouchState = .began
-    
-//    private var redMediaPlayer: AgoraRtcMediaPlayerProtocol?
-//    private var blueMediaPlayer: AgoraRtcMediaPlayerProtocol?
+
     private var panGesture: UIPanGestureRecognizer?
     private var lastTime: CFAbsoluteTime = CFAbsoluteTimeGetCurrent()
     private lazy var redSpatialParams = AgoraSpatialAudioParams()
     private lazy var blueSpatialParams = AgoraSpatialAudioParams()
+    private var isPlaying: Bool = false
     
     public var clickBlock: ((SABaseUserCellType, Int) -> Void)?
     public var activeBlock: ((SABaseUserCellType) -> Void)?
@@ -46,7 +38,6 @@ class SA3DRtcView: UIView {
             collectionView.reloadData()
             
             guard let mic = micInfos?.first else { return }
-            rtcUserView.cellType = getCellTypeWithStatus(mic.status)
             rtcUserView.user = mic.member
             panGesture?.isEnabled = mic.member?.uid == VLUserCenter.user.id
         }
@@ -101,7 +92,6 @@ class SA3DRtcView: UIView {
                 } else {
                     //更新可移动view的数据
                     let micInfo = micInfos[0]
-                    rtcUserView.cellType = getCellTypeWithStatus(micInfo.status)
                     rtcUserView.tag = 200
                     rtcUserView.user = micInfo.member
                 }
@@ -121,8 +111,7 @@ class SA3DRtcView: UIView {
                 guard let micInfos = self?.micInfos else { return }
                 let micInfo = micInfos[0]
                 micInfo.member?.volume = vol
-                self?.rtcUserView.cellType = self?.getCellTypeWithStatus(micInfo.status) ?? .AgoraChatRoomBaseUserCellTypeAdd
-                self?.rtcUserView.user = micInfo.member
+                self?.rtcUserView.volume = vol
             }
         }
     }
@@ -143,12 +132,11 @@ class SA3DRtcView: UIView {
         let indexPath = IndexPath(item: realIndex, section: 0)
         if realIndex != 3 {
             DispatchQueue.main.async {[weak self] in
-                guard let cell: SA3DUserCollectionViewCell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
+                guard let cell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
                 cell.refreshUser(with: mic)
             }
         } else {
             //更新可移动view的数据
-            rtcUserView.cellType = getCellTypeWithStatus(mic.status)
             rtcUserView.user = mic.member
             panGesture?.isEnabled = mic.member?.uid == VLUserCenter.user.id
 //            if mic.member == nil {
@@ -205,7 +193,6 @@ class SA3DRtcView: UIView {
                                                position: pos,
                                                forward: realPosition.0)
         }
-        print("pos == \(pos)  forward == \(realPosition.0) right == \(realPosition.1) angle == \(rtcUserView.angle)")
         return realPosition.0.map({ $0.doubleValue })
     }
     
@@ -332,18 +319,17 @@ extension SA3DRtcView {
         
         moveCenter = checkEdgeRange(point: moveCenter)
         let angle = getAngle(rtcUserView.center, preP: lastCenterPoint)
-        
         rtcUserView.angle = angle
         lastCenterPoint = rtcUserView.center
         
         rtcUserView.center = CGPoint(x: moveCenter.x, y: moveCenter.y)
         pan.setTranslation(.zero, in: self)
         
-        let forward = self.updateCenterUserPosition()
+        let forward = updateCenterUserPosition()
         let pos = viewCenterPostion(view: rtcUserView)
         DispatchQueue.global().async {
             let currentTime = CFAbsoluteTimeGetCurrent()
-            if currentTime - 0.2 < self.lastTime { return }
+            if currentTime - 0.05 < self.lastTime { return }
             if let user = self.micInfos?.first?.member {
                 var info = SAPositionInfo()
                 info.uid = Int(user.uid ?? "0") ?? 0
@@ -369,14 +355,13 @@ extension SA3DRtcView {
     }
     
     private func calcuRealPositon(angle: Double) -> ([NSNumber], [NSNumber])  {
-        let angle = angle < 0 ? 90 : angle == 90 ? 270 : angle
         let fx = cos(angle)
         let fy = sin(angle)
         let forward = [NSNumber(value: Double(fx)),
                        NSNumber(value: Double(fy)),
                        NSNumber(0.0)]
-        let right = [NSNumber(value: Double(-fy)),
-                     NSNumber(value: Double(fx)),
+        let right = [NSNumber(value: Double(fy)),
+                     NSNumber(value: Double(-fx)),
                      NSNumber(0.0)]
         return (forward, right)
     }
@@ -435,24 +420,24 @@ extension SA3DRtcView {
                 setMediaPlayerPosition(pos: info.pos ?? [],
                                        forward: info.forward,
                                        playerId: Int(rtcKit?.redMediaPlayer?.getMediaPlayerId() ?? 0))
-                rtcKit?.redMediaPlayer?.setSpatialAudioParams(redSpatialParams)
+//                rtcKit?.redMediaPlayer?.setSpatialAudioParams(redSpatialParams)
                 
             case 3: // blue robot
                 setMediaPlayerPosition(pos: info.pos ?? [],
                                        forward: info.forward,
                                        playerId: Int(rtcKit?.blueMediaPlayer?.getMediaPlayerId() ?? 0))
-                rtcKit?.blueMediaPlayer?.setSpatialAudioParams(blueSpatialParams)
+//                rtcKit?.blueMediaPlayer?.setSpatialAudioParams(blueSpatialParams)
                 
             default:
                 if info.member?.uid == VLUserCenter.user.id {
-                    rtcKit?.updateSpetialPostion(position: info.pos ?? [0, 0, 0],
-                                                 axisForward: info.forward ?? [0, 1, 0],
-                                                 axisRight: info.right ?? [1, 0, 0],
+                    rtcKit?.updateSpetialPostion(position: info.pos ?? [0 ,0 ,0],
+                                                 axisForward: info.forward ?? [1, 0, 0],
+                                                 axisRight: info.right ?? [0, 1, 0],
                                                  axisUp: info.up)
                 } else {
                     rtcKit?.updateRemoteSpetialPostion(uid: info.member?.uid,
-                                                       position: info.pos ??  [0, 0, 0],
-                                                       forward: info.forward ?? [0, 1, 0])
+                                                       position: info.pos ?? [0, 0, 0],
+                                                       forward: info.forward ?? [1, 0, 0])
                 }
             }
         })
@@ -655,8 +640,10 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
     }
     
     func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
-        if state == .playing {
+        if state == .playing && isPlaying == false {
             updateSpatialPos()
+            updateCenterUserPosition()
         }
+        isPlaying = state == .playing
     }
 }

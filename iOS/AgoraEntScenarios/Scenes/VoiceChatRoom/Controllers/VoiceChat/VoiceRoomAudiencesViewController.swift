@@ -60,6 +60,7 @@ extension VoiceRoomAudiencesViewController {
                 self.empty.isHidden = ((self.datas?.count ?? 0) > 0)
                 self.tableView.reloadData()
             }
+            self.tableView.refreshControl?.endRefreshing()
         }
     }
     

@@ -36,7 +36,7 @@ class SAMuteView: UIView {
     public var micInfo: SARoomMic? {
         didSet {
             // 0:正常状态 1:闭麦 2:禁言 3:锁麦 4:锁麦和禁言 -1:空闲
-            let m_type = micInfo?.status
+            let m_type = micInfo?.member?.mic_status == .mute ? 1 : micInfo?.status
             var username: String = "\(micInfo?.mic_index ?? 0)"
             var iconStr: String = ""
             if let user = micInfo?.member {
@@ -162,7 +162,10 @@ class SAMuteView: UIView {
             return
         }
 
-        let m_type = micInfo.status
+        var m_type = micInfo.status
+        if micInfo.member != nil {
+            m_type = micInfo.member?.mic_status == .mute ? 1 : 0
+        }
         if sender.tag == 400 {
             state = .leave
         } else {

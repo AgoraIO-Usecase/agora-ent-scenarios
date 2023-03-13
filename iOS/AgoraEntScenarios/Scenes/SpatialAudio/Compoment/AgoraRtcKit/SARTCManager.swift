@@ -410,10 +410,11 @@ public let kMPK_RTC_UID_SA: UInt = 1
      */
     public func playMusic(with type: SARtcType.VMMUSIC_TYPE, isPlay: Bool) {
         if isPlay {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) {
-                self.musicType = type
-                self.baseMusicCount = 0
-            }
+            let lanuage = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized() : "EN"
+            let redPath = "https://download.agora.io/demo/test/spatial-\(lanuage)-red.wav"
+            let bluePath = "https://download.agora.io/demo/test/spatial-\(lanuage)-blue.wav"
+            blueMediaPlayer?.open(bluePath, startPos: 0)
+            redMediaPlayer?.open(redPath, startPos: 0)
         } else {
             redMediaPlayer?.stop()
             blueMediaPlayer?.stop()
@@ -471,7 +472,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
      */
     @discardableResult
     public func enableAEC(with grade: SARtcType.AECGrade) -> Int32 {
-        return rtcKit.setParameters("{\"rtc.audio.music_mode\": \(grade.rawValue)}")
+        return 0//rtcKit.setParameters("{\"rtc.audio.music_mode\": \(grade.rawValue)}")
     }
     
 
@@ -857,6 +858,8 @@ extension SARTCManager: AgoraRtcMediaPlayerDelegate {
                 baseMusicCount += 1
             }
         }
-        playerDelegate?.didMPKChangedTo?(playerKit, state: state, error: error)
+        DispatchQueue.main.async {
+            self.playerDelegate?.didMPKChangedTo?(playerKit, state: state, error: error)
+        }
     }
 }

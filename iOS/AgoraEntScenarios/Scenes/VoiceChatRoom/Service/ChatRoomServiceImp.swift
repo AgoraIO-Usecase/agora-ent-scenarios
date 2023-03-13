@@ -198,7 +198,7 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
 
 //MARK: ChatRoomServiceProtocol
 extension ChatRoomServiceImp: ChatRoomServiceProtocol {
-    
+
     func updateAnnouncement(content: String, completion: @escaping (Bool) -> Void) {
         VoiceRoomIMManager.shared?.updateAnnouncement(content: content, completion: completion)
     }
@@ -249,6 +249,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let keys = ["ranking_list","member_list","gift_amount","mic_0","mic_1","mic_2","mic_3","mic_4","mic_5","mic_6","mic_7","robot_volume","use_robot"]
         let roomInfo = VRRoomInfo()
         roomInfo.room = entity
+        let group = DispatchGroup()
+        group.enter()
+        VoiceRoomIMManager.shared?.fetchChatroomAnnouncement(completion: { content in
+            roomInfo.room?.announcement = content
+            group.leave()
+        })
+        group.enter()
         VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: keys, completion: { error, map in
             if let ranking_list = map?["ranking_list"]?.toArray() {
                 agoraPrint("ranking_list: \(ranking_list)")
@@ -290,8 +297,11 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             if entity.owner == nil {
                 roomInfo.room?.owner = roomInfo.mic_info?.first?.member
             }
-            completion(self.convertError(error: error),roomInfo)
+            group.leave()
         })
+        group.notify(queue: .main) {
+            completion(self.convertError(error: nil), roomInfo)
+        }
     }
     
     func fetchGiftContribute(completion: @escaping (Error?, [VRUser]?) -> Void) {
@@ -665,7 +675,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             completion()
             return
         }
-
+        SyncUtil.reset()
         SyncUtil.initSyncManager(sceneId: cSceneId) {
 //            guard let self = self else {
 //                return

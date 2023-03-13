@@ -13,6 +13,7 @@ public typealias PresentationViewController = UIViewController & PresentedViewTy
 public extension VRBaseViewController {
     /// 自定义present方法
     func presentViewController(_ viewController: PresentationViewController, animated: Bool = true) {
+        dismiss(animated: false)
         viewController.modalPresentationStyle = .custom
         viewController.transitioningDelegate = self
         present(viewController, animated: animated, completion: nil)
