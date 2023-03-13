@@ -4,6 +4,9 @@ plugins {
     id 'kotlin-kapt'
 }
 
+final def agoraAppID = project.property("AGORA_APP_ID").toString()
+final def agoraAppCertificate = project.property("AGORA_APP_CERTIFICATE").toString()
+
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
 
@@ -24,8 +27,11 @@ android {
         buildConfigField "String", "SERVER_HOST", "\"${SERVER_HOST}\""
         buildConfigField "String", "TOOLBOX_SERVER_HOST", "\"${TOOLBOX_SERVER_HOST}\""
 
-        buildConfigField "String", "AGORA_APP_ID", "\"${AGORA_APP_ID}\""
-        buildConfigField "String", "AGORA_APP_CERTIFICATE", "\"${AGORA_APP_CERTIFICATE}\""
+        if (agoraAppID.isEmpty() || agoraAppCertificate.isEmpty()) {
+            throw new GradleException("请在 gradle.properties 中配置完整的key")
+        }
+        buildConfigField "String", "AGORA_APP_ID", "\"${agoraAppID}\""
+        buildConfigField "String", "AGORA_APP_CERTIFICATE", "\"${agoraAppCertificate}\""
 
         buildConfigField "String", "IM_APP_KEY", "\"${IM_APP_KEY}\""
         buildConfigField "String", "IM_APP_CLIENT_ID", "\"${IM_APP_CLIENT_ID}\""
