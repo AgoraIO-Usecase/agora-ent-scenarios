@@ -18,6 +18,20 @@ import org.json.JSONObject
 import java.nio.ByteBuffer
 import java.util.concurrent.CountDownLatch
 
+/**
+ * KTVLoadSongStateOK 加载成功
+ * KTVLoadSongStateInProgress 正在加载中
+ * KTVLoadSongStateNoLyricUrl 没有歌词
+ * KTVLoadSongStatePreloadFail Mcc 预加载歌曲失败
+ *
+ */
+enum class KTVLoadSongState(val value: Int) {
+    OK(0),
+    FAILED(1),
+    IN_PROGRESS(2),
+    IDLE(3)
+}
+
 class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver,
     IRtcEngineEventHandler(), IAudioFrameObserver {
     private val TAG: String = "KTV_API_LOG"
