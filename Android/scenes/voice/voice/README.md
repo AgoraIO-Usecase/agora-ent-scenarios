@@ -40,21 +40,10 @@
 	gradle.properties：
 		AGORA_APP_ID= （从声网console获取）
 		AGORA_APP_CERTIFICATE=（从声网console获取）
-    ```
-
-- 在voice模块下 创建voice_gradle.properties文件 可支持配置生产环境和开发环境。
-
-    ```
-	voice_gradle.properties：(配置参数从环信IM Console获取)
-	isBuildTypesTest=true 开发环境：
-		IM_APP_KEY_TEST="开发环境 IM APPKEY"
-    IM_APP_CLIENT_ID_TEST="开发环境 IM Client ID"
-    IM_APP_CLIENT_SECRET_TEST="开发环境 IM ClientSecret"
-
-	isBuildTypesTest=false 生产环境
-		IM_APP_KEY_RELEASE="生产环境 IM APPKEY"	
-    IM_APP_CLIENT_ID_RELEASE="生产环境 IM Client ID"
-    IM_APP_CLIENT_SECRET_RELEASE="生产环境 IM ClientSecret"
+  
+        IM_APP_KEY= （从环信IM Console获取）
+        IM_APP_CLIENT_ID= （从环信IM Console获取）
+        IM_APP_CLIENT_SECRET= （从环信IM Console获取）
     ```
 
 ### 3.1 重要类介绍
