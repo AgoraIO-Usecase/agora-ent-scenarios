@@ -99,9 +99,7 @@ class VoiceRoomViewController: VRBaseViewController {
         SyncUtil.scene(id: self.roomInfo?.room?.room_id ?? "")?.subscribe(key: "",onDeleted: { _ in
             if self.isHeaderBack == false {
                 self.view.window?.makeToast("Time limit desc".localized())
-                self.rtckit.leaveChannel()
-                self.isOwner ? self.ownerBack():self.backAction()
-                self.leaveRoom()
+                self.quitRoom()
             }
         })
     }
@@ -110,6 +108,10 @@ class VoiceRoomViewController: VRBaseViewController {
         super.viewWillDisappear(animated)
         navigation.isHidden = false
         UIApplication.shared.isIdleTimerDisabled = false
+    }
+    
+    deinit {
+        print("VoiceRoomVC deinit")
     }
 
 }
@@ -158,9 +160,7 @@ extension VoiceRoomViewController {
                 } else {
                     self.view.window?.makeToast("Join RTC failed!")
                 }
-                self.rtckit.leaveChannel()
-                self.isOwner ? self.ownerBack():self.backAction()
-                self.leaveRoom()
+                self.quitRoom()
             } else {
                 if self.isOwner == true {
                     //房主更新环信KV
@@ -168,7 +168,9 @@ extension VoiceRoomViewController {
                 } else {
                     //观众更新拉取详情后更新kv
                     self.requestRoomDetail()
-                    self.sendJoinedMessage()
+                    Throttler.throttle(queue: .main,delay: .seconds(0.5),shouldRunLatest: true) {
+                        self.sendJoinedMessage()
+                    }
                     self.requestAnnouncement()
                 }
             }
@@ -350,15 +352,10 @@ extension VoiceRoomViewController {
                 if destroyed != true {
                     showEndLive()
                 } else {
-                    notifySeverLeave()
-                    rtckit.leaveChannel()
-                    ownerBack()
+                    self.quitRoom()
                 }
             } else {
-                notifySeverLeave()
-                rtckit.leaveChannel()
-                self.leaveRoom()
-                backAction()
+                self.quitRoom()
             }
         } else if action == .notice {
             showNoticeView(with: isOwner ? .owner : .audience)
@@ -433,12 +430,7 @@ extension VoiceRoomViewController {
 
     func notifySeverLeave() {
         guard let roomId = roomInfo?.room?.room_id else { return }
-        if self.local_index == nil {
-            ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in }
-        } else {
-            ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: self.local_index ?? ChatRoomServiceImp.getSharedInstance().findMicIndex()) { error, result in
-                ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in }
-            }
+        ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: self.local_index ?? ChatRoomServiceImp.getSharedInstance().findMicIndex()) { error, result in
         }
 
     }
@@ -584,18 +576,22 @@ extension VoiceRoomViewController {
         micAlert.actionEvents = { [weak self] in
             vc.dismiss(animated: true)
             if $0 != 30 {
-                self?.notifySeverLeave()
-                self?.rtckit.leaveChannel()
-                // giveupStage()
-                VoiceRoomUserInfo.shared.currentRoomOwner = nil
-                VoiceRoomUserInfo.shared.user?.amount = 0
-                ChatRoomServiceImp.getSharedInstance().cleanCache()
-                ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
-                self?.rtckit.stopPlayMusic()
-                self?.ownerBack()
+                self?.quitRoom()
             }
         }
         presentViewController(vc)
+    }
+    
+    func quitRoom() {
+        self.rtckit.leaveChannel()
+        self.notifySeverLeave()
+        self.leaveRoom()
+        VoiceRoomUserInfo.shared.currentRoomOwner = nil
+        VoiceRoomUserInfo.shared.user?.amount = 0
+        ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
+        ChatRoomServiceImp.getSharedInstance().cleanCache()
+        self.rtckit.stopPlayMusic()
+        self.ownerBack()
     }
 
     private func ownerBack() {

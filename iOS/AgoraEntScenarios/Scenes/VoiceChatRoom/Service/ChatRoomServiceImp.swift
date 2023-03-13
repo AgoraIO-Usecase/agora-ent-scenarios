@@ -225,6 +225,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     func unsubscribeEvent() {
         VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
         VoiceRoomIMManager.shared?.removeListener()
+        VoiceRoomIMManager.shared?.currentRoomId = ""
         self.roomServiceDelegate = nil
     }
     
@@ -743,7 +744,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                property: params) {[weak self] result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
                 completion(nil,model)
-                self?.roomId = room.channel_id
+                self?.roomId = room.room_id
                 self?._startCheckExpire()
                 //添加鉴黄接口
                 NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: .voice) { msg in
@@ -837,13 +838,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                     data: params,
                                     success: { obj in
                                 agoraPrint("updateUserCount success")
-                                
                             },
                                     fail: { error in
                                 agoraPrint("updateUserCount fail")
                             })
                         VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
                     }
+                    break
                 }
             }
         }

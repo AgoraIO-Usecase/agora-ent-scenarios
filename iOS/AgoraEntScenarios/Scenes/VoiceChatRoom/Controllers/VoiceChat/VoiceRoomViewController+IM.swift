@@ -114,8 +114,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         if reason == .destroyed {
             NotificationCenter.default.post(name: NSNotification.Name("refreshList"), object: nil)
         }
-        ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { _, _ in }
-        self.backAction()
+        self.quitRoom()
     }
     
     func onSeatUpdated(roomId: String, mics: [VRRoomMic], from fromId: String) {
