@@ -3,13 +3,6 @@ ext {
 }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-Properties properties = new Properties()
-properties.load(project.file('voice_gradle.properties').newDataInputStream())
-def final isBuildTypesTest = properties.getProperty('isBuildTypesTest')
-
-def final TEST_TOOLBOX_SERVER_HOST = properties.getProperty('TOOLBOX_SERVER_HOST_TEST')
-def final RELEASE_TOOLBOX_SERVER_HOST = properties.getProperty('TOOLBOX_SERVER_HOST_RELEASE')
-
 android {
 
     defaultConfig {
@@ -18,13 +11,6 @@ android {
             buildConfigField "Boolean", "is_modular", "${true}"
         }else {
             buildConfigField "Boolean", "is_modular", "${false}"
-        }
-        if (isBuildTypesTest.toBoolean()){
-            buildConfigField "Boolean", "voice_env_is_test", "${true}"
-            buildConfigField "String", "toolbox_server_host", "${TEST_TOOLBOX_SERVER_HOST}"
-        }else {
-            buildConfigField "Boolean", "voice_env_is_test", "${false}"
-            buildConfigField "String", "toolbox_server_host", "${RELEASE_TOOLBOX_SERVER_HOST}"
         }
 
         ndk {
