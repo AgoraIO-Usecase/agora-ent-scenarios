@@ -236,6 +236,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             onSwitchRoleState(SwitchRoleState.SUCCESS, SwitchRoleFailReason.NONE)
         } else if (this.singerRole == KTVSingRole.LeadSinger && newRole == KTVSingRole.Audience) {
             // 8、LeadSinger -》Audience
+            leaveChorus(singerRole)
             stopSing()
 
             this.singerRole = newRole
@@ -478,6 +479,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         Log.d(TAG, "leaveChorus: $singerRole")
         when (role) {
             KTVSingRole.LeadSinger -> {
+                mainSingerHasJoinChannelEx = false
                 leaveChorus2ndChannel(role)
             }
             KTVSingRole.CoSinger -> {
@@ -493,14 +495,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
             }
             else -> {
-                Log.e(TAG, "JoinChorus with Wrong role: $singerRole")
+                Log.e(TAG, "JoinChorus with wrong role: $singerRole")
             }
         }
     }
 
     private fun stopSing() {
         Log.d(TAG, "stopSong called")
-        mainSingerHasJoinChannelEx = false
 
         val channelMediaOption = ChannelMediaOptions()
         channelMediaOption.autoSubscribeAudio = true
@@ -511,14 +512,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         if (mPlayer.state != Constants.MediaPlayerState.PLAYER_STATE_STOPPED) {
             mPlayer.stop()
         }
-        leaveChorus2ndChannel(singerRole)
         mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
     }
 
     // ------------------ inner --------------------
 
     private fun isChorusCoSinger(): Boolean {
-        return singerRole == KTVSingRole.CoSinger || singerRole == KTVSingRole.FollowSinger
+        return singerRole == KTVSingRole.CoSinger
     }
 
     private fun sendStreamMessageWithJsonObject(
@@ -627,9 +627,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         }
 
         this.mainSingerUid = mainSingerUid
-        if (newRole == KTVSingRole.CoSinger ||
-            newRole == KTVSingRole.FollowSinger
-        ) {
+        if (newRole == KTVSingRole.CoSinger) {
             mRtcEngine.muteRemoteAudioStream(mainSingerUid, true)
         }
     }
