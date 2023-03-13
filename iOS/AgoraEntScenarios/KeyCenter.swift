@@ -43,7 +43,22 @@ struct KeyCenter {
     */
     static var HostUrl: String = "https://ad-fulldemo-gateway-prod.bj2.agoralab.co"
     
+    
+    /**
+     在环信即时通讯云控制台创建应用时填入的应用名称。详见 获取环信即时通讯 IM 的信息
+     (https://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#获取环信即时通讯-im-的信息)
+     */
     static var IMAppKey: String? = nil
+    
+    /**
+     App 的 client_id，用于生成 app token 调用 REST API。详见 环信即时通讯云控制台
+     (https://console.easemob.com/user/login/)的应用详情页面
+     */
     static var IMClientId: String? = nil
+    
+    /**
+     App 的 client_secret，用于生成 app token 调用 REST API。详见 环信即时通讯云控制台
+     (https://console.easemob.com/user/login/)应用详情页面。
+     */
     static var IMClientSecret: String? = nil
 }
