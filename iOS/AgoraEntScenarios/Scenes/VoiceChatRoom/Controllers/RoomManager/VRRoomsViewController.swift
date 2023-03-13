@@ -66,7 +66,6 @@ let page_size = 15
     }
     
     deinit {
-        print("\(self.swiftClassName ?? "") is destroyed!")
         VoiceRoomIMManager.shared = nil
         ChatRoomServiceImp._sharedInstance = nil
         VoiceRoomUserInfo.shared.user = nil
