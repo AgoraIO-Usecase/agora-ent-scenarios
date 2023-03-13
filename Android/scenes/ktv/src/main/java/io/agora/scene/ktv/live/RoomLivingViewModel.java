@@ -293,7 +293,7 @@ public class RoomLivingViewModel extends ViewModel {
             if (e == null) {
                 // success
                 // do nothing for the subscriber will callback the new room info.
-                KTVLogger.e(TAG, "RoomLivingViewModel.setMV_BG() success");
+                KTVLogger.d(TAG, "RoomLivingViewModel.setMV_BG() success");
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.setMV_BG() failed: " + e.getMessage());
