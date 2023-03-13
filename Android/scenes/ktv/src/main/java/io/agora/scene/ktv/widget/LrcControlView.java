@@ -35,7 +35,6 @@ import com.bumptech.glide.request.target.Target;
 import java.io.File;
 import java.util.List;
 
-import io.agora.karaoke_view.DownloadManager;
 import io.agora.karaoke_view.v11.KaraokeEvent;
 import io.agora.karaoke_view.v11.KaraokeView;
 import io.agora.karaoke_view.v11.LyricsView;
@@ -43,6 +42,7 @@ import io.agora.karaoke_view.v11.ScoringView;
 import io.agora.karaoke_view.v11.model.LyricsLineModel;
 import io.agora.karaoke_view.v11.model.LyricsModel;
 import io.agora.scene.base.manager.UserManager;
+import io.agora.scene.base.utils.DownloadUtils;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.ZipUtils;
 import io.agora.scene.ktv.R;
@@ -564,7 +564,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     public void downloadLrcData(String url) {
         retryTime++;
-        DownloadManager.getInstance().download(getContext(), url, file -> {
+        DownloadUtils.getInstance().download(getContext(), url, file -> {
             if (file.getName().endsWith(".zip")) {
                 ZipUtils.unzipOnlyPlainXmlFilesAsync(file.getAbsolutePath(),
                         file.getAbsolutePath().replace(".zip", ""),

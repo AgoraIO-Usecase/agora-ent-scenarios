@@ -59,6 +59,7 @@ import io.agora.scene.ktv.service.OutSeatInputModel;
 import io.agora.scene.ktv.service.RemoveSongInputModel;
 import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.ktv.service.RoomSelSongModel;
+import io.agora.scene.ktv.service.ScoringAlgoControlModel;
 import io.agora.scene.ktv.widget.LrcControlView;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
@@ -116,6 +117,8 @@ public class RoomLivingViewModel extends ViewModel {
     final MutableLiveData<Integer> playerMusicPlayCompleteLiveData = new MutableLiveData<>();
     final MutableLiveData<Integer> playerMusicCountDownLiveData = new MutableLiveData<>();
     final MutableLiveData<NetWorkEvent> networkStatusLiveData = new MutableLiveData<>();
+
+    final MutableLiveData<ScoringAlgoControlModel> scoringAlgoControlLiveData = new MutableLiveData<>();
 
     /**
      * Rtc引擎
@@ -1088,6 +1091,11 @@ public class RoomLivingViewModel extends ViewModel {
                 } else {
                     mRtcEngine.setParameters("{\"rtc.debug.enable\": false}");
                 }
+            }
+
+            @Override
+            public void onScoringControl(int level, int offset) {
+                scoringAlgoControlLiveData.postValue(new ScoringAlgoControlModel(level, offset));
             }
         });
 

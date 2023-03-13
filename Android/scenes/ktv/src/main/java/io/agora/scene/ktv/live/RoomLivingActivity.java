@@ -381,6 +381,13 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             onMusicChanged(model);
             getBinding().lrcControlView.setScoreControlView(roomLivingViewModel.songPlayingLiveData.getValue());
         });
+        roomLivingViewModel.scoringAlgoControlLiveData.observe(this, model -> {
+            if (model == null) {
+                return;
+            }
+            getBinding().lrcControlView.getKaraokeView().setScoreLevel(model.getLevel());
+            getBinding().lrcControlView.getKaraokeView().setScoreCompensationOffset(model.getOffset());
+        });
         roomLivingViewModel.playerMusicStatusLiveData.observe(this, status -> {
             if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PREPARE) {
                 getBinding().lrcControlView.onPrepareStatus(roomLivingViewModel.isRoomOwner());
