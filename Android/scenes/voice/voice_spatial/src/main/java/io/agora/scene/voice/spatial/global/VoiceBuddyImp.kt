@@ -13,16 +13,12 @@ class VoiceBuddyImp : io.agora.scene.voice.spatial.global.IVoiceBuddy {
     private var chatToken: String = ""
     private var rtcToken: String = ""
 
-    override fun isBuildTest(): Boolean {
-        return BuildConfig.voice_env_is_test
-    }
-
     override fun application(): Application {
         return AgoraApplication.the()
     }
 
     override fun toolboxServiceUrl(): String {
-        return BuildConfig.toolbox_server_host
+        return io.agora.scene.base.BuildConfig.TOOLBOX_SERVER_HOST
     }
 
     override fun headUrl(): String {

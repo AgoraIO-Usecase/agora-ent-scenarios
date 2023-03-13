@@ -24,10 +24,7 @@ import io.agora.scene.voice.global.VoiceConfigManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.fragment.VoiceRoomListFragment
 import io.agora.voice.common.ui.BaseUiActivity
-import io.agora.voice.common.utils.DeviceTools
-import io.agora.voice.common.utils.FastClickTools
-import io.agora.voice.common.utils.ResourcesTools
-import io.agora.voice.common.utils.StatusBarCompat
+import io.agora.voice.common.utils.*
 
 @Route(path = PagePathConstant.pageVoiceChat)
 class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
@@ -61,6 +58,13 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
     override fun onCreate(savedInstanceState: Bundle?) {
         StatusBarCompat.setLightStatusBar(this, true)
         super.onCreate(savedInstanceState)
+        if (io.agora.scene.base.BuildConfig.IM_APP_KEY.isEmpty() ||
+            io.agora.scene.base.BuildConfig.IM_APP_CLIENT_ID.isEmpty() ||
+            io.agora.scene.base.BuildConfig.IM_APP_CLIENT_SECRET.isEmpty()) {
+            finish()
+            ToastTools.show(this, "IM_APP_KEY / IM_APP_CLIENT_ID / IM_APP_CLIENT_SECRET 未配置")
+            return
+        }
         binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
         setupWithViewPager()
         initListener()

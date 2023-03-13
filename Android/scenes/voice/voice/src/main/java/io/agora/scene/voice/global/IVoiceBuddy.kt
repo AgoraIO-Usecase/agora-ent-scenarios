@@ -6,9 +6,6 @@ import android.app.Application
  * @author create by zhangwei03
  */
 interface IVoiceBuddy {
-
-    fun isBuildTest(): Boolean
-
     /** app */
     fun application(): Application
 

@@ -3,41 +3,13 @@ ext {
 }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-Properties properties = new Properties()
-properties.load(project.file('voice_gradle.properties').newDataInputStream())
-def final isBuildTypesTest = properties.getProperty('isBuildTypesTest')
-
-def final TEST_IM_APP_KEY = properties.getProperty('IM_APP_KEY_TEST')
-def final TEST_IM_CLIENT_ID = properties.getProperty('IM_APP_CLIENT_ID_TEST')
-def final TEST_IM_CLIENT_SECRET = properties.getProperty('IM_APP_CLIENT_SECRET_TEST')
-def final TEST_TOOLBOX_SERVER_HOST = properties.getProperty('TOOLBOX_SERVER_HOST_TEST')
-
-def final RELEASE_IM_APP_KEY = properties.getProperty('IM_APP_KEY_RELEASE')
-def final RELEASE_IM_CLIENT_ID = properties.getProperty('IM_APP_CLIENT_ID_RELEASE')
-def final RELEASE_IM_CLIENT_SECRET = properties.getProperty('IM_APP_CLIENT_SECRET_RELEASE')
-def final RELEASE_TOOLBOX_SERVER_HOST = properties.getProperty('TOOLBOX_SERVER_HOST_RELEASE')
-
 android {
-
     defaultConfig {
         if(voice_is_modular){
             applicationId "io.agora.scenes.voice"
             buildConfigField "Boolean", "is_modular", "${true}"
         }else {
             buildConfigField "Boolean", "is_modular", "${false}"
-        }
-        if (isBuildTypesTest.toBoolean()){
-            buildConfigField "Boolean", "voice_env_is_test", "${true}"
-            buildConfigField "String", "im_app_key", "${TEST_IM_APP_KEY}"
-            buildConfigField "String", "im_client_id", "${TEST_IM_CLIENT_ID}"
-            buildConfigField "String", "im_client_secret", "${TEST_IM_CLIENT_SECRET}"
-            buildConfigField "String", "toolbox_server_host", "${TEST_TOOLBOX_SERVER_HOST}"
-        }else {
-            buildConfigField "Boolean", "voice_env_is_test", "${false}"
-            buildConfigField "String", "im_app_key", "${RELEASE_IM_APP_KEY}"
-            buildConfigField "String", "im_client_id", "${RELEASE_IM_CLIENT_ID}"
-            buildConfigField "String", "im_client_secret", "${RELEASE_IM_CLIENT_SECRET}"
-            buildConfigField "String", "toolbox_server_host", "${RELEASE_TOOLBOX_SERVER_HOST}"
         }
 
         ndk {
