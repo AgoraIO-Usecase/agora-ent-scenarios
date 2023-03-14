@@ -111,7 +111,7 @@
     }];
 }
 
-- (void)setSelSongsUIWithArray:(NSArray *)selSongsArray {
+- (void)setSelSongsArray:(NSArray *)selSongsArray {
     _selSongsArray = selSongsArray;
     [self.tableView reloadData];
 }

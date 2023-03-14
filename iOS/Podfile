@@ -18,7 +18,7 @@ def all_pods
   pod 'SDWebImage', '5.0.6'
   # Model
   pod 'YYModel', '1.0.4'
-  pod 'YYCache', '1.0.4'
+#  pod 'YYCache', '1.0.4'
   pod 'YYCategories', '1.0.4'
   # 键盘
   pod 'IQKeyboardManager', '6.5.10'
@@ -30,8 +30,8 @@ def all_pods
   
 #  pod 'AgoraRtcEngine_iOS', '~> 4.0.1'
 #pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
-  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
-#  pod 'AgoraRtcEngine_iOS', :path => './libs'
+#  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
+  pod 'AgoraRtcEngine_iOS', :path => './libs'
 
   #ThirdParty
   pod 'HWWeakTimer', '1.0'
@@ -40,9 +40,9 @@ def all_pods
   pod 'Agora-Scene-Utils', '1.0.9'
   
   #歌词组件
-#  pod "AgoraLyricsScore", :path => "../AgoraLyricsScore/AgoraLyricsScore.podspec"
-  pod 'AgoraLyricsScore', '1.1.1-beta-1'
+#  pod 'AgoraLyricsScore', '1.0.8.8'
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'cc0951f11f5fa6113ec2b9df2a509efa881d5bd7'
+  pod 'AgoraLyricsScore', :path => '../../AgoraLyricsScore/AgoraLyricsScore.podspec'
   pod 'AgoraRtm_iOS', '1.5.1'
   pod 'Zip'
   

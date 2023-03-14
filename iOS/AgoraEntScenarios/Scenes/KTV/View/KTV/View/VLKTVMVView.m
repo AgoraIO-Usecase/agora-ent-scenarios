@@ -97,18 +97,10 @@
 
     CGFloat lY = CGRectGetMaxX(currentPlayImgView.frame);
     CGFloat lH = self.height - lY;
+    [KaraokeView setLogWithPrintToConsole:true writeToFile:true];
     _karaokeView = [[KaraokeView alloc] initWithFrame:CGRectMake(0, lY, self.width, lH - 40)];
-    _karaokeView.delegate = self;
-    _karaokeView.lyricsView.textNormalColor = [UIColor grayColor];
-    _karaokeView.lyricsView.textSelectedColor = [UIColor whiteColor];
-    _karaokeView.lyricsView.textHighlightedColor = [UIColor colorWithHexString:@"#FF8AB4"];
-    _karaokeView.lyricsView.textNormalFontSize = [UIFont fontWithName:@"PingFang SC" size:13];
-    _karaokeView.lyricsView.textHighlightFontSize = [UIFont fontWithName:@"PingFang SC" size:16];
-    _karaokeView.lyricsView.draggable = true;
     _karaokeView.scoringView.viewHeight = 50;
     _karaokeView.scoringView.topSpaces = 5;
-    _karaokeView.scoringView.localPitchCursorOffsetX = 5;
-    _karaokeView.scoringView.localPitchCursorImage = [UIImage sceneImageWithName:@"t1"];
    // _karaokeView.scoringView.showDebugView = true;
     _karaokeView.backgroundImage = [UIImage imageNamed:@"ktv_top_bgIcon"];
     [self addSubview:_karaokeView];
@@ -141,7 +133,9 @@
     self.idleView.hidden = NO;
     [self addSubview:self.idleView];
 
-    [self setPlayerViewsHidden:YES nextButtonHidden:YES];
+    [self setPlayerViewsHidden:YES nextButtonHidden:YES playButtonHidden:YES];
+
+ //   [self setPlayerViewsHidden:YES nextButtonHidden:YES];
     
     VL(weakSelf);
     self.skipView = [[KTVSkipView alloc]initWithFrame:CGRectZero completion:^(SkipActionType type) {
@@ -248,20 +242,22 @@
 }
 
 - (void)configPlayerControls:(VLRoomSelSongModel *)song {
-    // 是自己点的歌曲
+    // 是主唱/伴唱
     if (song.isSongOwner) {
-        [self setPlayerViewsHidden:NO nextButtonHidden:NO];
-    }
-    else if(VLUserCenter.user.ifMaster) {
-        [self setPlayerViewsHidden:YES nextButtonHidden:NO];
-    }
-    else {
-        [self setPlayerViewsHidden:YES nextButtonHidden:YES];
+        [self setPlayerViewsHidden:NO nextButtonHidden:NO playButtonHidden:NO];
+    } else if ([song isSongCoSinger]) {
+        [self setPlayerViewsHidden:NO nextButtonHidden:YES playButtonHidden:YES];
+    } else if(VLUserCenter.user.ifMaster) {
+        [self setPlayerViewsHidden:YES nextButtonHidden:NO playButtonHidden:YES];
+    } else {
+        [self setPlayerViewsHidden:YES nextButtonHidden:YES playButtonHidden:YES];
     }
 }
 
-- (void)setPlayerViewsHidden:(BOOL)hidden nextButtonHidden:(BOOL)nextButtonHidden{
-    self.pauseBtn.hidden = hidden;
+- (void)setPlayerViewsHidden:(BOOL)hidden
+            nextButtonHidden:(BOOL)nextButtonHidden
+            playButtonHidden:(BOOL)playButtonHidden {
+    self.pauseBtn.hidden = playButtonHidden;
     self.nextButton.hidden = nextButtonHidden;
     self.originBtn.hidden = hidden;
     self.settingBtn.hidden = hidden;
@@ -301,9 +297,10 @@
 //}
 
 - (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song onSeat:(BOOL)onSeat {
+    KTVLogInfo(@"VLKTVMVView updateUIWithSong: songName: %@, name: %@", song.songName, song.name);
     self.idleView.hidden = song;
     self.joinChorusView.hidden = !(song && song.isChorus && ![self isPlaying:song]);
-    
+    self.karaokeView.lyricsView.draggable = !song.isChorus;
     //config score label visibility
 //    self.config.isHiddenScoreView = NO;
 //    [self.lrcView setConfig:self.config];
@@ -425,14 +422,76 @@
 
 - (void)reset {
     [_karaokeView reset];
-    [self setSongScore:0];
-    self.isPlayAccompany = YES;
-    [self cleanMusicText];
+    [_gradeView reset];
 }
 
-- (void)resetTime {
-    [_karaokeView reset];
+#pragma mark - AgoraKaraokeScoreDelegate
+
+/// 评分回调
+/// @param score 当前行得分
+/// @param cumulativeScore 累计得分
+/// @param totalScore 当前歌曲总得分
+-(void)agoraKaraokeScoreWithScore:(double)score cumulativeScore:(double)cumulativeScore totalScore:(double)totalScore {
+    double scale = cumulativeScore / totalScore;
+    double realScore = scale * 100;
+    self.scoreLabel.text = [NSString stringWithFormat:@"%.0lf",score];
+    self.totalLines += 1;
+    self.totalScore = cumulativeScore;
+    VLLog(@"Recording: %d lines at totalScore: %f", self.totalLines, cumulativeScore);
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:scoreDidUpdate:)]) {
+        [self.delegate onKTVMVView:self scoreDidUpdate:realScore];
+    }
 }
+
+- (int)getSongScore {
+    return [self.scoreLabel.text intValue];
+}
+
+- (int)getAvgSongScore
+{
+    if(self.totalLines <= 0) {
+        return 0;
+    }
+    else {
+        return (int)(self.totalScore / self.totalLines);
+    }
+}
+
+#pragma mark private method
+//- (void)_startLrc {
+//    [_lrcView start];
+//    self.totalLines = 0;
+//    self.totalScore = 0.0f;
+//    KTVLogInfo(@"VLKTVMVView _startLrc %@", self.musicTitleLabel.text);
+//}
+
+
+#pragma mark -
+
+//- (void)loadLrcURL:(NSString *)lrcURL {
+//    [_lrcView setLrcUrlWithUrl:lrcURL];
+//}
+//
+//- (void)start {
+//    [_lrcView start];
+//    KTVLogInfo(@"VLKTVMVView start [%@]", self.musicTitleLabel.text);
+//    NSAssert(self.musicTitleLabel.text.length > 0, @"dfd");
+//}
+//
+//- (void)stop {
+//    [_lrcView stop];
+//    KTVLogInfo(@"VLKTVMVView stop [%@]", self.musicTitleLabel.text);
+//}
+//
+//- (void)reset {
+//    KTVLogInfo(@"VLKTVMVView reset [%@]", self.musicTitleLabel.text);
+//    [_lrcView stop];
+//    [_lrcView reset];
+//>>>>>>> dev/scene/ktv_ios_remove_qmui
+//    [self setSongScore:0];
+//    self.isPlayAccompany = YES;
+//    [self cleanMusicText];
+//}
 
 - (UILabel *)musicTitleLabel {
     if (!_musicTitleLabel) {

@@ -35,7 +35,7 @@ import AgoraRtcKit
 
 
 /// 加载歌曲失败原因
-public enum KTVLoadSongFailReason: Int {
+@objc public enum KTVLoadSongFailReason: Int {
     case none = 0             //无错误
     case noLyricUrl         //无歌词
     case musicPreloadFail   //歌曲预加载失败

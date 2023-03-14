@@ -33,10 +33,14 @@ UITextFieldDelegate
 @property (nonatomic, strong) NSMutableSet *selSongViews;
 @property (nonatomic, copy) NSString *roomNo;
 @property (nonatomic, assign) BOOL ifChorus;
-@property (nonatomic, strong) NSArray *selSongArray;
 @end
 
 @implementation VLSelectedSongList
+
+- (void)setSelSongsArray:(NSArray *)selSongsArray {
+    _selSongsArray = selSongsArray;
+    [self updateUIWithSelSongsArray:selSongsArray];
+}
 
 - (instancetype)initWithFrame:(CGRect)frame
                  withDelegate:(id<VLSelectedSongListDelegate>)delegate
@@ -155,22 +159,24 @@ UITextFieldDelegate
 }
 
 -(void)setSelSongArrayWith:(NSArray *)array {
+    [self updateUIWithSelSongsArray:array];
+}
+
+-(void)updateUIWithSelSongsArray:(NSArray *)array {
     VLSelectSongTableItemView *selView = nil;
     for(VLSelectSongTableItemView *view in self.selSongViews){
         if (view.tag  == self.currentIndex) {
             selView = view;
             [selView setSelSongArrayWith:array];
-            self.selSongArray = array;
             return;
         }
     }
-    
 }
 
 #pragma mark --delegate
 - (void)categoryView:(JXCategoryBaseView *)categoryView didSelectedItemAtIndex:(NSInteger)index {
     self.currentIndex = index + BASICVCINDEX;
-    [self setSelSongArrayWith:self.selSongArray];
+    [self setSelSongArrayWith:self.selSongsArray];
 }
 
 // 返回列表的数量
@@ -182,6 +188,7 @@ UITextFieldDelegate
     VLSelectSongTableItemView *selSongView = [[VLSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)
                                                                                     withRooNo:self.roomNo
                                                                                      ifChorus:self.ifChorus];
+   // selSongView.selSongsArray = self.selSongsArray;
     [selSongView loadDatasWithIndex:index+1 ifRefresh:YES];
     selSongView.tag = BASICVCINDEX + index;
     [self.selSongViews addObject:selSongView];

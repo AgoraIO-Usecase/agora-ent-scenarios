@@ -22,9 +22,8 @@ AgoraMusicContentCenterEventDelegate
 >
 @property (nonatomic, strong) UITableView    *tableView;
 @property (nonatomic, strong) NSMutableArray *songsMuArray;
-@property (nonatomic, assign) NSInteger        page;
+@property (nonatomic, assign) NSInteger page;
 
-@property (nonatomic, strong) NSArray *selSongsArray;
 @property (nonatomic, copy) NSString *roomNo;
 @property (nonatomic, assign) BOOL ifChorus;
 @property (nonatomic, assign) NSInteger pageType;
@@ -34,6 +33,13 @@ AgoraMusicContentCenterEventDelegate
 @end
 
 @implementation VLSelectSongTableItemView
+
+- (void)setSelSongsArray:(NSArray *)selSongsArray {
+    _selSongsArray = selSongsArray;
+    
+    [self calcSelectedStatus];
+    [self.tableView reloadData];
+}
 
 - (void)dealloc {
     [[AppContext shared] unregisterEventDelegate:self];
@@ -65,12 +71,23 @@ AgoraMusicContentCenterEventDelegate
     _refreshControl = [[UIRefreshControl alloc]init];
     self.tableView.refreshControl = _refreshControl;
     [_refreshControl addTarget:self action:@selector(loadData) forControlEvents:UIControlEventValueChanged];
-
 }
 
 -(void)loadData {
     [self.tableView.refreshControl beginRefreshing];
     [self loadDatasWithIndex:self.pageType ifRefresh:YES];
+}
+
+- (void)calcSelectedStatus {
+    for (VLSongItmModel *itemModel in self.songsMuArray) {
+        itemModel.ifChoosed = NO;
+        for (VLRoomSelSongModel *selModel in self.selSongsArray) {
+            if ([itemModel.songNo isEqualToString:selModel.songNo]) {
+                itemModel.ifChoosed = YES;
+                break;
+            }
+        }
+    }
 }
 
 - (void)appendDatasWithSongList:(NSArray<VLSongItmModel*>*)songList {
@@ -90,8 +107,12 @@ AgoraMusicContentCenterEventDelegate
         }
     }
     
-    [self updateData];
 
+//    [self calcSelectedStatus];
+//
+//    [self.tableView reloadData];
+
+    [self updateData];
 }
 
 
