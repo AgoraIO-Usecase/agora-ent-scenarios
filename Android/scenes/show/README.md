@@ -83,7 +83,6 @@
 >      videoFrame.replaceBuffer(newBuffer, videoFrame.getRotation(), videoFrame.getTimestampNs());
 >    }
 >   ```
-
 > - 虚拟背景和虚化背景
 >   
 >   相关代码参考：[BeautyDialog](src/main//java//io//agora//scene//show//widget//BeautyDialog.kt) 中 onItemSelected.GROUP_ID_VIRTUAL_BG 部分。
