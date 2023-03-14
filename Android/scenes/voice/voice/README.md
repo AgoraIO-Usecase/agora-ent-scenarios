@@ -10,9 +10,13 @@
 - Android Studio 3.5及以上版本。
 - Android 5.0 及以上的手机设备。
 
+---
+
 ## 2. 运行示例
 
-- 获取声网App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
+- 获取声网App ID 和 App 证书  
+[声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)  
+[声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
    - 点击创建应用
   
@@ -25,12 +29,20 @@
    - 得到App ID与App 证书
       
      ![图片](image/get_app_id.jpg)
-
-- 获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
-
+  
 - <mark>联系销售给 AppID 开通 语聊房权限</mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员[Agora 支持](https://agora-ticket.agora.io/))
+  
+- 获取环信的App Key
 
-- 在项目的[**gradle.properties**](../../../gradle.properties)里填写需要的声网 App ID 和 App证书
+  - 创建应用
+
+    ![图片](image/im_create_app.jpg)
+  
+  - 查看应用的App Key  
+  
+    ![图片](image/im_get_app_id.jpg)
+  
+- 在项目的[**gradle.properties**](../../../gradle.properties)里填写需要的声网 App ID 和 环信的 App Key
 
   ![图片](image/config_app_id.jpg)
 
@@ -87,8 +99,9 @@ IM 配置管理类(主要包括初始化IM SDK 设置回调监听)：[ChatroomCo
 
 IM管理类（包含加入房间、登录、退出登录等）[ChatroomIMManager](src/main/java/io/agora/scene/voice/imkit/manager/ChatroomIMManager.java)
 
+---
 
-### 4.FAQ
+### 4. FAQ
 - 如何获取声网和环信APP ID：
   - 声网APP ID申请：https://www.agora.io/cn/
   - 环信APP ID申请：https://www.easemob.com/
