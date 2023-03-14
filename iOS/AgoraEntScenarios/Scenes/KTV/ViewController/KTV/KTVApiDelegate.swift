@@ -69,6 +69,7 @@ import AgoraRtcKit
     case musicPreloadFail  //歌曲预加载失败
     case musicOpenFail     //歌曲打开失败
     case joinChannelFail   //加入ex频道失败
+    case musicPreloadFailAndJoinChannelFail
 }
 
 @objc public protocol KTVMusicLoadStateListener: NSObjectProtocol {
