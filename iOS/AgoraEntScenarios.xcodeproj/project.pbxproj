@@ -66,6 +66,7 @@
 		DD0292F7295BF0DC00485225 /* VLOnLineListVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0292BF295BF0DC00485225 /* VLOnLineListVC.m */; };
 		DD0292F8295BF0DC00485225 /* KtvResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DD0292C0295BF0DC00485225 /* KtvResource.bundle */; };
 		DD1603442963CAFD00182A04 /* AgoraEntLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1603432963CAFD00182A04 /* AgoraEntLog.swift */; };
+		DD1CD29229C06430002331AE /* KTVLrcControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1CD29129C06430002331AE /* KTVLrcControl.swift */; };
 		DD220B09295B332C00F57F30 /* VoiceRoomBusinessApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2209FD295B332C00F57F30 /* VoiceRoomBusinessApi.swift */; };
 		DD220B0A295B332C00F57F30 /* VoiceRoomRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2209FE295B332C00F57F30 /* VoiceRoomRequest.swift */; };
 		DD220B0B295B332C00F57F30 /* VoiceRoomBusinessRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2209FF295B332C00F57F30 /* VoiceRoomBusinessRequest.swift */; };
@@ -457,6 +458,7 @@
 		DD0292BF295BF0DC00485225 /* VLOnLineListVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLOnLineListVC.m; sourceTree = "<group>"; };
 		DD0292C0295BF0DC00485225 /* KtvResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = KtvResource.bundle; sourceTree = "<group>"; };
 		DD1603432963CAFD00182A04 /* AgoraEntLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraEntLog.swift; sourceTree = "<group>"; };
+		DD1CD29129C06430002331AE /* KTVLrcControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KTVLrcControl.swift; sourceTree = "<group>"; };
 		DD2209FD295B332C00F57F30 /* VoiceRoomBusinessApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessApi.swift; sourceTree = "<group>"; };
 		DD2209FE295B332C00F57F30 /* VoiceRoomRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomRequest.swift; sourceTree = "<group>"; };
 		DD2209FF295B332C00F57F30 /* VoiceRoomBusinessRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessRequest.swift; sourceTree = "<group>"; };
@@ -1070,6 +1072,7 @@
 				DD0292BB295BF0DC00485225 /* VLKTVViewController.m */,
 				DD0292BC295BF0DC00485225 /* KTVApi.m */,
 				DD01BD2129C0447A00C9B403 /* KTVApiImpl.swift */,
+				DD1CD29129C06430002331AE /* KTVLrcControl.swift */,
 			);
 			path = KTV;
 			sourceTree = "<group>";
@@ -2330,6 +2333,7 @@
 				DDA199F328FFE579009D3E61 /* UIColor+Extension.swift in Sources */,
 				DD0292D2295BF0DC00485225 /* VLSearchSongResultView.m in Sources */,
 				DD220B58295B332C00F57F30 /* VoiceRoomEndLiveAlert.swift in Sources */,
+				DD1CD29229C06430002331AE /* KTVLrcControl.swift in Sources */,
 				DD220B7E295B332C00F57F30 /* VMConfirmView.swift in Sources */,
 				DD220B2D295B332C00F57F30 /* VoiceRoomGiftEntity.swift in Sources */,
 				DD0292CF295BF0DC00485225 /* VLSelectedSongList.m in Sources */,
