@@ -4,7 +4,7 @@
 
 ---
 
-# 环境准备
+## 1.环境准备
 
 - 最低兼容 Android 5.0（SDK API Level 21）
 - Android Studio 3.5及以上版本。
@@ -12,7 +12,7 @@
 
 ---
 
-## 运行示例
+## 2.运行示例
 
 - <mark>1. </mark> 获取声网App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)  
   
@@ -58,8 +58,38 @@
 - <mark>4. </mark> 用 Android Studio 运行项目即可开始您的体验
 
 ---
+## 3.项目介绍
+- <mark>1. 概述</mark> 
+> 秀场直播项目是声网秀场直播场景的开源代码，开发者可以获取并添加到您的APP工程里，本源码会伴随声动互娱Demo同步更新，为了获取更多新的功能和更佳的体验，强烈推荐您下载最新代码集成。
+- <mark>2. 功能介绍</mark> 
+> 秀场直播场景目前已涵盖以下功能
+> - PK 和连麦 
+> 
+>   相关代码请参考：[LiveDetailFragment](src/main/java/io/agora/scene/show/LiveDetailFragment.kt) 中的 updatePKingMode() 和 updateLinkingMode() 的实现。
+>
+> - 秒切
+>
+>   相关代码请参考：[LiveDetailActivity](src/main/java/io/agora/scene/show/LiveDetailActivity.kt) 中的 OnPageChangeCallback 的实现。
+> - 美颜
+>
+>   美颜是通过注册视频帧观测器，在视频观测器的 onCaptureVideoFrame 回调中通过商汤美颜SDK处理视频帧数据并替换实现美颜功能。
+>   
+>   商汤美颜功能的详细封装请参考：[BeautySenseTimeImpl](src/main/java/io/agora/scene/show/beauty/sensetime/BeautySenseTimeImpl.java) 的实现。
+>   
+>   ``` 
+>    @Override
+>    public boolean onCaptureVideoFrame(VideoFrame videoFrame) {
+>        ...
+>      videoFrame.replaceBuffer(newBuffer, videoFrame.getRotation(), videoFrame.getTimestampNs());
+>    }
+>   ```
 
-## 运行或集成遇到困难，该如何联系声网获取协助
+> - 虚拟背景和虚化背景
+>   
+>   相关代码参考：[BeautyDialog](src/main//java//io//agora//scene//show//widget//BeautyDialog.kt) 中 onItemSelected.GROUP_ID_VIRTUAL_BG 部分。
+
+## 4.FAQ
+### 运行或集成遇到困难，该如何联系声网获取协助
 
 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
 
