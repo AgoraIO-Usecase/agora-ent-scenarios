@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="voice_black">#FF000000</color>
+    <color name="voice_black_10">#1A000000</color>
+    <color name="voice_black_20">#33000000</color>
+    <color name="voice_black_30">#4D000000</color>
+    <color name="voice_black_40">#66000000</color>
+    <color name="voice_black_50">#80000000</color>
+    <color name="voice_black_60">#99000000</color>
+    <color name="voice_black_70">#B3000000</color>
+    <color name="voice_black_80">#CC000000</color>
+    <color name="voice_black_90">#E6000000</color>
+    <color name="voice_white">#FFFFFFFF</color>
+    <color name="voice_white_10">#1AFFFFFF</color>
+    <color name="voice_white_20">#33FFFFFF</color>
+    <color name="voice_white_30">#4DFFFFFF</color>
+    <color name="voice_white_40">#66FFFFFF</color>
+    <color name="voice_white_50">#80FFFFFF</color>
+    <color name="voice_white_60">#99FFFFFF</color>
+    <color name="voice_white_70">#B3FFFFFF</color>
+    <color name="voice_white_80">#CCFFFFFF</color>
+    <color name="voice_white_90">#E6FFFFFF</color>
+    <color name="voice_transparent">#00000000</color>
+</resources>

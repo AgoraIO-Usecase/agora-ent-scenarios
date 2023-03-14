@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivAudienceAvatar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginBottom="13dp"
+        android:background="@drawable/voice_bg_oval_white30"
+        android:scaleType="centerCrop"
+        android:src="@drawable/avatar2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearance="@style/voice_seat_roundStyle" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivContributionNumber"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/voice_icon_bang1"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ivAudienceAvatar"
+        app:layout_constraintEnd_toStartOf="@+id/ivAudienceAvatar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ivAudienceAvatar" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtContributionNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/voice_color_333333"
+        android:textSize="@dimen/voice_sp_8"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/ivAudienceAvatar"
+        app:layout_constraintEnd_toStartOf="@+id/ivAudienceAvatar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ivAudienceAvatar"
+        tools:text="4" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtContributionUsername"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:ellipsize="end"
+        android:layout_marginEnd="10dp"
+        android:gravity="start"
+        android:lines="1"
+        android:textColor="@color/voice_color_333333"
+        android:textSize="@dimen/voice_sp_14"
+        app:layout_constraintBottom_toBottomOf="@+id/ivAudienceAvatar"
+        app:layout_constraintStart_toEndOf="@+id/ivAudienceAvatar"
+        app:layout_constraintEnd_toStartOf="@+id/mtContributionValue"
+        app:layout_constraintTop_toTopOf="@+id/ivAudienceAvatar"
+        tools:text="Susan Stark" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtContributionValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="15dp"
+        android:gravity="end"
+        android:textColor="@color/voice_dark_grey_color_6c7192"
+        android:textSize="@dimen/voice_sp_16"
+        android:drawablePadding="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ivAudienceAvatar"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:drawableStart="@drawable/voice_icon_dollagora"
+        app:layout_constraintTop_toTopOf="@+id/ivAudienceAvatar"
+        tools:text="2134" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="5dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivSeatOuterRing"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_margin="20dp"
+        android:background="@drawable/voice_bg_oval_white30"
+        tools:background="@color/voice_black"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:shapeAppearance="@style/voice_seat_roundStyle" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivMicInfo"
+        android:layout_width="58dp"
+        android:layout_height="58dp"
+        android:background="@drawable/voice_bg_oval_white30"
+        app:layout_constraintBottom_toBottomOf="@+id/ivSeatOuterRing"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="@+id/ivSeatOuterRing"
+        app:layout_constraintStart_toStartOf="@+id/ivSeatOuterRing"
+        app:layout_constraintTop_toTopOf="@+id/ivSeatOuterRing"
+        app:shapeAppearance="@style/voice_seat_roundStyle" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivMicInnerIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/voice_icon_room_mic_add"
+        app:layout_constraintBottom_toBottomOf="@+id/ivMicInfo"
+        app:layout_constraintEnd_toEndOf="@+id/ivMicInfo"
+        app:layout_constraintStart_toStartOf="@+id/ivMicInfo"
+        app:layout_constraintTop_toTopOf="@+id/ivMicInfo" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivMicBotFloat"
+        android:layout_width="58dp"
+        android:layout_height="58dp"
+        android:background="@drawable/voice_bg_oval_black50"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/ivMicInfo"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="@+id/ivMicInfo"
+        app:layout_constraintStart_toStartOf="@+id/ivMicInfo"
+        app:layout_constraintTop_toTopOf="@+id/ivMicInfo"
+        app:shapeAppearance="@style/voice_seat_roundStyle" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivMicArrowAnim"
+        android:layout_width="20dp"
+        android:layout_height="14dp"
+        android:background="@drawable/voice_go_00028"
+        app:layout_constraintCircle="@+id/ivSeatOuterRing"
+        app:layout_constraintCircleAngle="0"
+        app:layout_constraintCircleRadius="37dp" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtMicRotActive"
+        android:layout_width="44dp"
+        android:layout_height="18dp"
+        android:layout_marginTop="-13dp"
+        android:background="@drawable/voice_bg_rect_radius11_gradient_blue"
+        android:gravity="center"
+        android:paddingHorizontal="6dp"
+        android:text="@string/voice_room_active"
+        android:textColor="@color/voice_white"
+        android:textSize="@dimen/voice_sp_11"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/ivMicInfo"
+        app:layout_constraintStart_toStartOf="@+id/ivMicInfo"
+        app:layout_constraintTop_toBottomOf="@+id/ivMicInfo" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivMicTag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/voice_icon_room_mic_mute_tag"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/ivMicInfo"
+        app:layout_constraintEnd_toEndOf="@id/ivMicInfo" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtMicUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:drawablePadding="2dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:textColor="@color/voice_white"
+        android:textSize="@dimen/voice_sp_11"
+        android:maxLines="1"
+        app:layout_constraintEnd_toEndOf="@+id/ivMicInfo"
+        app:layout_constraintStart_toStartOf="@+id/ivMicInfo"
+        app:layout_constraintTop_toBottomOf="@+id/ivMicInfo"
+        tools:text="Susan Stark" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtSoundSelectionCurrentName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="20dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="20dp"
+        android:textColor="@color/voice_color_3c4267"
+        android:textSize="@dimen/voice_sp_13"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Current Sound Selection" />
+
+    <LinearLayout
+        android:id="@+id/llSoundSelectionTips"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/voice_bg_rect_radius7_orange"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="6dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtSoundSelectionCurrentName"
+        app:layout_goneMarginTop="10dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/voice_icon_room_tips" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:gravity="top|start"
+            android:text="@string/voice_chatroom_sound_selection_tips"
+            android:textColor="@color/voice_color_e76d21"
+            android:textSize="@dimen/voice_sp_12" />
+    </LinearLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/mcvSoundSelectionContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
+        app:cardElevation="2dp"
+        app:cardCornerRadius="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llSoundSelectionTips"
+        app:layout_goneMarginTop="10dp"
+        app:strokeColor="@color/voice_main_color_009fff"
+        app:strokeWidth="1dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="15dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/mtSoundSelectionName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:textColor="@color/voice_main_color_156ef3"
+                android:textSize="@dimen/voice_sp_13"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Social Chat" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivSoundSelectionToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:src="@drawable/voice_icon_room_sound_listen"
+                app:layout_constraintBottom_toBottomOf="@+id/mtSoundSelectionName"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/mtSoundSelectionName" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/mtSoundSelectionContent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="20dp"
+                android:lineSpacingExtra="3dp"
+                android:textColor="@color/voice_color_3c4267"
+                android:textSize="@dimen/voice_sp_13"
+                android:breakStrategy="simple"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mtSoundSelectionName"
+                tools:text="This scenario focuses on echo cancellation, noise reduction in a multi-person chat setting, creating a quiet chat atmosphere" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/mdSoundSelectionDivider"
+                style="@style/voice_bottom_sheet_divider_style"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mtSoundSelectionContent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/mtSoundSelectionCustomerUsage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="20dp"
+                android:text="@string/voice_room_social_chat_following_customers"
+                android:textColor="@color/voice_dark_grey_color_979cbb"
+                android:textSize="@dimen/voice_sp_11"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mdSoundSelectionDivider" />
+
+            <LinearLayout
+                android:id="@+id/llSoundCustomerUsage"
+                android:layout_width="0dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="15dp"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mtSoundSelectionCustomerUsage" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivSoundSelected"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/voice_icon_room_sound_selected"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

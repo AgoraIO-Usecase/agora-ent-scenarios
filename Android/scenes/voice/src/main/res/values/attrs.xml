@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="voice_RoomTitleBar">
+        <!-- 标题文本 -->
+        <attr name="voice_titleBarTitle" format="reference|string"/>
+        <!-- 左侧图片 -->
+        <attr name="voice_titleBarLeftImage" format="reference"/>
+        <!-- 右侧图片 -->
+        <attr name="voice_titleBarRightImage" format="reference"/>
+        <!-- 右标题文本 -->
+        <attr name="voice_titleBarRightTitle" format="reference|string"/>
+        <!-- Toolbar返回箭头颜色 -->
+        <attr name="voice_titleBarArrowColor" format="reference|color"/>
+        <!-- Toolbar右侧菜单更多的图标 -->
+        <attr name="voice_titleBarMenuResource" format="reference"/>
+        <!-- Toolbar是否可见返回按钮 -->
+        <attr name="voice_titleBarDisplayHomeAsUpEnabled" format="boolean"/>
+        <!-- 右侧布局是否可见 -->
+        <attr name="voice_titleBarRightVisible" format="boolean"/>
+        <!-- 标题文本的位置-->
+        <attr name="voice_titleBarTitlePosition" format="enum">
+            <enum name="center" value="0"/>
+            <enum name="left" value="1"/>
+            <enum name="right" value="2"/>
+        </attr>
+        <!-- 标题文本的字体大小 -->
+        <attr name="voice_titleBarTitleTextSize" format="dimension"/>
+        <!-- 标题文本的字体颜色 -->
+        <attr name="voice_titleBarTitleTextColor" format="reference|color"/>
+    </declare-styleable>
+
+    <declare-styleable name="voice_SubtitleView">
+        <attr name="voice_customScrollSpeed">
+            <enum name="fast" value="9" />
+            <enum name="medium" value="6" />
+            <enum name="slow" value="3" />
+        </attr>
+        <attr name="voice_setSubtitleBgResource" format="reference"/>
+    </declare-styleable>
+</resources>
