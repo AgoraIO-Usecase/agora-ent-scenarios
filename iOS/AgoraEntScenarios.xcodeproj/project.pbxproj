@@ -212,7 +212,6 @@
 		DD36106329B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FBB29B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift */; };
 		DD36106429B70CDC00CE7984 /* ShowAgoraKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FBC29B70CDC00CE7984 /* ShowAgoraKitManager.swift */; };
 		DD36106529B70CDC00CE7984 /* ShowChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FBD29B70CDC00CE7984 /* ShowChatModel.swift */; };
-		DD36106629B70CDC00CE7984 /* ShowAgoraKitManager+Music.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FBE29B70CDC00CE7984 /* ShowAgoraKitManager+Music.swift */; };
 		DD36106729B70CDC00CE7984 /* ShowAgoraKitManager+DebugSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FBF29B70CDC00CE7984 /* ShowAgoraKitManager+DebugSetting.swift */; };
 		DD36106829B70CDC00CE7984 /* ShowDebug2TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FC129B70CDC00CE7984 /* ShowDebug2TFModel.swift */; };
 		DD36106929B70CDC00CE7984 /* ShowSettingKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FC229B70CDC00CE7984 /* ShowSettingKey.swift */; };
@@ -240,7 +239,6 @@
 		DD36107F29B70CDC00CE7984 /* Effects.m in Sources */ = {isa = PBXBuildFile; fileRef = DD360FEE29B70CDC00CE7984 /* Effects.m */; };
 		DD36108029B70CDC00CE7984 /* EffectsDetector.m in Sources */ = {isa = PBXBuildFile; fileRef = DD360FEF29B70CDC00CE7984 /* EffectsDetector.m */; };
 		DD36108129B70CDC00CE7984 /* EffectsAnimal.m in Sources */ = {isa = PBXBuildFile; fileRef = DD360FF129B70CDC00CE7984 /* EffectsAnimal.m */; };
-		DD36108229B70CDC00CE7984 /* SENSEME.lic in Resources */ = {isa = PBXBuildFile; fileRef = DD360FF229B70CDC00CE7984 /* SENSEME.lic */; };
 		DD36108329B70CDC00CE7984 /* EffectsProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = DD360FF329B70CDC00CE7984 /* EffectsProcess.m */; };
 		DD36108429B70CDC00CE7984 /* VideoProcessingManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DD360FF429B70CDC00CE7984 /* VideoProcessingManager.m */; };
 		DD36108529B70CDC00CE7984 /* EffectsLicense.m in Sources */ = {isa = PBXBuildFile; fileRef = DD360FF629B70CDC00CE7984 /* EffectsLicense.m */; };
@@ -718,7 +716,6 @@
 		DD360FBB29B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ShowAgoraKitManager+Setting.swift"; sourceTree = "<group>"; };
 		DD360FBC29B70CDC00CE7984 /* ShowAgoraKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowAgoraKitManager.swift; sourceTree = "<group>"; };
 		DD360FBD29B70CDC00CE7984 /* ShowChatModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowChatModel.swift; sourceTree = "<group>"; };
-		DD360FBE29B70CDC00CE7984 /* ShowAgoraKitManager+Music.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ShowAgoraKitManager+Music.swift"; sourceTree = "<group>"; };
 		DD360FBF29B70CDC00CE7984 /* ShowAgoraKitManager+DebugSetting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ShowAgoraKitManager+DebugSetting.swift"; sourceTree = "<group>"; };
 		DD360FC129B70CDC00CE7984 /* ShowDebug2TFModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebug2TFModel.swift; sourceTree = "<group>"; };
 		DD360FC229B70CDC00CE7984 /* ShowSettingKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingKey.swift; sourceTree = "<group>"; };
@@ -765,7 +762,6 @@
 		DD360FEF29B70CDC00CE7984 /* EffectsDetector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EffectsDetector.m; sourceTree = "<group>"; };
 		DD360FF029B70CDC00CE7984 /* EffectsCommonObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsCommonObject.h; sourceTree = "<group>"; };
 		DD360FF129B70CDC00CE7984 /* EffectsAnimal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EffectsAnimal.m; sourceTree = "<group>"; };
-		DD360FF229B70CDC00CE7984 /* SENSEME.lic */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SENSEME.lic; sourceTree = "<group>"; };
 		DD360FF329B70CDC00CE7984 /* EffectsProcess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EffectsProcess.m; sourceTree = "<group>"; };
 		DD360FF429B70CDC00CE7984 /* VideoProcessingManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoProcessingManager.m; sourceTree = "<group>"; };
 		DD360FF529B70CDC00CE7984 /* EffectsAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsAttribute.h; sourceTree = "<group>"; };
@@ -1687,7 +1683,6 @@
 				DD360FBB29B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift */,
 				DD360FBC29B70CDC00CE7984 /* ShowAgoraKitManager.swift */,
 				DD360FBD29B70CDC00CE7984 /* ShowChatModel.swift */,
-				DD360FBE29B70CDC00CE7984 /* ShowAgoraKitManager+Music.swift */,
 				DD360FBF29B70CDC00CE7984 /* ShowAgoraKitManager+DebugSetting.swift */,
 				DD360FC029B70CDC00CE7984 /* Setting */,
 			);
@@ -1782,7 +1777,6 @@
 				DD360FEF29B70CDC00CE7984 /* EffectsDetector.m */,
 				DD360FF029B70CDC00CE7984 /* EffectsCommonObject.h */,
 				DD360FF129B70CDC00CE7984 /* EffectsAnimal.m */,
-				DD360FF229B70CDC00CE7984 /* SENSEME.lic */,
 				DD360FF329B70CDC00CE7984 /* EffectsProcess.m */,
 				DD360FF429B70CDC00CE7984 /* VideoProcessingManager.m */,
 				DD360FF529B70CDC00CE7984 /* EffectsAttribute.h */,
@@ -2813,7 +2807,6 @@
 				DD220B2B295B332C00F57F30 /* VoiceChatRoomResource.bundle in Resources */,
 				DD84177629090C520026B624 /* product4.png in Resources */,
 				DD84177129090C520026B624 /* ic_play.png in Resources */,
-				DD36108229B70CDC00CE7984 /* SENSEME.lic in Resources */,
 				DD84177529090C520026B624 /* product1.png in Resources */,
 				DD84176929090C520026B624 /* banner1.png in Resources */,
 				DD84176B29090C520026B624 /* tab_home.png in Resources */,
@@ -3055,7 +3048,6 @@
 				DD36108029B70CDC00CE7984 /* EffectsDetector.m in Sources */,
 				DD84177B29090C520026B624 /* VLHomeViewController.m in Sources */,
 				DD36107329B70CDC00CE7984 /* BEFrameProcessor.mm in Sources */,
-				DD36106629B70CDC00CE7984 /* ShowAgoraKitManager+Music.swift in Sources */,
 				DD220B5B295B332C00F57F30 /* VoiceRoomChatCell.swift in Sources */,
 				DD220B5E295B332C00F57F30 /* VoiceRoomChatView.swift in Sources */,
 				DD3610B629B70CDC00CE7984 /* ShowDebugSetting1TFCell.swift in Sources */,
