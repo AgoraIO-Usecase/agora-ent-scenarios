@@ -42,6 +42,7 @@
 
 @property (nonatomic, assign) BOOL isPlayAccompany;
 @property (nonatomic, strong) KTVSkipView *skipView;
+@property (nonatomic, strong) UIButton *joinChorusBtn;
 @end
 
 @implementation VLKTVMVView
@@ -157,6 +158,19 @@
         make.height.equalTo(@(34));
     }];
     self.skipView.hidden = true;
+    
+    self.joinChorusBtn = [[UIButton alloc]init];
+        [self.joinChorusBtn setBackgroundColor:[UIColor blueColor]];
+        _joinChorusBtn.layer.cornerRadius = 17;
+        _joinChorusBtn.layer.masksToBounds = true;
+        [self.joinChorusBtn addTarget:self action:@selector(joinChorus) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:_joinChorusBtn];
+        [self.joinChorusBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self);
+            make.bottom.equalTo(self).offset(-24);
+            make.width.equalTo(@(120));
+            make.height.equalTo(@(34));
+        }];
 }
 
 - (void)_refreshOriginButton {
@@ -195,6 +209,13 @@
 //- (void)setVoicePitch:(NSArray <NSNumber *> *)pitch {
 //    [self.lrcView setVoicePitch:pitch];
 //}
+
+-(void)joinChorus{
+    //加入合唱
+    if([self.delegate respondsToSelector:@selector(didJoinChourse)]) {
+        [self.delegate didJoinChourse];
+    }
+}
 
 #pragma mark - Action
 
