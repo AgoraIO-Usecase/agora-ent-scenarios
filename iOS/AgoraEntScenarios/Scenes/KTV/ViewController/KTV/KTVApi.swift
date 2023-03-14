@@ -8,7 +8,7 @@
 import Foundation
 import AgoraRtcKit
 import AgoraLyricsScore
-
+#if false
 @objc public enum KTVSingRole: Int, Codable {
     case soloSinger = 0
     case coSinger
@@ -1216,3 +1216,4 @@ extension Date {
 
 
 
+#endif

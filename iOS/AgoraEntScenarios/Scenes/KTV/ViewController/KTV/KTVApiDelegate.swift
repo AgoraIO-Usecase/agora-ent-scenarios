@@ -9,7 +9,7 @@ import Foundation
 import AgoraRtcKit
 
 /// 用户角色
-public enum KTVSingRole: Int {
+@objc public enum KTVSingRole: Int {
     case soloSinger = 0     //独唱者
     case coSinger           //伴唱
     case leadSinger         //主唱
@@ -19,14 +19,14 @@ public enum KTVSingRole: Int {
 
 
 /// 歌曲状态
-public enum KTVPlayerTrackMode: Int {
+@objc public enum KTVPlayerTrackMode: Int {
     case origin = 0    //原唱
     case acc           //伴奏
 }
 
 
 /// 加载歌曲状态
-public enum KTVLoadSongState: Int {
+@objc public enum KTVLoadSongState: Int {
     case idle = -1      //空闲
     case ok = 0         //成功
     case failed         //失败
@@ -42,12 +42,12 @@ public enum KTVLoadSongFailReason: Int {
     case noPermission        //角色切换异常
 }
 
-public enum KTVSwitchRoleState: Int {
+@objc public enum KTVSwitchRoleState: Int {
     case success = 0
     case fail
 }
 
-public enum KTVSwitchRoleFailReason: Int {
+@objc public enum KTVSwitchRoleFailReason: Int {
     case none = 0
     case joinChannelFail
     case musicPreloadFail
@@ -57,21 +57,21 @@ public enum KTVSwitchRoleFailReason: Int {
 
 
 /// 加入合唱结果状态
-public enum KTVJoinChorusState: Int {
+@objc public enum KTVJoinChorusState: Int {
     case success = 0    //加入合唱成功
     case fail           //加入合唱失败
 }
 
 
 /// 加入合唱失败原因
-public enum KTVJoinChorusFailReason: Int {
+@objc public enum KTVJoinChorusFailReason: Int {
     case none = 0            //无作物
     case musicPreloadFail  //歌曲预加载失败
     case musicOpenFail     //歌曲打开失败
     case joinChannelFail   //加入ex频道失败
 }
 
-public protocol KTVMusicLoadStateListener: NSObjectProtocol {
+@objc public protocol KTVMusicLoadStateListener: NSObjectProtocol {
     
     /// 歌曲加载成功
     /// - Parameters:
@@ -149,8 +149,8 @@ open class KTVApiConfig: NSObject{
 /// 歌曲加载配置信息
 open class KTVSongConfiguration: NSObject {
     var autoPlay: Bool = true   //是否加载完成自动播放
-    var songCode: Int?          //歌曲id
-    var mainSingerUid: Int?     //主唱uid
+    var songCode: Int = 0          //歌曲id
+    var mainSingerUid: Int = 0     //主唱uid
 }
 
 
@@ -165,7 +165,7 @@ public protocol KTVApiDelegate: NSObjectProtocol {
     
     /// 初始化
     /// - Parameter config: <#config description#>
-    func setup(config: KTVApiConfig)
+//    init(config: KTVApiConfig)
     
     
     /// 订阅KTVApi事件
@@ -231,7 +231,7 @@ public protocol KTVApiDelegate: NSObjectProtocol {
     ///   - newRole: <#newRole description#>
     ///   - token: <#token description#>
     ///   - onSwitchRoleState: <#onSwitchRoleState description#>
-    func switchSingerRole(newRole: KTVSingRole, token: String, onSwitchRoleState: SwitchRoleStateCallBack)
+    func switchSingerRole(newRole: KTVSingRole, token: String, onSwitchRoleState:@escaping SwitchRoleStateCallBack)
     
     
     /// 播放
