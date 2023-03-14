@@ -392,14 +392,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.playerMusicStatusLiveData.observe(this, status -> {
             if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PREPARE) {
                 getBinding().lrcControlView.onPrepareStatus(roomLivingViewModel.isRoomOwner());
-            } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_JOIN_CHORUS) {
-                getBinding().cbMic.setChecked(true);
-                getBinding().lrcControlView.onSelfJoinedChorus();
-            } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_JOIN_FAILED) {
-                getBinding().lrcControlView.onSelfJoinedChorusFailed();
-            } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_LEAVE_CHORUS) {
-                getBinding().cbMic.setChecked(false);
-                getBinding().lrcControlView.onSelfLeavedChorus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PLAYING) {
                 getBinding().lrcControlView.onPlayStatus(roomLivingViewModel.songPlayingLiveData.getValue());
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE) {
@@ -410,8 +402,17 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.setEnabled(false);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_END) {
                 getBinding().lrcControlView.setEnabled(true);
-            } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_STOP) {
-
+            }
+        });
+        roomLivingViewModel.joinchorusStatusLiveData.observe(this, status -> {
+            if (status == RoomLivingViewModel.JoinChorusStatus.ON_JOIN_CHORUS) {
+                getBinding().cbMic.setChecked(true);
+                getBinding().lrcControlView.onSelfJoinedChorus();
+            } else if (status == RoomLivingViewModel.JoinChorusStatus.ON_JOIN_FAILED) {
+                getBinding().lrcControlView.onSelfJoinedChorusFailed();
+            } else if (status == RoomLivingViewModel.JoinChorusStatus.ON_LEAVE_CHORUS) {
+                getBinding().cbMic.setChecked(false);
+                getBinding().lrcControlView.onSelfLeavedChorus();
             }
         });
         roomLivingViewModel.playerMusicOpenDurationLiveData.observe(this, duration -> {
@@ -550,6 +551,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 public void onRightButtonClick() {
                     setDarkStatusIcon(isBlackDarkStatus());
                     roomLivingViewModel.exitRoom();
+                    finish();
                 }
             });
         }

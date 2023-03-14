@@ -12,7 +12,6 @@ import io.agora.musiccontentcenter.*
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
 import io.agora.rtc2.audio.AudioParams
-import io.agora.scene.ktv.widget.lrcView.ILrcView
 import io.agora.scene.ktv.widget.lrcView.LrcControlView
 import org.json.JSONException
 import org.json.JSONObject
@@ -336,9 +335,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         config: KTVSongConfiguration,
         onMusicLoadStateListener: OnMusicLoadStateListener
     ) {
-        Log.d(TAG, "loadSong called: $singerRole")
+        Log.d(TAG, "loadMusic called: $singerRole")
         if (loadSongState == KTVLoadSongState.IN_PROGRESS) {
-            Log.e(TAG, "loadSong failed: KTVLoadSongState is in progress")
+            Log.e(TAG, "loadMusic failed: KTVLoadSongState is in progress")
             return
         }
 
@@ -390,7 +389,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 }
             }
             else -> {
-                Log.d(TAG, "loadSong called wrong role")
+                Log.e(TAG, "loadMusic called wrong role")
             }
         }
 
