@@ -737,7 +737,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     BOOL isTopSong = [self.selSongsArray.firstObject.songNo integerValue] == songNo;
     
     if (isTopSong) {
-        [self.ktvApi stopSing];
+//        [self.ktvApi stopSing];
+        [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
+                                           token:@""
+                               onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+            
+        }];
     }
     
     NSMutableArray<VLRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
@@ -1200,7 +1205,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
             if(flag == true){
                 if (weakSelf.selSongsArray.count >= 1) {
-                    [weakSelf.ktvApi stopSing];
+//                    [weakSelf.ktvApi stopSing];
+                    [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
+                                                       token:@""
+                                           onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+                        
+                    }];
                     [weakSelf removeCurrentSongWithSync:YES];
                     [weakSelf.MVView showSkipView:false];
                 }
@@ -1413,10 +1423,20 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 //co singer leave chorus
                 [[AppContext ktvServiceImp] coSingerLeaveChorusWithCompletion:^(NSError * err) {
                 }];
-                [self.ktvApi stopSing];
+//                [self.ktvApi stopSing];
+                [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
+                                                   token:@""
+                                       onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+                    
+                }];
                 [self loadAndPlaySong];
             } else if (song.isSongOwner) {
-                [self.ktvApi stopSing];
+//                [self.ktvApi stopSing];
+                [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
+                                                   token:@""
+                                       onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+                    
+                }];
                 [self removeCurrentSongWithSync:YES];
             }
         }
@@ -1514,7 +1534,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         //solo
         if(![updatedTopSong isEqual:originalTopSong]){
             //song changes
-            [self.ktvApi stopSing];
+//            [self.ktvApi stopSing];
+            [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
+                                               token:@""
+                                   onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+                
+            }];
             [self loadAndPlaySong];
         }
     } else {

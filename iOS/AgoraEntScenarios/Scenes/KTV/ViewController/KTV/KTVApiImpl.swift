@@ -192,7 +192,7 @@ extension KTVApiImpl: KTVApiDelegate {
 //    }
 
     func switchSingerRole(newRole: KTVSingRole, token: String, onSwitchRoleState: @escaping (KTVSwitchRoleState, KTVSwitchRoleFailReason) -> Void) {
-        agoraPrint("switchSingerRole oldRole: \(singerRole), newRole: \(newRole) token: \(token)")
+        agoraPrint("switchSingerRole oldRole: \(singerRole.rawValue), newRole: \(newRole.rawValue) token: \(token)")
         let oldRole = singerRole
         self.switchSingerRole(oldRole: oldRole, newRole: newRole, token: token, stateCallBack: onSwitchRoleState)
     }
@@ -259,7 +259,7 @@ extension KTVApiImpl: KTVApiDelegate {
 // 主要是角色切换，加入合唱，加入多频道，退出合唱，退出多频道
 extension KTVApiImpl {
     private func switchSingerRole(oldRole: KTVSingRole, newRole: KTVSingRole, token: String, stateCallBack:@escaping SwitchRoleStateCallBack) {
-        agoraPrint("switchSingerRole oldRole: \(singerRole), newRole: \(newRole)")
+        agoraPrint("switchSingerRole oldRole: \(singerRole.rawValue), newRole: \(newRole.rawValue)")
         if oldRole == .audience && newRole == .soloSinger {
             // 1、KTVSingRoleAudience -》KTVSingRoleMainSinger
             singerRole = newRole
@@ -493,7 +493,7 @@ extension KTVApiImpl {
     }
 
     private func leaveChorus2ndChannel() {
-        agoraPrint("leaveChorus2ndChannel role: \(singerRole)")
+        agoraPrint("leaveChorus2ndChannel role: \(singerRole.rawValue)")
         guard let config = songConfig else {return}
         let role = singerRole
         guard let subConn = subChorusConnection else {return}
@@ -512,7 +512,7 @@ extension KTVApiImpl {
      * 离开合唱
      */
     private func leaveChorus() {
-        agoraPrint("leaveChorus role: \(singerRole)")
+        agoraPrint("leaveChorus role: \(singerRole.rawValue)")
         guard let config = songConfig else {return}
         let role = singerRole
         if role == .leadSinger {
@@ -565,7 +565,7 @@ extension KTVApiImpl {
      * 加载歌曲
      */
     private func _loadMusic(config: KTVSongConfiguration, onMusicLoadStateListener: KTVMusicLoadStateListener) {
-        agoraPrint("_loadMusic songCode: \(config.songCode) role: \(singerRole)")
+        agoraPrint("_loadMusic songCode: \(config.songCode) role: \(singerRole.rawValue)")
         songConfig = config
         let role = singerRole
         let songCode = config.songCode
@@ -573,11 +573,9 @@ extension KTVApiImpl {
         if (loadDict.keys.contains(String(songCode))) {
             let loadState = loadDict[String(songCode)]
             if loadState == .ok {
-                agoraPrint("_loadMusic songCode1: \(config.songCode) role: \(singerRole)")
+                agoraPrint("_loadMusic songCode1: \(config.songCode) role: \(singerRole.rawValue)")
                 if let url = lyricUrlMap[String(songCode)] {
-                    getEventHander { delegate in
-                        onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: url)
-                    }
+                    onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: url)
                     return
                 }
             }
