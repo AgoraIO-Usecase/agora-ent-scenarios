@@ -31,7 +31,7 @@
 
 - 在项目的[KeyCenter.swift](AgoraEntScenarios/KeyCenter.swift)里填写需要的声网 App ID 和 App证书
   
-  ![xxx](image/Keycenter.png)
+  ![xxx](image/KeyCenter.png)
   
   ```texag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0
   static let AppId: String = 声网AppID
@@ -71,11 +71,29 @@
 
 > 秀场直播场景目前已涵盖以下功能
 > 
-> 秒切 
+> - PK 和连麦
 > 
-> 美颜
+>   相关代码请参考：[ShowLiveViewController](/Scenes/Show/Controller/ShowLiveViewController.swift )中的 _onStartInteraction中对应的.pking和. onSeat的实现
 > 
-> 虚拟背景
+> - 秒切  
+> 
+>    相关代码请参考：[ ShowLivePagesViewControll](/Scenes/Show/Controller/ShowLivePagesViewController.swift )
+> 
+> - 美颜
+> 
+>   美颜SDK的调用入口是在 [ShowAgoraKitManager](/Scenes/Show/Models/ShowAgoraKitManager.swift )中AgoraVideoFrameDelegate的回调方法
+> ```texag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0
+>    func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
+>         videoFrame.pixelBuffer = BeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
+>         return true
+>     }
+>  ```
+>  
+>    商汤美颜功能的详细封装请参考[SenseBeautyManager](/Scenes/Show/Beauty/SenseBeaufy/SenseBeautyManager.swift)
+>  
+> - 虚拟背景和虚化背景
+> 
+>    相关代码请参考： [ShowAgoraKitManager](/Scenes/Show/Models/ShowAgoraKitManager.swift )的函数enableVirtualBackground和seVirtualtBackgoundImage
 >  
 ## 4. FAQ
 
