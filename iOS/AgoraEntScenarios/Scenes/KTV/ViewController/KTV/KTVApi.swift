@@ -486,16 +486,6 @@ private enum KTVLoadSongState: Int, Codable {
     @objc public func selectPlayerTrackMode(mode: KTVPlayerTrackMode) {
         apiConfig?.engine.selectAudioTrack(mode == .original ? 0 : 1)
     }
-    
-    /**
-     * 设置听到播放的所有音频的音量
-     */
-    @objc public func adjustRemoteVolume(volume: Int32) {
-        remoteVolume = volume
-        if musicPlayer?.getPlayerState() != .playing {
-            apiConfig?.engine.adjustPlaybackSignalVolume(Int(volume))
-        }
-    }
 
     /**
      * 设置当前mic开关状态
