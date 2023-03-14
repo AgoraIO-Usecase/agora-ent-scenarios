@@ -699,7 +699,7 @@ extension KTVApi {
         
         guard let dict = dataToDictionary(data: data) else {return}
         if isMainSinger() {return}
-        
+        guard let delegate =
         guard let delegate = self.delegate else {return}
         if dict.keys.contains("cmd") {
             if dict["cmd"] == "setLrcTime" {
@@ -1197,20 +1197,7 @@ extension KTVApi {
     }
 }
 
-extension Date {
-    /// 获取当前 秒级 时间戳 - 10位
-    ///
-    var timeStamp : TimeInterval {
-        let timeInterval: TimeInterval = self.timeIntervalSince1970
-        return timeInterval
-    }
-    /// 获取当前 毫秒级 时间戳 - 13位
-    var milListamp : TimeInterval {
-        let timeInterval: TimeInterval = self.timeIntervalSince1970
-        let millisecond = CLongLong(round(timeInterval*1000))
-        return TimeInterval(millisecond)
-    }
-}
+
 
 
 
