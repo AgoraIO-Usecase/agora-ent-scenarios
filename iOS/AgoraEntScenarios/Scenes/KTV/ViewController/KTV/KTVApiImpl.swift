@@ -7,8 +7,9 @@
 
 import Foundation
 import AgoraRtcKit
+import AgoraLyricsScore
 
-class KTVApiImpl: NSObject, AgoraRtcMediaPlayerDelegate {
+class KTVApiImpl: NSObject{
     private var apiConfig: KTVApiConfig?
 
     private var songConfig: KTVSongConfiguration?
@@ -25,15 +26,36 @@ class KTVApiImpl: NSObject, AgoraRtcMediaPlayerDelegate {
     private var loadDict = Dictionary<String, KTVLoadSongState>()
     private var lyricCallbacks = Dictionary<String, LyricCallback>()
     private var musicCallbacks = Dictionary<String, LoadMusicCallback>()
-
+    
+    private var hasSendPreludeEndPosition: Bool = false
+    private var hasSendEndPosition: Bool = false
+    private var totalLines: NSInteger = 0
+    private var totalScore: NSInteger = 0
+    private var audioPlayoutDelay: NSInteger = 0
+    private var isNowMicMuted: Bool = false
+    
+    private var playerState: AgoraMediaPlayerState = .idle
+    
+    private var pitch: Double = 0
     private var remoteVolume: Int = 15
+    private var localPlayerPosition: TimeInterval = 0
+    private var remotePlayerPosition: TimeInterval = 0
+    private var remotePlayerDuration: TimeInterval = 0
+    private var localPlayerSystemTime: TimeInterval = 0
+    private var lastAudienceUpTime: TimeInterval = 0
+    private var playerDuration: TimeInterval = 0
 
     private var musicChartDict: [String: MusicChartCallBacks] = [:]
     private var musicSearchDict: Dictionary<String, MusicResultCallBacks> = Dictionary<String, MusicResultCallBacks>()
     private var onJoinExChannelCallBack : JoinExChannelCallBack?
+    private var mainSingerHasJoinChannelEx: Bool = false
 
     private var singerRole: KTVSingRole = .audience
     private var lrcControl: KTVLrcViewDelegate?
+    
+    private var timer: Timer?
+    private var isPause: Bool = false
+    private var lrcView: KaraokeView?
 
     required init(config: KTVApiConfig) {
         super.init()
@@ -122,28 +144,28 @@ extension KTVApiImpl: KTVApiDelegate {
         return requestId
     }
 
-    func loadMusic(config: KTVSongConfiguration, onMusicLoadStateListener: KTVMusicLoadStateListener) {
-        self.songConfig = config
-        let songCode = config.songCode
-        guard songCode > 0, let mcc = self.mcc else {
-            //TODO: error
-            return
-        }
-        var err = mcc.isPreloaded(songCode: songCode)
-        if err == 0 {
-            musicCallbacks.removeValue(forKey: String(songCode))
-//            callBaclk(.OK)
-            return
-        }
-
-        err = mcc.preload(songCode: songCode, jsonOption: nil)
-        if err != 0 {
-            musicCallbacks.removeValue(forKey: String(songCode))
-//            callBaclk(.error)
-            return
-        }
-//        musicCallbacks.updateValue(callBaclk, forKey: String(songCode))
-    }
+//    func loadSong(config: KTVSongConfiguration, onMusicLoadStateListener: KTVMusicLoadStateListener) {
+//        self.songConfig = config
+//        let songCode = config.songCode
+//        guard songCode > 0, let mcc = self.mcc else {
+//            //TODO: error
+//            return
+//        }
+//        var err = mcc.isPreloaded(songCode: songCode)
+//        if err == 0 {
+//            musicCallbacks.removeValue(forKey: String(songCode))
+////            callBaclk(.OK)
+//            return
+//        }
+//
+//        err = mcc.preload(songCode: songCode, jsonOption: nil)
+//        if err != 0 {
+//            musicCallbacks.removeValue(forKey: String(songCode))
+////            callBaclk(.error)
+//            return
+//        }
+////        musicCallbacks.updateValue(callBaclk, forKey: String(songCode))
+//    }
 
     func switchSingerRole(newRole: KTVSingRole, token: String, onSwitchRoleState: @escaping (KTVSwitchRoleState, KTVSwitchRoleFailReason) -> Void) {
         print("switchSingerRole oldRole: (singerRole), newRole: (newRole)")
@@ -155,7 +177,11 @@ extension KTVApiImpl: KTVApiDelegate {
      * 恢复播放
      */
     @objc public func resumeSing() {
-        musicPlayer?.resume()
+        if musicPlayer?.getPlayerState() == .paused {
+            musicPlayer?.resume()
+        } else {
+            musicPlayer?.play()
+        }
     }
 
     /**
@@ -206,12 +232,14 @@ extension KTVApiImpl: KTVApiDelegate {
 extension KTVApiImpl {
     @objc public func switchSingerRole(oldRole: KTVSingRole, newRole: KTVSingRole, token: String, stateCallBack:@escaping SwitchRoleStateCallBack) {
         print("switchSingerRole oldRole: (singerRole), newRole: (newRole)")
-        guard let delegate = apiConfig?.delegate else {return}
         if oldRole == .audience && newRole == .soloSinger {
             // 1、KTVSingRoleAudience -》KTVSingRoleMainSinger
             singerRole = newRole
             becomeSoloSinger()
-            delegate.onSingerRoleChanged(oldRole: .audience, newRole: .soloSinger)
+            getEventHander { delegate in
+                delegate.onSingerRoleChanged(oldRole: .audience, newRole: .soloSinger)
+            }
+            
             stateCallBack(.success, .none)
         } else if oldRole == .audience && newRole == .leadSinger {
             becomeSoloSinger()
@@ -234,7 +262,10 @@ extension KTVApiImpl {
         } else if oldRole == .soloSinger && newRole == .audience {
             stopSing()
             singerRole = newRole
-            delegate.onSingerRoleChanged(oldRole: .soloSinger, newRole: .audience)
+            getEventHander { delegate in
+                delegate.onSingerRoleChanged(oldRole: .soloSinger, newRole: .audience)
+            }
+            
             stateCallBack(.success, .none)
         } else if oldRole == .audience && newRole == .coSinger {
             joinChorus(token: apiConfig?.rtmToken ?? "", joinExChannelCallBack: { flag, status in
@@ -255,7 +286,10 @@ extension KTVApiImpl {
         } else if oldRole == .coSinger && newRole == .audience {
             leaveChorus()
             singerRole = newRole
-            delegate.onSingerRoleChanged(oldRole: .coSinger, newRole: .audience)
+            getEventHander { delegate in
+                delegate.onSingerRoleChanged(oldRole: .coSinger, newRole: .audience)
+            }
+            
             stateCallBack(.success, .none)
         } else if oldRole == .soloSinger && newRole == .leadSinger {
             joinChorus(token: apiConfig?.rtmToken ?? "", joinExChannelCallBack: { flag, status in
@@ -276,12 +310,18 @@ extension KTVApiImpl {
         } else if oldRole == .leadSinger && newRole == .soloSinger {
             leaveChorus()
             singerRole = newRole
-            delegate.onSingerRoleChanged(oldRole: .leadSinger, newRole: .soloSinger)
+            getEventHander { delegate in
+                delegate.onSingerRoleChanged(oldRole: .leadSinger, newRole: .soloSinger)
+            }
+            
             stateCallBack(.success, .none)
         } else if oldRole == .leadSinger && newRole == .audience {
             stopSing()
             singerRole = newRole
-            delegate.onSingerRoleChanged(oldRole: .leadSinger, newRole: .audience)
+            getEventHander { delegate in
+                delegate.onSingerRoleChanged(oldRole: .leadSinger, newRole: .audience)
+            }
+            
             stateCallBack(.success, .none)
         } else {
             stateCallBack(.fail, .noPermission)
@@ -372,7 +412,6 @@ extension KTVApiImpl {
 
     private func joinChorus2ndChannel(token: String) {
 
-        guard let config = songConfig else {return}
         let role = singerRole
         if role == .soloSinger || role != .audience {
             print("joinChorus2ndChannel with wrong role")
@@ -462,28 +501,38 @@ extension KTVApiImpl {
 }
 
 extension KTVApiImpl {
+    
+    private func getEventHander(callBack:((KTVApiEventHandlerDelegate)-> Void)) {
+        for obj in eventHandlers.allObjects {
+            if obj is KTVApiEventHandlerDelegate {
+                callBack(obj as! KTVApiEventHandlerDelegate)
+            }
+        }
+    }
+    
     /**
      * 加载歌曲
      */
-    @objc public func loadSong(autoPlay: Bool,config: KTVSongConfiguration) {
+    func loadMusic(autoPlay: Bool, config: KTVSongConfiguration, onMusicLoadStateListener: KTVMusicLoadStateListener) {
         songConfig = config
         let role = singerRole
         let songCode = config.songCode
-
-        guard let delegate = self.delegate else {return}
 
         if (loadDict.keys.contains(String(songCode))) {
             let loadState = loadDict[String(songCode)]
             if loadState == .ok {
                 if let url = lyricUrlMap[String(songCode)] {
-                    delegate.onMusicLoadSuccess(songCode: songCode, lyricUrl: url)
+                    getEventHander { delegate in
+                        onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: url)
+                    }
                     return
                 }
             }
         }
 
         loadDict.updateValue(.inProgress, forKey: String(songCode))
-        var state: KTVLoadSongState = .inProgress
+        var songState: KTVLoadSongState = .inProgress
+        var failedState: KTVLoadSongFailReason = .none
 
         let KTVGroup = DispatchGroup()
         let KTVQueue = DispatchQueue(label: "com.agora.ktv.www")
@@ -499,7 +548,7 @@ extension KTVApiImpl {
                         })
                     } else {
                         self?.loadDict.removeValue(forKey: String(songCode))
-                        state = .noLyricUrl
+                        failedState = .noLyricUrl
                         KTVGroup.leave()
                     }
                 })
@@ -510,7 +559,7 @@ extension KTVApiImpl {
                 self?.loadMusic(with: songCode, callBaclk: { status in
                     if status != .OK {
                         self?.loadDict.removeValue(forKey: String(songCode))
-                        state = .failed
+                        failedState = .musicPreloadFail
                     }
                     KTVGroup.leave()
                 })
@@ -527,7 +576,7 @@ extension KTVApiImpl {
                         })
                     } else {
                         self?.loadDict.removeValue(forKey: String(songCode))
-                        state = .noLyricUrl
+                        failedState = .noLyricUrl
                         KTVGroup.leave()
                     }
 
@@ -536,16 +585,16 @@ extension KTVApiImpl {
         }
 
         KTVGroup.notify(queue: .main) { [weak self] in
-            if state == .inProgress {
+            if songState == .inProgress {
                 self?.loadDict.updateValue(.ok, forKey: String(songCode))
-                state = .ok
+                songState = .ok
             }
 
             if let url = self?.lyricUrlMap[String(songCode)] {
                 if role == .soloSinger && autoPlay == true {
                     self?.startSing()
                 }
-                delegate.onMusicLoadSuccess(songCode: songCode, lyricUrl: url)
+                onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: url)
             }
 
         }
@@ -587,7 +636,6 @@ extension KTVApiImpl {
         hasSendEndPosition = false
         totalLines = 0
         totalScore = 0
-        currentLoadUrl = url
 
         let isLocal = url.hasSuffix(".zip")
         downloadManager.downloadLrcFile(urlString: url) {[weak self] lrcurl in
@@ -660,25 +708,6 @@ extension KTVApiImpl {
         apiConfig?.engine.setAudioScenario(.gameStreaming)
     }
 
-
-    /**
-     * 恢复播放
-     */
-    @objc public func resumeSing() {
-        if musicPlayer?.getPlayerState() == .paused {
-            musicPlayer?.resume()
-        } else {
-            musicPlayer?.play()
-        }
-    }
-
-    /**
-     * 暂停播放
-     */
-    @objc public func pauseSing() {
-        musicPlayer?.pause()
-    }
-
 }
 
 // rtc的代理回调
@@ -738,7 +767,6 @@ extension KTVApiImpl {
         guard let dict = dataToDictionary(data: data) else {return}
         if isMainSinger() {return}
 
-        guard let delegate = self.delegate else {return}
         if dict.keys.contains("cmd") {
             if dict["cmd"] == "setLrcTime" {
                 let position = Double(dict["time"] ?? "0") ?? 0
@@ -752,7 +780,10 @@ extension KTVApiImpl {
                     print("recv state with setLrcTime : \(state.rawValue)")
                     self.playerState = state
                     updateCosingerPlayerStatusIfNeed()
-                    delegate.onMusicPlayerStateChanged(state: state, error: .none, isLocal: false)
+                    getEventHander { delegate in
+                        delegate.onMusicPlayerStateChanged(state: state, error: .none, isLocal: false)
+                    }
+                    
                 }
                 self.remotePlayerPosition = Date().milListamp - position
                 self.remotePlayerDuration = duration
@@ -780,7 +811,10 @@ extension KTVApiImpl {
                 self.playerState = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
 
                 updateCosingerPlayerStatusIfNeed()
-                delegate.onMusicPlayerStateChanged(state: self.playerState, error: .none, isLocal: false)
+                getEventHander { delegate in
+                    delegate.onMusicPlayerStateChanged(state: self.playerState, error: .none, isLocal: false)
+                }
+                
             } else if dict["cmd"] == "setVoicePitch" {
                 if role == .coSinger {return}
                 //同步新的pitch策略 todo
@@ -800,7 +834,7 @@ extension KTVApiImpl {
     }
 
     @objc public func didKTVAPILocalAudioStats(stats: AgoraRtcLocalAudioStats) {
-        audioPlayoutDelay = Int(stats.audioPlayoutDelay)
+        audioPlayoutDelay = Int(stats.audioDeviceDelay)
     }
 
 
@@ -814,27 +848,27 @@ extension KTVApiImpl {
             return
         }
 
-        guard let role = singerRole else {return}
         timer = Timer.scheduledTimer(withTimeInterval: 0.02, block: {[weak self] timer in
             let current = self?.getPlayerCurrentTime()
-            if role == .audience && (Date().milListamp - (self?.lastAudienceUpTime ?? 0)) > 1000 {
+            if self?.singerRole == .audience && (Date().milListamp - (self?.lastAudienceUpTime ?? 0)) > 1000 {
                 return
             }
             self?.setProgress(with: Int(current ?? 0))
-            guard let lyricModel = self?.lyricModel else {
-                assert(false)
-                return
-            }
-            guard let delegate = self?.delegate else {return}
-            if role == .soloSinger || role == .leadSinger {
-                if (Int(current ?? 0) + 500) >= lyricModel.preludeEndPosition && self?.hasSendPreludeEndPosition == false {
-                    self?.hasSendPreludeEndPosition = true
-                    delegate.didSkipViewShowPreludeEndPosition()
-                } else if Int(current ?? 0) >= lyricModel.duration && self?.hasSendEndPosition == false {
-                    self?.hasSendEndPosition = true
-                    delegate.didSkipViewShowEndDuration()
-                }
-            }
+            //这里面的逻辑放到control来做
+//            guard let lyricModel = self?.lyricModel else {
+//                assert(false)
+//                return
+//            }
+//            guard let delegate = self?.delegate else {return}
+//            if role == .soloSinger || role == .leadSinger {
+//                if (Int(current ?? 0) + 500) >= lyricModel.preludeEndPosition && self?.hasSendPreludeEndPosition == false {
+//                    self?.hasSendPreludeEndPosition = true
+//                    delegate.didSkipViewShowPreludeEndPosition()
+//                } else if Int(current ?? 0) >= lyricModel.duration && self?.hasSendEndPosition == false {
+//                    self?.hasSendEndPosition = true
+//                    delegate.didSkipViewShowEndDuration()
+//                }
+//            }
         }, repeats: true)
     }
 
@@ -951,7 +985,7 @@ extension KTVApiImpl {
 
     private func sendStreamMessageWithDict(_ dict: [String: Any], success: ((_ success: Bool) -> Void)?) {
         let messageData = compactDictionaryToData(dict as NSDictionary)
-        let code = apiConfig?.engine.sendStreamMessage(apiConfig?.streamId ?? 0, data: messageData ?? Data())
+        let code = apiConfig?.engine.sendStreamMessage(apiConfig?.dataStreamId ?? 0, data: messageData ?? Data())
         if code == 0 && success != nil { success!(true) }
         if code != 0 {
             print("sendStreamMessage fail: %d\n",code as Any)
@@ -962,12 +996,16 @@ extension KTVApiImpl {
         let dict: [String: Any] = [ "cmd": "PlayerState", "userId": apiConfig?.localUid as Any, "state": "\(state.rawValue)" ]
         sendStreamMessageWithDict(dict, success: nil)
     }
+    
+    @objc public func setProgress(with pos: NSInteger) {
+        lrcView?.setPitch(pitch: pitch, progress: pos)
+    }
 }
 
 //主要是MPK的回调
 extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
 
-    func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedToPosition position: Int) {
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {
 
         self.localPlayerPosition = Date().milListamp - Double(position)
         if isMainSinger() && position > self.audioPlayoutDelay {
@@ -987,8 +1025,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         }
     }
 
-    func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
-        guard let delegate = self.delegate else {return}
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         let role = singerRole
         if state == .openCompleted {
             print("loadSong play completed \(String(describing: songConfig?.songCode))")
@@ -1017,7 +1054,9 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         }
         self.playerState = state
         print("recv state with player callback : \(state.rawValue)")
-        delegate.onMusicPlayerStateChanged(state: state, error: .none, isLocal: true)
+        getEventHander { delegate in
+            delegate.onMusicPlayerStateChanged(state: state, error: .none, isLocal: true)
+        }
     }
 
     private func isMainSinger() -> Bool {
@@ -1029,14 +1068,14 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
 extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
     func onMusicChartsResult(_ requestId: String, status: AgoraMusicContentCenterStatusCode, result: [AgoraMusicChartInfo]) {
         guard let callback = musicChartDict[requestId] else {return}
-        callback(result)
+        callback(requestId, status, result)
         musicChartDict.removeValue(forKey: requestId)
 
     }
 
     func onMusicCollectionResult(_ requestId: String, status: AgoraMusicContentCenterStatusCode, result: AgoraMusicCollection) {
         guard let callback = musicSearchDict[requestId] else {return}
-        callback(status, result)
+        callback(requestId, status, result)
         musicSearchDict.removeValue(forKey: requestId)
 
     }
@@ -1067,16 +1106,16 @@ extension KTVApiImpl: KaraokeDelegate {
         musicPlayer?.seek(toPosition: position)
         totalScore = view.scoringView.getCumulativeScore()
         //将分数传到vc
-        guard let delegate = self.delegate else {return}
-        delegate.didlrcViewDidScrolled(with: self.totalScore, totalScore: self.totalCount * 100)
+//        guard let delegate = self.delegate else {return}
+//        delegate.didlrcViewDidScrolled(with: self.totalScore, totalScore: self.totalCount * 100)
     }
 
     func onKaraokeView(view: KaraokeView, didFinishLineWith model: LyricLineModel, score: Int, cumulativeScore: Int, lineIndex: Int, lineCount: Int) {
         self.totalLines = lineCount
         self.totalScore = cumulativeScore
         //将分数传到vc
-        guard let delegate = self.delegate else {return}
-        delegate.didlrcViewDidScrollFinished(with: self.totalScore, totalScore: lineCount * 100, lineScore: score)
+//        guard let delegate = self.delegate else {return}
+//        delegate.didlrcViewDidScrollFinished(with: self.totalScore, totalScore: lineCount * 100, lineScore: score)
     }
 }
 
@@ -1095,5 +1134,20 @@ extension KTVApiImpl: AgoraLrcDownloadDelegate {
         guard let callback = self.lyricCallbacks[url] else { return }
         self.lyricCallbacks.removeValue(forKey: url)
         callback(nil)
+    }
+}
+
+extension Date {
+    /// 获取当前 秒级 时间戳 - 10位
+    ///
+    var timeStamp : TimeInterval {
+        let timeInterval: TimeInterval = self.timeIntervalSince1970
+        return timeInterval
+    }
+    /// 获取当前 毫秒级 时间戳 - 13位
+    var milListamp : TimeInterval {
+        let timeInterval: TimeInterval = self.timeIntervalSince1970
+        let millisecond = CLongLong(round(timeInterval*1000))
+        return TimeInterval(millisecond)
     }
 }

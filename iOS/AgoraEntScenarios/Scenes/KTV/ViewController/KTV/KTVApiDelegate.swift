@@ -224,7 +224,7 @@ public protocol KTVApiDelegate: NSObjectProtocol {
     /// - Parameters:
     ///   - config: <#config description#>
     ///   - onMusicLoadStateListener: <#onMusicLoadStateListener description#>
-    func loadMusic(config: KTVSongConfiguration, onMusicLoadStateListener: KTVMusicLoadStateListener)
+    func loadMusic(autoPlay: Bool, config: KTVSongConfiguration, onMusicLoadStateListener: KTVMusicLoadStateListener)
     
     
     /// 切换角色
