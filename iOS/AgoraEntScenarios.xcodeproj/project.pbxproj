@@ -321,6 +321,7 @@
 		E3D1D842298CACA000BDBAC2 /* AgoraLrcModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D841298CACA000BDBAC2 /* AgoraLrcModel.swift */; };
 		E3D1D844298CAD4000BDBAC2 /* AgoraLrcParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D843298CAD4000BDBAC2 /* AgoraLrcParse.swift */; };
 		E3D1D846298CADAF00BDBAC2 /* AgoraMiguXmlLrcParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D845298CADAF00BDBAC2 /* AgoraMiguXmlLrcParse.swift */; };
+		E3ED206029C01BA400561DC3 /* KTVApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED205F29C01BA400561DC3 /* KTVApi.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -790,6 +791,7 @@
 		E3D1D841298CACA000BDBAC2 /* AgoraLrcModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraLrcModel.swift; sourceTree = "<group>"; };
 		E3D1D843298CAD4000BDBAC2 /* AgoraLrcParse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraLrcParse.swift; sourceTree = "<group>"; };
 		E3D1D845298CADAF00BDBAC2 /* AgoraMiguXmlLrcParse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraMiguXmlLrcParse.swift; sourceTree = "<group>"; };
+		E3ED205F29C01BA400561DC3 /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -1055,6 +1057,7 @@
 		DD0292B8295BF0DC00485225 /* KTV */ = {
 			isa = PBXGroup;
 			children = (
+				E3ED205F29C01BA400561DC3 /* KTVApi.swift */,
 				DD0292B9295BF0DC00485225 /* VLKTVViewController.h */,
 				DD0292BA295BF0DC00485225 /* KTVApi.h */,
 				DD0292BB295BF0DC00485225 /* VLKTVViewController.m */,
@@ -2359,6 +2362,7 @@
 				DD220B5A295B332C00F57F30 /* VoiceRoomGiftCell.swift in Sources */,
 				DD220B6D295B332C00F57F30 /* VMManagerView.swift in Sources */,
 				DD84179229090C520026B624 /* VLLoginInputPhoneView.m in Sources */,
+				E3ED206029C01BA400561DC3 /* KTVApi.swift in Sources */,
 				DD220B0B295B332C00F57F30 /* VoiceRoomBusinessRequest.swift in Sources */,
 				DD0292DF295BF0DC00485225 /* LSTPopView+KTVModal.m in Sources */,
 				DD220B50295B332C00F57F30 /* AgoraChatRoom3DUserCollectionViewCell.swift in Sources */,
