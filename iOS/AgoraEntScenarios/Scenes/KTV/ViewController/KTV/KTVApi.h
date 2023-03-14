@@ -12,12 +12,12 @@
 NS_ASSUME_NONNULL_BEGIN
 typedef void (^sendStreamSuccess)(BOOL ifSuccess);
 typedef enum : NSUInteger {
-    KTVSongTypeUnknown,
+    KTVSongTypeUnknown = 0,
     KTVSongTypeSolo,
     KTVSongTypeChorus
 } KTVSongType;
 typedef enum : NSUInteger {
-    KTVSingRoleUnknown,
+    KTVSingRoleUnknown = 0,
     KTVSingRoleMainSinger,
     KTVSingRoleCoSinger,
     KTVSingRoleAudience
@@ -27,11 +27,11 @@ typedef enum : NSUInteger {
     KTVPlayerTrackAcc = 1
 } KTVPlayerTrackMode;
 typedef enum : NSUInteger {
+    KTVLoadSongStateIdle = 0,
     KTVLoadSongStateOK,
     KTVLoadSongStateInProgress,
     KTVLoadSongStateNoLyricUrl,
     KTVLoadSongStatePreloadFail,
-    KTVLoadSongStateIdle
 } KTVLoadSongState;
 
 @interface KTVSongConfiguration : NSObject
@@ -54,7 +54,9 @@ typedef enum : NSUInteger {
 
 //歌词组件的滚动
 -(void)didlrcViewDidScrolledWithCumulativeScore:(NSInteger)score totalScore:(NSInteger)totalScore;
--(void)didlrcViewDidScrollFinishedWithCumulativeScore:(NSInteger)score totalScore:(NSInteger)totalScore;
+-(void)didlrcViewDidScrollFinishedWithCumulativeScore:(NSInteger)score
+                                           totalScore:(NSInteger)totalScore
+                                            lineScore:(NSInteger)score;
 
 -(void)didSongLoadedWith:(LyricModel *)model;
 -(void)didSkipViewShowPreludeEndPosition;//前奏结束
@@ -66,6 +68,7 @@ typedef enum : NSUInteger {
 @property(nonatomic, weak)id<KTVApiDelegate> delegate;
 @property(nonatomic, weak) KaraokeView* karaokeView;
 @property (nonatomic, assign) NSInteger last;
+@property (nonatomic, assign) BOOL isNowMicMuted;
 
 -(id)initWithRtcEngine:(AgoraRtcEngineKit *)engine channel:(NSString*)channelName musicCenter:(AgoraMusicContentCenter*)musicCenter player:(nonnull id<AgoraMusicPlayerProtocol>)rtcMediaPlayer dataStreamId:(NSInteger)streamId delegate:(id<KTVApiDelegate>)delegate;
 -(void)loadSong:(NSInteger)songCode withConfig:(KTVSongConfiguration*)config withCallback:(void (^ _Nullable)(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state))block;
@@ -74,6 +77,12 @@ typedef enum : NSUInteger {
 -(void)resumePlay;
 -(void)pausePlay;
 -(void)selectTrackMode:(KTVPlayerTrackMode)mode;
+
+- (void)adjustPlayoutVolume:(int)volume;
+- (void)adjustPublishSignalVolume:(int)volume;
+
+- (void)adjustChorusRemoteUserPlaybackVoulme:(int)volume;
+
 -(int)getAvgSongScore;
 -(void)Skip;
 -(void)setProgressWith:(NSInteger)progress;
@@ -90,7 +99,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
          streamId:(NSInteger)streamId
              data:(NSData * _Nonnull)data;
 
-
+- (void)mainRtcEngine:(AgoraRtcEngineKit *)engine localAudioStats:(AgoraRtcLocalAudioStats *)stats;
 @end
 
 NS_ASSUME_NONNULL_END

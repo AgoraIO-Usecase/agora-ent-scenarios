@@ -12,6 +12,7 @@
 #import "VLUserCenter.h"
 #import "AppContext+KTV.h"
 #import "KTVMacro.h"
+#import "NSString+Helper.h"
 
 @interface VLSearchSongResultView()<
 UITableViewDataSource,
@@ -94,11 +95,16 @@ AgoraMusicContentCenterEventDelegate
     self.page = ifRefresh ? 1 : self.page;
     self.keyWord = keyWord;
     
+    NSDictionary *dict = @{
+        @"pitchType":@(1),
+        @"needLyric": @(YES),
+    };
+    NSString *extra = [NSString convertToJsonData:dict];
     self.requestId =
     [[AppContext shared].agoraMcc searchMusicWithKeyWord:keyWord ? keyWord : @""
                                                     page:self.page
-                                                pageSize:5
-                                              jsonOption:nil];
+                                                pageSize:50
+                                              jsonOption:extra];
 }
 
 - (void)setupView{
