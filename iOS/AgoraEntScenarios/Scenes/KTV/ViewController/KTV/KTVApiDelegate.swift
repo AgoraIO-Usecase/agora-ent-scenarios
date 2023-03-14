@@ -89,15 +89,15 @@ public protocol KTVMusicLoadStateListener: NSObjectProtocol {
 }
 
 
-public protocol KTVJoinChorusStateListener: NSObjectProtocol {
-    
-    /// 加入合唱成功
-    func onJoinChorusSuccess()
-    
-    /// 加入合唱失败
-    /// - Parameter reason: 失败原因
-    func onJoinChorusFail(reason: KTVJoinChorusFailReason)
-}
+//public protocol KTVJoinChorusStateListener: NSObjectProtocol {
+//
+//    /// 加入合唱成功
+//    func onJoinChorusSuccess()
+//
+//    /// 加入合唱失败
+//    /// - Parameter reason: 失败原因
+//    func onJoinChorusFail(reason: KTVJoinChorusFailReason)
+//}
 
 public protocol KTVApiEventHandlerDelegate: NSObjectProtocol {
     
@@ -124,12 +124,26 @@ public protocol KTVApiEventHandlerDelegate: NSObjectProtocol {
 }
 
 open class KTVApiConfig: NSObject{
-    var appId: String?
-    var rtmToken: String?
-    var engine: AgoraRtcEngineKit?
-    var channelName: String?
+    var appId: String
+    var rtmToken: String
+    var engine: AgoraRtcEngineKit
+    var channelName: String
     var dataStreamId: Int = -1
     var localUid: Int = 0
+    
+    init(appId: String,
+         rtmToken: String,
+         engine: AgoraRtcEngineKit,
+         channelName: String,
+         streamId: Int,
+         localUid: Int) {
+        self.appId = appId
+        self.rtmToken = rtmToken
+        self.engine = engine
+        self.channelName = channelName
+        self.dataStreamId = streamId
+        self.localUid = localUid
+    }
 }
 
 /// 歌曲加载配置信息
@@ -139,11 +153,19 @@ open class KTVSongConfiguration: NSObject {
     var mainSingerUid: Int?     //主唱uid
 }
 
+
+public typealias LyricCallback = ((String?) -> Void)
+public typealias LoadMusicCallback = ((AgoraMusicContentCenterPreloadStatus) -> Void)
+public typealias SwitchRoleStateCallBack = (KTVSwitchRoleState, KTVSwitchRoleFailReason) -> Void
+public typealias MusicChartCallBacks = (String, AgoraMusicContentCenterStatusCode, [AgoraMusicChartInfo]?) -> Void
+public typealias MusicResultCallBacks = (String, AgoraMusicContentCenterStatusCode, AgoraMusicCollection) -> Void
+public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Void)
+
 public protocol KTVApiDelegate: NSObjectProtocol {
     
     /// 初始化
     /// - Parameter config: <#config description#>
-    init(config: KTVApiConfig)
+    func setup(config: KTVApiConfig)
     
     
     /// 订阅KTVApi事件
@@ -164,7 +186,7 @@ public protocol KTVApiDelegate: NSObjectProtocol {
     /// 获取歌曲榜单
     /// - Parameter musicChartResult: request, status,  chat info list
     /// - Returns: <#description#>
-    func fetchMusicCharts(completion: (String, AgoraMusicContentCenterStatusCode, [AgoraMusicChartInfo]?) -> ()) -> String
+    func fetchMusicCharts(completion:@escaping MusicChartCallBacks) -> String
     
     
     /// 根据歌曲榜单类型搜索歌单
@@ -175,12 +197,11 @@ public protocol KTVApiDelegate: NSObjectProtocol {
     ///   - jsonOption: <#jsonOption description#>
     ///   - musicCollectionResult: request, status, music list
     /// - Returns: <#description#>
-    func searchMusicByMusicChartId(musicChartId: Int,
-                                   page: Int,
-                                   pageSize: Int,
-                                   jsonOption: String,
-                                   completion: (String, AgoraMusicContentCenterStatusCode, [AgoraMusicCollection]?) -> ()
-                               ) -> String
+    func searchMusic(musicChartId: Int,
+                     page: Int,
+                     pageSize: Int,
+                     jsonOption: String,
+                     completion:@escaping MusicResultCallBacks) -> String
     
     
     /// 根据关键字搜索歌曲
@@ -191,11 +212,11 @@ public protocol KTVApiDelegate: NSObjectProtocol {
     ///   - jsonOption: <#jsonOption description#>
     ///   - completion: <#completion description#>
     /// - Returns: <#description#>
-    func searchMusicByKeyword(
-            keyword: String,
-            page: Int, pageSize: Int,
-            jsonOption: String,
-            completion: (String, AgoraMusicContentCenterStatusCode, [AgoraMusicCollection]?) -> ()) -> String
+    func searchMusic(keyword: String,
+                     page: Int, pageSize: Int,
+                     jsonOption: String,
+                     completion: @escaping MusicResultCallBacks) -> String
+            
     
     
     /// 加载歌曲
@@ -210,7 +231,7 @@ public protocol KTVApiDelegate: NSObjectProtocol {
     ///   - newRole: <#newRole description#>
     ///   - token: <#token description#>
     ///   - onSwitchRoleState: <#onSwitchRoleState description#>
-    func switchSingerRole(newRole: KTVSingRole, token: String, onSwitchRoleState: (KTVSwitchRoleState, KTVSwitchRoleFailReason) -> ())
+    func switchSingerRole(newRole: KTVSingRole, token: String, onSwitchRoleState: SwitchRoleStateCallBack)
     
     
     /// 播放
@@ -243,5 +264,5 @@ public protocol KTVApiDelegate: NSObjectProtocol {
     
     /// 获取mpk实例
     /// - Returns: <#description#>
-    func getMediaPlayer() -> AgoraMusicPlayerProtocol
+    func getMediaPlayer() -> AgoraMusicPlayerProtocol?
 }

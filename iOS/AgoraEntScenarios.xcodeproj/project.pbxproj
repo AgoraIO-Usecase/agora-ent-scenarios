@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053998C4290A83E0005143C7 /* HomeMenuCell.swift */; };
 		BF370B5409C9BBA693EEFB80 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */; };
+		DD01BD1F29C0422A00C9B403 /* KTVLrcViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD01BD1D29C0422A00C9B403 /* KTVLrcViewDelegate.swift */; };
+		DD01BD2029C0422A00C9B403 /* KTVApiDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD01BD1E29C0422A00C9B403 /* KTVApiDelegate.swift */; };
+		DD01BD2229C0447A00C9B403 /* KTVApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD01BD2129C0447A00C9B403 /* KTVApiImpl.swift */; };
 		DD0292C1295BF0DC00485225 /* KTVLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD029248295BF0DC00485225 /* KTVLog.swift */; };
 		DD0292C3295BF0DC00485225 /* VLAddRoomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD02924B295BF0DC00485225 /* VLAddRoomModel.m */; };
 		DD0292C4295BF0DC00485225 /* VLRoomSeatModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD02924E295BF0DC00485225 /* VLRoomSeatModel.m */; };
@@ -321,7 +324,6 @@
 		E3D1D842298CACA000BDBAC2 /* AgoraLrcModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D841298CACA000BDBAC2 /* AgoraLrcModel.swift */; };
 		E3D1D844298CAD4000BDBAC2 /* AgoraLrcParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D843298CAD4000BDBAC2 /* AgoraLrcParse.swift */; };
 		E3D1D846298CADAF00BDBAC2 /* AgoraMiguXmlLrcParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D845298CADAF00BDBAC2 /* AgoraMiguXmlLrcParse.swift */; };
-		E3ED206029C01BA400561DC3 /* KTVApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED205F29C01BA400561DC3 /* KTVApi.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -345,6 +347,10 @@
 		053998C4290A83E0005143C7 /* HomeMenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMenuCell.swift; sourceTree = "<group>"; };
 		4A3B186B38A56ACA440591ED /* Pods-AgoraEntScenarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.debug.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.debug.xcconfig"; sourceTree = "<group>"; };
 		563C78B601810D421A3F783A /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
+		DD01BD1D29C0422A00C9B403 /* KTVLrcViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLrcViewDelegate.swift; sourceTree = "<group>"; };
+		DD01BD1E29C0422A00C9B403 /* KTVApiDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApiDelegate.swift; sourceTree = "<group>"; };
+		DD01BD2129C0447A00C9B403 /* KTVApiImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KTVApiImpl.swift; sourceTree = "<group>"; };
+		DD01BD2529C045DB00C9B403 /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
 		DD029247295BF0DC00485225 /* KTVMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KTVMacro.h; sourceTree = "<group>"; };
 		DD029248295BF0DC00485225 /* KTVLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLog.swift; sourceTree = "<group>"; };
 		DD02924B295BF0DC00485225 /* VLAddRoomModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAddRoomModel.m; sourceTree = "<group>"; };
@@ -791,7 +797,6 @@
 		E3D1D841298CACA000BDBAC2 /* AgoraLrcModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraLrcModel.swift; sourceTree = "<group>"; };
 		E3D1D843298CAD4000BDBAC2 /* AgoraLrcParse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraLrcParse.swift; sourceTree = "<group>"; };
 		E3D1D845298CADAF00BDBAC2 /* AgoraMiguXmlLrcParse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraMiguXmlLrcParse.swift; sourceTree = "<group>"; };
-		E3ED205F29C01BA400561DC3 /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -1057,11 +1062,14 @@
 		DD0292B8295BF0DC00485225 /* KTV */ = {
 			isa = PBXGroup;
 			children = (
-				E3ED205F29C01BA400561DC3 /* KTVApi.swift */,
+				DD01BD2529C045DB00C9B403 /* KTVApi.swift */,
+				DD01BD1E29C0422A00C9B403 /* KTVApiDelegate.swift */,
+				DD01BD1D29C0422A00C9B403 /* KTVLrcViewDelegate.swift */,
 				DD0292B9295BF0DC00485225 /* VLKTVViewController.h */,
 				DD0292BA295BF0DC00485225 /* KTVApi.h */,
 				DD0292BB295BF0DC00485225 /* VLKTVViewController.m */,
 				DD0292BC295BF0DC00485225 /* KTVApi.m */,
+				DD01BD2129C0447A00C9B403 /* KTVApiImpl.swift */,
 			);
 			path = KTV;
 			sourceTree = "<group>";
@@ -2316,6 +2324,7 @@
 				DD8417CA29090C520026B624 /* TemplateServiceModel.swift in Sources */,
 				DD220B74295B332C00F57F30 /* VMSwitchTableViewCell.swift in Sources */,
 				DD220B21295B332C00F57F30 /* UIButtonLayoutExtension.swift in Sources */,
+				DD01BD1F29C0422A00C9B403 /* KTVLrcViewDelegate.swift in Sources */,
 				DD220B53295B332C00F57F30 /* PopTip.swift in Sources */,
 				DD0292F0295BF0DC00485225 /* VLHomeOnLineListView.m in Sources */,
 				DDA199F328FFE579009D3E61 /* UIColor+Extension.swift in Sources */,
@@ -2362,7 +2371,6 @@
 				DD220B5A295B332C00F57F30 /* VoiceRoomGiftCell.swift in Sources */,
 				DD220B6D295B332C00F57F30 /* VMManagerView.swift in Sources */,
 				DD84179229090C520026B624 /* VLLoginInputPhoneView.m in Sources */,
-				E3ED206029C01BA400561DC3 /* KTVApi.swift in Sources */,
 				DD220B0B295B332C00F57F30 /* VoiceRoomBusinessRequest.swift in Sources */,
 				DD0292DF295BF0DC00485225 /* LSTPopView+KTVModal.m in Sources */,
 				DD220B50295B332C00F57F30 /* AgoraChatRoom3DUserCollectionViewCell.swift in Sources */,
@@ -2514,6 +2522,7 @@
 				DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */,
 				DD220B75295B332C00F57F30 /* VMMuteView.swift in Sources */,
 				DDA199F728FFE579009D3E61 /* Array+Extension.swift in Sources */,
+				DD01BD2029C0422A00C9B403 /* KTVApiDelegate.swift in Sources */,
 				DD0292EB295BF0DC00485225 /* VLJoinChorusView.m in Sources */,
 				DD220B47295B332C00F57F30 /* VRSoundEffectsViewController.swift in Sources */,
 				DDA199FE28FFE579009D3E61 /* UIDevice+JKHardware.m in Sources */,
@@ -2537,6 +2546,7 @@
 				DD0292E4295BF0DC00485225 /* VLKTVSwitcherView.m in Sources */,
 				DD84178E29090C520026B624 /* VLLoginInputVerifyCodeView.m in Sources */,
 				DD220B66295B332C00F57F30 /* VoiceRoomGiftsView.swift in Sources */,
+				DD01BD2229C0447A00C9B403 /* KTVApiImpl.swift in Sources */,
 				DD0292E7295BF0DC00485225 /* VLKTVKindsView.m in Sources */,
 				DD220B86295B332C00F57F30 /* VRRoomMenuBar.swift in Sources */,
 				DD84178229090C520026B624 /* VLDiscoveryView.m in Sources */,
