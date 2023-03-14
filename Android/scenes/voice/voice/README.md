@@ -1,13 +1,64 @@
-# 语聊房-Android-中文
+# 语聊房-Android
 
-### 1.项目介绍
+> 本文档主要介绍如何快速跑通 语聊房 示例工程
 
-##### 1.1 概述
+---
+
+## 1. 环境准备
+
+- <mark>最低兼容 Android 5.0</mark>（SDK API Level 21）
+- Android Studio 3.5及以上版本。
+- Android 5.0 及以上的手机设备。
+
+## 2. 运行示例
+
+- 获取声网App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
+
+   - 点击创建应用
+  
+     ![图片](image/create_app_1.jpg)
+  
+   - 选择你要创建的应用类型
+  
+     ![图片](image/create_app_2.jpg)
+  
+   - 得到App ID与App 证书
+      
+     ![图片](image/get_app_id.jpg)
+
+- 获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
+
+- <mark>联系销售给 AppID 开通 语聊房权限</mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员[Agora 支持](https://agora-ticket.agora.io/))
+
+- 在项目的[**gradle.properties**](../../../gradle.properties)里填写需要的声网 App ID 和 App证书
+
+  ![图片](image/config_app_id.jpg)
+
+``` 
+AGORA_APP_ID= （从声网console获取）
+AGORA_APP_CERTIFICATE=（从声网console获取）
+  
+IM_APP_KEY= （从环信IM Console获取）
+IM_APP_CLIENT_ID= （从环信IM Console获取）
+IM_APP_CLIENT_SECRET= （从环信IM Console获取）
+```
+
+- 用 Android Studio 运行项目即可开始您的体验
+
+---
+
+## 3.项目介绍
+
+### 3.1 概述
 
 项目名称：声动语聊
 声动语聊项目是声网语聊房场景的开源代码，开发者可以获取并添加到您的APP工程里，本源码会伴随声动语聊Demo同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
 
-##### 1.2 功能介绍
+### 3.2 使用场景
+
+声网声动语聊源码，最终目的是方便开发者快速按需集成，减少开发者搭建语聊房的工作量。在现有源码的基础上，您可以按需自由定制，包括UI/UE，前端逻辑，权限体系等。
+
+### 3.3 功能介绍
 
 相关类restApi网络请求交互
 - 房间管理以及对语聊房内的基本交互请求和响应，例如麦位的变化、消息的变化、礼物收发、定向消息转发、成员变化等，通过VoiceServiceProtocol来定义协议，通过VoiceSyncManagerServiceImp来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
@@ -26,27 +77,7 @@
   - 音效、AI降噪参考：[AgoraRtcEngineController](src/main/java/io/agora/scene/voice/rtckit/AgoraRtcEngineController.kt)
   - 该类支持对音效功能的统一处理
 
-### 2.使用场景
-
-声网声动语聊源码，最终目的是方便开发者快速按需集成，减少开发者搭建语聊房的工作量。在现有源码的基础上，您可以按需自由定制，包括UI/UE，前端逻辑，权限体系等。
-
-### 3.快速开始
-
-- 在集成的同时，需要去声网合环信的官网注册好对应的账号，同时开通对应的权限从而快速开始你的体验
-- 然后[下载项目](https://github.com/AgoraIO-Usecase/agora-ent-scenarios)到本地，打开项目即可开始您的体验。
-- 运行前需要先完成配置项，在项目根目录下的gradle.properties文件中配置。
-
-    ```
-	gradle.properties：
-		AGORA_APP_ID= （从声网console获取）
-		AGORA_APP_CERTIFICATE=（从声网console获取）
-  
-        IM_APP_KEY= （从环信IM Console获取）
-        IM_APP_CLIENT_ID= （从环信IM Console获取）
-        IM_APP_CLIENT_SECRET= （从环信IM Console获取）
-    ```
-
-### 3.1 重要类介绍
+### 3.4 重要类介绍
 
 AgoraRtc管理类：[AgoraRtcEngineController](src/main/java/io/agora/scene/voice/rtckit/AgoraRtcEngineController.kt)
 
@@ -58,14 +89,12 @@ IM管理类（包含加入房间、登录、退出登录等）[ChatroomIMManager
 
 
 ### 4.FAQ
-- 如何获取声网和环信APPID：
-  - 声网APPID申请：https://www.agora.io/cn/
-  - 环信APPID申请：https://www.easemob.com/
+- 如何获取声网和环信APP ID：
+  - 声网APP ID申请：https://www.agora.io/cn/
+  - 环信APP ID申请：https://www.easemob.com/
 - 语聊房中的弹幕组件使用的是哪家？是否可以自己选择供应商？
   声动语聊源码使用的是环信AgoraChat的IM和信令服务，您也可以使用自己的服务。
 - 集成遇到困难，该如何联系声网获取协助
   - 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
   - 方案2：发送邮件给support@agora.io咨询。
-
-
-
+  
