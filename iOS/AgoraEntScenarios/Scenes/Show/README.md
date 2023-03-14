@@ -73,15 +73,15 @@
 > 
 > - PK 和连麦
 > 
->   相关代码请参考：[ShowLiveViewController](/Scenes/Show/Controller/ShowLiveViewController.swift )中的 _onStartInteraction中对应的.pking和. onSeat的实现
+>   相关代码请参考：[ShowLiveViewController](Controller/ShowLiveViewController.swift )中的 _onStartInteraction中对应的.pking和. onSeat的实现
 > 
 > - 秒切  
 > 
->    相关代码请参考：[ ShowLivePagesViewControll](/Scenes/Show/Controller/ShowLivePagesViewController.swift )
+>    相关代码请参考：[ ShowLivePagesViewControll](Controller/ShowLivePagesViewController.swift )
 > 
 > - 美颜
 > 
->   美颜SDK的调用入口是在 [ShowAgoraKitManager](/Scenes/Show/Models/ShowAgoraKitManager.swift )中AgoraVideoFrameDelegate的回调方法
+>   美颜SDK的调用入口是在 [ShowAgoraKitManager](Models/ShowAgoraKitManager.swift )中AgoraVideoFrameDelegate的回调方法
 > ```texag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0
 >    func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
 >         videoFrame.pixelBuffer = BeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
@@ -89,11 +89,11 @@
 >     }
 >  ```
 >  
->    商汤美颜功能的详细封装请参考[SenseBeautyManager](/Scenes/Show/Beauty/SenseBeaufy/SenseBeautyManager.swift)
+>    商汤美颜功能的详细封装请参考[SenseBeautyManager](Beauty/SenseBeaufy/SenseBeautyManager.swift)
 >  
 > - 虚拟背景和虚化背景
 > 
->    相关代码请参考： [ShowAgoraKitManager](/Scenes/Show/Models/ShowAgoraKitManager.swift )的函数enableVirtualBackground和seVirtualtBackgoundImage
+>    相关代码请参考： [ShowAgoraKitManager](Models/ShowAgoraKitManager.swift )的函数enableVirtualBackground和seVirtualtBackgoundImage
 >  
 ## 4. FAQ
 
