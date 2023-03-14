@@ -8,6 +8,21 @@
     tools:layout_height="230dp"
     tools:theme="@style/Theme.MaterialComponents.Light">
 
+    <TextView
+        android:id="@+id/downloadLrcFailedView"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="70dp"
+        android:text="下载歌词失败， 点击重试"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bgd_control_layout_lrc"/>
+
     <io.agora.karaoke_view.v11.ScoringView
         android:id="@+id/scoringView"
         android:layout_width="match_parent"
