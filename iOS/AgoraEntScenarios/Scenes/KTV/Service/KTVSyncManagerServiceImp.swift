@@ -206,7 +206,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 let userId = result.getPropertyWith(key: "creatorNo", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
                 
-                let playerRTCUid = VLUserCenter.user.agoraPlayerRTCUid;
+                let playerRTCUid = UserInfo.userId//VLUserCenter.user.agoraPlayerRTCUid;
                 var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
                 
                 let dispatchGroup = DispatchGroup()
@@ -287,7 +287,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 let userId = result.getPropertyWith(key: "creatorNo", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
                 
-                let playerRTCUid = VLUserCenter.user.agoraPlayerRTCUid
+                let playerRTCUid = UserInfo.userId//VLUserCenter.user.agoraPlayerRTCUid
                 var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
                 
                 let dispatchGroup = DispatchGroup()
