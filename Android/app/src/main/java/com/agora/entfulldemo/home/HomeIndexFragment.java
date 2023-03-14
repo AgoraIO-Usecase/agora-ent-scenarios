@@ -70,9 +70,6 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
                 PagePilotManager.pageKTVRoomList();
                 break;
             case Voice_Chat:
-                ARouter.getInstance()
-                        .build(PagePathConstant.pageVoiceChat)
-                        .navigation();
                 break;
             case Meta_Live:
                 break;

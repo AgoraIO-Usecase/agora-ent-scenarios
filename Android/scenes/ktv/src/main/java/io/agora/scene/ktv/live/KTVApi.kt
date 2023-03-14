@@ -30,7 +30,7 @@ enum class KTVPlayerTrackMode(val value: Int) {
 enum class KTVLoadSongFailReason(val value: Int) {
     NO_LYRIC_URL(0),
     MUSIC_PRELOAD_FAIL(1),
-    MUSIC_PRELOAD_FAIL_AND_JOIN_CHANNEL_FAIL(2)
+    MUSIC_PRELOAD_FAIL_AND_NO_LYRIC_URL(2)
 }
 
 enum class SwitchRoleState(val value: Int) {

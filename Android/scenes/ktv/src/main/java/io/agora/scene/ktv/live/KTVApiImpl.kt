@@ -397,31 +397,36 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             countDownLatch.await()
             val url = lyricUrlMap[songCode.toString()] ?: return@Thread
             if (isLrcUrlSuccess && isSongLoadedSuccess) {
+                Log.d(TAG, "loadMusic success")
                 loadSongState = KTVLoadSongState.OK
-
                 if (config.autoPlay && singerRole == KTVSingRole.SoloSinger) {
                     // 主唱自动播放歌曲
                     startSing(0)
                 }
                 onMusicLoadStateListener.onMusicLoadSuccess(songCode, url)
-
-            } else if (!isLrcUrlSuccess && isSongLoadedSuccess) {
+            } else if (!isLrcUrlSuccess && !isSongLoadedSuccess) {
+                Log.e(TAG, "loadMusic failed: MUSIC_PRELOAD_FAIL_AND_NO_LYRIC_URL")
+                loadSongState = KTVLoadSongState.FAILED
                 onMusicLoadStateListener.onMusicLoadFail(
                     songCode,
                     url,
-                    KTVLoadSongFailReason.NO_LYRIC_URL
+                    KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL_AND_NO_LYRIC_URL
                 )
-            } else if (isLrcUrlSuccess && !isSongLoadedSuccess) {
+            } else if (!isSongLoadedSuccess) {
+                Log.e(TAG, "loadMusic failed: MUSIC_PRELOAD_FAIL")
+                loadSongState = KTVLoadSongState.FAILED
                 onMusicLoadStateListener.onMusicLoadFail(
                     songCode,
                     url,
                     KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL
                 )
             } else {
+                Log.e(TAG, "loadMusic failed: NO_LYRIC_URL")
+                loadSongState = KTVLoadSongState.FAILED
                 onMusicLoadStateListener.onMusicLoadFail(
                     songCode,
                     url,
-                    KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL_AND_JOIN_CHANNEL_FAIL
+                    KTVLoadSongFailReason.NO_LYRIC_URL
                 )
             }
         }.start()
@@ -433,7 +438,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
             mPlayer.open(songCode, startPos)
         } else {
-            Log.e(TAG, "Wrong role playSong, you are not mainSinger right now!")
+            Log.e(TAG, "Wrong role startSing, you are not mainSinger right now!")
         }
     }
 
@@ -771,9 +776,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         val retPreload = mMusicCenter.preload(songNo, null)
         if (retPreload != 0) {
-            Log.e(TAG, "loadMusic failed: $retPreload")
+            Log.e(TAG, "preLoadMusic failed: $retPreload")
             loadMusicCallbackMap.remove(songNo.toString())
-            onLoadMusicCallback(retPreload)
+            onLoadMusicCallback(0)
             return
         }
         loadMusicCallbackMap[songNo.toString()] = onLoadMusicCallback

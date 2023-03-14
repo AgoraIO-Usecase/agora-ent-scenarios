@@ -19,13 +19,13 @@ object ScenesConstructor {
     @JvmStatic
     fun buildData(context: Context): List<ScenesModel> {
         return mutableListOf(
-            ScenesModel(
-                SceneType.Voice_Chat,
-                context.getString(R.string.app_voice_chat),
-                R.mipmap.bg_btn_home3,
-                R.mipmap.bg_btn_home_chat,
-                true
-            ),
+//            ScenesModel(
+//                SceneType.Voice_Chat,
+//                context.getString(R.string.app_voice_chat),
+//                R.mipmap.bg_btn_home3,
+//                R.mipmap.bg_btn_home_chat,
+//                true
+//            ),
             ScenesModel(
                 SceneType.Ktv_Online,
                 context.getString(R.string.ktv_online),
