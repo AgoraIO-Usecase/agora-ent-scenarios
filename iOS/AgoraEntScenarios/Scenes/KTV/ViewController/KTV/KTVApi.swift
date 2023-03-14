@@ -253,104 +253,6 @@ private enum KTVLoadSongState: Int, Codable {
         self.delegate = nil
     }
     
-    @objc public func switchSingerRole(newRole: KTVSingRole, token: String, stateCallBack:@escaping OnSwitchRoleStateCallBack) { print("switchSingerRole oldRole: (singerRole), newRole: (newRole)")
-        let oldRole = songConfig?.role
-        guard let delegate = apiConfig?.delegate else {return}
-        if oldRole == .audience && newRole == .soloSinger {
-            // 1、KTVSingRoleAudience -》KTVSingRoleMainSinger
-            songConfig?.role = newRole
-            becomeSoloSinger()
-            delegate.onSingerRoleChanged(oldRole: .audience, newRole: .soloSinger)
-            stateCallBack(.success, .none)
-        } else if oldRole == .audience && newRole == .leadSinger {
-            becomeSoloSinger()
-            joinChorus(token: apiConfig?.rtmToken ?? "", joinExChannelCallBack: { flag, status in
-                if flag == true {
-                    self.songConfig?.role = newRole
-                    stateCallBack(.success, .none)
-                } else {
-                    self.leaveChorus()
-                    if status == .musicPreloadFail {
-                        stateCallBack(.fail, .musicPreloadFail)
-                    } else if status == .joinChannelFail {
-                        stateCallBack(.fail, .joinChannelFail)
-                    } else if status == .musicPreloadFailAndJoinchannelFail {
-                        stateCallBack(.fail, .musicPreloadFailAndJoinchannelFail)
-                    }
-                }
-            })
-           
-        } else if oldRole == .soloSinger && newRole == .audience {
-            stopSing()
-            songConfig?.role = newRole
-            delegate.onSingerRoleChanged(oldRole: .soloSinger, newRole: .audience)
-            stateCallBack(.success, .none)
-        } else if oldRole == .audience && newRole == .coSinger {
-            joinChorus(token: apiConfig?.rtmToken ?? "", joinExChannelCallBack: { flag, status in
-                if flag == true {
-                    self.songConfig?.role = newRole
-                    stateCallBack(.success, .none)
-                } else {
-                    self.leaveChorus()
-                    if status == .musicPreloadFail {
-                        stateCallBack(.fail, .musicPreloadFail)
-                    } else if status == .joinChannelFail {
-                        stateCallBack(.fail, .joinChannelFail)
-                    } else if status == .musicPreloadFailAndJoinchannelFail {
-                        stateCallBack(.fail, .musicPreloadFailAndJoinchannelFail)
-                    }
-                }
-            })
-        } else if oldRole == .coSinger && newRole == .audience {
-            leaveChorus()
-            songConfig?.role = newRole
-            delegate.onSingerRoleChanged(oldRole: .coSinger, newRole: .audience)
-            stateCallBack(.success, .none)
-        } else if oldRole == .soloSinger && newRole == .leadSinger {
-            joinChorus(token: apiConfig?.rtmToken ?? "", joinExChannelCallBack: { flag, status in
-                if flag == true {
-                    self.songConfig?.role = newRole
-                    stateCallBack(.success, .none)
-                } else {
-                    self.leaveChorus()
-                    if status == .musicPreloadFail {
-                        stateCallBack(.fail, .musicPreloadFail)
-                    } else if status == .joinChannelFail {
-                        stateCallBack(.fail, .joinChannelFail)
-                    } else if status == .musicPreloadFailAndJoinchannelFail {
-                        stateCallBack(.fail, .musicPreloadFailAndJoinchannelFail)
-                    }
-                }
-            })
-        } else if oldRole == .leadSinger && newRole == .soloSinger {
-            leaveChorus()
-            songConfig?.role = newRole
-            delegate.onSingerRoleChanged(oldRole: .leadSinger, newRole: .soloSinger)
-            stateCallBack(.success, .none)
-        } else if oldRole == .leadSinger && newRole == .audience {
-            stopSing()
-            songConfig?.role = newRole
-            delegate.onSingerRoleChanged(oldRole: .leadSinger, newRole: .audience)
-            stateCallBack(.success, .none)
-        } else {
-            stateCallBack(.fail, .noPermission)
-            print("Error！You can not switch role from $singerRole to $newRole!")
-        }
-        
-    }
-    
-    private func becomeSoloSinger() {
-        let mediaOption = AgoraRtcChannelMediaOptions()
-        mediaOption.autoSubscribeAudio = true
-        mediaOption.autoSubscribeVideo = true
-        mediaOption.publishMediaPlayerId = Int(musicPlayer?.getMediaPlayerId() ?? 0)
-        mediaOption.publishMediaPlayerAudioTrack = true
-        apiConfig?.engine.updateChannel(with: mediaOption)
-        apiConfig?.engine.setDirectExternalAudioSource(true)
-        apiConfig?.engine.setRecordingAudioFrameParametersWithSampleRate(48000, channel: 2, mode: .readOnly, samplesPerCall: 960)
-        apiConfig?.engine.setAudioFrameDelegate(self)
-    }
-    
     /**
      * 加载歌曲
      */
@@ -548,163 +450,6 @@ private enum KTVLoadSongState: Int, Codable {
         apiConfig?.engine.setAudioScenario(.gameStreaming)
     }
     
-    /**
-     * 加入合唱
-     */
-    private func joinChorus(token: String, joinExChannelCallBack: @escaping JoinExChannelCallBack) {
-        guard let oldConfig = songConfig else { return}
-
-        let role = oldConfig.role
-        let songCode = oldConfig.songCode
-        self.onJoinExChannelCallBack = joinExChannelCallBack
-        if role == .leadSinger {
-            print("joinChorus: KTVSingRoleMainSinger")
-            joinChorus2ndChannel(token: token)
-        } else if role == .coSinger {
-            let mediaOption = AgoraRtcChannelMediaOptions()
-            mediaOption.autoSubscribeAudio = true
-            mediaOption.autoSubscribeVideo = true
-            mediaOption.publishMediaPlayerAudioTrack = false
-            apiConfig?.engine.updateChannel(with: mediaOption)
-            joinChorus2ndChannel(token: token)
-        }
-//        else if role == .followSinger {
-//            print("joinChorus: KTVSingRoleCoSinger")
-//            let mediaOption = AgoraRtcChannelMediaOptions()
-//            mediaOption.autoSubscribeAudio = true
-//            mediaOption.autoSubscribeVideo = true
-//            mediaOption.publishMediaPlayerAudioTrack = false
-//            apiConfig?.engine.updateChannel(with: mediaOption)
-//            joinChorus2ndChannel(token: token)
-//
-//            //todo 加个歌曲下载
-//            loadMusic(with: songCode) { status in
-//                if status == .OK {
-//                    self.apiConfig?.engine.adjustPlaybackSignalVolume(Int(self.remoteVolume))
-//                    self.musicPlayer?.openMedia(songCode: songCode, startPos: 0)
-//                    self.isLoadMusicSuccess = true
-//                }
-//            }
-//
-//            // 音量最佳实践调整
-//
-//            apiConfig?.engine.adjustPlaybackSignalVolume(Int(remoteVolume))
-//            apiConfig?.engine.muteLocalAudioStream(true)
-//
-//            musicPlayer?.openMedia(songCode: songCode, startPos: 0)
-//            if mainSingerHasJoinChannelEx == true && isLoadMusicSuccess {
-//                delegate?.onJoinChorusState(reason: .success)
-//            }
-//        }
-        else if role == .audience {
-            print("i am a audience")
-        }
-    }
-    
-    private func didCoSingerLoadMusic(with songCode: NSInteger, callBaclk:@escaping LoadMusicCallback) {
-        loadMusic(with: songCode) { status in
-            callBaclk(status)
-            if status == .OK {
-                self.apiConfig?.engine.adjustPlaybackSignalVolume(Int(self.remoteVolume))
-                self.musicPlayer?.openMedia(songCode: songCode, startPos: 0)
-            }
-        }
-
-        // 音量最佳实践调整
-        apiConfig?.engine.adjustPlaybackSignalVolume(Int(remoteVolume))
-
-        musicPlayer?.openMedia(songCode: songCode, startPos: 0)
-    }
-    
-    private func joinChorus2ndChannel(token: String) {
-        
-        guard let config = songConfig else {return}
-        let role = config.role
-        if role == .soloSinger || role != .audience {
-            print("joinChorus2ndChannel with wrong role")
-            return
-        }
-        
-       apiConfig?.engine.setAudioScenario(.chorus)
-
-       
-       let mediaOption = AgoraRtcChannelMediaOptions()
-       // main singer do not subscribe 2nd channel
-       // co singer auto sub
-        mediaOption.autoSubscribeAudio = role != .leadSinger
-        mediaOption.autoSubscribeVideo = false
-        mediaOption.publishMicrophoneTrack = false
-        mediaOption.enableAudioRecordingOrPlayout = role != .leadSinger
-        mediaOption.clientRoleType = .broadcaster
-        mediaOption.publishDirectCustomAudioTrack = role == .leadSinger
-
-       let rtcConnection = AgoraRtcConnection()
-        rtcConnection.channelId = (apiConfig?.channelName ?? "") + "_ex"
-        rtcConnection.localUid = UInt(apiConfig?.localUid ?? 0)
-       subChorusConnection = rtcConnection
-        
-        apiConfig?.engine.joinChannelEx(byToken: token, connection: rtcConnection, delegate: self, mediaOptions: mediaOption, joinSuccess: nil)
-
-        if config.role == .coSinger {
-            apiConfig?.engine.muteRemoteAudioStream(UInt(songConfig?.mainSingerUid ?? 0), mute: true)
-       }
-    }
-    
-    private func leaveChorus2ndChannel() {
-        guard let config = songConfig else {return}
-        let role = config.role
-        guard let subConn = subChorusConnection else {return}
-        if (role == .leadSinger) {
-            let mediaOption = AgoraRtcChannelMediaOptions()
-            mediaOption.publishDirectCustomAudioTrack = false
-            apiConfig?.engine.updateChannelEx(with: mediaOption, connection: subConn)
-            apiConfig?.engine.leaveChannelEx(subConn)
-        } else if (role == .coSinger) {
-            apiConfig?.engine.leaveChannelEx(subConn)
-            apiConfig?.engine.muteRemoteAudioStream(UInt(config.mainSingerUid), mute: false)
-        }
-    }
-    
-    /**
-     * 离开合唱
-     */
-    private func leaveChorus() {
-        guard let config = songConfig else {return}
-        let role = config.role
-        if role == .leadSinger {
-            mainSingerHasJoinChannelEx = false
-            leaveChorus2ndChannel()
-        } else if role == .coSinger {
-            musicPlayer?.stop()
-            let mediaOption = AgoraRtcChannelMediaOptions()
-            mediaOption.autoSubscribeAudio = true
-            mediaOption.autoSubscribeVideo = false
-            mediaOption.publishMediaPlayerAudioTrack = false
-            apiConfig?.engine.updateChannel(with: mediaOption)
-            leaveChorus2ndChannel()
-
-            apiConfig?.engine.setAudioScenario(.gameStreaming)
-        
-        }
-//        else if role == .followSinger {
-//            apiConfig?.engine.muteLocalAudioStream(false)
-//
-//            musicPlayer?.stop()
-//            let mediaOption = AgoraRtcChannelMediaOptions()
-//            mediaOption.autoSubscribeAudio = true
-//            mediaOption.autoSubscribeVideo = false
-//            mediaOption.publishMediaPlayerAudioTrack = false
-//            apiConfig?.engine.updateChannel(with: mediaOption)
-//            leaveChorus2ndChannel()
-//
-//            apiConfig?.engine.setAudioScenario(.gameStreaming)
-//            songConfig?.role = .audience
-//            songConfig?.songCode = 0
-//        }
-        else if role == .audience {
-            print("joinChorus: KTVSingRoleAudience does not need to leaveChorus!")
-        }
-    }
     
     /**
      * 恢复播放
@@ -1201,6 +946,264 @@ extension KTVApi: AgoraLrcDownloadDelegate {
         guard let callback = self.lyricCallbacks[url] else { return }
         self.lyricCallbacks.removeValue(forKey: url)
         callback(nil)
+    }
+}
+
+extension KTVApi {
+    @objc public func switchSingerRole(newRole: KTVSingRole, token: String, stateCallBack:@escaping OnSwitchRoleStateCallBack) { print("switchSingerRole oldRole: (singerRole), newRole: (newRole)")
+        let oldRole = songConfig?.role
+        guard let delegate = apiConfig?.delegate else {return}
+        if oldRole == .audience && newRole == .soloSinger {
+            // 1、KTVSingRoleAudience -》KTVSingRoleMainSinger
+            songConfig?.role = newRole
+            becomeSoloSinger()
+            delegate.onSingerRoleChanged(oldRole: .audience, newRole: .soloSinger)
+            stateCallBack(.success, .none)
+        } else if oldRole == .audience && newRole == .leadSinger {
+            becomeSoloSinger()
+            joinChorus(token: apiConfig?.rtmToken ?? "", joinExChannelCallBack: { flag, status in
+                if flag == true {
+                    self.songConfig?.role = newRole
+                    stateCallBack(.success, .none)
+                } else {
+                    self.leaveChorus()
+                    if status == .musicPreloadFail {
+                        stateCallBack(.fail, .musicPreloadFail)
+                    } else if status == .joinChannelFail {
+                        stateCallBack(.fail, .joinChannelFail)
+                    } else if status == .musicPreloadFailAndJoinchannelFail {
+                        stateCallBack(.fail, .musicPreloadFailAndJoinchannelFail)
+                    }
+                }
+            })
+           
+        } else if oldRole == .soloSinger && newRole == .audience {
+            stopSing()
+            songConfig?.role = newRole
+            delegate.onSingerRoleChanged(oldRole: .soloSinger, newRole: .audience)
+            stateCallBack(.success, .none)
+        } else if oldRole == .audience && newRole == .coSinger {
+            joinChorus(token: apiConfig?.rtmToken ?? "", joinExChannelCallBack: { flag, status in
+                if flag == true {
+                    self.songConfig?.role = newRole
+                    stateCallBack(.success, .none)
+                } else {
+                    self.leaveChorus()
+                    if status == .musicPreloadFail {
+                        stateCallBack(.fail, .musicPreloadFail)
+                    } else if status == .joinChannelFail {
+                        stateCallBack(.fail, .joinChannelFail)
+                    } else if status == .musicPreloadFailAndJoinchannelFail {
+                        stateCallBack(.fail, .musicPreloadFailAndJoinchannelFail)
+                    }
+                }
+            })
+        } else if oldRole == .coSinger && newRole == .audience {
+            leaveChorus()
+            songConfig?.role = newRole
+            delegate.onSingerRoleChanged(oldRole: .coSinger, newRole: .audience)
+            stateCallBack(.success, .none)
+        } else if oldRole == .soloSinger && newRole == .leadSinger {
+            joinChorus(token: apiConfig?.rtmToken ?? "", joinExChannelCallBack: { flag, status in
+                if flag == true {
+                    self.songConfig?.role = newRole
+                    stateCallBack(.success, .none)
+                } else {
+                    self.leaveChorus()
+                    if status == .musicPreloadFail {
+                        stateCallBack(.fail, .musicPreloadFail)
+                    } else if status == .joinChannelFail {
+                        stateCallBack(.fail, .joinChannelFail)
+                    } else if status == .musicPreloadFailAndJoinchannelFail {
+                        stateCallBack(.fail, .musicPreloadFailAndJoinchannelFail)
+                    }
+                }
+            })
+        } else if oldRole == .leadSinger && newRole == .soloSinger {
+            leaveChorus()
+            songConfig?.role = newRole
+            delegate.onSingerRoleChanged(oldRole: .leadSinger, newRole: .soloSinger)
+            stateCallBack(.success, .none)
+        } else if oldRole == .leadSinger && newRole == .audience {
+            stopSing()
+            songConfig?.role = newRole
+            delegate.onSingerRoleChanged(oldRole: .leadSinger, newRole: .audience)
+            stateCallBack(.success, .none)
+        } else {
+            stateCallBack(.fail, .noPermission)
+            print("Error！You can not switch role from $singerRole to $newRole!")
+        }
+        
+    }
+    
+    private func becomeSoloSinger() {
+        let mediaOption = AgoraRtcChannelMediaOptions()
+        mediaOption.autoSubscribeAudio = true
+        mediaOption.autoSubscribeVideo = true
+        mediaOption.publishMediaPlayerId = Int(musicPlayer?.getMediaPlayerId() ?? 0)
+        mediaOption.publishMediaPlayerAudioTrack = true
+        apiConfig?.engine.updateChannel(with: mediaOption)
+        apiConfig?.engine.setDirectExternalAudioSource(true)
+        apiConfig?.engine.setRecordingAudioFrameParametersWithSampleRate(48000, channel: 2, mode: .readOnly, samplesPerCall: 960)
+        apiConfig?.engine.setAudioFrameDelegate(self)
+    }
+    
+    /**
+     * 加入合唱
+     */
+    private func joinChorus(token: String, joinExChannelCallBack: @escaping JoinExChannelCallBack) {
+        guard let oldConfig = songConfig else { return}
+
+        let role = oldConfig.role
+        let songCode = oldConfig.songCode
+        self.onJoinExChannelCallBack = joinExChannelCallBack
+        if role == .leadSinger {
+            print("joinChorus: KTVSingRoleMainSinger")
+            joinChorus2ndChannel(token: token)
+        } else if role == .coSinger {
+            let mediaOption = AgoraRtcChannelMediaOptions()
+            mediaOption.autoSubscribeAudio = true
+            mediaOption.autoSubscribeVideo = true
+            mediaOption.publishMediaPlayerAudioTrack = false
+            apiConfig?.engine.updateChannel(with: mediaOption)
+            joinChorus2ndChannel(token: token)
+        }
+//        else if role == .followSinger {
+//            print("joinChorus: KTVSingRoleCoSinger")
+//            let mediaOption = AgoraRtcChannelMediaOptions()
+//            mediaOption.autoSubscribeAudio = true
+//            mediaOption.autoSubscribeVideo = true
+//            mediaOption.publishMediaPlayerAudioTrack = false
+//            apiConfig?.engine.updateChannel(with: mediaOption)
+//            joinChorus2ndChannel(token: token)
+//
+//            //todo 加个歌曲下载
+//            loadMusic(with: songCode) { status in
+//                if status == .OK {
+//                    self.apiConfig?.engine.adjustPlaybackSignalVolume(Int(self.remoteVolume))
+//                    self.musicPlayer?.openMedia(songCode: songCode, startPos: 0)
+//                    self.isLoadMusicSuccess = true
+//                }
+//            }
+//
+//            // 音量最佳实践调整
+//
+//            apiConfig?.engine.adjustPlaybackSignalVolume(Int(remoteVolume))
+//            apiConfig?.engine.muteLocalAudioStream(true)
+//
+//            musicPlayer?.openMedia(songCode: songCode, startPos: 0)
+//            if mainSingerHasJoinChannelEx == true && isLoadMusicSuccess {
+//                delegate?.onJoinChorusState(reason: .success)
+//            }
+//        }
+        else if role == .audience {
+            print("i am a audience")
+        }
+    }
+    
+    private func didCoSingerLoadMusic(with songCode: NSInteger, callBaclk:@escaping LoadMusicCallback) {
+        loadMusic(with: songCode) { status in
+            callBaclk(status)
+            if status == .OK {
+                self.apiConfig?.engine.adjustPlaybackSignalVolume(Int(self.remoteVolume))
+                self.musicPlayer?.openMedia(songCode: songCode, startPos: 0)
+            }
+        }
+
+        // 音量最佳实践调整
+        apiConfig?.engine.adjustPlaybackSignalVolume(Int(remoteVolume))
+
+        musicPlayer?.openMedia(songCode: songCode, startPos: 0)
+    }
+    
+    private func joinChorus2ndChannel(token: String) {
+        
+        guard let config = songConfig else {return}
+        let role = config.role
+        if role == .soloSinger || role != .audience {
+            print("joinChorus2ndChannel with wrong role")
+            return
+        }
+        
+       apiConfig?.engine.setAudioScenario(.chorus)
+
+       
+       let mediaOption = AgoraRtcChannelMediaOptions()
+       // main singer do not subscribe 2nd channel
+       // co singer auto sub
+        mediaOption.autoSubscribeAudio = role != .leadSinger
+        mediaOption.autoSubscribeVideo = false
+        mediaOption.publishMicrophoneTrack = false
+        mediaOption.enableAudioRecordingOrPlayout = role != .leadSinger
+        mediaOption.clientRoleType = .broadcaster
+        mediaOption.publishDirectCustomAudioTrack = role == .leadSinger
+
+       let rtcConnection = AgoraRtcConnection()
+        rtcConnection.channelId = (apiConfig?.channelName ?? "") + "_ex"
+        rtcConnection.localUid = UInt(apiConfig?.localUid ?? 0)
+       subChorusConnection = rtcConnection
+        
+        apiConfig?.engine.joinChannelEx(byToken: token, connection: rtcConnection, delegate: self, mediaOptions: mediaOption, joinSuccess: nil)
+
+        if config.role == .coSinger {
+            apiConfig?.engine.muteRemoteAudioStream(UInt(songConfig?.mainSingerUid ?? 0), mute: true)
+       }
+    }
+    
+    private func leaveChorus2ndChannel() {
+        guard let config = songConfig else {return}
+        let role = config.role
+        guard let subConn = subChorusConnection else {return}
+        if (role == .leadSinger) {
+            let mediaOption = AgoraRtcChannelMediaOptions()
+            mediaOption.publishDirectCustomAudioTrack = false
+            apiConfig?.engine.updateChannelEx(with: mediaOption, connection: subConn)
+            apiConfig?.engine.leaveChannelEx(subConn)
+        } else if (role == .coSinger) {
+            apiConfig?.engine.leaveChannelEx(subConn)
+            apiConfig?.engine.muteRemoteAudioStream(UInt(config.mainSingerUid), mute: false)
+        }
+    }
+    
+    /**
+     * 离开合唱
+     */
+    private func leaveChorus() {
+        guard let config = songConfig else {return}
+        let role = config.role
+        if role == .leadSinger {
+            mainSingerHasJoinChannelEx = false
+            leaveChorus2ndChannel()
+        } else if role == .coSinger {
+            musicPlayer?.stop()
+            let mediaOption = AgoraRtcChannelMediaOptions()
+            mediaOption.autoSubscribeAudio = true
+            mediaOption.autoSubscribeVideo = false
+            mediaOption.publishMediaPlayerAudioTrack = false
+            apiConfig?.engine.updateChannel(with: mediaOption)
+            leaveChorus2ndChannel()
+
+            apiConfig?.engine.setAudioScenario(.gameStreaming)
+        
+        }
+//        else if role == .followSinger {
+//            apiConfig?.engine.muteLocalAudioStream(false)
+//
+//            musicPlayer?.stop()
+//            let mediaOption = AgoraRtcChannelMediaOptions()
+//            mediaOption.autoSubscribeAudio = true
+//            mediaOption.autoSubscribeVideo = false
+//            mediaOption.publishMediaPlayerAudioTrack = false
+//            apiConfig?.engine.updateChannel(with: mediaOption)
+//            leaveChorus2ndChannel()
+//
+//            apiConfig?.engine.setAudioScenario(.gameStreaming)
+//            songConfig?.role = .audience
+//            songConfig?.songCode = 0
+//        }
+        else if role == .audience {
+            print("joinChorus: KTVSingRoleAudience does not need to leaveChorus!")
+        }
     }
 }
 

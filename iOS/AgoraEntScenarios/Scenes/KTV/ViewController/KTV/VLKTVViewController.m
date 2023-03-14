@@ -1210,6 +1210,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi Skip];
 }
 
+//加入合唱
+-(void)didJoinChourse {
+    
+}
+
 #pragma mark - VLKTVSettingViewDelegate
 - (void)settingViewSettingChanged:(VLKTVSettingModel *)setting
               valueDidChangedType:(VLKTVValueDidChangedType)type {
