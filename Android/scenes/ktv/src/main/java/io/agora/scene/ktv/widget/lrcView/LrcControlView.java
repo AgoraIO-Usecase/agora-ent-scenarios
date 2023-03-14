@@ -48,8 +48,10 @@ import io.agora.scene.base.utils.ZipUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
+import io.agora.scene.ktv.live.ILrcView;
 import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.widget.basic.OutlineSpan;
+import io.agora.scene.widget.utils.UiUtils;
 
 /**
  * 歌词控制View
@@ -293,7 +295,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     private void changeViewByRole() {
         if (this.mRole == Role.Singer) {
-            mBinding.ilActive.lyricsView.enableDragging(true);
+            mBinding.ilActive.lyricsView.enableDragging(false);
             mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
@@ -611,6 +613,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         } else if (v == mBinding.ilActive.ivSkipPostludeCancel) {
             mBinding.ilActive.ivSkipPostlude.setVisibility(INVISIBLE);
         } else if (v == mBinding.ilActive.ivJoinChorusBtn) {
+            if (UiUtils.isFastClick(2000)) {
+                ToastUtils.showToast("操作太频繁");
+                return;
+            }
             mOnKaraokeActionListener.onJoinChorus();
             mBinding.ilActive.ivJoinChorusLoading.setVisibility(VISIBLE);
         } else if (v == mBinding.ilActive.ivLeaveChorus) {

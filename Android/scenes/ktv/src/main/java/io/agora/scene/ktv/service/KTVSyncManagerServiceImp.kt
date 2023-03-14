@@ -224,6 +224,7 @@ class KTVSyncManagerServiceImp(
                                         rtmToken,
                                         rtcToken,
                                         "", //TODO fetchToken,
+                                        cacheRoom.createdAt
                                     )
                                     runOnMainThread {
                                         completion.invoke(null, kTVJoinRoomOutputModel)

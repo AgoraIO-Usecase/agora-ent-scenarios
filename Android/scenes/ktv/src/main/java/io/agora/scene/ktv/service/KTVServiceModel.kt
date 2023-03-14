@@ -89,6 +89,7 @@ data class JoinRoomOutputModel(
     val agoraRTMToken: String,
     val agoraRTCToken: String,
     val agoraPlayerRTCToken: String,
+    val createdAt: String
 ) : java.io.Serializable
 
 

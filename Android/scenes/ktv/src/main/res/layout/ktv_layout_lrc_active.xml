@@ -69,7 +69,7 @@
         android:textSize="6sp"
         app:backgroundTint="@android:color/transparent"
         app:cornerRadius="6dp"
-        app:icon="@mipmap/ic_play_next"
+        app:icon="@mipmap/ic_leave_chorus"
         app:iconGravity="top"
         app:iconPadding="0dp"
         app:iconTintMode="src_atop"
@@ -148,6 +148,7 @@
         android:background="@mipmap/ic_join_chorus_loading"
         android:layout_marginBottom="10dp"
         android:visibility="invisible"
+        android:clickable="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
