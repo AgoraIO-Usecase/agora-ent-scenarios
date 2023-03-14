@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.widget;
+package io.agora.scene.ktv.widget.lrcView;
 
 import android.animation.Animator;
 import android.content.Context;
@@ -54,7 +54,7 @@ import io.agora.scene.widget.basic.OutlineSpan;
 /**
  * 歌词控制View
  */
-public class LrcControlView extends FrameLayout implements View.OnClickListener {
+public class LrcControlView extends FrameLayout implements View.OnClickListener, ILrcView {
 
     protected KtvLayoutLrcControlViewBinding mBinding;
     protected KtvLayoutLrcPrepareBinding mPrepareBinding;
@@ -83,6 +83,84 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     public KaraokeView getKaraokeView() {
         return mKaraokeView;
+    }
+
+    @Override
+    public void onUpdatePitch(Float pitch) {
+        if (mKaraokeView == null) return;
+        mKaraokeView.setPitch(pitch);
+    }
+
+    public int retryTime = 0;
+    @Override
+    public void onUpdateProgress(Long progress) {
+        if (mKaraokeView.getLyricsData() == null) return;
+        if (mRole == Role.Singer) {
+            if (progress >= mKaraokeView.getLyricsData().startOfVerse) {
+                mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);
+            }
+
+            if (progress >= mKaraokeView.getLyricsData().duration) {
+                mBinding.ilActive.ivSkipPostlude.setVisibility(VISIBLE);
+            } else {
+                mBinding.ilActive.ivSkipPostlude.setVisibility(INVISIBLE);
+            }
+        }
+        mKaraokeView.setProgress(progress);
+    }
+
+    @Override
+    public void onDownloadLrcData(String url) {
+        retryTime++;
+        DownloadUtils.getInstance().download(getContext(), url, file -> {
+            if (file.getName().endsWith(".zip")) {
+                ZipUtils.unzipOnlyPlainXmlFilesAsync(file.getAbsolutePath(),
+                        file.getAbsolutePath().replace(".zip", ""),
+                        new ZipUtils.UnZipCallback() {
+                            @Override
+                            public void onFileUnZipped(List<String> unZipFilePaths) {
+                                String xmlPath = "";
+                                for (String path : unZipFilePaths) {
+                                    if (path.endsWith(".xml")) {
+                                        xmlPath = path;
+                                        break;
+                                    }
+                                }
+                                if (TextUtils.isEmpty(xmlPath)) {
+                                    ToastUtils.showToast("The xml file not exist!");
+                                    return;
+                                }
+                                File xmlFile = new File(xmlPath);
+
+                                LyricsModel lyricsModel = KaraokeView.parseLyricsData(xmlFile);
+                                if (mKaraokeView != null) {
+                                    mKaraokeView.setLyricsData(lyricsModel);
+                                }
+
+                                retryTime = 0;
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                ToastUtils.showToast(e.getMessage());
+                            }
+                        });
+            } else {
+                LyricsModel lyricsModel = KaraokeView.parseLyricsData(file);
+                if (mKaraokeView != null) {
+                    mKaraokeView.setLyricsData(lyricsModel);
+                }
+
+                retryTime = 0;
+            }
+        }, exception -> {
+            if (retryTime < 3) {
+                onDownloadLrcData(url);
+            } else {
+                retryTime = 0;
+                ToastUtils.showToast(exception.getMessage());
+            }
+        });
     }
 
     public enum Role {
@@ -542,77 +620,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     public void setSwitchOriginalChecked(boolean checked) {
         mBinding.ilActive.switchOriginal.setChecked(checked);
-    }
-
-    public void setProgress(Long progress) {
-        if (mKaraokeView.getLyricsData() == null) return;
-        if (mRole == Role.Singer) {
-            if (progress >= mKaraokeView.getLyricsData().startOfVerse) {
-                mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);
-            }
-
-            if (progress >= mKaraokeView.getLyricsData().duration) {
-                mBinding.ilActive.ivSkipPostlude.setVisibility(VISIBLE);
-            } else {
-                mBinding.ilActive.ivSkipPostlude.setVisibility(INVISIBLE);
-            }
-        }
-        mKaraokeView.setProgress(progress);
-    }
-
-    public int retryTime = 0;
-
-    public void downloadLrcData(String url) {
-        retryTime++;
-        DownloadUtils.getInstance().download(getContext(), url, file -> {
-            if (file.getName().endsWith(".zip")) {
-                ZipUtils.unzipOnlyPlainXmlFilesAsync(file.getAbsolutePath(),
-                        file.getAbsolutePath().replace(".zip", ""),
-                        new ZipUtils.UnZipCallback() {
-                            @Override
-                            public void onFileUnZipped(List<String> unZipFilePaths) {
-                                String xmlPath = "";
-                                for (String path : unZipFilePaths) {
-                                    if (path.endsWith(".xml")) {
-                                        xmlPath = path;
-                                        break;
-                                    }
-                                }
-                                if (TextUtils.isEmpty(xmlPath)) {
-                                    ToastUtils.showToast("The xml file not exist!");
-                                    return;
-                                }
-                                File xmlFile = new File(xmlPath);
-
-                                LyricsModel lyricsModel = KaraokeView.parseLyricsData(xmlFile);
-                                if (mKaraokeView != null) {
-                                    mKaraokeView.setLyricsData(lyricsModel);
-                                }
-
-                                retryTime = 0;
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                ToastUtils.showToast(e.getMessage());
-                            }
-                        });
-            } else {
-                LyricsModel lyricsModel = KaraokeView.parseLyricsData(file);
-                if (mKaraokeView != null) {
-                    mKaraokeView.setLyricsData(lyricsModel);
-                }
-
-                retryTime = 0;
-            }
-        }, exception -> {
-            if (retryTime < 3) {
-                downloadLrcData(url);
-            } else {
-                retryTime = 0;
-                ToastUtils.showToast(exception.getMessage());
-            }
-        });
     }
 
     public interface OnKaraokeEventListener {

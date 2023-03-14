@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.widget;
+package io.agora.scene.ktv.widget.lrcView;
 
 import android.content.Context;
 import android.graphics.Canvas;

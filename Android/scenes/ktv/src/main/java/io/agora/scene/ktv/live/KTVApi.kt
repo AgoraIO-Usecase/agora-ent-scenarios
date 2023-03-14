@@ -5,7 +5,8 @@ import io.agora.mediaplayer.IMediaPlayer
 import io.agora.musiccontentcenter.Music
 import io.agora.musiccontentcenter.MusicChartInfo
 import io.agora.rtc2.RtcEngine
-import io.agora.scene.ktv.widget.LrcControlView
+import io.agora.scene.ktv.widget.lrcView.ILrcView
+import io.agora.scene.ktv.widget.lrcView.LrcControlView
 
 /**
  * SoloSinger 独唱
@@ -55,7 +56,8 @@ enum class SwitchRoleFailReason(val value: Int) {
 enum class KTVJoinChorusFailReason(val value: Int) {
     MUSIC_PRELOAD_FAIL(0),
     MUSIC_OPEN_FAIL(1),
-    JOIN_CHANNEL_FAIL(2)
+    JOIN_CHANNEL_FAIL(2),
+    MUSIC_PRELOAD_FAIL_AND_JOIN_CHANNEL_FAIL(3)
 }
 
 interface OnMusicLoadStateListener {
@@ -66,11 +68,6 @@ interface OnMusicLoadStateListener {
     fun onMusicLoadFail(
         songCode: Long, lyricUrl: String, reason: KTVLoadSongFailReason
     )
-}
-
-interface OnJoinChorusStateListener {
-    fun onJoinChorusSuccess()
-    fun onJoinChorusFail(reason: KTVJoinChorusFailReason)
 }
 
 abstract class IKTVApiEventHandler {
@@ -218,7 +215,7 @@ interface KTVApi {
     /**
      * 设置歌词组件，在任意时机设置都可以生效
      */
-    fun setLrcView(view: LrcControlView)
+    fun setLrcView(view: ILrcView)
 
     /**
      * 设置当前mic开关状态

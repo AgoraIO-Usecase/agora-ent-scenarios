@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -24,12 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import io.agora.musiccontentcenter.IAgoraMusicContentCenter;
-import io.agora.musiccontentcenter.IAgoraMusicPlayer;
 import io.agora.musiccontentcenter.IMusicContentCenterEventHandler;
 import io.agora.musiccontentcenter.Music;
 import io.agora.musiccontentcenter.MusicChartInfo;
-import io.agora.musiccontentcenter.MusicContentCenterConfiguration;
 import io.agora.rtc2.ChannelMediaOptions;
 import io.agora.rtc2.Constants;
 import io.agora.rtc2.DataStreamConfig;
@@ -60,7 +56,8 @@ import io.agora.scene.ktv.service.RemoveSongInputModel;
 import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.ktv.service.ScoringAlgoControlModel;
-import io.agora.scene.ktv.widget.LrcControlView;
+import io.agora.scene.ktv.widget.lrcView.ILrcView;
+import io.agora.scene.ktv.widget.lrcView.LrcControlView;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
 
@@ -187,9 +184,6 @@ public class RoomLivingViewModel extends ViewModel {
 
     public void initReConnectEvent() {
         ktvServiceProtocol.subscribeReConnectEvent(() -> {
-//            if (needRePreload) {
-//                rePreloadRunnable("", "").run();
-//            }
             reFetchUserNum();
             reFetchSeatStatus();
             reFetchSongStatus();
@@ -998,7 +992,7 @@ public class RoomLivingViewModel extends ViewModel {
     /**
      * 设置歌词view
      */
-    public void setLryView(LrcControlView view) {
+    public void setLrcView(ILrcView view) {
         ktvApiProtocol.setLrcView(view);
     }
 
@@ -1340,7 +1334,6 @@ public class RoomLivingViewModel extends ViewModel {
         ktvApiProtocol.loadMusic(new KTVSongConfiguration(true, songCode, Integer.parseInt(music.getUserNo())), new OnMusicLoadStateListener() {
             @Override
             public void onMusicLoadSuccess(long songCode, @NonNull String lyricUrl) {
-                // 歌曲load成功
                 // 重置settings
                 mSetting.setVolMic(100);
                 mSetting.setVolMusic(50);
@@ -1352,7 +1345,13 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void onMusicLoadFail(long songCode, @NonNull String lyricUrl, @NonNull KTVLoadSongFailReason reason) {
-
+                KTVLogger.e(TAG, "onMusicLoadFail, songCode:" + songCode + " reason: " + reason);
+                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                if (isOwnSong) {
+                    ToastUtils.showToastLong("onMusicLoadFail, reason:" + reason + "请自动切歌");
+                } else {
+                    ToastUtils.showToastLong("onMusicLoadFail, reason:" + reason);
+                }
             }
         });
         ktvServiceProtocol.makeSongDidPlay(music, e -> {
@@ -1363,17 +1362,6 @@ public class RoomLivingViewModel extends ViewModel {
             return null;
         });
     }
-
-    private Boolean needRePreload = false;
-//    private Runnable rePreloadRunnable(Long songCode, int mainSingerUid) {
-//        return new Runnable() {
-//            @Override
-//            public void run() {
-//                KTVLogger.e(TAG, "ktvApiProtocol.rePreloadSong called");
-//                ktvApiProtocol.loadMusic(songCode, mainSingerUid);
-//            }
-//        };
-//    }
 
     // ------------------ 歌曲seek ------------------
     public void musicSeek(long time) {
@@ -1389,9 +1377,7 @@ public class RoomLivingViewModel extends ViewModel {
         KTVLogger.d(TAG, "RoomLivingViewModel.musicStop() called");
         // 列表中无歌曲， 还原状态
         ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, "", (state, reason) -> null);
-        //ktvApiProtocol.stopSing();
         mAudioTrackMode = KTVPlayerTrackMode.Acc;
-        needRePreload = false;
         if (mRtcEngine == null) {
             return;
         }

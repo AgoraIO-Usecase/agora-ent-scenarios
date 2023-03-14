@@ -48,7 +48,7 @@ import io.agora.scene.ktv.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.ktv.widget.KtvCommonDialog;
-import io.agora.scene.ktv.widget.LrcControlView;
+import io.agora.scene.ktv.widget.lrcView.LrcControlView;
 import io.agora.scene.ktv.widget.MoreDialog;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
 import io.agora.scene.ktv.widget.UserLeaveSeatMenuDialog;
@@ -102,7 +102,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 return (T) new RoomLivingViewModel((JoinRoomOutputModel) getIntent().getSerializableExtra(EXTRA_ROOM_INFO));
             }
         }).get(RoomLivingViewModel.class);
-        roomLivingViewModel.setLryView(getBinding().lrcControlView);
+        roomLivingViewModel.setLrcView(getBinding().lrcControlView);
 
         mRoomSpeakerAdapter = new BindingSingleAdapter<RoomSeatModel, KtvItemRoomSpeakerBinding>() {
             @Override
@@ -265,6 +265,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().ivExit.setOnClickListener(view -> showExitDialog());
         getBinding().superLayout.setOnClickListener(view -> setDarkStatusIcon(isBlackDarkStatus()));
         getBinding().cbMic.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (!compoundButton.isPressed()) return;
             RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
             if (seatLocal == null || mRoomSpeakerAdapter.getItem(seatLocal.getSeatIndex()) == null) {
                 return;

@@ -5,7 +5,7 @@ import android.content.Context;
 import io.agora.karaoke_view.v11.model.LyricsLineModel;
 import io.agora.karaoke_view.v11.model.LyricsModel;
 import io.agora.scene.ktv.live.RoomLivingViewModel;
-import io.agora.scene.ktv.widget.LrcControlView;
+import io.agora.scene.ktv.widget.lrcView.LrcControlView;
 
 public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListener {
 
