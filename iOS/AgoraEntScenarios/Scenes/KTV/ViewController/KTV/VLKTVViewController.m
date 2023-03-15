@@ -41,17 +41,12 @@
 @import YYCategories;
 @import SDWebImage;
 
-typedef enum : NSUInteger {
-    KTVCoSingerWaitStopTimeOut,
-    KTVCoSingerWaitStopCancel,
-} KTVCoSingerWaitStopReason;
 
 NSInteger ktvApiStreamId = -1;
 NSInteger ktvStreamId = -1;
 
 typedef void (^LyricCallback)(NSString* lyricUrl);
 typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
-typedef void (^ChorusCallback)(KTVCoSingerWaitStopReason);
 
 @interface VLKTVViewController ()<
 VLKTVTopViewDelegate,
@@ -91,8 +86,6 @@ KTVMusicLoadStateListener
 @property (nonatomic, strong) AgoraMusicContentCenter *AgoraMcc;
 @property (nonatomic, strong) VLSongItmModel *choosedSongModel; //点的歌曲
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
-@property (nonatomic, strong) NSTimer *chorusMatchingTimer;
-@property (nonatomic, strong) ChorusCallback chorusMatchingCallback;
 
 @property (nonatomic, strong) VLPopScoreView *scoreView;
 @property (nonatomic, strong) NSMutableDictionary<NSString*, LyricCallback>* lyricCallbacks;
@@ -253,7 +246,7 @@ KTVMusicLoadStateListener
             if ([model.userNo isEqualToString:VLUserCenter.user.id]) {
                 //当前的座位用户离开RTC通道
                 VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
-                [weakSelf.MVView updateUIWithSong:song onSeat:NO];;
+                [weakSelf.MVView updateUIWithSong:song role:[weakSelf getUserSingRole]];
 //                [weakSelf resetChorusStatus:model.userNo];
             }
             
@@ -463,13 +456,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     NSDictionary *dict = [VLGlobalHelper dictionaryForJsonData:data];
 //    KTVLogInfo(@"receiveStreamMessageFromUid:%@,streamID:%d,uid:%d",dict,(int)streamId,(int)uid);
-    if([dict[@"cmd"] isEqualToString:@"countdown"]) {  //倒计时
-        int leftSecond = [dict[@"time"] intValue];
-        [self.MVView setCoundDown:leftSecond];
-        KTVLogInfo(@"count down: %ds",(int)leftSecond);
-        
-        return;
-    } else if ([dict[@"cmd"] isEqualToString:@"SingingScore"]) {
+    if ([dict[@"cmd"] isEqualToString:@"SingingScore"]) {
         int score = [dict[@"score"] intValue];
         [self showScoreViewWithScore:score];
         KTVLogInfo(@"score: %ds",score);
@@ -537,20 +524,18 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)loadAndPlaySong {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     
+    //TODO: fix score view visible problem while owner reopen the room
+    [self.MVView updateUIWithSong:model role:[self getUserSingRole]];
     if(!model){
-        [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
         return;
     }
-    //TODO: fix score view visible problem while owner reopen the room
-    [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
     [self markSongPlaying:model];
     
     //TODO: will remove ktv api adjust playout volume method
     [self setPlayoutVolume:50];
     
     //TODO: lead singer???
-    KTVSingRole role = [model isSongOwner] ? KTVSingRoleSoloSinger :
-        [[model chorusNo] isEqualToString:VLUserCenter.user.id] ? KTVSingRoleCoSinger : KTVSingRoleAudience;
+    KTVSingRole role = [self getUserSingRole];
 //    KTVSongType type = [model isChorus] ? KTVSongTypeChorus : KTVSongTypeSolo;
 //    KTVSongConfiguration* config = [KTVSongConfiguration configWithSongCode:[[model songNo] integerValue]];
     
@@ -572,14 +557,21 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                        token:exChannelToken
                            onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
         if(state != KTVSwitchRoleStateSuccess) {
-            //TODO(chenpan): error toast?
-            KTVLogError(@"switchSingerRole error: %ld", reason);
+            if(weakSelf.retryCount < 2) {
+                KTVLogInfo(@"songName: %@, songNo: %@, err: %ld retryCount: %ld",model.songName, model.songNo, state, weakSelf.retryCount);
+                weakSelf.retryCount++;
+                [weakSelf loadAndPlaySong];
+            } else {
+                //TODO(chenpan): error toast?
+                KTVLogError(@"switchSingerRole error: %ld", reason);
+            }
+            
             return;
         }
         
 //        [weakSelf.ktvApi startSingWithStartPos:0];
         [weakSelf.ktvApi loadMusicWithConfig:songConfig
-                    onMusicLoadStateListener:self];
+                    onMusicLoadStateListener:weakSelf];
     }];
     
 //    [self.ktvApi loadSong:[[model songNo] integerValue] withConfig:config withCallback:^(NSInteger songCode, NSString * _Nonnull lyricUrl, KTVSingRole role, KTVLoadSongState state) {
@@ -630,59 +622,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                         completion:completion];
 }
 
-- (void)startChorusMatching
-{
-    VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
-    [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
-    if(model.isChorus && model.status == VLSongPlayStatusIdle && model.chorusNo.length == 0) {
-        // for new chorus song, need to wait till co-singer joins or force solo
-        if([model isSongOwner]){
-            //only song owner setup the timer, audience do nothing
-            [self startCoSingerWaitForSeconds:20 withCallback:^(KTVCoSingerWaitStopReason reason) {
-                KTVLogInfo(@"startCoSingerWaitForSeconds did stop: %ld", reason);
-                if (reason == KTVCoSingerWaitStopCancel) {
-                    return;
-                }
-                [[AppContext ktvServiceImp] enterSoloMode];
-            }];
-        }
-        return;
-    }
-}
-
-- (void)startCoSingerWaitForSeconds:(NSInteger)seconds withCallback:(void (^ _Nullable)(KTVCoSingerWaitStopReason))block
-{
-    if(self.chorusMatchingTimer) {
-        //already waiting, ignore
-        KTVLogInfo(@"already waiting for chorus, ignore call");
-        return;
-    }
-    self.chorusMatchingCallback = block;
-    __block NSInteger leftSecond = seconds;
-    VL(weakSelf);
-    self.chorusMatchingTimer = [HWWeakTimer scheduledTimerWithTimeInterval:1.0f block:^(id userInfo) {
-        leftSecond -= 1;
-        if (leftSecond == 0) {
-            [weakSelf.MVView setChorusOptViewHidden];
-            [weakSelf stopCoSingerWaitWithReason:KTVCoSingerWaitStopTimeOut];
-        } else {
-            [weakSelf.MVView setCoundDown:leftSecond];
-            [weakSelf syncChorusMatchCountDown:leftSecond];
-        }
-    } userInfo:@"Fire" repeats:YES];
-    [self.chorusMatchingTimer fire];
-}
-
-- (void)stopCoSingerWaitWithReason:(KTVCoSingerWaitStopReason)reason
-{
-    [self.chorusMatchingTimer invalidate];
-    if (self.chorusMatchingCallback) {
-        self.chorusMatchingCallback(reason);
-    }
-    self.chorusMatchingTimer = nil;
-    self.chorusMatchingCallback = nil;
-}
-
 - (void)refreshChoosedSongList:(void (^ _Nullable)(void))block{
     VL(weakSelf);
     [[AppContext ktvServiceImp] getChoosedSongsListWithCompletion:^(NSError * error, NSArray<VLRoomSelSongModel *> * songArray) {
@@ -704,13 +643,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [[AppContext ktvServiceImp] markSongDidPlayWithInput:model
                                               completion:^(NSError * error) {
     }];
-}
-- (void)syncChorusMatchCountDown:(NSInteger)seconds {
-    NSDictionary *dict = @{
-        @"cmd":@"countdown",
-        @"time":@(seconds)
-    };
-    [self sendStreamMessageWithDict:dict success:nil];
 }
 
 - (void)syncChoruScore:(NSInteger)score {
@@ -1232,32 +1164,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
-- (void)onKTVMVView:(VLKTVMVView *)view chorusSingAction:(VLKTVMVViewSingActionType)singType {
-    if (singType == VLKTVMVViewSingActionTypeSolo) { // 独唱
-        //发送独唱的消息
-        [self.MVView setChorusOptViewHidden];
-        [self stopCoSingerWaitWithReason:KTVCoSingerWaitStopTimeOut];
-    } else if (singType == VLKTVMVViewSingActionTypeJoinChorus) { // 加入合唱
-        if(!self.isOnMicSeat) {
-            [VLToast toast:KTVLocalizedString(@"请先上坐")];
-        } else {
-            [self.MVView setChorusOptViewHidden];
-            [self joinChorus]; //发送加入合唱的消息
-        }
-    }
-}
-
 - (void)onKTVMView:(VLKTVMVView *)view lrcViewDidScrolled:(NSInteger)position {
     [self.rtcMediaPlayer seekToPosition:position];
 }
 
 - (void)didSkipViewClick{
 //    [self.ktvApi Skip];
-}
-
-//加入合唱
--(void)didJoinChourse {
-    
 }
 
 #pragma mark - VLKTVSettingViewDelegate
@@ -1380,6 +1292,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     return song;
 }
 
+
+/// 获取当前用户的麦位
 - (VLRoomSeatModel*)getCurrentUserSeatInfo {
     for (VLRoomSeatModel *model in self.seatsArray) {
         if ([model.userNo isEqualToString:VLUserCenter.user.id]) {
@@ -1390,6 +1304,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     return nil;
 }
 
+
+/// 根据麦位索引获取麦位
+/// @param seatIndex <#seatIndex description#>
 - (VLRoomSeatModel*)getUserSeatInfoWithIndex:(NSUInteger)seatIndex {
     for (VLRoomSeatModel *model in self.seatsArray) {
         if (model.seatIndex == seatIndex) {
@@ -1398,6 +1315,21 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     
     return nil;
+}
+
+/// 计算当前歌曲用户的演唱角色
+- (KTVSingRole)getUserSingRole {
+    VLRoomSelSongModel* songModel = [[self selSongsArray] firstObject];
+    BOOL currentSongIsJoinSing = [self getCurrentUserSeatInfo].joinSing;
+    BOOL currentSongIsSongOwner = [songModel isSongOwner];
+    BOOL currentSongIsChorus = [songModel isChorus];
+    if (currentSongIsSongOwner) {
+        return currentSongIsChorus ? KTVSingRoleLeadSinger : KTVSingRoleSoloSinger;
+    } else if (currentSongIsJoinSing) {
+        return KTVSingRoleCoSinger;
+    } else {
+        return KTVSingRoleAudience;
+    }
 }
 
 #pragma mark - setter
@@ -1425,9 +1357,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     _isOnMicSeat = isOnMicSeat;
     
     if (onMicSeatStatusDidChanged) {
-        VLRoomSelSongModel* song = [self.selSongsArray firstObject];
         if (!isOnMicSeat) {
-            if (song.isChorus && song.chorusNo == VLUserCenter.user.id) {
+            KTVSingRole role = [self getUserSingRole];
+            if (role == KTVSingRoleCoSinger) {
                 //co singer leave chorus
                 [[AppContext ktvServiceImp] coSingerLeaveChorusWithCompletion:^(NSError * err) {
                 }];
@@ -1438,7 +1370,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                     
                 }];
                 [self loadAndPlaySong];
-            } else if (song.isSongOwner) {
+            } else if (role == KTVSingRoleLeadSinger || role == KTVSingRoleSoloSinger) {
 //                [self.ktvApi stopSing];
                 [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
                                                    token:@""
@@ -1534,33 +1466,19 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     VLRoomSelSongModel* originalTopSong = [oldSongsArray firstObject];
     VLRoomSelSongModel* updatedTopSong = [selSongsArray firstObject];
-    KTVLogInfo(@"setSelSongsArray current top: songName: %@ isChorus: %d, chorusNo: %@, status: %ld",
-               updatedTopSong.songName, updatedTopSong.isChorus, updatedTopSong.chorusNo, updatedTopSong.status);
-    KTVLogInfo(@"setSelSongsArray orig top: songName: %@ isChorus: %d, chorusNo: %@, status: %ld",
-               originalTopSong.songName, originalTopSong.isChorus, originalTopSong.chorusNo, originalTopSong.status);
-    if(!updatedTopSong.isChorus) {
-        //solo
-        if(![updatedTopSong isEqual:originalTopSong]){
-            //song changes
-//            [self.ktvApi stopSing];
-            [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
-                                               token:@""
-                                   onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-                
-            }];
-            [self loadAndPlaySong];
-        }
-    } else {
-        //chorus
-//        if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
-            if([updatedTopSong waittingForChorusMatch]) {
-                [self startChorusMatching];
-            }
-//        }
-        if([updatedTopSong doneChorusMatch]) {
-            [self stopCoSingerWaitWithReason:KTVCoSingerWaitStopCancel];
-            [self loadAndPlaySong];
-        }
+    KTVLogInfo(@"setSelSongsArray current top: songName: %@ isChorus: %d, chorusNum: %ld, status: %ld",
+               updatedTopSong.songName, updatedTopSong.isChorus, updatedTopSong.chorusNum, updatedTopSong.status);
+    KTVLogInfo(@"setSelSongsArray orig top: songName: %@ isChorus: %d, chorusNum: %ld, status: %ld",
+               originalTopSong.songName, originalTopSong.isChorus, originalTopSong.chorusNum, originalTopSong.status);
+    if(![updatedTopSong isEqual:originalTopSong]){
+        //song changes
+//        [self.ktvApi stopSing];
+        [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
+                                           token:@""
+                               onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+            
+        }];
+        [self loadAndPlaySong];
     }
 }
 
@@ -1574,7 +1492,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 
 
-#pragma mark
+#pragma mark KTVApiEventHandlerDelegate
 - (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error isLocal:(BOOL)isLocal {
     
 }
@@ -1587,30 +1505,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
 }
 
+#pragma mark KTVMusicLoadStateListener
 - (void)onMusicLoadFailWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl reason:(enum KTVLoadSongFailReason)reason { 
     
 }
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
-//    VLRoomSelSongModel* model = [self.selSongsArray firstObject];
-//    NSAssert([model.songNo integerValue] == songCode, @"sss");
-//    //TODO(chenpan): KTVSingRoleLeadSinger?
-//    KTVSingRole role = [model isSongOwner] ? KTVSingRoleSoloSinger :
-//        [[model chorusNo] isEqualToString:VLUserCenter.user.id] ? KTVSingRoleCoSinger : KTVSingRoleAudience;
-//    NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
-//    VL(weakSelf);
-//    [self.ktvApi switchSingerRoleWithNewRole:role
-//                                       token:exChannelToken
-//                           onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-//        if(state != KTVSwitchRoleStateSuccess) {
-//            //TODO(chenpan): error toast?
-//            return;
-//        }
-//
-//        [weakSelf.ktvApi startSingWithStartPos:0];
-//    }];
 }
-
 
 @end
 
