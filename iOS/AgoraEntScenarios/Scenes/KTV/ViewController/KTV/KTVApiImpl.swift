@@ -577,7 +577,7 @@ extension KTVApiImpl {
                         isLoadUrlSuccess = false
                         KTVGroup.leave()
                     }
-
+                    isLoadMusicSuccess = true
                 })
             }
         }
@@ -844,7 +844,6 @@ extension KTVApiImpl {
         audioPlayoutDelay = Int(stats.audioDeviceDelay)
     }
 
-
 }
 
 //private method
@@ -1012,7 +1011,6 @@ extension KTVApiImpl {
 
 //主要是MPK的回调
 extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
-
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {
         self.localPlayerPosition = Date().milListamp - Double(position)
         if isMainSinger() && position > self.audioPlayoutDelay {
@@ -1034,6 +1032,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
     
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         agoraPrint("loadSong play status: \(state.rawValue) \(String(describing: songConfig?.songCode))")
+
         if state == .openCompleted {
             self.localPlayerPosition = Date().milListamp
             self.playerDuration = 0
