@@ -3,7 +3,7 @@ apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
 android {
     defaultConfig {
-        applicationId "com.agora.entfulldemo"
+        applicationId "io.agora.ktvroom"
     }
 }
 

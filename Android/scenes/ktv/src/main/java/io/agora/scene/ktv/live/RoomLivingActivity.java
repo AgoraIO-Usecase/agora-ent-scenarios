@@ -289,7 +289,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
         };
         getBinding().lrcControlView.setOnLrcClickListener(lrcActionListenerImpl);
-        getBinding().cbVideo.setOnCheckedChangeListener((compoundButton, b) -> toggleSelfVideo(b));
+        getBinding().cbVideo.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (!compoundButton.isPressed()) return;
+            toggleSelfVideo(b);
+        });
 
         roomLivingViewModel.loadingDialogVisible.observe(this, visible -> {
             if (visible) {
@@ -326,6 +329,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             boolean isOnSeat = seatModel != null && seatModel.getSeatIndex() >= 0;
             getBinding().groupBottomView.setVisibility(isOnSeat ? View.VISIBLE : View.GONE);
             getBinding().groupEmptyPrompt.setVisibility(isOnSeat ? View.GONE : View.VISIBLE);
+
+            boolean isVideoChecked = seatModel != null && seatModel.isVideoMuted() == RoomSeatModel.Companion.getMUTED_VALUE_FALSE();
+            getBinding().cbVideo.setChecked(isVideoChecked);
+            boolean isAudioChecked = seatModel != null && seatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_FALSE();
+            getBinding().cbMic.setChecked(isAudioChecked);
         });
         roomLivingViewModel.seatListLiveData.observe(this, seatModels -> {
             if (seatModels == null) {
