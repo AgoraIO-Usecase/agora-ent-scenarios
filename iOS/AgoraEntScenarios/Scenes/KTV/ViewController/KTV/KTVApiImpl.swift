@@ -47,8 +47,12 @@ class KTVApiImpl: NSObject{
     private var audioPlayoutDelay: NSInteger = 0
     private var isNowMicMuted: Bool = false
     
-    private var playerState: AgoraMediaPlayerState = .idle
-    
+    private var playerState: AgoraMediaPlayerState = .idle {
+        didSet {
+            updateRemotePlayBackVolumeIfNeed()
+            updateTimer(with: playerState)
+        }
+    }
     private var pitch: Double = 0
     private var localPlayerPosition: TimeInterval = 0
     private var remotePlayerPosition: TimeInterval = 0
@@ -71,8 +75,6 @@ class KTVApiImpl: NSObject{
     public var remoteVolume: Int = 15
     private var joinChorusNewRole: KTVSingRole = .audience
     private var loadMusicState: KTVLoadSongFailReason = .none
-
-    private var lrcView: KTVLrcControl?
     
     deinit {
         mcc.register(nil)
@@ -201,15 +203,6 @@ extension KTVApiImpl: KTVApiDelegate {
     @objc public func seekSing(time: NSInteger) {
         agoraPrint("seekSing")
         musicPlayer?.seek(toPosition: time)
-    }
-
-    /**
-     * 设置歌词组件，在任意时机设置都可以生效
-     */
-    @objc public func setLycView(view: KTVLrcControl) {
-//        lrcView = view
-//        lrcView?.delegate = self
-        lrcView = view
     }
 
     /**
@@ -521,6 +514,10 @@ extension KTVApiImpl {
             if loadState == .ok {
                 agoraPrint("_loadMusic songCode1: \(config.songCode) role: \(singerRole.rawValue) url: \(lyricUrlMap[String(songCode)] ?? "")")
                 if let url = lyricUrlMap[String(songCode)] {
+                    if (config.autoPlay && (self.singerRole == .soloSinger || self.singerRole == .leadSinger)) {
+                        // 主唱自动播放歌曲
+                        self.startSing(startPos: 0)
+                    }
                     onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: url)
                     return
                 }
@@ -837,8 +834,8 @@ extension KTVApiImpl {
 
         let pitch = isNowMicMuted ? 0 : speakers.first?.voicePitch
         self.pitch = pitch ?? 0
-        lrcView?.onUpdatePitch(pitch: Float(self.pitch))
-        lrcView?.onUpdateProgress(progress: Int(getPlayerCurrentTime()))
+        lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
+        lrcControl?.onUpdateProgress(progress: Int(getPlayerCurrentTime()))
 
         if isMainSinger()  {return}
     }
@@ -1008,9 +1005,8 @@ extension KTVApiImpl {
     }
     
     private func setProgress(with pos: NSInteger) {
-//        lrcView?.setPitch(pitch: pitch, progress: pos)
-        lrcView?.onUpdatePitch(pitch: Float(self.pitch))
-        lrcView?.onUpdateProgress(progress: pos)
+        lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
+        lrcControl?.onUpdateProgress(progress: pos)
     }
 }
 
