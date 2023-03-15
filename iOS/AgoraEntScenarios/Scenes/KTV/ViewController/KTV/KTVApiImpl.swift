@@ -577,7 +577,7 @@ extension KTVApiImpl {
                         isLoadUrlSuccess = false
                         KTVGroup.leave()
                     }
-
+                    isLoadMusicSuccess = true
                 })
             }
         }
