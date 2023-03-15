@@ -548,13 +548,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             })
         }
     
-    func acceptMicSeatInvitation(completion: @escaping (Error?, VRRoomMic?) -> Void) {
+    func acceptMicSeatInvitation(index: Int?,completion: @escaping (Error?, VRRoomMic?) -> Void) {
         let mic = VRRoomMic()
         let user = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
             $0.uid == VoiceRoomUserInfo.shared.user?.uid ?? ""
         })
-        if user?.mic_index ?? 0 > 1 {
-            mic.mic_index = user?.mic_index ?? 1
+        if index != nil {
+            mic.mic_index = index ?? self.findMicIndex()
         } else {
             mic.mic_index = self.findMicIndex()
         }
