@@ -7,6 +7,7 @@
 #import "AgoraEntScenarios-swift.h"
 #import "VLRoomSelSongModel.h"
 #import "KTVSkipView.h"
+@import ScoreEffectUI;
 @import AgoraLyricsScore;
 
 NS_ASSUME_NONNULL_BEGIN

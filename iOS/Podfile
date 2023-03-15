@@ -42,7 +42,10 @@ def all_pods
   #歌词组件
 #  pod 'AgoraLyricsScore', '1.0.8.8'
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'cc0951f11f5fa6113ec2b9df2a509efa881d5bd7'
-  pod 'AgoraLyricsScore', :path => '../../AgoraLyricsScore/AgoraLyricsScore.podspec'
+  pod "ScoreEffectUI"
+  pod 'AgoraLyricsScore', '1.1.1-beta-1'
+ # pod 'AgoraLyricsScore', :path => '../../AgoraLyricsScore/AgoraLyricsScore.podspec'
+ 
   pod 'AgoraRtm_iOS', '1.5.1'
   pod 'Zip'
   
