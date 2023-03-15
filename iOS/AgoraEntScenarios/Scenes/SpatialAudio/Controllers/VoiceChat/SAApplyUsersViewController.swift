@@ -69,6 +69,7 @@ public class SAApplyUsersViewController: UITableViewController {
 }
 
 extension SAApplyUsersViewController {
+    
     @objc func refresh() {
         AppContext.saServiceImp().fetchApplicantsList {[weak self] error, applicants in
             guard let self = self else {return}

@@ -112,11 +112,10 @@ class SARoomViewController: SABaseViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigation.isHidden = false
-        UIApplication.shared.isIdleTimerDisabled = false
+//        UIApplication.shared.isIdleTimerDisabled = false
     }
 
     deinit {
-        print("\(String(describing: self.swiftClassName)) is destroyed!")
         SAUserInfo.shared.currentRoomOwner = nil
         SAUserInfo.shared.user?.amount = 0
 //        AppContext.saServiceImp().cleanCache()
@@ -339,7 +338,6 @@ extension SARoomViewController {
             AppContext.saServiceImp().leaveRoom(roomId) { error, flag in }
         } else {
             AppContext.saServiceImp().leaveMic(mic_index: self.local_index ?? AppContext.saTmpServiceImp().findMicIndex()) { error, result in
-                AppContext.saServiceImp().leaveRoom(roomId) { error, flag in }
             }
         }
 

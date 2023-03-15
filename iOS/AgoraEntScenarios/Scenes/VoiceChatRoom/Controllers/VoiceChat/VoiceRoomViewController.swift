@@ -582,12 +582,14 @@ extension VoiceRoomViewController {
         self.rtckit.leaveChannel()
         self.notifySeverLeave()
         self.leaveRoom()
+        dismiss(animated: false)
         VoiceRoomUserInfo.shared.currentRoomOwner = nil
         VoiceRoomUserInfo.shared.user?.amount = 0
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
         ChatRoomServiceImp.getSharedInstance().cleanCache()
         self.rtckit.stopPlayMusic()
         self.ownerBack()
+        
     }
 
     private func ownerBack() {

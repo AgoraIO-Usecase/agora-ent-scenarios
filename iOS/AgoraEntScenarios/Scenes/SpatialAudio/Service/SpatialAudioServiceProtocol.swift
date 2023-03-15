@@ -128,6 +128,10 @@ public enum SAUpdateRoomState {
     /// 机器人相关设置
     /// - Parameter robotInfo: <#robotInfo description#>
     func onRobotUpdate(robotInfo: SARobotAudioInfo)
+    
+    /// Description 公告更新回调
+    /// - Parameter announce: 已更新公告
+    func onRoomAnnouncementChanged(announce: String)
 }
 
 /// 房间内部需要用到环信KV

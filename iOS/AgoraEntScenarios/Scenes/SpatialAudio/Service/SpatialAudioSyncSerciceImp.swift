@@ -138,14 +138,7 @@ extension SpatialAudioSyncSerciceImp {
             
             let group = DispatchGroup()
             
-            var existMicIdxs: [Int] = []
-            mics.forEach { mic in
-                existMicIdxs.append(mic.mic_index)
-            }
             for i in 0...6 {
-                if existMicIdxs.contains(i) {
-                    continue
-                }
                 let item = i == 0 ? self._getOwnerSeat() : SARoomMic()
                 if i != 0 {
                     item.mic_index = i
@@ -154,8 +147,6 @@ extension SpatialAudioSyncSerciceImp {
                     } else {
                         item.status = -1   //mormal
                     }
-                } else {
-                    item.status = 0
                 }
                 group.enter()
                 self._addMicSeat(roomId: roomId, mic: item) { error, mic in
@@ -164,14 +155,17 @@ extension SpatialAudioSyncSerciceImp {
                         return
                     }
                     item.objectId = mic?.objectId
-                    mics.append(item)
+                    mics.append(mic ?? item)
                     group.leave()
+                    
                 }
             }
             group.notify(queue: DispatchQueue.main) {
-                mics = mics.sorted {$0.mic_index < $1.mic_index}
-                self.mics = mics
-                completion(nil, mics)
+                if mics.count == 7 {
+                    mics = mics.sorted {$0.mic_index < $1.mic_index}
+                    self.mics = mics
+                    completion(nil, mics)
+                }
             }
         }
     }
@@ -281,7 +275,8 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
                 VLUserCenter.user.agoraRTCToken = token ?? ""
                 VLUserCenter.user.chat_uid = userId
                 self._addUserIfNeed(roomId: room_id) { err in
-                    self.createMics(roomId: room_id) { error, miclist in
+                    self._getMicSeatList(roomId: room_id) { error, mics in
+                        self.mics = mics ?? []
                         completion(error, updateRoom, self.robotInfo)
                     }
                 }
@@ -859,6 +854,7 @@ extension SpatialAudioSyncSerciceImp {
                            agoraPrint("imp room subscribe onUpdated...")
                            if origRoom?.announcement != room.announcement {
                                origRoom?.announcement = room.announcement
+                               self.subscribeDelegate?.onRoomAnnouncementChanged(announce: (room.announcement ?? origRoom?.announcement!)!)
                            } /*else if origRoom?.use_robot != room.use_robot {
                                origRoom?.use_robot = room.use_robot
                                self.subscribeDelegate?.onRobotSwitch(roomId: channelName, enable: room.use_robot ?? false, from: room.owner?.name ?? "")
@@ -1011,11 +1007,12 @@ extension SpatialAudioSyncSerciceImp {
                            self.micApplys.append(apply)
                        }, onDeleted: {[weak self] object in
                            agoraPrint("imp seat apply subscribe onDeleted...")
-                           guard let self = self else {return}
-                           var apply: SAApply? = nil
-                           if let index = self.micApplys.firstIndex(where: { object.getId() == $0.objectId }) {
-                               apply = self.micApplys[index]
-                               self.micApplys.remove(at: index)
+                           guard let self = self,
+                                 let jsonStr = object.toJson() else {return}
+                           let applicant = model(from: jsonStr.z.jsonToDictionary(), SAApply.self)
+                           let apply: SAApply? = self.micApplys.first { $0.objectId == applicant.objectId
+                           }
+                           self.micApplys.removeAll { $0.objectId == applicant.objectId
                            }
                            guard let apply = apply else {return}
                            if VLUserCenter.user.id != apply.member?.uid {
@@ -1066,7 +1063,7 @@ extension SpatialAudioSyncSerciceImp {
             })
     }
     
-    fileprivate func _removeMicSeatApply(roomId: String, apply: SAApply, completion: @escaping (Error?) -> Void) {
+    func _removeMicSeatApply(roomId: String, apply: SAApply, completion: @escaping (Error?) -> Void) {
         agoraPrint("imp seat apply remove...")
         SyncUtil
             .scene(id: roomId)?
@@ -1217,7 +1214,7 @@ extension SpatialAudioSyncSerciceImp {
                            if user.uid == VLUserCenter.user.id {
                                self.subscribeDelegate?.onUserBeKicked(roomId: roomId, reason: SAServiceKickedReason.removed)
                            } else {
-                               self.subscribeDelegate?.onUserLeftRoom(roomId: roomId, userName: user.name ?? "")
+                               self.subscribeDelegate?.onUserLeftRoom(roomId: roomId, userName: user.uid ?? "")
                            }
 //                           self.subscribeDelegate?.onUserCountChanged(userCount: self.userList.count)
                        }, onSubscribed: {
