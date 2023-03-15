@@ -521,7 +521,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     //TODO: will remove ktv api adjust playout volume method
     [self setPlayoutVolume:50];
-    self.retryCount = 0;
+//    self.retryCount = 0;
     
     KTVSingRole role = [self getUserSingRole];
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
@@ -549,14 +549,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
-- (void)enterSeatWithIndex:(NSInteger)index {
+- (void)enterSeatWithIndex:(NSInteger)index completion:(void(^)(NSError*))completion {
     
     KTVOnSeatInputModel* inputModel = [KTVOnSeatInputModel new];
     inputModel.seatIndex = index;
 //    VL(weakSelf);
     [[AppContext ktvServiceImp] enterSeatWithInput:inputModel
-                                        completion:^(NSError * error) {
-    }];
+                                        completion:completion];
 }
 
 - (void)leaveSeatWithSeatModel:(VLRoomSeatModel * __nonnull)seatModel
@@ -609,6 +608,28 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)joinChorus {
+    //不是观众不允许加入
+    if ([self getUserSingRole] != KTVSingRoleAudience) {
+        return;
+    }
+    
+    //没有上麦需要先上麦
+    if ([self getCurrentUserSeatInfo] == nil) {
+        for (int i = 1; i < self.seatsArray.count; i++) {
+            VLRoomSeatModel* seat = self.seatsArray[i];
+            if (seat == nil) {
+                VL(weakSelf);
+                [self enterSeatWithIndex:i completion:^(NSError *error) {
+                    [weakSelf joinChorus];
+                }];
+                return;
+            }
+        }
+        
+        //TODO(chenpan):没有空麦位，show error
+        return;
+    }
+    
     VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
     
     KTVJoinChorusInputModel* inputModel = [KTVJoinChorusInputModel new];
@@ -947,9 +968,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         case VLKTVBottomBtnClickTypeChorus:
 //            [self popUpChooseSongView:YES];
 #if DEBUG
-            if ([self getCurrentUserSeatInfo] && [self getUserSingRole] == KTVSingRoleAudience) {
-                [self joinChorus];
-            }
+            [self joinChorus];
 #else
 #error remove it
 #endif
@@ -998,7 +1017,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             BOOL isOnSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
             if (!isOnSeat) {
                 //not yet seated
-                [self enterSeatWithIndex:seatIndex];
+                [self enterSeatWithIndex:seatIndex completion:^(NSError *error) {
+                }];
             }
         }
     }
