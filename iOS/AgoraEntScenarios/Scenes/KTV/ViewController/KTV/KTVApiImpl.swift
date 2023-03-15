@@ -756,7 +756,7 @@ extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
     func onRecordAudioFrame(_ frame: AgoraAudioFrame, channelId: String) -> Bool {
         if mainSingerHasJoinChannelEx == true {
             guard let buffer = frame.buffer else {return false}
-            apiConfig?.engine.pushDirectAudioFrameRawData(buffer, samples: frame.channels*frame.samplesPerChannel, sampleRate: frame.samplesPerSec, channels: frame.channels)
+//            apiConfig?.engine.pushDirectAudioFrameRawData(buffer, samples: frame.channels*frame.samplesPerChannel, sampleRate: frame.samplesPerSec, channels: frame.channels)
         }
         return true
     }
@@ -774,13 +774,13 @@ extension KTVApiImpl {
         if isMainSinger() {return}
 
         if dict.keys.contains("cmd") {
-            if dict["cmd"] == "setLrcTime" {
-                let position = Double(dict["time"] ?? "0") ?? 0
-                let duration = Double(dict["duration"] ?? "0") ?? 0
-                let remoteNtp = Int(dict["ntp"] ?? "0") ?? 0
-                let voicePitch = Double(dict["pitch"] ?? "0") ?? 0
+            if dict["cmd"] as! String == "setLrcTime" {
+                guard let position: Int64 = dict["time"] as? Int64 else {return}
+                guard let duration: Int64 = dict["duration"] as? Int64 else {return}
+                guard let remoteNtp: Int64 = dict["ntp"] as? Int64 else {return}
+                guard let voicePitch: Int64 = dict["pitch"] as? Int64 else {return}
 
-                let mainSingerState: Int = Int(dict["state"] ?? "0") ?? 0
+                guard let mainSingerState: Int = dict["playerState"] as? Int else {return}
                 let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
                 if (self.playerState != state) {
                     print("recv state with setLrcTime : \(state.rawValue)")
@@ -791,8 +791,8 @@ extension KTVApiImpl {
                     }
                     
                 }
-                self.remotePlayerPosition = Date().milListamp - position
-                self.remotePlayerDuration = duration
+                self.remotePlayerPosition = Date().milListamp - TimeInterval(position)
+                self.remotePlayerDuration = TimeInterval(duration)
                 if (role == .audience) {
                     self.lastAudienceUpTime = Date().milListamp
                 }
@@ -801,7 +801,7 @@ extension KTVApiImpl {
                     if musicPlayer?.getPlayerState() == .playing {
                         let localNtpTime = getNtpTimeInMs()
                         let localPosition = Date().milListamp - self.localPlayerPosition
-                        let expectPosition = Int(position) + localNtpTime - remoteNtp + self.audioPlayoutDelay
+                        let expectPosition = Int(position) + localNtpTime - Int(remoteNtp) + self.audioPlayoutDelay
                         let threshold = expectPosition - Int(localPosition)
                         if(abs(threshold) > 40) {
                             musicPlayer?.seek(toPosition: expectPosition)
@@ -809,11 +809,11 @@ extension KTVApiImpl {
                         }
                     }
                 } else if role == .audience {
-                    self.pitch = voicePitch
+                    self.pitch = Double(voicePitch)
                 }
 
-            } else if dict["cmd"] == "PlayerState" {
-                let mainSingerState: Int = Int(dict["state"] ?? "0") ?? 0
+            } else if dict["cmd"] as? String == "PlayerState" {
+                let mainSingerState: Int = Int(dict["state"] as! String) ?? 0
                 self.playerState = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
 
                 updateCosingerPlayerStatusIfNeed()
@@ -821,7 +821,7 @@ extension KTVApiImpl {
                     delegate.onMusicPlayerStateChanged(state: self.playerState, error: .none, isLocal: false)
                 }
                 
-            } else if dict["cmd"] == "setVoicePitch" {
+            } else if dict["cmd"] as? String == "setVoicePitch" {
                 if role == .coSinger {return}
                 //同步新的pitch策略 todo
             }
@@ -960,10 +960,12 @@ extension KTVApiImpl {
         musicPlayer?.pause()
     }
 
-    private func dataToDictionary(data: Data) -> Dictionary<String, String>? {
-        let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers)
-        let dict = json as? Dictionary<String, String>
-        return dict
+    private func dataToDictionary(data: Data) -> Dictionary<String, Any>? {
+        guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+            let dictionary = json as? [String: Any] else {
+            return nil
+        }
+        return dictionary
     }
 
     private func compactDictionaryToData(_ dict: NSDictionary) -> Data? {
