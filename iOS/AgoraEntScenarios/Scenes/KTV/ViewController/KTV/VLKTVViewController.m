@@ -553,26 +553,23 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     songConfig.mainSingerUid = [model.userNo integerValue];
     VL(weakSelf);
     NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
-    [self.ktvApi switchSingerRoleWithNewRole:role
-                                       token:exChannelToken
-                           onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-        if(state != KTVSwitchRoleStateSuccess) {
-            if(weakSelf.retryCount < 2) {
-                KTVLogInfo(@"songName: %@, songNo: %@, err: %ld retryCount: %ld",model.songName, model.songNo, state, weakSelf.retryCount);
-                weakSelf.retryCount++;
-                [weakSelf loadAndPlaySong];
-            } else {
-                //TODO(chenpan): error toast?
+    if (role == KTVSingRoleAudience) {
+        [self.ktvApi loadMusicWithConfig:songConfig
+                onMusicLoadStateListener:self];
+    } else {
+        [self.ktvApi switchSingerRoleWithNewRole:role
+                                           token:exChannelToken
+                               onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+            if(state != KTVSwitchRoleStateSuccess) {
+                //TODO(chenpan): error toast and retry?
                 KTVLogError(@"switchSingerRole error: %ld", reason);
+                return;
             }
             
-            return;
-        }
-        
-//        [weakSelf.ktvApi startSingWithStartPos:0];
-        [weakSelf.ktvApi loadMusicWithConfig:songConfig
-                    onMusicLoadStateListener:weakSelf];
-    }];
+            [weakSelf.ktvApi loadMusicWithConfig:songConfig
+                        onMusicLoadStateListener:weakSelf];
+        }];
+    }
     
 //    [self.ktvApi loadSong:[[model songNo] integerValue] withConfig:config withCallback:^(NSInteger songCode, NSString * _Nonnull lyricUrl, KTVSingRole role, KTVLoadSongState state) {
 //        KTVLogInfo(@"loadSong result: %ld", state);
@@ -1506,8 +1503,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark KTVMusicLoadStateListener
-- (void)onMusicLoadFailWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl reason:(enum KTVLoadSongFailReason)reason { 
-    
+- (void)onMusicLoadFailWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl reason:(enum KTVLoadSongFailReason)reason {
+    KTVLogError(@"onMusicLoadFail songCode: %ld error: %ld retry count: %ld", songCode, reason, self.retryCount);
+    if(self.retryCount < 2) {
+        self.retryCount++;
+        [self loadAndPlaySong];
+    } else {
+        //TODO(chenpan): error toast?
+    }
 }
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
