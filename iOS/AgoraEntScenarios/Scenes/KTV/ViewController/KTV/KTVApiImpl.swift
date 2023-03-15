@@ -47,8 +47,12 @@ class KTVApiImpl: NSObject{
     private var audioPlayoutDelay: NSInteger = 0
     private var isNowMicMuted: Bool = false
     
-    private var playerState: AgoraMediaPlayerState = .idle
-    
+    private var playerState: AgoraMediaPlayerState = .idle {
+        didSet {
+            updateRemotePlayBackVolumeIfNeed()
+            updateTimer(with: playerState)
+        }
+    }
     private var pitch: Double = 0
     private var localPlayerPosition: TimeInterval = 0
     private var remotePlayerPosition: TimeInterval = 0
@@ -71,8 +75,6 @@ class KTVApiImpl: NSObject{
     public var remoteVolume: Int = 15
     private var joinChorusNewRole: KTVSingRole = .audience
     private var loadMusicState: KTVLoadSongFailReason = .none
-
-    private var lrcView: KTVLrcControl?
     
     deinit {
         mcc.register(nil)
@@ -201,15 +203,6 @@ extension KTVApiImpl: KTVApiDelegate {
     @objc public func seekSing(time: NSInteger) {
         agoraPrint("seekSing")
         musicPlayer?.seek(toPosition: time)
-    }
-
-    /**
-     * 设置歌词组件，在任意时机设置都可以生效
-     */
-    @objc public func setLycView(view: KTVLrcControl) {
-//        lrcView = view
-//        lrcView?.delegate = self
-        lrcView = view
     }
 
     /**
@@ -520,11 +513,11 @@ extension KTVApiImpl {
             let loadState = loadDict[String(songCode)]
             if loadState == .ok {
                 agoraPrint("_loadMusic songCode1: \(config.songCode) role: \(singerRole.rawValue) url: \(lyricUrlMap[String(songCode)] ?? "")")
-                if (config.autoPlay && (singerRole == .soloSinger || singerRole == .leadSinger)) {
-                    // 主唱自动播放歌曲
-                    startSing(startPos: 0)
-                }
                 if let url = lyricUrlMap[String(songCode)] {
+                    if (config.autoPlay && (self.singerRole == .soloSinger || self.singerRole == .leadSinger)) {
+                        // 主唱自动播放歌曲
+                        self.startSing(startPos: 0)
+                    }
                     onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: url)
                     return
                 }
@@ -609,7 +602,6 @@ extension KTVApiImpl {
                 if let url = self?.lyricUrlMap[String(songCode)] {
                     onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, lyricUrl: url, reason: .musicPreloadFailedAndNoLyricUrl)
                 } else {
-                    agoraPrint("_loadMusic fail: url is empty")
                     return
                 }
             }
@@ -842,8 +834,8 @@ extension KTVApiImpl {
 
         let pitch = isNowMicMuted ? 0 : speakers.first?.voicePitch
         self.pitch = pitch ?? 0
-        lrcView?.onUpdatePitch(pitch: Float(self.pitch))
-        lrcView?.onUpdateProgress(progress: Int(getPlayerCurrentTime()))
+        lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
+        lrcControl?.onUpdateProgress(progress: Int(getPlayerCurrentTime()))
 
         if isMainSinger()  {return}
     }
@@ -1013,15 +1005,14 @@ extension KTVApiImpl {
     }
     
     private func setProgress(with pos: NSInteger) {
-//        lrcView?.setPitch(pitch: pitch, progress: pos)
-        lrcView?.onUpdatePitch(pitch: Float(self.pitch))
-        lrcView?.onUpdateProgress(progress: pos)
+        lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
+        lrcControl?.onUpdateProgress(progress: pos)
     }
 }
 
 //主要是MPK的回调
 extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
-    
+
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {
         self.localPlayerPosition = Date().milListamp - Double(position)
         if isMainSinger() && position > self.audioPlayoutDelay {
@@ -1041,10 +1032,9 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         }
     }
     
-    
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         if state == .openCompleted {
-            agoraPrint("loadSong play completed \(String(describing: songConfig?.songCode))")
+            print("loadSong play completed \(String(describing: songConfig?.songCode))")
             self.localPlayerPosition = Date().milListamp
             self.playerDuration = 0
             if isMainSinger() { //主唱播放，通过同步消息“setLrcTime”通知伴唱play
@@ -1069,7 +1059,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
             syncPlayState(state: state)
         }
         self.playerState = state
-        agoraPrint("recv state with player callback : \(state.rawValue)")
+        print("recv state with player callback : \(state.rawValue)")
         getEventHander { delegate in
             delegate.onMusicPlayerStateChanged(state: state, error: .none, isLocal: true)
         }
@@ -1139,14 +1129,14 @@ extension KTVApiImpl: KaraokeDelegate {
 extension KTVApiImpl: AgoraLrcDownloadDelegate {
 
     func downloadLrcFinished(url: String) {
-        agoraPrint("download lrc finished \(url)")
+        print("download lrc finished \(url)")
         guard let callback = self.lyricCallbacks[url] else { return }
         self.lyricCallbacks.removeValue(forKey: url)
         callback(url)
     }
 
     func downloadLrcError(url: String, error: Error?) {
-        agoraPrint("download lrc fail \(url): \(String(describing: error))")
+        print("download lrc fail \(url): \(String(describing: error))")
         guard let callback = self.lyricCallbacks[url] else { return }
         self.lyricCallbacks.removeValue(forKey: url)
         callback(nil)
