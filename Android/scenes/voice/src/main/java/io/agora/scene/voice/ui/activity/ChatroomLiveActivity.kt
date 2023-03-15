@@ -475,7 +475,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
             override fun onClickSoundSocial(view: View) {
                 roomObservableDelegate.onClickSoundSocial(roomKitBean.soundEffect, finishBack = {
-                    finish()
+                    leaveRoom()
                 })
             }
 
@@ -486,7 +486,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 when (itemId) {
                     R.id.voice_extend_item_eq -> {
                         roomObservableDelegate.onAudioSettingsDialog(finishBack = {
-                            finish()
+                            leaveRoom()
                         })
                     }
                     R.id.voice_extend_item_mic -> {
