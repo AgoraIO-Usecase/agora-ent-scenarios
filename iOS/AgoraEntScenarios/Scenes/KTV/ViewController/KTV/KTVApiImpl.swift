@@ -367,8 +367,11 @@ extension KTVApiImpl {
             apiConfig?.engine.updateChannel(with: mediaOption)
             //合唱者先加载歌曲再加入多频道
             didCoSingerLoadMusic(with: songConfig?.songCode ?? 0) { status in
-                self.loadMusicState = status == .OK ? .none : .musicPreloadFail
-                self.joinChorus2ndChannel(newRole: role, token: token)
+                if status != .OK {//如果歌曲加载失败直接返回
+                    self.onJoinExChannelCallBack?(false, .musicPreloadFail)
+                } else {
+                    self.joinChorus2ndChannel(newRole: role, token: token)
+                }
             }
             
         } else if role == .audience {
@@ -749,8 +752,6 @@ extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
         if joinChorusNewRole == .coSinger {
             if loadMusicState == .none {
                 self.onJoinExChannelCallBack?(false, .joinChannelFail)
-            } else {
-                self.onJoinExChannelCallBack?(false, .musicPreloadFailAndJoinChannelFail)
             }
         }
     }
@@ -1017,7 +1018,8 @@ extension KTVApiImpl {
 
 //主要是MPK的回调
 extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
-    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {
+
+    func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedToPosition position: Int) {
         self.localPlayerPosition = Date().milListamp - Double(position)
         if isMainSinger() && position > self.audioPlayoutDelay {
             if isMainSinger()  { //if i am main singer
@@ -1035,8 +1037,8 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
 //            delegate.onSyncMusicPosition(position: position, pitch: Float(pitch))
         }
     }
-    
-    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+  
+    func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         agoraPrint("loadSong play status: \(state.rawValue) \(songConfig?.songCode ?? 0)")
 
         if state == .openCompleted {
