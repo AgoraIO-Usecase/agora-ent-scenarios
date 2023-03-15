@@ -61,7 +61,7 @@ let page_size = 15
         guard let imKey = KeyCenter.IMAppKey,
               let imCID = KeyCenter.IMClientId,
               let imCS = KeyCenter.IMClientSecret,
-              imKey.isEmpty, imCID.isEmpty, imCS.isEmpty
+              !imKey.isEmpty, !imCID.isEmpty, !imCS.isEmpty
         else {
             navigationController?.popViewController(animated: true)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
