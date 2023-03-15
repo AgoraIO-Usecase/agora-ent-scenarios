@@ -548,9 +548,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //TODO: will remove ktv api adjust playout volume method
     [self setPlayoutVolume:50];
     
-    
-//    KTVSingRole role = [model isSongOwner] ? KTVSingRoleLeadSinger :
-//        [[model chorusNo] isEqualToString:VLUserCenter.user.id] ? KTVSingRoleCoSinger : KTVSingRoleAudience;
+    //TODO: lead singer???
+    KTVSingRole role = [model isSongOwner] ? KTVSingRoleSoloSinger :
+        [[model chorusNo] isEqualToString:VLUserCenter.user.id] ? KTVSingRoleCoSinger : KTVSingRoleAudience;
 //    KTVSongType type = [model isChorus] ? KTVSongTypeChorus : KTVSongTypeSolo;
 //    KTVSongConfiguration* config = [KTVSongConfiguration configWithSongCode:[[model songNo] integerValue]];
     
@@ -566,14 +566,22 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     songConfig.autoPlay = YES;
     songConfig.songCode = [model.songNo integerValue];
     songConfig.mainSingerUid = [model.userNo integerValue];
-    [self.ktvApi loadMusicWithConfig:songConfig
-            onMusicLoadStateListener:self];
+    VL(weakSelf);
+    NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
+    [self.ktvApi switchSingerRoleWithNewRole:role
+                                       token:exChannelToken
+                           onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+        if(state != KTVSwitchRoleStateSuccess) {
+            //TODO(chenpan): error toast?
+            KTVLogError(@"switchSingerRole error: %ld", reason);
+            return;
+        }
+        
+//        [weakSelf.ktvApi startSingWithStartPos:0];
+        [weakSelf.ktvApi loadMusicWithConfig:songConfig
+                    onMusicLoadStateListener:self];
+    }];
     
-//    [self.ktvApi switchSingerRoleWithNewRole:role
-//                                       token:VLUserCenter.user.agoraRTMToken
-//                           onSwitchRoleState:^(enum KTVSwitchRoleState, enum KTVSwitchRoleFailReason) {
-//
-//    }];
 //    [self.ktvApi loadSong:[[model songNo] integerValue] withConfig:config withCallback:^(NSInteger songCode, NSString * _Nonnull lyricUrl, KTVSingRole role, KTVLoadSongState state) {
 //        KTVLogInfo(@"loadSong result: %ld", state);
 //        if(state == KTVLoadSongStateOK) {
@@ -1584,23 +1592,23 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
-    VLRoomSelSongModel* model = [self.selSongsArray firstObject];
-    NSAssert([model.songNo integerValue] == songCode, @"sss");
-    //TODO(chenpan): KTVSingRoleLeadSinger?
-    KTVSingRole role = [model isSongOwner] ? KTVSingRoleSoloSinger :
-        [[model chorusNo] isEqualToString:VLUserCenter.user.id] ? KTVSingRoleCoSinger : KTVSingRoleAudience;
-    NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
-    VL(weakSelf);
-    [self.ktvApi switchSingerRoleWithNewRole:role
-                                       token:exChannelToken
-                           onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-        if(state != KTVSwitchRoleStateSuccess) {
-            //TODO(chenpan): error toast?
-            return;
-        }
-        
-        [weakSelf.ktvApi startSingWithStartPos:0];
-    }];
+//    VLRoomSelSongModel* model = [self.selSongsArray firstObject];
+//    NSAssert([model.songNo integerValue] == songCode, @"sss");
+//    //TODO(chenpan): KTVSingRoleLeadSinger?
+//    KTVSingRole role = [model isSongOwner] ? KTVSingRoleSoloSinger :
+//        [[model chorusNo] isEqualToString:VLUserCenter.user.id] ? KTVSingRoleCoSinger : KTVSingRoleAudience;
+//    NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
+//    VL(weakSelf);
+//    [self.ktvApi switchSingerRoleWithNewRole:role
+//                                       token:exChannelToken
+//                           onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+//        if(state != KTVSwitchRoleStateSuccess) {
+//            //TODO(chenpan): error toast?
+//            return;
+//        }
+//
+//        [weakSelf.ktvApi startSingWithStartPos:0];
+//    }];
 }
 
 
