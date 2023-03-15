@@ -55,7 +55,21 @@
 
 - 更新pod
 
+   打开终端，cd到Podfile所在目录，执行
+  > 
   > pod install
+  > 
+   如果遇到下图错误
+  >
+  >  ![xxx](image/podinstallError.png)
+  >  
+   在终端执行如下命令：
+  >  
+  >  gem install cocoapods-pod-sign
+  >  
+   之后
+  >  
+  >  pod install
 
 - 运行项目即可开始您的体验
 
@@ -97,7 +111,7 @@
 >  
 ## 4. FAQ
 
-### 如何获取声网和环信APPID
+### 如何获取声网APPID
 
 > - 声网APPID申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
 > 
