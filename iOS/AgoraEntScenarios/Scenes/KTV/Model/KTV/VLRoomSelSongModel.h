@@ -15,10 +15,14 @@ typedef enum : NSUInteger {
 
 @interface VLRoomSelSongModel : VLBaseModel
 /// 合唱者userNo
-@property (nonatomic, copy) NSString *chorusNo;
+//@property (nonatomic, copy) NSString *chorusNo;
 @property (nonatomic, copy) NSString *imageUrl;
 ///是否合唱
-@property (nonatomic, assign) BOOL isChorus;
+//@property (nonatomic, assign) BOOL isChorus;
+
+//合唱者个数
+@property (nonatomic, assign) NSInteger chorusNum;
+
 ///是否原唱
 @property (nonatomic, copy) NSString *isOriginal;
 @property (nonatomic, copy) NSString *singer;

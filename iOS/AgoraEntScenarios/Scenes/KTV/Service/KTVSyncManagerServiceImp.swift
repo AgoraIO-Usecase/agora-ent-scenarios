@@ -450,40 +450,43 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     }
 
     func joinChorus(withInput inputModel: KTVJoinChorusInputModel,
-                    completion: @escaping (Error?) -> Void) {
-        guard let topSong = self.songList.filter({ $0.songNo == inputModel.songNo}).first else {
-            agoraAssert("join Chorus fail")
-            return
-        }
-        //isChorus always true
-//        topSong.isChorus = inputModel.isChorus == "1" ? true : false
-        let isChorus = topSong.isChorus
-        let status = topSong.status
-        let chorusNo = topSong.chorusNo
-        topSong.isChorus = true
-        topSong.status = VLSongPlayStatusPlaying
-        topSong.chorusNo = VLUserCenter.user.id
-        _updateChooseSong(songInfo: topSong,
-                          finished: completion)
-        topSong.isChorus = isChorus
-        topSong.status = status
-        topSong.chorusNo = chorusNo
+                        completion: @escaping (Error?) -> Void) {
+            guard let topSong = self.songList.filter({ $0.songNo == inputModel.songNo}).first else {
+                agoraAssert("join Chorus fail")
+                return
+            }
+            //isChorus always true
+    //        topSong.isChorus = inputModel.isChorus == "1" ? true : false
+    //        let isChorus = topSong.isChorus
+    //        let status = topSong.status
+    //        let chorusNo = topSong.chorusNo
+    //        topSong.isChorus = true
+    //        topSong.status = VLSongPlayStatusPlaying
+    //        topSong.chorusNo = VLUserCenter.user.id
+            topSong.chorusNum += 1;
+            _updateChooseSong(songInfo: topSong,
+                              finished: completion)
+    //        topSong.isChorus = isChorus
+    //        topSong.status = status
+    //        topSong.chorusNo = chorusNo
     }
     
     func coSingerLeaveChorus(completion: @escaping (Error?) -> Void) {
-        guard let topSong = self.songList.filter({ $0.chorusNo == VLUserCenter.user.id}).first else {
-            agoraAssert("join Chorus fail")
-            return
-        }
-        
-        let isChorus = topSong.isChorus
-        let chorusNo = topSong.chorusNo
-        topSong.isChorus = true
-        topSong.chorusNo = "0"
-        _updateChooseSong(songInfo: topSong,
-                          finished: completion)
-        topSong.isChorus = isChorus
-        topSong.chorusNo = chorusNo
+            guard let topSong = self.songList.first else {return}
+    //        guard let topSong = self.songList.filter({ $0.chorusNo == VLUserCenter.user.id}).first else {
+    //            agoraAssert("join Chorus fail")
+    //            return
+    //        }
+            
+    //        let isChorus = topSong.isChorus
+    //        let chorusNo = topSong.chorusNo
+    //        topSong.isChorus = true
+    //        topSong.chorusNo = "0"
+            topSong.chorusNum -= 1;
+            _updateChooseSong(songInfo: topSong,
+                              finished: completion)
+    //        topSong.isChorus = isChorus
+    //        topSong.chorusNo = chorusNo
     }
 
     func markSongDidPlay(withInput inputModel: VLRoomSelSongModel,
@@ -507,7 +510,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         if flag {return}
         
         let songInfo = VLRoomSelSongModel()
-        songInfo.isChorus = inputModel.isChorus
+       // songInfo.isChorus = inputModel.isChorus
         songInfo.songName = inputModel.songName
         songInfo.songNo = inputModel.songNo
 //        songInfo.songUrl = inputModel.songUrl
@@ -1276,7 +1279,7 @@ extension KTVSyncManagerServiceImp {
     private func _markCurrentSongIfNeed() {
         guard let topSong = songList.first,
               topSong.status == VLSongPlayStatusIdle, // ready status
-              topSong.isChorus == false,
+             // topSong.isChorus == false,
               topSong.userNo == VLUserCenter.user.id
         else {
             return
@@ -1289,19 +1292,19 @@ extension KTVSyncManagerServiceImp {
 
     private func _markSoloSongIfNeed() {
         guard let topSong = songList.first,
-              topSong.isChorus == true, // current is chorus
+            //  topSong.isChorus == true, // current is chorus
               topSong.userNo == VLUserCenter.user.id
         else {
-            KTVLog.warning(text: "_markSoloSongIfNeed break: \(songList.first?.isChorus) \(songList.first?.status) \(songList.first?.userNo)/\(VLUserCenter.user.id)")
+            KTVLog.warning(text: "_markSoloSongIfNeed break:  \(songList.first?.status) \(songList.first?.userNo)/\(VLUserCenter.user.id)")
             return
         }
         
-        topSong.isChorus = false
+       // topSong.isChorus = false
         let status = topSong.status
         topSong.status = VLSongPlayStatusPlaying
         _updateChooseSong(songInfo: topSong) { error in
         }
-        topSong.isChorus = true
+        //topSong.isChorus = true
         topSong.status = status
     }
 
