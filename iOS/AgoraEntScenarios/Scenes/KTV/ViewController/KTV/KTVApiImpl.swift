@@ -573,7 +573,7 @@ extension KTVApiImpl {
         if (loadDict.keys.contains(String(songCode))) {
             let loadState = loadDict[String(songCode)]
             if loadState == .ok {
-                agoraPrint("_loadMusic songCode1: \(config.songCode) role: \(singerRole.rawValue)")
+                agoraPrint("_loadMusic songCode1: \(config.songCode) role: \(singerRole.rawValue) url: \(lyricUrlMap[String(songCode)] ?? "")")
                 if let url = lyricUrlMap[String(songCode)] {
                     onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: url)
                     return
@@ -642,7 +642,7 @@ extension KTVApiImpl {
                 songState = .ok
             }
 
-            agoraPrint("_loadMusic finished: \(songState.rawValue)")
+            agoraPrint("_loadMusic finished: \(songState.rawValue) url: \(self?.lyricUrlMap[String(songCode)] ?? "")")
             if let url = self?.lyricUrlMap[String(songCode)] {
                 if role == .soloSinger && autoPlay == true {
                     self?.startSing()
@@ -736,7 +736,7 @@ extension KTVApiImpl {
 
     private func startSing() {
         let role = singerRole
-        agoraPrint("startSing role: \(role)")
+        agoraPrint("startSing role: \(role.rawValue)")
         if role == .soloSinger {
             apiConfig?.engine.adjustPlaybackSignalVolume(Int(remoteVolume))
             musicPlayer?.openMedia(songCode: songConfig?.songCode ?? 0, startPos: 0)
