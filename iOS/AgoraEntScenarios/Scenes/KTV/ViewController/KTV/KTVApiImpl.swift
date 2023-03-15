@@ -756,7 +756,7 @@ extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
     func onRecordAudioFrame(_ frame: AgoraAudioFrame, channelId: String) -> Bool {
         if mainSingerHasJoinChannelEx == true {
             guard let buffer = frame.buffer else {return false}
-//            apiConfig?.engine.pushDirectAudioFrameRawData(buffer, samples: frame.channels*frame.samplesPerChannel, sampleRate: frame.samplesPerSec, channels: frame.channels)
+     apiConfig?.engine.pushDirectAudioFrameRawData(buffer, samples: frame.channels*frame.samplesPerChannel, sampleRate: frame.samplesPerSec, channels: frame.channels)
         }
         return true
     }
