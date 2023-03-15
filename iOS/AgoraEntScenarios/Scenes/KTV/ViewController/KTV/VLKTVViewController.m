@@ -434,7 +434,7 @@ KTVMusicLoadStateListener
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine
 reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
       totalVolume:(NSInteger)totalVolume {
-//    [self.ktvApi mainRtcEngine:engine reportAudioVolumeIndicationOfSpeakers:speakers totalVolume:totalVolume];
+    [self.ktvApi didKTVAPIReceiveAudioVolumeIndicationWith:speakers totalVolume:totalVolume];
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit * _Nonnull)engine
@@ -450,8 +450,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         KTVLogInfo(@"score: %ds",score);
         return;
     }
-    
-//    [self.ktvApi mainRtcEngine:engine receiveStreamMessageFromUid:uid streamId:streamId data:data];
+    [self.ktvApi didKTVAPIReceiveStreamMessageFromUid:uid streamId:streamId data:data];
 }
 
 // Network quality callbacks
@@ -505,7 +504,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine localAudioStats:(AgoraRtcLocalAudioStats *)stats {
-//    [self.ktvApi mainRtcEngine:engine localAudioStats:stats];
+    [self.ktvApi didKTVAPILocalAudioStatsWithStats:stats];
 }
 
 #pragma mark - action utils / business
@@ -521,6 +520,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     //TODO: will remove ktv api adjust playout volume method
     [self setPlayoutVolume:50];
+    
 //    self.retryCount = 0;
     
     KTVSingRole role = [self getUserSingRole];
