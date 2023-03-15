@@ -604,6 +604,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
            } else {
                apply.index = self.findMicIndex()
            }
+        apply.member?.mic_index = apply.index//专门用于安卓那边数据模型复用
            VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: VoiceRoomUserInfo.shared.currentRoomOwner?.rtc_uid ?? "", event: VoiceRoomSubmitApplySite, customExt: ["user" : apply.kj.JSONString(),"chatroomId":VoiceRoomIMManager.shared?.currentRoomId ?? ""], completion: { message, error in
                completion(self.convertError(error: error),error == nil)
            })
