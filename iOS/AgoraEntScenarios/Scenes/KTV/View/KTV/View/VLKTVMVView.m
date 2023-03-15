@@ -92,7 +92,7 @@
 
     CGFloat lY = CGRectGetMaxX(currentPlayImgView.frame);
     CGFloat lH = self.height - lY;
-    [KaraokeView setLogWithPrintToConsole:true writeToFile:true];
+   // [KaraokeView setLogWithPrintToConsole:true writeToFile:true];
     _karaokeView = [[KaraokeView alloc] initWithFrame:CGRectMake(0, lY, self.width, lH - 40)];
     _karaokeView.scoringView.viewHeight = 50;
     _karaokeView.scoringView.topSpaces = 5;
@@ -212,9 +212,9 @@
             [self setPlayerViewsHidden:NO nextButtonHidden:NO playButtonHidden:NO];
             break;
         case KTVSingRoleCoSinger:
-        case KTVSingRoleFollowSinger:
-            [self setPlayerViewsHidden:NO nextButtonHidden:YES playButtonHidden:YES];
-            break;
+//        case KTVSingRoleFollowSinger:
+//            [self setPlayerViewsHidden:NO nextButtonHidden:YES playButtonHidden:YES];
+//            break;
         case KTVSingRoleAudience:
         default: {
             if(VLUserCenter.user.ifMaster) {
