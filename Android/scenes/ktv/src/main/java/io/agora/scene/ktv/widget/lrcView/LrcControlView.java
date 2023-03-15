@@ -547,9 +547,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         }
 
         private void showScoreAnimation(View lyricsControlView, double score) {
-            if (score == 0) {
-                return;
-            }
             TextView lineScore = lyricsControlView.findViewById(R.id.line_score);
             int widthOfParent = ((View) (lineScore.getParent())).getWidth();
             int marginLeft = (int) (widthOfParent * 0.4);
