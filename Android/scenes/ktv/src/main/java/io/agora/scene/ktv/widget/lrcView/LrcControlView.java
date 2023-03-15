@@ -133,14 +133,22 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                                         break;
                                     }
                                 }
+
                                 if (TextUtils.isEmpty(xmlPath)) {
                                     ToastUtils.showToast("The xml file not exist!");
                                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
                                     return;
                                 }
-                                File xmlFile = new File(xmlPath);
 
+                                File xmlFile = new File(xmlPath);
                                 LyricsModel lyricsModel = KaraokeView.parseLyricsData(xmlFile);
+
+                                if (lyricsModel == null) {
+                                    ToastUtils.showToast("Unexpected content from " + xmlPath);
+                                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+                                    return;
+                                }
+
                                 if (mKaraokeView != null) {
                                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
                                     mKaraokeView.setLyricsData(lyricsModel);
