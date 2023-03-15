@@ -8,17 +8,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef enum : NSUInteger {
-    VLSongPlayStatusIdle = 0,
-    VLSongPlayStatusPlayed,
-    VLSongPlayStatusPlaying
+    VLSongPlayStatusIdle = 0, //未播放
+    VLSongPlayStatusPlaying = 2   //正在播放
 } VLSongPlayStatus;
 
 @interface VLRoomSelSongModel : VLBaseModel
-/// 合唱者userNo
-//@property (nonatomic, copy) NSString *chorusNo;
+
 @property (nonatomic, copy) NSString *imageUrl;
-///是否合唱
-//@property (nonatomic, assign) BOOL isChorus;
 
 //合唱者个数
 @property (nonatomic, assign) NSInteger chorusNum;
@@ -50,15 +46,9 @@ typedef enum : NSUInteger {
 /// 是否是自己点的歌曲
 - (BOOL)isSongOwner;
 
+/// 是否合唱
+- (BOOL)isChorus;
 
-/// 自己是伴唱
-- (BOOL)isSongCoSinger;
-
-- (BOOL)readyToPlay;
-
-- (BOOL)waittingForChorusMatch;
-
-- (BOOL)doneChorusMatch;
 @end
 
 NS_ASSUME_NONNULL_END

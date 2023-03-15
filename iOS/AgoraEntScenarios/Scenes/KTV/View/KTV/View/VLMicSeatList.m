@@ -114,7 +114,7 @@
     
     cell.muteImgView.hidden = !seatModel.isAudioMuted;
     
-    if(seatModel.isJoinedChorus)
+    if(seatModel.joinSing)
         cell.joinChorusBtn.hidden = NO;
     else
         cell.joinChorusBtn.hidden = YES;
@@ -159,13 +159,8 @@
         VLRoomSelSongModel *songModel = choosedSongArray.firstObject;
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
             BOOL isOwner = [seatModel.userNo isEqualToString:songModel.userNo];
-            BOOL isJoinedChorus = [seatModel.userNo isEqualToString:songModel.chorusNo];
             if (isOwner != seatModel.isOwner) {
                 seatModel.isOwner = isOwner;
-                hasChanged = YES;
-            }
-            if (isJoinedChorus != seatModel.isJoinedChorus) {
-                seatModel.isJoinedChorus = isJoinedChorus;
                 hasChanged = YES;
             }
         }
@@ -175,8 +170,8 @@
                 seatModel.isOwner = NO;
                 hasChanged = YES;
             }
-            if (seatModel.isJoinedChorus) {
-                seatModel.isJoinedChorus = NO;
+            if (seatModel.joinSing) {
+                seatModel.joinSing = NO;
                 hasChanged = YES;
             }
         }

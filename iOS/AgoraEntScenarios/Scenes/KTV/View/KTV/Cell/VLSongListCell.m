@@ -113,7 +113,7 @@
 //        self.typeLabel.text = KTVLocalizedString(@"独唱");
 //    }
     self.nameLabel.text = selSongModel.songName;
-    if(selSongModel.isChorus) {
+    if([selSongModel isChorus]) {
         self.chooserLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"合唱: %@"), selSongModel.name];
     }
     else {
