@@ -783,7 +783,7 @@ extension KTVApiImpl {
                 guard let mainSingerState: Int = dict["playerState"] as? Int else {return}
                 let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
                 if (self.playerState != state) {
-                    print("recv state with setLrcTime : \(state.rawValue)")
+                    agoraPrint("recv state with setLrcTime : \(state.rawValue)")
                     self.playerState = state
                     updateCosingerPlayerStatusIfNeed()
                     getEventHander { delegate in
@@ -805,7 +805,7 @@ extension KTVApiImpl {
                         let threshold = expectPosition - Int(localPosition)
                         if(abs(threshold) > 40) {
                             musicPlayer?.seek(toPosition: expectPosition)
-                            print("progress: setthreshold: \(threshold) expectPosition: \(expectPosition) position: \(position), localNtpTime: \(localNtpTime), remoteNtp: \(remoteNtp), audioPlayoutDelay: \(self.audioPlayoutDelay), localPosition: \(localPosition)")
+                            agoraPrint("progress: setthreshold: \(threshold) expectPosition: \(expectPosition) position: \(position), localNtpTime: \(localNtpTime), remoteNtp: \(remoteNtp), audioPlayoutDelay: \(self.audioPlayoutDelay), localPosition: \(localPosition)")
                         }
                     }
                 } else if role == .audience {
@@ -996,7 +996,7 @@ extension KTVApiImpl {
         let code = apiConfig?.engine.sendStreamMessage(apiConfig?.dataStreamId ?? 0, data: messageData ?? Data())
         if code == 0 && success != nil { success!(true) }
         if code != 0 {
-            print("sendStreamMessage fail: %d\n",code as Any)
+            agoraPrint("sendStreamMessage fail: \(String(describing: code))")
         }
     }
 
@@ -1014,7 +1014,6 @@ extension KTVApiImpl {
 //主要是MPK的回调
 extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {
-
         self.localPlayerPosition = Date().milListamp - Double(position)
         if isMainSinger() && position > self.audioPlayoutDelay {
             if isMainSinger()  { //if i am main singer
@@ -1034,8 +1033,9 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
     }
     
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+        agoraPrint("loadSong play status: \(state.rawValue) \(String(describing: songConfig?.songCode))")
+
         if state == .openCompleted {
-            print("loadSong play completed \(String(describing: songConfig?.songCode))")
             self.localPlayerPosition = Date().milListamp
             self.playerDuration = 0
             if isMainSinger() { //主唱播放，通过同步消息“setLrcTime”通知伴唱play
@@ -1060,7 +1060,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
             syncPlayState(state: state)
         }
         self.playerState = state
-        print("recv state with player callback : \(state.rawValue)")
+        agoraPrint("recv state with player callback : \(state.rawValue)")
         getEventHander { delegate in
             delegate.onMusicPlayerStateChanged(state: state, error: .none, isLocal: true)
         }
@@ -1130,14 +1130,14 @@ extension KTVApiImpl: KaraokeDelegate {
 extension KTVApiImpl: AgoraLrcDownloadDelegate {
 
     func downloadLrcFinished(url: String) {
-        print("download lrc finished \(url)")
+        agoraPrint("download lrc finished \(url)")
         guard let callback = self.lyricCallbacks[url] else { return }
         self.lyricCallbacks.removeValue(forKey: url)
         callback(url)
     }
 
     func downloadLrcError(url: String, error: Error?) {
-        print("download lrc fail \(url): \(String(describing: error))")
+        agoraPrint("download lrc fail \(url): \(String(describing: error))")
         guard let callback = self.lyricCallbacks[url] else { return }
         self.lyricCallbacks.removeValue(forKey: url)
         callback(nil)
