@@ -1324,28 +1324,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)setIsOnMicSeat:(BOOL)isOnMicSeat {
-    BOOL onMicSeatStatusDidChanged = _isOnMicSeat != isOnMicSeat;
     _isOnMicSeat = isOnMicSeat;
     
+    BOOL onMicSeatStatusDidChanged = _isOnMicSeat != isOnMicSeat;
     if (onMicSeatStatusDidChanged) {
         if (!isOnMicSeat) {
-            KTVSingRole role = [self getUserSingRole];
-            if (role == KTVSingRoleCoSinger) {
-                //co singer leave chorus
-                [[AppContext ktvServiceImp] coSingerLeaveChorusWithCompletion:^(NSError * err) {
-                }];
-                [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
-                                                   token:@""
-                                       onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-                }];
-                [self loadAndPlaySong];
-            } else if (role == KTVSingRoleLeadSinger || role == KTVSingRoleSoloSinger) {
-                [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
-                                                   token:@""
-                                       onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-                }];
-                [self removeCurrentSongWithSync:YES];
-            }
+            [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
+                                               token:@""
+                                   onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+            }];
         }
         
         //start mic once enter seat

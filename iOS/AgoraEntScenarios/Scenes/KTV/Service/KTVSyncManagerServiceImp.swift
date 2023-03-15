@@ -404,6 +404,12 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         _removeSeat(seatInfo: seatInfo) { error in
         }
         
+        if let topSong = songList.first {
+            topSong.chorusNum = max(_getSeatJoinChorusCount() - 1, 0)
+            _updateChooseSong(songInfo: topSong,
+                              finished: completion)
+        }
+        
         //remove current user's choose song
         _removeAllUserChooseSong(userNo: seatInfo.userNo)
         completion(nil)
@@ -441,6 +447,14 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     // MARK: choose songs
     func removeSong(withInput inputModel: KTVRemoveSongInputModel,
                     completion: @escaping (Error?) -> Void) {
+        if inputModel.songNo == songList.first?.songNo {
+            //删除正在播放的歌曲，把所有麦位合唱信息更新
+            seatMap.forEach { (key, seatInfo) in
+                seatInfo.joinSing = false
+                _updateSeat(seatInfo: seatInfo) { error in
+                }
+            }
+        }
         _removeChooseSong(songId: inputModel.objectId,
                           completion: completion)
     }
@@ -455,7 +469,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             agoraAssert("join Chorus fail")
             return
         }
-        topSong.chorusNum += 1;
+        topSong.chorusNum = _getSeatJoinChorusCount() + 1
         _updateChooseSong(songInfo: topSong,
                           finished: completion)
         _markSeatToPlaying(joinSing: true) { err in
@@ -884,6 +898,20 @@ extension KTVSyncManagerServiceImp {
         }
 
         return seatArray
+    }
+    
+    private func _getSeatJoinChorusCount() -> Int {
+        var joinCount = 0
+        seatMap.forEach { (key, seat) in
+            guard seat.seatIndex != 0 else {
+                return
+            }
+            if seat.joinSing {
+                joinCount += 1
+            }
+        }
+        
+        return joinCount
     }
 
     private func _getUserSeatInfo(seatIndex: Int, model: VLRoomSeatModel? = nil) -> VLRoomSeatModel {

@@ -759,7 +759,6 @@ extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
         
         if mainSingerHasJoinChannelEx == true {
             guard let buffer = frame.buffer else {return false}
-            agoraPrint("pushDirectAudioFrameRawData")
             apiConfig?.engine.pushDirectAudioFrameRawData(buffer, samples: frame.channels*frame.samplesPerChannel, sampleRate: frame.samplesPerSec, channels: frame.channels)
         }
         return true
@@ -1015,7 +1014,7 @@ extension KTVApiImpl {
 
 //主要是MPK的回调
 extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
-    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {
+    func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedToPosition position: Int) {
         self.localPlayerPosition = Date().milListamp - Double(position)
         if isMainSinger() && position > self.audioPlayoutDelay {
             if isMainSinger()  { //if i am main singer
@@ -1034,7 +1033,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         }
     }
     
-    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+    func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         agoraPrint("loadSong play status: \(state.rawValue) \(songConfig?.songCode ?? 0)")
 
         if state == .openCompleted {
