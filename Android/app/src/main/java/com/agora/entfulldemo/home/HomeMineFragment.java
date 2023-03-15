@@ -51,11 +51,6 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
     private SelectPhotoFromDialog selectPhotoFromDialog;
     private EditNameDialog editNameDialog;
 
-    private CommonDialog debugModeDialog;
-    private int counts = 0;
-    private final long debugModeOpenTime = 2000;
-    private long beginTime = 0;
-
     @NonNull
     @Override
     protected AppFragmentHomeMineBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
@@ -122,26 +117,6 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERM_REQID_RDSTORAGE);
 //            ((MainActivity) requireActivity()).requestReadStoragePermission();
         });
-        getBinding().tvVersion.setOnClickListener(v -> {
-            if (counts == 0) {
-                beginTime = System.currentTimeMillis();
-            }
-            counts ++;
-            if (counts == 5) {
-                if (System.currentTimeMillis() - beginTime > debugModeOpenTime) {
-                    counts = 0;
-                    return;
-                }
-                counts = 0;
-                getBinding().tvDebugMode.setVisibility(View.VISIBLE);
-                AgoraApplication.the().enableDebugMode(true);
-                ToastUtils.showToast("Debug模式已打开");
-            }
-        });
-        getBinding().tvDebugMode.setOnClickListener(v -> showDebugModeCloseDialog());
-        if (AgoraApplication.the().isDebugModeOpen()) {
-            getBinding().tvDebugMode.setVisibility(View.VISIBLE);
-        }
     }
 
     private static final int CHOOSE_PHOTO = 100;
@@ -270,27 +245,5 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             });
         }
         logoutDialog.show();
-    }
-
-    private void showDebugModeCloseDialog() {
-        if (debugModeDialog == null) {
-            debugModeDialog = new CommonDialog(requireContext());
-            debugModeDialog.setDialogTitle("确定退出Debug模式么？");
-            debugModeDialog.setDescText("退出debug模式后， 设置页面将恢复成正常的设置页面哦～");
-            debugModeDialog.setDialogBtnText(getString(R.string.cancel), getString(R.string.app_exit));
-            debugModeDialog.setOnButtonClickListener(new OnButtonClickListener() {
-                @Override
-                public void onLeftButtonClick() { }
-
-                @Override
-                public void onRightButtonClick() {
-                    counts = 0;
-                    getBinding().tvDebugMode.setVisibility(View.GONE);
-                    AgoraApplication.the().enableDebugMode(false);
-                    ToastUtils.showToast("Debug模式已关闭");
-                }
-            });
-        }
-        debugModeDialog.show();
     }
 }
