@@ -248,9 +248,15 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             override fun onReceiveSeatInvitation(message: ChatMessageData) {
                 super.onReceiveSeatInvitation(message)
                 "onReceiveSeatInvitation $message".logD(TAG)
-                ThreadManager.getInstance().runOnMainThread {
-                    roomObservableDelegate.receiveInviteSite(roomKitBean.roomId, -1)
+                if (message.customParams.containsKey("user")) {
+                    val voiceRoomInvite = GsonTools.toBean(message.customParams["user"], VoiceMemberModel::class.java)
+                    if (voiceRoomInvite != null) {
+                        ThreadManager.getInstance().runOnMainThread {
+                            roomObservableDelegate.receiveInviteSite(roomKitBean.roomId, voiceRoomInvite.micIndex)
+                        }
+                    }
                 }
+
             }
 
             override fun onReceiveSeatInvitationRejected(

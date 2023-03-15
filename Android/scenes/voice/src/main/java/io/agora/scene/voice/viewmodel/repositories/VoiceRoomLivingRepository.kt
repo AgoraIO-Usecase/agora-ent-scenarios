@@ -292,10 +292,10 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     // 接受邀请
-    fun acceptMicSeatInvitation(): LiveData<Resource<VoiceMicInfoModel>> {
+    fun acceptMicSeatInvitation(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
-                voiceServiceProtocol.acceptMicSeatInvitation(completion = { error, result ->
+                voiceServiceProtocol.acceptMicSeatInvitation(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {

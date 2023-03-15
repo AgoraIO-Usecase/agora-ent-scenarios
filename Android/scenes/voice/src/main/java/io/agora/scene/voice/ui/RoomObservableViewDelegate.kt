@@ -708,7 +708,7 @@ class RoomObservableViewDelegate constructor(
                         MicClickAction.Invite -> {
                             // 房主邀请他人
                             if (data.enable) {
-                                showOwnerHandsDialog()
+                                showOwnerHandsDialog(micInfo.micIndex)
                             } else {
                                 ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_close_by_host))
                             }
@@ -890,7 +890,7 @@ class RoomObservableViewDelegate constructor(
             .rightText(activity.getString(R.string.voice_room_accept))
             .setOnClickListener(object : CommonFragmentAlertDialog.OnClickBottomListener {
                 override fun onConfirmClick() {
-                    roomLivingViewModel.acceptMicSeatInvitation()
+                    roomLivingViewModel.acceptMicSeatInvitation(micIndex)
                 }
 
                 override fun onCancelClick() {
@@ -925,11 +925,12 @@ class RoomObservableViewDelegate constructor(
     }
 
     /**房主举手弹框*/
-    fun showOwnerHandsDialog() {
+    fun showOwnerHandsDialog(inviteIndex: Int) {
         handsDialog = activity.supportFragmentManager.findFragmentByTag("room_hands") as ChatroomHandsDialog?
         if (handsDialog == null) {
             handsDialog = ChatroomHandsDialog.newInstance
         }
+        handsDialog?.setInviteMicIndex(inviteIndex)
         handsDialog?.setFragmentListener(object : ChatroomHandsDialog.OnFragmentListener {
             override fun onAcceptMicSeatApply(voiceMicInfoModel: VoiceMicInfoModel) {
                 // 更新麦位
@@ -985,7 +986,7 @@ class RoomObservableViewDelegate constructor(
     // 点击下方举手icon
     fun onClickBottomHandUp() {
         if (roomKitBean.isOwner) {
-            showOwnerHandsDialog()
+            showOwnerHandsDialog(-1)
         } else {
             showMemberHandsDialog(-1)
         }

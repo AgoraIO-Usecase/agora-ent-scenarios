@@ -617,8 +617,6 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param chatUid
      * @param callBack
      */
-    public void invitationMic(String chatUid,CallBack callBack){delegate.invitationMic(chatUid,null,callBack);}
-
     public void invitationMic(String chatUid,int micIndex,CallBack callBack){delegate.invitationMic(chatUid,micIndex,callBack);}
 
 
@@ -709,8 +707,8 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * 接受邀请
      * @param callBack
      */
-    public void acceptMicSeatInvitation(ValueCallBack<VoiceMicInfoModel> callBack){
-        delegate.acceptMicSeatInvitation(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),null,callBack);
+    public void acceptMicSeatInvitation(int micIndex, ValueCallBack<VoiceMicInfoModel> callBack){
+        delegate.acceptMicSeatInvitation(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),micIndex,callBack);
     }
 
     /**
@@ -726,15 +724,13 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param callBack
      */
     public void startMicSeatApply(int micIndex, CallBack callBack){ delegate.startMicSeatApply(micIndex,callBack);}
-    public void startMicSeatApply(CallBack callBack){ delegate.startMicSeatApply(null,callBack);}
-
 
     /**
      * 同意申请
      * @param callBack
      */
-    public void acceptMicSeatApply(String chatUid,ValueCallBack<VoiceMicInfoModel> callBack){
-        delegate.acceptMicSeatApply(chatUid,null,callBack);
+    public void acceptMicSeatApply(int micIndex, String chatUid, ValueCallBack<VoiceMicInfoModel> callBack) {
+        delegate.acceptMicSeatApply(chatUid, micIndex, callBack);
     }
 
     /**

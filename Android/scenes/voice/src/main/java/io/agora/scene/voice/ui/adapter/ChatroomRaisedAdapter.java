@@ -65,6 +65,8 @@ public class ChatroomRaisedAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
                     action.setBackgroundResource(R.drawable.voice_bg_rect_radius20_gradient_blue);
                     action.setEnabled(true);
                 }
+            }else {
+
             }
         }
     }
@@ -72,7 +74,7 @@ public class ChatroomRaisedAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
     public void setAccepted(String uid, boolean isAccepted) {
         this.isAccepted = isAccepted;
         this.selectUid = uid;
-        notifyDataSetChanged();
+//        notifyDataSetChanged();
     }
 
     public void setOnActionListener(onActionListener listener) {
