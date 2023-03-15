@@ -405,9 +405,11 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         }
         
         if let topSong = songList.first {
+            let origChorusNum = topSong.chorusNum
             topSong.chorusNum = max(_getSeatJoinChorusCount() - 1, 0)
             _updateChooseSong(songInfo: topSong,
                               finished: completion)
+            topSong.chorusNum = origChorusNum
         }
         
         //remove current user's choose song
@@ -469,11 +471,15 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             agoraAssert("join Chorus fail")
             return
         }
+        //TODO: _markSeatToPlaying without callback
+        _markSeatToPlaying(joinSing: true) { err in
+        }
+        let origChorusNum = topSong.chorusNum
         topSong.chorusNum = _getSeatJoinChorusCount() + 1
         _updateChooseSong(songInfo: topSong,
                           finished: completion)
-        _markSeatToPlaying(joinSing: true) { err in
-        }
+        topSong.chorusNum = origChorusNum
+        
     }
     
     func coSingerLeaveChorus(completion: @escaping (Error?) -> Void) {
