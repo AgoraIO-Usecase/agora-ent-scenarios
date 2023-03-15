@@ -29,7 +29,6 @@ AgoraMusicContentCenterEventDelegate
 @property (nonatomic, assign) NSInteger pageType;
 
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
-@property (nonatomic, copy) NSString* requestId;
 @end
 
 @implementation VLSelectSongTableItemView
@@ -42,7 +41,6 @@ AgoraMusicContentCenterEventDelegate
 }
 
 - (void)dealloc {
-    [[AppContext shared] unregisterEventDelegate:self];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -54,7 +52,6 @@ AgoraMusicContentCenterEventDelegate
         self.roomNo = roomNo;
         self.ifChorus = ifChorus;
         [self setupView];
-        [[AppContext shared] registerEventDelegate:self];
     }
     return self;
 }
@@ -140,12 +137,26 @@ AgoraMusicContentCenterEventDelegate
             @"needLyric": @(YES),
         };
         NSString *extra = [NSString convertToJsonData:dict];
-        self.requestId =
-       [[AppContext shared].agoraMcc getMusicCollectionWithMusicChartId:chartId
-                                                                    page:self.page
-                                                                pageSize:20
-                                                              jsonOption:extra];
         
+        [[AppContext shared].ktvAPI searchMusicWithMusicChartId:chartId
+                                                           page:self.page
+                                                       pageSize:20
+                                                     jsonOption:extra
+                                                     completion:^(NSString * requestId, AgoraMusicContentCenterStatusCode status, AgoraMusicCollection * result) {
+            NSMutableArray* songArray = [NSMutableArray array];
+            [result.musicList enumerateObjectsUsingBlock:^(AgoraMusic * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                VLSongItmModel* model = [VLSongItmModel new];
+                model.songNo = [NSString stringWithFormat:@"%ld", obj.songCode];
+                model.songName = obj.name;
+                model.singer = obj.singer;
+                model.imageUrl = obj.poster;
+                [songArray addObject:model];
+            }];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self appendDatasWithSongList:songArray];
+            });
+        }];
     }];
 }
 
@@ -240,55 +251,6 @@ AgoraMusicContentCenterEventDelegate
         _songsMuArray = [NSMutableArray array];
     }
     return _songsMuArray;
-}
-
-
-#pragma mark AgoraMusicContentCenterDelegate
-- (void)onMusicChartsResult:(NSString *)requestId
-                     status:(AgoraMusicContentCenterStatusCode)status
-                     result:(NSArray<AgoraMusicChartInfo*> *)result {
-    if (![self.requestId isEqualToString:requestId]) {
-        return;
-    }
-}
-
-- (void)onMusicCollectionResult:(NSString *)requestId
-                         status:(AgoraMusicContentCenterStatusCode)status
-                         result:(AgoraMusicCollection *)result {
-    if (![self.requestId isEqualToString:requestId]) {
-        return;
-    }
-    
-    NSMutableArray* songArray = [NSMutableArray array];
-    [result.musicList enumerateObjectsUsingBlock:^(AgoraMusic * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        VLSongItmModel* model = [VLSongItmModel new];
-        model.songNo = [NSString stringWithFormat:@"%ld", obj.songCode];
-        model.songName = obj.name;
-        model.singer = obj.singer;
-        model.imageUrl = obj.poster;
-        [songArray addObject:model];
-    }];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self appendDatasWithSongList:songArray];
-    });
-}
-
-- (void)onLyricResult:(NSString*)requestId
-             lyricUrl:(NSString*)lyricUrl {
-    if (![self.requestId isEqualToString:requestId]) {
-        return;
-    }
-    
-    
-}
-
-- (void)onPreLoadEvent:(NSInteger)songCode
-               percent:(NSInteger)percent
-                status:(AgoraMusicContentCenterPreloadStatus)status
-                   msg:(NSString *)msg
-              lyricUrl:(NSString *)lyricUrl {
-
 }
 
 @end

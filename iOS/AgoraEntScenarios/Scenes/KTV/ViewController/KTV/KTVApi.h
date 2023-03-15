@@ -8,7 +8,7 @@
 #import <Foundation/Foundation.h>
 #import <AgoraLyricsScore-Swift.h>
 @import AgoraRtcKit;
-
+#if 0
 NS_ASSUME_NONNULL_BEGIN
 typedef void (^sendStreamSuccess)(BOOL ifSuccess);
 typedef enum : NSUInteger {
@@ -103,3 +103,4 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 @end
 
 NS_ASSUME_NONNULL_END
+#endif

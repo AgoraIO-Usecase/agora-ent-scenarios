@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol KTVLrcViewDelegate: NSObjectProtocol {
+@objc public protocol KTVLrcViewDelegate: NSObjectProtocol {
     func onUpdatePitch(pitch: Float)
     func onUpdateProgress(progress: Int)
     func onDownloadLrcData(url: String)

@@ -8,19 +8,24 @@
 import Foundation
 import AgoraLyricsScore
 
-class KTVLrcControl: NSObject {
-    public var lrcView: KaraokeView?
+@objc class KTVLrcControl: NSObject {
+    private var lrcView: KaraokeView
     private var lyricModel: LyricModel?
+    
+    @objc init(lrcView: KaraokeView) {
+        self.lrcView = lrcView
+        super.init()
+    }
 }
 
 
 extension KTVLrcControl: KTVLrcViewDelegate {
     func onUpdatePitch(pitch: Float) {
-        lrcView?.setPitch(pitch: Double(pitch))
+        lrcView.setPitch(pitch: Double(pitch))
     }
     
     func onUpdateProgress(progress: Int) {
-        lrcView?.setProgress(progress: progress)
+        lrcView.setProgress(progress: progress)
     }
     
     func onDownloadLrcData(url: String) {
@@ -30,7 +35,7 @@ extension KTVLrcControl: KTVLrcViewDelegate {
         guard let model: LyricModel = KaraokeView.parseLyricData(data: data) else {return}
         self.lyricModel = model
 
-        lrcView?.setLyricData(data: model)
+        lrcView.setLyricData(data: model)
     }
     
     
