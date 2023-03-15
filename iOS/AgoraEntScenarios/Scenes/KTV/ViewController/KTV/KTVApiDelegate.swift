@@ -14,7 +14,7 @@ import AgoraRtcKit
     case coSinger           //伴唱
     case leadSinger         //主唱
     case audience           //观众
-    case followSinger       //跟唱
+//    case followSinger       //跟唱
 }
 
 
@@ -24,22 +24,11 @@ import AgoraRtcKit
     case acc           //伴奏
 }
 
-
-/// 加载歌曲状态
-@objc public enum KTVLoadSongState: Int {
-    case idle = -1      //空闲
-    case ok = 0         //成功
-    case failed         //失败
-    case inProgress    //加载中
-}
-
-
 /// 加载歌曲失败原因
 @objc public enum KTVLoadSongFailReason: Int {
-    case none = 0             //无错误
-    case noLyricUrl         //无歌词
+    case noLyricUrl = 0         //无歌词
     case musicPreloadFail   //歌曲预加载失败
-    case noPermission        //角色切换异常
+    case musicPreloadFailedAndNoLyricUrl        //歌曲加载失败并且没有歌词
 }
 
 @objc public enum KTVSwitchRoleState: Int {
@@ -65,7 +54,6 @@ import AgoraRtcKit
 
 /// 加入合唱失败原因
 @objc public enum KTVJoinChorusFailReason: Int {
-    case none = 0            //无作物
     case musicPreloadFail  //歌曲预加载失败
     case musicOpenFail     //歌曲打开失败
     case joinChannelFail   //加入ex频道失败
@@ -166,7 +154,7 @@ public protocol KTVApiDelegate: NSObjectProtocol {
     
     /// 初始化
     /// - Parameter config: <#config description#>
-//    init(config: KTVApiConfig)
+    init(config: KTVApiConfig)
     
     
     /// 订阅KTVApi事件
@@ -187,7 +175,7 @@ public protocol KTVApiDelegate: NSObjectProtocol {
     /// 获取歌曲榜单
     /// - Parameter musicChartResult: request, status,  chat info list
     /// - Returns: <#description#>
-    func fetchMusicCharts(completion:@escaping MusicChartCallBacks) -> String
+    func fetchMusicCharts(completion:@escaping MusicChartCallBacks)
     
     
     /// 根据歌曲榜单类型搜索歌单
@@ -202,7 +190,7 @@ public protocol KTVApiDelegate: NSObjectProtocol {
                      page: Int,
                      pageSize: Int,
                      jsonOption: String,
-                     completion:@escaping MusicResultCallBacks) -> String
+                     completion:@escaping MusicResultCallBacks)
     
     
     /// 根据关键字搜索歌曲
@@ -216,7 +204,7 @@ public protocol KTVApiDelegate: NSObjectProtocol {
     func searchMusic(keyword: String,
                      page: Int, pageSize: Int,
                      jsonOption: String,
-                     completion: @escaping MusicResultCallBacks) -> String
+                     completion: @escaping MusicResultCallBacks)
             
     
     
@@ -224,7 +212,7 @@ public protocol KTVApiDelegate: NSObjectProtocol {
     /// - Parameters:
     ///   - config: <#config description#>
     ///   - onMusicLoadStateListener: <#onMusicLoadStateListener description#>
-    func loadMusic(autoPlay: Bool, config: KTVSongConfiguration, onMusicLoadStateListener: KTVMusicLoadStateListener)
+    func loadMusic(config: KTVSongConfiguration, onMusicLoadStateListener: KTVMusicLoadStateListener)
     
     
     /// 切换角色
