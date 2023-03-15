@@ -67,8 +67,9 @@ public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListe
         if (lyrics == null) {
             return;
         }
-        // Experience will be better when seeking 500 milliseconds ahead
-        mViewModel.musicSeek(lyrics.startOfVerse - 500);
+        // Experience will be better when seeking 2000 milliseconds ahead
+        long seekPosition = lyrics.startOfVerse - 2000;
+        mViewModel.musicSeek(seekPosition > 0 ? seekPosition : 0);
     }
 
     @Override

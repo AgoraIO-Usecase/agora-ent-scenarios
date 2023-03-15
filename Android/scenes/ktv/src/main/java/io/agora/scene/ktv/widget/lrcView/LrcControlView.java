@@ -133,14 +133,22 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                                         break;
                                     }
                                 }
+
                                 if (TextUtils.isEmpty(xmlPath)) {
                                     ToastUtils.showToast("The xml file not exist!");
                                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
                                     return;
                                 }
-                                File xmlFile = new File(xmlPath);
 
+                                File xmlFile = new File(xmlPath);
                                 LyricsModel lyricsModel = KaraokeView.parseLyricsData(xmlFile);
+
+                                if (lyricsModel == null) {
+                                    ToastUtils.showToast("Unexpected content from " + xmlPath);
+                                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+                                    return;
+                                }
+
                                 if (mKaraokeView != null) {
                                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
                                     mKaraokeView.setLyricsData(lyricsModel);
@@ -157,6 +165,13 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                         });
             } else {
                 LyricsModel lyricsModel = KaraokeView.parseLyricsData(file);
+
+                if (lyricsModel == null) {
+                    ToastUtils.showToast("Unexpected content from " + file);
+                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+                    return;
+                }
+
                 if (mKaraokeView != null) {
                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
                     mKaraokeView.setLyricsData(lyricsModel);
@@ -532,9 +547,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         }
 
         private void showScoreAnimation(View lyricsControlView, double score) {
-            if (score == 0) {
-                return;
-            }
             TextView lineScore = lyricsControlView.findViewById(R.id.line_score);
             int widthOfParent = ((View) (lineScore.getParent())).getWidth();
             int marginLeft = (int) (widthOfParent * 0.4);
