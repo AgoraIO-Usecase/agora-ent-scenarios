@@ -445,7 +445,7 @@ extension KTVApiImpl {
 //                }
 //            }
 //        }
-        agoraPrint("joinChannelEx ret: \(String(describing: ret))")
+        agoraPrint("joinChannelEx ret: \(ret ?? -999)")
         if singerRole == .coSinger {
             apiConfig?.engine.muteRemoteAudioStream(UInt(songConfig?.mainSingerUid ?? 0), mute: true)
        }
@@ -721,6 +721,7 @@ extension KTVApiImpl {
 extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
+        agoraPrint("didJoinChannel channel:\(channel) uid: \(uid)")
         if joinChorusNewRole == .leadSinger {
             mainSingerHasJoinChannelEx = true
             onJoinExChannelCallBack?(true, nil)
@@ -736,6 +737,7 @@ extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
+        agoraPrint("didOccurError: \(errorCode.rawValue)")
         if errorCode != .joinChannelRejected {return}
         agoraPrint("join ex channel failed")
         engine.setAudioScenario(.gameStreaming)
@@ -754,8 +756,10 @@ extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
     }
 
     func onRecordAudioFrame(_ frame: AgoraAudioFrame, channelId: String) -> Bool {
+        
         if mainSingerHasJoinChannelEx == true {
             guard let buffer = frame.buffer else {return false}
+            agoraPrint("pushDirectAudioFrameRawData")
             apiConfig?.engine.pushDirectAudioFrameRawData(buffer, samples: frame.channels*frame.samplesPerChannel, sampleRate: frame.samplesPerSec, channels: frame.channels)
         }
         return true
@@ -1031,7 +1035,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
     }
     
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
-        agoraPrint("loadSong play status: \(state.rawValue) \(String(describing: songConfig?.songCode))")
+        agoraPrint("loadSong play status: \(state.rawValue) \(songConfig?.songCode ?? 0)")
 
         if state == .openCompleted {
             self.localPlayerPosition = Date().milListamp
