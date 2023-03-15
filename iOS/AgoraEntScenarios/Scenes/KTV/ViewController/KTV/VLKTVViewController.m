@@ -1462,11 +1462,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)onMusicLoadFailWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl reason:(enum KTVLoadSongFailReason)reason {
     KTVLogError(@"onMusicLoadFail songCode: %ld error: %ld retry count: %ld", songCode, reason, self.retryCount);
     if(self.retryCount < 3) {
-        self.retryCount++;
         [self loadAndPlaySong];
     } else {
         //TODO(chenpan): error toast?
     }
+    self.retryCount++;
 }
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
