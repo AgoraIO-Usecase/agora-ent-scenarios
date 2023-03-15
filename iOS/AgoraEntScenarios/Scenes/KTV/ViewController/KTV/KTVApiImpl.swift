@@ -995,7 +995,7 @@ extension KTVApiImpl {
         let code = apiConfig?.engine.sendStreamMessage(apiConfig?.dataStreamId ?? 0, data: messageData ?? Data())
         if code == 0 && success != nil { success!(true) }
         if code != 0 {
-            agoraPrint("sendStreamMessage fail: %d\n",code as Any)
+            agoraPrint("sendStreamMessage fail: \(String(describing: code))")
         }
     }
 
