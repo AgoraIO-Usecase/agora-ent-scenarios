@@ -165,6 +165,13 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                         });
             } else {
                 LyricsModel lyricsModel = KaraokeView.parseLyricsData(file);
+
+                if (lyricsModel == null) {
+                    ToastUtils.showToast("Unexpected content from " + file);
+                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+                    return;
+                }
+
                 if (mKaraokeView != null) {
                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
                     mKaraokeView.setLyricsData(lyricsModel);
