@@ -630,14 +630,28 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     }
     
-    VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
-    
-    KTVJoinChorusInputModel* inputModel = [KTVJoinChorusInputModel new];
-    inputModel.isChorus = YES;
-    inputModel.songNo = selSongModel.songNo;
-    [[AppContext ktvServiceImp] joinChorusWithInput:inputModel
-                                         completion:^(NSError * error) {
+    NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
+    //先切role，保证preload等耗时操作结束才广播给其他人
+    [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleCoSinger
+                                       token:exChannelToken
+                           onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+        
+        if (state == KTVSwitchRoleStateFail) {
+            //TODO: error toast?
+            return;
+        }
+        
+        VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
+        
+        KTVJoinChorusInputModel* inputModel = [KTVJoinChorusInputModel new];
+        inputModel.isChorus = YES;
+        inputModel.songNo = selSongModel.songNo;
+        [[AppContext ktvServiceImp] joinChorusWithInput:inputModel
+                                             completion:^(NSError * error) {
+        }];
     }];
+    
+    
 }
 
 - (void)removeCurrentSongWithSync:(BOOL)sync
