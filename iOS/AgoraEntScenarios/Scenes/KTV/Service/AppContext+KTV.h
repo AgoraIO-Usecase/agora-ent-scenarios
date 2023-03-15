@@ -12,11 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AppContext (KTV)<AgoraMusicContentCenterEventDelegate, AgoraRtcMediaPlayerDelegate>
 
-@property (nonatomic, nullable) AgoraMusicContentCenter* agoraMcc;
+@property (nonatomic, nullable) KTVApiImpl* ktvAPI;
 @property (nonatomic, nullable) id<AgoraRtcMediaPlayerDelegate> agoraRtcMediaPlayer;
 
-- (void)registerEventDelegate:(id<AgoraMusicContentCenterEventDelegate>)delegate;
-- (void)unregisterEventDelegate:(id<AgoraMusicContentCenterEventDelegate>)delegate;
 - (void)registerPlayerEventDelegate:(id<AgoraRtcMediaPlayerDelegate>)delegate;
 - (void)unregisterPlayerEventDelegate:(id<AgoraRtcMediaPlayerDelegate>)delegate;
 

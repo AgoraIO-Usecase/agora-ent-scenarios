@@ -15,24 +15,8 @@
     return NO;
 }
 
-- (BOOL)isSongCoSinger {
-    if (self.isChorus && [self.chorusNo isEqualToString:VLUserCenter.user.id]) {
-        return YES;
-    }
-    return NO;
-}
-
-
-- (BOOL)readyToPlay {
-    return !self.isChorus || (self.isChorus && [self.chorusNo length] > 0);
-}
-
-- (BOOL)waittingForChorusMatch {
-    return self.isChorus && self.chorusNo.length == 0 && self.status == VLSongPlayStatusIdle;
-}
-
-- (BOOL)doneChorusMatch {
-    return self.isChorus && self.chorusNo.length > 0 && self.status == VLSongPlayStatusPlaying;
+- (BOOL)isChorus {
+    return self.chorusNum > 0;
 }
 
 - (BOOL)isEqual:(VLRoomSelSongModel*)object {
@@ -48,9 +32,7 @@
         return YES;
     }
     
-    NSString* origChorusNO = self.chorusNo ? self.chorusNo : @"";
-    NSString* curChorusNO = object.chorusNo ? object.chorusNo : @"";
-    if(![origChorusNO isEqualToString:curChorusNO]) {
+    if(self.chorusNum != object.chorusNum) {
         return NO;
     }
     

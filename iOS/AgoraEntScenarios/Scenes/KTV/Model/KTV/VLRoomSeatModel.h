@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///在哪个座位
 @property (nonatomic, assign) NSInteger seatIndex;
 ///是否合唱
-@property (nonatomic, assign) BOOL isJoinedChorus;
+@property (nonatomic, assign) BOOL joinSing;
 ///是否自己静音
 @property (nonatomic, assign) NSInteger isAudioMuted;
 ///是否开启视频

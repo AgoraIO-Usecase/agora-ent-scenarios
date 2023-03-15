@@ -21,7 +21,7 @@
     self.rtcUid = seatInfo ? seatInfo.rtcUid : nil;
     self.isAudioMuted = seatInfo ? seatInfo.isAudioMuted : 0;
     self.isVideoMuted = seatInfo ? seatInfo.isVideoMuted : 0;
-    self.isJoinedChorus = seatInfo ? seatInfo.isJoinedChorus : NO;
+    self.joinSing = seatInfo ? seatInfo.joinSing : NO;
 }
 
 @end

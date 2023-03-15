@@ -9,7 +9,7 @@
 #import "AgoraEntScenarios-Swift.h"
 
 NSString* kServiceImpKey = @"ServiceImpKey";
-NSString* kAgoraMusicContentCenterKey = @"AgoraMusicContentCenterKey";
+NSString* kAgoraKTVAPIKey = @"kAgoraKTVAPIKey";
 NSString* kAgoraMediaPlayerKey = @"AgoraMediaPlayerKey";
 NSString* kAgoraMccWeakTableKey = @"AgoraMccWeakTableKey";
 NSString* kAgoraMpkWeakTableKey = @"AgoraMpkWeakTableKey";
@@ -21,12 +21,12 @@ NSString* kAgoraMpkWeakTableKey = @"AgoraMpkWeakTableKey";
     [AppContext shared].sceneLocalizeBundleName = @"KtvResource";
 }
 
-- (void)setAgoraMcc:(AgoraMusicContentCenter *)agoraMcc {
-    [[AppContext shared].extDic setValue:agoraMcc forKey:kAgoraMusicContentCenterKey];
+- (void)setKtvAPI:(KTVApiImpl *)ktvAPI {
+    [[AppContext shared].extDic setValue:ktvAPI forKey:kAgoraKTVAPIKey];
 }
 
-- (AgoraMusicContentCenter*)agoraMcc {
-    return [[AppContext shared].extDic valueForKey:kAgoraMusicContentCenterKey];
+- (KTVApiImpl*)ktvAPI {
+    return [[AppContext shared].extDic valueForKey:kAgoraKTVAPIKey];
 }
 
 - (void)setAgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerDelegate>)agoraRtcMediaPlayer {

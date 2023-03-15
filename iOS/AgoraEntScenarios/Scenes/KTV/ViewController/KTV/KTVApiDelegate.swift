@@ -29,6 +29,7 @@ import AgoraRtcKit
     case noLyricUrl = 0         //无歌词
     case musicPreloadFail   //歌曲预加载失败
     case musicPreloadFailedAndNoLyricUrl        //歌曲加载失败并且没有歌词
+    case none
 }
 
 @objc public enum KTVSwitchRoleState: Int {
@@ -88,7 +89,7 @@ import AgoraRtcKit
 //    func onJoinChorusFail(reason: KTVJoinChorusFailReason)
 //}
 
-public protocol KTVApiEventHandlerDelegate: NSObjectProtocol {
+@objc public protocol KTVApiEventHandlerDelegate: NSObjectProtocol {
     
     /// 歌曲播放状态变化
     /// - Parameters:
@@ -112,7 +113,7 @@ public protocol KTVApiEventHandlerDelegate: NSObjectProtocol {
     func onSingerRoleChanged(oldRole: KTVSingRole, newRole: KTVSingRole)
 }
 
-open class KTVApiConfig: NSObject{
+@objc open class KTVApiConfig: NSObject{
     var appId: String
     var rtmToken: String
     var engine: AgoraRtcEngineKit
@@ -120,6 +121,7 @@ open class KTVApiConfig: NSObject{
     var dataStreamId: Int = -1
     var localUid: Int = 0
     
+    @objc public
     init(appId: String,
          rtmToken: String,
          engine: AgoraRtcEngineKit,
@@ -136,10 +138,10 @@ open class KTVApiConfig: NSObject{
 }
 
 /// 歌曲加载配置信息
-open class KTVSongConfiguration: NSObject {
-    var autoPlay: Bool = true   //是否加载完成自动播放
-    var songCode: Int = 0          //歌曲id
-    var mainSingerUid: Int = 0     //主唱uid
+@objcMembers open class KTVSongConfiguration: NSObject {
+    public var autoPlay: Bool = true   //是否加载完成自动播放
+    public var songCode: Int = 0          //歌曲id
+    public var mainSingerUid: Int = 0     //主唱uid
 }
 
 
@@ -150,7 +152,7 @@ public typealias MusicChartCallBacks = (String, AgoraMusicContentCenterStatusCod
 public typealias MusicResultCallBacks = (String, AgoraMusicContentCenterStatusCode, AgoraMusicCollection) -> Void
 public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Void)
 
-public protocol KTVApiDelegate: NSObjectProtocol {
+@objc public protocol KTVApiDelegate: NSObjectProtocol {
     
     /// 初始化
     /// - Parameter config: <#config description#>
