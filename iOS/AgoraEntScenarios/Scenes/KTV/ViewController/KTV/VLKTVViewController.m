@@ -1433,7 +1433,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }];
         [self loadAndPlaySong];
     } else if(updatedTopSong.chorusNum != originalTopSong.chorusNum) {
-        //chorus <-> solo
+        //lead singer <-> solo
         NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
         [self.ktvApi switchSingerRoleWithNewRole:[self getUserSingRole]
                                            token:exChannelToken
