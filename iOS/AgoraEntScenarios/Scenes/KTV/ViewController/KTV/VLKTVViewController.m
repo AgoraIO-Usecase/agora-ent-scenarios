@@ -31,7 +31,6 @@
 #import "AppContext+KTV.h"
 #import "KTVMacro.h"
 #import "LSTPopView+KTVModal.h"
-#import "KTVApi.h"
 #import "HWWeakTimer.h"
 #import "VLAlert.h"
 #import "VLKTVAlert.h"
@@ -946,7 +945,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [self popSelMoreView];
             break;
         case VLKTVBottomBtnClickTypeChorus:
-            [self popUpChooseSongView:YES];
+//            [self popUpChooseSongView:YES];
+#if DEBUG
+            if ([self getCurrentUserSeatInfo] && [self getUserSingRole] == KTVSingRoleAudience) {
+                [self joinChorus];
+            }
+#else
+#error remove it
+#endif
             break;
         case VLKTVBottomBtnClickTypeChoose:
             [self popUpChooseSongView:NO];
@@ -1412,14 +1418,20 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                updatedTopSong.songName, updatedTopSong.isChorus, updatedTopSong.chorusNum, updatedTopSong.status);
     KTVLogInfo(@"setSelSongsArray orig top: songName: %@ isChorus: %d, chorusNum: %ld, status: %ld",
                originalTopSong.songName, originalTopSong.isChorus, originalTopSong.chorusNum, originalTopSong.status);
-    if(![updatedTopSong isEqual:originalTopSong]){
+    if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
         //song changes
-//        [self.ktvApi stopSing];
         [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
                                            token:@""
                                onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
         }];
         [self loadAndPlaySong];
+    } else if(updatedTopSong.chorusNum != originalTopSong.chorusNum) {
+        //chorus <-> solo
+        NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
+        [self.ktvApi switchSingerRoleWithNewRole:[self getUserSingRole]
+                                           token:exChannelToken
+                               onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+        }];
     }
 }
 
