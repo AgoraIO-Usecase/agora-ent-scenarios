@@ -60,7 +60,6 @@
 		DD0292F3295BF0DC00485225 /* KTVServiceModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0292B4295BF0DC00485225 /* KTVServiceModel.m */; };
 		DD0292F4295BF0DC00485225 /* VLCreateRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0292B7295BF0DC00485225 /* VLCreateRoomViewController.m */; };
 		DD0292F5295BF0DC00485225 /* VLKTVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0292BB295BF0DC00485225 /* VLKTVViewController.m */; };
-		DD0292F6295BF0DC00485225 /* KTVApi.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0292BC295BF0DC00485225 /* KTVApi.m */; };
 		DD0292F7295BF0DC00485225 /* VLOnLineListVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0292BF295BF0DC00485225 /* VLOnLineListVC.m */; };
 		DD0292F8295BF0DC00485225 /* KtvResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DD0292C0295BF0DC00485225 /* KtvResource.bundle */; };
 		DD1603442963CAFD00182A04 /* AgoraEntLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1603432963CAFD00182A04 /* AgoraEntLog.swift */; };
@@ -353,7 +352,6 @@
 		DD01BD1D29C0422A00C9B403 /* KTVLrcViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLrcViewDelegate.swift; sourceTree = "<group>"; };
 		DD01BD1E29C0422A00C9B403 /* KTVApiDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApiDelegate.swift; sourceTree = "<group>"; };
 		DD01BD2129C0447A00C9B403 /* KTVApiImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KTVApiImpl.swift; sourceTree = "<group>"; };
-		DD01BD2529C045DB00C9B403 /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
 		DD029247295BF0DC00485225 /* KTVMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KTVMacro.h; sourceTree = "<group>"; };
 		DD029248295BF0DC00485225 /* KTVLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLog.swift; sourceTree = "<group>"; };
 		DD02924B295BF0DC00485225 /* VLAddRoomModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAddRoomModel.m; sourceTree = "<group>"; };
@@ -448,9 +446,7 @@
 		DD0292B5295BF0DC00485225 /* AppContext+KTV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AppContext+KTV.h"; sourceTree = "<group>"; };
 		DD0292B7295BF0DC00485225 /* VLCreateRoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCreateRoomViewController.m; sourceTree = "<group>"; };
 		DD0292B9295BF0DC00485225 /* VLKTVViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVViewController.h; sourceTree = "<group>"; };
-		DD0292BA295BF0DC00485225 /* KTVApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KTVApi.h; sourceTree = "<group>"; };
 		DD0292BB295BF0DC00485225 /* VLKTVViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLKTVViewController.m; sourceTree = "<group>"; };
-		DD0292BC295BF0DC00485225 /* KTVApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KTVApi.m; sourceTree = "<group>"; };
 		DD0292BD295BF0DC00485225 /* VLOnLineListVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLOnLineListVC.h; sourceTree = "<group>"; };
 		DD0292BE295BF0DC00485225 /* VLCreateRoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCreateRoomViewController.h; sourceTree = "<group>"; };
 		DD0292BF295BF0DC00485225 /* VLOnLineListVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLOnLineListVC.m; sourceTree = "<group>"; };
@@ -1071,13 +1067,10 @@
 		DD0292B8295BF0DC00485225 /* KTV */ = {
 			isa = PBXGroup;
 			children = (
-				DD01BD2529C045DB00C9B403 /* KTVApi.swift */,
 				DD01BD1E29C0422A00C9B403 /* KTVApiDelegate.swift */,
 				DD01BD1D29C0422A00C9B403 /* KTVLrcViewDelegate.swift */,
 				DD0292B9295BF0DC00485225 /* VLKTVViewController.h */,
-				DD0292BA295BF0DC00485225 /* KTVApi.h */,
 				DD0292BB295BF0DC00485225 /* VLKTVViewController.m */,
-				DD0292BC295BF0DC00485225 /* KTVApi.m */,
 				DD01BD2129C0447A00C9B403 /* KTVApiImpl.swift */,
 				DD1CD29129C06430002331AE /* KTVLrcControl.swift */,
 			);
@@ -2383,7 +2376,6 @@
 				DD84177D29090C520026B624 /* VLHomeItemModel.m in Sources */,
 				DD220B83295B332C00F57F30 /* HorizontalCardsView.swift in Sources */,
 				DD84178429090C520026B624 /* VLDiscoveryViewController.m in Sources */,
-				DD0292F6295BF0DC00485225 /* KTVApi.m in Sources */,
 				DDA199F628FFE579009D3E61 /* UIImage+Color.swift in Sources */,
 				DDA19A0D28FFE579009D3E61 /* NetworkManager.swift in Sources */,
 				DDA199F928FFE579009D3E61 /* NSDictionary+dictToModel.m in Sources */,

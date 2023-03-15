@@ -19,24 +19,4 @@
     return self.chorusNum > 0;
 }
 
-- (BOOL)isEqual:(VLRoomSelSongModel*)object {
-    if (![self.songNo isEqualToString:object.songNo]) {
-        return NO;
-    }
-    
-    if (self.isChorus != object.isChorus) {
-        return NO;
-    }
-    
-    if (self.isSongOwner) {
-        return YES;
-    }
-    
-    if(self.chorusNum != object.chorusNum) {
-        return NO;
-    }
-    
-    return YES;
-}
-
 @end
