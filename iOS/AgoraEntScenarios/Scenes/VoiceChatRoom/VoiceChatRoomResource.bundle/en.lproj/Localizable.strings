@@ -170,3 +170,4 @@
 "Removed Stage" = "You were removed from stage";
 "Mic Closed" = "Mic closed by host";
 "Members reach limit!" = "Members reach limit!";
+"voice_im_key_empty_error" = "Invalid Parameter, Please check ’IMAppKey’ / ‘IMClientId’ / ‘IMClientSecret’ in KeyCenter.swift";

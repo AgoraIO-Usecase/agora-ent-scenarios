@@ -207,3 +207,4 @@
 "Members reach limit!" = "房间人数超过限制";
 "Content prohibited" = "内容禁止发送";
 "Incorrect room name" = "房间名不合规";
+"voice_im_key_empty_error" = "参数非法，请检查 KeyCenter.swift中的 ’IMAppKey’ / ‘IMClientId’ / ‘IMClientSecret’";
