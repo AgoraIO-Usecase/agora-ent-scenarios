@@ -224,7 +224,7 @@ public class RoomLivingViewModel extends ViewModel {
     public void initRoom() {
         JoinRoomOutputModel _roomInfo = roomInfoLiveData.getValue();
         if (_roomInfo == null) {
-            throw new RuntimeException("The roomInfo muse be not null before initSeats method calling!");
+            throw new RuntimeException("The roomInfo must be not null before initSeats method calling!");
         }
 
         roomUserCountLiveData.postValue(_roomInfo.getRoomPeopleNum());
@@ -236,19 +236,18 @@ public class RoomLivingViewModel extends ViewModel {
             } else if (ktvSubscribe == KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated) {
                 // 当房间内状态发生改变时触发
                 KTVLogger.d(TAG, "subscribeRoomStatus KTVSubscribeUpdated");
-                JoinRoomOutputModel _rroomInfo = roomInfoLiveData.getValue();
-                if (!vlRoomListModel.getBgOption().equals(_rroomInfo.getBgOption())) {
+                if (!vlRoomListModel.getBgOption().equals(_roomInfo.getBgOption())) {
                     roomInfoLiveData.postValue(new JoinRoomOutputModel(
-                            _rroomInfo.getRoomName(),
-                            _rroomInfo.getRoomNo(),
-                            _rroomInfo.getCreatorNo(),
+                            _roomInfo.getRoomName(),
+                            _roomInfo.getRoomNo(),
+                            _roomInfo.getCreatorNo(),
                             vlRoomListModel.getBgOption(),
-                            _rroomInfo.getSeatsArray(),
-                            _rroomInfo.getRoomPeopleNum(),
-                            _rroomInfo.getAgoraRTMToken(),
-                            _rroomInfo.getAgoraRTCToken(),
-                            _rroomInfo.getAgoraPlayerRTCToken(),
-                            _rroomInfo.getCreatedAt()
+                            _roomInfo.getSeatsArray(),
+                            _roomInfo.getRoomPeopleNum(),
+                            _roomInfo.getAgoraRTMToken(),
+                            _roomInfo.getAgoraRTCToken(),
+                            _roomInfo.getAgoraPlayerRTCToken(),
+                            _roomInfo.getCreatedAt()
                     ));
                 }
             }
@@ -310,7 +309,7 @@ public class RoomLivingViewModel extends ViewModel {
     public void initSeats() {
         JoinRoomOutputModel _roomInfo = roomInfoLiveData.getValue();
         if (_roomInfo == null) {
-            throw new RuntimeException("The roomInfo muse be not null before initSeats method calling!");
+            throw new RuntimeException("The roomInfo must be not null before initSeats method calling!");
         }
         List<RoomSeatModel> seatsArray = _roomInfo.getSeatsArray();
         seatListLiveData.postValue(seatsArray);
@@ -321,14 +320,15 @@ public class RoomLivingViewModel extends ViewModel {
                     seatLocalLiveData.setValue(roomSeatModel);
                     isOnSeat = true;
                     if (mRtcEngine != null) {
-                        mainChannelMediaOption.publishCameraTrack = false;
+                        mainChannelMediaOption.publishCameraTrack = roomSeatModel.isVideoMuted() == RoomSeatModel.Companion.getMUTED_VALUE_FALSE();
                         mainChannelMediaOption.publishMicrophoneTrack = true;
-                        mainChannelMediaOption.publishCustomAudioTrack = false;
                         mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
                         mainChannelMediaOption.autoSubscribeVideo = true;
                         mainChannelMediaOption.autoSubscribeAudio = true;
                         mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
                         mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
+
+                        updateVolumeStatus(roomSeatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_FALSE());
                     }
                     break;
                 }
@@ -405,7 +405,6 @@ public class RoomLivingViewModel extends ViewModel {
                     if (mRtcEngine != null) {
                         mainChannelMediaOption.publishCameraTrack = false;
                         mainChannelMediaOption.publishMicrophoneTrack = false;
-                        mainChannelMediaOption.publishCustomAudioTrack = false;
                         mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
                         mainChannelMediaOption.autoSubscribeVideo = true;
                         mainChannelMediaOption.autoSubscribeAudio = true;
@@ -448,7 +447,6 @@ public class RoomLivingViewModel extends ViewModel {
                 if (mRtcEngine != null) {
                     mainChannelMediaOption.publishCameraTrack = false;
                     mainChannelMediaOption.publishMicrophoneTrack = true;
-                    mainChannelMediaOption.publishCustomAudioTrack = false;
                     mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
                     mainChannelMediaOption.autoSubscribeVideo = true;
                     mainChannelMediaOption.autoSubscribeAudio = true;
@@ -488,7 +486,6 @@ public class RoomLivingViewModel extends ViewModel {
                                 if (mRtcEngine != null) {
                                     mainChannelMediaOption.publishCameraTrack = false;
                                     mainChannelMediaOption.publishMicrophoneTrack = false;
-                                    mainChannelMediaOption.publishCustomAudioTrack = false;
                                     mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
                                     mainChannelMediaOption.autoSubscribeVideo = true;
                                     mainChannelMediaOption.autoSubscribeAudio = true;
@@ -687,6 +684,7 @@ public class RoomLivingViewModel extends ViewModel {
         KTVLogger.d(TAG, "RoomLivingViewModel.searchSong() called, condition:" + condition);
         MutableLiveData<List<RoomSelSongModel>> liveData = new MutableLiveData<>();
 
+        // 过滤没有歌词的歌曲
         String jsonOption = "{\"pitchType\":1,\"needLyric\":true}";
         ktvApiProtocol.searchMusicByKeyword(condition, 0, 50, jsonOption,
                 (id, status, p, size, total, list) -> {
@@ -1055,6 +1053,7 @@ public class RoomLivingViewModel extends ViewModel {
         // ------------------ 加入频道 ------------------
         mRtcEngine.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING);
         mRtcEngine.enableVideo();
+        mRtcEngine.enableLocalVideo(false);
         mRtcEngine.enableAudio();
         mRtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, Constants.AUDIO_SCENARIO_GAME_STREAMING);
         mRtcEngine.enableAudioVolumeIndication(50, 10, true);
@@ -1175,6 +1174,8 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void onRemoteVolumeChanged(int volume) {
+                KTVApiImpl ktvApiImpl = (KTVApiImpl) ktvApiProtocol;
+                ktvApiImpl.setRemoteVolume(volume);
                 mRtcEngine.adjustPlaybackSignalVolume(volume);
             }
         });
@@ -1309,7 +1310,6 @@ public class RoomLivingViewModel extends ViewModel {
 
     // ------------------ 暂停/播放 ------------------
     public void musicToggleStart() {
-        KTVLogger.d("hugo", "musicToggleStart:" + playerMusicStatusLiveData.getValue());
         if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
             ktvApiProtocol.pauseSing();
         } else if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PAUSE) {
@@ -1344,7 +1344,6 @@ public class RoomLivingViewModel extends ViewModel {
 
         boolean isOwnSong = Objects.equals(music.getUserNo(), UserManager.getInstance().getUser().id.toString());
         long songCode = Long.parseLong(music.getSongNo());
-        int mainSingerUid = Integer.parseInt(Objects.requireNonNull(music.getUserNo()));
 
         if (isOwnSong) {
             // 点歌者切换身份到SoloSinger
@@ -1428,22 +1427,18 @@ public class RoomLivingViewModel extends ViewModel {
         if (isOnSeat) {
             mainChannelMediaOption.publishMicrophoneTrack = true;
             mainChannelMediaOption.publishCameraTrack = isCameraOpened;
-            mainChannelMediaOption.publishCustomAudioTrack = false;
             mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
             mainChannelMediaOption.autoSubscribeVideo = true;
             mainChannelMediaOption.autoSubscribeAudio = true;
             mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
-            mainChannelMediaOption.publishMediaPlayerAudioTrack = false;
             mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
         } else {
             mainChannelMediaOption.publishCameraTrack = false;
             mainChannelMediaOption.publishMicrophoneTrack = false;
-            mainChannelMediaOption.publishCustomAudioTrack = false;
             mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
             mainChannelMediaOption.autoSubscribeVideo = true;
             mainChannelMediaOption.autoSubscribeAudio = true;
             mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
-            mainChannelMediaOption.publishMediaPlayerAudioTrack = false;
             mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
         }
     }

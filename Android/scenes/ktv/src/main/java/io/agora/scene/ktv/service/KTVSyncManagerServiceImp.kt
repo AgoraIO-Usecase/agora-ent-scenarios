@@ -416,7 +416,7 @@ class KTVSyncManagerServiceImp(
             }
         }
         if (list.isEmpty()) {
-            completion.invoke(java.lang.Exception("list is full"))
+            completion.invoke(java.lang.Exception("麦位已满，请在他人下麦后重试"))
         } else {
             val seatInfo = innerGenUserSeatInfo(list[0])
             innerAddSeatInfo(seatInfo, completion)
