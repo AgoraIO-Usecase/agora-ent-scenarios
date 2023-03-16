@@ -845,7 +845,7 @@ extension KTVApiImpl {
                 }
 
             } else if dict["cmd"] as? String == "PlayerState" {
-                let mainSingerState: Int = Int(dict["state"] as! String) ?? 0
+                let mainSingerState: Int = dict["state"] as? Int ?? 0
                 self.playerState = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
 
                 updateCosingerPlayerStatusIfNeed()
