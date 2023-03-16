@@ -1475,9 +1475,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //                VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
                 if([self isCurrentSongMainSinger:VLUserCenter.user.id]) {
                     //将房主实时的分数共享给所有人
-                    //TODO(chenpan): score!
-//                    [self syncChoruScore:[self.ktvApi getAvgSongScore]];
-//                    [self showScoreViewWithScore: [self.ktvApi getAvgSongScore]];
+                    [self syncChoruScore:[self.MVView getAvgSongScore]];
+                    [self showScoreViewWithScore: [self.MVView getAvgSongScore]];
                 }
                 [self removeCurrentSongWithSync:YES];
             }
