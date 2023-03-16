@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///在哪个座位
 @property (nonatomic, assign) NSInteger seatIndex;
 ///合唱歌曲code
-@property (nonatomic, copy, nullable) NSString* chorusSongCode;
+@property (nonatomic, copy) NSString* chorusSongCode;
 ///是否自己静音
 @property (nonatomic, assign) NSInteger isAudioMuted;
 ///是否开启视频
