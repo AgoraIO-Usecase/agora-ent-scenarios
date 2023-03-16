@@ -139,7 +139,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.ivSkipPreludeCancel.setOnClickListener(this);
         mBinding.ilActive.ivJoinChorusBtn.setOnClickListener(this);
         mBinding.ilActive.ivLeaveChorus.setOnClickListener(this);
-        mBinding.ilActive.downloadLrcFailedView.setOnClickListener(this);
+        mBinding.ilActive.downloadLrcFailedBtn.setOnClickListener(this);
 
         mKaraokeView.setKaraokeEvent(new KaraokeEvent() {
             @Override
@@ -233,6 +233,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     private void changeViewByRole() {
         mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
+        mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.INVISIBLE);
         if (this.mRole == Role.Singer) {
             mBinding.ilActive.lyricsView.enableDragging(false);
             mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
@@ -564,8 +565,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mBinding.ilActive.ivJoinChorusLoading.setVisibility(VISIBLE);
         } else if (v == mBinding.ilActive.ivLeaveChorus) {
             mOnKaraokeActionListener.onLeaveChorus();
-        } else if (v == mBinding.ilActive.downloadLrcFailedView) {
+        } else if (v == mBinding.ilActive.downloadLrcFailedBtn) {
             mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
+            mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.INVISIBLE);
             if (lrcUrl == null) {
                 mOnKaraokeActionListener.onReGetLrcUrl();
             } else {
@@ -628,6 +630,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                                 if (TextUtils.isEmpty(xmlPath)) {
                                     ToastUtils.showToast("The xml file not exist!");
                                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+                                    mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
                                     return;
                                 }
 
@@ -637,6 +640,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                                 if (lyricsModel == null) {
                                     ToastUtils.showToast("Unexpected content from " + xmlPath);
                                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+                                    mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
                                     return;
                                 }
 
@@ -649,6 +653,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                             @Override
                             public void onError(Exception e) {
                                 mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+                                mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
                                 ToastUtils.showToast(e.getMessage());
                             }
                         });
@@ -658,23 +663,27 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 if (lyricsModel == null) {
                     ToastUtils.showToast("Unexpected content from " + file);
                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+                    mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
                     return;
                 }
 
                 if (mKaraokeView != null) {
                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
+                    mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.INVISIBLE);
                     mKaraokeView.setLyricsData(lyricsModel);
                 }
             }
         }, exception -> {
             ToastUtils.showToast(exception.getMessage());
             mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+            mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
         });
     }
 
     public void onNoLrc() {
         lrcUrl = null;
         mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+        mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
     }
 
     public interface OnKaraokeEventListener {

@@ -438,7 +438,7 @@ public class RoomLivingViewModel extends ViewModel {
             if (songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                 int chorusNowNum = 0;
                 for (RoomSeatModel seat: seatListLiveData.getValue()) {
-                    if (seat.getChorusSongCode().equals(songPlayingLiveData.getValue().getSongNo())) {
+                    if (seat.getChorusSongCode() != null && seat.getChorusSongCode().equals(songPlayingLiveData.getValue().getSongNo())) {
                         chorusNowNum ++;
                     }
                 }
@@ -511,9 +511,9 @@ public class RoomLivingViewModel extends ViewModel {
                     if (e == null) {
                         // success
                         KTVLogger.d(TAG, "RoomLivingViewModel.leaveSeat() success");
-                        isOnSeat = false;
-                        if (seatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
-                            if (seatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
+                        if (seatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
+                            isOnSeat = false;
+                            if (seatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
                                 if (mRtcEngine != null) {
                                     mainChannelMediaOption.publishCameraTrack = false;
                                     mainChannelMediaOption.publishMicrophoneTrack = false;
