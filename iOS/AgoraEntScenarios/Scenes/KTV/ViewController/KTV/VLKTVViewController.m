@@ -619,7 +619,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         
         //TODO(chenpan):没有空麦位，show error
         [VLToast toast:@"麦位已满，请在他人下麦后重试"];
+        return;
     }
+    
+    [self _joinChorus];
 }
 
 - (void)_joinChorus {
