@@ -220,8 +220,7 @@
         } break;
         case KTVSingRoleCoSinger: {
 //        case KTVSingRoleFollowSinger:
-//            [self setPlayerViewsHidden:NO nextButtonHidden:YES playButtonHidden:YES];
-//            break;
+            [self setPlayerViewsHidden:NO nextButtonHidden:YES playButtonHidden:YES];
             _joinChorusBtn.hidden = YES;
             _leaveChorusBtn.hidden = NO;
         } break;
