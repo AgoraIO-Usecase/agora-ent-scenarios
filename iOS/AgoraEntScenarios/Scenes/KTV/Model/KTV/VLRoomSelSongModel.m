@@ -14,9 +14,4 @@
     }
     return NO;
 }
-
-- (BOOL)isChorus {
-    return self.chorusNum > 0;
-}
-
 @end

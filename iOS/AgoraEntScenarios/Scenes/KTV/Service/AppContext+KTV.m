@@ -65,16 +65,6 @@ NSString* kAgoraMpkWeakTableKey = @"AgoraMpkWeakTableKey";
     return [[[self mpkDelegateTable] objectEnumerator] allObjects];
 }
 
-- (void)registerEventDelegate:(id<AgoraMusicContentCenterEventDelegate>)delegate {
-    NSString* key = [NSString stringWithFormat:@"%p", delegate];
-    [[self mccDelegateTable] setObject:delegate forKey:key];
-}
-
-- (void)unregisterEventDelegate:(id<AgoraMusicContentCenterEventDelegate>)delegate {
-    NSString* key = [NSString stringWithFormat:@"%p", delegate];
-    [self.mccDelegateTable removeObjectForKey:key];
-}
-
 - (void)registerPlayerEventDelegate:(id<AgoraRtcMediaPlayerDelegate>)delegate {
     NSString* key = [NSString stringWithFormat:@"%p", delegate];
     [[self mpkDelegateTable] setObject:delegate forKey:key];

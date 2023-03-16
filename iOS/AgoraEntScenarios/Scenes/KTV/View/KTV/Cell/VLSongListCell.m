@@ -113,12 +113,7 @@
 //        self.typeLabel.text = KTVLocalizedString(@"独唱");
 //    }
     self.nameLabel.text = selSongModel.songName;
-    if([selSongModel isChorus]) {
-        self.chooserLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"合唱: %@"), selSongModel.name];
-    }
-    else {
-        self.chooserLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"点唱: %@"), selSongModel.name];
-    }
+    self.chooserLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"点唱: %@"), selSongModel.name];
     
     if (selSongModel.status == VLSongPlayStatusIdle) {
         self.sortBtn.hidden = self.deleteBtn.hidden = NO;

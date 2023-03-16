@@ -21,8 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *name;
 ///在哪个座位
 @property (nonatomic, assign) NSInteger seatIndex;
-///是否合唱
-@property (nonatomic, assign) BOOL joinSing;
+///合唱歌曲code
+@property (nonatomic, copy, nullable) NSString* chorusSongCode;
 ///是否自己静音
 @property (nonatomic, assign) NSInteger isAudioMuted;
 ///是否开启视频
@@ -37,6 +37,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 重置模型
 - (void)resetWithInfo:(VLRoomSeatModel* __nullable)seatInfo;
+
+//是否加入合唱
+- (BOOL)isJoinChours;
 @end
 
 NS_ASSUME_NONNULL_END
