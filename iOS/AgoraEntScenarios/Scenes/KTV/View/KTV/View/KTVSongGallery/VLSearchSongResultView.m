@@ -16,8 +16,7 @@
 
 @interface VLSearchSongResultView()<
 UITableViewDataSource,
-UITableViewDelegate,
-AgoraMusicContentCenterEventDelegate
+UITableViewDelegate
 >
 
 @property(nonatomic, weak) id <VLSearchSongResultViewDelegate>delegate;

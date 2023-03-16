@@ -9,7 +9,7 @@ import Foundation
 import YYCategories
 import SVProgressHUD
 
-private let kSceneId = "scene_ktv_2.2.0"
+private let kSceneId = "scene_ktv_2.3.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
@@ -404,14 +404,6 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         _removeSeat(seatInfo: seatInfo) { error in
         }
         
-        if let topSong = songList.first {
-            let origChorusNum = topSong.chorusNum
-            topSong.chorusNum = max(_getSeatJoinChorusCount() - 1, 0)
-            _updateChooseSong(songInfo: topSong,
-                              finished: completion)
-            topSong.chorusNum = origChorusNum
-        }
-        
         //remove current user's choose song
         _removeAllUserChooseSong(userNo: seatInfo.userNo)
         completion(nil)
@@ -450,9 +442,9 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     func removeSong(withInput inputModel: KTVRemoveSongInputModel,
                     completion: @escaping (Error?) -> Void) {
         if inputModel.songNo == songList.first?.songNo {
-            //删除正在播放的歌曲，把所有麦位合唱信息更新
+            //把所有麦位合唱歌曲code清除（不清楚也可以，因为上层业务会判断topSong.songCode==seat.chorusSongCode来作为合唱的状态）
             seatMap.forEach { (key, seatInfo) in
-                seatInfo.joinSing = false
+                seatInfo.chorusSongCode = nil
                 _updateSeat(seatInfo: seatInfo) { error in
                 }
             }
@@ -472,23 +464,12 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             return
         }
         //TODO: _markSeatToPlaying without callback
-        _markSeatToPlaying(joinSing: true) { err in
-        }
-        let origChorusNum = topSong.chorusNum
-        topSong.chorusNum = _getSeatJoinChorusCount() + 1
-        _updateChooseSong(songInfo: topSong,
-                          finished: completion)
-        topSong.chorusNum = origChorusNum
-        
+        _markSeatChoursStatus(songCode: topSong.songNo, completion: completion)
     }
     
     func coSingerLeaveChorus(completion: @escaping (Error?) -> Void) {
-        guard let topSong = self.songList.first else {return}
-        topSong.chorusNum -= 1;
-        _updateChooseSong(songInfo: topSong,
-                          finished: completion)
-        _markSeatToPlaying(joinSing: false) { err in
-        }
+        //TODO: _markSeatToPlaying without callback
+        _markSeatChoursStatus(songCode: nil, completion: completion)
     }
 
     func markSongDidPlay(withInput inputModel: VLRoomSelSongModel,
@@ -875,7 +856,7 @@ extension KTVSyncManagerServiceImp {
 // MARK: Seat operation
 
 extension KTVSyncManagerServiceImp {
-    private func _markSeatToPlaying(joinSing: Bool, completion: @escaping (Error?)->()) {
+    private func _markSeatChoursStatus(songCode: String?, completion: @escaping (Error?)->()) {
         guard let seatInfo = self.seatMap
             .filter({ $0.value.userNo == VLUserCenter.user.id })
             .first?.value else {
@@ -885,7 +866,7 @@ extension KTVSyncManagerServiceImp {
             return
         }
         
-        seatInfo.joinSing = joinSing
+        seatInfo.chorusSongCode = songCode
         _updateSeat(seatInfo: seatInfo, finished: completion)
     }
     
@@ -904,20 +885,6 @@ extension KTVSyncManagerServiceImp {
         }
 
         return seatArray
-    }
-    
-    private func _getSeatJoinChorusCount() -> Int {
-        var joinCount = 0
-        seatMap.forEach { (key, seat) in
-            guard seat.seatIndex != 0 else {
-                return
-            }
-            if seat.joinSing {
-                joinCount += 1
-            }
-        }
-        
-        return joinCount
     }
 
     private func _getUserSeatInfo(seatIndex: Int, model: VLRoomSeatModel? = nil) -> VLRoomSeatModel {
@@ -939,7 +906,7 @@ extension KTVSyncManagerServiceImp {
             /// 新增, 判断当前歌曲是否是自己点的
             seatInfo.isOwner = m.isOwner
 
-            seatInfo.joinSing = m.joinSing
+            seatInfo.chorusSongCode = m.chorusSongCode
         } else {
             /// 是否自己静音
             seatInfo.isAudioMuted = 1
@@ -949,7 +916,7 @@ extension KTVSyncManagerServiceImp {
             /// 新增, 判断当前歌曲是否是自己点的
             seatInfo.isOwner = false
 
-            seatInfo.joinSing = false
+            seatInfo.chorusSongCode = nil
         }
         
 
@@ -1039,7 +1006,7 @@ extension KTVSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INFO)
-            .get(success: { [weak self] list in
+            .get(success: { list in
                 agoraPrint("imp seat get success...")
                 let seats = list.compactMap({ VLRoomSeatModel.yy_model(withJSON: $0.toJson()!)! })
                 
@@ -1325,7 +1292,7 @@ extension KTVSyncManagerServiceImp {
             //  topSong.isChorus == true, // current is chorus
               topSong.userNo == VLUserCenter.user.id
         else {
-            KTVLog.warning(text: "_markSoloSongIfNeed break:  \(songList.first?.status) \(songList.first?.userNo)/\(VLUserCenter.user.id)")
+            KTVLog.warning(text: "_markSoloSongIfNeed break:  \(songList.first?.status.rawValue ?? 0) \(songList.first?.userNo ?? "")/\(VLUserCenter.user.id)")
             return
         }
         
@@ -1334,10 +1301,9 @@ extension KTVSyncManagerServiceImp {
         _updateChooseSong(songInfo: topSong) { error in
         }
         topSong.status = status
-        
-        _markSeatToPlaying(joinSing: true) { err in
-            
-        }
+        //自己不需要标记
+//        _markSeatChoursStatus(songCode: nil) { err in
+//        }
     }
 
     private func _subscribeChooseSong(finished: @escaping () -> Void) {

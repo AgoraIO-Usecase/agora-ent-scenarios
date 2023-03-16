@@ -65,14 +65,14 @@ typedef enum : NSUInteger {
 - (void)setSongScore:(int)score;
 - (int)getAvgSongScore;
 
-- (void)setPlayerViewsHidden:(BOOL)hidden nextButtonHidden:(BOOL)nextButtonHidden;
+//- (void)setPlayerViewsHidden:(BOOL)hidden nextButtonHidden:(BOOL)nextButtonHidden;
 - (void)setOriginBtnState:(VLKTVMVViewActionType)type;
 
 #pragma mark - 歌词相关
 
 /// 加载歌词链接
 /// @param lrcURL 链接
-- (void)loadLrcURL:(NSString *)lrcURL;
+//- (void)loadLrcURL:(NSString *)lrcURL;
 
 /// 开始滚动歌词
 - (void)start;
@@ -81,7 +81,7 @@ typedef enum : NSUInteger {
 /// 重置歌词界面
 - (void)reset;
 ///滚动到指定位置
-- (void)scrollToTime:(NSTimeInterval)time;
+//- (void)scrollToTime:(NSTimeInterval)time;
 
 #pragma mark - 前奏尾奏相关
 -(void)setSkipType:(SkipType)type;

@@ -17,8 +17,7 @@
 
 @interface VLSelectSongTableItemView ()<
 UITableViewDataSource,
-UITableViewDelegate,
-AgoraMusicContentCenterEventDelegate
+UITableViewDelegate
 >
 @property (nonatomic, strong) UITableView    *tableView;
 @property (nonatomic, strong) NSMutableArray *songsMuArray;
