@@ -9,7 +9,7 @@ import Foundation
 import AgoraLyricsScore
 
 @objc class KTVLrcControl: NSObject {
-    private var lrcView: KaraokeView
+    @objc public var lrcView: KaraokeView
     private var skipBtn: KTVSkipView!
     @objc public var isMainSinger: Bool = false //是否为主唱
     private var lyricModel: LyricModel?
@@ -22,7 +22,7 @@ import AgoraLyricsScore
         self.lrcView = lrcView
         super.init()
         
-        skipBtn = KTVSkipView(frame: CGRect(x: self.lrcView.bounds.size.width / 2.0 - 60, y: 60, width: 120, height: 34), completion: { type in
+        skipBtn = KTVSkipView(frame: CGRect(x: self.lrcView.bounds.size.width / 2.0 - 60, y: self.lrcView.bounds.size.height - 34, width: 120, height: 34), completion: { type in
             if type == .down {
                 self.skipBtn.isHidden = true
                 guard let duration = self.lyricModel?.duration else {return}
