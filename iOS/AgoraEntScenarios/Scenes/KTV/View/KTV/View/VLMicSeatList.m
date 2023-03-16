@@ -114,7 +114,7 @@
     
     cell.muteImgView.hidden = !seatModel.isAudioMuted;
     
-    if(seatModel.joinSing)
+    if(seatModel.isJoinChours)
         cell.joinChorusBtn.hidden = NO;
     else
         cell.joinChorusBtn.hidden = YES;
@@ -170,8 +170,8 @@
                 seatModel.isOwner = NO;
                 hasChanged = YES;
             }
-            if (seatModel.joinSing) {
-                seatModel.joinSing = NO;
+            if (seatModel.isJoinChours) {
+                seatModel.chorusSongCode = nil;
                 hasChanged = YES;
             }
         }
