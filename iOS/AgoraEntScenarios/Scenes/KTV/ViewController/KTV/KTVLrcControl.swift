@@ -11,7 +11,7 @@ import AgoraLyricsScore
 @objc class KTVLrcControl: NSObject {
     private var lrcView: KaraokeView
     private var skipBtn: KTVSkipView!
-    public var isMainSinger: Bool = false //是否为主唱
+    @objc public var isMainSinger: Bool = false //是否为主唱
     private var lyricModel: LyricModel?
     private var hasShowPreludeEndPosition = false
     private var hasShowEndPosition = false
