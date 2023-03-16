@@ -186,7 +186,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                             binding.tvZC.setText("主唱");
                             binding.tvHC.setVisibility(View.GONE);
                             binding.tvZC.setVisibility(View.VISIBLE);
-                        } else if (!item.getUserNo().equals(songModel.getUserNo()) && item.getJoinSing()) {
+                        } else if (!item.getUserNo().equals(songModel.getUserNo()) && item.getChorusSongCode().equals(songModel.getSongNo())) {
                             binding.tvHC.setText("合唱");
                             binding.tvZC.setVisibility(View.GONE);
                             binding.tvHC.setVisibility(View.VISIBLE);
@@ -334,6 +334,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             getBinding().cbVideo.setChecked(isVideoChecked);
             boolean isAudioChecked = seatModel != null && seatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_FALSE();
             getBinding().cbMic.setChecked(isAudioChecked);
+
+            getBinding().lrcControlView.onSeat(seatModel != null);
         });
         roomLivingViewModel.seatListLiveData.observe(this, seatModels -> {
             if (seatModels == null) {
@@ -344,7 +346,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 if (oSeatModel == null
                         || oSeatModel.isAudioMuted() != seatModel.isAudioMuted()
                         || oSeatModel.isVideoMuted() != seatModel.isVideoMuted()
-                        || oSeatModel.getJoinSing() != seatModel.getJoinSing()) {
+                        || !oSeatModel.getChorusSongCode().equals(seatModel.getChorusSongCode())) {
                     mRoomSpeakerAdapter.replace(seatModel.getSeatIndex(), seatModel);
                 }
             }
@@ -363,6 +365,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 if (!exist) {
                     onMemberLeave(seatModel);
                 }
+            }
+            if (seatModels.size() == 3) {
+                getBinding().lrcControlView.onSeatFull(true);
+            } else if ((seatModels.size() < 3)) {
+                getBinding().lrcControlView.onSeatFull(false);
             }
         });
 
@@ -397,6 +404,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             getBinding().lrcControlView.getKaraokeView().setScoreLevel(model.getLevel());
             getBinding().lrcControlView.getKaraokeView().setScoreCompensationOffset(model.getOffset());
         });
+        roomLivingViewModel.noLrcLiveData.observe(this, isNoLrc -> {
+            if (isNoLrc) {
+                getBinding().lrcControlView.onNoLrc();
+            }
+        });
         roomLivingViewModel.playerMusicStatusLiveData.observe(this, status -> {
             if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PREPARE) {
                 getBinding().lrcControlView.onPrepareStatus(roomLivingViewModel.isRoomOwner());
@@ -416,6 +428,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if (status == RoomLivingViewModel.JoinChorusStatus.ON_JOIN_CHORUS) {
                 getBinding().cbMic.setChecked(true);
                 getBinding().lrcControlView.onSelfJoinedChorus();
+                //getBinding().lrcControlView.setRole(LrcControlView.Role.CoSinger);
             } else if (status == RoomLivingViewModel.JoinChorusStatus.ON_JOIN_FAILED) {
                 getBinding().lrcControlView.onSelfJoinedChorusFailed();
             } else if (status == RoomLivingViewModel.JoinChorusStatus.ON_LEAVE_CHORUS) {

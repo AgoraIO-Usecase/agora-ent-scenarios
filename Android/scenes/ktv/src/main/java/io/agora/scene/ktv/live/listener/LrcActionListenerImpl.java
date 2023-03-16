@@ -80,4 +80,9 @@ public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListe
         }
         mViewModel.musicSeek(mViewModel.getSongDuration() - 500);
     }
+
+    @Override
+    public void onReGetLrcUrl() {
+        mViewModel.reGetLrcUrl();
+    }
 }

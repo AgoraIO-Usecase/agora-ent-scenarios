@@ -43,7 +43,7 @@ data class RoomSeatModel(
     val rtcUid: String,// 座位上用户id，与rtc的userId一致
     val name: String,// 座位上用户昵称
     val seatIndex: Int,// 座位编号
-    val joinSing: Boolean,// 是否合唱
+    val chorusSongCode: String,// 是否合唱
     val isAudioMuted: Int,// 是否静音
     val isVideoMuted: Int,// 是否开启视频
 ) : java.io.Serializable {
@@ -123,7 +123,6 @@ data class RoomSelSongModel(
     // 获取已点歌记返回的歌词信息，同时也包含上面信息
     val userNo: String? = null,// 点歌人No
     val name: String? = null,// 点歌人昵称
-    val chorusNum: Int = 0, // 合唱者个数
     val isOriginal: Int = 0, //是否原唱
 
     // 排序字段

@@ -333,6 +333,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     override fun loadMusic(
         config: KTVSongConfiguration,
+        mode: KTVLoadMusicMode,
         onMusicLoadStateListener: OnMusicLoadStateListener
     ) {
         Log.d(TAG, "loadMusic called: $singerRole")
@@ -347,89 +348,92 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mLastReceivedPlayPosTime = null
         mReceivedPlayPosition = 0
 
-        val countDownLatch = CountDownLatch(2)
+        if (mode == KTVLoadMusicMode.LOAD_LRC_ONLY) {
+            // 加载歌词
+            loadLyric(songCode) { lyricUrl ->
+                if (lyricUrl == null) {
+                    // 加载歌词失败
+                    Log.e(TAG, "loadMusic failed: NO_LYRIC_URL")
+                    loadSongState = KTVLoadSongState.FAILED
+                    onMusicLoadStateListener.onMusicLoadFail(songCode, "", KTVLoadSongFailReason.NO_LYRIC_URL)
+                } else {
+                    // 加载歌词成功
+                    Log.d(TAG, "loadMusic success")
+                    loadSongState = KTVLoadSongState.OK
+                    lrcView?.onDownloadLrcData(lyricUrl)
+                    onMusicLoadStateListener.onMusicLoadSuccess(songCode, lyricUrl)
+                }
+            }
+            return
+        }
 
-        var isLrcUrlSuccess = false
-        var isSongLoadedSuccess = false
         when (singerRole) {
             KTVSingRole.SoloSinger -> {
-                // 获取歌词url
-                loadLyric(songCode) { lyricUrl ->
-                    if (lyricUrl == null) {
-                        lyricUrlMap[songCode.toString()] = ""
-                        isLrcUrlSuccess = false
-                    } else {
-                        lyricUrlMap[songCode.toString()] = lyricUrl
-                        lrcView?.onDownloadLrcData(lyricUrl)
-                        isLrcUrlSuccess = true
-                    }
-                    countDownLatch.countDown()
-                }
-
                 // 预加载歌曲
                 preLoadMusic(songCode) { status ->
-                    isSongLoadedSuccess = status == 0
-                    countDownLatch.countDown()
+                    if (status == 0) {
+                        // 预加载歌曲成功
+                        if (mode == KTVLoadMusicMode.LOAD_MUSIC_AND_LRC) {
+                            // 需要加载歌词
+                            loadLyric(songCode) { lyricUrl ->
+                                if (lyricUrl == null) {
+                                    // 加载歌词失败
+                                    Log.e(TAG, "loadMusic failed: NO_LYRIC_URL")
+                                    loadSongState = KTVLoadSongState.FAILED
+                                    onMusicLoadStateListener.onMusicLoadFail(songCode, "", KTVLoadSongFailReason.NO_LYRIC_URL)
+                                } else {
+                                    // 加载歌词成功
+                                    Log.d(TAG, "loadMusic success")
+                                    loadSongState = KTVLoadSongState.OK
+                                    lrcView?.onDownloadLrcData(lyricUrl)
+                                    onMusicLoadStateListener.onMusicLoadSuccess(songCode, lyricUrl)
+                                }
+
+                                if (config.autoPlay && (singerRole == KTVSingRole.SoloSinger || singerRole == KTVSingRole.LeadSinger)) {
+                                    // 主唱自动播放歌曲
+                                    startSing(0)
+                                }
+                            }
+                        } else if (mode == KTVLoadMusicMode.LOAD_MUSIC_ONLY) {
+                            // 不需要加载歌词
+                            Log.d(TAG, "loadMusic success")
+                            loadSongState = KTVLoadSongState.OK
+                            if (config.autoPlay && (singerRole == KTVSingRole.SoloSinger || singerRole == KTVSingRole.LeadSinger)) {
+                                // 主唱自动播放歌曲
+                                startSing(0)
+                            }
+                            onMusicLoadStateListener.onMusicLoadSuccess(songCode, "")
+                        }
+                    } else {
+                        // 预加载歌曲失败
+                        Log.e(TAG, "loadMusic failed: MUSIC_PRELOAD_FAIL")
+                        loadSongState = KTVLoadSongState.FAILED
+                        onMusicLoadStateListener.onMusicLoadFail(songCode, "", KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL)
+                    }
                 }
             }
             KTVSingRole.Audience -> {
-                // 获取歌词url
+                // 加载歌词
                 loadLyric(songCode) { lyricUrl ->
                     if (lyricUrl == null) {
-                        lyricUrlMap[songCode.toString()] = ""
-                        isLrcUrlSuccess = false
+                        // 加载歌词失败
+                        Log.e(TAG, "loadMusic failed: NO_LYRIC_URL")
+                        loadSongState = KTVLoadSongState.FAILED
+                        onMusicLoadStateListener.onMusicLoadFail(songCode, "", KTVLoadSongFailReason.NO_LYRIC_URL)
                     } else {
-                        lyricUrlMap[songCode.toString()] = lyricUrl
+                        // 加载歌词成功
+                        Log.d(TAG, "loadMusic success")
+                        loadSongState = KTVLoadSongState.OK
                         lrcView?.onDownloadLrcData(lyricUrl)
-                        isLrcUrlSuccess = true
+                        onMusicLoadStateListener.onMusicLoadSuccess(songCode, lyricUrl)
                     }
-                    isSongLoadedSuccess = true
-                    countDownLatch.countDown()
-                    countDownLatch.countDown()
                 }
             }
             else -> {
                 Log.e(TAG, "loadMusic called wrong role")
+                loadSongState = KTVLoadSongState.IDLE
             }
         }
-
-        Thread {
-            countDownLatch.await()
-            val url = lyricUrlMap[songCode.toString()] ?: return@Thread
-            if (isLrcUrlSuccess && isSongLoadedSuccess) {
-                Log.d(TAG, "loadMusic success")
-                loadSongState = KTVLoadSongState.OK
-                if (config.autoPlay && (singerRole == KTVSingRole.SoloSinger || singerRole == KTVSingRole.LeadSinger)) {
-                    // 主唱自动播放歌曲
-                    startSing(0)
-                }
-                onMusicLoadStateListener.onMusicLoadSuccess(songCode, url)
-            } else if (!isLrcUrlSuccess && !isSongLoadedSuccess) {
-                Log.e(TAG, "loadMusic failed: MUSIC_PRELOAD_FAIL_AND_NO_LYRIC_URL")
-                loadSongState = KTVLoadSongState.FAILED
-                onMusicLoadStateListener.onMusicLoadFail(
-                    songCode,
-                    url,
-                    KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL_AND_NO_LYRIC_URL
-                )
-            } else if (!isSongLoadedSuccess) {
-                Log.e(TAG, "loadMusic failed: MUSIC_PRELOAD_FAIL")
-                loadSongState = KTVLoadSongState.FAILED
-                onMusicLoadStateListener.onMusicLoadFail(
-                    songCode,
-                    url,
-                    KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL
-                )
-            } else {
-                Log.e(TAG, "loadMusic failed: NO_LYRIC_URL")
-                loadSongState = KTVLoadSongState.FAILED
-                onMusicLoadStateListener.onMusicLoadFail(
-                    songCode,
-                    url,
-                    KTVLoadSongFailReason.NO_LYRIC_URL
-                )
-            }
-        }.start()
     }
 
     override fun startSing(startPos: Long) {
@@ -542,9 +546,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 leaveChorus2ndChannel(role)
             }
             KTVSingRole.CoSinger -> {
-                if (mPlayer.state != Constants.MediaPlayerState.PLAYER_STATE_STOPPED) {
-                    mPlayer.stop()
-                }
+                mPlayer.stop()
                 val channelMediaOption = ChannelMediaOptions()
                 channelMediaOption.autoSubscribeAudio = true
                 channelMediaOption.publishMediaPlayerAudioTrack = false
@@ -566,9 +568,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         channelMediaOption.publishMediaPlayerAudioTrack = false
         mRtcEngine.updateChannelMediaOptions(channelMediaOption)
 
-        if (mPlayer.state != Constants.MediaPlayerState.PLAYER_STATE_STOPPED) {
-            mPlayer.stop()
-        }
+        mPlayer.stop()
         mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
     }
 
@@ -1032,7 +1032,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             mLastReceivedPlayPosTime = null
             mReceivedPlayPosition = 0
         }
-
     }
 
     override fun onPlayerEvent(

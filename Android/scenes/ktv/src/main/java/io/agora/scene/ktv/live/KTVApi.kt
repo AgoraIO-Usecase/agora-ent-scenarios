@@ -30,7 +30,6 @@ enum class KTVPlayerTrackMode(val value: Int) {
 enum class KTVLoadSongFailReason(val value: Int) {
     NO_LYRIC_URL(0),
     MUSIC_PRELOAD_FAIL(1),
-    MUSIC_PRELOAD_FAIL_AND_NO_LYRIC_URL(2)
 }
 
 enum class SwitchRoleState(val value: Int) {
@@ -56,6 +55,12 @@ enum class KTVJoinChorusFailReason(val value: Int) {
     MUSIC_OPEN_FAIL(1),
     JOIN_CHANNEL_FAIL(2),
     MUSIC_PRELOAD_FAIL_AND_JOIN_CHANNEL_FAIL(3)
+}
+
+enum class KTVLoadMusicMode(val value: Int) {
+    LOAD_MUSIC_ONLY(0),
+    LOAD_LRC_ONLY(1),
+    LOAD_MUSIC_AND_LRC(2)
 }
 
 interface ILrcView {
@@ -189,7 +194,7 @@ interface KTVApi {
     /**
      * 加载歌曲
      */
-    fun loadMusic(config: KTVSongConfiguration, onMusicLoadStateListener: OnMusicLoadStateListener)
+    fun loadMusic(config: KTVSongConfiguration, mode: KTVLoadMusicMode, onMusicLoadStateListener: OnMusicLoadStateListener)
 
     /**
      * 切换演唱身份
