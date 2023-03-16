@@ -91,6 +91,7 @@ KTVMusicLoadStateListener
 @property (nonatomic, assign) BOOL isNowCameraMuted;
 @property (nonatomic, assign) BOOL isOnMicSeat;
 @property (nonatomic, assign) NSUInteger chorusNum;    //合唱人数
+@property (nonatomic, assign) KTVSingRole singRole;    //角色
 @property (nonatomic, assign) BOOL isEarOn;
 @property (nonatomic, assign) int playoutVolume;
 @property (nonatomic, assign) KTVPlayerTrackMode trackMode;
@@ -495,6 +496,18 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark - action utils / business
+- (void)stopPlaySong {
+    [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
+                                       token:@""
+                           onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+        if (state == KTVSwitchRoleStateFail) {
+            return;
+        }
+        
+        self.singRole = KTVSingRoleCoSinger;
+    }];
+}
+
 - (void)loadAndPlaySong {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     
@@ -529,7 +542,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 KTVLogError(@"switchSingerRole error: %ld", reason);
                 return;
             }
-            
+            self.singRole = role;
             [weakSelf.ktvApi loadMusicWithConfig:songConfig mode: KTVLoadMusicModeLoadMusicAndLrc
                         onMusicLoadStateListener:weakSelf];
         }];
@@ -633,6 +646,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
+        self.singRole = KTVSingRoleCoSinger;
         VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
         
         KTVJoinChorusInputModel* inputModel = [KTVJoinChorusInputModel new];
@@ -657,11 +671,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     BOOL isTopSong = [self.selSongsArray.firstObject.songNo integerValue] == songNo;
     
     if (isTopSong) {
-//        [self.ktvApi stopSing];
-        [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
-                                           token:@""
-                               onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-        }];
+        [self stopPlaySong];
     }
     
     NSMutableArray<VLRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
@@ -1069,11 +1079,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
             if(flag == true){
                 if (weakSelf.selSongsArray.count >= 1) {
-//                    [weakSelf.ktvApi stopSing];
-                    [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
-                                                       token:@""
-                                           onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-                    }];
+                    [weakSelf stopPlaySong];
                     [weakSelf removeCurrentSongWithSync:YES];
                 }
             }
@@ -1335,10 +1341,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     BOOL onMicSeatStatusDidChanged = _isOnMicSeat != isOnMicSeat;
     if (onMicSeatStatusDidChanged) {
         if (!isOnMicSeat) {
-            [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
-                                               token:@""
-                                   onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-            }];
+            [self stopPlaySong];
         }
         
         //start mic once enter seat
@@ -1435,10 +1438,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
         [self.MVView reset];
         //song changes
-        [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
-                                           token:@""
-                               onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-        }];
+        [self stopPlaySong];
         [self loadAndPlaySong];
     }
 }
@@ -1449,6 +1449,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [[self.ktvApi getMediaPlayer] selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1];
     
     [self.MVView setOriginBtnState: trackMode == KTVPlayerTrackModeOrigin ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc];
+}
+
+- (void)setSingRole:(KTVSingRole)singRole {
+    _singRole = singRole;
+    KTVLogInfo(@"setSingRole: %ld", singRole);
 }
 
 #pragma mark KTVApiEventHandlerDelegate
