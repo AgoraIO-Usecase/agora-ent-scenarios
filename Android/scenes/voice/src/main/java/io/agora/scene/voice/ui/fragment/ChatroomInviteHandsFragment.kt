@@ -39,6 +39,13 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     private var emptyView: View? = null
     private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
 
+    // 房主准备邀请的麦位
+    private var inviteMicIndex:Int = -1
+
+    fun setInviteMicIndex(inviteMicIndex: Int){
+        this.inviteMicIndex = inviteMicIndex
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         emptyView = layoutInflater.inflate(R.layout.voice_no_data_layout, container, false)
         val textView = emptyView?.findViewById<TextView>(R.id.content_item)
@@ -153,7 +160,7 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     override fun onItemActionClick(view: View, position: Int, chatUid: String) {
         map[chatUid] = true
         adapter?.setInvited(map)
-        userListViewModel.startMicSeatInvitation(chatUid,-1)
+        userListViewModel.startMicSeatInvitation(chatUid,inviteMicIndex)
     }
 
     fun setFragmentListener(listener: ChatroomHandsDialog.OnFragmentListener?) {

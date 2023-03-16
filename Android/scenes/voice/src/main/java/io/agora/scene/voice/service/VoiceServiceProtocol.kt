@@ -116,7 +116,7 @@ interface VoiceServiceProtocol {
      * 同意申请
      * @param chatUid 环信用户id
      */
-    fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
+    fun acceptMicSeatApply(micIndex: Int?, chatUid: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * 取消上麦
@@ -133,7 +133,7 @@ interface VoiceServiceProtocol {
     /**
      * 接受邀请
      */
-    fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
+    fun acceptMicSeatInvitation(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * 拒绝邀请

@@ -413,13 +413,13 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun startMicSeatApply(micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit) {
-        ChatroomIMManager.getInstance().startMicSeatApply(object : CallBack{
+        ChatroomIMManager.getInstance().startMicSeatApply(micIndex ?: -1, object : CallBack {
             override fun onSuccess() {
-                completion.invoke(VoiceServiceProtocol.ERR_OK,true)
+                completion.invoke(VoiceServiceProtocol.ERR_OK, true)
             }
 
             override fun onError(code: Int, error: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED,false)
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
             }
         })
     }
@@ -428,8 +428,8 @@ class VoiceSyncManagerServiceImp(
      * 同意申请
      * @param chatUid 环信用户id
      */
-    override fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        ChatroomIMManager.getInstance().acceptMicSeatApply(chatUid,object :
+    override fun acceptMicSeatApply(micIndex: Int?, chatUid: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
+        ChatroomIMManager.getInstance().acceptMicSeatApply(micIndex ?: -1,chatUid,object :
             ValueCallBack<VoiceMicInfoModel>{
             override fun onSuccess(value: VoiceMicInfoModel) {
                 completion.invoke(VoiceServiceProtocol.ERR_OK,value)
@@ -466,7 +466,7 @@ class VoiceSyncManagerServiceImp(
         micIndex: Int?,
         completion: (error: Int, result: Boolean) -> Unit
     ) {
-        ChatroomIMManager.getInstance().invitationMic(chatUid,object : CallBack{
+        ChatroomIMManager.getInstance().invitationMic(chatUid,micIndex?:-1,object : CallBack{
             override fun onSuccess() {
                 completion.invoke(VoiceServiceProtocol.ERR_OK,true)
             }
@@ -480,8 +480,8 @@ class VoiceSyncManagerServiceImp(
     /**
      * 接受邀请
      */
-    override fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        ChatroomIMManager.getInstance().acceptMicSeatInvitation(object :
+    override fun acceptMicSeatInvitation(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
+        ChatroomIMManager.getInstance().acceptMicSeatInvitation(micIndex, object :
             ValueCallBack<VoiceMicInfoModel>{
             override fun onSuccess(value: VoiceMicInfoModel?) {
                 completion.invoke(VoiceServiceProtocol.ERR_OK,value)

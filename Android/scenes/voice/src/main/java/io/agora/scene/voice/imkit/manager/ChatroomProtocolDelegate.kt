@@ -356,7 +356,7 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 申请上麦
      */
-    fun startMicSeatApply(micIndex: Int? = null, callback: CallBack) {
+    fun startMicSeatApply(micIndex: Int, callback: CallBack) {
         val attributeMap = mutableMapOf<String, String>()
         val voiceRoomApply = VoiceRoomApply()
         val memberBean = VoiceMemberModel().apply {
@@ -366,7 +366,7 @@ class ChatroomProtocolDelegate constructor(
             nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
             portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
         }
-        if (micIndex != null) {
+        if (micIndex != -1) {
             voiceRoomApply.index = micIndex
             memberBean.micIndex = micIndex
         }
@@ -381,10 +381,16 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 同意上麦申请
      */
-    fun acceptMicSeatApply(chatUid:String,micIndex: Int? = null, callback: ValueCallBack<VoiceMicInfoModel>) {
+    fun acceptMicSeatApply(chatUid:String,micIndex: Int, callback: ValueCallBack<VoiceMicInfoModel>) {
         val memberBean = ChatroomCacheManager.cacheManager.getMember(chatUid)
         if (memberBean != null) {
-            memberBean.micIndex = micIndex?:getFirstFreeMic()
+            if (micIndex != -1) {
+                val micInfoModel = getMicInfo(micIndex)
+                // 指定的麦位没人，则在指定麦位，有人则找空闲位置
+                memberBean.micIndex = if (micInfoModel?.micStatus == MicStatus.Idle || micInfoModel?.micStatus==MicStatus.ForceMute) micIndex else getFirstFreeMic()
+            } else {
+                memberBean.micIndex = getFirstFreeMic()
+            }
         }
         ThreadManager.getInstance().runOnIOThread {
             if (checkMemberIsOnMic(memberBean)) return@runOnIOThread
@@ -444,9 +450,10 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 邀请上麦
      */
-    fun invitationMic(chatUid: String, micIndex: Int? = null, callback: CallBack) {
+    fun invitationMic(chatUid: String, micIndex: Int, callback: CallBack) {
         val attributeMap = mutableMapOf<String, String>()
         val userBeam = ChatroomCacheManager.cacheManager.getMember(chatUid)
+        userBeam?.micIndex = micIndex
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
         attributeMap["chatroomId"] = ChatroomIMManager.getInstance().currentRoomId
         sendChatroomEvent(true, chatUid, CustomMsgType.CHATROOM_INVITE_SITE, attributeMap, callback)
@@ -464,10 +471,16 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 用户同意上麦邀请
      */
-    fun acceptMicSeatInvitation(chatUid: String,micIndex: Int? = null, callback: ValueCallBack<VoiceMicInfoModel>) {
+    fun acceptMicSeatInvitation(chatUid: String,micIndex: Int, callback: ValueCallBack<VoiceMicInfoModel>) {
         val memberBean = ChatroomCacheManager.cacheManager.getMember(chatUid)
         if (memberBean != null) {
-            memberBean.micIndex = micIndex?:getFirstFreeMic()
+            if (micIndex != -1) {
+                val micInfoModel = getMicInfo(micIndex)
+                // 指定的麦位没人，则在指定麦位，有人则找空闲位置
+                memberBean.micIndex = if (micInfoModel?.micStatus == MicStatus.Idle || micInfoModel?.micStatus==MicStatus.ForceMute) micIndex else getFirstFreeMic()
+            } else {
+                memberBean.micIndex = getFirstFreeMic()
+            }
         }
         ThreadManager.getInstance().runOnIOThread {
             if (checkMemberIsOnMic(memberBean)) return@runOnIOThread

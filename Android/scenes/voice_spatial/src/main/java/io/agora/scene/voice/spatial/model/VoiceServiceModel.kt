@@ -92,7 +92,6 @@ data class VoiceMicInfoModel constructor(
     @SerializedName("mic_index") var micIndex: Int = -1,
     var member: VoiceMemberModel? = null,
     @SerializedName("status") var micStatus: Int = -1, // 座位状态
-    @Transient var userStatus: Int = -1, // 用户状态，备用
     @Transient var ownerTag: Boolean = false,
     @Transient var audioVolumeType: Int = ConfigConstants.VolumeType.Volume_None,
     @Transient var position: PointF = PointF(0f, 0f),
