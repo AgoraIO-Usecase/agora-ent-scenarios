@@ -103,6 +103,7 @@ KTVMusicLoadStateListener
 @property (nonatomic, assign) NSInteger prePosition;
 
 @property (nonatomic, strong) LyricModel *lyricModel;
+@property (nonatomic, strong) KTVLrcControl *lrcControl;
 @end
 
 @implementation VLKTVViewController
@@ -795,6 +796,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.ktvApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
     KTVLrcControl* lrcControl = [[KTVLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
     [self.ktvApi setLrcViewWithView:lrcControl];
+    lrcControl.skipCallBack = ^(NSInteger time) {
+        [self.ktvApi seekSingWithTime:time];
+    };
     [self.ktvApi setMicStatusWithIsOnMicOpen:!self.isNowMicMuted];
     [self.ktvApi addEventHandlerWithKtvApiEventHandler:self];
 //    VL(weakSelf);
@@ -861,19 +865,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)didSongLoadedWith:(LyricModel *)model{
     self.lyricModel = model;
-}
-
-- (void)didSkipViewShowPreludeEndPosition {
-    if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
-        [self.MVView showSkipView:false];
-    }
-}
-
--(void)didSkipViewShowEndDuration{
-    if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
-        [self.MVView setSkipType:SkipTypeEpilogue];
-        [self.MVView showSkipView:true];
-    }
 }
 
 - (void)didJoinChours {
@@ -1084,7 +1075,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                            onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
                     }];
                     [weakSelf removeCurrentSongWithSync:YES];
-                    [weakSelf.MVView showSkipView:false];
                 }
             }
             [[VLAlert shared] dismiss];
@@ -1473,14 +1463,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         } else if(state == AgoraMediaPlayerStatePaused) {
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
         } else if(state == AgoraMediaPlayerStateStopped) {
-//            [self.MVView reset];
-            if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
-                [self.MVView showSkipView:false];
-            }
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
-            if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
-                [self.MVView showSkipView:false];
-            }
             if(isLocal) {
                 KTVLogInfo(@"Playback all loop completed");
 //                VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
@@ -1515,6 +1498,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
+    if(lyricUrl.length > 0){
+        self.lrcControl.isMainSinger = true;
+    }
 }
 
 @end

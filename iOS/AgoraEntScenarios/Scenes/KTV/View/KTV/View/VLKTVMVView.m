@@ -37,7 +37,6 @@
 @property (nonatomic, assign) double currentTime;
 
 @property (nonatomic, assign) BOOL isPlayAccompany;
-@property (nonatomic, strong) KTVSkipView *skipView;
 @property (nonatomic, strong) UIButton *joinChorusBtn;
 @property (nonatomic, strong) UIButton *leaveChorusBtn;
 @end
@@ -126,22 +125,6 @@
 
  //   [self setPlayerViewsHidden:YES nextButtonHidden:YES];
     
-    VL(weakSelf);
-    self.skipView = [[KTVSkipView alloc]initWithFrame:CGRectZero completion:^(SkipActionType type) {
-        if([weakSelf.delegate respondsToSelector:@selector(didSkipViewClick)] && type == SkipActionTypeDown){
-            [weakSelf.delegate didSkipViewClick];
-        }
-        weakSelf.skipView.hidden = true;
-    }];
-    [self addSubview:self.skipView];
-    [self.skipView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.equalTo(self);
-        make.bottom.equalTo(self).offset(-24);
-        make.width.equalTo(@(120));
-        make.height.equalTo(@(34));
-    }];
-    self.skipView.hidden = true;
-    
     self.joinChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(self.width / 2.0 - 56, self.height - 44, 112, 34)];
     [self.joinChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_join_chorus"] forState:UIControlStateNormal];
     [self.joinChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_join_chorus_loading"] forState:UIControlStateSelected];
@@ -150,7 +133,7 @@
     [self.joinChorusBtn addTarget:self action:@selector(joinChorus) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_joinChorusBtn];
     
-    self.leaveChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(20, self.height - 44, 40, 34)];
+    self.leaveChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(20, _pauseBtn.top, 24, 24)];
     [self.leaveChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_leave_chorus"] forState:UIControlStateNormal];
     [self.leaveChorusBtn addTarget:self action:@selector(leaveChorus) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.leaveChorusBtn];
@@ -165,14 +148,6 @@
         [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
     }
     [self setNeedsLayout];
-}
-
--(void)setSkipType:(SkipType)type{
-    [self.skipView setSkipType:type];
-}
-
--(void)showSkipView:(bool)flag{
-    self.skipView.hidden = !flag;
 }
 
 -(void)joinChorus{
