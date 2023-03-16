@@ -12,8 +12,9 @@ typedef enum : NSUInteger {
     VLKTVBottomBtnClickTypeAudio = 0,       // 声音
     VLKTVBottomBtnClickTypeVideo,           // 视频
     VLKTVBottomBtnClickTypeMore,            // 更多
-    VLKTVBottomBtnClickTypeChorus,           // 合唱
+    VLKTVBottomBtnClickTypeJoinChorus,           // 合唱
     VLKTVBottomBtnClickTypeChoose,          // 点歌
+    VLKTVBottomBtnClickTypeLeaveChorus
 } VLKTVBottomBtnClickType;
 
 NS_ASSUME_NONNULL_BEGIN

@@ -23,6 +23,7 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 @property (nonatomic, assign) NSInteger isVideoMuted;
 @property (nonatomic, strong)VLHotSpotBtn *audioBtn;
 @property (nonatomic, strong)VLHotSpotBtn *videoBtn;
+
 @end
 
 @implementation VLKTVBottomToolbar
@@ -64,12 +65,6 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     [dianGeBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     dianGeBtn.tag = VLKTVBottomBtnClickTypeChoose;
     [self addSubview:dianGeBtn];
-    
-    VLHotSpotBtn *heChangeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(dianGeBtn.left-20-70, (self.height-32)*0.5, 70, 32)];
-    heChangeBtn.tag = VLKTVBottomBtnClickTypeChorus;
-    [heChangeBtn setImage:[UIImage sceneImageWithName:@"ktv_hechang_icon"] forState:UIControlStateNormal];
-    [heChangeBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:heChangeBtn];
     
     for (VLRoomSeatModel *info in self.seatsArray) {
         if ([info.rtcUid integerValue] == [VLUserCenter.user.id integerValue]) {
