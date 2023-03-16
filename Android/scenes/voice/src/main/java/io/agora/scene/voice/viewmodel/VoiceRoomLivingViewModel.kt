@@ -255,8 +255,8 @@ class VoiceRoomLivingViewModel : ViewModel() {
     }
 
     // 接受邀请
-    fun acceptMicSeatInvitation() {
-        _acceptMicSeatInvitationObservable.setSource(mRepository.acceptMicSeatInvitation())
+    fun acceptMicSeatInvitation(micIndex: Int) {
+        _acceptMicSeatInvitationObservable.setSource(mRepository.acceptMicSeatInvitation(micIndex))
     }
 
     // 用户拒绝上麦申请

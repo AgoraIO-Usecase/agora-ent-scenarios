@@ -92,11 +92,7 @@ internal object RoomMicConstructor {
                 } else {
                     mutableListOf(
                         MicManagerBean(context.getString(R.string.voice_room_kickoff), true, MicClickAction.KickOff),
-                        if(micInfo.member?.micStatus == 0){
-                            MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnMute)
-                        }else{
-                            MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.Mute)
-                        },
+                        MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.ForbidMic),
                         MicManagerBean(context.getString(R.string.voice_room_block), true, MicClickAction.Lock)
                     )
                 }

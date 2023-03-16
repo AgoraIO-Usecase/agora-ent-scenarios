@@ -77,8 +77,8 @@ class VoiceUserListViewModel : ViewModel() {
     }
 
     // 同意上麦申请
-    fun acceptMicSeatApply(chatUid: String) {
-        _acceptMicSeatApplyObservable.setSource(mRepository.acceptMicSeatApply(chatUid))
+    fun acceptMicSeatApply(micIndex: Int?,chatUid: String) {
+        _acceptMicSeatApplyObservable.setSource(mRepository.acceptMicSeatApply(micIndex,chatUid))
     }
 
     // 将成员踢出房间

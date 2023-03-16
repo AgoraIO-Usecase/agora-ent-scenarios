@@ -120,10 +120,10 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
                         "accept mic seat apply：${data?.micIndex}".logD()
                         data?.let {
                             it.member?.chatUid?.let { chatUid ->
+                                adapter?.notifyItemRemoved(currentIndex)
                                 ChatroomIMManager.getInstance().removeSubmitMember(
                                     chatUid
                                 )
-                                adapter?.notifyItemRemoved(currentIndex)
                             }
                             onFragmentListener?.onAcceptMicSeatApply(it)
                         }
@@ -176,7 +176,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
         adapter!!.setAccepted(uid, true)
         map[uid] = true
         currentIndex = index
-        userListViewModel.acceptMicSeatApply(uid)
+        userListViewModel.acceptMicSeatApply(index, uid)
     }
 
     fun setFragmentListener(listener: ChatroomHandsDialog.OnFragmentListener?) {

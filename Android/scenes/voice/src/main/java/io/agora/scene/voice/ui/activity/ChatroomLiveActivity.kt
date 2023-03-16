@@ -248,9 +248,15 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             override fun onReceiveSeatInvitation(message: ChatMessageData) {
                 super.onReceiveSeatInvitation(message)
                 "onReceiveSeatInvitation $message".logD(TAG)
-                ThreadManager.getInstance().runOnMainThread {
-                    roomObservableDelegate.receiveInviteSite(roomKitBean.roomId, -1)
+                if (message.customParams.containsKey("user")) {
+                    val voiceRoomInvite = GsonTools.toBean(message.customParams["user"], VoiceMemberModel::class.java)
+                    if (voiceRoomInvite != null) {
+                        ThreadManager.getInstance().runOnMainThread {
+                            roomObservableDelegate.receiveInviteSite(roomKitBean.roomId, voiceRoomInvite.micIndex)
+                        }
+                    }
                 }
+
             }
 
             override fun onReceiveSeatInvitationRejected(
@@ -475,7 +481,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
             override fun onClickSoundSocial(view: View) {
                 roomObservableDelegate.onClickSoundSocial(roomKitBean.soundEffect, finishBack = {
-                    finish()
+                    leaveRoom()
                 })
             }
 
@@ -486,7 +492,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 when (itemId) {
                     R.id.voice_extend_item_eq -> {
                         roomObservableDelegate.onAudioSettingsDialog(finishBack = {
-                            finish()
+                            leaveRoom()
                         })
                     }
                     R.id.voice_extend_item_mic -> {

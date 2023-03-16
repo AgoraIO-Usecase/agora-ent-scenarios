@@ -39,6 +39,13 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
 
     private var onFragmentListener: OnFragmentListener? = null
 
+    // 房主准备邀请的麦位
+    private var inviteMicIndex:Int = -1
+
+    fun setInviteMicIndex(inviteMicIndex: Int){
+        this.inviteMicIndex = inviteMicIndex
+    }
+
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceRoomHandLayoutBinding {
         return VoiceRoomHandLayoutBinding.inflate(inflater, container, false)
     }
@@ -157,6 +164,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
                     })
                 } else if (fragments[position] is ChatroomInviteHandsFragment) {
                     inviteHandsFragment = fragments[position] as ChatroomInviteHandsFragment?
+                    inviteHandsFragment?.setInviteMicIndex(inviteMicIndex)
                     inviteHandsFragment?.setFragmentListener(object : OnFragmentListener {
                         override fun getItemCount(count: Int) {
                             mCount = count
