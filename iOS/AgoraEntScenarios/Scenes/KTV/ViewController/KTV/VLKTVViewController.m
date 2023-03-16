@@ -600,8 +600,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)joinChorus {
-    //不是观众不允许加入
-    if ([self getUserSingRole] != KTVSingRoleAudience) {
+    if (![self getJoinChorusEnable]) {
         return;
     }
     
@@ -609,10 +608,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if ([self getCurrentUserSeatInfo] == nil) {
         for (int i = 1; i < self.seatsArray.count; i++) {
             VLRoomSeatModel* seat = self.seatsArray[i];
-            if (seat == nil) {
+            if (seat.rtcUid == 0) {
                 VL(weakSelf);
                 [self enterSeatWithIndex:i completion:^(NSError *error) {
-                    [weakSelf joinChorus];
+                    [weakSelf _joinChorus];
                 }];
                 return;
             }
@@ -620,9 +619,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         
         //TODO(chenpan):没有空麦位，show error
         [VLToast toast:@"麦位已满，请在他人下麦后重试"];
-        return;
     }
-    
+}
+
+- (void)_joinChorus {
     NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
     //先切role，保证preload等耗时操作结束才广播给其他人
     [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleCoSinger
@@ -644,8 +644,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                              completion:^(NSError * error) {
         }];
     }];
-    
-    
 }
 
 - (void)removeCurrentSongWithSync:(BOOL)sync
@@ -935,12 +933,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [self popSelMoreView];
             break;
         case VLKTVBottomBtnClickTypeJoinChorus:
-//            [self popUpChooseSongView:YES];
-#if DEBUG
-            [self joinChorus];
-#else
-#error remove it
-#endif
+            [self popUpChooseSongView:YES];
             break;
         case VLKTVBottomBtnClickTypeChoose:
             [self popUpChooseSongView:NO];
@@ -1293,6 +1286,21 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     return chorusNum;
 }
 
+- (BOOL)getJoinChorusEnable {
+    //不是观众不允许加入
+    if ([self getUserSingRole] != KTVSingRoleAudience) {
+        return NO;
+    }
+    
+    VLRoomSelSongModel* topSong = [[self selSongsArray] firstObject];
+    //TODO: 不在播放不允许加入
+    if (topSong.status != VLSongPlayStatusPlaying) {
+        return NO;
+    }
+    
+    return YES;
+}
+
 #pragma mark - setter
 - (void)setKtvApi:(KTVApiImpl *)ktvApi {
     _ktvApi = ktvApi;
@@ -1446,16 +1454,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
-- (void)setTrackMode:(KTVPlayerTrackMode)trackMode
-{
+- (void)setTrackMode:(KTVPlayerTrackMode)trackMode {
     KTVLogInfo(@"setTrackMode: %ld", trackMode);
     _trackMode = trackMode;
     [[self.ktvApi getMediaPlayer] selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1];
     
     [self.MVView setOriginBtnState: trackMode == KTVPlayerTrackModeOrigin ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc];
 }
-
-
 
 #pragma mark KTVApiEventHandlerDelegate
 - (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error isLocal:(BOOL)isLocal {
