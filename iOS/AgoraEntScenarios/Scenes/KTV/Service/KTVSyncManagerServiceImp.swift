@@ -444,7 +444,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         if inputModel.songNo == songList.first?.songNo {
             //把所有麦位合唱歌曲code清除（不清楚也可以，因为上层业务会判断topSong.songCode==seat.chorusSongCode来作为合唱的状态）
             seatMap.forEach { (key, seatInfo) in
-                seatInfo.chorusSongCode = nil
+                seatInfo.chorusSongCode = ""
                 _updateSeat(seatInfo: seatInfo) { error in
                 }
             }
@@ -469,7 +469,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     
     func coSingerLeaveChorus(completion: @escaping (Error?) -> Void) {
         //TODO: _markSeatToPlaying without callback
-        _markSeatChoursStatus(songCode: nil, completion: completion)
+        _markSeatChoursStatus(songCode: "", completion: completion)
     }
 
     func markSongDidPlay(withInput inputModel: VLRoomSelSongModel,
@@ -856,7 +856,7 @@ extension KTVSyncManagerServiceImp {
 // MARK: Seat operation
 
 extension KTVSyncManagerServiceImp {
-    private func _markSeatChoursStatus(songCode: String?, completion: @escaping (Error?)->()) {
+    private func _markSeatChoursStatus(songCode: String, completion: @escaping (Error?)->()) {
         guard let seatInfo = self.seatMap
             .filter({ $0.value.userNo == VLUserCenter.user.id })
             .first?.value else {
@@ -916,7 +916,7 @@ extension KTVSyncManagerServiceImp {
             /// 新增, 判断当前歌曲是否是自己点的
             seatInfo.isOwner = false
 
-            seatInfo.chorusSongCode = nil
+            seatInfo.chorusSongCode = ""
         }
         
 
