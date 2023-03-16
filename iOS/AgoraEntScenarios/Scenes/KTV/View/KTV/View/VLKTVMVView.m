@@ -237,13 +237,18 @@
     // 是主唱/伴唱
     switch (role) {
         case KTVSingRoleSoloSinger:
-        case KTVSingRoleLeadSinger:
+        case KTVSingRoleLeadSinger: {
             [self setPlayerViewsHidden:NO nextButtonHidden:NO playButtonHidden:NO];
-            break;
-        case KTVSingRoleCoSinger:
+            _joinChorusBtn.hidden = YES;
+            _leaveChorusBtn.hidden = YES;
+        } break;
+        case KTVSingRoleCoSinger: {
 //        case KTVSingRoleFollowSinger:
 //            [self setPlayerViewsHidden:NO nextButtonHidden:YES playButtonHidden:YES];
 //            break;
+            _joinChorusBtn.hidden = YES;
+            _leaveChorusBtn.hidden = NO;
+        } break;
         case KTVSingRoleAudience:
         default: {
             if(VLUserCenter.user.ifMaster) {
@@ -251,6 +256,9 @@
             } else {
                 [self setPlayerViewsHidden:YES nextButtonHidden:YES playButtonHidden:YES];
             }
+            
+            _joinChorusBtn.hidden = NO;
+            _leaveChorusBtn.hidden = YES;
         } break;
     }
 }
@@ -280,7 +288,7 @@
 }
 
 - (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song role:(KTVSingRole)role {
-    KTVLogInfo(@"VLKTVMVView updateUIWithSong: songName: %@, name: %@", song.songName, song.name);
+    KTVLogInfo(@"VLKTVMVView updateUIWithSong: songName: %@, name: %@, role: %ld", song.songName, song.name, role);
     self.idleView.hidden = song;
     self.karaokeView.lyricsView.draggable = role == KTVSingRoleSoloSinger;
     //config score label visibility

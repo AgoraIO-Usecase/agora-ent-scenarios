@@ -232,18 +232,13 @@ KTVMusicLoadStateListener
         } else if (status == KTVSubscribeDeleted) {
             // 下麦消息
             
-            // 被下麦用户刷新UI
-            if ([model.userNo isEqualToString:VLUserCenter.user.id]) {
-                //当前的座位用户离开RTC通道
-                VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
-                [weakSelf.MVView updateUIWithSong:song role:[weakSelf getUserSingRole]];
-//                [weakSelf resetChorusStatus:model.userNo];
-            }
-            
             // 下麦重置占位模型
             [model resetWithInfo:nil];
             [weakSelf setSeatsArray:weakSelf.seatsArray];
         }
+        
+        VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
+        [weakSelf.MVView updateUIWithSong:song role:[weakSelf getUserSingRole]];
         [weakSelf.roomPersonView reloadSeatIndex:model.seatIndex];
     }];
     
@@ -889,7 +884,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 -(void)didLeaveChours {
     //退出合唱
-    
+    [[AppContext ktvServiceImp] coSingerLeaveChorusWithCompletion:^(NSError * error) {
+    }];
 }
 
 #pragma mark -- VLKTVTopViewDelegate
