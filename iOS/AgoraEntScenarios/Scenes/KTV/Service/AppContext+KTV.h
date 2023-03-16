@@ -10,14 +10,9 @@
 @import AgoraRtcKit;
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AppContext (KTV)<AgoraMusicContentCenterEventDelegate, AgoraRtcMediaPlayerDelegate>
+@interface AppContext (KTV)
 
 @property (nonatomic, nullable) KTVApiImpl* ktvAPI;
-@property (nonatomic, nullable) id<AgoraRtcMediaPlayerDelegate> agoraRtcMediaPlayer;
-
-- (void)registerPlayerEventDelegate:(id<AgoraRtcMediaPlayerDelegate>)delegate;
-- (void)unregisterPlayerEventDelegate:(id<AgoraRtcMediaPlayerDelegate>)delegate;
-
 + (void)setupKtvConfig;
 
 /// get service imp instance,  thread unsafe

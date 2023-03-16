@@ -81,8 +81,6 @@ KTVMusicLoadStateListener
 @property (nonatomic, strong) VLPopSongList *chooseSongView; //点歌视图
 @property (nonatomic, strong) VLEffectView *effectView; // 音效视图
 
-@property (nonatomic, strong) id<AgoraMusicPlayerProtocol> rtcMediaPlayer;
-@property (nonatomic, strong) AgoraMusicContentCenter *AgoraMcc;
 @property (nonatomic, strong) VLSongItmModel *choosedSongModel; //点的歌曲
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
 
@@ -191,16 +189,9 @@ KTVMusicLoadStateListener
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-    [[AppContext shared] setKtvAPI:nil];
-    [AgoraMusicContentCenter destroy];
-    
-    [self.rtcMediaPlayer stop];
-    [[AppContext shared] setAgoraRtcMediaPlayer:nil];
-    [self.RTCkit destroyMediaPlayer:self.rtcMediaPlayer];
-    
     [AgoraRtcEngineKit destroy];
     KTVLogInfo(@"Agora - destroy RTCEngine");
-    
+    [self.ktvApi cleanCache];
     self.ktvApi = nil;
     
     [self.lyricCallbacks removeAllObjects];
@@ -495,7 +486,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                      type:AgoraTokenTypeRtm
                                                   success:^(NSString * token) {
         KTVLogInfo(@"tokenPrivilegeWillExpire rtm renewToken: %@", token);
-        [self.AgoraMcc renewToken:token];
+        //TODO(chenpan): mcc missing
+//        [self.AgoraMcc renewToken:token];
     }];
 }
 
@@ -806,7 +798,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                          streamId:ktvApiStreamId
                                                          localUid:[VLUserCenter.user.id integerValue]];
     self.ktvApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
-    [[AppContext shared] setKtvAPI:self.ktvApi];
     KTVLrcControl* lrcControl = [[KTVLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
     [self.ktvApi setLrcViewWithView:lrcControl];
     [self.ktvApi setMicStatusWithIsOnMicOpen:!self.isNowMicMuted];
@@ -844,7 +835,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [option setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     [option setAutoSubscribeAudio:YES];
     [option setAutoSubscribeVideo:YES];
-    [option setPublishMediaPlayerId:[self.rtcMediaPlayer getMediaPlayerId]];
+    [option setPublishMediaPlayerId:[[self.ktvApi getMediaPlayer] getMediaPlayerId]];
     [option setEnableAudioRecordingOrPlayout:YES];
     return option;
 }
@@ -1105,7 +1096,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)onKTVMView:(VLKTVMVView *)view lrcViewDidScrolled:(NSInteger)position {
-    [self.rtcMediaPlayer seekToPosition:position];
+    [[self.ktvApi getMediaPlayer] seekToPosition:position];
 }
 
 - (void)didSkipViewClick{
@@ -1131,7 +1122,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         // 调整当前播放的媒体资源的音调
         // 按半音音阶调整本地播放的音乐文件的音调，默认值为 0，即不调整音调。取值范围为 [-12,12]，每相邻两个值的音高距离相差半音。取值的绝对值越大，音调升高或降低得越多
         NSInteger value = setting.toneValue * 2 - 12;
-        [self.rtcMediaPlayer setAudioPitch:value];
+        [[self.ktvApi getMediaPlayer] setAudioPitch:value];
     } else if (type == VLKTVValueDidChangedTypeSound) { // 音量
         // 调节音频采集信号音量、取值范围为 [0,400]
         // 0、静音 100、默认原始音量 400、原始音量的4倍、自带溢出保护
@@ -1293,6 +1284,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark - setter
+- (void)setKtvApi:(KTVApiImpl *)ktvApi {
+    _ktvApi = ktvApi;
+    [[AppContext shared] setKtvAPI:ktvApi];
+}
+
 - (void)setRoomUsersCount:(NSUInteger)userCount {
     self.roomModel.roomPeopleNum = [NSString stringWithFormat:@"%ld", userCount];
     self.topView.listModel = self.roomModel;
