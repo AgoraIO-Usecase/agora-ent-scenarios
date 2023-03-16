@@ -35,6 +35,10 @@ typedef enum : NSUInteger {
 
 -(void)didSkipViewClick;
 
+-(void)didJoinChours;
+
+-(void)didLeaveChours;
+
 @end
 
 @interface VLKTVMVView : UIView

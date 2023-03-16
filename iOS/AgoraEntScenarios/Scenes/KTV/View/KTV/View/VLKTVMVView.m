@@ -38,6 +38,8 @@
 
 @property (nonatomic, assign) BOOL isPlayAccompany;
 @property (nonatomic, strong) KTVSkipView *skipView;
+@property (nonatomic, strong) UIButton *joinChorusBtn;
+@property (nonatomic, strong) UIButton *leaveChorusBtn;
 @end
 
 @implementation VLKTVMVView
@@ -139,6 +141,19 @@
         make.height.equalTo(@(34));
     }];
     self.skipView.hidden = true;
+    
+    self.joinChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(self.width / 2.0 - 56, self.height - 44, 112, 34)];
+    [self.joinChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_join_chorus"] forState:UIControlStateNormal];
+    [self.joinChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_join_chorus_loading"] forState:UIControlStateSelected];
+    _joinChorusBtn.layer.cornerRadius = 17;
+    _joinChorusBtn.layer.masksToBounds = true;
+    [self.joinChorusBtn addTarget:self action:@selector(joinChorus) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:_joinChorusBtn];
+    
+    self.leaveChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(20, self.height - 44, 40, 34)];
+    [self.leaveChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_leave_chorus"] forState:UIControlStateNormal];
+    [self.leaveChorusBtn addTarget:self action:@selector(leaveChorus) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:self.leaveChorusBtn];
 }
 
 - (void)_refreshOriginButton {
@@ -158,6 +173,20 @@
 
 -(void)showSkipView:(bool)flag{
     self.skipView.hidden = !flag;
+}
+
+-(void)joinChorus{
+    //加入合唱
+    if([self.delegate respondsToSelector:@selector(didJoinChours)]) {
+        [self.delegate didJoinChours];
+    }
+}
+
+-(void)leaveChorus{
+    //离开合唱
+    if([self.delegate respondsToSelector:@selector(didJoinChours)]) {
+        [self.delegate didLeaveChours];
+    }
 }
 
 #pragma mark - public
