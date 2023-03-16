@@ -761,7 +761,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
 //    [self.RTCkit setParameters: @"{\"che.audio.enable.md \": false}"];
     /// 开启唱歌评分功能
-    int code = [self.RTCkit enableAudioVolumeIndication:250 smooth:3 reportVad:YES];
+    int code = [self.RTCkit enableAudioVolumeIndication:20 smooth:3 reportVad:YES];
     if (code == 0) {
         KTVLogInfo(@"评分回调开启成功\n");
     } else {
@@ -1455,7 +1455,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)setSingRole:(KTVSingRole)singRole {
     _singRole = singRole;
-    self.lrcControl.lrcView.scoringEnabled = singRole == KTVSingRoleSoloSinger;
+    self.lrcControl.lrcView.lyricsView.draggable = singRole == KTVSingRoleSoloSinger;
     KTVLogInfo(@"setSingRole: %ld", singRole);
 }
 

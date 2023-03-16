@@ -276,7 +276,7 @@
 - (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song role:(KTVSingRole)role {
     KTVLogInfo(@"VLKTVMVView updateUIWithSong: songName: %@, name: %@, role: %ld", song.songName, song.name, role);
     self.idleView.hidden = song;
-    self.karaokeView.lyricsView.draggable = role == KTVSingRoleSoloSinger;
+   // self.karaokeView.lyricsView.draggable = role == KTVSingRoleSoloSinger;
     //config score label visibility
 //    self.config.isHiddenScoreView = NO;
 //    [self.lrcView setConfig:self.config];
