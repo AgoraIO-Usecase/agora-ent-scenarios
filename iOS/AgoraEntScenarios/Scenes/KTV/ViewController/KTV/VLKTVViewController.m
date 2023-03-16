@@ -1338,9 +1338,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)setIsOnMicSeat:(BOOL)isOnMicSeat {
+    BOOL onMicSeatStatusDidChanged = _isOnMicSeat != isOnMicSeat;
     _isOnMicSeat = isOnMicSeat;
     
-    BOOL onMicSeatStatusDidChanged = _isOnMicSeat != isOnMicSeat;
     if (onMicSeatStatusDidChanged) {
         if (!isOnMicSeat) {
             [self stopPlaySong];
