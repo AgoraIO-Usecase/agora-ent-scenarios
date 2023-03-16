@@ -801,6 +801,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.ktvApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
     KTVLrcControl* lrcControl = [[KTVLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
     [self.ktvApi setLrcViewWithView:lrcControl];
+    lrcControl.skipCallBack = ^(NSInteger time) {
+        [self.ktvApi seekSingWithTime:time];
+    };
     [self.ktvApi setMicStatusWithIsOnMicOpen:!self.isNowMicMuted];
     [self.ktvApi addEventHandlerWithKtvApiEventHandler:self];
 //    VL(weakSelf);
