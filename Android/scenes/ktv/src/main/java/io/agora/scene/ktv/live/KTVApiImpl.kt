@@ -12,6 +12,7 @@ import io.agora.musiccontentcenter.*
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
 import io.agora.rtc2.audio.AudioParams
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.ktv.widget.lrcView.LrcControlView
 import org.json.JSONException
 import org.json.JSONObject
@@ -587,6 +588,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             success.invoke(true)
         } else {
             Log.e(TAG, "sendStreamMessageWithJsonObject failed: $ret")
+            ToastUtils.showToast("消息没发出去啊: $ret")
         }
     }
 
@@ -813,6 +815,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val duration = jsonMsg.getLong("duration")
                 val remoteNtp = jsonMsg.getLong("ntp")
                 val pitch = jsonMsg.getDouble("pitch")
+                val songCode = jsonMsg.getLong("songCode")
 
                 if (isChorusCoSinger()) {
                     // 本地BGM校准逻辑
@@ -841,9 +844,15 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     }
                 } else {
                     // 独唱观众
-                    mLastReceivedPlayPosTime = System.currentTimeMillis()
-                    mReceivedPlayPosition = position
-                    this.pitch = pitch
+                    if (this.songCode == songCode) {
+                        mLastReceivedPlayPosTime = System.currentTimeMillis()
+                        mReceivedPlayPosition = position
+                        this.pitch = pitch
+                    } else {
+                        mLastReceivedPlayPosTime = null
+                        mReceivedPlayPosition = 0
+                        this.pitch = 0.0
+                    }
                 }
             } else if (jsonMsg.getString("cmd") == "Seek") {
                 // 伴唱收到原唱seek指令
@@ -898,6 +907,20 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         }
                 }
             }
+        }
+
+        if ((this.singerRole == KTVSingRole.SoloSinger || this.singerRole == KTVSingRole.LeadSinger) && localPlayerPosition > audioPlayoutDelay) {
+            val msg: MutableMap<String?, Any?> = HashMap()
+            msg["cmd"] = "setLrcTime"
+            msg["ntp"] = getNtpTimeInMs()
+            msg["duration"] = duration
+            msg["time"] =
+                localPlayerPosition + System.currentTimeMillis() - localPlayerSystemTime - audioPlayoutDelay // "position-audioDeviceDelay" 是计算出当前播放的真实进度
+            msg["playerState"] = Constants.MediaPlayerState.getValue(mPlayer.state)
+            msg["pitch"] = pitch
+            msg["songCode"] = songCode
+            val jsonMsg = JSONObject(msg)
+            sendStreamMessageWithJsonObject(jsonMsg) {}
         }
     }
 
@@ -1011,19 +1034,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     override fun onPositionChanged(position_ms: Long) {
         localPlayerPosition = position_ms
         localPlayerSystemTime = System.currentTimeMillis()
-
-        if ((this.singerRole == KTVSingRole.SoloSinger || this.singerRole == KTVSingRole.LeadSinger) && position_ms > audioPlayoutDelay) {
-            val msg: MutableMap<String?, Any?> = HashMap()
-            msg["cmd"] = "setLrcTime"
-            msg["ntp"] = getNtpTimeInMs()
-            msg["duration"] = duration
-            msg["time"] =
-                position_ms - audioPlayoutDelay // "position-audioDeviceDelay" 是计算出当前播放的真实进度
-            msg["playerState"] = Constants.MediaPlayerState.getValue(mPlayer.state)
-            msg["pitch"] = pitch
-            val jsonMsg = JSONObject(msg)
-            sendStreamMessageWithJsonObject(jsonMsg) {}
-        }
 
         if (this.singerRole != KTVSingRole.Audience) {
             mLastReceivedPlayPosTime = System.currentTimeMillis()

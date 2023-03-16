@@ -11,17 +11,32 @@
     <TextView
         android:id="@+id/downloadLrcFailedView"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="40dp"
         android:layout_marginTop="70dp"
-        android:text="下载歌词失败， 点击重试"
+        android:text="歌词加载失败"
         android:textColor="@color/white"
         android:gravity="center"
         android:textSize="20dp"
-        android:visibility="invisible"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/bgd_control_layout_lrc"/>
+
+
+    <TextView
+        android:id="@+id/downloadLrcFailedBtn"
+        android:layout_width="80dp"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:text="点击重试"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:background="@drawable/ktv_skip_btn_bg"
+        app:layout_constraintTop_toBottomOf="@id/downloadLrcFailedView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
 
     <io.agora.karaoke_view.v11.ScoringView
         android:id="@+id/scoringView"
