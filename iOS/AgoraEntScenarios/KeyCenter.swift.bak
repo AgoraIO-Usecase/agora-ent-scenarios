@@ -55,9 +55,8 @@ struct KeyCenter {
     static var IMClientId: String? = "YXA6tczxcixPTCqT1sN1hSBU1g"
     static var IMClientSecret: String? = "YXA6-wvmWSubEWga1En1YdxdrL1ktKY"
     
-    static var HostUrl: String = "https://gateway-fulldemo-staging.agoralab.co"
+    static var HostUrl: String = "https://gateway-fulldemo.agoralab.co"
     
-    static var baseServerUrl4Test: String? = "https://test-toolbox.bj2.agoralab.co/v1/"
     static var baseServerUrl: String? = "https://toolbox.bj2.agoralab.co/v1/"
     static var onlineBaseServerUrl: String? = baseServerUrl
 }
