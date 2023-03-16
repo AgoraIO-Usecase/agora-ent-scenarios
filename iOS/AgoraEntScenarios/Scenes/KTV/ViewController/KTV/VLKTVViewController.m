@@ -531,7 +531,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VL(weakSelf);
     NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
     if (role == KTVSingRoleAudience) {
-        [self.ktvApi loadMusicWithConfig:songConfig
+        [self.ktvApi loadMusicWithConfig:songConfig mode: KTVLoadMusicModeLoadMusicAndLrc
                 onMusicLoadStateListener:self];
     } else {
         [self.ktvApi switchSingerRoleWithNewRole:role
@@ -543,7 +543,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 return;
             }
             
-            [weakSelf.ktvApi loadMusicWithConfig:songConfig
+            [weakSelf.ktvApi loadMusicWithConfig:songConfig mode: KTVLoadMusicModeLoadMusicAndLrc
                         onMusicLoadStateListener:weakSelf];
         }];
     }
@@ -936,6 +936,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
+- (void)didJoinChours {
+    //加入合唱
+    [self joinChorus];
+}
+
+-(void)didLeaveChours {
+    //退出合唱
+    
+}
+
 #pragma mark -- VLKTVTopViewDelegate
 - (void)onVLKTVTopView:(VLKTVTopView *)view closeBtnTapped:(id)sender {
     VL(weakSelf);
@@ -979,7 +989,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //            [self popSelMVBgView];
             [self popSelMoreView];
             break;
-        case VLKTVBottomBtnClickTypeChorus:
+        case VLKTVBottomBtnClickTypeJoinChorus:
 //            [self popUpChooseSongView:YES];
 #if DEBUG
             [self joinChorus];

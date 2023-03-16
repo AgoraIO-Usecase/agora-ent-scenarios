@@ -25,6 +25,13 @@ import AgoraRtcKit
 }
 
 /// 加载歌曲失败原因
+@objc public enum KTVLoadMusicMode: Int {
+    case loadMusicOnly
+    case loadLrcOnly
+    case loadMusicAndLrc
+}
+
+/// 加载歌曲失败原因
 @objc public enum KTVLoadSongFailReason: Int {
     case noLyricUrl = 0         //无歌词
     case musicPreloadFail   //歌曲预加载失败
@@ -214,7 +221,7 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     /// - Parameters:
     ///   - config: <#config description#>
     ///   - onMusicLoadStateListener: <#onMusicLoadStateListener description#>
-    func loadMusic(config: KTVSongConfiguration, onMusicLoadStateListener: KTVMusicLoadStateListener)
+    func loadMusic(config: KTVSongConfiguration, mode: KTVLoadMusicMode, onMusicLoadStateListener: KTVMusicLoadStateListener)
     
     
     /// 切换角色
