@@ -45,9 +45,10 @@ extension KTVLrcControl: KTVLrcViewDelegate {
     
     func onUpdateProgress(progress: Int) {
         lrcView.setProgress(progress: progress)
-        
+        if progress > (lyricModel?.duration ?? 0) {return}
+        print("fuck progress: \(progress)")
         if !isMainSinger {return}
-        if progress == 0 {
+        if progress > 10 && progress < 40 {
             skipBtn.isHidden = false
             hasShowEndPosition = false
             hasShowPreludeEndPosition = false

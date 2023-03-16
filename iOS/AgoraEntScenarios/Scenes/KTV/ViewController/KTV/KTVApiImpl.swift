@@ -1037,7 +1037,7 @@ extension KTVApiImpl {
         sendStreamMessageWithDict(dict, success: nil)
     }
     
-    private func setProgress(with pos: NSInteger) {
+    private func setProgress(with pos: Int) {
         lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
         lrcControl?.onUpdateProgress(progress: pos)
     }
@@ -1068,7 +1068,9 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         agoraPrint("loadSong play status: \(state.rawValue) \(songConfig?.songCode ?? 0)")
 
         if state == .openCompleted {
-            self.localPlayerPosition = Date().milListamp
+            if singerRole == .soloSinger || singerRole == .leadSinger {
+                self.localPlayerPosition = Date().milListamp
+            }
             self.playerDuration = 0
             if isMainSinger() { //主唱播放，通过同步消息“setLrcTime”通知伴唱play
                 playerKit.play()
