@@ -286,6 +286,9 @@
         NSString *songText = [NSString stringWithFormat:@"%@-%@",song.songName,song.singer];
         self.musicTitleLabel.text = songText;
         [self configPlayerControls:song role:role];
+    } else {
+        _joinChorusBtn.hidden = YES;
+        _leaveChorusBtn.hidden = YES;
     }
 }
 
