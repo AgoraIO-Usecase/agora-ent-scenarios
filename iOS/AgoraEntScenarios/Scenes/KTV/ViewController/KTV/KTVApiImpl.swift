@@ -825,8 +825,14 @@ extension KTVApiImpl {
                 let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
                 if (self.playerState != state) {
                     agoraPrint("recv state with setLrcTime : \(state.rawValue)")
+                    
+                    if state == .playing && self.playerState == .openCompleted {
+                        musicPlayer.seek(toPosition: Int(position))
+                    }
+                    
                     self.playerState = state
                     updateCosingerPlayerStatusIfNeed()
+                    
                     getEventHander { delegate in
                         delegate.onMusicPlayerStateChanged(state: state, error: .none, isLocal: false)
                     }
@@ -1065,9 +1071,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         agoraPrint("loadSong play status: \(state.rawValue) \(songConfig?.songCode ?? 0)")
 
         if state == .openCompleted {
-            if singerRole == .soloSinger || singerRole == .leadSinger {
-                self.localPlayerPosition = Date().milListamp
-            }
+            self.localPlayerPosition = Date().milListamp
             self.playerDuration = TimeInterval(musicPlayer.getDuration())
             if isMainSinger() { //主唱播放，通过同步消息“setLrcTime”通知伴唱play
                 playerKit.play()
