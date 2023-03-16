@@ -293,6 +293,7 @@
 - (void)reset {
     [_karaokeView reset];
     [_gradeView reset];
+    self.isPlayAccompany = YES;
 }
 
 #pragma mark - AgoraKaraokeScoreDelegate
