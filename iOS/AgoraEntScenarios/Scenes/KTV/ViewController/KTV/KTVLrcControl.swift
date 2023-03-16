@@ -52,10 +52,14 @@ extension KTVLrcControl: KTVLrcViewDelegate {
             hasShowEndPosition = false
             hasShowPreludeEndPosition = false
         }
-        if (lyricModel?.preludeEndPosition ?? 0) - 500 < progress && hasShowPreludeEndPosition == false {
+        
+        let preludeEndPosition: Int = (lyricModel?.preludeEndPosition ?? 0) - 500
+        let duration: Int = (lyricModel?.duration ?? 0) - 500
+        
+        if (preludeEndPosition < progress && hasShowPreludeEndPosition == false) {
             skipBtn.isHidden = true
             hasShowPreludeEndPosition = true
-        } else if (lyricModel?.duration ?? 0) - 500 < progress && hasShowEndPosition == false {
+        } else if (duration < progress && hasShowEndPosition == false) {
             skipBtn.isHidden = false
             hasShowEndPosition = true
         }
