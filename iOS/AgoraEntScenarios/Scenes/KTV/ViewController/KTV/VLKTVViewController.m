@@ -218,7 +218,6 @@ KTVMusicLoadStateListener
     }];
     
     [[AppContext ktvServiceImp] subscribeSeatListChangedWithBlock:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
-        
         VLRoomSeatModel* model = [self getUserSeatInfoWithIndex:seatModel.seatIndex];
         if (model == nil) {
             NSAssert(false, @"model == nil");
@@ -1444,6 +1443,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVLogInfo(@"setSelSongsArray orig top: songName: %@, status: %ld",
                originalTopSong.songName, originalTopSong.status);
     if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
+        [self.MVView reset];
         //song changes
         [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
                                            token:@""
@@ -1473,7 +1473,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         } else if(state == AgoraMediaPlayerStatePaused) {
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
         } else if(state == AgoraMediaPlayerStateStopped) {
-            [self.MVView reset];
+//            [self.MVView reset];
             if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
                 [self.MVView showSkipView:false];
             }
