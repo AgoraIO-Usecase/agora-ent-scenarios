@@ -640,7 +640,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                        token:exChannelToken
                            onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
         
-        if (state == KTVSwitchRoleStateFail) {
+        if (state == KTVSwitchRoleStateFail && reason != KTVSwitchRoleFailReasonNoPermission) {
             [VLToast toast:[NSString stringWithFormat:@"join chorus fail: %ld", reason]];
             //TODO: error toast?
             return;
