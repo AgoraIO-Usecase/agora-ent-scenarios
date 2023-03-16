@@ -32,9 +32,6 @@ typedef enum : NSUInteger {
 /// @param score 分数
 - (void)onKTVMVView:(VLKTVMVView*)view scoreDidUpdate:(int)score;
 
-
--(void)didSkipViewClick;
-
 -(void)didJoinChours;
 
 -(void)didLeaveChours;
@@ -86,11 +83,6 @@ typedef enum : NSUInteger {
 - (void)reset;
 ///滚动到指定位置
 //- (void)scrollToTime:(NSTimeInterval)time;
-
-#pragma mark - 前奏尾奏相关
--(void)setSkipType:(SkipType)type;
-
--(void)showSkipView:(bool)flag;
 
 @end
 

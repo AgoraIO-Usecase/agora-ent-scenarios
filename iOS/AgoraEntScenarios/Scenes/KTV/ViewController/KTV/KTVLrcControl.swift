@@ -11,11 +11,11 @@ import AgoraLyricsScore
 @objc class KTVLrcControl: NSObject {
     private var lrcView: KaraokeView
     private var skipBtn: KTVSkipView!
-    public var isMainSinger: Bool = false //是否为主唱
+    @objc public var isMainSinger: Bool = false //是否为主唱
     private var lyricModel: LyricModel?
     private var hasShowPreludeEndPosition = false
     private var hasShowEndPosition = false
-    public var skipCallBack: ((Int) -> Void)?
+    @objc public var skipCallBack: ((Int) -> Void)?
     private var progress: Int = 0
     
     @objc init(lrcView: KaraokeView) {
@@ -27,7 +27,7 @@ import AgoraLyricsScore
                 self.skipBtn.isHidden = true
                 guard let duration = self.lyricModel?.duration else {return}
                 guard let preludeEndPosition = self.lyricModel?.preludeEndPosition else {return}
-                var pos: Int = self.progress >= duration  ? duration - 500 : preludeEndPosition - 500
+                let pos: Int = self.progress >= duration  ? duration - 500 : preludeEndPosition - 500
                 self.skipCallBack?(pos)
             }
         })

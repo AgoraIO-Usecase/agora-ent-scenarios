@@ -799,8 +799,8 @@ extension KTVApiImpl {
     @objc public func didKTVAPIReceiveStreamMessageFrom( uid: NSInteger, streamId: NSInteger, data: Data){
         let songCode: Int = songConfig?.songCode ?? 0
         let role = singerRole
-        guard let state: KTVLoadSongState = loadDict[String(songCode)] else {return}
-        if state != .ok {return}
+//        guard let state: KTVLoadSongState = loadDict[String(songCode)] else {return}
+//        if state != .ok {return}
 
         guard let dict = dataToDictionary(data: data) else {return}
         if isMainSinger() {return}
