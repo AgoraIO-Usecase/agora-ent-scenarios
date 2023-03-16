@@ -168,6 +168,7 @@ interface KTVServiceProtocol {
      * 加入合唱
      */
     fun joinChorus(
+        songCode: String,
         completion: (error: Exception?) -> Unit
     )
 

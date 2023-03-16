@@ -87,106 +87,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         return mKaraokeView;
     }
 
-    @Override
-    public void onUpdatePitch(Float pitch) {
-        if (mKaraokeView == null) return;
-        mKaraokeView.setPitch(pitch);
-    }
-
-    public int retryTime = 0;
-    @Override
-    public void onUpdateProgress(Long progress) {
-        if (mKaraokeView.getLyricsData() == null) return;
-        if (mRole == Role.Singer) {
-            if (progress >= mKaraokeView.getLyricsData().startOfVerse) {
-                mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);
-            }
-
-            if (progress >= mKaraokeView.getLyricsData().duration) {
-                mBinding.ilActive.ivSkipPostlude.setVisibility(VISIBLE);
-            } else {
-                mBinding.ilActive.ivSkipPostlude.setVisibility(INVISIBLE);
-            }
-        }
-        mKaraokeView.setProgress(progress);
-    }
-
-    private String lrcUrl;
-    @Override
-    public void onDownloadLrcData(String url) {
-        this.lrcUrl = url;
-        downloadAndSetLrcData();
-    }
-
-    private void downloadAndSetLrcData() {
-        DownloadUtils.getInstance().download(getContext(), lrcUrl, file -> {
-            if (file.getName().endsWith(".zip")) {
-                ZipUtils.unzipOnlyPlainXmlFilesAsync(file.getAbsolutePath(),
-                        file.getAbsolutePath().replace(".zip", ""),
-                        new ZipUtils.UnZipCallback() {
-                            @Override
-                            public void onFileUnZipped(List<String> unZipFilePaths) {
-                                String xmlPath = "";
-                                for (String path : unZipFilePaths) {
-                                    if (path.endsWith(".xml")) {
-                                        xmlPath = path;
-                                        break;
-                                    }
-                                }
-
-                                if (TextUtils.isEmpty(xmlPath)) {
-                                    ToastUtils.showToast("The xml file not exist!");
-                                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
-                                    return;
-                                }
-
-                                File xmlFile = new File(xmlPath);
-                                LyricsModel lyricsModel = KaraokeView.parseLyricsData(xmlFile);
-
-                                if (lyricsModel == null) {
-                                    ToastUtils.showToast("Unexpected content from " + xmlPath);
-                                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
-                                    return;
-                                }
-
-                                if (mKaraokeView != null) {
-                                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
-                                    mKaraokeView.setLyricsData(lyricsModel);
-                                }
-
-                                retryTime = 0;
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
-                                ToastUtils.showToast(e.getMessage());
-                            }
-                        });
-            } else {
-                LyricsModel lyricsModel = KaraokeView.parseLyricsData(file);
-
-                if (lyricsModel == null) {
-                    ToastUtils.showToast("Unexpected content from " + file);
-                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
-                    return;
-                }
-
-                if (mKaraokeView != null) {
-                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
-                    mKaraokeView.setLyricsData(lyricsModel);
-                }
-
-                retryTime = 0;
-            }
-        }, exception -> {
-            ToastUtils.showToast(exception.getMessage());
-            mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
-        });
-    }
-
     public enum Role {
-        Singer, Listener
+        Singer, Listener, CoSinger
     }
 
     private Role mRole = Role.Listener;
@@ -268,6 +170,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public void onSelfJoinedChorus() {
+        this.mRole = Role.CoSinger;
         mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
         mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
         mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
@@ -282,10 +185,24 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public void onSelfLeavedChorus() {
+        this.mRole = Role.Listener;
+        mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
         mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
         mBinding.ilActive.ivMusicMenu.setVisibility(View.INVISIBLE);
         mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.VISIBLE);
         mBinding.ilActive.ivLeaveChorus.setVisibility(View.INVISIBLE);
+    }
+
+    private boolean isSeatFull = false;
+    public void onSeatFull(boolean isFull) {
+        this.isSeatFull = isFull;
+        if (!isOnSeat && this.mRole == Role.Listener) {
+            mBinding.ilActive.ivJoinChorusBtn.setVisibility(isFull ? View.INVISIBLE : View.VISIBLE);
+        }
+    }
+    private boolean isOnSeat = false;
+    public void onSeat(boolean isOnSeat) {
+        this.isOnSeat = isOnSeat;
     }
 
     private boolean isMineOwner = false;
@@ -330,7 +247,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         } else if (this.mRole == Role.Listener) {
             mBinding.ilActive.lyricsView.enableDragging(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
-            mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.VISIBLE);
+            if (!isSeatFull || isOnSeat) {
+                mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.VISIBLE);
+            }
             mBinding.ilActive.ivLeaveChorus.setVisibility(View.INVISIBLE);
         }
         if (isMineOwner) {
@@ -382,6 +301,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     public void setRole(@NonNull Role mRole) {
         this.mRole = mRole;
+        lrcUrl = null;
         changeViewByRole();
     }
 
@@ -642,12 +562,115 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mOnKaraokeActionListener.onLeaveChorus();
         } else if (v == mBinding.ilActive.downloadLrcFailedView) {
             mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
-            downloadAndSetLrcData();
+            if (lrcUrl == null) {
+                mOnKaraokeActionListener.onReGetLrcUrl();
+            } else {
+                downloadAndSetLrcData();
+            }
         }
     }
 
     public void setSwitchOriginalChecked(boolean checked) {
         mBinding.ilActive.switchOriginal.setChecked(checked);
+    }
+
+    // ------------------ ILrcView ------------------
+    @Override
+    public void onUpdatePitch(Float pitch) {
+        if (mKaraokeView == null) return;
+        mKaraokeView.setPitch(pitch);
+    }
+
+    @Override
+    public void onUpdateProgress(Long progress) {
+        if (mKaraokeView.getLyricsData() == null) return;
+        if (mRole == Role.Singer) {
+            if (progress >= mKaraokeView.getLyricsData().startOfVerse) {
+                mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);
+            }
+
+            if (progress >= mKaraokeView.getLyricsData().duration) {
+                mBinding.ilActive.ivSkipPostlude.setVisibility(VISIBLE);
+            } else {
+                mBinding.ilActive.ivSkipPostlude.setVisibility(INVISIBLE);
+            }
+        }
+        mKaraokeView.setProgress(progress);
+    }
+
+    private String lrcUrl;
+    @Override
+    public void onDownloadLrcData(String url) {
+        this.lrcUrl = url;
+        downloadAndSetLrcData();
+    }
+
+    private void downloadAndSetLrcData() {
+        DownloadUtils.getInstance().download(getContext(), lrcUrl, file -> {
+            if (file.getName().endsWith(".zip")) {
+                ZipUtils.unzipOnlyPlainXmlFilesAsync(file.getAbsolutePath(),
+                        file.getAbsolutePath().replace(".zip", ""),
+                        new ZipUtils.UnZipCallback() {
+                            @Override
+                            public void onFileUnZipped(List<String> unZipFilePaths) {
+                                String xmlPath = "";
+                                for (String path : unZipFilePaths) {
+                                    if (path.endsWith(".xml")) {
+                                        xmlPath = path;
+                                        break;
+                                    }
+                                }
+
+                                if (TextUtils.isEmpty(xmlPath)) {
+                                    ToastUtils.showToast("The xml file not exist!");
+                                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+                                    return;
+                                }
+
+                                File xmlFile = new File(xmlPath);
+                                LyricsModel lyricsModel = KaraokeView.parseLyricsData(xmlFile);
+
+                                if (lyricsModel == null) {
+                                    ToastUtils.showToast("Unexpected content from " + xmlPath);
+                                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+                                    return;
+                                }
+
+                                if (mKaraokeView != null) {
+                                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
+                                    mKaraokeView.setLyricsData(lyricsModel);
+                                }
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+                                ToastUtils.showToast(e.getMessage());
+                            }
+                        });
+            } else {
+                LyricsModel lyricsModel = KaraokeView.parseLyricsData(file);
+
+                if (lyricsModel == null) {
+                    ToastUtils.showToast("Unexpected content from " + file);
+                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+                    return;
+                }
+
+                if (mKaraokeView != null) {
+                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
+                    mKaraokeView.setLyricsData(lyricsModel);
+                }
+            }
+        }, exception -> {
+            ToastUtils.showToast(exception.getMessage());
+            mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+        });
+    }
+
+    public void onNoLrc() {
+        lrcUrl = null;
+        mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
     }
 
     public interface OnKaraokeEventListener {
@@ -685,6 +708,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         }
 
         default void onSkipPostludeClick() {
+        }
+
+        default void onReGetLrcUrl() {
         }
     }
 }
