@@ -810,6 +810,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVLrcControl* lrcControl = [[KTVLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
     [self.ktvApi setLrcViewWithView:lrcControl];
     [self.ktvApi setMicStatusWithIsOnMicOpen:!self.isNowMicMuted];
+    [self.ktvApi addEventHandlerWithKtvApiEventHandler:self];
 //    VL(weakSelf);
     KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
     int ret =
@@ -827,6 +828,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)leaveRTCChannel {
+    [self.ktvApi removeEventHandlerWithKtvApiEventHandler:self];
     [self.RTCkit leaveChannel:^(AgoraChannelStats * _Nonnull stat) {
         KTVLogInfo(@"Agora - Leave RTC channel");
     }];
