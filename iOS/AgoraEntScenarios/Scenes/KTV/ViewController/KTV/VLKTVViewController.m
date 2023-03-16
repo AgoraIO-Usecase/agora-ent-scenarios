@@ -861,42 +861,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     };
 }
 
-#pragma mark - KTVSoloController
-- (void)controller:(KTVApiImpl *)controller song:(NSInteger)songCode didChangedToState:(AgoraMediaPlayerState)state local:(BOOL)local
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if(state == AgoraMediaPlayerStatePlaying) {
-            if(local) {
-                //track has to be selected after loaded
-                [[self.ktvApi getMediaPlayer] selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1];
-            }
-            [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
-        } else if(state == AgoraMediaPlayerStatePaused) {
-            [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
-        } else if(state == AgoraMediaPlayerStateStopped) {
-            [self.MVView reset];
-            if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
-                [self.MVView showSkipView:false];
-            }
-        } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
-            if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
-                [self.MVView showSkipView:false];
-            }
-            if(local) {
-                KTVLogInfo(@"Playback all loop completed");
-//                VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
-                if([self isCurrentSongMainSinger:VLUserCenter.user.id]) {
-                    //将房主实时的分数共享给所有人
-                    //TODO(chenpan): score!
-//                    [self syncChoruScore:[self.ktvApi getAvgSongScore]];
-//                    [self showScoreViewWithScore: [self.ktvApi getAvgSongScore]];
-                }
-                [self removeCurrentSongWithSync:YES];
-            }
-        }
-    });
-}
-
 #pragma mark -- VLKTVAPIDelegate
 - (void)didlrcViewDidScrolledWithCumulativeScore:(NSInteger)score totalScore:(NSInteger)totalScore{
     [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
@@ -1475,8 +1439,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)setTrackMode:(KTVPlayerTrackMode)trackMode
 {
+    KTVLogInfo(@"setTrackMode: %ld", trackMode);
     _trackMode = trackMode;
-//    [self.ktvApi selectTrackMode:trackMode];
+    [[self.ktvApi getMediaPlayer] selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1];
     
     [self.MVView setOriginBtnState: trackMode == KTVPlayerTrackModeOrigin ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc];
 }
@@ -1485,7 +1450,37 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 #pragma mark KTVApiEventHandlerDelegate
 - (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error isLocal:(BOOL)isLocal {
-    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if(state == AgoraMediaPlayerStatePlaying) {
+            if(isLocal) {
+                //track has to be selected after loaded
+                self.trackMode = self.trackMode;
+            }
+            [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
+        } else if(state == AgoraMediaPlayerStatePaused) {
+            [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
+        } else if(state == AgoraMediaPlayerStateStopped) {
+            [self.MVView reset];
+            if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
+                [self.MVView showSkipView:false];
+            }
+        } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
+            if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
+                [self.MVView showSkipView:false];
+            }
+            if(isLocal) {
+                KTVLogInfo(@"Playback all loop completed");
+//                VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
+                if([self isCurrentSongMainSinger:VLUserCenter.user.id]) {
+                    //将房主实时的分数共享给所有人
+                    //TODO(chenpan): score!
+//                    [self syncChoruScore:[self.ktvApi getAvgSongScore]];
+//                    [self showScoreViewWithScore: [self.ktvApi getAvgSongScore]];
+                }
+                [self removeCurrentSongWithSync:YES];
+            }
+        }
+    });
 }
 
 - (void)onSingerRoleChangedWithOldRole:(enum KTVSingRole)oldRole newRole:(enum KTVSingRole)newRole { 
