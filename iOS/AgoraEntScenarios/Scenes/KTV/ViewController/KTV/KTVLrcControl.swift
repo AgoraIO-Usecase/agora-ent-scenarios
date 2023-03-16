@@ -48,7 +48,7 @@ extension KTVLrcControl: KTVLrcViewDelegate {
         if progress > (lyricModel?.duration ?? 0) {return}
         print("fuck progress: \(progress)")
         if !isMainSinger {return}
-        if progress > 10 && progress < 40 {
+        if progress > 10 && progress < 100 {
             skipBtn.isHidden = false
             hasShowEndPosition = false
             hasShowPreludeEndPosition = false

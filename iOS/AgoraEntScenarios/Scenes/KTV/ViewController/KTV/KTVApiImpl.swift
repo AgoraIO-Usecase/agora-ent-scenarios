@@ -75,7 +75,7 @@ class KTVApiImpl: NSObject{
     public var remoteVolume: Int = 15
     private var joinChorusNewRole: KTVSingRole = .audience
     private var loadMusicState: KTVLoadSongFailReason = .none
-    
+    private var oldPitch: Double = 0
     deinit {
         mcc.register(nil)
         agoraPrint("deinit KTVApiImpl")
@@ -811,8 +811,15 @@ extension KTVApiImpl {
                 guard let duration: Int64 = dict["duration"] as? Int64 else {return}
                 guard let remoteNtp: Int64 = dict["ntp"] as? Int64 else {return}
                 guard let voicePitch: Int64 = dict["pitch"] as? Int64 else {return}
-
+                guard let songCode: Int64 = dict["songCode"] as? Int64 else {return}
                 guard let mainSingerState: Int = dict["playerState"] as? Int else {return}
+                
+                //如果接收到的歌曲和自己本地的歌曲不一致就不更新进度
+                if songCode != songConfig?.songCode ?? 0 {
+                    agoraPrint("local songCode is not equal to recv songCode")
+                    return
+                }
+                
                 let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
                 if (self.playerState != state) {
                     agoraPrint("recv state with setLrcTime : \(state.rawValue)")
@@ -869,7 +876,18 @@ extension KTVApiImpl {
         lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
         lrcControl?.onUpdateProgress(progress: Int(getPlayerCurrentTime()))
 
-        if isMainSinger()  {return}
+        if isMainSinger() && getPlayerCurrentTime() > TimeInterval(self.audioPlayoutDelay) {
+            let dict: [String: Any] = [ "cmd": "setLrcTime",
+                                        "duration": self.playerDuration,
+                                        "time": getPlayerCurrentTime(),
+                                        //不同机型delay不同，需要发送同步的时候减去发送机型的delay，在接收同步加上接收机型的delay
+                                        "ntp": self.getNtpTimeInMs(),
+                                        "pitch": self.pitch,
+                                        "playerState": self.playerState.rawValue,
+                                        "songCode": songConfig?.songCode ?? 0
+            ]
+            sendStreamMessageWithDict(dict, success: nil)
+        }
     }
 
     @objc public func didKTVAPILocalAudioStats(stats: AgoraRtcLocalAudioStats) {
@@ -891,22 +909,14 @@ extension KTVApiImpl {
             if self?.singerRole == .audience && (Date().milListamp - (self?.lastAudienceUpTime ?? 0)) > 1000 {
                 return
             }
+            if self?.oldPitch == self?.pitch && (self?.oldPitch != 0 && self?.pitch != 0) {
+                self?.pitch = -1
+            }
+            if self?.pitch == -1 {
+                return
+            }
             self?.setProgress(with: Int(current ?? 0))
-            //这里面的逻辑放到control来做
-//            guard let lyricModel = self?.lyricModel else {
-//                assert(false)
-//                return
-//            }
-//            guard let delegate = self?.delegate else {return}
-//            if role == .soloSinger || role == .leadSinger {
-//                if (Int(current ?? 0) + 500) >= lyricModel.preludeEndPosition && self?.hasSendPreludeEndPosition == false {
-//                    self?.hasSendPreludeEndPosition = true
-//                    delegate.didSkipViewShowPreludeEndPosition()
-//                } else if Int(current ?? 0) >= lyricModel.duration && self?.hasSendEndPosition == false {
-//                    self?.hasSendEndPosition = true
-//                    delegate.didSkipViewShowEndDuration()
-//                }
-//            }
+            self?.oldPitch = self?.pitch ?? -1
         }, repeats: true)
     }
 
@@ -1047,21 +1057,6 @@ extension KTVApiImpl {
 extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
     func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedToPosition position: Int) {
         self.localPlayerPosition = Date().milListamp - Double(position)
-        if isMainSinger() && position > self.audioPlayoutDelay {
-            if isMainSinger()  { //if i am main singer
-                let dict: [String: Any] = [ "cmd": "setLrcTime",
-                                            "duration": self.playerDuration,
-                                            "time": position - self.audioPlayoutDelay,
-                                            //不同机型delay不同，需要发送同步的时候减去发送机型的delay，在接收同步加上接收机型的delay
-                                            "ntp": self.getNtpTimeInMs(),
-                                            "pitch": self.pitch,
-                                            "playerState": self.playerState.rawValue
-                ]
-                sendStreamMessageWithDict(dict, success: nil)
-            }
-//            guard let delegate = self.delegate else {return}
-//            delegate.onSyncMusicPosition(position: position, pitch: Float(pitch))
-        }
     }
     
     func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
@@ -1071,7 +1066,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
             if singerRole == .soloSinger || singerRole == .leadSinger {
                 self.localPlayerPosition = Date().milListamp
             }
-            self.playerDuration = 0
+            self.playerDuration = TimeInterval(musicPlayer.getDuration())
             if isMainSinger() { //主唱播放，通过同步消息“setLrcTime”通知伴唱play
                 playerKit.play()
             }
@@ -1079,14 +1074,11 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
             self.localPlayerPosition = Date().milListamp
             self.playerDuration = 0
             self.remotePlayerPosition = Date().milListamp - 0
-        } else if state == .playing {
-            self.localPlayerPosition = Date().milListamp - Double(musicPlayer?.getPosition() ?? 0)
-            self.playerDuration = 0
-        } else if state == .paused {
+        }
+        else if state == .paused {
             self.remotePlayerPosition = Date().milListamp
         } else if state == .playing {
             self.localPlayerPosition = Date().milListamp - Double(musicPlayer?.getPosition() ?? 0)
-            self.playerDuration = 0
             self.remotePlayerPosition = Date().milListamp
         }
 
