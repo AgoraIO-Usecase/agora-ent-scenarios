@@ -44,9 +44,6 @@
 NSInteger ktvApiStreamId = -1;
 NSInteger ktvStreamId = -1;
 
-typedef void (^LyricCallback)(NSString* lyricUrl);
-typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
-
 @interface VLKTVViewController ()<
 VLKTVTopViewDelegate,
 VLKTVMVViewDelegate,
@@ -85,7 +82,6 @@ KTVMusicLoadStateListener
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
 
 @property (nonatomic, strong) VLPopScoreView *scoreView;
-@property (nonatomic, strong) NSMutableDictionary<NSString*, LyricCallback>* lyricCallbacks;
 
 @property (nonatomic, assign) BOOL isNowMicMuted;
 @property (nonatomic, assign) BOOL isNowCameraMuted;
@@ -116,7 +112,6 @@ KTVMusicLoadStateListener
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = UIColor.blackColor;
-    self.lyricCallbacks = [NSMutableDictionary dictionary];
 
     [self subscribeServiceEvent];
     
@@ -191,12 +186,11 @@ KTVMusicLoadStateListener
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-    [AgoraRtcEngineKit destroy];
-    KTVLogInfo(@"Agora - destroy RTCEngine");
     [self.ktvApi cleanCache];
     self.ktvApi = nil;
     
-    [self.lyricCallbacks removeAllObjects];
+    KTVLogInfo(@"Agora - destroy RTCEngine");
+    [AgoraRtcEngineKit destroy];
 }
 
 - (void)configNavigationBar:(UINavigationBar *)navigationBar {
