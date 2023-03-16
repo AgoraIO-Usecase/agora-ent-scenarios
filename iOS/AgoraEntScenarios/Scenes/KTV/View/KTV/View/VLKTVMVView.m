@@ -291,9 +291,11 @@
 }
 
 - (void)reset {
+    KTVLogInfo(@"VLKTVMVView reset [%@]", self.musicTitleLabel.text);
     [_karaokeView reset];
-    [_gradeView reset];
+    [self setSongScore:0];
     self.isPlayAccompany = YES;
+    [self cleanMusicText];
 }
 
 #pragma mark - AgoraKaraokeScoreDelegate
