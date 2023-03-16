@@ -1392,10 +1392,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     // 调节本地播放音量 取值范围为 [0,100]
     // 0、无声。 100、（默认）媒体文件的原始播放音量
 //    [self.ktvApi adjustPlayoutVolume:playoutVolume];
+    [[self.ktvApi getMediaPlayer] adjustPlayoutVolume:playoutVolume];
     
     // 调节远端用户听到的音量 取值范围[0、400]
     // 100: （默认）媒体文件的原始音量。400: 原始音量的四倍（自带溢出保护）
-//    [self.ktvApi adjustPublishSignalVolume:playoutVolume];
+    [[self.ktvApi getMediaPlayer] adjustPublishSignalVolume:playoutVolume];
     
     //update ui
     [self.settingView setAccValue: (float)playoutVolume / 400.0];
