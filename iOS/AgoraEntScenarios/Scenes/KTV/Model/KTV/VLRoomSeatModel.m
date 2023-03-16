@@ -18,10 +18,13 @@
     self.headUrl = seatInfo ? seatInfo.headUrl : @"";
     self.name = seatInfo ? seatInfo.name : @"";
     self.userNo = seatInfo ? seatInfo.userNo : @"";
-    self.rtcUid = seatInfo ? seatInfo.rtcUid : nil;
+    self.rtcUid = seatInfo.rtcUid;
     self.isAudioMuted = seatInfo ? seatInfo.isAudioMuted : 0;
     self.isVideoMuted = seatInfo ? seatInfo.isVideoMuted : 0;
-    self.joinSing = seatInfo ? seatInfo.joinSing : NO;
+    self.chorusSongCode = seatInfo.chorusSongCode;
 }
 
+- (BOOL)isJoinChours {
+    return [self.chorusSongCode length] > 0;
+}
 @end

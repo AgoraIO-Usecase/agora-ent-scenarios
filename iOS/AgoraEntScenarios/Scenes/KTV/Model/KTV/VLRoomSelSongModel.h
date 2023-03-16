@@ -16,9 +16,6 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, copy) NSString *imageUrl;
 
-//合唱者个数
-@property (nonatomic, assign) NSInteger chorusNum;
-
 ///是否原唱
 @property (nonatomic, copy) NSString *isOriginal;
 @property (nonatomic, copy) NSString *singer;
@@ -45,9 +42,6 @@ typedef enum : NSUInteger {
 
 /// 是否是自己点的歌曲
 - (BOOL)isSongOwner;
-
-/// 是否合唱
-- (BOOL)isChorus;
 
 @end
 
