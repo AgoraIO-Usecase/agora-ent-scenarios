@@ -145,6 +145,8 @@ extension KTVApiImpl: KTVApiDelegate {
         apiConfig?.engine.setAudioFrameDelegate(nil)
         lyricCallbacks.removeAll()
         musicCallbacks.removeAll()
+        apiConfig?.engine .destroyMediaPlayer(musicPlayer)
+        AgoraMusicContentCenter.destroy()
         self.eventHandlers.removeAllObjects()
     }
 
