@@ -137,6 +137,7 @@
     [self.leaveChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_leave_chorus"] forState:UIControlStateNormal];
     [self.leaveChorusBtn addTarget:self action:@selector(leaveChorus) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.leaveChorusBtn];
+    _joinChorusBtn.hidden = _leaveChorusBtn.hidden = YES;
 }
 
 - (void)_refreshOriginButton {
