@@ -154,7 +154,7 @@
 -(void)joinChorus{
     //加入合唱
     if([self.delegate respondsToSelector:@selector(didJoinChours)]) {
-        self.joinChorusBtn.selected = true;
+        self.joinChorusBtn.selected = false;
         [self.delegate didJoinChours];
     }
 }
@@ -212,6 +212,7 @@
 
 -(void)configJoinChorusState:(BOOL)isSuccess {
     if(isSuccess){
+        self.joinChorusBtn.selected = false;
         self.joinChorusBtn.hidden = true;
     } else {
         _joinChorusBtn.selected = false;
