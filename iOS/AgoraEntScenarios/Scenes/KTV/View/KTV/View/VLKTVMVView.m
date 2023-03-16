@@ -154,6 +154,7 @@
 -(void)joinChorus{
     //加入合唱
     if([self.delegate respondsToSelector:@selector(didJoinChours)]) {
+        self.joinChorusBtn.selected = true;
         [self.delegate didJoinChours];
     }
 }
@@ -207,6 +208,15 @@
 
 - (void)changeBgViewByModel:(VLKTVSelBgModel *)selBgModel {
     self.bgImgView.image = [UIImage sceneImageWithName:selBgModel.imageName];
+}
+
+-(void)configJoinChorusState:(BOOL)isSuccess {
+    if(isSuccess){
+        self.joinChorusBtn.hidden = true;
+    } else {
+        _joinChorusBtn.selected = false;
+        _joinChorusBtn.hidden = false;
+    }
 }
 
 - (void)configPlayerControls:(VLRoomSelSongModel *)song role:(KTVSingRole)role {

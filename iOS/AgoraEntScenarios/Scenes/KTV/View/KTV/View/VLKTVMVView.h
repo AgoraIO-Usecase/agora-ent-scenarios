@@ -84,6 +84,8 @@ typedef enum : NSUInteger {
 ///滚动到指定位置
 //- (void)scrollToTime:(NSTimeInterval)time;
 
+-(void)configJoinChorusState:(BOOL)isSuccess;
+
 @end
 
 NS_ASSUME_NONNULL_END

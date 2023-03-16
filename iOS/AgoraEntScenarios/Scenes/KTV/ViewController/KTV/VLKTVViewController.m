@@ -543,6 +543,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 return;
             }
             self.singRole = role;
+            [self.MVView configJoinChorusState:state == KTVSwitchRoleStateSuccess];
             [weakSelf.ktvApi loadMusicWithConfig:songConfig mode: KTVLoadMusicModeLoadMusicAndLrc
                         onMusicLoadStateListener:weakSelf];
         }];
@@ -806,6 +807,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.ktvApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
     KTVLrcControl* lrcControl = [[KTVLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
     [self.ktvApi setLrcViewWithView:lrcControl];
+    self.lrcControl = lrcControl;
     lrcControl.skipCallBack = ^(NSInteger time) {
         [self.ktvApi seekSingWithTime:time];
     };
@@ -1453,6 +1455,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)setSingRole:(KTVSingRole)singRole {
     _singRole = singRole;
+    self.lrcControl.lrcView.scoringEnabled = singRole == KTVSingRoleSoloSinger;
     KTVLogInfo(@"setSingRole: %ld", singRole);
 }
 
@@ -1504,7 +1507,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
     if(lyricUrl.length > 0){
-        self.lrcControl.isMainSinger = true;
+        self.lrcControl.isMainSinger = (_singRole == KTVSingRoleSoloSinger || _singRole == KTVSingRoleLeadSinger);
     }
 }
 
