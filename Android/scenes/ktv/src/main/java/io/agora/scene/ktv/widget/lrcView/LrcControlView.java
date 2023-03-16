@@ -388,7 +388,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             showScoreAnimation((View) binding.comboView.getRoot().getParent(), score);
         }
 
-        private int mComboOfLastTime;
+        private int mComboOfLastTime; // Only for showComboAnimation
 
         private void showComboAnimation(View comboView, int score) {
             int comboIconRes = 0;
@@ -466,6 +466,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             }
         }
 
+        private float mInitialYOfScoreView; // Only for showScoreAnimation
+
         private void showScoreAnimation(View lyricsControlView, double score) {
             TextView lineScore = lyricsControlView.findViewById(R.id.line_score);
             int widthOfParent = ((View) (lineScore.getParent())).getWidth();
@@ -476,7 +478,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             lineScore.setText("+" + (int) score);
             lineScore.setAlpha(1.0f);
             lineScore.setVisibility(VISIBLE);
-            float yOfScore = lineScore.getY();
+            if (mInitialYOfScoreView == 0) {
+                mInitialYOfScoreView = lineScore.getY();
+            }
 
             float movingPixels = 200;
             lineScore.animate().translationY(-movingPixels).setDuration(1000).setListener(new Animator.AnimatorListener() {
@@ -494,7 +498,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
                         @Override
                         public void onAnimationEnd(Animator animation) {
-                            lineScore.setY(yOfScore);
+                            lineScore.setY(mInitialYOfScoreView);
                             lineScore.setVisibility(INVISIBLE);
                         }
 
