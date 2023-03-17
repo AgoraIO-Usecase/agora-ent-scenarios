@@ -404,6 +404,14 @@ extension KTVApiImpl {
             if status == .OK {
                 self.apiConfig?.engine.adjustPlaybackSignalVolume(Int(self.remoteVolume))
                 self.musicPlayer?.openMedia(songCode: songCode, startPos: 0)
+                
+                if let listener = self.loadMusicListeners.object(forKey: "\(songCode)" as NSString) as? KTVMusicLoadStateListener {
+                    listener.onMusicLoadSuccess(songCode: songCode, lyricUrl: "")
+                }
+            } else if status == .error {
+                if let listener = self.loadMusicListeners.object(forKey: "\(songCode)" as NSString) as? KTVMusicLoadStateListener {
+                    listener.onMusicLoadFail(songCode: songCode, lyricUrl: "", reason:  .musicPreloadFail)
+                }
             }
         }
 
