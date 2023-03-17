@@ -8,7 +8,14 @@
 import UIKit
 import ZSwiftBaseLib
 
+protocol AboutAgoraHeaderDelegate: NSObjectProtocol {
+    
+    func enterDebugMode()
+}
+
 final class AboutAgoraHeader: UIView {
+    
+    var delegate: AboutAgoraHeaderDelegate?
     
     private lazy var icon: UIImageView = {
         UIImageView(frame: CGRect(x: self.frame.width/2.0-37, y: 42, width: 74, height: 74)).backgroundColor(.white).image(UIImage(named: "app_icon")!)
@@ -19,7 +26,17 @@ final class AboutAgoraHeader: UIView {
     }()
     
     private lazy var version: UILabel = {
-        UILabel(frame: CGRect(x: 20, y: self.appName.frame.maxY+5, width: ScreenWidth-40, height: 20)).font(.systemFont(ofSize: 13, weight: .regular)).textColor(UIColor(0x979CBB)).textAlignment(.center).backgroundColor(.white)
+        let label = UILabel(frame: CGRect(x: 20, y: self.appName.frame.maxY+5, width: ScreenWidth-40, height: 20))
+            .font(.systemFont(ofSize: 13, weight: .regular))
+            .textColor(UIColor(0x979CBB))
+            .textAlignment(.center)
+            .backgroundColor(.white)
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(onTapVersionLabel(_:)))
+        tap.numberOfTapsRequired = 5;
+        label.addGestureRecognizer(tap)
+        label.isUserInteractionEnabled = true
+        return label
     }()
 
     override init(frame: CGRect) {
@@ -35,6 +52,10 @@ final class AboutAgoraHeader: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc func onTapVersionLabel(_ sender: UITapGestureRecognizer) {
+        delegate?.enterDebugMode()
     }
     
 }

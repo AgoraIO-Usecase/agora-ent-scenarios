@@ -30,8 +30,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 @property (nonatomic, strong) VLHotSpotBtn *editBtn;
 
 @property (nonatomic, strong) UITableView *mineTable;
-@property (nonatomic, strong) NSArray *itemsArray;
-@property (nonatomic, strong) NSMutableArray *dataArray;
+@property (nonatomic, copy) NSArray *itemsArray;
 
 @end
 
@@ -56,13 +55,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 }
 
 - (void)setupData {
-    self.dataArray = [self.itemsArray mutableCopy];
-    BOOL developIsOn = [AppContext shared].isDebugMode;
-    if (developIsOn) {
-        VLMineCellModel *model = [VLMineCellModel modelWithItemImg:@"mine_debug_icon" title:AGLocalizedString(@"开发者模式") style:VLMineCellStyleSwitch];
-        [self.dataArray addObject:model];
-    }
-    _mineTable.frame = CGRectMake(20, _mineTopView.bottom+VLREALVALUE_WIDTH(15), SCREEN_WIDTH-40, VLREALVALUE_WIDTH(58)* self.dataArray.count + 10);
+    _mineTable.frame = CGRectMake(20, _mineTopView.bottom+VLREALVALUE_WIDTH(15), SCREEN_WIDTH-40, VLREALVALUE_WIDTH(58)* self.itemsArray.count + 10);
 }
 
 - (void)editButtonClickEvent {
@@ -89,26 +82,11 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.dataArray.count;
+    return self.itemsArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    VLMineCellModel *model = self.dataArray[indexPath.row];
-    /*
-    if (model.style == VLMineCellStyleSwitch) {
-        VLMineSwitchCell *switchCell = [tableView dequeueReusableCellWithIdentifier:kSwitchCellID forIndexPath:indexPath];
-        BOOL developIsOn = [AppContext shared].isDebugMode;
-        @weakify(self)
-        [switchCell setTitle:model.titleStr isOn:developIsOn valueChangedAction:^(BOOL isOn) {
-            @strongify(self)
-            [AppContext shared].isDebugMode = isOn;
-            [self setupData];
-            [self.mineTable reloadData];
-        }];
-        return switchCell;
-    }
-     */
-    
+    VLMineCellModel *model = self.itemsArray[indexPath.row];
     VLMineTCell *cell = [tableView dequeueReusableCellWithIdentifier:kDefaultCellID forIndexPath:indexPath];
     [cell setIconImageName:model.itemImgStr title:model.titleStr];
     return cell;
