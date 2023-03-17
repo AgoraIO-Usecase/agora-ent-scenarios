@@ -1489,8 +1489,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 #pragma mark KTVMusicLoadStateListener
 
-- (void)onMusicLoadStartWithSongCode:(NSInteger)songCode {
-    self.MVView.isLoading = YES;
+- (void)onMusicLoadProgressWithSongCode:(NSInteger)songCode
+                                percent:(NSInteger)percent
+                                 status:(AgoraMusicContentCenterPreloadStatus)status
+                                    msg:(NSString *)msg
+                               lyricUrl:(NSString *)lyricUrl {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (percent == 0) {
+            self.MVView.isLoading = YES;
+        }
+        self.MVView.loadingProgress = percent;
+    });
 }
 
 - (void)onMusicLoadFailWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl reason:(enum KTVLoadSongFailReason)reason {

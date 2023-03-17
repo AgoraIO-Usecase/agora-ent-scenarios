@@ -40,6 +40,7 @@ typedef enum : NSUInteger {
 
 @interface VLKTVMVView : UIView
 @property (nonatomic, assign) BOOL isLoading;
+@property (nonatomic, assign) NSInteger loadingProgress;
 @property (nonatomic, strong) KaraokeView *karaokeView;
 @property (nonatomic, strong) GradeView *gradeView;
 @property (nonatomic, strong) IncentiveView *incentiveView;

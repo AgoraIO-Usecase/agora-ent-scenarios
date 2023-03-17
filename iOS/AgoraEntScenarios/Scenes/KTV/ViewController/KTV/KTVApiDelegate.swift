@@ -70,9 +70,15 @@ import AgoraRtcKit
 
 @objc public protocol KTVMusicLoadStateListener: NSObjectProtocol {
     
-    /// 歌曲加载中
-    /// - Parameter songCode: <#songCode description#>
-    func onMusicLoadStart(songCode: Int)
+    
+    /// 歌曲进度
+    /// - Parameters:
+    ///   - songCode: <#songCode description#>
+    ///   - percent: 歌曲加载进度 范围： 0-100
+    ///   - status: <#status description#>
+    ///   - msg: <#msg description#>
+    ///   - lyricUrl: <#lyricUrl description#>
+    func onMusicLoadProgress(songCode: Int, percent: Int, status: AgoraMusicContentCenterPreloadStatus, msg: String?, lyricUrl: String?)
     
     /// 歌曲加载成功
     /// - Parameters:

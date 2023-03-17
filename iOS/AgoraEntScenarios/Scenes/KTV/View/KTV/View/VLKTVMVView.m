@@ -20,6 +20,7 @@
 @property(nonatomic, weak) id <VLKTVMVViewDelegate>delegate;
 
 @property (nonatomic, strong) UIActivityIndicatorView* loadingView;  //加载中
+@property (nonatomic, strong) UILabel* loadingTipsLabel;  //加载提示
 @property (nonatomic, strong) UIView* contentView;
 
 @property (nonatomic, strong) UILabel *musicTitleLabel;
@@ -73,12 +74,21 @@
     if (_isLoading) {
         [self.loadingView startAnimating];
         [self.contentView setHidden:YES];
-        [self.loadingView setHidden:NO];
+        [self.loadingTipsLabel setHidden:NO];
     } else {
         [self.loadingView stopAnimating];
         [self.contentView setHidden:NO];
-        [self.loadingView setHidden:YES];
+        [self.loadingTipsLabel setHidden:YES];
     }
+}
+
+- (void)setLoadingProgress:(NSInteger)loadingProgress {
+    _loadingProgress = loadingProgress;
+#if DEBUG
+    self.loadingTipsLabel.text = [NSString stringWithFormat:@"loading %ld%%", loadingProgress];
+#else
+    self.loadingTipsLabel.text = @"loading";
+#endif
 }
 
 - (void)layoutSubviews {
@@ -87,7 +97,9 @@
     [self.originBtn sizeToFit];
     self.originBtn.frame = CGRectMake(self.width-20-self.originBtn.width, _pauseBtn.top, self.originBtn.width, 24);
     self.settingBtn.frame = CGRectMake(_originBtn.left-20-24, _pauseBtn.top, 24, 24);
-    self.loadingView.frame = self.bounds;
+    [self.loadingView sizeToFit];
+    self.loadingView.center = CGRectGetCenter(self.bounds);
+    self.loadingTipsLabel.frame = CGRectMake(self.loadingView.centerX - 50, self.loadingView.bottom + 5, 200, 40);
 }
 
 #pragma mark private
@@ -98,6 +110,16 @@
     self.bgImgView.layer.cornerRadius = 10;
     self.bgImgView.layer.masksToBounds = YES;
     [self addSubview:self.bgImgView];
+    
+    self.loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
+    self.loadingView.color = [UIColor whiteColor];
+    [self.loadingView setHidden:YES];
+    [self addSubview:self.loadingView];
+    
+    self.loadingTipsLabel = [[UILabel alloc] init];
+    self.loadingTipsLabel.font = [UIFont systemFontOfSize:14];
+    self.loadingTipsLabel.textColor = [UIColor whiteColor];
+    [self addSubview:self.loadingTipsLabel];
     
     self.contentView = [[UIView alloc] initWithFrame:self.bounds];
     self.contentView.backgroundColor = [UIColor clearColor];
@@ -161,11 +183,6 @@
     [self.leaveChorusBtn addTarget:self action:@selector(leaveChorus) forControlEvents:UIControlEventTouchUpInside];
     [self.contentView addSubview:self.leaveChorusBtn];
     _joinChorusBtn.hidden = _leaveChorusBtn.hidden = YES;
-    
-    self.loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
-    self.loadingView.color = [UIColor whiteColor];
-    [self.loadingView setHidden:YES];
-    [self addSubview:self.loadingView];
 }
 
 - (void)_refreshOriginButton {
@@ -259,7 +276,8 @@
         } break;
         case KTVSingRoleCoSinger: {
 //        case KTVSingRoleFollowSinger:
-            [self setPlayerViewsHidden:NO nextButtonHidden:YES playButtonHidden:YES];
+            BOOL isNextEnable = !VLUserCenter.user.ifMaster;
+            [self setPlayerViewsHidden:NO nextButtonHidden:isNextEnable playButtonHidden:YES];
             _joinChorusBtn.hidden = YES;
             _leaveChorusBtn.hidden = NO;
         } break;

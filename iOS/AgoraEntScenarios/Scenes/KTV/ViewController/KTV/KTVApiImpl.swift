@@ -30,6 +30,7 @@ class KTVApiImpl: NSObject{
     private var downloadManager: AgoraDownLoadManager = AgoraDownLoadManager()
 
     private var eventHandlers: NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
+    private var loadMusicListeners: NSMapTable<NSString, AnyObject> = NSMapTable<NSString, AnyObject>(keyOptions: .copyIn, valueOptions: .weakMemory)
 
     private var musicPlayer: AgoraMusicPlayerProtocol!
     private var mcc: AgoraMusicContentCenter!
@@ -398,7 +399,7 @@ extension KTVApiImpl {
 
     private func didCoSingerLoadMusic(with songCode: NSInteger, callBaclk:@escaping LoadMusicCallback) {
         preloadMusic(with: songCode) { status in
-        agoraPrint("didCoSingerLoadMusic songCode: \(songCode)")
+            agoraPrint("didCoSingerLoadMusic songCode: \(songCode)")
             callBaclk(status)
             if status == .OK {
                 self.apiConfig?.engine.adjustPlaybackSignalVolume(Int(self.remoteVolume))
@@ -531,9 +532,8 @@ extension KTVApiImpl {
         let role = singerRole
         let songCode = config.songCode
         
-        
-        onMusicLoadStateListener.onMusicLoadStart(songCode: songCode)
-
+        self.loadMusicListeners.setObject(onMusicLoadStateListener, forKey: "\(songCode)" as NSString)
+        onMusicLoadStateListener.onMusicLoadProgress(songCode: songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
 //        if (loadDict.keys.contains(String(songCode))) {
 //            let loadState = loadDict[String(songCode)]
 //            if loadState == .ok {
@@ -1127,7 +1127,6 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
         guard let callback = musicSearchDict[requestId] else {return}
         callback(requestId, status, result)
         musicSearchDict.removeValue(forKey: requestId)
-
     }
 
     func onLyricResult(_ requestId: String, lyricUrl: String) {
@@ -1142,6 +1141,9 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
     }
 
     func onPreLoadEvent(_ songCode: Int, percent: Int, status: AgoraMusicContentCenterPreloadStatus, msg: String, lyricUrl: String) {
+        if let listener = self.loadMusicListeners.object(forKey: "\(songCode)" as NSString) as? KTVMusicLoadStateListener {
+            listener.onMusicLoadProgress(songCode: songCode, percent: percent, status: status, msg: msg, lyricUrl: lyricUrl)
+        }
         if (status == .preloading) { return }
         let SongCode = "\(songCode)"
         guard let block = self.musicCallbacks[SongCode] else { return }
