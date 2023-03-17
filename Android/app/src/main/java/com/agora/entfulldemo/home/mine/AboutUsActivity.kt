@@ -7,19 +7,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.agora.entfulldemo.BuildConfig
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppAboutInfoItemBinding
 import com.agora.entfulldemo.databinding.AppAboutSceneItemBinding
 import com.agora.entfulldemo.databinding.AppActivityAboutUsBinding
-import com.agora.entfulldemo.home.constructor.ScenesConstructor
-import com.agora.entfulldemo.home.constructor.ScenesModel
 import com.alibaba.android.arouter.facade.annotation.Route
+import io.agora.rtc2.RtcEngine
 import io.agora.scene.base.PagePathConstant
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
@@ -33,6 +30,9 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
 
     private val servicePhone = "400-632-6626"
     private val webSite = "https://www.agora.io/cn/about-us/"
+
+    private val kChatRoomAppID = "io.agora.chatroom"
+    private val kFullAppID = "com.agora.entfulldemo"
 
     private var counts = 0
     private val debugModeOpenTime: Long = 2000
@@ -48,13 +48,27 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         super.onCreate(savedInstanceState)
 
         binding.rvAboutUs.adapter = adapter
-        setupAppInfo()
+        if (BuildConfig.APPLICATION_ID == kChatRoomAppID) {
+            setupChatRoomAppInfo()
+        } else if (BuildConfig.APPLICATION_ID == kFullAppID) {
+            setupFullAppInfo()
+        }
         setupDebugMode()
         setupClickWebAction()
         setupClickPhoneAction()
     }
-
-    private fun setupAppInfo() {
+    // 设置语聊App的信息
+    private fun setupChatRoomAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        adapter.appInfo = AppInfo(
+            this.getString(R.string.app_about_name),
+            "20230110-2.1.0-" + RtcEngine.getSdkVersion(),
+            servicePhone,
+            webSite
+        )
+    }
+    // 设置综合App的信息
+    private fun setupFullAppInfo() {
         val scenes = mutableListOf<SceneInfo>()
         if (io.agora.scene.base.BuildConfig.VERSION_SCENE_VOICE.isNotEmpty()) {
             scenes.add(
@@ -93,7 +107,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             adapter.scenes = scenes
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_about_name),
-                "20230110-2.1.0-4.1.1",
+                "20230110-2.1.0-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
