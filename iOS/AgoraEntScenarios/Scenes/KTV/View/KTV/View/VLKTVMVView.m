@@ -19,6 +19,10 @@
 
 @property(nonatomic, weak) id <VLKTVMVViewDelegate>delegate;
 
+@property (nonatomic, strong) UIActivityIndicatorView* loadingView;  //加载中
+@property (nonatomic, strong) UILabel* loadingTipsLabel;  //加载提示
+@property (nonatomic, strong) UIView* contentView;
+
 @property (nonatomic, strong) UILabel *musicTitleLabel;
 @property (nonatomic, strong) UILabel *scoreLabel;
 // 分数分开优化性能
@@ -30,6 +34,7 @@
 @property (nonatomic, strong) UIButton *originBtn;  /// 原唱按钮
 @property (nonatomic, strong) VLHotSpotBtn *settingBtn; /// 设置参数按钮
 @property (nonatomic, strong) VLKTVMVIdleView *idleView;//没有人演唱视图
+
 
 //@property (nonatomic, strong) AgoraLrcScoreConfigModel *config;
 @property (nonatomic, assign) int totalLines;
@@ -63,33 +68,73 @@
     }
 }
 
+- (void)setIsLoading:(BOOL)isLoading {
+    _isLoading = isLoading;
+    
+    if (_isLoading) {
+        [self.loadingView startAnimating];
+        [self.contentView setHidden:YES];
+        [self.loadingTipsLabel setHidden:NO];
+    } else {
+        [self.loadingView stopAnimating];
+        [self.contentView setHidden:NO];
+        [self.loadingTipsLabel setHidden:YES];
+    }
+}
+
+- (void)setLoadingProgress:(NSInteger)loadingProgress {
+    _loadingProgress = loadingProgress;
+#if DEBUG
+    self.loadingTipsLabel.text = [NSString stringWithFormat:@"loading %ld%%", loadingProgress];
+#else
+    self.loadingTipsLabel.text = @"loading";
+#endif
+}
+
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
+//
 //    [self.originBtn sizeToFit];
 //    self.originBtn.frame = CGRectMake(self.width-20-self.originBtn.width, _pauseBtn.top, self.originBtn.width, 24);
 //    self.settingBtn.frame = CGRectMake(_originBtn.left-20-24, _pauseBtn.top, 24, 24);
+    [self.loadingView sizeToFit];
+    self.loadingView.center = CGRectGetCenter(self.bounds);
+    self.loadingTipsLabel.frame = CGRectMake(self.loadingView.centerX - 50, self.loadingView.bottom + 5, 200, 40);
 }
 
 #pragma mark private
 
 - (void)setupView {
-    self.bgImgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height)];
+    self.bgImgView = [[UIImageView alloc]initWithFrame:self.bounds];
     self.bgImgView.image = [UIImage sceneImageWithName:@"ktv_mv_tempBg"];
     self.bgImgView.layer.cornerRadius = 10;
     self.bgImgView.layer.masksToBounds = YES;
     [self addSubview:self.bgImgView];
     
+    self.loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
+    self.loadingView.color = [UIColor whiteColor];
+    [self.loadingView setHidden:YES];
+    [self addSubview:self.loadingView];
+    
+    self.loadingTipsLabel = [[UILabel alloc] init];
+    self.loadingTipsLabel.font = [UIFont systemFontOfSize:14];
+    self.loadingTipsLabel.textColor = [UIColor whiteColor];
+    [self addSubview:self.loadingTipsLabel];
+    
+    self.contentView = [[UIView alloc] initWithFrame:self.bounds];
+    self.contentView.backgroundColor = [UIColor clearColor];
+    [self addSubview:self.contentView];
+    
     UIImageView *currentPlayImgView = [[UIImageView alloc]initWithFrame:CGRectMake(9, 2, 39, 39)];
     currentPlayImgView.image = [UIImage sceneImageWithName:@"ktv_currentPlay_icon"];
-    [self addSubview:currentPlayImgView];
+    [self.contentView addSubview:currentPlayImgView];
 
     self.musicTitleLabel.frame = CGRectMake(currentPlayImgView.right+2, currentPlayImgView.centerY-9, 120, 18);
-    [self addSubview:self.musicTitleLabel];
+    [self.contentView addSubview:self.musicTitleLabel];
     
     self.gradeView = [[GradeView alloc]init];
     self.gradeView.frame = CGRectMake(15, 15, self.width - 30, 30);
-    [self addSubview:self.gradeView];
+    [self.contentView addSubview:self.gradeView];
 
     CGFloat lY = CGRectGetMaxX(currentPlayImgView.frame);
     CGFloat lH = self.height - lY;
@@ -99,17 +144,17 @@
     _karaokeView.scoringView.topSpaces = 5;
    // _karaokeView.scoringView.showDebugView = true;
     _karaokeView.backgroundImage = [UIImage imageNamed:@"ktv_top_bgIcon"];
-    [self addSubview:_karaokeView];
+    [self.contentView addSubview:_karaokeView];
     
     self.incentiveView = [[IncentiveView alloc]init];
     self.incentiveView.frame = CGRectMake(15, 55, 192, 45);
     [self.karaokeView addSubview:self.incentiveView];
-    
+
     self.pauseBtn.frame = CGRectMake(20, self.height-54-12, 34, 54);
     [self updateBtnLayout:self.pauseBtn];
     [self addSubview:self.pauseBtn];
 
-    self.nextButton.frame = CGRectMake(_pauseBtn.right+20, _pauseBtn.top, 34, 54);
+    self.nextButton.frame = CGRectMake(_pauseBtn.right+10, _pauseBtn.top, 34, 54);
     [self updateBtnLayout:self.nextButton];
     [self addSubview:self.nextButton];
     
@@ -117,8 +162,7 @@
     [self updateBtnLayout:self.originBtn];
     [self addSubview:self.originBtn];
     
-    self.settingBtn.frame = CGRectMake(_originBtn.left-20-34, _pauseBtn.top, 34, 54);
-   // [self.settingBtn setImage:[UIImage sceneImageWithName:@""] forState:UIControlStateNormal]];
+    self.settingBtn.frame = CGRectMake(_originBtn.left-10-34, _pauseBtn.top, 34, 54);
     [self updateBtnLayout:self.settingBtn];
     [self addSubview:self.settingBtn];
     
@@ -136,7 +180,7 @@
     _joinChorusBtn.layer.cornerRadius = 17;
     _joinChorusBtn.layer.masksToBounds = true;
     [self.joinChorusBtn addTarget:self action:@selector(joinChorus) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_joinChorusBtn];
+    [self.contentView addSubview:_joinChorusBtn];
     
     self.leaveChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(20, _pauseBtn.top, 54, 54)];
     [self.leaveChorusBtn setTitle:@"退出合唱" forState:UIControlStateNormal];
@@ -145,9 +189,7 @@
     [self.leaveChorusBtn setImage:[UIImage sceneImageWithName:@"ic_leave_chorus"] forState:UIControlStateNormal];
     [self.leaveChorusBtn addTarget:self action:@selector(leaveChorus) forControlEvents:UIControlEventTouchUpInside];
     [self updateBtnLayout:self.leaveChorusBtn];
-    [self.leaveChorusBtn layoutIfNeeded];
     [self addSubview:self.leaveChorusBtn];
-    
     _joinChorusBtn.hidden = _leaveChorusBtn.hidden = YES;
 }
 
@@ -258,7 +300,8 @@
         } break;
         case KTVSingRoleCoSinger: {
 //        case KTVSingRoleFollowSinger:
-            [self setPlayerViewsHidden:NO nextButtonHidden:YES playButtonHidden:YES];
+            BOOL isNextEnable = !VLUserCenter.user.ifMaster;
+            [self setPlayerViewsHidden:NO nextButtonHidden:isNextEnable playButtonHidden:YES];
             _joinChorusBtn.hidden = YES;
             _leaveChorusBtn.hidden = NO;
         } break;
@@ -303,10 +346,6 @@
 - (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song role:(KTVSingRole)role {
     KTVLogInfo(@"VLKTVMVView updateUIWithSong: songName: %@, name: %@, role: %ld", song.songName, song.name, role);
     self.idleView.hidden = song;
-   // self.karaokeView.lyricsView.draggable = role == KTVSingRoleSoloSinger;
-    //config score label visibility
-//    self.config.isHiddenScoreView = NO;
-//    [self.lrcView setConfig:self.config];
     self.scoreLabel.hidden = NO;
     
     if(song) {
@@ -383,42 +422,6 @@
     }
 }
 
-#pragma mark private method
-//- (void)_startLrc {
-//    [_lrcView start];
-//    self.totalLines = 0;
-//    self.totalScore = 0.0f;
-//    KTVLogInfo(@"VLKTVMVView _startLrc %@", self.musicTitleLabel.text);
-//}
-
-
-#pragma mark -
-
-//- (void)loadLrcURL:(NSString *)lrcURL {
-//    [_lrcView setLrcUrlWithUrl:lrcURL];
-//}
-//
-//- (void)start {
-//    [_lrcView start];
-//    KTVLogInfo(@"VLKTVMVView start [%@]", self.musicTitleLabel.text);
-//    NSAssert(self.musicTitleLabel.text.length > 0, @"dfd");
-//}
-//
-//- (void)stop {
-//    [_lrcView stop];
-//    KTVLogInfo(@"VLKTVMVView stop [%@]", self.musicTitleLabel.text);
-//}
-//
-//- (void)reset {
-//    KTVLogInfo(@"VLKTVMVView reset [%@]", self.musicTitleLabel.text);
-//    [_lrcView stop];
-//    [_lrcView reset];
-//>>>>>>> dev/scene/ktv_ios_remove_qmui
-//    [self setSongScore:0];
-//    self.isPlayAccompany = YES;
-//    [self cleanMusicText];
-//}
-
 - (UILabel *)musicTitleLabel {
     if (!_musicTitleLabel) {
         _musicTitleLabel = [[UILabel alloc]init];
@@ -457,8 +460,6 @@
 
 - (UIButton *)originBtn {
     if (!_originBtn) {
-//        _originBtn = [[QMUIButton alloc] qmui_initWithImage:nil title:KTVLocalizedString(@"原唱")];
-//        _originBtn.imagePosition = QMUIButtonImagePositionLeft;
         _originBtn.spacingBetweenImageAndTitle = 2;
         _originBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
