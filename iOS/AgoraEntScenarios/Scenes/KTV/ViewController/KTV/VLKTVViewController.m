@@ -231,7 +231,7 @@ KTVMusicLoadStateListener
         }
         
         VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
-        [weakSelf.MVView updateUIWithSong:song role:[weakSelf getUserSingRole]];
+        [weakSelf.MVView updateUIWithSong:song role:self.singRole];
         [weakSelf.roomPersonView reloadSeatIndex:model.seatIndex];
     }];
     
@@ -492,11 +492,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
                                        token:@""
                            onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-        if (state == KTVSwitchRoleStateFail) {
-            return;
-        }
-        
-        self.singRole = KTVSingRoleAudience;
     }];
 }
 
@@ -504,7 +499,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     
     //TODO: fix score view visible problem while owner reopen the room
-    [self.MVView updateUIWithSong:model role:[self getUserSingRole]];
+    [self.MVView updateUIWithSong:model role:self.singRole];
     if(!model){
         return;
     }
@@ -534,7 +529,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 KTVLogError(@"switchSingerRole error: %ld", reason);
                 return;
             }
-            self.singRole = role;
+            
             [self.MVView configJoinChorusState:state == KTVSwitchRoleStateSuccess];
             [weakSelf.ktvApi loadMusicWithConfig:songConfig mode: KTVLoadMusicModeLoadMusicAndLrc
                         onMusicLoadStateListener:weakSelf];
@@ -639,7 +634,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
-        self.singRole = KTVSingRoleCoSinger;
         VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
         
         KTVJoinChorusInputModel* inputModel = [KTVJoinChorusInputModel new];
@@ -770,6 +764,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.isNowMicMuted = myseat.isAudioMuted;
     self.isNowCameraMuted = myseat.isVideoMuted;
     self.trackMode = KTVPlayerTrackModeAcc;
+    self.singRole = KTVSingRoleAudience;
     
     AgoraVideoEncoderConfiguration *encoderConfiguration =
     [[AgoraVideoEncoderConfiguration alloc] initWithSize:CGSizeMake(100, 100)
@@ -1329,11 +1324,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.ktvApi switchSingerRoleWithNewRole:role
                                            token:exChannelToken
                                onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-            if (state == KTVSwitchRoleStateFail) {
-                return;
-            }
-            
-            self.singRole = role;
         }];
     }
 }
@@ -1458,6 +1448,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     _singRole = singRole;
     self.lrcControl.lrcView.lyricsView.draggable = singRole == KTVSingRoleSoloSinger;
     KTVLogInfo(@"setSingRole: %ld", singRole);
+    
+    VLRoomSelSongModel *song = self.selSongsArray.firstObject;
+    [self.MVView updateUIWithSong:song role:singRole];
 }
 
 #pragma mark KTVApiEventHandlerDelegate
@@ -1488,15 +1481,25 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)onSingerRoleChangedWithOldRole:(enum KTVSingRole)oldRole newRole:(enum KTVSingRole)newRole { 
-    
+    self.singRole = newRole;
 }
 
-- (void)onSingingScoreResultWithScore:(float)score { 
-    
+- (void)onSingingScoreResultWithScore:(float)score {
 }
 
 #pragma mark KTVMusicLoadStateListener
+
+- (void)onMusicLoadStartWithSongCode:(NSInteger)songCode {
+    self.MVView.isLoading = YES;
+}
+
 - (void)onMusicLoadFailWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl reason:(enum KTVLoadSongFailReason)reason {
+    self.MVView.isLoading = NO;
+    if (reason == KTVLoadSongFailReasonNoLyricUrl) {
+        //空歌词也认为成功
+        return;
+    }
+    
     KTVLogError(@"onMusicLoadFail songCode: %ld error: %ld retry count: %ld", songCode, reason, self.retryCount);
     if(self.retryCount < 3) {
         [self loadAndPlaySong];
@@ -1507,6 +1510,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
+    self.MVView.isLoading = NO;
     if(lyricUrl.length > 0){
         self.lrcControl.isMainSinger = (_singRole == KTVSingRoleSoloSinger || _singRole == KTVSingRoleLeadSinger);
     }
