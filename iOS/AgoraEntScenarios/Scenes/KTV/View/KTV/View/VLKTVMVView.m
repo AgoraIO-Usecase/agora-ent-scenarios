@@ -66,9 +66,9 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    [self.originBtn sizeToFit];
-    self.originBtn.frame = CGRectMake(self.width-20-self.originBtn.width, _pauseBtn.top, self.originBtn.width, 24);
-    self.settingBtn.frame = CGRectMake(_originBtn.left-20-24, _pauseBtn.top, 24, 24);
+//    [self.originBtn sizeToFit];
+//    self.originBtn.frame = CGRectMake(self.width-20-self.originBtn.width, _pauseBtn.top, self.originBtn.width, 24);
+//    self.settingBtn.frame = CGRectMake(_originBtn.left-20-24, _pauseBtn.top, 24, 24);
 }
 
 #pragma mark private
@@ -105,16 +105,21 @@
     self.incentiveView.frame = CGRectMake(15, 55, 192, 45);
     [self.karaokeView addSubview:self.incentiveView];
     
-    self.pauseBtn.frame = CGRectMake(20, self.height-24-12, 24, 24);
+    self.pauseBtn.frame = CGRectMake(20, self.height-54-12, 34, 54);
+    [self updateBtnLayout:self.pauseBtn];
     [self addSubview:self.pauseBtn];
 
-    self.nextButton.frame = CGRectMake(_pauseBtn.right+20, _pauseBtn.top, 24, 24);
+    self.nextButton.frame = CGRectMake(_pauseBtn.right+20, _pauseBtn.top, 34, 54);
+    [self updateBtnLayout:self.nextButton];
     [self addSubview:self.nextButton];
     
-    self.originBtn.frame = CGRectMake(self.width-20-48, _pauseBtn.top, 48, 24);
+    self.originBtn.frame = CGRectMake(self.width-20-48, _pauseBtn.top, 34, 54);
+    [self updateBtnLayout:self.originBtn];
     [self addSubview:self.originBtn];
     
-    self.settingBtn.frame = CGRectMake(_originBtn.left-20-24, _pauseBtn.top, 24, 24);
+    self.settingBtn.frame = CGRectMake(_originBtn.left-20-34, _pauseBtn.top, 34, 54);
+   // [self.settingBtn setImage:[UIImage sceneImageWithName:@""] forState:UIControlStateNormal]];
+    [self updateBtnLayout:self.settingBtn];
     [self addSubview:self.settingBtn];
     
     self.idleView = [[VLKTVMVIdleView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height) withDelegate:self];
@@ -133,11 +138,33 @@
     [self.joinChorusBtn addTarget:self action:@selector(joinChorus) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_joinChorusBtn];
     
-    self.leaveChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(20, _pauseBtn.top, 24, 24)];
-    [self.leaveChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_leave_chorus"] forState:UIControlStateNormal];
+    self.leaveChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(20, _pauseBtn.top, 54, 54)];
+    [self.leaveChorusBtn setTitle:@"退出合唱" forState:UIControlStateNormal];
+    [self.leaveChorusBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.leaveChorusBtn setFont:[UIFont systemFontOfSize:11]];
+    [self.leaveChorusBtn setImage:[UIImage sceneImageWithName:@"ic_leave_chorus"] forState:UIControlStateNormal];
     [self.leaveChorusBtn addTarget:self action:@selector(leaveChorus) forControlEvents:UIControlEventTouchUpInside];
+    [self updateBtnLayout:self.leaveChorusBtn];
+    [self.leaveChorusBtn layoutIfNeeded];
     [self addSubview:self.leaveChorusBtn];
+    
     _joinChorusBtn.hidden = _leaveChorusBtn.hidden = YES;
+}
+
+-(void)updateBtnLayout:(UIButton*)button {
+    CGFloat spacing = -5;
+      CGSize imageSize = button.imageView.frame.size;
+       CGSize titleSize = button.titleLabel.frame.size;
+        CGSize textSize = [button.titleLabel.text sizeWithFont:button.titleLabel.font];
+      CGSize frameSize = CGSizeMake(ceilf(textSize.width), ceilf(textSize.height));
+      if (titleSize.width + 0.5 < frameSize.width) {
+          titleSize.width = frameSize.width;
+        }
+
+      CGFloat totalHeight = imageSize.height + titleSize.height;
+    button.imageEdgeInsets = UIEdgeInsetsMake(- (totalHeight - imageSize.height + spacing), 0.0, 10.0, - titleSize.width);
+    button.titleEdgeInsets = UIEdgeInsetsMake(0, - imageSize.width, - (totalHeight - titleSize.height + spacing), 0);
+
 }
 
 - (void)_refreshOriginButton {
@@ -145,8 +172,8 @@
         [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
         [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
     } else {
-        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateNormal];
-        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
+        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
+        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
     }
     [self setNeedsLayout];
 }
@@ -405,6 +432,9 @@
 - (VLHotSpotBtn *)pauseBtn {
     if (!_pauseBtn) {
          _pauseBtn = [[VLHotSpotBtn alloc] init];
+        [self.pauseBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.pauseBtn.titleLabel.font = UIFontMake(10.0);
+        [self.pauseBtn setTitle:@"暂停" forState:UIControlStateNormal];
         [_pauseBtn setImage:[UIImage sceneImageWithName:@"ktv_pause_icon"] forState:UIControlStateSelected];
         [_pauseBtn setImage:[UIImage sceneImageWithName:@"ktv_pause_resumeicon"] forState:UIControlStateNormal];
         _pauseBtn.selected = NO;
@@ -417,6 +447,9 @@
     if (!_nextButton) {
         _nextButton = [[VLHotSpotBtn alloc] init];
         [_nextButton setImage:[UIImage sceneImageWithName:@"ktv_playNext_icon"] forState:UIControlStateNormal];
+        [self.nextButton setTitle:@"切歌" forState:UIControlStateNormal];
+        [self.nextButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.nextButton.titleLabel.font = UIFontMake(10.0);
         [_nextButton addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _nextButton;
@@ -430,10 +463,10 @@
         _originBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
         _originBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
-        [_originBtn setTitleColor:UIColorMakeWithHex(@"#979CBB") forState:UIControlStateNormal];
         _originBtn.titleLabel.font = UIFontMake(10.0);
-        [_originBtn setImage:[UIImage sceneImageWithName:@"ktv_origin_playOn"] forState:UIControlStateNormal];
-        [_originBtn setImage:[UIImage sceneImageWithName:@"ktv_origin_playOn"] forState:UIControlStateSelected];
+        [self.originBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [self.originBtn setImage:[UIImage sceneImageWithName:@"ic_play_original_off"] forState:UIControlStateNormal];
+        [self.originBtn setImage:[UIImage sceneImageWithName:@"ic_play_original_on"] forState:UIControlStateSelected];
         _originBtn.selected = NO;
         [_originBtn addTarget:self action:@selector(originClick:) forControlEvents:UIControlEventTouchUpInside];
     }
@@ -444,6 +477,9 @@
     if (!_settingBtn) {
         _settingBtn = [[VLHotSpotBtn alloc] init];
         [_settingBtn setImage:[UIImage sceneImageWithName:@"ktv_subtitle_icon"] forState:UIControlStateNormal];
+        [self.settingBtn setTitle:@"调音" forState:UIControlStateNormal];
+        [self.settingBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.settingBtn.titleLabel.font = UIFontMake(10.0);
         [_settingBtn addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _settingBtn;

@@ -21,8 +21,8 @@
         self.completion = completion;
         self.bgView = [[UIView alloc]init];
         self.bgView.backgroundColor = [UIColor whiteColor];
-        self.bgView.layer.backgroundColor = [UIColor colorWithRed:0.027 green:0.063 blue:0.192 alpha:0.2].CGColor;
-        self.bgView.layer.borderColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2].CGColor;
+        self.bgView.layer.backgroundColor = [UIColor colorWithRed:0.027 green:0.063 blue:0.192 alpha:0.6].CGColor;
+        self.bgView.layer.borderColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.6].CGColor;
         [self addSubview:self.bgView];
         
         self.SkipBtn = [[UIButton alloc]init];
