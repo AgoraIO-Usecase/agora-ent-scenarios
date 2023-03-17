@@ -30,9 +30,7 @@
    - 得到App ID与App 证书
       
      ![图片](image/get_app_id.jpg)
-  
-- <mark>联系销售给 AppID 开通 语聊房权限</mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员[Agora 支持](https://agora-ticket.agora.io/))
-  
+   
 - 获取环信的App Key
   [环信](https://www.easemob.com/)
 
@@ -110,6 +108,7 @@ IM管理类（包含加入房间、登录、退出登录等）[ChatroomIMManager
 - 语聊房中的弹幕组件使用的是哪家？是否可以自己选择供应商？
   声动语聊源码使用的是环信AgoraChat的IM和信令服务，您也可以使用自己的服务。
 - 集成遇到困难，该如何联系声网获取协助
-  - 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
-  - 方案2：发送邮件给support@agora.io咨询。
+  - 方案1：可以从智能客服获取帮助或联系销售人员[Agora 支持](https://agora-ticket.agora.io/) ；
+  - 方案2：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
+  - 方案3：发送邮件给support@agora.io咨询。
   
