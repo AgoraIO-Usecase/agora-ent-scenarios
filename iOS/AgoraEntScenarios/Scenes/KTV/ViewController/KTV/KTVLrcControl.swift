@@ -9,8 +9,8 @@ import Foundation
 import AgoraLyricsScore
 
 @objc public protocol KTVLrcControlDelegate: NSObjectProtocol {
-    func didLrcViewDragTo( pos: Int)
-    func didLrcViewFinishLine(with model: LyricLineModel, score: Int, cumulativeScore: Int, lineIndex: Int, lineCount: Int)
+    func didLrcViewDragedTo(pos: Int, score: Int, totalScore: Int)
+    func didLrcViewScorllFinished(with score: Int, totalScore: Int, lineScore: Int)
 }
 
 @objc class KTVLrcControl: NSObject {
@@ -20,7 +20,7 @@ import AgoraLyricsScore
     private var lyricModel: LyricModel?
     private var hasShowPreludeEndPosition = false
     private var hasShowEndPosition = false
-    public weak var delegate: KTVLrcControlDelegate?
+    @objc public weak var delegate: KTVLrcControlDelegate?
     @objc public var skipCallBack: ((Int) -> Void)?
     private var progress: Int = 0
     private var totalLines: NSInteger = 0
@@ -45,20 +45,28 @@ import AgoraLyricsScore
         self.lrcView.delegate = self
         self.skipBtn.isHidden = true
     }
+    
+    @objc public func getAvgScore() -> Int {
+       if self.totalLines <= 0 {
+           return 0
+       } else {
+           return self.totalScore / self.totalLines
+       }
+    }
 }
 
 extension KTVLrcControl: KaraokeDelegate {
     func onKaraokeView(view: KaraokeView, didDragTo position: Int) {
         totalScore = view.scoringView.getCumulativeScore()
         guard let delegate = delegate else {return}
-        delegate.didLrcViewDragTo(pos: position)
+        delegate.didLrcViewDragedTo(pos: position, score: totalScore, totalScore: self.totalCount * 100)
     }
     
     func onKaraokeView(view: KaraokeView, didFinishLineWith model: LyricLineModel, score: Int, cumulativeScore: Int, lineIndex: Int, lineCount: Int) {
         self.totalLines = lineCount
         self.totalScore = cumulativeScore
         guard let delegate = delegate else {return}
-        delegate.didLrcViewFinishLine(with: model, score: score, cumulativeScore: cumulativeScore, lineIndex: lineIndex, lineCount: lineCount)
+        delegate.didLrcViewScorllFinished(with: totalScore, totalScore: lineCount * 100, lineScore: score)
     }
 }
 
@@ -69,10 +77,12 @@ extension KTVLrcControl: KTVLrcViewDelegate {
     }
     
     func onUpdateProgress(progress: Int) {
+        self.progress = progress
         lrcView.setProgress(progress: progress)
         if progress > (lyricModel?.duration ?? 0) {return}
         if !isMainSinger {return}
         if progress > 10 && progress < 100 {
+            skipBtn.setSkipType(.prelude)
             skipBtn.isHidden = false
             hasShowEndPosition = false
             hasShowPreludeEndPosition = false
@@ -85,6 +95,7 @@ extension KTVLrcControl: KTVLrcViewDelegate {
             skipBtn.isHidden = true
             hasShowPreludeEndPosition = true
         } else if (duration < progress && hasShowEndPosition == false) {
+            skipBtn.setSkipType(.epilogue)
             skipBtn.isHidden = false
             hasShowEndPosition = true
         }
