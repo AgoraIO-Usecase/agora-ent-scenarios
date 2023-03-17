@@ -1024,8 +1024,8 @@ extension KTVApiImpl {
         return localNtpTime
     }
 
-    private func syncPlayState(state: AgoraMediaPlayerState) {
-        let dict: [String: Any] = ["cmd": "PlayerState", "userId": apiConfig?.localUid as Any, "state": "\(state.rawValue)"]
+    private func syncPlayState(state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+        let dict: [String: Any] = ["cmd": "PlayerState", "userId": apiConfig?.localUid as Any, "state": "\(state.rawValue)", "error": "\(error.rawValue)"]
         sendStreamMessageWithDict(dict, success: nil)
     }
 
@@ -1090,7 +1090,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         }
 
         if isMainSinger() {
-            syncPlayState(state: state)
+            syncPlayState(state: state, error: error)
         }
         self.playerState = state
         agoraPrint("recv state with player callback : \(state.rawValue)")
