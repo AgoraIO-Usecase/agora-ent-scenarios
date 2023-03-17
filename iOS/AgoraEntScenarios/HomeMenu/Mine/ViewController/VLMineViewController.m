@@ -328,7 +328,8 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 - (UILabel *)versionLabel {
     if (!_versionLabel) {
         _versionLabel = [[UILabel alloc] init];
-        _versionLabel.text = [NSString stringWithFormat:AGLocalizedString(@"当前版本号 LTS%@(%@) SDK %@"),
+        _versionLabel.text = [NSString stringWithFormat:AGLocalizedString(@"当前版本号 V%@"),
+//        _versionLabel.text = [NSString stringWithFormat:AGLocalizedString(@"当前版本号 LTS%@(%@) SDK %@"),
                               [VLGlobalHelper appVersion],
                               [VLGlobalHelper appBuild],
                               [AgoraRtcEngineKit getSdkVersion]];
