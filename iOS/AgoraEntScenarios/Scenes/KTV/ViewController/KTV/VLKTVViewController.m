@@ -61,7 +61,7 @@ VLBadNetWorkViewDelegate,
 AgoraRtcMediaPlayerDelegate,
 AgoraRtcEngineDelegate,
 VLPopScoreViewDelegate,
-
+KTVLrcControlDelegate,
 KTVApiEventHandlerDelegate,
 KTVMusicLoadStateListener
 >
@@ -800,6 +800,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVLrcControl* lrcControl = [[KTVLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
     [self.ktvApi setLrcViewWithView:lrcControl];
     self.lrcControl = lrcControl;
+    self.lrcControl.delegate = self;
     lrcControl.skipCallBack = ^(NSInteger time) {
         [self.ktvApi seekSingWithTime:time];
     };
@@ -858,11 +859,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark -- VLKTVAPIDelegate
-- (void)didlrcViewDidScrolledWithCumulativeScore:(NSInteger)score totalScore:(NSInteger)totalScore{
+
+- (void)didLrcViewDragedToPos:(NSInteger)pos score:(NSInteger)score totalScore:(NSInteger)totalScore{
+    [self.ktvApi.getMediaPlayer seekToPosition:pos];
     [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
 }
 
-- (void)didlrcViewDidScrollFinishedWithCumulativeScore:(NSInteger)score totalScore:(NSInteger)totalScore lineScore:(NSInteger)lineScore {
+- (void)didLrcViewScorllFinishedWith:(NSInteger)score totalScore:(NSInteger)totalScore lineScore:(NSInteger)lineScore{
     [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
     [self.MVView.incentiveView showWithScore:lineScore];
 }
@@ -1469,8 +1472,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //                VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
                 if([self isCurrentSongMainSinger:VLUserCenter.user.id]) {
                     //将房主实时的分数共享给所有人
-                    [self syncChoruScore:[self.MVView getAvgSongScore]];
-                    [self showScoreViewWithScore: [self.MVView getAvgSongScore]];
+                    [self syncChoruScore:[self.lrcControl getAvgScore]];
+                    [self showScoreViewWithScore: [self.lrcControl getAvgScore]];
                 }
                 [self removeCurrentSongWithSync:YES];
             }

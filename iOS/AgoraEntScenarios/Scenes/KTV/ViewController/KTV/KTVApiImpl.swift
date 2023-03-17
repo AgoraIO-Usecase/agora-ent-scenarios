@@ -873,19 +873,6 @@ extension KTVApiImpl {
         self.pitch = pitch ?? 0
         lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
         lrcControl?.onUpdateProgress(progress: Int(getPlayerCurrentTime()))
-
-        if isMainSinger() && getPlayerCurrentTime() > TimeInterval(self.audioPlayoutDelay) {
-            let dict: [String: Any] = [ "cmd": "setLrcTime",
-                                        "duration": self.playerDuration,
-                                        "time": getPlayerCurrentTime(),
-                                        //不同机型delay不同，需要发送同步的时候减去发送机型的delay，在接收同步加上接收机型的delay
-                                        "ntp": self.getNtpTimeInMs(),
-                                        "pitch": self.pitch,
-                                        "playerState": self.playerState.rawValue,
-                                        "songCode": songConfig?.songCode ?? 0
-            ]
-            sendStreamMessageWithDict(dict, success: nil)
-        }
     }
 
     @objc public func didKTVAPILocalAudioStats(stats: AgoraRtcLocalAudioStats) {
@@ -907,12 +894,13 @@ extension KTVApiImpl {
             if self?.singerRole == .audience && (Date().milListamp - (self?.lastAudienceUpTime ?? 0)) > 1000 {
                 return
             }
-            if self?.oldPitch == self?.pitch && (self?.oldPitch != 0 && self?.pitch != 0) {
-                self?.pitch = -1
+            
+            if self?.singerRole == .audience {
+                if self?.oldPitch == self?.pitch && (self?.oldPitch != 0 && self?.pitch != 0) {
+                    self?.pitch = -1
+                }
             }
-            if self?.pitch == -1 {
-                return
-            }
+          
             self?.setProgress(with: Int(current ?? 0))
             self?.oldPitch = self?.pitch ?? -1
         }, repeats: true)
@@ -1066,6 +1054,18 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
     func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedToPosition position: Int) {
         self.localPlayerPosition = Date().milListamp - Double(position)
 //        agoraPrint("didChangedToPosition: \(position)")
+        if isMainSinger() && getPlayerCurrentTime() > TimeInterval(self.audioPlayoutDelay) {
+            let dict: [String: Any] = [ "cmd": "setLrcTime",
+                                        "duration": self.playerDuration,
+                                        "time": getPlayerCurrentTime(),
+                                        //不同机型delay不同，需要发送同步的时候减去发送机型的delay，在接收同步加上接收机型的delay
+                                        "ntp": self.getNtpTimeInMs(),
+                                        "pitch": self.pitch,
+                                        "playerState": self.playerState.rawValue,
+                                        "songCode": songConfig?.songCode ?? 0
+            ]
+            sendStreamMessageWithDict(dict, success: nil)
+        }
     }
     
     func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
