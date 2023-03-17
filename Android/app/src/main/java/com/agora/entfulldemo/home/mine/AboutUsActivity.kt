@@ -6,10 +6,19 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
+import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.agora.entfulldemo.R
+import com.agora.entfulldemo.databinding.AppAboutInfoItemBinding
+import com.agora.entfulldemo.databinding.AppAboutSceneItemBinding
 import com.agora.entfulldemo.databinding.AppActivityAboutUsBinding
+import com.agora.entfulldemo.home.constructor.ScenesConstructor
+import com.agora.entfulldemo.home.constructor.ScenesModel
 import com.alibaba.android.arouter.facade.annotation.Route
 import io.agora.scene.base.PagePathConstant
 import io.agora.scene.base.component.AgoraApplication
@@ -29,6 +38,8 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val debugModeOpenTime: Long = 2000
     private var beginTime: Long = 0
 
+    private val adapter = AboutUsAdapter()
+
     override fun getViewBinding(inflater: LayoutInflater): AppActivityAboutUsBinding {
         return AppActivityAboutUsBinding.inflate(inflater)
     }
@@ -36,26 +47,67 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setupClickPhoneAction()
-        setupClickWebAction()
+        binding.rvAboutUs.adapter = adapter
+        setupAppInfo()
         setupDebugMode()
-        // set versions
-        binding.tvVersion.text = "20230110-2.1.0-4.1.1"
-        binding.tvServiceNumber.text = servicePhone
-        binding.tvHomeWebSite.text = webSite
-        binding.tvChatRoomVersion.text = "YL-2.1.0"
-        binding.tvSpaceVoiceVersion.text = "YLSA-2.1.0"
-        binding.tvOnlineKTVVersion.text = "KTV-2.1.0"
+        setupClickWebAction()
+        setupClickPhoneAction()
+    }
+
+    private fun setupAppInfo() {
+        val scenes = mutableListOf<SceneInfo>()
+        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_VOICE.isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_chat_room),
+                    io.agora.scene.base.BuildConfig.VERSION_SCENE_VOICE
+                )
+            )
+        }
+        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_KTV.isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_karaoke),
+                    io.agora.scene.base.BuildConfig.VERSION_SCENE_KTV
+                )
+            )
+        }
+        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_SPATIAL_VOICE.isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_chat_room_spatial),
+                    io.agora.scene.base.BuildConfig.VERSION_SCENE_SPATIAL_VOICE
+                )
+            )
+        }
+        if (scenes.size == 1) {
+            adapter.scenes = mutableListOf()
+            val scene = scenes[0]
+            adapter.appInfo = AppInfo(
+                scene.name,
+                scene.version,
+                servicePhone,
+                webSite
+            )
+        } else if (scenes.size > 1) {
+            adapter.scenes = scenes
+            adapter.appInfo = AppInfo(
+                this.getString(R.string.app_about_name),
+                "20230110-2.1.0-4.1.1",
+                servicePhone,
+                webSite
+            )
+        }
     }
 
     private fun setupClickWebAction() {
-        binding.vHomeWebPage.setOnClickListener {
+        adapter.onClickWebSiteListener = {
             PagePilotManager.pageWebView(webSite)
         }
     }
 
     private fun setupClickPhoneAction() {
-        binding.vServicePhone.setOnClickListener {
+        adapter.onClickPhoneListener = {
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CALL_PHONE),1)
             } else {
@@ -77,23 +129,20 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
 
     private fun setupDebugMode() {
         binding.tvDebugMode.visibility = View.INVISIBLE
-        binding.tvVersion.setOnClickListener {
-            if (counts == 0) {
+        adapter.onClickVersionListener = {
+            if (counts == 0 || System.currentTimeMillis() - beginTime > debugModeOpenTime) {
                 beginTime = System.currentTimeMillis();
+                counts = 0
             }
-            counts ++;
-            if (counts == 5) {
-                if (System.currentTimeMillis() - beginTime > debugModeOpenTime) {
-                    counts = 0;
-                    return@setOnClickListener;
-                }
+            counts ++
+            if (counts > 5) {
                 counts = 0;
                 binding.tvDebugMode.visibility = View.VISIBLE
                 AgoraApplication.the().enableDebugMode(true)
                 ToastUtils.showToast("Debug模式已打开");
             }
         }
-        binding.tvDebugMode.setOnClickListener { v ->
+        binding.tvDebugMode.setOnClickListener {
             showDebugModeCloseDialog()
         }
         if (AgoraApplication.the().isDebugModeOpen) {
@@ -118,4 +167,92 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         }
         dialog.show()
     }
+}
+private data class AppInfo(
+    val name: String,
+    val version: String,
+    val servicePhone: String,
+    val webSite: String
+)
+
+private data class SceneInfo(
+    val name: String,
+    val version: String
+)
+
+private class AboutUsAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private val VIEW_TYPE_APP_INFO = 0
+
+    private val VIEW_TYPE_SCENE_INFO = 1
+
+    var appInfo: AppInfo? = null
+
+    var scenes = mutableListOf<SceneInfo>()
+
+    var onClickPhoneListener: (() -> Unit)? = null
+
+    var onClickWebSiteListener: (() -> Unit)? = null
+
+    var onClickVersionListener: (() -> Unit)? = null
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == VIEW_TYPE_APP_INFO) {
+            val binding = AppAboutInfoItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            AppInfoViewHolder(binding, binding.root)
+        } else {
+            val binding = AppAboutSceneItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            SceneInfoViewHolder(binding, binding.root)
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder.itemViewType == VIEW_TYPE_APP_INFO) {
+            val current = holder as AppInfoViewHolder
+            appInfo?.let {
+                current.binding.tvAppName.text = it.name
+                current.binding.tvVersion.text = it.version
+                current.binding.tvServiceNumber.text = it.servicePhone
+                current.binding.tvHomeWebSite.text = it.webSite
+            }
+            current.binding.tvSceneSubTitle.visibility = if (scenes.size > 1)  View.VISIBLE else View.INVISIBLE
+            current.binding.tvVersion.setOnClickListener {
+                onClickVersionListener?.invoke()
+            }
+            current.binding.vServicePhone.setOnClickListener {
+                onClickPhoneListener?.invoke()
+            }
+            current.binding.vHomeWebPage.setOnClickListener {
+                onClickWebSiteListener?.invoke()
+            }
+        } else if (holder.itemViewType == VIEW_TYPE_SCENE_INFO) {
+            val current = holder as SceneInfoViewHolder
+            val index = position - 1
+            val model = scenes[index]
+            current.binding.tvTitle.text  = model.name
+            current.binding.tvVersion.text = model.version
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (position == 0) {
+            VIEW_TYPE_APP_INFO
+        } else {
+            VIEW_TYPE_SCENE_INFO
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return scenes.size + 1
+    }
+
+    inner class AppInfoViewHolder(
+        val binding: AppAboutInfoItemBinding,
+        itemView: View
+    ) : RecyclerView.ViewHolder(itemView)
+
+    inner class SceneInfoViewHolder(
+        val binding: AppAboutSceneItemBinding,
+        itemView: View
+    ) : RecyclerView.ViewHolder(itemView)
 }
