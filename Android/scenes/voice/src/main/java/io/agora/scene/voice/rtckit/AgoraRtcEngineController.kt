@@ -205,7 +205,7 @@ class AgoraRtcEngineController {
         when (anisMode) {
             ConfigConstants.AINSMode.AINS_Off -> {
                 rtcEngine?.apply {
-                    setParameters("{\"che.audio.ains_mode\":0}")
+                    setParameters("{\"che.audio.ains_mode\":-1}")
                     setParameters("{\"che.audio.nsng.lowerBound\":80}")
                     setParameters("{\"che.audio.nsng.lowerMask\":50}")
                     setParameters("{\"che.audio.nsng.statisticalbound\":5}")
