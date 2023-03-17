@@ -42,8 +42,7 @@ class KTVApiImpl: NSObject{
     
     private var hasSendPreludeEndPosition: Bool = false
     private var hasSendEndPosition: Bool = false
-    private var totalLines: NSInteger = 0
-    private var totalScore: NSInteger = 0
+   
     private var audioPlayoutDelay: NSInteger = 0
     private var isNowMicMuted: Bool = false
     
@@ -673,11 +672,6 @@ extension KTVApiImpl {
             self.lyricCallbacks.updateValue(callBack, forKey: url)
         }
 
-        hasSendPreludeEndPosition = false
-        hasSendEndPosition = false
-        totalLines = 0
-        totalScore = 0
-
         downloadManager.downloadLrcFile(urlString: url) {[weak self] lrcurl in
             var path: String? = nil
             defer{
@@ -1134,23 +1128,23 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
 }
 
 //主要是歌词组件的回调
-extension KTVApiImpl: KaraokeDelegate {
-    func onKaraokeView(view: KaraokeView, didDragTo position: Int) {
-        musicPlayer?.seek(toPosition: position)
-        totalScore = view.scoringView.getCumulativeScore()
-        //将分数传到vc
-//        guard let delegate = self.delegate else {return}
-//        delegate.didlrcViewDidScrolled(with: self.totalScore, totalScore: self.totalCount * 100)
-    }
-
-    func onKaraokeView(view: KaraokeView, didFinishLineWith model: LyricLineModel, score: Int, cumulativeScore: Int, lineIndex: Int, lineCount: Int) {
-        self.totalLines = lineCount
-        self.totalScore = cumulativeScore
-        //将分数传到vc
-//        guard let delegate = self.delegate else {return}
-//        delegate.didlrcViewDidScrollFinished(with: self.totalScore, totalScore: lineCount * 100, lineScore: score)
-    }
-}
+//extension KTVApiImpl: KaraokeDelegate {
+//    func onKaraokeView(view: KaraokeView, didDragTo position: Int) {
+//        musicPlayer?.seek(toPosition: position)
+//        totalScore = view.scoringView.getCumulativeScore()
+//        //将分数传到vc
+////        guard let delegate = self.delegate else {return}
+////        delegate.didlrcViewDidScrolled(with: self.totalScore, totalScore: self.totalCount * 100)
+//    }
+//
+//    func onKaraokeView(view: KaraokeView, didFinishLineWith model: LyricLineModel, score: Int, cumulativeScore: Int, lineIndex: Int, lineCount: Int) {
+//        self.totalLines = lineCount
+//        self.totalScore = cumulativeScore
+//        //将分数传到vc
+////        guard let delegate = self.delegate else {return}
+////        delegate.didlrcViewDidScrollFinished(with: self.totalScore, totalScore: lineCount * 100, lineScore: score)
+//    }
+//}
 
 //主要是歌曲下载的回调
 extension KTVApiImpl: AgoraLrcDownloadDelegate {
