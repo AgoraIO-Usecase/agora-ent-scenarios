@@ -81,12 +81,12 @@
 - (NSArray *)itemsArray {
     if (!_itemsArray) {
         _itemsArray = @[
-            @{
-                @"bgImgStr":@"home_talk_bg",
-                @"iconImgStr":@"home_talk_icon",
-                @"titleStr":AGLocalizedString(@"ChatRoom"),
-                @"subTitleStr":@""
-            },
+//            @{
+//                @"bgImgStr":@"home_talk_bg",
+//                @"iconImgStr":@"home_talk_icon",
+//                @"titleStr":AGLocalizedString(@"ChatRoom"),
+//                @"subTitleStr":@""
+//            },
             @{
                 @"bgImgStr":@"home_KTV_bg",
                 @"iconImgStr":@"home_KTV_icon",
