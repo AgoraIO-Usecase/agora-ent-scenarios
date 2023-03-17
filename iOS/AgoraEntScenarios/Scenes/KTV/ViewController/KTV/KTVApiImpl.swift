@@ -65,7 +65,11 @@ class KTVApiImpl: NSObject{
     private var onJoinExChannelCallBack : JoinExChannelCallBack?
     private var mainSingerHasJoinChannelEx: Bool = false
 
-    private var singerRole: KTVSingRole = .audience
+    private var singerRole: KTVSingRole = .audience {
+        didSet {
+            agoraPrint("singerRole changed: \(singerRole.rawValue) ->\(oldValue.rawValue)")
+        }
+    }
     private var lrcControl: KTVLrcViewDelegate?
     
     private var timer: Timer?
@@ -236,7 +240,7 @@ extension KTVApiImpl: KTVApiDelegate {
 // 主要是角色切换，加入合唱，加入多频道，退出合唱，退出多频道
 extension KTVApiImpl {
     private func switchSingerRole(oldRole: KTVSingRole, newRole: KTVSingRole, token: String, stateCallBack:@escaping SwitchRoleStateCallBack) {
-        agoraPrint("switchSingerRole oldRole: \(singerRole.rawValue), newRole: \(newRole.rawValue)")
+        agoraPrint("switchSingerRole oldRole: \(oldRole.rawValue), newRole: \(newRole.rawValue)")
         if oldRole == .audience && newRole == .soloSinger {
             // 1、KTVSingRoleAudience -》KTVSingRoleMainSinger
             singerRole = newRole
@@ -338,7 +342,7 @@ extension KTVApiImpl {
             stateCallBack(.success, .none)
         } else {
             stateCallBack(.fail, .noPermission)
-            agoraPrint("Error！You can not switch role from \(singerRole.rawValue) to \(newRole.rawValue)!")
+            agoraPrint("Error！You can not switch role from \(oldRole.rawValue) to \(newRole.rawValue)!")
         }
 
     }
@@ -412,7 +416,6 @@ extension KTVApiImpl {
         agoraPrint("joinChorus2ndChannel role: \(role.rawValue)")
         apiConfig?.engine.setAudioScenario(.chorus)
 
-
         let mediaOption = AgoraRtcChannelMediaOptions()
         // main singer do not subscribe 2nd channel
         // co singer auto sub
@@ -455,8 +458,11 @@ extension KTVApiImpl {
 //            }
 //        }
         agoraPrint("joinChannelEx ret: \(ret ?? -999)")
-        if singerRole == .coSinger {
-            apiConfig?.engine.muteRemoteAudioStream(UInt(songConfig?.mainSingerUid ?? 0), mute: true)
+        if newRole == .coSinger {
+            let uid = UInt(songConfig?.mainSingerUid ?? 0)
+            let ret =
+            apiConfig?.engine.muteRemoteAudioStream(uid, mute: true)
+            agoraPrint("muteRemoteAudioStream: \(uid), ret: \(ret ?? -1)")
        }
     }
 
@@ -812,26 +818,27 @@ extension KTVApiImpl {
                 
                 //如果接收到的歌曲和自己本地的歌曲不一致就不更新进度
                 if songCode != songConfig?.songCode ?? 0 {
-                    agoraPrint("local songCode is not equal to recv songCode")
+                    agoraPrint("local songCode[\(songCode)] is not equal to recv songCode[\(songConfig?.songCode ?? 0)] role: \(singerRole.rawValue)")
                     return
                 }
                 
-                let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
-                if (self.playerState != state) {
-                    agoraPrint("recv state with setLrcTime : \(state.rawValue)")
-                    if state == .playing, playerState == .openCompleted {
-                        //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
-                        musicPlayer.seek(toPosition: Int(position))
-                    }
-                    syncPlayStateFromRemote(state: state)
-                    
-                }
                 self.remotePlayerPosition = Date().milListamp - TimeInterval(position)
                 self.remotePlayerDuration = TimeInterval(duration)
                 if (role == .audience) {
                     self.lastAudienceUpTime = Date().milListamp
                 }
-
+                
+                let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
+                if (self.playerState != state) {
+                    agoraPrint("recv state with setLrcTime: \(state.rawValue) state: \(self.playerState.rawValue)->\(state.rawValue) role: \(singerRole.rawValue)")
+                    if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
+                        //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
+                        self.localPlayerPosition = Date().milListamp - Double(position)
+                        musicPlayer.seek(toPosition: Int(position))
+                    }
+                    syncPlayStateFromRemote(state: state)
+                }
+                
                 if role == .coSinger {
                     if musicPlayer?.getPlayerState() == .playing {
                         let localNtpTime = getNtpTimeInMs()
@@ -969,9 +976,14 @@ extension KTVApiImpl {
 
     private func getPlayerCurrentTime() -> TimeInterval {
         let role = singerRole
-        if role == .soloSinger || role == .coSinger || role == .leadSinger{
+        if role == .soloSinger || role == .leadSinger{
             let time = Date().milListamp - localPlayerPosition
             return time
+        } else if role == .coSinger {
+            if playerState == .playing || playerState == .paused {
+                let time = Date().milListamp - localPlayerPosition
+                return time
+            }
         }
         return Date().milListamp - remotePlayerPosition
     }
@@ -1053,6 +1065,7 @@ extension KTVApiImpl {
 extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
     func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedToPosition position: Int) {
         self.localPlayerPosition = Date().milListamp - Double(position)
+//        agoraPrint("didChangedToPosition: \(position)")
     }
     
     func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
