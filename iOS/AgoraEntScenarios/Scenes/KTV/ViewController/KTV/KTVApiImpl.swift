@@ -280,11 +280,15 @@ extension KTVApiImpl {
             
             stateCallBack(.success, .none)
         } else if oldRole == .audience && newRole == .coSinger {
+            //TODO(chenpan): clouse retain cycle
             joinChorus(role: newRole, token: token, joinExChannelCallBack: { flag, status in
                 //还原临时变量为观众
                 self.joinChorusNewRole = .audience
                 if flag == true {
                     self.singerRole = newRole
+                    self.getEventHander { delegate in
+                        delegate.onSingerRoleChanged(oldRole: .audience, newRole: .coSinger)
+                    }
                     stateCallBack(.success, .none)
                 } else {
                     self.leaveChorus(role: .coSinger)
@@ -311,6 +315,9 @@ extension KTVApiImpl {
                 self.joinChorusNewRole = .audience
                 if flag == true {
                     self.singerRole = newRole
+                    getEventHander { delegate in
+                        delegate.onSingerRoleChanged(oldRole: .soloSinger, newRole: .leadSinger)
+                    }
                     stateCallBack(.success, .none)
                 } else {
                     self.leaveChorus(role: .leadSinger)
