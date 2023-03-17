@@ -44,9 +44,6 @@
 NSInteger ktvApiStreamId = -1;
 NSInteger ktvStreamId = -1;
 
-typedef void (^LyricCallback)(NSString* lyricUrl);
-typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
-
 @interface VLKTVViewController ()<
 VLKTVTopViewDelegate,
 VLKTVMVViewDelegate,
@@ -85,7 +82,6 @@ KTVMusicLoadStateListener
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
 
 @property (nonatomic, strong) VLPopScoreView *scoreView;
-@property (nonatomic, strong) NSMutableDictionary<NSString*, LyricCallback>* lyricCallbacks;
 
 @property (nonatomic, assign) BOOL isNowMicMuted;
 @property (nonatomic, assign) BOOL isNowCameraMuted;
@@ -94,14 +90,12 @@ KTVMusicLoadStateListener
 @property (nonatomic, assign) KTVSingRole singRole;    //角色
 @property (nonatomic, assign) BOOL isEarOn;
 @property (nonatomic, assign) int playoutVolume;
-@property (nonatomic, assign) KTVPlayerTrackMode trackMode;
+@property (nonatomic, assign) KTVPlayerTrackMode trackMode;  //合唱/伴奏
 
 @property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
 @property (nonatomic, strong) KTVApiImpl* ktvApi;
 
 @property (nonatomic, assign) NSUInteger retryCount;
-@property (nonatomic, assign) NSInteger endPosition;
-@property (nonatomic, assign) NSInteger prePosition;
 
 @property (nonatomic, strong) LyricModel *lyricModel;
 @property (nonatomic, strong) KTVLrcControl *lrcControl;
@@ -116,7 +110,6 @@ KTVMusicLoadStateListener
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = UIColor.blackColor;
-    self.lyricCallbacks = [NSMutableDictionary dictionary];
 
     [self subscribeServiceEvent];
     
@@ -191,12 +184,11 @@ KTVMusicLoadStateListener
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-    [AgoraRtcEngineKit destroy];
-    KTVLogInfo(@"Agora - destroy RTCEngine");
     [self.ktvApi cleanCache];
     self.ktvApi = nil;
     
-    [self.lyricCallbacks removeAllObjects];
+    KTVLogInfo(@"Agora - destroy RTCEngine");
+    [AgoraRtcEngineKit destroy];
 }
 
 - (void)configNavigationBar:(UINavigationBar *)navigationBar {

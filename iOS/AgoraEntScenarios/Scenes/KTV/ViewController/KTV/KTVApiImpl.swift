@@ -144,8 +144,10 @@ extension KTVApiImpl: KTVApiDelegate {
         apiConfig?.engine.setAudioFrameDelegate(nil)
         lyricCallbacks.removeAll()
         musicCallbacks.removeAll()
-        apiConfig?.engine .destroyMediaPlayer(musicPlayer)
+        mcc.register(nil)
         AgoraMusicContentCenter.destroy()
+        musicPlayer.stop()
+        apiConfig?.engine.destroyMediaPlayer(musicPlayer)
         self.eventHandlers.removeAllObjects()
     }
 
@@ -791,7 +793,7 @@ extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
 //需要外部转发的方法 主要是dataStream相关的
 extension KTVApiImpl {
     @objc public func didKTVAPIReceiveStreamMessageFrom( uid: NSInteger, streamId: NSInteger, data: Data){
-        let songCode: Int = songConfig?.songCode ?? 0
+//        let songCode: Int = songConfig?.songCode ?? 0
         let role = singerRole
 //        guard let state: KTVLoadSongState = loadDict[String(songCode)] else {return}
 //        if state != .ok {return}
@@ -817,17 +819,11 @@ extension KTVApiImpl {
                 let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
                 if (self.playerState != state) {
                     agoraPrint("recv state with setLrcTime : \(state.rawValue)")
-                    
-                    if state == .playing && self.playerState == .openCompleted {
+                    if state == .playing, playerState == .openCompleted {
+                        //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
                         musicPlayer.seek(toPosition: Int(position))
                     }
-                    
-                    self.playerState = state
-                    updateCosingerPlayerStatusIfNeed()
-                    
-                    getEventHander { delegate in
-                        delegate.onMusicPlayerStateChanged(state: state, error: .none, isLocal: false)
-                    }
+                    syncPlayStateFromRemote(state: state)
                     
                 }
                 self.remotePlayerPosition = Date().milListamp - TimeInterval(position)
@@ -853,13 +849,8 @@ extension KTVApiImpl {
 
             } else if dict["cmd"] as? String == "PlayerState" {
                 let mainSingerState: Int = dict["state"] as? Int ?? 0
-                self.playerState = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
-
-                updateCosingerPlayerStatusIfNeed()
-                getEventHander { delegate in
-                    delegate.onMusicPlayerStateChanged(state: self.playerState, error: .none, isLocal: false)
-                }
-                
+                let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
+                syncPlayStateFromRemote(state: state)
             } else if dict["cmd"] as? String == "setVoicePitch" {
                 if role == .coSinger {return}
                 //同步新的pitch策略 todo
@@ -985,15 +976,20 @@ extension KTVApiImpl {
         return Date().milListamp - remotePlayerPosition
     }
 
-    private func updateCosingerPlayerStatusIfNeed() {
+    private func syncPlayStateFromRemote(state: AgoraMediaPlayerState) {
         let role = singerRole
         if role == .coSinger {
-            if playerState == .stopped {
+            if state == .stopped {
                 stopSing()
-            } else if playerState == .paused {
+            } else if state == .paused {
                 pausePlay()
-            } else if playerState == .playing {
+            } else if state == .playing {
                 resumeSing()
+            }
+        } else {
+            self.playerState = state
+            getEventHander { delegate in
+                delegate.onMusicPlayerStateChanged(state: self.playerState, error: .none, isLocal: false)
             }
         }
     }
@@ -1003,8 +999,8 @@ extension KTVApiImpl {
     }
 
     private func dataToDictionary(data: Data) -> Dictionary<String, Any>? {
-        guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-            let dictionary = json as? [String: Any] else {
+        guard let json = try? JSONSerialization.jsonObject(with: data, options: []),
+              let dictionary = json as? [String: Any] else {
             return nil
         }
         return dictionary
