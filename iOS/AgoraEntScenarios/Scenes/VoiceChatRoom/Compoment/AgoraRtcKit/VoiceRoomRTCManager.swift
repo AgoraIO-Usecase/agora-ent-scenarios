@@ -538,7 +538,7 @@ public let kMPK_RTC_UID: UInt = 1
             rtcKit.setParameters("{\"che.audio.nsng.finallowermask\":30}")
             rtcKit.setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
         case .off:
-            rtcKit.setParameters("{\"che.audio.ains_mode\":0}")
+            rtcKit.setParameters("{\"che.audio.ains_mode\":-1}")
             rtcKit.setParameters("{\"che.audio.nsng.lowerBound\":80}")
             rtcKit.setParameters("{\"che.audio.nsng.lowerMask\":50}")
             rtcKit.setParameters("{\"che.audio.nsng.statisticalbound\":5}")
