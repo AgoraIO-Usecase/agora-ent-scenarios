@@ -1494,12 +1494,19 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                  status:(AgoraMusicContentCenterPreloadStatus)status
                                     msg:(NSString *)msg
                                lyricUrl:(NSString *)lyricUrl {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    if ([NSThread isMainThread]) {
         if (percent == 0) {
             self.MVView.isLoading = YES;
         }
         self.MVView.loadingProgress = percent;
-    });
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (percent == 0) {
+                self.MVView.isLoading = YES;
+            }
+            self.MVView.loadingProgress = percent;
+        });
+    }
 }
 
 - (void)onMusicLoadFailWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl reason:(enum KTVLoadSongFailReason)reason {
