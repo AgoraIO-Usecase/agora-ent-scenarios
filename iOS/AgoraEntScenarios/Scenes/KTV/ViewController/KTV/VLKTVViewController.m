@@ -90,14 +90,12 @@ KTVMusicLoadStateListener
 @property (nonatomic, assign) KTVSingRole singRole;    //角色
 @property (nonatomic, assign) BOOL isEarOn;
 @property (nonatomic, assign) int playoutVolume;
-@property (nonatomic, assign) KTVPlayerTrackMode trackMode;
+@property (nonatomic, assign) KTVPlayerTrackMode trackMode;  //合唱/伴奏
 
 @property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
 @property (nonatomic, strong) KTVApiImpl* ktvApi;
 
 @property (nonatomic, assign) NSUInteger retryCount;
-@property (nonatomic, assign) NSInteger endPosition;
-@property (nonatomic, assign) NSInteger prePosition;
 
 @property (nonatomic, strong) LyricModel *lyricModel;
 @property (nonatomic, strong) KTVLrcControl *lrcControl;
