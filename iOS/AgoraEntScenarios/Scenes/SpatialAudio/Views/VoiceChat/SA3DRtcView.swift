@@ -281,6 +281,8 @@ class SA3DRtcView: UIView {
                     return .AgoraChatRoomBaseUserCellTypeMuteAndLock
                 case -1:
                     return .AgoraChatRoomBaseUserCellTypeAdd
+                case -2:
+                    return .AgoraChatRoomBaseUserCellTypeAlienNonActive
                 default:
                     break
             }
@@ -497,7 +499,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                     member.portrait = "red"
                     mic_info.member = member
                     cell.setArrowInfo(imageName: "sa_downleft_arrow", margin: 6)
-                    cell.cellType = mic_info.status == 5 ? .AgoraChatRoomBaseUserCellTypeAlienActive : .AgoraChatRoomBaseUserCellTypeAlienNonActive
+                    cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
                     cell.refreshUser(with: mic_info)
                 }
@@ -510,7 +512,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                     member.portrait = "blue"
                     mic_info.member = member
                     cell.setArrowInfo(imageName: "sa_upright_arrow", margin: -6)
-                    cell.cellType = mic_info.status == 5 ? .AgoraChatRoomBaseUserCellTypeAlienActive : .AgoraChatRoomBaseUserCellTypeAlienNonActive
+                    cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
                     cell.refreshUser(with: mic_info)
                 }

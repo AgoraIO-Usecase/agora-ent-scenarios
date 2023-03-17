@@ -115,13 +115,13 @@ extension VoiceRoomViewController {
         
     }
                            
-    func applyMembersAlert(position: VoiceRoomSwitchBarDirection) {
+    func applyMembersAlert(position: VoiceRoomSwitchBarDirection,index: Int?) {
         let apply = VoiceRoomApplyUsersViewController(roomId: roomInfo?.room?.room_id ?? "")
         apply.agreeApply = {
             self.rtcView.updateUser($0)
             self.micMuteManager(mic: $0)
         }
-        let invite = VoiceRoomInviteUsersController(roomId: roomInfo?.room?.room_id ?? "", mic_index:nil)
+        let invite = VoiceRoomInviteUsersController(roomId: roomInfo?.room?.room_id ?? "", mic_index:index)
         let userAlert = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [apply, invite], titles: [LanguageManager.localValue(key: "Raised Hands"), LanguageManager.localValue(key: "Invite On-Stage")], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
         let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 420)), custom: userAlert)
         presentViewController(vc, animated: true)
@@ -223,7 +223,7 @@ extension VoiceRoomViewController {
 
     func changeHandsUpState() {
         if isOwner {
-            applyMembersAlert(position: .left)
+            applyMembersAlert(position: .left,index: nil)
             chatBar.refresh(event: .handsUp, state: .selected, asCreator: true)
         } else {
             if chatBar.handsState == .unSelected {
@@ -284,7 +284,7 @@ extension VoiceRoomViewController {
             self?.dismiss(animated: true)
             if state == .invite {
                 if flag {
-                    self?.applyMembersAlert(position: .right)
+                    self?.applyMembersAlert(position: .right,index: index)
                 } else {
                     self?.kickoff(with: index)
                 }

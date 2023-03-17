@@ -239,7 +239,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 接受邀请
     /// - Parameters:
     ///
-    func acceptMicSeatInvitation(completion: @escaping (Error?, VRRoomMic?) -> Void)
+    func acceptMicSeatInvitation(index: Int?,completion: @escaping (Error?, VRRoomMic?) -> Void)
     
     /// 拒绝邀请
     /// - Parameters:

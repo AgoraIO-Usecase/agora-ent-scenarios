@@ -171,11 +171,7 @@ extension SARoomViewController {
     }
 
     @objc func leaveRoom() {
-        if self.isOwner {
-            SAIMManager.shared?.userDestroyedChatroom()
-        } else {
-            AppContext.saServiceImp().leaveRoom(self.roomInfo?.room?.chatroom_id ?? "") { _, _ in }
-        }
+        AppContext.saServiceImp().leaveRoom(self.roomInfo?.room?.room_id ?? "") { _, _ in }
     }
 
     func refuse() {

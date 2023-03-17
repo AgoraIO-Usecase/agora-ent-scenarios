@@ -76,7 +76,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onReceiveSeatInvitation(roomId: String, user: VRUser) {
-        self.showInviteMicAlert()
+        self.showInviteMicAlert(index: user.mic_index)
     }
     
     func onReceiveCancelSeatInvitation(roomId: String, chat_uid: String) {
