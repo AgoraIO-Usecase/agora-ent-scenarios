@@ -94,7 +94,7 @@
     CGFloat lY = CGRectGetMaxX(currentPlayImgView.frame);
     CGFloat lH = self.height - lY;
    // [KaraokeView setLogWithPrintToConsole:true writeToFile:true];
-    _karaokeView = [[KaraokeView alloc] initWithFrame:CGRectMake(0, lY, self.width, lH - 40)];
+    _karaokeView = [[KaraokeView alloc] initWithFrame:CGRectMake(0, lY, self.width, lH - 40) loggers:@[[FileLogger new]]];
     _karaokeView.scoringView.viewHeight = 50;
     _karaokeView.scoringView.topSpaces = 5;
    // _karaokeView.scoringView.showDebugView = true;
