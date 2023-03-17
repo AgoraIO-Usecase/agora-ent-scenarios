@@ -102,16 +102,16 @@ public class GradeView extends View {
         mGradeSeparatorLabelIndicatorPaint.setTextAlign(Paint.Align.CENTER);
 
         mDefaultBackgroundPaint.setShader(null);
-        int colorOfBgBlue = 0;
+        int colorOfBackground = 0;
         int colorOfContentGray = 0;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            colorOfBgBlue = getResources().getColor(R.color.ktv_grade_view_bg_blue, null);
+            colorOfBackground = getResources().getColor(R.color.ktv_grade_view_bg, null);
             colorOfContentGray = getResources().getColor(R.color.ktv_grade_view_content_gray, null);
         } else {
-            colorOfBgBlue = getResources().getColor(R.color.ktv_grade_view_bg_blue);
+            colorOfBackground = getResources().getColor(R.color.ktv_grade_view_bg);
             colorOfContentGray = getResources().getColor(R.color.ktv_grade_view_content_gray);
         }
-        mDefaultBackgroundPaint.setColor(colorOfBgBlue);
+        mDefaultBackgroundPaint.setColor(colorOfBackground);
         mGradeSeparatorIndicatorPaint.setColor(colorOfContentGray);
         mGradeSeparatorLabelIndicatorPaint.setColor(colorOfContentGray);
 

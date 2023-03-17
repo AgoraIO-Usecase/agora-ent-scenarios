@@ -33,11 +33,8 @@
                 android:id="@+id/tvMusicName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
                 android:layout_marginTop="6dp"
-                android:drawablePadding="6dp"
-                android:textColor="@android:color/white"
-                app:drawableStartCompat="@drawable/ktv_ic_music"
+                android:textColor="@color/def_text_grey_979"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

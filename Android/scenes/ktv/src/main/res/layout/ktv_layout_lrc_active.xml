@@ -37,8 +37,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-
-    <io.agora.karaoke_view.v11.ScoringView
+    <io.agora.scene.ktv.widget.lrcView.MyScoringView
         android:id="@+id/scoringView"
         android:layout_width="match_parent"
         android:layout_height="90dp"
@@ -49,7 +48,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:pitchIndicatorRadius="6dp"
         app:pitchInitialScore="0"
-        app:pitchStickHeight="6dp" />
+        app:pitchStickHeight="4dp"
+        app:pitchStickHighlightColor="@color/pink_b4" />
 
     <io.agora.karaoke_view.v11.LyricsView
         android:id="@+id/lyricsView"
@@ -70,7 +70,7 @@
         app:lineSpacing="8sp"
         app:paddingTop="2dp"
         app:startOfVerseIndicatorPaddingTop="6dp"
-        app:startOfVerseIndicatorRadius="6dp"
+        app:startOfVerseIndicatorRadius="4dp"
         app:textGravity="center" />
 
     <View

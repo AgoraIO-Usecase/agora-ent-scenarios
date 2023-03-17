@@ -75,6 +75,7 @@
     <color name="text_color_99">#999999</color>
     <color name="text_color_dd">#dddddd</color>
     <color name="white_20_percent">#33FFFFFF</color>
+    <color name="white_35_percent">#59FFFFFF</color>
     <color name="white_60_percent">#99FFFFFF</color>
     <color name="white_70_percent">#B3FFFFFF</color>
     <color name="white_80_percent">#CCFFFFFF</color>
