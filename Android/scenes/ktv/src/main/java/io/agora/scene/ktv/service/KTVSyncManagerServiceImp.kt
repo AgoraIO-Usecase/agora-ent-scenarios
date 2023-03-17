@@ -653,13 +653,11 @@ class KTVSyncManagerServiceImp(
         songCode: String,
         completion: (error: Exception?) -> Unit
     ) {
-        KTVLogger.d("hugo", "11111111")
         //加入合唱
         innerGetSeatInfo { err, list ->
             if (err == null && list != null) {
                 list.forEach { seat ->
                     if (seat.userNo == UserManager.getInstance().user.id.toString()) {
-                        KTVLogger.d("hugo", "2222222")
                         // 座位 joinSing -> true
                         val seatInfo = RoomSeatModel(
                             seat.isMaster,

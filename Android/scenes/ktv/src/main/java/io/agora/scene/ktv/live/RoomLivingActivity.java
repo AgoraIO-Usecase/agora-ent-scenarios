@@ -30,6 +30,7 @@ import java.util.Map;
 
 import io.agora.rtc2.Constants;
 import io.agora.scene.base.GlideApp;
+import io.agora.scene.base.TokenGenerator;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
@@ -341,6 +342,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if (seatModels == null) {
                 return;
             }
+            int chorusNowNum = 0;
             for (RoomSeatModel seatModel : seatModels) {
                 RoomSeatModel oSeatModel = mRoomSpeakerAdapter.getItem(seatModel.getSeatIndex());
                 if (oSeatModel == null
@@ -349,7 +351,22 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         || (oSeatModel.getChorusSongCode() != null && !oSeatModel.getChorusSongCode().equals(seatModel.getChorusSongCode()))) {
                     mRoomSpeakerAdapter.replace(seatModel.getSeatIndex(), seatModel);
                 }
+
+                if (seatModel.getChorusSongCode() != null && roomLivingViewModel.songPlayingLiveData.getValue() != null && seatModel.getChorusSongCode().equals(roomLivingViewModel.songPlayingLiveData.getValue().getSongNo())) {
+                    chorusNowNum ++;
+                }
             }
+
+            if (roomLivingViewModel.chorusNum == 0 && chorusNowNum > 0) {
+                // 有人加入合唱
+                roomLivingViewModel.soloSingerJoinChorusMode(true);
+            } else if (roomLivingViewModel.chorusNum > 0 && chorusNowNum == 0) {
+                // 最后一人退出合唱
+                roomLivingViewModel.soloSingerJoinChorusMode(false);
+            }
+            roomLivingViewModel.chorusNum = chorusNowNum;
+
+
             for (int i = 0; i < mRoomSpeakerAdapter.getItemCount(); i++) {
                 RoomSeatModel seatModel = mRoomSpeakerAdapter.getItem(i);
                 if (seatModel == null) {
