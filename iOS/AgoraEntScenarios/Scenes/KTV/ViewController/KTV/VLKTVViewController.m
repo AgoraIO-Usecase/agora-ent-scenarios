@@ -496,7 +496,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
-        self.singRole = KTVSingRoleCoSinger;
+        self.singRole = KTVSingRoleAudience;
     }];
 }
 
@@ -1325,9 +1325,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         KTVLogInfo(@"seat array update chorusNum %ld->%ld", origChorusNum, chorusNum);
         //lead singer <-> solo
         NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
-        [self.ktvApi switchSingerRoleWithNewRole:[self getUserSingRole]
+        KTVSingRole role = [self getUserSingRole];
+        [self.ktvApi switchSingerRoleWithNewRole:role
                                            token:exChannelToken
                                onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+            if (state == KTVSwitchRoleStateFail) {
+                return;
+            }
+            
+            self.singRole = role;
         }];
     }
 }
