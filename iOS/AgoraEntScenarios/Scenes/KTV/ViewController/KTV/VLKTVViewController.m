@@ -1517,26 +1517,30 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)onMusicLoadFailWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl reason:(enum KTVLoadSongFailReason)reason {
-    self.MVView.isLoading = NO;
-    if (reason == KTVLoadSongFailReasonNoLyricUrl) {
-        //空歌词也认为成功
-        return;
-    }
-    
-    KTVLogError(@"onMusicLoadFail songCode: %ld error: %ld retry count: %ld", songCode, reason, self.retryCount);
-    if(self.retryCount < 3) {
-        [self loadAndPlaySong];
-    } else {
-        //TODO(chenpan): error toast?
-    }
-    self.retryCount++;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.MVView.isLoading = NO;
+        if (reason == KTVLoadSongFailReasonNoLyricUrl) {
+            //空歌词也认为成功
+            return;
+        }
+        
+        KTVLogError(@"onMusicLoadFail songCode: %ld error: %ld retry count: %ld", songCode, reason, self.retryCount);
+        if(self.retryCount < 3) {
+            [self loadAndPlaySong];
+        } else {
+            //TODO(chenpan): error toast?
+        }
+        self.retryCount++;
+    });
 }
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
-    self.MVView.isLoading = NO;
-    if(lyricUrl.length > 0){
-        self.lrcControl.isMainSinger = (_singRole == KTVSingRoleSoloSinger || _singRole == KTVSingRoleLeadSinger);
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.MVView.isLoading = NO;
+        if(lyricUrl.length > 0){
+            self.lrcControl.isMainSinger = (_singRole == KTVSingRoleSoloSinger || _singRole == KTVSingRoleLeadSinger);
+        }
+    });
 }
 
 @end
