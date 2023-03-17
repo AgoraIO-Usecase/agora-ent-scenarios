@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.agora.entfulldemo.BuildConfig;
 import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppFragmentHomeMineBinding;
+import com.agora.entfulldemo.home.mine.AboutUsActivity;
 
 import java.io.File;
 
@@ -99,7 +100,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             showLogoffAccountDialog();
         });
         getBinding().tvAbout.setOnClickListener(view -> {
-            PagePilotManager.pageMineAboutUs();
+            startActivity(new Intent(getContext(), AboutUsActivity.class));
         });
         getBinding().vToEdit.setOnClickListener(view -> {
             if (editNameDialog == null) {
