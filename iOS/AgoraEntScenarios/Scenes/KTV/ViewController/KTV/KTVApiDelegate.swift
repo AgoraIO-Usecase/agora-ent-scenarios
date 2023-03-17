@@ -70,6 +70,10 @@ import AgoraRtcKit
 
 @objc public protocol KTVMusicLoadStateListener: NSObjectProtocol {
     
+    /// 歌曲加载中
+    /// - Parameter songCode: <#songCode description#>
+    func onMusicLoadStart(songCode: Int)
+    
     /// 歌曲加载成功
     /// - Parameters:
     ///   - songCode: 歌曲code

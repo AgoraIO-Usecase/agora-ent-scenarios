@@ -530,6 +530,9 @@ extension KTVApiImpl {
         songConfig = config
         let role = singerRole
         let songCode = config.songCode
+        
+        
+        onMusicLoadStateListener.onMusicLoadStart(songCode: songCode)
 
 //        if (loadDict.keys.contains(String(songCode))) {
 //            let loadState = loadDict[String(songCode)]
