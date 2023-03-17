@@ -30,8 +30,6 @@
   - 得到App ID与App 证书
 
     ![图片](image/get_app_id.jpg)
-  
-- <mark>联系销售给 AppID 开通 语聊房权限</mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员[Agora 支持](https://agora-ticket.agora.io/))
 
 - 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 App证书
 
@@ -89,5 +87,6 @@ AgoraRtc管理类：[AgoraRtcEngineController](src/main/java/io/agora/scene/voic
 - 如何获取声网的APP ID：
   - 声网APP ID申请：https://www.agora.io/cn/
 - 集成遇到困难，该如何联系声网获取协助
-  - 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
-  - 方案2：发送邮件给support@agora.io咨询。
+  - 方案1：可以从智能客服获取帮助或联系销售人员[Agora 支持](https://agora-ticket.agora.io/) ；
+  - 方案2：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
+  - 方案3：发送邮件给support@agora.io咨询。
