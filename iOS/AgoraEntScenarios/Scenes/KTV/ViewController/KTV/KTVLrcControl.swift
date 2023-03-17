@@ -7,7 +7,7 @@
 
 import Foundation
 import AgoraLyricsScore
-
+import ScoreEffectUI
 @objc public protocol KTVLrcControlDelegate: NSObjectProtocol {
     func didLrcViewDragedTo(pos: Int, score: Int, totalScore: Int)
     func didLrcViewScorllFinished(with score: Int, totalScore: Int, lineScore: Int)
@@ -15,6 +15,8 @@ import AgoraLyricsScore
 
 @objc class KTVLrcControl: NSObject {
     @objc public var lrcView: KaraokeView
+    private var gradeView: GradeView!
+    private var incentiveView: IncentiveView!
     private var skipBtn: KTVSkipView!
     @objc public var isMainSinger: Bool = false //是否为主唱
     private var lyricModel: LyricModel?
@@ -30,6 +32,8 @@ import AgoraLyricsScore
     @objc init(lrcView: KaraokeView) {
         self.lrcView = lrcView
         super.init()
+        
+        
         
         skipBtn = KTVSkipView(frame: CGRect(x: self.lrcView.bounds.size.width / 2.0 - 44, y: self.lrcView.bounds.size.height - 34, width: 120, height: 34), completion: { type in
             if type == .down {
