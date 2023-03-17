@@ -315,7 +315,7 @@ extension KTVApiImpl {
                 self.joinChorusNewRole = .audience
                 if flag == true {
                     self.singerRole = newRole
-                    getEventHander { delegate in
+                    self.getEventHander { delegate in
                         delegate.onSingerRoleChanged(oldRole: .soloSinger, newRole: .leadSinger)
                     }
                     stateCallBack(.success, .none)
