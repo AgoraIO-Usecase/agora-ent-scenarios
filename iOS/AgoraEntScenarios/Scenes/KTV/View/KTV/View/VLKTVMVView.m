@@ -73,9 +73,11 @@
     if (_isLoading) {
         [self.loadingView startAnimating];
         [self.contentView setHidden:YES];
+        [self.loadingView setHidden:NO];
     } else {
         [self.loadingView stopAnimating];
         [self.contentView setHidden:NO];
+        [self.loadingView setHidden:YES];
     }
 }
 
@@ -162,6 +164,7 @@
     
     self.loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
     self.loadingView.color = [UIColor whiteColor];
+    [self.loadingView setHidden:YES];
     [self addSubview:self.loadingView];
 }
 
