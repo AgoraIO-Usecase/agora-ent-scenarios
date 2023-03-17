@@ -36,7 +36,7 @@ import AgoraLyricsScore
                 self.skipBtn.isHidden = true
                 guard let duration = self.lyricModel?.duration else {return}
                 guard let preludeEndPosition = self.lyricModel?.preludeEndPosition else {return}
-                let pos: Int = self.progress >= duration  ? duration - 500 : preludeEndPosition - 500
+                let pos: Int = self.progress >= duration - 500  ? duration : preludeEndPosition - 500
                 self.skipCallBack?(pos)
             }
         })
