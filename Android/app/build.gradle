@@ -5,6 +5,10 @@ android {
     defaultConfig {
         applicationId "io.agora.chatroom"
     }
+
+    lintOptions {
+        disable "Instantiatable"
+    }
 }
 
 dependencies {
