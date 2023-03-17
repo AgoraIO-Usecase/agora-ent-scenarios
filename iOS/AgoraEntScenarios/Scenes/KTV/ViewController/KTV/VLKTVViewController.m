@@ -1446,7 +1446,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)setSingRole:(KTVSingRole)singRole {
     _singRole = singRole;
-    self.lrcControl.lrcView.lyricsView.draggable = singRole == KTVSingRoleSoloSinger;
+    self.lrcControl.lrcView.lyricsView.draggable = false;
     KTVLogInfo(@"setSingRole: %ld", singRole);
     
     VLRoomSelSongModel *song = self.selSongsArray.firstObject;
