@@ -68,7 +68,7 @@ class KTVApiImpl: NSObject{
 
     private var singerRole: KTVSingRole = .audience {
         didSet {
-            agoraPrint("singerRole changed: \(singerRole.rawValue) ->\(oldValue.rawValue)")
+            agoraPrint("singerRole changed: \(oldValue.rawValue)->\(singerRole.rawValue)")
         }
     }
     private var lrcControl: KTVLrcViewDelegate?
@@ -637,25 +637,19 @@ extension KTVApiImpl {
                         self?.startSing(startPos: 0)
                     }
                 }
-                if let url = self?.lyricUrlMap[String(songCode)] {
-                    onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: url)
-                }
+                let url = self?.lyricUrlMap[String(songCode)] ?? ""
+                onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: url)
             } else if (!isLoadUrlSuccess && isLoadMusicSuccess) {
                 onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, lyricUrl: "", reason: .noLyricUrl)
             } else if (isLoadUrlSuccess && !isLoadMusicSuccess) {
-                if let url = self?.lyricUrlMap[String(songCode)] {
-                    onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, lyricUrl: url, reason: .musicPreloadFail)
-                }
+                let url = self?.lyricUrlMap[String(songCode)] ?? ""
+                onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, lyricUrl: url, reason: .musicPreloadFail)
             } else {
-                if let url = self?.lyricUrlMap[String(songCode)] {
-                    onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, lyricUrl: url, reason: .musicPreloadFailedAndNoLyricUrl)
-                } else {
-                    return
-                }
+                let url = self?.lyricUrlMap[String(songCode)] ?? ""
+                onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, lyricUrl: url, reason: .musicPreloadFailedAndNoLyricUrl)
             }
             agoraPrint("_loadMusic finished: \(songCode) url: \(self?.lyricUrlMap[String(songCode)] ?? "")")
         }
-
     }
 
     private func loadLyric(with songCode: NSInteger, callBack:@escaping LyricCallback) {
