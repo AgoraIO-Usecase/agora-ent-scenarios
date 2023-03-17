@@ -13,6 +13,11 @@ import ZSwiftBaseLib
 
 // MARK: - ChatRoomServiceSubscribeDelegate
 extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
+    func onRoomAnnouncementChanged(announce: String) {
+        ToastView.show(text: "announcement changed!")
+        roomInfo?.room?.announcement = announce
+    }
+    
     func onRoomExpired() {
         ToastView.show(text: SAServiceKickedReason.destroyed.errorDesc())
         fetchDetailError()
@@ -211,13 +216,15 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
             }
         }
 //        self.roomInfo?.room?.member_list = self.roomInfo?.room?.member_list?.filter({
-//            $0.chat_uid != userName
+//            $0.chat_uid != userNamemicApplys
 //        })
         self.refreshApplicants(chat_uid: userName)
 //        AppContext.saTmpServiceImp().userList = self.roomInfo?.room?.member_list ?? []
         self.roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
         if isOwner {
             AppContext.saServiceImp().updateRoomMembers { _ in }
+            guard let imp = AppContext.saServiceImp() as? SpatialAudioSyncSerciceImp else { return }
+            imp.micApplys.removeAll { $0.member?.uid ?? "" == userName }
         }
     }
     
@@ -250,6 +257,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                 var micUser = AppContext.saTmpServiceImp().userList.first(where: {
                     $0.chat_uid ?? "" == fromId
                 })
+                
                 if status == -1 {
                     micUser?.mic_index = -1
                 } else {
@@ -272,6 +280,16 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                     }
                     if mic_index == local_index && (status == -1 || status == 3 || status == 4 || status == 2) {
                         local_index = nil
+                    }
+                } else {
+                    if let index = AppContext.saTmpServiceImp().micApplys.firstIndex(where: { $0.member?.uid ?? "" == first.member?.uid ?? ""
+                    })  {
+                        let apply = AppContext.saTmpServiceImp().micApplys[safe: index] ?? SAApply()
+                        AppContext.saTmpServiceImp()._removeMicSeatApply(roomId: self.roomInfo?.room?.room_id ?? "", apply: apply) { error in
+                            if error == nil {
+                                AppContext.saTmpServiceImp().micApplys.remove(at: index)
+                            }
+                        }
                     }
                 }
                 /**

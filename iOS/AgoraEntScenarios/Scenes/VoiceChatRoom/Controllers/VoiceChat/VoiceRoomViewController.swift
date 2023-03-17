@@ -582,12 +582,14 @@ extension VoiceRoomViewController {
         self.rtckit.leaveChannel()
         self.notifySeverLeave()
         self.leaveRoom()
+        dismiss(animated: false)
         VoiceRoomUserInfo.shared.currentRoomOwner = nil
         VoiceRoomUserInfo.shared.user?.amount = 0
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
         ChatRoomServiceImp.getSharedInstance().cleanCache()
         self.rtckit.stopPlayMusic()
         self.ownerBack()
+        
     }
 
     private func ownerBack() {
@@ -598,7 +600,7 @@ extension VoiceRoomViewController {
         }
     }
 
-    func showInviteMicAlert() {
+    func showInviteMicAlert(index: Int?) {
         VoiceRoomPresentView.shared.dismiss()
         inputBar.hiddenInputBar()
         var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 75, height: 200))
@@ -609,7 +611,7 @@ extension VoiceRoomViewController {
             if $0 == 30 {
                 self?.refuse()
             } else {
-                self?.agreeInvite()
+                self?.agreeInvite(index: index)
             }
             vc.dismiss(animated: true)
         }

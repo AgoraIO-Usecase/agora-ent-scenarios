@@ -169,8 +169,8 @@ extension VoiceRoomViewController {
         }
     }
 
-    func agreeInvite() {
-        ChatRoomServiceImp.getSharedInstance().acceptMicSeatInvitation(completion: { error, mic in
+    func agreeInvite(index: Int?) {
+        ChatRoomServiceImp.getSharedInstance().acceptMicSeatInvitation(index: index,completion: { error, mic in
             if error == nil,let mic = mic {
                 self.rtcView.updateUser(mic)
                 self.local_index = mic.mic_index

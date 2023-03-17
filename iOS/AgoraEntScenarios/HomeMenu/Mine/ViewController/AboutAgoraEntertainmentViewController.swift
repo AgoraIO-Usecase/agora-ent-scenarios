@@ -100,11 +100,10 @@ extension AboutAgoraEntertainmentViewController: UITableViewDelegate,UITableView
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if let name = self.infos[safe: section]?["sectionName"] as? String,name == NSLocalizedString("SceneVersion", comment: "") {
-            let sectionHeader = UIView {
+            return UIView {
                 UIView(frame: CGRect(x: 0, y: 0, width: self.infoList.frame.width, height: 44)).backgroundColor(.white)
                 UILabel(frame: CGRect(x: 20, y: 12, width: self.infoList.frame.width-40, height: 20)).font(.systemFont(ofSize: 13, weight: .regular)).textColor(UIColor(0x6C7192)).text(name)
             }
-            return sectionHeader
         }
         return nil
     }
