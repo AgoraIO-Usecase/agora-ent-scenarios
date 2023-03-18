@@ -1539,7 +1539,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     dispatch_async(dispatch_get_main_queue(), ^{
         self.MVView.isLoading = NO;
         if(lyricUrl.length > 0){
-            NSLog(@"onMusicLoadSuccessWithSongCode: %ld", _singRole);
+            NSLog(@"onMusicLoadSuccessWithSongCode: %ld", self.singRole);
         }
     });
 }
