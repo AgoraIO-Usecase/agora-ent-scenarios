@@ -1450,13 +1450,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVLogInfo(@"setSelSongsArray orig top: songName: %@, status: %ld",
                originalTopSong.songName, originalTopSong.status);
     if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
-        //检查麦位信息里合唱状态
-        for(VLRoomSeatModel* seat in self.seatsArray) {
-            if(![seat.chorusSongCode isEqualToString:updatedTopSong.songNo]) {
-                seat.chorusSongCode = @"";
-            }
-        }
-        
         [self.MVView reset];
         //song changes
         [self stopPlaySong];

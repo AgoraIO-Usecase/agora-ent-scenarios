@@ -163,6 +163,11 @@
                 seatModel.isOwner = isOwner;
                 hasChanged = YES;
             }
+            //检查麦位合唱歌曲状态
+            if (![seatModel.chorusSongCode isEqualToString:songModel.songNo]) {
+                seatModel.chorusSongCode = @"";
+                hasChanged = YES;
+            }
         }
     }else{
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
