@@ -540,8 +540,6 @@ extension KTVApiImpl {
         let role = singerRole
         let songCode = config.songCode
         
-        self.loadMusicListeners.setObject(onMusicLoadStateListener, forKey: "\(songCode)" as NSString)
-        onMusicLoadStateListener.onMusicLoadProgress(songCode: songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
 //        if (loadDict.keys.contains(String(songCode))) {
 //            let loadState = loadDict[String(songCode)]
 //            if loadState == .ok {
@@ -565,6 +563,12 @@ extension KTVApiImpl {
         let KTVQueue = DispatchQueue(label: "com.agora.ktv.www")
 
         if role != .audience  {
+            
+            if mode == .loadMusicOnly || mode == .loadMusicAndLrc {
+                self.loadMusicListeners.setObject(onMusicLoadStateListener, forKey: "\(songCode)" as NSString)
+                onMusicLoadStateListener.onMusicLoadProgress(songCode: songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
+            }
+            
             KTVGroup.enter()
             KTVQueue.async { [weak self] in
                 if mode == .loadMusicOnly {
@@ -613,7 +617,9 @@ extension KTVApiImpl {
                     KTVGroup.leave()
                 }
                 
+                agoraPrint("audience start load lrc")
                 self?.loadLyric(with: songCode, callBack: { url in
+                    agoraPrint("audience get lrc: \(url)")
                     if let urlPath = url, urlPath.count > 0 {
                         self?.lyricUrlMap.updateValue(urlPath, forKey: String(songCode))
                         self?.setLyric(with: urlPath, callBack: { lyricUrl in
@@ -828,6 +834,9 @@ extension KTVApiImpl {
                 guard let songCode: Int64 = dict["songCode"] as? Int64 else {return}
                 guard let mainSingerState: Int = dict["playerState"] as? Int else {return}
                 
+//                if songConfig?.songCode == 0 {
+//                    songConfig?.songCode = Int(songCode)
+//                }
                 //如果接收到的歌曲和自己本地的歌曲不一致就不更新进度
                 if songCode != songConfig?.songCode ?? 0 {
                     agoraPrint("local songCode[\(songCode)] is not equal to recv songCode[\(songConfig?.songCode ?? 0)] role: \(singerRole.rawValue)")
@@ -1132,6 +1141,7 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
     }
 
     func onLyricResult(_ requestId: String, lyricUrl: String) {
+        agoraPrint("加载的歌词地址:\(lyricUrl)")
         let callback = self.lyricCallbacks[requestId]
         guard let lyricCallback = callback else { return }
         self.lyricCallbacks.removeValue(forKey: requestId)
