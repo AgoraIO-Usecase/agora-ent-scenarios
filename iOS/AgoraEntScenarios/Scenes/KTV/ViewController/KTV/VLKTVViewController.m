@@ -1533,8 +1533,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             self.loadMusicCallBack(NO, songCode);
             self.loadMusicCallBack = nil;
         }
-        
-        self.MVView.loadingType = VLKTVMVViewStateIdle;
+        if (reason == KTVLoadSongFailReasonNoLyricUrl) {
+            self.MVView.loadingType = VLKTVMVViewStateLoadFail;
+        } else {
+            self.MVView.loadingType = VLKTVMVViewStateIdle;
+        }
         KTVLogError(@"onMusicLoadFail songCode: %ld error: %ld", songCode, reason);
     });
 }
