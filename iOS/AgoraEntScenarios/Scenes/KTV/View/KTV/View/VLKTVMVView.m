@@ -76,6 +76,7 @@
         [self.contentView setHidden:YES];
         [self.loadingTipsLabel setHidden:NO];
     } else {
+        NSLog(@"curThread: %@", [NSThread currentThread]);
         [self.loadingView stopAnimating];
         [self.contentView setHidden:NO];
         [self.loadingTipsLabel setHidden:YES];
@@ -150,7 +151,7 @@
     self.incentiveView.frame = CGRectMake(15, 55, 192, 45);
     [self.karaokeView addSubview:self.incentiveView];
 
-    self.pauseBtn.frame = CGRectMake(20, self.height-54-12, 34, 54);
+    self.pauseBtn.frame = CGRectMake(20, self.height-54, 34, 54);
     [self updateBtnLayout:self.pauseBtn];
     [self addSubview:self.pauseBtn];
 
@@ -182,7 +183,7 @@
     [self.joinChorusBtn addTarget:self action:@selector(joinChorus) forControlEvents:UIControlEventTouchUpInside];
     [self.contentView addSubview:_joinChorusBtn];
     
-    self.leaveChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(20, _pauseBtn.top, 54, 54)];
+    self.leaveChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(10, _pauseBtn.top, 54, 54)];
     [self.leaveChorusBtn setTitle:@"退出合唱" forState:UIControlStateNormal];
     [self.leaveChorusBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.leaveChorusBtn setFont:[UIFont systemFontOfSize:11]];
