@@ -20,7 +20,8 @@
 @property(nonatomic, weak) id <VLKTVMVViewDelegate>delegate;
 
 @property (nonatomic, strong) UIActivityIndicatorView* loadingView;  //加载中
-@property (nonatomic, strong) UILabel* loadingTipsLabel;  //加载提示
+@property (nonatomic, strong) UILabel* loadingTipsLabel;  //加载结果提示
+@property (nonatomic, strong) UIButton* retryButton;   //重试按钮
 @property (nonatomic, strong) UIView* contentView;
 
 @property (nonatomic, strong) UILabel *musicTitleLabel;
@@ -68,19 +69,30 @@
     }
 }
 
-- (void)setIsLoading:(BOOL)isLoading {
-    _isLoading = isLoading;
+- (void)setLoadingType:(VLKTVMVLoadingState)loadingType {
+    _loadingType = loadingType;
     
-    if (_isLoading) {
+    if (loadingType == VLKTVMVViewStateLoading) {
         [self.loadingView startAnimating];
+        [self.loadingView setHidden:NO];
         [self.contentView setHidden:YES];
+        [self.retryButton setHidden:YES];
         [self.loadingTipsLabel setHidden:NO];
-    } else {
-        NSLog(@"curThread: %@", [NSThread currentThread]);
+    } else if (loadingType == VLKTVMVViewStateLoadFail) {
         [self.loadingView stopAnimating];
+        [self.loadingView setHidden:YES];
         [self.contentView setHidden:NO];
+        [self.retryButton setHidden:NO];
+        [self.loadingTipsLabel setHidden:NO];
+        self.loadingTipsLabel.text = @"歌词加载失败";
+    } else if (loadingType == VLKTVMVViewStateIdle){
+        [self.loadingView stopAnimating];
+        [self.loadingView setHidden:YES];
+        [self.contentView setHidden:NO];
+        [self.retryButton setHidden:YES];
         [self.loadingTipsLabel setHidden:YES];
     }
+    [self setNeedsLayout];
 }
 
 - (void)setLoadingProgress:(NSInteger)loadingProgress {
@@ -88,19 +100,20 @@
 #if DEBUG
     self.loadingTipsLabel.text = [NSString stringWithFormat:@"loading %ld%%", loadingProgress];
 #else
-    self.loadingTipsLabel.text = @"loading";
+    self.loadingTipsLabel.text = @"加载中";
 #endif
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-//
-//    [self.originBtn sizeToFit];
-//    self.originBtn.frame = CGRectMake(self.width-20-self.originBtn.width, _pauseBtn.top, self.originBtn.width, 24);
-//    self.settingBtn.frame = CGRectMake(_originBtn.left-20-24, _pauseBtn.top, 24, 24);
+    
     [self.loadingView sizeToFit];
     self.loadingView.center = CGRectGetCenter(self.bounds);
-    self.loadingTipsLabel.frame = CGRectMake(self.loadingView.centerX - 50, self.loadingView.bottom + 5, 200, 40);
+    CGFloat tipsTop = self.loadingType == VLKTVMVViewStateLoading ? self.loadingView.bottom + 5 : self.incentiveView.bottom + 10;
+    self.loadingTipsLabel.frame = CGRectMake(self.loadingView.centerX - 100, tipsTop, 200, 40);
+    
+    [self.retryButton sizeToFit];
+    self.retryButton.center = CGPointMake(self.loadingView.centerX, self.loadingTipsLabel.bottom + self.retryButton.height / 2);
 }
 
 #pragma mark private
@@ -112,19 +125,30 @@
     self.bgImgView.layer.masksToBounds = YES;
     [self addSubview:self.bgImgView];
     
+    self.contentView = [[UIView alloc] initWithFrame:self.bounds];
+    self.contentView.backgroundColor = [UIColor clearColor];
+    [self addSubview:self.contentView];
+    
     self.loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
     self.loadingView.color = [UIColor whiteColor];
     [self.loadingView setHidden:YES];
     [self addSubview:self.loadingView];
     
     self.loadingTipsLabel = [[UILabel alloc] init];
-    self.loadingTipsLabel.font = [UIFont systemFontOfSize:14];
+    self.loadingTipsLabel.textAlignment = NSTextAlignmentCenter;
+    self.loadingTipsLabel.font = [UIFont systemFontOfSize:16];
     self.loadingTipsLabel.textColor = [UIColor whiteColor];
     [self addSubview:self.loadingTipsLabel];
     
-    self.contentView = [[UIView alloc] initWithFrame:self.bounds];
-    self.contentView.backgroundColor = [UIColor clearColor];
-    [self addSubview:self.contentView];
+    self.retryButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.retryButton addTarget:self action:@selector(onRetryAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.retryButton.titleLabel.font = self.loadingTipsLabel.font;
+    [self.retryButton setTitle:@"  点击重试  " forState:UIControlStateNormal];
+    [self.retryButton sizeToFit];
+    self.retryButton.layer.cornerRadius = self.retryButton.height / 2;
+    self.retryButton.layer.borderWidth = 1;
+    self.retryButton.layer.borderColor = [UIColor whiteColor].CGColor;
+    [self addSubview:self.retryButton];
     
     UIImageView *currentPlayImgView = [[UIImageView alloc]initWithFrame:CGRectMake(9, 2, 39, 39)];
     currentPlayImgView.image = [UIImage sceneImageWithName:@"ktv_currentPlay_icon"];
@@ -251,6 +275,12 @@
 }
 
 #pragma mark - Action
+
+- (void)onRetryAction:(UIButton*)button {
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
+        [self.delegate onKTVMVView:self btnTappedWithActionType:VLKTVMVViewActionTypeRetryLrc];
+    }
+}
 
 - (void)playClick:(UIButton *)button {
     button.selected = !button.selected;

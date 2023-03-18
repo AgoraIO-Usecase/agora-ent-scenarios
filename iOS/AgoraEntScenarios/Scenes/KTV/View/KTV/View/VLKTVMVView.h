@@ -14,13 +14,19 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLKTVSelBgModel;
 
 typedef enum : NSUInteger {
+    VLKTVMVViewStateIdle = 0,
+    VLKTVMVViewStateLoading,
+    VLKTVMVViewStateLoadFail,
+} VLKTVMVLoadingState;
+
+typedef enum : NSUInteger {
     VLKTVMVViewActionTypeSetParam = 0,  // 设置参数
-    VLKTVMVViewActionTypeMVPlay,    // play
-    VLKTVMVViewActionTypeMVPause,   // parse
+    VLKTVMVViewActionTypeMVPlay,     // play
+    VLKTVMVViewActionTypeMVPause,    // parse
     VLKTVMVViewActionTypeMVNext,     // 播放下一首
-    VLKTVMVViewActionTypeSingOrigin, //原唱
-    VLKTVMVViewActionTypeSingAcc   // 伴奏
-    
+    VLKTVMVViewActionTypeSingOrigin, // 原唱
+    VLKTVMVViewActionTypeSingAcc,    // 伴奏
+    VLKTVMVViewActionTypeRetryLrc    // 歌曲重试
 } VLKTVMVViewActionType;
 
 @class VLKTVMVView;
@@ -39,7 +45,7 @@ typedef enum : NSUInteger {
 @end
 
 @interface VLKTVMVView : UIView
-@property (nonatomic, assign) BOOL isLoading;
+@property (nonatomic, assign) VLKTVMVLoadingState loadingType;
 @property (nonatomic, assign) NSInteger loadingProgress;
 @property (nonatomic, strong) KaraokeView *karaokeView;
 @property (nonatomic, strong) GradeView *gradeView;

@@ -95,8 +95,6 @@ KTVMusicLoadStateListener
 @property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
 @property (nonatomic, strong) KTVApiImpl* ktvApi;
 
-@property (nonatomic, assign) NSUInteger retryCount;
-
 @property (nonatomic, strong) LyricModel *lyricModel;
 @property (nonatomic, strong) KTVLrcControl *lrcControl;
 @end
@@ -158,8 +156,6 @@ KTVMusicLoadStateListener
     //处理背景
     [self prepareBgImage];
     [[UIApplication sharedApplication] setIdleTimerDisabled: YES];
-
-    self.retryCount = 0;
     
     //add debug
     [self.topView addGestureRecognizer:[KTVDebugManager createStartGesture]];
@@ -1081,6 +1077,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         self.trackMode = KTVPlayerTrackModeOrigin;
     } else if (type == VLKTVMVViewActionTypeSingAcc) { // 伴奏
         self.trackMode = KTVPlayerTrackModeAcc;
+    } else if (type == VLKTVMVViewActionTypeRetryLrc) {  //重试
+        //TODO(chenpan):
     }
 }
 
@@ -1505,19 +1503,19 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVLogInfo(@"load: %li, %li", status, percent);
     if ([NSThread isMainThread]) {
         if (percent == 0) {
-            self.MVView.isLoading = YES;
+            self.MVView.loadingType = VLKTVMVViewStateLoading;
         }
         if (status == AgoraMusicContentCenterPreloadStatusOK){
-            self.MVView.isLoading = NO;
+            self.MVView.loadingType = VLKTVMVViewStateLoadFail;
         }
         self.MVView.loadingProgress = percent;
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (percent == 0) {
-                self.MVView.isLoading = YES;
+                self.MVView.loadingType = VLKTVMVViewStateLoading;
             }
             if (status == AgoraMusicContentCenterPreloadStatusOK){
-                self.MVView.isLoading = NO;
+                self.MVView.loadingType = VLKTVMVViewStateLoadFail;
             }
             self.MVView.loadingProgress = percent;
         });
@@ -1526,19 +1524,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)onMusicLoadFailWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl reason:(enum KTVLoadSongFailReason)reason {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.MVView.isLoading = NO;
         if (reason == KTVLoadSongFailReasonNoLyricUrl) {
-            //空歌词也认为成功
-            return;
+            self.MVView.loadingType = VLKTVMVViewStateLoadFail;
+        } else {
+            self.MVView.loadingType = VLKTVMVViewStateIdle;
         }
         
-        KTVLogError(@"onMusicLoadFail songCode: %ld error: %ld retry count: %ld", songCode, reason, self.retryCount);
-        if(self.retryCount < 3) {
-            [self loadAndPlaySong];
-        } else {
-            //TODO(chenpan): error toast?
-        }
-        self.retryCount++;
+        KTVLogError(@"onMusicLoadFail songCode: %ld error: %ld", songCode, reason);
     });
 }
 
@@ -1546,7 +1538,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     dispatch_async(dispatch_get_main_queue(), ^{
 //        self.MVView.isLoading = NO;
         if(lyricUrl.length > 0){
-            NSLog(@"onMusicLoadSuccessWithSongCode: %ld", self.singRole);
+            KTVLogInfo(@"onMusicLoadSuccessWithSongCode: %ld", self.singRole);
         }
     });
 }
