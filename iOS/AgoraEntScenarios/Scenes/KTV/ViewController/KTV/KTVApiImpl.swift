@@ -46,6 +46,7 @@ class KTVApiImpl: NSObject{
    
     private var audioPlayoutDelay: NSInteger = 0
     private var isNowMicMuted: Bool = false
+    private var loadSongState: KTVLoadSongState = .idle
     
     private var playerState: AgoraMediaPlayerState = .idle {
         didSet {
@@ -78,7 +79,6 @@ class KTVApiImpl: NSObject{
     
     public var remoteVolume: Int = 15
     private var joinChorusNewRole: KTVSingRole = .audience
-    private var loadMusicState: KTVLoadSongFailReason = .none
     private var oldPitch: Double = 0
     deinit {
         mcc.register(nil)
@@ -253,7 +253,8 @@ extension KTVApiImpl {
             stateCallBack(.success, .none)
         } else if oldRole == .audience && newRole == .leadSinger {
             becomeSoloSinger()
-            joinChorus(role: newRole, token: token, joinExChannelCallBack: { flag, status in
+            joinChorus(role: newRole, token: token, joinExChannelCallBack: {[weak self] flag, status in
+                guard let self = self else {return}
                 //还原临时变量为观众
                 self.joinChorusNewRole = .audience
 
@@ -262,13 +263,7 @@ extension KTVApiImpl {
                     stateCallBack(.success, .none)
                 } else {
                     self.leaveChorus(role: .leadSinger)
-                    if status == .musicPreloadFail {
-                        stateCallBack(.fail, .musicPreloadFail)
-                    } else if status == .joinChannelFail {
-                        stateCallBack(.fail, .joinChannelFail)
-                    } else if status == .musicPreloadFailAndJoinChannelFail {
-                        stateCallBack(.fail, .musicPreloadFailAndJoinChannelFail)
-                    }
+                    stateCallBack(.fail, .joinChannelFail)
                 }
             })
 
@@ -281,8 +276,8 @@ extension KTVApiImpl {
             
             stateCallBack(.success, .none)
         } else if oldRole == .audience && newRole == .coSinger {
-            //TODO(chenpan): clouse retain cycle
-            joinChorus(role: newRole, token: token, joinExChannelCallBack: { flag, status in
+            joinChorus(role: newRole, token: token, joinExChannelCallBack: {[weak self] flag, status in
+                guard let self = self else {return}
                 //还原临时变量为观众
                 self.joinChorusNewRole = .audience
                 if flag == true {
@@ -293,13 +288,7 @@ extension KTVApiImpl {
                     stateCallBack(.success, .none)
                 } else {
                     self.leaveChorus(role: .coSinger)
-                    if status == .musicPreloadFail {
-                        stateCallBack(.fail, .musicPreloadFail)
-                    } else if status == .joinChannelFail {
-                        stateCallBack(.fail, .joinChannelFail)
-                    } else if status == .musicPreloadFailAndJoinChannelFail {
-                        stateCallBack(.fail, .musicPreloadFailAndJoinChannelFail)
-                    }
+                    stateCallBack(.fail, .joinChannelFail)
                 }
             })
         } else if oldRole == .coSinger && newRole == .audience {
@@ -311,7 +300,8 @@ extension KTVApiImpl {
             
             stateCallBack(.success, .none)
         } else if oldRole == .soloSinger && newRole == .leadSinger {
-            joinChorus(role: newRole, token: token, joinExChannelCallBack: { flag, status in
+            joinChorus(role: newRole, token: token, joinExChannelCallBack: {[weak self] flag, status in
+                guard let self = self else {return}
                 //还原临时变量为观众
                 self.joinChorusNewRole = .audience
                 if flag == true {
@@ -322,13 +312,7 @@ extension KTVApiImpl {
                     stateCallBack(.success, .none)
                 } else {
                     self.leaveChorus(role: .leadSinger)
-                    if status == .musicPreloadFail {
-                        stateCallBack(.fail, .musicPreloadFail)
-                    } else if status == .joinChannelFail {
-                        stateCallBack(.fail, .joinChannelFail)
-                    } else if status == .musicPreloadFailAndJoinChannelFail {
-                        stateCallBack(.fail, .musicPreloadFailAndJoinChannelFail)
-                    }
+                    stateCallBack(.fail, .joinChannelFail)
                 }
             })
         } else if oldRole == .leadSinger && newRole == .soloSinger {
@@ -383,44 +367,12 @@ extension KTVApiImpl {
            // mediaOption.autoSubscribeVideo = true
             mediaOption.publishMediaPlayerAudioTrack = false
             apiConfig?.engine.updateChannel(with: mediaOption)
-            //合唱者先加载歌曲再加入多频道
-            didCoSingerLoadMusic(with: songConfig?.songCode ?? 0) { status in
-                if status != .OK {//如果歌曲加载失败直接返回
-                    self.onJoinExChannelCallBack?(false, .musicPreloadFail)
-                } else {
-                    self.joinChorus2ndChannel(newRole: role, token: token)
-                }
-            }
+            joinChorus2ndChannel(newRole: role, token: token)
             
         } else if role == .audience {
             agoraPrint("joinChorus fail!")
         }
     }
-
-    private func didCoSingerLoadMusic(with songCode: NSInteger, callBaclk:@escaping LoadMusicCallback) {
-        preloadMusic(with: songCode) { status in
-            agoraPrint("didCoSingerLoadMusic songCode: \(songCode)")
-            callBaclk(status)
-            if status == .OK {
-                self.apiConfig?.engine.adjustPlaybackSignalVolume(Int(self.remoteVolume))
-                self.musicPlayer?.openMedia(songCode: songCode, startPos: 0)
-                
-                if let listener = self.loadMusicListeners.object(forKey: "\(songCode)" as NSString) as? KTVMusicLoadStateListener {
-                    listener.onMusicLoadSuccess(songCode: songCode, lyricUrl: "")
-                }
-            } else if status == .error {
-                if let listener = self.loadMusicListeners.object(forKey: "\(songCode)" as NSString) as? KTVMusicLoadStateListener {
-                    listener.onMusicLoadFail(songCode: songCode, lyricUrl: "", reason:  .musicPreloadFail)
-                }
-            }
-        }
-
-        // 音量最佳实践调整
-        apiConfig?.engine.adjustPlaybackSignalVolume(Int(remoteVolume))
-
-        musicPlayer?.openMedia(songCode: songCode, startPos: 0)
-    }
-
 
     private func joinChorus2ndChannel(newRole: KTVSingRole, token: String) {
         let role = newRole
@@ -449,30 +401,6 @@ extension KTVApiImpl {
 
         joinChorusNewRole = role
        let ret = apiConfig?.engine.joinChannelEx(byToken: token, connection: rtcConnection, delegate: self, mediaOptions: mediaOption, joinSuccess: nil)
-
-//        if role == .coSinger {
-//        subChorusConnection = rtcConnection
-//
-//        let ret =
-//        apiConfig!.engine.joinChannelEx(byToken: token, connection: rtcConnection, delegate: self, mediaOptions: mediaOption) {[weak self] channelId, uid, elapsed in
-//            guard let self = self else {
-//                return
-//            }
-//            agoraPrint("didJoinChannel: \(channelId) uid: \(uid)")
-//            if newRole == .leadSinger {
-//                self.mainSingerHasJoinChannelEx = true
-//                self.onJoinExChannelCallBack?(true, nil)
-//            }
-//            if newRole == .coSinger {
-//                self.didCoSingerLoadMusic(with: self.songConfig?.songCode ?? 0) { status in
-//                    if status == .OK {
-//                        self.onJoinExChannelCallBack?(true, nil)
-//                    } else {
-//                        self.onJoinExChannelCallBack?(false, .musicPreloadFail)
-//                    }
-//                }
-//            }
-//        }
         agoraPrint("joinChannelEx ret: \(ret ?? -999)")
         if newRole == .coSinger {
             let uid = UInt(songConfig?.mainSingerUid ?? 0)
@@ -531,144 +459,79 @@ extension KTVApiImpl {
         }
     }
     
-    /**
-     * 加载歌曲
-     */
-    private func _loadMusic(config: KTVSongConfiguration, mode: KTVLoadMusicMode, onMusicLoadStateListener: KTVMusicLoadStateListener) {
-        agoraPrint("_loadMusic songCode: \(config.songCode) role: \(singerRole.rawValue)")
+    private func _loadMusic(config: KTVSongConfiguration, mode: KTVLoadMusicMode, onMusicLoadStateListener: KTVMusicLoadStateListener){
+        
+//        if loadSongState == .inProgress {
+//            agoraPrint("loadMusic failed: KTVLoadSongState is in progress")
+//            onMusicLoadStateListener.onMusicLoadFail( reason: .inProgress)
+//            return
+//        }
+//
+//        loadSongState = .inProgress
         songConfig = config
         let role = singerRole
         let songCode = config.songCode
         
-//        if (loadDict.keys.contains(String(songCode))) {
-//            let loadState = loadDict[String(songCode)]
-//            if loadState == .ok {
-//                agoraPrint("_loadMusic songCode1: \(config.songCode) role: \(singerRole.rawValue) url: \(lyricUrlMap[String(songCode)] ?? "")")
-//                if let url = lyricUrlMap[String(songCode)] {
-//                    if (config.autoPlay && (self.singerRole == .soloSinger || self.singerRole == .leadSinger)) {
-//                        // 主唱自动播放歌曲
-//                        self.startSing(startPos: 0)
-//                    }
-//                    onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: url)
-//                    return
-//                }
-//            }
-//        }
-
-       // loadDict.updateValue(.inProgress, forKey: String(songCode))
-        var isLoadUrlSuccess: Bool = false
-        var isLoadMusicSuccess: Bool = false
-
-        let KTVGroup = DispatchGroup()
-        let KTVQueue = DispatchQueue(label: "com.agora.ktv.www")
-
-        if role != .audience  {
-            
-            if mode == .loadMusicOnly || mode == .loadMusicAndLrc {
-                self.loadMusicListeners.setObject(onMusicLoadStateListener, forKey: "\(songCode)" as NSString)
-                //TODO(chenpan):如果没有缓存，才加，否则有缓存不会有进度给出100%
-                if mcc.isPreloaded(songCode: songCode) != 0 {
-                    onMusicLoadStateListener.onMusicLoadProgress(songCode: songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
-                }
-            }
-            
-            KTVGroup.enter()
-            KTVQueue.async { [weak self] in
-                if mode == .loadMusicOnly {
-                    isLoadUrlSuccess = true
-                    KTVGroup.leave()
-                }
-                self?.loadLyric(with: songCode, callBack: { url in
-                    if let urlPath = url, urlPath.count > 0 {
+        if mode == .loadLrcOnly {
+            loadLyric(with: songCode, callBack: {[weak self] url in
+                if let urlPath = url, urlPath.count > 0 {
                         self?.lyricUrlMap.updateValue(urlPath, forKey: String(songCode))
                         self?.setLyric(with: urlPath, callBack: { lyricUrl in
-                            isLoadUrlSuccess = true
-                            KTVGroup.leave()
-                        })
-                    } else {
-                        self?.loadDict.removeValue(forKey: String(songCode))
-                        isLoadUrlSuccess = false
-                        KTVGroup.leave()
-                    }
-                })
-            }
-
-            KTVGroup.enter()
-            KTVQueue.async {[weak self] in
-                if mode == .loadLrcOnly {
-                    isLoadUrlSuccess = true
-                    KTVGroup.leave()
+                          //  self?.loadSongState = .ok
+                            onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: urlPath)
+                    })
+                } else {
+                  //  self?.loadSongState = .failed
+                    onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .noLyricUrl)
                 }
-                self?.preloadMusic(with: songCode, callBaclk: { status in
-                    if status != .OK {
-                        self?.loadDict.removeValue(forKey: String(songCode))
-                        isLoadMusicSuccess = false
-                    } else {
-                        isLoadMusicSuccess = true
-                    }
-                    KTVGroup.leave()
-                })
-
-            }
+                return
+            })
         } else {
-            KTVGroup.enter()
-            KTVQueue.async { [weak self] in
-                
-                if mode == .loadMusicOnly {
-                    isLoadMusicSuccess = true
-                    isLoadUrlSuccess = true
-                    KTVGroup.leave()
-                }
-                
-                agoraPrint("audience start load lrc")
-                self?.loadLyric(with: songCode, callBack: { url in
-                    agoraPrint("audience get lrc: \(url)")
-                    if let urlPath = url, urlPath.count > 0 {
-                        self?.lyricUrlMap.updateValue(urlPath, forKey: String(songCode))
-                        self?.setLyric(with: urlPath, callBack: { lyricUrl in
-                            isLoadUrlSuccess = true
-                            KTVGroup.leave()
+            loadMusicListeners.setObject(onMusicLoadStateListener, forKey: "\(songCode)" as NSString)
+            onMusicLoadStateListener.onMusicLoadProgress(songCode: songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
+            //TODO(chenpan):如果没有缓存，才加，否则有缓存不会有进度给出100%
+            if mcc.isPreloaded(songCode: songCode) != 0 {
+               onMusicLoadStateListener.onMusicLoadProgress(songCode: songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
+            }
+            preloadMusic(with: songCode) {[weak self] status in
+
+                if status == .OK {
+                    if mode == .loadMusicAndLrc {
+                        //需要加载歌词
+                        self?.loadLyric(with: songCode, callBack: { url in
+                            if let urlPath = url, urlPath.count > 0 {
+                                    self?.lyricUrlMap.updateValue(urlPath, forKey: String(songCode))
+                                    self?.setLyric(with: urlPath, callBack: { lyricUrl in
+                                      //  self?.loadSongState = .ok
+                                        onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: urlPath)
+                                })
+                            } else {
+                               // self?.loadSongState = .failed
+                                onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .noLyricUrl)
+                            }
+                            
+                            if config.autoPlay == true {
+                                self?.startSing(startPos: 0)
+                            }
+                            
                         })
-                    } else {
-                        self?.loadDict.removeValue(forKey: String(songCode))
-                        isLoadUrlSuccess = false
-                        KTVGroup.leave()
+                    } else if mode == .loadMusicOnly {
+                       // self?.loadSongState = .ok
+                        if config.autoPlay == true {
+                            self?.startSing(startPos: 0)
+                        }
+                        onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: "")
                     }
-                    isLoadMusicSuccess = true
-                })
-            }
-        }
-
-        KTVGroup.notify(queue: .main) { [weak self] in
-            if (isLoadUrlSuccess && isLoadMusicSuccess) {
-              //  self?.loadDict.updateValue(.ok, forKey: String(songCode))
-                if mode == .loadMusicOnly {
-                    agoraPrint("only load music callBack ")
-                    onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: "")
-                    return
+                    
+                } else {
+                    agoraPrint("load music failed")
+                   // self?.loadSongState = .failed
+                    onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .musicPreloadFail)
                 }
-
-                if (config.autoPlay && (self?.singerRole == .soloSinger || self?.singerRole == .leadSinger)) {
-                    // 主唱自动播放歌曲
-                    if mode != .loadLrcOnly {
-                        self?.startSing(startPos: 0)
-                    }
-                }
-                let url = self?.lyricUrlMap[String(songCode)] ?? ""
-                onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: url)
-            } else if (!isLoadUrlSuccess && isLoadMusicSuccess) {
-                onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, lyricUrl: "", reason: .noLyricUrl)
-            } else if (isLoadUrlSuccess && !isLoadMusicSuccess) {
-                let url = self?.lyricUrlMap[String(songCode)] ?? ""
-                onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, lyricUrl: url, reason: .musicPreloadFail)
-            } else {
-                let url = self?.lyricUrlMap[String(songCode)] ?? ""
-                onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, lyricUrl: url, reason: .musicPreloadFailedAndNoLyricUrl)
             }
-            agoraPrint("_loadMusic finished: \(songCode) url: \(self?.lyricUrlMap[String(songCode)] ?? "")")
         }
     }
-
+    
     private func loadLyric(with songCode: NSInteger, callBack:@escaping LyricCallback) {
         agoraPrint("loadLyric songCode: \(songCode)")
         let requestId: String = self.mcc.getLyric(songCode: songCode, lyricType: 0)
@@ -742,12 +605,8 @@ extension KTVApiImpl {
     func startSing(startPos: Int) {
         let role = singerRole
         agoraPrint("startSing role: \(role.rawValue)")
-        if role == .soloSinger {
-            apiConfig?.engine.adjustPlaybackSignalVolume(Int(remoteVolume))
-            musicPlayer?.openMedia(songCode: songConfig?.songCode ?? 0, startPos: startPos)
-        } else {
-            agoraPrint("Wrong role playSong, you are not mainSinger right now!")
-        }
+        apiConfig?.engine.adjustPlaybackSignalVolume(Int(remoteVolume))
+        musicPlayer?.openMedia(songCode: songConfig?.songCode ?? 0, startPos: startPos)
     }
 
     /**
@@ -781,11 +640,7 @@ extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
             onJoinExChannelCallBack?(true, nil)
         }
         if joinChorusNewRole == .coSinger {
-            if loadMusicState == .none {
-                self.onJoinExChannelCallBack?(true, nil)
-            } else {
-                self.onJoinExChannelCallBack?(false, .musicPreloadFail)
-            }
+           self.onJoinExChannelCallBack?(true, nil)
         }
 
     }
@@ -801,9 +656,7 @@ extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
         }
 
         if joinChorusNewRole == .coSinger {
-            if loadMusicState == .none {
-                self.onJoinExChannelCallBack?(false, .joinChannelFail)
-            }
+            self.onJoinExChannelCallBack?(false, .joinChannelFail)
         }
     }
 
@@ -846,11 +699,9 @@ extension KTVApiImpl {
                     return
                 }
                 
-                self.remotePlayerPosition = Date().milListamp - TimeInterval(position)
+                
                 self.remotePlayerDuration = TimeInterval(duration)
-                if (role == .audience) {
-                    self.lastAudienceUpTime = Date().milListamp
-                }
+
                 
                 let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
                 if (self.playerState != state) {
@@ -873,14 +724,20 @@ extension KTVApiImpl {
                             musicPlayer?.seek(toPosition: expectPosition)
                             agoraPrint("progress: setthreshold: \(threshold) expectPosition: \(expectPosition) position: \(position), localNtpTime: \(localNtpTime), remoteNtp: \(remoteNtp), audioPlayoutDelay: \(self.audioPlayoutDelay), localPosition: \(localPosition)")
                         }
+                    } else {
+                        self.remotePlayerPosition = Date().milListamp - TimeInterval(position)
+                        self.pitch = Double(voicePitch)
+                        self.lastAudienceUpTime = Date().milListamp
                     }
                 } else if role == .audience {
+                    self.remotePlayerPosition = Date().milListamp - TimeInterval(position)
                     self.pitch = Double(voicePitch)
+                    self.lastAudienceUpTime = Date().milListamp
                 }
 
             } else if dict["cmd"] as? String == "PlayerState" {
-                let mainSingerState: Int = dict["state"] as? Int ?? 0
-                let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
+                let mainSingerState: String = dict["state"] as? String ?? ""
+                let state = AgoraMediaPlayerState(rawValue: Int(mainSingerState) ?? 0) ?? .idle
                 syncPlayStateFromRemote(state: state)
             } else if dict["cmd"] as? String == "setVoicePitch" {
                 if role == .coSinger {return}
@@ -1098,6 +955,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         if state == .openCompleted {
             self.localPlayerPosition = Date().milListamp
             self.playerDuration = TimeInterval(musicPlayer.getDuration())
+            playerKit.selectAudioTrack(1)
             if isMainSinger() { //主唱播放，通过同步消息“setLrcTime”通知伴唱play
                 playerKit.play()
             }
