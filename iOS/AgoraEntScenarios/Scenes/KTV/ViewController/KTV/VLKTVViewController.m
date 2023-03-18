@@ -1454,6 +1454,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setSingRole:(KTVSingRole)singRole {
     _singRole = singRole;
     self.lrcControl.lrcView.lyricsView.draggable = false;
+    self.lrcControl.isMainSinger = (_singRole == KTVSingRoleSoloSinger || _singRole == KTVSingRoleLeadSinger);
     KTVLogInfo(@"setSingRole: %ld", singRole);
     
     VLRoomSelSongModel *song = self.selSongsArray.firstObject;
@@ -1538,7 +1539,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     dispatch_async(dispatch_get_main_queue(), ^{
         self.MVView.isLoading = NO;
         if(lyricUrl.length > 0){
-            self.lrcControl.isMainSinger = (_singRole == KTVSingRoleSoloSinger || _singRole == KTVSingRoleLeadSinger);
+            NSLog(@"onMusicLoadSuccessWithSongCode: %ld", _singRole);
         }
     });
 }

@@ -241,7 +241,7 @@ extension KTVApiImpl: KTVApiDelegate {
 // 主要是角色切换，加入合唱，加入多频道，退出合唱，退出多频道
 extension KTVApiImpl {
     private func switchSingerRole(oldRole: KTVSingRole, newRole: KTVSingRole, token: String, stateCallBack:@escaping SwitchRoleStateCallBack) {
-        agoraPrint("switchSingerRole oldRole: \(oldRole.rawValue), newRole: \(newRole.rawValue)")
+    //    agoraPrint("switchSingerRole oldRole: \(oldRole.rawValue), newRole: \(newRole.rawValue)")
         if oldRole == .audience && newRole == .soloSinger {
             // 1、KTVSingRoleAudience -》KTVSingRoleMainSinger
             singerRole = newRole
@@ -1065,7 +1065,7 @@ extension KTVApiImpl {
 extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
     func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedToPosition position: Int) {
         self.localPlayerPosition = Date().milListamp - Double(position)
-//        agoraPrint("didChangedToPosition: \(position)")
+        agoraPrint("didChangedToPosition: \(position)")
         if isMainSinger() && getPlayerCurrentTime() > TimeInterval(self.audioPlayoutDelay) {
             let dict: [String: Any] = [ "cmd": "setLrcTime",
                                         "duration": self.playerDuration,
