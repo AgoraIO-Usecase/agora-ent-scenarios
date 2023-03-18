@@ -566,7 +566,10 @@ extension KTVApiImpl {
             
             if mode == .loadMusicOnly || mode == .loadMusicAndLrc {
                 self.loadMusicListeners.setObject(onMusicLoadStateListener, forKey: "\(songCode)" as NSString)
-                onMusicLoadStateListener.onMusicLoadProgress(songCode: songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
+                //TODO(chenpan):如果没有缓存，才加，否则有缓存不会有进度给出100%
+                if mcc.isPreloaded(songCode: songCode) != 0 {
+                    onMusicLoadStateListener.onMusicLoadProgress(songCode: songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
+                }
             }
             
             KTVGroup.enter()
