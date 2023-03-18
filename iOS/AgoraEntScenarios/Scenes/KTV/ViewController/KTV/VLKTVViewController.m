@@ -212,7 +212,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [[AppContext ktvServiceImp] subscribeSeatListChangedWithBlock:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
         VLRoomSeatModel* model = [self getUserSeatInfoWithIndex:seatModel.seatIndex];
         if (model == nil) {
-            NSAssert(false, @"model == nil");
+            NSAssert(NO, @"model == nil");
             return;
         }
         
@@ -640,7 +640,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if (state == KTVSwitchRoleStateFail && reason != KTVSwitchRoleFailReasonNoPermission) {
             [VLToast toast:[NSString stringWithFormat:@"join chorus fail: %ld", reason]];
             //TODO: error toast?
-            [weakSelf.MVView configJoinChorusState:false];
+            [weakSelf.MVView configJoinChorusState:NO];
             return;
         }
         [weakSelf.MVView configJoinChorusState:true];
@@ -797,8 +797,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.RTCkit setEnableSpeakerphone:YES];
     
     AgoraDataStreamConfig *config = [AgoraDataStreamConfig new];
-    config.ordered = false;
-    config.syncWithAudio = false;
+    config.ordered = NO;
+    config.syncWithAudio = NO;
     [self.RTCkit createDataStream:&ktvStreamId
                            config:config];
     [self.RTCkit createDataStream:&ktvApiStreamId
@@ -1100,7 +1100,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         self.trackMode = KTVPlayerTrackModeOrigin;
     } else if (type == VLKTVMVViewActionTypeSingAcc) { // 伴奏
         self.trackMode = KTVPlayerTrackModeAcc;
-    } else if (type == VLKTVMVViewActionTypeRetryLrc) {  //重试
+    } else if (type == VLKTVMVViewActionTypeRetryLrc) {  //歌词重试
         //TODO(chenpan):
     }
 }
@@ -1474,7 +1474,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)setSingRole:(KTVSingRole)singRole {
     _singRole = singRole;
-    self.lrcControl.lrcView.lyricsView.draggable = false;
+    self.lrcControl.lrcView.lyricsView.draggable = NO;
     self.lrcControl.isMainSinger = (_singRole == KTVSingRoleSoloSinger || _singRole == KTVSingRoleLeadSinger);
     KTVLogInfo(@"setSingRole: %ld", singRole);
     
