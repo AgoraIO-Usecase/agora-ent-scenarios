@@ -689,7 +689,6 @@ extension KTVApiImpl {
                 guard let voicePitch: Int64 = dict["pitch"] as? Int64 else {return}
                 guard let songCode: Int64 = dict["songCode"] as? Int64 else {return}
                 guard let mainSingerState: Int = dict["playerState"] as? Int else {return}
-                
 //                if songConfig?.songCode == 0 {
 //                    songConfig?.songCode = Int(songCode)
 //                }
@@ -736,8 +735,8 @@ extension KTVApiImpl {
                 }
 
             } else if dict["cmd"] as? String == "PlayerState" {
-                let mainSingerState: String = dict["state"] as? String ?? ""
-                let state = AgoraMediaPlayerState(rawValue: Int(mainSingerState) ?? 0) ?? .idle
+                let mainSingerState: Int = dict["state"] as? Int ?? 0
+                let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
                 syncPlayStateFromRemote(state: state)
             } else if dict["cmd"] as? String == "setVoicePitch" {
                 if role == .coSinger {return}
@@ -906,7 +905,7 @@ extension KTVApiImpl {
     }
 
     private func syncPlayState(state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
-        let dict: [String: Any] = ["cmd": "PlayerState", "userId": apiConfig?.localUid as Any, "state": "\(state.rawValue)", "error": "\(error.rawValue)"]
+        let dict: [String: Any] = ["cmd": "PlayerState", "userId": apiConfig?.localUid as Any, "state": state.rawValue, "error": "\(error.rawValue)"]
         sendStreamMessageWithDict(dict, success: nil)
     }
 
