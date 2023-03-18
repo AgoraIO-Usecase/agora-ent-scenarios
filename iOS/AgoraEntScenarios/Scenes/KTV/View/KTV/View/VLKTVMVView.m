@@ -207,11 +207,11 @@
     [self.joinChorusBtn addTarget:self action:@selector(joinChorus) forControlEvents:UIControlEventTouchUpInside];
     [self.contentView addSubview:_joinChorusBtn];
     
-    self.leaveChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(10, _pauseBtn.top, 54, 54)];
+    self.leaveChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(15, _pauseBtn.top, 54, 54)];
     [self.leaveChorusBtn setTitle:@"退出合唱" forState:UIControlStateNormal];
     [self.leaveChorusBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.leaveChorusBtn setFont:[UIFont systemFontOfSize:11]];
-    [self.leaveChorusBtn setImage:[UIImage sceneImageWithName:@"ic_leave_chorus"] forState:UIControlStateNormal];
+    [self.leaveChorusBtn setImage:[UIImage sceneImageWithName:@"Union"] forState:UIControlStateNormal];
     [self.leaveChorusBtn addTarget:self action:@selector(leaveChorus) forControlEvents:UIControlEventTouchUpInside];
     [self updateBtnLayout:self.leaveChorusBtn];
     [self addSubview:self.leaveChorusBtn];
@@ -229,7 +229,7 @@
         }
 
       CGFloat totalHeight = imageSize.height + titleSize.height;
-    button.imageEdgeInsets = UIEdgeInsetsMake(- (totalHeight - imageSize.height + spacing), 0.0, 10.0, - titleSize.width);
+    button.imageEdgeInsets = UIEdgeInsetsMake(- (totalHeight - imageSize.height + spacing), 0.0, 15.0, - titleSize.width);
     button.titleEdgeInsets = UIEdgeInsetsMake(0, - imageSize.width, - (totalHeight - titleSize.height + spacing), 0);
 
 }
@@ -248,7 +248,7 @@
 -(void)joinChorus{
     //加入合唱
     if([self.delegate respondsToSelector:@selector(didJoinChours)]) {
-        self.joinChorusBtn.selected = false;
+        self.joinChorusBtn.selected = true;
         [self.delegate didJoinChours];
     }
 }
@@ -469,6 +469,7 @@
         [self.pauseBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.pauseBtn.titleLabel.font = UIFontMake(10.0);
         [self.pauseBtn setTitle:@"暂停" forState:UIControlStateNormal];
+        [self.pauseBtn setTitle:@"播放" forState:UIControlStateSelected];
         [_pauseBtn setImage:[UIImage sceneImageWithName:@"ktv_pause_icon"] forState:UIControlStateSelected];
         [_pauseBtn setImage:[UIImage sceneImageWithName:@"ktv_pause_resumeicon"] forState:UIControlStateNormal];
         _pauseBtn.selected = NO;

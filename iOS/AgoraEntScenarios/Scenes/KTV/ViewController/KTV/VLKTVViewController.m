@@ -66,6 +66,7 @@ KTVApiEventHandlerDelegate,
 KTVMusicLoadStateListener
 >
 
+typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, strong) VLKTVMVView *MVView;
 @property (nonatomic, strong) VLKTVSelBgModel *choosedBgModel;
 @property (nonatomic, strong) VLKTVBottomToolbar *bottomView;
@@ -97,6 +98,7 @@ KTVMusicLoadStateListener
 
 @property (nonatomic, strong) LyricModel *lyricModel;
 @property (nonatomic, strong) KTVLrcControl *lrcControl;
+@property (nonatomic, copy, nullable) CompletionBlock loadMusicCallBack;
 @end
 
 @implementation VLKTVViewController
@@ -491,7 +493,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
-- (void)loadAndPlaySong {
+- (void)loadAndPlaySong{
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     
     //TODO: fix score view visible problem while owner reopen the room
@@ -511,26 +513,30 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     songConfig.autoPlay = YES;
     songConfig.songCode = [model.songNo integerValue];
     songConfig.mainSingerUid = [model.userNo integerValue];
+    
+    self.MVView.loadingType = VLKTVMVViewStateLoading;
+
     VL(weakSelf);
     NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
-    if (role == KTVSingRoleAudience) {
-        [self.ktvApi loadMusicWithConfig:songConfig mode: KTVLoadMusicModeLoadMusicAndLrc
+    [weakSelf.ktvApi switchSingerRoleWithNewRole:role
+                                       token:exChannelToken
+                           onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+        if(state != KTVSwitchRoleStateSuccess) {
+            //TODO(chenpan): error toast and retry?
+            KTVLogError(@"switchSingerRole error: %ld", reason);
+            return;
+        }
+    }];
+    self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
+        if (!isSuccess) {
+            return;
+        }
+        
+        [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
+    };
+    
+    [self.ktvApi loadMusicWithConfig:songConfig mode: role == KTVSingRoleAudience ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc
                 onMusicLoadStateListener:self];
-    } else {
-        [self.ktvApi switchSingerRoleWithNewRole:role
-                                           token:exChannelToken
-                               onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-            if(state != KTVSwitchRoleStateSuccess) {
-                //TODO(chenpan): error toast and retry?
-                KTVLogError(@"switchSingerRole error: %ld", reason);
-                return;
-            }
-            
-            [self.MVView configJoinChorusState:state == KTVSwitchRoleStateSuccess];
-            [weakSelf.ktvApi loadMusicWithConfig:songConfig mode: KTVLoadMusicModeLoadMusicAndLrc
-                        onMusicLoadStateListener:weakSelf];
-        }];
-    }
 }
 
 - (void)enterSeatWithIndex:(NSInteger)index completion:(void(^)(NSError*))completion {
@@ -600,6 +606,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if ([self getCurrentUserSeatInfo] == nil) {
         for (int i = 1; i < self.seatsArray.count; i++) {
             VLRoomSeatModel* seat = self.seatsArray[i];
+            
             if (seat.rtcUid == 0) {
                 VL(weakSelf);
                 [self enterSeatWithIndex:i completion:^(NSError *error) {
@@ -618,20 +625,27 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)_joinChorus {
+    VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
+    KTVSingRole role = [self getUserSingRole] == KTVSingRoleAudience ? KTVSingRoleCoSinger : KTVSingRoleAudience;
+    KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
+    songConfig.autoPlay = true;
+    songConfig.songCode = [model.songNo integerValue];
+    songConfig.mainSingerUid = [model.userNo integerValue];
+
+    VL(weakSelf);
     NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
-    //先切role，保证preload等耗时操作结束才广播给其他人
-    [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleCoSinger
+    [self.ktvApi switchSingerRoleWithNewRole:role
                                        token:exChannelToken
-                           onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-        
+                           onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
         if (state == KTVSwitchRoleStateFail && reason != KTVSwitchRoleFailReasonNoPermission) {
             [VLToast toast:[NSString stringWithFormat:@"join chorus fail: %ld", reason]];
             //TODO: error toast?
+            [weakSelf.MVView configJoinChorusState:false];
             return;
         }
+        [weakSelf.MVView configJoinChorusState:true];
         
-        VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
-        
+        VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
         KTVJoinChorusInputModel* inputModel = [KTVJoinChorusInputModel new];
         inputModel.isChorus = YES;
         inputModel.songNo = selSongModel.songNo;
@@ -639,6 +653,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                              completion:^(NSError * error) {
         }];
     }];
+    
+    self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
+        if (!isSuccess) {
+            return;
+        }
+    };
+    KTVLogInfo(@"before songCode:%li", songConfig.songCode);
+    [self.ktvApi loadMusicWithConfig:songConfig mode: role == KTVSingRoleAudience ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc
+                onMusicLoadStateListener:self];
 }
 
 - (void)removeCurrentSongWithSync:(BOOL)sync
@@ -1455,6 +1478,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.lrcControl.isMainSinger = (_singRole == KTVSingRoleSoloSinger || _singRole == KTVSingRoleLeadSinger);
     KTVLogInfo(@"setSingRole: %ld", singRole);
     
+    
     VLRoomSelSongModel *song = self.selSongsArray.firstObject;
     [self.MVView updateUIWithSong:song role:singRole];
 }
@@ -1501,42 +1525,34 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                     msg:(NSString *)msg
                                lyricUrl:(NSString *)lyricUrl {
     KTVLogInfo(@"load: %li, %li", status, percent);
-    if ([NSThread isMainThread]) {
-        if (percent == 0) {
-            self.MVView.loadingType = VLKTVMVViewStateLoading;
-        }
+    dispatch_async_on_main_queue(^{
         if (status == AgoraMusicContentCenterPreloadStatusOK){
-            self.MVView.loadingType = VLKTVMVViewStateLoadFail;
-        }
-        self.MVView.loadingProgress = percent;
-    } else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (percent == 0) {
-                self.MVView.loadingType = VLKTVMVViewStateLoading;
-            }
-            if (status == AgoraMusicContentCenterPreloadStatusOK){
-                self.MVView.loadingType = VLKTVMVViewStateLoadFail;
-            }
-            self.MVView.loadingProgress = percent;
-        });
-    }
-}
-
-- (void)onMusicLoadFailWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl reason:(enum KTVLoadSongFailReason)reason {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (reason == KTVLoadSongFailReasonNoLyricUrl) {
-            self.MVView.loadingType = VLKTVMVViewStateLoadFail;
-        } else {
             self.MVView.loadingType = VLKTVMVViewStateIdle;
         }
+        self.MVView.loadingProgress = percent;
+    });
+}
+
+- (void)onMusicLoadFailWithSongCode:(NSInteger)songCode reason:(enum KTVLoadSongFailReason)reason{
+    
+    dispatch_async_on_main_queue(^{
+        if(self.loadMusicCallBack) {
+            self.loadMusicCallBack(NO, songCode);
+            self.loadMusicCallBack = nil;
+        }
         
+        self.MVView.loadingType = VLKTVMVViewStateIdle;
         KTVLogError(@"onMusicLoadFail songCode: %ld error: %ld", songCode, reason);
     });
 }
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
-    dispatch_async(dispatch_get_main_queue(), ^{
-//        self.MVView.isLoading = NO;
+    dispatch_async_on_main_queue(^{
+        if(self.loadMusicCallBack){
+            self.loadMusicCallBack(true, songCode);
+            self.loadMusicCallBack = nil;
+        }
+        self.MVView.loadingType = VLKTVMVViewStateIdle;
         if(lyricUrl.length > 0){
             KTVLogInfo(@"onMusicLoadSuccessWithSongCode: %ld", self.singRole);
         }
