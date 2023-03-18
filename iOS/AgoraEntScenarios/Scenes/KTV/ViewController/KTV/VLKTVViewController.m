@@ -1541,7 +1541,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
-   // self.MVView.isLoading = NO;
+    self.MVView.isLoading = NO;
     //todo 判断为什么这个回调异常
     if(lyricUrl.length > 0){
         NSLog(@"onMusicLoadSuccessWithSongCode:%li", _singRole);
