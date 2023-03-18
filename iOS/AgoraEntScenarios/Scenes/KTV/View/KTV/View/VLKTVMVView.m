@@ -187,7 +187,7 @@
     [self.leaveChorusBtn setTitle:@"退出合唱" forState:UIControlStateNormal];
     [self.leaveChorusBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.leaveChorusBtn setFont:[UIFont systemFontOfSize:11]];
-    [self.leaveChorusBtn setImage:[UIImage sceneImageWithName:@"ic_leave_chorus"] forState:UIControlStateNormal];
+    [self.leaveChorusBtn setImage:[UIImage sceneImageWithName:@"leaveChorus"] forState:UIControlStateNormal];
     [self.leaveChorusBtn addTarget:self action:@selector(leaveChorus) forControlEvents:UIControlEventTouchUpInside];
     [self updateBtnLayout:self.leaveChorusBtn];
     [self addSubview:self.leaveChorusBtn];

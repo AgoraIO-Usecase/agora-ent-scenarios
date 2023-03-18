@@ -35,8 +35,7 @@ import AgoraRtcKit
 @objc public enum KTVLoadSongFailReason: Int {
     case noLyricUrl = 0         //无歌词
     case musicPreloadFail   //歌曲预加载失败
-    case musicPreloadFailedAndNoLyricUrl        //歌曲加载失败并且没有歌词
-    case none
+    case inProgress
 }
 
 @objc public enum KTVSwitchRoleState: Int {
@@ -47,8 +46,6 @@ import AgoraRtcKit
 @objc public enum KTVSwitchRoleFailReason: Int {
     case none = 0
     case joinChannelFail
-    case musicPreloadFail
-    case musicPreloadFailAndJoinChannelFail
     case noPermission
 }
 
@@ -92,7 +89,7 @@ import AgoraRtcKit
     ///   - songCode: 歌曲code
     ///   - lyricUrl: 歌曲远端url
     ///   - reason: 错误原因
-    func onMusicLoadFail(songCode: Int, lyricUrl: String, reason: KTVLoadSongFailReason)
+    func onMusicLoadFail(reason: KTVLoadSongFailReason)
 }
 
 
