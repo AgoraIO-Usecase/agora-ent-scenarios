@@ -224,7 +224,7 @@
 -(void)joinChorus{
     //加入合唱
     if([self.delegate respondsToSelector:@selector(didJoinChours)]) {
-        self.joinChorusBtn.selected = false;
+        self.joinChorusBtn.selected = true;
         [self.delegate didJoinChours];
     }
 }
@@ -439,6 +439,7 @@
         [self.pauseBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.pauseBtn.titleLabel.font = UIFontMake(10.0);
         [self.pauseBtn setTitle:@"暂停" forState:UIControlStateNormal];
+        [self.pauseBtn setTitle:@"播放" forState:UIControlStateNormal];
         [_pauseBtn setImage:[UIImage sceneImageWithName:@"ktv_pause_icon"] forState:UIControlStateSelected];
         [_pauseBtn setImage:[UIImage sceneImageWithName:@"ktv_pause_resumeicon"] forState:UIControlStateNormal];
         _pauseBtn.selected = NO;
