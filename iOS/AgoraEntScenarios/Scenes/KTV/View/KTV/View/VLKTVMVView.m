@@ -78,6 +78,7 @@
         [self.contentView setHidden:YES];
         [self.retryButton setHidden:YES];
         [self.loadingTipsLabel setHidden:NO];
+        self.loadingTipsLabel.text = @"";
     } else if (loadingType == VLKTVMVViewStateLoadFail) {
         [self.loadingView stopAnimating];
         [self.loadingView setHidden:YES];
