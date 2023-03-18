@@ -1502,15 +1502,22 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                  status:(AgoraMusicContentCenterPreloadStatus)status
                                     msg:(NSString *)msg
                                lyricUrl:(NSString *)lyricUrl {
+    NSLog(@"load: %li, %li", status, percent);
     if ([NSThread isMainThread]) {
         if (percent == 0) {
             self.MVView.isLoading = YES;
+        }
+        if (status == AgoraMusicContentCenterPreloadStatusOK){
+            self.MVView.isLoading = FALSE;
         }
         self.MVView.loadingProgress = percent;
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (percent == 0) {
                 self.MVView.isLoading = YES;
+            }
+            if (status == AgoraMusicContentCenterPreloadStatusOK){
+                self.MVView.isLoading = FALSE;
             }
             self.MVView.loadingProgress = percent;
         });
@@ -1534,7 +1541,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
-    self.MVView.isLoading = NO;
+   // self.MVView.isLoading = NO;
+    //todo 判断为什么这个回调异常
     if(lyricUrl.length > 0){
         NSLog(@"onMusicLoadSuccessWithSongCode:%li", _singRole);
     }
