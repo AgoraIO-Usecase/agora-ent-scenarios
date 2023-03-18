@@ -487,7 +487,14 @@ extension KTVApiImpl {
                 return
             })
         } else {
+            loadMusicListeners.setObject(onMusicLoadStateListener, forKey: "\(songCode)" as NSString)
+            onMusicLoadStateListener.onMusicLoadProgress(songCode: songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
+            //TODO(chenpan):如果没有缓存，才加，否则有缓存不会有进度给出100%
+            if mcc.isPreloaded(songCode: songCode) != 0 {
+               onMusicLoadStateListener.onMusicLoadProgress(songCode: songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
+            }
             preloadMusic(with: songCode) {[weak self] status in
+
                 if status == .OK {
                     if mode == .loadMusicAndLrc {
                         //需要加载歌词
@@ -692,11 +699,9 @@ extension KTVApiImpl {
                     return
                 }
                 
-                self.remotePlayerPosition = Date().milListamp - TimeInterval(position)
+                
                 self.remotePlayerDuration = TimeInterval(duration)
-                if (role == .audience) {
-                    self.lastAudienceUpTime = Date().milListamp
-                }
+
                 
                 let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
                 if (self.playerState != state) {
@@ -719,14 +724,20 @@ extension KTVApiImpl {
                             musicPlayer?.seek(toPosition: expectPosition)
                             agoraPrint("progress: setthreshold: \(threshold) expectPosition: \(expectPosition) position: \(position), localNtpTime: \(localNtpTime), remoteNtp: \(remoteNtp), audioPlayoutDelay: \(self.audioPlayoutDelay), localPosition: \(localPosition)")
                         }
+                    } else {
+                        self.remotePlayerPosition = Date().milListamp - TimeInterval(position)
+                        self.pitch = Double(voicePitch)
+                        self.lastAudienceUpTime = Date().milListamp
                     }
                 } else if role == .audience {
+                    self.remotePlayerPosition = Date().milListamp - TimeInterval(position)
                     self.pitch = Double(voicePitch)
+                    self.lastAudienceUpTime = Date().milListamp
                 }
 
             } else if dict["cmd"] as? String == "PlayerState" {
-                let mainSingerState: Int = dict["state"] as? Int ?? 0
-                let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
+                let mainSingerState: String = dict["state"] as? String ?? ""
+                let state = AgoraMediaPlayerState(rawValue: Int(mainSingerState) ?? 0) ?? .idle
                 syncPlayStateFromRemote(state: state)
             } else if dict["cmd"] as? String == "setVoicePitch" {
                 if role == .coSinger {return}

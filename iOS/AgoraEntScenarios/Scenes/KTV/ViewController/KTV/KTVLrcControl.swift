@@ -31,7 +31,7 @@ import AgoraLyricsScore
         self.lrcView = lrcView
         super.init()
         
-        skipBtn = KTVSkipView(frame: CGRect(x: self.lrcView.bounds.size.width / 2.0 - 44, y: self.lrcView.bounds.size.height - 34, width: 120, height: 34), completion: { type in
+        skipBtn = KTVSkipView(frame: CGRect(x: self.lrcView.bounds.size.width / 2.0 - 60, y: self.lrcView.bounds.size.height - 20, width: 120, height: 34), completion: { type in
             if type == .down {
                 self.skipBtn.isHidden = true
                 guard let duration = self.lyricModel?.duration else {return}
