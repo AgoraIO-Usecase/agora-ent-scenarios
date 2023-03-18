@@ -1508,7 +1508,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             self.MVView.isLoading = YES;
         }
         if (status == AgoraMusicContentCenterPreloadStatusOK){
-            self.MVView.isLoading = FALSE;
+            self.MVView.isLoading = NO;
         }
         self.MVView.loadingProgress = percent;
     } else {
@@ -1517,7 +1517,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 self.MVView.isLoading = YES;
             }
             if (status == AgoraMusicContentCenterPreloadStatusOK){
-                self.MVView.isLoading = FALSE;
+                self.MVView.isLoading = NO;
             }
             self.MVView.loadingProgress = percent;
         });
