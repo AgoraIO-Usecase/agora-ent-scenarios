@@ -171,7 +171,7 @@
                 hasChanged = YES;
             }
             if (seatModel.isJoinChours) {
-                seatModel.chorusSongCode = nil;
+                seatModel.chorusSongCode = @"";
                 hasChanged = YES;
             }
         }

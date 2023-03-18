@@ -441,14 +441,6 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     // MARK: choose songs
     func removeSong(withInput inputModel: KTVRemoveSongInputModel,
                     completion: @escaping (Error?) -> Void) {
-        if inputModel.songNo == songList.first?.songNo {
-            //把所有麦位合唱歌曲code清除（不清楚也可以，因为上层业务会判断topSong.songCode==seat.chorusSongCode来作为合唱的状态）
-            seatMap.forEach { (key, seatInfo) in
-                seatInfo.chorusSongCode = ""
-                _updateSeat(seatInfo: seatInfo) { error in
-                }
-            }
-        }
         _removeChooseSong(songId: inputModel.objectId,
                           completion: completion)
     }

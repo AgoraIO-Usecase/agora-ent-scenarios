@@ -89,7 +89,7 @@ import AgoraRtcKit
     ///   - songCode: 歌曲code
     ///   - lyricUrl: 歌曲远端url
     ///   - reason: 错误原因
-    func onMusicLoadFail(reason: KTVLoadSongFailReason)
+    func onMusicLoadFail(songCode: Int, reason: KTVLoadSongFailReason)
 }
 
 
