@@ -269,6 +269,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     {
         guard let roomInfo = roomList?.filter({ $0.roomNo == inputModel.roomNo }).first else {
             agoraAssert("join Room fail")
+            completion(nil, nil)
             return
         }
 
@@ -319,6 +320,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                         _hideLoadingIfNeed()
                         agoraAssert(tokenMap1.count == 2, "rtcToken == nil || rtmToken == nil")
                         agoraAssert(tokenMap2.count == 1, "playerRtcToken == nil")
+                        completion(nil, nil)
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.id == userId ? true : false
@@ -364,6 +366,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
               let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first
         else {
             agoraAssert("channelName = nil")
+            completion(nil)
             return
         }
         roomInfo.bgOption = Int(inputModel.mvIndex)
@@ -415,6 +418,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             .filter({ $0.value.userNo == VLUserCenter.user.id })
             .first?.value else {
             agoraAssert("mute seat not found")
+            completion(nil)
             return
         }
         
@@ -429,6 +433,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             .filter({ $0.value.userNo == VLUserCenter.user.id })
             .first?.value else {
             agoraAssert("open video seat not found")
+            completion(nil)
             return
         }
         
@@ -453,6 +458,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                         completion: @escaping (Error?) -> Void) {
         guard let topSong = self.songList.filter({ $0.songNo == inputModel.songNo}).first else {
             agoraAssert("join Chorus fail")
+            completion(nil)
             return
         }
         //TODO: _markSeatToPlaying without callback
@@ -513,6 +519,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
               let song = songList.filter({ $0.objectId == inputModel.objectId }).first
         else {
             agoraAssert("make song to top not found! \(inputModel.songNo)")
+            completion(nil)
             return
         }
 
@@ -787,10 +794,12 @@ extension KTVSyncManagerServiceImp {
     private func _removeUser(completion: @escaping (Error?) -> Void) {
         guard let channelName = roomNo else {
             agoraAssert("_removeUser channelName = nil")
+            completion(nil)
             return
         }
         guard let objectId = userList.filter({ $0.id == VLUserCenter.user.id }).first?.objectId else {
 //            agoraAssert("_removeUser objectId = nil")
+            completion(nil)
             return
         }
         agoraPrint("imp user delete... [\(objectId)]")
@@ -992,6 +1001,7 @@ extension KTVSyncManagerServiceImp {
     private func _getSeatInfo(finished: @escaping (Error?, [VLRoomSeatModel]?) -> Void) {
         guard let channelName = roomNo else {
             agoraAssert("channelName = nil")
+            finished(nil, nil)
             return
         }
         agoraPrint("imp seat get...")
@@ -1249,6 +1259,7 @@ extension KTVSyncManagerServiceImp {
               let objectId = songId
         else {
             agoraAssert("channelName = nil")
+            completion(nil)
             return
         }
         agoraPrint("imp song delete... [\(objectId)]")
@@ -1301,6 +1312,7 @@ extension KTVSyncManagerServiceImp {
     private func _subscribeChooseSong(finished: @escaping () -> Void) {
         guard let channelName = roomNo else {
             agoraAssert("channelName = nil")
+            finished()
             return
         }
         agoraPrint("imp song subscribe...")
