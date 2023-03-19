@@ -628,7 +628,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)_joinChorus {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
-    KTVSingRole role = [self getUserSingRole] == KTVSingRoleAudience ? KTVSingRoleCoSinger : KTVSingRoleAudience;
+    KTVSingRole role = KTVSingRoleCoSinger;
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
     songConfig.autoPlay = YES;
     songConfig.songCode = [model.songNo integerValue];
