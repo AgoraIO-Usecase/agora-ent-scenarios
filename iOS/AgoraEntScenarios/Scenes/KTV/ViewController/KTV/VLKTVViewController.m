@@ -515,18 +515,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     songConfig.mainSingerUid = [model.userNo integerValue];
     
     self.MVView.loadingType = VLKTVMVViewStateLoading;
-
+    
     VL(weakSelf);
-    NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
-    [weakSelf.ktvApi switchSingerRoleWithNewRole:role
-                                       token:exChannelToken
-                           onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-        if(state != KTVSwitchRoleStateSuccess) {
-            //TODO(chenpan): error toast and retry?
-            KTVLogError(@"switchSingerRole error: %ld", reason);
-            return;
-        }
-    }];
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
         if (!isSuccess) {
             return;
@@ -537,6 +527,18 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     [self.ktvApi loadMusicWithConfig:songConfig mode: role == KTVSingRoleAudience ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc
                 onMusicLoadStateListener:self];
+
+    NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
+    [weakSelf.ktvApi switchSingerRoleWithNewRole:role
+                                       token:exChannelToken
+                           onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+        if(state != KTVSwitchRoleStateSuccess) {
+            //TODO(chenpan): error toast and retry?
+            KTVLogError(@"switchSingerRole error: %ld", reason);
+            return;
+        }
+    }];
+    
 }
 
 - (void)enterSeatWithIndex:(NSInteger)index completion:(void(^)(NSError*))completion {
@@ -631,8 +633,20 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     songConfig.autoPlay = true;
     songConfig.songCode = [model.songNo integerValue];
     songConfig.mainSingerUid = [model.userNo integerValue];
-
+    
+    self.MVView.loadingType = VLKTVMVViewStateLoading;
+    
     VL(weakSelf);
+    self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
+        if (!isSuccess) {
+            return;
+        }
+        [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
+    };
+    KTVLogInfo(@"before songCode:%li", songConfig.songCode);
+    [self.ktvApi loadMusicWithConfig:songConfig mode: role == KTVSingRoleAudience ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc
+                onMusicLoadStateListener:self];
+
     NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
     [self.ktvApi switchSingerRoleWithNewRole:role
                                        token:exChannelToken
@@ -645,6 +659,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
         [weakSelf.MVView configJoinChorusState:true];
         
+        weakSelf.isNowMicMuted = role == KTVSingRoleAudience;
+        [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
+                                                            completion:^(NSError * error) {
+        }];
+        
         VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
         KTVJoinChorusInputModel* inputModel = [KTVJoinChorusInputModel new];
         inputModel.isChorus = YES;
@@ -653,15 +672,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                              completion:^(NSError * error) {
         }];
     }];
-    
-    self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
-        if (!isSuccess) {
-            return;
-        }
-    };
-    KTVLogInfo(@"before songCode:%li", songConfig.songCode);
-    [self.ktvApi loadMusicWithConfig:songConfig mode: role == KTVSingRoleAudience ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc
-                onMusicLoadStateListener:self];
+
 }
 
 - (void)removeCurrentSongWithSync:(BOOL)sync
@@ -1342,9 +1353,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         //lead singer <-> solo
         NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
         KTVSingRole role = [self getUserSingRole];
+        
+        VL(weakSelf);
         [self.ktvApi switchSingerRoleWithNewRole:role
                                            token:exChannelToken
                                onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+            weakSelf.isNowMicMuted = role == KTVSingRoleAudience;
+            [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
+                                                                completion:^(NSError * error) {
+            }];
         }];
     }
 }
