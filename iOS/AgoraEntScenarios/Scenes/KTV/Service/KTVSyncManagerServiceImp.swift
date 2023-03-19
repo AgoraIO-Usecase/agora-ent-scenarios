@@ -818,6 +818,15 @@ extension KTVSyncManagerServiceImp {
 
     private func _updateUserCount(completion: @escaping (Error?) -> Void) {
         _updateUserCount(with: userList.count)
+        
+        //user count == 0, notify to leave room except room owner
+        guard userList.count == 0,
+           let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first,
+            roomInfo.creatorNo != VLUserCenter.user.id else {
+            return
+        }
+        
+        roomStatusDidChanged?(KTVSubscribeDeleted.rawValue, roomInfo)
     }
 
     private func _updateUserCount(with count: Int) {
