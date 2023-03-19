@@ -933,7 +933,7 @@ extension KTVApiImpl {
 extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
     func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedToPosition position: Int) {
         self.localPlayerPosition = Date().milListamp - Double(position)
-        agoraPrint("didChangedToPosition: \(position)")
+//        agoraPrint("didChangedToPosition: \(position)")
         if isMainSinger() && getPlayerCurrentTime() > TimeInterval(self.audioPlayoutDelay) {
             let dict: [String: Any] = [ "cmd": "setLrcTime",
                                         "duration": self.playerDuration,
