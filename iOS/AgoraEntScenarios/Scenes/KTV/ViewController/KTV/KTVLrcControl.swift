@@ -8,6 +8,11 @@
 import Foundation
 import AgoraLyricsScore
 
+
+private func agoraPrint(_ message: String) {
+    KTVLog.info(text: message, tag: "KTVLrcControl")
+}
+
 @objc public protocol KTVLrcControlDelegate: NSObjectProtocol {
     func didLrcViewDragedTo(pos: Int, score: Int, totalScore: Int)
     func didLrcViewScorllFinished(with score: Int, totalScore: Int, lineScore: Int)
@@ -16,7 +21,12 @@ import AgoraLyricsScore
 @objc class KTVLrcControl: NSObject {
     @objc public var lrcView: KaraokeView
     private var skipBtn: KTVSkipView!
-    @objc public var isMainSinger: Bool = false //是否为主唱
+    @objc public var isMainSinger: Bool = false { //是否为主唱
+        didSet {
+            if isMainSinger {return}
+            skipBtn.isHidden = true
+        }
+    }
     private var lyricModel: LyricModel?
     private var hasShowPreludeEndPosition = false
     private var hasShowEndPosition = false
@@ -54,6 +64,11 @@ import AgoraLyricsScore
        } else {
            return self.totalScore / self.totalLines
        }
+    }
+    
+    @objc public func resetLrc() {
+        self.lrcView.reset()
+        self.currentLoadLrcPath = nil
     }
 }
 
@@ -105,12 +120,19 @@ extension KTVLrcControl: KTVLrcViewDelegate {
     
     func onDownloadLrcData(url: String) {
         if currentLoadLrcPath == url {
+            agoraPrint("onDownloadLrcData fail, url repeat invoke")
             return
         }
         let musicUrl: URL = URL(fileURLWithPath: url)
 
-        guard let data = try? Data(contentsOf: musicUrl) else {return}
-        guard let model: LyricModel = KaraokeView.parseLyricData(data: data) else {return}
+        guard let data = try? Data(contentsOf: musicUrl) else {
+            agoraPrint("onDownloadLrcData fail, load data fail")
+            return
+        }
+        guard let model: LyricModel = KaraokeView.parseLyricData(data: data) else {
+            agoraPrint("onDownloadLrcData fail, parseLyricData fail")
+            return
+        }
         currentLoadLrcPath = url
         self.lyricModel = model
         self.totalCount = model.lines.count
@@ -118,6 +140,4 @@ extension KTVLrcControl: KTVLrcViewDelegate {
         self.totalScore = 0
         lrcView.setLyricData(data: model)
     }
-    
-    
 }

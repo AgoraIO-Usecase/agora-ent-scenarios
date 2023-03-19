@@ -87,18 +87,8 @@ typedef enum : NSUInteger {
 
 #pragma mark - 歌词相关
 
-/// 加载歌词链接
-/// @param lrcURL 链接
-//- (void)loadLrcURL:(NSString *)lrcURL;
-
-/// 开始滚动歌词
-- (void)start;
-/// 停止滚动歌词
-- (void)stop;
-/// 重置歌词界面
+/// 重置分数
 - (void)reset;
-///滚动到指定位置
-//- (void)scrollToTime:(NSTimeInterval)time;
 
 @end
 

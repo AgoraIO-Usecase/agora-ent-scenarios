@@ -1469,6 +1469,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                originalTopSong.songName, originalTopSong.status);
     if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
         [self.MVView reset];
+        [self.lrcControl resetLrc];
         //song changes
         [self stopPlaySong];
         [self loadAndPlaySong];

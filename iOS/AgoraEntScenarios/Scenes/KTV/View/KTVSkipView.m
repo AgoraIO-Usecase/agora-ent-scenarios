@@ -9,8 +9,8 @@
 #import "AgoraEntScenarios-Swift.h"
 @interface KTVSkipView ()
 @property (nonatomic, strong) UIView *bgView;
-@property (nonatomic, strong) UIButton *SkipBtn;
-@property (nonatomic, strong) UIButton *CanCelBtn;
+@property (nonatomic, strong) UIButton *skipBtn;
+@property (nonatomic, strong) UIButton *canCelBtn;
 @property (nonatomic, copy) OnSkipCallback completion;
 @end
 
@@ -25,27 +25,27 @@
         self.bgView.layer.borderColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.6].CGColor;
         [self addSubview:self.bgView];
         
-        self.SkipBtn = [[UIButton alloc]init];
-        [self.SkipBtn setFont:[UIFont systemFontOfSize:15]];
-        [self.SkipBtn setTitle:@"  跳过前奏" forState:UIControlStateNormal];
-        [self.SkipBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [self.SkipBtn addTarget:self action:@selector(skip:) forControlEvents:UIControlEventTouchUpInside];
-        self.SkipBtn.tag = 200;
-        [self.bgView addSubview:self.SkipBtn];
+        self.skipBtn = [[UIButton alloc]init];
+        self.skipBtn.titleLabel.font = [UIFont systemFontOfSize:15];
+        [self.skipBtn setTitle:@"  跳过前奏" forState:UIControlStateNormal];
+        [self.skipBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [self.skipBtn addTarget:self action:@selector(skip:) forControlEvents:UIControlEventTouchUpInside];
+        self.skipBtn.tag = 200;
+        [self.bgView addSubview:self.skipBtn];
         
-        self.CanCelBtn = [[UIButton alloc]init];
-        [self.CanCelBtn setFont:[UIFont systemFontOfSize:13]];
-        [self.CanCelBtn setImage:[UIImage sceneImageWithName:@"x"] forState:UIControlStateNormal];
-        self.CanCelBtn.tag = 201;
-        [self.CanCelBtn addTarget:self action:@selector(skip:) forControlEvents:UIControlEventTouchUpInside];
-        [self.CanCelBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [self.bgView addSubview:self.CanCelBtn];
+        self.canCelBtn = [[UIButton alloc]init];
+        self.canCelBtn.titleLabel.font = [UIFont systemFontOfSize:13];
+        [self.canCelBtn setImage:[UIImage sceneImageWithName:@"x"] forState:UIControlStateNormal];
+        self.canCelBtn.tag = 201;
+        [self.canCelBtn addTarget:self action:@selector(skip:) forControlEvents:UIControlEventTouchUpInside];
+        [self.canCelBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [self.bgView addSubview:self.canCelBtn];
     }
     return self;
 }
 
 -(void)setSkipType:(SkipType)type{
-    [self.SkipBtn setTitle:[NSString stringWithFormat:@"跳过%@奏", type == SkipTypePrelude ? @"前" : @"尾"] forState:UIControlStateNormal];
+    [self.skipBtn setTitle:[NSString stringWithFormat:@"跳过%@奏", type == SkipTypePrelude ? @"前" : @"尾"] forState:UIControlStateNormal];
 }
 
 -(void)skip:(UIButton *)btn{
@@ -58,8 +58,8 @@
     self.bgView.layer.cornerRadius = self.bounds.size.height / 2.0;
     self.bgView.layer.masksToBounds = true;
     self.bgView.layer.borderWidth = 1;
-    self.SkipBtn.frame = CGRectMake(10, 0, self.bounds.size.width / 3.0 * 2 , self.bounds.size.height);
-    self.CanCelBtn.frame = CGRectMake(self.bounds.size.width / 3.0 * 2, 0, self.bounds.size.width / 3.0 , self.bounds.size.height);
+    self.skipBtn.frame = CGRectMake(10, 0, self.bounds.size.width / 3.0 * 2 , self.bounds.size.height);
+    self.canCelBtn.frame = CGRectMake(self.bounds.size.width / 3.0 * 2, 0, self.bounds.size.width / 3.0 , self.bounds.size.height);
 }
 
 @end

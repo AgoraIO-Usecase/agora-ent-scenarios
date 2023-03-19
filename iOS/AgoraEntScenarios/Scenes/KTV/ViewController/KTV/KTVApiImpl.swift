@@ -572,12 +572,16 @@ extension KTVApiImpl {
                 callBack(path)
             }
 
-            guard let lrcurl = lrcurl else {return}
+            guard let lrcurl = lrcurl else {
+                agoraPrint("downloadLrcFile fail, lrcurl = nil")
+                return
+            }
             let curStr: String = url.components(separatedBy: "/").last ?? ""
             let loadStr: String = lrcurl.components(separatedBy: "/").last ?? ""
             let curSongStr: String = curStr.components(separatedBy: ".").first ?? ""
             let loadSongStr: String = loadStr.components(separatedBy: ".").first ?? ""
             if curSongStr != loadSongStr {
+                agoraPrint("downloadLrcFile fail, missmatch cur:\(curSongStr) load:\(loadSongStr)")
                 return
             }
 
