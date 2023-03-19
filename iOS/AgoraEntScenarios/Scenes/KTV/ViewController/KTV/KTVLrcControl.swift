@@ -27,6 +27,8 @@ import AgoraLyricsScore
     private var totalScore: NSInteger = 0
     private var totalCount: NSInteger = 0
     
+    private var currentLoadLrcPath: String?
+    
     @objc init(lrcView: KaraokeView) {
         self.lrcView = lrcView
         super.init()
@@ -102,10 +104,14 @@ extension KTVLrcControl: KTVLrcViewDelegate {
     }
     
     func onDownloadLrcData(url: String) {
+        if currentLoadLrcPath == url {
+            return
+        }
         let musicUrl: URL = URL(fileURLWithPath: url)
 
         guard let data = try? Data(contentsOf: musicUrl) else {return}
         guard let model: LyricModel = KaraokeView.parseLyricData(data: data) else {return}
+        currentLoadLrcPath = url
         self.lyricModel = model
         self.totalCount = model.lines.count
         self.totalLines = 0
