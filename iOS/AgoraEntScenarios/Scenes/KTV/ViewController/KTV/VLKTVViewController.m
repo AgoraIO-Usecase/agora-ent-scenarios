@@ -193,7 +193,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [super configNavigationBar:navigationBar];
 }
 - (BOOL)preferredNavigationBarHidden {
-    return true;
+    return YES;
 }
 // 是否允许手动滑回 @return true 是、 false否
 - (BOOL)forceEnableInteractivePopGestuzreRecognizer {
@@ -630,15 +630,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSingRole role = [self getUserSingRole] == KTVSingRoleAudience ? KTVSingRoleCoSinger : KTVSingRoleAudience;
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = true;
+    songConfig.autoPlay = YES;
     songConfig.songCode = [model.songNo integerValue];
     songConfig.mainSingerUid = [model.userNo integerValue];
     
-    self.MVView.loadingType = VLKTVMVViewStateLoading;
-    
+    self.MVView.joinCoSingerState = KTVJoinCoSingerStateJoinNow;
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
         if (!isSuccess) {
+            weakSelf.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
             return;
         }
         
@@ -647,12 +647,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                token:exChannelToken
                                    onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
             if (state == KTVSwitchRoleStateFail && reason != KTVSwitchRoleFailReasonNoPermission) {
+                weakSelf.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
                 [VLToast toast:[NSString stringWithFormat:@"join chorus fail: %ld", reason]];
                 //TODO: error toast?
-                [weakSelf.MVView configJoinChorusState:NO];
                 return;
             }
-            [weakSelf.MVView configJoinChorusState:true];
+            weakSelf.MVView.loadingType = VLKTVMVViewStateIdle;
+            weakSelf.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForLeave;
             
             weakSelf.isNowMicMuted = role == KTVSingRoleAudience;
             [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:weakSelf.isNowMicMuted
@@ -916,7 +917,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     NSString *message = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"确定解散该房间吗？") : KTVLocalizedString(@"确定退出该房间吗？");
     NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"取消"),KTVLocalizedString(@"确定"), nil];
     [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
-        if(flag == true){
+        if(flag == YES){
             [weakSelf leaveRoom];
         }
         [[VLAlert shared] dismiss];
@@ -1098,7 +1099,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         NSString *message = KTVLocalizedString(@"切换下一首歌歌曲？");
         NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"取消"),KTVLocalizedString(@"确定"), nil];
         [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
-            if(flag == true){
+            if(flag == YES){
                 if (weakSelf.selSongsArray.count >= 1) {
                     [weakSelf stopPlaySong];
                     [weakSelf removeCurrentSongWithSync:YES];
@@ -1561,7 +1562,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
     dispatch_async_on_main_queue(^{
         if(self.loadMusicCallBack){
-            self.loadMusicCallBack(true, songCode);
+            self.loadMusicCallBack(YES, songCode);
             self.loadMusicCallBack = nil;
         }
         self.MVView.loadingType = VLKTVMVViewStateIdle;

@@ -13,6 +13,14 @@
 NS_ASSUME_NONNULL_BEGIN
 @class VLKTVSelBgModel;
 
+//加入为伴唱状态
+typedef enum : NSUInteger {
+    KTVJoinCoSingerStateIdle = 0,         //无按钮
+    KTVJoinCoSingerStateWaitingForJoin,   //按钮显示:加入合唱
+    KTVJoinCoSingerStateJoinNow,          //按钮显示:加入中
+    KTVJoinCoSingerStateWaitingForLeave,   //按钮显示:退出合唱
+} KTVJoinCoSingerState;
+
 typedef enum : NSUInteger {
     VLKTVMVViewStateIdle = 0,
     VLKTVMVViewStateLoading,
@@ -46,6 +54,7 @@ typedef enum : NSUInteger {
 
 @interface VLKTVMVView : UIView
 @property (nonatomic, assign) VLKTVMVLoadingState loadingType;
+@property (nonatomic, assign) KTVJoinCoSingerState joinCoSingerState;   //加入合唱状态
 @property (nonatomic, assign) NSInteger loadingProgress;
 @property (nonatomic, strong) KaraokeView *karaokeView;
 @property (nonatomic, strong) GradeView *gradeView;
@@ -90,8 +99,6 @@ typedef enum : NSUInteger {
 - (void)reset;
 ///滚动到指定位置
 //- (void)scrollToTime:(NSTimeInterval)time;
-
--(void)configJoinChorusState:(BOOL)isSuccess;
 
 @end
 

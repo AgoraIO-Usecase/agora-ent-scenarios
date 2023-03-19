@@ -249,7 +249,6 @@
 -(void)joinChorus{
     //加入合唱
     if([self.delegate respondsToSelector:@selector(didJoinChours)]) {
-        self.joinChorusBtn.selected = true;
         [self.delegate didJoinChours];
     }
 }
@@ -311,13 +310,30 @@
     self.bgImgView.image = [UIImage sceneImageWithName:selBgModel.imageName];
 }
 
--(void)configJoinChorusState:(BOOL)isSuccess {
-    if(isSuccess){
-        self.joinChorusBtn.selected = false;
-        self.joinChorusBtn.hidden = true;
-    } else {
-        _joinChorusBtn.selected = false;
-        _joinChorusBtn.hidden = false;
+- (void)setJoinCoSingerState:(KTVJoinCoSingerState)joinCoSingerState {
+    _joinCoSingerState = joinCoSingerState;
+    switch (joinCoSingerState) {
+        case KTVJoinCoSingerStateWaitingForJoin:
+            self.joinChorusBtn.selected = NO;
+            self.joinChorusBtn.hidden = NO;
+            self.leaveChorusBtn.hidden = YES;
+            break;
+        case KTVJoinCoSingerStateJoinNow:
+            self.joinChorusBtn.selected = YES;
+            self.joinChorusBtn.hidden = NO;
+            self.leaveChorusBtn.hidden = YES;
+            break;
+        case KTVJoinCoSingerStateWaitingForLeave:
+            self.joinChorusBtn.selected = NO;
+            self.joinChorusBtn.hidden = YES;
+            self.leaveChorusBtn.hidden = NO;
+            break;
+        case KTVJoinCoSingerStateIdle:
+        default:
+            self.joinChorusBtn.selected = NO;
+            self.joinChorusBtn.hidden = YES;
+            self.leaveChorusBtn.hidden = YES;
+            break;
     }
 }
 
@@ -327,15 +343,13 @@
         case KTVSingRoleSoloSinger:
         case KTVSingRoleLeadSinger: {
             [self setPlayerViewsHidden:NO nextButtonHidden:NO playButtonHidden:NO];
-            _joinChorusBtn.hidden = YES;
-            _leaveChorusBtn.hidden = YES;
+            self.joinCoSingerState = KTVJoinCoSingerStateIdle;
         } break;
         case KTVSingRoleCoSinger: {
 //        case KTVSingRoleFollowSinger:
             BOOL isNextEnable = !VLUserCenter.user.ifMaster;
             [self setPlayerViewsHidden:NO nextButtonHidden:isNextEnable playButtonHidden:YES];
-            _joinChorusBtn.hidden = YES;
-            _leaveChorusBtn.hidden = NO;
+            self.joinCoSingerState = KTVJoinCoSingerStateWaitingForLeave;
         } break;
         case KTVSingRoleAudience:
         default: {
@@ -345,8 +359,7 @@
                 [self setPlayerViewsHidden:YES nextButtonHidden:YES playButtonHidden:YES];
             }
             
-            _joinChorusBtn.hidden = NO;
-            _leaveChorusBtn.hidden = YES;
+            self.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
         } break;
     }
 }
