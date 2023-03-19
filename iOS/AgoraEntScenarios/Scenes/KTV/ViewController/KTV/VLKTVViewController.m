@@ -668,6 +668,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                  completion:^(NSError * error) {
             }];
             [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
+            
+            //开麦
+            [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:NO
+                                                                completion:^(NSError * error) {
+            }];
         }];
     };
     KTVLogInfo(@"before songCode:%li", songConfig.songCode);
@@ -1358,10 +1363,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.ktvApi switchSingerRoleWithNewRole:role
                                            token:exChannelToken
                                onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-            weakSelf.isNowMicMuted = role == KTVSingRoleAudience;
-            [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
-                                                                completion:^(NSError * error) {
-            }];
         }];
     }
 }
