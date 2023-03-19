@@ -50,6 +50,7 @@ class KTVApiImpl: NSObject{
     
     private var playerState: AgoraMediaPlayerState = .idle {
         didSet {
+            agoraPrint("playerState did changed: \(oldValue.rawValue)->\(playerState.rawValue)")
             updateRemotePlayBackVolumeIfNeed()
             updateTimer(with: playerState)
         }
@@ -282,6 +283,9 @@ extension KTVApiImpl {
                 self.joinChorusNewRole = .audience
                 if flag == true {
                     self.singerRole = newRole
+                    //TODO(chenpan):如果观众变成伴唱，需要重置state，防止同步主唱state因为都是playing不会修改
+                    //后面建议改成remote state(通过data stream获取)和local state(通过player didChangedToState获取)
+                    self.playerState = .idle
                     self.getEventHander { delegate in
                         delegate.onSingerRoleChanged(oldRole: .audience, newRole: .coSinger)
                     }
@@ -698,13 +702,11 @@ extension KTVApiImpl {
                     return
                 }
                 
-                
                 self.remotePlayerDuration = TimeInterval(duration)
 
-                
                 let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
                 if (self.playerState != state) {
-                    agoraPrint("recv state with setLrcTime: \(state.rawValue) state: \(self.playerState.rawValue)->\(state.rawValue) role: \(singerRole.rawValue)")
+                    agoraPrint("[setLrcTime] recv state: \(self.playerState.rawValue)->\(state.rawValue) role: \(singerRole.rawValue) role: \(singerRole.rawValue)")
                     if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
                         //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
                         self.localPlayerPosition = Date().milListamp - Double(position)
@@ -846,13 +848,16 @@ extension KTVApiImpl {
         let role = singerRole
         if role == .soloSinger || role == .leadSinger{
             let time = Date().milListamp - localPlayerPosition
+//                agoraPrint("getPlayerCurrentTime MainSinger \(time) \(playerState.rawValue)")
             return time
         } else if role == .coSinger {
             if playerState == .playing || playerState == .paused {
                 let time = Date().milListamp - localPlayerPosition
+//                agoraPrint("getPlayerCurrentTime CoSinger \(time) \(playerState.rawValue)")
                 return time
             }
         }
+//        agoraPrint("getPlayerCurrentTime Audience \(Date().milListamp - remotePlayerPosition)")
         return Date().milListamp - remotePlayerPosition
     }
 
@@ -933,7 +938,7 @@ extension KTVApiImpl {
 extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
     func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedToPosition position: Int) {
         self.localPlayerPosition = Date().milListamp - Double(position)
-//        agoraPrint("didChangedToPosition: \(position)")
+//        agoraPrint("agoraRtcMediaPlayer didChangedToPosition: \(position)")
         if isMainSinger() && getPlayerCurrentTime() > TimeInterval(self.audioPlayoutDelay) {
             let dict: [String: Any] = [ "cmd": "setLrcTime",
                                         "duration": self.playerDuration,
@@ -949,7 +954,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
     }
     
     func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
-        agoraPrint("loadSong play status: \(state.rawValue) \(songConfig?.songCode ?? 0)")
+        agoraPrint("agoraRtcMediaPlayer didChangedToState: \(state.rawValue) \(songConfig?.songCode ?? 0)")
 
         if state == .openCompleted {
             self.localPlayerPosition = Date().milListamp
@@ -961,13 +966,13 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         } else if state == .stopped {
             self.localPlayerPosition = Date().milListamp
             self.playerDuration = 0
-            self.remotePlayerPosition = Date().milListamp - 0
+//            self.remotePlayerPosition = Date().milListamp - 0
         }
         else if state == .paused {
-            self.remotePlayerPosition = Date().milListamp
+//            self.remotePlayerPosition = Date().milListamp
         } else if state == .playing {
             self.localPlayerPosition = Date().milListamp - Double(musicPlayer?.getPosition() ?? 0)
-            self.remotePlayerPosition = Date().milListamp
+//            self.remotePlayerPosition = Date().milListamp
         }
 
         if isMainSinger() {
