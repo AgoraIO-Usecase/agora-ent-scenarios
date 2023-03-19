@@ -21,10 +21,10 @@ private func agoraAssert(_ message: String) {
 }
 
 private func agoraAssert(_ condition: Bool, _ message: String) {
-    #if DEBUG
-    assert(condition, message)
-    #else
     KTVLog.error(text: message, tag: "KTVService")
+    #if DEBUG
+//    assert(condition, message)
+    #else
     #endif
 }
 
