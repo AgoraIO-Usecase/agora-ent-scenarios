@@ -285,7 +285,7 @@ extension KTVApiImpl {
                     self.singerRole = newRole
                     //TODO(chenpan):如果观众变成伴唱，需要重置state，防止同步主唱state因为都是playing不会修改
                     //后面建议改成remote state(通过data stream获取)和local state(通过player didChangedToState获取)
-                    self.playerState = .idle
+                    self.playerState = self.musicPlayer?.getPlayerState() ?? .idle
                     self.getEventHander { delegate in
                         delegate.onSingerRoleChanged(oldRole: .audience, newRole: .coSinger)
                     }
