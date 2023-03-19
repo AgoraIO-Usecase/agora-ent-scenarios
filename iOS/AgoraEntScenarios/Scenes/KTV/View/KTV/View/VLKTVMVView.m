@@ -202,7 +202,7 @@
     
     self.joinChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(self.width / 2.0 - 56, self.height - 44, 112, 34)];
     [self.joinChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_join_chorus"] forState:UIControlStateNormal];
-    [self.joinChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_join_chorus_loading"] forState:UIControlStateSelected];
+    [self.joinChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_join_chorus_loading"] forState:UIControlStateDisabled];
     _joinChorusBtn.layer.cornerRadius = 17;
     _joinChorusBtn.layer.masksToBounds = true;
     [self.joinChorusBtn addTarget:self action:@selector(joinChorus) forControlEvents:UIControlEventTouchUpInside];
@@ -314,23 +314,23 @@
     _joinCoSingerState = joinCoSingerState;
     switch (joinCoSingerState) {
         case KTVJoinCoSingerStateWaitingForJoin:
-            self.joinChorusBtn.selected = NO;
+            self.joinChorusBtn.enabled = YES;
             self.joinChorusBtn.hidden = NO;
             self.leaveChorusBtn.hidden = YES;
             break;
         case KTVJoinCoSingerStateJoinNow:
-            self.joinChorusBtn.selected = YES;
+            self.joinChorusBtn.enabled = NO;
             self.joinChorusBtn.hidden = NO;
             self.leaveChorusBtn.hidden = YES;
             break;
         case KTVJoinCoSingerStateWaitingForLeave:
-            self.joinChorusBtn.selected = NO;
+            self.joinChorusBtn.enabled = YES;
             self.joinChorusBtn.hidden = YES;
             self.leaveChorusBtn.hidden = NO;
             break;
         case KTVJoinCoSingerStateIdle:
         default:
-            self.joinChorusBtn.selected = NO;
+            self.joinChorusBtn.enabled = YES;
             self.joinChorusBtn.hidden = YES;
             self.leaveChorusBtn.hidden = YES;
             break;
