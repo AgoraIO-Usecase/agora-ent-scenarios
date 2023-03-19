@@ -641,38 +641,37 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if (!isSuccess) {
             return;
         }
-        [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
+        
+        NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
+        [weakSelf.ktvApi switchSingerRoleWithNewRole:role
+                                               token:exChannelToken
+                                   onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+            if (state == KTVSwitchRoleStateFail && reason != KTVSwitchRoleFailReasonNoPermission) {
+                [VLToast toast:[NSString stringWithFormat:@"join chorus fail: %ld", reason]];
+                //TODO: error toast?
+                [weakSelf.MVView configJoinChorusState:NO];
+                return;
+            }
+            [weakSelf.MVView configJoinChorusState:true];
+            
+            weakSelf.isNowMicMuted = role == KTVSingRoleAudience;
+            [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:weakSelf.isNowMicMuted
+                                                                completion:^(NSError * error) {
+            }];
+            
+            VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
+            KTVJoinChorusInputModel* inputModel = [KTVJoinChorusInputModel new];
+            inputModel.isChorus = YES;
+            inputModel.songNo = selSongModel.songNo;
+            [[AppContext ktvServiceImp] joinChorusWithInput:inputModel
+                                                 completion:^(NSError * error) {
+            }];
+            [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
+        }];
     };
     KTVLogInfo(@"before songCode:%li", songConfig.songCode);
     [self.ktvApi loadMusicWithConfig:songConfig mode: role == KTVSingRoleAudience ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc
                 onMusicLoadStateListener:self];
-
-    NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
-    [self.ktvApi switchSingerRoleWithNewRole:role
-                                       token:exChannelToken
-                           onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-        if (state == KTVSwitchRoleStateFail && reason != KTVSwitchRoleFailReasonNoPermission) {
-            [VLToast toast:[NSString stringWithFormat:@"join chorus fail: %ld", reason]];
-            //TODO: error toast?
-            [weakSelf.MVView configJoinChorusState:NO];
-            return;
-        }
-        [weakSelf.MVView configJoinChorusState:true];
-        
-        weakSelf.isNowMicMuted = role == KTVSingRoleAudience;
-        [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
-                                                            completion:^(NSError * error) {
-        }];
-        
-        VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
-        KTVJoinChorusInputModel* inputModel = [KTVJoinChorusInputModel new];
-        inputModel.isChorus = YES;
-        inputModel.songNo = selSongModel.songNo;
-        [[AppContext ktvServiceImp] joinChorusWithInput:inputModel
-                                             completion:^(NSError * error) {
-        }];
-    }];
-
 }
 
 - (void)removeCurrentSongWithSync:(BOOL)sync
