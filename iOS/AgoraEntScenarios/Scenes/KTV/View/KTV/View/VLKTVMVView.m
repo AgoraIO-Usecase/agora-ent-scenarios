@@ -313,6 +313,7 @@
 
 - (void)setJoinCoSingerState:(KTVJoinCoSingerState)joinCoSingerState {
     _joinCoSingerState = joinCoSingerState;
+    NSLog(@"joinCoSingerState: %li", joinCoSingerState);
     switch (joinCoSingerState) {
         case KTVJoinCoSingerStateWaitingForJoin:
             self.joinChorusBtn.enabled = YES;

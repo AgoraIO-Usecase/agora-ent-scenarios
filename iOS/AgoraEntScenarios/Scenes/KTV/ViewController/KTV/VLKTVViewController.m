@@ -600,8 +600,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)joinChorus {
+    NSLog(@"currentThread:%@", [NSThread currentThread]);
+    
     if (![self getJoinChorusEnable]) {
         KTVLogInfo(@"getJoinChorusEnable false");
+        self.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
         return;
     }
     
@@ -616,6 +619,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 [self enterSeatWithIndex:i completion:^(NSError *error) {
                     if(error){
                         KTVLogError(@"enterSeat error:%@", error.description);
+                        self.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
                     }
                     [weakSelf _joinChorus];
                 }];
@@ -639,13 +643,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     songConfig.songCode = [model.songNo integerValue];
     songConfig.mainSingerUid = [model.userNo integerValue];
     
-    self.MVView.joinCoSingerState = KTVJoinCoSingerStateJoinNow;
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
         if (!isSuccess) {
             return;
         }
-        
+        NSLog(@"before switch role, load music success");
         NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
         [weakSelf.ktvApi switchSingerRoleWithNewRole:role
                                                token:exChannelToken
@@ -653,6 +656,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             if (state == KTVSwitchRoleStateFail && reason != KTVSwitchRoleFailReasonNoPermission) {
                 weakSelf.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
                 [VLToast toast:[NSString stringWithFormat:@"join chorus fail: %ld", reason]];
+                KTVLogInfo(@"join chorus fail");
                 //TODO: error toast?
                 return;
             }
@@ -910,6 +914,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)didJoinChours {
     //加入合唱
+    self.MVView.joinCoSingerState = KTVJoinCoSingerStateJoinNow;
     [self joinChorus];
 }
 

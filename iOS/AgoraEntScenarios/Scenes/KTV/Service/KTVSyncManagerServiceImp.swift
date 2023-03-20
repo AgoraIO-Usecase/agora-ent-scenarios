@@ -1087,6 +1087,8 @@ extension KTVSyncManagerServiceImp {
         guard let channelName = roomNo else {
 //            assert(false, "channelName = nil")
             agoraPrint("addUserInfo channelName = nil")
+            let error = NSError(domain: "addUserInfo channelName = nil", code: -1)
+            finished(error)
             return
         }
         

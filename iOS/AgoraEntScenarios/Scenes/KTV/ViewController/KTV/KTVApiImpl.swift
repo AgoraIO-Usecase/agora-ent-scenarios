@@ -483,7 +483,7 @@ extension KTVApiImpl {
         
         if mode == .loadLrcOnly {
             loadLyric(with: songCode, callBack: {[weak self] url in
-                agoraPrint("loadLrcOnly: ulr:\(String(describing: url))")
+                agoraPrint("loadLrcOnly: songCode:\(songCode) ulr:\(String(describing: url))")
                 if let urlPath = url, urlPath.count > 0 {
                         self?.lyricUrlMap.updateValue(urlPath, forKey: String(songCode))
                         self?.setLyric(with: urlPath, callBack: { lyricUrl in
@@ -509,7 +509,7 @@ extension KTVApiImpl {
                     if mode == .loadMusicAndLrc {
                         //需要加载歌词
                         self?.loadLyric(with: songCode, callBack: { url in
-                            agoraPrint("loadMusicAndLrc: status:\(status.rawValue) ulr:\(String(describing: url))")
+                            agoraPrint("loadMusicAndLrc: songCode:\(songCode) status:\(status.rawValue) ulr:\(String(describing: url))")
                             if let urlPath = url, urlPath.count > 0 {
                                     self?.lyricUrlMap.updateValue(urlPath, forKey: String(songCode))
                                     self?.setLyric(with: urlPath, callBack: { lyricUrl in
@@ -527,7 +527,7 @@ extension KTVApiImpl {
                             
                         })
                     } else if mode == .loadMusicOnly {
-                        agoraPrint("loadMusicOnly: load success")
+                        agoraPrint("loadMusicOnly: songCode:\(songCode) load success")
                         if config.autoPlay == true {
                             self?.startSing(startPos: 0)
                         }
@@ -535,7 +535,7 @@ extension KTVApiImpl {
                     }
                     
                 } else {
-                    agoraPrint("load music failed")
+                    agoraPrint("load music failed songCode:\(songCode)")
                    // self?.loadSongState = .failed
                     onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .musicPreloadFail)
                 }
