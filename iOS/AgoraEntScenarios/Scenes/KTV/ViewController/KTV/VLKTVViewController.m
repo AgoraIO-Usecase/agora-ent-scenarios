@@ -651,8 +651,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 //TODO: error toast?
                 return;
             }
-            weakSelf.MVView.loadingType = VLKTVMVViewStateIdle;
-            
+
             weakSelf.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForLeave;
             
             weakSelf.isNowMicMuted = role == KTVSingRoleAudience;
