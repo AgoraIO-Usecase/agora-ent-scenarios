@@ -353,13 +353,13 @@
         case KTVSingRoleSoloSinger:
         case KTVSingRoleLeadSinger: {
             [self setPlayerViewsHidden:NO nextButtonHidden:NO playButtonHidden:NO];
-            self.joinCoSingerState = KTVJoinCoSingerStateIdle;
+          //  self.joinCoSingerState = KTVJoinCoSingerStateIdle;
         } break;
         case KTVSingRoleCoSinger: {
 //        case KTVSingRoleFollowSinger:
             BOOL isNextEnable = !VLUserCenter.user.ifMaster;
             [self setPlayerViewsHidden:NO nextButtonHidden:isNextEnable playButtonHidden:YES];
-            self.joinCoSingerState = KTVJoinCoSingerStateWaitingForLeave;
+         //   self.joinCoSingerState = KTVJoinCoSingerStateWaitingForLeave;
         } break;
         case KTVSingRoleAudience:
         default: {
@@ -369,7 +369,7 @@
                 [self setPlayerViewsHidden:YES nextButtonHidden:YES playButtonHidden:YES];
             }
             
-            self.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
+           // self.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
         } break;
     }
 }

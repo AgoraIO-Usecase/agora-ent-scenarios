@@ -23,6 +23,16 @@
     return self;
 }
 
+-(void)setSelectedIndex:(NSInteger)index{
+    self.selBtn.selected = false;
+    self.selBtn.layer.borderWidth = 0;
+    UIButton *btn = [self viewWithTag:200 + index];
+    btn.selected = true;
+    btn.layer.borderColor = [UIColor blueColor].CGColor;
+    btn.layer.borderWidth = 1;
+    self.selBtn = btn;
+}
+
 -(void)layoutUI {
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
     titleLabel.text = KTVLocalizedString(@"音效");
