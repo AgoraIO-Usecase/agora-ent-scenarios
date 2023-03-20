@@ -638,7 +638,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
         if (!isSuccess) {
-            weakSelf.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
             return;
         }
         
@@ -653,6 +652,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 return;
             }
             weakSelf.MVView.loadingType = VLKTVMVViewStateIdle;
+            
             weakSelf.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForLeave;
             
             weakSelf.isNowMicMuted = role == KTVSingRoleAudience;
@@ -1117,7 +1117,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else if (type == VLKTVMVViewActionTypeSingAcc) { // 伴奏
         self.trackMode = KTVPlayerTrackModeAcc;
     } else if (type == VLKTVMVViewActionTypeRetryLrc) {  //歌词重试
-        //TODO(chenpan):
+        [self reloadMusic];
     }
 }
 
@@ -1125,8 +1125,26 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [[self.ktvApi getMediaPlayer] seekToPosition:position];
 }
 
-- (void)didSkipViewClick{
-//    [self.ktvApi Skip];
+- (void)reloadMusic{
+    VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
+    KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
+    songConfig.autoPlay = YES;
+    songConfig.songCode = [model.songNo integerValue];
+    songConfig.mainSingerUid = [model.userNo integerValue];
+    
+    self.MVView.loadingType = VLKTVMVViewStateLoading;
+    
+    VL(weakSelf);
+    self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
+        if (!isSuccess) {
+            return;
+        }
+        
+        [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
+    };
+    
+    [self.ktvApi loadMusicWithConfig:songConfig mode: KTVLoadMusicModeLoadLrcOnly
+                onMusicLoadStateListener:self];
 }
 
 #pragma mark - VLKTVSettingViewDelegate
