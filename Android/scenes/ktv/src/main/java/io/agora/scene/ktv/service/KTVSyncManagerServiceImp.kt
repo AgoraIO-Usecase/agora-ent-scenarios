@@ -511,7 +511,7 @@ class KTVSyncManagerServiceImp(
             name = UserManager.getInstance().user.name,
 
             status = RoomSelSongModel.STATUS_IDLE,
-            createAt = System.currentTimeMillis().toDouble(),
+            createAt = System.currentTimeMillis().toLong(),
             pinAt = 0.0
         )
         //net request and notify others
