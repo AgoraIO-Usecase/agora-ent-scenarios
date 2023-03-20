@@ -601,6 +601,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)joinChorus {
     if (![self getJoinChorusEnable]) {
+        KTVLogInfo(@"getJoinChorusEnable false");
         return;
     }
     
@@ -611,7 +612,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             
             if (seat.rtcUid == 0) {
                 VL(weakSelf);
+                KTVLogError(@"before enterSeat error");
                 [self enterSeatWithIndex:i completion:^(NSError *error) {
+                    if(error){
+                        KTVLogError(@"enterSeat error:%@", error.description);
+                    }
                     [weakSelf _joinChorus];
                 }];
                 return;
