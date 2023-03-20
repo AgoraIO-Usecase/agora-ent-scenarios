@@ -230,6 +230,8 @@ class KTVSyncManagerServiceImp(
                                         completion.invoke(null, kTVJoinRoomOutputModel)
                                     }
 
+                                    // 重置体验时间事件
+                                    mainHandler.removeCallbacks(timerRoomEndRun)
                                     // 定时删除房间
                                     val expireLeftTime = ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - cacheRoom.createdAt.toLong())
                                     KTVLogger.d(TAG, "expireLeftTime: $expireLeftTime")
@@ -622,7 +624,7 @@ class KTVSyncManagerServiceImp(
         val indexOf = songChosenList.indexOf(targetSong)
         songChosenList.removeAt(indexOf)
         val removeAt = objIdOfSongNo.removeAt(indexOf)
-//
+
 //        if (isSingingSong) {
 //            seatMap.forEach {
 //                val originSeatInfo = it.value
@@ -634,7 +636,7 @@ class KTVSyncManagerServiceImp(
 //                        originSeatInfo.rtcUid,
 //                        originSeatInfo.name,
 //                        originSeatInfo.seatIndex,
-//                        false,
+//                        "",
 //                        originSeatInfo.isAudioMuted,
 //                        originSeatInfo.isVideoMuted
 //                    )
@@ -650,7 +652,7 @@ class KTVSyncManagerServiceImp(
     }
 
     override fun joinChorus(
-        songCode: String,
+        inputModel: RoomSelSongModel,
         completion: (error: Exception?) -> Unit
     ) {
         //加入合唱
@@ -666,7 +668,7 @@ class KTVSyncManagerServiceImp(
                             seat.rtcUid,
                             seat.name,
                             seat.seatIndex,
-                            songCode,
+                            inputModel.songNo + inputModel.createAt,
                             RoomSeatModel.MUTED_VALUE_FALSE,
                             seat.isVideoMuted
                         )

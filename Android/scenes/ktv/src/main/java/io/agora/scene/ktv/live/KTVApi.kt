@@ -98,12 +98,13 @@ interface OnMusicLoadStateListener {
      * 音乐加载失败
      * @param reason 歌曲加载失败的原因
      */
-    fun onMusicLoadFail(reason: KTVLoadSongFailReason)
+    fun onMusicLoadFail(songCode: Long, reason: KTVLoadSongFailReason)
 
     /**
      * 音乐加载进度
      * @param songCode 歌曲编码
      * @param percent 歌曲加载进度
+     * @param status 歌曲加载的状态
      * @param msg
      * @param lyricUrl
      */

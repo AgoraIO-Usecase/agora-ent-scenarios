@@ -187,7 +187,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                             binding.tvZC.setText("主唱");
                             binding.tvHC.setVisibility(View.GONE);
                             binding.tvZC.setVisibility(View.VISIBLE);
-                        } else if (item.getChorusSongCode() != null && !item.getUserNo().equals(songModel.getUserNo()) && item.getChorusSongCode().equals(songModel.getSongNo())) {
+                        } else if (item.getChorusSongCode() != null && !item.getUserNo().equals(songModel.getUserNo()) && item.getChorusSongCode().equals(songModel.getSongNo() + songModel.getCreateAt())) {
                             binding.tvHC.setText("合唱");
                             binding.tvZC.setVisibility(View.GONE);
                             binding.tvHC.setVisibility(View.VISIBLE);
@@ -195,6 +195,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                             binding.tvZC.setVisibility(View.GONE);
                             binding.tvHC.setVisibility(View.GONE);
                         }
+                    } else {
+                        binding.tvZC.setVisibility(View.GONE);
+                        binding.tvHC.setVisibility(View.GONE);
                     }
                 }
             }
@@ -352,7 +355,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     mRoomSpeakerAdapter.replace(seatModel.getSeatIndex(), seatModel);
                 }
 
-                if (seatModel.getChorusSongCode() != null && roomLivingViewModel.songPlayingLiveData.getValue() != null && seatModel.getChorusSongCode().equals(roomLivingViewModel.songPlayingLiveData.getValue().getSongNo())) {
+                if (seatModel.getChorusSongCode() != null && roomLivingViewModel.songPlayingLiveData.getValue() != null && seatModel.getChorusSongCode().equals(roomLivingViewModel.songPlayingLiveData.getValue().getSongNo() + roomLivingViewModel.songPlayingLiveData.getValue().getCreateAt())) {
                     chorusNowNum ++;
                 }
             }
@@ -604,6 +607,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         } else {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
         }
+        roomLivingViewModel.resetMusicStatus();
         roomLivingViewModel.musicStartPlay(music);
         mRoomSpeakerAdapter.notifyDataSetChanged();
     }
@@ -659,7 +663,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 hideLoadingView();
 
                 if (!mChooseSongDialog.isAdded()) {
-                    roomLivingViewModel.getSongChosenList();
                     mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
                 }
 
@@ -669,7 +672,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         }
 
         if (!mChooseSongDialog.isAdded()) {
-            roomLivingViewModel.getSongChosenList();
             mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
         }
 
