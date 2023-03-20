@@ -41,7 +41,7 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.0.130.1'
   
   #歌词组件
   pod "ScoreEffectUI"
-  pod 'AgoraLyricsScore', '1.1.1-beta-1'
+  pod 'AgoraLyricsScore', '1.1.1-beta-2'
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'cc0951f11f5fa6113ec2b9df2a509efa881d5bd7'
 #  pod 'AgoraLyricsScore', :path => '../../AgoraLyricsScore/AgoraLyricsScore.podspec'
   pod 'AgoraRtm_iOS', '1.5.1'
