@@ -197,7 +197,8 @@ extension KTVApiImpl: KTVApiDelegate {
         if musicPlayer?.getPlayerState() == .paused {
             musicPlayer?.resume()
         } else {
-            musicPlayer?.play()
+            let ret = musicPlayer?.play()
+            agoraPrint("resumeSing fail: \(ret ?? -1)")
         }
     }
 
@@ -614,7 +615,8 @@ extension KTVApiImpl {
         let role = singerRole
         agoraPrint("startSing role: \(role.rawValue)")
         apiConfig?.engine.adjustPlaybackSignalVolume(Int(remoteVolume))
-        musicPlayer?.openMedia(songCode: songConfig?.songCode ?? 0, startPos: startPos)
+        let ret = musicPlayer?.openMedia(songCode: songConfig?.songCode ?? 0, startPos: startPos)
+        agoraPrint("startSing->openMedia(\(songConfig?.songCode ?? -1) fail: \(ret ?? -1)")
     }
 
     /**
