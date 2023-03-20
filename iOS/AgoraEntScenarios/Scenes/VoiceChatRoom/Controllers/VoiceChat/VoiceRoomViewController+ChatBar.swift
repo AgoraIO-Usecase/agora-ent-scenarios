@@ -89,9 +89,11 @@ extension VoiceRoomViewController {
                     let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: (205 / 375.0) * ScreenWidth)), custom: applyAlert)
                     applyAlert.actionEvents = { [weak self] in
                         if $0 == 31 {
+                            let count = (index - 1000) / 10
+                            let tag = (index - 1000) % 10
                             self?.activeAlien(true)
                             self?.roomInfo?.room?.use_robot = true
-                            self?.rtckit.playMusic(with: .alien)
+                            self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
                         }
                         vc.dismiss(animated: true)
                     }

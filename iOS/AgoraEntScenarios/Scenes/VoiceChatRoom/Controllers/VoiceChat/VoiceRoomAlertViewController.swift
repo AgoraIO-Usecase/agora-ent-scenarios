@@ -26,9 +26,9 @@ public class VoiceRoomAlertViewController: UIViewController, PresentedViewType {
         self.init()
         presentedViewComponent = compent
         customView = custom
-//        if custom.isKind(of: VMNoticeView.self), compent.destination == .bottomBaseline {
-//            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIApplication.keyboardWillShowNotification, object: nil)
-//        }
+        if custom.isKind(of: VMNoticeView.self), compent.destination == .bottomBaseline {
+            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIApplication.keyboardWillShowNotification, object: nil)
+        }
     }
 
     override public func viewDidLoad() {
