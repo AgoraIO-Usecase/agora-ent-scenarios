@@ -60,7 +60,7 @@ class KTVApiImpl: NSObject{
     private var remotePlayerPosition: TimeInterval = 0
     private var remotePlayerDuration: TimeInterval = 0
     private var localPlayerSystemTime: TimeInterval = 0
-    private var lastAudienceUpTime: TimeInterval = 0
+    private var lastMainSingerUpdateTime: TimeInterval = 0
     private var playerDuration: TimeInterval = 0
 
     private var musicChartDict: [String: MusicChartCallBacks] = [:]
@@ -198,7 +198,7 @@ extension KTVApiImpl: KTVApiDelegate {
             musicPlayer?.resume()
         } else {
             let ret = musicPlayer?.play()
-            agoraPrint("resumeSing fail: \(ret ?? -1)")
+            agoraPrint("resumeSing ret: \(ret ?? -1)")
         }
     }
 
@@ -715,13 +715,16 @@ extension KTVApiImpl {
                 }
                 
                 self.remotePlayerDuration = TimeInterval(duration)
+                self.lastMainSingerUpdateTime = Date().milListamp
+                self.remotePlayerPosition = TimeInterval(position)
 
                 let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
                 if (self.playerState != state) {
                     agoraPrint("[setLrcTime] recv state: \(self.playerState.rawValue)->\(state.rawValue) role: \(singerRole.rawValue) role: \(singerRole.rawValue)")
                     if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
                         //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
-                        self.localPlayerPosition = Date().milListamp - Double(position)
+                        self.localPlayerPosition = self.lastMainSingerUpdateTime - Double(position)
+                        agoraPrint("seek toPosition: \(position)")
                         musicPlayer.seek(toPosition: Int(position))
                     }
                     syncPlayStateFromRemote(state: state)
@@ -730,7 +733,7 @@ extension KTVApiImpl {
                 if role == .coSinger {
                     if musicPlayer?.getPlayerState() == .playing {
                         let localNtpTime = getNtpTimeInMs()
-                        let localPosition = Date().milListamp - self.localPlayerPosition
+                        let localPosition = self.lastMainSingerUpdateTime - self.localPlayerPosition
                         let expectPosition = Int(position) + localNtpTime - Int(remoteNtp) + self.audioPlayoutDelay
                         let threshold = expectPosition - Int(localPosition)
                         if(abs(threshold) > 40) {
@@ -738,19 +741,21 @@ extension KTVApiImpl {
                             agoraPrint("progress: setthreshold: \(threshold) expectPosition: \(expectPosition) position: \(position), localNtpTime: \(localNtpTime), remoteNtp: \(remoteNtp), audioPlayoutDelay: \(self.audioPlayoutDelay), localPosition: \(localPosition)")
                         }
                     } else {
-                        self.remotePlayerPosition = Date().milListamp - TimeInterval(position)
                         self.pitch = Double(voicePitch)
-                        self.lastAudienceUpTime = Date().milListamp
                     }
                 } else if role == .audience {
-                    self.remotePlayerPosition = Date().milListamp - TimeInterval(position)
                     self.pitch = Double(voicePitch)
-                    self.lastAudienceUpTime = Date().milListamp
                 }
 
             } else if dict["cmd"] as? String == "PlayerState" {
                 let mainSingerState: Int = dict["state"] as? Int ?? 0
                 let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
+                if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
+                    //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
+                    self.localPlayerPosition = getPlayerCurrentTime()
+                    agoraPrint("seek toPosition: \(self.localPlayerPosition)")
+                    musicPlayer.seek(toPosition: Int(self.localPlayerPosition))
+                }
                 syncPlayStateFromRemote(state: state)
             } else if dict["cmd"] as? String == "setVoicePitch" {
                 if role == .coSinger {return}
@@ -787,7 +792,7 @@ extension KTVApiImpl {
 
         timer = Timer.scheduledTimer(withTimeInterval: 0.02, block: {[weak self] timer in
             let current = self?.getPlayerCurrentTime()
-            if self?.singerRole == .audience && (Date().milListamp - (self?.lastAudienceUpTime ?? 0)) > 1000 {
+            if self?.singerRole == .audience && (Date().milListamp - (self?.lastMainSingerUpdateTime ?? 0)) > 1000 {
                 return
             }
             
@@ -871,8 +876,13 @@ extension KTVApiImpl {
                 return time
             }
         }
-//        agoraPrint("getPlayerCurrentTime Audience \(Date().milListamp - remotePlayerPosition)")
-        return Date().milListamp - remotePlayerPosition
+        
+        var position = Date().milListamp - self.lastMainSingerUpdateTime + remotePlayerPosition
+        if playerState != .playing {
+            position = remotePlayerPosition
+        }
+//        agoraPrint("getPlayerCurrentTime Audience \(position)")
+        return position
     }
 
     private func syncPlayStateFromRemote(state: AgoraMediaPlayerState) {
