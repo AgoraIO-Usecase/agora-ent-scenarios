@@ -45,12 +45,12 @@ private func agoraPrint(_ message: String) {
         
         skipBtn = KTVSkipView(frame: CGRect(x: self.lrcView.bounds.size.width / 2.0 - 60, y: self.lrcView.bounds.size.height - 20, width: 120, height: 34), completion: { type in
             if type == .down {
-                self.skipBtn.isHidden = true
                 guard let duration = self.lyricModel?.duration else {return}
                 guard let preludeEndPosition = self.lyricModel?.preludeEndPosition else {return}
                 let pos: Int = self.progress >= duration - 500  ? duration : preludeEndPosition - 500
                 self.skipCallBack?(pos)
             }
+            self.skipBtn.isHidden = true
         })
         
         self.lrcView.addSubview(skipBtn)
