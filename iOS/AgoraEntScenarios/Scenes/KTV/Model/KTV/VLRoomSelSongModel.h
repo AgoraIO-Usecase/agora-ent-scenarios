@@ -43,6 +43,10 @@ typedef enum : NSUInteger {
 /// 是否是自己点的歌曲
 - (BOOL)isSongOwner;
 
+
+/// 上麦之后的麦位id，通过songNo+createAt拼接
+- (NSString*)chorusSongId;
+
 @end
 
 NS_ASSUME_NONNULL_END
