@@ -153,7 +153,7 @@
                 [changeSet addObject:@(seatModel.seatIndex)];
             }
             //检查麦位合唱歌曲状态
-            if (![seatModel.chorusSongCode isEqualToString:songModel.songNo]) {
+            if (seatModel.isJoinChours && ![seatModel.chorusSongCode isEqualToString:songModel.songNo]) {
                 seatModel.chorusSongCode = @"";
                 [changeSet addObject:@(seatModel.seatIndex)];
             }
