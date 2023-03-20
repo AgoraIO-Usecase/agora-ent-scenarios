@@ -14,4 +14,8 @@
     }
     return NO;
 }
+
+- (NSString*)chorusSongId {
+    return [NSString stringWithFormat:@"%@%lld", self.songNo, self.createAt];
+}
 @end
