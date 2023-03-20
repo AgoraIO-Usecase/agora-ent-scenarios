@@ -211,7 +211,7 @@
     self.leaveChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(15, _pauseBtn.top, 54, 54)];
     [self.leaveChorusBtn setTitle:@"退出合唱" forState:UIControlStateNormal];
     [self.leaveChorusBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [self.leaveChorusBtn setFont:[UIFont systemFontOfSize:11]];
+    [self.leaveChorusBtn setFont:UIFontMake(10.0)];
     [self.leaveChorusBtn setImage:[UIImage sceneImageWithName:@"Union"] forState:UIControlStateNormal];
     [self.leaveChorusBtn addTarget:self action:@selector(leaveChorus) forControlEvents:UIControlEventTouchUpInside];
     [self updateBtnLayout:self.leaveChorusBtn];
@@ -322,6 +322,7 @@
             self.joinChorusBtn.enabled = NO;
             self.joinChorusBtn.hidden = NO;
             self.leaveChorusBtn.hidden = YES;
+            self.nextButton.hidden = YES;
             break;
         case KTVJoinCoSingerStateWaitingForLeave:
             self.joinChorusBtn.enabled = YES;
@@ -371,6 +372,11 @@
     self.nextButton.hidden = nextButtonHidden;
     self.originBtn.hidden = hidden;
     self.settingBtn.hidden = hidden;
+    if(self.pauseBtn.hidden == YES && self.nextButton.hidden == NO){
+        self.nextButton.frame = self.pauseBtn.frame;
+    } else {
+        self.nextButton.frame = CGRectMake(_pauseBtn.right+10, _pauseBtn.top, 34, 54);
+    }
 }
 
 - (BOOL)isPlaying:(VLRoomSelSongModel *)song {
