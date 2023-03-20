@@ -500,6 +500,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     //TODO: fix score view visible problem while owner reopen the room
     [self.MVView updateUIWithSong:model role:self.singRole];
+    [self setCoSingerStateWith:self.singRole];
     if(!model){
         return;
     }
@@ -1528,7 +1529,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     VLRoomSelSongModel *song = self.selSongsArray.firstObject;
     [self.MVView updateUIWithSong:song role:singRole];
-    switch (singRole) {
+    [self setCoSingerStateWith:singRole];
+}
+
+-(void)setCoSingerStateWith:(KTVSingRole)role {
+    switch (role) {
         case KTVSingRoleSoloSinger:
         case KTVSingRoleLeadSinger: {
             self.MVView.joinCoSingerState = KTVJoinCoSingerStateIdle;
