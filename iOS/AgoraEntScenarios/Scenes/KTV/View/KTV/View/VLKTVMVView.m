@@ -337,6 +337,12 @@
             break;
     }
     
+    if(self.pauseBtn.hidden == YES && self.nextButton.hidden == NO && self.leaveChorusBtn.hidden == YES){
+        self.nextButton.frame = self.pauseBtn.frame;
+    } else {
+        self.nextButton.frame = CGRectMake(_pauseBtn.right+10, _pauseBtn.top, 34, 54);
+    }
+    
 }
 
 - (void)configPlayerControls:(VLRoomSelSongModel *)song role:(KTVSingRole)role {
@@ -373,11 +379,6 @@
     self.nextButton.hidden = nextButtonHidden;
     self.originBtn.hidden = hidden;
     self.settingBtn.hidden = hidden;
-    if(self.pauseBtn.hidden == YES && self.nextButton.hidden == NO && self.leaveChorusBtn.hidden == YES){
-        self.nextButton.frame = self.pauseBtn.frame;
-    } else {
-        self.nextButton.frame = CGRectMake(_pauseBtn.right+10, _pauseBtn.top, 34, 54);
-    }
 }
 
 - (BOOL)isPlaying:(VLRoomSelSongModel *)song {
