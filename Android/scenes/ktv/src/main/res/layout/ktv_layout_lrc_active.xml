@@ -67,11 +67,13 @@
         app:labelWhenNoLyrics=" "
         app:layout_constraintBottom_toTopOf="@+id/bgd_control_layout_lrc"
         app:layout_constraintTop_toBottomOf="@+id/scoringView"
+        app:layout_constraintVertical_bias="0.0"
         app:lineSpacing="8sp"
         app:paddingTop="2dp"
         app:startOfVerseIndicatorPaddingTop="6dp"
         app:startOfVerseIndicatorRadius="4dp"
-        app:textGravity="center" />
+        app:textGravity="center"
+        tools:layout_editor_absoluteX="-36dp" />
 
     <View
         android:id="@+id/bgd_control_layout_lrc"
@@ -83,12 +85,12 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/ivLeaveChorus"
         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-        android:layout_width="26dp"
+        android:layout_width="36dp"
         android:layout_height="36dp"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="15dp"
         android:layout_marginBottom="0dp"
         android:insetLeft="0dp"
-        android:insetTop="0dp"
+        android:insetTop="2dp"
         android:insetRight="0dp"
         android:insetBottom="0dp"
         android:minWidth="0dp"
@@ -96,12 +98,12 @@
         android:text="离开合唱"
         android:textAppearance="?android:attr/textAppearanceButton"
         android:textColor="#9BA2AB"
-        android:textSize="6sp"
+        android:textSize="8sp"
         app:backgroundTint="@android:color/transparent"
         app:cornerRadius="6dp"
         app:icon="@mipmap/ic_leave_chorus"
         app:iconGravity="top"
-        app:iconPadding="0dp"
+        app:iconPadding="2dp"
         app:iconTintMode="src_atop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

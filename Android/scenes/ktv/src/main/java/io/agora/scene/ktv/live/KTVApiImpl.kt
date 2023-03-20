@@ -19,10 +19,11 @@ import org.json.JSONObject
 import java.nio.ByteBuffer
 
 /**
- * KTVLoadSongStateOK 加载成功
- * KTVLoadSongStateInProgress 正在加载中
- * KTVLoadSongStateNoLyricUrl 没有歌词
- * KTVLoadSongStatePreloadFail Mcc 预加载歌曲失败
+ * loadSong 内部状态
+ * @param OK  加载成功
+ * @param FAILED 正在加载中
+ * @param IN_PROGRESS 没有歌词
+ * @param IDLE Mcc 预加载歌曲失败
  *
  */
 enum class KTVLoadSongState(val value: Int) {
@@ -65,9 +66,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     private val lyricUrlMap = mutableMapOf<String, String>() // (songCode, lyricUrl)
     private val lyricCallbackMap =
-        mutableMapOf<String, (lyricUrl: String?) -> Unit>() // (requestId, callback)
+        mutableMapOf<String, (songNo: Long, lyricUrl: String?) -> Unit>() // (requestId, callback)
+    private val lyricSongCodeMap = mutableMapOf<String, Long>() // (requestId, songCode)
     private val loadMusicCallbackMap =
-        mutableMapOf<String, (isPreload: Int?) -> Unit>() // (songNo, callback)
+        mutableMapOf<String, (songNo: Long, isPreload: Int?) -> Unit>() // (songNo, callback)
     private val musicChartsCallbackMap =
         mutableMapOf<String, (requestId: String?, status: Int, list: Array<out MusicChartInfo>?) -> Unit>()
     private val musicCollectionCallbackMap =
@@ -314,8 +316,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         onMusicLoadStateListener: OnMusicLoadStateListener
     ) {
         Log.d(TAG, "loadMusic called: $singerRole")
-        if (loadSongState == KTVLoadSongState.IN_PROGRESS) {
-            onMusicLoadStateListener.onMusicLoadFail(KTVLoadSongFailReason.IN_PROGRESS)
+        if (loadSongState == KTVLoadSongState.IN_PROGRESS && this.songCode == config.songCode) {
+            onMusicLoadStateListener.onMusicLoadFail(config.songCode, KTVLoadSongFailReason.IN_PROGRESS)
             Log.e(TAG, "loadMusic failed: KTVLoadSongState is in progress")
             return
         }
@@ -330,44 +332,46 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         if (config.mode == KTVLoadMusicMode.LOAD_LRC_ONLY) {
             // 加载歌词
-            loadLyric(songCode) { lyricUrl ->
+            loadLyric(songCode) { song, lyricUrl ->
                 if (lyricUrl == null) {
                     // 加载歌词失败
                     Log.e(TAG, "loadMusic failed: NO_LYRIC_URL")
                     loadSongState = KTVLoadSongState.FAILED
-                    onMusicLoadStateListener.onMusicLoadFail(KTVLoadSongFailReason.NO_LYRIC_URL)
+                    onMusicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.NO_LYRIC_URL)
                 } else {
                     // 加载歌词成功
                     Log.d(TAG, "loadMusic success")
                     loadSongState = KTVLoadSongState.OK
                     lrcView?.onDownloadLrcData(lyricUrl)
-                    onMusicLoadStateListener.onMusicLoadSuccess(songCode, lyricUrl)
+                    onMusicLoadStateListener.onMusicLoadSuccess(song, lyricUrl)
                 }
             }
             return
         }
 
         // 预加载歌曲
-        preLoadMusic(songCode) { status ->
+        preLoadMusic(songCode) { song, status ->
             if (status == 0) {
                 // 预加载歌曲成功
                 if (config.mode == KTVLoadMusicMode.LOAD_MUSIC_AND_LRC) {
                     // 需要加载歌词
-                    loadLyric(songCode) { lyricUrl ->
+                    loadLyric(song) { _, lyricUrl ->
                         if (lyricUrl == null) {
                             // 加载歌词失败
                             Log.e(TAG, "loadMusic failed: NO_LYRIC_URL")
                             loadSongState = KTVLoadSongState.FAILED
-                            onMusicLoadStateListener.onMusicLoadFail(KTVLoadSongFailReason.NO_LYRIC_URL)
+                            onMusicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.NO_LYRIC_URL)
                         } else {
                             // 加载歌词成功
                             Log.d(TAG, "loadMusic success")
                             loadSongState = KTVLoadSongState.OK
-                            lrcView?.onDownloadLrcData(lyricUrl)
-                            onMusicLoadStateListener.onMusicLoadSuccess(songCode, lyricUrl)
+                            if (this.songCode == song) {
+                                lrcView?.onDownloadLrcData(lyricUrl)
+                            }
+                            onMusicLoadStateListener.onMusicLoadSuccess(song, lyricUrl)
                         }
 
-                        if (config.autoPlay) {
+                        if (config.autoPlay && this.songCode == song) {
                             // 主唱自动播放歌曲
                             startSing(0)
                         }
@@ -380,13 +384,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         // 主唱自动播放歌曲
                         startSing(0)
                     }
-                    onMusicLoadStateListener.onMusicLoadSuccess(songCode, "")
+                    onMusicLoadStateListener.onMusicLoadSuccess(song, "")
                 }
             } else {
                 // 预加载歌曲失败
                 Log.e(TAG, "loadMusic failed: MUSIC_PRELOAD_FAIL")
                 loadSongState = KTVLoadSongState.FAILED
-                onMusicLoadStateListener.onMusicLoadFail(KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL)
+                onMusicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL)
             }
         }
     }
@@ -466,7 +470,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 mRtcEngine.updateChannelMediaOptions(channelMediaOption)
 
                 // 预加载歌曲成功
-                mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
                 mPlayer.open(songCode, 0) // TODO open failed
 
                 // 预加载成功后加入第二频道：预加载时间>>joinChannel时间
@@ -702,22 +705,23 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         }
     }
 
-    private fun loadLyric(songNo: Long, onLoadLyricCallback: (lyricUrl: String?) -> Unit) {
+    private fun loadLyric(songNo: Long, onLoadLyricCallback: (songNo: Long, lyricUrl: String?) -> Unit) {
         Log.d(TAG, "loadLyric: $songNo")
         val requestId = mMusicCenter.getLyric(songNo, 0)
         if (requestId.isEmpty()) {
-            onLoadLyricCallback.invoke(null)
+            onLoadLyricCallback.invoke(songNo, null)
             return
         }
+        lyricSongCodeMap[requestId] = songNo
         lyricCallbackMap[requestId] = onLoadLyricCallback
     }
 
-    private fun preLoadMusic(songNo: Long, onLoadMusicCallback: (status: Int?) -> Unit) {
+    private fun preLoadMusic(songNo: Long, onLoadMusicCallback: (songNo: Long, status: Int?) -> Unit) {
         Log.d(TAG, "loadMusic: $songNo")
         val ret = mMusicCenter.isPreloaded(songNo)
         if (ret == 0) {
             loadMusicCallbackMap.remove(songNo.toString())
-            onLoadMusicCallback(0)
+            onLoadMusicCallback(songNo, 0)
             return
         }
 
@@ -725,7 +729,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         if (retPreload != 0) {
             Log.e(TAG, "preLoadMusic failed: $retPreload")
             loadMusicCallbackMap.remove(songNo.toString())
-            onLoadMusicCallback(0)
+            onLoadMusicCallback(songNo, 0)
             return
         }
         loadMusicCallbackMap[songNo.toString()] = onLoadMusicCallback
@@ -769,6 +773,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 if (isChorusCoSinger()) {
                     // 本地BGM校准逻辑
                     if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
+                        // 合唱者开始播放音乐前调小远端人声
+                        mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
+                        // 收到leadSinger第一次播放位置消息时开启本地播放（先通过seek校准）
                         val delta = getNtpTimeInMs() - remoteNtp
                         val expectPosition = position + delta + audioPlayoutDelay
                         if (expectPosition in 1 until duration) {
@@ -891,7 +898,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         if (status == 2) return
         val callback = loadMusicCallbackMap[songCode.toString()] ?: return
         loadMusicCallbackMap.remove(songCode.toString())
-        callback.invoke(status)
+        callback.invoke(songCode, status)
     }
 
     override fun onMusicCollectionResult(
@@ -921,12 +928,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     override fun onLyricResult(requestId: String?, lyricUrl: String?) {
         val callback = lyricCallbackMap[requestId] ?: return
+        val songCode = lyricSongCodeMap[requestId] ?: return
         lyricCallbackMap.remove(lyricUrl)
         if (lyricUrl == null || lyricUrl.isEmpty()) {
-            callback(null)
+            callback(songCode, null)
             return
         }
-        callback(lyricUrl)
+        callback(songCode, lyricUrl)
     }
 
     // ------------------------ AgoraRtcMediaPlayerDelegate ------------------------
