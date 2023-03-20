@@ -99,6 +99,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, strong) LyricModel *lyricModel;
 @property (nonatomic, strong) KTVLrcControl *lrcControl;
 @property (nonatomic, copy, nullable) CompletionBlock loadMusicCallBack;
+@property (nonatomic, assign) NSInteger selectedEffectIndex;
 @end
 
 @implementation VLKTVViewController
@@ -351,6 +352,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
                                           soundView:self.effectView
                                        withDelegate:self];
     self.effectView = (VLEffectView*)popView.currCustomView;
+    [self.effectView setSelectedIndex:self.selectedEffectIndex];
 }
 
 //网络差视图
@@ -620,6 +622,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                     if(error){
                         KTVLogError(@"enterSeat error:%@", error.description);
                         self.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
+                        return;
                     }
                     [weakSelf _joinChorus];
                 }];
@@ -1217,6 +1220,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 //音效设置
 - (void)effectItemClickAction:(NSInteger)effect {
+    self.selectedEffectIndex = effect;
     NSArray *effects = @[@(AgoraAudioEffectPresetOff),
                          @(AgoraAudioEffectPresetRoomAcousticsKTV),
                          @(AgoraAudioEffectPresetRoomAcousVocalConcer),
@@ -1226,7 +1230,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                          @(AgoraAudioEffectPresetRoomAcousEthereal),
                          @(AgoraAudioEffectPresetStyleTransformationPopular),
                          @(AgoraAudioEffectPresetStyleTransformationRnb)];
-   [self.RTCkit setAudioEffectPreset: (AgoraAudioEffectPreset)effects[effect]];
+  [self.RTCkit setAudioEffectPreset: [effects[effect] integerValue]];
+    
 }
 //- (void)soundEffectItemClickAction:(VLKTVSoundEffectType)effectType {
 //    if (effectType == VLKTVSoundEffectTypeHeFeng) {
@@ -1523,6 +1528,20 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     VLRoomSelSongModel *song = self.selSongsArray.firstObject;
     [self.MVView updateUIWithSong:song role:singRole];
+    switch (singRole) {
+        case KTVSingRoleSoloSinger:
+        case KTVSingRoleLeadSinger: {
+            self.MVView.joinCoSingerState = KTVJoinCoSingerStateIdle;
+        } break;
+        case KTVSingRoleCoSinger: {
+//        case KTVSingRoleFollowSinger:
+            self.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForLeave;
+        } break;
+        case KTVSingRoleAudience:
+        default: {
+            self.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
+        } break;
+    }
 }
 
 #pragma mark KTVApiEventHandlerDelegate
@@ -1552,7 +1571,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     });
 }
 
-- (void)onSingerRoleChangedWithOldRole:(enum KTVSingRole)oldRole newRole:(enum KTVSingRole)newRole { 
+- (void)onSingerRoleChangedWithOldRole:(enum KTVSingRole)oldRole newRole:(enum KTVSingRole)newRole {
+    if(oldRole == newRole){
+        KTVLogInfo(@"old role:%li is equal to new role", oldRole);
+    }
     self.singRole = newRole;
 }
 

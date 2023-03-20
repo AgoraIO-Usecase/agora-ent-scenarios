@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLEffectViewDelegate>)delegate;
 
+-(void)setSelectedIndex:(NSInteger)index;
+
 @end
 
 NS_ASSUME_NONNULL_END
