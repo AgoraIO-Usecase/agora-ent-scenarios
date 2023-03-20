@@ -367,13 +367,16 @@ extension KTVApiImpl {
             agoraPrint("joinChorus: KTVSingRoleMainSinger")
             joinChorus2ndChannel(newRole: role, token: token)
         } else if role == .coSinger {
+            
+            musicPlayer.openMedia(songCode: songConfig?.songCode ?? 0, startPos: 0)
+            
             let mediaOption = AgoraRtcChannelMediaOptions()
             mediaOption.autoSubscribeAudio = true
            // mediaOption.autoSubscribeVideo = true
             mediaOption.publishMediaPlayerAudioTrack = false
             apiConfig?.engine.updateChannel(with: mediaOption)
             joinChorus2ndChannel(newRole: role, token: token)
-            
+
         } else if role == .audience {
             agoraPrint("joinChorus fail!")
         }

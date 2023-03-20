@@ -630,7 +630,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSingRole role = KTVSingRoleCoSinger;
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = YES;
+    songConfig.autoPlay = NO;
     songConfig.songCode = [model.songNo integerValue];
     songConfig.mainSingerUid = [model.userNo integerValue];
     

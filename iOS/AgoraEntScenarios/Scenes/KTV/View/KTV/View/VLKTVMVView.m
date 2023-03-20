@@ -336,6 +336,7 @@
             self.leaveChorusBtn.hidden = YES;
             break;
     }
+    
 }
 
 - (void)configPlayerControls:(VLRoomSelSongModel *)song role:(KTVSingRole)role {
