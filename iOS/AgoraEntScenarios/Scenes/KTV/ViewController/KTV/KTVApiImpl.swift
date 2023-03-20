@@ -483,6 +483,7 @@ extension KTVApiImpl {
         
         if mode == .loadLrcOnly {
             loadLyric(with: songCode, callBack: {[weak self] url in
+                agoraPrint("loadLrcOnly: ulr:\(String(describing: url))")
                 if let urlPath = url, urlPath.count > 0 {
                         self?.lyricUrlMap.updateValue(urlPath, forKey: String(songCode))
                         self?.setLyric(with: urlPath, callBack: { lyricUrl in
@@ -508,6 +509,7 @@ extension KTVApiImpl {
                     if mode == .loadMusicAndLrc {
                         //需要加载歌词
                         self?.loadLyric(with: songCode, callBack: { url in
+                            agoraPrint("loadMusicAndLrc: status:\(status.rawValue) ulr:\(String(describing: url))")
                             if let urlPath = url, urlPath.count > 0 {
                                     self?.lyricUrlMap.updateValue(urlPath, forKey: String(songCode))
                                     self?.setLyric(with: urlPath, callBack: { lyricUrl in
@@ -525,7 +527,7 @@ extension KTVApiImpl {
                             
                         })
                     } else if mode == .loadMusicOnly {
-                       // self?.loadSongState = .ok
+                        agoraPrint("loadMusicOnly: load success")
                         if config.autoPlay == true {
                             self?.startSing(startPos: 0)
                         }
