@@ -150,6 +150,7 @@
     self.retryButton.layer.borderWidth = 1;
     self.retryButton.layer.borderColor = [UIColor whiteColor].CGColor;
     [self addSubview:self.retryButton];
+    self.retryButton.hidden = YES;
     
     UIImageView *currentPlayImgView = [[UIImageView alloc]initWithFrame:CGRectMake(9, 2, 39, 39)];
     currentPlayImgView.image = [UIImage sceneImageWithName:@"ktv_currentPlay_icon"];
