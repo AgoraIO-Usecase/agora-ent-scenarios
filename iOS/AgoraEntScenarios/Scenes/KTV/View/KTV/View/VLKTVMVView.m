@@ -372,7 +372,7 @@
     self.nextButton.hidden = nextButtonHidden;
     self.originBtn.hidden = hidden;
     self.settingBtn.hidden = hidden;
-    if((self.pauseBtn.hidden == YES || self.leaveChorusBtn.hidden == YES) && self.nextButton.hidden == NO ){
+    if(self.pauseBtn.hidden == YES && self.nextButton.hidden == NO && self.leaveChorusBtn.hidden == YES){
         self.nextButton.frame = self.pauseBtn.frame;
     } else {
         self.nextButton.frame = CGRectMake(_pauseBtn.right+10, _pauseBtn.top, 34, 54);
