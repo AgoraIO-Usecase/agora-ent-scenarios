@@ -912,6 +912,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //退出合唱
     [[AppContext ktvServiceImp] coSingerLeaveChorusWithCompletion:^(NSError * error) {
     }];
+    [self stopPlaySong];
 }
 
 #pragma mark -- VLKTVTopViewDelegate
@@ -1372,6 +1373,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     NSUInteger origChorusNum = _chorusNum;
     _chorusNum = chorusNum;
     if (origChorusNum != chorusNum) {
+        //主唱<->独唱切换，非歌曲owner不需要调用
+        if(![self isCurrentSongMainSinger:VLUserCenter.user.id]) {
+            return;
+        }
         KTVLogInfo(@"seat array update chorusNum %ld->%ld", origChorusNum, chorusNum);
         //lead singer <-> solo
         NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
