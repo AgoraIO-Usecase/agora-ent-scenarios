@@ -1347,7 +1347,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     
     self.roomPersonView.roomSeatsArray = self.seatsArray;
-    [self.roomPersonView updateSingBtnWithChoosedSongArray:_selSongsArray];
     self.chorusNum = [self getChorusNumWithSeatArray:seatsArray];
 }
 
@@ -1459,7 +1458,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     
     [self.roomPersonView updateSingBtnWithChoosedSongArray:_selSongsArray];
-    
     VLRoomSelSongModel* originalTopSong = [oldSongsArray firstObject];
     VLRoomSelSongModel* updatedTopSong = [selSongsArray firstObject];
     KTVLogInfo(@"setSelSongsArray current top: songName: %@, status: %ld",

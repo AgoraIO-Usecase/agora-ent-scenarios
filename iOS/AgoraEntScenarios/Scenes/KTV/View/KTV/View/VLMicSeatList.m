@@ -68,8 +68,7 @@
     [self.personCollectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:seatIndex inSection:0]]];
 }
 
-- (void)updateIfNeeded
-{
+- (void)updateIfNeeded {
     [self.personCollectionView reloadData];
 }
 
@@ -136,16 +135,6 @@
     return cell;
 }
 
-
-//- (AgoraRtcChannelMediaOptions *)mediaOption {
-//    if (!_mediaOption) {
-//        _mediaOption = [[AgoraRtcChannelMediaOptions alloc] init];
-//        _mediaOption.autoSubscribeAudio = [AgoraRtcBoolOptional of:YES];
-//        _mediaOption.autoSubscribeVideo = [AgoraRtcBoolOptional of:YES];
-//    }
-//    return _mediaOption;
-//}
-
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     VLRoomSeatModel *roomSeatModel = self.roomSeatsArray[indexPath.row];
     if (self.delegate && [self.delegate respondsToSelector:@selector(onVLRoomPersonView:seatItemTappedWithModel:atIndex:)]) {
@@ -154,39 +143,43 @@
 }
 
 - (void)updateSingBtnWithChoosedSongArray:(NSArray *)choosedSongArray {
-    BOOL hasChanged = NO;
+    NSMutableSet* changeSet = [NSMutableSet set];
     if (choosedSongArray.count > 0) {
         VLRoomSelSongModel *songModel = choosedSongArray.firstObject;
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
             BOOL isOwner = [seatModel.userNo isEqualToString:songModel.userNo];
             if (isOwner != seatModel.isOwner) {
                 seatModel.isOwner = isOwner;
-                hasChanged = YES;
+                [changeSet addObject:@(seatModel.seatIndex)];
             }
             //检查麦位合唱歌曲状态
             if (![seatModel.chorusSongCode isEqualToString:songModel.songNo]) {
                 seatModel.chorusSongCode = @"";
-                hasChanged = YES;
+                [changeSet addObject:@(seatModel.seatIndex)];
             }
         }
     }else{
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
             if (seatModel.isOwner) {
                 seatModel.isOwner = NO;
-                hasChanged = YES;
+                [changeSet addObject:@(seatModel.seatIndex)];
             }
             if (seatModel.isJoinChours) {
                 seatModel.chorusSongCode = @"";
-                hasChanged = YES;
+                [changeSet addObject:@(seatModel.seatIndex)];
             }
         }
     }
     
-    if (!hasChanged) {
+    if (changeSet.count == 0) {
         return;
     }
-    [self.personCollectionView reloadData];
+    
+    NSMutableArray* indexPaths = [NSMutableArray array];
+    for (NSNumber * index in changeSet) {
+        [indexPaths addObject:[NSIndexPath indexPathForRow:[index integerValue] inSection:0]];
+    }
+    [self.personCollectionView reloadItemsAtIndexPaths:indexPaths];
 }
-
 
 @end
