@@ -84,8 +84,15 @@ echo PLIST_PATH: $PLIST_PATH
 # archive 这边使用的工作区间 也可以使用project
 xcodebuild CODE_SIGN_STYLE="Manual" -workspace "${APP_PATH}" -scheme "${TARGET_NAME}" clean CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -configuration "${CONFIGURATION}" archive -archivePath "${ARCHIVE_PATH}" -destination 'generic/platform=iOS' -quiet || exit
 
+# 上传IPA
+APP_PATH="$ARCHIVE_PATH/Products/Applications/${TARGET_NAME}.app"
+
+mv $APP_PATH $EXPORT_PATH/Payload
+
+cd $EXPORT_PATH $EXPORT_PATH/ && zip -q $TARGET_NAME.ipa -r Payload && cd -
+
 # 导出ipa
-xcodebuild -exportArchive -archivePath "${ARCHIVE_PATH}" -exportPath "${EXPORT_PATH}" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -exportOptionsPlist "${PLIST_PATH}" -quiet || exit
+# xcodebuild -exportArchive -archivePath "${ARCHIVE_PATH}" -exportPath "${EXPORT_PATH}" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -exportOptionsPlist "${PLIST_PATH}" -quiet || exit
 
 if [ $isSign = true ]; then
     echo "true"
