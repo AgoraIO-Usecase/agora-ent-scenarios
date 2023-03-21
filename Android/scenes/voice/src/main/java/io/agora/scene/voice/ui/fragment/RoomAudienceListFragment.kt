@@ -52,6 +52,10 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
     private lateinit var userListViewModel: VoiceUserListViewModel
 
     private var total = 0
+     set(value) {
+         field = value
+         checkEmpty()
+     }
     private var isEnd = false
     private val members = mutableListOf<VoiceMemberModel>()
 
@@ -74,7 +78,6 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
                         ThreadManager.getInstance().runOnMainThread{
                             audienceAdapter?.addItem(voiceMember)
                             total += 1
-                            checkEmpty()
                         }
                     }
                 })
@@ -143,7 +146,6 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
                     "getMembers total：${data?.size}".logE()
                     if (data == null) return
                     total = data.size
-                    checkEmpty()
                     isEnd = true
                     if (data.isNotEmpty()) {
                         audienceAdapter?.addItems(data)
@@ -161,12 +163,13 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
         userListViewModel.kickOffObservable().observe(requireActivity()) { response:Resource<Int> ->
             parseResource(response,object :OnResourceParseCallback<Int>(){
                 override fun onSuccess(position: Int?) {
-                    position?.let {
-                        audienceAdapter?.deleteItem(it)
-                        if (total > 0){
-                            total -= 1
+                    ThreadManager.getInstance().runOnMainThread {
+                        position?.let {
+                            audienceAdapter?.deleteItem(it)
+                            if (total > 0){
+                                total -= 1
+                            }
                         }
-                        checkEmpty()
                     }
                 }
 

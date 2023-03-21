@@ -20,6 +20,7 @@ import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.Navigation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +32,8 @@ import io.agora.scene.voice.ui.widget.expression.ExpressionView;
 import io.agora.scene.voice.ui.widget.expression.SmileUtils;
 import io.agora.voice.common.utils.DeviceTools;
 import io.agora.voice.common.utils.LogTools;
+import io.agora.voice.common.utils.NavigationUtils;
+import io.agora.voice.common.utils.NavigationUtilsKt;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
 

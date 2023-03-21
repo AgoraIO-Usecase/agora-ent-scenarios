@@ -1356,6 +1356,9 @@ class VoiceSyncManagerServiceImp(
                 objIdOfSeatInfo[obj.micIndex] = item.id
 
                 micSeatMap[obj.micIndex.toString()] = obj
+                obj.member?.userId?.let {
+                    userMap[it]?.micIndex = obj.micIndex
+                }
                 roomServiceSubscribeDelegates.forEach {
                     ThreadManager.getInstance().runOnMainThread {
                         val attributeMap = hashMapOf<String, String>()
