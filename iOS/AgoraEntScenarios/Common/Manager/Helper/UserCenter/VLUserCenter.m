@@ -16,6 +16,10 @@ static NSString *kLocalLoginKey = @"kLocalLoginKey";
 
 @implementation VLUserCenter
 
++ (VLUserCenter* )shared {
+    return [VLUserCenter center];
+}
+
 + (VLUserCenter *)center{
     static VLUserCenter *instancel = nil;
     static dispatch_once_t oneToken;

@@ -26,9 +26,8 @@ import Bugly
     override init() {
         super.init()
         
-        //login or
-        if VLUserCenter.user.id.count > 0 {
-            self.isAgreeLicense = true
+        if VLUserCenter.shared().isLogin() {
+            setupBugly()
         }
     }
     
