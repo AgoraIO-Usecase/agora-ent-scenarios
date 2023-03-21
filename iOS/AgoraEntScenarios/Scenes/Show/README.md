@@ -52,6 +52,10 @@
   > 
   >   ![xxx](image/SensemeLicFile.png)
   >   
+  > - 注意事项：
+  > 
+  >   **申请商汤美颜的bundleId一定要和工程的bundleId保持一致，否则美颜是无效的**
+  > 
 
 - 更新pod
 
