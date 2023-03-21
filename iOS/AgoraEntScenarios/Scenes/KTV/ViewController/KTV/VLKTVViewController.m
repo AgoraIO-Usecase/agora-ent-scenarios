@@ -517,20 +517,19 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     songConfig.mainSingerUid = [model.userNo integerValue];
     
     self.MVView.loadingType = VLKTVMVViewStateLoading;
-    
+    [self.MVView setBotViewHidden:true];
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
         if (!isSuccess) {
             return;
         }
-        
+        [weakSelf.MVView setBotViewHidden:false];
         [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
     };
     
     [self.ktvApi loadMusicWithConfig:songConfig mode: role == KTVSingRoleAudience ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc
                 onMusicLoadStateListener:self];
 
-    NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
     [weakSelf.ktvApi switchSingerRoleWithNewRole:role
                            onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
         if(state != KTVSwitchRoleStateSuccess) {
@@ -651,7 +650,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         NSLog(@"before switch role, load music success");
-        NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
         [weakSelf.ktvApi switchSingerRoleWithNewRole:role
                                    onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
             if (state == KTVSwitchRoleStateFail && reason != KTVSwitchRoleFailReasonNoPermission) {
@@ -1147,13 +1145,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     songConfig.mainSingerUid = [model.userNo integerValue];
     
     self.MVView.loadingType = VLKTVMVViewStateLoading;
-    
+    [self.MVView setBotViewHidden:true];
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
         if (!isSuccess) {
             return;
         }
-        
         [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
     };
     

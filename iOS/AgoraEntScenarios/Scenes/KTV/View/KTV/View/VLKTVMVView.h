@@ -90,6 +90,8 @@ typedef enum : NSUInteger {
 /// 重置分数
 - (void)reset;
 
+-(void)setBotViewHidden:(BOOL)isHidden;
+
 @end
 
 NS_ASSUME_NONNULL_END

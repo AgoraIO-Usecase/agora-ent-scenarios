@@ -45,6 +45,7 @@
 @property (nonatomic, assign) BOOL isPlayAccompany;
 @property (nonatomic, strong) UIButton *joinChorusBtn;
 @property (nonatomic, strong) UIButton *leaveChorusBtn;
+@property (nonatomic, strong) UIView *BotView;
 @end
 
 @implementation VLKTVMVView
@@ -164,9 +165,9 @@
     [self.contentView addSubview:self.gradeView];
 
     CGFloat lY = CGRectGetMaxX(currentPlayImgView.frame);
-    CGFloat lH = self.height - lY;
+    CGFloat lH = self.height - 54 - lY;
    // [KaraokeView setLogWithPrintToConsole:true writeToFile:true];
-    _karaokeView = [[KaraokeView alloc] initWithFrame:CGRectMake(0, lY, self.width, lH - 40) loggers:@[[FileLogger new]]];
+    _karaokeView = [[KaraokeView alloc] initWithFrame:CGRectMake(0, lY, self.width, lH) loggers:@[[FileLogger new]]];
     _karaokeView.scoringView.viewHeight = 50;
     _karaokeView.scoringView.topSpaces = 5;
    // _karaokeView.scoringView.showDebugView = true;
@@ -176,22 +177,26 @@
     self.incentiveView = [[IncentiveView alloc]init];
     self.incentiveView.frame = CGRectMake(15, 55, 192, 45);
     [self.karaokeView addSubview:self.incentiveView];
+    
+    self.BotView = [[UIView alloc]initWithFrame:CGRectMake(0, self.height-54, self.width, 54)];
+    self.BotView.backgroundColor = [UIColor clearColor];
+    [self addSubview:self.BotView];
 
-    self.pauseBtn.frame = CGRectMake(20, self.height-54, 34, 54);
+    self.pauseBtn.frame = CGRectMake(20, 0, 34, 54);
     [self updateBtnLayout:self.pauseBtn];
-    [self addSubview:self.pauseBtn];
+    [self.BotView addSubview:self.pauseBtn];
 
-    self.nextButton.frame = CGRectMake(_pauseBtn.right+10, _pauseBtn.top, 34, 54);
+    self.nextButton.frame = CGRectMake(_pauseBtn.right+10, 0, 34, 54);
     [self updateBtnLayout:self.nextButton];
-    [self addSubview:self.nextButton];
+    [self.BotView addSubview:self.nextButton];
     
-    self.originBtn.frame = CGRectMake(self.width-20-48, _pauseBtn.top, 34, 54);
+    self.originBtn.frame = CGRectMake(self.width-20-48, 0, 34, 54);
     [self updateBtnLayout:self.originBtn];
-    [self addSubview:self.originBtn];
+    [self.BotView addSubview:self.originBtn];
     
-    self.settingBtn.frame = CGRectMake(_originBtn.left-10-34, _pauseBtn.top, 34, 54);
+    self.settingBtn.frame = CGRectMake(_originBtn.left-10-34, 0, 34, 54);
     [self updateBtnLayout:self.settingBtn];
-    [self addSubview:self.settingBtn];
+    [self.BotView addSubview:self.settingBtn];
     
     self.idleView = [[VLKTVMVIdleView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height) withDelegate:self];
     self.idleView.hidden = NO;
@@ -201,23 +206,27 @@
 
  //   [self setPlayerViewsHidden:YES nextButtonHidden:YES];
     
-    self.joinChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(self.width / 2.0 - 56, self.height - 44, 112, 34)];
+    self.joinChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(self.width / 2.0 - 56, 10, 112, 34)];
     [self.joinChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_join_chorus"] forState:UIControlStateNormal];
     [self.joinChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_join_chorus_loading"] forState:UIControlStateDisabled];
     _joinChorusBtn.layer.cornerRadius = 17;
     _joinChorusBtn.layer.masksToBounds = true;
     [self.joinChorusBtn addTarget:self action:@selector(joinChorus) forControlEvents:UIControlEventTouchUpInside];
-    [self.contentView addSubview:_joinChorusBtn];
+    [self.BotView addSubview:_joinChorusBtn];
     
-    self.leaveChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(15, _pauseBtn.top, 54, 54)];
+    self.leaveChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(15, 0, 54, 54)];
     [self.leaveChorusBtn setTitle:@"退出合唱" forState:UIControlStateNormal];
     [self.leaveChorusBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.leaveChorusBtn setFont:UIFontMake(10.0)];
     [self.leaveChorusBtn setImage:[UIImage sceneImageWithName:@"Union"] forState:UIControlStateNormal];
     [self.leaveChorusBtn addTarget:self action:@selector(leaveChorus) forControlEvents:UIControlEventTouchUpInside];
     [self updateBtnLayout:self.leaveChorusBtn];
-    [self addSubview:self.leaveChorusBtn];
+    [self.BotView addSubview:self.leaveChorusBtn];
     _joinChorusBtn.hidden = _leaveChorusBtn.hidden = YES;
+}
+
+-(void)setBotViewHidden:(BOOL)isHidden{
+    [self.BotView setHidden:isHidden];
 }
 
 -(void)updateBtnLayout:(UIButton*)button {
