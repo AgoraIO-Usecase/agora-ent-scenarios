@@ -138,6 +138,7 @@ extension SpatialAudioSyncSerciceImp {
             
             let group = DispatchGroup()
             
+            group.enter()
             for i in 0...6 {
                 let item = i == 0 ? self._getOwnerSeat() : SARoomMic()
                 if i != 0 {
@@ -148,7 +149,6 @@ extension SpatialAudioSyncSerciceImp {
                         item.status = -1   //mormal
                     }
                 }
-                group.enter()
                 self._addMicSeat(roomId: roomId, mic: item) { error, mic in
                     if let _ = error {
                         group.leave()
@@ -156,7 +156,9 @@ extension SpatialAudioSyncSerciceImp {
                     }
                     item.objectId = mic?.objectId
                     mics.append(mic ?? item)
-                    group.leave()
+                    if mics.count == 7 {
+                        group.leave()
+                    }
                     
                 }
             }
