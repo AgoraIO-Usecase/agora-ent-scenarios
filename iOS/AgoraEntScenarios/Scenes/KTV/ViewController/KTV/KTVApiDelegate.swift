@@ -125,6 +125,9 @@ import AgoraRtcKit
     ///   - oldRole: <#oldRole description#>
     ///   - newRole: <#newRole description#>
     func onSingerRoleChanged(oldRole: KTVSingRole, newRole: KTVSingRole)
+    
+    
+    func onChorusChannelTokenPrivilegeWillExpire(token: String?)
 }
 
 @objc open class KTVApiConfig: NSObject{
@@ -134,6 +137,8 @@ import AgoraRtcKit
     var channelName: String
     var dataStreamId: Int = -1
     var localUid: Int = 0
+    var chorusChannelName: String
+    var chorusChannelToken: String
     
     @objc public
     init(appId: String,
@@ -141,13 +146,18 @@ import AgoraRtcKit
          engine: AgoraRtcEngineKit,
          channelName: String,
          streamId: Int,
-         localUid: Int) {
+         localUid: Int,
+         chorusChannelName: String,
+         chorusChannelToken: String
+    ) {
         self.appId = appId
         self.rtmToken = rtmToken
         self.engine = engine
         self.channelName = channelName
         self.dataStreamId = streamId
         self.localUid = localUid
+        self.chorusChannelName = chorusChannelName
+        self.chorusChannelToken = chorusChannelToken
     }
 }
 
@@ -236,7 +246,7 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     ///   - newRole: <#newRole description#>
     ///   - token: <#token description#>
     ///   - onSwitchRoleState: <#onSwitchRoleState description#>
-    func switchSingerRole(newRole: KTVSingRole, token: String, onSwitchRoleState:@escaping SwitchRoleStateCallBack)
+    func switchSingerRole(newRole: KTVSingRole, onSwitchRoleState:@escaping SwitchRoleStateCallBack)
     
     
     /// 播放
@@ -270,4 +280,8 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     /// 获取mpk实例
     /// - Returns: <#description#>
     func getMediaPlayer() -> AgoraMusicPlayerProtocol?
+    
+    /// 获取MCC实例
+    /// - Returns: <#description#>
+    func getMusicCenter() -> AgoraMusicContentCenter?
 }

@@ -490,7 +490,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 #pragma mark - action utils / business
 - (void)stopPlaySong {
     [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
-                                       token:@""
                            onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
     }];
 }
@@ -533,7 +532,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
     NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
     [weakSelf.ktvApi switchSingerRoleWithNewRole:role
-                                       token:exChannelToken
                            onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
         if(state != KTVSwitchRoleStateSuccess) {
             //TODO(chenpan): error toast and retry?
@@ -655,7 +653,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         NSLog(@"before switch role, load music success");
         NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
         [weakSelf.ktvApi switchSingerRoleWithNewRole:role
-                                               token:exChannelToken
                                    onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
             if (state == KTVSwitchRoleStateFail && reason != KTVSwitchRoleFailReasonNoPermission) {
                 weakSelf.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
@@ -832,12 +829,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.RTCkit createDataStream:&ktvApiStreamId
                            config:config];
     
+    NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
     KTVApiConfig* apiConfig = [[KTVApiConfig alloc] initWithAppId:[[AppContext shared] appId]
                                                          rtmToken:VLUserCenter.user.agoraRTMToken
                                                            engine:self.RTCkit
                                                       channelName:self.roomModel.roomNo
                                                          streamId:ktvApiStreamId
-                                                         localUid:[VLUserCenter.user.id integerValue]];
+                                                         localUid:[VLUserCenter.user.id integerValue]
+                                                        chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
+    ];
     self.ktvApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
     KTVLrcControl* lrcControl = [[KTVLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
     [self.ktvApi setLrcViewWithView:lrcControl];
@@ -1395,10 +1395,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
         KTVLogInfo(@"seat array update chorusNum %ld->%ld", origChorusNum, chorusNum);
         //lead singer <-> solo
-        NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
         KTVSingRole role = [self getUserSingRole];
         [self.ktvApi switchSingerRoleWithNewRole:role
-                                           token:exChannelToken
                                onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
         }];
     }
