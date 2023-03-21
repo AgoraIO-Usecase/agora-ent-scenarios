@@ -26,7 +26,7 @@ def all_pods
 #  pod 'libextobjc', '~> 0.4.1'
   pod 'MJExtension'
   # 键盘
-  pod 'IQKeyboardManager'
+  pod 'IQKeyboardManager', '6.5.10'
   # 变色龙
   pod 'ChameleonFramework'
   #弹框

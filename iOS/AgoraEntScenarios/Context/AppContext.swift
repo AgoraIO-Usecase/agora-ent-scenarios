@@ -14,9 +14,22 @@ import Bugly
     @objc var sceneImageBundleName: String?
     @objc var extDic: NSMutableDictionary = NSMutableDictionary()
     
+    @objc var isAgreeLicense: Bool = false {
+        didSet {
+            guard isAgreeLicense else {
+                return
+            }
+            setupBugly()
+        }
+    }
+    
     override init() {
         super.init()
-        setupBugly()
+        
+        //login or
+        if VLUserCenter.user.id.count > 0 {
+            self.isAgreeLicense = true
+        }
     }
     
     private func setupBugly() {

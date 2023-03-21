@@ -66,7 +66,7 @@ PODS:
   - MBProgressHUD (1.1.0)
   - MJExtension (3.4.1)
   - MJRefresh (3.2.3)
-  - Protobuf (3.21.12)
+  - Protobuf (3.22.1)
   - QMUIKit (4.5.1):
     - QMUIKit/QMUIComponents (= 4.5.1)
     - QMUIKit/QMUICore (= 4.5.1)
@@ -401,7 +401,7 @@ DEPENDENCIES:
   - HWPanModal (~> 0.8.9)
   - HWWeakTimer
   - InputKit
-  - IQKeyboardManager
+  - IQKeyboardManager (= 6.5.10)
   - JXCategoryView
   - KakaJSON
   - LEEAlert
@@ -463,7 +463,7 @@ SPEC REPOS:
     - ZSwiftBaseLib
 
 SPEC CHECKSUMS:
-  AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
+  AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   Agora-Scene-Utils: 260f18dfa184b64b064ddeb222aae08f6f6c4937
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: dac68d57abe2f80c977ccc7580ed769922f38d6b
@@ -486,7 +486,7 @@ SPEC CHECKSUMS:
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
   MJExtension: 21c5f6f8c4d5d8844b7ae8fbae08fed0b501f961
   MJRefresh: 2b1214a2dc8f4df4c5dcb028ea2ad4e245425fb7
-  Protobuf: 120350fc38646e2dedc26f49ecba778184ea1de2
+  Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
   QMUIKit: 3e717c45730ecdf5011ca76751990ad1a23ba7e1
   SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
@@ -501,6 +501,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: c8e8ea9505599216c3224461f3c0161d4d86fcb2
+PODFILE CHECKSUM: d67aadf295780ac0094e2224264210cbae8de99c
 
 COCOAPODS: 1.11.3
