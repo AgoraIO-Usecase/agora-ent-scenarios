@@ -165,7 +165,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         if isOwner {
             ChatRoomServiceImp.getSharedInstance().updateRoomMembers { error in
                 if error != nil {
-                    self.view.makeToast("\(error?.localizedDescription ?? "")")
+//                    self.view.makeToast("\(error?.localizedDescription ?? "")")
                 }
             }
         }
@@ -219,7 +219,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                  如果房主踢用户下麦
                  */
                 if let host: VRUser = roomInfo?.room?.owner {
-                    if host.uid == fromId && status == -1 {
+                    if host.uid == fromId && status == -1 && first.member == nil {
                         ChatRoomServiceImp.getSharedInstance().userList?.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
                         view.makeToast("Removed Stage".localized())
                     }  else {
