@@ -121,9 +121,9 @@ object NavigationUtils {
 
         // 部分无良厂商的手势操作，显示高度 + 导航栏高度，竟然大于物理高度，对于这种情况，直接默认未启用导航栏
 //        if (displayHeight > displayWidth) {
-//            if (displayHeight + DisplayUtils.getNavigationBarHeight(context) > realHeight) return false
+//            if (displayHeight + getNavigationBarHeight(context) > realHeight) return false
 //        } else {
-//            if (displayWidth + DisplayUtils.getNavigationBarHeight(context) > realWidth) return false
+//            if (displayWidth + getNavigationBarHeight(context) > realWidth) return false
 //        }
 
         return realWidth - displayWidth > 0 || realHeight - displayHeight > 0
