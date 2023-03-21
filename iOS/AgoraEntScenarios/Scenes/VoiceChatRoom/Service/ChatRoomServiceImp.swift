@@ -660,11 +660,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func findMicIndex() -> Int {
-        var mic_index = 0
+        var mic_index = 1
         for i in 0...7 {
-            let mic = self.mics[safe: i]
-            if mic?.member == nil {
-                mic_index = mic?.mic_index ?? 1
+            if let mic = self.mics[safe: i] ,mic.member == nil,mic.status != 3,mic.status != 4 {
+                mic_index = mic.mic_index
                 break
             }
         }
