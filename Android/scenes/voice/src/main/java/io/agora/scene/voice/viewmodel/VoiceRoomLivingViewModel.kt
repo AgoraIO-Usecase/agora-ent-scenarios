@@ -135,9 +135,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
     /**接受邀请*/
     fun acceptMicSeatInvitationObservable(): LiveData<Resource<VoiceMicInfoModel>> = _acceptMicSeatInvitationObservable
 
-    /**离开syncManager 房间*/
-    fun leaveSyncRoomObservable(): LiveData<Resource<Boolean>> = _leaveSyncRoomObservable
-
     /**更新成员列表*/
     fun updateRoomMemberObservable():LiveData<Resource<Boolean>> = _updateRoomMemberObservable
 

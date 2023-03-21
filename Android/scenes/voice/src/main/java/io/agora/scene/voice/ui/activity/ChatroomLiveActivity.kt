@@ -613,16 +613,17 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 override fun onError(code: Int, error: String?) {}
             })
         }
-        ChatroomIMManager.getInstance().leaveChatRoom(roomKitBean.chatroomId)
         roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId, isRoomOwnerLeave)
         finish()
     }
 
     override fun finish() {
+        ChatroomIMManager.getInstance().leaveChatRoom(roomKitBean.chatroomId)
+        ChatroomIMManager.getInstance().removeChatRoomChangeListener()
+        ChatroomIMManager.getInstance().clearCache()
         binding.chatroomGiftView.clear()
         roomObservableDelegate.destroy()
         voiceServiceProtocol.unsubscribeEvent()
-        ChatroomIMManager.getInstance().clearCache()
         isRoomOwnerLeave = false
         binding.subtitle.clearTask()
         dialogFragments.clear()

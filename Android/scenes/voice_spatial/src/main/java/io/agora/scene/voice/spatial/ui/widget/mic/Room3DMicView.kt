@@ -82,6 +82,7 @@ class Room3DMicView : ConstraintLayout, IRoomMicBinding {
                 }
             } else { // 有人
                 ivMicInnerIcon.isVisible = false
+                ivMicTag.isVisible = true
                 ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
                 mtMicUsername.text = micInfo.member?.nickName ?: ""
                 if (micInfo.ownerTag) {
@@ -91,43 +92,31 @@ class Room3DMicView : ConstraintLayout, IRoomMicBinding {
                 } else {
                     mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
                 }
-                when (micInfo.micStatus) {
-                    MicStatus.Mute,
-                    MicStatus.ForceMute -> {
-                        ivMicTag.isVisible = true
-                        ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
+            }
+            if (micInfo.micStatus == MicStatus.Mute ||
+                micInfo.micStatus == MicStatus.ForceMute ||
+                micInfo.member?.micStatus == MicStatus.Mute) {
+                ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
+            } else {
+                // 用户音量
+                when (micInfo.audioVolumeType) {
+                    ConfigConstants.VolumeType.Volume_None -> {
+                        ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open0)
+                    }
+                    ConfigConstants.VolumeType.Volume_Low -> {
+                        ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open1)
+                    }
+                    ConfigConstants.VolumeType.Volume_Medium -> {
+                        ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open2)
+                    }
+                    ConfigConstants.VolumeType.Volume_High -> {
+                        ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open3)
+                    }
+                    ConfigConstants.VolumeType.Volume_Max -> {
+                        ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open4)
                     }
                     else -> {
-                        if (micInfo.member?.micStatus == MicStatus.Normal) {
-                            ivMicTag.isVisible = false
-                        } else {
-                            ivMicTag.isVisible = true
-                            ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
-                        }
                     }
-                }
-            }
-            // 用户音量
-            when (micInfo.audioVolumeType) {
-                ConfigConstants.VolumeType.Volume_None -> ivMicTag.isVisible = false
-                ConfigConstants.VolumeType.Volume_Low -> {
-                    ivMicTag.isVisible = true
-                    ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open1)
-                }
-                ConfigConstants.VolumeType.Volume_Medium -> {
-                    ivMicTag.isVisible = true
-                    ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open2)
-                }
-                ConfigConstants.VolumeType.Volume_High -> {
-                    ivMicTag.isVisible = true
-                    ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open3)
-                }
-                ConfigConstants.VolumeType.Volume_Max -> {
-                    ivMicTag.isVisible = true
-                    ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open4)
-                }
-                else -> {
-
                 }
             }
         }
