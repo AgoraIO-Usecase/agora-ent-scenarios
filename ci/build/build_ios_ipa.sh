@@ -7,7 +7,7 @@ echo PROJECT_PATH: $PROJECT_PATH
 echo TARGET_NAME: $TARGET_NAME
 echo pwd: $CURRENT_PATH
 
-cd ${PROJECT_PATH} && pod install
+cd ${PROJECT_PATH} && pod install --repo-update
 
 if [ $? -eq 0 ]; then
     echo "success"
@@ -20,10 +20,16 @@ fi
 TARGET_NAME=AgoraEntScenarios
 
 KEYCENTER_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/KeyCenter.swift"
-cp $KEYCENTER_PATH.bak $KEYCENTER_PATH
+KEYCENTER_BAK_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/KeyCenter.swift.bak"
+
+cp $KEYCENTER_BAT_PATH $KEYCENTER_PATH
+
+INFO_PLIST_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/Info.plist"
+
+METHOD_PATH=${PROJECT_PATH}"/ExportOptions.plist"
 
 # 打包环境
-CONFIGURATION=Development
+CONFIGURATION=$method
 
 #工程文件路径
 APP_PATH="${PROJECT_PATH}/${TARGET_NAME}.xcworkspace"
@@ -41,6 +47,26 @@ echo PBXPROJ_PATH: $PBXPROJ_PATH
 /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:CODE_SIGN_STYLE 'Manual'" $PBXPROJ_PATH
 /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:DEVELOPMENT_TEAM 'GM72UGLGZW'" $PBXPROJ_PATH
 /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'App'" $PBXPROJ_PATH
+
+#修改build number
+# Debug
+/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:CURRENT_PROJECT_VERSION ${BUILD_NUMBER}" $PBXPROJ_PATH
+# Release
+/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:CURRENT_PROJECT_VERSION ${BUILD_NUMBER}" $PBXPROJ_PATH
+
+#修改打包方式
+set signingCertificate='Apple Development'
+set teamID='GM72UGLGZW'
+set provisioningProfiles='App'
+if [[ $CONFIGURATION=='app-store' ]]; then
+    signingCertificate='Apple Distribution'
+    teamID='YS397FG5PA'
+    provisioningProfiles='io.agora.entfull'
+fi
+/usr/libexec/PlistBuddy -c "Set :method $CONFIGURATION" $METHOD_PATH
+/usr/libexec/PlistBuddy -c "Set :signingCertificate $signingCertificate" $METHOD_PATH
+/usr/libexec/PlistBuddy -c "Set :teamID $teamID" $METHOD_PATH
+/usr/libexec/PlistBuddy -c "Set :provisioningProfiles:io.agora.entfull $provisioningProfiles" $METHOD_PATH
 
 # 读取APPID环境变量
 echo AGORA_APP_ID:$APP_ID
