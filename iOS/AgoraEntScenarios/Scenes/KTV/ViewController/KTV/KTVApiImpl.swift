@@ -115,6 +115,10 @@ class KTVApiImpl: NSObject{
 
 //MARK: KTVApiDelegate
 extension KTVApiImpl: KTVApiDelegate {
+    func getMusicCenter() -> AgoraMusicContentCenter? {
+        return mcc
+    }
+    
     func setLrcView(view: KTVLrcViewDelegate) {
         lrcControl = view
 //        lrcControl?.skipCallBack =  {[weak self] time in
@@ -183,10 +187,9 @@ extension KTVApiImpl: KTVApiDelegate {
         musicSearchDict[requestId] = completion
     }
 
-    func switchSingerRole(newRole: KTVSingRole, token: String, onSwitchRoleState: @escaping (KTVSwitchRoleState, KTVSwitchRoleFailReason) -> Void) {
-        agoraPrint("switchSingerRole oldRole: \(singerRole.rawValue), newRole: \(newRole.rawValue) token: \(token)")
+    func switchSingerRole(newRole: KTVSingRole, onSwitchRoleState: @escaping (KTVSwitchRoleState, KTVSwitchRoleFailReason) -> Void) {
         let oldRole = singerRole
-        self.switchSingerRole(oldRole: oldRole, newRole: newRole, token: token, stateCallBack: onSwitchRoleState)
+        self.switchSingerRole(oldRole: oldRole, newRole: newRole, token: apiConfig?.chorusChannelToken ?? "", stateCallBack: onSwitchRoleState)
     }
 
     /**
@@ -404,7 +407,7 @@ extension KTVApiImpl {
         mediaOption.publishDirectCustomAudioTrack = role == .leadSinger
 
         let rtcConnection = AgoraRtcConnection()
-        rtcConnection.channelId = (apiConfig?.channelName ?? "") + "_ex"
+        rtcConnection.channelId = apiConfig?.chorusChannelName ?? ""
         rtcConnection.localUid = UInt(apiConfig?.localUid ?? 0)
        subChorusConnection = rtcConnection
 
@@ -683,6 +686,12 @@ extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
             apiConfig?.engine.pushDirectAudioFrameRawData(buffer, samples: frame.channels*frame.samplesPerChannel, sampleRate: frame.samplesPerSec, channels: frame.channels)
         }
         return true
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
+        getEventHander { delegate in
+            delegate.onChorusChannelTokenPrivilegeWillExpire(token: token)
+        }
     }
 }
 

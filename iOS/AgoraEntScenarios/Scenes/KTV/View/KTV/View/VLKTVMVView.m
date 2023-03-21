@@ -514,8 +514,8 @@
         _originBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
         _originBtn.titleLabel.font = UIFontMake(10.0);
         [self.originBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [self.originBtn setImage:[UIImage sceneImageWithName:@"ic_play_original_off"] forState:UIControlStateNormal];
-        [self.originBtn setImage:[UIImage sceneImageWithName:@"ic_play_original_on"] forState:UIControlStateSelected];
+        [self.originBtn setImage:[UIImage sceneImageWithName:@"acc"] forState:UIControlStateNormal];
+        [self.originBtn setImage:[UIImage sceneImageWithName:@"original"] forState:UIControlStateSelected];
         _originBtn.selected = NO;
         [_originBtn addTarget:self action:@selector(originClick:) forControlEvents:UIControlEventTouchUpInside];
     }
