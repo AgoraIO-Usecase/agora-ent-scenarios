@@ -6,6 +6,7 @@ import io.agora.musiccontentcenter.IAgoraMusicContentCenter
 import io.agora.musiccontentcenter.Music
 import io.agora.musiccontentcenter.MusicChartInfo
 import io.agora.rtc2.RtcEngine
+import io.agora.scene.ktv.live.RoomLivingViewModel.JoinChorusStatus
 
 /**
  * 在KTVApi中的身份
@@ -154,6 +155,8 @@ abstract class IKTVApiEventHandler {
      * @param newRole 新角色
      */
     open fun onSingerRoleChanged(oldRole: KTVSingRole, newRole: KTVSingRole) {}
+
+    open fun onChorusChannelTokenPrivilegeWillExpire(token: String?) {}
 }
 
 /**
@@ -176,7 +179,11 @@ data class KTVApiConfig(
     val engine: RtcEngine,
     val channelName: String,
     val dataStreamId: Int,
-    val localUid: Int
+
+    // TODO joinChannel2
+    val localUid: Int,
+    val chorusChannelName: String,
+    val chorusChannelToken: String
 )
 
 /**
@@ -309,7 +316,6 @@ interface KTVApi {
      */
     fun switchSingerRole(
         newRole: KTVSingRole,
-        token: String,
         onSwitchRoleStateListener: OnSwitchRoleStateListener?
     )
 
@@ -357,7 +363,11 @@ interface KTVApi {
 
     /**
      * 获取mcc实例
-     * TODO 是否直接暴露renewToken即可
      */
     fun getMusicCenter() : IAgoraMusicContentCenter
 }
+
+// 0、注释换成Print 不要有AgoraPrint
+// 1、token 和 2ndChannelName 传递方式和业务逻辑调用
+// 2、主动暴露 getMusicCenter() 为了renewToken
+// 3、onChorusChannelTokenPrivilegeWillExpire

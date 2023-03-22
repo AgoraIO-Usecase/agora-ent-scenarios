@@ -55,9 +55,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private lateinit var mMusicCenter: IAgoraMusicContentCenter
     private lateinit var mPlayer: IAgoraMusicPlayer
 
-    private var localUid: Int = 0
-    private var channelName: String = ""
-    private var dataStreamId: Int = 0
+    private lateinit var ktvApiConfig: KTVApiConfig
     private var subChorusConnection: RtcConnection? = null
 
     private var mainSingerUid: Int = 0
@@ -109,14 +107,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         config: KTVApiConfig
     ) {
         this.mRtcEngine = config.engine as RtcEngineEx
-        this.channelName = config.channelName
-        this.dataStreamId = config.dataStreamId
-        this.localUid = config.localUid
+        this.ktvApiConfig = config
 
         // ------------------ 初始化内容中心 ------------------
         val contentCenterConfiguration = MusicContentCenterConfiguration()
         contentCenterConfiguration.appId = config.appId
-        contentCenterConfiguration.mccUid = localUid.toLong()
+        contentCenterConfiguration.mccUid = ktvApiConfig.localUid.toLong()
         contentCenterConfiguration.token = config.rtmToken
         mMusicCenter = IAgoraMusicContentCenter.create(mRtcEngine)
         mMusicCenter.initialize(contentCenterConfiguration)
@@ -169,7 +165,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         IAgoraMusicContentCenter.destroy()
 
         mainSingerHasJoinChannelEx = false
-        dataStreamId = 0
     }
 
     // 1、Audience -》SoloSinger
@@ -183,7 +178,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     var singerRole: KTVSingRole = KTVSingRole.Audience
     override fun switchSingerRole(
         newRole: KTVSingRole,
-        token: String,
         onSwitchRoleStateListener: OnSwitchRoleStateListener?
     ) {
         Log.d(TAG, "switchSingerRole oldRole: $singerRole, newRole: $newRole")
@@ -197,7 +191,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         } else if (this.singerRole == KTVSingRole.Audience && newRole == KTVSingRole.LeadSinger) {
             // 2、Audience -》LeadSinger
             becomeSoloSinger()
-            joinChorus(newRole, token, object : OnJoinChorusStateListener {
+            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object : OnJoinChorusStateListener {
                 override fun onJoinChorusSuccess() {
                     Log.d(TAG, "onJoinChorusSuccess")
                     singerRole = newRole
@@ -221,7 +215,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         } else if (this.singerRole == KTVSingRole.Audience && newRole == KTVSingRole.CoSinger) {
             // 4、Audience -》CoSinger
-            joinChorus(newRole, token, object : OnJoinChorusStateListener {
+            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object : OnJoinChorusStateListener {
                 override fun onJoinChorusSuccess() {
                     Log.d(TAG, "onJoinChorusSuccess")
                     singerRole = newRole
@@ -247,7 +241,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         } else if (this.singerRole == KTVSingRole.SoloSinger && newRole == KTVSingRole.LeadSinger) {
             // 6、SoloSinger -》LeadSinger
 
-            joinChorus(newRole, token, object : OnJoinChorusStateListener {
+            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object : OnJoinChorusStateListener {
                 override fun onJoinChorusSuccess() {
                     Log.d(TAG, "onJoinChorusSuccess")
                     singerRole = newRole
@@ -533,7 +527,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         obj: JSONObject,
         success: (isSendSuccess: Boolean) -> Unit
     ) {
-        val ret = mRtcEngine.sendStreamMessage(dataStreamId, obj.toString().toByteArray())
+        val ret = mRtcEngine.sendStreamMessage(ktvApiConfig.dataStreamId, obj.toString().toByteArray())
         if (ret == 0) {
             success.invoke(true)
         } else {
@@ -599,8 +593,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             newRole == KTVSingRole.LeadSinger
 
         val rtcConnection = RtcConnection()
-        rtcConnection.channelId = channelName + "_ex"
-        rtcConnection.localUid = localUid
+        rtcConnection.channelId = ktvApiConfig.chorusChannelName
+        rtcConnection.localUid = ktvApiConfig.localUid
         subChorusConnection = rtcConnection
 
         val ret = mRtcEngine.joinChannelEx(
@@ -636,6 +630,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     } else if (err == ERR_LEAVE_CHANNEL_REJECTED) {
                         Log.e(TAG, "leaveChorus2ndChannel failed: ERR_LEAVE_CHANNEL_REJECTED")
                     }
+                }
+
+                override fun onTokenPrivilegeWillExpire(token: String?) {
+                    super.onTokenPrivilegeWillExpire(token)
+                    ktvApiEventHandlerList.forEach { it.onChorusChannelTokenPrivilegeWillExpire(token) }
                 }
             }
         )
