@@ -904,10 +904,10 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     private void innerJoinChorus(String songCode) {
-        ktvApiProtocol.loadMusic(new KTVLoadMusicConfiguration(false, Long.parseLong(songCode), Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_ONLY), new OnMusicLoadStateListener(){
+        ktvApiProtocol.loadMusic(new KTVLoadMusicConfiguration(false, Long.parseLong(songCode), Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_AND_LRC), new OnMusicLoadStateListener(){
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
-                KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent);
+                KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
             }
 
             @Override
@@ -1394,13 +1394,14 @@ public class RoomLivingViewModel extends ViewModel {
         ktvApiProtocol.loadMusic(config, new OnMusicLoadStateListener() {
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
-                KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent);
+                KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
             }
 
             @Override
             public void onMusicLoadSuccess(long songCode, @NonNull String lyricUrl) {
                 // 当前已被切歌
-                if (songPlayingLiveData.getValue() == null || !songPlayingLiveData.getValue().getSongNo().equals(String.valueOf(config.getSongCode()))) {
+                if (songPlayingLiveData.getValue() == null) {
+                    ToastUtils.showToastLong("load失败，当前已无歌曲");
                     return;
                 }
 
@@ -1417,7 +1418,8 @@ public class RoomLivingViewModel extends ViewModel {
             @Override
             public void onMusicLoadFail(long songCode, @NonNull KTVLoadSongFailReason reason) {
                 // 当前已被切歌
-                if (songPlayingLiveData.getValue() == null || !songPlayingLiveData.getValue().getSongNo().equals(String.valueOf(config.getSongCode()))) {
+                if (songPlayingLiveData.getValue() == null) {
+                    ToastUtils.showToastLong("load失败，当前已无歌曲");
                     return;
                 }
 
@@ -1432,7 +1434,7 @@ public class RoomLivingViewModel extends ViewModel {
 
                     playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                     noLrcLiveData.postValue(true);
-                } else {
+                } else if (reason == KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL) {
                     // 歌曲加载失败 ，重试3次
                     ToastUtils.showToastLong("歌曲加载失败");
                     retryTimes = retryTimes + 1;
@@ -1442,6 +1444,9 @@ public class RoomLivingViewModel extends ViewModel {
                         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                         ToastUtils.showToastLong("已尝试三次，请自动切歌");
                     }
+                } else if (reason == KTVLoadSongFailReason.CANCELED) {
+                    // 当前已被切歌
+                    ToastUtils.showToastLong("load失败，当前已切换到另一首歌");
                 }
             }
         });
