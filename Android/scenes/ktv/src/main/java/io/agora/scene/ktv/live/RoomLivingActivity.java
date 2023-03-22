@@ -76,7 +76,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private CommonDialog exitDialog;
     private UserLeaveSeatMenuDialog mUserLeaveSeatMenuDialog;
     private SongDialog mChooseSongDialog;
-    private SongDialog mChorusSongDialog;
 
     // 房间存活时间，单位ms
     private KtvCommonDialog timeUpExitDialog;
@@ -405,9 +404,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if (mChooseSongDialog != null) {
                 mChooseSongDialog.resetChosenSongList(SongActionListenerImpl.transSongModel(models));
             }
-            if (mChorusSongDialog != null) {
-                mChorusSongDialog.resetChosenSongList(SongActionListenerImpl.transSongModel(models));
-            }
         });
         roomLivingViewModel.songPlayingLiveData.observe(this, model -> {
             if (model == null) {
@@ -415,7 +411,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 return;
             }
             onMusicChanged(model);
-            getBinding().lrcControlView.setScoreControlView(roomLivingViewModel.songPlayingLiveData.getValue());
         });
         roomLivingViewModel.scoringAlgoControlLiveData.observe(this, model -> {
             if (model == null) {
@@ -448,7 +443,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if (status == RoomLivingViewModel.JoinChorusStatus.ON_JOIN_CHORUS) {
                 getBinding().cbMic.setChecked(true);
                 getBinding().lrcControlView.onSelfJoinedChorus();
-                //getBinding().lrcControlView.setRole(LrcControlView.Role.CoSinger);
             } else if (status == RoomLivingViewModel.JoinChorusStatus.ON_JOIN_FAILED) {
                 getBinding().lrcControlView.onSelfJoinedChorusFailed();
             } else if (status == RoomLivingViewModel.JoinChorusStatus.ON_LEAVE_CHORUS) {
@@ -663,6 +657,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 hideLoadingView();
 
                 if (!mChooseSongDialog.isAdded()) {
+                    roomLivingViewModel.getSongChosenList();
                     mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
                 }
 
@@ -672,6 +667,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         }
 
         if (!mChooseSongDialog.isAdded()) {
+            roomLivingViewModel.getSongChosenList();
             mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
         }
 
