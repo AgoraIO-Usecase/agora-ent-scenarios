@@ -68,7 +68,8 @@ object NavigationUtils {
     fun hasNavigationBar(context: Context) = when {
         getNavigationBarHeight(context) == 0 -> false
         RomUtils.isHuaweiRom() && isHuaWeiHideNav(context) -> false
-        RomUtils.isMiuiRom() && isMiuiFullScreen(context) -> false
+        // 打开会导致小米机型里带底部手势栏的被判断为全屏
+//        RomUtils.isMiuiRom() && isMiuiFullScreen(context) -> false
         RomUtils.isVivoRom() && isVivoFullScreen(context) -> false
         else -> isHasNavigationBar(context)
     }
