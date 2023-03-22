@@ -690,7 +690,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         dialog.setOnButtonClickListener(new OnButtonClickListener() {
             @Override
             public void onLeftButtonClick() {
-                roomLivingViewModel.exitRoom();
+                if(permission.equals(Manifest.permission.RECORD_AUDIO) && roomLivingViewModel.isRoomOwner()){
+                    roomLivingViewModel.exitRoom();
+                }
             }
 
             @Override
