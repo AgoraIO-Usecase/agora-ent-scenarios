@@ -26,12 +26,12 @@ enum class KTVSingRole(val value: Int) {
  * loadSong失败的原因
  * @param NO_LYRIC_URL 没有歌词，不影响音乐正常播放
  * @param MUSIC_PRELOAD_FAIL 音乐加载失败
- * @param IN_PROGRESS 加载中
+ * @param CANCELED 本地加载已终止
  */
 enum class KTVLoadSongFailReason(val value: Int) {
     NO_LYRIC_URL(0),
     MUSIC_PRELOAD_FAIL(1),
-    IN_PROGRESS(2)
+    CANCELED(2)
 }
 
 /**
@@ -327,7 +327,7 @@ interface KTVApi {
      * 如果loadMusic时你选择了autoPlay = false 则需要在loadMusic成功后调用startSing
      * TODO 如何支持URL
      */
-    fun startSing(startPos: Long)
+    fun startSing(songCode: Long, startPos: Long)
 
     /**
      * 恢复播放

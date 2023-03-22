@@ -258,7 +258,7 @@ public class RoomLivingViewModel extends ViewModel {
                             _roomInfo.getRoomPeopleNum(),
                             _roomInfo.getAgoraRTMToken(),
                             _roomInfo.getAgoraRTCToken(),
-                            _roomInfo.getAgoraPlayerRTCToken(),
+                            _roomInfo.getAgoraChorusToken(),
                             _roomInfo.getCreatedAt()
                     ));
                 }
@@ -1194,25 +1194,15 @@ public class RoomLivingViewModel extends ViewModel {
             streamId = mRtcEngine.createDataStream(cfg);
         }
 
-        TokenGenerator.INSTANCE.generateToken(
+        ktvApiProtocol.initialize(new KTVApiConfig(
+                BuildConfig.AGORA_APP_ID,
+                roomInfoLiveData.getValue().getAgoraRTMToken(),
+                mRtcEngine,
+                roomInfoLiveData.getValue().getRoomNo(),
+                streamId,
+                UserManager.getInstance().getUser().id.intValue(),
                 roomInfoLiveData.getValue().getRoomNo() + "_ex",
-                UserManager.getInstance().getUser().id.toString(),
-                TokenGenerator.TokenGeneratorType.token006,
-                TokenGenerator.AgoraTokenType.rtc,
-                token -> {
-                    ktvApiProtocol.initialize(new KTVApiConfig(
-                            BuildConfig.AGORA_APP_ID,
-                            roomInfoLiveData.getValue().getAgoraRTMToken(),
-                            mRtcEngine,
-                            roomInfoLiveData.getValue().getRoomNo(),
-                            streamId,
-                            UserManager.getInstance().getUser().id.intValue(),
-                            roomInfoLiveData.getValue().getRoomNo() + "_ex",
-                            token
-                            )
-                    );
-                    return null;
-                }, null
+                roomInfoLiveData.getValue().getAgoraChorusToken())
         );
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
