@@ -224,10 +224,12 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         changeViewByRole();
     }
 
+    private RoomSelSongModel songPlaying;
     public void onPlayStatus(RoomSelSongModel songPlaying) {
+        this.songPlaying = songPlaying;
+
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
-        setScoreControlView(songPlaying);
         mBinding.ilChorus.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setBackgroundResource(backgroundResId);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.GONE);
@@ -272,16 +274,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 mBinding.ilActive.ivSkipPostlude.setVisibility(View.INVISIBLE);
                 mBinding.ilActive.ivSkipPrelude.setVisibility(View.INVISIBLE);
             }
-        }
-    }
-
-    private boolean mNeedToShowComboView;
-
-    public void setScoreControlView(RoomSelSongModel songPlaying) {
-        if (songPlaying != null) {
-            mNeedToShowComboView = UserManager.getInstance().getUser().id.toString().equals(songPlaying.getUserNo());
-        } else {
-            mNeedToShowComboView = false;
         }
     }
 
@@ -368,9 +360,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mBinding.ivCumulativeScoreGrade.setVisibility(VISIBLE);
         }
 
-//        if (!mNeedToShowComboView) {
-//            return;
-//        }
         if (this.mRole == Role.Listener) {
             return;
         }

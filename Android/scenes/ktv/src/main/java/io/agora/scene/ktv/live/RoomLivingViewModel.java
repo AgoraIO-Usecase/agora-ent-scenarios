@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Observable;
 
 import io.agora.musiccontentcenter.IMusicContentCenterEventHandler;
 import io.agora.musiccontentcenter.Music;
@@ -647,6 +648,23 @@ public class RoomLivingViewModel extends ViewModel {
         });
     }
 
+    public void getSongChosenList() {
+        ktvServiceProtocol.getChoosedSongsList((e, data) -> {
+            if (e == null && data != null) {
+                // success
+                KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() success");
+                songsOrderedLiveData.postValue(data);
+            } else {
+                // failed
+                if (e != null) {
+                    KTVLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed: " + e.getMessage());
+                    ToastUtils.showToast(e.getMessage());
+                }
+            }
+            return null;
+        });
+    }
+
     /**
      * 获取歌曲类型
      * @return map key: 类型名称，value: 类型值
@@ -904,7 +922,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     private void innerJoinChorus(String songCode) {
-        ktvApiProtocol.loadMusic(new KTVLoadMusicConfiguration(false, Long.parseLong(songCode), Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_AND_LRC), new OnMusicLoadStateListener(){
+        ktvApiProtocol.loadMusic(new KTVLoadMusicConfiguration(false, Long.parseLong(songCode), Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_ONLY), new OnMusicLoadStateListener(){
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
                 KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
