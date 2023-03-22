@@ -368,7 +368,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mBinding.ivCumulativeScoreGrade.setVisibility(VISIBLE);
         }
 
-        if (!mNeedToShowComboView) {
+//        if (!mNeedToShowComboView) {
+//            return;
+//        }
+        if (this.mRole == Role.Listener) {
             return;
         }
 

@@ -19,7 +19,7 @@ import org.json.JSONObject
 import java.nio.ByteBuffer
 
 /**
- * Description：加入合唱错误原因
+ * 加入合唱错误原因
  */
 enum class KTVJoinChorusFailReason(val value: Int) {
     JOIN_CHANNEL_FAIL(0),  // 加入channel2失败
@@ -46,12 +46,15 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private var mainSingerUid: Int = 0
     private var songCode: Long = 0
 
-    private val lyricUrlMap = mutableMapOf<String, String>() // (songCode, lyricUrl)
     private val lyricCallbackMap =
         mutableMapOf<String, (songNo: Long, lyricUrl: String?) -> Unit>() // (requestId, callback)
     private val lyricSongCodeMap = mutableMapOf<String, Long>() // (requestId, songCode)
     private val loadMusicCallbackMap =
-        mutableMapOf<String, (songNo: Long, isPreload: Int?) -> Unit>() // (songNo, callback)
+        mutableMapOf<String, (songCode: Long,
+                              percent: Int,
+                              status: Int,
+                              msg: String?,
+                              lyricUrl: String?) -> Unit>() // (songNo, callback)
     private val musicChartsCallbackMap =
         mutableMapOf<String, (requestId: String?, status: Int, list: Array<out MusicChartInfo>?) -> Unit>()
     private val musicCollectionCallbackMap =
@@ -132,7 +135,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         this.mLastReceivedPlayPosTime = null
         this.mReceivedPlayPosition = 0
 
-        lyricUrlMap.clear()
         lyricCallbackMap.clear()
         loadMusicCallbackMap.clear()
         musicChartsCallbackMap.clear()
@@ -287,19 +289,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         musicCollectionCallbackMap[requestId] = onMusicCollectionResultListener
     }
 
-    var onMusicLoadStateListener: OnMusicLoadStateListener? = null
     override fun loadMusic(
         config: KTVLoadMusicConfiguration,
         onMusicLoadStateListener: OnMusicLoadStateListener
     ) {
         Log.d(TAG, "loadMusic called: $singerRole")
-//        if (this.songCode == config.songCode) {
-//            onMusicLoadStateListener.onMusicLoadFail(config.songCode, KTVLoadSongFailReason.CANCELED)
-//            Log.e(TAG, "loadMusic failed: KTVLoadSongState is in progress")
-//            return
-//        }
-
-        this.onMusicLoadStateListener = onMusicLoadStateListener
+        // 设置到全局， 连续调用以最新的为准
         this.songCode = config.songCode
         this.mainSingerUid = config.mainSingerUid
         mLastReceivedPlayPosTime = null
@@ -324,7 +319,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         }
 
         // 预加载歌曲
-        preLoadMusic(songCode) { song, status ->
+        preLoadMusic(songCode) { song, percent, status, msg, lrcUrl ->
             if (status == 0) {
                 // 预加载歌曲成功
                 if (this.songCode != song) {
@@ -352,6 +347,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                             // 加载歌词成功
                             Log.d(TAG, "loadMusic success")
                             lrcView?.onDownloadLrcData(lyricUrl)
+                            onMusicLoadStateListener.onMusicLoadProgress(song, 100, MusicLoadStatus.COMPLETED, msg, lrcUrl)
                             onMusicLoadStateListener.onMusicLoadSuccess(song, lyricUrl)
                         }
 
@@ -367,8 +363,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         // 主唱自动播放歌曲
                         startSing(song, 0)
                     }
+                    onMusicLoadStateListener.onMusicLoadProgress(song, 100, MusicLoadStatus.COMPLETED, msg, lrcUrl)
                     onMusicLoadStateListener.onMusicLoadSuccess(song, "")
                 }
+            } else if (status == 2) {
+                // 预加载歌曲加载中
+                onMusicLoadStateListener.onMusicLoadProgress(song, percent, MusicLoadStatus.values().firstOrNull { it.value == status } ?: MusicLoadStatus.FAILED, msg, lrcUrl)
             } else {
                 // 预加载歌曲失败
                 Log.e(TAG, "loadMusic failed: MUSIC_PRELOAD_FAIL")
@@ -707,12 +707,16 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         lyricCallbackMap[requestId] = onLoadLyricCallback
     }
 
-    private fun preLoadMusic(songNo: Long, onLoadMusicCallback: (songNo: Long, status: Int?) -> Unit) {
+    private fun preLoadMusic(songNo: Long, onLoadMusicCallback: (songCode: Long,
+                                                                 percent: Int,
+                                                                 status: Int,
+                                                                 msg: String?,
+                                                                 lyricUrl: String?) -> Unit) {
         Log.d(TAG, "loadMusic: $songNo")
         val ret = mMusicCenter.isPreloaded(songNo)
         if (ret == 0) {
             loadMusicCallbackMap.remove(songNo.toString())
-            onLoadMusicCallback(songNo, 0)
+            onLoadMusicCallback(songNo, 100, 0, null, null)
             return
         }
 
@@ -720,7 +724,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         if (retPreload != 0) {
             Log.e(TAG, "preLoadMusic failed: $retPreload")
             loadMusicCallbackMap.remove(songNo.toString())
-            onLoadMusicCallback(songNo, 0)
+            onLoadMusicCallback(songNo, 100, 0, null, null)
             return
         }
         loadMusicCallbackMap[songNo.toString()] = onLoadMusicCallback
@@ -885,11 +889,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         msg: String?,
         lyricUrl: String?
     ) {
-        onMusicLoadStateListener?.onMusicLoadProgress(songCode, percent, MusicLoadStatus.values().firstOrNull { it.value == status } ?: MusicLoadStatus.FAILED, msg, lyricUrl)
-        if (status == 2) return
         val callback = loadMusicCallbackMap[songCode.toString()] ?: return
-        loadMusicCallbackMap.remove(songCode.toString())
-        callback.invoke(songCode, status)
+        if (status == 0 || status == 1) {
+            loadMusicCallbackMap.remove(songCode.toString())
+        }
+        callback.invoke(songCode, percent, status, msg, lyricUrl)
     }
 
     override fun onMusicCollectionResult(
