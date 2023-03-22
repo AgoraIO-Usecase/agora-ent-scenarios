@@ -3,7 +3,11 @@ apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
 android {
     defaultConfig {
-        applicationId "com.agora.entfulldemo"
+        applicationId "io.agora.chatroom"
+    }
+
+    lintOptions {
+        disable "Instantiatable"
     }
 }
 
@@ -15,11 +19,11 @@ dependencies {
     if (isProjectLibrary(':scenes:ktv')) {
         runtimeOnly project(':scenes:ktv')
     }
-    if (isProjectLibrary(':scenes:voice:voice')) {
-        runtimeOnly project(':scenes:voice:voice')
+    if (isProjectLibrary(':scenes:voice')) {
+        runtimeOnly project(':scenes:voice')
     }
-    if (isProjectLibrary(':scenes:voice:voice_spatial')) {
-        runtimeOnly project(':scenes:voice:voice_spatial')
+    if (isProjectLibrary(':scenes:voice_spatial')) {
+        runtimeOnly project(':scenes:voice_spatial')
     }
 
     //glide 图片加载

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">声动互娱</string>
+    <string name="app_name">声动互娱-语聊</string>
     <string name="app_title_home">首页</string>
     <string name="app_title_find">发现</string>
     <string name="app_title_mine">我的</string>
@@ -11,7 +11,6 @@
     <string name="app_and">及</string>
 
     <string name="app_confirm_deletion">确认删除？</string>
-    <string name="app_version_is">当前版本号：%s SDK %s</string>
     <string name="app_about_us">关于我们</string>
 
     <string name="app_please_input_account">请输入手机号</string>

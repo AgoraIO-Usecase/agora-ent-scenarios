@@ -1,6 +1,7 @@
 package com.agora.entfulldemo.home.constructor
 
 import android.content.Context
+import com.agora.entfulldemo.BuildConfig
 import com.agora.entfulldemo.R
 
 /**
@@ -19,29 +20,42 @@ object ScenesConstructor {
 
     @JvmStatic
     fun buildData(context: Context): List<ScenesModel> {
-        return mutableListOf(
-            ScenesModel(
-                SceneType.Voice_Chat,
-                context.getString(R.string.app_voice_chat),
-                R.mipmap.bg_btn_home3,
-                R.mipmap.bg_btn_home_chat,
-                true
-            ),
-            ScenesModel(
-                SceneType.Ktv_Online,
-                context.getString(R.string.ktv_online),
-                R.mipmap.bg_btn_home1,
-                R.mipmap.bg_btn_home_ktv,
-                true
-            ),
-            ScenesModel(
-                SceneType.Voice_Chat_Spatial,
-                context.getString(R.string.app_voice_chat),
-                R.mipmap.bg_btn_home5,
-                0,
-                true,
-                context.getString(R.string.app_voice_chat_spatialTip)
-            ),
+        val list = mutableListOf<ScenesModel>()
+        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_VOICE.isNotEmpty()) {
+            list.add(
+                ScenesModel(
+                    SceneType.Voice_Chat,
+                    context.getString(R.string.app_voice_chat),
+                    R.mipmap.bg_btn_home3,
+                    R.mipmap.bg_btn_home_chat,
+                    true
+                )
+            )
+        }
+        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_KTV.isNotEmpty()) {
+            list.add(
+                ScenesModel(
+                    SceneType.Ktv_Online,
+                    context.getString(R.string.ktv_online),
+                    R.mipmap.bg_btn_home1,
+                    R.mipmap.bg_btn_home_ktv,
+                    true
+                )
+            )
+        }
+        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_SPATIAL_VOICE.isNotEmpty()) {
+            list.add(
+                ScenesModel(
+                    SceneType.Voice_Chat_Spatial,
+                    context.getString(R.string.app_voice_chat),
+                    R.mipmap.bg_btn_home5,
+                    0,
+                    true,
+                    context.getString(R.string.app_voice_chat_spatialTip)
+                )
+            )
+        }
+        return list
 //            ScenesModel(
 //                SceneType.Meta_Live,
 //                context.getString(R.string.meta_live),
@@ -63,6 +77,5 @@ object ScenesConstructor {
 //                R.mipmap.bg_btn_home_youxi,
 //                false
 //            )
-        )
     }
 }

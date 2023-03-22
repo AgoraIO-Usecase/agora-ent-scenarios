@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,309 +12,29 @@
         app:ctv_centerText="@string/app_about_app"
         tools:ignore="MissingConstraints" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="72dp"
-        android:layout_marginTop="42dp"
-        android:src="@mipmap/app_welcome_app_logo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title_view" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvAppName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/app_about_name"
-        android:textColor="@color/def_text_color_040"
-        android:textSize="17sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivLogo" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvVersion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="版本号：1.0.0.9087"
-        android:textColor="@color/def_text_grey_979"
-        android:textSize="13sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvAppName" />
-
-    <!-- 联系客服 -->
-    <View
-        android:id="@+id/vServicePhone"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvAboutUs"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:layout_marginTop="48dp"
-        app:layout_constraintTop_toBottomOf="@+id/tvVersion" />
+        android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_view"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="0dp" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvServicePhone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/app_about_customer_service"
-        android:textColor="@color/def_text_color_3c4"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/vServicePhone"
-        app:layout_constraintTop_toTopOf="@+id/vServicePhone" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvServiceNumber"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="PhoneNumb"
-        android:textColor="@color/bg_color_blue_31"
-        android:textSize="13sp"
-        app:layout_constraintStart_toStartOf="@+id/tvServicePhone"
-        app:layout_constraintTop_toBottomOf="@+id/tvServicePhone" />
-
-    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/tvDebugMode"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        app:dividerColor="@color/grey_f8"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vServicePhone" />
-
-    <!-- 官网地址 -->
-    <View
-        android:id="@+id/vHomeWebPage"
-        android:layout_width="match_parent"
-        android:layout_height="72dp"
-        app:layout_constraintTop_toBottomOf="@+id/vServicePhone" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvHomeWebPage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/app_about_official_website"
-        android:textColor="@color/def_text_color_3c4"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/vHomeWebPage"
-        app:layout_constraintTop_toTopOf="@+id/vHomeWebPage" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvHomeWebSite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="WebSite"
-        android:textColor="@color/bg_color_blue_31"
-        android:textSize="13sp"
-        app:layout_constraintStart_toStartOf="@+id/tvHomeWebPage"
-        app:layout_constraintTop_toBottomOf="@+id/tvHomeWebPage" />
-
-    <com.google.android.material.divider.MaterialDivider
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        app:dividerColor="@color/grey_f8"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vHomeWebPage" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvSceneSubTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="32dp"
-        android:gravity="center_vertical"
-        android:paddingLeft="20dp"
-        android:text="@string/app_about_scene_version"
-        android:textColor="@color/def_text_grey_6c7"
-        android:textSize="13sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vHomeWebPage" />
-
-    <!-- 语聊房 -->
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvChatRoomTitle"
-        android:layout_width="wrap_content"
         android:layout_height="54dp"
-        android:gravity="center_vertical"
+        android:gravity="center"
         android:paddingLeft="20dp"
-        android:text="@string/app_about_chat_room"
-        android:textColor="@color/def_text_color_3c4"
+        android:text="Debug Mode is On"
+        android:textColor="@color/white"
+        android:background="@color/blue_9F"
         android:textSize="15sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvSceneSubTitle" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvChatRoomVersion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="20dp"
-        android:gravity="center_vertical"
-        android:text="1.0.0"
-        android:textColor="@color/def_text_grey_6c7"
-        android:textSize="13sp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvChatRoomTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvChatRoomTitle" />
-
-    <com.google.android.material.divider.MaterialDivider
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        app:dividerColor="@color/grey_f8"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvChatRoomTitle" />
-
-    <!-- 语聊房-空间音频模式 -->
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvSpaceVoiceTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="54dp"
-        android:gravity="center_vertical"
-        android:paddingLeft="20dp"
-        android:text="@string/app_about_chat_room_spatial"
-        android:textColor="@color/def_text_color_3c4"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvChatRoomTitle" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvSpaceVoiceVersion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="20dp"
-        android:gravity="center_vertical"
-        android:text="1.0.0"
-        android:textColor="@color/def_text_grey_6c7"
-        android:textSize="13sp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvSpaceVoiceTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvSpaceVoiceTitle" />
-
-    <com.google.android.material.divider.MaterialDivider
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        app:dividerColor="@color/grey_f8"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvSpaceVoiceTitle" />
-
-    <!-- 在线K歌房 -->
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvOnlineKTVTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="54dp"
-        android:gravity="center_vertical"
-        android:paddingLeft="20dp"
-        android:text="@string/app_about_karaoke"
-        android:textColor="@color/def_text_color_3c4"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvSpaceVoiceTitle" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvOnlineKTVVersion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="20dp"
-        android:gravity="center_vertical"
-        android:text="1.0.0"
-        android:textColor="@color/def_text_grey_6c7"
-        android:textSize="13sp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvOnlineKTVTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvOnlineKTVTitle" />
-
-    <com.google.android.material.divider.MaterialDivider
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        app:dividerColor="@color/grey_f8"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvOnlineKTVTitle" />
-
-<!--                &lt;!&ndash; 秀场直播 &ndash;&gt;-->
-<!--                <androidx.appcompat.widget.AppCompatTextView-->
-<!--                    android:id="@+id/tvLiveShowTitle"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="54dp"-->
-<!--                    android:paddingLeft="20dp"-->
-<!--                    android:textColor="@color/def_text_color_3c4"-->
-<!--                    android:textStyle="bold"-->
-<!--                    android:textSize="15sp"-->
-<!--                    android:gravity="center_vertical"-->
-<!--                    app:layout_constraintTop_toBottomOf="@+id/tvOnlineKTVTitle"-->
-<!--                    app:layout_constraintStart_toStartOf="parent"-->
-<!--                    android:text="#秀场直播" />-->
-
-<!--                <androidx.appcompat.widget.AppCompatTextView-->
-<!--                    android:id="@+id/tvLiveShowVersion"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginRight="20dp"-->
-<!--                    android:textColor="@color/def_text_grey_6c7"-->
-<!--                    android:textSize="13sp"-->
-<!--                    android:gravity="center_vertical"-->
-<!--                    app:layout_constraintTop_toTopOf="@+id/tvLiveShowTitle"-->
-<!--                    app:layout_constraintBottom_toBottomOf="@+id/tvLiveShowTitle"-->
-<!--                    app:layout_constraintEnd_toEndOf="parent"-->
-<!--                    android:text="1.0.0" />-->
-
-<!--                <com.google.android.material.divider.MaterialDivider-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="1dp"-->
-<!--                    android:layout_marginStart="20dp"-->
-<!--                    android:layout_marginEnd="20dp"-->
-<!--                    app:dividerColor="@color/grey_f8"-->
-<!--                    app:layout_constraintEnd_toEndOf="parent"-->
-<!--                    app:layout_constraintStart_toStartOf="parent"-->
-<!--                    app:layout_constraintTop_toBottomOf="@+id/tvLiveShowTitle" />-->
-
-<!--                &lt;!&ndash; 游戏房 &ndash;&gt;-->
-<!--                <androidx.appcompat.widget.AppCompatTextView-->
-<!--                    android:id="@+id/tvGameRoomTitle"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="54dp"-->
-<!--                    android:paddingLeft="20dp"-->
-<!--                    android:textColor="@color/def_text_color_3c4"-->
-<!--                    android:textStyle="bold"-->
-<!--                    android:textSize="15sp"-->
-<!--                    android:gravity="center_vertical"-->
-<!--                    app:layout_constraintTop_toBottomOf="@+id/tvLiveShowTitle"-->
-<!--                    app:layout_constraintStart_toStartOf="parent"-->
-<!--                    android:text="#游戏房" />-->
-
-<!--                <androidx.appcompat.widget.AppCompatTextView-->
-<!--                    android:id="@+id/tvGameRoomVersion"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginRight="20dp"-->
-<!--                    android:textColor="@color/def_text_grey_6c7"-->
-<!--                    android:textSize="13sp"-->
-<!--                    android:gravity="center_vertical"-->
-<!--                    app:layout_constraintTop_toTopOf="@+id/tvGameRoomTitle"-->
-<!--                    app:layout_constraintBottom_toBottomOf="@+id/tvGameRoomTitle"-->
-<!--                    app:layout_constraintEnd_toEndOf="parent"-->
-<!--                    android:text="1.0.0" />-->
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
