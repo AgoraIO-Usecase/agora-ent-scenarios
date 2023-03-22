@@ -637,7 +637,13 @@ class RoomObservableViewDelegate constructor(
     /**
      * 点击麦位
      */
+    private var lastUserMicClick: Long = 0
     fun onUserMicClick(micInfo: VoiceMicInfoModel) {
+        // 防止暴力点击
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastUserMicClick < 500) { return }
+        lastUserMicClick = currentTime
+
         val isMyself = TextUtils.equals(VoiceBuddyFactory.get().getVoiceBuddy().userId(), micInfo.member?.userId)
         if (roomKitBean.isOwner || isMyself) { // 房主或者自己
             val roomMicMangerDialog = RoomMicManagerSheetDialog().apply {

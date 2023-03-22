@@ -64,18 +64,6 @@
         android:layout_width="300dp"
         android:layout_height="0dp"/>
 
-    <io.agora.scene.voice.ui.widget.mic.Room3DMicLayout
-        android:id="@+id/rvChatroom3dMicLayout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="18dp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cTopView" />
-
     <com.opensource.svgaplayer.SVGAImageView
         android:id="@+id/svga_view"
         android:layout_width="match_parent"
