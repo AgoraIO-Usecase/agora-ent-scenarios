@@ -19,21 +19,6 @@ import org.json.JSONObject
 import java.nio.ByteBuffer
 
 /**
- * loadSong 内部状态
- * @param OK  加载成功
- * @param FAILED 正在加载中
- * @param IN_PROGRESS 没有歌词
- * @param IDLE Mcc 预加载歌曲失败
- *
- */
-enum class KTVLoadSongState(val value: Int) {
-    OK(0),
-    FAILED(1),
-    IN_PROGRESS(2),
-    IDLE(3)
-}
-
-/**
  * Description：加入合唱错误原因
  */
 enum class KTVJoinChorusFailReason(val value: Int) {
@@ -59,7 +44,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private var subChorusConnection: RtcConnection? = null
 
     private var mainSingerUid: Int = 0
-    private var loadSongState: KTVLoadSongState = KTVLoadSongState.IDLE
     private var songCode: Long = 0
 
     private val lyricUrlMap = mutableMapOf<String, String>() // (songCode, lyricUrl)
@@ -143,7 +127,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         if (isRelease) return;
         isRelease = true
         singerRole = KTVSingRole.Audience
-        loadSongState = KTVLoadSongState.IDLE
 
         stopDisplayLrc()
         this.mLastReceivedPlayPosTime = null
@@ -310,14 +293,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         onMusicLoadStateListener: OnMusicLoadStateListener
     ) {
         Log.d(TAG, "loadMusic called: $singerRole")
-        if (loadSongState == KTVLoadSongState.IN_PROGRESS && this.songCode == config.songCode) {
-            onMusicLoadStateListener.onMusicLoadFail(config.songCode, KTVLoadSongFailReason.IN_PROGRESS)
-            Log.e(TAG, "loadMusic failed: KTVLoadSongState is in progress")
-            return
-        }
+//        if (this.songCode == config.songCode) {
+//            onMusicLoadStateListener.onMusicLoadFail(config.songCode, KTVLoadSongFailReason.CANCELED)
+//            Log.e(TAG, "loadMusic failed: KTVLoadSongState is in progress")
+//            return
+//        }
 
         this.onMusicLoadStateListener = onMusicLoadStateListener
-        loadSongState = KTVLoadSongState.IN_PROGRESS
         this.songCode = config.songCode
         this.mainSingerUid = config.mainSingerUid
         mLastReceivedPlayPosTime = null
@@ -330,12 +312,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 if (lyricUrl == null) {
                     // 加载歌词失败
                     Log.e(TAG, "loadMusic failed: NO_LYRIC_URL")
-                    loadSongState = KTVLoadSongState.FAILED
                     onMusicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.NO_LYRIC_URL)
                 } else {
                     // 加载歌词成功
                     Log.d(TAG, "loadMusic success")
-                    loadSongState = KTVLoadSongState.OK
                     lrcView?.onDownloadLrcData(lyricUrl)
                     onMusicLoadStateListener.onMusicLoadSuccess(song, lyricUrl)
                 }
@@ -347,50 +327,62 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         preLoadMusic(songCode) { song, status ->
             if (status == 0) {
                 // 预加载歌曲成功
+                if (this.songCode != song) {
+                    // 当前歌曲已发生变化，以最新load歌曲为准
+                    Log.e(TAG, "loadMusic failed: CANCELED")
+                    onMusicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.CANCELED)
+                    return@preLoadMusic
+                }
+
                 if (config.mode == KTVLoadMusicMode.LOAD_MUSIC_AND_LRC) {
                     // 需要加载歌词
                     loadLyric(song) { _, lyricUrl ->
+                        if (this.songCode != song) {
+                            // 当前歌曲已发生变化，以最新load歌曲为准
+                            Log.e(TAG, "loadMusic failed: CANCELED")
+                            onMusicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.CANCELED)
+                            return@loadLyric
+                        }
+
                         if (lyricUrl == null) {
                             // 加载歌词失败
                             Log.e(TAG, "loadMusic failed: NO_LYRIC_URL")
-                            loadSongState = KTVLoadSongState.FAILED
                             onMusicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.NO_LYRIC_URL)
                         } else {
                             // 加载歌词成功
                             Log.d(TAG, "loadMusic success")
-                            loadSongState = KTVLoadSongState.OK
-                            if (this.songCode == song) {
-                                lrcView?.onDownloadLrcData(lyricUrl)
-                            }
+                            lrcView?.onDownloadLrcData(lyricUrl)
                             onMusicLoadStateListener.onMusicLoadSuccess(song, lyricUrl)
                         }
 
-                        if (config.autoPlay && this.songCode == song) {
+                        if (config.autoPlay) {
                             // 主唱自动播放歌曲
-                            startSing(0)
+                            startSing(song, 0)
                         }
                     }
                 } else if (config.mode == KTVLoadMusicMode.LOAD_MUSIC_ONLY) {
                     // 不需要加载歌词
                     Log.d(TAG, "loadMusic success")
-                    loadSongState = KTVLoadSongState.OK
                     if (config.autoPlay) {
                         // 主唱自动播放歌曲
-                        startSing(0)
+                        startSing(song, 0)
                     }
                     onMusicLoadStateListener.onMusicLoadSuccess(song, "")
                 }
             } else {
                 // 预加载歌曲失败
                 Log.e(TAG, "loadMusic failed: MUSIC_PRELOAD_FAIL")
-                loadSongState = KTVLoadSongState.FAILED
                 onMusicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL)
             }
         }
     }
 
-    override fun startSing(startPos: Long) {
+    override fun startSing(songCode: Long, startPos: Long) {
         Log.d(TAG, "playSong called: $singerRole")
+        if (this.songCode != songCode) {
+            Log.e(TAG, "startSing failed: canceled")
+            return
+        }
         mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
         mPlayer.open(songCode, startPos)
     }

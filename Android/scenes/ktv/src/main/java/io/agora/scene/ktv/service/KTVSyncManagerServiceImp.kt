@@ -214,28 +214,40 @@ class KTVSyncManagerServiceImp(
                                         return@innerAutoOnSeatIfNeed
                                     }
 
-                                    val kTVJoinRoomOutputModel = JoinRoomOutputModel(
-                                        cacheRoom.name,
-                                        inputModel.roomNo,
-                                        cacheRoom.creatorNo,
-                                        cacheRoom.bgOption,
-                                        seats,
-                                        userSize,
-                                        rtmToken,
-                                        rtcToken,
-                                        "", //TODO fetchToken,
-                                        cacheRoom.createdAt
-                                    )
-                                    runOnMainThread {
-                                        completion.invoke(null, kTVJoinRoomOutputModel)
-                                    }
+                                    TokenGenerator.generateToken(
+                                        currRoomNo + "_ex",
+                                        UserManager.getInstance().user.id.toString(),
+                                        TokenGenerator.TokenGeneratorType.token006,
+                                        TokenGenerator.AgoraTokenType.rtc,
+                                        { chorusToken ->
+                                            val kTVJoinRoomOutputModel = JoinRoomOutputModel(
+                                                cacheRoom.name,
+                                                inputModel.roomNo,
+                                                cacheRoom.creatorNo,
+                                                cacheRoom.bgOption,
+                                                seats,
+                                                userSize,
+                                                rtmToken,
+                                                rtcToken,
+                                                chorusToken,
+                                                cacheRoom.createdAt
+                                            )
+                                            runOnMainThread {
+                                                completion.invoke(null, kTVJoinRoomOutputModel)
+                                            }
 
-                                    // 重置体验时间事件
-                                    mainHandler.removeCallbacks(timerRoomEndRun)
-                                    // 定时删除房间
-                                    val expireLeftTime = ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - cacheRoom.createdAt.toLong())
-                                    KTVLogger.d(TAG, "expireLeftTime: $expireLeftTime")
-                                    mainHandler.postDelayed(timerRoomEndRun, expireLeftTime)
+                                            // 重置体验时间事件
+                                            mainHandler.removeCallbacks(timerRoomEndRun)
+                                            // 定时删除房间
+                                            val expireLeftTime =
+                                                ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - cacheRoom.createdAt.toLong())
+                                            KTVLogger.d(TAG, "expireLeftTime: $expireLeftTime")
+                                            mainHandler.postDelayed(timerRoomEndRun, expireLeftTime)
+                                        },
+                                        {
+                                            completion.invoke(it, null)
+                                        }
+                                    )
                                 }
 
                             }
