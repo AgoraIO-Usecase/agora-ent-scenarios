@@ -30,7 +30,6 @@ import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.ui.BaseUiFragment
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.utils.FastClickTools
-import io.agora.voice.common.utils.LogTools.i
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
