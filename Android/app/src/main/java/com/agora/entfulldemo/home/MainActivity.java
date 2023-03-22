@@ -16,9 +16,11 @@ import androidx.navigation.ui.BottomNavigationViewKt;
 import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppActivityMainBinding;
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.List;
 
+import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.Constant;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
@@ -43,6 +45,7 @@ public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding
 
     @Override
     public void initView(@Nullable Bundle savedInstanceState) {
+        CrashReport.initCrashReport(getApplicationContext(), "0e701c6bd0", BuildConfig.DEBUG);
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         mainViewModel.setLifecycleOwner(this);
         navController = ActivityKt.findNavController(this, R.id.nav_host_fragment_activity_main);

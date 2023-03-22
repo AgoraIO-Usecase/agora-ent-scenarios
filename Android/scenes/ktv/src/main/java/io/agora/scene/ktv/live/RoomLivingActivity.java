@@ -1,5 +1,6 @@
 package io.agora.scene.ktv.live;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -663,6 +664,42 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             toggleAudioRun.run();
             toggleAudioRun = null;
         }
+    }
+
+    @Override
+    protected void onPermissionDined(String permission) {
+        String title;
+        String content;
+        if (permission.equals(Manifest.permission.RECORD_AUDIO)) {
+            title = getString(R.string.ktv_permission_leak_auido_title);
+            content = getString(R.string.ktv_permission_leak_auido_content);
+        } else if (permission.equals(Manifest.permission.CAMERA)) {
+            title = getString(R.string.ktv_permission_leak_camera_title);
+            content = getString(R.string.ktv_permission_leak_camera_content);
+        } else if (permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            title = getString(R.string.ktv_permission_leak_sdcard_title);
+            content = getString(R.string.ktv_permission_leak_sdcard_content);
+        } else {
+            title = getString(R.string.ktv_permission_leak_other_title);
+            content = getString(R.string.ktv_permission_leak_other_content);
+        }
+        CommonDialog dialog = new CommonDialog(this);
+        dialog.setDialogTitle(title);
+        dialog.setDescText(content);
+        dialog.setDialogBtnText(getString(R.string.ktv_cancel), getString(R.string.ktv_setting));
+        dialog.setOnButtonClickListener(new OnButtonClickListener() {
+            @Override
+            public void onLeftButtonClick() {
+                roomLivingViewModel.exitRoom();
+            }
+
+            @Override
+            public void onRightButtonClick() {
+                launchAppSetting(permission);
+            }
+        });
+        dialog.setCancelable(false);
+        dialog.show();
     }
 
     private void onMemberLeave(@NonNull RoomSeatModel member) {
