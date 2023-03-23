@@ -43,7 +43,7 @@
   
 - 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 环信的 App Key
 
-  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/im_get_app_id_android.jpg)
+  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/config_app_id_android.jpg)
 
 ``` 
 AGORA_APP_ID= （从声网console获取）
