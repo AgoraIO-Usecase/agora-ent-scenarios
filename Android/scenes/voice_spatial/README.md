@@ -20,19 +20,19 @@
 
   - 点击创建应用
 
-    ![图片](image/create_app_1.jpg)
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_1.jpg)
 
   - 选择你要创建的应用类型
 
-    ![图片](image/create_app_2.jpg)
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
 
   - 得到App ID与App 证书
 
-    ![图片](image/get_app_id.jpg)
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
 
 - 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 App证书
 
-  ![图片](image/config_app_id.jpg)
+  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/config_app_id_android.jpg)
 
 ``` 
 AGORA_APP_ID= （从声网console获取）
