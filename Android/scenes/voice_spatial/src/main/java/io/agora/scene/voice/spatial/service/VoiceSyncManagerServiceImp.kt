@@ -623,7 +623,7 @@ class VoiceSyncManagerServiceImp(
                     seatInfo.micStatus = MicStatus.Lock
                 }
                 else -> {
-                    seatInfo.micStatus = MicStatus.Normal
+                    seatInfo.micStatus = if (seatInfo.member == null) MicStatus.Idle else MicStatus.Normal
                 }
             }
             innerUpdateSeat(seatInfo) {
@@ -677,7 +677,7 @@ class VoiceSyncManagerServiceImp(
                     seatInfo.micStatus = MicStatus.ForceMute
                 }
                 else -> {
-                    seatInfo.micStatus = MicStatus.Normal
+                    seatInfo.micStatus = if (seatInfo.member == null) MicStatus.Idle else MicStatus.Normal
                 }
             }
             innerUpdateSeat(seatInfo) {
