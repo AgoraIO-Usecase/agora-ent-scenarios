@@ -59,6 +59,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) KaraokeView *karaokeView;
 @property (nonatomic, strong) GradeView *gradeView;
 @property (nonatomic, strong) IncentiveView *incentiveView;
+@property (nonatomic, strong) LineScoreView *lineScoreView;
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVMVViewDelegate>)delegate;
 

@@ -186,7 +186,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         roomInfo.password = inputModel.password
         roomInfo.creatorNo = VLUserCenter.user.id
         roomInfo.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id
-        roomInfo.bgOption = Int.random(in: 1...2)
+        roomInfo.bgOption = 0
         roomInfo.roomPeopleNum = "0"
         roomInfo.icon = inputModel.icon
         roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)

@@ -31,7 +31,7 @@ private func agoraPrint(_ message: String) {
     private var hasShowPreludeEndPosition = false
     private var hasShowEndPosition = false
     @objc public weak var delegate: KTVLrcControlDelegate?
-    @objc public var skipCallBack: ((Int) -> Void)?
+    @objc public var skipCallBack: ((Int, Bool) -> Void)?
     private var progress: Int = 0
     private var totalLines: NSInteger = 0
     private var totalScore: NSInteger = 0
@@ -47,8 +47,9 @@ private func agoraPrint(_ message: String) {
             if type == .down {
                 guard let duration = self.lyricModel?.duration else {return}
                 guard let preludeEndPosition = self.lyricModel?.preludeEndPosition else {return}
-                let pos: Int = self.progress >= duration - 500  ? duration : preludeEndPosition - 500
-                self.skipCallBack?(pos)
+                let pos: Int = self.progress >= duration - 500  ? duration - 500 : preludeEndPosition - 500
+                let flag: Bool = self.progress >= duration - 500  ? true : false
+                self.skipCallBack?(pos, flag)
             }
             self.skipBtn.isHidden = true
         })

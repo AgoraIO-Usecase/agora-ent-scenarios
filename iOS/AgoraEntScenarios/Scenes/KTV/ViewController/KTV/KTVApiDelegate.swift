@@ -35,7 +35,7 @@ import AgoraRtcKit
 @objc public enum KTVLoadSongFailReason: Int {
     case noLyricUrl = 0         //无歌词
     case musicPreloadFail   //歌曲预加载失败
-    case inProgress
+    case cancled // 本次加载取消/停止
 }
 
 @objc public enum KTVSwitchRoleState: Int {
@@ -170,7 +170,7 @@ import AgoraRtcKit
 
 
 public typealias LyricCallback = ((String?) -> Void)
-public typealias LoadMusicCallback = ((AgoraMusicContentCenterPreloadStatus) -> Void)
+public typealias LoadMusicCallback = ((AgoraMusicContentCenterPreloadStatus, NSInteger) -> Void)
 public typealias SwitchRoleStateCallBack = (KTVSwitchRoleState, KTVSwitchRoleFailReason) -> Void
 public typealias MusicChartCallBacks = (String, AgoraMusicContentCenterStatusCode, [AgoraMusicChartInfo]?) -> Void
 public typealias MusicResultCallBacks = (String, AgoraMusicContentCenterStatusCode, AgoraMusicCollection) -> Void

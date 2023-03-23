@@ -222,6 +222,7 @@ VLKTVRemoteVolumeViewDelegate
         _remoteVolumeView = [[VLKTVRemoteVolumeView alloc] initWithMin:0 withMax:100 withCurrent:15];
         _remoteVolumeView.titleLabel.text = KTVLocalizedString(@"RemoteVolume");
         _remoteVolumeView.delegate = self;
+        _setting.remoteVolume = 15;
     }
     return _remoteVolumeView;
 }
@@ -244,6 +245,11 @@ VLKTVRemoteVolumeViewDelegate
 - (void)setAccValue:(float)accValue {
     self.setting.accValue = accValue;
     self.accSlider.value = accValue;
+}
+
+-(void)setIspause:(BOOL)isPause{
+    _remoteVolumeView.userInteractionEnabled = !isPause;
+    [_remoteVolumeView setCurrent:isPause ? 100 : self.setting.remoteVolume];
 }
 
 @end
