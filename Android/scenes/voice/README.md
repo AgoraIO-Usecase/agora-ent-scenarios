@@ -20,30 +20,30 @@
 
    - 点击创建应用
   
-     ![图片](image/create_app_1.jpg)
+     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/voice_chat_room/create_app_1.jpg)
   
    - 选择你要创建的应用类型
   
-     ![图片](image/create_app_2.jpg)
+     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/voice_chat_room/create_app_2.jpg)
   
    - 得到App ID与App 证书
       
-     ![图片](image/get_app_id.jpg)
+     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/voice_chat_room/get_app_id.jpg)
    
 - 获取环信的App Key
   [环信](https://www.easemob.com/)
 
   - 创建应用
 
-    ![图片](image/im_create_app.jpg)
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/voice_chat_room/im_create_app.jpg)
   
   - 查看应用的App Key  
   
-    ![图片](image/im_get_app_id.jpg)
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/voice_chat_room/im_get_app_id.jpg)
   
 - 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 环信的 App Key
 
-  ![图片](image/config_app_id.jpg)
+  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/voice_chat_room/config_app_id.jpg)
 
 ``` 
 AGORA_APP_ID= （从声网console获取）
