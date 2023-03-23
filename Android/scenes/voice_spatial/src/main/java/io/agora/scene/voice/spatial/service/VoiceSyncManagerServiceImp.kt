@@ -655,11 +655,15 @@ class VoiceSyncManagerServiceImp(
             }
             innerUpdateSeat(seatInfo) {
                 if (it == null) {
+                    kickOff(micIndex) { i, a ->
+
+                    }
                     completion.invoke(VoiceServiceProtocol.ERR_OK, seatInfo)
                 } else {
                     completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                 }
             }
+
         } else {
             completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
         }
