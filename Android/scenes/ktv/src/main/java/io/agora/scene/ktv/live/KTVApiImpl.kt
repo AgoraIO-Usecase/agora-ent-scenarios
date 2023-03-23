@@ -1098,6 +1098,20 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         return false
     }
 
+    override fun onPublishAudioFrame(
+        channelId: String?,
+        type: Int,
+        samplesPerChannel: Int,
+        bytesPerSample: Int,
+        channels: Int,
+        samplesPerSec: Int,
+        buffer: ByteBuffer?,
+        renderTimeMs: Long,
+        avsync_type: Int
+    ): Boolean {
+        return false
+    }
+
     override fun getObservedAudioFramePosition(): Int {
         return 0
     }
@@ -1111,6 +1125,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun getMixedAudioParams(): AudioParams? {
+        return null
+    }
+
+    override fun getPublishAudioParams(): AudioParams? {
         return null
     }
 }
