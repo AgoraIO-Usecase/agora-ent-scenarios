@@ -12,6 +12,7 @@ import java.util.List;
 
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.component.BaseViewBindingFragment;
+import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvFragmentSongOrderListBinding;
 import io.agora.scene.ktv.databinding.KtvItemChoosedSongListBinding;
@@ -68,8 +69,16 @@ public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmen
                 } else {
                     binding.tvSing.setVisibility(View.GONE);
                     binding.ivSinging.setVisibility(View.GONE);
-                    binding.ivToDel.setVisibility(View.GONE);
                     binding.ivToTop.setVisibility(View.GONE);
+
+                    if (item.chooserId.equals(UserManager.getInstance().getUser().id.toString())) {
+                        binding.ivToDel.setOnClickListener(v -> {
+                            onSongDeleteClicked(item);
+                        });
+                        binding.ivToDel.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.ivToDel.setVisibility(View.GONE);
+                    }
                 }
 
                 binding.tvChorus.setText(getString(R.string.ktv_song_ordering_person));

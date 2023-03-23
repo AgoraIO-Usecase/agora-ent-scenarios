@@ -1,9 +1,10 @@
 package io.agora.scene.ktv.live;
 
+import static io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE.CONNECTION_STATE_CONNECTED;
+import static io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE.getValue;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE;
 
-import android.os.Build;
 import android.text.TextUtils;
 import android.view.SurfaceView;
 
@@ -18,21 +19,18 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Observable;
 
-import io.agora.musiccontentcenter.IMusicContentCenterEventHandler;
 import io.agora.musiccontentcenter.Music;
 import io.agora.musiccontentcenter.MusicChartInfo;
 import io.agora.rtc2.ChannelMediaOptions;
 import io.agora.rtc2.Constants;
 import io.agora.rtc2.DataStreamConfig;
 import io.agora.rtc2.IRtcEngineEventHandler;
+import io.agora.rtc2.RtcConnection;
 import io.agora.rtc2.RtcEngine;
 import io.agora.rtc2.RtcEngineConfig;
 import io.agora.rtc2.RtcEngineEx;
@@ -893,6 +891,12 @@ public class RoomLivingViewModel extends ViewModel {
      */
     public void joinChorus() {
         KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus() called");
+        if (mRtcEngine.getConnectionState() != getValue(CONNECTION_STATE_CONNECTED)) {
+            joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
+            ToastUtils.showToast("加入合唱失败， reason：连接已断开");
+            return;
+        }
+
         RoomSelSongModel musicModel = songPlayingLiveData.getValue();
         if (musicModel == null) {
             KTVLogger.e(TAG, "RoomLivingViewModel.joinChorus() failed, no song playing now");
@@ -1389,7 +1393,7 @@ public class RoomLivingViewModel extends ViewModel {
         } else {
             if (seatLocalLiveData.getValue() != null && seatLocalLiveData.getValue().getChorusSongCode().equals(music.getSongNo() + music.getCreateAt())) {
                 // 合唱者
-                loadMusic(new KTVLoadMusicConfiguration(false, songCode, mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC));
+                loadMusic(new KTVLoadMusicConfiguration(false, songCode, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY));
                 // 加入合唱
                 innerJoinChorus(music.getSongNo());
             } else {
