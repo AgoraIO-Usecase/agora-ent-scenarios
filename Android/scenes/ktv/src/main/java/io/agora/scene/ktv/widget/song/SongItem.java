@@ -9,20 +9,22 @@ public class SongItem {
 
     // 已点歌曲信息
     public String chooser; // 点歌人
+    public String chooserId;
     public boolean isChosen; // 是否已被点
 
-    public SongItem(String songNo, String songName, String imageUrl, String singer) {
-        this(songNo, songName, imageUrl, singer, "", false);
+    public SongItem(String songNo, String songName, String imageUrl, String singer, String chooserId) {
+        this(songNo, songName, imageUrl, singer, "", false, chooserId);
     }
 
     public SongItem(String songNo, String songName,
                     String imageUrl, String singer,
-                    String chooser, boolean isChosen) {
+                    String chooser, boolean isChosen, String chooserId) {
         this.songNo = songNo;
         this.songName = songName;
         this.imageUrl = imageUrl;
         this.singer = singer;
         this.chooser = chooser;
+        this.chooserId = chooserId;
         this.isChosen = isChosen;
     }
 

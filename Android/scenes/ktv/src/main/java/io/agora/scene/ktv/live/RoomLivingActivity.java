@@ -30,7 +30,6 @@ import java.util.Map;
 
 import io.agora.rtc2.Constants;
 import io.agora.scene.base.GlideApp;
-import io.agora.scene.base.TokenGenerator;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
@@ -685,7 +684,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     private void showMusicSettingDialog() {
         //if (musicSettingDialog == null) {
-            musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting);
+            musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting, roomLivingViewModel.playerMusicStatusLiveData.getValue() == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE);
         //}
         musicSettingDialog.show(getSupportFragmentManager(), MusicSettingDialog.TAG);
     }

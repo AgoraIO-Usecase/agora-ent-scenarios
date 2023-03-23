@@ -137,7 +137,8 @@ public class SongActionListenerImpl implements OnSongActionListener {
                         song.getImageUrl(),
                         song.getSinger(),
                         song.getName(),
-                        !TextUtils.isEmpty(song.getName())
+                        !TextUtils.isEmpty(song.getName()),
+                        song.getUserNo()
                 );
                 item.setTag(song);
                 list.add(item);

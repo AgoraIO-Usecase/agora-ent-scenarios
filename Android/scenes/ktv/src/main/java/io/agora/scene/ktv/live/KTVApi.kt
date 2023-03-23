@@ -26,7 +26,7 @@ enum class KTVSingRole(val value: Int) {
  * loadSong失败的原因
  * @param NO_LYRIC_URL 没有歌词，不影响音乐正常播放
  * @param MUSIC_PRELOAD_FAIL 音乐加载失败
- * @param CANCELED 本地加载已终止
+ * @param CANCELED 本次加载已终止
  */
 enum class KTVLoadSongFailReason(val value: Int) {
     NO_LYRIC_URL(0),

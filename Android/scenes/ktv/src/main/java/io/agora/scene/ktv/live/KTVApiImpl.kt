@@ -304,6 +304,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         if (config.mode == KTVLoadMusicMode.LOAD_LRC_ONLY) {
             // 加载歌词
             loadLyric(songCode) { song, lyricUrl ->
+                if (this.songCode != song) {
+                    // 当前歌曲已发生变化，以最新load歌曲为准
+                    Log.e(TAG, "loadMusic failed: CANCELED")
+                    onMusicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.CANCELED)
+                    return@loadLyric
+                }
+
                 if (lyricUrl == null) {
                     // 加载歌词失败
                     Log.e(TAG, "loadMusic failed: NO_LYRIC_URL")
@@ -328,7 +335,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     onMusicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.CANCELED)
                     return@preLoadMusic
                 }
-
                 if (config.mode == KTVLoadMusicMode.LOAD_MUSIC_AND_LRC) {
                     // 需要加载歌词
                     loadLyric(song) { _, lyricUrl ->
@@ -724,7 +730,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         if (retPreload != 0) {
             Log.e(TAG, "preLoadMusic failed: $retPreload")
             loadMusicCallbackMap.remove(songNo.toString())
-            onLoadMusicCallback(songNo, 100, 0, null, null)
+            onLoadMusicCallback(songNo, 100, 1, null, null)
             return
         }
         loadMusicCallbackMap[songNo.toString()] = onLoadMusicCallback
