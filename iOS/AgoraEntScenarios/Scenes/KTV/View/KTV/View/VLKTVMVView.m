@@ -178,6 +178,10 @@
     self.incentiveView.frame = CGRectMake(15, 55, 192, 45);
     [self.karaokeView addSubview:self.incentiveView];
     
+    self.lineScoreView = [[LineScoreView alloc]init];
+    self.lineScoreView.frame = CGRectMake(self.karaokeView.scoringView.defaultPitchCursorX, self.karaokeView.scoringView.topSpaces + self.karaokeView.top, 50, self.karaokeView.scoringView.viewHeight);
+    [self.contentView addSubview:self.lineScoreView];
+    
     self.BotView = [[UIView alloc]initWithFrame:CGRectMake(0, self.height-54, self.width, 54)];
     self.BotView.backgroundColor = [UIColor clearColor];
     [self addSubview:self.BotView];

@@ -100,6 +100,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, strong) KTVLrcControl *lrcControl;
 @property (nonatomic, copy, nullable) CompletionBlock loadMusicCallBack;
 @property (nonatomic, assign) NSInteger selectedEffectIndex;
+@property (nonatomic, assign) BOOL isPause;
 @end
 
 @implementation VLKTVViewController
@@ -382,6 +383,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
                                                       withDelegate:self];
     
     self.settingView = (VLKTVSettingView*)popView.currCustomView;
+    [self.settingView setIspause:self.isPause];
 }
 
 - (void)showScoreViewWithScore:(int)score {
@@ -423,13 +425,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     NSDictionary *dict = [VLGlobalHelper dictionaryForJsonData:data];
 //    KTVLogInfo(@"receiveStreamMessageFromUid:%@,streamID:%d,uid:%d",dict,(int)streamId,(int)uid);
+    [self.ktvApi didKTVAPIReceiveStreamMessageFromUid:uid streamId:streamId data:data];
     if ([dict[@"cmd"] isEqualToString:@"SingingScore"]) {
+        //伴唱显示自己的分数，观众显示主唱的分数
+        if(self.singRole == KTVSingRoleCoSinger){
+            return;
+        }
         int score = [dict[@"score"] intValue];
         [self showScoreViewWithScore:score];
         KTVLogInfo(@"score: %ds",score);
         return;
     }
-    [self.ktvApi didKTVAPIReceiveStreamMessageFromUid:uid streamId:streamId data:data];
 }
 
 // Network quality callbacks
@@ -495,6 +501,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)loadAndPlaySong{
+    //清空分数
+    [self.MVView.gradeView reset];
+    
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     
     //TODO: fix score view visible problem while owner reopen the room
@@ -601,6 +610,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)joinChorus {
     NSLog(@"currentThread:%@", [NSThread currentThread]);
+    
+    if(self.RTCkit.getConnectionState != AgoraConnectionStateConnected){
+        self.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
+        [VLToast toast:@"加入合唱失败，reson:连接已断开"];
+        return;
+    }
     
     if (![self getJoinChorusEnable]) {
         KTVLogInfo(@"getJoinChorusEnable false");
@@ -841,8 +856,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi setLrcViewWithView:lrcControl];
     self.lrcControl = lrcControl;
     self.lrcControl.delegate = self;
-    lrcControl.skipCallBack = ^(NSInteger time) {
-        [self.ktvApi seekSingWithTime:time];
+    lrcControl.skipCallBack = ^(NSInteger time, BOOL flag) {
+        NSInteger seekTime = flag ? [self.ktvApi getMediaPlayer].getDuration - 800 : time;
+        [self.ktvApi seekSingWithTime:seekTime];
     };
     [self.ktvApi setMicStatusWithIsOnMicOpen:!self.isNowMicMuted];
     [self.ktvApi addEventHandlerWithKtvApiEventHandler:self];
@@ -855,7 +871,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                        mediaOptions:[self channelMediaOptions]
                         joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
         KTVLogInfo(@"Agora - 加入RTC成功");
-//        [weakSelf.RTCkit setParameters: @"{\"che.audio.enable.md \": false}"];
+//        [weakSelf.RTCkit setParameters: @"{\"che.audio.enable.md \": false}"];sin
     }];
     if (ret != 0) {
         KTVLogError(@"joinChannelByToken fail: %d, uid: %ld, token: %@", ret, [VLUserCenter.user.id integerValue], VLUserCenter.user.agoraRTCToken);
@@ -906,6 +922,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)didLrcViewScorllFinishedWith:(NSInteger)score totalScore:(NSInteger)totalScore lineScore:(NSInteger)lineScore{
+    [self.MVView.lineScoreView showScoreViewWithScore:lineScore];
     [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
     [self.MVView.incentiveView showWithScore:lineScore];
 }
@@ -925,6 +942,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [[AppContext ktvServiceImp] coSingerLeaveChorusWithCompletion:^(NSError * error) {
     }];
     [self stopPlaySong];
+    self.isNowMicMuted = true;
+    [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:YES
+                                                        completion:^(NSError * error) {
+    }];
 }
 
 #pragma mark -- VLKTVTopViewDelegate
@@ -1107,8 +1128,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self showSettingView];
     } else if (type == VLKTVMVViewActionTypeMVPlay) { //播放
         [self.ktvApi resumeSing];
+        self.isPause = false;
     } else if (type == VLKTVMVViewActionTypeMVPause) { //暂停
         [self.ktvApi pauseSing];
+        self.isPause = true;
     } else if (type == VLKTVMVViewActionTypeMVNext) { //切换
         VL(weakSelf);
 
@@ -1181,12 +1204,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else if (type == VLKTVValueDidChangedTypeSound) { // 音量
         // 调节音频采集信号音量、取值范围为 [0,400]
         // 0、静音 100、默认原始音量 400、原始音量的4倍、自带溢出保护
-        [self.RTCkit adjustRecordingSignalVolume:setting.soundValue * 400];
+        [self.RTCkit adjustRecordingSignalVolume:setting.soundValue * 100];
         if(setting.soundOn) {
-            [self.RTCkit setInEarMonitoringVolume:setting.soundValue * 400];
+            [self.RTCkit setInEarMonitoringVolume:setting.soundValue * 100];
         }
     } else if (type == VLKTVValueDidChangedTypeAcc) { // 伴奏
-        int value = setting.accValue * 400;
+        int value = setting.accValue * 100;
         self.playoutVolume = value;
     } else if (type == VLKTVValueDidChangedTypeListItem) {
         AgoraAudioEffectPreset preset = [self audioEffectPreset:setting.kindIndex];
@@ -1477,9 +1500,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)_checkInEarMonitoring {
     if([self isCurrentSongMainSinger:VLUserCenter.user.id]) {
-        [self.RTCkit enableInEarMonitoring:_isEarOn];
+        [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFilters];
     } else {
-        [self.RTCkit enableInEarMonitoring:NO];
+        [self.RTCkit enableInEarMonitoring:NO includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFilters];
     }
 }
 
@@ -1517,7 +1540,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)setSingRole:(KTVSingRole)singRole {
     _singRole = singRole;
-    self.lrcControl.lrcView.lyricsView.draggable = NO;
+    self.lrcControl.lrcView.lyricsView.draggable = true;
     self.lrcControl.isMainSinger = (_singRole == KTVSingRoleSoloSinger || _singRole == KTVSingRoleLeadSinger);
     KTVLogInfo(@"setSingRole: %ld", singRole);
     
@@ -1556,13 +1579,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         } else if(state == AgoraMediaPlayerStatePaused) {
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
         } else if(state == AgoraMediaPlayerStateStopped) {
-        } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
+            
+        } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted || state == AgoraMediaPlayerStatePlayBackCompleted) {
             if(isLocal) {
                 KTVLogInfo(@"Playback all loop completed");
-//                VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
-                if([self isCurrentSongMainSinger:VLUserCenter.user.id]) {
-                    //将房主实时的分数共享给所有人
-                    [self syncChoruScore:[self.lrcControl getAvgScore]];
+                //if([self isCurrentSongMainSinger:VLUserCenter.user.id]) {
+                if(self.singRole != KTVSingRoleAudience){
+                    //伴唱和房主都用自己的分数
+                    if(self.singRole == KTVSingRoleLeadSinger || self.singRole == KTVSingRoleSoloSinger){
+                        [self syncChoruScore:[self.lrcControl getAvgScore]];
+                    }
                     [self showScoreViewWithScore: [self.lrcControl getAvgScore]];
                 }
                 [self removeCurrentSongWithSync:YES];

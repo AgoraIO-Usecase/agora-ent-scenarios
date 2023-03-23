@@ -473,13 +473,6 @@ extension KTVApiImpl {
     
     private func _loadMusic(config: KTVSongConfiguration, mode: KTVLoadMusicMode, onMusicLoadStateListener: KTVMusicLoadStateListener){
         
-//        if loadSongState == .inProgress {
-//            agoraPrint("loadMusic failed: KTVLoadSongState is in progress")
-//            onMusicLoadStateListener.onMusicLoadFail( reason: .inProgress)
-//            return
-//        }
-//
-//        loadSongState = .inProgress
         songConfig = config
         let role = singerRole
         let songCode = config.songCode
@@ -487,6 +480,12 @@ extension KTVApiImpl {
         if mode == .loadLrcOnly {
             loadLyric(with: songCode, callBack: {[weak self] url in
                 agoraPrint("loadLrcOnly: songCode:\(songCode) ulr:\(String(describing: url))")
+                
+                if self?.songConfig?.songCode != songCode {
+                    onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .cancled)
+                    return
+                }
+                
                 if let urlPath = url, urlPath.count > 0 {
                         self?.lyricUrlMap.updateValue(urlPath, forKey: String(songCode))
                         self?.setLyric(with: urlPath, callBack: { lyricUrl in
@@ -506,13 +505,25 @@ extension KTVApiImpl {
             if mcc.isPreloaded(songCode: songCode) != 0 {
                onMusicLoadStateListener.onMusicLoadProgress(songCode: songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
             }
-            preloadMusic(with: songCode) {[weak self] status in
+            preloadMusic(with: songCode) {[weak self] status, songCode in
+                
+                if self?.songConfig?.songCode != songCode {
+                    onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .cancled)
+                    return
+                }
 
                 if status == .OK {
+                    
                     if mode == .loadMusicAndLrc {
                         //需要加载歌词
                         self?.loadLyric(with: songCode, callBack: { url in
                             agoraPrint("loadMusicAndLrc: songCode:\(songCode) status:\(status.rawValue) ulr:\(String(describing: url))")
+                            
+                            if self?.songConfig?.songCode != songCode {
+                                onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .cancled)
+                                return
+                            }
+                            
                             if let urlPath = url, urlPath.count > 0 {
                                     self?.lyricUrlMap.updateValue(urlPath, forKey: String(songCode))
                                     self?.setLyric(with: urlPath, callBack: { lyricUrl in
@@ -557,14 +568,14 @@ extension KTVApiImpl {
         var err = self.mcc.isPreloaded(songCode: songCode)
         if err == 0 {
             musicCallbacks.removeValue(forKey: String(songCode))
-            callBaclk(.OK)
+            callBaclk(.OK, songCode)
             return
         }
 
         err = self.mcc.preload(songCode: songCode, jsonOption: nil)
         if err != 0 {
             musicCallbacks.removeValue(forKey: String(songCode))
-            callBaclk(.error)
+            callBaclk(.error, songCode)
             return
         }
         musicCallbacks.updateValue(callBaclk, forKey: String(songCode))
@@ -1058,7 +1069,7 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
         let SongCode = "\(songCode)"
         guard let block = self.musicCallbacks[SongCode] else { return }
         self.musicCallbacks.removeValue(forKey: SongCode)
-        block(status)
+        block(status, songCode)
     }
 }
 
