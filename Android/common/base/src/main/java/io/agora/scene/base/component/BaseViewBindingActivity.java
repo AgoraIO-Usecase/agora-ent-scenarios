@@ -274,7 +274,7 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
     }
 
     private void doOnPermissionsDenied(int requestCode){
-        ToastUtils.showToast(R.string.permission_leak_tip);
+        // ToastUtils.showToast(R.string.permission_leak_tip);
         if(mPermissionArray==null) return;
         String permission = null;
         for (int i = 0; i < mPermissionArray.length; i++) {

@@ -1,8 +1,5 @@
 package com.agora.entfulldemo.home;
 
-import static io.agora.scene.base.component.BaseViewBindingActivity.PERM_REQID_RDSTORAGE;
-
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -14,7 +11,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -109,11 +105,10 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             editNameDialog.show();
         });
         getBinding().ivUserAvatar.setOnClickListener(view -> {
-//            showSelectPhotoFromDialog();
-            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERM_REQID_RDSTORAGE);
-//            ((MainActivity) requireActivity()).requestReadStoragePermission();
+            ((MainActivity) requireActivity()).requestReadStoragePermission();
         });
     }
+
 
     private static final int CHOOSE_PHOTO = 100;
     private static final int TAKE_PHOTO = 101;

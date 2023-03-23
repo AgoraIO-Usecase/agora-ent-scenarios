@@ -26,6 +26,7 @@ import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.manager.PagePilotManager;
 import io.agora.scene.base.manager.UserManager;
+import io.agora.scene.widget.dialog.PermissionLeakDialog;
 
 /**
  * 主页容器
@@ -80,6 +81,12 @@ public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding
         if (fragment != null) {
             ((HomeMineFragment) fragment).openAlbum();
         }
+    }
+
+    @Override
+    protected void onPermissionDined(String permission) {
+        super.onPermissionDined(permission);
+        new PermissionLeakDialog(this).show(permission, null, () -> launchAppSetting(permission));
     }
 
     public Fragment getFragment(Class<?> clazz) {

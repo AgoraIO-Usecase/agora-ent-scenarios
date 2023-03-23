@@ -134,13 +134,5 @@
     <string name="ktv_permission_refused">运行此功能需要的必要权限未被授予。</string>
     <string name="ktv_network_unavailable">未检测到可用网络，确认继续？</string>
     <string name="ktv_no_lrc">暂无歌词 </string>
-    <string name="ktv_permission_leak_auido_title">没有麦克风权限</string>
-    <string name="ktv_permission_leak_auido_content">请在设置中打开K歌的麦克风权限</string>
-    <string name="ktv_permission_leak_camera_title">没有摄像头权限</string>
-    <string name="ktv_permission_leak_camera_content">请在设置中打开K歌的摄像头权限</string>
-    <string name="ktv_permission_leak_sdcard_title">没有SDCard权限</string>
-    <string name="ktv_permission_leak_sdcard_content">请在设置中打开K歌的SDCard权限</string>
-    <string name="ktv_permission_leak_other_title">没有运行所需权限</string>
-    <string name="ktv_permission_leak_other_content">请在设置中打开K歌运行所需权限</string>
-    <string name="ktv_setting">设置</string>
+
 </resources>

@@ -51,6 +51,7 @@ import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
 import io.agora.scene.widget.dialog.CloseRoomDialog;
 import io.agora.scene.widget.dialog.CommonDialog;
+import io.agora.scene.widget.dialog.PermissionLeakDialog;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 import io.agora.scene.widget.utils.UiUtils;
 
@@ -85,6 +86,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     @Override
     public void initView(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            finish();
+            return;
+        }
         getWindow().getDecorView().setKeepScreenOn(true);
         roomLivingViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
             @NonNull
@@ -650,7 +655,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     //开启 关闭摄像头
     private void toggleSelfVideo(boolean isOpen) {
-        toggleVideoRun = () -> roomLivingViewModel.toggleSelfVideo(isOpen);
+        toggleVideoRun = () -> {
+            roomLivingViewModel.toggleSelfVideo(isOpen);
+            getBinding().cbVideo.setChecked(isOpen);
+        };
         requestCameraPermission();
     }
 
@@ -668,40 +676,20 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     @Override
     protected void onPermissionDined(String permission) {
-        String title;
-        String content;
-        if (permission.equals(Manifest.permission.RECORD_AUDIO)) {
-            title = getString(R.string.ktv_permission_leak_auido_title);
-            content = getString(R.string.ktv_permission_leak_auido_content);
-        } else if (permission.equals(Manifest.permission.CAMERA)) {
-            title = getString(R.string.ktv_permission_leak_camera_title);
-            content = getString(R.string.ktv_permission_leak_camera_content);
-        } else if (permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            title = getString(R.string.ktv_permission_leak_sdcard_title);
-            content = getString(R.string.ktv_permission_leak_sdcard_content);
-        } else {
-            title = getString(R.string.ktv_permission_leak_other_title);
-            content = getString(R.string.ktv_permission_leak_other_content);
+        new PermissionLeakDialog(this).show(permission,
+                () -> {
+                    if (permission.equals(Manifest.permission.RECORD_AUDIO)) {
+                        roomLivingViewModel.exitRoom();
+                    }
+                },
+                () -> launchAppSetting(permission));
+        if (permission.equals(Manifest.permission.CAMERA)) {
+            getBinding().cbVideo.setChecked(false);
+        } else if (permission.equals(Manifest.permission.RECORD_AUDIO)) {
+            if (!roomLivingViewModel.isRoomOwner()) {
+                getBinding().cbMic.setChecked(false);
+            }
         }
-        CommonDialog dialog = new CommonDialog(this);
-        dialog.setDialogTitle(title);
-        dialog.setDescText(content);
-        dialog.setDialogBtnText(getString(R.string.ktv_cancel), getString(R.string.ktv_setting));
-        dialog.setOnButtonClickListener(new OnButtonClickListener() {
-            @Override
-            public void onLeftButtonClick() {
-                if(permission.equals(Manifest.permission.RECORD_AUDIO) && roomLivingViewModel.isRoomOwner()){
-                    roomLivingViewModel.exitRoom();
-                }
-            }
-
-            @Override
-            public void onRightButtonClick() {
-                launchAppSetting(permission);
-            }
-        });
-        dialog.setCancelable(false);
-        dialog.show();
     }
 
     private void onMemberLeave(@NonNull RoomSeatModel member) {
