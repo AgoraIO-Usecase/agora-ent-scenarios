@@ -412,6 +412,13 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 } else {
                     mNumberOfCombos = 1;
                 }
+
+                if (mNumberOfCombos == 1) { // Per request from product team, do not show combo view for first one
+                    comboIcon.setVisibility(INVISIBLE);
+                    comboText.setVisibility(INVISIBLE);
+                    return;
+                }
+
                 RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.RESOURCE);
                 OutlineSpan outlineSpan = new OutlineSpan(Color.parseColor("#368CFF"), 10F
                 );
