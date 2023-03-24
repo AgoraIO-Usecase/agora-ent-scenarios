@@ -990,7 +990,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     // 同步播放进度
     override fun onPositionChanged(position_ms: Long) {
-        Log.d("hugo", "121212121221")
         localPlayerPosition = position_ms
         localPlayerSystemTime = System.currentTimeMillis()
 
