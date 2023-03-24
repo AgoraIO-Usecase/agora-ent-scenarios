@@ -52,7 +52,11 @@ public class VRSoundEffectsViewController: VRBaseViewController {
             view.makeToast("No Room Name".localized(), point: view.center, title: nil, image: nil, completion: nil)
         }
         Throttler.throttle {
-            DispatchQueue.main.async {
+            AgoraEntAuthorizedManager.requestAudioSession { granted in
+                guard granted else {
+                    AgoraEntAuthorizedManager.showAudioAuthorizedFail(parent: self)
+                    return
+                }
                 self.entryRoom()
             }
         }
