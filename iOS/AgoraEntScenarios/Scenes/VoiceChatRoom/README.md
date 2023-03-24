@@ -1,8 +1,58 @@
 # 语聊房
-# 1.项目介绍
-## 1.1 概述
+
+> 本文档主要介绍如何快速跑通 语聊房 示例工程
+
+---
+
+## 1. 环境准备
+
+- <mark>最低兼容 iOS 13.0及以上的手机设备。</mark>
+- Xcode 13.0及以上版本。
+
+---
+
+## 2. 运行示例
+
+- 获取声网App ID 和 App 证书  
+  [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)  
+  [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
+
+   - 点击创建应用
+  
+     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_1.jpg)
+  
+   - 选择你要创建的应用类型
+  
+     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
+  
+   - 得到App ID与App 证书
+      
+     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
+   
+- 获取环信的App Key
+  [环信](https://www.easemob.com/)
+
+  - 创建应用
+
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/im_create_app.jpg)
+  
+  - 查看应用的App Key  
+  
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/im_get_app_id.jpg)
+    
+ - 在项目的[KeyCenter.swift](../../KeyCenter.swift)里填写需要的声网 App ID 和 App证书
+  
+  ![xxx](https://download.agora.io/demo/test/KeyCenter.png)
+  
+  ```texag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0
+  static let AppId: String = 声网AppID
+  static let Certificate: String? = 声网App证书
+  ```
+
+# 3.项目介绍
+## 3.1 概述
 **声动语聊**项目是声网语聊房场景的开源代码，开发者可以获取并添加到您的APP工程里，本源码会伴随声动语聊Demo同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
-## 1.2 功能介绍
+## 3.2 功能介绍
 
 ### 场景功能代码根目录
 
@@ -30,35 +80,19 @@
 - 音效方法参考：[VoiceRoomViewController+ChatBar.swift](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_ios_merge/iOS/AgoraEntScenarios/Scenes/VoiceChatRoom/Controllers/VoiceChat/VoiceRoomViewController%2BChatBar.swift)文件的 func showEQView()
 - 该方法支持对音效功能的统一处理
 
-# 2.使用场景
+# 4.使用场景
 
 声网声动语聊源码，最终目的是方便开发者快速按需集成，减少开发者搭建语聊房的工作量。在现有源码的基础上，您可以按需自由定制，包括UI/UE，前端逻辑，权限体系等
 
-# 3.快速开始
 
-- 在集成的同时，需要去声网合环信的官网注册好对应的账号
-- 将项目的iOS/AgoraEntScenarios/KeyCenter.swift.bak重命名为KeyCenter.swift
-- 在KeyCenter.swift文件中填写需要的声网的 appId 和 appCertificate 及环信的 IMAppKey, IMClientId 和 IMClientSecret
-- 然后pod install成功之后，打开项目即可开始您的体验
-```
-AppId：声网appid
-Certificate：声网Certificate
-IMAppKey：环信appkey
-IMClientId：环信IMClientId
-IMClientSecret：环信IMClientSecret
-```
-配置好这些参数之后。就可以快速开始体验了♥️
+# 5.FAQ
 
-
-# 4.FAQ
-
-## 4.1 如何获取声网和环信APPID：
+## 5.1 如何获取声网和环信APPID：
 - 声网APPID申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
 - 环信APPKey申请：[https://www.easemob.com/](https://www.easemob.com/)
-## 4.2 语聊房中的弹幕组件使用的是哪家？是否可以自己选择供应商？
+## 5.2 语聊房中的弹幕组件使用的是哪家？是否可以自己选择供应商？
 声动语聊源码使用的是环信AgoraChat的IM和信令服务，您也可以使用自己的服务
 
-## 4.3 集成遇到困难，该如何联系声网获取协助
-方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
-
-方案2：发送邮件给support@agora.io咨询
+## 5.3 集成遇到困难，该如何联系声网获取协助
+- 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
+- 方案2：发送邮件给support@agora.io咨询。
