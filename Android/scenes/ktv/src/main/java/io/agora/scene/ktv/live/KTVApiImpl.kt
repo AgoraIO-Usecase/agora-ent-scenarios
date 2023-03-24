@@ -108,6 +108,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mPlayer = mMusicCenter.createMusicPlayer()
         mPlayer.adjustPublishSignalVolume(mpkPublishVolume)
         mPlayer.adjustPlayoutVolume(mpkPlayoutVolume)
+        mPlayer.setPlayerOption("play_pos_change_callback", 100)
 
         // 注册回调
         mRtcEngine.addHandler(this)
@@ -989,6 +990,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     // 同步播放进度
     override fun onPositionChanged(position_ms: Long) {
+        Log.d("hugo", "121212121221")
         localPlayerPosition = position_ms
         localPlayerSystemTime = System.currentTimeMillis()
 
