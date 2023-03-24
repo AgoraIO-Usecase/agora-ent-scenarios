@@ -141,7 +141,6 @@
 		DD220B8C295B332C00F57F30 /* VLRoomSeatModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD220A96295B332C00F57F30 /* VLRoomSeatModel.m */; };
 		DD220B8D295B332C00F57F30 /* VLSongItmModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD220A97295B332C00F57F30 /* VLSongItmModel.m */; };
 		DD220B8E295B332C00F57F30 /* RtcMusicLrcMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = DD220A99295B332C00F57F30 /* RtcMusicLrcMessage.m */; };
-		DD220B8F295B332C00F57F30 /* AgoraRtm.m in Sources */ = {isa = PBXBuildFile; fileRef = DD220A9D295B332C00F57F30 /* AgoraRtm.m */; };
 		DD220B90295B332C00F57F30 /* VLRoomListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD220AA0295B332C00F57F30 /* VLRoomListModel.m */; };
 		DD220B91295B332C00F57F30 /* VLBelcantoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD220AA1295B332C00F57F30 /* VLBelcantoModel.m */; };
 		DD220B92295B332C00F57F30 /* VLKTVSelBgModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD220AA2295B332C00F57F30 /* VLKTVSelBgModel.m */; };
@@ -560,12 +559,10 @@
 		DD220A95295B332C00F57F30 /* VLRoomListModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLRoomListModel.h; sourceTree = "<group>"; };
 		DD220A96295B332C00F57F30 /* VLRoomSeatModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLRoomSeatModel.m; sourceTree = "<group>"; };
 		DD220A97295B332C00F57F30 /* VLSongItmModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSongItmModel.m; sourceTree = "<group>"; };
-		DD220A98295B332C00F57F30 /* AgoraRtm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AgoraRtm.h; sourceTree = "<group>"; };
 		DD220A99295B332C00F57F30 /* RtcMusicLrcMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RtcMusicLrcMessage.m; sourceTree = "<group>"; };
 		DD220A9A295B332C00F57F30 /* VLKTVSelBgModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVSelBgModel.h; sourceTree = "<group>"; };
 		DD220A9B295B332C00F57F30 /* VLBelcantoModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLBelcantoModel.h; sourceTree = "<group>"; };
 		DD220A9C295B332C00F57F30 /* VLRoomSelSongModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLRoomSelSongModel.h; sourceTree = "<group>"; };
-		DD220A9D295B332C00F57F30 /* AgoraRtm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AgoraRtm.m; sourceTree = "<group>"; };
 		DD220A9E295B332C00F57F30 /* VLSongItmModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSongItmModel.h; sourceTree = "<group>"; };
 		DD220A9F295B332C00F57F30 /* VLRoomSeatModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLRoomSeatModel.h; sourceTree = "<group>"; };
 		DD220AA0295B332C00F57F30 /* VLRoomListModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLRoomListModel.m; sourceTree = "<group>"; };
@@ -1313,12 +1310,10 @@
 				DD220A95295B332C00F57F30 /* VLRoomListModel.h */,
 				DD220A96295B332C00F57F30 /* VLRoomSeatModel.m */,
 				DD220A97295B332C00F57F30 /* VLSongItmModel.m */,
-				DD220A98295B332C00F57F30 /* AgoraRtm.h */,
 				DD220A99295B332C00F57F30 /* RtcMusicLrcMessage.m */,
 				DD220A9A295B332C00F57F30 /* VLKTVSelBgModel.h */,
 				DD220A9B295B332C00F57F30 /* VLBelcantoModel.h */,
 				DD220A9C295B332C00F57F30 /* VLRoomSelSongModel.h */,
-				DD220A9D295B332C00F57F30 /* AgoraRtm.m */,
 				DD220A9E295B332C00F57F30 /* VLSongItmModel.h */,
 				DD220A9F295B332C00F57F30 /* VLRoomSeatModel.h */,
 				DD220AA0295B332C00F57F30 /* VLRoomListModel.m */,
@@ -2761,7 +2756,6 @@
 				DDA19A6328FFE57A009D3E61 /* EKNoteMessageView.swift in Sources */,
 				DDA19A3028FFE57A009D3E61 /* EntryCachingHeuristic.swift in Sources */,
 				DD220B61295B332C00F57F30 /* VoiceRoomGifterCell.swift in Sources */,
-				DD220B8F295B332C00F57F30 /* AgoraRtm.m in Sources */,
 				DD220B9A295B332C00F57F30 /* VLPopMoreSelView.m in Sources */,
 				DD220B1A295B332C00F57F30 /* PresentationSegue.swift in Sources */,
 				DD220B60295B332C00F57F30 /* PopTip+Draw.swift in Sources */,

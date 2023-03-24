@@ -8,7 +8,6 @@
 #import <Foundation/Foundation.h>
 #import "KTVServiceModel.h"
 #import "VLRoomListModel.h"
-@import AgoraRtmKit;
 
 typedef enum : NSUInteger {
     KTVServiceNetworkStatusConnecting = 0,
