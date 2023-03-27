@@ -33,7 +33,9 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.agora.karaoke_view.v11.KaraokeEvent;
 import io.agora.karaoke_view.v11.KaraokeView;
@@ -45,6 +47,7 @@ import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.DownloadUtils;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.ZipUtils;
+import io.agora.scene.ktv.KTVLogger;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
@@ -91,7 +94,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         Singer, Listener, CoSinger
     }
 
-    private Role mRole = Role.Listener;
+    public Role mRole = Role.Listener;
     private OnKaraokeEventListener mOnKaraokeActionListener;
 
     public LrcControlView(@NonNull Context context) {
@@ -158,8 +161,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
             @Override
             public void onLineFinished(KaraokeView view, LyricsLineModel line, int score, int cumulativeScore, int index, int total) {
-                if (mOnKaraokeActionListener != null) {
+                if (mRole == Role.Singer && mOnKaraokeActionListener != null) {
                     mOnKaraokeActionListener.onLineFinished(line, score, cumulativeScore, index, total);
+                } else if (mRole == Role.CoSinger) {
+                    updateScore(score, cumulativeScore, /** Workaround(Hai_Guo)*/total * 100);
                 }
             }
         });
@@ -693,6 +698,12 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         lrcUrl = null;
         mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
         mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
+    }
+
+    public void onReceiveSingleLineScore(int score, int index, int cumulativeScore, int total) {
+        if (mRole == Role.Listener) {
+            updateScore(score, cumulativeScore, /** Workaround(Hai_Guo)*/total * 100);
+        }
     }
 
     public interface OnKaraokeEventListener {

@@ -166,10 +166,17 @@ class KTVSyncManagerServiceImp(
         }
     }
 
+    private var isJoined: Boolean = false
     override fun joinRoom(
         inputModel: JoinRoomInputModel,
         completion: (error: Exception?, out: JoinRoomOutputModel?) -> Unit
     ) {
+        if (isJoined) {
+            completion.invoke(RuntimeException("The room $currRoomNo has been joined!"), null)
+            return
+        }
+
+        currRoomNo = ""
         if (!TextUtils.isEmpty(currRoomNo) && currRoomNo != inputModel.roomNo) {
             completion.invoke(RuntimeException("The room $currRoomNo has been joined!"), null)
             return
@@ -232,6 +239,7 @@ class KTVSyncManagerServiceImp(
                                                 chorusToken,
                                                 cacheRoom.createdAt
                                             )
+                                            isJoined = true
                                             runOnMainThread {
                                                 completion.invoke(null, kTVJoinRoomOutputModel)
                                             }
@@ -283,8 +291,8 @@ class KTVSyncManagerServiceImp(
             // 移除房间
             mSceneReference?.delete(object : Callback {
                 override fun onSuccess() {
+                    resetCacheInfo(true)
                     runOnMainThread {
-                        resetCacheInfo(true)
                         completion.invoke(null)
                     }
                 }
@@ -343,6 +351,7 @@ class KTVSyncManagerServiceImp(
         }
         mSceneReference = null
         currRoomNo = ""
+        isJoined = false
     }
 
     override fun changeMVCover(

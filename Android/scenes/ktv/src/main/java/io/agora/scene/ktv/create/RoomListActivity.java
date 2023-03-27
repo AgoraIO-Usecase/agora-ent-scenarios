@@ -1,7 +1,10 @@
 package io.agora.scene.ktv.create;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -32,6 +35,7 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
     private BaseRecyclerViewAdapter<ItemRoomListBinding, RoomListModel, RoomHolder> mAdapter;
     private RoomCreateViewModel roomCreateViewModel;
     private InputPasswordDialog inputPasswordDialog;
+    private boolean isJoining = false;
 
     @Override
     protected ActivityRoomListBinding getViewBinding(@NonNull LayoutInflater inflater) {
@@ -65,7 +69,10 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
                     showInputPwdDialog(data);
                 } else {
                     // RoomManager.getInstance().setAgoraRoom(data);
-                    roomCreateViewModel.joinRoom(data.getRoomNo(), null);
+                    if (!isJoining) {
+                        isJoining = true;
+                        roomCreateViewModel.joinRoom(data.getRoomNo(), null);
+                    }
                 }
             }
         }, RoomHolder.class);
@@ -101,6 +108,7 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
             }
         });
         roomCreateViewModel.joinRoomResult.observe(this, ktvJoinRoomOutputModel -> {
+            isJoining = false;
             if (ktvJoinRoomOutputModel == null) {
                 setDarkStatusIcon(isBlackDarkStatus());
             } else {
