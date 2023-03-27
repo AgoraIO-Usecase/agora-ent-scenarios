@@ -321,9 +321,9 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
 //                })
 //            SAIMManager.shared?.userQuitRoom(completion: nil)
             
+            cancelMicSeatApply(chat_uid: VLUserCenter.user.id) { _, _ in }
+            _removeUser(roomId: self.roomId!) { error in }
             agoraPrint("imp leaveRoom leaveScene \(roomId)")
-            _removeUser(roomId: self.roomId!) { error in
-            }
             
             SyncUtil.leaveScene(id: self.roomId!)
         }
@@ -461,7 +461,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
     
     func leaveMic(mic_index: Int, completion: @escaping (Error?, SARoomMic?) -> Void) {
-        guard self.mics.count > mic_index else {return }
+        guard self.mics.count > mic_index else { return }
         let mic = SARoomMic()
         let oldMic = self.mics[mic_index]
         mic.mic_index = mic_index
