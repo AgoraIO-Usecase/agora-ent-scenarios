@@ -15,6 +15,8 @@ import io.agora.scene.ktv.service.JoinRoomInputModel;
 import io.agora.scene.ktv.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.service.KTVServiceProtocol;
 import io.agora.scene.ktv.service.RoomListModel;
+import io.reactivex.internal.observers.LambdaObserver;
+import kotlin.jvm.internal.Lambda;
 
 public class RoomCreateViewModel extends AndroidViewModel {
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();

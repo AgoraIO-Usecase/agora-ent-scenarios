@@ -158,6 +158,7 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
                 } else if (code.length() > 4) {
                     ToastUtils.showToast(getString(R.string.ktv_please_input_4_pwd));
                 } else {
+                    getBinding().btnCreate.setEnabled(false);
                     createRoom(code);
                 }
             }

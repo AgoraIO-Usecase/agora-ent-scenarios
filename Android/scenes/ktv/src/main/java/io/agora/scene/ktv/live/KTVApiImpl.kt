@@ -108,7 +108,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mPlayer = mMusicCenter.createMusicPlayer()
         mPlayer.adjustPublishSignalVolume(mpkPublishVolume)
         mPlayer.adjustPlayoutVolume(mpkPlayoutVolume)
-        mPlayer.setPlayerOption("play_pos_change_callback", 100)
 
         // 注册回调
         mRtcEngine.addHandler(this)
@@ -563,6 +562,14 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         sendStreamMessageWithJsonObject(jsonMsg) {}
     }
 
+    private fun sendSyncPitch(pitch: Double) {
+        val msg: MutableMap<String?, Any?> = java.util.HashMap()
+        msg["cmd"] = "setVoicePitch"
+        msg["pitch"] = pitch
+        val jsonMsg = JSONObject(msg)
+        sendStreamMessageWithJsonObject(jsonMsg) {}
+    }
+
     // 合唱
     private fun joinChorus2ndChannel(
         newRole: KTVSingRole,
@@ -679,7 +686,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 }
 
                 try {
-                    Thread.sleep(50)
+                    Thread.sleep(20)
                 } catch (exp: InterruptedException) {
                     break
                 }
@@ -768,7 +775,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val position = jsonMsg.getLong("time")
                 val duration = jsonMsg.getLong("duration")
                 val remoteNtp = jsonMsg.getLong("ntp")
-                val pitch = jsonMsg.getDouble("pitch")
                 val songCode = jsonMsg.getLong("songCode")
                 val mpkState = jsonMsg.getInt("playerState")
 
@@ -798,7 +804,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     } else {
                         mLastReceivedPlayPosTime = System.currentTimeMillis()
                         mReceivedPlayPosition = position
-                        this.pitch = pitch
                     }
 
                     if (Constants.MediaPlayerState.getStateByValue(mpkState) != mPlayer.state) {
@@ -817,11 +822,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     if (this.songCode == songCode) {
                         mLastReceivedPlayPosTime = System.currentTimeMillis()
                         mReceivedPlayPosition = position
-                        this.pitch = pitch
                     } else {
                         mLastReceivedPlayPosTime = null
                         mReceivedPlayPosition = 0
-                        this.pitch = 0.0
                     }
                 }
             } else if (jsonMsg.getString("cmd") == "Seek") {
@@ -856,6 +859,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 if (!isChorusCoSinger()) {
                     ktvApiEventHandlerList.forEach { it.onSingingScoreResult(score) }
                 }
+            } else if (jsonMsg.getString("cmd") == "setVoicePitch") {
+                val pitch = jsonMsg.getDouble("pitch")
+                if (this.singerRole == KTVSingRole.Audience) {
+                    this.pitch = pitch
+                }
             }
         } catch (exp: JSONException) {
             Log.e(TAG, "onStreamMessage:$exp")
@@ -877,6 +885,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         }
                 }
             }
+        }
+        if (this.singerRole == KTVSingRole.LeadSinger || this.singerRole == KTVSingRole.SoloSinger) {
+            sendSyncPitch(pitch)
         }
     }
 

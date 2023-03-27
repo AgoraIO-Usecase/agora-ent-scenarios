@@ -19,9 +19,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import io.agora.musiccontentcenter.Music;
@@ -59,6 +61,7 @@ import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.ktv.service.ScoringAlgoControlModel;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
+import io.agora.scene.ktv.widget.lrcView.LrcControlView;
 
 public class RoomLivingViewModel extends ViewModel {
 
@@ -90,6 +93,15 @@ public class RoomLivingViewModel extends ViewModel {
      */
     final MutableLiveData<List<RoomSelSongModel>> songsOrderedLiveData = new MutableLiveData<>();
     final MutableLiveData<RoomSelSongModel> songPlayingLiveData = new MutableLiveData<>();
+
+    class LineScore {
+        int score;
+        int index;
+        int cumulativeScore;
+        int total;
+    }
+
+    final MutableLiveData<LineScore> mainSingerScoreLiveData = new MutableLiveData<>();
 
     /**
      * Player/RTC信息
@@ -614,7 +626,7 @@ public class RoomLivingViewModel extends ViewModel {
         ktvServiceProtocol.getChoosedSongsList((e, data) -> {
             if (e == null && data != null) {
                 // success
-                KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() success");
+                KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() success");
                 songsOrderedLiveData.postValue(data);
 
                 if (data.size() > 0){
@@ -623,15 +635,15 @@ public class RoomLivingViewModel extends ViewModel {
 
                     if (value == null) {
                         // 无已点歌曲， 直接将列表第一个设置为当前播放歌曲
-                        KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() chosen song list is empty");
+                        KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() chosen song list is empty");
                         songPlayingLiveData.postValue(songPlaying);
                     } else if (!value.getSongNo().equals(songPlaying.getSongNo())) {
                         // 当前有已点歌曲, 且更新歌曲和之前歌曲非同一首
-                        KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() single or first chorus");
+                        KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() single or first chorus");
                         songPlayingLiveData.postValue(songPlaying);
                     }
                 } else {
-                    KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() return is emptyList");
+                    KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() return is emptyList");
                     songPlayingLiveData.postValue(null);
                 }
 
@@ -1068,6 +1080,31 @@ public class RoomLivingViewModel extends ViewModel {
                     ToastUtils.showToast(R.string.ktv_content);
                 }
             }
+
+            @Override
+            public void onStreamMessage(int uid, int streamId, byte[] data) {
+                JSONObject jsonMsg;
+                try {
+                    String strMsg = new String(data);
+                    jsonMsg = new JSONObject(strMsg);
+                    if (jsonMsg.getString("cmd").equals("singleLineScore")) {
+                        KTVLogger.d("HUGO", strMsg);
+                        int score = jsonMsg.getInt("score");
+                        int index = jsonMsg.getInt("index");
+                        int cumulativeScore = jsonMsg.getInt("cumulativeScore");
+                        int total = jsonMsg.getInt("total");
+
+                        LineScore lineScore = new LineScore();
+                        lineScore.score = score;
+                        lineScore.index = index;
+                        lineScore.cumulativeScore = cumulativeScore;
+                        lineScore.total = total;
+                        mainSingerScoreLiveData.postValue(lineScore);
+                    }
+                } catch (JSONException exp) {
+                    KTVLogger.e(TAG, "onStreamMessage:" + exp.toString());
+                }
+            }
         };
         config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING;
         config.mAudioScenario = Constants.AUDIO_SCENARIO_CHORUS;
@@ -1209,6 +1246,7 @@ public class RoomLivingViewModel extends ViewModel {
             }
         });
 
+        // 外部使用的StreamId
         if (streamId == 0) {
             DataStreamConfig cfg = new DataStreamConfig();
             cfg.syncWithAudio = false;
@@ -1216,12 +1254,18 @@ public class RoomLivingViewModel extends ViewModel {
             streamId = mRtcEngine.createDataStream(cfg);
         }
 
+        // 内部使用的StreamId
+        DataStreamConfig innerCfg = new DataStreamConfig();
+        innerCfg.syncWithAudio = false;
+        innerCfg.ordered = false;
+
+        // 场景化api初始化
         ktvApiProtocol.initialize(new KTVApiConfig(
                 BuildConfig.AGORA_APP_ID,
                 roomInfoLiveData.getValue().getAgoraRTMToken(),
                 mRtcEngine,
                 roomInfoLiveData.getValue().getRoomNo(),
-                streamId,
+                mRtcEngine.createDataStream(innerCfg),
                 UserManager.getInstance().getUser().id.intValue(),
                 roomInfoLiveData.getValue().getRoomNo() + "_ex",
                 roomInfoLiveData.getValue().getAgoraChorusToken())
@@ -1494,26 +1538,6 @@ public class RoomLivingViewModel extends ViewModel {
         KTVLogger.d(TAG, "RoomLivingViewModel.musicStop() called");
         // 列表中无歌曲， 还原状态
         resetMusicStatus();
-//        if (mRtcEngine == null) {
-//            return;
-//        }
-//        if (isOnSeat) {
-//            mainChannelMediaOption.publishMicrophoneTrack = true;
-//            mainChannelMediaOption.publishCameraTrack = isCameraOpened;
-//            mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
-//            mainChannelMediaOption.autoSubscribeVideo = true;
-//            mainChannelMediaOption.autoSubscribeAudio = true;
-//            mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
-//            mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
-//        } else {
-//            mainChannelMediaOption.publishCameraTrack = false;
-//            mainChannelMediaOption.publishMicrophoneTrack = false;
-//            mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
-//            mainChannelMediaOption.autoSubscribeVideo = true;
-//            mainChannelMediaOption.autoSubscribeAudio = true;
-//            mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
-//            mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
-//        }
     }
 
     public void onStart() {
@@ -1525,6 +1549,22 @@ public class RoomLivingViewModel extends ViewModel {
     public void onStop() {
         if (isBackPlay) {
             ktvApiProtocol.getMediaPlayer().mute(true);
+        }
+    }
+
+    // ------------------ 歌词组件相关 ------------------
+    public void syncSingleLineScore(int score, int cumulativeScore, int index, int total) {
+        if (mRtcEngine == null) return;
+        Map<String, Object> msg = new HashMap<>();
+        msg.put("cmd", "singleLineScore");
+        msg.put("score", score);
+        msg.put("index", index);
+        msg.put("cumulativeScore", cumulativeScore);
+        msg.put("total", total);
+        JSONObject jsonMsg = new JSONObject(msg);
+        int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
+        if (ret < 0) {
+            KTVLogger.e(TAG, "syncSingleLineScore() sendStreamMessage called returned: " + ret);
         }
     }
 }
