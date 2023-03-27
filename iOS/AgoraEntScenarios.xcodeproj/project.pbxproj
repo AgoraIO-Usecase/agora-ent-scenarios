@@ -310,7 +310,6 @@
 		E75B151E296FE59100C33678 /* VideoProcessingManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B150C296FE59100C33678 /* VideoProcessingManager.m */; };
 		E75B151F296FE59100C33678 /* EffectsAnimal.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B150E296FE59100C33678 /* EffectsAnimal.m */; };
 		E75B1520296FE59100C33678 /* EFMotionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B1511296FE59100C33678 /* EFMotionManager.m */; };
-		E75B1521296FE59100C33678 /* SENSEME.lic in Resources */ = {isa = PBXBuildFile; fileRef = E75B1512296FE59100C33678 /* SENSEME.lic */; };
 		E75B1522296FE59100C33678 /* EffectsLicense.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B1513296FE59100C33678 /* EffectsLicense.m */; };
 		E75B1523296FE59100C33678 /* EffectsDetector.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B1515296FE59100C33678 /* EffectsDetector.m */; };
 		E75B1524296FE59100C33678 /* Effects.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B1517296FE59100C33678 /* Effects.m */; };
@@ -749,7 +748,6 @@
 		E75B150F296FE59100C33678 /* EffectsCommonObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsCommonObject.h; sourceTree = "<group>"; };
 		E75B1510296FE59100C33678 /* EffectsAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsAttribute.h; sourceTree = "<group>"; };
 		E75B1511296FE59100C33678 /* EFMotionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EFMotionManager.m; sourceTree = "<group>"; };
-		E75B1512296FE59100C33678 /* SENSEME.lic */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SENSEME.lic; sourceTree = "<group>"; };
 		E75B1513296FE59100C33678 /* EffectsLicense.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EffectsLicense.m; sourceTree = "<group>"; };
 		E75B1514296FE59100C33678 /* Effects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Effects.h; sourceTree = "<group>"; };
 		E75B1515296FE59100C33678 /* EffectsDetector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EffectsDetector.m; sourceTree = "<group>"; };
@@ -2060,7 +2058,6 @@
 			isa = PBXGroup;
 			children = (
 				E75B1529297007C500C33678 /* EffectMacro.h */,
-				E75B1512296FE59100C33678 /* SENSEME.lic */,
 				E75B1514296FE59100C33678 /* Effects.h */,
 				E75B1517296FE59100C33678 /* Effects.m */,
 				E75B150A296FE59100C33678 /* EffectsAnimal.h */,
@@ -2212,7 +2209,6 @@
 				DD84176C29090C520026B624 /* ic_game.png in Resources */,
 				DD84176E29090C520026B624 /* tab_discover.png in Resources */,
 				DD84177A29090C520026B624 /* product.js in Resources */,
-				E75B1521296FE59100C33678 /* SENSEME.lic in Resources */,
 				DD84177629090C520026B624 /* product4.png in Resources */,
 				DD84177129090C520026B624 /* ic_play.png in Resources */,
 				DD84177529090C520026B624 /* product1.png in Resources */,
