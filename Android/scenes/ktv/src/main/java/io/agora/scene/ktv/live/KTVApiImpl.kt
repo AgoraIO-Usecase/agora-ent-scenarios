@@ -770,13 +770,15 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         try {
             val strMsg = String(messageData)
             jsonMsg = JSONObject(strMsg)
-            Log.d(TAG, "onStreamMessage: $strMsg")
+            //Log.d(TAG, "onStreamMessage: $strMsg")
             if (jsonMsg.getString("cmd") == "setLrcTime") { //同步歌词
                 val position = jsonMsg.getLong("time")
+                val realPosition = jsonMsg.getLong("realTime")
                 val duration = jsonMsg.getLong("duration")
                 val remoteNtp = jsonMsg.getLong("ntp")
                 val songCode = jsonMsg.getLong("songCode")
                 val mpkState = jsonMsg.getInt("playerState")
+                Log.d(TAG, "onStreamMessage: $realPosition")
 
                 if (isChorusCoSinger()) {
                     // 本地BGM校准逻辑
@@ -803,7 +805,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         }
                     } else {
                         mLastReceivedPlayPosTime = System.currentTimeMillis()
-                        mReceivedPlayPosition = position
+                        mReceivedPlayPosition = realPosition
                     }
 
                     if (Constants.MediaPlayerState.getStateByValue(mpkState) != mPlayer.state) {
@@ -821,7 +823,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     // 独唱观众
                     if (this.songCode == songCode) {
                         mLastReceivedPlayPosTime = System.currentTimeMillis()
-                        mReceivedPlayPosition = position
+                        mReceivedPlayPosition = realPosition
                     } else {
                         mLastReceivedPlayPosTime = null
                         mReceivedPlayPosition = 0
@@ -1011,6 +1013,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             msg["duration"] = duration
             msg["time"] =
                 position_ms - audioPlayoutDelay // "position-audioDeviceDelay" 是计算出当前播放的真实进度
+            msg["realTime"] = position_ms
             msg["playerState"] = Constants.MediaPlayerState.getValue(mPlayer.state)
             msg["pitch"] = pitch
             msg["songCode"] = songCode
