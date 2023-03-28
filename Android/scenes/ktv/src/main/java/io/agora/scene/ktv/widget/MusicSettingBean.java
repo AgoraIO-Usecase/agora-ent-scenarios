@@ -10,7 +10,7 @@ public class MusicSettingBean {
     private int toneValue;
     private int audioEffectParams1 = 0;
     private int audioEffectParams2 = 0;
-    private int remoteVolume = 15;
+    private int remoteVolume = 40;
 
 
     public MusicSettingBean(boolean isEar, int volMic, int volMusic, int toneValue, MusicSettingDialog.Callback mCallback) {
