@@ -14,7 +14,7 @@
 
 ## 2. 运行示例
 
-- 获取声网App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
+- 获取声网 App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
   
   > - 点击创建应用
   >
@@ -28,13 +28,13 @@
   >
   >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
 
-- 获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
+- 获取 App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
 - <mark>联系销售给 AppID 开通 K 歌权限</mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员[Agora 支持](https://agora-ticket.agora.io/))
 
   - 注: 拉取榜单、歌单、歌词等功能是需要开通权限的
 
-- 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 App证书
+- 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 App 证书
 
   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/config_app_id_android.png)
 
@@ -51,7 +51,7 @@
 
 ### 3.1 概述
 
-> **在线K歌房**项目是声网在线K歌房场景的开源代码，开发者可以获取并添加到您的APP工程里，本源码会伴随声动互娱Demo同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
+> **在线K歌房**项目是声网在线K歌房场景的开源代码，开发者可以获取并添加到您的APP工程里，本源码会伴随声动互娱 Demo 同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
 
 ### 3.2 项目文件结构简介
 
@@ -97,7 +97,7 @@
 
 > 在线K歌房场景目前已涵盖以下功能，您可以参考注释按需从代码中调用
 >
-> 场景功能代码根目录**Android/scenes/ktv**
+> 场景功能代码根目录 **Android/scenes/ktv**
 >
 > ---
 >
@@ -245,7 +245,7 @@
 >
 > * 与歌词组件配合使用
 >
->   支持您传入您自定义的歌词组件与KTVApi模块配合使用, 您需要让您的歌词组件继承**ILrcView**类并实现以下三个接口, KTVApi模块回通过下列三个回调将演唱pitch、歌曲播放进度、歌词url发送给您的歌词组件
+>   支持您传入您自定义的歌词组件与 KTVApi 模块配合使用, 您需要让您的歌词组件继承 **ILrcView** 类并实现以下三个接口, KTVApi 模块回通过下列三个回调将演唱 pitch、歌曲播放进度、歌词url 发送给您的歌词组件
 >
 >   ~~~kotlin
 >   interface ILrcView {
@@ -324,9 +324,9 @@
 
 ## 4. FAQ
 
-### 如何获取声网和环信APPID
+### 如何获取声网和环信 APPID
 
-> - 声网APPID申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
+> - 声网 APPID 申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
 
 ### 程序运行后，歌曲列表为空
 
