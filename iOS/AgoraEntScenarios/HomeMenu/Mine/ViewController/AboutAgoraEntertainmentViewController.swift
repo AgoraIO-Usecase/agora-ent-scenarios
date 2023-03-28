@@ -48,7 +48,6 @@ import AgoraRtcKit
         debugModeButton.isHidden = !AppContext.shared.isDebugMode
         self.view.addSubview(debugModeButton)
         self.createConstrains()
-        
     }
     
     private func createConstrains() {

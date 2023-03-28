@@ -91,9 +91,14 @@ extension VoiceRoomViewController {
                         if $0 == 31 {
                             let count = (index - 1000) / 10
                             let tag = (index - 1000) % 10
-                            self?.activeAlien(true)
+                            self?.rtckit.stopPlaySound()
+                            let mic_info = self?.roomInfo?.mic_info![6]
+                            mic_info?.status = 5
                             self?.roomInfo?.room?.use_robot = true
+                            self?.roomInfo?.mic_info![6] = mic_info!
+                            self?.rtcView.updateAlien(mic_info?.status ?? 5)
                             self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
+                            self?.rtcView.updateAlienMic(.blue)
                         }
                         vc.dismiss(animated: true)
                     }
@@ -101,10 +106,10 @@ extension VoiceRoomViewController {
                     return
                 }
             }
-            let count = (index - 1000) / 10
-            let tag = (index - 1000) % 10
-            self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
-            self?.rtcView.updateAlienMic(.blue)
+//            let count = (index - 1000) / 10
+//            let tag = (index - 1000) % 10
+//            self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
+//            self?.rtcView.updateAlienMic(.blue)
         }
         audioSetVC.visitBlock = { [weak self] in
             let VC: VoiceRoomHelpViewController = .init()
