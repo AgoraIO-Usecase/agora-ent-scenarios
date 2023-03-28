@@ -51,9 +51,9 @@ struct KeyCenter {
 //    static var Token: String? = nil
     
     
-    static var IMAppKey: String? = "81399972#1019272"
-    static var IMClientId: String? = "YXA6tczxcixPTCqT1sN1hSBU1g"
-    static var IMClientSecret: String? = "YXA6-wvmWSubEWga1En1YdxdrL1ktKY"
+    static var IMAppKey: String? = <#Your IM App Key#>
+    static var IMClientId: String? = <#Your IM Client Id#>
+    static var IMClientSecret: String? = <#Your IM Client Secret#>
     
     static var HostUrl: String = "https://gateway-fulldemo.agoralab.co"
     
