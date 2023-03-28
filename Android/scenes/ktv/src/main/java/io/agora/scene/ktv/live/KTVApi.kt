@@ -301,7 +301,6 @@ interface KTVApi {
     /**
      * 异步切换演唱身份，结果会通过回调通知业务层
      * @param newRole 新演唱身份
-     * @param token // TODO 是否有更好方式，且协议支持外部自定义
      * @param onSwitchRoleState 切换演唱身份结果
      *
      * 允许的调用路径：
