@@ -395,8 +395,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func leaveMic(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
+        guard let oldMic = self.mics[safe: mic_index] else {
+            return
+        }
         let mic = VRRoomMic()
-        let oldMic = self.mics[mic_index]
         mic.mic_index = mic_index
         mic.status = oldMic.status == 2 ? 2:-1
         self.cleanUserMicIndex(mic: self.mics[mic_index])

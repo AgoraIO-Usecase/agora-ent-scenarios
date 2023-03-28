@@ -166,13 +166,8 @@ extension VRRoomsViewController {
 
         normal.didSelected = { [weak self] room in
             Throttler.throttle(delay: .seconds(1)) {
-                AgoraEntAuthorizedManager.requestAudioSession { granted in
-                    guard let self = self else {return}
-                    guard granted else {
-                        AgoraEntAuthorizedManager.showAudioAuthorizedFail(parent: self)
-                        return
-                    }
-                    self.entryRoom(room: room)
+                DispatchQueue.main.async {
+                    self?.entryRoom(room: room)
                 }
             }
         }

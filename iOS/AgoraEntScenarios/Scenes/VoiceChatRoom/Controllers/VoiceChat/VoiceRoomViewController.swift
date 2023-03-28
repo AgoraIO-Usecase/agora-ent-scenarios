@@ -23,6 +23,7 @@ let giftMap = [["gift_id": "VoiceRoomGift1", "gift_name": LanguageManager.localV
 fileprivate let ownerMic = ["index":0,"status":0,"member":["uid":VoiceRoomUserInfo.shared.user?.uid ?? "","chat_uid":VoiceRoomUserInfo.shared.user?.chat_uid ?? "","name":VoiceRoomUserInfo.shared.user?.name ?? "","portrait":VoiceRoomUserInfo.shared.user?.portrait ?? "","rtc_uid":VoiceRoomUserInfo.shared.user?.rtc_uid ?? "","mic_index":0]] as [String : Any]
 
 class VoiceRoomViewController: VRBaseViewController {
+    private var isEnterSeatFirst: Bool = false
     lazy var toastPoint: CGPoint = .init(x: self.view.center.x, y: self.view.center.y + 70)
 
     override public var preferredStatusBarStyle: UIStatusBarStyle {
@@ -121,6 +122,10 @@ extension VoiceRoomViewController {
         let rtcUid = VLUserCenter.user.id
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
+        
+        if isOwner {
+            checkEnterSeatAudioAuthorized()
+        }
 
         var rtcJoinSuccess = false
         var IMJoinSuccess = false
@@ -635,5 +640,23 @@ extension VoiceRoomViewController: VMManagerDelegate {
                 }
             }
         }
+    }
+}
+
+
+extension VoiceRoomViewController {
+    func checkEnterSeatAudioAuthorized() {
+        //trigger once
+        if isEnterSeatFirst {
+            return
+        }
+        
+        isEnterSeatFirst = true
+        
+        checkAudioAuthorized()
+    }
+    
+    func checkAudioAuthorized() {
+        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
     }
 }

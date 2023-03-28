@@ -247,6 +247,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                         local_index = mic_index
                         if !isOwner {
                             self.rtckit.setClientRole(role: status == 0 ? .owner : .audience)
+                            self.checkEnterSeatAudioAuthorized()
                         }
                         //如果当前是0的状态  就设置成主播
                         self.rtckit.muteLocalAudioStream(mute: status != 0)

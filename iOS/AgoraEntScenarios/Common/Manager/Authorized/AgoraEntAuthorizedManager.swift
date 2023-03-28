@@ -18,6 +18,20 @@ open class AgoraEntAuthorizedManager: NSObject {
         showAuthorizedFail(parent: parent, message: "摄像头权限未设置,请设置摄像头权限")
     }
     
+    @objc class func checkAudioAuthorized(parent: UIViewController) {
+        requestAudioSession { granted in
+            if granted {return}
+            showAudioAuthorizedFail(parent: parent)
+        }
+    }
+    
+    @objc class func checkCameraAuthorized(parent: UIViewController) {
+        requestCapture { granted in
+            if granted {return}
+            showCameraAuthorizedFail(parent: parent)
+        }
+    }
+    
     @objc class func showAuthorizedFail(parent: UIViewController, message: String) {
         let vc = UIAlertController(title: "提示".toSceneLocalization() as String,
                                    message: message,
