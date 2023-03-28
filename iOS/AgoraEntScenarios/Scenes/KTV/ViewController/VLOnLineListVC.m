@@ -159,31 +159,24 @@
         return;
     }
     
-    [AgoraEntAuthorizedManager requestAudioSessionWithCompletion:^(BOOL granted) {
-        if (!granted) {
-            [AgoraEntAuthorizedManager showAudioAuthorizedFailWithParent:self];
+    KTVJoinRoomInputModel* inputModel = [KTVJoinRoomInputModel new];
+    inputModel.roomNo = listModel.roomNo;
+//    inputModel.userNo = VLUserCenter.user.userNo;
+    inputModel.password = inputText;
+
+    VL(weakSelf);
+    [[AppContext ktvServiceImp] joinRoomWithInput:inputModel
+                                       completion:^(NSError * error, KTVJoinRoomOutputModel * outputModel) {
+        if (error != nil) {
+            [VLToast toast:error.description];
             return;
         }
         
-        KTVJoinRoomInputModel* inputModel = [KTVJoinRoomInputModel new];
-        inputModel.roomNo = listModel.roomNo;
-    //    inputModel.userNo = VLUserCenter.user.userNo;
-        inputModel.password = inputText;
-
-        VL(weakSelf);
-        [[AppContext ktvServiceImp] joinRoomWithInput:inputModel
-                                           completion:^(NSError * error, KTVJoinRoomOutputModel * outputModel) {
-            if (error != nil) {
-                [VLToast toast:error.description];
-                return;
-            }
-            
-            listModel.creator = outputModel.creator;
-            VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
-            ktvVC.roomModel = listModel;
-            ktvVC.seatsArray = outputModel.seatsArray;
-            [weakSelf.navigationController pushViewController:ktvVC animated:YES];
-        }];
+        listModel.creator = outputModel.creator;
+        VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
+        ktvVC.roomModel = listModel;
+        ktvVC.seatsArray = outputModel.seatsArray;
+        [weakSelf.navigationController pushViewController:ktvVC animated:YES];
     }];
 }
 

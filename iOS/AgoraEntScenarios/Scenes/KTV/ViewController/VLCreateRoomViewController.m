@@ -62,41 +62,34 @@
         return;
     }
     
-    [AgoraEntAuthorizedManager requestAudioSessionWithCompletion:^(BOOL granted) {
-        if (!granted) {
-            [AgoraEntAuthorizedManager showAudioAuthorizedFailWithParent:self];
+    KTVCreateRoomInputModel* intputModel = [KTVCreateRoomInputModel new];
+    intputModel.belCanto = @"0";
+    intputModel.icon = [NSString stringWithFormat:@"%@",roomModel.icon];
+    intputModel.isPrivate = roomModel.isPrivate ? @(1) : @(0);
+    intputModel.name = [NSString stringWithFormat:@"%@",roomModel.name];
+    intputModel.password = roomModel.password.length > 0 ? [NSString stringWithFormat:@"%@",roomModel.password] : @"";
+    intputModel.soundEffect = @"0";
+//    intputModel.userNo = VLUserCenter.user.userNo;
+    VL(weakSelf);
+    self.view.userInteractionEnabled = NO;
+    [[AppContext ktvServiceImp] createRoomWithInput:intputModel
+                                         completion:^(NSError * error, KTVCreateRoomOutputModel * outputModel) {
+        weakSelf.view.userInteractionEnabled = YES;
+        if (error != nil) {
+            [VLToast toast:error.description];
             return;
         }
         
-        KTVCreateRoomInputModel* intputModel = [KTVCreateRoomInputModel new];
-        intputModel.belCanto = @"0";
-        intputModel.icon = [NSString stringWithFormat:@"%@",roomModel.icon];
-        intputModel.isPrivate = roomModel.isPrivate ? @(1) : @(0);
-        intputModel.name = [NSString stringWithFormat:@"%@",roomModel.name];
-        intputModel.password = roomModel.password.length > 0 ? [NSString stringWithFormat:@"%@",roomModel.password] : @"";
-        intputModel.soundEffect = @"0";
-    //    intputModel.userNo = VLUserCenter.user.userNo;
-        VL(weakSelf);
-        self.view.userInteractionEnabled = NO;
-        [[AppContext ktvServiceImp] createRoomWithInput:intputModel
-                                             completion:^(NSError * error, KTVCreateRoomOutputModel * outputModel) {
-            weakSelf.view.userInteractionEnabled = YES;
-            if (error != nil) {
-                [VLToast toast:error.description];
-                return;
-            }
-            
-            //处理座位信息
-            VLRoomListModel *listModel = [[VLRoomListModel alloc]init];
-            listModel.roomNo = outputModel.roomNo;
-            listModel.name = outputModel.name;
-            listModel.bgOption = 0;
-            listModel.creatorNo = VLUserCenter.user.userNo;
-            VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
-            ktvVC.roomModel = listModel;
-            ktvVC.seatsArray = outputModel.seatsArray;
-            [weakSelf.navigationController pushViewController:ktvVC animated:YES];
-        }];
+        //处理座位信息
+        VLRoomListModel *listModel = [[VLRoomListModel alloc]init];
+        listModel.roomNo = outputModel.roomNo;
+        listModel.name = outputModel.name;
+        listModel.bgOption = 0;
+        listModel.creatorNo = VLUserCenter.user.userNo;
+        VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
+        ktvVC.roomModel = listModel;
+        ktvVC.seatsArray = outputModel.seatsArray;
+        [weakSelf.navigationController pushViewController:ktvVC animated:YES];
     }];
 }
 

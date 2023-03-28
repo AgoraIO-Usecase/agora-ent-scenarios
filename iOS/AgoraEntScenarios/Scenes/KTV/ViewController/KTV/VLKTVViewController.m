@@ -183,39 +183,6 @@ VLPopScoreViewDelegate
         //请求歌词和歌曲
         [weakSelf loadAndPlaySong];
     }];
-    
-    
-    //check camera status
-    VLRoomSeatModel* currentSeat = [self getCurrentUserSeatInfo];
-    if (currentSeat && currentSeat.isVideoMuted == 0) {
-        [AgoraEntAuthorizedManager requestCaptureWithCompletion:^(BOOL granted) {
-            if (granted) {
-                return;
-            }
-            
-            [AgoraEntAuthorizedManager showCameraAuthorizedFailWithParent:self];
-            //TODO: set isNowMicMuted by subscribe msg
-            self.isNowCameraMuted = YES;
-            [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:YES completion:^(NSError * err) {
-            }];
-        }];
-    }
-    
-    
-    //check authorized if non room owner after join room
-//    if (!self.isOnMicSeat) {
-//        return;
-//    }
-//    
-//    [AgoraEntAuthorizedManager requestAudioSessionWithCompletion:^(BOOL granted) {
-//        if (granted) {
-//            return;
-//        }
-//        
-//        [AgoraEntAuthorizedManager showAudioAuthorizedFailWithParent:self];
-//        [self _leaveSeatWithSeatModel:[self getCurrentUserSeatInfo] withCompletion:^(NSError * err) {
-//        }];
-//    }];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -917,18 +884,10 @@ connectionChangedToState:(AgoraConnectionState)state
 }
 
 - (void)enterSeatWithIndex:(NSInteger)index {
-    [AgoraEntAuthorizedManager requestAudioSessionWithCompletion:^(BOOL granted) {
-        if (!granted) {
-            [AgoraEntAuthorizedManager showAudioAuthorizedFailWithParent:self];
-            return;
-        }
-        
-        KTVOnSeatInputModel* inputModel = [KTVOnSeatInputModel new];
-        inputModel.seatIndex = index;
-    //    VL(weakSelf);
-        [[AppContext ktvServiceImp] enterSeatWithInput:inputModel
-                                            completion:^(NSError * error) {
-        }];
+    KTVOnSeatInputModel* inputModel = [KTVOnSeatInputModel new];
+    inputModel.seatIndex = index;
+    [[AppContext ktvServiceImp] enterSeatWithInput:inputModel
+                                        completion:^(NSError * error) {
     }];
 }
 
@@ -1040,10 +999,31 @@ connectionChangedToState:(AgoraConnectionState)state
     [self.RTCkit enableVideo];
     [self.RTCkit enableAudio];
     
-    VLRoomSeatModel* myseat = [self.seatsArray objectAtIndex:0];
-    
-    self.isNowMicMuted = myseat.isAudioMuted;
-    self.isNowCameraMuted = myseat.isVideoMuted;
+    VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
+    if (info) {
+        if (!info.isAudioMuted) {
+            [AgoraEntAuthorizedManager requestAudioSessionWithCompletion:^(BOOL granted) {
+                if (!granted) {
+                    [AgoraEntAuthorizedManager showAudioAuthorizedFailWithParent:self];
+                    return;
+                }
+            }];
+        }
+        
+        if (!info.isVideoMuted) {
+            [AgoraEntAuthorizedManager requestCaptureWithCompletion:^(BOOL granted) {
+                if (!granted) {
+                    [AgoraEntAuthorizedManager showCameraAuthorizedFailWithParent:self];
+                    return;
+                }
+            }];
+        }
+        self.isNowMicMuted = info.isAudioMuted;
+        self.isNowCameraMuted = info.isVideoMuted;
+    } else {
+        self.isNowMicMuted = YES;
+        self.isNowCameraMuted = YES;
+    }
     
     AgoraVideoEncoderConfiguration *encoderConfiguration =
     [[AgoraVideoEncoderConfiguration alloc] initWithSize:CGSizeMake(100, 100)
@@ -1164,21 +1144,31 @@ connectionChangedToState:(AgoraConnectionState)state
             [self popUpChooseSongView:NO];
             break;
         case VLKTVBottomBtnClickTypeAudio:
+            if (self.isNowMicMuted) {
+                [AgoraEntAuthorizedManager requestAudioSessionWithCompletion:^(BOOL granted) {
+                    if (!granted) {
+                        [AgoraEntAuthorizedManager showAudioAuthorizedFailWithParent:self];
+                        return;
+                    }
+                }];
+            }
             self.isNowMicMuted = !self.isNowMicMuted;
             [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
                                                                 completion:^(NSError * error) {
             }];
             break;
         case VLKTVBottomBtnClickTypeVideo: {
-            [AgoraEntAuthorizedManager requestCaptureWithCompletion:^(BOOL granted) {
-                if (!granted) {
-                    [AgoraEntAuthorizedManager showCameraAuthorizedFailWithParent:self];
-                    return;
-                }
-                self.isNowCameraMuted = !self.isNowCameraMuted;
-                [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:self.isNowCameraMuted
-                                                                    completion:^(NSError * error) {
+            if (self.isNowCameraMuted) {
+                [AgoraEntAuthorizedManager requestCaptureWithCompletion:^(BOOL granted) {
+                    if (!granted) {
+                        [AgoraEntAuthorizedManager showCameraAuthorizedFailWithParent:self];
+                        return;
+                    }
                 }];
+            }
+            self.isNowCameraMuted = !self.isNowCameraMuted;
+            [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:self.isNowCameraMuted
+                                                                completion:^(NSError * error) {
             }];
         } break;
         default:
@@ -1791,12 +1781,6 @@ connectionChangedToState:(AgoraConnectionState)state
 
 - (void)setSeatsArray:(NSArray<VLRoomSeatModel *> *)seatsArray {
     _seatsArray = seatsArray;
-    
-    //检查当前用户上麦情况和权限授予情况，例如上麦用户，但是没有麦克风权限，需要提示
-//    if ([AgoraEntAuthorizedManager get]) {
-//
-//    }
-    
     //update booleans
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     
@@ -1818,8 +1802,13 @@ connectionChangedToState:(AgoraConnectionState)state
     
     
     VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
-    self.isNowMicMuted = info.isAudioMuted;
-    self.isNowCameraMuted = info.isVideoMuted;
+    if (info) {
+        self.isNowMicMuted = info.isAudioMuted;
+        self.isNowCameraMuted = info.isVideoMuted;
+    } else {
+        self.isNowMicMuted = YES;
+        self.isNowCameraMuted = YES;
+    }
     
     self.bottomView.hidden = !_isOnMicSeat;
     self.requestOnLineView.hidden = !self.bottomView.hidden;
