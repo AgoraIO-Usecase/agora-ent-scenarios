@@ -112,8 +112,7 @@ echo "IM_APP_CLIENT_SECRET_RELEASE=\"${IM_CLIENT_SECRET}\"\n" >> $voicePropFile
 cat $voicePropFile
 
 # download hw-audio.jar and copy to libs
-curl -o ~/${WORKSPACE}/hw-audiokit.jar https://download.agora.io/demo/test/hw-audiokit.jar
-cp hw-audiokit.jar app/libs
+curl -o app/libs/hw-audiokit.jar https://download.agora.io/demo/test/hw-audiokit.jar
 
 # Compile apk
 ./gradlew clean || exit 1
