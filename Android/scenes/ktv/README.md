@@ -53,7 +53,47 @@
 
 > **在线K歌房**项目是声网在线K歌房场景的开源代码，开发者可以获取并添加到您的APP工程里，本源码会伴随声动互娱Demo同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
 
-### 3.2 功能介绍
+### 3.2 项目文件结构简介
+
+```kotlin
+├── scene
+│   ├── ktv
+│   │   └── main
+│   │       ├── java
+│   │       │   └── io.agora.scene.ktv
+│   │       │					    					├── bean           #数据类
+│   │       │   										├── create         #房间列表模块
+│   │       │   										├── debugSettings  #debug页面模块
+│   │       │   										├── live           #房间内业务逻辑模块
+│   │       │					    					├── service        #网络模块
+│   │       │   										├── widget         #UI模块
+│   │       │   										└── KTVLogger.kt   #Log模块
+│   │       ├── res
+│   │       │   ├── drawable
+│   │       │   ├── layout
+│   │       │   ├── mipmap
+│   │       │   └── values
+│   │       └── AndroidManifest.xml
+│   │   
+│   ├── build.gradle
+│   ├── build
+│   └── gradle
+│       └── wrapper
+│           ├── gradle-wrapper.jar
+│           └── gradle-wrapper.properties
+├── build.gradle     
+├── config.gradle       #共用的依赖配置
+├── gradle
+│   └── wrapper
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── gradlew
+├── gradlew.bat
+├── gradle.properties  #项目的基础账号配置(appid、app证书)
+└── settings.gradle
+```
+
+### 3.3 功能介绍
 
 > 在线K歌房场景目前已涵盖以下功能，您可以参考注释按需从代码中调用
 >
@@ -63,7 +103,9 @@
 >
 > #### K歌房场景化API
 >
-> K歌房场景化API是一个帮助您快速集成声网K歌房能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过[**KTVApi**](src/main/java/io/agora/scene/ktv/live/KTVApi.kt)来定义协议，通过[**KTVApiImp**](src/main/java/io/agora/scene/ktv/live/KTVApiImp.kt)来实现
+> ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/KTVSamplePicture5.png)
+>
+> K歌房场景化API是一个帮助您快速集成声网K歌房能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过[**KTVApi**](src/main/java/io/agora/scene/ktv/live/KTVApi.kt)来定义协议，通过[**KTVApiImp**](src/main/java/io/agora/scene/ktv/live/KTVApiImp.kt)来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
 >
 > * 拉取歌单
 >
@@ -234,9 +276,11 @@
 >
 >   
 >
-> #### 相关网络请求交互
+> #### 业务服务器交互模块
 >
-> 房间内消息管理包括对房间内的基本交互请求和响应，例如用户的变化、麦位的变化、已点歌曲列表的变化，通过[**KTVServiceProtocol**](src/main/java/io/agora/scene/ktv/service/KTVServiceProtocol.kt)来定义协议，通过[**KTVSyncManagerServiceImp**](src/main/java/io/agora/scene/ktv/service/KTVSyncManagerServiceImp.kt)来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
+> ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/KTVSamplePicture6.png)
+>
+> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过[**KTVServiceProtocol**](src/main/java/io/agora/scene/ktv/service/KTVServiceProtocol.kt)来定义协议，通过[**KTVSyncManagerServiceImp**](src/main/java/io/agora/scene/ktv/service/KTVSyncManagerServiceImp.kt)来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
 >
 > - 房间管理
 >
