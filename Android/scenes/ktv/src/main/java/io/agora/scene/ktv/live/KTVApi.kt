@@ -6,7 +6,6 @@ import io.agora.musiccontentcenter.IAgoraMusicContentCenter
 import io.agora.musiccontentcenter.Music
 import io.agora.musiccontentcenter.MusicChartInfo
 import io.agora.rtc2.RtcEngine
-import io.agora.scene.ktv.live.RoomLivingViewModel.JoinChorusStatus
 
 /**
  * 在KTVApi中的身份
