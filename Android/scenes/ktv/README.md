@@ -15,18 +15,18 @@
 ## 2. 运行示例
 
 - 获取声网App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
-
+  
   > - 点击创建应用
-      >
-      >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_1.jpg)
+  >
+  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_1.jpg)
   >
   > - 选择你要创建的应用类型
-      >
-      >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
+  >
+  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
   >
   > - 得到App ID与App 证书
-      >
-      >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
+  >
+  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
 
 - 获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
@@ -66,10 +66,10 @@
 > K歌房场景化API是一个帮助您快速集成声网K歌房能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过[**KTVApi**](src/main/java/io/agora/scene/ktv/live/KTVApi.kt)来定义协议，通过[**KTVApiImp**](src/main/java/io/agora/scene/ktv/live/KTVApiImp.kt)来实现
 >
 > * 拉取歌单
-    >
-    >   包含了榜单、歌单、搜索歌曲的功能
-    >
-    >   ~~~kotlin
+>
+>   包含了榜单、歌单、搜索歌曲的功能
+>
+>   ~~~kotlin
 >   /**
 >    * 获取歌曲榜单
 >    * @param onMusicChartResultListener 榜单列表回调
@@ -128,10 +128,10 @@
 >   ~~~
 >
 > * 加载歌曲
-    >
-    >   通过这个接口, 您可以完成音乐和歌词的加载, 加载歌曲的进度、状态会通过回调通知您
-    >
-    >   ~~~kotlin
+>
+>   通过这个接口, 您可以完成音乐和歌词的加载, 加载歌曲的进度、状态会通过回调通知您
+>
+>   ~~~kotlin
 >   /**
 >    * 异步加载歌曲，同时只能为一首歌loadSong，loadSong结果会通过回调通知业务层
 >    * @param config 加载歌曲配置
@@ -152,10 +152,10 @@
 >   ~~~
 >
 > * 切换角色
-    >
-    >   通过这个接口, 您可以完成演唱过程中不同角色的切换, 切换角色的结果会通过回调通知您
-    >
-    >   ~~~kotlin
+>
+>   通过这个接口, 您可以完成演唱过程中不同角色的切换, 切换角色的结果会通过回调通知您
+>
+>   ~~~kotlin
 >   /**
 >    * 异步切换演唱身份，结果会通过回调通知业务层
 >    * @param newRole 新演唱身份
@@ -178,8 +178,8 @@
 >   ~~~
 >
 > * 控制歌曲
-    >
-    >   ~~~kotlin
+>
+>   ~~~kotlin
 >   /**
 >   * 开始播放
 >   */
@@ -202,10 +202,10 @@
 >   ~~~
 >
 > * 与歌词组件配合使用
-    >
-    >   支持您传入您自定义的歌词组件与KTVApi模块配合使用, 您需要让您的歌词组件继承**ILrcView**类并实现以下三个接口, KTVApi模块回通过下列三个回调将演唱pitch、歌曲播放进度、歌词url发送给您的歌词组件
-    >
-    >   ~~~kotlin
+>
+>   支持您传入您自定义的歌词组件与KTVApi模块配合使用, 您需要让您的歌词组件继承**ILrcView**类并实现以下三个接口, KTVApi模块回通过下列三个回调将演唱pitch、歌曲播放进度、歌词url发送给您的歌词组件
+>
+>   ~~~kotlin
 >   interface ILrcView {
 >       /**
 >        * ktvApi内部更新音高pitch时会主动调用此方法将pitch值传给你的歌词组件
@@ -232,19 +232,19 @@
 >   fun setLrcView(view: ILrcView)
 >   ~~~
 >
->
+>   
 >
 > #### 相关网络请求交互
 >
 > 房间内消息管理包括对房间内的基本交互请求和响应，例如用户的变化、麦位的变化、已点歌曲列表的变化，通过[**KTVServiceProtocol**](src/main/java/io/agora/scene/ktv/service/KTVServiceProtocol.kt)来定义协议，通过[**KTVSyncManagerServiceImp**](src/main/java/io/agora/scene/ktv/service/KTVSyncManagerServiceImp.kt)来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
 >
 > - 房间管理
-    >
-    >   包含了房间的创建和房间列表的获取
-    >
-    >   相关代码请参考：[**RoomCreateViewModel**](src/main/java/io/agora/scene/ktv/create/RoomCreateViewModel.java)，分别依赖[**KTVServiceProtocol**](src/main/java/io/agora/scene/ktv/service/KTVServiceProtocol.kt)的下列方法去交互
-    >
-    >   ```kotlin
+>
+>   包含了房间的创建和房间列表的获取
+>
+>   相关代码请参考：[**RoomCreateViewModel**](src/main/java/io/agora/scene/ktv/create/RoomCreateViewModel.java)，分别依赖[**KTVServiceProtocol**](src/main/java/io/agora/scene/ktv/service/KTVServiceProtocol.kt)的下列方法去交互
+>
+>   ```kotlin
 >     fun getRoomList(completion: (error: Exception?, list: List<RoomListModel>?) -> Unit)
 >     fun createRoom(
 >         inputModel: CreateRoomInputModel,
@@ -257,24 +257,24 @@
 >   ```
 >
 > - 麦位管理
-    >
-    >   包含上麦、下麦、开关麦、开关摄像头等状态的同步
+>
+>   包含上麦、下麦、开关麦、开关摄像头等状态的同步
 >
 > - 歌词管理
-    >
-    >   点歌、已点歌曲删除、已点歌曲置顶
-    >
-    >   歌曲列表菜单：请参考[**RoomLivingActivity#showChooseSongDialog**]((src/main/java/io/agora/scene/ktv/live/RoomLivingViewModel.java))
 >
+>   点歌、已点歌曲删除、已点歌曲置顶
 >
+>   歌曲列表菜单：请参考[**RoomLivingActivity#showChooseSongDialog**]((src/main/java/io/agora/scene/ktv/live/RoomLivingViewModel.java))
+>
+>   
 >
 > #### 其他功能
 >
 > * 音效、美声
-    >
-    >   声网最佳美声
-    >
-    >    实现参考[**MusicSettingDialog#Callback**](src/main/java/io/agora/scene/ktv/widget/MusicSettingDialog.java)里的**onEffectChanged**实现
+>
+>   声网最佳美声
+>
+>    实现参考[**MusicSettingDialog#Callback**](src/main/java/io/agora/scene/ktv/widget/MusicSettingDialog.java)里的**onEffectChanged**实现
 
 ---
 
