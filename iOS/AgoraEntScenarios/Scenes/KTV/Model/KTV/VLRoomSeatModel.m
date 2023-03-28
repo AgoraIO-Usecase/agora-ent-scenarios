@@ -25,7 +25,7 @@
     self.chorusSongCode = seatInfo.chorusSongCode;
 }
 
-- (BOOL)isJoinChours {
-    return [self.chorusSongCode length] > 0;
-}
+//- (BOOL)isJoinChours {
+//    return [self.chorusSongCode length] > 0;
+//}
 @end

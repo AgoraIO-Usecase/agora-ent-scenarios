@@ -18,6 +18,7 @@
 @property(nonatomic, weak) id <VLMicSeatListDelegate>delegate;
 
 @property (nonatomic, strong) UICollectionView *personCollectionView;
+@property (nonatomic, copy) NSString *currentPlayingSongCode;
 @end
 
 @implementation VLMicSeatList
@@ -113,10 +114,11 @@
     
     cell.muteImgView.hidden = !seatModel.isAudioMuted;
     
-    if(seatModel.isJoinChours)
+    if([seatModel.chorusSongCode isEqualToString:self.currentPlayingSongCode]){
         cell.joinChorusBtn.hidden = NO;
-    else
+    } else {
         cell.joinChorusBtn.hidden = YES;
+    }
     
     if (seatModel.rtcUid == nil) {
         cell.muteImgView.hidden = YES;
@@ -144,19 +146,31 @@
 
 - (void)updateSingBtnWithChoosedSongArray:(NSArray *)choosedSongArray {
     NSMutableSet* changeSet = [NSMutableSet set];
+    if(choosedSongArray.count == 0){
+        self.currentPlayingSongCode = @"0";
+    }
     if (choosedSongArray.count > 0) {
         VLRoomSelSongModel *songModel = choosedSongArray.firstObject;
+        self.currentPlayingSongCode = songModel.chorusSongId;
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
             BOOL isOwner = [seatModel.userNo isEqualToString:songModel.userNo];
             if (isOwner != seatModel.isOwner) {
                 seatModel.isOwner = isOwner;
                 [changeSet addObject:@(seatModel.seatIndex)];
             }
-            //检查麦位合唱歌曲状态
-            if (seatModel.isJoinChours && ![seatModel.chorusSongCode isEqualToString:[songModel chorusSongId]]) {
-                seatModel.chorusSongCode = @"";
+            //检查麦上用户
+            BOOL needtoJoinChorus = [seatModel.chorusSongCode isEqualToString:[songModel chorusSongId]];
+//            cell.joinsttus
+            NSIndexPath *path = [NSIndexPath indexPathForRow:seatModel.seatIndex inSection:0];
+            VLMicSeatCell* cell = [self.personCollectionView cellForItemAtIndexPath:path];
+            if (needtoJoinChorus != !cell.joinChorusBtn.isHidden){
+                //            if (![seatModel.chorusSongCode isEqualToString:[songModel chorusSongId]] && seatModel.chorusSongCode) {
+                // seatModel.chorusSongCode = @"";
                 [changeSet addObject:@(seatModel.seatIndex)];
             }
+//            }
+            NSLog(@"seat: %@--%@--%li", seatModel.chorusSongCode, songModel.chorusSongId, seatModel.seatIndex);
+            
         }
     }else{
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
@@ -164,8 +178,8 @@
                 seatModel.isOwner = NO;
                 [changeSet addObject:@(seatModel.seatIndex)];
             }
-            if (seatModel.isJoinChours) {
-                seatModel.chorusSongCode = @"";
+            if (seatModel.chorusSongCode.length > 0) {
+               // seatModel.chorusSongCode = @"";
                 [changeSet addObject:@(seatModel.seatIndex)];
             }
         }

@@ -43,7 +43,6 @@
 @property (nonatomic, assign) double currentTime;
 
 @property (nonatomic, assign) BOOL isPlayAccompany;
-@property (nonatomic, strong) UIButton *joinChorusBtn;
 @property (nonatomic, strong) UIButton *leaveChorusBtn;
 @property (nonatomic, strong) UIView *BotView;
 @end
@@ -168,8 +167,12 @@
     CGFloat lH = self.height - 54 - lY;
    // [KaraokeView setLogWithPrintToConsole:true writeToFile:true];
     _karaokeView = [[KaraokeView alloc] initWithFrame:CGRectMake(0, lY, self.width, lH) loggers:@[[FileLogger new]]];
-    _karaokeView.scoringView.viewHeight = 50;
+    _karaokeView.scoringView.viewHeight = 60;
     _karaokeView.scoringView.topSpaces = 5;
+   // _karaokeView.lyricsView.textSelectedColor = [UIColor colorWithHexString:@"#33FFFFFF"];
+    _karaokeView.lyricsView.textNormalColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.5];
+    _karaokeView.lyricsView.textHighlightedColor = [UIColor colorWithHexString:@"#FF8AB4"];
+    _karaokeView.lyricsView.lyricLineSpacing = 6;
    // _karaokeView.scoringView.showDebugView = true;
     _karaokeView.backgroundImage = [UIImage imageNamed:@"ktv_top_bgIcon"];
     [self.contentView addSubview:_karaokeView];
