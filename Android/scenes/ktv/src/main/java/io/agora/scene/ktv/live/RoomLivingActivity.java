@@ -1,6 +1,5 @@
 package io.agora.scene.ktv.live;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -223,7 +222,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if (seatLocal == null || mRoomSpeakerAdapter.getItem(seatLocal.getSeatIndex()) == null) {
                 return;
             }
-            roomLivingViewModel.toggleMic(b);
+            toggleAudioRun = () -> roomLivingViewModel.toggleMic(b);
+            requestRecordPermission();
         });
         getBinding().iBtnChorus.setOnClickListener(v -> showChorusSongDialog());
         getBinding().iBtnChorus.setClickable(false);
@@ -657,7 +657,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private void toggleSelfVideo(boolean isOpen) {
         toggleVideoRun = () -> {
             roomLivingViewModel.toggleSelfVideo(isOpen);
-            getBinding().cbVideo.setChecked(isOpen);
         };
         requestCameraPermission();
     }
@@ -677,19 +676,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     @Override
     protected void onPermissionDined(String permission) {
         new PermissionLeakDialog(this).show(permission,
-                () -> {
-                    if (permission.equals(Manifest.permission.RECORD_AUDIO)) {
-                        roomLivingViewModel.exitRoom();
-                    }
-                },
+                this::getPermissions,
                 () -> launchAppSetting(permission));
-        if (permission.equals(Manifest.permission.CAMERA)) {
-            getBinding().cbVideo.setChecked(false);
-        } else if (permission.equals(Manifest.permission.RECORD_AUDIO)) {
-            if (!roomLivingViewModel.isRoomOwner()) {
-                getBinding().cbMic.setChecked(false);
-            }
-        }
     }
 
     private void onMemberLeave(@NonNull RoomSeatModel member) {

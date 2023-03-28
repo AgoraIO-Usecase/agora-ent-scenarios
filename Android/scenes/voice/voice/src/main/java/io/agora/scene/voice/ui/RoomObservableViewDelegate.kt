@@ -19,6 +19,7 @@ import io.agora.scene.voice.model.constructor.RoomSoundAudioConstructor
 import io.agora.scene.voice.model.constructor.RoomSoundSelectionConstructor
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
+import io.agora.scene.voice.ui.activity.ChatroomLiveActivity
 import io.agora.scene.voice.ui.dialog.*
 import io.agora.scene.voice.ui.dialog.common.CommonFragmentAlertDialog
 import io.agora.scene.voice.ui.dialog.common.CommonSheetAlertDialog
@@ -634,7 +635,9 @@ class RoomObservableViewDelegate constructor(
                         }
                         MicClickAction.UnMute -> {
                             //取消自己禁言
-                            muteLocalAudio(false, micInfo.micIndex)
+                            (activity as? ChatroomLiveActivity)?.requestAudioPermission {
+                                muteLocalAudio(false, micInfo.micIndex)
+                            } ?: muteLocalAudio(false, micInfo.micIndex)
                         }
                         MicClickAction.Lock -> {
                             //房主锁麦
