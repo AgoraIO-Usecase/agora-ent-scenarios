@@ -111,6 +111,10 @@ echo "IM_APP_CLIENT_ID_RELEASE=\"${IM_CLIENT_ID}\"\n" >> $voicePropFile
 echo "IM_APP_CLIENT_SECRET_RELEASE=\"${IM_CLIENT_SECRET}\"\n" >> $voicePropFile
 cat $voicePropFile
 
+# download hw-audio.jar and copy to libs
+python3 ${WORKSPACE}/artifactory_utils.py --action=download_file --file=https://download.agora.io/demo/test/hw-audiokit.jar
+cp hw-audiokit.jar app/libs
+
 # Compile apk
 ./gradlew clean || exit 1
 ./gradlew :app:assembleRelease || exit 1

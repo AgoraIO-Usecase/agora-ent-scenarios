@@ -245,24 +245,24 @@
 >   相关代码请参考：[**RoomCreateViewModel**](src/main/java/io/agora/scene/ktv/create/RoomCreateViewModel.java)，分别依赖[**KTVServiceProtocol**](src/main/java/io/agora/scene/ktv/service/KTVServiceProtocol.kt)的下列方法去交互
 >
 >   ```kotlin
->     fun getRoomList(completion: (error: Exception?, list: List<RoomListModel>?) -> Unit)
->     fun createRoom(
->         inputModel: CreateRoomInputModel,
->         completion: (error: Exception?, out: CreateRoomOutputModel?) -> Unit
->     )
->     fun joinRoom(
->         inputModel: JoinRoomInputModel,
->         completion: (error: Exception?, out: JoinRoomOutputModel?) -> Unit
->     )
+>   fun getRoomList(completion: (error: Exception?, list: List<RoomListModel>?) -> Unit)
+>   fun createRoom(
+>     inputModel: CreateRoomInputModel,
+>     completion: (error: Exception?, out: CreateRoomOutputModel?) -> Unit
+>   )
+>   fun joinRoom(
+>     inputModel: JoinRoomInputModel,
+>     completion: (error: Exception?, out: JoinRoomOutputModel?) -> Unit
+>   )
 >   ```
 >
 > - 麦位管理
 >
 >   包含上麦、下麦、开关麦、开关摄像头等状态的同步
 >
-> - 歌词管理
+> - 歌曲管理
 >
->   点歌、已点歌曲删除、已点歌曲置顶
+>   点歌、已点歌曲删除、已点歌曲置顶、切歌等状态的同步
 >
 >   歌曲列表菜单：请参考[**RoomLivingActivity#showChooseSongDialog**]((src/main/java/io/agora/scene/ktv/live/RoomLivingViewModel.java))
 >
