@@ -79,7 +79,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private var audioPlayoutDelay = 0
 
     // 音频最佳实践
-    var remoteVolume: Int = 15 // 远端音频
+    var remoteVolume: Int = 40 // 远端音频
     var mpkPlayoutVolume: Int = 50
     var mpkPublishVolume: Int = 50
 
