@@ -15,7 +15,7 @@ private func agoraPrint(_ message: String) {
 
 @objc public protocol KTVLrcControlDelegate: NSObjectProtocol {
     func didLrcViewDragedTo(pos: Int, score: Int, totalScore: Int)
-    func didLrcViewScorllFinished(with score: Int, totalScore: Int, lineScore: Int)
+    func didLrcViewScorllFinished(with score: Int, totalScore: Int, lineScore: Int, lineIndex:Int)
 }
 
 @objc class KTVLrcControl: NSObject {
@@ -47,7 +47,7 @@ private func agoraPrint(_ message: String) {
             if type == .down {
                 guard let duration = self.lyricModel?.duration else {return}
                 guard let preludeEndPosition = self.lyricModel?.preludeEndPosition else {return}
-                let pos: Int = self.progress >= duration - 500  ? duration - 500 : preludeEndPosition - 500
+                let pos: Int = self.progress >= duration - 500  ? duration - 500 : preludeEndPosition - 2000
                 let flag: Bool = self.progress >= duration - 500  ? true : false
                 self.skipCallBack?(pos, flag)
             }
@@ -71,6 +71,14 @@ private func agoraPrint(_ message: String) {
         self.lrcView.reset()
         self.currentLoadLrcPath = nil
     }
+    
+    @objc public func showPreludeEnd() {
+        //显示跳过前奏
+        skipBtn.setSkipType(.prelude)
+        skipBtn.isHidden = false
+        hasShowEndPosition = false
+        hasShowPreludeEndPosition = false
+    }
 }
 
 extension KTVLrcControl: KaraokeDelegate {
@@ -84,7 +92,7 @@ extension KTVLrcControl: KaraokeDelegate {
         self.totalLines = lineCount
         self.totalScore = cumulativeScore
         guard let delegate = delegate else {return}
-        delegate.didLrcViewScorllFinished(with: totalScore, totalScore: lineCount * 100, lineScore: score)
+        delegate.didLrcViewScorllFinished(with: totalScore, totalScore: lineCount * 100, lineScore: score, lineIndex: lineIndex)
     }
 }
 
@@ -99,14 +107,7 @@ extension KTVLrcControl: KTVLrcViewDelegate {
         lrcView.setProgress(progress: progress)
         if progress > (lyricModel?.duration ?? 0) {return}
         if !isMainSinger {return}
-        if progress > 10 && progress < 100 {
-            skipBtn.setSkipType(.prelude)
-            skipBtn.isHidden = false
-            hasShowEndPosition = false
-            hasShowPreludeEndPosition = false
-        }
-        
-        let preludeEndPosition: Int = (lyricModel?.preludeEndPosition ?? 0) - 500
+        let preludeEndPosition: Int = (lyricModel?.preludeEndPosition ?? 0)
         let duration: Int = (lyricModel?.duration ?? 0) - 500
         
         if (preludeEndPosition < progress && hasShowPreludeEndPosition == false) {
@@ -140,5 +141,6 @@ extension KTVLrcControl: KTVLrcViewDelegate {
         self.totalLines = 0
         self.totalScore = 0
         lrcView.setLyricData(data: model)
+        
     }
 }

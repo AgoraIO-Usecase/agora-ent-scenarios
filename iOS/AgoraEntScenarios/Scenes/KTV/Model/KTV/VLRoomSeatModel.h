@@ -27,10 +27,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger isAudioMuted;
 ///是否开启视频
 @property (nonatomic, assign) NSInteger isVideoMuted;
-
-
 ///新增, 判断当前歌曲是否是自己点的
 @property (nonatomic, assign) BOOL isOwner;
+
 
 /// for sync manager
 @property (nonatomic, copy, nullable) NSString* objectId;
@@ -38,8 +37,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// 重置模型
 - (void)resetWithInfo:(VLRoomSeatModel* __nullable)seatInfo;
 
-//是否加入合唱
-- (BOOL)isJoinChours;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -60,6 +60,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) GradeView *gradeView;
 @property (nonatomic, strong) IncentiveView *incentiveView;
 @property (nonatomic, strong) LineScoreView *lineScoreView;
+@property (nonatomic, strong) UIButton *joinChorusBtn;
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVMVViewDelegate>)delegate;
 

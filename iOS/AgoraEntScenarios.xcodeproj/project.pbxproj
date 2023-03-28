@@ -2858,7 +2858,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.ktvroom;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.ktv;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

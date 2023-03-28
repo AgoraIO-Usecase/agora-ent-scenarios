@@ -39,8 +39,8 @@ VLKTVRemoteVolumeViewDelegate
         [self configData:setting];
         [self initSubViews];
         [self addSubViewConstraints];
-        self.soundSlider.value = 0.25;
-        self.accSlider.value = 0.25;
+        self.soundSlider.value = 1.0;
+        self.accSlider.value = 0.5;
     }
     return self;
 }
@@ -219,10 +219,10 @@ VLKTVRemoteVolumeViewDelegate
 
 - (VLKTVRemoteVolumeView*)remoteVolumeView {
     if (!_remoteVolumeView) {
-        _remoteVolumeView = [[VLKTVRemoteVolumeView alloc] initWithMin:0 withMax:100 withCurrent:15];
+        _remoteVolumeView = [[VLKTVRemoteVolumeView alloc] initWithMin:0 withMax:100 withCurrent:40];
         _remoteVolumeView.titleLabel.text = KTVLocalizedString(@"RemoteVolume");
         _remoteVolumeView.delegate = self;
-        _setting.remoteVolume = 15;
+        _setting.remoteVolume = 40;
     }
     return _remoteVolumeView;
 }

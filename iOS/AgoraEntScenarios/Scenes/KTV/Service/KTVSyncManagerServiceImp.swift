@@ -462,7 +462,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             return
         }
         //TODO: _markSeatToPlaying without callback
-        _markSeatChoursStatus(songCode: topSong.chorusSongId(), completion: completion)
+        _markSeatChoursStatus(songCode: topSong.chorusSongId(),  completion: completion)
     }
     
     func coSingerLeaveChorus(completion: @escaping (Error?) -> Void) {
@@ -875,7 +875,6 @@ extension KTVSyncManagerServiceImp {
             completion(nil)
             return
         }
-        
         seatInfo.chorusSongCode = songCode
         _updateSeat(seatInfo: seatInfo, finished: completion)
     }

@@ -722,7 +722,8 @@ extension KTVApiImpl {
                 guard let position: Int64 = dict["time"] as? Int64 else {return}
                 guard let duration: Int64 = dict["duration"] as? Int64 else {return}
                 guard let remoteNtp: Int64 = dict["ntp"] as? Int64 else {return}
-                guard let voicePitch: Int64 = dict["pitch"] as? Int64 else {return}
+               // guard let voicePitch: Double = dict["pitch"] as? Double else {return}
+                guard let realPosition: Int64 = dict["realTime"] as? Int64 else {return}
                 guard let songCode: Int64 = dict["songCode"] as? Int64 else {return}
                 guard let mainSingerState: Int = dict["playerState"] as? Int else {return}
 //                if songConfig?.songCode == 0 {
@@ -733,11 +734,11 @@ extension KTVApiImpl {
                     agoraPrint("local songCode[\(songCode)] is not equal to recv songCode[\(songConfig?.songCode ?? 0)] role: \(singerRole.rawValue)")
                     return
                 }
-                
+          
                 self.remotePlayerDuration = TimeInterval(duration)
                 self.lastMainSingerUpdateTime = Date().milListamp
-                self.remotePlayerPosition = TimeInterval(position)
-
+                self.remotePlayerPosition = TimeInterval(realPosition)
+                print("remote position: \(self.remotePlayerPosition)")
                 let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
                 if (self.playerState != state) {
                     agoraPrint("[setLrcTime] recv state: \(self.playerState.rawValue)->\(state.rawValue) role: \(singerRole.rawValue) role: \(singerRole.rawValue)")
@@ -747,7 +748,8 @@ extension KTVApiImpl {
                         agoraPrint("seek toPosition: \(position)")
                         musicPlayer.seek(toPosition: Int(position))
                     }
-                    syncPlayStateFromRemote(state: state)
+                    print("recv state with MainSinger0: \(state.rawValue)")
+                    syncPlayStateFromRemote(state: state, needDisplay: false)
                 }
                 
                 if role == .coSinger {
@@ -761,10 +763,10 @@ extension KTVApiImpl {
                             agoraPrint("progress: setthreshold: \(threshold) expectPosition: \(expectPosition) position: \(position), localNtpTime: \(localNtpTime), remoteNtp: \(remoteNtp), audioPlayoutDelay: \(self.audioPlayoutDelay), localPosition: \(localPosition)")
                         }
                     } else {
-                        self.pitch = Double(voicePitch)
+                       // self.pitch = Double(voicePitch)
                     }
                 } else if role == .audience {
-                    self.pitch = Double(voicePitch)
+                  //  self.pitch = Double(voicePitch)
                 }
 
             } else if dict["cmd"] as? String == "PlayerState" {
@@ -776,10 +778,15 @@ extension KTVApiImpl {
                     agoraPrint("seek toPosition: \(self.localPlayerPosition)")
                     musicPlayer.seek(toPosition: Int(self.localPlayerPosition))
                 }
-                syncPlayStateFromRemote(state: state)
+                print("recv state with MainSinger: \(state.rawValue)")
+                syncPlayStateFromRemote(state: state, needDisplay: true)
+                
             } else if dict["cmd"] as? String == "setVoicePitch" {
-                if role == .coSinger {return}
-                //同步新的pitch策略 todo
+                if role == .audience {
+                    guard let voicePitch: Double = dict["pitch"] as? Double else {return}
+                    print("test pitch:\(voicePitch)")
+                    self.pitch = voicePitch
+                }
             }
         }
     }
@@ -788,12 +795,22 @@ extension KTVApiImpl {
         if playerState != .playing {return}
         if singerRole == .audience {return}
 
-        var pitch = isNowMicMuted ? 0 : speakers.first?.voicePitch
+        guard var pitch: Double = speakers.first?.voicePitch else {return}
+        pitch = isNowMicMuted ? 0 : pitch
         //如果mpk不是playing状态 pitch = 0
         if musicPlayer.getPlayerState() != .playing {pitch = 0}
-        self.pitch = pitch ?? 0
+        self.pitch = pitch
         lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
         lrcControl?.onUpdateProgress(progress: Int(getPlayerCurrentTime()))
+        
+        //将主唱的pitch同步到观众
+        if isMainSinger() {
+            let dict: [String: Any] = [ "cmd": "setVoicePitch",
+                                        "pitch": pitch,
+            ]
+            print("sendPitch: \(pitch)")
+            sendStreamMessageWithDict(dict, success: nil)
+        }
     }
 
     @objc public func didKTVAPILocalAudioStats(stats: AgoraRtcLocalAudioStats) {
@@ -905,7 +922,7 @@ extension KTVApiImpl {
         return position
     }
 
-    private func syncPlayStateFromRemote(state: AgoraMediaPlayerState) {
+    private func syncPlayStateFromRemote(state: AgoraMediaPlayerState, needDisplay: Bool) {
         let role = singerRole
         if role == .coSinger {
             if state == .stopped {
@@ -914,6 +931,10 @@ extension KTVApiImpl {
                 pausePlay()
             } else if state == .playing {
                 resumeSing()
+            } else if (state == .playBackAllLoopsCompleted && needDisplay == true) {
+                getEventHander { delegate in
+                    delegate.onMusicPlayerStateChanged(state: state, error: .none, isLocal: true)
+                }
             }
         } else {
             self.playerState = state
@@ -975,6 +996,7 @@ extension KTVApiImpl {
     private func setProgress(with pos: Int) {
         lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
         lrcControl?.onUpdateProgress(progress: pos)
+        print("test: pitch:\(self.pitch) pos: \(pos)")
     }
 }
 
@@ -982,18 +1004,18 @@ extension KTVApiImpl {
 extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
     func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedToPosition position: Int) {
         self.localPlayerPosition = Date().milListamp - Double(position)
-//        agoraPrint("agoraRtcMediaPlayer didChangedToPosition: \(position)")
         if isMainSinger() && getPlayerCurrentTime() > TimeInterval(self.audioPlayoutDelay) {
             let dict: [String: Any] = [ "cmd": "setLrcTime",
                                         "duration": self.playerDuration,
                                         "time": getPlayerCurrentTime(),
                                         //不同机型delay不同，需要发送同步的时候减去发送机型的delay，在接收同步加上接收机型的delay
+                                        "realTime":position,
                                         "ntp": self.getNtpTimeInMs(),
-                                        "pitch": self.pitch,
                                         "playerState": self.playerState.rawValue,
                                         "songCode": songConfig?.songCode ?? 0
             ]
             sendStreamMessageWithDict(dict, success: nil)
+            print("lrc: \(getPlayerCurrentTime())")
         }
     }
     
@@ -1024,6 +1046,9 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         }
         self.playerState = state
         agoraPrint("recv state with player callback : \(state.rawValue)")
+        if state == .playBackAllLoopsCompleted && singerRole == .coSinger {//可能存在伴唱不返回allloopbackComplete状态 这个状态通过主唱的playerState来同步
+            return
+        }
         getEventHander { delegate in
             delegate.onMusicPlayerStateChanged(state: state, error: .none, isLocal: true)
         }
