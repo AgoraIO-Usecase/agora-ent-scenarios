@@ -55,19 +55,19 @@
 
 ### 3.2 项目文件结构简介
 
-```kotlin
+```
 ├── scene
 │   ├── ktv
 │   │   └── main
 │   │       ├── java
 │   │       │   └── io.agora.scene.ktv
-│   │       │					    ├── bean           #数据类
-│   │       │   					├── create         #房间列表模块
-│   │       │   					├── debugSettings  #debug页面模块
-│   │       │   					├── live           #房间内业务逻辑模块
-│   │       │					    ├── service        #网络模块
-│   │       │   					├── widget         #UI模块
-│   │       │   					└── KTVLogger.kt   #Log模块
+│   │       │                       ├── bean           #数据类
+│   │       │                       ├── create         #房间列表模块
+│   │       │                       ├── debugSettings  #debug页面模块
+│   │       │                       ├── live           #房间内业务逻辑模块
+│   │       │                       ├── service        #网络模块
+│   │       │                       ├── widget         #UI模块
+│   │       │                       └── KTVLogger.kt   #Log模块
 │   │       ├── res              #资源文件
 │   │       │   ├── drawable
 │   │       │   ├── layout
