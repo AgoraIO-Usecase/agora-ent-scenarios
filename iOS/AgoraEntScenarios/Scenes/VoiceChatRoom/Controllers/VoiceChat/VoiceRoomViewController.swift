@@ -23,7 +23,7 @@ let giftMap = [["gift_id": "VoiceRoomGift1", "gift_name": LanguageManager.localV
 fileprivate let ownerMic = ["index":0,"status":0,"member":["uid":VoiceRoomUserInfo.shared.user?.uid ?? "","chat_uid":VoiceRoomUserInfo.shared.user?.chat_uid ?? "","name":VoiceRoomUserInfo.shared.user?.name ?? "","portrait":VoiceRoomUserInfo.shared.user?.portrait ?? "","rtc_uid":VoiceRoomUserInfo.shared.user?.rtc_uid ?? "","mic_index":0]] as [String : Any]
 
 class VoiceRoomViewController: VRBaseViewController {
-    private var isEnterSeatFirst: Bool = false
+    private var isEnterSeatNotFirst: Bool = false
     lazy var toastPoint: CGPoint = .init(x: self.view.center.x, y: self.view.center.y + 70)
 
     override public var preferredStatusBarStyle: UIStatusBarStyle {
@@ -647,11 +647,11 @@ extension VoiceRoomViewController: VMManagerDelegate {
 extension VoiceRoomViewController {
     func checkEnterSeatAudioAuthorized() {
         //trigger once
-        if isEnterSeatFirst {
+        if isEnterSeatNotFirst {
             return
         }
         
-        isEnterSeatFirst = true
+        isEnterSeatNotFirst = true
         
         checkAudioAuthorized()
     }
