@@ -19,6 +19,7 @@ import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnItemClickListener;
+import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.create.holder.RoomHolder;
 import io.agora.scene.ktv.databinding.ActivityRoomListBinding;
 import io.agora.scene.ktv.databinding.ItemRoomListBinding;
@@ -26,6 +27,7 @@ import io.agora.scene.ktv.live.RoomLivingActivity;
 import io.agora.scene.ktv.service.KTVServiceProtocol;
 import io.agora.scene.ktv.service.RoomListModel;
 import io.agora.scene.widget.dialog.InputPasswordDialog;
+import io.agora.scene.widget.utils.UiUtils;
 
 /**
  * 房间列表
@@ -84,9 +86,17 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
     @Override
     public void initListener() {
         getBinding().btnCreateRoom.setOnClickListener(view -> {
+            if (UiUtils.isFastClick(2000)) {
+                ToastUtils.showToast("操作太频繁");
+                return;
+            }
             startActivity(new Intent(this, RoomCreateActivity.class));
         });
         getBinding().btnCreateRoom2.setOnClickListener(view -> {
+            if (UiUtils.isFastClick(2000)) {
+                ToastUtils.showToast("操作太频繁");
+                return;
+            }
             startActivity(new Intent(this, RoomCreateActivity.class));
         });
         roomCreateViewModel.roomModelList.observe(this, vlRoomListModels -> {
