@@ -179,6 +179,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
 
     private func updateMic(_ mics: [VRRoomMic], fromId: String) {
+        let changeMic = ChatRoomServiceImp.getSharedInstance().mics[mics.first?.mic_index ?? 1]
         for mic in mics {
             ChatRoomServiceImp.getSharedInstance().mics[mic.mic_index] = mic
         }
@@ -219,9 +220,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                  如果房主踢用户下麦
                  */
                 if let host: VRUser = roomInfo?.room?.owner {
-                    if host.uid == fromId && status == -1 && first.member == nil {
+                    if host.uid == fromId && status == -1 && first.member == nil,changeMic.status != 2 {
                         ChatRoomServiceImp.getSharedInstance().userList?.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
-                        view.makeToast("Removed Stage".localized())
+                        view.makeToast("You were removed from stage".localized())
                     }  else {
                         self.refreshApplicants(chat_uid: fromId)
                     }
@@ -242,9 +243,6 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                         self.micMuteManager(mic: first)
                     }
                 } else {
-                    if !self.isOwner,status == -1,first.member == nil {
-                        self.view.makeToast("You were removed from stage".localized())
-                    }
                     if local_index == nil || mic_index == local_index {
                         rtckit.setClientRole(role: .audience)
                         rtckit.muteLocalAudioStream(mute: true)
