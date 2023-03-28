@@ -31,6 +31,7 @@ import AgoraChat
     private lazy var create: SARoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage("blur")!).backgroundColor(.clear)
     
     private var initialError: AgoraChatError?
+    private var isDestory: Bool = false
     
     @objc convenience init(user: VLLoginModel) {
         AppContext.shared.sceneImageBundleName = "SpatialAudioResource"
@@ -50,6 +51,18 @@ import AgoraChat
         // Do any additional setup after loading the view.
         navigation.title.text = sceneLocalized( "Agora Chat Room")
     }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        isDestory = true
+    }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if isDestory {
+            destory()
+        }
+    }
 
     private func showContent() {
         view.addSubViews([background, container, create])
@@ -58,12 +71,15 @@ import AgoraChat
         childViewControllersEvent()
     }
     
-    deinit {
-        print("\(self.swiftClassName ?? "") is destroyed!")
+    func destory() {
         SAIMManager.shared?.logoutIM()
         SAIMManager.shared = nil
         SAUserInfo.shared.user = nil
         SAUserInfo.shared.currentRoomOwner = nil
+    }
+    
+    deinit {
+        print("\(self.swiftClassName ?? "") is destroyed!")
     }
 }
 
@@ -82,6 +98,7 @@ extension SARoomsViewController {
 
     private func viewsAction() {
         create.action = { [weak self] in
+            self?.isDestory = false
             self?.navigationController?.pushViewController(SACreateRoomViewController(), animated: true)
         }
     }
@@ -127,6 +144,7 @@ extension SARoomsViewController {
                 info.room = room
                 info.robotInfo = robot ?? SARobotAudioInfo()
                 info.mic_info = nil
+                self.isDestory = false
                 let vc = SARoomViewController(info: info)
                 self.navigationController?.pushViewController(vc, animated: true)
             } else {
