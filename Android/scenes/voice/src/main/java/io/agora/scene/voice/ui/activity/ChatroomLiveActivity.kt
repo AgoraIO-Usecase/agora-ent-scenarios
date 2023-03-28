@@ -401,69 +401,46 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
     private fun initView() {
         binding.chatBottom.initMenu(roomKitBean.roomType)
-        if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) { // 普通房间
-            binding.likeView.likeView.setOnClickListener { binding.likeView.addFavor() }
-            binding.chatroomGiftView.init(roomKitBean.chatroomId)
-            binding.messageView.init(roomKitBean.chatroomId, roomKitBean.ownerChatUid)
-            binding.rvChatroom2dMicLayout.isVisible = true
-            binding.rvChatroom3dMicLayout.isVisible = false
-            roomObservableDelegate =
-                RoomObservableViewDelegate(
-                    this,
-                    roomLivingViewModel,
-                    roomKitBean,
-                    binding.cTopView,
-                    binding.rvChatroom2dMicLayout,
-                    binding.chatBottom
-                )
-            binding.rvChatroom2dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
-            binding.rvChatroom2dMicLayout.onItemClickListener(
-                object :
-                    OnItemClickListener<VoiceMicInfoModel> {
-                    override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onUserMicClick(data)
-                    }
-                },
-                object :
-                    OnItemClickListener<VoiceMicInfoModel> {
-                    override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt)) {
-                            finish()
-                        }
+        binding.likeView.likeView.setOnClickListener { binding.likeView.addFavor() }
+        binding.chatroomGiftView.init(roomKitBean.chatroomId)
+        binding.messageView.init(roomKitBean.chatroomId, roomKitBean.ownerChatUid)
+        binding.rvChatroom2dMicLayout.isVisible = true
+        roomObservableDelegate =
+            RoomObservableViewDelegate(
+                this,
+                roomLivingViewModel,
+                roomKitBean,
+                binding.cTopView,
+                binding.rvChatroom2dMicLayout,
+                binding.chatBottom
+            )
+        binding.rvChatroom2dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
+        binding.rvChatroom2dMicLayout.onItemClickListener(
+            object :
+                OnItemClickListener<VoiceMicInfoModel> {
+                override fun onItemClick(
+                    data: VoiceMicInfoModel,
+                    view: View,
+                    position: Int,
+                    viewType: Long
+                ) {
+                    roomObservableDelegate.onUserMicClick(data)
+                }
+            },
+            object :
+                OnItemClickListener<VoiceMicInfoModel> {
+                override fun onItemClick(
+                    data: VoiceMicInfoModel,
+                    view: View,
+                    position: Int,
+                    viewType: Long
+                ) {
+                    roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt)) {
+                        finish()
                     }
                 }
-            ).setUpInitAdapter()
-        } else { // 空间音效房间
-            binding.likeView.isVisible = false
-            binding.rvChatroom2dMicLayout.isVisible = false
-            binding.rvChatroom3dMicLayout.isVisible = true
-            roomObservableDelegate =
-                RoomObservableViewDelegate(
-                    this,
-                    roomLivingViewModel,
-                    roomKitBean,
-                    binding.cTopView,
-                    binding.rvChatroom3dMicLayout,
-                    binding.chatBottom
-                )
-            binding.rvChatroom3dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
-            binding.rvChatroom3dMicLayout.onItemClickListener(
-                object :
-                    OnItemClickListener<VoiceMicInfoModel> {
-                    override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onUserMicClick(data)
-                    }
-                },
-                object :
-                    OnItemClickListener<VoiceMicInfoModel> {
-                    override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt)) {
-                            finish()
-                        }
-                    }
-                },
-            ).setUpInitMicInfoMap()
-        }
+            }
+        ).setUpInitAdapter()
         binding.cTopView.setTitleMaxWidth()
 //        roomObservableDelegate.onRoomModel(voiceRoomModel)
         binding.cTopView.setOnLiveTopClickListener(object : OnLiveTopClickListener {

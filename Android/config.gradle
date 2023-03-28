@@ -67,7 +67,7 @@ ext {
             agora_im           : 'io.agora.rtm:rtm-sdk:1.5.0',
             bugly              : 'com.tencent.bugly:crashreport:4.0.4',
             svga_player        : 'com.github.yyued:SVGAPlayer-Android:2.6.1',
-            agora_chat         : 'io.agora.rtc:chat-sdk:1.0.8',
+            agora_chat         : 'io.agora.rtc:chat-sdk:1.1.0',
     ]
     android = [
             compileSdkVersion: 31,

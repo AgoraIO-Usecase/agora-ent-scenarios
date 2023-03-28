@@ -585,29 +585,29 @@ class VoiceSyncManagerServiceImp(
      * 禁言指定麦位置
      * @param micIndex 麦位index
      */
-    override fun forbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        val targetSeatInfo = if (micSeatMap.containsKey(micIndex.toString())) {
-            val originInfo = micSeatMap[micIndex.toString()]
-            VoiceMicInfoModel().apply {
-                this.micIndex = micIndex
-                member = originInfo?.member
-                ownerTag = originInfo?.ownerTag!!
-                micStatus = MicStatus.ForceMute
+    override fun forbidMic(
+        micIndex: Int,
+        completion: (error: Int, result: VoiceMicInfoModel?) -> Unit
+    ) {
+        val seatInfo = micSeatMap[micIndex.toString()]
+        if (seatInfo != null) {
+            when (seatInfo.micStatus) {
+                MicStatus.Lock -> {
+                    seatInfo.micStatus = MicStatus.LockForceMute
+                }
+                else -> {
+                    seatInfo.micStatus = MicStatus.ForceMute
+                }
+            }
+            innerUpdateSeat(seatInfo) {
+                if (it == null) {
+                    completion.invoke(VoiceServiceProtocol.ERR_OK, seatInfo)
+                } else {
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+                }
             }
         } else {
-            VoiceMicInfoModel().apply {
-                this.micIndex = micIndex
-                ownerTag = false
-                micStatus = MicStatus.ForceMute
-            }
-        }
-
-        innerUpdateSeat(targetSeatInfo) {
-            if (it == null) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
-            } else {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
-            }
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
         }
     }
 
@@ -618,7 +618,14 @@ class VoiceSyncManagerServiceImp(
     override fun unForbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         val seatInfo = micSeatMap[micIndex.toString()]
         if (seatInfo != null) {
-            seatInfo.micStatus = MicStatus.Normal
+            when (seatInfo.micStatus) {
+                MicStatus.LockForceMute -> {
+                    seatInfo.micStatus = MicStatus.Lock
+                }
+                else -> {
+                    seatInfo.micStatus = if (seatInfo.member == null) MicStatus.Idle else MicStatus.Normal
+                }
+            }
             innerUpdateSeat(seatInfo) {
                 if (it == null) {
                     completion.invoke(VoiceServiceProtocol.ERR_OK, seatInfo)
@@ -636,27 +643,29 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun lockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        val targetSeatInfo = if (micSeatMap.containsKey(micIndex.toString())) {
-            val originInfo = micSeatMap[micIndex.toString()]
-            VoiceMicInfoModel().apply {
-                this.micIndex = micIndex
-                ownerTag = originInfo?.ownerTag!!
-                micStatus = MicStatus.Lock
+        val seatInfo = micSeatMap[micIndex.toString()]
+        if (seatInfo != null) {
+            when (seatInfo.micStatus) {
+                MicStatus.ForceMute -> {
+                    seatInfo.micStatus = MicStatus.LockForceMute
+                }
+                else -> {
+                    seatInfo.micStatus = MicStatus.Lock
+                }
             }
-        } else {
-            VoiceMicInfoModel().apply {
-                this.micIndex = micIndex
-                ownerTag = false
-                micStatus = MicStatus.Lock
-            }
-        }
+            innerUpdateSeat(seatInfo) {
+                if (it == null) {
+                    kickOff(micIndex) { i, a ->
 
-        innerUpdateSeat(targetSeatInfo) {
-            if (it == null) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
-            } else {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+                    }
+                    completion.invoke(VoiceServiceProtocol.ERR_OK, seatInfo)
+                } else {
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+                }
             }
+
+        } else {
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
         }
     }
 
@@ -667,7 +676,14 @@ class VoiceSyncManagerServiceImp(
     override fun unLockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         val seatInfo = micSeatMap[micIndex.toString()]
         if (seatInfo != null) {
-            seatInfo.micStatus = MicStatus.Idle
+            when (seatInfo.micStatus) {
+                MicStatus.LockForceMute -> {
+                    seatInfo.micStatus = MicStatus.ForceMute
+                }
+                else -> {
+                    seatInfo.micStatus = if (seatInfo.member == null) MicStatus.Idle else MicStatus.Normal
+                }
+            }
             innerUpdateSeat(seatInfo) {
                 if (it == null) {
                     completion.invoke(VoiceServiceProtocol.ERR_OK, seatInfo)
