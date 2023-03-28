@@ -24,17 +24,17 @@
   >
   >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
   >
-  > - 得到App ID与App 证书
+  > - 得到 App ID 与 App 证书
   >
   >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
 
 - 获取 App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
-- <mark>联系销售给 AppID 开通 K 歌权限</mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员[Agora 支持](https://agora-ticket.agora.io/))
+- <mark>联系销售给 AppID 开通 K 歌权限</mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/))
 
   - 注: 拉取榜单、歌单、歌词等功能是需要开通权限的
 
-- 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 App 证书
+- 在项目的 [**gradle.properties**](../../gradle.properties) 里填写需要的声网 App ID 和 App 证书
 
   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/config_app_id_android.png)
 
@@ -51,7 +51,7 @@
 
 ### 3.1 概述
 
-> **在线K歌房**项目是声网在线K歌房场景的开源代码，开发者可以获取并添加到您的APP工程里，本源码会伴随声动互娱 Demo 同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
+> **在线K歌房**项目是声网在线K歌房场景的开源代码，开发者可以获取并添加到您的 APP 工程里，本源码会伴随声动互娱 Demo 同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
 
 ### 3.2 项目文件结构简介
 
@@ -105,7 +105,7 @@
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/KTVSamplePicture5.png)
 >
-> K歌房场景化API是一个帮助您快速集成声网K歌房能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过[**KTVApi**](src/main/java/io/agora/scene/ktv/live/KTVApi.kt)来定义协议，通过[**KTVApiImp**](src/main/java/io/agora/scene/ktv/live/KTVApiImp.kt)来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
+> K歌房场景化API是一个帮助您快速集成声网K歌房能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**KTVApi**](src/main/java/io/agora/scene/ktv/live/KTVApi.kt) 来定义协议，通过 [**KTVApiImp**](src/main/java/io/agora/scene/ktv/live/KTVApiImp.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
 >
 > * 拉取歌单
 >
@@ -280,13 +280,13 @@
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/KTVSamplePicture6.png)
 >
-> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过[**KTVServiceProtocol**](src/main/java/io/agora/scene/ktv/service/KTVServiceProtocol.kt)来定义协议，通过[**KTVSyncManagerServiceImp**](src/main/java/io/agora/scene/ktv/service/KTVSyncManagerServiceImp.kt)来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
+> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过 [**KTVServiceProtocol**](src/main/java/io/agora/scene/ktv/service/KTVServiceProtocol.kt) 来定义协议，通过 [**KTVSyncManagerServiceImp**](src/main/java/io/agora/scene/ktv/service/KTVSyncManagerServiceImp.kt) 来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
 >
 > - 房间管理
 >
 >   包含了房间的创建和房间列表的获取
 >
->   相关代码请参考：[**RoomCreateViewModel**](src/main/java/io/agora/scene/ktv/create/RoomCreateViewModel.java)，分别依赖[**KTVServiceProtocol**](src/main/java/io/agora/scene/ktv/service/KTVServiceProtocol.kt)的下列方法去交互
+>   相关代码请参考：[**RoomCreateViewModel**](src/main/java/io/agora/scene/ktv/create/RoomCreateViewModel.java)，分别依赖 [**KTVServiceProtocol**](src/main/java/io/agora/scene/ktv/service/KTVServiceProtocol.kt) 的下列方法去交互
 >
 >   ```kotlin
 >   fun getRoomList(completion: (error: Exception?, list: List<RoomListModel>?) -> Unit)
@@ -308,7 +308,7 @@
 >
 >   点歌、已点歌曲删除、已点歌曲置顶、切歌等状态的同步
 >
->   歌曲列表菜单：请参考[**RoomLivingActivity#showChooseSongDialog**]((src/main/java/io/agora/scene/ktv/live/RoomLivingViewModel.java))
+>   歌曲列表菜单：请参考 [**RoomLivingActivity#showChooseSongDialog**]((src/main/java/io/agora/scene/ktv/live/RoomLivingViewModel.java))
 >
 >   
 >
@@ -318,7 +318,7 @@
 >
 >   声网最佳美声
 >
->    实现参考[**MusicSettingDialog#Callback**](src/main/java/io/agora/scene/ktv/widget/MusicSettingDialog.java)里的**onEffectChanged**实现
+>    实现参考 [**MusicSettingDialog#Callback**](src/main/java/io/agora/scene/ktv/widget/MusicSettingDialog.java)里的**onEffectChanged**实现
 
 ---
 
@@ -334,12 +334,12 @@
 
 ### K歌房中的歌曲资源使用的是哪家？是否可以自己选择供应商？
 
-> K歌房的歌曲资源使用的是Agora内容中心服务，暂不支持自行切换供应商，详情请查看[版权音乐 - 在线 K 歌房 - 文档中心 - 声网Agora](https://docs.agora.io/cn/online-ktv/API%20Reference/ios_ng/API/toc_drm.html)
+> K歌房的歌曲资源使用的是Agora内容中心服务，暂不支持自行切换供应商，详情请查看 [版权音乐 - 在线 K 歌房 - 文档中心 - 声网Agora](https://docs.agora.io/cn/online-ktv/API%20Reference/ios_ng/API/toc_drm.html)
 
 ### 集成遇到困难，该如何联系声网获取协助
 
 > 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
 >
-> 方案2：发送邮件给[support@agora.io](mailto:support@agora.io)咨询
+> 方案2：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
 
 ---
