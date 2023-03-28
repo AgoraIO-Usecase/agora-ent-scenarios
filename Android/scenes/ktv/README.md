@@ -326,7 +326,7 @@
 
 ### 如何获取声网和环信 APPID
 
-> - 声网 APPID 申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
+> 声网 APPID 申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
 
 ### 程序运行后，歌曲列表为空
 
