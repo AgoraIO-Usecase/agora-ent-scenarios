@@ -324,13 +324,13 @@
 
 ## 4. FAQ
 
-### 如何获取声网和环信 APPID
+### 如何获取声网 APPID
 
 > 声网 APPID 申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
 
 ### 程序运行后，歌曲列表为空
 
-> 需要联系销售给 appId 开通 K 歌权限
+> 需要联系销售给 APPID 开通 K 歌权限
 
 ### K歌房中的歌曲资源使用的是哪家？是否可以自己选择供应商？
 
