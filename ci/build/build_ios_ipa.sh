@@ -85,7 +85,7 @@ echo PLIST_PATH: $PLIST_PATH
 xcodebuild CODE_SIGN_STYLE="Manual" -workspace "${APP_PATH}" -scheme "${TARGET_NAME}" clean CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -configuration "${CONFIGURATION}" archive -archivePath "${ARCHIVE_PATH}" -destination 'generic/platform=iOS' -quiet || exit
 
 # 压缩archive
-7za a -tzip "${TARGET_NAME}.zip" "${ARCHIVE_PATH}"
+7za a -tzip "${TARGET_NAME}.xcarchive.zip" "${ARCHIVE_PATH}"
 
 # 上传IPA
 # APP_PATH="$ARCHIVE_PATH/Products/Applications/${TARGET_NAME}.app"
@@ -104,7 +104,7 @@ if [ $isSign = true ]; then
     pushd ${WORKSPACE}
     # sh sign "${EXPORT_PATH}/${TARGET_NAME}.ipa"
     # mv *.ipa "${TARGET_NAME}.ipa"
-    sh sign "${PROJECT_PATH}/${TARGET_NAME}.zip" --type xcarchive --plist "${PLIST_PATH}"
+    sh sign "${PROJECT_PATH}/${TARGET_NAME}.xcarchive.zip" --type xcarchive --plist "${PLIST_PATH}"
     popd
 
     cd ${WORKSPACE}
