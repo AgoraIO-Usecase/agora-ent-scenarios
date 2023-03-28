@@ -678,11 +678,24 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         });
     }
 
+    private boolean showMoreDialogTag = false;
     private void showMoreDialog(View view) {
+        if (showMoreDialogTag) {
+            return;
+        }
+        showMoreDialogTag = true;
+
         if (moreDialog == null) {
             moreDialog = new MoreDialog(roomLivingViewModel.mSetting);
         }
-        moreDialog.show(getSupportFragmentManager(), MoreDialog.TAG);
+
+        if (!moreDialog.isAdded()) {
+            moreDialog.show(getSupportFragmentManager(), MoreDialog.TAG);
+        }
+
+        getBinding().getRoot().post(() -> {
+            showMoreDialogTag = false;
+        });
     }
 
     private void showMusicSettingDialog() {

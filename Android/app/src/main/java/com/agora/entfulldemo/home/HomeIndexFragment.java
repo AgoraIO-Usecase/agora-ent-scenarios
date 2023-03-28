@@ -24,7 +24,9 @@ import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnItemClickListener;
 import io.agora.scene.base.manager.PagePilotManager;
+import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.UiUtil;
+import io.agora.scene.widget.utils.UiUtils;
 
 public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIndexBinding> {
 
@@ -43,6 +45,10 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
             BaseRecyclerViewAdapter<AppItemHomeIndexBinding, ScenesModel, HomeIndexHolder> homeIndexAdapter = new BaseRecyclerViewAdapter<>(scenesModels, new OnItemClickListener<ScenesModel>() {
                 @Override
                 public void onItemClick(@NonNull ScenesModel scenesModel, View view, int position, long viewType) {
+                    if (UiUtils.isFastClick(2000)) {
+                        ToastUtils.showToast("操作太频繁");
+                        return;
+                    }
                     if (scenesModel.getActive()) {
                         goScene(scenesModel);
                     }
