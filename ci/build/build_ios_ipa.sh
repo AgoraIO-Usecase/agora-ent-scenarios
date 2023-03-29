@@ -85,13 +85,22 @@ cd ${WORKSPACE}
 # 压缩archive
 7za a -tzip "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" "${ARCHIVE_PATH}"
 
-# pushd ${WORKSPACE}
 sh sign "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" --type xcarchive --plist "${PLIST_PATH}"
-# popd
 
+CER_NAME="TestEntFull"
+if [[ ! -z $(echo ${packageName} | grep "io.agora.entfull") ]]; then
+    CER_NAME='EntFull'
+
+elif [[ ! -z $(echo ${packageName} | grep "io.agora.chatroom") ]]; then
+    CER_NAME="Room"
+
+elif [[ ! -z $(echo ${packageName} | grep "io.agora.ktv") ]]; then
+    CER_NAME="KTV"
+
+fi
 
 # 上传IPA
-7za a -tzip "${TARGET_NAME}_${BUILD_NUMBER}.zip" -r "${TARGET_NAME}_AES.ipa"
+7za a -tzip "${TARGET_NAME}_${BUILD_NUMBER}.zip" -r "${TARGET_NAME}_${CER_NAME}.ipa"
 python3 artifactory_utils.py --action=upload_file --file="${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
 
 # 上传符号表
