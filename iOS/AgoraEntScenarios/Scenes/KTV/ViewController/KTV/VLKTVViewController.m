@@ -102,6 +102,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) NSInteger selectedEffectIndex;
 @property (nonatomic, assign) BOOL isPause;
 @property (nonatomic, assign) NSInteger retryCount;
+@property (nonatomic, assign) BOOL isJoinChorus;
 @end
 
 @implementation VLKTVViewController
@@ -164,6 +165,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     
     //add debug
     [self.topView addGestureRecognizer:[KTVDebugManager createStartGesture]];
+    
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -662,10 +664,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             if (seat.rtcUid == 0) {
                 VL(weakSelf);
                 KTVLogError(@"before enterSeat error");
+                self.isJoinChorus = true;
                 [self enterSeatWithIndex:i completion:^(NSError *error) {
                     if(error){
                         KTVLogError(@"enterSeat error:%@", error.description);
                         self.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
+                        self.isJoinChorus = false;
                         return;
                     }
                     [weakSelf _joinChorus];
@@ -693,6 +697,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
         if (!isSuccess) {
+            weakSelf.isJoinChorus = false;
             return;
         }
         NSLog(@"before switch role, load music success");
@@ -701,12 +706,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             if (state == KTVSwitchRoleStateFail && reason != KTVSwitchRoleFailReasonNoPermission) {
                 weakSelf.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
                 [VLToast toast:[NSString stringWithFormat:@"join chorus fail: %ld", reason]];
+                weakSelf.isJoinChorus = false;
                 KTVLogInfo(@"join chorus fail");
                 //TODO: error toast?
                 return;
             }
 
             weakSelf.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForLeave;
+            weakSelf.isJoinChorus = false;
             
             weakSelf.isNowMicMuted = role == KTVSingRoleAudience;
             [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:weakSelf.isNowMicMuted
@@ -1481,7 +1488,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if(!_isOnMicSeat && count >=8){
         self.MVView.joinCoSingerState = KTVJoinCoSingerStateIdle;
     } else {
-        self.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
+        if(!self.isJoinChorus){
+            self.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
+        }
     }
 }
 
