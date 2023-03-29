@@ -131,6 +131,7 @@ VLKTVRemoteVolumeViewDelegate
 - (void)sliderView:(VLKTVSliderView *)sliderView valueChanged:(float)value {
     VLKTVValueDidChangedType type;
     if (sliderView == self.soundSlider) {
+        NSLog(@"value:%f", value);
         self.setting.soundValue = value;
         type = VLKTVValueDidChangedTypeSound;
     } else {

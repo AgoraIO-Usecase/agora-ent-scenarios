@@ -865,6 +865,7 @@
 				DD02925C295BF0DC00485225 /* View */,
 				DD0292AF295BF0DC00485225 /* Service */,
 				DD0292B6295BF0DC00485225 /* ViewController */,
+				DD0292B8295BF0DC00485225 /* KTVAPI */,
 				DD0292C0295BF0DC00485225 /* KtvResource.bundle */,
 			);
 			path = KTV;
@@ -1043,10 +1044,10 @@
 			isa = PBXGroup;
 			children = (
 				DD0292B0295BF0DC00485225 /* KTVServiceModel.h */,
+				DD0292B4295BF0DC00485225 /* KTVServiceModel.m */,
+				DD0292B3295BF0DC00485225 /* KTVServiceProtocol.h */,
 				DD0292B1295BF0DC00485225 /* KTVSyncManagerServiceImp.swift */,
 				DD0292B2295BF0DC00485225 /* AppContext+KTV.m */,
-				DD0292B3295BF0DC00485225 /* KTVServiceProtocol.h */,
-				DD0292B4295BF0DC00485225 /* KTVServiceModel.m */,
 				DD0292B5295BF0DC00485225 /* AppContext+KTV.h */,
 			);
 			path = Service;
@@ -1056,7 +1057,8 @@
 			isa = PBXGroup;
 			children = (
 				DD0292B7295BF0DC00485225 /* VLCreateRoomViewController.m */,
-				DD0292B8295BF0DC00485225 /* KTV */,
+				DD0292B9295BF0DC00485225 /* VLKTVViewController.h */,
+				DD0292BB295BF0DC00485225 /* VLKTVViewController.m */,
 				DD0292BD295BF0DC00485225 /* VLOnLineListVC.h */,
 				DD0292BE295BF0DC00485225 /* VLCreateRoomViewController.h */,
 				DD0292BF295BF0DC00485225 /* VLOnLineListVC.m */,
@@ -1064,17 +1066,15 @@
 			path = ViewController;
 			sourceTree = "<group>";
 		};
-		DD0292B8295BF0DC00485225 /* KTV */ = {
+		DD0292B8295BF0DC00485225 /* KTVAPI */ = {
 			isa = PBXGroup;
 			children = (
 				DD01BD1E29C0422A00C9B403 /* KTVApiDelegate.swift */,
 				DD01BD1D29C0422A00C9B403 /* KTVLrcViewDelegate.swift */,
-				DD0292B9295BF0DC00485225 /* VLKTVViewController.h */,
-				DD0292BB295BF0DC00485225 /* VLKTVViewController.m */,
 				DD01BD2129C0447A00C9B403 /* KTVApiImpl.swift */,
 				DD1CD29129C06430002331AE /* KTVLrcControl.swift */,
 			);
-			path = KTV;
+			path = KTVAPI;
 			sourceTree = "<group>";
 		};
 		DD2209FB295B332C00F57F30 /* VoiceChatRoom */ = {
@@ -1890,6 +1890,7 @@
 				DDA1991928FFE579009D3E61 /* String+Extension.swift */,
 				DDA1991A28FFE579009D3E61 /* AgoraExtension.swift */,
 				DDA1991B28FFE579009D3E61 /* UIImage+Color.swift */,
+				DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */,
 				DDA1991C28FFE579009D3E61 /* Array+Extension.swift */,
 			);
 			path = Extension;
@@ -2083,7 +2084,6 @@
 		DDDDDB3228FFD78B005F4E8B /* Context */ = {
 			isa = PBXGroup;
 			children = (
-				DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */,
 				DDDDDB3428FFD78B005F4E8B /* AppContext.swift */,
 				DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */,
 				DD1603432963CAFD00182A04 /* AgoraEntLog.swift */,
