@@ -738,7 +738,6 @@ extension KTVApiImpl {
                 self.remotePlayerDuration = TimeInterval(duration)
                 self.lastMainSingerUpdateTime = Date().milListamp
                 self.remotePlayerPosition = TimeInterval(realPosition)
-                print("remote position: \(self.remotePlayerPosition)")
                 let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
                 if (self.playerState != state) {
                     agoraPrint("[setLrcTime] recv state: \(self.playerState.rawValue)->\(state.rawValue) role: \(singerRole.rawValue) role: \(singerRole.rawValue)")
@@ -784,7 +783,6 @@ extension KTVApiImpl {
             } else if dict["cmd"] as? String == "setVoicePitch" {
                 if role == .audience {
                     guard let voicePitch: Double = dict["pitch"] as? Double else {return}
-                    print("test pitch:\(voicePitch)")
                     self.pitch = voicePitch
                 }
             }
@@ -996,7 +994,6 @@ extension KTVApiImpl {
     private func setProgress(with pos: Int) {
         lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
         lrcControl?.onUpdateProgress(progress: pos)
-        print("test: pitch:\(self.pitch) pos: \(pos)")
     }
 }
 
