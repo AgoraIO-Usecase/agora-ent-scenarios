@@ -91,7 +91,7 @@ popd
 cd ${WORKSPACE}
 
 # 上传IPA
-7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r "${TARGET_NAME}_AES.ipa"
+7za a -tzip "${TARGET_NAME}_${BUILD_NUMBER}.zip" -r "${TARGET_NAME}_AES.ipa"
 python3 artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
 
 # 上传符号表
@@ -100,7 +100,7 @@ python3 artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/dsym_$
 
 
 # 删除IPA文件夹
-cd ${PROJECT_PATH} && rm -rf "*.zip"
+# cd ${PROJECT_PATH} && rm -rf "*.zip"
 
 # 复原Keycenter文件
 python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 1
