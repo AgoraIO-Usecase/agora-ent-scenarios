@@ -491,7 +491,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                         })
                     }
                     R.id.voice_extend_item_mic -> {
-                        requestAudioPermission{ roomObservableDelegate.onClickBottomMic() }
+                        roomObservableDelegate.onClickBottomMic()
                     }
                     R.id.voice_extend_item_hand_up -> {
                         roomObservableDelegate.onClickBottomHandUp()

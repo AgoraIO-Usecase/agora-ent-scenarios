@@ -635,9 +635,9 @@ class RoomObservableViewDelegate constructor(
                         }
                         MicClickAction.UnMute -> {
                             //取消自己禁言
-                            (activity as? ChatroomLiveActivity)?.requestAudioPermission {
+                            (activity as ChatroomLiveActivity).requestAudioPermission {
                                 muteLocalAudio(false, micInfo.micIndex)
-                            } ?: muteLocalAudio(false, micInfo.micIndex)
+                            }
                         }
                         MicClickAction.Lock -> {
                             //房主锁麦
@@ -867,9 +867,11 @@ class RoomObservableViewDelegate constructor(
             return
         }
         if (isLocalAudioMute) {
-            isLocalAudioMute = false
-            chatPrimaryMenuView.setEnableMic(true)
-            muteLocalAudio(false)
+            (activity as ChatroomLiveActivity).requestAudioPermission{
+                isLocalAudioMute = false
+                chatPrimaryMenuView.setEnableMic(true)
+                muteLocalAudio(false)
+            }
         } else {
             isLocalAudioMute = true
             chatPrimaryMenuView.setEnableMic(false)
