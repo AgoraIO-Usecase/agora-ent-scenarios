@@ -81,25 +81,26 @@ echo PLIST_PATH: $PLIST_PATH
 # archive 这边使用的工作区间 也可以使用project
 xcodebuild CODE_SIGN_STYLE="Manual" -workspace "${APP_PATH}" -scheme "${TARGET_NAME}" clean CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -configuration "${CONFIGURATION}" archive -archivePath "${ARCHIVE_PATH}" -destination 'generic/platform=iOS' -quiet || exit
 
+cd ${WORKSPACE}
 # 压缩archive
 7za a -tzip "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" "${ARCHIVE_PATH}"
 
-pushd ${WORKSPACE}
-sh sign "${PROJECT_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" --type xcarchive --plist "${PLIST_PATH}"
-popd
+# pushd ${WORKSPACE}
+sh sign "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" --type xcarchive --plist "${PLIST_PATH}"
+# popd
 
-cd ${WORKSPACE}
 
 # 上传IPA
 7za a -tzip "${TARGET_NAME}_${BUILD_NUMBER}.zip" -r "${TARGET_NAME}_AES.ipa"
-python3 artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
+python3 artifactory_utils.py --action=upload_file --file="${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
 
 # 上传符号表
 7za a -tzip dsym_${BUILD_NUMBER}.zip -r "${ARCHIVE_PATH}/dSYMs/${TARGET_NAME}.app.dSYM"
-python3 artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/dsym_${BUILD_NUMBER}.zip" --project
+python3 artifactory_utils.py --action=upload_file --file="dsym_${BUILD_NUMBER}.zip" --project
 
 
 # 删除IPA文件夹
+# rm -rf "${PROJECT_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip"
 # cd ${PROJECT_PATH} && rm -rf "*.zip"
 
 # 复原Keycenter文件
