@@ -128,6 +128,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         self.roomInfo?.room?.use_robot = enable
         self.roomInfo?.mic_info![6] = mic_info
         self.rtcView.updateAlien(mic_info.status)
+        if enable {
+            self.rtcView.updateAlienMic(.blue)
+        }
     }
     
     func onRobotVolumeChanged(roomId: String, volume: UInt, from fromId: String) {
@@ -196,7 +199,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 let mic_index = first.mic_index
                 //刷新底部✋🏻状态
                 if !isOwner {
-                    refreshHandsUp(status: status)
+                    if first.member != nil {
+                        refreshHandsUp(status: status)
+                    }
                 }
                 var micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
                     $0.chat_uid ?? "" == fromId
@@ -244,9 +249,11 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                     }
                 } else {
                     if local_index == nil || mic_index == local_index {
-                        rtckit.setClientRole(role: .audience)
-                        rtckit.muteLocalAudioStream(mute: true)
-                        chatBar.refresh(event: .mic, state: .selected, asCreator: false)
+                        if status == 2 {
+                            rtckit.setClientRole(role: .audience)
+                            rtckit.muteLocalAudioStream(mute: true)
+                            chatBar.refresh(event: .mic, state: .selected, asCreator: false)
+                        }
                     }
                 }
                 
