@@ -90,6 +90,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
     /**房间基础*/
     private val roomKitBean = RoomKitBean()
+    private var audioPermDenied = false
 
     private val appSettingLauncher =
         registerForActivityResult(object : ActivityResultContract<String, Boolean>(){
@@ -128,8 +129,12 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         initListeners()
         initData()
         initView()
-        requestAudioPermission {
-            "onPermissionGrant initSdkJoin".logD(TAG)
+        if (roomKitBean.isOwner) {
+            requestAudioPermission {
+                "onPermissionGrant initSdkJoin".logD(TAG)
+                roomLivingViewModel.initSdkJoin(roomKitBean)
+            }
+        } else {
             roomLivingViewModel.initSdkJoin(roomKitBean)
         }
     }
@@ -578,7 +583,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         super.finish()
     }
 
-    fun requestAudioPermission(grantedRun: Runnable? = null) {
+    fun requestAudioPermission(force: Boolean = false, grantedRun: Runnable? = null ) {
+        if (audioPermDenied && !force ) {
+            grantedRun?.run()
+            return
+        }
         grantedRun?.let {
             permissionGrantedRun = it
         }
@@ -634,6 +643,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     }
 
     private fun onPermissionsDenied(){
+        audioPermDenied = true
         // 显示弹窗
         CommonFragmentAlertDialog()
             .titleText(getString(R.string.voice_chatroom_permission_leak_title))

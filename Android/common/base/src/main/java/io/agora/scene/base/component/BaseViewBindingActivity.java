@@ -29,6 +29,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewbinding.ViewBinding;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.agora.scene.base.R;
 import io.agora.scene.base.utils.ToastUtils;
 import kotlin.jvm.internal.Intrinsics;
@@ -103,6 +106,7 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
     //////////////////////// Methods of Permission ////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     protected PermissionItem[] mPermissionArray;
+    protected final List<String> mPermissionListDenied = new ArrayList<>();
 
     public static final int PERM_REQID_RECORD_AUDIO = 0x1001;
     public static final int PERM_REQID_CAMERA = 0x1002;
@@ -119,7 +123,14 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         }
     }
 
-    public void requestReadStoragePermission() {
+    public void requestReadStoragePermission(){
+        this.requestReadStoragePermission(false);
+    }
+
+    public void requestReadStoragePermission(boolean force) {
+        if (force) {
+            mPermissionListDenied.remove(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
         if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mPermissionArray = new PermissionItem[1];
             for (PermissionItem item : mPermissionArray) {
@@ -141,7 +152,14 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         checkPermission();
     }
 
-    protected void requestCameraPermission() {
+    protected void requestCameraPermission(){
+        this.requestCameraPermission(false);
+    }
+
+    protected void requestCameraPermission(boolean force) {
+        if (force) {
+            mPermissionListDenied.remove(Manifest.permission.CAMERA);
+        }
         if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mPermissionArray = new PermissionItem[1];
             for (PermissionItem item : mPermissionArray) {
@@ -164,7 +182,14 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         checkPermission();
     }
 
-    protected void requestRecordPermission() {
+    protected void requestRecordPermission(){
+        this.requestRecordPermission(false);
+    }
+
+    protected void requestRecordPermission(boolean force) {
+        if(force){
+            mPermissionListDenied.remove(Manifest.permission.RECORD_AUDIO);
+        }
         if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mPermissionArray = new PermissionItem[1];
             for (PermissionItem item : mPermissionArray) {
@@ -198,6 +223,9 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
             if (!mPermissionArray[i].granted) {
                 // 请求相应的权限i
                 String permission = mPermissionArray[i].permissionName;
+                if (mPermissionListDenied.contains(permission)) {
+                    continue;
+                }
                 int requestCode = mPermissionArray[i].requestId;
                 boolean shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(this, permission);
                 if (shouldShowRationale) {
@@ -286,6 +314,7 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         if(permission == null){
             return;
         }
+        mPermissionListDenied.add(permission);
         onPermissionDined(permission);
     }
 

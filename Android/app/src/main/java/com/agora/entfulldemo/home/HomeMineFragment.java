@@ -105,7 +105,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             editNameDialog.show();
         });
         getBinding().ivUserAvatar.setOnClickListener(view -> {
-            ((MainActivity) requireActivity()).requestReadStoragePermission();
+            ((MainActivity) requireActivity()).requestReadStoragePermission(true);
         });
     }
 

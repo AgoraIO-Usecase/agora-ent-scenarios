@@ -199,8 +199,13 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
         getBinding().lrcControlView.post(() -> {
             // TODO workaround 先强制申请权限， 避免首次安装无声
-            toggleAudioRun = () -> roomLivingViewModel.init();
-            requestRecordPermission();
+            if(roomLivingViewModel.isRoomOwner()){
+                toggleAudioRun = () -> roomLivingViewModel.init();
+                requestRecordPermission();
+            }
+            else{
+                roomLivingViewModel.init();
+            }
         });
 
         if (!TextUtils.isEmpty(roomLivingViewModel.roomInfoLiveData.getValue().getBgOption())) {
@@ -226,7 +231,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
             if (b) {
                 toggleAudioRun = () -> roomLivingViewModel.toggleMic(true);
-                requestRecordPermission();
+                requestRecordPermission(true);
             } else {
                 roomLivingViewModel.toggleMic(false);
             }
@@ -665,7 +670,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             toggleVideoRun = () -> {
                 roomLivingViewModel.toggleSelfVideo(true);
             };
-            requestCameraPermission();
+            requestCameraPermission(true);
         } else {
             roomLivingViewModel.toggleSelfVideo(false);
         }

@@ -635,7 +635,7 @@ class RoomObservableViewDelegate constructor(
                         }
                         MicClickAction.UnMute -> {
                             //取消自己禁言
-                            (activity as ChatroomLiveActivity).requestAudioPermission {
+                            (activity as ChatroomLiveActivity).requestAudioPermission(true) {
                                 muteLocalAudio(false, micInfo.micIndex)
                             }
                         }
@@ -785,7 +785,9 @@ class RoomObservableViewDelegate constructor(
             .rightText(activity.getString(R.string.voice_room_accept))
             .setOnClickListener(object : CommonFragmentAlertDialog.OnClickBottomListener {
                 override fun onConfirmClick() {
-                    roomLivingViewModel.acceptMicSeatInvitation()
+                    (activity as ChatroomLiveActivity).requestAudioPermission{
+                        roomLivingViewModel.acceptMicSeatInvitation()
+                    }
                 }
 
                 override fun onCancelClick() {
@@ -849,7 +851,9 @@ class RoomObservableViewDelegate constructor(
                     if (isRequesting) {
                         roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())
                     } else {
-                        roomLivingViewModel.startMicSeatApply(micIndex)
+                        (activity as ChatroomLiveActivity).requestAudioPermission{
+                            roomLivingViewModel.startMicSeatApply(micIndex)
+                        }
                     }
                 }
             }).show(activity.supportFragmentManager, "room_hands_apply")
@@ -867,7 +871,7 @@ class RoomObservableViewDelegate constructor(
             return
         }
         if (isLocalAudioMute) {
-            (activity as ChatroomLiveActivity).requestAudioPermission{
+            (activity as ChatroomLiveActivity).requestAudioPermission(true){
                 isLocalAudioMute = false
                 chatPrimaryMenuView.setEnableMic(true)
                 muteLocalAudio(false)
