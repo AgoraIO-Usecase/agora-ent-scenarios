@@ -89,17 +89,23 @@ extension VoiceRoomViewController {
                     let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: (205 / 375.0) * ScreenWidth)), custom: applyAlert)
                     applyAlert.actionEvents = { [weak self] in
                         if $0 == 31 {
-                            let count = (index - 1000) / 10
-                            let tag = (index - 1000) % 10
-                            self?.rtckit.stopPlaySound()
-                            let mic_info = self?.roomInfo?.mic_info![6]
-                            mic_info?.status = 5
-                            self?.roomInfo?.room?.use_robot = true
-                            self?.roomInfo?.mic_info![6] = mic_info!
-                            self?.rtcView.updateAlien(mic_info?.status ?? 5)
-                            self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
-                            self?.rtcView.updateAlienMic(.blue)
-                        }
+                            ChatRoomServiceImp.getSharedInstance().enableRobot(enable: true) { error in
+                                if error == nil {
+                                    let count = (index - 1000) / 10
+                                    let tag = (index - 1000) % 10
+                                    self?.rtckit.stopPlaySound()
+                                    let mic_info = self?.roomInfo?.mic_info![6]
+                                    mic_info?.status = 5
+                                    self?.roomInfo?.room?.use_robot = true
+                                    self?.roomInfo?.mic_info![6] = mic_info!
+                                    self?.rtcView.updateAlien(mic_info?.status ?? 5)
+                                    self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
+                                    self?.rtcView.updateAlienMic(.blue)
+                                } else {
+                                    self?.view.makeToast("激活机器人失败")
+                                }
+                            }
+                                                    }
                         vc.dismiss(animated: true)
                     }
                     self?.presentViewController(vc,animated: true)
