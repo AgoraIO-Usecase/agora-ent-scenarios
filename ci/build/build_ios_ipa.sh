@@ -100,7 +100,7 @@ elif [[ ! -z $(echo ${packageName} | grep "io.agora.ktv") ]]; then
 fi
 
 # 上传IPA
-7za a -tzip "${TARGET_NAME}_${BUILD_NUMBER}.zip" -r "${TARGET_NAME}_${BUILD_NUMBER}_${CER_NAME}.ipa"
+7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r "${TARGET_NAME}_${BUILD_NUMBER}_${CER_NAME}.ipa"
 python3 artifactory_utils.py --action=upload_file --file="${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
 
 # 上传符号表
