@@ -534,7 +534,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                                 binding.likeView.isVisible = true
                                 if (code == Error.MODERATION_FAILED){
                                     ToastTools.show(this@ChatroomLiveActivity,
-                                        getString(R.string.voice_room_content_prohibited,Toast.LENGTH_SHORT)
+                                        getString(R.string.voice_room_content_prohibited),Toast.LENGTH_SHORT
                                     )
                                 }
                             }

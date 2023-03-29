@@ -119,9 +119,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         // 上麦
                         RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
                         if (seatLocal == null || seatLocal.getSeatIndex() < 0) {
-                            roomLivingViewModel.haveSeat(position);
-                            getBinding().cbMic.setChecked(false);
-                            getBinding().cbVideo.setChecked(false);
+                            toggleAudioRun = () -> {
+                                roomLivingViewModel.haveSeat(position);
+                                getBinding().cbMic.setChecked(false);
+                                getBinding().cbVideo.setChecked(false);
+                            };
                             requestRecordPermission();
                         }
                     }
@@ -222,8 +224,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if (seatLocal == null || mRoomSpeakerAdapter.getItem(seatLocal.getSeatIndex()) == null) {
                 return;
             }
-            toggleAudioRun = () -> roomLivingViewModel.toggleMic(b);
-            requestRecordPermission();
+            if (b) {
+                toggleAudioRun = () -> roomLivingViewModel.toggleMic(true);
+                requestRecordPermission();
+            } else {
+                roomLivingViewModel.toggleMic(false);
+            }
         });
         getBinding().iBtnChorus.setOnClickListener(v -> showChorusSongDialog());
         getBinding().iBtnChorus.setClickable(false);
@@ -655,10 +661,14 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     //开启 关闭摄像头
     private void toggleSelfVideo(boolean isOpen) {
-        toggleVideoRun = () -> {
-            roomLivingViewModel.toggleSelfVideo(isOpen);
-        };
-        requestCameraPermission();
+        if (isOpen) {
+            toggleVideoRun = () -> {
+                roomLivingViewModel.toggleSelfVideo(true);
+            };
+            requestCameraPermission();
+        } else {
+            roomLivingViewModel.toggleSelfVideo(false);
+        }
     }
 
     @Override
