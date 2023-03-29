@@ -798,6 +798,7 @@ extension KTVApiImpl {
         //如果mpk不是playing状态 pitch = 0
         if musicPlayer.getPlayerState() != .playing {pitch = 0}
         self.pitch = pitch
+        print("\(Thread.current)")
         lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
         lrcControl?.onUpdateProgress(progress: Int(getPlayerCurrentTime()))
         

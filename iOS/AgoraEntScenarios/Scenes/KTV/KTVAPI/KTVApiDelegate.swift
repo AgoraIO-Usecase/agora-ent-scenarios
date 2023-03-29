@@ -197,36 +197,36 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     func cleanCache()
     
     
-    
-    /// 获取歌曲榜单
-    /// - Parameter musicChartResult: request, status,  chat info list
-    /// - Returns: <#description#>
+    /**
+     * 获取歌曲榜单
+     * Parameter completion: 榜单列表回调
+     */
     func fetchMusicCharts(completion:@escaping MusicChartCallBacks)
     
-    
-    /// 根据歌曲榜单类型搜索歌单
-    /// - Parameters:
-    ///   - musicChartId: <#musicChartId description#>
-    ///   - page: <#page description#>
-    ///   - pageSize: <#pageSize description#>
-    ///   - jsonOption: <#jsonOption description#>
-    ///   - musicCollectionResult: request, status, music list
-    /// - Returns: <#description#>
+    /**
+    * 根据歌曲榜单类型搜索歌单
+    *  Parameters:
+    *  musicChartId: 榜单id
+    *  page: 榜单的查询页数
+    *  pageSize: 查询每页的数据长度
+    *  jsonOption: 自定义过滤模式
+    *  completion: 歌曲列表回调
+    */
     func searchMusic(musicChartId: Int,
                      page: Int,
                      pageSize: Int,
                      jsonOption: String,
                      completion:@escaping MusicResultCallBacks)
     
-    
-    /// 根据关键字搜索歌曲
-    /// - Parameters:
-    ///   - keyword: <#keyword description#>
-    ///   - page: <#page description#>
-    ///   - pageSize: <#pageSize description#>
-    ///   - jsonOption: <#jsonOption description#>
-    ///   - completion: <#completion description#>
-    /// - Returns: <#description#>
+    /**
+    * 根据关键字搜索歌曲
+    *  Parameters:
+    *  keyword: 搜索关键字
+    *  page: 榜单的查询页数
+    *  pageSize: 查询每页的数据长度
+    *  jsonOption: 自定义过滤模式
+    *  completion: 歌曲列表回调
+    */
     func searchMusic(keyword: String,
                      page: Int, pageSize: Int,
                      jsonOption: String,
