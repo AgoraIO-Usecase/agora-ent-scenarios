@@ -21,9 +21,7 @@ struct KeyCenter {
      则应使用不同的 App ID。如果应用程序需要相互通信，则应使用同一个App ID。
      进入声网控制台(https://console.agora.io/)，创建一个项目，进入项目配置页，即可看到APP ID。
      */
-    static let AppId: String = "72d8d5c7b38445e5bb26f1f270ee4649"
-    //72d8d5c7b38445e5bb26f1f270ee4649
-    // b792b33fc5f046ffa22776bf8d140e4d
+    static let AppId: String = <#Your AppId#>
     /**
      Certificate.
      Agora provides App certificate to generate Token. You can deploy and generate a token on your server,
@@ -36,9 +34,7 @@ struct KeyCenter {
      进入声网控制台(https://console.agora.io/)，创建一个带证书鉴权的项目，进入项目配置页，即可看到APP证书。
      注意：如果项目没有开启证书鉴权，这个字段留空。
      */
-    static let Certificate: String? = "d8f9f6762e494fcfaa8bed63de726ffb"
-    // d8f9f6762e494fcfaa8bed63de726ffb
-    //cedaa9beef5c4378ad9675c4e0ca0af2
+    static let Certificate: String? = <#Your Certificate#>
     /**
      Token.
      Agora provides Temporary Access Token to join the spatial channel with APP ID which enable App Certificate.
@@ -54,11 +50,9 @@ struct KeyCenter {
     
     static var HostUrl: String = "https://gateway-fulldemo-staging.agoralab.co"
     
-    static var IMAppKey: String? = "81399972#1019272"
-    static var IMClientId: String? = "YXA6tczxcixPTCqT1sN1hSBU1g"
-    static var IMClientSecret: String? = "YXA6-wvmWSubEWga1En1YdxdrL1ktKY"
-
-    static var baseServerUrl4Test: String? = "https://test-toolbox.bj2.agoralab.co/v1/"
-    static var baseServerUrl: String? = "https://toolbox.bj2.agoralab.co/v1/"
-    static var onlineBaseServerUrl: String? = baseServerUrl
+    static var IMAppKey: String? = ""
+    static var IMClientId: String? = ""
+    static var IMClientSecret: String? = ""
+ 
+    static var onlineBaseServerUrl: String? = "https://toolbox.bj2.agoralab.co/v1/"
 }
