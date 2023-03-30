@@ -13,29 +13,29 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="70dp"
+        android:gravity="center"
         android:text="歌词加载失败"
         android:textColor="@color/white"
-        android:gravity="center"
         android:textSize="20dp"
         android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/bgd_control_layout_lrc"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/bgd_control_layout_lrc"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
         android:id="@+id/downloadLrcFailedBtn"
         android:layout_width="80dp"
         android:layout_height="30dp"
+        android:background="@drawable/ktv_skip_btn_bg"
         android:gravity="center"
         android:text="点击重试"
         android:textColor="@color/white"
         android:textSize="12sp"
-        android:background="@drawable/ktv_skip_btn_bg"
-        app:layout_constraintTop_toBottomOf="@id/downloadLrcFailedView"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/downloadLrcFailedView" />
 
     <io.agora.scene.ktv.widget.lrcView.MyScoringView
         android:id="@+id/scoringView"
@@ -43,13 +43,13 @@
         android:layout_height="90dp"
         android:layout_marginTop="48dp"
         android:background="#02FFFFFF"
+        app:initialScore="0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:pitchIndicatorRadius="6dp"
-        app:pitchInitialScore="0"
         app:pitchStickHeight="4dp"
-        app:pitchStickHighlightColor="@color/pink_b4" />
+        app:pitchStickHighlightedColor="@color/pink_b4" />
 
     <io.agora.karaoke_view.v11.LyricsView
         android:id="@+id/lyricsView"
@@ -60,10 +60,9 @@
         android:paddingTop="4dp"
         android:paddingEnd="10dp"
         android:paddingBottom="10dp"
-        app:currentHighlightedTextColor="@color/pink_b4"
-        app:currentTextColor="@color/white"
-        app:currentTextSize="16sp"
-        app:defaultTextSize="14sp"
+        app:currentLineHighlightedTextColor="@color/pink_b4"
+        app:currentLineTextColor="@color/white"
+        app:currentLineTextSize="16sp"
         app:labelWhenNoLyrics=" "
         app:layout_constraintBottom_toTopOf="@+id/bgd_control_layout_lrc"
         app:layout_constraintTop_toBottomOf="@+id/scoringView"
@@ -73,6 +72,7 @@
         app:startOfVerseIndicatorPaddingTop="6dp"
         app:startOfVerseIndicatorRadius="4dp"
         app:textGravity="center"
+        app:textSize="14sp"
         tools:layout_editor_absoluteX="-36dp" />
 
     <View
@@ -165,25 +165,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@mipmap/ic_join_chorus"
         android:layout_marginBottom="10dp"
+        android:background="@mipmap/ic_join_chorus"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/ivJoinChorusLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@mipmap/ic_join_chorus_loading"
         android:layout_marginBottom="10dp"
-        android:visibility="invisible"
+        android:background="@mipmap/ic_join_chorus_loading"
         android:clickable="false"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/ivSkipPrelude"
