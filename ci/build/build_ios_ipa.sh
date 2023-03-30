@@ -26,7 +26,7 @@ cp $KEYCENTER_PATH.bak $KEYCENTER_PATH
 CONFIGURATION='Release'
 CER_NAME="EntFull_Dis"
 result=$(echo ${method} | grep "development")
-if [ -z "$result" ]
+if [[ ! -z "$result" ]]
 then
     CONFIGURATION='Debug'
     CER_NAME="EntFull_Dev"
