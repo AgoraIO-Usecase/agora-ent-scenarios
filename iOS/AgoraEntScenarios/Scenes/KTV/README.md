@@ -42,7 +42,7 @@
   AppId：声网appid
   Certificate：声网Certificate
   ```
-- 项目的第三方库使用pod集成，需要在agora-ent-scenarios/iOS目录下执行pod install,然后再开始体验项目
+- 项目的第三方库使用 pod 集成，需要在 agora-ent-scenarios/iOS 目录下执行 pod install ,然后再开始体验项目
 - 用 Xcode 运行项目即可开始您的体验
 
 ---
