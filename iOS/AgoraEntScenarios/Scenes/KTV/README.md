@@ -208,7 +208,7 @@
 >   /**
 >   * 调整进度
 >   */
->   fun seekSing(time: Int)
+>   func seekSing(time: Int)
 >   ~~~
 >
 > * 与歌词组件配合使用
