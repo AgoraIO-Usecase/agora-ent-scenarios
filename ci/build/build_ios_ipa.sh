@@ -99,10 +99,11 @@ elif [[ ! -z $(echo ${packageName} | grep "io.agora.ktv") ]]; then
 
 fi
 
+PAYLOAD_PATH="${TARGET_NAME}_${BUILD_NUMBER}_Payload"
 # 上传IPA
-mkdir "${WORKSPACE}/${TARGET_NAME}_${BUILD_NUMBER}"
-mv "${WORKSPACE}/${TARGET_NAME}_${BUILD_NUMBER}_${CER_NAME}.ipa" "${WORKSPACE}/${TARGET_NAME}_${BUILD_NUMBER}"
-7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r "${WORKSPACE}/${TARGET_NAME}_${BUILD_NUMBER}"
+mkdir PAYLOAD_PATH
+mv "${TARGET_NAME}_${BUILD_NUMBER}_${CER_NAME}.ipa" "${ARCHIVE_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.ipa"
+7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r PAYLOAD_PATH
 python3 artifactory_utils.py --action=upload_file --file="${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
 
 # 上传符号表
