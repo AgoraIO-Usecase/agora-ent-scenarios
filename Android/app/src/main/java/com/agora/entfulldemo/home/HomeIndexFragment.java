@@ -46,7 +46,6 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
                 @Override
                 public void onItemClick(@NonNull ScenesModel scenesModel, View view, int position, long viewType) {
                     if (UiUtils.isFastClick(2000)) {
-                        ToastUtils.showToast("操作太频繁");
                         return;
                     }
                     if (scenesModel.getActive()) {

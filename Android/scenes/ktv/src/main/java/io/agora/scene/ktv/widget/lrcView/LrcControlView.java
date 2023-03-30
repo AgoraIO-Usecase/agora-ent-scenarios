@@ -178,6 +178,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     public void onSelfJoinedChorus() {
         chorusScore = 0;
+        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "" + 0));
         this.mRole = Role.CoSinger;
         mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
         mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
@@ -200,6 +201,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     public void onSelfLeavedChorus() {
         chorusScore = 0;
+        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "" + 0));
         this.mRole = Role.Listener;
         mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
         mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);

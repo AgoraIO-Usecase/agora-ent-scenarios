@@ -4,6 +4,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import io.agora.mediaplayer.Constants
+import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.IMediaPlayerObserver
 import io.agora.mediaplayer.data.PlayerUpdatedInfo
@@ -12,7 +13,6 @@ import io.agora.musiccontentcenter.*
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
 import io.agora.rtc2.audio.AudioParams
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.ktv.widget.lrcView.LrcControlView
 import org.json.JSONException
 import org.json.JSONObject
@@ -41,6 +41,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private lateinit var mPlayer: IAgoraMusicPlayer
 
     private lateinit var ktvApiConfig: KTVApiConfig
+    private var innerDataStreamId: Int = 0
     private var subChorusConnection: RtcConnection? = null
 
     private var mainSingerUid: Int = 0
@@ -90,11 +91,23 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private var isOnMicOpen = false
     private var isRelease = false
 
+    // mpk状态
+    private var mediaPlayerState: MediaPlayerState = MediaPlayerState.PLAYER_STATE_IDLE
+
     override fun initialize(
         config: KTVApiConfig
     ) {
         this.mRtcEngine = config.engine as RtcEngineEx
         this.ktvApiConfig = config
+
+        // ------------------ 创建内部使用的DataStream -----------------
+        // 内部使用的StreamId
+
+        // 内部使用的StreamId
+        val innerCfg = DataStreamConfig()
+        innerCfg.syncWithAudio = true
+        innerCfg.ordered = false
+        innerDataStreamId = mRtcEngine.createDataStream(innerCfg)
 
         // ------------------ 初始化内容中心 ------------------
         val contentCenterConfiguration = MusicContentCenterConfiguration()
@@ -115,6 +128,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mMusicCenter.registerEventHandler(this)
 
         startDisplayLrc()
+        startSyncPitch()
         isRelease = false;
     }
 
@@ -131,6 +145,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         isRelease = true
         singerRole = KTVSingRole.Audience
 
+        stopSyncPitch()
         stopDisplayLrc()
         this.mLastReceivedPlayPosTime = null
         this.mReceivedPlayPosition = 0
@@ -525,12 +540,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         obj: JSONObject,
         success: (isSendSuccess: Boolean) -> Unit
     ) {
-        val ret = mRtcEngine.sendStreamMessage(ktvApiConfig.dataStreamId, obj.toString().toByteArray())
+        val ret = mRtcEngine.sendStreamMessage(innerDataStreamId, obj.toString().toByteArray())
         if (ret == 0) {
             success.invoke(true)
         } else {
             Log.e(TAG, "sendStreamMessageWithJsonObject failed: $ret")
-            ToastUtils.showToast("消息没发出去啊: $ret")
         }
     }
 
@@ -562,13 +576,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         sendStreamMessageWithJsonObject(jsonMsg) {}
     }
 
-    private fun sendSyncPitch(pitch: Double) {
-        val msg: MutableMap<String?, Any?> = java.util.HashMap()
-        msg["cmd"] = "setVoicePitch"
-        msg["pitch"] = pitch
-        val jsonMsg = JSONObject(msg)
-        sendStreamMessageWithJsonObject(jsonMsg) {}
-    }
+//    private fun sendSyncPitch(pitch: Double) {
+//        val msg: MutableMap<String?, Any?> = java.util.HashMap()
+//        msg["cmd"] = "setVoicePitch"
+//        msg["pitch"] = pitch
+//        val jsonMsg = JSONObject(msg)
+//        sendStreamMessageWithJsonObject(jsonMsg) {}
+//    }
 
     // 合唱
     private fun joinChorus2ndChannel(
@@ -710,6 +724,53 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         }
     }
 
+    // ------------------ 音高pitch同步 ------------------
+    private var mSyncPitchThread: Thread? = null
+    private var mStopSyncPitch = true
+
+    // 开始同步音高
+    private fun startSyncPitch() {
+        mSyncPitchThread = Thread(object : Runnable {
+            override fun run() {
+                mStopSyncPitch = false
+                while (!mStopSyncPitch) {
+                    if (mediaPlayerState == MediaPlayerState.PLAYER_STATE_PLAYING &&
+                        (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.SoloSinger)) {
+                        sendSyncPitch(pitch)
+                    }
+                    try {
+                        Thread.sleep(50)
+                    } catch (exp: InterruptedException) {
+                        break
+                    }
+                }
+            }
+
+            private fun sendSyncPitch(pitch: Double) {
+                val msg: MutableMap<String?, Any?> = java.util.HashMap()
+                msg["cmd"] = "setVoicePitch"
+                msg["pitch"] = pitch
+                val jsonMsg = JSONObject(msg)
+                sendStreamMessageWithJsonObject(jsonMsg) {}
+            }
+        })
+        mSyncPitchThread?.name = "Thread-SyncPitch"
+        mSyncPitchThread?.start()
+    }
+
+    // 停止同步音高
+    private fun stopSyncPitch() {
+        mStopSyncPitch = true
+        pitch = 0.0
+        if (mSyncPitchThread != null) {
+            try {
+                mSyncPitchThread?.join()
+            } catch (exp: InterruptedException) {
+                Log.e(TAG, "stopSyncPitch: $exp")
+            }
+        }
+    }
+
     private fun loadLyric(songNo: Long, onLoadLyricCallback: (songNo: Long, lyricUrl: String?) -> Unit) {
         Log.d(TAG, "loadLyric: $songNo")
         val requestId = mMusicCenter.getLyric(songNo, 0)
@@ -782,7 +843,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
                 if (isChorusCoSinger()) {
                     // 本地BGM校准逻辑
-                    if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
+                    if (this.mediaPlayerState == MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
                         // 合唱者开始播放音乐前调小远端人声
                         mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
                         // 收到leadSinger第一次播放位置消息时开启本地播放（先通过seek校准）
@@ -792,7 +853,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                             mPlayer.seek(expectPosition)
                         }
                         mPlayer.play()
-                    } else if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
+                    } else if (this.mediaPlayerState == MediaPlayerState.PLAYER_STATE_PLAYING) {
                         val localNtpTime = getNtpTimeInMs()
                         val currentSystemTime = System.currentTimeMillis()
                         val localPosition =
@@ -808,12 +869,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         mReceivedPlayPosition = realPosition
                     }
 
-                    if (Constants.MediaPlayerState.getStateByValue(mpkState) != mPlayer.state) {
-                        when (Constants.MediaPlayerState.getStateByValue(mpkState)) {
-                            Constants.MediaPlayerState.PLAYER_STATE_PAUSED -> {
+                    if (MediaPlayerState.getStateByValue(mpkState) != this.mediaPlayerState) {
+                        when (MediaPlayerState.getStateByValue(mpkState)) {
+                            MediaPlayerState.PLAYER_STATE_PAUSED -> {
                                 mPlayer.pause()
                             }
-                            Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
+                            MediaPlayerState.PLAYER_STATE_PLAYING -> {
                                 mPlayer.resume()
                             }
                             else -> {}
@@ -840,18 +901,20 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val state = jsonMsg.getInt("state")
                 val error = jsonMsg.getInt("error")
                 if (isChorusCoSinger()) {
-                    when (Constants.MediaPlayerState.getStateByValue(state)) {
-                        Constants.MediaPlayerState.PLAYER_STATE_PAUSED -> {
+                    when (MediaPlayerState.getStateByValue(state)) {
+                        MediaPlayerState.PLAYER_STATE_PAUSED -> {
                             mPlayer.pause()
                         }
-                        Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
+                        MediaPlayerState.PLAYER_STATE_PLAYING -> {
                             mPlayer.resume()
                         }
                         else -> {}
                     }
+                } else {
+                    this.mediaPlayerState = MediaPlayerState.getStateByValue(state)
                 }
                 ktvApiEventHandlerList.forEach { it.onMusicPlayerStateChanged(
-                    Constants.MediaPlayerState.getStateByValue(state),
+                    MediaPlayerState.getStateByValue(state),
                     Constants.MediaPlayerError.getErrorByValue(error),
                     false
                 ) }
@@ -880,7 +943,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             for (info in allSpeakers) {
                 if (info.uid == 0) {
                     pitch =
-                        if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING && isOnMicOpen) {
+                        if (this.mediaPlayerState == MediaPlayerState.PLAYER_STATE_PLAYING && isOnMicOpen) {
                             info.voicePitch
                         } else {
                             0.0
@@ -888,9 +951,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 }
             }
         }
-        if (this.singerRole == KTVSingRole.LeadSinger || this.singerRole == KTVSingRole.SoloSinger) {
-            sendSyncPitch(pitch)
-        }
+//        if (this.singerRole == KTVSingRole.LeadSinger || this.singerRole == KTVSingRole.SoloSinger) {
+//            sendSyncPitch(pitch)
+//        }
     }
 
     // 用于合唱校准
@@ -961,8 +1024,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         val mediaPlayerState = state ?: return
         val mediaPlayerError = error ?: return
         Log.d(TAG, "onPlayerStateChanged called, state: $mediaPlayerState, error: $error")
+        this.mediaPlayerState = mediaPlayerState
         when (mediaPlayerState) {
-            Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
+            MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                 duration = mPlayer.duration
                 this.localPlayerPosition = 0
                 mPlayer.selectAudioTrack(1)
@@ -972,17 +1036,17 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     mPlayer.play()
                 }
             }
-            Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
+            MediaPlayerState.PLAYER_STATE_PLAYING -> {
                 mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
             }
-            Constants.MediaPlayerState.PLAYER_STATE_PAUSED -> {
+            MediaPlayerState.PLAYER_STATE_PAUSED -> {
                 mRtcEngine.adjustPlaybackSignalVolume(100)
             }
-            Constants.MediaPlayerState.PLAYER_STATE_STOPPED -> {
+            MediaPlayerState.PLAYER_STATE_STOPPED -> {
                 mRtcEngine.adjustPlaybackSignalVolume(100)
                 duration = 0
             }
-            Constants.MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
+            MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
                 // 打分 + 同步分数
                 val view = lrcView as LrcControlView
                 val score = view.cumulativeScoreInPercentage.toFloat()
@@ -1014,7 +1078,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             msg["time"] =
                 position_ms - audioPlayoutDelay // "position-audioDeviceDelay" 是计算出当前播放的真实进度
             msg["realTime"] = position_ms
-            msg["playerState"] = Constants.MediaPlayerState.getValue(mPlayer.state)
+            msg["playerState"] = MediaPlayerState.getValue(this.mediaPlayerState)
             msg["pitch"] = pitch
             msg["songCode"] = songCode
             val jsonMsg = JSONObject(msg)
