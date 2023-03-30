@@ -135,7 +135,6 @@ import AgoraRtcKit
     var rtmToken: String
     var engine: AgoraRtcEngineKit
     var channelName: String
-    var dataStreamId: Int = -1
     var localUid: Int = 0
     var chorusChannelName: String
     var chorusChannelToken: String
@@ -145,7 +144,6 @@ import AgoraRtcKit
          rtmToken: String,
          engine: AgoraRtcEngineKit,
          channelName: String,
-         streamId: Int,
          localUid: Int,
          chorusChannelName: String,
          chorusChannelToken: String
@@ -154,7 +152,6 @@ import AgoraRtcKit
         self.rtmToken = rtmToken
         self.engine = engine
         self.channelName = channelName
-        self.dataStreamId = streamId
         self.localUid = localUid
         self.chorusChannelName = chorusChannelName
         self.chorusChannelToken = chorusChannelToken

@@ -90,7 +90,7 @@ extension KTVLrcControl: KaraokeDelegate {
     
     func onKaraokeView(view: KaraokeView, didFinishLineWith model: LyricLineModel, score: Int, cumulativeScore: Int, lineIndex: Int, lineCount: Int) {
         self.totalLines = lineCount
-        self.totalScore = cumulativeScore
+        self.totalScore += score
         guard let delegate = delegate else {return}
         delegate.didLrcViewScorllFinished(with: totalScore, totalScore: lineCount * 100, lineScore: score, lineIndex: lineIndex)
     }
