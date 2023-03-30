@@ -153,9 +153,11 @@ extension VRRoomsViewController {
                         if self.loginError == nil {
                             self.loginIMThenPush(room: room)
                         } else {
-                            self.fetchIMConfig { success in
+                            self.fetchIMConfig { [weak self] success in
                                 if success {
-                                    self.loginIMThenPush(room: room)
+                                    self?.loginIMThenPush(room: room)
+                                } else {
+                                    self?.normal.roomList.isUserInteractionEnabled = false
                                 }
                             }
                         }
@@ -202,6 +204,7 @@ extension VRRoomsViewController {
                 self.isDestory = false
                 let vc = VoiceRoomViewController(info: info)
                 self.navigationController?.pushViewController(vc, animated: true)
+                self.normal.roomList.isUserInteractionEnabled = false
             }
         }
     }
@@ -217,7 +220,8 @@ extension VRRoomsViewController {
 //        }
 
         normal.didSelected = { [weak self] room in
-            Throttler.throttle(queue:.main,delay: 1,shouldRunLatest: true) {
+            self?.normal.roomList.isUserInteractionEnabled = false
+            Throttler.throttle(queue:.main,delay: .seconds(1.5)) {
                 self?.entryRoom(room: room)
             }
         }
