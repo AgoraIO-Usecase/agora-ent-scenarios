@@ -150,15 +150,16 @@ extension SARoomsViewController {
             } else {
                 SVProgressHUD.showError(withStatus: "join room failed!")
             }
+            
+            self.normal.roomList.isUserInteractionEnabled = true
         }
     }
 
     private func childViewControllersEvent() {
         normal.didSelected = { [weak self] room in
-            SAThrottler.throttle(delay: .seconds(1)) {
-                DispatchQueue.main.async {
-                    self?.entryRoom(room: room)
-                }
+            SAThrottler.throttle(queue: .main,delay: .seconds(1.5),shouldRunLatest: true) {
+                self?.normal.roomList.isUserInteractionEnabled = false
+                self?.entryRoom(room: room)
             }
         }
     }
