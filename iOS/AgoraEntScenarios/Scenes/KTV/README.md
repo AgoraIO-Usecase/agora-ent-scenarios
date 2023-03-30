@@ -6,9 +6,9 @@
 
 ## 1. 环境准备
 
-- <mark>最低兼容 iOS 13.0.0</mark> 
-- XCode 13.0及以上版本。
-- iPhone6 及以上的手机设备(系统需要iOS13.0及以上)。
+- <mark>最低兼容 iOS 13.0.0 </mark> 
+- Xcode 13.0.0 及以上版本。
+- iPhone 6 及以上的手机设备(系统需要 iOS 13.0.0 及以上)。
 
 ---
 
@@ -30,17 +30,17 @@
 
 - 获取 App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
-- 联系销售给 AppID 开通 K 歌权限</mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/)
+- 联系销售给  AppID  开通 K 歌权限 </mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/)
 
   - 注: 拉取榜单、歌单、歌词等功能是需要开通权限的
 
-- 在项目的 agora-ent-scenarios/iOS/AgoraEntScenarios/目录下会有一个KeyCenter.swift.bak文件，需要把这个文件的bak后缀去掉，让他变成KeyCenter.swift文件。然后在KeyCenter.swift里填写需要的声网 App ID 和 App 证书，再把KeyCenter.swift文件拖到项目中去
+- 在项目的 agora-ent-scenarios/iOS/AgoraEntScenarios/ 目录下会有一个 KeyCenter.swift.bak 文件，需要把这个文件的 bak 后缀去掉，让他变成  KeyCenter.swift 文件。然后在 KeyCenter.swift 里填写需要的声网 App ID 和 App 证书，再把 KeyCenter.swift 文件拖到项目中去
 
   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_keys_ios.png)
 
   ```texag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0
-  AppId：声网appid
-  Certificate：声网Certificate
+  AppId：声网 appid
+  Certificate：声网 Certificate
   ```
 - 项目的第三方库使用 pod 集成，需要在 agora-ent-scenarios/iOS 目录下执行 pod install ,然后再开始体验项目
 - 在 agora-ent-scenarios/iOS 目录下，找到 AgoraEntScenarios.xcworkspace 文件
@@ -209,7 +209,7 @@
 >   /**
 >   * 调整进度
 >   */
->   fun seekSing(time: Int)
+>   func seekSing(time: Int)
 >   ~~~
 >
 > * 与歌词组件配合使用
@@ -274,7 +274,7 @@
 >
 >   点歌、已点歌曲删除、已点歌曲置顶、切歌等状态的同步
 >
->   歌曲列表菜单：请参考 [**VLPopSongList**]((View/KTV/KTVSongGallery/VLPopSongList.m))
+>   歌曲列表菜单：请参考  [**VLPopSongList**]((View/KTV/KTVSongGallery/VLPopSongList.m))
 >
 > 
 >
@@ -283,11 +283,11 @@
 > * 音效、美声
 >   声网最佳音效
 >
->    实现参考 [**VLKTVViewContolller**](viewController/VLKTVViewController.m)里的**effectItemClickAction**实现
+>    实现参考  [**VLKTVViewContolller**](viewController/VLKTVViewController.m) 里的 **effectItemClickAction** 实现
 >
 >   声网最佳美声
 >
->    实现参考 [**VLKTVViewContolller**](viewController/VLKTVViewController.m)里的**onVLChooseBelcantoView**实现
+>    实现参考  [**VLKTVViewContolller**](viewController/VLKTVViewController.m) 里的 **onVLChooseBelcantoView** 实现
 
 ---
 
