@@ -87,14 +87,12 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
     public void initListener() {
         getBinding().btnCreateRoom.setOnClickListener(view -> {
             if (UiUtils.isFastClick(2000)) {
-                ToastUtils.showToast("操作太频繁");
                 return;
             }
             startActivity(new Intent(this, RoomCreateActivity.class));
         });
         getBinding().btnCreateRoom2.setOnClickListener(view -> {
             if (UiUtils.isFastClick(2000)) {
-                ToastUtils.showToast("操作太频繁");
                 return;
             }
             startActivity(new Intent(this, RoomCreateActivity.class));

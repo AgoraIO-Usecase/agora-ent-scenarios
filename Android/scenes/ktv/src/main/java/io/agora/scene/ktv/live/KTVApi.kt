@@ -177,7 +177,6 @@ data class KTVApiConfig(
     val rtmToken: String,
     val engine: RtcEngine,
     val channelName: String,
-    val dataStreamId: Int,
 
     // TODO joinChannel2
     val localUid: Int,

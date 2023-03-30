@@ -1254,18 +1254,12 @@ public class RoomLivingViewModel extends ViewModel {
             streamId = mRtcEngine.createDataStream(cfg);
         }
 
-        // 内部使用的StreamId
-        DataStreamConfig innerCfg = new DataStreamConfig();
-        innerCfg.syncWithAudio = false;
-        innerCfg.ordered = false;
-
         // 场景化api初始化
         ktvApiProtocol.initialize(new KTVApiConfig(
                 BuildConfig.AGORA_APP_ID,
                 roomInfoLiveData.getValue().getAgoraRTMToken(),
                 mRtcEngine,
                 roomInfoLiveData.getValue().getRoomNo(),
-                mRtcEngine.createDataStream(innerCfg),
                 UserManager.getInstance().getUser().id.intValue(),
                 roomInfoLiveData.getValue().getRoomNo() + "_ex",
                 roomInfoLiveData.getValue().getAgoraChorusToken())
