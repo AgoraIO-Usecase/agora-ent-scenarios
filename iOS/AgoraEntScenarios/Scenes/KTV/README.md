@@ -7,14 +7,14 @@
 ## 1. 环境准备
 
 - <mark>最低兼容 iOS 13.0.0</mark> 
-- XCode 13.0.0 及以上版本。
-- iPhone 6 及以上的手机设备(系统需要iOS 13.0.0 及以上)。
+- XCode 13.0及以上版本。
+- iPhone6 及以上的手机设备(系统需要iOS13.0及以上)。
 
 ---
 
 ## 2. 运行示例
 
-- 获取声网  App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
+- 获取声网 App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
   
   > - 点击创建应用
   >
@@ -34,7 +34,7 @@
 
   - 注: 拉取榜单、歌单、歌词等功能是需要开通权限的
 
-- 在项目的 agora-ent-scenarios/iOS/AgoraEntScenarios/目录下会有一个KeyCenter.swift.bak文件，需要把这个文件的bak后缀去掉，让他变成KeyCenter.swift文件。然后在KeyCenter.swift里填写需要的声网 App ID 和 App 证书，再把KeyCenter.swift文件拖到项目中去
+- 在项目的 agora-ent-scenarios/iOS/AgoraEntScenarios/ 目录下会有一个 KeyCenter.swift.bak 文件，需要把这个文件的bak后缀去掉，让他变成 KeyCenter.swift 文件。然后在   KeyCenter.swift 里填写需要的声网 App ID 和 App 证书，再把 KeyCenter.swift 文件拖到项目中去
 
   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_keys_ios.png)
 
@@ -43,7 +43,7 @@
   Certificate：声网Certificate
   ```
 
-- 用 Xcode 运行项目即可开始您的体验(项目的第三方库使用pod集成，需要在agora-ent-scenarios/iOS目录下执行pod install,然后再开始体验项目)
+- 用  Xcode  运行项目即可开始您的体验(项目的第三方库使用pod集成，需要在 agora-ent-scenarios/iOS 目录下执行 pod install ,然后再开始体验项目)
 
 ---
 
