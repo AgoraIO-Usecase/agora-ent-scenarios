@@ -217,7 +217,7 @@ extension VRRoomsViewController {
 //        }
 
         normal.didSelected = { [weak self] room in
-            Throttler.throttle(queue:.main,shouldRunLatest: true) {
+            Throttler.throttle(queue:.main,delay: 1,shouldRunLatest: true) {
                 self?.entryRoom(room: room)
             }
         }
