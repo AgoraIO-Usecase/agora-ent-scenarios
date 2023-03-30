@@ -43,7 +43,8 @@
   Certificate：声网Certificate
   ```
 - 项目的第三方库使用 pod 集成，需要在 agora-ent-scenarios/iOS 目录下执行 pod install ,然后再开始体验项目
-- 用 Xcode 运行项目即可开始您的体验
+- 在 agora-ent-scenarios/iOS 目录下，找到 AgoraEntScenarios.xcworkspace 文件
+- 用 Xcode 运行 xcworkspace文件 即可开始您的体验
 
 ---
 
