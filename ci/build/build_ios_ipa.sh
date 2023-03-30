@@ -91,9 +91,9 @@ sh sign "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" --type xcarchive --plist 
 
 PAYLOAD_PATH="${TARGET_NAME}_${BUILD_NUMBER}_Payload"
 # 上传IPA
-mkdir PAYLOAD_PATH
-mv "${TARGET_NAME}_${BUILD_NUMBER}_${CER_NAME}.ipa" ${PAYLOAD_PATH} #"${PAYLOAD_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.ipa"
-7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r ${PAYLOAD_PATH}
+mkdir "${PAYLOAD_PATH}"
+mv "${TARGET_NAME}_${BUILD_NUMBER}_${CER_NAME}.ipa" "${PAYLOAD_PATH}"
+7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r "${PAYLOAD_PATH}"
 python3 artifactory_utils.py --action=upload_file --file="${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
 
 # 上传符号表
