@@ -106,7 +106,9 @@ extension VoiceRoomViewController {
         
         ChatRoomServiceImp.getSharedInstance().unmuteLocal(mic_index: index) { error, mic in
             if error == nil,let mic = mic {
-                self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
+                if mic.member?.micStatus ?? 0 == 1 {
+                    self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
+                }
                 self.rtckit.muteLocalAudioStream(mute: false)
                 self.rtcView.updateUser(mic)
             }
