@@ -8,6 +8,13 @@
 	<true/>
 	<key>method</key>
 	<string>app-store</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>io.agora.test.enfull</key>
+		<string>apiexample_all_dis</string>
+	</dict>
+	<key>signingCertificate</key>
+	<string>9FD7EB5E52172F5DC47F0D873407C08B48C3320F</string>
 	<key>signingStyle</key>
 	<string>manual</string>
 	<key>stripSwiftSymbols</key>
