@@ -24,11 +24,10 @@ public final class SACreateRoomViewController: SABaseViewController {
         container.createAction = { [weak self] in
             guard let self = self else { return }
             print("idx:\(self.container.idx)")
-//            if self.container.idx <= 0 {
-//                self.settingSound()
-//            } else {
+            Throttler.throttle(queue:.main,delay: 1,shouldRunLatest: true) {
                 self.goLive()
-//            }
+            }
+
         }
     }
     
