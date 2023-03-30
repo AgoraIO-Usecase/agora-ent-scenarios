@@ -102,7 +102,7 @@ fi
 PAYLOAD_PATH="${TARGET_NAME}_${BUILD_NUMBER}_Payload"
 # 上传IPA
 mkdir PAYLOAD_PATH
-mv "${TARGET_NAME}_${BUILD_NUMBER}_${CER_NAME}.ipa" "${PAYLOAD_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.ipa"
+mv "${TARGET_NAME}_${BUILD_NUMBER}_${CER_NAME}.ipa" PAYLOAD_PATH #"${PAYLOAD_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.ipa"
 7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r PAYLOAD_PATH
 python3 artifactory_utils.py --action=upload_file --file="${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
 
