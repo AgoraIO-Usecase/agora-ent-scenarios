@@ -39,6 +39,7 @@ let page_size = 15
     private var initialError: AgoraChatError?
     
     private var loginError: AgoraChatError?
+    private var isDestory: Bool = false
     
     @objc convenience init(user: VLLoginModel) {
         self.init()
@@ -56,6 +57,18 @@ let page_size = 15
         // Do any additional setup after loading the view.
         navigation.title.text = LanguageManager.localValue(key: "Agora Chat Room")
     }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        isDestory = true
+    }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if isDestory {
+            destory()
+        }
+    }
 
     private func showContent() {
         view.addSubViews([background, container, create])
@@ -65,7 +78,7 @@ let page_size = 15
         childViewControllersEvent()
     }
     
-    deinit {
+    func destory() {
         VoiceRoomIMManager.shared = nil
         ChatRoomServiceImp._sharedInstance = nil
         VoiceRoomUserInfo.shared.user = nil
@@ -116,6 +129,7 @@ extension VRRoomsViewController {
 
     private func viewsAction() {
         create.action = { [weak self] in
+            self?.isDestory = false
             self?.navigationController?.pushViewController(VRCreateRoomViewController(), animated: true)
         }
 //        self.container.scrollClosure = { [weak self] in
@@ -185,6 +199,7 @@ extension VRRoomsViewController {
                 let info: VRRoomInfo = VRRoomInfo()
                 info.room = room
                 info.mic_info = nil
+                self.isDestory = false
                 let vc = VoiceRoomViewController(info: info)
                 self.navigationController?.pushViewController(vc, animated: true)
             }
