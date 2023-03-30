@@ -347,10 +347,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 return;
             }
             int defaultColor = ContextCompat.getColor(getContext(), R.color.pink_b4);
-            mBinding.ilActive.lyricsView.setCurrentHighlightedTextColor(defaultColor);
+            mBinding.ilActive.lyricsView.setCurrentLineHighlightedTextColor(defaultColor);
 
             defaultColor = ContextCompat.getColor(getContext(), R.color.white);
-            mBinding.ilActive.lyricsView.setCurrentTextColor(defaultColor);
+            mBinding.ilActive.lyricsView.setCurrentLineTextColor(defaultColor);
         });
         mBinding.clActive.setBackgroundResource(resId);
     }
@@ -418,12 +418,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                     mNumberOfCombos = 1;
                 }
 
-                if (mNumberOfCombos == 1) { // Per request from product team, do not show combo view for first one
-                    comboIcon.setVisibility(INVISIBLE);
-                    comboText.setVisibility(INVISIBLE);
-                    return;
-                }
-
                 RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.RESOURCE);
                 OutlineSpan outlineSpan = new OutlineSpan(Color.parseColor("#368CFF"), 10F
                 );
@@ -457,15 +451,17 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
                         resource.setLoopCount(1);
 
-                        comboText.setAlpha(0f);
                         comboIcon.setVisibility(VISIBLE);
-                        comboText.setVisibility(VISIBLE);
 
-                        String text = "x" + mNumberOfCombos;
-                        SpannableString spannable = new SpannableString(text);
-                        spannable.setSpan(outlineSpan, 0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        comboText.setText(spannable);
-                        comboText.animate().alpha(1f).setDuration(500).setStartDelay(0).start();
+                        comboText.setAlpha(0f);
+                        comboText.setVisibility(mNumberOfCombos == 1 ? INVISIBLE : VISIBLE); // // Per request from product team, do not show combo view for first one
+                        if (mNumberOfCombos != 1) {
+                            String text = "x" + mNumberOfCombos;
+                            SpannableString spannable = new SpannableString(text);
+                            spannable.setSpan(outlineSpan, 0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            comboText.setText(spannable);
+                            comboText.animate().alpha(1f).setDuration(500).setStartDelay(0).start();
+                        }
 
                         return false;
                     }

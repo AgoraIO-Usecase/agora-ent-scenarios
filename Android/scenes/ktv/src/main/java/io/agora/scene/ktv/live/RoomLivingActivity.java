@@ -418,8 +418,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if (model == null) {
                 return;
             }
-            getBinding().lrcControlView.getKaraokeView().setScoreLevel(model.getLevel());
-            getBinding().lrcControlView.getKaraokeView().setScoreCompensationOffset(model.getOffset());
+            getBinding().lrcControlView.getKaraokeView().setScoringLevel(model.getLevel());
+            getBinding().lrcControlView.getKaraokeView().setScoringCompensationOffset(model.getOffset());
         });
         roomLivingViewModel.noLrcLiveData.observe(this, isNoLrc -> {
             if (isNoLrc) {
