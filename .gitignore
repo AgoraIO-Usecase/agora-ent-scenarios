@@ -5,7 +5,7 @@ local.properties
 Pods
 **/*.xcworkspace/*
 **/xcuserdata
-KeyCenter.swift
+#KeyCenter.swift
 **/ByteEffectLib/*
 **/SenseLib/*
 **/libs/*
