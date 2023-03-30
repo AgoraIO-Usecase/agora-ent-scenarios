@@ -62,7 +62,7 @@ echo KEYCENTER_PATH: $KEYCENTER_PATH
 echo APP_PATH: $APP_PATH
 
 #修改Keycenter文件
-python3 ./ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 0
+python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 0
 
 # Xcode clean
 xcodebuild clean -workspace "${APP_PATH}" -configuration "${CONFIGURATION}" -scheme "${TARGET_NAME}" -quiet
@@ -105,7 +105,7 @@ python3 artifactory_utils.py --action=upload_file --file="dsym_${BUILD_NUMBER}.z
 # cd ${PROJECT_PATH} && rm -rf "*.zip"
 
 # 复原Keycenter文件
-python3 ./ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 1
+python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 1
 
 
 
