@@ -67,6 +67,7 @@ class KTVApiImpl: NSObject{
     private var musicSearchDict: Dictionary<String, MusicResultCallBacks> = Dictionary<String, MusicResultCallBacks>()
     private var onJoinExChannelCallBack : JoinExChannelCallBack?
     private var mainSingerHasJoinChannelEx: Bool = false
+    private var dataStreamId: Int = 0
 
     private var singerRole: KTVSingRole = .audience {
         didSet {
@@ -90,6 +91,12 @@ class KTVApiImpl: NSObject{
         super.init()
         agoraPrint("init KTVApiImpl")
         self.apiConfig = config
+        
+        let dataStreamConfig = AgoraDataStreamConfig()
+        dataStreamConfig.ordered = false
+        dataStreamConfig.syncWithAudio = true
+        // ktvStreamId 是定义的可保存 Stream ID 的全局变量
+        self.apiConfig?.engine.createDataStream(&dataStreamId, config: dataStreamConfig)
 
         // ------------------ 初始化内容中心 ------------------
         let contentCenterConfiguration = AgoraMusicContentCenterConfig()
@@ -726,9 +733,7 @@ extension KTVApiImpl {
                 guard let realPosition: Int64 = dict["realTime"] as? Int64 else {return}
                 guard let songCode: Int64 = dict["songCode"] as? Int64 else {return}
                 guard let mainSingerState: Int = dict["playerState"] as? Int else {return}
-//                if songConfig?.songCode == 0 {
-//                    songConfig?.songCode = Int(songCode)
-//                }
+
                 //如果接收到的歌曲和自己本地的歌曲不一致就不更新进度
                 if songCode != songConfig?.songCode ?? 0 {
                     agoraPrint("local songCode[\(songCode)] is not equal to recv songCode[\(songConfig?.songCode ?? 0)] role: \(singerRole.rawValue)")
@@ -807,7 +812,6 @@ extension KTVApiImpl {
             let dict: [String: Any] = [ "cmd": "setVoicePitch",
                                         "pitch": pitch,
             ]
-            print("sendPitch: \(pitch)")
             sendStreamMessageWithDict(dict, success: nil)
         }
     }
@@ -980,7 +984,7 @@ extension KTVApiImpl {
 
     private func sendStreamMessageWithDict(_ dict: [String: Any], success: ((_ success: Bool) -> Void)?) {
         let messageData = compactDictionaryToData(dict as NSDictionary)
-        let code = apiConfig?.engine.sendStreamMessage(apiConfig?.dataStreamId ?? 0, data: messageData ?? Data())
+        let code = apiConfig?.engine.sendStreamMessage(dataStreamId, data: messageData ?? Data())
         if code == 0 && success != nil { success!(true) }
         if code != 0 {
             agoraPrint("sendStreamMessage fail: \(String(describing: code))")

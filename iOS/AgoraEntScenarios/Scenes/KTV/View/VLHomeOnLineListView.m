@@ -23,6 +23,7 @@
 @property (nonatomic, assign) NSInteger        page;
 @property (nonatomic, strong) VLListEmptyView *emptyView;
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
+
 @end
 
 @implementation VLHomeOnLineListView
@@ -94,15 +95,24 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    VL(weakSelf);
+  //  VL(weakSelf);
     VLHomeOnLineListCCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[VLHomeOnLineListCCell className] forIndexPath:indexPath];
     cell.listModel = self.roomListModeArray[indexPath.row];
-    cell.joinBtnClickBlock = ^(VLRoomListModel *model) {
-        if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(listItemClickAction:)]) {
-            [weakSelf.delegate listItemClickAction:model];
-        }
-    };
     return cell;
+}
+
+static long lastClickTime = 0;
+static const int INTERVAL = 1000; // 时间间隔为1秒
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    VLHomeOnLineListCCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[VLHomeOnLineListCCell className] forIndexPath:indexPath];
+    VLRoomListModel *listModel = self.roomListModeArray[indexPath.row];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(listItemClickAction:)]) {
+        long currentTime = [[NSDate date] timeIntervalSince1970] * 1000;
+        if (currentTime - lastClickTime > INTERVAL) { // 执行点击事件
+            [self.delegate listItemClickAction:listModel];
+            lastClickTime = currentTime;
+        }
+    }
 }
 
 

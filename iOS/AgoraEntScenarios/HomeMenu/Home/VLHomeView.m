@@ -75,6 +75,8 @@
     [collectionView deselectItemAtIndexPath:indexPath animated:YES];
     if (self.delegate && [self.delegate respondsToSelector:@selector(itemClickAction:)]) {
         [self.delegate itemClickAction:(int)indexPath.row];
+        HomeMenuCell *cell = (HomeMenuCell *)[collectionView cellForItemAtIndexPath:indexPath];
+        [cell handleClick];
     }
 }
 

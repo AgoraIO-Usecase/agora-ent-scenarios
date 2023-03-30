@@ -103,12 +103,14 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) BOOL isPause;
 @property (nonatomic, assign) NSInteger retryCount;
 @property (nonatomic, assign) BOOL isJoinChorus;
+@property (nonatomic, assign) NSInteger coSingerDegree;
 @end
 
 @implementation VLKTVViewController
 
 #pragma mark view lifecycles
 - (void)dealloc {
+    
 }
 
 - (void)viewDidLoad {
@@ -276,6 +278,8 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
                 self.selSongsArray = songArray;
                 KTVLogInfo(@"removeSelSongWithSongNo fail, reload it");
             }
+            //清除合唱者总分
+            self.coSingerDegree = 0;
         } else {
             VLRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
             //add new song
@@ -885,7 +889,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                          rtmToken:VLUserCenter.user.agoraRTMToken
                                                            engine:self.RTCkit
                                                       channelName:self.roomModel.roomNo
-                                                         streamId:ktvApiStreamId
                                                          localUid:[VLUserCenter.user.id integerValue]
                                                         chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
     ];
@@ -963,13 +966,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if(self.singRole == KTVSingRoleAudience){
         return;
     }
-    [self.MVView.lineScoreView showScoreViewWithScore:lineScore];
-    [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
-    [self.MVView.incentiveView showWithScore:lineScore];
     
+    NSInteger realScore = self.singRole == KTVSingRoleCoSinger ? self.coSingerDegree + lineScore : score;
+    [self.MVView.lineScoreView showScoreViewWithScore:lineScore];
+    [self.MVView.gradeView setScoreWithCumulativeScore:realScore totalScore:totalScore];
+    [self.MVView.incentiveView showWithScore:lineScore];
     //将主唱的分数同步给观众
     if(self.singRole == KTVSingRoleSoloSinger || self.singRole == KTVSingRoleLeadSinger){
         [self sendMainSingerLineScoreToAudienceWith:score totalScore:totalScore lineScore:lineScore lineIndex:lineIndex];
+    } else {
+        self.coSingerDegree += lineScore;
     }
 }
 
@@ -1017,6 +1023,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
         if(flag == YES){
             [weakSelf leaveRoom];
+            [weakSelf.ktvApi cleanCache];
         }
         [[VLAlert shared] dismiss];
     }];
@@ -1193,6 +1200,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.ktvApi pauseSing];
         self.isPause = true;
     } else if (type == VLKTVMVViewActionTypeMVNext) { //切换
+        
+        if(self.RTCkit.getConnectionState != AgoraConnectionStateConnected){
+            [VLToast toast:@"切歌失败，reson:连接已断开"];
+            return;
+        }
+        
         VL(weakSelf);
 
         NSString *title = KTVLocalizedString(@"切换歌曲");
@@ -1676,7 +1689,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         } else if(state == AgoraMediaPlayerStatePaused) {
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
         } else if(state == AgoraMediaPlayerStateStopped) {
-            
+
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted || state == AgoraMediaPlayerStatePlayBackCompleted) {
             if(isLocal) {
                 KTVLogInfo(@"Playback all loop completed");
@@ -1718,6 +1731,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                lyricUrl:(NSString *)lyricUrl {
     KTVLogInfo(@"load: %li, %li", status, percent);
     dispatch_async_on_main_queue(^{
+        
+        if(status == AgoraMusicContentCenterPreloadStatusError){
+            [VLToast toast:@"加载歌曲失败，请切歌"];
+            [self.MVView setBotViewHidden:false];
+            self.MVView.loadingType = VLKTVMVViewStateIdle;
+            return;
+        }
+        
         if (status == AgoraMusicContentCenterPreloadStatusOK){
             self.MVView.loadingType = VLKTVMVViewStateIdle;
         }
