@@ -131,6 +131,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     private int chorusScore = 0;
+
     private void initListener() {
         mBinding.ilChorus.btChorus.setOnClickListener(this);
         mBinding.ilActive.switchOriginal.setOnClickListener(this);
@@ -209,18 +210,22 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     private boolean isSeatFull = false;
+
     public void onSeatFull(boolean isFull) {
         this.isSeatFull = isFull;
         if (!isOnSeat && this.mRole == Role.Listener) {
             mBinding.ilActive.ivJoinChorusBtn.setVisibility(isFull ? View.INVISIBLE : View.VISIBLE);
         }
     }
+
     private boolean isOnSeat = false;
+
     public void onSeat(boolean isOnSeat) {
         this.isOnSeat = isOnSeat;
     }
 
     private boolean isMineOwner = false;
+
     public void onPrepareStatus(boolean isMineOwner) {
         this.isMineOwner = isMineOwner;
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
@@ -234,6 +239,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     private RoomSelSongModel songPlaying;
+
     public void onPlayStatus(RoomSelSongModel songPlaying) {
         this.songPlaying = songPlaying;
 
@@ -454,7 +460,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                         comboIcon.setVisibility(VISIBLE);
 
                         comboText.setAlpha(0f);
-                        comboText.setVisibility(mNumberOfCombos == 1 ? INVISIBLE : VISIBLE); // // Per request from product team, do not show combo view for first one
+                        comboText.setVisibility(mNumberOfCombos == 1 ? INVISIBLE : VISIBLE); // Per request from product team, do not show `+X` view for first one
                         if (mNumberOfCombos != 1) {
                             String text = "x" + mNumberOfCombos;
                             SpannableString spannable = new SpannableString(text);
@@ -615,6 +621,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     private String lrcUrl;
+
     @Override
     public void onDownloadLrcData(String url) {
         this.lrcUrl = url;
