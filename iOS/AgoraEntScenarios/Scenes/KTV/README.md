@@ -8,13 +8,13 @@
 
 - <mark>最低兼容 iOS 13.0.0</mark> 
 - XCode 13.0.0 及以上版本。
-- iPhone 6 及以上的手机设备(系统需要 iOS13.0.0 及以上)。
+- iPhone 6 及以上的手机设备(系统需要iOS 13.0.0 及以上)。
 
 ---
 
 ## 2. 运行示例
 
-- 获取声网 App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
+- 获取声网  App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
   
   > - 点击创建应用
   >
