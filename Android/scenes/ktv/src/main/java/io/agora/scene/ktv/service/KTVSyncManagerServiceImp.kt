@@ -177,10 +177,7 @@ class KTVSyncManagerServiceImp(
         }
 
         currRoomNo = ""
-        if (!TextUtils.isEmpty(currRoomNo) && currRoomNo != inputModel.roomNo) {
-            completion.invoke(RuntimeException("The room $currRoomNo has been joined!"), null)
-            return
-        }
+        if (!TextUtils.isEmpty(currRoomNo) && currRoomNo != inputModel.roomNo) return
         val cacheRoom = roomMap[inputModel.roomNo]
         if (cacheRoom == null) {
             completion.invoke(RuntimeException("The room is not available!"), null)
@@ -239,9 +236,9 @@ class KTVSyncManagerServiceImp(
                                                 chorusToken,
                                                 cacheRoom.createdAt
                                             )
-                                            isJoined = true
                                             runOnMainThread {
                                                 completion.invoke(null, kTVJoinRoomOutputModel)
+                                                isJoined = true
                                             }
 
                                             // 重置体验时间事件

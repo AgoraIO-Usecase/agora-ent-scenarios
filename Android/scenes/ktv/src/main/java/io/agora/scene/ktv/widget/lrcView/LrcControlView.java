@@ -33,9 +33,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.agora.karaoke_view.v11.KaraokeEvent;
 import io.agora.karaoke_view.v11.KaraokeView;
@@ -43,11 +41,9 @@ import io.agora.karaoke_view.v11.LyricsView;
 import io.agora.karaoke_view.v11.ScoringView;
 import io.agora.karaoke_view.v11.model.LyricsLineModel;
 import io.agora.karaoke_view.v11.model.LyricsModel;
-import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.DownloadUtils;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.ZipUtils;
-import io.agora.scene.ktv.KTVLogger;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
@@ -178,8 +174,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public void onSelfJoinedChorus() {
-        chorusScore = 0;
-        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "" + 0));
+        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "" + chorusScore));
         this.mRole = Role.CoSinger;
         mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
         mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
@@ -201,7 +196,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public void onSelfLeavedChorus() {
-        chorusScore = 0;
         mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "" + 0));
         this.mRole = Role.Listener;
         mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
@@ -229,6 +223,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     private boolean isMineOwner = false;
 
     public void onPrepareStatus(boolean isMineOwner) {
+        chorusScore = 0;
         this.isMineOwner = isMineOwner;
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);

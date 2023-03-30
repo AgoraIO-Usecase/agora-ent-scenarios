@@ -164,21 +164,20 @@ abstract class IKTVApiEventHandler {
  * @param rtmToken 创建 Mcc Engine 需要
  * @param engine RTC engine 对象
  * @param channelName 频道号，子频道名以基于主频道名 + "_ex" 固定规则生成频道号
- * @param dataStreamId 数据流传输通道，用来：
  * Player 状态同步
  * 打分结果同步
  * 歌词同步
  * pitch同步
  * 建议你为KTVApi单独创建一个新的dataStreamId
  * @param localUid 创建 Mcc engine 和 加入子频道需要用到
+ * @param chorusChannelName 子频道名 加入子频道需要用到
+ * @param chorusChannelToken 子频道token 加入子频道需要用到
  */
 data class KTVApiConfig(
     val appId: String,
     val rtmToken: String,
     val engine: RtcEngine,
     val channelName: String,
-
-    // TODO joinChannel2
     val localUid: Int,
     val chorusChannelName: String,
     val chorusChannelToken: String

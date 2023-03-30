@@ -900,6 +900,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 // 其他端收到原唱seek指令
                 val state = jsonMsg.getInt("state")
                 val error = jsonMsg.getInt("error")
+                Log.d(TAG, "onStreamMessage PlayerState: $state")
                 if (isChorusCoSinger()) {
                     when (MediaPlayerState.getStateByValue(state)) {
                         MediaPlayerState.PLAYER_STATE_PAUSED -> {
