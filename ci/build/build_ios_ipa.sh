@@ -24,10 +24,12 @@ cp $KEYCENTER_PATH.bak $KEYCENTER_PATH
 
 # 打包环境
 CONFIGURATION='Release'
+CER_NAME="EntFull_Dis"
 result=$(echo ${method} | grep "development")
 if [ -z "$result" ]
 then
     CONFIGURATION='Debug'
+    CER_NAME="EntFull_Dev"
 fi
 
 #工程文件路径
@@ -86,18 +88,6 @@ cd ${WORKSPACE}
 7za a -tzip "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" "${ARCHIVE_PATH}"
 
 sh sign "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" --type xcarchive --plist "${PLIST_PATH}"
-
-CER_NAME="TestEntFull"
-if [[ ! -z $(echo ${packageName} | grep "io.agora.entfull") ]]; then
-    CER_NAME='EntFull'
-
-elif [[ ! -z $(echo ${packageName} | grep "io.agora.chatroom") ]]; then
-    CER_NAME="Room"
-
-elif [[ ! -z $(echo ${packageName} | grep "io.agora.ktv") ]]; then
-    CER_NAME="KTV"
-
-fi
 
 PAYLOAD_PATH="${TARGET_NAME}_${BUILD_NUMBER}_Payload"
 # 上传IPA
