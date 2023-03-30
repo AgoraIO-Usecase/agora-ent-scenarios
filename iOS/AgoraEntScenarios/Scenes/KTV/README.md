@@ -34,7 +34,7 @@
 
   - 注: 拉取榜单、歌单、歌词等功能是需要开通权限的
 
-- 在项目的 agora-ent-scenarios/iOS/AgoraEntScenarios/ 目录下会有一个 KeyCenter.swift.bak 文件，需要把这个文件的bak后缀去掉，让他变成 KeyCenter.swift 文件。然后在   KeyCenter.swift 里填写需要的声网 App ID 和 App 证书，再把 KeyCenter.swift 文件拖到项目中去
+- 在项目的 agora-ent-scenarios/iOS/AgoraEntScenarios/目录下会有一个KeyCenter.swift.bak文件，需要把这个文件的bak后缀去掉，让他变成KeyCenter.swift文件。然后在KeyCenter.swift里填写需要的声网 App ID 和 App 证书，再把KeyCenter.swift文件拖到项目中去
 
   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_keys_ios.png)
 
@@ -42,8 +42,8 @@
   AppId：声网appid
   Certificate：声网Certificate
   ```
-
-- 用  Xcode  运行项目即可开始您的体验(项目的第三方库使用pod集成，需要在 agora-ent-scenarios/iOS 目录下执行 pod install ,然后再开始体验项目)
+- 项目的第三方库使用pod集成，需要在agora-ent-scenarios/iOS目录下执行pod install,然后再开始体验项目
+- 用 Xcode 运行项目即可开始您的体验
 
 ---
 
@@ -94,7 +94,7 @@
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_api_ios.png)
 >
-> K歌房场景化API是一个帮助您快速集成声网K歌房能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**KTVApiDelegate**](KTVApi/KTVApiDelegate.swift) 来定义协议，通过 [**KTVApiImp**](KTVApi/KTVApiImp.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
+> K 歌房场景化 API 是一个帮助您快速集成声网 K 歌房能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**KTVApiDelegate**](KTVApi/KTVApiDelegate.swift) 来定义协议，通过 [**KTVApiImp**](KTVApi/KTVApiImp.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
 >
 > * 拉取歌单
 >
