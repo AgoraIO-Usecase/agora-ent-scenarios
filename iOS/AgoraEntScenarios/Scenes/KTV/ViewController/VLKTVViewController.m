@@ -182,7 +182,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [UIViewController popGestureOpen:self];
-//    [self.ktvApi freeTimer];
     [self leaveRTCChannel];
     [[UIApplication sharedApplication] setIdleTimerDisabled: NO];
 }
@@ -1023,7 +1022,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
         if(flag == YES){
             [weakSelf leaveRoom];
-            [weakSelf.ktvApi cleanCache];
         }
         [[VLAlert shared] dismiss];
     }];

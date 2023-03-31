@@ -2,25 +2,25 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>signingCertificate</key>
-	<string>Apple Development</string>
-	<key>provisioningProfiles</key>
-	<dict>
-		<key>io.agora.entfull</key>
-		<string>App</string>
-	</dict>
 	<key>compileBitcode</key>
 	<true/>
 	<key>destination</key>
 	<string>export</string>
 	<key>method</key>
 	<string>development</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>io.agora.test.enfull</key>
+		<string>apiexamples_all</string>
+	</dict>
+	<key>signingCertificate</key>
+	<string>E40A63338EDCCBA764C8E0FC2D2184973746F22E</string>
 	<key>signingStyle</key>
 	<string>manual</string>
 	<key>stripSwiftSymbols</key>
 	<true/>
 	<key>teamID</key>
-	<string>GM72UGLGZW</string>
+	<string>YS397FG5PA</string>
 	<key>thinning</key>
 	<string>&lt;none&gt;</string>
 </dict>
