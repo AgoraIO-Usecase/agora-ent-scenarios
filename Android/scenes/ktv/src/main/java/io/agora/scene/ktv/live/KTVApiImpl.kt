@@ -597,7 +597,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             return
         }
 
-        mRtcEngine.setAudioScenario(AUDIO_SCENARIO_CHORUS)
+        if (newRole == KTVSingRole.CoSinger) {
+            mRtcEngine.setAudioScenario(AUDIO_SCENARIO_CHORUS)
+        }
 
         // main singer do not subscribe 2nd channel
         // co singer auto sub
