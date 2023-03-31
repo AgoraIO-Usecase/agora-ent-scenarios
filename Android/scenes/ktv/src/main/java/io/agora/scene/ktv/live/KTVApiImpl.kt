@@ -695,7 +695,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     val curTs = mReceivedPlayPosition + offset
                     runOnMainThread {
                         lrcView?.onUpdatePitch(pitch.toFloat())
-                        // Make lyrics delay for 200ms
+                        // (fix ENT-489)Make lyrics delay for 200ms
                         // Per suggestion from Bob, it has a intrinsic buffer/delay between sound and `onPositionChanged(Player)`,
                         // such as AEC/Player/Device buffer.
                         // We choose the estimated 200ms.
