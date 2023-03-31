@@ -699,7 +699,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         // Per suggestion from Bob, it has a intrinsic buffer/delay between sound and `onPositionChanged(Player)`,
                         // such as AEC/Player/Device buffer.
                         // We choose the estimated 200ms.
-                        lrcView?.onUpdateProgress(curTs - 200)
+                        lrcView?.onUpdateProgress(curTs - 200) // The delay here will impact both singer and audience side
                     }
                 }
 
