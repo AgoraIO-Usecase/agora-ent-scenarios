@@ -116,12 +116,11 @@ if [[ "${sdk_url}" != 'none' ]]; then
 
     mv "${PWD}/${unzip_name}/libs" "${PWD}/iOS"
 
-    echo $(ls -l) "${PWD}/iOS/"
+    echo $(ls -l) "${PWD}/iOS/libs"
 
     # 修改podfile文件
     python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} 'sdk'
 
-    cd "${PWD}/iOS" && pod install --repo-update
 fi
 
 if [[ "${beauty_sources}" != 'none' ]]; then
