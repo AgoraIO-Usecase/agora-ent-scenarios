@@ -101,7 +101,7 @@ extension SpatialAudioSyncSerciceImp {
         for i in 1...8 {
             if i == 8 { return 0 }
             let mic = self.mics[safe: i]
-            if mic?.member == nil {
+            if mic?.status == -1 {
                 mic_index = mic?.mic_index ?? 1
                 break
             }
@@ -454,6 +454,11 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
             if error == nil {
+                if let member = oldMic.member {
+                    member.status = .idle
+                    member.invited = false
+                    mic.member = member
+                }
                 self.mics[mic_index] = mic
             }
             completion(error,mic)
@@ -747,12 +752,13 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             guard let user = self.userList.first(where: { $0.uid ?? "" == apply.member?.uid ?? "" }) else { return }
             user.mic_index = mic_index
             user.status = .accepted
+            mic.member?.objectId = user.objectId
             _updateUserInfo(roomId: self.roomId!, user: user) { _ in
                 
             }
             let currentMic = self.mics[safe: mic_index]
             if currentMic?.status ?? 0 == -1 || currentMic?.status ?? 0 == 2 {
-                self.mics[mic_index]  = mic
+                self.mics[mic_index] = mic
                 completion(nil,mic)
             } else {
                 completion(SAErrorType.unknown("acceptMicSeatApply", "currentMic.status != -1/2").error(), nil)
@@ -923,6 +929,13 @@ extension SpatialAudioSyncSerciceImp {
                                self.subscribeDelegate?.onSeatUpdated(roomId: self.roomId!, mics: [seat], from: "")
                            }
                            if let index = self.mics.firstIndex(where: { $0.objectId == seat.objectId }) {
+                               if seat.member?.objectId == nil && self.mics[index].member?.objectId != nil {
+                                   if seat.member != nil {
+                                       seat.member?.objectId = self.mics[index].member?.objectId
+                                   } else {
+                                       seat.member = self.mics[index].member
+                                   }
+                               }
                                self.mics[index] = seat
                            }
                        }, onDeleted: { _ in
@@ -1000,6 +1013,11 @@ extension SpatialAudioSyncSerciceImp {
                            guard let self = self,
                                  let jsonStr = object.toJson() else { return }
                            let apply = model(from: jsonStr.z.jsonToDictionary(), SAApply.self)
+                           if apply.member?.objectId == nil {
+                               let objectId = self.mics.first(where: { $0.member?.uid == apply.member?.uid })?.member?.objectId
+                               apply.member?.objectId = objectId
+                               apply.member?.status = .waitting
+                           }
                            defer {
                                if VLUserCenter.user.id != apply.member?.uid {
                                    self.subscribeDelegate?.onReceiveSeatRequest(roomId: self.roomId!, applicant: apply)
@@ -1037,7 +1055,7 @@ extension SpatialAudioSyncSerciceImp {
                 let applys = list.map({$0.toJson()}).kj.modelArray(SAApply.self)
                 self?.micApplys = applys.filter({ apply in
                     for mic in self?.mics ?? [] {
-                        if mic.member?.uid == apply.member?.uid {
+                        if mic.member?.uid == apply.member?.uid && apply.member?.status != .idle {
                             return false
                         }
                     }
@@ -1191,11 +1209,17 @@ extension SpatialAudioSyncSerciceImp {
                            let user = model(from: jsonStr.z.jsonToDictionary(), SAUser.self)
                            if VLUserCenter.user.id == user.uid {
                                if user.status == .waitting {
+                                   if let index = self.userList.firstIndex(where: { $0.uid == user.uid }) {
+                                       self.userList[index] = user
+                                   }
                                    self.subscribeDelegate?.onReceiveSeatInvitation(roomId: self.roomId!, user: user)
                                } else if user.status == .rejected {
                                    self.subscribeDelegate?.onReceiveCancelSeatInvitation(roomId: self.roomId!, chat_uid: user.uid!)
                                }
                                return
+                           }
+                           if let index = self.mics.firstIndex(where: { $0.member?.uid == user.uid }) {
+                               self.mics[index].member = user
                            }
                            self.userList.append(user)
                            self._updateUserCount { error in

@@ -500,7 +500,7 @@ extension SARoomViewController {
         }
     }
 
-    func showInviteMicAlert() {
+    func showInviteMicAlert(user: SAUser) {
         dismiss(animated: false)
         var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 75, height: 200))
         compent.destination = .center
@@ -510,7 +510,7 @@ extension SARoomViewController {
             if $0 == 30 {
                 self?.refuse()
             } else {
-                self?.agreeInvite()
+                self?.agreeInvite(user: user)
             }
             vc.dismiss(animated: true)
         }
