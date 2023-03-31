@@ -205,6 +205,7 @@ extension VRRoomsViewController {
                 let vc = VoiceRoomViewController(info: info)
                 self.navigationController?.pushViewController(vc, animated: true)
                 self.normal.roomList.isUserInteractionEnabled = true
+
             }
         }
     }
