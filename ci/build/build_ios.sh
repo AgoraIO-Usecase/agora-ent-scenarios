@@ -106,7 +106,7 @@ download_file () {
     echo $(ls -l) "${PWD}/iOS/"
 }
 
-if [[ "${sdk_url}" != 'none' ]]; then
+if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
     zip_name=${sdk_url##*/}
     python3 $WORKSPACE/artifactory_utils.py --action=download_file --file=$sdk_url
     7za x ./$zip_name -y
@@ -120,7 +120,7 @@ if [[ "${sdk_url}" != 'none' ]]; then
     python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} 'sdk'
 fi
 
-if [[ "${beauty_sources}" != 'none' ]]; then
+if [[ ! -z ${beauty_sources} && "${beauty_sources}" != 'none' ]]; then
 	# 下载美颜资源
 	download_file ${beauty_sources}
 	# 修改podfile文件
