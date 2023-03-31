@@ -89,6 +89,7 @@ echo release_version: $release_version
 echo short_version: $short_version
 echo beauty_sources: $beauty_sources
 echo pwd: `pwd`
+echo sdk_url: $sdk_url
 
 PODFILE_PATH=${PWD}"/iOS/Podfile"
 
@@ -105,6 +106,20 @@ download_file () {
     echo $(ls -l) "${PWD}/iOS/"
 }
 
+if [[ "${sdk_url}" != 'none' ]]; then
+    zip_name=${sdk_url##*/}
+    python3 $WORKSPACE/artifactory_utils.py --action=download_file --file=$sdk_url
+    7za x ./$zip_name -y
+
+    unzip_name=`ls -S -d */ | grep Agora`
+    echo unzip_name: $unzip_name
+
+    mv "${unzip_name}/libs" "${PWD}/iOS/"
+
+    # 修改podfile文件
+    python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} 'sdk'
+fi
+
 if [[ "${beauty_sources}" != 'none' ]]; then
 	# 下载美颜资源
 	download_file ${beauty_sources}
@@ -112,5 +127,5 @@ if [[ "${beauty_sources}" != 'none' ]]; then
 	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} ${beauty_type}
 fi
 
-./ci/build/build_ios_ipa.sh
+# ./ci/build/build_ios_ipa.sh
 

@@ -1,19 +1,22 @@
 #coding=utf-8
 import os, sys
 
-def modfiy(path, beauty_type):
+def modfiy(path, pod_type):
     with open(path, 'r', encoding='utf-8') as file:
         contents = []
         for num, line in enumerate(file):
             line = line.strip()
-            if beauty_type == '字节' and 'bytedEffect' in line:
+            if pod_type == '字节' and 'bytedEffect' in line:
                 line = "pod 'bytedEffect', :path => 'bytedEffect.podspec'"
 
-            elif beauty_type == '相芯' and 'fuLib' in line:
+            elif pod_type == '相芯' and 'fuLib' in line:
                 line = "pod 'fuLib', :path => 'fu.podspec'"
 
-            elif beauty_type == '商汤' and 'senseLib' in line:
+            elif pod_type == '商汤' and 'senseLib' in line:
                 line = "pod 'senseLib', :path => 'sense.podspec'"
+
+            elif pod_type == 'sdk' and "pod 'sdk'," in line:
+                line = "pod 'sdk', :path => 'sdk.podspec'"
 
             contents.append(line)
         file.close()
@@ -30,5 +33,5 @@ def modfiy(path, beauty_type):
 if __name__ == '__main__':
     print(f'argv === {sys.argv[1:]}')
     path = sys.argv[1:][0]
-    beauty_type = sys.argv[1:][1]
-    modfiy(path.strip(), beauty_type)
+    pod_type = sys.argv[1:][1]
+    modfiy(path.strip(), pod_type)
