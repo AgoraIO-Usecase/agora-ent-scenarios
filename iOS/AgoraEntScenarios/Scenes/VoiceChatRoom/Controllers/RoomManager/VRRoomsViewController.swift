@@ -209,7 +209,7 @@ extension VRRoomsViewController {
         }
     }
 
-    private func childViewControllersEvent() {
+    private func childViewControllersEvent()  {
 //        self.all.didSelected = { [weak self] in
 //            self?.entryRoom(room: $0)
 //        }
