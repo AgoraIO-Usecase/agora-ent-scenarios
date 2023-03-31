@@ -20,7 +20,6 @@ fi
 TARGET_NAME=AgoraEntScenarios
 
 KEYCENTER_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/KeyCenter.swift"
-cp $KEYCENTER_PATH.bak $KEYCENTER_PATH
 
 # 打包环境
 CONFIGURATION='Release'
@@ -76,7 +75,7 @@ ARCHIVE_PATH="${WORKSPACE}/${TARGET_NAME}_${BUILD_NUMBER}.xcarchive"  #"${PROJEC
 # 编译环境
 
 # plist路径
-PLIST_PATH="${PROJECT_PATH}/ExportOptions_${method}.plist"
+PLIST_PATH="${CURRENT_PATH}/ci/build/ExportOptions_${method}.plist"
 
 echo PLIST_PATH: $PLIST_PATH
 
