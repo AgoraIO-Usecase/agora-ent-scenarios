@@ -871,7 +871,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         val expectPosition =
                             localNtpTime - remoteNtp + position + audioPlayoutDelay // 期望主唱的播放时间
                         val diff = expectPosition - localPosition
-                        if ((diff > 40 || diff < -40) && expectPosition < duration) { //设置阈值为40ms，避免频繁seek
+                        if ((diff > 80 || diff < -80) && expectPosition < duration) { //设置阈值为40ms，避免频繁seek
                             mPlayer.seek(expectPosition)
                         }
                     } else {
