@@ -172,7 +172,11 @@ extension VoiceRoomViewController {
     }
 
     func agreeInvite(index: Int?) {
-        ChatRoomServiceImp.getSharedInstance().acceptMicSeatInvitation(index: index,completion: { error, mic in
+        var idx: Int?
+        if index != -1, index != 0 {
+            idx = index
+        }
+        ChatRoomServiceImp.getSharedInstance().acceptMicSeatInvitation(index: idx,completion: { error, mic in
             if error == nil,let mic = mic {
                 self.rtcView.updateUser(mic)
                 self.local_index = mic.mic_index
@@ -180,6 +184,8 @@ extension VoiceRoomViewController {
                 self.chatBar.refresh(event: .handsUp, state: .disable, asCreator: self.isOwner)
                 self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: self.isOwner)
                 self.rtckit.muteLocalAudioStream(mute: mic.status != 0)
+            } else {
+                self.view.makeToast("\(error?.localizedDescription ?? "")",point: self.toastPoint, title: nil, image: nil, completion: nil)
             }
         })
     }
