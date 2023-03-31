@@ -1127,6 +1127,11 @@ public class RoomLivingViewModel extends ViewModel {
         mRtcEngine.setParameters("{\"rtc.ntp_delay_drop_threshold\":1000}");
         mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp\": true}");
         mRtcEngine.setParameters("{\"rtc.net.maxS2LDelay\": 800}");
+        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":true}");
+        mRtcEngine.setParameters("{\"rtc.net.maxS2LDelayBroadcast\":400}");
+        mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer\":true}");
+        mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\":600}");
+        mRtcEngine.setParameters("{\"che.audio.max_mixed_participants\": 8}");
         mRtcEngine.setClientRole(isOnSeat ? Constants.CLIENT_ROLE_BROADCASTER : Constants.CLIENT_ROLE_AUDIENCE);
         int ret = mRtcEngine.joinChannel(
                 roomInfoLiveData.getValue().getAgoraRTCToken(),
