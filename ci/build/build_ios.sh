@@ -114,7 +114,9 @@ if [[ "${sdk_url}" != 'none' ]]; then
     unzip_name=`ls -S -d */ | grep Agora`
     echo unzip_name: $unzip_name
 
-    mv "${unzip_name}/libs" "${PWD}/iOS/"
+    mv "${PWD}/${unzip_name}/libs" "${PWD}/iOS"
+
+    echo $(ls -l) "${PWD}/iOS/"
 
     # 修改podfile文件
     python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} 'sdk'

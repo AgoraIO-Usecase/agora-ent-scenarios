@@ -15,7 +15,7 @@ def modfiy(path, pod_type):
             elif pod_type == '商汤' and 'senseLib' in line:
                 line = "pod 'senseLib', :path => 'sense.podspec'"
 
-            elif pod_type == 'sdk' and "pod 'sdk'," in line:
+            elif pod_type == 'sdk' and "pod 'AgoraRtcEngine" in line:
                 line = "pod 'sdk', :path => 'sdk.podspec'"
 
             contents.append(line)
