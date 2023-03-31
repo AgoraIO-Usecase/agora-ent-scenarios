@@ -116,11 +116,8 @@ if [[ "${sdk_url}" != 'none' ]]; then
 
     mv "${PWD}/${unzip_name}/libs" "${PWD}/iOS"
 
-    echo $(ls -l) "${PWD}/iOS/libs"
-
     # 修改podfile文件
     python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} 'sdk'
-
 fi
 
 if [[ "${beauty_sources}" != 'none' ]]; then
@@ -130,5 +127,5 @@ if [[ "${beauty_sources}" != 'none' ]]; then
 	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} ${beauty_type}
 fi
 
-# ./ci/build/build_ios_ipa.sh
+./ci/build/build_ios_ipa.sh
 
