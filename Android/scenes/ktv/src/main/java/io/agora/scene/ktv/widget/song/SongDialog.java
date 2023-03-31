@@ -15,9 +15,11 @@ import androidx.viewpager2.widget.ViewPager2;
 import java.util.List;
 
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
+import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvDialogChooseSongBinding;
 import io.agora.scene.ktv.live.listener.SongActionListenerImpl;
+import io.agora.scene.widget.utils.UiUtils;
 
 /**
  * 点歌菜单
@@ -43,6 +45,9 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
         songChooseFragment.setListener(new SongChooseFragment.Listener() {
             @Override
             public void onSongItemChosen(@NonNull SongItem songItem) {
+                if (UiUtils.isFastClick(2000)) {
+                    return;
+                }
                 if (chooseSongListener != null) {
                     chooseSongListener.onChooseSongChosen(SongDialog.this, songItem);
                 }
