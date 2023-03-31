@@ -24,10 +24,12 @@ cp $KEYCENTER_PATH.bak $KEYCENTER_PATH
 
 # 打包环境
 CONFIGURATION='Release'
+CER_NAME="EntFull_Dis"
 result=$(echo ${method} | grep "development")
-if [ -z "$result" ]
+if [[ ! -z "$result" ]]
 then
     CONFIGURATION='Debug'
+    CER_NAME="EntFull_Dev"
 fi
 
 #工程文件路径
@@ -70,65 +72,40 @@ xcodebuild clean -workspace "${APP_PATH}" -configuration "${CONFIGURATION}" -sch
 CURRENT_TIME=$(date "+%Y-%m-%d_%H-%M-%S")
 
 # 归档路径
-ARCHIVE_PATH="${PROJECT_PATH}/${TARGET_NAME}_${CURRENT_TIME}/${TARGET_NAME}_${BUILD_NUMBER}.xcarchive"
+ARCHIVE_PATH="${WORKSPACE}/${TARGET_NAME}_${BUILD_NUMBER}.xcarchive"  #"${PROJECT_PATH}/${TARGET_NAME}_${CURRENT_TIME}/${TARGET_NAME}_${BUILD_NUMBER}.xcarchive"
 # 编译环境
 
-# 导出路径
-EXPORT_PATH="${PROJECT_PATH}/${TARGET_NAME}_${CURRENT_TIME}"
-
 # plist路径
-PLIST_PATH="${PROJECT_PATH}/ExportOptions_${method}.plist"
+PLIST_PATH="${CURRENT_PATH}/ci/build/ExportOptions_${method}.plist"
 
 echo PLIST_PATH: $PLIST_PATH
 
 # archive 这边使用的工作区间 也可以使用project
 xcodebuild CODE_SIGN_STYLE="Manual" -workspace "${APP_PATH}" -scheme "${TARGET_NAME}" clean CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -configuration "${CONFIGURATION}" archive -archivePath "${ARCHIVE_PATH}" -destination 'generic/platform=iOS' -quiet || exit
 
+cd ${WORKSPACE}
+# 压缩archive
+7za a -tzip "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" "${ARCHIVE_PATH}"
+
+sh sign "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" --type xcarchive --plist "${PLIST_PATH}"
+
+PAYLOAD_PATH="${TARGET_NAME}_${BUILD_NUMBER}_Payload"
 # 上传IPA
-APP_PATH="$ARCHIVE_PATH/Products/Applications/${TARGET_NAME}.app"
+mkdir "${PAYLOAD_PATH}"
+mv "${TARGET_NAME}_${BUILD_NUMBER}_${CER_NAME}.ipa" "${PAYLOAD_PATH}"
+7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r "${PAYLOAD_PATH}"
+python3 artifactory_utils.py --action=upload_file --file="${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
 
-mv $APP_PATH $EXPORT_PATH/Payload
+# 上传符号表
+7za a -tzip dsym_${BUILD_NUMBER}.zip -r "${ARCHIVE_PATH}/dSYMs/${TARGET_NAME}.app.dSYM"
+python3 artifactory_utils.py --action=upload_file --file="dsym_${BUILD_NUMBER}.zip" --project
 
-cd $EXPORT_PATH $EXPORT_PATH/ && zip -q $TARGET_NAME.ipa -r Payload && cd -
-
-# 导出ipa
-# xcodebuild -exportArchive -archivePath "${ARCHIVE_PATH}" -exportPath "${EXPORT_PATH}" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -exportOptionsPlist "${PLIST_PATH}" -quiet || exit
-
-if [ $isSign = true ]; then
-    echo "true"
-    # 给ipa包签名
-    echo "============Sign IPA Begin============"
-    pushd ${WORKSPACE}
-    sh sign "${EXPORT_PATH}/${TARGET_NAME}.ipa"
-    mv *.ipa "${TARGET_NAME}.ipa"
-    popd
-
-    cd ${WORKSPACE}
-
-    # 上传IPA
-    7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r "${TARGET_NAME}.ipa"
-    python3 artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
-
-    # 上传符号表
-    7za a -tzip dsym_${BUILD_NUMBER}.zip -r "${ARCHIVE_PATH}/dSYMs/${TARGET_NAME}.app.dSYM"
-    python3 artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/dsym_${BUILD_NUMBER}.zip" --project
-
-else 
-    # 上传IPA
-    7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r "${EXPORT_PATH}/${TARGET_NAME}.ipa"
-    python3 $WORKSPACE/artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
-
-    # 上传符号表
-    7za a -tzip dsym_${BUILD_NUMBER}.zip -r "${ARCHIVE_PATH}/dSYMs/${TARGET_NAME}.app.dSYM"
-    python3 $WORKSPACE/artifactory_utils.py --action=upload_file --file="${PROJECT_PATH}/dsym_${BUILD_NUMBER}.zip" --project
-
-fi
 
 # 删除IPA文件夹
-# rm -rf "${EXPORT_PATH}"
+# rm -rf "${PROJECT_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip"
 # cd ${PROJECT_PATH} && rm -rf "*.zip"
 
-#复原Keycenter文件
+# 复原Keycenter文件
 python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 1
 
 
