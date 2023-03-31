@@ -14,7 +14,6 @@ import ZSwiftBaseLib
 // MARK: - ChatRoomServiceSubscribeDelegate
 extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     func onRoomAnnouncementChanged(announce: String) {
-        ToastView.show(text: "announcement changed!")
         roomInfo?.room?.announcement = announce
     }
     
@@ -114,7 +113,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
     
     func onReceiveSeatInvitation(roomId: String, user: SAUser) {
-        self.showInviteMicAlert()
+        self.showInviteMicAlert(user: user)
     }
     
     func onReceiveCancelSeatInvitation(roomId: String, chat_uid: String) {

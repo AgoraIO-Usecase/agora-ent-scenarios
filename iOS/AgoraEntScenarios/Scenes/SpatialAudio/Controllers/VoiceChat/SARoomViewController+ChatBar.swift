@@ -115,12 +115,12 @@ extension SARoomViewController {
         actionView.show()
     }
     
-    func applyMembersAlert(position: SASwitchBarDirection) {
+    func applyMembersAlert(position: SASwitchBarDirection, index: Int) {
         let apply = SAApplyUsersViewController(roomId: roomInfo?.room?.room_id ?? "")
         //apply.agreeApply = {
            // self.rtcView.updateUser($0)
         //}
-        let invite = SAInviteUsersController(roomId: roomInfo?.room?.room_id ?? "", mic_index:nil)
+        let invite = SAInviteUsersController(roomId: roomInfo?.room?.room_id ?? "", mic_index:index)
         let userAlert = SAUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [apply, invite], titles: [sceneLocalized( "Raised Hands"), sceneLocalized( "Invite On-Stage")], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
         let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 420)), custom: userAlert)
         sa_presentViewController(vc)
@@ -214,7 +214,7 @@ extension SARoomViewController {
 
     func changeHandsUpState() {
         if isOwner {
-            applyMembersAlert(position: .left)
+            applyMembersAlert(position: .left, index: -1)
             chatBar.refresh(event: .handsUp, state: .selected, asCreator: true)
         } else {
             if chatBar.handsState == .unSelected {
@@ -257,7 +257,7 @@ extension SARoomViewController {
             self?.dismiss(animated: true)
             if state == .invite {
                 if flag {
-                    self?.applyMembersAlert(position: .right)
+                    self?.applyMembersAlert(position: .right, index: index)
                 } else {
                     self?.kickoff(with: index)
                 }

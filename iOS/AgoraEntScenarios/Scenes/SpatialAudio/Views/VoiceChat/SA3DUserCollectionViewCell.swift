@@ -95,10 +95,10 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             break
         }
         
-        rtcUserView.iconView.isHidden = mic.member == nil
-        if status != 5 && status != -2 {
+        rtcUserView.iconView.isHidden = status == -1
+        if status != 5 && status != -2 && mic.member != nil {
             rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: nil)
-        } else {
+        } else if mic.member != nil {
             rtcUserView.iconView.image = UIImage(mic.member?.portrait ?? "")
         }
         rtcUserView.nameBtn.setImage(UIImage((mic.mic_index == 0 || mic.mic_index == 3 || mic.mic_index == 6) ? "Landlord" : ""), for: .normal)

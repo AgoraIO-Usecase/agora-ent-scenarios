@@ -180,7 +180,7 @@ extension SARoomViewController {
         }
     }
 
-    func agreeInvite() {
+    func agreeInvite(user: SAUser) {
         AppContext.saServiceImp().acceptMicSeatInvitation(completion: {[weak self] error, mic in
             guard let self = self else {return}
             if error == nil,let mic = mic {
