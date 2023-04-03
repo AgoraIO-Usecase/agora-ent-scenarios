@@ -1055,7 +1055,7 @@ extension SpatialAudioSyncSerciceImp {
                 let applys = list.map({$0.toJson()}).kj.modelArray(SAApply.self)
                 self?.micApplys = applys.filter({ apply in
                     for mic in self?.mics ?? [] {
-                        if mic.member?.uid == apply.member?.uid && apply.member?.status != .idle {
+                        if mic.member?.uid == apply.member?.uid && mic.status != -1 {
                             return false
                         }
                     }
@@ -1221,10 +1221,12 @@ extension SpatialAudioSyncSerciceImp {
                            if let index = self.mics.firstIndex(where: { $0.member?.uid == user.uid }) {
                                self.mics[index].member = user
                            }
-                           self.userList.append(user)
-                           self._updateUserCount { error in
+                           if !self.userList.contains(where: { $0.uid == user.uid }) {
+                               self.userList.append(user)
+                               self._updateUserCount { error in
+                               }
+                               self.subscribeDelegate?.onUserJoinedRoom(roomId: self.roomId!, user: user)
                            }
-                           self.subscribeDelegate?.onUserJoinedRoom(roomId: self.roomId!, user: user)
                        }, onDeleted: { [weak self] object in
                            agoraPrint("imp user subscribe onDeleted... [\(object.getId())]")
                            guard let self = self, let roomId = self.roomId else { return }
