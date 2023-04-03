@@ -938,7 +938,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     private void innerJoinChorus(String songCode) {
-        ktvApiProtocol.loadMusic(new KTVLoadMusicConfiguration(false, Long.parseLong(songCode), Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_ONLY), new OnMusicLoadStateListener(){
+        ktvApiProtocol.loadMusic(new KTVLoadMusicConfiguration(false, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_ONLY), Long.parseLong(songCode), new OnMusicLoadStateListener(){
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
                 KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
@@ -1430,18 +1430,18 @@ public class RoomLivingViewModel extends ViewModel {
         int mainSingerUid = Integer.parseInt(music.getUserNo());
         if (isOwnSong) {
             // 主唱加载歌曲
-            loadMusic(new KTVLoadMusicConfiguration(true, songCode, mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC));
+            loadMusic(new KTVLoadMusicConfiguration(true, mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC), songCode);
             // 点歌者切换身份到SoloSinger
             ktvApiProtocol.switchSingerRole(KTVSingRole.SoloSinger, null);
         } else {
             if (seatLocalLiveData.getValue() != null && seatLocalLiveData.getValue().getChorusSongCode().equals(music.getSongNo() + music.getCreateAt())) {
                 // 合唱者
-                loadMusic(new KTVLoadMusicConfiguration(false, songCode, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY));
+                loadMusic(new KTVLoadMusicConfiguration(false, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), songCode);
                 // 加入合唱
                 innerJoinChorus(music.getSongNo());
             } else {
                 // 观众
-                loadMusic(new KTVLoadMusicConfiguration(false, songCode, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY));
+                loadMusic(new KTVLoadMusicConfiguration(false, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), songCode);
             }
         }
 
@@ -1455,8 +1455,8 @@ public class RoomLivingViewModel extends ViewModel {
         });
     }
 
-    private void loadMusic(KTVLoadMusicConfiguration config) {
-        ktvApiProtocol.loadMusic(config, new OnMusicLoadStateListener() {
+    private void loadMusic(KTVLoadMusicConfiguration config, Long songCode) {
+        ktvApiProtocol.loadMusic(config, songCode, new OnMusicLoadStateListener() {
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
                 KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
@@ -1504,7 +1504,7 @@ public class RoomLivingViewModel extends ViewModel {
                     ToastUtils.showToastLong("歌曲加载失败");
                     retryTimes = retryTimes + 1;
                     if (retryTimes < 3) {
-                        loadMusic(config);
+                        loadMusic(config, songCode);
                     } else {
                         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                         ToastUtils.showToastLong("已尝试三次，请自动切歌");
@@ -1520,7 +1520,7 @@ public class RoomLivingViewModel extends ViewModel {
     // ------------------ 重新获取歌词url ------------------
     public void reGetLrcUrl() {
         if (songPlayingLiveData.getValue() == null) return;
-        loadMusic(new KTVLoadMusicConfiguration(true, Long.parseLong(songPlayingLiveData.getValue().getSongNo()), Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_LRC_ONLY));
+        loadMusic(new KTVLoadMusicConfiguration(true, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_LRC_ONLY), Long.parseLong(songPlayingLiveData.getValue().getSongNo()));
     }
 
     // ------------------ 歌曲seek ------------------

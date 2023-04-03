@@ -18,6 +18,11 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.nio.ByteBuffer
 
+enum class KTVSongMode(val value: Int) {
+    SONG_CODE(0),
+    SONG_URL(1)
+}
+
 /**
  * 加入合唱错误原因
  */
@@ -36,6 +41,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private val TAG: String = "KTV_API_LOG"
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
 
+    private var songMode:KTVSongMode = KTVSongMode.SONG_CODE
+    var useCustomAudioSource:Boolean = false
+
     private lateinit var mRtcEngine: RtcEngineEx
     private lateinit var mMusicCenter: IAgoraMusicContentCenter
     private lateinit var mPlayer: IAgoraMusicPlayer
@@ -46,6 +54,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     private var mainSingerUid: Int = 0
     private var songCode: Long = 0
+    private var songUrl: String = ""
 
     private val lyricCallbackMap =
         mutableMapOf<String, (songNo: Long, lyricUrl: String?) -> Unit>() // (requestId, callback)
@@ -101,8 +110,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         this.ktvApiConfig = config
 
         // ------------------ 创建内部使用的DataStream -----------------
-        // 内部使用的StreamId
-
         // 内部使用的StreamId
         val innerCfg = DataStreamConfig()
         innerCfg.syncWithAudio = true
@@ -306,18 +313,20 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     override fun loadMusic(
         config: KTVLoadMusicConfiguration,
+        songCode: Long,
         onMusicLoadStateListener: OnMusicLoadStateListener
     ) {
         Log.d(TAG, "loadMusic called: $singerRole")
+        this.songMode = KTVSongMode.SONG_CODE
         // 设置到全局， 连续调用以最新的为准
-        this.songCode = config.songCode
+        this.songCode = songCode
         this.mainSingerUid = config.mainSingerUid
         mLastReceivedPlayPosTime = null
         mReceivedPlayPosition = 0
 
 
         if (config.mode == KTVLoadMusicMode.LOAD_LRC_ONLY) {
-            // 加载歌词
+            // 只加载歌词
             loadLyric(songCode) { song, lyricUrl ->
                 if (this.songCode != song) {
                     // 当前歌曲已发生变化，以最新load歌曲为准
@@ -398,6 +407,21 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         }
     }
 
+    override fun loadMusic(
+        config: KTVLoadMusicConfiguration,
+        url: String
+    ) {
+        Log.d(TAG, "loadMusic called: $singerRole")
+        this.songMode = KTVSongMode.SONG_URL
+        this.songUrl = url
+        this.mainSingerUid = config.mainSingerUid
+
+        if (config.autoPlay) {
+            // 主唱自动播放歌曲
+            startSing(url, 0)
+        }
+    }
+
     override fun startSing(songCode: Long, startPos: Long) {
         Log.d(TAG, "playSong called: $singerRole")
         if (this.songCode != songCode) {
@@ -406,6 +430,16 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         }
         mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
         mPlayer.open(songCode, startPos)
+    }
+
+    override fun startSing(url: String, startPos: Long) {
+        Log.d(TAG, "playSong called: $singerRole")
+        if (this.songUrl != url) {
+            Log.e(TAG, "startSing failed: canceled")
+            return
+        }
+        mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
+        mPlayer.open(url, startPos)
     }
 
     override fun resumeSing() {
@@ -431,6 +465,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     override fun setMicStatus(isOnMicOpen: Boolean) {
         this.isOnMicOpen = isOnMicOpen
+    }
+
+    override fun setAudioPlayoutDelay(audioPlayoutDelay: Int) {
+        this.audioPlayoutDelay = audioPlayoutDelay
     }
 
     override fun getMediaPlayer(): IMediaPlayer {
@@ -478,7 +516,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 mRtcEngine.updateChannelMediaOptions(channelMediaOption)
 
                 // 预加载歌曲成功
-                mPlayer.open(songCode, 0) // TODO open failed
+                if (songMode == KTVSongMode.SONG_CODE) {
+                    mPlayer.open(songCode, 0) // TODO open failed
+                } else {
+                    mPlayer.open(songUrl, 0) // TODO open failed
+                }
 
                 // 预加载成功后加入第二频道：预加载时间>>joinChannel时间
                 joinChorus2ndChannel(newRole, token, mainSingerUid) { joinStatus ->
@@ -578,14 +620,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         val jsonMsg = JSONObject(msg)
         sendStreamMessageWithJsonObject(jsonMsg) {}
     }
-
-//    private fun sendSyncPitch(pitch: Double) {
-//        val msg: MutableMap<String?, Any?> = java.util.HashMap()
-//        msg["cmd"] = "setVoicePitch"
-//        msg["pitch"] = pitch
-//        val jsonMsg = JSONObject(msg)
-//        sendStreamMessageWithJsonObject(jsonMsg) {}
-//    }
 
     // 合唱
     private fun joinChorus2ndChannel(
@@ -816,9 +850,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     private fun getNtpTimeInMs(): Long {
-        val currentNtpTime = mRtcEngine.ntpWallTimeInMs
+        val currentNtpTime = mRtcEngine.ntpTimeInMs
         return if (currentNtpTime != 0L) {
-            currentNtpTime
+            currentNtpTime - 2208988800L * 1000
         } else {
             Log.e(TAG, "getNtpTimeInMs DeviceDelay is zero!!!")
             System.currentTimeMillis()
@@ -962,14 +996,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 }
             }
         }
-//        if (this.singerRole == KTVSingRole.LeadSinger || this.singerRole == KTVSingRole.SoloSinger) {
-//            sendSyncPitch(pitch)
-//        }
     }
 
     // 用于合唱校准
     override fun onLocalAudioStats(stats: LocalAudioStats?) {
         super.onLocalAudioStats(stats)
+        if (useCustomAudioSource) return
         val audioState = stats ?: return
         audioPlayoutDelay = audioState.audioPlayoutDelay
         Log.d(TAG, "onLocalAudioStats, audioPlay-outDelay=$audioPlayoutDelay")
@@ -1139,7 +1171,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         renderTimeMs: Long,
         avsync_type: Int
     ): Boolean {
-        if (mainSingerHasJoinChannelEx) {
+        if (mainSingerHasJoinChannelEx && !useCustomAudioSource) {
             mRtcEngine.pushDirectAudioFrame(buffer, renderTimeMs, 48000, 2)
         }
         return true
