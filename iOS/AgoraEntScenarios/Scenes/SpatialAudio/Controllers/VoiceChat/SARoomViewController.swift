@@ -313,7 +313,7 @@ extension SARoomViewController {
                  1.如果当前麦位有用户，普通人只能操作自己
                  2.如果麦位没人 需要先判端是否是换麦还是申请上卖
                  */
-                if let _ = mic.member {
+                if let _ = mic.member, mic.status != -1 {
                     if local_index == index {
                         showMuteView(with: index)
                     }
