@@ -297,7 +297,7 @@ interface KTVApi {
     )
 
     /**
-     * 异步加载歌曲，同时只能为一首歌loadSong，loadSong结果会通过回调通知业务层
+     * 加载歌曲，同时只能为一首歌loadSong，同步调用， 一般使用此loadSong是歌曲已经preload成功（url为本地文件地址）
      * @param config 加载歌曲配置
      * @param url 歌曲地址
      *
@@ -382,6 +382,10 @@ interface KTVApi {
     fun setMicStatus(isOnMicOpen: Boolean)
 
 
+    /**
+     * 设置当前音频播放delay， 适用于音频自采集的情况
+     * @param audioPlayoutDelay 音频帧处理和播放的时间差
+     */
     fun setAudioPlayoutDelay(audioPlayoutDelay: Int)
 
     /**
