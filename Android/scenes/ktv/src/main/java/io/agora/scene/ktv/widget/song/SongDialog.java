@@ -45,7 +45,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
         songChooseFragment.setListener(new SongChooseFragment.Listener() {
             @Override
             public void onSongItemChosen(@NonNull SongItem songItem) {
-                if (UiUtils.isFastClick(2000)) {
+                if (UiUtils.isFastClick(1000)) {
                     return;
                 }
                 if (chooseSongListener != null) {

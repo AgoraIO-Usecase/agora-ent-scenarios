@@ -192,7 +192,6 @@ data class KTVApiConfig(
  */
 data class KTVLoadMusicConfiguration(
     val autoPlay: Boolean = false,
-    val songCode: Long,
     val mainSingerUid: Int,
     val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
 )
@@ -280,6 +279,7 @@ interface KTVApi {
     /**
      * 异步加载歌曲，同时只能为一首歌loadSong，loadSong结果会通过回调通知业务层
      * @param config 加载歌曲配置
+     * @param songCode 歌曲唯一编码
      * @param onMusicLoadStateListener 加载歌曲结果回调
      *
      * 推荐调用：
@@ -292,7 +292,26 @@ interface KTVApi {
      */
     fun loadMusic(
         config: KTVLoadMusicConfiguration,
+        songCode: Long,
         onMusicLoadStateListener: OnMusicLoadStateListener
+    )
+
+    /**
+     * 异步加载歌曲，同时只能为一首歌loadSong，loadSong结果会通过回调通知业务层
+     * @param config 加载歌曲配置
+     * @param url 歌曲地址
+     *
+     * 推荐调用：
+     * 歌曲开始时：
+     * 主唱 loadMusic(KTVLoadMusicConfiguration(autoPlay=true, mode=LOAD_MUSIC_AND_LRC, url, mainSingerUid)) switchSingerRole(SoloSinger)
+     * 观众 loadMusic(KTVLoadMusicConfiguration(autoPlay=false, mode=LOAD_LRC_ONLY, url, mainSingerUid))
+     * 加入合唱时：
+     * 准备加入合唱者：loadMusic(KTVLoadMusicConfiguration(autoPlay=false, mode=LOAD_MUSIC_ONLY, url, mainSingerUid))
+     * loadMusic成功后switchSingerRole(CoSinger)
+     */
+    fun loadMusic(
+        config: KTVLoadMusicConfiguration,
+        url: String
     )
 
     /**
@@ -317,13 +336,23 @@ interface KTVApi {
 
     /**
      * 播放歌曲
+     * @param songCode 歌曲唯一编码
      * @param startPos 开始播放的位置
      * 对于主唱：
      * 如果loadMusic时你选择了autoPlay = true 则不需要主动调用startSing
      * 如果loadMusic时你选择了autoPlay = false 则需要在loadMusic成功后调用startSing
-     * TODO 如何支持URL
      */
     fun startSing(songCode: Long, startPos: Long)
+
+    /**
+     * 播放歌曲
+     * @param url 歌曲地址
+     * @param startPos 开始播放的位置
+     * 对于主唱：
+     * 如果loadMusic时你选择了autoPlay = true 则不需要主动调用startSing
+     * 如果loadMusic时你选择了autoPlay = false 则需要在loadMusic成功后调用startSing
+     */
+    fun startSing(url: String, startPos: Long)
 
     /**
      * 恢复播放
@@ -352,6 +381,9 @@ interface KTVApi {
      */
     fun setMicStatus(isOnMicOpen: Boolean)
 
+
+    fun setAudioPlayoutDelay(audioPlayoutDelay: Int)
+
     /**
      * 获取mpk实例
      */
@@ -362,8 +394,3 @@ interface KTVApi {
      */
     fun getMusicCenter() : IAgoraMusicContentCenter
 }
-
-// 0、注释换成Print 不要有AgoraPrint
-// 1、token 和 2ndChannelName 传递方式和业务逻辑调用
-// 2、主动暴露 getMusicCenter() 为了renewToken
-// 3、onChorusChannelTokenPrivilegeWillExpire
