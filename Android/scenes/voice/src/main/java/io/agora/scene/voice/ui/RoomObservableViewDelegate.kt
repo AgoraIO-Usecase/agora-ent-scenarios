@@ -1055,7 +1055,12 @@ class RoomObservableViewDelegate constructor(
                 .forEach { (key, value) ->
                     val micInfo =
                         GsonTools.toBean<VoiceMicInfoModel>(value, object : TypeToken<VoiceMicInfoModel>() {}.type)
-                    micInfo?.let { micInfoMap[key] = it }
+                    micInfo?.let {
+                        micInfoMap[key] = it
+                        if (it.member?.rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()){
+                            localUserMicInfo = micInfo
+                        }
+                    }
                 }
             val newMicMap = RoomInfoConstructor.extendMicInfoMap(micInfoMap, roomKitBean.ownerId)
             dealMicDataMap(newMicMap)
