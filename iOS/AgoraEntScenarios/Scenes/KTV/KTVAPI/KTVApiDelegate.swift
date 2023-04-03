@@ -160,9 +160,9 @@ import AgoraRtcKit
 
 /// 歌曲加载配置信息
 @objcMembers open class KTVSongConfiguration: NSObject {
-    public var autoPlay: Bool = true   //是否加载完成自动播放
-    public var songCode: Int = 0          //歌曲id
+    public var autoPlay: Bool = false   //是否加载完成自动播放
     public var mainSingerUid: Int = 0     //主唱uid
+    public var mode: KTVLoadMusicMode = .loadMusicAndLrc
 }
 
 
@@ -235,7 +235,13 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     /// - Parameters:
     ///   - config: <#config description#>
     ///   - onMusicLoadStateListener: <#onMusicLoadStateListener description#>
-    func loadMusic(config: KTVSongConfiguration, mode: KTVLoadMusicMode, onMusicLoadStateListener: KTVMusicLoadStateListener)
+    func loadMusic(config: KTVSongConfiguration, songCode: Int, onMusicLoadStateListener: KTVMusicLoadStateListener)
+    
+    /// 通过url加载歌曲
+    /// - Parameters:
+    ///   - config: <#config description#>
+    ///   - onMusicLoadStateListener: <#onMusicLoadStateListener description#>
+    func loadMusic(config: KTVSongConfiguration, url: String)
     
     
     /// 切换角色
@@ -248,8 +254,17 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     
     /// 播放
     /// - Parameter startPos: <#startPos description#>
-    func startSing(startPos: Int)
+    func startSing(songCode: Int, startPos: Int)
     
+    /**
+     * 播放歌曲
+     * @param url 歌曲地址
+     * @param startPos 开始播放的位置
+     * 对于主唱：
+     * 如果loadMusic时你选择了autoPlay = true 则不需要主动调用startSing
+     * 如果loadMusic时你选择了autoPlay = false 则需要在loadMusic成功后调用startSing
+     */
+    func startSing(url: String, startPos: Int)
     
     /// 恢复播放
     func resumeSing()
@@ -263,6 +278,11 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     /// - Parameter time: 进度，单位ms
     func seekSing(time: Int)
     
+    /**
+     * 设置当前音频播放delay， 适用于音频自采集的情况
+     * @param audioPlayoutDelay 音频帧处理和播放的时间差
+     */
+    func setAudioPlayoutDelay(audioPlayoutDelay: Int)
     
     /// 设置歌词组件，在任意时机设置都可以生效
     /// - Parameter view: <#view description#>

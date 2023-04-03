@@ -110,7 +110,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 #pragma mark view lifecycles
 - (void)dealloc {
-    
+    NSLog(@"%s",__FUNCTION__);
 }
 
 - (void)viewDidLoad {
@@ -188,9 +188,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-    [self.ktvApi cleanCache];
-    self.ktvApi = nil;
-    
     KTVLogInfo(@"Agora - destroy RTCEngine");
     [AgoraRtcEngineKit destroy];
 }
@@ -548,9 +545,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //    self.retryCount = 0;
     
     
+    KTVSingRole role = [self getUserSingRole];
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
     songConfig.autoPlay = YES;
-    songConfig.songCode = [model.songNo integerValue];
+    songConfig.mode = (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.userNo integerValue];
     
     self.MVView.loadingType = VLKTVMVViewStateLoading;
@@ -564,8 +562,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
     };
     
-    KTVSingRole role = [self getUserSingRole];
-    [self.ktvApi loadMusicWithConfig:songConfig mode: (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc
+    
+    [self.ktvApi loadMusicWithConfig:songConfig songCode:[model.songNo integerValue]
                 onMusicLoadStateListener:self];
 
     [weakSelf.ktvApi switchSingerRoleWithNewRole:role
@@ -694,7 +692,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVSingRole role = KTVSingRoleCoSinger;
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
     songConfig.autoPlay = NO;
-    songConfig.songCode = [model.songNo integerValue];
+    songConfig.mode = KTVLoadMusicModeLoadMusicOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     
     VL(weakSelf);
@@ -738,8 +736,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             }];
         }];
     };
-    KTVLogInfo(@"before songCode:%li", songConfig.songCode);
-    [self.ktvApi loadMusicWithConfig:songConfig mode: role == KTVSingRoleAudience ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc
+    KTVLogInfo(@"before songCode:%li", [model.songNo integerValue]);
+    [self.ktvApi loadMusicWithConfig:songConfig songCode: [model.songNo integerValue]
                 onMusicLoadStateListener:self];
 }
 
@@ -800,6 +798,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
+        [weakSelf.ktvApi cleanCache];
+        weakSelf.ktvApi = nil;
+        
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
                 [weakSelf.navigationController popToViewController:vc animated:YES];
@@ -843,7 +844,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
-//    [self.RTCkit setParameters: @"{\"che.audio.enable.md \": false}"];
+    [self.RTCkit setParameters: @"{\"rtc.enable_nasa2\": false}"];
+    [self.RTCkit setParameters: @"{\"rtc.ntp_delay_drop_threshold\": 1000}"];
+    [self.RTCkit setParameters: @"{\"rtc.video.enable_sync_render_ntp\": true}"];
+    [self.RTCkit setParameters: @"{\"rtc.net.maxS2LDelay\": 800}"];
+    [self.RTCkit setParameters: @"{\"rtc.video.enable_sync_render_ntp_broadcast\": true}"];
+    [self.RTCkit setParameters: @"{\"rtc.net.maxS2LDelayBroadcast\": 400}"];
+    [self.RTCkit setParameters: @"{\"che.audio.neteq.prebuffer\": true}"];
+    [self.RTCkit setParameters: @"{\"che.audio.neteq.prebuffer_max_delay\": 600}"];
+    [self.RTCkit setParameters: @"{\"che.audio.max_mixed_participants\": 8}"];
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:50 smooth:3 reportVad:YES];
     if (code == 0) {
@@ -1033,9 +1042,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                  withValue:(VLKTVMoreBtnClickType)typeValue {
     [[LSTPopView getPopViewWithCustomView:view] dismiss];
     switch (typeValue) {
-        case VLKTVMoreBtnClickTypeBelcanto:
-            [self popBelcantoView];
-            break;
+//        case VLKTVMoreBtnClickTypeBelcanto:
+//            [self popBelcantoView];
+//            break;
         case VLKTVMoreBtnClickTypeSound:
             [self popSetSoundEffectView];
             break;
@@ -1235,7 +1244,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
     songConfig.autoPlay = YES;
-    songConfig.songCode = [model.songNo integerValue];
+    songConfig.mode = KTVLoadMusicModeLoadLrcOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     
     self.MVView.loadingType = VLKTVMVViewStateLoading;
@@ -1248,7 +1257,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
     };
     
-    [self.ktvApi loadMusicWithConfig:songConfig mode: KTVLoadMusicModeLoadLrcOnly
+    [self.ktvApi loadMusicWithConfig:songConfig songCode: [model.songNo integerValue]
                 onMusicLoadStateListener:self];
 }
 
@@ -1686,6 +1695,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             }
         } else if(state == AgoraMediaPlayerStatePaused) {
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
+            [self.lrcControl hideSkipViewWithFlag:true];
         } else if(state == AgoraMediaPlayerStateStopped) {
 
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted || state == AgoraMediaPlayerStatePlayBackCompleted) {

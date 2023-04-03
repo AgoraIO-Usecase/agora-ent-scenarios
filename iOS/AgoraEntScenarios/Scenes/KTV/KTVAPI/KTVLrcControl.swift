@@ -38,6 +38,7 @@ private func agoraPrint(_ message: String) {
     private var totalCount: NSInteger = 0
     
     private var currentLoadLrcPath: String?
+    private var hasShowOnce: Bool = false
     
     @objc init(lrcView: KaraokeView) {
         self.lrcView = lrcView
@@ -50,6 +51,7 @@ private func agoraPrint(_ message: String) {
                 let pos: Int = self.progress >= duration - 500  ? duration - 500 : preludeEndPosition - 2000
                 let flag: Bool = self.progress >= duration - 500  ? true : false
                 self.skipCallBack?(pos, flag)
+                self.hasShowOnce = true
             }
             self.skipBtn.isHidden = true
         })
@@ -72,7 +74,12 @@ private func agoraPrint(_ message: String) {
         self.currentLoadLrcPath = nil
     }
     
+    @objc public func hideSkipView(flag: Bool) {
+        skipBtn.isHidden = flag
+    }
+    
     @objc public func showPreludeEnd() {
+        if hasShowOnce == true {return}
         //显示跳过前奏
         skipBtn.setSkipType(.prelude)
         skipBtn.isHidden = false
@@ -113,6 +120,7 @@ extension KTVLrcControl: KTVLrcViewDelegate {
         if (preludeEndPosition < progress && hasShowPreludeEndPosition == false) {
             skipBtn.isHidden = true
             hasShowPreludeEndPosition = true
+            hasShowOnce = true
         } else if (duration < progress && hasShowEndPosition == false) {
             skipBtn.setSkipType(.epilogue)
             skipBtn.isHidden = false
@@ -140,6 +148,7 @@ extension KTVLrcControl: KTVLrcViewDelegate {
         self.totalCount = model.lines.count
         self.totalLines = 0
         self.totalScore = 0
+        self.hasShowOnce = false
         lrcView.setLyricData(data: model)
         
     }
