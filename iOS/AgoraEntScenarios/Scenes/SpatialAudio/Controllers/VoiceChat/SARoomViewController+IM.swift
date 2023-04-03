@@ -299,6 +299,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                         AppContext.saTmpServiceImp().userList.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
                         view.makeToast("Removed Stage".localized())
                     }  else {
+                        local_index = nil
                         self.refreshApplicants(chat_uid: fromId)
                     }
                 } else {
@@ -306,11 +307,11 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                 }
 
                 // 刷新普通用户
-                if first.member != nil {
+                if first.member != nil, first.status != -1 {
                     first.member?.mic_index = mic_index
                 }
 
-                if let _ = first.member {
+                if let _ = first.member, first.status != -1 {
                     let local_uid: String = VLUserCenter.user.id
                     let cp_uid: String = first.member?.uid ?? ""
                     if local_uid == cp_uid {

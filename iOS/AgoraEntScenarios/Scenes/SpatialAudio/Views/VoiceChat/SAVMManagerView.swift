@@ -41,7 +41,7 @@ class SAVMManagerView: UIView {
             let m_type = micInfo?.status
             var username: String = "\(micInfo?.mic_index ?? 0)"
             var iconStr: String = ""
-            if let user = micInfo?.member {
+            if let user = micInfo?.member, micInfo?.status != -1 {
                 username = user.name ?? "\(String(describing: micInfo?.index))"
                 iconStr = user.portrait ?? ""
             }
