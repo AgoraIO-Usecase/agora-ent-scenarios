@@ -520,20 +520,24 @@ class VoiceSyncManagerServiceImp(
      * 接受邀请
      */
     override fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        val userInfo = userMap[VoiceBuddyFactory.get().getVoiceBuddy().userId()] ?: return
-        userInfo.status = MicRequestStatus.accepted.value
-        val micIndex = selectEmptySeat(userInfo.micIndex)
-        userInfo.micIndex = micIndex
-        innerUpdateUserInfo(userInfo, {
-            if (micSeatMap.containsKey(micIndex.toString()) && micSeatMap[micIndex.toString()]?.member != null) {
-                return@innerUpdateUserInfo
-            }
-            val targetSeatInfo = innerGenerateDefaultSeatInfo(micIndex,
-                userInfo.userId!!
-            )
-            innerUpdateSeat(targetSeatInfo) { e ->
+        val member = userMap[VoiceBuddyFactory.get().getVoiceBuddy().userId()] ?: return
+        member.status = MicRequestStatus.accepted.value
+        val toIndex = selectEmptySeat(member.micIndex)
+        val toSeat = micSeatMap[toIndex.toString()]
+        if (toSeat == null) {
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+            return
+        }
+        if (micSeatMap.containsKey(toIndex.toString()) && toSeat.member != null) {
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+            return
+        }
+        member.micIndex = toIndex
+        seatDownMember(toSeat, member)
+        innerUpdateUserInfo(member, {
+            innerUpdateSeat(toSeat) { e ->
                 if (e == null) {
-                    completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
+                    completion.invoke(VoiceServiceProtocol.ERR_OK, toSeat)
                 } else {
                     completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                 }
@@ -1201,13 +1205,11 @@ class VoiceSyncManagerServiceImp(
 
     // ----------------------------- 麦位状态 -----------------------------
     private fun seatDownMember(seat: VoiceMicInfoModel, member: VoiceMemberModel?) {
-        val oldMember = seat.member
         seat.member = member
         if (member != null) { // 落座
             seat.micStatus = if (seat.micStatus == MicStatus.Idle) MicStatus.Normal else seat.micStatus
         } else { // 离座
             seat.micStatus = if (seat.micStatus == MicStatus.Normal) MicStatus.Idle else seat.micStatus
-
         }
     }
 
