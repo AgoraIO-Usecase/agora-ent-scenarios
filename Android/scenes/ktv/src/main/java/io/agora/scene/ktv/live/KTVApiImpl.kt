@@ -317,6 +317,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         onMusicLoadStateListener: OnMusicLoadStateListener
     ) {
         Log.d(TAG, "loadMusic called: $singerRole")
+        this.songMode = KTVSongMode.SONG_CODE
         // 设置到全局， 连续调用以最新的为准
         this.songCode = songCode
         this.mainSingerUid = config.mainSingerUid
@@ -411,6 +412,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         url: String
     ) {
         Log.d(TAG, "loadMusic called: $singerRole")
+        this.songMode = KTVSongMode.SONG_URL
         this.songUrl = url
         this.mainSingerUid = config.mainSingerUid
 
@@ -426,7 +428,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             Log.e(TAG, "startSing failed: canceled")
             return
         }
-        this.songMode = KTVSongMode.SONG_CODE
         mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
         mPlayer.open(songCode, startPos)
     }
@@ -437,7 +438,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             Log.e(TAG, "startSing failed: canceled")
             return
         }
-        this.songMode = KTVSongMode.SONG_URL
         mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
         mPlayer.open(url, startPos)
     }
