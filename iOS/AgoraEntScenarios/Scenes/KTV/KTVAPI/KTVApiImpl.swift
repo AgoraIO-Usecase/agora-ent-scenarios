@@ -880,7 +880,7 @@ extension KTVApiImpl {
                 let songCode = dict["songCode"] as? Int64,
                 let mainSingerState = dict["playerState"] as? Int
         else { return }
-
+        print("realTime:\(realPosition) position:\(position)")
         //如果接收到的歌曲和自己本地的歌曲不一致就不更新进度
         guard songCode == self.songCode else {
             agoraPrint("local songCode[\(songCode)] is not equal to recv songCode[\(self.songCode)] role: \(singerRole.rawValue)")
@@ -1257,8 +1257,8 @@ extension KTVApiImpl {
     
     private func setProgress(with pos: Int) {
         lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
-        lrcControl?.onUpdateProgress(progress: pos)
-     //   print("cosinger: pos\(pos > 200 ? pos - 200 : pos)")
+        lrcControl?.onUpdateProgress(progress: pos > 200 ? pos - 200 : pos)
+        print("pos\(pos > 200 ? pos - 200 : pos)")
 //        lrcControl?.onUpdateProgress(progress: pos > 200 ? pos - 200 : pos)
 //        print("cosinger: pos\(pos > 200 ? pos - 200 : pos)")
     }
