@@ -101,7 +101,7 @@ extension SpatialAudioSyncSerciceImp {
         for i in 1...8 {
             if i == 8 { return 0 }
             let mic = self.mics[safe: i]
-            if mic?.status == -1 {
+            if mic?.member == nil {
                 mic_index = mic?.mic_index ?? 1
                 break
             }
@@ -454,11 +454,6 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
             if error == nil {
-                if let member = oldMic.member {
-                    member.status = .idle
-                    member.invited = false
-                    mic.member = member
-                }
                 self.mics[mic_index] = mic
             }
             completion(error,mic)
@@ -929,13 +924,6 @@ extension SpatialAudioSyncSerciceImp {
                                self.subscribeDelegate?.onSeatUpdated(roomId: self.roomId!, mics: [seat], from: "")
                            }
                            if let index = self.mics.firstIndex(where: { $0.objectId == seat.objectId }) {
-                               if seat.member?.objectId == nil && self.mics[index].member?.objectId != nil {
-                                   if seat.member != nil {
-                                       seat.member?.objectId = self.mics[index].member?.objectId
-                                   } else {
-                                       seat.member = self.mics[index].member
-                                   }
-                               }
                                self.mics[index] = seat
                            }
                        }, onDeleted: { _ in
@@ -1013,11 +1001,6 @@ extension SpatialAudioSyncSerciceImp {
                            guard let self = self,
                                  let jsonStr = object.toJson() else { return }
                            let apply = model(from: jsonStr.z.jsonToDictionary(), SAApply.self)
-                           if apply.member?.objectId == nil {
-                               let objectId = self.mics.first(where: { $0.member?.uid == apply.member?.uid })?.member?.objectId
-                               apply.member?.objectId = objectId
-                               apply.member?.status = .waitting
-                           }
                            defer {
                                if VLUserCenter.user.id != apply.member?.uid {
                                    self.subscribeDelegate?.onReceiveSeatRequest(roomId: self.roomId!, applicant: apply)
@@ -1055,7 +1038,7 @@ extension SpatialAudioSyncSerciceImp {
                 let applys = list.map({$0.toJson()}).kj.modelArray(SAApply.self)
                 self?.micApplys = applys.filter({ apply in
                     for mic in self?.mics ?? [] {
-                        if mic.member?.uid == apply.member?.uid && mic.status != -1 {
+                        if mic.member?.uid == apply.member?.uid {
                             return false
                         }
                     }
@@ -1180,6 +1163,18 @@ extension SpatialAudioSyncSerciceImp {
     
     fileprivate func _updateUserInfo(roomId: String, user: SAUser, completion: @escaping (Error?) -> Void) {
         agoraPrint("imp user update...")
+        if user.objectId == nil {
+            _getUserList(roomId: roomId) { [weak self] _, users in
+                guard let self = self else { return }
+                user.objectId = users?.first(where: { $0.uid == user.uid })?.objectId
+                self._updateUserInfoHandler(roomId: roomId, user: user, completion: completion)
+            }
+            return
+        }
+        _updateUserInfoHandler(roomId: roomId, user: user, completion: completion)
+    }
+    
+    private func _updateUserInfoHandler(roomId: String, user: SAUser, completion: @escaping (Error?) -> Void) {
         guard user.objectId != nil else { return }
         let params = user.kj.JSONObject()
         SyncUtil
@@ -1195,7 +1190,7 @@ extension SpatialAudioSyncSerciceImp {
                 completion(SAErrorType.unknown("update userInfo", error.message).error())
             })
     }
-
+    
     fileprivate func _subscribeUsersChanged() {
         agoraPrint("imp user subscribe ...")
         SyncUtil
