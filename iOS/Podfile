@@ -67,6 +67,3 @@ end
 target 'AgoraEntScenarios' do
   all_pods
 end
-
-
-

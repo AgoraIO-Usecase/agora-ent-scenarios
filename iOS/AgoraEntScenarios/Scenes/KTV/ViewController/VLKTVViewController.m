@@ -110,7 +110,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 #pragma mark view lifecycles
 - (void)dealloc {
-    NSLog(@"%s",__FUNCTION__);
+    NSLog(@"dealloc:%s",__FUNCTION__);
 }
 
 - (void)viewDidLoad {
@@ -235,7 +235,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         [weakSelf.MVView updateUIWithSong:song role:self.singRole];
         [weakSelf.roomPersonView reloadSeatIndex:model.seatIndex];
         
-        [self onSeatFull];
+        [weakSelf onSeatFull];
 
     }];
     
