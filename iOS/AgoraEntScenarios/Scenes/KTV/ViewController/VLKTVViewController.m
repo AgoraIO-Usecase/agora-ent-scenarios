@@ -232,7 +232,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         }
         
         VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
-        [weakSelf.MVView updateUIWithSong:song role:self.singRole];
+        [weakSelf.MVView updateUIWithSong:song role:weakSelf.singRole];
         [weakSelf.roomPersonView reloadSeatIndex:model.seatIndex];
         
         [weakSelf onSeatFull];
@@ -271,11 +271,11 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         if (KTVSubscribeDeleted == status) {
             BOOL success = [weakSelf removeSelSongWithSongNo:[songInfo.songNo integerValue] sync:NO];
             if (!success) {
-                self.selSongsArray = songArray;
+                weakSelf.selSongsArray = songArray;
                 KTVLogInfo(@"removeSelSongWithSongNo fail, reload it");
             }
             //清除合唱者总分
-            self.coSingerDegree = 0;
+            weakSelf.coSingerDegree = 0;
         } else {
             VLRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
             //add new song
@@ -905,9 +905,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi setLrcViewWithView:lrcControl];
     self.lrcControl = lrcControl;
     self.lrcControl.delegate = self;
+    VL(weakSelf);
     lrcControl.skipCallBack = ^(NSInteger time, BOOL flag) {
-        NSInteger seekTime = flag ? [self.ktvApi getMediaPlayer].getDuration - 800 : time;
-        [self.ktvApi seekSingWithTime:seekTime];
+        NSInteger seekTime = flag ? [weakSelf.ktvApi getMediaPlayer].getDuration - 800 : time;
+        [weakSelf.ktvApi seekSingWithTime:seekTime];
     };
     [self.ktvApi setMicStatusWithIsOnMicOpen:!self.isNowMicMuted];
     [self.ktvApi addEventHandlerWithKtvApiEventHandler:self];
