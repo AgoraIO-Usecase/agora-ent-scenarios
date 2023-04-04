@@ -37,8 +37,8 @@ class KTVApiImpl: NSObject{
     private var eventHandlers: NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
     private var loadMusicListeners: NSMapTable<NSString, AnyObject> = NSMapTable<NSString, AnyObject>(keyOptions: .copyIn, valueOptions: .weakMemory)
 
-    private var musicPlayer: AgoraMusicPlayerProtocol!
-    private var mcc: AgoraMusicContentCenter!
+    private var musicPlayer: AgoraMusicPlayerProtocol?
+    private var mcc: AgoraMusicContentCenter?
 
     private var loadSongMap = Dictionary<String, KTVLoadSongState>()
     private var lyricUrlMap = Dictionary<String, String>()
@@ -52,6 +52,7 @@ class KTVApiImpl: NSObject{
     private var audioPlayoutDelay: NSInteger = 0
     private var isNowMicMuted: Bool = false
     private var loadSongState: KTVLoadSongState = .idle
+    private var lastNtpTime: Int = 0
     
     private var playerState: AgoraMediaPlayerState = .idle {
         didSet {
@@ -95,7 +96,7 @@ class KTVApiImpl: NSObject{
     private var joinChorusNewRole: KTVSingRole = .audience
     private var oldPitch: Double = 0
     deinit {
-        mcc.register(nil)
+        mcc?.register(nil)
         agoraPrint("deinit KTVApiImpl")
     }
 
@@ -118,13 +119,13 @@ class KTVApiImpl: NSObject{
         contentCenterConfiguration.rtcEngine = config.engine
         
         mcc = AgoraMusicContentCenter.sharedContentCenter(config: contentCenterConfiguration)
-        mcc.register(self)
+        mcc?.register(self)
         // ------------------ 初始化音乐播放器实例 ------------------
-        musicPlayer = mcc.createMusicPlayer(delegate: self)
+        musicPlayer = mcc?.createMusicPlayer(delegate: self)
 
         // 音量最佳实践调整
-        musicPlayer.adjustPlayoutVolume(50)
-        musicPlayer.adjustPublishSignalVolume(50)
+        musicPlayer?.adjustPlayoutVolume(50)
+        musicPlayer?.adjustPublishSignalVolume(50)
 
         downloadManager.delegate = self
 
@@ -181,9 +182,11 @@ extension KTVApiImpl: KTVApiDelegate {
         apiConfig?.engine.setAudioFrameDelegate(nil)
         lyricCallbacks.removeAll()
         musicCallbacks.removeAll()
-        musicPlayer.stop()
+        musicPlayer?.stop()
         apiConfig?.engine.destroyMediaPlayer(musicPlayer)
-        mcc.register(nil)
+        musicPlayer = nil
+        mcc?.register(nil)
+        mcc = nil
         AgoraMusicContentCenter.destroy()
         self.eventHandlers.removeAllObjects()
     }
@@ -406,9 +409,9 @@ extension KTVApiImpl {
             apiConfig?.engine.updateChannel(with: mediaOption)
             
             if self.songMode == .songCode {
-                musicPlayer.openMedia(songCode: self.songCode , startPos: 0)
+                musicPlayer?.openMedia(songCode: self.songCode , startPos: 0)
             } else {
-                musicPlayer.open(self.songUrl, startPos: 0)
+                musicPlayer?.open(self.songUrl, startPos: 0)
             }
             
             joinChorus2ndChannel(newRole: role, token: token)
@@ -533,7 +536,7 @@ extension KTVApiImpl {
             loadMusicListeners.setObject(onMusicLoadStateListener, forKey: "\(self.songCode)" as NSString)
             onMusicLoadStateListener.onMusicLoadProgress(songCode: self.songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
             // TODO: 只有未缓存时才显示进度条
-            if mcc.isPreloaded(songCode: songCode) != 0 {
+            if mcc?.isPreloaded(songCode: songCode) != 0 {
                 onMusicLoadStateListener.onMusicLoadProgress(songCode: self.songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
             }
             preloadMusic(with: songCode) { [weak self] status, songCode in
@@ -655,18 +658,18 @@ extension KTVApiImpl {
     
     private func loadLyric(with songCode: NSInteger, callBack:@escaping LyricCallback) {
         agoraPrint("loadLyric songCode: \(songCode)")
-        let requestId: String = self.mcc.getLyric(songCode: songCode, lyricType: 0)
+        let requestId: String = self.mcc?.getLyric(songCode: songCode, lyricType: 0) ?? ""
         self.lyricCallbacks.updateValue(callBack, forKey: requestId)
     }
     
     private func preloadMusic(with songCode: Int, callback: @escaping LoadMusicCallback) {
         agoraPrint("preloadMusic songCode: \(songCode)")
-        if self.mcc.isPreloaded(songCode: songCode) == 0 {
+        if self.mcc?.isPreloaded(songCode: songCode) == 0 {
             musicCallbacks.removeValue(forKey: String(songCode))
             callback(.OK, songCode)
             return
         }
-        let err = self.mcc.preload(songCode: songCode, jsonOption: nil)
+        let err = self.mcc?.preload(songCode: songCode, jsonOption: nil)
         if err != 0 {
             musicCallbacks.removeValue(forKey: String(songCode))
             callback(.error, songCode)
@@ -878,15 +881,17 @@ extension KTVApiImpl {
                 let duration = dict["duration"] as? Int64,
                 let realPosition = dict["realTime"] as? Int64,
                 let songCode = dict["songCode"] as? Int64,
-                let mainSingerState = dict["playerState"] as? Int
+                let mainSingerState = dict["playerState"] as? Int,
+                let ntpTime = dict["ntp"] as? Int
         else { return }
-        print("realTime:\(realPosition) position:\(position)")
+        print("realTime:\(realPosition) position:\(position) lastNtpTime:\(lastNtpTime) ntpTime:\(ntpTime) ntpGap:\(ntpTime - self.lastNtpTime) ")
         //如果接收到的歌曲和自己本地的歌曲不一致就不更新进度
         guard songCode == self.songCode else {
             agoraPrint("local songCode[\(songCode)] is not equal to recv songCode[\(self.songCode)] role: \(singerRole.rawValue)")
             return
         }
 
+        self.lastNtpTime = ntpTime
         self.remotePlayerDuration = TimeInterval(duration)
         self.lastMainSingerUpdateTime = Date().milListamp
         self.remotePlayerPosition = TimeInterval(realPosition)
@@ -900,7 +905,7 @@ extension KTVApiImpl {
                 self.localPlayerPosition = self.lastMainSingerUpdateTime - Double(position)
                 print("localPlayerPosition:playerKit:handleSetLrcTimeCommand \(localPlayerPosition)")
                 agoraPrint("seek toPosition: \(position)")
-                musicPlayer.seek(toPosition: Int(position))
+                musicPlayer?.seek(toPosition: Int(position))
             }
             
             syncPlayStateFromRemote(state: state, needDisplay: false)
@@ -922,7 +927,7 @@ extension KTVApiImpl {
             self.localPlayerPosition = getPlayerCurrentTime()
             print("localPlayerPosition:playerKit:handlePlayerStateCommand \(localPlayerPosition)")
             agoraPrint("seek toPosition: \(self.localPlayerPosition)")
-            musicPlayer.seek(toPosition: Int(self.localPlayerPosition))
+            musicPlayer?.seek(toPosition: Int(self.localPlayerPosition))
         }
 
         agoraPrint("recv state with MainSinger: \(state.rawValue)")
@@ -951,6 +956,13 @@ extension KTVApiImpl {
 
     private func handleAudienceRole(dict: [String: Any]) {
         // do something for audience role
+        guard let position = dict["time"] as? Int64,
+                let duration = dict["duration"] as? Int64,
+                let realPosition = dict["realTime"] as? Int64,
+                let songCode = dict["songCode"] as? Int64,
+                let mainSingerState = dict["playerState"] as? Int
+        else { return }
+        agoraPrint("audience: position: \(position) realPosition:\(realPosition)")
     }
     
 //    @objc public func didKTVAPIReceiveStreamMessageFrom( uid: NSInteger, streamId: NSInteger, data: Data){
@@ -1031,10 +1043,8 @@ extension KTVApiImpl {
         guard var pitch: Double = speakers.first?.voicePitch else {return}
         pitch = isNowMicMuted ? 0 : pitch
         //如果mpk不是playing状态 pitch = 0
-        if musicPlayer.getPlayerState() != .playing {pitch = 0}
+        if musicPlayer?.getPlayerState() != .playing {pitch = 0}
         self.pitch = pitch
-        lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
-        lrcControl?.onUpdateProgress(progress: Int(getPlayerCurrentTime()))
         
         //将主唱的pitch同步到观众
         if isMainSinger() {
@@ -1083,7 +1093,6 @@ extension KTVApiImpl {
             if self.singerRole != .audience {
                 current = Date().milListamp - self.lastReceivedPosition + Double(self.localPosition)
             }
-
             self.setProgress(with: Int(current ))
             self.oldPitch = self.pitch
         }, repeats: true)
@@ -1259,8 +1268,6 @@ extension KTVApiImpl {
         lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
         lrcControl?.onUpdateProgress(progress: pos > 200 ? pos - 200 : pos)
         print("pos\(pos > 200 ? pos - 200 : pos)")
-//        lrcControl?.onUpdateProgress(progress: pos > 200 ? pos - 200 : pos)
-//        print("cosinger: pos\(pos > 200 ? pos - 200 : pos)")
     }
 }
 
@@ -1282,7 +1289,8 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
                                         "songCode": self.songCode
             ]
             sendStreamMessageWithDict(dict, success: nil)
-            print("lrc: \(getPlayerCurrentTime())")
+            print("main: ntp:\(self.getNtpTimeInMs()) realTime:\(position) gap:\(self.getNtpTimeInMs() - lastNtpTime )")
+
         }
     }
     
@@ -1292,7 +1300,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         if state == .openCompleted {
             self.localPlayerPosition = Date().milListamp
             print("localPlayerPosition:playerKit:openCompleted \(localPlayerPosition)")
-            self.playerDuration = TimeInterval(musicPlayer.getDuration())
+            self.playerDuration = TimeInterval(musicPlayer?.getDuration() ?? 0)
             playerKit.selectAudioTrack(1)
             if isMainSinger() { //主唱播放，通过同步消息“setLrcTime”通知伴唱play
                 playerKit.play()
