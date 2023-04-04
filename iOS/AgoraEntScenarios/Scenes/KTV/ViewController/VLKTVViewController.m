@@ -669,8 +669,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 [self enterSeatWithIndex:i completion:^(NSError *error) {
                     if(error){
                         KTVLogError(@"enterSeat error:%@", error.description);
-                        self.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
-                        self.isJoinChorus = false;
+                        weakSelf.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
+                        weakSelf.isJoinChorus = false;
                         return;
                     }
                     [weakSelf _joinChorus];
