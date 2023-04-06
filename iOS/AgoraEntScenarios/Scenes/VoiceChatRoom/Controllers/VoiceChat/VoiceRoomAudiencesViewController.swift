@@ -73,14 +73,16 @@ extension VoiceRoomAudiencesViewController {
         VoiceRoomIMManager.shared?.kickUser(chat_uid: user.chat_uid ?? "", completion: { success in
             if success {
                 var index = -1
+                var status = -1
                 for mic in ChatRoomServiceImp.getSharedInstance().mics {
                     if mic.member?.chat_uid ?? "" == user.chat_uid ?? "" {
                         index = mic.mic_index
+                        status = mic.status
                         break
                     }
                 }
                 if index > 0,var mic = ChatRoomServiceImp.getSharedInstance().mics[safe: index]  {
-                    mic.status = -1
+                    mic.status = status
                     mic.member = nil
                     VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(index)":mic.kj.JSONString()], completion: { error in
                         if error == nil {
