@@ -143,18 +143,16 @@ abstract class IKTVApiEventHandler {
     }
 
     /**
-     * 歌曲播放结束分数
-     * @param score 歌曲结束的总分
-     */
-    open fun onSingingScoreResult(score: Float) {}
-
-    /**
      * ktvApi内部角色切换
      * @param oldRole 老角色
      * @param newRole 新角色
      */
     open fun onSingerRoleChanged(oldRole: KTVSingRole, newRole: KTVSingRole) {}
 
+    /**
+     * 合唱频道token将要过期回调，需要renew这个token
+     * @param token 即将过期的token
+     */
     open fun onChorusChannelTokenPrivilegeWillExpire(token: String?) {}
 }
 
@@ -278,8 +276,8 @@ interface KTVApi {
 
     /**
      * 异步加载歌曲，同时只能为一首歌loadSong，loadSong结果会通过回调通知业务层
-     * @param config 加载歌曲配置
      * @param songCode 歌曲唯一编码
+     * @param config 加载歌曲配置
      * @param onMusicLoadStateListener 加载歌曲结果回调
      *
      * 推荐调用：
@@ -291,8 +289,8 @@ interface KTVApi {
      * loadMusic成功后switchSingerRole(CoSinger)
      */
     fun loadMusic(
-        config: KTVLoadMusicConfiguration,
         songCode: Long,
+        config: KTVLoadMusicConfiguration,
         onMusicLoadStateListener: OnMusicLoadStateListener
     )
 
@@ -310,8 +308,8 @@ interface KTVApi {
      * loadMusic成功后switchSingerRole(CoSinger)
      */
     fun loadMusic(
-        config: KTVLoadMusicConfiguration,
-        url: String
+        url: String,
+        config: KTVLoadMusicConfiguration
     )
 
     /**

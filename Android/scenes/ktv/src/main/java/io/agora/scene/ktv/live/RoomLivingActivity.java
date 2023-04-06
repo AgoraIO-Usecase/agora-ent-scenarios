@@ -435,6 +435,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.onPauseStatus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_LRC_RESET) {
                 getBinding().lrcControlView.getLyricsView().reset();
+                if (getBinding().lrcControlView.getRole() == LrcControlView.Role.Singer) {
+                    roomLivingViewModel.changeMusic();
+                }
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_START) {
                 getBinding().lrcControlView.setEnabled(false);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_END) {
@@ -456,17 +459,37 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             getBinding().lrcControlView.getLyricsView().setDuration(duration);
         });
         roomLivingViewModel.playerMusicPlayCompleteLiveData.observe(this, score -> {
-            getBinding().tvResultScore.setText(String.valueOf(score));
-            if (score >= 90) {
-                getBinding().ivResultLevel.setImageResource(R.mipmap.ic_s);
-            } else if (score >= 80) {
-                getBinding().ivResultLevel.setImageResource(R.mipmap.ic_a);
-            } else if (score >= 70) {
-                getBinding().ivResultLevel.setImageResource(R.mipmap.ic_b);
+            if (score.isLocal()) {
+                int sc = getBinding().lrcControlView.getCumulativeScoreInPercentage();
+                getBinding().tvResultScore.setText(String.valueOf(sc));
+                if (sc >= 90) {
+                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_s);
+                } else if (sc >= 80) {
+                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_a);
+                } else if (sc >= 70) {
+                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_b);
+                } else {
+                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_c);
+                }
+                getBinding().groupResult.setVisibility(View.VISIBLE);
+
+                if (getBinding().lrcControlView.getRole() == LrcControlView.Role.Singer) {
+                    roomLivingViewModel.syncSingingAverageScore(sc);
+                }
             } else {
-                getBinding().ivResultLevel.setImageResource(R.mipmap.ic_c);
+                if (getBinding().lrcControlView.getRole() != LrcControlView.Role.Listener) return;
+                getBinding().tvResultScore.setText(String.valueOf(score.getScore()));
+                if (score.getScore() >= 90) {
+                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_s);
+                } else if (score.getScore() >= 80) {
+                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_a);
+                } else if (score.getScore() >= 70) {
+                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_b);
+                } else {
+                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_c);
+                }
+                getBinding().groupResult.setVisibility(View.VISIBLE);
             }
-            getBinding().groupResult.setVisibility(View.VISIBLE);
         });
         roomLivingViewModel.playerMusicCountDownLiveData.observe(this, time ->
                 getBinding().lrcControlView.setCountDown(time));
