@@ -56,6 +56,18 @@ enum class KTVLoadMusicMode(val value: Int) {
 }
 
 /**
+ * 加载音乐的状态
+ * @param COMPLETED 加载完成, 进度为100
+ * @param FAILED 加载失败
+ * @param INPROGRESS 加载中
+ */
+enum class MusicLoadStatus(val value: Int) {
+    COMPLETED(0),
+    FAILED(1),
+    INPROGRESS(2),
+}
+
+/**
  * 歌词组件接口，您setLrcView传入的歌词组件需要继承此接口类，并实现以下三个方法
  */
 interface ILrcView {
@@ -77,16 +89,10 @@ interface ILrcView {
     fun onDownloadLrcData(url: String?)
 }
 
-enum class MusicLoadStatus(val value: Int) {
-    COMPLETED(0),
-    FAILED(1),
-    INPROGRESS(2),
-}
-
 /**
  * 音乐加载状态接口
  */
-interface OnMusicLoadStateListener {
+interface IMusicLoadStateListener {
     /**
      * 音乐加载成功
      * @param songCode 歌曲编码， 和你loadMusic传入的songCode一致
@@ -114,7 +120,7 @@ interface OnMusicLoadStateListener {
 /**
  * 切换演唱角色状态接口
  */
-interface OnSwitchRoleStateListener {
+interface ISwitchRoleStateListener {
     /**
      * 切换演唱角色成功
      */
@@ -197,7 +203,7 @@ data class KTVLoadMusicConfiguration(
 interface KTVApi {
     /**
      * 初始化内部变量/缓存数据，并注册相应的监听，必须在其他KTVApi调用前调用initialize初始化KTVApi
-     * @param config
+     * @param config 初始化KTVApi的配置
      */
     fun initialize(config: KTVApiConfig)
 
@@ -278,7 +284,7 @@ interface KTVApi {
      * 异步加载歌曲，同时只能为一首歌loadSong，loadSong结果会通过回调通知业务层
      * @param songCode 歌曲唯一编码
      * @param config 加载歌曲配置
-     * @param onMusicLoadStateListener 加载歌曲结果回调
+     * @param musicLoadStateListener 加载歌曲结果回调
      *
      * 推荐调用：
      * 歌曲开始时：
@@ -291,7 +297,7 @@ interface KTVApi {
     fun loadMusic(
         songCode: Long,
         config: KTVLoadMusicConfiguration,
-        onMusicLoadStateListener: OnMusicLoadStateListener
+        musicLoadStateListener: IMusicLoadStateListener
     )
 
     /**
@@ -315,7 +321,7 @@ interface KTVApi {
     /**
      * 异步切换演唱身份，结果会通过回调通知业务层
      * @param newRole 新演唱身份
-     * @param onSwitchRoleState 切换演唱身份结果
+     * @param switchRoleStateListener 切换演唱身份结果
      *
      * 允许的调用路径：
      * 1、Audience -》SoloSinger 自己点的歌播放时
@@ -329,7 +335,7 @@ interface KTVApi {
      */
     fun switchSingerRole(
         newRole: KTVSingRole,
-        onSwitchRoleStateListener: OnSwitchRoleStateListener?
+        switchRoleStateListener: ISwitchRoleStateListener?
     )
 
     /**
@@ -379,7 +385,6 @@ interface KTVApi {
      */
     fun setMicStatus(isOnMicOpen: Boolean)
 
-
     /**
      * 设置当前音频播放delay， 适用于音频自采集的情况
      * @param audioPlayoutDelay 音频帧处理和播放的时间差
@@ -394,5 +399,5 @@ interface KTVApi {
     /**
      * 获取mcc实例
      */
-    fun getMusicCenter() : IAgoraMusicContentCenter
+    fun getMusicContentCenter() : IAgoraMusicContentCenter
 }
