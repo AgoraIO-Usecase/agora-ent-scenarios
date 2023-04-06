@@ -59,6 +59,7 @@ import io.agora.scene.ktv.service.RemoveSongInputModel;
 import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.ktv.service.ScoringAlgoControlModel;
+import io.agora.scene.ktv.service.ScoringAverageModel;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
 import io.agora.scene.ktv.widget.lrcView.LrcControlView;
@@ -129,7 +130,7 @@ public class RoomLivingViewModel extends ViewModel {
     final MutableLiveData<Boolean> noLrcLiveData = new MutableLiveData<>();
 
     final MutableLiveData<Long> playerMusicOpenDurationLiveData = new MutableLiveData<>();
-    final MutableLiveData<Integer> playerMusicPlayCompleteLiveData = new MutableLiveData<>();
+    final MutableLiveData<ScoringAverageModel> playerMusicPlayCompleteLiveData = new MutableLiveData<>();
     final MutableLiveData<Integer> playerMusicCountDownLiveData = new MutableLiveData<>();
     final MutableLiveData<NetWorkEvent> networkStatusLiveData = new MutableLiveData<>();
 
@@ -938,7 +939,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     private void innerJoinChorus(String songCode) {
-        ktvApiProtocol.loadMusic(new KTVLoadMusicConfiguration(false, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_ONLY), Long.parseLong(songCode), new OnMusicLoadStateListener(){
+        ktvApiProtocol.loadMusic(Long.parseLong(songCode), new KTVLoadMusicConfiguration(false, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_ONLY), new OnMusicLoadStateListener(){
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
                 KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
@@ -1088,7 +1089,6 @@ public class RoomLivingViewModel extends ViewModel {
                     String strMsg = new String(data);
                     jsonMsg = new JSONObject(strMsg);
                     if (jsonMsg.getString("cmd").equals("singleLineScore")) {
-                        KTVLogger.d("HUGO", strMsg);
                         int score = jsonMsg.getInt("score");
                         int index = jsonMsg.getInt("index");
                         int cumulativeScore = jsonMsg.getInt("cumulativeScore");
@@ -1100,9 +1100,12 @@ public class RoomLivingViewModel extends ViewModel {
                         lineScore.cumulativeScore = cumulativeScore;
                         lineScore.total = total;
                         mainSingerScoreLiveData.postValue(lineScore);
+                    } else if (jsonMsg.getString("cmd").equals("SingingScore")) {
+                        float score = (float) jsonMsg.getDouble("score");
+                        playerMusicPlayCompleteLiveData.postValue(new ScoringAverageModel(false, (int)score));
                     }
                 } catch (JSONException exp) {
-                    KTVLogger.e(TAG, "onStreamMessage:" + exp.toString());
+                    KTVLogger.e(TAG, "onStreamMessage:" + exp);
                 }
             }
         };
@@ -1284,16 +1287,13 @@ public class RoomLivingViewModel extends ViewModel {
                                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
                                break;
                            case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
-                               playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
-                               changeMusic();
+                               if (isLocal) {
+                                   playerMusicPlayCompleteLiveData.postValue(new ScoringAverageModel(true, 0));
+                                   playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
+                               }
                                break;
                            default:
                        }
-                   }
-
-                   @Override
-                   public void onSingingScoreResult(float score) {
-                       playerMusicPlayCompleteLiveData.postValue((int)score);
                    }
                }
         );
@@ -1456,7 +1456,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     private void loadMusic(KTVLoadMusicConfiguration config, Long songCode) {
-        ktvApiProtocol.loadMusic(config, songCode, new OnMusicLoadStateListener() {
+        ktvApiProtocol.loadMusic(songCode, config, new OnMusicLoadStateListener() {
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
                 KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
@@ -1564,6 +1564,18 @@ public class RoomLivingViewModel extends ViewModel {
         int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
         if (ret < 0) {
             KTVLogger.e(TAG, "syncSingleLineScore() sendStreamMessage called returned: " + ret);
+        }
+    }
+
+    public void syncSingingAverageScore(double score) {
+        if (mRtcEngine == null) return;
+        Map<String, Object> msg = new HashMap<>();
+        msg.put("cmd", "SingingScore");
+        msg.put("score", score);
+        JSONObject jsonMsg = new JSONObject(msg);
+        int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
+        if (ret < 0) {
+            KTVLogger.e(TAG, "syncSingingAverageScore() sendStreamMessage called returned: " + ret);
         }
     }
 }

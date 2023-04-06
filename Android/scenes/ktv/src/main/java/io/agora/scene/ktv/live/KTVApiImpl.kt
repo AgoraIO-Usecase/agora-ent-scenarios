@@ -13,7 +13,6 @@ import io.agora.musiccontentcenter.*
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
 import io.agora.rtc2.audio.AudioParams
-import io.agora.scene.ktv.widget.lrcView.LrcControlView
 import org.json.JSONException
 import org.json.JSONObject
 import java.nio.ByteBuffer
@@ -312,8 +311,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun loadMusic(
-        config: KTVLoadMusicConfiguration,
         songCode: Long,
+        config: KTVLoadMusicConfiguration,
         onMusicLoadStateListener: OnMusicLoadStateListener
     ) {
         Log.d(TAG, "loadMusic called: $singerRole")
@@ -408,8 +407,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun loadMusic(
-        config: KTVLoadMusicConfiguration,
-        url: String
+        url: String,
+        config: KTVLoadMusicConfiguration
     ) {
         Log.d(TAG, "loadMusic called: $singerRole")
         this.songMode = KTVSongMode.SONG_URL
@@ -955,7 +954,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         }
                         else -> {}
                     }
-                } else {
+                } else if (this.singerRole == KTVSingRole.Audience) {
                     this.mediaPlayerState = MediaPlayerState.getStateByValue(state)
                 }
                 ktvApiEventHandlerList.forEach { it.onMusicPlayerStateChanged(
@@ -963,12 +962,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     Constants.MediaPlayerError.getErrorByValue(error),
                     false
                 ) }
-            } else if (jsonMsg.getString("cmd") == "SingingScore") {
-                // 其他端收到原唱seek指令
-                val score = jsonMsg.getDouble("score").toFloat()
-                if (!isChorusCoSinger()) {
-                    ktvApiEventHandlerList.forEach { it.onSingingScoreResult(score) }
-                }
             } else if (jsonMsg.getString("cmd") == "setVoicePitch") {
                 val pitch = jsonMsg.getDouble("pitch")
                 if (this.singerRole == KTVSingRole.Audience) {
@@ -1004,7 +997,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         if (useCustomAudioSource) return
         val audioState = stats ?: return
         audioPlayoutDelay = audioState.audioPlayoutDelay
-        Log.d(TAG, "onLocalAudioStats, audioPlay-outDelay=$audioPlayoutDelay")
     }
 
     // ------------------------ AgoraMusicContentCenterEventDelegate  ------------------------
@@ -1088,16 +1080,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             MediaPlayerState.PLAYER_STATE_STOPPED -> {
                 mRtcEngine.adjustPlaybackSignalVolume(100)
                 duration = 0
-            }
-            MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
-                // 打分 + 同步分数
-                val view = lrcView as LrcControlView
-                val score = view.cumulativeScoreInPercentage.toFloat()
-                ktvApiEventHandlerList.forEach { it.onSingingScoreResult(score) }
-
-                // 只有主唱同步分数给观众端
-                if (isChorusCoSinger()) return
-                syncSingingScore(score)
             }
             else -> {}
         }

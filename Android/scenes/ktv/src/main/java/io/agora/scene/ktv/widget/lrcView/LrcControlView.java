@@ -316,6 +316,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         changeViewByRole();
     }
 
+    public Role getRole() {
+        return this.mRole;
+    }
+
     public void setMusic(@NonNull RoomSelSongModel mMusic) {
         mKaraokeView.reset();
         if (mComboControl != null) {
@@ -604,7 +608,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     public void onUpdateProgress(Long progress) {
         if (mKaraokeView.getLyricsData() == null) return;
         if (mRole == Role.Singer) {
-            if (progress >= mKaraokeView.getLyricsData().startOfVerse) {
+            if (progress >= mKaraokeView.getLyricsData().startOfVerse - 2000) {
                 mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);
             }
 

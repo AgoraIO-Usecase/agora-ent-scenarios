@@ -160,3 +160,8 @@ data class ScoringAlgoControlModel(
     val level: Int,
     val offset: Int
 )
+
+data class ScoringAverageModel(
+    val isLocal: Boolean,
+    val score: Int
+)
