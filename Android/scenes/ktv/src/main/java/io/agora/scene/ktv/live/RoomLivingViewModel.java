@@ -939,7 +939,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     private void innerJoinChorus(String songCode) {
-        ktvApiProtocol.loadMusic(Long.parseLong(songCode), new KTVLoadMusicConfiguration(false, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_ONLY), new OnMusicLoadStateListener(){
+        ktvApiProtocol.loadMusic(Long.parseLong(songCode), new KTVLoadMusicConfiguration(false, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_ONLY), new IMusicLoadStateListener(){
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
                 KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
@@ -953,7 +953,7 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void onMusicLoadSuccess(long songCode, @NonNull String lyricUrl) {
-                ktvApiProtocol.switchSingerRole(KTVSingRole.CoSinger, new OnSwitchRoleStateListener() {
+                ktvApiProtocol.switchSingerRole(KTVSingRole.CoSinger, new ISwitchRoleStateListener() {
                     @Override
                     public void onSwitchRoleFail(@NonNull SwitchRoleFailReason reason) {
                         ToastUtils.showToastLong("加入合唱失败");
@@ -1456,7 +1456,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     private void loadMusic(KTVLoadMusicConfiguration config, Long songCode) {
-        ktvApiProtocol.loadMusic(songCode, config, new OnMusicLoadStateListener() {
+        ktvApiProtocol.loadMusic(songCode, config, new IMusicLoadStateListener() {
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
                 KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
