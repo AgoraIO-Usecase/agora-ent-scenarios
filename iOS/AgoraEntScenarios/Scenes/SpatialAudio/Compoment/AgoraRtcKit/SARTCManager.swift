@@ -302,13 +302,13 @@ public let kMPK_RTC_UID_SA: UInt = 1
     }
     
     func initSpatialAudio(recvRange: Float) {
-        rtcKit.muteAllRemoteAudioStreams(true)
+//        rtcKit.muteAllRemoteAudioStreams(true)
         localSpatial = AgoraLocalSpatialAudioKit()
         let localSpatialConfig = AgoraLocalSpatialAudioConfig()
         localSpatialConfig.rtcEngine = rtcKit
         localSpatial = AgoraLocalSpatialAudioKit.sharedLocalSpatialAudio(with: localSpatialConfig)
         localSpatial?.muteLocalAudioStream(false)
-        localSpatial?.muteAllRemoteAudioStreams(false)
+//        localSpatial?.muteAllRemoteAudioStreams(false)
         localSpatial?.setAudioRecvRange(recvRange)
         localSpatial?.setMaxAudioRecvCount(6)
         localSpatial?.setDistanceUnit(1)
