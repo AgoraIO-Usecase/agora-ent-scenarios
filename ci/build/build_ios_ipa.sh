@@ -100,9 +100,10 @@ python3 artifactory_utils.py --action=upload_file --file="${TARGET_NAME}_${BUILD
 python3 artifactory_utils.py --action=upload_file --file="dsym_${BUILD_NUMBER}.zip" --project
 
 
-# 删除IPA文件夹
-# rm -rf "${PROJECT_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip"
-# cd ${PROJECT_PATH} && rm -rf "*.zip"
+# 删除文件
+rm -rf "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive"
+rm -rf "*.zip"
+rm -rf ${PAYLOAD_PATH}
 
 # 复原Keycenter文件
 python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 1
