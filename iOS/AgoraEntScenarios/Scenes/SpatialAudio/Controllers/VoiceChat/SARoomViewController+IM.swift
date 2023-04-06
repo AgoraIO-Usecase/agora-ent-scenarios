@@ -322,7 +322,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                     }
                 } else {
                     if local_index == nil || mic_index == local_index {
-                        rtckit.setClientRole(role: .audience)
+                        rtckit.setClientRole(role: isOwner ? .owner : .audience)
                         rtckit.muteLocalAudioStream(mute: true)
                     }
                 }
