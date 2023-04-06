@@ -21,7 +21,7 @@ struct KeyCenter {
      则应使用不同的 App ID。如果应用程序需要相互通信，则应使用同一个App ID。
      进入声网控制台(https://console.agora.io/)，创建一个项目，进入项目配置页，即可看到APP ID。
      */
-    static let AppId: String = <#Your AppId#>
+    static let AppId: String = <#YOUR APPID#>
 
     /**
      Certificate.
@@ -35,7 +35,7 @@ struct KeyCenter {
      进入声网控制台(https://console.agora.io/)，创建一个带证书鉴权的项目，进入项目配置页，即可看到APP证书。
      注意：如果项目没有开启证书鉴权，这个字段留空。
      */
-    static let Certificate: String? = <#Your Certificate#>
+    static let Certificate: String? = <#YOUR Certificate#>
     
     /**
      Token.
@@ -51,9 +51,9 @@ struct KeyCenter {
 //    static var Token: String? = nil
     
     
-    static var IMAppKey: String? = <#Your IM App Key#>
-    static var IMClientId: String? = <#Your IM Client Id#>
-    static var IMClientSecret: String? = <#Your IM Client Secret#>
+    static var IMAppKey: String? = <#YOUR IMAppKey#>
+    static var IMClientId: String? = <#YOUR IMClientId#>
+    static var IMClientSecret: String? = <#YOUR IMClientSecret#>
     
     static var HostUrl: String = "https://gateway-fulldemo.agoralab.co"
     
