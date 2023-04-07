@@ -65,7 +65,7 @@ import AgoraRtcKit
     case musicPreloadFailAndJoinChannelFail
 }
 
-@objc public protocol KTVMusicLoadStateListener: NSObjectProtocol {
+@objc public protocol IMusicLoadStateListener: NSObjectProtocol {
     
     
     /// 歌曲进度
@@ -133,7 +133,7 @@ import AgoraRtcKit
 @objc open class KTVApiConfig: NSObject{
     var appId: String
     var rtmToken: String
-    var engine: AgoraRtcEngineKit
+    weak var engine: AgoraRtcEngineKit?
     var channelName: String
     var localUid: Int = 0
     var chorusChannelName: String
@@ -168,7 +168,7 @@ import AgoraRtcKit
 
 public typealias LyricCallback = ((String?) -> Void)
 public typealias LoadMusicCallback = ((AgoraMusicContentCenterPreloadStatus, NSInteger) -> Void)
-public typealias SwitchRoleStateCallBack = (KTVSwitchRoleState, KTVSwitchRoleFailReason) -> Void
+public typealias ISwitchRoleStateListener = (KTVSwitchRoleState, KTVSwitchRoleFailReason) -> Void
 public typealias MusicChartCallBacks = (String, AgoraMusicContentCenterStatusCode, [AgoraMusicChartInfo]?) -> Void
 public typealias MusicResultCallBacks = (String, AgoraMusicContentCenterStatusCode, AgoraMusicCollection) -> Void
 public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Void)
@@ -235,7 +235,7 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     /// - Parameters:
     ///   - config: <#config description#>
     ///   - onMusicLoadStateListener: <#onMusicLoadStateListener description#>
-    func loadMusic(config: KTVSongConfiguration, songCode: Int, onMusicLoadStateListener: KTVMusicLoadStateListener)
+    func loadMusic(songCode: Int, config: KTVSongConfiguration, onMusicLoadStateListener: IMusicLoadStateListener)
     
     /// 通过url加载歌曲
     /// - Parameters:
@@ -249,7 +249,7 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     ///   - newRole: <#newRole description#>
     ///   - token: <#token description#>
     ///   - onSwitchRoleState: <#onSwitchRoleState description#>
-    func switchSingerRole(newRole: KTVSingRole, onSwitchRoleState:@escaping SwitchRoleStateCallBack)
+    func switchSingerRole(newRole: KTVSingRole, onSwitchRoleState:@escaping ISwitchRoleStateListener)
     
     
     /// 播放
@@ -300,5 +300,5 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     
     /// 获取MCC实例
     /// - Returns: <#description#>
-    func getMusicCenter() -> AgoraMusicContentCenter?
+    func getMusicContentCenter() -> AgoraMusicContentCenter?
 }
