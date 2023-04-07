@@ -63,7 +63,7 @@ AgoraRtcEngineDelegate,
 VLPopScoreViewDelegate,
 KTVLrcControlDelegate,
 KTVApiEventHandlerDelegate,
-KTVMusicLoadStateListener
+IMusicLoadStateListener
 >
 
 typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
@@ -563,8 +563,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     };
     
     
-    [self.ktvApi loadMusicWithConfig:songConfig songCode:[model.songNo integerValue]
-                onMusicLoadStateListener:self];
+    [self.ktvApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
 
     [weakSelf.ktvApi switchSingerRoleWithNewRole:role
                            onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
@@ -638,8 +637,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)joinChorus {
     
     [self.MVView.gradeView reset];
-    
-    NSLog(@"currentThread:%@", [NSThread currentThread]);
+
     if([self getOnMicUserCount] == 8 && !_isOnMicSeat){
         [VLToast toast:@"“麦位已满，请在他人下麦后重试"];
         return;
@@ -717,10 +715,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             weakSelf.isJoinChorus = false;
             
             weakSelf.isNowMicMuted = role == KTVSingRoleAudience;
-            [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:weakSelf.isNowMicMuted
-                                                                completion:^(NSError * error) {
-            }];
-            
+
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
             KTVJoinChorusInputModel* inputModel = [KTVJoinChorusInputModel new];
             inputModel.isChorus = YES;
@@ -737,8 +732,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }];
     };
     KTVLogInfo(@"before songCode:%li", [model.songNo integerValue]);
-    [self.ktvApi loadMusicWithConfig:songConfig songCode: [model.songNo integerValue]
-                onMusicLoadStateListener:self];
+    [self.ktvApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
 }
 
 - (void)removeCurrentSongWithSync:(BOOL)sync
@@ -797,9 +791,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if (error != nil) {
             return;
         }
-        
-        [weakSelf.ktvApi cleanCache];
-        weakSelf.ktvApi = nil;
         
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
@@ -930,6 +921,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)leaveRTCChannel {
     [self.ktvApi removeEventHandlerWithKtvApiEventHandler:self];
+    [self.ktvApi cleanCache];
+    self.ktvApi = nil;
+    self.loadMusicCallBack = nil;
     [self.RTCkit leaveChannel:^(AgoraChannelStats * _Nonnull stat) {
         KTVLogInfo(@"Agora - Leave RTC channel");
     }];
@@ -1258,8 +1252,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
     };
     
-    [self.ktvApi loadMusicWithConfig:songConfig songCode: [model.songNo integerValue]
-                onMusicLoadStateListener:self];
+    [self.ktvApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
 }
 
 #pragma mark - VLKTVSettingViewDelegate
