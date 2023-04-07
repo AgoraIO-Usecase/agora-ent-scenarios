@@ -34,7 +34,7 @@
 
   - 注: 拉取榜单、歌单、歌词等功能是需要开通权限的
 
-- 在项目的 agora-ent-scenarios/iOS/AgoraEntScenarios/ 目录下会有一个 KeyCenter.swift.bak 文件，需要把这个文件的 bak 后缀去掉，让他变成  KeyCenter.swift 文件。然后在 KeyCenter.swift 里填写需要的声网 App ID 和 App 证书，再把 KeyCenter.swift 文件拖到项目中去
+- 在项目的 agora-ent-scenarios/iOS/AgoraEntScenarios/ 目录下会有一个 KeyCenter.swift 文件，需要在 KeyCenter.swift 里填写需要的声网 App ID 和 App 证书
 
   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_keys_ios.png)
 
@@ -151,16 +151,16 @@
 >    *
 >    * 推荐调用：
 >    * 歌曲开始时：
->    * 主唱 loadMusic(KTVLoadMusicConfiguration(autoPlay=true, songCode, mainSingerUid)) mode= .loadMusicAndLrc, switchSingerRole(SoloSinger)
->    * 观众 loadMusic(KTVLoadMusicConfiguration(autoPlay=false, songCode, mainSingerUid)) mode = .loadLrcOnly
+>    * 主唱 loadMusic(songCode, KTVLoadMusicConfiguration(autoPlay=true, mode= .loadMusicAndLrc, mainSingerUid)) , switchSingerRole(SoloSinger)
+>    * 观众 loadMusic(songCode, KTVLoadMusicConfiguration(autoPlay=false, mode = .loadLrcOnly, mainSingerUid)) 
 >    * 加入合唱时：
->    * 准备加入合唱者：loadMusic(KTVLoadMusicConfiguration(autoPlay=false, songCode, mainSingerUid)) mode = .loadMusicOnly
+>    * 准备加入合唱者：loadMusic(songCode, KTVLoadMusicConfiguration(autoPlay=false, mode = .loadMusicOnly, mainSingerUid)) 
 >    * loadMusic成功后switchSingerRole(CoSinger)
 >    */
 >   func loadMusic(
 >                config: KTVSongConfiguration, 
 >                mode: KTVLoadMusicMode, 
->                onMusicLoadStateListener: >KTVMusicLoadStateListener)
+>                onMusicLoadStateListener: >IMusicLoadStateListener)
 >
 > * 切换角色
 >
@@ -184,7 +184,7 @@
 >    */
 >   func switchSingerRole(
 >     newRole: KTVSingRole,
->     onSwitchRoleState:@escaping SwitchRoleStateCallBack
+>     onSwitchRoleState:@escaping ISwitchRoleStateListener
 >   )
 >   ~~~
 >
@@ -194,7 +194,7 @@
 >   /**
 >   * 开始播放
 >   */
->   func startSing(startPos: Int)
+>   func startSing(songCode: Int, startPos: Int)
 >
 >   /**
 >   * 恢复播放
