@@ -101,7 +101,7 @@ extension SpatialAudioSyncSerciceImp {
         for i in 1...8 {
             if i == 8 { return 0 }
             let mic = self.mics[safe: i]
-            if mic?.member == nil {
+            if mic?.member == nil && mic?.status != 3 {
                 mic_index = mic?.mic_index ?? 1
                 break
             }
@@ -408,6 +408,12 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         } else {
             mic.status = 3
         }
+        if let member = mic.member {
+            member.status = .idle
+            member.invited = false
+            _updateUserInfo(roomId: roomId!, user: member) { _ in }
+        }
+        
         self._cleanUserMicIndex(mic: mic)
         mic.member = nil
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
@@ -476,7 +482,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         }
         
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
-            if error == nil {
+            if error == nil && self.mics.count > mic_index {
                 self.mics[mic_index] = mic
             }
             completion(error, mic)
@@ -707,6 +713,10 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             mic_index = self.findMicIndex()
         } else {
             mic_index = apply.index ?? 1
+        }
+        
+        if mics[mic_index].status != -1 {
+            mic_index = self.findMicIndex()
         }
         
         let mic = SARoomMic()
