@@ -246,10 +246,10 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
             sRtcView.updateUser(last)
         } else {
             if let first = mics.first {
-                let status = first.member?.mic_status == .mute ? 1 : first.status
+                let status = (first.member?.mic_status == .mute && first.member?.uid == VLUserCenter.user.id) ? 1 : (first.status == 3 ? -1 : first.status)
                 let mic_index = first.mic_index
                 //刷新底部✋🏻状态
-                if !isOwner {
+                if !isOwner && first.mic_index != 0  {
                     refreshHandsUp(status: status)
                 }
                 //将userList中的上麦用户做标记，便于后续过滤
@@ -274,7 +274,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                     } else {
                         state = .selected
                     }
-                    if first.member != nil {
+                    if first.member != nil && first.mic_index != 0 {
                         self.chatBar.refresh(event: .mic, state: state, asCreator: isOwner)
                     }
                     if mic_index == local_index && (status == -1 || status == 3 || status == 4 || status == 2) {
