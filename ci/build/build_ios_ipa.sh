@@ -20,7 +20,6 @@ fi
 TARGET_NAME=AgoraEntScenarios
 
 KEYCENTER_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/KeyCenter.swift"
-cp $KEYCENTER_PATH.bak $KEYCENTER_PATH
 
 # 打包环境
 CONFIGURATION='Release'
@@ -100,14 +99,20 @@ python3 artifactory_utils.py --action=upload_file --file="${TARGET_NAME}_${BUILD
 7za a -tzip dsym_${BUILD_NUMBER}.zip -r "${ARCHIVE_PATH}/dSYMs/${TARGET_NAME}.app.dSYM"
 python3 artifactory_utils.py --action=upload_file --file="dsym_${BUILD_NUMBER}.zip" --project
 
+echo "Debug info ***"
+ls $WORKSPACE
 
-# 删除IPA文件夹
-# rm -rf "${PROJECT_PATH}/${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip"
-# cd ${PROJECT_PATH} && rm -rf "*.zip"
+# 删除文件
+rm -rf "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive"
+rm -rf "*.zip"
+rm -rf ${PAYLOAD_PATH}
+
+ls $WORKSPACE
+echo "Debug info *** end"
 
 # 复原Keycenter文件
 python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 1
 
-
+echo 'reset keycenter down'
 
 

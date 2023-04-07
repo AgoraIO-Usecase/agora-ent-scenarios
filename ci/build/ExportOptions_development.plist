@@ -10,6 +10,10 @@
 	<string>development</string>
 	<key>provisioningProfiles</key>
 	<dict>
+		<key>io.agora.ktv</key>
+		<string>apiexamples_all</string>
+		<key>io.agora.chatroom</key>
+		<string>apiexamples_all</string>
 		<key>io.agora.test.enfull</key>
 		<string>apiexamples_all</string>
 	</dict>
