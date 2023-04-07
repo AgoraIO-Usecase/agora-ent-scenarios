@@ -10,7 +10,11 @@
 	<string>app-store</string>
 	<key>provisioningProfiles</key>
 	<dict>
-		<key>io.agora.test.enfull</key>
+		<key>io.agora.ktv</key>
+		<string>apiexample_all_dis</string>
+		<key>io.agora.entfull</key>
+		<string>apiexample_all_dis</string>
+		<key>io.agora.chatroom</key>
 		<string>apiexample_all_dis</string>
 	</dict>
 	<key>signingCertificate</key>
