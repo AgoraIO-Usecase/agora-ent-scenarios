@@ -249,7 +249,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                 let status = first.member?.mic_status == .mute ? 1 : first.status
                 let mic_index = first.mic_index
                 //刷新底部✋🏻状态
-                if !isOwner && status < 1 {
+                if !isOwner {
                     refreshHandsUp(status: status)
                 }
                 //将userList中的上麦用户做标记，便于后续过滤
@@ -299,7 +299,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                         AppContext.saTmpServiceImp().userList.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
                         view.makeToast("Removed Stage".localized())
                     }  else {
-                        local_index = nil
+//                        local_index = nil
                         self.refreshApplicants(chat_uid: fromId)
                     }
                 } else {

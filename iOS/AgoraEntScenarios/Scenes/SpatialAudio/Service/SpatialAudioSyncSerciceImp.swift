@@ -543,14 +543,9 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         new_mic.mic_index = new_index
         new_mic.member = mics[old_index].member
         
-        let impGroup = DispatchGroup()
-        impGroup.enter()
         var ret = [Int: SARoomMic]()
         var retErr: Error? = nil
         _updateMicSeat(roomId: self.roomId!, mic: old_mic) { error in
-            defer {
-                impGroup.leave()
-            }
             if error == nil {
                 ret[old_index] = old_mic
             } else {
@@ -559,24 +554,17 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             completion(error, [old_index: old_mic])
         }
         
-        impGroup.enter()
         _updateMicSeat(roomId: self.roomId!, mic: new_mic) { error in
-            defer {
-                impGroup.leave()
-            }
             if error == nil {
                 ret[new_index] = old_mic
             } else {
                 retErr = error
             }
         }
-        
-        impGroup.notify(queue: .main) {
-            ret.forEach { (key: Int, value: SARoomMic) in
-                self.mics[key] = value
-            }
-            completion(retErr, ret)
+        ret.forEach { (key: Int, value: SARoomMic) in
+            self.mics[key] = value
         }
+        completion(retErr, ret)
     }
     
     func startMicSeatInvitation(chatUid: String, index: Int?, completion: @escaping (Error?, Bool) -> Void) {
