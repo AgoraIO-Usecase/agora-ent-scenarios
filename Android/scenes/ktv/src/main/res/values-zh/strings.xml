@@ -134,4 +134,5 @@
     <string name="ktv_permission_refused">运行此功能需要的必要权限未被授予。</string>
     <string name="ktv_network_unavailable">未检测到可用网络，确认继续？</string>
     <string name="ktv_no_lrc">暂无歌词 </string>
+
 </resources>

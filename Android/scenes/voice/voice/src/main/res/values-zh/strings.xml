@@ -226,4 +226,7 @@
     <string name="voice_room_content_prohibited">内容禁止发送</string>
     <string name="voice_room_send_tip">发送</string>
     <string name="voice_room_name_rule">房间名不合规</string>
+    <string name="voice_chatroom_permission_setting">设置</string>
+    <string name="voice_chatroom_permission_leak_title">没有麦克风权限</string>
+    <string name="voice_chatroom_permission_leak_content">请在设置里打开麦克风权限</string>
 </resources>

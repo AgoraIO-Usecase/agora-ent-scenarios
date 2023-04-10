@@ -2,12 +2,16 @@ package io.agora.scene.base.component;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,11 +21,16 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewbinding.ViewBinding;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.agora.scene.base.R;
 import io.agora.scene.base.utils.ToastUtils;
@@ -37,6 +46,27 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
      * 退出标记位
      */
     private boolean isExit = false;
+
+    private String appSettingInput;
+    private ActivityResultLauncher<String> appSettingLauncher = registerForActivityResult(new ActivityResultContract<String, Boolean>() {
+
+        @NonNull
+        @Override
+        public Intent createIntent(@NonNull Context context, String input) {
+            appSettingInput = input;
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setData(Uri.parse("package:" + context.getPackageName()));
+            return intent;
+        }
+
+        @Override
+        public Boolean parseResult(int resultCode, @Nullable Intent intent) {
+            return ActivityCompat.checkSelfPermission(BaseViewBindingActivity.this, appSettingInput) == PackageManager.PERMISSION_GRANTED;
+        }
+    }, result -> {
+        checkPermission();
+    });
 
     private void addLoadingView() {
         if (this.loadingView == null) {
@@ -76,6 +106,7 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
     //////////////////////// Methods of Permission ////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     protected PermissionItem[] mPermissionArray;
+    protected final List<String> mPermissionListDenied = new ArrayList<>();
 
     public static final int PERM_REQID_RECORD_AUDIO = 0x1001;
     public static final int PERM_REQID_CAMERA = 0x1002;
@@ -92,7 +123,14 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         }
     }
 
-    public void requestReadStoragePermission() {
+    public void requestReadStoragePermission(){
+        this.requestReadStoragePermission(false);
+    }
+
+    public void requestReadStoragePermission(boolean force) {
+        if (force) {
+            mPermissionListDenied.remove(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
         if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mPermissionArray = new PermissionItem[1];
             for (PermissionItem item : mPermissionArray) {
@@ -114,7 +152,14 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         checkPermission();
     }
 
-    protected void requestCameraPermission() {
+    protected void requestCameraPermission(){
+        this.requestCameraPermission(false);
+    }
+
+    protected void requestCameraPermission(boolean force) {
+        if (force) {
+            mPermissionListDenied.remove(Manifest.permission.CAMERA);
+        }
         if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mPermissionArray = new PermissionItem[1];
             for (PermissionItem item : mPermissionArray) {
@@ -137,7 +182,14 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         checkPermission();
     }
 
-    protected void requestRecordPermission() {
+    protected void requestRecordPermission(){
+        this.requestRecordPermission(false);
+    }
+
+    protected void requestRecordPermission(boolean force) {
+        if(force){
+            mPermissionListDenied.remove(Manifest.permission.RECORD_AUDIO);
+        }
         if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mPermissionArray = new PermissionItem[1];
             for (PermissionItem item : mPermissionArray) {
@@ -171,8 +223,16 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
             if (!mPermissionArray[i].granted) {
                 // 请求相应的权限i
                 String permission = mPermissionArray[i].permissionName;
+                if (mPermissionListDenied.contains(permission)) {
+                    continue;
+                }
                 int requestCode = mPermissionArray[i].requestId;
-                ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
+                boolean shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(this, permission);
+                if (shouldShowRationale) {
+                    doOnPermissionsDenied(requestCode);
+                } else {
+                    ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
+                }
                 return i;
             }
         }
@@ -187,7 +247,7 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             setPermGrantedByReqId(requestCode);
         } else { // 拒绝了该权限
-            ToastUtils.showToast(R.string.permission_leak_tip);
+            doOnPermissionsDenied(requestCode);
             return;
         }
 
@@ -238,6 +298,31 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         } else {
             this.getAlonePermissions();
         }
+
+    }
+
+    private void doOnPermissionsDenied(int requestCode){
+        // ToastUtils.showToast(R.string.permission_leak_tip);
+        if(mPermissionArray==null) return;
+        String permission = null;
+        for (int i = 0; i < mPermissionArray.length; i++) {
+            if (mPermissionArray[i].requestId == requestCode) {
+                permission = mPermissionArray[i].permissionName;
+                break;
+            }
+        }
+        if(permission == null){
+            return;
+        }
+        mPermissionListDenied.add(permission);
+        onPermissionDined(permission);
+    }
+
+    protected void launchAppSetting(String permission){
+        appSettingLauncher.launch(permission);
+    }
+
+    protected void onPermissionDined(String permission){
 
     }
 
