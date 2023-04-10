@@ -2,13 +2,20 @@ package io.agora.scene.voice.ui.activity
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -30,6 +37,7 @@ import io.agora.scene.voice.service.VoiceRoomSubscribeDelegate
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.RoomGiftViewDelegate
 import io.agora.scene.voice.ui.RoomObservableViewDelegate
+import io.agora.scene.voice.ui.dialog.common.CommonFragmentAlertDialog
 import io.agora.scene.voice.ui.widget.barrage.ChatroomMessagesView
 import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
@@ -68,6 +76,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     private lateinit var roomLivingViewModel: VoiceRoomLivingViewModel
     private lateinit var giftViewDelegate: RoomGiftViewDelegate
     private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
+    private var permissionGrantedRun: Runnable? = null
 
     /**
      * 代理头部view以及麦位view
@@ -81,6 +90,30 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
     /**房间基础*/
     private val roomKitBean = RoomKitBean()
+    private var audioPermDenied = false
+
+    private val appSettingLauncher =
+        registerForActivityResult(object : ActivityResultContract<String, Boolean>(){
+            private var input: String? = null
+
+            override fun createIntent(context: Context, input: String?): Intent {
+                this.input = input
+                return Intent().apply {
+                    action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                    data = Uri.parse("package:" + context.packageName)
+                }
+            }
+
+            override fun parseResult(resultCode: Int, intent: Intent?): Boolean {
+                return ContextCompat.checkSelfPermission(
+                    this@ChatroomLiveActivity,
+                    input ?: ""
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+
+        }) { isGranted ->
+            requestAudioPermission();
+        }
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceActivityChatroomBinding {
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -96,7 +129,14 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         initListeners()
         initData()
         initView()
-        requestAudioPermission()
+        if (roomKitBean.isOwner) {
+            requestAudioPermission {
+                "onPermissionGrant initSdkJoin".logD(TAG)
+                roomLivingViewModel.initSdkJoin(roomKitBean)
+            }
+        } else {
+            roomLivingViewModel.initSdkJoin(roomKitBean)
+        }
     }
 
     private fun initData() {
@@ -499,7 +539,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                                 binding.likeView.isVisible = true
                                 if (code == Error.MODERATION_FAILED){
                                     ToastTools.show(this@ChatroomLiveActivity,
-                                        getString(R.string.voice_room_content_prohibited,Toast.LENGTH_SHORT)
+                                        getString(R.string.voice_room_content_prohibited),Toast.LENGTH_SHORT
                                     )
                                 }
                             }
@@ -543,14 +583,38 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         super.finish()
     }
 
-    private fun requestAudioPermission() {
+    fun requestAudioPermission(force: Boolean = false, grantedRun: Runnable? = null ) {
+        if (audioPermDenied && !force ) {
+            grantedRun?.run()
+            return
+        }
+        grantedRun?.let {
+            permissionGrantedRun = it
+        }
         val perms = arrayOf(Manifest.permission.RECORD_AUDIO)
         if (EasyPermissions.hasPermissions(this, *perms)) {
             onPermissionGrant()
+        } else if (shouldShowRequestPermissionRationale(*perms)) {
+            onPermissionsDenied()
         } else {
             // Do not have permissions, request them now
-            EasyPermissions.requestPermissions(PermissionRequest.Builder(this, RC_PERMISSIONS, *perms).build())
+            EasyPermissions.requestPermissions(
+                PermissionRequest.Builder(
+                    this,
+                    RC_PERMISSIONS,
+                    *perms
+                ).build()
+            )
         }
+    }
+
+    private fun shouldShowRequestPermissionRationale(vararg perms: String): Boolean {
+        for (perm in perms) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, perm)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -560,8 +624,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     }
 
     private fun onPermissionGrant() {
-        "onPermissionGrant initSdkJoin".logD(TAG)
-        roomLivingViewModel.initSdkJoin(roomKitBean)
+        permissionGrantedRun?.run()
+        permissionGrantedRun = null
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
@@ -573,6 +637,29 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
     override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
         "onPermissionsDenied $perms ".logD()
+        if (requestCode == RC_PERMISSIONS) {
+            onPermissionsDenied()
+        }
+    }
+
+    private fun onPermissionsDenied(){
+        audioPermDenied = true
+        // 显示弹窗
+        CommonFragmentAlertDialog()
+            .titleText(getString(R.string.voice_chatroom_permission_leak_title))
+            .contentText(getString(R.string.voice_chatroom_permission_leak_content))
+            .leftText(getString(R.string.voice_room_cancel))
+            .rightText(getString(R.string.voice_chatroom_permission_setting))
+            .setOnClickListener(object : CommonFragmentAlertDialog.OnClickBottomListener {
+                override fun onConfirmClick() {
+                    appSettingLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                }
+
+                override fun onCancelClick() {
+                    onPermissionGrant()
+                }
+            })
+            .show(supportFragmentManager, "permissionSettingDialog")
     }
 
     override fun onRationaleAccepted(requestCode: Int) {

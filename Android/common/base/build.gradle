@@ -67,7 +67,7 @@ dependencies {
     implementation rootProject.ext.deps.glide
 
     implementation rootProject.ext.deps.coroutines_android
-    implementation rootProject.ext.deps.bugly
+
 
     api rootProject.ext.deps.rtc
     api rootProject.ext.deps.rtm
