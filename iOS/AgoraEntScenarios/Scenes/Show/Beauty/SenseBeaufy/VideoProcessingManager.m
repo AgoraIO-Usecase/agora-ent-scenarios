@@ -108,7 +108,7 @@
     CVPixelBufferLockBaseAddress(pixelBuffer, 0);
     int width = (int)CVPixelBufferGetWidth(pixelBuffer);
     int heigh = (int)CVPixelBufferGetHeight(pixelBuffer);
-    
+#if __has_include("st_mobile_common.h")
     if (_outTexture) {
         int _cacheW = (int)CVPixelBufferGetWidth(_outputPixelBuffer);
         int _cacheH = (int)CVPixelBufferGetHeight(_outputPixelBuffer);
@@ -119,16 +119,14 @@
             _outputPixelBuffer = NULL;
             _outputCVTexture = NULL;
         }
-    }
-    if(!_outTexture){
-#if __has_include("st_mobile_common.h")
+    } else {
         [self.effectsProcess createGLObjectWith:width
                                          height:heigh
                                         texture:&_outTexture
                                     pixelBuffer:&_outputPixelBuffer
                                       cvTexture:&_outputCVTexture];
-#endif
     }
+#endif
 #if __has_include("st_mobile_common.h")
     st_mobile_human_action_t detectResult;
     memset(&detectResult, 0, sizeof(st_mobile_human_action_t));
