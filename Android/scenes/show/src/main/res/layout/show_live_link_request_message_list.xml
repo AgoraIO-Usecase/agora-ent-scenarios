@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/textLinking"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/show_pk_or_link_status_bg"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:hint="@string/show_linking"
+        android:imeOptions="actionSearch"
+        android:maxLines="1"
+        android:paddingHorizontal="15dp"
+        android:singleLine="true"
+        android:textColor="@color/black"
+        android:textColorHint="@color/text_color_66"
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/iBtnStopLink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/show_stop_linking"
+        android:textColor="@drawable/show_purple"
+        android:drawablePadding="6dp"
+        android:visibility="gone"
+        android:drawableEnd="@mipmap/show_stop_link_or_pk_btn"
+        app:layout_constraintBottom_toBottomOf="@id/textLinking"
+        app:layout_constraintEnd_toEndOf="@id/textLinking"
+        app:layout_constraintTop_toTopOf="@id/textLinking" />
+
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
+        android:id="@+id/smart_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textLinking">
+
+        <com.scwang.smart.refresh.header.ClassicsHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/linkRequestList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="1"
+            tools:listitem="@layout/show_live_link_request_message" />
+
+        <com.scwang.smart.refresh.footer.ClassicsFooter
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/linkRequestListEmptyImg"
+        android:layout_width="147dp"
+        android:layout_height="93dp"
+        android:layout_marginTop="80dp"
+        android:src="@mipmap/show_link_empty"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textLinking" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/linkRequestListEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="39dp"
+        android:drawablePadding="12dp"
+        android:gravity="center"
+        android:text="@string/show_empty_onseat_apply"
+        android:textColor="@color/def_text_grey_979"
+        android:textSize="14sp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/linkRequestListEmptyImg" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

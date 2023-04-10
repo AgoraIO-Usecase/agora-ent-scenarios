@@ -12,12 +12,6 @@
         tools:layout="@layout/app_fragment_home_index" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.agora.entfulldemo.home.HomeFindFragment"
-        android:label="@string/app_title_find"
-        tools:layout="@layout/app_fragment_home_find" />
-
-    <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.agora.entfulldemo.home.HomeMineFragment"
         android:label="@string/app_title_mine"

@@ -1,2 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+
+    <string name="comm_permission_leak_auido_title">没有麦克风权限</string>
+    <string name="comm_permission_leak_auido_content">请在设置中打开麦克风权限</string>
+    <string name="comm_permission_leak_camera_title">没有相机权限</string>
+    <string name="comm_permission_leak_camera_content">请在设置中打开相机权限</string>
+    <string name="comm_permission_leak_sdcard_title">没有照片和视频权限</string>
+    <string name="comm_permission_leak_sdcard_content">请在设置中打开照片和视频权限</string>
+    <string name="comm_permission_leak_other_title">没有运行所需权限</string>
+    <string name="comm_permission_leak_other_content">请在设置中打开运行所需权限</string>
+    <string name="comm_setting">设置</string>
+
+</resources>
