@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
@@ -18,7 +19,7 @@ public abstract class BindingSingleAdapter<Data, Binding extends ViewBinding> ex
 
     @NonNull
     @Override
-    public final BindingViewHolder<Binding> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public BindingViewHolder<Binding> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return createBindingViewHolder(getClass(), parent, 1);
     }
 
@@ -92,7 +93,7 @@ public abstract class BindingSingleAdapter<Data, Binding extends ViewBinding> ex
         notifyItemRangeRemoved(0, itemCount);
     }
 
-    public Data getItem(int index){
+    public @Nullable Data getItem(int index){
         int itemCount = getItemCount();
         if (index < 0 || index >= itemCount) {
             return null;

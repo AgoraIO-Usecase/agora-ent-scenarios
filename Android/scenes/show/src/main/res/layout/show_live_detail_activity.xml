@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.viewpager2.widget.ViewPager2 xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/viewPager2"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:overScrollMode="never"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:layout_scrollEffect="none"
+    android:layout_height="match_parent" />

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_gravity="bottom"
+    android:orientation="vertical"
+    tools:background="@drawable/show_bottom_dark_dialog_bg"
+    tools:paddingTop="20dp"
+    android:paddingBottom="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:text="@string/show_music_effect_title"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/white_8_percent"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="20dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        android:layout_marginTop="16dp"
+        android:text="@string/show_music_effect_background"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvBgMusic"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="1"
+        android:layout_marginTop="12dp"
+        tools:listitem="@layout/show_widget_music_effect_item_01"
+        android:orientation="horizontal"
+        android:paddingHorizontal="14dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        android:layout_marginTop="20dp"
+        android:text="@string/show_music_effect_voice"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvVoice"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="1"
+        android:layout_marginTop="12dp"
+        tools:listitem="@layout/show_widget_music_effect_item_02"
+        android:orientation="horizontal"
+        android:paddingHorizontal="14dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        android:layout_marginTop="20dp"
+        android:text="@string/show_music_effect_mixing"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMixing"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="1"
+        android:layout_marginTop="12dp"
+        tools:listitem="@layout/show_widget_music_effect_item_02"
+        android:orientation="horizontal"
+        android:paddingHorizontal="14dp"/>
+
+</LinearLayout>
