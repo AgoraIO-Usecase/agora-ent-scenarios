@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;

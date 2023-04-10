@@ -1,6 +1,9 @@
 package io.agora.scene.ktv.widget;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -60,6 +63,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         }
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -81,6 +85,8 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         setSoundMode();
         mBinding.btnToneDownDialogSetting.setOnClickListener(v -> tuningTone(false));
         mBinding.btnToneUpDialogSetting.setOnClickListener(v -> tuningTone(true));
+
+        mBinding.textRemoteVolume.setText("" + this.mSetting.getRemoteVolume());
 
         mBinding.switchEar.setOnCheckedChangeListener((buttonView, isChecked) -> this.mSetting.setEar(isChecked));
         mBinding.sbVol1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -113,6 +119,45 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
+            }
+        });
+        mBinding.btnRemoteVolumeDownDialogSetting.setOnClickListener(v -> {
+            int volume = mSetting.getRemoteVolume();
+            int newVolume = volume - 1;
+            mBinding.textRemoteVolume.setText("" + newVolume);
+        });
+        mBinding.btnRemoteVolumeUpDialogSetting.setOnClickListener(v -> {
+            int volume = mSetting.getRemoteVolume();
+            int newVolume = volume + 1;
+            mBinding.textRemoteVolume.setText("" + newVolume);
+        });
+        mBinding.textRemoteVolume.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable != null && editable.length() > 0) {
+                    String text = editable.toString();
+                    int newVolume = Integer.parseInt(text);
+                    if (newVolume < 0) {
+                        newVolume = 0;
+                    } else if (newVolume > 100) {
+                        newVolume = 100;
+                    }
+                    mSetting.setRemoteVolume(newVolume);
+                    mBinding.textRemoteVolume.setHint("" + newVolume);
+                } else {
+                    mSetting.setRemoteVolume(15);
+                    mBinding.textRemoteVolume.setHint("" + 15);
+                }
             }
         });
     }
@@ -201,5 +246,9 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         void setAudioEffectParameters(int param1, int param2);
 
         void onToneChanged(int newToneValue);
+
+        void onRemoteVolumeChanged(int volume);
+
+        void onAudioDumpEnable(boolean enable);
     }
 }

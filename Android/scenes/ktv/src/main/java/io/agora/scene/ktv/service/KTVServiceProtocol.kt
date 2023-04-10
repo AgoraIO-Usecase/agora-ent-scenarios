@@ -75,6 +75,10 @@ interface KTVServiceProtocol {
         changedBlock: (count: Int) -> Unit
     )
 
+    fun subscribeRoomTimeUp(
+        onRoomTimeUp: () -> Unit
+    )
+
 
     // ===================== 麦位相关 =================================
 
@@ -164,6 +168,11 @@ interface KTVServiceProtocol {
     )
 
     /**
+     * 合唱者离开合唱
+     */
+    fun leaveChorus()
+
+    /**
      * 当前歌曲合唱改为独唱
      */
     fun becomeSolo()
@@ -174,15 +183,4 @@ interface KTVServiceProtocol {
     fun subscribeChooseSong(
         changedBlock: (KTVSubscribe, RoomSelSongModel?) -> Unit
     )
-
-
-    // ================== 打分相关 ==============================
-
-    /**
-     * 同步唱歌者音量
-     */
-    fun updateSingingScore(inputModel: UpdateSingingScoreInputModel)
-
-    fun subscribeSingingScoreChange(changedBlock: (KTVSubscribe, Double?) -> Unit)
-
 }

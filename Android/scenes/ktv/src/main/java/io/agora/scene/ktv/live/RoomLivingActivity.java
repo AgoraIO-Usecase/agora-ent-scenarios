@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.LiveDataUtils;
+import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.KTVLogger;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvActivityRoomLivingBinding;
@@ -97,6 +99,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 return (T) new RoomLivingViewModel((JoinRoomOutputModel) getIntent().getSerializableExtra(EXTRA_ROOM_INFO));
             }
         }).get(RoomLivingViewModel.class);
+        roomLivingViewModel.setLryView(getBinding().lrcControlView);
 
         mRoomSpeakerAdapter = new BindingSingleAdapter<RoomSeatModel, KtvItemRoomSpeakerBinding>() {
             @Override
@@ -109,10 +112,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     if (!isOutSeat) {
                         // 下麦
                         if (roomLivingViewModel.isRoomOwner()) {
-                            if (!item.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+                            if (!item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                                 showUserLeaveSeatMenuDialog(item);
                             }
-                        } else if (item.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+                        } else if (item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                             showUserLeaveSeatMenuDialog(item);
                         }
                     } else {
@@ -166,7 +169,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         binding.avatarItemRoomSpeaker.setVisibility(View.INVISIBLE);
                         binding.flVideoContainer.removeAllViews();
                         SurfaceView surfaceView = fillWithRenderView(binding.flVideoContainer);
-                        if (item.getUserNo().equals(UserManager.getInstance().getUser().userNo)) { // 是本人
+                        if (item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) { // 是本人
                             roomLivingViewModel.renderLocalCameraVideo(surfaceView);
                         } else {
                             int uid = Integer.parseInt(item.getRtcUid());
@@ -180,7 +183,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         if (item.getUserNo().equals(songModel.getUserNo())) {
                             binding.tvZC.setText("主唱");
                             binding.tvZC.setVisibility(View.VISIBLE);
-                        } else if (item.getUserNo().equals(songModel.getUserNo()) || item.getUserNo().equals(songModel.getChorusNo())) {
+                        } else if ((item.getUserNo().equals(songModel.getUserNo()) || item.getUserNo().equals(songModel.getChorusNo()))
+                            && (roomLivingViewModel.chorusPlayingLiveData.getValue() == null)) {
                             binding.tvZC.setText("合唱");
                             binding.tvZC.setVisibility(View.VISIBLE);
                         } else {
@@ -237,7 +241,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
         });
         getBinding().iBtnChorus.setOnClickListener(v -> showChorusSongDialog());
-        getBinding().iBtnChorus.setClickable(false);
         getBinding().iBtnChooseSong.setOnClickListener(v -> showChooseSongDialog());
         getBinding().btnMenu.setOnClickListener(this::showMoreDialog);
         getBinding().btnOK.setOnClickListener(view -> {
@@ -284,6 +287,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         });
         roomLivingViewModel.roomUserCountLiveData.observe(this, count ->
                 getBinding().tvRoomMCount.setText(getString(R.string.ktv_room_count, String.valueOf(count))));
+
+        roomLivingViewModel.roomTimeUpLiveData.observe(this, isTimeUp -> {
+            if (roomLivingViewModel.release() && isTimeUp) {
+                showTimeUpExitDialog();
+            }
+        });
 
         // 麦位相关
         roomLivingViewModel.seatLocalLiveData.observe(this, seatModel -> {
@@ -349,6 +358,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PREPARE) {
                 getBinding().lrcControlView.onPrepareStatus(roomLivingViewModel.isRoomOwner());
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_WAIT_CHORUS) {
+                if (!roomLivingViewModel.isRoomOwner() && roomLivingViewModel.seatLocalLiveData.getValue() == null) {
+                    ToastUtils.showToast(R.string.ktv_onseat_toast);
+                }
                 getBinding().lrcControlView.onWaitChorusStatus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHORUS_JOINED) {
                 getBinding().lrcControlView.onMemberJoinedChorus();
@@ -364,18 +376,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.setEnabled(true);
             }
         });
-        roomLivingViewModel.playerMusicLrcDataLiveData.observe(this, lrcData -> {
-            if (lrcData == null)
-                getBinding().lrcControlView.getLrcView().setLabel(getString(R.string.ktv_no_lrc));
-            getBinding().lrcControlView.getLrcView().setLrcData(lrcData);
-            getBinding().lrcControlView.getPitchView().setLrcData(lrcData);
-        });
         roomLivingViewModel.playerMusicOpenDurationLiveData.observe(this, duration -> {
             getBinding().lrcControlView.getLrcView().setTotalDuration(duration);
         });
         roomLivingViewModel.playerMusicPlayCompleteLiveData.observe(this, userNo -> {
             KTVLogger.d("cwtsw", "得分回调 userNo = " + UserManager.getInstance().getUser().userNo + " o = " + userNo);
-            if (UserManager.getInstance().getUser().userNo.equals(userNo)) {
+            if (UserManager.getInstance().getUser().id.toString().equals(userNo)) {
                 KTVLogger.d("cwtsw", "计算得分");
                 int score = (int) getBinding().lrcControlView.getPitchView().cumulatedScore;
                 getBinding().tvResultScore.setText(String.valueOf(score));
@@ -388,22 +394,14 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 } else {
                     getBinding().ivResultLevel.setImageResource(R.mipmap.ic_c);
                 }
-                if (UserManager.getInstance().getUser().userNo.equals(roomLivingViewModel.songPlayingLiveData.getValue().getUserNo())) {
+                if (UserManager.getInstance().getUser().id.toString().equals(roomLivingViewModel.songPlayingLiveData.getValue().getUserNo())) {
                     getBinding().groupResult.setVisibility(View.VISIBLE);
                     KTVLogger.d("cwtsw", "显示得分");
                 }
             }
         });
-        roomLivingViewModel.playerMusicPlayPositionChangeLiveData.observe(this, position -> {
-            getBinding().lrcControlView.getLrcView().updateTime(position);
-            getBinding().lrcControlView.getPitchView().updateTime(position);
-        });
         roomLivingViewModel.playerMusicCountDownLiveData.observe(this, time ->
                 getBinding().lrcControlView.setCountDown(time));
-        roomLivingViewModel.playerPitchLiveData.observe(this, pitch -> {
-                    getBinding().lrcControlView.getPitchView().updateLocalPitch(pitch.floatValue());
-                }
-        );
         roomLivingViewModel.networkStatusLiveData.observe(this, netWorkStatus ->
                 setNetWorkStatus(netWorkStatus.txQuality, netWorkStatus.rxQuality));
     }
@@ -509,9 +507,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     @SuppressLint("NotifyDataSetChanged")
     private void onMusicChanged(@NonNull RoomSelSongModel music) {
         getBinding().lrcControlView.setMusic(music);
-        if (UserManager.getInstance().getUser().userNo.equals(music.getUserNo())) {
+        if (UserManager.getInstance().getUser().id.toString().equals(music.getUserNo())) {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Singer);
-        } else if (UserManager.getInstance().getUser().userNo.equals(music.getChorusNo())) {
+        } else if (UserManager.getInstance().getUser().id.toString().equals(music.getChorusNo())) {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Partner);
         } else {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
@@ -548,7 +546,13 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         return ret;
     }
 
+    private boolean showChorusSongDialogTag = false;
     private void showChorusSongDialog() {
+        if (showChorusSongDialogTag) {
+            return;
+        }
+        showChorusSongDialogTag = true;
+
         if (mChorusSongDialog == null) {
             mChorusSongDialog = new SongDialog();
             mChorusSongDialog.setChosenControllable(roomLivingViewModel.isRoomOwner());
@@ -564,15 +568,32 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                                 0);
                         mChorusSongDialog.setChooseSongListener(chooseSongListener);
                         hideLoadingView();
-                        showChorusSongDialog();
+
+                        if (!mChorusSongDialog.isAdded()) {
+                            roomLivingViewModel.getSongChosenList();
+                            mChorusSongDialog.show(getSupportFragmentManager(), "ChorusSongDialog");
+                        }
+
+                        getBinding().getRoot().post(() -> showChorusSongDialogTag = false);
                     });
             return;
         }
-        roomLivingViewModel.getSongChosenList();
-        mChorusSongDialog.show(getSupportFragmentManager(), "ChorusSongDialog");
+
+        if (!mChorusSongDialog.isAdded()) {
+            roomLivingViewModel.getSongChosenList();
+            mChorusSongDialog.show(getSupportFragmentManager(), "ChorusSongDialog");
+        }
+
+        getBinding().getRoot().post(() -> showChorusSongDialogTag = false);
     }
 
+    private boolean showChooseSongDialogTag = false;
     private void showChooseSongDialog() {
+        if (showChooseSongDialogTag) {
+            return;
+        }
+        showChooseSongDialogTag = true;
+
         if (mChooseSongDialog == null) {
             mChooseSongDialog = new SongDialog();
             mChooseSongDialog.setChosenControllable(roomLivingViewModel.isRoomOwner());
@@ -588,12 +609,25 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                                 0);
                         mChooseSongDialog.setChooseSongListener(chooseSongListener);
                         hideLoadingView();
-                        showChooseSongDialog();
+
+                        if (!mChooseSongDialog.isAdded()) {
+                            roomLivingViewModel.getSongChosenList();
+                            mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
+                        }
+
+                        getBinding().getRoot().post(() -> showChooseSongDialogTag = false);
                     });
             return;
         }
-        roomLivingViewModel.getSongChosenList();
-        mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
+
+        if (!mChooseSongDialog.isAdded()) {
+            roomLivingViewModel.getSongChosenList();
+            mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
+        }
+
+        getBinding().getRoot().post(() -> {
+            showChooseSongDialogTag = false;
+        });
     }
 
     private void showMoreDialog(View view) {
@@ -604,9 +638,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     private void showMusicSettingDialog() {
-        if (musicSettingDialog == null) {
+        //if (musicSettingDialog == null) {
             musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting);
-        }
+        //}
         musicSettingDialog.show(getSupportFragmentManager(), MusicSettingDialog.TAG);
     }
 
@@ -696,7 +730,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     private void onMemberLeave(@NonNull RoomSeatModel member) {
-        if (member.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+        if (member.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
             getBinding().groupBottomView.setVisibility(View.GONE);
             getBinding().groupEmptyPrompt.setVisibility(View.VISIBLE);
         }
@@ -704,6 +738,27 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         if (temp != null) {
             mRoomSpeakerAdapter.replace(member.getSeatIndex(), null);
         }
+    }
+
+    // 房间存活时间，单位ms
+    private CloseRoomDialog timeUpExitDialog;
+    private void showTimeUpExitDialog() {
+        if (timeUpExitDialog == null) {
+            timeUpExitDialog = new CloseRoomDialog(this);
+            timeUpExitDialog.setCanceledOnTouchOutside(false);
+            timeUpExitDialog.setOnButtonClickListener(new OnButtonClickListener() {
+                @Override
+                public void onLeftButtonClick() {
+                    roomLivingViewModel.exitRoom();
+                }
+
+                @Override
+                public void onRightButtonClick() {
+                    roomLivingViewModel.exitRoom();
+                }
+            });
+        }
+        timeUpExitDialog.show();
     }
 
     private void showCreatorExitDialog() {
