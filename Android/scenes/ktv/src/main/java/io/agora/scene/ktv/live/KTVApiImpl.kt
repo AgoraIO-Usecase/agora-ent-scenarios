@@ -38,11 +38,17 @@ interface OnJoinChorusStateListener {
 class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver,
     IRtcEngineEventHandler(), IAudioFrameObserver {
     private val TAG: String = "KTV_API_LOG"
-    private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
 
-    private var songMode:KTVSongMode = KTVSongMode.SONG_CODE
+    // 外部可修改
+    var songMode:KTVSongMode = KTVSongMode.SONG_CODE
     var useCustomAudioSource:Boolean = false
 
+    // 音频最佳实践
+    var remoteVolume: Int = 40 // 远端音频
+    var mpkPlayoutVolume: Int = 50
+    var mpkPublishVolume: Int = 50
+
+    private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
     private lateinit var mRtcEngine: RtcEngineEx
     private lateinit var mMusicCenter: IAgoraMusicContentCenter
     private lateinit var mPlayer: IAgoraMusicPlayer
@@ -86,11 +92,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     // 合唱校准
     private var audioPlayoutDelay = 0
-
-    // 音频最佳实践
-    var remoteVolume: Int = 40 // 远端音频
-    var mpkPlayoutVolume: Int = 50
-    var mpkPublishVolume: Int = 50
 
     // 音高
     private var pitch = 0.0
@@ -315,14 +316,21 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         config: KTVLoadMusicConfiguration,
         musicLoadStateListener: IMusicLoadStateListener
     ) {
-        Log.d(TAG, "loadMusic called: $singerRole")
-        this.songMode = KTVSongMode.SONG_CODE
+        Log.d(TAG, "loadMusic called: songCode $songCode")
         // 设置到全局， 连续调用以最新的为准
         this.songCode = songCode
         this.mainSingerUid = config.mainSingerUid
         mLastReceivedPlayPosTime = null
         mReceivedPlayPosition = 0
 
+        if (config.mode == KTVLoadMusicMode.LOAD_NONE) {
+            if (config.autoPlay) {
+                // 主唱自动播放歌曲
+                switchSingerRole(KTVSingRole.SoloSinger, null)
+                startSing(songCode, 0)
+            }
+            return
+        }
 
         if (config.mode == KTVLoadMusicMode.LOAD_LRC_ONLY) {
             // 只加载歌词
@@ -382,6 +390,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
                         if (config.autoPlay) {
                             // 主唱自动播放歌曲
+                            switchSingerRole(KTVSingRole.SoloSinger, null)
                             startSing(song, 0)
                         }
                     }
@@ -390,6 +399,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     Log.d(TAG, "loadMusic success")
                     if (config.autoPlay) {
                         // 主唱自动播放歌曲
+                        switchSingerRole(KTVSingRole.SoloSinger, null)
                         startSing(song, 0)
                     }
                     musicLoadStateListener.onMusicLoadProgress(song, 100, MusicLoadStatus.COMPLETED, msg, lrcUrl)
@@ -410,13 +420,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         url: String,
         config: KTVLoadMusicConfiguration
     ) {
-        Log.d(TAG, "loadMusic called: $singerRole")
-        this.songMode = KTVSongMode.SONG_URL
+        Log.d(TAG, "loadMusic called: songCode $songCode")
         this.songUrl = url
         this.mainSingerUid = config.mainSingerUid
 
         if (config.autoPlay) {
             // 主唱自动播放歌曲
+            switchSingerRole(KTVSingRole.SoloSinger, null)
             startSing(url, 0)
         }
     }
@@ -874,7 +884,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         try {
             val strMsg = String(messageData)
             jsonMsg = JSONObject(strMsg)
-            //Log.d(TAG, "onStreamMessage: $strMsg")
             if (jsonMsg.getString("cmd") == "setLrcTime") { //同步歌词
                 val position = jsonMsg.getLong("time")
                 val realPosition = jsonMsg.getLong("realTime")
@@ -882,7 +891,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val remoteNtp = jsonMsg.getLong("ntp")
                 val songCode = jsonMsg.getLong("songCode")
                 val mpkState = jsonMsg.getInt("playerState")
-                Log.d(TAG, "onStreamMessage: $realPosition")
 
                 if (isChorusCoSinger()) {
                     // 本地BGM校准逻辑

@@ -444,14 +444,6 @@ public class RoomLivingViewModel extends ViewModel {
                         ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
                         joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS);
                     }
-
-                    // TODO
-//                    // 合唱相关逻辑
-//                    if (UserManager.getInstance().getUser().id.toString().equals(songPlayingLiveData.getValue().getChorusNo())) {
-//                        //我是合唱
-//                        getSongChosenList();
-//                        ktvServiceProtocol.leaveChorus();
-//                    }
                 }
             }
             return null;
@@ -1431,8 +1423,6 @@ public class RoomLivingViewModel extends ViewModel {
         if (isOwnSong) {
             // 主唱加载歌曲
             loadMusic(new KTVLoadMusicConfiguration(true, mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC), songCode);
-            // 点歌者切换身份到SoloSinger
-            ktvApiProtocol.switchSingerRole(KTVSingRole.SoloSinger, null);
         } else {
             if (seatLocalLiveData.getValue() != null && seatLocalLiveData.getValue().getChorusSongCode().equals(music.getSongNo() + music.getCreateAt())) {
                 // 合唱者
