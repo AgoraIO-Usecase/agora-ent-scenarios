@@ -231,4 +231,7 @@
     <string name="voice_room_content_prohibited">Content prohibited</string>
     <string name="voice_room_send_tip">Send</string>
     <string name="voice_room_name_rule">Incorrect room name</string>
+    <string name="voice_chatroom_permission_setting">Setting</string>
+    <string name="voice_chatroom_permission_leak_title">no microphone permission</string>
+    <string name="voice_chatroom_permission_leak_content">Please turn on the microphone permission in the settings</string>
 </resources>

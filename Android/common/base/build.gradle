@@ -81,10 +81,10 @@ dependencies {
     implementation rootProject.ext.deps.arouter
     api rootProject.ext.deps.rxjava2
     api rootProject.ext.deps.rxandroid2
-    implementation rootProject.ext.deps.okhttp
-    implementation rootProject.ext.deps.okhttp_logger
-    implementation rootProject.ext.deps.retrofit2
-    implementation rootProject.ext.deps.retrofit2_adapter
+    api rootProject.ext.deps.okhttp
+    api rootProject.ext.deps.okhttp_logger
+    api rootProject.ext.deps.retrofit2
+    api rootProject.ext.deps.retrofit2_adapter
     api rootProject.ext.deps.gson
     implementation rootProject.ext.deps.autosize
 
@@ -94,9 +94,8 @@ dependencies {
     implementation rootProject.ext.deps.glide
 
     implementation rootProject.ext.deps.coroutines_android
-    implementation rootProject.ext.deps.bugly
 
-    api rootProject.ext.deps.rtc
+
     api rootProject.ext.deps.rtm
-
+    api rootProject.ext.deps.rtc
 }

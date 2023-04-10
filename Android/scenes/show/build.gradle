@@ -1,0 +1,37 @@
+ext { ktv_is_modular = false }
+apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
+
+android {
+    defaultConfig {
+        if(isModular()){
+            applicationId "io.agora.scenes.show"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(path: ":scenes:show:aars:SenseArSourceManager")
+    implementation project(path: ":scenes:show:aars:STMobileJNI")
+    implementation project(":common:base")
+    implementation project(':common:ui-widget')
+
+    implementation rootProject.ext.deps.appcompat
+    implementation rootProject.ext.deps.annotation
+    api rootProject.ext.deps.material
+    implementation rootProject.ext.deps.palette_ktx
+    implementation rootProject.ext.deps.layout_kernel
+    implementation rootProject.ext.deps.header_classics
+
+    implementation rootProject.ext.deps.eventbus
+    implementation rootProject.ext.deps.xlog
+
+    kapt rootProject.ext.deps.glide_compiler
+    implementation rootProject.ext.deps.glide
+
+    implementation rootProject.ext.deps.lifecycle
+    implementation rootProject.ext.deps.fragment_ktx
+
+    implementation rootProject.ext.deps.syncManager
+
+}
