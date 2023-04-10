@@ -20,8 +20,11 @@ dependencies {
     if (isProjectLibrary(':scenes:ktv')) {
         runtimeOnly project(':scenes:ktv')
     }
-    if (isProjectLibrary(':scenes:voice:voice')) {
-        runtimeOnly project(':scenes:voice:voice')
+    if (isProjectLibrary(':scenes:voice')) {
+        runtimeOnly project(':scenes:voice')
+    }
+    if (isProjectLibrary(':scenes:voice_spatial')) {
+        runtimeOnly project(':scenes:voice_spatial')
     }
     if (isProjectLibrary(':scenes:show')) {
         runtimeOnly project(':scenes:show')

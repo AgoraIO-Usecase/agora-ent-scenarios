@@ -68,7 +68,8 @@ object NavigationUtils {
     fun hasNavigationBar(context: Context) = when {
         getNavigationBarHeight(context) == 0 -> false
         RomUtils.isHuaweiRom() && isHuaWeiHideNav(context) -> false
-        RomUtils.isMiuiRom() && isMiuiFullScreen(context) -> false
+        // 打开会导致小米机型里带底部手势栏的被判断为全屏
+//        RomUtils.isMiuiRom() && isMiuiFullScreen(context) -> false
         RomUtils.isVivoRom() && isVivoFullScreen(context) -> false
         else -> isHasNavigationBar(context)
     }
@@ -121,9 +122,9 @@ object NavigationUtils {
 
         // 部分无良厂商的手势操作，显示高度 + 导航栏高度，竟然大于物理高度，对于这种情况，直接默认未启用导航栏
 //        if (displayHeight > displayWidth) {
-//            if (displayHeight + DisplayUtils.getNavigationBarHeight(context) > realHeight) return false
+//            if (displayHeight + getNavigationBarHeight(context) > realHeight) return false
 //        } else {
-//            if (displayWidth + DisplayUtils.getNavigationBarHeight(context) > realWidth) return false
+//            if (displayWidth + getNavigationBarHeight(context) > realWidth) return false
 //        }
 
         return realWidth - displayWidth > 0 || realHeight - displayHeight > 0

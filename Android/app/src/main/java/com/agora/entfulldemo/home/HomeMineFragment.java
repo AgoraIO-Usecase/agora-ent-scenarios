@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -19,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.agora.entfulldemo.BuildConfig;
 import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppFragmentHomeMineBinding;
+import com.agora.entfulldemo.home.mine.AboutUsActivity;
 
 import java.io.File;
 
@@ -65,8 +65,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         mainViewModel.setLifecycleOwner(this);
 
-        // String sdkVersionString = RTCManager.getInstance().getAgoraRTCSdkVersion();
-        // getBinding().tvVersion.setText(getString(R.string.version_is, versionString, sdkVersionString));
+        getBinding().tvVersion.setText(getString(R.string.app_mine_current_version, BuildConfig.VERSION_NAME));
     }
 
     @SuppressLint("SetTextI18n")
@@ -100,7 +99,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             showLogoffAccountDialog();
         });
         getBinding().tvAbout.setOnClickListener(view -> {
-            PagePilotManager.pageWebView("https://www.agora.io/cn/about-us/");
+            startActivity(new Intent(getContext(), AboutUsActivity.class));
         });
         getBinding().vToEdit.setOnClickListener(view -> {
             if (editNameDialog == null) {

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- 在线K歌房 -->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="54dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:text="@string/app_about_karaoke"
+        android:textColor="@color/def_text_color_3c4"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvVersion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="20dp"
+        android:gravity="center_vertical"
+        android:text="1.0.0"
+        android:textColor="@color/def_text_grey_6c7"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvTitle" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:dividerColor="@color/grey_f8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
