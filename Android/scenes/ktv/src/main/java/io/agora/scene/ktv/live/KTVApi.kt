@@ -50,6 +50,7 @@ enum class SwitchRoleFailReason(val value: Int) {
  * @param LOAD_MUSIC_AND_LRC 默认模式，加载歌词和音乐（通常歌曲开始播放时主唱使用此模式）
  */
 enum class KTVLoadMusicMode(val value: Int) {
+    LOAD_NONE(-1),
     LOAD_MUSIC_ONLY(0),
     LOAD_LRC_ONLY(1),
     LOAD_MUSIC_AND_LRC(2)
