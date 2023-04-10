@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:fitsSystemWindows="false"
+    android:gravity="bottom"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/topLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/bottomLayout"
+        tools:layout_height="100dp" />
+
+    <View
+        android:id="@+id/vBgContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="@id/bottomLayout"
+        app:layout_constraintTop_toBottomOf="@id/vBgHead" />
+
+    <View
+        android:id="@+id/vBgHead"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:background="@drawable/show_bottom_light_dialog_bg_top"
+        app:layout_constraintTop_toTopOf="@id/bottomLayout" />
+
+    <FrameLayout
+        android:id="@+id/bottomLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_height="100dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

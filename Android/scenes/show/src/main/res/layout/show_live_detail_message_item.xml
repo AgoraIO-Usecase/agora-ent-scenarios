@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@drawable/show_live_message_item_bg"
+        android:lineSpacingExtra="3dp"
+        android:maxWidth="300dp"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        tools:text="Agora Blue Bot: Welcome to Agora Chat room 2.0 demo, this is Agora Blue Bot" />
+
+</FrameLayout>

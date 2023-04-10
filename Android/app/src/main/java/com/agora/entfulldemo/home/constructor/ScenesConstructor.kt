@@ -1,81 +1,42 @@
 package com.agora.entfulldemo.home.constructor
 
 import android.content.Context
-import com.agora.entfulldemo.BuildConfig
 import com.agora.entfulldemo.R
+import io.agora.scene.base.AgoraScene
 
 /**
  * @author create by zhangwei03
  */
 object ScenesConstructor {
 
-    enum class SceneType {
-        Ktv_Online,
-        Voice_Chat,
-        Voice_Chat_Spatial,
-        Meta_Live,
-        Meta_Chat,
-        Games,
-    }
 
     @JvmStatic
     fun buildData(context: Context): List<ScenesModel> {
-        val list = mutableListOf<ScenesModel>()
-        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_VOICE.isNotEmpty()) {
-            list.add(
-                ScenesModel(
-                    SceneType.Voice_Chat,
-                    context.getString(R.string.app_voice_chat),
-                    R.mipmap.bg_btn_home3,
-                    R.mipmap.bg_btn_home_chat,
-                    true
-                )
+        return mutableListOf(
+            ScenesModel(
+                AgoraScene.ChatRoom,
+                "io.agora.scene.voice.ui.activity.VoiceRoomListActivity",
+                context.getString(R.string.app_voice_chat),
+                R.mipmap.bg_btn_home3,
+                R.mipmap.bg_btn_home_chat,
+                true
+            ),
+            ScenesModel(
+                AgoraScene.KTV,
+                "io.agora.scene.ktv.create.RoomListActivity",
+                context.getString(R.string.ktv_online),
+                R.mipmap.bg_btn_home1,
+                R.mipmap.bg_btn_home_ktv,
+                true
+            ),
+            ScenesModel(
+                AgoraScene.LiveShow,
+                "io.agora.scene.show.RoomListActivity",
+                context.getString(R.string.app_show_live),
+                R.mipmap.bg_btn_home1,
+                R.mipmap.bg_btn_home_ktv,
+                true
             )
-        }
-        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_KTV.isNotEmpty()) {
-            list.add(
-                ScenesModel(
-                    SceneType.Ktv_Online,
-                    context.getString(R.string.ktv_online),
-                    R.mipmap.bg_btn_home1,
-                    R.mipmap.bg_btn_home_ktv,
-                    true
-                )
-            )
-        }
-        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_SPATIAL_VOICE.isNotEmpty()) {
-            list.add(
-                ScenesModel(
-                    SceneType.Voice_Chat_Spatial,
-                    context.getString(R.string.app_voice_chat),
-                    R.mipmap.bg_btn_home5,
-                    0,
-                    true,
-                    context.getString(R.string.app_voice_chat_spatialTip)
-                )
-            )
-        }
-        return list
-//            ScenesModel(
-//                SceneType.Meta_Live,
-//                context.getString(R.string.meta_live),
-//                R.mipmap.bg_btn_home2,
-//                R.mipmap.bg_btn_home_live,
-//                false
-//            ),
-//            ScenesModel(
-//                SceneType.Meta_Chat,
-//                context.getString(R.string.meta_chatting),
-//                R.mipmap.bg_btn_home3,
-//                R.mipmap.bg_btn_home_chat,
-//                false
-//            ),
-//            ScenesModel(
-//                SceneType.Games,
-//                context.getString(R.string.interactive_games),
-//                R.mipmap.bg_btn_home4,
-//                R.mipmap.bg_btn_home_youxi,
-//                false
-//            )
+        )
     }
 }

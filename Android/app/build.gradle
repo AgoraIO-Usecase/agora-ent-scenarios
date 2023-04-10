@@ -3,11 +3,12 @@ apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
 android {
     defaultConfig {
-        applicationId "io.agora.chatroom"
+        applicationId "io.agora.entfull"
+        ndk.abiFilters 'arm64-v8a' // 'armeabi-v7a'//, 'arm64-v8a'//, 'x86', 'x86-64'
     }
 
-    lintOptions {
-        disable "Instantiatable"
+    packagingOptions {
+        pickFirst 'lib/*/libc++_shared.so'
     }
 }
 
@@ -24,6 +25,9 @@ dependencies {
     }
     if (isProjectLibrary(':scenes:voice_spatial')) {
         runtimeOnly project(':scenes:voice_spatial')
+    }
+    if (isProjectLibrary(':scenes:show')) {
+        runtimeOnly project(':scenes:show')
     }
 
     //glide 图片加载
@@ -49,4 +53,5 @@ dependencies {
     implementation rootProject.ext.deps.header_classics
 
     implementation rootProject.ext.deps.gson
+    implementation rootProject.ext.deps.bugly
 }

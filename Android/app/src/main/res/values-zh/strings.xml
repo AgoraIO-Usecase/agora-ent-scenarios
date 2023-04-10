@@ -32,6 +32,7 @@
     <string name="app_debug_mode">开发者模式</string>
 
     <string name="app_voice_chat">语聊房</string>
+    <string name="app_show_live">秀场直播</string>
     <string name="app_meta_live">元直播</string>
     <string name="app_meta_chatting">元语聊</string>
     <string name="app_interactive_games">互动游戏</string>

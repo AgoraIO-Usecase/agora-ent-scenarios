@@ -23,6 +23,7 @@ if (versionCtrl.exists()) {
 final def isVoiceEmpty = properties.getProperty("VERSION_SCENE_VOICE").isEmpty()
 final def isSpatialVoiceEmpty = properties.getProperty("VERSION_SCENE_SPATIAL_VOICE").isEmpty()
 final def isKTVEmpty = properties.getProperty("VERSION_SCENE_KTV").isEmpty()
+final def isShowEmpty = properties.getProperty("VERSION_SCENE_SHOW").isEmpty()
 
 rootProject.name = "AgoraEntFullDemo"
 include ':app'
@@ -41,4 +42,10 @@ if (!isVoiceEmpty) {
 if (!isSpatialVoiceEmpty) {
     include ':scenes:voice_spatial'
     include ':scenes:voice_spatial:common'
+}
+
+if(!isShowEmpty){
+    include ':scenes:show'
+    include ':scenes:show:aars:SenseArSourceManager'
+    include ':scenes:show:aars:STMobileJNI'
 }
