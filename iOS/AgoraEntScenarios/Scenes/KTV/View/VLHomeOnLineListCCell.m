@@ -71,6 +71,7 @@
     [self.joinBtn setTitle:KTVLocalizedString(@"加入") forState:UIControlStateNormal];
     [self.joinBtn setTitleColor:UIColorMakeWithHex(@"#009FFF") forState:UIControlStateNormal];
     self.joinBtn.titleLabel.font = VLUIFontMake(12);
+    self.joinBtn.userInteractionEnabled = false;
     [self.contentView addSubview:self.joinBtn];
 }
 

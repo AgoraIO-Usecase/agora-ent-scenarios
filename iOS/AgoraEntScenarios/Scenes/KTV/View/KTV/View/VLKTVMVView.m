@@ -416,17 +416,19 @@
 
 - (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song role:(KTVSingRole)role {
     KTVLogInfo(@"VLKTVMVView updateUIWithSong: songName: %@, name: %@, role: %ld", song.songName, song.name, role);
-    self.idleView.hidden = song;
-    self.scoreLabel.hidden = NO;
-    
-    if(song) {
-        NSString *songText = [NSString stringWithFormat:@"%@-%@",song.songName,song.singer];
-        self.musicTitleLabel.text = songText;
-        [self configPlayerControls:song role:role];
-    } else {
-        _joinChorusBtn.hidden = YES;
-        _leaveChorusBtn.hidden = YES;
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.idleView.hidden = song;
+        self.scoreLabel.hidden = NO;
+        
+        if(song) {
+            NSString *songText = [NSString stringWithFormat:@"%@-%@",song.songName,song.singer];
+            self.musicTitleLabel.text = songText;
+            [self configPlayerControls:song role:role];
+        } else {
+            self.joinChorusBtn.hidden = YES;
+            self.leaveChorusBtn.hidden = YES;
+        }
+    });
 }
 
 #pragma mark - 合唱代理

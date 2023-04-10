@@ -547,7 +547,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     KTVSingRole role = [self getUserSingRole];
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = YES;
+    songConfig.autoPlay = (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? NO : YES ;
     songConfig.mode = (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.userNo integerValue];
     
@@ -560,9 +560,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
         [weakSelf.MVView setBotViewHidden:false];
         [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
+        if(role == KTVSingRoleCoSinger){
+            [weakSelf.ktvApi startSingWithSongCode:songCode startPos:0];
+        }
     };
     
-    
+    [self.lrcControl resetShowOnce];
     [self.ktvApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
 
     [weakSelf.ktvApi switchSingerRoleWithNewRole:role
@@ -699,6 +702,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             weakSelf.isJoinChorus = false;
             return;
         }
+        
+        [weakSelf.ktvApi startSingWithSongCode:songCode startPos:0];
         NSLog(@"before switch role, load music success");
         [weakSelf.ktvApi switchSingerRoleWithNewRole:role
                                    onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
@@ -844,6 +849,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.RTCkit setParameters: @"{\"che.audio.neteq.prebuffer\": true}"];
     [self.RTCkit setParameters: @"{\"che.audio.neteq.prebuffer_max_delay\": 600}"];
     [self.RTCkit setParameters: @"{\"che.audio.max_mixed_participants\": 8}"];
+    [self.RTCkit setParameters: @"{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\": true}"];
+    [self.RTCkit setParameters: @"{\"che.audio.custom_bitrate\": 48000}"];
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:50 smooth:3 reportVad:YES];
     if (code == 0) {

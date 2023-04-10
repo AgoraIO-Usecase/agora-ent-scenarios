@@ -26,6 +26,7 @@ import AgoraRtcKit
 
 /// 加载歌曲失败原因
 @objc public enum KTVLoadMusicMode: Int {
+    case loadNone
     case loadMusicOnly
     case loadLrcOnly
     case loadMusicAndLrc

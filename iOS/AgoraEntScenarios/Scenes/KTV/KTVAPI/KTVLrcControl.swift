@@ -71,6 +71,10 @@ private func agoraPrint(_ message: String) {
         hasShowEndPosition = false
         hasShowPreludeEndPosition = false
     }
+    
+    @objc public func resetShowOnce() {
+        hasShowOnce = false
+    }
 
     private func setupSkipBtn() {
         let frame = CGRect(x: (lrcView?.bounds.size.width ?? 0) / 2.0 - 60,
@@ -135,6 +139,7 @@ extension KTVLrcControl: KTVLrcViewDelegate {
 
     func onUpdateProgress(progress: Int) {
         self.progress = progress
+        print("setProgress:\(progress)")
         lrcView?.setProgress(progress: progress)
         guard let model = lyricModel else {
             return
@@ -172,7 +177,6 @@ extension KTVLrcControl: KTVLrcViewDelegate {
         totalCount = model.lines.count
         totalLines = 0
         totalScore = 0
-        hasShowOnce = false
         lrcView?.setLyricData(data: model)
     }
 }
