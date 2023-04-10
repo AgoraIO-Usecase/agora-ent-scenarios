@@ -12,11 +12,18 @@ dependencyResolutionManagement {
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
     }
 }
+def syncPath = new File(settingsDir, '../../SyncManager-Android/rtmSyncManager')
+if(syncPath.exists()){
+    include ':syncManager'
+    project(':syncManager').projectDir = syncPath
+}
 rootProject.name = "AgoraEntFullDemo"
 include ':app'
 include ':common:base'
 include ':common:ui-widget'
-include ':scenes:ktv'
-
-include ':scenes:voice:voice'
-include ':scenes:voice:common'
+// include ':scenes:ktv'
+// include ':scenes:voice:voice'
+// include ':scenes:voice:common'
+include ':scenes:show'
+include ':scenes:show:aars:SenseArSourceManager'
+include ':scenes:show:aars:STMobileJNI'
