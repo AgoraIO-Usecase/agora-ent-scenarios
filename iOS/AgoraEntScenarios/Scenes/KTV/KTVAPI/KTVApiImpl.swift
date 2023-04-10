@@ -156,6 +156,10 @@ extension KTVApiImpl: KTVApiDelegate {
         self.songMode = .songUrl
         self.songUrl = url
         if config.autoPlay {
+            // 主唱自动播放歌曲
+            switchSingerRole(newRole: .soloSinger) { _, _ in
+                
+            }
             startSing(url: url, startPos: 0)
         }
     }
@@ -383,6 +387,7 @@ extension KTVApiImpl {
 
     private func becomeSoloSinger() {
         apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":false}")
+        apiConfig?.engine?.setParameters("{\"che.audio.custom_bitrate\": 80000}")
         apiConfig?.engine?.setAudioScenario(.chorus)
         agoraPrint("becomeSoloSinger")
         let mediaOption = AgoraRtcChannelMediaOptions()
@@ -435,6 +440,7 @@ extension KTVApiImpl {
         agoraPrint("joinChorus2ndChannel role: \(role.rawValue)")
         if newRole == .coSinger {
             apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":false}")
+            apiConfig?.engine?.setParameters("{\"che.audio.custom_bitrate\": 48000}")
             apiConfig?.engine?.setAudioScenario(.chorus)
         }
 
@@ -496,6 +502,7 @@ extension KTVApiImpl {
             apiConfig?.engine?.updateChannel(with: mediaOption)
             leaveChorus2ndChannel(role)
             apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":true}")
+            apiConfig?.engine?.setParameters("{\"che.audio.custom_bitrate\": 48000}")
             apiConfig?.engine?.setAudioScenario(.gameStreaming)
         } else if role == .audience {
             agoraPrint("joinChorus: KTVSingRoleAudience does not need to leaveChorus!")
@@ -519,6 +526,17 @@ extension KTVApiImpl {
         lastReceivedPosition = 0
         localPosition = 0
         
+        if (config.mode == .loadNone) {
+            if (config.autoPlay) {
+                // 主唱自动播放歌曲
+                switchSingerRole(newRole: .soloSinger) { _, _ in
+                    
+                }
+                startSing(songCode: songCode, startPos: 0)
+            }
+            return
+        }
+        
         if mode == .loadLrcOnly {
             loadLyric(with: songCode) { [weak self] url in
                 guard let self = self else { return }
@@ -534,6 +552,14 @@ extension KTVApiImpl {
                     }
                 } else {
                     onMusicLoadStateListener.onMusicLoadFail(songCode: self.songCode, reason: .noLyricUrl)
+                }
+                
+                if (config.autoPlay) {
+                    // 主唱自动播放歌曲
+                    self.switchSingerRole(newRole: .soloSinger) { _, _ in
+                        
+                    }
+                    self.startSing(songCode: self.songCode, startPos: 0)
                 }
             }
         } else {
@@ -573,6 +599,10 @@ extension KTVApiImpl {
                     } else if mode == .loadMusicOnly {
                         agoraPrint("loadMusicOnly: songCode:\(songCode) load success")
                         if config.autoPlay {
+                            // 主唱自动播放歌曲
+                            self.switchSingerRole(newRole: .soloSinger) { _, _ in
+                                
+                            }
                             self.startSing(songCode: self.songCode, startPos: 0)
                         }
                         onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: "")
@@ -730,6 +760,7 @@ extension KTVApiImpl {
             musicPlayer?.stop()
         }
         apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":true}")
+        apiConfig?.engine?.setParameters("{\"che.audio.custom_bitrate\": 48000}")
         apiConfig?.engine?.setAudioScenario(.gameStreaming)
     }
     
