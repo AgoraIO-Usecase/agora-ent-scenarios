@@ -59,7 +59,7 @@ PODS:
   - LSTTimer (0.2.10)
   - Masonry (1.1.0)
   - MJRefresh (3.7.5)
-  - Protobuf (3.22.0)
+  - Protobuf (3.22.1)
   - SDWebImage (5.0.6):
     - SDWebImage/Core (= 5.0.6)
   - SDWebImage/Core (5.0.6)
@@ -163,7 +163,7 @@ SPEC CHECKSUMS:
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
-  Protobuf: 5e6cbc143d02fe08585d86b0098f8b755d2caaab
+  Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
   SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
   SenseLib: 6b0a54e6057dc62f2c1aa8227bd095bcaba2e268
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25

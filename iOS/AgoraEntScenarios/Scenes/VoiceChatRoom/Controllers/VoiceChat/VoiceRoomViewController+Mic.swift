@@ -109,6 +109,7 @@ extension VoiceRoomViewController {
                 self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
                 self.rtckit.muteLocalAudioStream(mute: false)
                 self.rtcView.updateUser(mic)
+                self.checkAudioAuthorized()
             }
         }
 
@@ -182,6 +183,8 @@ extension VoiceRoomViewController {
                 self.chatBar.refresh(event: .handsUp, state: .disable, asCreator: self.isOwner)
                 self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: self.isOwner)
                 self.rtckit.muteLocalAudioStream(mute: mic.status != 0)
+                
+                self.checkEnterSeatAudioAuthorized()
             }
         })
     }

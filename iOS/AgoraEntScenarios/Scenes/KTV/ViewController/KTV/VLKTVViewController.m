@@ -71,6 +71,7 @@ AgoraRtcEngineDelegate,
 VLPopScoreViewDelegate,
 KTVApiDelegate
 >
+@property (nonatomic, assign) BOOL isEnterSeatNotFirst;
 
 @property (nonatomic, strong) VLKTVMVView *MVView;
 @property (nonatomic, strong) VLKTVSelBgModel *choosedBgModel;
@@ -554,6 +555,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [[AppContext ktvServiceImp] enterSeatWithInput:inputModel
                                         completion:^(NSError * error) {
     }];
+    
+    
+    [self _checkEnterSeatAudioAuthorized];
 }
 
 - (void)leaveSeatWithSeatModel:(VLRoomSeatModel * __nonnull)seatModel
@@ -733,6 +737,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
+- (void)_checkEnterSeatAudioAuthorized {
+    if (self.isEnterSeatNotFirst) {
+        return;
+    }
+    
+    self.isEnterSeatNotFirst = YES;
+    [AgoraEntAuthorizedManager checkAudioAuthorizedWithParent:self];
+}
+
 #pragma mark - rtc utils
 - (void)setupContentInspectConfig {
     AgoraContentInspectConfig* config = [AgoraContentInspectConfig new];
@@ -835,6 +848,20 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
     if (ret != 0) {
         KTVLogError(@"joinChannelByToken fail: %d, uid: %ld, token: %@", ret, [VLUserCenter.user.id integerValue], VLUserCenter.user.agoraRTCToken);
+    }
+    
+    VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
+    if (info) {
+        [self _checkEnterSeatAudioAuthorized];
+        
+        if (!info.isVideoMuted) {
+            [AgoraEntAuthorizedManager checkCameraAuthorizedWithParent:self];
+        }
+        self.isNowMicMuted = info.isAudioMuted;
+        self.isNowCameraMuted = info.isVideoMuted;
+    } else {
+        self.isNowMicMuted = YES;
+        self.isNowCameraMuted = YES;
     }
 }
 
@@ -960,12 +987,18 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [self popUpChooseSongView:NO];
             break;
         case VLKTVBottomBtnClickTypeAudio:
+            if (self.isNowMicMuted) {
+                [AgoraEntAuthorizedManager checkAudioAuthorizedWithParent:self];
+            }
             self.isNowMicMuted = !self.isNowMicMuted;
             [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
                                                                 completion:^(NSError * error) {
             }];
             break;
         case VLKTVBottomBtnClickTypeVideo:
+            if (self.isNowCameraMuted) {
+                [AgoraEntAuthorizedManager checkCameraAuthorizedWithParent:self];
+            }
             self.isNowCameraMuted = !self.isNowCameraMuted;
             [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:self.isNowCameraMuted
                                                                 completion:^(NSError * error) {

@@ -24,6 +24,10 @@ static NSString *kLocalLoginKey = @"kLocalLoginKey";
     return instancel;
 }
 
++ (VLUserCenter* )shared {
+    return [self center];
+}
+
 - (BOOL)isLogin {
     if (!_loginModel) {
         NSString* ret = [[NSUserDefaults standardUserDefaults] objectForKey:kLocalLoginKey];

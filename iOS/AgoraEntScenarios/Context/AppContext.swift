@@ -16,9 +16,22 @@ import Bugly
     @objc var isDebugMode = false
     @objc var imageCahe = [String: AnyObject]()
     @objc var localizedCache = [String: String]()
+    
+    @objc var isAgreeLicense: Bool = false {
+        didSet {
+            guard isAgreeLicense else {
+                return
+            }
+            setupBugly()
+        }
+    }
+    
     override init() {
         super.init()
-        setupBugly()
+        
+        if VLUserCenter.shared().isLogin() {
+            setupBugly()
+        }
     }
     
     private func setupBugly() {

@@ -319,6 +319,7 @@
 		DD5EBDC3299F201D00F36349 /* KTVDebugManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DD5EBDC2299F201D00F36349 /* KTVDebugManager.m */; };
 		DD5EBDC6299F230100F36349 /* KTVDebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD5EBDC5299F230100F36349 /* KTVDebugViewController.m */; };
 		DD5EBDC9299F491F00F36349 /* KTVDebugInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = DD5EBDC8299F491F00F36349 /* KTVDebugInfo.m */; };
+		DD6199CC29E3D36D008F63E4 /* AgoraEntAuthorizedManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199CB29E3D36D008F63E4 /* AgoraEntAuthorizedManager.swift */; };
 		DD64C68C295C142A00EAB750 /* UIButton+EntLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD64C68B295C142A00EAB750 /* UIButton+EntLayout.swift */; };
 		DD84176229090C520026B624 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = DD84168729090C520026B624 /* index.html */; };
 		DD84176329090C520026B624 /* util.js in Resources */ = {isa = PBXBuildFile; fileRef = DD84168929090C520026B624 /* util.js */; };
@@ -858,6 +859,7 @@
 		DD5EBDC5299F230100F36349 /* KTVDebugViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KTVDebugViewController.m; sourceTree = "<group>"; };
 		DD5EBDC7299F491F00F36349 /* KTVDebugInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KTVDebugInfo.h; sourceTree = "<group>"; };
 		DD5EBDC8299F491F00F36349 /* KTVDebugInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KTVDebugInfo.m; sourceTree = "<group>"; };
+		DD6199CB29E3D36D008F63E4 /* AgoraEntAuthorizedManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraEntAuthorizedManager.swift; sourceTree = "<group>"; };
 		DD64C68B295C142A00EAB750 /* UIButton+EntLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+EntLayout.swift"; sourceTree = "<group>"; };
 		DD84168729090C520026B624 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
 		DD84168929090C520026B624 /* util.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = util.js; sourceTree = "<group>"; };
@@ -2023,6 +2025,14 @@
 			path = Debug;
 			sourceTree = "<group>";
 		};
+		DD6199CA29E3D36D008F63E4 /* Authorized */ = {
+			isa = PBXGroup;
+			children = (
+				DD6199CB29E3D36D008F63E4 /* AgoraEntAuthorizedManager.swift */,
+			);
+			path = Authorized;
+			sourceTree = "<group>";
+		};
 		DD84168629090C520026B624 /* Resource */ = {
 			isa = PBXGroup;
 			children = (
@@ -2628,6 +2638,7 @@
 		DDA1994D28FFE579009D3E61 /* Manager */ = {
 			isa = PBXGroup;
 			children = (
+				DD6199CA29E3D36D008F63E4 /* Authorized */,
 				DDA1994E28FFE579009D3E61 /* NetworkManager */,
 				DDA1995328FFE579009D3E61 /* VLDefine */,
 				DDA1995A28FFE579009D3E61 /* Helper */,
@@ -3198,6 +3209,7 @@
 				DD36106529B70CDC00CE7984 /* ShowChatModel.swift in Sources */,
 				DD220B12295B332C00F57F30 /* FlipHorizontalAnimation.swift in Sources */,
 				DD3610C129B70CDC00CE7984 /* ShowSegmentView.swift in Sources */,
+				DD6199CC29E3D36D008F63E4 /* AgoraEntAuthorizedManager.swift in Sources */,
 				DDA199FC28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m in Sources */,
 				DD36108929B70CDC00CE7984 /* ShowRoomListVC.swift in Sources */,
 				DD220B6E295B332C00F57F30 /* VMNorSetTableViewCell.swift in Sources */,
