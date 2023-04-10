@@ -11,7 +11,7 @@ import AgoraRtcKit
 
 @objcMembers final class AboutAgoraEntertainmentViewController: VRBaseViewController {
     
-    var infos = [["contents":[["title":NSLocalizedString("ContactCustomerService", comment: ""),"detail":"400-632-6626"],["title":NSLocalizedString("OfficialWebsiteAddress", comment: ""),"detail":"https://www.shengwang.cn"]],"sectionName":""]/*,["contents":[["title":"语聊房","detail":"YL-2.1.0"],["title":"语聊房-空间音频模式","detail":"YLKJ-2.1.0"],["title":"在线K歌房","detail":"KTV-2.1.0"]],"sectionName":NSLocalizedString("SceneVersion", comment: "")]*/]
+    var infos = [["contents":[["title":NSLocalizedString("ContactCustomerService", comment: ""),"detail":"400-632-6626"],["title":NSLocalizedString("OfficialWebsiteAddress", comment: ""),"detail":"https://www.shengwang.cn"]],"sectionName":""],["contents":[["title":"语聊房","detail":"YL-2.1.0"],["title":"语聊房-空间音频模式","detail":"YLKJ-2.1.0"],["title":"在线K歌房","detail":"KTV-2.1.0"], ["title":"秀场","detail":"KTV-1.1.0"]],"sectionName":NSLocalizedString("SceneVersion", comment: "")]]
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220), name: NSLocalizedString("AgoraEntertainment", comment: ""), versionText: NSLocalizedString("Version", comment: "")+": "+"20230110-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
     
