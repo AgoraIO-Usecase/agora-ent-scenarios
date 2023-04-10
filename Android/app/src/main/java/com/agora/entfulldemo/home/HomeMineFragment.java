@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -66,8 +65,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         mainViewModel.setLifecycleOwner(this);
 
-        // String sdkVersionString = RTCManager.getInstance().getAgoraRTCSdkVersion();
-        // getBinding().tvVersion.setText(getString(R.string.version_is, versionString, sdkVersionString));
+        getBinding().tvVersion.setText(getString(R.string.app_mine_current_version, BuildConfig.VERSION_NAME));
     }
 
     @SuppressLint("SetTextI18n")

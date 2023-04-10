@@ -52,6 +52,7 @@
     <string name="app_about_customer_service">Customer Service</string>
     <string name="app_about_official_website">Official Website</string>
     <string name="app_about_phone_cancel">Cancel</string>
+    <string name="app_mine_current_version">Version %s</string>
 
 
 </resources>
