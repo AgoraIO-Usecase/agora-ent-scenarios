@@ -20,8 +20,8 @@ class VLMineSwitchCell: UITableViewCell {
     
     lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .show_Ellipse6
-        label.font = .show_R_14
+        label.textColor = .gray
+        label.font = .systemFont(ofSize: 14)
         return label
     }()
     

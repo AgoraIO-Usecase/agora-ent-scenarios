@@ -62,6 +62,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
         [self.dataArray addObject:model];
     }
     _mineTable.frame = CGRectMake(20, _mineTopView.bottom+VLREALVALUE_WIDTH(15), SCREEN_WIDTH-40, VLREALVALUE_WIDTH(58)* self.dataArray.count + 10);
+
 }
 
 - (void)editButtonClickEvent {
@@ -93,21 +94,6 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     VLMineCellModel *model = self.dataArray[indexPath.row];
-    /*
-    if (model.style == VLMineCellStyleSwitch) {
-        VLMineSwitchCell *switchCell = [tableView dequeueReusableCellWithIdentifier:kSwitchCellID forIndexPath:indexPath];
-        BOOL developIsOn = [AppContext shared].isDebugMode;
-        @weakify(self)
-        [switchCell setTitle:model.titleStr isOn:developIsOn valueChangedAction:^(BOOL isOn) {
-            @strongify(self)
-            [AppContext shared].isDebugMode = isOn;
-            [self setupData];
-            [self.mineTable reloadData];
-        }];
-        return switchCell;
-    }
-     */
-    
     VLMineTCell *cell = [tableView dequeueReusableCellWithIdentifier:kDefaultCellID forIndexPath:indexPath];
     [cell setIconImageName:model.itemImgStr title:model.titleStr];
     return cell;

@@ -87,8 +87,45 @@ echo build_date: $build_date
 echo build_time: $build_time
 echo release_version: $release_version
 echo short_version: $short_version
+echo beauty_sources: $beauty_sources
 echo pwd: `pwd`
+echo sdk_url: $sdk_url
 
+PODFILE_PATH=${PWD}"/iOS/Podfile"
+
+download_file () {
+    url=$1
+    agent="Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.47 Safari/536.11Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.47 Safari/536.11"
+    file_name=`echo ${url} | awk -F '?' '{print $1}' | awk -F '/' '{print $NF}'`
+    if [ ! -f ${file_name} ];then
+        curl ${url} -A "${agent}" -o ${file_name} --progress-bar
+    fi
+    # 解压缩
+    7za x "${file_name}" -y
+    mv ${file_name} "${PWD}/iOS/${file_name}"
+    echo $(ls -l) "${PWD}/iOS/"
+}
+
+if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
+    zip_name=${sdk_url##*/}
+    python3 $WORKSPACE/artifactory_utils.py --action=download_file --file=$sdk_url
+    7za x ./$zip_name -y
+
+    unzip_name=`ls -S -d */ | grep Agora`
+    echo unzip_name: $unzip_name
+
+    mv "${PWD}/${unzip_name}/libs" "${PWD}/iOS"
+
+    # 修改podfile文件
+    python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} 'sdk'
+fi
+
+if [[ ! -z ${beauty_sources} && "${beauty_sources}" != 'none' ]]; then
+	# 下载美颜资源
+	download_file ${beauty_sources}
+	# 修改podfile文件
+	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} ${beauty_type}
+fi
 
 ./ci/build/build_ios_ipa.sh
 

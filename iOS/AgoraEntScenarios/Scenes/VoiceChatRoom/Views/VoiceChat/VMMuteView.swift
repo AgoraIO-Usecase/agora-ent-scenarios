@@ -38,6 +38,7 @@ class VMMuteView: UIView {
         didSet {
             // 0:正常状态 1:闭麦 2:禁言 3:锁麦 4:锁麦和禁言 -1:空闲
             let m_type = micInfo?.status
+            let userStatus = micInfo?.member?.micStatus
             var username: String = "\(micInfo?.mic_index ?? 0)"
             var iconStr: String = ""
             if let user = micInfo?.member {
@@ -49,7 +50,7 @@ class VMMuteView: UIView {
             sepView.isHidden = isOwner
             roleBtn.isHidden = !isOwner
             muteBtn.frame = isOwner ? CGRect(x: 0, y: 170, width: bounds.size.width, height: 40) : CGRect(x: bounds.size.width / 2.0, y: 170, width: bounds.size.width / 2.0, height: 40)
-            iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage("mine_avatar_placeHolder"), context: nil)
+            iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage("mine_avatar_placeHolder"))
             if m_type == 0 {
                 iconView.isHidden = false
                 nameLabel.text = username

@@ -21,7 +21,7 @@ struct KeyCenter {
      则应使用不同的 App ID。如果应用程序需要相互通信，则应使用同一个App ID。
      进入声网控制台(https://console.agora.io/)，创建一个项目，进入项目配置页，即可看到APP ID。
      */
-    static let AppId: String = <#Your AppId#>
+    static let AppId: String = <#YOUR APPID#>
 
     /**
      Certificate.
@@ -31,34 +31,32 @@ struct KeyCenter {
      then the APP Certificate can be found in the project detail page.
      PS: If the project does not have certificates enabled, leave this field blank.
      声网APP证书
-     Agora 提供 App certificate 用以生成 Token。您可以在您的服务器部署并生成 Token，或者使用控制台生成临时的 Token。
+     Agora 提供 App certificate 用以生成 Token。您可以在您的服务器部署并生成，或者使用控制台生成临时的 Token。
      进入声网控制台(https://console.agora.io/)，创建一个带证书鉴权的项目，进入项目配置页，即可看到APP证书。
      注意：如果项目没有开启证书鉴权，这个字段留空。
      */
-    static let Certificate: String? = <#Your Certificate#>
-
-    /**
-     声网用户中心域名地址
-     Agora提供的用户注册、登录、修改用户信息等的域名地址，只用于Demo展示，不可作为上线的版本使用。
-    */
-    static var HostUrl: String = "https://gateway-fulldemo.agoralab.co/"
-    
+    static let Certificate: String? = <#YOUR Certificate#>
     
     /**
-     在环信即时通讯云控制台创建应用时填入的应用名称。详见 获取环信即时通讯 IM 的信息
-     (https://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#获取环信即时通讯-im-的信息)
+     Token.
+     Agora provides Temporary Access Token to join the spatial channel with APP ID which enable App Certificate.
+     You can use it to test your project.
+     You can generate the temporary access token in the project console with the App Certificate enabled.
+     PS：If agora_app_certificate is configured, this field will be invalid.
+     音视频临时Token
+     Agora 提供 音视频临时Token 用以加入带证书鉴权的频道。您可以使用这个Token来做测试。
+     进入控制台开启证书鉴权的项目配置页，在APP证书下方有"生成临时音视频token"的按钮，输入频道名即可生成一个临时token。
+     注意：如果配置了agora_app_certificate，则这个字段会失效。
      */
-    static var IMAppKey: String? = nil
+//    static var Token: String? = nil
     
-    /**
-     App 的 client_id，用于生成 app token 调用 REST API。详见 环信即时通讯云控制台
-     (https://console.easemob.com/user/login/)的应用详情页面
-     */
-    static var IMClientId: String? = nil
     
-    /**
-     App 的 client_secret，用于生成 app token 调用 REST API。详见 环信即时通讯云控制台
-     (https://console.easemob.com/user/login/)应用详情页面。
-     */
-    static var IMClientSecret: String? = nil
+    static var IMAppKey: String? = <#YOUR IMAppKey#>
+    static var IMClientId: String? = <#YOUR IMClientId#>
+    static var IMClientSecret: String? = <#YOUR IMClientSecret#>
+    
+    static var HostUrl: String = "https://gateway-fulldemo.agoralab.co"
+    
+    static var baseServerUrl: String? = "https://toolbox.bj2.agoralab.co/v1/"
+    static var onlineBaseServerUrl: String? = baseServerUrl
 }

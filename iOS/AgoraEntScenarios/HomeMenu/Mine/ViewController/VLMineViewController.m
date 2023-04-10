@@ -18,8 +18,9 @@
 #import "VLAPIRequest.h"
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
-#import "KTVMacro.h"
 #import <Photos/Photos.h>
+#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import Masonry;
 @import LEEAlert;
 
@@ -31,7 +32,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 @interface VLMineViewController ()
 <UINavigationControllerDelegate,UIImagePickerControllerDelegate,VLMineViewDelegate>
 
-@property (nonatomic, strong) UILabel *versionLabel;
 @property (nonatomic, strong) VLMineView *mineView;
 
 @end
@@ -50,12 +50,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     [mineView refreseUserInfo:VLUserCenter.user];
     [self.view addSubview:mineView];
     self.mineView = mineView;
-    [self.view addSubview:self.versionLabel];
-    [self.versionLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.mas_equalTo(self.view);
-        make.height.mas_equalTo(40);
-        make.bottom.mas_equalTo(-TabBarHeight - 8);
-    }];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -74,7 +68,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
             [self pushWebView:kURLPathH5Privacy];
             break;
         case VLMineViewClickTypeAboutUS:
-            [self pushWebView:kURLPathH5AboutUS];
+            [self about];
             break;
         case VLMineViewClickTypeLogout:
             [self loadLogoutUserRequest];
@@ -101,6 +95,12 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     VLCommonWebViewController *webVC = [[VLCommonWebViewController alloc] init];
     webVC.urlString = string;
     [self.navigationController pushViewController:webVC animated:YES];
+}
+
+- (void)about {
+    AboutAgoraEntertainmentViewController *VC = [[AboutAgoraEntertainmentViewController alloc] init];
+    VC.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:VC animated:YES];
 }
 
 - (void)userLogout {
@@ -446,7 +446,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         };
     })
     .LeeShow();
-    
 }
 
 - (void)closeOffDebugMode {
@@ -519,35 +518,4 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 - (BOOL)preferredNavigationBarHidden {
     return true;
 }
-
-#pragma mark - Lazy
-
-- (UILabel *)versionLabel {
-    if (!_versionLabel) {
-        _versionLabel = [[UILabel alloc] init];
-        _versionLabel.text = [NSString stringWithFormat:AGLocalizedString(@"当前版本号 LTS%@(%@) SDK %@"),
-                              [VLGlobalHelper appVersion],
-                              [VLGlobalHelper appBuild],
-                              [AgoraRtcEngineKit getSdkVersion]];
-        _versionLabel.font = VLUIFontMake(12);
-        _versionLabel.textColor = UIColorMakeWithHex(@"#6C7192");
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTapedVersionLabel)];
-        tap.numberOfTapsRequired = 5;
-        [_versionLabel addGestureRecognizer:tap];
-        _versionLabel.userInteractionEnabled = YES;
-    }
-    return _versionLabel;
-}
-
-#pragma mark for debug
-
-- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
-    [super motionEnded:motion withEvent:event];
-    
-    UIActivityViewController *controller = [[UIActivityViewController alloc] initWithActivityItems:@[[NSURL fileURLWithPath:[AgoraEntLog cacheDir]]]
-                                                                             applicationActivities:nil];
-
-    [self presentViewController:controller animated:YES completion:nil];
-}
-
 @end

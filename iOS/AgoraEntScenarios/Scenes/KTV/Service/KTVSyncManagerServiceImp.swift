@@ -198,8 +198,8 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         initScene { [weak self] in
             agoraPrint("createRoom initScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
             SyncUtil.joinScene(id: roomInfo.roomNo,
-                               userId: roomInfo.creatorNo,
-                               isOwner: roomInfo.creatorNo == VLUserCenter.user.id,
+                               userId: roomInfo.creator,
+                               isOwner: true,
                                property: params) { result in
                 agoraPrint("createRoom joinScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
@@ -279,8 +279,8 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         initScene { [weak self] in
             agoraPrint("joinRoom initScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
             SyncUtil.joinScene(id: roomInfo.roomNo,
-                               userId: roomInfo.creatorNo,
-                               isOwner: roomInfo.creatorNo == VLUserCenter.user.id,
+                               userId: roomInfo.creator,
+                               isOwner: roomInfo.creator == VLUserCenter.user.id,
                                property: params) { result in
                 agoraPrint("joinRoom joinScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String

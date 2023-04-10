@@ -5,7 +5,7 @@
 //  Created by zhaoyongqiang on 2021/11/19.
 //
 import UIKit
-//import YYCategories
+import YYCategories
 
 @objc
 class NetworkManager:NSObject {
@@ -140,8 +140,11 @@ class NetworkManager:NSObject {
     ///   - nickName: <#nickName description#>
     ///   - password: <#password description#>
     ///   - uid: <#uid description#>
+    ///   - type: 0: 同时处理用户注册/返回用户token和创建聊天室 1: 只处理用户注册/返回用户token 2: 只处理创建聊天室
+
     ///   - success: success description {roomid, uid}
-    func generateIMConfig(channelName: String,
+    func generateIMConfig(type: Int,
+                          channelName: String,
                           nickName: String,
                           chatId: String?,
                           imUid: String?,
@@ -172,13 +175,15 @@ class NetworkManager:NSObject {
         ]
         
         let payload: String = getPlayloadWithSceneType(.voice) ?? ""
+        let traceId = UUID().uuidString.md5Encrypt
         let params = ["appId": KeyCenter.AppId,
                       "chat": chatParams,
                       "src": "iOS",
                       "im": imConfig,
                       "payload": payload,
                       "traceId": NSString.withUUID().md5() as Any,
-                      "user": userParams] as [String: Any]
+                      "user": userParams,
+                      "type":type] as [String: Any]
  
         NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)webdemo/im/chat/create",
                                           params: params,
@@ -206,7 +211,7 @@ class NetworkManager:NSObject {
                       "channelName": channelName,
                       "channelType": channelType,
                       "src": "iOS",
-                      "traceId": NSString.withUUID().md5() as Any,
+                      "traceId": UUID().uuidString.md5Encrypt,
                       "payload": payload] as [String: Any]
                       
         NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)moderation/audio",

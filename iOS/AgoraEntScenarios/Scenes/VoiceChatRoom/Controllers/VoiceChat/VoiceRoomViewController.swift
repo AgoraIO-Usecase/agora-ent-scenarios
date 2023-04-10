@@ -32,7 +32,6 @@ class VoiceRoomViewController: VRBaseViewController {
 
     var headerView: AgoraChatRoomHeaderView!
     var rtcView: AgoraChatRoomNormalRtcView!
-    var sRtcView: AgoraChatRoom3DRtcView!
 
     @UserDefault("VoiceRoomUserAvatar", defaultValue: "") var userAvatar
 
@@ -43,24 +42,22 @@ class VoiceRoomViewController: VRBaseViewController {
     lazy var inputBar: VoiceRoomInputBar = .init(frame: CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 60)).backgroundColor(.white)
 
     var preView: VMPresentView!
-    var noticeView: VMNoticeView!
+    private lazy var noticeView = VMNoticeView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 230))
     var isShowPreSentView: Bool = false
     var rtckit: VoiceRoomRTCManager = VoiceRoomRTCManager.getSharedInstance()
     var isOwner: Bool = false
     var ains_state: AINS_STATE = .mid
     var local_index: Int?
-    var alienCanPlay: Bool = true
     var vmType: VMMUSIC_TYPE = .social
+    var isHeaderBack = false
 
     public var roomInfo: VRRoomInfo? {
         didSet {
             VoiceRoomUserInfo.shared.currentRoomOwner = self.roomInfo?.room?.owner
             if let mics = roomInfo?.mic_info {
                 if let type = roomInfo?.room?.type {
-                    if type == 0 && self.rtcView != nil {
+                    if type == 0 {
                         self.rtcView.micInfos = mics
-                    } else if type == 1 && self.sRtcView != nil {
-                        self.sRtcView.micInfos = mics
                     }
                 }
             }
@@ -81,22 +78,31 @@ class VoiceRoomViewController: VRBaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setNeedsStatusBarAppearanceUpdate()
-
+        ChatRoomServiceImp.getSharedInstance().subscribeEvent(with: self)
         guard let user = VoiceRoomUserInfo.shared.user else { return }
         guard let owner = roomInfo?.room?.owner else { return }
         guard let type = roomInfo?.room?.sound_effect else { return }
         isOwner = user.uid == owner.uid
         local_index = isOwner ? 0 : nil
         vmType = getSceneType(type)
-        ChatRoomServiceImp.getSharedInstance().subscribeEvent(with: self)
         // 布局UI
         layoutUI()
         // 加载RTC+IM
         loadKit()
         // 处理底部事件
         charBarEvents()
+        self.subscribeSceneRoom()
         NotificationCenter.default.addObserver(self, selector: #selector(leaveRoom), name: Notification.Name("terminate"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateMicInfo), name: Notification.Name("updateMicInfo"), object: nil)
+    }
+    
+    private func subscribeSceneRoom() {
+        SyncUtil.scene(id: self.roomInfo?.room?.room_id ?? "")?.subscribe(key: "",onDeleted: { _ in
+            if self.isHeaderBack == false {
+                self.view.window?.makeToast("Time limit desc".localized())
+                self.quitRoom()
+            }
+        })
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -104,14 +110,11 @@ class VoiceRoomViewController: VRBaseViewController {
         navigation.isHidden = false
         UIApplication.shared.isIdleTimerDisabled = false
     }
-
+    
     deinit {
-        print("\(String(describing: self.swiftClassName)) is destroyed!")
-        VoiceRoomUserInfo.shared.currentRoomOwner = nil
-        VoiceRoomUserInfo.shared.user?.amount = 0
-        ChatRoomServiceImp.getSharedInstance().cleanCache()
-        ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
+        print("VoiceRoomVC deinit")
     }
+
 }
 
 extension VoiceRoomViewController {
@@ -142,18 +145,27 @@ extension VoiceRoomViewController {
 
         VMGroup.enter()
         imQueue.async {
-            VoiceRoomIMManager.shared?.joinedChatRoom(roomId: roomId, completion: { room, error in
-                IMJoinSuccess = error == nil
+            if VoiceRoomIMManager.shared?.isLogin ?? false {
+                VoiceRoomIMManager.shared?.joinedChatRoom(roomId: roomId, completion: { room, error in
+                    IMJoinSuccess = error == nil
+                    VMGroup.leave()
+                })
+            } else {
+                IMJoinSuccess = false
                 VMGroup.leave()
-            })
+            }
         }
 
         VMGroup.notify(queue: .main) { [weak self] in
             let joinSuccess = rtcJoinSuccess && IMJoinSuccess
             guard let `self` = self else { return }
             if !joinSuccess {
-                self.view.makeToast("Join failed!")
-                self.didHeaderAction(with: .back, destroyed: true)
+                if !IMJoinSuccess {
+                    self.view.window?.makeToast("Join IM failed!")
+                } else {
+                    self.view.window?.makeToast("Join RTC failed!")
+                }
+                self.quitRoom()
             } else {
                 if self.isOwner == true {
                     //房主更新环信KV
@@ -161,7 +173,10 @@ extension VoiceRoomViewController {
                 } else {
                     //观众更新拉取详情后更新kv
                     self.requestRoomDetail()
-                    self.sendJoinedMessage()
+                    Throttler.throttle(queue: .main,delay: .seconds(0.5),shouldRunLatest: true) {
+                        self.sendJoinedMessage()
+                    }
+                    self.requestAnnouncement()
                 }
             }
         }
@@ -220,6 +235,15 @@ extension VoiceRoomViewController {
         }
     }
     
+    func requestAnnouncement() {
+        VoiceRoomIMManager.shared?.announcement(completion: { room, error in
+            if error == nil, room != nil {
+                guard let announcement = room?.announcement,!announcement.isEmpty  else { return }
+                self.noticeView.noticeStr = announcement
+            }
+        })
+    }
+    
     func roomInfoUpdateUI(info: VRRoomInfo) {
         self.roomInfo = info
         self.headerView.updateHeader(with: info.room)
@@ -239,6 +263,14 @@ extension VoiceRoomViewController {
         if let first = info.room?.ranking_list?.first(where: { $0.chat_uid == VLUserCenter.user.chat_uid
         }) {
             VoiceRoomUserInfo.shared.user?.amount = first.amount
+        }
+        if let enable = info.room?.use_robot {
+            guard let mic = info.mic_info?[6] else { return }
+            let mic_info = mic
+            mic_info.status = enable ? 5 : -2
+            self.roomInfo?.room?.use_robot = enable
+            self.roomInfo?.mic_info![6] = mic_info
+            self.rtcView.updateAlien(mic_info.status)
         }
     }
     
@@ -268,14 +300,11 @@ extension VoiceRoomViewController {
         bgImgView.image = UIImage("lbg")
         view.addSubview(bgImgView)
 
-        headerView = AgoraChatRoomHeaderView()
+        headerView = AgoraChatRoomHeaderView() 
         headerView.completeBlock = { [weak self] action in
             self?.didHeaderAction(with: action, destroyed: false)
         }
         view.addSubview(headerView)
-
-        sRtcView = AgoraChatRoom3DRtcView()
-        view.addSubview(sRtcView)
 
         rtcView = AgoraChatRoomNormalRtcView()
         rtcView.isOwner = isOwner
@@ -285,7 +314,6 @@ extension VoiceRoomViewController {
         view.addSubview(rtcView)
 
         if let entity = roomInfo?.room {
-            sRtcView.isHidden = entity.type == 0
             rtcView.isHidden = entity.type == 1
             headerView.updateHeader(with: entity)
         }
@@ -298,12 +326,6 @@ extension VoiceRoomViewController {
         headerView.snp.makeConstraints { make in
             make.left.top.right.equalTo(self.view)
             make.height.equalTo(isHairScreen ? 140~ : 140~ - 25)
-        }
-
-        sRtcView.snp.makeConstraints { make in
-            make.top.equalTo(self.headerView.snp.bottom)
-            make.left.right.equalTo(self.view)
-            make.bottom.equalTo(self.view.snp.bottom).offset(isHairScreen ? -84 : -50)
         }
 
         rtcView.snp.makeConstraints { make in
@@ -327,27 +349,25 @@ extension VoiceRoomViewController {
 
     func didHeaderAction(with action: HEADER_ACTION, destroyed: Bool) {
         if action == .back || action == .popBack {
+            self.isHeaderBack = true
             if isOwner && action != .popBack {
                 if destroyed != true {
                     showEndLive()
                 } else {
-                    notifySeverLeave()
-                    rtckit.leaveChannel()
-                    ownerBack()
+                    self.quitRoom()
                 }
             } else {
-                notifySeverLeave()
-                rtckit.leaveChannel()
-                self.leaveRoom()
-                backAction()
+                self.quitRoom()
             }
         } else if action == .notice {
             showNoticeView(with: isOwner ? .owner : .audience)
         } else if action == .rank {
             // 展示土豪榜
-            showUsers()
+            showUsers(position: .left)
         } else if action == .soundClick {
             showSoundView()
+        } else if action == .members {
+            showUsers(position: .right)
         }
     }
 
@@ -357,6 +377,8 @@ extension VoiceRoomViewController {
         if index == 6 { // 操作机器人
             if roomInfo?.room?.use_robot == false {
                 showActiveAlienView(true)
+            } else {
+                self.showEQOperation()
             }
         } else {
             if isOwner {
@@ -376,10 +398,8 @@ extension VoiceRoomViewController {
                     }
                 } else {
                     if local_index != nil {
-                        Throttler.throttle(delay: .seconds(1)) {
-                            DispatchQueue.main.async {
-                                self.changeMic(from: self.local_index!, to: tag - 200)
-                            }
+                        Throttler.throttle(queue:.main,shouldRunLatest: true) {
+                            self.changeMic(from: self.local_index!, to: tag - 200)
                         }
                     } else {
                         userApplyAlert(tag - 200)
@@ -388,15 +408,31 @@ extension VoiceRoomViewController {
             }
         }
     }
+    
+    func showEQOperation() {
+        if !isOwner {
+            view.makeToast("Host Bot".localized())
+            return
+        }
+        let confirmView = VREQOperationAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: (254/375.0)*ScreenWidth)).backgroundColor(.white).cornerRadius(20, [.topLeft, .topRight], .white, 0)
+        var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: (254/375.0)*ScreenWidth))
+        compent.destination = .bottomBaseline
+        let vc = VoiceRoomAlertViewController(compent: compent, custom: confirmView)
+        confirmView.actionClosure = { [weak self] in
+            self?.dismiss(animated: true)
+            switch $0 {
+            case .close:
+                self?.activeAlien(false)
+            default:
+                self?.showEQView()
+            }
+        }
+        presentViewController(vc)
+    }
 
     func notifySeverLeave() {
         guard let roomId = roomInfo?.room?.room_id else { return }
-        if self.local_index == nil {
-            ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in }
-        } else {
-            ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: self.local_index!) { error, result in
-                ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in }
-            }
+        ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: self.local_index ?? ChatRoomServiceImp.getSharedInstance().findMicIndex()) { error, result in
         }
 
     }
@@ -410,7 +446,6 @@ extension VoiceRoomViewController {
                 if self.preView == nil {return}
                 self.preView.removeFromSuperview()
                 self.preView = nil
-                self.sRtcView.isUserInteractionEnabled = true
                 self.rtcView.isUserInteractionEnabled = true
                 self.headerView.isUserInteractionEnabled = true
                 self.isShowPreSentView = false
@@ -419,7 +454,6 @@ extension VoiceRoomViewController {
     }
 
     func showNoticeView(with role: ROLE_TYPE) {
-        let noticeView = VMNoticeView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220))
         noticeView.roleType = role
         noticeView.noticeStr = roomInfo?.room?.announcement ?? ""
         noticeView.resBlock = { [weak self] flag, str in
@@ -430,7 +464,10 @@ extension VoiceRoomViewController {
         }
         let noticeStr = roomInfo?.room?.announcement ?? ""
         noticeView.noticeStr = noticeStr
-        let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 220)), custom: noticeView)
+        var component = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 220))
+        component.destination = .bottomBaseline
+        component.keyboardTranslationType = .unabgeschirmt(compress: true)
+        let vc = VoiceRoomAlertViewController(compent: component, custom: noticeView)
         presentViewController(vc)
     }
 
@@ -462,13 +499,14 @@ extension VoiceRoomViewController {
             view.makeToast("Host Bot".localized())
             return
         }
-        guard let mic: VRRoomMic = roomInfo?.mic_info![6] else { return }
+        guard let mic: VRRoomMic = roomInfo?.mic_info?[6] else { return }
         ChatRoomServiceImp.getSharedInstance().enableRobot(enable: flag) { error in
             if error == nil {
-                if self.alienCanPlay {
+                if flag {
                     self.rtckit.adjustAudioMixingVolume(with: 50)
                     self.rtckit.playMusic(with: .alien)
-                    self.alienCanPlay = false
+                } else {
+                    self.rtckit.stopPlayMusic()
                 }
 
                 let mic_info = mic
@@ -539,13 +577,24 @@ extension VoiceRoomViewController {
         micAlert.actionEvents = { [weak self] in
             vc.dismiss(animated: true)
             if $0 != 30 {
-                self?.notifySeverLeave()
-                self?.rtckit.leaveChannel()
-                // giveupStage()
-                self?.ownerBack()
+                self?.quitRoom()
             }
         }
         presentViewController(vc)
+    }
+    
+    func quitRoom() {
+        self.rtckit.leaveChannel()
+        self.notifySeverLeave()
+        self.leaveRoom()
+        dismiss(animated: false)
+        VoiceRoomUserInfo.shared.currentRoomOwner = nil
+        VoiceRoomUserInfo.shared.user?.amount = 0
+        ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
+        ChatRoomServiceImp.getSharedInstance().cleanCache()
+        self.rtckit.stopPlayMusic()
+        self.ownerBack()
+        
     }
 
     private func ownerBack() {
@@ -556,7 +605,8 @@ extension VoiceRoomViewController {
         }
     }
 
-    func showInviteMicAlert() {
+    func showInviteMicAlert(index: Int?) {
+        VoiceRoomPresentView.shared.dismiss()
         inputBar.hiddenInputBar()
         var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 75, height: 200))
         compent.destination = .center
@@ -566,7 +616,7 @@ extension VoiceRoomViewController {
             if $0 == 30 {
                 self?.refuse()
             } else {
-                self?.agreeInvite()
+                self?.agreeInvite(index: index)
             }
             vc.dismiss(animated: true)
         }
@@ -635,7 +685,9 @@ extension VoiceRoomViewController: VMManagerDelegate {
                 let user = mic.member
                 guard let rtcUid = Int(user?.rtc_uid ?? "0") else { return }
                 if rtcUid == speaker.uid {
-                    rtcView.updateVolume(with: mic.mic_index, vol: Int(speaker.volume))
+                    DispatchQueue.main.async {
+                        self.rtcView.updateVolume(with: mic.mic_index, vol: Int(speaker.volume))
+                    }
                     break
                 }
             }

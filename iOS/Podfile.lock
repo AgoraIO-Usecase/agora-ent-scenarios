@@ -44,7 +44,7 @@ PODS:
   - AgoraRtcEngine_iOS/VirtualBackground (4.1.1)
   - AgoraRtcEngine_iOS/VQA (4.1.1)
   - AgoraRtm_iOS (1.5.1)
-  - AgoraSyncManager (2.0.1):
+  - AgoraSyncManager (2.0.2):
     - SocketRocket
   - Bugly (2.5.93)
   - HWWeakTimer (1.0)
@@ -60,9 +60,11 @@ PODS:
   - Masonry (1.1.0)
   - MJRefresh (3.7.5)
   - Protobuf (3.22.1)
-  - SDWebImage (5.0.6):
-    - SDWebImage/Core (= 5.0.6)
-  - SDWebImage/Core (5.0.6)
+  - SDWebImage (4.4.8):
+    - SDWebImage/Core (= 4.4.8)
+  - SDWebImage/Core (4.4.8)
+  - SDWebImageAPNGCoder (0.1.1):
+    - SDWebImage/Core (~> 4.2)
   - SenseLib (1.0)
   - SnapKit (5.6.0)
   - SocketRocket (0.6.0)
@@ -91,20 +93,21 @@ DEPENDENCIES:
   - AgoraLyricsScore (= 1.0.8.8)
   - AgoraRtcEngine_iOS (~> 4.1.1)
   - AgoraRtm_iOS (= 1.5.1)
-  - AgoraSyncManager (= 2.0.1)
+  - AgoraSyncManager (= 2.0.2)
   - Bugly (= 2.5.93)
   - HWWeakTimer (= 1.0)
   - JXCategoryView (= 1.6.1)
-  - KakaJSON (= 1.1.2)
+  - KakaJSON
   - LEEAlert (= 1.6.4)
   - LSTPopView (= 0.3.10)
   - Masonry (= 1.1.0)
   - MJRefresh
-  - SDWebImage (= 5.0.6)
+  - SDWebImage (~> 4.2)
+  - SDWebImageAPNGCoder
   - SenseLib (from `sense.podspec`)
-  - SnapKit (= 5.6.0)
+  - SnapKit
   - SocketRocket (= 0.6.0)
-  - SVGAPlayer (= 2.5.7)
+  - SVGAPlayer
   - SVProgressHUD (= 2.2.5)
   - SwiftyBeaver (= 1.9.5)
   - YYCategories (= 1.0.4)
@@ -131,6 +134,7 @@ SPEC REPOS:
     - MJRefresh
     - Protobuf
     - SDWebImage
+    - SDWebImageAPNGCoder
     - SnapKit
     - SocketRocket
     - SSZipArchive
@@ -153,7 +157,7 @@ SPEC CHECKSUMS:
   AgoraLyricsScore: dac68d57abe2f80c977ccc7580ed769922f38d6b
   AgoraRtcEngine_iOS: df216a18a01c30fba926565d889c9542319252ac
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
-  AgoraSyncManager: d56780c956d689495f3e6876547c1152e6969da7
+  AgoraSyncManager: 21d109857dc41f78de2f020a4f9e713ed31814c5
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
@@ -164,7 +168,8 @@ SPEC CHECKSUMS:
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
+  SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
+  SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
   SenseLib: 6b0a54e6057dc62f2c1aa8227bd095bcaba2e268
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
@@ -177,6 +182,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 5770ebf6c8623750b5d249cf8c2d6f5e3cf08dd4
+PODFILE CHECKSUM: a5345a1e33c93d888ffaf9c7f09788778c6d6c47
 
 COCOAPODS: 1.11.3

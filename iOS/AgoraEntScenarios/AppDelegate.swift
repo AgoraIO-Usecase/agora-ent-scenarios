@@ -19,5 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationWillTerminate(_ application: UIApplication) {
         NotificationCenter.default.post(name: Notification.Name("terminate"), object: nil)
+        VoiceRoomIMManager.shared?.logoutIM()
+        VoiceRoomIMManager.shared = nil
     }
 }

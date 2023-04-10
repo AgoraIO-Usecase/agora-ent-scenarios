@@ -17,7 +17,8 @@ def all_pods
 #  pod 'MBProgressHUD', '~> 1.1.0'
   pod 'SVProgressHUD', '2.2.5'
   # 加载图片
-  pod 'SDWebImage', '5.0.6'
+  pod 'SDWebImage', '~> 4.2'
+  pod 'SDWebImageAPNGCoder'
   # Model
   pod 'YYModel', '1.0.4'
 #  pod 'YYCache', '1.0.4'
@@ -33,7 +34,7 @@ def all_pods
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
   
-  pod 'AgoraSyncManager', '2.0.1'
+  pod 'AgoraSyncManager', '2.0.2'
   
   # pod 'AgoraRtcEngine_iOS', :path => './libs'
   pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
@@ -55,14 +56,14 @@ def all_pods
 
   #VoiceChatRoom rely
   pod 'ZSwiftBaseLib', '0.1.6.1'
-  pod 'SnapKit', '5.6.0'
-  pod 'SVGAPlayer', '2.5.7'
-  pod 'KakaJSON', '1.1.2'
-  pod 'Agora_Chat_iOS','1.0.8'
 
-
+  pod 'SnapKit'
+  pod 'SVGAPlayer'
+  pod 'KakaJSON'
+  pod 'Agora_Chat_iOS', '1.0.8'
   pod 'SwiftyBeaver', '1.9.5'
-  
+ #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
+
   #bugly
   pod 'Bugly','2.5.93'
   

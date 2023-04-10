@@ -51,7 +51,7 @@
 
 
 - (void)itemClickAction:(int)tagValue {
-    NSArray* sceneNames = @[@"VoiceChat", @"KTV", @"LiveShow"];
+    NSArray* sceneNames = @[@"VoiceChat", @"KTV", @"LiveShow", @"SA"];
     [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
     switch (tagValue) {
         case 0: {
@@ -68,10 +68,14 @@
             ShowRoomListVC *vc = [ShowRoomListVC new];
             [self.navigationController pushViewController:vc animated:YES];
         } break;
+        case 3: {
+            SARoomsViewController *roomVc = [[SARoomsViewController alloc] initWithUser:VLUserCenter.user];
+            roomVc.hidesBottomBarWhenPushed = YES;
+            [self.navigationController pushViewController:roomVc animated:YES];
+        } break;
         default:
             break;
     }
-
 }
 
 @end

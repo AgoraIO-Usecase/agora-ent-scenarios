@@ -99,6 +99,12 @@
                 @"titleStr":@"秀场直播",
                 @"subTitleStr":@""
             },
+            @{
+                @"bgImgStr":@"spatial_bg",
+                @"iconImgStr":@"home_talk_icon",
+                @"titleStr":AGLocalizedString(@"语聊房"),
+                @"subTitleStr":AGLocalizedString(@"-空间音频模式")
+            },
         ];
     }
     return _itemsArray;
