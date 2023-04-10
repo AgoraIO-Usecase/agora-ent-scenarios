@@ -52,5 +52,6 @@
     <string name="app_about_customer_service">联系客服</string>
     <string name="app_about_official_website">官网地址</string>
     <string name="app_about_phone_cancel">取消</string>
+    <string name="app_mine_current_version">当前版本号：%s</string>
 
 </resources>

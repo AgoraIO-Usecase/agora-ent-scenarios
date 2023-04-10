@@ -7,11 +7,8 @@ import android.text.TextUtils
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.manager.UserManager
-import io.agora.syncmanager.rtm.IObject
-import io.agora.syncmanager.rtm.Scene
-import io.agora.syncmanager.rtm.SceneReference
+import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.*
-import io.agora.syncmanager.rtm.SyncManagerException
 import kotlin.random.Random
 
 
@@ -710,12 +707,8 @@ class KTVSyncManagerServiceImp(
             return
         }
 
-        Instance().init(context,
-            mapOf(
-                Pair("appid", io.agora.scene.base.BuildConfig.AGORA_APP_ID),
-                Pair("defaultChannel", kSceneId),
-                // Pair("isUseRtm", "true"),
-            ),
+        Instance().init(
+            RethinkConfig(io.agora.scene.base.BuildConfig.AGORA_APP_ID, kSceneId),
             object : Callback {
                 override fun onSuccess() {
                     syncUtilsInited = true
