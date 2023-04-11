@@ -134,9 +134,24 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mPlayer.registerPlayerObserver(this)
         mMusicCenter.registerEventHandler(this)
 
+        setKTVParameters()
         startDisplayLrc()
         startSyncPitch()
         isRelease = false;
+    }
+
+    private fun setKTVParameters() {
+        mRtcEngine.setParameters("{\"rtc.enable_nasa2\": false}")
+        mRtcEngine.setParameters("{\"rtc.ntp_delay_drop_threshold\":1000}")
+        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp\": true}")
+        mRtcEngine.setParameters("{\"rtc.net.maxS2LDelay\": 800}")
+        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":true}")
+        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":true}")
+        mRtcEngine.setParameters("{\"rtc.net.maxS2LDelayBroadcast\":400}")
+        mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer\":true}")
+        mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\":600}")
+        mRtcEngine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
+        mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
     }
 
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {

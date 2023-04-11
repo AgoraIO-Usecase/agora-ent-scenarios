@@ -1111,6 +1111,43 @@ public class RoomLivingViewModel extends ViewModel {
         }
         mRtcEngine.loadExtensionProvider("agora_drm_loader");
 
+
+        // ------------------ 场景化api初始化 ------------------
+        ktvApiProtocol.initialize(new KTVApiConfig(
+                BuildConfig.AGORA_APP_ID,
+                roomInfoLiveData.getValue().getAgoraRTMToken(),
+                mRtcEngine,
+                roomInfoLiveData.getValue().getRoomNo(),
+                UserManager.getInstance().getUser().id.intValue(),
+                roomInfoLiveData.getValue().getRoomNo() + "_ex",
+                roomInfoLiveData.getValue().getAgoraChorusToken())
+        );
+
+        ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
+               @Override
+               public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, io.agora.mediaplayer.Constants.MediaPlayerError error,  boolean isLocal) {
+                   switch (state) {
+                       case PLAYER_STATE_OPEN_COMPLETED:
+                           playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
+                           break;
+                       case PLAYER_STATE_PLAYING:
+                           playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                           break;
+                       case PLAYER_STATE_PAUSED:
+                           playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
+                           break;
+                       case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
+                           if (isLocal) {
+                               playerMusicPlayCompleteLiveData.postValue(new ScoringAverageModel(true, 0));
+                               playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
+                           }
+                           break;
+                       default:
+                   }
+               }
+           }
+        );
+
         // ------------------ 加入频道 ------------------
         mRtcEngine.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING);
         mRtcEngine.enableVideo();
@@ -1118,17 +1155,6 @@ public class RoomLivingViewModel extends ViewModel {
         mRtcEngine.enableAudio();
         mRtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, Constants.AUDIO_SCENARIO_GAME_STREAMING);
         mRtcEngine.enableAudioVolumeIndication(50, 10, true);
-        mRtcEngine.setParameters("{\"rtc.enable_nasa2\": false}");
-        mRtcEngine.setParameters("{\"rtc.ntp_delay_drop_threshold\":1000}");
-        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp\": true}");
-        mRtcEngine.setParameters("{\"rtc.net.maxS2LDelay\": 800}");
-        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":true}");
-        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":true}");
-        mRtcEngine.setParameters("{\"rtc.net.maxS2LDelayBroadcast\":400}");
-        mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer\":true}");
-        mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\":600}");
-        mRtcEngine.setParameters("{\"che.audio.max_mixed_participants\": 8}");
-        mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}");
         mRtcEngine.setClientRole(isOnSeat ? Constants.CLIENT_ROLE_BROADCASTER : Constants.CLIENT_ROLE_AUDIENCE);
         int ret = mRtcEngine.joinChannel(
                 roomInfoLiveData.getValue().getAgoraRTCToken(),
@@ -1255,42 +1281,6 @@ public class RoomLivingViewModel extends ViewModel {
             cfg.ordered = false;
             streamId = mRtcEngine.createDataStream(cfg);
         }
-
-        // 场景化api初始化
-        ktvApiProtocol.initialize(new KTVApiConfig(
-                BuildConfig.AGORA_APP_ID,
-                roomInfoLiveData.getValue().getAgoraRTMToken(),
-                mRtcEngine,
-                roomInfoLiveData.getValue().getRoomNo(),
-                UserManager.getInstance().getUser().id.intValue(),
-                roomInfoLiveData.getValue().getRoomNo() + "_ex",
-                roomInfoLiveData.getValue().getAgoraChorusToken())
-        );
-
-        ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
-                   @Override
-                   public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, io.agora.mediaplayer.Constants.MediaPlayerError error,  boolean isLocal) {
-                       switch (state) {
-                           case PLAYER_STATE_OPEN_COMPLETED:
-                               playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
-                               break;
-                           case PLAYER_STATE_PLAYING:
-                               playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                               break;
-                           case PLAYER_STATE_PAUSED:
-                               playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
-                               break;
-                           case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
-                               if (isLocal) {
-                                   playerMusicPlayCompleteLiveData.postValue(new ScoringAverageModel(true, 0));
-                                   playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
-                               }
-                               break;
-                           default:
-                       }
-                   }
-               }
-        );
     }
 
     private void setAudioEffectPreset(int effect) {
