@@ -18,8 +18,16 @@ class ShowRoomListView: UIView {
     
     var clickCreateButtonAction: (()->())?
     var joinRoomAction: ((_ room: ShowRoomListModel)->())?
+    var refreshValueChanged: (()->())?
     
     var collectionView: UICollectionView!
+    
+    private lazy var refreshControl: UIRefreshControl = {
+        let ctrl = UIRefreshControl()
+        ctrl.addTarget(self, action: #selector(refreshControlValueChanged), for: .valueChanged)
+        return ctrl
+    }()
+    
     private var emptyView: ShowEmptyView!
 
     override init(frame: CGRect) {
@@ -42,6 +50,7 @@ class ShowRoomListView: UIView {
         collectionView.register(ShowRoomListCell.self, forCellWithReuseIdentifier: NSStringFromClass(ShowRoomListCell.self))
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.refreshControl = self.refreshControl
         addSubview(collectionView)
         collectionView.snp.makeConstraints { make in
             make.edges.equalTo(UIEdgeInsets(top:  Screen.safeAreaTopHeight() + 54, left: 0, bottom: 0, right: 0))
@@ -81,6 +90,18 @@ class ShowRoomListView: UIView {
     // 点击创建按钮
     @objc private func didClickCreateButton(){
        clickCreateButtonAction?()
+    }
+    
+    @objc private func refreshControlValueChanged() {
+        refreshValueChanged?()
+    }
+    
+    func beginRefreshing(){
+        refreshControl.beginRefreshing()
+    }
+    
+    func endRefrshing(){
+        refreshControl.endRefreshing()
     }
 }
 

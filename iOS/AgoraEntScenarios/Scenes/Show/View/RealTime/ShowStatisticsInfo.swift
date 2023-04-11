@@ -83,11 +83,11 @@ struct ShowStatisticsInfo {
     }
     
     mutating func updateUplinkNetworkInfo(_ uplinkNetworkInfo: AgoraUplinkNetworkInfo) {
-        uplink = uplinkNetworkInfo.videoEncoderTargetBitrateBps / 1000
+        uplink = uplinkNetworkInfo.videoEncoderTargetBitrateBps / 8 / 1024
     }
     
     mutating func updateDownlinkNetworkInfo(_ downlinkNetworkInfo: AgoraDownlinkNetworkInfo) {
-        downlink = downlinkNetworkInfo.bandwidthEstimationBps / 1000
+        downlink = downlinkNetworkInfo.bandwidthEstimationBps / 8 / 1024
     }
     
     mutating func updateVideoStats(_ stats: AgoraRtcRemoteVideoStats) {

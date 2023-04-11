@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import MJRefresh
 
 class ShowEmptyView: UIView {
     

@@ -33,7 +33,7 @@ class ShowMusicEffectVC: UIViewController {
     }()
     
     deinit {
-        print("----ShowMusicEffectVC销毁了--------")
+        showLogger.info("deinit-- ShowMusicEffectVC ")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {

@@ -88,24 +88,24 @@ class ShowDebugSettingVC: UIViewController {
             settingManager.debug1TFModelForKey(.encodeFrameRate),
             settingManager.debug2TFModelForKey(.encodeVideoSize),
             settingManager.debug1TFModelForKey(.bitRate),
-            ShowSettingKey.debugPVC,
-            ShowSettingKey.focusFace,  // 人脸对焦
+            ShowDebugSettingKey.debugPVC,
+            ShowDebugSettingKey.focusFace,  // 人脸对焦
             settingManager.debug2TFModelForKey(.exposureRange),// 曝光区域
             settingManager.debug2TFModelForKey(.colorSpace), // 颜色空间
-            ShowSettingKey.encode,
-            ShowSettingKey.codeCType,
-            ShowSettingKey.mirror,
-            ShowSettingKey.renderMode,
-            ShowSettingKey.colorEnhance,
-            ShowSettingKey.lowlightEnhance,
-            ShowSettingKey.videoDenoiser,
+            ShowDebugSettingKey.encode,
+            ShowDebugSettingKey.codeCType,
+            ShowDebugSettingKey.mirror,
+            ShowDebugSettingKey.renderMode,
+            ShowDebugSettingKey.colorEnhance,
+            ShowDebugSettingKey.lowlightEnhance,
+            ShowDebugSettingKey.videoDenoiser,
         ]
     }
     
     private func createAudienceDataArray() -> [Any] {
         [
-            ShowSettingKey.debugSR,
-            ShowSettingKey.debugSrType
+            ShowDebugSettingKey.debugSR,
+            ShowDebugSettingKey.debugSrType
         ]
     }
 }
@@ -143,7 +143,7 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
             return cell
         }
         
-        let data:ShowSettingKey = dataArray[indexPath.row] as! ShowSettingKey
+        let data:ShowDebugSettingKey = dataArray[indexPath.row] as! ShowDebugSettingKey
         var cell: UITableViewCell!
         if data.type == .aSwitch {
             let cell = tableView.dequeueReusableCell(withIdentifier: SwitchCellID, for: indexPath) as! ShowSettingSwitchCell
@@ -152,15 +152,6 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
             } detailButtonAction: {[weak self] in
                 self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
             }
-            return cell
-        }else if data.type == .slider {
-            let cell = tableView.dequeueReusableCell(withIdentifier: SliderCellID, for: indexPath) as! ShowSettingSliderCell
-            cell.setTitle(data.title, value: data.floatValue, minValue: data.sliderValueScope.0, maxValue: data.sliderValueScope.1) {value in
-                
-            } sliderValueChangedAction: {[weak self] value in
-                self?.changeValue(value, forSettingKey: data)
-            }
-
             return cell
         }else if data.type == .label {
             let cell = tableView.dequeueReusableCell(withIdentifier: LabelCellID, for: indexPath) as! ShowSettingLabelCell
@@ -174,7 +165,7 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
                 vc.dataArray = data.items
                 vc.didSelectedIndex = {[weak self] index in
                     data.writeValue(index)
-                    self?.settingManager?.updateSettingForkey(data)
+                    self?.settingManager?.updateSettingForDebugkey(data)
                     tableView.reloadData()
                 }
                 self?.present(vc, animated: true, completion: {
@@ -193,9 +184,9 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
 }
 
 extension ShowDebugSettingVC {
-    func changeValue(_ value: Any, forSettingKey key: ShowSettingKey) {
+    func changeValue(_ value: Any, forSettingKey key: ShowDebugSettingKey) {
         key.writeValue(value)
-        settingManager?.updateSettingForkey(key)
+        settingManager?.updateSettingForDebugkey(key)
         tableView.reloadData()
     }
 }
