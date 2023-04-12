@@ -43,8 +43,6 @@
 声网在线K歌房源码，最终目的是方便开发者快速按需集成，减少开发者搭建K歌房的工作量。在现有源码的基础上，您可以按需自由定制，包括UI/UE，前端逻辑，权限体系等
 
 # 3.快速开始
-
-- 将项目的iOS/AgoraEntScenarios/KeyCenter.swift.bak重命名为KeyCenter.swift
 - 在KeyCenter.swift文件中填写需要的 appId 和 appCertificate (**需要联系销售给 appId 开通 K 歌权限**)
 ```
 AppId：声网appid
