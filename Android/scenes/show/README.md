@@ -30,9 +30,9 @@
   
   获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6) 
 
-- <mark>2. </mark>在[**settings.gradle**](../../settings.gradle)内取消秀场直播include的注释
+- <mark>2. </mark>在 [**settings.gradle**](../../settings.gradle) 内取消对秀场直播 include 的注释
 ~~~
-//if(!isShowEmpty){
+if(!isShowEmpty){
     include ':scenes:show'
     include ':scenes:show:aars:SenseArSourceManager'
     include ':scenes:show:aars:STMobileJNI'
