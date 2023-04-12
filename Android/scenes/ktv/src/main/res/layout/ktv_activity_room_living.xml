@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_app_def_dark"
-    android:paddingTop="20dp">
+    android:paddingTop="20dp"
+    tools:context=".live.RoomLivingActivity">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="match_parent"
@@ -141,6 +142,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginBottom="20dp"
         android:background="@null"
+        android:visibility="gone"
         android:padding="5dp"
         android:src="@mipmap/ic_more"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -189,7 +191,6 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
         android:src="@mipmap/ic_hechuang"
-        android:alpha="0.5"
         app:layout_constraintBottom_toBottomOf="@id/iBtnChooseSong"
         app:layout_constraintEnd_toStartOf="@id/iBtnChooseSong"
         app:layout_constraintTop_toTopOf="@id/iBtnChooseSong" />
@@ -290,7 +291,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="iBtnChorus,iBtnChooseSong,cbMic,cbVideo,btnMenu"
+        app:constraint_referenced_ids="iBtnChorus,iBtnChooseSong,cbMic,cbVideo"
         tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.Group

@@ -8,11 +8,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-
-    <!-- 扩展存储读写权限 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- 扩展存储读写权限 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission
         android:name="android.permission.FOREGROUND_SERVICE"
         tools:node="remove" />
@@ -26,10 +24,12 @@
         android:roundIcon="@mipmap/app_ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/app_Theme.AgoraKTV">
+
         <activity
             android:name="com.agora.entfulldemo.welcome.WelcomeActivity"
             android:exported="true"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -40,12 +40,14 @@
             android:name="com.agora.entfulldemo.home.MainActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize"
             android:screenOrientation="portrait" />
-
         <activity
             android:name="com.agora.entfulldemo.login.ui.PhoneLoginRegisterActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name="com.agora.entfulldemo.webview.WebViewActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.agora.entfulldemo.home.mine.AboutUsActivity"
             android:screenOrientation="portrait" />
 
         <meta-data

@@ -31,7 +31,6 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="SmallSp" />
 
-
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvUserName"
         android:layout_width="wrap_content"
@@ -81,6 +80,5 @@
         app:layout_constraintEnd_toEndOf="@id/avatar_item_room_speaker"
         app:layout_constraintStart_toStartOf="@id/avatar_item_room_speaker"
         app:layout_constraintTop_toTopOf="@id/avatar_item_room_speaker" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

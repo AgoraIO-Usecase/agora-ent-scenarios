@@ -1,0 +1,11 @@
+*.aar
+*.so
+src/main/assets/resource
+\build
+
+src/main/assets/filter_portrait
+src/main/assets/license
+src/main/assets/makeup_*
+src/main/assets/models
+src/main/assets/sticker_face_shape
+src/main/assets/style_lightly

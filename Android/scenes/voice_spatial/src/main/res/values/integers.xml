@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="voice_like_anim_bezier_factor">6</integer>
+    <integer name="voice_anim_duration">3000</integer>
+
+</resources>
