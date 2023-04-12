@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/qualityEnhance"
+                layout="@layout/show_setting_advance_item_switch"/>
+
+            <include
+                android:id="@+id/colorEnhance"
+                layout="@layout/show_setting_advance_item_switch"/>
+
+            <include
+                android:id="@+id/darkEnhance"
+                layout="@layout/show_setting_advance_item_switch"/>
+
+            <include
+                android:id="@+id/videoNoiseReduction"
+                layout="@layout/show_setting_advance_item_switch"/>
+
+            <include
+                android:id="@+id/bitrateSave"
+                layout="@layout/show_setting_advance_item_switch"/>
+
+            <include
+                android:id="@+id/resolution"
+                layout="@layout/show_setting_advance_item_selector"/>
+
+            <include
+                android:id="@+id/frameRate"
+                layout="@layout/show_setting_advance_item_selector"/>
+
+            <include
+                android:id="@+id/bitrate"
+                layout="@layout/show_setting_advance_item_seekbar"/>
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</FrameLayout>

@@ -1,0 +1,33 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="voice_Theme.AgoraScenesChatroom" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/voice_main_color_156ef3</item>
+        <item name="colorPrimaryVariant">@color/voice_main_color_16a7ff</item>
+        <item name="colorOnPrimary">@color/voice_white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/voice_main_color_009fff</item>
+        <item name="colorSecondaryVariant">@color/voice_main_color_009fff</item>
+        <item name="colorOnSecondary">@color/voice_black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" >@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- Customize your theme here. -->
+
+        <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:windowLightStatusBar" >true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+<!--        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>-->
+    </style>
+
+    <style name="BottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="enableEdgeToEdge">true</item>
+        <item name="bottomSheetStyle">@style/bottomSheetStyleWrapper</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="bottomSheetStyleWrapper" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+</resources>

@@ -11,8 +11,8 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:text="声网"
+        android:fitsSystemWindows="true"
         android:textColor="@color/def_text_color_040"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -26,7 +26,8 @@
         android:layout_height="0dp"
         app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
         app:spanCount="2"
-        android:paddingHorizontal="12dp"
+        tools:listitem="@layout/app_item_home_index"
+        android:paddingHorizontal="5dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginTop="82dp" />
