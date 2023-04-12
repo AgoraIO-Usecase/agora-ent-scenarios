@@ -63,17 +63,19 @@
   > 
   > pod install
   > 
-   如果遇到下图错误
+   如果xcode14编译失败并遇到下图错误
   >
-  >  ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/PodinstallError.png)
+  >  ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/PodError.png)
   >  
-   在终端执行如下命令：
+   在终端执行如下命令将cocoapods升级到1.12.0以上：
   >  
-  >  gem install cocoapods-pod-sign
+  >  sudo gem install -n /usr/local/bin cocoapods
   >  
-   之后
+
+  >  如果网络不好升级失败，也可以手动给三方库签名 
   >  
-  >  pod install
+  >  将Team里的None替换成你自己的签名即可
+  >  
 
 - 运行项目即可开始您的体验
 

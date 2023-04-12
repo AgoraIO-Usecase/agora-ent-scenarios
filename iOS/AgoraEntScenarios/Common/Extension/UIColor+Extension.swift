@@ -22,6 +22,7 @@ public extension UIColor {
     convenience init?(hex string: String, alpha: CGFloat = 1.0) {
         
         var hex = string.hasPrefix("#") ? String(string.dropFirst()) : string
+        hex = hex.hasPrefix("0x") ? String(hex.dropFirst(2)) : hex
         guard hex.count == 3 || hex.count == 6  else {
             self.init(white: 1.0, alpha: 0.0)
             return
