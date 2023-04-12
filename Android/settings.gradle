@@ -44,8 +44,8 @@ if (!isSpatialVoiceEmpty) {
     include ':scenes:voice_spatial:common'
 }
 
-if(!isShowEmpty){
-    include ':scenes:show'
-    include ':scenes:show:aars:SenseArSourceManager'
-    include ':scenes:show:aars:STMobileJNI'
-}
+//if(!isShowEmpty){
+//    include ':scenes:show'
+//    include ':scenes:show:aars:SenseArSourceManager'
+//    include ':scenes:show:aars:STMobileJNI'
+//}

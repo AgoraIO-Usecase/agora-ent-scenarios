@@ -30,7 +30,16 @@
   
   获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6) 
 
-- <mark>2. </mark> 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 App证书  
+- <mark>2. </mark>在[**settings.gradle**](../../settings.gradle)内取消秀场直播include的注释
+~~~
+//if(!isShowEmpty){
+    include ':scenes:show'
+    include ':scenes:show:aars:SenseArSourceManager'
+    include ':scenes:show:aars:STMobileJNI'
+}
+~~~
+
+- <mark>3. </mark> 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 App证书  
   ![xxx](image/SamplePicture1.png)  
   
   ```texag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0
@@ -38,7 +47,7 @@
   AGORA_APP_CERTIFICATE：声网Certificate  
   ```
 
-- <mark>3. </mark> 美颜配置
+- <mark>4. </mark> 美颜配置
   
   美颜资源请联系商汤科技商务获取。
   
@@ -55,7 +64,7 @@
   >   - sticker_face_shape/lianxingface.zip : 贴纸资源
   >   - style_lightly/*.zip : 风格妆资源
 
-- <mark>4. </mark> 用 Android Studio 运行项目即可开始您的体验
+- <mark>5. </mark> 用 Android Studio 运行项目即可开始您的体验
 
 ---
 ## 3.项目介绍
