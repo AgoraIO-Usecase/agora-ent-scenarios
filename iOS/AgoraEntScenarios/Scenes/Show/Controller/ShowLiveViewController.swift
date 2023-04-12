@@ -421,7 +421,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     private func _ensureRoomIsExst(roomId: String) {
-        print("finishAlertVC joinRoom : roomid = \(roomId) ,_ensureRoomIsExst , checking = \(checking) ")
         if checking { return }
         checking = true
         AppContext.showServiceImp("").getRoomList(page: 1) { [weak self] error, roomList in
@@ -429,18 +428,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             self.checking = false
             guard let list = roomList else {
                 self.onRoomExpired()
-                print("finishAlertVC joinRoom : roomid = \(roomId) ,_ensureRoomIsExst , roomlist is empty ")
                 return
             }
             for item in list {
                 let aRoomId = item.roomId
                 if aRoomId == roomId {
                     self._joinRoom()
-                    print("finishAlertVC joinRoom : roomid = \(roomId) _joinRoom 房间实时上存在")
                     return
                 }
             }
-            print("finishAlertVC joinRoom : roomid = \(roomId) _ensureRoomIsExst 房间确实不存在")
             self.onRoomExpired()
         }
     }

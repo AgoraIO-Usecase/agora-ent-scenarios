@@ -41,22 +41,6 @@ extension ShowAgoraKitManager {
         ShowAgoraCaptureVideoDimensions.allCases.map({$0.sizeValue})
     }
     
-    private var encodeItems: [Bool] {
-        ShowAgoraEncode.allCases.map({$0.encodeValue})
-    }
-    
-    private var codeCTypeItems: [Int] {
-        ShowAgoraCodeCType.allCases.map({$0.typeValue})
-    }
-    
-    private var renderModeItems: [AgoraVideoRenderMode] {
-        ShowAgoraRenderMode.allCases.map({$0.modeValue})
-    }
-    
-    private var debugSrTypeItems: [SRType] {
-        ShowAgoraSRType.allCases.map({$0.typeValue})
-    }
-    
     // 默认设置
     func defaultSetting() {
         // 默认音量设置
@@ -65,7 +49,7 @@ extension ShowAgoraKitManager {
         let hasOpened = UserDefaults.standard.bool(forKey: hasOpenedKey)
         // 第一次进入房间的时候设置
         if hasOpened == false {
-            updatePresetForType(presetType ?? .show_medium, mode: .single)
+            updatePresetForType(.show_medium, mode: .single)
             UserDefaults.standard.set(true, forKey: hasOpenedKey)
         }
         updateSettingForkey(.lowlightEnhance)
@@ -204,14 +188,7 @@ extension ShowAgoraKitManager {
     }
     
     /// 设置观众端画质增强
-    private func _setQualityEnable(_ isOn: Bool, uid: UInt?){
-        /*
-        if let uid = uid {
-            agoraKit.enableRemoteSuperResolution(uid, enable: isOn)
-        }
-        ShowSettingKey.SR.writeValue(isOn)
-         */
-//        setSuperResolutionOn(isOn, srType: srType)
+    private func _setQualityEnable(_ isOn: Bool){
         ShowSettingKey.SR.writeValue(isOn)
     }
     
@@ -222,52 +199,51 @@ extension ShowAgoraKitManager {
         updateSettingForkey(.captureVideoSize)
     }
 
-    
-    func updatePresetForType(_ type: ShowPresetType, mode: ShowMode,uid: UInt? = nil) {
+    func updatePresetForType(_ type: ShowPresetType, mode: ShowMode, cache: Bool = true) {
         switch type {
         case .unknown:
             break
         case .show_low:
             switch mode {
             case .single:
-                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 1461, h265On: false, captureSize: ._1080P)
+                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 1461, h265On: false, captureSize: ._1080P, cache: cache)
             case .pk:
-                _presetValuesWith(encodeSize: ._360x640, fps: .fps15, bitRate: 700, h265On: false, captureSize: ._720P)
+                _presetValuesWith(encodeSize: ._360x640, fps: .fps15, bitRate: 700, h265On: false, captureSize: ._720P, cache: cache)
             }
             broadcastorMachineType = .low
         case .show_medium:
             switch mode {
             case .single:
-                _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 1800, h265On: true, captureSize: ._720P)
+                _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 1800, h265On: true, captureSize: ._720P, cache: cache)
             case .pk:
-                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P)
+                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P, cache: cache)
             }
             broadcastorMachineType = .medium
         case .show_high:
             
             switch mode {
             case .single:
-                _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 2099, h265On: true, captureSize: ._720P)
+                _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 2099, h265On: true, captureSize: ._720P, cache: cache)
             case .pk:
-                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P)
+                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P, cache: cache)
             }
             broadcastorMachineType = .high
         case .quality_low:
-            _setQualityEnable(false,uid: uid)
+            _setQualityEnable(false)
         case .quality_medium:
-            _setQualityEnable(true, uid: uid)
+            _setQualityEnable(true)
         case .quality_high:
-            _setQualityEnable(true, uid: uid)
+            _setQualityEnable(true)
         case .base_low:
-            _setQualityEnable(false,uid: uid)
+            _setQualityEnable(false)
         case .base_medium:
-            _setQualityEnable(false,uid: uid)
+            _setQualityEnable(false)
         case .base_high:
-            _setQualityEnable(false,uid: uid)
+            _setQualityEnable(false)
         }
     }
     
-    /// 更新配置信息
+    /// 更新配置信息 该设置不会保存到本地
     /// - Parameters:
     ///   - mode: 秀场交互类型
     func updateVideoProfileForMode(_ mode: ShowMode) {
@@ -279,7 +255,7 @@ extension ShowAgoraKitManager {
             case .single:
                 _resetPresetValues()
             case .pk:
-                _presetValuesWith(encodeSize: ._360x640, fps: .fps15, bitRate: 700, h265On: false, captureSize: ._720P, cache: false)
+                updatePresetForType(.show_low, mode: .pk, cache: false)
             }
             
         case .medium:
@@ -287,7 +263,7 @@ extension ShowAgoraKitManager {
             case .single:
                 _resetPresetValues()
             case .pk:
-                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P, cache: false)
+                updatePresetForType(.show_medium, mode: .pk, cache: false)
             }
             
         case .high:
@@ -295,7 +271,7 @@ extension ShowAgoraKitManager {
             case .single:
                 _resetPresetValues()
             case .pk:
-                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P, cache: false)
+                updatePresetForType(.show_high, mode: .pk, cache: false)
             }
         }
     }
@@ -349,8 +325,6 @@ extension ShowAgoraKitManager {
             }
             // 采集帧率
             captureConfig.frameRate = Int32(fpsItems[index].rawValue)
-//            agoraKit.setCameraCapturerConfiguration(captureConfig)
-//            updateCameraCaptureConfiguration()
             
         case .H265:
             setH265On(isOn)
@@ -365,35 +339,6 @@ extension ShowAgoraKitManager {
         case .captureVideoSize:
             let index = indexValue % captureDimensionsItems.count
             captureConfig.dimensions = captureDimensionsItems[index]
-        case .captureFrameRate:
-            let index = indexValue % fpsItems.count
-            captureConfig.frameRate = Int32(fpsItems[index].rawValue)
-            updateCameraCaptureConfiguration()
-        case .focusFace:
-            agoraKit.setCameraAutoFocusFaceModeEnabled(isOn)
-            showLogger.info("***Debug*** setCameraAutoFocusFaceModeEnabled  \(isOn)")
-        case .encode:
-            let index = indexValue % encodeItems.count
-            agoraKit.setParameters("{\"engine.video.enable_hw_encoder\":\"\(encodeItems[index])\"}")
-            showLogger.info("***Debug*** engine.video.enable_hw_encoder  \(encodeItems[index])")
-        case .codeCType:
-            let index = indexValue % codeCTypeItems.count
-            agoraKit.setParameters("{\"engine.video.codec_type\":\"\(codeCTypeItems[index])\"}")
-            showLogger.info("***Debug*** engine.video.codec_type  \(codeCTypeItems[index])")
-
-        case .mirror, .renderMode:
-            let index = ShowSettingKey.renderMode.intValue % renderModeItems.count
-            let mirrorIsOn = ShowSettingKey.mirror.boolValue
-            agoraKit.setLocalRenderMode(renderModeItems[index], mirror: mirrorIsOn ? .enabled : .disabled)
-            showLogger.info("***Debug*** setLocalRenderMode  mirror = \(mirrorIsOn ? AgoraVideoMirrorMode.enabled : AgoraVideoMirrorMode.disabled), rendermode = \(renderModeItems[index])")
-        case .debugSR, .debugSrType:
-            let srIsOn = ShowSettingKey.debugSR.boolValue
-            let index = ShowSettingKey.debugSrType.intValue % debugSrTypeItems.count
-            setSuperResolutionOn(srIsOn, srType: debugSrTypeItems[index])
-            showLogger.info("***Debug*** setSuperResolutionOn  srIsOn = \(srIsOn), srType = \(debugSrTypeItems[index])")
-        case .debugPVC:
-            agoraKit.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
-            showLogger.info("***Debug*** rtc.video.enable_pvc \(isOn)")
         }
     }
 
@@ -420,35 +365,5 @@ extension ShowAgoraKitManager {
             }
             return .unknown
         }
-    }
-}
-
-
-typealias ShowAgoraPreviewConfig = (AgoraVideoEncoderConfiguration, AgoraCameraCapturerConfiguration)
-
-
-extension ShowAgoraKitManager {
-    
-    static func previewPreset() -> ShowAgoraPreviewConfig {
-        let encoderConfig = AgoraVideoEncoderConfiguration()
-        let captrueConfig = AgoraCameraCapturerConfiguration()
-        
-        let dimensionsItems = ShowAgoraVideoDimensions.allCases.map({$0.sizeValue})
-        // 编码分辨率
-        let encodeDimensionIndex = ShowSettingKey.videoEncodeSize.intValue % dimensionsItems.count
-        encoderConfig.dimensions = dimensionsItems[encodeDimensionIndex]
-        // 码率
-        let videoBitRate = Int(ShowSettingKey.videoBitRate.floatValue)
-        encoderConfig.bitrate = videoBitRate
-        // 帧率
-        let fpsIndex = ShowSettingKey.FPS.intValue % fpsItems.count
-        encoderConfig.frameRate = fpsItems[fpsIndex]
-        captrueConfig.frameRate = Int32(fpsItems[fpsIndex].rawValue)
-        
-        // 采集分辨率
-        let captureDimensionsItems = ShowAgoraCaptureVideoDimensions.allCases.map({$0.sizeValue})
-        let captruesizeindex = ShowSettingKey.captureVideoSize.intValue % captureDimensionsItems.count
-        captrueConfig.dimensions = captureDimensionsItems[captruesizeindex]
-        return (encoderConfig, captrueConfig)
     }
 }
