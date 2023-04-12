@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fitsSystemWindows="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoomTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/show_live_detail_top_view_bg"
+        android:paddingHorizontal="5dp"
+        android:paddingVertical="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivOwnerAvatar"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearance="@style/show_roundStyle_50"
+            app:strokeColor="@android:color/transparent"
+            tools:src="@mipmap/portrait01" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRoomName"
+            android:layout_width="154dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:paddingHorizontal="8dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@id/ivOwnerAvatar"
+            app:layout_constraintTop_toTopOf="@id/ivOwnerAvatar"
+            tools:text="Chatroom-123555666Chatroom-123555666Chatroom-123555666Chatroom-123555666Chatroom-123555666Chatroom-123555666Chatroom-123555666" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRoomId"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:paddingStart="8dp"
+            android:singleLine="true"
+            android:textColor="@color/white_80_percent"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@id/tvTimer"
+            app:layout_constraintStart_toStartOf="@id/tvRoomName"
+            app:layout_constraintTop_toBottomOf="@id/tvRoomName"
+            tools:text="ID: 11234477" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@mipmap/show_live_top_green_dot"
+            android:drawablePadding="5dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingEnd="8dp"
+            android:textColor="@color/white_80_percent"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@id/tvRoomName"
+            app:layout_constraintStart_toEndOf="@id/tvRoomId"
+            app:layout_constraintTop_toBottomOf="@id/tvRoomName"
+            tools:text="00:00:00" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvUserCount"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginVertical="4dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/show_live_detail_top_view_bg"
+        android:drawableTop="@mipmap/show_live_top_user_tag"
+        android:gravity="center"
+        android:maxLines="1"
+        android:paddingVertical="5dp"
+        android:textColor="@color/white_80_percent"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="@id/clRoomTitle"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@id/ivClose"
+        app:layout_constraintTop_toTopOf="@id/clRoomTitle"
+        tools:text="1.5K" />
+
+    <ImageView
+        android:id="@+id/ivClose"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginVertical="4dp"
+        android:background="@drawable/show_live_detail_top_view_bg"
+        android:contentDescription="@string/show_live_top_close"
+        android:padding="10dp"
+        android:scaleType="fitXY"
+        android:src="@mipmap/show_live_top_close"
+        app:layout_constraintBottom_toBottomOf="@id/clRoomTitle"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/clRoomTitle" />
+
+    <TableLayout
+        android:id="@+id/tlStatistic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/show_live_detail_top_statistic_bg"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="10dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/clRoomTitle"
+        tools:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/show_statistic_up"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvEncodeResolution"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_encode_resolution" />
+
+            <TextView
+                android:id="@+id/tvStatisticEncodeFPS"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_encode_fps" />
+        </TableRow>
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvStatisticUpBitrate"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_up_bitrate" />
+
+            <TextView
+                android:id="@+id/tvStatisticUpLossPackage"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_up_loss_package" />
+        </TableRow>
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvStatisticUpNet"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_up_net_speech" />
+        </TableRow>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/show_statistic_down"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvReceiveResolution"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_receive_resolution" />
+
+            <TextView
+                android:id="@+id/tvStatisticReceiveFPS"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_receive_fps" />
+        </TableRow>
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvStatisticDownBitrate"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_down_bitrate" />
+
+            <TextView
+                android:id="@+id/tvStatisticDownLossPackage"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_down_loss_package" />
+        </TableRow>
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvStatisticDownNet"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_down_net_speech" />
+
+            <TextView
+                android:id="@+id/tvStatisticDownDelay"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_delay" />
+
+        </TableRow>
+
+    </TableLayout>
+
+    <ImageView
+        android:id="@+id/ivStatisticClose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:src="@mipmap/close"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/tlStatistic"
+        app:layout_constraintTop_toTopOf="@id/tlStatistic"
+        tools:visibility="visible" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

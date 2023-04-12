@@ -1,38 +1,39 @@
 package com.agora.entfulldemo.home;
 
-import static io.agora.scene.base.component.BaseViewBindingActivity.PERM_REQID_RDSTORAGE;
-
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.agora.entfulldemo.BuildConfig;
 import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppFragmentHomeMineBinding;
+import com.agora.entfulldemo.home.mine.AboutUsActivity;
 
 import java.io.File;
 
 import io.agora.scene.base.Constant;
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.api.model.User;
+import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.base.manager.PagePilotManager;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.FileUtils;
 import io.agora.scene.base.utils.SPUtil;
+import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.UriUtils;
 import io.agora.scene.widget.dialog.CommonDialog;
 import io.agora.scene.widget.dialog.EditNameDialog;
@@ -47,6 +48,11 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
     private SelectPhotoFromDialog selectPhotoFromDialog;
     private EditNameDialog editNameDialog;
 
+    private CommonDialog debugModeDialog;
+    private int counts = 0;
+    private final long debugModeOpenTime = 2000;
+    private long beginTime = 0;
+
     @NonNull
     @Override
     protected AppFragmentHomeMineBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
@@ -60,8 +66,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         mainViewModel.setLifecycleOwner(this);
 
-        // String sdkVersionString = RTCManager.getInstance().getAgoraRTCSdkVersion();
-        // getBinding().tvVersion.setText(getString(R.string.version_is, versionString, sdkVersionString));
+        getBinding().tvVersion.setText(getString(R.string.app_mine_current_version, BuildConfig.VERSION_NAME));
     }
 
     @SuppressLint("SetTextI18n")
@@ -95,7 +100,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             showLogoffAccountDialog();
         });
         getBinding().tvAbout.setOnClickListener(view -> {
-            PagePilotManager.pageWebView("https://www.agora.io/cn/about-us/");
+            startActivity(new Intent(getContext(), AboutUsActivity.class));
         });
         getBinding().vToEdit.setOnClickListener(view -> {
             if (editNameDialog == null) {
@@ -109,11 +114,30 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             editNameDialog.show();
         });
         getBinding().ivUserAvatar.setOnClickListener(view -> {
-//            showSelectPhotoFromDialog();
-            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERM_REQID_RDSTORAGE);
-//            ((MainActivity) requireActivity()).requestReadStoragePermission();
+            ((MainActivity) requireActivity()).requestReadStoragePermission(true);
         });
+        getBinding().tvVersion.setOnClickListener(v -> {
+            if (counts == 0) {
+                beginTime = System.currentTimeMillis();
+            }
+            counts ++;
+            if (counts == 5) {
+                if (System.currentTimeMillis() - beginTime > debugModeOpenTime) {
+                    counts = 0;
+                    return;
+                }
+                counts = 0;
+                getBinding().tvDebugMode.setVisibility(View.VISIBLE);
+                AgoraApplication.the().enableDebugMode(true);
+                ToastUtils.showToast("Debug模式已打开");
+            }
+        });
+        getBinding().tvDebugMode.setOnClickListener(v -> showDebugModeCloseDialog());
+        if (AgoraApplication.the().isDebugModeOpen()) {
+            getBinding().tvDebugMode.setVisibility(View.VISIBLE);
+        }
     }
+
 
     private static final int CHOOSE_PHOTO = 100;
     private static final int TAKE_PHOTO = 101;
@@ -241,5 +265,27 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             });
         }
         logoutDialog.show();
+    }
+
+    private void showDebugModeCloseDialog() {
+        if (debugModeDialog == null) {
+            debugModeDialog = new CommonDialog(requireContext());
+            debugModeDialog.setDialogTitle("确定退出Debug模式么？");
+            debugModeDialog.setDescText("退出debug模式后， 设置页面将恢复成正常的设置页面哦～");
+            debugModeDialog.setDialogBtnText(getString(R.string.cancel), getString(R.string.app_exit));
+            debugModeDialog.setOnButtonClickListener(new OnButtonClickListener() {
+                @Override
+                public void onLeftButtonClick() { }
+
+                @Override
+                public void onRightButtonClick() {
+                    counts = 0;
+                    getBinding().tvDebugMode.setVisibility(View.GONE);
+                    AgoraApplication.the().enableDebugMode(false);
+                    ToastUtils.showToast("Debug模式已关闭");
+                }
+            });
+        }
+        debugModeDialog.show();
     }
 }
