@@ -44,10 +44,18 @@
   
   美颜资源请联系商汤科技商务获取。
   
+  1.
   > - 新建一个文件夹命名为SenseLib放在Podfile的同级目录下，并将商汤SDK里的资源文件复制到SenseLib 目录下。如图：
   > 
-  >  ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/SenseLibPath.png)
+  >  ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/SenseLibSource.png)
   >  
+  >  <mark> 注意：以上只包含基础美颜功能。</mark>  
+  >  如果需要贴纸或者风格效果，需要联系商汤获取，同样将资源放到SenseLib路径下即可。如图：
+  > 
+  >  ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/SenceLibStickerStyle.png)
+  >  
+  2.
+  >
   > - 将申请到的商汤的license文件命名为“SENSEME.lic”并拖入工程 如图：
   > 
   >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/SensemeLicFile.png)
