@@ -10,9 +10,10 @@ import Foundation
 /// 遵守PresentationViewType协议的UIViewController
 public typealias PresentationViewController = UIViewController & PresentedViewType
 
-public extension UIViewController {
+public extension VRBaseViewController {
     /// 自定义present方法
     func presentViewController(_ viewController: PresentationViewController, animated: Bool = true) {
+        dismiss(animated: false)
         viewController.modalPresentationStyle = .custom
         viewController.transitioningDelegate = self
         present(viewController, animated: animated, completion: nil)
@@ -20,8 +21,8 @@ public extension UIViewController {
 }
 
 // MARK: -  UIViewControllerTransitioningDelegate
-
-extension UIViewController: UIViewControllerTransitioningDelegate {
+//
+extension VRBaseViewController: UIViewControllerTransitioningDelegate {
     public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
         return PresentationController(presentedViewController: presented, presenting: presenting)
     }

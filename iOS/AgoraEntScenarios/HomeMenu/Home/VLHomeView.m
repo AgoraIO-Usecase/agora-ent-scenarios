@@ -8,7 +8,7 @@
 #import "VLHomeItemModel.h"
 #import "VLMacroDefine.h"
 #import "MenuUtils.h"
-@import QMUIKit;
+#import "KTVMacro.h"
 @import YYCategories;
 
 @interface VLHomeView ()<UICollectionViewDelegate,UICollectionViewDataSource>
@@ -84,15 +84,27 @@
             @{
                 @"bgImgStr":@"home_talk_bg",
                 @"iconImgStr":@"home_talk_icon",
-                @"titleStr":AGLocalizedString(@"语聊房"),
-                @"subTitleStr":AGLocalizedString(@"")
+                @"titleStr":AGLocalizedString(@"ChatRoom"),
+                @"subTitleStr":@""
             },
             @{
                 @"bgImgStr":@"home_KTV_bg",
                 @"iconImgStr":@"home_KTV_icon",
                 @"titleStr":AGLocalizedString(@"在线K歌房"),
                 @"subTitleStr":@""
-            }
+            },
+            @{
+                @"bgImgStr":@"home_KTV_bg",
+                @"iconImgStr":@"home_KTV_icon",
+                @"titleStr":@"秀场直播",
+                @"subTitleStr":@""
+            },
+            @{
+                @"bgImgStr":@"spatial_bg",
+                @"iconImgStr":@"home_talk_icon",
+                @"titleStr":AGLocalizedString(@"语聊房"),
+                @"subTitleStr":AGLocalizedString(@"-空间音频模式")
+            },
         ];
     }
     return _itemsArray;

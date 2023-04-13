@@ -7,14 +7,12 @@
 #import "VLRoomListModel.h"
 #import "VLHotSpotBtn.h"
 #import "KTVMacro.h"
-@import QMUIKit;
-@import YYCategories;
 
 @interface VLKTVTopView ()
 
 @property(nonatomic, weak) id <VLKTVTopViewDelegate>delegate;
 @property (nonatomic, strong) UILabel *titleLabel;
-@property (nonatomic, strong) QMUIButton *networkStatusBtn;
+@property (nonatomic, strong) UIButton *networkStatusBtn;
 @property (nonatomic, strong) UILabel *countLabel;
 
 @end
@@ -44,10 +42,13 @@
     self.titleLabel.textColor = UIColorWhite;
     [self addSubview:self.titleLabel];
     
-    self.networkStatusBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"]
-                                                             title:KTVLocalizedString(@"本机网络好")];
+//    self.networkStatusBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"]
+//                                                             title:KTVLocalizedString(@"本机网络好")];
+    self.networkStatusBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.networkStatusBtn setTitle:KTVLocalizedString(@"本机网络好") forState:UIControlStateNormal];
+    [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
     self.networkStatusBtn.frame = CGRectMake(closeBtn.left-15-75, closeBtn.top, 75, 20);
-    self.networkStatusBtn.imagePosition = QMUIButtonImagePositionLeft;
+//    self.networkStatusBtn.imagePosition = QMUIButtonImagePositionLeft;
     self.networkStatusBtn.spacingBetweenImageAndTitle = 4;
     self.networkStatusBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
     [self.networkStatusBtn setTitleColor:UIColorMakeWithHex(@"#979CBB") forState:UIControlStateNormal];

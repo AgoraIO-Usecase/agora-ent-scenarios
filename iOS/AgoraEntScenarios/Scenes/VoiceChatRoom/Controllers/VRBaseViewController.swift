@@ -27,7 +27,11 @@ import SVProgressHUD
     }
 
     override public var preferredStatusBarStyle: UIStatusBarStyle {
-        .darkContent
+        if #available(iOS 13.0, *) {
+            return .darkContent
+        } else {
+            return .default
+        }
     }
 
     public func setupNavigationAttributes() {

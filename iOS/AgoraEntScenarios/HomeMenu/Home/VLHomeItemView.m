@@ -6,8 +6,7 @@
 #import "VLHomeItemView.h"
 #import "VLHomeItemModel.h"
 #import "VLMacroDefine.h"
-@import YYCategories;
-@import QMUIKit;
+#import "KTVMacro.h"
 
 @interface VLHomeItemView ()
 
@@ -58,18 +57,18 @@
 
 - (UIView *)subTitleBgView {
     if (!_subTitleBgView) {
-        _subTitleBgView = [[UIImageView alloc]initWithFrame:CGRectMake(_titleLabel.left, _titleLabel.bottom+3, 56, 20)];
+        _subTitleBgView = [[UIImageView alloc]initWithFrame:CGRectMake(_titleLabel.left, _titleLabel.bottom+3, 150, 20)];
         _subTitleBgView.layer.cornerRadius = 10;
         _subTitleBgView.layer.masksToBounds = YES;
-        _subTitleBgView.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.3);
+//        _subTitleBgView.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.3);
     }
     return _subTitleBgView;
 }
 
 - (UILabel *)subTitleLabel {
     if (!_subTitleLabel) {
-        _subTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 56, 20)];
-        _subTitleLabel.textAlignment = NSTextAlignmentCenter;
+        _subTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 150, 20)];
+        _subTitleLabel.textAlignment = NSTextAlignmentLeft;
         _subTitleLabel.font = [UIFont fontWithName:@"PingFangSC" size:10];
         _subTitleLabel.font = [UIFont systemFontOfSize:10 weight:UIFontWeightMedium];
         _subTitleLabel.textColor = UIColorMakeWithHex(@"#FFFFFF");

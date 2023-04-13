@@ -43,14 +43,12 @@
 声网在线K歌房源码，最终目的是方便开发者快速按需集成，减少开发者搭建K歌房的工作量。在现有源码的基础上，您可以按需自由定制，包括UI/UE，前端逻辑，权限体系等
 
 # 3.快速开始
-
-- 将项目的iOS/AgoraEntScenarios/KeyCenter.swift.bak重命名为KeyCenter.swift
 - 在KeyCenter.swift文件中填写需要的 appId 和 appCertificate (**需要联系销售给 appId 开通 K 歌权限**)
 ```
 AppId：声网appid
 Certificate：声网Certificate
 ```
-- 在集成的同时，需要去声网与环信的官网注册好对应的账号，同时开通对应的权限从而快速开始你的体验
+- 在集成的同时，需要去声网的官网注册好对应的账号，同时开通对应的权限从而快速开始你的体验
 - 然后pod install成功之后，打开项目即可开始您的体验
 
 配置好这些参数之后。就可以快速开始体验了
@@ -58,9 +56,8 @@ Certificate：声网Certificate
 
 # 4.FAQ
 
-## 4.1 如何获取声网和环信APPID：
+## 4.1 如何获取声网APPID：
 - 声网APPID申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
-- 环信APPID申请：[https://www.easemob.com/](https://www.easemob.com/)
 ## 4.2 程序运行后，歌曲列表为空：
 - 需要联系销售给 appId 开通 K 歌权限
 ## 4.3 K歌房中的歌曲资源使用的是哪家？是否可以自己选择供应商？

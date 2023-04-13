@@ -6,22 +6,18 @@
 #import "VLKTVMVView.h"
 #import "VLKTVSelBgModel.h"
 
-#import "VLRobMicrophoneView.h"
-#import "VLSoloSongView.h"
-#import "VLNoBodyOnLineView.h"
+#import "VLJoinChorusView.h"
+#import "VLStartSoloView.h"
+#import "VLKTVMVIdleView.h"
 #import "HWWeakTimer.h"
 #import "VLHotSpotBtn.h"
 #import "VLUserCenter.h"
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
 #import "KTVMacro.h"
-
-@import QMUIKit;
-@import YYCategories;
 @import Masonry;
 
-@class QMUIButton;
-@interface VLKTVMVView () <VLNoBodyOnLineViewDelegate,VLRobMicrophoneViewDelegate,VLSoloSongViewDelegate,AgoraKaraokeScoreDelegate>
+@interface VLKTVMVView () <VLKTVMVIdleViewDelegate,VLJoinChorusViewDelegate,VLStartSoloViewDelegate,AgoraKaraokeScoreDelegate>
 
 @property(nonatomic, weak) id <VLKTVMVViewDelegate>delegate;
 
@@ -32,14 +28,12 @@
 
 @property (nonatomic, strong) VLHotSpotBtn *pauseBtn; /// 暂停播放
 @property (nonatomic, strong) VLHotSpotBtn *nextButton; /// 下一首
-@property (nonatomic, strong) QMUIButton *originBtn;  /// 原唱按钮
-@property (nonatomic, strong) VLHotSpotBtn *subtitleBtn; /// 设置参数按钮
-@property (nonatomic, strong) VLRobMicrophoneView *robMicrophoneView; // 合唱倒计时视图
-@property (nonatomic, strong) VLSoloSongView *soloSongView; // 独唱倒计时视图
-@property (nonatomic, strong) VLNoBodyOnLineView *noBodyOnLineView;//没有人演唱视图
 
-@property (nonatomic, strong) NSTimer *soloTimer;    //独唱倒计时
-@property (nonatomic, strong) NSTimer *robMicroPhoneTimer; //抢麦倒计时
+@property (nonatomic, strong) UIButton *originBtn;  /// 原唱按钮
+@property (nonatomic, strong) VLHotSpotBtn *settingBtn; /// 设置参数按钮
+@property (nonatomic, strong) VLJoinChorusView *joinChorusView; // 合唱倒计时视图
+@property (nonatomic, strong) VLStartSoloView *startSoloView; // 独唱倒计时视图
+@property (nonatomic, strong) VLKTVMVIdleView *idleView;//没有人演唱视图
 
 @property (nonatomic, strong) AgoraLrcScoreConfigModel *config;
 @property (nonatomic, assign) int totalLines;
@@ -64,6 +58,19 @@
 - (void)setIsPlayAccompany:(BOOL)isPlayAccompany {
     [self.originBtn setSelected:!isPlayAccompany];
     [self _refreshOriginButton];
+    
+    VLKTVMVViewActionType targetOrigin = isPlayAccompany ? VLKTVMVViewActionTypeSingAcc : VLKTVMVViewActionTypeSingOrigin;
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
+        [self.delegate onKTVMVView:self btnTappedWithActionType:targetOrigin];
+    }
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    [self.originBtn sizeToFit];
+    self.originBtn.frame = CGRectMake(self.width-20-self.originBtn.width, _pauseBtn.top, self.originBtn.width, 24);
+    self.settingBtn.frame = CGRectMake(_originBtn.left-20-24, _pauseBtn.top, 24, 24);
 }
 
 #pragma mark private
@@ -110,34 +117,34 @@
     self.originBtn.frame = CGRectMake(self.width-20-48, _pauseBtn.top, 48, 24);
     [self addSubview:self.originBtn];
     
-    self.subtitleBtn.frame = CGRectMake(_originBtn.left-20-24, _pauseBtn.top, 24, 24);
-    [self addSubview:self.subtitleBtn];
+    self.settingBtn.frame = CGRectMake(_originBtn.left-20-24, _pauseBtn.top, 24, 24);
+    [self addSubview:self.settingBtn];
         
-    self.robMicrophoneView = [[VLRobMicrophoneView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height) withDelegate:self];
-    self.robMicrophoneView.hidden = NO;
-    [self addSubview:self.robMicrophoneView];
+    self.joinChorusView = [[VLJoinChorusView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height) withDelegate:self];
+    self.joinChorusView.hidden = NO;
+    [self addSubview:self.joinChorusView];
     
-    self.soloSongView = [[VLSoloSongView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height) withDelegate:self];
-    self.soloSongView.hidden = YES;
-    [self addSubview:self.soloSongView];
+    self.startSoloView = [[VLStartSoloView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height) withDelegate:self];
+    self.startSoloView.hidden = YES;
+    [self addSubview:self.startSoloView];
     
-    self.noBodyOnLineView = [[VLNoBodyOnLineView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height) withDelegate:self];
-    self.noBodyOnLineView.hidden = NO;
-    [self addSubview:self.noBodyOnLineView];
+    self.idleView = [[VLKTVMVIdleView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height) withDelegate:self];
+    self.idleView.hidden = NO;
+    [self addSubview:self.idleView];
     
     self.lrcView.config = self.config;
-    [self setPlayerViewsHidden:YES nextButtonHidden:YES];
+    [self setPlayerViewsHidden:YES nextButtonHidden:YES playButtonHidden:YES];
 }
 
 - (void)_refreshOriginButton {
     if (self.originBtn.selected) {
         [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
         [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
-    }
-    else {
+    } else {
         [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateNormal];
         [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
     }
+    [self setNeedsLayout];
 }
 
 #pragma mark - public
@@ -154,9 +161,9 @@
     }
 }
 
-- (void)setVoicePitch:(NSArray <NSNumber *> *)pitch {
-    [self.lrcView setVoicePitch:pitch];    
-}
+//- (void)setVoicePitch:(NSArray <NSNumber *> *)pitch {
+//    [self.lrcView setVoicePitch:pitch];
+//}
 
 #pragma mark - Action
 
@@ -173,7 +180,7 @@
 
 - (void)buttonClick:(UIButton *)sender {
     // 设置参数
-    if (sender == self.subtitleBtn) {
+    if (sender == self.settingBtn) {
         if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
             [self.delegate onKTVMVView:self btnTappedWithActionType:VLKTVMVViewActionTypeSetParam];
         }
@@ -188,28 +195,30 @@
     self.bgImgView.image = [UIImage sceneImageWithName:selBgModel.imageName];
 }
 
-- (void)configLrcViewUIWithCurrentSong:(VLRoomSelSongModel *)song {
-    // 是自己点的歌曲
+- (void)configPlayerControls:(VLRoomSelSongModel *)song {
+    // 是主唱/伴唱
     if (song.isSongOwner) {
-        [self setPlayerViewsHidden:NO nextButtonHidden:NO];
-    }
-    else if(VLUserCenter.user.ifMaster) {
-        [self setPlayerViewsHidden:YES nextButtonHidden:NO];
-    }
-    else {
-        [self setPlayerViewsHidden:YES nextButtonHidden:YES];
+        [self setPlayerViewsHidden:NO nextButtonHidden:NO playButtonHidden:NO];
+    } else if ([song isSongCoSinger]) {
+        [self setPlayerViewsHidden:NO nextButtonHidden:YES playButtonHidden:YES];
+    } else if(VLUserCenter.user.ifMaster) {
+        [self setPlayerViewsHidden:YES nextButtonHidden:NO playButtonHidden:YES];
+    } else {
+        [self setPlayerViewsHidden:YES nextButtonHidden:YES playButtonHidden:YES];
     }
 }
 
-- (void)setPlayerViewsHidden:(BOOL)hidden nextButtonHidden:(BOOL)nextButtonHidden{
-    self.pauseBtn.hidden = hidden;
+- (void)setPlayerViewsHidden:(BOOL)hidden
+            nextButtonHidden:(BOOL)nextButtonHidden
+            playButtonHidden:(BOOL)playButtonHidden {
+    self.pauseBtn.hidden = playButtonHidden;
     self.nextButton.hidden = nextButtonHidden;
     self.originBtn.hidden = hidden;
-    self.subtitleBtn.hidden = hidden;
+    self.settingBtn.hidden = hidden;
 }
 
 - (BOOL)isPlaying:(VLRoomSelSongModel *)song {
-    if (song.status == 2) {
+    if (song.status == VLSongPlayStatusPlaying) {
         return YES;
     }
     return NO;
@@ -223,180 +232,138 @@
     self.scoreLabel.text = [NSString stringWithFormat:@"%d",score];
 }
 
-- (void)updateUIWithUserOnSeat:(BOOL)onSeat song:(VLRoomSelSongModel *)song {
-    if (onSeat) {
-        if (!song) {
-            self.noBodyOnLineView.hidden = NO;
-        } else {
-            self.noBodyOnLineView.hidden = YES;
-        }
-    } else {
-        self.config.isHiddenScoreView = YES;
-        self.scoreLabel.hidden = YES;
-        self.scoreUnitLabel.hidden = YES;
-        
-        if(!song) {
-            self.noBodyOnLineView.hidden = NO;
-        } else {
-            self.noBodyOnLineView.hidden = YES;
-        }
-        self.robMicrophoneView.hidden = YES;
-        self.soloSongView.hidden = YES;
-    }
-    
-    // 是否是合唱歌曲
-    if (song.isChorus) {
-        self.config.isHiddenScoreView = NO;
-        self.scoreLabel.hidden = NO;
-        self.scoreUnitLabel.hidden = NO;
-    } else {
-        self.config.isHiddenScoreView = NO;
-        self.scoreLabel.hidden = NO;
-        self.scoreUnitLabel.hidden = NO;
-    }
 
-    self.lrcView.config = self.config;
-}
-
-- (void)receiveCountDown:(int)countDown onSeat:(BOOL)onSeat currentSong:(VLRoomSelSongModel *)currentSong {
-    [self updateUIWithUserOnSeat:onSeat song:currentSong];
-    if(onSeat) {
-        if (countDown > 0) {
-            self.robMicrophoneView.hidden = NO;
-            if (currentSong) {
-                NSString *songText = [NSString stringWithFormat:@"%@-%@",currentSong.songName,currentSong.singer];
-                self.robMicrophoneView.musicLabel.text = songText;
-            }
-            self.robMicrophoneView.countDownLabel.text = [NSString stringWithFormat:@"00:%02d",countDown];
-        } else {
-            self.robMicrophoneView.hidden = YES;
-            [self soloBtnClickAction];
-        }
-    }
-}
+//- (void)receiveCountDown:(int)countDown onSeat:(BOOL)onSeat currentSong:(VLRoomSelSongModel *)currentSong {
+////    [self updateUIWithUserOnSeat:onSeat song:currentSong];
+//    if(onSeat) {
+//        if (countDown > 0) {
+//            self.joinChorusView.hidden = NO;
+//            if (currentSong) {
+//                NSString *songText = [NSString stringWithFormat:@"%@-%@",currentSong.songName,currentSong.singer];
+//                self.joinChorusView.musicLabel.text = songText;
+//            }
+//            self.joinChorusView.countDownLabel.text = [NSString stringWithFormat:@"00:%02d",countDown];
+//        } else {
+//            self.joinChorusView.hidden = YES;
+//            [self soloBtnClickAction];
+//        }
+//    }
+//}
 
 - (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song onSeat:(BOOL)onSeat {
-    [self updateUIWithUserOnSeat:onSeat song:song];
-    if (!song) return;
-//    self.scoreLabel.text = @"0";
-    NSString *songText = [NSString stringWithFormat:@"%@-%@",song.songName,song.singer];
-    self.musicTitleLabel.text = songText;
-    self.noBodyOnLineView.hidden = YES;
+    KTVLogInfo(@"VLKTVMVView updateUIWithSong: songName: %@, name: %@", song.songName, song.name);
+    self.idleView.hidden = song;
+    self.joinChorusView.hidden = !(song && song.isChorus && ![self isPlaying:song]);
     
-    [self configLrcViewUIWithCurrentSong:song];
+    //config score label visibility
+    self.config.isHiddenScoreView = NO;
+    [self.lrcView setConfig:self.config];
+    self.scoreLabel.hidden = NO;
     
-    if (!onSeat) return;
-    
-    //有正在演唱的歌曲
-    if ([self isPlaying:song]) {
-        self.robMicrophoneView.hidden = self.soloSongView.hidden = YES;
-    
-    //根据歌曲判断,如果歌曲是合唱那么显示倒计时视图,如果是独唱就开始播放歌曲 2. 播放歌曲的时候如果歌曲是当前用户点的歌曲(显示底部按钮,可以切歌,暂停,) 如果不是就不显示
-    } else {
-        VL(weakSelf);
-        [self configLrcViewUIWithCurrentSong:song];
-        // 歌曲是合唱
-        if (song.isChorus) {
-            // 歌曲是本人点的 (不等了、独唱)
-            if (song.isSongOwner) {
-                if (self.soloTimer) return;
-                self.soloSongView.hidden = NO;
-                self.robMicrophoneView.hidden = YES;
-                self.soloSongView.musicLabel.text = songText;
-                //开始倒计时(独唱倒计时)
-                __block int leftSecond = 20;
-                self.soloTimer = [HWWeakTimer scheduledTimerWithTimeInterval:1.0f block:^(id userInfo) {
-                    leftSecond -= 1;
-                    weakSelf.soloSongView.countDownLabel.text = [NSString stringWithFormat:@"00:%02d",leftSecond];
-                    if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(onKTVMVView:timerCountDown:)]) {
-                        [weakSelf.delegate onKTVMVView:self timerCountDown:leftSecond];
-                    }
-                    if (leftSecond == 0) {
-                        //倒计时结束、执行独唱（销毁定时器）
-                        [weakSelf soloBtnClickAction];
-                    }
-
-                } userInfo:@"Fire" repeats:YES];
-                [self.soloTimer fire];
-            }else{
-                if (self.robMicroPhoneTimer) return;
-                self.soloSongView.hidden = YES;
-                self.robMicrophoneView.hidden = NO;
-                self.robMicrophoneView.musicLabel.text = songText;
-                //开始倒计时(抢麦)
-                //开始倒计时(独唱倒计时)
-                __block int leftSecond = 20;
-                self.robMicroPhoneTimer = [HWWeakTimer scheduledTimerWithTimeInterval:1.0f block:^(id userInfo) {
-                    leftSecond -= 1;
-                    weakSelf.robMicrophoneView.countDownLabel.text = [NSString stringWithFormat:@"00:%02d",leftSecond];
-                    //执行合唱
-                    if (leftSecond == 0) {
-                        //倒计时结束、执行独唱（销毁定时器）
-                        [weakSelf soloBtnClickAction];
-                    }
-                } userInfo:@"Fire" repeats:YES];
-                [self.robMicroPhoneTimer fire];
-            }
-        } else{                       //准备播放歌曲
-            self.noBodyOnLineView.hidden = self.robMicrophoneView.hidden = self.soloSongView.hidden = YES;
-        }
+    if(song) {
+        NSString *songText = [NSString stringWithFormat:@"%@-%@",song.songName,song.singer];
+        self.musicTitleLabel.text = songText;
+        self.startSoloView.musicLabel.text = songText;
+        self.joinChorusView.musicLabelText = songText;
+        [self configPlayerControls:song];
     }
-}
-
-- (void)setJoinInViewHidden { //独唱
-    self.soloSongView.hidden = YES;
-    self.robMicrophoneView.hidden = YES;
-    [self.robMicroPhoneTimer invalidate];
-    self.robMicroPhoneTimer = nil;
-    [self.soloTimer invalidate];
-    self.soloTimer = nil;
-}
-
-#pragma mark - VLSoloSongViewDelegate
-
-- (void)soloBtnClickAction {
-    [self.soloTimer invalidate];
-    self.soloTimer = nil;
-    if ([self.delegate respondsToSelector:@selector(onKTVMVView:startSingType:)]) {
-        self.soloSongView.hidden = YES;
-        [self.delegate onKTVMVView:self startSingType:VLKTVMVViewSingActionTypeSolo];
-    }
-}
-
-#pragma mark - 合唱代理
-- (void)robViewChorusAction {
-    //抢麦
-    [self.robMicroPhoneTimer invalidate];
-    self.robMicroPhoneTimer = nil;
-    if ([self.delegate respondsToSelector:@selector(onKTVMVView:startSingType:)]) {
-        self.robMicrophoneView.hidden = YES;
-        [self.delegate onKTVMVView:self startSingType:VLKTVMVViewSingActionTypeJoinChorus];
-    }
-//    if([self.delegate respondsToSelector:@selector(ktvIsMyselfOnSeat)]) {
-//        if([self.delegate ktvIsMyselfOnSeat]) {
-//            [self.robMicroPhoneTimer invalidate];
-//            self.robMicroPhoneTimer = nil;
-//            if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClickSingType:)]) {
+    
+    self.joinChorusView.hidden = !(![self isPlaying:song] && song.isChorus && song.chorusNo.length == 0 && !song.isSongOwner);
+    self.startSoloView.hidden = !(![self isPlaying:song] && song.isChorus && song.chorusNo.length == 0 && song.isSongOwner);
+    
+//    if (!onSeat) return;
+//
+//    //有正在演唱的歌曲
+//    if ([self isPlaying:song]) {
+//        self.robMicrophoneView.hidden = self.soloSongView.hidden = YES;
+//
+//    //根据歌曲判断,如果歌曲是合唱那么显示倒计时视图,如果是独唱就开始播放歌曲 2. 播放歌曲的时候如果歌曲是当前用户点的歌曲(显示底部按钮,可以切歌,暂停,) 如果不是就不显示
+//    } else {
+//        VL(weakSelf);
+//        [self configLrcViewUIWithCurrentSong:song];
+//        // 歌曲是合唱
+//        if (song.isChorus) {
+//            // 歌曲是本人点的 (不等了、独唱)
+//            if (song.isSongOwner) {
+//                if (self.soloTimer) return;
+//                self.soloSongView.hidden = NO;
 //                self.robMicrophoneView.hidden = YES;
-//                [self.delegate ktvMVViewDidClickSingType:VLKTVMVViewSingActionTypeJoinChorus];
+//                self.soloSongView.musicLabel.text = songText;
+//                //开始倒计时(独唱倒计时)
+//                __block int leftSecond = 20;
+//                self.soloTimer = [HWWeakTimer scheduledTimerWithTimeInterval:1.0f block:^(id userInfo) {
+//                    leftSecond -= 1;
+//                    weakSelf.soloSongView.countDownLabel.text = [NSString stringWithFormat:@"00:%02d",leftSecond];
+//                    if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(onKTVMVView:timerCountDown:)]) {
+//                        [weakSelf.delegate onKTVMVView:self timerCountDown:leftSecond];
+//                    }
+//                    if (leftSecond == 0) {
+//                        //倒计时结束、执行独唱（销毁定时器）
+//                        [weakSelf soloBtnClickAction];
+//                    }
+//
+//                } userInfo:@"Fire" repeats:YES];
+//                [self.soloTimer fire];
+//            }else{
+//                if (self.robMicroPhoneTimer) return;
+//                self.soloSongView.hidden = YES;
+//                self.robMicrophoneView.hidden = NO;
+//                self.robMicrophoneView.musicLabel.text = songText;
+//                //开始倒计时(抢麦)
+//                //开始倒计时(独唱倒计时)
+//                __block int leftSecond = 20;
+//                self.robMicroPhoneTimer = [HWWeakTimer scheduledTimerWithTimeInterval:1.0f block:^(id userInfo) {
+//                    leftSecond -= 1;
+//                    weakSelf.robMicrophoneView.countDownLabel.text = [NSString stringWithFormat:@"00:%02d",leftSecond];
+//                    //执行合唱
+//                    if (leftSecond == 0) {
+//                        //倒计时结束、执行独唱（销毁定时器）
+//                        [weakSelf soloBtnClickAction];
+//                    }
+//                } userInfo:@"Fire" repeats:YES];
+//                [self.robMicroPhoneTimer fire];
 //            }
-//        }
-//        else {
-//            if([self.delegate respondsToSelector:@selector(ktvNotifyUserNotOnSeat)]) {
-//                [self.delegate ktvNotifyUserNotOnSeat];
-//            }
+//        } else{                       //准备播放歌曲
+//            self.noBodyOnLineView.hidden = self.robMicrophoneView.hidden = self.soloSongView.hidden = YES;
 //        }
 //    }
 }
 
+- (void)setChorusOptViewHidden { //独唱
+    self.startSoloView.hidden = YES;
+    self.joinChorusView.hidden = YES;
+}
+
+- (void)setCoundDown:(NSInteger)seconds
+{
+    self.joinChorusView.countDownLabel.text = [NSString stringWithFormat:@"00:%02ld",seconds];
+    self.startSoloView.countDownLabel.text = [NSString stringWithFormat:@"00:%02ld",seconds];
+}
+
+#pragma mark - VLSoloSongViewDelegate
+
+- (void)onStartSoloBtn {
+    [self.delegate onKTVMVView:self chorusSingAction:VLKTVMVViewSingActionTypeSolo];
+}
+
+#pragma mark - 合唱代理
+- (void)onJoinChorusBtn {
+    [self.delegate onKTVMVView:self chorusSingAction:VLKTVMVViewSingActionTypeJoinChorus];
+}
+
+- (void)setOriginBtnState:(VLKTVMVViewActionType)type
+{
+    _originBtn.selected = type == VLKTVMVViewActionTypeSingOrigin ? YES : NO;
+    [self _refreshOriginButton];
+}
 
 - (void)originClick:(UIButton *)button {
-    button.selected = !button.selected;
-    VLKTVMVViewActionType origin = button.selected ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc;
-    [self _refreshOriginButton];
+    BOOL targetState = !button.selected;
+    VLKTVMVViewActionType targetOrigin = targetState ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc;
+    [self setOriginBtnState:targetOrigin];
     
     if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
-        [self.delegate onKTVMVView:self btnTappedWithActionType:origin];
+        [self.delegate onKTVMVView:self btnTappedWithActionType:targetOrigin];
     }
 }
 
@@ -432,6 +399,17 @@
     }
 }
 
+//<<<<<<< HEAD
+//#pragma mark private method
+//- (void)_startLrc {
+//    [_lrcView start];
+//    self.totalLines = 0;
+//    self.totalScore = 0.0f;
+//    KTVLogInfo(@"VLKTVMVView _startLrc %@", self.musicTitleLabel.text);
+//}
+//
+//=======
+//>>>>>>> origin/main
 
 #pragma mark -
 
@@ -441,16 +419,22 @@
 
 - (void)start {
     [_lrcView start];
+    KTVLogInfo(@"VLKTVMVView start [%@]", self.musicTitleLabel.text);
+    NSAssert(self.musicTitleLabel.text.length > 0, @"dfd");
 }
 
 - (void)stop {
     [_lrcView stop];
+    KTVLogInfo(@"VLKTVMVView stop [%@]", self.musicTitleLabel.text);
 }
 
 - (void)reset {
+    KTVLogInfo(@"VLKTVMVView reset [%@]", self.musicTitleLabel.text);
+    [_lrcView stop];
     [_lrcView reset];
     [self setSongScore:0];
-    self.isPlayAccompany = NO;
+    self.isPlayAccompany = YES;
+    [_lrcView resetTime];
     [self cleanMusicText];
 }
 
@@ -492,6 +476,7 @@
         lrcConfig.lrcHighlightFontSize = VLUIFontMake(18);
         lrcConfig.lrcTopAndBottomMargin = 8;
         lrcConfig.isHiddenSeparator = YES;
+        lrcConfig.isDrag = YES;
         lrcConfig.tipsColor = [UIColor whiteColor];
 
         _config.lrcConfig = lrcConfig;
@@ -541,29 +526,31 @@
     return _nextButton;
 }
 
-- (QMUIButton *)originBtn {
+- (UIButton *)originBtn {
     if (!_originBtn) {
-        _originBtn = [[QMUIButton alloc] qmui_initWithImage:nil title:KTVLocalizedString(@"原唱")];
-        _originBtn.imagePosition = QMUIButtonImagePositionLeft;
+//        _originBtn = [[QMUIButton alloc] qmui_initWithImage:nil title:KTVLocalizedString(@"原唱")];
+//        _originBtn.imagePosition = QMUIButtonImagePositionLeft;
         _originBtn.spacingBetweenImageAndTitle = 2;
+        _originBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
         _originBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
         [_originBtn setTitleColor:UIColorMakeWithHex(@"#979CBB") forState:UIControlStateNormal];
         _originBtn.titleLabel.font = UIFontMake(10.0);
         [_originBtn setImage:[UIImage sceneImageWithName:@"ktv_origin_playOn"] forState:UIControlStateNormal];
         [_originBtn setImage:[UIImage sceneImageWithName:@"ktv_origin_playOn"] forState:UIControlStateSelected];
-        _originBtn.selected = YES;
+        _originBtn.selected = NO;
         [_originBtn addTarget:self action:@selector(originClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _originBtn;
 }
 
-- (VLHotSpotBtn *)subtitleBtn {
-    if (!_subtitleBtn) {
-        _subtitleBtn = [[VLHotSpotBtn alloc] init];
-        [_subtitleBtn setImage:[UIImage sceneImageWithName:@"ktv_subtitle_icon"] forState:UIControlStateNormal];
-        [_subtitleBtn addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
+- (VLHotSpotBtn *)settingBtn {
+    if (!_settingBtn) {
+        _settingBtn = [[VLHotSpotBtn alloc] init];
+        [_settingBtn setImage:[UIImage sceneImageWithName:@"ktv_subtitle_icon"] forState:UIControlStateNormal];
+        [_settingBtn addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
     }
-    return _subtitleBtn;
+    return _settingBtn;
 }
 
 - (UILabel *)scoreLabel {

@@ -35,3 +35,13 @@ public class VoiceRoomAlertViewController: UIViewController, PresentedViewType {
         }
     }
 }
+
+extension VoiceRoomAlertViewController {
+    @objc private func keyboardWillShow(notification: Notification) {
+        guard let keyboardFrame = notification.keyboardEndFrame else { return }
+        let duration = notification.keyboardAnimationDuration!
+        UIView.animate(withDuration: duration) {
+            self.customView?.frame = CGRect(x: 0, y: ScreenHeight-keyboardFrame.height - self.customView!.frame.height, width: self.customView!.frame.width, height: self.customView!.frame.height)
+        }
+    }
+}

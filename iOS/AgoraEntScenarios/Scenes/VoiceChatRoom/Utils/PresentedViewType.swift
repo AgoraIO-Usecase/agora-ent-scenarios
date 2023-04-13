@@ -33,8 +33,8 @@ public struct PresentedViewComponent {
     /// 键盘出现的平移方式，默认贴近PresentedView
     public var keyboardTranslationType: KeyboardTranslationType = .unabgeschirmt(compress: true)
 
-    /// 键盘间隔，默认20
-    public var keyboardPadding: CGFloat = 20
+    /// 键盘间隔，默认0
+    public var keyboardPadding: CGFloat = 0
 
     /// 初始化方法
     ///

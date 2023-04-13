@@ -11,7 +11,6 @@ extension RethinkSyncManager: ISyncManager {
     func subscribeConnectState(state: @escaping (SocketConnectState) -> Void) {
         connectStateBlock = state
     }
-    
     func createScene(scene: Scene, success: SuccessBlockVoid?, fail: FailBlock?) {
         /** add room in list **/
         let attr = Attribute(key: scene.id, value: scene.toJson())
@@ -76,9 +75,9 @@ extension RethinkSyncManager: ISyncManager {
         query(channelName: channelName)
     }
 
-    func deleteScenes(sceneIds: [String], success: SuccessBlockVoid?, fail: FailBlock?) {
+    func deleteScenes(sceneIds: [String], success: SuccessBlockObjOptional?, fail: FailBlock?) {
         let params = sceneIds.map({ ["objectId": $0] })
-        onSuccessBlockVoid[channelName] = success
+        onDeleteBlockObjOptional[channelName] = success
         onFailBlock[channelName] = fail
         delete(channelName: channelName, data: params)
     }
@@ -105,10 +104,10 @@ extension RethinkSyncManager: ISyncManager {
         write(channelName: reference.className, data: data, objectId: id)
     }
 
-    func delete(reference: CollectionReference, id: String, success: SuccessBlockVoid?, fail: FailBlock?) {
+    func delete(reference: CollectionReference, id: String, success: SuccessBlockObjOptional?, fail: FailBlock?) {
         let className = reference.className == sceneName ? channelName : reference.className
         print("channelName == \(channelName)")
-        onSuccessBlockVoid[className] = success
+        onDeleteBlockObjOptional[className] = success
         onFailBlock[className] = fail
         delete(channelName: className, data: ["objectId": id])
     }

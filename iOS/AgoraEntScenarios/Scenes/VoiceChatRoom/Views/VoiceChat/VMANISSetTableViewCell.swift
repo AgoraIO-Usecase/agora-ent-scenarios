@@ -65,7 +65,7 @@ class VMANISSetTableViewCell: UITableViewCell {
         addSubview(offBtn)
 
         midBtn.backgroundColor = .white
-        midBtn.setTitle(" \("Middle".localized()) ".localized(), for: .normal)
+        midBtn.setTitle(" \("Medium".localized()) ".localized(), for: .normal)
         midBtn.setTitleColor(UIColor.HexColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
         midBtn.font(UIFont.systemFont(ofSize: 11))
         midBtn.backgroundColor = .white

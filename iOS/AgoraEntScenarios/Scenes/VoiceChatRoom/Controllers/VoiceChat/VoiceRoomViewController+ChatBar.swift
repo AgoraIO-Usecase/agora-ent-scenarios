@@ -11,13 +11,32 @@ import KakaJSON
 import ZSwiftBaseLib
 
 extension VoiceRoomViewController {
+    
     func showEQView() {
-        preView = VMPresentView(frame: CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 280~))
-        preView.isAudience = !isOwner
-        preView.roomInfo = roomInfo
-        preView.ains_state = ains_state
-        preView.isTouchAble = roomInfo?.room?.use_robot ?? false
-        preView.selBlock = { [weak self] state in
+        //更新为不等高弹窗视图 全都是控制器 方便业务更新
+        let audioSetVC: VoiceRoomAudioSettingViewController = VoiceRoomAudioSettingViewController()
+        audioSetVC.roomInfo = roomInfo
+        audioSetVC.isAudience = !isOwner
+        audioSetVC.ains_state = ains_state
+        audioSetVC.isTouchAble = roomInfo?.room?.use_robot ?? false
+        audioSetVC.useRobotBlock = { [weak self] flag in
+            if flag == true {
+                self?.roomInfo?.room?.use_robot = true
+                self?.rtckit.playMusic(with: .alien)
+            }
+            if flag == false {
+                self?.roomInfo?.room?.use_robot = false
+                self?.rtckit.stopPlayMusic()
+            }
+            self?.activeAlien(flag)
+            self?.roomInfo?.room?.use_robot = flag
+        }
+
+        audioSetVC.volBlock = { [weak self] vol in
+            self?.updateVolume(vol)
+        }
+        
+        audioSetVC.selBlock = { [weak self] state in
             self?.ains_state = state
             self?.rtckit.setAINS(with: state)
             if self?.isOwner == false || self?.roomInfo?.room?.use_robot == false { return }
@@ -29,26 +48,15 @@ extension VoiceRoomViewController {
                 self?.rtckit.playMusic(with: .ainsOff)
             }
         }
-        preView.useRobotBlock = { [weak self] flag in
-            if self?.alienCanPlay == true && flag == true {
-                self?.roomInfo?.room?.use_robot = true
-                self?.rtckit.playMusic(with: .alien)
-            }
-//            if self?.alienCanPlay == true && flag == false {
-//                self?.rtckit.stopPlayMusic()
-//            }
-//
-            if flag == false {
-                self?.roomInfo?.room?.use_robot = false
-                self?.rtckit.stopPlayMusic()
-            }
-            self?.preView.isTouchAble = flag
-            self?.activeAlien(flag)
+        
+        audioSetVC.turnAIAECBlock = {[weak self] flag in
+            self?.rtckit.setAIAECOn(isOn: flag);
         }
-        preView.volBlock = { [weak self] vol in
-            self?.updateVolume(vol)
+        audioSetVC.turnAGCBlock = {[weak self] flag in
+            self?.rtckit.setAGCOn(isOn: flag);
         }
-        preView.eqView.effectClickBlock = { [weak self] type in
+        
+        audioSetVC.effectClickBlock = { [weak self] type in
 
             /**
              1.如果是观众，则toast 提示
@@ -58,10 +66,10 @@ extension VoiceRoomViewController {
                 self?.view.makeToast("Host Sound".localized())
                 return
             }
-            if self?.roomInfo?.room?.use_robot == false {
-                self?.view.makeToast("Active First".localized())
-                return
-            }
+//            if self?.roomInfo?.room?.use_robot == false {
+//                self?.view.makeToast("Active First".localized())
+//                return
+//            }
 
             if type == .none {
                 // 如果选择的是其他音效。弹窗确认是否需要退出
@@ -70,46 +78,73 @@ extension VoiceRoomViewController {
             }
             self?.rtckit.playMusic(with: self?.getSceneType(self?.roomInfo?.room?.sound_effect ?? 1) ?? .social)
         }
-        preView.eqView.soundBlock = { [weak self] index in
+        audioSetVC.soundBlock = { [weak self] index in
             if self?.isOwner == false {
                 self?.view.makeToast("Host Bot".localized())
                 return
             }
             if let use_robot = self?.roomInfo?.room?.use_robot {
                 if use_robot == false {
-                    self?.view.makeToast("Active First".localized())
+                    let applyAlert = VoiceRoomApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: (205 / 375.0) * ScreenWidth), content:"Add Bot", cancel: "Cancel", confirm: "Confirm", position: .bottom).backgroundColor(.white).cornerRadius(20, [.topLeft, .topRight], .clear, 0)
+                    let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: (205 / 375.0) * ScreenWidth)), custom: applyAlert)
+                    applyAlert.actionEvents = { [weak self] in
+                        if $0 == 31 {
+                            ChatRoomServiceImp.getSharedInstance().enableRobot(enable: true) { error in
+                                if error == nil {
+                                    let count = (index - 1000) / 10
+                                    let tag = (index - 1000) % 10
+                                    self?.rtckit.stopPlaySound()
+                                    let mic_info = self?.roomInfo?.mic_info![6]
+                                    mic_info?.status = 5
+                                    self?.roomInfo?.room?.use_robot = true
+                                    self?.roomInfo?.mic_info![6] = mic_info!
+                                    self?.rtcView.updateAlien(mic_info?.status ?? 5)
+                                    self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
+                                    self?.rtcView.updateAlienMic(.blue)
+                                } else {
+                                    self?.view.makeToast("激活机器人失败")
+                                }
+                            }
+                                                    }
+                        vc.dismiss(animated: true)
+                    }
+                    self?.presentViewController(vc,animated: true)
                     return
                 }
             }
-            let count = (index - 1000) / 10
-            let tag = (index - 1000) % 10
-            self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
-            self?.rtcView.updateAlienMic(.blue)
+//            let count = (index - 1000) / 10
+//            let tag = (index - 1000) % 10
+//            self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
+//            self?.rtcView.updateAlienMic(.blue)
         }
-        preView.eqView.visitBlock = { [weak self] in
+        audioSetVC.visitBlock = { [weak self] in
             let VC: VoiceRoomHelpViewController = .init()
             self?.navigationController?.pushViewController(VC, animated: true)
         }
-        view.addSubview(preView)
-        isShowPreSentView = true
-        sRtcView.isUserInteractionEnabled = false
-        rtcView.isUserInteractionEnabled = false
-        headerView.isUserInteractionEnabled = false
-
-        UIView.animate(withDuration: 0.5, animations: {
-            self.preView.frame = CGRect(x: 0, y: ScreenHeight - 360~, width: ScreenWidth, height: 360~)
-        }, completion: nil)
+        
+        let presentView: VoiceRoomPresentView = VoiceRoomPresentView.shared
+        presentView.showView(with: CGRect(x: 0, y: 0, width: ScreenWidth, height: 500), vc: audioSetVC, maxHeight: 500)
+        view.addSubview(presentView)
+        
     }
-
-    func applyMembersAlert(position: VoiceRoomSwitchBarDirection) {
+                           
+    func applyMembersAlert(position: VoiceRoomSwitchBarDirection,index: Int?) {
         let apply = VoiceRoomApplyUsersViewController(roomId: roomInfo?.room?.room_id ?? "")
         apply.agreeApply = {
             self.rtcView.updateUser($0)
+            self.micMuteManager(mic: $0)
         }
-        let invite = VoiceRoomInviteUsersController(roomId: roomInfo?.room?.room_id ?? "", mic_index:nil)
+        let invite = VoiceRoomInviteUsersController(roomId: roomInfo?.room?.room_id ?? "", mic_index:index)
         let userAlert = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [apply, invite], titles: [LanguageManager.localValue(key: "Raised Hands"), LanguageManager.localValue(key: "Invite On-Stage")], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
         let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 420)), custom: userAlert)
-        presentViewController(vc)
+        presentViewController(vc, animated: true)
+    }
+    
+    func micMuteManager(mic: VRRoomMic) {
+        let mute = (mic.status > 0 || mic.member?.micStatus == 0) && mic.member?.uid == VLUserCenter.user.id
+        self.rtckit.setClientRole(role: mute ? .audience : .owner)
+        self.rtckit.muteLocalAudioStream(mute: mute)
+        self.chatBar.refresh(event: .mic, state: mute ? .selected : .unSelected, asCreator: false)
     }
 
     func showGiftAlert() {
@@ -120,9 +155,10 @@ extension VoiceRoomViewController {
             if $0.gift_id == "VoiceRoomGift9" {
                 vc.dismiss(animated: true)
                 self?.rocketAnimation()
+                self?.notifyHorizontalTextCarousel(gift: $0)
             }
         }
-        presentViewController(vc)
+        presentViewController(vc, animated: true)
     }
 
     func sendGift(gift: VoiceRoomGiftEntity) {
@@ -200,7 +236,7 @@ extension VoiceRoomViewController {
 
     func changeHandsUpState() {
         if isOwner {
-            applyMembersAlert(position: .left)
+            applyMembersAlert(position: .left,index: nil)
             chatBar.refresh(event: .handsUp, state: .selected, asCreator: true)
         } else {
             if chatBar.handsState == .unSelected {
@@ -220,15 +256,34 @@ extension VoiceRoomViewController {
             view.makeToast("you have no wheat slots!".localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
+        guard let mic = ChatRoomServiceImp.getSharedInstance().mics[safe: idx] else { return }
+        if mic.status == 2 {
+            view.makeToast("The current microphone has been muted".localized(), point: view.center, title: nil, image: nil, completion: nil)
+            return
+        }
         chatBar.micState = !chatBar.micState
         chatBar.refresh(event: .mic, state: chatBar.micState ? .selected : .unSelected, asCreator: false)
-        // 需要根据麦位特殊处理
-        chatBar.micState == true ? muteLocal(with: idx) : unmuteLocal(with: idx)
-        rtckit.muteLocalAudioStream(mute: chatBar.micState)
+        let status = (chatBar.micState == true ? 0:1)
+        VoiceRoomUserInfo.shared.user?.micStatus = status
+        ChatRoomServiceImp.getSharedInstance().changeMicUserStatus(status: status) { [weak self] error, mic in
+            guard let `self` = self else { return }
+            if error == nil,mic?.mic_index == self.local_index {
+                self.rtckit.muteLocalAudioStream(mute: self.chatBar.micState)
+                self.rtcView.updateUser(mic!)
+            } else {
+                self.view.makeToast("Mute local mic failed!")
+            }
+        }
     }
 
-    func showUsers() {
-        let contributes = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [VoiceRoomGiftersViewController(roomId: roomInfo?.room?.room_id ?? "")], titles: [LanguageManager.localValue(key: "Contribution List")], position: .left).cornerRadius(20, [.topLeft, .topRight], .white, 0)
+    func showUsers(position: VoiceRoomSwitchBarDirection) {
+        let audience = VoiceRoomAudiencesViewController()
+        let contributes = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [VoiceRoomGiftersViewController(roomId: roomInfo?.room?.room_id ?? ""),audience], titles: ["Contribution List".localized(),"Audience".localized()], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
+        audience.kickClosure = { [weak self] user,mic in
+            if mic != nil{
+                self?.rtcView.updateUser(mic!)
+            }
+        }
         let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 420)), custom: contributes)
         presentViewController(vc)
     }
@@ -242,7 +297,7 @@ extension VoiceRoomViewController {
             self?.dismiss(animated: true)
             if state == .invite {
                 if flag {
-                    self?.applyMembersAlert(position: .right)
+                    self?.applyMembersAlert(position: .right,index: index)
                 } else {
                     self?.kickoff(with: index)
                 }
@@ -287,7 +342,7 @@ extension VoiceRoomViewController {
             }
             vc.dismiss(animated: true)
         }
-        presentViewController(vc)
+        presentViewController(vc,animated: true)
     }
 
     func requestSpeak(index: Int?) {
@@ -325,7 +380,7 @@ extension VoiceRoomViewController {
             }
             vc.dismiss(animated: true)
         }
-        presentViewController(vc)
+        presentViewController(vc, animated: true)
     }
 
     func showExitRoomView() {
@@ -339,7 +394,7 @@ extension VoiceRoomViewController {
                 self?.didHeaderAction(with: .popBack, destroyed: false)
             }
         }
-        presentViewController(vc)
+        presentViewController(vc, animated: true)
     }
     
     func giftList() -> VoiceRoomGiftView {

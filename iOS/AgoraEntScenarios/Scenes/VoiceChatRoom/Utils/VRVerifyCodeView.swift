@@ -9,19 +9,19 @@ import UIKit
 import ZSwiftBaseLib
 
 public class VRVerifyCodeView: UIView {
-    var beginEdit: (() -> Void)?
+    @objc var beginEdit: (() -> Void)?
 
     /// 输入值改变
-    var textValueChange: ((_ text: String) -> Void)?
+    @objc var textValueChange: ((_ text: String) -> Void)?
 
     /// 输入完成
-    var inputFinish: ((_ text: String) -> Void)?
+    @objc var inputFinish: ((_ text: String) -> Void)?
 
     /// 验证码输入框个数
-    var inputTextNum: Int = 4
+    @objc var inputTextNum: Int = 4
 
     /// 输入框
-    lazy var textFiled: VRVerifyCodeTextView = {
+    @objc lazy var textFiled: VRVerifyCodeTextView = {
         let textFiled = VRVerifyCodeTextView(frame: CGRect(x: self.padding, y: 0, width: self.frame.width - 2 * self.padding, height: self.frame.height)).backgroundColor(.clear).textColor(.clear).delegate(self)
         textFiled.tintColor = .darkText
         textFiled.keyboardType = .decimalPad
@@ -31,22 +31,22 @@ public class VRVerifyCodeView: UIView {
     }()
 
     /// 验证码数量
-    var codeViews: [VRVerifyCodeNumberView] = []
+    @objc var codeViews: [VRVerifyCodeNumberView] = []
 
     /// 验证码输入框距离两边的边距
-    var padding: CGFloat = 15
+    @objc var padding: CGFloat = 15
 
     /// 每个验证码输入框间距
-    var spacing: CGFloat = 10
+    @objc var spacing: CGFloat = 10
 
     /// 是否在输入中
-    var isInput = true
+    @objc var isInput = true
 
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
 
-    convenience init(frame: CGRect, codeNumbers: Int, space: CGFloat, padding: CGFloat) {
+    @objc convenience init(frame: CGRect, codeNumbers: Int, space: CGFloat, padding: CGFloat) {
         self.init(frame: frame)
         spacing = space
         self.padding = padding
@@ -83,14 +83,14 @@ public class VRVerifyCodeView: UIView {
 
 public extension VRVerifyCodeView {
     /// 清除所有输入
-    func cleanCodes() {
+    @objc func cleanCodes() {
         textFiled.text = ""
         textFiledDidChange(textFiled)
         allCursorHidden()
     }
 
     /// 隐藏所有输入光标
-    func allCursorHidden() {
+    @objc func allCursorHidden() {
         DispatchQueue.main.async {
             for i in 0..<self.codeViews.count {
                 let codeView = self.codeViews[i]

@@ -18,9 +18,9 @@
 #import "VLAPIRequest.h"
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
-#import "KTVMacro.h"
 #import <Photos/Photos.h>
-@import AgoraRtcKit;
+#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import Masonry;
 @import LEEAlert;
 
@@ -32,7 +32,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 @interface VLMineViewController ()
 <UINavigationControllerDelegate,UIImagePickerControllerDelegate,VLMineViewDelegate>
 
-@property (nonatomic, strong) UILabel *versionLabel;
 @property (nonatomic, strong) VLMineView *mineView;
 
 @end
@@ -51,11 +50,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     [mineView refreseUserInfo:VLUserCenter.user];
     [self.view addSubview:mineView];
     self.mineView = mineView;
-    [self.view addSubview:self.versionLabel];
-    [self.versionLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.mas_equalTo(self.view);
-        make.bottom.mas_equalTo(-TabBarHeight - 20);
-    }];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -74,7 +68,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
             [self pushWebView:kURLPathH5Privacy];
             break;
         case VLMineViewClickTypeAboutUS:
-            [self pushWebView:kURLPathH5AboutUS];
+            [self about];
             break;
         case VLMineViewClickTypeLogout:
             [self loadLogoutUserRequest];
@@ -82,6 +76,8 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         case VLMineViewClickTypeDestroyAccount:
             [self loadDestoryUserRequest];
             break;
+        case VLMineViewClickTypeDebug:
+            [self closeOffDebugMode];
         default:
             break;
     }
@@ -99,6 +95,12 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     VLCommonWebViewController *webVC = [[VLCommonWebViewController alloc] init];
     webVC.urlString = string;
     [self.navigationController pushViewController:webVC animated:YES];
+}
+
+- (void)about {
+    AboutAgoraEntertainmentViewController *VC = [[AboutAgoraEntertainmentViewController alloc] init];
+    VC.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:VC animated:YES];
 }
 
 - (void)userLogout {
@@ -444,7 +446,47 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         };
     })
     .LeeShow();
-    
+}
+
+- (void)closeOffDebugMode {
+    [LEEAlert alert].config
+    .LeeAddTitle(^(UILabel *label) {
+        label.text = AGLocalizedString(@"确定退出Debug模式么？");
+        label.textColor = UIColorMakeWithHex(@"#040925");
+        label.font = UIFontBoldMake(16);
+    })
+    .LeeContent(AGLocalizedString(@"退出debug模式后，设置页面将恢复成正常的设置页面哦~"))
+    .LeeAddAction(^(LEEAction *action) {
+        VL(weakSelf);
+        action.type = LEEActionTypeCancel;
+        action.title = AGLocalizedString(@"确定");
+        action.titleColor = UIColorMakeWithHex(@"#000000");
+        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
+        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
+        action.cornerRadius = 20;
+        action.height = 40;
+        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
+        action.font = UIFontBoldMake(16);
+        action.clickBlock = ^{
+            [AppContext shared].isDebugMode = NO;
+            [self.mineView refreshTableView];
+        };
+    })
+    .LeeAddAction(^(LEEAction *action) {
+        action.type = LEEActionTypeCancel;
+        action.title = AGLocalizedString(@"取消");
+        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
+        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
+        action.cornerRadius = 20;
+        action.height = 40;
+        action.font = UIFontBoldMake(16);
+        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
+        action.borderColor = UIColorMakeWithHex(@"#2753FF");
+        action.clickBlock = ^{
+            // 取消点击事件Block
+        };
+    })
+    .LeeShow();
 }
  
 /// 上传图片
@@ -462,6 +504,12 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     }];
 }
 
+// 连续点击事件
+- (void)didTapedVersionLabel {
+    [AppContext shared].isDebugMode = YES;
+    [self.mineView refreshTableView];
+}
+
 #pragma mark - Public Methods
 
 - (void)configNavigationBar:(UINavigationBar *)navigationBar {
@@ -470,20 +518,4 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 - (BOOL)preferredNavigationBarHidden {
     return true;
 }
-
-#pragma mark - Lazy
-
-- (UILabel *)versionLabel {
-    if (!_versionLabel) {
-        _versionLabel = [[UILabel alloc] init];
-        _versionLabel.text = [NSString stringWithFormat:AGLocalizedString(@"当前版本号 LTS%@(%@) SDK %@"),
-                              [VLGlobalHelper appVersion],
-                              [VLGlobalHelper appBuild],
-                              [AgoraRtcEngineKit getSdkVersion]];
-        _versionLabel.font = VLUIFontMake(12);
-        _versionLabel.textColor = UIColorMakeWithHex(@"#6C7192");
-    }
-    return _versionLabel;
-}
-
 @end

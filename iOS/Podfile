@@ -1,83 +1,80 @@
 source 'https://github.com/CocoaPods/Specs.git'
 
-# platform :ios, '10.0'
+platform :ios, '12.0'
 inhibit_all_warnings!
+#plugin 'cocoapods-pod-sign'
+#skip_pod_bundle_sign # 用来跳过Xcode对bundle资源的签名
 
 def all_pods
   
 #  use_modular_headers!
   use_frameworks!
   # 网络层
-  pod 'AFNetworking', '~> 4.0.1'
+  pod 'AFNetworking', '4.0.1'
   # 布局
-  pod 'Masonry', '~> 1.1.0'
-  pod 'HWPanModal', '~> 0.8.9'
-  # 刷新
-  pod 'MJRefresh', '~> 3.2.0'
+  pod 'Masonry', '1.1.0'
   # tips
-  pod 'MBProgressHUD', '~> 1.1.0'
-  pod 'SVProgressHUD'
+#  pod 'MBProgressHUD', '~> 1.1.0'
+  pod 'SVProgressHUD', '2.2.5'
   # 加载图片
-  pod 'SDWebImage', '~> 5.0.3'
+  pod 'SDWebImage', '~> 4.2'
+  pod 'SDWebImageAPNGCoder'
   # Model
-  pod 'YYModel', '~> 1.0.4'
-  pod 'YYCache', '~> 1.0.4'
-  pod 'YYCategories', '~> 1.0.4'
-#  pod 'libextobjc', '~> 0.4.1'
-  pod 'MJExtension'
-  # 键盘
-  pod 'IQKeyboardManager'
-  # 变色龙
-  pod 'ChameleonFramework'
+  pod 'YYModel', '1.0.4'
+#  pod 'YYCache', '1.0.4'
+  pod 'YYCategories', '1.0.4'
+
   #弹框
-  pod 'LEEAlert'
+  pod 'LEEAlert', '1.6.4'
   #滚动视图
-  pod 'JXCategoryView'
+  pod 'JXCategoryView', '1.6.1'
+
+  # 火山美颜
+#  pod 'BytedEffect', :path => 'bytedEffect.podspec'
+  # 商汤美颜
+  pod 'SenseLib', :path => 'sense.podspec'
   
+  pod 'AgoraSyncManager', '2.0.2'
   
-#  pod 'AgoraRtcEngine_iOS', '~> 4.0.1'
-#pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
-  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
-#  pod 'AgoraAudio_Special_iOS', '4.0.0.9'
+  # pod 'AgoraRtcEngine_iOS', :path => './libs'
+  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 
   #ThirdParty
-  pod 'HWWeakTimer'
-#  pod 'QMUI'
-  pod 'CRBoxInputView'
-#  pod 'Displayer'
-  pod 'YYText'
-  pod 'LSTPopView'
-  pod 'QMUIKit', '4.5.1'
-  pod 'InputKit'
-  pod 'CYLTabBarController'
-#  pod 'ZQTCustomSwitch'
-
-  pod 'SocketRocket'
-#  pod 'Fastboard'
-  pod 'Agora-Scene-Utils', '~> 1.0.8'
+  pod 'HWWeakTimer', '1.0'
+  pod 'LSTPopView', '0.3.10'
+  pod 'SocketRocket', '0.6.0'
+  pod 'Agora-Scene-Utils', '1.1.0'
   
   #歌词组件
   pod 'AgoraLyricsScore', '1.0.8.8'
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'f0613f7a8e11aa4e333f1dba2cfb2516d1140367'
-  pod 'AgoraRtm_iOS'
+  pod 'AgoraRtm_iOS', '1.5.1'
   
   
   # Swift Code Formatter
 #  pod 'SwiftFormat/CLI'
+
   #VoiceChatRoom rely
   pod 'ZSwiftBaseLib', '0.1.6.1'
+
   pod 'SnapKit'
   pod 'SVGAPlayer'
   pod 'KakaJSON'
   pod 'Agora_Chat_iOS', '1.0.8'
-  
+  pod 'SwiftyBeaver', '1.9.5'
+ #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
+
   #bugly
   pod 'Bugly','2.5.93'
+  
+  
+  #need to remove
+#  pod 'MJRefresh'
 end
 
 target 'AgoraEntScenarios' do
   all_pods
 end
 
-
+system("./libs/setup_podspec.sh")
 
