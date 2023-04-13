@@ -16,6 +16,10 @@ import io.agora.rtc2.audio.AudioParams
 import org.json.JSONException
 import org.json.JSONObject
 import java.nio.ByteBuffer
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ScheduledThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 enum class KTVSongMode(val value: Int) {
     SONG_CODE(0),
@@ -72,9 +76,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                               msg: String?,
                               lyricUrl: String?) -> Unit>() // (songNo, callback)
     private val musicChartsCallbackMap =
-        mutableMapOf<String, (requestId: String?, status: Int, list: Array<out MusicChartInfo>?) -> Unit>()
+        mutableMapOf<String, (requestId: String?, errorCode: Int, list: Array<out MusicChartInfo>?) -> Unit>()
     private val musicCollectionCallbackMap =
-        mutableMapOf<String, (requestId: String?, status: Int, page: Int, pageSize: Int, total: Int, list: Array<out Music>?) -> Unit>()
+        mutableMapOf<String, (requestId: String?, errorCode: Int, page: Int, pageSize: Int, total: Int, list: Array<out Music>?) -> Unit>()
 
     private var lrcView: ILrcView? = null
 
@@ -83,7 +87,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     //歌词实时刷新
     private var mStopDisplayLrc = true
-    private var mDisplayThread: Thread? = null
     private var mReceivedPlayPosition: Long = 0 //播放器播放position，ms
     private var mLastReceivedPlayPosTime: Long? = null
 
@@ -103,6 +106,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     // mpk状态
     private var mediaPlayerState: MediaPlayerState = MediaPlayerState.PLAYER_STATE_IDLE
+
+    companion object{
+        private val scheduledThreadPool: ScheduledExecutorService = Executors.newScheduledThreadPool(5)
+    }
 
     override fun initialize(
         config: KTVApiConfig
@@ -757,12 +764,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     // ------------------ 歌词播放、同步 ------------------
     // 开始播放歌词
-    private fun startDisplayLrc() {
-        Log.d(TAG, "startDisplayLrc called")
-        mStopDisplayLrc = false
-        mDisplayThread = Thread {
-            while (!mStopDisplayLrc) {
-                val lastReceivedTime = mLastReceivedPlayPosTime ?: continue
+
+    private val displayLrcTask  = object : Runnable {
+        override fun run() {
+            if (!mStopDisplayLrc){
+                val lastReceivedTime = mLastReceivedPlayPosTime ?: return
                 val curTime = System.currentTimeMillis()
                 val offset = curTime - lastReceivedTime
                 if (offset <= 1000) {
@@ -776,76 +782,63 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         lrcView?.onUpdateProgress(if (curTs > 200) (curTs - 200) else curTs) // The delay here will impact both singer and audience side
                     }
                 }
-
-                try {
-                    Thread.sleep(20)
-                } catch (exp: InterruptedException) {
-                    break
-                }
             }
         }
-        mDisplayThread?.name = "Thread-Display"
-        mDisplayThread?.start()
+    }
+    private fun startDisplayLrc() {
+        Log.d(TAG, "startDisplayLrc called")
+        mStopDisplayLrc = false
+        scheduledThreadPool.scheduleAtFixedRate(displayLrcTask, 0,20, TimeUnit.MILLISECONDS)
     }
 
     // 停止播放歌词
     private fun stopDisplayLrc() {
         Log.d(TAG, "stopDisplayLrc called")
         mStopDisplayLrc = true
-        if (mDisplayThread != null) {
-            try {
-                mDisplayThread?.join()
-                mDisplayThread = null
-            } catch (exp: InterruptedException) {
-                Log.d(TAG, "stopDisplayLrc: $exp")
-            }
+        if (scheduledThreadPool is ScheduledThreadPoolExecutor) {
+            (scheduledThreadPool as ScheduledThreadPoolExecutor).remove(displayLrcTask)
         }
     }
 
     // ------------------ 音高pitch同步 ------------------
-    private var mSyncPitchThread: Thread? = null
+//    private var mSyncPitchThread: Thread? = null
     private var mStopSyncPitch = true
+
+    private val mSyncPitchTask = Runnable {
+        mStopSyncPitch = false
+        while (!mStopSyncPitch) {
+            if (mediaPlayerState == MediaPlayerState.PLAYER_STATE_PLAYING &&
+                (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.SoloSinger)) {
+                sendSyncPitch(pitch)
+            }
+            try {
+                Thread.sleep(50)
+            } catch (exp: InterruptedException) {
+                break
+            }
+        }
+    }
+
+    private fun sendSyncPitch(pitch: Double) {
+        val msg: MutableMap<String?, Any?> = java.util.HashMap()
+        msg["cmd"] = "setVoicePitch"
+        msg["pitch"] = pitch
+        val jsonMsg = JSONObject(msg)
+        sendStreamMessageWithJsonObject(jsonMsg) {}
+    }
 
     // 开始同步音高
     private fun startSyncPitch() {
-        mSyncPitchThread = Thread(object : Runnable {
-            override fun run() {
-                mStopSyncPitch = false
-                while (!mStopSyncPitch) {
-                    if (mediaPlayerState == MediaPlayerState.PLAYER_STATE_PLAYING &&
-                        (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.SoloSinger)) {
-                        sendSyncPitch(pitch)
-                    }
-                    try {
-                        Thread.sleep(50)
-                    } catch (exp: InterruptedException) {
-                        break
-                    }
-                }
-            }
-
-            private fun sendSyncPitch(pitch: Double) {
-                val msg: MutableMap<String?, Any?> = java.util.HashMap()
-                msg["cmd"] = "setVoicePitch"
-                msg["pitch"] = pitch
-                val jsonMsg = JSONObject(msg)
-                sendStreamMessageWithJsonObject(jsonMsg) {}
-            }
-        })
-        mSyncPitchThread?.name = "Thread-SyncPitch"
-        mSyncPitchThread?.start()
+        scheduledThreadPool.scheduleAtFixedRate(mSyncPitchTask,0,50,TimeUnit.MILLISECONDS)
     }
 
     // 停止同步音高
     private fun stopSyncPitch() {
         mStopSyncPitch = true
         pitch = 0.0
-        if (mSyncPitchThread != null) {
-            try {
-                mSyncPitchThread?.join()
-            } catch (exp: InterruptedException) {
-                Log.e(TAG, "stopSyncPitch: $exp")
-            }
+
+        if (scheduledThreadPool is ScheduledThreadPoolExecutor) {
+            (scheduledThreadPool as ScheduledThreadPoolExecutor).remove(mSyncPitchTask)
         }
     }
 
