@@ -23,6 +23,9 @@ class VMPresentView: UIView {
     var selBlock: ((AINS_STATE) -> Void)?
     var ains_state: AINS_STATE = .mid
     var useRobotBlock: ((Bool) -> Void)?
+    var turnAIAECBlock: ((Bool) -> Void)?
+    var turnAGCBlock: ((Bool) -> Void)?
+
     var volBlock: ((Int) -> Void)?
 
     override func draw(_ rect: CGRect) {
@@ -54,6 +57,7 @@ class VMPresentView: UIView {
         }
         audioSetView.useRobotBlock = { [weak self] flag in
             guard let useRobotBlock = self?.useRobotBlock else { return }
+
             useRobotBlock(flag)
         }
         audioSetView.volBlock = { [weak self] vol in
@@ -64,6 +68,7 @@ class VMPresentView: UIView {
 
         eqView.backgroundColor = .white
         eqView.frame = CGRect(x: screenSize.width, y: 0, width: screenSize.width, height: bounds.size.height)
+        eqView.roomInfo = roomInfo
         eqView.isTouchAble = isTouchAble
         eqView.isAudience = isAudience
         eqView.soundEffect = roomInfo?.room?.sound_effect ?? 1
@@ -82,6 +87,22 @@ class VMPresentView: UIView {
             self?.audioSetView.ains_state = state
             selBlock(state)
         }
+        eqView.turnAIAECBlock = {[weak self] flag in
+            guard let turnAIAECBlock = self?.turnAIAECBlock else {return}
+
+            turnAIAECBlock(flag);
+            self?.roomInfo?.room?.turn_AIAEC = flag;
+            self?.audioSetView.tableView.reloadData()
+
+        }
+        eqView.turnAGCBlock = {[weak self] flag in
+            guard let turnAGCBlock = self?.turnAGCBlock else {return}
+                    
+            turnAGCBlock(flag);
+            self?.roomInfo?.room?.turn_AGC = flag;
+            self?.audioSetView.tableView.reloadData()
+        }
+
         scrollView.addSubview(eqView)
     }
 }

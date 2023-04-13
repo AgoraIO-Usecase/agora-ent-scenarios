@@ -13,7 +13,10 @@ import ZSwiftBaseLib
 
 // MARK: - ChatRoomServiceSubscribeDelegate
 extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
-    
+    func onRoomExpired() {
+        ToastView.show(text: ChatRoomServiceKickedReason.destroyed.errorDesc())
+        fetchDetailError()
+    }
     
     func chatTokenWillExpire() {
         AgoraChatClient.shared().renewToken(VLUserCenter.user.im_token)
@@ -29,6 +32,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         giftList?.cellAnimation()
         if gift.gift_id ?? "" == "VoiceRoomGift9" {
             rocketAnimation()
+            self.notifyHorizontalTextCarousel(gift: gift)
         }
         if var gift_amount = self.roomInfo?.room?.gift_amount {
             gift_amount += Int(gift.gift_price ?? "1")!*Int(gift.gift_count ?? "1")!
@@ -40,13 +44,19 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         //刷新礼物贡献总数，头部
 //        self.requestRankList()
     }
+        
     
-    func fetchGiftContribution() {
-//        let seconds: [Double] = [0,1,2,3]
-//        guard let refreshSeconds = seconds.randomElement() else { return }
-//        Throttler.throttle(delay: .seconds(refreshSeconds)) {
-//            self.requestRankList()
-//        }
+    func notifyHorizontalTextCarousel(gift: VoiceRoomGiftEntity) {
+        let string = NSAttributedString {
+            AttributedText("\(gift.userName ?? "" ) ").font(.systemFont(ofSize: 12, weight: .semibold)).foregroundColor(Color(white: 1, alpha: 0.74))
+            AttributedText("gifts".localized()).font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(.white)
+            AttributedText(" \(VoiceRoomUserInfo.shared.currentRoomOwner?.name ?? "") ").font(.systemFont(ofSize: 12, weight: .semibold)).foregroundColor(Color(white: 1, alpha: 0.74))
+            AttributedText("a rocket".localized()).font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(.white)
+        }
+        
+        let text = HorizontalTextCarousel(frame: CGRect(x: 15, y: self.headerView.frame.maxY-10, width: 0, height: 20)).cornerRadius(10)
+        self.view.addSubview(text)
+        text.textAnimation(text: string)
     }
     
     func onReceiveSeatRequest(roomId: String, applicant: VoiceRoomApply) {
@@ -66,7 +76,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onReceiveSeatInvitation(roomId: String, user: VRUser) {
-        self.showInviteMicAlert()
+        self.showInviteMicAlert(index: user.mic_index)
     }
     
     func onReceiveCancelSeatInvitation(roomId: String, chat_uid: String) {
@@ -82,11 +92,15 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         headerView.updateHeader(with: info?.room)
         self.roomInfo?.room?.member_list?.append(user)
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
+        ChatRoomServiceImp.getSharedInstance().updateRoomMembers { _ in
+            
+        }
+        self.headerView.updateHeader(with: self.roomInfo?.room)
         self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
     }
     
     func onAnnouncementChanged(roomId: String, content: String) {
-        self.view.makeToast("Voice room announcement changed!", point: toastPoint, title: nil, image: nil, completion: nil)
+        self.view.makeToast("Voice room announcement changed!".localized(), point: toastPoint, title: nil, image: nil, completion: nil)
         self.roomInfo?.room?.announcement = content
     }
     
@@ -96,22 +110,14 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     
     func onUserBeKicked(roomId: String, reason: ChatRoomServiceKickedReason) {
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
-        var message = ""
-        switch reason {
-        case .removed: message = "you are removed by owner!"
-        case .destroyed: message = "VoiceRoom was destroyed!"
-        case .offLined: message = "you are offline!"
-        @unknown default:
-            break
+        let message = reason.errorDesc()
+        if !self.isOwner {
+            self.view.window?.makeToast(message)
         }
-        self.view.makeToast(message, point: toastPoint, title: nil, image: nil, completion: nil)
-        var destroyed = false
         if reason == .destroyed {
-            destroyed = true
             NotificationCenter.default.post(name: NSNotification.Name("refreshList"), object: nil)
         }
-        ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { _, _ in }
-        self.didHeaderAction(with: .back, destroyed: destroyed)
+        self.quitRoom()
     }
     
     func onSeatUpdated(roomId: String, mics: [VRRoomMic], from fromId: String) {
@@ -125,6 +131,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         self.roomInfo?.room?.use_robot = enable
         self.roomInfo?.mic_info![6] = mic_info
         self.rtcView.updateAlien(mic_info.status)
+        if enable {
+            self.rtcView.updateAlienMic(.blue)
+        }
     }
     
     func onRobotVolumeChanged(roomId: String, volume: UInt, from fromId: String) {
@@ -162,7 +171,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         if isOwner {
             ChatRoomServiceImp.getSharedInstance().updateRoomMembers { error in
                 if error != nil {
-                    self.view.makeToast("\(error?.localizedDescription ?? "")")
+//                    self.view.makeToast("\(error?.localizedDescription ?? "")")
                 }
             }
         }
@@ -176,6 +185,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
 
     private func updateMic(_ mics: [VRRoomMic], fromId: String) {
+        let changeMic = ChatRoomServiceImp.getSharedInstance().mics[mics.first?.mic_index ?? 1]
         for mic in mics {
             ChatRoomServiceImp.getSharedInstance().mics[mic.mic_index] = mic
         }
@@ -192,12 +202,14 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 let mic_index = first.mic_index
                 //刷新底部✋🏻状态
                 if !isOwner {
-                    refreshHandsUp(status: status)
+                    if first.member != nil {
+                        refreshHandsUp(status: status)
+                    } else {
+                        if changeMic.member != nil {
+                            refreshHandsUp(status: status)
+                        }
+                    }
                 }
-                //                if fromId != self.roomInfo?.room?.owner?.chat_uid ?? "",!isOwner {
-                //                    refreshHandsUp(status: status)
-                //                }
-                //将userList中的上麦用户做标记，便于后续过滤
                 var micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
                     $0.chat_uid ?? "" == fromId
                 })
@@ -212,11 +224,6 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                     }
                 }
                 if !isOwner {
-                    var state: VoiceRoomChatBarState = .selected
-                    if status == 0 || status != -1 {
-                        state = .unSelected
-                    }
-                    self.chatBar.refresh(event: .mic, state: state, asCreator: isOwner)
                     if mic_index == local_index && (status == -1 || status == 3 || status == 4 || status == 2) {
                         local_index = nil
                     }
@@ -225,9 +232,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                  如果房主踢用户下麦
                  */
                 if let host: VRUser = roomInfo?.room?.owner {
-                    if host.uid == fromId && status == -1 {
+                    if host.uid == fromId, status == -1, first.member == nil,changeMic.member?.uid ?? "" == VoiceRoomUserInfo.shared.user?.uid ?? "" {
                         ChatRoomServiceImp.getSharedInstance().userList?.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
-                        view.makeToast("Removed Stage".localized())
+                        view.makeToast("You were removed from stage".localized())
                     }  else {
                         self.refreshApplicants(chat_uid: fromId)
                     }
@@ -246,15 +253,17 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                     if local_uid == cp_uid {
                         local_index = mic_index
                         if !isOwner {
-                            self.rtckit.setClientRole(role: status == 0 ? .owner : .audience)
+                            self.checkEnterSeatAudioAuthorized()
                         }
-                        //如果当前是0的状态  就设置成主播
-                        self.rtckit.muteLocalAudioStream(mute: status != 0)
+                        self.micMuteManager(mic: first)
                     }
                 } else {
                     if local_index == nil || mic_index == local_index {
-                        rtckit.setClientRole(role: .audience)
-                        rtckit.muteLocalAudioStream(mute: true)
+                        if status == 2 {
+                            rtckit.setClientRole(role: .audience)
+                            rtckit.muteLocalAudioStream(mute: true)
+                            chatBar.refresh(event: .mic, state: .selected, asCreator: false)
+                        }
                     }
                 }
                 

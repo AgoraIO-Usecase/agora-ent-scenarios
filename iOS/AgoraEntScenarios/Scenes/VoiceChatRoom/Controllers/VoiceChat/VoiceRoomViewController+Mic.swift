@@ -106,9 +106,12 @@ extension VoiceRoomViewController {
         
         ChatRoomServiceImp.getSharedInstance().unmuteLocal(mic_index: index) { error, mic in
             if error == nil,let mic = mic {
-                self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
+                if mic.member?.micStatus ?? 0 == 1 {
+                    self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
+                }
                 self.rtckit.muteLocalAudioStream(mute: false)
                 self.rtcView.updateUser(mic)
+                self.checkAudioAuthorized()
             }
         }
 
@@ -121,6 +124,7 @@ extension VoiceRoomViewController {
                 return
             }
         }
+        
         ChatRoomServiceImp.getSharedInstance().changeMic(old_index: from, new_index: to) { error, micMap in
             if error == nil,let old_mic = micMap?[from],let new_mic = micMap?[to] {
                 self.local_index = to
@@ -131,11 +135,9 @@ extension VoiceRoomViewController {
                 guard let mic = ChatRoomServiceImp.getSharedInstance().mics.first(where: {
                                     VoiceRoomUserInfo.shared.user?.chat_uid ?? "" == $0.member?.chat_uid ?? ""
                                 }) else { return }
-                self.rtckit.setClientRole(role: mic.status == 0 ? .owner : .audience)
-                self.rtckit.muteLocalAudioStream(mute: mic.status != 0)
+                self.micMuteManager(mic: mic)
             }
         }
-
     }
 
 
@@ -160,10 +162,7 @@ extension VoiceRoomViewController {
     }
 
     @objc func leaveRoom() {
-        if self.isOwner {
-            VoiceRoomIMManager.shared?.userDestroyedChatroom()
-        } else {
-            ChatRoomServiceImp.getSharedInstance().leaveRoom(self.roomInfo?.room?.chatroom_id ?? "") { _, _ in }
+        ChatRoomServiceImp.getSharedInstance().leaveRoom(self.roomInfo?.room?.room_id ?? "") { _, _ in
         }
     }
 
@@ -173,8 +172,12 @@ extension VoiceRoomViewController {
         }
     }
 
-    func agreeInvite() {
-        ChatRoomServiceImp.getSharedInstance().acceptMicSeatInvitation(completion: { error, mic in
+    func agreeInvite(index: Int?) {
+        var idx: Int?
+        if index != -1, index != 0 {
+            idx = index
+        }
+        ChatRoomServiceImp.getSharedInstance().acceptMicSeatInvitation(index: idx,completion: { error, mic in
             if error == nil,let mic = mic {
                 self.rtcView.updateUser(mic)
                 self.local_index = mic.mic_index
@@ -182,6 +185,9 @@ extension VoiceRoomViewController {
                 self.chatBar.refresh(event: .handsUp, state: .disable, asCreator: self.isOwner)
                 self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: self.isOwner)
                 self.rtckit.muteLocalAudioStream(mute: mic.status != 0)
+                self.checkEnterSeatAudioAuthorized()
+            } else {
+                self.view.makeToast("\(error?.localizedDescription ?? "")",point: self.toastPoint, title: nil, image: nil, completion: nil)
             }
         })
     }

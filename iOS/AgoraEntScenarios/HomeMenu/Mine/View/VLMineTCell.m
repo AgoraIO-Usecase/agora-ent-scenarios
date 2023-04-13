@@ -4,13 +4,9 @@
 //
 
 #import "VLMineTCell.h"
-@import QMUIKit;
-@import YYCategories;
+#import "KTVMacro.h"
 
 @interface VLMineTCell ()
-
-
-
 @end
 
 @implementation VLMineTCell
@@ -52,6 +48,11 @@
     _dict = dict;
     self.iconImgView.image = UIImageMake(dict[@"itemImgStr"]);
     self.itemTitleLabel.text = dict[@"titleStr"];
+}
+
+- (void)setIconImageName:(NSString *)imgStr title:(NSString *)title {
+    self.iconImgView.image = UIImageMake(imgStr);
+    self.itemTitleLabel.text = title;
 }
 
 @end

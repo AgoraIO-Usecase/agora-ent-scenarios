@@ -18,7 +18,7 @@ protocol ISyncManager {
     func getScenes(success: SuccessBlock?,
                    fail: FailBlock?)
     func deleteScenes(sceneIds: [String],
-                      success: SuccessBlockVoid?,
+                      success: SuccessBlockObjOptional?,
                       fail: FailBlock?)
     func get(documentRef: DocumentReference,
              key: String,
@@ -38,7 +38,7 @@ protocol ISyncManager {
                 fail: FailBlock?)
     func delete(reference: CollectionReference,
                 id: String,
-                success: SuccessBlockVoid?,
+                success: SuccessBlockObjOptional?,
                 fail: FailBlock?)
     func update(reference: DocumentReference,
                 key: String,

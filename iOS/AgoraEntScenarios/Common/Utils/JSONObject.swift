@@ -62,6 +62,14 @@ class JSONObject {
         guard let dict = try? JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers), let result = dict as? [String: Any] else { return [:] }
         return result
     }
+    
+    /// 模型转Data
+    static func toData<T: Codable>(_ model: T) -> Data? {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        guard let data = try? encoder.encode(model) else { return nil }
+        return data
+    }
 
     /// JSON字符串转字典
     static func toDictionary(jsonStr: String) -> [String: String] {

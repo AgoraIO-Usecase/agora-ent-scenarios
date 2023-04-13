@@ -176,6 +176,8 @@ public let kMPK_RTC_UID: UInt = 1
     @objc public weak var delegate: VMManagerDelegate?
 
     @objc public weak var playerDelegate: VMMusicPlayerDelegate?
+    
+    var stopMixingClosure: (() -> ())?
 
     // 单例
     @objc public class func getSharedInstance() -> VoiceRoomRTCManager {
@@ -241,14 +243,15 @@ public let kMPK_RTC_UID: UInt = 1
                 } else if musicPath.contains("-B&R-") {
                     delegate?.reportAlien?(with: .blueAndRed, musicType: musicType)
                 }
-                musicPath = musicPath.replacingOccurrences(of: "CN", with: "Lau".localized())
+                let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized() : "EN"
+                musicPath = musicPath.replacingOccurrences(of: "CN", with: lanuagePath)
                 rtcKit.startAudioMixing(musicPath, loopback: false, cycle: 1)
             }
         }
     }
 
     // init rtc
-    private let rtcKit: AgoraRtcEngineKit = AgoraRtcEngineKit.sharedEngine(withAppId: KeyCenter.AppId, delegate: nil)
+    let rtcKit: AgoraRtcEngineKit = AgoraRtcEngineKit.sharedEngine(withAppId: KeyCenter.AppId, delegate: nil)
 
     /**
      * 设置RTC角色
@@ -275,6 +278,8 @@ public let kMPK_RTC_UID: UInt = 1
         rtcKit.setParameters("{\"rtc.audio_resend\":false}")
         rtcKit.setParameters("{\"rtc.audio_fec\":[3,2]}")
         rtcKit.setParameters("{\"rtc.audio.aec_length\":50}")
+        self .setParametersWithMD()
+
         rtcKit.setAudioProfile(.musicHighQualityStereo, scenario: .chorus)
         rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: false)
 
@@ -303,6 +308,8 @@ public let kMPK_RTC_UID: UInt = 1
             option.autoSubscribeAudio = false
             option.autoSubscribeVideo = false
             option.clientRoleType = .broadcaster
+            self .setParametersWithMD()
+
             rtcKit.setAudioProfile(.musicHighQuality, scenario: .chorus)
             rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: UInt(rtcUid), mediaOptions: option)
 
@@ -333,6 +340,8 @@ public let kMPK_RTC_UID: UInt = 1
             option.autoSubscribeAudio = true
             option.autoSubscribeVideo = true
             option.clientRoleType = .broadcaster
+            self .setParametersWithMD()
+
             rtcKit.setAudioProfile(.musicHighQuality, scenario: .chorus)
             rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: UInt(rtcUid), mediaOptions: option)
 
@@ -341,6 +350,8 @@ public let kMPK_RTC_UID: UInt = 1
             option.publishCameraTrack = false // 关闭视频采集
             option.publishMicrophoneTrack = false // 关闭音频采集
             option.autoSubscribeAudio = true
+            self .setParametersWithMD()
+
             rtcKit.setAudioProfile(.musicHighQuality, scenario: .chorus) // 设置profile
             option.clientRoleType = .audience // 设置观众角色
             rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: 0, mediaOptions: option)
@@ -358,8 +369,10 @@ public let kMPK_RTC_UID: UInt = 1
         self.type = .VoiceChat
         rtcKit.delegate = self
         rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
+        self .setParametersWithMD()
         if type == .ktv || type == .social {
             rtcKit.setChannelProfile(.liveBroadcasting)
+
             rtcKit.setAudioProfile(.musicHighQuality)
             rtcKit.setAudioScenario(.gameStreaming)
         } else if type == .game {
@@ -375,6 +388,8 @@ public let kMPK_RTC_UID: UInt = 1
         }
         setAINS(with: .mid)
         rtcKit.setParameters("{\"che.audio.start_debug_recording\":\"all\"}")
+        rtcKit.setEnableSpeakerphone(true)
+        rtcKit.setDefaultAudioRouteToSpeakerphone(true)
         let code: Int32 = rtcKit.joinChannel(byToken: token, channelId: channelName, info: nil, uid: UInt(rtcUid ?? 0))
         return code
     }
@@ -388,6 +403,10 @@ public let kMPK_RTC_UID: UInt = 1
         rtcKit.delegate = self
     }
 
+    private func setParametersWithMD (){
+        rtcKit.setParameters("{\"che.audio.md.enable\":false}")
+
+    }
     /**
      * 加载RTC
      */
@@ -453,7 +472,8 @@ public let kMPK_RTC_UID: UInt = 1
         } else if type == .ainsOff {
             path = AgoraConfig.NoneSound[index]
         }
-        path = path.replacingOccurrences(of: "CN", with: LanguageManager.localValue(key: "Lau"))
+        let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized() : "EN"
+        path = path.replacingOccurrences(of: "CN", with: lanuagePath)
         rtcKit.startAudioMixing(path, loopback: false, cycle: 1)
     }
 
@@ -470,7 +490,32 @@ public let kMPK_RTC_UID: UInt = 1
     public func enableAEC(with grade: AECGrade) -> Int32 {
         return rtcKit.setParameters("{\"rtc.audio.music_mode\": \(grade.rawValue)}")
     }
+    
+    //AIAEC-AI回声消除
+    public func setAIAECOn(isOn:Bool){
+        //agora_ai_echo_cancellation
+//        rtcKit.enableExtension(withVendor: "agora_ai_echo_cancellation", extension: "", enabled: true)
+        
+        if (isOn){
+            rtcKit.setParameters("{\"che.audio.aiaec.working_mode\":1}");
 
+        } else {
+            rtcKit.setParameters("{\"che.audio.aiaec.working_mode\":0}");
+
+        }
+    }
+
+    //AGC-新增人声自动增益开关
+    public func setAGCOn(isOn:Bool){
+        if (isOn) {
+            rtcKit.setParameters("{\"che.audio.agc.enable\":true}")
+        } else {
+            rtcKit.setParameters("{\"che.audio.agc.enable\":false}")
+        }
+        rtcKit.setParameters("{\"che.audio.agc.targetlevelBov\":3}")
+        rtcKit.setParameters("{\"che.audio.agc.compressionGain\":18}")
+    }
+    
     /**
      * 开启/关闭 AI降噪
      * @param
@@ -493,7 +538,7 @@ public let kMPK_RTC_UID: UInt = 1
             rtcKit.setParameters("{\"che.audio.nsng.finallowermask\":30}")
             rtcKit.setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
         case .off:
-            rtcKit.setParameters("{\"che.audio.ains_mode\":0}")
+            rtcKit.setParameters("{\"che.audio.ains_mode\":-1}")
             rtcKit.setParameters("{\"che.audio.nsng.lowerBound\":80}")
             rtcKit.setParameters("{\"che.audio.nsng.lowerMask\":50}")
             rtcKit.setParameters("{\"che.audio.nsng.statisticalbound\":5}")
@@ -805,6 +850,7 @@ extension VoiceRoomRTCManager: AgoraRtcEngineDelegate {
         playerDelegate?.didReceiveStreamMsgOfUid?(uid: uid, data: data)
     }
 
+    
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
         guard let _ = delegate else {
             return
@@ -830,6 +876,9 @@ extension VoiceRoomRTCManager: AgoraRtcEngineDelegate {
 extension VoiceRoomRTCManager: AgoraRtcMediaPlayerDelegate {
     public func rtcEngine(_ engine: AgoraRtcEngineKit, audioMixingStateChanged state: AgoraAudioMixingStateType, reasonCode: AgoraAudioMixingReasonCode) {
         if state == .stopped {
+            if self.stopMixingClosure != nil {
+                self.stopMixingClosure!()
+            }
             guard let musicType = musicType else { return }
             var count = 0
             switch musicType {
