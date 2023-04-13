@@ -65,7 +65,16 @@ class NetworkManager:NSObject {
 
     @objc static let shared = NetworkManager()
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
-    private let baseServerUrl: String = "https://toolbox.bj2.agoralab.co/v1/"
+    private let baseServerUrl: String = "https://test-toolbox.bj2.agoralab.co/v1/"
+    
+    private func basicAuth(key: String, password: String) -> String {
+        let loginString = String(format: "%@:%@", key, password)
+        guard let loginData = loginString.data(using: String.Encoding.utf8) else {
+            return ""
+        }
+        let base64LoginString = loginData.base64EncodedString()
+        return base64LoginString
+    }
     
     /// get tokens
     /// - Parameters:
@@ -246,7 +255,8 @@ class NetworkManager:NSObject {
                           streamUrl: String,
                           success: @escaping (String?) -> Void) {
         let params: [String: Any] = ["appId": KeyCenter.AppId,
-                                     "appCertificate": KeyCenter.Certificate ?? "",
+                                     "appCert": KeyCenter.Certificate ?? "",
+                                     "basicAuth":basicAuth(key: KeyCenter.CloudPlayerKey, password: KeyCenter.CloudPlayerSecret),
                                         "channelName": channelName,
                                         "uid": uid,
                                         "robotUid": robotUid,
