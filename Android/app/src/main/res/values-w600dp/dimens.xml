@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="app_fab_margin">48dp</dimen>
+    <dimen name="app_text_margin">48dp</dimen>
+</resources>

@@ -32,4 +32,15 @@
     <string name="send_v_code">发送验证码</string>
     <string name="i_agree">我已阅读并同意</string>
     <string name="ktv_online">在线K歌房</string>
+
+    <string name="comm_permission_leak_auido_title">no microphone permission</string>
+    <string name="comm_permission_leak_auido_content">Please turn on microphone permission in settings.</string>
+    <string name="comm_permission_leak_camera_title">no camera permission</string>
+    <string name="comm_permission_leak_camera_content">Please turn on the camera permission in the settings.</string>
+    <string name="comm_permission_leak_sdcard_title">No photo and video permissions</string>
+    <string name="comm_permission_leak_sdcard_content">Please turn on photo and video permissions in settings.</string>
+    <string name="comm_permission_leak_other_title">no permissions to run</string>
+    <string name="comm_permission_leak_other_content">Please turn on the permission required to run in the settings.</string>
+    <string name="comm_setting">Setting</string>
+
 </resources>

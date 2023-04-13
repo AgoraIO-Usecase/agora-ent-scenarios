@@ -153,6 +153,7 @@
             android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/tvLogoffAccount"
             tools:ignore="MissingConstraints" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -160,10 +161,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="29dp"
-        android:text="当前版本号 V1.0"
+        tools:text="当前版本号 V1.0"
         android:textColor="@color/def_text_grey_6c7"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

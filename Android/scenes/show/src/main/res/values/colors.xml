@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="show_deliver">#EFEFEF</color>
+    <drawable name="show_purple">#684BF2</drawable>
+    <color name="show_view">#141650</color>
+    <color name="show_text">#CE27FB</color>
+</resources>

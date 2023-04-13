@@ -1,30 +1,32 @@
 package com.agora.entfulldemo.home;
 
 import android.content.Context;
-import android.graphics.Rect;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 
+import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding;
+import com.agora.entfulldemo.databinding.AppItemHomeIndexBinding;
 import com.agora.entfulldemo.databinding.AppItemHomeIndexBinding;
 import com.agora.entfulldemo.home.constructor.ScenesConstructor;
 import com.agora.entfulldemo.home.constructor.ScenesModel;
 import com.agora.entfulldemo.home.holder.HomeIndexHolder;
-import com.alibaba.android.arouter.launcher.ARouter;
+import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding;
 
 import java.util.List;
 
-import io.agora.scene.base.PagePathConstant;
+import io.agora.scene.base.ReportApi;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnItemClickListener;
-import io.agora.scene.base.manager.PagePilotManager;
-import io.agora.scene.base.utils.UiUtil;
+import io.agora.scene.base.utils.ToastUtils;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIndexBinding> {
 
@@ -44,44 +46,31 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
                 @Override
                 public void onItemClick(@NonNull ScenesModel scenesModel, View view, int position, long viewType) {
                     if (scenesModel.getActive()) {
+                        reportEnter(scenesModel);
                         goScene(scenesModel);
                     }
                 }
             }, HomeIndexHolder.class);
-            int padding = UiUtil.dp2px(8);
-            RecyclerView.ItemDecoration itemDecoration = new RecyclerView.ItemDecoration() {
-                @Override
-                public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-                    super.getItemOffsets(outRect, view, parent, state);
-                    outRect.top = padding;
-                    outRect.bottom = padding;
-                    outRect.left = padding;
-                    outRect.right = padding;
-                }
-            };
-            getBinding().rvScenes.addItemDecoration(itemDecoration);
             getBinding().rvScenes.setAdapter(homeIndexAdapter);
         }
     }
 
+    private void reportEnter(@NonNull ScenesModel scenesModel){
+        ReportApi.reportEnter(scenesModel.getScene(), new Function1<Boolean, Unit>() {
+            @Override
+            public Unit invoke(Boolean aBoolean) {
+                return null;
+            }
+        },null);
+    }
+
     private void goScene(@NonNull ScenesModel scenesModel) {
-        switch (scenesModel.getType()) {
-            case Ktv_Online:
-                PagePilotManager.pageKTVRoomList();
-                break;
-            case Voice_Chat:
-                ARouter.getInstance()
-                        .build(PagePathConstant.pageVoiceChat)
-                        .navigation();
-                break;
-            case Meta_Live:
-                break;
-            case Meta_Chat:
-                break;
-            case Games:
-                break;
-            default:
-                break;
+        Intent intent = new Intent();
+        intent.setClassName(requireContext(), scenesModel.getClazzName());
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            ToastUtils.showToast(R.string.app_coming_soon);
         }
     }
 
