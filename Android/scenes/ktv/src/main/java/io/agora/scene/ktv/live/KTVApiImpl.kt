@@ -180,6 +180,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         lrcView = null
 
         mRtcEngine.removeHandler(this)
+        mRtcEngine.registerAudioFrameObserver(null)
         mPlayer.unRegisterPlayerObserver(this)
         mMusicCenter.unregisterEventHandler()
 
