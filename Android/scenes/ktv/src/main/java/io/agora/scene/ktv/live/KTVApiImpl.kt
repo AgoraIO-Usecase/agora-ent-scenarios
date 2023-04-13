@@ -60,6 +60,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private var mainSingerUid: Int = 0
     private var songCode: Long = 0
     private var songUrl: String = ""
+    private var songIdentifier: String = ""
 
     private val lyricCallbackMap =
         mutableMapOf<String, (songNo: Long, lyricUrl: String?) -> Unit>() // (requestId, callback)
@@ -333,7 +334,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     ) {
         Log.d(TAG, "loadMusic called: songCode $songCode")
         // 设置到全局， 连续调用以最新的为准
+        this.songMode = KTVSongMode.SONG_CODE
         this.songCode = songCode
+        this.songIdentifier = config.songIdentifier
         this.mainSingerUid = config.mainSingerUid
         mLastReceivedPlayPosTime = null
         mReceivedPlayPosition = 0
@@ -436,6 +439,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         config: KTVLoadMusicConfiguration
     ) {
         Log.d(TAG, "loadMusic called: songCode $songCode")
+        this.songMode = KTVSongMode.SONG_URL
+        this.songIdentifier = config.songIdentifier
         this.songUrl = url
         this.mainSingerUid = config.mainSingerUid
 
@@ -908,7 +913,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val realPosition = jsonMsg.getLong("realTime")
                 val duration = jsonMsg.getLong("duration")
                 val remoteNtp = jsonMsg.getLong("ntp")
-                val songCode = jsonMsg.getLong("songCode")
+                val songId = jsonMsg.getString("songIdentifier")
                 val mpkState = jsonMsg.getInt("playerState")
 
                 if (isChorusCoSinger()) {
@@ -952,7 +957,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     }
                 } else {
                     // 独唱观众
-                    if (this.songCode == songCode) {
+                    if (this.songIdentifier == songId) {
                         mLastReceivedPlayPosTime = System.currentTimeMillis()
                         mReceivedPlayPosition = realPosition
                     } else {
@@ -1132,7 +1137,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             msg["realTime"] = position_ms
             msg["playerState"] = MediaPlayerState.getValue(this.mediaPlayerState)
             msg["pitch"] = pitch
-            msg["songCode"] = songCode
+            msg["songIdentifier"] = songIdentifier
             val jsonMsg = JSONObject(msg)
             sendStreamMessageWithJsonObject(jsonMsg) {}
         }

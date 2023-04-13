@@ -196,6 +196,7 @@ data class KTVApiConfig(
  * @param mainSingerUid 主唱的 Uid，如果是伴唱，伴唱需要根据这个信息 mute 主频道主唱的声音
  */
 data class KTVLoadMusicConfiguration(
+    val songIdentifier: String,
     val autoPlay: Boolean = false,
     val mainSingerUid: Int,
     val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
