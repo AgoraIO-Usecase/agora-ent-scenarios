@@ -65,7 +65,7 @@ class NetworkManager:NSObject {
 
     @objc static let shared = NetworkManager()
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
-    private let baseServerUrl: String = "https://test-toolbox.bj2.agoralab.co/v1/"
+    private let baseServerUrl: String = "https://toolbox.bj2.agoralab.co/v1/"
     
     /// get tokens
     /// - Parameters:
