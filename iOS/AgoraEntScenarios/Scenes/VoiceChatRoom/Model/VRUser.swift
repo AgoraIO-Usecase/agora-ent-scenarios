@@ -19,6 +19,7 @@ import KakaJSON
     public var mic_index: Int?
     public var rtc_uid: String?
     public var volume: Int = 0 // 麦克风音量
+    public var micStatus: Int = 1 //1开麦 0自主静麦
 
     override public required init() {}
 

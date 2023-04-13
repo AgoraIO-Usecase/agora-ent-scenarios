@@ -52,9 +52,9 @@ class AgoraMicVolView: UIView {
     }
 
     public func setState(_ state: AgoraMicVolViewState) {
-        guard micState != state else {
-            return
-        }
+//        guard micState != state else {
+//            return
+//        }
         micState = state
         switch state {
         case .on:

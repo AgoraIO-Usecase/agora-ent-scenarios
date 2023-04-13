@@ -22,13 +22,13 @@
 #import "VLUserCenter.h"
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
-@import YYText;
+#import "KTVMacro.h"
+#import "AttributedTextView.h"
 @import Masonry;
 @import LEEAlert;
-@import YYCategories;
 @import SDWebImage;
 
-@interface VLLoginViewController () <VLLoginInputVerifyCodeViewDelegate, VLPrivacyCustomViewDelegate,VLPopImageVerifyViewDelegate>
+@interface VLLoginViewController () <VLLoginInputVerifyCodeViewDelegate, VLPrivacyCustomViewDelegate,VLPopImageVerifyViewDelegate, UITextViewDelegate>
 
 @property (nonatomic, strong) UILabel *appNameLabel;
 @property (nonatomic, strong) VLLoginInputPhoneView *phoneView;
@@ -36,10 +36,9 @@
 @property (nonatomic, strong) VLPrivacyCustomView *privacyCustomView;
 @property (nonatomic, strong) UIButton *loginButton;
 @property (nonatomic, strong) UIButton *agreeButton;    // 同意按钮
-@property (nonatomic, strong) YYLabel *privacyLabel;    // 隐私政策
 @property (nonatomic, strong) LSTPopView *popView;
 @property (nonatomic, assign) bool policyAgreed;
-
+@property (nonatomic, strong) AttributedTextView *textView;
 @end
 
 @implementation VLLoginViewController
@@ -67,40 +66,45 @@
 }
 
 - (void)setupViews {
+    
     [self.view addSubview:self.appNameLabel];
     [self.view addSubview:self.phoneView];
     [self.view addSubview:self.verifyView];
     [self.view addSubview:self.agreeButton];
-    [self.view addSubview:self.privacyLabel];
+    [self addAttributeView];
     [self.view addSubview:self.loginButton];
 }
 
 - (void)setupLayout {
+    
     [self.appNameLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(30);
         make.top.mas_equalTo(kStatusBarHeight + 125);
-        
+
     }];
     [self.phoneView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(self.appNameLabel);
         make.right.mas_equalTo(-30);
         make.top.mas_equalTo(self.appNameLabel.mas_bottom).offset(24);
     }];
-    
+
     [self.verifyView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(self.appNameLabel);
         make.right.mas_equalTo(-30);
         make.top.mas_equalTo(self.phoneView.mas_bottom).offset(24);
     }];
-    
+
     [self.agreeButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(30);
+        make.width.height.mas_equalTo(24);
         make.top.mas_equalTo(self.verifyView.mas_bottom).offset(20);
     }];
-    
-    [self.privacyLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+
+    [self.textView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(self.agreeButton.mas_right).offset(5);
-        make.centerY.mas_equalTo(self.agreeButton);
+        make.right.mas_equalTo(self.view.mas_right).offset(-20);
+        make.height.mas_equalTo(24);
+        make.centerY.mas_equalTo(self.agreeButton).offset(-3);
     }];
     
     [self.loginButton mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -109,6 +113,19 @@
         make.height.mas_equalTo(48);
         make.top.mas_equalTo(self.verifyView.mas_bottom).offset(64);
     }];
+}
+
+-(void)addAttributeView {
+    NSString *textString = @"我已阅读并同意 用户协议 及 隐私政策 ";
+    NSRange range1 = NSMakeRange(8, 4);
+    NSRange range2 = NSMakeRange(15, 4);
+    NSArray *array = [[NSArray alloc]initWithObjects:@"用户协议",@"隐私政策", nil];
+    NSMutableArray *ranges = [[NSMutableArray alloc]init];
+    [ranges addObject:[NSValue valueWithRange:range1]];
+    [ranges addObject:[NSValue valueWithRange:range2]];
+    _textView = [[AttributedTextView alloc]initWithFrame:CGRectZero text: textString AttributedStringS:array ranges:ranges textColor:UIColorMakeWithHex(@"#6C7192") attributeTextColor:UIColorMakeWithHex(@"#009FFF")];
+    _textView .delegate = self;
+    [self.view addSubview:_textView];
 }
 
 - (void)alertPrivacyAlertView:(int)pass {
@@ -349,39 +366,13 @@
     return _agreeButton;
 }
 
-- (YYLabel *)privacyLabel{
-    if(_privacyLabel) return _privacyLabel;
-    
-    _privacyLabel = [[YYLabel alloc] init];
-    _privacyLabel.numberOfLines = 0;
-    _privacyLabel.preferredMaxLayoutWidth = kScreenWidth - 30 * 2;
-    
-    NSString *_str4Total = AGLocalizedString(@"我已阅读并同意 用户协议 及 隐私政策 ");
-    NSString *_str4Highlight1 = AGLocalizedString(@"用户协议");
-    NSString *_str4Highlight2 = AGLocalizedString(@"隐私政策");
-    NSMutableAttributedString *_mattrStr = [NSMutableAttributedString new];
-    
-    [_mattrStr appendAttributedString:[[NSAttributedString alloc] initWithString:_str4Total attributes:@{NSFontAttributeName : VLUIFontMake(12), NSForegroundColorAttributeName : UIColorMakeWithHex(@"#6C7192")}]];
-    _mattrStr.yy_lineSpacing = 6;
-    NSRange range1 = [_str4Total rangeOfString:_str4Highlight1];
-    NSRange range2 = [_str4Total rangeOfString:_str4Highlight2];
-    [_mattrStr addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range1];
-    [_mattrStr addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range2];
-    if(range1.location != NSNotFound){
-        kWeakSelf(self)
-        [_mattrStr yy_setTextHighlightRange:range1 color:UIColorMakeWithHex(@"#009FFF") backgroundColor:[UIColor clearColor] tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
-            [weakself navigatorToWebviewOfUserProtocol];
-        }];
+- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction {
+    if([URL isEqual:[NSURL URLWithString:@"0"]]){
+        [self navigatorToWebviewOfUserProtocol];
+    } else {
+        [self navigatorToWebviewOfPrivacyProtocol];
     }
-    if(range2.location != NSNotFound){
-        kWeakSelf(self)
-        [_mattrStr yy_setTextHighlightRange:range2 color:UIColorMakeWithHex(@"#009FFF") backgroundColor:[UIColor clearColor] tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
-            [weakself navigatorToWebviewOfPrivacyProtocol];
-        }];
-    }
-    _privacyLabel.lineBreakMode = NSLineBreakByWordWrapping;
-    _privacyLabel.attributedText = _mattrStr;
-    return _privacyLabel;
+    return YES;
 }
 
 - (UIButton *)loginButton {

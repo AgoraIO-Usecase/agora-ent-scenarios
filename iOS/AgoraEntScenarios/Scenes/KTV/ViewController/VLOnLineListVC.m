@@ -156,12 +156,13 @@
 
 - (void)joinInRoomWithModel:(VLRoomListModel *)listModel withInPutText:(NSString *)inputText {
     if (listModel.isPrivate && ![listModel.password isEqualToString:inputText]) {
+        [VLToast toast:KTVLocalizedString(@"PasswordError")];
         return;
     }
     
     KTVJoinRoomInputModel* inputModel = [KTVJoinRoomInputModel new];
     inputModel.roomNo = listModel.roomNo;
-//    inputModel.userNo = VLUserCenter.user.userNo;
+//    inputModel.userNo = VLUserCenter.user.id;
     inputModel.password = inputText;
 
     VL(weakSelf);
@@ -172,7 +173,7 @@
             return;
         }
         
-        listModel.creator = outputModel.creator;
+        listModel.creatorNo = outputModel.creatorNo;
         VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
         ktvVC.roomModel = listModel;
         ktvVC.seatsArray = outputModel.seatsArray;

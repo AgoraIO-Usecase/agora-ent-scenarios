@@ -16,8 +16,7 @@ typedef enum : NSUInteger {
     VLKTVMVViewActionTypeMVPause,   // parse
     VLKTVMVViewActionTypeMVNext,     // 播放下一首
     VLKTVMVViewActionTypeSingOrigin, //原唱
-    VLKTVMVViewActionTypeSingAcc,   // 伴奏
-    VLKTVMVViewActionTypeExit
+    VLKTVMVViewActionTypeSingAcc   // 伴奏
     
 } VLKTVMVViewActionType;
 
@@ -27,17 +26,15 @@ typedef enum : NSUInteger {
 } VLKTVMVViewSingActionType;
 
 @class VLKTVMVView;
-@protocol VLKTVMVViewDelegate <NSObject, AgoraLrcDownloadDelegate, AgoraLrcViewDelegate>
+@protocol VLKTVMVViewDelegate <NSObject>
 
 //- (BOOL)ktvIsMyselfOnSeat;
 //
 //- (void)ktvNotifyUserNotOnSeat;
 
-- (void)onKTVMVView:(VLKTVMVView*)view startSingType:(VLKTVMVViewSingActionType)singType;
+- (void)onKTVMVView:(VLKTVMVView*)view chorusSingAction:(VLKTVMVViewSingActionType)singType;
 
 - (void)onKTVMVView:(VLKTVMVView*)view btnTappedWithActionType:(VLKTVMVViewActionType)type;
-
-- (void)onKTVMVView:(VLKTVMVView*)view timerCountDown:(NSInteger)countDownSecond;
 
 /// 打分实时回调
 /// @param score 分数
@@ -58,24 +55,22 @@ typedef enum : NSUInteger {
 /// @param state 状态
 - (void)updateMVPlayerState:(VLKTVMVViewActionType)state;
 
-- (void)setVoicePitch:(NSArray <NSNumber *> *)pitch;
+//- (void)setVoicePitch:(NSArray <NSNumber *> *)pitch;
 
-- (void)updateUIWithSong:(VLRoomSelSongModel* _Nullable)song onSeat:(BOOL)onSeat;
-
-- (void)setJoinInViewHidden;
+- (void)setChorusOptViewHidden;
 
 @property (nonatomic, strong) UIImageView *bgImgView;
 
-/// 收到倒计时消息 (只有上麦)
-/// @param countDown 倒计时 <= 0 时候不处理
-/// @param onSeat 是否是上麦状态
-/// @param currentSong 当前歌曲
-- (void)receiveCountDown:(int)countDown onSeat:(BOOL)onSeat currentSong:(VLRoomSelSongModel *)currentSong;
- 
+///// 收到倒计时消息 (只有上麦)
+///// @param countDown 倒计时 <= 0 时候不处理
+///// @param onSeat 是否是上麦状态
+///// @param currentSong 当前歌曲
+//- (void)receiveCountDown:(int)countDown onSeat:(BOOL)onSeat currentSong:(VLRoomSelSongModel *)currentSong;
+//
 /// 当前用户上麦下麦
 /// @param onSeat 当前用户上麦下麦
 /// @param song 歌曲信息
-- (void)updateUIWithUserOnSeat:(BOOL)onSeat song:(VLRoomSelSongModel *)song;
+- (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song onSeat:(BOOL)onSeat;
 
 //- (void)cleanMusicText;
 - (int)getSongScore;
@@ -83,6 +78,8 @@ typedef enum : NSUInteger {
 - (int)getAvgSongScore;
 
 - (void)setPlayerViewsHidden:(BOOL)hidden nextButtonHidden:(BOOL)nextButtonHidden;
+- (void)setOriginBtnState:(VLKTVMVViewActionType)type;
+- (void)setCoundDown:(NSInteger)seconds;
 
 #pragma mark - 歌词相关
 
@@ -96,8 +93,6 @@ typedef enum : NSUInteger {
 - (void)stop;
 /// 重置歌词界面
 - (void)reset;
-/// 重置歌词时间
-- (void)resetTime;
 ///滚动到指定位置
 - (void)scrollToTime:(NSTimeInterval)time;
 
