@@ -246,6 +246,7 @@ class NetworkManager:NSObject {
                           streamUrl: String,
                           success: @escaping (String?) -> Void) {
         let params: [String: Any] = ["appId": KeyCenter.AppId,
+                                     "appCertificate": KeyCenter.Certificate ?? "",
                                         "channelName": channelName,
                                         "uid": uid,
                                         "robotUid": robotUid,
