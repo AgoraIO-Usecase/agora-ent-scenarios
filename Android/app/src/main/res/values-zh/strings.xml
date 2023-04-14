@@ -3,6 +3,7 @@
     <string name="app_title_home">首页</string>
     <string name="app_title_find">发现</string>
     <string name="app_title_mine">我的</string>
+    <string name="app_action_settings">设置</string>
 
     <string name="app_exit">退出</string>
     <string name="app_user_agreement">用户协议</string>
@@ -10,10 +11,8 @@
     <string name="app_and">及</string>
 
     <string name="app_confirm_deletion">确认删除？</string>
-    <string name="app_version_is">当前版本号：%s SDK %s</string>
     <string name="app_about_us">关于我们</string>
-    <string name="app_about">关于</string>
-    <string name="app_used_agree">使用该应用即表示您同意</string>
+
     <string name="app_please_input_account">请输入手机号</string>
     <string name="app_error_pwd_tip">8-20个字符，包含大、小写字母和数字</string>
     <string name="app_please_input_pwd">请输入密码</string>
@@ -33,8 +32,26 @@
     <string name="app_debug_mode">开发者模式</string>
 
     <string name="app_voice_chat">语聊房</string>
+    <string name="app_show_live">秀场直播</string>
     <string name="app_meta_live">元直播</string>
     <string name="app_meta_chatting">元语聊</string>
     <string name="app_interactive_games">互动游戏</string>
     <string name="app_coming_soon">敬请期待</string>
+    <string name="app_voice_chat_spatial">空间音频</string>
+
+    <string name="app_voice_chat_spatialTip">—空间音频模式</string>
+
+
+    <string name="app_about_app">关于声动互娱</string>
+    <string name="app_about_name">声动互娱</string>
+    <string name="app_about_version">版本号</string>
+    <string name="app_about_scene_version">场景版本号</string>
+    <string name="app_about_chat_room">语聊房</string>
+    <string name="app_about_chat_room_spatial">语聊房-空间音频模式</string>
+    <string name="app_about_karaoke">在线K歌</string>
+    <string name="app_about_customer_service">联系客服</string>
+    <string name="app_about_official_website">官网地址</string>
+    <string name="app_about_phone_cancel">取消</string>
+    <string name="app_mine_current_version">当前版本号：%s</string>
+
 </resources>

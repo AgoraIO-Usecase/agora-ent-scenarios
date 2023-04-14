@@ -1,0 +1,29 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/base_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.25"
+        android:id="@+id/empty_icon"
+        android:src="@mipmap/voice_icon_empty_room_layout"
+        android:layout_width="238dp"
+        android:layout_height="140dp"/>
+
+    <TextView
+        android:id="@+id/content_item"
+        app:layout_constraintTop_toBottomOf="@+id/empty_icon"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_below="@+id/empty_icon"
+        android:text="@string/voice_room_empty_data"
+        android:textColor="@color/voice_dark_grey_color_979cbb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

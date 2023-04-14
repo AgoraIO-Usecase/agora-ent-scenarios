@@ -140,4 +140,5 @@
     <string name="ktv_no_lrc">暂无歌词 </string>
     <string name="ktv_content">监测到当前内容存在违规行为</string>
     <string name="ktv_onseat_toast">加入合唱前，您需要先上麦</string>
+
 </resources>

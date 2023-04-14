@@ -52,6 +52,7 @@ import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
 import io.agora.scene.widget.dialog.CloseRoomDialog;
 import io.agora.scene.widget.dialog.CommonDialog;
+import io.agora.scene.widget.dialog.PermissionLeakDialog;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 import io.agora.scene.widget.utils.UiUtils;
 
@@ -86,6 +87,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     @Override
     public void initView(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            finish();
+            return;
+        }
         getWindow().getDecorView().setKeepScreenOn(true);
         roomLivingViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
             @NonNull
@@ -117,9 +122,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         // 上麦
                         RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
                         if (seatLocal == null || seatLocal.getSeatIndex() < 0) {
-                            roomLivingViewModel.haveSeat(position);
-                            getBinding().cbMic.setChecked(false);
-                            getBinding().cbVideo.setChecked(false);
+                            toggleAudioRun = () -> {
+                                roomLivingViewModel.haveSeat(position);
+                                getBinding().cbMic.setChecked(false);
+                                getBinding().cbVideo.setChecked(false);
+                            };
                             requestRecordPermission();
                         }
                     }
@@ -196,8 +203,13 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
         getBinding().lrcControlView.post(() -> {
             // TODO workaround 先强制申请权限， 避免首次安装无声
-            toggleAudioRun = () -> roomLivingViewModel.init();
-            requestRecordPermission();
+            if(roomLivingViewModel.isRoomOwner()){
+                toggleAudioRun = () -> roomLivingViewModel.init();
+                requestRecordPermission();
+            }
+            else{
+                roomLivingViewModel.init();
+            }
         });
 
         if (!TextUtils.isEmpty(roomLivingViewModel.roomInfoLiveData.getValue().getBgOption())) {
@@ -221,7 +233,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if (seatLocal == null || mRoomSpeakerAdapter.getItem(seatLocal.getSeatIndex()) == null) {
                 return;
             }
-            roomLivingViewModel.toggleMic(b);
+            if (b) {
+                toggleAudioRun = () -> roomLivingViewModel.toggleMic(true);
+                requestRecordPermission(true);
+            } else {
+                roomLivingViewModel.toggleMic(false);
+            }
         });
         getBinding().iBtnChorus.setOnClickListener(v -> showChorusSongDialog());
         getBinding().iBtnChooseSong.setOnClickListener(v -> showChooseSongDialog());
@@ -683,8 +700,14 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     //开启 关闭摄像头
     private void toggleSelfVideo(boolean isOpen) {
-        toggleVideoRun = () -> roomLivingViewModel.toggleSelfVideo(isOpen);
-        requestCameraPermission();
+        if (isOpen) {
+            toggleVideoRun = () -> {
+                roomLivingViewModel.toggleSelfVideo(true);
+            };
+            requestCameraPermission(true);
+        } else {
+            roomLivingViewModel.toggleSelfVideo(false);
+        }
     }
 
     @Override
@@ -697,6 +720,13 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             toggleAudioRun.run();
             toggleAudioRun = null;
         }
+    }
+
+    @Override
+    protected void onPermissionDined(String permission) {
+        new PermissionLeakDialog(this).show(permission,
+                this::getPermissions,
+                () -> launchAppSetting(permission));
     }
 
     private void onMemberLeave(@NonNull RoomSeatModel member) {
