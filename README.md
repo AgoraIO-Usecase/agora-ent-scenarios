@@ -12,8 +12,10 @@
 
 * 空间音频语聊房
     * [Android](Android/scenes/voice_spatial)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/SpatialAudio)
 * 秀场直播
     * [Android](Android/scenes/show)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/Show)
 
 ## 1.2 运行示例
 * 运行 K 歌房项目，请参考以下流程
@@ -24,8 +26,10 @@
     * [iOS](iOS/AgoraEntScenarios/Scenes/VoiceChatRoom)
 * 运行空间音频语聊房项目，请参考以下流程
     * [Android](Android/scenes/voice_spatial)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/SpatialAudio)
 * 运行秀场直播项目，请参考以下流程
     * [Android](Android/scenes/show)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/Show)
 
 # 2. FAQ
 
