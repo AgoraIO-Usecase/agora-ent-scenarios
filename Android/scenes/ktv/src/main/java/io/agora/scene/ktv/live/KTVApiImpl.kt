@@ -760,7 +760,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     // ------------------ 歌词播放、同步 ------------------
     // 开始播放歌词
 
-    private val displayLrcTask  = object : Runnable {
+    private val displayLrcTask = object : Runnable {
         override fun run() {
             if (!mStopDisplayLrc){
                 val lastReceivedTime = mLastReceivedPlayPosTime ?: return
@@ -800,16 +800,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private var mStopSyncPitch = true
 
     private val mSyncPitchTask = Runnable {
-        mStopSyncPitch = false
-        while (!mStopSyncPitch) {
+        if (!mStopSyncPitch) {
             if (mediaPlayerState == MediaPlayerState.PLAYER_STATE_PLAYING &&
                 (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.SoloSinger)) {
                 sendSyncPitch(pitch)
-            }
-            try {
-                Thread.sleep(50)
-            } catch (exp: InterruptedException) {
-                break
             }
         }
     }
@@ -824,6 +818,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     // 开始同步音高
     private fun startSyncPitch() {
+        mStopSyncPitch = false
         scheduledThreadPool.scheduleAtFixedRate(mSyncPitchTask,0,50,TimeUnit.MILLISECONDS)
     }
 
