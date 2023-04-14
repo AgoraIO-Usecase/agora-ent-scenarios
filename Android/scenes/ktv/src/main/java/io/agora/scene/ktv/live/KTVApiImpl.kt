@@ -350,11 +350,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mReceivedPlayPosition = 0
 
         if (config.mode == KTVLoadMusicMode.LOAD_NONE) {
-            if (config.autoPlay) {
-                // 主唱自动播放歌曲
-                switchSingerRole(KTVSingRole.SoloSinger, null)
-                startSing(songCode, 0)
-            }
             return
         }
 
@@ -746,7 +741,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         if (newRole == KTVSingRole.CoSinger) {
             mRtcEngine.muteRemoteAudioStream(mainSingerUid, true)
-            Log.e(TAG, "muteRemoteAudioStream$mainSingerUid")
+            Log.d(TAG, "muteRemoteAudioStream$mainSingerUid")
         }
     }
 

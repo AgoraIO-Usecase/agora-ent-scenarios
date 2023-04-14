@@ -552,8 +552,9 @@ public class RoomLivingViewModel extends ViewModel {
                 KTVLogger.d(TAG, "RoomLivingViewModel.toggleSelfVideo() success");
                 isCameraOpened = isOpen;
                 mRtcEngine.enableLocalVideo(isOpen);
-                mainChannelMediaOption.publishCameraTrack = isOpen;
-                mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
+                ChannelMediaOptions channelMediaOption = new ChannelMediaOptions();
+                channelMediaOption.publishCameraTrack = isOpen;
+                mRtcEngine.updateChannelMediaOptions(channelMediaOption);
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.toggleSelfVideo() failed: " + e.getMessage());
