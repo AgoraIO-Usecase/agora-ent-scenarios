@@ -49,6 +49,9 @@ android {
         buildConfigField "String", "IM_APP_KEY", "\"${IM_APP_KEY}\""
         buildConfigField "String", "IM_APP_CLIENT_ID", "\"${IM_APP_CLIENT_ID}\""
         buildConfigField "String", "IM_APP_CLIENT_SECRET", "\"${IM_APP_CLIENT_SECRET}\""
+
+        buildConfigField "String", "CLOUD_PLAYER_KEY", "\"${CLOUD_PLAYER_KEY}\""
+        buildConfigField "String", "CLOUD_PLAYER_SECRET", "\"${CLOUD_PLAYER_SECRET}\""
     }
 
     buildTypes {

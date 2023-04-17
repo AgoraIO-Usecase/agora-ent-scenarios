@@ -1,6 +1,7 @@
 package io.agora.scene.show.service
 
 import android.os.CountDownTimer
+import android.util.Base64
 import io.agora.scene.base.BuildConfig
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
@@ -86,6 +87,7 @@ class CloudPlayerService {
         }
     }
 
+
     private fun reqStartCloudPlayer(
         channelName: String,
         uid: String,
@@ -99,7 +101,7 @@ class CloudPlayerService {
             JSONObject()
                 .put("appId", BuildConfig.AGORA_APP_ID)
                 .put("appCert", BuildConfig.AGORA_APP_CERTIFICATE)
-                //.put("basicAuth", "")
+                .put("basicAuth", Base64.encodeToString("${BuildConfig.CLOUD_PLAYER_KEY}:${BuildConfig.CLOUD_PLAYER_SECRET}".toByteArray(Charsets.UTF_8), Base64.NO_WRAP))
                 .put("channelName", channelName)
                 .put("uid", uid)
                 .put("robotUid", robotUid)
