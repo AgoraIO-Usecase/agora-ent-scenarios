@@ -26,6 +26,11 @@
   > - 得到App ID与App 证书
   >   
   >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
+  >   
+  > - 秒切机器人服务配置（CloudPlayer）
+  > 
+  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/CloudPlayer.png)
+  > 
 
 - 获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
@@ -88,6 +93,8 @@
 - 运行项目即可开始您的体验
 
 ---
+  
+
 
 ## 3. 项目介绍
 

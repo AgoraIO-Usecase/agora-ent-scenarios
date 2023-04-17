@@ -50,6 +50,8 @@ struct KeyCenter {
      */
 //    static var Token: String? = nil
     
+    static let CloudPlayerKey: String? = nil
+    static let CloudPlayerSecret: String? = nil
     
     static var IMAppKey: String? = nil
     static var IMClientId: String? = nil
