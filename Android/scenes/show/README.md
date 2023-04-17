@@ -48,7 +48,9 @@ if(!isShowEmpty){
   
   ```texag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0
   AGORA_APP_ID：声网appid  
-  AGORA_APP_CERTIFICATE：声网Certificate  
+  AGORA_APP_CERTIFICATE：声网Certificate 
+  CLOUD_PLAYER_KEY：声网RESTful API key
+  CLOUD_PLAYER_SECRET：声网RESTful API secret
   ```
 
 - <mark>4. </mark> 美颜配置
