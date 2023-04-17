@@ -16,10 +16,7 @@ import io.agora.rtc2.audio.AudioParams
 import org.json.JSONException
 import org.json.JSONObject
 import java.nio.ByteBuffer
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.ScheduledThreadPoolExecutor
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 
 enum class KTVSongMode(val value: Int) {
     SONG_CODE(0),
@@ -780,16 +777,20 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             }
         }
     }
+
+    private var displayLrcFuture: ScheduledFuture<*>? = null
     private fun startDisplayLrc() {
         Log.d(TAG, "startDisplayLrc called")
         mStopDisplayLrc = false
-        scheduledThreadPool.scheduleAtFixedRate(displayLrcTask, 0,20, TimeUnit.MILLISECONDS)
+        displayLrcFuture = scheduledThreadPool.scheduleAtFixedRate(displayLrcTask, 0,20, TimeUnit.MILLISECONDS)
     }
 
     // 停止播放歌词
     private fun stopDisplayLrc() {
         Log.d(TAG, "stopDisplayLrc called")
         mStopDisplayLrc = true
+        displayLrcFuture?.cancel(true)
+        displayLrcFuture = null
         if (scheduledThreadPool is ScheduledThreadPoolExecutor) {
             (scheduledThreadPool as ScheduledThreadPoolExecutor).remove(displayLrcTask)
         }
@@ -817,9 +818,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     // 开始同步音高
+    private var mSyncPitchFuture :ScheduledFuture<*>? = null
     private fun startSyncPitch() {
         mStopSyncPitch = false
-        scheduledThreadPool.scheduleAtFixedRate(mSyncPitchTask,0,50,TimeUnit.MILLISECONDS)
+        mSyncPitchFuture = scheduledThreadPool.scheduleAtFixedRate(mSyncPitchTask,0,50,TimeUnit.MILLISECONDS)
     }
 
     // 停止同步音高
@@ -827,6 +829,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mStopSyncPitch = true
         pitch = 0.0
 
+        mSyncPitchFuture?.cancel(true)
+        mSyncPitchFuture = null
         if (scheduledThreadPool is ScheduledThreadPoolExecutor) {
             (scheduledThreadPool as ScheduledThreadPoolExecutor).remove(mSyncPitchTask)
         }
