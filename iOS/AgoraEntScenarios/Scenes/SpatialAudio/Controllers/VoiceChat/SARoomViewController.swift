@@ -107,6 +107,7 @@ class SARoomViewController: SABaseViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         tipsView.show()
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -120,6 +121,7 @@ class SARoomViewController: SABaseViewController {
         SAUserInfo.shared.user?.amount = 0
 //        AppContext.saServiceImp().cleanCache()
         AppContext.saServiceImp().unsubscribeEvent()
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
 }
 
