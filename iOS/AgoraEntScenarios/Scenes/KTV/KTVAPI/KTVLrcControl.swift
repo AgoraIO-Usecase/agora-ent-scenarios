@@ -139,7 +139,6 @@ extension KTVLrcControl: KTVLrcViewDelegate {
 
     func onUpdateProgress(progress: Int) {
         self.progress = progress
-        print("setProgress:\(progress)")
         lrcView?.setProgress(progress: progress)
         guard let model = lyricModel else {
             return

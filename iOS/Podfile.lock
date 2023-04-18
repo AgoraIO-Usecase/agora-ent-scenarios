@@ -17,7 +17,7 @@ PODS:
   - Agora-Scene-Utils (1.0.9)
   - Agora_Chat_iOS (1.0.8)
   - AgoraLyricsScore (1.1.1-beta-3)
-  - AgoraRtcEngine_Special_iOS (4.0.0.133.1)
+  - AgoraRtcEngine_Special_iOS (4.0.0.133.2)
   - AgoraRtm_iOS (1.5.1)
   - AgoraSyncManager (1.1.3):
     - SocketRocket
@@ -33,8 +33,8 @@ PODS:
     - LSTTimer
   - LSTTimer (0.2.10)
   - Masonry (1.1.0)
-  - Protobuf (3.22.1)
-  - ScoreEffectUI (1.0.0)
+  - Protobuf (3.22.3)
+  - ScoreEffectUI (1.0.1)
   - SDWebImage (5.0.6):
     - SDWebImage/Core (= 5.0.6)
   - SDWebImage/Core (5.0.6)
@@ -63,7 +63,7 @@ DEPENDENCIES:
   - Agora-Scene-Utils (= 1.0.9)
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraLyricsScore (= 1.1.1-beta-3)
-  - AgoraRtcEngine_Special_iOS (= 4.0.0.133.1)
+  - AgoraRtcEngine_Special_iOS (= 4.0.0.133.2)
   - AgoraRtm_iOS (= 1.5.1)
   - AgoraSyncManager (= 1.1.3)
   - Bugly (= 2.5.93)
@@ -73,7 +73,7 @@ DEPENDENCIES:
   - KakaJSON (= 1.1.2)
   - LSTPopView (= 0.3.10)
   - Masonry (= 1.1.0)
-  - ScoreEffectUI
+  - ScoreEffectUI (= 1.0.1)
   - SDWebImage (= 5.0.6)
   - SnapKit (= 5.6.0)
   - SocketRocket (= 0.6.0)
@@ -121,7 +121,7 @@ SPEC CHECKSUMS:
   Agora-Scene-Utils: 260f18dfa184b64b064ddeb222aae08f6f6c4937
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
-  AgoraRtcEngine_Special_iOS: 7f667e858969fb23d3453dc9737f04ffa4a23863
+  AgoraRtcEngine_Special_iOS: 1ecbcbf903b2e35fcc6e148ed152b2674a3948ad
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   AgoraSyncManager: ee9b8af10559986f82a3c98308fa60603aedfa25
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
@@ -132,8 +132,8 @@ SPEC CHECKSUMS:
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
-  Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  ScoreEffectUI: 072afb2f77c952e2b4d757792cbf340c1a271651
+  Protobuf: d03938d5f7e974a97964fb0567771e36fbe9ecce
+  ScoreEffectUI: 1a3bbd83b17cfef1c16a3a4eede2854f89c9eb10
   SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
@@ -146,6 +146,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 3b3fb16918de1ba8bc4722e8c3f404c8df7c0a91
+PODFILE CHECKSUM: d85967c7573e2b85ccb089097f84fd2a81536e46
 
 COCOAPODS: 1.11.3

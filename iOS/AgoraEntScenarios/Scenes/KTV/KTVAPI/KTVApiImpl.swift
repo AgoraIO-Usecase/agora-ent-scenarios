@@ -81,6 +81,7 @@ class KTVApiImpl: NSObject{
     private var useCustomAudioSource:Bool = false
     private var songUrl: String = ""
     private var songCode: Int = 0
+    private var songIdentifier: String = ""
 
     private var singerRole: KTVSingRole = .audience {
         didSet {
@@ -104,6 +105,8 @@ class KTVApiImpl: NSObject{
         super.init()
         agoraPrint("init KTVApiImpl")
         self.apiConfig = config
+        
+        setParams()
         
         let dataStreamConfig = AgoraDataStreamConfig()
         dataStreamConfig.ordered = false
@@ -131,6 +134,21 @@ class KTVApiImpl: NSObject{
 
         initTimer()
     }
+    
+    private func setParams() {
+        guard let engine = self.apiConfig?.engine else {return}
+        engine.setParameters("{\"rtc.enable_nasa2\": false}")
+        engine.setParameters("{\"rtc.ntp_delay_drop_threshold\": 1000}")
+        engine.setParameters("{\"rtc.video.enable_sync_render_ntp\": true}")
+        engine.setParameters("{\"rtc.net.maxS2LDelay\": 800}")
+        engine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\": true}")
+        engine.setParameters("{\"rtc.net.maxS2LDelayBroadcast\": 400}")
+        engine.setParameters("{\"che.audio.neteq.prebuffer\": true}")
+        engine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\": 600}")
+        engine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
+        engine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\": true}")
+        engine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
+    }
 }
 
 //MARK: KTVApiDelegate
@@ -149,12 +167,14 @@ extension KTVApiImpl: KTVApiDelegate {
         agoraPrint("loadMusic songCode:\(songCode) ")
         self.songMode = .songCode
         self.songCode = songCode
+        self.songIdentifier = config.songIdentifier
         _loadMusic(config: config, mode: config.mode, onMusicLoadStateListener: onMusicLoadStateListener)
     }
     
     func loadMusic(config: KTVSongConfiguration, url: String) {
         self.songMode = .songUrl
         self.songUrl = url
+        self.songIdentifier = config.songIdentifier
         if config.autoPlay {
             // 主唱自动播放歌曲
             switchSingerRole(newRole: .soloSinger) { _, _ in
@@ -840,23 +860,24 @@ extension KTVApiImpl {
         guard let position = dict["time"] as? Int64,
                 let duration = dict["duration"] as? Int64,
                 let realPosition = dict["realTime"] as? Int64,
-                let songCode = dict["songCode"] as? Int64,
+               // let songCode = dict["songCode"] as? Int64,
                 let mainSingerState = dict["playerState"] as? Int,
-                let ntpTime = dict["ntp"] as? Int
+                let ntpTime = dict["ntp"] as? Int,
+                let songId = dict["songIdentifier"] as? String
         else { return }
         print("realTime:\(realPosition) position:\(position) lastNtpTime:\(lastNtpTime) ntpTime:\(ntpTime) ntpGap:\(ntpTime - self.lastNtpTime) ")
         //如果接收到的歌曲和自己本地的歌曲不一致就不更新进度
-        guard songCode == self.songCode else {
-            agoraPrint("local songCode[\(songCode)] is not equal to recv songCode[\(self.songCode)] role: \(singerRole.rawValue)")
-            return
-        }
+//        guard songCode == self.songCode else {
+//            agoraPrint("local songCode[\(songCode)] is not equal to recv songCode[\(self.songCode)] role: \(singerRole.rawValue)")
+//            return
+//        }
 
         self.lastNtpTime = ntpTime
         self.remotePlayerDuration = TimeInterval(duration)
-        self.lastMainSingerUpdateTime = Date().milListamp
-        self.remotePlayerPosition = TimeInterval(realPosition)
+        
         let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
-
+//        self.lastMainSingerUpdateTime = Date().milListamp
+//        self.remotePlayerPosition = TimeInterval(realPosition)
         if self.playerState != state {
             agoraPrint("[setLrcTime] recv state: \(self.playerState.rawValue)->\(state.rawValue) role: \(singerRole.rawValue) role: \(singerRole.rawValue)")
             
@@ -872,8 +893,17 @@ extension KTVApiImpl {
         }
 
         if role == .coSinger {
+            self.lastMainSingerUpdateTime = Date().milListamp
+            self.remotePlayerPosition = TimeInterval(realPosition)
             handleCoSingerRole(dict: dict)
         } else if role == .audience {
+            if self.songIdentifier == songId {
+                self.lastMainSingerUpdateTime = Date().milListamp
+                self.remotePlayerPosition = TimeInterval(realPosition)
+            } else {
+                self.lastMainSingerUpdateTime = 0
+                self.remotePlayerPosition = 0
+            }
             handleAudienceRole(dict: dict)
         }
     }
@@ -1005,7 +1035,6 @@ extension KTVApiImpl {
         //如果mpk不是playing状态 pitch = 0
         if musicPlayer?.getPlayerState() != .playing {pitch = 0}
         self.pitch = pitch
-        
         //将主唱的pitch同步到观众
         if isMainSinger() {
             let dict: [String: Any] = [ "cmd": "setVoicePitch",
@@ -1029,7 +1058,7 @@ extension KTVApiImpl {
         
         guard timer == nil else { return }
 
-        timer = Timer.scheduledTimer(withTimeInterval: 0.02, block: {[weak self] timer in
+        timer = Timer.scheduledTimer(withTimeInterval: 0.05, block: {[weak self] timer in
             guard let self = self else {
                 timer.invalidate()
                 return
@@ -1044,10 +1073,8 @@ extension KTVApiImpl {
                 return
             }
 
-            if self.singerRole == .audience {
-                if self.oldPitch == self.pitch && (self.oldPitch != 0 && self.pitch != 0) {
-                    self.pitch = -1
-                }
+            if self.oldPitch == self.pitch && (self.oldPitch != 0 && self.pitch != 0) {
+                self.pitch = -1
             }
             
             if self.singerRole != .audience {
@@ -1227,7 +1254,6 @@ extension KTVApiImpl {
     private func setProgress(with pos: Int) {
         lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
         lrcControl?.onUpdateProgress(progress: pos > 200 ? pos - 200 : pos)
-        print("pos\(pos > 200 ? pos - 200 : pos)")
     }
 }
 
@@ -1246,10 +1272,10 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
                                         "realTime":position,
                                         "ntp": self.getNtpTimeInMs(),
                                         "playerState": self.playerState.rawValue,
-                                        "songCode": self.songCode
+                                        "songIdentifier": songIdentifier
+                                       // "songCode": self.songCode
             ]
             sendStreamMessageWithDict(dict, success: nil)
-            print("main: ntp:\(self.getNtpTimeInMs()) realTime:\(position) gap:\(self.getNtpTimeInMs() - lastNtpTime )")
 
         }
     }

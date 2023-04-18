@@ -161,6 +161,7 @@ import AgoraRtcKit
 
 /// 歌曲加载配置信息
 @objcMembers open class KTVSongConfiguration: NSObject {
+    public var songIdentifier: String = ""
     public var autoPlay: Bool = false   //是否加载完成自动播放
     public var mainSingerUid: Int = 0     //主唱uid
     public var mode: KTVLoadMusicMode = .loadMusicAndLrc
