@@ -181,13 +181,14 @@
 >    *
 >    * 推荐调用：
 >    * 歌曲开始时：
->    * 主唱 loadMusic(KTVLoadMusicConfiguration(autoPlay=true, mode=LOAD_MUSIC_AND_LRC, songCode, mainSingerUid)) switchSingerRole(SoloSinger)
->    * 观众 loadMusic(KTVLoadMusicConfiguration(autoPlay=false, mode=LOAD_LRC_ONLY, songCode, mainSingerUid))
+>    * 主唱 loadMusic(songCode, KTVLoadMusicConfiguration(songId, autoPlay=true, mode=LOAD_MUSIC_AND_LRC, mainSingerUid)) switchSingerRole(SoloSinger)
+>    * 观众 loadMusic(songCode, KTVLoadMusicConfiguration(songId, autoPlay=false, mode=LOAD_LRC_ONLY, mainSingerUid))
 >    * 加入合唱时：
 >    * 准备加入合唱者：loadMusic(KTVLoadMusicConfiguration(autoPlay=false, mode=LOAD_MUSIC_ONLY, songCode, mainSingerUid))
 >    * loadMusic成功后switchSingerRole(CoSinger)
 >    */
 >   fun loadMusic(
+>     songCode: Long,
 >     config: KTVLoadMusicConfiguration,
 >     onMusicLoadStateListener: OnMusicLoadStateListener
 >   )
