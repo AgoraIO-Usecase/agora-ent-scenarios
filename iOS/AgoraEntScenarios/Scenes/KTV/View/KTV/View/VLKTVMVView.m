@@ -356,7 +356,7 @@
     }
     
     if(self.pauseBtn.hidden == YES && self.nextButton.hidden == NO && self.leaveChorusBtn.hidden == YES){
-        self.nextButton.frame = self.pauseBtn.frame;
+        self.nextButton.frame = CGRectMake(20, 0, 34, 54);
     } else {
         self.nextButton.frame = CGRectMake(_pauseBtn.right+10, _pauseBtn.top, 34, 54);
     }
@@ -369,6 +369,8 @@
         case KTVSingRoleSoloSinger:
         case KTVSingRoleLeadSinger: {
             [self setPlayerViewsHidden:NO nextButtonHidden:NO playButtonHidden:NO];
+            self.pauseBtn.frame = CGRectMake(20, 0, 34, 54);
+            self.nextButton.frame = CGRectMake(_pauseBtn.right+10, _pauseBtn.top, 34, 54);
           //  self.joinCoSingerState = KTVJoinCoSingerStateIdle;
         } break;
         case KTVSingRoleCoSinger: {
@@ -381,6 +383,7 @@
         default: {
             if(VLUserCenter.user.ifMaster) {
                 [self setPlayerViewsHidden:YES nextButtonHidden:NO playButtonHidden:YES];
+                self.nextButton.frame = CGRectMake(20, 0, 34, 54);
             } else {
                 [self setPlayerViewsHidden:YES nextButtonHidden:YES playButtonHidden:YES];
             }

@@ -520,6 +520,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 #pragma mark - action utils / business
 - (void)stopPlaySong {
+    self.isPause = false;
+    self.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
     [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
                            onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
     }];
@@ -550,6 +552,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     songConfig.autoPlay = (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? NO : YES ;
     songConfig.mode = (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.userNo integerValue];
+    songConfig.songIdentifier = model.songNo;
     
     self.MVView.loadingType = VLKTVMVViewStateLoading;
     [self.MVView setBotViewHidden:true];
@@ -695,6 +698,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     songConfig.autoPlay = NO;
     songConfig.mode = KTVLoadMusicModeLoadMusicOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
+    songConfig.songIdentifier = model.songNo;
     
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
@@ -840,19 +844,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
-    [self.RTCkit setParameters: @"{\"rtc.enable_nasa2\": false}"];
-    [self.RTCkit setParameters: @"{\"rtc.ntp_delay_drop_threshold\": 1000}"];
-    [self.RTCkit setParameters: @"{\"rtc.video.enable_sync_render_ntp\": true}"];
-    [self.RTCkit setParameters: @"{\"rtc.net.maxS2LDelay\": 800}"];
-    [self.RTCkit setParameters: @"{\"rtc.video.enable_sync_render_ntp_broadcast\": true}"];
-    [self.RTCkit setParameters: @"{\"rtc.net.maxS2LDelayBroadcast\": 400}"];
-    [self.RTCkit setParameters: @"{\"che.audio.neteq.prebuffer\": true}"];
-    [self.RTCkit setParameters: @"{\"che.audio.neteq.prebuffer_max_delay\": 600}"];
-    [self.RTCkit setParameters: @"{\"che.audio.max_mixed_participants\": 8}"];
-    [self.RTCkit setParameters: @"{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\": true}"];
-    [self.RTCkit setParameters: @"{\"che.audio.custom_bitrate\": 48000}"];
+    
     /// 开启唱歌评分功能
-    int code = [self.RTCkit enableAudioVolumeIndication:50 smooth:3 reportVad:YES];
+    int code = [self.RTCkit enableAudioVolumeIndication:50 smooth:10 reportVad:true];
+    
     if (code == 0) {
         KTVLogInfo(@"评分回调开启成功\n");
     } else {
@@ -886,8 +881,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     config.ordered = NO;
     config.syncWithAudio = NO;
     [self.RTCkit createDataStream:&ktvStreamId
-                           config:config];
-    [self.RTCkit createDataStream:&ktvApiStreamId
                            config:config];
     
     NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
@@ -1248,6 +1241,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     songConfig.autoPlay = YES;
     songConfig.mode = KTVLoadMusicModeLoadLrcOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
+    songConfig.songIdentifier = model.songNo;
     
     self.MVView.loadingType = VLKTVMVViewStateLoading;
     [self.MVView setBotViewHidden:true];
@@ -1615,14 +1609,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //        [self.RTCkit enableInEarMonitoring:NO includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFilters];
 //    }
     if(self.singRole != KTVSingRoleAudience){//主唱伴唱都能开启耳返
-        [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFilters];
+        [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterNone];
     }
 }
 
 - (void)setSelSongsArray:(NSArray<VLRoomSelSongModel *> *)selSongsArray {
     NSArray<VLRoomSelSongModel*> *oldSongsArray = _selSongsArray;
     _selSongsArray = [NSMutableArray arrayWithArray:selSongsArray];
-    
+    self.chorusNum = [self getChorusNumWithSeatArray:self.seatsArray];
     if (self.chooseSongView) {
         self.chooseSongView.selSongsArray = _selSongsArray; //刷新已点歌曲UI
     }
