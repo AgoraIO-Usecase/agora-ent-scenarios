@@ -61,6 +61,11 @@
   ```texag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0
   static let AppId: String = 声网AppID
   static let Certificate: String? = 声网App证书
+  
+    static var IMAppKey: String? = 环信AppKey
+    static var IMClientId: String? = 环信ClientId
+    static var IMClientSecret: String? = 环信ClientSecret
+  
   ```
 
 # 3.项目介绍
