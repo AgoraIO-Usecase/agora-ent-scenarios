@@ -12,6 +12,20 @@
 ---
 
 ## 2. 运行示例
+-  安装依赖库
+
+	切换到 **iOS** 目录，运行以下命令使用CocoaPods安装依赖，AgoraSDK会在安装后自动完成集成。
+	
+	使用cocoapods
+	
+	[安装cocoapods](http://t.zoukankan.com/lijiejoy-p-9680485.html)
+	
+	```
+	pod install
+	```
+
+	打开 `AgoraEntScenarios.xcworkspace`
+
 
 - 获取声网App ID 和 App 证书  
   [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)  
@@ -47,6 +61,11 @@
   ```texag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0
   static let AppId: String = 声网AppID
   static let Certificate: String? = 声网App证书
+  
+    static var IMAppKey: String? = 环信AppKey
+    static var IMClientId: String? = 环信ClientId
+    static var IMClientSecret: String? = 环信ClientSecret
+  
   ```
 
 # 3.项目介绍

@@ -61,7 +61,7 @@ let page_size = 15
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         guard let imKey = KeyCenter.IMAppKey,
               let imCID = KeyCenter.IMClientId,
               let imCS = KeyCenter.IMClientSecret,
@@ -100,6 +100,7 @@ let page_size = 15
         ChatRoomServiceImp._sharedInstance = nil
         VoiceRoomUserInfo.shared.user = nil
         VoiceRoomUserInfo.shared.currentRoomOwner = nil
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
 }
 
