@@ -18,6 +18,8 @@ object TokenGenerator {
         builder.build()
     }
 
+    var expireSecond: Long = -1
+
     enum class TokenGeneratorType {
         token006, token007;
     }
@@ -72,7 +74,7 @@ object TokenGenerator {
         postBody.put("appId", BuildConfig.AGORA_APP_ID)
         postBody.put("appCertificate", BuildConfig.AGORA_APP_CERTIFICATE)
         postBody.put("channelName", channelName)
-        postBody.put("expire", 1500)
+        postBody.put("expire", if(expireSecond > 0) expireSecond else 600)
         postBody.put("src", "Android")
         postBody.put("ts", System.currentTimeMillis().toString() + "")
         postBody.put("type", tokenType.value)

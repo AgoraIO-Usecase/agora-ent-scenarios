@@ -142,21 +142,17 @@ public extension VoiceRoomGiftsView {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let index = scrollView.contentOffset.x / giftList.frame.width
         pageControl.currentPage = Int(index)
-        if index > 1, scrollView.contentOffset.x - lastPoint.x > 0 {
-            UIView.animate(withDuration: 0.3, delay: 0) {
-                self.giftList.scrollToItem(at: IndexPath(row: self.gifts.count - 1, section: 0), at: .right, animated: false)
-            }
-        }
+
         lastPoint = scrollView.contentOffset
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        gifts.count
+        gifts.count+3
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VoiceRoomSendGiftCell", for: indexPath) as? VoiceRoomSendGiftCell
-        cell?.refresh(item: gifts[safe: indexPath.row]!)
+        cell?.refresh(item: gifts[safe: indexPath.row])
         return cell ?? VoiceRoomSendGiftCell()
     }
 
@@ -167,7 +163,6 @@ public extension VoiceRoomGiftsView {
         gift?.selected = true
         if indexPath.row == 8 {
             pageControl.currentPage = 3
-            giftList.scrollToItem(at: IndexPath(row: gifts.count - 1, section: 0), at: .right, animated: true)
         }
         current = gift
         if let value = gift?.gift_price {

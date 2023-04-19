@@ -63,9 +63,8 @@ AGORA_APP_CERTIFICATE：声网Certificate
 
 # 4.FAQ
 
-## 4.1 如何获取声网和环信APPID：
+## 4.1 如何获取声网APPID：
 - 声网APPID申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
-- 环信APPID申请：[https://www.easemob.com/](https://www.easemob.com/)
 
 ## 4.2 程序运行后，歌曲列表为空：
 - 需要联系销售给 appId 开通 K 歌权限

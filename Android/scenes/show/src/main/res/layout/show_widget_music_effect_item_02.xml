@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+
+    android:paddingHorizontal="6dp"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <FrameLayout
+        android:layout_width="58dp"
+        android:layout_height="58dp"
+        android:gravity="center"
+        android:layout_gravity="center"
+
+        android:orientation="vertical">
+
+
+        <ImageView
+            android:id="@+id/ivIcon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@mipmap/show_music_effect_ic_bg_01"/>
+
+        <ImageView
+            android:id="@+id/ivOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/show_music_effect_item_bg"/>
+
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/show_music_effect_item_text_bg"
+            android:textSize="12sp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="3dp"
+            tools:text="KTV"/>
+
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/ivNone"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:src="@mipmap/show_music_effect_none"/>
+
+
+</FrameLayout>

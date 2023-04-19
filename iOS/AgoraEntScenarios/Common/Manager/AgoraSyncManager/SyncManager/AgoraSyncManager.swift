@@ -72,7 +72,7 @@ public class AgoraSyncManager: NSObject {
     /// - Parameters:
     ///   - attributesByKeys: 房间id列表
     public func deleteScenes(sceneIds: [String],
-                             success: SuccessBlockVoid? = nil,
+                             success: SuccessBlockObjOptional? = nil,
                              fail: FailBlock? = nil)
     {
         proxy.deleteScenes(sceneIds: sceneIds,
@@ -137,7 +137,7 @@ public class AgoraSyncManager: NSObject {
 
     public func delete(reference: CollectionReference,
                 id: String,
-                success: SuccessBlockVoid?,
+                success: SuccessBlockObjOptional?,
                 fail: FailBlock?)
     {
         proxy.delete(reference: reference,

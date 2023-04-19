@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/flVideoContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_80_percent" />
+
+    <FrameLayout
+        android:id="@+id/llTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:src="@mipmap/show_live_prepare_ic_close" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/show_live_prepare_title"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+    </FrameLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoomInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/show_live_prepare_room_info_bg"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="12dp"
+        app:layout_constraintTop_toBottomOf="@id/llTitle">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivRoomCover"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearance="@style/show_roundStyle_12"
+            tools:src="@mipmap/portrait01" />
+
+        <EditText
+            android:id="@+id/etRoomName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:background="@null"
+            android:ellipsize="end"
+            android:hint="@string/show_live_prepare_room_name_hint"
+            android:imeOptions="actionDone"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white_60_percent"
+            android:textSize="15sp"
+            android:maxLength="16"
+            app:layout_constraintBottom_toTopOf="@id/tvRoomId"
+            app:layout_constraintEnd_toStartOf="@id/ivEdit"
+            app:layout_constraintHorizontal_weight="0.6"
+            app:layout_constraintStart_toEndOf="@id/ivRoomCover"
+            app:layout_constraintTop_toTopOf="@id/ivRoomCover"
+            tools:text="12345345435345345345345" />
+
+        <ImageView
+            android:id="@+id/ivEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:src="@mipmap/show_live_prepare_ic_edit"
+            app:layout_constraintBottom_toBottomOf="@id/etRoomName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/etRoomName"
+            app:layout_constraintTop_toTopOf="@id/etRoomName" />
+
+        <TextView
+            android:id="@+id/tvRoomId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:ellipsize="marquee"
+            android:maxWidth="120dp"
+            android:singleLine="true"
+            android:textColor="@color/white_60_percent"
+            app:layout_constraintBottom_toBottomOf="@id/ivRoomCover"
+            app:layout_constraintStart_toEndOf="@id/ivRoomCover"
+            app:layout_constraintTop_toBottomOf="@id/etRoomName"
+            tools:text="ID: 1234566" />
+
+        <ImageView
+            android:id="@+id/ivCopy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:src="@mipmap/show_live_prepare_ic_copy"
+            app:layout_constraintBottom_toBottomOf="@id/tvRoomId"
+            app:layout_constraintStart_toEndOf="@id/tvRoomId"
+            app:layout_constraintTop_toTopOf="@id/tvRoomId" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clController"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/tvRotate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@mipmap/show_live_prepare_ic_camera"
+            android:drawablePadding="3dp"
+            android:gravity="center"
+            android:text="@string/show_live_prepare_rotate"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/tvTip"
+            app:layout_constraintEnd_toStartOf="@id/tvBeauty"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tvBeauty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@mipmap/show_live_prepare_ic_beauty"
+            android:drawablePadding="3dp"
+            android:gravity="center"
+            android:text="@string/show_live_prepare_beauty"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/tvTip"
+            app:layout_constraintEnd_toStartOf="@id/tvHD"
+            app:layout_constraintStart_toEndOf="@id/tvRotate" />
+
+        <TextView
+            android:id="@+id/tvHD"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@mipmap/show_live_prepare_ic_hd"
+            android:drawablePadding="3dp"
+            android:gravity="center"
+            android:text="@string/show_live_prepare_hd"
+            android:textColor="@color/white"
+            android:visibility="gone"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/tvTip"
+            app:layout_constraintEnd_toStartOf="@id/tvSetting"
+            app:layout_constraintStart_toEndOf="@id/tvBeauty" />
+
+        <TextView
+            android:id="@+id/tvSetting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@mipmap/show_live_prepare_ic_setting"
+            android:drawablePadding="3dp"
+            android:gravity="center"
+            android:text="@string/show_live_prepare_setting"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/tvTip"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tvHD" />
+
+        <TextView
+            android:id="@+id/tvTip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@mipmap/show_live_prepare_ic_tip"
+            android:drawablePadding="6dp"
+            android:paddingVertical="25dp"
+            android:text="@string/show_live_prepare_tip"
+            android:textColor="@color/white_80_percent"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toTopOf="@id/btnStartLive"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnStartLive"
+            style="@style/def_btn_full"
+            android:layout_width="195dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:gravity="center"
+            android:paddingHorizontal="50dp"
+            android:text="@string/show_live_prepare_start_live"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

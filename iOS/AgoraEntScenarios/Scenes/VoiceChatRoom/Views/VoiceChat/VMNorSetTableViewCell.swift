@@ -41,7 +41,7 @@ class VMNorSetTableViewCell: UITableViewCell {
         contentView.addSubview(titleLabel)
 
         contentLabel.frame = CGRect(x: screenWidth - 150, y: 17, width: 100, height: 30)
-        contentLabel.text = "Middle"
+        contentLabel.text = "Medium"
         contentLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
         contentLabel.textAlignment = .right
         contentLabel.font = UIFont.systemFont(ofSize: 13)

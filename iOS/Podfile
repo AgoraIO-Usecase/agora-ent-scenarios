@@ -1,7 +1,9 @@
 source 'https://github.com/CocoaPods/Specs.git'
 
-# platform :ios, '10.0'
+platform :ios, '12.0'
 inhibit_all_warnings!
+#plugin 'cocoapods-pod-sign'
+#skip_pod_bundle_sign # 用来跳过Xcode对bundle资源的签名
 
 def all_pods
   
@@ -15,29 +17,37 @@ def all_pods
 #  pod 'MBProgressHUD', '~> 1.1.0'
   pod 'SVProgressHUD', '2.2.5'
   # 加载图片
-  pod 'SDWebImage', '5.0.6'
+  pod 'SDWebImage', '~> 4.2'
+  pod 'SDWebImageAPNGCoder'
   # Model
   pod 'YYModel', '1.0.4'
 #  pod 'YYCache', '1.0.4'
   pod 'YYCategories', '1.0.4'
   # 键盘
   pod 'IQKeyboardManager', '6.5.10'
+
+  #弹框
+  pod 'LEEAlert', '1.6.4'
   #滚动视图
   pod 'JXCategoryView', '1.6.1'
+
+  # 火山美颜
+#  pod 'BytedEffect', :path => 'bytedEffect.podspec'
+  # 商汤美颜
+  pod 'SenseLib', :path => 'sense.podspec'
   
-  pod 'AgoraSyncManager', '1.1.3'
-#  pod 'AgoraSyncManager', :path=> './AgoraEntScenarios/Common/Manager/AgoraSyncManager'
-  
-#  pod 'AgoraRtcEngine_iOS', '~> 4.0.1'
-#pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
-pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133.2'
-#  pod 'AgoraRtcEngine_iOS', :path => './libs'
+  pod 'AgoraSyncManager', '2.0.2'
+
+  # pod 'AgoraRtcEngine_iOS', :path => './libs'
+  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
+# pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
+
 
   #ThirdParty
   pod 'HWWeakTimer', '1.0'
   pod 'LSTPopView', '0.3.10'
   pod 'SocketRocket', '0.6.0'
-  pod 'Agora-Scene-Utils', '1.0.9'
+  pod 'Agora-Scene-Utils', '1.1.0'
   
   #歌词组件
   pod "ScoreEffectUI", '1.0.1'
@@ -54,17 +64,25 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133.2'
 
   #VoiceChatRoom rely
   pod 'ZSwiftBaseLib', '0.1.6.1'
-  pod 'SnapKit', '5.6.0'
-  pod 'SVGAPlayer', '2.5.7'
-  pod 'KakaJSON', '1.1.2'
-  pod 'Agora_Chat_iOS','1.0.8'
-  
+
+  pod 'SnapKit'
+  pod 'SVGAPlayer'
+  pod 'KakaJSON'
+  pod 'Agora_Chat_iOS', '1.0.8'
   pod 'SwiftyBeaver', '1.9.5'
-  
+ #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
+
   #bugly
   pod 'Bugly','2.5.93'
+  
+  
+  #need to remove
+#  pod 'MJRefresh'
 end
 
 target 'AgoraEntScenarios' do
   all_pods
 end
+
+
+system("./libs/setup_podspec.sh")

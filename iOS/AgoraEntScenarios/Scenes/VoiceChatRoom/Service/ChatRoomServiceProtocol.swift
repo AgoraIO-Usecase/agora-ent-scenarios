@@ -20,9 +20,25 @@ public enum updateRoomState {
     case removed
     case destroyed
     case offLined
+    
+    func errorDesc() -> String {
+        switch self {
+        case .removed:
+            return "You were kicked off from the room"
+        case .destroyed:
+            return "This room has been dissolved by the host"
+        case .offLined:
+            return "you were offline!"
+        default:
+            return ""
+        }
+    }
 }
 
 @objc public protocol ChatRoomServiceSubscribeDelegate: NSObjectProtocol {
+    
+    /// 房间过期
+    func onRoomExpired()
     
     /// Description token 过期
     func chatTokenWillExpire()
@@ -203,7 +219,13 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///
     func unmuteLocal(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void)
-
+    
+    
+    /// Description  更新当前上麦用户对自己麦克状态
+    /// - Parameters:
+    ///   - status: 0 自主静麦 1主动开麦
+    ///   - completion: 回调
+    func changeMicUserStatus(status: Int,completion: @escaping (Error?, VRRoomMic?) -> Void)
     /// 换麦
     /// - Parameters:
     ///
@@ -217,7 +239,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 接受邀请
     /// - Parameters:
     ///
-    func acceptMicSeatInvitation(completion: @escaping (Error?, VRRoomMic?) -> Void)
+    func acceptMicSeatInvitation(index: Int?,completion: @escaping (Error?, VRRoomMic?) -> Void)
     
     /// 拒绝邀请
     /// - Parameters:

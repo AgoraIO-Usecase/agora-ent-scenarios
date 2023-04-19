@@ -51,8 +51,7 @@
 
 
 - (void)itemClickAction:(int)tagValue {
-    VLOnLineListVC *listVC = [[VLOnLineListVC alloc]init];
-    [self.navigationController pushViewController:listVC animated:YES];
+
 //    switch (tagValue) {
 //        case 0:
 //        {
@@ -70,6 +69,32 @@
 //        default:
 //            break;
 //    }
+
+    NSArray* sceneNames = @[@"VoiceChat", @"KTV", @"LiveShow", @"SA"];
+    [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
+    switch (tagValue) {
+        case 0: {
+            VRRoomsViewController *vc = [[VRRoomsViewController alloc] initWithUser:VLUserCenter.user];
+            vc.hidesBottomBarWhenPushed = YES;
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+            break;
+        case 1: {
+            VLOnLineListVC *vc = [[VLOnLineListVC alloc]init];
+            [self.navigationController pushViewController:vc animated:YES];
+        } break;
+        case 2: {
+            ShowRoomListVC *vc = [ShowRoomListVC new];
+            [self.navigationController pushViewController:vc animated:YES];
+        } break;
+        case 3: {
+            SARoomsViewController *roomVc = [[SARoomsViewController alloc] initWithUser:VLUserCenter.user];
+            roomVc.hidesBottomBarWhenPushed = YES;
+            [self.navigationController pushViewController:roomVc animated:YES];
+        } break;
+        default:
+            break;
+    }
 
 }
 

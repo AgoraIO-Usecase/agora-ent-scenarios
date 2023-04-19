@@ -7,6 +7,7 @@
 
 @implementation VLLoginModel
 @synthesize extraDic = _extraDic;
+
 + (UInt32)mediaPlayerUidWithUid:(NSString*)uid {
     return 200000000 + [uid intValue];
 }

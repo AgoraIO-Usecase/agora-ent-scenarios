@@ -55,30 +55,32 @@ class AgoraChatRoomBaseUserCollectionViewCell: UICollectionViewCell {
         case 0:
             rtcUserView.iconView.isHidden = false
             rtcUserView.micView.isHidden = false
-            rtcUserView.micView.setState(.on)
-            rtcUserView.bgIconView.isHidden = true
-            rtcUserView.nameBtn.setImage(UIImage(""), for: .normal)
+            if mic.member?.micStatus ?? 0 == 1 {
+                rtcUserView.micView.setState(.on)
+                rtcUserView.bgIconView.isHidden = true
+                rtcUserView.nameBtn.setImage(UIImage(""), for: .normal)
+            } else {
+                rtcUserView.micView.setState(.off)
+            }
         case 1:
             // 需要区分有用户还是没有用户
-            bgIcon = mic.member == nil ? "icons／solid／mute" : ""
-            if mic.member != nil {
-                rtcUserView.micView.isHidden = false
-                rtcUserView.micView.setState(.off)
-            } else {
-                rtcUserView.micView.isHidden = true
+            if mic.member?.micStatus ?? 1 == 0 || status == 1 {
+                bgIcon = mic.member == nil ? "icons／solid／mute" : ""
+                if mic.member != nil {
+                    rtcUserView.micView.isHidden = false
+                    rtcUserView.micView.setState(.off)
+                } else {
+                    rtcUserView.micView.isHidden = true
+                }
+                rtcUserView.bgIconView.image = UIImage(bgIcon)
+                rtcUserView.bgIconView.isHidden = mic.member != nil
             }
-            rtcUserView.bgIconView.image = UIImage(bgIcon)
-            rtcUserView.bgIconView.isHidden = mic.member != nil
         case 2:
-            bgIcon = mic.member == nil ? "icons／solid／mute" : ""
-            if mic.member != nil {
-                rtcUserView.micView.isHidden = false
-                rtcUserView.micView.setState(.off)
-            } else {
-                rtcUserView.micView.isHidden = true
-            }
+            bgIcon = "icons／solid／mute"
+            rtcUserView.micView.isHidden = mic.member == nil
+            rtcUserView.micView.setState(.off)
             rtcUserView.bgIconView.image = UIImage(bgIcon)
-            rtcUserView.bgIconView.isHidden = mic.member != nil
+            rtcUserView.bgIconView.isHidden = false
         case 3:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true
@@ -93,9 +95,10 @@ class AgoraChatRoomBaseUserCollectionViewCell: UICollectionViewCell {
         default:
             break
         }
-
         rtcUserView.iconView.isHidden = mic.member == nil
-        rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: UIImage("mine_avatar_placeHolder"), context: nil)
+        if mic.member?.portrait != nil {
+            rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: UIImage("mine_avatar_placeHolder"))
+        }
         rtcUserView.nameBtn.setImage(UIImage(mic.mic_index == 0 ? "Landlord" : ""), for: .normal)
         rtcUserView.nameBtn.setTitle(mic.member?.name ?? "\(mic.mic_index)", for: .normal)
     }

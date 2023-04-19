@@ -65,6 +65,7 @@
         VLPrivacyClickType type;
         if (sender == self.agreeButton) {
             type = VLPrivacyClickTypeAgree;
+            [AppContext shared].isAgreeLicense = YES;
         } else {
             type = VLPrivacyClickTypeDisagree;
         }

@@ -43,7 +43,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    self.tabBar.hidden = NO;
+//    self.tabBar.hidden = NO;
 }
 
 - (NSArray *)tabViewControllers {
@@ -67,7 +67,6 @@
 
    NSArray *viewControllers = @[
        homeNavigationController,
-      // discoveryNavigationController,
        mineNavigationController,
    ];
    return viewControllers;
