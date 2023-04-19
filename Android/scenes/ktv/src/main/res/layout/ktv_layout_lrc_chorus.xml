@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:background="@mipmap/bg_player_default">
+    tools:background="@mipmap/ktv_mv_default">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvMusicName2"

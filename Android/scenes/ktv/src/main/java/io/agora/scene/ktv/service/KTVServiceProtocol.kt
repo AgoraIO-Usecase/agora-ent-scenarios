@@ -97,6 +97,10 @@ interface KTVServiceProtocol {
         completion: (error: Exception?) -> Unit
     )
 
+    fun autoOnSeat(
+        completion: (error: Exception?) -> Unit
+    )
+
     /**
      * 下麦
      */
@@ -138,7 +142,7 @@ interface KTVServiceProtocol {
      * 删除歌曲
      */
     fun removeSong(
-        inputModel: RemoveSongInputModel, completion: (error: Exception?) -> Unit
+        isSingingSong: Boolean, inputModel: RemoveSongInputModel, completion: (error: Exception?) -> Unit
     )
 
     /**
@@ -164,18 +168,16 @@ interface KTVServiceProtocol {
      * 加入合唱
      */
     fun joinChorus(
-        inputModel: JoinChorusInputModel, completion: (error: Exception?) -> Unit
+        inputModel: RoomSelSongModel,
+        completion: (error: Exception?) -> Unit
     )
 
     /**
      * 合唱者离开合唱
      */
-    fun leaveChorus()
-
-    /**
-     * 当前歌曲合唱改为独唱
-     */
-    fun becomeSolo()
+    fun leaveChorus(
+        completion: (error: Exception?) -> Unit
+    )
 
     /**
      * song did changed
@@ -183,4 +185,16 @@ interface KTVServiceProtocol {
     fun subscribeChooseSong(
         changedBlock: (KTVSubscribe, RoomSelSongModel?) -> Unit
     )
+
+    // =================== 断网重连相关 =========================
+
+    /**
+     * 订阅重连事件
+     */
+    fun subscribeReConnectEvent(onReconnect: () -> Unit)
+
+    /**
+     * 拉取房间内用户列表
+     */
+    fun getAllUserList(success: (userNum : Int) -> Unit, error: ((Exception) -> Unit)? = null)
 }

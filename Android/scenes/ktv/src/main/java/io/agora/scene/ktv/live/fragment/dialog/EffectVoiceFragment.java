@@ -49,9 +49,7 @@ public class EffectVoiceFragment extends BaseViewBindingFragment<FragmentEffectV
                 mSetting.setAudioEffectParameters(0, 4);
             }
         });
-        getBinding().cbStartAudioDump.setOnCheckedChangeListener((compoundButton, b) -> {
-            mSetting.enableAudioDump(b);
-        });
+
         getBinding().cbGentleWind.setOnCheckedChangeListener((compoundButton, b) -> {
             if (b) {
                 params1 = 3;
@@ -87,12 +85,6 @@ public class EffectVoiceFragment extends BaseViewBindingFragment<FragmentEffectV
             getBinding().cbMinor.setChecked(true);
         } else if (mSetting.getAudioEffectParams1() == 1) {
             getBinding().cbMajor.setChecked(true);
-        }
-
-        if (mSetting.isAudioDumpEnabled()) {
-            getBinding().cbStartAudioDump.setChecked(true);
-        } else {
-            getBinding().cbStartAudioDump.setChecked(false);
         }
     }
 }

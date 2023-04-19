@@ -41,12 +41,20 @@ public class UserLeaveSeatMenuDialog extends BaseDialog<KtvDialogUserSeatMenuBin
         setCanceledOnTouchOutside(true);
         getWindow().setWindowAnimations(R.style.popup_window_style_bottom);
         getBinding().btSeatoff.setOnClickListener(this::seatOff);
+        getBinding().btLeaveChorus.setOnClickListener(this::leaveChorus);
     }
 
     private void seatOff(View v) {
         if (getOnButtonClickListener() != null) {
             dismiss();
             getOnButtonClickListener().onRightButtonClick();
+        }
+    }
+
+    private void leaveChorus(View v) {
+        if (getOnButtonClickListener() != null) {
+            dismiss();
+            getOnButtonClickListener().onLeftButtonClick();
         }
     }
 

@@ -25,6 +25,7 @@ import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnItemClickListener;
 import io.agora.scene.base.utils.ToastUtils;
+import io.agora.scene.widget.utils.UiUtils;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
@@ -45,6 +46,9 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
             BaseRecyclerViewAdapter<AppItemHomeIndexBinding, ScenesModel, HomeIndexHolder> homeIndexAdapter = new BaseRecyclerViewAdapter<>(scenesModels, new OnItemClickListener<ScenesModel>() {
                 @Override
                 public void onItemClick(@NonNull ScenesModel scenesModel, View view, int position, long viewType) {
+                    if (UiUtils.isFastClick(2000)) {
+                        return;
+                    }
                     if (scenesModel.getActive()) {
                         reportEnter(scenesModel);
                         goScene(scenesModel);

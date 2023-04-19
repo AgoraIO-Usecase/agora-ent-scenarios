@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:id="@+id/playerBg"
     android:layout_height="match_parent"
-    android:background="@mipmap/bg_player_default"
+    android:background="@mipmap/ktv_mv_default"
     android:gravity="center"
     android:orientation="vertical">
 

@@ -18,6 +18,7 @@ import io.agora.scene.ktv.databinding.KtvDialogMoreBinding;
 import io.agora.scene.ktv.live.RoomLivingActivity;
 import io.agora.scene.ktv.live.fragment.dialog.BeautyVoiceFragment;
 import io.agora.scene.ktv.live.fragment.dialog.EffectVoiceFragment;
+import io.agora.scene.ktv.live.fragment.dialog.EffectVoiceFragment2;
 import io.agora.scene.ktv.live.fragment.dialog.MVFragment;
 
 public class MoreDialog extends BaseBottomSheetDialogFragment<KtvDialogMoreBinding> {
@@ -58,9 +59,9 @@ public class MoreDialog extends BaseBottomSheetDialogFragment<KtvDialogMoreBindi
 
     private void showEffectPage(View v) {
         mBinding.getRoot().removeAllViews();
-        BaseViewBindingFragment<?> voiceFragment = new EffectVoiceFragment(mSetting);
+        BaseViewBindingFragment<?> voiceFragment = new EffectVoiceFragment2(mSetting);
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
-        ft.add(mBinding.getRoot().getId(), voiceFragment, EffectVoiceFragment.TAG);
+        ft.add(mBinding.getRoot().getId(), voiceFragment, EffectVoiceFragment2.TAG);
         ft.commit();
     }
 
