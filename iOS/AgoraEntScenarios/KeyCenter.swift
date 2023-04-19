@@ -61,8 +61,7 @@ struct KeyCenter {
   
     static let CloudPlayerKey: String? = nil
     static let CloudPlayerSecret: String? = nil
-    
-    static var HostUrl: String = "https://gateway-fulldemo.agoralab.co"
+
     static var baseServerUrl: String? = "https://toolbox.bj2.agoralab.co/v1/"
     static var onlineBaseServerUrl: String? = baseServerUrl
 
