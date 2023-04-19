@@ -23,6 +23,8 @@ def all_pods
   pod 'YYModel', '1.0.4'
 #  pod 'YYCache', '1.0.4'
   pod 'YYCategories', '1.0.4'
+  # 键盘
+  pod 'IQKeyboardManager', '6.5.10'
 
   #弹框
   pod 'LEEAlert', '1.6.4'
@@ -35,9 +37,11 @@ def all_pods
   pod 'SenseLib', :path => 'sense.podspec'
   
   pod 'AgoraSyncManager', '2.0.2'
-  
+
   # pod 'AgoraRtcEngine_iOS', :path => './libs'
   pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
+# pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
+
 
   #ThirdParty
   pod 'HWWeakTimer', '1.0'
@@ -46,9 +50,13 @@ def all_pods
   pod 'Agora-Scene-Utils', '1.1.0'
   
   #歌词组件
-  pod 'AgoraLyricsScore', '1.0.8.8'
-#  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'f0613f7a8e11aa4e333f1dba2cfb2516d1140367'
+  pod "ScoreEffectUI", '1.0.1'
+  pod 'AgoraLyricsScore', '1.1.1-beta-3'
+#  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'cc0951f11f5fa6113ec2b9df2a509efa881d5bd7'
+#  pod 'AgoraLyricsScore', :path => '../../AgoraLyricsScore/AgoraLyricsScore.podspec'
   pod 'AgoraRtm_iOS', '1.5.1'
+  pod 'Zip'
+  pod 'MJRefresh'
   
   
   # Swift Code Formatter
@@ -76,5 +84,5 @@ target 'AgoraEntScenarios' do
   all_pods
 end
 
-system("./libs/setup_podspec.sh")
 
+system("./libs/setup_podspec.sh")

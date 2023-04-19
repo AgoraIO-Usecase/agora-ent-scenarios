@@ -36,15 +36,18 @@
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];
     
-    CGFloat leftMargin = VLREALVALUE_WIDTH(52);
+   // CGFloat leftMargin = VLREALVALUE_WIDTH(52);
+    CGFloat leftMargin = VLREALVALUE_WIDTH(80);
     CGFloat itemWH = 64;
     CGFloat btnItemWH = 40;
-    CGFloat middleMargin = (SCREEN_WIDTH-itemWH*3-2*leftMargin)/2.0;
+   // CGFloat middleMargin = (SCREEN_WIDTH-itemWH*3-2*leftMargin)/2.0;
+    CGFloat middleMargin = (SCREEN_WIDTH-itemWH*2-2*leftMargin);
     CGFloat itemY = titleLabel.bottom + 26;
     
-    NSArray *itemsArray = @[@"ktv_more_belcantoIcon",@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
+   // NSArray *itemsArray = @[@"ktv_more_belcantoIcon",@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
+    NSArray *itemsArray = @[@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
     NSArray *titlesArray = @[
-        KTVLocalizedString(@"美声"),
+       // KTVLocalizedString(@"美声"),
         KTVLocalizedString(@"音效"),
         KTVLocalizedString(@"MV")];
     for (int i=0; i<itemsArray.count; i++) {

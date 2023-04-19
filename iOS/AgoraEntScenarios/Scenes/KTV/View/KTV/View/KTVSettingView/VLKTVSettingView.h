@@ -30,7 +30,7 @@ typedef enum : NSUInteger {
 
 - (void)setIsEarOn:(BOOL)isEarOn;
 - (void)setAccValue:(float)accValue;
-
+-(void)setIspause:(BOOL)isPause;
 @end
 
 @interface VLKTVSettingModel : NSObject
@@ -44,6 +44,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) float accValue;
 @property (nonatomic, assign) NSInteger toneValue;
 @property (nonatomic, assign) int remoteVolume;
+
 
 /// list选项
 @property (nonatomic, assign) NSInteger kindIndex;
