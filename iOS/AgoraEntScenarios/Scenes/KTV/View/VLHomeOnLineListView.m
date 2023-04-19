@@ -11,6 +11,7 @@
 #import "VLURLPathConfig.h"
 #import "KTVMacro.h"
 #import "AppContext+KTV.h"
+@import MJRefresh;
 
 @interface VLHomeOnLineListView ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
@@ -22,7 +23,6 @@
 
 @property (nonatomic, assign) NSInteger        page;
 @property (nonatomic, strong) VLListEmptyView *emptyView;
-@property (nonatomic, strong) UIRefreshControl *refreshControl;
 
 @end
 
@@ -42,10 +42,13 @@
     [self addSubview:self.listCollectionView];
     [self addSubview:self.createBtn];
     
-    _refreshControl = [[UIRefreshControl alloc]init];
-    self.listCollectionView.refreshControl = _refreshControl;
-    [_refreshControl addTarget:self action:@selector(loadData) forControlEvents:UIControlEventValueChanged];
-
+    self.listCollectionView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf getRoomListIfRefresh:YES];
+    }];
+    
+    self.listCollectionView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
+        [weakSelf getRoomListIfRefresh:NO];
+    }];
 }
 
 -(void)loadData {
@@ -59,23 +62,35 @@
     [[AppContext ktvServiceImp] getRoomListWithPage:self.page
                                          completion:^(NSError * error, NSArray<VLRoomListModel *> * roomArray) {
         if (error != nil) {
-            [self.listCollectionView.refreshControl endRefreshing];
+            [self.listCollectionView.mj_header endRefreshing];
+            [self.listCollectionView.mj_footer endRefreshing];
             return;
         }
         
-        [self.listCollectionView.refreshControl endRefreshing];
+        [self.listCollectionView.mj_header endRefreshing];
         self.page += 1;
         NSArray *array = roomArray;
         
         if (ifRefresh) {
             [self.roomListModeArray removeAllObjects];
             self.roomListModeArray = array.mutableCopy;
+            if (array.count > 0) {
+                self.listCollectionView.mj_footer.hidden = NO;
+            }else{
+                self.listCollectionView.mj_footer.hidden = YES;
+            }
         }else{
             for (VLRoomListModel *model in array) {
                 [self.roomListModeArray addObject:model];
             }
         }
         [self.listCollectionView reloadData];
+        if (array.count < 10) {
+            [self.listCollectionView.mj_footer endRefreshing];
+            self.listCollectionView.mj_footer.hidden = YES;
+        }else{
+            [self.listCollectionView.mj_footer endRefreshing];
+        }
         if(self.roomListModeArray.count > 0) {
             self.emptyView.hidden = YES;
         }

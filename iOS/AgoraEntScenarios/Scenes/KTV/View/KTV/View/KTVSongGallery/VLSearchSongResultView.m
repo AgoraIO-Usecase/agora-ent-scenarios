@@ -13,6 +13,7 @@
 #import "AppContext+KTV.h"
 #import "KTVMacro.h"
 #import "NSString+Helper.h"
+@import MJRefresh;
 
 @interface VLSearchSongResultView()<
 UITableViewDataSource,
@@ -28,7 +29,6 @@ UITableViewDelegate
 @property (nonatomic, copy) NSString *roomNo;
 @property (nonatomic, assign) BOOL ifChorus;
 
-@property (nonatomic, strong) UIRefreshControl *refreshControl;
 @end
 
 @implementation VLSearchSongResultView
@@ -52,7 +52,7 @@ UITableViewDelegate
 
 
 - (void)appendDatasWithSongList:(NSArray<VLSongItmModel*>*)songList {
-    [self.tableView.refreshControl endRefreshing];
+    [self.tableView.mj_header endRefreshing];
     if (songList.count == 0) {
         return;
     }
@@ -77,12 +77,22 @@ UITableViewDelegate
     if (ifRefresh) {
         [self.songsMuArray removeAllObjects];
         self.songsMuArray = modelsArray.mutableCopy;
+        if (modelsArray.count > 0) {
+            self.tableView.mj_footer.hidden = NO;
+        }else{
+            self.tableView.mj_footer.hidden = YES;
+        }
     }else{
         for (VLSongItmModel *model in modelsArray) {
             [self.songsMuArray addObject:model];
         }
     }
     [self.tableView reloadData];
+    if (modelsArray.count < 5) {
+        [self.tableView.mj_footer endRefreshingWithNoMoreData];
+    }else{
+        [self.tableView.mj_footer endRefreshing];
+    }
 }
 
 
@@ -99,7 +109,7 @@ UITableViewDelegate
     
     [[AppContext shared].ktvAPI searchMusicWithKeyword:keyWord ? keyWord : @""
                                                   page:self.page
-                                              pageSize:50
+                                              pageSize:5
                                             jsonOption:extra
                                             completion:^(NSString * requestId, AgoraMusicContentCenterStatusCode status, AgoraMusicCollection * result) {
         NSMutableArray* songArray = [NSMutableArray array];
@@ -141,9 +151,14 @@ UITableViewDelegate
     [self addSubview:self.tableView];
     self.tableView.hidden = NO;
     
-    _refreshControl = [[UIRefreshControl alloc]init];
-    self.tableView.refreshControl = _refreshControl;
-    [_refreshControl addTarget:self action:@selector(loadData) forControlEvents:UIControlEventValueChanged];
+    VL(weakSelf);
+    self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadSearchDataWithKeyWord:self.keyWord ifRefresh:YES];
+    }];
+    
+    self.tableView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
+        [weakSelf loadSearchDataWithKeyWord:self.keyWord ifRefresh:NO];
+    }];
 
 }
 

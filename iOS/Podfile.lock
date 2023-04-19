@@ -33,6 +33,7 @@ PODS:
     - LSTTimer
   - LSTTimer (0.2.10)
   - Masonry (1.1.0)
+  - MJRefresh (3.7.5)
   - Protobuf (3.22.3)
   - ScoreEffectUI (1.0.1)
   - SDWebImage (5.0.6):
@@ -73,6 +74,7 @@ DEPENDENCIES:
   - KakaJSON (= 1.1.2)
   - LSTPopView (= 0.3.10)
   - Masonry (= 1.1.0)
+  - MJRefresh
   - ScoreEffectUI (= 1.0.1)
   - SDWebImage (= 5.0.6)
   - SnapKit (= 5.6.0)
@@ -102,6 +104,7 @@ SPEC REPOS:
     - LSTPopView
     - LSTTimer
     - Masonry
+    - MJRefresh
     - Protobuf
     - ScoreEffectUI
     - SDWebImage
@@ -132,6 +135,7 @@ SPEC CHECKSUMS:
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
+  MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
   Protobuf: d03938d5f7e974a97964fb0567771e36fbe9ecce
   ScoreEffectUI: 1a3bbd83b17cfef1c16a3a4eede2854f89c9eb10
   SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
@@ -146,6 +150,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: d85967c7573e2b85ccb089097f84fd2a81536e46
+PODFILE CHECKSUM: 0372722e83087f13c6d3baa242046ef7c451cf79
 
 COCOAPODS: 1.11.3
