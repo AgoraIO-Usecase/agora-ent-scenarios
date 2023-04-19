@@ -19,6 +19,7 @@ if (versionCtrl.exists()) {
 final def VERSION_SCENE_VOICE = properties.getProperty("VERSION_SCENE_VOICE")
 final def VERSION_SCENE_SPATIAL_VOICE = properties.getProperty("VERSION_SCENE_SPATIAL_VOICE")
 final def VERSION_SCENE_KTV = properties.getProperty("VERSION_SCENE_KTV")
+final def VERSION_SCENE_SHOW = properties.getProperty("VERSION_SCENE_SHOW")
 
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
@@ -39,6 +40,7 @@ android {
         buildConfigField "String", "VERSION_SCENE_VOICE", "\"${VERSION_SCENE_VOICE}\""
         buildConfigField "String", "VERSION_SCENE_SPATIAL_VOICE", "\"${VERSION_SCENE_SPATIAL_VOICE}\""
         buildConfigField "String", "VERSION_SCENE_KTV", "\"${VERSION_SCENE_KTV}\""
+        buildConfigField "String", "VERSION_SCENE_SHOW", "\"${VERSION_SCENE_SHOW}\""
 
         buildConfigField "String", "SERVER_HOST", "\"${SERVER_HOST}\""
         buildConfigField "String", "TOOLBOX_SERVER_HOST", "\"${TOOLBOX_SERVER_HOST}\""

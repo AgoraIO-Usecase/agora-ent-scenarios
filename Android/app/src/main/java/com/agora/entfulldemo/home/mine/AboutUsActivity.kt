@@ -29,7 +29,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val webSite = "https://www.agora.io/cn/about-us/"
 
     private val kChatRoomAppID = "io.agora.chatroom"
-    private val kFullAppID = "com.agora.entfulldemo"
+    private val kFullAppID = "io.agora.entfull"
 
     private var counts = 0
     private val debugModeOpenTime: Long = 2000
@@ -54,6 +54,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         setupClickWebAction()
         setupClickPhoneAction()
     }
+
     // 设置语聊App的信息
     private fun setupChatRoomAppInfo() {
         adapter.scenes = mutableListOf<SceneInfo>()
@@ -64,6 +65,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             webSite
         )
     }
+
     // 设置综合App的信息
     private fun setupFullAppInfo() {
         val scenes = mutableListOf<SceneInfo>()
@@ -71,15 +73,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             scenes.add(
                 SceneInfo(
                     this.getString(R.string.app_about_chat_room),
-                    io.agora.scene.base.BuildConfig.VERSION_SCENE_VOICE
-                )
-            )
-        }
-        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_KTV.isNotEmpty()) {
-            scenes.add(
-                SceneInfo(
-                    this.getString(R.string.app_about_karaoke),
-                    io.agora.scene.base.BuildConfig.VERSION_SCENE_KTV
+                    "YL-" + io.agora.scene.base.BuildConfig.VERSION_SCENE_VOICE
                 )
             )
         }
@@ -87,7 +81,23 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             scenes.add(
                 SceneInfo(
                     this.getString(R.string.app_about_chat_room_spatial),
-                    io.agora.scene.base.BuildConfig.VERSION_SCENE_SPATIAL_VOICE
+                    "YLKJ-" + io.agora.scene.base.BuildConfig.VERSION_SCENE_SPATIAL_VOICE
+                )
+            )
+        }
+        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_KTV.isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_karaoke),
+                    "KTV-" + io.agora.scene.base.BuildConfig.VERSION_SCENE_KTV
+                )
+            )
+        }
+        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_SHOW.isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_show),
+                    "ZB-" + io.agora.scene.base.BuildConfig.VERSION_SCENE_SHOW
                 )
             )
         }
@@ -104,7 +114,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             adapter.scenes = scenes
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_about_name),
-                "20230110-2.1.0-" + RtcEngine.getSdkVersion(),
+                "20230530-" + BuildConfig.VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
@@ -119,8 +129,12 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
 
     private fun setupClickPhoneAction() {
         adapter.onClickPhoneListener = {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CALL_PHONE),1)
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.CALL_PHONE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CALL_PHONE), 1)
             } else {
                 val dialog = CallPhoneDialog().apply {
                     arguments = Bundle().apply {
@@ -145,7 +159,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 beginTime = System.currentTimeMillis();
                 counts = 0
             }
-            counts ++
+            counts++
             if (counts > 5) {
                 counts = 0;
                 binding.tvDebugMode.visibility = View.VISIBLE
@@ -165,8 +179,10 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         val dialog = CommonDialog(this)
         dialog.setDialogTitle("确定退出Debug模式么？")
         dialog.setDescText("退出debug模式后， 设置页面将恢复成正常的设置页面哦～")
-        dialog.setDialogBtnText(getString(R.string.cancel),
-            getString(R.string.app_exit))
+        dialog.setDialogBtnText(
+            getString(R.string.cancel),
+            getString(R.string.app_exit)
+        )
         dialog.onButtonClickListener = object : OnButtonClickListener {
             override fun onLeftButtonClick() {}
             override fun onRightButtonClick() {
@@ -179,6 +195,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         dialog.show()
     }
 }
+
 private data class AppInfo(
     val name: String,
     val version: String,
@@ -191,7 +208,7 @@ private data class SceneInfo(
     val version: String
 )
 
-private class AboutUsAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+private class AboutUsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val VIEW_TYPE_APP_INFO = 0
 
@@ -226,7 +243,7 @@ private class AboutUsAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() 
                 current.binding.tvServiceNumber.text = it.servicePhone
                 current.binding.tvHomeWebSite.text = it.webSite
             }
-            current.binding.tvSceneSubTitle.visibility = if (scenes.size > 1)  View.VISIBLE else View.INVISIBLE
+            current.binding.tvSceneSubTitle.visibility = if (scenes.size > 1) View.VISIBLE else View.INVISIBLE
             current.binding.tvVersion.setOnClickListener {
                 onClickVersionListener?.invoke()
             }
@@ -240,7 +257,7 @@ private class AboutUsAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() 
             val current = holder as SceneInfoViewHolder
             val index = position - 1
             val model = scenes[index]
-            current.binding.tvTitle.text  = model.name
+            current.binding.tvTitle.text = model.name
             current.binding.tvVersion.text = model.version
         }
     }
