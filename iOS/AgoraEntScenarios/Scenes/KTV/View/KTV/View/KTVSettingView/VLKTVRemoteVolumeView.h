@@ -16,8 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface VLKTVRemoteVolumeView : VLKTVItemBaseView
-- (id)initWithMin:(int)min withMax:(int)max withCurrent:(int)current;
 
+- (id)initWithMin:(int)min withMax:(int)max withCurrent:(int)current;
+-(void)setCurrent:(int)current;
 @property (nonatomic, weak) id<VLKTVRemoteVolumeViewDelegate> delegate;
 @end
 

@@ -2,6 +2,8 @@
 .DS_Store
 local.properties
 .idea
+**/AgoraLyricsScore/*
+**/AgoraLyricsScore123/*
 Pods
 **/*.xcworkspace/**
 **/xcuserdata
@@ -11,3 +13,4 @@ Pods
 **/libs/*
 **/buglyqq-upload-symbol/**
 **/build.sh
+

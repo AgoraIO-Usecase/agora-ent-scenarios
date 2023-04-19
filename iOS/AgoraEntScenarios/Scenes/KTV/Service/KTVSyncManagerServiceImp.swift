@@ -9,7 +9,7 @@ import Foundation
 import YYCategories
 import SVProgressHUD
 
-private let kSceneId = "scene_ktv"
+private let kSceneId = "scene_ktv_2.3.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
@@ -21,10 +21,10 @@ private func agoraAssert(_ message: String) {
 }
 
 private func agoraAssert(_ condition: Bool, _ message: String) {
-    #if DEBUG
-    assert(condition, message)
-    #else
     KTVLog.error(text: message, tag: "KTVService")
+    #if DEBUG
+//    assert(condition, message)
+    #else
     #endif
 }
 
@@ -110,7 +110,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
         let expiredDuration = 20 * 60 * 1000
-        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
+//        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
         guard currentTs - room.createdAt > expiredDuration else { return }
         
         guard let callback = self.roomExpiredDidChanged else {
@@ -186,7 +186,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         roomInfo.password = inputModel.password
         roomInfo.creatorNo = VLUserCenter.user.id
         roomInfo.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id
-        roomInfo.bgOption = Int.random(in: 1...2)
+        roomInfo.bgOption = 0
         roomInfo.roomPeopleNum = "0"
         roomInfo.icon = inputModel.icon
         roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
@@ -206,7 +206,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 let userId = result.getPropertyWith(key: "creatorNo", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
                 
-                let playerRTCUid = VLUserCenter.user.agoraPlayerRTCUid;
+                let playerRTCUid = UserInfo.userId//VLUserCenter.user.agoraPlayerRTCUid;
                 var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
                 
                 let dispatchGroup = DispatchGroup()
@@ -269,6 +269,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     {
         guard let roomInfo = roomList?.filter({ $0.roomNo == inputModel.roomNo }).first else {
             agoraAssert("join Room fail")
+            completion(nil, nil)
             return
         }
 
@@ -287,7 +288,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 let userId = result.getPropertyWith(key: "creatorNo", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
                 
-                let playerRTCUid = VLUserCenter.user.agoraPlayerRTCUid
+                let playerRTCUid = UserInfo.userId//VLUserCenter.user.agoraPlayerRTCUid
                 var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
                 
                 let dispatchGroup = DispatchGroup()
@@ -319,6 +320,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                         _hideLoadingIfNeed()
                         agoraAssert(tokenMap1.count == 2, "rtcToken == nil || rtmToken == nil")
                         agoraAssert(tokenMap2.count == 1, "playerRtcToken == nil")
+                        completion(nil, nil)
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.id == userId ? true : false
@@ -364,6 +366,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
               let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first
         else {
             agoraAssert("channelName = nil")
+            completion(nil)
             return
         }
         roomInfo.bgOption = Int(inputModel.mvIndex)
@@ -415,6 +418,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             .filter({ $0.value.userNo == VLUserCenter.user.id })
             .first?.value else {
             agoraAssert("mute seat not found")
+            completion(nil)
             return
         }
         
@@ -429,6 +433,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             .filter({ $0.value.userNo == VLUserCenter.user.id })
             .first?.value else {
             agoraAssert("open video seat not found")
+            completion(nil)
             return
         }
         
@@ -450,40 +455,19 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     }
 
     func joinChorus(withInput inputModel: KTVJoinChorusInputModel,
-                    completion: @escaping (Error?) -> Void) {
+                        completion: @escaping (Error?) -> Void) {
         guard let topSong = self.songList.filter({ $0.songNo == inputModel.songNo}).first else {
             agoraAssert("join Chorus fail")
+            completion(nil)
             return
         }
-        //isChorus always true
-//        topSong.isChorus = inputModel.isChorus == "1" ? true : false
-        let isChorus = topSong.isChorus
-        let status = topSong.status
-        let chorusNo = topSong.chorusNo
-        topSong.isChorus = true
-        topSong.status = VLSongPlayStatusPlaying
-        topSong.chorusNo = VLUserCenter.user.id
-        _updateChooseSong(songInfo: topSong,
-                          finished: completion)
-        topSong.isChorus = isChorus
-        topSong.status = status
-        topSong.chorusNo = chorusNo
+        //TODO: _markSeatToPlaying without callback
+        _markSeatChoursStatus(songCode: topSong.chorusSongId(),  completion: completion)
     }
     
     func coSingerLeaveChorus(completion: @escaping (Error?) -> Void) {
-        guard let topSong = self.songList.filter({ $0.chorusNo == VLUserCenter.user.id}).first else {
-            agoraAssert("join Chorus fail")
-            return
-        }
-        
-        let isChorus = topSong.isChorus
-        let chorusNo = topSong.chorusNo
-        topSong.isChorus = true
-        topSong.chorusNo = "0"
-        _updateChooseSong(songInfo: topSong,
-                          finished: completion)
-        topSong.isChorus = isChorus
-        topSong.chorusNo = chorusNo
+        //TODO: _markSeatToPlaying without callback
+        _markSeatChoursStatus(songCode: "", completion: completion)
     }
 
     func markSongDidPlay(withInput inputModel: VLRoomSelSongModel,
@@ -495,8 +479,19 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     func chooseSong(withInput inputModel: KTVChooseSongInputModel,
                     completion: @escaping (Error?) -> Void)
     {
+        //添加歌曲前先判断
+        var flag = false
+        _ =  songList.compactMap { model in
+            if model.songNo == inputModel.songNo {
+                agoraPrint("The song has been added")
+                flag = true
+                return
+            }
+        }
+        if flag {return}
+        
         let songInfo = VLRoomSelSongModel()
-        songInfo.isChorus = inputModel.isChorus
+       // songInfo.isChorus = inputModel.isChorus
         songInfo.songName = inputModel.songName
         songInfo.songNo = inputModel.songNo
 //        songInfo.songUrl = inputModel.songUrl
@@ -508,6 +503,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
 //        songInfo.userId = UserInfo.userId
         /// 点歌人昵称
         songInfo.name = VLUserCenter.user.name
+
         _addChooseSongInfo(songInfo: songInfo) { error in
             // TODO(wushengtao): fetch all list can not be changed if immediately invoke
             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.2) {
@@ -523,6 +519,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
               let song = songList.filter({ $0.objectId == inputModel.objectId }).first
         else {
             agoraAssert("make song to top not found! \(inputModel.songNo)")
+            completion(nil)
             return
         }
 
@@ -797,10 +794,12 @@ extension KTVSyncManagerServiceImp {
     private func _removeUser(completion: @escaping (Error?) -> Void) {
         guard let channelName = roomNo else {
             agoraAssert("_removeUser channelName = nil")
+            completion(nil)
             return
         }
         guard let objectId = userList.filter({ $0.id == VLUserCenter.user.id }).first?.objectId else {
 //            agoraAssert("_removeUser objectId = nil")
+            completion(nil)
             return
         }
         agoraPrint("imp user delete... [\(objectId)]")
@@ -819,6 +818,15 @@ extension KTVSyncManagerServiceImp {
 
     private func _updateUserCount(completion: @escaping (Error?) -> Void) {
         _updateUserCount(with: userList.count)
+        
+        //user count == 0, notify to leave room except room owner
+        guard userList.count == 0,
+           let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first,
+            roomInfo.creatorNo != VLUserCenter.user.id else {
+            return
+        }
+        
+        roomStatusDidChanged?(KTVSubscribeDeleted.rawValue, roomInfo)
     }
 
     private func _updateUserCount(with count: Int) {
@@ -858,6 +866,19 @@ extension KTVSyncManagerServiceImp {
 // MARK: Seat operation
 
 extension KTVSyncManagerServiceImp {
+    private func _markSeatChoursStatus(songCode: String, completion: @escaping (Error?)->()) {
+        guard let seatInfo = self.seatMap
+            .filter({ $0.value.userNo == VLUserCenter.user.id })
+            .first?.value else {
+            agoraAssert("mark join seat not found")
+            //TODO: error
+            completion(nil)
+            return
+        }
+        seatInfo.chorusSongCode = songCode
+        _updateSeat(seatInfo: seatInfo, finished: completion)
+    }
+    
     private func _getInitSeats() -> [VLRoomSeatModel] {
         var seatArray = [VLRoomSeatModel]()
         for i in 0...7 {
@@ -894,7 +915,7 @@ extension KTVSyncManagerServiceImp {
             /// 新增, 判断当前歌曲是否是自己点的
             seatInfo.isOwner = m.isOwner
 
-            seatInfo.isJoinedChorus = m.isJoinedChorus
+            seatInfo.chorusSongCode = m.chorusSongCode
         } else {
             /// 是否自己静音
             seatInfo.isAudioMuted = 1
@@ -904,7 +925,7 @@ extension KTVSyncManagerServiceImp {
             /// 新增, 判断当前歌曲是否是自己点的
             seatInfo.isOwner = false
 
-            seatInfo.isJoinedChorus = false
+            seatInfo.chorusSongCode = ""
         }
         
 
@@ -988,13 +1009,14 @@ extension KTVSyncManagerServiceImp {
     private func _getSeatInfo(finished: @escaping (Error?, [VLRoomSeatModel]?) -> Void) {
         guard let channelName = roomNo else {
             agoraAssert("channelName = nil")
+            finished(nil, nil)
             return
         }
         agoraPrint("imp seat get...")
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INFO)
-            .get(success: { [weak self] list in
+            .get(success: { list in
                 agoraPrint("imp seat get success...")
                 let seats = list.compactMap({ VLRoomSeatModel.yy_model(withJSON: $0.toJson()!)! })
                 
@@ -1064,6 +1086,8 @@ extension KTVSyncManagerServiceImp {
         guard let channelName = roomNo else {
 //            assert(false, "channelName = nil")
             agoraPrint("addUserInfo channelName = nil")
+            let error = NSError(domain: "addUserInfo channelName = nil", code: -1)
+            finished(error)
             return
         }
         
@@ -1171,7 +1195,10 @@ extension KTVSyncManagerServiceImp {
                     return
                 }
                 agoraPrint("imp song get success... \(list.count)")
-                self.songList = list.compactMap({ VLRoomSelSongModel.yy_model(withJSON: $0.toJson()!)! })
+                let totalList = list.compactMap({
+                    VLRoomSelSongModel.yy_model(withJSON: $0.toJson()!)!
+                })
+                self.songList = totalList.filterDuplicates({$0.songNo})
                 self._sortChooseSongList()
                 let songList = self.songList
                 finished(nil, songList)
@@ -1242,6 +1269,7 @@ extension KTVSyncManagerServiceImp {
               let objectId = songId
         else {
             agoraAssert("channelName = nil")
+            completion(nil)
             return
         }
         agoraPrint("imp song delete... [\(objectId)]")
@@ -1261,7 +1289,7 @@ extension KTVSyncManagerServiceImp {
     private func _markCurrentSongIfNeed() {
         guard let topSong = songList.first,
               topSong.status == VLSongPlayStatusIdle, // ready status
-              topSong.isChorus == false,
+             // topSong.isChorus == false,
               topSong.userNo == VLUserCenter.user.id
         else {
             return
@@ -1274,25 +1302,27 @@ extension KTVSyncManagerServiceImp {
 
     private func _markSoloSongIfNeed() {
         guard let topSong = songList.first,
-              topSong.isChorus == true, // current is chorus
+            //  topSong.isChorus == true, // current is chorus
               topSong.userNo == VLUserCenter.user.id
         else {
-            KTVLog.warning(text: "_markSoloSongIfNeed break: \(songList.first?.isChorus) \(songList.first?.status) \(songList.first?.userNo)/\(VLUserCenter.user.id)")
+            KTVLog.warning(text: "_markSoloSongIfNeed break:  \(songList.first?.status.rawValue ?? 0) \(songList.first?.userNo ?? "")/\(VLUserCenter.user.id)")
             return
         }
         
-        topSong.isChorus = false
         let status = topSong.status
         topSong.status = VLSongPlayStatusPlaying
         _updateChooseSong(songInfo: topSong) { error in
         }
-        topSong.isChorus = true
         topSong.status = status
+        //自己不需要标记
+//        _markSeatChoursStatus(songCode: nil) { err in
+//        }
     }
 
     private func _subscribeChooseSong(finished: @escaping () -> Void) {
         guard let channelName = roomNo else {
             agoraAssert("channelName = nil")
+            finished()
             return
         }
         agoraPrint("imp song subscribe...")
