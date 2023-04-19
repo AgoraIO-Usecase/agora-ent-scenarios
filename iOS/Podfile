@@ -46,6 +46,7 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133.2'
 #  pod 'AgoraLyricsScore', :path => '../../AgoraLyricsScore/AgoraLyricsScore.podspec'
   pod 'AgoraRtm_iOS', '1.5.1'
   pod 'Zip'
+  pod 'MJRefresh'
   
   
   # Swift Code Formatter

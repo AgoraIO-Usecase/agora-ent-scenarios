@@ -14,6 +14,7 @@
 #import "AppContext+KTV.h"
 #import "KTVMacro.h"
 #import "NSString+Helper.h"
+@import MJRefresh;
 
 @interface VLSelectSongTableItemView ()<
 UITableViewDataSource,
@@ -27,7 +28,6 @@ UITableViewDelegate
 @property (nonatomic, assign) BOOL ifChorus;
 @property (nonatomic, assign) NSInteger pageType;
 
-@property (nonatomic, strong) UIRefreshControl *refreshControl;
 @end
 
 @implementation VLSelectSongTableItemView
@@ -64,9 +64,15 @@ UITableViewDelegate
     self.tableView.backgroundColor = UIColorMakeWithHex(@"#152164");
     [self addSubview:self.tableView];
     
-    _refreshControl = [[UIRefreshControl alloc]init];
-    self.tableView.refreshControl = _refreshControl;
-    [_refreshControl addTarget:self action:@selector(loadData) forControlEvents:UIControlEventValueChanged];
+    VL(weakSelf);
+    self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadDatasWithIndex:self.pageType ifRefresh:YES];
+    }];
+    
+    self.tableView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
+        [weakSelf loadDatasWithIndex:self.pageType ifRefresh:NO];
+    }];
+
 }
 
 -(void)loadData {
@@ -87,7 +93,7 @@ UITableViewDelegate
 }
 
 - (void)appendDatasWithSongList:(NSArray<VLSongItmModel*>*)songList {
-    [self.tableView.refreshControl endRefreshing];
+    [self.tableView.mj_header endRefreshing];
     if (songList.count == 0) {
         return;
     }
@@ -109,6 +115,11 @@ UITableViewDelegate
 //    [self.tableView reloadData];
 
     [self updateData];
+    if (modelsArray.count < 20) {
+        [self.tableView.mj_footer endRefreshingWithNoMoreData];
+    }else{
+        [self.tableView.mj_footer endRefreshing];
+    }
 }
 
 
