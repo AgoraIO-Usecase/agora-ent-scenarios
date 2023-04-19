@@ -37,7 +37,7 @@ public class SceneReference: DocumentReference {
     }
 
     public func deleteScenes() {
-        manager.deleteScenes(sceneIds: [id], success: {
+        manager.deleteScenes(sceneIds: [id], success: { _ in 
             Log.info(text: "deleteScenes success", tag: "SceneReference")
         }, fail: { error in
             Log.error(error: error, tag: "SceneReference")

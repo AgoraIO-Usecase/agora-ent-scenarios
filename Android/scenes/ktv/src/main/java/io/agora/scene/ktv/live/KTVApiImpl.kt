@@ -1016,7 +1016,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         super.onLocalAudioStats(stats)
         if (useCustomAudioSource) return
         val audioState = stats ?: return
-        audioPlayoutDelay = audioState.audioPlayoutDelay
+        // TODO Try to fix the problem by updating rtc sdk version.
+        //audioPlayoutDelay = audioState.audioPlayoutDelay
     }
 
     // ------------------------ AgoraMusicContentCenterEventDelegate  ------------------------
@@ -1152,8 +1153,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     override fun onPreloadEvent(src: String?, event: Constants.MediaPlayerPreloadEvent?) {}
 
-    override fun onCompleted() {}
-
     override fun onAgoraCDNTokenWillExpire() {}
 
     override fun onPlayerSrcInfoChanged(from: SrcInfo?, to: SrcInfo?) {}
@@ -1207,9 +1206,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         return false
     }
 
-    override fun onPlaybackAudioFrameBeforeMixing(
-        channelId: String?,
-        userId: Int,
+    override fun onEarMonitoringAudioFrame(
         type: Int,
         samplesPerChannel: Int,
         bytesPerSample: Int,
@@ -1222,8 +1219,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         return false
     }
 
-    override fun onPublishAudioFrame(
+    override fun onPlaybackAudioFrameBeforeMixing(
         channelId: String?,
+        userId: Int,
         type: Int,
         samplesPerChannel: Int,
         bytesPerSample: Int,
@@ -1252,7 +1250,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         return null
     }
 
-    override fun getPublishAudioParams(): AudioParams? {
+    override fun getEarMonitoringAudioParams(): AudioParams? {
         return null
     }
 }

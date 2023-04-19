@@ -7,6 +7,7 @@
 #import "VLMacroDefine.h"
 #import "NSString+Helper.h"
 #import "MenuUtils.h"
+#import "KTVMacro.h"
 @import Masonry;
 
 @interface VLEmptyView ()
@@ -14,7 +15,7 @@
 @property (nonatomic, weak) id <VLEmptyViewDelegate>delegate;
 @property (nonatomic, strong) UIImageView *showImageView;
 @property (nonatomic, strong) UILabel *textLabel;
-@property (nonatomic, strong) QMUIButton *button;
+@property (nonatomic, strong) UIButton *button;
 @end
 
 @implementation VLEmptyView
@@ -107,9 +108,11 @@
     return _showImageView;
 }
 
-- (QMUIButton *)button {
+- (UIButton *)button {
     if (!_button) {
-        _button = [[QMUIButton alloc] qmui_initWithImage:nil title:AGLocalizedString(@"返回")];
+//        _button = [[QMUIButton alloc] qmui_initWithImage:nil title:AGLocalizedString(@"返回")];
+        _button = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_button setTitle:AGLocalizedString(@"返回") forState:UIControlStateNormal];
         _button.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
         [_button addTarget:self action:@selector(buttonEvent) forControlEvents:UIControlEventTouchUpInside];
         [_button setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];

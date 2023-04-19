@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="http://schemas.android.com/tools">
+    <color name="voice_auxiliary_color_6842f6">#6842F6</color>
+    <color name="voice_auxiliary_color_7a51ff">#7A51FF</color>
+    <color name="voice_auxiliary_color_cf00ff">#CF00FF</color>
+    <color name="voice_auxiliary_color_ff53da">#FF53DA</color>
+    <color name="voice_auxiliary_color_ffe856">#FFE856</color>
+    <color name="voice_auxiliary_color_ffeb6e">#FFEB6E</color>
+    <color name="voice_color_009fff">#009FFF</color>
+    <color name="voice_color_0a7aff">#0A7AFF</color>
+    <color name="voice_color_156ef3">#156EF3</color>
+    <color name="voice_color_219bff">#219BFF</color>
+    <color name="voice_color_333333">#333333</color>
+    <color name="voice_color_345dff">#345DFF</color>
+    <color name="voice_color_3c4267">#3C4267</color>
+    <color name="voice_color_756e98">#756E98</color>
+    <color name="voice_color_8bb3ff">#8BB3FF</color>
+    <color name="voice_color_979cbb">#979CBB</color>
+    <color name="voice_color_a8abff">#A8ABFF</color>
+    <color name="voice_color_b6b8c9">#B6B8C9</color>
+    <color name="voice_color_d8d8d8">#D8D8D8</color>
+    <color name="voice_color_dad9e9">#DAD9E9</color>
+    <color name="voice_color_e4e3ed">#E4E3ED</color>
+    <color name="voice_color_e76d21">#E76D21</color>
+    <color name="voice_color_ececf0">#ECECF0</color>
+    <color name="voice_color_f1f3f8">#F1F3F8</color>
+    <color name="voice_color_f2f2f5">#F2F2F5</color>
+    <color name="voice_color_f6f6f6">#F6F6F6</color>
+    <color name="voice_color_f7f8fb">#F7F8FB</color>
+    <color name="voice_color_fa396a">#FA396A</color>
+    <color name="voice_color_fcf0b3">#FCF0B3</color>
+    <color name="voice_dark_grey_color_040925">#040925</color>
+    <color name="voice_dark_grey_color_303554">#303554</color>
+    <color name="voice_dark_grey_color_6c7192">#6C7192</color>
+    <color name="voice_dark_grey_color_979cbb">#979CBB</color>
+    <color name="voice_dark_grey_color_c6c4de">#C6C4DE</color>
+    <color name="voice_dark_grey_color_eff4ff">#EFF4FF</color>
+    <color name="voice_divider_color_1f979797">#1F979797</color>
+    <color name="voice_main_color_009fff">#009FFF</color>
+    <color name="voice_main_color_156ef3">#156EF3</color>
+    <color name="voice_main_color_16a7ff">#16A7FF</color>
+    <dimen name="voice_like_anim_bezier_x_rand">50.0dp</dimen>
+    <dimen name="voice_like_anim_init_x">50.0dp</dimen>
+    <dimen name="voice_like_anim_init_y">25.0dp</dimen>
+    <dimen name="voice_like_anim_length">400.0dp</dimen>
+    <dimen name="voice_like_anim_length_rand">350.0dp</dimen>
+    <dimen name="voice_like_anim_x_point_factor">30.0dp</dimen>
+    <dimen name="voice_like_size_height">27.3dp</dimen>
+    <dimen name="voice_like_size_width">32.5dp</dimen>
+    <dimen name="voice_space_84dp">84dp</dimen>
+    <dimen name="voice_space_8dp">8dp</dimen>
+    <item name="voice_extend_item_eq" type="id"/>
+    <item name="voice_extend_item_gift" type="id"/>
+    <item name="voice_extend_item_hand_up" type="id"/>
+    <item name="voice_extend_item_hand_up_status" type="id"/>
+    <item name="voice_extend_item_mic" type="id"/>
+    <integer name="voice_anim_duration">3000</integer>
+    <integer name="voice_like_anim_bezier_factor">6</integer>
+    <string name="voice_agora_chat_room_create">Create Room</string>
+    <string name="voice_app_agora_chatroom">Agora Chat Room</string>
+    <string name="voice_app_agora_chatroom_copy_right">Powered by Agora.io</string>
+    <string name="voice_app_name">Agora Chat Room</string>
+    <string name="voice_chatroom_agora_ains">AINS Definition</string>
+    <string name="voice_chatroom_agora_ains_supports_sounds">Agora AINS supports the following sounds, click to have bot play the sound:</string>
+    <string name="voice_chatroom_agora_blue">Agora Blue</string>
+    <string name="voice_chatroom_agora_blue_bot">Agora Blue Bot</string>
+    <string name="voice_chatroom_agora_blue_bot_ains">Agora Blue Bot AINS</string>
+    <string name="voice_chatroom_agora_bot">Agora Blue &amp; Red Bot</string>
+    <string name="voice_chatroom_agora_red">Agora Red</string>
+    <string name="voice_chatroom_agora_red_bot">Agora Red Bot</string>
+    <string name="voice_chatroom_agora_red_bot_ains">Agora Red Bot AINS</string>
+    <string name="voice_chatroom_aiaec">AIAEC</string>
+    <string name="voice_chatroom_aiaec_introduce">    When you turn on accompaniment singing, AIAEC can greatly improve your singing effect. It is strongly recommended that you turn it on when singing</string>
+    <string name="voice_chatroom_aiagc">AGC</string>
+    <string name="voice_chatroom_aiagc_introduce">    After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing</string>
+    <string name="voice_chatroom_ains">AINS</string>
+    <string name="voice_chatroom_ains_introduce">AINS：AI Noise Suppression</string>
+    <string name="voice_chatroom_ains_settings">AINS Settings</string>
+    <string name="voice_chatroom_air_absorb">Airborne Simulation</string>
+    <string name="voice_chatroom_attenuation_factor">Attenuation factor</string>
+    <string name="voice_chatroom_audio_settings">Audio Settings</string>
+    <string name="voice_chatroom_best_sound_effect">Best Agora Sound</string>
+    <string name="voice_chatroom_bot_settings">Bot Settings</string>
+    <string name="voice_chatroom_bot_volume">Bot Volume</string>
+    <string name="voice_chatroom_cancel_request_speak">Cancel Request to Speak?</string>
+    <string name="voice_chatroom_create_tip1">This product is for testing only, not for commerce.</string>
+    <string name="voice_chatroom_create_tip2">Every room will be maintained for 10 minutes.</string>
+    <string name="voice_chatroom_current_sound_selection">Current Sound Selection</string>
+    <string name="voice_chatroom_edit">Edit</string>
+    <string name="voice_chatroom_end_live">End Live?</string>
+    <string name="voice_chatroom_end_live_tips">The room will close after you leave.</string>
+    <string name="voice_chatroom_exchange_mic">Exchange seat?</string>
+    <string name="voice_chatroom_exchange_mic_fail">Exchange seat error:%1$s</string>
+    <string name="voice_chatroom_exchange_mic_success">Exchange seat success</string>
+    <string name="voice_chatroom_exit">Exit the chatroom?</string>
+    <string name="voice_chatroom_exit_and_create_one">Exit the chatroom and recreate a new one?</string>
+    <string name="voice_chatroom_gaming_buddy">Gaming Buddy</string>
+    <string name="voice_chatroom_gaming_buddy_introduce">This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice.</string>
+    <string name="voice_chatroom_gift_dialog_send">Send</string>
+    <string name="voice_chatroom_gift_title">Gifts</string>
+    <string name="voice_chatroom_high">High</string>
+    <string name="voice_chatroom_host_invitation_sent">Invitation sent!</string>
+    <string name="voice_chatroom_join_room_failed">Joined Failed</string>
+    <string name="voice_chatroom_join_room_success">Joined Success</string>
+    <string name="voice_chatroom_karaoke">Karaoke</string>
+    <string name="voice_chatroom_karaoke_introduce">This sound effect focuses on solving all kinds of problems in the Karaoke scene of single person or multi person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi person chorus, etc. It can make the scenes of Karaoke more realistic and the singers´ songs more beautiful.</string>
+    <string name="voice_chatroom_medium">Medium</string>
+    <string name="voice_chatroom_mic_anchor_invited_you_on_stage">Anchor Invited You On-Stage</string>
+    <string name="voice_chatroom_mic_apply_fail">Apply failed!</string>
+    <string name="voice_chatroom_mic_apply_success">Apply success!</string>
+    <string name="voice_chatroom_mic_audience_accepted_invitation">%1$s Accepted Invitation</string>
+    <string name="voice_chatroom_mic_audience_rejected_invitation">%1$s Rejected Invitation</string>
+    <string name="voice_chatroom_mic_blocked">Mic Blocked</string>
+    <string name="voice_chatroom_mic_cancel_apply_fail">Cancel apply failed!</string>
+    <string name="voice_chatroom_mic_cancel_apply_success">Cancel apply success!</string>
+    <string name="voice_chatroom_mic_close_by_host">Mic closed by host</string>
+    <string name="voice_chatroom_mic_exchange_mic_failed">Exchange mic failed</string>
+    <string name="voice_chatroom_mic_exchange_mic_success">Exchange mic success</string>
+    <string name="voice_chatroom_mic_kicked_off">Kicked Off</string>
+    <string name="voice_chatroom_mic_kicked_out_of_the_room">You have been kicked out of the room</string>
+    <string name="voice_chatroom_mic_muted">Mic Muted</string>
+    <string name="voice_chatroom_mic_muted_by_host">The current seat has been banned by the host</string>
+    <string name="voice_chatroom_mic_off_stage">Off-Stage</string>
+    <string name="voice_chatroom_mic_on_stage">On-Stage</string>
+    <string name="voice_chatroom_mic_removed_from_stage">You were removed from stage</string>
+    <string name="voice_chatroom_mic_request_cancelled">Request Cancelled</string>
+    <string name="voice_chatroom_mic_stafe_is_full">The stage is full,try again later</string>
+    <string name="voice_chatroom_mic_submit_sent">Your request has been sent,please wait for reply</string>
+    <string name="voice_chatroom_mic_unblocked">Mic Unblocked</string>
+    <string name="voice_chatroom_mic_unmuted">Mic Unmuted</string>
+    <string name="voice_chatroom_noise_suppression">Noise Suppression</string>
+    <string name="voice_chatroom_none">None</string>
+    <string name="voice_chatroom_notice">Notice</string>
+    <string name="voice_chatroom_notice_edit_hint">Announce to chatroom, 140 character limit.</string>
+    <string name="voice_chatroom_notice_edit_limit">140 character limit.</string>
+    <string name="voice_chatroom_notice_post">Post</string>
+    <string name="voice_chatroom_notice_posted">Notice Posted</string>
+    <string name="voice_chatroom_notice_posted_error">Post Failed</string>
+    <string name="voice_chatroom_off">Off</string>
+    <string name="voice_chatroom_on">On</string>
+    <string name="voice_chatroom_only_host_can_change_best_sound">Only host can change Best Agora Sound</string>
+    <string name="voice_chatroom_only_host_can_change_robot">Only host can change the robot settings</string>
+    <string name="voice_chatroom_open_bot_prompt">Add bot?</string>
+    <string name="voice_chatroom_open_bot_to_sound_effect">Add bot to listen to sound effect?</string>
+    <string name="voice_chatroom_other_sound_selection">Other Sound Selection</string>
+    <string name="voice_chatroom_own_audio_settings">Personal Audio Settings</string>
+    <string name="voice_chatroom_professional_broadcaster">Professional podcaster</string>
+    <string name="voice_chatroom_professional_broadcaster_introduce">This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market.</string>
+    <string name="voice_chatroom_profile_change_picture">Change Profile Picture</string>
+    <string name="voice_chatroom_prompt">Prompt</string>
+    <string name="voice_chatroom_request_speak">Request to Speak?</string>
+    <string name="voice_chatroom_room_audio_settings">Room Audio Settings</string>
+    <string name="voice_chatroom_send_gift_fail">Gift Sent Failed</string>
+    <string name="voice_chatroom_settings_host_only">Host Only</string>
+    <string name="voice_chatroom_social_chat">Social Chat</string>
+    <string name="voice_chatroom_social_chat_introduce">This sound effect focuses on solving the voice call problem of Social Chat scene, including noise cancellation and echo suppression of the anchor´s voice. It can enable users of different network environments and models to enjoy ultra-low delay, clear and beautiful voice in multi person chat.</string>
+    <string name="voice_chatroom_sound_selection">Sound Selection</string>
+    <string name="voice_chatroom_sound_selection_more">Need more Agora Sound Selection or custom sound. Visit <![CDATA[<font color=\'#3C4267\'><strong><u>www.agora.io.</u></strong></font>]]></string>
+    <string name="voice_chatroom_sound_selection_tips">Switching other Agora Sound Selection need to exit the chatroom.</string>
+    <string name="voice_chatroom_sounds_construction">Construction Sound</string>
+    <string name="voice_chatroom_sounds_construction_tips">Ex. Knocking sound</string>
+    <string name="voice_chatroom_sounds_home">Home Sound</string>
+    <string name="voice_chatroom_sounds_home_tips">Ex. Door closing, chair squeaking, baby crying sounds</string>
+    <string name="voice_chatroom_sounds_kitchen">Kitchen Sound</string>
+    <string name="voice_chatroom_sounds_machine">Robot Sound</string>
+    <string name="voice_chatroom_sounds_machine_tips">Ex. Fan, air conditioner, vacuum cleaner, printer sounds</string>
+    <string name="voice_chatroom_sounds_office">Office Sound</string>
+    <string name="voice_chatroom_sounds_office_tips">Ex. Keyboard tapping, mouse clicking sounds</string>
+    <string name="voice_chatroom_sounds_street">Street Sound</string>
+    <string name="voice_chatroom_sounds_street_tips">Ex. Bird, car, subway sounds</string>
+    <string name="voice_chatroom_sounds_tv">TV Sound</string>
+    <string name="voice_chatroom_spatial_audio">Spatial Audio</string>
+    <string name="voice_chatroom_time_up_tips">The room experience time has been exhausted.</string>
+    <string name="voice_chatroom_turnon_aiaec">Turn on AIAEC</string>
+    <string name="voice_chatroom_turnon_aiagc">Turn on AGC</string>
+    <string name="voice_chatroom_voice_blur">Voice blur</string>
+    <string name="voice_chatroom_welcome">How to use 3D Spatial Audio Seat</string>
+    <string name="voice_chatroom_welcome_gotit">I got it</string>
+    <string name="voice_chatroom_welcome_tip1">Put on headsets</string>
+    <string name="voice_chatroom_welcome_tip2">Move avatar around to hear different spatial audio effects</string>
+    <string name="voice_chatroom_your_ains">Your AINS</string>
+    <string name="voice_dialog_gift_total_count">Contribution Total:%1$s</string>
+    <string name="voice_empty_invite_hands">No audience yet</string>
+    <string name="voice_empty_raised_hands">No one raised hands yet</string>
+    <string name="voice_gift_default_name_1">Sweet Heart</string>
+    <string name="voice_gift_default_name_2">Flower</string>
+    <string name="voice_gift_default_name_3">Crystal Box</string>
+    <string name="voice_gift_default_name_4">Super Agora</string>
+    <string name="voice_gift_default_name_5">Star</string>
+    <string name="voice_gift_default_name_6">Lollipop</string>
+    <string name="voice_gift_default_name_7">Diamond</string>
+    <string name="voice_gift_default_name_8">Crown</string>
+    <string name="voice_gift_default_name_9">Rocket</string>
+    <string name="voice_gift_sent">sent </string>
+    <string name="voice_room_3d_spatial_audio">3D Spatial Audio Seat</string>
+    <string name="voice_room_3d_spatial_audio_part1">Put on headset</string>
+    <string name="voice_room_3d_spatial_audio_part2">Move avatar around to hear different spatial audio effects</string>
+    <string name="voice_room_3d_spatial_audio_tips">3D Spatial Audio Seat Tutorial</string>
+    <string name="voice_room_accept">Accept</string>
+    <string name="voice_room_accepted">Accepted</string>
+    <string name="voice_room_active">active</string>
+    <string name="voice_room_agree_fail">Agree failed!</string>
+    <string name="voice_room_agree_success">Agree success!</string>
+    <string name="voice_room_ask_upstage">Ask Upstage</string>
+    <string name="voice_room_audience_list">Audience List</string>
+    <string name="voice_room_block">Block</string>
+    <string name="voice_room_cancel">Cancel</string>
+    <string name="voice_room_cancel_request">Cancel Request</string>
+    <string name="voice_room_check_password">Incorrect Password</string>
+    <string name="voice_room_close">Room Closed</string>
+    <string name="voice_room_confirm">Confirm</string>
+    <string name="voice_room_content_prohibited">Content prohibited</string>
+    <string name="voice_room_contribution_empty">No data</string>
+    <string name="voice_room_contribution_ranking">Contribution Ranking</string>
+    <string name="voice_room_contribution_value">Contribution Value</string>
+    <string name="voice_room_create_3d_room">Spatial Audio</string>
+    <string name="voice_room_create_3d_room_desc">Power natural conversations that make people feel like "they're in the room" together</string>
+    <string name="voice_room_create_chat_3d_room">Spatial Audio</string>
+    <string name="voice_room_create_chat_room">Chat Room</string>
+    <string name="voice_room_create_chat_room_desc">Multi-audio chat scenario where anyone can unmute their mic and speak \nCo-Watch / Team Chat / Gaming Buddy Chat</string>
+    <string name="voice_room_create_empty_name">No Room Name</string>
+    <string name="voice_room_create_encrypt">Room Access?</string>
+    <string name="voice_room_create_error">Create Room Error</string>
+    <string name="voice_room_create_go_live">Go Live</string>
+    <string name="voice_room_create_hint_room_name">Set Room Name</string>
+    <string name="voice_room_create_ktv_room">KTV</string>
+    <string name="voice_room_create_next">Next</string>
+    <string name="voice_room_create_private">Private</string>
+    <string name="voice_room_create_public">Public</string>
+    <string name="voice_room_create_random_name">Random</string>
+    <string name="voice_room_create_room_name">Room Name</string>
+    <string name="voice_room_create_tips">Enter 4 Digit PassWord</string>
+    <string name="voice_room_current_customer_usage">Current Customer Usage</string>
+    <string name="voice_room_decline">Decline</string>
+    <string name="voice_room_disclaimer">Disclaimer for demo</string>
+    <string name="voice_room_disclaimer_content_1">[Agora Chat Room Demo] (this "Product") is a test product provided by Agora. This Product is available for our current and potential customers only, and for them to test the functionality and quality of this Product. This Product is provided neither for commercial nor for public use. Agora enjoys the copyright and ownership of this product. You shall not modify, consolidate, compile, adjust, reverse engineer, sub-license, transfer, sell this Product or infringe the legitimate interests of Agora in any way.</string>
+    <string name="voice_room_disclaimer_content_2">If you’d like to test this Product, you’re welcome to download, install and use it. Agora hereby grants you a world-wide and royalty-free license to use this Product. This product is provided "as is" without any express or implicit warranty, including but not limited to guarantees of suitability, suitability for specific purposes, and non-infringement. Whether it is due to any contract, infringement or other forms of conduct related to this Product or the use of this Product or otherwise, Agora shall not be liable for any claims, damages or liabilities arising out of or related to your use of this Product.</string>
+    <string name="voice_room_disclaimer_content_3">It’s your freedom to choose to test this Product or not. But if you decide to do so, and if you download, install, or use this Product, it means that you confirm and agree that under no circumstances shall Agora be liable for any form of loss or injury caused to yourself or others when you use this Product for any reason, in any manner.</string>
+    <string name="voice_room_disclaimer_email">If you have any query, please feel free to contact support@agora.io</string>
+    <string name="voice_room_empty_data">No Chat Room Yet</string>
+    <string name="voice_room_host">Host</string>
+    <string name="voice_room_input_chat_title">Let\'s Chat</string>
+    <string name="voice_room_invite">Invite</string>
+    <string name="voice_room_invite_hands_title">Invite On-Stage</string>
+    <string name="voice_room_invited">Invited</string>
+    <string name="voice_room_kick_member">Kicked Out</string>
+    <string name="voice_room_kickoff">Kick Off Stage</string>
+    <string name="voice_room_list_count">%1$s</string>
+    <string name="voice_room_list_item_enter">Enter</string>
+    <string name="voice_room_list_title_name">Agora Chat Room</string>
+    <string name="voice_room_list_title_private">Private</string>
+    <string name="voice_room_login_exception">Login exception</string>
+    <string name="voice_room_mute">Mute</string>
+    <string name="voice_room_name_rule">Incorrect room name</string>
+    <string name="voice_room_off_stage">Off-Stage</string>
+    <string name="voice_room_only_host_can_change_anis">Only host can click to have bot play the sound</string>
+    <string name="voice_room_profile">Profile</string>
+    <string name="voice_room_profile_update_name_fail">Change Failed</string>
+    <string name="voice_room_profile_update_name_suc">Change Success</string>
+    <string name="voice_room_raised_hands_title">Raised Hands</string>
+    <string name="voice_room_send_invited_fail">Invited failed!</string>
+    <string name="voice_room_send_tip">Send</string>
+    <string name="voice_room_social_chat_following_customers">The following customers are using it</string>
+    <string name="voice_room_social_chat_more">More Best Agora Sound</string>
+    <string name="voice_room_sound_selection">Sound Selection</string>
+    <string name="voice_room_sounds_alert">Alert Sound / Music</string>
+    <string name="voice_room_sounds_applause">Applause</string>
+    <string name="voice_room_sounds_audio_feedback">Audio Feedback</string>
+    <string name="voice_room_sounds_mic_pop_filter">Mic Pop Filter</string>
+    <string name="voice_room_sounds_microphone_finger_rub_sound">Microphone Finger Rub Sound</string>
+    <string name="voice_room_sounds_microphone_screen_tap_sound">Screen Tap Sound</string>
+    <string name="voice_room_sounds_wind">Wind Sound</string>
+    <string name="voice_room_submit">Submit</string>
+    <string name="voice_room_system_msg_member_add">Joined</string>
+    <string name="voice_room_tab_layout_count">(%1$s)</string>
+    <string name="voice_room_unavailable_tip">The room does not exist, refresh and try again</string>
+    <string name="voice_room_unblock">Unblock</string>
+    <string name="voice_room_unmute">Unmute</string>
+    <string name="voice_room_welcome">Welcome to the voice chat room! Pornography, gambling or violence is strictly prohibited in the room.</string>
+    <string name="voice_spatial_room_list_title_name">Spatial Audio Chat Mode Room</string>
+    <string name="voice_tab_layout_all">All</string>
+    <string name="voice_tab_layout_audio_room">Spatial Audio Room</string>
+    <string name="voice_tab_layout_chat_room">Chat Room</string>
+    <string name="voice_tab_layout_karaoke_room">Karaoke</string>
+    <string name="voice_voice_voice_chatroom_first_enter_room_notice_tips">Welcome!</string>
+    <style name="BottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="enableEdgeToEdge">true</item>
+        <item name="bottomSheetStyle">@style/bottomSheetStyleWrapper</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+    <style name="bottomSheetStyleWrapper" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+    <style name="voice_BottomDialogFragment.Animation" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/voice_bottom_anim_enter</item>
+        <item name="android:windowExitAnimation">@anim/voice_bottom_anim_exit</item>
+    </style>
+    <style name="voice_BottomSheetDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/voice_anim_slide_in_right</item>
+        <item name="android:windowExitAnimation">@anim/voice_anim_slide_out_right</item>
+    </style>
+    <style name="voice_RoundedStyle">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+    <style name="voice_Theme.AgoraScenesChatroom" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/voice_main_color_156ef3</item>
+        <item name="colorPrimaryVariant">@color/voice_main_color_16a7ff</item>
+        <item name="colorOnPrimary">@color/voice_white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/voice_main_color_009fff</item>
+        <item name="colorSecondaryVariant">@color/voice_main_color_009fff</item>
+        <item name="colorOnSecondary">@color/voice_black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- Customize your theme here. -->
+
+        <item name="android:enforceStatusBarContrast" ns1:targetApi="q">false</item>
+        <item name="android:enforceNavigationBarContrast" ns1:targetApi="q">false</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" ns1:targetApi="o_mr1">true</item>
+<!--        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>-->
+    </style>
+    <style name="voice_bottom_sheet_checkbox">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginEnd">20dp</item>
+        <item name="android:background">@color/voice_transparent</item>
+        <item name="android:button">@drawable/voice_cb_checkbox_selector</item>
+    </style>
+    <style name="voice_bottom_sheet_divider_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="dividerColor">@color/voice_divider_color_1f979797</item>
+    </style>
+    <style name="voice_bottom_sheet_frame_text_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingStart">7dp</item>
+        <item name="android:paddingEnd">7dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:textColor">@color/voice_main_color_156ef3</item>
+        <item name="android:textSize">@dimen/voice_sp_11</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/voice_bg_rect_stoke4_blue</item>
+    </style>
+    <style name="voice_bottom_sheet_progress">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:progressDrawable">@drawable/voice_pb_chatroom_seekbar</item>
+        <item name="android:thumb">@drawable/voice_icon_progress_thumb20</item>
+        <item name="android:max">100</item>
+    </style>
+    <style name="voice_bottom_sheet_right_text_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingStart">18dp</item>
+        <item name="android:paddingTop">15dp</item>
+        <item name="android:paddingBottom">15dp</item>
+        <item name="android:paddingEnd">19dp</item>
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:textColor">@color/voice_color_3c4267</item>
+        <item name="android:textSize">@dimen/voice_sp_13</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+    <style name="voice_bottom_sheet_subtitle_style">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:paddingTop">7dp</item>
+        <item name="android:paddingBottom">7dp</item>
+        <item name="android:textColor">@color/voice_dark_grey_color_6c7192</item>
+        <item name="android:textSize">@dimen/voice_sp_13</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:drawablePadding">5dp</item>
+        <item name="android:background">@color/voice_color_f7f8fb</item>
+    </style>
+    <style name="voice_bottom_sheet_text_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingEnd">30dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:drawablePadding">12dp</item>
+        <item name="android:textColor">@color/voice_color_3c4267</item>
+        <item name="android:textSize">@dimen/voice_sp_13</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="voice_bottom_sheet_title_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">11dp</item>
+        <item name="android:paddingBottom">11dp</item>
+        <item name="android:textColor">@color/voice_dark_grey_color_040925</item>
+        <item name="android:textSize">@dimen/voice_sp_16</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+    </style>
+    <style name="voice_chatroom_cancel_button_text_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textColor">@color/voice_color_756e98</item>
+        <item name="android:textSize">@dimen/voice_sp_16</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/voice_bg_rect_radius24_eff4ff</item>
+    </style>
+    <style name="voice_chatroom_confirm_button_text_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textColor">@color/voice_white</item>
+        <item name="android:textSize">@dimen/voice_sp_16</item>
+        <item name="android:gravity">center</item>
+        <!--        9.0 以下隐藏阴影 -->
+        <!--        <item name="android:elevation">4dp</item>-->
+        <item name="android:background">@drawable/voice_bg_rect_radius24_gradient_blue</item>
+    </style>
+    <style name="voice_edit_encryption">
+        <item name="android:layout_marginStart">16dp</item>
+    </style>
+    <style name="voice_measureSoftKeyAppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="voice_radio_style">
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:button">@drawable/voice_room_create_encrypt_bg</item>
+        <item name="buttonStyle">@style/Widget.AppCompat.Button.Borderless</item>
+        <item name="background">@color/voice_transparent</item>
+    </style>
+    <style name="voice_seat_roundStyle">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+    <style name="voice_top_text_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawablePadding">3dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:textColor">@color/voice_white</item>
+        <item name="android:textSize">@dimen/voice_sp_11</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/voice_bg_rect_radius13_black20</item>
+    </style>
+    <declare-styleable name="voice_LikeLayout">
+        <attr format="dimension" name="voice_initX"/>
+        <attr format="dimension" name="voice_initY"/>
+        <attr format="dimension" name="voice_xRand"/>
+        <attr format="dimension" name="voice_animLengthRand"/>
+        <attr format="dimension" name="voice_xPointFactor"/>
+        <attr format="dimension" name="voice_animLength"/>
+        <attr format="dimension" name="voice_heart_width"/>
+        <attr format="dimension" name="voice_heart_height"/>
+        <attr format="integer" name="voice_bezierFactor"/>
+        <attr format="integer" name="voice_anim_duration"/>
+    </declare-styleable>
+    <declare-styleable name="voice_RoomTitleBar">
+        <!-- 标题文本 -->
+        <attr format="reference|string" name="voice_titleBarTitle"/>
+        <!-- 左侧图片 -->
+        <attr format="reference" name="voice_titleBarLeftImage"/>
+        <!-- 右侧图片 -->
+        <attr format="reference" name="voice_titleBarRightImage"/>
+        <!-- 右标题文本 -->
+        <attr format="reference|string" name="voice_titleBarRightTitle"/>
+        <!-- Toolbar返回箭头颜色 -->
+        <attr format="reference|color" name="voice_titleBarArrowColor"/>
+        <!-- Toolbar右侧菜单更多的图标 -->
+        <attr format="reference" name="voice_titleBarMenuResource"/>
+        <!-- Toolbar是否可见返回按钮 -->
+        <attr format="boolean" name="voice_titleBarDisplayHomeAsUpEnabled"/>
+        <!-- 右侧布局是否可见 -->
+        <attr format="boolean" name="voice_titleBarRightVisible"/>
+        <!-- 标题文本的位置-->
+        <attr format="enum" name="voice_titleBarTitlePosition">
+            <enum name="center" value="0"/>
+            <enum name="left" value="1"/>
+            <enum name="right" value="2"/>
+        </attr>
+        <!-- 标题文本的字体大小 -->
+        <attr format="dimension" name="voice_titleBarTitleTextSize"/>
+        <!-- 标题文本的字体颜色 -->
+        <attr format="reference|color" name="voice_titleBarTitleTextColor"/>
+    </declare-styleable>
+    <declare-styleable name="voice_encryption_input_style">
+        <attr format="dimension" name="voice_space"/>
+        <attr format="dimension" name="voice_strokeWidth"/>
+        <attr format="color" name="voice_checkedColor"/>
+        <attr format="color" name="voice_defaultColor"/>
+        <attr format="integer" name="voice_textLength"/>
+        <attr format="color" name="voice_backColor"/>
+        <attr format="color" name="voice_textColor"/>
+        <attr format="dimension" name="voice_circle"/>
+        <attr format="dimension" name="voice_round"/>
+        <attr format="dimension" name="voice_textSize"/>
+        <attr format="boolean" name="voice_isPwd"/>
+        <attr format="color" name="voice_waitInputColor"/>
+        <attr format="boolean" name="voice_isWaitInput"/>
+    </declare-styleable>
+</resources>

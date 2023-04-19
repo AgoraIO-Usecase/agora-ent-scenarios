@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/voice_bg_rect_top_radius20_white"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <View
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:background="@drawable/voice_bg_rect_top_radius20_gradient_white"
+        app:layout_constraintTop_toTopOf="@+id/ivBottomSheetTitle" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBottomSheetTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:src="@drawable/voice_icon_room_rectangle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/micRotOutBg"
+        android:layout_width="0dp"
+        android:layout_height="66dp"
+        android:background="@drawable/voice_bg_rect_stoke32_white20"
+        app:layout_constraintEnd_toEndOf="@+id/micBlueRed"
+        app:layout_constraintStart_toStartOf="@+id/micBlueBot"
+        app:layout_constraintTop_toBottomOf="@id/top" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/micBlueBot"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/voice_bg_robot_bottom"
+        android:src="@drawable/voice_icon_room_blue_robot"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/glVertical50"
+        app:layout_constraintTop_toTopOf="@+id/micRotOutBg" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/voice_chatroom_agora_blue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/glVertical50"
+        app:layout_constraintTop_toBottomOf="@+id/micBlueBot"
+        android:textColor="@color/voice_color_333333"
+        android:textStyle="bold"
+        android:drawablePadding="5dp"
+        android:drawableStart="@drawable/voice_icon_room_mic_robot_tag"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/voice_icon_room_robot_link"
+        app:layout_constraintBottom_toBottomOf="@+id/micRotOutBg"
+        app:layout_constraintEnd_toEndOf="@+id/glVertical50"
+        app:layout_constraintStart_toStartOf="@+id/glVertical50"
+        app:layout_constraintTop_toTopOf="@+id/micRotOutBg" />
+
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/micBlueRed"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/voice_bg_robot_bottom"
+        android:src="@drawable/voice_icon_room_red_robot"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/glVertical50"
+        app:layout_constraintTop_toTopOf="@+id/micRotOutBg" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/robot_red"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/voice_chatroom_agora_red"
+        app:layout_constraintStart_toStartOf="@+id/glVertical50"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/micBlueBot"
+        android:textColor="@color/voice_color_333333"
+        android:textStyle="bold"
+        android:drawablePadding="5dp"
+        android:drawableStart="@drawable/voice_icon_room_mic_robot_tag"
+        />
+
+    <View
+        android:id="@+id/bottom_line"
+        app:layout_constraintTop_toBottomOf="@+id/robot_red"
+        android:background="@color/voice_divider_color_1f979797"
+        android:layout_width="match_parent"
+        android:layout_marginTop="30dp"
+        android:layout_height="1dp"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/glVertical50"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:id="@+id/left_btn"
+        android:text="@string/voice_room_robot_left"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/glVertical50"
+        app:layout_constraintTop_toBottomOf="@+id/bottom_line"
+        android:textColor="@color/voice_color_156ef3"
+        />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="16dp"
+        android:background="@color/voice_divider_color_1f979797"
+        app:layout_constraintBottom_toBottomOf="@+id/left_btn"
+        app:layout_constraintEnd_toEndOf="@+id/glVertical50"
+        app:layout_constraintStart_toStartOf="@+id/glVertical50"
+        app:layout_constraintTop_toTopOf="@+id/left_btn" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:id="@+id/right_btn"
+        android:text="@string/voice_room_robot_right"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/glVertical50"
+        app:layout_constraintTop_toBottomOf="@+id/bottom_line"
+        android:textColor="@color/voice_color_156ef3"
+        />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

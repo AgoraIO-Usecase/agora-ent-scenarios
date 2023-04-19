@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLUserCenter : NSObject
 
 + (instancetype)center;
++ (instancetype)shared;
 
 @property (nonatomic, strong, class, readonly) VLLoginModel *user;
 

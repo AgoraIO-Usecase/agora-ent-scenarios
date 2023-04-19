@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/voice_bg_rect_top_radius20_white">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/voice_bg_rect_top_radius20_gradient_white"
+        app:layout_constraintTop_toTopOf="@+id/ivBottomSheetTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/mtBottomSheetTitle"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBottomSheetTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:src="@drawable/voice_icon_room_rectangle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtBottomSheetTitle"
+        style="@style/voice_bottom_sheet_title_style"
+        android:text="@string/voice_chatroom_social_chat"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtSocialChatContent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:textColor="@color/voice_color_3c4267"
+        android:textSize="@dimen/voice_sp_13"
+        android:breakStrategy="simple"
+        android:lineSpacingExtra="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle"
+        tools:text="This scenario focuses on echo cancellation, noise reduction in a multi-person chat setting, creating a quiet chat atmosphere" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mlSoundSelectionContent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/voice_bg_rect_radius20_f1f3f8"
+        android:paddingTop="10dp"
+        android:layout_marginBottom="34dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtSocialChatContent">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtSocialChatCustomers"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/voice_room_social_chat_following_customers"
+            android:textColor="@color/voice_dark_grey_color_979cbb"
+            android:textSize="@dimen/voice_sp_11"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/llSocialChatCustomers"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mtSocialChatCustomers" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.divider.MaterialDivider
+        style="@style/voice_bottom_sheet_divider_style"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="15dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mlSoundSelectionContent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtSocialChatMore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:drawableEnd="@drawable/voice_icon_arrow_right_blue"
+        android:drawablePadding="4dp"
+        android:text="@string/voice_room_social_chat_more"
+        android:textColor="@color/voice_main_color_156ef3"
+        android:textSize="@dimen/voice_sp_14"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mlSoundSelectionContent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

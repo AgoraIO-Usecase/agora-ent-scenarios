@@ -145,4 +145,5 @@
     <string name="ktv_skip_prelude">跳过前奏</string>
     <string name="ktv_skip_postlude">跳过尾奏</string>
     <string name="ktv_onseat_toast">加入合唱前，您需要先上麦</string>
+
 </resources>

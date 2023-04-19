@@ -3,5 +3,4 @@
 *.iml
 /build
 common/base/sdk-*/
-/scenes/show/
-/scenes/voice/
+/app/release/

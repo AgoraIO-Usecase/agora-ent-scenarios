@@ -19,9 +19,7 @@ import androidx.core.content.ContextCompat;
 
 import org.jetbrains.annotations.NotNull;
 
-import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.widget.databinding.ViewCommonTitleBinding;
-import io.agora.scene.widget.utils.NotchUtils;
 import kotlin.jvm.JvmOverloads;
 import kotlin.jvm.internal.DefaultConstructorMarker;
 import kotlin.jvm.internal.Intrinsics;
@@ -33,19 +31,6 @@ public final class CommonTitleView extends ConstraintLayout {
     private ViewCommonTitleBinding binding;
 
     private final void initView(AttributeSet attrs, int defStyleAttr) {
-        this.post((Runnable) (new Runnable() {
-            public final void run() {
-                Context var10000 = CommonTitleView.this.getContext();
-                if (var10000 == null) {
-                    throw new NullPointerException("null cannot be cast to non-null type android.app.Activity");
-                } else {
-                    if (!NotchUtils.hasNotchInScreen((Activity) var10000)) {
-                        CommonTitleView.this.setPadding(0, UiUtil.dp2px(16), 0, 0);
-                    }
-
-                }
-            }
-        }));
         Context var10000 = this.getContext();
         Intrinsics.checkNotNullExpressionValue(var10000, "context");
         TypedArray var11 = var10000.getTheme().obtainStyledAttributes(attrs, R.styleable.titleView, defStyleAttr, 0);

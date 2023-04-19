@@ -3,6 +3,11 @@
 local.properties
 .idea
 Pods
-**/*.xcworkspace/*
+**/*.xcworkspace/**
 **/xcuserdata
-KeyCenter.swift
+**/ByteEffectLib/*
+**/SenseLib/*
+**/*.lic
+**/libs/*
+**/buglyqq-upload-symbol/**
+**/build.sh

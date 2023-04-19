@@ -17,6 +17,7 @@ class AlertManager: NSObject {
     }
 
     enum AlertPosition {
+        case top
         case center
         case bottom
     }
@@ -45,10 +46,16 @@ class AlertManager: NSObject {
         containerView.addSubview(view)
         view.translatesAutoresizingMaskIntoConstraints = false
         view.alpha = 0
-        if alertPostion == .center {
+        switch alertPostion {
+        case .top:
+            view.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
+            view.topAnchor.constraint(equalTo: containerView.topAnchor, constant: Screen.safeAreaTopHeight() + 50).isActive = true
+            
+        case .center:
             view.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
             view.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
-        } else {
+            
+        case .bottom:
             bottomAnchor = view.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
             view.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
             view.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
@@ -75,9 +82,11 @@ class AlertManager: NSObject {
 
     private static func showAlertPostion(alertPostion: AlertPosition, view: UIView) {
         containerView?.layoutIfNeeded()
-        if alertPostion == .center {
+        switch alertPostion {
+        case .top, .center:
             showCenterView(view: view)
-        } else {
+            
+        case .bottom:
             bottomAnchor?.constant = view.frame.height
             bottomAnchor?.isActive = true
             containerView?.layoutIfNeeded()
@@ -138,7 +147,7 @@ class AlertManager: NSObject {
                                                          alpha: 0.0)
                 containerView?.layoutIfNeeded()
             }
-            if currentPosition == .center {
+            if currentPosition != .bottom {
                 viewCache.last?.view?.alpha = 0
             }
         }, completion: { _ in
@@ -187,15 +196,19 @@ class AlertManager: NSObject {
 extension UIViewController {
     static var keyWindow: UIWindow? {
         // Get connected scenes
-        return UIApplication.shared.connectedScenes
+        if #available(iOS 13.0, *) {
+            return UIApplication.shared.connectedScenes
             // Keep only active scenes, onscreen and visible to the user
-            .filter { $0.activationState == .foregroundActive }
+                .filter { $0.activationState == .foregroundActive }
             // Keep only the first `UIWindowScene`
-            .first(where: { $0 is UIWindowScene })
+                .first(where: { $0 is UIWindowScene })
             // Get its associated windows
-            .flatMap({ $0 as? UIWindowScene })?.windows
+                .flatMap({ $0 as? UIWindowScene })?.windows
             // Finally, keep only the key window
-            .first(where: \.isKeyWindow)
+                .first(where: \.isKeyWindow)
+        } else {
+            return UIApplication.shared.keyWindow
+        }
     }
 
     static func cl_topViewController(_ viewController: UIViewController? = nil) -> UIViewController? {

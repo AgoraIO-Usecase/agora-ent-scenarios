@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) UILabel *itemTitleLabel;
 @property (nonatomic, strong) UIImageView *arrowImgView;
 
+- (void)setIconImageName:(NSString *)imgStr title:(NSString *)title;
+
 @end
 
 NS_ASSUME_NONNULL_END

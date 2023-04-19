@@ -7,12 +7,6 @@
         android:title="@string/app_title_home" />
 
     <item
-        android:id="@+id/navigation_dashboard"
-        android:visible="false"
-        android:icon="@drawable/btn_home_faxian_selector"
-        android:title="@string/app_title_find" />
-
-    <item
         android:id="@+id/navigation_notifications"
         android:icon="@drawable/btn_home_mine_selector"
         android:title="@string/app_title_mine" />

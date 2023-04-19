@@ -57,6 +57,8 @@ public class PhoneLoginRegisterActivity extends BaseViewBindingActivity<AppActiv
                 // RoomManager.getInstance().loginOut();
                 PagePilotManager.pageMainHome();
                 finish();
+            } else if (var1 == Constant.CALLBACK_TYPE_LOGIN_REQUEST_CODE_SUCCESS) {
+                if (countDownTimerUtils != null) countDownTimerUtils.start();
             }
             hideLoadingView();
         });
@@ -108,7 +110,6 @@ public class PhoneLoginRegisterActivity extends BaseViewBindingActivity<AppActiv
                 ToastUtils.showToast("请输入正确手机号");
             } else {
                 phoneLoginViewModel.requestSendVCode(account);
-                countDownTimerUtils.start();
             }
         });
         getBinding().iBtnClearAccount.setOnClickListener(view -> {

@@ -4,7 +4,6 @@
 //
 
 #import "VLUserCenter.h"
-#import "VLCache.h"
 
 @interface VLUserCenter()
 
@@ -25,16 +24,23 @@ static NSString *kLocalLoginKey = @"kLocalLoginKey";
     return instancel;
 }
 
++ (VLUserCenter* )shared {
+    return [self center];
+}
+
 - (BOOL)isLogin {
     if (!_loginModel) {
-        _loginModel = (VLLoginModel *)[VLCache.system objectForKey:kLocalLoginKey];
+        NSString* ret = [[NSUserDefaults standardUserDefaults] objectForKey:kLocalLoginKey];
+        _loginModel = [VLLoginModel yy_modelWithJSON:ret];
     }
     return _loginModel ? YES : NO;
 }
 
 - (void)storeUserInfo:(VLLoginModel *)user {
     _loginModel = user;
-    [VLCache.system setObject:_loginModel forKey:kLocalLoginKey];
+    NSString* ret = [_loginModel yy_modelToJSONString];
+    [[NSUserDefaults standardUserDefaults] setObject:ret forKey:kLocalLoginKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)logout {
@@ -43,7 +49,7 @@ static NSString *kLocalLoginKey = @"kLocalLoginKey";
 
 - (void)cleanUserInfo {
     _loginModel = nil;
-    [VLCache.system removeObjectForKey:kLocalLoginKey];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kLocalLoginKey];
 }
 
 + (VLLoginModel *)user {
@@ -52,7 +58,7 @@ static NSString *kLocalLoginKey = @"kLocalLoginKey";
 
 + (void)clearUserRoomInfo {
     VLUserCenter.user.ifMaster = NO;
-    [VLCache.system setObject:VLUserCenter.user forKey:kLocalLoginKey];
+    [VLUserCenter.center storeUserInfo:VLUserCenter.user];
 }
 
 @end
