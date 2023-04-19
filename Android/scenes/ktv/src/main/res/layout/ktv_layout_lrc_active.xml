@@ -4,117 +4,299 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@mipmap/bg_player_default"
+    tools:background="@mipmap/ktv_mv_default"
     tools:layout_height="230dp"
     tools:theme="@style/Theme.MaterialComponents.Light">
 
-    <io.agora.lyrics_view.PitchView
-        android:id="@+id/pitchView"
+    <TextView
+        android:id="@+id/downloadLrcFailedView"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="70dp"
+        android:gravity="center"
+        android:text="歌词加载失败"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/bgd_control_layout_lrc"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/downloadLrcFailedBtn"
+        android:layout_width="80dp"
+        android:layout_height="30dp"
+        android:background="@drawable/ktv_skip_btn_bg"
+        android:gravity="center"
+        android:text="点击重试"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/downloadLrcFailedView" />
+
+    <io.agora.scene.ktv.widget.lrcView.MyScoringView
+        android:id="@+id/scoringView"
         android:layout_width="match_parent"
         android:layout_height="90dp"
-        android:layout_marginTop="26dp"
+        android:layout_marginTop="48dp"
         android:background="#02FFFFFF"
+        app:initialScore="0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:minimumScore="40"
-        app:pitchDoneTextColor="@color/white"
         app:pitchIndicatorRadius="6dp"
-        app:pitchInitialScore="0"
-        app:pitchStickHeight="6dp" />
+        app:pitchStickHeight="4dp"
+        app:pitchStickHighlightedColor="@color/pink_b4" />
 
-    <io.agora.lyrics_view.LrcView
-        android:id="@+id/lrcView"
+    <io.agora.karaoke_view.v11.LyricsView
+        android:id="@+id/lyricsView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="#00000000"
         android:paddingStart="10dp"
-        android:paddingTop="10dp"
+        android:paddingTop="4dp"
         android:paddingEnd="10dp"
         android:paddingBottom="10dp"
-        app:firstToneStartIndicatorPaddingTop="8dp"
-        app:firstToneStartIndicatorRadius="4dp"
+        app:currentLineHighlightedTextColor="@color/pink_b4"
+        app:currentLineTextColor="@color/white"
+        app:currentLineTextSize="16sp"
+        app:labelWhenNoLyrics=" "
         app:layout_constraintBottom_toTopOf="@+id/bgd_control_layout_lrc"
-        app:layout_constraintTop_toBottomOf="@+id/pitchView"
-        app:lrcCurrentTextColor="#FFE960"
-        app:lrcDividerHeight="8sp"
-        app:lrcLabel=" "
-        app:lrcMarginTop="6dp"
-        app:lrcNormalTextColor="@color/white"
-        app:lrcNormalTextSize="16sp"
-        app:lrcTextGravity="center"
-        app:lrcTextSize="18sp" />
+        app:layout_constraintTop_toBottomOf="@+id/scoringView"
+        app:layout_constraintVertical_bias="0.0"
+        app:lineSpacing="6dp"
+        app:paddingTop="2dp"
+        app:startOfVerseIndicatorPaddingTop="6dp"
+        app:startOfVerseIndicatorRadius="4dp"
+        app:textGravity="center"
+        app:textSize="14sp"
+        tools:layout_editor_absoluteX="-36dp" />
 
     <View
         android:id="@+id/bgd_control_layout_lrc"
         android:layout_width="match_parent"
-        android:layout_height="44dp"
+        android:layout_height="22dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivMusicStart"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginBottom="10dp"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ivLeaveChorus"
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginBottom="0dp"
         android:insetLeft="0dp"
-        android:insetTop="0dp"
+        android:insetTop="2dp"
         android:insetRight="0dp"
         android:insetBottom="0dp"
         android:minWidth="0dp"
         android:padding="0dp"
-        android:src="@mipmap/ktv_ic_pause"
+        android:text="离开合唱"
+        android:textAppearance="?android:attr/textAppearanceButton"
+        android:textColor="#9BA2AB"
+        android:textSize="8sp"
+        app:backgroundTint="@android:color/transparent"
+        app:cornerRadius="6dp"
+        app:icon="@mipmap/ic_leave_chorus"
+        app:iconGravity="top"
+        app:iconPadding="2dp"
+        app:iconTintMode="src_atop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivChangeSong"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ivMusicStart"
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        android:layout_width="26dp"
+        android:layout_height="36dp"
         android:layout_marginStart="20dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="0dp"
         android:insetLeft="0dp"
         android:insetTop="0dp"
         android:insetRight="0dp"
         android:insetBottom="0dp"
         android:minWidth="0dp"
         android:padding="0dp"
-        android:src="@mipmap/ic_play_next"
+        android:text="@string/ktv_room_player_pause"
+        android:textAppearance="?android:attr/textAppearanceButton"
+        android:textColor="#9BA2AB"
+        android:textSize="8sp"
+        app:backgroundTint="@android:color/transparent"
+        app:cornerRadius="6dp"
+        app:icon="@mipmap/ktv_ic_pause"
+        app:iconGravity="top"
+        app:iconPadding="0dp"
+        app:iconTintMode="src_atop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ivChangeSong"
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        android:layout_width="26dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="0dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:minWidth="0dp"
+        android:padding="0dp"
+        android:text="@string/ktv_room_change_song"
+        android:textAppearance="?android:attr/textAppearanceButton"
+        android:textColor="#9BA2AB"
+        android:textSize="8sp"
+        app:backgroundTint="@android:color/transparent"
+        app:cornerRadius="6dp"
+        app:icon="@mipmap/ic_play_next"
+        app:iconGravity="top"
+        app:iconPadding="0dp"
+        app:iconTintMode="src_atop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/ivMusicStart" />
 
-    <androidx.appcompat.widget.AppCompatCheckBox
-        android:id="@+id/switchOriginal"
+    <ImageView
+        android:id="@+id/ivJoinChorusBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:button="@mipmap/ic_original_song"
-        android:checked="true"
-        android:text="@string/ktv_room_original"
-        android:textColor="#9BA2AB"
-        app:layout_constraintBottom_toBottomOf="@id/ivMusicStart"
+        android:layout_gravity="center"
+        android:layout_marginBottom="10dp"
+        android:background="@mipmap/ic_join_chorus"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/ivMusicStart"
-        app:switchPadding="12dp" />
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/ivJoinChorusLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="10dp"
+        android:background="@mipmap/ic_join_chorus_loading"
+        android:clickable="false"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/ivSkipPrelude"
+        android:layout_width="80dp"
+        android:layout_height="26dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/ktv_skip_btn_bg"
+        android:orientation="horizontal"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/switchOriginal"
+        app:layout_constraintStart_toEndOf="@id/ivMusicStart">
+
+        <TextView
+            android:id="@+id/ivSkipPreludeSkip"
+            android:layout_width="56dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/ktv_skip_prelude"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:id="@+id/ivSkipPreludeCancel"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:background="@mipmap/ktv_skip_cancel" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/ivSkipPostlude"
+        android:layout_width="80dp"
+        android:layout_height="26dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/ktv_skip_btn_bg"
+        android:orientation="horizontal"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/switchOriginal"
+        app:layout_constraintStart_toEndOf="@id/ivMusicStart">
+
+        <TextView
+            android:id="@+id/ivSkipPostludeSkip"
+            android:layout_width="56dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/ktv_skip_postlude"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:id="@+id/ivSkipPostludeCancel"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:background="@mipmap/ktv_skip_cancel" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/ivMusicMenu"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:id="@+id/switchOriginal"
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        android:layout_width="26dp"
+        android:layout_height="36dp"
         android:layout_marginEnd="20dp"
+        android:layout_marginBottom="0dp"
+        android:background="@null"
+        android:checkable="true"
         android:insetLeft="0dp"
         android:insetTop="0dp"
         android:insetRight="0dp"
         android:insetBottom="0dp"
         android:minWidth="0dp"
         android:padding="0dp"
+        android:text="@string/ktv_room_original"
         android:textAppearance="?android:attr/textAppearanceButton"
-        app:icon="@mipmap/ktv_ic_settings"
-        app:iconGravity="textStart"
+        android:textColor="#9BA2AB"
+        android:textSize="8sp"
+        app:backgroundTint="@android:color/transparent"
+        app:cornerRadius="6dp"
+        app:icon="@mipmap/ic_play_original_off"
+        app:iconGravity="top"
         app:iconPadding="0dp"
-        app:iconTint="@android:color/transparent"
+        app:iconTintMode="multiply"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ivMusicMenu"
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="0dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:minWidth="0dp"
+        android:padding="0dp"
+        android:text="@string/ktv_room_player_tweak"
+        android:textAppearance="?android:attr/textAppearanceButton"
+        android:textColor="#9BA2AB"
+        android:textSize="8sp"
+        app:backgroundTint="@android:color/transparent"
+        app:cornerRadius="6dp"
+        app:icon="@mipmap/ktv_ic_settings"
+        app:iconGravity="top"
+        app:iconPadding="0dp"
         app:iconTintMode="src_atop"
         app:layout_constraintBottom_toBottomOf="@id/ivMusicStart"
         app:layout_constraintEnd_toStartOf="@id/switchOriginal"
@@ -124,5 +306,5 @@
         android:id="@+id/rlMusicControlMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="bgd_control_layout_lrc,switchOriginal,ivMusicMenu,ivMusicStart,ivChangeSong" />
+        app:constraint_referenced_ids="bgd_control_layout_lrc,switchOriginal,ivMusicMenu,ivMusicStart,ivChangeSong,ivSkipPostlude,ivSkipPrelude" />
 </androidx.constraintlayout.widget.ConstraintLayout>

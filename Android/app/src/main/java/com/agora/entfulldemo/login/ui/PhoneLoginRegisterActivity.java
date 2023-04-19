@@ -149,7 +149,7 @@ public class PhoneLoginRegisterActivity extends BaseViewBindingActivity<AppActiv
                 @Override
                 public void onRightButtonClick() {
                     //验证成功
-                    showLoadingView();
+                    //showLoadingView();
                     String account = getBinding().etAccounts.getText().toString();
                     String vCode = getBinding().etVCode.getText().toString();
                     phoneLoginViewModel.requestLogin(account, vCode);

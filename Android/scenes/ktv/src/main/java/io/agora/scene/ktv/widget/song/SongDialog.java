@@ -15,8 +15,11 @@ import androidx.viewpager2.widget.ViewPager2;
 import java.util.List;
 
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
+import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvDialogChooseSongBinding;
+import io.agora.scene.ktv.live.listener.SongActionListenerImpl;
+import io.agora.scene.widget.utils.UiUtils;
 
 /**
  * 点歌菜单
@@ -42,6 +45,9 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
         songChooseFragment.setListener(new SongChooseFragment.Listener() {
             @Override
             public void onSongItemChosen(@NonNull SongItem songItem) {
+                if (UiUtils.isFastClick(500)) {
+                    return;
+                }
                 if (chooseSongListener != null) {
                     chooseSongListener.onChooseSongChosen(SongDialog.this, songItem);
                 }
@@ -127,8 +133,9 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
     /**
      * 设置事件监听
      */
-    public void setChooseSongListener(OnSongActionListener chooseSongListener) {
+    public void setChooseSongListener(SongActionListenerImpl chooseSongListener) {
         this.chooseSongListener = chooseSongListener;
+        chooseSongListener.getSongTypeList();
     }
 
     /**
@@ -141,8 +148,8 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
     /**
      * 点歌-标题设置
      */
-    public void setChooseSongTabsTitle(List<String> titles, int defaultIndex) {
-        songChooseFragment.setSongTagsTitle(titles, defaultIndex);
+    public void setChooseSongTabsTitle(List<String> titles, List<Integer> types, int defaultIndex) {
+        songChooseFragment.setSongTagsTitle(titles, types, defaultIndex);
     }
 
     /**
@@ -162,15 +169,15 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
     /**
      * 点歌-下拉刷新重置列表
      */
-    public void setChooseRefreshingResult(List<SongItem> list) {
-        songChooseFragment.setRefreshingResult(list);
+    public void setChooseRefreshingResult(List<SongItem> list,int index) {
+        songChooseFragment.setRefreshingResult(list, index);
     }
 
     /**
      * 点歌-加载更多刷新列表
      */
-    public void setChooseLoadMoreResult(List<SongItem> list, boolean hasMore) {
-        songChooseFragment.setLoadMoreResult(list, hasMore);
+    public void setChooseLoadMoreResult(List<SongItem> list, boolean hasMore, int index) {
+        songChooseFragment.setLoadMoreResult(list, hasMore, index);
     }
 
     /**
