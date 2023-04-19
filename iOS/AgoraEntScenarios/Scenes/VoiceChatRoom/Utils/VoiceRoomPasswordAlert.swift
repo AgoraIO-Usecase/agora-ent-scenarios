@@ -30,6 +30,9 @@ import ZSwiftBaseLib
         pinCode.inputFinish = { [weak self] in
             self?.code = $0
         }
+        pinCode.textValueChange = { [weak self] in
+            self?.code = $0
+        }
         pinCode.textFiled.becomeFirstResponder()
     }
 

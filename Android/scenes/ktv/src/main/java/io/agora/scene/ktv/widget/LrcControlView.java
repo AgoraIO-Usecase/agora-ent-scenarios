@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,9 +21,17 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.palette.graphics.Palette;
 
+import java.io.File;
+import java.util.List;
+
+import io.agora.lyrics_view.DownloadManager;
+import io.agora.lyrics_view.LrcLoadUtils;
 import io.agora.lyrics_view.LrcView;
 import io.agora.lyrics_view.PitchView;
+import io.agora.lyrics_view.bean.LrcData;
 import io.agora.scene.base.manager.UserManager;
+import io.agora.scene.base.utils.ToastUtils;
+import io.agora.scene.base.utils.ZipUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
@@ -179,6 +188,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     }
 
     public void onMemberJoinedChorus() {
+        mBinding.ilActive.lrcView.setEnableDrag(false);
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
         mBinding.ilChorus.getRoot().setVisibility(View.GONE);
@@ -201,7 +211,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
-            mBinding.ilActive.switchOriginal.setChecked(true);
+            mBinding.ilActive.switchOriginal.setChecked(false);
         } else if (this.mRole == Role.Listener) {
             mBinding.ilActive.lrcView.setEnableDrag(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
@@ -211,10 +221,12 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
-            if (this.mRole != Role.Singer) {
+            if (this.mRole == Role.Listener) {
                 mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
                 mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
                 mBinding.ilActive.ivMusicMenu.setVisibility(View.INVISIBLE);
+            } else if (this.mRole == Role.Partner) {
+                mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
             }
         }
         stopTimer();
@@ -234,7 +246,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     public void setScoreControlView(RoomSelSongModel songPlaying) {
         if (songPlaying != null && songPlaying.isChorus()) {
-            if (UserManager.getInstance().getUser().userNo.equals(songPlaying.getUserNo())) {
+            if (UserManager.getInstance().getUser().id.toString().equals(songPlaying.getUserNo())) {
                 mBinding.scoreControlView.setVisibility(VISIBLE);
                 mBinding.scoreControlView.setText(getContext().getString(R.string.ktv_score_formatter, 0.00));
             } else {
@@ -275,13 +287,14 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         if (this.mRole == Role.Singer) {
             mBinding.ilActive.lrcView.setEnableDrag(true);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
-            mBinding.ilActive.switchOriginal.setChecked(true);
+            mBinding.ilActive.switchOriginal.setChecked(false);
         } else if (this.mRole == Role.Partner) {
+            mBinding.ilActive.switchOriginal.setChecked(false);
             mBinding.ilActive.lrcView.setEnableDrag(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
             mBinding.ilActive.ivChangeSong.setVisibility(View.INVISIBLE);
-            mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
+            mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
         } else if (this.mRole == Role.Listener) {
             mBinding.ilActive.lrcView.setEnableDrag(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.INVISIBLE);
@@ -349,6 +362,47 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     public void setSwitchOriginalChecked(boolean checked) {
         mBinding.ilActive.switchOriginal.setChecked(checked);
+    }
+
+    public void downloadLrcData(String url) {
+        DownloadManager.getInstance().download(getContext(), url, file -> {
+            if (file.getName().endsWith(".zip")) {
+                ZipUtils.unZipAsync(file.getAbsolutePath(),
+                        file.getAbsolutePath().replace(".zip", ""),
+                        new ZipUtils.UnZipCallback() {
+                            @Override
+                            public void onFileUnZipped(List<String> unZipFilePaths) {
+                                String xmlPath = "";
+                                for (String path : unZipFilePaths) {
+                                    if(path.endsWith(".xml")){
+                                        xmlPath = path;
+                                        break;
+                                    }
+                                }
+                                if(TextUtils.isEmpty(xmlPath)){
+                                    ToastUtils.showToast("The xml file not exist!");
+                                    return;
+                                }
+                                File xmlFile = new File(xmlPath);
+
+                                LrcData data = LrcLoadUtils.parse(xmlFile);
+                                getLrcView().setLrcData(data);
+                                getPitchView().setLrcData(data);
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                ToastUtils.showToast(e.getMessage());
+                            }
+                        });
+            } else {
+                LrcData data = LrcLoadUtils.parse(file);
+                getLrcView().setLrcData(data);
+                getPitchView().setLrcData(data);
+            }
+        }, exception -> {
+            ToastUtils.showToast(exception.getMessage());
+        });
     }
 
     public interface OnLrcActionListener extends LrcView.OnLyricsSeekListener {

@@ -8,7 +8,8 @@ Pods
 **/*.xcworkspace/**
 **/xcuserdata
 **/ByteEffectLib/*
-iOS/libs/**.xcframework/**
+**/SenseLib/*
+**/*.lic
 **/libs/*
 **/buglyqq-upload-symbol/**
 **/build.sh

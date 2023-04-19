@@ -5,6 +5,7 @@
 //  Created by zhaoyongqiang on 2021/11/19.
 //
 import UIKit
+import YYCategories
 
 @objc
 class NetworkManager:NSObject {
@@ -64,7 +65,16 @@ class NetworkManager:NSObject {
 
     @objc static let shared = NetworkManager()
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
-    private let baseServerUrl: String = KeyCenter.onlineBaseServerUrl ?? ""
+    private let baseServerUrl: String = "https://toolbox.bj2.agoralab.co/v1/"
+    
+    private func basicAuth(key: String, password: String) -> String {
+        let loginString = String(format: "%@:%@", key, password)
+        guard let loginData = loginString.data(using: String.Encoding.utf8) else {
+            return ""
+        }
+        let base64LoginString = loginData.base64EncodedString()
+        return base64LoginString
+    }
     
     /// get tokens
     /// - Parameters:
@@ -106,10 +116,6 @@ class NetworkManager:NSObject {
                        type: AgoraTokenType,
                        success: @escaping (String?) -> Void)
     {
-        if KeyCenter.Certificate == nil || KeyCenter.Certificate?.isEmpty == true {
-            success(nil)
-            return
-        }
         let params = ["appCertificate": KeyCenter.Certificate ?? "",
                       "appId": KeyCenter.AppId,
                       "channelName": channelName,
@@ -143,8 +149,11 @@ class NetworkManager:NSObject {
     ///   - nickName: <#nickName description#>
     ///   - password: <#password description#>
     ///   - uid: <#uid description#>
+    ///   - type: 0: 同时处理用户注册/返回用户token和创建聊天室 1: 只处理用户注册/返回用户token 2: 只处理创建聊天室
+
     ///   - success: success description {roomid, uid}
-    func generateIMConfig(channelName: String,
+    func generateIMConfig(type: Int,
+                          channelName: String,
                           nickName: String,
                           chatId: String?,
                           imUid: String?,
@@ -152,10 +161,6 @@ class NetworkManager:NSObject {
                           uid: String,
                           sceneType: SceneType,
                           success: @escaping (String?, String?, String?) -> Void) {
-        if KeyCenter.Certificate == nil || KeyCenter.Certificate?.isEmpty == true {
-            success(nil, nil, nil)
-            return
-        }
         var chatParams = [
             "name": channelName,
             "description": "test",
@@ -179,13 +184,15 @@ class NetworkManager:NSObject {
         ]
         
         let payload: String = getPlayloadWithSceneType(.voice) ?? ""
+        let traceId = UUID().uuidString.md5Encrypt
         let params = ["appId": KeyCenter.AppId,
                       "chat": chatParams,
                       "src": "iOS",
                       "im": imConfig,
                       "payload": payload,
                       "traceId": NSString.withUUID().md5() as Any,
-                      "user": userParams] as [String: Any]
+                      "user": userParams,
+                      "type":type] as [String: Any]
  
         NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)webdemo/im/chat/create",
                                           params: params,
@@ -213,7 +220,7 @@ class NetworkManager:NSObject {
                       "channelName": channelName,
                       "channelType": channelType,
                       "src": "iOS",
-                      "traceId": NSString.withUUID().md5() as Any,
+                      "traceId": UUID().uuidString.md5Encrypt,
                       "payload": payload] as [String: Any]
                       
         NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)moderation/audio",
@@ -240,6 +247,55 @@ class NetworkManager:NSObject {
         }
         let payload: String? = String(data: jsonData, encoding: .utf8) ?? nil
         return payload
+    }
+    
+    func startCloudPlayer(channelName: String,
+                          uid: String,
+                          robotUid: UInt,
+                          streamUrl: String,
+                          success: @escaping (String?) -> Void) {
+        let params: [String: Any] = ["appId": KeyCenter.AppId,
+                                     "appCert": KeyCenter.Certificate ?? "",
+                                     "basicAuth":basicAuth(key: KeyCenter.CloudPlayerKey ?? "", password: KeyCenter.CloudPlayerSecret ?? ""),
+                                        "channelName": channelName,
+                                        "uid": uid,
+                                        "robotUid": robotUid,
+                                        "region": "cn",
+                                        "streamUrl": streamUrl,
+                                        "src": "iOS",
+                                        "traceId": NSString.withUUID().md5() ?? ""]
+                      
+        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)cloud-player/start",
+                                          params: params,
+                                          success: { response in
+            let code = response["code"] as? Int
+            let msg = response["msg"] as? String
+            success(code == 0 ? nil : msg)
+        }, failure: { error in
+            print(error)
+            success(error.description)
+        })
+    }
+    
+    func cloudPlayerHeartbeat(channelName: String,
+                              uid: String,
+                              success: @escaping (String?) -> Void) {
+        let params: [String: String] = ["appId": KeyCenter.AppId,
+                                        "channelName": channelName,
+                                        "uid": uid,
+                                        "src": "iOS",
+                                        "traceId": NSString.withUUID().md5() ?? ""]
+                      
+        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)heartbeat",
+                                          params: params,
+                                          success: { response in
+            let code = response["code"] as? Int
+            let msg = response["msg"] as? String
+            success(code == 0 ? nil : msg)
+        }, failure: { error in
+            print(error)
+            success(error.description)
+        })
     }
 
     func getRequest(urlString: String, success: SuccessClosure?, failure: FailClosure?) {
@@ -301,7 +357,9 @@ class NetworkManager:NSObject {
                                                            options: .sortedKeys) // convertParams(params: params).data(using: .utf8)
         }
         let curl = request.cURL(pretty: true)
+        #if DEBUG
         debugPrint("curl == \(curl)")
+        #endif
         return request
     }
 
@@ -352,5 +410,40 @@ public extension URLRequest {
         cURL += method + url + header + data
 
         return cURL
+    }
+}
+
+//event report
+extension NetworkManager {
+    @objc public func reportSceneClick(sceneName: String) {
+        let src: String = "agora_ent_demo"
+        let ts: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
+        let params = ["pts": [["m": "event",
+                              "ls": [
+                                "name": "entryScene",
+                                "project": sceneName,
+                                "version": UIApplication.shared.appVersion ?? "",
+                                "platform": "iOS",
+                                "model": UIDevice.current.machineModel ?? ""
+                              ],
+                              "vs": ["count": 1]
+                             ]],
+                      "src": src,
+                      "ts": ts,
+                      "sign": "src=\(src)&ts=\(ts)".md5Encrypt] as [String: Any]
+//        ToastView.showWait(text: "loading...", view: nil)
+        let url = "https://report-ad.agoralab.co/v1/report"
+        NetworkManager.shared.postRequest(urlString: url,
+                                          params: params,
+                                          success: { response in
+//            let data = response["data"] as? [String: String]
+            print(response)
+//            success(token)
+//            ToastView.hidden()
+        }, failure: { error in
+//            print(error)
+//            success(nil)
+//            ToastView.hidden()
+        })
     }
 }

@@ -10,6 +10,10 @@ import UIKit
 
 public extension UIImage {
     convenience init?(_ bundleResourceName: String) {
-        self.init(named: bundleResourceName, in: Bundle.voiceRoomBundle, with: nil)
+        if #available(iOS 13.0, *) {
+            self.init(named: bundleResourceName, in: Bundle.voiceRoomBundle, with: nil)
+        } else {
+            self.init(named: bundleResourceName, in: Bundle.voiceRoomBundle, compatibleWith: nil)
+        }
     }
 }

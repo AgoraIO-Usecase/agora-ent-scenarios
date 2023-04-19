@@ -21,7 +21,9 @@ struct KeyCenter {
      则应使用不同的 App ID。如果应用程序需要相互通信，则应使用同一个App ID。
      进入声网控制台(https://console.agora.io/)，创建一个项目，进入项目配置页，即可看到APP ID。
      */
+
     static let AppId: String = <#Your AppId#>
+
     /**
      Certificate.
      Agora provides App certificate to generate Token. You can deploy and generate a token on your server,
@@ -30,11 +32,13 @@ struct KeyCenter {
      then the APP Certificate can be found in the project detail page.
      PS: If the project does not have certificates enabled, leave this field blank.
      声网APP证书
-     Agora 提供 App certificate 用以生成 Token。您可以在您的服务器部署并生成 Token，或者使用控制台生成临时的 Token。
+     Agora 提供 App certificate 用以生成 Token。您可以在您的服务器部署并生成，或者使用控制台生成临时的 Token。
      进入声网控制台(https://console.agora.io/)，创建一个带证书鉴权的项目，进入项目配置页，即可看到APP证书。
      注意：如果项目没有开启证书鉴权，这个字段留空。
      */
-    static let Certificate: String? = <#Your Certificate#>
+    
+    static let Certificate: String? = <#YOUR Certificate#>
+
     /**
      Token.
      Agora provides Temporary Access Token to join the spatial channel with APP ID which enable App Certificate.
@@ -46,6 +50,7 @@ struct KeyCenter {
      进入控制台开启证书鉴权的项目配置页，在APP证书下方有"生成临时音视频token"的按钮，输入频道名即可生成一个临时token。
      注意：如果配置了agora_app_certificate，则这个字段会失效。
      */
+
     static var Token: String? = nil
     
     static var HostUrl: String = "https://gateway-fulldemo-staging.agoralab.co"
@@ -53,6 +58,12 @@ struct KeyCenter {
     static var IMAppKey: String? = ""
     static var IMClientId: String? = ""
     static var IMClientSecret: String? = ""
- 
-    static var onlineBaseServerUrl: String? = "https://toolbox.bj2.agoralab.co/v1/"
+  
+    static let CloudPlayerKey: String? = nil
+    static let CloudPlayerSecret: String? = nil
+    
+    static var HostUrl: String = "https://gateway-fulldemo.agoralab.co"
+    static var baseServerUrl: String? = "https://toolbox.bj2.agoralab.co/v1/"
+    static var onlineBaseServerUrl: String? = baseServerUrl
+
 }

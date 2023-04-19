@@ -47,6 +47,7 @@ public class RethinkSyncManager: NSObject {
     var onSuccessBlock = [String: SuccessBlock]()
     var onSuccessBlockVoid = [String: SuccessBlockVoid]()
     var onSuccessBlockObjOptional = [String: SuccessBlockObjOptional]()
+    var onDeleteBlockObjOptional = [String: SuccessBlockObjOptional?]()
     var onSuccessBlockObj = [String: SuccessBlockObj]()
     var onFailBlock = [String: FailBlock]()
     var onCreateBlocks = [String: OnSubscribeBlock]()
@@ -298,8 +299,8 @@ extension RethinkSyncManager: SRWebSocketDelegate {
             if let successBlockObjVoid = onSuccessBlockObjOptional[channelName], action == .query {
                 successBlockObjVoid(attrs?.first)
             }
-            if let successBlock = onSuccessBlock[channelName], action == .deleteProp {
-                successBlock(attrs ?? [])
+            if let deleteBlock = onDeletedBlocks[channelName], action == .deleteProp, let object = attrs?.first {
+                deleteBlock(object)
             }
         }
         Log.info(text: "channelName == \(channelName) action == \(action.rawValue) realAction == \(realAction.rawValue) props == \(props ?? [:])", tag: "recv_msg")

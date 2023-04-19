@@ -26,12 +26,13 @@ object AudioModeration {
         uid: Long,
         type: AgoraChannelType,
         sceneName: String,
-        success: (String) -> Unit,
+        success: ((String) -> Unit)?= null,
         failure: ((Exception?) -> Unit)? = null
     ) {
         scope.launch(Dispatchers.Main) {
             try {
-                success.invoke(startAudioModeration(channelName, uid, type, sceneName))
+                val result = startAudioModeration(channelName, uid, type, sceneName)
+                success?.invoke(result)
             } catch (e: Exception) {
                 failure?.invoke(e)
             }

@@ -1259,7 +1259,8 @@ extension KTVApiImpl {
 
 //主要是MPK的回调
 extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
-    func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedToPosition position: Int) {
+
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {
         self.lastReceivedPosition = Date().milListamp
         self.localPosition = position
         self.localPlayerPosition = Date().milListamp - Double(position)
@@ -1280,7 +1281,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         }
     }
     
-    func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         agoraPrint("agoraRtcMediaPlayer didChangedToState: \(state.rawValue) \(self.songCode)")
 
         if state == .openCompleted {
@@ -1410,33 +1411,3 @@ extension Date {
     }
 }
 
-class ShowAgoraProxy: NSObject {
-    weak var delegate: NSObjectProtocol?
-    
-    override func responds(to aSelector: Selector!) -> Bool {
-        return delegate?.responds(to: aSelector) ?? false
-    }
-    
-    override func method(for aSelector: Selector!) -> IMP! {
-        guard let obj = self.delegate as? NSObject else {
-            return super.method(for: aSelector)
-        }
-        
-        return obj.method(for: aSelector)
-    }
-    
-    override func forwardingTarget(for aSelector: Selector!) -> Any? {
-        if delegate?.responds(to: aSelector) ?? false {
-            return delegate
-        }
-        
-        return super.forwardingTarget(for: aSelector)
-    }
-}
-
-class ShowAgoraExProxy: ShowAgoraProxy, AgoraRtcEngineDelegate {
-    init(delegate: AgoraRtcEngineDelegate?) {
-        super.init()
-        self.delegate = delegate
-    }
-}

@@ -11,6 +11,12 @@ import SwiftyBeaver
 @objc class AgoraEntLogConfig: NSObject {
     var sceneName: String = ""
     var logFileMaxSize: Int = (2 * 1024 * 1024)
+    
+    init(sceneName: String, logFileMaxSize: Int = 2 * 1024 * 1024) {
+        super.init()
+        self.sceneName = sceneName
+        self.logFileMaxSize = logFileMaxSize
+    }
 }
 
 @objc class AgoraEntLog: NSObject {
