@@ -18,6 +18,10 @@ public class ToastUtils {
         runOnMainThread(() -> Toast.makeText(AgoraApplication.the(), str, Toast.LENGTH_SHORT).show());
     }
 
+    public static void showToastLong(String str) {
+        runOnMainThread(() -> Toast.makeText(AgoraApplication.the(), str, Toast.LENGTH_LONG).show());
+    }
+
     private static void runOnMainThread(Runnable runnable){
         if(mainHandler == null){
             mainHandler = new Handler(Looper.getMainLooper());

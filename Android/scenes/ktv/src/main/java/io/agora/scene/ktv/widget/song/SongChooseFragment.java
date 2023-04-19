@@ -1,5 +1,6 @@
 package io.agora.scene.ktv.widget.song;
 
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -9,8 +10,13 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
+import com.scwang.smart.refresh.layout.api.RefreshLayout;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,18 +36,14 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
     private Listener listener;
     private final List<Runnable> pendingViewCreatedRuns = new ArrayList<>();
 
-    private final SongChooseViewAdapter mRankListAdapter = new SongChooseViewAdapter() {
-        @Override
-        void onSongChosen(SongItem song, int position) {
-            onSongItemChosen(song);
-        }
-    };
     private final SongChooseViewAdapter mSearchAdapter = new SongChooseViewAdapter() {
         @Override
         void onSongChosen(SongItem song, int position) {
             onSongItemChosen(song);
         }
     };
+
+    private ScreenSlidePageFragment[] fragments = new ScreenSlidePageFragment[4];
 
 
     @NonNull
@@ -55,8 +57,11 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         getBinding().tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                mRankListAdapter.resetAll(null);
-                onSongsRefreshing(tab.getPosition());
+                int position = tab.getPosition();
+                if (fragments[position] != null) {
+                    fragments[position].onTabSelected(position);
+                }
+                onSongsRefreshing(position);
             }
 
             @Override
@@ -69,12 +74,57 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
 
             }
         });
+        ScreenSlidePageFragment.OnScreenSlidePageFragmentCallBack callBack = new ScreenSlidePageFragment.OnScreenSlidePageFragmentCallBack() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                onSongsRefreshing(getBinding().tabLayout.getSelectedTabPosition());
+            }
 
-        getBinding().rvRankList.setAdapter(mRankListAdapter);
+            @Override
+            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
+                onSongsLoadMore(getBinding().tabLayout.getSelectedTabPosition());
+            }
+
+            @Override
+            public void onClickSongItem(SongItem songItem) {
+                onSongItemChosen(songItem);
+            }
+
+        };
+        getBinding().mViewPager2.setAdapter(new FragmentStateAdapter(getActivity()) {
+            @NonNull
+            @Override
+            public Fragment createFragment(int position) {
+                if (fragments[position] == null) {
+                    fragments[position] = new ScreenSlidePageFragment();
+                }
+                fragments[position].setCallBack(callBack, position);
+                return fragments[position];
+            }
+
+            @Override
+            public int getItemCount() {
+                return fragments.length;
+            }
+        });
+        getBinding().mViewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                if (getBinding().tabLayout.getSelectedTabPosition() == position) {
+                    return;
+                }
+                TabLayout.Tab tabAt = getBinding().tabLayout.getTabAt(position);
+                if (tabAt == null) {
+                    return;
+                }
+                getBinding().tabLayout.selectTab(tabAt);
+            }
+        });
         getBinding().recyclerSearchResult.setAdapter(mSearchAdapter);
 
         Iterator<Runnable> iterator = pendingViewCreatedRuns.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             Runnable next = iterator.next();
             next.run();
         }
@@ -115,13 +165,13 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
             public void afterTextChanged(Editable editable) {
                 if (editable == null || editable.length() == 0) {
                     getBinding().iBtnClear.setVisibility(View.GONE);
-                    getBinding().smartRefreshLayout.setVisibility(View.VISIBLE);
+                    getBinding().mViewPager2.setVisibility(View.VISIBLE);
                     getBinding().recyclerSearchResult.setVisibility(View.GONE);
                     getBinding().hScrollView.setVisibility(View.VISIBLE);
                     getBinding().llEmpty.setVisibility(View.GONE);
                 } else {
                     getBinding().iBtnClear.setVisibility(View.VISIBLE);
-                    getBinding().smartRefreshLayout.setVisibility(View.GONE);
+                    getBinding().mViewPager2.setVisibility(View.GONE);
                     getBinding().recyclerSearchResult.setVisibility(View.VISIBLE);
                     getBinding().hScrollView.setVisibility(View.GONE);
                     getBinding().llEmpty.setVisibility(View.GONE);
@@ -129,31 +179,25 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
             }
         });
         getBinding().iBtnClear.setOnClickListener(view -> getBinding().etSearch.setText(""));
-        getBinding().smartRefreshLayout.setOnRefreshListener(refreshLayout -> {
-            onSongsRefreshing(getBinding().tabLayout.getSelectedTabPosition());
-        });
-        getBinding().smartRefreshLayout.setOnLoadMoreListener(refreshLayout -> {
-            onSongsLoadMore(getBinding().tabLayout.getSelectedTabPosition());
-        });
     }
 
-    private void runOnViewCreated(Runnable runnable){
+    private void runOnViewCreated(Runnable runnable) {
         View view = getView();
-        if(view == null){
+        if (view == null) {
             pendingViewCreatedRuns.add(runnable);
-        }else{
+        } else {
             runnable.run();
         }
     }
 
-    int getCurrentTabIndex(){
-        if(getView() == null){
+    int getCurrentTabIndex() {
+        if (getView() == null) {
             return 0;
         }
         return getBinding().tabLayout.getSelectedTabPosition();
     }
 
-    void setSongTagsTitle(List<String> titles, int defaultIndex) {
+    void setSongTagsTitle(List<String> titles, List<Integer> types, int defaultIndex) {
         runOnViewCreated(() -> {
             for (String title : titles) {
                 getBinding().tabLayout.addTab(getBinding().tabLayout.newTab().setText(title));
@@ -162,6 +206,8 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
             if (tabAt != null) {
                 getBinding().tabLayout.selectTab(tabAt);
             }
+
+
         });
     }
 
@@ -177,14 +223,11 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
                 }
             }
         } else {
-            int itemCount = mRankListAdapter.getItemCount();
-            for (int i = 0; i < itemCount; i++) {
-                SongItem item = mRankListAdapter.getItem(i);
-                if (item.songNo.equals(songItem.songNo)) {
-                    item.isChosen = isChosen;
-                    mRankListAdapter.notifyItemChanged(i);
-                    break;
+            for (ScreenSlidePageFragment fragment : fragments) {
+                if (fragment == null) {
+                    continue;
                 }
+                fragment.setSongItemStatus(songItem, isChosen);
             }
         }
     }
@@ -198,29 +241,28 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         mSearchAdapter.resetAll(list);
     }
 
-    void setRefreshingResult(List<SongItem> list) {
+    void setRefreshingResult(List<SongItem> list, int index) {
         if (list == null || list.isEmpty()) {
             getBinding().llEmpty.setVisibility(View.VISIBLE);
         } else {
             getBinding().llEmpty.setVisibility(View.GONE);
         }
-        mRankListAdapter.resetAll(list);
-
-        getBinding().smartRefreshLayout.setEnableLoadMore(true);
-        getBinding().smartRefreshLayout.finishRefresh();
+        if (fragments[index] != null) {
+            fragments[index].setRefreshingResult(list);
+        }
         enableTabLayoutClick(true);
     }
 
-    void setLoadMoreResult(List<SongItem> list, boolean hasMore) {
-        mRankListAdapter.insertAll(list);
-        getBinding().smartRefreshLayout.finishLoadMore();
-        getBinding().smartRefreshLayout.setEnableLoadMore(hasMore);
+    void setLoadMoreResult(List<SongItem> list, boolean hasMore, int index) {
+        if (fragments[index] != null) {
+            fragments[index].setLoadMoreResult(list, hasMore);
+        }
         enableTabLayoutClick(true);
     }
 
-    private void enableTabLayoutClick(boolean enable){
+    private void enableTabLayoutClick(boolean enable) {
         KtvFragmentSongListBinding binding = getBinding();
-        if(binding == null){
+        if (binding == null) {
             return;
         }
         TabLayout tabLayout = binding.tabLayout;
@@ -230,28 +272,29 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
     }
 
 
-    private void onSongItemChosen(@NonNull SongItem songItem){
-        if(listener != null){
+    private void onSongItemChosen(@NonNull SongItem songItem) {
+        if (listener != null) {
             listener.onSongItemChosen(songItem);
         }
     }
 
-    private void onSongsSearching(String condition){
-        if(listener != null){
+    private void onSongsSearching(String condition) {
+        if (listener != null) {
             listener.onSongsSearching(condition);
         }
     }
 
-    private void onSongsRefreshing(int tagIndex){
+    private void onSongsRefreshing(int tagIndex) {
         enableTabLayoutClick(false);
-        if(listener != null){
+        if (listener != null) {
             listener.onSongsRefreshing(tagIndex);
         }
+        getBinding().mViewPager2.setCurrentItem(tagIndex);
     }
 
-    private void onSongsLoadMore(int tagIndex){
+    private void onSongsLoadMore(int tagIndex) {
         enableTabLayoutClick(false);
-        if(listener != null){
+        if (listener != null) {
             listener.onSongsLoadMore(tagIndex);
         }
     }
@@ -262,9 +305,11 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
 
     interface Listener {
         void onSongItemChosen(@NonNull SongItem songItem);
+
         void onSongsSearching(String condition);
+
         void onSongsRefreshing(int tagIndex);
+
         void onSongsLoadMore(int tagIndex);
     }
-
 }

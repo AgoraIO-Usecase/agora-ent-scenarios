@@ -49,6 +49,7 @@
     <color name="red_e0">#E02020</color>
     <color name="red_fa">#FA396A</color>
     <color name="red_f7">#F74747</color>
+    <color name="pink_b4">#FF8AB4</color>
     <color name="orange_e6">#e69138</color>
 
     <color name="bg_color_blue_31">#3187FF</color>
@@ -75,6 +76,7 @@
     <color name="text_color_99">#999999</color>
     <color name="text_color_dd">#dddddd</color>
     <color name="white_20_percent">#33FFFFFF</color>
+    <color name="white_35_percent">#59FFFFFF</color>
     <color name="white_60_percent">#99FFFFFF</color>
     <color name="white_70_percent">#B3FFFFFF</color>
     <color name="white_80_percent">#CCFFFFFF</color>

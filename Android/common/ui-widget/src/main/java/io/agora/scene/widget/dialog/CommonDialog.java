@@ -43,10 +43,10 @@ public class CommonDialog extends BaseDialog<DialogCommonBinding> {
     public void setDescText(String desc) {
         getBinding().tvDesc.setText(desc);
         getBinding().tvDesc.setVisibility(View.VISIBLE);
-        getWindow().setLayout(
-                UiUtil.dp2px(300),
-                UiUtil.dp2px(220)
-        );
+//        getWindow().setLayout(
+//                UiUtil.dp2px(300),
+//                UiUtil.dp2px(220)
+//        );
     }
 
     public void setDialogBtnText(String leftText, String rightText) {

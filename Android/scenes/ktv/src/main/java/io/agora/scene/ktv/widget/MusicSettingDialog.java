@@ -26,9 +26,11 @@ import io.agora.scene.ktv.databinding.KtvDialogMusicSettingBinding;
 public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogMusicSettingBinding> {
     public static final String TAG = "MusicSettingDialog";
     private MusicSettingBean mSetting;
+    private Boolean isPause = false;
 
-    public MusicSettingDialog(MusicSettingBean mSetting) {
+    public MusicSettingDialog(MusicSettingBean mSetting, boolean isPause) {
         this.mSetting = mSetting;
+        this.isPause = isPause;
     }
 
     private int getCurrentPitch(int value) {
@@ -86,7 +88,17 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         mBinding.btnToneDownDialogSetting.setOnClickListener(v -> tuningTone(false));
         mBinding.btnToneUpDialogSetting.setOnClickListener(v -> tuningTone(true));
 
-        mBinding.textRemoteVolume.setText("" + this.mSetting.getRemoteVolume());
+        if (isPause) {
+            mBinding.textRemoteVolume.setEnabled(false);
+            mBinding.btnRemoteVolumeUpDialogSetting.setEnabled(false);
+            mBinding.btnRemoteVolumeDownDialogSetting.setEnabled(false);
+            mBinding.textRemoteVolume.setText("" + 100);
+        } else {
+            mBinding.textRemoteVolume.setEnabled(true);
+            mBinding.btnRemoteVolumeUpDialogSetting.setEnabled(true);
+            mBinding.btnRemoteVolumeDownDialogSetting.setEnabled(true);
+            mBinding.textRemoteVolume.setText("" + this.mSetting.getRemoteVolume());
+        }
 
         mBinding.switchEar.setOnCheckedChangeListener((buttonView, isChecked) -> this.mSetting.setEar(isChecked));
         mBinding.sbVol1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -231,6 +243,14 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
 //        mBinding.textToneDialogSetting.setText(String.valueOf(newToneValue));
     }
 
+    public void onStopPlayer() {
+        mBinding.textRemoteVolume.setHint("" + 100);
+    }
+
+    public void onResumePlayer() {
+        mBinding.textRemoteVolume.setHint("" + this.mSetting.getRemoteVolume());
+    }
+
 
     public interface Callback {
         void onEarChanged(boolean isEar);
@@ -248,7 +268,5 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         void onToneChanged(int newToneValue);
 
         void onRemoteVolumeChanged(int volume);
-
-        void onAudioDumpEnable(boolean enable);
     }
 }

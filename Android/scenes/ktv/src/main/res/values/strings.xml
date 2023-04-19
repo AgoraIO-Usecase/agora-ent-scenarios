@@ -31,12 +31,13 @@
     <string name="ktv_room_sing1">演唱中</string>
     <string name="ktv_room_sing1_1">合唱中</string>
     <string name="ktv_room_original">原唱</string>
-    <string name="ktv_room_accompany">伴奏</string>
     <string name="ktv_room_change_song">切歌</string>
     <string name="ktv_room_seat_off">下麦</string>
-    <string name="ktv_room_cut_off_song">切歌</string>
+    <string name="ktv_room_player_pause">暂停</string>
+    <string name="ktv_room_player_play">播放</string>
+    <string name="ktv_room_player_tweak">调音</string>
     <string name="ktv_room_choose_song">点歌</string>
-    <string name="ktv_room_choosed_song">已点</string>
+    <string name="ktv_room_chosen_song_list">已点</string>
     <string name="ktv_room_sing2">演唱中</string>
     <string name="ktv_room_no_sing">当前无人演唱\n点击“点歌”一展歌喉</string>
     <string name="ktv_dialog_migu_tip" />
@@ -107,10 +108,11 @@
     <string name="ktv_song_ordering_person_chorus">合唱：</string>
     <string name="ktv_people">人</string>
     <string name="ktv_music_menu_dialog_mv">MV</string>
-    <string name="ktv_score_formatter" translatable="false">%.2f分</string>
+    <string name="ktv_score_formatter">%s分</string>
     <string name="ktv_beauty_voice">美声</string>
     <string name="ktv_voice_effect">音效</string>
     <string name="ktv_camera">摄像头</string>
+    <string name="ktv_leave_chorus">退出合唱</string>
 
     <!--    Content Description-->
     <string name="ktv_toggle_mic">麦克风启用或静音</string>
@@ -139,6 +141,9 @@
     <string name="ktv_network_unavailable">未检测到可用网络，确认继续？</string>
     <string name="ktv_no_lrc">暂无歌词 </string>
     <string name="ktv_content">监测到当前内容存在违规行为</string>
+    <string name="ktv_iknow">我知道了</string>
+    <string name="ktv_skip_prelude">跳过前奏</string>
+    <string name="ktv_skip_postlude">跳过尾奏</string>
     <string name="ktv_onseat_toast">加入合唱前，您需要先上麦</string>
 
 </resources>

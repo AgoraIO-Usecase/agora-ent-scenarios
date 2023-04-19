@@ -86,7 +86,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvRoomName" />
 
-    <io.agora.scene.ktv.widget.LrcControlView
+    <io.agora.scene.ktv.widget.lrcView.LrcControlView
         android:id="@+id/lrcControlView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -117,7 +117,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
         android:button="@null"
-        android:checked="false"
+        android:checked="true"
         android:drawableStart="@drawable/bg_cb_mic_status"
         android:padding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -142,7 +142,6 @@
         android:layout_marginStart="5dp"
         android:layout_marginBottom="20dp"
         android:background="@null"
-        android:visibility="gone"
         android:padding="5dp"
         android:src="@mipmap/ic_more"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -184,16 +183,6 @@
         android:src="@mipmap/ic_diange"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/iBtnChorus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:src="@mipmap/ic_hechuang"
-        app:layout_constraintBottom_toBottomOf="@id/iBtnChooseSong"
-        app:layout_constraintEnd_toStartOf="@id/iBtnChooseSong"
-        app:layout_constraintTop_toTopOf="@id/iBtnChooseSong" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivResultBg"
@@ -291,7 +280,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="iBtnChorus,iBtnChooseSong,cbMic,cbVideo"
+        app:constraint_referenced_ids="iBtnChooseSong,cbMic,cbVideo, btnMenu"
         tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.Group
@@ -301,4 +290,17 @@
         android:visibility="gone"
         app:constraint_referenced_ids="ivNotOnMic, tvNotOnMic"
         tools:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnDebug"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:text="Debug"
+        android:textSize="@dimen/ktv_space_small"
+        android:visibility="visible"
+        android:textAllCaps="false"
+        android:layout_marginBottom="70dp"
+        android:background="@drawable/bg_def_btn_selector"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
