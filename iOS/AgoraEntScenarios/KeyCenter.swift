@@ -6,7 +6,8 @@
 //  Copyright © 2016 Agora. All rights reserved.
 //
 
-struct KeyCenter {
+@objcMembers
+class KeyCenter: NSObject {
     
     /**
      Agora APP ID.
