@@ -1001,6 +1001,12 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
         }
     }
     
+    func onClickMoreButton() {
+        let dialog = AUiMoreDialog(frame: view.bounds)
+        view.addSubview(dialog)
+        dialog.show()
+    }
+    
     func onClickPKButton(_ button: ShowRedDotButton) {
         AlertManager.show(view: pkInviteView, alertPostion: .bottom)
         _refreshPKUserList()
