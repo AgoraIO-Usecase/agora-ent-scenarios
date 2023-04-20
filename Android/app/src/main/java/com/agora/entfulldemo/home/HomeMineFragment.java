@@ -66,6 +66,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         mainViewModel.setLifecycleOwner(this);
         getBinding().tvVersion.setText(getString(R.string.app_mine_current_version, versionString));
+        getBinding().tvVersion.setVisibility(View.GONE);
     }
 
     @SuppressLint("SetTextI18n")
