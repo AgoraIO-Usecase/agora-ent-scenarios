@@ -292,6 +292,10 @@ extension SARoomViewController {
             showUsers()
         } else if action == .beginnersGuide {
             showSoundView()
+        }else if action == .more {
+            let dialog = AUiMoreDialog(frame: view.bounds)
+            view.addSubview(dialog)
+            dialog.show()
         }
     }
 
