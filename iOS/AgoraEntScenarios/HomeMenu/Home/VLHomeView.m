@@ -90,6 +90,12 @@
                 @"subTitleStr":@""
             },
             @{
+                @"bgImgStr":@"spatial_bg",
+                @"iconImgStr":@"home_talk_icon",
+                @"titleStr":AGLocalizedString(@"语聊房"),
+                @"subTitleStr":AGLocalizedString(@"-空间音频模式")
+            },
+            @{
                 @"bgImgStr":@"home_KTV_bg",
                 @"iconImgStr":@"home_KTV_icon",
                 @"titleStr":AGLocalizedString(@"在线K歌房"),
@@ -100,12 +106,6 @@
                 @"iconImgStr":@"home_KTV_icon",
                 @"titleStr":@"秀场直播",
                 @"subTitleStr":@""
-            },
-            @{
-                @"bgImgStr":@"spatial_bg",
-                @"iconImgStr":@"home_talk_icon",
-                @"titleStr":AGLocalizedString(@"语聊房"),
-                @"subTitleStr":AGLocalizedString(@"-空间音频模式")
             },
         ];
     }
