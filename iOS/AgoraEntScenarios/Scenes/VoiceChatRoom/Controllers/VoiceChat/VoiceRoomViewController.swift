@@ -32,7 +32,7 @@ class VoiceRoomViewController: VRBaseViewController {
 
     var headerView: AgoraChatRoomHeaderView!
     var rtcView: AgoraChatRoomNormalRtcView!
-
+    
     @UserDefault("VoiceRoomUserAvatar", defaultValue: "") var userAvatar
 
     lazy var chatView: VoiceRoomChatView = .init(frame: CGRect(x: 0, y: ScreenHeight - CGFloat(ZBottombarHeight) - (ScreenHeight / 667) * 210 - 50, width: ScreenWidth, height: (ScreenHeight / 667) * 210))
@@ -368,6 +368,10 @@ extension VoiceRoomViewController {
             showSoundView()
         } else if action == .members {
             showUsers(position: .right)
+        } else if action == .more {
+            let dialog = AUiMoreDialog(frame: view.bounds)
+            view.addSubview(dialog)
+            dialog.show()
         }
     }
 
