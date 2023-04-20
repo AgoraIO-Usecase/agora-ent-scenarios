@@ -206,6 +206,10 @@
         [VLToast toast:AGLocalizedString(@"请输入手机号")];
         return NO;
     }
+    if (_phoneView.phoneNo.length != 11) {
+        [VLToast toast:AGLocalizedString(@"手机号码格式错误")];
+        return NO;
+    }
     return YES;
 }
 
