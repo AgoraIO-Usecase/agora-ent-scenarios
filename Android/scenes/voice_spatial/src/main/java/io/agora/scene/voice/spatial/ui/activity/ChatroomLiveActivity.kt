@@ -30,6 +30,7 @@ import io.agora.scene.voice.spatial.ui.dialog.VoiceRoomDebugOptionsDialog
 import io.agora.scene.voice.spatial.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.spatial.ui.widget.top.OnLiveTopClickListener
 import io.agora.scene.voice.spatial.viewmodel.VoiceRoomLivingViewModel
+import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.net.OnResourceParseCallback
 import io.agora.voice.common.net.Resource
@@ -382,6 +383,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
 
             override fun onClickSoundSocial(view: View) {
                 roomObservableDelegate.showRoom3DWelcomeSheetDialog()
+            }
+
+            override fun onClickMore(view: View) {
+                TopFunctionDialog(this@ChatroomLiveActivity).show()
             }
         })
         binding.chatBottom.setMenuItemOnClickListener(object :

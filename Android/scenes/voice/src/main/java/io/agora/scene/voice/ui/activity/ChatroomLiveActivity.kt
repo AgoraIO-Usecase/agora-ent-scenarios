@@ -20,6 +20,7 @@ import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.Error
 import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
 import io.agora.scene.voice.global.VoiceBuddyFactory
@@ -39,6 +40,7 @@ import io.agora.scene.voice.ui.widget.barrage.ChatroomMessagesView
 import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
 import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel
+import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.net.OnResourceParseCallback
 import io.agora.voice.common.net.Resource
@@ -462,6 +464,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 })
             }
 
+            override fun onClickMore(view: View) {
+                TopFunctionDialog(this@ChatroomLiveActivity).show()
+            }
         })
         binding.chatBottom.setMenuItemOnClickListener(object :
             MenuItemClickListener {
@@ -519,9 +524,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                                 "onSendMessage onError  $code $error".logE(TAG)
                                 binding.likeView.isVisible = true
                                 if (code == Error.MODERATION_FAILED){
-                                    ToastTools.show(this@ChatroomLiveActivity,
-                                        getString(R.string.voice_room_content_prohibited,Toast.LENGTH_SHORT)
-                                    )
+                                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_content_prohibited))
                                 }
                             }
                         })

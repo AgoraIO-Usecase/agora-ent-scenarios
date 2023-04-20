@@ -114,7 +114,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             adapter.scenes = scenes
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_about_name),
-                "20230530-" + BuildConfig.VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
+                "20230530-" + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )

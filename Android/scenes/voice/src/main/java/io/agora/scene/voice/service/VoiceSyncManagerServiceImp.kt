@@ -27,7 +27,7 @@ class VoiceSyncManagerServiceImp(
     private val errorHandler: ((Exception?) -> Unit)?
 ) : VoiceServiceProtocol {
 
-    private val voiceSceneId = "scene_chatRoom"
+    private val voiceSceneId = "scene_chatRoom_3.0.0"
 
     private val roomChecker = RoomChecker(context)
 

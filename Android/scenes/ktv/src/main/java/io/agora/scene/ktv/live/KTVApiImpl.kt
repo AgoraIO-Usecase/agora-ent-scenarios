@@ -525,7 +525,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         channelMediaOption.publishMediaPlayerAudioTrack = true
         mRtcEngine.updateChannelMediaOptions(channelMediaOption)
 
-        mCustomAudioTrackId = mRtcEngine.createCustomAudioTrack(AudioTrackType.AUDIO_TRACK_DIRECT, AudioTrackConfig());
+        val audioTrackConfig = AudioTrackConfig()
+        audioTrackConfig.enableLocalPlayback = false
+        mCustomAudioTrackId = mRtcEngine.createCustomAudioTrack(AudioTrackType.AUDIO_TRACK_DIRECT, audioTrackConfig)
         mRtcEngine.setRecordingAudioFrameParameters(48000, 2, 0, 960)
         mRtcEngine.registerAudioFrameObserver(this)
     }
@@ -874,7 +876,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private fun getNtpTimeInMs(): Long {
         val currentNtpTime = mRtcEngine.ntpWallTimeInMs
         return if (currentNtpTime != 0L) {
-            currentNtpTime - 2208988800L * 1000
+            currentNtpTime
         } else {
             Log.e(TAG, "getNtpTimeInMs DeviceDelay is zero!!!")
             System.currentTimeMillis()

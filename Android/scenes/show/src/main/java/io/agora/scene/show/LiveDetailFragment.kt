@@ -52,6 +52,7 @@ import io.agora.scene.show.widget.pk.LiveRoomConfig
 import io.agora.scene.show.widget.pk.OnPKDialogActionListener
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
+import io.agora.scene.widget.dialog.TopFunctionDialog
 import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -272,6 +273,11 @@ class LiveDetailFragment : Fragment() {
         topLayout.tvRoomId.text = getString(R.string.show_room_id, mRoomInfo.roomId)
         topLayout.tvUserCount.text = mRoomInfo.roomUserCount.toString()
         topLayout.ivClose.setOnClickListener { onBackPressed() }
+        topLayout.ivMore.setOnClickListener {
+            context?.let {
+                TopFunctionDialog(it).show()
+            }
+        }
     }
 
     private fun startTopLayoutTimer() {

@@ -236,4 +236,6 @@
     <string name="voice_room_name_rule">房间名不合规</string>
     <string name="voice_room_robot_left">关闭机器人</string>
     <string name="voice_room_robot_right">音效设置</string>
+    <string name="voice_room_online">%1$s在线</string>
+    <string name="voice_room_views">%1$s观看</string>
 </resources>
