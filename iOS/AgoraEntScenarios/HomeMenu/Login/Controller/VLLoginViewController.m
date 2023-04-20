@@ -206,12 +206,6 @@
         [VLToast toast:AGLocalizedString(@"请输入手机号")];
         return NO;
     }
-    
-    if (![NSString isValidateTelNumber:_phoneView.phoneNo]) {
-        [VLToast toast:AGLocalizedString(@"手机号码格式错误")];
-        return NO;
-    }
-    
     return YES;
 }
 
