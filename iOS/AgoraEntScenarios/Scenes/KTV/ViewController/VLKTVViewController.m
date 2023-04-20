@@ -1056,6 +1056,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
+- (void)onVLKTVTopView:(VLKTVTopView *)view moreBtnTapped:(id)sender {
+    AUiMoreDialog* dialog = [[AUiMoreDialog alloc] initWithFrame:self.view.bounds];
+    [self.view addSubview:dialog];
+    [dialog show];
+}
+
 #pragma mark - VLPopMoreSelViewDelegate
 - (void)onVLKTVMoreSelView:(VLPopMoreSelView *)view
                  btnTapped:(id)sender
