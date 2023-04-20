@@ -9,6 +9,7 @@
 #import "VLMacroDefine.h"
 #import "MenuUtils.h"
 #import "KTVMacro.h"
+#import "VLToast.h"
 
 @interface VLHomeViewController ()<VLHomeViewDelegate>
 
@@ -69,6 +70,10 @@
 //        default:
 //            break;
 //    }
+    if (!KeyCenter.IMAppKey.isNotBlank || !KeyCenter.IMClientId.isNotBlank || !KeyCenter.IMClientSecret.isNotBlank) {
+        [VLToast toast:@"IMAppKey / IMClientId / IMClientSecret 未配置"];
+        return;
+    }
 
     NSArray* sceneNames = @[@"VoiceChat", @"SA", @"KTV", @"LiveShow"];
     [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
