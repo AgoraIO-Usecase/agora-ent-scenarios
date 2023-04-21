@@ -58,8 +58,6 @@ ext {
             recyclerview       : "androidx.recyclerview:recyclerview:1.2.1",
             databinding_runtime: "androidx.databinding:databinding-runtime:4.2.2",
 
-            easypermissions    : "pub.devrel:easypermissions:3.0.0",
-
             // im
             agora_im           : 'io.agora.rtm:rtm-sdk:1.5.0',
             bugly              : 'com.tencent.bugly:crashreport:4.0.4',

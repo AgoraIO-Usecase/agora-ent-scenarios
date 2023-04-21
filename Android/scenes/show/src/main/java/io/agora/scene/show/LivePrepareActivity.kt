@@ -1,8 +1,8 @@
 package io.agora.scene.show
 
-import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -10,27 +10,27 @@ import android.view.SurfaceView
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.ComponentActivity
 import androidx.annotation.DrawableRes
-import androidx.appcompat.app.AlertDialog
+import androidx.annotation.RequiresApi
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
 import io.agora.scene.show.debugSettings.DebugSettingDialog
 import io.agora.scene.show.service.ShowServiceProtocol
-import io.agora.scene.show.utils.PermissionHelp
 import io.agora.scene.show.widget.BeautyDialog
 import io.agora.scene.show.widget.PictureQualityDialog
 import io.agora.scene.show.widget.PresetDialog
+import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 import kotlin.random.Random
 
-class LivePrepareActivity : ComponentActivity() {
+@RequiresApi(Build.VERSION_CODES.M)
+class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBinding>() {
 
-    private val mBinding by lazy { ShowLivePrepareActivityBinding.inflate(LayoutInflater.from(this)) }
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
     private val mInputMethodManager by lazy { getSystemService(InputMethodManager::class.java) }
 
@@ -38,90 +38,79 @@ class LivePrepareActivity : ComponentActivity() {
     private val mRoomId by lazy { getRandomRoomId() }
     private val mBeautyProcessor by lazy { RtcEngineInstance.beautyProcessor }
 
-    private val mPermissionHelp = PermissionHelp(this)
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
 
     private var isFinishToLiveDetail = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun getViewBinding(inflater: LayoutInflater): ShowLivePrepareActivityBinding {
+        return ShowLivePrepareActivityBinding.inflate(inflater)
+    }
+
+    override fun initView(savedInstanceState: Bundle?) {
+        super.initView(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, false)
-        setContentView(mBinding.root)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        mBinding.ivRoomCover.setImageResource(getThumbnailIcon(mThumbnailId))
-        mBinding.tvRoomId.text = getString(R.string.show_room_id, mRoomId)
-        mBinding.etRoomName.setOnEditorActionListener { v, actionId, _ ->
+        binding.ivRoomCover.setImageResource(getThumbnailIcon(mThumbnailId))
+        binding.tvRoomId.text = getString(R.string.show_room_id, mRoomId)
+        binding.etRoomName.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 mInputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
         }
-        mBinding.ivClose.setOnClickListener {
+        binding.ivClose.setOnClickListener {
             finish()
         }
 
-        mBinding.ivCopy.setOnClickListener {
+        binding.ivCopy.setOnClickListener {
             // Copy to system clipboard
             copy2Clipboard(mRoomId)
         }
-        mBinding.btnStartLive.setOnClickListener {
-            createAndStartLive(mBinding.etRoomName.text.toString())
+        binding.btnStartLive.setOnClickListener {
+            createAndStartLive(binding.etRoomName.text.toString())
         }
-        mBinding.tvRotate.setOnClickListener {
+        binding.tvRotate.setOnClickListener {
             mRtcEngine.switchCamera()
         }
-        mBinding.tvBeauty.setOnClickListener {
+        binding.tvBeauty.setOnClickListener {
             showBeautyDialog()
         }
-        mBinding.tvHD.setOnClickListener {
+        binding.tvHD.setOnClickListener {
             showPictureQualityDialog()
         }
-        mBinding.tvSetting.setOnClickListener {
+        binding.tvSetting.setOnClickListener {
             if (AgoraApplication.the().isDebugModeOpen) {
                 showDebugModeDialog()
             } else {
                 showPresetDialog()
             }
         }
-
-        checkRequirePerms {
+        toggleVideoRun = Runnable {
             mBeautyProcessor.reset()
             initRtcEngine()
             showPresetDialog()
+        }
+        requestCameraPermission(true)
+    }
+
+    private var toggleVideoRun: Runnable? = null
+
+    override fun onPermissionDined(permission: String?) {
+        PermissionLeakDialog(this).show(permission,
+            { getPermissions() }
+        ) { launchAppSetting(permission) }
+    }
+
+    override fun getPermissions() {
+        if (toggleVideoRun != null) {
+            toggleVideoRun?.run()
+            toggleVideoRun = null
         }
     }
 
     private fun showPresetDialog() = PresetDialog(this).show()
     private fun showDebugModeDialog() = DebugSettingDialog(this).show()
-
-    private fun checkRequirePerms(force: Boolean = false, granted: () -> Unit) {
-        mPermissionHelp.checkCameraPerm(
-            {
-                mPermissionHelp.checkStoragePerm(
-                    granted, { showPermissionLeakDialog(granted) }, force
-                )
-            },
-            { showPermissionLeakDialog(granted) },
-            force
-        )
-    }
-
-    private fun showPermissionLeakDialog(yes: () -> Unit) {
-        AlertDialog.Builder(this).apply {
-            setMessage(R.string.show_live_perms_leak_tip)
-            setCancelable(false)
-            setPositiveButton(R.string.show_live_yes) { dialog, _ ->
-                dialog.dismiss()
-                checkRequirePerms(true, yes)
-            }
-            setNegativeButton(R.string.show_live_no) { dialog, _ ->
-                dialog.dismiss()
-                finish()
-            }
-            show()
-        }
-    }
 
     override fun onResume() {
         super.onResume()
@@ -138,7 +127,7 @@ class LivePrepareActivity : ComponentActivity() {
     private fun initRtcEngine() {
         mRtcEngine.setupLocalVideo(
             VideoCanvas(SurfaceView(this).apply {
-                mBinding.flVideoContainer.addView(this)
+                binding.flVideoContainer.addView(this)
             })
         )
         val cacheQualityResolution = PictureQualityDialog.getCacheQualityResolution()
@@ -178,7 +167,6 @@ class LivePrepareActivity : ComponentActivity() {
         }
     }
 
-
     private fun copy2Clipboard(roomId: String) {
         val clipboardManager = getSystemService(ClipboardManager::class.java)
         clipboardManager.setPrimaryClip(ClipData.newPlainText(roomId, roomId))
@@ -188,12 +176,12 @@ class LivePrepareActivity : ComponentActivity() {
     private fun createAndStartLive(roomName: String) {
         if (TextUtils.isEmpty(roomName)) {
             ToastUtils.showToast(R.string.show_live_prepare_room_empty)
-            mBinding.etRoomName.requestFocus()
-            mInputMethodManager.showSoftInput(mBinding.etRoomName, 0)
+            binding.etRoomName.requestFocus()
+            mInputMethodManager.showSoftInput(binding.etRoomName, 0)
             return
         }
 
-        mBinding.btnStartLive.isEnabled = false
+        binding.btnStartLive.isEnabled = false
         mService.createRoom(mRoomId, roomName, mThumbnailId, {
             runOnUiThread {
                 isFinishToLiveDetail = true
@@ -203,7 +191,7 @@ class LivePrepareActivity : ComponentActivity() {
         }, {
             runOnUiThread {
                 ToastUtils.showToast(it.message)
-                mBinding.btnStartLive.isEnabled = true
+                binding.btnStartLive.isEnabled = true
             }
         })
     }

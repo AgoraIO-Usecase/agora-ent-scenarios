@@ -226,7 +226,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                 userName = (String) ext.get("userName");
             }
         }
-        LogTools.e("Helper","getUserName: " + userName);
+        LogTools.d("Helper","getUserName: " + userName);
         return userName;
     }
 
@@ -236,7 +236,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         Map<String,String> params = msg.getCustomParams();
         if (params.containsKey("user")){
             jsonString = params.get("user");
-            LogTools.e("getSystemUserName","jsonString: " + jsonString);
+            LogTools.d("getSystemUserName","jsonString: " + jsonString);
             if (!TextUtils.isEmpty(jsonString)){
                 try {
                     assert jsonString != null;
@@ -247,7 +247,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                 }
             }
         }
-        LogTools.e("getSystemUserName","userName: " + userName);
+        LogTools.d("getSystemUserName","userName: " + userName);
         return userName;
     }
 
