@@ -39,8 +39,9 @@ def all_pods
   pod 'AgoraSyncManager', '2.0.2'
 
   # pod 'AgoraRtcEngine_iOS', :path => './libs'
-  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
+#  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 # pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
+  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.4'
 
 
   #ThirdParty
@@ -84,5 +85,12 @@ target 'AgoraEntScenarios' do
   all_pods
 end
 
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
+    end
+  end
+end
 
 system("./libs/setup_podspec.sh")
