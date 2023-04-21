@@ -241,6 +241,8 @@ class ShowLiveViewController: UIViewController {
         view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
         setupUI()
         defaultConfig()
+        AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
+        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
         guard let room = room else {return}
         if room.ownerId == VLUserCenter.user.id {
             self.joinChannel()
