@@ -286,6 +286,17 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     }];
 }
 
+#pragma mark for debug
+- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
+    [super motionEnded:motion withEvent:event];
+    
+    UIActivityViewController *controller = [[UIActivityViewController alloc] initWithActivityItems:@[[NSURL fileURLWithPath:[AgoraEntLog cacheDir]]]
+                                                                             applicationActivities:nil];
+
+    [self presentViewController:controller animated:YES completion:nil];
+}
+
+
 #pragma mark - UIImagePickerControllerDelegate
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     [picker dismissViewControllerAnimated:YES completion:^{
