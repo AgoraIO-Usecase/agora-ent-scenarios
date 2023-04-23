@@ -41,7 +41,7 @@ def all_pods
   # pod 'AgoraRtcEngine_iOS', :path => './libs'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 # pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
-  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.4'
+  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.5'
 
 
   #ThirdParty
