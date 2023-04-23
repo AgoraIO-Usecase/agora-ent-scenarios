@@ -26,7 +26,7 @@ class VoiceRoomViewController: VRBaseViewController {
     private var isEnterSeatNotFirst: Bool = false
     lazy var toastPoint: CGPoint = .init(x: self.view.center.x, y: self.view.center.y + 70)
 
-    override public var preferredStatusBarStyle: UIStatusBarStyle {
+    override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
 

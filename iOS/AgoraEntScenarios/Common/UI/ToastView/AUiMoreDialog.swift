@@ -17,7 +17,7 @@ import UIKit
     
     private lazy var reportButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "icon_report"), for: .normal)
+        button.setImage(UIImage.sceneImage(name: "report_icon", bundleName: "VoiceChatRoomResource"), for: .normal)
         button.setTitle("举报", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         button.setTitleColor(.gray, for: .normal)
