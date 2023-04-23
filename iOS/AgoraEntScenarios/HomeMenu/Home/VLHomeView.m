@@ -104,7 +104,7 @@
             @{
                 @"bgImgStr":@"home_live_bg",
                 @"iconImgStr":@"home_live_icon",
-                @"titleStr":@"秀场直播",
+                @"titleStr":AGLocalizedString(@"秀场直播"),
                 @"subTitleStr":@""
             },
         ];
