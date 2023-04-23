@@ -1,6 +1,5 @@
 package io.agora.scene.voice.ui.activity
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -8,7 +7,6 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -20,6 +18,7 @@ import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.Error
 import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
 import io.agora.scene.voice.global.VoiceBuddyFactory
@@ -39,10 +38,12 @@ import io.agora.scene.voice.ui.widget.barrage.ChatroomMessagesView
 import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
 import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel
+import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.net.OnResourceParseCallback
 import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.BaseUiActivity
+import io.agora.voice.common.ui.IParserSource
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.LogTools.logD
@@ -50,14 +51,12 @@ import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.StatusBarCompat
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
-import pub.devrel.easypermissions.EasyPermissions
-import pub.devrel.easypermissions.PermissionRequest
 
-class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), EasyPermissions.PermissionCallbacks,
-    EasyPermissions.RationaleCallbacks, VoiceRoomSubscribeDelegate {
+
+class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBinding>(), VoiceRoomSubscribeDelegate,
+    IParserSource {
 
     companion object {
-        const val RC_PERMISSIONS = 101
         const val KEY_VOICE_ROOM_MODEL = "voice_chat_room_model"
         const val TAG = "ChatroomLiveActivity"
 
@@ -94,43 +93,72 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         return VoiceActivityChatroomBinding.inflate(inflater)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun initView(savedInstanceState: Bundle?) {
+        super.initView(savedInstanceState)
         StatusBarCompat.setLightStatusBar(this, false)
         roomLivingViewModel = ViewModelProvider(this)[VoiceRoomLivingViewModel::class.java]
         giftViewDelegate =
             RoomGiftViewDelegate.getInstance(this, roomLivingViewModel, binding.chatroomGiftView, binding.svgaView)
-        initListeners()
-        initData()
-        initView()
-        requestAudioPermission()
-    }
-
-    private fun initData() {
         roomKitBean.convertByVoiceRoomModel(voiceRoomModel)
+        initView()
         giftViewDelegate.onRoomDetails(roomKitBean.roomId, roomKitBean.ownerId)
-        ChatroomIMManager.getInstance().init(roomKitBean.chatroomId,roomKitBean.isOwner)
+        ChatroomIMManager.getInstance().init(roomKitBean.chatroomId, roomKitBean.isOwner)
         ChatroomIMManager.getInstance().saveWelcomeMsg(
             getString(R.string.voice_room_welcome),
             VoiceBuddyFactory.get().getVoiceBuddy().nickName()
         )
-        binding.messageView.refreshSelectLast()
-//        roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
+
+//        binding.messageView.refreshSelectLast()
+        if (roomKitBean.isOwner) {
+            toggleAudioRun =  Runnable {
+                "onPermissionGrant initSdkJoin".logD(TAG)
+                roomLivingViewModel.initSdkJoin(roomKitBean)
+            }
+            requestRecordPermission(true)
+        } else {
+            roomLivingViewModel.initSdkJoin(roomKitBean)
+        }
     }
 
-    private fun initListeners() {
+    private var toggleAudioRun: Runnable? = null
+
+    fun toggleSelfAudio(isOpen: Boolean, callback : () -> Unit) {
+        if (isOpen) {
+            toggleAudioRun = Runnable {
+                callback.invoke()
+            }
+            requestRecordPermission(true)
+        } else {
+            callback.invoke()
+        }
+    }
+
+    override fun onPermissionDined(permission: String?) {
+        PermissionLeakDialog(this).show(permission,
+            { getPermissions() }
+        ) { launchAppSetting(permission) }
+    }
+
+    override fun getPermissions() {
+        if (toggleAudioRun != null) {
+            toggleAudioRun?.run()
+            toggleAudioRun = null
+        }
+    }
+
+    override fun initListener() {
         // 房间详情
         roomLivingViewModel.roomDetailsObservable().observe(this) { response: Resource<VoiceRoomInfo> ->
             parseResource(response, object : OnResourceParseCallback<VoiceRoomInfo>() {
 
                 override fun onLoading(data: VoiceRoomInfo?) {
                     super.onLoading(data)
-                    showLoading(false)
+                    showLoadingView()
                 }
 
                 override fun onHideLoading() {
                     super.onHideLoading()
-                    dismissLoading()
+                    hideLoadingView()
                 }
 
                 override fun onSuccess(data: VoiceRoomInfo?) {
@@ -171,8 +199,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 }
             })
         }
-        roomLivingViewModel.updateRoomMemberObservable().observe(this){ response: Resource<Boolean> ->
-            parseResource(response, object : OnResourceParseCallback<Boolean>(){
+        roomLivingViewModel.updateRoomMemberObservable().observe(this) { response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
                     "ChatroomLiveActivity updateRoomMember onSuccess".logD()
                 }
@@ -203,7 +231,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 reset()
             }
         })
-        voiceServiceProtocol.subscribeEvent(object : VoiceRoomSubscribeDelegate{
+        voiceServiceProtocol.subscribeEvent(object : VoiceRoomSubscribeDelegate {
             override fun onReceiveGift(roomId: String, message: ChatMessageData?) {
                 super.onReceiveGift(roomId, message)
                 if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
@@ -212,10 +240,14 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     binding.chatroomGiftView.refresh()
                     if (CustomMsgHelper.getInstance().getMsgGiftId(message).equals("VoiceRoomGift9")) {
                         giftViewDelegate.showGiftAction()
-                        binding.subtitle.showSubtitleView(resources.getString(R.string.voice_chatroom_gift_notice,
-                            ChatroomIMManager.getInstance().getUserName(message),voiceRoomModel.owner?.nickName))
+                        binding.subtitle.showSubtitleView(
+                            resources.getString(
+                                R.string.voice_chatroom_gift_notice,
+                                ChatroomIMManager.getInstance().getUserName(message), voiceRoomModel.owner?.nickName
+                            )
+                        )
                     }
-                    roomObservableDelegate.receiveGift(roomKitBean.roomId,message)
+                    roomObservableDelegate.receiveGift(roomKitBean.roomId, message)
                 }
             }
 
@@ -288,7 +320,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
                     binding.cTopView.onUpdateWatchCount(voiceRoomModel.clickCount)
                     voiceMember.let {
-                        if (roomKitBean.isOwner){
+                        if (roomKitBean.isOwner) {
                             ChatroomIMManager.getInstance().setMemberList(it)
                             roomLivingViewModel.updateRoomMember()
                         }
@@ -303,7 +335,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 "onUserLeftRoom $roomId, $chatUid".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     chatUid.let {
-                        if (roomKitBean.isOwner){
+                        if (roomKitBean.isOwner) {
                             ChatroomIMManager.getInstance().removeMember(it)
                             //当成员已申请上麦 未经过房主同意退出时 申请列表移除该成员
                             ChatroomIMManager.getInstance().removeSubmitMember(it)
@@ -312,7 +344,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                             //刷新 owner 申请列表
                             roomObservableDelegate.handsUpdate(0)
                             roomLivingViewModel.updateRoomMember()
-                            roomObservableDelegate.checkUserLeaveMic(ChatroomIMManager.getInstance().getMicIndexByChatUid(it))
+                            roomObservableDelegate.checkUserLeaveMic(
+                                ChatroomIMManager.getInstance().getMicIndexByChatUid(it)
+                            )
                         }
                     }
                     "onUserLeftRoom 1 ${voiceRoomModel.memberCount}".logD(TAG)
@@ -355,15 +389,15 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                         val micInfo =
                             GsonTools.toBean<VoiceMicInfoModel>(value, object : TypeToken<VoiceMicInfoModel>() {}.type)
                         micInfo?.let {
-                            if(it.member?.chatUid != null){
-                                if (ChatroomIMManager.getInstance().checkMember(it.member?.chatUid)){
+                            if (it.member?.chatUid != null) {
+                                if (ChatroomIMManager.getInstance().checkMember(it.member?.chatUid)) {
                                     ChatroomIMManager.getInstance().removeSubmitMember(it.member?.chatUid)
                                     ThreadManager.getInstance().runOnMainThread {
                                         //刷新 owner 申请列表
                                         roomObservableDelegate.handsUpdate(0)
                                     }
                                 }
-                                if (ChatroomIMManager.getInstance().checkInvitationMember(it.member?.chatUid)){
+                                if (ChatroomIMManager.getInstance().checkInvitationMember(it.member?.chatUid)) {
                                     ThreadManager.getInstance().runOnMainThread {
                                         //刷新 owner 邀请列表
                                         roomObservableDelegate.handsUpdate(1)
@@ -448,7 +482,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 onBackPressed()
             }
 
-            override fun onClickRank(view: View,pageIndex:Int) {
+            override fun onClickRank(view: View, pageIndex: Int) {
                 roomObservableDelegate.onClickRank(pageIndex)
             }
 
@@ -462,6 +496,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 })
             }
 
+            override fun onClickMore(view: View) {
+                TopFunctionDialog(this@ChatroomLiveActivity).show()
+            }
         })
         binding.chatBottom.setMenuItemOnClickListener(object :
             MenuItemClickListener {
@@ -481,10 +518,15 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     R.id.voice_extend_item_gift -> {
                         giftViewDelegate.showGiftDialog(object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
-                                roomObservableDelegate.onSendGiftSuccess(roomKitBean.roomId,message)
-                                if (CustomMsgHelper.getInstance().getMsgGiftId(message).equals("VoiceRoomGift9")){
-                                    binding.subtitle.showSubtitleView(resources.getString(R.string.voice_chatroom_gift_notice,
-                                        ChatroomIMManager.getInstance().getUserName(message),voiceRoomModel.owner?.nickName))
+                                roomObservableDelegate.onSendGiftSuccess(roomKitBean.roomId, message)
+                                if (CustomMsgHelper.getInstance().getMsgGiftId(message).equals("VoiceRoomGift9")) {
+                                    binding.subtitle.showSubtitleView(
+                                        resources.getString(
+                                            R.string.voice_chatroom_gift_notice,
+                                            ChatroomIMManager.getInstance().getUserName(message),
+                                            voiceRoomModel.owner?.nickName
+                                        )
+                                    )
                                 }
                             }
 
@@ -518,9 +560,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                             override fun onError(code: Int, error: String?) {
                                 "onSendMessage onError  $code $error".logE(TAG)
                                 binding.likeView.isVisible = true
-                                if (code == Error.MODERATION_FAILED){
-                                    ToastTools.show(this@ChatroomLiveActivity,
-                                        getString(R.string.voice_room_content_prohibited,Toast.LENGTH_SHORT)
+                                if (code == Error.MODERATION_FAILED) {
+                                    ToastTools.show(
+                                        this@ChatroomLiveActivity,
+                                        getString(R.string.voice_room_content_prohibited)
                                     )
                                 }
                             }
@@ -528,7 +571,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             }
         })
 
-        supportFragmentManager.registerFragmentLifecycleCallbacks(object: FragmentManager.FragmentLifecycleCallbacks(){
+        supportFragmentManager.registerFragmentLifecycleCallbacks(object :
+            FragmentManager.FragmentLifecycleCallbacks() {
             override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
                 if (f is BottomSheetDialogFragment) {
                     if (dialogFragments.contains(f)) {
@@ -540,9 +584,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 }
                 super.onFragmentStarted(fm, f)
             }
+
             override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
                 super.onFragmentStopped(fm, f)
-                if(f is BottomSheetDialogFragment){
+                if (f is BottomSheetDialogFragment) {
                     val lastFragment = dialogFragments.lastOrNull()
                     if (lastFragment == f) {
                         dialogFragments.remove(f)
@@ -607,53 +652,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         super.finish()
     }
 
-    private fun requestAudioPermission() {
-        val perms = arrayOf(Manifest.permission.RECORD_AUDIO)
-        if (EasyPermissions.hasPermissions(this, *perms)) {
-            onPermissionGrant()
-        } else {
-            // Do not have permissions, request them now
-            EasyPermissions.requestPermissions(PermissionRequest.Builder(this, RC_PERMISSIONS, *perms).build())
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        // Forward results to EasyPermissions
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
-    }
-
-    private fun onPermissionGrant() {
-        "onPermissionGrant initSdkJoin".logD(TAG)
-        roomLivingViewModel.initSdkJoin(roomKitBean)
-    }
-
-    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-        "onPermissionsGranted requestCode$requestCode $perms".logD(TAG)
-        if (requestCode == RC_PERMISSIONS) {
-            onPermissionGrant()
-        }
-    }
-
-    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
-        "onPermissionsDenied $perms ".logD()
-    }
-
-    override fun onRationaleAccepted(requestCode: Int) {
-        "onRationaleAccepted requestCode$requestCode ".logD(TAG)
-        if (requestCode == RC_PERMISSIONS) {
-            onPermissionGrant()
-        }
-    }
-
-    override fun onRationaleDenied(requestCode: Int) {
-        "onRationaleDenied requestCode$requestCode ".logD(TAG)
-    }
-
     private fun reset() {
         if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) {
             binding.chatBottom.hideExpressionView(false)
-            hideKeyboard()
+            hideInput()
             binding.chatBottom.showInput()
             binding.likeView.isVisible = true
             binding.chatBottom.hindViewChangeIcon()

@@ -20,6 +20,7 @@ import io.agora.scene.voice.model.constructor.RoomSoundAudioConstructor
 import io.agora.scene.voice.model.constructor.RoomSoundSelectionConstructor
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
+import io.agora.scene.voice.ui.activity.ChatroomLiveActivity
 import io.agora.scene.voice.ui.dialog.*
 import io.agora.scene.voice.ui.dialog.common.CommonFragmentAlertDialog
 import io.agora.scene.voice.ui.dialog.common.CommonFragmentContentDialog
@@ -737,7 +738,11 @@ class RoomObservableViewDelegate constructor(
                         }
                         MicClickAction.UnMute -> {
                             //取消自己禁言
-                            muteLocalAudio(false, micInfo.micIndex)
+                            if (activity is ChatroomLiveActivity) {
+                                activity.toggleSelfAudio(true, callback = {
+                                    muteLocalAudio(false, micInfo.micIndex)
+                                })
+                            }
                         }
                         MicClickAction.Lock -> {
                             //房主锁麦
@@ -896,7 +901,12 @@ class RoomObservableViewDelegate constructor(
             .rightText(activity.getString(R.string.voice_room_accept))
             .setOnClickListener(object : CommonFragmentAlertDialog.OnClickBottomListener {
                 override fun onConfirmClick() {
-                    roomLivingViewModel.acceptMicSeatInvitation(micIndex)
+
+                    if (activity is ChatroomLiveActivity) {
+                        activity.toggleSelfAudio(true, callback = {
+                            roomLivingViewModel.acceptMicSeatInvitation(micIndex)
+                        })
+                    }
                 }
 
                 override fun onCancelClick() {
@@ -961,7 +971,11 @@ class RoomObservableViewDelegate constructor(
                     if (isRequesting) {
                         roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())
                     } else {
-                        roomLivingViewModel.startMicSeatApply(micIndex)
+                        if (activity is ChatroomLiveActivity) {
+                            activity.toggleSelfAudio(true, callback = {
+                                roomLivingViewModel.startMicSeatApply(micIndex)
+                            })
+                        }
                     }
                 }
             }).show(activity.supportFragmentManager, "room_hands_apply")
@@ -978,14 +992,12 @@ class RoomObservableViewDelegate constructor(
             ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_muted_by_host))
             return
         }
-        if (isLocalAudioMute) {
-            isLocalAudioMute = false
-            chatPrimaryMenuView.setEnableMic(true)
-            muteLocalAudio(false)
-        } else {
-            isLocalAudioMute = true
-            chatPrimaryMenuView.setEnableMic(false)
-            muteLocalAudio(true)
+        if (activity is ChatroomLiveActivity){
+            activity.toggleSelfAudio(isLocalAudioMute, callback = {
+                chatPrimaryMenuView.setEnableMic(isLocalAudioMute)
+                muteLocalAudio(!isLocalAudioMute)
+                isLocalAudioMute = !isLocalAudioMute
+            })
         }
     }
 

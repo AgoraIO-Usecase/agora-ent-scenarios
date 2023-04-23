@@ -121,7 +121,7 @@ public class ChatroomMessagesView extends RelativeLayout{
                 LinearLayoutManager lm = (LinearLayoutManager) recyclerView.getLayoutManager();
                 int lastVisibleItemPosition = lm.findLastVisibleItemPosition();
                 int totalCount = lm.getItemCount();
-                LogTools.e("onScrolled","lastVisibleItemPosition: " + lastVisibleItemPosition + " totalCount: " + (totalCount - 1));
+                LogTools.d("onScrolled","lastVisibleItemPosition: " + lastVisibleItemPosition + " totalCount: " + (totalCount - 1));
                 if (lastVisibleItemPosition == totalCount - 1 ) {
                     int findLastVisibleItemPosition = lm.findLastVisibleItemPosition();
                     if (findLastVisibleItemPosition == lm.getItemCount() - 1) {
@@ -152,7 +152,7 @@ public class ChatroomMessagesView extends RelativeLayout{
 
     public void refresh(){
         if(adapter != null){
-            LogTools.e("refresh","isScrollBottom: " + isScrollBottom);
+            LogTools.d("refresh","isScrollBottom: " + isScrollBottom);
             if (isScrollBottom){
                 refreshSelectLast();
             }else {
@@ -162,9 +162,11 @@ public class ChatroomMessagesView extends RelativeLayout{
     }
 
     public void refreshSelectLast(){
-        if(adapter != null){
+        if (adapter != null) {
             adapter.refresh();
-            listview.smoothScrollToPosition(adapter.getItemCount()-1);
+            if (adapter.getItemCount() > 0) {
+                listview.smoothScrollToPosition(adapter.getItemCount() - 1);
+            }
         }
     }
 
@@ -290,7 +292,7 @@ public class ChatroomMessagesView extends RelativeLayout{
         public void refresh(){
             int startPosition = messages.size();
             messages.addAll(startPosition,CustomMsgHelper.getInstance().getNormalData(chatroomId));
-            LogTools.e("room_refresh",messages.size()+" startPosition" + startPosition);
+            LogTools.d("room_refresh",messages.size()+" startPosition" + startPosition);
 
             if (messages.size() > 0){
                 ((Activity)context).runOnUiThread(new Runnable() {

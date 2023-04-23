@@ -48,6 +48,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         binding.mtChatroomNotice.setOnClickListener(this)
         binding.mtChatroomAgoraSound.setOnClickListener(this)
         binding.mtChatroomWatch.setOnClickListener(this)
+        binding.ivChatroomMore.setOnClickListener(this)
 
     }
 
@@ -60,14 +61,13 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
     override fun onChatroomInfo(voiceRoomModel: VoiceRoomModel) {
         this.roomDetailInfo = voiceRoomModel
         binding.apply {
-            mtChatroomOwnerName.text = roomDetailInfo.owner?.nickName
             mtChatroomName.text = roomDetailInfo.roomName
             val memberText = roomDetailInfo.memberCount.number2K()
-            mtChatroomMembers.text = memberText
+            mtChatroomMembers.text = context.getString(R.string.voice_room_online, memberText)
             val giftText = roomDetailInfo.giftAmount.number2K()
             mtChatroomGifts.text = giftText
             val watchText = roomDetailInfo.clickCount.number2K()
-            mtChatroomWatch.text = watchText
+            mtChatroomWatch.text = context.getString(R.string.voice_room_views, watchText)
             // 普通房间显示 最佳音效
             if (roomDetailInfo.roomType == ConfigConstants.RoomType.Common_Chatroom) {
                 mtChatroomAgoraSound.isVisible = true
@@ -146,7 +146,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         if (this::roomDetailInfo.isInitialized) {
             roomDetailInfo.memberCount = count
             val text = roomDetailInfo.memberCount.number2K()
-            binding.mtChatroomMembers.text = text
+            binding.mtChatroomMembers.text = context.getString(R.string.voice_room_online, text)
         }
     }
 
@@ -156,7 +156,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         if (this::roomDetailInfo.isInitialized) {
             roomDetailInfo.clickCount = count
             val text = roomDetailInfo.clickCount.number2K()
-            binding.mtChatroomWatch.text = text
+            binding.mtChatroomWatch.text = context.getString(R.string.voice_room_views, text)
         }
     }
 
@@ -173,15 +173,29 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
     override fun onClick(v: View?) {
         when (v?.id) {
             // 返回
-            binding.ivChatroomBack.id -> {onLiveTopClickListener?.onClickBack(v)}
+            binding.ivChatroomBack.id -> {
+                onLiveTopClickListener?.onClickBack(v)
+            }
             // 公告
-            binding.mtChatroomNotice.id -> {onLiveTopClickListener?.onClickNotice(v)}
+            binding.mtChatroomNotice.id -> {
+                onLiveTopClickListener?.onClickNotice(v)
+            }
             //音效
-            binding.mtChatroomAgoraSound.id -> {onLiveTopClickListener?.onClickSoundSocial(v)}
+            binding.mtChatroomAgoraSound.id -> {
+                onLiveTopClickListener?.onClickSoundSocial(v)
+            }
             // 排行榜
-            binding.llChatroomMemberRank.id ->{onLiveTopClickListener?.onClickRank(v,0)}
+            binding.llChatroomMemberRank.id -> {
+                onLiveTopClickListener?.onClickRank(v, 0)
+            }
             // 成员列表
-            binding.mtChatroomMembers.id -> {onLiveTopClickListener?.onClickRank(v,1)}
+            binding.mtChatroomMembers.id -> {
+                onLiveTopClickListener?.onClickRank(v, 1)
+            }
+            // 更多
+            binding.ivChatroomMore.id -> {
+                onLiveTopClickListener?.onClickMore(v)
+            }
         }
     }
 }

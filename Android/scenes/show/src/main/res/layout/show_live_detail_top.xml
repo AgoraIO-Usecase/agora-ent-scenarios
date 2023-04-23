@@ -73,28 +73,7 @@
             app:layout_constraintTop_toBottomOf="@id/tvRoomName"
             tools:text="00:00:00" />
 
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvUserCount"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginVertical="4dp"
-        android:layout_marginEnd="10dp"
-        android:background="@drawable/show_live_detail_top_view_bg"
-        android:drawableTop="@mipmap/show_live_top_user_tag"
-        android:gravity="center"
-        android:maxLines="1"
-        android:paddingVertical="5dp"
-        android:textColor="@color/white_80_percent"
-        android:textSize="11sp"
-        app:layout_constraintBottom_toBottomOf="@id/clRoomTitle"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toStartOf="@id/ivClose"
-        app:layout_constraintTop_toTopOf="@id/clRoomTitle"
-        tools:text="1.5K" />
 
     <ImageView
         android:id="@+id/ivClose"
@@ -110,6 +89,37 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/clRoomTitle" />
+
+    <ImageView
+        android:id="@+id/ivMore"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingVertical="8dp"
+        android:layout_marginEnd="2dp"
+        app:layout_constraintDimensionRatio="1:1"
+        android:background="@drawable/show_live_detail_top_view_bg"
+        app:layout_constraintTop_toTopOf="@id/ivClose"
+        app:layout_constraintEnd_toStartOf="@id/ivClose"
+        app:layout_constraintBottom_toBottomOf="@id/ivClose"
+        android:src="@mipmap/show_icon_more" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvUserCount"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="2dp"
+        android:background="@drawable/show_live_detail_top_view_bg"
+        android:drawableTop="@mipmap/show_live_top_user_tag"
+        android:gravity="center"
+        android:maxLines="1"
+        android:paddingVertical="5dp"
+        android:textColor="@color/white_80_percent"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="@id/ivClose"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@id/ivMore"
+        app:layout_constraintTop_toTopOf="@id/ivClose"
+        tools:text="1.5K" />
 
     <TableLayout
         android:id="@+id/tlStatistic"

@@ -13,6 +13,7 @@ import io.agora.musiccontentcenter.*
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
 import io.agora.rtc2.audio.AudioParams
+import io.agora.rtc2.audio.AudioTrackConfig
 import org.json.JSONException
 import org.json.JSONObject
 import java.nio.ByteBuffer
@@ -107,6 +108,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     companion object{
         private val scheduledThreadPool: ScheduledExecutorService = Executors.newScheduledThreadPool(5)
     }
+
+    private var mCustomAudioTrackId = -1
 
     override fun initialize(
         config: KTVApiConfig
@@ -522,7 +525,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         channelMediaOption.publishMediaPlayerAudioTrack = true
         mRtcEngine.updateChannelMediaOptions(channelMediaOption)
 
-        mRtcEngine.setDirectExternalAudioSource(true)
+        val audioTrackConfig = AudioTrackConfig()
+        audioTrackConfig.enableLocalPlayback = false
+        mCustomAudioTrackId = mRtcEngine.createCustomAudioTrack(AudioTrackType.AUDIO_TRACK_DIRECT, audioTrackConfig)
         mRtcEngine.setRecordingAudioFrameParameters(48000, 2, 0, 960)
         mRtcEngine.registerAudioFrameObserver(this)
     }
@@ -682,8 +687,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         channelMediaOption.enableAudioRecordingOrPlayout =
             newRole != KTVSingRole.LeadSinger
         channelMediaOption.clientRoleType = CLIENT_ROLE_BROADCASTER
-        channelMediaOption.publishDirectCustomAudioTrack =
+        channelMediaOption.publishCustomAudioTrack =
             newRole == KTVSingRole.LeadSinger
+        channelMediaOption.publishCustomAudioTrackId = mCustomAudioTrackId;
 
         val rtcConnection = RtcConnection()
         rtcConnection.channelId = ktvApiConfig.chorusChannelName
@@ -744,9 +750,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     private fun leaveChorus2ndChannel(role: KTVSingRole) {
         if (role == KTVSingRole.LeadSinger) {
-            val channelMediaOption = ChannelMediaOptions()
-            channelMediaOption.publishDirectCustomAudioTrack = false
-            mRtcEngine.updateChannelMediaOptionsEx(channelMediaOption, subChorusConnection)
             mRtcEngine.leaveChannelEx(subChorusConnection)
         } else if (role == KTVSingRole.CoSinger) {
             mRtcEngine.leaveChannelEx(subChorusConnection)
@@ -871,9 +874,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     private fun getNtpTimeInMs(): Long {
-        val currentNtpTime = mRtcEngine.ntpTimeInMs
+        val currentNtpTime = mRtcEngine.ntpWallTimeInMs
         return if (currentNtpTime != 0L) {
-            currentNtpTime - 2208988800L * 1000
+            currentNtpTime
         } else {
             Log.e(TAG, "getNtpTimeInMs DeviceDelay is zero!!!")
             System.currentTimeMillis()
@@ -1016,51 +1019,40 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         super.onLocalAudioStats(stats)
         if (useCustomAudioSource) return
         val audioState = stats ?: return
-        // TODO Try to fix the problem by updating rtc sdk version.
-        //audioPlayoutDelay = audioState.audioPlayoutDelay
+        audioPlayoutDelay = audioState.audioPlayoutDelay
     }
 
     // ------------------------ AgoraMusicContentCenterEventDelegate  ------------------------
-    override fun onPreLoadEvent(
-        songCode: Long,
-        percent: Int,
-        status: Int,
-        msg: String?,
-        lyricUrl: String?
-    ) {
+    override fun onPreLoadEvent(songCode: Long, percent: Int, lyricUrl: String?, status: Int, errorCode: Int) {
         val callback = loadMusicCallbackMap[songCode.toString()] ?: return
         if (status == 0 || status == 1) {
             loadMusicCallbackMap.remove(songCode.toString())
         }
-        callback.invoke(songCode, percent, status, msg, lyricUrl)
+        callback.invoke(songCode, percent, status, RtcEngine.getErrorDescription(errorCode), lyricUrl)
     }
 
     override fun onMusicCollectionResult(
         requestId: String?,
-        status: Int,
         page: Int,
         pageSize: Int,
         total: Int,
-        list: Array<out Music>?
+        list: Array<out Music>?,
+        errorCode: Int
     ) {
         val id = requestId ?: return
         val callback = musicCollectionCallbackMap[id] ?: return
         musicCollectionCallbackMap.remove(id)
-        callback.invoke(requestId, status, page, pageSize, total, list)
+        callback.invoke(requestId, errorCode, page, pageSize, total, list)
     }
 
-    override fun onMusicChartsResult(
-        requestId: String?,
-        status: Int,
-        list: Array<out MusicChartInfo>?
-    ) {
+    override fun onMusicChartsResult(requestId: String?, list: Array<out MusicChartInfo>?, errorCode: Int) {
         val id = requestId ?: return
         val callback = musicChartsCallbackMap[id] ?: return
         musicChartsCallbackMap.remove(id)
-        callback.invoke(requestId, status, list)
+        callback.invoke(requestId, errorCode, list)
     }
 
-    override fun onLyricResult(requestId: String?, lyricUrl: String?) {
+    override fun onLyricResult(requestId: String?, lyricUrl: String?, errorCode: Int) {
         val callback = lyricCallbackMap[requestId] ?: return
         val songCode = lyricSongCodeMap[requestId] ?: return
         lyricCallbackMap.remove(lyricUrl)
@@ -1173,7 +1165,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         avsync_type: Int
     ): Boolean {
         if (mainSingerHasJoinChannelEx && !useCustomAudioSource) {
-            mRtcEngine.pushDirectAudioFrame(buffer, renderTimeMs, 48000, 2)
+            mRtcEngine.pushExternalAudioFrame(buffer, renderTimeMs, samplesPerSec, channels, BytesPerSample.TWO_BYTES_PER_SAMPLE, mCustomAudioTrackId)
         }
         return true
     }
