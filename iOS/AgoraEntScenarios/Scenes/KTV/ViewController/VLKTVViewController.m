@@ -199,6 +199,9 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 - (BOOL)preferredNavigationBarHidden {
     return YES;
 }
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
 // 是否允许手动滑回 @return true 是、 false否
 - (BOOL)forceEnableInteractivePopGestuzreRecognizer {
     return NO;

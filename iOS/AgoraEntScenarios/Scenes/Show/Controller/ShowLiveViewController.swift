@@ -277,6 +277,10 @@ class ShowLiveViewController: UIViewController {
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
     }
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        .lightContent
+    }
+    
     private func defaultConfig(){
         if AppContext.shared.isDebugMode {
             guard let room = room else {return}

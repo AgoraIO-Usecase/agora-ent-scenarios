@@ -185,7 +185,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
 
     private func updateMic(_ mics: [VRRoomMic], fromId: String) {
-        let changeMic = ChatRoomServiceImp.getSharedInstance().mics[mics.first?.mic_index ?? 1]
+        guard let changeMic = ChatRoomServiceImp.getSharedInstance().mics[safe: mics.first?.mic_index ?? 1] else { return }
         for mic in mics {
             ChatRoomServiceImp.getSharedInstance().mics[mic.mic_index] = mic
         }
