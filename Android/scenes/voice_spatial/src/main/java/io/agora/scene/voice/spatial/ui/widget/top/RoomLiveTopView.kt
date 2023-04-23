@@ -62,12 +62,16 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         if (roomType == 1) {
             binding.ivChatroomOwner.visibility = VISIBLE // 头像
             binding.llTitle.visibility = VISIBLE // 标题栏（包含房间名与房主名）
+            binding.iv3DLogo.visibility = VISIBLE // xxx
+            binding.tvChatroomName.visibility = VISIBLE // xxx
             binding.mtChatroomGifts.visibility = GONE // 排行榜
         }
         // 其他房间类型
         else {
             binding.ivChatroomOwner.visibility = VISIBLE // 头像
             binding.llTitle.visibility = VISIBLE // 标题栏（包含房间名与房主名）
+            binding.iv3DLogo.visibility = GONE // xxx
+            binding.tvChatroomName.visibility = GONE // xxx
             binding.mtChatroomGifts.visibility = VISIBLE // 排行榜
         }
     }
@@ -75,15 +79,20 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
     override fun onChatroomInfo(voiceRoomModel: VoiceRoomModel) {
         this.roomDetailInfo = voiceRoomModel
         binding.apply {
+            mtChatroomOwnerName.text = roomDetailInfo.owner?.nickName
             mtChatroomName.text = roomDetailInfo.roomName
+            tvChatroomName.text = roomDetailInfo.roomName
             val memberText = roomDetailInfo.memberCount.number2K()
-            mtChatroomMembers.text = context.getString(R.string.voice_room_online, memberText)
+            mtChatroomMembers.text = memberText
             val giftText = roomDetailInfo.giftAmount.number2K()
             mtChatroomGifts.text = giftText
             val watchText = roomDetailInfo.clickCount.number2K()
-            mtChatroomWatch.text = context.getString(R.string.voice_room_views, watchText)
+            mtChatroomWatch.text = watchText
             // 普通房间显示 最佳音效
             if (roomDetailInfo.roomType == ConfigConstants.RoomType.Common_Chatroom) {
+                mtChatroomAgoraSound.isVisible = true
+                llChatroomAgoraSound.isVisible = true
+                ivIcon.isVisible = false
                 mtChatroomAgoraSound.text = when (roomDetailInfo.soundEffect) {
                     ConfigConstants.SoundSelection.Karaoke -> root.context.getString(R.string.voice_chatroom_karaoke)
                     ConfigConstants.SoundSelection.Gaming_Buddy -> root.context.getString(R.string.voice_chatroom_gaming_buddy)
@@ -93,8 +102,11 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             }
             // 空间音频
             else if (roomDetailInfo.roomType == ConfigConstants.RoomType.Spatial_Chatroom) {
+                llChatroomAgoraSound.isVisible = true
+                ivIcon.isVisible = true
                 mtChatroomAgoraSound.text = root.context.getString(R.string.voice_chatroom_beginner_guide)
             } else {
+                llChatroomAgoraSound.isVisible = false
                 mtChatroomAgoraSound.isVisible = false
             }
 
@@ -163,7 +175,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         if (this::roomDetailInfo.isInitialized) {
             roomDetailInfo.memberCount = count
             val text = roomDetailInfo.memberCount.number2K()
-            binding.mtChatroomMembers.text = context.getString(R.string.voice_room_online, text)
+            binding.mtChatroomMembers.text = text
         }
     }
 
@@ -173,7 +185,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         if (this::roomDetailInfo.isInitialized) {
             roomDetailInfo.clickCount = count
             val text = roomDetailInfo.clickCount.number2K()
-            binding.mtChatroomWatch.text = context.getString(R.string.voice_room_views, text)
+            binding.mtChatroomWatch.text = text
         }
     }
 
@@ -197,7 +209,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             // 公告
             binding.mtChatroomNotice -> onLiveTopClickListener?.onClickNotice(v)
             //音效
-            binding.mtChatroomAgoraSound -> onLiveTopClickListener?.onClickSoundSocial(v)
+            binding.llChatroomAgoraSound -> onLiveTopClickListener?.onClickSoundSocial(v)
             // 更多
             binding.ivChatroomMore -> onLiveTopClickListener?.onClickMore(v)
         }
