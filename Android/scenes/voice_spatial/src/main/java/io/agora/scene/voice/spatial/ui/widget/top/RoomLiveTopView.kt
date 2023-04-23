@@ -62,8 +62,8 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         if (roomType == 1) {
             binding.ivChatroomOwner.visibility = VISIBLE // 头像
             binding.llTitle.visibility = VISIBLE // 标题栏（包含房间名与房主名）
-            binding.iv3DLogo.visibility = VISIBLE // xxx
-            binding.tvChatroomName.visibility = VISIBLE // xxx
+            binding.iv3DLogo.visibility = INVISIBLE // xxx
+            binding.tvChatroomName.visibility = INVISIBLE // xxx
             binding.mtChatroomGifts.visibility = GONE // 排行榜
         }
         // 其他房间类型
