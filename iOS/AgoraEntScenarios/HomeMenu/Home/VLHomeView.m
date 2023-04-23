@@ -102,8 +102,8 @@
                 @"subTitleStr":@""
             },
             @{
-                @"bgImgStr":@"home_KTV_bg",
-                @"iconImgStr":@"home_KTV_icon",
+                @"bgImgStr":@"home_live_bg",
+                @"iconImgStr":@"home_live_icon",
                 @"titleStr":@"秀场直播",
                 @"subTitleStr":@""
             },
