@@ -69,6 +69,7 @@ public class STRenderer {
     private long mDetectConfig = -1;
 
     private STGLRender mGLRenderBefore;
+    private STGLRender mGLRenderAfter;
     private int[] mTextureOutId;
     private byte[] mImageDataBuffer = null;
     protected STHumanAction[] mSTHumanAction = new STHumanAction[2];
@@ -187,6 +188,7 @@ public class STRenderer {
 
     private void initGLRender() {
         mGLRenderBefore = new STGLRender(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
+        mGLRenderAfter = new STGLRender(GLES20.GL_TEXTURE_2D);
     }
 
 
@@ -288,7 +290,7 @@ public class STRenderer {
 
         // prepare params
         updateHumanActionDetectConfig();
-        //mSTHumanActionNative.nativeHumanActionPtrCopy();
+        mSTHumanActionNative.nativeHumanActionPtrCopy();
 
         int ret = mSTHumanActionNative.nativeHumanActionDetectPtr(
                 mImageDataBuffer,
@@ -338,7 +340,7 @@ public class STRenderer {
 
         //渲染接口输入参数
         STEffectRenderInParam sTEffectRenderInParam = new STEffectRenderInParam(
-                mSTHumanActionNative.getNativeHumanActionResultPtr(),
+                mSTHumanActionNative.getNativeHumanActionPtrCopy(),
                 mAnimalFaceInfo[0],
                 0,
                 0,
@@ -358,7 +360,10 @@ public class STRenderer {
             textureId = stEffectRenderOutParam.getTexture().getId();
         }
 
-        GLES20.glFinish();
+        mGLRenderAfter.adjustRenderSize(imageWidth, imageHeight, 0, false, false);
+        textureId = mGLRenderAfter.process(textureId, STGLRender.IDENTITY_MATRIX);
+
+        GLES20.glFlush();
 
         return textureId;
     }
@@ -412,7 +417,7 @@ public class STRenderer {
 
             // prepare params
             updateHumanActionDetectConfig();
-            //mSTHumanActionNative.nativeHumanActionPtrCopy();
+            mSTHumanActionNative.nativeHumanActionPtrCopy();
 
             int ret = mSTHumanActionNative.nativeHumanActionDetectPtr(mImageDataBuffer,
                     pixelFormat,
@@ -441,7 +446,7 @@ public class STRenderer {
 
         //渲染接口输入参数
         STEffectRenderInParam sTEffectRenderInParam = new STEffectRenderInParam(
-                mSTHumanActionNative.getNativeHumanActionResultPtr(),
+                mSTHumanActionNative.getNativeHumanActionPtrCopy(),
                 mAnimalFaceInfo[0],
                 0,
                 0,
@@ -457,7 +462,10 @@ public class STRenderer {
             textureId = stEffectRenderOutParam.getTexture().getId();
         }
 
-        GLES20.glFinish();
+        mGLRenderAfter.adjustRenderSize(imageWidth, imageHeight, 0, false, false);
+        textureId = mGLRenderAfter.process(textureId, STGLRender.IDENTITY_MATRIX);
+
+        GLES20.glFlush();
 
         return textureId;
     }
@@ -625,6 +633,7 @@ public class STRenderer {
         mChangeStickerManagerThread = null;
         deleteTextures();
         mGLRenderBefore.destroyPrograms();
+        mGLRenderAfter.destroyPrograms();
     }
 
     private void deleteTextures() {
