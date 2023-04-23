@@ -58,6 +58,7 @@ import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
 import io.agora.scene.widget.dialog.CommonDialog;
 import io.agora.scene.widget.dialog.PermissionLeakDialog;
+import io.agora.scene.widget.dialog.TopFunctionDialog;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 import io.agora.scene.widget.utils.UiUtils;
 
@@ -240,6 +241,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().btnDebug.setOnClickListener(v -> {
             KTVDebugSettingsDialog dialog = new KTVDebugSettingsDialog(roomLivingViewModel.mDebugSetting);
             dialog.show(getSupportFragmentManager(), "debugSettings");
+        });
+        getBinding().ivMore.setOnClickListener(v -> {
+            new TopFunctionDialog(RoomLivingActivity.this).show();
         });
     }
 

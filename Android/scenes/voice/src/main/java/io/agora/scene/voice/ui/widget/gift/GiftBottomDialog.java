@@ -141,7 +141,7 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
      * @param count        要添加多少个小圆点
      */
     public void addViewPagerDots(LinearLayoutCompat llGuideGroup, int count) {
-        LogTools.e("addViewPagerDots", "count: " + count);
+        LogTools.d("addViewPagerDots", "count: " + count);
         if (llGuideGroup == null || count < 1 || getContext() == null) return;
         LinearLayoutCompat.LayoutParams lp = new LinearLayoutCompat.LayoutParams(
                 DeviceTools.dp2px(getContext(), 5), DeviceTools.dp2px(getContext(), 5));

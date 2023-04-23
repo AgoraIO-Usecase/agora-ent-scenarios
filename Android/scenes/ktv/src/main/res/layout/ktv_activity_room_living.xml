@@ -53,6 +53,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tvRoomName" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivMore"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:paddingVertical="8dp"
+        android:layout_marginEnd="4dp"
+        app:layout_constraintTop_toTopOf="@id/ivExit"
+        app:layout_constraintEnd_toStartOf="@id/ivExit"
+        app:layout_constraintBottom_toBottomOf="@id/ivExit"
+        android:src="@mipmap/icon_more" />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvNetStatus"
         android:layout_width="wrap_content"
@@ -61,9 +72,9 @@
         android:text="@string/ktv_net_status_good"
         android:textColor="@color/def_text_grey_979"
         android:textSize="10sp"
-        app:layout_constraintBottom_toBottomOf="@id/ivExit"
-        app:layout_constraintEnd_toStartOf="@id/ivExit"
-        app:layout_constraintTop_toTopOf="@id/ivExit"
+        app:layout_constraintBottom_toBottomOf="@id/ivMore"
+        app:layout_constraintEnd_toStartOf="@id/ivMore"
+        app:layout_constraintTop_toTopOf="@id/ivMore"
         tools:ignore="SmallSp" />
 
     <androidx.appcompat.widget.AppCompatImageView

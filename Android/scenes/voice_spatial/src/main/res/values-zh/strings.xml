@@ -231,4 +231,6 @@
     <string name="voice_room_content_prohibited">内容禁止发送</string>
     <string name="voice_room_send_tip">发送</string>
     <string name="voice_room_name_rule">房间名不合规</string>
+    <string name="voice_room_online">%1$s在线</string>
+    <string name="voice_room_views">%1$s观看</string>
 </resources>

@@ -412,12 +412,12 @@ public class CustomMsgHelper implements MessageListener {
         }
 
         Map<String, String> params = getCustomMsgParams(msg);
-        LogTools.e("getMsgGiftId","getMsgGiftId_1: "+params.toString());
+        LogTools.d("getMsgGiftId","getMsgGiftId_1: "+params.toString());
         if(params.containsKey(MsgConstant.CUSTOM_GIFT_KEY_ID)) {
-            LogTools.e("getMsgGiftId",params.get(MsgConstant.CUSTOM_GIFT_KEY_ID));
+            LogTools.d("getMsgGiftId",params.get(MsgConstant.CUSTOM_GIFT_KEY_ID));
             return params.get(MsgConstant.CUSTOM_GIFT_KEY_ID);
         }
-        LogTools.e("getMsgGiftId","getMsgGiftId_3");
+        LogTools.d("getMsgGiftId","getMsgGiftId_3");
         return null;
     }
 

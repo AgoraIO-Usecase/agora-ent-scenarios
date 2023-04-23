@@ -105,7 +105,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveApplySite(ChatMessageData message) {
-                LogTools.e(TAG,"onReceiveSeatRequest");
+                LogTools.d(TAG,"onReceiveSeatRequest");
                 try {
                     for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
                         listener.onReceiveSeatRequest(message);
@@ -117,7 +117,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveCancelApplySite(ChatMessageData message) {
-                LogTools.e(TAG,"onReceiveSeatRequestRejected");
+                LogTools.d(TAG,"onReceiveSeatRequestRejected");
                 try {
                     for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
                         listener.onReceiveSeatRequestRejected(message.getFrom());
@@ -129,7 +129,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveInviteSite(ChatMessageData message) {
-                LogTools.e(TAG,"onReceiveSeatInvitation");
+                LogTools.d(TAG,"onReceiveSeatInvitation");
                 try {
                     for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
                         listener.onReceiveSeatInvitation(message);
@@ -141,7 +141,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveInviteRefusedSite(ChatMessageData message) {
-                LogTools.e(TAG,"onReceiveSeatInvitationRejected");
+                LogTools.d(TAG,"onReceiveSeatInvitationRejected");
                 try {
                     for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
                         listener.onReceiveSeatInvitationRejected(message.getConversationId(), message);
