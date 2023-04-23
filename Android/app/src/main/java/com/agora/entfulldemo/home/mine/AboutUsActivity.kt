@@ -15,7 +15,9 @@ import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppAboutInfoItemBinding
 import com.agora.entfulldemo.databinding.AppAboutSceneItemBinding
 import com.agora.entfulldemo.databinding.AppActivityAboutUsBinding
+import com.alibaba.android.arouter.facade.annotation.Route
 import io.agora.rtc2.RtcEngine
+import io.agora.scene.base.PagePathConstant
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
@@ -23,6 +25,7 @@ import io.agora.scene.base.manager.PagePilotManager
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.widget.dialog.CommonDialog
 
+@Route(path = PagePathConstant.pageAboutUs)
 class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
 
     private val servicePhone = "400-632-6626"

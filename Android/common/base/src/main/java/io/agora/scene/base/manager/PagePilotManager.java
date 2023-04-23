@@ -25,6 +25,12 @@ public class PagePilotManager {
                 .navigation();
     }
 
+    public static void pageAboutUs() {
+        ARouter.getInstance()
+                .build(PagePathConstant.pageAboutUs)
+                .navigation();
+    }
+
     /**
      * 手机号登录注册
      */

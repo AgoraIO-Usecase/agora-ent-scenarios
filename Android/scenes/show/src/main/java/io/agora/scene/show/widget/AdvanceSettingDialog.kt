@@ -1,5 +1,6 @@
 package io.agora.scene.show.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.slider.Slider
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.show.R
 import io.agora.scene.show.VideoSetting
@@ -351,18 +353,35 @@ class AdvanceSettingDialog(context: Context) : BottomFullDialog(context) {
         binding.slider.value = defaultValue
         binding.tvValue.text = String.format(Locale.US, valueFormat, binding.slider.value.toInt())
         binding.slider.clearOnChangeListeners()
+        binding.slider.clearOnSliderTouchListeners()
         onSeekbarChanged(itemId, defaultValue.toInt())
-        binding.slider.addOnChangeListener { _, nValue, fromUser ->
+        var changed = false
+        binding.slider.addOnChangeListener { status, nValue, fromUser ->
             if (fromUser) {
                 if (checkPresetMode()) {
                     binding.slider.value = defaultValue
                 } else {
                     binding.tvValue.text = String.format(Locale.US, valueFormat, nValue.toInt())
                     defaultItemValues[itemId] = nValue.toInt()
-                    onSeekbarChanged(itemId, nValue.toInt())
+                    changed = true
                 }
             }
         }
+        binding.slider.addOnSliderTouchListener(object: Slider.OnSliderTouchListener {
+            @SuppressLint("RestrictedApi")
+            override fun onStartTrackingTouch(slider: Slider) {
+
+            }
+
+            @SuppressLint("RestrictedApi")
+            override fun onStopTrackingTouch(slider: Slider) {
+                if(changed){
+                    onSeekbarChanged(itemId, slider.value.toInt())
+                    changed = false
+                }
+            }
+        })
+
     }
 
     private fun checkPresetMode(): Boolean {
