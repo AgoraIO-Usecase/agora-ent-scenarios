@@ -236,6 +236,4 @@
     <string name="voice_room_name_rule">Incorrect room name</string>
     <string name="voice_room_robot_left">Close Bot</string>
     <string name="voice_room_robot_right">Audio Settings</string>
-    <string name="voice_room_online">%1$s online</string>
-    <string name="voice_room_views">%1$s views</string>
 </resources>
