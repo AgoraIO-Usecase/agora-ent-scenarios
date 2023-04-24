@@ -623,22 +623,24 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
     
     func didReceiveStreamMsgOfUid(uid: UInt, data: Data) {
         guard "\(uid)" != VLUserCenter.user.id else { return }
-        let result = String(data: data, encoding: .utf8)
-        guard let streamInfo = JSONObject.toModel(SADataStreamInfo.self, value: result),
-              let info = JSONObject.toModel(SAPositionInfo.self, value: streamInfo.message) else { return }
-        
-        var point = pointConvertToView(point: CGPoint(x: info.x, y: info.y))
-        point = checkEdgeRange(point: point)
-        let pos = viewCenterPostion(rect: CGRect(origin: point, size: rtcUserView.size))
-        let forward = info.forward.map({ NSNumber(value: $0) })
-        rtcKit?.updateRemoteSpetialPostion(uid: "\(uid)",
-                                           position: pos,
-                                           forward: forward)
-        
-        UIView.animate(withDuration: 0.25) {
-            self.rtcUserView.center = point
+        DispatchQueue.main.async {
+            let result = String(data: data, encoding: .utf8)
+            guard let streamInfo = JSONObject.toModel(SADataStreamInfo.self, value: result),
+                  let info = JSONObject.toModel(SAPositionInfo.self, value: streamInfo.message) else { return }
+            
+            var point = self.pointConvertToView(point: CGPoint(x: info.x, y: info.y))
+            point = self.checkEdgeRange(point: point)
+            let pos = self.viewCenterPostion(rect: CGRect(origin: point, size: self.rtcUserView.size))
+            let forward = info.forward.map({ NSNumber(value: $0) })
+            self.rtcKit?.updateRemoteSpetialPostion(uid: "\(uid)",
+                                               position: pos,
+                                               forward: forward)
+            
+            UIView.animate(withDuration: 0.25) {
+                self.rtcUserView.center = point
+            }
+            self.rtcUserView.angle = info.angle
         }
-        rtcUserView.angle = info.angle
     }
     
     func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
