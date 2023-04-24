@@ -77,7 +77,6 @@ extension VoiceRoomAudiencesViewController {
                 for mic in ChatRoomServiceImp.getSharedInstance().mics {
                     if mic.member?.chat_uid ?? "" == user.chat_uid ?? "" {
                         index = mic.mic_index
-                        status = mic.status
                         break
                     }
                 }

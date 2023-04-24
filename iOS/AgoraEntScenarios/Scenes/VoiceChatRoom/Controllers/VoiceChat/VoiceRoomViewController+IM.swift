@@ -203,7 +203,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 //刷新底部✋🏻状态
                 if !isOwner {
                     if first.member != nil {
-                        refreshHandsUp(status: status)
+                        if self.local_index != nil {
+                            refreshHandsUp(status: status)
+                        }
                     } else {
                         if changeMic.member != nil {
                             refreshHandsUp(status: status)
