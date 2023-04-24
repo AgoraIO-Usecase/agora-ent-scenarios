@@ -274,8 +274,13 @@ extension VoiceRoomViewController {
         VoiceRoomUserInfo.shared.user?.micStatus = status
         ChatRoomServiceImp.getSharedInstance().changeMicUserStatus(status: status) { [weak self] error, mic in
             guard let `self` = self else { return }
-            if error == nil,mic?.mic_index == self.local_index {
-                self.rtckit.muteLocalAudioStream(mute: self.chatBar.micState)
+            if error == nil,mic?.mic_index == self.local_index,let status = mic?.status {
+                let micStatus = mic?.member?.micStatus ?? 0
+                var mute = true
+                if status == 0,micStatus == 1 {
+                    mute = false
+                }
+                self.rtckit.muteLocalAudioStream(mute: mute)
                 self.rtcView.updateUser(mic!)
             } else {
                 self.view.makeToast("Mute local mic failed!")
@@ -346,28 +351,11 @@ extension VoiceRoomViewController {
         applyAlert.actionEvents = { [weak self] in
             guard let `self` = self else { return }
             if $0 == 31 {
-                if self.checkWhetherApplyMic() {
-                    self.requestSpeak(index: index)
-                } else {
-                    self.view.makeToast("All mics locked!", point: self.toastPoint, title: nil, image: nil, completion: nil)
-                }
+               self.requestSpeak(index: index)
             }
             vc.dismiss(animated: true)
         }
         presentViewController(vc,animated: true)
-    }
-    
-    private func checkWhetherApplyMic() -> Bool {
-        var result = false
-        var mics = [VRRoomMic]()
-        mics = ChatRoomServiceImp.getSharedInstance().mics.filter { $0.member?.chat_uid != self.roomInfo?.room?.owner?.chat_uid
-        }
-        for mic in mics {
-            if mic.status == -1 {
-                result = true
-            }
-        }
-        return result
     }
 
     func requestSpeak(index: Int?) {
