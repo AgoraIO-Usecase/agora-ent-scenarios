@@ -91,16 +91,7 @@ extension VoiceRoomViewController {
                         if $0 == 31 {
                             ChatRoomServiceImp.getSharedInstance().enableRobot(enable: true) { error in
                                 if error == nil {
-                                    let count = (index - 1000) / 10
-                                    let tag = (index - 1000) % 10
-                                    self?.rtckit.stopPlaySound()
-                                    let mic_info = self?.roomInfo?.mic_info![6]
-                                    mic_info?.status = 5
-                                    self?.roomInfo?.room?.use_robot = true
-                                    self?.roomInfo?.mic_info![6] = mic_info!
-                                    self?.rtcView.updateAlien(mic_info?.status ?? 5)
-                                    self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
-                                    self?.rtcView.updateAlienMic(.blue)
+                                    self?.playAINS(index: index)
                                 } else {
                                     self?.view.makeToast("激活机器人失败")
                                 }
@@ -110,12 +101,11 @@ extension VoiceRoomViewController {
                     }
                     self?.presentViewController(vc,animated: true)
                     return
+                } else {
+                    self?.playAINS(index: index)
                 }
             }
-//            let count = (index - 1000) / 10
-//            let tag = (index - 1000) % 10
-//            self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
-//            self?.rtcView.updateAlienMic(.blue)
+            
         }
         audioSetVC.visitBlock = { [weak self] in
             let VC: VoiceRoomHelpViewController = .init()
@@ -126,6 +116,20 @@ extension VoiceRoomViewController {
         presentView.showView(with: CGRect(x: 0, y: 0, width: ScreenWidth, height: 500), vc: audioSetVC, maxHeight: 500)
         view.addSubview(presentView)
         
+    }
+    
+    private func playAINS(index: Int) {
+        let count = (index - 1000) / 10
+        let tag = (index - 1000) % 10
+        self.rtckit.stopPlaySound()
+        self.rtckit.stopPlayMusic()
+        let mic_info = self.roomInfo?.mic_info![6]
+        mic_info?.status = 5
+        self.roomInfo?.room?.use_robot = true
+        self.roomInfo?.mic_info![6] = mic_info!
+        self.rtcView.updateAlien(mic_info?.status ?? 5)
+        self.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
+        self.rtcView.updateAlienMic(.blue)
     }
                            
     func applyMembersAlert(position: VoiceRoomSwitchBarDirection,index: Int?) {
