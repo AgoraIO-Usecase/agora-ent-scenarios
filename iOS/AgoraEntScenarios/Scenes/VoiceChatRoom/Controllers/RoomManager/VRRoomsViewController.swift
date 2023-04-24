@@ -83,7 +83,7 @@ let page_size = 15
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if isDestory {
-//            destroy()
+            destroy()
         }
     }
 
