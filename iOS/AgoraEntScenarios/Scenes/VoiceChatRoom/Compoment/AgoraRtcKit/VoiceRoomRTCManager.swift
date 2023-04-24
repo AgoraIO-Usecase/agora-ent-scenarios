@@ -245,7 +245,6 @@ public let kMPK_RTC_UID: UInt = 1
                 }
                 let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized() : "EN"
                 musicPath = musicPath.replacingOccurrences(of: "CN", with: lanuagePath)
-                print("alien remote path:\(musicPath)")
                 rtcKit.startAudioMixing(musicPath, loopback: false, cycle: 1)
             }
         }
