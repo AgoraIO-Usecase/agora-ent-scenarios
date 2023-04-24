@@ -162,6 +162,7 @@ extension VRRoomsViewController {
 
     private func entryRoom(room: VRRoomEntity) {
         if room.is_private ?? false {
+            self.normal.roomList.isUserInteractionEnabled = true
             let alert = VoiceRoomPasswordAlert(frame: CGRect(x: 37.5, y: 168, width: ScreenWidth - 75, height: (ScreenWidth - 63 - 3 * 16) / 4.0 + 177)).cornerRadius(16).backgroundColor(.white)
             let vc = VoiceRoomAlertViewController(compent: component(), custom: alert)
             presentViewController(vc)
