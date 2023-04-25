@@ -1121,7 +1121,7 @@ public class RoomLivingViewModel extends ViewModel {
                 roomInfoLiveData.getValue().getRoomNo(),
                 UserManager.getInstance().getUser().id.intValue(),
                 roomInfoLiveData.getValue().getRoomNo() + "_ex",
-                roomInfoLiveData.getValue().getAgoraChorusToken())
+                roomInfoLiveData.getValue().getAgoraChorusToken(), 10)
         );
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
@@ -1148,6 +1148,8 @@ public class RoomLivingViewModel extends ViewModel {
                }
            }
         );
+
+        ktvApiProtocol.renewInnerDataStreamId();
 
         // ------------------ 加入频道 ------------------
         mRtcEngine.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING);
