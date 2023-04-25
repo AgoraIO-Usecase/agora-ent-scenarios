@@ -177,6 +177,7 @@ abstract class IKTVApiEventHandler {
  * @param localUid 创建 Mcc engine 和 加入子频道需要用到
  * @param chorusChannelName 子频道名 加入子频道需要用到
  * @param chorusChannelToken 子频道token 加入子频道需要用到
+ * @param maxCacheSize 最大缓存歌曲数
  */
 data class KTVApiConfig(
     val appId: String,
@@ -185,7 +186,8 @@ data class KTVApiConfig(
     val channelName: String,
     val localUid: Int,
     val chorusChannelName: String,
-    val chorusChannelToken: String
+    val chorusChannelToken: String,
+    val maxCacheSize: Int = 10
 )
 
 /**
@@ -208,6 +210,11 @@ interface KTVApi {
      * @param config 初始化KTVApi的配置
      */
     fun initialize(config: KTVApiConfig)
+
+    /**
+     * 更新ktvapi内部使用的streamId，每次加入频道需要更新内部streamId
+     */
+    fun renewInnerDataStreamId()
 
     /**
      * 订阅KTVApi事件, 支持多注册

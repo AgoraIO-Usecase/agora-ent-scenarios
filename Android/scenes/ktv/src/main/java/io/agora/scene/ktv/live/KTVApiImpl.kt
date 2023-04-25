@@ -117,18 +117,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         this.mRtcEngine = config.engine as RtcEngineEx
         this.ktvApiConfig = config
 
-        // ------------------ 创建内部使用的DataStream -----------------
-        // 内部使用的StreamId
-        val innerCfg = DataStreamConfig()
-        innerCfg.syncWithAudio = true
-        innerCfg.ordered = false
-        innerDataStreamId = mRtcEngine.createDataStream(innerCfg)
-
         // ------------------ 初始化内容中心 ------------------
         val contentCenterConfiguration = MusicContentCenterConfiguration()
         contentCenterConfiguration.appId = config.appId
         contentCenterConfiguration.mccUid = ktvApiConfig.localUid.toLong()
         contentCenterConfiguration.token = config.rtmToken
+        contentCenterConfiguration.maxCacheSize = config.maxCacheSize
         mMusicCenter = IAgoraMusicContentCenter.create(mRtcEngine)
         mMusicCenter.initialize(contentCenterConfiguration)
 
@@ -148,6 +142,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         isRelease = false;
     }
 
+    override fun renewInnerDataStreamId() {
+        val innerCfg = DataStreamConfig()
+        innerCfg.syncWithAudio = true
+        innerCfg.ordered = false
+        this.innerDataStreamId = mRtcEngine.createDataStream(innerCfg)
+    }
+
     private fun setKTVParameters() {
         mRtcEngine.setParameters("{\"rtc.enable_nasa2\": false}")
         mRtcEngine.setParameters("{\"rtc.ntp_delay_drop_threshold\":1000}")
@@ -160,6 +161,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\":600}")
         mRtcEngine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
         mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
+
+        // Android Only
+        mRtcEngine.setParameters("{\"che.audio.enable_estimated_device_delay\":false}")
     }
 
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
@@ -179,6 +183,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         stopDisplayLrc()
         this.mLastReceivedPlayPosTime = null
         this.mReceivedPlayPosition = 0
+        this.innerDataStreamId = 0
 
         lyricCallbackMap.clear()
         loadMusicCallbackMap.clear()
@@ -689,7 +694,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         channelMediaOption.clientRoleType = CLIENT_ROLE_BROADCASTER
         channelMediaOption.publishCustomAudioTrack =
             newRole == KTVSingRole.LeadSinger
-        channelMediaOption.publishCustomAudioTrackId = mCustomAudioTrackId;
+        channelMediaOption.publishCustomAudioTrackId = mCustomAudioTrackId
 
         val rtcConnection = RtcConnection()
         rtcConnection.channelId = ktvApiConfig.chorusChannelName
