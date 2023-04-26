@@ -91,16 +91,7 @@ extension VoiceRoomViewController {
                         if $0 == 31 {
                             ChatRoomServiceImp.getSharedInstance().enableRobot(enable: true) { error in
                                 if error == nil {
-                                    let count = (index - 1000) / 10
-                                    let tag = (index - 1000) % 10
-                                    self?.rtckit.stopPlaySound()
-                                    let mic_info = self?.roomInfo?.mic_info![6]
-                                    mic_info?.status = 5
-                                    self?.roomInfo?.room?.use_robot = true
-                                    self?.roomInfo?.mic_info![6] = mic_info!
-                                    self?.rtcView.updateAlien(mic_info?.status ?? 5)
-                                    self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
-                                    self?.rtcView.updateAlienMic(.blue)
+                                    self?.playAINS(index: index)
                                 } else {
                                     self?.view.makeToast("激活机器人失败")
                                 }
@@ -110,12 +101,11 @@ extension VoiceRoomViewController {
                     }
                     self?.presentViewController(vc,animated: true)
                     return
+                } else {
+                    self?.playAINS(index: index)
                 }
             }
-//            let count = (index - 1000) / 10
-//            let tag = (index - 1000) % 10
-//            self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
-//            self?.rtcView.updateAlienMic(.blue)
+            
         }
         audioSetVC.visitBlock = { [weak self] in
             let VC: VoiceRoomHelpViewController = .init()
@@ -127,12 +117,26 @@ extension VoiceRoomViewController {
         view.addSubview(presentView)
         
     }
+    
+    private func playAINS(index: Int) {
+        let count = (index - 1000) / 10
+        let tag = (index - 1000) % 10
+        self.rtckit.stopPlaySound()
+        self.rtckit.stopPlayMusic()
+        let mic_info = self.roomInfo?.mic_info![6]
+        mic_info?.status = 5
+        self.roomInfo?.room?.use_robot = true
+        self.roomInfo?.mic_info![6] = mic_info!
+        self.rtcView.updateAlien(mic_info?.status ?? 5)
+        self.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
+        self.rtcView.updateAlienMic(.blue)
+    }
                            
     func applyMembersAlert(position: VoiceRoomSwitchBarDirection,index: Int?) {
         let apply = VoiceRoomApplyUsersViewController(roomId: roomInfo?.room?.room_id ?? "")
         apply.agreeApply = {
             self.rtcView.updateUser($0)
-            self.micMuteManager(mic: $0)
+//            self.micMuteManager(mic: $0)
         }
         let invite = VoiceRoomInviteUsersController(roomId: roomInfo?.room?.room_id ?? "", mic_index:index)
         let userAlert = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [apply, invite], titles: [LanguageManager.localValue(key: "Raised Hands"), LanguageManager.localValue(key: "Invite On-Stage")], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
@@ -270,8 +274,13 @@ extension VoiceRoomViewController {
         VoiceRoomUserInfo.shared.user?.micStatus = status
         ChatRoomServiceImp.getSharedInstance().changeMicUserStatus(status: status) { [weak self] error, mic in
             guard let `self` = self else { return }
-            if error == nil,mic?.mic_index == self.local_index {
-                self.rtckit.muteLocalAudioStream(mute: self.chatBar.micState)
+            if error == nil,mic?.mic_index == self.local_index,let status = mic?.status {
+                let micStatus = mic?.member?.micStatus ?? 0
+                var mute = true
+                if status == 0,micStatus == 1 {
+                    mute = false
+                }
+                self.rtckit.muteLocalAudioStream(mute: mute)
                 self.rtcView.updateUser(mic!)
             } else {
                 self.view.makeToast("Mute local mic failed!")
@@ -340,8 +349,9 @@ extension VoiceRoomViewController {
         let applyAlert = VoiceRoomApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: (205 / 375.0) * ScreenWidth), content: "Request to Speak?", cancel: "Cancel", confirm: "Confirm", position: .bottom).backgroundColor(.white).cornerRadius(20, [.topLeft, .topRight], .clear, 0)
         let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: (205 / 375.0) * ScreenWidth)), custom: applyAlert)
         applyAlert.actionEvents = { [weak self] in
+            guard let `self` = self else { return }
             if $0 == 31 {
-                self?.requestSpeak(index: index)
+               self.requestSpeak(index: index)
             }
             vc.dismiss(animated: true)
         }
