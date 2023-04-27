@@ -365,6 +365,12 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         }
     }
 
+    override fun adjustAudioMixingVolume(connection: RtcConnection, volume: Int) {
+        val connectionWrap = connectionsJoined.firstOrNull { it.isSameChannel(connection) } ?: return
+        connectionWrap.audioMixingPlayer?.adjustPlayoutVolume(volume)
+        connectionWrap.audioMixingPlayer?.adjustPublishSignalVolume(volume)
+    }
+
     private fun leaveRtcChannel(connection: RtcConnectionWrap) {
         val options = LeaveChannelOptions()
         options.stopAllEffect = false

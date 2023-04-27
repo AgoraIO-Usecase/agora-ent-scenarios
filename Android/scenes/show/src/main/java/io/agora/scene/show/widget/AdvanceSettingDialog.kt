@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.slider.Slider
 import com.google.android.material.tabs.TabLayoutMediator
+import io.agora.rtc2.RtcConnection
 import io.agora.scene.show.R
 import io.agora.scene.show.VideoSetting
 import io.agora.scene.show.VideoSetting.toIndex
@@ -22,7 +23,7 @@ import java.util.*
 /**
  * 高级设置弹窗
  */
-class AdvanceSettingDialog(context: Context) : BottomFullDialog(context) {
+class AdvanceSettingDialog constructor(context: Context,val rtcConnection: RtcConnection) : BottomFullDialog(context) {
 
     companion object {
         private const val ITEM_ID_SWITCH_BASE = 0x00000001
@@ -411,7 +412,7 @@ class AdvanceSettingDialog(context: Context) : BottomFullDialog(context) {
             ITEM_ID_SEEKBAR_VOCAL_VOLUME -> VideoSetting.updateBroadcastSetting(
                 recordingSignalVolume = value
             )
-            ITEM_ID_SEEKBAR_MUSIC_VOLUME -> VideoSetting.updateBroadcastSetting(audioMixingVolume = value)
+            ITEM_ID_SEEKBAR_MUSIC_VOLUME -> VideoSetting.updateBroadcastSetting(rtcConnection, audioMixingVolume = value)
         }
     }
 

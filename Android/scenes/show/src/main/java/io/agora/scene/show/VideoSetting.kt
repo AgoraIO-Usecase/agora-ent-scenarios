@@ -555,6 +555,7 @@ object VideoSetting {
     ) {
         val rtcEngine = RtcEngineInstance.rtcEngine
         val videoEncoderConfiguration = RtcEngineInstance.videoEncoderConfiguration
+        val videoSwitcher = RtcEngineInstance.videoSwitcher
         h265?.let {
             if (!isJoinedRoom) {
                 // 只能在加入房间前设置，否则rtc sdk会崩溃
@@ -616,7 +617,12 @@ object VideoSetting {
             rtcEngine.adjustRecordingSignalVolume(it)
         }
         audioMixingVolume?.let {
-            rtcEngine.adjustAudioMixingVolume(it)
+            // fix 播放用的是mpk
+            if (rtcConnection != null) {
+                videoSwitcher.adjustAudioMixingVolume(rtcConnection, it)
+            } else {
+                rtcEngine.adjustAudioMixingVolume(it)
+            }
         }
     }
 
