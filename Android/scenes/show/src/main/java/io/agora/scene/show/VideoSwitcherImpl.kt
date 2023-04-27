@@ -248,8 +248,12 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             container.container.addView(videoView, container.viewIndex)
         }
 
-        rtcEngine.setupLocalVideo(LocalVideoCanvasWrap(container.lifecycleOwner,
-            videoView, container.renderMode, container.uid))
+        val local = LocalVideoCanvasWrap(
+            container.lifecycleOwner,
+            videoView, container.renderMode, container.uid
+        )
+        local.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
+        rtcEngine.setupLocalVideo(local)
     }
 
     override fun startAudioMixing(
