@@ -266,6 +266,11 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                             rtckit.muteLocalAudioStream(mute: true)
                             chatBar.refresh(event: .mic, state: .selected, asCreator: false)
                         }
+                        if status == -1 || status == 4 || status == 3{
+                            rtckit.setClientRole(role: .audience)
+                            rtckit.muteLocalAudioStream(mute: true)
+                            chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
+                        }
                     }
                 }
                 
