@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Color
 import android.view.View
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -44,7 +45,7 @@ open class BottomFullDialog : BottomSheetDialog {
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        StatusBarUtil.hideStatusBar(window, Color.WHITE, true)
+        StatusBarUtil.hideNavigation(window)
         onDialogStatusChanged(mParentContext, true)
     }
 
@@ -85,7 +86,10 @@ open class BottomFullDialog : BottomSheetDialog {
                     height = view.resources.displayMetrics.heightPixels
                 }
             }
-            insets
+            val inset =
+                insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(inset.left, 0, inset.right, 0)
+            WindowInsetsCompat.CONSUMED
         }
     }
 }
