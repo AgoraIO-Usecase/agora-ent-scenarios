@@ -12,6 +12,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
+import io.agora.rtc2.Constants
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.component.AgoraApplication
@@ -125,10 +126,12 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
     private fun initRtcEngine() {
+        val videoCanvas = VideoCanvas(SurfaceView(this).apply {
+            binding.flVideoContainer.addView(this)
+        })
+        videoCanvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
         mRtcEngine.setupLocalVideo(
-            VideoCanvas(SurfaceView(this).apply {
-                binding.flVideoContainer.addView(this)
-            })
+            videoCanvas
         )
         val cacheQualityResolution = PictureQualityDialog.getCacheQualityResolution()
         mRtcEngine.setCameraCapturerConfiguration(
