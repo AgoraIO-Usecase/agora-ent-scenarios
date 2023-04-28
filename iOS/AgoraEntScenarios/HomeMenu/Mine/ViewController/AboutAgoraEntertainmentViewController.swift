@@ -18,7 +18,7 @@ import AgoraRtcKit
                   "sectionName": ""],
                  ["contents": [["title": "语聊房", "detail":"YL-2.1.0"],
                                ["title":"语聊房-空间音频模式", "detail":"YLKJ-2.1.0"],
-                               ["title":"在线K歌房","detail":"KTV-2.3.0"],
+                               ["title":"在线K歌","detail":"KTV-2.3.0"],
                                ["title": "秀场", "detail":"ZB-2.4.0"]],
                   "sectionName": NSLocalizedString("SceneVersion", comment: "")]]
     
