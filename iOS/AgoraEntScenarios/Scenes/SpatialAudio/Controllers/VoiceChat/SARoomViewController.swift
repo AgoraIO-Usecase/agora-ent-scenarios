@@ -104,7 +104,9 @@ class SARoomViewController: SABaseViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(leaveRoom), name: Notification.Name("terminate"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateMicInfo), name: Notification.Name("updateMicInfo"), object: nil)
         
-        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
+        if isOwner {
+            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
