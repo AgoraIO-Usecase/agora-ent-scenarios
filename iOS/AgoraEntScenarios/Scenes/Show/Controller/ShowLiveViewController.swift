@@ -241,8 +241,6 @@ class ShowLiveViewController: UIViewController {
         view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
         setupUI()
         defaultConfig()
-        AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
-        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
         guard let room = room else {return}
         if room.ownerId == VLUserCenter.user.id {
             self.joinChannel()
@@ -251,6 +249,8 @@ class ShowLiveViewController: UIViewController {
             }
             self._subscribeServiceEvent()
             UIApplication.shared.isIdleTimerDisabled = true
+            AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
+            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
         } else {
             AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
                 guard let self = self else { return }
