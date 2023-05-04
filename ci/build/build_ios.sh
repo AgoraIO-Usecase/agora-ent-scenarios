@@ -98,7 +98,7 @@ download_file () {
     agent="Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.47 Safari/536.11Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.47 Safari/536.11"
     file_name=`echo ${url} | awk -F '?' '{print $1}' | awk -F '/' '{print $NF}'`
     if [ ! -f ${file_name} ];then
-        curl ${url} -A "${agent}" -o ${file_name} --progress-bar
+        curl ${url} -A "${agent}" -o ${WORKSPACE}/${file_name} --progress-bar
     fi
     # 解压缩
     7za x "${file_name}" -y
@@ -114,7 +114,7 @@ download_file () {
     fi
     echo ${file_name}
     echo ${beauty_name}
-    mv ${file_name} "${PWD}/iOS/${beauty_name}"
+    mv ${WORKSPACE}/${file_name} "${PWD}/iOS/${beauty_name}"
     echo $(ls -l) "${PWD}/iOS/"
 }
 
