@@ -112,6 +112,8 @@ download_file () {
     elif [[ ${beauty_type} == '商汤' ]]; then
         beauty_name="SenseLib"
     fi
+    echo ${file_name}
+    echo ${beauty_name}
     mv ${file_name} "${PWD}/iOS/${beauty_name}"
     echo $(ls -l) "${PWD}/iOS/"
 }
