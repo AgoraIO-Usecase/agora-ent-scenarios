@@ -1313,6 +1313,9 @@ class LiveDetailFragment : Fragment() {
                 initVideoView()
                 joinChannel(eventListener)
             })
+            (activity as LiveDetailActivity).toggleSelfAudio(isRoomOwner || isMeLinking(), callback = {
+              // nothing
+            })
         }
 
         // ------------------ 开启鉴黄服务 ------------------
