@@ -96,12 +96,10 @@ PODFILE_PATH=${PWD}"/iOS/Podfile"
 
 download_file () {
     url=$1
-    file_name=`echo ${url} | awk -F '?' '{print $1}' | awk -F '/' '{print $NF}'`
-    if [ ! -f ${file_name} ];then
-        curl -o "${PWD}/${file_name}" ${url} --progress-bar
-    fi
+    python3 $WORKSPACE/artifactory_utils.py --action=download_file --file=$url
     # 解压缩
-    7za x "${PWD}/${file_name}" -y
+    7za x ./$zip_name -y
+
     beauty_name=''
     if [[ ${beauty_type} == '字节' ]]; then
         beauty_name="ByteEffectLib"
@@ -114,8 +112,10 @@ download_file () {
     fi
     echo ${file_name}
     echo ${beauty_name}
-    mv ${PWD}/${file_name} "${PWD}/iOS/${beauty_name}"
-    echo $(ls -l) "${PWD}/iOS/"
+    unzip_name=`ls -S -d */ | grep ${beauty_type}`
+    echo unzip_name: ${unzip_name}
+    mv ${WORKSPACE}/${unzip_name} "${PWD}/iOS/${beauty_name}"
+    echo $(ls -l) "${pwd}/iOS/"
 }
 
 if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
@@ -139,5 +139,5 @@ if [[ ! -z ${beauty_sources} && "${beauty_sources}" != 'none' ]]; then
 	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} ${beauty_type}
 fi
 
-./ci/build/build_ios_ipa.sh
+# ./ci/build/build_ios_ipa.sh
 
