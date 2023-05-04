@@ -101,7 +101,7 @@ class LiveDetailFragment : Fragment() {
     // 当前互动状态
     private var interactionInfo: ShowInteractionInfo? = null
     private var isPKCompetition: Boolean = false
-    private var deletedPKInvitation: ShowPKInvitation? = null
+//    private var deletedPKInvitation: ShowPKInvitation? = null
 
     private var mLinkInvitationCountDownLatch: CountDownTimer? = null
     private var mPKInvitationCountDownLatch: CountDownTimer? = null
@@ -1060,13 +1060,13 @@ class LiveDetailFragment : Fragment() {
             if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && info != null) {
                 // 开始互动
                 if (interactionInfo == null) {
-                    if (deletedPKInvitation != null) {
-                        mService.stopInteraction(mRoomInfo.roomId, info, {
-                            // success
-                        })
-                        deletedPKInvitation = null
-                        return@subscribeInteractionChanged
-                    }
+//                    if (deletedPKInvitation != null) {
+//                        mService.stopInteraction(mRoomInfo.roomId, info, {
+//                            // success
+//                        })
+//                        deletedPKInvitation = null
+//                        return@subscribeInteractionChanged
+//                    }
                     interactionInfo = info
                     // UI
                     updateVideoSetting(true)
@@ -1116,12 +1116,12 @@ class LiveDetailFragment : Fragment() {
                 // 被邀请者结束pk
                 val curUserId = UserManager.getInstance().user.id.toString()
                 if (info != null && (info.userId == curUserId || info.fromUserId == curUserId)) {
-                    deletedPKInvitation = info
+//                    deletedPKInvitation = info
                     if (interactionInfo != null) {
                         mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!, {
                             // success
                         })
-                        deletedPKInvitation = null
+//                        deletedPKInvitation = null
                     }
                 }
             }
