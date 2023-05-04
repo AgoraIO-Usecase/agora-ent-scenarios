@@ -102,7 +102,17 @@ download_file () {
     fi
     # 解压缩
     7za x "${file_name}" -y
-    mv ${file_name} "${PWD}/iOS/${file_name}"
+    beauty_name=''
+    if ${beauty_type} == '字节':
+        beauty_name="ByteEffectLib"
+
+    elif ${beauty_type} == '相芯':
+        beauty_name="FULib"
+
+    elif ${beauty_type} == '商汤':
+        beauty_name="SenseLib"
+
+    mv ${file_name} "${PWD}/iOS/${beauty_name}"
     echo $(ls -l) "${PWD}/iOS/"
 }
 
