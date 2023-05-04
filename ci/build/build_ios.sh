@@ -98,10 +98,10 @@ download_file () {
     url=$1
     file_name=`echo ${url} | awk -F '?' '{print $1}' | awk -F '/' '{print $NF}'`
     if [ ! -f ${file_name} ];then
-        curl -o "${PWD}/${file_name}" ${url} --progress-bar
+        curl -o "${WORKSPACE}/${file_name}" ${url} --progress-bar
     fi
     # 解压缩
-    7za x "${file_name}" -y
+    7za x "${WORKSPACE}/${file_name}" -y
     beauty_name=''
     if [[ ${beauty_type} == '字节' ]]; then
         beauty_name="ByteEffectLib"
@@ -114,7 +114,7 @@ download_file () {
     fi
     echo ${file_name}
     echo ${beauty_name}
-    mv ${PWD}/${file_name} "${PWD}/iOS/${beauty_name}"
+    mv ${WORKSPACE}/${file_name} "${PWD}/iOS/${beauty_name}"
     echo $(ls -l) "${PWD}/iOS/"
 }
 
