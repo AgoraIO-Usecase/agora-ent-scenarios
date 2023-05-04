@@ -99,7 +99,7 @@ download_file () {
     zip_name=${url##*/}
     curl -o "${WORKSPACE}/${zip_name}" ${url} --progress-bar
     # 解压缩
-    7za x ./$zip_name -y
+    7za x ${WORKSPACE}/$zip_name -y
 
     beauty_name=''
     if [[ ${beauty_type} == '字节' ]]; then
@@ -115,8 +115,8 @@ download_file () {
     echo ${beauty_name}
     unzip_name=`ls -S -d */ | grep ${beauty_type}`
     echo unzip_name: ${unzip_name}
-    mv ${WORKSPACE}/${unzip_name} "${pwd}/iOS/${beauty_name}"
-    echo $(ls -l) "${pwd}/iOS/"
+    mv ${WORKSPACE}/${unzip_name} "${PWD}/iOS/${beauty_name}"
+    echo $(ls -l) "${PWD}/iOS/"
 }
 
 if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
