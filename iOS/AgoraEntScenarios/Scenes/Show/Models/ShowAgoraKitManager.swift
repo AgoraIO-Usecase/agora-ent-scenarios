@@ -500,10 +500,8 @@ class ShowAgoraKitManager: NSObject {
 
 extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
     
-    func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
-//        print("aaa onCapture1 w:\(CVPixelBufferGetWidth(videoFrame.pixelBuffer!)) h:\(CVPixelBufferGetHeight(videoFrame.pixelBuffer!))")
+    func onCapture(_ videoFrame: AgoraOutputVideoFrame, sourceType: AgoraVideoSourceType) -> Bool {
         videoFrame.pixelBuffer = BeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
-//        print("aaa onCapture2 w:\(CVPixelBufferGetWidth(videoFrame.pixelBuffer!)) h:\(CVPixelBufferGetHeight(videoFrame.pixelBuffer!))")
         return true
     }
     
