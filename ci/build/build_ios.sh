@@ -96,7 +96,8 @@ PODFILE_PATH=${PWD}"/iOS/Podfile"
 
 download_file () {
     url=$1
-    python3 $WORKSPACE/artifactory_utils.py --action=download_file --file=$url
+    file_name=`echo ${url} | awk -F '?' '{print $1}' | awk -F '/' '{print $NF}'`
+    curl -o "${WORKSPACE}/${file_name}" ${url} --progress-bar
     # 解压缩
     7za x ./$zip_name -y
 
@@ -114,7 +115,7 @@ download_file () {
     echo ${beauty_name}
     unzip_name=`ls -S -d */ | grep ${beauty_type}`
     echo unzip_name: ${unzip_name}
-    mv ${WORKSPACE}/${unzip_name} "${PWD}/iOS/${beauty_name}"
+    mv ${WORKSPACE}/${unzip_name} "${pwd}/iOS/${beauty_name}"
     echo $(ls -l) "${pwd}/iOS/"
 }
 
