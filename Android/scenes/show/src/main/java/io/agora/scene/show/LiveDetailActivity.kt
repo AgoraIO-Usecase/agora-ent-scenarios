@@ -1,5 +1,6 @@
 package io.agora.scene.show
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -18,6 +19,7 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
 import io.agora.scene.show.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.show.service.ShowRoomDetailModel
+import io.agora.scene.show.utils.RunnableWithDenied
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 
@@ -68,7 +70,7 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
     private val vpFragments = SparseArray<LiveDetailFragment>()
     private var currLoadPosition = POSITION_NONE
 
-    private var toggleVideoRun: Runnable? = null
+    private var toggleVideoRun: RunnableWithDenied? = null
     private var toggleAudioRun: Runnable? = null
 
     override fun getPermissions() {
@@ -82,14 +84,21 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         }
     }
 
-    fun toggleSelfVideo(isOpen: Boolean, callback : () -> Unit) {
+
+    fun toggleSelfVideo(isOpen: Boolean, callback : (result:Boolean) -> Unit) {
         if (isOpen) {
-            toggleVideoRun = Runnable {
-                callback.invoke()
+            toggleVideoRun = object :RunnableWithDenied(){
+                override fun onDenied() {
+                    callback.invoke(false)
+                }
+
+                override fun run() {
+                    callback.invoke(true)
+                }
             }
             requestCameraPermission(true)
         } else {
-            callback.invoke()
+            callback.invoke(true)
         }
     }
 
@@ -104,6 +113,9 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         }
     }
     override fun onPermissionDined(permission: String?) {
+        if (toggleVideoRun != null && permission == Manifest.permission.CAMERA) {
+            toggleVideoRun?.onDenied()
+        }
         PermissionLeakDialog(this).show(permission, { getPermissions() }
         ) { launchAppSetting(permission) }
     }

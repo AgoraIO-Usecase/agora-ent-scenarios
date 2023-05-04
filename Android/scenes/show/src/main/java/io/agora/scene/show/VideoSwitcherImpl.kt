@@ -343,6 +343,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         if(!loopbackOnly){
             val mediaOptions = connectionWrap.mediaOptions
             mediaOptions.publishMediaPlayerId = mediaPlayer.mediaPlayerId
+            // TODO: 没开启麦克风权限情况下，publishMediaPlayerAudioTrack = true 会自动停止音频播放
             mediaOptions.publishMediaPlayerAudioTrack = true
             rtcEngine.updateChannelMediaOptionsEx(mediaOptions, connectionWrap)
         }

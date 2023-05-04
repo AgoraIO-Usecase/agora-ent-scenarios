@@ -1595,32 +1595,33 @@ class LiveDetailFragment : Fragment() {
                 channelMediaOptions.autoSubscribeVideo = true
                 channelMediaOptions.autoSubscribeAudio = true
                 channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-                checkRequirePerms(
-                    denied = {
-                        mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!)
-                    },
-                    granted = {
-                        mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
-                        activity?.let {
+                if (activity is LiveDetailActivity){
+                    (activity as LiveDetailActivity).toggleSelfVideo(true, callback = {
+                        if (it){
+                            // 有权限
+                            mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
+                            val context = activity ?: return@toggleSelfVideo
                             mRtcVideoSwitcher.setupRemoteVideo(
                                 rtcConnection,
                                 VideoSwitcher.VideoCanvasContainer(
-                                    it,
+                                    context,
                                     mBinding.videoLinkingLayout.videoContainer,
                                     mRoomInfo.ownerId.toInt()
                                 )
                             )
                             mRtcVideoSwitcher.setupLocalVideo(
                                 VideoSwitcher.VideoCanvasContainer(
-                                    it,
+                                    context,
                                     mBinding.videoLinkingAudienceLayout.videoContainer,
                                     0
                                 )
                             )
+                        }else{
+                            // 没有权限
+                            mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!)
                         }
-
-
                     })
+                }
             } else {
                 // 其他观众视角
                 activity?.let {
@@ -1759,17 +1760,6 @@ class LiveDetailFragment : Fragment() {
                     )
                 )
             }
-        }
-    }
-
-    private fun checkRequirePerms(
-        force: Boolean = false,
-        denied: (() -> Unit)? = null,
-        granted: () -> Unit
-    ) {
-        if (!isRoomOwner && !isMeLinking()) {
-            granted.invoke()
-            return
         }
     }
 
