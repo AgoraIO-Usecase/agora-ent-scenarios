@@ -95,10 +95,9 @@ PODFILE_PATH=${PWD}"/iOS/Podfile"
 
 download_file () {
     url=$1
-    agent="Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.47 Safari/536.11Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.47 Safari/536.11"
     file_name=`echo ${url} | awk -F '?' '{print $1}' | awk -F '/' '{print $NF}'`
     if [ ! -f ${file_name} ];then
-        curl ${url} -A "${agent}" -o ${WORKSPACE}/${file_name} --progress-bar
+        curl -o ${WORKSPACE}/${file_name} ${url} --progress-bar
     fi
     # 解压缩
     7za x "${file_name}" -y
