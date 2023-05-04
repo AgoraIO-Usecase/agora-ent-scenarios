@@ -99,7 +99,7 @@ download_file () {
     file_name=`echo ${url} | awk -F '?' '{print $1}' | awk -F '/' '{print $NF}'`
     curl -o "${WORKSPACE}/${file_name}" ${url} --progress-bar
     # 解压缩
-    7za x ./$zip_name -y
+    7za x ./$file_name -y
 
     beauty_name=''
     if [[ ${beauty_type} == '字节' ]]; then
