@@ -111,7 +111,7 @@ download_file () {
     elif [[ ${beauty_type} == '商汤' ]]; then
         beauty_name="SenseLib"
     fi
-    echo ${file_name}
+    echo ${zip_name}
     echo ${beauty_name}
     unzip_name=`ls -S -d */ | grep ${beauty_type}`
     echo unzip_name: ${unzip_name}
