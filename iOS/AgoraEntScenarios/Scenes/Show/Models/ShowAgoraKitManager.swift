@@ -63,6 +63,7 @@ class ShowAgoraKitManager: NSObject {
     var exposureRangeY: Int?
     var matrixCoefficientsExt: Int?
     var videoFullrangeExt: Int?
+    var isFrontCamera = true
     
     //[ex channelId: connection]
     private var exConnectionMap: [String: AgoraRtcConnection] = [:]
@@ -90,8 +91,6 @@ class ShowAgoraKitManager: NSObject {
     
     private lazy var canvas: AgoraRtcVideoCanvas = {
         let canvas = AgoraRtcVideoCanvas()
-        canvas.renderMode = .hidden
-        canvas.mirrorMode = .disabled
         return canvas
     }()
     
@@ -267,12 +266,21 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.enableVideo()
         agoraKit.startPreview()
         // 设置镜像
-//        agoraKit.setLocalRenderMode(.hidden, mirror: .enabled)
+        updateRenderMirrorMode()
     }
     
     /// 切换摄像头
-    func switchCamera() {
+    func switchCamera(_ channelId: String? = nil) {
+        isFrontCamera = !isFrontCamera
         agoraKit.switchCamera()
+        updateRenderMirrorMode(channelId)
+    }
+    
+    func updateRenderMirrorMode(_ channelId:String? = nil){
+        agoraKit.setLocalRenderMode(.hidden, mirror: isFrontCamera ? .disabled : .enabled)
+        guard let channelId = channelId else { return }
+        videoEncoderConfig.mirrorMode = isFrontCamera ? .disabled : .enabled
+        updateVideoEncoderConfigurationForConnenction(currentChannelId: channelId)
     }
     
     /// 开启虚化背景
@@ -434,6 +442,7 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.enableVideo()
         agoraKit.setupLocalVideo(canvas)
         agoraKit.startPreview()
+        updateRenderMirrorMode()
         showLogger.info("setupLocalVideo target uid:\(uid), user uid\(UserInfo.userId)", context: kShowLogBaseContext)
     }
     

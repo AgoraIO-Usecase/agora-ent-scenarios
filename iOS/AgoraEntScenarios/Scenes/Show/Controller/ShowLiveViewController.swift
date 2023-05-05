@@ -1155,7 +1155,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     }
     
     func onClickSwitchCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-        agoraKitManager.switchCamera()
+        agoraKitManager.switchCamera(self.roomId)
     }
     
     func onClickSettingButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
