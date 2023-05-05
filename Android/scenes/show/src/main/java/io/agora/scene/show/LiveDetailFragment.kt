@@ -299,7 +299,7 @@ class LiveDetailFragment : Fragment() {
 
     private fun initBottomLayout() {
         val bottomLayout = mBinding.bottomLayout
-        bottomLayout.tvChat.setOnClickListener {
+        bottomLayout.layoutChat.setOnClickListener {
             showMessageInputDialog()
         }
         bottomLayout.ivSetting.setOnClickListener {

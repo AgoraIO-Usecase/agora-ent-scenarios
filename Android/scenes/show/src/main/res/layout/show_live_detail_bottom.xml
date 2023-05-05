@@ -4,17 +4,26 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     xmlns:tools="http://schemas.android.com/tools"
+    android:gravity="center_vertical"
     tools:background="@color/grey_5B">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvChat"
-        android:layout_width="85dp"
-        android:layout_height="38dp"
-        android:textColor="@color/white_80_percent"
-        android:textSize="12sp"
-        android:text="@string/show_live_bottom_chat"
-        android:gravity="center"
-        android:background="@drawable/show_live_detail_bottom_chat_bg"/>
+    <FrameLayout
+        android:id="@+id/layoutChat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="15dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvChat"
+            android:layout_width="85dp"
+            android:layout_height="38dp"
+            android:textColor="@color/white_80_percent"
+            android:textSize="12sp"
+            android:text="@string/show_live_bottom_chat"
+            android:gravity="center"
+            android:background="@drawable/show_live_detail_bottom_chat_bg"/>
+    </FrameLayout>
+
 
     <HorizontalScrollView
         android:layout_width="0dp"
@@ -32,6 +41,7 @@
                 android:id="@+id/flPK"
                 android:layout_width="wrap_content"
                 android:visibility="gone"
+                tools:visibility="visible"
                 android:layout_height="wrap_content">
 
                 <ImageView
@@ -61,6 +71,7 @@
                 android:id="@+id/flLinking"
                 android:layout_width="wrap_content"
                 android:visibility="gone"
+                tools:visibility="visible"
                 android:layout_height="wrap_content">
 
                 <ImageView
@@ -97,6 +108,7 @@
                 android:layout_marginStart="5dp"
                 android:scaleType="fitXY"
                 android:visibility="gone"
+                tools:visibility="visible"
                 android:background="@drawable/show_live_detail_bottom_btn_bg" />
 
 
@@ -109,6 +121,7 @@
                 android:visibility="gone"
                 android:layout_marginStart="5dp"
                 android:scaleType="fitXY"
+                tools:visibility="visible"
                 android:background="@drawable/show_live_detail_bottom_btn_bg" />
 
 
@@ -118,8 +131,10 @@
                 android:layout_height="38dp"
                 android:src="@mipmap/show_live_bottom_ic_setting"
                 android:padding="8dp"
+                tools:visibility="visible"
                 android:layout_marginStart="5dp"
                 android:scaleType="fitXY"
+                android:layout_marginEnd="15dp"
                 android:background="@drawable/show_live_detail_bottom_btn_bg" />
 
 
