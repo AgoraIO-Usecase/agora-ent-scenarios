@@ -115,7 +115,9 @@ download_file () {
     echo unzip_name: ${unzip_name}
     echo PWD: ${PWD}
 
-    unzip ${WORKSPACE}/$zip_name -d "${PWD}/iOS/${beauty_name}"
+    unzip ${WORKSPACE}/$zip_name
+
+    mv ${WORKSPACE}/${unzip_name} ${PWD}/iOS/${beauty_name}
 
     echo $(ls -l) "${PWD}/iOS/"
 }
