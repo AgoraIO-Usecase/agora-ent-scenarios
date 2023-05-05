@@ -113,11 +113,9 @@ download_file () {
     echo ${beauty_name}
     echo PWD: ${PWD}
 
-    unzip ${WORKSPACE}/$zip_name -d ${WORKSPACE}
+    unzip ${WORKSPACE}/$zip_name -d ${PWD}/iOS/
 
-    mv ${WORKSPACE}/__MACOSX/${beauty_name} ${PWD}/iOS/
-
-    echo $(ls -l) "${PWD}/iOS/"
+    # mv ${WORKSPACE}/${beauty_name} ${PWD}/iOS/
 }
 
 if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
