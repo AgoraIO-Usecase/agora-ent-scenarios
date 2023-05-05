@@ -113,6 +113,7 @@ download_file () {
     echo ${beauty_name}
     unzip_name=${zip_name/%.zip/''}
     echo unzip_name: ${unzip_name}
+    echo PWD: ${PWD}
 
     unzip ${WORKSPACE}/$zip_name -d "${PWD}/iOS/${beauty_name}"
 
