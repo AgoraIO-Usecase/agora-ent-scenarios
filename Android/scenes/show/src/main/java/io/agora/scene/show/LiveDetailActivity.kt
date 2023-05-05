@@ -7,7 +7,10 @@ import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
 import android.view.LayoutInflater
+import android.view.View
 import android.view.WindowManager
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -132,6 +135,11 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, false)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.viewPager2) { v: View?, insets: WindowInsetsCompat ->
+            val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            binding.viewPager2.setPaddingRelative(inset.left, 0, inset.right, inset.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val selectedRoomIndex = intent.getIntExtra(EXTRA_ROOM_DETAIL_INFO_LIST_SELECTED_INDEX, 0)
