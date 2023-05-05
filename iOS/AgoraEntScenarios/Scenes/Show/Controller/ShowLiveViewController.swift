@@ -758,6 +758,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             AlertManager.hiddenView()
             if role == .broadcaster {
                 self.delegate?.currentUserIsOnSeat()
+                // 创建默认美颜效果
+                ShowBeautyFaceVC.beautyData.forEach({
+                    BeautyManager.shareManager.setBeauty(path: $0.path,
+                                                             key: $0.key,
+                                                             value: $0.value)
+                })
             }
         default:
             break
