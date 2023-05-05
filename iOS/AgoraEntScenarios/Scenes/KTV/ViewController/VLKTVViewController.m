@@ -269,6 +269,9 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         [weakSelf _checkInEarMonitoring];
         
         if (KTVSubscribeDeleted == status) {
+            if(weakSelf.singRole == KTVSingRoleCoSinger){
+                [weakSelf showScoreViewWithScore:[weakSelf.lrcControl getAvgScore]];
+            }
             BOOL success = [weakSelf removeSelSongWithSongNo:[songInfo.songNo integerValue] sync:NO];
             if (!success) {
                 weakSelf.selSongsArray = songArray;
