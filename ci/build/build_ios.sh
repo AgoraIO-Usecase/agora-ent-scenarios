@@ -113,10 +113,10 @@ download_file () {
     fi
     echo ${zip_name}
     echo ${beauty_name}
-    unzip_name=`ls -S -d */ | grep ${beauty_type}`
+    unzip_name=`ls -S -d */ | grep ${beauty_name}`
     echo unzip_name: ${unzip_name}
-    # mv ${WORKSPACE}/${unzip_name} "${PWD}/iOS/${beauty_name}"
-    # echo $(ls -l) "${PWD}/iOS/"
+    mv ${WORKSPACE}/${unzip_name} "${PWD}/iOS/${beauty_name}"
+    echo $(ls -l) "${PWD}/iOS/"
 }
 
 if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
