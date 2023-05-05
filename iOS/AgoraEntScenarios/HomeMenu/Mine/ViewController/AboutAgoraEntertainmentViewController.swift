@@ -19,7 +19,7 @@ import AgoraRtcKit
                  ["contents": [["title": "语聊房", "detail":"YL-2.1.0"],
                                ["title":"语聊房-空间音频模式", "detail":"YLKJ-2.1.0"],
                                ["title":"在线K歌","detail":"KTV-2.3.0"],
-                               ["title": "秀场", "detail":"ZB-2.4.0"]],
+                               ["title": "秀场直播", "detail":"ZB-2.4.0"]],
                   "sectionName": NSLocalizedString("SceneVersion", comment: "")]]
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220),
