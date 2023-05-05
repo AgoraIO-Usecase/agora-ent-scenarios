@@ -27,8 +27,8 @@ public final class SACreateRoomViewController: SABaseViewController {
             Throttler.throttle(queue:.main,delay: 1,shouldRunLatest: true) {
                 self.goLive()
             }
-
         }
+        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
     }
     
     deinit {

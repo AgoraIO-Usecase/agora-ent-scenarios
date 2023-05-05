@@ -191,12 +191,16 @@ extension ShowToolMenuView: AGECollectionViewDelegate {
               let model = self.collectionView.dataArray?[indexPath.item] as? ShowToolMenuModel else { return }
         let isSelected = cell.updateButtonState()
         if model.type == .mic && isSelected, let controller = UIViewController.cl_topViewController() {
-            cell.updateButtonState()
-            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: controller)
+            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: controller) { granted in
+                guard granted else { return }
+                cell.updateButtonState()
+            }
             return
         } else if model.type == .camera && isSelected, let controller = UIViewController.cl_topViewController() {
-            cell.updateButtonState()
-            AgoraEntAuthorizedManager.checkCameraAuthorized(parent: controller)
+            AgoraEntAuthorizedManager.checkCameraAuthorized(parent: controller) { granted in
+                guard granted else { return }
+                cell.updateButtonState()
+            }
             return
         }
         onTapItemClosure?(model.type, isSelected)

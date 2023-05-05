@@ -105,7 +105,7 @@ class SARoomViewController: SABaseViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(updateMicInfo), name: Notification.Name("updateMicInfo"), object: nil)
         
         if isOwner {
-            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
+            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         }
     }
 
@@ -336,7 +336,10 @@ extension SARoomViewController {
                             }
                         }
                     } else {
-                        userApplyAlert(tag - 200)
+                        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self) { granted in
+                            guard granted else { return }
+                            self.userApplyAlert(tag - 200)
+                        }
                     }
                 }
             }
@@ -477,9 +480,17 @@ extension SARoomViewController {
             guard let self = self else { return }
             switch $0 {
             case .eq: self.showEQView()
-            case .mic: self.changeMicState()
+            case .mic:
+                AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self) { granted in
+                    guard granted else { return }
+                    self.changeMicState()
+                }
             case .gift: self.showGiftAlert()
-            case .handsUp: self.changeHandsUpState()
+            case .handsUp:
+                AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self) { granted in
+                    guard granted else { return }
+                    self.changeHandsUpState()
+                }
             default: break
             }
         }

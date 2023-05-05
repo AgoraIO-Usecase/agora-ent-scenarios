@@ -96,7 +96,7 @@ class VoiceRoomViewController: VRBaseViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(updateMicInfo), name: Notification.Name("updateMicInfo"), object: nil)
         
         if isOwner {
-            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
+            checkAudioAuthorized()
         }
     }
     
@@ -410,7 +410,10 @@ extension VoiceRoomViewController {
                             self.changeMic(from: self.local_index!, to: tag - 200)
                         }
                     } else {
-                        userApplyAlert(tag - 200)
+                        checkAudioAuthorized { granted in
+                            guard granted else { return }
+                            self.userApplyAlert(tag - 200)
+                        }
                     }
                 }
             }
@@ -567,9 +570,17 @@ extension VoiceRoomViewController {
             guard let self = self else { return }
             switch $0 {
             case .eq: self.showEQView()
-            case .mic: self.changeMicState()
+            case .mic:
+                checkAudioAuthorized { granted in
+                    guard granted else { return }
+                    self.changeMicState()
+                }
             case .gift: self.showGiftAlert()
-            case .handsUp: self.changeHandsUpState()
+            case .handsUp:
+                checkAudioAuthorized { granted in
+                    guard granted else { return }
+                    self.changeHandsUpState()
+                }
             default: break
             }
         }
@@ -716,7 +727,7 @@ extension VoiceRoomViewController {
         checkAudioAuthorized()
     }
     
-    func checkAudioAuthorized() {
-        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
+    func checkAudioAuthorized(completion: ((Bool) -> Void)? = nil) {
+        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: completion)
     }
 }
