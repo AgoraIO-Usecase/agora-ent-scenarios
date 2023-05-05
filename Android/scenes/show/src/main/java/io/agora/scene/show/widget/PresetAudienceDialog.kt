@@ -7,7 +7,7 @@ import io.agora.scene.show.R
 import io.agora.scene.show.VideoSetting
 import io.agora.scene.show.databinding.ShowSettingPresetAudienceDialogBinding
 
-class PresetAudienceDialog(context: Context, showCloseBtn: Boolean = true) : BottomFullDialog(context) {
+class PresetAudienceDialog constructor(context: Context, showCloseBtn: Boolean = true) : BottomFullDialog(context) {
 
     var callBack: OnPresetAudienceDialogCallBack? = null
     private val mBinding by lazy {
