@@ -32,7 +32,7 @@ class ShowSettingSliderCell: ShowSettingBaseCell {
         slider.minimumTrackTintColor = .show_zi03
         slider.maximumTrackTintColor = .show_Ellipse2
         slider.addTarget(self, action: #selector(sliderValueDidChanged), for: .valueChanged)
-        slider.addTarget(self, action: #selector(sliderDidTouchUp), for: [.touchUpInside, .touchUpOutside, .touchDragExit])
+        slider.addTarget(self, action: #selector(sliderDidTouchUp), for: [.touchUpInside, .touchUpOutside])
         return slider
     }()
     
