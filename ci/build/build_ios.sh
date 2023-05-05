@@ -113,7 +113,7 @@ download_file () {
     echo ${beauty_name}
     echo PWD: ${PWD}
 
-    unzip ${WORKSPACE}/$zip_name
+    unzip ${WORKSPACE}/$zip_name -d ${WORKSPACE}
 
     mv ${WORKSPACE}/${beauty_name} ${PWD}/iOS/
 
