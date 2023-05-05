@@ -29,7 +29,9 @@ import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.ContentInspectConfig
-import io.agora.rtc2.video.ContentInspectConfig.*
+import io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION
+import io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE
+import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
@@ -40,8 +42,23 @@ import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
 import io.agora.scene.show.databinding.ShowLivingEndDialogBinding
 import io.agora.scene.show.debugSettings.DebugAudienceSettingDialog
 import io.agora.scene.show.debugSettings.DebugSettingDialog
-import io.agora.scene.show.service.*
-import io.agora.scene.show.widget.*
+import io.agora.scene.show.service.ROOM_AVAILABLE_DURATION
+import io.agora.scene.show.service.RoomException
+import io.agora.scene.show.service.ShowInteractionInfo
+import io.agora.scene.show.service.ShowInteractionStatus
+import io.agora.scene.show.service.ShowMessage
+import io.agora.scene.show.service.ShowMicSeatApply
+import io.agora.scene.show.service.ShowRoomDetailModel
+import io.agora.scene.show.service.ShowRoomRequestStatus
+import io.agora.scene.show.service.ShowServiceProtocol
+import io.agora.scene.show.service.ShowUser
+import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
+import io.agora.scene.show.widget.AdvanceSettingDialog
+import io.agora.scene.show.widget.BeautyDialog
+import io.agora.scene.show.widget.MusicEffectDialog
+import io.agora.scene.show.widget.PictureQualityDialog
+import io.agora.scene.show.widget.SettingDialog
+import io.agora.scene.show.widget.TextInputDialog
 import io.agora.scene.show.widget.link.LiveLinkAudienceSettingsDialog
 import io.agora.scene.show.widget.link.LiveLinkDialog
 import io.agora.scene.show.widget.link.OnLinkDialogActionListener
@@ -55,7 +72,8 @@ import io.agora.scene.widget.dialog.TopFunctionDialog
 import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.TimeZone
 
 
 class LiveDetailFragment : Fragment() {

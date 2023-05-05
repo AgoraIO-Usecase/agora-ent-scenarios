@@ -34,6 +34,7 @@ public class WebViewActivity extends BaseViewBindingActivity<AppActivityWebviewB
 
     @Override
     public void initView(@Nullable Bundle savedInstanceState) {
+        setOnApplyWindowInsetsListener(getBinding().superLayout);
         ARouter.getInstance().inject(this);
         if (url.contains("user_agreement")) {
             getBinding().titleView.setTitle(getString(R.string.app_user_agreement));

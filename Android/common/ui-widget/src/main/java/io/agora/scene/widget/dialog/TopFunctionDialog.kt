@@ -29,7 +29,7 @@ class TopFunctionDialog constructor(context: Context) : BaseDialog<DialogTopFunc
             window?.let { window ->
                 window.setBackgroundDrawableResource(android.R.color.transparent)
                 window.setDimAmount(0f)
-                window.decorView.setPadding(0, 0, 0, 0)
+                window.decorView.setPaddingRelative(0, 0, 0, 0)
                 window.decorView.fitsSystemWindows = true
                 window.attributes.apply {
                     val lp = WindowManager.LayoutParams()
