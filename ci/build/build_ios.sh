@@ -98,20 +98,7 @@ download_file () {
     url=$1
     zip_name=${url##*/}
     curl -o "${WORKSPACE}/${zip_name}" ${url} --progress-bar
-
-    beauty_name=''
-    if [[ ${beauty_type} == '字节' ]]; then
-        beauty_name="ByteEffectLib"
-
-    elif [[ ${beauty_type} == '相芯' ]]; then
-        beauty_name="FULib"
-
-    elif [[ ${beauty_type} == '商汤' ]]; then
-        beauty_name="SenseLib"
-    fi
     echo ${zip_name}
-    echo ${beauty_name}
-    echo PWD: ${PWD}
 
     unzip ${WORKSPACE}/$zip_name -d ${PWD}/iOS/
 
