@@ -18,17 +18,45 @@ open class AgoraEntAuthorizedManager: NSObject {
         showAuthorizedFail(parent: parent, message: "摄像头权限未设置,请设置摄像头权限")
     }
     
-    @objc class func checkAudioAuthorized(parent: UIViewController) {
+    @objc class func checkMediaAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
+        var isPermission: Bool = true
+        let group = DispatchGroup()
+        group.enter()
         requestAudioSession { granted in
-            if granted {return}
-            showAudioAuthorizedFail(parent: parent)
+            if !granted {
+                showAudioAuthorizedFail(parent: parent)
+            }
+            isPermission = granted
+            group.leave()
+        }
+        group.enter()
+        requestCapture { granted in
+            if !granted {
+                showCameraAuthorizedFail(parent: parent)
+            }
+            isPermission = granted
+            group.leave()
+        }
+        group.notify(queue: .main) {
+            completion?(isPermission)
         }
     }
     
-    @objc class func checkCameraAuthorized(parent: UIViewController) {
+    @objc class func checkAudioAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
+        requestAudioSession { granted in
+            if !granted {
+                showAudioAuthorizedFail(parent: parent)
+            }
+            completion?(granted)
+        }
+    }
+    
+    @objc class func checkCameraAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
         requestCapture { granted in
-            if granted {return}
-            showCameraAuthorizedFail(parent: parent)
+            if !granted {
+                showCameraAuthorizedFail(parent: parent)
+            }
+            completion?(granted)
         }
     }
     

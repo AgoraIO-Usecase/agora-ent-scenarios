@@ -253,7 +253,7 @@ extension VoiceRoomViewController {
 
     func changeMicState() {
         if chatBar.micState {
-            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
+            checkAudioAuthorized()
         }
         guard let idx = local_index else {
             view.makeToast("you have no wheat slots!".localized(), point: view.center, title: nil, image: nil, completion: nil)
@@ -351,7 +351,8 @@ extension VoiceRoomViewController {
         applyAlert.actionEvents = { [weak self] in
             guard let `self` = self else { return }
             if $0 == 31 {
-               self.requestSpeak(index: index)
+                self.checkAudioAuthorized()
+                self.requestSpeak(index: index)
             }
             vc.dismiss(animated: true)
         }

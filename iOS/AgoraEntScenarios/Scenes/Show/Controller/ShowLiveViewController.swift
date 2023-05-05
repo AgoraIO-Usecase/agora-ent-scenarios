@@ -249,8 +249,8 @@ class ShowLiveViewController: UIViewController {
             }
             self._subscribeServiceEvent()
             UIApplication.shared.isIdleTimerDisabled = true
-            AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
-            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
+            AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self)
+            
         } else {
             AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
                 guard let self = self else { return }
@@ -1024,8 +1024,11 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
             AlertManager.show(view: applyAndInviteView, alertPostion: .bottom)
             
         } else {
-            applyView.getAllMicSeatList(autoApply: role == .audience)
-            AlertManager.show(view: applyView, alertPostion: .bottom)
+            AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self) { granted in
+                guard granted else { return }
+                self.applyView.getAllMicSeatList(autoApply: self.role == .audience)
+                AlertManager.show(view: self.applyView, alertPostion: .bottom)
+            }
         }
     }
     
@@ -1097,11 +1100,14 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
 //        let option = self.channelOptions
 //        option.publishCameraTrack = !selected
 //        agoraKitManager.agoraKit.updateChannel(with: option)
-        self.muteLocalVideo = selected
-        if selected {
-            agoraKitManager.agoraKit.stopPreview()
-        } else {
-            agoraKitManager.agoraKit.startPreview()
+        AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self) { granted in
+            guard granted else { return }
+            self.muteLocalVideo = selected
+            if selected {
+                self.agoraKitManager.agoraKit.stopPreview()
+            } else {
+                self.agoraKitManager.agoraKit.startPreview()
+            }
         }
     }
     
@@ -1142,10 +1148,13 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
 //        if info.userId == VLUserCenter.user.id {
 //            agoraKitManager.agoraKit.updateChannel(with: options)
 //        }
-        let uid = menu.type == .managerMic ? currentInteraction?.userId ?? "" : VLUserCenter.user.id
-        AppContext.showServiceImp(roomId).muteAudio(mute: selected, userId: uid) { err in
+        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self) { granted in
+            guard granted else { return }
+            let uid = menu.type == .managerMic ? self.currentInteraction?.userId ?? "" : VLUserCenter.user.id
+            AppContext.showServiceImp(self.roomId).muteAudio(mute: selected, userId: uid) { err in
+            }
+            self.muteLocalAudio = selected
         }
-        self.muteLocalAudio = selected
     }
     
     // 静音
@@ -1167,7 +1176,10 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     }
     
     func onClickSwitchCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-        agoraKitManager.switchCamera()
+        AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self) { granted in
+            guard granted else { return }
+            self.agoraKitManager.switchCamera()
+        }
     }
     
     func onClickSettingButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
