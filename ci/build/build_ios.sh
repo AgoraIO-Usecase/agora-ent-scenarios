@@ -98,8 +98,6 @@ download_file () {
     url=$1
     zip_name=${url##*/}
     curl -o "${WORKSPACE}/${zip_name}" ${url} --progress-bar
-    # 解压缩
-    7za x ${WORKSPACE}/$zip_name -y
 
     beauty_name=''
     if [[ ${beauty_type} == '字节' ]]; then
@@ -115,7 +113,9 @@ download_file () {
     echo ${beauty_name}
     unzip_name=${zip_name/%.zip/''}
     echo unzip_name: ${unzip_name}
-    mv ${WORKSPACE}/${unzip_name} "${PWD}/iOS/${beauty_name}"
+
+    unzip ${WORKSPACE}/$zip_name -d "${PWD}/iOS/${beauty_name}"
+
     echo $(ls -l) "${PWD}/iOS/"
 }
 
