@@ -113,7 +113,7 @@ download_file () {
     fi
     echo ${zip_name}
     echo ${beauty_name}
-    unzip_name=${beauty_name/%.zip/''}
+    unzip_name=${zip_name/%.zip/''}
     echo unzip_name: ${unzip_name}
     mv ${WORKSPACE}/${unzip_name} "${PWD}/iOS/${beauty_name}"
     echo $(ls -l) "${PWD}/iOS/"
@@ -140,5 +140,5 @@ if [[ ! -z ${beauty_sources} && "${beauty_sources}" != 'none' ]]; then
 	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} ${beauty_type}
 fi
 
-# ./ci/build/build_ios_ipa.sh
+./ci/build/build_ios_ipa.sh
 
