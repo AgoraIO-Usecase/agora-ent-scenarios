@@ -20,6 +20,7 @@ class ShowVideoSettingVC: UIViewController {
     var isOutside = true // 频道外
     var dataArray = [ShowSettingKey]()
     var settingManager: ShowAgoraKitManager!
+    var musicManager: ShowMusicManager!
     var willChangeSettingParams: ((_ key: ShowSettingKey, _ value: Any)->Bool)?
     var currentChannelId: String?
     
@@ -126,7 +127,11 @@ extension ShowVideoSettingVC {
     func changeValue(_ value: Any, forSettingKey key: ShowSettingKey) {
         if let willChange = willChangeSettingParams, willChange(key,value) == true {
             key.writeValue(value)
-            settingManager.updateSettingForkey(key, currentChannelId: currentChannelId)
+            if key == .musincVolume {
+                musicManager.setMusicVolume(value as! Float)
+            }else{
+                settingManager.updateSettingForkey(key, currentChannelId: currentChannelId)
+            }
         }
         tableView.reloadData()
     }

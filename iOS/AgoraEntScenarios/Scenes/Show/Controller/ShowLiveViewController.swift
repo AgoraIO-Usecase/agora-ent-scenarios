@@ -1172,6 +1172,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
                 vc.mode = wSelf.interactionStatus == .pking ? .pk : .single // 根据当前模式设置
                 vc.isBroadcaster = wSelf.role == .broadcaster
                 vc.settingManager = wSelf.agoraKitManager
+                vc.musicManager = wSelf.musicManager
                 vc.audiencePresetType = wSelf.audiencePresetType
                 vc.currentChannelId = wSelf.currentChannelId
                 wSelf.navigationController?.pushViewController(vc, animated: true)
