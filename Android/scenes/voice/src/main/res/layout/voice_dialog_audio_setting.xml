@@ -397,7 +397,6 @@
             android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
             app:layout_constraintBottom_toBottomOf="@+id/mtSpatialAudio"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/mtSpatialAudio"
-            tools:text="@string/voice_chatroom_off" />
+            app:layout_constraintTop_toTopOf="@+id/mtSpatialAudio" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
