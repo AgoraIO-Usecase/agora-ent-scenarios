@@ -1283,7 +1283,6 @@ class LiveDetailFragment : Fragment() {
                             downBitrate = stats.receivedBitrate,
                             receiveFPS = stats.decoderOutputFrameRate,
                             downLossPackage = stats.packetLossRate,
-                            downDelay = stats.delay,
                             receiveVideoSize = Size(stats.width, stats.height)
                         )
                     }
@@ -1297,6 +1296,7 @@ class LiveDetailFragment : Fragment() {
                         refreshStatisticInfo(
                             audioBitrate = stats.receivedBitrate,
                             audioLossPackage = stats.audioLossRate,
+                            downDelay = stats.networkTransportDelay,
                         )
                     }
                 }
