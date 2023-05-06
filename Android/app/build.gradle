@@ -24,6 +24,9 @@ dependencies {
     if (isProjectLibrary(':scenes:ktv')) {
         runtimeOnly project(':scenes:ktv')
     }
+    if (isProjectLibrary(':scenes:ktv_grasp')) {
+        runtimeOnly project(':scenes:ktv_grasp')
+    }
     if (isProjectLibrary(':scenes:voice')) {
         runtimeOnly project(':scenes:voice')
     }
