@@ -25,10 +25,10 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     func onRobotUpdate(robotInfo: SARobotAudioInfo) {
         roomInfo?.robotInfo = robotInfo
         rtckit.updatePlayerVolume(value: Double(robotInfo.robot_volume))
-        guard roomInfo?.mic_info != nil else { return }
+        guard let mic_info = roomInfo?.mic_info, mic_info.isEmpty == false else { return }
         //update user robot
-        guard let red_mic: SARoomMic = roomInfo?.mic_info![6] else { return }
-        guard let blue_mic: SARoomMic = roomInfo?.mic_info![3] else { return }
+        let red_mic: SARoomMic = mic_info[6]
+        let blue_mic: SARoomMic = mic_info[3]
 
         red_mic.status = robotInfo.use_robot ? 5 : -2
         blue_mic.status = robotInfo.use_robot ? 5 : -2
