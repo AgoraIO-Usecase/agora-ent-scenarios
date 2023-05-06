@@ -10,7 +10,9 @@ import UIKit
 @objc public class AUiMoreDialog: UIView {
     private lazy var contentView: UIView = {
         let view = UIView()
-        view.backgroundColor = .black
+        view.backgroundColor = UIColor(hex: "#000000", alpha: 0.85)
+        view.layer.cornerRadius = 15
+        view.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         view.frame = CGRect(origin: .zero, size: CGSize(width: self.frame.size.width, height: 152))
         return view
     }()
