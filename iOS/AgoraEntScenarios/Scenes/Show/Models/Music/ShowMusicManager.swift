@@ -158,6 +158,11 @@ extension ShowMusicManager {
     func setMixIndex(_ index: Int?){
         agoraKit.setAudioEffectPreset(mixPresets[index ?? 0])
     }
+    
+    func setMusicVolume(_ volume: Float) {
+        player?.adjustPlayoutVolume(Int32(volume))
+        player?.adjustPublishSignalVolume(Int32(volume))
+    }
 
 }
 
@@ -174,6 +179,7 @@ extension ShowMusicManager {
         let source = AgoraMediaSource()
         source.url = musicPath
         player?.open(with: source)
+        setMusicVolume(ShowSettingKey.musincVolume.floatValue)
     }
 }
 

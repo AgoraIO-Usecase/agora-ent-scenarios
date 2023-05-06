@@ -20,6 +20,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     private let naviBar = ShowNavigationBar()
     
     var settingManager: ShowAgoraKitManager!
+    var musicManager: ShowMusicManager!
     
     // 当前设置的预设值名称
     var presetModeName: String?
@@ -151,6 +152,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         
         let vc = ShowVideoSettingVC()
         vc.settingManager = settingManager
+        vc.musicManager = musicManager
         vc.isOutside = isOutside
         vc.currentChannelId = currentChannelId
         vc.dataArray = settings[index]
