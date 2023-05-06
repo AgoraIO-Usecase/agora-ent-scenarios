@@ -39,6 +39,14 @@ object ScenesConstructor {
                 true
             ),
             ScenesModel(
+                AgoraScene.GraspSingRoom,
+                "io.agora.scene.ktv.grasp.create.RoomListActivity",
+                context.getString(R.string.ktv_grasp_online),
+                R.mipmap.bg_btn_home1,
+                R.mipmap.bg_btn_home_ktv,
+                true
+            ),
+            ScenesModel(
                 AgoraScene.LiveShow,
                 "io.agora.scene.show.RoomListActivity",
                 context.getString(R.string.app_show_live),

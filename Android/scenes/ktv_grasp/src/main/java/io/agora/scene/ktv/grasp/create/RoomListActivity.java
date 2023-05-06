@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.create;
+package io.agora.scene.ktv.grasp.create;
 
 import android.content.Intent;
 import android.os.Build;
@@ -20,12 +20,12 @@ import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnItemClickListener;
 import io.agora.scene.base.utils.ToastUtils;
-import io.agora.scene.ktv.create.holder.RoomHolder;
-import io.agora.scene.ktv.databinding.ActivityRoomListBinding;
-import io.agora.scene.ktv.databinding.ItemRoomListBinding;
-import io.agora.scene.ktv.live.RoomLivingActivity;
-import io.agora.scene.ktv.service.KTVServiceProtocol;
-import io.agora.scene.ktv.service.RoomListModel;
+import io.agora.scene.ktv.grasp.create.holder.RoomHolder;
+import io.agora.scene.ktv.grasp.databinding.ActivityRoomListBinding;
+import io.agora.scene.ktv.grasp.databinding.ItemRoomListBinding;
+import io.agora.scene.ktv.grasp.live.RoomLivingActivity;
+import io.agora.scene.ktv.grasp.service.KTVServiceProtocol;
+import io.agora.scene.ktv.grasp.service.RoomListModel;
 import io.agora.scene.widget.dialog.InputPasswordDialog;
 import io.agora.scene.widget.utils.UiUtils;
 

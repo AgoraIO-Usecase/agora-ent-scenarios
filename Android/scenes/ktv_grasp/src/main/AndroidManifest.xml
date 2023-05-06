@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.agora.scene.ktv.grasp">
+
+    <application>
+        <activity
+            android:name="io.agora.scene.ktv.grasp.create.RoomCreateActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="io.agora.scene.ktv.grasp.create.RoomListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="io.agora.scene.ktv.grasp.live.RoomLivingActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+    </application>
+</manifest>
