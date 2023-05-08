@@ -34,7 +34,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="4dp"
             android:gravity="center"
-            android:text="举报"
+            android:text="@string/report_room"
             android:textColor="#C6C4DD"
             android:textSize="12sp" />
     </LinearLayout>

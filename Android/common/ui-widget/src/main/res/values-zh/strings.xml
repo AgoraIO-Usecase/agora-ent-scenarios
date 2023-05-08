@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="report_room">举报</string>
+
     <string name="comm_permission_leak_auido_title">没有麦克风权限</string>
     <string name="comm_permission_leak_auido_content">请在设置中打开麦克风权限</string>
     <string name="comm_permission_leak_camera_title">没有相机权限</string>
