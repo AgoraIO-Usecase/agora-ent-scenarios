@@ -1642,6 +1642,9 @@ class LiveDetailFragment : Fragment() {
                             mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!)
                         }
                     })
+                    (activity as LiveDetailActivity).toggleSelfAudio(true, callback = {
+                        // nothing
+                    })
                 }
             } else {
                 // 其他观众视角
