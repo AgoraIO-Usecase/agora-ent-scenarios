@@ -571,13 +571,13 @@ extension VoiceRoomViewController {
             switch $0 {
             case .eq: self.showEQView()
             case .mic:
-                checkAudioAuthorized { granted in
+                self.checkAudioAuthorized { granted in
                     guard granted else { return }
                     self.changeMicState()
                 }
             case .gift: self.showGiftAlert()
             case .handsUp:
-                checkAudioAuthorized { granted in
+                self.checkAudioAuthorized { granted in
                     guard granted else { return }
                     self.changeHandsUpState()
                 }
