@@ -367,6 +367,10 @@ extension ShowLiveViewController {
     private func _updateApplyMenu() {
         if role == .broadcaster {
             applyAndInviteView.reloadData()
+            AppContext.showServiceImp(roomId).getAllMicSeatApplyList {[weak self] _, list in
+                guard let list = list?.filterDuplicates({ $0.userId }) else { return }
+                self?.liveView.bottomBar.linkButton.isShowRedDot = list.count > 0
+            }
         } else {
             applyView.getAllMicSeatList(autoApply: false)
         }

@@ -150,6 +150,7 @@ class KTVApiImpl: NSObject{
         engine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
         engine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\": true}")
         engine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
+        engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
     }
 }
 
