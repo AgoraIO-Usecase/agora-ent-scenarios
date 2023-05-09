@@ -316,7 +316,6 @@
 		E33622C9296FBAB0002F9341 /* VLKTVAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E33622C8296FBAB0002F9341 /* VLKTVAlert.m */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
-		E36C616929D67E1700E0559C /* KTVAPIProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36C616829D67E1700E0559C /* KTVAPIProxy.swift */; };
 		E3AE704B29B1D14D00266344 /* VLEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3AE704A29B1D14D00266344 /* VLEffectView.m */; };
 		E3C0489F29DABD5C008974E6 /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C0489E29DABD5C008974E6 /* KeyCenter.swift */; };
 		E3D1D83C298CAA5400BDBAC2 /* AgoraRequestTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D837298CAA5400BDBAC2 /* AgoraRequestTask.swift */; };
@@ -791,7 +790,6 @@
 		E358F803293494C100A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
 		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
-		E36C616829D67E1700E0559C /* KTVAPIProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KTVAPIProxy.swift; sourceTree = "<group>"; };
 		E3AE704929B1D14D00266344 /* VLEffectView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLEffectView.h; sourceTree = "<group>"; };
 		E3AE704A29B1D14D00266344 /* VLEffectView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLEffectView.m; sourceTree = "<group>"; };
 		E3C0489E29DABD5C008974E6 /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
@@ -1075,7 +1073,6 @@
 				DD01BD1D29C0422A00C9B403 /* KTVLrcViewDelegate.swift */,
 				DD01BD2129C0447A00C9B403 /* KTVApiImpl.swift */,
 				DD1CD29129C06430002331AE /* KTVLrcControl.swift */,
-				E36C616829D67E1700E0559C /* KTVAPIProxy.swift */,
 			);
 			path = KTVAPI;
 			sourceTree = "<group>";
@@ -2352,7 +2349,6 @@
 				DD220B7E295B332C00F57F30 /* VMConfirmView.swift in Sources */,
 				DD220B2D295B332C00F57F30 /* VoiceRoomGiftEntity.swift in Sources */,
 				DD0292CF295BF0DC00485225 /* VLSelectedSongList.m in Sources */,
-				E36C616929D67E1700E0559C /* KTVAPIProxy.swift in Sources */,
 				DDA199FD28FFE579009D3E61 /* UIView+VL.m in Sources */,
 				DD0292E6295BF0DC00485225 /* VLKTVSliderView.m in Sources */,
 				DD220B4C295B332C00F57F30 /* VRRoomMenuBarCell.swift in Sources */,
@@ -2820,7 +2816,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.0;
+				MARKETING_VERSION = 2.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2864,7 +2860,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.0;
+				MARKETING_VERSION = 2.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.ktv;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
