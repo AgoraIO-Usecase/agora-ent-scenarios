@@ -47,9 +47,9 @@ ext {
             gson              : 'com.google.code.gson:gson:2.9.0',
             autosize          : 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1',
 
-            rtc               : 'io.agora.rtc:agora-special-full:4.0.0.133.2',
-            rtc_special_voice : 'io.agora.rtc:agora-special-voice:4.0.1.130',
-            rtc_screen_sharing: 'io.agora.rtc:full-screen-sharing:4.0.0.133.2',
+            rtc               : 'io.agora.rtc:agora-special-full:4.0.0.133.3',
+            rtc_special_voice : 'io.agora.rtc:agora-special-voice:4.0.1.133.3',
+            rtc_screen_sharing: 'io.agora.rtc:full-screen-sharing:4.0.0.133.3',
             rtm               : 'com.github.agorabuilder:rtm-sdk:1.4.10',
             syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.4',
             lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.1-beta.8',
