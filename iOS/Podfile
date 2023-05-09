@@ -24,7 +24,7 @@ def all_pods
 #  pod 'YYCache', '1.0.4'
   pod 'YYCategories', '1.0.4'
   # 键盘
-  pod 'IQKeyboardManager', '6.5.10'
+#  pod 'IQKeyboardManager', '6.5.10'
 
   #弹框
   pod 'LEEAlert', '1.6.4'

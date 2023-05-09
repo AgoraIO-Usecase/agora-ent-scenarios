@@ -23,7 +23,6 @@ PODS:
     - SocketRocket
   - Bugly (2.5.93)
   - HWWeakTimer (1.0)
-  - IQKeyboardManager (6.5.10)
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
   - LEEAlert (1.6.4)
@@ -73,7 +72,6 @@ DEPENDENCIES:
   - AgoraSyncManager (= 2.0.4)
   - Bugly (= 2.5.93)
   - HWWeakTimer (= 1.0)
-  - IQKeyboardManager (= 6.5.10)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
   - LEEAlert (= 1.6.4)
@@ -105,7 +103,6 @@ SPEC REPOS:
     - AgoraSyncManager
     - Bugly
     - HWWeakTimer
-    - IQKeyboardManager
     - JXCategoryView
     - KakaJSON
     - LEEAlert
@@ -142,7 +139,6 @@ SPEC CHECKSUMS:
   AgoraSyncManager: 4df1ae866bda7bf8e0ab3602b4b23d65b657ee9b
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
-  IQKeyboardManager: 45a1fa55c1a5b02c61ac0fd7fd5b62bb4ad20d97
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
@@ -166,6 +162,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 9e0db21d0ee4224690f59dab4540fa92d8e5294e
+PODFILE CHECKSUM: 32a926d3f1b8b680b32528ac7533540137cfa816
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.12.0
