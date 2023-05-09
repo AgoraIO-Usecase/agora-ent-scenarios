@@ -160,7 +160,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="29dp"
-        android:text="当前版本号 V2.3.0"
+        android:text="当前版本号 V2.3.1"
         android:textColor="@color/def_text_grey_6c7"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
