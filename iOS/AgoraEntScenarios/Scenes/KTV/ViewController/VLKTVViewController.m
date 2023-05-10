@@ -439,6 +439,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         dispatch_async(dispatch_get_main_queue(), ^{
             if(self.singRole == KTVSingRoleCoSinger){
                 [self showScoreViewWithScore:[self.lrcControl getAvgScore]];
+                return;
             }
             [self showScoreViewWithScore:score];
         });
