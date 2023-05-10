@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/playerBg"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/ktv_game_background"
+    tools:layout_height="320dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/messageText"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginTop="108dp"
+        android:background="@mipmap/ktv_game_idle_text_background"
+        android:text="@string/ktv_game_room_owner_idle"
+        android:textSize="40px"
+        android:gravity="center"
+        android:textColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+    </androidx.appcompat.widget.AppCompatTextView>
+    
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btChooseSong"
+        android:layout_width="82dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="73dp"
+        android:layout_marginBottom="34dp"
+        android:background="@mipmap/ic_diange"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+    </androidx.appcompat.widget.AppCompatImageButton>
+
+    <TextView
+        android:id="@+id/btAutoSelectSong"
+        android:layout_width="80dp"
+        android:layout_height="34dp"
+        android:background="@drawable/ktv_skip_btn_bg"
+        android:gravity="center"
+        android:text="@string/ktv_game_auto_select_song"
+        android:textColor="@color/white"
+        android:textSize="10sp"
+        android:layout_marginStart="180dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btChooseSong" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

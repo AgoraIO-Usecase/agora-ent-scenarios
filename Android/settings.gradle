@@ -34,7 +34,7 @@ include ':common:ui-widget'
 //    include ':scenes:ktv'
 //}
 
-include ':scenes:ktv_grasp'
+include ':scenes:ktv_singbattle'
 
 //if (!isVoiceEmpty) {
 //    include ':scenes:voice'
