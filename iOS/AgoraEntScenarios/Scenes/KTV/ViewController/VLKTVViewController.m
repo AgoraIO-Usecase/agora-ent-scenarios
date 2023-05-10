@@ -269,9 +269,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         [weakSelf _checkInEarMonitoring];
         
         if (KTVSubscribeDeleted == status) {
-            if(weakSelf.singRole == KTVSingRoleCoSinger){
-                [weakSelf showScoreViewWithScore:[weakSelf.lrcControl getAvgScore]];
-            }
             BOOL success = [weakSelf removeSelSongWithSongNo:[songInfo.songNo integerValue] sync:NO];
             if (!success) {
                 weakSelf.selSongsArray = songArray;
@@ -437,11 +434,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi didKTVAPIReceiveStreamMessageFromUid:uid streamId:streamId data:data];
     if ([dict[@"cmd"] isEqualToString:@"SingingScore"]) {
         //伴唱显示自己的分数，观众显示主唱的分数
-        if(self.singRole == KTVSingRoleCoSinger){
-            return;
-        }
+        
         int score = [dict[@"score"] intValue];
         dispatch_async(dispatch_get_main_queue(), ^{
+            if(self.singRole == KTVSingRoleCoSinger){
+                [self showScoreViewWithScore:[self.lrcControl getAvgScore]];
+            }
             [self showScoreViewWithScore:score];
         });
         
@@ -1650,7 +1648,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)setSingRole:(KTVSingRole)singRole {
     _singRole = singRole;
-    self.lrcControl.lrcView.lyricsView.draggable = false;
     self.lrcControl.isMainSinger = (_singRole == KTVSingRoleSoloSinger || _singRole == KTVSingRoleLeadSinger);
     KTVLogInfo(@"setSingRole: %ld", singRole);
     
@@ -1700,15 +1697,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             if(isLocal) {
                 KTVLogInfo(@"Playback all loop completed");
                 //if([self isCurrentSongMainSinger:VLUserCenter.user.id]) {
-                if(self.singRole != KTVSingRoleAudience){
+               // if(self.singRole != KTVSingRoleAudience){
                     //伴唱和房主都用自己的分数
                     if(self.singRole == KTVSingRoleLeadSinger || self.singRole == KTVSingRoleSoloSinger){
                         [self syncChoruScore:[self.lrcControl getAvgScore]];
+                        [self showScoreViewWithScore: [self.lrcControl getAvgScore]];
+                        [self removeCurrentSongWithSync:YES];
                     }
-                    [self showScoreViewWithScore: [self.lrcControl getAvgScore]];
                 }
-                [self removeCurrentSongWithSync:YES];
-            }
+                
+            //}
         }
         
         //判断伴唱是否是暂停状态
