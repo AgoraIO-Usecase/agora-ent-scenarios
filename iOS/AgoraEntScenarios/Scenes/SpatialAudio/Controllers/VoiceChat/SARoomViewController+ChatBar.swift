@@ -300,8 +300,12 @@ extension SARoomViewController {
         let applyAlert = SAApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: (205 / 375.0) * ScreenWidth), content: "Request to Speak?", cancel: "Cancel", confirm: "Confirm", position: .bottom).backgroundColor(.white).cornerRadius(20, [.topLeft, .topRight], .clear, 0)
         let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: (205 / 375.0) * ScreenWidth)), custom: applyAlert)
         applyAlert.actionEvents = { [weak self] in
+            guard let self = self else { return }
             if $0 == 31 {
-                self?.requestSpeak(index: index)
+                AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self) { granted in
+                    guard granted else { return }
+                    self.requestSpeak(index: index)
+                }
             }
             vc.dismiss(animated: true)
         }

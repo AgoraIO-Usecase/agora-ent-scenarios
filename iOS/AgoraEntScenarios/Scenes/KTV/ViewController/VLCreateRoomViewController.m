@@ -40,7 +40,6 @@
 //    }
     [self commonUI];
     [self setUpUI];
-    [AgoraEntAuthorizedManager checkMediaAuthorizedWithParent:self completion:nil];
 }
 
 - (void)commonUI {

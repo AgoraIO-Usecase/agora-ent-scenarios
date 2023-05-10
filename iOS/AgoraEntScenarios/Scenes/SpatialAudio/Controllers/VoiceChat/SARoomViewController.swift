@@ -480,17 +480,9 @@ extension SARoomViewController {
             guard let self = self else { return }
             switch $0 {
             case .eq: self.showEQView()
-            case .mic:
-                AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self) { granted in
-                    guard granted else { return }
-                    self.changeMicState()
-                }
+            case .mic: self.changeMicState()
             case .gift: self.showGiftAlert()
-            case .handsUp:
-                AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self) { granted in
-                    guard granted else { return }
-                    self.changeHandsUpState()
-                }
+            case .handsUp: self.changeHandsUpState()
             default: break
             }
         }
