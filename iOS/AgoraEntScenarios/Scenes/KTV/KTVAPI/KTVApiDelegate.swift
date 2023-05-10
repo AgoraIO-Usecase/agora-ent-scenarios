@@ -104,6 +104,12 @@ import AgoraRtcKit
 //    func onJoinChorusFail(reason: KTVJoinChorusFailReason)
 //}
 
+@objc public protocol KTVLrcViewDelegate: NSObjectProtocol {
+    func onUpdatePitch(pitch: Float)
+    func onUpdateProgress(progress: Int)
+    func onDownloadLrcData(url: String)
+}
+
 @objc public protocol KTVApiEventHandlerDelegate: NSObjectProtocol {
     
     /// 歌曲播放状态变化
