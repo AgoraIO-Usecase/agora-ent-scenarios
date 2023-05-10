@@ -29,7 +29,6 @@ final class VRCreateRoomViewController: VRBaseViewController {
                 self.goLive()
             }
         }
-        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
     }
     
     deinit {
