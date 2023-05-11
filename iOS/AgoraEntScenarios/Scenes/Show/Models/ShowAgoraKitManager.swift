@@ -63,6 +63,7 @@ class ShowAgoraKitManager: NSObject {
     var exposureRangeY: Int?
     var matrixCoefficientsExt: Int?
     var videoFullrangeExt: Int?
+    var isFrontCamera = true
     
     //[ex channelId: connection]
     private var exConnectionMap: [String: AgoraRtcConnection] = [:]
@@ -90,7 +91,6 @@ class ShowAgoraKitManager: NSObject {
     
     private lazy var canvas: AgoraRtcVideoCanvas = {
         let canvas = AgoraRtcVideoCanvas()
-        canvas.renderMode = .hidden
         canvas.mirrorMode = .disabled
         return canvas
     }()
@@ -266,12 +266,11 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.setupLocalVideo(canvas)
         agoraKit.enableVideo()
         agoraKit.startPreview()
-        // 设置镜像
-//        agoraKit.setLocalRenderMode(.hidden, mirror: .enabled)
     }
     
     /// 切换摄像头
-    func switchCamera() {
+    func switchCamera(_ channelId: String? = nil) {
+        isFrontCamera = !isFrontCamera
         agoraKit.switchCamera()
     }
     
@@ -428,6 +427,7 @@ class ShowAgoraKitManager: NSObject {
     func setupLocalVideo(uid: UInt, canvasView: UIView) {
         canvas.view = canvasView
         canvas.uid = uid
+        canvas.mirrorMode = .disabled
         agoraKit.setVideoFrameDelegate(self)
         agoraKit.setDefaultAudioRouteToSpeakerphone(true)
         agoraKit.enableAudio()
@@ -500,10 +500,8 @@ class ShowAgoraKitManager: NSObject {
 
 extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
     
-    func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
-//        print("aaa onCapture1 w:\(CVPixelBufferGetWidth(videoFrame.pixelBuffer!)) h:\(CVPixelBufferGetHeight(videoFrame.pixelBuffer!))")
+    func onCapture(_ videoFrame: AgoraOutputVideoFrame, sourceType: AgoraVideoSourceType) -> Bool {
         videoFrame.pixelBuffer = BeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
-//        print("aaa onCapture2 w:\(CVPixelBufferGetWidth(videoFrame.pixelBuffer!)) h:\(CVPixelBufferGetHeight(videoFrame.pixelBuffer!))")
         return true
     }
     
@@ -520,11 +518,15 @@ extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
     }
     
     func getMirrorApplied() -> Bool {
-        true
+        isFrontCamera
     }
     
     func getRotationApplied() -> Bool {
         false
+    }
+    
+    func getObservedFramePosition() -> AgoraVideoFramePosition {
+        AgoraVideoFramePosition.postCapture
     }
     
 }

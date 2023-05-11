@@ -40,7 +40,6 @@
 //    }
     [self commonUI];
     [self setUpUI];
-    
 }
 
 - (void)commonUI {

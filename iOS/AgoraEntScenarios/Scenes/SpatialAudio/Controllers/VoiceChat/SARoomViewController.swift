@@ -104,7 +104,9 @@ class SARoomViewController: SABaseViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(leaveRoom), name: Notification.Name("terminate"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateMicInfo), name: Notification.Name("updateMicInfo"), object: nil)
         
-        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
+        if isOwner {
+            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -334,7 +336,10 @@ extension SARoomViewController {
                             }
                         }
                     } else {
-                        userApplyAlert(tag - 200)
+                        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self) { granted in
+                            guard granted else { return }
+                            self.userApplyAlert(tag - 200)
+                        }
                     }
                 }
             }

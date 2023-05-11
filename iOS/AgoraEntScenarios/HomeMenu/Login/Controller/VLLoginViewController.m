@@ -153,6 +153,7 @@
         _policyAgreed = NO;
     } else {
         _policyAgreed = YES;
+        [self showPrivacyViewWith: _policyAgreed];
     }
 }
 

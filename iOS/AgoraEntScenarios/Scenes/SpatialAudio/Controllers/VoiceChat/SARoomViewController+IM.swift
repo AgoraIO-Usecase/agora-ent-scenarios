@@ -25,10 +25,10 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     func onRobotUpdate(robotInfo: SARobotAudioInfo) {
         roomInfo?.robotInfo = robotInfo
         rtckit.updatePlayerVolume(value: Double(robotInfo.robot_volume))
-        guard roomInfo?.mic_info != nil else { return }
+        guard let mic_info = roomInfo?.mic_info, mic_info.isEmpty == false else { return }
         //update user robot
-        guard let red_mic: SARoomMic = roomInfo?.mic_info![6] else { return }
-        guard let blue_mic: SARoomMic = roomInfo?.mic_info![3] else { return }
+        let red_mic: SARoomMic = mic_info[6]
+        let blue_mic: SARoomMic = mic_info[3]
 
         red_mic.status = robotInfo.use_robot ? 5 : -2
         blue_mic.status = robotInfo.use_robot ? 5 : -2
@@ -94,7 +94,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
     
     func onReceiveSeatRequest(roomId: String, applicant: SAApply) {
-        self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: true)
+        self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: isOwner)
     }
 
     func onReceiveSeatRequestRejected(roomId: String, chat_uid: String) {
@@ -246,7 +246,9 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
             sRtcView.updateUser(last)
         } else {
             if let first = mics.first {
-                let status = (first.member?.mic_status == .mute && first.member?.uid == VLUserCenter.user.id) ? 1 : (first.status == 3 ? -1 : first.status)
+                // 查询自己有没有在麦上
+                let seatUser = AppContext.saTmpServiceImp().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
+                let status = ((first.member?.mic_status == .mute && first.member?.uid == VLUserCenter.user.id) || (seatUser != nil && seatUser?.status != -1)) ? 1 : (first.status == 3 ? -1 : first.status)
                 let mic_index = first.mic_index
                 //刷新底部✋🏻状态
                 if !isOwner && first.mic_index != 0  {
