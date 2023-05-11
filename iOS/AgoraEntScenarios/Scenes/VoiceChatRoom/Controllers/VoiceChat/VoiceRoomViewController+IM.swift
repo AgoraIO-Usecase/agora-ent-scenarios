@@ -200,15 +200,20 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             if let first = mics.first {
                 let status = first.status
                 let mic_index = first.mic_index
+                self.local_index = mic_index
                 //刷新底部✋🏻状态
                 if !isOwner {
                     if first.member != nil {
                         if self.local_index != nil {
                             refreshHandsUp(status: status)
+                        } else {
+                            refreshHandsUp(status: -1)
                         }
                     } else {
                         if changeMic.member != nil {
                             refreshHandsUp(status: status)
+                        } else {
+                            refreshHandsUp(status: -1)
                         }
                     }
                 }
@@ -266,10 +271,14 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                             rtckit.muteLocalAudioStream(mute: true)
                             chatBar.refresh(event: .mic, state: .selected, asCreator: false)
                         }
-                        if status == -1 || status == 4 || status == 3{
+                        if status == -1 || status == 4 || status == 3 {
                             rtckit.setClientRole(role: .audience)
                             rtckit.muteLocalAudioStream(mute: true)
                             chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
+                        } else {
+                            rtckit.setClientRole(role: .audience)
+                            rtckit.muteLocalAudioStream(mute: true)
+                            chatBar.refresh(event: .handsUp, state: .disable, asCreator: false)
                         }
                     }
                 }
