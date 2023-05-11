@@ -28,7 +28,6 @@ public final class SACreateRoomViewController: SABaseViewController {
                 self.goLive()
             }
         }
-        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
     }
     
     deinit {

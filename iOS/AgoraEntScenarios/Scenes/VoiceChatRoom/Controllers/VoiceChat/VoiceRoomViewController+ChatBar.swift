@@ -351,8 +351,10 @@ extension VoiceRoomViewController {
         applyAlert.actionEvents = { [weak self] in
             guard let `self` = self else { return }
             if $0 == 31 {
-                self.checkAudioAuthorized()
-                self.requestSpeak(index: index)
+                self.checkAudioAuthorized { granted in
+                    guard granted else { return }
+                    self.requestSpeak(index: index)
+                }
             }
             vc.dismiss(animated: true)
         }

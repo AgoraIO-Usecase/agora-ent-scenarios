@@ -111,7 +111,6 @@ extension VoiceRoomViewController {
                 }
                 self.rtckit.muteLocalAudioStream(mute: false)
                 self.rtcView.updateUser(mic)
-                self.checkAudioAuthorized()
             }
         }
 
