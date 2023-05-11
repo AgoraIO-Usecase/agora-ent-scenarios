@@ -246,7 +246,9 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
             sRtcView.updateUser(last)
         } else {
             if let first = mics.first {
-                let status = (first.member?.mic_status == .mute && first.member?.uid == VLUserCenter.user.id) ? 1 : (first.status == 3 ? -1 : first.status)
+                // 查询自己有没有在麦上
+                let seatUser = AppContext.saTmpServiceImp().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
+                let status = ((first.member?.mic_status == .mute && first.member?.uid == VLUserCenter.user.id) || (seatUser != nil && seatUser?.status != -1)) ? 1 : (first.status == 3 ? -1 : first.status)
                 let mic_index = first.mic_index
                 //刷新底部✋🏻状态
                 if !isOwner && first.mic_index != 0  {
