@@ -10,7 +10,9 @@ import UIKit
 @objc public class AUiMoreDialog: UIView {
     private lazy var contentView: UIView = {
         let view = UIView()
-        view.backgroundColor = .black
+        view.backgroundColor = UIColor(hex: "#000000", alpha: 0.85)
+        view.layer.cornerRadius = 15
+        view.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         view.frame = CGRect(origin: .zero, size: CGSize(width: self.frame.size.width, height: 152))
         return view
     }()
@@ -18,7 +20,7 @@ import UIKit
     private lazy var reportButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage.sceneImage(name: "report_icon", bundleName: "VoiceChatRoomResource"), for: .normal)
-        button.setTitle("举报", for: .normal)
+        button.setTitle("Report".localized(), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         button.setTitleColor(.gray, for: .normal)
         button.contentHorizontalAlignment = .center;
@@ -79,7 +81,7 @@ import UIKit
     @objc private func onAction(_ sender: UIButton) {
         //TODO: mock success
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.2) {
-            ToastView.show(text: "举报成功")
+            ToastView.show(text: "Report success".localized())
         }
     }
 }

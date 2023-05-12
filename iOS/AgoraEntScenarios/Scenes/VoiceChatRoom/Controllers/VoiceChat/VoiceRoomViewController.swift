@@ -95,7 +95,9 @@ class VoiceRoomViewController: VRBaseViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(leaveRoom), name: Notification.Name("terminate"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateMicInfo), name: Notification.Name("updateMicInfo"), object: nil)
         
-        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
+        if isOwner {
+            checkAudioAuthorized()
+        }
     }
     
     private func subscribeSceneRoom() {
@@ -409,7 +411,10 @@ extension VoiceRoomViewController {
                             self.changeMic(from: self.local_index!, to: tag - 200)
                         }
                     } else {
-                        userApplyAlert(tag - 200)
+                        checkAudioAuthorized { granted in
+                            guard granted else { return }
+                            self.userApplyAlert(tag - 200)
+                        }
                     }
                 }
             }
@@ -715,7 +720,7 @@ extension VoiceRoomViewController {
         checkAudioAuthorized()
     }
     
-    func checkAudioAuthorized() {
-        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
+    func checkAudioAuthorized(completion: ((Bool) -> Void)? = nil) {
+        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: completion)
     }
 }

@@ -44,7 +44,7 @@ class ShowCreateLiveVC: UIViewController {
         super.viewDidLoad()
         setUpUI()
 //        agoraKitManager.defaultSetting()
-        agoraKitManager.startPreview(canvasView: localView)
+        agoraKitManager.startPreview(canvasView: self.localView)
         configNaviBar()
         if !UserDefaults.standard.bool(forKey: kBroadcastorHasShowPreset) {
             showPreset()

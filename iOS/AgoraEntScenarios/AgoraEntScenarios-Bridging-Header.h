@@ -19,3 +19,4 @@
 #import "BEFrameProcessor.h"
 #import "VideoProcessingManager.h"
 @import YYModel;
+#import "BundleUtil.h"

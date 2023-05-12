@@ -217,30 +217,32 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     }];
     
     [[AppContext ktvServiceImp] subscribeSeatListChangedWithBlock:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
-        VLRoomSeatModel* model = [self getUserSeatInfoWithIndex:seatModel.seatIndex];
-        if (model == nil) {
-            NSAssert(NO, @"model == nil");
-            return;
-        }
-        
-        if (status == KTVSubscribeCreated || status == KTVSubscribeUpdated) {
-            //上麦消息 / 是否打开视频 / 是否静音
-            [model resetWithInfo:seatModel];
-            [weakSelf setSeatsArray:weakSelf.seatsArray];
-        } else if (status == KTVSubscribeDeleted) {
-            // 下麦消息
+        [AgoraEntAuthorizedManager checkMediaAuthorizedWithParent:self completion:^(BOOL granted) {
+            if (!granted) { return; }
+            VLRoomSeatModel* model = [self getUserSeatInfoWithIndex:seatModel.seatIndex];
+            if (model == nil) {
+                NSAssert(NO, @"model == nil");
+                return;
+            }
             
-            // 下麦重置占位模型
-            [model resetWithInfo:nil];
-            [weakSelf setSeatsArray:weakSelf.seatsArray];
-        }
-        
-        VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
-        [weakSelf.MVView updateUIWithSong:song role:weakSelf.singRole];
-        [weakSelf.roomPersonView reloadSeatIndex:model.seatIndex];
-        
-        [weakSelf onSeatFull];
-
+            if (status == KTVSubscribeCreated || status == KTVSubscribeUpdated) {
+                //上麦消息 / 是否打开视频 / 是否静音
+                [model resetWithInfo:seatModel];
+                [weakSelf setSeatsArray:weakSelf.seatsArray];
+            } else if (status == KTVSubscribeDeleted) {
+                // 下麦消息
+                
+                // 下麦重置占位模型
+                [model resetWithInfo:nil];
+                [weakSelf setSeatsArray:weakSelf.seatsArray];
+            }
+            
+            VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
+            [weakSelf.MVView updateUIWithSong:song role:weakSelf.singRole];
+            [weakSelf.roomPersonView reloadSeatIndex:model.seatIndex];
+            
+            [weakSelf onSeatFull];
+        }];
     }];
     
     [[AppContext ktvServiceImp] subscribeRoomStatusChangedWithBlock:^(KTVSubscribe status, VLRoomListModel * roomInfo) {
@@ -438,11 +440,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi didKTVAPIReceiveStreamMessageFromUid:uid streamId:streamId data:data];
     if ([dict[@"cmd"] isEqualToString:@"SingingScore"]) {
         //伴唱显示自己的分数，观众显示主唱的分数
-        if(self.singRole == KTVSingRoleCoSinger){
-            return;
-        }
         int score = [dict[@"score"] intValue];
         dispatch_async(dispatch_get_main_queue(), ^{
+            if(self.singRole == KTVSingRoleCoSinger){
+                [self showScoreViewWithScore:[self.lrcControl getAvgScore]];
+                return;
+            }
+
             [self showScoreViewWithScore:score];
         });
         
@@ -602,7 +606,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     
     self.isEnterSeatNotFirst = YES;
-    [AgoraEntAuthorizedManager checkAudioAuthorizedWithParent:self];
+    [AgoraEntAuthorizedManager checkAudioAuthorizedWithParent:self completion:nil];
 }
 
 - (void)leaveSeatWithSeatModel:(VLRoomSeatModel * __nonnull)seatModel
@@ -937,7 +941,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self _checkEnterSeatAudioAuthorized];
         
         if (!info.isVideoMuted) {
-            [AgoraEntAuthorizedManager checkCameraAuthorizedWithParent:self];
+            [AgoraEntAuthorizedManager checkCameraAuthorizedWithParent:self completion:nil];
         }
         self.isNowMicMuted = info.isAudioMuted;
         self.isNowCameraMuted = info.isVideoMuted;
@@ -1102,21 +1106,27 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             break;
         case VLKTVBottomBtnClickTypeAudio:
             if (self.isNowMicMuted) {
-                [AgoraEntAuthorizedManager checkAudioAuthorizedWithParent:self];
+                [AgoraEntAuthorizedManager checkAudioAuthorizedWithParent:self completion:^(BOOL granted) {
+                    if (granted) {
+                        self.isNowMicMuted = !self.isNowMicMuted;
+                        [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
+                                                                            completion:^(NSError * error) {
+                        }];
+                    }
+                }];
             }
-            self.isNowMicMuted = !self.isNowMicMuted;
-            [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
-                                                                completion:^(NSError * error) {
-            }];
             break;
         case VLKTVBottomBtnClickTypeVideo:
             if (self.isNowCameraMuted) {
-                [AgoraEntAuthorizedManager checkCameraAuthorizedWithParent:self];
+                [AgoraEntAuthorizedManager checkCameraAuthorizedWithParent:self completion:^(BOOL granted) {
+                    if (granted) {
+                        self.isNowCameraMuted = !self.isNowCameraMuted;
+                        [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:self.isNowCameraMuted
+                                                                            completion:^(NSError * error) {
+                        }];
+                    }
+                }];
             }
-            self.isNowCameraMuted = !self.isNowCameraMuted;
-            [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:self.isNowCameraMuted
-                                                                completion:^(NSError * error) {
-            }];
             break;
         default:
             break;
@@ -1736,16 +1746,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted || state == AgoraMediaPlayerStatePlayBackCompleted) {
             if(isLocal) {
                 KTVLogInfo(@"Playback all loop completed");
-                //if([self isCurrentSongMainSinger:VLUserCenter.user.id]) {
-                if(self.singRole != KTVSingRoleAudience){
+               // if(self.singRole != KTVSingRoleAudience){
                     //伴唱和房主都用自己的分数
                     if(self.singRole == KTVSingRoleLeadSinger || self.singRole == KTVSingRoleSoloSinger){
                         [self syncChoruScore:[self.lrcControl getAvgScore]];
+                        [self showScoreViewWithScore: [self.lrcControl getAvgScore]];
+                        [self removeCurrentSongWithSync:YES];
                     }
-                    [self showScoreViewWithScore: [self.lrcControl getAvgScore]];
                 }
-                [self removeCurrentSongWithSync:YES];
-            }
+                
+            //}
         }
         
         //判断伴唱是否是暂停状态

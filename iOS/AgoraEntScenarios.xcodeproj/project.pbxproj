@@ -571,9 +571,7 @@
 		E357354729EFD719009D54E1 /* VLKTVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E357354229EFD718009D54E1 /* VLKTVViewController.m */; };
 		E357354829EFD719009D54E1 /* VLCreateRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E357354329EFD718009D54E1 /* VLCreateRoomViewController.m */; };
 		E357355829EFD74A009D54E1 /* KTVApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357354A29EFD74A009D54E1 /* KTVApiImpl.swift */; };
-		E357355929EFD74A009D54E1 /* KTVLrcViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357354B29EFD74A009D54E1 /* KTVLrcViewDelegate.swift */; };
 		E357355A29EFD74A009D54E1 /* KTVApiDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357354C29EFD74A009D54E1 /* KTVApiDelegate.swift */; };
-		E357355B29EFD74A009D54E1 /* KTVAPIProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357354D29EFD74A009D54E1 /* KTVAPIProxy.swift */; };
 		E357355C29EFD74A009D54E1 /* KTVLrcControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357354E29EFD74A009D54E1 /* KTVLrcControl.swift */; };
 		E357355D29EFD74A009D54E1 /* AgoraMiguXmlLrcParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357355029EFD74A009D54E1 /* AgoraMiguXmlLrcParse.swift */; };
 		E357355E29EFD74A009D54E1 /* AgoraLrcParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357355129EFD74A009D54E1 /* AgoraLrcParse.swift */; };
@@ -1332,9 +1330,7 @@
 		E357354329EFD718009D54E1 /* VLCreateRoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCreateRoomViewController.m; sourceTree = "<group>"; };
 		E357354529EFD718009D54E1 /* VLKTVViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVViewController.h; sourceTree = "<group>"; };
 		E357354A29EFD74A009D54E1 /* KTVApiImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApiImpl.swift; sourceTree = "<group>"; };
-		E357354B29EFD74A009D54E1 /* KTVLrcViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLrcViewDelegate.swift; sourceTree = "<group>"; };
 		E357354C29EFD74A009D54E1 /* KTVApiDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApiDelegate.swift; sourceTree = "<group>"; };
-		E357354D29EFD74A009D54E1 /* KTVAPIProxy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVAPIProxy.swift; sourceTree = "<group>"; };
 		E357354E29EFD74A009D54E1 /* KTVLrcControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLrcControl.swift; sourceTree = "<group>"; };
 		E357355029EFD74A009D54E1 /* AgoraMiguXmlLrcParse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraMiguXmlLrcParse.swift; sourceTree = "<group>"; };
 		E357355129EFD74A009D54E1 /* AgoraLrcParse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraLrcParse.swift; sourceTree = "<group>"; };
@@ -1503,6 +1499,7 @@
 		DD029266295BF0DC00485225 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				E357354E29EFD74A009D54E1 /* KTVLrcControl.swift */,
 				E357356529EFD8B4009D54E1 /* VLEffectView.h */,
 				E357356729EFD8B4009D54E1 /* VLEffectView.m */,
 				E357356629EFD8B4009D54E1 /* VLSoundEffectView.h */,
@@ -3298,10 +3295,7 @@
 			isa = PBXGroup;
 			children = (
 				E357354A29EFD74A009D54E1 /* KTVApiImpl.swift */,
-				E357354B29EFD74A009D54E1 /* KTVLrcViewDelegate.swift */,
 				E357354C29EFD74A009D54E1 /* KTVApiDelegate.swift */,
-				E357354D29EFD74A009D54E1 /* KTVAPIProxy.swift */,
-				E357354E29EFD74A009D54E1 /* KTVLrcControl.swift */,
 			);
 			path = KTVAPI;
 			sourceTree = "<group>";
@@ -3333,7 +3327,7 @@
 				DD2A43C428FFCEE7004CEDCF /* Frameworks */,
 				DD2A43C528FFCEE7004CEDCF /* Resources */,
 				AD4E4CC20B1F880834B4962F /* [CP] Embed Pods Frameworks */,
-				B00CE1731C23135062474AA2 /* [CP] Copy Pods Resources */,
+				38F440C94F7856A3EF72ED84 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -3486,6 +3480,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		38F440C94F7856A3EF72ED84 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		AD4E4CC20B1F880834B4962F /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -3501,23 +3512,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		B00CE1731C23135062474AA2 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		C928B35B34CF50A54FF97751 /* [CP] Check Pods Manifest.lock */ = {
@@ -3837,7 +3831,6 @@
 				DD64C68C295C142A00EAB750 /* UIButton+EntLayout.swift in Sources */,
 				DDA199E828FFE579009D3E61 /* UITextField+Font.m in Sources */,
 				DD619AA129E3E247008F63E4 /* SANormalRoomsViewController.swift in Sources */,
-				E357355B29EFD74A009D54E1 /* KTVAPIProxy.swift in Sources */,
 				DD0292F1295BF0DC00485225 /* KTVSyncManagerServiceImp.swift in Sources */,
 				DDA199DF28FFE579009D3E61 /* VLHotSpotBtn.m in Sources */,
 				DD36107E29B70CDC00CE7984 /* EffectsAttribute.m in Sources */,
@@ -3864,7 +3857,6 @@
 				DD84177F29090C520026B624 /* UIWindow+Router.m in Sources */,
 				DD3610AA29B70CDC00CE7984 /* ShowEmptyView.swift in Sources */,
 				DD36109C29B70CDC00CE7984 /* AEAListContainerView.m in Sources */,
-				E357355929EFD74A009D54E1 /* KTVLrcViewDelegate.swift in Sources */,
 				DD619BCF29E3E262008F63E4 /* VMSoundView.swift in Sources */,
 				DD619A8E29E3E247008F63E4 /* SAAudiencesEntity.swift in Sources */,
 				E357353929EFD35B009D54E1 /* KTVSkipView.m in Sources */,
