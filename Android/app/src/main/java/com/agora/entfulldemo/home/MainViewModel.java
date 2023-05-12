@@ -1,6 +1,7 @@
 package com.agora.entfulldemo.home;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -154,5 +155,27 @@ public class MainViewModel extends BaseRequestViewModel {
                     }
                 }
         );
+    }
+
+    public void requestReportDevice(String userNo,String sceneId) {
+        ApiManager.getInstance().requestReportDevice(userNo,sceneId)
+                .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
+                        new ApiSubscriber<BaseResponse<String>>() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+                                addDispose(d);
+                            }
+
+                            @Override
+                            public void onSuccess(BaseResponse<String> data) {
+                                Log.d("requestReportDevice","onSuccess");
+                            }
+
+                            @Override
+                            public void onFailure(@Nullable ApiException t) {
+                                Log.d("requestReportDevice","onFailure:"+t.getMessage());
+                            }
+                        }
+                );
     }
 }

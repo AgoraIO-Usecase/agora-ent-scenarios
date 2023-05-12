@@ -91,6 +91,12 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
         getBinding().tvPrivacyAgreement.setOnClickListener(view -> {
             PagePilotManager.pageWebView("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/privacy.html");
         });
+        getBinding().tvCollectionChecklist.setOnClickListener(view -> {
+            PagePilotManager.pageWebView("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/privacy.html");
+        });
+        getBinding().tvDataSharing.setOnClickListener(view -> {
+            PagePilotManager.pageWebView("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/libraries.html");
+        });
 
         getBinding().tvLogout.setOnClickListener(view -> {
             showLogoutDialog();

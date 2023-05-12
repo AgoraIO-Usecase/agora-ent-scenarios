@@ -1,5 +1,6 @@
 package io.agora.scene.base.api;
 
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.ArrayMap;
 
@@ -143,6 +144,20 @@ public class ApiManager {
             params.put("userNo", userNo);
         }
         return apiManagerService.requestUserUpdate(getRequestBody(params)).flatMap(it -> Observable.just(it));
+    }
+
+    public Observable<BaseResponse<String>> requestReportDevice(String userNo, String sceneId){
+        ArrayMap<String, String> params = new ArrayMap();
+        params.put("userNo",userNo);
+        params.put("sceneId",sceneId);
+        params.put("appId",BuildConfig.AGORA_APP_ID);
+        params.put("appVersion",BuildConfig.APP_VERSION_NAME);
+        params.put("platform","Android");
+        params.put("model", Build.MODEL);
+        params.put("manufacture", Build.MANUFACTURER);
+        params.put("osVersion", Build.VERSION.RELEASE);
+        return apiManagerService.requestReportDevice(getRequestBody(params)).flatMap(it -> Observable.just(it));
+
     }
 
     private RequestBody getRequestBody(ArrayMap<String, String> params) {

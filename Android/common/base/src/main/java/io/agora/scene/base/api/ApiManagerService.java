@@ -39,4 +39,7 @@ public interface ApiManagerService {
     Observable<BaseResponse<User>> requestUserUpdate(
             @Body RequestBody requestBody
     );
+
+    @POST(UrlConstants.REQUEST_REPORT_DEVICE)
+    Observable<BaseResponse<String>> requestReportDevice(@Body RequestBody requestBody);
 }
