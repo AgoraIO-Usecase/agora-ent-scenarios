@@ -151,6 +151,7 @@
     <string name="ktv_game_auto_select_song">随机选歌开始</string>
     <string name="ktv_game_room_owner_choosing_song">房主点歌中，游戏即将开始</string>
     <string name="ktv_game_start">嗨唱开始</string>
+    <string name="ktv_game_nobody_grasp">本轮无人抢到麦 \n 即将播放下一首</string>
 
 
 </resources>

@@ -16,7 +16,7 @@
         android:drawableStart="@mipmap/ic_music_name"
         android:gravity="center"
         android:textColor="@android:color/white"
-        android:textSize="8sp"
+        android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -51,13 +51,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/downloadLrcFailedView" />
 
-    <TextView
+    <Button
         android:id="@+id/singBattle"
-        android:layout_width="130dp"
-        android:layout_height="60dp"
-        android:background="@mipmap/ktv_start_grasp_waitting"
+        android:layout_width="80dp"
+        android:layout_height="30dp"
+        android:background="@mipmap/ktv_start_grasp_waiting"
         android:gravity="center"
         android:text="3"
+        android:layout_marginBottom="10dp"
         android:textColor="@color/white"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -126,6 +127,7 @@
         android:textAppearance="?android:attr/textAppearanceButton"
         android:textColor="#9BA2AB"
         android:textSize="8sp"
+        android:visibility="gone"
         app:backgroundTint="@android:color/transparent"
         app:cornerRadius="6dp"
         app:icon="@mipmap/ktv_ic_pause"
@@ -212,13 +214,13 @@
         app:iconGravity="top"
         app:iconPadding="0dp"
         app:iconTintMode="src_atop"
-        app:layout_constraintBottom_toBottomOf="@id/ivMusicStart"
+        app:layout_constraintBottom_toBottomOf="@id/ivChangeSong"
         app:layout_constraintEnd_toStartOf="@id/switchOriginal"
-        app:layout_constraintTop_toTopOf="@id/ivMusicStart" />
+        app:layout_constraintTop_toTopOf="@id/ivChangeSong" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/rlMusicControlMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="bgd_control_layout_lrc,switchOriginal,ivMusicMenu,ivMusicStart,ivChangeSong" />
+        app:constraint_referenced_ids="bgd_control_layout_lrc,switchOriginal,ivMusicMenu,ivChangeSong" />
 </androidx.constraintlayout.widget.ConstraintLayout>

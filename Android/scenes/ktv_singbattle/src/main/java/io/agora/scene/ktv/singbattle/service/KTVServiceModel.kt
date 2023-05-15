@@ -124,6 +124,7 @@ data class RoomSelSongModel(
     val userNo: String? = null,// 点歌人No
     val name: String? = null,// 点歌人昵称
     val isOriginal: Int = 0, //是否原唱
+    val winnerNo: String = "",// 抢唱获胜者No
 
     // 排序字段
     val status : Int, // 0 未开始 1.已唱 2.正在唱

@@ -8,7 +8,7 @@
     tools:layout_height="320dp">
 
     <TextView
-        android:id="@+id/btAutoSelectSong"
+        android:id="@+id/tvSongTab"
         android:layout_width="41dp"
         android:layout_height="20dp"
         android:background="@drawable/ktv_skip_btn_bg"

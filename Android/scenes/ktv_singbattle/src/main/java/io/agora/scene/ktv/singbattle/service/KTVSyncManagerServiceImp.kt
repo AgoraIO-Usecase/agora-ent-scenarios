@@ -91,12 +91,14 @@ class KTVSyncManagerServiceImp(
             objIdOfSongNo.clear()
             objIdOfSeatIndex.clear()
             objIdOfUserNo.clear()
+            objIdOfSingBattleGameInfo = null
 
             roomSubscribeListener.clear()
             roomMap.clear()
             userMap.clear()
             seatMap.clear()
             songChosenList.clear()
+            singBattleGameInfo = null
             currRoomNo = ""
         }
     }
@@ -731,12 +733,18 @@ class KTVSyncManagerServiceImp(
         chooseSongSubscriber = changedBlock
     }
 
-    override fun startSingBattleGameChooseSong(completion: (error: Exception?) -> Unit) {
+    override fun prepareSingBattleGame(completion: (error: Exception?) -> Unit) {
         val singBattleGameModel = SingBattleGameModel(
             SingBattleGameStatus.waitting.value
         )
-        innerAddSingBattleGameInfo(singBattleGameModel) {
-            completion.invoke(it)
+        if (objIdOfSingBattleGameInfo == null) {
+            innerAddSingBattleGameInfo(singBattleGameModel) {
+                completion.invoke(it)
+            }
+        } else {
+            innerUpdateSingBattleGameInfo(objIdOfSingBattleGameInfo!!, singBattleGameModel) {
+                completion.invoke(it)
+            }
         }
     }
 
@@ -746,7 +754,45 @@ class KTVSyncManagerServiceImp(
         val singBattleGameModel = SingBattleGameModel(
             SingBattleGameStatus.started.value
         )
-        innerAddSingBattleGameInfo(singBattleGameModel) {
+        objIdOfSingBattleGameInfo?.let { objId ->
+            innerUpdateSingBattleGameInfo(objId, singBattleGameModel) {
+                completion.invoke(it)
+            }
+        }
+    }
+
+    override fun finishSingBattleGame(completion: (error: Exception?) -> Unit) {
+        val singBattleGameModel = SingBattleGameModel(
+            SingBattleGameStatus.ended.value
+        )
+        objIdOfSingBattleGameInfo?.let { objId ->
+            innerUpdateSingBattleGameInfo(objId, singBattleGameModel) {
+                completion.invoke(it)
+            }
+        }
+    }
+
+    override fun getSingBattleGameInfo(completion: (error: Exception?, info: SingBattleGameModel?) -> Unit) {
+        innerGetSingBattleGameInfo(completion)
+    }
+
+    override fun updateSongModel(songCode: String, winner: String, completion: (error: Exception?) -> Unit) {
+        val song = songChosenList.filter { it.songNo == songCode }.getOrNull(0) ?: return;
+        val index = songChosenList.indexOf(song)
+        val newSong = RoomSelSongModel(
+            song.songName,
+            song.songNo,
+            song.singer,
+            song.imageUrl,
+            song.userNo,
+            song.name,
+            song.isOriginal,
+            winner,
+            song.status,
+            song.createAt,
+            song.pinAt
+        )
+        innerUpdateChooseSong(objIdOfSongNo[index], newSong) {
             completion.invoke(it)
         }
     }
@@ -1371,6 +1417,29 @@ class KTVSyncManagerServiceImp(
             })
     }
 
+    private fun innerGetSingBattleGameInfo(completion: (error: Exception?, SingBattleGameModel?) -> Unit) {
+        mSceneReference?.collection(kCollectionSingBattleGameInfo)?.get(object : DataListCallback {
+            override fun onSuccess(result: MutableList<IObject>?) {
+                if (result == null) return
+                if (result.isEmpty()) {
+                    singBattleGameInfo = null
+                    objIdOfSingBattleGameInfo = null
+                }
+                result.forEach {
+                    val obj = it.toObject(SingBattleGameModel::class.java)
+                    singBattleGameInfo = obj
+                    objIdOfSingBattleGameInfo = it.id
+                }
+
+                completion.invoke(null, singBattleGameInfo)
+            }
+
+            override fun onFail(exception: SyncManagerException?) {
+                completion.invoke(exception, null)
+            }
+        })
+    }
+
     private fun innerSubscribeSingBattleGameInfo(completion: () -> Unit) {
         val listener = object : EventListener {
             override fun onCreated(item: IObject?) {
@@ -1379,6 +1448,8 @@ class KTVSyncManagerServiceImp(
 
             override fun onUpdated(item: IObject?) {
                 val gameInfo = item?.toObject(SingBattleGameModel::class.java) ?: return
+                singBattleGameInfo = gameInfo
+                objIdOfSingBattleGameInfo = item.id
                 singBattleGameSubscribe?.invoke(
                     KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
                     gameInfo
@@ -1387,6 +1458,8 @@ class KTVSyncManagerServiceImp(
 
             override fun onDeleted(item: IObject?) {
                 //item ?: return
+                singBattleGameInfo = null
+                objIdOfSingBattleGameInfo = null
                 singBattleGameSubscribe?.invoke(
                     KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
                     null

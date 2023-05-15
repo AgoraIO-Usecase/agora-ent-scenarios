@@ -50,4 +50,9 @@ public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListe
     public void onReGetLrcUrl() {
         mViewModel.reGetLrcUrl();
     }
+
+    @Override
+    public void onGraspSongClick() {
+        mViewModel.graspSong();
+    }
 }

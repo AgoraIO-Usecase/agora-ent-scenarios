@@ -44,6 +44,7 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
     };
 
     private ScreenSlidePageFragment[] fragments = new ScreenSlidePageFragment[4];
+    private boolean isItemEnable = true;
 
 
     @NonNull
@@ -128,6 +129,24 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
             Runnable next = iterator.next();
             next.run();
         }
+
+        getBinding().getRoot().post(() -> {
+            if (getBinding().recyclerSearchResult.getVisibility() == View.VISIBLE) {
+                int searchCount = mSearchAdapter.getItemCount();
+                for (int i = 0; i < searchCount; i++) {
+                    SongItem item = mSearchAdapter.getItem(i);
+                    item.enable = isItemEnable;
+                    mSearchAdapter.notifyItemChanged(i);
+                }
+            } else {
+                for (ScreenSlidePageFragment fragment : fragments) {
+                    if (fragment == null) {
+                        continue;
+                    }
+                    fragment.setSongItemDisable(isItemEnable);
+                }
+            }
+        });
     }
 
     @Override
@@ -233,22 +252,25 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
     }
 
     void setSongItemDisable(boolean enable) {
+        this.isItemEnable = enable;
         if (getBinding() == null) return;
-        if (getBinding().recyclerSearchResult.getVisibility() == View.VISIBLE) {
-            int searchCount = mSearchAdapter.getItemCount();
-            for (int i = 0; i < searchCount; i++) {
-                SongItem item = mSearchAdapter.getItem(i);
-                item.enable = enable;
-                mSearchAdapter.notifyItemChanged(i);
-            }
-        } else {
-            for (ScreenSlidePageFragment fragment : fragments) {
-                if (fragment == null) {
-                    continue;
+        getBinding().getRoot().post(() -> {
+            if (getBinding().recyclerSearchResult.getVisibility() == View.VISIBLE) {
+                int searchCount = mSearchAdapter.getItemCount();
+                for (int i = 0; i < searchCount; i++) {
+                    SongItem item = mSearchAdapter.getItem(i);
+                    item.enable = enable;
+                    mSearchAdapter.notifyItemChanged(i);
                 }
-                fragment.setSongItemDisable(enable);
+            } else {
+                for (ScreenSlidePageFragment fragment : fragments) {
+                    if (fragment == null) {
+                        continue;
+                    }
+                    fragment.setSongItemDisable(enable);
+                }
             }
-        }
+        });
     }
 
     void setSearchResult(List<SongItem> list) {

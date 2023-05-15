@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@mipmap/ktv_game_rank_list_1_background"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/tvTank"
+        android:text="排名"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_width="0dp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/tvPlayer"
+        android:text="玩家"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_width="0dp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:layout_weight="2"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/tvSongNum"
+        android:text="抢唱成功"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_width="0dp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/tvScore"
+        android:text="总分"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

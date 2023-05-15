@@ -118,9 +118,10 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
         });
         mBinding.ilGameSong.btStartGame.setOnClickListener(v -> {
             if (chooseSongListener != null) {
-                if (chooseSongListener != null) {
-                    chooseSongListener.onStartSingBattleGame(this);
-                }
+                chooseSongListener.onStartSingBattleGame(this);
+            }
+            if (getDialog() != null) {
+                getDialog().dismiss();
             }
         });
         setChosenSongCount(chosenSongCount);
