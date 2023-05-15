@@ -213,11 +213,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                             refreshHandsUp(status: -1)
                         }
                     } else {
-                        if changeMic.member != nil {
-                            refreshHandsUp(status: status)
-                        } else {
-                            refreshHandsUp(status: -1)
-                        }
+                        refreshHandsUp(status: status)
                     }
                 }
                 var micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
