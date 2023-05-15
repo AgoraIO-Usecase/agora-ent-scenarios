@@ -155,7 +155,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp\": true}")
         mRtcEngine.setParameters("{\"rtc.net.maxS2LDelay\": 800}")
         mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":true}")
-        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":true}")
+
+        mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
+        mRtcEngine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
+
         mRtcEngine.setParameters("{\"rtc.net.maxS2LDelayBroadcast\":400}")
         mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer\":true}")
         mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\":600}")
@@ -521,7 +524,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private fun becomeSoloSinger() {
         Log.d(TAG, "becomeSoloSinger called")
         // 主唱进入合唱模式
-        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":false}")
+        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":false}")
+        mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":false}")
         mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 80000}")
         mRtcEngine.setAudioScenario(AUDIO_SCENARIO_CHORUS)
 
@@ -594,7 +598,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 channelMediaOption.publishMediaPlayerAudioTrack = false
                 mRtcEngine.updateChannelMediaOptions(channelMediaOption)
                 leaveChorus2ndChannel(role)
-                mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":true}")
+                mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":true}")
+                mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
                 mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
                 mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
             }
@@ -613,7 +618,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mRtcEngine.updateChannelMediaOptions(channelMediaOption)
 
         mPlayer.stop()
-        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":true}")
+        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":true}")
+        mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
         mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
     }
@@ -678,7 +684,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         }
 
         if (newRole == KTVSingRole.CoSinger) {
-            mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":false}")
+            mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":false}")
+            mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":false}")
             mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
             mRtcEngine.setAudioScenario(AUDIO_SCENARIO_CHORUS)
         }
@@ -1029,7 +1036,14 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     // ------------------------ AgoraMusicContentCenterEventDelegate  ------------------------
-    override fun onPreLoadEvent(songCode: Long, percent: Int, lyricUrl: String?, status: Int, errorCode: Int) {
+    override fun onPreLoadEvent(
+        requestId: String?,
+        songCode: Long,
+        percent: Int,
+        lyricUrl: String?,
+        status: Int,
+        errorCode: Int
+    ) {
         val callback = loadMusicCallbackMap[songCode.toString()] ?: return
         if (status == 0 || status == 1) {
             loadMusicCallbackMap.remove(songCode.toString())
@@ -1058,7 +1072,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         callback.invoke(requestId, errorCode, list)
     }
 
-    override fun onLyricResult(requestId: String?, lyricUrl: String?, errorCode: Int) {
+    override fun onLyricResult(
+        requestId: String?,
+        songCode: Long,
+        lyricUrl: String?,
+        errorCode: Int
+    ) {
         val callback = lyricCallbackMap[requestId] ?: return
         val songCode = lyricSongCodeMap[requestId] ?: return
         lyricCallbackMap.remove(lyricUrl)
@@ -1067,6 +1086,15 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             return
         }
         callback(songCode, lyricUrl)
+    }
+
+    override fun onSongSimpleInfoResult(
+        requestId: String?,
+        songCode: Long,
+        simpleInfo: String?,
+        errorCode: Int
+    ) {
+        //TODO("Not yet implemented")
     }
 
     // ------------------------ AgoraRtcMediaPlayerDelegate ------------------------
