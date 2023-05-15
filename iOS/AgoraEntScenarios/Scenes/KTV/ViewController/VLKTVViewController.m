@@ -1106,27 +1106,21 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             break;
         case VLKTVBottomBtnClickTypeAudio:
             if (self.isNowMicMuted) {
-                [AgoraEntAuthorizedManager checkAudioAuthorizedWithParent:self completion:^(BOOL granted) {
-                    if (granted) {
-                        self.isNowMicMuted = !self.isNowMicMuted;
-                        [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
-                                                                            completion:^(NSError * error) {
-                        }];
-                    }
-                }];
+                [AgoraEntAuthorizedManager checkAudioAuthorizedWithParent:self completion:nil];
             }
+            self.isNowMicMuted = !self.isNowMicMuted;
+            [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
+                                                                completion:^(NSError * error) {
+            }];
             break;
         case VLKTVBottomBtnClickTypeVideo:
             if (self.isNowCameraMuted) {
-                [AgoraEntAuthorizedManager checkCameraAuthorizedWithParent:self completion:^(BOOL granted) {
-                    if (granted) {
-                        self.isNowCameraMuted = !self.isNowCameraMuted;
-                        [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:self.isNowCameraMuted
-                                                                            completion:^(NSError * error) {
-                        }];
-                    }
-                }];
+                [AgoraEntAuthorizedManager checkCameraAuthorizedWithParent:self completion:nil];
             }
+            self.isNowCameraMuted = !self.isNowCameraMuted;
+            [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:self.isNowCameraMuted
+                                                                completion:^(NSError * error) {
+            }];
             break;
         default:
             break;
