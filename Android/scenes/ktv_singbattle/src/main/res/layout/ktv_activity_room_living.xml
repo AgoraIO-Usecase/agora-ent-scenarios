@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@mipmap/bg_room_living" />
+        android:src="@mipmap/ktv_room_bg" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvRoomName"
@@ -87,25 +87,25 @@
         app:layout_constraintEnd_toStartOf="@id/tvNetStatus"
         app:layout_constraintTop_toTopOf="@id/tvNetStatus" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/bgRoom"
-        android:layout_width="match_parent"
-        android:layout_height="232dp"
-        android:layout_marginHorizontal="15dp"
-        android:layout_marginTop="24dp"
-        android:minWidth="345dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvRoomName" />
+<!--    <androidx.appcompat.widget.AppCompatImageView-->
+<!--        android:id="@+id/bgRoom"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="232dp"-->
+<!--        android:layout_marginHorizontal="15dp"-->
+<!--        android:layout_marginTop="24dp"-->
+<!--        android:minWidth="345dp"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/tvRoomName" />-->
 
     <io.agora.scene.ktv.singbattle.widget.game.SingBattleGameView
         android:id="@+id/singBattleGameView"
         android:layout_width="match_parent"
         android:layout_height="320dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintBottom_toTopOf="@id/rvUserMember"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvRoomName" />
+        app:layout_constraintTop_toBottomOf="@id/tvRoomMCount" />
 
     <io.agora.scene.ktv.singbattle.widget.lrcView.LrcControlView
         android:id="@+id/lrcControlView"
@@ -122,10 +122,11 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvUserMember"
         android:layout_width="match_parent"
-        android:layout_height="260dp"
-        android:layout_marginBottom="12dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="15dp"
         android:overScrollMode="never"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintTop_toBottomOf="@+id/singBattleGameView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -166,6 +167,7 @@
         android:background="@null"
         android:padding="5dp"
         android:src="@mipmap/ic_more"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/cbVideo"
         tools:ignore="SpeakableTextPresentCheck" />
@@ -292,7 +294,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="cbMic,cbVideo, btnMenu"
+        app:constraint_referenced_ids="cbMic,cbVideo"
         tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.Group

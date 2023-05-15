@@ -24,9 +24,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.card.MaterialCardView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.agora.rtc2.Constants;
 import io.agora.scene.base.GlideApp;
@@ -53,6 +56,7 @@ import io.agora.scene.ktv.singbattle.widget.lrcView.LrcControlView;
 import io.agora.scene.ktv.singbattle.widget.MoreDialog;
 import io.agora.scene.ktv.singbattle.widget.MusicSettingDialog;
 import io.agora.scene.ktv.singbattle.widget.UserLeaveSeatMenuDialog;
+import io.agora.scene.ktv.singbattle.widget.rankList.RankItem;
 import io.agora.scene.ktv.singbattle.widget.song.SongDialog;
 import io.agora.scene.widget.DividerDecoration;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
@@ -122,15 +126,27 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         // 下麦
                         if (roomLivingViewModel.isRoomOwner()) {
                             if (!item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
+                                if (roomLivingViewModel.singBattleGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
+                                    ToastUtils.showToast("正在游戏中，游戏结束后方可踢人下麦");
+                                    return;
+                                }
                                 showUserLeaveSeatMenuDialog(item);
                             }
                         } else if (item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
+                            if (roomLivingViewModel.singBattleGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
+                                ToastUtils.showToast("正在游戏中，游戏结束后方可下麦");
+                                return;
+                            }
                             showUserLeaveSeatMenuDialog(item);
                         }
                     } else {
                         // 上麦
                         RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
                         if (seatLocal == null || seatLocal.getSeatIndex() < 0) {
+                            if (roomLivingViewModel.singBattleGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
+                                ToastUtils.showToast("游戏进行中，请在下局游戏开始前上麦");
+                                return;
+                            }
                             toggleAudioRun = () -> {
                                 roomLivingViewModel.haveSeat(position);
                                 getBinding().cbMic.setChecked(false);
@@ -188,16 +204,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     }
 
 
-                    RoomSelSongModel songModel = roomLivingViewModel.songPlayingLiveData.getValue();
+                    RoomSelSongModel songModel = roomLivingViewModel.gameSong;
                     if (songModel != null) {
                         if (item.getUserNo().equals(songModel.getUserNo())) {
                             binding.tvZC.setText("主唱");
                             binding.tvHC.setVisibility(View.GONE);
                             binding.tvZC.setVisibility(View.VISIBLE);
-                        } else if (item.getChorusSongCode() != null && !item.getUserNo().equals(songModel.getUserNo()) && item.getChorusSongCode().equals(songModel.getSongNo() + songModel.getCreateAt())) {
-                            binding.tvHC.setText("合唱");
-                            binding.tvZC.setVisibility(View.GONE);
-                            binding.tvHC.setVisibility(View.VISIBLE);
                         } else {
                             binding.tvZC.setVisibility(View.GONE);
                             binding.tvHC.setVisibility(View.GONE);
@@ -304,8 +316,46 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
 
             @Override
-            public void onAutoSelectSongClick() {
+            public void onAutoSelectSongClick() {}
 
+            @Override
+            public void onGameStart() {
+                roomLivingViewModel.onSongChanged();
+            }
+
+            @Override
+            public void onStartSing() {
+                getBinding().lrcControlView.setMusic(roomLivingViewModel.gameSong);
+                roomLivingViewModel.musicStartPlay(roomLivingViewModel.gameSong);
+                getBinding().lrcControlView.onGamingStatus();
+                mRoomSpeakerAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNextSong() {
+                roomLivingViewModel.changeMusic();
+                getBinding().singBattleGameView.onBattleGamePrepare();
+                getBinding().lrcControlView.onGameBattlePrepareStatus();
+                getBinding().getRoot().postDelayed(() -> {
+                    if (roomLivingViewModel.songPlayingLiveData.getValue() != null) {
+                        roomLivingViewModel.musicStop();
+                        roomLivingViewModel.onGraspFinish();
+                    }
+                }, 10000);
+                mRoomSpeakerAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onGameEnd() {
+                // TODO
+                List<RankItem> list = new ArrayList<>();
+                RankItem item = new RankItem();
+                item.rank = 1;
+                item.userName = UserManager.getInstance().getUser().name;
+                item.score = "100";
+                item.songNum = "4";
+                list.add(item);
+                getBinding().singBattleGameView.onGameEnd(list);
             }
         });
         getBinding().btnMenu.setOnClickListener(this::showMoreDialog);
@@ -369,25 +419,17 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             getBinding().cbVideo.setChecked(isVideoChecked);
             boolean isAudioChecked = seatModel != null && seatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_FALSE();
             getBinding().cbMic.setChecked(isAudioChecked);
-
-            getBinding().lrcControlView.onSeat(seatModel != null);
         });
         roomLivingViewModel.seatListLiveData.observe(this, seatModels -> {
             if (seatModels == null) {
                 return;
             }
-            int chorusNowNum = 0;
             for (RoomSeatModel seatModel : seatModels) {
                 RoomSeatModel oSeatModel = mRoomSpeakerAdapter.getItem(seatModel.getSeatIndex());
                 if (oSeatModel == null
                         || oSeatModel.isAudioMuted() != seatModel.isAudioMuted()
-                        || oSeatModel.isVideoMuted() != seatModel.isVideoMuted()
-                        || (oSeatModel.getChorusSongCode() != null && !oSeatModel.getChorusSongCode().equals(seatModel.getChorusSongCode()))) {
+                        || oSeatModel.isVideoMuted() != seatModel.isVideoMuted()) {
                     mRoomSpeakerAdapter.replace(seatModel.getSeatIndex(), seatModel);
-                }
-
-                if (seatModel.getChorusSongCode() != null && roomLivingViewModel.songPlayingLiveData.getValue() != null && seatModel.getChorusSongCode().equals(roomLivingViewModel.songPlayingLiveData.getValue().getSongNo() + roomLivingViewModel.songPlayingLiveData.getValue().getCreateAt())) {
-                    chorusNowNum ++;
                 }
             }
 
@@ -449,13 +491,20 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.onPrepareStatus(roomLivingViewModel.isRoomOwner());
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PLAYING) {
                 getBinding().lrcControlView.onPlayStatus(roomLivingViewModel.songPlayingLiveData.getValue());
+                if (roomLivingViewModel.gameSong == null) {
+                    getBinding().getRoot().postDelayed(() -> {
+                        if (roomLivingViewModel.songPlayingLiveData.getValue() != null) {
+                            roomLivingViewModel.musicStop();
+                            roomLivingViewModel.onGraspFinish();
+                        }
+                    }, 10000);
+                }
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE) {
                 getBinding().lrcControlView.onPauseStatus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_LRC_RESET) {
                 getBinding().lrcControlView.getLyricsView().reset();
-                if (getBinding().lrcControlView.getRole() == LrcControlView.Role.Singer) {
-                    roomLivingViewModel.changeMusic();
-                }
+                //TODO
+                //getBinding().singBattleGameView.onSongFinish(0);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_START) {
                 getBinding().lrcControlView.setEnabled(false);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_END) {
@@ -465,12 +514,17 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
         roomLivingViewModel.singBattleGameStatusMutableLiveData.observe(this, status -> {
             if (status == RoomLivingViewModel.GameStatus.ON_START) {
-                mChooseSongDialog.post(this::finish);
-                roomLivingViewModel.onSongChanged();
-                getBinding().singBattleGameView.onGameStartStatus();
-                getBinding().lrcControlView.onGameBattleStatus();
+                getBinding().singBattleGameView.onGameStartStatus(roomLivingViewModel.songNum);
+                getBinding().lrcControlView.onGameBattlePrepareStatus();
             } else if (status == RoomLivingViewModel.GameStatus.ON_WAITING) {
-
+                getBinding().singBattleGameView.onGameWaitingStatus();
+            }
+        });
+        roomLivingViewModel.graspStatusMutableLiveData.observe(this, model -> {
+            if (model.status == RoomLivingViewModel.GraspStatus.SUCCESS) {
+                getBinding().singBattleGameView.onGraspSongSuccess(model.userName);
+            } else if (model.status == RoomLivingViewModel.GraspStatus.EMPTY) {
+                getBinding().singBattleGameView.onNobodyGraspSong();
             }
         });
         roomLivingViewModel.playerMusicOpenDurationLiveData.observe(this, duration -> {
@@ -479,34 +533,14 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.playerMusicPlayCompleteLiveData.observe(this, score -> {
             if (score.isLocal()) {
                 int sc = getBinding().lrcControlView.getCumulativeScoreInPercentage();
-                getBinding().tvResultScore.setText(String.valueOf(sc));
-                if (sc >= 90) {
-                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_s);
-                } else if (sc >= 80) {
-                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_a);
-                } else if (sc >= 70) {
-                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_b);
-                } else {
-                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_c);
-                }
-                getBinding().groupResult.setVisibility(View.VISIBLE);
+                getBinding().singBattleGameView.onSongFinish(sc);
 
                 if (getBinding().lrcControlView.getRole() == LrcControlView.Role.Singer) {
                     roomLivingViewModel.syncSingingAverageScore(sc);
                 }
             } else {
                 if (getBinding().lrcControlView.getRole() != LrcControlView.Role.Listener) return;
-                getBinding().tvResultScore.setText(String.valueOf(score.getScore()));
-                if (score.getScore() >= 90) {
-                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_s);
-                } else if (score.getScore() >= 80) {
-                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_a);
-                } else if (score.getScore() >= 70) {
-                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_b);
-                } else {
-                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_c);
-                }
-                getBinding().groupResult.setVisibility(View.VISIBLE);
+                getBinding().singBattleGameView.onSongFinish(score.getScore());
             }
         });
         roomLivingViewModel.networkStatusLiveData.observe(this, netWorkStatus ->
@@ -760,7 +794,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 @Override
                 public void onRightButtonClick() {
                     setDarkStatusIcon(isBlackDarkStatus());
-                    roomLivingViewModel.changeMusic();
+                    getBinding().singBattleGameView.onSongFinish(0);
+                    roomLivingViewModel.syncSingingAverageScore(0);
+                    roomLivingViewModel.resetMusicStatus();
                 }
             });
         }

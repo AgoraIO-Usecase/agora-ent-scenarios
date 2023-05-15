@@ -345,9 +345,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         config: KTVLoadMusicConfiguration,
         musicLoadStateListener: IMusicLoadStateListener
     ) {
+        // TODO
         Log.d(TAG, "loadMusic called: songCode $songCode")
         val jsonOption = "{\"format\":{\"highPart\":0}}";
-        val songCode1 = mMusicCenter.makeInternalSongCode(6625526607069440, jsonOption)
+        val songCode1 = mMusicCenter.makeInternalSongCode(songCode, jsonOption)
+        mMusicCenter.getSongSimpleInfo(songCode1);
         // 设置到全局， 连续调用以最新的为准
         this.songMode = KTVSongMode.SONG_CODE
         this.songCode = songCode1
@@ -774,7 +776,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val curTime = System.currentTimeMillis()
                 val offset = curTime - lastReceivedTime
                 if (offset <= 1000) {
-                    val curTs = mReceivedPlayPosition + offset
+                    val curTs = mReceivedPlayPosition + offset + pig
                     runOnMainThread {
                         lrcView?.onUpdatePitch(pitch.toFloat())
                         // (fix ENT-489)Make lyrics delay for 200ms
@@ -1082,13 +1084,21 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         callback(songCode, lyricUrl)
     }
 
+    // TODO
+    private var pig = 0L;
     override fun onSongSimpleInfoResult(
         requestId: String?,
         songCode: Long,
-        simpleInfo: String?,
+        simpleInfo: String,
         errorCode: Int
     ) {
-
+        Log.d(TAG, "onSongSimpleInfoResult" + simpleInfo);
+        val jsonMsg = JSONObject(simpleInfo)
+        val format = jsonMsg.getJSONObject("format")
+        val highPart = format.getJSONArray("highPart")
+        val highStartTime = JSONObject(highPart[0].toString())
+        val time = highStartTime.getLong("highStartTime") - 1000
+        pig = time;
     }
 
     // ------------------------ AgoraRtcMediaPlayerDelegate ------------------------
@@ -1105,7 +1115,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                 duration = mPlayer.duration
                 this.localPlayerPosition = 0
-                mPlayer.selectAudioTrack(1)
+                mPlayer.selectAudioTrack(0)
                 if (this.singerRole == KTVSingRole.SoloSinger ||
                     this.singerRole == KTVSingRole.LeadSinger
                 ) {

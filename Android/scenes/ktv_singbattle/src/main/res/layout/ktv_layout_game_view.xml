@@ -24,6 +24,13 @@
             android:visibility="gone"
             tools:visibility="gone" />
 
+        <io.agora.scene.ktv.singbattle.widget.rankList.RankListView
+            android:id="@+id/ilRank"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
     </FrameLayout>
 
 </androidx.cardview.widget.CardView>

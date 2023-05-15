@@ -187,9 +187,23 @@ interface KTVServiceProtocol {
     )
 
     // =================== 抢唱游戏相关相关 =========================
-    fun startSingBattleGameChooseSong(completion: (error: Exception?) -> Unit)
+    fun prepareSingBattleGame(completion: (error: Exception?) -> Unit)
 
     fun startSingBattleGame(
+        completion: (error: Exception?) -> Unit
+    )
+
+    fun finishSingBattleGame(
+        completion: (error: Exception?) -> Unit
+    )
+
+    fun getSingBattleGameInfo(
+        completion: (error: Exception?, info: SingBattleGameModel?) -> Unit
+    )
+
+    fun updateSongModel(
+        songCode: String,
+        winner: String,
         completion: (error: Exception?) -> Unit
     )
 

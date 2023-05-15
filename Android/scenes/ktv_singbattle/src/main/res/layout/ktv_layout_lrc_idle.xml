@@ -7,14 +7,4 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawablePadding="@dimen/ktv_space_normal"
-        android:gravity="center"
-        android:lineSpacingExtra="14dp"
-        android:text="@string/ktv_room_no_sing"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
-
 </LinearLayout>
