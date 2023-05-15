@@ -200,21 +200,20 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             if let first = mics.first {
                 let status = first.status
                 let mic_index = first.mic_index
-                self.local_index = mic_index
+                if changeMic.member != nil {
+                    self.local_index = mic_index
+                }
                 //刷新底部✋🏻状态
                 if !isOwner {
                     if first.member != nil {
+                        self.local_index = mic_index
                         if self.local_index != nil {
                             refreshHandsUp(status: status)
                         } else {
                             refreshHandsUp(status: -1)
                         }
                     } else {
-                        if changeMic.member != nil {
-                            refreshHandsUp(status: status)
-                        } else {
-                            refreshHandsUp(status: -1)
-                        }
+                        refreshHandsUp(status: status)
                     }
                 }
                 var micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
