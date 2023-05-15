@@ -270,7 +270,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                     }
                 }
                 if !isOwner {
-                    let state: SAChatBarState = ((seatUser != nil && seatUser?.member?.mic_status == .mute && seatUser?.member?.uid == VLUserCenter.user.id) || seatUser?.status == 1 || seatUser?.status == 2 || seatUser?.status == 4) ? .selected : .unSelected
+                    let state: SAChatBarState = ((seatUser != nil && seatUser?.member?.mic_status == .mute) || seatUser?.status == 1 || seatUser?.status == 2 || seatUser?.status == 4) ? .selected : .unSelected
                     if first.member != nil && first.mic_index != 0 {
                         self.chatBar.refresh(event: .mic, state: state, asCreator: isOwner)
                     }
