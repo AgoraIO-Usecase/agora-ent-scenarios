@@ -411,10 +411,7 @@ extension VoiceRoomViewController {
                             self.changeMic(from: self.local_index!, to: tag - 200)
                         }
                     } else {
-                        checkAudioAuthorized { granted in
-                            guard granted else { return }
-                            self.userApplyAlert(tag - 200)
-                        }
+                        userApplyAlert(tag - 200)
                     }
                 }
             }

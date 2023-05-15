@@ -336,10 +336,7 @@ extension SARoomViewController {
                             }
                         }
                     } else {
-                        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self) { granted in
-                            guard granted else { return }
-                            self.userApplyAlert(tag - 200)
-                        }
+                        userApplyAlert(tag - 200)
                     }
                 }
             }
