@@ -57,7 +57,7 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
                     }
                     if (scenesModel.getActive()) {
                         reportEnter(scenesModel);
-                        mainViewModel.requestReportDevice(UserManager.getInstance().getUser().userNo,"-1");
+                        mainViewModel.requestReportDevice(UserManager.getInstance().getUser().userNo,scenesModel.getScene().name());
                         goScene(scenesModel);
                     }
                 }

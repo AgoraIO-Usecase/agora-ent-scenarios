@@ -146,13 +146,14 @@ public class ApiManager {
         return apiManagerService.requestUserUpdate(getRequestBody(params)).flatMap(it -> Observable.just(it));
     }
 
-    public Observable<BaseResponse<String>> requestReportDevice(String userNo, String sceneId){
+    public Observable<BaseResponse<String>> requestReportDevice(String userNo, String sceneId) {
         ArrayMap<String, String> params = new ArrayMap();
-        params.put("userNo",userNo);
-        params.put("sceneId",sceneId);
-        params.put("appId",BuildConfig.AGORA_APP_ID);
-        params.put("appVersion",BuildConfig.APP_VERSION_NAME);
-        params.put("platform","Android");
+        params.put("userNo", userNo);
+        params.put("sceneId", sceneId);
+        params.put("appId", BuildConfig.AGORA_APP_ID);
+        params.put("projectId", "agora_ent_demo");
+        params.put("appVersion", BuildConfig.APP_VERSION_NAME);
+        params.put("platform", "Android");
         params.put("model", Build.MODEL);
         params.put("manufacture", Build.MANUFACTURER);
         params.put("osVersion", Build.VERSION.RELEASE);
