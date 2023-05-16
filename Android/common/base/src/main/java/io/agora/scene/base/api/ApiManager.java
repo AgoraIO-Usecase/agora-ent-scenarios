@@ -3,9 +3,11 @@ package io.agora.scene.base.api;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.ArrayMap;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.moczul.ok2curl.CurlInterceptor;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +42,7 @@ public class ApiManager {
                     .disableHtmlEscaping()
                     .registerTypeAdapter(String.class, new GsonUtils.StringConverter()).create();
         }
-        httpClient = new OkHttpClient.Builder().addInterceptor(chain -> {
+        OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder().addInterceptor(chain -> {
                     Request.Builder builder = chain.request().newBuilder();
                     builder.addHeader(NetConstants.HEADER_APP_OS, "android");
                     builder.addHeader(NetConstants.HEADER_VERSION_NAME, BuildConfig.APP_VERSION_NAME);
@@ -60,8 +62,11 @@ public class ApiManager {
                 .addInterceptor(new HttpLoggingInterceptor())
                 .connectTimeout(TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(TIMEOUT, TimeUnit.SECONDS)
-                .writeTimeout(TIMEOUT, TimeUnit.SECONDS)
-                .build();
+                .writeTimeout(TIMEOUT, TimeUnit.SECONDS);
+        if (BuildConfig.DEBUG) {
+            httpClientBuilder.addInterceptor(new CurlInterceptor(s -> Log.d("CurlInterceptor", s)));
+        }
+        httpClient = httpClientBuilder.build();
 
 
         Retrofit sRetrofit = new Retrofit.Builder()
@@ -148,16 +153,18 @@ public class ApiManager {
 
     public Observable<BaseResponse<String>> requestReportDevice(String userNo, String sceneId) {
         ArrayMap<String, String> params = new ArrayMap();
-        params.put("userNo", userNo);
-        params.put("sceneId", sceneId);
-        params.put("appId", BuildConfig.AGORA_APP_ID);
-        params.put("projectId", "agora_ent_demo");
+        //todo 这几个参数query?
+//        params.put("userNo", userNo);
+//        params.put("sceneId", sceneId);
+//        params.put("appId", BuildConfig.AGORA_APP_ID);
+//        params.put("projectId", "agora_ent_demo");
         params.put("appVersion", BuildConfig.APP_VERSION_NAME);
         params.put("platform", "Android");
         params.put("model", Build.MODEL);
         params.put("manufacture", Build.MANUFACTURER);
         params.put("osVersion", Build.VERSION.RELEASE);
-        return apiManagerService.requestReportDevice(getRequestBody(params)).flatMap(it -> Observable.just(it));
+        return apiManagerService.requestReportDevice(userNo,sceneId,BuildConfig.AGORA_APP_ID,"agora_ent_demo",
+                getRequestBody(params)).flatMap(it -> Observable.just(it));
 
     }
 

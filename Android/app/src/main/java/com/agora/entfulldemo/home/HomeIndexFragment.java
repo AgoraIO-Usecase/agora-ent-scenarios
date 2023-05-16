@@ -13,11 +13,9 @@ import androidx.lifecycle.ViewModelProvider;
 import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding;
 import com.agora.entfulldemo.databinding.AppItemHomeIndexBinding;
-import com.agora.entfulldemo.databinding.AppItemHomeIndexBinding;
 import com.agora.entfulldemo.home.constructor.ScenesConstructor;
 import com.agora.entfulldemo.home.constructor.ScenesModel;
 import com.agora.entfulldemo.home.holder.HomeIndexHolder;
-import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding;
 
 import java.util.List;
 
@@ -57,7 +55,7 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
                     }
                     if (scenesModel.getActive()) {
                         reportEnter(scenesModel);
-                        mainViewModel.requestReportDevice(UserManager.getInstance().getUser().userNo,scenesModel.getScene().name());
+                        mainViewModel.requestReportDevice(UserManager.getInstance().getUser().userNo, scenesModel.getScene().name());
                         goScene(scenesModel);
                     }
                 }

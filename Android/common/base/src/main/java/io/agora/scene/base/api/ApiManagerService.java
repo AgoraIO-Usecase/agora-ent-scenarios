@@ -41,5 +41,9 @@ public interface ApiManagerService {
     );
 
     @POST(UrlConstants.REQUEST_REPORT_DEVICE)
-    Observable<BaseResponse<String>> requestReportDevice(@Body RequestBody requestBody);
+    Observable<BaseResponse<String>> requestReportDevice(@Query("userNo") String userNo,
+                                                         @Query("sceneId") String sceneId,
+                                                         @Query("appId") String appId,
+                                                         @Query("projectId") String projectId,
+                                                         @Body RequestBody requestBody);
 }
