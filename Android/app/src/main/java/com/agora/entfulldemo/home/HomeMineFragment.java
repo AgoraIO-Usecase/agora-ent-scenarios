@@ -92,7 +92,13 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             PagePilotManager.pageWebView("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/privacy.html");
         });
         getBinding().tvCollectionChecklist.setOnClickListener(view -> {
-            PagePilotManager.pageWebView("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/privacy.html");
+            StringBuilder stringBuilder =  new StringBuilder("https://webdemo.agora.io/agora-ent-scenarios-dev")
+                    .append("?userNo=").append(UserManager.getInstance().getUser().userNo)
+                    .append("&appId=").append(io.agora.scene.base.BuildConfig.AGORA_APP_ID)
+                    .append("&projectId=").append("agora_ent_demo")
+//                    .append("&sceneId=").append("-1")
+                    .append("&token=").append(UserManager.getInstance().getUser().token);
+            PagePilotManager.pageWebView(stringBuilder.toString());
         });
         getBinding().tvDataSharing.setOnClickListener(view -> {
             PagePilotManager.pageWebView("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/libraries.html");

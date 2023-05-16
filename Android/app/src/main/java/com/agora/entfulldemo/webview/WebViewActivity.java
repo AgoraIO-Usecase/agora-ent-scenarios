@@ -54,6 +54,8 @@ public class WebViewActivity extends BaseViewBindingActivity<AppActivityWebviewB
             getBinding().titleView.setTitle(getString(R.string.app_privacy_agreement));
         } else if (url.contains("privacy/libraries")) {
             getBinding().titleView.setTitle(getString(R.string.app_third_party_info_data_sharing));
+        }else if (url.contains("agora-ent-scenarios")){
+            getBinding().titleView.setTitle(getString(R.string.app_personal_info_collection_checklist));
         }
         getBinding().webView.loadUrl(url);
     }

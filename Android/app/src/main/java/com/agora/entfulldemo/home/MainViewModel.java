@@ -52,26 +52,26 @@ public class MainViewModel extends BaseRequestViewModel {
     public void requestUserInfo(String userNo) {
         ApiManager.getInstance().requestUserInfo(userNo)
                 .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
-                new ApiSubscriber<BaseResponse<User>>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-                        addDispose(d);
-                    }
+                        new ApiSubscriber<BaseResponse<User>>() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+                                addDispose(d);
+                            }
 
-                    @Override
-                    public void onSuccess(BaseResponse<User> data) {
-                        UserManager.getInstance().getUser().name = data.getData().name;
-                        UserManager.getInstance().getUser().headUrl = data.getData().headUrl;
-                        UserManager.getInstance().saveUserInfo(UserManager.getInstance().getUser());
-                        getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS, null);
-                    }
+                            @Override
+                            public void onSuccess(BaseResponse<User> data) {
+                                UserManager.getInstance().getUser().name = data.getData().name;
+                                UserManager.getInstance().getUser().headUrl = data.getData().headUrl;
+                                UserManager.getInstance().saveUserInfo(UserManager.getInstance().getUser());
+                                getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS, null);
+                            }
 
-                    @Override
-                    public void onFailure(@Nullable ApiException t) {
-                        ToastUtils.showToast(t.getMessage());
-                    }
-                }
-        );
+                            @Override
+                            public void onFailure(@Nullable ApiException t) {
+                                ToastUtils.showToast(t.getMessage());
+                            }
+                        }
+                );
     }
 
     /**
@@ -82,54 +82,54 @@ public class MainViewModel extends BaseRequestViewModel {
                                     String sex) {
         ApiManager.getInstance().requestUserUpdate(headUrl, name, sex, UserManager.getInstance().getUser().userNo).
                 compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
-                new ApiSubscriber<BaseResponse<User>>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-                        addDispose(d);
-                    }
+                        new ApiSubscriber<BaseResponse<User>>() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+                                addDispose(d);
+                            }
 
-                    @Override
-                    public void onSuccess(BaseResponse<User> data) {
-                        ToastUtils.showToast("修改成功");
-                        getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
-                        if (!TextUtils.isEmpty(name)) {
-                            UserManager.getInstance().getUser().name = name;
-                        }
-                        if (!TextUtils.isEmpty(headUrl)) {
-                            UserManager.getInstance().getUser().headUrl = headUrl;
-                        }
-                        UserManager.getInstance().saveUserInfo(UserManager.getInstance().getUser());
-                        requestUserInfo(UserManager.getInstance().getUser().userNo);
-                    }
+                            @Override
+                            public void onSuccess(BaseResponse<User> data) {
+                                ToastUtils.showToast("修改成功");
+                                getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
+                                if (!TextUtils.isEmpty(name)) {
+                                    UserManager.getInstance().getUser().name = name;
+                                }
+                                if (!TextUtils.isEmpty(headUrl)) {
+                                    UserManager.getInstance().getUser().headUrl = headUrl;
+                                }
+                                UserManager.getInstance().saveUserInfo(UserManager.getInstance().getUser());
+                                requestUserInfo(UserManager.getInstance().getUser().userNo);
+                            }
 
-                    @Override
-                    public void onFailure(@Nullable ApiException t) {
-                        ToastUtils.showToast(t.getMessage());
-                    }
-                });
+                            @Override
+                            public void onFailure(@Nullable ApiException t) {
+                                ToastUtils.showToast(t.getMessage());
+                            }
+                        });
     }
 
     public void updatePhoto(File file) {
         ApiManager.getInstance().requestUploadPhoto(file)
                 .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
-                new ApiSubscriber<BaseResponse<CommonBean>>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-                        addDispose(d);
-                    }
+                        new ApiSubscriber<BaseResponse<CommonBean>>() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+                                addDispose(d);
+                            }
 
-                    @Override
-                    public void onSuccess(BaseResponse<CommonBean> data) {
-                        UserManager.getInstance().getUser().headUrl = data.getData().url;
-                        requestEditUserInfo(data.getData().url, null, null);
-                    }
+                            @Override
+                            public void onSuccess(BaseResponse<CommonBean> data) {
+                                UserManager.getInstance().getUser().headUrl = data.getData().url;
+                                requestEditUserInfo(data.getData().url, null, null);
+                            }
 
-                    @Override
-                    public void onFailure(@Nullable ApiException t) {
-                        ToastUtils.showToast(t.getMessage());
-                    }
-                }
-        );
+                            @Override
+                            public void onFailure(@Nullable ApiException t) {
+                                ToastUtils.showToast(t.getMessage());
+                            }
+                        }
+                );
     }
 
     /**
@@ -137,28 +137,6 @@ public class MainViewModel extends BaseRequestViewModel {
      */
     public void requestCancellation(String userNo) {
         ApiManager.getInstance().requestCancellationUser(userNo)
-                .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
-                new ApiSubscriber<BaseResponse<String>>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-                        addDispose(d);
-                    }
-
-                    @Override
-                    public void onSuccess(BaseResponse<String> data) {
-                        getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_CANCEL_ACCOUNTS, null);
-                    }
-
-                    @Override
-                    public void onFailure(@Nullable ApiException t) {
-                        ToastUtils.showToast(t.getMessage());
-                    }
-                }
-        );
-    }
-
-    public void requestReportDevice(String userNo,String sceneId) {
-        ApiManager.getInstance().requestReportDevice(userNo,sceneId)
                 .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
                         new ApiSubscriber<BaseResponse<String>>() {
                             @Override
@@ -168,12 +146,34 @@ public class MainViewModel extends BaseRequestViewModel {
 
                             @Override
                             public void onSuccess(BaseResponse<String> data) {
-                                Log.d("requestReportDevice","onSuccess");
+                                getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_CANCEL_ACCOUNTS, null);
                             }
 
                             @Override
                             public void onFailure(@Nullable ApiException t) {
-                                Log.d("requestReportDevice","onFailure:"+t.getMessage());
+                                ToastUtils.showToast(t.getMessage());
+                            }
+                        }
+                );
+    }
+
+    public void requestReportDevice(String userNo, String sceneId) {
+        ApiManager.getInstance().requestReportDevice(userNo, sceneId)
+                .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
+                        new ApiSubscriber<BaseResponse<String>>() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+                                addDispose(d);
+                            }
+
+                            @Override
+                            public void onSuccess(BaseResponse<String> data) {
+                                Log.d("requestReportDevice", "onSuccess");
+                            }
+
+                            @Override
+                            public void onFailure(@Nullable ApiException t) {
+                                Log.d("requestReportDevice", "onFailure:" + t.getMessage());
                             }
                         }
                 );
