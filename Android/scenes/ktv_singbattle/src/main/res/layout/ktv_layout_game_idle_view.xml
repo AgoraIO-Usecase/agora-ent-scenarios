@@ -29,6 +29,7 @@
         android:layout_marginStart="73dp"
         android:layout_marginBottom="34dp"
         android:background="@mipmap/ic_diange"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
     </androidx.appcompat.widget.AppCompatImageButton>

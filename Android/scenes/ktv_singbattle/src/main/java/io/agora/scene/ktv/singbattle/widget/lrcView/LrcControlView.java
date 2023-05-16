@@ -20,6 +20,8 @@ import android.widget.TextView;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.palette.graphics.Palette;
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
@@ -93,6 +95,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     public Role mRole = Role.Listener;
     private OnKaraokeEventListener mOnKaraokeActionListener;
+
+    private boolean isOnSeat = false;
+    public void onSeat(boolean isOnSeat) {
+        this.isOnSeat = isOnSeat;
+    }
 
     public LrcControlView(@NonNull Context context) {
         this(context, null);
@@ -272,29 +279,50 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
     }
 
+    private boolean isPrepareSong = true;
     public void onGameBattlePrepareStatus() {
         if (mBinding == null) return;
+        isPrepareSong = true;
         mBinding.ilActive.scoringView.setVisibility(View.GONE);
         mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
         mBinding.tvMusicName.setVisibility(View.GONE);
         mBinding.tvCumulativeScore.setVisibility(View.GONE);
         mBinding.gradeView.setVisibility(View.GONE);
-
+        mBinding.comboView.getRoot().setVisibility(View.GONE);
+        mBinding.lineScore.setVisibility(View.GONE);
         mBinding.ilActive.tvMusicName2.setVisibility(View.VISIBLE);
-        mBinding.ilActive.singBattle.setVisibility(View.VISIBLE);
-        mBinding.ilActive.singBattle.setEnabled(false);
-        mBinding.ilActive.singBattle.setBackgroundResource(R.mipmap.ktv_start_grasp_waiting);
+
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams)findViewById(R.id.lyricsView).getLayoutParams();
+        params.topToBottom = R.id.tvMusicName2;
+        params.bottomToTop = R.id.singBattle;
+        findViewById(R.id.lyricsView).requestLayout();
+
+        if (isOnSeat) {
+            mBinding.ilActive.singBattle.setVisibility(View.VISIBLE);
+            mBinding.ilActive.singBattle.setEnabled(false);
+            mBinding.ilActive.singBattle.setBackgroundResource(R.mipmap.ktv_start_grasp_waiting);
+        } else {
+            mBinding.ilActive.singBattle.setVisibility(View.GONE);
+        }
     }
 
     public void onGamingStatus() {
         if (mBinding == null) return;
+        isPrepareSong = false;
         mBinding.ilActive.scoringView.setVisibility(View.VISIBLE);
         mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
         mBinding.tvMusicName.setVisibility(View.VISIBLE);
         mBinding.tvCumulativeScore.setVisibility(View.VISIBLE);
         mBinding.gradeView.setVisibility(View.VISIBLE);
+        mBinding.comboView.getRoot().setVisibility(View.VISIBLE);
+        mBinding.lineScore.setVisibility(View.VISIBLE);
         mBinding.ilActive.tvMusicName2.setVisibility(View.GONE);
         mBinding.ilActive.singBattle.setVisibility(View.GONE);
+
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams)findViewById(R.id.lyricsView).getLayoutParams();
+        params.topToBottom = R.id.scoringView;
+        params.bottomToTop = R.id.bgd_control_layout_lrc;
+        findViewById(R.id.lyricsView).requestLayout();
     }
 
     public void setRole(@NonNull Role mRole) {
@@ -340,6 +368,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public void updateScore(double score, double cumulativeScore, double perfectScore) {
+        if (isPrepareSong) return;
         mCumulativeScoreInPercentage = (int) ((cumulativeScore / perfectScore) * 100);
 
         mBinding.gradeView.setScore((int) score, (int) cumulativeScore, (int) perfectScore);

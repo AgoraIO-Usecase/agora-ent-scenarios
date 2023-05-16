@@ -11,7 +11,7 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvMusicName2"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginTop="0dp"
         android:drawableStart="@mipmap/ic_music_name"
         android:gravity="center"

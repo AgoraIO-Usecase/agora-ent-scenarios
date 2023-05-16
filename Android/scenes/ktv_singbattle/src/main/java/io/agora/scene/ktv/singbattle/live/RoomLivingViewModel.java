@@ -1,7 +1,5 @@
 package io.agora.scene.ktv.singbattle.live;
 
-import static io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE.CONNECTION_STATE_CONNECTED;
-import static io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE.getValue;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE;
 
@@ -26,8 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.agora.musiccontentcenter.Music;
 import io.agora.musiccontentcenter.MusicChartInfo;
@@ -65,6 +62,7 @@ import io.agora.scene.ktv.singbattle.service.ScoringAverageModel;
 import io.agora.scene.ktv.singbattle.service.SingBattleGameStatus;
 import io.agora.scene.ktv.singbattle.widget.MusicSettingBean;
 import io.agora.scene.ktv.singbattle.widget.MusicSettingDialog;
+import io.agora.scene.ktv.singbattle.widget.rankList.RankItem;
 
 public class RoomLivingViewModel extends ViewModel {
 
@@ -151,6 +149,13 @@ public class RoomLivingViewModel extends ViewModel {
     final MutableLiveData<NetWorkEvent> networkStatusLiveData = new MutableLiveData<>();
 
     final MutableLiveData<ScoringAlgoControlModel> scoringAlgoControlLiveData = new MutableLiveData<>();
+
+    class RankModel {
+        String userName;
+        int songNum;
+        double score;
+    }
+    private final Map<String, RankModel> rankMap = new HashMap<>();
 
     /**
      * Rtc引擎
@@ -619,12 +624,14 @@ public class RoomLivingViewModel extends ViewModel {
                         if (value == null || !value.getSongNo().equals(songPlaying.getSongNo())) {
                             // 无已点歌曲， 直接将列表第一个设置为当前播放歌曲
                             //KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() chosen song list is empty");
+                            gameSong = null;
                             songPlayingLiveData.postValue(songPlaying);
                         } else if (!value.getWinnerNo().equals(songPlaying.getWinnerNo())) {
                             gameSong = songPlaying;
                         }
                     } else {
                         KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() return is emptyList");
+                        gameSong = null;
                         songPlayingLiveData.postValue(null);
                     }
                 }
@@ -970,7 +977,23 @@ public class RoomLivingViewModel extends ViewModel {
                         mainSingerScoreLiveData.postValue(lineScore);
                     } else if (jsonMsg.getString("cmd").equals("SingingScore")) {
                         float score = (float) jsonMsg.getDouble("score");
+                        String userId = (String) jsonMsg.getString("userId");
+                        String userName = (String) jsonMsg.getString("userName");
                         playerMusicPlayCompleteLiveData.postValue(new ScoringAverageModel(false, (int)score));
+
+                        // 本地演唱 计入rank
+                        RankModel model = new RankModel();
+                        if (rankMap.containsKey(userId)) {
+                            RankModel oldModel = rankMap.get(userId);
+                            model.userName = oldModel.userName;
+                            model.score = (oldModel.score * oldModel.songNum + score) / (oldModel.songNum + 1) ;
+                            model.songNum = oldModel.songNum + 1;
+                        } else {
+                            model.userName = userName;
+                            model.score = score;
+                            model.songNum = 1;
+                        }
+                        rankMap.put(userId, model);
                     }
                 } catch (JSONException exp) {
                     KTVLogger.e(TAG, "onStreamMessage:" + exp);
@@ -1007,7 +1030,10 @@ public class RoomLivingViewModel extends ViewModel {
                            playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
                            break;
                        case PLAYER_STATE_PLAYING:
-                           playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                           //playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                           if (gameSong == null && isLocal) {
+                               ktvApiProtocol.getMediaPlayer().selectAudioTrack(0);
+                           }
                            break;
                        case PLAYER_STATE_PAUSED:
                            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
@@ -1201,6 +1227,14 @@ public class RoomLivingViewModel extends ViewModel {
         KTVLogger.d(TAG, "startSingBattleGame called");
         ktvServiceProtocol.startSingBattleGame(e -> {
             KTVLogger.d(TAG, "startSingBattleGame success");
+            return null;
+        });
+    }
+
+    public void prepareSingBattleGame() {
+        KTVLogger.d(TAG, "startPrepareSingBattleGame called");
+        ktvServiceProtocol.prepareSingBattleGame(e -> {
+            KTVLogger.d(TAG, "startPrepareSingBattleGame success");
             return null;
         });
     }
@@ -1522,11 +1556,44 @@ public class RoomLivingViewModel extends ViewModel {
         Map<String, Object> msg = new HashMap<>();
         msg.put("cmd", "SingingScore");
         msg.put("score", score);
+        msg.put("userName", UserManager.getInstance().getUser().name);
+        msg.put("userId", UserManager.getInstance().getUser().id.toString());
         JSONObject jsonMsg = new JSONObject(msg);
         int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
         if (ret < 0) {
             KTVLogger.e(TAG, "syncSingingAverageScore() sendStreamMessage called returned: " + ret);
         }
+
+        // 本地演唱 计入rank
+        RankModel model = new RankModel();
+        if (rankMap.containsKey(UserManager.getInstance().getUser().id.toString())) {
+            RankModel oldModel = rankMap.get(UserManager.getInstance().getUser().id.toString());
+            model.userName = oldModel.userName;
+            model.score = (oldModel.score * oldModel.songNum + score) / (oldModel.songNum + 1) ;
+            model.songNum = oldModel.songNum + 1;
+        } else {
+            model.userName = UserManager.getInstance().getUser().name;
+            model.score = score;
+            model.songNum = 1;
+        }
+        rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
+    }
+
+    public List<RankItem> getRankList() {
+        List<RankItem> rankItemList = new ArrayList<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            AtomicInteger i = new AtomicInteger();
+            rankMap.forEach((uid, model) -> {
+                RankItem item = new RankItem();
+                item.rank = i.get();
+                item.userName = model.userName;
+                item.songNum = model.songNum;
+                item.score = model.score;
+                rankItemList.add(item);
+                i.getAndIncrement();
+            });
+        }
+        return rankItemList;
     }
 
     private List<Music> getMockMusicList() {

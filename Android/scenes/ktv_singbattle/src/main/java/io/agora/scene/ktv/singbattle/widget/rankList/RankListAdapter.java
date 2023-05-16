@@ -14,17 +14,17 @@ public class RankListAdapter extends BindingSingleAdapter<RankItem, KtvItemRankL
         RankItem item = getItem(position);
         KtvItemRankListBinding mBinding = holder.binding;
         if (position == 0) {
-            mBinding.getRoot().setBackgroundColor(R.mipmap.ktv_game_rank_list_1_background);
+            mBinding.getRoot().setBackgroundResource(R.mipmap.ktv_game_rank_list_1_background);
         } else if (position == 1) {
-            mBinding.getRoot().setBackgroundColor(R.mipmap.ktv_game_rank_list_2_background);
+            mBinding.getRoot().setBackgroundResource(R.mipmap.ktv_game_rank_list_2_background);
         } else if (position == 2) {
-            mBinding.getRoot().setBackgroundColor(R.mipmap.ktv_game_rank_list_3_background);
+            mBinding.getRoot().setBackgroundResource(R.mipmap.ktv_game_rank_list_3_background);
         } else {
-            mBinding.getRoot().setBackgroundColor(R.mipmap.ktv_game_rank_list_default_background);
+            mBinding.getRoot().setBackgroundResource(R.mipmap.ktv_game_rank_list_default_background);
         }
         mBinding.tvTank.setText("" + (position + 1));
         mBinding.tvPlayer.setText(item.userName);
-        mBinding.tvSongNum.setText(item.songNum);
-        mBinding.tvScore.setText(item.score);
+        mBinding.tvSongNum.setText(String.valueOf(item.songNum));
+        mBinding.tvScore.setText(String.valueOf(item.score));
     }
 }

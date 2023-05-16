@@ -31,6 +31,19 @@
             android:visibility="gone"
             tools:visibility="visible"/>
 
+        <Button
+            android:id="@+id/btGameAgain"
+            android:layout_width="109dp"
+            android:layout_height="34dp"
+            android:layout_marginTop="260dp"
+            android:text="再来一轮"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:background="@mipmap/ktv_start_grasp_waiting"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone"/>
+
     </FrameLayout>
 
 </androidx.cardview.widget.CardView>

@@ -206,7 +206,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
         if (mBinding == null) return;
         mBinding.ilGameSong.tvSongNum.setText("已点 " + songs.size() + "/8");
-        if (songs.size() <= 3) {
+        if (songs.size() <= 0) {
             mBinding.ilGameSong.btStartGame.setBackgroundResource(R.mipmap.ktv_start_game_disabled);
             mBinding.ilGameSong.btStartGame.setEnabled(false);
         } else if (songs.size() <= 8) {
