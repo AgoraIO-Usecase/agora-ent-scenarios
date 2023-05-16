@@ -1115,7 +1115,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                 duration = mPlayer.duration
                 this.localPlayerPosition = 0
-                mPlayer.selectAudioTrack(0)
+                mPlayer.selectAudioTrack(1)
                 if (this.singerRole == KTVSingRole.SoloSinger ||
                     this.singerRole == KTVSingRole.LeadSinger
                 ) {

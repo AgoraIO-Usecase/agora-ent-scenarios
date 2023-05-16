@@ -3,6 +3,7 @@ package io.agora.scene.ktv.singbattle.widget.game;
 import android.content.Context;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -18,6 +19,7 @@ import io.agora.scene.ktv.singbattle.widget.rankList.RankItem;
 
 public class SingBattleGameView extends FrameLayout {
 
+    private final String TAG = "SingBattleGameView_LOG";
     protected KtvLayoutGameViewBinding mBinding;
     private boolean isRoomOwner = false;
     private OnSingBattleGameEventListener mSingBattleGameEventListener;
@@ -50,6 +52,7 @@ public class SingBattleGameView extends FrameLayout {
     private void initListener() {
         mBinding.ilIDLE.btAutoSelectSong.setOnClickListener(view -> mSingBattleGameEventListener.onAutoSelectSongClick());
         mBinding.ilIDLE.btChooseSong.setOnClickListener(View -> mSingBattleGameEventListener.onChooseSongClick());
+        mBinding.btGameAgain.setOnClickListener(View -> mSingBattleGameEventListener.onGameAgainClick());
     }
 
     private CountDownTimer mCountDownLatch;
@@ -95,8 +98,11 @@ public class SingBattleGameView extends FrameLayout {
 
     // 游戏等待
     public void onGameWaitingStatus() {
+        Log.d(TAG, "onGameWaitingStatus");
         if (mBinding == null) return;
+        mBinding.ilRank.setVisibility(GONE);
         if (isRoomOwner) {
+            mBinding.btGameAgain.setVisibility(GONE);
             mBinding.ilIDLE.messageText.setText(R.string.ktv_game_room_owner_idle);
             mBinding.ilIDLE.btChooseSong.setVisibility(View.VISIBLE);
             mBinding.ilIDLE.btAutoSelectSong.setVisibility(View.VISIBLE);
@@ -109,6 +115,7 @@ public class SingBattleGameView extends FrameLayout {
 
     // 游戏开始
     public void onGameStartStatus(int songNum) {
+        Log.d(TAG, "onGameStartStatus, songNum:" + songNum);
         this.songNum = songNum;
         if (mBinding == null) return;
         mBinding.ilIDLE.messageText.setText(R.string.ktv_game_start);
@@ -121,8 +128,8 @@ public class SingBattleGameView extends FrameLayout {
     private int songNum = 0;
     private int nowNum = 0;
     public void onBattleGamePrepare() {
+        Log.d(TAG, "onBattleGamePrepare");
         if (mBinding == null) return;
-        if (nowNum >= songNum) return;
         nowNum ++;
         mBinding.ilActive.tvSongTab.setText(nowNum + "/" + songNum);
         mBinding.ilIDLE.messageText.setVisibility(View.GONE);
@@ -132,6 +139,7 @@ public class SingBattleGameView extends FrameLayout {
 
     // 抢唱成功
     public void onGraspSongSuccess(String userName) {
+        Log.d(TAG, "onGraspSongSuccess");
         if (mBinding == null) return;
         mBinding.ilIDLE.messageText.setText("本轮由 " + userName + " 抢到麦");
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
@@ -145,21 +153,24 @@ public class SingBattleGameView extends FrameLayout {
 
     // 无人抢唱
     public void onNobodyGraspSong() {
+        Log.d(TAG, "onNobodyGraspSong");
         if (mBinding == null) return;
         mBinding.ilIDLE.messageText.setText(R.string.ktv_game_nobody_grasp);
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
         mBinding.getRoot().postDelayed(() -> {
-            if (nowNum >= songNum) {
+            if (nowNum < songNum) {
+                onNextSong();
+            } else {
+                // 已经是最后一首歌
                 if (mSingBattleGameEventListener != null) mSingBattleGameEventListener.onGameEnd();
-                return;
             }
-            if (mSingBattleGameEventListener != null) mSingBattleGameEventListener.onNextSong();
         }, 5000);
     }
 
-    // 挑战结束
+    // 歌曲演唱结束
     public void onSongFinish(int score) {
+        Log.d(TAG, "onSongFinish");
         if (mBinding == null) return;
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
@@ -170,28 +181,38 @@ public class SingBattleGameView extends FrameLayout {
             mBinding.ilIDLE.messageText.setText("挑战成功：" + score);
             mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_win_text_background);
         }
-        mBinding.getRoot().postDelayed(this::onNextSong, 5000);
+        mBinding.getRoot().postDelayed(() -> {
+            if (nowNum < songNum) {
+                onNextSong();
+            } else {
+                // 已经是最后一首歌
+                if (mSingBattleGameEventListener != null) mSingBattleGameEventListener.onGameEnd();
+            }
+        }, 5000);
     }
 
     // 下一首
     public void onNextSong() {
-        if (nowNum < songNum) {
-            mBinding.ilIDLE.messageText.setText("下一首");
-            mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_idle_text_background);
-            mBinding.getRoot().postDelayed(() -> {
-                if (mSingBattleGameEventListener != null) mSingBattleGameEventListener.onNextSong();
-            }, 3000);
-        } else {
-            // TODO UI
-            //onGameEnd();
-        }
+        Log.d(TAG, "onNextSong");
+        if (mBinding == null) return;
+        mBinding.ilIDLE.messageText.setText("下一首");
+        mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_idle_text_background);
+        mBinding.getRoot().postDelayed(() -> {
+            if (mSingBattleGameEventListener != null) mSingBattleGameEventListener.onNextSong();
+        }, 3000);
     }
 
     // 游戏结束
     public void onGameEnd(List<RankItem> list) {
+        Log.d(TAG, "onGameEnd");
+        if (mBinding == null) return;
         nowNum = 0;
         songNum = 0;
         mBinding.ilRank.setVisibility(View.VISIBLE);
+
+        if (isRoomOwner) {
+            mBinding.btGameAgain.setVisibility(View.VISIBLE);
+        }
         mBinding.ilRank.resetRankList(list);
     }
 
@@ -225,5 +246,10 @@ public class SingBattleGameView extends FrameLayout {
          * 抢唱-游戏结束
          */
         default void onGameEnd() {}
+
+        /**
+         * 抢唱-再来一轮
+         */
+        default void onGameAgainClick() {}
     }
 }
