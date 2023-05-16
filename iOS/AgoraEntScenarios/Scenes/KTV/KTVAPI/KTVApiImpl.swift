@@ -148,9 +148,10 @@ class KTVApiImpl: NSObject{
         engine.setParameters("{\"che.audio.neteq.prebuffer\": true}")
         engine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\": 600}")
         engine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
-        engine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\": true}")
         engine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
         engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
+        engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
+        engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}");
     }
 }
 
@@ -409,7 +410,8 @@ extension KTVApiImpl {
     }
 
     private func becomeSoloSinger() {
-        apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":false}")
+        apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":false}")
+        apiConfig?.engine?.setParameters("{\"che.audio.neteq.enable_stable_playout\":false}")
         apiConfig?.engine?.setParameters("{\"che.audio.custom_bitrate\": 80000}")
         apiConfig?.engine?.setAudioScenario(.chorus)
         agoraPrint("becomeSoloSinger")
@@ -465,7 +467,8 @@ extension KTVApiImpl {
         
         agoraPrint("joinChorus2ndChannel role: \(role.rawValue)")
         if newRole == .coSinger {
-            apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":false}")
+            apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":false}")
+            apiConfig?.engine?.setParameters("{\"che.audio.neteq.enable_stable_playout\":false}")
             apiConfig?.engine?.setParameters("{\"che.audio.custom_bitrate\": 48000}")
             apiConfig?.engine?.setAudioScenario(.chorus)
         }
@@ -525,7 +528,8 @@ extension KTVApiImpl {
             mediaOption.publishMediaPlayerAudioTrack = false
             apiConfig?.engine?.updateChannel(with: mediaOption)
             leaveChorus2ndChannel(role)
-            apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":true}")
+            apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":true}")
+            apiConfig?.engine?.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
             apiConfig?.engine?.setParameters("{\"che.audio.custom_bitrate\": 48000}")
             apiConfig?.engine?.setAudioScenario(.gameStreaming)
         } else if role == .audience {
@@ -783,7 +787,8 @@ extension KTVApiImpl {
         if musicPlayer?.getPlayerState() != .stopped {
             musicPlayer?.stop()
         }
-        apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":true}")
+        apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":true}")
+        apiConfig?.engine?.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         apiConfig?.engine?.setParameters("{\"che.audio.custom_bitrate\": 48000}")
         apiConfig?.engine?.setAudioScenario(.gameStreaming)
     }
@@ -1325,6 +1330,11 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
 
 //主要是MCC的回调
 extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
+
+    func onSongSimpleInfoResult(_ requestId: String, songCode: Int, simpleInfo: String?, errorCode: AgoraMusicContentCenterStatusCode) {
+        
+    }
+
     func onMusicChartsResult(_ requestId: String, result: [AgoraMusicChartInfo], errorCode: AgoraMusicContentCenterStatusCode) {
         guard let callback = musicChartDict[requestId] else {return}
         callback(requestId, errorCode, result)
@@ -1337,7 +1347,7 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
         musicSearchDict.removeValue(forKey: requestId)
     }
     
-    func onLyricResult(_ requestId: String, lyricUrl: String?, errorCode: AgoraMusicContentCenterStatusCode) {
+    func onLyricResult(_ requestId: String, songCode: Int, lyricUrl: String?, errorCode: AgoraMusicContentCenterStatusCode){
         guard let lrcUrl = lyricUrl else {return}
         let callback = self.lyricCallbacks[requestId]
         guard let lyricCallback = callback else { return }
@@ -1349,7 +1359,7 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
         lyricCallback(lrcUrl)
     }
     
-    func onPreLoadEvent(_ songCode: Int, percent: Int, lyricUrl: String?, status: AgoraMusicContentCenterPreloadStatus, errorCode: AgoraMusicContentCenterStatusCode) {
+    func onPreLoadEvent(_ requestId: String, songCode: Int, percent: Int, lyricUrl: String?, status: AgoraMusicContentCenterPreloadStatus, errorCode: AgoraMusicContentCenterStatusCode) {
         if let listener = self.loadMusicListeners.object(forKey: "\(songCode)" as NSString) as? IMusicLoadStateListener {
             listener.onMusicLoadProgress(songCode: songCode, percent: percent, status: status, msg: String(errorCode.rawValue), lyricUrl: lyricUrl)
         }
