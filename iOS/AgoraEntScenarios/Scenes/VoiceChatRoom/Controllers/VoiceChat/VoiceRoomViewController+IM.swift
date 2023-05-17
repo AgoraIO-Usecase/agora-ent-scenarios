@@ -226,7 +226,10 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                  如果房主踢用户下麦
                  */
                 if let host: VRUser = roomInfo?.room?.owner {
-                    if host.uid == fromId, status == -1, first.member == nil,changeMic.member?.uid ?? "" == VoiceRoomUserInfo.shared.user?.uid ?? "" {
+                    if host.uid == fromId, first.member == nil,changeMic.member?.uid ?? "" == VoiceRoomUserInfo.shared.user?.uid ?? "" {
+                        if status == -1 || status == 3 || status == 4 {
+                            self.local_index = nil
+                        }
                         ChatRoomServiceImp.getSharedInstance().userList?.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
                         view.makeToast("You were removed from stage".localized())
                     }  else {
@@ -270,7 +273,11 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                             refreshHandsUp(status: -1)
                         }
                     } else {
-                        refreshHandsUp(status: status)
+                        if status < 3 {
+                            refreshHandsUp(status: status)
+                        } else {
+                            refreshHandsUp(status: -1)
+                        }
                     }
                 }
                 ChatRoomServiceImp.getSharedInstance().mics[first.mic_index] = first
