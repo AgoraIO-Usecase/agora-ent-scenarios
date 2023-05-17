@@ -232,6 +232,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                         }
                         ChatRoomServiceImp.getSharedInstance().userList?.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
                         view.makeToast("You were removed from stage".localized())
+                        self.refreshHandsUp(status: -1)
                     }  else {
                         self.refreshApplicants(chat_uid: fromId)
                     }
