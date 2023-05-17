@@ -274,9 +274,17 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                         }
                     } else {
                         if status < 3 {
-                            refreshHandsUp(status: status)
+                            let local_uid: String = VoiceRoomUserInfo.shared.user?.chat_uid ?? ""
+                            let cp_uid: String = first.member?.chat_uid ?? ""
+                            if local_uid == cp_uid {
+                                refreshHandsUp(status: status)
+                            }
                         } else {
-                            refreshHandsUp(status: -1)
+                            if self.local_index == nil {
+                                refreshHandsUp(status: -1)
+                            } else {
+                                refreshHandsUp(status: status)
+                            }
                         }
                     }
                 }
