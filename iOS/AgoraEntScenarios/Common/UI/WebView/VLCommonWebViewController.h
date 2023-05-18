@@ -11,6 +11,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSString *urlString;
 
+- (void)injectMethod:(NSString *)method;
+
+- (void)evaluateJS: (NSString *)js;
+
 @end
 
 NS_ASSUME_NONNULL_END
