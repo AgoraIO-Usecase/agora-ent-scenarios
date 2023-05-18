@@ -49,6 +49,16 @@ NSString *const USBaseWebViewController_KVO_Title = @"title";
     }
 }
 
+- (void)injectMethod:(NSString *)method {
+    [self.webView.configuration.userContentController addScriptMessageHandler:self name:method];
+}
+
+- (void)evaluateJS: (NSString *)js {
+    [self.webView evaluateJavaScript:js completionHandler:^(id _Nullable obj, NSError * _Nullable error) {
+        NSLog(@"obj == %@", obj);
+    }];
+}
+
 - (void)setupViews {
     [self.view addSubview:self.webView];
     [self.webView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -175,7 +185,8 @@ NSString *const USBaseWebViewController_KVO_Title = @"title";
 }
 
 - (void)userContentController:(nonnull WKUserContentController *)userContentController didReceiveScriptMessage:(nonnull WKScriptMessage *)message {
-    
+    NSLog(@"js调用的方法:%@",message.name);
+    NSLog(@"js传过来的数据:%@",message.body);
 }
 
 - (void)encodeWithCoder:(nonnull NSCoder *)coder {
