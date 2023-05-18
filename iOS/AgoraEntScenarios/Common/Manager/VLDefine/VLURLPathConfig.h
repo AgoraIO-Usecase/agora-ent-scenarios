@@ -23,7 +23,9 @@ static NSString * const kURLPathVerifyCode = @"/api-login/users/verificationCode
 static NSString * const kURLPathH5UserAgreement = @"https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/service.html";
 static NSString * const kURLPathH5Privacy = @"https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/privacy.html";
 static NSString * const kURLPathH5AboutUS = @"https://www.agora.io/cn/about-us/";
-static NSString * const kURLPathH5PersonInfo = @"http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest-dev/index.html";
+
+static NSString * const kURLPathH5PersonInfo = @"http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest/index.html";
+
 static NSString * const kURLPathH5ThirdInfoShared = @"https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/libraries.html";
 
 #endif /* VLURLPathConfig_h */
