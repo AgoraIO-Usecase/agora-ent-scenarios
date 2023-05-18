@@ -51,3 +51,11 @@ enum UserInfo {
 //        "\(userId)"
 //    }
 }
+
+
+enum AgoraScene: String {
+    case KTV
+    case ChatRoom
+    case LiveShow
+    case SpatialAudioChatRoom
+}

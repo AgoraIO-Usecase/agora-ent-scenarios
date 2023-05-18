@@ -67,6 +67,24 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         case VLMineViewClickTypePrivacyProtocol:
             [self pushWebView:kURLPathH5Privacy];
             break;
+        case VLMineViewClickTypePersonInfo:
+        {
+            VLCommonWebViewController *webVC = [[VLCommonWebViewController alloc] init];
+            NSString *url = [kURLPathH5PersonInfo stringByAppendingFormat:@"?userNo=%@&projectId=agora_ent_demo&appId=%@&token=%@",
+                             VLUserCenter.user.userNo,
+                             KeyCenter.AppId,
+                             VLUserCenter.user.token];
+            webVC.urlString = url;
+            [self.navigationController pushViewController:webVC animated:YES];
+        }
+            break;
+        case VLMineViewClickTypeThirdInfoShared:
+        {
+            VLCommonWebViewController *webVC = [[VLCommonWebViewController alloc] init];
+            webVC.urlString = kURLPathH5ThirdInfoShared;
+            [self.navigationController pushViewController:webVC animated:YES];
+        }
+            break;
         case VLMineViewClickTypeAboutUS:
             [self about];
             break;

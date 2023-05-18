@@ -57,6 +57,9 @@ class NetworkManager:NSObject {
                                         "X-LC-Id": "fkUjxadPMmvYF3F3BI4uvmjo-gzGzoHsz",
                                         "X-LC-Key": "QAvFS62IOR28GfSFQO5ze45s",
                                         "X-LC-Session": "qmdj8pdidnmyzp0c7yqil91oc"]
+        if !VLUserCenter.user.token.isEmpty {
+            config.httpAdditionalHeaders?["Authorization"] = VLUserCenter.user.token
+        }
         config.timeoutIntervalForRequest = 30
         config.timeoutIntervalForResource = 30
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -429,23 +432,51 @@ extension NetworkManager {
                                 "model": UIDevice.current.machineModel ?? ""
                               ],
                               "vs": ["count": 1]
-                             ]],
+                              ] as [String : Any]],
                       "src": src,
                       "ts": ts,
                       "sign": "src=\(src)&ts=\(ts)".md5Encrypt] as [String: Any]
-//        ToastView.showWait(text: "loading...", view: nil)
         let url = "https://report-ad.agoralab.co/v1/report"
         NetworkManager.shared.postRequest(urlString: url,
                                           params: params,
                                           success: { response in
-//            let data = response["data"] as? [String: String]
             print(response)
-//            success(token)
-//            ToastView.hidden()
         }, failure: { error in
-//            print(error)
-//            success(nil)
-//            ToastView.hidden()
+            print(error)
+        })
+    }
+    
+    @objc
+    public func reportDeviceInfo(sceneName: String) {
+        let appVersion = UIApplication.shared.appVersion ?? ""
+        let deviceModel = UIDevice.current.machineModel ?? ""
+        let params = ["appVersion": appVersion ,
+                      "platform": "iOS",
+                      "model": deviceModel] as [String : Any]
+        let url = KeyCenter.HostUrl + "/api-login/report/device?userNo=\(VLUserCenter.user.userNo)&sceneId=\(sceneName)&appId=\(KeyCenter.AppId)&projectId=agora_ent_demo"
+        NetworkManager.shared.postRequest(urlString: url,
+                                          params: params,
+                                          success: { response in
+            print(response)
+
+        }, failure: { error in
+            print(error)
+        })
+    }
+    
+    @objc
+    public func reportUserBehavior(sceneName: String) {
+        let appVersion = UIApplication.shared.appVersion ?? ""
+        let deviceModel = UIDevice.current.machineModel ?? ""
+        let params = ["action": sceneName] as [String : Any]
+        let url = KeyCenter.HostUrl + "/api-login/report/action?userNo=\(VLUserCenter.user.userNo)&sceneId=\(sceneName)&appId=\(KeyCenter.AppId)&projectId=agora_ent_demo"
+        NetworkManager.shared.postRequest(urlString: url,
+                                          params: params,
+                                          success: { response in
+            print(response)
+
+        }, failure: { error in
+            print(error)
         })
     }
 }
