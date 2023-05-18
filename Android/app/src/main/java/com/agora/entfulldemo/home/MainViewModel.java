@@ -178,4 +178,25 @@ public class MainViewModel extends BaseRequestViewModel {
                         }
                 );
     }
+
+    public void requestReportAction(String userNo, String action){
+        ApiManager.getInstance().requestReportAction(userNo,action)
+                .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
+                        new ApiSubscriber<BaseResponse<String>>(){
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+                                addDispose(d);
+                            }
+                            @Override
+                            public void onSuccess(BaseResponse<String> stringBaseResponse) {
+                                Log.d("requestReportAction", "onSuccess");
+                            }
+
+                            @Override
+                            public void onFailure(ApiException t) {
+                                Log.d("requestReportAction", "onFailure:" + t.getMessage());
+                            }
+                        }
+                );
+    }
 }

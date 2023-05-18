@@ -20,6 +20,7 @@ import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.bean.CommonBean;
 import io.agora.scene.base.manager.UserManager;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -163,7 +164,15 @@ public class ApiManager {
         params.put("model", Build.MODEL);
         params.put("manufacture", Build.MANUFACTURER);
         params.put("osVersion", Build.VERSION.RELEASE);
-        return apiManagerService.requestReportDevice(userNo,sceneId,BuildConfig.AGORA_APP_ID,"agora_ent_demo",
+        return apiManagerService.requestReportDevice(userNo, sceneId, BuildConfig.AGORA_APP_ID, "agora_ent_demo",
+                getRequestBody(params)).flatMap(it -> Observable.just(it));
+
+    }
+
+    public Observable<BaseResponse<String>> requestReportAction(String userNo, String action) {
+        ArrayMap<String, String> params = new ArrayMap();
+        params.put("action", action);
+        return apiManagerService.requestReportAction(userNo, action, BuildConfig.AGORA_APP_ID, "agora_ent_demo",
                 getRequestBody(params)).flatMap(it -> Observable.just(it));
 
     }
