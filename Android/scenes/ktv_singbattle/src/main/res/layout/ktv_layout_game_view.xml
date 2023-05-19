@@ -22,14 +22,14 @@
             android:id="@+id/ilActive"
             layout="@layout/ktv_layout_game_active_view"
             android:visibility="gone"
-            tools:visibility="gone" />
+            tools:visibility="visible" />
 
         <io.agora.scene.ktv.singbattle.widget.rankList.RankListView
             android:id="@+id/ilRank"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:visibility="gone"
-            tools:visibility="visible"/>
+            tools:visibility="gone"/>
 
         <Button
             android:id="@+id/btGameAgain"

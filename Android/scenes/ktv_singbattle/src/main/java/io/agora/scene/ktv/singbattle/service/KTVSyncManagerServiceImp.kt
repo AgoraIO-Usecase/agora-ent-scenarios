@@ -204,7 +204,7 @@ class KTVSyncManagerServiceImp(
                     TokenGenerator.generateTokens(
                         currRoomNo,
                         UserManager.getInstance().user.id.toString(),
-                        TokenGenerator.TokenGeneratorType.token006,
+                        TokenGenerator.TokenGeneratorType.token007,
                         arrayOf(
                             TokenGenerator.AgoraTokenType.rtc,
                             TokenGenerator.AgoraTokenType.rtm
@@ -229,7 +229,7 @@ class KTVSyncManagerServiceImp(
                                     TokenGenerator.generateToken(
                                         currRoomNo + "_ex",
                                         UserManager.getInstance().user.id.toString(),
-                                        TokenGenerator.TokenGeneratorType.token006,
+                                        TokenGenerator.TokenGeneratorType.token007,
                                         TokenGenerator.AgoraTokenType.rtc,
                                         { chorusToken ->
                                             val kTVJoinRoomOutputModel = JoinRoomOutputModel(

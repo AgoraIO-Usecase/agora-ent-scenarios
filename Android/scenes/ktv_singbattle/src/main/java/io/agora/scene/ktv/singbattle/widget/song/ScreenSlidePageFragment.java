@@ -84,6 +84,12 @@ public class ScreenSlidePageFragment extends Fragment {
 
     public void setRefreshingResult(List<SongItem> list) {
         mRankListAdapter.resetAll(list);
+        int searchCount = mRankListAdapter.getItemCount();
+        for (int i = 0; i < searchCount; i++) {
+            SongItem item = mRankListAdapter.getItem(i);
+            item.enable = isItemEnable;
+            mRankListAdapter.notifyItemChanged(i);
+        }
 
         if (smartRefreshLayout == null) {
             return;
@@ -114,7 +120,9 @@ public class ScreenSlidePageFragment extends Fragment {
         }
     }
 
+    private boolean isItemEnable = true;
     void setSongItemDisable(boolean enable) {
+        isItemEnable = enable;
         int searchCount = mRankListAdapter.getItemCount();
         for (int i = 0; i < searchCount; i++) {
             SongItem item = mRankListAdapter.getItem(i);

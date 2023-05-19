@@ -348,7 +348,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         // TODO
         Log.d(TAG, "loadMusic called: songCode $songCode")
         val jsonOption = "{\"format\":{\"highPart\":0}}";
-        val songCode1 = mMusicCenter.makeInternalSongCode(songCode, jsonOption)
+        val songCode1 = mMusicCenter.getInternalSongCode(songCode, jsonOption)
         mMusicCenter.getSongSimpleInfo(songCode1);
         // 设置到全局， 连续调用以最新的为准
         this.songMode = KTVSongMode.SONG_CODE
@@ -873,12 +873,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         }
 
         val retPreload = mMusicCenter.preload(songNo)
-        if (retPreload != 0) {
-            Log.e(TAG, "preLoadMusic failed: $retPreload")
-            loadMusicCallbackMap.remove(songNo.toString())
-            onLoadMusicCallback(songNo, 100, 1, null, null)
-            return
-        }
+//        if (retPreload != 0) {
+//            Log.e(TAG, "preLoadMusic failed: $retPreload")
+//            loadMusicCallbackMap.remove(songNo.toString())
+//            onLoadMusicCallback(songNo, 100, 1, null, null)
+//            return
+//        }
         loadMusicCallbackMap[songCode.toString()] = onLoadMusicCallback
     }
 
