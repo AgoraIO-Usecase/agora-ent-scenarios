@@ -383,6 +383,8 @@ class NetworkManager:NSObject {
             default:
                 failure?("Error in the request status code \(httpResponse.statusCode), response: \(String(describing: response))")
             }
+        } else {
+            failure?("Error in the request status code \(400), response: \(String(describing: response))")
         }
     }
 }
