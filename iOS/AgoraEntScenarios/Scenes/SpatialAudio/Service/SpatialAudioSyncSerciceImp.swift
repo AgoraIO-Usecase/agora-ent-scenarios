@@ -85,7 +85,6 @@ extension SpatialAudioSyncSerciceImp {
             
             agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
 //            self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: UInt(state.rawValue)))
-            guard state == .open else { return }
             guard !self.syncUtilsInited else {
                 //TODO: retry get data if restore connection
                 return

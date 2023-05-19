@@ -135,7 +135,6 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             
             agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
             self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: UInt(state.rawValue)))
-            guard state == .open else { return }
             guard !self.syncUtilsInited else {
                 self._seatListReloadIfNeed()
                 self._getUserInfo { err, list in
