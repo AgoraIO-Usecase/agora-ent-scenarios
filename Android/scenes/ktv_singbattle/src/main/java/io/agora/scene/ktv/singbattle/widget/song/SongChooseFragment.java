@@ -1,6 +1,5 @@
 package io.agora.scene.ktv.singbattle.widget.song;
 
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -11,7 +10,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -44,8 +42,6 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
     };
 
     private ScreenSlidePageFragment[] fragments = new ScreenSlidePageFragment[4];
-    private boolean isItemEnable = true;
-
 
     @NonNull
     @Override
@@ -129,24 +125,6 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
             Runnable next = iterator.next();
             next.run();
         }
-
-        getBinding().getRoot().post(() -> {
-            if (getBinding().recyclerSearchResult.getVisibility() == View.VISIBLE) {
-                int searchCount = mSearchAdapter.getItemCount();
-                for (int i = 0; i < searchCount; i++) {
-                    SongItem item = mSearchAdapter.getItem(i);
-                    item.enable = isItemEnable;
-                    mSearchAdapter.notifyItemChanged(i);
-                }
-            } else {
-                for (ScreenSlidePageFragment fragment : fragments) {
-                    if (fragment == null) {
-                        continue;
-                    }
-                    fragment.setSongItemDisable(isItemEnable);
-                }
-            }
-        });
     }
 
     @Override
@@ -252,25 +230,22 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
     }
 
     void setSongItemDisable(boolean enable) {
-        this.isItemEnable = enable;
         if (getBinding() == null) return;
-        getBinding().getRoot().post(() -> {
-            if (getBinding().recyclerSearchResult.getVisibility() == View.VISIBLE) {
-                int searchCount = mSearchAdapter.getItemCount();
-                for (int i = 0; i < searchCount; i++) {
-                    SongItem item = mSearchAdapter.getItem(i);
-                    item.enable = enable;
-                    mSearchAdapter.notifyItemChanged(i);
-                }
-            } else {
-                for (ScreenSlidePageFragment fragment : fragments) {
-                    if (fragment == null) {
-                        continue;
-                    }
-                    fragment.setSongItemDisable(enable);
-                }
+        if (getBinding().recyclerSearchResult.getVisibility() == View.VISIBLE) {
+            int searchCount = mSearchAdapter.getItemCount();
+            for (int i = 0; i < searchCount; i++) {
+                SongItem item = mSearchAdapter.getItem(i);
+                item.enable = enable;
+                mSearchAdapter.notifyItemChanged(i);
             }
-        });
+        } else {
+            for (ScreenSlidePageFragment fragment : fragments) {
+                if (fragment == null) {
+                    continue;
+                }
+                fragment.setSongItemDisable(enable);
+            }
+        }
     }
 
     void setSearchResult(List<SongItem> list) {

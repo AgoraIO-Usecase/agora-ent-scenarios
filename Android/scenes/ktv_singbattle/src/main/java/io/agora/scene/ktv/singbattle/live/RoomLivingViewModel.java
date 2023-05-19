@@ -707,13 +707,13 @@ public class RoomLivingViewModel extends ViewModel {
         // 从RTC中获取歌曲列表
         KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() called, type:" + type + " page:" + page);
         MutableLiveData<List<RoomSelSongModel>> liveData = new MutableLiveData<>();
-        String jsonOption = "{\"pitchType\":1,\"needLyric\":true}";
+        String jsonOption = "{\"pitchType\":1,\"needLyric\":true,\"needHighPart\":true}";
         ktvApiProtocol.searchMusicByMusicChartId(type, page, 30, jsonOption,
                 (id, status, p, size, total, list) -> {
                     KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() return");
                     // TODO MOCK
-                    //List<Music> musicList = new ArrayList<>(Arrays.asList(list));
-                    List<Music> musicList = getMockMusicList();
+                    List<Music> musicList = new ArrayList<>(Arrays.asList(list));
+                    //List<Music> musicList = getMockMusicList();
                     List<RoomSelSongModel> songs = new ArrayList<>();
 
                     // 需要再调一个接口获取当前已点的歌单来补充列表信息 >_<
