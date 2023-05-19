@@ -969,7 +969,7 @@ class RoomObservableViewDelegate constructor(
             .setOnClickListener(object : CommonSheetAlertDialog.OnClickBottomListener {
                 override fun onConfirmClick() {
                     if (isRequesting) {
-                        roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())
+                        roomLivingViewModel.cancelMicSeatApply(roomKitBean.chatroomId, VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())
                     } else {
                         if (activity is ChatroomLiveActivity) {
                             activity.toggleSelfAudio(true, callback = {

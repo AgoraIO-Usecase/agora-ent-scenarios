@@ -445,8 +445,8 @@ class VoiceSyncManagerServiceImp(
      * 取消上麦
      * @param chatUid im uid
      */
-    override fun cancelMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit) {
-        ChatroomIMManager.getInstance().cancelMicSeatApply(chatUid,object : CallBack{
+    override fun cancelMicSeatApply(chatroomId: String, chatUid: String, completion: (error: Int, result: Boolean) -> Unit) {
+        ChatroomIMManager.getInstance().cancelMicSeatApply(chatroomId, chatUid, object : CallBack{
             override fun onSuccess() {
                 completion.invoke(VoiceServiceProtocol.ERR_OK,true)
             }
