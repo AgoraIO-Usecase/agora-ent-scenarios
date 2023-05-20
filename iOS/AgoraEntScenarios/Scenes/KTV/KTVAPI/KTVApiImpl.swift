@@ -149,7 +149,8 @@ class KTVApiImpl: NSObject{
         engine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
         engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
         engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
-        engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}");
+        engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
+        engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
     }
 }
 
