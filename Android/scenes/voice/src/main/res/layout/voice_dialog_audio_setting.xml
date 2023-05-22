@@ -159,34 +159,35 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtAGC" />
 
-<!--        <androidx.appcompat.widget.AppCompatImageView-->
-<!--            android:id="@+id/ivVoiceChanger"-->
-<!--            android:layout_width="20dp"-->
-<!--            android:layout_height="20dp"-->
-<!--            android:layout_marginStart="20dp"-->
-<!--            android:src="@drawable/voice_icon_room_setting_voice_changer"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="@+id/mtVoiceChanger"-->
-<!--            app:layout_constraintBottom_toBottomOf="@+id/mtVoiceChanger"/>-->
+        <!--  In-Ear Monitor  -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivInEarTitle"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/voice_icon_room_setting_ear_back"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvInEar"
+            app:layout_constraintBottom_toBottomOf="@+id/tvInEar"/>
 
-<!--        <com.google.android.material.textview.MaterialTextView-->
-<!--            android:id="@+id/mtVoiceChanger"-->
-<!--            style="@style/voice_bottom_sheet_text_style"-->
-<!--            android:layout_marginTop="1dp"-->
-<!--            android:layout_marginBottom="15dp"-->
-<!--            android:layout_marginStart="52dp"-->
-<!--            android:text="# 变声"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/mtAGC" />-->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvInEar"
+            style="@style/voice_bottom_sheet_text_style"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginStart="52dp"
+            android:text="# 耳返"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mtAGC" />
 
-<!--        <com.google.android.material.textview.MaterialTextView-->
-<!--            android:id="@+id/mtVoiceChangerArrow"-->
-<!--            style="@style/voice_bottom_sheet_right_text_style"-->
-<!--            android:drawableEnd="@drawable/voice_icon_arrow_right_grey"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintBottom_toBottomOf="@+id/mtVoiceChanger"-->
-<!--            app:layout_constraintTop_toTopOf="@+id/mtVoiceChanger"-->
-<!--            tools:text="@string/voice_chatroom_off" />-->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvInEarArrow"
+            style="@style/voice_bottom_sheet_right_text_style"
+            android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/tvInEar"
+            app:layout_constraintTop_toTopOf="@+id/tvInEar"
+            tools:text="@string/voice_chatroom_off" />
 
         <!--  Bot Settings Title  -->
         <View
@@ -206,7 +207,7 @@
             android:drawableEnd="@drawable/voice_icon_room_setting_new_tag"
             android:drawablePadding="5dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mtAGC" />
+            app:layout_constraintTop_toBottomOf="@+id/tvInEar" />
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_height="wrap_content"
@@ -371,32 +372,50 @@
             app:layout_constraintTop_toBottomOf="@+id/mtBestSoundEffect" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivSpatialAudio"
+            android:id="@+id/ivBGM"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="20dp"
-            android:src="@drawable/voice_icon_room_setting_spatial_audio"
-            app:layout_constraintBottom_toBottomOf="@+id/mtSpatialAudio"
+            android:src="@drawable/voice_icon_room_setting_bgm"
+            app:layout_constraintBottom_toBottomOf="@+id/tvBGM"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/mtSpatialAudio" />
+            app:layout_constraintTop_toTopOf="@+id/tvBGM" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/mtSpatialAudio"
+            android:id="@+id/tvBGM"
             style="@style/voice_bottom_sheet_text_style"
             android:layout_marginTop="1dp"
             android:layout_marginBottom="15dp"
             android:layout_marginStart="52dp"
-            android:text="@string/voice_chatroom_spatial_audio"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="# Background Music"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtBestSoundEffect" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/mtSpatialAudioArrow"
+            android:id="@+id/tvBGMArrow"
             style="@style/voice_bottom_sheet_right_text_style"
             android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
-            app:layout_constraintBottom_toBottomOf="@+id/mtSpatialAudio"
+            android:text="# song name"
+            app:layout_constraintBottom_toBottomOf="@+id/tvBGM"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/mtSpatialAudio" />
+            app:layout_constraintTop_toTopOf="@+id/tvBGM" />
+
+        <com.google.android.material.divider.MaterialDivider
+            style="@style/voice_bottom_sheet_divider_style"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvBGM" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvLogo"
+            style="@style/voice_bottom_sheet_right_text_style"
+            android:drawableStart="@drawable/voice_icon_arrow_right_grey"
+            app:layout_constraintTop_toBottomOf="@+id/tvBGM"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="# 声网凤鸣AI引擎提供支持" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

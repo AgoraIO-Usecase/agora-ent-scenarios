@@ -44,11 +44,6 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
 
         binding?.apply {
             setOnApplyWindowInsets(root)
-            if (audioSettingsInfo.roomType == ConfigConstants.RoomType.Common_Chatroom) {
-                ivSpatialAudio.isVisible = false
-                mtSpatialAudio.isVisible = false
-                mtSpatialAudioArrow.isVisible = false
-            }
             if (audioSettingsInfo.enable) {
                 mcbAgoraBot.alpha = ENABLE_ALPHA
                 pbAgoraBotVolume.alpha = ENABLE_ALPHA
@@ -100,9 +95,6 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
 //            }
             mtBestSoundEffectArrow.setOnClickListener {
                 audioSettingsListener?.onSoundEffect(audioSettingsInfo.soundSelection, audioSettingsInfo.enable)
-            }
-            mtSpatialAudioArrow.setOnClickListener {
-                audioSettingsListener?.onSpatialAudio(audioSettingsInfo.spatialOpen, audioSettingsInfo.enable)
             }
             pbAgoraBotVolume.onStopTrackingTouch {
                 it?.progress?.let { progress ->
