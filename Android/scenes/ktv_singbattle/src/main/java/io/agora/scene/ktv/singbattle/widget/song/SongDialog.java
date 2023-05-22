@@ -206,9 +206,10 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
         if (mBinding == null) return;
         mBinding.ilGameSong.tvSongNum.setText("已点 " + songs.size() + "/8");
-        if (songs.size() <= 0) {
+        if (songs.size() <= 3) {
             mBinding.ilGameSong.btStartGame.setBackgroundResource(R.mipmap.ktv_start_game_disabled);
             mBinding.ilGameSong.btStartGame.setEnabled(false);
+            ToastUtils.showToast("至少需要4首歌才能开始游戏");
         } else if (songs.size() <= 8) {
             mBinding.ilGameSong.btStartGame.setBackgroundResource(R.mipmap.ktv_start_game);
             mBinding.ilGameSong.btStartGame.setEnabled(true);

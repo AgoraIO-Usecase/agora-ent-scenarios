@@ -4,7 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="60dp"
     android:background="@color/ktv_dialog_bg_blue"
-    android:orientation="vertical">
+    android:layout_gravity="bottom">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:alpha="0.6"
+        android:background="@color/white_20_percent"/>
 
     <TextView
         android:id="@+id/tvSongNum"

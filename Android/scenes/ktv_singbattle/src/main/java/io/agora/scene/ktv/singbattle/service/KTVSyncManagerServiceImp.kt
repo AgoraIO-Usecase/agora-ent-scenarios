@@ -10,6 +10,8 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.ktv.singbattle.KTVLogger
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.*
+import okhttp3.internal.wait
+import java.util.concurrent.CountDownLatch
 import kotlin.random.Random
 
 
@@ -542,6 +544,29 @@ class KTVSyncManagerServiceImp(
         )
         //net request and notify others
         innerAddChooseSongInfo(song, completion)
+    }
+
+    override fun autoChooseSongAndStartGame(
+        list: List<ChooseSongInputModel>,
+        completion: (error: Exception?) -> Unit
+    ) {
+        // already has eight songs
+        if (songChosenList.size == 8) startSingBattleGame(completion)
+        if (songChosenList.size < 8) {
+            val needSize = 8 - songChosenList.size
+            val countDown = CountDownLatch(needSize)
+            for (i in 0 until needSize) {
+                chooseSong(list[i]) {
+                    countDown.countDown()
+                }
+            }
+
+            Thread {
+                countDown.await()
+                Thread.sleep(3000)
+                startSingBattleGame(completion)
+            }.start()
+        }
     }
 
     override fun makeSongTop(

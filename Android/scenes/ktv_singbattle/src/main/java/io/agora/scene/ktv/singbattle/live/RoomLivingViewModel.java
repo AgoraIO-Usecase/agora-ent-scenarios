@@ -1250,6 +1250,7 @@ public class RoomLivingViewModel extends ViewModel {
                 songPlayingLiveData.getValue().getSongNo(),
                 (userId) -> {
                     KTVLogger.d(TAG, "RoomLivingViewModel.graspSong() success " + userId);
+                    ToastUtils.showToast("抢唱成功");
                     return null;
                 },
                 null
@@ -1596,61 +1597,61 @@ public class RoomLivingViewModel extends ViewModel {
         return rankItemList;
     }
 
-    private List<Music> getMockMusicList() {
-        List<Music> musicList = new ArrayList<>();
-        Music music1 = new Music();
-        music1.songCode = 6625526603247450L;
-        music1.name = "后来";
-        music1.singer = "刘若英";
-        music1.poster = "";
+    public void autoSelectMusic() {
+        ktvServiceProtocol.autoChooseSongAndStartGame(getMockMusicList(), e -> {
+            return null;
+        });
+    }
 
-        Music music2 = new Music();
-        music2.songCode = 6625526603270070L;
-        music2.name = "追光者";
-        music2.singer = "岑宁儿";
-        music2.poster = "";
+    private List<ChooseSongInputModel> getMockMusicList() {
+        List<ChooseSongInputModel> musicList = new ArrayList<>();
+        ChooseSongInputModel music1 = new ChooseSongInputModel(
+                "后来",
+                "6625526603247450",
+                "刘若英",
+                "");
 
-        Music music3 = new Music();
-        music3.songCode = 6625526603287770L;
-        music3.name = "纸短情长";
-        music3.singer = "烟把儿乐队";
-        music3.poster = "";
+        ChooseSongInputModel music2 = new ChooseSongInputModel(
+                "追光者",
+                "6625526603270070",
+                "岑宁儿",
+                "");
 
-        Music music4 = new Music();
-        music4.songCode = 6625526604169700L;
-        music4.name = "起风了";
-        music4.singer = "吴青峰";
-        music4.poster = "";
+        ChooseSongInputModel music3 = new ChooseSongInputModel(
+                "纸短情长",
+                "6625526603287770",
+                "烟把儿乐队",
+                "");
 
-        Music music5 = new Music();
-        music5.songCode = 6625526603590690L;
-        music5.name = "月半小夜曲";
-        music5.singer = "李克勤";
-        music5.poster = "";
+        ChooseSongInputModel music4 = new ChooseSongInputModel(
+                "起风了",
+                "6625526604169700",
+                "吴青峰",
+                "");
 
-        Music music6 = new Music();
-        music6.songCode = 6625526603907880L;
-        music6.name = "痴心绝对";
-        music6.singer = "李圣杰";
-        music6.poster = "";
+        ChooseSongInputModel music5 = new ChooseSongInputModel(
+                "月半小夜曲",
+                "6625526603590690",
+                "李克勤",
+                "");
 
-        Music music7 = new Music();
-        music7.songCode = 6625526603774840L;
-        music7.name = "岁月神偷";
-        music7.singer = "金玟岐";
-        music7.poster = "";
+        ChooseSongInputModel music6 = new ChooseSongInputModel(
+                "痴心绝对",
+                "6625526603907880",
+                "李圣杰",
+                "");
 
-        Music music8 = new Music();
-        music8.songCode = 6625526603711050L;
-        music8.name = "我的一个道姑朋友";
-        music8.singer = "以冬";
-        music8.poster = "";
+        ChooseSongInputModel music7 = new ChooseSongInputModel(
+                "岁月神偷",
+                "6625526603774840",
+                "金玟岐",
+                "");
 
-        Music music9 = new Music();
-        music9.songCode = 6625526603711000L;
-        music9.name = "皮皮泥";
-        music9.singer = "陈雨果";
-        music9.poster = "";
+        ChooseSongInputModel music8 = new ChooseSongInputModel(
+                "我的一个道姑朋友",
+                "6625526603711050",
+                "以冬",
+                "");
 
         musicList.add(music1);
         musicList.add(music2);
@@ -1660,8 +1661,6 @@ public class RoomLivingViewModel extends ViewModel {
         musicList.add(music6);
         musicList.add(music7);
         musicList.add(music8);
-        musicList.add(music9);
-
         return musicList;
     }
 }
