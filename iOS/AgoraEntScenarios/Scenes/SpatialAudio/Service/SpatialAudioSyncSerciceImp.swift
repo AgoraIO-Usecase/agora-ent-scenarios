@@ -684,6 +684,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             completion(SAErrorType.userNotFound("startMicSeatApply").error(), false)
             return
         }
+        user.status = .waitting
         apply.member = user
         _addMicSeatApply(roomId: self.roomId!, apply: apply) { error in
             completion(error, error == nil)
