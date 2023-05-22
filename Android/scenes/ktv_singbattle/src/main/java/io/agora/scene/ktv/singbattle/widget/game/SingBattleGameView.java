@@ -50,7 +50,10 @@ public class SingBattleGameView extends FrameLayout {
     }
 
     private void initListener() {
-        mBinding.ilIDLE.btAutoSelectSong.setOnClickListener(view -> mSingBattleGameEventListener.onAutoSelectSongClick());
+        mBinding.ilIDLE.btAutoSelectSong.setOnClickListener(view -> {
+            mBinding.ilIDLE.btAutoSelectSong.setEnabled(false);
+            mSingBattleGameEventListener.onAutoSelectSongClick();
+        });
         mBinding.ilIDLE.btChooseSong.setOnClickListener(View -> mSingBattleGameEventListener.onChooseSongClick());
         mBinding.btGameAgain.setOnClickListener(View -> mSingBattleGameEventListener.onGameAgainClick());
     }
@@ -106,6 +109,7 @@ public class SingBattleGameView extends FrameLayout {
             mBinding.ilIDLE.messageText.setText(R.string.ktv_game_room_owner_idle);
             mBinding.ilIDLE.btChooseSong.setVisibility(View.VISIBLE);
             mBinding.ilIDLE.btAutoSelectSong.setVisibility(View.VISIBLE);
+            mBinding.ilIDLE.btAutoSelectSong.setEnabled(true);
         } else {
             mBinding.ilIDLE.messageText.setText(R.string.ktv_game_room_owner_choosing_song);
             mBinding.ilIDLE.btChooseSong.setVisibility(View.GONE);
@@ -175,12 +179,17 @@ public class SingBattleGameView extends FrameLayout {
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
         if (score <= 60) {
-            mBinding.ilIDLE.messageText.setText("挑战失败：" + score);
+            mBinding.ilIDLE.messageText.setText("");
             mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_defeat_text_background);
+            mBinding.ilIDLE.scoreFailText.setVisibility(View.VISIBLE);
+            mBinding.ilIDLE.scoreFailText.setText("" + score);
         } else {
-            mBinding.ilIDLE.messageText.setText("挑战成功：" + score);
+            mBinding.ilIDLE.messageText.setText("");
             mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_win_text_background);
+            mBinding.ilIDLE.scoreSuccessText.setVisibility(View.VISIBLE);
+            mBinding.ilIDLE.scoreSuccessText.setText("" + score);
         }
+
         mBinding.getRoot().postDelayed(() -> {
             if (nowNum < songNum) {
                 onNextSong();
@@ -195,6 +204,8 @@ public class SingBattleGameView extends FrameLayout {
     public void onNextSong() {
         Log.d(TAG, "onNextSong");
         if (mBinding == null) return;
+        mBinding.ilIDLE.scoreFailText.setVisibility(View.GONE);
+        mBinding.ilIDLE.scoreSuccessText.setVisibility(View.GONE);
         mBinding.ilIDLE.messageText.setText("下一首");
         mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_idle_text_background);
         mBinding.getRoot().postDelayed(() -> {

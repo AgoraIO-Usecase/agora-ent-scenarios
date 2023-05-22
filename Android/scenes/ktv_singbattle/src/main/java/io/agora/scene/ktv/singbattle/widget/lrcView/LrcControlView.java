@@ -47,6 +47,7 @@ import io.agora.karaoke_view.v11.model.LyricsModel;
 import io.agora.scene.base.utils.DownloadUtils;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.ZipUtils;
+import io.agora.scene.ktv.singbattle.KTVLogger;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.singbattle.databinding.KtvLayoutLrcPrepareBinding;
@@ -176,12 +177,14 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     private void startTimer() {
         if (mCountDownLatch != null) mCountDownLatch.cancel();
 
-        mCountDownLatch = new CountDownTimer(3 * 1000, 999) {
+        mCountDownLatch = new CountDownTimer(4 * 1000, 999) {
             @Override
             public void onTick(long millisUntilFinished) {
                 int second = (int) (millisUntilFinished / 1000);
 
-                setCountDown(second);
+                if (second <= 2) {
+                    setCountDown(second);
+                }
             }
 
             @Override
@@ -200,7 +203,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     private void setCountDown(int second) {
         if (mBinding == null) return;
-        mBinding.ilActive.singBattle.setText("" + second);
+        mBinding.ilActive.singBattle.setText("" + (second + 1));
     }
 
     private void onCountFinished() {
@@ -369,6 +372,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     public void updateScore(double score, double cumulativeScore, double perfectScore) {
         if (isPrepareSong) return;
+        KTVLogger.d("hugo", "updateScore, score: " + score + " cumulativeScore: " + cumulativeScore + " perfectScore: " + perfectScore);
         mCumulativeScoreInPercentage = (int) ((cumulativeScore / perfectScore) * 100);
 
         mBinding.gradeView.setScore((int) score, (int) cumulativeScore, (int) perfectScore);

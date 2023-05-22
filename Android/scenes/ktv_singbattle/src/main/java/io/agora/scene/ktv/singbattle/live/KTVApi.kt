@@ -80,7 +80,7 @@ interface ILrcView {
 
     /**
      * ktvApi内部更新音乐播放进度progress时会主动调用此方法将进度值progress传给你的歌词组件，50ms回调一次
-     * @param progress 歌曲播放的真实进度 50ms回调一次
+     * @param progress 歌曲播放的真实进度 20ms回调一次
      */
     fun onUpdateProgress(progress: Long?)
 
