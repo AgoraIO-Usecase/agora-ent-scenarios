@@ -63,14 +63,16 @@ public class SingBattleGameView extends FrameLayout {
     private void startTimer() {
         if (mCountDownLatch != null) mCountDownLatch.cancel();
 
-        mCountDownLatch = new CountDownTimer(4 * 1000, 999) {
+        mCountDownLatch = new CountDownTimer(5 * 1000, 999) {
             @Override
             public void onTick(long millisUntilFinished) {
                 int second = (int) (millisUntilFinished / 1000);
 
-                if (second <= 2) {
+                if (second <= 3 && second >= 1) {
                     if (mBinding == null) return;
-                    mBinding.ilIDLE.messageText.setText("" + (second + 1));
+                    mBinding.ilIDLE.messageText.setText("" + second);
+                } else if (second < 1) {
+                    mBinding.ilIDLE.messageText.setText("Go");
                 }
             }
 
@@ -219,6 +221,8 @@ public class SingBattleGameView extends FrameLayout {
         if (mBinding == null) return;
         nowNum = 0;
         songNum = 0;
+        mBinding.ilIDLE.scoreFailText.setVisibility(View.GONE);
+        mBinding.ilIDLE.scoreSuccessText.setVisibility(View.GONE);
         mBinding.ilRank.setVisibility(View.VISIBLE);
 
         if (isRoomOwner) {

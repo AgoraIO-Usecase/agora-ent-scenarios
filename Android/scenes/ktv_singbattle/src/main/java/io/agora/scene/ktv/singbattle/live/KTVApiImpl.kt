@@ -907,6 +907,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         val messageData = data ?: return
         try {
             val strMsg = String(messageData)
+            Log.d(TAG, strMsg)
             jsonMsg = JSONObject(strMsg)
             if (jsonMsg.getString("cmd") == "setLrcTime") { //同步歌词
                 val position = jsonMsg.getLong("time")
@@ -1097,8 +1098,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         val format = jsonMsg.getJSONObject("format")
         val highPart = format.getJSONArray("highPart")
         val highStartTime = JSONObject(highPart[0].toString())
-        val time = highStartTime.getLong("highStartTime") - 1000
+        val time = highStartTime.getLong("highStartTime")
+        val endTime = highStartTime.getLong("highEndTime")
         pig = time;
+        lrcView?.onHighPartTime(time, endTime)
     }
 
     // ------------------------ AgoraRtcMediaPlayerDelegate ------------------------
