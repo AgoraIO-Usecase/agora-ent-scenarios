@@ -210,8 +210,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     private void onCountFinished() {
         if (mBinding == null) return;
         mBinding.ilActive.singBattle.setEnabled(true);
-        mBinding.ilActive.singBattle.setText("抢唱");
-        //mBinding.ilActive.singBattle.setBackgroundResource(R.mipmap.ktv_start_grasp);
+        mBinding.ilActive.singBattle.setText("");
+        mBinding.ilActive.singBattle.setBackgroundResource(R.mipmap.ktv_start_grasp);
     }
 
     public void startTimerCount() {
@@ -304,7 +304,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         if (isOnSeat) {
             mBinding.ilActive.singBattle.setVisibility(View.VISIBLE);
             mBinding.ilActive.singBattle.setEnabled(false);
-            //mBinding.ilActive.singBattle.setBackgroundResource(R.mipmap.ktv_start_grasp_waiting);
+            mBinding.ilActive.singBattle.setBackgroundResource(R.mipmap.ktv_start_grasp_waiting);
         } else {
             mBinding.ilActive.singBattle.setVisibility(View.GONE);
         }

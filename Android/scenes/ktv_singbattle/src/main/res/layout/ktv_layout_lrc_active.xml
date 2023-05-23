@@ -54,11 +54,11 @@
     <Button
         android:id="@+id/singBattle"
         android:layout_width="80dp"
-        android:layout_height="30dp"
+        android:layout_height="40dp"
         android:background="@mipmap/ktv_start_grasp_waiting"
         android:gravity="center"
         android:text="3"
-        android:layout_marginBottom="10dp"
+        android:paddingBottom="8dp"
         android:textColor="@color/white"
         android:textSize="12sp"
         android:textStyle="bold"

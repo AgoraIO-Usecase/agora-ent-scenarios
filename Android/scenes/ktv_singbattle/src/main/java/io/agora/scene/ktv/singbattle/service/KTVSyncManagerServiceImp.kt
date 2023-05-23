@@ -761,7 +761,8 @@ class KTVSyncManagerServiceImp(
 
     override fun prepareSingBattleGame(completion: (error: Exception?) -> Unit) {
         val singBattleGameModel = SingBattleGameModel(
-            SingBattleGameStatus.waitting.value
+            SingBattleGameStatus.waitting.value,
+            null
         )
         if (objIdOfSingBattleGameInfo == null) {
             innerAddSingBattleGameInfo(singBattleGameModel) {
@@ -778,7 +779,8 @@ class KTVSyncManagerServiceImp(
         completion: (error: Exception?) -> Unit
     ) {
         val singBattleGameModel = SingBattleGameModel(
-            SingBattleGameStatus.started.value
+            SingBattleGameStatus.started.value,
+            null
         )
         objIdOfSingBattleGameInfo?.let { objId ->
             innerUpdateSingBattleGameInfo(objId, singBattleGameModel) {
@@ -787,9 +789,13 @@ class KTVSyncManagerServiceImp(
         }
     }
 
-    override fun finishSingBattleGame(completion: (error: Exception?) -> Unit) {
+    override fun finishSingBattleGame(
+        rank: Map<String, RankModel>,
+        completion: (error: Exception?) -> Unit
+    ) {
         val singBattleGameModel = SingBattleGameModel(
-            SingBattleGameStatus.ended.value
+            SingBattleGameStatus.ended.value,
+            rank
         )
         objIdOfSingBattleGameInfo?.let { objId ->
             innerUpdateSingBattleGameInfo(objId, singBattleGameModel) {
