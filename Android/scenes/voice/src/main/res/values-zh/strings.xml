@@ -142,6 +142,8 @@
     <string name="voice_chatroom_noise_suppression">AI降噪</string>
     <string name="voice_chatroom_aiaec">AI回声消除</string>
     <string name="voice_chatroom_aiagc">人声自动增益</string>
+    <string name="voice_chatroom_ear_back">耳返</string>
+    <string name="voice_chatroom_bgm">背景音乐</string>
     <string name="voice_chatroom_aiaec_audition">AIAEC试听</string>
     <string name="voice_chatroom_aiagc_audition">AGC试听</string>
     <string name="voice_chatroom_audition_before">之前</string>

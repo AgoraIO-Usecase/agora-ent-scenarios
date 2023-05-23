@@ -176,7 +176,7 @@
             android:layout_marginTop="1dp"
             android:layout_marginBottom="15dp"
             android:layout_marginStart="52dp"
-            android:text="# 耳返"
+            android:text="@string/voice_chatroom_ear_back"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtAGC" />
 
@@ -387,7 +387,7 @@
             android:layout_marginTop="1dp"
             android:layout_marginBottom="15dp"
             android:layout_marginStart="52dp"
-            android:text="# Background Music"
+            android:text="@string/voice_chatroom_bgm"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtBestSoundEffect" />
 
@@ -395,7 +395,6 @@
             android:id="@+id/tvBGMArrow"
             style="@style/voice_bottom_sheet_right_text_style"
             android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
-            android:text="# song name"
             app:layout_constraintBottom_toBottomOf="@+id/tvBGM"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tvBGM" />

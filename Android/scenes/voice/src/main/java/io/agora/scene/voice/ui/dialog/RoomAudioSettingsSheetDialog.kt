@@ -90,9 +90,12 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             mtAGCArrow.setOnClickListener {
                 audioSettingsListener?.onAGC(audioSettingsInfo.isAIAGCOn, audioSettingsInfo.enable)
             }
-//            mtVoiceChanger.setOnClickListener {
-//                audioSettingsListener?.onVoiceChanger(audioSettingsInfo.voiceChangerMode, audioSettingsInfo.enable)
-//            }
+            tvInEarArrow.setOnClickListener {
+                audioSettingsListener?.onEarBackSetting(audioSettingsInfo.isEarBckOn)
+            }
+            tvBGMArrow.setOnClickListener {
+                audioSettingsListener?.onBGMSetting()
+            }
             mtBestSoundEffectArrow.setOnClickListener {
                 audioSettingsListener?.onSoundEffect(audioSettingsInfo.soundSelection, audioSettingsInfo.enable)
             }
@@ -174,6 +177,12 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
 
         /**人声自动增益*/
         fun onAGC(isOn: Boolean, isEnable: Boolean)
+
+        /**耳返设置*/
+        fun onEarBackSetting(isOn: Boolean)
+
+        /** BGM 设置*/
+        fun onBGMSetting()
 
         /**变声*/
         fun onVoiceChanger(mode: Int, isEnable: Boolean)

@@ -140,6 +140,8 @@
     <string name="voice_chatroom_room_audio_settings">Room Audio Settings</string>
     <string name="voice_chatroom_best_sound_effect">Sound Selection</string>
     <string name="voice_chatroom_noise_suppression">Noise Suppression</string>
+    <string name="voice_chatroom_ear_back">In-Ear Monitor</string>
+    <string name="voice_chatroom_bgm">Background music</string>
     <string name="voice_chatroom_aiaec">AIAEC</string>
     <string name="voice_chatroom_aiagc">AGC</string>
     <string name="voice_chatroom_aiaec_audition">AIAEC Audition</string>
