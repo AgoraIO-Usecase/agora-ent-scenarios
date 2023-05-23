@@ -88,6 +88,8 @@ interface ILrcView {
      * ktvApi获取到歌词地址时会主动调用此方法将歌词地址url传给你的歌词组件，您需要在这个回调内完成歌词的下载
      */
     fun onDownloadLrcData(url: String?)
+
+    fun onHighPartTime(highStartTime: Long, highEndTime: Long)
 }
 
 /**

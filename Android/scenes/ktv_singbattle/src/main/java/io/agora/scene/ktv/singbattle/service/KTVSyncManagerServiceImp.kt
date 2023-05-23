@@ -643,6 +643,7 @@ class KTVSyncManagerServiceImp(
             userNo = targetSong.userNo,
             name = targetSong.name,
             isOriginal = targetSong.isOriginal,
+            "",
 
             status = RoomSelSongModel.STATUS_PLAYING,
             createAt = targetSong.createAt,
@@ -802,7 +803,7 @@ class KTVSyncManagerServiceImp(
     }
 
     override fun updateSongModel(songCode: String, winner: String, completion: (error: Exception?) -> Unit) {
-        val song = songChosenList.filter { it.songNo == songCode }.getOrNull(0) ?: return;
+        val song = songChosenList.filter { it.songNo == songCode }.getOrNull(0) ?: return
         val index = songChosenList.indexOf(song)
         val newSong = RoomSelSongModel(
             song.songName,

@@ -229,7 +229,9 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         }
     }
 
+    private boolean isItemEnable = true;
     void setSongItemDisable(boolean enable) {
+        this.isItemEnable = enable;
         if (getBinding() == null) return;
         if (getBinding().recyclerSearchResult.getVisibility() == View.VISIBLE) {
             int searchCount = mSearchAdapter.getItemCount();
@@ -255,6 +257,15 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
             getBinding().llEmpty.setVisibility(View.GONE);
         }
         mSearchAdapter.resetAll(list);
+
+        if (getBinding().recyclerSearchResult.getVisibility() == View.VISIBLE) {
+            int searchCount = mSearchAdapter.getItemCount();
+            for (int i = 0; i < searchCount; i++) {
+                SongItem item = mSearchAdapter.getItem(i);
+                item.enable = isItemEnable;
+                mSearchAdapter.notifyItemChanged(i);
+            }
+        }
     }
 
     void setRefreshingResult(List<SongItem> list, int index) {
