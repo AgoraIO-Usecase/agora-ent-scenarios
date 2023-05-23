@@ -71,6 +71,7 @@ def all_pods
   pod 'KakaJSON'
   pod 'Agora_Chat_iOS', '1.0.8'
   pod 'SwiftyBeaver', '1.9.5'
+  pod 'Protobuf', '3.22.1'
  #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
 
   #bugly

@@ -904,6 +904,8 @@ extension SpatialAudioSyncSerciceImp {
             $0.uid ?? "" == mic.member?.uid ?? ""
         })
         user?.mic_index = -1
+        // TODO: 不应该拿mic.member去更新
+        mic.member?.mic_index = -1
     }
     
     fileprivate func _subscribeMicSeatInfoChanged() {
