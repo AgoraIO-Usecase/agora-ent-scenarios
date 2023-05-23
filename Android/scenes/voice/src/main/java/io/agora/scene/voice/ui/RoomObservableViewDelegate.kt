@@ -484,7 +484,12 @@ class RoomObservableViewDelegate constructor(
                 override fun onAGC(isOn: Boolean, isEnable: Boolean) {
                     onAIAGCDialog(isOn)
                 }
-
+                override fun onEarBackSetting(isOn: Boolean) {
+                    onEarBackSettingDialog(isOn)
+                }
+                override fun onBGMSetting() {
+                    onBGMSettingDialog()
+                }
                 override fun onVoiceChanger(mode: Int, isEnable: Boolean) {
                     onVoiceChangerDialog(mode)
                 }
@@ -642,6 +647,26 @@ class RoomObservableViewDelegate constructor(
             }
         }
         dialog.show(activity.supportFragmentManager, "mtAIAGC")
+    }
+    /** 耳返设置弹框
+     */
+    fun onEarBackSettingDialog(isOn: Boolean) {
+        val dialog = RoomEarBackSettingSheetDialog().apply {
+            arguments = Bundle().apply {
+                putBoolean(RoomEarBackSettingSheetDialog.KEY_IS_ON, isOn)
+            }
+        }
+        dialog.show(activity.supportFragmentManager, "mtBGMSetting")
+    }
+    /** 背景音乐设置弹框
+     */
+    fun onBGMSettingDialog() {
+        val dialog = RoomBGMSettingSheetDialog().apply {
+            arguments = Bundle().apply {
+                putBoolean(RoomBGMSettingSheetDialog.KEY_IS_ON, true)
+            }
+        }
+        dialog.show(activity.supportFragmentManager, "mtBGMSetting")
     }
     /**
      * 变声器弹框
