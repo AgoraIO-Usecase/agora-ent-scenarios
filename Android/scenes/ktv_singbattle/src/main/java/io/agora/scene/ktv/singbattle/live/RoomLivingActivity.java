@@ -358,6 +358,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             @Override
             public void onGameEnd() {
                 getBinding().singBattleGameView.onGameEnd(roomLivingViewModel.getRankList());
+                if (roomLivingViewModel.isRoomOwner()) {
+                    roomLivingViewModel.finishSingBattleGame();
+                }
             }
 
             @Override
@@ -529,6 +532,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.onGameBattlePrepareStatus();
             } else if (status == RoomLivingViewModel.GameStatus.ON_WAITING) {
                 getBinding().singBattleGameView.onGameWaitingStatus();
+            } else if (status == RoomLivingViewModel.GameStatus.ON_END) {
+                getBinding().singBattleGameView.onGameEnd(roomLivingViewModel.getRankList());
             }
         });
         roomLivingViewModel.graspStatusMutableLiveData.observe(this, model -> {

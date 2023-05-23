@@ -201,6 +201,7 @@ interface KTVServiceProtocol {
     )
 
     fun finishSingBattleGame(
+        rank: Map<String, RankModel>,
         completion: (error: Exception?) -> Unit
     )
 

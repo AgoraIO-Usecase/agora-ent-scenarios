@@ -15,27 +15,33 @@
         android:textStyle="bold"
         android:textColor="@color/white"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="40dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:alpha="0.6"
+        android:background="@color/white_20_percent"/>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
+        android:layout_height="30dp"
+        android:gravity="center">
 
         <TextView
             android:text="排名"
-            android:textSize="16sp"
+            android:textSize="12sp"
             android:textStyle="bold"
-            android:layout_width="0dp"
             android:textColor="@color/white"
             android:gravity="center"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"/>
+            android:layout_marginStart="20dp"
+            android:layout_height="wrap_content"
+            android:layout_width="50dp"/>
 
         <TextView
             android:text="玩家"
-            android:textSize="16sp"
+            android:textSize="12sp"
             android:textStyle="bold"
             android:layout_width="0dp"
             android:textColor="@color/white"
@@ -45,7 +51,7 @@
 
         <TextView
             android:text="抢唱成功"
-            android:textSize="16sp"
+            android:textSize="12sp"
             android:textStyle="bold"
             android:layout_width="0dp"
             android:textColor="@color/white"
@@ -55,7 +61,7 @@
 
         <TextView
             android:text="总分"
-            android:textSize="16sp"
+            android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@color/white"
             android:gravity="center"

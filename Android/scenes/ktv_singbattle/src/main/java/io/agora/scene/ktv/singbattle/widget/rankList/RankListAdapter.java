@@ -3,10 +3,12 @@ package io.agora.scene.ktv.singbattle.widget.rankList;
 
 import androidx.annotation.NonNull;
 
+import io.agora.scene.base.GlideApp;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvItemRankListBinding;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
+import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 public class RankListAdapter extends BindingSingleAdapter<RankItem, KtvItemRankListBinding> {
     @Override
@@ -31,7 +33,23 @@ public class RankListAdapter extends BindingSingleAdapter<RankItem, KtvItemRankL
             mBinding.tvTank.setText("" + (position + 1));
         }
         mBinding.tvPlayer.setText(item.userName);
-        mBinding.tvSongNum.setText(String.valueOf(item.songNum));
-        mBinding.tvScore.setText(String.valueOf(item.score));
+
+        if (item.songNum == -1) {
+            mBinding.tvSongNum.setText("-");
+        } else {
+            mBinding.tvSongNum.setText(String.valueOf(item.songNum));
+        }
+
+        if (item.score == -1) {
+            mBinding.tvScore.setText("-");
+        } else {
+            mBinding.tvScore.setText(String.valueOf(item.score));
+        }
+
+        GlideApp.with(mBinding.getRoot())
+                .load(item.poster)
+                .error(R.mipmap.userimage)
+                .transform(new CenterCropRoundCornerTransform(100))
+                .into(mBinding.ivHeader);
     }
 }

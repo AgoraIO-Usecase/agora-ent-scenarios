@@ -167,6 +167,13 @@ data class ScoringAverageModel(
     val score: Int
 )
 
+data class RankModel(
+    val userName: String,
+    val songNum: Int = 0,
+    val score: Double = 0.0,
+    val poster: String
+)
+
 enum class SingBattleGameStatus(val value: Int) {
     idle(0),
     waitting(1),// 等待中
@@ -175,5 +182,6 @@ enum class SingBattleGameStatus(val value: Int) {
 }
 
 data class SingBattleGameModel(
-    val status: Int
+    val status: Int,
+    val rank: Map<String, RankModel>?
 )

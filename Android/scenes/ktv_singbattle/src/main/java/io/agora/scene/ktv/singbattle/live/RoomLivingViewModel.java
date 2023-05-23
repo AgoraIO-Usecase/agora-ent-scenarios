@@ -54,6 +54,7 @@ import io.agora.scene.ktv.singbattle.service.KTVSingBattleGameService;
 import io.agora.scene.ktv.singbattle.service.MakeSongTopInputModel;
 import io.agora.scene.ktv.singbattle.service.OnSeatInputModel;
 import io.agora.scene.ktv.singbattle.service.OutSeatInputModel;
+import io.agora.scene.ktv.singbattle.service.RankModel;
 import io.agora.scene.ktv.singbattle.service.RemoveSongInputModel;
 import io.agora.scene.ktv.singbattle.service.RoomSeatModel;
 import io.agora.scene.ktv.singbattle.service.RoomSelSongModel;
@@ -150,11 +151,6 @@ public class RoomLivingViewModel extends ViewModel {
 
     final MutableLiveData<ScoringAlgoControlModel> scoringAlgoControlLiveData = new MutableLiveData<>();
 
-    class RankModel {
-        String userName;
-        int songNum;
-        double score;
-    }
     private final Map<String, RankModel> rankMap = new HashMap<>();
 
     /**
@@ -1031,21 +1027,28 @@ public class RoomLivingViewModel extends ViewModel {
                         float score = (float) jsonMsg.getDouble("score");
                         String userId = (String) jsonMsg.getString("userId");
                         String userName = (String) jsonMsg.getString("userName");
+                        String poster = (String) jsonMsg.getString("poster");
                         playerMusicPlayCompleteLiveData.postValue(new ScoringAverageModel(false, (int)score));
 
                         // 本地演唱 计入rank
-                        RankModel model = new RankModel();
                         if (rankMap.containsKey(userId)) {
                             RankModel oldModel = rankMap.get(userId);
-                            model.userName = oldModel.userName;
-                            model.score = (oldModel.score * oldModel.songNum + score) / (oldModel.songNum + 1) ;
-                            model.songNum = oldModel.songNum + 1;
+                            RankModel model = new RankModel(
+                                    oldModel.getUserName(),
+                                    oldModel.getSongNum() + 1,
+                                    (oldModel.getScore() * oldModel.getSongNum() + score) / (oldModel.getSongNum() + 1),
+                                    poster
+                            );
+                            rankMap.put(userId, model);
                         } else {
-                            model.userName = userName;
-                            model.score = score;
-                            model.songNum = 1;
+                            RankModel model = new RankModel(
+                                    userName,
+                                    1,
+                                    score,
+                                    poster
+                            );
+                            rankMap.put(userId, model);
                         }
-                        rankMap.put(userId, model);
                     }
                 } catch (JSONException exp) {
                     KTVLogger.e(TAG, "onStreamMessage:" + exp);
@@ -1267,6 +1270,9 @@ public class RoomLivingViewModel extends ViewModel {
                     singBattleGameStatusMutableLiveData.postValue(GameStatus.ON_START);
                 } else if (info.getStatus() == SingBattleGameStatus.ended.getValue()) {
                     singBattleGameStatusMutableLiveData.postValue(GameStatus.ON_END);
+                    if (info.getRank() != null) {
+                        rankMap.putAll(info.getRank());
+                    }
                 }
             } else {
                 ktvServiceProtocol.prepareSingBattleGame(error -> null);
@@ -1287,6 +1293,14 @@ public class RoomLivingViewModel extends ViewModel {
         KTVLogger.d(TAG, "startPrepareSingBattleGame called");
         ktvServiceProtocol.prepareSingBattleGame(e -> {
             KTVLogger.d(TAG, "startPrepareSingBattleGame success");
+            return null;
+        });
+    }
+
+    public void finishSingBattleGame() {
+        KTVLogger.d(TAG, "finishSingBattleGame called");
+        ktvServiceProtocol.finishSingBattleGame(rankMap, e -> {
+            KTVLogger.d(TAG, "finishSingBattleGame success");
             return null;
         });
     }
@@ -1619,18 +1633,24 @@ public class RoomLivingViewModel extends ViewModel {
         }
 
         // 本地演唱 计入rank
-        RankModel model = new RankModel();
         if (rankMap.containsKey(UserManager.getInstance().getUser().id.toString())) {
             RankModel oldModel = rankMap.get(UserManager.getInstance().getUser().id.toString());
-            model.userName = oldModel.userName;
-            model.score = (oldModel.score * oldModel.songNum + score) / (oldModel.songNum + 1) ;
-            model.songNum = oldModel.songNum + 1;
+            RankModel model = new RankModel(
+                    oldModel.getUserName(),
+                    oldModel.getSongNum() + 1,
+                    (oldModel.getScore() * oldModel.getSongNum() + score) / (oldModel.getSongNum() + 1),
+                    UserManager.getInstance().getUser().headUrl
+            );
+            rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
         } else {
-            model.userName = UserManager.getInstance().getUser().name;
-            model.score = score;
-            model.songNum = 1;
+            RankModel model = new RankModel(
+                    UserManager.getInstance().getUser().name,
+                    1,
+                    score,
+                    UserManager.getInstance().getUser().headUrl
+            );
+            rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
         }
-        rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
     }
 
     public List<RankItem> getRankList() {
@@ -1640,9 +1660,10 @@ public class RoomLivingViewModel extends ViewModel {
             rankMap.forEach((uid, model) -> {
                 RankItem item = new RankItem();
                 item.rank = i.get();
-                item.userName = model.userName;
-                item.songNum = model.songNum;
-                item.score = model.score;
+                item.userName = model.getUserName();
+                item.songNum = model.getSongNum();
+                item.score = model.getScore();
+                item.poster = model.getPoster();
                 rankItemList.add(item);
                 i.getAndIncrement();
             });

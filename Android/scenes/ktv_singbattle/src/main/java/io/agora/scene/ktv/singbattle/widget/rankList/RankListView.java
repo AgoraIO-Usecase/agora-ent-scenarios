@@ -8,6 +8,7 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.agora.scene.ktv.singbattle.databinding.KtvLayoutGameRankListViewBinding;
@@ -34,6 +35,17 @@ public class RankListView extends FrameLayout {
     }
 
     public void resetRankList(List<RankItem> list) {
-        mAdapter.resetAll(list);
+        List<RankItem> newList = new ArrayList<>();
+        newList.addAll(list);
+        if (list.size() < 3) {
+            for (int i = 0; i < 3 - list.size(); i++) {
+                RankItem emptyItem = new RankItem();
+                emptyItem.score = -1;
+                emptyItem.songNum = -1;
+                emptyItem.userName = "暂无上榜";
+                newList.add(emptyItem);
+            }
+        }
+        mAdapter.resetAll(newList);
     }
 }
