@@ -7,19 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.vectordrawable.graphics.drawable.Animatable2Compat
-import com.github.penfeizhou.animation.apng.APNGDrawable
 import io.agora.scene.voice.R
-import io.agora.scene.voice.databinding.VoiceDialogChatroomAiagcBinding
 import io.agora.scene.voice.databinding.VoiceDialogChatroomBgmSettingBinding
 import io.agora.scene.voice.databinding.VoiceRoomMusicItemLayoutBinding
-import io.agora.scene.voice.model.RoomBGMModel
 import io.agora.scene.voice.model.SoundSelectionBean
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.widget.basic.BindingViewHolder
-import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter.ViewHolder
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
-import java.util.*
 
 class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBinding>() {
 
@@ -47,7 +41,17 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.attributes?.windowAnimations = R.style.voice_BottomSheetDialogAnimation
+        setupListAdapter()
+        fetchData()
+    }
 
+    private fun fetchData() {
+        AgoraRtcEngineController.get().bgmManager.fetchBGMList {
+
+        }
+    }
+
+    private fun setupListAdapter() {
         listAdapter = object : ListAdapter<SoundSelectionBean, BindingViewHolder<VoiceRoomMusicItemLayoutBinding>>(object : DiffUtil.ItemCallback<SoundSelectionBean>() {
             override fun areItemsTheSame(
                 oldItem: SoundSelectionBean,
@@ -80,5 +84,6 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
 
             }
         }
+        binding?.rvMusicList?.adapter = listAdapter
     }
 }

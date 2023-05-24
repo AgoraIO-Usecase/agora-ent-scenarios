@@ -37,8 +37,9 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft=""
-        android:background="@color/black"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@color/white_f6"
         app:layout_constraintBottom_toBottomOf="parent"
         />
 
