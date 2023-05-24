@@ -35,6 +35,17 @@ class AgoraRtcEngineController {
 
     private var rtcEngine: RtcEngineEx? = null
 
+    private var mLocalUid = 0
+
+    public val bgmManager by lazy {
+        AgoraBGMManager(
+            rtcEngine!!,
+            VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(),
+            mLocalUid,
+            ""
+        )
+    }
+
     private var micVolumeListener: RtcMicVolumeListener? = null
 
     fun setMicVolumeListener(micVolumeListener: RtcMicVolumeListener) {
@@ -49,6 +60,7 @@ class AgoraRtcEngineController {
         joinCallback: VRValueCallBack<Boolean>
     ) {
         initRtcEngine(context)
+        this.mLocalUid = rtcUid
         this.joinCallback = joinCallback
         VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
         checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
