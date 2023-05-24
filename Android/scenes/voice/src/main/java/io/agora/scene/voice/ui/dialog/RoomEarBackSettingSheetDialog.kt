@@ -27,16 +27,10 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
 
     var onClickCheckBox: ((isOn: Boolean) -> Unit)? = null
 
-    private var beforeDrawable: APNGDrawable? = null
-    private var beforeTimer: Timer? = null
-
-    private var afterDrawable: APNGDrawable? = null
-    private var afterTimer: Timer? = null
-
     override fun getViewBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
-    ): VoiceDialogChatroomEarbackSettingBinding? {
+    ): VoiceDialogChatroomEarbackSettingBinding {
         return VoiceDialogChatroomEarbackSettingBinding.inflate(inflater, container, false)
     }
 
@@ -47,18 +41,6 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.attributes?.windowAnimations = R.style.voice_BottomSheetDialogAnimation
-
-        beforeDrawable = APNGDrawable.fromAsset(activity?.applicationContext, "voice_agc_sample_before.png")
-        beforeDrawable?.registerAnimationCallback(object: Animatable2Compat.AnimationCallback(){
-            var firstStart = true
-            override fun onAnimationStart(drawable: Drawable?) {
-                super.onAnimationStart(drawable)
-                if(firstStart){
-                    beforeDrawable?.pause()
-                    firstStart = false
-                }
-            }
-        })
 
     }
 

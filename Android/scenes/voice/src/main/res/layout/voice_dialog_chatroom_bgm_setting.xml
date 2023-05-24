@@ -46,7 +46,7 @@
         android:background="@color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rcMusicList"
+        app:layout_constraintTop_toBottomOf="@+id/rvMusicList"
         />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -56,7 +56,7 @@
         android:padding="8dp"
         android:background="@drawable/voice_icon_bgm_play"
         app:layout_constraintStart_toStartOf="@id/vBottom"
-        app:layout_constraintTop_toBottomOf="@+id/rcMusicList"
+        app:layout_constraintTop_toBottomOf="@+id/rvMusicList"
         />
 
     <androidx.appcompat.widget.AppCompatTextView
