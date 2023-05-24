@@ -25,105 +25,153 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/mtBottomSheetTitle"
         style="@style/voice_bottom_sheet_title_style"
-        android:text="# 背景音乐"
+        android:text="# 耳返"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
-    
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rcMusicList"
-        android:layout_width="wrap_content"
-        android:layout_height="387dp"
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvOpenSwitch"
+        style="@style/voice_bottom_sheet_text_style"
+        android:layout_marginStart="20dp"
+        android:text="# 开启耳返"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle"
+        app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cbSwitch"
+        android:layout_width="45dp"
+        android:layout_height="28dp"
+        style="@style/voice_bottom_sheet_checkbox"
+        android:checked="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvOpenSwitch"
+        app:layout_constraintBottom_toBottomOf="@+id/tvOpenSwitch" />
+
+    <com.google.android.material.divider.MaterialDivider
+        style="@style/voice_bottom_sheet_divider_style"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvOpenSwitch" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:textColor="@color/voice_dark_grey_color_979cbb"
+        android:drawableLeft="@drawable/voice_icon_room_setting_introduce"
+        android:textSize="@dimen/voice_sp_12"
+        android:textAlignment="textStart"
+        android:text="# 开启耳返可实时听到自己的声音，唱歌的时候及时调整"
+        app:layout_constraintTop_toBottomOf="@+id/tvOpenSwitch"
         />
+    
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvSetting"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginTop="16dp"
+        android:paddingLeft="@dimen/voice_sp_20"
+        android:gravity="center_vertical"
+        android:text="# 耳返设置"
+        android:background="@color/voice_color_f7f8fb"
+        android:textColor="@color/voice_dark_grey_color_6c7192"
+        app:layout_constraintTop_toBottomOf="@+id/tvTips"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvVolume"
+        style="@style/voice_bottom_sheet_text_style"
+        android:layout_marginStart="20dp"
+        android:text="# 耳返音量"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvSetting" />
+
+    <com.google.android.material.divider.MaterialDivider
+        style="@style/voice_bottom_sheet_divider_style"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvVolume" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvMode"
+        style="@style/voice_bottom_sheet_text_style"
+        android:layout_marginStart="20dp"
+        android:text="# 耳返模式"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvVolume" />
+
+    <com.google.android.material.divider.MaterialDivider
+        style="@style/voice_bottom_sheet_divider_style"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvMode" />
+    
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvPing"
+        android:layout_width="match_parent"
+        android:layout_height="111dp"
+        android:layout_marginTop="@dimen/voice_sp_12"
+        android:layout_marginLeft="@dimen/voice_sp_12"
+        android:layout_marginRight="@dimen/voice_sp_12"
+        android:layout_marginBottom="@dimen/voice_sp_20"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="#FAFBFC"
+        app:cardCornerRadius="@dimen/voice_sp_8"
+        app:layout_constraintTop_toBottomOf="@+id/tvMode"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPingTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/voice_color_3c4267"
+        android:textSize="@dimen/voice_sp_13"
+        android:text="# 耳返延时"
+        app:layout_constraintStart_toStartOf="@+id/cvPing"
+        app:layout_constraintTop_toTopOf="@+id/cvPing" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPingInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textSize="@dimen/voice_sp_11"
+        android:text="# 请对着耳麦说话，测试实时耳返延时"
+        android:textColor="@color/voice_color_979cbb"
+        app:layout_constraintStart_toStartOf="@+id/cvPing"
+        app:layout_constraintTop_toBottomOf="@+id/tvPingTitle" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textColor="#6d7291"
+        android:gravity="center"
+        android:text="66ms"
+        app:layout_constraintStart_toStartOf="@id/cvPing"
+        app:layout_constraintEnd_toEndOf="@+id/cvPing"
+        app:layout_constraintTop_toBottomOf="@+id/tvPingInfo" />
 
     <View
-        android:id="@+id/vBottom"
         android:layout_width="match_parent"
-        android:layout_height="90dp"
-        android:background="@color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rcMusicList"
-        />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnSound"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        app:layout_constraintStart_toStartOf="@id/vBottom"
-        app:layout_constraintTop_toBottomOf="@+id/rcMusicList"
-        />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvMusic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="15sp"
-        android:textColor="@color/voice_color_3c4267"
-        android:text="孤单心事"
-        app:layout_constraintStart_toEndOf="@+id/btnSound"
-        app:layout_constraintTop_toTopOf="@id/btnSound"
-        app:layout_constraintBottom_toBottomOf="@id/btnSound"
-        />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvSinger"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="13sp"
-        android:textColor="@color/voice_color_3c4267"
-        android:text="梁雨"
-        app:layout_constraintStart_toEndOf="@+id/tvMusic"
-        app:layout_constraintTop_toTopOf="@id/btnSound"
-        app:layout_constraintBottom_toBottomOf="@id/btnSound"
-        />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivNext"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:padding="8dp"
-        android:background="@drawable/voice_icon_bgm_next"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/btnSound"
-        app:layout_constraintBottom_toBottomOf="@id/btnSound"
-        />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivPlay"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:padding="8dp"
-        android:background="@drawable/voice_icon_bgm_play"
-        app:layout_constraintEnd_toStartOf="@id/ivNext"
-        app:layout_constraintTop_toTopOf="@id/btnSound"
-        app:layout_constraintBottom_toBottomOf="@id/btnSound"
-        />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivSinging"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:padding="8dp"
-        android:background="@drawable/voice_icon_bgm_sing_on"
-        app:layout_constraintEnd_toStartOf="@id/ivPlay"
-        app:layout_constraintTop_toTopOf="@id/btnSound"
-        app:layout_constraintBottom_toBottomOf="@id/btnSound"
-        />
-
-    <androidx.appcompat.widget.AppCompatSeekBar
-        android:id="@+id/slSound"
-        android:background="@color/white"
-        android:layout_width="34dp"
-        android:layout_height="176dp"
-        app:layout_constraintStart_toStartOf="@id/btnSound"
-        app:layout_constraintEnd_toEndOf="@id/btnSound"
-        app:layout_constraintBottom_toTopOf="@id/btnSound"
+        android:layout_height="34dp"
+        app:layout_constraintTop_toBottomOf="@+id/cvPing"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
