@@ -22,6 +22,8 @@
     [self setBackgroundImage:@"home_bg_image"];
     [self setNaviTitleName:AGLocalizedString(@"声网")];
     
+    [[NetworkManager shared] reportDeviceInfoWithSceneName: @""];
+    
     [self setUpUI];
 }
 
