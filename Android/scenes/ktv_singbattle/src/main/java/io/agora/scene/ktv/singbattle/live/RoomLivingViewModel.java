@@ -654,10 +654,23 @@ public class RoomLivingViewModel extends ViewModel {
                         RoomSelSongModel value = songPlayingLiveData.getValue();
                         RoomSelSongModel songPlaying = data.get(0);
 
-                        if (value != null && !value.getSongNo().equals(songPlaying.getSongNo())) {
-                            // 无已点歌曲， 直接将列表第一个设置为当前播放歌曲
-                            //KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() chosen song list is empty");
-                            //songPlayingLiveData.postValue(songPlaying);
+                        if (value != null && value.getWinnerNo().equals("") && !songPlaying.getWinnerNo().equals("")) {
+                            // 所有人更新抢唱结果UI
+                            KTVSingBattleGameService.INSTANCE.getWinnerInfo(
+                                    "scene_singbattle_3.4.0",
+                                    roomInfoLiveData.getValue().getRoomNo(),
+                                    songPlayingLiveData.getValue().getSongNo(),
+                                    (userId, userName) -> {
+                                        KTVLogger.d(TAG, "RoomLivingViewModel.getWinnerInfo() called：" + userId + " success");
+                                        GraspModel model = new GraspModel();
+                                        model.status = GraspStatus.SUCCESS;
+                                        model.userId = songPlaying.getWinnerNo();
+                                        model.userName = userName;
+                                        graspStatusMutableLiveData.postValue(model);
+                                        return null;
+                                    },
+                                    null
+                            );
                         }
                     } else {
                         KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() return is emptyList");
@@ -1330,7 +1343,14 @@ public class RoomLivingViewModel extends ViewModel {
                 songPlayingLiveData.getValue().getSongNo(),
                 (userId) -> {
                     KTVLogger.d(TAG, "RoomLivingViewModel.graspSong() success " + userId);
-                    ToastUtils.showToast("抢唱成功");
+                    //ToastUtils.showToast("抢唱成功");
+                    // 更新Service抢唱结果
+                    ktvServiceProtocol.updateSongModel(songPlayingLiveData.getValue().getSongNo(), userId, e -> {
+                        if (e == null) {
+                            KTVLogger.d(TAG, "RoomLivingViewModel.updateSongModel() success " + userId);
+                        }
+                        return null;
+                    });
                     return null;
                 },
                 null
@@ -1346,22 +1366,15 @@ public class RoomLivingViewModel extends ViewModel {
                 songPlayingLiveData.getValue().getSongNo(),
                 (userId, userName) -> {
                     KTVLogger.d(TAG, "RoomLivingViewModel.getWinnerInfo() called：" + userId + " success");
-                    // 房主更新Service抢唱结果
-                    if (isRoomOwner()) {
-                        ktvServiceProtocol.updateSongModel(songPlayingLiveData.getValue().getSongNo(), userId, e -> {
-                            if (e == null) {
-                                KTVLogger.d(TAG, "RoomLivingViewModel.updateSongModel() success " + userId);
-                            }
-                            return null;
-                        });
-                    }
-
-                    // 所有人更新抢唱结果UI
-                    GraspModel model = new GraspModel();
-                    model.status = GraspStatus.SUCCESS;
-                    model.userId = userId;
-                    model.userName = userName;
-                    graspStatusMutableLiveData.postValue(model);
+//                    // 房主更新Service抢唱结果
+//                    if (isRoomOwner()) {
+//                        ktvServiceProtocol.updateSongModel(songPlayingLiveData.getValue().getSongNo(), userId, e -> {
+//                            if (e == null) {
+//                                KTVLogger.d(TAG, "RoomLivingViewModel.updateSongModel() success " + userId);
+//                            }
+//                            return null;
+//                        });
+//                    }
                     return null;
                 },
                 e -> {
