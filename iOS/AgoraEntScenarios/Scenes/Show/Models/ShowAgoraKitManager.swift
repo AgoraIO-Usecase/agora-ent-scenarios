@@ -326,9 +326,7 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         options.clientRoleType = role
-        if role == .audience {
-            options.audienceLatencyLevel = .lowLatency
-        }
+        options.audienceLatencyLevel = role == .audience ? .lowLatency : .ultraLowLatency
         updateChannelEx(channelId:channelId, options: options)
         if "\(uid)" == VLUserCenter.user.id {
             setupLocalVideo(uid: uid, canvasView: canvasView)
