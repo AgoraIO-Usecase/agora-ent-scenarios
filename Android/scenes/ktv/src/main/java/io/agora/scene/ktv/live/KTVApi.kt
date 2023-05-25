@@ -5,6 +5,7 @@ import io.agora.mediaplayer.IMediaPlayer
 import io.agora.musiccontentcenter.IAgoraMusicContentCenter
 import io.agora.musiccontentcenter.Music
 import io.agora.musiccontentcenter.MusicChartInfo
+import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 
 /**
@@ -157,10 +158,18 @@ abstract class IKTVApiEventHandler {
     open fun onSingerRoleChanged(oldRole: KTVSingRole, newRole: KTVSingRole) {}
 
     /**
-     * 合唱频道token将要过期回调，需要renew这个token
-     * @param token 即将过期的token
+     * rtm或合唱频道token将要过期回调，需要renew这个token
      */
-    open fun onChorusChannelTokenPrivilegeWillExpire(token: String?) {}
+    open fun onTokenPrivilegeWillExpire() {}
+
+    /**
+     * 合唱频道人声音量提示
+     * @param speakers 不同用户音量信息
+     * @param totalVolume 总音量
+     */
+    open fun onChorusChannelAudioVolumeIndication(
+        speakers: Array<out IRtcEngineEventHandler.AudioVolumeInfo>?,
+        totalVolume: Int) {}
 }
 
 /**
@@ -232,6 +241,16 @@ interface KTVApi {
      * 清空内部变量/缓存，取消在initWithRtcEngine时的监听，以及取消网络请求等
      */
     fun release()
+
+    /**
+     * 收到 IKTVApiEventHandler.onTokenPrivilegeWillExpire 回调时需要主动调用方法更新Token
+     * @param rtmToken musicContentCenter模块需要的rtm token
+     * @param chorusChannelRtcToken 合唱需要的频道rtc token
+     */
+    fun renewToken(
+        rtmToken: String,
+        chorusChannelRtcToken: String
+    )
 
     /**
      * 获取歌曲榜单
