@@ -117,6 +117,10 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
             }
         });
         mBinding.ilGameSong.btStartGame.setOnClickListener(v -> {
+            if (chosenSong < 4) {
+                ToastUtils.showToast("至少需要4首歌才能开始游戏");
+                return;
+            }
             if (chooseSongListener != null) {
                 chooseSongListener.onStartSingBattleGame(this);
             }
@@ -199,6 +203,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
     /**
      * 已点歌单-重置列表
      */
+    private int chosenSong = 0;
     public void resetChosenSongList(List<SongItem> songs) {
         songChosenFragment.resetSongList(songs);
         this.chosenSongCount = songChosenFragment.getSongSize();
@@ -206,10 +211,9 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
         if (mBinding == null) return;
         mBinding.ilGameSong.tvSongNum.setText("已点 " + songs.size() + "/8");
+        chosenSong = songs.size();
         if (songs.size() <= 3) {
             mBinding.ilGameSong.btStartGame.setBackgroundResource(R.mipmap.ktv_start_game_disabled);
-            mBinding.ilGameSong.btStartGame.setEnabled(false);
-            ToastUtils.showToast("至少需要4首歌才能开始游戏");
         } else if (songs.size() <= 8) {
             mBinding.ilGameSong.btStartGame.setBackgroundResource(R.mipmap.ktv_start_game);
             mBinding.ilGameSong.btStartGame.setEnabled(true);

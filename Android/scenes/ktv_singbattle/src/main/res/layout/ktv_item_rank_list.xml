@@ -31,7 +31,7 @@
         android:layout_width="0dp"
         android:textColor="@color/white"
         android:layout_marginStart="10dp"
-        android:layout_weight="1.2"
+        android:layout_weight="1.1"
         android:layout_height="wrap_content"/>
 
     <TextView

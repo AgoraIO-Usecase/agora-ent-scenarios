@@ -67,9 +67,8 @@ public class SingBattleGameView extends FrameLayout {
             @Override
             public void onTick(long millisUntilFinished) {
                 int second = (int) (millisUntilFinished / 1000);
-
+                if (mBinding == null) return;
                 if (second <= 3 && second >= 1) {
-                    if (mBinding == null) return;
                     mBinding.ilIDLE.messageText.setText("" + second);
                 } else if (second < 1) {
                     mBinding.ilIDLE.messageText.setText("Go");
@@ -80,7 +79,7 @@ public class SingBattleGameView extends FrameLayout {
             public void onFinish() {
                 if (mBinding == null || mSingBattleGameEventListener == null) return;
                 mSingBattleGameEventListener.onGameStart();
-                onBattleGamePrepare();
+                onBattleGamePrepare(-1);
             }
         }.start();
     }
@@ -137,10 +136,14 @@ public class SingBattleGameView extends FrameLayout {
     // 预播放歌曲
     private int songNum = 0;
     private int nowNum = 0;
-    public void onBattleGamePrepare() {
+    public void onBattleGamePrepare(int leftSongNum) {
         KTVLogger.d(TAG, "onBattleGamePrepare");
         if (mBinding == null) return;
-        nowNum ++;
+        if (leftSongNum == -1) {
+            nowNum = 1;
+        } else {
+            nowNum = songNum - leftSongNum + 1;
+        }
         mBinding.ilActive.tvSongTab.setText(nowNum + "/" + songNum);
         mBinding.ilIDLE.messageText.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
@@ -227,6 +230,7 @@ public class SingBattleGameView extends FrameLayout {
         mBinding.ilIDLE.scoreFailText.setVisibility(View.GONE);
         mBinding.ilIDLE.scoreSuccessText.setVisibility(View.GONE);
         mBinding.ilRank.setVisibility(View.VISIBLE);
+        mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_idle_text_background);
 
         if (isRoomOwner) {
             mBinding.btGameAgain.setVisibility(View.VISIBLE);
