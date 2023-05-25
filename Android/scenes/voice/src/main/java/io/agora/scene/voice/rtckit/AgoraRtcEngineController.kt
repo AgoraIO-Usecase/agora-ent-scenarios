@@ -6,6 +6,7 @@ import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.TokenGenerator
 import io.agora.scene.voice.model.SoundAudioBean
 import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
@@ -42,9 +43,11 @@ class AgoraRtcEngineController {
             rtcEngine!!,
             VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(),
             mLocalUid,
-            ""
+            mRtmToken
         )
     }
+
+    private var mRtmToken = ""
 
     private var micVolumeListener: RtcMicVolumeListener? = null
 
@@ -59,15 +62,28 @@ class AgoraRtcEngineController {
         context: Context, channelId: String, rtcUid: Int, soundEffect: Int, broadcaster: Boolean = false,
         joinCallback: VRValueCallBack<Boolean>
     ) {
-        initRtcEngine(context)
-        this.mLocalUid = rtcUid
-        this.joinCallback = joinCallback
-        VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
-        checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
+        TokenGenerator.generateTokens(
+            channelId,
+            rtcUid.toString(),
+            TokenGenerator.TokenGeneratorType.token006,
+            arrayOf(
+                TokenGenerator.AgoraTokenType.rtm
+            ),
+            { ret ->
+                mRtmToken = ret[TokenGenerator.AgoraTokenType.rtm] ?: ""
 
-        // 语音鉴定
-        AudioModeration.moderationAudio(channelId, rtcUid.toLong(),
-            AudioModeration.AgoraChannelType.broadcast, "voice", {})
+                initRtcEngine(context)
+                this.mLocalUid = rtcUid
+                this.joinCallback = joinCallback
+                VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
+                checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
+                // 语音鉴定
+                AudioModeration.moderationAudio(channelId, rtcUid.toLong(),
+                    AudioModeration.AgoraChannelType.broadcast, "voice", {})
+            },{
+                joinCallback?.onError(Constants.ERR_FAILED, "get token error")
+            }
+        )
     }
 
     private fun initRtcEngine(context: Context): Boolean {
