@@ -1727,7 +1727,7 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.autoSubscribeVideo = true
             channelMediaOptions.autoSubscribeAudio = true
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-            channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+            channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_ULTRA_LOW_LATENCY
             val pkRtcConnection = RtcConnection(
                 interactionInfo!!.roomId,
                 UserManager.getInstance().user.id.toInt()
