@@ -234,6 +234,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     private RoomSelSongModel songPlaying;
 
     public void onPlayStatus(RoomSelSongModel songPlaying) {
+        if (isPrepareSong) startTimerCount();
         this.songPlaying = songPlaying;
 
         if (mBinding == null) return;
@@ -350,7 +351,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         if (mMusic == null) return;
 
-        if (!mMusic.getWinnerNo().equals("")) {
+        if (mMusic.getWinnerNo() == null || !mMusic.getWinnerNo().equals("")) {
             onGamingStatus();
         }
         mBinding.tvMusicName.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
@@ -694,21 +695,15 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     private int totalScore = 0;
     private void dealWithBattleSong(LyricsModel lyricsModel) {
-        AtomicInteger x = new AtomicInteger();
-        AtomicInteger y = new AtomicInteger();
-        AtomicInteger z = new AtomicInteger();
+        AtomicInteger lineCount = new AtomicInteger();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             lyricsModel.lines.forEach(line -> {
-                z.getAndIncrement();
-                if (line.getStartTime() == highStartTime) {
-                    x.set(z.get());
-                }
-                if (line.getEndTime() == highEndTime) {
-                    y.set(z.get());
+                if (line.getStartTime() >= highStartTime && line.getEndTime() <= highEndTime) {
+                    lineCount.getAndIncrement();
                 }
             });
         }
-        totalScore = (y.get() - x.get() + 1) * 100;
+        totalScore = lineCount.get() * 100;
         Log.d("hugo", "totalScore: " + totalScore);
     }
 

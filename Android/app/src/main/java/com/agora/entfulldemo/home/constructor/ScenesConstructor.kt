@@ -30,14 +30,14 @@ object ScenesConstructor {
 //                true,
 //                context.getString(R.string.app_voice_chat_spatialTip)
 //            ),
-            ScenesModel(
-                AgoraScene.KTV,
-                "io.agora.scene.ktv.create.RoomListActivity",
-                context.getString(R.string.ktv_online),
-                R.mipmap.bg_btn_home1,
-                R.mipmap.bg_btn_home_ktv,
-                true
-            ),
+//            ScenesModel(
+//                AgoraScene.KTV,
+//                "io.agora.scene.ktv.create.RoomListActivity",
+//                context.getString(R.string.ktv_online),
+//                R.mipmap.bg_btn_home1,
+//                R.mipmap.bg_btn_home_ktv,
+//                true
+//            ),
             ScenesModel(
                 AgoraScene.SingBattleGame,
                 "io.agora.scene.ktv.singbattle.create.RoomListActivity",

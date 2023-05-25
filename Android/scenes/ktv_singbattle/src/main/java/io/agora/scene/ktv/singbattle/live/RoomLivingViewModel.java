@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -117,7 +118,8 @@ public class RoomLivingViewModel extends ViewModel {
         ON_STOP,
         ON_LRC_RESET,
         ON_CHANGING_START,
-        ON_CHANGING_END
+        ON_CHANGING_END,
+        ON_LEAVE
     }
     final MutableLiveData<PlayerMusicStatus> playerMusicStatusLiveData = new MutableLiveData<>();
 
@@ -127,7 +129,8 @@ public class RoomLivingViewModel extends ViewModel {
     enum GameStatus {
         ON_WAITING,
         ON_START,
-        ON_END
+        ON_END,
+        ON_ERROR
     }
     final MutableLiveData<GameStatus> singBattleGameStatusMutableLiveData = new MutableLiveData<>();
 
@@ -642,7 +645,7 @@ public class RoomLivingViewModel extends ViewModel {
         ktvServiceProtocol.getChoosedSongsList((e, data) -> {
             if (e == null && data != null) {
                 // success
-                KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() success");
+                KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() success" + data);
                 songNum = data.size();
                 songsOrderedLiveData.postValue(data);
 
@@ -654,7 +657,7 @@ public class RoomLivingViewModel extends ViewModel {
                         if (value != null && !value.getSongNo().equals(songPlaying.getSongNo())) {
                             // 无已点歌曲， 直接将列表第一个设置为当前播放歌曲
                             //KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() chosen song list is empty");
-                            songPlayingLiveData.postValue(songPlaying);
+                            //songPlayingLiveData.postValue(songPlaying);
                         }
                     } else {
                         KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() return is emptyList");
@@ -673,6 +676,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public void onSongPlaying() {
+        KTVLogger.d(TAG, "RoomLivingViewModel.onSongPlaying()");
         if (singBattleGameStatusMutableLiveData.getValue() == GameStatus.ON_START) {
             if (songsOrderedLiveData.getValue() != null && songsOrderedLiveData.getValue().size() > 0){
                 RoomSelSongModel value = songPlayingLiveData.getValue();
@@ -680,10 +684,10 @@ public class RoomLivingViewModel extends ViewModel {
 
                 if (value == null || !value.getSongNo().equals(songPlaying.getSongNo())) {
                     // 无已点歌曲， 直接将列表第一个设置为当前播放歌曲
-                    //KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() chosen song list is empty");
-                    //gameSong = null;
+                    KTVLogger.d(TAG, "RoomLivingViewModel.onSongPlaying() chosen song list is empty");
                     songPlayingLiveData.postValue(songPlaying);
                 } else if (!value.getWinnerNo().equals(songPlaying.getWinnerNo())) {
+                    KTVLogger.d(TAG, "RoomLivingViewModel.onSongPlaying() has winner");
                     songPlayingLiveData.postValue(songPlaying);
                 }
             } else {
@@ -817,7 +821,7 @@ public class RoomLivingViewModel extends ViewModel {
         MutableLiveData<List<RoomSelSongModel>> liveData = new MutableLiveData<>();
 
         // 过滤没有歌词的歌曲
-        String jsonOption = "{\"pitchType\":1,\"needLyric\":true}";
+        String jsonOption = "{\"pitchType\":1,\"needLyric\":true,\"needHighPart\":true}";
         ktvApiProtocol.searchMusicByKeyword(condition, 0, 50, jsonOption,
                 (id, status, p, size, total, list) -> {
                     List<Music> musicList = new ArrayList<>(Arrays.asList(list));
@@ -990,6 +994,13 @@ public class RoomLivingViewModel extends ViewModel {
         config.mAppId = BuildConfig.AGORA_APP_ID;
         config.mEventHandler = new IRtcEngineEventHandler() {
             @Override
+            public void onUserOffline(int uid, int reason) {
+                if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getWinnerNo().equals(String.valueOf(uid))) {
+                    playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LEAVE);
+                }
+            }
+
+            @Override
             public void onNetworkQuality(int uid, int txQuality, int rxQuality) {
                 // 网络状态回调, 本地user uid = 0
                 if (uid == 0) {
@@ -1024,6 +1035,7 @@ public class RoomLivingViewModel extends ViewModel {
                         lineScore.total = total;
                         mainSingerScoreLiveData.postValue(lineScore);
                     } else if (jsonMsg.getString("cmd").equals("SingingScore")) {
+                        KTVLogger.d("hugo", "onMessage/SingingScore: " + jsonMsg);
                         float score = (float) jsonMsg.getDouble("score");
                         String userId = (String) jsonMsg.getString("userId");
                         String userName = (String) jsonMsg.getString("userName");
@@ -1036,7 +1048,7 @@ public class RoomLivingViewModel extends ViewModel {
                             RankModel model = new RankModel(
                                     oldModel.getUserName(),
                                     oldModel.getSongNum() + 1,
-                                    (oldModel.getScore() * oldModel.getSongNum() + score) / (oldModel.getSongNum() + 1),
+                                    (int)(oldModel.getScore() * oldModel.getSongNum() + score) / (oldModel.getSongNum() + 1),
                                     poster
                             );
                             rankMap.put(userId, model);
@@ -1044,7 +1056,7 @@ public class RoomLivingViewModel extends ViewModel {
                             RankModel model = new RankModel(
                                     userName,
                                     1,
-                                    score,
+                                    (int)score,
                                     poster
                             );
                             rankMap.put(userId, model);
@@ -1085,7 +1097,7 @@ public class RoomLivingViewModel extends ViewModel {
                            playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
                            break;
                        case PLAYER_STATE_PLAYING:
-                           //playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                           playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                            if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getWinnerNo().equals("") && isLocal) {
                                ktvApiProtocol.getMediaPlayer().selectAudioTrack(0);
                            }
@@ -1257,6 +1269,7 @@ public class RoomLivingViewModel extends ViewModel {
                 singBattleGameStatusMutableLiveData.postValue(GameStatus.ON_WAITING);
             } else if (gameModel.getStatus() == SingBattleGameStatus.started.getValue()) {
                 singBattleGameStatusMutableLiveData.postValue(GameStatus.ON_START);
+                rankMap.clear();
             } else if (gameModel.getStatus() == SingBattleGameStatus.ended.getValue()) {
                 singBattleGameStatusMutableLiveData.postValue(GameStatus.ON_END);
             }
@@ -1267,9 +1280,10 @@ public class RoomLivingViewModel extends ViewModel {
                 if (info.getStatus() == SingBattleGameStatus.waitting.getValue()) {
                     singBattleGameStatusMutableLiveData.postValue(GameStatus.ON_WAITING);
                 } else if (info.getStatus() == SingBattleGameStatus.started.getValue()) {
-                    singBattleGameStatusMutableLiveData.postValue(GameStatus.ON_START);
+                    singBattleGameStatusMutableLiveData.postValue(GameStatus.ON_ERROR);
                 } else if (info.getStatus() == SingBattleGameStatus.ended.getValue()) {
                     singBattleGameStatusMutableLiveData.postValue(GameStatus.ON_END);
+                    KTVLogger.d(TAG, "rank: " + info.getRank());
                     if (info.getRank() != null) {
                         rankMap.putAll(info.getRank());
                     }
@@ -1528,7 +1542,7 @@ public class RoomLivingViewModel extends ViewModel {
                 ktvApiProtocol.getMediaPlayer().adjustPlayoutVolume(50);
                 ktvApiProtocol.getMediaPlayer().adjustPublishSignalVolume(50);
 
-                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                //playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
             }
 
             @Override
@@ -1638,7 +1652,7 @@ public class RoomLivingViewModel extends ViewModel {
             RankModel model = new RankModel(
                     oldModel.getUserName(),
                     oldModel.getSongNum() + 1,
-                    (oldModel.getScore() * oldModel.getSongNum() + score) / (oldModel.getSongNum() + 1),
+                    (int)(oldModel.getScore() * oldModel.getSongNum() + score) / (oldModel.getSongNum() + 1),
                     UserManager.getInstance().getUser().headUrl
             );
             rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
@@ -1646,7 +1660,7 @@ public class RoomLivingViewModel extends ViewModel {
             RankModel model = new RankModel(
                     UserManager.getInstance().getUser().name,
                     1,
-                    score,
+                    (int)score,
                     UserManager.getInstance().getUser().headUrl
             );
             rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
@@ -1668,7 +1682,20 @@ public class RoomLivingViewModel extends ViewModel {
                 i.getAndIncrement();
             });
         }
+        sort(rankItemList);
         return rankItemList;
+    }
+
+    public void sort(List<RankItem> list) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            list.sort((o1, o2) -> {
+                if (o1.songNum != o2.songNum) {
+                    return o2.songNum - o1.songNum; //songNum多的在前面
+                } else {
+                    return (int)o2.score - (int)o1.score; //songNum相同 score大的在前面
+                }
+            });
+        }
     }
 
     public void autoSelectMusic() {

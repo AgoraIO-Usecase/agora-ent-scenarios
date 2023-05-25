@@ -33,6 +33,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
 
     private val kChatRoomAppID = "io.agora.chatroom"
     private val kFullAppID = "io.agora.entfull"
+    private val kSingBattleRoomAppID = "io.agora.singbattle"
 
     private var counts = 0
     private val debugModeOpenTime: Long = 2000
@@ -52,6 +53,8 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             setupChatRoomAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kFullAppID) {
             setupFullAppInfo()
+        } else if (BuildConfig.APPLICATION_ID == kSingBattleRoomAppID) {
+            setupSingBattleRoomAppInfo()
         }
         setupDebugMode()
         setupClickWebAction()
@@ -64,6 +67,17 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         adapter.appInfo = AppInfo(
             this.getString(R.string.app_about_name),
             "20230110-2.1.0-" + RtcEngine.getSdkVersion(),
+            servicePhone,
+            webSite
+        )
+    }
+
+    // 设置抢唱App的信息
+    private fun setupSingBattleRoomAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        adapter.appInfo = AppInfo(
+            this.getString(R.string.app_about_name),
+            "20230520-3.4.0-" + RtcEngine.getSdkVersion(),
             servicePhone,
             webSite
         )

@@ -170,7 +170,7 @@ data class ScoringAverageModel(
 data class RankModel(
     val userName: String,
     val songNum: Int = 0,
-    val score: Double = 0.0,
+    val score: Int = 0,
     val poster: String
 )
 

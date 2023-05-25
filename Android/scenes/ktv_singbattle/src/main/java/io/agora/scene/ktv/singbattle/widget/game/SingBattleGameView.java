@@ -3,7 +3,6 @@ package io.agora.scene.ktv.singbattle.widget.game;
 import android.content.Context;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -13,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
+import io.agora.scene.ktv.singbattle.KTVLogger;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvLayoutGameViewBinding;
 import io.agora.scene.ktv.singbattle.widget.rankList.RankItem;
@@ -103,7 +103,7 @@ public class SingBattleGameView extends FrameLayout {
 
     // 游戏等待
     public void onGameWaitingStatus() {
-        Log.d(TAG, "onGameWaitingStatus");
+        KTVLogger.d(TAG, "onGameWaitingStatus");
         if (mBinding == null) return;
         mBinding.ilRank.setVisibility(GONE);
         if (isRoomOwner) {
@@ -120,9 +120,8 @@ public class SingBattleGameView extends FrameLayout {
     }
 
     // 游戏开始
-    public void onGameStartStatus(int songNum) {
-        Log.d(TAG, "onGameStartStatus, songNum:" + songNum);
-        this.songNum = songNum;
+    public void onGameStartStatus() {
+        KTVLogger.d(TAG, "onGameStartStatus");
         if (mBinding == null) return;
         mBinding.ilIDLE.messageText.setText(R.string.ktv_game_start);
         mBinding.ilIDLE.btChooseSong.setVisibility(View.GONE);
@@ -130,22 +129,26 @@ public class SingBattleGameView extends FrameLayout {
         startTimer();
     }
 
+    public void setSongTotalNum(int songNum) {
+        KTVLogger.d(TAG, "setSongTotalNum, songNum:" + songNum);
+        this.songNum = songNum;
+    }
+
     // 预播放歌曲
     private int songNum = 0;
     private int nowNum = 0;
     public void onBattleGamePrepare() {
-        Log.d(TAG, "onBattleGamePrepare");
+        KTVLogger.d(TAG, "onBattleGamePrepare");
         if (mBinding == null) return;
         nowNum ++;
         mBinding.ilActive.tvSongTab.setText(nowNum + "/" + songNum);
         mBinding.ilIDLE.messageText.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
-        mBinding.ilActive.lrcControlView.startTimerCount();
     }
 
     // 抢唱成功
     public void onGraspSongSuccess(String userName) {
-        Log.d(TAG, "onGraspSongSuccess");
+        KTVLogger.d(TAG, "onGraspSongSuccess");
         if (mBinding == null) return;
         mBinding.ilIDLE.messageText.setText("本轮由 " + userName + " 抢到麦");
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
@@ -159,7 +162,7 @@ public class SingBattleGameView extends FrameLayout {
 
     // 无人抢唱
     public void onNobodyGraspSong() {
-        Log.d(TAG, "onNobodyGraspSong");
+        KTVLogger.d(TAG, "onNobodyGraspSong");
         if (mBinding == null) return;
         mBinding.ilIDLE.messageText.setText(R.string.ktv_game_nobody_grasp);
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
@@ -176,11 +179,11 @@ public class SingBattleGameView extends FrameLayout {
 
     // 歌曲演唱结束
     public void onSongFinish(int score) {
-        Log.d(TAG, "onSongFinish");
+        KTVLogger.d(TAG, "onSongFinish");
         if (mBinding == null) return;
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
-        if (score <= 60) {
+        if (score < 50) {
             mBinding.ilIDLE.messageText.setText("");
             mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_defeat_text_background);
             mBinding.ilIDLE.scoreFailText.setVisibility(View.VISIBLE);
@@ -204,7 +207,7 @@ public class SingBattleGameView extends FrameLayout {
 
     // 下一首
     public void onNextSong() {
-        Log.d(TAG, "onNextSong");
+        KTVLogger.d(TAG, "onNextSong");
         if (mBinding == null) return;
         mBinding.ilIDLE.scoreFailText.setVisibility(View.GONE);
         mBinding.ilIDLE.scoreSuccessText.setVisibility(View.GONE);
@@ -217,7 +220,7 @@ public class SingBattleGameView extends FrameLayout {
 
     // 游戏结束
     public void onGameEnd(List<RankItem> list) {
-        Log.d(TAG, "onGameEnd");
+        KTVLogger.d(TAG, "onGameEnd");
         if (mBinding == null) return;
         nowNum = 0;
         songNum = 0;

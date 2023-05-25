@@ -24,6 +24,7 @@ final def isVoiceEmpty = properties.getProperty("VERSION_SCENE_VOICE").isEmpty()
 final def isSpatialVoiceEmpty = properties.getProperty("VERSION_SCENE_SPATIAL_VOICE").isEmpty()
 final def isKTVEmpty = properties.getProperty("VERSION_SCENE_KTV").isEmpty()
 final def isShowEmpty = properties.getProperty("VERSION_SCENE_SHOW").isEmpty()
+final def isSingBattleGameEmpty = properties.getProperty("VERSION_SCENE_SING_BATTLE").isEmpty()
 
 rootProject.name = "AgoraEntFullDemo"
 include ':app'
@@ -34,7 +35,9 @@ include ':common:ui-widget'
 //    include ':scenes:ktv'
 //}
 
-include ':scenes:ktv_singbattle'
+if (!isSingBattleGameEmpty) {
+    include ':scenes:ktv_singbattle'
+}
 
 //if (!isVoiceEmpty) {
 //    include ':scenes:voice'
