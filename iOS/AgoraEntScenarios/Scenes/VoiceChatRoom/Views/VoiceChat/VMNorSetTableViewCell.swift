@@ -31,6 +31,7 @@ class VMNorSetTableViewCell: UITableViewCell {
 
     private func layoutUI() {
         iconView.frame = CGRect(x: 20, y: 17, width: 20, height: 20)
+        iconView.contentMode = .scaleAspectFit
         iconView.image = UIImage("icons／set／jiqi")
         contentView.addSubview(iconView)
 

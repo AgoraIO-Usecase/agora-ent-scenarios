@@ -11,7 +11,9 @@ public enum TV_TYPE_HEIGHT: CGFloat {
     case ANS = 920
     case AEC = 455
     case AGC = 454
+    case InEar = 400
     case EFFECT = 921
+    case Music = 500
 }
 
 class VoiceRoomAudioSettingDetailViewController: UIViewController {
@@ -233,6 +235,10 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
         case .AGC:
             return 54
         case .Spatial:
+            return 54
+        case .InEar:
+            return 54
+        case .Music:
             return 54
         }
     }
@@ -467,14 +473,20 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
              }
              return cell
 
-             
-             
-//             let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
-//             cell.isNoiseSet = true
-//             cell.titleLabel.text = AIAECSettingName[indexPath.row]
+         } else if settingType == .InEar {
+             let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
+             cell.titleLabel.text = AIAECSettingName[indexPath.row]
+             cell.selectionStyle = .none
+             cell.swith.isOn = roomInfo?.room?.turn_AIAEC ?? false
+             cell.useRobotBlock = { [weak self] flag in
+                 guard let turnAIAECBlock = self?.turnAIAECBlock else { return }
+                 turnAIAECBlock(flag)
+//                 guard let backBlock = self?.backBlock else {return}
+//                 backBlock();
+             }
+             return cell
 
-//             return cell
-         } else if settingType == .AGC {
+         }  else if settingType == .AGC {
              let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
              cell.titleLabel.text = AGCSettingName[indexPath.row]
              cell.selectionStyle = .none
