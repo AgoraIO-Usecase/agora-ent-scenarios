@@ -61,12 +61,14 @@ class ShowDebugSettingVC: UIViewController {
         naviBar.backgroundColor = .white
         view.addSubview(naviBar)
         
-//        let saveButtonItem = ShowBarButtonItem(title: "show_advanced_setting_presetting_save".show_localized, target: self, action: #selector(didClickSaveButton))
-//        naviBar.rightItems = [saveButtonItem]
+        let saveButtonItem = ShowBarButtonItem(title: "show_advanced_setting_debugsetting_private".show_localized, target: self, action: #selector(didClickSaveButton))
+        naviBar.rightItems = [saveButtonItem]
     }
     
     @objc private func didClickSaveButton() {
-        navigationController?.popViewController(animated: true)
+        let vc = ShowDebugPrivateParamsVC()
+        vc.settingManager = settingManager
+        self.present(vc, animated: true)
     }
     
     private func setUpUI(){
