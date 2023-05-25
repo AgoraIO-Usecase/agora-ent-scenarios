@@ -16,6 +16,8 @@ public enum AUDIO_SETTING_TYPE {
     case Spatial
     case AIAEC
     case AGC
+    case InEar
+    case Music
 }
 
 

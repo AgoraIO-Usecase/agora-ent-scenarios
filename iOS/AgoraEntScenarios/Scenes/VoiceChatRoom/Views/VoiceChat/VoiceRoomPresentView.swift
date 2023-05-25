@@ -100,6 +100,7 @@ class VoiceRoomPresentView: UIView, UIGestureRecognizerDelegate {
         maxHeights.append(maxHeight)
         minHeights.append(frame.height)
         curTableview = getTableView(with: vc)
+        nav.interactivePopGestureRecognizer?.isEnabled = false
         UIView.animate(withDuration: animationDuration) {[weak self] in
             self?.mainView.frame = CGRect(x: 0, y: (self?.screenSize.height ?? 0) - frame.height, width: frame.width, height: frame.height)
             self?.nav.pushViewController(vc, animated: true)
@@ -110,6 +111,7 @@ class VoiceRoomPresentView: UIView, UIGestureRecognizerDelegate {
     @objc func pop() {
         if frames.count < 2 {return}
         let lastFrame: CGRect = frames[frames.count - 2];
+        nav.interactivePopGestureRecognizer?.isEnabled = true
         UIView.animate(withDuration: animationDuration) {[weak self] in
             self?.mainView.frame = CGRect(x: 0, y: (self?.screenSize.height ?? 0) - lastFrame.height, width: lastFrame.width, height: lastFrame.height)
             self?.nav.popViewController(animated: true)
