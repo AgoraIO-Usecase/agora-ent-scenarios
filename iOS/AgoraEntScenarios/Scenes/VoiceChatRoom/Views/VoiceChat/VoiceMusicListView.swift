@@ -31,15 +31,7 @@ class VoiceMusicListView: UIView {
     }()
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-<<<<<<< HEAD
-<<<<<<< HEAD
         label.text = "背景音乐".show_localized
-=======
-        label.text = "背景音乐"
->>>>>>> 6fecc737 (开发310版本功能)
-=======
-        label.text = "背景音乐".show_localized
->>>>>>> 8ae58bee (添加多语言)
         label.textColor = UIColor(hex: "#040925", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 16)
         return label
@@ -49,10 +41,7 @@ class VoiceMusicListView: UIView {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.delegate = self
         tableView.dataSource = self
-<<<<<<< HEAD
         tableView.separatorColor = .gray.withAlphaComponent(0.1)
-=======
->>>>>>> 6fecc737 (开发310版本功能)
         tableView.register(VoiceMusicListCell.self, forCellReuseIdentifier: "cell")
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
@@ -109,10 +98,7 @@ class VoiceMusicListView: UIView {
                 }
                 return model
             })
-<<<<<<< HEAD
             self.titleLabel.text = "背景音乐".show_localized + "(\(list.count))"
-=======
->>>>>>> 6fecc737 (开发310版本功能)
             if !self.musicList.isEmpty && self.currentMusic == nil {
                 self.musicToolView.setupMusicInfo(model: self.musicList[0], isOrigin: self.isOrigin)
             }
@@ -173,10 +159,7 @@ class VoiceMusicListView: UIView {
             rtcKit?.playMusic(songCode: model.songCode)
             tableView.reloadData()
             backgroundMusicPlaying?(model)
-<<<<<<< HEAD
             musicToolView.setupMusicInfo(model: model, isOrigin: isOrigin)
-=======
->>>>>>> 6fecc737 (开发310版本功能)
             currentIndex += 1
         } else {
             currentIndex += 1
@@ -186,11 +169,8 @@ class VoiceMusicListView: UIView {
             rtcKit?.playMusic(songCode: model.songCode)
             tableView.reloadData()
             backgroundMusicPlaying?(model)
-<<<<<<< HEAD
             musicToolView.setupMusicInfo(model: model, isOrigin: isOrigin)
             tableView.scrollToRow(at: IndexPath(row: currentIndex, section: 0), at: .middle, animated: true)
-=======
->>>>>>> 6fecc737 (开发310版本功能)
         }
     }
     

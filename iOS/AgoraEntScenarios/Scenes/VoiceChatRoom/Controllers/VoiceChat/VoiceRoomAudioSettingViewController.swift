@@ -405,6 +405,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 var inEar_volume = Double((roomInfo?.room?.inEar_volume ?? 0)) / 100.0
                 var inEarMode = roomInfo?.room?.inEarMode ?? ""
                 let actionView = ActionSheetManager()
+<<<<<<< HEAD
                 let earModes = ["自动".show_localized, "强制OpenSL".show_localized, "强制Oboe".show_localized]
                 var inEarModeIndex = earModes.firstIndex(where: { $0 == inEarMode }) ?? 0
                 let hasHeadset = HeadSetUtil.hasHeadset()
@@ -415,6 +416,18 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                     .tipsCell(iconName: "inEra_tips_icon", title: tipsText, titleColor: tipsTextColor)
                     .sectionHeader(title: "耳返设置".show_localized, desc: nil)
                     .sliderCell(title: "耳返音量".show_localized, value: inEar_volume, isEnable: isOn)
+=======
+                let earModes = ["自动", "强制OpenSL", "强制Oboe"]
+                var inEarModeIndex = earModes.firstIndex(where: { $0 == inEarMode }) ?? 0
+                let hasHeadset = HeadSetUtil.hasHeadset()
+                let tipsTextColor = hasHeadset ? UIColor(hex: "#979CBB") : UIColor(hex: "#FF1216")
+                let tipsText = hasHeadset ? "开启耳返可实时听到自己的声音, 唱歌的时候及时调整" : "使用耳返必须插入耳机，当前未检测到耳机"
+                actionView.title(title: "耳返")
+                    .switchCell(title: "开启耳返", isOn: isOn, isEnabel: hasHeadset)
+                    .tipsCell(iconName: "inEra_tips_icon", title: tipsText, titleColor: tipsTextColor)
+                    .sectionHeader(title: "耳返设置", desc: nil)
+                    .sliderCell(title: "耳返音量", value: inEar_volume, isEnable: isOn)
+>>>>>>> f4feb24b (开发310版本功能)
 //                    .segmentCell(title: "耳返模式", items: earModes, selectedIndex: inEarModeIndex, isEnable: isOn)
 //                    .customCell(customView: inEarView, viewHeight: 150)
                     .config()
@@ -436,7 +449,11 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 }
                 actionView.didSegmentValueChangeClosure = { [weak self] indexPath, mode, index in
                     guard let self = self else { return }
+<<<<<<< HEAD
                     self.showCustomAlert(title: "提示", message: String(format: "切换后将强制使用%@模式,确认?".show_localized, mode), confirm: {
+=======
+                    self.showCustomAlert(title: "提示", message: "切换后将强制使用\(mode)模式,确认?", confirm: {
+>>>>>>> f4feb24b (开发310版本功能)
                         inEarModeIndex = earModes.firstIndex(where: { $0 == mode }) ?? 0
                         self.roomInfo?.room?.inEarMode = mode
                         inEarMode = mode
