@@ -6,8 +6,14 @@ import io.agora.mediaplayer.IMediaPlayerObserver
 import io.agora.mediaplayer.data.PlayerUpdatedInfo
 import io.agora.mediaplayer.data.SrcInfo
 import io.agora.musiccontentcenter.*
+import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.RtcEngineEx
 
+data class AgoraBGMParams (
+    var isSingerOn: Boolean = true,
+    var isPlaying: Boolean = true,
+    var volume: Int = 50
+){}
 class AgoraBGMManager(
     private val mRtcEngine: RtcEngineEx,
     private val mAppId: String,
@@ -15,13 +21,15 @@ class AgoraBGMManager(
     private val mRtmToken: String
 ) : IMediaPlayerObserver, IMusicContentCenterEventHandler {
 
+    val params = AgoraBGMParams()
+
+    var bgm: Music? = null
+
     private val TAG: String = "BGM_MANAGER_LOG"
 
-    var remoteVolume: Int = 40 // 远端音频
-    var mpkPlayerVolume: Int = 50
-    var mpkPublishVolume: Int = 50
-
-    var selectSongCode: Long = 0
+    private var remoteVolume: Int = 40 // 远端音频
+    private var mpkPlayerVolume: Int = 50
+    private var mpkPublishVolume: Int = 50
 
     private val musicCollectionCallbackMap = mutableMapOf<String, (list: Array<out Music>?) -> Unit>()
 
@@ -49,6 +57,12 @@ class AgoraBGMManager(
 
         mPlayer.registerPlayerObserver(this)
         mMusicCenter.registerEventHandler(this)
+
+        val channelMediaOption = ChannelMediaOptions()
+        channelMediaOption.autoSubscribeAudio = true
+        channelMediaOption.publishMediaPlayerId = mPlayer.mediaPlayerId
+        channelMediaOption.publishMediaPlayerAudioTrack = true
+        mRtcEngine.updateChannelMediaOptions(channelMediaOption)
     }
 
     fun fetchBGMList(complete: (list: Array<out Music>?) -> Unit) {
@@ -58,54 +72,91 @@ class AgoraBGMManager(
         }
     }
 
-    fun loadAndAutoPlay(songCode: Long, complete: (Boolean) -> Unit) {
-        Log.d(TAG, "loadMusic: $songCode")
-        preLoadMusic() {song, percent, status, msg, lrcUrl ->
-            mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
-            mPlayer.open(songCode, 0)
+    fun loadMusic(music: Music?, autoPlay: Boolean, complete: (Boolean) -> Unit) {
+        bgm = music
+        complete.invoke(true)
+        if (music == null) {
+            return
+        }
+        Log.d(TAG, "loadMusic: ${music.songCode}, name: ${music.name}")
+        params.isPlaying = autoPlay
+        preLoadMusic {songCode, percent, status, msg, lrcUrl ->
+            if (autoPlay) {
+                mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
+                mPlayer.open(songCode, 0)
+            }
+            complete.invoke(true)
         }
     }
 
-    fun playerPause() {
-        mPlayer.pause()
+    fun setPlayState(isPlay: Boolean) {
+        params.isPlaying = isPlay
+        if (isPlay) {
+            mPlayer.play()
+        } else {
+            mPlayer.pause()
+        }
     }
 
     fun setSingerOn(isOn: Boolean) {
+        params.isSingerOn = isOn
         mPlayer.selectAudioTrack(if (isOn) 0 else 1)
     }
 
     fun setVolume(value: Int) {
+        params.volume = value
         mPlayer.adjustPublishSignalVolume(value)
         mPlayer.adjustPlayoutVolume(value)
     }
 
     private fun preLoadMusic(complete: (songCode: Long, percent: Int, status: Int, msg: String?, lyricUrl: String?) -> Unit) {
-        val ret = mMusicCenter.isPreloaded(selectSongCode)
+        val target = bgm?.songCode ?: return
+        val ret = mMusicCenter.isPreloaded(target)
         if (ret == 0) {
-            loadMusicCallbackMap.remove(selectSongCode.toString())
-            complete(selectSongCode, 100, 0, null, null)
+            loadMusicCallbackMap.remove(target.toString())
+            complete(target, 100, 0, null, null)
             return
         }
 
-        val retPreload = mMusicCenter.preload(selectSongCode, null)
+        val retPreload = mMusicCenter.preload(target, null)
         if (retPreload != 0) {
             Log.e(TAG, "preLoadMusic failed: $retPreload")
-            loadMusicCallbackMap.remove(selectSongCode.toString())
-            complete(selectSongCode, 100, 1, null, null)
+            loadMusicCallbackMap.remove(target.toString())
+            complete(target, 100, 1, null, null)
             return
         }
-        loadMusicCallbackMap[selectSongCode.toString()] = complete
+        loadMusicCallbackMap[target.toString()] = complete
     }
 
     override fun onPlayerStateChanged(
         state: Constants.MediaPlayerState?,
         error: Constants.MediaPlayerError?
     ) {
-        TODO("Not yet implemented")
+        val mediaPlayerState = state ?: return
+        val mediaPlayerError = error ?: return
+        Log.d(TAG, "onPlayerStateChanged called, state: $mediaPlayerState, error: $error")
+        when (mediaPlayerState) {
+            Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
+                if (params.isPlaying) {
+                    mPlayer.play()
+                }
+                mPlayer.selectAudioTrack(1)
+            }
+            Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
+                mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
+            }
+            Constants.MediaPlayerState.PLAYER_STATE_PAUSED -> {
+                mRtcEngine.adjustPlaybackSignalVolume(100)
+            }
+            Constants.MediaPlayerState.PLAYER_STATE_STOPPED -> {
+                mRtcEngine.adjustPlaybackSignalVolume(100)
+            }
+            else -> {}
+        }
     }
 
     override fun onPositionChanged(position_ms: Long) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onPlayerEvent(
@@ -121,7 +172,7 @@ class AgoraBGMManager(
     }
 
     override fun onPlayBufferUpdated(playCachedBuffer: Long) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onPreloadEvent(src: String?, event: Constants.MediaPlayerPreloadEvent?) {
@@ -137,11 +188,11 @@ class AgoraBGMManager(
     }
 
     override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onAudioVolumeIndication(volume: Int) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onPreLoadEvent(
@@ -177,11 +228,11 @@ class AgoraBGMManager(
         list: Array<out MusicChartInfo>?,
         errorCode: Int
     ) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onLyricResult(requestId: String?, lyricUrl: String?, errorCode: Int) {
-        TODO("Not yet implemented")
+
     }
 
 }

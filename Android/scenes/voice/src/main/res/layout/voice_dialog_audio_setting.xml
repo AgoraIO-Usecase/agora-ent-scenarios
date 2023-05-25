@@ -282,7 +282,6 @@
             android:text="@string/voice_chatroom_bot_volume"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtAgoraBot" />
-
         <androidx.appcompat.widget.AppCompatSeekBar
             android:id="@+id/pbAgoraBotVolume"
             style="@style/voice_bottom_sheet_progress"
