@@ -197,6 +197,10 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             return 54
         case .Spatial:
             return 54
+        case .InEar:
+            return 54
+        case .Music:
+            return 54
         }
     }
 

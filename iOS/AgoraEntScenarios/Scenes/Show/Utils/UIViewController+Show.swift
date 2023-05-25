@@ -24,4 +24,31 @@ extension UIViewController {
         present(alertController, animated: true, completion: nil)
     }
     
+    func showCustomAlert(title: String? = nil,
+                         message: String? = nil,
+                         confirmTitle: String? = LanguageManager.localValue(key: "Confirm"),
+                         cancelTitle: String? = LanguageManager.localValue(key: "Cancel"),
+                         confirm: (()->Void)? = nil,
+                         cancel: (()->Void)? = nil) {
+        
+        AUiAlertView()
+            .title(title: title)
+            .content(content: message)
+            .content(textAlignment: .center)
+            .contentColor(color: UIColor(hexString: "#6C7192"))
+            .leftButton(title: cancelTitle)
+            .leftButtonBorder(color: .clear)
+            .leftButton(color: UIColor(hexString: "#3C4267"))
+            .leftButtonBackground(color: UIColor(hexString: "#EFF4FF"))
+            .leftButton(cornerRadius: 24)
+            .rightButton(title: confirmTitle)
+            .rightButton(color: UIColor(hexString: "#FFFFFF"))
+            .rightButtonBackground(color: UIColor(hexString: "#219BFF"))
+            .rightButton(cornerRadius: 24)
+            .leftButtonTapClosure {
+                cancel?()
+            }.rightButtonTapClosure {
+                confirm?()
+            }.show()
+    }
 }
