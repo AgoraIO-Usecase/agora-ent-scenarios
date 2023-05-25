@@ -11,7 +11,6 @@
 //#import "VLAPIRequest.h"
 #import "VLHomeItemView.h"
 #import "VLHomeItemModel.h"
-#import "VLLoginModel.h"
 #import "KTVSkipView.h"
 #import "BaseViewController.h"
 #import "AEACategoryView.h"
