@@ -192,7 +192,11 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         } else if section == 1 {
             return 2
         } else {
+<<<<<<< HEAD
             return roomInfo?.room?.owner?.uid == VLUserCenter.user.id ? 2 : 1
+=======
+            return 2
+>>>>>>> f4feb24b (开发310版本功能)
         }
     }
 
