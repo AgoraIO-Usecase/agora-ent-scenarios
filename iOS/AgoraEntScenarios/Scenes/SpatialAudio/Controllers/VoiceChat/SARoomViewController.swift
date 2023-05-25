@@ -263,8 +263,7 @@ extension SARoomViewController {
 
     @objc
     private func onTapDebugButton() {
-        actionView.section(section: 1)
-            .row(row: 1)
+        actionView
             .title(title: "Dump数据类型")
             .switchCell(iconName: "icons／set／jiqi", title: "APM全链路音频", isOn: true)
             .config()
