@@ -31,7 +31,11 @@ class VoiceMusicListView: UIView {
     }()
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
+<<<<<<< HEAD
         label.text = "背景音乐".show_localized
+=======
+        label.text = "背景音乐"
+>>>>>>> 2e29d26e (开发310版本功能)
         label.textColor = UIColor(hex: "#040925", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 16)
         return label
@@ -41,7 +45,10 @@ class VoiceMusicListView: UIView {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.delegate = self
         tableView.dataSource = self
+<<<<<<< HEAD
         tableView.separatorColor = .gray.withAlphaComponent(0.1)
+=======
+>>>>>>> 2e29d26e (开发310版本功能)
         tableView.register(VoiceMusicListCell.self, forCellReuseIdentifier: "cell")
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
@@ -98,7 +105,10 @@ class VoiceMusicListView: UIView {
                 }
                 return model
             })
+<<<<<<< HEAD
             self.titleLabel.text = "背景音乐".show_localized + "(\(list.count))"
+=======
+>>>>>>> 2e29d26e (开发310版本功能)
             if !self.musicList.isEmpty && self.currentMusic == nil {
                 self.musicToolView.setupMusicInfo(model: self.musicList[0], isOrigin: self.isOrigin)
             }
@@ -159,7 +169,10 @@ class VoiceMusicListView: UIView {
             rtcKit?.playMusic(songCode: model.songCode)
             tableView.reloadData()
             backgroundMusicPlaying?(model)
+<<<<<<< HEAD
             musicToolView.setupMusicInfo(model: model, isOrigin: isOrigin)
+=======
+>>>>>>> 2e29d26e (开发310版本功能)
             currentIndex += 1
         } else {
             currentIndex += 1
@@ -169,8 +182,11 @@ class VoiceMusicListView: UIView {
             rtcKit?.playMusic(songCode: model.songCode)
             tableView.reloadData()
             backgroundMusicPlaying?(model)
+<<<<<<< HEAD
             musicToolView.setupMusicInfo(model: model, isOrigin: isOrigin)
             tableView.scrollToRow(at: IndexPath(row: currentIndex, section: 0), at: .middle, animated: true)
+=======
+>>>>>>> 2e29d26e (开发310版本功能)
         }
     }
     
@@ -195,6 +211,7 @@ class VoiceMusicListView: UIView {
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         layer.masksToBounds = true
         
+<<<<<<< HEAD
         addSubview(lineView)
         lineView.addSubview(titleLabel)
         addSubview(backButton)
@@ -202,6 +219,15 @@ class VoiceMusicListView: UIView {
         backButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
         backButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
         
+=======
+        addSubview(backButton)
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        backButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
+        backButton.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
+        
+        addSubview(lineView)
+        lineView.addSubview(titleLabel)
+>>>>>>> 2e29d26e (开发310版本功能)
         lineView.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
@@ -270,7 +296,11 @@ extension VoiceMusicListView: UITableViewDataSource, UITableViewDelegate {
 class VoiceMusicListCell: UITableViewCell {
     private lazy var songTitleLabel: UILabel = {
         let label = UILabel()
+<<<<<<< HEAD
         label.text = ""
+=======
+        label.text = "孤单心事"
+>>>>>>> 2e29d26e (开发310版本功能)
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -278,7 +308,11 @@ class VoiceMusicListCell: UITableViewCell {
     }()
     private lazy var singerLabeL: UILabel = {
         let label = UILabel()
+<<<<<<< HEAD
         label.text = ""
+=======
+        label.text = "梁雨"
+>>>>>>> 2e29d26e (开发310版本功能)
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.systemFont(ofSize: 11)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -324,7 +358,10 @@ class VoiceMusicListCell: UITableViewCell {
         statusImageView.image = UIImage.sd_animatedGIF(with: gifData)
         statusImageView.isHidden = !model.isPlaying
         songTitleLabel.textColor = model.isPlaying ? UIColor(hexString: "#0A7AFF") : UIColor(hexString: "#3C4267")
+<<<<<<< HEAD
         songTitleLabel.font = model.isPlaying ? .boldSystemFont(ofSize: 14) : .systemFont(ofSize: 14)
+=======
+>>>>>>> 2e29d26e (开发310版本功能)
         singerLabeL.textColor = songTitleLabel.textColor
         indicatorView.isHidden = !model.isDownload
         model.isDownload ? indicatorView.startAnimating() : indicatorView.stopAnimating()
