@@ -139,7 +139,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         setKTVParameters()
         startDisplayLrc()
         startSyncPitch()
-        isRelease = false;
+        isRelease = false
     }
 
     override fun renewInnerDataStreamId() {
@@ -180,7 +180,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun release() {
-        if (isRelease) return;
+        if (isRelease) return
         isRelease = true
         singerRole = KTVSingRole.Audience
 
@@ -206,6 +206,17 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         IAgoraMusicContentCenter.destroy()
 
         mainSingerHasJoinChannelEx = false
+    }
+
+    override fun renewToken(rtmToken: String, chorusChannelRtcToken: String) {
+        // 更新RtmToken
+        mMusicCenter.renewToken(rtmToken)
+        // 更新合唱频道RtcToken
+        if (subChorusConnection != null) {
+            val channelMediaOption = ChannelMediaOptions()
+            channelMediaOption.token = chorusChannelRtcToken
+            mRtcEngine.updateChannelMediaOptionsEx(channelMediaOption, subChorusConnection)
+        }
     }
 
     // 1、Audience -》SoloSinger
@@ -501,7 +512,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun setLrcView(view: ILrcView) {
-        Log.d(TAG, "setLycView called")
+        Log.d(TAG, "setLrcView called")
         this.lrcView = view
     }
 
@@ -663,14 +674,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         sendStreamMessageWithJsonObject(jsonMsg) {}
     }
 
-    private fun syncSingingScore(score: Float) {
-        val msg: MutableMap<String?, Any?> = HashMap()
-        msg["cmd"] = "SingingScore"
-        msg["score"] = score.toDouble()
-        val jsonMsg = JSONObject(msg)
-        sendStreamMessageWithJsonObject(jsonMsg) {}
-    }
-
     // 合唱
     private fun joinChorus2ndChannel(
         newRole: KTVSingRole,
@@ -723,6 +726,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         mainSingerHasJoinChannelEx = true
                     }
                     onJoinChorus2ndChannelCallback(0)
+                    mRtcEngine.enableAudioVolumeIndicationEx(50, 10, true, rtcConnection)
                 }
 
                 override fun onLeaveChannel(stats: RtcStats?) {
@@ -747,7 +751,15 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
                 override fun onTokenPrivilegeWillExpire(token: String?) {
                     super.onTokenPrivilegeWillExpire(token)
-                    ktvApiEventHandlerList.forEach { it.onChorusChannelTokenPrivilegeWillExpire(token) }
+                    ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
+                }
+
+                override fun onAudioVolumeIndication(
+                    speakers: Array<out AudioVolumeInfo>?,
+                    totalVolume: Int
+                ) {
+                    super.onAudioVolumeIndication(speakers, totalVolume)
+                    ktvApiEventHandlerList.forEach { it.onChorusChannelAudioVolumeIndication(speakers, totalVolume) }
                 }
             }
         )
@@ -809,7 +821,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         displayLrcFuture?.cancel(true)
         displayLrcFuture = null
         if (scheduledThreadPool is ScheduledThreadPoolExecutor) {
-            (scheduledThreadPool as ScheduledThreadPoolExecutor).remove(displayLrcTask)
+            scheduledThreadPool.remove(displayLrcTask)
         }
     }
 
@@ -849,7 +861,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mSyncPitchFuture?.cancel(true)
         mSyncPitchFuture = null
         if (scheduledThreadPool is ScheduledThreadPoolExecutor) {
-            (scheduledThreadPool as ScheduledThreadPoolExecutor).remove(mSyncPitchTask)
+            scheduledThreadPool.remove(mSyncPitchTask)
         }
     }
 
@@ -1049,6 +1061,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         if (status == 0 || status == 1) {
             loadMusicCallbackMap.remove(songCode.toString())
         }
+        if (errorCode == 2) {
+            // Token过期
+            ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
+        }
         callback.invoke(songCode, percent, status, RtcEngine.getErrorDescription(errorCode), lyricUrl)
     }
 
@@ -1063,6 +1079,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         val id = requestId ?: return
         val callback = musicCollectionCallbackMap[id] ?: return
         musicCollectionCallbackMap.remove(id)
+        if (errorCode == 2) {
+            // Token过期
+            ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
+        }
         callback.invoke(requestId, errorCode, page, pageSize, total, list)
     }
 
@@ -1070,6 +1090,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         val id = requestId ?: return
         val callback = musicChartsCallbackMap[id] ?: return
         musicChartsCallbackMap.remove(id)
+        if (errorCode == 2) {
+            // Token过期
+            ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
+        }
         callback.invoke(requestId, errorCode, list)
     }
 
@@ -1082,6 +1106,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         val callback = lyricCallbackMap[requestId] ?: return
         val songCode = lyricSongCodeMap[requestId] ?: return
         lyricCallbackMap.remove(lyricUrl)
+        if (errorCode == 2) {
+            // Token过期
+            ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
+        }
         if (lyricUrl == null || lyricUrl.isEmpty()) {
             callback(songCode, null)
             return
@@ -1096,6 +1124,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         errorCode: Int
     ) {
         //TODO("Not yet implemented")
+        if (errorCode == 2) {
+            // Token过期
+            ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
+        }
     }
 
     // ------------------------ AgoraRtcMediaPlayerDelegate ------------------------
