@@ -170,6 +170,7 @@ class ShowAgoraKitManager: NSObject {
             if role == .audience {
                 mediaOptions.audienceLatencyLevel = .lowLatency
             }else{
+                mediaOptions.clientRoleType = currentChannelId == targetChannelId ? .broadcaster : .audience
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }
         
