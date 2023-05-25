@@ -226,7 +226,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                  如果房主踢用户下麦
                  */
                 if let host: VRUser = roomInfo?.room?.owner {
-                    if host.uid == fromId, first.member == nil,changeMic.member?.uid ?? "" == VoiceRoomUserInfo.shared.user?.uid ?? "" {
+                    if host.chat_uid == fromId, first.member == nil,changeMic.member?.uid ?? "" == VoiceRoomUserInfo.shared.user?.uid ?? "" {
                         if status == -1 || status == 3 || status == 4 {
                             self.local_index = nil
                         }
