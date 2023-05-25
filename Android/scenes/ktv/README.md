@@ -3,6 +3,7 @@
 > 本文档主要介绍如何快速跑通 <mark>在线K歌房</mark> 示例工程
 >
 > Demo 效果:
+> 
 > <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ktvRoom_1.png" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ktvRoom_2.png" width="300" height="640">
 ---
 
