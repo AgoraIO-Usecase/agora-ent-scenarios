@@ -33,6 +33,16 @@ public enum AINS_STATE {
 }
 
 /**
+ * 耳返模式
+ *
+ */
+public enum INEAR_MODE: Int {
+    case auto = 0
+    case opneSL
+    case oboe
+}
+
+/**
  * 机器人类型
  *
  */
@@ -152,6 +162,14 @@ public enum AINS_STATE {
      * report alien type
      */
     @objc optional func reportAlien(with type: ALIEN_TYPE, musicType: VMMUSIC_TYPE) -> Void
+    
+    /**
+     * 加载歌曲
+     * @param songCode code
+     * @param progress 进度
+     * @param status 状态
+     */
+    @objc optional func downloadBackgroundMusicStatus(songCode: Int, progress: Int, status: AgoraMusicContentCenterPreloadStatus)
 }
 
 public let kMPK_RTC_UID: UInt = 1
@@ -172,12 +190,20 @@ public let kMPK_RTC_UID: UInt = 1
     fileprivate var localRtcUid: UInt = 0
 
     private var musicType: VMMUSIC_TYPE?
-
+    
+    private var mcc: AgoraMusicContentCenter?
+    private var musicPlayer: AgoraMusicPlayerProtocol?
+    typealias MusicListCallback = ([AgoraMusic])->()
+    private var onMusicChartsIdCache: [String: MusicListCallback] = [:]
+    var backgroundMusics: [AgoraMusic] = []
+    
     @objc public weak var delegate: VMManagerDelegate?
 
     @objc public weak var playerDelegate: VMMusicPlayerDelegate?
     
     var stopMixingClosure: (() -> ())?
+    var downloadBackgroundMusicStatusClosure: ((_ songCode: Int, _ progress: Int, _ status: AgoraMusicContentCenterPreloadStatus) -> Void)?
+    var backgroundMusicPlayingStatusClosure: ((_ state: AgoraMediaPlayerState) -> Void)?
 
     // 单例
     @objc public class func getSharedInstance() -> VoiceRoomRTCManager {
@@ -243,6 +269,7 @@ public let kMPK_RTC_UID: UInt = 1
                 } else if musicPath.contains("-B&R-") {
                     delegate?.reportAlien?(with: .blueAndRed, musicType: musicType)
                 }
+                musicPlayer?.pause()
                 let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized() : "EN"
                 musicPath = musicPath.replacingOccurrences(of: "CN", with: lanuagePath)
                 rtcKit.startAudioMixing(musicPath, loopback: false, cycle: 1)
@@ -424,6 +451,101 @@ public let kMPK_RTC_UID: UInt = 1
     public func enableLocalAudio(enable: Bool) -> Int32 {
         return rtcKit.enableLocalAudio(enable)
     }
+    
+    public func initMusicControlCenter() {
+        let contentCenterConfiguration = AgoraMusicContentCenterConfig()
+        contentCenterConfiguration.appId = KeyCenter.AppId
+        contentCenterConfiguration.mccUid = Int(VLUserCenter.user.id) ?? 0
+        contentCenterConfiguration.token = VLUserCenter.user.agoraRTMToken
+        contentCenterConfiguration.rtcEngine = rtcKit
+        
+        mcc = AgoraMusicContentCenter.sharedContentCenter(config: contentCenterConfiguration)
+        mcc?.register(self)
+        
+        musicPlayer = mcc?.createMusicPlayer(delegate: self)
+
+        musicPlayer?.adjustPlayoutVolume(50)
+        musicPlayer?.adjustPublishSignalVolume(50)
+    }
+    
+    func fetchMusicList(musicListCallback: @escaping MusicListCallback) {
+        let jsonOption = "{\"pitchType\":1,\"needLyric\":false}"
+        let requestId = mcc?.getMusicCollection(musicChartId: 3, page: 0, pageSize: 20, jsonOption: jsonOption)
+        onMusicChartsIdCache[requestId ?? ""] = musicListCallback
+    }
+    
+    func playMusic(songCode: Int, startPos: Int = 0) {
+        if musicPlayer?.getPlayerState() == .paused  {
+            musicPlayer?.resume()
+        } else if musicPlayer?.getPlayerState() == .playing {
+            musicPlayer?.pause()
+        } else {
+            stopPlaySound()
+            mediaPlayer?.pause()
+            musicPlayer?.stop()
+            let mediaOption = AgoraRtcChannelMediaOptions()
+            mediaOption.publishMediaPlayerAudioTrack = true
+            rtcKit.updateChannel(with: mediaOption)
+            if let mcc = mcc, mcc.isPreloaded(songCode: songCode) != 0 {
+                mcc.preload(songCode: songCode)
+            } else {
+                musicPlayer?.openMedia(songCode: songCode, startPos: startPos)
+                downloadBackgroundMusicStatusClosure?(songCode, 100, .OK)
+            }
+        }
+    }
+
+    /**
+     * 停止播放歌曲
+     */
+    @objc public func stopMusic() {
+        let mediaOption = AgoraRtcChannelMediaOptions()
+        mediaOption.publishMediaPlayerAudioTrack = false
+        rtcKit.updateChannel(with: mediaOption)
+        if musicPlayer?.getPlayerState() != .stopped {
+            musicPlayer?.stop()
+        }
+    }
+    
+    /**
+     * 恢复播放
+     */
+    public func resumeMusic() {
+        if musicPlayer?.getPlayerState() == .paused {
+            musicPlayer?.resume()
+        } else {
+            musicPlayer?.play()
+        }
+    }
+
+    /**
+     * 暂停播放
+     */
+    public func pauseMusic() {
+        musicPlayer?.pause()
+    }
+
+    /**
+     * 调整进度
+     */
+    public func seekMusic(time: NSInteger) {
+       musicPlayer?.seek(toPosition: time)
+        
+    }
+    
+    /**
+     * 调整音量
+     */
+    public func adjustMusicVolume(volume: Int) {
+        musicPlayer?.adjustPlayoutVolume(Int32(volume))
+    }
+
+    /**
+     * 选择音轨，原唱、伴唱
+     */
+    public func selectPlayerTrackMode(isOrigin: Bool) {
+        musicPlayer?.selectAudioTrack(isOrigin ? 1: 0)
+    }
 
     /**
      *
@@ -472,6 +594,7 @@ public let kMPK_RTC_UID: UInt = 1
         } else if type == .ainsOff {
             path = AgoraConfig.NoneSound[index]
         }
+        musicPlayer?.pause()
         let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized() : "EN"
         path = path.replacingOccurrences(of: "CN", with: lanuagePath)
         rtcKit.startAudioMixing(path, loopback: false, cycle: 1)
@@ -547,6 +670,23 @@ public let kMPK_RTC_UID: UInt = 1
         }
     }
 
+    /**
+     * 开启/关闭 耳返
+     * @param
+     * @return 开启/关闭耳返的结果
+     */
+    public func setInEarMode(with mode: INEAR_MODE) {
+        switch mode {
+        case .auto:
+            rtcKit.setParameters("{\"opensl che.audio.opensl.mode\": 0}")
+            rtcKit.setParameters("{\"oboe che.audio.oboe.enable\": 0}")
+        case .opneSL:
+            rtcKit.setParameters("{\"opensl che.audio.opensl.mode\": 1}")
+        case .oboe:
+            rtcKit.setParameters("{\"oboe che.audio.oboe.enable\": 1}")
+        }
+    }
+    
     /**
      * 开启/关闭 本地视频
      * @param enable 是否开启视频
@@ -704,6 +844,7 @@ public let kMPK_RTC_UID: UInt = 1
      */
     @discardableResult
     @objc public func play() -> Int32 {
+        musicPlayer?.pause()
         return mediaPlayer?.play() ?? -1
     }
 
@@ -792,6 +933,13 @@ public let kMPK_RTC_UID: UInt = 1
         rtcKit.stopPreview()
         rtcKit.leaveChannel(nil)
         rtcKit.delegate = nil
+        musicPlayer?.stop()
+        musicPlayer = nil
+        mcc = nil
+        if !backgroundMusics.isEmpty {
+            backgroundMusics.removeAll()
+        }
+        AgoraMusicContentCenter.destroy()
         AgoraRtcEngineKit.destroy()
         VoiceRoomRTCManager._sharedInstance = nil // 释放单例
     }
@@ -918,11 +1066,44 @@ extension VoiceRoomRTCManager: AgoraRtcMediaPlayerDelegate {
     }
 
     // mpk didChangedTo
-    public func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
-        guard let _ = delegate else {
-            return
+    public func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+        if delegate != nil {
+            playerDelegate?.didMPKChangedTo?(state: state, error: error)
         }
+        if let musicPlayer = musicPlayer, state == .openCompleted {
+            musicPlayer.play()
+        }
+        backgroundMusicPlayingStatusClosure?(state)
+    }
+}
 
-        playerDelegate?.didMPKChangedTo?(state: state, error: error)
+extension VoiceRoomRTCManager: AgoraMusicContentCenterEventDelegate {
+    public func onMusicChartsResult(_ requestId: String, result: [AgoraMusicChartInfo], errorCode: AgoraMusicContentCenterStatusCode) {
+        print("songCode == \(result)")
+    }
+    
+    public func onMusicCollectionResult(_ requestId: String, result: AgoraMusicCollection, errorCode: AgoraMusicContentCenterStatusCode) {
+        guard let callback = onMusicChartsIdCache[requestId] else { return }
+        backgroundMusics = result.musicList
+        DispatchQueue.main.async(execute: {
+            callback(result.musicList)
+        })
+    }
+    
+    public func onLyricResult(_ requestId: String, songCode: Int, lyricUrl: String?, errorCode: AgoraMusicContentCenterStatusCode) {
+        print("songCode == \(songCode)")
+    }
+    
+    public func onSongSimpleInfoResult(_ requestId: String, songCode: Int, simpleInfo: String?, errorCode: AgoraMusicContentCenterStatusCode) {
+        print("songCode == \(songCode)")
+    }
+    
+    public func onPreLoadEvent(_ requestId: String, songCode: Int, percent: Int, lyricUrl: String?, status: AgoraMusicContentCenterPreloadStatus, errorCode: AgoraMusicContentCenterStatusCode) {
+        print("songCode == \(songCode) percent == \(percent)")
+        delegate?.downloadBackgroundMusicStatus?(songCode: songCode, progress: percent, status: status)
+        downloadBackgroundMusicStatusClosure?(songCode, percent, status)
+        if status == .OK {
+            musicPlayer?.openMedia(songCode: songCode, startPos: 0)
+        }
     }
 }
