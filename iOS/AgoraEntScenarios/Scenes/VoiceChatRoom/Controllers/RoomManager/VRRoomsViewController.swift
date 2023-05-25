@@ -43,6 +43,7 @@ let page_size = 15
     
     @objc convenience init(user: VLLoginModel) {
         self.init()
+        AppContext.shared.sceneImageBundleName = "VoiceChatRoomResource"
         currentUser = user
         if VoiceRoomIMManager.shared == nil {
             VoiceRoomIMManager.shared = VoiceRoomIMManager()
