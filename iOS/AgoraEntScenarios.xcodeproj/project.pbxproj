@@ -587,6 +587,11 @@
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
 		E751D85D29F11723001354CA /* AUiMoreDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E751D85C29F11723001354CA /* AUiMoreDialog.swift */; };
+		E785617E2A1E24D6000A0BF6 /* AUiAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E785617D2A1E24D6000A0BF6 /* AUiAlertView.swift */; };
+		E797BAE52A1B3F9C00B7D610 /* VoiceRealInEarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E797BAE42A1B3F9C00B7D610 /* VoiceRealInEarView.swift */; };
+		E797BAE92A1B57C400B7D610 /* VoiceMusicListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E797BAE82A1B57C400B7D610 /* VoiceMusicListView.swift */; };
+		E797BAEB2A1B80F600B7D610 /* HeadSetUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = E797BAEA2A1B80F600B7D610 /* HeadSetUtil.swift */; };
+		E797BAED2A1C62C900B7D610 /* VoiceMusicPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E797BAEC2A1C62C900B7D610 /* VoiceMusicPlayingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1354,6 +1359,11 @@
 		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
 		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
 		E751D85C29F11723001354CA /* AUiMoreDialog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiMoreDialog.swift; sourceTree = "<group>"; };
+		E785617D2A1E24D6000A0BF6 /* AUiAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiAlertView.swift; sourceTree = "<group>"; };
+		E797BAE42A1B3F9C00B7D610 /* VoiceRealInEarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceRealInEarView.swift; sourceTree = "<group>"; };
+		E797BAE82A1B57C400B7D610 /* VoiceMusicListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceMusicListView.swift; sourceTree = "<group>"; };
+		E797BAEA2A1B80F600B7D610 /* HeadSetUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadSetUtil.swift; sourceTree = "<group>"; };
+		E797BAEC2A1C62C900B7D610 /* VoiceMusicPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceMusicPlayingView.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -2396,6 +2406,7 @@
 				DD619B0329E3E262008F63E4 /* VoiceRoomPageContainer.swift */,
 				DD619B0429E3E262008F63E4 /* Xcode14.m */,
 				DD619B0529E3E262008F63E4 /* Notification+Presentation.swift */,
+				E797BAEA2A1B80F600B7D610 /* HeadSetUtil.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -2594,6 +2605,9 @@
 				DD619B7129E3E262008F63E4 /* VoiceRoomPraiseEmitterView.swift */,
 				DD619B7229E3E262008F63E4 /* AgoraChatRoomBaseRtcUserView.swift */,
 				DD619B7329E3E262008F63E4 /* VMConfirmView.swift */,
+				E797BAE42A1B3F9C00B7D610 /* VoiceRealInEarView.swift */,
+				E797BAE82A1B57C400B7D610 /* VoiceMusicListView.swift */,
+				E797BAEC2A1C62C900B7D610 /* VoiceMusicPlayingView.swift */,
 			);
 			path = VoiceChat;
 			sourceTree = "<group>";
@@ -2942,6 +2956,7 @@
 			children = (
 				E751D85C29F11723001354CA /* AUiMoreDialog.swift */,
 				DDA198DF28FFE579009D3E61 /* ToastView.swift */,
+				E785617D2A1E24D6000A0BF6 /* AUiAlertView.swift */,
 				DDA198E028FFE579009D3E61 /* AlertManager.swift */,
 			);
 			path = ToastView;
@@ -3720,6 +3735,7 @@
 				DD619BE229E3E262008F63E4 /* VMSoundSelTableViewCell.swift in Sources */,
 				DD0292E0295BF0DC00485225 /* VLAudienceIndicator.m in Sources */,
 				DD36108129B70CDC00CE7984 /* EffectsAnimal.m in Sources */,
+				E797BAEB2A1B80F600B7D610 /* HeadSetUtil.swift in Sources */,
 				DD619B8529E3E262008F63E4 /* UIViewController+Presentation.swift in Sources */,
 				DD619AA429E3E247008F63E4 /* SARoomsViewController.swift in Sources */,
 				DD36109829B70CDC00CE7984 /* ShowVideoSettingVC.swift in Sources */,
@@ -3909,6 +3925,7 @@
 				DD619AAB29E3E247008F63E4 /* SABaseNavigationView.swift in Sources */,
 				DD3610C529B70CDC00CE7984 /* ShowPKInviteView.swift in Sources */,
 				DD619BA129E3E262008F63E4 /* VoiceRoomRTCManager.swift in Sources */,
+				E797BAE52A1B3F9C00B7D610 /* VoiceRealInEarView.swift in Sources */,
 				DD619BFC29E3E262008F63E4 /* VRCreateRoomInputView.swift in Sources */,
 				DD619AAE29E3E247008F63E4 /* SARoomPresentView.swift in Sources */,
 				DD619BD029E3E262008F63E4 /* VoiceRoomEndLiveAlert.swift in Sources */,
@@ -3965,6 +3982,8 @@
 				E357354629EFD719009D54E1 /* VLOnLineListVC.m in Sources */,
 				DD619A7029E3E247008F63E4 /* SAPresentationAnimation.swift in Sources */,
 				DD1603442963CAFD00182A04 /* AgoraEntLog.swift in Sources */,
+				E797BAED2A1C62C900B7D610 /* VoiceMusicPlayingView.swift in Sources */,
+				E797BAE92A1B57C400B7D610 /* VoiceMusicListView.swift in Sources */,
 				DD619BB129E3E262008F63E4 /* VoiceRoomViewController+Mic.swift in Sources */,
 				DD0292D6295BF0DC00485225 /* VLBadNetWorkView.m in Sources */,
 				DD619BEA29E3E262008F63E4 /* PopTip+Transitions.swift in Sources */,
@@ -3990,6 +4009,7 @@
 				E32C7EA72A2088D200512523 /* ShowDebugPrivateParamsVC.swift in Sources */,
 				DD619BAE29E3E262008F63E4 /* VRBaseViewController.swift in Sources */,
 				DD36106E29B70CDC00CE7984 /* BeautyModel.swift in Sources */,
+				E785617E2A1E24D6000A0BF6 /* AUiAlertView.swift in Sources */,
 				DD36107B29B70CDC00CE7984 /* BEPixelBufferInfo.m in Sources */,
 				DD619AE329E3E247008F63E4 /* SAEmptyView.swift in Sources */,
 				DD0292D5295BF0DC00485225 /* VLSoundEffectView.m in Sources */,
