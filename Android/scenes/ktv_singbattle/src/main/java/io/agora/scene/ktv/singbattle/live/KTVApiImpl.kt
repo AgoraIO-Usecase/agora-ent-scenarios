@@ -347,17 +347,17 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     ) {
         // TODO
         Log.d(TAG, "loadMusic called: songCode $songCode")
-        val jsonOption = "{\"format\":{\"highPart\":0}}";
+        val jsonOption = "{\"format\":{\"highPart\":0}}"
         val songCode1 = mMusicCenter.getInternalSongCode(songCode, jsonOption)
         mMusicCenter.getSongSimpleInfo(songCode1);
         // 设置到全局， 连续调用以最新的为准
         this.songMode = KTVSongMode.SONG_CODE
         this.songCode = songCode1
-        this.songIdentifier = config.songIdentifier
+        this.songIdentifier = songCode1.toString()
         this.mainSingerUid = config.mainSingerUid
         mLastReceivedPlayPosTime = null
         mReceivedPlayPosition = 0
-
+        this.mediaPlayerState = MediaPlayerState.PLAYER_STATE_IDLE
         if (config.mode == KTVLoadMusicMode.LOAD_NONE) {
             return
         }
@@ -648,6 +648,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         msg["state"] = Constants.MediaPlayerState.getValue(state)
         msg["error"] = Constants.MediaPlayerError.getValue(error)
         val jsonMsg = JSONObject(msg)
+        Log.d(TAG, "syncPlayState: $jsonMsg")
         sendStreamMessageWithJsonObject(jsonMsg) {}
     }
 
@@ -655,14 +656,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         val msg: MutableMap<String?, Any?> = HashMap()
         msg["cmd"] = "Seek"
         msg["position"] = time
-        val jsonMsg = JSONObject(msg)
-        sendStreamMessageWithJsonObject(jsonMsg) {}
-    }
-
-    private fun syncSingingScore(score: Float) {
-        val msg: MutableMap<String?, Any?> = HashMap()
-        msg["cmd"] = "SingingScore"
-        msg["score"] = score.toDouble()
         val jsonMsg = JSONObject(msg)
         sendStreamMessageWithJsonObject(jsonMsg) {}
     }
@@ -907,7 +900,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         val messageData = data ?: return
         try {
             val strMsg = String(messageData)
-            Log.d(TAG, strMsg)
+            Log.d(TAG, "onStreamMessage:$strMsg")
             jsonMsg = JSONObject(strMsg)
             if (jsonMsg.getString("cmd") == "setLrcTime") { //同步歌词
                 val position = jsonMsg.getLong("time")
@@ -965,6 +958,16 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         mLastReceivedPlayPosTime = null
                         mReceivedPlayPosition = 0
                     }
+
+                    if (MediaPlayerState.getStateByValue(mpkState) != this.mediaPlayerState) {
+                        when (MediaPlayerState.getStateByValue(mpkState)) {
+                            MediaPlayerState.PLAYER_STATE_PLAYING -> {
+                                ktvApiEventHandlerList.forEach { it.onMusicPlayerStateChanged(MediaPlayerState.getStateByValue(mpkState), Constants.MediaPlayerError.PLAYER_ERROR_NONE, false) }
+                            }
+                            else -> {}
+                        }
+                        this.mediaPlayerState = MediaPlayerState.getStateByValue(mpkState)
+                    }
                 }
             } else if (jsonMsg.getString("cmd") == "Seek") {
                 // 伴唱收到原唱seek指令
@@ -973,7 +976,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     mPlayer.seek(position)
                 }
             } else if (jsonMsg.getString("cmd") == "PlayerState") {
-                // 其他端收到原唱seek指令
+                // 其他端收到原唱PlayerState指令
                 val state = jsonMsg.getInt("state")
                 val error = jsonMsg.getInt("error")
                 Log.d(TAG, "onStreamMessage PlayerState: $state")
@@ -988,13 +991,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         else -> {}
                     }
                 } else if (this.singerRole == KTVSingRole.Audience) {
-                    this.mediaPlayerState = MediaPlayerState.getStateByValue(state)
+                    //this.mediaPlayerState = MediaPlayerState.getStateByValue(state)
                 }
-                ktvApiEventHandlerList.forEach { it.onMusicPlayerStateChanged(
-                    MediaPlayerState.getStateByValue(state),
-                    Constants.MediaPlayerError.getErrorByValue(error),
-                    false
-                ) }
+//                ktvApiEventHandlerList.forEach { it.onMusicPlayerStateChanged(
+//                    MediaPlayerState.getStateByValue(state),
+//                    Constants.MediaPlayerError.getErrorByValue(error),
+//                    false
+//                ) }
             } else if (jsonMsg.getString("cmd") == "setVoicePitch") {
                 val pitch = jsonMsg.getDouble("pitch")
                 if (this.singerRole == KTVSingRole.Audience) {
@@ -1139,7 +1142,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         }
 
         if (this.singerRole == KTVSingRole.SoloSinger || this.singerRole == KTVSingRole.LeadSinger) {
-            syncPlayState(mediaPlayerState, mediaPlayerError)
+            runOnMainThread {
+                syncPlayState(mediaPlayerState, mediaPlayerError)
+            }
         }
         ktvApiEventHandlerList.forEach { it.onMusicPlayerStateChanged(mediaPlayerState, mediaPlayerError, true) }
     }
