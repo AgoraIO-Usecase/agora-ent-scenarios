@@ -43,6 +43,16 @@ class VoiceRoomViewController: VRBaseViewController {
 
     var preView: VMPresentView!
     private lazy var noticeView = VMNoticeView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 230))
+    public lazy var musicView: VoiceMusicPlayingView = {
+        let view = VoiceMusicPlayingView()
+        view.isHidden = true
+        view.onClickAccompanyButtonClosure = { [weak self] isOrigin in
+            self?.roomInfo?.room?.musicIsOrigin = isOrigin
+            view.updateOriginButtonStatus(isOrigin: isOrigin)
+            self?.rtckit.selectPlayerTrackMode(isOrigin: isOrigin)
+        }
+        return view
+    }()
     var isShowPreSentView: Bool = false
     var rtckit: VoiceRoomRTCManager = VoiceRoomRTCManager.getSharedInstance()
     var isOwner: Bool = false
@@ -130,9 +140,11 @@ extension VoiceRoomViewController {
         let rtcUid = VLUserCenter.user.id
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
+        rtckit.playerDelegate = self
         
         if isOwner {
             checkEnterSeatAudioAuthorized()
+            rtckit.initMusicControlCenter()
         }
 
         var rtcJoinSuccess = false
@@ -318,6 +330,12 @@ extension VoiceRoomViewController {
         }
         view.addSubview(rtcView)
 
+        view.addSubview(musicView)
+        musicView.snp.makeConstraints { make in
+            make.trailing.equalToSuperview()
+            make.top.equalTo(headerView.snp.bottom).offset(-13)
+        }
+        
         if let entity = roomInfo?.room {
             rtcView.isHidden = entity.type == 1
             headerView.updateHeader(with: entity)
@@ -654,6 +672,30 @@ extension VoiceRoomViewController {
             detailStr = "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ".localized()
         }
         return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40~)
+    }
+}
+
+extension VoiceRoomViewController: VMMusicPlayerDelegate {
+    func didMPKChangedTo(state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+        if !rtckit.backgroundMusics.isEmpty  {
+            if state == .playBackAllLoopsCompleted {
+                let music = roomInfo?.room?.backgroundMusic
+                var index = (rtckit.backgroundMusics.firstIndex(where: { $0.songCode == music?.songCode }) ?? 0) + 1
+                index = index < rtckit.backgroundMusics.count ? index : 0
+                let musicModel = rtckit.backgroundMusics[index]
+                let model = VoiceMusicModel()
+                model.songCode = musicModel.songCode
+                model.name = musicModel.name
+                model.singer = musicModel.singer
+                roomInfo?.room?.backgroundMusic = model
+                rtckit.playMusic(songCode: model.songCode)
+                DispatchQueue.main.async {
+                    self.musicView.setupMusic(model: model, isOrigin: self.roomInfo?.room?.musicIsOrigin ?? false)
+                }
+            } else if state == .paused {
+                roomInfo?.room?.backgroundMusic?.isPlaying = false
+            }
+        }
     }
 }
 
