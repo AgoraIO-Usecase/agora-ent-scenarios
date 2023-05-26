@@ -651,11 +651,7 @@ class RoomObservableViewDelegate constructor(
     /** 耳返设置弹框
      */
     fun onEarBackSettingDialog(isOn: Boolean) {
-        val dialog = RoomEarBackSettingSheetDialog().apply {
-            arguments = Bundle().apply {
-                putBoolean(RoomEarBackSettingSheetDialog.KEY_IS_ON, isOn)
-            }
-        }
+        val dialog = RoomEarBackSettingSheetDialog()
         dialog.show(activity.supportFragmentManager, "mtBGMSetting")
     }
     /** 背景音乐设置弹框
