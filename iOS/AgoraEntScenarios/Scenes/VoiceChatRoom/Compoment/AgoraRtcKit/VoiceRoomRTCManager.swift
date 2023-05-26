@@ -469,6 +469,9 @@ public let kMPK_RTC_UID: UInt = 1
     }
     
     func fetchMusicList(musicListCallback: @escaping MusicListCallback) {
+        if mcc == nil {
+            initMusicControlCenter()
+        }
         let jsonOption = "{\"pitchType\":1,\"needLyric\":false}"
         let requestId = mcc?.getMusicCollection(musicChartId: 3, page: 0, pageSize: 20, jsonOption: jsonOption)
         onMusicChartsIdCache[requestId ?? ""] = musicListCallback
@@ -484,6 +487,7 @@ public let kMPK_RTC_UID: UInt = 1
             mediaPlayer?.pause()
             musicPlayer?.stop()
             let mediaOption = AgoraRtcChannelMediaOptions()
+            mediaOption.publishMediaPlayerId = Int(musicPlayer?.getMediaPlayerId() ?? 0)
             mediaOption.publishMediaPlayerAudioTrack = true
             rtcKit.updateChannel(with: mediaOption)
             if let mcc = mcc, mcc.isPreloaded(songCode: songCode) != 0 {

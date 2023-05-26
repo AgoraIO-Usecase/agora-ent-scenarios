@@ -129,7 +129,8 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     }
     
     private func layoutUI() {
-
+        navigation.back.isHidden = true
+        
         let path = UIBezierPath(roundedRect: self.view.bounds, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 20.0, height: 20.0))
         let layer = CAShapeLayer()
         layer.path = path.cgPath

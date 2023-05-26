@@ -117,12 +117,13 @@ class ActionSheetManager: UIView {
         layer.masksToBounds = true
         
         addSubview(backButton)
-        backButton.translatesAutoresizingMaskIntoConstraints = false
-        backButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
-        backButton.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
-        
         addSubview(lineView)
         lineView.addSubview(titleLabel)
+        
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        backButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
+        backButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
+        
         lineView.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
