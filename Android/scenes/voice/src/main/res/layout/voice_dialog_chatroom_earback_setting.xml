@@ -87,13 +87,48 @@
         app:layout_constraintTop_toBottomOf="@+id/tvTips"
         />
 
+    <View
+        android:id="@+id/vSettingMark"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:elevation="0.5dp"
+        android:background="@color/white"
+        android:alpha="0.8"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@+id/tvSetting"
+        />
+
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvVolume"
+        android:id="@+id/tvVolumeTitle"
         style="@style/voice_bottom_sheet_text_style"
         android:layout_marginStart="20dp"
         android:text="# 耳返音量"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvSetting" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvVolume"
+        android:layout_width="35dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="20dp"
+        android:textColor="#6D7291"
+        android:textSize="@dimen/voice_sp_14"
+        android:gravity="right"
+        android:text="59"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvVolumeTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/tvVolumeTitle" />
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/slVolume"
+        style="@style/voice_bottom_sheet_progress"
+        android:layout_width="160dp"
+        android:layout_height="40dp"
+        android:progress="50"
+        app:layout_constraintTop_toTopOf="@+id/tvVolumeTitle"
+        app:layout_constraintEnd_toStartOf="@id/tvVolume"
+        app:layout_constraintBottom_toBottomOf="@id/tvVolumeTitle"
+        />
 
     <com.google.android.material.divider.MaterialDivider
         style="@style/voice_bottom_sheet_divider_style"
@@ -101,7 +136,7 @@
         android:layout_marginEnd="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvVolume" />
+        app:layout_constraintTop_toBottomOf="@+id/tvVolumeTitle" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvMode"
@@ -109,7 +144,70 @@
         android:layout_marginStart="20dp"
         android:text="# 耳返模式"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvVolume" />
+        app:layout_constraintTop_toBottomOf="@+id/tvVolumeTitle" />
+
+    <RadioGroup
+        android:id="@+id/rgMode"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_marginRight="20dp"
+        android:padding="2dp"
+        android:background="@drawable/voice_ear_back_mode_radius"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="@+id/tvMode"
+        app:layout_constraintBottom_toBottomOf="@+id/tvMode"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+        <RadioButton
+            android:id="@+id/tvModeAuto"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textColor="@color/voice_ear_back_mode_selector"
+            android:background="@drawable/voice_ear_back_mode_selector"
+            android:gravity="center"
+            android:button="@null"
+            android:checked="true"
+            android:text="自动"
+            app:layout_constraintTop_toTopOf="@+id/tvModeOboe"
+            app:layout_constraintBottom_toBottomOf="@+id/tvModeOboe"
+            app:layout_constraintEnd_toStartOf="@+id/tvModeOboe"
+            />
+        <RadioButton
+            android:id="@+id/tvModeOpenSL"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textColor="@color/voice_ear_back_mode_selector"
+            android:background="@drawable/voice_ear_back_mode_selector"
+            android:gravity="center"
+            android:button="@null"
+            android:checked="false"
+            android:text="强制OpenSL"
+            app:layout_constraintTop_toTopOf="@+id/tvModeOboe"
+            app:layout_constraintBottom_toBottomOf="@+id/tvModeOboe"
+            app:layout_constraintEnd_toStartOf="@+id/tvModeOboe"
+            />
+        <RadioButton
+            android:id="@+id/tvModeOboe"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textColor="@color/voice_ear_back_mode_selector"
+            android:background="@drawable/voice_ear_back_mode_selector"
+            android:gravity="center"
+            android:button="@null"
+            android:checked="false"
+            android:text="强制Oboe"
+            app:layout_constraintTop_toTopOf="@+id/tvMode"
+            app:layout_constraintBottom_toBottomOf="@+id/tvMode"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+    </RadioGroup>
 
     <com.google.android.material.divider.MaterialDivider
         style="@style/voice_bottom_sheet_divider_style"
@@ -118,6 +216,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvMode" />
+
+    <View
+        android:id="@+id/vPingMark"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginTop="@dimen/voice_sp_8"
+        android:elevation="2dp"
+        android:background="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@+id/tvMode"
+        />
     
     <androidx.cardview.widget.CardView
         android:id="@+id/cvPing"
@@ -163,15 +272,24 @@
         android:layout_marginTop="20dp"
         android:textColor="#6d7291"
         android:gravity="center"
-        android:text="66ms"
+        android:text="105ms"
         app:layout_constraintStart_toStartOf="@id/cvPing"
         app:layout_constraintEnd_toEndOf="@+id/cvPing"
         app:layout_constraintTop_toBottomOf="@+id/tvPingInfo" />
 
-    <View
+    <ProgressBar
+        android:id="@+id/pbPing"
         android:layout_width="match_parent"
-        android:layout_height="34dp"
-        app:layout_constraintTop_toBottomOf="@+id/cvPing"
+        android:layout_height="4dp"
+        android:layout_marginTop="@dimen/voice_space_8dp"
+        android:layout_marginLeft="28dp"
+        android:layout_marginRight="28dp"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:progressDrawable="@drawable/voice_ear_back_ping_progress"
+        android:max="200"
+        android:progress="105"
+        app:layout_constraintEnd_toEndOf="@+id/cvPing"
+        app:layout_constraintTop_toBottomOf="@+id/tvPing"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

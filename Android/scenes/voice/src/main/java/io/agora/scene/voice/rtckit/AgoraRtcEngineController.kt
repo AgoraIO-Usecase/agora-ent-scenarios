@@ -38,13 +38,17 @@ class AgoraRtcEngineController {
 
     private var mLocalUid = 0
 
-    public val bgmManager by lazy {
+    val bgmManager by lazy {
         AgoraBGMManager(
             rtcEngine!!,
             VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(),
             mLocalUid,
             mRtmToken
         )
+    }
+
+    val earBackManager by lazy {
+        AgoraEarBackManager(rtcEngine!!)
     }
 
     private var mRtmToken = ""
