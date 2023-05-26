@@ -32,10 +32,14 @@ class VoiceMusicListView: UIView {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
 <<<<<<< HEAD
+<<<<<<< HEAD
         label.text = "背景音乐".show_localized
 =======
         label.text = "背景音乐"
 >>>>>>> 6fecc737 (开发310版本功能)
+=======
+        label.text = "背景音乐".show_localized
+>>>>>>> 8ae58bee (添加多语言)
         label.textColor = UIColor(hex: "#040925", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 16)
         return label
@@ -211,7 +215,6 @@ class VoiceMusicListView: UIView {
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         layer.masksToBounds = true
         
-<<<<<<< HEAD
         addSubview(lineView)
         lineView.addSubview(titleLabel)
         addSubview(backButton)
@@ -219,15 +222,6 @@ class VoiceMusicListView: UIView {
         backButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
         backButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
         
-=======
-        addSubview(backButton)
-        backButton.translatesAutoresizingMaskIntoConstraints = false
-        backButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
-        backButton.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
-        
-        addSubview(lineView)
-        lineView.addSubview(titleLabel)
->>>>>>> 6fecc737 (开发310版本功能)
         lineView.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
