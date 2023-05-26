@@ -487,10 +487,7 @@ public let kMPK_RTC_UID: UInt = 1
             mediaPlayer?.pause()
             musicPlayer?.stop()
             let mediaOption = AgoraRtcChannelMediaOptions()
-<<<<<<< HEAD
             mediaOption.publishMediaPlayerId = Int(musicPlayer?.getMediaPlayerId() ?? 0)
-=======
->>>>>>> 6fecc737 (开发310版本功能)
             mediaOption.publishMediaPlayerAudioTrack = true
             rtcKit.updateChannel(with: mediaOption)
             if let mcc = mcc, mcc.isPreloaded(songCode: songCode) != 0 {
