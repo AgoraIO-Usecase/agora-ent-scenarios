@@ -54,7 +54,7 @@ class KeyCenter: NSObject {
 
     static var Token: String? = nil
     
-    static var HostUrl: String = "https://gateway-fulldemo-staging.agoralab.co"
+    static var HostUrl: String = "https://gateway-fulldemo.agoralab.co"
     
     static var IMAppKey: String? = ""
     static var IMClientId: String? = ""
