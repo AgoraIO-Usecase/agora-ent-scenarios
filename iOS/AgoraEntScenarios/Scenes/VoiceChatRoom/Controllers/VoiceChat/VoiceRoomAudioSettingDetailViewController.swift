@@ -77,7 +77,13 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
     var turnAIAECBlock:((Bool) ->Void)?
     var turnAGCBlock:((Bool) ->Void)?
 
-    private var selTag: Int?
+    var selTag: Int? {
+        didSet {
+            if self.selTag != nil {
+                self.tableView.reloadData()
+            }
+        }
+    }
 
     private let settingName: [String] = ["Spatial Audio", "Attenuation factor", "Air absorb", "Voice blur"]
     
