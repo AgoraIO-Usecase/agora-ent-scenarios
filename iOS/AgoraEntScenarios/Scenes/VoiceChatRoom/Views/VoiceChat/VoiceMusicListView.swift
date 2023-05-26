@@ -265,7 +265,7 @@ extension VoiceMusicListView: UITableViewDataSource, UITableViewDelegate {
 class VoiceMusicListCell: UITableViewCell {
     private lazy var songTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "孤单心事"
+        label.text = ""
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -273,7 +273,7 @@ class VoiceMusicListCell: UITableViewCell {
     }()
     private lazy var singerLabeL: UILabel = {
         let label = UILabel()
-        label.text = "梁雨"
+        label.text = ""
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.systemFont(ofSize: 11)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -361,7 +361,7 @@ class VoiceMusicToolView: UIView {
     }()
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "孤单心事"
+        label.text = "-"
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 15)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -369,7 +369,7 @@ class VoiceMusicToolView: UIView {
     }()
     private lazy var singerLabeL: UILabel = {
         let label = UILabel()
-        label.text = "颜人中"
+        label.text = "-"
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.systemFont(ofSize: 13)
         label.translatesAutoresizingMaskIntoConstraints = false

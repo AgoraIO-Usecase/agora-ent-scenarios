@@ -138,10 +138,9 @@ class VoiceRoomPresentView: UIView, UIGestureRecognizerDelegate {
     
     fileprivate func getTableView(with VC: UIViewController) -> UITableView? {
         var tableView: UITableView? = nil
-        for view in VC.view.subviews {
-            if view.isKind(of: UITableView.self) {
-                tableView = view as? UITableView
-            }
+        for view in VC.view.subviews where view.isKind(of: UITableView.self) {
+            tableView = view as? UITableView
+            break
         }
         return tableView
     }
