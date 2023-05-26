@@ -158,10 +158,10 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
 
         view.addSubview(cover)
 
-        backBtn.frame = CGRect(x: 10, y: 30, width: 20, height: 30)
         backBtn.setImage(UIImage("back"), for: .normal)
         backBtn.addTargetFor(self, action: #selector(back), for: .touchUpInside)
         view.addSubview(backBtn)
+        backBtn.translatesAutoresizingMaskIntoConstraints = false
 
         lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20, y: 8, width: 40, height: 4)
         lineImgView.image = UIImage("pop_indicator")
@@ -173,6 +173,9 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
         titleLabel.textColor = UIColor.HexColor(hex: 0x040925, alpha: 1)
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(titleLabel)
+        
+        backBtn.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
+        backBtn.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
 
         tableView.frame = .zero
         tableView.registerCell(VMSwitchTableViewCell.self, forCellReuseIdentifier: swIdentifier)

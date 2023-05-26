@@ -777,13 +777,47 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                isOwner: true,
                                property: params) {[weak self] result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
-                completion(nil,model)
                 self?.roomId = room.room_id
                 self?._startCheckExpire()
                 //添加鉴黄接口
                 NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: .voice) { msg in
                     agoraPrint("\(msg == nil ? "开启鉴黄成功" : "开启鉴黄失败")")
                 }
+                
+                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
+                let dispatchGroup = DispatchGroup()
+                dispatchGroup.enter()
+                NetworkManager.shared.generateTokens(channelName: room.room_id ?? "",
+                                                     uid: "\(UserInfo.userId)",
+                                                     tokenGeneratorType: .token006,
+                                                     tokenTypes: [.rtc, .rtm]) { tokenMap in
+                    tokenMap1 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.enter()
+                NetworkManager.shared.generateTokens(channelName: "\(room.room_id ?? "")_ex",
+                                                     uid: "\(UserInfo.userId)",
+                                                     tokenGeneratorType: .token006,
+                                                     tokenTypes: [.rtc]) { tokenMap in
+                    tokenMap2 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.notify(queue: .main){
+                    guard let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
+                          let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
+                          let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
+                    else {
+                        completion(nil, nil)
+                        return
+                    }
+                    VLUserCenter.user.agoraRTCToken = rtcToken
+                    VLUserCenter.user.agoraRTMToken = rtmToken
+                    VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
+                    completion(nil, model)
+                }
+                
             } fail: { error in
                 completion(error, nil)
             }
@@ -813,13 +847,6 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     updateRoom.click_count = (updateRoom.click_count ?? 0) + 1
                     let params = updateRoom.kj.JSONObject()
                     
-                    //获取IM信息
-//                    let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
-//                    self.initIM(with: room.name ?? "", type: <#T##Int#>,chatId: updateRoom.chatroom_id, channelId: updateRoom.channel_id ?? "",imUid: imId, pwd: "12345678") { im_token, chat_uid, chatroom_id in
-//                        VLUserCenter.user.im_token = im_token
-//                        VLUserCenter.user.chat_uid = chat_uid
-//
-//                    }
                     completion(nil, updateRoom)
                     initScene{
                         SyncUtil.joinScene(id: roomId,
