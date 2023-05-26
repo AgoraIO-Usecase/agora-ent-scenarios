@@ -426,7 +426,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 }
                 actionView.didSegmentValueChangeClosure = { [weak self] indexPath, mode, index in
                     guard let self = self else { return }
-                    self.showCustomAlert(title: "提示", message: String(format: "切换后将强制使用%@模式,确认?".show_localized, mode), confirm: {
+                    self.showCustomAlert(title: "提示".show_localized, message: String(format: "切换后将强制使用%@模式,确认?".show_localized, mode), confirm: {
                         inEarModeIndex = earModes.firstIndex(where: { $0 == mode }) ?? 0
                         self.roomInfo?.room?.inEarMode = mode
                         inEarMode = mode
