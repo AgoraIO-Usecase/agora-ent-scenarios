@@ -10,7 +10,7 @@ import UIKit
 class VoiceRealInEarView: UIView {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "实时耳返延时"
+        label.text = "实时耳返延时".show_localized
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.systemFont(ofSize: 13)
         label.translatesAutoresizingMaskIntoConstraints = false
