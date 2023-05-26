@@ -12,11 +12,8 @@ import io.agora.mediaplayer.data.SrcInfo
 import io.agora.musiccontentcenter.*
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
-import io.agora.rtc2.audio.AudioParams
-import io.agora.rtc2.audio.AudioTrackConfig
 import org.json.JSONException
 import org.json.JSONObject
-import java.nio.ByteBuffer
 import java.util.concurrent.*
 
 enum class KTVSongMode(val value: Int) {
