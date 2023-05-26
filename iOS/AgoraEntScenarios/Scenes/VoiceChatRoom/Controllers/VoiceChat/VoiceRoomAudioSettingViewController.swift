@@ -19,7 +19,17 @@ class VoiceRoomAudioSettingViewController: UIViewController {
     public var tableView: UITableView = .init()
     public var isAudience: Bool = false
     public var isPrivate: Bool = false
-    public var isTouchAble: Bool = false
+    public var isTouchAble: Bool = false {
+        willSet {
+            self.detailVC?.isTouchAble = newValue
+        }
+    }
+    var selTag: Int? {
+        willSet {
+            self.detailVC?.selTag = newValue
+        }
+    }
+    weak var detailVC: VoiceRoomAudioSettingDetailViewController?
     private let swIdentifier = "switch"
     private let slIdentifier = "slider"
     private let nIdentifier = "normal"
@@ -68,7 +78,7 @@ class VoiceRoomAudioSettingViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
+//        VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
     }
     
     private func layoutUI() {
@@ -445,6 +455,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         }
         tableViewHeight = heightType.rawValue - 70
         let detailVC: VoiceRoomAudioSettingDetailViewController = VoiceRoomAudioSettingDetailViewController()
+        self.detailVC = detailVC
         detailVC.roomInfo = roomInfo
         detailVC.isAudience = isAudience
         detailVC.soundEffect = roomInfo?.room?.sound_effect ?? 1

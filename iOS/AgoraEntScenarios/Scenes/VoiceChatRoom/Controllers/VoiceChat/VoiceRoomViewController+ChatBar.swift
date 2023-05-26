@@ -92,6 +92,8 @@ extension VoiceRoomViewController {
                             ChatRoomServiceImp.getSharedInstance().enableRobot(enable: true) { error in
                                 if error == nil {
                                     self?.playAINS(index: index)
+                                    audioSetVC.selTag = index
+                                    audioSetVC.isTouchAble = true
                                 } else {
                                     self?.view.makeToast("激活机器人失败")
                                 }
