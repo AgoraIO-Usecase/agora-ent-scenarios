@@ -82,8 +82,6 @@ class KTVApiImpl: NSObject{
     private var songUrl: String = ""
     private var songCode: Int = 0
     private var songIdentifier: String = ""
-    
-    private var mCustomAudioTrackId: Int32 = -1
 
     private var singerRole: KTVSingRole = .audience {
         didSet {
@@ -209,7 +207,6 @@ extension KTVApiImpl: KTVApiDelegate {
         agoraPrint("cleanCache")
         downloadManager.delegate = nil
         lrcControl = nil
-        apiConfig?.engine?.setAudioFrameDelegate(nil)
         lyricCallbacks.removeAll()
         musicCallbacks.removeAll()
         onJoinExChannelCallBack = nil
@@ -421,12 +418,6 @@ extension KTVApiImpl {
         mediaOption.publishMediaPlayerId = Int(musicPlayer?.getMediaPlayerId() ?? 0)
         mediaOption.publishMediaPlayerAudioTrack = true
         apiConfig?.engine?.updateChannel(with: mediaOption)
-        
-        let audioTrackConfig = AgoraAudioTrackConfig()
-        audioTrackConfig.enableLocalPlayback = false
-        mCustomAudioTrackId = apiConfig?.engine?.createCustomAudioTrack(.direct, config: audioTrackConfig) ?? 0
-        apiConfig?.engine?.setRecordingAudioFrameParametersWithSampleRate(48000, channel: 2, mode: .readOnly, samplesPerCall: 960)
-        apiConfig?.engine?.setAudioFrameDelegate(self)
     }
 
     /**
@@ -478,11 +469,9 @@ extension KTVApiImpl {
         // co singer auto sub
         mediaOption.autoSubscribeAudio = role != .leadSinger
       //  mediaOption.autoSubscribeVideo = false
-        mediaOption.publishMicrophoneTrack = false
+        mediaOption.publishMicrophoneTrack = newRole == .leadSinger
         mediaOption.enableAudioRecordingOrPlayout = role != .leadSinger
         mediaOption.clientRoleType = .broadcaster
-        mediaOption.publishCustomAudioTrack = role == .leadSinger
-        mediaOption.publishCustomAudioTrackId = Int(mCustomAudioTrackId)
 
         let rtcConnection = AgoraRtcConnection()
         rtcConnection.channelId = apiConfig?.chorusChannelName ?? ""
@@ -800,7 +789,7 @@ extension KTVApiImpl {
 }
 
 // rtc的代理回调
-extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
+extension KTVApiImpl: AgoraRtcEngineDelegate {
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
         agoraPrint("didJoinChannel channel:\(channel) uid: \(uid)")
@@ -827,16 +816,6 @@ extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
         if joinChorusNewRole == .coSinger {
             self.onJoinExChannelCallBack?(false, .joinChannelFail)
         }
-    }
-    
-
-    func onRecordAudioFrame(_ frame: AgoraAudioFrame, channelId: String) -> Bool {
-
-        if mainSingerHasJoinChannelEx == true && useCustomAudioSource == false {
-            guard let buffer = frame.buffer else {return false}
-            apiConfig?.engine?.pushExternalAudioFrameRawData(buffer, samples: frame.channels*frame.samplesPerChannel, sampleRate: frame.samplesPerSec, channels: frame.channels, trackId: Int(mCustomAudioTrackId), timestamp: TimeInterval(frame.renderTimeMs))
-        }
-        return true
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
@@ -1347,7 +1326,7 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
         musicSearchDict.removeValue(forKey: requestId)
     }
     
-    func onLyricResult(_ requestId: String, lyricUrl: String?, errorCode: AgoraMusicContentCenterStatusCode) {
+    func onLyricResult(_ requestId: String, songCode: Int, lyricUrl: String?, errorCode: AgoraMusicContentCenterStatusCode) {
         guard let lrcUrl = lyricUrl else {return}
         let callback = self.lyricCallbacks[requestId]
         guard let lyricCallback = callback else { return }
@@ -1359,7 +1338,7 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
         lyricCallback(lrcUrl)
     }
     
-    func onPreLoadEvent(_ songCode: Int, percent: Int, lyricUrl: String?, status: AgoraMusicContentCenterPreloadStatus, errorCode: AgoraMusicContentCenterStatusCode) {
+    func onPreLoadEvent(_ requestId: String, songCode: Int, percent: Int, lyricUrl: String?, status: AgoraMusicContentCenterPreloadStatus, errorCode: AgoraMusicContentCenterStatusCode) {
         if let listener = self.loadMusicListeners.object(forKey: "\(songCode)" as NSString) as? IMusicLoadStateListener {
             listener.onMusicLoadProgress(songCode: songCode, percent: percent, status: status, msg: String(errorCode.rawValue), lyricUrl: lyricUrl)
         }
