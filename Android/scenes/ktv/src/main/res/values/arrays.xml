@@ -35,4 +35,10 @@
         <item>流行</item>
         <item>RnB</item>
     </string-array>
+
+    <string-array name="ktv_aec">
+        <item>低</item>
+        <item>中</item>
+        <item>高</item>
+    </string-array>
 </resources>

@@ -20,6 +20,7 @@ import io.agora.scene.ktv.live.fragment.dialog.BeautyVoiceFragment;
 import io.agora.scene.ktv.live.fragment.dialog.EffectVoiceFragment;
 import io.agora.scene.ktv.live.fragment.dialog.EffectVoiceFragment2;
 import io.agora.scene.ktv.live.fragment.dialog.MVFragment;
+import io.agora.scene.ktv.live.fragment.dialog.ProfileFragment;
 
 public class MoreDialog extends BaseBottomSheetDialogFragment<KtvDialogMoreBinding> {
     public static final String TAG = "MoreDialog";
@@ -47,6 +48,7 @@ public class MoreDialog extends BaseBottomSheetDialogFragment<KtvDialogMoreBindi
         mBinding.iBtnBeautyVoice.setOnClickListener(this::showVoicePage);
         mBinding.iBtnEffectVoice.setOnClickListener(this::showEffectPage);
         mBinding.iBtnMV.setOnClickListener(this::showMVPage);
+        mBinding.iBtnProfile.setOnClickListener(this::showProfilePage);
     }
 
     private void showVoicePage(View v) {
@@ -70,6 +72,14 @@ public class MoreDialog extends BaseBottomSheetDialogFragment<KtvDialogMoreBindi
         BaseViewBindingFragment<?> voiceFragment = new MVFragment(0);
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
         ft.add(mBinding.getRoot().getId(), voiceFragment, EffectVoiceFragment.TAG);
+        ft.commit();
+    }
+
+    private void showProfilePage(View v) {
+        mBinding.getRoot().removeAllViews();
+        BaseViewBindingFragment<?> voiceFragment = new ProfileFragment(mSetting);
+        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+        ft.add(mBinding.getRoot().getId(), voiceFragment, ProfileFragment.TAG);
         ft.commit();
     }
 

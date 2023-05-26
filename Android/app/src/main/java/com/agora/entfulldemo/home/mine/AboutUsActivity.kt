@@ -31,6 +31,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val servicePhone = "400-632-6626"
     private val webSite = "https://www.shengwang.cn/"
 
+    private val kKtvRoomAppID = "io.agora.ktv"
     private val kChatRoomAppID = "io.agora.chatroom"
     private val kFullAppID = "io.agora.entfull"
 
@@ -52,10 +53,23 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             setupChatRoomAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kFullAppID) {
             setupFullAppInfo()
+        } else if (BuildConfig.APPLICATION_ID == kKtvRoomAppID) {
+            setupKtvRoomAppInfo()
         }
         setupDebugMode()
         setupClickWebAction()
         setupClickPhoneAction()
+    }
+
+    // 设置K歌房App的信息
+    private fun setupKtvRoomAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        adapter.appInfo = AppInfo(
+            this.getString(R.string.app_about_name),
+            "20230110-3.3.0-" + RtcEngine.getSdkVersion(),
+            servicePhone,
+            webSite
+        )
     }
 
     // 设置语聊App的信息

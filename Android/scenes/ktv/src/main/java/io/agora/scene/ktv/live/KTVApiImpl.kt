@@ -111,6 +111,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     private var mCustomAudioTrackId = -1
 
+    private var professionalModeOpen = false
+    private var audioRouting = 0
+    private var isPublishAudio = false // 通过是否发音频流判断
+
     override fun initialize(
         config: KTVApiConfig
     ) {
@@ -136,6 +140,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mPlayer.registerPlayerObserver(this)
         mMusicCenter.registerEventHandler(this)
 
+        renewInnerDataStreamId()
         setKTVParameters()
         startDisplayLrc()
         startSyncPitch()
@@ -166,6 +171,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
         mRtcEngine.setParameters("{\"che.audio.direct.uplink_process\": false}")
         mRtcEngine.setParameters("{\"che.audio.uplink_apm_async_process\": true}")
+
+//        mRtcEngine.setParameters("{\"che.audio.aec.split_srate_for_32k\": 32000}")
+//        mRtcEngine.setParameters("{\"che.audio.aec.split_srate_for_48k\": 24000}")
 
         // Android Only
         mRtcEngine.setParameters("{\"che.audio.enable_estimated_device_delay\":false}")
@@ -206,6 +214,44 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         IAgoraMusicContentCenter.destroy()
 
         mainSingerHasJoinChannelEx = false
+        professionalModeOpen = false
+        audioRouting = 0
+        isPublishAudio = false
+    }
+
+    override fun enableProfessionalStreamerMode(enable: Boolean) {
+        this.professionalModeOpen = enable
+        processAudioProfessionalProfile()
+    }
+
+    private fun processAudioProfessionalProfile() {
+        Log.d(TAG, "processAudioProfessionalProfile: audioRouting: $audioRouting, professionalModeOpen: $professionalModeOpen， isPublishAudio：$isPublishAudio")
+        if (!isPublishAudio) return // 必须为麦上者
+        if (professionalModeOpen) {
+            // 专业
+            if (audioRouting == 0 || audioRouting == 2 || audioRouting == 5) {
+                // 耳机 关闭3A 关闭md
+                mRtcEngine.setParameters("{\"che.audio.aec.enable\": false}")
+                mRtcEngine.setParameters("{\"che.audio.agc.enable\": false}")
+                mRtcEngine.setParameters("{\"che.audio.ans.enable\": false}")
+                mRtcEngine.setParameters("{\"che.audio.md.enable\": false}")
+                mRtcEngine.setAudioProfile(5) // AgoraAudioProfileMusicHighQualityStereo
+            } else {
+                // 非耳机 开启3A 关闭md
+                mRtcEngine.setParameters("{\"che.audio.aec.enable\": true}")
+                mRtcEngine.setParameters("{\"che.audio.agc.enable\": true}")
+                mRtcEngine.setParameters("{\"che.audio.ans.enable\": true}")
+                mRtcEngine.setParameters("{\"che.audio.md.enable\": false}")
+                mRtcEngine.setAudioProfile(5) // AgoraAudioProfileMusicHighQualityStereo
+            }
+        } else {
+            // 非专业 开启3A 关闭md
+            mRtcEngine.setParameters("{\"che.audio.aec.enable\": true}")
+            mRtcEngine.setParameters("{\"che.audio.agc.enable\": true}")
+            mRtcEngine.setParameters("{\"che.audio.ans.enable\": true}")
+            mRtcEngine.setParameters("{\"che.audio.md.enable\": false}")
+            mRtcEngine.setAudioProfile(3) // AgoraAudioProfileMusicStandardStereo
+        }
     }
 
     override fun renewToken(rtmToken: String, chorusChannelRtcToken: String) {
@@ -482,6 +528,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             return
         }
         mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
+
+        // 导唱
+        //mPlayer.setPlayerOption("select_track_mode", 1)
         mPlayer.open(songCode, startPos)
     }
 
@@ -1048,6 +1097,30 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         audioPlayoutDelay = audioState.audioPlayoutDelay
     }
 
+    // 用于检测耳机状态
+    override fun onAudioRouteChanged(routing: Int) { // 0\2\5 earPhone
+        super.onAudioRouteChanged(routing)
+        this.audioRouting = routing
+        processAudioProfessionalProfile()
+    }
+
+    // 用于检测收发流状态
+    override fun onAudioPublishStateChanged(
+        channel: String?,
+        oldState: Int,
+        newState: Int,
+        elapseSinceLastState: Int
+    ) {
+        super.onAudioPublishStateChanged(channel, oldState, newState, elapseSinceLastState)
+        Log.d(TAG, "onAudioPublishStateChanged: oldState: $oldState, newState: $newState")
+        if (newState == 3) {
+            this.isPublishAudio = true
+            processAudioProfessionalProfile()
+        } else if (newState == 1) {
+            this.isPublishAudio = false
+        }
+    }
+
     // ------------------------ AgoraMusicContentCenterEventDelegate  ------------------------
     override fun onPreLoadEvent(
         requestId: String?,
@@ -1144,7 +1217,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                 duration = mPlayer.duration
                 this.localPlayerPosition = 0
-                mPlayer.selectAudioTrack(1)
+                // 伴奏
+                mPlayer.selectMultiAudioTrack(1, 1)
                 if (this.singerRole == KTVSingRole.SoloSinger ||
                     this.singerRole == KTVSingRole.LeadSinger
                 ) {
