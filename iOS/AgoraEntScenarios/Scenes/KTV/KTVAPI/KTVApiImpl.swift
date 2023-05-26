@@ -98,6 +98,9 @@ class KTVApiImpl: NSObject{
     public var remoteVolume: Int = 15
     private var joinChorusNewRole: KTVSingRole = .audience
     private var oldPitch: Double = 0
+    private var isWearingHeadPhones: Bool = false
+    private var enableProfessional: Bool = false
+    private var isPublishAudio: Bool = false
     deinit {
         mcc?.register(nil)
         agoraPrint("deinit KTVApiImpl")
@@ -149,7 +152,9 @@ class KTVApiImpl: NSObject{
         engine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\": 600}")
         engine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
         engine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
-        engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
+        engine.setParameters("{\"che.audio.aec.split_srate_for_32k\": 32000}")
+        engine.setParameters("{\"che.audio.aec.split_srate_for_48k\": 48000}")
+        engine.setParameters("{\"rtc.sync_render_ntp_e2e_delay_offset\":100}")
         engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}");
     }
@@ -222,6 +227,17 @@ extension KTVApiImpl: KTVApiDelegate {
         AgoraMusicContentCenter.destroy()
         self.eventHandlers.removeAllObjects()
     }
+    
+    func renewToken(rtmToken: String, chorusChannelRtcToken: String) {
+            // 更新RtmToken
+        mcc?.renewToken(rtmToken)
+            // 更新合唱频道RtcToken
+            if let subChorusConnection = subChorusConnection {
+                var channelMediaOption = AgoraRtcChannelMediaOptions()
+                channelMediaOption.token = chorusChannelRtcToken
+                apiConfig?.engine?.updateChannelEx(with: channelMediaOption, connection: subChorusConnection)
+            }
+        }
 
     func fetchMusicCharts(completion: @escaping MusicChartCallBacks) {
         agoraPrint("fetchMusicCharts")
@@ -796,6 +812,17 @@ extension KTVApiImpl {
     @objc public func setAudioPlayoutDelay(audioPlayoutDelay: Int) {
         self.audioPlayoutDelay = audioPlayoutDelay
     }
+    
+    @objc func enableProfessionalStreamerMode(_ enable: Bool)   {
+        if self.isPublishAudio == false {return}
+        self.enableProfessional = enable
+        //专业非专业还需要根据是否佩戴耳机来判断是否开启3A
+        apiConfig?.engine?.setAudioProfile(enable ? .musicHighQualityStereo : .musicStandardStereo)
+        apiConfig?.engine?.setParameters("{\"che.audio.aec.enable\":\((enable && !isWearingHeadPhones) ? "true" : "false")}")
+        apiConfig?.engine?.setParameters("{\"che.audio.agc.enable\":\((enable && !isWearingHeadPhones) ? "true" : "false")}")
+        apiConfig?.engine?.setParameters("{\"che.audio.ans.enable\":\((enable && !isWearingHeadPhones) ? "true" : "false")}")
+        apiConfig?.engine?.setParameters("{\"che.audio.md.enable\":\((enable && !isWearingHeadPhones) ? "true" : "false")}")
+    }
 
 }
 
@@ -811,7 +838,9 @@ extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
         if joinChorusNewRole == .coSinger {
           self.onJoinExChannelCallBack?(true, nil)
         }
-
+        if let subChorusConnection = subChorusConnection {
+            apiConfig?.engine?.enableAudioVolumeIndicationEx(50, smooth: 10, reportVad: true, connection: subChorusConnection)
+        }
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
@@ -841,13 +870,42 @@ extension KTVApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
         getEventHander { delegate in
-            delegate.onChorusChannelTokenPrivilegeWillExpire(token: token)
+            delegate.onTokenPrivilegeWillExpire()
+        }
+    }
+    
+    func onaudiovolu
+    
+    @objc func onAECLevelChanged(level: Int) {
+        if level == 0 {
+            apiConfig?.engine?.setParameters("{\"che.audio.aec.split_srate_for_48k\": 16000}")
+        } else if level == 1 {
+            apiConfig?.engine?.setParameters("{\"che.audio.aec.split_srate_for_48k\": 24000}")
+        } else if level == 2 {
+            apiConfig?.engine?.setParameters("{\"che.audio.aec.split_srate_for_48k\": 48000}")
         }
     }
 }
 
 //需要外部转发的方法 主要是dataStream相关的
 extension KTVApiImpl {
+    
+    @objc func didAudioPublishStateChange(newState: AgoraStreamPublishState) {
+        self.isPublishAudio = newState == .published
+        enableProfessionalStreamerMode(self.enableProfessional)
+        print("PublishStateChange:\(newState)")
+    }
+    
+    @objc func didAudioRouteChanged( routing: AgoraAudioOutputRouting) {
+        print("Route changed:\(routing)")
+        let headPhones: [AgoraAudioOutputRouting] = [.headset, .headsetBluetooth, .headsetNoMic]
+        let wearHeadPhone: Bool = headPhones.contains(routing)
+        if wearHeadPhone == self.isWearingHeadPhones {
+            return
+        }
+        self.isWearingHeadPhones = wearHeadPhone
+        enableProfessionalStreamerMode(self.enableProfessional)
+    }
     
     @objc public func didKTVAPIReceiveStreamMessageFrom(uid: NSInteger, streamId: NSInteger, data: Data) {
         
