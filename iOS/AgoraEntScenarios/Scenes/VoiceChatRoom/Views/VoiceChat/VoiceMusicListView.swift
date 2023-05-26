@@ -31,7 +31,7 @@ class VoiceMusicListView: UIView {
     }()
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "背景音乐"
+        label.text = "背景音乐".show_localized
         label.textColor = UIColor(hex: "#040925", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 16)
         return label
