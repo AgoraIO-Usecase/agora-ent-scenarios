@@ -393,11 +393,7 @@ class VoiceMusicToolView: UIView {
     }()
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-<<<<<<< HEAD
         label.text = "-"
-=======
-        label.text = "孤单心事"
->>>>>>> 6fecc737 (开发310版本功能)
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 15)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -405,11 +401,7 @@ class VoiceMusicToolView: UIView {
     }()
     private lazy var singerLabeL: UILabel = {
         let label = UILabel()
-<<<<<<< HEAD
         label.text = "-"
-=======
-        label.text = "颜人中"
->>>>>>> 6fecc737 (开发310版本功能)
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.systemFont(ofSize: 13)
         label.translatesAutoresizingMaskIntoConstraints = false
