@@ -192,7 +192,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         } else if section == 1 {
             return 2
         } else {
-            return 2
+            return roomInfo?.room?.owner?.uid == VLUserCenter.user.id ? 2 : 1
         }
     }
 
