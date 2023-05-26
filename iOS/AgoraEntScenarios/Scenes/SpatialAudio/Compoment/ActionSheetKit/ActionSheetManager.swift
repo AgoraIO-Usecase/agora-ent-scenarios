@@ -116,9 +116,9 @@ class ActionSheetManager: UIView {
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         layer.masksToBounds = true
         
-        addSubview(backButton)
         addSubview(lineView)
         lineView.addSubview(titleLabel)
+        addSubview(backButton)
         
         backButton.translatesAutoresizingMaskIntoConstraints = false
         backButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
