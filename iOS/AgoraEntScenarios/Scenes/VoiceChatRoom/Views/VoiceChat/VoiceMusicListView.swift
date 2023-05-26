@@ -324,10 +324,7 @@ class VoiceMusicListCell: UITableViewCell {
         statusImageView.image = UIImage.sd_animatedGIF(with: gifData)
         statusImageView.isHidden = !model.isPlaying
         songTitleLabel.textColor = model.isPlaying ? UIColor(hexString: "#0A7AFF") : UIColor(hexString: "#3C4267")
-<<<<<<< HEAD
         songTitleLabel.font = model.isPlaying ? .boldSystemFont(ofSize: 14) : .systemFont(ofSize: 14)
-=======
->>>>>>> 2e29d26e (开发310版本功能)
         singerLabeL.textColor = songTitleLabel.textColor
         indicatorView.isHidden = !model.isDownload
         model.isDownload ? indicatorView.startAnimating() : indicatorView.stopAnimating()
