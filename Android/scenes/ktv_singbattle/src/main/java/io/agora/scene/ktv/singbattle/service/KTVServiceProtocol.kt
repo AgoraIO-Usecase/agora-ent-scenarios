@@ -212,6 +212,7 @@ interface KTVServiceProtocol {
     fun updateSongModel(
         songCode: String,
         winner: String,
+        winnerName: String,
         completion: (error: Exception?) -> Unit
     )
 

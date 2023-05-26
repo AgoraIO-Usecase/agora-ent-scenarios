@@ -654,7 +654,7 @@ public class RoomLivingViewModel extends ViewModel {
                         RoomSelSongModel value = songPlayingLiveData.getValue();
                         RoomSelSongModel songPlaying = data.get(0);
 
-                        if (value != null && value.getWinnerNo().equals("") && !songPlaying.getWinnerNo().equals("")) {
+                        if (value != null && value.getWinnerNo() != null && value.getWinnerNo().equals("") && !songPlaying.getWinnerNo().equals("")) {
                             // 所有人更新抢唱结果UI
                             KTVSingBattleGameService.INSTANCE.getWinnerInfo(
                                     "scene_singbattle_3.4.0",
@@ -1345,7 +1345,7 @@ public class RoomLivingViewModel extends ViewModel {
                     KTVLogger.d(TAG, "RoomLivingViewModel.graspSong() success " + userId);
                     //ToastUtils.showToast("抢唱成功");
                     // 更新Service抢唱结果
-                    ktvServiceProtocol.updateSongModel(songPlayingLiveData.getValue().getSongNo(), userId, e -> {
+                    ktvServiceProtocol.updateSongModel(songPlayingLiveData.getValue().getSongNo(), userId, UserManager.getInstance().getUser().name, e -> {
                         if (e == null) {
                             KTVLogger.d(TAG, "RoomLivingViewModel.updateSongModel() success " + userId);
                         }
