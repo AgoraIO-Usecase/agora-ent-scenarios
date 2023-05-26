@@ -91,6 +91,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public Role mRole = Role.Listener;
+
+    public enum AudioTrack {
+        Origin, Acc, DaoChang
+    }
+    private AudioTrack mAudioTrack = AudioTrack.Acc;
     private OnKaraokeEventListener mOnKaraokeActionListener;
 
     public LrcControlView(@NonNull Context context) {
@@ -249,6 +254,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         mBinding.ilActive.ivMusicStart.setIconResource(R.mipmap.ktv_ic_pause);
         mBinding.ilActive.ivMusicStart.setText(R.string.ktv_room_player_pause);
+        mAudioTrack = AudioTrack.Acc;
     }
 
     private void changeViewByRole() {
@@ -544,10 +550,34 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     @Override
     public void onClick(View v) {
         if (v == mBinding.ilActive.switchOriginal) {
-            mOnKaraokeActionListener.onSwitchOriginalClick();
-
-            boolean withOriginal = mBinding.ilActive.switchOriginal.isChecked();
-            mBinding.ilActive.switchOriginal.setIconResource(withOriginal ? R.mipmap.ic_play_original_on : R.mipmap.ic_play_original_off);
+            if (mRole == Role.Singer) {
+                if (mAudioTrack == AudioTrack.Acc) {
+                    mAudioTrack = AudioTrack.DaoChang;
+                    mOnKaraokeActionListener.onSwitchOriginalClick(2);
+                    mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ktv_ic_daochang);
+                    mBinding.ilActive.switchOriginal.setText("导唱");
+                } else if (mAudioTrack == AudioTrack.DaoChang) {
+                    mAudioTrack = AudioTrack.Origin;
+                    mOnKaraokeActionListener.onSwitchOriginalClick(0);
+                    mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_on);
+                    mBinding.ilActive.switchOriginal.setText("原唱");
+                } else {
+                    mAudioTrack = AudioTrack.Acc;
+                    mOnKaraokeActionListener.onSwitchOriginalClick(1);
+                    mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+                }
+            } else if (mRole == Role.CoSinger) {
+                if (mAudioTrack == AudioTrack.Acc) {
+                    mAudioTrack = AudioTrack.Origin;
+                    mOnKaraokeActionListener.onSwitchOriginalClick(0);
+                    mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_on);
+                    mBinding.ilActive.switchOriginal.setText("原唱");
+                } else {
+                    mAudioTrack = AudioTrack.Acc;
+                    mOnKaraokeActionListener.onSwitchOriginalClick(1);
+                    mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+                }
+            }
         } else if (v == mBinding.ilActive.ivMusicMenu) {
             mOnKaraokeActionListener.onMenuClick();
         } else if (v == mBinding.ilActive.ivMusicStart) {
@@ -711,7 +741,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public interface OnKaraokeEventListener {
-        default void onSwitchOriginalClick() {
+        default void onSwitchOriginalClick(int aimStatus) { // 0: origin 1: acc 2: daochang
         }
 
         default void onMenuClick() {

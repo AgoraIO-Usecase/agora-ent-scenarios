@@ -24,9 +24,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.card.MaterialCardView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.agora.rtc2.Constants;
 import io.agora.scene.base.GlideApp;
@@ -53,6 +56,9 @@ import io.agora.scene.ktv.widget.MoreDialog;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
 import io.agora.scene.ktv.widget.UserLeaveSeatMenuDialog;
 import io.agora.scene.ktv.widget.song.SongDialog;
+import io.agora.scene.ktv.widget.voiceHighight.OnVoiceHighlightDialogListener;
+import io.agora.scene.ktv.widget.voiceHighight.VoiceHighlightBean;
+import io.agora.scene.ktv.widget.voiceHighight.VoiceHighlightDialog;
 import io.agora.scene.widget.DividerDecoration;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
@@ -70,6 +76,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     private RoomLivingViewModel roomLivingViewModel;
     private MoreDialog moreDialog;
+    private VoiceHighlightDialog voiceHighlightDialog;
     private MusicSettingDialog musicSettingDialog;
     private BindingSingleAdapter<RoomSeatModel, KtvItemRoomSpeakerBinding> mRoomSpeakerAdapter;
     private KtvCommonDialog creatorExitDialog;
@@ -246,6 +253,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().ivMore.setOnClickListener(v -> {
             new TopFunctionDialog(RoomLivingActivity.this).show();
         });
+        if (roomLivingViewModel.isRoomOwner()) {
+            getBinding().btnVocal.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -298,6 +308,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         });
         getBinding().iBtnChooseSong.setOnClickListener(v -> showChooseSongDialog());
         getBinding().btnMenu.setOnClickListener(this::showMoreDialog);
+        getBinding().btnVocal.setOnClickListener(this::showVoiceHighlightDialog);
         getBinding().btnOK.setOnClickListener(view -> getBinding().groupResult.setVisibility(View.GONE));
         LrcActionListenerImpl lrcActionListenerImpl = new LrcActionListenerImpl(this, roomLivingViewModel, getBinding().lrcControlView) {
             @Override
@@ -740,6 +751,54 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
         getBinding().getRoot().post(() -> {
             showMoreDialogTag = false;
+        });
+    }
+
+    private boolean showVoiceHighlightDialogTag = false;
+    private void showVoiceHighlightDialog(View view) {
+        if (showVoiceHighlightDialogTag) {
+            return;
+        }
+        showVoiceHighlightDialogTag = true;
+
+        if (voiceHighlightDialog == null) {
+            voiceHighlightDialog = new VoiceHighlightDialog(new OnVoiceHighlightDialogListener() {
+                @Override
+                public void onUserListLoad() {
+                    List<VoiceHighlightBean> list = new ArrayList<>();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        if (roomLivingViewModel.seatListLiveData.getValue() == null || roomLivingViewModel.songPlayingLiveData.getValue() == null) return;
+                        AtomicBoolean hasChorus = new AtomicBoolean(false);
+                        roomLivingViewModel.seatListLiveData.getValue().forEach(seat -> {
+                            if (seat.getChorusSongCode().equals(roomLivingViewModel.songPlayingLiveData.getValue().getSongNo() + roomLivingViewModel.songPlayingLiveData.getValue().getCreateAt())) {
+                                VoiceHighlightBean bean = new VoiceHighlightBean();
+                                bean.user = seat;
+                                list.add(bean);
+                                hasChorus.set(true);
+                            } else if (seat.getUserNo().equals(roomLivingViewModel.songPlayingLiveData.getValue().getUserNo())) {
+                                VoiceHighlightBean bean = new VoiceHighlightBean();
+                                bean.user = seat;
+                                list.add(bean);
+                            }
+                        });
+                        if (!hasChorus.get()) return;
+                    }
+                    voiceHighlightDialog.setUserList(list);
+                }
+
+                @Override
+                public void onUserItemChosen(VoiceHighlightBean user) {
+                    roomLivingViewModel.syncVoiceHighlightResult(user.user.getRtcUid(), user.user.getChorusSongCode());
+                }
+            });
+        }
+
+        if (!voiceHighlightDialog.isAdded()) {
+            voiceHighlightDialog.show(getSupportFragmentManager(), MoreDialog.TAG);
+        }
+
+        getBinding().getRoot().post(() -> {
+            showVoiceHighlightDialogTag = false;
         });
     }
 

@@ -11,6 +11,9 @@ public class MusicSettingBean {
     private int audioEffectParams1 = 0;
     private int audioEffectParams2 = 0;
     private int remoteVolume = 40;
+    private boolean professionalMode = false; // 专业模式
+    private int aecLevel = 1; // 0(16K),1(24K),2(48K)
+    private boolean lowLatencyMode = false;  // 低延时模式
 
 
     public MusicSettingBean(boolean isEar, int volMic, int volMusic, int toneValue, MusicSettingDialog.Callback mCallback) {
@@ -98,5 +101,26 @@ public class MusicSettingBean {
     public void setRemoteVolume(int newValue) {
         this.remoteVolume = newValue;
         this.mCallback.onRemoteVolumeChanged(newValue);
+    }
+
+    public boolean getProfessionalMode() { return professionalMode; }
+
+    public void setProfessionalMode(boolean mode) {
+        this.professionalMode = mode;
+        this.mCallback.onProfessionalModeChanged(mode);
+    }
+
+    public int getAECLevel() { return aecLevel; }
+
+    public void setAECLevel(int level) {
+        this.aecLevel = level;
+        this.mCallback.onAECLevelChanged(level);
+    }
+
+    public boolean getLowLatencyMode() { return lowLatencyMode; }
+
+    public void setLowLatencyMode(boolean mode) {
+        this.lowLatencyMode = mode;
+        this.mCallback.onLowLatencyModeChanged(mode);
     }
 }

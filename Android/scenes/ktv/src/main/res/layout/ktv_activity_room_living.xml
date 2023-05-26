@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@mipmap/bg_room_living" />
+        android:src="@mipmap/ktv_room_bg" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvRoomName"
@@ -21,6 +21,7 @@
         android:layout_marginStart="20dp"
         android:drawableStart="@mipmap/ic_k"
         android:drawablePadding="5dp"
+        android:layout_marginTop="15dp"
         android:gravity="center_vertical"
         android:textColor="@color/white"
         android:textSize="16sp"
@@ -85,34 +86,36 @@
         app:layout_constraintEnd_toStartOf="@id/tvNetStatus"
         app:layout_constraintTop_toTopOf="@id/tvNetStatus" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/bgRoom"
-        android:layout_width="match_parent"
-        android:layout_height="232dp"
-        android:layout_marginHorizontal="15dp"
-        android:layout_marginTop="24dp"
-        android:minWidth="345dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvRoomName" />
+<!--    <androidx.appcompat.widget.AppCompatImageView-->
+<!--        android:id="@+id/bgRoom"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="232dp"-->
+<!--        android:layout_marginHorizontal="15dp"-->
+<!--        android:layout_marginTop="24dp"-->
+<!--        android:minWidth="345dp"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/tvRoomName" />-->
 
     <io.agora.scene.ktv.widget.lrcView.LrcControlView
         android:id="@+id/lrcControlView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginHorizontal="15dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="15dp"
         app:layout_constraintBottom_toTopOf="@id/rvUserMember"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvRoomName" />
+        app:layout_constraintTop_toBottomOf="@id/tvRoomMCount" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvUserMember"
         android:layout_width="match_parent"
-        android:layout_height="260dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="15dp"
         android:layout_marginBottom="12dp"
         android:overScrollMode="never"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintTop_toBottomOf="@+id/lrcControlView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -155,6 +158,20 @@
         android:src="@mipmap/ic_more"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/cbVideo"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btnVocal"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginBottom="20dp"
+        android:background="@null"
+        android:padding="5dp"
+        android:src="@mipmap/ktv_ic_vocal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btnMenu"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <androidx.appcompat.widget.AppCompatImageView
