@@ -20,13 +20,7 @@ import io.agora.voice.common.ui.dialog.BaseSheetDialog
 
 class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBinding>() {
 
-    companion object {
-        const val KEY_IS_ON = "isOn"
-    }
-
-    private val isOn by lazy {
-        arguments?.getBoolean(RoomAIAECSheetDialog.KEY_IS_ON, true) ?: true
-    }
+    private var mOnBGMChanged: (() -> Unit)? = null
 
     private val adapter = MusicAdapter(mutableListOf())
 
@@ -45,8 +39,12 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.attributes?.windowAnimations = R.style.voice_BottomSheetDialogAnimation
         setupRecycleView()
-        setupCtrlItems()
+        setupView()
         fetchData()
+    }
+
+    fun setOnBGMChanged(action: (() -> Unit)?) {
+        mOnBGMChanged = action
     }
 
     private fun setupRecycleView() {
@@ -54,41 +52,45 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
         layout.orientation = LinearLayoutManager.VERTICAL
         binding?.rvMusicList?.layoutManager = layout
         adapter.setOnClickItemAction { music ->
-            AgoraRtcEngineController.get().bgmManager.setPlayState(false)
-            binding?.ivPlay?.setImageResource(R.drawable.voice_icon_bgm_play)
-            AgoraRtcEngineController.get().bgmManager.loadMusic(music, true) { success ->
-                if (success) {
-                    adapter.updateSelected(music)
-                    binding?.tvMusic?.text = music.name
-                    binding?.tvSinger?.text = music.singer
-                } else {
-                }
-            }
+            setPlayOn(true)
+            AgoraRtcEngineController.get().bgmManager.loadMusic(music)
+            adapter.updateSelected(music)
+            binding?.tvMusic?.text = music.name
+            binding?.tvSinger?.text = music.singer
         }
         binding?.rvMusicList?.adapter = adapter
     }
-    private fun setupCtrlItems() {
+    private fun setupView() {
+        val bgmManager = AgoraRtcEngineController.get().bgmManager
+        // 原唱伴唱
+        if (bgmManager.params.isSingerOn) {
+            binding?.ivSinging?.setImageResource(R.drawable.voice_icon_bgm_sing_on)
+        } else {
+            binding?.ivSinging?.setImageResource(R.drawable.voice_icon_bgm_sing_off)
+        }
         binding?.ivSinging?.setOnClickListener {
-            val toState = !AgoraRtcEngineController.get().bgmManager.params.isSingerOn
-            AgoraRtcEngineController.get().bgmManager.setSingerOn(toState)
+            val toState = !bgmManager.params.isSingerOn
+            bgmManager.setSingerOn(toState)
             if (toState) {
                 binding?.ivSinging?.setImageResource(R.drawable.voice_icon_bgm_sing_on)
             } else {
                 binding?.ivSinging?.setImageResource(R.drawable.voice_icon_bgm_sing_off)
             }
         }
+        // 播放/暂停
+        if (bgmManager.params.isAutoPlay) {
+            binding?.ivPlay?.setImageResource(R.drawable.voice_icon_bgm_pause)
+        } else {
+            binding?.ivPlay?.setImageResource(R.drawable.voice_icon_bgm_play)
+        }
         binding?.ivPlay?.setOnClickListener {
-            val toState = !AgoraRtcEngineController.get().bgmManager.params.isPlaying
-            AgoraRtcEngineController.get().bgmManager.setPlayState(toState)
-            if (toState) {
-                binding?.ivPlay?.setImageResource(R.drawable.voice_icon_bgm_pause)
-            } else {
-                binding?.ivPlay?.setImageResource(R.drawable.voice_icon_bgm_play)
-            }
+            val toState = !AgoraRtcEngineController.get().bgmManager.params.isAutoPlay
+            setPlayOn(toState)
         }
         binding?.ivNext?.setOnClickListener {
             adapter.selectNext()
         }
+        // 音量
         binding?.ivVolume?.setOnClickListener {
             val isSelected = binding?.ivVolume?.isSelected ?: true
             if (isSelected) {
@@ -121,16 +123,22 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
             binding?.rvMusicList?.post {
                 adapter.updateDataSource(list?.toList() ?: listOf())
                 binding?.tvDialogTitle?.text = "背景音乐(${list?.size ?: 0})"
-                val music = list?.firstOrNull()
-                AgoraRtcEngineController.get().bgmManager.loadMusic(music, false) { success ->
-                    if (success) {
-                        adapter.updateSelected(music)
-                        binding?.tvMusic?.text = music?.name ?: ""
-                        binding?.tvSinger?.text = music?.singer ?: ""
-                    } else {
-                    }
+                AgoraRtcEngineController.get().bgmManager.setAutoPlay(false)
+                list?.firstOrNull()?.let { music ->
+                    AgoraRtcEngineController.get().bgmManager.loadMusic(music)
+                    adapter.updateSelected(music)
+                    binding?.tvMusic?.text = music?.name ?: ""
+                    binding?.tvSinger?.text = music?.singer ?: ""
                 }
             }
+        }
+    }
+    private fun setPlayOn(isOn: Boolean) {
+        AgoraRtcEngineController.get().bgmManager.setAutoPlay(isOn)
+        if (isOn) {
+            binding?.ivPlay?.setImageResource(R.drawable.voice_icon_bgm_pause)
+        } else {
+            binding?.ivPlay?.setImageResource(R.drawable.voice_icon_bgm_play)
         }
     }
 }
@@ -193,7 +201,9 @@ private class MusicAdapter (  // 数据源
             holder.ivSelected.visibility = View.INVISIBLE
         }
         holder.itemView.setOnClickListener {
-            mOnClickItemAction?.invoke(music)
+            if (mSelected?.songCode != music.songCode) {
+                mOnClickItemAction?.invoke(music)
+            }
         }
     }
 

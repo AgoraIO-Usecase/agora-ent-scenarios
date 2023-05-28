@@ -490,10 +490,6 @@ class RoomObservableViewDelegate constructor(
                 override fun onBGMSetting() {
                     onBGMSettingDialog()
                 }
-                override fun onVoiceChanger(mode: Int, isEnable: Boolean) {
-                    onVoiceChangerDialog(mode)
-                }
-
                 override fun onBotCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
                     roomLivingViewModel.enableRobot(isChecked)
                 }
@@ -641,10 +637,8 @@ class RoomObservableViewDelegate constructor(
         dialog.onClickCheckBox = { isOn ->
             AgoraRtcEngineController.get().setAIAGCOn(isOn)
             VoiceBuddyFactory.get().rtcChannelTemp.isAIAGCOn = isOn
-            roomAudioSettingDialog?.apply {
-                audioSettingsInfo.isAIAGCOn = isOn
-                updateAIAGCView()
-            }
+            roomAudioSettingDialog?.audioSettingsInfo?.isAIAGCOn = isOn
+            roomAudioSettingDialog?.updateAIAGCView()
         }
         dialog.show(activity.supportFragmentManager, "mtAIAGC")
     }
@@ -652,23 +646,19 @@ class RoomObservableViewDelegate constructor(
      */
     fun onEarBackSettingDialog(isOn: Boolean) {
         val dialog = RoomEarBackSettingSheetDialog()
+        dialog.setOnEarBackStateChange {
+            roomAudioSettingDialog?.updateEarBackState()
+        }
         dialog.show(activity.supportFragmentManager, "mtBGMSetting")
     }
     /** 背景音乐设置弹框
      */
     fun onBGMSettingDialog() {
-        val dialog = RoomBGMSettingSheetDialog().apply {
-            arguments = Bundle().apply {
-                putBoolean(RoomBGMSettingSheetDialog.KEY_IS_ON, true)
-            }
+        val dialog = RoomBGMSettingSheetDialog()
+        dialog.setOnBGMChanged {
+            roomAudioSettingDialog?.updateBGMView()
         }
         dialog.show(activity.supportFragmentManager, "mtBGMSetting")
-    }
-    /**
-     * 变声器弹框
-     */
-    fun onVoiceChangerDialog(mode: Int) {
-
     }
     /**
      * 空间音频弹框

@@ -11,6 +11,8 @@ import androidx.core.view.isVisible
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogAudioSettingBinding
 import io.agora.scene.voice.model.constructor.RoomAudioSettingsConstructor
+import io.agora.scene.voice.rtckit.AgoraBGMManager
+import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.constant.ConfigConstants.DISABLE_ALPHA
 import io.agora.voice.common.constant.ConfigConstants.ENABLE_ALPHA
@@ -67,7 +69,10 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             updateAIAECView()
             updateAIAGCView()
             updateBotStateView()
+            updateBGMView()
+            updateEarBackState()
 
+            tvBGMArrow.text = AgoraRtcEngineController.get().bgmManager.bgm?.name ?: ""
             mcbAgoraBot.setOnCheckedChangeListener { button, isChecked ->
                 if (!button.isPressed) return@setOnCheckedChangeListener
                 "isChecked：$isChecked".logD("mcbAgoraBot")
@@ -143,6 +148,18 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
         }
     }
 
+    fun updateBGMView() {
+        binding?.tvBGMArrow?.text = AgoraRtcEngineController.get().bgmManager.bgm?.name ?: ""
+    }
+
+    fun updateEarBackState() {
+        if (AgoraRtcEngineController.get().earBackManager.params.isOn) {
+            binding?.tvInEarArrow?.text = view?.context?.getString(R.string.voice_chatroom_on)
+        } else {
+            binding?.tvInEarArrow?.text = view?.context?.getString(R.string.voice_chatroom_off)
+        }
+    }
+
     /**
      * 更新机器人ui
      */
@@ -183,10 +200,6 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
 
         /** BGM 设置*/
         fun onBGMSetting()
-
-        /**变声*/
-        fun onVoiceChanger(mode: Int, isEnable: Boolean)
-
         /**机器人开关*/
         fun onBotCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
 

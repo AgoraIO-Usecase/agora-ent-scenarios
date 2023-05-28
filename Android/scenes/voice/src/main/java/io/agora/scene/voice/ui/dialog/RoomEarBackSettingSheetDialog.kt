@@ -23,6 +23,8 @@ import io.agora.voice.common.ui.dialog.BaseSheetDialog
 class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackSettingBinding>() {
 
     private val mReceiver = HeadphoneReceiver()
+
+    private var mOnEarBackStateChange: (() -> Unit)? = null
     override fun getViewBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
@@ -42,7 +44,9 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
         setupHeadPhoneReceiver()
         setupView()
     }
-
+    fun setOnEarBackStateChange(action: (() -> Unit)?) {
+        mOnEarBackStateChange = action
+    }
     private fun setupView() {
         val earBackManager = AgoraRtcEngineController.get().earBackManager
         setSwitchOn(earBackManager.params.isOn)
