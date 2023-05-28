@@ -16,10 +16,6 @@ class AgoraEarBackManager(
 
     private val TAG: String = "EAR_BACK_MANAGER_LOG"
 
-    init {
-        // 设置耳返监听
-    }
-
     fun setOn(isOn: Boolean) {
         params.isOn = isOn
         mRtcEngine.enableInEarMonitoring(isOn)

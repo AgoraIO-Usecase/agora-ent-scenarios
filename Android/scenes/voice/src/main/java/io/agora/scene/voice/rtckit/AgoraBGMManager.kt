@@ -11,7 +11,7 @@ import io.agora.rtc2.RtcEngineEx
 
 data class AgoraBGMParams (
     var isSingerOn: Boolean = true,
-    var isPlaying: Boolean = true,
+    var isAutoPlay: Boolean = false,
     var volume: Int = 50
 ){}
 class AgoraBGMManager(
@@ -52,6 +52,7 @@ class AgoraBGMManager(
         contentCenterConfiguration.maxCacheSize = 10
 
         mMusicCenter.initialize(contentCenterConfiguration)
+        mPlayer.setLoopCount(Int.MAX_VALUE) // 单曲循环
         mPlayer.adjustPlayoutVolume(mpkPlayerVolume)
         mPlayer.adjustPublishSignalVolume(mpkPublishVolume)
 
@@ -72,30 +73,27 @@ class AgoraBGMManager(
         }
     }
 
-    fun loadMusic(music: Music?, autoPlay: Boolean, complete: (Boolean) -> Unit) {
+    fun loadMusic(music: Music?) {
         bgm = music
-        complete.invoke(true)
+        mPlayer.stop()
         if (music == null) {
             return
         }
         Log.d(TAG, "loadMusic: ${music.songCode}, name: ${music.name}")
-        params.isPlaying = autoPlay
         preLoadMusic {songCode, percent, status, msg, lrcUrl ->
-            if (autoPlay) {
+            if (bgm?.songCode == songCode) {
                 mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
                 mPlayer.open(songCode, 0)
             }
-            complete.invoke(true)
         }
     }
 
-    fun setPlayState(isPlay: Boolean) {
-        params.isPlaying = isPlay
-        if (isPlay) {
-            mPlayer.play()
-        } else {
-            mPlayer.pause()
+    fun setAutoPlay(isPlay: Boolean) {
+        params.isAutoPlay = isPlay
+        if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_STOPPED) {
+            return
         }
+        if (isPlay) mPlayer.play() else mPlayer.pause()
     }
 
     fun setSingerOn(isOn: Boolean) {
@@ -137,10 +135,10 @@ class AgoraBGMManager(
         Log.d(TAG, "onPlayerStateChanged called, state: $mediaPlayerState, error: $error")
         when (mediaPlayerState) {
             Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
-                if (params.isPlaying) {
+                if (params.isAutoPlay) {
                     mPlayer.play()
                 }
-                mPlayer.selectAudioTrack(1)
+                mPlayer.selectAudioTrack(if (params.isSingerOn) 0 else 1)
             }
             Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
                 mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
@@ -150,6 +148,12 @@ class AgoraBGMManager(
             }
             Constants.MediaPlayerState.PLAYER_STATE_STOPPED -> {
                 mRtcEngine.adjustPlaybackSignalVolume(100)
+            }
+            Constants.MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
+                if (params.isAutoPlay) {
+                    mPlayer.play()
+                }
+                mPlayer.selectAudioTrack(if (params.isSingerOn) 0 else 1)
             }
             else -> {}
         }
@@ -164,7 +168,7 @@ class AgoraBGMManager(
         elapsedTime: Long,
         message: String?
     ) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onMetaData(type: Constants.MediaPlayerMetadataType?, data: ByteArray?) {

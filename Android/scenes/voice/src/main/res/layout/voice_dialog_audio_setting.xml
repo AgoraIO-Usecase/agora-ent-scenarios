@@ -406,14 +406,30 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvBGM" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvLogo"
-            style="@style/voice_bottom_sheet_right_text_style"
-            android:drawableStart="@drawable/voice_icon_arrow_right_grey"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginLeft="20dp"
+            android:paddingLeft="8dp"
+            android:gravity="center_vertical"
+            android:textSize="@dimen/voice_sp_12"
+            android:textColor="@color/def_text_grey_6c7"
+            android:text="声网凤鸣AI引擎提供支持"
             app:layout_constraintTop_toBottomOf="@+id/tvBGM"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:text="# 声网凤鸣AI引擎提供支持" />
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/voice_icon_engine_logo"
+            app:layout_constraintBottom_toBottomOf="@+id/tvLogo"
+            app:layout_constraintEnd_toStartOf="@+id/tvLogo"
+            app:layout_constraintTop_toTopOf="@+id/tvLogo"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
