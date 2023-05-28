@@ -3,8 +3,11 @@ package com.agora.entfulldemo.webview;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +28,7 @@ import io.agora.scene.base.api.apiutils.GsonUtils;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.manager.UserManager;
+import io.agora.scene.widget.CustomWebView;
 import kotlin.jvm.JvmField;
 
 @Route(path = PagePathConstant.pageWebView)
@@ -54,10 +58,38 @@ public class WebViewActivity extends BaseViewBindingActivity<AppActivityWebviewB
             getBinding().titleView.setTitle(getString(R.string.app_privacy_agreement));
         } else if (url.contains("privacy/libraries")) {
             getBinding().titleView.setTitle(getString(R.string.app_third_party_info_data_sharing));
-        }else if (url.contains("agora-ent-scenarios")){
+        }else if (url.contains("ent-scenarios/pages/manifest")){
             getBinding().titleView.setTitle(getString(R.string.app_personal_info_collection_checklist));
         }
         getBinding().webView.loadUrl(url);
+
+        getBinding().titleView.setLeftClick(v -> {
+            if (getBinding().webView.canGoBack()){
+                getBinding().webView.goBack();
+            }else {
+                finish();
+            }
+        });
+
+        getBinding().webView.setWebViewClient(new CustomWebView.MyWebViewClient(){
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                String title = view.getTitle();
+                if (!TextUtils.isEmpty(title)) {
+                    getBinding().titleView.setTitle(title);
+                }
+            }
+        });
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (getBinding().webView.canGoBack()){
+            getBinding().webView.goBack();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     private void addJavascriptInterface() {

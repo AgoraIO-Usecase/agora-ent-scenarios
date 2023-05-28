@@ -31,6 +31,6 @@ public class UrlConstants {
     public static final String REQUEST_REPORT_DEVICE = BASE_REQUEST_LOGIN_BY_TOKEN + "/report/device";
 
     // 用户点击行为数据上报
-    public static final String REQUEST_REPORT_ACTION = BASE_REQUEST_LOGIN_BY_TOKEN + "/report/action?";
+    public static final String REQUEST_REPORT_ACTION = BASE_REQUEST_LOGIN_BY_TOKEN + "/report/action";
 
 }
