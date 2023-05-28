@@ -63,6 +63,7 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
             }, HomeIndexHolder.class);
             getBinding().rvScenes.setAdapter(homeIndexAdapter);
         }
+        mainViewModel.requestReportDevice(UserManager.getInstance().getUser().userNo, "");
     }
 
     private void reportEnter(@NonNull ScenesModel scenesModel){
