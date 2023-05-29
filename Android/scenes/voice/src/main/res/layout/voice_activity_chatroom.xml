@@ -22,24 +22,43 @@
         app:layout_constraintTop_toBottomOf="@+id/cTopView"
         android:layout_width="match_parent"
         android:layout_marginTop="14dp"
-        android:layout_height="20dp"/>
+        android:layout_height="20dp"
+        />
+    
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBGM"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="14dp"
+        android:src="@drawable/voice_icon_room_bgm_on"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/cTopView"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvBGM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:text=""
+        android:textColor="@color/grey_97"
+        android:textSize="@dimen/voice_sp_12"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@+id/ivBGM"
+        app:layout_constraintBottom_toBottomOf="@+id/ivBGM"
+        app:layout_constraintEnd_toStartOf="@id/ivBGM"
+        />
 
     <io.agora.scene.voice.ui.widget.mic.Room2DMicLayout
         android:id="@+id/rvChatroom2dMicLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/glHorizontal45"
         app:layout_constraintTop_toBottomOf="@+id/subtitle" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/glHorizontal45"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.45" />
 
     <io.agora.scene.voice.ui.widget.gift.ChatroomGiftView
         android:id="@+id/chatroom_gift_view"

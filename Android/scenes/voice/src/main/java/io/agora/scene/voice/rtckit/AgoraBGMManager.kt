@@ -21,11 +21,20 @@ class AgoraBGMManager(
     private val mRtmToken: String
 ) : IMediaPlayerObserver, IMusicContentCenterEventHandler {
 
+    private val TAG: String = "BGM_MANAGER_LOG"
+
     val params = AgoraBGMParams()
 
     var bgm: Music? = null
 
-    private val TAG: String = "BGM_MANAGER_LOG"
+    private var mOnMusicChanged: (() -> Unit)? = null
+    fun setOnMusicChanged(action: (() -> Unit)?) {
+        mOnMusicChanged = action
+    }
+    private var mOnPlayStateChanged: (() -> Unit)? = null
+    fun setOnPlayStateChanged(action: (() -> Unit)?) {
+        mOnPlayStateChanged = action
+    }
 
     private var remoteVolume: Int = 40 // 远端音频
     private var mpkPlayerVolume: Int = 50
@@ -43,6 +52,15 @@ class AgoraBGMManager(
 
     private val mMusicCenter: IAgoraMusicContentCenter = IAgoraMusicContentCenter.create(mRtcEngine)
     private val mPlayer: IAgoraMusicPlayer = mMusicCenter.createMusicPlayer()
+
+    fun release() {
+        mPlayer.unRegisterPlayerObserver(this)
+        mPlayer.stop()
+        mPlayer.destroy()
+
+        mMusicCenter.unregisterEventHandler()
+        IAgoraMusicContentCenter.destroy()
+    }
 
     init {
         val contentCenterConfiguration = MusicContentCenterConfiguration()
@@ -76,6 +94,8 @@ class AgoraBGMManager(
     fun loadMusic(music: Music?) {
         bgm = music
         mPlayer.stop()
+        mOnMusicChanged?.invoke()
+        setAutoPlay(false)
         if (music == null) {
             return
         }
@@ -90,6 +110,7 @@ class AgoraBGMManager(
 
     fun setAutoPlay(isPlay: Boolean) {
         params.isAutoPlay = isPlay
+        mOnPlayStateChanged?.invoke()
         if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_STOPPED) {
             return
         }
@@ -200,6 +221,7 @@ class AgoraBGMManager(
     }
 
     override fun onPreLoadEvent(
+        requestId: String?,
         songCode: Long,
         percent: Int,
         lyricUrl: String?,
@@ -235,8 +257,16 @@ class AgoraBGMManager(
 
     }
 
-    override fun onLyricResult(requestId: String?, lyricUrl: String?, errorCode: Int) {
+    override fun onLyricResult(requestId: String?, songCode: Long, lyricUrl: String?, errorCode: Int) {
 
     }
 
+    override fun onSongSimpleInfoResult(
+        requestId: String?,
+        songCode: Long,
+        simpleInfo: String?,
+        errorCode: Int
+    ) {
+
+    }
 }

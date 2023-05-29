@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.moczul.ok2curl.CurlInterceptor;
+//import com.moczul.ok2curl.CurlInterceptor;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +65,7 @@ public class ApiManager {
                 .readTimeout(TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(TIMEOUT, TimeUnit.SECONDS);
         if (BuildConfig.DEBUG) {
-            httpClientBuilder.addInterceptor(new CurlInterceptor(s -> Log.d("CurlInterceptor", s)));
+//            httpClientBuilder.addInterceptor(new CurlInterceptor(s -> Log.d("CurlInterceptor", s)));
         }
         httpClient = httpClientBuilder.build();
 

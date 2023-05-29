@@ -28,7 +28,7 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/mtBottomSheetTitle"
         style="@style/voice_bottom_sheet_title_style"
-        android:text="# 耳返"
+        android:text="耳返"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
@@ -37,7 +37,7 @@
         android:id="@+id/tvOpenSwitch"
         style="@style/voice_bottom_sheet_text_style"
         android:layout_marginStart="20dp"
-        android:text="# 开启耳返"
+        android:text="开启耳返"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
 
@@ -70,7 +70,7 @@
         android:drawableLeft="@drawable/voice_icon_room_setting_introduce"
         android:textSize="@dimen/voice_sp_12"
         android:textAlignment="textStart"
-        android:text="# 开启耳返可实时听到自己的声音，唱歌的时候及时调整"
+        android:text="  开启耳返可实时听到自己的声音，唱歌的时候及时调整"
         app:layout_constraintTop_toBottomOf="@+id/tvOpenSwitch"
         />
     
@@ -81,7 +81,7 @@
         android:layout_marginTop="16dp"
         android:paddingLeft="@dimen/voice_sp_20"
         android:gravity="center_vertical"
-        android:text="# 耳返设置"
+        android:text="耳返设置"
         android:background="@color/voice_color_f7f8fb"
         android:textColor="@color/voice_dark_grey_color_6c7192"
         app:layout_constraintTop_toBottomOf="@+id/tvTips"
@@ -102,19 +102,19 @@
         android:id="@+id/tvVolumeTitle"
         style="@style/voice_bottom_sheet_text_style"
         android:layout_marginStart="20dp"
-        android:text="# 耳返音量"
+        android:text="耳返音量"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvSetting" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvVolume"
-        android:layout_width="35dp"
+        android:layout_width="30dp"
         android:layout_height="wrap_content"
         android:layout_marginRight="20dp"
         android:textColor="#6D7291"
         android:textSize="@dimen/voice_sp_14"
         android:gravity="right"
-        android:text="59"
+        android:text="100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tvVolumeTitle"
         app:layout_constraintBottom_toBottomOf="@+id/tvVolumeTitle" />
@@ -142,7 +142,7 @@
         android:id="@+id/tvMode"
         style="@style/voice_bottom_sheet_text_style"
         android:layout_marginStart="20dp"
-        android:text="# 耳返模式"
+        android:text="耳返模式"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvVolumeTitle" />
 
@@ -250,7 +250,7 @@
         android:layout_marginStart="8dp"
         android:textColor="@color/voice_color_3c4267"
         android:textSize="@dimen/voice_sp_13"
-        android:text="# 耳返延时"
+        android:text="耳返延时"
         app:layout_constraintStart_toStartOf="@+id/cvPing"
         app:layout_constraintTop_toTopOf="@+id/cvPing" />
 
@@ -260,7 +260,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:textSize="@dimen/voice_sp_11"
-        android:text="# 请对着耳麦说话，测试实时耳返延时"
+        android:text="请对着耳麦说话，测试实时耳返延时"
         android:textColor="@color/voice_color_979cbb"
         app:layout_constraintStart_toStartOf="@+id/cvPing"
         app:layout_constraintTop_toBottomOf="@+id/tvPingTitle" />
@@ -272,7 +272,7 @@
         android:layout_marginTop="20dp"
         android:textColor="#6d7291"
         android:gravity="center"
-        android:text="105ms"
+        android:text="60ms"
         app:layout_constraintStart_toStartOf="@id/cvPing"
         app:layout_constraintEnd_toEndOf="@+id/cvPing"
         app:layout_constraintTop_toBottomOf="@+id/tvPingInfo" />
@@ -286,8 +286,8 @@
         android:layout_marginRight="28dp"
         style="@android:style/Widget.ProgressBar.Horizontal"
         android:progressDrawable="@drawable/voice_ear_back_ping_progress"
-        android:max="200"
-        android:progress="105"
+        android:max="150"
+        android:progress="60"
         app:layout_constraintEnd_toEndOf="@+id/cvPing"
         app:layout_constraintTop_toBottomOf="@+id/tvPing"
         />

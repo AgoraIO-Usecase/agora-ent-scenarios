@@ -53,7 +53,7 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
         binding?.rvMusicList?.layoutManager = layout
         adapter.setOnClickItemAction { music ->
             setPlayOn(true)
-            AgoraRtcEngineController.get().bgmManager.loadMusic(music)
+            AgoraRtcEngineController.get().bgmManager().loadMusic(music)
             adapter.updateSelected(music)
             binding?.tvMusic?.text = music.name
             binding?.tvSinger?.text = music.singer
@@ -61,7 +61,11 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
         binding?.rvMusicList?.adapter = adapter
     }
     private fun setupView() {
-        val bgmManager = AgoraRtcEngineController.get().bgmManager
+        val bgmManager = AgoraRtcEngineController.get().bgmManager()
+        bgmManager.bgm?.let { music ->
+            binding?.tvMusic?.text = music.name
+            binding?.tvSinger?.text = music.singer
+        }
         // 原唱伴唱
         if (bgmManager.params.isSingerOn) {
             binding?.ivSinging?.setImageResource(R.drawable.voice_icon_bgm_sing_on)
@@ -84,7 +88,7 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
             binding?.ivPlay?.setImageResource(R.drawable.voice_icon_bgm_play)
         }
         binding?.ivPlay?.setOnClickListener {
-            val toState = !AgoraRtcEngineController.get().bgmManager.params.isAutoPlay
+            val toState = !AgoraRtcEngineController.get().bgmManager().params.isAutoPlay
             setPlayOn(toState)
         }
         binding?.ivNext?.setOnClickListener {
@@ -104,10 +108,10 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
             }
         }
         binding?.slVolume?.max = 100
-        binding?.slVolume?.progress = AgoraRtcEngineController.get().bgmManager.params.volume
+        binding?.slVolume?.progress = AgoraRtcEngineController.get().bgmManager().params.volume
         binding?.slVolume?.setOnSeekBarChangeListener(object: OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-                AgoraRtcEngineController.get().bgmManager.setVolume(p1)
+                AgoraRtcEngineController.get().bgmManager().setVolume(p1)
             }
             override fun onStartTrackingTouch(p0: SeekBar?) {
 
@@ -118,23 +122,27 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
         })
     }
     private fun fetchData() {
-        val bgmManager = AgoraRtcEngineController.get().bgmManager
+        val bgmManager = AgoraRtcEngineController.get().bgmManager()
         bgmManager.fetchBGMList { list ->
             binding?.rvMusicList?.post {
-                adapter.updateDataSource(list?.toList() ?: listOf())
                 binding?.tvDialogTitle?.text = "背景音乐(${list?.size ?: 0})"
-                AgoraRtcEngineController.get().bgmManager.setAutoPlay(false)
-                list?.firstOrNull()?.let { music ->
-                    AgoraRtcEngineController.get().bgmManager.loadMusic(music)
-                    adapter.updateSelected(music)
-                    binding?.tvMusic?.text = music?.name ?: ""
-                    binding?.tvSinger?.text = music?.singer ?: ""
+                adapter.updateDataSource(list?.toList() ?: listOf())
+                if (bgmManager.bgm == null) {
+                    list?.firstOrNull()?.let { music ->
+                        bgmManager.setAutoPlay(false)
+                        bgmManager.loadMusic(music)
+                        adapter.updateSelected(music)
+                        binding?.tvMusic?.text = music?.name ?: ""
+                        binding?.tvSinger?.text = music?.singer ?: ""
+                    }
+                } else {
+                    adapter.updateSelected(bgmManager.bgm)
                 }
             }
         }
     }
     private fun setPlayOn(isOn: Boolean) {
-        AgoraRtcEngineController.get().bgmManager.setAutoPlay(isOn)
+        AgoraRtcEngineController.get().bgmManager().setAutoPlay(isOn)
         if (isOn) {
             binding?.ivPlay?.setImageResource(R.drawable.voice_icon_bgm_pause)
         } else {

@@ -11,9 +11,7 @@ import androidx.core.view.isVisible
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogAudioSettingBinding
 import io.agora.scene.voice.model.constructor.RoomAudioSettingsConstructor
-import io.agora.scene.voice.rtckit.AgoraBGMManager
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
-import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.constant.ConfigConstants.DISABLE_ALPHA
 import io.agora.voice.common.constant.ConfigConstants.ENABLE_ALPHA
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
@@ -72,7 +70,6 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             updateBGMView()
             updateEarBackState()
 
-            tvBGMArrow.text = AgoraRtcEngineController.get().bgmManager.bgm?.name ?: ""
             mcbAgoraBot.setOnCheckedChangeListener { button, isChecked ->
                 if (!button.isPressed) return@setOnCheckedChangeListener
                 "isChecked：$isChecked".logD("mcbAgoraBot")
@@ -96,7 +93,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
                 audioSettingsListener?.onAGC(audioSettingsInfo.isAIAGCOn, audioSettingsInfo.enable)
             }
             tvInEarArrow.setOnClickListener {
-                audioSettingsListener?.onEarBackSetting(audioSettingsInfo.isEarBckOn)
+                audioSettingsListener?.onEarBackSetting()
             }
             tvBGMArrow.setOnClickListener {
                 audioSettingsListener?.onBGMSetting()
@@ -149,11 +146,16 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
     }
 
     fun updateBGMView() {
-        binding?.tvBGMArrow?.text = AgoraRtcEngineController.get().bgmManager.bgm?.name ?: ""
+        val music = AgoraRtcEngineController.get().bgmManager().bgm
+        if (music != null) {
+            binding?.tvBGMArrow?.text = "${music.name}-${music.singer}"
+        } else {
+            binding?.tvBGMArrow?.text = ""
+        }
     }
 
     fun updateEarBackState() {
-        if (AgoraRtcEngineController.get().earBackManager.params.isOn) {
+        if (AgoraRtcEngineController.get().earBackManager().params.isOn) {
             binding?.tvInEarArrow?.text = view?.context?.getString(R.string.voice_chatroom_on)
         } else {
             binding?.tvInEarArrow?.text = view?.context?.getString(R.string.voice_chatroom_off)
@@ -196,7 +198,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
         fun onAGC(isOn: Boolean, isEnable: Boolean)
 
         /**耳返设置*/
-        fun onEarBackSetting(isOn: Boolean)
+        fun onEarBackSetting()
 
         /** BGM 设置*/
         fun onBGMSetting()
