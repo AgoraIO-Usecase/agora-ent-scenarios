@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -33,7 +34,9 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.agora.karaoke_view.v11.KaraokeEvent;
 import io.agora.karaoke_view.v11.KaraokeView;
@@ -146,6 +149,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.ivJoinChorusBtn.setOnClickListener(this);
         mBinding.ilActive.ivLeaveChorus.setOnClickListener(this);
         mBinding.ilActive.downloadLrcFailedBtn.setOnClickListener(this);
+
+        mBinding.ilActive.btnVocalHighlight.setOnClickListener(this);
+        mBinding.ilActive.btnVocalHighlight.bringToFront();
 
         mKaraokeView.setKaraokeEvent(new KaraokeEvent() {
             @Override
@@ -620,6 +626,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             } else {
                 downloadAndSetLrcData();
             }
+        } else if (v == mBinding.ilActive.btnVocalHighlight) {
+            if (mOnKaraokeActionListener != null) {
+                mOnKaraokeActionListener.onVocalHighlightClick();
+            }
         }
     }
 
@@ -778,6 +788,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         }
 
         default void onReGetLrcUrl() {
+        }
+
+        default void onVocalHighlightClick() {
+
         }
     }
 }

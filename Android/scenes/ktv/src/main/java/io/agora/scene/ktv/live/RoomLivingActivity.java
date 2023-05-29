@@ -319,6 +319,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 super.onChangeMusicClick();
                 showChangeMusicDialog();
             }
+
+            @Override
+            public void onVocalHighlightClick() {
+                super.onVocalHighlightClick();
+                showVoiceHighlightDialog();
+            }
         };
         getBinding().lrcControlView.setOnLrcClickListener(lrcActionListenerImpl);
         getBinding().cbVideo.setOnCheckedChangeListener((compoundButton, b) -> {
@@ -752,7 +758,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     private boolean showVoiceHighlightDialogTag = false;
-    private void showVoiceHighlightDialog(View view) {
+    private void showVoiceHighlightDialog() {
         if (showVoiceHighlightDialogTag) {
             return;
         }

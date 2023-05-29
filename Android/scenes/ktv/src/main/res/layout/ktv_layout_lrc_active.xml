@@ -9,6 +9,16 @@
     tools:theme="@style/Theme.MaterialComponents.Light">
 
     <TextView
+        android:id="@+id/btnVocalHighlight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="突出人声"
+        android:textColor="@color/white_60_percent"
+        app:layout_constraintTop_toBottomOf="@+id/scoringView"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
         android:id="@+id/downloadLrcFailedView"
         android:layout_width="match_parent"
         android:layout_height="40dp"
