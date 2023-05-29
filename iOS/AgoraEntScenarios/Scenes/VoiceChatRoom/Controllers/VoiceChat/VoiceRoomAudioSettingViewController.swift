@@ -19,7 +19,17 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     public var tableView: UITableView = .init()
     public var isAudience: Bool = false
     public var isPrivate: Bool = false
-    public var isTouchAble: Bool = false
+    public var isTouchAble: Bool = false {
+        willSet {
+            self.detailVC?.isTouchAble = newValue
+        }
+    }
+    var selTag: Int? {
+        willSet {
+            self.detailVC?.selTag = newValue
+        }
+    }
+    weak var detailVC: VoiceRoomAudioSettingDetailViewController?
     private let swIdentifier = "switch"
     private let slIdentifier = "slider"
     private let nIdentifier = "normal"
@@ -115,11 +125,12 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
+//        VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
     }
     
     private func layoutUI() {
-
+        navigation.back.isHidden = true
+        
         let path = UIBezierPath(roundedRect: self.view.bounds, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 20.0, height: 20.0))
         let layer = CAShapeLayer()
         layer.path = path.cgPath
@@ -181,7 +192,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         } else if section == 1 {
             return 2
         } else {
-            return 2
+            return roomInfo?.room?.owner?.uid == VLUserCenter.user.id ? 2 : 1
         }
     }
 
@@ -394,16 +405,16 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 var inEar_volume = Double((roomInfo?.room?.inEar_volume ?? 0)) / 100.0
                 var inEarMode = roomInfo?.room?.inEarMode ?? ""
                 let actionView = ActionSheetManager()
-                let earModes = ["自动", "强制OpenSL", "强制Oboe"]
+                let earModes = ["自动".show_localized, "强制OpenSL".show_localized, "强制Oboe".show_localized]
                 var inEarModeIndex = earModes.firstIndex(where: { $0 == inEarMode }) ?? 0
                 let hasHeadset = HeadSetUtil.hasHeadset()
                 let tipsTextColor = hasHeadset ? UIColor(hex: "#979CBB") : UIColor(hex: "#FF1216")
-                let tipsText = hasHeadset ? "开启耳返可实时听到自己的声音, 唱歌的时候及时调整" : "使用耳返必须插入耳机，当前未检测到耳机"
-                actionView.title(title: "耳返")
-                    .switchCell(title: "开启耳返", isOn: isOn, isEnabel: hasHeadset)
+                let tipsText = hasHeadset ? "开启耳返可实时听到自己的声音, 唱歌的时候及时调整".show_localized : "使用耳返必须插入耳机，当前未检测到耳机".show_localized
+                actionView.title(title: "耳返".show_localized)
+                    .switchCell(title: "开启耳返".show_localized, isOn: isOn, isEnabel: hasHeadset)
                     .tipsCell(iconName: "inEra_tips_icon", title: tipsText, titleColor: tipsTextColor)
-                    .sectionHeader(title: "耳返设置", desc: nil)
-                    .sliderCell(title: "耳返音量", value: inEar_volume, isEnable: isOn)
+                    .sectionHeader(title: "耳返设置".show_localized, desc: nil)
+                    .sliderCell(title: "耳返音量".show_localized, value: inEar_volume, isEnable: isOn)
 //                    .segmentCell(title: "耳返模式", items: earModes, selectedIndex: inEarModeIndex, isEnable: isOn)
 //                    .customCell(customView: inEarView, viewHeight: 150)
                     .config()
@@ -425,7 +436,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 }
                 actionView.didSegmentValueChangeClosure = { [weak self] indexPath, mode, index in
                     guard let self = self else { return }
-                    self.showCustomAlert(title: "提示", message: "切换后将强制使用\(mode)模式,确认?", confirm: {
+                    self.showCustomAlert(title: "提示".show_localized, message: String(format: "切换后将强制使用%@模式,确认?".show_localized, mode), confirm: {
                         inEarModeIndex = earModes.firstIndex(where: { $0 == mode }) ?? 0
                         self.roomInfo?.room?.inEarMode = mode
                         inEarMode = mode
@@ -461,6 +472,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         }
         tableViewHeight = heightType.rawValue - 70
         let detailVC: VoiceRoomAudioSettingDetailViewController = VoiceRoomAudioSettingDetailViewController()
+        self.detailVC = detailVC
         detailVC.roomInfo = roomInfo
         detailVC.isAudience = isAudience
         detailVC.soundEffect = roomInfo?.room?.sound_effect ?? 1

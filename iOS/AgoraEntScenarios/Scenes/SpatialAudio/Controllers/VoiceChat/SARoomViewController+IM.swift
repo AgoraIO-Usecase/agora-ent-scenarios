@@ -314,9 +314,9 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                     let cp_uid: String = first.member?.uid ?? ""
                     if local_uid == cp_uid {
                         local_index = mic_index
-                        self.rtckit.setClientRole(role: (isOwner || status == 0) ? .owner : .audience)
+                        self.rtckit.setClientRole(role: (isOwner || seatUser?.status == 0) ? .owner : .audience)
                         //如果当前是0的状态  就设置成主播
-                        self.rtckit.muteLocalAudioStream(mute: status != 0)
+                        self.rtckit.muteLocalAudioStream(mute: seatUser?.status != 0)
                     }
                 } else {
                     if local_index == nil || mic_index == local_index {

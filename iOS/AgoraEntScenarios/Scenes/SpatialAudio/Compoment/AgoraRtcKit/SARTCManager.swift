@@ -307,7 +307,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
         let localSpatialConfig = AgoraLocalSpatialAudioConfig()
         localSpatialConfig.rtcEngine = rtcKit
         localSpatial = AgoraLocalSpatialAudioKit.sharedLocalSpatialAudio(with: localSpatialConfig)
-        localSpatial?.muteLocalAudioStream(false)
+//        localSpatial?.muteLocalAudioStream(false)
 //        localSpatial?.muteAllRemoteAudioStreams(false)
         localSpatial?.setAudioRecvRange(recvRange)
         localSpatial?.setMaxAudioRecvCount(6)

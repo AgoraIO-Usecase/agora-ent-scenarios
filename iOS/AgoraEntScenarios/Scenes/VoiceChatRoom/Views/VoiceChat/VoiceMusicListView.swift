@@ -31,7 +31,7 @@ class VoiceMusicListView: UIView {
     }()
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "背景音乐"
+        label.text = "背景音乐".show_localized
         label.textColor = UIColor(hex: "#040925", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 16)
         return label
@@ -41,6 +41,7 @@ class VoiceMusicListView: UIView {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.separatorColor = .gray.withAlphaComponent(0.1)
         tableView.register(VoiceMusicListCell.self, forCellReuseIdentifier: "cell")
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
@@ -97,6 +98,7 @@ class VoiceMusicListView: UIView {
                 }
                 return model
             })
+            self.titleLabel.text = "背景音乐".show_localized + "(\(list.count))"
             if !self.musicList.isEmpty && self.currentMusic == nil {
                 self.musicToolView.setupMusicInfo(model: self.musicList[0], isOrigin: self.isOrigin)
             }
@@ -157,6 +159,7 @@ class VoiceMusicListView: UIView {
             rtcKit?.playMusic(songCode: model.songCode)
             tableView.reloadData()
             backgroundMusicPlaying?(model)
+            musicToolView.setupMusicInfo(model: model, isOrigin: isOrigin)
             currentIndex += 1
         } else {
             currentIndex += 1
@@ -166,6 +169,8 @@ class VoiceMusicListView: UIView {
             rtcKit?.playMusic(songCode: model.songCode)
             tableView.reloadData()
             backgroundMusicPlaying?(model)
+            musicToolView.setupMusicInfo(model: model, isOrigin: isOrigin)
+            tableView.scrollToRow(at: IndexPath(row: currentIndex, section: 0), at: .middle, animated: true)
         }
     }
     
@@ -190,13 +195,13 @@ class VoiceMusicListView: UIView {
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         layer.masksToBounds = true
         
+        addSubview(lineView)
+        lineView.addSubview(titleLabel)
         addSubview(backButton)
         backButton.translatesAutoresizingMaskIntoConstraints = false
         backButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
-        backButton.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
+        backButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
         
-        addSubview(lineView)
-        lineView.addSubview(titleLabel)
         lineView.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
@@ -265,7 +270,7 @@ extension VoiceMusicListView: UITableViewDataSource, UITableViewDelegate {
 class VoiceMusicListCell: UITableViewCell {
     private lazy var songTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "孤单心事"
+        label.text = ""
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -273,7 +278,7 @@ class VoiceMusicListCell: UITableViewCell {
     }()
     private lazy var singerLabeL: UILabel = {
         let label = UILabel()
-        label.text = "梁雨"
+        label.text = ""
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.systemFont(ofSize: 11)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -319,6 +324,7 @@ class VoiceMusicListCell: UITableViewCell {
         statusImageView.image = UIImage.sd_animatedGIF(with: gifData)
         statusImageView.isHidden = !model.isPlaying
         songTitleLabel.textColor = model.isPlaying ? UIColor(hexString: "#0A7AFF") : UIColor(hexString: "#3C4267")
+        songTitleLabel.font = model.isPlaying ? .boldSystemFont(ofSize: 14) : .systemFont(ofSize: 14)
         singerLabeL.textColor = songTitleLabel.textColor
         indicatorView.isHidden = !model.isDownload
         model.isDownload ? indicatorView.startAnimating() : indicatorView.stopAnimating()
@@ -361,7 +367,7 @@ class VoiceMusicToolView: UIView {
     }()
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "孤单心事"
+        label.text = "-"
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 15)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -369,7 +375,7 @@ class VoiceMusicToolView: UIView {
     }()
     private lazy var singerLabeL: UILabel = {
         let label = UILabel()
-        label.text = "颜人中"
+        label.text = "-"
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.systemFont(ofSize: 13)
         label.translatesAutoresizingMaskIntoConstraints = false
