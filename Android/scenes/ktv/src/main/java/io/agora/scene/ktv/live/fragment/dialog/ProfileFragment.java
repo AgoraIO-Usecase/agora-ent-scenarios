@@ -11,7 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import io.agora.scene.base.component.BaseViewBindingFragment;
+import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.FragmentProfileBinding;
+import io.agora.scene.ktv.live.RoomLivingActivity;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 
 public class ProfileFragment extends BaseViewBindingFragment<FragmentProfileBinding> {
@@ -40,24 +42,38 @@ public class ProfileFragment extends BaseViewBindingFragment<FragmentProfileBind
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSetting.setProfessionalMode(isChecked);
+                if (isChecked) {
+                    getBinding().vSettingMark.setVisibility(View.INVISIBLE);
+                } else {
+                    getBinding().vSettingMark.setVisibility(View.VISIBLE);
+                    getBinding().vSettingMark.setOnClickListener(v -> {});
+                }
             }
         });
         getBinding().cbStartProfessionalMode.setChecked(mSetting.getProfessionalMode());
+        if (mSetting.getProfessionalMode()) {
+            getBinding().vSettingMark.setVisibility(View.INVISIBLE);
+        } else {
+            getBinding().vSettingMark.setVisibility(View.VISIBLE);
+            getBinding().vSettingMark.setOnClickListener(v -> {});
+        }
 
-        getBinding().spAEC.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (mSetting.getAECLevel() != position) {
-                    mSetting.setAECLevel(position);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+        if (this.mSetting.getAECLevel() == 0) {
+            getBinding().rgVoiceMode.check(R.id.tvModeLow);
+        } else if (this.mSetting.getAECLevel() == 1) {
+            getBinding().rgVoiceMode.check(R.id.tvModeMiddle);
+        } else {
+            getBinding().rgVoiceMode.check(R.id.tvModeHigh);
+        }
+        getBinding().rgVoiceMode.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.tvModeLow) {
+                mSetting.setAECLevel(0);
+            } else if (checkedId == R.id.tvModeMiddle) {
+                mSetting.setAECLevel(1);
+            } else {
+                mSetting.setAECLevel(2);
             }
         });
-        getBinding().spAEC.setSelection(mSetting.getAECLevel());
 
         getBinding().cbLowLatency.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -66,5 +82,9 @@ public class ProfileFragment extends BaseViewBindingFragment<FragmentProfileBind
             }
         });
         getBinding().cbLowLatency.setChecked(mSetting.getLowLatencyMode());
+
+        getBinding().ivBackIcon.setOnClickListener(view -> {
+            ((RoomLivingActivity) requireActivity()).closeMenuDialog();
+        });
     }
 }

@@ -130,7 +130,7 @@
         android:layout_marginBottom="20dp"
         android:button="@null"
         android:checked="true"
-        android:drawableStart="@drawable/bg_cb_mic_status"
+        android:background="@drawable/ktv_cb_mic_status"
         android:padding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -142,7 +142,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginBottom="20dp"
         android:button="@null"
-        android:drawableStart="@drawable/bg_cb_video_status"
+        android:background="@drawable/ktv_cb_camera_status"
         android:padding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/cbMic" />
@@ -153,25 +153,10 @@
         android:layout_height="38dp"
         android:layout_marginStart="5dp"
         android:layout_marginBottom="20dp"
-        android:background="@null"
         android:padding="5dp"
-        android:src="@mipmap/ic_more"
+        android:background="@mipmap/ktv_ic_vocal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/cbVideo"
-        tools:ignore="SpeakableTextPresentCheck" />
-
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/btnVocal"
-        android:layout_width="38dp"
-        android:layout_height="38dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginBottom="20dp"
-        android:background="@null"
-        android:padding="5dp"
-        android:src="@mipmap/ktv_ic_vocal"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/btnMenu"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <androidx.appcompat.widget.AppCompatImageView

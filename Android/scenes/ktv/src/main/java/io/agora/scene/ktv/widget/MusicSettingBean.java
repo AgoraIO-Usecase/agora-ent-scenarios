@@ -2,7 +2,7 @@ package io.agora.scene.ktv.widget;
 
 public class MusicSettingBean {
     private final MusicSettingDialog.Callback mCallback;
-    private boolean isEar;
+    private EarPhoneCallback mEarPhoneCallback;
     private int volMic;
     private int volMusic;
     private int effect;
@@ -15,6 +15,13 @@ public class MusicSettingBean {
     private int aecLevel = 1; // 0(16K),1(24K),2(48K)
     private boolean lowLatencyMode = false;  // 低延时模式
 
+    // 耳返设置
+    private boolean isEar; // 耳返开关
+    private int earBackVolume = 100; // 耳返音量
+    private int earBackMode = 0; // 耳返模式：0(自动), 1(强制OpenSL), 2(强制Oboe)
+    private boolean hasEarPhone = false; // 是否有耳机
+    private int earBackDelay = 0; // 耳返延迟
+
 
     public MusicSettingBean(boolean isEar, int volMic, int volMusic, int toneValue, MusicSettingDialog.Callback mCallback) {
         this.isEar = isEar;
@@ -26,6 +33,10 @@ public class MusicSettingBean {
 
     public MusicSettingDialog.Callback getCallback() {
         return mCallback;
+    }
+
+    public void setEarPhoneCallback(EarPhoneCallback callback) {
+        this.mEarPhoneCallback = callback;
     }
 
     public boolean isEar() {
@@ -122,5 +133,49 @@ public class MusicSettingBean {
     public void setLowLatencyMode(boolean mode) {
         this.lowLatencyMode = mode;
         this.mCallback.onLowLatencyModeChanged(mode);
+    }
+
+    public int getEarBackVolume() {
+        return earBackVolume;
+    }
+    public void setEarBackVolume(int volume) {
+        this.earBackVolume = volume;
+        this.mCallback.onEarBackVolumeChanged(volume);
+    }
+
+    public int getEarBackMode() {
+        return earBackMode;
+    }
+
+    public void setEarBackMode(int mode) {
+        this.earBackMode = mode;
+        this.mCallback.onEarBackModeChanged(mode);
+    }
+
+    public boolean hasEarPhone() {
+        return hasEarPhone;
+    }
+
+    public void setHasEarPhone(boolean hasEarPhone) {
+        this.hasEarPhone = hasEarPhone;
+        if (mEarPhoneCallback != null) {
+            mEarPhoneCallback.onHasEarPhoneChanged(hasEarPhone);
+        }
+    }
+
+    public int getEarBackDelay() {
+        return earBackDelay;
+    }
+
+    public void setEarBackDelay(int earBackDelay) {
+        this.earBackDelay = earBackDelay;
+        if (mEarPhoneCallback != null) {
+            mEarPhoneCallback.onEarMonitorDelay(earBackDelay);
+        }
+    }
+
+    public interface EarPhoneCallback {
+        void onHasEarPhoneChanged(boolean hasEarPhone);
+        void onEarMonitorDelay(int earsBackDelay);
     }
 }
