@@ -17,6 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.Error
+import io.agora.musiccontentcenter.Music
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.voice.R
@@ -28,6 +29,8 @@ import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.*
 import io.agora.scene.voice.model.constructor.RoomInfoConstructor.convertByVoiceRoomModel
+import io.agora.scene.voice.rtckit.AgoraBGMStateListener
+import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.service.VoiceRoomServiceKickedReason
 import io.agora.scene.voice.service.VoiceRoomSubscribeDelegate
 import io.agora.scene.voice.service.VoiceServiceProtocol
@@ -186,6 +189,18 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                             }
                         }
                     )
+
+                    AgoraRtcEngineController.get().setStateListener(object: AgoraBGMStateListener {
+                        override fun onPlayStateChanged(isPlay: Boolean) {
+                            val visible = if (isPlay) View.VISIBLE else View.INVISIBLE
+                            binding.ivBGM.visibility = visible
+                            binding.tvBGM.visibility = visible
+                        }
+                        override fun onMusicChanged(music: Music?) {
+                            val m = music ?: return
+                            binding.tvBGM.text = "${m.name}-${m.singer}"
+                        }
+                    })
                 }
 
                 override fun onError(code: Int, message: String?) {

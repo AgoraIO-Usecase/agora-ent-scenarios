@@ -484,8 +484,8 @@ class RoomObservableViewDelegate constructor(
                 override fun onAGC(isOn: Boolean, isEnable: Boolean) {
                     onAIAGCDialog(isOn)
                 }
-                override fun onEarBackSetting(isOn: Boolean) {
-                    onEarBackSettingDialog(isOn)
+                override fun onEarBackSetting() {
+                    onEarBackSettingDialog()
                 }
                 override fun onBGMSetting() {
                     onBGMSettingDialog()
@@ -644,8 +644,9 @@ class RoomObservableViewDelegate constructor(
     }
     /** 耳返设置弹框
      */
-    fun onEarBackSettingDialog(isOn: Boolean) {
+    fun onEarBackSettingDialog() {
         val dialog = RoomEarBackSettingSheetDialog()
+        dialog.setFragmentManager(activity.supportFragmentManager)
         dialog.setOnEarBackStateChange {
             roomAudioSettingDialog?.updateEarBackState()
         }

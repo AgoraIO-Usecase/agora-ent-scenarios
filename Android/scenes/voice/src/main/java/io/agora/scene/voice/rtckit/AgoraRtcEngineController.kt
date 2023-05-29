@@ -4,6 +4,7 @@ import android.content.Context
 import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
+import io.agora.musiccontentcenter.Music
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.TokenGenerator
@@ -16,6 +17,11 @@ import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
+
+interface AgoraBGMStateListener {
+    fun onPlayStateChanged(isPlay: Boolean)
+    fun onMusicChanged(music: Music?)
+}
 
 /**
  * @author create by zhangwei03
@@ -38,18 +44,9 @@ class AgoraRtcEngineController {
 
     private var mLocalUid = 0
 
-    val bgmManager by lazy {
-        AgoraBGMManager(
-            rtcEngine!!,
-            VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(),
-            mLocalUid,
-            mRtmToken
-        )
-    }
+    private var mBgmManager: AgoraBGMManager? = null
 
-    val earBackManager by lazy {
-        AgoraEarBackManager(rtcEngine!!)
-    }
+    private var mEarBackManager: AgoraEarBackManager? = null
 
     private var mRtmToken = ""
 
@@ -57,6 +54,11 @@ class AgoraRtcEngineController {
 
     fun setMicVolumeListener(micVolumeListener: RtcMicVolumeListener) {
         this.micVolumeListener = micVolumeListener
+    }
+
+    private var mBGMStateListener: AgoraBGMStateListener? = null
+    fun setStateListener(listener: AgoraBGMStateListener) {
+        mBGMStateListener = listener
     }
 
     private var joinCallback: VRValueCallBack<Boolean>? = null
@@ -88,6 +90,31 @@ class AgoraRtcEngineController {
                 joinCallback?.onError(Constants.ERR_FAILED, "get token error")
             }
         )
+    }
+
+    fun bgmManager(): AgoraBGMManager {
+        if (mBgmManager == null) {
+            mBgmManager = AgoraBGMManager(
+                rtcEngine!!,
+                VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(),
+                mLocalUid,
+                mRtmToken
+            )
+            mBgmManager?.setOnMusicChanged {
+                mBGMStateListener?.onMusicChanged(mBgmManager?.bgm)
+            }
+            mBgmManager?.setOnPlayStateChanged {
+                mBGMStateListener?.onPlayStateChanged(mBgmManager?.params?.isAutoPlay ?: false)
+            }
+        }
+        return mBgmManager!!
+    }
+
+    fun earBackManager(): AgoraEarBackManager {
+        if (mEarBackManager == null) {
+            mEarBackManager = AgoraEarBackManager(rtcEngine!!)
+        }
+        return mEarBackManager!!
     }
 
     private fun initRtcEngine(context: Context): Boolean {
@@ -144,6 +171,10 @@ class AgoraRtcEngineController {
                             }
                         }
                     }
+                }
+
+                override fun onLocalAudioStats(stats: LocalAudioStats?) {
+                    mEarBackManager?.updateDelay(stats?.earMonitorDelay ?: 0)
                 }
             }
             // 加载ai 降噪so
@@ -370,6 +401,10 @@ class AgoraRtcEngineController {
 
     fun destroy() {
         VoiceBuddyFactory.get().rtcChannelTemp.reset()
+
+        mBgmManager?.release()
+        mBgmManager = null
+
         if (mediaPlayer != null) {
             mediaPlayer?.unRegisterPlayerObserver(firstMediaPlayerObserver)
             mediaPlayer?.destroy()
