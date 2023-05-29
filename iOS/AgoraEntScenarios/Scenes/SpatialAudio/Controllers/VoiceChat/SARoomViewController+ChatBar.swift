@@ -241,6 +241,12 @@ extension SARoomViewController {
        // chatBar.refresh(event: .mic, state: chatBar.micState ? .selected : .unSelected, asCreator: false)
         // 需要根据麦位特殊处理
         chatBar.micState == true ? muteLocal(with: idx) : unmuteLocal(with: idx)
+        if let index = AppContext.saTmpServiceImp().mics.firstIndex(where: { $0.member?.uid == VLUserCenter.user.id }) {
+            let model = AppContext.saTmpServiceImp().mics[index]
+            model.status = chatBar.micState == true ? 1 : 0
+            AppContext.saTmpServiceImp().mics[index] = model
+        }
+        
         rtckit.muteLocalAudioStream(mute: chatBar.micState)
     }
 

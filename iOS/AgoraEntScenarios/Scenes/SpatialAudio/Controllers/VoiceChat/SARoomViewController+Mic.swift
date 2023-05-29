@@ -75,7 +75,7 @@ extension SARoomViewController {
             guard let self = self else {return}
             if error == nil,let mic = mic {
                 self.sRtcView.updateUser(mic)
-                self.rtckit.setClientRole(role: .audience)
+                self.rtckit.muteLocalAudioStream(mute: true)
                 self.local_index = nil
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: self.isOwner)
                 self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: self.isOwner)
@@ -91,7 +91,6 @@ extension SARoomViewController {
             guard let self = self else {return}
             if error == nil,let mic = mic {
                 self.chatBar.refresh(event: .mic, state: .selected, asCreator: false)
-                self.rtckit.muteLocalAudioStream(mute: true)
                 self.sRtcView.updateUser(mic)
             } else {
                 self.view.makeToast("\(error?.localizedDescription ?? "")",point: self.toastPoint, title: nil, image: nil, completion: nil)
@@ -116,7 +115,6 @@ extension SARoomViewController {
             guard let self = self else {return}
             if error == nil,let mic = mic {
                 self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
-                self.rtckit.muteLocalAudioStream(mute: false)
                 self.sRtcView.updateUser(mic)
             }
         }
@@ -142,7 +140,6 @@ extension SARoomViewController {
                 guard let mic = AppContext.saTmpServiceImp().mics.first(where: {
                                     SAUserInfo.shared.user?.chat_uid ?? "" == $0.member?.chat_uid ?? ""
                                 }) else { return }
-                self.rtckit.setClientRole(role: mic.status == 0 ? .owner : .audience)
                 self.rtckit.muteLocalAudioStream(mute: mic.status != 0)
             }
         }
@@ -186,7 +183,6 @@ extension SARoomViewController {
             if error == nil,let mic = mic {
                 self.sRtcView.updateUser(mic)
                 self.local_index = mic.mic_index
-                self.rtckit.setClientRole(role: .owner)
                 self.chatBar.refresh(event: .handsUp, state: .disable, asCreator: self.isOwner)
                 self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: self.isOwner)
                 self.rtckit.muteLocalAudioStream(mute: mic.status != 0)
