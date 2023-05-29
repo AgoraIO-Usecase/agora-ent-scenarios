@@ -54,15 +54,50 @@ class KeyCenter: NSObject {
 
     static var Token: String? = nil
     
-    static var HostUrl: String = "https://gateway-fulldemo-staging.agoralab.co"
+    /**
+     EaseMob APPKEY.
+     The application name filled in when creating an application on the EaseMob  console.
+     If you need to use Chat Room, you must to set this parameter.
+     Please refer to the information on obtaining instant messaging IM from EaseMob for more information(http://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E8%8E%B7%E5%8F%96%E7%8E%AF%E4%BF%A1%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF-im-%E7%9A%84%E4%BF%A1%E6%81%AF).
+     环信APPKEY
+     在环信即时通讯云控制台创建应用时填入的应用名称。
+     如需使用语聊房场景，需要设置该参数。
+     详见获取环信即时通讯IM的信息(http://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E8%8E%B7%E5%8F%96%E7%8E%AF%E4%BF%A1%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF-im-%E7%9A%84%E4%BF%A1%E6%81%AF)。
+     */
     
     static var IMAppKey: String? = ""
+    
+    /**
+     EaseMob Client ID.
+     Client id of EaseMob, used to generate app tokens to call REST API.
+     If you need to use Chat Room, you must to set this parameter.
+     Please refer to the information on obtaining instant messaging IM from EaseMob for more information( https://console.easemob.com/user/login/ ).
+     环信Client ID
+     环信的 client id，用于生成 app token 调用 REST API。
+     如需使用语聊房场景，需要设置该参数。
+     详见 环信即时通讯云控制台(https://console.easemob.com/user/login/)的应用详情页面。
+     */
+    
     static var IMClientId: String? = ""
+    
+    /**
+     EaseMob Client Secret.
+     Client Secret of EaseMob, used to generate app tokens to call REST API.
+     If you need to use Chat Room, you must to set this parameter.
+     Please refer to the information on obtaining instant messaging IM from EaseMob for more information( https://console.easemob.com/user/login/ ).
+     环信Client Secret
+     App 的 client_secret，用于生成 app token 调用 REST API。
+     如需使用语聊房场景，需要设置该参数。
+     详见 环信即时通讯云控制台( https://console.easemob.com/user/login/ )的应用详情页面。
+     */
+    
     static var IMClientSecret: String? = ""
   
+    
     static let CloudPlayerKey: String? = nil
     static let CloudPlayerSecret: String? = nil
-
+    
+    static var HostUrl: String = "https://gateway-fulldemo-staging.agoralab.co"
     static var baseServerUrl: String? = "https://toolbox.bj2.agoralab.co/v1/"
     static var onlineBaseServerUrl: String? = baseServerUrl
 
