@@ -57,11 +57,7 @@ class SpatialAudioSyncSerciceImp: NSObject {
     fileprivate var roomId: String?
     fileprivate var roomList: [SARoomEntity] = [SARoomEntity]()
     fileprivate var syncUtilsInited: Bool = false
-    public var mics: [SARoomMic] = [SARoomMic]() {
-        didSet {
-            print("===")
-        }
-    }
+    public var mics: [SARoomMic] = [SARoomMic]() 
     public var userList: [SAUser] = [SAUser]()
     public var micApplys: [SAApply] = [SAApply]()
     private var robotInfo: SARobotAudioInfo?
