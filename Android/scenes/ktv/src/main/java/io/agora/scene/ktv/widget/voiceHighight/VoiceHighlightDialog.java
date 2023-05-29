@@ -38,8 +38,8 @@ public class VoiceHighlightDialog extends BaseBottomSheetDialogFragment<KtvDialo
 
         mRecyclerView = view.findViewById(R.id.mRecyclerView);
 
-        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
-        mRecyclerView.addItemDecoration(new DividerDecoration(3));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
+        mRecyclerView.addItemDecoration(new DividerDecoration(4, 24, 8));
         mRecyclerView.setItemAnimator(null);
 
         mListener.onUserListLoad();
