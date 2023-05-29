@@ -253,9 +253,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().ivMore.setOnClickListener(v -> {
             new TopFunctionDialog(RoomLivingActivity.this).show();
         });
-        if (roomLivingViewModel.isRoomOwner()) {
-            getBinding().btnVocal.setVisibility(View.VISIBLE);
-        }
     }
 
     @Override
@@ -308,7 +305,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         });
         getBinding().iBtnChooseSong.setOnClickListener(v -> showChooseSongDialog());
         getBinding().btnMenu.setOnClickListener(this::showMoreDialog);
-        getBinding().btnVocal.setOnClickListener(this::showVoiceHighlightDialog);
+        //getBinding().btnVocal.setOnClickListener(this::showVoiceHighlightDialog);
         getBinding().btnOK.setOnClickListener(view -> getBinding().groupResult.setVisibility(View.GONE));
         LrcActionListenerImpl lrcActionListenerImpl = new LrcActionListenerImpl(this, roomLivingViewModel, getBinding().lrcControlView) {
             @Override

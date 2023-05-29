@@ -1147,6 +1147,24 @@ public class RoomLivingViewModel extends ViewModel {
                     KTVLogger.e(TAG, "onStreamMessage:" + exp);
                 }
             }
+
+            @Override
+            public void onAudioRouteChanged(int routing) { // 0\2\5 earPhone
+                super.onAudioRouteChanged(routing);
+                if (mSetting == null) return;
+                if (routing == 0 || routing == 2 || routing == 5) {
+                    mSetting.setHasEarPhone(true);
+                } else {
+                    mSetting.setHasEarPhone(false);
+                }
+            }
+
+            @Override
+            public void onLocalAudioStats(LocalAudioStats stats) {
+                super.onLocalAudioStats(stats);
+                if (mSetting == null) return;
+                mSetting.setEarBackDelay(stats.earMonitorDelay);
+            }
         };
         config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING;
         config.mAudioScenario = Constants.AUDIO_SCENARIO_CHORUS;
@@ -1349,6 +1367,32 @@ public class RoomLivingViewModel extends ViewModel {
             @Override
             public void onLowLatencyModeChanged(boolean enable) {
                 KTVLogger.d(TAG, "onLowLatencyModeChanged: " + enable);
+                if (enable) {
+                    mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\": 0}");
+                    mRtcEngine.setParameters("{\"che.audio.ains_mode\": -1}");
+                    mRtcEngine.setParameters("{\"che.audio.aec.nlp_size\": 128}");
+                    mRtcEngine.setParameters("{\"che.audio.aec.nlp_size\": 64}");
+                } else {
+                    // TODO
+                }
+            }
+
+            @Override
+            public void onEarBackVolumeChanged(int volume) {
+                KTVLogger.d(TAG, "onEarBackVolumeChanged: " + volume);
+                mRtcEngine.setInEarMonitoringVolume(volume);
+            }
+
+            @Override
+            public void onEarBackModeChanged(int mode) {
+                KTVLogger.d(TAG, "onEarBackModeChanged: " + mode);
+                if (mode == 1) {
+                    // OpenSL
+                    mRtcEngine.setParameters("{\"che.audio.opensl.mode\": 0}");
+                } else if (mode == 2) {
+                    // Oboe
+                    mRtcEngine.setParameters("{\"che.audio.oboe.enable\": true}");
+                }
             }
         });
 

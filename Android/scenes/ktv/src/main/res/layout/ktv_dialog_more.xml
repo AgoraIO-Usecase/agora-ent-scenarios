@@ -53,6 +53,7 @@
         android:layout_marginBottom="64dp"
         android:background="@drawable/bg_round_black"
         android:src="@mipmap/ic_bel_canto"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/iBtnProfile"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,6 +65,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/ktv_voice_effect"
         android:textColor="@color/def_text_grey_6c7"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@id/iBtnEffectVoice"
         app:layout_constraintStart_toStartOf="@id/iBtnEffectVoice"
         app:layout_constraintTop_toBottomOf="@id/iBtnEffectVoice" />
@@ -78,7 +80,7 @@
         android:src="@mipmap/ic_beauty_voice"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/iBtnMV"
-        app:layout_constraintStart_toEndOf="@+id/iBtnEffectVoice"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -95,13 +97,11 @@
         android:id="@+id/iBtnMV"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_marginTop="68dp"
         android:background="@drawable/bg_round_black"
         android:src="@mipmap/ic_camera_on"
-        app:layout_constraintBottom_toBottomOf="@id/iBtnEffectVoice"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/iBtnProfile"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/iBtnProfile" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="wrap_content"
