@@ -144,6 +144,7 @@ public class RoomLivingViewModel extends ViewModel {
         GraspStatus status;
         String userId;
         String userName;
+        String headUrl;
     }
     final MutableLiveData<GraspModel> graspStatusMutableLiveData = new MutableLiveData<>();
 
@@ -656,21 +657,12 @@ public class RoomLivingViewModel extends ViewModel {
 
                         if (value != null && value.getWinnerNo() != null && value.getWinnerNo().equals("") && !songPlaying.getWinnerNo().equals("")) {
                             // 所有人更新抢唱结果UI
-                            KTVSingBattleGameService.INSTANCE.getWinnerInfo(
-                                    "scene_singbattle_3.4.0",
-                                    roomInfoLiveData.getValue().getRoomNo(),
-                                    songPlayingLiveData.getValue().getSongNo(),
-                                    (userId, userName) -> {
-                                        KTVLogger.d(TAG, "RoomLivingViewModel.getWinnerInfo() called：" + userId + " success");
-                                        GraspModel model = new GraspModel();
-                                        model.status = GraspStatus.SUCCESS;
-                                        model.userId = songPlaying.getWinnerNo();
-                                        model.userName = userName;
-                                        graspStatusMutableLiveData.postValue(model);
-                                        return null;
-                                    },
-                                    null
-                            );
+                            GraspModel model = new GraspModel();
+                            model.status = GraspStatus.SUCCESS;
+                            model.userId = songPlaying.getWinnerNo();
+                            model.userName = songPlaying.getName();
+                            model.headUrl = songPlaying.getImageUrl();
+                            graspStatusMutableLiveData.postValue(model);
                         }
                     } else {
                         KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() return is emptyList");
@@ -1074,6 +1066,8 @@ public class RoomLivingViewModel extends ViewModel {
                             );
                             rankMap.put(userId, model);
                         }
+                    } else if (jsonMsg.getString("cmd").equals("StartSingBattleCountDown")) {
+                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                     }
                 } catch (JSONException exp) {
                     KTVLogger.e(TAG, "onStreamMessage:" + exp);
@@ -1110,9 +1104,10 @@ public class RoomLivingViewModel extends ViewModel {
                            playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
                            break;
                        case PLAYER_STATE_PLAYING:
-                           playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                           //playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                            if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getWinnerNo().equals("") && isLocal) {
                                ktvApiProtocol.getMediaPlayer().selectAudioTrack(0);
+                               //SyncStartSing();
                            }
                            break;
                        case PLAYER_STATE_PAUSED:
@@ -1341,11 +1336,11 @@ public class RoomLivingViewModel extends ViewModel {
                 UserManager.getInstance().getUser().id.toString(),
                 UserManager.getInstance().getUser().name,
                 songPlayingLiveData.getValue().getSongNo(),
+                UserManager.getInstance().getUser().headUrl,
                 (userId) -> {
                     KTVLogger.d(TAG, "RoomLivingViewModel.graspSong() success " + userId);
-                    //ToastUtils.showToast("抢唱成功");
                     // 更新Service抢唱结果
-                    ktvServiceProtocol.updateSongModel(songPlayingLiveData.getValue().getSongNo(), userId, UserManager.getInstance().getUser().name, e -> {
+                    ktvServiceProtocol.updateSongModel(songPlayingLiveData.getValue().getSongNo(), userId, UserManager.getInstance().getUser().name, UserManager.getInstance().getUser().headUrl, e -> {
                         if (e == null) {
                             KTVLogger.d(TAG, "RoomLivingViewModel.updateSongModel() success " + userId);
                         }
@@ -1555,7 +1550,12 @@ public class RoomLivingViewModel extends ViewModel {
                 ktvApiProtocol.getMediaPlayer().adjustPlayoutVolume(50);
                 ktvApiProtocol.getMediaPlayer().adjustPublishSignalVolume(50);
 
-                //playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getWinnerNo().equals("") && isRoomOwner()) {
+                    SyncStartSing();
+                    playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                } else if (songPlayingLiveData.getValue() != null && !songPlayingLiveData.getValue().getWinnerNo().equals("")) {
+                    playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                }
             }
 
             @Override
@@ -1677,6 +1677,17 @@ public class RoomLivingViewModel extends ViewModel {
                     UserManager.getInstance().getUser().headUrl
             );
             rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
+        }
+    }
+
+    private void SyncStartSing() {
+        if (mRtcEngine == null) return;
+        Map<String, Object> msg = new HashMap<>();
+        msg.put("cmd", "StartSingBattleCountDown");
+        JSONObject jsonMsg = new JSONObject(msg);
+        int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
+        if (ret < 0) {
+            KTVLogger.e(TAG, "SyncStartSing() sendStreamMessage called returned: " + ret);
         }
     }
 

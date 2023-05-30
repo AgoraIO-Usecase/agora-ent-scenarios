@@ -5,5 +5,5 @@ public class RankItem {
     public String userName;
     public String poster;
     public int songNum;
-    public double score;
+    public int score;
 }

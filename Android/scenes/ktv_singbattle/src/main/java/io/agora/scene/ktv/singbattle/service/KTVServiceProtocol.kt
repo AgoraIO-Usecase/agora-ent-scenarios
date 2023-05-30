@@ -213,6 +213,7 @@ interface KTVServiceProtocol {
         songCode: String,
         winner: String,
         winnerName: String,
+        headUrl: String,
         completion: (error: Exception?) -> Unit
     )
 

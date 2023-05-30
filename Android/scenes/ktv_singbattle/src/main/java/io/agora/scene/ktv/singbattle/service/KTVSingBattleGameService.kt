@@ -26,12 +26,13 @@ object KTVSingBattleGameService {
         userId: String,
         userName: String,
         songCode: String,
+        headUrl: String,
         success: (userId: String) -> Unit,
         failure: ((Exception?) -> Unit)? = null
     ) {
         scope.launch(Dispatchers.Main) {
             try {
-                success.invoke(graspSong(sceneId, roomId, userId, userName, songCode))
+                success.invoke(graspSong(sceneId, roomId, userId, userName, songCode, headUrl))
             } catch (e: Exception) {
                 failure?.invoke(e)
             }
@@ -62,6 +63,7 @@ object KTVSingBattleGameService {
         userId: String,
         userName: String,
         songCode: String,
+        headUrl: String,
     ) = withContext(Dispatchers.IO) {
 
         val postBody = JSONObject()
@@ -71,6 +73,7 @@ object KTVSingBattleGameService {
         postBody.put("userName", userName)
         postBody.put("userId", userId)
         postBody.put("songCode", songCode)
+        postBody.put("headUrl", headUrl)
         postBody.put("src", "postman")
         postBody.put("traceId", "test-trace")
 

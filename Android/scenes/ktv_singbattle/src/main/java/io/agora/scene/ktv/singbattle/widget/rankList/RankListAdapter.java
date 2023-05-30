@@ -1,6 +1,8 @@
 package io.agora.scene.ktv.singbattle.widget.rankList;
 
 
+import android.view.View;
+
 import androidx.annotation.NonNull;
 
 import io.agora.scene.base.GlideApp;
@@ -37,19 +39,23 @@ public class RankListAdapter extends BindingSingleAdapter<RankItem, KtvItemRankL
         if (item.songNum == -1) {
             mBinding.tvSongNum.setText("-");
         } else {
-            mBinding.tvSongNum.setText(String.valueOf(item.songNum));
+            mBinding.tvSongNum.setText(item.songNum + "首");
         }
 
         if (item.score == -1) {
             mBinding.tvScore.setText("-");
         } else {
-            mBinding.tvScore.setText(String.valueOf(item.score));
+            mBinding.tvScore.setText(item.score + "分");
         }
 
-        GlideApp.with(mBinding.getRoot())
-                .load(item.poster)
-                .error(R.mipmap.userimage)
-                .transform(new CenterCropRoundCornerTransform(100))
-                .into(mBinding.ivHeader);
+        if (item.poster.equals("")) {
+            mBinding.ivHeader.setVisibility(View.INVISIBLE);
+        } else {
+            GlideApp.with(mBinding.getRoot())
+                    .load(item.poster)
+                    .error(R.mipmap.userimage)
+                    .transform(new CenterCropRoundCornerTransform(100))
+                    .into(mBinding.ivHeader);
+        }
     }
 }
