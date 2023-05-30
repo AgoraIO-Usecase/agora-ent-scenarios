@@ -640,7 +640,6 @@ public class RoomLivingViewModel extends ViewModel {
         songsOrderedLiveData.postValue(new ArrayList<>());
     }
 
-    //public RoomSelSongModel gameSong;
     public int songNum = 0;
     public void onSongChanged() {
         ktvServiceProtocol.getChoosedSongsList((e, data) -> {
@@ -1361,15 +1360,6 @@ public class RoomLivingViewModel extends ViewModel {
                 songPlayingLiveData.getValue().getSongNo(),
                 (userId, userName) -> {
                     KTVLogger.d(TAG, "RoomLivingViewModel.getWinnerInfo() called：" + userId + " success");
-//                    // 房主更新Service抢唱结果
-//                    if (isRoomOwner()) {
-//                        ktvServiceProtocol.updateSongModel(songPlayingLiveData.getValue().getSongNo(), userId, e -> {
-//                            if (e == null) {
-//                                KTVLogger.d(TAG, "RoomLivingViewModel.updateSongModel() success " + userId);
-//                            }
-//                            return null;
-//                        });
-//                    }
                     return null;
                 },
                 e -> {

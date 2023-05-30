@@ -959,15 +959,15 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         mReceivedPlayPosition = 0
                     }
 
-                    if (MediaPlayerState.getStateByValue(mpkState) != this.mediaPlayerState) {
-                        when (MediaPlayerState.getStateByValue(mpkState)) {
-                            MediaPlayerState.PLAYER_STATE_PLAYING -> {
-                                ktvApiEventHandlerList.forEach { it.onMusicPlayerStateChanged(MediaPlayerState.getStateByValue(mpkState), Constants.MediaPlayerError.PLAYER_ERROR_NONE, false) }
-                            }
-                            else -> {}
-                        }
-                        this.mediaPlayerState = MediaPlayerState.getStateByValue(mpkState)
-                    }
+//                    if (MediaPlayerState.getStateByValue(mpkState) != this.mediaPlayerState) {
+//                        when (MediaPlayerState.getStateByValue(mpkState)) {
+//                            MediaPlayerState.PLAYER_STATE_PLAYING -> {
+//                                ktvApiEventHandlerList.forEach { it.onMusicPlayerStateChanged(MediaPlayerState.getStateByValue(mpkState), Constants.MediaPlayerError.PLAYER_ERROR_NONE, false) }
+//                            }
+//                            else -> {}
+//                        }
+//                        this.mediaPlayerState = MediaPlayerState.getStateByValue(mpkState)
+//                    }
                 }
             } else if (jsonMsg.getString("cmd") == "Seek") {
                 // 伴唱收到原唱seek指令
@@ -991,13 +991,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         else -> {}
                     }
                 } else if (this.singerRole == KTVSingRole.Audience) {
-                    //this.mediaPlayerState = MediaPlayerState.getStateByValue(state)
+                    this.mediaPlayerState = MediaPlayerState.getStateByValue(state)
                 }
-//                ktvApiEventHandlerList.forEach { it.onMusicPlayerStateChanged(
-//                    MediaPlayerState.getStateByValue(state),
-//                    Constants.MediaPlayerError.getErrorByValue(error),
-//                    false
-//                ) }
+                ktvApiEventHandlerList.forEach { it.onMusicPlayerStateChanged(
+                    MediaPlayerState.getStateByValue(state),
+                    Constants.MediaPlayerError.getErrorByValue(error),
+                    false
+                ) }
             } else if (jsonMsg.getString("cmd") == "setVoicePitch") {
                 val pitch = jsonMsg.getDouble("pitch")
                 if (this.singerRole == KTVSingRole.Audience) {
