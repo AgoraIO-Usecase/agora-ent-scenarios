@@ -119,9 +119,9 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         callback()
     }
 
-    private func initScene(completion: @escaping () -> Void) {
+    private func initScene(completion: @escaping (NSError?) -> Void) {
         if syncUtilsInited {
-            completion()
+            completion(nil)
             return
         }
 
@@ -131,6 +131,10 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         SyncUtil.subscribeConnectState { [weak self] (state) in
             guard let self = self else {
                 return
+            }
+            
+            defer {
+                completion(state == .open ? nil : NSError(domain: "network error", code: 1000))
             }
             
             agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
@@ -144,7 +148,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             }
             
             self.syncUtilsInited = true
-            completion()
+          //  completion()
         }
     }
     
@@ -152,7 +156,12 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     
     // MARK: room info
     func getRoomList(withPage page: UInt, completion: @escaping (Error?, [VLRoomListModel]?) -> Void) {
-        initScene { [weak self] in
+        initScene { [weak self] error in
+            if let error = error  {
+                _hideLoadingIfNeed()
+                completion(error, nil)
+                return
+            }
             guard page < 1 else {
                 completion(nil, [])
                 return
@@ -194,7 +203,12 @@ private func mapConvert(model: NSObject) ->[String: Any] {
 
         _showLoadingIfNeed()
         let date = Date()
-        initScene { [weak self] in
+        initScene { [weak self] error in
+            if let error = error  {
+                _hideLoadingIfNeed()
+                completion(error, nil)
+                return
+            }
             agoraPrint("createRoom initScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
             SyncUtil.joinScene(id: roomInfo.roomNo,
                                userId: roomInfo.creator,
@@ -276,7 +290,12 @@ private func mapConvert(model: NSObject) ->[String: Any] {
 
         _showLoadingIfNeed()
         let date = Date()
-        initScene { [weak self] in
+        initScene { [weak self] error in
+            if let error = error  {
+                _hideLoadingIfNeed()
+                completion(error, nil)
+                return
+            }
             agoraPrint("joinRoom initScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
             SyncUtil.joinScene(id: roomInfo.roomNo,
                                userId: roomInfo.creator,

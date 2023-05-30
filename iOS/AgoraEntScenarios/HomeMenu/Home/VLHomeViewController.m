@@ -22,6 +22,8 @@
     [self setBackgroundImage:@"home_bg_image"];
     [self setNaviTitleName:AGLocalizedString(@"声网")];
     
+    [[NetworkManager shared] reportDeviceInfoWithSceneName: @""];
+    
     [self setUpUI];
 }
 
@@ -75,8 +77,10 @@
         return;
     }
 
-    NSArray* sceneNames = @[@"VoiceChat", @"SA", @"KTV", @"LiveShow"];
+    NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow"];
     [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
+    [[NetworkManager shared] reportDeviceInfoWithSceneName:sceneNames[tagValue]];
+    [[NetworkManager shared] reportUserBehaviorWithSceneName:sceneNames[tagValue]];
     switch (tagValue) {
         case 0: {
             VRRoomsViewController *vc = [[VRRoomsViewController alloc] initWithUser:VLUserCenter.user];

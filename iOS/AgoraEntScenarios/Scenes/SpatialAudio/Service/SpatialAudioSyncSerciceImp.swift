@@ -57,11 +57,7 @@ class SpatialAudioSyncSerciceImp: NSObject {
     fileprivate var roomId: String?
     fileprivate var roomList: [SARoomEntity] = [SARoomEntity]()
     fileprivate var syncUtilsInited: Bool = false
-    public var mics: [SARoomMic] = [SARoomMic]() {
-        didSet {
-            print("===")
-        }
-    }
+    public var mics: [SARoomMic] = [SARoomMic]() 
     public var userList: [SAUser] = [SAUser]()
     public var micApplys: [SAApply] = [SAApply]()
     private var robotInfo: SARobotAudioInfo?
@@ -684,6 +680,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             completion(SAErrorType.userNotFound("startMicSeatApply").error(), false)
             return
         }
+        user.status = .waitting
         apply.member = user
         _addMicSeatApply(roomId: self.roomId!, apply: apply) { error in
             completion(error, error == nil)

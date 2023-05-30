@@ -61,6 +61,7 @@
   static let AppId: String = 声网AppID
   static let Certificate: String? = 声网App证书
   
+  空间音频语聊房不需要配置IM Key
     static var IMAppKey: String? = 环信AppKey
     static var IMClientId: String? = 环信ClientId
     static var IMClientSecret: String? = 环信ClientSecret
