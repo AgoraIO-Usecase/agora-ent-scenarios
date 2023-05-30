@@ -10,7 +10,6 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.ktv.singbattle.KTVLogger
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.*
-import okhttp3.internal.wait
 import java.util.concurrent.CountDownLatch
 import kotlin.random.Random
 

@@ -1,5 +1,6 @@
 package io.agora.scene.ktv.singbattle.widget.song;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -42,6 +43,18 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
         });
         mBinding.rBtnChooseSong.setChecked(true);
         mBinding.pager.getChildAt(0).setOverScrollMode(View.OVER_SCROLL_NEVER);
+        mBinding.getRoot().getRootView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        mBinding.getRoot().getRootView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override public void onSystemUiVisibilityChange(int visibility) {
+                int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+                if (Build.VERSION.SDK_INT >= 19) {
+                    uiOptions |= 0x00001000;
+                } else {
+                    uiOptions |= View.SYSTEM_UI_FLAG_LOW_PROFILE;
+                }
+                mBinding.getRoot().getRootView().setSystemUiVisibility(uiOptions);
+            }
+        });
 
         songChooseFragment.setListener(new SongChooseFragment.Listener() {
             @Override
