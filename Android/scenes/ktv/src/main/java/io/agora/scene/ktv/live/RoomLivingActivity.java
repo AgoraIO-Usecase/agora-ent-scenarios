@@ -792,6 +792,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 @Override
                 public void onUserItemChosen(VoiceHighlightBean user) {
                     roomLivingViewModel.syncVoiceHighlightResult(user.user.getRtcUid(), user.user.getChorusSongCode());
+                    getBinding().lrcControlView.setHighLightPersonHeadUrl(user.user.getHeadUrl());
                 }
             });
         }

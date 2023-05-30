@@ -29,12 +29,16 @@ public class EarBackFragment extends BaseViewBindingFragment<KtvDialogEarbackSet
         mSetting.setEarPhoneCallback(new MusicSettingBean.EarPhoneCallback() {
             @Override
             public void onHasEarPhoneChanged(boolean hasEarPhone) {
-                updateEarPhoneStatus(hasEarPhone);
+                if (getView() != null) {
+                    getView().post(() -> updateEarPhoneStatus(hasEarPhone));
+                }
             }
 
             @Override
             public void onEarMonitorDelay(int earsBackDelay) {
-                updateEarPhoneDelay(earsBackDelay);
+                if (getView() != null) {
+                    getView().post(() ->  updateEarPhoneDelay(earsBackDelay));
+                }
             }
         });
     }
@@ -102,6 +106,7 @@ public class EarBackFragment extends BaseViewBindingFragment<KtvDialogEarbackSet
     private void updateEarPhoneStatus(boolean hasEarPhone) {
         if (hasEarPhone) {
             // 检测到耳机
+            getBinding().cbSwitch.setEnabled(true);
             getBinding().cbSwitch.setChecked(mSetting.isEar());
             getBinding().cbSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 mSetting.setEar(isChecked);
