@@ -27,7 +27,7 @@
     <string name="ktv_create_tips2">本应用为测试产品，请勿商用</string>
     <string name="ktv_create_tips3">单次K歌最长20分钟，每个房间最多8人</string>
     <string name="ktv_create_tips4">欢迎来到声网嗨歌抢唱游戏，\n热歌劲曲、歌词同步、动态打分等功能一站体验，\n一起来抢吧！</string>
-    <string name="ktv_room_before_speaker">点击空麦位，上麦后可点歌与发言</string>
+    <string name="ktv_room_before_speaker">点击空麦位，上麦后加入游戏</string>
     <string name="ktv_room_owner">房主</string>
     <string name="ktv_room_sing1">演唱中</string>
     <string name="ktv_room_sing1_1">合唱中</string>
@@ -152,7 +152,7 @@
     <string name="ktv_game_auto_select_song">随机选歌开始</string>
     <string name="ktv_game_room_owner_choosing_song">房主点歌中，游戏即将开始</string>
     <string name="ktv_game_start">嗨唱开始</string>
-    <string name="ktv_game_nobody_grasp">本轮无人抢到麦 \n 即将播放下一首</string>
+    <string name="ktv_game_nobody_grasp">本轮无人演唱 \n 即将播放下一首</string>
 
 
 </resources>

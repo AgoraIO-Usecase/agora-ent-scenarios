@@ -1,7 +1,11 @@
 package io.agora.scene.ktv.singbattle.widget.game;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.CountDownTimer;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,12 +14,18 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+
 import java.util.List;
 
+import io.agora.scene.base.GlideApp;
 import io.agora.scene.ktv.singbattle.KTVLogger;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvLayoutGameViewBinding;
 import io.agora.scene.ktv.singbattle.widget.rankList.RankItem;
+import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 public class SingBattleGameView extends FrameLayout {
 
@@ -68,6 +78,7 @@ public class SingBattleGameView extends FrameLayout {
             public void onTick(long millisUntilFinished) {
                 int second = (int) (millisUntilFinished / 1000);
                 if (mBinding == null) return;
+                KTVLogger.d("hugo", "pig" + second);
                 if (second <= 3 && second >= 1) {
                     mBinding.ilIDLE.messageText.setText("" + second);
                 } else if (second < 1) {
@@ -150,15 +161,24 @@ public class SingBattleGameView extends FrameLayout {
     }
 
     // 抢唱成功
-    public void onGraspSongSuccess(String userName) {
-        KTVLogger.d(TAG, "onGraspSongSuccess");
+    public void onGraspSongSuccess(String userName, String headUrl) {
+        KTVLogger.d(TAG, "onGraspSongSuccess， headUrl：" + headUrl);
         if (mBinding == null) return;
-        mBinding.ilIDLE.messageText.setText("本轮由 " + userName + " 抢到麦");
+        mBinding.ilIDLE.tvBattleResultView.setVisibility(View.VISIBLE);
+        GlideApp.with(mBinding.getRoot())
+                .load(headUrl)
+                .error(R.mipmap.userimage)
+                .transform(new CenterCropRoundCornerTransform(100))
+                .into(mBinding.ilIDLE.ivHeader);
+        mBinding.ilIDLE.tvBattleResultName.setText(" " + userName + " 抢到麦");
+        mBinding.ilIDLE.messageText.setText("");
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
         mBinding.getRoot().postDelayed(() -> {
+            if (mBinding == null) return;
             if (mSingBattleGameEventListener != null) mSingBattleGameEventListener.onStartSing();
             mBinding.ilIDLE.messageText.setVisibility(View.GONE);
+            mBinding.ilIDLE.tvBattleResultView.setVisibility(View.GONE);
             mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
         }, 5000);
     }

@@ -812,6 +812,7 @@ class KTVSyncManagerServiceImp(
         songCode: String,
         winner: String,
         winnerName: String,
+        headUrl: String,
         completion: (error: Exception?) -> Unit
     ) {
         val song = songChosenList.filter { it.songNo == songCode }.getOrNull(0) ?: return
@@ -820,7 +821,7 @@ class KTVSyncManagerServiceImp(
             song.songName,
             song.songNo,
             song.singer,
-            song.imageUrl,
+            headUrl,
             song.userNo,
             winnerName,
             song.isOriginal,

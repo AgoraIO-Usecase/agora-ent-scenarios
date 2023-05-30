@@ -341,6 +341,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public void setMusic(RoomSelSongModel mMusic) {
+        if (mBinding == null) return;
         mKaraokeView.reset();
         if (mComboControl != null) {
             mComboControl.reset(mBinding);

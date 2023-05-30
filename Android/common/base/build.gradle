@@ -20,7 +20,6 @@ final def VERSION_SCENE_VOICE = properties.getProperty("VERSION_SCENE_VOICE")
 final def VERSION_SCENE_SPATIAL_VOICE = properties.getProperty("VERSION_SCENE_SPATIAL_VOICE")
 final def VERSION_SCENE_KTV = properties.getProperty("VERSION_SCENE_KTV")
 final def VERSION_SCENE_SHOW = properties.getProperty("VERSION_SCENE_SHOW")
-def localsdkPath = "3.4.0-sdk"
 
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
@@ -72,12 +71,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
-    sourceSets {
-        main {
-            jniLibs.srcDirs += "${localsdkPath}"
-        }
-    }
 }
 
 dependencies {
@@ -108,6 +101,5 @@ dependencies {
 
 
     api rootProject.ext.deps.rtm
-    //api rootProject.ext.deps.rtc
-    api fileTree(dir: "${localsdkPath}", include: ['*.jar'])
+    api rootProject.ext.deps.rtc
 }

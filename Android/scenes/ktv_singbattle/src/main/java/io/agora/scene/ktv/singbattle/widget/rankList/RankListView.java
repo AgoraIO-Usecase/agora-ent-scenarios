@@ -43,6 +43,7 @@ public class RankListView extends FrameLayout {
                 emptyItem.score = -1;
                 emptyItem.songNum = -1;
                 emptyItem.userName = "暂无上榜";
+                emptyItem.poster = "";
                 newList.add(emptyItem);
             }
         }
