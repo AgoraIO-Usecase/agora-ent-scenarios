@@ -44,6 +44,7 @@ import io.agora.karaoke_view.v11.LyricsView;
 import io.agora.karaoke_view.v11.ScoringView;
 import io.agora.karaoke_view.v11.model.LyricsLineModel;
 import io.agora.karaoke_view.v11.model.LyricsModel;
+import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.utils.DownloadUtils;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.ZipUtils;
@@ -53,6 +54,7 @@ import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
 import io.agora.scene.ktv.live.ILrcView;
 import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.widget.basic.OutlineSpan;
+import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
@@ -123,6 +125,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
 
         mKaraokeView = new KaraokeView(mBinding.ilActive.lyricsView, mBinding.ilActive.scoringView);
+
+        if (!isMineOwner) {
+            mBinding.ilActive.btnVocalHighlight.setVisibility(View.GONE);
+        }
 
         initListener();
     }
@@ -236,6 +242,13 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     public void onPrepareStatus(boolean isMineOwner) {
         chorusScore = 0;
         this.isMineOwner = isMineOwner;
+
+        if (isMineOwner) {
+            mBinding.ilActive.btnVocalHighlight.setVisibility(View.VISIBLE);
+        } else {
+            mBinding.ilActive.btnVocalHighlight.setVisibility(View.GONE);
+        }
+
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
         mBinding.ilChorus.getRoot().setVisibility(View.GONE);
@@ -748,6 +761,14 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         if (mRole == Role.Listener) {
             updateScore(score, cumulativeScore, /** Workaround(Hai_Guo)*/total);
         }
+    }
+
+    public void setHighLightPersonHeadUrl(String url) {
+        GlideApp.with(mBinding.getRoot())
+                .load(url)
+                .error(R.mipmap.ktv_highlight_head_bg)
+                .transform(new CenterCropRoundCornerTransform(100))
+                .into(mBinding.ilActive.ivVocalHighlight);
     }
 
     public interface OnKaraokeEventListener {
