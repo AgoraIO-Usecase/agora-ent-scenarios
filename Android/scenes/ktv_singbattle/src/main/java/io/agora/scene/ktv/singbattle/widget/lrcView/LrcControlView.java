@@ -56,6 +56,7 @@ import io.agora.scene.ktv.singbattle.databinding.KtvLayoutLrcPrepareBinding;
 import io.agora.scene.ktv.singbattle.live.ILrcView;
 import io.agora.scene.ktv.singbattle.service.RoomSelSongModel;
 import io.agora.scene.widget.basic.OutlineSpan;
+import io.agora.scene.widget.utils.UiUtils;
 
 /**
  * 歌词控制View
@@ -249,12 +250,12 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     private void changeViewByRole() {
+        KTVLogger.d("LrcView", "changeViewByRole, role: " + mRole);
         if (mBinding == null) return;
         mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
         mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.INVISIBLE);
         if (this.mRole == Role.Singer) {
             mBinding.ilActive.lyricsView.enableDragging(false);
-            //mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
             mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
         } else if (this.mRole == Role.Listener) {
@@ -315,7 +316,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         if (mBinding == null) return;
         isPrepareSong = false;
         mBinding.ilActive.scoringView.setVisibility(View.VISIBLE);
-        mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
+        if (mRole == Role.Singer) {
+            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
+        } else {
+            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
+        }
         mBinding.tvMusicName.setVisibility(View.VISIBLE);
         mBinding.tvCumulativeScore.setVisibility(View.VISIBLE);
         mBinding.gradeView.setVisibility(View.VISIBLE);
@@ -331,6 +336,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public void setRole(@NonNull Role mRole) {
+        KTVLogger.d("LrcView", "setRole: " + mRole);
         this.mRole = mRole;
         lrcUrl = null;
         changeViewByRole();
@@ -580,6 +586,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 downloadAndSetLrcData();
             }
         } else if (v == mBinding.ilActive.singBattle) {
+            if (UiUtils.isFastClick(2000)) {
+                return;
+            }
             mOnKaraokeActionListener.onGraspSongClick();
         }
     }

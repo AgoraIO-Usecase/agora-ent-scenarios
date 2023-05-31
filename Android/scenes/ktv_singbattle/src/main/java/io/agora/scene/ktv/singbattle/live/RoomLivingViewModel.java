@@ -1066,6 +1066,7 @@ public class RoomLivingViewModel extends ViewModel {
                             rankMap.put(userId, model);
                         }
                     } else if (jsonMsg.getString("cmd").equals("StartSingBattleCountDown")) {
+                        KTVLogger.d("hugo", "StartSingBattleCountDown");
                         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                     }
                 } catch (JSONException exp) {
