@@ -347,13 +347,14 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     ) {
         // TODO
         Log.d(TAG, "loadMusic called: songCode $songCode")
-        val jsonOption = "{\"format\":{\"highPart\":0}}"
-        val songCode1 = mMusicCenter.getInternalSongCode(songCode, jsonOption)
-        mMusicCenter.getSongSimpleInfo(songCode1);
+        if (this.ktvApiConfig.type == KTVType.SingBattle) {
+            mMusicCenter.getSongSimpleInfo(songCode);
+        }
+
         // 设置到全局， 连续调用以最新的为准
         this.songMode = KTVSongMode.SONG_CODE
-        this.songCode = songCode1
-        this.songIdentifier = songCode1.toString()
+        this.songCode = songCode
+        this.songIdentifier = songCode.toString()
         this.mainSingerUid = config.mainSingerUid
         mLastReceivedPlayPosTime = null
         mReceivedPlayPosition = 0
@@ -364,7 +365,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         if (config.mode == KTVLoadMusicMode.LOAD_LRC_ONLY) {
             // 只加载歌词
-            loadLyric(songCode1) { song, lyricUrl ->
+            loadLyric(songCode) { song, lyricUrl ->
                 if (this.songCode != song) {
                     // 当前歌曲已发生变化，以最新load歌曲为准
                     Log.e(TAG, "loadMusic failed: CANCELED")
@@ -387,7 +388,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         }
 
         // 预加载歌曲
-        preLoadMusic(songCode1) { song, percent, status, msg, lrcUrl ->
+        preLoadMusic(songCode) { song, percent, status, msg, lrcUrl ->
             if (status == 0) {
                 // 预加载歌曲成功
                 if (this.songCode != song) {
@@ -769,7 +770,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val curTime = System.currentTimeMillis()
                 val offset = curTime - lastReceivedTime
                 if (offset <= 1000) {
-                    val curTs = mReceivedPlayPosition + offset + pig
+                    val curTs = mReceivedPlayPosition + offset + highStartTime
                     runOnMainThread {
                         lrcView?.onUpdatePitch(pitch.toFloat())
                         // (fix ENT-489)Make lyrics delay for 200ms
@@ -1088,22 +1089,21 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         callback(songCode, lyricUrl)
     }
 
-    // TODO
-    private var pig = 0L;
+    private var highStartTime = 0L;
     override fun onSongSimpleInfoResult(
         requestId: String?,
         songCode: Long,
         simpleInfo: String,
         errorCode: Int
     ) {
-        Log.d(TAG, "onSongSimpleInfoResult" + simpleInfo);
+        if (this.ktvApiConfig.type == KTVType.Normal) return
         val jsonMsg = JSONObject(simpleInfo)
         val format = jsonMsg.getJSONObject("format")
         val highPart = format.getJSONArray("highPart")
         val highStartTime = JSONObject(highPart[0].toString())
         val time = highStartTime.getLong("highStartTime")
         val endTime = highStartTime.getLong("highEndTime")
-        pig = time;
+        this.highStartTime = time
         lrcView?.onHighPartTime(time, endTime)
     }
 

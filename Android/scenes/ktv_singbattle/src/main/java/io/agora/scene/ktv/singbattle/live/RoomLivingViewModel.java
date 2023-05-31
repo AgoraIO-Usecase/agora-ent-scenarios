@@ -1093,7 +1093,7 @@ public class RoomLivingViewModel extends ViewModel {
                 roomInfoLiveData.getValue().getRoomNo(),
                 UserManager.getInstance().getUser().id.intValue(),
                 roomInfoLiveData.getValue().getRoomNo() + "_ex",
-                roomInfoLiveData.getValue().getAgoraChorusToken(), 10)
+                roomInfoLiveData.getValue().getAgoraChorusToken(), 10, KTVType.SingBattle)
         );
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
@@ -1520,7 +1520,9 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     private void loadMusic(KTVLoadMusicConfiguration config, Long songCode) {
-        ktvApiProtocol.loadMusic(songCode, config, new IMusicLoadStateListener() {
+        String jsonOption = "{\"format\":{\"highPart\":0}}";
+        Long newSongCode = ktvApiProtocol.getMusicContentCenter().getInternalSongCode(songCode, jsonOption);
+        ktvApiProtocol.loadMusic(newSongCode, config, new IMusicLoadStateListener() {
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
                 KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);

@@ -7,6 +7,11 @@ import io.agora.musiccontentcenter.Music
 import io.agora.musiccontentcenter.MusicChartInfo
 import io.agora.rtc2.RtcEngine
 
+enum class KTVType(val value: Int)  {
+    Normal(0),
+    SingBattle(1)
+}
+
 /**
  * 在KTVApi中的身份
  * @param SoloSinger 独唱者: 当前只有自己在唱歌
@@ -189,7 +194,8 @@ data class KTVApiConfig(
     val localUid: Int,
     val chorusChannelName: String,
     val chorusChannelToken: String,
-    val maxCacheSize: Int = 10
+    val maxCacheSize: Int = 10,
+    val type: KTVType = KTVType.Normal
 )
 
 /**
