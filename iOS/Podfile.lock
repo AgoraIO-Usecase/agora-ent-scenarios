@@ -17,9 +17,9 @@ PODS:
   - Agora-Scene-Utils (1.1.0)
   - Agora_Chat_iOS (1.0.8)
   - AgoraLyricsScore (1.1.1-beta-3)
-  - AgoraRtcEngine_Special_iOS (4.1.1.5)
+  - AgoraRtcEngine_iOS (1.0)
   - AgoraRtm_iOS (1.5.1)
-  - AgoraSyncManager (2.0.4):
+  - AgoraSyncManager (2.0.5):
     - SocketRocket
   - Bugly (2.5.93)
   - HWWeakTimer (1.0)
@@ -67,9 +67,9 @@ DEPENDENCIES:
   - Agora-Scene-Utils (= 1.1.0)
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraLyricsScore (= 1.1.1-beta-3)
-  - AgoraRtcEngine_Special_iOS (= 4.1.1.5)
+  - AgoraRtcEngine_iOS (from `./libs`)
   - AgoraRtm_iOS (= 1.5.1)
-  - AgoraSyncManager (= 2.0.4)
+  - AgoraSyncManager (= 2.0.5)
   - Bugly (= 2.5.93)
   - HWWeakTimer (= 1.0)
   - JXCategoryView (= 1.6.1)
@@ -78,6 +78,7 @@ DEPENDENCIES:
   - LSTPopView (= 0.3.10)
   - Masonry (= 1.1.0)
   - MJRefresh
+  - Protobuf (= 3.22.1)
   - ScoreEffectUI (= 1.0.1)
   - SDWebImage (~> 4.2)
   - SDWebImageAPNGCoder
@@ -98,7 +99,6 @@ SPEC REPOS:
     - Agora-Scene-Utils
     - Agora_Chat_iOS
     - AgoraLyricsScore
-    - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS
     - AgoraSyncManager
     - Bugly
@@ -126,6 +126,8 @@ SPEC REPOS:
     - ZSwiftBaseLib
 
 EXTERNAL SOURCES:
+  AgoraRtcEngine_iOS:
+    :path: "./libs"
   SenseLib:
     :path: sense.podspec
 
@@ -134,9 +136,9 @@ SPEC CHECKSUMS:
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
-  AgoraRtcEngine_Special_iOS: 752e4f3bf249980e8faeaa709a0094ac3288fd43
+  AgoraRtcEngine_iOS: 7af3b344c55059556eeb05dc748ff124c593d4fb
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
-  AgoraSyncManager: 4df1ae866bda7bf8e0ab3602b4b23d65b657ee9b
+  AgoraSyncManager: 4f265d83188031bbfdd610e2110e63fca545ecc1
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
@@ -162,6 +164,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 32a926d3f1b8b680b32528ac7533540137cfa816
+PODFILE CHECKSUM: c91e43a37a933df6347e474a395edec924b77610
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.11.3
