@@ -10,7 +10,7 @@
 #import "MenuUtils.h"
 #import "KTVMacro.h"
 #import "VLToast.h"
-
+#import "VLSBGOnLineListVC.h"
 @interface VLHomeViewController ()<VLHomeViewDelegate>
 
 @end
@@ -52,7 +52,9 @@
 
 
 - (void)itemClickAction:(int)tagValue {
-
+    VLSBGOnLineListVC *listVC = [[VLSBGOnLineListVC alloc]init];
+    [self.navigationController pushViewController:listVC animated:YES];
+    return;
 //    switch (tagValue) {
 //        case 0:
 //        {

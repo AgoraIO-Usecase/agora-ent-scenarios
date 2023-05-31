@@ -119,7 +119,8 @@ extension AboutAgoraEntertainmentViewController: UITableViewDelegate,UITableView
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        self.infos.count
+       // self.infos.count
+        return 1
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
