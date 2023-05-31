@@ -258,6 +258,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mBinding.ilActive.lyricsView.enableDragging(false);
             mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
             mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+            if (isPrepareSong) {
+                mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
+            } else {
+                mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
+            }
         } else if (this.mRole == Role.Listener) {
             mBinding.ilActive.lyricsView.enableDragging(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);

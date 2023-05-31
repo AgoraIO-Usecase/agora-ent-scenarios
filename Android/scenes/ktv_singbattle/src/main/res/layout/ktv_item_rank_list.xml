@@ -1,57 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="40dp"
-    android:background="@mipmap/ktv_game_rank_list_1_background"
-    android:gravity="center">
-
-    <TextView
-        android:id="@+id/tvTank"
-        android:text="排名"
-        android:textSize="12sp"
-        android:textColor="@color/white"
-        android:gravity="center"
-        android:layout_marginStart="20dp"
-        android:layout_width="50dp"
-        android:layout_height="40dp"/>
+    tools:ignore="ResourceName">
 
     <ImageView
-        android:id="@+id/ivHeader"
-        android:layout_marginStart="40dp"
-        android:layout_height="30dp"
-        android:layout_width="30dp"/>
+        android:id="@+id/ivBg"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@mipmap/ktv_game_rank_list_1_background"/>
 
-    <TextView
-        android:id="@+id/tvPlayer"
-        android:text="玩家"
-        android:textSize="12sp"
-        android:layout_width="0dp"
-        android:textColor="@color/white"
-        android:layout_marginStart="10dp"
-        android:layout_weight="1.1"
-        android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTank"
+            android:text="排名"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:layout_marginStart="25dp"
+            android:layout_width="40dp"
+            android:layout_height="32dp"/>
 
-    <TextView
-        android:id="@+id/tvSongNum"
-        android:text="抢唱成功"
-        android:textSize="12sp"
-        android:layout_width="0dp"
-        android:textColor="@color/white"
-        android:gravity="center"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivHeader"
+            android:layout_marginStart="40dp"
+            android:layout_height="30dp"
+            android:layout_width="30dp"/>
 
-    <TextView
-        android:id="@+id/tvScore"
-        android:text="总分"
-        android:textSize="12sp"
-        android:textColor="@color/white"
-        android:gravity="center"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPlayer"
+            android:text="玩家"
+            android:textSize="12sp"
+            android:layout_width="wrap_content"
+            android:textColor="@color/white"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1.1"
+            android:layout_height="wrap_content"/>
 
-</LinearLayout>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSongNum"
+            android:text="抢唱成功"
+            android:textSize="12sp"
+            android:layout_width="wrap_content"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvScore"
+            android:text="总分"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</FrameLayout>
