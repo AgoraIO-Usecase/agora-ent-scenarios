@@ -7,6 +7,7 @@
 
 import UIKit
 import ZSwiftBaseLib
+import SVProgressHUD
 
 public final class VoiceRoomAudiencesViewController: UITableViewController {
     
@@ -70,23 +71,25 @@ extension VoiceRoomAudiencesViewController {
     }
     
     private func removeUser(user: VRUser) {
+        SVProgressHUD.show()
         VoiceRoomIMManager.shared?.kickUser(chat_uid: user.chat_uid ?? "", completion: { success in
+            SVProgressHUD.dismiss()
             if success {
                 var index = -1
-                let status = -1
+                var changeMic = VRRoomMic()
                 for mic in ChatRoomServiceImp.getSharedInstance().mics {
                     if mic.member?.chat_uid ?? "" == user.chat_uid ?? "" {
+                        changeMic = mic
                         index = mic.mic_index
                         break
                     }
                 }
-                if index > 0,let mic = ChatRoomServiceImp.getSharedInstance().mics[safe: index]  {
-                    mic.status = status
-                    mic.member = nil
-                    VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(index)":mic.kj.JSONString()], completion: { error in
+                if index > 0 {
+                    changeMic.member = nil
+                    VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(index)":changeMic.kj.JSONString()], completion: { error in
                         if error == nil {
                             if self.kickClosure != nil  {
-                                self.kickClosure!(user,mic)
+                                self.kickClosure!(user,changeMic)
                             }
                             self.removeUserFromUserList(user: user)
                         } else {
