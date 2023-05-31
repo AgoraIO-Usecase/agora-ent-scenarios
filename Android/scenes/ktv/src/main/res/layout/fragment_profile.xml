@@ -107,12 +107,13 @@
     <View
         android:id="@+id/vSettingMark"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="21dp"
         android:elevation="0.5dp"
         android:background="@color/ktv_dialog_bg_blue"
         android:alpha="0.7"
         android:visibility="invisible"
-        app:layout_constraintTop_toTopOf="@+id/tvVoice"
+        app:layout_constraintTop_toBottomOf="@+id/tvPrefessional"
         />
 
     <androidx.appcompat.widget.AppCompatTextView

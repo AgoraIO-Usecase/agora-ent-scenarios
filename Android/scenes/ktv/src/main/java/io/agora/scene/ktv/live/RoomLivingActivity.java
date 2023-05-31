@@ -376,10 +376,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             getBinding().lrcControlView.onSeat(seatModel != null);
         });
         roomLivingViewModel.seatListLiveData.observe(this, seatModels -> {
-            if (seatModels == null) {
+            if (seatModels == null || roomLivingViewModel.mSetting == null) {
                 return;
             }
             int chorusNowNum = 0;
+            boolean hasHighlighter = false;
             for (RoomSeatModel seatModel : seatModels) {
                 RoomSeatModel oSeatModel = mRoomSpeakerAdapter.getItem(seatModel.getSeatIndex());
                 if (oSeatModel == null
@@ -392,6 +393,17 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 if (seatModel.getChorusSongCode() != null && roomLivingViewModel.songPlayingLiveData.getValue() != null && seatModel.getChorusSongCode().equals(roomLivingViewModel.songPlayingLiveData.getValue().getSongNo() + roomLivingViewModel.songPlayingLiveData.getValue().getCreateAt())) {
                     chorusNowNum ++;
                 }
+
+                if (roomLivingViewModel.mSetting.getHighLighterUid().equals(seatModel.getRtcUid()) && !seatModel.getChorusSongCode().equals("")) {
+                    hasHighlighter = true;
+                }
+            }
+
+            if (!hasHighlighter && roomLivingViewModel.isRoomOwner() && chorusNowNum >= 0 && !roomLivingViewModel.mSetting.getHighLighterUid().equals("")) {
+                // 人声突出者退出合唱
+                ToastUtils.showToast("人声突出功能已失效， 请重设");
+                getBinding().lrcControlView.setHighLightPersonHeadUrl("");
+                roomLivingViewModel.mSetting.setHighLighterUid("");
             }
 
             if (roomLivingViewModel.chorusNum == 0 && chorusNowNum > 0) {
@@ -449,6 +461,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 return;
             }
             onMusicChanged(model);
+
+            if (roomLivingViewModel.isRoomOwner()) {
+                getBinding().lrcControlView.setHighLightPersonHeadUrl("");
+                roomLivingViewModel.mSetting.setHighLighterUid("");
+            }
         });
         roomLivingViewModel.scoringAlgoControlLiveData.observe(this, model -> {
             if (model == null) {
@@ -794,7 +811,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     roomLivingViewModel.syncVoiceHighlightResult(user.user.getRtcUid(), user.user.getChorusSongCode());
                     getBinding().lrcControlView.setHighLightPersonHeadUrl(user.user.getHeadUrl());
                 }
-            });
+            }, roomLivingViewModel.mSetting);
         }
 
         if (!voiceHighlightDialog.isAdded()) {
@@ -811,6 +828,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting, roomLivingViewModel.playerMusicStatusLiveData.getValue() == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE);
         //}
         musicSettingDialog.show(getSupportFragmentManager(), MusicSettingDialog.TAG);
+    }
+
+    public void closeMusicSettingsDialog() {
+        setDarkStatusIcon(isBlackDarkStatus());
+        musicSettingDialog.dismiss();
     }
 
     private CommonDialog changeMusicDialog;

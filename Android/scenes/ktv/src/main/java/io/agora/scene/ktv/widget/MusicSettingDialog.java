@@ -187,24 +187,6 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
             public void onStopTrackingTouch(SeekBar seekBar) {
 
             }
-
-//            @Override
-//            public void afterTextChanged(Editable editable) {
-//                if (editable != null && editable.length() > 0) {
-//                    String text = editable.toString();
-//                    int newVolume = Integer.parseInt(text);
-//                    if (newVolume < 0) {
-//                        newVolume = 0;
-//                    } else if (newVolume > 100) {
-//                        newVolume = 100;
-//                    }
-//                    mSetting.setRemoteVolume(newVolume);
-//                    mBinding.textRemoteVolume.setHint("" + newVolume);
-//                } else {
-//                    mSetting.setRemoteVolume(15);
-//                    mBinding.textRemoteVolume.setHint("" + 15);
-//                }
-//            }
         });
 
         List<EffectVoiceBean> list = new ArrayList<>();
@@ -224,7 +206,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         adapter = new BaseRecyclerViewAdapter<>(list, this, EffectVoiceHolder.class);
 
         mBinding.rvVoiceEffectList.setAdapter(adapter);
-        mBinding.rvVoiceEffectList.addItemDecoration(new DividerDecoration(10));
+        mBinding.rvVoiceEffectList.addItemDecoration(new DividerDecoration(10, 20, 0));
     }
 
     private void setSoundMode() {

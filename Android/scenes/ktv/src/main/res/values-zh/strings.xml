@@ -60,7 +60,7 @@
     <string name="ktv_leave_title">关闭歌房</string>
     <string name="ktv_leave_msg">关闭歌房后所有成员将被移除房间</string>
     <string name="ktv_music_menu_dialog_title">控制台</string>
-    <string name="ktv_music_menu_dialog_ear">耳返</string>
+    <string name="ktv_music_menu_dialog_ear">耳返设置</string>
     <string name="ktv_music_menu_dialog_tone">升降调</string>
     <string name="ktv_music_menu_dialog_vol1">人声音量</string>
     <string name="ktv_music_menu_dialog_remote_volume">远端音量</string>
@@ -113,7 +113,7 @@
     <string name="ktv_voice_effect">音效</string>
     <string name="ktv_camera">摄像头</string>
     <string name="ktv_leave_chorus">退出合唱</string>
-    <string name="ktv_voice_highlight">人声突出</string>
+    <string name="ktv_voice_highlight">突出人声</string>
     <string name="ktv_voice_profile">配置</string>
     <string name="ktv_voice_professional">专业主播</string>
 
