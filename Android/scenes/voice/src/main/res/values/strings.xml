@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <resources>
     <string name="voice_app_name">Agora Chat Room</string>
     <string name="voice_app_agora_chatroom">Agora Chat Room</string>
@@ -140,8 +139,6 @@
     <string name="voice_chatroom_room_audio_settings">Room Audio Settings</string>
     <string name="voice_chatroom_best_sound_effect">Sound Selection</string>
     <string name="voice_chatroom_noise_suppression">Noise Suppression</string>
-    <string name="voice_chatroom_ear_back">In-Ear Monitor</string>
-    <string name="voice_chatroom_bgm">Background music</string>
     <string name="voice_chatroom_aiaec">AIAEC</string>
     <string name="voice_chatroom_aiagc">AGC</string>
     <string name="voice_chatroom_aiaec_audition">AIAEC Audition</string>
@@ -149,9 +146,9 @@
     <string name="voice_chatroom_audition_before">Before</string>
     <string name="voice_chatroom_audition_after">After</string>
     <string name="voice_chatroom_turnon_aiaec">Turn on AIAEC</string>
-    <string name="voice_chatroom_aiaec_introduce">&#160;&#160;&#160;&#160;When you turn on accompaniment singing, AIAEC can greatly improve your singing effect. It is strongly recommended that you turn it on when singing</string>
+    <string name="voice_chatroom_aiaec_introduce">When you turn on accompaniment singing, AIAEC can greatly improve your singing effect. It is strongly recommended that you turn it on when singing</string>
     <string name="voice_chatroom_turnon_aiagc">Turn on AGC</string>
-    <string name="voice_chatroom_aiagc_introduce">&#160;&#160;&#160;&#160;After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing</string>
+    <string name="voice_chatroom_aiagc_introduce">After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing</string>
     <string name="voice_chatroom_spatial_audio">Spatial Audio</string>
     <string name="voice_chatroom_only_host_can_change_robot">Only host can change the robot settings</string>
     <string name="voice_chatroom_agora_blue">Agora Blue Bot</string>
@@ -174,7 +171,9 @@
     <string name="voice_chatroom_gaming_buddy_introduce">This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice.</string>
     <string name="voice_chatroom_professional_broadcaster">Professional podcaster</string>
     <string name="voice_chatroom_professional_broadcaster_introduce">This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The Agora stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market.</string>
-    <string name="voice_chatroom_sound_selection_more">Need more Agora Sound Selection or custom sound. Visit &lt;font color=\'#3C4267\'&gt;&lt;strong&gt;&lt;u&gt;www.agora.io.&lt;/u&gt;&lt;/strong&gt;&lt;/font&gt;<![CDATA[]]></string>
+    <string name="voice_chatroom_sound_selection_more">Need more Agora Sound Selection or custom sound. Visit &lt;font color=\'#3C4267\'&gt;&lt;strong&gt;&lt;u&gt;www.agora.io.&lt;/u&gt;&lt;/strong&gt;&lt;/font&gt;
+        <![CDATA[]]>
+    </string>
     <string name="voice_chatroom_ains_settings">AINS Settings</string>
     <string name="voice_chatroom_your_ains">Your AINS</string>
     <string name="voice_chatroom_agora_blue_bot_ains">Agora Blue Bot AINS</string>
