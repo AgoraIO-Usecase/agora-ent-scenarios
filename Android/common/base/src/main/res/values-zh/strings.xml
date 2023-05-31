@@ -2,5 +2,4 @@
 <resources>
     <string name="try_again_to_exit">再按一次退出应用</string>
     <string name="permission_leak_tip">需要相应权限，请打开</string>
-
 </resources>

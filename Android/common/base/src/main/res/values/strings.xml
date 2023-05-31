@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <resources>
-    <string name="try_again_to_exit">Try again to exit</string>
-    <string name="permission_leak_tip">The required permissions should be open firstly.</string>
-
-    <string name="id_is_">ID:%s</string>
+    <string name="try_again_to_exit">Press again to exit the app</string>
+    <string name="permission_leak_tip">Appropriate permissions are required, please open</string>
 </resources>
