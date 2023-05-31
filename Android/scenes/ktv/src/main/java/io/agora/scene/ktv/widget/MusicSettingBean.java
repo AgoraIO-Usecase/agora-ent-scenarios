@@ -22,6 +22,9 @@ public class MusicSettingBean {
     private boolean hasEarPhone = false; // 是否有耳机
     private int earBackDelay = 0; // 耳返延迟
 
+    // 人声突出
+    private String highLighterUid = "";
+
 
     public MusicSettingBean(boolean isEar, int volMic, int volMusic, int toneValue, MusicSettingDialog.Callback mCallback) {
         this.isEar = isEar;
@@ -172,6 +175,14 @@ public class MusicSettingBean {
         if (mEarPhoneCallback != null) {
             mEarPhoneCallback.onEarMonitorDelay(earBackDelay);
         }
+    }
+
+    public String getHighLighterUid() {
+        return highLighterUid;
+    }
+
+    public void setHighLighterUid(String uid) {
+        this.highLighterUid = uid;
     }
 
     public interface EarPhoneCallback {

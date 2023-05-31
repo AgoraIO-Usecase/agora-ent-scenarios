@@ -10,12 +10,15 @@ import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentTransaction;
 
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvDialogEarbackSettingBinding;
+import io.agora.scene.ktv.live.RoomLivingActivity;
 import io.agora.scene.ktv.widget.MusicSettingBean;
+import io.agora.scene.ktv.widget.MusicSettingDialog;
 import io.agora.scene.widget.dialog.CommonDialog;
 
 public class EarBackFragment extends BaseViewBindingFragment<KtvDialogEarbackSettingBinding> {
@@ -101,6 +104,10 @@ public class EarBackFragment extends BaseViewBindingFragment<KtvDialogEarbackSet
         });
 
         updateEarPhoneDelay(mSetting.getEarBackDelay());
+
+        getBinding().ivBackIcon.setOnClickListener(view -> {
+            ((RoomLivingActivity) requireActivity()).closeMusicSettingsDialog();
+        });
     }
 
     private void updateEarPhoneStatus(boolean hasEarPhone) {
