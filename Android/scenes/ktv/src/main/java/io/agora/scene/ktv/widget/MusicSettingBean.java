@@ -78,6 +78,10 @@ public class MusicSettingBean {
         this.mCallback.onEffectChanged(effect);
     }
 
+    public void updateEffect(int effect) {
+        this.effect = effect;
+    }
+
     public int getBeautifier() {
         return beautifier;
     }
