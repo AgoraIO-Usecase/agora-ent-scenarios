@@ -1266,6 +1266,7 @@ public class RoomLivingViewModel extends ViewModel {
                             KTVLogger.d(TAG, "You are highlighter, " + "uid: " + uid);
                             isHighlightSinger = true;
                             mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
+                            mSetting.updateEffect(AUDIO_EFFECT_OFF);
                             audioPreset = AUDIO_EFFECT_OFF;
                             syncAudioPreset(audioPreset);
                         } else {
@@ -1532,6 +1533,7 @@ public class RoomLivingViewModel extends ViewModel {
 
         // 清空音效
         mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
+        mSetting.updateEffect(AUDIO_EFFECT_OFF);
         this.audioPreset = AUDIO_EFFECT_OFF;
         isHighlightSinger = false;
     }
@@ -1703,6 +1705,7 @@ public class RoomLivingViewModel extends ViewModel {
             // 突出房主自己
             isHighlightSinger = true;
             mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
+            mSetting.updateEffect(AUDIO_EFFECT_OFF);
             audioPreset = AUDIO_EFFECT_OFF;
             syncAudioPreset(audioPreset);
             KTVLogger.d(TAG, "Your are highlighter, " + "uid: " + uid);

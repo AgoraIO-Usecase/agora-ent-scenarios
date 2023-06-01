@@ -155,7 +155,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     binding.tvHC.setVisibility(View.GONE);
                     binding.tvRoomOwner.setVisibility(View.GONE);
                     binding.ivMute.setVisibility(View.GONE);
-                    binding.tvUserName.setText(String.valueOf(position + 1));
+                    binding.tvUserName.setText((position + 1) + "号麦");
                     binding.flVideoContainer.removeAllViews();
                 } else {
                     binding.tvUserName.setText(item.getName());
