@@ -237,6 +237,10 @@ extension SARoomViewController {
             view.makeToast("you have no wheat slots!".localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
+        if let mic = roomInfo?.mic_info?[idx], mic.status == 2 && isOwner == false  {
+            view.makeToast("Banned".localized())
+            return
+        }
         chatBar.micState = !chatBar.micState
        // chatBar.refresh(event: .mic, state: chatBar.micState ? .selected : .unSelected, asCreator: false)
         // 需要根据麦位特殊处理
