@@ -50,13 +50,13 @@ public class ProfileFragment extends BaseViewBindingFragment<FragmentProfileBind
                 }
             }
         });
-        getBinding().cbStartProfessionalMode.setChecked(mSetting.getProfessionalMode());
-        if (mSetting.getProfessionalMode()) {
-            getBinding().vSettingMark.setVisibility(View.INVISIBLE);
-        } else {
-            getBinding().vSettingMark.setVisibility(View.VISIBLE);
-            getBinding().vSettingMark.setOnClickListener(v -> {});
-        }
+        getBinding().cbStartProfessionalMode.setChecked(mSetting.getProfes scenes/ktv/src/main/sionalMode());
+//        if (mSetting.getProfessionalMode()) {
+//            getBinding().vSettingMark.setVisibility(View.INVISIBLE);
+//        } else {
+//            getBinding().vSettingMark.setVisibility(View.VISIBLE);
+//            getBinding().vSettingMark.setOnClickListener(v -> {});
+//        }
 
         if (this.mSetting.getAECLevel() == 0) {
             getBinding().rgVoiceMode.check(R.id.tvModeLow);
@@ -78,10 +78,37 @@ public class ProfileFragment extends BaseViewBindingFragment<FragmentProfileBind
         getBinding().cbLowLatency.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (buttonView.isPressed() && isChecked && mSetting.getAinsMode() != 0) {
+                    getBinding().rgAINSMode.check(R.id.tvAINSClose);
+                }
                 mSetting.setLowLatencyMode(isChecked);
             }
         });
         getBinding().cbLowLatency.setChecked(mSetting.getLowLatencyMode());
+
+
+        if (this.mSetting.getAinsMode() == 0) {
+            getBinding().rgAINSMode.check(R.id.tvAINSClose);
+        } else if (this.mSetting.getAECLevel() == 1) {
+            getBinding().rgAINSMode.check(R.id.tvAINSMiddle);
+        } else {
+            getBinding().rgAINSMode.check(R.id.tvAINSHigh);
+        }
+        getBinding().rgAINSMode.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.tvAINSClose) {
+                mSetting.setAinsMode(0);
+            } else if (checkedId == R.id.tvAINSMiddle) {
+                if (mSetting.getLowLatencyMode()) {
+                    getBinding().cbLowLatency.setChecked(false);
+                }
+                mSetting.setAinsMode(1);
+            } else if (checkedId == R.id.tvAINSHigh) {
+                if (mSetting.getLowLatencyMode()) {
+                    getBinding().cbLowLatency.setChecked(false);
+                }
+                mSetting.setAinsMode(2);
+            }
+        });
 
         getBinding().ivBackIcon.setOnClickListener(view -> {
             ((RoomLivingActivity) requireActivity()).closeMenuDialog();
