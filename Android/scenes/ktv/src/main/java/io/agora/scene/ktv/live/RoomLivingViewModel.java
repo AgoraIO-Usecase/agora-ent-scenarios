@@ -1209,6 +1209,18 @@ public class RoomLivingViewModel extends ViewModel {
                     mRtcEngine.setParameters("{\"che.audio.oboe.enable\": true}");
                 }
             }
+
+            @Override
+            public void onAINSModeChanged(int mode) {
+                KTVLogger.d(TAG, "onAINSModeChanged: " + mode);
+                if (mode == 0) {
+                    // 关闭
+                } else if (mode == 1) {
+                    // 中
+                } else if (mode == 2) {
+                    // 高
+                }
+            }
         });
     }
 

@@ -129,7 +129,9 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         mBinding.sbVol1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mSetting.setVolMic(i);
+                if (seekBar.isPressed()) {
+                    mSetting.setVolMic(i);
+                }
             }
 
             @Override
@@ -148,7 +150,9 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         mBinding.sbVol2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mSetting.setVolMusic(i);
+                if (seekBar.isPressed()) {
+                    mSetting.setVolMusic(i);
+                }
             }
 
             @Override
@@ -174,8 +178,10 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         mBinding.sbRemoteVol.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mSetting.setRemoteVolume(i);
-                mBinding.sbRemoteVol.setProgress(i);
+                if (seekBar.isPressed()) {
+                    mSetting.setRemoteVolume(i);
+                    mBinding.sbRemoteVol.setProgress(i);
+                }
             }
 
             @Override
@@ -366,5 +372,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         void onEarBackVolumeChanged(int volume);
 
         void onEarBackModeChanged(int mode);
+
+        void onAINSModeChanged(int mode);
     }
 }
