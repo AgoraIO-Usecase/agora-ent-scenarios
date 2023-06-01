@@ -100,6 +100,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, strong) LyricModel *lyricModel;
 @property (nonatomic, strong) KTVLrcControl *lrcControl;
 @property (nonatomic, copy, nullable) CompletionBlock loadMusicCallBack;
+@property (nonatomic, assign) int soundVolume;
 @property (nonatomic, assign) NSInteger selectedEffectIndex;
 @property (nonatomic, assign) BOOL isPause;
 @property (nonatomic, assign) NSInteger retryCount;
@@ -1323,13 +1324,18 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else if (type == VLKTVValueDidChangedTypeSound) { // 音量
         // 调节音频采集信号音量、取值范围为 [0,400]
         // 0、静音 100、默认原始音量 400、原始音量的4倍、自带溢出保护
-        [self.RTCkit adjustRecordingSignalVolume:setting.soundValue * 100];
-        if(setting.soundOn) {
-            [self.RTCkit setInEarMonitoringVolume:setting.soundValue * 100];
+        if(self.soundVolume != setting.soundValue * 100){
+            [self.RTCkit adjustRecordingSignalVolume:setting.soundValue * 100];
+            if(setting.soundOn) {
+                [self.RTCkit setInEarMonitoringVolume:setting.soundValue * 100];
+            }
+            self.soundVolume = setting.soundValue * 100;
         }
     } else if (type == VLKTVValueDidChangedTypeAcc) { // 伴奏
         int value = setting.accValue * 100;
-        self.playoutVolume = value;
+        if(self.playoutVolume != value){
+            self.playoutVolume = value;
+        }
     } else if (type == VLKTVValueDidChangedTypeListItem) {
         AgoraAudioEffectPreset preset = [self audioEffectPreset:setting.kindIndex];
         [self.RTCkit setAudioEffectPreset:preset];
