@@ -293,7 +293,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
         let mediaOption = AgoraRtcChannelMediaOptions()
         mediaOption.autoSubscribeAudio = true
         mediaOption.clientRoleType = .broadcaster
-        mediaOption.publishMicrophoneTrack = "\(rtcUid ?? 0)" == VLUserCenter.user.id
+        mediaOption.publishMicrophoneTrack = role != .audience
 
         rtcKit.setParameters("{\"che.audio.start_debug_recording\":\"all\"}")
         let code = rtcKit.joinChannel(byToken: token, channelId: channelName, uid: UInt(rtcUid ?? 0), mediaOptions: mediaOption)
