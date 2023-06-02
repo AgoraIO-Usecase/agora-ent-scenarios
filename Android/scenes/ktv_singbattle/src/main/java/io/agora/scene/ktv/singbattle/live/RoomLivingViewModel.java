@@ -656,6 +656,7 @@ public class RoomLivingViewModel extends ViewModel {
 
                         if (value != null && value.getWinnerNo() != null && value.getWinnerNo().equals("") && !songPlaying.getWinnerNo().equals("")) {
                             // 所有人更新抢唱结果UI
+                            hasReceiveStartSingBattle = false;
                             GraspModel model = new GraspModel();
                             model.status = GraspStatus.SUCCESS;
                             model.userId = songPlaying.getWinnerNo();
@@ -1066,8 +1067,9 @@ public class RoomLivingViewModel extends ViewModel {
                             rankMap.put(userId, model);
                         }
                     } else if (jsonMsg.getString("cmd").equals("StartSingBattleCountDown")) {
-                        KTVLogger.d("hugo", "StartSingBattleCountDown");
+                        KTVLogger.d(TAG, "StartSingBattleCountDown");
                         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                        hasReceiveStartSingBattle = true;
                     }
                 } catch (JSONException exp) {
                     KTVLogger.e(TAG, "onStreamMessage:" + exp);
@@ -1366,6 +1368,7 @@ public class RoomLivingViewModel extends ViewModel {
                 e -> {
                     if (e.getMessage().equals("961")) {
                         KTVLogger.d(TAG, "RoomLivingViewModel.getWinnerInfo() nobody grasp");
+                        hasReceiveStartSingBattle = false;
                         GraspModel model = new GraspModel();
                         model.status = GraspStatus.EMPTY;
                         graspStatusMutableLiveData.postValue(model);
@@ -1508,17 +1511,9 @@ public class RoomLivingViewModel extends ViewModel {
             // 观众
             loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), false, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), songCode);
         }
-
-        // 标记歌曲为播放中
-        ktvServiceProtocol.makeSongDidPlay(music, e -> {
-            if (e != null) {
-                // failure
-                ToastUtils.showToast(e.getMessage());
-            }
-            return null;
-        });
     }
 
+    private boolean hasReceiveStartSingBattle = false;
     private void loadMusic(KTVLoadMusicConfiguration config, Long songCode) {
         String jsonOption = "{\"format\":{\"highPart\":0}}";
         Long newSongCode = ktvApiProtocol.getMusicContentCenter().getInternalSongCode(songCode, jsonOption);
@@ -1545,6 +1540,8 @@ public class RoomLivingViewModel extends ViewModel {
 
                 if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getWinnerNo().equals("") && isRoomOwner()) {
                     SyncStartSing();
+                    playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                } else if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getWinnerNo().equals("") && !isRoomOwner() && hasReceiveStartSingBattle) {
                     playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                 } else if (songPlayingLiveData.getValue() != null && !songPlayingLiveData.getValue().getWinnerNo().equals("")) {
                     playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);

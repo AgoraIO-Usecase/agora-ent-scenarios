@@ -36,10 +36,10 @@
             android:id="@+id/tvPlayer"
             android:text="玩家"
             android:textSize="12sp"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:textColor="@color/white"
             android:layout_marginStart="10dp"
-            android:layout_weight="1.1"
+            android:layout_weight="1.6"
             android:layout_height="wrap_content"/>
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -49,7 +49,7 @@
             android:layout_width="wrap_content"
             android:textColor="@color/white"
             android:gravity="center"
-            android:layout_weight="1"
+            android:layout_weight="0.8"
             android:layout_height="wrap_content"/>
 
         <androidx.appcompat.widget.AppCompatTextView
