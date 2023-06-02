@@ -951,9 +951,12 @@ extension KTVApiImpl {
             let localPosition = self.lastMainSingerUpdateTime - self.localPlayerPosition
             let expectPosition = Int(dict["time"] as? Int64 ?? 0) + localNtpTime - Int(dict["ntp"] as? Int64 ?? 0) + self.audioPlayoutDelay
             let threshold = expectPosition - Int(localPosition)
-
+            let ntpTime = dict["ntp"] as? Int ?? 0
+            let time = dict["time"] as? Int64 ?? 0
+            agoraPrint("checkNtp, diff:\(threshold), localNtp:\(getNtpTimeInMs()), localPosition:\(localPosition), audioPlayoutDelay:\(audioPlayoutDelay), remoteDiff:\(String(describing: ntpTime - Int(time)))")
             if abs(threshold) > 80 {
                 musicPlayer?.seek(toPosition: expectPosition)
+                agoraPrint("CheckNtp, cosinger expectPosition: \(expectPosition) nowTime:\(Date().milListamp)")
                 agoraPrint("progress: setthreshold: \(threshold) expectPosition: \(expectPosition), localNtpTime: \(localNtpTime), audioPlayoutDelay: \(self.audioPlayoutDelay), localPosition: \(localPosition)")
             }
         }
@@ -1288,6 +1291,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
                                         "songIdentifier": songIdentifier
                                        // "songCode": self.songCode
             ]
+            agoraPrint("position_ms:\(position), ntp:\(getNtpTimeInMs()), delta:\(self.getNtpTimeInMs() - position), autoPlayoutDelay:\(self.audioPlayoutDelay)")
             sendStreamMessageWithDict(dict, success: nil)
         }
     }
