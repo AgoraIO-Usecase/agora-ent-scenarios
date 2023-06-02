@@ -100,6 +100,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             return;
         }
         getWindow().getDecorView().setKeepScreenOn(true);
+        setOnApplyWindowInsetsListener(getBinding().superLayout);
         roomLivingViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
             @NonNull
             @Override

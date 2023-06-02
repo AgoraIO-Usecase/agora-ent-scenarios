@@ -248,8 +248,12 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             container.container.addView(videoView, container.viewIndex)
         }
 
-        rtcEngine.setupLocalVideo(LocalVideoCanvasWrap(container.lifecycleOwner,
-            videoView, container.renderMode, container.uid))
+        val local = LocalVideoCanvasWrap(
+            container.lifecycleOwner,
+            videoView, container.renderMode, container.uid
+        )
+        local.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
+        rtcEngine.setupLocalVideo(local)
     }
 
     override fun startAudioMixing(
@@ -339,6 +343,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         if(!loopbackOnly){
             val mediaOptions = connectionWrap.mediaOptions
             mediaOptions.publishMediaPlayerId = mediaPlayer.mediaPlayerId
+            // TODO: 没开启麦克风权限情况下，publishMediaPlayerAudioTrack = true 会自动停止音频播放
             mediaOptions.publishMediaPlayerAudioTrack = true
             rtcEngine.updateChannelMediaOptionsEx(mediaOptions, connectionWrap)
         }
@@ -359,6 +364,12 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             mediaOptions.publishMediaPlayerAudioTrack = false
             rtcEngine.updateChannelMediaOptionsEx(mediaOptions, connectionWrap)
         }
+    }
+
+    override fun adjustAudioMixingVolume(connection: RtcConnection, volume: Int) {
+        val connectionWrap = connectionsJoined.firstOrNull { it.isSameChannel(connection) } ?: return
+        connectionWrap.audioMixingPlayer?.adjustPlayoutVolume(volume)
+        connectionWrap.audioMixingPlayer?.adjustPublishSignalVolume(volume)
     }
 
     private fun leaveRtcChannel(connection: RtcConnectionWrap) {

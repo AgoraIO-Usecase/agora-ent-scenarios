@@ -12,7 +12,7 @@ import io.agora.scene.show.ShowLogger
 import io.agora.scene.show.databinding.ShowWidgetDebugAudienceSettingDialogBinding
 import io.agora.scene.show.widget.BottomFullDialog
 
-class DebugAudienceSettingDialog (context: Context) : BottomFullDialog(context) {
+class DebugAudienceSettingDialog constructor(context: Context) : BottomFullDialog(context) {
     private val TAG = "DebugSettings"
     private val mBinding by lazy {
         ShowWidgetDebugAudienceSettingDialogBinding.inflate(

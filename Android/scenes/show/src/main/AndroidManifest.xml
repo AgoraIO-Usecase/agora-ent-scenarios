@@ -18,17 +18,17 @@
         <activity
             android:name=".RoomListActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="behind" />
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".LivePrepareActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="behind" />
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".LiveDetailActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="behind"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing" />
 
     </application>

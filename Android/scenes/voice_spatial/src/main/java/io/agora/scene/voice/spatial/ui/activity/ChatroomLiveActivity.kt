@@ -195,8 +195,10 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             override fun onReceiveSeatRequest() {
                 super.onReceiveSeatRequest()
                 "onReceiveSeatRequest ${roomKitBean.isOwner}".logD(TAG)
-                ThreadManager.getInstance().runOnMainThread {
-                    binding.chatBottom.setShowHandStatus(roomKitBean.isOwner, true)
+                if (roomKitBean.isOwner) {
+                    ThreadManager.getInstance().runOnMainThread {
+                        binding.chatBottom.setShowHandStatus(true, true)
+                    }
                 }
             }
 

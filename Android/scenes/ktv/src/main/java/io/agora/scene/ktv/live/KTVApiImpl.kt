@@ -161,6 +161,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\":600}")
         mRtcEngine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
         mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
+        mRtcEngine.setParameters("{\"che.audio.direct.uplink_process\": false}")
 
         // Android Only
         mRtcEngine.setParameters("{\"che.audio.enable_estimated_device_delay\":false}")

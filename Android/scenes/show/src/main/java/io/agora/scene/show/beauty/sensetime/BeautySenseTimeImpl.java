@@ -111,12 +111,10 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
     @Override
     public boolean onCaptureVideoFrame(int type,VideoFrame videoFrame) {
         if (!isEnable() || isReleased) {
-            if (shouldMirror) {
-                shouldMirror = false;
-                return false;
-            }
+            shouldMirror = videoFrame.getSourceType() == VideoFrame.SourceType.kFrontCamera;
             return true;
         }
+        shouldMirror = false;
         VideoFrame.Buffer buffer = videoFrame.getBuffer();
         // 获取NV21数据
         VideoFrame.I420Buffer i420Buffer = buffer.toI420();
@@ -140,8 +138,8 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         mNV21Buffer.get(mNV21ByteArray);
         i420Buffer.release();
 
-        int texture;
-        Matrix transformMatrix;
+        int texture = -1;
+        Matrix transformMatrix = new Matrix();
         if (buffer instanceof VideoFrame.TextureBuffer) {
             // 使用双输入处理
             VideoFrame.TextureBuffer textureBuffer = (VideoFrame.TextureBuffer) buffer;
@@ -173,11 +171,8 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
                             textureBuffer.getTextureId(),
                             textureBuffer.getType() == VideoFrame.TextureBuffer.Type.RGB ? GLES20.GL_TEXTURE_2D : GLES11Ext.GL_TEXTURE_EXTERNAL_OES));
             transformMatrix = textureBuffer.getTransformMatrix();
-            if (shouldMirror) {
-                shouldMirror = false;
-                return false;
-            }
-        } else {
+        }
+        else {
             // 使用单输入处理
             if (textureBufferHelper == null) {
                 mEglBaseContext = null;
@@ -190,13 +185,9 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
             texture = textureBufferHelper.invoke(() ->
                     mSTRenderer.preProcess(buffer.getWidth(), buffer.getHeight(), videoFrame.getRotation(), mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21));
             transformMatrix = new Matrix();
-            if(!shouldMirror){
-                shouldMirror = true;
-                return false;
-            }
         }
 
-        boolean isFront = videoFrame.getRotation() == 270;
+        boolean isFront = videoFrame.getSourceType() == VideoFrame.SourceType.kFrontCamera;
         if (isFrontCamera != isFront) {
             isFrontCamera = isFront;
             return false;

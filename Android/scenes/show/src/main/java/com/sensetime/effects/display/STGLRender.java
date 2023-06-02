@@ -11,6 +11,8 @@ public class STGLRender {
     }
 
     private float[] renderMVPMatrix = new float[16];
+    private int rotation;
+    private boolean flipH, flipV;
 
 
     private RenderProgram mRenderProgram;
@@ -20,8 +22,12 @@ public class STGLRender {
     }
 
     public void adjustRenderSize(int width, int height, int rotation, boolean flipH, boolean flipV) {
-        boolean resize = mRenderProgram.resize(width, height);
+        boolean resize = mRenderProgram.resize(width, height) || this.rotation != rotation || this.flipH != flipH || this.flipV != flipV;
         if (resize) {
+            this.rotation = rotation;
+            this.flipH = flipH;
+            this.flipV = flipV;
+
             float[] tmp = new float[16];
             Matrix.setIdentityM(tmp, 0);
 
