@@ -13,6 +13,7 @@ import io.agora.scene.base.component.BaseDialog
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.widget.databinding.DialogTopFunctionBinding
 import io.agora.scene.widget.utils.StatusBarUtil
+import io.agora.scene.widget.R
 
 /**
  * @author create by zhangwei03
@@ -42,9 +43,8 @@ class TopFunctionDialog constructor(context: Context) : BaseDialog<DialogTopFunc
     }
 
     override fun initView() {
-
         binding.layoutReport.setOnClickListener {
-            ToastUtils.showToast("举报成功")
+            ToastUtils.showToast(context.getString(R.string.report_room_success))
             dismiss()
         }
     }

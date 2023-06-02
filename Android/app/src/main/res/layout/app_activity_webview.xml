@@ -10,7 +10,7 @@
     <io.agora.scene.widget.CommonTitleView
         android:id="@+id/title_view"
         style="@style/title_view"
-        app:ctv_centerText=""
+        app:ctv_centerText="@string/app_name"
         tools:ignore="MissingConstraints" />
 
     <io.agora.scene.widget.CustomWebView

@@ -2,6 +2,7 @@
 <resources>
 
     <string name="report_room">举报</string>
+    <string name="report_room_success">举报成功</string>
 
     <string name="comm_permission_leak_auido_title">没有麦克风权限</string>
     <string name="comm_permission_leak_auido_content">请在设置中打开麦克风权限</string>
