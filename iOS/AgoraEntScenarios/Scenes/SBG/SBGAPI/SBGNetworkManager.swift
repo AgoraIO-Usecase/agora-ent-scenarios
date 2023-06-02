@@ -10,7 +10,7 @@ import Foundation
 class SBGNetworkManager: NSObject {
     @objc static let shared = SBGNetworkManager()
     let testUrl = "https://test-toolbox.bj2.agoralab.co/v1/ktv/song/grab"
-    let url = "https://toolbox.bj2.agoralab.co/v1/ktv/"
+    let url = "https://toolbox.bj2.agoralab.co/v1/ktv/song/grab"
     let networkTool = NetworkTools()
     //发起抢唱
     @objc func startSongGrab(_ appid: String, sceneId: String, roomId: String, headUrl: String, userId: String, userName: String, songCode: String, success: @escaping (Bool) -> Void) {
@@ -25,7 +25,7 @@ class SBGNetworkManager: NSObject {
             "headUrl":headUrl
         ]
         
-        networkTool.request(testUrl, method: .post, parameters: params) {[weak self] result in
+        networkTool.request(url, method: .post, parameters: params) {[weak self] result in
             switch result{
                 case .success(let data):
                     let obj = self?.data2Dict(with: data)
@@ -50,7 +50,7 @@ class SBGNetworkManager: NSObject {
             "src": "postman"
         ]
         
-        networkTool.request("\(testUrl)/query".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "", method: .get, parameters: params) { result in
+        networkTool.request("\(url)/query".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "", method: .get, parameters: params) { result in
             switch result {
             case .success(let data):
                 do {

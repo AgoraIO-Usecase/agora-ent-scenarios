@@ -73,7 +73,10 @@
         
         if (ifRefresh) {
             [self.roomListModeArray removeAllObjects];
-            self.roomListModeArray = array.mutableCopy;
+            NSMutableArray *filteredArray = [NSMutableArray arrayWithArray:array.mutableCopy];
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"objectId != nil"];
+            [filteredArray filterUsingPredicate:predicate];
+            self.roomListModeArray = filteredArray;
             if (array.count > 0) {
                 self.listCollectionView.mj_footer.hidden = NO;
             }else{

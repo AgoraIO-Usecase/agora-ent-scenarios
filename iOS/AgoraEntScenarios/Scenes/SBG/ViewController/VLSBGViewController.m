@@ -343,8 +343,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
             }
         } else {
             VLSBGRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
-            
-           // if(![songInfo.winnerNo isEqualToString:@""] && status == SBGSubscribeUpdated){
+
             if(![songInfo.winnerNo isEqualToString:@""] && status == SBGSubscribeUpdated){
                 [weakSelf dealWithSbgEventWithUserNo:songInfo];
             }
@@ -835,9 +834,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (model.status == VLSBGSongPlayStatusPlaying) {
         return;
     }
-    [[AppContext sbgServiceImp] markSongDidPlayWithInput:model
-                                              completion:^(NSError * error) {
-    }];
+//    [[AppContext sbgServiceImp] markSongDidPlayWithInput:model
+//                                              completion:^(NSError * error) {
+//    }];
 }
 
 - (void)syncChoruScore:(NSInteger)score {
@@ -1213,32 +1212,55 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
--(void)didRandomSelectSongEvent {
+- (void)didRandomSelectSongEvent {
     NSInteger count = 8 - self.selSongsArray.count;
-    if(self.selSongsArray.count == 8){
-        //直接开始
-    } else {
-        for(int i= 0;i< count;i++){
-            AgoraMusic *music = [self getMockMusicList][i];
-            SBGChooseSongInputModel* inputModel = [SBGChooseSongInputModel new];
-            inputModel.isChorus = false;
-            inputModel.songName = music.name;
-            inputModel.songNo = [NSString stringWithFormat:@"%li", music.songCode] ;
-            inputModel.imageUrl = music.poster;
-            inputModel.singer = music.singer;
-            [[AppContext sbgServiceImp] chooseSongWithInput:inputModel
-                                                 completion:^(NSError * error) {
-            }];
-        }
-    }
-    
-    self.maxCount = 8;
-    //更新UI为倒计时状态并倒计时
-    [self stopPlaySong];
-    self.gameModel.status = SingBattleGameStatusStarted;
-    [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:self.gameModel completion:^(NSError * _Nullable) {
+    NSArray *musicList = [self getMockMusicList];
+    if (self.selSongsArray.count == 8) {
+        // 直接开始
+        self.gameModel.status = SingBattleGameStatusStarted;
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:self.gameModel completion:^(NSError * _Nullable) {
                 
-    }];
+            }];
+        });
+    } else {
+        dispatch_group_t group = dispatch_group_create();
+        __block NSError *error = nil; // 可以用 __block 修饰符来允许在 block 内修改变量
+
+        dispatch_apply(count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t i) { // 使用 dispatch_apply 替换 for 循环
+            if (i < musicList.count) {
+                AgoraMusic *music = musicList[i];
+
+                SBGChooseSongInputModel *inputModel = [[SBGChooseSongInputModel alloc]init];
+                inputModel.isChorus = false;
+                inputModel.songName = music.name;
+                inputModel.songNo = [NSString stringWithFormat:@"%li", music.songCode];
+                inputModel.imageUrl = music.poster;
+                inputModel.singer = music.singer;
+
+                dispatch_group_enter(group);
+                [[AppContext sbgServiceImp] chooseSongWithInput:inputModel
+                                                     completion:^(NSError * err) {
+                                                         error = err;
+                                                         dispatch_group_leave(group);
+                                                     }];
+            }
+        });
+
+        dispatch_group_notify(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            if (!error) { // 异常检查
+                self.gameModel.status = SingBattleGameStatusStarted;
+                
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:self.gameModel completion:^(NSError * _Nullable) {
+                        
+                    }];
+                });
+            } else {
+                // 处理错误情况
+            }
+        });
+    }
 }
 
 -(void)onKaraokeViewWithScore:(NSInteger)score totalScore:(NSInteger)totalScore lineScore:(NSInteger)lineScore lineIndex:(NSInteger)lineIndex {
@@ -1324,7 +1346,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 -(void)handleSingSuccessNextMusicWithScore:(NSInteger)score{
     if([self isRoomOwner]){
-        NSLog(@"removeCurrentSongWithSync: handleSingFailedNextMusicWithScore");
+        NSLog(@"removeCurrentSongWithSync: handleSingSuccessNextMusicWithScore");
         [self removeCurrentSongWithSync:YES];
     }
     [self stopSingAndShowSuccessStateWithScore:score];
@@ -2229,8 +2251,20 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 }
 
 -(void)querySbgStatusAndUpdateUI {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW , (int64_t)(13 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    
+    dispatch_time_t queryTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(13 * NSEC_PER_SEC));
+    dispatch_after(queryTime, dispatch_get_main_queue(), ^{
         [self sbgQuery];
+    });
+
+    
+    dispatch_time_t updateTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(12 * NSEC_PER_SEC));
+    dispatch_after(updateTime, dispatch_get_main_queue(), ^{
+        VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
+        if(![model.winnerNo isEqualToString:@""]){//如果这首歌被人抢唱了 就不需要再查询了
+            return;
+        }
+        self.statusView.state = SBGStateSbgingOffSeat;
     });
 }
 
@@ -2638,7 +2672,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
     
     AgoraMusic *music8 = [[AgoraMusic alloc] init];
     music8.songCode = 6625526603711050;
-    music8.name = @"我的";
+    music8.name = @"我的道姑朋友";
     music8.singer = @"以东";
     music7.poster = @"";
     
