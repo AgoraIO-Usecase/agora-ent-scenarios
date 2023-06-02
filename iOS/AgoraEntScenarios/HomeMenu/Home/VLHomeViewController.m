@@ -72,16 +72,12 @@
 //        default:
 //            break;
 //    }
-<<<<<<< HEAD
 
     if (!KeyCenter.IMAppKey.isNotBlank || !KeyCenter.IMClientId.isNotBlank || !KeyCenter.IMClientSecret.isNotBlank) {
         [VLToast toast:@"IMAppKey / IMClientId / IMClientSecret 未配置"];
         return;
     }
 
-=======
-    
->>>>>>> d849bfcc268c8bb1b2547de85411be7bb584d225
     NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow"];
     [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
     [[NetworkManager shared] reportDeviceInfoWithSceneName:sceneNames[tagValue]];
