@@ -11,9 +11,9 @@ import AgoraRtcKit
 
 @objcMembers final class AboutAgoraEntertainmentViewController: VRBaseViewController {
     
-    var infos = [["contents":[["title": NSLocalizedString("ContactCustomerService", comment: ""),
+    var infos = [["contents":[["title": NSLocalizedString("联系客服", comment: ""),
                                "detail": "400-632-6626"],
-                              ["title": NSLocalizedString("OfficialWebsiteAddress", comment: ""),
+                              ["title": NSLocalizedString("官网地址", comment: ""),
                                "detail":"https://www.shengwang.cn"]],
                   "sectionName": ""],
                  ["contents": [["title": "语聊房", "detail":"YL-2.1.0"],
@@ -54,7 +54,7 @@ import AgoraRtcKit
         tableHeader.delegate = self
         self.view.addSubview(self.infoList)
         self.view.bringSubviewToFront(navigation)
-        self.navigation.title.text = NSLocalizedString("AboutAgoraEntertainment", comment: "")
+        self.navigation.title.text = NSLocalizedString("关于声动互娱", comment: "")
         
         debugModeButton.isHidden = !AppContext.shared.isDebugMode
         self.view.addSubview(debugModeButton)

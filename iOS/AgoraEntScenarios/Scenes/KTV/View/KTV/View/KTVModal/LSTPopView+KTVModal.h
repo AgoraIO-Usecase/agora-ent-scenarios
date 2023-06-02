@@ -15,6 +15,10 @@
 #import "VLPopSongList.h"
 #import "VLEffectView.h"
 #import "VLKTVSettingView.h"
+#import "VLVoiceShowView.h"
+#import "VLVoicePerShowView.h"
+#import "VLVoiceShowView.h"
+#import "VLVoicePerShowView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -63,6 +67,19 @@ NS_ASSUME_NONNULL_BEGIN
 + (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
                                settingView:(VLKTVSettingView*)settingView
                                withDelegate:(id<VLKTVSettingViewDelegate>)delegate;
+
++ (LSTPopView*)popVoiceShowViewWithParentView:(UIView*)parentView
+                                         showView:(VLVoiceShowView*)showView
+                                   dataSource:(NSArray *)array
+                                      withDelegate:(id<VLVoiceShowViewDelegate>)delegate;
+
+
++ (LSTPopView*)popVoicePerViewWithParentView:(UIView*)parentView
+                                       grade:(NSInteger)grade
+                                    isRoomOwner: (BOOL) isRoomOwner
+                                         perView:(VLVoicePerShowView*)perView
+                                withDelegate:(id<VLVoicePerShowViewDelegate>)delegate;
+
 @end
 
 NS_ASSUME_NONNULL_END

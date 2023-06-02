@@ -21,6 +21,7 @@ import AgoraRtcKit
 /// 歌曲状态
 @objc public enum KTVPlayerTrackMode: Int {
     case origin = 0    //原唱
+    case lead          //导唱
     case acc           //伴奏
 }
 
@@ -327,4 +328,8 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     /// 获取MCC实例
     /// - Returns: <#description#>
     func getMusicContentCenter() -> AgoraMusicContentCenter?
+    
+    // 开启专业主播模式
+    func enableProfessionalStreamerMode(_ enable: Bool)
+
 }
