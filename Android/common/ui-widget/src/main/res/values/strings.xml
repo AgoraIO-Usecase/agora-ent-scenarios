@@ -7,6 +7,7 @@
     <string name="exit_room">退出房间</string>
     <string name="dismiss_room">解散房间</string>
     <string name="report_room">Report</string>
+    <string name="report_room_success">Reported</string>
 
     <string name="cancel">取消</string>
     <string name="close">关闭</string>

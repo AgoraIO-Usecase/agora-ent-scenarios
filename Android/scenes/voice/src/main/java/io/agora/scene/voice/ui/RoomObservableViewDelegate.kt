@@ -68,9 +68,6 @@ class RoomObservableViewDelegate constructor(
     /**申请上麦标志*/
     private var isRequesting: Boolean = false
 
-    /**本地 座位 mute标志*/
-    private var isLocalAudioMute: Boolean = true
-
     private var voiceRoomModel: VoiceRoomModel = VoiceRoomModel()
 
     private fun localUserIndex(): Int {
@@ -160,7 +157,7 @@ class RoomObservableViewDelegate constructor(
                 if (rtcUid == 0) {
                     // 自己,没有关麦
                     val myselfIndex = localUserIndex()
-                    if (myselfIndex >= 0 && !isLocalAudioMute) {
+                    if (myselfIndex >= 0) {
                         iRoomMicView.updateVolume(myselfIndex, volume)
                     }
                 } else {
@@ -320,7 +317,6 @@ class RoomObservableViewDelegate constructor(
                     override fun onSuccess(data: VoiceMicInfoModel?) {
                         data?.let {
                             // 更新麦位
-                            isLocalAudioMute = it.micStatus == MicStatus.Normal
                             val newMicMap = mutableMapOf(it.micIndex to it)
                             dealMicDataMap(newMicMap)
                             updateViewByMicMap(newMicMap)
@@ -385,7 +381,6 @@ class RoomObservableViewDelegate constructor(
                             // 自己
                             if (rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
                                 localUserMicInfo = micInfo
-                                isLocalAudioMute = micInfo.micStatus != MicStatus.Normal
                             }
                             micMap[micIndex] = rtcUid
                         }
@@ -394,7 +389,9 @@ class RoomObservableViewDelegate constructor(
                 iRoomMicView.onInitMic(micInfoList, voiceRoomModel.useRobot)
             }
         }
-        chatPrimaryMenuView.showMicVisible(isLocalAudioMute, localUserIndex() >= 0)
+        val isOn = (localUserMicInfo?.member?.micStatus == 1 &&
+                localUserMicInfo?.micStatus == MicStatus.Normal)
+        chatPrimaryMenuView.showMicVisible(localUserIndex() >= 0, isOn)
     }
 
     /**
@@ -969,7 +966,7 @@ class RoomObservableViewDelegate constructor(
             .setOnClickListener(object : CommonSheetAlertDialog.OnClickBottomListener {
                 override fun onConfirmClick() {
                     if (isRequesting) {
-                        roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())
+                        roomLivingViewModel.cancelMicSeatApply(roomKitBean.chatroomId, VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())
                     } else {
                         if (activity is ChatroomLiveActivity) {
                             activity.toggleSelfAudio(true, callback = {
@@ -992,11 +989,12 @@ class RoomObservableViewDelegate constructor(
             ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_muted_by_host))
             return
         }
+        val isOn = localUserMicInfo?.member?.micStatus == 1
+        val toState = !isOn
         if (activity is ChatroomLiveActivity){
-            activity.toggleSelfAudio(isLocalAudioMute, callback = {
-                chatPrimaryMenuView.setEnableMic(isLocalAudioMute)
-                muteLocalAudio(!isLocalAudioMute)
-                isLocalAudioMute = !isLocalAudioMute
+            activity.toggleSelfAudio(toState, callback = {
+                chatPrimaryMenuView.setEnableMic(toState)
+                muteLocalAudio(!toState)
             })
         }
     }
@@ -1102,19 +1100,10 @@ class RoomObservableViewDelegate constructor(
         }
         kvLocalUser?.let { localUserMicInfo = it }
         AgoraRtcEngineController.get().switchRole(localUserIndex() >= 0)
-        //如果麦位状态正常 则需要打开麦克风 并且开启本地音频
-        if (localUserMicInfo?.micStatus == MicStatus.Normal) {   // 状态正常
-            if (localUserMicInfo?.member?.micStatus == 1){ //user麦位状态 打开
-                if (!isLocalAudioMute) return
-                isLocalAudioMute = false
-                AgoraRtcEngineController.get().enableLocalAudio(true)
-            }else{ //user 麦位状态 关闭
-                isLocalAudioMute = true
-                AgoraRtcEngineController.get().enableLocalAudio(false)
-            }
+        if (localUserMicInfo?.member?.micStatus == 1 &&
+            localUserMicInfo?.micStatus == MicStatus.Normal) {   // 状态正常
+            AgoraRtcEngineController.get().enableLocalAudio(true)
         } else {  // 其他状态
-            if (isLocalAudioMute) return
-            isLocalAudioMute = true
             AgoraRtcEngineController.get().enableLocalAudio(false)
         }
     }
@@ -1124,7 +1113,9 @@ class RoomObservableViewDelegate constructor(
      */
     private fun updateViewByMicMap(newMicMap: Map<Int, VoiceMicInfoModel>) {
         iRoomMicView.onSeatUpdated(newMicMap)
-        chatPrimaryMenuView.showMicVisible(isLocalAudioMute, localUserIndex() >= 0)
+        val isOn = (localUserMicInfo?.member?.micStatus == 1 &&
+                localUserMicInfo?.micStatus == MicStatus.Normal)
+        chatPrimaryMenuView.showMicVisible(localUserIndex() >= 0, isOn)
         if (roomKitBean.isOwner) {
             val handsCheckMap = mutableMapOf<Int, String>()
             newMicMap.forEach { (t, u) ->

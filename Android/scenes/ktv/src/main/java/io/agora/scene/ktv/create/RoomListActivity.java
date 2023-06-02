@@ -81,6 +81,7 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
         getBinding().rvRooms.setLayoutManager(new GridLayoutManager(this, 2));
         getBinding().rvRooms.setAdapter(mAdapter);
         getBinding().smartRefreshLayout.setEnableLoadMore(false);
+        setOnApplyWindowInsetsListener(getBinding().getRoot());
     }
 
     @Override

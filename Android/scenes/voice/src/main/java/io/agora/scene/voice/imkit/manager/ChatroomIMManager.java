@@ -735,11 +735,12 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
 
     /**
      * 取消上麦
+     * @param chatroomId 撤销申请的IM房间号
      * @param chatUid
      * @param callBack
      */
-    public void cancelMicSeatApply(String chatUid,CallBack callBack){
-        delegate.cancelSubmitMic(chatUid,callBack);
+    public void cancelMicSeatApply(String chatroomId, String chatUid,CallBack callBack){
+        delegate.cancelSubmitMic(chatroomId, chatUid, callBack);
     }
 
 

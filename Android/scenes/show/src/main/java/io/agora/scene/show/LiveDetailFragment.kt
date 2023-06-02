@@ -1675,12 +1675,21 @@ class LiveDetailFragment : Fragment() {
             onRemoteVideoStats = { stats ->
                 setEnhance(stats)
                 activity?.runOnUiThread {
-                    refreshStatisticInfo(downBitrate = stats.receivedBitrate, receiveFPS = stats.decoderOutputFrameRate, downLossPackage = stats.packetLossRate, downDelay = stats.delay, receiveVideoSize = Size(stats.width, stats.height))
+                    refreshStatisticInfo(
+                        downBitrate = stats.receivedBitrate,
+                        receiveFPS = stats.decoderOutputFrameRate,
+                        downLossPackage = stats.packetLossRate,
+                        receiveVideoSize = Size(stats.width, stats.height)
+                    )
                 }
             },
             onRemoteAudioStats = { stats ->
                 activity?.runOnUiThread {
-                    refreshStatisticInfo(audioBitrate = stats.receivedBitrate, audioLossPackage = stats.audioLossRate)
+                    refreshStatisticInfo(
+                        audioBitrate = stats.receivedBitrate,
+                        audioLossPackage = stats.audioLossRate,
+                        downDelay = stats.networkTransportDelay,
+                    )
                 }
             },
             onDownlinkNetworkInfoUpdated = { info ->
@@ -1727,7 +1736,8 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.autoSubscribeVideo = true
             channelMediaOptions.autoSubscribeAudio = true
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-            channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+            channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_ULTRA_LOW_LATENCY
+            channelMediaOptions.isInteractiveAudience = true
             val pkRtcConnection = RtcConnection(
                 interactionInfo!!.roomId,
                 UserManager.getInstance().user.id.toInt()
