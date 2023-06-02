@@ -498,6 +498,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.onPlayStatus(roomLivingViewModel.songPlayingLiveData.getValue());
                 if (roomLivingViewModel.songPlayingLiveData.getValue() != null && roomLivingViewModel.songPlayingLiveData.getValue().getWinnerNo().equals("")) {
                     getBinding().getRoot().postDelayed(() -> {
+                        getBinding().lrcControlView.onGraspDiasble();
+                    }, 12000);
+                    getBinding().getRoot().postDelayed(() -> {
                         roomLivingViewModel.onGraspFinish();
                     }, 13000);
                 }

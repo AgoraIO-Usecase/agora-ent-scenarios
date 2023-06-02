@@ -1291,6 +1291,7 @@ class KTVSyncManagerServiceImp(
     }
 
     private fun innerPinSong(objectId: String, song: RoomSelSongModel, completion: (error: Exception?) -> Unit) {
+        KTVLogger.d(TAG, "innerPinSong: $song")
         val sceneReference = mSceneReference ?: return
         sceneReference.collection(kCollectionIdChooseSong)
             .update(objectId,
@@ -1307,6 +1308,7 @@ class KTVSyncManagerServiceImp(
     }
 
     private fun innerDidPlaySong(objectId: String, song: RoomSelSongModel, completion: (error: Exception?) -> Unit) {
+        KTVLogger.d(TAG, "innerDidPlaySong: $song")
         val sceneReference = mSceneReference ?: return
         sceneReference.collection(kCollectionIdChooseSong)
             .update(objectId,
@@ -1353,6 +1355,7 @@ class KTVSyncManagerServiceImp(
         songInfo: RoomSelSongModel,
         completion: (error: Exception?) -> Unit
     ) {
+        KTVLogger.d(TAG, "innerUpdateChooseSong: $songInfo")
         mSceneReference?.collection(kCollectionIdChooseSong)
             ?.update(objectId, songInfo, object : Callback {
                 override fun onSuccess() {
@@ -1369,6 +1372,7 @@ class KTVSyncManagerServiceImp(
         songInfo: RoomSelSongModel,
         completion: (error: Exception?) -> Unit
     ) {
+        KTVLogger.d(TAG, "innerAddChooseSongInfo: $songInfo")
         mSceneReference?.collection(kCollectionIdChooseSong)
             ?.add(songInfo, object : DataItemCallback {
                 override fun onSuccess(result: IObject) {

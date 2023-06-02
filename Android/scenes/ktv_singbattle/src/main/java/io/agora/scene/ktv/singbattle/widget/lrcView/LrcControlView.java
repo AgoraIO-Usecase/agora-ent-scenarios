@@ -340,6 +340,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         findViewById(R.id.lyricsView).requestLayout();
     }
 
+    public void onGraspDiasble() {
+        if (mBinding == null) return;
+        mBinding.ilActive.singBattle.setVisibility(View.INVISIBLE);
+    }
+
     public void setRole(@NonNull Role mRole) {
         KTVLogger.d("LrcView", "setRole: " + mRole);
         this.mRole = mRole;
