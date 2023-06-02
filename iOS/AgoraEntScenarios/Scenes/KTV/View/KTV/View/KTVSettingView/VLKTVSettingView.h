@@ -42,6 +42,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) BOOL mvOn;
 @property (nonatomic, assign) float soundValue;
 @property (nonatomic, assign) float accValue;
+@property (nonatomic, assign) float remoteValue;
 @property (nonatomic, assign) NSInteger toneValue;
 @property (nonatomic, assign) int remoteVolume;
 

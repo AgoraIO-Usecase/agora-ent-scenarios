@@ -66,6 +66,13 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     dianGeBtn.tag = VLKTVBottomBtnClickTypeChoose;
     [self addSubview:dianGeBtn];
     
+    VLHotSpotBtn *voiceShowBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(moreBtn.right + 14 , (self.height-24)*0.5, 24, 24)];
+    [voiceShowBtn setImage:[UIImage sceneImageWithName:@"ktv_moreItem_icon"] forState:UIControlStateNormal];
+    [voiceShowBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
+    voiceShowBtn.tag = VLKTVBottomBtnClickTypeShowVoice;
+    [self addSubview:voiceShowBtn];
+    voiceShowBtn.hidden = YES;
+    
     for (VLRoomSeatModel *info in self.seatsArray) {
         if ([info.rtcUid integerValue] == [VLUserCenter.user.id integerValue]) {
             //is self
@@ -91,6 +98,10 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 //            if (self.delegate && [self.delegate respondsToSelector:@selector(bottomSetVideoMute:)]) {
 //                [self.delegate bottomSetVideoMute:info.isVideoMuted];
 //            }
+            if(info.seatIndex == 0){
+                voiceShowBtn.hidden = NO;
+            }
+
             break;
         }
     }

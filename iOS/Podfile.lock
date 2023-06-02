@@ -19,7 +19,7 @@ PODS:
   - AgoraLyricsScore (1.1.1-beta-3)
   - AgoraRtcEngine_Special_iOS (4.1.1.5)
   - AgoraRtm_iOS (1.5.1)
-  - AgoraSyncManager (2.0.4):
+  - AgoraSyncManager (2.0.5):
     - SocketRocket
   - Bugly (2.5.93)
   - HWWeakTimer (1.0)
@@ -69,7 +69,7 @@ DEPENDENCIES:
   - AgoraLyricsScore (= 1.1.1-beta-3)
   - AgoraRtcEngine_Special_iOS (= 4.1.1.5)
   - AgoraRtm_iOS (= 1.5.1)
-  - AgoraSyncManager (= 2.0.4)
+  - AgoraSyncManager (= 2.0.5)
   - Bugly (= 2.5.93)
   - HWWeakTimer (= 1.0)
   - JXCategoryView (= 1.6.1)
@@ -78,6 +78,7 @@ DEPENDENCIES:
   - LSTPopView (= 0.3.10)
   - Masonry (= 1.1.0)
   - MJRefresh
+  - Protobuf (= 3.22.1)
   - ScoreEffectUI (= 1.0.1)
   - SDWebImage (~> 4.2)
   - SDWebImageAPNGCoder
@@ -136,7 +137,7 @@ SPEC CHECKSUMS:
   AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
   AgoraRtcEngine_Special_iOS: 752e4f3bf249980e8faeaa709a0094ac3288fd43
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
-  AgoraSyncManager: 4df1ae866bda7bf8e0ab3602b4b23d65b657ee9b
+  AgoraSyncManager: 4f265d83188031bbfdd610e2110e63fca545ecc1
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
@@ -162,6 +163,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 32a926d3f1b8b680b32528ac7533540137cfa816
+PODFILE CHECKSUM: 11f08525785ee186cfdee445a2dbee48d26424d8
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.11.3
