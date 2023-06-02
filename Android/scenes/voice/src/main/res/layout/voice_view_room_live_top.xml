@@ -15,22 +15,12 @@
         app:layout_constraintTop_toTopOf="parent"
         app:title="">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivChatroomBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:paddingStart="12dp"
-            android:paddingTop="16dp"
-            android:paddingEnd="5dp"
-            android:paddingBottom="16dp"
-            android:src="@drawable/voice_icon_back" />
-
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivChatroomOwner"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:scaleType="centerCrop"
+            android:layout_marginStart="12dp"
             android:src="@drawable/voice_bg_oval_black20"
             app:layout_constraintDimensionRatio="1:1"
             app:shapeAppearance="@style/voice_seat_roundStyle" />
@@ -65,13 +55,22 @@
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivChatroomBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:paddingStart="12dp"
+            android:paddingEnd="16dp"
+            android:paddingVertical="16dp"
+            android:src="@drawable/voice_icon_close" />
+
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivChatroomMore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingHorizontal="12dp"
             android:paddingVertical="16dp"
             android:layout_gravity="end"
-            android:layout_marginEnd="16dp"
             android:src="@drawable/voice_icon_more" />
 
         <com.google.android.material.textview.MaterialTextView
@@ -130,12 +129,13 @@
                 app:layout_constraintDimensionRatio="1:1"
                 app:shapeAppearance="@style/voice_seat_roundStyle" />
         </LinearLayout>
+
     </androidx.appcompat.widget.Toolbar>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtChatroomGifts"
         style="@style/voice_top_text_style"
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="12dp"
         android:drawableStart="@drawable/voice_icon_room_gift"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tbChatroomTop"

@@ -276,7 +276,7 @@ public class STRenderer {
         if (!mAuthorized || !mIsCreateHumanActionHandleSucceeded) {
             return -1;
         }
-
+        boolean isFront = orientation == 270;
         int imageWidth = width;
         int imageHeight = height;
         boolean imageSizeChange = mImageDataBuffer == null || mImageDataBuffer.length != cameraPixel.length;
@@ -342,9 +342,9 @@ public class STRenderer {
         STEffectRenderInParam sTEffectRenderInParam = new STEffectRenderInParam(
                 mSTHumanActionNative.getNativeHumanActionPtrCopy(),
                 mAnimalFaceInfo[0],
-                0,
-                0,
-                false,
+                getCurrentOrientation(orientation),
+                getCurrentOrientation(orientation),
+                isFront,
                 null,
                 stEffectTexture,
                 null
@@ -360,10 +360,10 @@ public class STRenderer {
             textureId = stEffectRenderOutParam.getTexture().getId();
         }
 
-        mGLRenderAfter.adjustRenderSize(imageWidth, imageHeight, 0, false, false);
+        mGLRenderAfter.adjustRenderSize(imageWidth, imageHeight, 0, false, !isFront);
         textureId = mGLRenderAfter.process(textureId, STGLRender.IDENTITY_MATRIX);
 
-        GLES20.glFlush();
+        GLES20.glFinish();
 
         return textureId;
     }
@@ -388,6 +388,7 @@ public class STRenderer {
             return -1;
         }
 
+        boolean isFront = orientation == 270;
         int imageWidth = width;
         int imageHeight = height;
         boolean imageSizeChange = mImageDataBuffer == null || mImageDataBuffer.length != cameraPixel.length;
@@ -448,9 +449,9 @@ public class STRenderer {
         STEffectRenderInParam sTEffectRenderInParam = new STEffectRenderInParam(
                 mSTHumanActionNative.getNativeHumanActionPtrCopy(),
                 mAnimalFaceInfo[0],
-                0,
-                0,
-                false,
+                getCurrentOrientation(orientation),
+                getCurrentOrientation(orientation),
+                isFront,
                 null,
                 stEffectTexture,
                 null);
@@ -462,10 +463,11 @@ public class STRenderer {
             textureId = stEffectRenderOutParam.getTexture().getId();
         }
 
-        mGLRenderAfter.adjustRenderSize(imageWidth, imageHeight, 0, false, false);
+
+        mGLRenderAfter.adjustRenderSize(imageWidth, imageHeight, 0, false, isFront);
         textureId = mGLRenderAfter.process(textureId, STGLRender.IDENTITY_MATRIX);
 
-        GLES20.glFlush();
+        GLES20.glFinish();
 
         return textureId;
     }

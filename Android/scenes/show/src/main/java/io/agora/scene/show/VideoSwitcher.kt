@@ -91,4 +91,10 @@ interface VideoSwitcher {
      */
     fun stopAudioMixing(connection: RtcConnection)
 
+    /**
+     * 调整音乐音量
+     * @param volume 0～100
+     */
+    fun adjustAudioMixingVolume(connection: RtcConnection, volume: Int)
+
 }
