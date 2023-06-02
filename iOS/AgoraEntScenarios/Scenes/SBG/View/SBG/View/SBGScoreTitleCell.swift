@@ -45,7 +45,7 @@ class SBGScoreTitleCell: UITableViewCell {
         self.contentView.addSubview(sbgCountLabel)
         
         scoreLabel = UILabel()
-        scoreLabel.text = "分数"
+        scoreLabel.text = "总分"
         scoreLabel.textAlignment = .center
         scoreLabel.textColor = .white
         scoreLabel.font = UIFont.systemFont(ofSize: 10)

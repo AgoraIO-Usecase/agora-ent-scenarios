@@ -224,7 +224,7 @@ class VLSBGLyricView: UIView {
         lrcView.lyricsView.textNormalColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
         lrcView.lyricsView.textHighlightedColor = UIColor(hex: "#FF8AB4")
         lrcView.lyricsView.lyricLineSpacing = 6
-        lrcView.lyricsView.draggable = true
+        lrcView.lyricsView.draggable = false
         lrcView.delegate = self
         addSubview(lrcView!)
 
