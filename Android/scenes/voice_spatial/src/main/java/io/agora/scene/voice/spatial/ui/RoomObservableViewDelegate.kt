@@ -1012,14 +1012,12 @@ class RoomObservableViewDelegate constructor(
     }
 
     private fun activeRobotSound() {
-        // 创建房间，第⼀次启动机器⼈后播放音效：
-        if (VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot) {
-            VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot = false
-            AgoraRtcEngineController.get()
-                .updateEffectVolume(robotInfo.robotVolume)
-            RoomSoundAudioConstructor.createRoomSoundAudioMap[roomKitBean.roomType]?.let {
-                AgoraRtcEngineController.get().playMusic(it)
-            }
+        // 空间音频机器人每次都播放音效
+        VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot = false
+        AgoraRtcEngineController.get()
+            .updateEffectVolume(robotInfo.robotVolume)
+        RoomSoundAudioConstructor.createRoomSoundAudioMap[roomKitBean.roomType]?.let {
+            AgoraRtcEngineController.get().playMusic(it)
         }
     }
 
