@@ -2,4 +2,5 @@
 <resources>
     <string name="try_again_to_exit">Press again to exit the app</string>
     <string name="permission_leak_tip">Appropriate permissions are required, please open</string>
+    <string name="id_is_">ID:%s</string>
 </resources>
