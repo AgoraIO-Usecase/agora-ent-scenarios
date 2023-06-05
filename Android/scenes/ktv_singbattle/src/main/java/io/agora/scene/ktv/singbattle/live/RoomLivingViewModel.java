@@ -1053,7 +1053,7 @@ public class RoomLivingViewModel extends ViewModel {
                             RankModel model = new RankModel(
                                     oldModel.getUserName(),
                                     oldModel.getSongNum() + 1,
-                                    (int)(oldModel.getScore() * oldModel.getSongNum() + score) / (oldModel.getSongNum() + 1),
+                                    (int)(oldModel.getScore() * oldModel.getSongNum() + score),
                                     poster
                             );
                             rankMap.put(userId, model);
@@ -1655,7 +1655,7 @@ public class RoomLivingViewModel extends ViewModel {
             RankModel model = new RankModel(
                     oldModel.getUserName(),
                     oldModel.getSongNum() + 1,
-                    (int)(oldModel.getScore() * oldModel.getSongNum() + score) / (oldModel.getSongNum() + 1),
+                    (int)(oldModel.getScore() * oldModel.getSongNum() + score),
                     UserManager.getInstance().getUser().headUrl
             );
             rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
@@ -1703,10 +1703,10 @@ public class RoomLivingViewModel extends ViewModel {
     public void sort(List<RankItem> list) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             list.sort((o1, o2) -> {
-                if (o1.songNum != o2.songNum) {
-                    return o2.songNum - o1.songNum; //songNum多的在前面
+                if (o1.score != o2.score) {
+                    return o2.score - o1.score; //score大的在前面
                 } else {
-                    return (int)o2.score - (int)o1.score; //songNum相同 score大的在前面
+                    return o2.songNum - o1.songNum; //score相同 songNum大的在前面
                 }
             });
         }

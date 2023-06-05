@@ -47,6 +47,7 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
     public void initView(@Nullable Bundle savedInstanceState) {
         roomCreateViewModel = new ViewModelProvider(this).get(RoomCreateViewModel.class);
         setRandomRoomTitleAndCover();
+        setOnApplyWindowInsetsListener(getBinding().superLayout);
     }
 
     private int positionCover = 1;

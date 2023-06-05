@@ -261,6 +261,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().ivMore.setOnClickListener(v -> {
             new TopFunctionDialog(RoomLivingActivity.this).show();
         });
+
+        setOnApplyWindowInsetsListener(getBinding().superLayout);
     }
 
     @Override
