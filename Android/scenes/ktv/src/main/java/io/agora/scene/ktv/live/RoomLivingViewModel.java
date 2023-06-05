@@ -1215,10 +1215,28 @@ public class RoomLivingViewModel extends ViewModel {
                 KTVLogger.d(TAG, "onAINSModeChanged: " + mode);
                 if (mode == 0) {
                     // 关闭
+                    mRtcEngine.setParameters("{\"che.audio.ains_mode\": 0}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.lowerBound\": 80}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.lowerMask\": 50}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.statisticalbound\": 5}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.finallowermask\": 30}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.enhfactorstastical\": 200}");
                 } else if (mode == 1) {
                     // 中
+                    mRtcEngine.setParameters("{\"che.audio.ains_mode\": 2}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.lowerBound\": 80}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.lowerMask\": 50}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.statisticalbound\": 5}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.finallowermask\": 30}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.enhfactorstastical\": 200}");
                 } else if (mode == 2) {
                     // 高
+                    mRtcEngine.setParameters("{\"che.audio.ains_mode\": 2}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.lowerBound\": 10}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.lowerMask\": 10}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.statisticalbound\": 0}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.finallowermask\": 8}");
+                    mRtcEngine.setParameters("{\"che.audio.nsng.enhfactorstastical\": 200}");
                 }
             }
         });
