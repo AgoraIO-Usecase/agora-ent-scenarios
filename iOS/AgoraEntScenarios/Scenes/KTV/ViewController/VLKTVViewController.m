@@ -995,6 +995,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 #pragma mark -- VLKTVAPIDelegate
 
+- (void)onChorusChannelAudioVolumeIndicationWithSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers totalVolume:(NSInteger)totalVolume{
+    
+}
+
 - (void)didLrcViewDragedToPos:(NSInteger)pos score:(NSInteger)score totalScore:(NSInteger)totalScore{
     [self.ktvApi.getMediaPlayer seekToPosition:pos];
     [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];

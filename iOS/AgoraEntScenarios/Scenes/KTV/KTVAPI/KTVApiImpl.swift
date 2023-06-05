@@ -948,7 +948,7 @@ extension KTVApiImpl {
     private func handleCoSingerRole(dict: [String: Any]) {
         if musicPlayer?.getPlayerState() == .playing {
             let localNtpTime = getNtpTimeInMs()
-            let localPosition = self.lastMainSingerUpdateTime - self.localPlayerPosition
+            let localPosition = localNtpTime - Int(localPlayerSystemTime) + localPosition
             let expectPosition = Int(dict["time"] as? Int64 ?? 0) + localNtpTime - Int(dict["ntp"] as? Int64 ?? 0) + self.audioPlayoutDelay
             let threshold = expectPosition - Int(localPosition)
             let ntpTime = dict["ntp"] as? Int ?? 0
@@ -1241,8 +1241,8 @@ extension KTVApiImpl {
     private func getNtpTimeInMs() -> Int {
         var localNtpTime: Int = Int(apiConfig?.engine?.getNtpWallTimeInMs() ?? 0)
 
-        if localNtpTime == 0 {
-            localNtpTime = Int(round(Date().timeIntervalSince1970 * 1000.0))
+        if localNtpTime != 0 {
+            localNtpTime = localNtpTime + 2208988800 * 1000
         }
 
         return localNtpTime
@@ -1275,25 +1275,30 @@ extension KTVApiImpl {
 
 //主要是MPK的回调
 extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
-
-    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {
+    
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position_ms: Int, atTimestamp timestamp_ms: TimeInterval) {
         self.lastReceivedPosition = Date().milListamp
-        self.localPosition = position
-        self.localPlayerPosition = Date().milListamp - Double(position)
+        self.localPosition = Int(position_ms)
+        self.localPlayerSystemTime = timestamp_ms
+        self.localPlayerPosition = Date().milListamp - Double(position_ms)
         if isMainSinger() && getPlayerCurrentTime() > TimeInterval(self.audioPlayoutDelay) {
             let dict: [String: Any] = [ "cmd": "setLrcTime",
                                         "duration": self.playerDuration,
-                                        "time": getPlayerCurrentTime(),
+                                        "time": position_ms - audioPlayoutDelay,
                                         //不同机型delay不同，需要发送同步的时候减去发送机型的delay，在接收同步加上接收机型的delay
-                                        "realTime":position,
-                                        "ntp": self.getNtpTimeInMs(),
+                                        "realTime":position_ms,
+                                        "ntp": timestamp_ms,
                                         "playerState": self.playerState.rawValue,
                                         "songIdentifier": songIdentifier
                                        // "songCode": self.songCode
             ]
-            agoraPrint("position_ms:\(position), ntp:\(getNtpTimeInMs()), delta:\(self.getNtpTimeInMs() - position), autoPlayoutDelay:\(self.audioPlayoutDelay)")
+            agoraPrint("position_ms:\(position_ms), ntp:\(getNtpTimeInMs()), delta:\(self.getNtpTimeInMs() - position_ms), autoPlayoutDelay:\(self.audioPlayoutDelay)")
             sendStreamMessageWithDict(dict, success: nil)
         }
+    }
+
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {
+        
     }
     
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
