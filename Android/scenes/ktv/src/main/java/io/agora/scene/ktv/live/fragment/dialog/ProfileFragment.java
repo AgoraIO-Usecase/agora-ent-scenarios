@@ -50,7 +50,7 @@ public class ProfileFragment extends BaseViewBindingFragment<FragmentProfileBind
                 }
             }
         });
-        getBinding().cbStartProfessionalMode.setChecked(mSetting.getProfes scenes/ktv/src/main/sionalMode());
+        getBinding().cbStartProfessionalMode.setChecked(mSetting.getProfessionalMode());
 //        if (mSetting.getProfessionalMode()) {
 //            getBinding().vSettingMark.setVisibility(View.INVISIBLE);
 //        } else {
