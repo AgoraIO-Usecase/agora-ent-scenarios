@@ -1675,12 +1675,21 @@ class LiveDetailFragment : Fragment() {
             onRemoteVideoStats = { stats ->
                 setEnhance(stats)
                 activity?.runOnUiThread {
-                    refreshStatisticInfo(downBitrate = stats.receivedBitrate, receiveFPS = stats.decoderOutputFrameRate, downLossPackage = stats.packetLossRate, downDelay = stats.delay, receiveVideoSize = Size(stats.width, stats.height))
+                    refreshStatisticInfo(
+                        downBitrate = stats.receivedBitrate,
+                        receiveFPS = stats.decoderOutputFrameRate,
+                        downLossPackage = stats.packetLossRate,
+                        receiveVideoSize = Size(stats.width, stats.height)
+                    )
                 }
             },
             onRemoteAudioStats = { stats ->
                 activity?.runOnUiThread {
-                    refreshStatisticInfo(audioBitrate = stats.receivedBitrate, audioLossPackage = stats.audioLossRate)
+                    refreshStatisticInfo(
+                        audioBitrate = stats.receivedBitrate,
+                        audioLossPackage = stats.audioLossRate,
+                        downDelay = stats.networkTransportDelay,
+                    )
                 }
             },
             onDownlinkNetworkInfoUpdated = { info ->
