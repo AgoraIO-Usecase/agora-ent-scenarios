@@ -108,11 +108,11 @@ class KTVApiImpl: NSObject{
         
         setParams()
         
-        let dataStreamConfig = AgoraDataStreamConfig()
-        dataStreamConfig.ordered = false
-        dataStreamConfig.syncWithAudio = true
-        // ktvStreamId 是定义的可保存 Stream ID 的全局变量
-        self.apiConfig?.engine?.createDataStream(&dataStreamId, config: dataStreamConfig)
+//        let dataStreamConfig = AgoraDataStreamConfig()
+//        dataStreamConfig.ordered = false
+//        dataStreamConfig.syncWithAudio = true
+//        // ktvStreamId 是定义的可保存 Stream ID 的全局变量
+//        self.apiConfig?.engine?.createDataStream(&dataStreamId, config: dataStreamConfig)
 
         // ------------------ 初始化内容中心 ------------------
         let contentCenterConfiguration = AgoraMusicContentCenterConfig()
@@ -120,6 +120,7 @@ class KTVApiImpl: NSObject{
         contentCenterConfiguration.mccUid = config.localUid
         contentCenterConfiguration.token = config.rtmToken
         contentCenterConfiguration.rtcEngine = config.engine
+        contentCenterConfiguration.maxCacheSize = UInt(config.maxCacheSize)
         
         mcc = AgoraMusicContentCenter.sharedContentCenter(config: contentCenterConfiguration)
         mcc?.register(self)
@@ -151,6 +152,13 @@ class KTVApiImpl: NSObject{
         engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
         engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
+    }
+    
+    func renewInnerDataStreamId() {
+        let dataStreamConfig = AgoraDataStreamConfig()
+        dataStreamConfig.ordered = false
+        dataStreamConfig.syncWithAudio = true
+        self.apiConfig?.engine?.createDataStream(&dataStreamId, config: dataStreamConfig)
     }
 }
 
@@ -219,6 +227,17 @@ extension KTVApiImpl: KTVApiDelegate {
         apiConfig = nil
         AgoraMusicContentCenter.destroy()
         self.eventHandlers.removeAllObjects()
+    }
+    
+    func renewToken(rtmToken: String, chorusChannelRtcToken: String) {
+               // 更新RtmToken
+       mcc?.renewToken(rtmToken)
+           // 更新合唱频道RtcToken
+           if let subChorusConnection = subChorusConnection {
+               var channelMediaOption = AgoraRtcChannelMediaOptions()
+               channelMediaOption.token = chorusChannelRtcToken
+               apiConfig?.engine?.updateChannelEx(with: channelMediaOption, connection: subChorusConnection)
+        }
     }
 
     func fetchMusicCharts(completion: @escaping MusicChartCallBacks) {
@@ -545,13 +564,6 @@ extension KTVApiImpl {
         localPosition = 0
         
         if (config.mode == .loadNone) {
-            if (config.autoPlay) {
-                // 主唱自动播放歌曲
-                switchSingerRole(newRole: .soloSinger) { _, _ in
-                    
-                }
-                startSing(songCode: songCode, startPos: 0)
-            }
             return
         }
         
@@ -611,6 +623,10 @@ extension KTVApiImpl {
                                 onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .noLyricUrl)
                             }
                             if config.autoPlay {
+                                // 主唱自动播放歌曲
+                                self.switchSingerRole(newRole: .soloSinger) { _, _ in
+                                    
+                                }
                                 self.startSing(songCode: self.songCode, startPos: 0)
                             }
                         }
@@ -801,7 +817,9 @@ extension KTVApiImpl: AgoraRtcEngineDelegate {
         if joinChorusNewRole == .coSinger {
           self.onJoinExChannelCallBack?(true, nil)
         }
-
+        if let subChorusConnection = subChorusConnection {
+            apiConfig?.engine?.enableAudioVolumeIndicationEx(50, smooth: 10, reportVad: true, connection: subChorusConnection)
+        }
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
@@ -819,9 +837,16 @@ extension KTVApiImpl: AgoraRtcEngineDelegate {
         }
     }
     
+    //合唱频道的声音回调
+    func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
+        getEventHander { delegate in
+            delegate.onChorusChannelAudioVolumeIndication(speakers: speakers, totalVolume: totalVolume)
+        }
+    }
+    
     func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
         getEventHander { delegate in
-            delegate.onChorusChannelTokenPrivilegeWillExpire(token: token)
+            delegate.onTokenPrivilegeWillExpire()
         }
     }
 }
@@ -1252,7 +1277,6 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         self.lastReceivedPosition = Date().milListamp
         self.localPosition = position
         self.localPlayerPosition = Date().milListamp - Double(position)
-        print("localPlayerPosition:playerKit:didChangedToPosition \(localPlayerPosition)")
         if isMainSinger() && getPlayerCurrentTime() > TimeInterval(self.audioPlayoutDelay) {
             let dict: [String: Any] = [ "cmd": "setLrcTime",
                                         "duration": self.playerDuration,
@@ -1265,7 +1289,6 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
                                        // "songCode": self.songCode
             ]
             sendStreamMessageWithDict(dict, success: nil)
-
         }
     }
     

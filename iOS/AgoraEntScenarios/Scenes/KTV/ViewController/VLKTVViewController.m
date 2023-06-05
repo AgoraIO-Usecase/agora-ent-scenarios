@@ -909,8 +909,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                       channelName:self.roomModel.roomNo
                                                          localUid:[VLUserCenter.user.id integerValue]
                                                         chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
+                                                        maxCacheSize:10
     ];
     self.ktvApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
+    [self.ktvApi renewInnerDataStreamId];
     KTVLrcControl* lrcControl = [[KTVLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
     [self.ktvApi setLrcViewWithView:lrcControl];
     self.lrcControl = lrcControl;
