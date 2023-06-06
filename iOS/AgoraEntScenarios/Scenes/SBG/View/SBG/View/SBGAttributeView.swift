@@ -62,3 +62,5 @@ class SBGAttributeView: UIView {
         return rect.width
     }
 }
+
+

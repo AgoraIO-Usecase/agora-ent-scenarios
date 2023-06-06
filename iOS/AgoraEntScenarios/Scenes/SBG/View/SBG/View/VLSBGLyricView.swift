@@ -37,8 +37,10 @@ class VLSBGLyricView: UIView {
     public var state: singingState = .singingAudience {
         didSet {
             if state == .timeDownAudience {//倒计时
-                songNameBtn.isHidden = false
-                songNameBtn.frame = CGRect(x: self.bounds.width / 2.0 - 50, y: 15, width: 100, height: 20)
+//                songNameBtn.isHidden = false
+//                songNameBtn.frame = CGRect(x: self.bounds.width / 2.0 - 50, y: 15, width: 100, height: 20)
+                songNameView.isHidden = false
+                songNameView.setName(with: songContent, isCenter: true)
                 sbgBtn.isHidden = true
                // sbgBtn.frame = CGRect(x: self.bounds.width / 2.0 - 55, y: self.bounds.height - 54, width: 88, height: 34)
                 sbgBtn.isEnabled = false
@@ -50,8 +52,10 @@ class VLSBGLyricView: UIView {
                 effectBtn.isHidden = true
                 originBtn.isHidden = true
             } else if state == .timeDownBroadcaster {//倒计时
-                songNameBtn.isHidden = false
-                songNameBtn.frame = CGRect(x: self.bounds.width / 2.0 - 50, y: 15, width: 100, height: 20)
+//                songNameBtn.isHidden = false
+//                songNameBtn.frame = CGRect(x: self.bounds.width / 2.0 - 50, y: 15, width: 100, height: 20)
+                songNameView.isHidden = false
+                songNameView.setName(with: songContent, isCenter: true)
                 sbgBtn.isEnabled = false
                 sbgBtn.isHidden = false
                // sbgBtn.frame = CGRect(x: self.bounds.width / 2.0 - 55, y: self.bounds.height - 54, width: 88, height: 34)
@@ -63,8 +67,10 @@ class VLSBGLyricView: UIView {
                 effectBtn.isHidden = true
                 originBtn.isHidden = true
             } else if state == .sbgingOnSeat {//麦上
-                songNameBtn.isHidden = false
-                songNameBtn.frame = CGRect(x: self.bounds.width / 2.0 - 50, y: 15, width: 100, height: 20)
+//                songNameBtn.isHidden = false
+//                songNameBtn.frame = CGRect(x: self.bounds.width / 2.0 - 50, y: 15, width: 100, height: 20)
+                songNameView.isHidden = false
+                songNameView.setName(with: songContent, isCenter: true)
                 sbgBtn.setTitle("", for: .normal)
                 sbgBtn.isHidden = false
               //  sbgBtn.frame = CGRect(x: self.bounds.width / 2.0 - 55, y: self.bounds.height - 54, width: 88, height: 34)
@@ -78,8 +84,10 @@ class VLSBGLyricView: UIView {
                 effectBtn.isHidden = true
                 originBtn.isHidden = true
             } else if state == .sbgingOffSeat {//麦下
-                songNameBtn.isHidden = false
-                songNameBtn.frame = CGRect(x: self.bounds.width / 2.0 - 50, y: 15, width: 100, height: 20)
+//                songNameBtn.isHidden = false
+//                songNameBtn.frame = CGRect(x: self.bounds.width / 2.0 - 50, y: 15, width: 100, height: 20)
+                songNameView.isHidden = false
+                songNameView.setName(with: songContent, isCenter: true)
                 sbgBtn.isHidden = true
               //  sbgBtn.frame = CGRect(x: self.bounds.width / 2.0 - 55, y: self.bounds.height - 54, width: 88, height: 34)
                 sbgBtn.isEnabled = true
@@ -93,8 +101,10 @@ class VLSBGLyricView: UIView {
                 originBtn.isHidden = true
                 sbgBtn.setTitle("", for: .normal)
             } else if state == .singingAudience {//观众
-                songNameBtn.isHidden = false
-                songNameBtn.frame = CGRect(x: self.bounds.width / 2.0 - 50, y: 15, width: 100, height: 20)
+//                songNameBtn.isHidden = false
+//                songNameBtn.frame = CGRect(x: self.bounds.width / 2.0 - 50, y: 15, width: 100, height: 20)
+                songNameView.isHidden = false
+                songNameView.setName(with: songContent, isCenter: true)
                 sbgBtn.isHidden = true
                 incentiveView.isHidden = false
                 lineScoreView.isHidden = false
@@ -104,8 +114,10 @@ class VLSBGLyricView: UIView {
                 effectBtn.isHidden = true
                 originBtn.isHidden = true
             } else if state == .singingBroadcaster {//主唱
-                songNameBtn.isHidden = false
-                songNameBtn.frame = CGRect(x: 12, y: 15, width: 100, height: 20)
+//                songNameBtn.isHidden = false
+//                songNameBtn.frame = CGRect(x: 12, y: 15, width: 100, height: 20)
+                songNameView.isHidden = false
+                songNameView.setName(with: songContent, isCenter: false)
                 sbgBtn.isHidden = true
                 lrcView.scoringEnabled = true
                 incentiveView.isHidden = false
@@ -115,7 +127,6 @@ class VLSBGLyricView: UIView {
                 effectBtn.isHidden = false
                 originBtn.isHidden = false
             }
-            songNameBtn.sizeToFit()
         }
     }
 
@@ -126,6 +137,11 @@ class VLSBGLyricView: UIView {
         btn.setImage(UIImage.sceneImage(name: "ktv_bigMusic_icon"), for: .normal)
         btn.setTitleColor(.white, for: .normal)
         return btn
+    }()
+    
+    private var songNameView: SBGLrcNameView = {
+        let view = SBGLrcNameView()
+        return view
     }()
     
     var lrcView: KaraokeView!
@@ -143,6 +159,7 @@ class VLSBGLyricView: UIView {
     @objc weak var delegate: VLSBGLrcViewDelegate?
     private var model: LyricModel?
     private var isTaped: Bool = false
+    private var songContent: String = ""
     private var bgImgView: UIImageView = {
         let imgView = UIImageView()
         imgView.image = UIImage.sceneImage(name: "ktv_mv_tempBg")
@@ -234,7 +251,9 @@ class VLSBGLyricView: UIView {
         lineScoreView = LineScoreView()
         addSubview(self.lineScoreView!)
         
-        addSubview(songNameBtn)
+        //addSubview(songNameBtn)
+       // addSubview(songNameLabel)
+        addSubview(songNameView)
         
         addSubview(nextBtn)
         addSubview(effectBtn)
@@ -287,7 +306,7 @@ class VLSBGLyricView: UIView {
         incentiveView.show(score: lineScore)
     }
     
-    public func resetScore() {
+    @objc public func resetScore() {
         gradeView.reset()
     }
     
@@ -307,7 +326,8 @@ class VLSBGLyricView: UIView {
         originBtn.frame = CGRect(x: self.bounds.width - 50, y: self.bounds.height - 70, width: 30, height: 50)
         effectBtn.frame = CGRect(x: self.bounds.width - 100, y: self.bounds.height - 70, width: 30, height: 50)
         
-        songNameBtn.frame = CGRect(x: state == .singingBroadcaster ? 20 : (self.bounds.width / 2.0 - 50) , y: 8, width: 100, height: 20)
+        //songNameBtn.frame = CGRect(x: state == .singingBroadcaster ? 20 : (self.bounds.width / 2.0 - 50) , y: 8, width: 100, height: 20)
+        songNameView.frame = CGRect(x: 20, y:8, width:self.bounds.width - 40 , height: 20)
         sbgBtn.frame = CGRect(x: self.bounds.width / 2.0 - 60, y: self.bounds.height - 70, width: 110, height: 50)
         self.bgImgView.layer.cornerRadius = 10
         self.bgImgView.layer.masksToBounds = true
@@ -366,10 +386,11 @@ extension VLSBGLyricView: SBGLrcViewDelegate {
         totalLines = 0
         dealWithBattleSong(lyricsModel: model)
         lrcView.reset()
-        songNameBtn.setTitle("\(model.name.trimmingCharacters(in: .whitespacesAndNewlines))-\(model.singer)", for: .normal)
+        songContent = "\(model.name.trimmingCharacters(in: .whitespacesAndNewlines))-\(model.singer)"
+        songNameView.setName(with: songContent, isCenter: true)
         lrcView?.setLyricData(data: model)
     }
-    
+
     func dealWithBattleSong(lyricsModel: LyricModel?) {
         guard let model = lyricsModel else {return}
             var lineCount = 0

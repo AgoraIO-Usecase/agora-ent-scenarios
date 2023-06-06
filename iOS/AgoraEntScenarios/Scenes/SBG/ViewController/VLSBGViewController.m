@@ -335,7 +335,6 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
         [weakSelf _checkInEarMonitoring];
         
         if (SBGSubscribeDeleted == status) {
-            weakSelf.currentSelSong = nil;
             BOOL success = [weakSelf removeSelSongWithSongNo:[songInfo.songNo integerValue] sync:NO];
             if (!success) {
                 weakSelf.selSongsArray = songArray;
@@ -344,7 +343,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
         } else {
             VLSBGRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
 
-            if(![songInfo.winnerNo isEqualToString:@""] && status == SBGSubscribeUpdated){
+            if(![songInfo.winnerNo isEqualToString:@""] && status == SBGSubscribeUpdated ){
                 [weakSelf dealWithSbgEventWithUserNo:songInfo];
             }
             
@@ -612,6 +611,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         model.userId = userId;
         [self.scoreArray addObject:model];
         
+        //这个时候表示当前歌曲已结束
+        self.currentSelSong = nil;
+        
         if([self isRoomOwner]){
             NSLog(@"removeCurrentSongWithSync: receiveStreamMessageFromUid");
             [self removeCurrentSongWithSync:YES];
@@ -736,10 +738,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)loadAndPlaySongWith:(SBGPlayerTrackMode)mode{
     //清空分数
-   // [self.MVView.gradeView reset];
+    [self.statusView.lrcView resetScore];
     self.trackMode = mode;
     VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
-    
+    self.currentSelSong = model;
     //TODO: fix score view visible problem while owner reopen the room
    // [self.MVView updateUIWithSong:model role:self.singRole];
     [self setCoSingerStateWith:self.singRole];
@@ -1408,7 +1410,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 -(void)sbgQuery {
     __block VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
-    if(![model.winnerNo isEqualToString:@""]){//如果这首歌被人抢唱了 就不需要再查询了
+    if (model.winnerNo == nil || [model.winnerNo isEqualToString:@""]) {
+        //表示无人抢唱
+    } else {
+        //表示有人抢唱了
+        return;
+    }
+    if(!self.currentSelSong){
         return;
     }
     kWeakSelf(self);
@@ -2132,20 +2140,20 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
     return [userDict allValues];
 }
 
-NSArray<SubRankModel *> *updateScoreWith(NSArray<SubRankModel *> *models) {
-    NSMutableArray *array = [NSMutableArray arrayWithCapacity:models.count];
-    for (SubRankModel *model in models) {
-        SubRankModel *updateModel = model;
-        updateModel.score = model.score / model.songNum;
-        [array addObject:updateModel];
-    }
-    return [array copy];
-}
+//NSArray<SubRankModel *> *updateScoreWith(NSArray<SubRankModel *> *models) {
+//    NSMutableArray *array = [NSMutableArray arrayWithCapacity:models.count];
+//    for (SubRankModel *model in models) {
+//        SubRankModel *updateModel = model;
+//        updateModel.score = model.score / model.songNum;
+//        [array addObject:updateModel];
+//    }
+//    return [array copy];
+//}
 
 NSArray<SubRankModel *> *sortModelsByCountAndScore(NSArray<SubRankModel *> *models, BOOL ascending) {
     NSSortDescriptor *countSorter = [NSSortDescriptor sortDescriptorWithKey:@"songNum" ascending:ascending];
     NSSortDescriptor *scoreSorter = [NSSortDescriptor sortDescriptorWithKey:@"score" ascending:ascending];
-    NSArray *sortedArray = [models sortedArrayUsingDescriptors:@[countSorter, scoreSorter]];
+    NSArray *sortedArray = [models sortedArrayUsingDescriptors:@[scoreSorter, countSorter]];
     
     return sortedArray;
 }
@@ -2173,12 +2181,12 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
     NSMutableDictionary *muDict = [NSMutableDictionary dictionary];
     //先进性数组合并
     NSArray *mergeModels = mergeModelsWithSameUserIds(self.scoreArray);
-    NSArray *updateScoreModels = updateScoreWith(mergeModels);
-    NSInteger count = updateScoreModels.count;
+ //   NSArray *updateScoreModels = updateScoreWith(mergeModels);
+    NSInteger count = mergeModels.count;
     if(count == 0){
         return muDict;
     }
-    for(SubRankModel *model in updateScoreModels){
+    for(SubRankModel *model in mergeModels){
         RankModel *model1 = [[RankModel alloc]init];
         model1.userName = model.userName;
         model1.poster = model.poster;
@@ -2261,7 +2269,13 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
     dispatch_time_t updateTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(12 * NSEC_PER_SEC));
     dispatch_after(updateTime, dispatch_get_main_queue(), ^{
         VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
-        if(![model.winnerNo isEqualToString:@""]){//如果这首歌被人抢唱了 就不需要再查询了
+        if (model.winnerNo == nil || [model.winnerNo isEqualToString:@""]) {
+            //表示无人抢唱
+        } else {
+            //表示有人抢唱了
+            return;
+        }
+        if(!self.currentSelSong){
             return;
         }
         self.statusView.state = SBGStateSbgingOffSeat;
