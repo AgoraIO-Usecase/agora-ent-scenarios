@@ -192,6 +192,8 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
         _itemsArray = @[
             [VLMineCellModel modelWithItemImg:@"mine_screct_icon" title:AGLocalizedString(@"用户协议")],
             [VLMineCellModel modelWithItemImg:@"mine_userRule_icon" title:AGLocalizedString(@"隐私政策")],
+            [VLMineCellModel modelWithItemImg:@"mine_userRule_icon" title:AGLocalizedString(@"个人信息收集清单")],
+            [VLMineCellModel modelWithItemImg:@"mine_userRule_icon" title:AGLocalizedString(@"第三方信息数据共享")],
             [VLMineCellModel modelWithItemImg:@"mine_aboutus_icon" title:AGLocalizedString(@"关于我们")],
             [VLMineCellModel modelWithItemImg:@"mine_logout_icon" title:AGLocalizedString(@"退出登录")],
             [VLMineCellModel modelWithItemImg:@"mine_quit_icon" title:AGLocalizedString(@"注销账号")],

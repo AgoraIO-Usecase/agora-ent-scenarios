@@ -656,6 +656,7 @@
 		E36B429C2A24B8290034FACF /* SBGDebugInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = E36B42552A24B8290034FACF /* SBGDebugInfo.m */; };
 		E36B429E2A259AA80034FACF /* SBGAttributeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36B429D2A259AA80034FACF /* SBGAttributeView.swift */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
+		E3BA36DF2A2E069100ACD073 /* SBGLrcNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3BA36DE2A2E069000ACD073 /* SBGLrcNameView.swift */; };
 		E751D85D29F11723001354CA /* AUiMoreDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E751D85C29F11723001354CA /* AUiMoreDialog.swift */; };
 /* End PBXBuildFile section */
 
@@ -1549,6 +1550,7 @@
 		E36B429D2A259AA80034FACF /* SBGAttributeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SBGAttributeView.swift; sourceTree = "<group>"; };
 		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
 		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
+		E3BA36DE2A2E069000ACD073 /* SBGLrcNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SBGLrcNameView.swift; sourceTree = "<group>"; };
 		E751D85C29F11723001354CA /* AUiMoreDialog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiMoreDialog.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -3664,6 +3666,7 @@
 				E36B423A2A24B8290034FACF /* VLSBGVoicePerShowView.h */,
 				E36B423B2A24B8290034FACF /* VLSBGVoiceShowView.m */,
 				E36B423C2A24B8290034FACF /* VLSBGAudienceIndicator.m */,
+				E3BA36DE2A2E069000ACD073 /* SBGLrcNameView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -4487,6 +4490,7 @@
 				DD619BFE29E3E262008F63E4 /* VRRoomListView.swift in Sources */,
 				DD36106A29B70CDC00CE7984 /* ShowPresettingModel.swift in Sources */,
 				DD0292D4295BF0DC00485225 /* VLKTVMVIdleView.m in Sources */,
+				E3BA36DF2A2E069100ACD073 /* SBGLrcNameView.swift in Sources */,
 				DD3610A929B70CDC00CE7984 /* ShowRealTimeDataView.swift in Sources */,
 				DD619AC229E3E247008F63E4 /* SASendGiftCell.swift in Sources */,
 				DD619AAD29E3E247008F63E4 /* SAChatView.swift in Sources */,
