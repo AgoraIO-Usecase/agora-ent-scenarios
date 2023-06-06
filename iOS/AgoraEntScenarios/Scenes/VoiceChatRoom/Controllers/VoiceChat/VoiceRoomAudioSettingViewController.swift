@@ -78,6 +78,73 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
         }
         return view
     }()
+    private lazy var actionView: ActionSheetManager = {
+        let actionView = ActionSheetManager()
+        let isOn = (roomInfo?.room?.turn_InEar ?? false)
+        inEarView.isHidden = !isOn
+        var inEar_volume = Double((roomInfo?.room?.inEar_volume ?? 0)) / 100.0
+        var inEarMode = roomInfo?.room?.inEarMode ?? ""
+        let earModes = ["自动".show_localized, "强制OpenSL".show_localized, "强制Oboe".show_localized]
+        var inEarModeIndex = earModes.firstIndex(where: { $0 == inEarMode }) ?? 0
+        let hasHeadset = HeadSetUtil.hasHeadset()
+        let tipsTextColor = hasHeadset ? UIColor(hex: "#979CBB") : UIColor(hex: "#FF1216")
+        let tipsText = hasHeadset ? "开启耳返可实时听到自己的声音, 唱歌的时候及时调整".show_localized : "使用耳返必须插入耳机，当前未检测到耳机".show_localized
+        actionView.title(title: "耳返".show_localized)
+            .switchCell(title: "开启耳返".show_localized, isOn: isOn, isEnabel: hasHeadset)
+            .tipsCell(iconName: "inEra_tips_icon", title: tipsText, titleColor: tipsTextColor)
+            .sectionHeader(title: "耳返设置".show_localized, desc: nil)
+            .sliderCell(title: "耳返音量".show_localized, value: inEar_volume, isEnable: isOn)
+//                    .segmentCell(title: "耳返模式", items: earModes, selectedIndex: inEarModeIndex, isEnable: isOn)
+//                    .customCell(customView: inEarView, viewHeight: 150)
+            .config()
+        
+        actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
+            self?.roomInfo?.room?.turn_InEar = isOn
+            self?.actionView.updateSliderValue(indexPath: IndexPath(row: 0, section: 1), value: inEar_volume, isEnable: isOn)
+//                    actionView.updateSegmentStatus(indexPath: IndexPath(row: 1, section: 1), selectedIndex: inEarModeIndex, isEnable: isOn)
+            self?.inEarView.isHidden = !isOn
+            self?.tableView.reloadData()
+            self?.turnInearBlock?(isOn)
+
+        }
+        actionView.didSliderValueChangeClosure = { [weak self] _, value in
+            let v = Int(value * 100)
+            self?.roomInfo?.room?.inEar_volume = v
+            inEar_volume = value
+            self?.setInEarVolumnBlock?(v)
+        }
+        actionView.didSegmentValueChangeClosure = { [weak self] indexPath, mode, index in
+            guard let self = self else { return }
+            self.showCustomAlert(title: "提示".show_localized, message: String(format: "切换后将强制使用%@模式,确认?".show_localized, mode), confirm: {
+                inEarModeIndex = earModes.firstIndex(where: { $0 == mode }) ?? 0
+                self.roomInfo?.room?.inEarMode = mode
+                inEarMode = mode
+                self.setInEarModeBlock?(INEAR_MODE(rawValue: index) ?? .auto)
+            }, cancel: {
+                let index = earModes.firstIndex(where: { $0 == inEarMode }) ?? 0
+                self.actionView.updateSegmentStatus(indexPath: indexPath, selectedIndex: index)
+            })
+        }
+        
+        // 监听耳机插入
+        HeadSetUtil.addHeadsetObserver { hasHeadset in
+            let isOn = (self.roomInfo?.room?.turn_InEar ?? false)
+            let switchIndexPath = IndexPath(row: 0, section: 0)
+            actionView.updateSwitchStatus(indexPath: switchIndexPath, isOn: hasHeadset ? isOn : false, isEnable: hasHeadset)
+            let tipsIndexPath = IndexPath(row: 1, section: 0)
+            let tipsTextColor = hasHeadset ? UIColor(hex: "#979CBB") : UIColor(hex: "#FF1216")
+            let tipsText = hasHeadset ? "开启耳返可实时听到自己的声音, 唱歌的时候及时调整".show_localized : "使用耳返必须插入耳机，当前未检测到耳机".show_localized
+            actionView.updateTipsCellTitle(indexPath: tipsIndexPath, title: tipsText, titleColor: tipsTextColor)
+            let sliderIndexPath = IndexPath(row: 0, section: 1)
+            let inEar_volume = Double((self.roomInfo?.room?.inEar_volume ?? 0)) / 100.0
+            actionView.updateSliderValue(indexPath: sliderIndexPath, value: inEar_volume, isEnable: hasHeadset && isOn)
+            if hasHeadset == false && isOn {
+                self.roomInfo?.room?.turn_InEar = false
+            }
+            self.turnInearBlock?(isOn == hasHeadset)
+        }
+        return actionView
+    }()
     
     public var roomInfo: VRRoomInfo?
     public var ains_state: AINS_STATE = .mid {
@@ -400,52 +467,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 state = .InEar
                 heightType = .InEar
                 
-                let isOn = (roomInfo?.room?.turn_InEar ?? false)
-                inEarView.isHidden = !isOn
-                var inEar_volume = Double((roomInfo?.room?.inEar_volume ?? 0)) / 100.0
-                var inEarMode = roomInfo?.room?.inEarMode ?? ""
-                let actionView = ActionSheetManager()
-                let earModes = ["自动".show_localized, "强制OpenSL".show_localized, "强制Oboe".show_localized]
-                var inEarModeIndex = earModes.firstIndex(where: { $0 == inEarMode }) ?? 0
-                let hasHeadset = HeadSetUtil.hasHeadset()
-                let tipsTextColor = hasHeadset ? UIColor(hex: "#979CBB") : UIColor(hex: "#FF1216")
-                let tipsText = hasHeadset ? "开启耳返可实时听到自己的声音, 唱歌的时候及时调整".show_localized : "使用耳返必须插入耳机，当前未检测到耳机".show_localized
-                actionView.title(title: "耳返".show_localized)
-                    .switchCell(title: "开启耳返".show_localized, isOn: isOn, isEnabel: hasHeadset)
-                    .tipsCell(iconName: "inEra_tips_icon", title: tipsText, titleColor: tipsTextColor)
-                    .sectionHeader(title: "耳返设置".show_localized, desc: nil)
-                    .sliderCell(title: "耳返音量".show_localized, value: inEar_volume, isEnable: isOn)
-//                    .segmentCell(title: "耳返模式", items: earModes, selectedIndex: inEarModeIndex, isEnable: isOn)
-//                    .customCell(customView: inEarView, viewHeight: 150)
-                    .config()
                 actionView.show_voice()
-                actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
-                    self?.roomInfo?.room?.turn_InEar = isOn
-                    actionView.updateSliderValue(indexPath: IndexPath(row: 0, section: 1), value: inEar_volume, isEnable: isOn)
-                    actionView.updateSegmentStatus(indexPath: IndexPath(row: 1, section: 1), selectedIndex: inEarModeIndex, isEnable: isOn)
-                    self?.inEarView.isHidden = !isOn
-                    self?.tableView.reloadData()
-                    self?.turnInearBlock?(isOn)
-
-                }
-                actionView.didSliderValueChangeClosure = { [weak self] _, value in
-                    let v = Int(value * 100)
-                    self?.roomInfo?.room?.inEar_volume = v
-                    inEar_volume = value
-                    self?.setInEarVolumnBlock?(v)
-                }
-                actionView.didSegmentValueChangeClosure = { [weak self] indexPath, mode, index in
-                    guard let self = self else { return }
-                    self.showCustomAlert(title: "提示".show_localized, message: String(format: "切换后将强制使用%@模式,确认?".show_localized, mode), confirm: {
-                        inEarModeIndex = earModes.firstIndex(where: { $0 == mode }) ?? 0
-                        self.roomInfo?.room?.inEarMode = mode
-                        inEarMode = mode
-                        self.setInEarModeBlock?(INEAR_MODE(rawValue: index) ?? .auto)
-                    }, cancel: {
-                        let index = earModes.firstIndex(where: { $0 == inEarMode }) ?? 0
-                        actionView.updateSegmentStatus(indexPath: indexPath, selectedIndex: index)
-                    })
-                }
                 return
             default:
                 state = .Spatial

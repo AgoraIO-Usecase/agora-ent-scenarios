@@ -254,6 +254,13 @@ class ActionSheetManager: UIView {
         model.decs = desc
         tableView.reloadData()
     }
+    func updateTipsCellTitle(indexPath: IndexPath, title: String?, titleColor: UIColor?) {
+        let section = indexPath.section >= sectionArray.count ? indexPath.section - 1 : indexPath.section
+        let model = sectionArray.count > 0 ? sectionArray[section][indexPath.row] : dataArray[indexPath.row]
+        model.title = title
+        model.titleColor = titleColor
+        tableView.reloadData()
+    }
     func updateSliderValue(indexPath: IndexPath, value: Double, isEnable: Bool = true) {
         let section = indexPath.section >= sectionArray.count ? indexPath.section - 1 : indexPath.section
         let model = sectionArray.count > 0 ? sectionArray[section][indexPath.row] : dataArray[indexPath.row]
