@@ -13,7 +13,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="40dp"
         android:orientation="horizontal"
         android:gravity="center">
         <androidx.appcompat.widget.AppCompatTextView
@@ -28,6 +28,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivHeader"
+            android:layout_gravity="center"
             android:layout_marginStart="40dp"
             android:layout_height="30dp"
             android:layout_width="30dp"/>
