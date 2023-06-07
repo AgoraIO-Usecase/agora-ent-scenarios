@@ -114,12 +114,12 @@
         android:id="@+id/btChooseSong"
         android:layout_width="82dp"
         android:layout_height="34dp"
-        android:layout_marginStart="73dp"
         android:layout_marginBottom="34dp"
         android:background="@mipmap/ic_diange"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
     </androidx.appcompat.widget.AppCompatImageButton>
 
     <TextView
@@ -132,6 +132,7 @@
         android:textColor="@color/white"
         android:textSize="10sp"
         android:layout_marginStart="180dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/btChooseSong" />

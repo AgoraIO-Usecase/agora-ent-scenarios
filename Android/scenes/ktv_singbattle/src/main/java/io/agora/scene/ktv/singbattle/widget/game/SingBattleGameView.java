@@ -120,12 +120,12 @@ public class SingBattleGameView extends FrameLayout {
             mBinding.btGameAgain.setVisibility(GONE);
             mBinding.ilIDLE.messageText.setText(R.string.ktv_game_room_owner_idle);
             mBinding.ilIDLE.btChooseSong.setVisibility(View.VISIBLE);
-            mBinding.ilIDLE.btAutoSelectSong.setVisibility(View.VISIBLE);
-            mBinding.ilIDLE.btAutoSelectSong.setEnabled(true);
+            //mBinding.ilIDLE.btAutoSelectSong.setVisibility(View.VISIBLE);
+            //mBinding.ilIDLE.btAutoSelectSong.setEnabled(true);
         } else {
             mBinding.ilIDLE.messageText.setText(R.string.ktv_game_room_owner_choosing_song);
             mBinding.ilIDLE.btChooseSong.setVisibility(View.GONE);
-            mBinding.ilIDLE.btAutoSelectSong.setVisibility(View.GONE);
+            //mBinding.ilIDLE.btAutoSelectSong.setVisibility(View.GONE);
         }
     }
 
@@ -135,7 +135,7 @@ public class SingBattleGameView extends FrameLayout {
         if (mBinding == null) return;
         mBinding.ilIDLE.messageText.setText(R.string.ktv_game_start);
         mBinding.ilIDLE.btChooseSong.setVisibility(View.GONE);
-        mBinding.ilIDLE.btAutoSelectSong.setVisibility(View.GONE);
+        //mBinding.ilIDLE.btAutoSelectSong.setVisibility(View.GONE);
         startTimer();
     }
 
