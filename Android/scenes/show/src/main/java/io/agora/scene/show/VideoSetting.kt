@@ -14,12 +14,14 @@ object VideoSetting {
         //1.5倍：  n=8
         //2倍：     n=3
         //锐化：    n=10(android是10，iOS是11)
+        //超级画质  n=20
         SR_1(6),
         SR_1_33(7),
         SR_1_5(8),
         SR_2(3),
         SR_SHARP(10),
-        SR_NONE(0)
+        SR_NONE(0),
+        SR_SUPER(20)
     }
 
     enum class Resolution(val width: Int, val height: Int) {

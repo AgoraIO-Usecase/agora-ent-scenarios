@@ -1377,7 +1377,8 @@ class LiveDetailFragment : Fragment() {
                     }
                     // 720P
                     else if (stats.width == VideoSetting.Resolution.V_720P.height && stats.height == VideoSetting.Resolution.V_720P.width) {
-                        superResolution = VideoSetting.SuperResolution.SR_1_5
+                        // 将画质增强-高端机 及 画质增强-中端机的“超分倍数“改成 20,超级画质
+                        superResolution = VideoSetting.SuperResolution.SR_SUPER
                     }
                     // 540P、480P
                     else if ((stats.width == VideoSetting.Resolution.V_540P.height && stats.height == VideoSetting.Resolution.V_540P.width)
@@ -1398,7 +1399,8 @@ class LiveDetailFragment : Fragment() {
                     }
                     // 720P
                     else if (stats.width == VideoSetting.Resolution.V_720P.height && stats.height == VideoSetting.Resolution.V_720P.width) {
-                        superResolution = VideoSetting.SuperResolution.SR_1
+                        // 将画质增强-高端机 及 画质增强-中端机的“超分倍数“改成 20,超级画质
+                        superResolution = VideoSetting.SuperResolution.SR_SUPER
                     }
                     // 360P以及以下
                     else {

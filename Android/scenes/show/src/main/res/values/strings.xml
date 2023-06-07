@@ -153,7 +153,7 @@
     <string name="show_setting_preset">预设</string>
     <string name="show_setting_advance_video_setting">视频设置</string>
     <string name="show_setting_advance_audio_setting">音频设置</string>
-    <string name="show_setting_advance_quality_enhance">画质增强</string>
+    <string name="show_setting_advance_quality_enhance">超分</string>
     <string name="show_setting_advance_quality_h265">H265</string>
     <string name="show_setting_advance_ok">OK</string>
     <string name="show_setting_confirm">确认</string>
