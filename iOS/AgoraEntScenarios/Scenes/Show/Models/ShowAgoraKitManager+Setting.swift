@@ -82,6 +82,7 @@ extension ShowAgoraKitManager {
         if srType == .none {
             agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
         }else{
+            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
             agoraKit.setParameters("{\"rtc.video.sr_type\":\(srType.rawValue)}")
             agoraKit.setParameters("{\"rtc.video.sr_max_wh\":\(921600)}")
             // enabled要放在srType之后 否则修改超分倍数可能不会立即生效
