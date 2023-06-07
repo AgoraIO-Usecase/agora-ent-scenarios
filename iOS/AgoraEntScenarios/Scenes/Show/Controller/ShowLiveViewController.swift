@@ -320,12 +320,11 @@ class ShowLiveViewController: UIViewController {
     private func joinChannel(needUpdateCavans: Bool = true) {
         agoraKitManager.setRtcDelegate(delegate: self, roomId: roomId)
 //        agoraKitManager.defaultSetting()
-        guard let channelId = room?.roomId, let ownerId = room?.ownerId else {
+        guard let channelId = room?.roomId, let ownerId = room?.ownerId,  let uid: UInt = UInt(ownerId) else {
             return
         }
         currentChannelId = channelId
         self.joinStartDate = Date()
-        let uid: UInt = UInt(ownerId)!
         agoraKitManager.joinChannelEx(currentChannelId: channelId,
                                       targetChannelId: channelId,
                                       ownerId: uid,
