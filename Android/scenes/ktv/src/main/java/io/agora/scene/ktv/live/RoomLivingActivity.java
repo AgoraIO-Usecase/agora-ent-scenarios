@@ -762,7 +762,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         showMoreDialogTag = true;
 
         if (moreDialog == null) {
-            moreDialog = new MoreDialog(roomLivingViewModel.mSetting);
+            moreDialog = new MoreDialog(roomLivingViewModel.mSetting, roomLivingViewModel.isRoomOwner());
         }
 
         if (!moreDialog.isAdded()) {

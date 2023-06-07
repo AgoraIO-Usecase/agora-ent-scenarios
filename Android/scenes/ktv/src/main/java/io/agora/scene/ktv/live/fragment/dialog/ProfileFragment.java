@@ -19,9 +19,11 @@ import io.agora.scene.ktv.widget.MusicSettingBean;
 public class ProfileFragment extends BaseViewBindingFragment<FragmentProfileBinding> {
     public static final String TAG = "ProfileFragment";
     private final MusicSettingBean mSetting;
+    private final Boolean isRoomOwner;
 
-    public ProfileFragment(MusicSettingBean mSetting) {
+    public ProfileFragment(MusicSettingBean mSetting, Boolean isRoomOwner) {
         this.mSetting = mSetting;
+        this.isRoomOwner = isRoomOwner;
     }
 
     @Override
@@ -32,6 +34,10 @@ public class ProfileFragment extends BaseViewBindingFragment<FragmentProfileBind
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (!isRoomOwner) {
+            getBinding().cbLowLatency.setVisibility(View.GONE);
+            getBinding().tvLowLatency.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -42,21 +48,9 @@ public class ProfileFragment extends BaseViewBindingFragment<FragmentProfileBind
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSetting.setProfessionalMode(isChecked);
-                if (isChecked) {
-                    getBinding().vSettingMark.setVisibility(View.INVISIBLE);
-                } else {
-                    getBinding().vSettingMark.setVisibility(View.VISIBLE);
-                    getBinding().vSettingMark.setOnClickListener(v -> {});
-                }
             }
         });
         getBinding().cbStartProfessionalMode.setChecked(mSetting.getProfessionalMode());
-//        if (mSetting.getProfessionalMode()) {
-//            getBinding().vSettingMark.setVisibility(View.INVISIBLE);
-//        } else {
-//            getBinding().vSettingMark.setVisibility(View.VISIBLE);
-//            getBinding().vSettingMark.setOnClickListener(v -> {});
-//        }
 
         if (this.mSetting.getAECLevel() == 0) {
             getBinding().rgVoiceMode.check(R.id.tvModeLow);

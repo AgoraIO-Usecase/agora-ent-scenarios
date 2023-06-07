@@ -26,9 +26,11 @@ public class MoreDialog extends BaseBottomSheetDialogFragment<KtvDialogMoreBindi
     public static final String TAG = "MoreDialog";
 
     private final MusicSettingBean mSetting;
+    private final Boolean isRoomOwner;
 
-    public MoreDialog(MusicSettingBean mSetting) {
+    public MoreDialog(MusicSettingBean mSetting, boolean isRoomOwner) {
         this.mSetting = mSetting;
+        this.isRoomOwner = isRoomOwner;
     }
 
     @Override
@@ -77,7 +79,7 @@ public class MoreDialog extends BaseBottomSheetDialogFragment<KtvDialogMoreBindi
 
     private void showProfilePage(View v) {
         mBinding.getRoot().removeAllViews();
-        BaseViewBindingFragment<?> voiceFragment = new ProfileFragment(mSetting);
+        BaseViewBindingFragment<?> voiceFragment = new ProfileFragment(mSetting, isRoomOwner);
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
         ft.add(mBinding.getRoot().getId(), voiceFragment, ProfileFragment.TAG);
         ft.commit();

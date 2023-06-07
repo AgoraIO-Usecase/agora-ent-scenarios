@@ -83,7 +83,6 @@
         android:textStyle="bold"
         android:textColor="@color/white_80_percent"
         android:textSize="17sp"
-        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/hScrollView" />
 
@@ -93,7 +92,6 @@
         android:layout_height="26dp"
         android:layout_marginEnd="20dp"
         android:button="@drawable/cb_def_selector"
-        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tvPrefessional" />
 
@@ -102,7 +100,6 @@
         android:layout_height="1dp"
         android:layout_marginTop="20dp"
         android:background="@color/white_20_percent"
-        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvPrefessional" />
@@ -218,7 +215,7 @@
         android:textColor="@color/white_80_percent"
         android:textSize="17sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvVoice"/>
+        app:layout_constraintTop_toBottomOf="@+id/tvAINS"/>
 
     <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/cbLowLatency"
@@ -249,7 +246,7 @@
         android:textColor="@color/white_80_percent"
         android:textSize="17sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvLowLatency"/>
+        app:layout_constraintTop_toBottomOf="@+id/tvPrefessional"/>
 
     <RadioGroup
         android:id="@+id/rgAINSMode"
