@@ -282,7 +282,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
                     }
                 }
 
-                override fun onPositionChanged(position_ms: Long) {
+                override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
 
                 }
 
