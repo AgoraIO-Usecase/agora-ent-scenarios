@@ -521,6 +521,11 @@ object VideoSetting {
             if (enableSR) {
                 // 设置最大分辨率
                 rtcEngine.setParameters("{\"rtc.video.sr_max_wh\":921600}")
+                // 在切换时必须先关闭sr再设置倍数再打开,，即
+                //i.   "rtc.video.enable_sr":("enabled": false, "mode" :2)
+                //ii.  "rtc.video.sr_type"：（超分倍数类型 推荐3、7、20）
+                //iii. "rtc.video.enable_sr": {"enabled": true, "mode":2)
+                rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":false, \"mode\": 2}}")
                 /**
                  * 超分倍数选项
                  * 1倍：      n=6
@@ -528,6 +533,7 @@ object VideoSetting {
                  * 1.5倍：   n=8
                  * 2倍：     n=3
                  * 锐化：    n=10(android是10，iOS是11)
+                 * 超级画质： n=20
                  */
                 rtcEngine.setParameters("{\"rtc.video.sr_type\":${SR.value}}")
             }
