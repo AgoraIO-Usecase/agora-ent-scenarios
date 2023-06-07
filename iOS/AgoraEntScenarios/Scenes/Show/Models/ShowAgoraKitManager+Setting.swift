@@ -31,6 +31,7 @@ extension ShowAgoraKitManager {
         case x1_5 = 8
         case x2 = 3
         case x_sharpen = 11
+        case x_superQuality = 20
     }
     
     private var dimensionsItems: [CGSize] {
@@ -117,7 +118,7 @@ extension ShowAgoraKitManager {
                 if videoWidth <= 540 {
                     srType = .x1_33
                 } else if videoWidth == 720 {
-                    srType = .x1_5
+                    srType = .x_superQuality
                 } else {
                     srType = .none
                 }
@@ -132,7 +133,7 @@ extension ShowAgoraKitManager {
                 }else if videoWidth <= 540 {
                     srType = .x1_33
                 }else if videoWidth == 720 {
-                    srType = .x1_5
+                    srType = .x_superQuality
                 }else {
                     srType = .none
                 }
