@@ -15,10 +15,12 @@ import androidx.recyclerview.widget.RecyclerView
 import io.agora.musiccontentcenter.Music
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogChatroomBgmSettingBinding
+import io.agora.scene.voice.rtckit.AgoraBGMStateListener
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
 
-class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBinding>() {
+class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBinding>(),
+    AgoraBGMStateListener {
 
     private var mOnBGMChanged: (() -> Unit)? = null
 
@@ -32,6 +34,7 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
     }
 
     override fun onDestroy() {
+        AgoraRtcEngineController.get().bgmManager().removeListener(this)
         super.onDestroy()
     }
 
@@ -41,6 +44,7 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
         setupRecycleView()
         setupView()
         fetchData()
+        AgoraRtcEngineController.get().bgmManager().addListener(this)
     }
 
     fun setOnBGMChanged(action: (() -> Unit)?) {
@@ -52,11 +56,8 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
         layout.orientation = LinearLayoutManager.VERTICAL
         binding?.rvMusicList?.layoutManager = layout
         adapter.setOnClickItemAction { music ->
-            setPlayOn(true)
             AgoraRtcEngineController.get().bgmManager().loadMusic(music)
-            adapter.updateSelected(music)
-            binding?.tvMusic?.text = music.name
-            binding?.tvSinger?.text = music.singer
+            AgoraRtcEngineController.get().bgmManager().setAutoPlay(true)
         }
         binding?.rvMusicList?.adapter = adapter
     }
@@ -89,10 +90,10 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
         }
         binding?.ivPlay?.setOnClickListener {
             val toState = !AgoraRtcEngineController.get().bgmManager().params.isAutoPlay
-            setPlayOn(toState)
+            AgoraRtcEngineController.get().bgmManager().setAutoPlay(toState)
         }
         binding?.ivNext?.setOnClickListener {
-            adapter.selectNext()
+            AgoraRtcEngineController.get().bgmManager().playNext()
         }
         // 音量
         binding?.ivVolume?.setOnClickListener {
@@ -132,8 +133,8 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
                         bgmManager.setAutoPlay(false)
                         bgmManager.loadMusic(music)
                         adapter.updateSelected(music)
-                        binding?.tvMusic?.text = music?.name ?: ""
-                        binding?.tvSinger?.text = music?.singer ?: ""
+                        binding?.tvMusic?.text = music.name ?: ""
+                        binding?.tvSinger?.text = music.singer ?: ""
                     }
                 } else {
                     adapter.updateSelected(bgmManager.bgm)
@@ -141,9 +142,15 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
             }
         }
     }
-    private fun setPlayOn(isOn: Boolean) {
-        AgoraRtcEngineController.get().bgmManager().setAutoPlay(isOn)
-        if (isOn) {
+
+    override fun onMusicChanged(music: Music?) {
+        adapter.updateSelected(music)
+        binding?.tvMusic?.text = music?.name
+        binding?.tvSinger?.text = music?.singer
+    }
+
+    override fun onPlayStateChanged(isPlay: Boolean) {
+        if (isPlay) {
             binding?.ivPlay?.setImageResource(R.drawable.voice_icon_bgm_pause)
         } else {
             binding?.ivPlay?.setImageResource(R.drawable.voice_icon_bgm_play)
@@ -164,25 +171,6 @@ private class MusicAdapter (  // 数据源
     fun updateSelected(selected: Music?) {
         mSelected = selected
         notifyDataSetChanged()
-    }
-    fun selectNext() {
-        if (mData == null) {
-            return
-        }
-        if (mSelected == null) {
-            val music = mData.first()
-            mOnClickItemAction?.invoke(music)
-        }
-        var nextIs = false
-        for (music in mData) {
-            if (nextIs) {
-                mOnClickItemAction?.invoke(music)
-                break
-            }
-            if (music.songCode == mSelected?.songCode) {
-                nextIs = true
-            }
-        }
     }
     fun setOnClickItemAction(action: ((music: Music) -> Unit)?) {
         mOnClickItemAction = action

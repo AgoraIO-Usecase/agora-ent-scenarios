@@ -1,5 +1,7 @@
 package io.agora.scene.voice.rtckit
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayerObserver
@@ -9,6 +11,10 @@ import io.agora.musiccontentcenter.*
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.RtcEngineEx
 
+interface AgoraBGMStateListener {
+    fun onMusicChanged(music: Music?)
+    fun onPlayStateChanged(isPlay: Boolean)
+}
 data class AgoraBGMParams (
     var isSingerOn: Boolean = true,
     var isAutoPlay: Boolean = false,
@@ -25,16 +31,11 @@ class AgoraBGMManager(
 
     val params = AgoraBGMParams()
 
+    private var mMusicList: Array<out Music>? = null
+
     var bgm: Music? = null
 
-    private var mOnMusicChanged: (() -> Unit)? = null
-    fun setOnMusicChanged(action: (() -> Unit)?) {
-        mOnMusicChanged = action
-    }
-    private var mOnPlayStateChanged: (() -> Unit)? = null
-    fun setOnPlayStateChanged(action: (() -> Unit)?) {
-        mOnPlayStateChanged = action
-    }
+    private var mListeners: ArrayList<AgoraBGMStateListener>? = null
 
     private var remoteVolume: Int = 40 // 远端音频
     private var mpkPlayerVolume: Int = 50
@@ -70,7 +71,7 @@ class AgoraBGMManager(
         contentCenterConfiguration.maxCacheSize = 10
 
         mMusicCenter.initialize(contentCenterConfiguration)
-        mPlayer.setLoopCount(Int.MAX_VALUE) // 单曲循环
+        mPlayer.setLoopCount(1) // 只播放一次
         mPlayer.adjustPlayoutVolume(mpkPlayerVolume)
         mPlayer.adjustPublishSignalVolume(mpkPublishVolume)
 
@@ -84,18 +85,41 @@ class AgoraBGMManager(
         mRtcEngine.updateChannelMediaOptions(channelMediaOption)
     }
 
+    fun addListener(listener: AgoraBGMStateListener) {
+        if (mListeners == null) {
+            mListeners = ArrayList<AgoraBGMStateListener>()
+        }
+        mListeners?.add(listener)
+    }
+
+    fun removeListener(listener: AgoraBGMStateListener) {
+        if (mListeners == null) {
+            return
+        }
+        mListeners?.remove(listener)
+        if (mListeners?.size == 0) {
+            mListeners = null
+        }
+    }
+
     fun fetchBGMList(complete: (list: Array<out Music>?) -> Unit) {
-        val jsonOption = "{\"pitchType\":1,\"needLyric\":true}"
-        mMusicCenter.getMusicCollectionByMusicChartId(0, 0, 20, jsonOption)?.let { requestId ->
-            musicCollectionCallbackMap[requestId] = complete
+        val musicList = mMusicList
+        if (musicList != null) {
+            complete.invoke(musicList)
+        } else {
+            val jsonOption = "{\"pitchType\":1,\"needLyric\":true}"
+            mMusicCenter.getMusicCollectionByMusicChartId(0, 0, 20, jsonOption)?.let { requestId ->
+                musicCollectionCallbackMap[requestId] = complete
+            }
         }
     }
 
     fun loadMusic(music: Music?) {
         bgm = music
         mPlayer.stop()
-        mOnMusicChanged?.invoke()
-        setAutoPlay(false)
+        mListeners?.forEach {
+            it.onMusicChanged(music)
+        }
         if (music == null) {
             return
         }
@@ -109,12 +133,21 @@ class AgoraBGMManager(
     }
 
     fun setAutoPlay(isPlay: Boolean) {
-        params.isAutoPlay = isPlay
-        mOnPlayStateChanged?.invoke()
+        if (params.isAutoPlay != isPlay) {
+            params.isAutoPlay = isPlay
+            mListeners?.forEach {
+                it.onPlayStateChanged(isPlay)
+            }
+        }
         if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_STOPPED) {
             return
         }
         if (isPlay) mPlayer.play() else mPlayer.pause()
+    }
+
+    fun playNext() {
+        loadMusic(nextMusic())
+        setAutoPlay(true)
     }
 
     fun setSingerOn(isOn: Boolean) {
@@ -147,6 +180,29 @@ class AgoraBGMManager(
         loadMusicCallbackMap[target.toString()] = complete
     }
 
+    private fun nextMusic(): Music? {
+        if (mMusicList == null) { return null }
+        if (bgm == null) { return mMusicList?.firstOrNull() }
+        var nextIs = false
+        mMusicList?.forEach { music ->
+            if (nextIs) {
+                return music
+            }
+            if (music.songCode == bgm?.songCode) {
+                nextIs = true
+            }
+        }
+        return mMusicList?.firstOrNull()
+    }
+
+    private fun runOnMainThread(runnable: Runnable) {
+        if (Thread.currentThread() === Looper.getMainLooper().thread) {
+            runnable.run()
+        } else {
+            Handler(Looper.getMainLooper()).post(runnable)
+        }
+    }
+
     override fun onPlayerStateChanged(
         state: Constants.MediaPlayerState?,
         error: Constants.MediaPlayerError?
@@ -158,8 +214,8 @@ class AgoraBGMManager(
             Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                 if (params.isAutoPlay) {
                     mPlayer.play()
+                    mPlayer.selectAudioTrack(if (params.isSingerOn) 0 else 1)
                 }
-                mPlayer.selectAudioTrack(if (params.isSingerOn) 0 else 1)
             }
             Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
                 mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
@@ -171,10 +227,9 @@ class AgoraBGMManager(
                 mRtcEngine.adjustPlaybackSignalVolume(100)
             }
             Constants.MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
-                if (params.isAutoPlay) {
-                    mPlayer.play()
+                runOnMainThread {
+                    playNext()
                 }
-                mPlayer.selectAudioTrack(if (params.isSingerOn) 0 else 1)
             }
             else -> {}
         }
@@ -246,6 +301,7 @@ class AgoraBGMManager(
         val id = requestId ?: return
         val callback = musicCollectionCallbackMap[id] ?: return
         musicCollectionCallbackMap.remove(id)
+        mMusicList = list
         callback.invoke(list)
     }
 
