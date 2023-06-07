@@ -57,7 +57,7 @@ import io.agora.voice.common.utils.ToastTools
 
 
 class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBinding>(), VoiceRoomSubscribeDelegate,
-    IParserSource {
+    IParserSource, AgoraBGMStateListener {
 
     companion object {
         const val KEY_VOICE_ROOM_MODEL = "voice_chat_room_model"
@@ -189,18 +189,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                             }
                         }
                     )
-
-                    AgoraRtcEngineController.get().setStateListener(object: AgoraBGMStateListener {
-                        override fun onPlayStateChanged(isPlay: Boolean) {
-                            val visible = if (isPlay) View.VISIBLE else View.INVISIBLE
-                            binding.ivBGM.visibility = visible
-                            binding.tvBGM.visibility = visible
-                        }
-                        override fun onMusicChanged(music: Music?) {
-                            val m = music ?: return
-                            binding.tvBGM.text = "${m.name}-${m.singer}"
-                        }
-                    })
+                    AgoraRtcEngineController.get().bgmManager().addListener(this@ChatroomLiveActivity)
                 }
 
                 override fun onError(code: Int, message: String?) {
@@ -655,6 +644,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
     }
 
     override fun finish() {
+        AgoraRtcEngineController.get().bgmManager().removeListener(this)
         ChatroomIMManager.getInstance().leaveChatRoom(roomKitBean.chatroomId)
         ChatroomIMManager.getInstance().removeChatRoomChangeListener()
         ChatroomIMManager.getInstance().clearCache()
@@ -679,5 +669,15 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
     private fun checkFocus(focus: Boolean) {
         binding.likeView.isVisible = focus
+    }
+
+    override fun onPlayStateChanged(isPlay: Boolean) {
+        val visible = if (isPlay) View.VISIBLE else View.INVISIBLE
+        binding.ivBGM.visibility = visible
+        binding.tvBGM.visibility = visible
+    }
+    override fun onMusicChanged(music: Music?) {
+        val m = music ?: return
+        binding.tvBGM.text = "${m.name}-${m.singer}"
     }
 }

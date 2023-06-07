@@ -82,15 +82,15 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
             }
         })
         updateModeSegment()
-        binding?.rgMode?.setOnCheckedChangeListener { _, i ->
-            val mode = when (i) {
-                R.id.tvModeAuto -> AgoraEarBackMode.Default
-                R.id.tvModeOpenSL -> AgoraEarBackMode.OpenSL
-                R.id.tvModeOboe -> AgoraEarBackMode.Oboe
-                else -> AgoraEarBackMode.Default
-            }
-            showDialogWithMode(mode)
-        }
+//        binding?.rgMode?.setOnCheckedChangeListener { _, i ->
+//            val mode = when (i) {
+//                R.id.tvModeAuto -> AgoraEarBackMode.Default
+//                R.id.tvModeOpenSL -> AgoraEarBackMode.OpenSL
+//                R.id.tvModeOboe -> AgoraEarBackMode.Oboe
+//                else -> AgoraEarBackMode.Default
+//            }
+//            showDialogWithMode(mode)
+//        }
         setPing(60)
         earBackManager.setOnEarBackDelayChanged { value ->
             binding?.root?.post {
@@ -149,12 +149,12 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
     }
 
     private fun updateModeSegment() {
-        mSetBack = true
-        when (AgoraRtcEngineController.get().earBackManager().params.mode) {
-            AgoraEarBackMode.Default -> binding?.tvModeAuto?.isChecked = true
-            AgoraEarBackMode.OpenSL -> binding?.tvModeOpenSL?.isChecked = true
-            else -> binding?.tvModeOboe?.isChecked = true
-        }
+//        mSetBack = true
+//        when (AgoraRtcEngineController.get().earBackManager().params.mode) {
+//            AgoraEarBackMode.Default -> binding?.tvModeAuto?.isChecked = true
+//            AgoraEarBackMode.OpenSL -> binding?.tvModeOpenSL?.isChecked = true
+//            else -> binding?.tvModeOboe?.isChecked = true
+//        }
     }
 
     private fun updateViewState() {
@@ -165,6 +165,7 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
             binding?.tvTips?.setTextColor(Color.rgb(255, 18, 22))
             binding?.tvTips?.text = "  使用耳返必须插入耳机，当前未检测到耳机"
             binding?.vSettingMark?.visibility = View.VISIBLE
+            binding?.clSetting?.alpha = 0.3f
             binding?.vPingMark?.visibility = View.VISIBLE
             return
         }
@@ -174,6 +175,7 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
         val isOn = AgoraRtcEngineController.get().earBackManager().params.isOn
         binding?.cbSwitch?.isChecked = isOn
         binding?.vSettingMark?.visibility = if (isOn) View.INVISIBLE else View.VISIBLE
+        binding?.clSetting?.alpha = if (isOn) 1f else 0.3f
         binding?.vPingMark?.visibility = if (isOn) View.INVISIBLE else View.VISIBLE
     }
 

@@ -18,11 +18,6 @@ import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
 
-interface AgoraBGMStateListener {
-    fun onPlayStateChanged(isPlay: Boolean)
-    fun onMusicChanged(music: Music?)
-}
-
 /**
  * @author create by zhangwei03
  */
@@ -54,11 +49,6 @@ class AgoraRtcEngineController {
 
     fun setMicVolumeListener(micVolumeListener: RtcMicVolumeListener) {
         this.micVolumeListener = micVolumeListener
-    }
-
-    private var mBGMStateListener: AgoraBGMStateListener? = null
-    fun setStateListener(listener: AgoraBGMStateListener) {
-        mBGMStateListener = listener
     }
 
     private var joinCallback: VRValueCallBack<Boolean>? = null
@@ -100,12 +90,6 @@ class AgoraRtcEngineController {
                 mLocalUid,
                 mRtmToken
             )
-            mBgmManager?.setOnMusicChanged {
-                mBGMStateListener?.onMusicChanged(mBgmManager?.bgm)
-            }
-            mBgmManager?.setOnPlayStateChanged {
-                mBGMStateListener?.onPlayStateChanged(mBgmManager?.params?.isAutoPlay ?: false)
-            }
         }
         return mBgmManager!!
     }
