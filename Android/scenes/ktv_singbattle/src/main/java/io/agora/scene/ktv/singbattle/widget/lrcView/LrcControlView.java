@@ -235,7 +235,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     private RoomSelSongModel songPlaying;
 
     public void onPlayStatus(RoomSelSongModel songPlaying) {
-        if (isPrepareSong) startTimerCount();
+        //if (isPrepareSong) startTimerCount();
         this.songPlaying = songPlaying;
 
         if (mBinding == null) return;
@@ -247,6 +247,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         mBinding.ilActive.ivMusicStart.setIconResource(R.mipmap.ktv_ic_pause);
         mBinding.ilActive.ivMusicStart.setText(R.string.ktv_room_player_pause);
+    }
+
+    public void startSingBattlePrepareTimeCount() {
+        if (isPrepareSong) startTimerCount();
     }
 
     private void changeViewByRole() {
