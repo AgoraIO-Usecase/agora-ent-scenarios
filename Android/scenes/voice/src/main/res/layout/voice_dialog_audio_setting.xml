@@ -71,6 +71,8 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtAINSArrow"
             style="@style/voice_bottom_sheet_right_text_style"
+            android:layout_width="200dp"
+            android:gravity="right"
             android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
             app:layout_constraintBottom_toBottomOf="@+id/mtAINS"
             app:layout_constraintEnd_toEndOf="parent"
@@ -108,6 +110,8 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtAECArrow"
             style="@style/voice_bottom_sheet_right_text_style"
+            android:layout_width="200dp"
+            android:gravity="right"
             android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
             app:layout_constraintBottom_toBottomOf="@+id/mtAEC"
             app:layout_constraintEnd_toEndOf="parent"
@@ -145,6 +149,8 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtAGCArrow"
             style="@style/voice_bottom_sheet_right_text_style"
+            android:layout_width="200dp"
+            android:gravity="right"
             android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/mtAGC"
@@ -183,6 +189,8 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tvInEarArrow"
             style="@style/voice_bottom_sheet_right_text_style"
+            android:layout_width="200dp"
+            android:gravity="right"
             android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/tvInEar"
@@ -356,6 +364,8 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtBestSoundEffectArrow"
             style="@style/voice_bottom_sheet_right_text_style"
+            android:layout_width="200dp"
+            android:gravity="right"
             android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
             app:layout_constraintBottom_toBottomOf="@+id/mtBestSoundEffect"
             app:layout_constraintEnd_toEndOf="parent"
@@ -390,9 +400,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtBestSoundEffect" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvBGMArrow"
             style="@style/voice_bottom_sheet_right_text_style"
+            android:layout_width="200dp"
+            android:gravity="right"
             android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
             app:layout_constraintBottom_toBottomOf="@+id/tvBGM"
             app:layout_constraintEnd_toEndOf="parent"

@@ -389,6 +389,8 @@ class AgoraRtcEngineController {
         mBgmManager?.release()
         mBgmManager = null
 
+        mEarBackManager = null
+
         if (mediaPlayer != null) {
             mediaPlayer?.unRegisterPlayerObserver(firstMediaPlayerObserver)
             mediaPlayer?.destroy()
