@@ -342,7 +342,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
             }
         } else {
             VLSBGRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
-
+            NSLog(@"update:%@---%lu", songInfo.winnerNo, (unsigned long)status);
             if(![songInfo.winnerNo isEqualToString:@""] && status == SBGSubscribeUpdated ){
                 [weakSelf dealWithSbgEventWithUserNo:songInfo];
             }
@@ -392,10 +392,12 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
         [self.SBGApi stopSing];
     }
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.statusView.state = SBGStateSbgSuccess;
+        NSLog(@"update: time2---%f", [[NSDate date] timeIntervalSince1970] * 1000);
         [self.statusView setMicOwnerWith:model.name url:model.imageUrl];
+        self.statusView.state = SBGStateSbgSuccess;
     });
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW , (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSLog(@"update:%@抢到麦", model.winnerNo);
             if([VLUserCenter.user.id isEqualToString:model.winnerNo]) {
                 self.statusView.state = SBGStateSingingBroadcaster;
             } else {
@@ -1306,6 +1308,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
         if(flag == YES){
             [weakself syncChoruScore:0];
+            weakself.currentSelSong = nil;
             //把自己的信息存进去
             SubRankModel *model = [[SubRankModel alloc]init];
             VLSBGRoomSelSongModel *currentSong = weakself.selSongsArray.firstObject;
@@ -1430,7 +1433,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
         //房主同步进度为waiting
         if([self isRoomOwner]){
-            NSLog(@"removeCurrentSongWithSync: sbgquery");
             [self removeCurrentSongWithSync:YES];
         }
         if(self.totalCount > self.hasPlayedCount){
@@ -2086,7 +2088,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self updateSBGUI];
         //关闭卖位 等待解锁
         self.isNowMicMuted = true;
-        [_bottomView setAudioBtnEnabled:true];
+        [_bottomView setAudioBtnEnabled:false];
         [[AppContext sbgServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
                                                             completion:^(NSError * error) {
         }];
@@ -2256,6 +2258,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
             });
         }
     });
+    NSLog(@"update: time1---%f", [[NSDate date] timeIntervalSince1970] * 1000);
 }
 
 -(void)querySbgStatusAndUpdateUI {
@@ -2414,7 +2417,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
     
     if (self.chooseSongView) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.roomPersonView updateSingBtnWithChoosedSongArray:_selSongsArray];
+            [self.roomPersonView updateSingBtnWithChoosedSongArray:self.selSongsArray];
             self.chooseSongView.selSongsArray = selSongsArray; //刷新已点歌曲UI
         });
     }

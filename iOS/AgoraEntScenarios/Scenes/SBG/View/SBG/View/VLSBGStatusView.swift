@@ -448,7 +448,7 @@ class VLSBGStatusView: UIView {
         
         addSubview(orderBtn)
         
-        addSubview(randomBtn)
+       // addSubview(randomBtn)
         
         addSubview(resultTitleLabel)
         
@@ -507,7 +507,8 @@ class VLSBGStatusView: UIView {
         fightResult.frame = CGRect(x: self.bounds.width / 2.0 - 45, y: 40, width: 90, height: 24)
         attributeView.frame = CGRect(x: 0, y: 0, width: self.bounds.width, height: 64)
         
-        orderBtn.frame = CGRect(x: self.bounds.width / 2.0 - 114, y: self.bounds.height - 68, width: 84, height: 34)
+       // orderBtn.frame = CGRect(x: self.bounds.width / 2.0 - 114, y: self.bounds.height - 68, width: 84, height: 34)
+        orderBtn.frame = CGRect(x: self.bounds.width / 2.0 - 42, y: self.bounds.height - 68, width: 84, height: 34)
         
         randomBtn.frame = CGRect(x: self.bounds.width / 2.0 - 114 + 108, y: self.bounds.height - 68, width: 120, height: 34)
         

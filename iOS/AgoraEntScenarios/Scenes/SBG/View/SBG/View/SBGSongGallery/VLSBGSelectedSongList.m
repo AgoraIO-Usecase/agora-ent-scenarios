@@ -131,12 +131,12 @@ UITextFieldDelegate
     
     self.listContainerView = [[JXCategoryListContainerView alloc] initWithType:JXCategoryListContainerType_ScrollView delegate:self];
     [self addSubview:self.listContainerView];
-    self.listContainerView.frame = CGRectMake(0, self.categoryView.bottom + 10, SCREEN_WIDTH, SCREEN_HEIGHT*0.7-95);
+    self.listContainerView.frame = CGRectMake(0, self.categoryView.bottom + 10, SCREEN_WIDTH, self.bounds.size.height - 40);
     // 关联到 categoryView
     self.categoryView.listContainer = self.listContainerView;
     
     //搜索结果
-    self.resultView = [[VLSBGSearchSongResultView alloc]initWithFrame:CGRectMake(0, bgView.bottom+4, SCREEN_WIDTH, self.height-bgView.bottom-4)
+    self.resultView = [[VLSBGSearchSongResultView alloc]initWithFrame:CGRectMake(0, bgView.bottom+4, SCREEN_WIDTH, self.height + 5)
                                                       withDelegate:self
                                                         withRoomNo:self.roomNo
                                                           ifChorus:self.ifChorus];
@@ -191,7 +191,7 @@ UITextFieldDelegate
 }
 // 根据下标 index 返回对应遵守并实现 `JXCategoryListContentViewDelegate` 协议的列表实例
 - (id<JXCategoryListContentViewDelegate>)listContainerView:(JXCategoryListContainerView *)listContainerView initListForIndex:(NSInteger)index {
-    VLSBGSelectSongTableItemView *selSongView = [[VLSBGSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)
+    VLSBGSelectSongTableItemView *selSongView = [[VLSBGSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, self.bounds.size.height - 40)
                                                                                     withRooNo:self.roomNo
                                                                                      ifChorus:self.ifChorus];
    // selSongView.selSongsArray = self.selSongsArray;
