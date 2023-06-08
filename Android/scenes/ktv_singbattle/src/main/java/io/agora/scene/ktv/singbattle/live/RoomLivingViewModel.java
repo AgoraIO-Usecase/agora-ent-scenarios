@@ -114,6 +114,7 @@ public class RoomLivingViewModel extends ViewModel {
     enum PlayerMusicStatus {
         ON_PREPARE,
         ON_PLAYING,
+        ON_BATTLE,
         ON_PAUSE,
         ON_STOP,
         ON_LRC_RESET,
@@ -1068,7 +1069,7 @@ public class RoomLivingViewModel extends ViewModel {
                         }
                     } else if (jsonMsg.getString("cmd").equals("StartSingBattleCountDown")) {
                         KTVLogger.d(TAG, "StartSingBattleCountDown");
-                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_BATTLE);
                         hasReceiveStartSingBattle = true;
                     }
                 } catch (JSONException exp) {
@@ -1077,7 +1078,7 @@ public class RoomLivingViewModel extends ViewModel {
             }
         };
         config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING;
-        config.mAudioScenario = Constants.AUDIO_SCENARIO_CHORUS;
+        config.mAudioScenario = Constants.AUDIO_SCENARIO_GAME_STREAMING;
         try {
             mRtcEngine = (RtcEngineEx) RtcEngine.create(config);
         } catch (Exception e) {
@@ -1538,10 +1539,19 @@ public class RoomLivingViewModel extends ViewModel {
                 ktvApiProtocol.getMediaPlayer().adjustPlayoutVolume(50);
                 ktvApiProtocol.getMediaPlayer().adjustPublishSignalVolume(50);
 
+//                if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getWinnerNo().equals("") && isRoomOwner()) {
+//                    SyncStartSing();
+//                    playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+//                } else if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getWinnerNo().equals("") && !isRoomOwner() && hasReceiveStartSingBattle) {
+//                    playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+//                } else if (songPlayingLiveData.getValue() != null && !songPlayingLiveData.getValue().getWinnerNo().equals("")) {
+//                    playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+//                }
+
                 if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getWinnerNo().equals("") && isRoomOwner()) {
                     SyncStartSing();
                     playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                } else if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getWinnerNo().equals("") && !isRoomOwner() && hasReceiveStartSingBattle) {
+                } else if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getWinnerNo().equals("") && !isRoomOwner()) {
                     playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                 } else if (songPlayingLiveData.getValue() != null && !songPlayingLiveData.getValue().getWinnerNo().equals("")) {
                     playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);

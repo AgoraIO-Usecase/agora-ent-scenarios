@@ -494,11 +494,24 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
         });
         roomLivingViewModel.playerMusicStatusLiveData.observe(this, status -> {
+            KTVLogger.d("KTV_Scene_LOG", "playerMusicStatusLiveData: " + status);
             if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PREPARE) {
                 getBinding().lrcControlView.onPrepareStatus(roomLivingViewModel.isRoomOwner());
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PLAYING) {
                 getBinding().lrcControlView.onPlayStatus(roomLivingViewModel.songPlayingLiveData.getValue());
+                if (roomLivingViewModel.isRoomOwner() && roomLivingViewModel.songPlayingLiveData.getValue() != null && roomLivingViewModel.songPlayingLiveData.getValue().getWinnerNo().equals("")) {
+                    getBinding().lrcControlView.startSingBattlePrepareTimeCount();
+                    getBinding().getRoot().postDelayed(() -> {
+                        getBinding().lrcControlView.onGraspDiasble();
+                    }, 12000);
+                    getBinding().getRoot().postDelayed(() -> {
+                        roomLivingViewModel.onGraspFinish();
+                    }, 13000);
+                }
+            } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_BATTLE) {
+                getBinding().lrcControlView.onPlayStatus(roomLivingViewModel.songPlayingLiveData.getValue());
                 if (roomLivingViewModel.songPlayingLiveData.getValue() != null && roomLivingViewModel.songPlayingLiveData.getValue().getWinnerNo().equals("")) {
+                    getBinding().lrcControlView.startSingBattlePrepareTimeCount();
                     getBinding().getRoot().postDelayed(() -> {
                         getBinding().lrcControlView.onGraspDiasble();
                     }, 12000);
