@@ -337,7 +337,8 @@ class ShowSyncManagerServiceImpl(
                                 roomId,
                                 UserManager.getInstance().user.userNo,
                                 roomInfo.ownerId.toInt(),
-                                kRobotVideoStreamUrls[roomInfo.roomId.toInt() % kRobotVideoStreamUrls.size],
+                                //20230001->10.mp4,20230002->11.mp4,20230003->12.mp4,
+                                kRobotVideoStreamUrls[(roomInfo.roomId.toInt() + 1) % kRobotVideoStreamUrls.size],
                                 "cn",
                                 success = {
                                     createRoomInner(
