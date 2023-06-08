@@ -93,7 +93,7 @@ class KTVApiImpl: NSObject{
     private var timer: Timer?
     private var isPause: Bool = false
     
-    public var remoteVolume: Int = 15
+    public var remoteVolume: Int = 40
     private var joinChorusNewRole: KTVSingRole = .audience
     private var oldPitch: Double = 0
     deinit {
@@ -972,77 +972,6 @@ extension KTVApiImpl {
         else { return }
         agoraPrint("audience: position: \(position) realPosition:\(realPosition)")
     }
-    
-//    @objc public func didKTVAPIReceiveStreamMessageFrom( uid: NSInteger, streamId: NSInteger, data: Data){
-//        let role = singerRole
-//        guard let dict = dataToDictionary(data: data) else {return}
-//        if isMainSinger() {return}
-//
-//        if dict.keys.contains("cmd") {
-//            if dict["cmd"] as! String == "setLrcTime" {
-//                guard let position: Int64 = dict["time"] as? Int64 else {return}
-//                guard let duration: Int64 = dict["duration"] as? Int64 else {return}
-//                guard let remoteNtp: Int64 = dict["ntp"] as? Int64 else {return}
-//                guard let realPosition: Int64 = dict["realTime"] as? Int64 else {return}
-//                guard let songCode: Int64 = dict["songCode"] as? Int64 else {return}
-//                guard let mainSingerState: Int = dict["playerState"] as? Int else {return}
-//
-//                //如果接收到的歌曲和自己本地的歌曲不一致就不更新进度
-//                if songCode != songConfig?.songCode ?? 0 {
-//                    agoraPrint("local songCode[\(songCode)] is not equal to recv songCode[\(songConfig?.songCode ?? 0)] role: \(singerRole.rawValue)")
-//                    return
-//                }
-//
-//                self.remotePlayerDuration = TimeInterval(duration)
-//                self.lastMainSingerUpdateTime = Date().milListamp
-//                self.remotePlayerPosition = TimeInterval(realPosition)
-//                let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
-//                if (self.playerState != state) {
-//                    agoraPrint("[setLrcTime] recv state: \(self.playerState.rawValue)->\(state.rawValue) role: \(singerRole.rawValue) role: \(singerRole.rawValue)")
-//                    if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
-//                        //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
-//                        self.localPlayerPosition = self.lastMainSingerUpdateTime - Double(position)
-//                        agoraPrint("seek toPosition: \(position)")
-//                        musicPlayer.seek(toPosition: Int(position))
-//                    }
-//                    syncPlayStateFromRemote(state: state, needDisplay: false)
-//                }
-//
-//                if role == .coSinger {
-//                    if musicPlayer?.getPlayerState() == .playing {
-//                        let localNtpTime = getNtpTimeInMs()
-//                        let localPosition = self.lastMainSingerUpdateTime - self.localPlayerPosition
-//                        let expectPosition = Int(position) + localNtpTime - Int(remoteNtp) + self.audioPlayoutDelay
-//                        let threshold = expectPosition - Int(localPosition)
-//                        if(abs(threshold) > 40) {
-//                            musicPlayer?.seek(toPosition: expectPosition)
-//                            agoraPrint("progress: setthreshold: \(threshold) expectPosition: \(expectPosition) position: \(position), localNtpTime: \(localNtpTime), remoteNtp: \(remoteNtp), audioPlayoutDelay: \(self.audioPlayoutDelay), localPosition: \(localPosition)")
-//                        }
-//                    } else {
-//                    }
-//                } else if role == .audience {
-//                }
-//
-//            } else if dict["cmd"] as? String == "PlayerState" {
-//                let mainSingerState: Int = dict["state"] as? Int ?? 0
-//                let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
-//                if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
-//                    //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
-//                    self.localPlayerPosition = getPlayerCurrentTime()
-//                    agoraPrint("seek toPosition: \(self.localPlayerPosition)")
-//                    musicPlayer.seek(toPosition: Int(self.localPlayerPosition))
-//                }
-//                print("recv state with MainSinger: \(state.rawValue)")
-//                syncPlayStateFromRemote(state: state, needDisplay: true)
-//
-//            } else if dict["cmd"] as? String == "setVoicePitch" {
-//                if role == .audience {
-//                    guard let voicePitch: Double = dict["pitch"] as? Double else {return}
-//                    self.pitch = voicePitch
-//                }
-//            }
-//        }
-//    }
 
     @objc public func didKTVAPIReceiveAudioVolumeIndication(with speakers: [AgoraRtcAudioVolumeInfo], totalVolume: NSInteger) {
         if playerState != .playing {return}
@@ -1064,7 +993,7 @@ extension KTVApiImpl {
 
     @objc public func didKTVAPILocalAudioStats(stats: AgoraRtcLocalAudioStats) {
         if useCustomAudioSource == true {return}
-        audioPlayoutDelay = Int(stats.audioDeviceDelay)
+        audioPlayoutDelay = Int(stats.audioPlayoutDelay)
     }
 
 }
@@ -1344,19 +1273,33 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
 extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
 
     func onSongSimpleInfoResult(_ requestId: String, songCode: Int, simpleInfo: String?, errorCode: AgoraMusicContentCenterStatusCode) {
-        
+        if (errorCode == .errorGateway) {
+            getEventHander { delegate in
+                delegate.onTokenPrivilegeWillExpire()
+            }
+        }
     }
 
     func onMusicChartsResult(_ requestId: String, result: [AgoraMusicChartInfo], errorCode: AgoraMusicContentCenterStatusCode) {
         guard let callback = musicChartDict[requestId] else {return}
         callback(requestId, errorCode, result)
         musicChartDict.removeValue(forKey: requestId)
+        if (errorCode == .errorGateway) {
+            getEventHander { delegate in
+                delegate.onTokenPrivilegeWillExpire()
+            }
+        }
     }
     
     func onMusicCollectionResult(_ requestId: String, result: AgoraMusicCollection, errorCode: AgoraMusicContentCenterStatusCode) {
         guard let callback = musicSearchDict[requestId] else {return}
         callback(requestId, errorCode, result)
         musicSearchDict.removeValue(forKey: requestId)
+        if (errorCode == .errorGateway) {
+            getEventHander { delegate in
+                delegate.onTokenPrivilegeWillExpire()
+            }
+        }
     }
     
     func onLyricResult(_ requestId: String, songCode: Int, lyricUrl: String?, errorCode: AgoraMusicContentCenterStatusCode) {
@@ -1364,6 +1307,11 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
         let callback = self.lyricCallbacks[requestId]
         guard let lyricCallback = callback else { return }
         self.lyricCallbacks.removeValue(forKey: requestId)
+        if (errorCode == .errorGateway) {
+            getEventHander { delegate in
+                delegate.onTokenPrivilegeWillExpire()
+            }
+        }
         if lrcUrl.isEmpty {
             lyricCallback(nil)
             return
@@ -1379,29 +1327,15 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
         let SongCode = "\(songCode)"
         guard let block = self.musicCallbacks[SongCode] else { return }
         self.musicCallbacks.removeValue(forKey: SongCode)
+        if (errorCode == .errorGateway) {
+            getEventHander { delegate in
+                delegate.onTokenPrivilegeWillExpire()
+            }
+        }
         block(status, songCode)
     }
 
 }
-
-//主要是歌词组件的回调
-//extension KTVApiImpl: KaraokeDelegate {
-//    func onKaraokeView(view: KaraokeView, didDragTo position: Int) {
-//        musicPlayer?.seek(toPosition: position)
-//        totalScore = view.scoringView.getCumulativeScore()
-//        //将分数传到vc
-////        guard let delegate = self.delegate else {return}
-////        delegate.didlrcViewDidScrolled(with: self.totalScore, totalScore: self.totalCount * 100)
-//    }
-//
-//    func onKaraokeView(view: KaraokeView, didFinishLineWith model: LyricLineModel, score: Int, cumulativeScore: Int, lineIndex: Int, lineCount: Int) {
-//        self.totalLines = lineCount
-//        self.totalScore = cumulativeScore
-//        //将分数传到vc
-////        guard let delegate = self.delegate else {return}
-////        delegate.didlrcViewDidScrollFinished(with: self.totalScore, totalScore: lineCount * 100, lineScore: score)
-//    }
-//}
 
 //主要是歌曲下载的回调
 extension KTVApiImpl: AgoraLrcDownloadDelegate {
