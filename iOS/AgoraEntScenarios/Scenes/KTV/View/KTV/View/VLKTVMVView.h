@@ -51,6 +51,8 @@ typedef enum : NSUInteger {
 
 -(void)didLeaveChours;
 
+-(void)didShowVoiceChooseView;
+
 @end
 
 @interface VLKTVMVView : UIView

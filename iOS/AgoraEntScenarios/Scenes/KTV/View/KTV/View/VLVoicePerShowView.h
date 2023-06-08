@@ -19,10 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface VLVoicePerShowView : UIView
-
-- (instancetype)initWithFrame:(CGRect)frame aecGrade:(NSInteger)grade withDelegate:(id<VLVoicePerShowViewDelegate>)delegate;
-
--(void)setPerSelected:(BOOL)isSelected;
+- (instancetype)initWithFrame:(CGRect)frame isProfessional:(BOOL)isProfessional isDelay:(BOOL)isDelay isRoomOwner:(BOOL)isRoomOwner aecGrade:(NSInteger)grade withDelegate:(id<VLVoicePerShowViewDelegate>)delegate;
 @end
 
 NS_ASSUME_NONNULL_END

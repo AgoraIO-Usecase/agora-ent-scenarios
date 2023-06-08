@@ -7,62 +7,94 @@
 
 #import "VLVoiceShowView.h"
 #import "KTVMacro.h"
+#import <SDWebImage/UIImageView+WebCache.h>
 @interface VLVoiceShowView()
 @property(nonatomic, weak) id <VLVoiceShowViewDelegate>delegate;
-@property (nonatomic,strong) UIButton *selBtn;
+@property (nonatomic,strong) UILabel *selLabel;
+@property (nonatomic,strong) UIImageView *selCoverImg;
+@property (nonatomic, assign) NSInteger selectIndex;
 @end
 
 @implementation VLVoiceShowView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLVoiceShowViewDelegate>)delegate dataSource:(NSArray *)dataSource {
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLVoiceShowViewDelegate>)delegate imgSource:(NSArray *)imgSource nameSource:(NSArray *)nameSource selectIndex:(NSInteger)selectIndex {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;
-        [self layoutUIWithDataSource: dataSource];
+        self.selectIndex = selectIndex;
+        [self layoutUIWithDataSource: imgSource nameSource:nameSource selectIndex:selectIndex];
     }
     return self;
 }
 
--(void)setSelectedIndex:(NSInteger)index{
-    self.selBtn.selected = false;
-    self.selBtn.layer.borderWidth = 0;
-    [self.selBtn setBackgroundImage:nil forState:UIControlStateNormal];
-    UIButton *btn = [self viewWithTag:200 + index];
-    btn.selected = true;
-    btn.layer.borderColor = [UIColor blueColor].CGColor;
-    btn.layer.borderWidth = 1;
-    [btn setBackgroundImage:[UIImage sceneImageWithName:@"ktv_selIcon"] forState:UIControlStateNormal];
-    self.selBtn = btn;
-}
-
--(void)layoutUIWithDataSource:(NSArray *)dataSource {
+-(void)layoutUIWithDataSource:(NSArray *)imgSource nameSource:(NSArray *)nameSource selectIndex:(NSInteger)selectIndex {
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = KTVLocalizedString(@"设置人声突出");
+    titleLabel.text = KTVLocalizedString(@"设置人声");
     titleLabel.font = UIFontMake(18);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];
     
-    for(int i=0;i< dataSource.count; i++){
-        UIButton *btn = [[UIButton alloc]init];
-        [btn setTitle:dataSource[i] forState:UIControlStateNormal];
-        [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [btn setTag:200 + i];
+    CGFloat width = 54;
+    CGFloat btnHeight = 92;
+    CGFloat imgHeight = 54;
+    CGFloat titleHeight = 17;
+    CGFloat margin = (self.bounds.size.width - 4 * 54) / 5;
+    for(int i=0;i< nameSource.count; i++){
+        CGFloat tx =  margin + (i) % 4 * (width + margin);
+        CGFloat ty = margin + (i) / 4 * (btnHeight + margin) + 42 + 62;
+        NSLog(@"t:frame %f--%f--%f--%f", tx, ty, width, titleHeight);
+        UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(tx, ty, width, titleHeight)];
+        titleLabel.text = nameSource[i];
+        titleLabel.tag = 1000 + i;
+        titleLabel.textAlignment = NSTextAlignmentCenter;
+        titleLabel.textColor = i == selectIndex ? [UIColor whiteColor] : [UIColor lightGrayColor];
+        titleLabel.tag = i;
+        if(i == selectIndex){
+            self.selLabel = titleLabel;
+        }
+        titleLabel.font = [UIFont systemFontOfSize:12];
+        [self addSubview:titleLabel];
+        
+        CGFloat ix =  margin + (i) % 4 * (width + margin);
+        CGFloat iy = margin + (i) / 4 * (btnHeight + margin) + 42;
+        NSLog(@"i:frame %f--%f--%f--%f", ix, iy, width, imgHeight);
+        UIImageView *imgView = [[UIImageView alloc]initWithFrame:CGRectMake(ix, iy, width, imgHeight)];
+        [imgView sd_setImageWithURL:[NSURL URLWithString:imgSource[i]]];
+        [self addSubview:imgView];
+        
+        UIImageView *coverImgView = [[UIImageView alloc]initWithFrame:CGRectMake(ix, iy, width, imgHeight)];
+        coverImgView.image = [UIImage sceneImageWithName:@"ktv_selIcon"];
+        coverImgView.tag = 300 + i;
+        coverImgView.hidden = i != selectIndex;
+        if(i == selectIndex){
+            self.selCoverImg = coverImgView;
+        }
+        [self addSubview:coverImgView];
+        
+        CGFloat bx =  margin + (i) % 4 * (width + margin);
+        CGFloat by = margin + (i) / 4 * (btnHeight + margin) + 42;
+        NSLog(@"b:frame %f--%f--%f--%f", bx, by, width, btnHeight);
+        UIButton *btn = [[UIButton alloc]initWithFrame:CGRectMake(bx, by, width, btnHeight)];
+        btn.tag = 200 + i;
         [btn addTarget:self action:@selector(click:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:btn];
     }
 }
 
 -(void)click:(UIButton *)btn {
-    self.selBtn.selected = false;
-    self.selBtn.layer.borderWidth = 0;
-    [self.selBtn setBackgroundImage:nil forState:UIControlStateNormal];
+    if(btn.tag - 200 == _selectIndex){
+        return;
+    }
+    self.selLabel.textColor = [UIColor lightGrayColor];
+    self.selCoverImg.hidden = true;
     
-    btn.selected = true;
-    btn.layer.borderColor = [UIColor blueColor].CGColor;
-    btn.layer.borderWidth = 1;
-    [btn setBackgroundImage:[UIImage sceneImageWithName:@"ktv_selIcon"] forState:UIControlStateNormal];
-    self.selBtn = btn;
+    UIImageView *selImg = [self viewWithTag:btn.tag + 100];
+    UILabel *selLabel = [self viewWithTag:btn.tag - 100];
+    selImg.hidden = false;
+    selLabel.textColor = [UIColor whiteColor];
+    self.selLabel = selLabel;
+    self.selCoverImg = selImg;
     if([self.delegate respondsToSelector:@selector(voiceItemClickAction:)]){
         [self.delegate voiceItemClickAction:btn.tag - 200];
     }
@@ -70,19 +102,6 @@
 
 -(void)layoutSubviews{
     [super layoutSubviews];
-    CGFloat margin = 20;
-    CGFloat width = (self.bounds.size.width - 4 * margin) / 3.0;
-    CGFloat height = (self.bounds.size.height - 50 - 4 * margin) / 3.0;
-    for(UIView *view in self.subviews){
-        if([view isMemberOfClass:[UIButton class]]){
-            UIButton *btn = (UIButton *)view;
-            CGFloat x =  margin + (btn.tag - 200) % 3 * (width + margin);
-            CGFloat y = margin + (btn.tag - 200) / 3 * (height + margin) + 42;
-            btn.frame = CGRectMake(x, y, width, height);
-            btn.layer.cornerRadius = 5;
-            btn.layer.masksToBounds = true;
-        }
-    }
 }
 
 @end

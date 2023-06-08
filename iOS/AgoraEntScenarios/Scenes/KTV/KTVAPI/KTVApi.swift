@@ -156,7 +156,7 @@ import AgoraRtcKit
     var localUid: Int = 0
     var chorusChannelName: String
     var chorusChannelToken: String
-    
+    var maxCacheSize: Int = 10
     @objc public
     init(appId: String,
          rtmToken: String,
@@ -164,7 +164,8 @@ import AgoraRtcKit
          channelName: String,
          localUid: Int,
          chorusChannelName: String,
-         chorusChannelToken: String
+         chorusChannelToken: String,
+         maxCacheSize: Int
     ) {
         self.appId = appId
         self.rtmToken = rtmToken
@@ -173,6 +174,7 @@ import AgoraRtcKit
         self.localUid = localUid
         self.chorusChannelName = chorusChannelName
         self.chorusChannelToken = chorusChannelToken
+        self.maxCacheSize = maxCacheSize
     }
 }
 
@@ -331,5 +333,9 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     
     // 开启专业主播模式
     func enableProfessionalStreamerMode(_ enable: Bool)
-
+    
+    /**
+     创建dataStreamID
+     */
+    func renewInnerDataStreamId()
 }

@@ -50,7 +50,7 @@ UICollectionViewDataSource
         self.accSlider.value = 0.5;
         self.remoteSlider.value = 0.4;
         self.setting.remoteVolume = 40;
-        self.cellWidth = CGRectGetWidth([UIScreen mainScreen].bounds) - 24;
+        self.cellWidth = (CGRectGetWidth([UIScreen mainScreen].bounds) - 48) / 4.0;
         self.titles = @[@"原声", @"KTV",@"演唱会", @"录音棚", @"留声机", @"空旷", @"空灵", @"流行",@"R&B"];
         self.effectImgs = @[@"ktv_console_setting1",@"ktv_console_setting2",@"ktv_console_setting3",@"ktv_console_setting4"];
     }
@@ -185,8 +185,16 @@ UICollectionViewDataSource
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     EffectCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"EffectCollectionViewCell" forIndexPath:indexPath];
-    cell.bgImageView.image = [UIImage sceneImageWithName:self.effectImgs[indexPath.item]];
+    cell.bgImageView.image = [UIImage sceneImageWithName:self.effectImgs[indexPath.item % 4]];
     cell.titleLabel.text = self.titles[indexPath.item];
+    cell.layer.cornerRadius = 5;
+    cell.layer.masksToBounds = true;
+    if(self.setting.selectEffect == indexPath.item){
+        cell.layer.borderColor = [UIColor blueColor].CGColor;
+        cell.layer.borderWidth = 2;
+    } else {
+        cell.layer.borderWidth = 0;
+    }
     return cell;
 }
 
@@ -203,13 +211,11 @@ UICollectionViewDataSource
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    NSArray *visibleCells = [self.collectionView visibleCells];
-    for (EffectCollectionViewCell *cell in visibleCells) {
-        cell.layer.borderWidth = 0;
+    self.setting.selectEffect = indexPath.item;
+    [self.collectionView reloadData];
+    if([self.delegate respondsToSelector:@selector(settingViewEffectChoosed:)]){
+        [self.delegate settingViewEffectChoosed:indexPath.item];
     }
-    EffectCollectionViewCell *selectedCell = (EffectCollectionViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
-    selectedCell.layer.borderColor = [UIColor blueColor].CGColor;
-    selectedCell.layer.borderWidth = 2;
 }
 
 #pragma mark - VLKTVKindsViewDelegate
@@ -298,7 +304,9 @@ UICollectionViewDataSource
 
 -(UICollectionView *)collectionView {
     if(!_collectionView){
-            self.collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:[[UICollectionViewFlowLayout alloc]init]];
+            UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc]init];
+            layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+            self.collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
             self.collectionView.dataSource = self;
             self.collectionView.delegate = self;
             self.collectionView.backgroundColor = [UIColor clearColor];
@@ -342,6 +350,11 @@ UICollectionViewDataSource
 -(void)setIspause:(BOOL)isPause{
     _remoteSlider.userInteractionEnabled = !isPause;
     _remoteSlider.value = isPause ? 1 : self.setting.remoteVolume / 100.0;
+}
+
+- (void)setSelectEffect:(NSInteger)index{
+    self.setting.selectEffect = index;
+    
 }
 
 @end

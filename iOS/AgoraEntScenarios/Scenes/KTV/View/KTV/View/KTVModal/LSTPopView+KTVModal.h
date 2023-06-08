@@ -19,7 +19,7 @@
 #import "VLVoicePerShowView.h"
 #import "VLVoiceShowView.h"
 #import "VLVoicePerShowView.h"
-
+#import "VLEarSettingView.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LSTPopView (KTVModal)
@@ -68,17 +68,28 @@ NS_ASSUME_NONNULL_BEGIN
                                settingView:(VLKTVSettingView*)settingView
                                withDelegate:(id<VLKTVSettingViewDelegate>)delegate;
 
+//弹出人声突出
 + (LSTPopView*)popVoiceShowViewWithParentView:(UIView*)parentView
                                          showView:(VLVoiceShowView*)showView
-                                   dataSource:(NSArray *)array
+                                   imgSource:(NSArray *)imgSource
+                                    nameSource:(NSArray *)nameSource
+                                  selectIndex:(NSInteger)index
                                       withDelegate:(id<VLVoiceShowViewDelegate>)delegate;
 
 
 + (LSTPopView*)popVoicePerViewWithParentView:(UIView*)parentView
+                              isProfessional: (BOOL) isProfessional
+                                     isDelay: (BOOL) isDelay
                                        grade:(NSInteger)grade
                                     isRoomOwner: (BOOL) isRoomOwner
                                          perView:(VLVoicePerShowView*)perView
-                                withDelegate:(id<VLVoicePerShowViewDelegate>)delegate;
+                                      withDelegate:(id<VLVoicePerShowViewDelegate>)delegate;
+
+//弹出耳返视图
++ (LSTPopView*)popEarSettingViewWithParentView:(UIView*)parentView
+                                   isEarOn:(BOOL)isEarOn
+                                           vol:(CGFloat)vol
+                                  withDelegate:(id<VLEarSettingViewViewDelegate>)delegate;
 
 @end
 

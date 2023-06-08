@@ -18,8 +18,6 @@ extension SARoomViewController {
 
         let actionView = ActionSheetManager()
         actionView
-            .section(section: 2)
-            .rows(rows: [2, 1])
             .title(title: "Audio Settings".localized_spatial())
             .sectionHeader(title: "Bot Settings".localized_spatial(), desc: "Host Only".localized_spatial())
             .switchCell(iconName: "icons／set／jiqi", title: "Agora Blue&Agora Red".localized_spatial(), isOn: isOpenSpatial, isEnabel: isOwner)
@@ -52,8 +50,6 @@ extension SARoomViewController {
         
         let actionView = ActionSheetManager()
         actionView
-            .section(section: 2)
-            .rows(rows: [2, 2])
             .title(title: "Spatial Audio".localized_spatial())
             .sectionHeader(iconName: "new", title: "Agora Blue Bot".localized_spatial(), desc: "Host Only".localized_spatial())
             .sliderCell(title: "Attenuation factor volume".localized_spatial(), value: robotInfo.blue_robot_attenuation, isEnable: isOwner)
