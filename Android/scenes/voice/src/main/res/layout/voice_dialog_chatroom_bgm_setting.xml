@@ -64,6 +64,7 @@
         android:id="@+id/ivVolume"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_marginLeft="12dp"
         android:padding="8dp"
         android:src="@drawable/voice_icon_bgm_volume"
         app:layout_constraintStart_toStartOf="@id/vBottom"
@@ -97,9 +98,10 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivNext"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:padding="8dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:padding="4dp"
+        android:layout_marginRight="12dp"
         android:src="@drawable/voice_icon_bgm_next"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/ivVolume"
@@ -108,9 +110,9 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivPlay"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:padding="8dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:padding="4dp"
         android:src="@drawable/voice_icon_bgm_play"
         app:layout_constraintEnd_toStartOf="@id/ivNext"
         app:layout_constraintTop_toTopOf="@id/ivVolume"
@@ -119,9 +121,9 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivSinging"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:padding="8dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:padding="4dp"
         android:src="@drawable/voice_icon_bgm_sing_on"
         app:layout_constraintEnd_toStartOf="@id/ivPlay"
         app:layout_constraintTop_toTopOf="@id/ivVolume"

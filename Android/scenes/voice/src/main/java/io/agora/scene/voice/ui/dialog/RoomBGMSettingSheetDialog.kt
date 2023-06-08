@@ -1,5 +1,6 @@
 package io.agora.scene.voice.ui.dialog
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import io.agora.musiccontentcenter.Music
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogChatroomBgmSettingBinding
@@ -24,7 +26,7 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
 
     private var mOnBGMChanged: (() -> Unit)? = null
 
-    private val adapter = MusicAdapter(mutableListOf())
+    private lateinit var adapter: MusicAdapter
 
     override fun getViewBinding(
         inflater: LayoutInflater,
@@ -55,6 +57,7 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
         val layout = LinearLayoutManager(context)
         layout.orientation = LinearLayoutManager.VERTICAL
         binding?.rvMusicList?.layoutManager = layout
+        adapter = MusicAdapter(context, mutableListOf())
         adapter.setOnClickItemAction { music ->
             AgoraRtcEngineController.get().bgmManager().loadMusic(music)
             AgoraRtcEngineController.get().bgmManager().setAutoPlay(true)
@@ -128,6 +131,7 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
             binding?.rvMusicList?.post {
                 binding?.tvDialogTitle?.text = "背景音乐(${list?.size ?: 0})"
                 adapter.updateDataSource(list?.toList() ?: listOf())
+                adapter.updatePlaying(bgmManager.params.isAutoPlay)
                 if (bgmManager.bgm == null) {
                     list?.firstOrNull()?.let { music ->
                         bgmManager.setAutoPlay(false)
@@ -150,6 +154,7 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
     }
 
     override fun onPlayStateChanged(isPlay: Boolean) {
+        adapter.updatePlaying(isPlay)
         if (isPlay) {
             binding?.ivPlay?.setImageResource(R.drawable.voice_icon_bgm_pause)
         } else {
@@ -159,17 +164,24 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
 }
 
 private class MusicAdapter (  // 数据源
+    private var context: Context?,
     private var mData: List<Music>,
     private var mSelected: Music? = null
 ) : RecyclerView.Adapter<MusicAdapter.MusicViewHolder>() {
 
     private var mOnClickItemAction: ((music: Music) -> Unit)? = null
+
+    private var mPlaying = false
     fun updateDataSource(data: List<Music>) {
         mData = data
         notifyDataSetChanged()
     }
     fun updateSelected(selected: Music?) {
         mSelected = selected
+        notifyDataSetChanged()
+    }
+    fun updatePlaying(isPlay: Boolean) {
+        mPlaying = isPlay
         notifyDataSetChanged()
     }
     fun setOnClickItemAction(action: ((music: Music) -> Unit)?) {
@@ -187,14 +199,25 @@ private class MusicAdapter (  // 数据源
         val music = mData[position]
         holder.tvTitle.text = music.name
         holder.tvSinger.text = music.singer
+        if (!holder.isLoadedGif) {
+            holder.isLoadedGif = true
+            context?.let { context ->
+                Glide.with(context)
+                    .asGif().load(R.drawable.voice_icon_bgm_playing)
+                    .placeholder(R.drawable.voice_icon_bgm_selected)
+                    .into(holder.ivSelectGif)
+            }
+        }
         if (music.songCode == mSelected?.songCode) {
-            holder.ivSelected.visibility = View.VISIBLE
+            holder.ivSelected.visibility = if (mPlaying) View.INVISIBLE else View.VISIBLE
+            holder.ivSelectGif.visibility = if (mPlaying) View.VISIBLE else View.INVISIBLE
             holder.tvTitle.setTextColor(Color.rgb(10, 122, 255))
             holder.tvSinger.setTextColor(Color.rgb(10, 122, 255))
         } else {
+            holder.ivSelected.visibility = View.INVISIBLE
+            holder.ivSelectGif.visibility = View.INVISIBLE
             holder.tvTitle.setTextColor(Color.rgb(60, 66, 103))
             holder.tvSinger.setTextColor(Color.rgb(60, 66, 103))
-            holder.ivSelected.visibility = View.INVISIBLE
         }
         holder.itemView.setOnClickListener {
             if (mSelected?.songCode != music.songCode) {
@@ -209,14 +232,18 @@ private class MusicAdapter (  // 数据源
 
     // ViewHolder类
     internal class MusicViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+        var isLoadedGif = false
         var tvTitle: TextView
         var tvSinger: TextView
         var ivSelected: ImageView
+        var ivSelectGif: ImageView
 
         init {
             tvTitle = itemView.findViewById<TextView>(R.id.tvTitle)
             tvSinger = itemView.findViewById<TextView>(R.id.tvSinger)
             ivSelected = itemView.findViewById<ImageView>(R.id.ivSelected)
+            ivSelectGif = itemView.findViewById<ImageView>(R.id.ivSelectGif)
         }
     }
 }
