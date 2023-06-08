@@ -198,14 +198,16 @@
 
 - (VLSBGSelectedSongList *)selsectSongView {
     if (!_selsectSongView) {
-        _selsectSongView = [[VLSBGSelectedSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20) withDelegate:self withRoomNo:self.roomNo ifChorus:self.ifChorus];
+       // _selsectSongView = [[VLSBGSelectedSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20 - 100) withDelegate:self withRoomNo:self.roomNo ifChorus:self.ifChorus];
+        _selsectSongView = [[VLSBGSelectedSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, SCREEN_HEIGHT * 0.7 - 200) withDelegate:self withRoomNo:self.roomNo ifChorus:self.ifChorus];
     }
     return _selsectSongView;
 }
 
 - (VLSBGSongList *)choosedSongView {
     if (!_choosedSongView) {
-        _choosedSongView = [[VLSBGSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20) withDelegate:self ];
+      //  _choosedSongView = [[VLSBGSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20 - 100) withDelegate:self ];
+        _choosedSongView = [[VLSBGSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, SCREEN_HEIGHT * 0.7 - 200) withDelegate:self ];
         _choosedSongView.hidden = YES;
     }
     return _choosedSongView;
