@@ -84,7 +84,9 @@
 }
 
 -(void)click {
-    
+    if([_delegate respondsToSelector:@selector(switcherView:on:)]){
+        [self.delegate switcherView:self on:_on];
+    }
 }
 
 @end

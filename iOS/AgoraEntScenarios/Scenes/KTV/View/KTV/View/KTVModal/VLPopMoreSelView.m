@@ -44,11 +44,12 @@
     //CGFloat middleMargin = (SCREEN_WIDTH-itemWH*2-2*leftMargin);
     CGFloat itemY = titleLabel.bottom + 26;
     
-    NSArray *itemsArray = @[@"ktv_more_belcantoIcon",@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
+   // NSArray *itemsArray = @[@"ktv_more_belcantoIcon",@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
   //  NSArray *itemsArray = @[@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
+    NSArray *itemsArray = @[@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
     NSArray *titlesArray = @[
        // KTVLocalizedString(@"美声"),
-        KTVLocalizedString(@"音效"),
+       // KTVLocalizedString(@"音效"),
         KTVLocalizedString(@"配置"),
         KTVLocalizedString(@"MV")];
     for (int i=0; i<itemsArray.count; i++) {

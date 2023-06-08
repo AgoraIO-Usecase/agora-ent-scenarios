@@ -15,26 +15,24 @@
 @property (nonatomic, assign) NSInteger aecGrade;
 @property (nonatomic, strong) UISegmentedControl *qualitySegment;
 @property (nonatomic, strong) UILabel *qualityLabel;
+@property (nonatomic, assign) BOOL isRoomOwner;
+@property (nonatomic, assign) BOOL isProfessional;
+@property (nonatomic, assign) BOOL isDelay;
 @end
 
 @implementation VLVoicePerShowView
 
-- (instancetype)initWithFrame:(CGRect)frame aecGrade:(NSInteger)grade withDelegate:(id<VLVoicePerShowViewDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame isProfessional:(BOOL)isProfessional isDelay:(BOOL)isDelay isRoomOwner:(BOOL)isRoomOwner aecGrade:(NSInteger)grade withDelegate:(id<VLVoicePerShowViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;
         self.aecGrade = grade;
+        self.isRoomOwner = isRoomOwner;
+        self.isProfessional = isProfessional;
+        self.isDelay = isDelay;
         [self layoutUI];
     }
     return self;
-}
-
--(void)setPerSelected:(BOOL)isSelected{
-    self.voiceSwitch.on = isSelected;
-}
-
--(void)setAECLevel:(NSInteger)level {
-   // self.menu.selectedIndex = level;
 }
 
 -(void)layoutUI {
@@ -53,14 +51,15 @@
     self.voiceSwitch = [[UISwitch alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 70, 60, 50, 30)];
     self.voiceSwitch.onTintColor = UIColorMakeWithHex(@"#099DFD");
     [self.voiceSwitch addTarget:self action:@selector(perChange:) forControlEvents:UIControlEventValueChanged];
+    self.voiceSwitch.on = self.isProfessional;
     [self addSubview:_voiceSwitch];
     
     UIView *sepView = [[UIView alloc]initWithFrame:CGRectMake(20, 105, SCREEN_WIDTH - 40 , 1)];
     sepView.backgroundColor = [UIColor colorWithRed:0.938 green:0.938 blue:0.938 alpha:0.08];
     [self addSubview:sepView];
     
-    UILabel *qualityLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 123, 80, 30)];
-    qualityLabel.text = @"音质";
+    UILabel *qualityLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 123, 150, 30)];
+    qualityLabel.text = @"降低背景噪音";
     qualityLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:qualityLabel];
     _qualityLabel = qualityLabel;
@@ -78,30 +77,41 @@
     
     self.delaySwitch = [[UISwitch alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 70, 186, 50, 30)];
     self.delaySwitch.onTintColor = UIColorMakeWithHex(@"#099DFD");
+    self.delaySwitch.on = self.isDelay;
     [self.delaySwitch addTarget:self action:@selector(delayChange:) forControlEvents:UIControlEventValueChanged];
     [self addSubview:_delaySwitch];
+    
+    if(!self.isRoomOwner) {
+        self.delaySwitch.hidden = true;
+        delayLabel.hidden = true;
+    }
 
 }
 
 -(void)perChange:(UISwitch *)voiceSwitch {
-    self.qualitySegment.enabled = voiceSwitch.on;
-    self.qualitySegment.alpha = 0.8;
-    
     if([self.delegate respondsToSelector:@selector(voicePerItemSelectedAction:)]){
         [self.delegate voicePerItemSelectedAction:voiceSwitch.isOn];
     }
 }
 
--(void)delayChange:(UISwitch *)voiceSwitch {
+-(void)delayChange:(UISwitch *)delaySwitch {
+    self.isDelay = delaySwitch.on;
+    if(self.isDelay){
+        self.qualitySegment.selectedSegmentIndex = 0;
+        self.aecGrade = 0;
+        if([self.delegate respondsToSelector:@selector(didAIAECGradeChangedWithIndex:)]){
+            [self.delegate didAIAECGradeChangedWithIndex:self.aecGrade];
+        }
+    }
     if([self.delegate respondsToSelector:@selector(voiceDelaySelectedAction:)]){
-        [self.delegate voiceDelaySelectedAction:voiceSwitch.isOn];
+        [self.delegate voiceDelaySelectedAction:delaySwitch.isOn];
     }
 }
 
 //初始化Segmented控件
 - (void)initSegmentedControl
 {
-    NSArray *segmentedData = [[NSArray alloc]initWithObjects:@"低音质",@"中音质",@"高音质",nil];
+    NSArray *segmentedData = [[NSArray alloc]initWithObjects:@"关闭",@"中",@"高",nil];
     self.qualitySegment = [[UISegmentedControl alloc]initWithItems:segmentedData];
     self.qualitySegment.frame = CGRectMake(SCREEN_WIDTH - 209, 121, 189, 34);
     //这个是设置按下按钮时的颜色
@@ -122,6 +132,13 @@
 
 -(void)segmentSelect:(UISegmentedControl *)seg{
     self.aecGrade = seg.selectedSegmentIndex;
+    if(self.aecGrade > 0){
+        self.isDelay = false;
+        self.delaySwitch.on = false;
+        if([self.delegate respondsToSelector:@selector(voiceDelaySelectedAction:)]){
+            [self.delegate voiceDelaySelectedAction:false];
+        }
+    }
     if([self.delegate respondsToSelector:@selector(didAIAECGradeChangedWithIndex:)]){
         [self.delegate didAIAECGradeChangedWithIndex:self.aecGrade];
     }

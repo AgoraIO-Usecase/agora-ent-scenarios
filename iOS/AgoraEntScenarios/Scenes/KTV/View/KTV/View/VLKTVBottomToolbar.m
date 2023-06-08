@@ -98,10 +98,6 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 //            if (self.delegate && [self.delegate respondsToSelector:@selector(bottomSetVideoMute:)]) {
 //                [self.delegate bottomSetVideoMute:info.isVideoMuted];
 //            }
-            if(info.seatIndex == 0){
-                voiceShowBtn.hidden = NO;
-            }
-
             break;
         }
     }

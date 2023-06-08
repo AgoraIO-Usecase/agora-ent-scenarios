@@ -261,6 +261,16 @@
     _iconView.image = [UIImage sceneImageWithName:@"ktv_showVoice"];
     [_perShowView addSubview:_iconView];
     _perShowView.hidden = true;
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(voiceChoose)];
+    _perShowView.userInteractionEnabled = true;
+    [_perShowView addGestureRecognizer:tap];
+}
+
+-(void)voiceChoose{
+    if([self.delegate respondsToSelector:@selector(didShowVoiceChooseView)]){
+        [self.delegate didShowVoiceChooseView];
+    }
 }
 
 -(void)setPerViewHidden:(BOOL)isHidden {
