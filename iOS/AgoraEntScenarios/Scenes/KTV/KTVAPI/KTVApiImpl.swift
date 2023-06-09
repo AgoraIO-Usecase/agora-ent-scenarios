@@ -32,7 +32,6 @@ class KTVApiImpl: NSObject{
 
     private var songConfig: KTVSongConfiguration?
     private var subChorusConnection: AgoraRtcConnection?
-    private var downloadManager: AgoraDownLoadManager = AgoraDownLoadManager()
 
     private var eventHandlers: NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
     private var loadMusicListeners: NSMapTable<NSString, AnyObject> = NSMapTable<NSString, AnyObject>(keyOptions: .copyIn, valueOptions: .weakMemory)
@@ -107,12 +106,6 @@ class KTVApiImpl: NSObject{
         self.apiConfig = config
         
         setParams()
-        
-//        let dataStreamConfig = AgoraDataStreamConfig()
-//        dataStreamConfig.ordered = false
-//        dataStreamConfig.syncWithAudio = true
-//        // ktvStreamId 是定义的可保存 Stream ID 的全局变量
-//        self.apiConfig?.engine?.createDataStream(&dataStreamId, config: dataStreamConfig)
 
         // ------------------ 初始化内容中心 ------------------
         let contentCenterConfiguration = AgoraMusicContentCenterConfig()
@@ -130,8 +123,6 @@ class KTVApiImpl: NSObject{
         // 音量最佳实践调整
         musicPlayer?.adjustPlayoutVolume(50)
         musicPlayer?.adjustPublishSignalVolume(50)
-
-        downloadManager.delegate = self
 
         initTimer()
     }
@@ -214,7 +205,6 @@ extension KTVApiImpl: KTVApiDelegate {
         musicPlayer?.stop()
         freeTimer()
         agoraPrint("cleanCache")
-        downloadManager.delegate = nil
         lrcControl = nil
         lyricCallbacks.removeAll()
         musicCallbacks.removeAll()
@@ -673,86 +663,9 @@ extension KTVApiImpl {
     
     private func setLyric(with url: String, callBack: @escaping LyricCallback) {
         agoraPrint("setLyric url: (url)")
-        
-        var path: String? = nil
-
-        if self.lyricCallbacks.keys.contains(url) {
-            self.lyricCallbacks[url] = callBack
-        }
-
-        downloadManager.downloadLrcFile(urlString: url) { [weak self] lrcurl in
-            defer {
-                callBack(path)
-            }
-            guard let lrcurl = lrcurl else {
-                agoraPrint("downloadLrcFile fail, lrcurl is nil")
-                return
-            }
-            
-            let curSong = URL(string: url)?.lastPathComponent.components(separatedBy: ".").first
-            let loadSong = URL(string: lrcurl)?.lastPathComponent.components(separatedBy: ".").first
-            guard curSong == loadSong else {
-                agoraPrint("downloadLrcFile fail, missmatch, cur:\(curSong ?? "") load:\(loadSong ?? "")")
-                return
-            }
-            self?.lrcControl?.onDownloadLrcData(url: lrcurl)
-            path = lrcurl
-        } failure: {
-            callBack(nil)
-            agoraPrint("歌词解析失败")
-        }
+        self.lrcControl?.onDownloadLrcData(url: url)
+        callBack(url)
     }
-//    private func preloadMusic(with songCode: NSInteger, callBaclk:@escaping LoadMusicCallback) {
-//        agoraPrint("preloadMusic songCode: \(songCode)")
-//        var err = self.mcc.isPreloaded(songCode: songCode)
-//        if err == 0 {
-//            musicCallbacks.removeValue(forKey: String(songCode))
-//            callBaclk(.OK, songCode)
-//            return
-//        }
-//
-//        err = self.mcc.preload(songCode: songCode, jsonOption: nil)
-//        if err != 0 {
-//            musicCallbacks.removeValue(forKey: String(songCode))
-//            callBaclk(.error, songCode)
-//            return
-//        }
-//        musicCallbacks.updateValue(callBaclk, forKey: String(songCode))
-//    }
-
-//    private func setLyric(with url: String, callBack:@escaping LyricCallback) {
-//        agoraPrint("setLyric url: \(url)")
-//        if self.lyricCallbacks.keys.contains(url) {
-//            self.lyricCallbacks.updateValue(callBack, forKey: url)
-//        }
-//
-//        downloadManager.downloadLrcFile(urlString: url) {[weak self] lrcurl in
-//            var path: String? = nil
-//            defer{
-//                callBack(path)
-//            }
-//
-//            guard let lrcurl = lrcurl else {
-//                agoraPrint("downloadLrcFile fail, lrcurl = nil")
-//                return
-//            }
-//            let curStr: String = url.components(separatedBy: "/").last ?? ""
-//            let loadStr: String = lrcurl.components(separatedBy: "/").last ?? ""
-//            let curSongStr: String = curStr.components(separatedBy: ".").first ?? ""
-//            let loadSongStr: String = loadStr.components(separatedBy: ".").first ?? ""
-//            if curSongStr != loadSongStr {
-//                agoraPrint("downloadLrcFile fail, missmatch cur:\(curSongStr) load:\(loadSongStr)")
-//                return
-//            }
-//            self?.lrcControl?.onDownloadLrcData(url: lrcurl)
-//            path = lrcurl
-//
-//        } failure: {
-//            callBack(nil)
-//            agoraPrint("歌词解析失败")
-//        }
-//
-//    }
 
     func startSing(songCode: Int, startPos: Int) {
         let role = singerRole
@@ -1153,20 +1066,6 @@ extension KTVApiImpl {
         }
     }
 
-//    private func dataToDictionary(data: Data) -> Dictionary<String, Any>? {
-//        guard let json = try? JSONSerialization.jsonObject(with: data, options: []),
-//              let dictionary = json as? [String: Any] else {
-//            return nil
-//        }
-//        return dictionary
-//    }
-
-//    private func compactDictionaryToData(_ dict: NSDictionary) -> Data? {
-//        guard JSONSerialization.isValidJSONObject(dict) else { return nil }
-//        guard let jsonData = try? JSONSerialization.data(withJSONObject: dict, options: []) else { return nil }
-//        return jsonData
-//    }
-
     private func getNtpTimeInMs() -> Int {
         var localNtpTime: Int = Int(apiConfig?.engine?.getNtpWallTimeInMs() ?? 0)
 
@@ -1335,24 +1234,6 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
         block(status, songCode)
     }
 
-}
-
-//主要是歌曲下载的回调
-extension KTVApiImpl: AgoraLrcDownloadDelegate {
-
-    func downloadLrcFinished(url: String) {
-        agoraPrint("download lrc finished \(url)")
-        guard let callback = self.lyricCallbacks[url] else { return }
-        self.lyricCallbacks.removeValue(forKey: url)
-        callback(url)
-    }
-
-    func downloadLrcError(url: String, error: Error?) {
-        agoraPrint("download lrc fail \(url): \(String(describing: error))")
-        guard let callback = self.lyricCallbacks[url] else { return }
-        self.lyricCallbacks.removeValue(forKey: url)
-        callback(nil)
-    }
 }
 
 extension Date {
