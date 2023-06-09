@@ -41,7 +41,7 @@ import KakaJSON
     public var turn_AIAEC: Bool? = false
     public var turn_AGC: Bool? = false
     public var turn_InEar: Bool? = false
-    public var inEar_volume: Int = 0
+    public var inEar_volume: Int = 100
     public var inEarMode: String?
     public var robot_volume: UInt?
     public var sound_effect: Int = 1
