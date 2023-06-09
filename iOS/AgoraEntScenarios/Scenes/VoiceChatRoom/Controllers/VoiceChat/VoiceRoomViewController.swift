@@ -693,7 +693,7 @@ extension VoiceRoomViewController: VMMusicPlayerDelegate {
                     self.musicView.setupMusic(model: model, isOrigin: self.roomInfo?.room?.musicIsOrigin ?? false)
                 }
             } else if state == .paused {
-                roomInfo?.room?.backgroundMusic?.isPlaying = false
+                roomInfo?.room?.backgroundMusic?.status = .pause
             }
         }
     }
