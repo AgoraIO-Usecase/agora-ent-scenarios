@@ -14,7 +14,12 @@ class HeadSetUtil: NSObject {
         let audioSession = AVAudioSession.sharedInstance()
         let currentRoute = audioSession.currentRoute
         for output in currentRoute.outputs {
-            if output.portType == .headphones || output.portType == .bluetoothLE || output.portType == .bluetoothHFP || output.portType == .bluetoothA2DP {
+            if output.portType == .headphones
+                || output.portType == .bluetoothLE
+                || output.portType == .bluetoothHFP
+                || output.portType == .bluetoothA2DP
+                || output.portType == .builtInSpeaker
+                || output.portType == .usbAudio {
                 return true
             }
         }
