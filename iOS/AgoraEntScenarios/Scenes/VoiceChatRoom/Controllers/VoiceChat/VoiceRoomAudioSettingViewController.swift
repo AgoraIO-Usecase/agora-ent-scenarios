@@ -66,7 +66,8 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     private lazy var musicListView: VoiceMusicListView = {
         let view = VoiceMusicListView(rtcKit: rtcKit,
                                       currentMusic: roomInfo?.room?.backgroundMusic,
-                                      isOrigin: roomInfo?.room?.musicIsOrigin ?? true)
+                                      isOrigin: roomInfo?.room?.musicIsOrigin ?? true,
+                                      roomInfo: roomInfo)
         view.backgroundMusicPlaying = { [weak self] model in
             self?.backgroundMusicPlaying?(model)
             self?.roomInfo?.room?.backgroundMusic = model
@@ -261,7 +262,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         } else if section == 1 {
             return 2
         } else {
-            return roomInfo?.room?.owner?.uid == VLUserCenter.user.id ? 2 : 1
+            return 2
         }
     }
 
@@ -487,7 +488,6 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             case 1:
                 state = .Music
                 heightType = .Music
-                guard roomInfo?.room?.owner?.uid == VLUserCenter.user.id else { return }
                 musicListView.show()
                 return
                 

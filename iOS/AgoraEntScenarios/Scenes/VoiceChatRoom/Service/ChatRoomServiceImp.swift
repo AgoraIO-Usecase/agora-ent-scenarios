@@ -853,7 +853,40 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                            userId: VLUserCenter.user.id,
                                            isOwner: VLUserCenter.user.id == room.owner?.uid,
                                            property: params) {[weak self] result in
-//                            let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
+
+                            var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
+                            let dispatchGroup = DispatchGroup()
+                            dispatchGroup.enter()
+                            NetworkManager.shared.generateTokens(channelName: room.room_id ?? "",
+                                                                 uid: "\(UserInfo.userId)",
+                                                                 tokenGeneratorType: .token006,
+                                                                 tokenTypes: [.rtc, .rtm]) { tokenMap in
+                                tokenMap1 = tokenMap
+                                dispatchGroup.leave()
+                            }
+                            
+                            dispatchGroup.enter()
+                            NetworkManager.shared.generateTokens(channelName: "\(room.room_id ?? "")_ex",
+                                                                 uid: "\(UserInfo.userId)",
+                                                                 tokenGeneratorType: .token006,
+                                                                 tokenTypes: [.rtc]) { tokenMap in
+                                tokenMap2 = tokenMap
+                                dispatchGroup.leave()
+                            }
+                            
+                            dispatchGroup.notify(queue: .main){
+                                guard let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
+                                      let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
+                                      let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
+                                else {
+                                    completion(nil, nil)
+                                    return
+                                }
+                                VLUserCenter.user.agoraRTCToken = rtcToken
+                                VLUserCenter.user.agoraRTMToken = rtmToken
+                                VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
+                            }
+                            
                             self?.roomId = roomId
                             self?._startCheckExpire()
 //                            completion(nil, model)
