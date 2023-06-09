@@ -82,7 +82,9 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
         let actionView = ActionSheetManager()
         let isOn = (roomInfo?.room?.turn_InEar ?? false)
         inEarView.isHidden = !isOn
-        var inEar_volume = Double((roomInfo?.room?.inEar_volume ?? 0)) / 100.0
+        // 设置耳返音量
+        setInEarVolumnBlock?(roomInfo?.room?.inEar_volume ?? 100)
+        var inEar_volume = Double((roomInfo?.room?.inEar_volume ?? 100)) / 100.0
         var inEarMode = roomInfo?.room?.inEarMode ?? ""
         let earModes = ["自动".show_localized, "强制OpenSL".show_localized, "强制Oboe".show_localized]
         var inEarModeIndex = earModes.firstIndex(where: { $0 == inEarMode }) ?? 0
