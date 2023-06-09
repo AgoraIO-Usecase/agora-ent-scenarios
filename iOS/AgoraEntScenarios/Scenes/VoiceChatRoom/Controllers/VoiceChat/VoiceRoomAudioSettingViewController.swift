@@ -488,6 +488,10 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             case 1:
                 state = .Music
                 heightType = .Music
+                if roomInfo?.room?.owner?.uid != VLUserCenter.user.id {
+                    ToastView.show(text: "Host Music".localized())
+                    return
+                }
                 musicListView.show()
                 return
                 
