@@ -438,7 +438,10 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             if indexPath.row == 0 {
                 cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
             } else if indexPath.row == 1 {
-                cell.contentLabel.text = "\(roomInfo?.room?.backgroundMusic?.name ?? "")-\(roomInfo?.room?.backgroundMusic?.singer ?? "")"
+                let musicName = roomInfo?.room?.backgroundMusic?.name
+                let singerName = roomInfo?.room?.backgroundMusic?.singer
+                let text = musicName == nil ? "" : "\(musicName ?? "")-\(singerName ?? "")"
+                cell.contentLabel.text = text
             }
             return cell
         }
@@ -476,7 +479,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             switch indexPath.row {
             case 0:
                 //最佳音效
-                state = .Music
+                state = .effect
                 heightType = .EFFECT
                 
             case 1:
