@@ -56,18 +56,21 @@ class VoiceMusicListView: UIView {
     private lazy var musicToolView = VoiceMusicToolView()
     private var rtcKit: VoiceRoomRTCManager?
     private var currentMusic: VoiceMusicModel?
+    private var roomInfo: VRRoomInfo?
     private var musicList: [VoiceMusicModel] = []
     private var currentIndex: Int = -1
     private var isOrigin: Bool = true
     private var tableViewHCons: NSLayoutConstraint?
     
-    init(rtcKit: VoiceRoomRTCManager?, currentMusic: VoiceMusicModel?, isOrigin: Bool) {
+    init(rtcKit: VoiceRoomRTCManager?, currentMusic: VoiceMusicModel?, isOrigin: Bool, roomInfo: VRRoomInfo?) {
         super.init(frame: .zero)
         self.rtcKit = rtcKit
         self.currentMusic = currentMusic
+        self.roomInfo = roomInfo
         self.isOrigin = isOrigin
         setupUI()
         getMusicList()
+        musicToolView.roomInfo = roomInfo
     }
     
     override init(frame: CGRect) {
@@ -378,6 +381,8 @@ class VoiceMusicToolView: UIView {
     var onClickPlayButtonClosure: ((Bool) -> Void)?
     var onClickNextButtonClosure: (() -> Void)?
     
+    var roomInfo: VRRoomInfo?
+    
     private lazy var volumnButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage.sceneImage(name: "voice_volumn_icon"), for: .normal)
@@ -463,6 +468,7 @@ class VoiceMusicToolView: UIView {
         return label
     }()
     
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -537,6 +543,10 @@ class VoiceMusicToolView: UIView {
     
     @objc
     private func onClickVolumnButton(sender: UIButton) {
+        if roomInfo?.room?.owner?.uid != VLUserCenter.user.id {
+            ToastView.show(text: "Host Music".localized())
+            return
+        }
         sender.isSelected = !sender.isSelected
         UIView.animate(withDuration: 0.25) {
             self.sliderContaonerView.alpha = sender.isSelected ? 1.0 : 0.0
@@ -547,16 +557,28 @@ class VoiceMusicToolView: UIView {
     }
     @objc
     private func onClickAccompanyButton(sender: UIButton) {
+        if roomInfo?.room?.owner?.uid != VLUserCenter.user.id {
+            ToastView.show(text: "Host Music".localized())
+            return
+        }
         sender.isSelected = !sender.isSelected
         onClickAccompanyButtonClosure?(sender.isSelected)
     }
     @objc
     private func onClickPlayButton(sender: UIButton) {
+        if roomInfo?.room?.owner?.uid != VLUserCenter.user.id {
+            ToastView.show(text: "Host Music".localized())
+            return
+        }
         sender.isSelected = !sender.isSelected
         onClickPlayButtonClosure?(sender.isSelected)
     }
     @objc
     private func onClickNextButton() {
+        if roomInfo?.room?.owner?.uid != VLUserCenter.user.id {
+            ToastView.show(text: "Host Music".localized())
+            return
+        }
         onClickNextButtonClosure?()
     }
     @objc
