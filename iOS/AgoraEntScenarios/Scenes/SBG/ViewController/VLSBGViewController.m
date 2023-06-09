@@ -2493,7 +2493,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
             if(isLocal) {
                 SBGLogInfo(@"Playback all loop completed");
                 if(self.singRole != SBGSingRoleAudience){
-
+                    self.currentSelSong = nil;
                     self.isNowMicMuted = true;
                     [[AppContext sbgServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
                                                                         completion:^(NSError * error) {
