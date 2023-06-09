@@ -34,7 +34,7 @@ private func agoraPrint(_ message: String) {
     private var totalCount: Int = 0
     private var currentLoadLrcPath: String?
     private var hasShowOnce: Bool = false
-
+    private var downloadManager: AgoraDownLoadManager = AgoraDownLoadManager()
     @objc public var isMainSinger: Bool = false {
         didSet {
             if isMainSinger {return}
@@ -48,6 +48,7 @@ private func agoraPrint(_ message: String) {
         setupSkipBtn()
         lrcView.delegate = self
         skipBtn.isHidden = true
+        downloadManager.delegate = self
     }
 
     @objc public func getAvgScore() -> Int {
@@ -163,6 +164,38 @@ extension KTVLrcControl: KTVLrcViewDelegate {
     }
 
     func onDownloadLrcData(url: String) {
+        //开始歌词下载
+        startDownloadLrc(with: url) {[weak self] url in
+            guard let self = self, let url = url else {return}
+            self.resetLrcData(with: url)
+        }
+    }
+    
+    func startDownloadLrc(with url: String, callBack: @escaping LyricCallback) {
+        var path: String? = nil
+        downloadManager.downloadLrcFile(urlString: url) { lrcurl in
+            defer {
+                callBack(path)
+            }
+            guard let lrcurl = lrcurl else {
+                agoraPrint("downloadLrcFile fail, lrcurl is nil")
+                return
+            }
+
+            let curSong = URL(string: url)?.lastPathComponent.components(separatedBy: ".").first
+            let loadSong = URL(string: lrcurl)?.lastPathComponent.components(separatedBy: ".").first
+            guard curSong == loadSong else {
+                agoraPrint("downloadLrcFile fail, missmatch, cur:\(curSong ?? "") load:\(loadSong ?? "")")
+                return
+            }
+            path = lrcurl
+        } failure: {
+            callBack(nil)
+            agoraPrint("歌词解析失败")
+        }
+    }
+    
+    func resetLrcData(with url: String) {
         guard currentLoadLrcPath != url else {
             return
         }
@@ -177,5 +210,15 @@ extension KTVLrcControl: KTVLrcViewDelegate {
         totalLines = 0
         totalScore = 0
         lrcView?.setLyricData(data: model)
+    }
+}
+
+extension KTVLrcControl: AgoraLrcDownloadDelegate {
+    func downloadLrcFinished(url: String) {
+        agoraPrint("download lrc finished \(url)")
+    }
+    
+    func downloadLrcError(url: String, error: Error?) {
+        agoraPrint("download lrc fail \(url): \(String(describing: error))")
     }
 }
