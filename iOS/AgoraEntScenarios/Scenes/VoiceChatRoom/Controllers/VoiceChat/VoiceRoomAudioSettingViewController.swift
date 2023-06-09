@@ -324,7 +324,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         label.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(label)
         label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        label.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -5).isActive = true
+        label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
         
         let logoImageView = UIImageView(image: UIImage.sceneImage(name: "AI_logo", bundleName: "VoiceChatRoomResource"))
         logoImageView.contentMode = .scaleAspectFit
