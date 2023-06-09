@@ -38,11 +38,11 @@ def all_pods
   
   pod 'AgoraSyncManager', '~> 2.0.7'
 
-  pod 'sdk', :path => 'sdk.podspec'
+#  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 # pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
- # pod 'AgoraRtcEngine_Special_iOS', '4.1.1.5'
+  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.8'
 
 
   #ThirdParty
