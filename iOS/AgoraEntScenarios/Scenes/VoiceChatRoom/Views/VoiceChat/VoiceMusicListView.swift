@@ -53,6 +53,7 @@ class VoiceMusicListView: UIView {
     private var musicList: [VoiceMusicModel] = []
     private var currentIndex: Int = -1
     private var isOrigin: Bool = true
+    private var tableViewHCons: NSLayoutConstraint?
     
     init(rtcKit: VoiceRoomRTCManager?, currentMusic: VoiceMusicModel?, isOrigin: Bool) {
         super.init(frame: .zero)
@@ -74,12 +75,19 @@ class VoiceMusicListView: UIView {
     
     func show() {
         let height = 387 + 59 + 60 + Screen.safeAreaBottomHeight()
-        let component = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth,
+        let component = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth,
                                                                      height: height))
-        let controller = SAAlertViewController(compent: component,
-                                               custom: self,
-                                               isLayout: true)
-        VoiceRoomPresentView.shared.push(with: controller, frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 540), maxHeight: height)
+        let controller = VoiceRoomAlertViewController(compent: component, custom: self)
+        VoiceRoomPresentView.shared.push(with: controller, frame: CGRect(x: 0,
+                                                                         y: 0,
+                                                                         width: ScreenWidth,
+                                                                         height: height),
+                                         maxHeight: Screen.height - 40)
+        VoiceRoomPresentView.shared.panViewHeightClosure = { height in
+            self.tableViewHCons?.constant = height - 59 - (60 + Screen.safeAreaBottomHeight())
+            self.tableViewHCons?.isActive = true
+            self.layoutIfNeeded()
+        }
     }
     
     private func getMusicList() {
@@ -218,14 +226,16 @@ class VoiceMusicListView: UIView {
         tableView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         tableView.topAnchor.constraint(equalTo: lineView.bottomAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        tableView.heightAnchor.constraint(equalToConstant: 387).isActive = true
-        
+        tableViewHCons = tableView.heightAnchor.constraint(equalToConstant: 387)
+        tableViewHCons?.isActive = true
+
         addSubview(musicToolView)
         musicToolView.translatesAutoresizingMaskIntoConstraints = false
         musicToolView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         musicToolView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         musicToolView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         musicToolView.topAnchor.constraint(equalTo: tableView.bottomAnchor).isActive = true
+        musicToolView.heightAnchor.constraint(equalToConstant: 60 + Screen.safeAreaBottomHeight()).isActive = true
         
         eventHandler()
     }
@@ -367,7 +377,7 @@ class VoiceMusicToolView: UIView {
     }()
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "-"
+        label.text = ""
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 15)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -375,7 +385,7 @@ class VoiceMusicToolView: UIView {
     }()
     private lazy var singerLabeL: UILabel = {
         let label = UILabel()
-        label.text = "-"
+        label.text = ""
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.systemFont(ofSize: 13)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -473,7 +483,7 @@ class VoiceMusicToolView: UIView {
         addSubview(nextButton)
         
         volumnButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20).isActive = true
-        volumnButton.topAnchor.constraint(equalTo: topAnchor, constant: 35).isActive = true
+        volumnButton.topAnchor.constraint(equalTo: topAnchor, constant: 19).isActive = true
         
         titleLabel.leadingAnchor.constraint(equalTo: volumnButton.trailingAnchor, constant: 15).isActive = true
         titleLabel.centerYAnchor.constraint(equalTo: volumnButton.centerYAnchor).isActive = true
