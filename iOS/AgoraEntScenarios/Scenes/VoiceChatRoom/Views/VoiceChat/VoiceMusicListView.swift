@@ -8,12 +8,18 @@
 import UIKit
 import AgoraRtcKit
 
+enum VoiceMusicPlayStatus {
+    case pause
+    case download
+    case playing
+    case none
+}
+
 class VoiceMusicModel: NSObject {
     var name: String?
     var singer: String?
     var songCode: Int = 0
-    var isPlaying: Bool = false
-    var isDownload: Bool = false
+    var status: VoiceMusicPlayStatus = .none
 }
 
 class VoiceMusicListView: UIView {
@@ -99,7 +105,7 @@ class VoiceMusicListView: UIView {
                 model.singer = $0.singer
                 model.songCode = $0.songCode
                 if $0.name == self.currentMusic?.name {
-                    model.isPlaying = true
+                    model.status = .playing
                     self.musicToolView.setupMusicInfo(model: model, isOrigin: self.isOrigin)
                     self.backgroundMusicPlaying?(model)
                     self.currentIndex = list.firstIndex(where: { $0.name == self.currentMusic?.name }) ?? 0
@@ -108,6 +114,7 @@ class VoiceMusicListView: UIView {
             })
             self.titleLabel.text = "背景音乐".show_localized + "(\(list.count))"
             if !self.musicList.isEmpty && self.currentMusic == nil {
+                self.musicList[0].status = .pause
                 self.musicToolView.setupMusicInfo(model: self.musicList[0], isOrigin: self.isOrigin)
             }
             self.tableView.reloadData()
@@ -129,8 +136,7 @@ class VoiceMusicListView: UIView {
             guard let self = self else { return }
             let index = self.musicList.firstIndex(where: { $0.songCode == songCode }) ?? 0
             let model = self.musicList[index]
-            model.isDownload = status == .preloading
-            model.isPlaying = status == .OK
+            model.status = status == .preloading ? .download : status == .OK ? .playing : .none
             guard progress <= 0 || progress == 100 else { return }
             DispatchQueue.main.async {
                 let indexPath = IndexPath(row: index, section: 0)
@@ -161,9 +167,9 @@ class VoiceMusicListView: UIView {
     
     private func nextMusicHandler() {
         rtcKit?.stopMusic()
-        musicList.forEach({ $0.isPlaying = false })
+        musicList.forEach({ $0.status = .none })
         if self.currentIndex < 0, let model = self.musicList.first {
-            model.isPlaying = true
+            model.status = .playing
             rtcKit?.playMusic(songCode: model.songCode)
             tableView.reloadData()
             backgroundMusicPlaying?(model)
@@ -173,7 +179,7 @@ class VoiceMusicListView: UIView {
             currentIndex += 1
             currentIndex = currentIndex < musicList.count ? currentIndex : 0
             let model = musicList[currentIndex]
-            model.isPlaying = true
+            model.status = .playing
             rtcKit?.playMusic(songCode: model.songCode)
             tableView.reloadData()
             backgroundMusicPlaying?(model)
@@ -187,7 +193,7 @@ class VoiceMusicListView: UIView {
         if !musicList.isEmpty {
             currentIndex = currentIndex < 0 ? 0 : currentIndex
             let currentModel = musicList[currentIndex]
-            currentModel.isPlaying = isPlay
+            currentModel.status = isPlay ? .playing : .pause
             backgroundMusicPlaying?(currentModel)
             tableView.reloadData()
             return currentModel.songCode
@@ -260,10 +266,10 @@ extension VoiceMusicListView: UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         if currentIndex > -1 {
             let preModel = musicList[currentIndex]
-            preModel.isPlaying = false
+            preModel.status = .none
         }
         let model = musicList[indexPath.row]
-        model.isPlaying = true
+        model.status = .playing
         rtcKit?.stopMusic()
         rtcKit?.playMusic(songCode: model.songCode)
         currentIndex = indexPath.row
@@ -331,13 +337,18 @@ class VoiceMusicListCell: UITableViewCell {
         songTitleLabel.text = model.name
         singerLabeL.text = model.singer
         
-        statusImageView.image = UIImage.sd_animatedGIF(with: gifData)
-        statusImageView.isHidden = !model.isPlaying
-        songTitleLabel.textColor = model.isPlaying ? UIColor(hexString: "#0A7AFF") : UIColor(hexString: "#3C4267")
-        songTitleLabel.font = model.isPlaying ? .boldSystemFont(ofSize: 14) : .systemFont(ofSize: 14)
+        statusImageView.isHidden = model.status == .download || model.status == .none
+        model.status == .playing ? statusImageView.startAnimating() : statusImageView.stopAnimating()
+        if model.status == .playing {
+            statusImageView.image = UIImage.sd_animatedGIF(with: gifData)
+        } else if model.status == .pause {
+            statusImageView.image = UIImage.sceneImage(name: "voice_music_play")
+        }
+        songTitleLabel.textColor = (model.status == .playing || model.status == .pause) ? UIColor(hexString: "#0A7AFF") : UIColor(hexString: "#3C4267")
+        songTitleLabel.font = (model.status == .playing || model.status == .pause) ? .boldSystemFont(ofSize: 14) : .systemFont(ofSize: 14)
         singerLabeL.textColor = songTitleLabel.textColor
-        indicatorView.isHidden = !model.isDownload
-        model.isDownload ? indicatorView.startAnimating() : indicatorView.stopAnimating()
+        indicatorView.isHidden = model.status != .download
+        model.status == .download ? indicatorView.startAnimating() : indicatorView.stopAnimating()
     }
     
     private func setupUI() {
@@ -464,7 +475,7 @@ class VoiceMusicToolView: UIView {
     func setupMusicInfo(model: VoiceMusicModel, isOrigin: Bool) {
         titleLabel.text = model.name
         singerLabeL.text = model.singer
-        playButton.isSelected = model.isPlaying
+        playButton.isSelected = model.status == .playing
         accompanyButton.isSelected = isOrigin
     }
     
