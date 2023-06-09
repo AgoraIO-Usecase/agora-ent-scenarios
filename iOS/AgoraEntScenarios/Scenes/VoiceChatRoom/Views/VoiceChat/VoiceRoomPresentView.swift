@@ -8,6 +8,7 @@
 import UIKit
 
 class VoiceRoomPresentView: UIView, UIGestureRecognizerDelegate {
+    var panViewHeightClosure: ((CGFloat) -> Void)?
     
     fileprivate let screenSize: CGSize = UIScreen.main.bounds.size
     
@@ -93,6 +94,7 @@ class VoiceRoomPresentView: UIView, UIGestureRecognizerDelegate {
         self.frames[frames.count - 1] = rect
         pan.setTranslation(.zero, in: self)
         print(rect)
+        panViewHeightClosure?(rect.height)
     }
     
     @objc func push(with vc: UIViewController, frame: CGRect, maxHeight: CGFloat) {
