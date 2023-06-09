@@ -288,4 +288,20 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// Description 更新机器人音量
     /// - Parameter value: 音量值
     func updateRobotVolume(value: Int,completion: @escaping (Error?) -> Void)
+    
+    /// Description 获取房间背景音乐
+    /// - Parameter roomId:房间id
+    /// - Parameter completion:回调
+    func fetchRoomBGM(roomId: String?, completion: @escaping (_ songName: String?, _ singerName: String?, _ isPlaying: Bool) -> Void)
+    
+    /// Description 更新房间背景音乐
+    /// - Parameter songName:歌名
+    /// - Parameter singerName:歌手
+    /// - Parameter isOrigin: 是否在播放
+    func updateRoomBGM(songName: String?, singerName: String?, isOrigin: Bool)
+    
+    /// Description 监听房间背景音乐变化
+    /// - Parameter roomId:房间id
+    /// - Parameter completion:回调
+    func subscribeRoomBGMChange(roomId: String?, completion: @escaping (_ songName: String?, _ singerName: String?, _ isPlaying: Bool) -> Void)
 }

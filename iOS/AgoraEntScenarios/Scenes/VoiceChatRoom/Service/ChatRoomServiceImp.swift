@@ -17,6 +17,7 @@ private let cSceneId = "scene_chatRoom_3.1.0"
 private func agoraPrint(_ message: String) {
     voiceLogger.info(message, context: "Service")
 }
+let roomBGMKey = "room_bgm"
 
 let voiceLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "VoiceChat"))
 public class ChatRoomServiceImp: NSObject {
@@ -198,7 +199,29 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
 
 //MARK: ChatRoomServiceProtocol
 extension ChatRoomServiceImp: ChatRoomServiceProtocol {
-
+    func fetchRoomBGM(roomId: String?, completion: @escaping (String?, String?, Bool) -> Void) {
+        SyncUtil.scene(id: roomId ?? "")?.get(key: roomBGMKey, success: { object in
+            let singerName = object?.toDict()["singerName"] as? String
+            let isOrigin = object?.toDict()["isOrigin"] as? Bool
+            let songName = object?.toDict()["songName"] as? String
+            completion(songName, singerName, isOrigin ?? false)
+        })
+    }
+    
+    func updateRoomBGM(songName: String?, singerName: String?, isOrigin: Bool) {
+        let params = ["songName": songName ?? "", "singerName": singerName ?? "", "isOrigin": isOrigin] as [String : Any]
+        SyncUtil.scene(id: roomId ?? "")?.update(key: roomBGMKey, data: params)
+    }
+    
+    func subscribeRoomBGMChange(roomId: String?, completion: @escaping (String?, String?, Bool) -> Void) {
+        SyncUtil.scene(id: roomId ?? "")?.subscribe(key: roomBGMKey, onUpdated: { object in
+            let singerName = object.toDict()["singerName"] as? String
+            let isOrigin = object.toDict()["isOrigin"] as? Bool
+            let songName = object.toDict()["songName"] as? String
+            completion(songName, singerName, isOrigin ?? false)
+        })
+    }
+    
     func updateAnnouncement(content: String, completion: @escaping (Bool) -> Void) {
         VoiceRoomIMManager.shared?.updateAnnouncement(content: content, completion: completion)
     }
@@ -847,7 +870,6 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     updateRoom.click_count = (updateRoom.click_count ?? 0) + 1
                     let params = updateRoom.kj.JSONObject()
                     
-                    completion(nil, updateRoom)
                     initScene{
                         SyncUtil.joinScene(id: roomId,
                                            userId: VLUserCenter.user.id,
@@ -885,12 +907,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                 VLUserCenter.user.agoraRTCToken = rtcToken
                                 VLUserCenter.user.agoraRTMToken = rtmToken
                                 VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
+                                self?.roomId = roomId
+                                self?._startCheckExpire()
+                                completion(nil, updateRoom)
                             }
-                            
-                            self?.roomId = roomId
-                            self?._startCheckExpire()
-//                            completion(nil, model)
-                            //TODO(chenpan): without callback
                         } fail: { error in
                             completion(error, nil)
                         }

@@ -162,9 +162,10 @@ class VoiceMusicListView: UIView {
             }
         }
         musicToolView.onClickAccompanyButtonClosure = { [weak self] isOrigin in
-            guard let self = self else { return }
+            guard let self = self, let model = self.currentMusic else { return }
             self.isOrigin = isOrigin
             self.onClickAccompanyButtonClosure?(isOrigin)
+            ChatRoomServiceImp.getSharedInstance().updateRoomBGM(songName: model.name, singerName: model.singer, isOrigin: isOrigin)
         }
     }
     
@@ -267,10 +268,7 @@ extension VoiceMusicListView: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if currentIndex > -1 {
-            let preModel = musicList[currentIndex]
-            preModel.status = .none
-        }
+        musicList.forEach({ $0.status = .none })
         let model = musicList[indexPath.row]
         model.status = .playing
         rtcKit?.stopMusic()

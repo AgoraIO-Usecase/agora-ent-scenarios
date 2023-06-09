@@ -442,6 +442,7 @@ class VoiceMusicPlayingView: UIView {
         button.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         return button
     }()
+    private var voiceModel: VoiceMusicModel?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -454,11 +455,27 @@ class VoiceMusicPlayingView: UIView {
     
     func updateOriginButtonStatus(isOrigin: Bool) {
         accompanyButton.isSelected = isOrigin
+        ChatRoomServiceImp.getSharedInstance().updateRoomBGM(songName: voiceModel?.name, singerName: voiceModel?.singer, isOrigin: isOrigin)
     }
     
     func setupMusic(model: VoiceMusicModel, isOrigin: Bool) {
+        voiceModel = model
         titleLabel.text = "\(model.name ?? "")-\(model.singer ?? "")"
         accompanyButton.isSelected = isOrigin
+        ChatRoomServiceImp.getSharedInstance().updateRoomBGM(songName: model.name, singerName: model.singer, isOrigin: isOrigin)
+    }
+    
+    func eventHandler(roomId: String?) {
+        ChatRoomServiceImp.getSharedInstance().subscribeRoomBGMChange(roomId: roomId) { songName, singerName, isOrigin in
+            self.isHidden = false
+            self.titleLabel.text = "\(songName ?? "")-\(singerName ?? "")"
+            self.accompanyButton.isSelected = isOrigin
+        }
+        ChatRoomServiceImp.getSharedInstance().fetchRoomBGM(roomId: roomId) { songName, singerName, isOrigin in
+            self.isHidden = false
+            self.titleLabel.text = "\(songName ?? "")-\(singerName ?? "")"
+            self.accompanyButton.isSelected = isOrigin
+        }
     }
     
     private func setupUI() {
