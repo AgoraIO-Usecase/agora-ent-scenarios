@@ -107,6 +107,8 @@ class VoiceRoomViewController: VRBaseViewController {
         
         if isOwner {
             checkAudioAuthorized()
+        } else {
+            musicView.eventHandler(roomId: roomInfo?.room?.room_id)
         }
     }
     

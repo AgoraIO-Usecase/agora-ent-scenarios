@@ -937,6 +937,7 @@ public let kMPK_RTC_UID: UInt = 1
         rtcKit.stopPreview()
         rtcKit.leaveChannel(nil)
         rtcKit.delegate = nil
+        selectPlayerTrackMode(isOrigin: true)
         musicPlayer?.stop()
         musicPlayer = nil
         mcc = nil
