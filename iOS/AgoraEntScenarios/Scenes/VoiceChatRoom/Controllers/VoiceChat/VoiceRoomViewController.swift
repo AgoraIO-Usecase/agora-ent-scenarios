@@ -62,6 +62,7 @@ class VoiceRoomViewController: VRBaseViewController {
         let view = VoiceMusicPlayingView()
         view.isHidden = true
         view.onClickAccompanyButtonClosure = { [weak self] isOrigin in
+            guard self?.isOwner == true else { return }
             self?.roomInfo?.room?.musicIsOrigin = isOrigin
             view.updateOriginButtonStatus(isOrigin: isOrigin)
             self?.rtckit.selectPlayerTrackMode(isOrigin: isOrigin)
