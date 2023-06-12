@@ -134,7 +134,16 @@ import AgoraRtcKit
     func onSingerRoleChanged(oldRole: SBGSingRole, newRole: SBGSingRole)
     
     
-    func onChorusChannelTokenPrivilegeWillExpire(token: String?)
+    func onTokenPrivilegeWillExpire()
+            
+    /**
+         * 合唱频道人声音量提示
+         * @param speakers 不同用户音量信息
+         * @param totalVolume 总音量
+         */
+    func onChorusChannelAudioVolumeIndication(
+        speakers: [AgoraRtcAudioVolumeInfo],
+        totalVolume: Int)
 }
 
 @objc open class SBGApiConfig: NSObject{
@@ -146,7 +155,7 @@ import AgoraRtcKit
     var chorusChannelName: String
     var chorusChannelToken: String
     var type: KTVType = .normal
-    
+    var maxCacheSize: Int = 10
     @objc public
     init(appId: String,
          rtmToken: String,
@@ -155,7 +164,8 @@ import AgoraRtcKit
          localUid: Int,
          chorusChannelName: String,
          chorusChannelToken: String,
-         type: KTVType
+         type: KTVType,
+         maxCacheSize: Int
     ) {
         self.appId = appId
         self.rtmToken = rtmToken
@@ -165,6 +175,7 @@ import AgoraRtcKit
         self.chorusChannelName = chorusChannelName
         self.chorusChannelToken = chorusChannelToken
         self.type = type
+        self.maxCacheSize = maxCacheSize
     }
 }
 
@@ -313,6 +324,8 @@ public typealias SBGJoinExChannelCallBack = ((Bool, SBGJoinChorusFailReason?)-> 
     /// - Returns: <#description#>
     func getMusicContentCenter() -> AgoraMusicContentCenter?
     
-    // 开启专业主播模式
-    func enableProfessionalStreamerMode(_ enable: Bool) 
+    /**
+     创建dataStreamID
+     */
+    func renewInnerDataStreamId()
 }

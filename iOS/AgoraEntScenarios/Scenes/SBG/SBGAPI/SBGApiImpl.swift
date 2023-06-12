@@ -32,9 +32,8 @@ class SBGApiImpl: NSObject{
 
     private var songConfig: SBGSongConfiguration?
     private var subChorusConnection: AgoraRtcConnection?
-    private var downloadManager: AgoraDownLoadManager = AgoraDownLoadManager()
 
-    private var eventHandleSBG: NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
+    private var eventHandlers: NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
     private var loadMusicListeners: NSMapTable<NSString, AnyObject> = NSMapTable<NSString, AnyObject>(keyOptions: .copyIn, valueOptions: .weakMemory)
 
     private var musicPlayer: AgoraMusicPlayerProtocol?
@@ -43,8 +42,8 @@ class SBGApiImpl: NSObject{
     private var loadSongMap = Dictionary<String, SBGLoadSongState>()
     private var lyricUrlMap = Dictionary<String, String>()
     private var loadDict = Dictionary<String, SBGLoadSongState>()
-    private var lyricCallbacks = Dictionary<String, SBGLyricCallback>()
-    private var musicCallbacks = Dictionary<String, SBGLoadMusicCallback>()
+    private var lyricCallbacks = Dictionary<String, LyricCallback>()
+    private var musicCallbacks = Dictionary<String, LoadMusicCallback>()
     
     private var hasSendPreludeEndPosition: Bool = false
     private var hasSendEndPosition: Bool = false
@@ -54,25 +53,24 @@ class SBGApiImpl: NSObject{
     private var loadSongState: SBGLoadSongState = .idle
     private var lastNtpTime: Int = 0
     private var startHighTime: Int = 0
-    
-    private var playeSBGtate: AgoraMediaPlayerState = .idle {
+    private var playerState: AgoraMediaPlayerState = .idle {
         didSet {
-            agoraPrint("playerState did changed: \(oldValue.rawValue)->\(playeSBGtate.rawValue)")
+            agoraPrint("playerState did changed: \(oldValue.rawValue)->\(playerState.rawValue)")
             updateRemotePlayBackVolumeIfNeed()
-            updateTimer(with: playeSBGtate)
+            updateTimer(with: playerState)
         }
     }
     private var pitch: Double = 0
     private var localPlayerPosition: TimeInterval = 0
     private var remotePlayerPosition: TimeInterval = 0
     private var remotePlayerDuration: TimeInterval = 0
-    private var localPlayeSBGystemTime: TimeInterval = 0
+    private var localPlayerSystemTime: TimeInterval = 0
     private var lastMainSingerUpdateTime: TimeInterval = 0
     private var playerDuration: TimeInterval = 0
 
-    private var musicChartDict: [String: SBGMusicChartCallBacks] = [:]
-    private var musicSearchDict: Dictionary<String, SBGMusicResultCallBacks> = Dictionary<String, SBGMusicResultCallBacks>()
-    private var onJoinExChannelCallBack : SBGJoinExChannelCallBack?
+    private var musicChartDict: [String: MusicChartCallBacks] = [:]
+    private var musicSearchDict: Dictionary<String, MusicResultCallBacks> = Dictionary<String, MusicResultCallBacks>()
+    private var onJoinExChannelCallBack : JoinExChannelCallBack?
     private var mainSingerHasJoinChannelEx: Bool = false
     private var dataStreamId: Int = 0
     private var lastReceivedPosition: TimeInterval = 0
@@ -83,7 +81,6 @@ class SBGApiImpl: NSObject{
     private var songUrl: String = ""
     private var songCode: Int = 0
     private var songIdentifier: String = ""
-    private var mCustomAudioTrackId: Int32 = -1
 
     private var singerRole: SBGSingRole = .audience {
         didSet {
@@ -95,12 +92,9 @@ class SBGApiImpl: NSObject{
     private var timer: Timer?
     private var isPause: Bool = false
     
-    public var remoteVolume: Int = 15
+    public var remoteVolume: Int = 40
     private var joinChorusNewRole: SBGSingRole = .audience
     private var oldPitch: Double = 0
-    private var isWearingHeadPhones: Bool = false
-    private var enableProfessional: Bool = false
-    private var isPublishAudio: Bool = false
     deinit {
         mcc?.register(nil)
         agoraPrint("deinit SBGApiImpl")
@@ -112,12 +106,6 @@ class SBGApiImpl: NSObject{
         self.apiConfig = config
         
         setParams()
-        
-        let dataStreamConfig = AgoraDataStreamConfig()
-        dataStreamConfig.ordered = false
-        dataStreamConfig.syncWithAudio = true
-        // SBGStreamId 是定义的可保存 Stream ID 的全局变量
-        self.apiConfig?.engine?.createDataStream(&dataStreamId, config: dataStreamConfig)
 
         // ------------------ 初始化内容中心 ------------------
         let contentCenterConfiguration = AgoraMusicContentCenterConfig()
@@ -125,6 +113,7 @@ class SBGApiImpl: NSObject{
         contentCenterConfiguration.mccUid = config.localUid
         contentCenterConfiguration.token = config.rtmToken
         contentCenterConfiguration.rtcEngine = config.engine
+        contentCenterConfiguration.maxCacheSize = UInt(config.maxCacheSize)
         
         mcc = AgoraMusicContentCenter.sharedContentCenter(config: contentCenterConfiguration)
         mcc?.register(self)
@@ -134,8 +123,6 @@ class SBGApiImpl: NSObject{
         // 音量最佳实践调整
         musicPlayer?.adjustPlayoutVolume(50)
         musicPlayer?.adjustPublishSignalVolume(50)
-
-        downloadManager.delegate = self
 
         initTimer()
     }
@@ -151,11 +138,18 @@ class SBGApiImpl: NSObject{
         engine.setParameters("{\"che.audio.neteq.prebuffer\": true}")
         engine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\": 600}")
         engine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
-        engine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\": true}")
         engine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
-        engine.setParameters("{\"che.audio.aec.split_srate_for_32k\": 32000}")
-        engine.setParameters("{\"che.audio.aec.split_srate_for_48k\": 48000}")
-        engine.setParameters("{\"rtc.sync_render_ntp_e2e_delay_offset\":100}")
+        engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
+        engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
+        engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
+        engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
+    }
+    
+    func renewInnerDataStreamId() {
+        let dataStreamConfig = AgoraDataStreamConfig()
+        dataStreamConfig.ordered = false
+        dataStreamConfig.syncWithAudio = true
+        self.apiConfig?.engine?.createDataStream(&dataStreamId, config: dataStreamConfig)
     }
 }
 
@@ -197,23 +191,21 @@ extension SBGApiImpl: SBGApiDelegate {
     }
 
     func addEventHandler(SBGApiEventHandler: SBGApiEventHandlerDelegate) {
-        if eventHandleSBG.contains(SBGApiEventHandler) {
+        if eventHandlers.contains(SBGApiEventHandler) {
             return
         }
-        eventHandleSBG.add(SBGApiEventHandler)
+        eventHandlers.add(SBGApiEventHandler)
     }
 
     func removeEventHandler(SBGApiEventHandler: SBGApiEventHandlerDelegate) {
-        eventHandleSBG.remove(SBGApiEventHandler)
+        eventHandlers.remove(SBGApiEventHandler)
     }
 
     func cleanCache() {
         musicPlayer?.stop()
         freeTimer()
         agoraPrint("cleanCache")
-        downloadManager.delegate = nil
         lrcControl = nil
-        apiConfig?.engine?.setAudioFrameDelegate(nil)
         lyricCallbacks.removeAll()
         musicCallbacks.removeAll()
         onJoinExChannelCallBack = nil
@@ -224,10 +216,21 @@ extension SBGApiImpl: SBGApiDelegate {
         mcc = nil
         apiConfig = nil
         AgoraMusicContentCenter.destroy()
-        self.eventHandleSBG.removeAllObjects()
+        self.eventHandlers.removeAllObjects()
+    }
+    
+    func renewToken(rtmToken: String, chorusChannelRtcToken: String) {
+               // 更新RtmToken
+       mcc?.renewToken(rtmToken)
+           // 更新合唱频道RtcToken
+           if let subChorusConnection = subChorusConnection {
+               var channelMediaOption = AgoraRtcChannelMediaOptions()
+               channelMediaOption.token = chorusChannelRtcToken
+               apiConfig?.engine?.updateChannelEx(with: channelMediaOption, connection: subChorusConnection)
+        }
     }
 
-    func fetchMusicCharts(completion: @escaping SBGMusicChartCallBacks) {
+    func fetchMusicCharts(completion: @escaping MusicChartCallBacks) {
         agoraPrint("fetchMusicCharts")
         let requestId = mcc!.getMusicCharts()
         musicChartDict[requestId] = completion
@@ -355,7 +358,7 @@ extension SBGApiImpl {
                     self.singerRole = newRole
                     //TODO(chenpan):如果观众变成伴唱，需要重置state，防止同步主唱state因为都是playing不会修改
                     //后面建议改成remote state(通过data stream获取)和local state(通过player didChangedToState获取)
-                    self.playeSBGtate = self.musicPlayer?.getPlayerState() ?? .idle
+                    self.playerState = self.musicPlayer?.getPlayerState() ?? .idle
                     self.getEventHander { delegate in
                         delegate.onSingerRoleChanged(oldRole: .audience, newRole: .coSinger)
                     }
@@ -414,7 +417,8 @@ extension SBGApiImpl {
     }
 
     private func becomeSoloSinger() {
-        apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":false}")
+        apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":false}")
+        apiConfig?.engine?.setParameters("{\"che.audio.neteq.enable_stable_playout\":false}")
         apiConfig?.engine?.setParameters("{\"che.audio.custom_bitrate\": 80000}")
         apiConfig?.engine?.setAudioScenario(.chorus)
         agoraPrint("becomeSoloSinger")
@@ -424,18 +428,12 @@ extension SBGApiImpl {
         mediaOption.publishMediaPlayerId = Int(musicPlayer?.getMediaPlayerId() ?? 0)
         mediaOption.publishMediaPlayerAudioTrack = true
         apiConfig?.engine?.updateChannel(with: mediaOption)
-        
-        let audioTrackConfig = AgoraAudioTrackConfig()
-        audioTrackConfig.enableLocalPlayback = false
-        mCustomAudioTrackId = apiConfig?.engine?.createCustomAudioTrack(.direct, config: audioTrackConfig) ?? 0
-        apiConfig?.engine?.setRecordingAudioFrameParametersWithSampleRate(48000, channel: 2, mode: .readOnly, samplesPerCall: 960)
-        apiConfig?.engine?.setAudioFrameDelegate(self)
     }
 
     /**
      * 加入合唱
      */
-    private func joinChorus(role: SBGSingRole, token: String, joinExChannelCallBack: @escaping SBGJoinExChannelCallBack) {
+    private func joinChorus(role: SBGSingRole, token: String, joinExChannelCallBack: @escaping JoinExChannelCallBack) {
         self.onJoinExChannelCallBack = joinExChannelCallBack
         if role == .leadSinger {
             agoraPrint("joinChorus: SBGSingRoleMainSinger")
@@ -470,7 +468,8 @@ extension SBGApiImpl {
         
         agoraPrint("joinChorus2ndChannel role: \(role.rawValue)")
         if newRole == .coSinger {
-            apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":false}")
+            apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":false}")
+            apiConfig?.engine?.setParameters("{\"che.audio.neteq.enable_stable_playout\":false}")
             apiConfig?.engine?.setParameters("{\"che.audio.custom_bitrate\": 48000}")
             apiConfig?.engine?.setAudioScenario(.chorus)
         }
@@ -480,10 +479,9 @@ extension SBGApiImpl {
         // co singer auto sub
         mediaOption.autoSubscribeAudio = role != .leadSinger
       //  mediaOption.autoSubscribeVideo = false
-        mediaOption.publishMicrophoneTrack = false
+        mediaOption.publishMicrophoneTrack = newRole == .leadSinger
         mediaOption.enableAudioRecordingOrPlayout = role != .leadSinger
         mediaOption.clientRoleType = .broadcaster
-        mediaOption.publishCustomAudioTrackId = Int(mCustomAudioTrackId)
 
         let rtcConnection = AgoraRtcConnection()
         rtcConnection.channelId = apiConfig?.chorusChannelName ?? ""
@@ -529,7 +527,8 @@ extension SBGApiImpl {
             mediaOption.publishMediaPlayerAudioTrack = false
             apiConfig?.engine?.updateChannel(with: mediaOption)
             leaveChorus2ndChannel(role)
-            apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":true}")
+            apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":true}")
+            apiConfig?.engine?.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
             apiConfig?.engine?.setParameters("{\"che.audio.custom_bitrate\": 48000}")
             apiConfig?.engine?.setAudioScenario(.gameStreaming)
         } else if role == .audience {
@@ -541,7 +540,7 @@ extension SBGApiImpl {
 extension SBGApiImpl {
     
     private func getEventHander(callBack:((SBGApiEventHandlerDelegate)-> Void)) {
-        for obj in eventHandleSBG.allObjects {
+        for obj in eventHandlers.allObjects {
             if obj is SBGApiEventHandlerDelegate {
                 callBack(obj as! SBGApiEventHandlerDelegate)
             }
@@ -553,19 +552,12 @@ extension SBGApiImpl {
         songConfig = config
         lastReceivedPosition = 0
         localPosition = 0
-        
-        if apiConfig?.type == .singbattle {
+      
+          if apiConfig?.type == .singbattle {
             mcc?.getSongSimpleInfo(songCode: songCode)
         }
         
         if (config.mode == .loadNone) {
-            if (config.autoPlay) {
-                // 主唱自动播放歌曲
-                switchSingerRole(newRole: .soloSinger) { _, _ in
-                    
-                }
-                startSing(songCode: songCode, startPos: 0)
-            }
             return
         }
         
@@ -625,6 +617,10 @@ extension SBGApiImpl {
                                 onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .noLyricUrl)
                             }
                             if config.autoPlay {
+                                // 主唱自动播放歌曲
+                                self.switchSingerRole(newRole: .soloSinger) { _, _ in
+                                    
+                                }
                                 self.startSing(songCode: self.songCode, startPos: 0)
                             }
                         }
@@ -647,21 +643,21 @@ extension SBGApiImpl {
         }
     }
     
-    private func loadLyric(with songCode: NSInteger, callBack:@escaping SBGLyricCallback) {
+    private func loadLyric(with songCode: NSInteger, callBack:@escaping LyricCallback) {
         agoraPrint("loadLyric songCode: \(songCode)")
         let requestId: String = self.mcc?.getLyric(songCode: songCode, lyricType: 0) ?? ""
         self.lyricCallbacks.updateValue(callBack, forKey: requestId)
     }
     
-    private func preloadMusic(with songCode: Int, callback: @escaping SBGLoadMusicCallback) {
+    private func preloadMusic(with songCode: Int, callback: @escaping LoadMusicCallback) {
         agoraPrint("preloadMusic songCode: \(songCode)")
         if self.mcc?.isPreloaded(songCode: songCode) == 0 {
             musicCallbacks.removeValue(forKey: String(songCode))
             callback(.OK, songCode)
             return
         }
-        let requestId = self.mcc?.preload(songCode: songCode)
-        if requestId == nil {
+        let err = self.mcc?.preload(songCode: songCode, jsonOption: nil)
+        if err != 0 {
             musicCallbacks.removeValue(forKey: String(songCode))
             callback(.error, songCode)
             return
@@ -669,88 +665,11 @@ extension SBGApiImpl {
         musicCallbacks.updateValue(callback, forKey: String(songCode))
     }
     
-    private func setLyric(with url: String, callBack: @escaping SBGLyricCallback) {
-        agoraPrint("setLyric url: (url)")
-        
-        var path: String? = nil
-
-        if self.lyricCallbacks.keys.contains(url) {
-            self.lyricCallbacks[url] = callBack
-        }
-
-        downloadManager.downloadLrcFile(urlString: url) { [weak self] lrcurl in
-            defer {
-                callBack(path)
-            }
-            guard let lrcurl = lrcurl else {
-                agoraPrint("downloadLrcFile fail, lrcurl is nil")
-                return
-            }
-            
-            let cuSBGong = URL(string: url)?.lastPathComponent.components(separatedBy: ".").first
-            let loadSong = URL(string: lrcurl)?.lastPathComponent.components(separatedBy: ".").first
-            guard cuSBGong == loadSong else {
-                agoraPrint("downloadLrcFile fail, missmatch, cur:\(cuSBGong ?? "") load:\(loadSong ?? "")")
-                return
-            }
-            self?.lrcControl?.onDownloadLrcData(url: lrcurl)
-            path = lrcurl
-        } failure: {
-            callBack(nil)
-            agoraPrint("歌词解析失败")
-        }
+    private func setLyric(with url: String, callBack: @escaping LyricCallback) {
+        agoraPrint("setLyric url: \(url)")
+        self.lrcControl?.onDownloadLrcData(url: url)
+        callBack(url)
     }
-//    private func preloadMusic(with songCode: NSInteger, callBaclk:@escaping LoadMusicCallback) {
-//        agoraPrint("preloadMusic songCode: \(songCode)")
-//        var err = self.mcc.isPreloaded(songCode: songCode)
-//        if err == 0 {
-//            musicCallbacks.removeValue(forKey: String(songCode))
-//            callBaclk(.OK, songCode)
-//            return
-//        }
-//
-//        err = self.mcc.preload(songCode: songCode, jsonOption: nil)
-//        if err != 0 {
-//            musicCallbacks.removeValue(forKey: String(songCode))
-//            callBaclk(.error, songCode)
-//            return
-//        }
-//        musicCallbacks.updateValue(callBaclk, forKey: String(songCode))
-//    }
-
-//    private func setLyric(with url: String, callBack:@escaping LyricCallback) {
-//        agoraPrint("setLyric url: \(url)")
-//        if self.lyricCallbacks.keys.contains(url) {
-//            self.lyricCallbacks.updateValue(callBack, forKey: url)
-//        }
-//
-//        downloadManager.downloadLrcFile(urlString: url) {[weak self] lrcurl in
-//            var path: String? = nil
-//            defer{
-//                callBack(path)
-//            }
-//
-//            guard let lrcurl = lrcurl else {
-//                agoraPrint("downloadLrcFile fail, lrcurl = nil")
-//                return
-//            }
-//            let cuSBGtr: String = url.components(separatedBy: "/").last ?? ""
-//            let loadStr: String = lrcurl.components(separatedBy: "/").last ?? ""
-//            let cuSBGongStr: String = cuSBGtr.components(separatedBy: ".").fiSBGt ?? ""
-//            let loadSongStr: String = loadStr.components(separatedBy: ".").fiSBGt ?? ""
-//            if cuSBGongStr != loadSongStr {
-//                agoraPrint("downloadLrcFile fail, missmatch cur:\(cuSBGongStr) load:\(loadSongStr)")
-//                return
-//            }
-//            self?.lrcControl?.onDownloadLrcData(url: lrcurl)
-//            path = lrcurl
-//
-//        } failure: {
-//            callBack(nil)
-//            agoraPrint("歌词解析失败")
-//        }
-//
-//    }
 
     func startSing(songCode: Int, startPos: Int) {
         let role = singerRole
@@ -760,7 +679,6 @@ extension SBGApiImpl {
             return
         }
         apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
-        musicPlayer?.setPlayerOption("select_track_mode", value: isMainSinger() ? 1 : 0)
         let ret = musicPlayer?.openMedia(songCode: songCode, startPos: startPos)
         agoraPrint("startSing->openMedia(\(songCode) fail: \(ret ?? -1)")
     }
@@ -773,7 +691,6 @@ extension SBGApiImpl {
             return
         }
         apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
-        musicPlayer?.setPlayerOption("select_track_mode", value: isMainSinger() ? 1 : 0)
         let ret = musicPlayer?.open(url, startPos: 0)
         agoraPrint("startSing->openMedia(\(url) fail: \(ret ?? -1)")
     }
@@ -793,7 +710,8 @@ extension SBGApiImpl {
         if musicPlayer?.getPlayerState() != .stopped {
             musicPlayer?.stop()
         }
-        apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast_dynamic\":true}")
+        apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":true}")
+        apiConfig?.engine?.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         apiConfig?.engine?.setParameters("{\"che.audio.custom_bitrate\": 48000}")
         apiConfig?.engine?.setAudioScenario(.gameStreaming)
     }
@@ -801,22 +719,11 @@ extension SBGApiImpl {
     @objc public func setAudioPlayoutDelay(audioPlayoutDelay: Int) {
         self.audioPlayoutDelay = audioPlayoutDelay
     }
-    
-    @objc func enableProfessionalStreamerMode(_ enable: Bool)   {
-        if self.isPublishAudio == false {return}
-        self.enableProfessional = enable
-        //专业非专业还需要根据是否佩戴耳机来判断是否开启3A
-        apiConfig?.engine?.setAudioProfile(enable ? .musicHighQualityStereo : .musicStandardStereo)
-        apiConfig?.engine?.setParameters("{\"che.audio.aec.enable\":\((enable && !isWearingHeadPhones) ? "true" : "false")}")
-        apiConfig?.engine?.setParameters("{\"che.audio.agc.enable\":\((enable && !isWearingHeadPhones) ? "true" : "false")}")
-        apiConfig?.engine?.setParameters("{\"che.audio.ans.enable\":\((enable && !isWearingHeadPhones) ? "true" : "false")}")
-        apiConfig?.engine?.setParameters("{\"che.audio.md.enable\":\((enable && !isWearingHeadPhones) ? "true" : "false")}")
-    }
 
 }
 
 // rtc的代理回调
-extension SBGApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
+extension SBGApiImpl: AgoraRtcEngineDelegate {
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
         agoraPrint("didJoinChannel channel:\(channel) uid: \(uid)")
@@ -827,7 +734,9 @@ extension SBGApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
         if joinChorusNewRole == .coSinger {
           self.onJoinExChannelCallBack?(true, nil)
         }
-
+        if let subChorusConnection = subChorusConnection {
+            apiConfig?.engine?.enableAudioVolumeIndicationEx(50, smooth: 10, reportVad: true, connection: subChorusConnection)
+        }
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
@@ -844,42 +753,23 @@ extension SBGApiImpl: AgoraRtcEngineDelegate, AgoraAudioFrameDelegate {
             self.onJoinExChannelCallBack?(false, .joinChannelFail)
         }
     }
-
-    func onRecordAudioFrame(_ frame: AgoraAudioFrame, channelId: String) -> Bool {
-        
-        if mainSingerHasJoinChannelEx == true && useCustomAudioSource == false {
-            guard let buffer = frame.buffer else {return false}
-            apiConfig?.engine?.pushExternalAudioFrameRawData(buffer, samples: frame.channels*frame.samplesPerChannel, sampleRate: frame.samplesPerSec, channels: frame.channels, trackId: Int(mCustomAudioTrackId), timestamp: TimeInterval(frame.renderTimeMs))
+    
+    //合唱频道的声音回调
+    func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
+        getEventHander { delegate in
+            delegate.onChorusChannelAudioVolumeIndication(speakers: speakers, totalVolume: totalVolume)
         }
-        return true
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
         getEventHander { delegate in
-            delegate.onChorusChannelTokenPrivilegeWillExpire(token: token)
+            delegate.onTokenPrivilegeWillExpire()
         }
     }
 }
 
 //需要外部转发的方法 主要是dataStream相关的
 extension SBGApiImpl {
-    
-    @objc func didAudioPublishStateChange(newState: AgoraStreamPublishState) {
-        self.isPublishAudio = newState == .published
-        enableProfessionalStreamerMode(self.enableProfessional)
-        print("PublishStateChange:\(newState)")
-    }
-    
-    @objc func didAudioRouteChanged( routing: AgoraAudioOutputRouting) {
-        print("Route changed:\(routing)")
-        let headPhones: [AgoraAudioOutputRouting] = [.headset, .headsetBluetooth, .headsetNoMic]
-        let wearHeadPhone: Bool = headPhones.contains(routing)
-        if wearHeadPhone == self.isWearingHeadPhones {
-            return
-        }
-        self.isWearingHeadPhones = wearHeadPhone
-        enableProfessionalStreamerMode(self.enableProfessional)
-    }
     
     @objc public func didSBGAPIReceiveStreamMessageFrom(uid: NSInteger, streamId: NSInteger, data: Data) {
         
@@ -903,7 +793,7 @@ extension SBGApiImpl {
                 let duration = dict["duration"] as? Int64,
                 let realPosition = dict["realTime"] as? Int64,
                // let songCode = dict["songCode"] as? Int64,
-                let mainSingeSBGtate = dict["playerState"] as? Int,
+                let mainSingerState = dict["playerState"] as? Int,
                 let ntpTime = dict["ntp"] as? Int,
                 let songId = dict["songIdentifier"] as? String
         else { return }
@@ -917,15 +807,16 @@ extension SBGApiImpl {
         self.lastNtpTime = ntpTime
         self.remotePlayerDuration = TimeInterval(duration)
         
-        let state = AgoraMediaPlayerState(rawValue: mainSingeSBGtate) ?? .stopped
+        let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
 //        self.lastMainSingerUpdateTime = Date().milListamp
 //        self.remotePlayerPosition = TimeInterval(realPosition)
-        if self.playeSBGtate != state {
-            agoraPrint("[setLrcTime] recv state: \(self.playeSBGtate.rawValue)->\(state.rawValue) role: \(singerRole.rawValue) role: \(singerRole.rawValue)")
+        if self.playerState != state {
+            agoraPrint("[setLrcTime] recv state: \(self.playerState.rawValue)->\(state.rawValue) role: \(singerRole.rawValue) role: \(singerRole.rawValue)")
             
-            if state == .playing, singerRole == .coSinger, playeSBGtate == .openCompleted {
+            if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
                 //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
                 self.localPlayerPosition = self.lastMainSingerUpdateTime - Double(position)
+                print("localPlayerPosition:playerKit:handleSetLrcTimeCommand \(localPlayerPosition)")
                 agoraPrint("seek toPosition: \(position)")
                 musicPlayer?.seek(toPosition: Int(position))
             }
@@ -934,12 +825,12 @@ extension SBGApiImpl {
         }
 
         if role == .coSinger {
-            self.lastMainSingerUpdateTime = Date().currentMilListamp
+            self.lastMainSingerUpdateTime = Date().milListamp
             self.remotePlayerPosition = TimeInterval(realPosition)
             handleCoSingerRole(dict: dict)
         } else if role == .audience {
             if self.songIdentifier == songId {
-                self.lastMainSingerUpdateTime = Date().currentMilListamp
+                self.lastMainSingerUpdateTime = Date().milListamp
                 self.remotePlayerPosition = TimeInterval(realPosition)
             } else {
                 self.lastMainSingerUpdateTime = 0
@@ -950,12 +841,13 @@ extension SBGApiImpl {
     }
     
     private func handlePlayerStateCommand(dict: [String: Any], role: SBGSingRole) {
-        let mainSingeSBGtate: Int = dict["state"] as? Int ?? 0
-        let state = AgoraMediaPlayerState(rawValue: mainSingeSBGtate) ?? .idle
+        let mainSingerState: Int = dict["state"] as? Int ?? 0
+        let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
 
-        if state == .playing, singerRole == .coSinger, playeSBGtate == .openCompleted {
+        if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
             //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
             self.localPlayerPosition = getPlayerCurrentTime()
+            print("localPlayerPosition:playerKit:handlePlayerStateCommand \(localPlayerPosition)")
             agoraPrint("seek toPosition: \(self.localPlayerPosition)")
             musicPlayer?.seek(toPosition: Int(self.localPlayerPosition))
         }
@@ -973,12 +865,15 @@ extension SBGApiImpl {
     private func handleCoSingerRole(dict: [String: Any]) {
         if musicPlayer?.getPlayerState() == .playing {
             let localNtpTime = getNtpTimeInMs()
-            let localPosition = self.lastMainSingerUpdateTime - self.localPlayerPosition
+            let localPosition = localNtpTime - Int(localPlayerSystemTime) + localPosition
             let expectPosition = Int(dict["time"] as? Int64 ?? 0) + localNtpTime - Int(dict["ntp"] as? Int64 ?? 0) + self.audioPlayoutDelay
             let threshold = expectPosition - Int(localPosition)
-
+            let ntpTime = dict["ntp"] as? Int ?? 0
+            let time = dict["time"] as? Int64 ?? 0
+            agoraPrint("checkNtp, diff:\(threshold), localNtp:\(getNtpTimeInMs()), localPosition:\(localPosition), audioPlayoutDelay:\(audioPlayoutDelay), remoteDiff:\(String(describing: ntpTime - Int(time)))")
             if abs(threshold) > 80 {
                 musicPlayer?.seek(toPosition: expectPosition)
+                agoraPrint("CheckNtp, cosinger expectPosition: \(expectPosition) nowTime:\(Date().milListamp)")
                 agoraPrint("progress: setthreshold: \(threshold) expectPosition: \(expectPosition), localNtpTime: \(localNtpTime), audioPlayoutDelay: \(self.audioPlayoutDelay), localPosition: \(localPosition)")
             }
         }
@@ -990,84 +885,13 @@ extension SBGApiImpl {
                 let duration = dict["duration"] as? Int64,
                 let realPosition = dict["realTime"] as? Int64,
                 let songCode = dict["songCode"] as? Int64,
-                let mainSingeSBGtate = dict["playerState"] as? Int
+                let mainSingerState = dict["playerState"] as? Int
         else { return }
         agoraPrint("audience: position: \(position) realPosition:\(realPosition)")
     }
-    
-//    @objc public func didSBGAPIReceiveStreamMessageFrom( uid: NSInteger, streamId: NSInteger, data: Data){
-//        let role = singerRole
-//        guard let dict = dataToDictionary(data: data) else {return}
-//        if isMainSinger() {return}
-//
-//        if dict.keys.contains("cmd") {
-//            if dict["cmd"] as! String == "setLrcTime" {
-//                guard let position: Int64 = dict["time"] as? Int64 else {return}
-//                guard let duration: Int64 = dict["duration"] as? Int64 else {return}
-//                guard let remoteNtp: Int64 = dict["ntp"] as? Int64 else {return}
-//                guard let realPosition: Int64 = dict["realTime"] as? Int64 else {return}
-//                guard let songCode: Int64 = dict["songCode"] as? Int64 else {return}
-//                guard let mainSingeSBGtate: Int = dict["playeSBGtate"] as? Int else {return}
-//
-//                //如果接收到的歌曲和自己本地的歌曲不一致就不更新进度
-//                if songCode != songConfig?.songCode ?? 0 {
-//                    agoraPrint("local songCode[\(songCode)] is not equal to recv songCode[\(songConfig?.songCode ?? 0)] role: \(singerRole.rawValue)")
-//                    return
-//                }
-//
-//                self.remotePlayerDuration = TimeInterval(duration)
-//                self.lastMainSingerUpdateTime = Date().milListamp
-//                self.remotePlayerPosition = TimeInterval(realPosition)
-//                let state = AgoraMediaPlayerState(rawValue: mainSingeSBGtate) ?? .stopped
-//                if (self.playeSBGtate != state) {
-//                    agoraPrint("[setLrcTime] recv state: \(self.playeSBGtate.rawValue)->\(state.rawValue) role: \(singerRole.rawValue) role: \(singerRole.rawValue)")
-//                    if state == .playing, singerRole == .coSinger, playeSBGtate == .openCompleted {
-//                        //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
-//                        self.localPlayerPosition = self.lastMainSingerUpdateTime - Double(position)
-//                        agoraPrint("seek toPosition: \(position)")
-//                        musicPlayer.seek(toPosition: Int(position))
-//                    }
-//                    syncPlayStateFromRemote(state: state, needDisplay: false)
-//                }
-//
-//                if role == .coSinger {
-//                    if musicPlayer?.getPlayeSBGtate() == .playing {
-//                        let localNtpTime = getNtpTimeInMs()
-//                        let localPosition = self.lastMainSingerUpdateTime - self.localPlayerPosition
-//                        let expectPosition = Int(position) + localNtpTime - Int(remoteNtp) + self.audioPlayoutDelay
-//                        let threshold = expectPosition - Int(localPosition)
-//                        if(abs(threshold) > 40) {
-//                            musicPlayer?.seek(toPosition: expectPosition)
-//                            agoraPrint("progress: setthreshold: \(threshold) expectPosition: \(expectPosition) position: \(position), localNtpTime: \(localNtpTime), remoteNtp: \(remoteNtp), audioPlayoutDelay: \(self.audioPlayoutDelay), localPosition: \(localPosition)")
-//                        }
-//                    } else {
-//                    }
-//                } else if role == .audience {
-//                }
-//
-//            } else if dict["cmd"] as? String == "PlayeSBGtate" {
-//                let mainSingeSBGtate: Int = dict["state"] as? Int ?? 0
-//                let state = AgoraMediaPlayerState(rawValue: mainSingeSBGtate) ?? .idle
-//                if state == .playing, singerRole == .coSinger, playeSBGtate == .openCompleted {
-//                    //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
-//                    self.localPlayerPosition = getPlayerCurrentTime()
-//                    agoraPrint("seek toPosition: \(self.localPlayerPosition)")
-//                    musicPlayer.seek(toPosition: Int(self.localPlayerPosition))
-//                }
-//                print("recv state with MainSinger: \(state.rawValue)")
-//                syncPlayStateFromRemote(state: state, needDisplay: true)
-//
-//            } else if dict["cmd"] as? String == "setVoicePitch" {
-//                if role == .audience {
-//                    guard let voicePitch: Double = dict["pitch"] as? Double else {return}
-//                    self.pitch = voicePitch
-//                }
-//            }
-//        }
-//    }
 
     @objc public func didSBGAPIReceiveAudioVolumeIndication(with speakers: [AgoraRtcAudioVolumeInfo], totalVolume: NSInteger) {
-        if playeSBGtate != .playing {return}
+        if playerState != .playing {return}
         if singerRole == .audience {return}
 
         guard var pitch: Double = speakers.first?.voicePitch else {return}
@@ -1086,7 +910,7 @@ extension SBGApiImpl {
 
     @objc public func didSBGAPILocalAudioStats(stats: AgoraRtcLocalAudioStats) {
         if useCustomAudioSource == true {return}
-        audioPlayoutDelay = Int(stats.audioDeviceDelay)
+        audioPlayoutDelay = Int(stats.audioPlayoutDelay)
     }
 
 }
@@ -1105,11 +929,11 @@ extension SBGApiImpl {
             }
             
             var current = self.getPlayerCurrentTime()
-            if self.singerRole == .audience && (Date().currentMilListamp - (self.lastMainSingerUpdateTime )) > 1000 {
+            if self.singerRole == .audience && (Date().milListamp - (self.lastMainSingerUpdateTime )) > 1000 {
                 return
             }
             
-            if self.singerRole != .audience && (Date().currentMilListamp - (self.lastReceivedPosition )) > 1000 {
+            if self.singerRole != .audience && (Date().milListamp - (self.lastReceivedPosition )) > 1000 {
                 return
             }
 
@@ -1118,15 +942,15 @@ extension SBGApiImpl {
             }
             
             if self.singerRole != .audience {
-                current = Date().currentMilListamp - self.lastReceivedPosition + Double(self.localPosition)
+                current = Date().milListamp - self.lastReceivedPosition + Double(self.localPosition)
             }
-            self.setProgress(with: Int(current) + Int(self.startHighTime))
+            self.setProgress(with: Int(current ) + Int(self.startHighTime))
             self.oldPitch = self.pitch
         }, repeats: true)
     }
 
-    private func setPlayeSBGtate(with state: AgoraMediaPlayerState) {
-        playeSBGtate = state
+    private func setPlayerState(with state: AgoraMediaPlayerState) {
+        playerState = state
         updateRemotePlayBackVolumeIfNeed()
         updateTimer(with: state)
     }
@@ -1138,7 +962,7 @@ extension SBGApiImpl {
             return
         }
 
-        let vol = self.playeSBGtate == .playing ? remoteVolume : 100
+        let vol = self.playerState == .playing ? remoteVolume : 100
         apiConfig?.engine?.adjustPlaybackSignalVolume(Int(vol))
     }
 
@@ -1184,17 +1008,17 @@ extension SBGApiImpl {
     private func getPlayerCurrentTime() -> TimeInterval {
         let role = singerRole
         if role == .soloSinger || role == .leadSinger{
-            let time = Date().currentMilListamp - localPlayerPosition
+            let time = Date().milListamp - localPlayerPosition
             return time
         } else if role == .coSinger {
-            if playeSBGtate == .playing || playeSBGtate == .paused {
-                let time = Date().currentMilListamp - localPlayerPosition
+            if playerState == .playing || playerState == .paused {
+                let time = Date().milListamp - localPlayerPosition
                 return time
             }
         }
         
-        var position = Date().currentMilListamp - self.lastMainSingerUpdateTime + remotePlayerPosition
-        if playeSBGtate != .playing {
+        var position = Date().milListamp - self.lastMainSingerUpdateTime + remotePlayerPosition
+        if playerState != .playing {
             position = remotePlayerPosition
         }
         return position
@@ -1215,9 +1039,9 @@ extension SBGApiImpl {
                 }
             }
         } else {
-            self.playeSBGtate = state
+            self.playerState = state
             getEventHander { delegate in
-                delegate.onMusicPlayerStateChanged(state: self.playeSBGtate, error: .none, isLocal: false)
+                delegate.onMusicPlayerStateChanged(state: self.playerState, error: .none, isLocal: false)
             }
         }
     }
@@ -1246,25 +1070,11 @@ extension SBGApiImpl {
         }
     }
 
-//    private func dataToDictionary(data: Data) -> Dictionary<String, Any>? {
-//        guard let json = try? JSONSerialization.jsonObject(with: data, options: []),
-//              let dictionary = json as? [String: Any] else {
-//            return nil
-//        }
-//        return dictionary
-//    }
-
-//    private func compactDictionaryToData(_ dict: NSDictionary) -> Data? {
-//        guard JSONSerialization.isValidJSONObject(dict) else { return nil }
-//        guard let jsonData = try? JSONSerialization.data(withJSONObject: dict, options: []) else { return nil }
-//        return jsonData
-//    }
-
     private func getNtpTimeInMs() -> Int {
         var localNtpTime: Int = Int(apiConfig?.engine?.getNtpWallTimeInMs() ?? 0)
 
-        if localNtpTime == 0 {
-            localNtpTime = Int(round(Date().timeIntervalSince1970 * 1000.0))
+        if localNtpTime != 0 {
+            localNtpTime = localNtpTime + 2208988800 * 1000
         }
 
         return localNtpTime
@@ -1297,51 +1107,59 @@ extension SBGApiImpl {
 
 //主要是MPK的回调
 extension SBGApiImpl: AgoraRtcMediaPlayerDelegate {
-    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {
-        self.lastReceivedPosition = Date().currentMilListamp
-        self.localPosition = position
-        self.localPlayerPosition = Date().currentMilListamp - Double(position)
+    
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position_ms: Int, atTimestamp timestamp_ms: TimeInterval) {
+        self.lastReceivedPosition = Date().milListamp
+        self.localPosition = Int(position_ms)
+        self.localPlayerSystemTime = timestamp_ms
+        self.localPlayerPosition = Date().milListamp - Double(position_ms)
         if isMainSinger() && getPlayerCurrentTime() > TimeInterval(self.audioPlayoutDelay) {
             let dict: [String: Any] = [ "cmd": "setLrcTime",
                                         "duration": self.playerDuration,
-                                        "time": getPlayerCurrentTime(),
+                                        "time": position_ms - audioPlayoutDelay,
                                         //不同机型delay不同，需要发送同步的时候减去发送机型的delay，在接收同步加上接收机型的delay
-                                        "realTime":position,
-                                        "ntp": self.getNtpTimeInMs(),
-                                        "playerState": self.playeSBGtate.rawValue,
+                                        "realTime":position_ms,
+                                        "ntp": timestamp_ms,
+                                        "playerState": self.playerState.rawValue,
                                         "songIdentifier": songIdentifier
                                        // "songCode": self.songCode
             ]
+            agoraPrint("position_ms:\(position_ms), ntp:\(getNtpTimeInMs()), delta:\(self.getNtpTimeInMs() - position_ms), autoPlayoutDelay:\(self.audioPlayoutDelay)")
             sendStreamMessageWithDict(dict, success: nil)
-
         }
+    }
+
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {
+        
     }
     
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         agoraPrint("agoraRtcMediaPlayer didChangedToState: \(state.rawValue) \(self.songCode)")
 
         if state == .openCompleted {
-            self.localPlayerPosition = Date().currentMilListamp
+            self.localPlayerPosition = Date().milListamp
+            print("localPlayerPosition:playerKit:openCompleted \(localPlayerPosition)")
             self.playerDuration = TimeInterval(musicPlayer?.getDuration() ?? 0)
-            //playerKit.selectAudioTrack(1)
+            playerKit.selectAudioTrack(1)
             if isMainSinger() { //主唱播放，通过同步消息“setLrcTime”通知伴唱play
                 playerKit.play()
             }
         } else if state == .stopped {
-            self.localPlayerPosition = Date().currentMilListamp
+            self.localPlayerPosition = Date().milListamp
             self.playerDuration = 0
         }
         else if state == .paused {
         } else if state == .playing {
-            self.localPlayerPosition = Date().currentMilListamp - Double(musicPlayer?.getPosition() ?? 0)
+            self.localPlayerPosition = Date().milListamp - Double(musicPlayer?.getPosition() ?? 0)
+            print("localPlayerPosition:playerKit:playing \(localPlayerPosition)")
         }
 
         if isMainSinger() {
             syncPlayState(state: state, error: error)
         }
-        self.playeSBGtate = state
+        self.playerState = state
         agoraPrint("recv state with player callback : \(state.rawValue)")
-        if state == .playBackAllLoopsCompleted && singerRole == .coSinger {//可能存在伴唱不返回allloopbackComplete状态 这个状态通过主唱的playeSBGtate来同步
+        if state == .playBackAllLoopsCompleted && singerRole == .coSinger {//可能存在伴唱不返回allloopbackComplete状态 这个状态通过主唱的playerState来同步
             return
         }
         getEventHander { delegate in
@@ -1356,21 +1174,9 @@ extension SBGApiImpl: AgoraRtcMediaPlayerDelegate {
 
 //主要是MCC的回调
 extension SBGApiImpl: AgoraMusicContentCenterEventDelegate {
-    
-    func onLyricResult(_ requestId: String, songCode: Int, lyricUrl: String?, errorCode: AgoraMusicContentCenterStatusCode) {
-        guard let lrcUrl = lyricUrl else {return}
-        let callback = self.lyricCallbacks[requestId]
-        guard let lyricCallback = callback else { return }
-        self.lyricCallbacks.removeValue(forKey: requestId)
-        if lrcUrl.isEmpty {
-            lyricCallback(nil)
-            return
-        }
-        lyricCallback(lrcUrl)
-    }
-    
+
     func onSongSimpleInfoResult(_ requestId: String, songCode: Int, simpleInfo: String?, errorCode: AgoraMusicContentCenterStatusCode) {
-        if let jsonData = simpleInfo?.data(using: .utf8) {
+       if let jsonData = simpleInfo?.data(using: .utf8) {
             do {
                 let jsonMsg = try JSONSerialization.jsonObject(with: jsonData, options: []) as! [String: Any]
                 let format = jsonMsg["format"] as! [String: Any]
@@ -1384,57 +1190,67 @@ extension SBGApiImpl: AgoraMusicContentCenterEventDelegate {
                 print("Error while parsing JSON: \(error.localizedDescription)")
             }
         }
-    }
-    
-    func onPreLoadEvent(_ requestId: String, songCode: Int, percent: Int, lyricUrl: String?, status: AgoraMusicContentCenterPreloadStatus, errorCode: AgoraMusicContentCenterStatusCode) {
-        print("percent:\(percent)")
-        if let listener = self.loadMusicListeners.object(forKey: "\(songCode)" as NSString) as? ISBGMusicLoadStateListener {
-            listener.onMusicLoadProgress(songCode: songCode, percent: percent, status: status, msg: String(errorCode.rawValue), lyricUrl: lyricUrl)
+        if (errorCode == .errorGateway) {
+            getEventHander { delegate in
+                delegate.onTokenPrivilegeWillExpire()
+            }
         }
-        if (status != .OK) { return }
-        let SongCode = "\(songCode)"
-        guard let block = self.musicCallbacks[SongCode] else { return }
-        self.musicCallbacks.removeValue(forKey: SongCode)
-        block(status, songCode)
     }
-    
+
     func onMusicChartsResult(_ requestId: String, result: [AgoraMusicChartInfo], errorCode: AgoraMusicContentCenterStatusCode) {
         guard let callback = musicChartDict[requestId] else {return}
         callback(requestId, errorCode, result)
         musicChartDict.removeValue(forKey: requestId)
+        if (errorCode == .errorGateway) {
+            getEventHander { delegate in
+                delegate.onTokenPrivilegeWillExpire()
+            }
+        }
     }
     
     func onMusicCollectionResult(_ requestId: String, result: AgoraMusicCollection, errorCode: AgoraMusicContentCenterStatusCode) {
         guard let callback = musicSearchDict[requestId] else {return}
         callback(requestId, errorCode, result)
         musicSearchDict.removeValue(forKey: requestId)
+        if (errorCode == .errorGateway) {
+            getEventHander { delegate in
+                delegate.onTokenPrivilegeWillExpire()
+            }
+        }
     }
-}
-
-//主要是歌曲下载的回调
-extension SBGApiImpl: AgoraLrcDownloadDelegate {
-
-    func downloadLrcFinished(url: String) {
-        agoraPrint("download lrc finished \(url)")
-        guard let callback = self.lyricCallbacks[url] else { return }
-        self.lyricCallbacks.removeValue(forKey: url)
-        callback(url)
+    
+    func onLyricResult(_ requestId: String, songCode: Int, lyricUrl: String?, errorCode: AgoraMusicContentCenterStatusCode) {
+        guard let lrcUrl = lyricUrl else {return}
+        let callback = self.lyricCallbacks[requestId]
+        guard let lyricCallback = callback else { return }
+        self.lyricCallbacks.removeValue(forKey: requestId)
+        if (errorCode == .errorGateway) {
+            getEventHander { delegate in
+                delegate.onTokenPrivilegeWillExpire()
+            }
+        }
+        if lrcUrl.isEmpty {
+            lyricCallback(nil)
+            return
+        }
+        lyricCallback(lrcUrl)
+    }
+    
+    func onPreLoadEvent(_ requestId: String, songCode: Int, percent: Int, lyricUrl: String?, status: AgoraMusicContentCenterPreloadStatus, errorCode: AgoraMusicContentCenterStatusCode) {
+        if let listener = self.loadMusicListeners.object(forKey: "\(songCode)" as NSString) as? IMusicLoadStateListener {
+            listener.onMusicLoadProgress(songCode: songCode, percent: percent, status: status, msg: String(errorCode.rawValue), lyricUrl: lyricUrl)
+        }
+        if (status == .preloading) { return }
+        let SongCode = "\(songCode)"
+        guard let block = self.musicCallbacks[SongCode] else { return }
+        self.musicCallbacks.removeValue(forKey: SongCode)
+        if (errorCode == .errorGateway) {
+            getEventHander { delegate in
+                delegate.onTokenPrivilegeWillExpire()
+            }
+        }
+        block(status, songCode)
     }
 
-    func downloadLrcError(url: String, error: Error?) {
-        agoraPrint("download lrc fail \(url): \(String(describing: error))")
-        guard let callback = self.lyricCallbacks[url] else { return }
-        self.lyricCallbacks.removeValue(forKey: url)
-        callback(nil)
-    }
-}
-
-extension Date {
-    /// 获取当前 毫秒级 时间戳 - 13位
-    var currentMilListamp : TimeInterval {
-        let timeInterval: TimeInterval = self.timeIntervalSince1970
-        let millisecond = CLongLong(round(timeInterval*1000))
-        return TimeInterval(millisecond)
-    }
 }
 

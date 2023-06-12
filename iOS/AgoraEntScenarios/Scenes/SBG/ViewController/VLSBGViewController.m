@@ -575,14 +575,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     [self.SBGApi didSBGAPIReceiveAudioVolumeIndicationWith:speakers totalVolume:totalVolume];
 }
 
-- (void)rtcEngine:(AgoraRtcEngineKit *)engine didAudioRouteChanged:(AgoraAudioOutputRouting)routing {
-    [self.SBGApi didAudioRouteChangedWithRouting:routing];
-}
-
-- (void)rtcEngine:(AgoraRtcEngineKit *)engine didAudioPublishStateChange:(NSString *)channelId oldState:(AgoraStreamPublishState)oldState newState:(AgoraStreamPublishState)newState elapseSinceLastState:(int)elapseSinceLastState {
-    [self.SBGApi didAudioPublishStateChangeWithNewState:newState];
-}
-
 -(NSMutableArray *)scoreArray {
     if(!_scoreArray){
        _scoreArray = [NSMutableArray array];
@@ -1133,9 +1125,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                       channelName:self.roomModel.roomNo
                                                          localUid:[VLUserCenter.user.id integerValue]
                                                         chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
-                               type:KTVTypeSingbattle
+                                                             type:KTVTypeSingbattle
+                                                     maxCacheSize:10
     ];
     self.SBGApi = [[SBGApiImpl alloc] initWithConfig: apiConfig];
+    [self.SBGApi renewInnerDataStreamId];
     [self.SBGApi setLrcViewWithView:self.statusView.lrcView];
     [self.SBGApi setMicStatusWithIsOnMicOpen:!self.isNowMicMuted];
     [self.SBGApi addEventHandlerWithSBGApiEventHandler:self];
@@ -1873,12 +1867,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)voiceItemClickAction:(NSInteger)ItemIndex {
     self.selectedVoiceShowIndex = ItemIndex;
     [self checkVoiceShowEffect: ItemIndex];
-}
-
-//专业主播设置
-- (void)voicePerItemSelectedAction:(BOOL)isSelected {
-    self.isProfessional = isSelected;
-    [self.SBGApi enableProfessionalStreamerMode:isSelected];
 }
 
 //- (void)soundEffectItemClickAction:(VLSBGSoundEffectType)effectType {
