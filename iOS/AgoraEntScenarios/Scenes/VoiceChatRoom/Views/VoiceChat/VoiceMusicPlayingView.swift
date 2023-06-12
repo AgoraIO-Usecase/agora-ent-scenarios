@@ -421,7 +421,7 @@ class VoiceMusicPlayingView: UIView {
     var onClickBGMClosure: ((VoiceMusicModel?) -> Void)?
     private lazy var titleLabel: AutoScrollLabel = {
         let label = AutoScrollLabel()
-        label.text = "歌曲名特别长时滚动-歌手名"
+        label.text = ""
         label.textColor = UIColor(hex: "#FFFFFF", alpha: 1.0)
         label.font = .systemFont(ofSize: 12)
         label.textAlignment = .right
@@ -461,7 +461,9 @@ class VoiceMusicPlayingView: UIView {
     
     func setupMusic(model: VoiceMusicModel, isOrigin: Bool) {
         voiceModel = model
-        titleLabel.text = "\(model.name ?? "")-\(model.singer ?? "")"
+        if model.name?.isEmpty == false {
+            titleLabel.text = "\(model.name ?? "")-\(model.singer ?? "")"
+        }
         accompanyButton.isSelected = isOrigin
         ChatRoomServiceImp.getSharedInstance().updateRoomBGM(songName: model.name, singerName: model.singer, isOrigin: isOrigin)
     }
@@ -474,7 +476,9 @@ class VoiceMusicPlayingView: UIView {
         }
         ChatRoomServiceImp.getSharedInstance().fetchRoomBGM(roomId: roomId) { songName, singerName, isOrigin in
             self.isHidden = false
-            self.titleLabel.text = "\(songName ?? "")-\(singerName ?? "")"
+            if songName?.isEmpty == false {
+                self.titleLabel.text = "\(songName ?? "")-\(singerName ?? "")"
+            }
             self.accompanyButton.isSelected = isOrigin
         }
     }
