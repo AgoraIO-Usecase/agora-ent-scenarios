@@ -1505,20 +1505,21 @@ public class RoomLivingViewModel extends ViewModel {
 
         long songCode = Long.parseLong(music.getSongNo());
         int mainSingerUid = Integer.parseInt(music.getUserNo());
+        String jsonOption = "{\"format\":{\"highPart\":0}}";
+        Long newSongCode = ktvApiProtocol.getMusicContentCenter().getInternalSongCode(songCode, jsonOption);
         if (isOwnSong) {
             // 主唱加载歌曲
-            loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), true, mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC), songCode);
+            loadMusic(new KTVLoadMusicConfiguration(newSongCode.toString(), true, mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC), newSongCode);
         } else {
             // 观众
-            loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), false, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), songCode);
+            loadMusic(new KTVLoadMusicConfiguration(newSongCode.toString(), false, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), newSongCode);
         }
     }
 
     private boolean hasReceiveStartSingBattle = false;
     private void loadMusic(KTVLoadMusicConfiguration config, Long songCode) {
-        String jsonOption = "{\"format\":{\"highPart\":0}}";
-        Long newSongCode = ktvApiProtocol.getMusicContentCenter().getInternalSongCode(songCode, jsonOption);
-        ktvApiProtocol.loadMusic(newSongCode, config, new IMusicLoadStateListener() {
+
+        ktvApiProtocol.loadMusic(songCode, config, new IMusicLoadStateListener() {
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
                 KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
