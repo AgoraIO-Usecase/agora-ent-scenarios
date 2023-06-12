@@ -656,8 +656,8 @@ extension SBGApiImpl {
             callback(.OK, songCode)
             return
         }
-        let err = self.mcc?.preload(songCode: songCode, jsonOption: nil)
-        if err != 0 {
+        let requestId = self.mcc?.preload(songCode: songCode)
+        if requestId == nil {
             musicCallbacks.removeValue(forKey: String(songCode))
             callback(.error, songCode)
             return
