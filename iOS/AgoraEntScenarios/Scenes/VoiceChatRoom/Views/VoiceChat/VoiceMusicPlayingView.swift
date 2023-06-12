@@ -198,7 +198,7 @@ class AutoScrollLabel: UIView {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.isScrollEnabled = false
-        isUserInteractionEnabled = false
+        isUserInteractionEnabled = true
         backgroundColor = .clear
         clipsToBounds = true
         fadeLength = kDefaultFadeLength
@@ -418,6 +418,7 @@ class AutoScrollLabel: UIView {
 
 class VoiceMusicPlayingView: UIView {
     var onClickAccompanyButtonClosure: ((Bool) -> Void)?
+    var onClickBGMClosure: ((VoiceMusicModel?) -> Void)?
     private lazy var titleLabel: AutoScrollLabel = {
         let label = AutoScrollLabel()
         label.text = "歌曲名特别长时滚动-歌手名"
@@ -434,8 +435,8 @@ class VoiceMusicPlayingView: UIView {
     }()
     private lazy var accompanyButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage.sceneImage(name: "voice_accompany_on"), for: .normal)
-        button.setImage(UIImage.sceneImage(name: "voice_accompany_off"), for: .selected)
+        button.setImage(UIImage.sceneImage(name: "voice_accompany_room_on"), for: .normal)
+        button.setImage(UIImage.sceneImage(name: "voice_accompany_room_off"), for: .selected)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(onClickAccompanyButton(sender:)), for: .touchUpInside)
         button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -492,11 +493,19 @@ class VoiceMusicPlayingView: UIView {
         titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         titleLabel.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(onClickBGMHandler))
+        titleLabel.addGestureRecognizer(tap)
     }
     
     @objc
     private func onClickAccompanyButton(sender: UIButton) {
         sender.isSelected = !sender.isSelected
         onClickAccompanyButtonClosure?(sender.isSelected)
+    }
+    
+    @objc
+    private func onClickBGMHandler() {
+        onClickBGMClosure?(voiceModel)
     }
 }

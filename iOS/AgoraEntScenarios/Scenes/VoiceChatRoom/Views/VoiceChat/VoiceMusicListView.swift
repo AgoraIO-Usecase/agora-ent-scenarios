@@ -99,6 +99,23 @@ class VoiceMusicListView: UIView {
         }
     }
     
+    func show_present() {
+        let height = 387 + 59 + 60 + Screen.safeAreaBottomHeight()
+        let component = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth,
+                                                                     height: height))
+        let controller = VoiceRoomAlertViewController(compent: component, custom: self)
+        
+        let presentView: VoiceRoomPresentView = VoiceRoomPresentView.shared
+        presentView.showView(with: CGRect(x: 0, y: 0, width: ScreenWidth, height: height), vc: controller, maxHeight: Screen.height - 40)
+        let vc = UIViewController.cl_topViewController()
+        vc?.view.addSubview(presentView)
+        VoiceRoomPresentView.shared.panViewHeightClosure = { height in
+            self.tableViewHCons?.constant = height - 59 - (60 + Screen.safeAreaBottomHeight())
+            self.tableViewHCons?.isActive = true
+            self.layoutIfNeeded()
+        }
+    }
+    
     private func getMusicList() {
         rtcKit?.fetchMusicList(musicListCallback: { [weak self] list in
             guard let self = self else { return }
@@ -499,6 +516,7 @@ class VoiceMusicToolView: UIView {
         
         volumnButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20).isActive = true
         volumnButton.topAnchor.constraint(equalTo: topAnchor, constant: 19).isActive = true
+        volumnButton.widthAnchor.constraint(equalToConstant: 17).isActive = true
         
         titleLabel.leadingAnchor.constraint(equalTo: volumnButton.trailingAnchor, constant: 15).isActive = true
         titleLabel.centerYAnchor.constraint(equalTo: volumnButton.centerYAnchor).isActive = true
