@@ -134,7 +134,17 @@ import AgoraRtcKit
     func onSingerRoleChanged(oldRole: KTVSingRole, newRole: KTVSingRole)
     
     
-    func onChorusChannelTokenPrivilegeWillExpire(token: String?)
+
+   func onTokenPrivilegeWillExpire()
+        
+    /**
+         * 合唱频道人声音量提示
+         * @param speakers 不同用户音量信息
+         * @param totalVolume 总音量
+         */
+    func onChorusChannelAudioVolumeIndication(
+        speakers: [AgoraRtcAudioVolumeInfo],
+        totalVolume: Int)
 }
 
 @objc open class KTVApiConfig: NSObject{
@@ -145,7 +155,7 @@ import AgoraRtcKit
     var localUid: Int = 0
     var chorusChannelName: String
     var chorusChannelToken: String
-    
+    var maxCacheSize: Int = 10
     @objc public
     init(appId: String,
          rtmToken: String,
@@ -153,7 +163,8 @@ import AgoraRtcKit
          channelName: String,
          localUid: Int,
          chorusChannelName: String,
-         chorusChannelToken: String
+         chorusChannelToken: String,
+         maxCacheSize: Int
     ) {
         self.appId = appId
         self.rtmToken = rtmToken
@@ -162,6 +173,7 @@ import AgoraRtcKit
         self.localUid = localUid
         self.chorusChannelName = chorusChannelName
         self.chorusChannelToken = chorusChannelToken
+        self.maxCacheSize = maxCacheSize
     }
 }
 
@@ -201,6 +213,14 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     /// 清空内部变量/缓存，取消在initWithRtcEngine时的监听，以及取消网络请求等
     func cleanCache()
     
+    /**
+     * 收到 IKTVApiEventHandler.onTokenPrivilegeWillExpire 回调时需要主动调用方法更新Token
+     * @param rtmToken musicContentCenter模块需要的rtm token
+     * @param chorusChannelRtcToken 合唱需要的频道rtc token
+     */
+    func renewToken(
+        rtmToken: String,
+        chorusChannelRtcToken: String)
     
     /**
      * 获取歌曲榜单
@@ -309,4 +329,9 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     /// 获取MCC实例
     /// - Returns: <#description#>
     func getMusicContentCenter() -> AgoraMusicContentCenter?
+    
+    /**
+     创建dataStreamID
+     */
+    func renewInnerDataStreamId()
 }

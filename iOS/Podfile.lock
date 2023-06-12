@@ -17,7 +17,7 @@ PODS:
   - Agora-Scene-Utils (1.1.0)
   - Agora_Chat_iOS (1.0.8)
   - AgoraLyricsScore (1.1.1-beta-3)
-  - AgoraRtcEngine_Special_iOS (4.1.1.7)
+  - AgoraRtcEngine_Special_iOS (4.1.1.8)
   - AgoraRtm_iOS (1.5.1)
   - AgoraSyncManager (2.0.7):
     - SocketRocket
@@ -67,7 +67,7 @@ DEPENDENCIES:
   - Agora-Scene-Utils (= 1.1.0)
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraLyricsScore (= 1.1.1-beta-3)
-  - AgoraRtcEngine_Special_iOS (= 4.1.1.7)
+  - AgoraRtcEngine_Special_iOS (= 4.1.1.8)
   - AgoraRtm_iOS (= 1.5.1)
   - AgoraSyncManager (= 2.0.7)
   - Bugly (= 2.5.93)
@@ -135,7 +135,7 @@ SPEC CHECKSUMS:
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
-  AgoraRtcEngine_Special_iOS: f88b16617f8cd10e83dd2149b28ee364884cb2e4
+  AgoraRtcEngine_Special_iOS: 21cbb267f02f81eaacc03d1ab9578a13cdecb090
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   AgoraSyncManager: 10597d95b7aafb6292b8d177ee06db58a6071406
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
@@ -163,6 +163,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 86ad4369868d48b9c2365bfdd8805c45d5ec953f
+PODFILE CHECKSUM: c7e9225db6691206876f57e372cf8c432e514547
 
 COCOAPODS: 1.11.3

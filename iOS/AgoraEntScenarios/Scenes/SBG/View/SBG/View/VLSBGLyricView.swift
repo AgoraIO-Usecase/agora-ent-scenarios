@@ -160,6 +160,7 @@ class VLSBGLyricView: UIView {
     private var model: LyricModel?
     private var isTaped: Bool = false
     private var songContent: String = ""
+    private var downloadManager = AgoraDownLoadManager()
     private var bgImgView: UIImageView = {
         let imgView = UIImageView()
         imgView.image = UIImage.sceneImage(name: "ktv_mv_tempBg")
@@ -221,6 +222,7 @@ class VLSBGLyricView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         layoutUI()
+        downloadManager.delegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -345,6 +347,7 @@ extension VLSBGLyricView: KaraokeDelegate {
             return
         }
         delegate.onKaraokeView(score: cumulativeScore, totalScore: localTotalScore, lineScore: score, lineIndex: lineIndex)
+        if localTotalScore == 0 {return}
         finalScore = Int(Double(cumulativeScore) / Double(localTotalScore) * 100)
        // updateScore(with: score, cumulativeScore: cumulativeScore, totalScore: localTotalScore)
     }
@@ -370,24 +373,50 @@ extension VLSBGLyricView: SBGLrcViewDelegate {
         lrcView?.setProgress(progress: progress)
     }
     
-    public func onDownloadLrcData(url: String) {
+    func onDownloadLrcData(url: String) {
+        //开始歌词下载
+        startDownloadLrc(with: url) {[weak self] url in
+            guard let self = self, let url = url else {return}
+            self.resetLrcData(with: url)
+        }
+    }
+        
+    func startDownloadLrc(with url: String, callBack: @escaping LyricCallback) {
+        var path: String? = nil
+        downloadManager.downloadLrcFile(urlString: url) { lrcurl in
+            defer {
+                callBack(path)
+            }
+            guard let lrcurl = lrcurl else {
+                print("downloadLrcFile fail, lrcurl is nil")
+                return
+            }
+
+            let curSong = URL(string: url)?.lastPathComponent.components(separatedBy: ".").first
+            let loadSong = URL(string: lrcurl)?.lastPathComponent.components(separatedBy: ".").first
+            guard curSong == loadSong else {
+                print("downloadLrcFile fail, missmatch, cur:\(curSong ?? "") load:\(loadSong ?? "")")
+                return
+            }
+            path = lrcurl
+        } failure: {
+            callBack(nil)
+            print("歌词解析失败")
+        }
+    }
+        
+    func resetLrcData(with url: String) {
         guard currentLoadLrcPath != url else {
             return
         }
-        //歌词下载好
         let musicUrl = URL(fileURLWithPath: url)
         guard let data = try? Data(contentsOf: musicUrl),
               let model = KaraokeView.parseLyricData(data: data) else {
             return
         }
-        self.model = model
         currentLoadLrcPath = url
         totalCount = model.lines.count
         totalLines = 0
-        dealWithBattleSong(lyricsModel: model)
-        lrcView.reset()
-        songContent = "\(model.name.trimmingCharacters(in: .whitespacesAndNewlines))-\(model.singer)"
-        songNameView.setName(with: songContent, isCenter: true)
         lrcView?.setLyricData(data: model)
     }
 
@@ -401,6 +430,16 @@ extension VLSBGLyricView: SBGLrcViewDelegate {
                 }
             }
         localTotalScore = lineCount * 100
+    }
+}
+
+extension VLSBGLyricView: AgoraLrcDownloadDelegate {
+    func downloadLrcFinished(url: String) {
+        print("download lrc finished \(url)")
+    }
+    
+    func downloadLrcError(url: String, error: Error?) {
+        print("download lrc fail \(url): \(String(describing: error))")
     }
 }
 
