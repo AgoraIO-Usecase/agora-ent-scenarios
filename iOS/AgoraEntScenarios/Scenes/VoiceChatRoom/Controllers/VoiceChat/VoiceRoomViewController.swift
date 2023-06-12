@@ -43,6 +43,21 @@ class VoiceRoomViewController: VRBaseViewController {
 
     var preView: VMPresentView!
     private lazy var noticeView = VMNoticeView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 230))
+    private lazy var musicListView: VoiceMusicListView = {
+        let view = VoiceMusicListView(rtcKit: rtckit,
+                                      currentMusic: roomInfo?.room?.backgroundMusic,
+                                      isOrigin: roomInfo?.room?.musicIsOrigin ?? true,
+                                      roomInfo: roomInfo)
+        view.backgroundMusicPlaying = { [weak self] model in
+            self?.roomInfo?.room?.backgroundMusic = model
+            self?.musicView.setupMusic(model: model, isOrigin: self?.roomInfo?.room?.musicIsOrigin ?? true)
+        }
+        view.onClickAccompanyButtonClosure = { [weak self] isOrigin in
+            self?.roomInfo?.room?.musicIsOrigin = isOrigin
+            self?.musicView.updateOriginButtonStatus(isOrigin: isOrigin)
+        }
+        return view
+    }()
     public lazy var musicView: VoiceMusicPlayingView = {
         let view = VoiceMusicPlayingView()
         view.isHidden = true
@@ -50,6 +65,10 @@ class VoiceRoomViewController: VRBaseViewController {
             self?.roomInfo?.room?.musicIsOrigin = isOrigin
             view.updateOriginButtonStatus(isOrigin: isOrigin)
             self?.rtckit.selectPlayerTrackMode(isOrigin: isOrigin)
+        }
+        view.onClickBGMClosure = { [weak self] model in
+            guard let self = self, self.isOwner == true else { return }
+            self.musicListView.show_present()
         }
         return view
     }()
