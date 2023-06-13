@@ -310,11 +310,14 @@ class VLSBGLyricView: UIView {
     
     @objc public func resetScore() {
         gradeView.reset()
+        incentiveView.reset()
+        lrcView?.reset()
+        currentLoadLrcPath = nil
     }
     
     @objc public func resetLrc() {
-        lrcView?.reset()
-        currentLoadLrcPath = nil
+//        lrcView?.reset()
+//        currentLoadLrcPath = nil
     }
     
     override func layoutSubviews() {
@@ -363,6 +366,7 @@ extension VLSBGLyricView: SBGLrcViewDelegate {
     public func onUpdatePitch(pitch: Float) {
         //pitch 更新
         lrcView?.setPitch(pitch: Double(pitch))
+        print("pitch---\(pitch)")
     }
     
     public func onUpdateProgress(progress: Int) {
