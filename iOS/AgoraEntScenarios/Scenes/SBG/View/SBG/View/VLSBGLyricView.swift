@@ -358,7 +358,6 @@ extension VLSBGLyricView: SBGLrcViewDelegate {
     func onHighPartTime(highStartTime: Int, highEndTime: Int) {
         self.highEndTime = highEndTime
         self.highStartTime = highStartTime
-        dealWithBattleSong(lyricsModel: self.model)
     }
     
     public func onUpdatePitch(pitch: Float) {
@@ -417,6 +416,10 @@ extension VLSBGLyricView: SBGLrcViewDelegate {
         currentLoadLrcPath = url
         totalCount = model.lines.count
         totalLines = 0
+        lrcView.reset()
+        dealWithBattleSong(lyricsModel: model)
+        songContent = "\(model.name.trimmingCharacters(in: .whitespacesAndNewlines))-\(model.singer)"
+        songNameView.setName(with: songContent, isCenter: true)
         lrcView?.setLyricData(data: model)
     }
 

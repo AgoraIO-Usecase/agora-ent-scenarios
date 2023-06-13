@@ -400,8 +400,14 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
         NSLog(@"update:%@抢到麦", model.winnerNo);
             if([VLUserCenter.user.id isEqualToString:model.winnerNo]) {
                 self.statusView.state = SBGStateSingingBroadcaster;
+                [self.SBGApi switchSingerRoleWithNewRole:SBGSingRoleSoloSinger onSwitchRoleState:^(enum SBGSwitchRoleState, enum SBGSwitchRoleFailReason) {
+                                    
+                }];
             } else {
                 self.statusView.state = SBGStateSingingAudience;
+                [self.SBGApi switchSingerRoleWithNewRole:SBGSingRoleAudience onSwitchRoleState:^(enum SBGSwitchRoleState, enum SBGSwitchRoleFailReason) {
+                                    
+                }];
             }
             [self loadAndPlaySongWith:SBGPlayerTrackModeAcc];
     });
@@ -758,6 +764,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         role = [model.winnerNo isEqualToString:VLUserCenter.user.id] ? SBGSingRoleSoloSinger : SBGSingRoleAudience;
         [self.statusView.lrcView setAudioTrackWithIndex:1];
     }
+    self.singRole = role;
+    
     SBGSongConfiguration *songConfig = [[SBGSongConfiguration alloc] init];
     songConfig.autoPlay = role == SBGSingRoleAudience ? NO : YES ;
     songConfig.mode = role == SBGSingRoleAudience ? SBGLoadMusicModeLoadLrcOnly : SBGLoadMusicModeLoadMusicAndLrc;
@@ -775,13 +783,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     [self.SBGApi loadMusicWithSongCode:songcode config:songConfig onMusicLoadStateListener:self];
 
-    [weakSelf.SBGApi switchSingerRoleWithNewRole:role
-                           onSwitchRoleState:^( SBGSwitchRoleState state, SBGSwitchRoleFailReason reason) {
-        if(state != SBGSwitchRoleStateSuccess) {
-            SBGLogError(@"switchSingerRole error: %ld", reason);
-            return;
-        }
-    }];
+//    [weakSelf.SBGApi switchSingerRoleWithNewRole:role
+//                           onSwitchRoleState:^( SBGSwitchRoleState state, SBGSwitchRoleFailReason reason) {
+//        if(state != SBGSwitchRoleStateSuccess) {
+//            SBGLogError(@"switchSingerRole error: %ld", reason);
+//            return;
+//        }
+//    }];
     
 }
 
@@ -1395,6 +1403,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             //抢唱成功
             NSLog(@"抢唱成功");
             //立即更新service
+            if([self isRoomOwner]){
+                [self.SBGApi switchSingerRoleWithNewRole:SBGSingRoleAudience onSwitchRoleState:^(enum SBGSwitchRoleState, enum SBGSwitchRoleFailReason) {
+                                    
+                }];
+            }
             VLSBGRoomSelSongModel *model = weakself.selSongsArray.firstObject;
             model.winnerNo = VLUserCenter.user.id;
             model.name = VLUserCenter.user.name;
@@ -1421,13 +1434,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(flag){
             return;
         }
-        
+        //房主同步进度为waiting
         if([weakself isRoomOwner]){
             [weakself.SBGApi stopSing];
-        }
-        //房主同步进度为waiting
-        if([self isRoomOwner]){
-            [self removeCurrentSongWithSync:YES];
+            [weakself removeCurrentSongWithSync:YES];
         }
         if(self.totalCount > self.hasPlayedCount){
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -2225,6 +2235,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
         }
     } else {
         [self loadAndPlaySongWith:SBGPlayerTrackModeOrigin];
+        [self finalUpdateUI];
     }
 }
 
@@ -2501,6 +2512,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                         NSLog(@"添加到service得model:userId:%@---count%li---score:%li", model.userName, model.score, model.songNum);
                     }
                 }
+                
                 if(self.statusView.lrcView.finalScore  > 50) {
                     [self handleSingSuccessNextMusicWithScore:self.statusView.lrcView.finalScore];
                 } else {
@@ -2591,7 +2603,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
         
         VLSBGRoomSelSongModel *model = self.selSongsArray.firstObject;
         if([model.winnerNo isEqualToString:@""]){
-            NSLog(@"加载成功的歌曲为:%@---%@", model.name, model.winnerNo);
+            NSLog(@"加载成功的歌曲为:%@---%@", model.songName, model.winnerNo);
             //如果是主唱歌曲加载成功 发送ds告诉观众同步进度
             if(self.singRole == SBGSingRoleSoloSinger){
                 NSDictionary *dict = @{
