@@ -1279,6 +1279,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
    [self.statusView.lrcView updateScoreWith:lineScore cumulativeScore:score totalScore:totalScore];
 }
 
+- (void)onTokenPrivilegeWillExpire{
+    
+}
+
 -(void)didLrcViewActionChangedWithState:(enum SBGClickAction)state{
     switch (state) {
         case SBGClickActionAac://aac
@@ -2230,7 +2234,8 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                             self.statusView.contentStr = @"Go";
                         } else {
                             [self loadAndPlaySongWith:SBGPlayerTrackModeOrigin];
-                            [self finalUpdateUI];
+                           // [self finalUpdateUI];
+                            [self updateWatingUI];
                         }
                     }
                 }
@@ -2238,8 +2243,13 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
         }
     } else {
         [self loadAndPlaySongWith:SBGPlayerTrackModeOrigin];
-        [self finalUpdateUI];
+       // [self finalUpdateUI];
+        [self updateWatingUI];
     }
+}
+
+-(void)updateWatingUI{
+    self.statusView.state = [self isOnMicSeat] ? SBGStateTimeDownBroadcaster : SBGStateSbgingOffSeat;
 }
 
 -(void)updateSBGCountDown {
@@ -2260,7 +2270,6 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
             });
         }
     });
-    NSLog(@"update: time1---%f", [[NSDate date] timeIntervalSince1970] * 1000);
 }
 
 -(void)querySbgStatusAndUpdateUI {
@@ -2549,7 +2558,6 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                                lyricUrl:(NSString *)lyricUrl {
     SBGLogInfo(@"load: %li, %li", status, percent);
     dispatch_async_on_main_queue(^{
-        
         if(status == AgoraMusicContentCenterPreloadStatusError){
             [VLToast toast:@"加载歌曲失败，请切歌"];
            // [self.MVView setBotViewHidden:false];
@@ -2571,6 +2579,8 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
             self.loadMusicCallBack(NO, songCode);
             self.loadMusicCallBack = nil;
         }
+        VLSBGRoomSelSongModel *model = self.selSongsArray.firstObject;
+        NSLog(@"加载失败的歌曲为:%@---%@", model.songName, model.winnerNo);
         if (reason == SBGLoadSongFailReasonNoLyricUrl) {
            // self.MVView.loadingType = VLSBGMVViewStateLoadFail;
         } else {

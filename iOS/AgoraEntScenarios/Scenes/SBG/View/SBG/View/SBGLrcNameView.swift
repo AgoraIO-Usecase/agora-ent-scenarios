@@ -43,6 +43,11 @@ class SBGLrcNameView: UIView {
         endLabel.frame = CGRect(x: 33, y: 4, width: endWidth, height: 20)
     }
     
+    public func reset() {
+        icon.image = nil
+        endLabel.text = ""
+    }
+    
     func textAutoWidth(text: String, height:CGFloat, fontSize:CGFloat) ->CGFloat{
         let origin = NSStringDrawingOptions.usesLineFragmentOrigin
         let lead = NSStringDrawingOptions.usesFontLeading
