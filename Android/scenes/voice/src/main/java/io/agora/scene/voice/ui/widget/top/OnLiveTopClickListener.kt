@@ -29,4 +29,9 @@ interface OnLiveTopClickListener {
      */
     fun onClickSoundSocial(view: View)
 
+    /**
+     * 背景音乐
+     */
+    fun onClickBGM(view: View)
+
 }

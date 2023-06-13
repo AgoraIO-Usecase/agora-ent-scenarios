@@ -162,6 +162,7 @@
     <string name="voice_chatroom_voice_blur">⼈声模糊</string>
     <string name="voice_chatroom_sound_selection">最佳⾳效</string>
     <string name="voice_chatroom_only_host_can_change_best_sound">只有房主可以更改最佳⾳效</string>
+    <string name="voice_chatroom_only_host_bgm">只有房主可以更改背景音乐</string>
     <string name="voice_chatroom_sound_selection_tips">切换其他最佳⾳效需退出房间</string>
     <string name="voice_chatroom_current_sound_selection">当前最佳⾳效</string>
     <string name="voice_chatroom_other_sound_selection">其他最佳⾳效</string>

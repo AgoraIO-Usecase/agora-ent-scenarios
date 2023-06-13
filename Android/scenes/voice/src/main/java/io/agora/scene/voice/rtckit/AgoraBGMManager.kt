@@ -12,10 +12,15 @@ import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.RtcEngineEx
 
 interface AgoraBGMStateListener {
-    fun onMusicChanged(music: Music?)
-    fun onPlayStateChanged(isPlay: Boolean)
+    fun onLocalMusicChanged(music: Music?) {}
+    fun onLocalPlayStateChanged(isPlay: Boolean) {}
+    /** 将BGM状态同步到远端*/
+    fun onUpdateBGMInfoToRemote() {}
+    fun onUpdateBGMInfoVisible(content: String?, singerOn: Boolean) {}
 }
 data class AgoraBGMParams (
+    var song: String = "",
+    var singer: String = "",
     var isSingerOn: Boolean = true,
     var isAutoPlay: Boolean = false,
     var volume: Int = 50
@@ -55,6 +60,7 @@ class AgoraBGMManager(
     private val mPlayer: IAgoraMusicPlayer = mMusicCenter.createMusicPlayer()
 
     fun release() {
+        mListeners = null
         mPlayer.unRegisterPlayerObserver(this)
         mPlayer.stop()
         mPlayer.destroy()
@@ -92,6 +98,14 @@ class AgoraBGMManager(
         mListeners?.add(listener)
     }
 
+    fun remoteUpdateBGMInfo(song: String, singer: String, singerOn: Boolean) {
+        Log.d(TAG, "remote update bgm $song $singer $singerOn")
+        params.song = song
+        params.singer = singer
+        params.isSingerOn = singerOn
+        notiUpdateBGMInfo()
+    }
+
     fun removeListener(listener: AgoraBGMStateListener) {
         if (mListeners == null) {
             return
@@ -104,7 +118,7 @@ class AgoraBGMManager(
 
     fun fetchBGMList(complete: (list: Array<out Music>?) -> Unit) {
         val musicList = mMusicList
-        if (musicList != null) {
+        if (musicList?.isNotEmpty() == true) {
             complete.invoke(musicList)
         } else {
             val jsonOption = "{\"pitchType\":1,\"needLyric\":true}"
@@ -117,8 +131,12 @@ class AgoraBGMManager(
     fun loadMusic(music: Music?) {
         bgm = music
         mPlayer.stop()
+        params.song = music?.name ?: ""
+        params.singer = music?.singer ?: ""
+        notiUpdateBGMInfo()
         mListeners?.forEach {
-            it.onMusicChanged(music)
+            it.onLocalMusicChanged(music)
+            it.onUpdateBGMInfoToRemote()
         }
         if (music == null) {
             return
@@ -136,7 +154,7 @@ class AgoraBGMManager(
         if (params.isAutoPlay != isPlay) {
             params.isAutoPlay = isPlay
             mListeners?.forEach {
-                it.onPlayStateChanged(isPlay)
+                it.onLocalPlayStateChanged(isPlay)
             }
         }
         if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_STOPPED) {
@@ -153,6 +171,10 @@ class AgoraBGMManager(
     fun setSingerOn(isOn: Boolean) {
         params.isSingerOn = isOn
         mPlayer.selectAudioTrack(if (isOn) 0 else 1)
+        notiUpdateBGMInfo()
+        mListeners?.forEach {
+            it.onUpdateBGMInfoToRemote()
+        }
     }
 
     fun setVolume(value: Int) {
@@ -195,6 +217,18 @@ class AgoraBGMManager(
         return mMusicList?.firstOrNull()
     }
 
+    private fun notiUpdateBGMInfo() {
+        var content: String? = null
+        if (params.song.isNotEmpty()) {
+            content = "${params.song} - ${params.singer}"
+        }
+        runOnMainThread {
+            mListeners?.forEach {
+                it.onUpdateBGMInfoVisible(content, params.isSingerOn)
+            }
+        }
+    }
+
     private fun runOnMainThread(runnable: Runnable) {
         if (Thread.currentThread() === Looper.getMainLooper().thread) {
             runnable.run()
@@ -235,7 +269,7 @@ class AgoraBGMManager(
         }
     }
 
-    override fun onPositionChanged(position_ms: Long) {
+    override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
 
     }
 

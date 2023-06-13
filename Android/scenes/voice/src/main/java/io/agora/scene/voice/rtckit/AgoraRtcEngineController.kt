@@ -433,6 +433,9 @@ class AgoraRtcEngineController {
                 else -> {}
             }
         }
+
+        override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
+        }
     }
 
     private fun openMediaPlayer(url: String, soundSpeaker: Int = ConfigConstants.BotSpeaker.BotBlue) {

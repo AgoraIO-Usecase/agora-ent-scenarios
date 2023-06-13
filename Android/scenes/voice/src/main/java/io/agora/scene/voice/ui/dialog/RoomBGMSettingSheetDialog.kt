@@ -24,8 +24,6 @@ import io.agora.voice.common.ui.dialog.BaseSheetDialog
 class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBinding>(),
     AgoraBGMStateListener {
 
-    private var mOnBGMChanged: (() -> Unit)? = null
-
     private lateinit var adapter: MusicAdapter
 
     override fun getViewBinding(
@@ -47,10 +45,6 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
         setupView()
         fetchData()
         AgoraRtcEngineController.get().bgmManager().addListener(this)
-    }
-
-    fun setOnBGMChanged(action: (() -> Unit)?) {
-        mOnBGMChanged = action
     }
 
     private fun setupRecycleView() {
@@ -102,10 +96,12 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
         binding?.ivVolume?.setOnClickListener {
             val isSelected = binding?.ivVolume?.isSelected ?: true
             if (isSelected) {
+                binding?.ivVolume?.setImageResource(R.drawable.voice_icon_bgm_volume_dark)
                 binding?.ivVolume?.isSelected = false
                 binding?.slVolume?.visibility = View.INVISIBLE
                 binding?.cvVolume?.visibility = View.INVISIBLE
             } else {
+                binding?.ivVolume?.setImageResource(R.drawable.voice_icon_bgm_volume_light)
                 binding?.ivVolume?.isSelected = true
                 binding?.slVolume?.visibility = View.VISIBLE
                 binding?.cvVolume?.visibility = View.VISIBLE
@@ -147,13 +143,13 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
         }
     }
 
-    override fun onMusicChanged(music: Music?) {
+    override fun onLocalMusicChanged(music: Music?) {
         adapter.updateSelected(music)
         binding?.tvMusic?.text = music?.name
         binding?.tvSinger?.text = music?.singer
     }
 
-    override fun onPlayStateChanged(isPlay: Boolean) {
+    override fun onLocalPlayStateChanged(isPlay: Boolean) {
         adapter.updatePlaying(isPlay)
         if (isPlay) {
             binding?.ivPlay?.setImageResource(R.drawable.voice_icon_bgm_pause)

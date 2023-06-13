@@ -162,6 +162,7 @@
     <string name="voice_chatroom_voice_blur">Voice blur</string>
     <string name="voice_chatroom_sound_selection">Sound Selection</string>
     <string name="voice_chatroom_only_host_can_change_best_sound">Only host can change Best Agora Sound</string>
+    <string name="voice_chatroom_only_host_bgm">Only host can change BGM</string>
     <string name="voice_chatroom_sound_selection_tips">Switching other Agora Sound Selection need to exit the chatroom.</string>
     <string name="voice_chatroom_current_sound_selection">Current Sound Selection</string>
     <string name="voice_chatroom_other_sound_selection">Other Sound Selection</string>

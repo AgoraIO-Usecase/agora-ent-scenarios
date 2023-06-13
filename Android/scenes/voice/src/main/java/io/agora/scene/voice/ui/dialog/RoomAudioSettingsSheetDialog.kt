@@ -146,9 +146,9 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
     }
 
     fun updateBGMView() {
-        val music = AgoraRtcEngineController.get().bgmManager().bgm
-        if (music != null) {
-            binding?.tvBGMArrow?.text = "${music.name}-${music.singer}"
+        val params = AgoraRtcEngineController.get().bgmManager().params
+        if (params.song.isNotEmpty()) {
+            binding?.tvBGMArrow?.text = "${params.song}-${params.singer}"
         } else {
             binding?.tvBGMArrow?.text = ""
         }
@@ -210,8 +210,5 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
 
         /**最佳音效*/
         fun onSoundEffect(soundSelectionType: Int, isEnable: Boolean)
-
-        /**空间音频*/
-        fun onSpatialAudio(isOpen: Boolean, isEnable: Boolean)
     }
 }

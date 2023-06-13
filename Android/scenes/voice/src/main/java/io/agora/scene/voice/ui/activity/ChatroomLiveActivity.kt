@@ -17,7 +17,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.Error
-import io.agora.musiccontentcenter.Music
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.voice.R
@@ -75,6 +74,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
     private lateinit var roomLivingViewModel: VoiceRoomLivingViewModel
     private lateinit var giftViewDelegate: RoomGiftViewDelegate
     private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
+    private var isActivityStop = false
 
     /**
      * 代理头部view以及麦位view
@@ -94,6 +94,16 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
     override fun getViewBinding(inflater: LayoutInflater): VoiceActivityChatroomBinding {
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         return VoiceActivityChatroomBinding.inflate(inflater)
+    }
+
+    override fun onStop() {
+        isActivityStop = true
+        super.onStop()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        isActivityStop = false
     }
 
     override fun initView(savedInstanceState: Bundle?) {
@@ -503,6 +513,10 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
             override fun onClickMore(view: View) {
                 TopFunctionDialog(this@ChatroomLiveActivity).show()
             }
+
+            override fun onClickBGM(view: View) {
+                roomObservableDelegate.onBGMSettingDialog()
+            }
         })
         binding.chatBottom.setMenuItemOnClickListener(object :
             MenuItemClickListener {
@@ -591,6 +605,9 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
             override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
                 super.onFragmentStopped(fm, f)
+                if (isActivityStop) {
+                    return
+                }
                 if (f is BottomSheetDialogFragment) {
                     val lastFragment = dialogFragments.lastOrNull()
                     if (lastFragment == f) {
@@ -671,13 +688,13 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
         binding.likeView.isVisible = focus
     }
 
-    override fun onPlayStateChanged(isPlay: Boolean) {
-        val visible = if (isPlay) View.VISIBLE else View.INVISIBLE
-        binding.ivBGM.visibility = visible
-        binding.tvBGM.visibility = visible
+    override fun onUpdateBGMInfoToRemote() {
+        val params = AgoraRtcEngineController.get().bgmManager().params
+        val info = VoiceBgmModel(params.song, params.singer, params.isSingerOn)
+        roomLivingViewModel.updateBGMInfo(info)
     }
-    override fun onMusicChanged(music: Music?) {
-        val m = music ?: return
-        binding.tvBGM.text = "${m.name}-${m.singer}"
+
+    override fun onUpdateBGMInfoVisible(content: String?, singerOn: Boolean) {
+        binding.cTopView.updateBGMContent(content, singerOn)
     }
 }

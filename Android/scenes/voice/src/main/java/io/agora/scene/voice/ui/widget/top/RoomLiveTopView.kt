@@ -49,7 +49,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         binding.mtChatroomAgoraSound.setOnClickListener(this)
         binding.mtChatroomWatch.setOnClickListener(this)
         binding.ivChatroomMore.setOnClickListener(this)
-
+        binding.tvBGM.setOnClickListener(this)
     }
 
     fun setTitleMaxWidth() {
@@ -171,6 +171,18 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         }
     }
 
+    override fun updateBGMContent(content: String?, isSingerOn: Boolean) {
+        if (content != null) {
+            binding.ivBGM.visibility = View.VISIBLE
+            binding.tvBGM.visibility = View.VISIBLE
+            binding.tvBGM.text = content
+        } else {
+            binding.ivBGM.visibility = View.INVISIBLE
+            binding.tvBGM.visibility = View.INVISIBLE
+            binding.tvBGM.text = ""
+        }
+    }
+
     override fun onClick(v: View?) {
         when (v?.id) {
             // 返回
@@ -185,6 +197,8 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             binding.mtChatroomMembers.id -> onLiveTopClickListener?.onClickRank(v, 1)
             // 更多
             binding.ivChatroomMore.id -> onLiveTopClickListener?.onClickMore(v)
+            // bgm
+            binding.tvBGM.id -> onLiveTopClickListener?.onClickBGM(v)
         }
     }
 }
