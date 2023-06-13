@@ -2,6 +2,7 @@ package io.agora.scene.voice.ui
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import androidx.fragment.app.FragmentActivity
@@ -88,6 +89,14 @@ class RoomObservableViewDelegate constructor(
 
                 override fun onError(code: Int, message: String?) {
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_notice_posted_error))
+                }
+            })
+        }
+        roomLivingViewModel.bgmInfoObservable().observe(activity) { response: Resource<VoiceBgmModel> ->
+            parseResource(response, object : OnResourceParseCallback<VoiceBgmModel>() {
+                override fun onSuccess(data: VoiceBgmModel?) {
+                }
+                override fun onError(code: Int, message: String?) {
                 }
             })
         }
@@ -498,13 +507,7 @@ class RoomObservableViewDelegate constructor(
                 override fun onSoundEffect(soundSelectionType: Int, isEnable: Boolean) {
                     onSoundSelectionDialog(soundSelectionType, finishBack)
                 }
-
-                override fun onSpatialAudio(isOpen: Boolean, isEnable: Boolean) {
-                    onSpatialDialog()
-                }
-
             }
-
         roomAudioSettingDialog?.show(activity.supportFragmentManager, "mtAudioSettings")
     }
 
@@ -652,26 +655,13 @@ class RoomObservableViewDelegate constructor(
     /** 背景音乐设置弹框
      */
     fun onBGMSettingDialog() {
-        val dialog = RoomBGMSettingSheetDialog()
-        dialog.setOnBGMChanged {
-            roomAudioSettingDialog?.updateBGMView()
+        if (!roomKitBean.isOwner) {
+            ToastTools.showTips(activity, activity.getString(R.string.voice_chatroom_only_host_bgm))
+            return
         }
+        val dialog = RoomBGMSettingSheetDialog()
         dialog.show(activity.supportFragmentManager, "mtBGMSetting")
     }
-    /**
-     * 空间音频弹框
-     */
-    fun onSpatialDialog() {
-        val spatialAudioSheetDialog = RoomSpatialAudioSheetDialog().apply {
-            arguments = Bundle().apply {
-                putBoolean(RoomSpatialAudioSheetDialog.KEY_SPATIAL_OPEN, false)
-                putBoolean(RoomSpatialAudioSheetDialog.KEY_IS_ENABLED, roomKitBean.isOwner)
-            }
-        }
-
-        spatialAudioSheetDialog.show(activity.supportFragmentManager, "mtSpatialAudio")
-    }
-
     /**
      * 退出房间
      */
@@ -1069,6 +1059,13 @@ class RoomObservableViewDelegate constructor(
                     }
                 }
             }
+        } else if(attributeMap.containsKey("room_bgm")) {
+            Log.d(TAG, "room bgm info ${attributeMap["room_bgm"]}")
+            val bgmInfo = GsonTools.toBean(attributeMap["room_bgm"], VoiceBgmModel::class.java)
+            val song = bgmInfo?.songName ?: ""
+            val singer = bgmInfo?.singerName ?: ""
+            val isOrigin = bgmInfo?.isOrigin ?: false
+            AgoraRtcEngineController.get().bgmManager().remoteUpdateBGMInfo(song, singer, isOrigin)
         } else {
             // mic
             val micInfoMap = mutableMapOf<String, VoiceMicInfoModel>()

@@ -188,4 +188,31 @@
         app:layout_constraintBottom_toBottomOf="@+id/mtChatroomGifts"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/mtChatroomGifts" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBGM"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="14dp"
+        android:src="@drawable/voice_icon_room_bgm_on"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@+id/mtChatroomAgoraSound"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvBGM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:text=""
+        android:textColor="@color/white"
+        android:alpha="0.6"
+        android:textSize="@dimen/voice_sp_12"
+        android:visibility="invisible"
+        app:layout_constraintTop_toTopOf="@+id/ivBGM"
+        app:layout_constraintBottom_toBottomOf="@+id/ivBGM"
+        app:layout_constraintEnd_toStartOf="@id/ivBGM"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

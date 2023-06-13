@@ -14,8 +14,16 @@ import io.agora.voice.common.utils.LogTools.logD
 import java.io.*
 
 class ChatroomCacheManager {
-    private var mEditor: SharedPreferences.Editor? = null
-    private var mSharedPreferences: SharedPreferences? = null
+
+    private val mSharedPreferences: SharedPreferences by lazy {
+        ChatroomConfigManager.getInstance().context.getSharedPreferences(
+            "SP_AT_PROFILE",
+            Context.MODE_PRIVATE
+        )
+    }
+    private val mEditor: SharedPreferences.Editor
+        get() = mSharedPreferences.edit()
+
     private val mMicInfoMap = mutableMapOf<String, String>()
     private val allInfoMap = mutableMapOf<String, String>()
 
@@ -35,15 +43,7 @@ class ChatroomCacheManager {
 
     companion object {
         const val TAG = "ChatroomCacheManager"
-        val cacheManager = ChatroomCacheManager().apply {
-            mSharedPreferences = ChatroomConfigManager.getInstance().context.getSharedPreferences(
-                "SP_AT_PROFILE",
-                Context.MODE_PRIVATE
-            )
-            mSharedPreferences.let {
-                mEditor = it?.edit()
-            }
-        }
+        val cacheManager = ChatroomCacheManager()
     }
 
     /**

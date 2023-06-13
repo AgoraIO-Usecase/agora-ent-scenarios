@@ -28,6 +28,7 @@ import io.agora.scene.voice.imkit.custorm.CustomMsgType;
 import io.agora.scene.voice.imkit.custorm.MsgConstant;
 import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
+import io.agora.scene.voice.model.VoiceBgmModel;
 import io.agora.scene.voice.model.VoiceGiftModel;
 import io.agora.scene.voice.model.VoiceMemberModel;
 import io.agora.scene.voice.model.VoiceMicInfoModel;
