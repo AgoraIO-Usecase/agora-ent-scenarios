@@ -613,6 +613,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         
         //这个时候表示当前歌曲已结束
         self.currentSelSong = nil;
+        [self.statusView.lrcView resetLrc];
         
         if([self isRoomOwner]){
             NSLog(@"removeCurrentSongWithSync: receiveStreamMessageFromUid");
@@ -1311,6 +1312,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(flag == YES){
             [weakself syncChoruScore:0];
             weakself.currentSelSong = nil;
+            [weakself.statusView.lrcView resetLrc];
             //把自己的信息存进去
             SubRankModel *model = [[SubRankModel alloc]init];
             VLSBGRoomSelSongModel *currentSong = weakself.selSongsArray.firstObject;
@@ -1438,6 +1440,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if([weakself isRoomOwner]){
             [weakself.SBGApi stopSing];
             [weakself removeCurrentSongWithSync:YES];
+            [weakself.statusView.lrcView resetLrc];
         }
         if(self.totalCount > self.hasPlayedCount){
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -2518,6 +2521,8 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                 } else {
                     [self handleSingFailedNextMusicWithScore: self.statusView.lrcView.finalScore];
                 }
+                
+                [self.statusView.lrcView resetLrc];
             }
         }
         
@@ -2600,7 +2605,6 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
             SBGLogInfo(@"onMusicLoadSuccessWithSongCode: %ld", self.singRole);
         }
         self.retryCount = 0;
-        
         VLSBGRoomSelSongModel *model = self.selSongsArray.firstObject;
         if([model.winnerNo isEqualToString:@""]){
             NSLog(@"加载成功的歌曲为:%@---%@", model.songName, model.winnerNo);
