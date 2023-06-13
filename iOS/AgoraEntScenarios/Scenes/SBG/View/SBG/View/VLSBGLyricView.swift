@@ -312,13 +312,18 @@ class VLSBGLyricView: UIView {
         gradeView.reset()
         incentiveView.reset()
         lrcView?.reset()
+        self.songContent = ""
+        self.songNameView.setName(with: self.songContent, isCenter: true)
         self.currentLoadLrcPath = nil
     }
     
     @objc public func resetLrc() {
         DispatchQueue.main.async {
+            self.gradeView.reset()
+            self.incentiveView.reset()
             self.lrcView?.reset()
-            self.songNameView.reset()
+            self.songContent = ""
+            self.songNameView.setName(with: self.songContent, isCenter: true)
             self.currentLoadLrcPath = nil
         }
     }

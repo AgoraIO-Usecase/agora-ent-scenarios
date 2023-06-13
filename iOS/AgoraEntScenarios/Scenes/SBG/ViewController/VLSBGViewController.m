@@ -633,7 +633,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             });
         }else {
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.statusView.state =  score > 50 ? SBGStateSbgSuccess : SBGStateSingFailed;
+                self.statusView.state =  score > 50 ? SBGStateSingSuccess : SBGStateSingFailed;
                 [self.statusView setFight:score > 50  score:score];
             });
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW , (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -1314,9 +1314,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     kWeakSelf(self);
     [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
         if(flag == YES){
+            [weakself.statusView.lrcView resetLrc];
             [weakself syncChoruScore:0];
             weakself.currentSelSong = nil;
-            [weakself.statusView.lrcView resetLrc];
             //把自己的信息存进去
             SubRankModel *model = [[SubRankModel alloc]init];
             VLSBGRoomSelSongModel *currentSong = weakself.selSongsArray.firstObject;
