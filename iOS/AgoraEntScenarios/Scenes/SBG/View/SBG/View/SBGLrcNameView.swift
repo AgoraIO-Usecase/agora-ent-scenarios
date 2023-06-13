@@ -44,8 +44,9 @@ class SBGLrcNameView: UIView {
     }
     
     public func reset() {
-        icon.image = nil
+        icon.image = UIImage()
         endLabel.text = ""
+        layoutIfNeeded()
     }
     
     func textAutoWidth(text: String, height:CGFloat, fontSize:CGFloat) ->CGFloat{
