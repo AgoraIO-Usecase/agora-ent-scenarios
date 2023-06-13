@@ -511,8 +511,7 @@ object VideoSetting {
     ) {
         val rtcEngine = RtcEngineInstance.rtcEngine
         SR?.let {
-            // pk 中关闭超分
-            val enableSR = currAudienceEnhanceSwitch && SR != SuperResolution.SR_NONE && !isPkMode
+            val enableSR = currAudienceEnhanceSwitch && SR != SuperResolution.SR_NONE
             ShowLogger.d(
                 "VideoSetting",
                 "SR_Config -- enable=$enableSR sr_type=$SR currAudienceEnhanceSwitch=$currAudienceEnhanceSwitch"
@@ -532,7 +531,7 @@ object VideoSetting {
                  * 1.33倍:   n=7
                  * 1.5倍：   n=8
                  * 2倍：     n=3
-                 * 锐化：    n=10(android是10，iOS是11)
+                 * 锐化：    n=10(android是10，iOS是11)Å
                  * 超级画质： n=20
                  */
                 rtcEngine.setParameters("{\"rtc.video.sr_type\":${SR.value}}")
