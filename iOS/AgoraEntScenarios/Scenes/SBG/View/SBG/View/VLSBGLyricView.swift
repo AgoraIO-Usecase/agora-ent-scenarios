@@ -312,12 +312,15 @@ class VLSBGLyricView: UIView {
         gradeView.reset()
         incentiveView.reset()
         lrcView?.reset()
-        currentLoadLrcPath = nil
+        self.currentLoadLrcPath = nil
     }
     
     @objc public func resetLrc() {
-//        lrcView?.reset()
-//        currentLoadLrcPath = nil
+        DispatchQueue.main.async {
+            self.lrcView?.reset()
+            self.songNameView.reset()
+            self.currentLoadLrcPath = nil
+        }
     }
     
     override func layoutSubviews() {
@@ -365,8 +368,9 @@ extension VLSBGLyricView: SBGLrcViewDelegate {
     
     public func onUpdatePitch(pitch: Float) {
         //pitch 更新
-        lrcView?.setPitch(pitch: Double(pitch))
-        print("pitch---\(pitch)")
+        DispatchQueue.main.async {
+            self.lrcView?.setPitch(pitch: Double(pitch))
+        }
     }
     
     public func onUpdateProgress(progress: Int) {
@@ -423,6 +427,7 @@ extension VLSBGLyricView: SBGLrcViewDelegate {
         lrcView.reset()
         dealWithBattleSong(lyricsModel: model)
         songContent = "\(model.name.trimmingCharacters(in: .whitespacesAndNewlines))-\(model.singer)"
+        songNameView.isHidden = false
         songNameView.setName(with: songContent, isCenter: true)
         lrcView?.setLyricData(data: model)
     }
