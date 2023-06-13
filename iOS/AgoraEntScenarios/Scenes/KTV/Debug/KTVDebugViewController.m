@@ -31,18 +31,22 @@
     [backBtn addTarget:self action:@selector(backAction:) forControlEvents:(UIControlEventTouchUpInside)];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBtn];
     
+    UIButton* cleanDumpBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [cleanDumpBtn setTitle:@"清除dump" forState:UIControlStateNormal];
+    [cleanDumpBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+    [cleanDumpBtn addTarget:self action:@selector(onClickClearDump) forControlEvents:(UIControlEventTouchUpInside)];
     
     UIButton* cleanBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [cleanBtn setTitle:@"清除log缓存" forState:UIControlStateNormal];
+    [cleanBtn setTitle:@"清除log" forState:UIControlStateNormal];
     [cleanBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
-    [cleanBtn addTarget:self action:@selector(onClickClear) forControlEvents:(UIControlEventTouchUpInside)];
-    
+    [cleanBtn addTarget:self action:@selector(onClickClearLog) forControlEvents:(UIControlEventTouchUpInside)];
     
     UIButton* exportBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [exportBtn setTitle:@"导出log" forState:UIControlStateNormal];
     [exportBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [exportBtn addTarget:self action:@selector(onClickExport) forControlEvents:(UIControlEventTouchUpInside)];
     self.navigationItem.rightBarButtonItems = @[
+        [[UIBarButtonItem alloc] initWithCustomView:cleanDumpBtn],
         [[UIBarButtonItem alloc] initWithCustomView:cleanBtn],
         [[UIBarButtonItem alloc] initWithCustomView:exportBtn]
     ];
@@ -72,15 +76,34 @@
   [self presentViewController:activityController animated:YES completion:nil];
 }
 
-- (void)onClickClear {
+- (void)onClickClearLog {
   NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
   NSString *cachePath = [paths objectAtIndex:0];
   NSFileManager *fileManager = [NSFileManager defaultManager];
   if ([fileManager fileExistsAtPath:cachePath]) {
       NSArray *childrenFiles = [fileManager subpathsAtPath:cachePath];
       for (NSString *fileName in childrenFiles) {
-          NSString *absolutePath = [cachePath stringByAppendingPathComponent:fileName];
-          [fileManager removeItemAtPath:absolutePath error:nil];
+          if([fileName hasSuffix:@".log"]) {
+              NSString *absolutePath = [cachePath stringByAppendingPathComponent:fileName];
+              [fileManager removeItemAtPath:absolutePath error:nil];
+              NSLog(@"remove log path:%@", absolutePath);
+          }
+      }
+  }
+}
+
+- (void)onClickClearDump {
+  NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+  NSString *cachePath = [paths objectAtIndex:0];
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  if ([fileManager fileExistsAtPath:cachePath]) {
+      NSArray *childrenFiles = [fileManager subpathsAtPath:cachePath];
+      for (NSString *fileName in childrenFiles) {
+          if([fileName hasSuffix:@".pcm"] || [fileName hasSuffix:@".wav"]) {
+              NSString *absolutePath = [cachePath stringByAppendingPathComponent:fileName];
+              [fileManager removeItemAtPath:absolutePath error:nil];
+              NSLog(@"remove dump path:%@", absolutePath);
+          }
       }
   }
 }
