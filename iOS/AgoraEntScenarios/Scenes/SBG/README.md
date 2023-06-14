@@ -1,7 +1,10 @@
-# 在线K歌房
+# 嗨歌抢唱
 
-> 本文档主要介绍如何快速跑通 <mark>在线K歌房</mark> 示例工程
-
+> 本文档主要介绍如何快速跑通 <mark>嗨歌抢唱</mark> 示例工程
+>
+> Demo 效果:
+> 
+> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/singBattle/singBattleRoom_1.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/singBattle/singBattleRoom_2.jpg" width="300" height="640">
 ---
 
 ## 1. 环境准备
@@ -30,7 +33,7 @@
 
 - 获取 App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
-- 联系销售给  AppID  开通 K 歌权限 </mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/)
+- 联系销售给  AppID  开通 嗨歌权限 </mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/)
 
   - 注: 拉取榜单、歌单、歌词等功能是需要开通权限的
 
@@ -52,28 +55,28 @@
 
 ### 3.1 概述
 
-> **在线K歌房**项目是声网在线 K 歌房场景的开源代码，开发者可以获取并添加到您的 APP 工程里，本源码会伴随声动互娱 Demo 同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
+> **嗨歌抢唱**项目是声网嗨歌抢唱场景的开源代码，开发者可以获取并添加到您的 APP 工程里，本源码会伴随声动互娱 Demo 同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
 
 ### 3.2 项目文件结构简介
 
 ```
 ├── Scenes
-│   ├── KTV
+│   ├── SBG
 │   │   └────FileDownloadCache #歌词下载工具类文件
-│   │   └────Debug            #KTV Debug工具类
-│   │   └────Utils            #KTV的宏和KTVLog
-│   │   └────Model            #KTV里面用到的Model
-│   │   └────View             #KTV里面用到的自定义View
-│   │   └────Model            #KTV里面用到的Model
-│   │   └────Service          #KTV里面用到的service接口和实现
-│   │       ├── KTVServiceProtocol.h #KTV里面用到的service接口
-│   │       └── KTVSyncManagerServiceImp.swift #KTV里面用到的service实现
-│   │   └────ViewController          #KTV里面用到的控制器
-│   │       ├── VLKTVViewController.m #KTV主控制器
-│   │   └────KTVAPI          #KTV里面KTVAPI
-│   │       ├── KTVApiDelegate.swift #KTVAPI的声明
-│   │       └── KTVApiImpl.swift #KTVAPI的实现
-│   │   └────KTVResource         #KTV里面用到的图片资源文件和国际化文件
+│   │   └────Debug            #SBG Debug工具类
+│   │   └────Utils            #SBG的宏和SBGLog
+│   │   └────Model            #SBG里面用到的Model
+│   │   └────View             #SBG里面用到的自定义View
+│   │   └────Model            #SBG里面用到的Model
+│   │   └────Service          #SBG里面用到的service接口和实现
+│   │       ├── SBGServiceProtocol.h #SBG里面用到的service接口
+│   │       └── SBGSyncManagerServiceImp.swift #SBG里面用到的service实现
+│   │   └────ViewController          #SBG里面用到的控制器
+│   │       ├── VLSBGViewController.m #SBG主控制器
+│   │   └────SBGAPI          #SBG里面SBGAPI
+│   │       ├── SBGApiDelegate.swift #SBGAPI的声明
+│   │       └── SBGApi.swift #SBGAPI的实现
+│   │   └────SBGResource         #SBG里面用到的图片资源文件和国际化文件
 ├── KeyCenter  #项目的基础账号配置(appid、app证书)   
 ├── Common     #共用的UI视图，拓展，分类，工具类等文件
 ├── Extension  #Swift的extension
@@ -87,15 +90,15 @@
 
 > 在线K歌房场景目前已涵盖以下功能，您可以参考注释按需从代码中调用
 >
-> 场景功能代码根目录 **AgoraEntScenarios/AgoraEntScenarios/scenes/KTV**
+> 场景功能代码根目录 **AgoraEntScenarios/AgoraEntScenarios/scenes/SBG**
 >
 > ---
 >
-> #### K歌房场景化API
+> #### 嗨歌抢唱场景化API
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_api_ios.png)
 >
-> K 歌房场景化 API 是一个帮助您快速集成声网 K 歌房能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**KTVApiDelegate**](KTVApi/KTVApiDelegate.swift) 来定义协议，通过 [**KTVApiImp**](KTVApi/KTVApiImp.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
+> 嗨歌抢唱场景化 API 是一个帮助您快速集成声网嗨歌抢唱能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**SBGAPI**](SBGApi/SBGApi.swift) 来定义协议，通过 [**SBGApiImp**](SBGApi/SBGpiImpl.swift) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网嗨歌抢唱能力
 >
 > * 拉取歌单
 >
@@ -183,7 +186,7 @@
 >    * 8、LeadSinger -》Audience 以领唱的身份结束歌曲时
 >    */
 >   func switchSingerRole(
->     newRole: KTVSingRole,
+>     newRole: SBGSingRole,
 >     onSwitchRoleState:@escaping ISwitchRoleStateListener
 >   )
 >   ~~~
@@ -214,22 +217,22 @@
 >
 > * 与歌词组件配合使用
 >
->   支持您传入您自定义的歌词组件与 KTVApi 模块配合使用, 您需要让您的歌词组件继承 **ILrcView** 类并实现以下三个接口, KTVApi 模块回通过下列三个回调将演唱 pitch、歌曲播放进度、歌词url 发送给您的歌词组件
+>   支持您传入您自定义的歌词组件与 SBGApi 模块配合使用, 您需要让您的歌词组件继承 **ILrcView** 类并实现以下三个接口, SBGApi 模块回通过下列三个回调将演唱 pitch、歌曲播放进度、歌词url 发送给您的歌词组件
 >
 >   ~~~swift
->   @objc public protocol KTVLrcViewDelegate: NSObjectProtocol {
+>   @objc public protocol SBGrcViewDelegate: NSObjectProtocol {
 >       /**
->        * ktvApi内部更新音高pitch时会主动调用此方法将pitch值传给你的歌词组件
+>        * SBGApi内部更新音高pitch时会主动调用此方法将pitch值传给你的歌词组件
 >        * @param pitch 音高值
 >        */
 >        func onUpdatePitch(pitch: Float)
 >       /**
->        * ktvApi内部更新音乐播放进度progress时会主动调用此方法将进度值progress传给你的歌词组件，50ms回调一次
+>        * SBGApi内部更新音乐播放进度progress时会主动调用此方法将进度值progress传给你的歌词组件，50ms回调一次
 >        * @param progress 歌曲播放的真实进度 50ms回调一次
 >        */
 >        func onUpdateProgress(progress: Int)
 >        /**
->        * ktvApi获取到歌词地址时会主动调用此方法将歌词地址url传给你的歌词组件，您需要在这个回调内完成歌词的下载
+>        * SBGApi获取到歌词地址时会主动调用此方法将歌词地址url传给你的歌词组件，您需要在这个回调内完成歌词的下载
 >        */
 >        func onDownloadLrcData(url: String)
 >   }
@@ -238,7 +241,7 @@
 >    * 设置歌词组件，在任意时机设置都可以生效
 >    * @param view 传入的歌词组件view， 需要继承ILrcView并实现ILrcView的三个接口
 >    */
->   func setLrcView(view: KTVLrcViewDelegate)
+>   func setLrcView(view: SBGrcViewDelegate)
 >   ~~~
 >
 > 
@@ -247,13 +250,13 @@
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_service_ios.png)
 >
-> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过 [**KTVServiceProtocol**](service/KTVServiceProtocol.h) 来定义协议，通过 [**KTVSyncManagerServiceImp**](service/KTVSyncManagerServiceImp.swift) 来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
+> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过 [**SBGServiceProtocol**](service/SBGServiceProtocol.h) 来定义协议，通过 [**SBGSyncManagerServiceImp**](service/SBGSyncManagerServiceImp.swift) 来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
 >
 > - 房间管理
 >
 >   包含了房间的创建和房间列表的获取
 >
->   相关代码请参考：[**KTVServiceModel**](service/KTVServiceModel.h)，分别依赖 [**KTVServiceProtocol**](service/KTVServiceProtocol.kt) 的下列方法去交互
+>   相关代码请参考：[**SBGServiceModel**](service/SBGServiceModel.h)，分别依赖 [**SBGServiceProtocol**](service/SBGServiceProtocol.kt) 的下列方法去交互
 >
 >   ```Swift
 >   - (void)getRoomListWithPage:(NSUInteger)page
@@ -274,22 +277,9 @@
 >
 >   点歌、已点歌曲删除、已点歌曲置顶、切歌等状态的同步
 >
->   歌曲列表菜单：请参考  [**VLPopSongList**]((View/KTV/KTVSongGallery/VLPopSongList.m))
+>   歌曲列表菜单：请参考  [**VLPopSongList**]((View/SBG/SBGSongGallery/VLPopSongList.m))
 >
 > 
->
-> #### 其他功能
->
-> * 音效、美声
->   声网最佳音效
->
->    实现参考  [**VLKTVViewContolller**](viewController/VLKTVViewController.m) 里的 **effectItemClickAction** 实现
->
->   声网最佳美声
->
->    实现参考  [**VLKTVViewContolller**](viewController/VLKTVViewController.m) 里的 **onVLChooseBelcantoView** 实现
-
----
 
 ## 4. FAQ
 
@@ -299,11 +289,11 @@
 
 ### 程序运行后，歌曲列表为空
 
-> 需要联系销售给 APPID 开通 K 歌权限
+> 需要联系销售给 APPID 开通 嗨歌抢唱权限
 
-### K歌房中的歌曲资源使用的是哪家？是否可以自己选择供应商？
+### 嗨歌抢唱中的歌曲资源使用的是哪家？是否可以自己选择供应商？
 
-> K歌房的歌曲资源使用的是Agora内容中心服务，暂不支持自行切换供应商，详情请查看 [版权音乐 - 在线 K 歌房 - 文档中心 - 声网Agora](https://docs.agora.io/cn/online-ktv/API%20Reference/ios_ng/API/toc_drm.html)
+> 嗨歌抢唱的歌曲资源使用的是Agora内容中心服务，暂不支持自行切换供应商，详情请查看 [版权音乐 - 在线 K 歌房 - 文档中心 - 声网Agora](https://docs.agora.io/cn/online-ktv/API%20Reference/ios_ng/API/toc_drm.html)
 
 ### 集成遇到困难，该如何联系声网获取协助
 
