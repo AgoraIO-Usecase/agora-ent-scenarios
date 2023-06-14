@@ -586,7 +586,6 @@
 		E357356A29EFD8B5009D54E1 /* VLSoundEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = E357356829EFD8B5009D54E1 /* VLSoundEffectView.m */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 		E36B42562A24B8290034FACF /* sbgResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E36B41C72A24B8290034FACF /* sbgResource.bundle */; };
-		E36B42572A24B8290034FACF /* SBGLrcViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36B41C92A24B8290034FACF /* SBGLrcViewDelegate.swift */; };
 		E36B42582A24B8290034FACF /* SBGNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36B41CA2A24B8290034FACF /* SBGNetworkManager.swift */; };
 		E36B42592A24B8290034FACF /* SBGApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36B41CB2A24B8290034FACF /* SBGApiImpl.swift */; };
 		E36B425A2A24B8290034FACF /* Networktool.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36B41CD2A24B8290034FACF /* Networktool.swift */; };
@@ -1423,7 +1422,6 @@
 		E358F801293494BC00A7EBD1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E358F803293494C100A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		E36B41C72A24B8290034FACF /* sbgResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = sbgResource.bundle; sourceTree = "<group>"; };
-		E36B41C92A24B8290034FACF /* SBGLrcViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBGLrcViewDelegate.swift; sourceTree = "<group>"; };
 		E36B41CA2A24B8290034FACF /* SBGNetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBGNetworkManager.swift; sourceTree = "<group>"; };
 		E36B41CB2A24B8290034FACF /* SBGApiImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBGApiImpl.swift; sourceTree = "<group>"; };
 		E36B41CD2A24B8290034FACF /* Networktool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Networktool.swift; sourceTree = "<group>"; };
@@ -3521,6 +3519,7 @@
 			isa = PBXGroup;
 			children = (
 				E36B41C72A24B8290034FACF /* sbgResource.bundle */,
+				E36B41CC2A24B8290034FACF /* NetWork */,
 				E36B41C82A24B8290034FACF /* SBGAPI */,
 				E36B41D02A24B8290034FACF /* Utils */,
 				E36B41D32A24B8290034FACF /* README.md */,
@@ -3537,12 +3536,9 @@
 		E36B41C82A24B8290034FACF /* SBGAPI */ = {
 			isa = PBXGroup;
 			children = (
-				E36B41C92A24B8290034FACF /* SBGLrcViewDelegate.swift */,
-				E36B41CA2A24B8290034FACF /* SBGNetworkManager.swift */,
-				E36B41CB2A24B8290034FACF /* SBGApiImpl.swift */,
-				E36B41CC2A24B8290034FACF /* NetWork */,
-				E36B41CE2A24B8290034FACF /* SBGLrcControl.swift */,
 				E36B41CF2A24B8290034FACF /* SBGApi.swift */,
+				E36B41CB2A24B8290034FACF /* SBGApiImpl.swift */,
+				E36B41CE2A24B8290034FACF /* SBGLrcControl.swift */,
 			);
 			path = SBGAPI;
 			sourceTree = "<group>";
@@ -3550,6 +3546,7 @@
 		E36B41CC2A24B8290034FACF /* NetWork */ = {
 			isa = PBXGroup;
 			children = (
+				E36B41CA2A24B8290034FACF /* SBGNetworkManager.swift */,
 				E36B41CD2A24B8290034FACF /* Networktool.swift */,
 			);
 			path = NetWork;
@@ -4128,7 +4125,6 @@
 				DD36105F29B70CDC00CE7984 /* UIImage+Show.swift in Sources */,
 				DD0292C1295BF0DC00485225 /* KTVLog.swift in Sources */,
 				DD619AB829E3E247008F63E4 /* SAPraiseEmitterView.swift in Sources */,
-				E36B42572A24B8290034FACF /* SBGLrcViewDelegate.swift in Sources */,
 				DD36107929B70CDC00CE7984 /* BEGLTexture.m in Sources */,
 				E36B42822A24B8290034FACF /* VLSBGVoicePerShowView.m in Sources */,
 				DD36106729B70CDC00CE7984 /* ShowAgoraKitManager+DebugSetting.swift in Sources */,
