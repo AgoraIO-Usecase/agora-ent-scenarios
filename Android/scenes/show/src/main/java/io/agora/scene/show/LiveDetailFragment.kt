@@ -1351,7 +1351,7 @@ class LiveDetailFragment : Fragment() {
             module2.type = CONTENT_INSPECT_TYPE_MODERATION
             contentInspectConfig.modules = arrayOf(module1, module2)
             contentInspectConfig.moduleCount = 2
-            mRtcEngine.enableContentInspect(true, contentInspectConfig)
+            mRtcEngine.enableContentInspectEx(true, contentInspectConfig, mMainRtcConnection)
         }
         catch (_: JSONException) {
 
