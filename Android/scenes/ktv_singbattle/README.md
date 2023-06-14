@@ -1,7 +1,10 @@
 # 嗨歌抢唱
 
 > 本文档主要介绍如何快速跑通 <mark> 嗨歌抢唱 </mark> 示例工程
-
+>
+> Demo 效果:
+> 
+> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/singBattle/singBattleRoom_1.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/singBattle/singBattleRoom_2.jpg" width="300" height="640">
 ---
 
 ## 1. 环境准备
