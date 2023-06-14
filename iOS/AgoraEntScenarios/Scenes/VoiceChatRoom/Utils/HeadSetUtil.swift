@@ -18,7 +18,6 @@ class HeadSetUtil: NSObject {
                 || output.portType == .bluetoothLE
                 || output.portType == .bluetoothHFP
                 || output.portType == .bluetoothA2DP
-                || output.portType == .builtInSpeaker
                 || output.portType == .usbAudio {
                 return true
             }

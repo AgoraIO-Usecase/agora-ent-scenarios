@@ -542,6 +542,7 @@ public let kMPK_RTC_UID: UInt = 1
      */
     public func adjustMusicVolume(volume: Int) {
         musicPlayer?.adjustPlayoutVolume(Int32(volume))
+        musicPlayer?.adjustPublishSignalVolume(Int32(volume))
     }
 
     /**
