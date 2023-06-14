@@ -99,6 +99,12 @@ import AgoraRtcKit
     func onMusicLoadFail(songCode: Int, reason: SBGLoadSongFailReason)
 }
 
+@objc public protocol SBGLrcViewDelegate: NSObjectProtocol {
+    func onUpdatePitch(pitch: Float)
+    func onUpdateProgress(progress: Int)
+    func onDownloadLrcData(url: String)
+    func onHighPartTime(highStartTime: Int, highEndTime: Int)
+}
 
 //public protocol SBGJoinChorusStateListener: NSObjectProtocol {
 //
