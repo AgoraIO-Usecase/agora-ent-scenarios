@@ -613,6 +613,10 @@ extension VoiceRoomViewController {
             default: break
             }
         }
+        chatBar.micStateChangeClosure = { [weak self] state in
+            guard let self = self else { return }
+            self.rtckit.enableinearmonitoring(enable: state == .selected ? false : self.roomInfo?.room?.turn_InEar ?? false)
+        }
     }
 
     

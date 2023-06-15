@@ -91,9 +91,19 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
         var inEarModeIndex = earModes.firstIndex(where: { $0 == inEarMode }) ?? 0
         let hasHeadset = HeadSetUtil.hasHeadset()
         let tipsTextColor = hasHeadset ? UIColor(hex: "#979CBB") : UIColor(hex: "#FF1216")
-        let tipsText = hasHeadset ? "开启耳返可实时听到自己的声音, 唱歌的时候及时调整".show_localized : "使用耳返必须插入耳机，当前未检测到耳机".show_localized
+        // 查询自己有没有在麦上
+        let seatUser = ChatRoomServiceImp.getSharedInstance().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status == 0 })
+        let isMic = seatUser != nil && seatUser?.member?.micStatus == 1
+        var tipsText: String = ""
+        if hasHeadset && isMic {
+            tipsText = "开启耳返可实时听到自己的声音, 唱歌的时候及时调整".show_localized
+        } else if hasHeadset == false {
+            tipsText = "使用耳返必须插入耳机，当前未检测到耳机".show_localized
+        } else if isMic == false {
+            tipsText = "使用耳返必须开麦，当前未开麦".show_localized
+        }
         actionView.title(title: "耳返".show_localized)
-            .switchCell(title: "开启耳返".show_localized, isOn: isOn, isEnabel: hasHeadset)
+            .switchCell(title: "开启耳返".show_localized, isOn: isOn, isEnabel: hasHeadset && isMic)
             .tipsCell(iconName: "inEra_tips_icon", title: tipsText, titleColor: tipsTextColor)
             .sectionHeader(title: "耳返设置".show_localized, desc: nil)
             .sliderCell(title: "耳返音量".show_localized, value: inEar_volume, isEnable: isOn)
