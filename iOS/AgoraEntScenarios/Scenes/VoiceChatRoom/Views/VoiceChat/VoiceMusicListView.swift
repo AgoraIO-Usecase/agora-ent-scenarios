@@ -155,12 +155,14 @@ class VoiceMusicListView: UIView {
     
     private func eventHandler() {
         rtcKit?.backgroundMusicPlayingStatusClosure = { [weak self] state in
-            guard let self = self, state == .playBackAllLoopsCompleted else { return }
+            guard let self = self else { return }
             DispatchQueue.main.async {
                 if state == .playBackAllLoopsCompleted {
                     self.nextMusicHandler()
                 } else if state == .paused {
                     self.playOrPauseHandler(isPlay: false)
+                } else if state == .playing {
+                    self.rtcKit?.selectPlayerTrackMode(isOrigin: self.roomInfo?.room?.musicIsOrigin ?? true)
                 }
             }
         }
