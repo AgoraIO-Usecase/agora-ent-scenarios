@@ -50,6 +50,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         binding.mtChatroomWatch.setOnClickListener(this)
         binding.ivChatroomMore.setOnClickListener(this)
         binding.tvBGM.setOnClickListener(this)
+        binding.ivBGM.setOnClickListener(this)
     }
 
     fun setTitleMaxWidth() {
@@ -176,6 +177,11 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             binding.ivBGM.visibility = View.VISIBLE
             binding.tvBGM.visibility = View.VISIBLE
             binding.tvBGM.text = content
+            if (isSingerOn) {
+                binding.ivBGM.setImageResource(R.drawable.voice_icon_room_bgm_on)
+            } else {
+                binding.ivBGM.setImageResource(R.drawable.voice_icon_room_bgm_off)
+            }
         } else {
             binding.ivBGM.visibility = View.INVISIBLE
             binding.tvBGM.visibility = View.INVISIBLE
@@ -199,6 +205,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             binding.ivChatroomMore.id -> onLiveTopClickListener?.onClickMore(v)
             // bgm
             binding.tvBGM.id -> onLiveTopClickListener?.onClickBGM(v)
+            binding.ivBGM.id -> onLiveTopClickListener?.onClickBGM(v)
         }
     }
 }

@@ -27,7 +27,7 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvDialogTitle"
         style="@style/voice_bottom_sheet_title_style"
-        android:text="# 背景音乐"
+        android:text="@string/voice_chatroom_settings_bgm_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
@@ -64,7 +64,7 @@
         android:id="@+id/ivVolume"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:padding="10dp"
         android:src="@drawable/voice_icon_bgm_volume_dark"
         app:layout_constraintStart_toStartOf="@id/vBottom"
@@ -101,7 +101,7 @@
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:padding="4dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
         android:src="@drawable/voice_icon_bgm_next"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/ivVolume"
@@ -156,6 +156,23 @@
         app:layout_constraintStart_toStartOf="@id/cvVolume"
         app:layout_constraintEnd_toEndOf="@id/cvVolume"
         app:layout_constraintBottom_toBottomOf="@id/cvVolume"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvVolume"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="68dp"
+        android:background="#66000000"
+        android:textSize="14dp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:visibility="invisible"
+        android:text="99"
+        app:layout_constraintStart_toStartOf="@+id/slVolume"
+        app:layout_constraintEnd_toEndOf="@id/slVolume"
+        app:layout_constraintTop_toTopOf="@id/slVolume"
+        app:layout_constraintBottom_toBottomOf="@id/slVolume"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

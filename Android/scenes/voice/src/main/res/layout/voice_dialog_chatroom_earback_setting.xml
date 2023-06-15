@@ -28,7 +28,7 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/mtBottomSheetTitle"
         style="@style/voice_bottom_sheet_title_style"
-        android:text="耳返"
+        android:text="@string/voice_chatroom_settings_earback_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
@@ -37,7 +37,7 @@
         android:id="@+id/tvOpenSwitch"
         style="@style/voice_bottom_sheet_text_style"
         android:layout_marginStart="20dp"
-        android:text="开启耳返"
+        android:text="@string/voice_chatroom_settings_earback_on"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
 
@@ -67,10 +67,10 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:textColor="@color/voice_dark_grey_color_979cbb"
-        android:drawableLeft="@drawable/voice_icon_room_setting_introduce"
+        android:drawableStart="@drawable/voice_icon_room_setting_introduce"
         android:textSize="@dimen/voice_sp_12"
         android:textAlignment="textStart"
-        android:text="  开启耳返可实时听到自己的声音，唱歌的时候及时调整"
+        android:text="@string/voice_chatroom_settings_earback_tip"
         app:layout_constraintTop_toBottomOf="@+id/tvOpenSwitch"
         />
     
@@ -108,7 +108,7 @@
             android:id="@+id/tvVolumeTitle"
             style="@style/voice_bottom_sheet_text_style"
             android:layout_marginStart="20dp"
-            android:text="耳返音量"
+            android:text="@string/voice_chatroom_settings_earback_volume"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -116,10 +116,10 @@
             android:id="@+id/tvVolume"
             android:layout_width="30dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
+            android:layout_marginEnd="20dp"
             android:textColor="#6D7291"
             android:textSize="@dimen/voice_sp_14"
-            android:gravity="right"
+            android:gravity="end"
             android:text="100"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tvVolumeTitle"
@@ -257,7 +257,7 @@
         android:layout_marginStart="8dp"
         android:textColor="@color/voice_color_3c4267"
         android:textSize="@dimen/voice_sp_13"
-        android:text="耳返延时"
+        android:text="@string/voice_chatroom_settings_earback_ping"
         app:layout_constraintStart_toStartOf="@+id/cvPing"
         app:layout_constraintTop_toTopOf="@+id/cvPing" />
 
@@ -267,7 +267,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:textSize="@dimen/voice_sp_11"
-        android:text="请对着耳麦说话，测试实时耳返延时"
+        android:text="@string/voice_chatroom_settings_earback_ping_tips"
         android:textColor="@color/voice_color_979cbb"
         app:layout_constraintStart_toStartOf="@+id/cvPing"
         app:layout_constraintTop_toBottomOf="@+id/tvPingTitle" />

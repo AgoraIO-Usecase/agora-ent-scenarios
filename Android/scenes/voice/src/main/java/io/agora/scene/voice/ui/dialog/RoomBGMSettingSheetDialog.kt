@@ -2,11 +2,13 @@ package io.agora.scene.voice.ui.dialog
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Outline
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -100,18 +102,28 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
                 binding?.ivVolume?.isSelected = false
                 binding?.slVolume?.visibility = View.INVISIBLE
                 binding?.cvVolume?.visibility = View.INVISIBLE
+                binding?.tvVolume?.visibility = View.INVISIBLE
             } else {
                 binding?.ivVolume?.setImageResource(R.drawable.voice_icon_bgm_volume_light)
                 binding?.ivVolume?.isSelected = true
                 binding?.slVolume?.visibility = View.VISIBLE
                 binding?.cvVolume?.visibility = View.VISIBLE
+                binding?.tvVolume?.visibility = View.VISIBLE
+            }
+        }
+        binding?.tvVolume?.clipToOutline = true
+        binding?.tvVolume?.outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: Outline) {
+                outline.setRoundRect(0, 0, view.width, view.height, 8f)
             }
         }
         binding?.slVolume?.max = 100
-        binding?.slVolume?.progress = AgoraRtcEngineController.get().bgmManager().params.volume
+        binding?.slVolume?.progress = bgmManager.params.volume
+        binding?.tvVolume?.text = bgmManager.params.volume.toString()
         binding?.slVolume?.setOnSeekBarChangeListener(object: OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 AgoraRtcEngineController.get().bgmManager().setVolume(p1)
+                binding?.tvVolume?.text = p1.toString()
             }
             override fun onStartTrackingTouch(p0: SeekBar?) {
 
@@ -125,7 +137,7 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
         val bgmManager = AgoraRtcEngineController.get().bgmManager()
         bgmManager.fetchBGMList { list ->
             binding?.rvMusicList?.post {
-                binding?.tvDialogTitle?.text = "背景音乐(${list?.size ?: 0})"
+                binding?.tvDialogTitle?.text = getString(R.string.voice_chatroom_settings_bgm_title, list?.size ?: 0)
                 adapter.updateDataSource(list?.toList() ?: listOf())
                 adapter.updatePlaying(bgmManager.params.isAutoPlay)
                 if (bgmManager.bgm == null) {
