@@ -64,14 +64,13 @@ extension VoiceRoomViewController {
 
     // 下麦
     func leaveMic(with index: Int) {
-        chatBar.refresh(event: .mic, state: .selected, asCreator: false)
         ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: index) { error, mic in
             if error == nil,let mic = mic {
                 self.rtcView.updateUser(mic)
                 self.rtckit.setClientRole(role: .audience)
                 self.local_index = nil
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: self.isOwner)
-                self.chatBar.refresh(event: .mic, state: .selected, asCreator: self.isOwner)
+                self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: self.isOwner)
             }
         }
         

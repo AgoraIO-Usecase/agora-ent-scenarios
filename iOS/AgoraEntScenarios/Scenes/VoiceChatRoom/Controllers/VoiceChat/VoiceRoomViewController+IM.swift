@@ -293,6 +293,8 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 roomInfo?.mic_info = ChatRoomServiceImp.getSharedInstance().mics
                 rtcView.updateUser(first)
                 refreshApplicants(chat_uid: fromId)
+                let seatUser = ChatRoomServiceImp.getSharedInstance().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
+                rtckit.enableinearmonitoring(enable: seatUser == nil ? false : roomInfo?.room?.turn_InEar ?? false)
             }
         }
     }
