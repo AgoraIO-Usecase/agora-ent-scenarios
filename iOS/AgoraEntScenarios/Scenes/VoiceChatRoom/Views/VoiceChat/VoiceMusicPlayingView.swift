@@ -444,6 +444,13 @@ class VoiceMusicPlayingView: UIView {
         return button
     }()
     private var voiceModel: VoiceMusicModel?
+    private var isOwner: Bool = false
+    
+    init(isOwner: Bool) {
+        super.init(frame: .zero)
+        self.isOwner = isOwner
+        setupUI()
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -504,6 +511,7 @@ class VoiceMusicPlayingView: UIView {
     
     @objc
     private func onClickAccompanyButton(sender: UIButton) {
+        guard isOwner else { return }
         sender.isSelected = !sender.isSelected
         onClickAccompanyButtonClosure?(sender.isSelected)
     }
