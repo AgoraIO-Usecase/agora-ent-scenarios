@@ -116,6 +116,17 @@ class VoiceMusicListView: UIView {
         }
     }
     
+    func updatePlayStatus(model: VoiceMusicModel?) {
+        musicList.forEach({
+            if $0.songCode == model?.songCode {
+                $0.status = model?.status ?? .none
+                musicToolView.setupMusicInfo(model: $0, isOrigin: roomInfo?.room?.musicIsOrigin ?? true)
+                return
+            }
+        })
+        tableView.reloadData()
+    }
+    
     private func getMusicList() {
         rtcKit?.fetchMusicList(musicListCallback: { [weak self] list in
             guard let self = self else { return }
@@ -136,6 +147,7 @@ class VoiceMusicListView: UIView {
             if !self.musicList.isEmpty && self.currentMusic == nil {
                 self.musicList[0].status = .pause
                 self.musicToolView.setupMusicInfo(model: self.musicList[0], isOrigin: self.isOrigin)
+                self.currentMusic = self.musicList.first
             }
             self.tableView.reloadData()
         })
@@ -291,6 +303,7 @@ extension VoiceMusicListView: UITableViewDataSource, UITableViewDelegate {
         rtcKit?.stopMusic()
         rtcKit?.playMusic(songCode: model.songCode)
         currentIndex = indexPath.row
+        currentMusic = model
         musicToolView.setupMusicInfo(model: model, isOrigin: isOrigin)
         backgroundMusicPlaying?(model)
         tableView.reloadData()

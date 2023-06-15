@@ -406,6 +406,8 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                     guard let useRobotBlock = self?.useRobotBlock else { return }
                     self?.isTouchAble = flag
                     useRobotBlock(flag)
+                    self?.roomInfo?.room?.backgroundMusic?.status = .pause
+                    self?.musicListView.updatePlayStatus(model: self?.roomInfo?.room?.backgroundMusic)
                 }
                 return cell
             } else if indexPath.row == 1 {
