@@ -715,6 +715,8 @@ extension VoiceRoomViewController: VMMusicPlayerDelegate {
                 }
             } else if state == .paused {
                 roomInfo?.room?.backgroundMusic?.status = .pause
+            } else if state == .playing {
+                rtckit.selectPlayerTrackMode(isOrigin: roomInfo?.room?.musicIsOrigin ?? true)
             }
         }
     }
