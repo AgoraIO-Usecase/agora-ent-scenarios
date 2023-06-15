@@ -91,7 +91,7 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
 //            }
 //            showDialogWithMode(mode)
 //        }
-        setPing(60)
+        setPing(earBackManager.params.delay)
         earBackManager.setOnEarBackDelayChanged { value ->
             binding?.root?.post {
                 setPing(value)
@@ -163,14 +163,15 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
             binding?.cbSwitch?.isChecked = false
             binding?.cbSwitch?.isEnabled = false
             binding?.tvTips?.setTextColor(Color.rgb(255, 18, 22))
-            binding?.tvTips?.text = "  使用耳返必须插入耳机，当前未检测到耳机"
+
+            binding?.tvTips?.text = getString(R.string.voice_chatroom_settings_earback_waring)
             binding?.vSettingMark?.visibility = View.VISIBLE
             binding?.clSetting?.alpha = 0.3f
             binding?.vPingMark?.visibility = View.VISIBLE
             return
         }
         binding?.tvTips?.setTextColor(ContextCompat.getColor(c, R.color.voice_dark_grey_color_979cbb))
-        binding?.tvTips?.text = "  开启耳返可实时听到自己的声音，唱歌的时候及时调整"
+        binding?.tvTips?.text = getString(R.string.voice_chatroom_settings_earback_tip)
         binding?.cbSwitch?.isEnabled = true
         val isOn = AgoraRtcEngineController.get().earBackManager().params.isOn
         binding?.cbSwitch?.isChecked = isOn

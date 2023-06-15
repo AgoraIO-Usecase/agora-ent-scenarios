@@ -1,6 +1,7 @@
 package io.agora.scene.voice.rtckit
 
 import android.content.Context
+import android.util.Log
 import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
@@ -28,7 +29,7 @@ class AgoraRtcEngineController {
         @JvmStatic
         fun get() = InstanceHelper.sSingle
 
-        private const val TAG = "AgoraRtcEngineController"
+        private const val TAG = "ENGINE_CONTROLLER_LOG"
     }
 
     object InstanceHelper {
@@ -46,6 +47,8 @@ class AgoraRtcEngineController {
     private var mRtmToken = ""
 
     private var micVolumeListener: RtcMicVolumeListener? = null
+
+    private var mEnableLocalAudio = true
 
     fun setMicVolumeListener(micVolumeListener: RtcMicVolumeListener) {
         this.micVolumeListener = micVolumeListener
@@ -97,6 +100,7 @@ class AgoraRtcEngineController {
     fun earBackManager(): AgoraEarBackManager {
         if (mEarBackManager == null) {
             mEarBackManager = AgoraEarBackManager(rtcEngine!!)
+            mEarBackManager?.setForbidden(!mEnableLocalAudio)
         }
         return mEarBackManager!!
     }
@@ -380,7 +384,10 @@ class AgoraRtcEngineController {
      * 本地mute/unmute
      */
     fun enableLocalAudio(enable: Boolean) {
+        Log.d(TAG, "set local audio enable: $enable")
+        mEnableLocalAudio = enable
         rtcEngine?.enableLocalAudio(enable)
+        mEarBackManager?.setForbidden(!enable)
     }
 
     fun destroy() {
