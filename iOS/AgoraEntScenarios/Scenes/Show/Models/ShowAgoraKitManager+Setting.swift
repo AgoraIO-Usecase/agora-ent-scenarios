@@ -189,7 +189,7 @@ extension ShowAgoraKitManager {
        
     }
     
-    /// 设置观众端画质增强
+    /// 设置观众端超分
     private func _setQualityEnable(_ isOn: Bool){
         ShowSettingKey.SR.writeValue(isOn)
     }

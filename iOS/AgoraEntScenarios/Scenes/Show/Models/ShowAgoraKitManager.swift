@@ -112,7 +112,7 @@ class ShowAgoraKitManager: NSObject {
     }
     
     //MARK: private
-    private func setupContentInspectConfig(_ enable: Bool) {
+    private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
         let config = AgoraContentInspectConfig()
         let dic: [String: String] = [
             "id": VLUserCenter.user.id,
@@ -129,7 +129,7 @@ class ShowAgoraKitManager: NSObject {
         module.interval = 30
         module.type = .moderation
         config.modules = [module]
-        let ret = agoraKit.enableContentInspect(enable, config: config)
+        let ret = agoraKit.enableContentInspectEx(enable, config: config, connection: connection)
         showLogger.info("setupContentInspectConfig: \(ret)")
     }
     
@@ -191,9 +191,10 @@ class ShowAgoraKitManager: NSObject {
             agoraKit.joinChannelEx(byToken: token,
                                    connection: connection,
                                    delegate: proxy,
-                                   mediaOptions: mediaOptions) { channelName, uid, elapsed in
+                                   mediaOptions: mediaOptions) {[weak self] channelName, uid, elapsed in
                 let cost = Int(-date.timeIntervalSinceNow * 1000)
                 showLogger.info("join room[\(channelName)] ex success uid: \(uid) cost \(cost) ms", context: kShowLogBaseContext)
+                self?.setupContentInspectConfig(true, connection: connection)
             }
             agoraKit.updateChannelEx(with: mediaOptions, connection: connection)
             exConnectionMap[targetChannelId] = connection

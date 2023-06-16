@@ -18,7 +18,7 @@ PODS:
   - Agora_Chat_iOS (1.0.8)
   - AgoraLyricsScore (1.1.1-beta-3)
   - AgoraRtm_iOS (1.5.1)
-  - AgoraSyncManager (2.0.7):
+  - AgoraSyncManager (2.0.8):
     - SocketRocket
   - Bugly (2.5.93)
   - HWWeakTimer (1.0)
@@ -68,7 +68,7 @@ DEPENDENCIES:
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraLyricsScore (= 1.1.1-beta-3)
   - AgoraRtm_iOS (= 1.5.1)
-  - AgoraSyncManager (~> 2.0.7)
+  - AgoraSyncManager (~> 2.0.8)
   - Bugly (= 2.5.93)
   - HWWeakTimer (= 1.0)
   - JXCategoryView (= 1.6.1)
@@ -137,7 +137,7 @@ SPEC CHECKSUMS:
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
-  AgoraSyncManager: 10597d95b7aafb6292b8d177ee06db58a6071406
+  AgoraSyncManager: 33b8ecf2cd80550f156612d6175a0b0ed1d48497
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
@@ -164,6 +164,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 0a303450567ee3f0055a545e78e81f59d8c6a55d
+PODFILE CHECKSUM: 4ce4ba0c5d7b41d97799cc8227c1ef53072730d4
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.0

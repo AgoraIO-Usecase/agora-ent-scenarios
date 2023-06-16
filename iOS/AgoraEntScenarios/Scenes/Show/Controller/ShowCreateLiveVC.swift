@@ -183,6 +183,9 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         AppContext.showServiceImp(createView.roomNo).createRoom(roomName: roomName,
                                                                 roomId: roomId,
                                                                 thumbnailId: createView.roomBg) { [weak self] err, detailModel in
+            if err != nil {
+                ToastView.show(text: err!.localizedDescription)
+            }
 //            liveVC.agoraKit = self?.agoraKitManager.agoraKit
             guard let wSelf = self, let detailModel = detailModel else { return }
             let liveVC = ShowLivePagesViewController()

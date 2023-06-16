@@ -937,7 +937,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
         showLogger.warning("contentInspectResult: \(result.rawValue)")
-        guard result == .porn else { return }
+        guard result != .neutral else { return }
         ToastView.show(text: "监测到当前内容存在违规行为")
     }
     
