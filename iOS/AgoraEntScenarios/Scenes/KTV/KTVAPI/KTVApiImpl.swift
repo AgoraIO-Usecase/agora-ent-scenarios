@@ -7,7 +7,6 @@
 
 import Foundation
 import AgoraRtcKit
-import AgoraLyricsScore
 
 /// 加载歌曲状态
 @objc public enum KTVLoadSongState: Int {
@@ -224,7 +223,7 @@ extension KTVApiImpl: KTVApiDelegate {
        mcc?.renewToken(rtmToken)
            // 更新合唱频道RtcToken
            if let subChorusConnection = subChorusConnection {
-               var channelMediaOption = AgoraRtcChannelMediaOptions()
+               let channelMediaOption = AgoraRtcChannelMediaOptions()
                channelMediaOption.token = chorusChannelRtcToken
                apiConfig?.engine?.updateChannelEx(with: channelMediaOption, connection: subChorusConnection)
         }
@@ -918,7 +917,7 @@ extension KTVApiImpl {
         
         guard timer == nil else { return }
 
-        timer = Timer.scheduledTimer(withTimeInterval: 0.05, block: {[weak self] timer in
+        timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true, block: {[weak self] timer in
             guard let self = self else {
                 timer.invalidate()
                 return
@@ -942,7 +941,7 @@ extension KTVApiImpl {
             }
             self.setProgress(with: Int(current ))
             self.oldPitch = self.pitch
-        }, repeats: true)
+        })
     }
 
     private func setPlayerState(with state: AgoraMediaPlayerState) {
