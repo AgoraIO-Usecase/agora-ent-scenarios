@@ -134,6 +134,7 @@
     <string name="voice_chatroom_settings_bgm_title">背景音乐(%d)</string>
     <string name="voice_chatroom_settings_earback_title">耳返</string>
     <string name="voice_chatroom_settings_earback_on">开启耳返</string>
+    <string name="voice_chatroom_settings_earback_forbidden_toast">仅上麦用户可以使用耳返</string>
     <string name="voice_chatroom_settings_earback_tip">&#160;&#160;开启耳返可实时听到自己的声音，唱歌的时候及时调整</string>
     <string name="voice_chatroom_settings_earback_waring">&#160;&#160;使用耳返必须插入耳机，当前未检测到耳机</string>
     <string name="voice_chatroom_settings_earback_setting">耳返设置</string>

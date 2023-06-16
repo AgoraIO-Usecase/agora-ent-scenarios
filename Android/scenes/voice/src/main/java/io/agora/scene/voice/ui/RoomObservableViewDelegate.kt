@@ -645,6 +645,10 @@ class RoomObservableViewDelegate constructor(
     /** 耳返设置弹框
      */
     fun onEarBackSettingDialog() {
+        if (AgoraRtcEngineController.get().earBackManager().params.isForbidden) {
+            ToastTools.showTips(activity, activity.getString(R.string.voice_chatroom_settings_earback_forbidden_toast))
+            return
+        }
         val dialog = RoomEarBackSettingSheetDialog()
         dialog.setFragmentManager(activity.supportFragmentManager)
         dialog.setOnEarBackStateChange {
