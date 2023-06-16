@@ -572,7 +572,6 @@
 		E357354729EFD719009D54E1 /* VLKTVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E357354229EFD718009D54E1 /* VLKTVViewController.m */; };
 		E357354829EFD719009D54E1 /* VLCreateRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E357354329EFD718009D54E1 /* VLCreateRoomViewController.m */; };
 		E357355829EFD74A009D54E1 /* KTVApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357354A29EFD74A009D54E1 /* KTVApiImpl.swift */; };
-		E357355A29EFD74A009D54E1 /* KTVApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357354C29EFD74A009D54E1 /* KTVApi.swift */; };
 		E357355C29EFD74A009D54E1 /* KTVLrcControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357354E29EFD74A009D54E1 /* KTVLrcControl.swift */; };
 		E357355D29EFD74A009D54E1 /* AgoraMiguXmlLrcParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357355029EFD74A009D54E1 /* AgoraMiguXmlLrcParse.swift */; };
 		E357355E29EFD74A009D54E1 /* AgoraLrcParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357355129EFD74A009D54E1 /* AgoraLrcParse.swift */; };
@@ -586,6 +585,7 @@
 		E357356A29EFD8B5009D54E1 /* VLSoundEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = E357356829EFD8B5009D54E1 /* VLSoundEffectView.m */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
+		E3BA36E32A2F2C6500ACD073 /* KTVApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3BA36E22A2F2C6500ACD073 /* KTVApi.swift */; };
 		E72D78792A27416C00C9134C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E72D78772A27416C00C9134C /* Localizable.strings */; };
 		E751D85D29F11723001354CA /* AUiMoreDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E751D85C29F11723001354CA /* AUiMoreDialog.swift */; };
 /* End PBXBuildFile section */
@@ -1334,7 +1334,6 @@
 		E357354329EFD718009D54E1 /* VLCreateRoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCreateRoomViewController.m; sourceTree = "<group>"; };
 		E357354529EFD718009D54E1 /* VLKTVViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVViewController.h; sourceTree = "<group>"; };
 		E357354A29EFD74A009D54E1 /* KTVApiImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApiImpl.swift; sourceTree = "<group>"; };
-		E357354C29EFD74A009D54E1 /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
 		E357354E29EFD74A009D54E1 /* KTVLrcControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLrcControl.swift; sourceTree = "<group>"; };
 		E357355029EFD74A009D54E1 /* AgoraMiguXmlLrcParse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraMiguXmlLrcParse.swift; sourceTree = "<group>"; };
 		E357355129EFD74A009D54E1 /* AgoraLrcParse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraLrcParse.swift; sourceTree = "<group>"; };
@@ -1353,6 +1352,7 @@
 		E358F803293494C100A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
 		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
+		E3BA36E22A2F2C6500ACD073 /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
 		E72D78782A27416C00C9134C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E72D787A2A27418600C9134C /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		E751D85C29F11723001354CA /* AUiMoreDialog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiMoreDialog.swift; sourceTree = "<group>"; };
@@ -3302,7 +3302,7 @@
 			isa = PBXGroup;
 			children = (
 				E357354A29EFD74A009D54E1 /* KTVApiImpl.swift */,
-				E357354C29EFD74A009D54E1 /* KTVApi.swift */,
+				E3BA36E22A2F2C6500ACD073 /* KTVApi.swift */,
 			);
 			path = KTVAPI;
 			sourceTree = "<group>";
@@ -3570,7 +3570,6 @@
 				DDA199F028FFE579009D3E61 /* BaseViewController.m in Sources */,
 				DD619ACE29E3E247008F63E4 /* SAUserView.swift in Sources */,
 				DD36107229B70CDC00CE7984 /* BEEffectManager.mm in Sources */,
-				E357355A29EFD74A009D54E1 /* KTVApi.swift in Sources */,
 				DD619C0429E3E81D008F63E4 /* AboutAgoraEntertainmentViewController.swift in Sources */,
 				DDA199ED28FFE579009D3E61 /* VLBaseView.m in Sources */,
 				DD3610CD29B70F3300CE7984 /* VLMineSwitchCell.swift in Sources */,
@@ -3763,6 +3762,7 @@
 				DD3610AC29B70CDC00CE7984 /* ShowRoomListCell.swift in Sources */,
 				DD5EBDC3299F201D00F36349 /* KTVDebugManager.m in Sources */,
 				DD619A8929E3E247008F63E4 /* SAGiftEntity.swift in Sources */,
+				E3BA36E32A2F2C6500ACD073 /* KTVApi.swift in Sources */,
 				DDA199F828FFE579009D3E61 /* NSDictionary+JKSafeAccess.m in Sources */,
 				DD619A8F29E3E247008F63E4 /* SpatialAudioServiceProtocol.swift in Sources */,
 				DD619BE629E3E262008F63E4 /* VoiceRoomPresentView.swift in Sources */,
