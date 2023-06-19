@@ -9,6 +9,16 @@ import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 
 /**
+ * KTV场景类型
+ * @param Normal 普通独唱或多人合唱
+ * @param SingBattle 嗨歌抢唱
+ */
+enum class KTVType(val value: Int)  {
+    Normal(0),
+    SingBattle(1)
+}
+
+/**
  * 在KTVApi中的身份
  * @param SoloSinger 独唱者: 当前只有自己在唱歌
  * @param CoSinger 合唱者: 加入合唱需要通过调用switchSingerRole将切换身份成合唱
@@ -81,7 +91,7 @@ interface ILrcView {
 
     /**
      * ktvApi内部更新音乐播放进度progress时会主动调用此方法将进度值progress传给你的歌词组件，50ms回调一次
-     * @param progress 歌曲播放的真实进度 50ms回调一次
+     * @param progress 歌曲播放的真实进度 20ms回调一次
      */
     fun onUpdateProgress(progress: Long?)
 
@@ -89,6 +99,11 @@ interface ILrcView {
      * ktvApi获取到歌词地址时会主动调用此方法将歌词地址url传给你的歌词组件，您需要在这个回调内完成歌词的下载
      */
     fun onDownloadLrcData(url: String?)
+
+    /**
+     * ktvApi获取到抢唱切片歌曲副歌片段时间时，会调用此方法回调给歌词组件
+     */
+    fun onHighPartTime(highStartTime: Long, highEndTime: Long)
 }
 
 /**
@@ -178,15 +193,11 @@ abstract class IKTVApiEventHandler {
  * @param rtmToken 创建 Mcc Engine 需要
  * @param engine RTC engine 对象
  * @param channelName 频道号，子频道名以基于主频道名 + "_ex" 固定规则生成频道号
- * Player 状态同步
- * 打分结果同步
- * 歌词同步
- * pitch同步
- * 建议你为KTVApi单独创建一个新的dataStreamId
  * @param localUid 创建 Mcc engine 和 加入子频道需要用到
  * @param chorusChannelName 子频道名 加入子频道需要用到
  * @param chorusChannelToken 子频道token 加入子频道需要用到
  * @param maxCacheSize 最大缓存歌曲数
+ * @param type KTV场景
  */
 data class KTVApiConfig(
     val appId: String,
@@ -196,7 +207,8 @@ data class KTVApiConfig(
     val localUid: Int,
     val chorusChannelName: String,
     val chorusChannelToken: String,
-    val maxCacheSize: Int = 10
+    val maxCacheSize: Int = 10,
+    val type: KTVType = KTVType.Normal
 )
 
 /**
