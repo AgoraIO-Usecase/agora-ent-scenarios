@@ -1176,13 +1176,10 @@ public class RoomLivingViewModel extends ViewModel {
             jsonObject.put("sceneName", "ktv");
             jsonObject.put("id", UserManager.getInstance().getUser().id.toString());
             contentInspectConfig.extraInfo = jsonObject.toString();
-            ContentInspectConfig.ContentInspectModule module1 = new ContentInspectConfig.ContentInspectModule();
-            module1.interval = 30;
-            module1.type = CONTENT_INSPECT_TYPE_SUPERVISE;
-            ContentInspectConfig.ContentInspectModule module2 = new ContentInspectConfig.ContentInspectModule();
-            module2.interval = 30;
-            module2.type = CONTENT_INSPECT_TYPE_MODERATION;
-            contentInspectConfig.modules = new ContentInspectConfig.ContentInspectModule[] { module1, module2 };
+            ContentInspectConfig.ContentInspectModule module = new ContentInspectConfig.ContentInspectModule();
+            module.interval = 30;
+            module.type = CONTENT_INSPECT_TYPE_MODERATION;
+            contentInspectConfig.modules = new ContentInspectConfig.ContentInspectModule[] { module };
             contentInspectConfig.moduleCount = 2;
             mRtcEngine.enableContentInspect(true, contentInspectConfig);
         } catch (JSONException e) {

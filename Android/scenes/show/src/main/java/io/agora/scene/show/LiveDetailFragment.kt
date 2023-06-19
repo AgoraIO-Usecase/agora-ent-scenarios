@@ -1346,13 +1346,10 @@ class LiveDetailFragment : Fragment() {
             jsonObject.put("sceneName", "show")
             jsonObject.put("id", UserManager.getInstance().user.id)
             contentInspectConfig.extraInfo = jsonObject.toString()
-            val module1 = ContentInspectModule()
-            module1.interval = 1
-            module1.type = CONTENT_INSPECT_TYPE_SUPERVISE
-            val module2 = ContentInspectModule()
-            module2.interval = 1
-            module2.type = CONTENT_INSPECT_TYPE_MODERATION
-            contentInspectConfig.modules = arrayOf( module2)
+            val module = ContentInspectModule()
+            module.interval = 30
+            module.type = CONTENT_INSPECT_TYPE_MODERATION
+            contentInspectConfig.modules = arrayOf( module)
             contentInspectConfig.moduleCount = 1
             mRtcEngine.enableContentInspectEx(true, contentInspectConfig, mMainRtcConnection)
         }
