@@ -1121,7 +1121,7 @@ public class RoomLivingViewModel extends ViewModel {
                 roomInfoLiveData.getValue().getRoomNo(),
                 UserManager.getInstance().getUser().id.intValue(),
                 roomInfoLiveData.getValue().getRoomNo() + "_ex",
-                roomInfoLiveData.getValue().getAgoraChorusToken(), 10)
+                roomInfoLiveData.getValue().getAgoraChorusToken(), 10, KTVType.Normal)
         );
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
