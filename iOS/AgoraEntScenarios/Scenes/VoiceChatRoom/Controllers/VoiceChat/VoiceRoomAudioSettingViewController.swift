@@ -149,7 +149,14 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
             actionView.updateSwitchStatus(indexPath: switchIndexPath, isOn: hasHeadset ? isOn : false, isEnable: hasHeadset && isMic)
             let tipsIndexPath = IndexPath(row: 1, section: 0)
             let tipsTextColor = hasHeadset ? UIColor(hex: "#979CBB") : UIColor(hex: "#FF1216")
-            let tipsText = hasHeadset ? "开启耳返可实时听到自己的声音, 唱歌的时候及时调整".show_localized : "使用耳返必须插入耳机，当前未检测到耳机".show_localized
+            var tipsText: String = ""
+            if hasHeadset && isMic {
+                tipsText = "开启耳返可实时听到自己的声音, 唱歌的时候及时调整".show_localized
+            } else if hasHeadset == false {
+                tipsText = "使用耳返必须插入耳机，当前未检测到耳机".show_localized
+            } else if isMic == false {
+                tipsText = "使用耳返必须开麦，当前未开麦".show_localized
+            }
             actionView.updateTipsCellTitle(indexPath: tipsIndexPath, title: tipsText, titleColor: tipsTextColor)
             let sliderIndexPath = IndexPath(row: 0, section: 1)
             let inEar_volume = Double((self.roomInfo?.room?.inEar_volume ?? 0)) / 100.0
