@@ -142,8 +142,11 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
         // 监听耳机插入
         HeadSetUtil.addHeadsetObserver { hasHeadset in
             let isOn = (self.roomInfo?.room?.turn_InEar ?? false)
+            // 查询自己有没有在麦上
+            let seatUser = ChatRoomServiceImp.getSharedInstance().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status == 0 })
+            let isMic = seatUser != nil && seatUser?.member?.micStatus == 1
             let switchIndexPath = IndexPath(row: 0, section: 0)
-            actionView.updateSwitchStatus(indexPath: switchIndexPath, isOn: hasHeadset ? isOn : false, isEnable: hasHeadset)
+            actionView.updateSwitchStatus(indexPath: switchIndexPath, isOn: hasHeadset ? isOn : false, isEnable: hasHeadset && isMic)
             let tipsIndexPath = IndexPath(row: 1, section: 0)
             let tipsTextColor = hasHeadset ? UIColor(hex: "#979CBB") : UIColor(hex: "#FF1216")
             let tipsText = hasHeadset ? "开启耳返可实时听到自己的声音, 唱歌的时候及时调整".show_localized : "使用耳返必须插入耳机，当前未检测到耳机".show_localized
