@@ -178,8 +178,10 @@ extension KTVApiImpl: KTVApiDelegate {
         self.songIdentifier = config.songIdentifier
         if config.autoPlay {
             // 主唱自动播放歌曲
-            switchSingerRole(newRole: .soloSinger) { _, _ in
-                
+            if singerRole != .leadSinger {
+                switchSingerRole(newRole: .soloSinger) { _, _ in
+                    
+                }
             }
             startSing(url: url, startPos: 0)
         }
@@ -575,9 +577,12 @@ extension KTVApiImpl {
                 
                 if (config.autoPlay) {
                     // 主唱自动播放歌曲
-                    self.switchSingerRole(newRole: .soloSinger) { _, _ in
-                        
+                    if self.singerRole != .leadSinger {
+                        self.switchSingerRole(newRole: .soloSinger) { _, _ in
+                            
+                        }
                     }
+
                     self.startSing(songCode: self.songCode, startPos: 0)
                 }
             }
@@ -613,9 +618,12 @@ extension KTVApiImpl {
                             }
                             if config.autoPlay {
                                 // 主唱自动播放歌曲
-                                self.switchSingerRole(newRole: .soloSinger) { _, _ in
-                                    
+                                if self.singerRole != .leadSinger {
+                                    self.switchSingerRole(newRole: .soloSinger) { _, _ in
+                                        
+                                    }
                                 }
+
                                 self.startSing(songCode: self.songCode, startPos: 0)
                             }
                         }
@@ -623,8 +631,10 @@ extension KTVApiImpl {
                         agoraPrint("loadMusicOnly: songCode:\(songCode) load success")
                         if config.autoPlay {
                             // 主唱自动播放歌曲
-                            self.switchSingerRole(newRole: .soloSinger) { _, _ in
-                                
+                            if self.singerRole != .leadSinger {
+                                self.switchSingerRole(newRole: .soloSinger) { _, _ in
+                                    
+                                }
                             }
                             self.startSing(songCode: self.songCode, startPos: 0)
                         }
