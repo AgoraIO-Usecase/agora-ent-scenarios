@@ -1180,7 +1180,7 @@ public class RoomLivingViewModel extends ViewModel {
             module.interval = 30;
             module.type = CONTENT_INSPECT_TYPE_MODERATION;
             contentInspectConfig.modules = new ContentInspectConfig.ContentInspectModule[] { module };
-            contentInspectConfig.moduleCount = 2;
+            contentInspectConfig.moduleCount = 1;
             mRtcEngine.enableContentInspect(true, contentInspectConfig);
         } catch (JSONException e) {
             KTVLogger.e(TAG, e.toString());
