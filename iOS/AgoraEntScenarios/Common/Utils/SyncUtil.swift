@@ -52,12 +52,28 @@ class SyncUtil: NSObject {
             manager.joinScene(sceneId: id) { sceneRef in
                 sceneRefs[id] = sceneRef
                 let attr = Attribute(key: id, value: jsonString)
-                success?(attr)
+                mainTreadTask {
+                    success?(attr)
+                }
             } fail: { error in
-                fail?(error)
+                mainTreadTask {
+                    fail?(error)
+                }
             }
         }) { error in
-            fail?(error)
+            mainTreadTask {
+                fail?(error)
+            }
+        }
+    }
+    
+    class func mainTreadTask(_ task: (()->())?){
+        if Thread.isMainThread {
+            task?()
+        }else{
+            DispatchQueue.main.async {
+                task?()
+            }
         }
     }
 
