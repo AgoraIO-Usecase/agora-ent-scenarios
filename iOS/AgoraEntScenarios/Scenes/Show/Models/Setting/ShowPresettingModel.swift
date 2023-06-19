@@ -31,9 +31,9 @@ enum ShowPresetType: Int {
     case show_low   // 秀场低端
     case show_medium    // 秀场终端
     case show_high      // 秀场高端
-    case quality_low    // 画质增强低端
-    case quality_medium // 画质增强中端
-    case quality_high   // 画质增强高端
+    case quality_low    // 超分低端
+    case quality_medium // 超分中端
+    case quality_high   // 超分高端
     case base_low       // 基础模式低端
     case base_medium    // 基础模式中端
     case base_high      // 基础模式高端

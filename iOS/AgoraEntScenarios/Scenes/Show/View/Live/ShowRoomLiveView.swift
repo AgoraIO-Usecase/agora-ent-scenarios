@@ -169,6 +169,7 @@ class ShowRoomLiveView: UIView {
             make.height.equalTo(168)
         }
     
+        chatButton.isHidden = true
         addSubview(chatButton)
         chatButton.snp.makeConstraints { make in
             let bottomOffset = Screen.safeAreaBottomHeight() + 4

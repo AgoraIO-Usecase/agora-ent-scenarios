@@ -72,10 +72,10 @@
 //        default:
 //            break;
 //    }
-    if (!KeyCenter.IMAppKey.isNotBlank || !KeyCenter.IMClientId.isNotBlank || !KeyCenter.IMClientSecret.isNotBlank) {
-        [VLToast toast:@"IMAppKey / IMClientId / IMClientSecret 未配置"];
-        return;
-    }
+//    if (!KeyCenter.IMAppKey.isNotBlank || !KeyCenter.IMClientId.isNotBlank || !KeyCenter.IMClientSecret.isNotBlank) {
+//        [VLToast toast:@"IMAppKey / IMClientId / IMClientSecret 未配置"];
+//        return;
+//    }
 
     NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow"];
     [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];

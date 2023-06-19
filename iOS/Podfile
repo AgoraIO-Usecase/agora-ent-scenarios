@@ -36,8 +36,8 @@ def all_pods
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
   
-  pod 'AgoraSyncManager', '~> 2.0.7'
-  pod 'KTVApi', '1.0.0.1'
+  pod 'AgoraSyncManager', '~> 2.0.8'
+
   pod 'sdk', :path => 'sdk.podspec'
 #  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'

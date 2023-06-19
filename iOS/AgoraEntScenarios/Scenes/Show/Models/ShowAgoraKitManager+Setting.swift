@@ -31,6 +31,7 @@ extension ShowAgoraKitManager {
         case x1_5 = 8
         case x2 = 3
         case x_sharpen = 11
+        case x_superQuality = 20
     }
     
     private var dimensionsItems: [CGSize] {
@@ -81,6 +82,7 @@ extension ShowAgoraKitManager {
         if srType == .none {
             agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
         }else{
+            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
             agoraKit.setParameters("{\"rtc.video.sr_type\":\(srType.rawValue)}")
             agoraKit.setParameters("{\"rtc.video.sr_max_wh\":\(921600)}")
             // enabled要放在srType之后 否则修改超分倍数可能不会立即生效
@@ -117,7 +119,7 @@ extension ShowAgoraKitManager {
                 if videoWidth <= 540 {
                     srType = .x1_33
                 } else if videoWidth == 720 {
-                    srType = .x1_5
+                    srType = .x_superQuality
                 } else {
                     srType = .none
                 }
@@ -132,7 +134,7 @@ extension ShowAgoraKitManager {
                 }else if videoWidth <= 540 {
                     srType = .x1_33
                 }else if videoWidth == 720 {
-                    srType = .x1_5
+                    srType = .x_superQuality
                 }else {
                     srType = .none
                 }
@@ -187,7 +189,7 @@ extension ShowAgoraKitManager {
        
     }
     
-    /// 设置观众端画质增强
+    /// 设置观众端超分
     private func _setQualityEnable(_ isOn: Bool){
         ShowSettingKey.SR.writeValue(isOn)
     }
