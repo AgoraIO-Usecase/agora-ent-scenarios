@@ -132,26 +132,26 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
 
     private fun setupClickPhoneAction() {
         adapter.onClickPhoneListener = {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    android.Manifest.permission.CALL_PHONE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CALL_PHONE), 1)
-            } else {
+//            if (ContextCompat.checkSelfPermission(
+//                    this,
+//                    android.Manifest.permission.CALL_PHONE
+//                ) != PackageManager.PERMISSION_GRANTED
+//            ) {
+//                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CALL_PHONE), 1)
+//            } else {
                 val dialog = CallPhoneDialog().apply {
                     arguments = Bundle().apply {
                         putString(CallPhoneDialog.KEY_PHONE, servicePhone)
                     }
                 }
                 dialog.onClickCallPhone = {
-                    val intent = Intent(Intent.ACTION_CALL)
+                    val intent = Intent(Intent.ACTION_DIAL)
                     val uri = Uri.parse("tel:" + servicePhone)
                     intent.setData(uri)
                     startActivity(intent)
                 }
                 dialog.show(supportFragmentManager, "CallPhoneDialog")
-            }
+//            }
         }
     }
 
