@@ -61,6 +61,7 @@ class VoiceMusicListView: UIView {
     private var currentIndex: Int = -1
     private var isOrigin: Bool = true
     private var tableViewHCons: NSLayoutConstraint?
+    private var downloadCaches: [VoiceMusicModel] = []
     
     init(rtcKit: VoiceRoomRTCManager?, currentMusic: VoiceMusicModel?, isOrigin: Bool, roomInfo: VRRoomInfo?) {
         super.init(frame: .zero)
@@ -167,7 +168,7 @@ class VoiceMusicListView: UIView {
             }
         }
         rtcKit?.downloadBackgroundMusicStatusClosure = { [weak self] songCode, progress, status in
-            guard let self = self else { return }
+            guard let self = self, self.currentMusic?.songCode == songCode else { return }
             let index = self.musicList.firstIndex(where: { $0.songCode == songCode }) ?? 0
             let model = self.musicList[index]
             model.status = status == .preloading ? .download : status == .OK ? .playing : .none
@@ -301,11 +302,11 @@ extension VoiceMusicListView: UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         musicList.forEach({ $0.status = .none })
         let model = musicList[indexPath.row]
-        model.status = .playing
+        currentMusic = model
+        model.status = .download
         rtcKit?.stopMusic()
         rtcKit?.playMusic(songCode: model.songCode)
         currentIndex = indexPath.row
-        currentMusic = model
         musicToolView.setupMusicInfo(model: model, isOrigin: isOrigin)
         backgroundMusicPlaying?(model)
         tableView.reloadData()
