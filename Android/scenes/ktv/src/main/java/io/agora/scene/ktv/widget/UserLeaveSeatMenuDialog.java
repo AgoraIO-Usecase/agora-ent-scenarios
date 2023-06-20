@@ -60,10 +60,10 @@ public class UserLeaveSeatMenuDialog extends BaseDialog<KtvDialogUserSeatMenuBin
 
     @Override
     protected void setGravity() {
-        getWindow().setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                UiUtil.dp2px(220)
-        );
+//        getWindow().setLayout(
+//                ViewGroup.LayoutParams.MATCH_PARENT,
+//                UiUtil.dp2px(220)
+//        );
         getWindow().getAttributes().gravity = Gravity.BOTTOM;
     }
 }
