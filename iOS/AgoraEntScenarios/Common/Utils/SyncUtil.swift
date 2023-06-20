@@ -155,12 +155,16 @@ class SyncUtilsWrapper {
         
         _resetTimer()
         timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: false, block: { timer in
+        #if DEBUG
             print("joinSceneByQueue timeout")
+        #endif
             _resetTimer()
             _dequeueJoinScene()
         })
         first()
+    #if DEBUG
         print("joinSceneByQueue: \(joinSceneQueue.count)")
+    #endif
     }
     
     class func joinSceneByQueue(id: String,
