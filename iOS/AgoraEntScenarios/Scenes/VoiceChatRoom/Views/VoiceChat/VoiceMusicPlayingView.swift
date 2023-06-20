@@ -479,14 +479,14 @@ class VoiceMusicPlayingView: UIView {
         ChatRoomServiceImp.getSharedInstance().subscribeRoomBGMChange(roomId: roomId) { songName, singerName, isOrigin in
             self.isHidden = songName == nil
             self.titleLabel.text = "\(songName ?? "")-\(singerName ?? "")"
-            self.accompanyButton.isSelected = isOrigin
+            self.accompanyButton.isSelected = !isOrigin
         }
         ChatRoomServiceImp.getSharedInstance().fetchRoomBGM(roomId: roomId) { songName, singerName, isOrigin in
             if songName?.isEmpty == false {
                 self.titleLabel.text = "\(songName ?? "")-\(singerName ?? "")"
             }
             self.isHidden = songName == nil
-            self.accompanyButton.isSelected = isOrigin
+            self.accompanyButton.isSelected = !isOrigin
         }
     }
     

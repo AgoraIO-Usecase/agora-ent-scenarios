@@ -209,7 +209,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func updateRoomBGM(songName: String?, singerName: String?, isOrigin: Bool) {
-        let params = ["songName": songName ?? "", "singerName": singerName ?? "", "isOrigin": isOrigin] as [String : Any]
+        let params = ["songName": songName ?? "", "singerName": singerName ?? "", "isOrigin": !isOrigin] as [String : Any]
         SyncUtil.scene(id: roomId ?? "")?.update(key: roomBGMKey, data: params)
     }
     
