@@ -517,6 +517,13 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
             override fun onClickBGM(view: View) {
                 roomObservableDelegate.onBGMSettingDialog()
             }
+
+            override fun onClickBGMSinger(view: View) {
+                if (roomKitBean.isOwner) {
+                    val manager = AgoraRtcEngineController.get().bgmManager()
+                    manager.setSingerOn(!manager.params.isSingerOn)
+                }
+            }
         })
         binding.chatBottom.setMenuItemOnClickListener(object :
             MenuItemClickListener {

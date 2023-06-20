@@ -205,7 +205,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             binding.ivChatroomMore.id -> onLiveTopClickListener?.onClickMore(v)
             // bgm
             binding.tvBGM.id -> onLiveTopClickListener?.onClickBGM(v)
-            binding.ivBGM.id -> onLiveTopClickListener?.onClickBGM(v)
+            binding.ivBGM.id -> onLiveTopClickListener?.onClickBGMSinger(v)
         }
     }
 }
