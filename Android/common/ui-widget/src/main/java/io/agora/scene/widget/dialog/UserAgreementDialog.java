@@ -86,10 +86,10 @@ public class UserAgreementDialog extends BaseDialog<DialogUserAgreementBinding> 
 
     @Override
     protected void setGravity() {
-        getWindow().setLayout(
-                UiUtil.dp2px(280),
-                UiUtil.dp2px(365)
-        );
+//        getWindow().setLayout(
+//                UiUtil.dp2px(280),
+//                UiUtil.dp2px(365)
+//        );
         getWindow().getAttributes().gravity = Gravity.CENTER;
     }
 }

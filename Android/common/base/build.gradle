@@ -73,7 +73,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api fileTree(dir: 'libs', include: ['*.jar'])
     implementation rootProject.ext.deps.appcompat
     api rootProject.ext.deps.multidex
     implementation rootProject.ext.deps.annotation
@@ -99,7 +99,7 @@ dependencies {
     implementation rootProject.ext.deps.coroutines_android
 
 
-    api rootProject.ext.deps.rtm
-    api rootProject.ext.deps.rtc
+//    api rootProject.ext.deps.rtm
+//    api rootProject.ext.deps.rtc
     api rootProject.ext.deps.ok2curl
 }
