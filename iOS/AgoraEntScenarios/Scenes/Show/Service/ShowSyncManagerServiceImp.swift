@@ -271,7 +271,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 completion(error, nil)
                 return
             }
-            SyncUtil.joinScene(id: room.roomId,
+            SyncUtilsWrapper.joinSceneByQueue(id: room.roomId,
                                          userId: room.ownerId,
                                          isOwner: self?.isOwner(room) ?? false,
                                          property: params) { result in
