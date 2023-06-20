@@ -122,7 +122,7 @@ class AgoraBGMManager(
             complete.invoke(musicList)
         } else {
             val jsonOption = "{\"pitchType\":1,\"needLyric\":true}"
-            mMusicCenter.getMusicCollectionByMusicChartId(0, 0, 20, jsonOption)?.let { requestId ->
+            mMusicCenter.getMusicCollectionByMusicChartId(3, 0, 20, jsonOption)?.let { requestId ->
                 musicCollectionCallbackMap[requestId] = complete
             }
         }

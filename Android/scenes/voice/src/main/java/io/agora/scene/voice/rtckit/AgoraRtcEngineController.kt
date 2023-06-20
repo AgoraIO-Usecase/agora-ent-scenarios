@@ -48,7 +48,7 @@ class AgoraRtcEngineController {
 
     private var micVolumeListener: RtcMicVolumeListener? = null
 
-    private var mEnableLocalAudio = true
+    private var mEnableLocalAudio = false
 
     fun setMicVolumeListener(micVolumeListener: RtcMicVolumeListener) {
         this.micVolumeListener = micVolumeListener
@@ -211,8 +211,10 @@ class AgoraRtcEngineController {
             // 音效默认50
             rtcEngine?.adjustAudioMixingVolume(ConfigConstants.RotDefaultVolume)
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_BROADCASTER)
+            mEnableLocalAudio = true
         } else {
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
+            mEnableLocalAudio = false
         }
         val status = rtcEngine?.joinChannel(VoiceBuddyFactory.get().getVoiceBuddy().rtcToken(), channelId, "", rtcUid)
         // 启用用户音量提示。
@@ -396,6 +398,7 @@ class AgoraRtcEngineController {
         mBgmManager?.release()
         mBgmManager = null
 
+        mEnableLocalAudio = false
         mEarBackManager = null
 
         if (mediaPlayer != null) {
