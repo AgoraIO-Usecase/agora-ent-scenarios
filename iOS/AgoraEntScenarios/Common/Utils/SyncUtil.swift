@@ -173,22 +173,26 @@ class SyncUtilsWrapper {
                                 property: [String: Any]?,
                                 success: SuccessBlockObj? = nil,
                                 fail: FailBlock? = nil) {
-        if isOwner == false {
-            SyncUtil.joinScene(id: id, userId: userId, isOwner: isOwner, property: property, success: success, fail:fail)
-            return
-        }
+//        if isOwner == false {
+//            SyncUtil.joinScene(id: id, userId: userId, isOwner: isOwner, property: property, success: success, fail:fail)
+//            return
+//        }
         
         //TODO: syncmanager does not support parallel calls 'create'
         joinSceneQueue.append({
             SyncUtil.joinScene(id: id, userId: userId, isOwner: isOwner, property: property) { obj in
                 _resetTimer()
                 success?(obj)
-                joinSceneQueue.removeFirst()
+                if joinSceneQueue.count > 0 {
+                    joinSceneQueue.removeFirst()
+                }
                 _dequeueJoinScene()
             } fail: { err in
                 _resetTimer()
                 fail?(err)
-                joinSceneQueue.removeFirst()
+                if joinSceneQueue.count > 0 {
+                    joinSceneQueue.removeFirst()
+                }
                 _dequeueJoinScene()
             }
         })

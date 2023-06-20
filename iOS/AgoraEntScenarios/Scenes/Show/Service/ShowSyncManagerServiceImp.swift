@@ -223,10 +223,10 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 completion(error, nil)
                 return
             }
-            SyncUtil.joinScene(id: room.roomId,
-                          userId: room.ownerId,
-                          isOwner: true,
-                          property: params) { result in
+            SyncUtilsWrapper.joinSceneByQueue(id: room.roomId,
+                                              userId: room.ownerId,
+                                              isOwner: true,
+                                              property: params) { result in
                 //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
                 let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
                 guard let channelName = channelName else {
@@ -1270,10 +1270,10 @@ extension ShowSyncManagerServiceImp {
             }
             
             agoraPrint("imp pk invitation get2... \(channelName)")
-            SyncUtil.joinScene(id: channelName,
-                               userId: ownerId,
-                               isOwner: true,
-                               property: params) { result in
+            SyncUtilsWrapper.joinSceneByQueue(id: channelName,
+                                              userId: ownerId,
+                                              isOwner: true,
+                                              property: params) { result in
                 SyncUtil
                     .scene(id: channelName)?
                     .collection(className: SYNC_MANAGER_PK_INVITATION_COLLECTION)
