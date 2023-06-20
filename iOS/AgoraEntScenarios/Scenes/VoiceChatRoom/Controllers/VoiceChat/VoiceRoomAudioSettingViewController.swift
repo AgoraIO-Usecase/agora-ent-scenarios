@@ -494,8 +494,14 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             case 3:
                 state = .InEar
                 heightType = .InEar
-                
-                actionView.show_voice()
+                // 查询自己有没有在麦上
+                let seatUser = ChatRoomServiceImp.getSharedInstance().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status == 0 })
+                let isMic = seatUser != nil && seatUser?.member?.micStatus == 1
+                if isMic {
+                    actionView.show_voice()
+                } else {
+                    ToastView.show(text: "仅上麦用户可以使用耳返".localized())
+                }
                 return
             default:
                 state = .Spatial
