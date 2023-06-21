@@ -7,7 +7,6 @@
 
 typedef enum : NSUInteger {
    // VLKTVMoreBtnClickTypeBelcanto = 0,      //美声
-    VLKTVMoreBtnClickTypeSound,             //音效
     VLKTVMoreBtnClickTypeSetting,           //配置
     VLKTVMoreBtnClickTypeMV                 //MV
 } VLKTVMoreBtnClickType;

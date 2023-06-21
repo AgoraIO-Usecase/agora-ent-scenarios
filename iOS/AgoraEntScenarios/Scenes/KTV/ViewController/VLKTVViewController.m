@@ -120,6 +120,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) BOOL isHighlightSinger;
 @property (nonatomic, assign) NSInteger aecGrade;
 @property (nonatomic, assign) CGFloat earValue;
+@property (nonatomic, assign) checkAuthType checkType;
 @end
 
 @implementation VLKTVViewController
@@ -133,6 +134,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [super viewDidLoad];
     self.view.backgroundColor = UIColor.blackColor;
     self.selectedVoiceShowIndex = -1;
+    self.checkType = checkAuthTypeAll;
 
     [self subscribeServiceEvent];
     
@@ -234,8 +236,8 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     }];
     
     [[AppContext ktvServiceImp] subscribeSeatListChangedWithBlock:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
-        [AgoraEntAuthorizedManager checkMediaAuthorizedWithParent:self completion:^(BOOL granted) {
-            if (!granted) { return; }
+//        [AgoraEntAuthorizedManager checkMediaAuthorizedWithParent:self type: self.checkType completion:^(BOOL granted) {
+//            if (!granted) { return; }
             VLRoomSeatModel* model = [self getUserSeatInfoWithIndex:seatModel.seatIndex];
             if (model == nil) {
                 NSAssert(NO, @"model == nil");
@@ -259,7 +261,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             [weakSelf.roomPersonView reloadSeatIndex:model.seatIndex];
             
             [weakSelf onSeatFull];
-        }];
+        //}];
     }];
     
     [[AppContext ktvServiceImp] subscribeRoomStatusChangedWithBlock:^(KTVSubscribe status, VLRoomListModel * roomInfo) {
@@ -1087,10 +1089,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
     if (info) {
         [self _checkEnterSeatAudioAuthorized];
-        
-        if (!info.isVideoMuted) {
-            [AgoraEntAuthorizedManager checkCameraAuthorizedWithParent:self completion:nil];
-        }
+//        
+//        if (!info.isVideoMuted) {
+//            [AgoraEntAuthorizedManager checkCameraAuthorizedWithParent:self completion:nil];
+//        }
         self.isNowMicMuted = info.isAudioMuted;
         self.isNowCameraMuted = info.isVideoMuted;
     } else {
@@ -1234,9 +1236,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //        case VLKTVMoreBtnClickTypeBelcanto:
 //            [self popBelcantoView];
 //            break;
-        case VLKTVMoreBtnClickTypeSound:
-            [self popSetSoundEffectView];
-            break;
+//        case VLKTVMoreBtnClickTypeSound:
+//            [self popSetSoundEffectView];
+//            break;
         case VLKTVMoreBtnClickTypeSetting:
             [self popVoicePerView];
             break;
@@ -1271,6 +1273,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 [AgoraEntAuthorizedManager checkAudioAuthorizedWithParent:self completion:nil];
             }
             self.isNowMicMuted = !self.isNowMicMuted;
+            //如果当前是关闭麦克风，并且耳返开启状态 需要关闭耳返
+            if(self.isEarOn && self.isNowMicMuted){
+                self.isEarOn = false;
+                [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterNone];
+            }
+            self.checkType = checkAuthTypeAudio;
             [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
                                                                 completion:^(NSError * error) {
             }];
@@ -1280,6 +1288,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 [AgoraEntAuthorizedManager checkCameraAuthorizedWithParent:self completion:nil];
             }
             self.isNowCameraMuted = !self.isNowCameraMuted;
+            self.checkType = checkAuthTypeVideo;
             [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:self.isNowCameraMuted
                                                                 completion:^(NSError * error) {
             }];
@@ -1921,7 +1930,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     
     if([self isRoomOwner]){
-        [self.MVView setPerViewHidden:[self getChorusSingerArrayWithSeatArray:_seatsArray].count == 0];
+        [self.MVView setPerViewHidden:[self getChorusSingerArrayWithSeatArray:_seatsArray].count < 2];
         if(self.selSongsArray.count == 0){
             [self.MVView setPerViewAvatar:@""];
         }

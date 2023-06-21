@@ -16,15 +16,16 @@ import AgoraRtcKit
                               ["title": NSLocalizedString("官网地址", comment: ""),
                                "detail":"https://www.shengwang.cn"]],
                   "sectionName": ""],
-                 ["contents": [["title": "语聊房", "detail":"YL-2.1.0"],
-                               ["title":"语聊房-空间音频模式", "detail":"YLKJ-2.1.0"],
-                               ["title":"在线K歌","detail":"KTV-2.3.0"],
-                               ["title": "秀场直播", "detail":"ZB-2.4.0"]],
-                  "sectionName": NSLocalizedString("SceneVersion", comment: "")]]
+//                 ["contents": [["title": "语聊房", "detail":"YL-2.1.0"],
+//                               ["title":"语聊房-空间音频模式", "detail":"YLKJ-2.1.0"],
+//                               ["title":"在线K歌","detail":"KTV-2.3.0"],
+//                               ["title": "秀场直播", "detail":"ZB-2.4.0"]],
+//                  "sectionName": NSLocalizedString("SceneVersion", comment: "")]
+    ]
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220),
-                                       name: NSLocalizedString("AgoraEntertainment", comment: ""),
-                                       versionText: NSLocalizedString("Version", comment: "")+": "+"20230530-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
+                                       name: NSLocalizedString("声动互娱", comment: ""),
+                                       versionText: NSLocalizedString("版本号", comment: "")+": "+"20230530-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
     
     lazy var infoList: UITableView = {
         UITableView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ScreenHeight-ZNavgationHeight), style: .plain)

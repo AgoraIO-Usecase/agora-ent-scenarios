@@ -190,6 +190,10 @@
     }
 }
 
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    [self endEditing:YES];
+}
+
 - (void)createRandomNumber {
     int titleValue = arc4random() % [self.titlesArray count]; //0...5的随机数
     int bgValue = (arc4random() % 9) + 1; //1...9的随机数
