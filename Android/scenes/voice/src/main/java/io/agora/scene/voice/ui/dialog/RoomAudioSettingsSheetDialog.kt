@@ -155,7 +155,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
     }
 
     fun updateEarBackState() {
-        if (AgoraRtcEngineController.get().earBackManager().params.isOn) {
+        if (AgoraRtcEngineController.get().earBackManager()?.params?.isOn == true) {
             binding?.tvInEarArrow?.text = view?.context?.getString(R.string.voice_chatroom_on)
         } else {
             binding?.tvInEarArrow?.text = view?.context?.getString(R.string.voice_chatroom_off)

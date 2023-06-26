@@ -11,7 +11,7 @@ enum class AgoraEarBackMode {
 }
 data class AgoraEarBackParams (
     var isOn: Boolean = false,
-    var isForbidden: Boolean = true,// 关麦时禁用耳返
+    var isForbidden: Boolean = true,// 下麦时禁用耳返
     var volume: Int = 100,
     var mode: AgoraEarBackMode = AgoraEarBackMode.Default,
     var delay: Int = 0,
@@ -74,7 +74,7 @@ class AgoraEarBackManager(
         }
     }
 
-    private fun updateEnableInEarMonitoring() {
+    fun updateEnableInEarMonitoring() {
         if (!params.isForbidden && params.isOn) {
             mRtcEngine.enableInEarMonitoring(true)
         } else {

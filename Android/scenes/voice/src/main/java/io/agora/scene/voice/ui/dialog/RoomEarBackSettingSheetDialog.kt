@@ -61,7 +61,7 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
         mAlertFragmentManager = fragmentManager
     }
     private fun setupView() {
-        val earBackManager = AgoraRtcEngineController.get().earBackManager()
+        val earBackManager = AgoraRtcEngineController.get().earBackManager() ?: return
         binding?.cbSwitch?.setOnCheckedChangeListener { _, isOn ->
             earBackManager.setOn(isOn)
             updateViewState()
@@ -109,7 +109,7 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
             return
         }
         if (mode == AgoraEarBackMode.Default) {
-            AgoraRtcEngineController.get().earBackManager().setMode(mode)
+            AgoraRtcEngineController.get().earBackManager()?.setMode(mode)
             return
         }
         val c = context ?: return
@@ -124,7 +124,7 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
             .rightText(c.getString(R.string.voice_room_confirm))
             .setOnClickListener(object : CommonFragmentAlertDialog.OnClickBottomListener {
                 override fun onConfirmClick() {
-                    AgoraRtcEngineController.get().earBackManager().setMode(mode)
+                    AgoraRtcEngineController.get().earBackManager()?.setMode(mode)
                 }
                 override fun onCancelClick() {
                     updateModeSegment()
@@ -143,7 +143,7 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
     private fun setHeadPhonePlugin(isPlug: Boolean) {
         if (isPlugIn != isPlug) {
             isPlugIn = isPlug
-            if (!isPlug) { AgoraRtcEngineController.get().earBackManager().setOn(false) }
+            if (!isPlug) { AgoraRtcEngineController.get().earBackManager()?.setOn(false) }
             updateViewState()
         }
     }
@@ -173,7 +173,7 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
         binding?.tvTips?.setTextColor(ContextCompat.getColor(c, R.color.voice_dark_grey_color_979cbb))
         binding?.tvTips?.text = getString(R.string.voice_chatroom_settings_earback_tip)
         binding?.cbSwitch?.isEnabled = true
-        val isOn = AgoraRtcEngineController.get().earBackManager().params.isOn
+        val isOn = AgoraRtcEngineController.get().earBackManager()?.params?.isOn ?: false
         binding?.cbSwitch?.isChecked = isOn
         binding?.vSettingMark?.visibility = if (isOn) View.INVISIBLE else View.VISIBLE
         binding?.clSetting?.alpha = if (isOn) 1f else 0.3f
