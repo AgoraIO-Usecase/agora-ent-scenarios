@@ -48,8 +48,6 @@ class AgoraRtcEngineController {
 
     private var micVolumeListener: RtcMicVolumeListener? = null
 
-    private var mEnableLocalAudio = false
-
     fun setMicVolumeListener(micVolumeListener: RtcMicVolumeListener) {
         this.micVolumeListener = micVolumeListener
     }
@@ -97,12 +95,8 @@ class AgoraRtcEngineController {
         return mBgmManager!!
     }
 
-    fun earBackManager(): AgoraEarBackManager {
-        if (mEarBackManager == null) {
-            mEarBackManager = AgoraEarBackManager(rtcEngine!!)
-            mEarBackManager?.setForbidden(!mEnableLocalAudio)
-        }
-        return mEarBackManager!!
+    fun earBackManager(): AgoraEarBackManager? {
+        return mEarBackManager
     }
 
     private fun initRtcEngine(context: Context): Boolean {
@@ -175,6 +169,7 @@ class AgoraRtcEngineController {
                 "voice rtc engine init error:${e.message}".logE(TAG)
                 return false
             }
+            mEarBackManager = AgoraEarBackManager(rtcEngine!!)
             return true
         }
     }
@@ -211,10 +206,8 @@ class AgoraRtcEngineController {
             // 音效默认50
             rtcEngine?.adjustAudioMixingVolume(ConfigConstants.RotDefaultVolume)
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_BROADCASTER)
-            mEnableLocalAudio = true
         } else {
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
-            mEnableLocalAudio = false
         }
         val status = rtcEngine?.joinChannel(VoiceBuddyFactory.get().getVoiceBuddy().rtcToken(), channelId, "", rtcUid)
         // 启用用户音量提示。
@@ -387,9 +380,8 @@ class AgoraRtcEngineController {
      */
     fun enableLocalAudio(enable: Boolean) {
         Log.d(TAG, "set local audio enable: $enable")
-        mEnableLocalAudio = enable
         rtcEngine?.enableLocalAudio(enable)
-        mEarBackManager?.setForbidden(!enable)
+        mEarBackManager?.updateEnableInEarMonitoring()
     }
 
     fun destroy() {
@@ -398,7 +390,6 @@ class AgoraRtcEngineController {
         mBgmManager?.release()
         mBgmManager = null
 
-        mEnableLocalAudio = false
         mEarBackManager = null
 
         if (mediaPlayer != null) {

@@ -400,7 +400,9 @@ class RoomObservableViewDelegate constructor(
         }
         val isOn = (localUserMicInfo?.member?.micStatus == 1 &&
                 localUserMicInfo?.micStatus == MicStatus.Normal)
-        chatPrimaryMenuView.showMicVisible(localUserIndex() >= 0, isOn)
+        val onStage = localUserIndex() >= 0
+        chatPrimaryMenuView.showMicVisible(onStage, isOn)
+        AgoraRtcEngineController.get().earBackManager()?.setForbidden(!onStage)
     }
 
     /**
@@ -645,7 +647,7 @@ class RoomObservableViewDelegate constructor(
     /** 耳返设置弹框
      */
     fun onEarBackSettingDialog() {
-        if (AgoraRtcEngineController.get().earBackManager().params.isForbidden) {
+        if (AgoraRtcEngineController.get().earBackManager()?.params?.isForbidden == true) {
             ToastTools.showTips(activity, activity.getString(R.string.voice_chatroom_settings_earback_forbidden_toast))
             return
         }
@@ -1128,7 +1130,9 @@ class RoomObservableViewDelegate constructor(
         iRoomMicView.onSeatUpdated(newMicMap)
         val isOn = (localUserMicInfo?.member?.micStatus == 1 &&
                 localUserMicInfo?.micStatus == MicStatus.Normal)
-        chatPrimaryMenuView.showMicVisible(localUserIndex() >= 0, isOn)
+        val onStage = localUserIndex() >= 0
+        chatPrimaryMenuView.showMicVisible(onStage, isOn)
+        AgoraRtcEngineController.get().earBackManager()?.setForbidden(!onStage)
         if (roomKitBean.isOwner) {
             val handsCheckMap = mutableMapOf<Int, String>()
             newMicMap.forEach { (t, u) ->
