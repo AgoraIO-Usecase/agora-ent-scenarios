@@ -909,6 +909,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                       channelName:self.roomModel.roomNo
                                                          localUid:[VLUserCenter.user.id integerValue]
                                                         chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
+                                                             type:KTVTypeNormal
                                                         maxCacheSize:10
     ];
     self.ktvApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
