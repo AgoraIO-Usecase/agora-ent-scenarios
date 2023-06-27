@@ -312,8 +312,12 @@ extension VoiceRoomViewController {
         let audience = VoiceRoomAudiencesViewController()
         let contributes = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [VoiceRoomGiftersViewController(roomId: roomInfo?.room?.room_id ?? ""),audience], titles: ["Contribution List".localized(),"Audience".localized()], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
         audience.kickClosure = { [weak self] user,mic in
-            if mic != nil{
-                self?.rtcView.updateUser(mic!)
+            if let mic = mic{
+                ChatRoomServiceImp.getSharedInstance().kickOff(mic_index: mic.mic_index) { error, mic in
+                    if error == nil, let mic = mic {
+                        self?.rtcView.updateUser(mic)
+                    }
+                }
             }
         }
         let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 420)), custom: contributes)
