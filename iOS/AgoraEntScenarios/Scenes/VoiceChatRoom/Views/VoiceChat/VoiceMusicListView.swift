@@ -165,6 +165,7 @@ class VoiceMusicListView: UIView {
                 } else if state == .playing {
                     self.rtcKit?.selectPlayerTrackMode(isOrigin: self.roomInfo?.room?.musicIsOrigin ?? true)
                 }
+                self.musicToolView.updatePlayStatus(isPlaying: state == .playing)
             }
         }
         rtcKit?.downloadBackgroundMusicStatusClosure = { [weak self] songCode, progress, status in
@@ -430,6 +431,8 @@ class VoiceMusicToolView: UIView {
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 15)
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         return label
     }()
     private lazy var singerLabeL: UILabel = {
@@ -437,7 +440,10 @@ class VoiceMusicToolView: UIView {
         label.text = ""
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = UIFont.systemFont(ofSize: 13)
+        label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         return label
     }()
     private lazy var accompanyButton: UIButton = {
@@ -446,6 +452,8 @@ class VoiceMusicToolView: UIView {
         button.setImage(UIImage.sceneImage(name: "voice_accompany_off"), for: .selected)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(onClickAccompanyButton(sender:)), for: .touchUpInside)
+        button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        button.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         return button
     }()
     private lazy var playButton: UIButton = {
@@ -454,6 +462,8 @@ class VoiceMusicToolView: UIView {
         button.setImage(UIImage.sceneImage(name: "voice_pause"), for: .selected)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(onClickPlayButton(sender:)), for: .touchUpInside)
+        button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        button.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         return button
     }()
     private lazy var nextButton: UIButton = {
@@ -461,6 +471,8 @@ class VoiceMusicToolView: UIView {
         button.setImage(UIImage.sceneImage(name: "voice_next"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(onClickNextButton), for: .touchUpInside)
+        button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        button.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         return button
     }()
     private lazy var sliderContaonerView: UIView = {
@@ -511,6 +523,10 @@ class VoiceMusicToolView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func updatePlayStatus(isPlaying: Bool) {
+        playButton.isSelected = isPlaying
+    }
+    
     func setupMusicInfo(model: VoiceMusicModel, isOrigin: Bool) {
         titleLabel.text = model.name
         singerLabeL.text = model.singer
@@ -541,6 +557,7 @@ class VoiceMusicToolView: UIView {
         
         singerLabeL.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 12).isActive = true
         singerLabeL.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
+        singerLabeL.trailingAnchor.constraint(equalTo: accompanyButton.leadingAnchor, constant: -15).isActive = true
         
         nextButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20).isActive = true
         nextButton.centerYAnchor.constraint(equalTo: singerLabeL.centerYAnchor).isActive = true
