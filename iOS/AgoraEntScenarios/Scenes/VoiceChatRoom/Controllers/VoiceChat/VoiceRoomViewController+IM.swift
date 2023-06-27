@@ -258,7 +258,6 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 } else {
                     if local_index == nil || mic_index == local_index {
                         if status == 2 {
-                            rtckit.setClientRole(role: .audience)
                             rtckit.muteLocalAudioStream(mute: true)
                             chatBar.refresh(event: .mic, state: .selected, asCreator: false)
                         }
