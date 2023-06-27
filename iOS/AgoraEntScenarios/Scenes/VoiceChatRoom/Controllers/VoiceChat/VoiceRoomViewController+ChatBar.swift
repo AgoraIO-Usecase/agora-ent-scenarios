@@ -167,7 +167,6 @@ extension VoiceRoomViewController {
     
     func micMuteManager(mic: VRRoomMic) {
         let mute = (mic.status > 0 || mic.member?.micStatus == 0) && mic.member?.uid == VLUserCenter.user.id
-        self.rtckit.setClientRole(role: mute ? .audience : .owner)
         self.rtckit.muteLocalAudioStream(mute: mute)
         self.chatBar.refresh(event: .mic, state: mute ? .selected : .unSelected, asCreator: false)
     }
@@ -302,7 +301,6 @@ extension VoiceRoomViewController {
                     mute = false
                 }
                 self.rtckit.muteLocalAudioStream(mute: mute)
-                self.rtckit.setClientRole(role: mute ? .audience:.owner)
                 self.rtcView.updateUser(mic!)
             } else {
                 self.view.makeToast("Mute local mic failed!")

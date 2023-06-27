@@ -92,18 +92,10 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
         let hasHeadset = HeadSetUtil.hasHeadset()
         let tipsTextColor = hasHeadset ? UIColor(hex: "#979CBB") : UIColor(hex: "#FF1216")
         // 查询自己有没有在麦上
-        let seatUser = ChatRoomServiceImp.getSharedInstance().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status == 0 })
-        let isMic = seatUser != nil && seatUser?.member?.micStatus == 1
-        var tipsText: String = ""
-        if hasHeadset && isMic {
-            tipsText = "开启耳返可实时听到自己的声音, 唱歌的时候及时调整".show_localized
-        } else if hasHeadset == false {
-            tipsText = "使用耳返必须插入耳机，当前未检测到耳机".show_localized
-        } else if isMic == false {
-            tipsText = "使用耳返必须开麦，当前未开麦".show_localized
-        }
+        let seatUser = ChatRoomServiceImp.getSharedInstance().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
+        let tipsText = hasHeadset ? "开启耳返可实时听到自己的声音, 唱歌的时候及时调整".show_localized : "使用耳返必须插入耳机，当前未检测到耳机".show_localized
         actionView.title(title: "耳返".show_localized)
-            .switchCell(title: "开启耳返".show_localized, isOn: hasHeadset ? isOn : false, isEnabel: hasHeadset && isMic)
+            .switchCell(title: "开启耳返".show_localized, isOn: hasHeadset ? isOn : false, isEnabel: hasHeadset && seatUser != nil)
             .tipsCell(iconName: "inEra_tips_icon", title: tipsText, titleColor: tipsTextColor)
             .sectionHeader(title: "耳返设置".show_localized, desc: nil)
             .sliderCell(title: "耳返音量".show_localized, value: inEar_volume, isEnable: isOn)
@@ -143,20 +135,12 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
         HeadSetUtil.addHeadsetObserver { hasHeadset in
             let isOn = (self.roomInfo?.room?.turn_InEar ?? false)
             // 查询自己有没有在麦上
-            let seatUser = ChatRoomServiceImp.getSharedInstance().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status == 0 })
-            let isMic = seatUser != nil && seatUser?.member?.micStatus == 1
+            let seatUser = ChatRoomServiceImp.getSharedInstance().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
             let switchIndexPath = IndexPath(row: 0, section: 0)
-            actionView.updateSwitchStatus(indexPath: switchIndexPath, isOn: hasHeadset ? isOn : false, isEnable: hasHeadset && isMic)
+            actionView.updateSwitchStatus(indexPath: switchIndexPath, isOn: hasHeadset ? isOn : false, isEnable: hasHeadset && seatUser != nil)
             let tipsIndexPath = IndexPath(row: 1, section: 0)
             let tipsTextColor = hasHeadset ? UIColor(hex: "#979CBB") : UIColor(hex: "#FF1216")
-            var tipsText: String = ""
-            if hasHeadset && isMic {
-                tipsText = "开启耳返可实时听到自己的声音, 唱歌的时候及时调整".show_localized
-            } else if hasHeadset == false {
-                tipsText = "使用耳返必须插入耳机，当前未检测到耳机".show_localized
-            } else if isMic == false {
-                tipsText = "使用耳返必须开麦，当前未开麦".show_localized
-            }
+            let tipsText = hasHeadset ? "开启耳返可实时听到自己的声音, 唱歌的时候及时调整".show_localized : "使用耳返必须插入耳机，当前未检测到耳机".show_localized
             actionView.updateTipsCellTitle(indexPath: tipsIndexPath, title: tipsText, titleColor: tipsTextColor)
             let sliderIndexPath = IndexPath(row: 0, section: 1)
             let inEar_volume = Double((self.roomInfo?.room?.inEar_volume ?? 0)) / 100.0
@@ -495,7 +479,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 state = .InEar
                 heightType = .InEar
                 // 查询自己有没有在麦上
-                let seatUser = ChatRoomServiceImp.getSharedInstance().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status == 0 })
+                let seatUser = ChatRoomServiceImp.getSharedInstance().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
                 if seatUser != nil {
                     actionView.show_voice()
                 } else {
