@@ -211,6 +211,7 @@ class VoiceMusicListView: UIView {
             backgroundMusicPlaying?(model)
             musicToolView.setupMusicInfo(model: model, isOrigin: isOrigin)
             currentIndex += 1
+            currentMusic = model
         } else {
             currentIndex += 1
             currentIndex = currentIndex < musicList.count ? currentIndex : 0
@@ -218,6 +219,7 @@ class VoiceMusicListView: UIView {
             model.status = .playing
             rtcKit?.playMusic(songCode: model.songCode)
             tableView.reloadData()
+            currentMusic = model
             backgroundMusicPlaying?(model)
             musicToolView.setupMusicInfo(model: model, isOrigin: isOrigin)
             tableView.scrollToRow(at: IndexPath(row: currentIndex, section: 0), at: .middle, animated: true)
