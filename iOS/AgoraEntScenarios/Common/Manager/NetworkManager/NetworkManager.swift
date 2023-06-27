@@ -7,6 +7,12 @@
 import UIKit
 import YYCategories
 
+public let kAppProjectName = "appProject"
+public let kAppProjectValue = "agora_ent_demo"
+public let kAppOS = "appOs"
+public let kAppOSValue = "iOS"
+public let kAppVersion = "versionName"
+
 @objc
 class NetworkManager:NSObject {
     @objc public enum TokenGeneratorType: Int {
@@ -53,10 +59,15 @@ class NetworkManager:NSObject {
 
     private var sessionConfig: URLSessionConfiguration = {
         let config = URLSessionConfiguration.default
-        config.httpAdditionalHeaders = ["Content-Type": "application/json",
-                                        "X-LC-Id": "fkUjxadPMmvYF3F3BI4uvmjo-gzGzoHsz",
-                                        "X-LC-Key": "QAvFS62IOR28GfSFQO5ze45s",
-                                        "X-LC-Session": "qmdj8pdidnmyzp0c7yqil91oc"]
+        config.httpAdditionalHeaders = [
+            "Content-Type": "application/json",
+            "X-LC-Id": "fkUjxadPMmvYF3F3BI4uvmjo-gzGzoHsz",
+            "X-LC-Key": "QAvFS62IOR28GfSFQO5ze45s",
+            "X-LC-Session": "qmdj8pdidnmyzp0c7yqil91oc",
+            kAppProjectName: kAppProjectValue,
+            kAppOS: kAppOSValue,
+            kAppVersion: UIApplication.shared.appVersion ?? ""
+        ]
         if !VLUserCenter.user.token.isEmpty {
             config.httpAdditionalHeaders?["Authorization"] = VLUserCenter.user.token
         }
