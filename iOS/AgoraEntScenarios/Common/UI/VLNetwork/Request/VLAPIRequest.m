@@ -14,6 +14,7 @@
 @import AFNetworking;
 @import YYModel;
 @import SVProgressHUD;
+@import YYCategories
 
 #define NSStringFormat(format,...) [NSString stringWithFormat:format,##__VA_ARGS__]
 
@@ -49,6 +50,18 @@ static AFHTTPSessionManager *_sessionManager;
     _sessionManager.responseSerializer = response;
     _sessionManager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json", @"text/html", @"text/json", @"text/plain", @"text/javascript", @"text/xml", @"image/*", @"image/png",@"image/jpeg",nil];
     [_sessionManager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    
+    /*
+     
+     public let kAppProjectName = "appProject"
+     public let kAppProjectValue = "agora_ent_demo"
+     public let kAppOS = "appOs"
+     public let kAppOSValue = "iOS"
+     public let kAppVersion = "versionName"
+     */
+    [_sessionManager.requestSerializer setValue:@"agora_ent_demo" forKey:@"appProject"];
+    [_sessionManager.requestSerializer setValue:@"iOS" forKey:@"appOs"];
+    [_sessionManager.requestSerializer setValue:[[UIApplication sharedApplication] appVersion] forKey:@"versionName"];
 }
 
 #pragma mark--网络请求
