@@ -171,6 +171,9 @@ extension KTVLrcControl: KTVLrcViewDelegate {
         }
     }
     
+    func onHighPartTime(highStartTime: Int, highEndTime: Int) {
+    }
+    
     func startDownloadLrc(with url: String, callBack: @escaping LyricCallback) {
         var path: String? = nil
         downloadManager.downloadLrcFile(urlString: url) { lrcurl in
