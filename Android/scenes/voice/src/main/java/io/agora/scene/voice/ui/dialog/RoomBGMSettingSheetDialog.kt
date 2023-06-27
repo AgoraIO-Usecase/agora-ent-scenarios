@@ -61,6 +61,7 @@ class RoomBGMSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomBgmSettingBi
         binding?.rvMusicList?.adapter = adapter
     }
     private fun setupView() {
+        binding?.tvDialogTitle?.text = getString(R.string.voice_chatroom_settings_bgm_title,  0)
         val bgmManager = AgoraRtcEngineController.get().bgmManager()
         bgmManager.bgm?.let { music ->
             binding?.tvMusic?.text = music.name
