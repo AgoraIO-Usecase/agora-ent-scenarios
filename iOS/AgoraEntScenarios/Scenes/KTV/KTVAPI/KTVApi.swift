@@ -113,6 +113,7 @@ import AgoraRtcKit
     func onUpdatePitch(pitch: Float)
     func onUpdateProgress(progress: Int)
     func onDownloadLrcData(url: String)
+    func onHighPartTime(highStartTime: Int, highEndTime: Int)
 }
 
 @objc public protocol KTVApiEventHandlerDelegate: NSObjectProtocol {
@@ -170,6 +171,7 @@ import AgoraRtcKit
          localUid: Int,
          chorusChannelName: String,
          chorusChannelToken: String,
+         type: KTVType,
          maxCacheSize: Int
     ) {
         self.appId = appId
