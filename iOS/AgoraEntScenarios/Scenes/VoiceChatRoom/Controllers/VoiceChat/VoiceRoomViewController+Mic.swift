@@ -83,6 +83,7 @@ extension VoiceRoomViewController {
             if error == nil,let mic = mic {
                 self.chatBar.refresh(event: .mic, state: .selected, asCreator: false)
                 self.rtckit.muteLocalAudioStream(mute: true)
+                self.rtckit.setClientRole(role: .audience)
                 self.rtcView.updateUser(mic)
             } else {
                 self.view.makeToast("\(error?.localizedDescription ?? "")",point: self.toastPoint, title: nil, image: nil, completion: nil)
@@ -108,6 +109,7 @@ extension VoiceRoomViewController {
                 if mic.member?.micStatus ?? 0 == 1 {
                     self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
                 }
+                self.rtckit.setClientRole(role: .owner)
                 self.rtckit.muteLocalAudioStream(mute: false)
                 self.rtcView.updateUser(mic)
             }

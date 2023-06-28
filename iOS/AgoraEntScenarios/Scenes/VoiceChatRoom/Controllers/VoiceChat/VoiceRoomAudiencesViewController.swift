@@ -86,6 +86,7 @@ extension VoiceRoomAudiencesViewController {
                 }
                 if index > 0 {
                     changeMic.member = nil
+                    changeMic.status = -1
                     VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(index)":changeMic.kj.JSONString()], completion: { error in
                         if error == nil {
                             if self.kickClosure != nil {
@@ -99,7 +100,7 @@ extension VoiceRoomAudiencesViewController {
                 } else {
                     self.removeUserFromUserList(user: user)
                     if self.kickClosure != nil  {
-                        self.kickClosure!(user,changeMic)
+                        self.kickClosure!(user,nil)
                     }
                 }
             }
