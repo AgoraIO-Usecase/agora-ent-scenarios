@@ -14,7 +14,7 @@
 @import AFNetworking;
 @import YYModel;
 @import SVProgressHUD;
-@import YYCategories
+@import YYCategories;
 
 #define NSStringFormat(format,...) [NSString stringWithFormat:format,##__VA_ARGS__]
 
