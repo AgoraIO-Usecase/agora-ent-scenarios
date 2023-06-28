@@ -1782,6 +1782,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)onSingingScoreResultWithScore:(float)score {
 }
 
+- (void)onTokenPrivilegeWillExpire {
+    
+}
+
+
 #pragma mark KTVMusicLoadStateListener
 
 - (void)onMusicLoadProgressWithSongCode:(NSInteger)songCode
