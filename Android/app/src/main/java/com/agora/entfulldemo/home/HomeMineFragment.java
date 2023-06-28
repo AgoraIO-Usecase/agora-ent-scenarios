@@ -89,7 +89,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             PagePilotManager.pageWebView("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/service.html");
         });
         getBinding().tvPrivacyAgreement.setOnClickListener(view -> {
-            PagePilotManager.pageWebView("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/privacy.html");
+            PagePilotManager.pageWebView("https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/privacy.html");
         });
         getBinding().tvCollectionChecklist.setOnClickListener(view -> {
             //开发服：http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest-dev/index.html
@@ -103,7 +103,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             PagePilotManager.pageWebView(stringBuilder.toString());
         });
         getBinding().tvDataSharing.setOnClickListener(view -> {
-            PagePilotManager.pageWebView("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/libraries.html");
+            PagePilotManager.pageWebView("https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/libraries.html");
         });
 
         getBinding().tvLogout.setOnClickListener(view -> {
