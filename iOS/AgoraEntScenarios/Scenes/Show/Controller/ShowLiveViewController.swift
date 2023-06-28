@@ -243,15 +243,25 @@ class ShowLiveViewController: UIViewController {
         defaultConfig()
         guard let room = room else {return}
         if room.ownerId == VLUserCenter.user.id {
-            self.joinChannel()
-            if self.loadingType == .loading {
-                self.updateLoadingType(loadingType: self.loadingType)
+            self.joinChannel { [weak self] in
+                guard let self = self else {return}
+                if self.loadingType == .loading {
+                    self.updateLoadingType(loadingType: self.loadingType)
+                }
             }
+            
             self._subscribeServiceEvent()
             UIApplication.shared.isIdleTimerDisabled = true
             AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self)
             
         } else {
+            
+            self.joinChannel(needUpdateCavans: self.loadingType == .loading) { [weak self] in
+                guard let self = self else {return}
+                if self.loadingType == .loading {
+                    self.updateLoadingType(loadingType: self.loadingType)
+                }
+            }
             AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
                 guard let self = self else { return }
                 showLogger.info("joinRoom: roomid = \(room.roomId)")
@@ -261,10 +271,6 @@ class ShowLiveViewController: UIViewController {
 //                    self.onRoomExpired()
                     self._ensureRoomIsExst(roomId: room.roomId)
                     return
-                }
-                self.joinChannel(needUpdateCavans: self.loadingType == .loading)
-                if self.loadingType == .loading {
-                    self.updateLoadingType(loadingType: self.loadingType)
                 }
                 self._subscribeServiceEvent()
                 UIApplication.shared.isIdleTimerDisabled = true
@@ -317,7 +323,7 @@ class ShowLiveViewController: UIViewController {
         }
     }
     
-    private func joinChannel(needUpdateCavans: Bool = true) {
+    private func joinChannel(needUpdateCavans: Bool = true, completion: (()->())? = nil) {
         agoraKitManager.setRtcDelegate(delegate: self, roomId: roomId)
 //        agoraKitManager.defaultSetting()
         guard let channelId = room?.roomId, let ownerId = room?.ownerId,  let uid: UInt = UInt(ownerId) else {
@@ -340,6 +346,7 @@ class ShowLiveViewController: UIViewController {
                     self.agoraKitManager.setupLocalVideo(uid: uid, canvasView: self.liveView.canvasView.localView)
                 }
             }
+            completion?()
         }
         
         liveView.canvasView.setLocalUserInfo(name: room?.ownerName ?? "", img: room?.ownerAvatar ?? "")
@@ -375,9 +382,10 @@ extension ShowLiveViewController {
         }
     }
     
-
     func updateLoadingType(loadingType: ShowRTCLoadingType) {
         agoraKitManager.updateLoadingType(roomId: roomId, channelId: roomId, loadingType: loadingType)
+        
+        //check pk channel autosubscribe
         if let targetRoomId = currentInteraction?.roomId, targetRoomId != roomId {
             agoraKitManager.updateLoadingType(roomId: roomId, channelId: targetRoomId, loadingType: loadingType)
         }

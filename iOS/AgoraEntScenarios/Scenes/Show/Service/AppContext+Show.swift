@@ -50,6 +50,9 @@ extension AppContext {
             self.extDic[kRtcTokenMapKey] = newValue
         }
         get {
+            if self.extDic[kRtcTokenMapKey] == nil {
+                self.extDic[kRtcTokenMapKey] = [String: String]()
+            }
             return self.extDic[kRtcTokenMapKey] as? [String: String]
         }
     }

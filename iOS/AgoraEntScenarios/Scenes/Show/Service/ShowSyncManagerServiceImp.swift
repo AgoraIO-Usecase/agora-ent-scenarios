@@ -226,37 +226,23 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             SyncUtilsWrapper.joinSceneByQueue(id: room.roomId,
                                               userId: room.ownerId,
                                               isOwner: true,
-                                              property: params) { result in
-                //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
+                                              property: params) {[weak self] result in
+                guard let self = self else {return}
                 let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
                 guard let channelName = channelName else {
                     agoraAssert("createRoom fail: channelName == nil")
                     completion(nil, nil)
                     return
                 }
-                self?.roomId = channelName
-                NetworkManager.shared.generateTokens(channelName: channelName,
-                                                     uid: "\(UserInfo.userId)",
-                                                     tokenGeneratorType: .token007,
-                                                     tokenTypes: [.rtc]) { tokenMap in
-                    guard let self = self,
-                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue]
-                    else {
-                        agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
-                        return
-                    }
-                    var map = AppContext.shared.rtcTokenMap ?? [String: String]()
-                    map[channelName] = rtcToken
-                    AppContext.shared.rtcTokenMap = map
-                    let output = ShowRoomDetailModel.yy_model(with: params!)
-                    self.roomList?.append(room)
-                    self._startCheckExpire()
-                    self._subscribeAll()
-//                    self._addUserIfNeed()
-                    self._getAllPKInvitationList(room: nil) { error, list in
-                    }
-                    completion(nil, output)
+                self.roomId = channelName
+                let output = ShowRoomDetailModel.yy_model(with: params!)
+                self.roomList?.append(room)
+                self._startCheckExpire()
+                self._subscribeAll()
+//                self._addUserIfNeed()
+                self._getAllPKInvitationList(room: nil) { error, list in
                 }
+                completion(nil, output)
             } fail: { error in
                 completion(error.toNSError(), nil)
             }
@@ -274,35 +260,21 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             SyncUtilsWrapper.joinSceneByQueue(id: room.roomId,
                                          userId: room.ownerId,
                                          isOwner: self?.isOwner(room) ?? false,
-                                         property: params) { result in
-                //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
+                                         property: params) {[weak self] result in
+                guard let self = self else {return}
                 let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
                 guard let channelName = channelName else {
                     agoraAssert("joinRoom fail: channelName == nil")
                     completion(nil, nil)
                     return
                 }
-                self?.roomId = channelName
-                NetworkManager.shared.generateTokens(channelName: channelName,
-                                                     uid: "\(UserInfo.userId)",
-                                                     tokenGeneratorType: .token007,
-                                                     tokenTypes: [.rtc]) { tokenMap in
-                    guard let self = self,
-                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue]
-                    else {
-                        agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
-                        return
-                    }
-                    var map = AppContext.shared.rtcTokenMap ?? [String: String]()
-                    map[channelName] = rtcToken
-                    AppContext.shared.rtcTokenMap = map
-                    let output = ShowRoomDetailModel.yy_model(with: params!)
-                    completion(nil, output)
-                    self._startCheckExpire()
-                    self._subscribeAll()
-//                    self._addUserIfNeed()
-                    self._getAllPKInvitationList(room: nil) { error, list in
-                    }
+                self.roomId = channelName
+                let output = ShowRoomDetailModel.yy_model(with: params!)
+                completion(nil, output)
+                self._startCheckExpire()
+                self._subscribeAll()
+//                self._addUserIfNeed()
+                self._getAllPKInvitationList(room: nil) { error, list in
                 }
             } fail: { error in
                 completion(error.toNSError(), nil)

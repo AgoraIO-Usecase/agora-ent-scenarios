@@ -102,6 +102,7 @@ class ShowAgoraKitManager: NSObject {
     }()
     
     deinit {
+        AppContext.shared.rtcTokenMap = nil
         AgoraRtcEngineKit.destroy()
         showLogger.info("deinit-- ShowAgoraKitManager")
     }
@@ -409,16 +410,18 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         
+        let date = Date()
         NetworkManager.shared.generateToken(channelName: targetChannelId,
                                             uid: VLUserCenter.user.id,
                                             tokenType: .token007,
                                             type: .rtc) {[weak self] token in
             defer {
+                showLogger.info("generateToken[\(targetChannelId)]: \(Int(-date.timeIntervalSinceNow * 1000)) ms", context: kShowLogBaseContext)
                 completion?()
             }
             
             guard let token = token else {
-                showLogger.error("joinChannelEx fail: token is empty")
+                showLogger.error("joinChannelEx fail: token is empty", context: kShowLogBaseContext)
                 return
             }
             AppContext.shared.rtcTokenMap?[targetChannelId] = token
@@ -459,6 +462,12 @@ class ShowAgoraKitManager: NSObject {
         showLogger.info("setupRemoteVideoEx ret = \(ret), uid:\(uid) localuid: \(UserInfo.userId) channelId: \(channelId)", context: kShowLogBaseContext)
     }
     
+    
+    /// Loading type switching
+    /// - Parameters:
+    ///   - roomId: The room where it is located
+    ///   - channelId: Channel id to be displayed
+    ///   - loadingType: Loading type
     func updateLoadingType(roomId: String, channelId: String, loadingType: ShowRTCLoadingType) {
         guard let _ = exConnectionMap[channelId] else {
             showLogger.error("updateLoadingType fail, mediaOptions not found")
