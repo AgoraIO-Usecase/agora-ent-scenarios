@@ -11,10 +11,10 @@
 #import "VLUserCenter.h"
 #import "NSString+Helper.h"
 #import "MenuUtils.h"
+#import "NSObject+JKAppInfo.h"
 @import AFNetworking;
 @import YYModel;
 @import SVProgressHUD;
-@import YYCategories;
 
 #define NSStringFormat(format,...) [NSString stringWithFormat:format,##__VA_ARGS__]
 
@@ -61,7 +61,7 @@ static AFHTTPSessionManager *_sessionManager;
      */
     [_sessionManager.requestSerializer setValue:@"agora_ent_demo" forHTTPHeaderField:@"appProject"];
     [_sessionManager.requestSerializer setValue:@"iOS" forHTTPHeaderField:@"appOs"];
-    [_sessionManager.requestSerializer setValue:[[UIApplication sharedApplication] appVersion] forHTTPHeaderField:@"versionName"];
+    [_sessionManager.requestSerializer setValue:[self jk_version] forHTTPHeaderField:@"versionName"];
 }
 
 #pragma mark--网络请求
