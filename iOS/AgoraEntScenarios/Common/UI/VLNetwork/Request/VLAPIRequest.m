@@ -59,9 +59,9 @@ static AFHTTPSessionManager *_sessionManager;
      public let kAppOSValue = "iOS"
      public let kAppVersion = "versionName"
      */
-    [_sessionManager.requestSerializer setValue:@"agora_ent_demo" forKey:@"appProject"];
-    [_sessionManager.requestSerializer setValue:@"iOS" forKey:@"appOs"];
-    [_sessionManager.requestSerializer setValue:[[UIApplication sharedApplication] appVersion] forKey:@"versionName"];
+    [_sessionManager.requestSerializer setValue:@"agora_ent_demo" forHTTPHeaderField:@"appProject"];
+    [_sessionManager.requestSerializer setValue:@"iOS" forHTTPHeaderField:@"appOs"];
+    [_sessionManager.requestSerializer setValue:[[UIApplication sharedApplication] appVersion] forHTTPHeaderField:@"versionName"];
 }
 
 #pragma mark--网络请求
