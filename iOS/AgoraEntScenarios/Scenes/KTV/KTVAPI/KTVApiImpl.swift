@@ -1154,11 +1154,14 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
                 playerKit.play()
             }
         } else if state == .stopped {
+            apiConfig?.engine?.adjustPlaybackSignalVolume(100)
             self.localPlayerPosition = Date().milListamp
             self.playerDuration = 0
         }
         else if state == .paused {
+            apiConfig?.engine?.adjustPlaybackSignalVolume(100)
         } else if state == .playing {
+            apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
             self.localPlayerPosition = Date().milListamp - Double(musicPlayer?.getPosition() ?? 0)
             print("localPlayerPosition:playerKit:playing \(localPlayerPosition)")
         }
