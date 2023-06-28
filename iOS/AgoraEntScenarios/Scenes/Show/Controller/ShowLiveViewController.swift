@@ -262,19 +262,22 @@ class ShowLiveViewController: UIViewController {
                     self.updateLoadingType(loadingType: self.loadingType)
                 }
             }
-            AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
-                guard let self = self else { return }
-                showLogger.info("joinRoom: roomid = \(room.roomId)")
-                if let err = error {
-    //                ToastView.show(text: error.localizedDescription)
-                    showLogger.info(" finishAlertVC joinRoom : roomid = \(room.roomId), error = \(err) ")
-//                    self.onRoomExpired()
-                    self._ensureRoomIsExst(roomId: room.roomId)
-                    return
+            
+//            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 5) {
+                AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
+                    guard let self = self else { return }
+                    showLogger.info("joinRoom: roomid = \(room.roomId)")
+                    if let err = error {
+        //                ToastView.show(text: error.localizedDescription)
+                        showLogger.info(" finishAlertVC joinRoom : roomid = \(room.roomId), error = \(err) ")
+    //                    self.onRoomExpired()
+                        self._ensureRoomIsExst(roomId: room.roomId)
+                        return
+                    }
+                    self._subscribeServiceEvent()
+                    UIApplication.shared.isIdleTimerDisabled = true
                 }
-                self._subscribeServiceEvent()
-                UIApplication.shared.isIdleTimerDisabled = true
-            }
+//            }
         }
     }
     
@@ -347,12 +350,12 @@ class ShowLiveViewController: UIViewController {
                 }
             }
             completion?()
+            self.muteLocalVideo = false
+            self.muteLocalAudio = false
         }
         
         liveView.canvasView.setLocalUserInfo(name: room?.ownerName ?? "", img: room?.ownerAvatar ?? "")
         
-        self.muteLocalVideo = false
-        self.muteLocalAudio = false
     }
     
     private func sendMessageWithText(_ text: String) {

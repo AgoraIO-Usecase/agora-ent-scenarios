@@ -244,7 +244,7 @@ class ShowAgoraKitManager: NSObject {
     func renewToken(channelId: String) {
         showLogger.info("renewToken with channelId: \(channelId)",
                         context: kShowLogBaseContext)
-        NetworkManager.shared.generateToken(channelName: channelId,
+        NetworkManager.shared.generateToken(channelName: "",
                                             uid: UserInfo.userId,
                                             tokenType: .token007,
                                             type: .rtc) {[weak self] token in
@@ -254,7 +254,7 @@ class ShowAgoraKitManager: NSObject {
             }
             let option = AgoraRtcChannelMediaOptions()
             option.token = token
-            AppContext.shared.rtcTokenMap?[channelId] = token
+            AppContext.shared.rtcTokenMap?[""] = token
             self?.updateChannelEx(channelId: channelId, options: option)
         }
     }
@@ -399,7 +399,7 @@ class ShowAgoraKitManager: NSObject {
                        options:AgoraRtcChannelMediaOptions,
                        role: AgoraClientRole,
                        completion: (()->())?) {
-        if let rtcToken = AppContext.shared.rtcTokenMap?[targetChannelId] {
+        if let rtcToken = AppContext.shared.rtcTokenMap?[""] {
             _joinChannelEx(currentChannelId: currentChannelId,
                            targetChannelId: targetChannelId,
                            ownerId: ownerId,
@@ -411,7 +411,7 @@ class ShowAgoraKitManager: NSObject {
         }
         
         let date = Date()
-        NetworkManager.shared.generateToken(channelName: targetChannelId,
+        NetworkManager.shared.generateToken(channelName: "",
                                             uid: VLUserCenter.user.id,
                                             tokenType: .token007,
                                             type: .rtc) {[weak self] token in
@@ -424,7 +424,7 @@ class ShowAgoraKitManager: NSObject {
                 showLogger.error("joinChannelEx fail: token is empty", context: kShowLogBaseContext)
                 return
             }
-            AppContext.shared.rtcTokenMap?[targetChannelId] = token
+            AppContext.shared.rtcTokenMap?[""] = token
             self?._joinChannelEx(currentChannelId: currentChannelId,
                                  targetChannelId: targetChannelId,
                                  ownerId: ownerId,
@@ -444,7 +444,7 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.enableVideo()
         agoraKit.setupLocalVideo(canvas)
         agoraKit.startPreview()
-        showLogger.info("setupLocalVideo target uid:\(uid), user uid\(UserInfo.userId)", context: kShowLogBaseContext)
+        showLogger.info("setupLocalVideo target uid:\(uid), user uid:\(UserInfo.userId)", context: kShowLogBaseContext)
     }
     
     func setupRemoteVideo(channelId: String, uid: UInt, canvasView: UIView) {
