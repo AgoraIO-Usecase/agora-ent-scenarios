@@ -51,7 +51,7 @@ class KTVApiImpl: NSObject{
     private var isNowMicMuted: Bool = false
     private var loadSongState: KTVLoadSongState = .idle
     private var lastNtpTime: Int = 0
-    
+    private var startHighTime: Int = 0
     private var playerState: AgoraMediaPlayerState = .idle {
         didSet {
             agoraPrint("playerState did changed: \(oldValue.rawValue)->\(playerState.rawValue)")
@@ -553,6 +553,10 @@ extension KTVApiImpl {
         songConfig = config
         lastReceivedPosition = 0
         localPosition = 0
+
+        if apiConfig?.type == .singbattle {
+            mcc?.getSongSimpleInfo(songCode: songCode)
+        }
         
         if (config.mode == .loadNone) {
             return
@@ -876,7 +880,7 @@ extension KTVApiImpl {
             let ntpTime = dict["ntp"] as? Int ?? 0
             let time = dict["time"] as? Int64 ?? 0
             agoraPrint("checkNtp, diff:\(threshold), localNtp:\(getNtpTimeInMs()), localPosition:\(localPosition), audioPlayoutDelay:\(audioPlayoutDelay), remoteDiff:\(String(describing: ntpTime - Int(time)))")
-            if abs(threshold) > 80 {
+            if abs(threshold) > 50 {
                 musicPlayer?.seek(toPosition: expectPosition)
                 agoraPrint("CheckNtp, cosinger expectPosition: \(expectPosition) nowTime:\(Date().milListamp)")
                 agoraPrint("progress: setthreshold: \(threshold) expectPosition: \(expectPosition), localNtpTime: \(localNtpTime), audioPlayoutDelay: \(self.audioPlayoutDelay), localPosition: \(localPosition)")
@@ -949,7 +953,7 @@ extension KTVApiImpl {
             if self.singerRole != .audience {
                 current = Date().milListamp - self.lastReceivedPosition + Double(self.localPosition)
             }
-            self.setProgress(with: Int(current ))
+            self.setProgress(with: Int(current) + Int(self.startHighTime))
             self.oldPitch = self.pitch
         })
     }
@@ -1181,6 +1185,20 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
 extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
 
     func onSongSimpleInfoResult(_ requestId: String, songCode: Int, simpleInfo: String?, errorCode: AgoraMusicContentCenterStatusCode) {
+        if let jsonData = simpleInfo?.data(using: .utf8) {
+            do {
+                let jsonMsg = try JSONSerialization.jsonObject(with: jsonData, options: []) as! [String: Any]
+                let format = jsonMsg["format"] as! [String: Any]
+                let highPart = format["highPart"] as! [[String: Any]]
+                let highStartTime = highPart[0]["highStartTime"] as! Int
+                let highEndTime = highPart[0]["highEndTime"] as! Int
+                let time = highStartTime
+                startHighTime = time
+                self.lrcControl?.onHighPartTime(highStartTime: highStartTime, highEndTime: highEndTime)
+            } catch {
+                print("Error while parsing JSON: \(error.localizedDescription)")
+            }
+        }
         if (errorCode == .errorGateway) {
             getEventHander { delegate in
                 delegate.onTokenPrivilegeWillExpire()

@@ -66,6 +66,11 @@ import AgoraRtcKit
     case musicPreloadFailAndJoinChannelFail
 }
 
+@objc public enum KTVType: Int {
+    case normal
+    case singbattle
+}
+
 @objc public protocol IMusicLoadStateListener: NSObjectProtocol {
     
     
@@ -108,6 +113,7 @@ import AgoraRtcKit
     func onUpdatePitch(pitch: Float)
     func onUpdateProgress(progress: Int)
     func onDownloadLrcData(url: String)
+    func onHighPartTime(highStartTime: Int, highEndTime: Int)
 }
 
 @objc public protocol KTVApiEventHandlerDelegate: NSObjectProtocol {
@@ -155,6 +161,7 @@ import AgoraRtcKit
     var localUid: Int = 0
     var chorusChannelName: String
     var chorusChannelToken: String
+    var type: KTVType = .normal
     var maxCacheSize: Int = 10
     @objc public
     init(appId: String,
@@ -164,6 +171,7 @@ import AgoraRtcKit
          localUid: Int,
          chorusChannelName: String,
          chorusChannelToken: String,
+         type: KTVType,
          maxCacheSize: Int
     ) {
         self.appId = appId
@@ -173,6 +181,7 @@ import AgoraRtcKit
         self.localUid = localUid
         self.chorusChannelName = chorusChannelName
         self.chorusChannelToken = chorusChannelToken
+        self.type = type
         self.maxCacheSize = maxCacheSize
     }
 }
