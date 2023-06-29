@@ -313,7 +313,6 @@ class ShowLiveViewController: UIViewController {
     
     func leaveRoom(){
         agoraKitManager.setRtcDelegate(delegate: nil, roomId: roomId)
-        agoraKitManager.cleanCapture()
         agoraKitManager.leaveChannelEx(roomId: roomId, channelId: roomId)
         AppContext.showServiceImp(roomId).unsubscribeEvent(delegate: self)
         
@@ -324,6 +323,8 @@ class ShowLiveViewController: UIViewController {
         if role == .broadcaster {
             BeautyManager.shareManager.destroy()
         }
+        
+        agoraKitManager.destroy()
     }
     
     private func joinChannel(needUpdateCavans: Bool = true, completion: (()->())? = nil) {

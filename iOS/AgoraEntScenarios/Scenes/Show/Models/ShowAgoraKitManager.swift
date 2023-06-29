@@ -102,8 +102,6 @@ class ShowAgoraKitManager: NSObject {
     }()
     
     deinit {
-        AppContext.shared.rtcTokenMap = nil
-        AgoraRtcEngineKit.destroy()
         showLogger.info("deinit-- ShowAgoraKitManager")
     }
     
@@ -114,12 +112,13 @@ class ShowAgoraKitManager: NSObject {
     
     //MARK: private
     private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
+    #if DEBUG
         let config = AgoraContentInspectConfig()
         let dic: [String: String] = [
             "id": VLUserCenter.user.id,
             "sceneName": "show"
         ]
-        
+
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
             showLogger.error("setupContentInspectConfig fail")
             return
@@ -132,6 +131,7 @@ class ShowAgoraKitManager: NSObject {
         config.modules = [module]
         let ret = agoraKit.enableContentInspectEx(enable, config: config, connection: connection)
         showLogger.info("setupContentInspectConfig: \(ret)")
+    #endif
     }
     
     /// 语音审核
@@ -371,6 +371,12 @@ class ShowAgoraKitManager: NSObject {
     func setH265On(_ isOn: Bool) {
         agoraKit.setParameters("{\"engine.video.enable_hw_encoder\":\(isOn)}")
         agoraKit.setParameters("{\"engine.video.codec_type\":\"\(isOn ? 3 : 2)\"}")
+    }
+    
+    func destroy() {
+        cleanCapture()
+        AppContext.shared.rtcTokenMap = nil
+        AgoraRtcEngineKit.destroy()
     }
     
     func cleanCapture() {
