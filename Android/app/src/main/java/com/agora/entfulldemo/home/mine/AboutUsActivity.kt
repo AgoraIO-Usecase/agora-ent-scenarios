@@ -32,7 +32,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val webSite = "https://www.shengwang.cn/"
 
     private val kChatRoomAppID = "io.agora.chatroom"
-    private val kFullAppID = "io.agora.entfull"
+    private val kFullAppID = "io.agora.AgoraVoice"
 
     private var counts = 0
     private val debugModeOpenTime: Long = 2000
