@@ -1438,7 +1438,7 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun destroyRtcEngine(): Boolean {
-        return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection)
+        return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection,true)
     }
 
     private fun enableLocalAudio(enable: Boolean) {
@@ -1519,12 +1519,10 @@ class LiveDetailFragment : Fragment() {
 
     private fun updateIdleMode() {
         if (interactionInfo?.interactStatus == ShowInteractionStatus.pking.value) {
-            // 退出连麦多频道
+            // 退出连麦多频道，主播需要离开对方频道
             mRtcVideoSwitcher.leaveChannel(
-                RtcConnection(
-                    interactionInfo!!.roomId,
-                    UserManager.getInstance().user.id.toInt()
-                )
+                RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()),
+                isRoomOwner
             )
         }
 
