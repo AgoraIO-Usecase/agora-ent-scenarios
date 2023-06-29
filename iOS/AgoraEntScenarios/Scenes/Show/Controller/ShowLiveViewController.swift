@@ -320,11 +320,6 @@ class ShowLiveViewController: UIViewController {
 //            self?.dismiss(animated: true) {
 //            }
         }
-        if role == .broadcaster {
-            BeautyManager.shareManager.destroy()
-        }
-        
-        agoraKitManager.destroy()
     }
     
     private func joinChannel(needUpdateCavans: Bool = true, completion: (()->())? = nil) {
@@ -515,9 +510,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         ShowReceiveLiveFinishAlertVC.show(topVC: self,
                                           ownerUrl: room?.ownerAvatar ?? "",
                                           ownerName: room?.ownerName ?? "") { [weak self] in
-            if self?.presentedViewController != nil {
-                self?.presentedViewController?.dismiss(animated: false)
-            }
+            self?._dismiss()
         }
     }
     
@@ -1020,11 +1013,11 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
         if role == .broadcaster {
             showAlert(message: "show_alert_live_end_title".show_localized) {[weak self] in
                 self?.leaveRoom()
-                self?.dismiss(animated: true)
+                self?._dismiss()
             }
         }else {
             leaveRoom()
-            dismiss(animated: true)
+            _dismiss()
         }
     }
     
@@ -1106,10 +1099,19 @@ extension ShowLiveViewController {
 
 
 extension ShowLiveViewController {
+    private func _dismiss() {
+        if let vc = delegate as? UIViewController {
+            vc.dismiss(animated: false)
+            return
+        }
+        
+        dismiss(animated: true)
+    }
+    
     private func showError(title: String, errMsg: String) {
         showAlert(title: title, message: errMsg) { [weak self] in
             self?.leaveRoom()
-            self?.dismiss(animated: true)
+            self?._dismiss()
         }
     }
 }

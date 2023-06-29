@@ -66,6 +66,12 @@ class ShowLivePagesViewController: ViewController {
 //        addDebugButton()
     }
     
+    override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+        super.dismiss(animated: flag, completion: completion)
+        BeautyManager.shareManager.destroy()
+        agoraKitManager.destroy()
+    }
+    
     private func addDebugButton(){
         let button = UIButton(type: .custom)
         button.setTitle("Video", for: .normal)
