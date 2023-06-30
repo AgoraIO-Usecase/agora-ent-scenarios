@@ -76,7 +76,15 @@ class VoiceRoomViewController: VRBaseViewController {
     var rtckit: VoiceRoomRTCManager = VoiceRoomRTCManager.getSharedInstance()
     var isOwner: Bool = false
     var ains_state: AINS_STATE = .mid
-    var local_index: Int?
+    var local_index: Int? {
+        didSet {
+            if local_index == nil {
+                self.rtckit.setClientRole(role: .audience)
+            } else {
+                self.rtckit.setClientRole(role: .owner)
+            }
+        }
+    }
     var vmType: VMMUSIC_TYPE = .social
     var isHeaderBack = false
 
