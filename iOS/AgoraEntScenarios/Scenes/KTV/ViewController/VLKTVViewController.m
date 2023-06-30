@@ -119,6 +119,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) NSInteger currentSelectEffect;
 @property (nonatomic, assign) BOOL isHighlightSinger;
 @property (nonatomic, assign) NSInteger aecGrade;
+@property (nonatomic, assign) NSInteger volGrade;
 @property (nonatomic, assign) CGFloat earValue;
 @property (nonatomic, assign) checkAuthType checkType;
 @end
@@ -401,7 +402,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //专业主播
 - (void)popVoicePerView {
     LSTPopView* popView =
-    [LSTPopView popVoicePerViewWithParentView:self.view isProfessional:self.isProfessional isDelay:self.isDelay grade: self.aecGrade isRoomOwner:[self isRoomOwner] perView:self.voicePerShowView withDelegate:self];
+    [LSTPopView popVoicePerViewWithParentView:self.view isProfessional:self.isProfessional isDelay:self.isDelay volGrade: self.volGrade grade: self.aecGrade isRoomOwner:[self isRoomOwner] perView:self.voicePerShowView withDelegate:self];
     self.voicePerShowView = (VLVoicePerShowView*)popView.currCustomView;
 }
 
@@ -477,7 +478,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 - (void)onVLKTVEarSettingViewSwitchChanged:(BOOL)flag{
     self.isEarOn = flag;
-    [self.RTCkit enableInEarMonitoring:self.isEarOn includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFilters | AgoraEarMonitoringFilterNoiseSuppression];
+    [self.RTCkit enableInEarMonitoring:flag];
 }
 
 #pragma mark - rtc callbacks
@@ -654,6 +655,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)loadAndPlaySong{
     //清空分数
     [self.MVView.gradeView reset];
+    [self.MVView.incentiveView reset];
     
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     
@@ -826,6 +828,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)_joinChorus {
+    
+    [self.MVView.incentiveView reset];
+    
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSingRole role = KTVSingRoleCoSinger;
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
@@ -1606,6 +1611,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi onAINSModeChanged:index];
 }
 
+-(void)didVolQualityGradeChangedWithIndex:(NSInteger)index {
+    self.volGrade = index;
+    [self.ktvApi onAECLevelChangedWithLevel:index];
+}
+
 - (void)voiceDelaySelectedAction:(BOOL)isSelected{
     self.isDelay = isSelected;
     [self.ktvApi enableLowLatencyMode:isSelected];
@@ -1793,6 +1803,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(!flag){//表示突出的人退出合唱
             [VLToast toast:@"人声突出功能已失效，请重设"];
             self.selectedVoiceShowIndex = -1;
+            [self.MVView setPerViewAvatar:@""];
+        }
+    }
+    
+    if([self isRoomOwner]){
+        [self.MVView setPerViewHidden:[self getChorusSingerArrayWithSeatArray:_seatsArray].count < 2];
+        if(self.selSongsArray.count == 0){
             [self.MVView setPerViewAvatar:@""];
         }
     }

@@ -151,14 +151,16 @@
 + (LSTPopView*)popVoicePerViewWithParentView:(UIView*)parentView
                               isProfessional: (BOOL) isProfessional
                                      isDelay: (BOOL) isDelay
+                                    volGrade:(NSInteger)volGrade
                                        grade:(NSInteger)grade
                                     isRoomOwner: (BOOL) isRoomOwner
                                          perView:(VLVoicePerShowView*)perView
                                       withDelegate:(id<VLVoicePerShowViewDelegate>)delegate {
-    VLVoicePerShowView* voiceView = [[VLVoicePerShowView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, isRoomOwner ? 244 : 172)
+    VLVoicePerShowView* voiceView = [[VLVoicePerShowView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, isRoomOwner ? 316 : 244)
                                                                                             isProfessional:isProfessional
                                                                                             isDelay:isDelay
                                                                                             isRoomOwner:isRoomOwner
+                                                                                            volGrade:volGrade
                                                                                             aecGrade:grade
                                                                                             withDelegate:delegate ];
     

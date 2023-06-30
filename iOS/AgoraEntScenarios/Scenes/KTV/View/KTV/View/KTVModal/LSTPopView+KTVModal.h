@@ -80,6 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (LSTPopView*)popVoicePerViewWithParentView:(UIView*)parentView
                               isProfessional: (BOOL) isProfessional
                                      isDelay: (BOOL) isDelay
+                                    volGrade:(NSInteger)volGrade
                                        grade:(NSInteger)grade
                                     isRoomOwner: (BOOL) isRoomOwner
                                          perView:(VLVoicePerShowView*)perView
