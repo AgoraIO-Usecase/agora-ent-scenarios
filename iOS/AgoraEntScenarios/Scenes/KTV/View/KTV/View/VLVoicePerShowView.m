@@ -13,7 +13,9 @@
 @property (nonatomic,strong) UISwitch *voiceSwitch;
 @property (nonatomic,strong) UISwitch *delaySwitch;
 @property (nonatomic, assign) NSInteger aecGrade;
+@property (nonatomic, assign) NSInteger volGrade;
 @property (nonatomic, strong) UISegmentedControl *qualitySegment;
+@property (nonatomic, strong) UISegmentedControl *volSegment;
 @property (nonatomic, strong) UILabel *qualityLabel;
 @property (nonatomic, assign) BOOL isRoomOwner;
 @property (nonatomic, assign) BOOL isProfessional;
@@ -22,11 +24,12 @@
 
 @implementation VLVoicePerShowView
 
-- (instancetype)initWithFrame:(CGRect)frame isProfessional:(BOOL)isProfessional isDelay:(BOOL)isDelay isRoomOwner:(BOOL)isRoomOwner aecGrade:(NSInteger)grade withDelegate:(id<VLVoicePerShowViewDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame isProfessional:(BOOL)isProfessional isDelay:(BOOL)isDelay isRoomOwner:(BOOL)isRoomOwner volGrade:(NSInteger)vol aecGrade:(NSInteger)grade withDelegate:(id<VLVoicePerShowViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;
         self.aecGrade = grade;
+        self.volGrade = vol;
         self.isRoomOwner = isRoomOwner;
         self.isProfessional = isProfessional;
         self.isDelay = isDelay;
@@ -54,11 +57,22 @@
     self.voiceSwitch.on = self.isProfessional;
     [self addSubview:_voiceSwitch];
     
-    UIView *sepView = [[UIView alloc]initWithFrame:CGRectMake(20, 105, SCREEN_WIDTH - 40 , 1)];
+    UIView *sepView3 = [[UIView alloc]initWithFrame:CGRectMake(20, 105, SCREEN_WIDTH - 40 , 1)];
+    sepView3.backgroundColor = [UIColor colorWithRed:0.938 green:0.938 blue:0.938 alpha:0.08];
+    [self addSubview:sepView3];
+    
+    UILabel *volLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 123, 150, 30)];
+    volLabel.text = @"音质";
+    volLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
+    [self addSubview:volLabel];
+    
+    [self initVolSegmentedControl];
+    
+    UIView *sepView = [[UIView alloc]initWithFrame:CGRectMake(20, 168, SCREEN_WIDTH - 40 , 1)];
     sepView.backgroundColor = [UIColor colorWithRed:0.938 green:0.938 blue:0.938 alpha:0.08];
     [self addSubview:sepView];
     
-    UILabel *qualityLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 123, 150, 30)];
+    UILabel *qualityLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 186, 150, 30)];
     qualityLabel.text = @"降低背景噪音";
     qualityLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:qualityLabel];
@@ -66,16 +80,16 @@
     
     [self initSegmentedControl];
     
-    UIView *sepView2 = [[UIView alloc]initWithFrame:CGRectMake(20, 168, SCREEN_WIDTH - 40 , 1)];
+    UIView *sepView2 = [[UIView alloc]initWithFrame:CGRectMake(20, 231, SCREEN_WIDTH - 40 , 1)];
     sepView2.backgroundColor = [UIColor colorWithRed:0.938 green:0.938 blue:0.938 alpha:0.08];
     [self addSubview:sepView2];
     
-    UILabel *delayLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 186, 100, 30)];
+    UILabel *delayLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 249, 100, 30)];
     delayLabel.text = @"低延时模式";
     delayLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:delayLabel];
     
-    self.delaySwitch = [[UISwitch alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 70, 186, 50, 30)];
+    self.delaySwitch = [[UISwitch alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 70, 249, 50, 30)];
     self.delaySwitch.onTintColor = UIColorMakeWithHex(@"#099DFD");
     self.delaySwitch.on = self.isDelay;
     [self.delaySwitch addTarget:self action:@selector(delayChange:) forControlEvents:UIControlEventValueChanged];
@@ -113,7 +127,7 @@
 {
     NSArray *segmentedData = [[NSArray alloc]initWithObjects:@"关闭",@"中",@"高",nil];
     self.qualitySegment = [[UISegmentedControl alloc]initWithItems:segmentedData];
-    self.qualitySegment.frame = CGRectMake(SCREEN_WIDTH - 209, 121, 189, 34);
+    self.qualitySegment.frame = CGRectMake(SCREEN_WIDTH - 209, 184, 189, 34);
     //这个是设置按下按钮时的颜色
     self.qualitySegment.selectedSegmentTintColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2];
     //默认选中的按钮索引
@@ -127,7 +141,35 @@
     [_qualitySegment addTarget:self action:@selector(segmentSelect:)forControlEvents:UIControlEventValueChanged];
     //添加到视图
     [self addSubview:self.qualitySegment];
+}
 
+//初始化音质Segmented控件
+- (void)initVolSegmentedControl
+{
+    NSArray *segmentedData = [[NSArray alloc]initWithObjects:@"标准音质",@"高音质",@"超高音质",nil];
+    self.volSegment = [[UISegmentedControl alloc]initWithItems:segmentedData];
+    self.volSegment.frame = CGRectMake(SCREEN_WIDTH - 309, 121, 289, 34);
+    //这个是设置按下按钮时的颜色
+    self.volSegment.selectedSegmentTintColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2];
+    //默认选中的按钮索引
+    self.volSegment.selectedSegmentIndex = self.volGrade;
+    self.volSegment.backgroundColor = [UIColor colorWithRed:0.938 green:0.938 blue:0.938 alpha:0.08];
+    NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:14],NSFontAttributeName,[UIColor whiteColor], NSForegroundColorAttributeName, nil];
+    [self.volSegment setTitleTextAttributes:attributes forState:UIControlStateNormal];
+    NSDictionary *selectedAttributes = [NSDictionary dictionaryWithObject:[UIColor whiteColor] forKey:NSForegroundColorAttributeName];
+    [self.volSegment setTitleTextAttributes:selectedAttributes forState:UIControlStateSelected];
+    //设置分段控件点击相应事件
+    [_volSegment addTarget:self action:@selector(volSegmentSelect:)forControlEvents:UIControlEventValueChanged];
+    //添加到视图
+    [self addSubview:self.volSegment];
+
+}
+
+-(void)volSegmentSelect:(UISegmentedControl *)seg{
+    self.volGrade = seg.selectedSegmentIndex;
+    if([self.delegate respondsToSelector:@selector(didVolQualityGradeChangedWithIndex:)]){
+        [self.delegate didVolQualityGradeChangedWithIndex:self.volGrade];
+    }
 }
 
 -(void)segmentSelect:(UISegmentedControl *)seg{
