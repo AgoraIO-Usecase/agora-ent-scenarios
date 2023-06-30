@@ -16,11 +16,12 @@ import AgoraRtcKit
                               ["title": NSLocalizedString("OfficialWebsiteAddress", comment: ""),
                                "detail":"https://www.shengwang.cn"]],
                   "sectionName": ""],
-                 ["contents": [["title": NSLocalizedString("语聊房", comment: ""), "detail":"YL-2.1.0"],
-                               ["title": NSLocalizedString("语聊房-空间音频模式", comment: ""), "detail":"YLKJ-2.1.0"],
-                               ["title": NSLocalizedString("在线K歌", comment: ""),"detail":"KTV-2.3.0"],
-                               ["title": NSLocalizedString("秀场直播", comment: ""), "detail":"ZB-2.4.0"]],
-                  "sectionName": NSLocalizedString("SceneVersion", comment: "")]]
+//                 ["contents": [["title": NSLocalizedString("语聊房", comment: ""), "detail":"YL-2.1.0"],
+//                               ["title": NSLocalizedString("语聊房-空间音频模式", comment: ""), "detail":"YLKJ-2.1.0"],
+//                               ["title": NSLocalizedString("在线K歌", comment: ""),"detail":"KTV-2.3.0"],
+//                               ["title": NSLocalizedString("秀场直播", comment: ""), "detail":"ZB-2.4.0"]],
+//                  "sectionName": NSLocalizedString("SceneVersion", comment: "")]
+    ]
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220),
                                        name: NSLocalizedString("AgoraEntertainment", comment: ""),
