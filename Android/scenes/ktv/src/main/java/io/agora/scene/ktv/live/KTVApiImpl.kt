@@ -43,7 +43,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     var useCustomAudioSource:Boolean = false
 
     // 音频最佳实践
-    var remoteVolume: Int = 40 // 远端音频
+    var remoteVolume: Int = 30 // 远端音频
     var mpkPlayoutVolume: Int = 50
     var mpkPublishVolume: Int = 50
 
@@ -164,11 +164,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\":600}")
         mRtcEngine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
         mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
-        mRtcEngine.setParameters("{\"che.audio.direct.uplink_process\": false}")
         mRtcEngine.setParameters("{\"che.audio.uplink_apm_async_process\": true}")
 
-//        mRtcEngine.setParameters("{\"che.audio.aec.split_srate_for_32k\": 32000}")
-//        mRtcEngine.setParameters("{\"che.audio.aec.split_srate_for_48k\": 24000}")
+        // 标准音质
+        mRtcEngine.setParameters("{\"che.audio.aec.split_srate_for_48k\": 16000}")
 
         // Android Only
         mRtcEngine.setParameters("{\"che.audio.enable_estimated_device_delay\":false}")
@@ -403,6 +402,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         musicLoadStateListener: IMusicLoadStateListener
     ) {
         Log.d(TAG, "loadMusic called: songCode $songCode")
+        if (this.ktvApiConfig.type == KTVType.SingBattle) {
+            mMusicCenter.getSongSimpleInfo(songCode);
+        }
         // 设置到全局， 连续调用以最新的为准
         this.songMode = KTVSongMode.SONG_CODE
         this.songCode = songCode
@@ -473,7 +475,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
                         if (config.autoPlay) {
                             // 主唱自动播放歌曲
-                            switchSingerRole(KTVSingRole.SoloSinger, null)
+                            if (this.singerRole != KTVSingRole.LeadSinger) {
+                                switchSingerRole(KTVSingRole.SoloSinger, null)
+                            }
                             startSing(song, 0)
                         }
                     }
@@ -482,7 +486,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     Log.d(TAG, "loadMusic success")
                     if (config.autoPlay) {
                         // 主唱自动播放歌曲
-                        switchSingerRole(KTVSingRole.SoloSinger, null)
+                        if (this.singerRole != KTVSingRole.LeadSinger) {
+                            switchSingerRole(KTVSingRole.SoloSinger, null)
+                        }
                         startSing(song, 0)
                     }
                     musicLoadStateListener.onMusicLoadProgress(song, 100, MusicLoadStatus.COMPLETED, msg, lrcUrl)
@@ -511,7 +517,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         if (config.autoPlay) {
             // 主唱自动播放歌曲
-            switchSingerRole(KTVSingRole.SoloSinger, null)
+            if (this.singerRole != KTVSingRole.LeadSinger) {
+                switchSingerRole(KTVSingRole.SoloSinger, null)
+            }
             startSing(url, 0)
         }
     }
@@ -536,6 +544,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             return
         }
         mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
+
+        // 导唱
+        mPlayer.setPlayerOption("enable_multi_audio_track", 1)
         mPlayer.open(url, startPos)
     }
 
@@ -611,6 +622,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 mRtcEngine.updateChannelMediaOptions(channelMediaOption)
 
                 // 预加载歌曲成功
+                // 导唱
+                mPlayer.setPlayerOption("enable_multi_audio_track", 1)
                 if (songMode == KTVSongMode.SONG_CODE) {
                     mPlayer.open(songCode, 0) // TODO open failed
                 } else {
@@ -820,7 +833,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     // ------------------ 歌词播放、同步 ------------------
     // 开始播放歌词
-
     private val displayLrcTask = object : Runnable {
         override fun run() {
             if (!mStopDisplayLrc){
@@ -828,7 +840,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val curTime = System.currentTimeMillis()
                 val offset = curTime - lastReceivedTime
                 if (offset <= 1000) {
-                    val curTs = mReceivedPlayPosition + offset
+                    val curTs = mReceivedPlayPosition + offset + highStartTime
                     runOnMainThread {
                         lrcView?.onUpdatePitch(pitch.toFloat())
                         // (fix ENT-489)Make lyrics delay for 200ms
@@ -1177,17 +1189,22 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         callback(songCode, lyricUrl)
     }
 
+    private var highStartTime = 0L;
     override fun onSongSimpleInfoResult(
         requestId: String?,
         songCode: Long,
-        simpleInfo: String?,
+        simpleInfo: String,
         errorCode: Int
     ) {
-        //TODO("Not yet implemented")
-        if (errorCode == 2) {
-            // Token过期
-            ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
-        }
+        if (this.ktvApiConfig.type == KTVType.Normal) return
+        val jsonMsg = JSONObject(simpleInfo)
+        val format = jsonMsg.getJSONObject("format")
+        val highPart = format.getJSONArray("highPart")
+        val highStartTime = JSONObject(highPart[0].toString())
+        val time = highStartTime.getLong("highStartTime")
+        val endTime = highStartTime.getLong("highEndTime")
+        this.highStartTime = time
+        lrcView?.onHighPartTime(time, endTime)
     }
 
     // ------------------------ AgoraRtcMediaPlayerDelegate ------------------------

@@ -406,6 +406,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 roomLivingViewModel.mSetting.setHighLighterUid("");
             }
 
+            if (roomLivingViewModel.isRoomOwner() && chorusNowNum > 0) {
+                getBinding().lrcControlView.showHighLightButton(true);
+            } else if (roomLivingViewModel.isRoomOwner() && chorusNowNum == 0) {
+                getBinding().lrcControlView.showHighLightButton(false);
+            }
+
             if (roomLivingViewModel.chorusNum == 0 && chorusNowNum > 0) {
                 // 有人加入合唱
                 roomLivingViewModel.soloSingerJoinChorusMode(true);
@@ -673,6 +679,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     @SuppressLint("NotifyDataSetChanged")
     private void onMusicChanged(@NonNull RoomSelSongModel music) {
+        if (voiceHighlightDialog != null) {
+            voiceHighlightDialog.reset();
+        }
+
         getBinding().lrcControlView.setMusic(music);
         if (UserManager.getInstance().getUser().id.toString().equals(music.getUserNo())) {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Singer);

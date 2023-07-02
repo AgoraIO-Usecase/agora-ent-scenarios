@@ -78,11 +78,20 @@ public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvDia
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
+
+        mBinding.btSetParams.setOnClickListener(v -> {
+            String key = mBinding.etParms.getText().toString();
+            String value = mBinding.etParmsNum.getText().toString();
+            String parameters = "{\"" + key + "\":" + value;
+            mSetting.setParameters(parameters);
+        });
     }
 
     public interface Callback {
         void onAudioDumpEnable(boolean enable);
 
         void onScoringControl(int level, int offset);
+
+        void onSetParameters(String parameters);
     }
 }

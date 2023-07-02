@@ -126,9 +126,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         mKaraokeView = new KaraokeView(mBinding.ilActive.lyricsView, mBinding.ilActive.scoringView);
 
-        if (!isMineOwner) {
-            mBinding.ilActive.btnVocalHighlight.setVisibility(View.GONE);
-        }
+        mBinding.ilActive.btnVocalHighlight.setVisibility(View.GONE);
 
         initListener();
     }
@@ -243,11 +241,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         chorusScore = 0;
         this.isMineOwner = isMineOwner;
 
-        if (isMineOwner) {
-            mBinding.ilActive.btnVocalHighlight.setVisibility(View.VISIBLE);
-        } else {
-            mBinding.ilActive.btnVocalHighlight.setVisibility(View.GONE);
-        }
+//        if (isMineOwner) {
+//            mBinding.ilActive.btnVocalHighlight.setVisibility(View.VISIBLE);
+//        } else {
+//            mBinding.ilActive.btnVocalHighlight.setVisibility(View.GONE);
+//        }
 
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
@@ -769,6 +767,20 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 .error(R.mipmap.ktv_highlight_head_bg)
                 .transform(new CenterCropRoundCornerTransform(100))
                 .into(mBinding.ilActive.ivVocalHighlight);
+    }
+
+    public void showHighLightButton(boolean show) {
+        if (show) {
+            mBinding.ilActive.btnVocalHighlight.setVisibility(View.VISIBLE);
+            mBinding.ilActive.btnVocalHighlight.bringToFront();
+        } else {
+            mBinding.ilActive.btnVocalHighlight.setVisibility(View.GONE);
+        }
+    }
+    
+    @Override
+    public void onHighPartTime(long highStartTime, long highEndTime) {
+
     }
 
     public interface OnKaraokeEventListener {
