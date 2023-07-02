@@ -41,4 +41,8 @@ public class KTVDebugSettingBean {
 
         this.mCallback.onScoringControl(level, offset);
     }
+
+    public void setParameters(String parameters) {
+        this.mCallback.onSetParameters(parameters);
+    }
 }

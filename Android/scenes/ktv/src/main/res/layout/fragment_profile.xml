@@ -126,7 +126,6 @@
         android:textStyle="bold"
         android:textColor="@color/white_80_percent"
         android:textSize="17sp"
-        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvPrefessional"/>
 
@@ -139,7 +138,6 @@
         android:background="@drawable/ktv_ear_back_mode_radius"
         android:orientation="horizontal"
         android:gravity="center"
-        android:visibility="gone"
         app:layout_constraintTop_toTopOf="@+id/tvVoice"
         app:layout_constraintBottom_toBottomOf="@+id/tvVoice"
         app:layout_constraintEnd_toEndOf="parent"
@@ -155,7 +153,7 @@
             android:gravity="center"
             android:button="@null"
             android:checked="true"
-            android:text="低音质"
+            android:text="标准音质"
             app:layout_constraintTop_toTopOf="@+id/tvModeOboe"
             app:layout_constraintBottom_toBottomOf="@+id/tvModeOboe"
             app:layout_constraintEnd_toStartOf="@+id/tvModeOboe"
@@ -171,7 +169,7 @@
             android:gravity="center"
             android:button="@null"
             android:checked="false"
-            android:text="中音质"
+            android:text="高音质"
             app:layout_constraintTop_toTopOf="@+id/tvModeOboe"
             app:layout_constraintBottom_toBottomOf="@+id/tvModeOboe"
             app:layout_constraintEnd_toStartOf="@+id/tvModeOboe"
@@ -187,7 +185,7 @@
             android:gravity="center"
             android:button="@null"
             android:checked="false"
-            android:text="高音质"
+            android:text="超高音质"
             app:layout_constraintTop_toTopOf="@+id/tvMode"
             app:layout_constraintBottom_toBottomOf="@+id/tvMode"
             app:layout_constraintEnd_toEndOf="parent"
@@ -199,7 +197,6 @@
         android:layout_height="1dp"
         android:layout_marginTop="20dp"
         android:background="@color/white_20_percent"
-        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvVoice" />
@@ -246,7 +243,7 @@
         android:textColor="@color/white_80_percent"
         android:textSize="17sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPrefessional"/>
+        app:layout_constraintTop_toBottomOf="@+id/tvVoice"/>
 
     <RadioGroup
         android:id="@+id/rgAINSMode"

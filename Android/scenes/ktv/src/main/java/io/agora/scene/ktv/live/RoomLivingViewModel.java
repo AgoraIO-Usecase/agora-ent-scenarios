@@ -42,15 +42,12 @@ import io.agora.rtc2.ChannelMediaOptions;
 import io.agora.rtc2.Constants;
 import io.agora.rtc2.DataStreamConfig;
 import io.agora.rtc2.IRtcEngineEventHandler;
-import io.agora.rtc2.RtcConnection;
 import io.agora.rtc2.RtcEngine;
 import io.agora.rtc2.RtcEngineConfig;
 import io.agora.rtc2.RtcEngineEx;
 import io.agora.rtc2.video.ContentInspectConfig;
 import io.agora.rtc2.video.VideoCanvas;
 import io.agora.scene.base.BuildConfig;
-import io.agora.scene.base.TokenGenerator;
-import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.NetWorkEvent;
 import io.agora.scene.base.manager.UserManager;
@@ -73,7 +70,6 @@ import io.agora.scene.ktv.service.ScoringAlgoControlModel;
 import io.agora.scene.ktv.service.ScoringAverageModel;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
-import io.agora.scene.ktv.widget.lrcView.LrcControlView;
 
 public class RoomLivingViewModel extends ViewModel {
 
@@ -1079,6 +1075,11 @@ public class RoomLivingViewModel extends ViewModel {
             public void onScoringControl(int level, int offset) {
                 scoringAlgoControlLiveData.postValue(new ScoringAlgoControlModel(level, offset));
             }
+
+            @Override
+            public void onSetParameters(String parameters) {
+                mRtcEngine.setParameters(parameters);
+            }
         });
 
         mSetting = new MusicSettingBean(false, 100, 50, 0, new MusicSettingDialog.Callback() {
@@ -1165,13 +1166,10 @@ public class RoomLivingViewModel extends ViewModel {
             public void onAECLevelChanged(int level) {
                 KTVLogger.d(TAG, "onAECLevelChanged: " + level);
                 if (level == 0) {
-                    ToastUtils.showToast("音质低");
                     mRtcEngine.setParameters("{\"che.audio.aec.split_srate_for_48k\": 16000}");
                 } else if (level == 1) {
-                    ToastUtils.showToast("音质中");
                     mRtcEngine.setParameters("{\"che.audio.aec.split_srate_for_48k\": 24000}");
                 } else if (level == 2) {
-                    ToastUtils.showToast("音质高");
                     mRtcEngine.setParameters("{\"che.audio.aec.split_srate_for_48k\": 48000}");
                 }
             }
@@ -1351,6 +1349,8 @@ public class RoomLivingViewModel extends ViewModel {
         };
         config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING;
         config.mAudioScenario = Constants.AUDIO_SCENARIO_CHORUS;
+        config.addExtension("agora_ai_echo_cancellation_extension");
+        config.addExtension("agora_ai_noise_suppression_extension");
         try {
             mRtcEngine = (RtcEngineEx) RtcEngine.create(config);
         } catch (Exception e) {
@@ -1368,7 +1368,7 @@ public class RoomLivingViewModel extends ViewModel {
                 roomInfoLiveData.getValue().getRoomNo(),
                 UserManager.getInstance().getUser().id.intValue(),
                 roomInfoLiveData.getValue().getRoomNo() + "_ex",
-                roomInfoLiveData.getValue().getAgoraChorusToken(), 10)
+                roomInfoLiveData.getValue().getAgoraChorusToken(), 10, KTVType.Normal)
         );
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
@@ -1739,7 +1739,7 @@ public class RoomLivingViewModel extends ViewModel {
             audioPreset = AUDIO_EFFECT_OFF;
             syncAudioPreset(audioPreset);
             KTVLogger.d(TAG, "Your are highlighter, " + "uid: " + uid);
-        } else if (seatLocalLiveData.getValue() != null && (songCode.equals(seatLocalLiveData.getValue().getChorusSongCode()) || seatLocalLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString()))) {
+        } else {
             // 房主自己在唱歌且Highlight其他人
             isHighlightSinger = false;
         }

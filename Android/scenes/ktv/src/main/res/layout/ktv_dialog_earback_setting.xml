@@ -185,6 +185,7 @@
         android:layout_marginTop="26dp"
         android:text="耳返模式"
         android:textColor="@color/white"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvVolumeTitle" />
 
@@ -197,6 +198,7 @@
         android:background="@drawable/ktv_ear_back_mode_radius"
         android:orientation="horizontal"
         android:gravity="center"
+        android:visibility="gone"
         app:layout_constraintTop_toTopOf="@+id/tvMode"
         app:layout_constraintBottom_toBottomOf="@+id/tvMode"
         app:layout_constraintStart_toEndOf="@+id/tvMode"

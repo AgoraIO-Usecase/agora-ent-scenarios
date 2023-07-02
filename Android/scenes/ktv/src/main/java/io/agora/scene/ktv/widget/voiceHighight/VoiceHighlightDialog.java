@@ -16,6 +16,7 @@ import java.util.List;
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.OnItemClickListener;
+import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvDialogVoiceHighlightBinding;
 import io.agora.scene.ktv.databinding.KtvItemHighlightVoiceBinding;
@@ -30,6 +31,7 @@ public class VoiceHighlightDialog extends BaseBottomSheetDialogFragment<KtvDialo
     private final @NonNull OnVoiceHighlightDialogListener mListener;
     private final MusicSettingBean mSettings;
     private RecyclerView mRecyclerView;
+    private Boolean hasHigher = false;
 
     public VoiceHighlightDialog(@NonNull OnVoiceHighlightDialogListener listener, MusicSettingBean settings) {
         this.mListener = listener;
@@ -53,7 +55,11 @@ public class VoiceHighlightDialog extends BaseBottomSheetDialogFragment<KtvDialo
     public void onItemClick(@NonNull VoiceHighlightBean data, View view, int position, long viewType) {
         OnItemClickListener.super.onItemClick(data, view, position, viewType);
         Log.d("hugo", "onItemClick    " + position);
-
+        if (hasHigher) {
+            ToastUtils.showToast("本首歌已有突出者");
+            return;
+        }
+        hasHigher = true;
         for (int i = 0; i < adapter.dataList.size(); i++) {
             adapter.dataList.get(i).setSelect(i == position);
             adapter.notifyItemChanged(i);
@@ -73,5 +79,9 @@ public class VoiceHighlightDialog extends BaseBottomSheetDialogFragment<KtvDialo
         adapter = new BaseRecyclerViewAdapter<>(list, this, VoiceHighlightHolder.class);
         mRecyclerView.setAdapter(adapter);
 
+    }
+
+    public void reset() {
+        this.hasHigher = false;
     }
 }
