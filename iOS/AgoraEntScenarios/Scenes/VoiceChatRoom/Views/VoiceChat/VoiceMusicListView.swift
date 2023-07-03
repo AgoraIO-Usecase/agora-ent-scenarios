@@ -206,21 +206,21 @@ class VoiceMusicListView: UIView {
         rtcKit?.stopMusic()
         musicList.forEach({ $0.status = .none })
         if self.currentIndex < 0, let model = self.musicList.first {
-            model.status = .playing
+            model.status = .download
+            currentMusic = model
             rtcKit?.playMusic(songCode: model.songCode)
             tableView.reloadData()
             backgroundMusicPlaying?(model)
             musicToolView.setupMusicInfo(model: model, isOrigin: isOrigin)
             currentIndex += 1
-            currentMusic = model
         } else {
             currentIndex += 1
             currentIndex = currentIndex < musicList.count ? currentIndex : 0
             let model = musicList[currentIndex]
-            model.status = .playing
+            model.status = .download
+            currentMusic = model
             rtcKit?.playMusic(songCode: model.songCode)
             tableView.reloadData()
-            currentMusic = model
             backgroundMusicPlaying?(model)
             musicToolView.setupMusicInfo(model: model, isOrigin: isOrigin)
             tableView.scrollToRow(at: IndexPath(row: currentIndex, section: 0), at: .middle, animated: true)
