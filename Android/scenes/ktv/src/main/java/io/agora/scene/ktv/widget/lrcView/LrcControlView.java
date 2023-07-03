@@ -782,11 +782,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mBinding.ilActive.btnVocalHighlight.setVisibility(View.GONE);
         }
     }
-    
-    @Override
-    public void onHighPartTime(long highStartTime, long highEndTime) {
-
-    }
 
     public interface OnKaraokeEventListener {
         default void onSwitchOriginalClick(int aimStatus) { // 0: origin 1: acc 2: daochang
