@@ -20,6 +20,9 @@ import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * @author create by zhangwei03
@@ -230,31 +233,16 @@ class VoiceSyncManagerServiceImp(
                     })
                     mSceneReference?.collection(kRoomBGMCollection)?.get(object: DataListCallback {
                         override fun onSuccess(result: MutableList<IObject>?) {
-                            Log.d(TAG, "kRoomBGMCollection get: $result")
                             val item = result?.firstOrNull() ?: return
                             val bgmInfo = item.toObject(VoiceBgmModel::class.java) ?: return
                             kRoomBGMId = item.id
-                            val song = bgmInfo.songName
-                            val singer = bgmInfo.singerName
-                            val isOrigin = bgmInfo.isOrigin
-                            AgoraRtcEngineController.get().bgmManager().remoteUpdateBGMInfo(song, singer, isOrigin)
+                            Log.d(TAG, "kRoomBGMCollection get: $bgmInfo")
+                            GlobalScope.launch {
+                                delay(3500)
+                                remoteUpdateBGMInfo(bgmInfo)
+                            }
                         }
                         override fun onFail(exception: SyncManagerException?) {
-                        }
-                    })
-                    mSceneReference?.subscribe(kRoomBGMCollection, object : Sync.EventListener {
-                        override fun onUpdated(item: IObject?) {
-                            Log.d(TAG, "kRoomBGM updated: $item")
-                            val bgmInfo = item?.toObject(VoiceBgmModel::class.java) ?: return
-                            remoteUpdateBGMInfo(bgmInfo)
-                        }
-                        override fun onCreated(item: IObject?) {
-                            kRoomBGMId = item?.id
-                            Log.d(TAG, "kRoomBGM created: $item")
-                        }
-                        override fun onDeleted(item: IObject?) {}
-                        override fun onSubscribeError(ex: SyncManagerException?) {
-                            Log.d(TAG, "kRoomBGM onSubscribeError: $ex")
                         }
                     })
                     mSceneReference?.collection(kRoomBGMCollection)?.subscribe(object : Sync.EventListener {
