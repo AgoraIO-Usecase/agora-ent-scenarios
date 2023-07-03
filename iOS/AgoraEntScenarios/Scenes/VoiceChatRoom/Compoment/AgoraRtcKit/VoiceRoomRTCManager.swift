@@ -195,6 +195,7 @@ public let kMPK_RTC_UID: UInt = 1
     private var musicPlayer: AgoraMusicPlayerProtocol?
     typealias MusicListCallback = ([AgoraMusic])->()
     private var onMusicChartsIdCache: [String: MusicListCallback] = [:]
+    private var lastSongCode: Int = 0
     var backgroundMusics: [AgoraMusic] = []
     
     @objc public weak var delegate: VMManagerDelegate?
@@ -397,6 +398,7 @@ public let kMPK_RTC_UID: UInt = 1
             mediaOption.publishMediaPlayerId = Int(musicPlayer?.getMediaPlayerId() ?? 0)
             mediaOption.publishMediaPlayerAudioTrack = true
             rtcKit.updateChannel(with: mediaOption)
+            lastSongCode = songCode
             if let mcc = mcc, mcc.isPreloaded(songCode: songCode) != 0 {
                 mcc.preload(songCode: songCode)
             } else {
@@ -1017,7 +1019,7 @@ extension VoiceRoomRTCManager: AgoraMusicContentCenterEventDelegate {
     public func onPreLoadEvent(_ requestId: String, songCode: Int, percent: Int, lyricUrl: String?, status: AgoraMusicContentCenterPreloadStatus, errorCode: AgoraMusicContentCenterStatusCode) {
         delegate?.downloadBackgroundMusicStatus?(songCode: songCode, progress: percent, status: status)
         downloadBackgroundMusicStatusClosure?(songCode, percent, status)
-        if status == .OK {
+        if status == .OK, lastSongCode == songCode {
             musicPlayer?.openMedia(songCode: songCode, startPos: 0)
         }
     }
