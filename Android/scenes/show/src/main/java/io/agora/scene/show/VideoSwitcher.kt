@@ -63,8 +63,9 @@ interface VideoSwitcher {
 
     /**
      * 离开频道，如果在已预加载的频道则只取消订阅音视频流
+     * @param force 强制离开
      */
-    fun leaveChannel(connection: RtcConnection): Boolean
+    fun leaveChannel(connection: RtcConnection,force: Boolean): Boolean
 
     /**
      * 渲染远端视频，相比于RtcEngineEx.setupRemoteVideoEx，这里会缓存渲染视图，减少渲染时不断重复创建渲染视图，提高渲染速度

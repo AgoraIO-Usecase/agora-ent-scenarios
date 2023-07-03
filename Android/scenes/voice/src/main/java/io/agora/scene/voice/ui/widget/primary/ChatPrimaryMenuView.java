@@ -311,10 +311,10 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
         });
     }
 
-    public void setEnableMic(boolean isEnable){
+    public void setEnableMic(boolean isOn){
         post(()-> {
             ImageView mic = menuLayout.findViewById(R.id.voice_extend_item_mic);
-            if (isEnable){
+            if (isOn){
                 mic.setImageResource(R.drawable.voice_icon_mic);
             }else {
                 mic.setImageResource(R.drawable.voice_icon_close_mic);
@@ -322,13 +322,13 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
         });
     }
 
-    public void showMicVisible(boolean muteLocal,boolean isVisible){
+    public void showMicVisible(boolean isVisible, boolean isOn){
         post(()-> {
             ImageView mic = menuLayout.findViewById(R.id.voice_extend_item_mic);
-            if (muteLocal) {
-                mic.setImageResource(R.drawable.voice_icon_close_mic);
-            } else {
+            if (isOn){
                 mic.setImageResource(R.drawable.voice_icon_mic);
+            }else {
+                mic.setImageResource(R.drawable.voice_icon_close_mic);
             }
             if (isVisible){
                 mic.setVisibility(VISIBLE);

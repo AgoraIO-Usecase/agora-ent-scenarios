@@ -199,7 +199,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         lrcView = null
 
         mRtcEngine.removeHandler(this)
-        mRtcEngine.registerAudioFrameObserver(null)
         mPlayer.unRegisterPlayerObserver(this)
         mMusicCenter.unregisterEventHandler()
 
@@ -601,6 +600,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         channelMediaOption.publishMediaPlayerId = mPlayer.mediaPlayerId
         channelMediaOption.publishMediaPlayerAudioTrack = true
         mRtcEngine.updateChannelMediaOptions(channelMediaOption)
+<<<<<<< HEAD
+=======
+
+>>>>>>> feat/scene/all_android_3.0.0
     }
 
     private fun joinChorus(newRole: KTVSingRole, token: String, onJoinChorusStateListener: OnJoinChorusStateListener) {
@@ -997,11 +1000,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         val localPosition =
                             localNtpTime - this.localPlayerSystemTime + this.localPlayerPosition // 当前副唱的播放时间
                         val expectPosition =
-                            localNtpTime - remoteNtp + position + audioPlayoutDelay // 期望主唱的播放时间
+                            localNtpTime - remoteNtp + position + audioPlayoutDelay // 实际主唱的播放时间
                         val diff = expectPosition - localPosition
-                        Log.i(TAG,"play_status_seek: " + diff + "  localNtpTime: " + localNtpTime + "  expectPosition: " + expectPosition +
+                        Log.d(TAG,"play_status_seek: " + diff + "  localNtpTime: " + localNtpTime + "  expectPosition: " + expectPosition +
                                 "  localPosition: " + localPosition + "  ntp diff: " + (localNtpTime - remoteNtp))
-                        if ((diff > 80 || diff < -80) && expectPosition < duration) { //设置阈值为40ms，避免频繁seek
+                        if ((diff > 50 || diff < -50) && expectPosition < duration) { //设置阈值为50ms，避免频繁seek
                             mPlayer.seek(expectPosition)
                         }
                     } else {

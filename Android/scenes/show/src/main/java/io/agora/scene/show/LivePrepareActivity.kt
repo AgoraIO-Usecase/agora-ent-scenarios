@@ -7,11 +7,14 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.SurfaceView
+import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import io.agora.rtc2.Constants
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoCanvas
@@ -51,6 +54,11 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         super.initView(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v: View?, insets: WindowInsetsCompat ->
+            val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            binding.root.setPaddingRelative(inset.left, 0, inset.right, inset.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
         binding.ivRoomCover.setImageResource(getThumbnailIcon(mThumbnailId))
         binding.tvRoomId.text = getString(R.string.show_room_id, mRoomId)
         binding.etRoomName.setOnEditorActionListener { v, actionId, _ ->

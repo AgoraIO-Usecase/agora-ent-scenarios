@@ -98,13 +98,13 @@ class PresetAudienceDialog constructor(context: Context, showCloseBtn: Boolean =
             // 中端机：画质增强
             VideoSetting.AudiencePlaySetting.ENHANCE_MEDIUM -> {
                 VideoSetting.setCurrAudienceEnhanceSwitch(true)
-                VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_1)
+                VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_SUPER)
                 VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.Medium, isByAudience = true)
             }
             // 高端机：画质增强
             VideoSetting.AudiencePlaySetting.ENHANCE_HIGH -> {
                 VideoSetting.setCurrAudienceEnhanceSwitch(true)
-                VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_1_5)
+                VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_SUPER)
                 VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.High, isByAudience = true)
             }
             // 低端机：基础

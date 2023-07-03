@@ -146,21 +146,26 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     }
 
 
-    override fun leaveChannel(connection: RtcConnection): Boolean {
+    override fun leaveChannel(connection: RtcConnection, force: Boolean): Boolean {
         connectionsJoined.firstOrNull { it.isSameChannel(connection) }
             ?.let { conn ->
-                val options = conn.mediaOptions
-                options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-                options.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
-                options.autoSubscribeVideo = false
-                options.autoSubscribeAudio = false
-                rtcEngine.updateChannelMediaOptionsEx(options, conn)
-                conn.rtcEventHandler?.setEventListener(null)
-                connectionsJoined.remove(conn)
-                connectionsPreloaded.add(conn)
-                //remoteVideoCanvasList.filter { canvas -> canvas.connection.equal(conn) }.forEach { it.release() }
-                // 移除播放中的MediaPlayer
-                conn.audioMixingPlayer?.stop()
+                if (force){
+                    leaveRtcChannel(conn)
+                    connectionsJoined.remove(conn)
+                }else{
+                    val options = conn.mediaOptions
+                    options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+                    options.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+                    options.autoSubscribeVideo = false
+                    options.autoSubscribeAudio = false
+                    rtcEngine.updateChannelMediaOptionsEx(options, conn)
+                    conn.rtcEventHandler?.setEventListener(null)
+                    connectionsJoined.remove(conn)
+                    connectionsPreloaded.add(conn)
+                    //remoteVideoCanvasList.filter { canvas -> canvas.connection.equal(conn) }.forEach { it.release() }
+                    // 移除播放中的MediaPlayer
+                    conn.audioMixingPlayer?.stop()
+                }
                 return true
             }
 
@@ -282,7 +287,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
                     }
                 }
 
-                override fun onPositionChanged(position_ms: Long) {
+                override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
 
                 }
 
