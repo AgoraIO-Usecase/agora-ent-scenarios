@@ -251,7 +251,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                 let status = ((first.member?.mic_status == .mute && first.member?.uid == VLUserCenter.user.id) || (seatUser != nil && seatUser?.status != -1)) ? 1 : (first.status == 3 ? -1 : first.status)
                 let mic_index = first.mic_index
                 //刷新底部✋🏻状态
-                if !isOwner && first.mic_index != 0  {
+                if !isOwner && first.mic_index != 0 && seatUser != nil  {
                     refreshHandsUp(status: status)
                 }
                 //将userList中的上麦用户做标记，便于后续过滤
