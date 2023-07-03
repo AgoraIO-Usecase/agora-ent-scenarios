@@ -55,7 +55,9 @@ class VoiceMusicListView: UIView {
     
     private lazy var musicToolView = VoiceMusicToolView()
     private var rtcKit: VoiceRoomRTCManager?
-    private var currentMusic: VoiceMusicModel?
+    private var currentMusic: VoiceMusicModel? {
+        (musicList.isEmpty || currentIndex < 0) ? nil : musicList[currentIndex]
+    }
     private var roomInfo: VRRoomInfo?
     private var musicList: [VoiceMusicModel] = []
     private var currentIndex: Int = -1
@@ -66,7 +68,7 @@ class VoiceMusicListView: UIView {
     init(rtcKit: VoiceRoomRTCManager?, currentMusic: VoiceMusicModel?, isOrigin: Bool, roomInfo: VRRoomInfo?) {
         super.init(frame: .zero)
         self.rtcKit = rtcKit
-        self.currentMusic = currentMusic
+        self.currentIndex = musicList.firstIndex(where: { $0.songCode == currentMusic?.songCode }) ?? -1
         self.roomInfo = roomInfo
         self.isOrigin = isOrigin
         setupUI()
@@ -105,11 +107,15 @@ class VoiceMusicListView: UIView {
         let component = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth,
                                                                      height: height))
         let controller = VoiceRoomAlertViewController(compent: component, custom: self)
-        
         let presentView: VoiceRoomPresentView = VoiceRoomPresentView.shared
         presentView.showView(with: CGRect(x: 0, y: 0, width: ScreenWidth, height: height), vc: controller, maxHeight: Screen.height - 40)
         let vc = UIViewController.cl_topViewController()
         vc?.view.addSubview(presentView)
+        currentIndex = -1
+        getMusicList()
+        tableViewHCons?.constant = height - 59 - (60 + Screen.safeAreaBottomHeight())
+        tableViewHCons?.isActive = true
+        layoutIfNeeded()
         VoiceRoomPresentView.shared.panViewHeightClosure = { height in
             self.tableViewHCons?.constant = height - 59 - (60 + Screen.safeAreaBottomHeight())
             self.tableViewHCons?.isActive = true
@@ -136,11 +142,13 @@ class VoiceMusicListView: UIView {
                 model.name = $0.name
                 model.singer = $0.singer
                 model.songCode = $0.songCode
-                if $0.name == self.currentMusic?.name {
-                    model.status = .playing
+                if $0.songCode == self.currentMusic?.songCode ||
+                    $0.songCode == self.roomInfo?.room?.backgroundMusic?.songCode {
+                    let status = self.roomInfo?.room?.backgroundMusic?.status ?? .playing
+                    model.status = status == .playing ? .playing : .download
                     self.musicToolView.setupMusicInfo(model: model, isOrigin: self.isOrigin)
                     self.backgroundMusicPlaying?(model)
-                    self.currentIndex = list.firstIndex(where: { $0.name == self.currentMusic?.name }) ?? 0
+                    self.currentIndex = list.firstIndex(where: { $0.songCode == model.songCode }) ?? -1
                 }
                 return model
             })
@@ -148,9 +156,12 @@ class VoiceMusicListView: UIView {
             if !self.musicList.isEmpty && self.currentMusic == nil {
                 self.musicList[0].status = .pause
                 self.musicToolView.setupMusicInfo(model: self.musicList[0], isOrigin: self.isOrigin)
-                self.currentMusic = self.musicList.first
+                self.currentIndex = 0
             }
             self.tableView.reloadData()
+            self.tableView.scrollToRow(at: IndexPath(row: self.currentIndex,
+                                                     section: 0), at: .middle,
+                                       animated: true)
         })
     }
     
@@ -163,6 +174,7 @@ class VoiceMusicListView: UIView {
                 } else if state == .paused {
                     self.playOrPauseHandler(isPlay: false)
                 } else if state == .playing {
+                    self.playOrPauseHandler(isPlay: true)
                     self.rtcKit?.selectPlayerTrackMode(isOrigin: self.roomInfo?.room?.musicIsOrigin ?? true)
                 }
                 self.musicToolView.updatePlayStatus(isPlaying: state == .playing)
@@ -207,7 +219,6 @@ class VoiceMusicListView: UIView {
         musicList.forEach({ $0.status = .none })
         if self.currentIndex < 0, let model = self.musicList.first {
             model.status = .download
-            currentMusic = model
             rtcKit?.playMusic(songCode: model.songCode)
             tableView.reloadData()
             backgroundMusicPlaying?(model)
@@ -218,7 +229,6 @@ class VoiceMusicListView: UIView {
             currentIndex = currentIndex < musicList.count ? currentIndex : 0
             let model = musicList[currentIndex]
             model.status = .download
-            currentMusic = model
             rtcKit?.playMusic(songCode: model.songCode)
             tableView.reloadData()
             backgroundMusicPlaying?(model)
@@ -230,7 +240,7 @@ class VoiceMusicListView: UIView {
     @discardableResult
     private func playOrPauseHandler(isPlay: Bool) -> Int {
         if !musicList.isEmpty {
-            currentIndex = currentIndex < 0 ? 0 : currentIndex
+            let currentIndex = currentIndex < 0 ? 0 : currentIndex
             let currentModel = musicList[currentIndex]
             currentModel.status = isPlay ? .playing : .pause
             backgroundMusicPlaying?(currentModel)
@@ -305,7 +315,6 @@ extension VoiceMusicListView: UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         musicList.forEach({ $0.status = .none })
         let model = musicList[indexPath.row]
-        currentMusic = model
         model.status = .download
         rtcKit?.stopMusic()
         rtcKit?.playMusic(songCode: model.songCode)
