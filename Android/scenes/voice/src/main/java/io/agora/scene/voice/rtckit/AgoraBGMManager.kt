@@ -260,7 +260,8 @@ class AgoraBGMManager(
             Constants.MediaPlayerState.PLAYER_STATE_STOPPED -> {
                 mRtcEngine.adjustPlaybackSignalVolume(100)
             }
-            Constants.MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
+            Constants.MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED,
+            Constants.MediaPlayerState.PLAYER_STATE_PLAYBACK_COMPLETED -> {
                 runOnMainThread {
                     playNext()
                 }
