@@ -1322,6 +1322,7 @@ class LiveDetailFragment : Fragment() {
             },
             onChannelJoined = {
                 onJoinChannelSuccess.invoke()
+                enableContentInspectEx()
             }
         )
 
@@ -1335,7 +1336,9 @@ class LiveDetailFragment : Fragment() {
               // nothing
             })
         }
+    }
 
+    private fun enableContentInspectEx(){
         // ------------------ 开启鉴黄服务 ------------------
         val contentInspectConfig = ContentInspectConfig()
         try {
@@ -1343,15 +1346,12 @@ class LiveDetailFragment : Fragment() {
             jsonObject.put("sceneName", "show")
             jsonObject.put("id", UserManager.getInstance().user.id)
             contentInspectConfig.extraInfo = jsonObject.toString()
-            val module1 = ContentInspectModule()
-            module1.interval = 30
-            module1.type = CONTENT_INSPECT_TYPE_SUPERVISE
-            val module2 = ContentInspectModule()
-            module2.interval = 30
-            module2.type = CONTENT_INSPECT_TYPE_MODERATION
-            contentInspectConfig.modules = arrayOf(module1, module2)
-            contentInspectConfig.moduleCount = 2
-            mRtcEngine.enableContentInspect(true, contentInspectConfig)
+            val module = ContentInspectModule()
+            module.interval = 30
+            module.type = CONTENT_INSPECT_TYPE_MODERATION
+            contentInspectConfig.modules = arrayOf( module)
+            contentInspectConfig.moduleCount = 1
+            mRtcEngine.enableContentInspectEx(true, contentInspectConfig, mMainRtcConnection)
         }
         catch (_: JSONException) {
 
@@ -1377,7 +1377,8 @@ class LiveDetailFragment : Fragment() {
                     }
                     // 720P
                     else if (stats.width == VideoSetting.Resolution.V_720P.height && stats.height == VideoSetting.Resolution.V_720P.width) {
-                        superResolution = VideoSetting.SuperResolution.SR_1_5
+                        // 将画质增强-高端机 及 画质增强-中端机的“超分倍数“改成 20,超级画质
+                        superResolution = VideoSetting.SuperResolution.SR_SUPER
                     }
                     // 540P、480P
                     else if ((stats.width == VideoSetting.Resolution.V_540P.height && stats.height == VideoSetting.Resolution.V_540P.width)
@@ -1398,7 +1399,8 @@ class LiveDetailFragment : Fragment() {
                     }
                     // 720P
                     else if (stats.width == VideoSetting.Resolution.V_720P.height && stats.height == VideoSetting.Resolution.V_720P.width) {
-                        superResolution = VideoSetting.SuperResolution.SR_1
+                        // 将画质增强-高端机 及 画质增强-中端机的“超分倍数“改成 20,超级画质
+                        superResolution = VideoSetting.SuperResolution.SR_SUPER
                     }
                     // 360P以及以下
                     else {
@@ -1436,7 +1438,7 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun destroyRtcEngine(): Boolean {
-        return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection)
+        return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection,true)
     }
 
     private fun enableLocalAudio(enable: Boolean) {
@@ -1517,12 +1519,10 @@ class LiveDetailFragment : Fragment() {
 
     private fun updateIdleMode() {
         if (interactionInfo?.interactStatus == ShowInteractionStatus.pking.value) {
-            // 退出连麦多频道
+            // 退出连麦多频道，主播需要离开对方频道
             mRtcVideoSwitcher.leaveChannel(
-                RtcConnection(
-                    interactionInfo!!.roomId,
-                    UserManager.getInstance().user.id.toInt()
-                )
+                RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()),
+                isRoomOwner
             )
         }
 
@@ -1675,12 +1675,21 @@ class LiveDetailFragment : Fragment() {
             onRemoteVideoStats = { stats ->
                 setEnhance(stats)
                 activity?.runOnUiThread {
-                    refreshStatisticInfo(downBitrate = stats.receivedBitrate, receiveFPS = stats.decoderOutputFrameRate, downLossPackage = stats.packetLossRate, downDelay = stats.delay, receiveVideoSize = Size(stats.width, stats.height))
+                    refreshStatisticInfo(
+                        downBitrate = stats.receivedBitrate,
+                        receiveFPS = stats.decoderOutputFrameRate,
+                        downLossPackage = stats.packetLossRate,
+                        receiveVideoSize = Size(stats.width, stats.height)
+                    )
                 }
             },
             onRemoteAudioStats = { stats ->
                 activity?.runOnUiThread {
-                    refreshStatisticInfo(audioBitrate = stats.receivedBitrate, audioLossPackage = stats.audioLossRate)
+                    refreshStatisticInfo(
+                        audioBitrate = stats.receivedBitrate,
+                        audioLossPackage = stats.audioLossRate,
+                        downDelay = stats.networkTransportDelay,
+                    )
                 }
             },
             onDownlinkNetworkInfoUpdated = { info ->
@@ -1728,6 +1737,7 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.autoSubscribeAudio = true
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
             channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_ULTRA_LOW_LATENCY
+            channelMediaOptions.isInteractiveAudience = true
             val pkRtcConnection = RtcConnection(
                 interactionInfo!!.roomId,
                 UserManager.getInstance().user.id.toInt()
