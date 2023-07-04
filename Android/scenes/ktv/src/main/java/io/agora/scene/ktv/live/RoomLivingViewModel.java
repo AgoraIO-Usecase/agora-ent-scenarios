@@ -1175,6 +1175,7 @@ public class RoomLivingViewModel extends ViewModel {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("sceneName", "ktv");
             jsonObject.put("id", UserManager.getInstance().getUser().id.toString());
+            jsonObject.put("userNo", UserManager.getInstance().getUser().userNo);
             contentInspectConfig.extraInfo = jsonObject.toString();
             ContentInspectConfig.ContentInspectModule module = new ContentInspectConfig.ContentInspectModule();
             module.interval = 30;
