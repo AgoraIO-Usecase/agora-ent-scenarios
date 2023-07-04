@@ -195,6 +195,7 @@ public let kMPK_RTC_UID: UInt = 1
     private var musicPlayer: AgoraMusicPlayerProtocol?
     typealias MusicListCallback = ([AgoraMusic])->()
     private var onMusicChartsIdCache: [String: MusicListCallback] = [:]
+    private var lastSongCode: Int = 0
     var backgroundMusics: [AgoraMusic] = []
     
     @objc public weak var delegate: VMManagerDelegate?
@@ -269,7 +270,6 @@ public let kMPK_RTC_UID: UInt = 1
                 } else if musicPath.contains("-B&R-") {
                     delegate?.reportAlien?(with: .blueAndRed, musicType: musicType)
                 }
-                musicPlayer?.pause()
                 let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized() : "EN"
                 musicPath = musicPath.replacingOccurrences(of: "CN", with: lanuagePath)
                 rtcKit.startAudioMixing(musicPath, loopback: false, cycle: 1)
@@ -300,7 +300,7 @@ public let kMPK_RTC_UID: UInt = 1
         self.type = .VoiceChat
         rtcKit.delegate = self
         rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
-        self .setParametersWithMD()
+        self.setParametersWithMD()
         if type == .ktv || type == .social {
             rtcKit.setChannelProfile(.liveBroadcasting)
 
@@ -392,13 +392,13 @@ public let kMPK_RTC_UID: UInt = 1
         } else if musicPlayer?.getPlayerState() == .playing {
             musicPlayer?.pause()
         } else {
-            stopPlaySound()
             mediaPlayer?.pause()
             musicPlayer?.stop()
             let mediaOption = AgoraRtcChannelMediaOptions()
             mediaOption.publishMediaPlayerId = Int(musicPlayer?.getMediaPlayerId() ?? 0)
             mediaOption.publishMediaPlayerAudioTrack = true
             rtcKit.updateChannel(with: mediaOption)
+            lastSongCode = songCode
             if let mcc = mcc, mcc.isPreloaded(songCode: songCode) != 0 {
                 mcc.preload(songCode: songCode)
             } else {
@@ -508,7 +508,6 @@ public let kMPK_RTC_UID: UInt = 1
         } else if type == .ainsOff {
             path = AgoraConfig.NoneSound[index]
         }
-        musicPlayer?.pause()
         let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized() : "EN"
         path = path.replacingOccurrences(of: "CN", with: lanuagePath)
         rtcKit.startAudioMixing(path, loopback: false, cycle: 1)
@@ -1020,7 +1019,7 @@ extension VoiceRoomRTCManager: AgoraMusicContentCenterEventDelegate {
     public func onPreLoadEvent(_ requestId: String, songCode: Int, percent: Int, lyricUrl: String?, status: AgoraMusicContentCenterPreloadStatus, errorCode: AgoraMusicContentCenterStatusCode) {
         delegate?.downloadBackgroundMusicStatus?(songCode: songCode, progress: percent, status: status)
         downloadBackgroundMusicStatusClosure?(songCode, percent, status)
-        if status == .OK {
+        if status == .OK, lastSongCode == songCode {
             musicPlayer?.openMedia(songCode: songCode, startPos: 0)
         }
     }
