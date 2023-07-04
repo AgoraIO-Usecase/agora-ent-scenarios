@@ -833,7 +833,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     AgoraContentInspectConfig* config = [AgoraContentInspectConfig new];
     NSDictionary* dic = @{
         @"userNo": [VLUserCenter user].id ? : @"unknown",
-        @"sceneName": @"ktv"
+        @"sceneName": @"ktv",
+        @"userNo": VLUserCenter.user.userNo
     };
     NSData* jsonData = [NSJSONSerialization dataWithJSONObject:dic options:0 error:nil];
     NSString* jsonStr = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
