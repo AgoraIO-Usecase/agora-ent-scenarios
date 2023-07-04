@@ -34,7 +34,7 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     private let slIdentifier = "slider"
     private let nIdentifier = "normal"
     private lazy var inEarView = VoiceRealInEarView()
-
+    private var useSoundCard: Bool = false
 //    private var settingName: [String] = ["\(LanguageManager.localValue(key: "blue")) & \(LanguageManager.localValue(key: "red"))", LanguageManager.localValue(key: "Robot Volume"), LanguageManager.localValue(key: "Best Sound"), "AINS", "Spatial Audio"]
 //    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
     
@@ -42,6 +42,7 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
                                          LanguageManager.localValue(key: "AIAEC"),
                                          LanguageManager.localValue(key: "AGC"),
                                          LanguageManager.localValue(key: "In-Ear Monitor"),
+                                         "虚拟声卡",
                                          LanguageManager.localValue(key: "Agora Blue & Red Bot"),
                                          LanguageManager.localValue(key: "Robot Volume"),
                                          LanguageManager.localValue(key: "Best Agora Sound"),
@@ -54,6 +55,7 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
                                           "AIAEC",
                                           "AGC",
                                           "InEar",
+                                          "InEar",
                                           "jiqi",
                                           "icons／set／laba",
                                           "icons／set／zuijia",
@@ -62,6 +64,10 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
 
     private var soundTitle: [String] = []
     private var ainsTitle: [String] = []
+    var soundOpen: Bool = false
+    var gainValue: Double = 1.0
+    var typeValue: Int = 2
+    var effectType: Int = 0
     private var rtcKit: VoiceRoomRTCManager?
     private lazy var musicListView: VoiceMusicListView = {
         let view = VoiceMusicListView(rtcKit: rtcKit,
@@ -200,6 +206,7 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 //        VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
+        self.openSoundCard(false)
     }
     
     private func layoutUI() {
@@ -262,7 +269,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
-            return 4
+            return 5
         } else if section == 1 {
             return 2
         } else {
@@ -390,7 +397,13 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 } else {
                     cell.contentLabel.text = "Off".localized()
                 }
-            } else {
+            } else if indexPath.row == 4 {
+                if useSoundCard == true {
+                    cell.contentLabel.text = "On".localized()
+                } else {
+                    cell.contentLabel.text = "Off".localized()
+                }
+            }else {
                 cell.contentLabel.text = "Other".localized()
 
             }
@@ -400,8 +413,8 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             if indexPath.row == 0 {
                 let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
                 guard !settingImage.isEmpty else { return cell}
-                cell.iconView.image = UIImage(settingImage[4])
-                cell.titleLabel.text = settingName[4]
+                cell.iconView.image = UIImage(settingImage[5])
+                cell.titleLabel.text = settingName[5]
                 cell.swith.alpha = isAudience ? 0.5 : 1
                 cell.swith.isUserInteractionEnabled = !isAudience
                 cell.selectionStyle = .none
@@ -418,8 +431,8 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 let cell: VMSliderTableViewCell = tableView.dequeueReusableCell(withIdentifier: slIdentifier) as! VMSliderTableViewCell
                 guard !settingImage.isEmpty else { return cell}
 
-                cell.iconView.image = UIImage(settingImage[5])
-                cell.titleLabel.text = settingName[5]
+                cell.iconView.image = UIImage(settingImage[6])
+                cell.titleLabel.text = settingName[6]
                 cell.isAudience = isAudience
                 cell.selectionStyle = .none
                 cell.volBlock = { [weak self] vol in
@@ -441,8 +454,8 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             }
             guard !settingImage.isEmpty else { return cell}
 
-            cell.iconView.image = UIImage(settingImage[6 + indexPath.row])
-            cell.titleLabel.text = settingName[6 + indexPath.row]
+            cell.iconView.image = UIImage(settingImage[7 + indexPath.row])
+            cell.titleLabel.text = settingName[7 + indexPath.row]
       
             if indexPath.row == 0 {
                 cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
@@ -513,6 +526,37 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             return
         }
         tableViewHeight = heightType.rawValue - 70
+        if indexPath.section == 0 && indexPath.row == 4 {
+            let VC: SoundCardSettingViewController = SoundCardSettingViewController()
+            VC.soundOpen = soundOpen
+            VC.typeValue = typeValue
+            VC.gainValue = gainValue
+            VC.effectType = effectType
+            VC.soundBlock = {[weak self] flag in
+                self?.soundOpen = flag
+                //开启/关闭声卡
+                self?.openSoundCard(flag)
+            }
+            VC.effectBlock = {[weak self] effect in
+                self?.effectType = effect
+                //调音效
+                self?.setSoundEffect(effect)
+            }
+            VC.gainBlock = {[weak self] gain in
+                self?.gainValue = gain
+                //调增益
+                self?.setGain(gain)
+            }
+            VC.typeBlock = {[weak self] type in
+                self?.typeValue = type
+                //调类型
+                self?.setPreset(type)
+            }
+            DispatchQueue.main.async {[weak self] in
+                self?.presentView.push(with: VC, frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 454), maxHeight: heightType.rawValue)
+            }
+            return
+        }
         let detailVC: VoiceRoomAudioSettingDetailViewController = VoiceRoomAudioSettingDetailViewController()
         self.detailVC = detailVC
         detailVC.roomInfo = roomInfo
@@ -597,4 +641,39 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         }
         return soundType
     }
+    
+    private func openSoundCard(_ isOpen: Bool) {
+        if isOpen {
+            self.rtcKit?.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":2,\"gain\":1.0,\"gender\":0,\"effect\":0}}")
+        } else {
+            self.rtcKit?.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":-1,\"gain\":-1.0,\"gender\":-1,\"effect\":-1}}")
+        }
+    }
+    
+    private func setSoundEffect(_ type: Int) {
+        gainValue = 1.0
+        effectType = type
+        typeValue = 4
+        switch type {
+        case 0:
+            self.rtcKit?.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":0}}")
+        case 1:
+            self.rtcKit?.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":0}}")
+        case 2:
+            self.rtcKit?.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":1}}")
+        case 3:
+            self.rtcKit?.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":1}}")
+        default:
+            break
+        }
+    }
+    
+    private func setGain(_ gain: Double) {
+        self.rtcKit?.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":\(typeValue),\"gain\":\(gain),\"gender\":\(effectType / 2 == 0 ? 0 : 1),\"effect\":\(effectType > 1 ? 1 : 0)}}")
+    }
+    
+    private func setPreset(_ preset: Int) {
+        self.rtcKit?.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":\(preset),\"gain\":\(gainValue),\"gender\":\(effectType / 2 == 0 ? 0 : 1),\"effect\":\(effectType > 1 ? 1 : 0)}}")
+    }
+    
 }

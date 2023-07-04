@@ -584,6 +584,9 @@
 		E357356429EFD74A009D54E1 /* AgoraDownLoadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357355729EFD74A009D54E1 /* AgoraDownLoadManager.swift */; };
 		E357356929EFD8B5009D54E1 /* VLEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = E357356729EFD8B4009D54E1 /* VLEffectView.m */; };
 		E357356A29EFD8B5009D54E1 /* VLSoundEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = E357356829EFD8B5009D54E1 /* VLSoundEffectView.m */; };
+		E357A8F32A52AA8E0054DA84 /* SoundCardSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357A8F12A52AA8E0054DA84 /* SoundCardSettingViewController.swift */; };
+		E357A8F42A52AA8E0054DA84 /* SoundCardSettingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E357A8F22A52AA8E0054DA84 /* SoundCardSettingViewController.xib */; };
+		E357A8F62A52C4AC0054DA84 /* DropMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357A8F52A52C4AC0054DA84 /* DropMenu.swift */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
 		E72D78792A27416C00C9134C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E72D78772A27416C00C9134C /* Localizable.strings */; };
@@ -1352,6 +1355,9 @@
 		E357356629EFD8B4009D54E1 /* VLSoundEffectView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSoundEffectView.h; sourceTree = "<group>"; };
 		E357356729EFD8B4009D54E1 /* VLEffectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLEffectView.m; sourceTree = "<group>"; };
 		E357356829EFD8B5009D54E1 /* VLSoundEffectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSoundEffectView.m; sourceTree = "<group>"; };
+		E357A8F12A52AA8E0054DA84 /* SoundCardSettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundCardSettingViewController.swift; sourceTree = "<group>"; };
+		E357A8F22A52AA8E0054DA84 /* SoundCardSettingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SoundCardSettingViewController.xib; sourceTree = "<group>"; };
+		E357A8F52A52C4AC0054DA84 /* DropMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropMenu.swift; sourceTree = "<group>"; };
 		E358F7FC293493AD00A7EBD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E358F801293494BC00A7EBD1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E358F803293494C100A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
@@ -2514,6 +2520,8 @@
 				DD619B2F29E3E262008F63E4 /* VoiceRoomAudioSettingDetailViewController.swift */,
 				DD619B3029E3E262008F63E4 /* VoiceRoomInviteUsersController.swift */,
 				DD619B3129E3E262008F63E4 /* VoiceRoomAudioSettingViewController.swift */,
+				E357A8F12A52AA8E0054DA84 /* SoundCardSettingViewController.swift */,
+				E357A8F22A52AA8E0054DA84 /* SoundCardSettingViewController.xib */,
 			);
 			path = VoiceChat;
 			sourceTree = "<group>";
@@ -2610,6 +2618,7 @@
 				E797BAE42A1B3F9C00B7D610 /* VoiceRealInEarView.swift */,
 				E797BAE82A1B57C400B7D610 /* VoiceMusicListView.swift */,
 				E797BAEC2A1C62C900B7D610 /* VoiceMusicPlayingView.swift */,
+				E357A8F52A52C4AC0054DA84 /* DropMenu.swift */,
 			);
 			path = VoiceChat;
 			sourceTree = "<group>";
@@ -3461,6 +3470,7 @@
 				DD84177529090C520026B624 /* product1.png in Resources */,
 				DD84176929090C520026B624 /* banner1.png in Resources */,
 				DD84176B29090C520026B624 /* tab_home.png in Resources */,
+				E357A8F42A52AA8E0054DA84 /* SoundCardSettingViewController.xib in Resources */,
 				DD84176829090C520026B624 /* ic_back_b.png in Resources */,
 				DD84177329090C520026B624 /* product2.png in Resources */,
 				DD2A43D728FFCEE7004CEDCF /* LaunchScreen.storyboard in Resources */,
@@ -3635,6 +3645,7 @@
 				DD3610BB29B70CDC00CE7984 /* ShowPresettingHeaderView.swift in Sources */,
 				DD0292C5295BF0DC00485225 /* VLSongItmModel.m in Sources */,
 				DDA199EF28FFE579009D3E61 /* VLBaseTableView.m in Sources */,
+				E357A8F62A52C4AC0054DA84 /* DropMenu.swift in Sources */,
 				DD84177C29090C520026B624 /* VLHomeItemView.m in Sources */,
 				DD619AC529E3E247008F63E4 /* SAGifterCell.swift in Sources */,
 				DD619BBE29E3E262008F63E4 /* VRCreateRoomViewController.swift in Sources */,
@@ -3743,6 +3754,7 @@
 				DD619AA429E3E247008F63E4 /* SARoomsViewController.swift in Sources */,
 				DD36109829B70CDC00CE7984 /* ShowVideoSettingVC.swift in Sources */,
 				DD36108029B70CDC00CE7984 /* EffectsDetector.m in Sources */,
+				E357A8F32A52AA8E0054DA84 /* SoundCardSettingViewController.swift in Sources */,
 				DD619BD129E3E262008F63E4 /* VoiceRoomEmojiListView.swift in Sources */,
 				DD84177B29090C520026B624 /* VLHomeViewController.m in Sources */,
 				DD36107329B70CDC00CE7984 /* BEFrameProcessor.mm in Sources */,

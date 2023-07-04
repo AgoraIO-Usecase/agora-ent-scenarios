@@ -152,6 +152,7 @@ class VoiceRoomViewController: VRBaseViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigation.isHidden = false
+        self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":-1,\"gain\":-1.0,\"gender\":-1,\"effect\":-1}}")
         UIApplication.shared.isIdleTimerDisabled = false
     }
     
