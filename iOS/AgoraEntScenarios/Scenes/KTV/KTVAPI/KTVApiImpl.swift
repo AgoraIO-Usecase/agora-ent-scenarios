@@ -154,7 +154,6 @@ class KTVApiImpl: NSObject{
         engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
         engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
-        engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
     }
     
     func renewInnerDataStreamId() {
@@ -820,10 +819,10 @@ extension KTVApiImpl {
         self.enableProfessional = enable
         //专业非专业还需要根据是否佩戴耳机来判断是否开启3A
         apiConfig?.engine?.setAudioProfile(enable ? .musicHighQualityStereo : .musicStandardStereo)
-        apiConfig?.engine?.setParameters("{\"che.audio.aec.enable\":\((enable && !isWearingHeadPhones) ? "true" : "false")}")
-        apiConfig?.engine?.setParameters("{\"che.audio.agc.enable\":\((enable && !isWearingHeadPhones) ? "true" : "false")}")
-        apiConfig?.engine?.setParameters("{\"che.audio.ans.enable\":\((enable && !isWearingHeadPhones) ? "true" : "false")}")
-        apiConfig?.engine?.setParameters("{\"che.audio.md.enable\":\((enable && !isWearingHeadPhones) ? "true" : "false")}")
+        apiConfig?.engine?.setParameters("{\"che.audio.aec.enable\":\((enable && isWearingHeadPhones) ? false : true)}")
+        apiConfig?.engine?.setParameters("{\"che.audio.agc.enable\":\((enable && isWearingHeadPhones) ? false : true)}")
+        apiConfig?.engine?.setParameters("{\"che.audio.ans.enable\":\((enable && isWearingHeadPhones) ? false : true)}")
+        apiConfig?.engine?.setParameters("{\"che.audio.md.enable\": false)}")
     }
 
 }

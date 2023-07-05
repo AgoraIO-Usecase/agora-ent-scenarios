@@ -20,6 +20,7 @@
 #import "VLVoiceShowView.h"
 #import "VLVoicePerShowView.h"
 #import "VLEarSettingView.h"
+#import "VLDebugView.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LSTPopView (KTVModal)
@@ -91,6 +92,11 @@ NS_ASSUME_NONNULL_BEGIN
                                    isEarOn:(BOOL)isEarOn
                                            vol:(CGFloat)vol
                                   withDelegate:(id<VLEarSettingViewViewDelegate>)delegate;
+
+//弹出DebugView
++ (LSTPopView*)popDebugViewWithParentView:(UIView*)parentView
+                                   isDebugMode:(BOOL)isDebugMode
+                                  withDelegate:(id<VLDebugViewDelegate>)delegate;
 
 @end
 
