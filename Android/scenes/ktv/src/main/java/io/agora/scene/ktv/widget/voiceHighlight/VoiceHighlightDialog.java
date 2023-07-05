@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.widget.voiceHighight;
+package io.agora.scene.ktv.widget.voiceHighlight;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
@@ -20,8 +19,6 @@ import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvDialogVoiceHighlightBinding;
 import io.agora.scene.ktv.databinding.KtvItemHighlightVoiceBinding;
-import io.agora.scene.ktv.live.holder.EffectVoiceHolder;
-import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.widget.DividerDecoration;
 
@@ -56,7 +53,7 @@ public class VoiceHighlightDialog extends BaseBottomSheetDialogFragment<KtvDialo
         OnItemClickListener.super.onItemClick(data, view, position, viewType);
         Log.d("hugo", "onItemClick    " + position);
         if (hasHigher) {
-            ToastUtils.showToast("本首歌已有突出者");
+            ToastUtils.showToast("本首歌已设置过突出者，请下首歌再设置");
             return;
         }
         hasHigher = true;

@@ -104,6 +104,41 @@ public class ProfileFragment extends BaseViewBindingFragment<FragmentProfileBind
             }
         });
 
+        getBinding().cbAIAECSwitcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (!isChecked) {
+                    getBinding().aiaecSelector.setEnabled(false);
+                } else {
+                    getBinding().aiaecSelector.setEnabled(true);
+                }
+                mSetting.setAIAECMode(isChecked);
+                mSetting.setAIAECStrength(mSetting.getAIAECStrength());
+            }
+        });
+        getBinding().cbAIAECSwitcher.setChecked(mSetting.isAIAECOpen());
+
+        getBinding().aiaecSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (mSetting.getAIAECStrength() != position) {
+                    mSetting.setAIAECStrength(position);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        getBinding().aiaecSelector.setSelection(mSetting.getAIAECStrength());
+
+        if (mSetting.isAIAECOpen()) {
+            getBinding().aiaecSelector.setEnabled(true);
+        } else {
+            getBinding().aiaecSelector.setEnabled(false);
+        }
+
         getBinding().ivBackIcon.setOnClickListener(view -> {
             ((RoomLivingActivity) requireActivity()).closeMenuDialog();
         });

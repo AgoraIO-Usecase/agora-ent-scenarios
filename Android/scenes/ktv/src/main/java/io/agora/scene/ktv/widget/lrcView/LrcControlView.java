@@ -245,13 +245,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     public void onPrepareStatus(boolean isMineOwner) {
         chorusScore = 0;
         this.isMineOwner = isMineOwner;
-
-//        if (isMineOwner) {
-//            mBinding.ilActive.btnVocalHighlight.setVisibility(View.VISIBLE);
-//        } else {
-//            mBinding.ilActive.btnVocalHighlight.setVisibility(View.GONE);
-//        }
-
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
         mBinding.ilChorus.getRoot().setVisibility(View.GONE);

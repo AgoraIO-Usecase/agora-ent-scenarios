@@ -998,7 +998,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         val expectPosition =
                             localNtpTime - remoteNtp + position + audioPlayoutDelay // 实际主唱的播放时间
                         val diff = expectPosition - localPosition
-                        Log.d(TAG,"play_status_seek: " + diff + "  localNtpTime: " + localNtpTime + "  expectPosition: " + expectPosition +
+                        Log.d(TAG,"play_status_seek: " + diff + " audioPlayoutDelay：" + audioPlayoutDelay +  "  localNtpTime: " + localNtpTime + "  expectPosition: " + expectPosition +
                                 "  localPosition: " + localPosition + "  ntp diff: " + (localNtpTime - remoteNtp))
                         if ((diff > 50 || diff < -50) && expectPosition < duration) { //设置阈值为50ms，避免频繁seek
                             mPlayer.seek(expectPosition)
@@ -1147,6 +1147,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         list: Array<out Music>?,
         errorCode: Int
     ) {
+        Log.d(TAG, "onMusicCollectionResult, requestId: $requestId, list: $list, errorCode: $errorCode")
         val id = requestId ?: return
         val callback = musicCollectionCallbackMap[id] ?: return
         musicCollectionCallbackMap.remove(id)

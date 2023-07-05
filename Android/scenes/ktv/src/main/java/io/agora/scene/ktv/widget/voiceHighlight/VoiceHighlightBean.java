@@ -1,8 +1,5 @@
-package io.agora.scene.ktv.widget.voiceHighight;
+package io.agora.scene.ktv.widget.voiceHighlight;
 
-import androidx.annotation.DrawableRes;
-
-import io.agora.scene.ktv.bean.EffectVoiceBean;
 import io.agora.scene.ktv.service.RoomSeatModel;
 
 public class VoiceHighlightBean {
