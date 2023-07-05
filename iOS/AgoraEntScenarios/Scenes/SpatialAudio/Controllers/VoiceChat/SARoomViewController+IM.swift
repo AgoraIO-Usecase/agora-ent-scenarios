@@ -249,7 +249,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                 // 查询自己有没有在麦上
                 let seatUser = AppContext.saTmpServiceImp().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
                 var status = first.status
-                if seatUser == nil, status == 3 || status == 4 {
+                if seatUser == nil, status == 2 || status == 3 || status == 4 {
                     status = -1
                 } else if (first.member?.mic_status == .mute && first.member?.uid == VLUserCenter.user.id) || (seatUser != nil && seatUser?.status != -1) {
                     status = 1
