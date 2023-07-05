@@ -38,6 +38,7 @@ import io.agora.rtc2.RtcEngineConfig;
 import io.agora.rtc2.RtcEngineEx;
 import io.agora.rtc2.video.ContentInspectConfig;
 import io.agora.rtc2.video.VideoCanvas;
+import io.agora.scene.base.AudioModeration;
 import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.TokenGenerator;
 import io.agora.scene.base.component.AgoraApplication;
@@ -1186,6 +1187,16 @@ public class RoomLivingViewModel extends ViewModel {
         } catch (JSONException e) {
             KTVLogger.e(TAG, e.toString());
         }
+
+        // ------------------ 开启语音鉴定服务 ------------------
+        AudioModeration.INSTANCE.moderationAudio(
+                roomInfoLiveData.getValue().getRoomNo(),
+                UserManager.getInstance().getUser().id,
+                AudioModeration.AgoraChannelType.rtc,
+                "ktv",
+                null,
+                null
+        );
 
         // ------------------ 初始化音乐播放设置面版 ------------------
         mDebugSetting = new KTVDebugSettingBean(new KTVDebugSettingsDialog.Callback() {
