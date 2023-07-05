@@ -64,7 +64,6 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
 
     private var soundTitle: [String] = []
     private var ainsTitle: [String] = []
-    var soundOpen: Bool = false
     var gainValue: Double = 1.0
     var typeValue: Int = 2
     var effectType: Int = 0
@@ -206,7 +205,6 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 //        VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
-        self.openSoundCard(false)
     }
     
     private func layoutUI() {
@@ -528,14 +526,15 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         tableViewHeight = heightType.rawValue - 70
         if indexPath.section == 0 && indexPath.row == 4 {
             let VC: SoundCardSettingViewController = SoundCardSettingViewController()
-            VC.soundOpen = soundOpen
+            VC.soundOpen = useSoundCard
             VC.typeValue = typeValue
             VC.gainValue = gainValue
             VC.effectType = effectType
             VC.soundBlock = {[weak self] flag in
-                self?.soundOpen = flag
+                self?.useSoundCard = flag
                 //开启/关闭声卡
                 self?.openSoundCard(flag)
+                tableView.reloadData()
             }
             VC.effectBlock = {[weak self] effect in
                 self?.effectType = effect
@@ -643,8 +642,12 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
     }
     
     private func openSoundCard(_ isOpen: Bool) {
+        useSoundCard = isOpen
         if isOpen {
-            self.rtcKit?.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":2,\"gain\":1.0,\"gender\":0,\"effect\":0}}")
+            gainValue = 1.0
+            effectType = 0
+            typeValue = 4
+            self.rtcKit?.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":0}}")
         } else {
             self.rtcKit?.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":-1,\"gain\":-1.0,\"gender\":-1,\"effect\":-1}}")
         }

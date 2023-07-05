@@ -39,6 +39,10 @@ class SoundCardSettingViewController: UIViewController {
         warningView.isHidden = flag
         HeadSetUtil.addSoundCardObserver {[weak self] flag in
             self?.warningView.isHidden = flag
+            guard let soundBlock = self?.soundBlock else {
+                return
+            }
+            soundBlock(flag)
         }
         volGainSlider.addTarget(self, action: #selector(gain), for: .valueChanged)
         volGainSlider.addTarget(self, action: #selector(gainSend), for: .touchUpInside)
@@ -74,6 +78,15 @@ class SoundCardSettingViewController: UIViewController {
     
     @objc func change( swich: UISwitch) {
         print("switch \(swich.isOn)")
+        if swich.isOn {
+            iconView.image = UIImage(named: "shuaige")
+            typeLabel.text = "性感欧巴"
+            descLabel.text = "悦耳 | 磁性"
+            gainLabel.text = "1.0"
+            volGainSlider.value = 0.5
+            micTypeLabel.text = "4"
+            micTypeSlider.value = 1
+        }
         guard let changeBlock = soundBlock else {return}
         changeBlock(swich.isOn)
     }
