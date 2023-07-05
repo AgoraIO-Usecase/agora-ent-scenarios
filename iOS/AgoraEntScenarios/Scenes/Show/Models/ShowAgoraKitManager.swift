@@ -116,7 +116,8 @@ class ShowAgoraKitManager: NSObject {
         let config = AgoraContentInspectConfig()
         let dic: [String: String] = [
             "id": VLUserCenter.user.id,
-            "sceneName": "show"
+            "sceneName": "show",
+            "userNo": VLUserCenter.user.userNo
         ]
 
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
@@ -139,6 +140,7 @@ class ShowAgoraKitManager: NSObject {
         guard role == .broadcaster else { return }
         let userInfo = ["id": VLUserCenter.user.id,
                         "sceneName": "show",
+                        "userNo": VLUserCenter.user.userNo,
                         "userName": VLUserCenter.user.name]
         let parasm: [String: Any] = ["appId": KeyCenter.AppId,
                                      "channelName": channelName,

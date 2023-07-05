@@ -252,7 +252,8 @@ class NetworkManager:NSObject {
     func getPlayloadWithSceneType(_ type: SceneType) -> String? {
         let userInfo: [String: Any] = [
             "id": VLUserCenter.user.id,     //用户id
-            "sceneName": type.desc()
+            "sceneName": type.desc(),
+            "userNo": VLUserCenter.user.userNo
         ]
                  
         guard let jsonData = try? JSONSerialization.data(withJSONObject: userInfo, options: .prettyPrinted) else {
