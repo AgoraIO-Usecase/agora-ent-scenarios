@@ -197,6 +197,7 @@ class ShowAgoraKitManager: NSObject {
                 let cost = Int(-date.timeIntervalSinceNow * 1000)
                 showLogger.info("join room[\(channelName)] ex success uid: \(uid) cost \(cost) ms", context: kShowLogBaseContext)
                 self?.setupContentInspectConfig(true, connection: connection)
+                self?.moderationAudio(channelName: targetChannelId, role: role)
             }
             agoraKit.updateChannelEx(with: mediaOptions, connection: connection)
             exConnectionMap[targetChannelId] = connection
