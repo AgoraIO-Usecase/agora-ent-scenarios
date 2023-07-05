@@ -584,6 +584,7 @@
 		E357356429EFD74A009D54E1 /* AgoraDownLoadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E357355729EFD74A009D54E1 /* AgoraDownLoadManager.swift */; };
 		E357356929EFD8B5009D54E1 /* VLEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = E357356729EFD8B4009D54E1 /* VLEffectView.m */; };
 		E357356A29EFD8B5009D54E1 /* VLSoundEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = E357356829EFD8B5009D54E1 /* VLSoundEffectView.m */; };
+		E357A8E62A4EAF9F0054DA84 /* VLDebugView.m in Sources */ = {isa = PBXBuildFile; fileRef = E357A8E52A4EAF9F0054DA84 /* VLDebugView.m */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 		E36B41C22A2452CC0034FACF /* VLVoicePerShowView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36B41C02A2452CC0034FACF /* VLVoicePerShowView.m */; };
 		E36B41C52A2453610034FACF /* VLVoiceShowView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36B41C32A2453610034FACF /* VLVoiceShowView.m */; };
@@ -1351,6 +1352,8 @@
 		E357356629EFD8B4009D54E1 /* VLSoundEffectView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSoundEffectView.h; sourceTree = "<group>"; };
 		E357356729EFD8B4009D54E1 /* VLEffectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLEffectView.m; sourceTree = "<group>"; };
 		E357356829EFD8B5009D54E1 /* VLSoundEffectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSoundEffectView.m; sourceTree = "<group>"; };
+		E357A8E42A4EAF9F0054DA84 /* VLDebugView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLDebugView.h; sourceTree = "<group>"; };
+		E357A8E52A4EAF9F0054DA84 /* VLDebugView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLDebugView.m; sourceTree = "<group>"; };
 		E358F7F72934925F00A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		E358F7F82934925F00A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		E358F7FC293493AD00A7EBD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1549,6 +1552,8 @@
 				DD0292A6295BF0DC00485225 /* VLAudienceIndicator.h */,
 				E36B41C12A2452CC0034FACF /* VLVoicePerShowView.h */,
 				E36B41C02A2452CC0034FACF /* VLVoicePerShowView.m */,
+				E357A8E42A4EAF9F0054DA84 /* VLDebugView.h */,
+				E357A8E52A4EAF9F0054DA84 /* VLDebugView.m */,
 				DD0292A7295BF0DC00485225 /* VLKTVMVView.h */,
 				DD0292A8295BF0DC00485225 /* VLKTVTopView.m */,
 				DD0292A9295BF0DC00485225 /* VLKTVBottomToolbar.h */,
@@ -3843,6 +3848,7 @@
 				DD0292D0295BF0DC00485225 /* VLSongList.m in Sources */,
 				DD0292ED295BF0DC00485225 /* VLKTVTopView.m in Sources */,
 				DD3610B129B70CDC00CE7984 /* ShowChatInputView.swift in Sources */,
+				E357A8E62A4EAF9F0054DA84 /* VLDebugView.m in Sources */,
 				DD0292EA295BF0DC00485225 /* VLKTVBottomToolbar.m in Sources */,
 				DD84178529090C520026B624 /* VLUploadImageResModel.m in Sources */,
 				DD619A8129E3E247008F63E4 /* UIButtonLayoutExtensionSA.swift in Sources */,

@@ -69,7 +69,8 @@ KTVApiEventHandlerDelegate,
 IMusicLoadStateListener,
 VLVoiceShowViewDelegate,
 VLVoicePerShowViewDelegate,
-VLEarSettingViewViewDelegate
+VLEarSettingViewViewDelegate,
+VLDebugViewDelegate
 >
 
 typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
@@ -122,6 +123,8 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) NSInteger volGrade;
 @property (nonatomic, assign) CGFloat earValue;
 @property (nonatomic, assign) checkAuthType checkType;
+@property (nonatomic, assign) BOOL isDumpMode;
+@property (nonatomic, assign) BOOL voiceShowHasSeted;
 @end
 
 @implementation VLKTVViewController
@@ -186,9 +189,25 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [[UIApplication sharedApplication] setIdleTimerDisabled: YES];
     
     //add debug
-    [self.topView addGestureRecognizer:[KTVDebugManager createStartGesture]];
+    //[self.topView addGestureRecognizer:[KTVDebugManager createStartGesture]];
     
     self.earValue = 100;
+    
+    if(AppContext.shared.isDebugMode){
+        //如果开启了debug模式
+        UIButton *debugBtn = [[UIButton alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 200, 80, 80)];
+        [debugBtn setBackgroundColor:[UIColor blueColor]];
+        debugBtn.layer.cornerRadius = 40;
+        debugBtn.layer.masksToBounds = true;
+        [debugBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [debugBtn setTitle:@"Debug" forState:UIControlStateNormal];
+        [debugBtn addTarget:self action:@selector(showDebug) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:debugBtn];
+    }
+}
+
+-(void)showDebug {
+    [LSTPopView popDebugViewWithParentView:self.view isDebugMode:self.isDumpMode withDelegate:self];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -481,6 +500,43 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [self.RTCkit enableInEarMonitoring:flag];
 }
 
+#pragma mark - VLDebugViewDelegate
+- (void)didExportLogWith:(NSString *)path {
+    UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:@[[NSURL fileURLWithPath:path isDirectory:YES]] applicationActivities:nil];
+    activityController.modalPresentationStyle = UIModalPresentationFullScreen;
+    [self presentViewController:activityController animated:YES completion:nil];
+}
+
+- (void)didDumpModeChanged:(BOOL)enable {
+    self.isDumpMode = enable;
+}
+
+-(void)didParamsSetWith:(NSString *)key value:(NSString *)value{
+    if([value.lowercaseString isEqualToString:@"true"] || [value.lowercaseString isEqualToString:@"false"] || [value.lowercaseString isEqualToString:@"yes"] || [value.lowercaseString isEqualToString:@"no"]){
+        BOOL flag = [value.lowercaseString isEqualToString:@"true"] || [value.lowercaseString isEqualToString:@"yes"];
+        NSString *params = @"";
+        if(flag){
+            params = [NSString stringWithFormat:@"{\"%@\":true", key];
+        } else {
+            params = [NSString stringWithFormat:@"{\"%@\":false", key];
+        }
+        [self.RTCkit setParameters:params];
+    }else if([self isPureNumberString:value]){
+        NSInteger num = [value integerValue];
+        NSString *params = [NSString stringWithFormat:@"{\"%@\":%li", key, (long)num];
+        [self.RTCkit setParameters:params];
+    } else {
+        NSString *params = [NSString stringWithFormat:@"{\"%@\":\"%@\"", key, value];
+        [self.RTCkit setParameters:params];
+    }
+}
+
+- (BOOL)isPureNumberString:(NSString *)string {
+    NSCharacterSet *numberSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789"];
+    NSRange range = [string rangeOfCharacterFromSet:numberSet.invertedSet];
+    return (range.location == NSNotFound);
+}
+
 #pragma mark - rtc callbacks
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed
 {
@@ -656,6 +712,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //清空分数
     [self.MVView.gradeView reset];
     [self.MVView.incentiveView reset];
+    self.voiceShowHasSeted = false;
     
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     
@@ -1602,6 +1659,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 //专业主播设置
 - (void)voicePerItemSelectedAction:(BOOL)isSelected {
+    if(self.voiceShowHasSeted){
+        [VLToast toast:@"本首歌已有突出者"];
+        return;
+    }
     self.isProfessional = isSelected;
     [self.ktvApi enableProfessionalStreamerMode:isSelected];
 }
