@@ -56,9 +56,9 @@ import io.agora.scene.ktv.widget.MoreDialog;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
 import io.agora.scene.ktv.widget.UserLeaveSeatMenuDialog;
 import io.agora.scene.ktv.widget.song.SongDialog;
-import io.agora.scene.ktv.widget.voiceHighight.OnVoiceHighlightDialogListener;
-import io.agora.scene.ktv.widget.voiceHighight.VoiceHighlightBean;
-import io.agora.scene.ktv.widget.voiceHighight.VoiceHighlightDialog;
+import io.agora.scene.ktv.widget.voiceHighlight.OnVoiceHighlightDialogListener;
+import io.agora.scene.ktv.widget.voiceHighlight.VoiceHighlightBean;
+import io.agora.scene.ktv.widget.voiceHighlight.VoiceHighlightDialog;
 import io.agora.scene.widget.DividerDecoration;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
@@ -397,6 +397,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 if (roomLivingViewModel.mSetting.getHighLighterUid().equals(seatModel.getRtcUid()) && !seatModel.getChorusSongCode().equals("")) {
                     hasHighlighter = true;
                 }
+
+                if (roomLivingViewModel.mSetting.getHighLighterUid().equals(seatModel.getRtcUid()) && roomLivingViewModel.songPlayingLiveData.getValue() != null && roomLivingViewModel.songPlayingLiveData.getValue().getUserNo().equals(seatModel.getRtcUid())) {
+                    hasHighlighter = true;
+                }
             }
 
             if (!hasHighlighter && roomLivingViewModel.isRoomOwner() && chorusNowNum >= 0 && !roomLivingViewModel.mSetting.getHighLighterUid().equals("")) {
@@ -404,6 +408,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 ToastUtils.showToast("人声突出功能已失效， 请重设");
                 getBinding().lrcControlView.setHighLightPersonHeadUrl("");
                 roomLivingViewModel.mSetting.setHighLighterUid("");
+            }
+
+            if (!hasHighlighter) {
+                roomLivingViewModel.resetAudioPreset();
             }
 
             if (roomLivingViewModel.isRoomOwner() && chorusNowNum > 0) {
@@ -469,6 +477,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             onMusicChanged(model);
 
             if (roomLivingViewModel.isRoomOwner()) {
+                getBinding().lrcControlView.showHighLightButton(false);
                 getBinding().lrcControlView.setHighLightPersonHeadUrl("");
                 roomLivingViewModel.mSetting.setHighLighterUid("");
             }

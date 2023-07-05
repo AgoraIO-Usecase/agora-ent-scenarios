@@ -337,7 +337,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
     @Override
     public void onItemClick(@NonNull EffectVoiceBean data, View view, int position, long viewType) {
         OnItemClickListener.super.onItemClick(data, view, position, viewType);
-        Log.e("liu0223", "onItemClick    " + position);
+        Log.d(TAG, "onItemClick    " + position);
 
         for (int i = 0; i < adapter.dataList.size(); i++) {
             adapter.dataList.get(i).setSelect(i == position);
@@ -374,5 +374,9 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         void onEarBackModeChanged(int mode);
 
         void onAINSModeChanged(int mode);
+
+        void onAIAECChanged(boolean enable);
+
+        void onAIAECStrengthSelect(int strength);
     }
 }

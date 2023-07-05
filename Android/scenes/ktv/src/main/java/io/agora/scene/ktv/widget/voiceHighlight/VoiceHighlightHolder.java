@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.widget.voiceHighight;
+package io.agora.scene.ktv.widget.voiceHighlight;
 
 import android.view.View;
 
@@ -9,7 +9,6 @@ import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvItemHighlightVoiceBinding;
-import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 public class VoiceHighlightHolder extends BaseRecyclerViewAdapter.BaseViewHolder<KtvItemHighlightVoiceBinding, VoiceHighlightBean> {

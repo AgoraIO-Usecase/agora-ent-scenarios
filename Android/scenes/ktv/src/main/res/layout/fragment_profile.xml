@@ -104,18 +104,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvPrefessional" />
 
-    <View
-        android:id="@+id/vSettingMark"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_marginTop="21dp"
-        android:elevation="0.5dp"
-        android:background="@color/ktv_dialog_bg_blue"
-        android:alpha="0.7"
-        android:visibility="invisible"
-        app:layout_constraintTop_toBottomOf="@+id/tvLowLatency"
-        />
-
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvVoice"
         android:layout_width="wrap_content"
@@ -307,6 +295,59 @@
             app:layout_constraintEnd_toEndOf="parent"
             />
     </RadioGroup>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvAIAECSwitcher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="40dp"
+        android:text="AIAEC 开关 （beta）"
+        android:textStyle="bold"
+        android:textColor="@color/white_80_percent"
+        android:textSize="17sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvLowLatency"/>
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cbAIAECSwitcher"
+        android:layout_width="50dp"
+        android:layout_height="26dp"
+        android:layout_marginEnd="20dp"
+        android:button="@drawable/cb_def_selector"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvAIAECSwitcher" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvAIAEC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="AIAEC 强度选择（beta）"
+        android:textStyle="bold"
+        android:textColor="@color/white_80_percent"
+        android:textSize="17sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAIAECSwitcher"/>
+
+    <Spinner
+        android:id="@+id/aiaec_selector"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_marginStart="20dp"
+        android:entries="@array/ktv_aiaec_strength"
+        app:layout_constraintStart_toEndOf="@+id/tvAIAEC"
+        app:layout_constraintTop_toTopOf="@+id/tvAIAEC"/>
+
+    <View
+        android:layout_width="365dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/white_20_percent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAIAEC" />
 
     <View
         android:layout_width="365dp"

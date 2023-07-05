@@ -28,6 +28,10 @@ public class MusicSettingBean {
     // 背景音降噪
     private int ainsMode = 0; // 背景音降噪：0(关闭), 1(中), 2(高)
 
+    // AIAEC
+    private boolean aiaecOpen = false;
+    private int mAIAECStrength = 0;
+
 
     public MusicSettingBean(boolean isEar, int volMic, int volMusic, int toneValue, MusicSettingDialog.Callback mCallback) {
         this.isEar = isEar;
@@ -77,6 +81,7 @@ public class MusicSettingBean {
     }
 
     public void setEffect(int effect) {
+        if (this.effect == effect) return;
         this.effect = effect;
         this.mCallback.onEffectChanged(effect);
     }
@@ -204,5 +209,21 @@ public class MusicSettingBean {
     public void setAinsMode(int mode) {
         this.ainsMode = mode;
         mCallback.onAINSModeChanged(mode);
+    }
+
+    public boolean isAIAECOpen() {
+        return aiaecOpen;
+    }
+
+    public void setAIAECMode(boolean open) {
+        this.aiaecOpen = open;
+        this.mCallback.onAIAECChanged(open);
+    }
+
+    public int getAIAECStrength() { return mAIAECStrength; }
+
+    public void setAIAECStrength(int strength) {
+        this.mAIAECStrength = strength;
+        this.mCallback.onAIAECStrengthSelect(strength);
     }
 }

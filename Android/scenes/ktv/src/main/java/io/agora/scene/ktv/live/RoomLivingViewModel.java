@@ -13,7 +13,6 @@ import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_VOCAL_CONCERT_HARMONY;
 import static io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE.CONNECTION_STATE_CONNECTED;
 import static io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE.getValue;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
-import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE;
 
 import android.text.TextUtils;
 import android.view.SurfaceView;
@@ -1237,6 +1236,21 @@ public class RoomLivingViewModel extends ViewModel {
                     mRtcEngine.setParameters("{\"che.audio.nsng.enhfactorstastical\": 200}");
                 }
             }
+
+            @Override
+            public void onAIAECChanged(boolean enable) {
+                if (enable) {
+                    mRtcEngine.setParameters("{\"che.audio.ains_mode\": 1}");
+                } else {
+                    mRtcEngine.setParameters("{\"che.audio.ains_mode\": 0}");
+                }
+            }
+
+            @Override
+            public void onAIAECStrengthSelect(int strength) {
+                KTVLogger.d(TAG, "onAIAECStrengthSelect: " + strength);
+                mRtcEngine.setParameters("{\"che.audio.aiaec.postprocessing_strategy\":" + strength + "}");
+            }
         });
     }
 
@@ -1309,16 +1323,28 @@ public class RoomLivingViewModel extends ViewModel {
                                         songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString()))) {
                             KTVLogger.d(TAG, "You are not highlighter, " + "highlighter preset: " + preset);
                             if (preset == AUDIO_EFFECT_OFF) {
+                                audioPreset = AUDIO_EFFECT_OFF_HARMONY;
+                                mSetting.updateEffect(0);
                                 mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF_HARMONY);
                             } else if (preset == ROOM_ACOUSTICS_KTV) {
+                                audioPreset = ROOM_ACOUSTICS_KTV_HARMONY;
+                                mSetting.updateEffect(1);
                                 mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_KTV_HARMONY);
                             } else if (preset == ROOM_ACOUSTICS_VOCAL_CONCERT) {
+                                audioPreset = ROOM_ACOUSTICS_VOCAL_CONCERT_HARMONY;
+                                mSetting.updateEffect(2);
                                 mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_VOCAL_CONCERT_HARMONY);
                             } else if (preset == ROOM_ACOUSTICS_PHONOGRAPH) {
+                                audioPreset = ROOM_ACOUSTICS_PHONOGRAPH_HARMONY;
+                                mSetting.updateEffect(4);
                                 mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_PHONOGRAPH_HARMONY);
                             } else if (preset == ROOM_ACOUSTICS_STUDIO) {
+                                audioPreset = ROOM_ACOUSTICS_STUDIO_HARMONY;
+                                mSetting.updateEffect(3);
                                 mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_STUDIO_HARMONY);
                             } else {
+                                audioPreset = AUDIO_EFFECT_OFF_HARMONY;
+                                mSetting.updateEffect(0);
                                 mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF_HARMONY);
                             }
                         }
@@ -1420,6 +1446,8 @@ public class RoomLivingViewModel extends ViewModel {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("sceneName", "ktv");
             jsonObject.put("id", UserManager.getInstance().getUser().id.toString());
+            jsonObject.put("userNo", UserManager.getInstance().getUser().userNo);
+            KTVLogger.d(TAG, "enableContentInspect: " + jsonObject);
             contentInspectConfig.extraInfo = jsonObject.toString();
             ContentInspectConfig.ContentInspectModule module = new ContentInspectConfig.ContentInspectModule();
             module.interval = 30;
@@ -1442,6 +1470,7 @@ public class RoomLivingViewModel extends ViewModel {
 
     private int audioPreset = 0;
     private void setAudioEffectPreset(int effect) {
+        KTVLogger.d(TAG, "setAudioEffectPreset: " + effect);
         if (mRtcEngine == null) {
             return;
         }
@@ -1761,5 +1790,11 @@ public class RoomLivingViewModel extends ViewModel {
         if (ret < 0) {
             KTVLogger.e(TAG, "syncVoiceHighlightResult() sendStreamMessage called returned: " + ret);
         }
+    }
+
+    public void resetAudioPreset() {
+        KTVLogger.d(TAG, "resetAudioPreset: " + audioPreset);
+        mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
+        mSetting.updateEffect(AUDIO_EFFECT_OFF);
     }
 }
