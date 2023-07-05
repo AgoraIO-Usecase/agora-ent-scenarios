@@ -998,7 +998,7 @@ extension SpatialAudioSyncSerciceImp {
                                  let jsonStr = object.toJson() else { return }
                            let apply = model(from: jsonStr.z.jsonToDictionary(), SAApply.self)
                            defer {
-                               if VLUserCenter.user.id != apply.member?.uid {
+                               if VLUserCenter.user.id == apply.member?.uid {
                                    self.subscribeDelegate?.onReceiveSeatRequest(roomId: self.roomId!, applicant: apply)
                                }
                            }
