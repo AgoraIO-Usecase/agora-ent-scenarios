@@ -16,7 +16,9 @@ interface ShowServiceProtocol {
     companion object {
         private val instance by lazy {
             ShowSyncManagerServiceImpl(AgoraApplication.the()){
-                ToastUtils.showToast(it.message)
+                if (it.message != "action error") {
+                    ToastUtils.showToast(it.message)
+                }
             }
         }
 

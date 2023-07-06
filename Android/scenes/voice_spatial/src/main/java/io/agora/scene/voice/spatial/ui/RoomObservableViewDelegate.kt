@@ -16,6 +16,7 @@ import io.agora.scene.voice.spatial.model.constructor.RoomSoundAudioConstructor
 import io.agora.scene.voice.spatial.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.spatial.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.spatial.rtckit.listener.RtcSpatialPositionListener
+import io.agora.scene.voice.spatial.ui.activity.ChatroomLiveActivity
 import io.agora.scene.voice.spatial.ui.dialog.*
 import io.agora.scene.voice.spatial.ui.dialog.common.CommonFragmentAlertDialog
 import io.agora.scene.voice.spatial.ui.dialog.common.CommonFragmentContentDialog
@@ -683,7 +684,11 @@ class RoomObservableViewDelegate constructor(
                         }
                         MicClickAction.UnMute -> {
                             //取消自己禁言
-                            muteLocalAudio(false)
+                            if (activity is ChatroomLiveActivity){
+                                activity.toggleSelfAudio(true, callback = {
+                                    muteLocalAudio(false)
+                                })
+                            }
                         }
                         MicClickAction.Lock -> {
                             //房主锁麦
@@ -774,7 +779,11 @@ class RoomObservableViewDelegate constructor(
                     if (isRequesting) { // 如果自己在申请上麦，就取消申请
                         roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().userId())
                     }
-                    roomLivingViewModel.acceptMicSeatInvitation()
+                    if (activity is ChatroomLiveActivity){
+                        activity.toggleSelfAudio(true, callback = {
+                            roomLivingViewModel.acceptMicSeatInvitation()
+                        })
+                    }
                 }
 
                 override fun onCancelClick() {
@@ -839,7 +848,11 @@ class RoomObservableViewDelegate constructor(
                     if (isRequesting) {
                         roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().userId())
                     } else {
-                        roomLivingViewModel.startMicSeatApply(micIndex)
+                        if (activity is ChatroomLiveActivity){
+                            activity.toggleSelfAudio(true, callback = {
+                                roomLivingViewModel.startMicSeatApply(micIndex)
+                            })
+                        }
                     }
                 }
             }).show(activity.supportFragmentManager, "room_hands_apply")
@@ -856,12 +869,12 @@ class RoomObservableViewDelegate constructor(
             ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_muted_by_host))
             return
         }
-        if (localUserMicInfo?.member?.micStatus == MicStatus.Normal) {
-            chatPrimaryMenuView.setEnableMic(false)
-            muteLocalAudio(true)
-        } else {
-            chatPrimaryMenuView.setEnableMic(true)
-            muteLocalAudio(false)
+        val openAudio = localUserMicInfo?.member?.micStatus != MicStatus.Normal
+        if (activity is ChatroomLiveActivity){
+            activity.toggleSelfAudio(openAudio, callback = {
+                chatPrimaryMenuView.setEnableMic(openAudio)
+                muteLocalAudio(!openAudio)
+            })
         }
     }
 
@@ -999,14 +1012,12 @@ class RoomObservableViewDelegate constructor(
     }
 
     private fun activeRobotSound() {
-        // 创建房间，第⼀次启动机器⼈后播放音效：
-        if (VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot) {
-            VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot = false
-            AgoraRtcEngineController.get()
-                .updateEffectVolume(robotInfo.robotVolume)
-            RoomSoundAudioConstructor.createRoomSoundAudioMap[roomKitBean.roomType]?.let {
-                AgoraRtcEngineController.get().playMusic(it)
-            }
+        // 空间音频机器人每次都播放音效
+        VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot = false
+        AgoraRtcEngineController.get()
+            .updateEffectVolume(robotInfo.robotVolume)
+        RoomSoundAudioConstructor.createRoomSoundAudioMap[roomKitBean.roomType]?.let {
+            AgoraRtcEngineController.get().playMusic(it)
         }
     }
 

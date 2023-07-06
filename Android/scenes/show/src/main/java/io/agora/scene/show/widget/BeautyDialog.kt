@@ -345,7 +345,6 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
 
     override fun onStop() {
         super.onStop()
-        beautyProcessor?.setEnable(true)
     }
 
     fun setBeautyProcessor(processor: IBeautyProcessor) {

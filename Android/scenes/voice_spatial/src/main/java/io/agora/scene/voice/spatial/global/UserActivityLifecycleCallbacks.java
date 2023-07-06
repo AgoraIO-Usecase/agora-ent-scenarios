@@ -24,18 +24,18 @@ public class UserActivityLifecycleCallbacks implements Application.ActivityLifec
 
     @Override
     public void onActivityCreated(Activity activity, Bundle bundle) {
-        LogTools.e("ActivityLifecycle", "onActivityCreated "+activity.getLocalClassName());
+        LogTools.d("ActivityLifecycle", "onActivityCreated "+activity.getLocalClassName());
         activityList.add(0, activity);
     }
 
     @Override
     public void onActivityStarted(Activity activity) {
-        LogTools.e("ActivityLifecycle", "onActivityStarted "+activity.getLocalClassName());
+        LogTools.d("ActivityLifecycle", "onActivityStarted "+activity.getLocalClassName());
     }
 
     @Override
     public void onActivityResumed(Activity activity) {
-        LogTools.e("ActivityLifecycle", "onActivityResumed activity's taskId = "+activity.getTaskId() + " name: "+activity.getLocalClassName());
+        LogTools.d("ActivityLifecycle", "onActivityResumed activity's taskId = "+activity.getTaskId() + " name: "+activity.getLocalClassName());
         if (!resumeActivity.contains(activity)) {
             resumeActivity.add(activity);
             if(resumeActivity.size() == 1) {
@@ -148,7 +148,7 @@ public class UserActivityLifecycleCallbacks implements Application.ActivityLifec
                         taskId = taskInfo.id;
                     }
                     //将任务栈置于前台
-                    LogTools.e("ActivityLifecycle", "执行moveTaskToFront，current activity:"+activity.getClass().getName());
+                    LogTools.d("ActivityLifecycle", "执行moveTaskToFront，current activity:"+activity.getClass().getName());
                     manager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME);
                 }
             }
@@ -156,7 +156,7 @@ public class UserActivityLifecycleCallbacks implements Application.ActivityLifec
     }
 
     private void makeTaskToFront(Activity activity) {
-        LogTools.e("ActivityLifecycle", "makeTaskToFront activity: "+activity.getLocalClassName());
+        LogTools.d("ActivityLifecycle", "makeTaskToFront activity: "+activity.getLocalClassName());
         ActivityManager manager = (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
         manager.moveTaskToFront(activity.getTaskId(), ActivityManager.MOVE_TASK_WITH_HOME);
     }

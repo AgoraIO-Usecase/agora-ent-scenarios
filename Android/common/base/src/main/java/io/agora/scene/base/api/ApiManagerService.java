@@ -4,6 +4,7 @@ import io.agora.scene.base.api.base.BaseResponse;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.bean.CommonBean;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.http.Body;
@@ -39,4 +40,18 @@ public interface ApiManagerService {
     Observable<BaseResponse<User>> requestUserUpdate(
             @Body RequestBody requestBody
     );
+
+    @POST(UrlConstants.REQUEST_REPORT_DEVICE)
+    Observable<BaseResponse<String>> requestReportDevice(@Query("userNo") String userNo,
+                                                         @Query("sceneId") String sceneId,
+                                                         @Query("appId") String appId,
+                                                         @Query("projectId") String projectId,
+                                                         @Body RequestBody requestBody);
+
+    @POST(UrlConstants.REQUEST_REPORT_ACTION)
+    Observable<BaseResponse<String>> requestReportAction(@Query("userNo") String userNo,
+                                                     @Query("sceneId") String sceneId,
+                                                     @Query("appId") String appId,
+                                                     @Query("projectId") String projectId,
+                                                     @Body RequestBody requestBody);
 }

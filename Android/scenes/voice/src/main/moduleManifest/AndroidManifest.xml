@@ -16,7 +16,7 @@
 
     <application
         android:name="io.agora.scene.base.component.AgoraApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/voice_ic_launcher_room"
         android:label="@string/voice_app_name"
         android:networkSecurityConfig="@xml/voice_net_config"
