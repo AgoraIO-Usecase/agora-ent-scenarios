@@ -207,7 +207,7 @@ public class ChatroomGiftView extends LinearLayout {
         @Override
         public int getItemCount() {
             if (messages != null && messages.size()>0){
-                LogTools.e("gift_view", "messages.size()" + messages.size());
+                LogTools.d("gift_view", "messages.size()" + messages.size());
                 return messages.size();
             }else {
                 return 0;
@@ -227,9 +227,9 @@ public class ChatroomGiftView extends LinearLayout {
 
         public void refresh() {
             int positionStart = messages.size();
-            LogTools.e("room_refresh", "positionStart1 " + positionStart);
+            LogTools.d("room_refresh", "positionStart1 " + positionStart);
             messages.addAll(CustomMsgHelper.getInstance().getGiftData(chatroomId));
-            LogTools.e("room_refresh", messages.size() + " positionStart: " + positionStart);
+            LogTools.d("room_refresh", messages.size() + " positionStart: " + positionStart);
             if (messages.size() > 0) {
                 ((Activity) context).runOnUiThread(new Runnable() {
                     @Override

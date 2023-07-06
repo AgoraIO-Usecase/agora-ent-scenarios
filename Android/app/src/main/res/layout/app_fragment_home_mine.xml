@@ -118,12 +118,30 @@
             tools:ignore="MissingConstraints" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvCollectionChecklist"
+            style="@style/app_tv_mine_style"
+            android:layout_marginTop="1dp"
+            android:drawableStart="@mipmap/ic_user_center2"
+            android:text="@string/app_personal_info_collection_checklist"
+            app:layout_constraintTop_toBottomOf="@id/tvPrivacyAgreement"
+            tools:ignore="MissingConstraints" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDataSharing"
+            style="@style/app_tv_mine_style"
+            android:layout_marginTop="1dp"
+            android:drawableStart="@mipmap/ic_user_center2"
+            android:text="@string/app_third_party_info_data_sharing"
+            app:layout_constraintTop_toBottomOf="@id/tvCollectionChecklist"
+            tools:ignore="MissingConstraints" />
+
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvAbout"
             style="@style/app_tv_mine_style"
             android:layout_marginTop="1dp"
             android:drawableStart="@mipmap/ic_user_center3"
             android:text="@string/app_about_us"
-            app:layout_constraintTop_toBottomOf="@id/tvPrivacyAgreement"
+            app:layout_constraintTop_toBottomOf="@id/tvDataSharing"
             tools:ignore="MissingConstraints" />
 
         <androidx.appcompat.widget.AppCompatTextView
