@@ -9,7 +9,8 @@ import UIKit
 import ZSwiftBaseLib
 import SVProgressHUD
 
-@objcMembers public class VRBaseViewController: UIViewController {
+@objcMembers
+class VRBaseViewController: UIViewController {
     lazy var navigation: BaseNavigationView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ZNavgationHeight))
 
     override public func viewWillAppear(_ animated: Bool) {
@@ -26,12 +27,8 @@ import SVProgressHUD
         navigation.back.addTarget(self, action: #selector(backAction), for: .touchUpInside)
     }
 
-    override public var preferredStatusBarStyle: UIStatusBarStyle {
-        if #available(iOS 13.0, *) {
-            return .darkContent
-        } else {
-            return .default
-        }
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        .default
     }
 
     public func setupNavigationAttributes() {
@@ -41,13 +38,13 @@ import SVProgressHUD
         navigation.backgroundColor = navBackgroundColor
     }
     
-    public override func viewWillDisappear(_ animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         SVProgressHUD.dismiss()
     }
 }
 
-public extension VRBaseViewController {
+extension VRBaseViewController {
     var showTitle: Bool { true }
 
     var titleColor: UIColor { .darkText }

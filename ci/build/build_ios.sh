@@ -1,3 +1,4 @@
+../ci/build/build_ios.sh
 # --------------------------------------------------------------------------------------------------------------------------
 # =====================================
 # ========== Guidelines ===============
@@ -95,15 +96,13 @@ PODFILE_PATH=${PWD}"/iOS/Podfile"
 
 download_file () {
     url=$1
-    agent="Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.47 Safari/536.11Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.47 Safari/536.11"
-    file_name=`echo ${url} | awk -F '?' '{print $1}' | awk -F '/' '{print $NF}'`
-    if [ ! -f ${file_name} ];then
-        curl ${url} -A "${agent}" -o ${file_name} --progress-bar
-    fi
-    # 解压缩
-    7za x "${file_name}" -y
-    mv ${file_name} "${PWD}/iOS/${file_name}"
-    echo $(ls -l) "${PWD}/iOS/"
+    zip_name=${url##*/}
+    curl -o "${WORKSPACE}/${zip_name}" ${url} --progress-bar
+    echo ${zip_name}
+
+    unzip ${WORKSPACE}/$zip_name -d ${PWD}/iOS/
+
+    # mv ${WORKSPACE}/${beauty_name} ${PWD}/iOS/
 }
 
 if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then

@@ -95,7 +95,7 @@
         imageNamed = @"ktv_score_S";
     } else if (score >= 80 && score < 90) {
         imageNamed = @"ktv_score_A";
-    } else if (score >= 60 && score < 80) {
+    } else if (score >= 70 && score < 80) {
         imageNamed = @"ktv_score_B";
     } else {
         imageNamed = @"ktv_score_C";

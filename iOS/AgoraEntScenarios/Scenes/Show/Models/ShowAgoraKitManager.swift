@@ -63,6 +63,7 @@ class ShowAgoraKitManager: NSObject {
     var exposureRangeY: Int?
     var matrixCoefficientsExt: Int?
     var videoFullrangeExt: Int?
+    var isFrontCamera = true
     
     //[ex channelId: connection]
     private var exConnectionMap: [String: AgoraRtcConnection] = [:]
@@ -90,7 +91,6 @@ class ShowAgoraKitManager: NSObject {
     
     private lazy var canvas: AgoraRtcVideoCanvas = {
         let canvas = AgoraRtcVideoCanvas()
-        canvas.renderMode = .hidden
         canvas.mirrorMode = .disabled
         return canvas
     }()
@@ -112,11 +112,12 @@ class ShowAgoraKitManager: NSObject {
     }
     
     //MARK: private
-    private func setupContentInspectConfig(_ enable: Bool) {
+    private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
         let config = AgoraContentInspectConfig()
         let dic: [String: String] = [
             "id": VLUserCenter.user.id,
-            "sceneName": "show"
+            "sceneName": "show",
+            "userNo": VLUserCenter.user.userNo
         ]
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
@@ -129,7 +130,7 @@ class ShowAgoraKitManager: NSObject {
         module.interval = 30
         module.type = .moderation
         config.modules = [module]
-        let ret = agoraKit.enableContentInspect(enable, config: config)
+        let ret = agoraKit.enableContentInspectEx(enable, config: config, connection: connection)
         showLogger.info("setupContentInspectConfig: \(ret)")
     }
     
@@ -138,6 +139,7 @@ class ShowAgoraKitManager: NSObject {
         guard role == .broadcaster else { return }
         let userInfo = ["id": VLUserCenter.user.id,
                         "sceneName": "show",
+                        "userNo": VLUserCenter.user.userNo,
                         "userName": VLUserCenter.user.name]
         let parasm: [String: Any] = ["appId": KeyCenter.AppId,
                                      "channelName": channelName,
@@ -170,6 +172,11 @@ class ShowAgoraKitManager: NSObject {
             if role == .audience {
                 mediaOptions.audienceLatencyLevel = .lowLatency
             }else{
+                let joinOtherChannel = currentChannelId != targetChannelId
+                if joinOtherChannel {
+                    mediaOptions.clientRoleType = .audience
+                    mediaOptions.isInteractiveAudience = true
+                }
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }
         
@@ -186,9 +193,11 @@ class ShowAgoraKitManager: NSObject {
             agoraKit.joinChannelEx(byToken: token,
                                    connection: connection,
                                    delegate: proxy,
-                                   mediaOptions: mediaOptions) { channelName, uid, elapsed in
+                                   mediaOptions: mediaOptions) {[weak self] channelName, uid, elapsed in
                 let cost = Int(-date.timeIntervalSinceNow * 1000)
                 showLogger.info("join room[\(channelName)] ex success uid: \(uid) cost \(cost) ms", context: kShowLogBaseContext)
+                self?.setupContentInspectConfig(true, connection: connection)
+                self?.moderationAudio(channelName: targetChannelId, role: role)
             }
             agoraKit.updateChannelEx(with: mediaOptions, connection: connection)
             exConnectionMap[targetChannelId] = connection
@@ -266,12 +275,11 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.setupLocalVideo(canvas)
         agoraKit.enableVideo()
         agoraKit.startPreview()
-        // 设置镜像
-//        agoraKit.setLocalRenderMode(.hidden, mirror: .enabled)
     }
     
     /// 切换摄像头
-    func switchCamera() {
+    func switchCamera(_ channelId: String? = nil) {
+        isFrontCamera = !isFrontCamera
         agoraKit.switchCamera()
     }
     
@@ -327,6 +335,7 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         options.clientRoleType = role
+        options.audienceLatencyLevel = role == .audience ? .lowLatency : .ultraLowLatency
         updateChannelEx(channelId:channelId, options: options)
         if "\(uid)" == VLUserCenter.user.id {
             setupLocalVideo(uid: uid, canvasView: canvasView)
@@ -428,6 +437,7 @@ class ShowAgoraKitManager: NSObject {
     func setupLocalVideo(uid: UInt, canvasView: UIView) {
         canvas.view = canvasView
         canvas.uid = uid
+        canvas.mirrorMode = .disabled
         agoraKit.setVideoFrameDelegate(self)
         agoraKit.setDefaultAudioRouteToSpeakerphone(true)
         agoraKit.enableAudio()
@@ -500,10 +510,8 @@ class ShowAgoraKitManager: NSObject {
 
 extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
     
-    func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
-//        print("aaa onCapture1 w:\(CVPixelBufferGetWidth(videoFrame.pixelBuffer!)) h:\(CVPixelBufferGetHeight(videoFrame.pixelBuffer!))")
+    func onCapture(_ videoFrame: AgoraOutputVideoFrame, sourceType: AgoraVideoSourceType) -> Bool {
         videoFrame.pixelBuffer = BeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
-//        print("aaa onCapture2 w:\(CVPixelBufferGetWidth(videoFrame.pixelBuffer!)) h:\(CVPixelBufferGetHeight(videoFrame.pixelBuffer!))")
         return true
     }
     
@@ -520,11 +528,15 @@ extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
     }
     
     func getMirrorApplied() -> Bool {
-        true
+        isFrontCamera
     }
     
     func getRotationApplied() -> Bool {
         false
+    }
+    
+    func getObservedFramePosition() -> AgoraVideoFramePosition {
+        AgoraVideoFramePosition.postCapture
     }
     
 }

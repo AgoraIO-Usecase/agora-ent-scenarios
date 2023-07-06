@@ -67,7 +67,7 @@
         if (model.status == VLSongPlayStatusPlaying) {
             return;
         }
-        if (VLUserCenter.user.ifMaster) {
+        if (VLUserCenter.user.ifMaster || [VLUserCenter.user.id isEqualToString:cell.selSongModel.userNo]) {
             [weakSelf deleteSongEvent:model];
         }
         

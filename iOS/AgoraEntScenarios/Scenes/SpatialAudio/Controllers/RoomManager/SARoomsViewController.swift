@@ -105,6 +105,7 @@ extension SARoomsViewController {
 
     private func entryRoom(room: SARoomEntity) {
         if room.is_private ?? false {
+            self.normal.roomList.isUserInteractionEnabled = true
             let width = ScreenWidth - 75
             let height = (ScreenWidth - 63 - 3 * 16) / 4.0 + 177
             var component = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth,

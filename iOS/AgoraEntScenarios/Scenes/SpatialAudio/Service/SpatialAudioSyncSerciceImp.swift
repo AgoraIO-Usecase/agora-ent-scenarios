@@ -47,7 +47,7 @@ enum SAErrorType {
     }
 }
 
-private let cSceneId = "scene_spatialChatRoom"
+private let cSceneId = "scene_spatialChatRoom_3.0.0"
 private let kCollectionIdUser = "user_collection"
 private let kCollectionIdSeatInfo = "seat_info_collection"
 private let kCollectionIdSeatApply = "show_seat_apply_collection"
@@ -57,11 +57,7 @@ class SpatialAudioSyncSerciceImp: NSObject {
     fileprivate var roomId: String?
     fileprivate var roomList: [SARoomEntity] = [SARoomEntity]()
     fileprivate var syncUtilsInited: Bool = false
-    public var mics: [SARoomMic] = [SARoomMic]() {
-        didSet {
-            print("===")
-        }
-    }
+    public var mics: [SARoomMic] = [SARoomMic]() 
     public var userList: [SAUser] = [SAUser]()
     public var micApplys: [SAApply] = [SAApply]()
     private var robotInfo: SARobotAudioInfo?
@@ -85,7 +81,6 @@ extension SpatialAudioSyncSerciceImp {
             
             agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
 //            self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: UInt(state.rawValue)))
-            guard state == .open else { return }
             guard !self.syncUtilsInited else {
                 //TODO: retry get data if restore connection
                 return
@@ -685,6 +680,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             completion(SAErrorType.userNotFound("startMicSeatApply").error(), false)
             return
         }
+        user.status = .waitting
         apply.member = user
         _addMicSeatApply(roomId: self.roomId!, apply: apply) { error in
             completion(error, error == nil)
@@ -905,6 +901,8 @@ extension SpatialAudioSyncSerciceImp {
             $0.uid ?? "" == mic.member?.uid ?? ""
         })
         user?.mic_index = -1
+        // TODO: 不应该拿mic.member去更新
+        mic.member?.mic_index = -1
     }
     
     fileprivate func _subscribeMicSeatInfoChanged() {

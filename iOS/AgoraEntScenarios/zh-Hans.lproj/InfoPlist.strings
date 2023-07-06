@@ -7,4 +7,4 @@
 */
 
 CFBundleDisplayName = "声动互娱";
-NSMicrophoneUsageDescription = "当你进行语聊/K歌/直播时，声动互娱想要申请麦克风访问";
+NSMicrophoneUsageDescription = "当你进行语聊/K歌/直播时，声动互娱 - K歌想要申请麦克风访问";

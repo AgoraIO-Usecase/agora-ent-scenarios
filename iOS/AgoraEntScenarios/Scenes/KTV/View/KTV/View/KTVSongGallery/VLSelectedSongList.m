@@ -12,6 +12,8 @@
 #import "VLHotSpotBtn.h"
 #import "KTVMacro.h"
 
+#define BASICVCINDEX 100
+
 @interface VLSelectedSongList ()<
 JXCategoryViewDelegate,
 JXCategoryListContainerViewDelegate,
@@ -26,25 +28,18 @@ UITextFieldDelegate
 @property (nonatomic, strong) JXCategoryTitleView *categoryView;
 @property (nonatomic, strong) JXCategoryListContainerView *listContainerView;
 @property (nonatomic, strong) VLSearchSongResultView *resultView;
-
+@property (nonatomic, assign) NSInteger currentIndex;
 @property (nonatomic, strong) VLRoomListModel *roomModel;
-
+@property (nonatomic, strong) NSMutableSet *selSongViews;
 @property (nonatomic, copy) NSString *roomNo;
 @property (nonatomic, assign) BOOL ifChorus;
-
 @end
 
 @implementation VLSelectedSongList
 
 - (void)setSelSongsArray:(NSArray *)selSongsArray {
     _selSongsArray = selSongsArray;
-    [self.listContainerView.validListDict enumerateKeysAndObjectsUsingBlock:^(NSNumber *  key, id<JXCategoryListContentViewDelegate>   obj, BOOL *  stop) {
-        if (![obj isKindOfClass:[VLSelectSongTableItemView class]]) {
-            return;
-        }
-        VLSelectSongTableItemView* itemView = (VLSelectSongTableItemView* )obj;
-        itemView.selSongsArray = selSongsArray;
-    }];
+    [self updateUIWithSelSongsArray:selSongsArray];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -146,6 +141,9 @@ UITextFieldDelegate
                                                           ifChorus:self.ifChorus];
     self.resultView.hidden = YES;
     [self addSubview:self.resultView];
+    
+    self.selSongViews = [NSMutableSet set];
+    self.currentIndex = 100;
 }
 
 #pragma mark --Event
@@ -160,10 +158,25 @@ UITextFieldDelegate
     self.resultView.hidden = YES;
 }
 
+-(void)setSelSongArrayWith:(NSArray *)array {
+    [self updateUIWithSelSongsArray:array];
+}
+
+-(void)updateUIWithSelSongsArray:(NSArray *)array {
+    VLSelectSongTableItemView *selView = nil;
+    for(VLSelectSongTableItemView *view in self.selSongViews){
+        if (view.tag  == self.currentIndex) {
+            selView = view;
+            [selView setSelSongArrayWith:array];
+            return;
+        }
+    }
+}
+
 #pragma mark --delegate
-// 点击选中或者滚动选中都会调用该方法。适用于只关心选中事件，不关心具体是点击还是滚动选中的。
 - (void)categoryView:(JXCategoryBaseView *)categoryView didSelectedItemAtIndex:(NSInteger)index {
-    
+    self.currentIndex = index + BASICVCINDEX;
+    [self setSelSongArrayWith:self.selSongsArray];
 }
 
 // 返回列表的数量
@@ -175,11 +188,12 @@ UITextFieldDelegate
     VLSelectSongTableItemView *selSongView = [[VLSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)
                                                                                     withRooNo:self.roomNo
                                                                                      ifChorus:self.ifChorus];
-    selSongView.selSongsArray = self.selSongsArray;
+   // selSongView.selSongsArray = self.selSongsArray;
     [selSongView loadDatasWithIndex:index+1 ifRefresh:YES];
+    selSongView.tag = BASICVCINDEX + index;
+    [self.selSongViews addObject:selSongView];
     return selSongView;
 }
-
 
 - (void)textChangeAction {
     if (self.searchTF.text.length > 0) {

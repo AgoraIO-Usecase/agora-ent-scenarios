@@ -15,12 +15,20 @@ public enum HEADER_ACTION {
     case rank
     case popBack
     case members
+    case more
 }
 
 class AgoraChatRoomHeaderView: UIView {
     typealias resBlock = (HEADER_ACTION) -> Void
 
     private var backBtn: UIButton = .init()
+    private lazy var moreBtn: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage.sceneImage(name: "icon_live_more", bundleName: "VoiceChatRoomResource"), for: .normal)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.addTarget(self, action: #selector(clickMore), for: .touchUpInside)
+        return button
+    }()
     private var iconImgView: UIImageView = .init()
     private var titleLabel: UILabel = .init()
     private var roomLabel: UILabel = .init()
@@ -70,10 +78,13 @@ class AgoraChatRoomHeaderView: UIView {
     }
 
     private func layoutUI() {
-        backBtn.setBackgroundImage(UIImage("icon／outline／left"), for: .normal)
+        backBtn.setBackgroundImage(UIImage(systemName: "xmark")?.withTintColor(.white, renderingMode: .alwaysOriginal),
+                                   for: .normal)
         backBtn.addTarget(self, action: #selector(back), for: .touchUpInside)
         backBtn.vm_expandSize(size: 20)
         addSubview(backBtn)
+
+        addSubview(moreBtn)
 
         iconImgView.layer.cornerRadius = 16~
         iconImgView.layer.masksToBounds = true
@@ -180,13 +191,12 @@ class AgoraChatRoomHeaderView: UIView {
 
         let isHairScreen = SwiftyFitsize.isFullScreen
         backBtn.snp.makeConstraints { make in
-            make.left.equalTo(12)
+            make.trailing.equalTo(-15)
             make.top.equalTo(isHairScreen ? 54~ : 54~ - 25)
-            make.width.height.equalTo(24~)
         }
 
         iconImgView.snp.makeConstraints { make in
-            make.left.equalTo(self.backBtn.snp.right).offset(5)
+            make.leading.equalToSuperview().offset(12)
             make.centerY.equalTo(self.backBtn)
             make.width.height.equalTo(32~)
         }
@@ -204,9 +214,15 @@ class AgoraChatRoomHeaderView: UIView {
             make.width.lessThanOrEqualTo(150~)
             make.bottom.equalTo(self.iconImgView)
         }
-
+        
+        moreBtn.snp.makeConstraints { make in
+            make.trailing.equalTo(backBtn.snp_leadingMargin).offset(-18)
+            make.centerY.equalTo(backBtn.snp.centerY)
+            make.width.equalTo(24)
+        }
+        
         totalCountLabel.snp.makeConstraints { make in
-            make.right.equalTo(self.snp.right).offset(-16)
+            make.right.equalTo(moreBtn.snp.left).offset(-10)
             make.centerY.equalTo(self.backBtn)
             make.width.height.equalTo(26~)
         }
@@ -319,6 +335,11 @@ class AgoraChatRoomHeaderView: UIView {
     @objc private func rankClick() {
         guard let block = completeBlock else { return }
         block(.rank)
+    }
+    @objc
+    private func clickMore() {
+        guard let block = completeBlock else { return }
+        block(.more)
     }
 
     private func updateGiftList(with room: VRRoomEntity) {

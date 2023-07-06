@@ -75,6 +75,8 @@
     [collectionView deselectItemAtIndexPath:indexPath animated:YES];
     if (self.delegate && [self.delegate respondsToSelector:@selector(itemClickAction:)]) {
         [self.delegate itemClickAction:(int)indexPath.row];
+        HomeMenuCell *cell = (HomeMenuCell *)[collectionView cellForItemAtIndexPath:indexPath];
+        [cell handleClick];
     }
 }
 
@@ -88,22 +90,22 @@
                 @"subTitleStr":@""
             },
             @{
+                @"bgImgStr":@"spatial_bg",
+                @"iconImgStr":@"home_talk_icon",
+                @"titleStr":AGLocalizedString(@"语聊房"),
+                @"subTitleStr":AGLocalizedString(@"-空间音频模式")
+            },
+            @{
                 @"bgImgStr":@"home_KTV_bg",
                 @"iconImgStr":@"home_KTV_icon",
                 @"titleStr":AGLocalizedString(@"在线K歌房"),
                 @"subTitleStr":@""
             },
             @{
-                @"bgImgStr":@"home_KTV_bg",
-                @"iconImgStr":@"home_KTV_icon",
-                @"titleStr":@"秀场直播",
+                @"bgImgStr":@"home_live_bg",
+                @"iconImgStr":@"home_live_icon",
+                @"titleStr":AGLocalizedString(@"秀场直播"),
                 @"subTitleStr":@""
-            },
-            @{
-                @"bgImgStr":@"spatial_bg",
-                @"iconImgStr":@"home_talk_icon",
-                @"titleStr":AGLocalizedString(@"语聊房"),
-                @"subTitleStr":AGLocalizedString(@"-空间音频模式")
             },
         ];
     }

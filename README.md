@@ -21,6 +21,7 @@
 > Demo 效果:
 >
 > <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/entFullDemo_1.png" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/entFullDemo_2.png" width="300" height="640">
+
 ## 1.2 运行示例
 * 运行 K 歌房项目，请参考以下流程
     * [Android](Android/scenes/ktv)

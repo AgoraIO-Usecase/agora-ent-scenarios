@@ -28,7 +28,7 @@ class ShowPresettingVC: UIViewController {
             let showMode = ShowPresettingModel(title: "show_presetting_mode_show_title".show_localized, desc: "show_presetting_mode_show_desc".show_localized,standard: .douyin, optionsArray: [.show_low,.show_medium,.show_high])
             return [showMode]
         }else {
-            // 画质增强模式
+            // 超分模式
             let qualityMode = ShowPresettingModel(title: "show_presetting_mode_qulity_title".show_localized, desc: "show_presetting_mode_qulity_desc".show_localized,standard: .douyin, optionsArray: [.quality_low,.quality_medium,.quality_high])
             // 基础模式
             let baseMode = ShowPresettingModel(title: "show_presetting_mode_base_title".show_localized, desc: "show_presetting_mode_base_title".show_localized,standard: .douyin, optionsArray: [.base_low,.base_medium,.base_high])
