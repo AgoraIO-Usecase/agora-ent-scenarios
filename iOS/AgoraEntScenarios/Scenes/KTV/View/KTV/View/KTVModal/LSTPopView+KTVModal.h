@@ -80,6 +80,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (LSTPopView*)popVoicePerViewWithParentView:(UIView*)parentView
                               isProfessional: (BOOL) isProfessional
+                                    aecState:(BOOL)state
+                                    aecLevel:(NSInteger)level
                                      isDelay: (BOOL) isDelay
                                     volGrade:(NSInteger)volGrade
                                        grade:(NSInteger)grade

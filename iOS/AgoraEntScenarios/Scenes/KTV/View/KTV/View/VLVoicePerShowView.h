@@ -17,10 +17,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didAIAECGradeChangedWithIndex:(NSInteger)index;
 - (void)didVolQualityGradeChangedWithIndex:(NSInteger)index;
 - (void)voiceDelaySelectedAction:(BOOL)isSelected;
+-(void)didAECStateChange:(BOOL)enable;
+-(void)didAECLevelSetWith:(NSInteger)level;
 @end
 
 @interface VLVoicePerShowView : UIView
--  (instancetype)initWithFrame:(CGRect)frame isProfessional:(BOOL)isProfessional isDelay:(BOOL)isDelay isRoomOwner:(BOOL)isRoomOwner volGrade:(NSInteger)vol aecGrade:(NSInteger)grade withDelegate:(id<VLVoicePerShowViewDelegate>)delegate;
+- (instancetype)initWithFrame:(CGRect)frame isProfessional:(BOOL)isProfessional aecState:(BOOL)state aecLevel:(NSInteger)level isDelay:(BOOL)isDelay isRoomOwner:(BOOL)isRoomOwner volGrade:(NSInteger)vol aecGrade:(NSInteger)grade withDelegate:(id<VLVoicePerShowViewDelegate>)delegate;
 @end
 
 NS_ASSUME_NONNULL_END

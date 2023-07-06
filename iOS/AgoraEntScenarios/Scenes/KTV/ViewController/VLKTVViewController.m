@@ -125,6 +125,8 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) checkAuthType checkType;
 @property (nonatomic, assign) BOOL isDumpMode;
 @property (nonatomic, assign) BOOL voiceShowHasSeted;
+@property (nonatomic, assign) BOOL aecState; //AIAEC开关
+@property (nonatomic, assign) NSInteger aecLevel; //AEC等级
 @end
 
 @implementation VLKTVViewController
@@ -421,14 +423,14 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //专业主播
 - (void)popVoicePerView {
     LSTPopView* popView =
-    [LSTPopView popVoicePerViewWithParentView:self.view isProfessional:self.isProfessional isDelay:self.isDelay volGrade: self.volGrade grade: self.aecGrade isRoomOwner:[self isRoomOwner] perView:self.voicePerShowView withDelegate:self];
+    [LSTPopView popVoicePerViewWithParentView:self.view isProfessional:self.isProfessional aecState: self.aecState aecLevel:self.aecLevel isDelay:self.isDelay volGrade: self.volGrade grade: self.aecGrade isRoomOwner:[self isRoomOwner] perView:self.voicePerShowView withDelegate:self];
     self.voicePerShowView = (VLVoicePerShowView*)popView.currCustomView;
 }
 
 
 //弹出音效
 - (void)popSetSoundEffectView {
-    LSTPopView* popView = 
+    LSTPopView* popView =
     [LSTPopView popSetSoundEffectViewWithParentView:self.view
                                           soundView:self.effectView
                                        withDelegate:self];
@@ -709,10 +711,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)loadAndPlaySong{
-    //清空分数
-    [self.MVView.gradeView reset];
-    [self.MVView.incentiveView reset];
     self.voiceShowHasSeted = false;
+    self.selectedVoiceShowIndex = -1;
+    self.currentSelectEffect = 0;
+    [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
+    
+    if([self isRoomOwner]){
+        [self.MVView setPerViewAvatar:@""];
+    }
     
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     
@@ -835,7 +841,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)joinChorus {
     
-    [self.MVView.gradeView reset];
+  //  [self.MVView.gradeView reset];
 
     if([self getOnMicUserCount] == 8 && !_isOnMicSeat){
         [VLToast toast:@"“麦位已满，请在他人下麦后重试"];
@@ -1151,7 +1157,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
     if (info) {
         [self _checkEnterSeatAudioAuthorized];
-//        
+//
 //        if (!info.isVideoMuted) {
 //            [AgoraEntAuthorizedManager checkCameraAuthorizedWithParent:self completion:nil];
 //        }
@@ -1266,7 +1272,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)didShowVoiceChooseView {
-    [self popVoiceShowView];
+     [self popVoiceShowView];
 }
 
 #pragma mark -- VLKTVTopViewDelegate
@@ -1653,16 +1659,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 //人声突出设置
 - (void)voiceItemClickAction:(NSInteger)ItemIndex {
+    if(self.voiceShowHasSeted){
+        [VLToast toast:@"本首歌已有突出者"];
+        return;
+    }
+    self.voiceShowHasSeted = true;
     self.selectedVoiceShowIndex = ItemIndex;
     [self checkVoiceShowEffect: ItemIndex];
 }
 
 //专业主播设置
 - (void)voicePerItemSelectedAction:(BOOL)isSelected {
-    if(self.voiceShowHasSeted){
-        [VLToast toast:@"本首歌已有突出者"];
-        return;
-    }
     self.isProfessional = isSelected;
     [self.ktvApi enableProfessionalStreamerMode:isSelected];
 }
@@ -1680,6 +1687,20 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)voiceDelaySelectedAction:(BOOL)isSelected{
     self.isDelay = isSelected;
     [self.ktvApi enableLowLatencyMode:isSelected];
+}
+
+-(void)didAECStateChange:(BOOL)enable{
+    self.aecState = enable;
+    if(enable){
+        [self.RTCkit setParameters:@"{\"che.audio.aiaec.working_mode\": 1}"];
+    } else {
+        [self.RTCkit setParameters:@"{\"che.audio.aiaec.working_mode\": 0}"];
+    }
+}
+
+-(void)didAECLevelSetWith:(NSInteger)level{
+    self.aecLevel = level;
+    [self.RTCkit setParameters:[NSString stringWithFormat:@"{\"che.audio.aiaec.postprocessing_strategy\":%ld}", (long)level]];
 }
 
 #pragma mark --
@@ -1861,11 +1882,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //判断突出人声的人是否退出合唱
     if([self getChorusSingerArrayWithSeatArray:self.seatsArray].count >= 1 && self.selectedVoiceShowIndex != -1){
         BOOL flag = [self checkIfCosingerWith:self.selectedVoiceShowIndex];
-        if(!flag){//表示突出的人退出合唱
+        if(!flag && self.selectedVoiceShowIndex != -2){//表示突出的人退出合唱
             [VLToast toast:@"人声突出功能已失效，请重设"];
-            self.selectedVoiceShowIndex = -1;
+            self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
             [self.MVView setPerViewAvatar:@""];
         }
+    }
+    
+    if(self.selectedVoiceShowIndex == -2){
+        //所有人切换为无音效
+        [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
     }
     
     if([self isRoomOwner]){
@@ -2193,6 +2219,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(self.loadMusicCallBack){
             self.loadMusicCallBack(YES, songCode);
             self.loadMusicCallBack = nil;
+            //清空分数
+            [self.MVView.gradeView reset];
+            [self.MVView.incentiveView reset];
         }
         self.MVView.loadingType = VLKTVMVViewStateIdle;
         if(lyricUrl.length > 0){
