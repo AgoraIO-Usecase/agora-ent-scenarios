@@ -46,6 +46,7 @@ import io.agora.rtc2.RtcEngineConfig;
 import io.agora.rtc2.RtcEngineEx;
 import io.agora.rtc2.video.ContentInspectConfig;
 import io.agora.rtc2.video.VideoCanvas;
+import io.agora.scene.base.AudioModeration;
 import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.NetWorkEvent;
@@ -1447,7 +1448,6 @@ public class RoomLivingViewModel extends ViewModel {
             jsonObject.put("sceneName", "ktv");
             jsonObject.put("id", UserManager.getInstance().getUser().id.toString());
             jsonObject.put("userNo", UserManager.getInstance().getUser().userNo);
-            KTVLogger.d(TAG, "enableContentInspect: " + jsonObject);
             contentInspectConfig.extraInfo = jsonObject.toString();
             ContentInspectConfig.ContentInspectModule module = new ContentInspectConfig.ContentInspectModule();
             module.interval = 30;
@@ -1458,6 +1458,16 @@ public class RoomLivingViewModel extends ViewModel {
         } catch (JSONException e) {
             KTVLogger.e(TAG, e.toString());
         }
+
+        // ------------------ 开启语音鉴定服务 ------------------
+        AudioModeration.INSTANCE.moderationAudio(
+                roomInfoLiveData.getValue().getRoomNo(),
+                UserManager.getInstance().getUser().id,
+                AudioModeration.AgoraChannelType.rtc,
+                "ktv",
+                null,
+                null
+        );
 
         // 外部使用的StreamId
         if (streamId == 0) {
