@@ -7,6 +7,13 @@
 
 import UIKit
 
+@objc protocol SoundCardDelegate: NSObjectProtocol {
+    func didUpdateEffectValue(_ value: Int)
+    func didUpdateSoundSetting(_ isEnabled: Bool)
+    func didUpdateTypeValue(_ value: Int)
+    func didUpdateGainValue(_ value: Double)
+}
+
 class SoundCardSettingViewController: UIViewController {
 
     @IBOutlet weak var deviceLabel: UILabel!
@@ -20,56 +27,83 @@ class SoundCardSettingViewController: UIViewController {
     @IBOutlet weak var typeLabel: UILabel!
     @IBOutlet weak var micTypeLabel: UILabel!
     @IBOutlet weak var micTypeSlider: UISlider!
-    var soundOpen: Bool = false
-    var gainValue: Double = 1.0
-    var typeValue: Int = 2
+    @objc var soundOpen: Bool = false
+    @objc var gainValue: Double = 1.0
+    @objc var typeValue: Int = 2
     var dropdownMenu: DropdownMenu?
-    var effectType: Int = 0
-    var effectBlock: ((Int)-> Void)?
-    var soundBlock: ((Bool)-> Void)?
-    var typeBlock: ((Int)-> Void)?
-    var gainBlock: ((Double)-> Void)?
+    @objc var effectType: Int = 0
+    @objc weak var delegate: SoundCardDelegate?
     
+    @IBOutlet weak var dropBtn: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
         iconView.layer.cornerRadius = 30
         iconView.layer.masksToBounds = true
         
-        let flag = HeadSetUtil.hasSoundCard()
-        warningView.isHidden = flag
-        HeadSetUtil.addSoundCardObserver {[weak self] flag in
-            self?.warningView.isHidden = flag
-            guard let soundBlock = self?.soundBlock else {
-                return
-            }
-            soundBlock(flag)
-        }
+//        let flag = HeadSetUtil.hasSoundCard()
+//        warningView.isHidden = flag
+//        HeadSetUtil.addSoundCardObserver {[weak self] flag in
+//            self?.warningView.isHidden = flag
+//            guard let soundBlock = self?.soundBlock else {
+//                return
+//            }
+//            soundBlock(flag)
+//        }
+        
         volGainSlider.addTarget(self, action: #selector(gain), for: .valueChanged)
         volGainSlider.addTarget(self, action: #selector(gainSend), for: .touchUpInside)
         micTypeSlider.addTarget(self, action: #selector(micTypeChange), for: .valueChanged)
         micTypeSlider.addTarget(self, action: #selector(typeSend), for: .touchUpInside)
         soundSwitch.addTarget(self, action: #selector(change), for: .valueChanged)
-        
+ 
         soundSwitch.isOn = soundOpen
-        volGainSlider.value = Float(0.5 * gainValue)
+        volGainSlider.value = Float(1/3.0 * gainValue)
         gainLabel.text = String(format: "%.1ff",gainValue)
         
         micTypeSlider.value = Float(0.25 * Double(typeValue))
-        typeLabel.text = "\(typeValue)"
+        micTypeLabel.text = "\(typeValue)"
         
-        setEffectDescWith(index: effectType)
+        switch effectType {
+            case 0:
+            iconView.image = UIImage.sceneImage(name: "shuaige")
+                typeLabel.text = "性感欧巴"
+                descLabel.text = "悦耳 | 磁性"
+            case 1:
+                iconView.image = UIImage.sceneImage(name: "meinv")
+                typeLabel.text = "温柔御姐"
+                descLabel.text = "柔美 | 磁性"
+            case 2:
+                iconView.image = UIImage.sceneImage(name: "zhengtai")
+                typeLabel.text = "阳光正太"
+                descLabel.text = "洪亮 | 饱满"
+            case 3:
+                iconView.image = UIImage.sceneImage(name: "girl")
+                typeLabel.text = "甜美嗲气"
+                descLabel.text = "夹子音 | 萝莉"
+            default:
+                break
+        }
+        
+        volGainSlider.isUserInteractionEnabled = soundOpen
+        micTypeSlider.isUserInteractionEnabled = soundOpen
+        dropBtn.isUserInteractionEnabled = soundOpen
     }
-
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+    }
+    
+    deinit {
+        print("sound card deinit")
+    }
+    
     @IBAction func showDropMenu(_ sender: UIButton) {
         sender.layoutIfNeeded()
         let dropdownFrame = CGRect(x: sender.frame.minX - 30, y: sender.frame.maxY + 10, width: 110, height: 180)
         dropdownMenu = DropdownMenu(frame: dropdownFrame, items: ["性感欧巴", "温柔御姐", "阳光正太", "甜美嗲气"], selectIndex: self.effectType)
         dropdownMenu?.delegate = self
         self.view.addSubview(dropdownMenu!)
-    }
-    
-    @IBAction func back(_ sender: UIButton) {
-        self.navigationController?.popViewController(animated: false)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -79,16 +113,19 @@ class SoundCardSettingViewController: UIViewController {
     @objc func change( swich: UISwitch) {
         print("switch \(swich.isOn)")
         if swich.isOn {
-            iconView.image = UIImage(named: "shuaige")
+            iconView.image = UIImage.sceneImage(name: "shuaige")
             typeLabel.text = "性感欧巴"
             descLabel.text = "悦耳 | 磁性"
             gainLabel.text = "1.0"
-            volGainSlider.value = 0.5
+            volGainSlider.value = 1/3.0
             micTypeLabel.text = "4"
             micTypeSlider.value = 1
         }
-        guard let changeBlock = soundBlock else {return}
-        changeBlock(swich.isOn)
+        volGainSlider.isUserInteractionEnabled = swich.isOn
+        micTypeSlider.isUserInteractionEnabled = swich.isOn
+        dropBtn.isUserInteractionEnabled = swich.isOn
+        guard let delegate = delegate else {return}
+        delegate.didUpdateSoundSetting(swich.isOn)
     }
     
     @objc func gain() {
@@ -106,8 +143,8 @@ class SoundCardSettingViewController: UIViewController {
         let level = String(format: "%.1ff", Double(calculateLevel(for: gain)) * 0.1)
         let levNum = Double(level)
         print("send lev:\(round(Double(calculateLevel(for: gain)) * 0.1, decimalPlaces: 1))")
-        guard let gainBlock = gainBlock else {return}
-        gainBlock(round(Double(calculateLevel(for: gain)) * 0.1, decimalPlaces: 1))
+        guard let delegate = delegate else {return}
+        delegate.didUpdateGainValue(round(Double(calculateLevel(for: gain)) * 0.1, decimalPlaces: 1))
     }
     
     func round(_ value: Double, decimalPlaces: Int) -> Double {
@@ -120,18 +157,19 @@ class SoundCardSettingViewController: UIViewController {
     @objc func typeSend() {
         let typeValue = micTypeSlider.value
         let type = calculateType(for: typeValue)
+        micTypeLabel.text = "\(type)"
         print("send type:\(type)")
-        guard let typeBlock = typeBlock else {return}
-        typeBlock(type)
+        guard let delegate = delegate else {return}
+        delegate.didUpdateTypeValue(type)
     }
     
     func calculateLevel(for value: Float) -> Int {
-        let stepSize: Float = 0.05
+        let stepSize: Float = 1/30
 
         if value <= 0 {
             return 0
         } else if value >= 1 {
-            return 20
+            return 30
         } else {
             let level = Int(value / stepSize)
             return level
@@ -156,8 +194,8 @@ extension SoundCardSettingViewController: DropdownMenuDelegate {
     func didSelectItemAtIndex(index: Int) {
         print("index: \(index)")
         self.effectType = index
-        guard let block = effectBlock else {return}
-        block(index)
+        guard let delegate = delegate else {return}
+        delegate.didUpdateEffectValue(index)
         self.setEffectDescWith(index: index)
     }
     
@@ -168,19 +206,19 @@ extension SoundCardSettingViewController: DropdownMenuDelegate {
         micTypeSlider.value = 1
         switch index {
         case 0:
-            iconView.image = UIImage(named: "shuaige")
+            iconView.image = UIImage.sceneImage(name: "shuaige")
             typeLabel.text = "性感欧巴"
             descLabel.text = "悦耳 | 磁性"
         case 1:
-            iconView.image = UIImage(named: "meinv")
+            iconView.image = UIImage.sceneImage(name: "meinv")
             typeLabel.text = "温柔御姐"
             descLabel.text = "柔美 | 磁性"
         case 2:
-            iconView.image = UIImage(named: "zhengtai")
+            iconView.image = UIImage.sceneImage(name: "zhengtai")
             typeLabel.text = "阳光正太"
             descLabel.text = "洪亮 | 饱满"
         case 3:
-            iconView.image = UIImage(named: "girl")
+            iconView.image = UIImage.sceneImage(name: "girl")
             typeLabel.text = "甜美嗲气"
             descLabel.text = "夹子音 | 萝莉"
         default:

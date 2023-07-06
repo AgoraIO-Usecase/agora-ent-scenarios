@@ -26,6 +26,7 @@ UICollectionViewDataSource
 
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) VLKTVSwitcherView *soundSwitcher;
+@property (nonatomic, strong) VLKTVSwitcherView *soundCardSwitcher;
 @property (nonatomic, strong) VLKTVTonesView *tonesView;
 @property (nonatomic, strong) VLKTVSliderView *soundSlider;
 @property (nonatomic, strong) VLKTVSliderView *accSlider;
@@ -64,7 +65,7 @@ UICollectionViewDataSource
     } else {
         _setting = setting;
     }
-    
+    self.soundCardSwitcher.on = self.setting.soundCardOn;
     self.soundSwitcher.on = self.setting.soundOn;
     self.soundSlider.value = self.setting.soundValue;
     self.accSlider.value = self.setting.accValue;
@@ -74,6 +75,7 @@ UICollectionViewDataSource
 - (void)initSubViews {
     [self addSubview:self.titleLabel];
     [self addSubview:self.soundSwitcher];
+    [self addSubview:self.soundCardSwitcher];
 //    [self addSubview:self.tonesView];
     [self addSubview:self.soundSlider];
     [self addSubview:self.accSlider];
@@ -94,6 +96,11 @@ UICollectionViewDataSource
         make.top.mas_equalTo(self.titleLabel.mas_bottom).offset(16);
     }];
     
+    [self.soundCardSwitcher mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.mas_equalTo(self);
+        make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(16);
+    }];
+    
 //    [self.tonesView mas_makeConstraints:^(MASConstraintMaker *make) {
 //        make.left.right.mas_equalTo(self);
 //        make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(25);
@@ -102,7 +109,7 @@ UICollectionViewDataSource
     
     [self.soundSlider mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.mas_equalTo(self);
-        make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(25);
+        make.top.mas_equalTo(self.soundCardSwitcher.mas_bottom).offset(25);
         make.height.mas_equalTo(22);
     }];
     
@@ -144,6 +151,9 @@ UICollectionViewDataSource
     if (switcherView == self.soundSwitcher) {
         self.setting.soundOn = on;
         type = VLKTVValueDidChangedTypeEar;
+    } else if (switcherView == self.soundCardSwitcher) {
+        self.setting.soundCardOn = on;
+        type = VLKTVValueDidChangedTypeSoundCard;
     } else {
         type = VLKTVValueDidChangedTypeMV;
         self.setting.mvOn = on;
@@ -266,6 +276,16 @@ UICollectionViewDataSource
     return _soundSwitcher;
 }
 
+- (VLKTVSwitcherView *)soundCardSwitcher {
+    if (!_soundCardSwitcher) {
+        _soundCardSwitcher = [[VLKTVSwitcherView alloc] init];
+        _soundCardSwitcher.titleLabel.text = KTVLocalizedString(@"虚拟声卡");
+        _soundCardSwitcher.subText = KTVLocalizedString(@"请插入耳机使用耳返功能");
+        _soundCardSwitcher.delegate = self;
+    }
+    return _soundCardSwitcher;
+}
+
 - (VLKTVTonesView *)tonesView {
     if (!_tonesView) {
         _tonesView = [[VLKTVTonesView alloc] initWithMaxLevel:12 currentLevel:6];
@@ -340,6 +360,12 @@ UICollectionViewDataSource
 {
     self.setting.soundOn = isEarOn;
     self.soundSwitcher.on = isEarOn;
+}
+
+-(void)setUseSoundCard:(BOOL)useSoundCard
+{
+    self.setting.soundCardOn = useSoundCard;
+    self.soundCardSwitcher.on = useSoundCard;
 }
 
 - (void)setAccValue:(float)accValue {

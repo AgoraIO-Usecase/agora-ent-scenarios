@@ -13,6 +13,7 @@
             <connections>
                 <outlet property="descLabel" destination="Zqw-FZ-ADt" id="OEL-gS-LY5"/>
                 <outlet property="deviceLabel" destination="ASW-Cn-Eyn" id="Xzs-eT-O57"/>
+                <outlet property="dropBtn" destination="VRR-fo-xzF" id="ZBM-it-JOQ"/>
                 <outlet property="gainLabel" destination="CfA-kD-JBM" id="sfb-Bs-vMq"/>
                 <outlet property="iconView" destination="wlI-5c-Z0j" id="6UL-sB-3JN"/>
                 <outlet property="micTypeLabel" destination="Ca8-Tw-FkZ" id="PcO-Pp-pAm"/>
@@ -49,7 +50,7 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Z6K-zU-wwa">
-                    <rect key="frame" x="20" y="156" width="353" height="562"/>
+                    <rect key="frame" x="20" y="156" width="353" height="582"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="虚拟声卡开关" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AV0-Q2-lnk">
                             <rect key="frame" x="0.0" y="7" width="86" height="17"/>
@@ -131,7 +132,7 @@
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="c1G-fM-Mo6">
+                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.33333333333333331" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="c1G-fM-Mo6">
                             <rect key="frame" x="111" y="209.66666666666669" width="204" height="31"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="200" id="L82-eY-V43"/>
@@ -201,7 +202,7 @@
                     </constraints>
                 </view>
                 <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pOc-O7-b6w">
-                    <rect key="frame" x="20" y="156" width="353" height="562"/>
+                    <rect key="frame" x="20" y="156" width="353" height="582"/>
                     <subviews>
                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="online_create_tipIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="tmK-B0-jWT">
                             <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
@@ -238,14 +239,6 @@
                         <constraint firstItem="tmK-B0-jWT" firstAttribute="leading" secondItem="pOc-O7-b6w" secondAttribute="leading" id="ysa-iD-zDd"/>
                     </constraints>
                 </view>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pPO-Fk-MU3">
-                    <rect key="frame" x="10" y="70.666666666666671" width="48" height="38"/>
-                    <state key="normal" title="Button"/>
-                    <buttonConfiguration key="configuration" style="plain" image="back.png"/>
-                    <connections>
-                        <action selector="back:" destination="-1" eventType="touchUpInside" id="fP6-3y-cN5"/>
-                    </connections>
-                </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -253,10 +246,8 @@
                 <constraint firstItem="pOc-O7-b6w" firstAttribute="leading" secondItem="Z6K-zU-wwa" secondAttribute="leading" id="4tV-IS-dia"/>
                 <constraint firstItem="Z6K-zU-wwa" firstAttribute="top" secondItem="ELa-QF-HQg" secondAttribute="bottom" constant="20" id="CWU-g2-4EU"/>
                 <constraint firstItem="GEk-ka-pKe" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" constant="20" id="Ie6-3a-7Qg"/>
-                <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="Z6K-zU-wwa" secondAttribute="bottom" constant="100" id="Igf-bh-9Gq"/>
-                <constraint firstItem="pPO-Fk-MU3" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="10" id="LXc-pV-xZy"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="Z6K-zU-wwa" secondAttribute="bottom" constant="80" id="Igf-bh-9Gq"/>
                 <constraint firstItem="pOc-O7-b6w" firstAttribute="top" secondItem="Z6K-zU-wwa" secondAttribute="top" id="Tz8-GQ-Ocg"/>
-                <constraint firstItem="pPO-Fk-MU3" firstAttribute="centerY" secondItem="GEk-ka-pKe" secondAttribute="centerY" id="Viu-Gh-zuN"/>
                 <constraint firstItem="ELa-QF-HQg" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" constant="60" id="Y30-RG-cuc"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="Z6K-zU-wwa" secondAttribute="trailing" constant="20" id="aOW-JL-y4n"/>
                 <constraint firstItem="ASW-Cn-Eyn" firstAttribute="centerY" secondItem="ELa-QF-HQg" secondAttribute="centerY" id="b2t-fx-hgY"/>
@@ -271,7 +262,6 @@
         </view>
     </objects>
     <resources>
-        <image name="back.png" width="24" height="24"/>
         <image name="online_create_tipIcon.png" width="16" height="15"/>
         <image name="shuaige" width="200" height="200"/>
         <systemColor name="systemBackgroundColor">

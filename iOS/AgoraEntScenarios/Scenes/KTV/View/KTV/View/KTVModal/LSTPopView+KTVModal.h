@@ -21,6 +21,7 @@
 #import "VLVoicePerShowView.h"
 #import "VLEarSettingView.h"
 #import "VLDebugView.h"
+#import "AgoraEntScenarios-Swift.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LSTPopView (KTVModal)
@@ -94,6 +95,17 @@ NS_ASSUME_NONNULL_BEGIN
                                    isEarOn:(BOOL)isEarOn
                                            vol:(CGFloat)vol
                                   withDelegate:(id<VLEarSettingViewViewDelegate>)delegate;
+
+//弹出虚拟声卡视图
++ (LSTPopView*)popSoundCardViewWithParentView:(UIView*)parentView
+                                    soundOpen:(BOOL)isOpen
+                                    gainValue:(double)gain
+                                    typeValue:(NSInteger)type
+                                   effectType:(NSInteger)effect
+                                     delegate:(id<SoundCardDelegate>)delegate;
+
++ (LSTPopView*)popSoundCardViewWithParentView:(UIView*)parentView
+                                soundCardView:(UIView *)soundCardView;
 
 //弹出DebugView
 + (LSTPopView*)popDebugViewWithParentView:(UIView*)parentView

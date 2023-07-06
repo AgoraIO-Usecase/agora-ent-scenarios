@@ -8,6 +8,7 @@
 
 typedef enum : NSUInteger {
     VLKTVValueDidChangedTypeEar = 0,      // 耳返
+    VLKTVValueDidChangedTypeSoundCard = 1,      // 声卡
     VLKTVValueDidChangedTypeMV,           // MV
     VLKTVValueDidChangedRiseFall,         // 升降调
     VLKTVValueDidChangedTypeSound,        // 声音
@@ -32,6 +33,7 @@ typedef enum : NSUInteger {
 - (void)setAccValue:(float)accValue;
 -(void)setIspause:(BOOL)isPause;
 -(void)setSelectEffect:(NSInteger)index;
+-(void)setUseSoundCard:(BOOL)useSoundCard;
 @end
 
 @interface VLKTVSettingModel : NSObject
@@ -40,6 +42,7 @@ typedef enum : NSUInteger {
 
 /// 耳返
 @property (nonatomic, assign) BOOL soundOn;
+@property (nonatomic, assign) BOOL soundCardOn;
 @property (nonatomic, assign) BOOL mvOn;
 @property (nonatomic, assign) float soundValue;
 @property (nonatomic, assign) float accValue;

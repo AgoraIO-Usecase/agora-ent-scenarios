@@ -38,6 +38,7 @@
 #import "VLVoiceShowView.h"
 #import "VLVoicePerShowView.h"
 #import "HeadSetManager.h"
+#import "AgoraEntScenarios-Swift.h"
 @import AgoraRtcKit;
 @import AgoraLyricsScore;
 @import YYCategories;
@@ -70,7 +71,8 @@ IMusicLoadStateListener,
 VLVoiceShowViewDelegate,
 VLVoicePerShowViewDelegate,
 VLEarSettingViewViewDelegate,
-VLDebugViewDelegate
+VLDebugViewDelegate,
+SoundCardDelegate
 >
 
 typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
@@ -127,6 +129,12 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) BOOL voiceShowHasSeted;
 @property (nonatomic, assign) BOOL aecState; //AIAEC开关
 @property (nonatomic, assign) NSInteger aecLevel; //AEC等级
+
+@property (nonatomic, assign) BOOL soundOpen;
+@property (nonatomic, assign) double gainValue;
+@property (nonatomic, assign) NSInteger typeValue;
+@property (nonatomic, assign) NSInteger effectType;
+@property (nonatomic, strong) SoundCardSettingViewController *soundCardVC;
 @end
 
 @implementation VLKTVViewController
@@ -141,6 +149,10 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     self.view.backgroundColor = UIColor.blackColor;
     self.selectedVoiceShowIndex = -1;
     self.checkType = checkAuthTypeAll;
+    self.soundOpen = false;
+    self.gainValue = 1.0;
+    self.typeValue = 2;
+    self.effectType = 0;
 
     [self subscribeServiceEvent];
     
@@ -537,6 +549,52 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     NSCharacterSet *numberSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789"];
     NSRange range = [string rangeOfCharacterFromSet:numberSet.invertedSet];
     return (range.location == NSNotFound);
+}
+
+#pragma mark SoundCardDelegate
+- (void)didUpdateGainValue:(double)value{
+    self.gainValue = value;
+    [self.RTCkit setParameters:[NSString stringWithFormat:@"{\"che.audio.virtual_soundcard\":{\"preset\":%ld,\"gain\":%f,\"gender\":%d,\"effect\":%d}}", (long)self.typeValue, value, self.effectType/2 == 0 ? 0 : 1, self.effectType > 1 ? 1 : 0]];
+}
+
+- (void)didUpdateTypeValue:(NSInteger)value{
+    self.typeValue = value;
+    [self.RTCkit setParameters:[NSString stringWithFormat:@"{\"che.audio.virtual_soundcard\":{\"preset\":%ld,\"gain\":%f,\"gender\":%d,\"effect\":%d}}", (long)value, self.gainValue, self.effectType/2 == 0 ? 0 : 1, self.effectType > 1 ? 1 : 0]];
+}
+
+- (void)didUpdateSoundSetting:(BOOL)isEnabled{
+    self.soundOpen = isEnabled;
+    [self.settingView setUseSoundCard:isEnabled];
+    if (isEnabled) {
+        self.gainValue = 1.0;
+        self.effectType = 0;
+        self.typeValue = 4;
+        [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":0}}"];
+    } else {
+        [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":-1,\"gain\":-1.0,\"gender\":-1,\"effect\":-1}}"];
+    }
+}
+
+- (void)didUpdateEffectValue:(NSInteger)value{
+    self.gainValue = 1.0;
+    self.effectType = value;
+    self.typeValue = 4;
+    switch (value) {
+        case 0:
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":0}}"];
+            break;
+        case 1:
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":0}}"];
+            break;
+        case 2:
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":1}}"];
+            break;
+        case 3:
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":1}}"];
+            break;
+        default:
+            break;
+    }
 }
 
 #pragma mark - rtc callbacks
@@ -1173,6 +1231,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi removeEventHandlerWithKtvApiEventHandler:self];
     [self.ktvApi cleanCache];
     self.ktvApi = nil;
+    [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":-1,\"gain\":-1.0,\"gender\":-1,\"effect\":-1}}"];
     self.loadMusicCallBack = nil;
     [self.RTCkit leaveChannel:^(AgoraChannelStats * _Nonnull stat) {
         KTVLogInfo(@"Agora - Leave RTC channel");
@@ -1554,8 +1613,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         // AgoraEarMonitoringFilterNoiseSuppression
         // [self.RTCkit enableInEarMonitoring:setting.soundOn includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFilters | AgoraEarMonitoringFilterNoiseSuppression];
         [self showEarSettingView];
-    } else if (type == VLKTVValueDidChangedTypeMV) { // MV
-        
+    } else if (type == VLKTVValueDidChangedTypeSoundCard) { // 虚拟声卡
+        [self showSoundCardView];
     } else if (type == VLKTVValueDidChangedRiseFall) { // 升降调
         // 调整当前播放的媒体资源的音调
         // 按半音音阶调整本地播放的音乐文件的音调，默认值为 0，即不调整音调。取值范围为 [-12,12]，每相邻两个值的音高距离相差半音。取值的绝对值越大，音调升高或降低得越多
@@ -1587,6 +1646,19 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)showEarSettingView {
    // LSTPopView* popChooseSongView =
     [LSTPopView popEarSettingViewWithParentView:self.view isEarOn:_isEarOn vol:self.earValue withDelegate:self];
+}
+
+-(void)showSoundCardView {
+    
+    self.soundCardVC = [[SoundCardSettingViewController alloc]init];
+    self.soundCardVC.soundOpen = self.soundOpen;
+    self.soundCardVC.gainValue = self.gainValue;
+    self.soundCardVC.effectType = self.effectType;
+    self.soundCardVC.typeValue = self.typeValue;
+    self.soundCardVC.delegate = self;
+    UIView *soundCardView = self.soundCardVC.view;
+   // [LSTPopView popSoundCardViewWithParentView:self.view soundOpen:self.soundOpen gainValue:self.gainValue typeValue:self.typeValue effectType:self.effectType delegate:self];
+    [LSTPopView popSoundCardViewWithParentView:self.view soundCardView:soundCardView];
 }
 
 - (void)settingViewEffectChoosed:(NSInteger)effectIndex {
