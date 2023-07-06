@@ -1345,6 +1345,7 @@ class LiveDetailFragment : Fragment() {
             val jsonObject = JSONObject()
             jsonObject.put("sceneName", "show")
             jsonObject.put("id", UserManager.getInstance().user.id)
+            jsonObject.put("userNo", UserManager.getInstance().getUser().userNo)
             contentInspectConfig.extraInfo = jsonObject.toString()
             val module = ContentInspectModule()
             module.interval = 30
