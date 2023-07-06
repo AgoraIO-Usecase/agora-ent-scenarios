@@ -112,10 +112,10 @@ class VoiceRoomLivingRepository : BaseRepository() {
     /**
      * 撤销上麦申请
      */
-    fun cancelMicSeatApply(chatUid: String): LiveData<Resource<Boolean>> {
+    fun cancelMicSeatApply(chatroomId: String, chatUid: String): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                voiceServiceProtocol.cancelMicSeatApply(chatUid, completion = { error, result ->
+                voiceServiceProtocol.cancelMicSeatApply(chatroomId, chatUid, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {

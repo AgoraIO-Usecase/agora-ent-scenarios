@@ -63,8 +63,7 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
     }
 
     private fun initView() {
-        baseAdapter =
-            ChatroomInviteAdapter()
+        baseAdapter = ChatroomInviteAdapter()
         adapter = baseAdapter as ChatroomInviteAdapter
         binding.let {
             it?.list?.layoutManager = LinearLayoutManager(

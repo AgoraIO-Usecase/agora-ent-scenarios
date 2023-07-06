@@ -426,10 +426,11 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 撤销上麦申请
      */
-    fun cancelSubmitMic(chatUid: String, callback: CallBack) {
+    fun cancelSubmitMic(chatroomId: String, chatUid: String, callback: CallBack) {
         val attributeMap = mutableMapOf<String, String>()
         val userBeam = ChatroomCacheManager.cacheManager.getMember(chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
+        attributeMap["chatroomId"] = chatroomId
         sendChatroomEvent(true, ownerBean.chatUid, CustomMsgType.CHATROOM_CANCEL_APPLY_SITE, attributeMap, callback)
     }
 

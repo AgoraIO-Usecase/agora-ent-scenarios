@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -19,10 +18,10 @@ import androidx.lifecycle.ViewModelProvider;
 import com.agora.entfulldemo.BuildConfig;
 import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppFragmentHomeMineBinding;
-import com.agora.entfulldemo.home.mine.AboutUsActivity;
 
 import java.io.File;
 
+import io.agora.rtc2.RtcEngine;
 import io.agora.scene.base.Constant;
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.api.model.User;
@@ -62,11 +61,11 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
 
     @Override
     public void initView() {
-        String versionString = BuildConfig.VERSION_NAME + "(" + BuildConfig.VERSION_CODE + ")";
+        String versionString = "20230530-" + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion();
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         mainViewModel.setLifecycleOwner(this);
-
-        getBinding().tvVersion.setText(getString(R.string.app_mine_current_version, BuildConfig.VERSION_NAME));
+        getBinding().tvVersion.setText(getString(R.string.app_mine_current_version, versionString));
+        getBinding().tvVersion.setVisibility(View.GONE);
     }
 
     @SuppressLint("SetTextI18n")
@@ -90,7 +89,21 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             PagePilotManager.pageWebView("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/service.html");
         });
         getBinding().tvPrivacyAgreement.setOnClickListener(view -> {
-            PagePilotManager.pageWebView("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/privacy.html");
+            PagePilotManager.pageWebView("https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/privacy.html");
+        });
+        getBinding().tvCollectionChecklist.setOnClickListener(view -> {
+            //开发服：http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest-dev/index.html
+            //正式服：http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest/index.html
+            StringBuilder stringBuilder =  new StringBuilder("http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest/index.html")
+                    .append("?userNo=").append(UserManager.getInstance().getUser().userNo)
+                    .append("&appId=").append(io.agora.scene.base.BuildConfig.AGORA_APP_ID)
+                    .append("&projectId=").append("agora_ent_demo")
+//                    .append("&sceneId=").append("-1")
+                    .append("&token=").append(UserManager.getInstance().getUser().token);
+            PagePilotManager.pageWebView(stringBuilder.toString());
+        });
+        getBinding().tvDataSharing.setOnClickListener(view -> {
+            PagePilotManager.pageWebView("https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/libraries.html");
         });
 
         getBinding().tvLogout.setOnClickListener(view -> {
@@ -100,7 +113,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             showLogoffAccountDialog();
         });
         getBinding().tvAbout.setOnClickListener(view -> {
-            startActivity(new Intent(getContext(), AboutUsActivity.class));
+            PagePilotManager.pageAboutUs();
         });
         getBinding().vToEdit.setOnClickListener(view -> {
             if (editNameDialog == null) {
@@ -120,7 +133,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             if (counts == 0) {
                 beginTime = System.currentTimeMillis();
             }
-            counts ++;
+            counts++;
             if (counts == 5) {
                 if (System.currentTimeMillis() - beginTime > debugModeOpenTime) {
                     counts = 0;
@@ -275,7 +288,8 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             debugModeDialog.setDialogBtnText(getString(R.string.cancel), getString(R.string.app_exit));
             debugModeDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
-                public void onLeftButtonClick() { }
+                public void onLeftButtonClick() {
+                }
 
                 @Override
                 public void onRightButtonClick() {

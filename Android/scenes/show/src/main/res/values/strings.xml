@@ -22,8 +22,8 @@
     <string name="show_setting_statistic">实时数据</string>
     <string name="show_setting_quality">画质</string>
     <string name="show_setting_advance_setting">高级设置</string>
-    <string name="show_setting_quality_enhance_tip">由于您的机型选择为低端机，为保障设备流畅运行，已关闭画质增强功能</string>
-    <string name="show_setting_quality_enhance_tip2">由于您选择机型或分辨率原因，为保证流畅运行，已为您暂时关闭画质增强功能</string>
+    <string name="show_setting_quality_enhance_tip">由于您的机型选择为低端机，为保障设备流畅运行，已关闭超分功能</string>
+    <string name="show_setting_quality_enhance_tip2">由于您选择机型或分辨率原因，为保证流畅运行，已为您暂时关闭超分功能</string>
     <string name="show_picture_quality_title">画质选择</string>
     <string name="show_picture_quality_1080p">1080P\n极清</string>
     <string name="show_picture_quality_720p">720P\n超清</string>
@@ -153,7 +153,7 @@
     <string name="show_setting_preset">预设</string>
     <string name="show_setting_advance_video_setting">视频设置</string>
     <string name="show_setting_advance_audio_setting">音频设置</string>
-    <string name="show_setting_advance_quality_enhance">画质增强</string>
+    <string name="show_setting_advance_quality_enhance">超分</string>
     <string name="show_setting_advance_quality_h265">H265</string>
     <string name="show_setting_advance_ok">OK</string>
     <string name="show_setting_confirm">确认</string>
@@ -202,8 +202,8 @@
     <string name="show_setting_opened">已打开</string>
     <string name="show_setting_closed">已关闭</string>
     <string name="show_setting_preset_audience_title">观众看播前设置</string>
-    <string name="show_setting_preset_audience_enhance_title">画质增强模式</string>
-    <string name="show_setting_preset_audience_enhance_description">针对不同机型适配了对应的画质增强策略</string>
+    <string name="show_setting_preset_audience_enhance_title">超分模式</string>
+    <string name="show_setting_preset_audience_enhance_description">针对不同机型适配了对应的画质清晰策略</string>
     <string name="show_setting_preset_audience_basic_title">基础模式</string>
     <string name="show_setting_preset_audience_basic_description">基础模式</string>
     <string name="show_live_prepare_setting">设置</string>

@@ -69,6 +69,7 @@ public class STRenderer {
     private long mDetectConfig = -1;
 
     private STGLRender mGLRenderBefore;
+    private STGLRender mGLRenderAfter;
     private int[] mTextureOutId;
     private byte[] mImageDataBuffer = null;
     protected STHumanAction[] mSTHumanAction = new STHumanAction[2];
@@ -187,6 +188,7 @@ public class STRenderer {
 
     private void initGLRender() {
         mGLRenderBefore = new STGLRender(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
+        mGLRenderAfter = new STGLRender(GLES20.GL_TEXTURE_2D);
     }
 
 
@@ -274,7 +276,7 @@ public class STRenderer {
         if (!mAuthorized || !mIsCreateHumanActionHandleSucceeded) {
             return -1;
         }
-
+        boolean isFront = orientation == 270;
         int imageWidth = width;
         int imageHeight = height;
         boolean imageSizeChange = mImageDataBuffer == null || mImageDataBuffer.length != cameraPixel.length;
@@ -288,7 +290,7 @@ public class STRenderer {
 
         // prepare params
         updateHumanActionDetectConfig();
-        //mSTHumanActionNative.nativeHumanActionPtrCopy();
+        mSTHumanActionNative.nativeHumanActionPtrCopy();
 
         int ret = mSTHumanActionNative.nativeHumanActionDetectPtr(
                 mImageDataBuffer,
@@ -338,11 +340,11 @@ public class STRenderer {
 
         //渲染接口输入参数
         STEffectRenderInParam sTEffectRenderInParam = new STEffectRenderInParam(
-                mSTHumanActionNative.getNativeHumanActionResultPtr(),
+                mSTHumanActionNative.getNativeHumanActionPtrCopy(),
                 mAnimalFaceInfo[0],
-                0,
-                0,
-                false,
+                getCurrentOrientation(orientation),
+                getCurrentOrientation(orientation),
+                isFront,
                 null,
                 stEffectTexture,
                 null
@@ -357,6 +359,9 @@ public class STRenderer {
         if (ret == 0 && stEffectRenderOutParam.getTexture() != null) {
             textureId = stEffectRenderOutParam.getTexture().getId();
         }
+
+        mGLRenderAfter.adjustRenderSize(imageWidth, imageHeight, 0, false, !isFront);
+        textureId = mGLRenderAfter.process(textureId, STGLRender.IDENTITY_MATRIX);
 
         GLES20.glFinish();
 
@@ -383,6 +388,7 @@ public class STRenderer {
             return -1;
         }
 
+        boolean isFront = orientation == 270;
         int imageWidth = width;
         int imageHeight = height;
         boolean imageSizeChange = mImageDataBuffer == null || mImageDataBuffer.length != cameraPixel.length;
@@ -412,7 +418,7 @@ public class STRenderer {
 
             // prepare params
             updateHumanActionDetectConfig();
-            //mSTHumanActionNative.nativeHumanActionPtrCopy();
+            mSTHumanActionNative.nativeHumanActionPtrCopy();
 
             int ret = mSTHumanActionNative.nativeHumanActionDetectPtr(mImageDataBuffer,
                     pixelFormat,
@@ -441,11 +447,11 @@ public class STRenderer {
 
         //渲染接口输入参数
         STEffectRenderInParam sTEffectRenderInParam = new STEffectRenderInParam(
-                mSTHumanActionNative.getNativeHumanActionResultPtr(),
+                mSTHumanActionNative.getNativeHumanActionPtrCopy(),
                 mAnimalFaceInfo[0],
-                0,
-                0,
-                false,
+                getCurrentOrientation(orientation),
+                getCurrentOrientation(orientation),
+                isFront,
                 null,
                 stEffectTexture,
                 null);
@@ -456,6 +462,10 @@ public class STRenderer {
         if (ret == 0 && stEffectRenderOutParam.getTexture() != null) {
             textureId = stEffectRenderOutParam.getTexture().getId();
         }
+
+
+        mGLRenderAfter.adjustRenderSize(imageWidth, imageHeight, 0, false, isFront);
+        textureId = mGLRenderAfter.process(textureId, STGLRender.IDENTITY_MATRIX);
 
         GLES20.glFinish();
 
@@ -625,6 +635,7 @@ public class STRenderer {
         mChangeStickerManagerThread = null;
         deleteTextures();
         mGLRenderBefore.destroyPrograms();
+        mGLRenderAfter.destroyPrograms();
     }
 
     private void deleteTextures() {
