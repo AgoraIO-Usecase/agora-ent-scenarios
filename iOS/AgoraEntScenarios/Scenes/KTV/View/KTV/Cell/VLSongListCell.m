@@ -113,27 +113,27 @@
 //        self.typeLabel.text = KTVLocalizedString(@"独唱");
 //    }
     self.nameLabel.text = selSongModel.songName;
-    if(selSongModel.isChorus) {
-        self.chooserLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"合唱: %@"), selSongModel.name];
-    }
-    else {
-        self.chooserLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"点唱: %@"), selSongModel.name];
-    }
+    self.chooserLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"点唱: %@"), selSongModel.name];
     
     if (selSongModel.status == VLSongPlayStatusIdle) {
-        self.sortBtn.hidden = self.deleteBtn.hidden = NO;
-        self.singingBtn.hidden = YES;
+        if(!VLUserCenter.user.ifMaster) {
+            if ([selSongModel.userNo isEqualToString:VLUserCenter.user.id]){
+                self.sortBtn.hidden = YES;
+                self.deleteBtn.hidden = NO;
+            } else {
+                self.sortBtn.hidden = YES;
+                self.deleteBtn.hidden = YES;
+            }
+            self.singingBtn.hidden = YES;
+        } else {
+            self.sortBtn.hidden = self.deleteBtn.hidden = NO;
+            self.singingBtn.hidden = YES;
+        }
     }else if (selSongModel.status == VLSongPlayStatusPlaying){
         self.sortBtn.hidden = self.deleteBtn.hidden = YES;
         self.singingBtn.hidden = NO;
     }
-    
-    
-    if(!VLUserCenter.user.ifMaster) {
-        self.sortBtn.hidden = YES;
-        self.deleteBtn.hidden = YES;
-    }
-    
+
     [self.picImgView sd_setImageWithURL:[NSURL URLWithString:selSongModel.imageUrl]
                        placeholderImage:[UIImage sceneImageWithName:@"default_avatar"]];
 }

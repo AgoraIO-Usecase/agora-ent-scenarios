@@ -10,7 +10,7 @@ import UIKit
 import ZSwiftBaseLib
 import AgoraChat
 
-public class VRSoundEffectsViewController: VRBaseViewController {
+class VRSoundEffectsViewController: VRBaseViewController {
     var code = ""
 
     var name = ""
@@ -29,7 +29,7 @@ public class VRSoundEffectsViewController: VRBaseViewController {
         UIButton(type: .custom).frame(CGRect(x: 30, y: 15, width: ScreenWidth - 60, height: 50)).title(LanguageManager.localValue(key: "Go Live"), .normal).font(.systemFont(ofSize: 16, weight: .semibold)).setGradient([UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1), UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).cornerRadius(25).addTargetFor(self, action: #selector(VRSoundEffectsViewController.goLive), for: .touchUpInside)
     }()
     
-    override public func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.addSubViews([background, effects, done])

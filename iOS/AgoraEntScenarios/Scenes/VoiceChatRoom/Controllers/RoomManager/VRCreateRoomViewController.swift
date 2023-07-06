@@ -9,12 +9,12 @@ import SVProgressHUD
 import UIKit
 import ZSwiftBaseLib
 
-public final class VRCreateRoomViewController: VRBaseViewController {
+final class VRCreateRoomViewController: VRBaseViewController {
     lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage("roomList")!)
 
     lazy var container: VRCreateRoomView = .init(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: ScreenHeight - ZNavgationHeight))
 
-    override public func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.addSubViews([background, container])

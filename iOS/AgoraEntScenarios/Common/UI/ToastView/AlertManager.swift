@@ -152,6 +152,7 @@ class AlertManager: NSObject {
             }
         }, completion: { _ in
             if all || viewCache.isEmpty {
+                viewCache.removeAll()
                 vc?.dismiss(animated: false, completion: completion)
                 vc = nil
             } else {

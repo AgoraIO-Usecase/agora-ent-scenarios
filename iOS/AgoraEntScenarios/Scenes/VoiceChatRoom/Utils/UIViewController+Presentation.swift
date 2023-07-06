@@ -10,7 +10,7 @@ import Foundation
 /// 遵守PresentationViewType协议的UIViewController
 public typealias PresentationViewController = UIViewController & PresentedViewType
 
-public extension VRBaseViewController {
+extension VRBaseViewController {
     /// 自定义present方法
     func presentViewController(_ viewController: PresentationViewController, animated: Bool = true) {
         dismiss(animated: false)

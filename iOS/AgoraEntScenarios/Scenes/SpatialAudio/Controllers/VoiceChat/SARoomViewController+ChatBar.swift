@@ -226,6 +226,9 @@ extension SARoomViewController {
     }
 
     func changeMicState() {
+        if chatBar.micState == true {
+            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
+        }
         guard let idx = local_index else {
             view.makeToast("you have no wheat slots!".localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
@@ -234,10 +237,20 @@ extension SARoomViewController {
             view.makeToast("you have no wheat slots!".localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
+        if let mic = roomInfo?.mic_info?[idx], mic.status == 2 && isOwner == false  {
+            view.makeToast("Banned".localized())
+            return
+        }
         chatBar.micState = !chatBar.micState
        // chatBar.refresh(event: .mic, state: chatBar.micState ? .selected : .unSelected, asCreator: false)
         // 需要根据麦位特殊处理
         chatBar.micState == true ? muteLocal(with: idx) : unmuteLocal(with: idx)
+        if let index = AppContext.saTmpServiceImp().mics.firstIndex(where: { $0.member?.uid == VLUserCenter.user.id }) {
+            let model = AppContext.saTmpServiceImp().mics[index]
+            model.status = chatBar.micState == true ? 1 : 0
+            AppContext.saTmpServiceImp().mics[index] = model
+        }
+        
         rtckit.muteLocalAudioStream(mute: chatBar.micState)
     }
 
@@ -297,8 +310,12 @@ extension SARoomViewController {
         let applyAlert = SAApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: (205 / 375.0) * ScreenWidth), content: "Request to Speak?", cancel: "Cancel", confirm: "Confirm", position: .bottom).backgroundColor(.white).cornerRadius(20, [.topLeft, .topRight], .clear, 0)
         let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: (205 / 375.0) * ScreenWidth)), custom: applyAlert)
         applyAlert.actionEvents = { [weak self] in
+            guard let self = self else { return }
             if $0 == 31 {
-                self?.requestSpeak(index: index)
+                AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self) { granted in
+                    guard granted else { return }
+                    self.requestSpeak(index: index)
+                }
             }
             vc.dismiss(animated: true)
         }

@@ -36,10 +36,10 @@
 
 #define KTVLocalizedString(s) ([s toSceneLocalization])
 
-#define KTVLogInfo(format, ...)  ([KTVLog infoWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"KTVAPI"])
-#define KTVLogError(format, ...)  ([KTVLog errorWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"KTVAPI"])
-#define KTVLogWarn(format, ...)  ([KTVLog warningWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"KTVAPI"])
-#define KTVLogDebug(format, ...)  ([KTVLog debugWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"KTVAPI"])
+#define KTVLogInfo(format, ...)  ([KTVLog infoWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"KTV"])
+#define KTVLogError(format, ...)  ([KTVLog errorWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"KTV"])
+#define KTVLogWarn(format, ...)  ([KTVLog warningWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"KTV"])
+#define KTVLogDebug(format, ...)  ([KTVLog debugWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"KTV"])
 
 
 
