@@ -15,17 +15,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:title="">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivChatroomBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:paddingStart="12dp"
-            android:paddingTop="16dp"
-            android:paddingEnd="5dp"
-            android:paddingBottom="16dp"
-            android:src="@drawable/voice_icon_back" />
-
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivChatroomOwner"
             android:layout_width="32dp"
@@ -33,6 +22,7 @@
             android:scaleType="centerCrop"
             android:src="@drawable/voice_bg_oval_black20"
             app:layout_constraintDimensionRatio="1:1"
+            android:layout_marginStart="12dp"
             app:shapeAppearance="@style/voice_seat_roundStyle" />
 
         <LinearLayout
@@ -135,8 +125,8 @@
                 android:id="@+id/mtChatroomMembers"
                 android:layout_width="wrap_content"
                 android:layout_height="26dp"
-                android:layout_gravity="end"
-                android:layout_marginEnd="16dp"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginEnd="2dp"
                 android:background="@drawable/voice_bg_rect_radius13_black20"
                 android:gravity="center"
                 android:minWidth="26dp"
@@ -145,6 +135,23 @@
                 android:textSize="@dimen/voice_sp_10"
                 tools:text="9k" />
 
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivChatroomMore"
+                android:layout_width="wrap_content"
+                android:layout_height="26dp"
+                android:paddingHorizontal="12dp"
+                android:layout_gravity="center_vertical|end"
+                android:src="@drawable/voice_icon_more" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivChatroomBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingStart="12dp"
+                android:paddingEnd="16dp"
+                android:paddingVertical="16dp"
+                android:src="@drawable/voice_icon_close" />
         </LinearLayout>
 
 
@@ -154,7 +161,7 @@
         android:id="@+id/ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="12dp"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tbChatroomTop">

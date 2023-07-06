@@ -8,6 +8,8 @@
     <string name="app_exit">退出</string>
     <string name="app_user_agreement">用户协议</string>
     <string name="app_privacy_agreement">隐私政策</string>
+    <string name="app_personal_info_collection_checklist">个人信息收集清单</string>
+    <string name="app_third_party_info_data_sharing">第三方信息数据共享</string>
     <string name="app_and">及</string>
 
     <string name="app_confirm_deletion">确认删除？</string>
@@ -49,6 +51,7 @@
     <string name="app_about_chat_room">语聊房</string>
     <string name="app_about_chat_room_spatial">语聊房-空间音频模式</string>
     <string name="app_about_karaoke">在线K歌</string>
+    <string name="app_about_show">秀场直播</string>
     <string name="app_about_customer_service">联系客服</string>
     <string name="app_about_official_website">官网地址</string>
     <string name="app_about_phone_cancel">取消</string>

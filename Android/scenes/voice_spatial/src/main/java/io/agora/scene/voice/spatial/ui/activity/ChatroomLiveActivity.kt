@@ -1,6 +1,5 @@
 package io.agora.scene.voice.spatial.ui.activity
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -17,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.reflect.TypeToken
 import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialActivityChatroomBinding
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
@@ -30,10 +30,12 @@ import io.agora.scene.voice.spatial.ui.dialog.VoiceRoomDebugOptionsDialog
 import io.agora.scene.voice.spatial.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.spatial.ui.widget.top.OnLiveTopClickListener
 import io.agora.scene.voice.spatial.viewmodel.VoiceRoomLivingViewModel
+import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.net.OnResourceParseCallback
 import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.BaseUiActivity
+import io.agora.voice.common.ui.IParserSource
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.LogTools.logD
@@ -41,15 +43,12 @@ import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.StatusBarCompat
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
-import pub.devrel.easypermissions.EasyPermissions
-import pub.devrel.easypermissions.PermissionRequest
 import java.util.*
 
-class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>(), EasyPermissions.PermissionCallbacks,
-    EasyPermissions.RationaleCallbacks, VoiceRoomSubscribeDelegate {
+class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroomBinding>(), VoiceRoomSubscribeDelegate,
+    IParserSource {
 
     companion object {
-        const val RC_PERMISSIONS = 101
         const val KEY_VOICE_ROOM_MODEL = "voice_chat_room_model"
         const val TAG = "ChatroomLiveActivity"
 
@@ -78,8 +77,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
     /**房间基础*/
     private val roomKitBean = RoomKitBean()
     private var isRoomOwnerLeave = false
+
     /** 空间位置信息 */
     private var spatialSeatInfo: SeatPositionInfo? = null
+
     /** 空间位置同步timer */
     private var spatialTimer: Timer? = null
 
@@ -93,34 +94,45 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
         setSpatialSeatInfo(null)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        StatusBarCompat.setLightStatusBar(this, false)
-        roomLivingViewModel = ViewModelProvider(this)[VoiceRoomLivingViewModel::class.java]
+    private var toggleAudioRun: Runnable? = null
 
-        initListeners()
-        initData()
-        initView()
-        requestAudioPermission()
+    fun toggleSelfAudio(isOpen: Boolean, callback : () -> Unit) {
+        if (isOpen) {
+            toggleAudioRun = Runnable {
+                callback.invoke()
+            }
+            requestRecordPermission(true)
+        } else {
+            callback.invoke()
+        }
     }
 
-    private fun initData() {
-        roomKitBean.convertByVoiceRoomModel(voiceRoomModel)
+    override fun onPermissionDined(permission: String?) {
+        PermissionLeakDialog(this).show(permission,
+            { getPermissions() }
+        ) { launchAppSetting(permission) }
     }
 
-    private fun initListeners() {
+    override fun getPermissions() {
+        if (toggleAudioRun != null) {
+            toggleAudioRun?.run()
+            toggleAudioRun = null
+        }
+    }
+
+    override fun initListener() {
         // 房间详情
         roomLivingViewModel.roomDetailsObservable().observe(this) { response: Resource<VoiceRoomInfo> ->
             parseResource(response, object : OnResourceParseCallback<VoiceRoomInfo>() {
 
                 override fun onLoading(data: VoiceRoomInfo?) {
                     super.onLoading(data)
-                    showLoading(false)
+                    showLoadingView()
                 }
 
                 override fun onHideLoading() {
                     super.onHideLoading()
-                    dismissLoading()
+                    hideLoadingView()
                 }
 
                 override fun onSuccess(data: VoiceRoomInfo?) {
@@ -142,6 +154,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                     ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_chatroom_join_room_success))
                     roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
                 }
+
                 override fun onError(code: Int, message: String?) {
                     ToastTools.show(
                         this@ChatroomLiveActivity,
@@ -153,8 +166,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 }
             })
         }
-        roomLivingViewModel.updateRoomMemberObservable().observe(this){ response: Resource<Boolean> ->
-            parseResource(response, object : OnResourceParseCallback<Boolean>(){
+        roomLivingViewModel.updateRoomMemberObservable().observe(this) { response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
                     "ChatroomLiveActivity updateRoomMember onSuccess".logD()
                 }
@@ -177,13 +190,15 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             reset()
             false
         }
-        voiceServiceProtocol.subscribeEvent(object : VoiceRoomSubscribeDelegate{
+        voiceServiceProtocol.subscribeEvent(object : VoiceRoomSubscribeDelegate {
 
             override fun onReceiveSeatRequest() {
                 super.onReceiveSeatRequest()
                 "onReceiveSeatRequest ${roomKitBean.isOwner}".logD(TAG)
-                ThreadManager.getInstance().runOnMainThread {
-                    binding.chatBottom.setShowHandStatus(roomKitBean.isOwner, true)
+                if (roomKitBean.isOwner) {
+                    ThreadManager.getInstance().runOnMainThread {
+                        binding.chatBottom.setShowHandStatus(true, true)
+                    }
                 }
             }
 
@@ -234,7 +249,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 "onUserLeftRoom $roomId, $userId".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     userId.let {
-                        if (roomKitBean.isOwner){
+                        if (roomKitBean.isOwner) {
                             //刷新 owner 邀请列表
                             roomObservableDelegate.handsUpdate(1)
                             //刷新 owner 申请列表
@@ -318,7 +333,12 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
         }
     }
 
-    private fun initView() {
+    override fun initView(savedInstanceState: Bundle?) {
+        super.initView(savedInstanceState)
+        StatusBarCompat.setLightStatusBar(this, false)
+        roomLivingViewModel = ViewModelProvider(this)[VoiceRoomLivingViewModel::class.java]
+        roomKitBean.convertByVoiceRoomModel(voiceRoomModel)
+
         binding.chatBottom.initMenu(roomKitBean.roomType)
         if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) { // 普通房间
             binding.likeView.likeView.setOnClickListener { binding.likeView.addFavor() }
@@ -383,6 +403,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             override fun onClickSoundSocial(view: View) {
                 roomObservableDelegate.showRoom3DWelcomeSheetDialog()
             }
+
+            override fun onClickMore(view: View) {
+                TopFunctionDialog(this@ChatroomLiveActivity).show()
+            }
         })
         binding.chatBottom.setMenuItemOnClickListener(object :
             MenuItemClickListener {
@@ -410,7 +434,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             }
         })
 
-        supportFragmentManager.registerFragmentLifecycleCallbacks(object: FragmentManager.FragmentLifecycleCallbacks(){
+        supportFragmentManager.registerFragmentLifecycleCallbacks(object :
+            FragmentManager.FragmentLifecycleCallbacks() {
             private val dialogFragments = mutableListOf<BottomSheetDialogFragment>()
             override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
                 if (f is BottomSheetDialogFragment) {
@@ -423,9 +448,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 }
                 super.onFragmentStarted(fm, f)
             }
+
             override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
                 super.onFragmentStopped(fm, f)
-                if(f is BottomSheetDialogFragment){
+                if (f is BottomSheetDialogFragment) {
                     val lastFragment = dialogFragments.lastOrNull()
                     if (lastFragment == f) {
                         dialogFragments.remove(f)
@@ -446,6 +472,15 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
         binding.btnDebug.setOnClickListener {
             VoiceRoomDebugOptionsDialog().show(supportFragmentManager, "mtDebug")
         }
+        if (roomKitBean.isOwner) {
+            toggleAudioRun =  Runnable {
+                "onPermissionGrant initSdkJoin".logD(TAG)
+                roomLivingViewModel.initSdkJoin(roomKitBean)
+            }
+            requestRecordPermission(true)
+        } else {
+            roomLivingViewModel.initSdkJoin(roomKitBean)
+        }
     }
 
     fun setSpatialSeatInfo(info: SeatPositionInfo?) {
@@ -453,7 +488,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
         spatialSeatInfo = info
         if (oldValue == null && info != null) {
             spatialTimer = Timer().apply {
-                schedule(object: TimerTask() {
+                schedule(object : TimerTask() {
                     override fun run() {
                         spatialSeatInfo?.let {
                             AgoraRtcEngineController.get().sendSelfPosition(it)
@@ -498,53 +533,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
         super.finish()
     }
 
-    private fun requestAudioPermission() {
-        val perms = arrayOf(Manifest.permission.RECORD_AUDIO)
-        if (EasyPermissions.hasPermissions(this, *perms)) {
-            onPermissionGrant()
-        } else {
-            // Do not have permissions, request them now
-            EasyPermissions.requestPermissions(PermissionRequest.Builder(this, RC_PERMISSIONS, *perms).build())
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        // Forward results to EasyPermissions
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
-    }
-
-    private fun onPermissionGrant() {
-        "onPermissionGrant initSdkJoin".logD(TAG)
-        roomLivingViewModel.initSdkJoin(roomKitBean)
-    }
-
-    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-        "onPermissionsGranted requestCode$requestCode $perms".logD(TAG)
-        if (requestCode == RC_PERMISSIONS) {
-            onPermissionGrant()
-        }
-    }
-
-    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
-        "onPermissionsDenied $perms ".logD()
-    }
-
-    override fun onRationaleAccepted(requestCode: Int) {
-        "onRationaleAccepted requestCode$requestCode ".logD(TAG)
-        if (requestCode == RC_PERMISSIONS) {
-            onPermissionGrant()
-        }
-    }
-
-    override fun onRationaleDenied(requestCode: Int) {
-        "onRationaleDenied requestCode$requestCode ".logD(TAG)
-    }
-
     private fun reset() {
         if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) {
             binding.chatBottom.hideExpressionView(false)
-            hideKeyboard()
+            hideInput()
             binding.chatBottom.showInput()
             binding.likeView.isVisible = true
             binding.chatBottom.hindViewChangeIcon()

@@ -80,10 +80,10 @@ public class EditNameDialog extends BaseDialog<DialogEditNameBinding> {
 
     @Override
     protected void setGravity() {
-        getWindow().setLayout(
-                UiUtil.dp2px(300),
-                UiUtil.dp2px(230)
-        );
+//        getWindow().setLayout(
+//                UiUtil.dp2px(300),
+//                UiUtil.dp2px(230)
+//        );
         getWindow().getAttributes().gravity = Gravity.CENTER;
     }
 }

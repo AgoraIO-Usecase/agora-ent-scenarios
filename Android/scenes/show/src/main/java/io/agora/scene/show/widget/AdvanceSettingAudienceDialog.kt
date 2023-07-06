@@ -14,7 +14,7 @@ import io.agora.scene.show.databinding.ShowSettingAdvanceItemSwitchBinding
 /**
  * 高级设置弹窗
  */
-class AdvanceSettingAudienceDialog(context: Context) : BottomFullDialog(context) {
+class AdvanceSettingAudienceDialog constructor(context: Context) : BottomFullDialog(context) {
 
     companion object {
         private const val ITEM_ID_SWITCH_BASE = 0x00000001
