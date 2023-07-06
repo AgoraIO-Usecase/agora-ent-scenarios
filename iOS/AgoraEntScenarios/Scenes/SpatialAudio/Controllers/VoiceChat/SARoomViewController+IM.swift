@@ -94,6 +94,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
     
     func onReceiveSeatRequest(roomId: String, applicant: SAApply) {
+        guard isOwner else { return }
         self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: isOwner)
     }
 
