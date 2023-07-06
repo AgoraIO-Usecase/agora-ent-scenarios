@@ -998,9 +998,7 @@ extension SpatialAudioSyncSerciceImp {
                                  let jsonStr = object.toJson() else { return }
                            let apply = model(from: jsonStr.z.jsonToDictionary(), SAApply.self)
                            defer {
-                               if VLUserCenter.user.id == apply.member?.uid {
-                                   self.subscribeDelegate?.onReceiveSeatRequest(roomId: self.roomId!, applicant: apply)
-                               }
+                               self.subscribeDelegate?.onReceiveSeatRequest(roomId: self.roomId!, applicant: apply)
                            }
                            self.micApplys.removeAll { $0.objectId == apply.objectId}
                            self.micApplys.append(apply)
@@ -1086,6 +1084,7 @@ extension SpatialAudioSyncSerciceImp {
                     data: params,
                     success: {
                 agoraPrint("imp seat apply update success ...")
+                completion(nil)
             }, fail: { error in
                 agoraPrint("imp seat apply update fail :\(error.message)...")
                 completion(SAErrorType.unknown("update seat apply", error.message).error())
