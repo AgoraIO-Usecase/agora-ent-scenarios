@@ -11,7 +11,7 @@ import ZSwiftBaseLib
 import AgoraChat.AgoraChatError
 import AgoraSyncManager
 
-private let cSceneId = "scene_chatRoom"
+private let cSceneId = "scene_chatRoom_3.0.0"
 
 
 private func agoraPrint(_ message: String) {
@@ -541,14 +541,22 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func startMicSeatInvitation(chatUid: String,index: Int?,completion: @escaping (Error?, Bool) -> Void) {
-            let user = self.userList?.first(where: { $0.chat_uid == chatUid })
-            user?.mic_index = index
-            VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: chatUid, event: VoiceRoomInviteSite, customExt: ["user" : user?.kj.JSONString() ?? "","chatroomId":VoiceRoomIMManager.shared?.currentRoomId ?? ""], completion: { message, error in
-                completion(self.convertError(error: error),error == nil)
-            })
+        if !self.checkWhetherApplyMic() {
+            completion(self.normalError(),false)
+            return
         }
+        let user = self.userList?.first(where: { $0.chat_uid == chatUid })
+        user?.mic_index = index
+        VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: chatUid, event: VoiceRoomInviteSite, customExt: ["user" : user?.kj.JSONString() ?? "","chatroomId":VoiceRoomIMManager.shared?.currentRoomId ?? ""], completion: { message, error in
+            completion(self.convertError(error: error),error == nil)
+        })
+    }
     
     func acceptMicSeatInvitation(index: Int?,completion: @escaping (Error?, VRRoomMic?) -> Void) {
+        if !self.checkWhetherApplyMic() {
+            completion(self.normalError(),nil)
+            return
+        }
         let mic = VRRoomMic()
         let user = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
             $0.uid == VoiceRoomUserInfo.shared.user?.uid ?? ""
@@ -596,19 +604,36 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     ///   - chat_user: 提交的用户模型，包含申请的麦位信息，若没有顺序分配
     ///   - completion: 回调
     func startMicSeatApply(index: Int?,completion: @escaping (Error?, Bool) -> Void) {
-           let apply = VoiceRoomApply()
-           apply.created_at = UInt64(Date().timeIntervalSince1970)
-           apply.member = VoiceRoomUserInfo.shared.user
-           if let idx = index {
-               apply.index = idx
-           } else {
-               apply.index = self.findMicIndex()
-           }
+        if !self.checkWhetherApplyMic() {
+            completion(nil,false)
+            return
+        }
+        let apply = VoiceRoomApply()
+        apply.created_at = UInt64(Date().timeIntervalSince1970)
+        apply.member = VoiceRoomUserInfo.shared.user
+        if let idx = index {
+            apply.index = idx
+        } else {
+            apply.index = self.findMicIndex()
+        }
         apply.member?.mic_index = apply.index//专门用于安卓那边数据模型复用
-           VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: VoiceRoomUserInfo.shared.currentRoomOwner?.rtc_uid ?? "", event: VoiceRoomSubmitApplySite, customExt: ["user" : apply.kj.JSONString(),"chatroomId":VoiceRoomIMManager.shared?.currentRoomId ?? ""], completion: { message, error in
-               completion(self.convertError(error: error),error == nil)
-           })
-       }
+        VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: VoiceRoomUserInfo.shared.currentRoomOwner?.rtc_uid ?? "", event: VoiceRoomSubmitApplySite, customExt: ["user" : apply.kj.JSONString(),"chatroomId":VoiceRoomIMManager.shared?.currentRoomId ?? ""], completion: { message, error in
+            completion(self.convertError(error: error),error == nil)
+        })
+    }
+    
+    private func checkWhetherApplyMic() -> Bool {
+        var result = false
+        var mics = [VRRoomMic]()
+        mics = self.mics.filter { $0.member?.chat_uid != VoiceRoomUserInfo.shared.currentRoomOwner?.chat_uid
+        }
+        for mic in mics {
+            if mic.status == -1 {
+                result = true
+            }
+        }
+        return result
+    }
     
     func cancelMicSeatApply(chat_uid: String, completion: @escaping (Error?, Bool) -> Void) {
             VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: chat_uid, event: VoiceRoomCancelApplySite, customExt: ["chatroomId":VoiceRoomIMManager.shared?.currentRoomId ?? ""], completion: { message, error in
@@ -692,7 +717,6 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             
             agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
 //            self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: UInt(state.rawValue)))
-            guard state == .open else { return }
             guard !self.syncUtilsInited else {
                 //TODO: retry get data if restore connection
                 return

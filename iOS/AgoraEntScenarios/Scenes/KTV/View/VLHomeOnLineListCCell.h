@@ -12,6 +12,8 @@
 
 @property (nonatomic, strong) VLRoomListModel *listModel;
 
+-(void)handleClick;
+
 @property (nonatomic, copy) void (^joinBtnClickBlock)(VLRoomListModel *model);
 @end
 

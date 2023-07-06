@@ -13,7 +13,7 @@ import AgoraChat
 let bottomSafeHeight = safeAreaExist ? 33 : 0
 let page_size = 15
 
-@objc public final class VRRoomsViewController: VRBaseViewController {
+@objc final class VRRoomsViewController: VRBaseViewController {
     private var index: Int = 0 {
         didSet {
             DispatchQueue.main.async {
@@ -59,7 +59,7 @@ let page_size = 15
     }
     
     
-    public override func viewDidAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         guard let imKey = KeyCenter.IMAppKey,
@@ -75,12 +75,12 @@ let page_size = 15
         }
     }
     
-    public override func viewWillAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         isDestory = true
     }
     
-    public override func viewDidDisappear(_ animated: Bool) {
+    override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if isDestory {
             destory()
@@ -162,6 +162,7 @@ extension VRRoomsViewController {
 
     private func entryRoom(room: VRRoomEntity) {
         if room.is_private ?? false {
+            self.normal.roomList.isUserInteractionEnabled = true
             let alert = VoiceRoomPasswordAlert(frame: CGRect(x: 37.5, y: 168, width: ScreenWidth - 75, height: (ScreenWidth - 63 - 3 * 16) / 4.0 + 177)).cornerRadius(16).backgroundColor(.white)
             let vc = VoiceRoomAlertViewController(compent: component(), custom: alert)
             presentViewController(vc)

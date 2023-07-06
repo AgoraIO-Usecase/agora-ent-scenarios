@@ -18,6 +18,13 @@
     self.navigationBar.hidden = YES;
 }
 #pragma mark - Intial Methods
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return self.viewControllers.lastObject.preferredStatusBarStyle;
+}
+
+- (UIViewController *)childViewControllerForStatusBarStyle {
+    return self.viewControllers.lastObject;
+}
 
 #pragma mark - Events
 - (void)leftButtonDidClickAction {

@@ -52,12 +52,28 @@ class SyncUtil: NSObject {
             manager.joinScene(sceneId: id) { sceneRef in
                 sceneRefs[id] = sceneRef
                 let attr = Attribute(key: id, value: jsonString)
-                success?(attr)
+                mainTreadTask {
+                    success?(attr)
+                }
             } fail: { error in
-                fail?(error)
+                mainTreadTask {
+                    fail?(error)
+                }
             }
         }) { error in
-            fail?(error)
+            mainTreadTask {
+                fail?(error)
+            }
+        }
+    }
+    
+    class func mainTreadTask(_ task: (()->())?){
+        if Thread.isMainThread {
+            task?()
+        }else{
+            DispatchQueue.main.async {
+                task?()
+            }
         }
     }
 
@@ -89,6 +105,8 @@ class SyncUtil: NSObject {
 class SyncUtilsWrapper {
     static var syncUtilsInited: Bool = false
     static private var subscribeConnectStateMap: [String: (SocketConnectState, Bool)->Void] = [:]
+    static private var joinSceneQueue: [()->()] = []
+    static private var timer: Timer?
     static private var currentState: SocketConnectState = .connecting
     
     class func initScene(uniqueId: String,
@@ -125,6 +143,62 @@ class SyncUtilsWrapper {
         }
     }
     
+    private class func _resetTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    private  class func _dequeueJoinScene() {
+        guard timer == nil, let first = joinSceneQueue.first else {
+            return
+        }
+        
+        _resetTimer()
+        timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: false, block: { timer in
+        #if DEBUG
+            print("joinSceneByQueue timeout")
+        #endif
+            _resetTimer()
+            _dequeueJoinScene()
+        })
+        first()
+    #if DEBUG
+        print("joinSceneByQueue: \(joinSceneQueue.count)")
+    #endif
+    }
+    
+    class func joinSceneByQueue(id: String,
+                                userId: String,
+                                isOwner: Bool,
+                                property: [String: Any]?,
+                                success: SuccessBlockObj? = nil,
+                                fail: FailBlock? = nil) {
+//        if isOwner == false {
+//            SyncUtil.joinScene(id: id, userId: userId, isOwner: isOwner, property: property, success: success, fail:fail)
+//            return
+//        }
+        
+        //TODO: syncmanager does not support parallel calls 'create'
+        joinSceneQueue.append({
+            SyncUtil.joinScene(id: id, userId: userId, isOwner: isOwner, property: property) { obj in
+                _resetTimer()
+                success?(obj)
+                if joinSceneQueue.count > 0 {
+                    joinSceneQueue.removeFirst()
+                }
+                _dequeueJoinScene()
+            } fail: { err in
+                _resetTimer()
+                fail?(err)
+                if joinSceneQueue.count > 0 {
+                    joinSceneQueue.removeFirst()
+                }
+                _dequeueJoinScene()
+            }
+        })
+        _dequeueJoinScene()
+    }
+    
     class func cleanScene(uniqueId: String) {
         subscribeConnectStateMap.removeValue(forKey: uniqueId)
     }
@@ -133,5 +207,7 @@ class SyncUtilsWrapper {
         syncUtilsInited = false
         currentState = .connecting
         subscribeConnectStateMap.removeAll()
+        joinSceneQueue.removeAll()
+        _resetTimer()
     }
 }

@@ -44,7 +44,7 @@ class ShowCreateLiveVC: UIViewController {
         super.viewDidLoad()
         setUpUI()
 //        agoraKitManager.defaultSetting()
-        agoraKitManager.startPreview(canvasView: localView)
+        agoraKitManager.startPreview(canvasView: self.localView)
         configNaviBar()
         if !UserDefaults.standard.bool(forKey: kBroadcastorHasShowPreset) {
             showPreset()
@@ -183,6 +183,9 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         AppContext.showServiceImp(createView.roomNo).createRoom(roomName: roomName,
                                                                 roomId: roomId,
                                                                 thumbnailId: createView.roomBg) { [weak self] err, detailModel in
+            if err != nil {
+                ToastView.show(text: err!.localizedDescription)
+            }
 //            liveVC.agoraKit = self?.agoraKitManager.agoraKit
             guard let wSelf = self, let detailModel = detailModel else { return }
             let liveVC = ShowLivePagesViewController()

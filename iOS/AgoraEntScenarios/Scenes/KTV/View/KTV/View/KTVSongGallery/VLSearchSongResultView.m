@@ -12,11 +12,12 @@
 #import "VLUserCenter.h"
 #import "AppContext+KTV.h"
 #import "KTVMacro.h"
+#import "NSString+Helper.h"
+@import MJRefresh;
 
 @interface VLSearchSongResultView()<
 UITableViewDataSource,
-UITableViewDelegate,
-AgoraMusicContentCenterEventDelegate
+UITableViewDelegate
 >
 
 @property(nonatomic, weak) id <VLSearchSongResultViewDelegate>delegate;
@@ -28,14 +29,11 @@ AgoraMusicContentCenterEventDelegate
 @property (nonatomic, copy) NSString *roomNo;
 @property (nonatomic, assign) BOOL ifChorus;
 
-@property (nonatomic, copy) NSString* requestId;
-@property (nonatomic, strong) UIRefreshControl *refreshControl;
 @end
 
 @implementation VLSearchSongResultView
 
 - (void)dealloc {
-    [[AppContext shared] unregisterEventDelegate:self];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -48,14 +46,13 @@ AgoraMusicContentCenterEventDelegate
         self.roomNo = roomNo;
         self.delegate = delegate;
         [self setupView];
-        [[AppContext shared] registerEventDelegate:self];
     }
     return self;
 }
 
 
 - (void)appendDatasWithSongList:(NSArray<VLSongItmModel*>*)songList {
-    [self.tableView.refreshControl endRefreshing];
+    [self.tableView.mj_header endRefreshing];
     if (songList.count == 0) {
         return;
     }
@@ -80,12 +77,22 @@ AgoraMusicContentCenterEventDelegate
     if (ifRefresh) {
         [self.songsMuArray removeAllObjects];
         self.songsMuArray = modelsArray.mutableCopy;
+        if (modelsArray.count > 0) {
+            self.tableView.mj_footer.hidden = NO;
+        }else{
+            self.tableView.mj_footer.hidden = YES;
+        }
     }else{
         for (VLSongItmModel *model in modelsArray) {
             [self.songsMuArray addObject:model];
         }
     }
     [self.tableView reloadData];
+    if (modelsArray.count < 5) {
+        [self.tableView.mj_footer endRefreshingWithNoMoreData];
+    }else{
+        [self.tableView.mj_footer endRefreshing];
+    }
 }
 
 
@@ -94,11 +101,31 @@ AgoraMusicContentCenterEventDelegate
     self.page = ifRefresh ? 1 : self.page;
     self.keyWord = keyWord;
     
-    self.requestId =
-    [[AppContext shared].agoraMcc searchMusicWithKeyWord:keyWord ? keyWord : @""
-                                                    page:self.page
-                                                pageSize:50
-                                              jsonOption:nil];
+    NSDictionary *dict = @{
+        @"pitchType":@(1),
+        @"needLyric": @(YES),
+    };
+    NSString *extra = [NSString convertToJsonData:dict];
+    
+    [[AppContext shared].ktvAPI searchMusicWithKeyword:keyWord ? keyWord : @""
+                                                  page:self.page
+                                              pageSize:5
+                                            jsonOption:extra
+                                            completion:^(NSString * requestId, AgoraMusicContentCenterStatusCode status, AgoraMusicCollection * result) {
+        NSMutableArray* songArray = [NSMutableArray array];
+        [result.musicList enumerateObjectsUsingBlock:^(AgoraMusic * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            VLSongItmModel* model = [VLSongItmModel new];
+            model.songNo = [NSString stringWithFormat:@"%ld", obj.songCode];
+            model.songName = obj.name;
+            model.singer = obj.singer;
+            model.imageUrl = obj.poster;
+            [songArray addObject:model];
+        }];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self appendDatasWithSongList:songArray];
+        });
+    }];
 }
 
 - (void)setupView{
@@ -124,9 +151,14 @@ AgoraMusicContentCenterEventDelegate
     [self addSubview:self.tableView];
     self.tableView.hidden = NO;
     
-    _refreshControl = [[UIRefreshControl alloc]init];
-    self.tableView.refreshControl = _refreshControl;
-    [_refreshControl addTarget:self action:@selector(loadData) forControlEvents:UIControlEventValueChanged];
+    VL(weakSelf);
+    self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadSearchDataWithKeyWord:self.keyWord ifRefresh:YES];
+    }];
+    
+    self.tableView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
+        [weakSelf loadSearchDataWithKeyWord:self.keyWord ifRefresh:NO];
+    }];
 
 }
 
@@ -204,54 +236,5 @@ AgoraMusicContentCenterEventDelegate
         _songsMuArray = [NSMutableArray array];
     }
     return _songsMuArray;
-}
-
-
-#pragma mark AgoraMusicContentCenterEventDelegate
-- (void)onMusicChartsResult:(NSString *)requestId
-                     status:(AgoraMusicContentCenterStatusCode)status
-                     result:(NSArray<AgoraMusicChartInfo*> *)result {
-    if (![self.requestId isEqualToString:requestId]) {
-        return;
-    }
-}
-
-- (void)onMusicCollectionResult:(NSString *)requestId
-                         status:(AgoraMusicContentCenterStatusCode)status
-                         result:(AgoraMusicCollection *)result {
-    if (![self.requestId isEqualToString:requestId]) {
-        return;
-    }
-    
-    NSMutableArray* songArray = [NSMutableArray array];
-    [result.musicList enumerateObjectsUsingBlock:^(AgoraMusic * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        VLSongItmModel* model = [VLSongItmModel new];
-        model.songNo = [NSString stringWithFormat:@"%ld", obj.songCode];
-        model.songName = obj.name;
-        model.singer = obj.singer;
-        model.imageUrl = obj.poster;
-        [songArray addObject:model];
-    }];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self appendDatasWithSongList:songArray];
-    });
-}
-
-- (void)onLyricResult:(NSString*)requestId
-             lyricUrl:(NSString*)lyricUrl {
-    if (![self.requestId isEqualToString:requestId]) {
-        return;
-    }
-    
-    
-}
-
-- (void)onPreLoadEvent:(NSInteger)songCode
-               percent:(NSInteger)percent
-                status:(AgoraMusicContentCenterPreloadStatus)status
-                   msg:(NSString *)msg
-              lyricUrl:(NSString *)lyricUrl {
-
 }
 @end

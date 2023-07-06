@@ -48,6 +48,7 @@ class SARoomViewController: SABaseViewController {
         button.cornerRadius(25)
         button.backgroundColor = .white
         button.addTarget(self, action: #selector(onTapDebugButton), for: .touchUpInside)
+        button.isHidden = !AppContext.shared.isDebugMode
         return button
     }()
     private lazy var actionView = ActionSheetManager()
@@ -102,6 +103,10 @@ class SARoomViewController: SABaseViewController {
         charBarEvents()
         NotificationCenter.default.addObserver(self, selector: #selector(leaveRoom), name: Notification.Name("terminate"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateMicInfo), name: Notification.Name("updateMicInfo"), object: nil)
+        
+        if isOwner {
+            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -292,6 +297,10 @@ extension SARoomViewController {
             showUsers()
         } else if action == .beginnersGuide {
             showSoundView()
+        }else if action == .more {
+            let dialog = AUiMoreDialog(frame: view.bounds)
+            view.addSubview(dialog)
+            dialog.show()
         }
     }
 

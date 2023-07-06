@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import AgoraSyncManager
 
-private let kSceneId = "scene_show"
+private let kSceneId = "scene_show_3.0.0"
 
 private let SYNC_MANAGER_MESSAGE_COLLECTION = "show_message_collection"
 private let SYNC_MANAGER_SEAT_APPLY_COLLECTION = "show_seat_apply_collection"
@@ -223,10 +223,10 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 completion(error, nil)
                 return
             }
-            SyncUtil.joinScene(id: room.roomId,
-                          userId: room.ownerId,
-                          isOwner: true,
-                          property: params) { result in
+            SyncUtilsWrapper.joinSceneByQueue(id: room.roomId,
+                                              userId: room.ownerId,
+                                              isOwner: true,
+                                              property: params) { result in
                 //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
                 let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
                 guard let channelName = channelName else {
@@ -271,7 +271,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 completion(error, nil)
                 return
             }
-            SyncUtil.joinScene(id: room.roomId,
+            SyncUtilsWrapper.joinSceneByQueue(id: room.roomId,
                                          userId: room.ownerId,
                                          isOwner: self?.isOwner(room) ?? false,
                                          property: params) { result in
@@ -1270,10 +1270,10 @@ extension ShowSyncManagerServiceImp {
             }
             
             agoraPrint("imp pk invitation get2... \(channelName)")
-            SyncUtil.joinScene(id: channelName,
-                               userId: ownerId,
-                               isOwner: true,
-                               property: params) { result in
+            SyncUtilsWrapper.joinSceneByQueue(id: channelName,
+                                              userId: ownerId,
+                                              isOwner: true,
+                                              property: params) { result in
                 SyncUtil
                     .scene(id: channelName)?
                     .collection(className: SYNC_MANAGER_PK_INVITATION_COLLECTION)

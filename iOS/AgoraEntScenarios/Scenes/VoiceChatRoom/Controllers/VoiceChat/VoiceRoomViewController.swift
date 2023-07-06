@@ -26,13 +26,13 @@ class VoiceRoomViewController: VRBaseViewController {
     private var isEnterSeatNotFirst: Bool = false
     lazy var toastPoint: CGPoint = .init(x: self.view.center.x, y: self.view.center.y + 70)
 
-    override public var preferredStatusBarStyle: UIStatusBarStyle {
+    override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
 
     var headerView: AgoraChatRoomHeaderView!
     var rtcView: AgoraChatRoomNormalRtcView!
-
+    
     @UserDefault("VoiceRoomUserAvatar", defaultValue: "") var userAvatar
 
     lazy var chatView: VoiceRoomChatView = .init(frame: CGRect(x: 0, y: ScreenHeight - CGFloat(ZBottombarHeight) - (ScreenHeight / 667) * 210 - 50, width: ScreenWidth, height: (ScreenHeight / 667) * 210))
@@ -94,11 +94,16 @@ class VoiceRoomViewController: VRBaseViewController {
         self.subscribeSceneRoom()
         NotificationCenter.default.addObserver(self, selector: #selector(leaveRoom), name: Notification.Name("terminate"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateMicInfo), name: Notification.Name("updateMicInfo"), object: nil)
+        
+        if isOwner {
+            checkAudioAuthorized()
+        }
     }
     
     private func subscribeSceneRoom() {
-        SyncUtil.scene(id: self.roomInfo?.room?.room_id ?? "")?.subscribe(key: "",onDeleted: { _ in
-            if self.isHeaderBack == false {
+        SyncUtil.scene(id: self.roomInfo?.room?.room_id ?? "")?.subscribe(key: "",onDeleted: { 
+            
+            if self.isHeaderBack == false,$0.getId() == self.roomInfo?.room?.room_id ?? "" {
                 self.view.window?.makeToast("Time limit desc".localized())
                 self.quitRoom()
             }
@@ -368,6 +373,10 @@ extension VoiceRoomViewController {
             showSoundView()
         } else if action == .members {
             showUsers(position: .right)
+        } else if action == .more {
+            let dialog = AUiMoreDialog(frame: view.bounds)
+            view.addSubview(dialog)
+            dialog.show()
         }
     }
 
@@ -708,7 +717,7 @@ extension VoiceRoomViewController {
         checkAudioAuthorized()
     }
     
-    func checkAudioAuthorized() {
-        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
+    func checkAudioAuthorized(completion: ((Bool) -> Void)? = nil) {
+        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: completion)
     }
 }

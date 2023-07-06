@@ -11,6 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)onVLKTVTopView:(VLKTVTopView*)view closeBtnTapped:(id)sender;
 
+- (void)onVLKTVTopView:(VLKTVTopView*)view moreBtnTapped:(id)sender;
+
 @end
 
 @interface VLKTVTopView : UIView

@@ -91,6 +91,10 @@
     [self addSubview:self.inputTipsLabel];
 }
 
+-(void)setCurrent:(int)current{
+    self.inputField.text = [NSString stringWithFormat:@"%i", current];
+}
+
 - (void)addSubViewConstraints {
     CGFloat padding = 8;
     [self.reduceButton mas_makeConstraints:^(MASConstraintMaker *make) {

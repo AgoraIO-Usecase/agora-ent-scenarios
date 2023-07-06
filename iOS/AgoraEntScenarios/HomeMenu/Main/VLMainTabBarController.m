@@ -63,11 +63,10 @@
     mineViewController.hidesBottomBarWhenPushed = NO;
     BaseNavigationController *mineNavigationController = [[BaseNavigationController alloc]
                                                    initWithRootViewController:mineViewController];
-    mineViewController.tabBarItem = [self tabBarItemsWithIndex:2];
+    mineViewController.tabBarItem = [self tabBarItemsWithIndex:1];
 
    NSArray *viewControllers = @[
        homeNavigationController,
-//       discoveryNavigationController,
        mineNavigationController,
    ];
    return viewControllers;
@@ -85,9 +84,9 @@
         [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"首页")
                                       image:[self tabbarImageWithImageNamed:@"Tab_home_normal"]
                               selectedImage:[self tabbarImageWithImageNamed:@"Tab_home_sel"]],
-        [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"发现")
-                                      image:[self tabbarImageWithImageNamed:@"Tab_discovery_normal"]
-                              selectedImage:[self tabbarImageWithImageNamed:@"Tab_discovery_sel"]],
+      //  [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"发现")
+//                                      image:[self tabbarImageWithImageNamed:@"Tab_discovery_normal"]
+//                              selectedImage:[self tabbarImageWithImageNamed:@"Tab_discovery_sel"]],
         [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"我的")
                                       image:[self tabbarImageWithImageNamed:@"Tab_mine_normal"]
                               selectedImage:[self tabbarImageWithImageNamed:@"Tab_mine_sel"]]

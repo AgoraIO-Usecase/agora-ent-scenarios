@@ -13,7 +13,7 @@
 #import "VLAudioEffectPicker.h"
 #import "VLBadNetWorkView.h"
 #import "VLPopSongList.h"
-#import "VLSoundEffectView.h"
+#import "VLEffectView.h"
 #import "VLKTVSettingView.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -51,8 +51,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 //弹出音效
 + (LSTPopView*)popSetSoundEffectViewWithParentView:(UIView*)parentView
-                                         soundView:(VLSoundEffectView*)soundView
-                                      withDelegate:(id<VLsoundEffectViewDelegate>)delegate;
+                                         soundView:(VLEffectView*)soundView
+                                      withDelegate:(id<VLEffectViewDelegate>)delegate;
 
 //网络差视图
 + (LSTPopView*)popBadNetWrokTipViewWithParentView:(UIView*)parentView
