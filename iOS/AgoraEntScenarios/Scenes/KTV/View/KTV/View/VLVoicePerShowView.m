@@ -12,19 +12,23 @@
 @property(nonatomic, weak) id <VLVoicePerShowViewDelegate>delegate;
 @property (nonatomic,strong) UISwitch *voiceSwitch;
 @property (nonatomic,strong) UISwitch *delaySwitch;
+@property (nonatomic,strong) UISwitch *aecSwitch;
 @property (nonatomic, assign) NSInteger aecGrade;
 @property (nonatomic, assign) NSInteger volGrade;
 @property (nonatomic, strong) UISegmentedControl *qualitySegment;
 @property (nonatomic, strong) UISegmentedControl *volSegment;
 @property (nonatomic, strong) UILabel *qualityLabel;
+@property (nonatomic, strong) UITextField *aecTF;
 @property (nonatomic, assign) BOOL isRoomOwner;
 @property (nonatomic, assign) BOOL isProfessional;
 @property (nonatomic, assign) BOOL isDelay;
+@property (nonatomic, assign) BOOL aecState; //AIAEC开关
+@property (nonatomic, assign) NSInteger aecLevel; //AEC等级
 @end
 
 @implementation VLVoicePerShowView
 
-- (instancetype)initWithFrame:(CGRect)frame isProfessional:(BOOL)isProfessional isDelay:(BOOL)isDelay isRoomOwner:(BOOL)isRoomOwner volGrade:(NSInteger)vol aecGrade:(NSInteger)grade withDelegate:(id<VLVoicePerShowViewDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame isProfessional:(BOOL)isProfessional aecState:(BOOL)state aecLevel:(NSInteger)level isDelay:(BOOL)isDelay isRoomOwner:(BOOL)isRoomOwner volGrade:(NSInteger)vol aecGrade:(NSInteger)grade withDelegate:(id<VLVoicePerShowViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;
@@ -33,6 +37,8 @@
         self.isRoomOwner = isRoomOwner;
         self.isProfessional = isProfessional;
         self.isDelay = isDelay;
+        self.aecLevel = level;
+        self.aecState = state;
         [self layoutUI];
     }
     return self;
@@ -80,16 +86,50 @@
     
     [self initSegmentedControl];
     
-    UIView *sepView2 = [[UIView alloc]initWithFrame:CGRectMake(20, 231, SCREEN_WIDTH - 40 , 1)];
+    UIView *sepView5 = [[UIView alloc]initWithFrame:CGRectMake(20, 231, SCREEN_WIDTH - 40 , 1)];
+    sepView5.backgroundColor = [UIColor colorWithRed:0.938 green:0.938 blue:0.938 alpha:0.08];
+    [self addSubview:sepView5];
+    
+    UILabel *AECLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 249, 150, 30)];
+    AECLabel.text = @"AIAEC开关";
+    AECLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
+    [self addSubview:AECLabel];
+    
+    self.aecSwitch = [[UISwitch alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 70, 249, 50, 30)];
+    self.aecSwitch.onTintColor = UIColorMakeWithHex(@"#099DFD");
+    [self.aecSwitch addTarget:self action:@selector(aecChange:) forControlEvents:UIControlEventValueChanged];
+    self.aecSwitch.on = self.aecState;
+    [self addSubview:_aecSwitch];
+    
+    UIView *sepView6 = [[UIView alloc]initWithFrame:CGRectMake(20, 294, SCREEN_WIDTH - 40 , 1)];
+    sepView6.backgroundColor = [UIColor colorWithRed:0.938 green:0.938 blue:0.938 alpha:0.08];
+    [self addSubview:sepView6];
+    
+    UILabel *AECGradeLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 312, 150, 30)];
+    AECGradeLabel.text = @"AIAEC强度选择";
+    AECGradeLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
+    [self addSubview:AECGradeLabel];
+    
+    _aecTF = [[UITextField alloc]initWithFrame:CGRectMake(200, 312, 80, 30)];
+    _aecTF.text = [NSString stringWithFormat:@"%li", (long)_aecLevel];
+    _aecTF.textColor = [UIColor whiteColor];
+    [self addSubview:_aecTF];
+    
+    UIButton *aecSetBtn = [[UIButton alloc]initWithFrame:CGRectMake(300, 312, 80, 30)];
+    [aecSetBtn setTitle:@"设置" forState:UIControlStateNormal];
+    [aecSetBtn addTarget:self action:@selector(aecSet) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:aecSetBtn];
+    
+    UIView *sepView2 = [[UIView alloc]initWithFrame:CGRectMake(20, 357, SCREEN_WIDTH - 40 , 1)];
     sepView2.backgroundColor = [UIColor colorWithRed:0.938 green:0.938 blue:0.938 alpha:0.08];
     [self addSubview:sepView2];
     
-    UILabel *delayLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 249, 100, 30)];
+    UILabel *delayLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 375, 100, 30)];
     delayLabel.text = @"低延时模式";
     delayLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:delayLabel];
     
-    self.delaySwitch = [[UISwitch alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 70, 249, 50, 30)];
+    self.delaySwitch = [[UISwitch alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 70, 375, 50, 30)];
     self.delaySwitch.onTintColor = UIColorMakeWithHex(@"#099DFD");
     self.delaySwitch.on = self.isDelay;
     [self.delaySwitch addTarget:self action:@selector(delayChange:) forControlEvents:UIControlEventValueChanged];
@@ -100,6 +140,19 @@
         delayLabel.hidden = true;
     }
 
+}
+
+-(void)aecChange:(UISwitch *)swich {
+    if([self.delegate respondsToSelector:@selector(didAECStateChange:)]){
+        [self.delegate didAECStateChange:swich.isOn];
+    }
+}
+
+-(void)aecSet{
+    [_aecTF resignFirstResponder];
+    if([self.delegate respondsToSelector:@selector(didAECLevelSetWith:)]){
+        [self.delegate didAECLevelSetWith:[_aecTF.text integerValue]];
+    }
 }
 
 -(void)perChange:(UISwitch *)voiceSwitch {

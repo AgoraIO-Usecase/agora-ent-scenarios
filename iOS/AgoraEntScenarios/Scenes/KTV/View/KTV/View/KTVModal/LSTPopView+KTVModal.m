@@ -150,14 +150,18 @@
 //弹出专业主播
 + (LSTPopView*)popVoicePerViewWithParentView:(UIView*)parentView
                               isProfessional: (BOOL) isProfessional
+                                    aecState:(BOOL)state
+                                    aecLevel:(NSInteger)level
                                      isDelay: (BOOL) isDelay
                                     volGrade:(NSInteger)volGrade
                                        grade:(NSInteger)grade
                                     isRoomOwner: (BOOL) isRoomOwner
                                          perView:(VLVoicePerShowView*)perView
                                       withDelegate:(id<VLVoicePerShowViewDelegate>)delegate {
-    VLVoicePerShowView* voiceView = [[VLVoicePerShowView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, isRoomOwner ? 316 : 244)
+    VLVoicePerShowView* voiceView = [[VLVoicePerShowView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, isRoomOwner ? 440 : 360)
                                                                                             isProfessional:isProfessional
+                                                                                            aecState:state
+                                                                                            aecLevel:level
                                                                                             isDelay:isDelay
                                                                                             isRoomOwner:isRoomOwner
                                                                                             volGrade:volGrade

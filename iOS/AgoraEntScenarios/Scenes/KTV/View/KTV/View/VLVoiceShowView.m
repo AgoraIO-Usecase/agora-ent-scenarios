@@ -86,6 +86,15 @@
     if(btn.tag - 200 == _selectIndex){
         return;
     }
+    
+    if(_selectIndex != -1){//已有人声突出
+        if([self.delegate respondsToSelector:@selector(voiceItemClickAction:)]){
+            [self.delegate voiceItemClickAction:-1];
+            return;
+        }
+    }
+    
+    _selectIndex = btn.tag - 200;
     self.selLabel.textColor = [UIColor lightGrayColor];
     self.selCoverImg.hidden = true;
     
