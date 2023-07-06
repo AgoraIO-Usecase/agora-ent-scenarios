@@ -1,7 +1,10 @@
 # 语聊房-空间音频-iOS
 
 > 本文档主要介绍如何快速跑通 示例工程
-
+> 
+> Demo 效果:
+> 
+> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/spatialAudioVoiceRoom_1.png" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/spatialAudioVoiceRoom_2.png" width="300" height="640">
 ---
 
 ## 1. 环境准备
