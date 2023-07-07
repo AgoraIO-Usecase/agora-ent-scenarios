@@ -511,7 +511,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 - (void)onVLKTVEarSettingViewSwitchChanged:(BOOL)flag{
     self.isEarOn = flag;
-    [self.RTCkit enableInEarMonitoring:flag];
+    [self.RTCkit enableInEarMonitoring:flag includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFilters];
 }
 
 #pragma mark - VLDebugViewDelegate

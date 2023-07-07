@@ -40,15 +40,15 @@ class SoundCardSettingViewController: UIViewController {
         iconView.layer.cornerRadius = 30
         iconView.layer.masksToBounds = true
         
-//        let flag = HeadSetUtil.hasSoundCard()
-//        warningView.isHidden = flag
-//        HeadSetUtil.addSoundCardObserver {[weak self] flag in
-//            self?.warningView.isHidden = flag
-//            guard let soundBlock = self?.soundBlock else {
-//                return
-//            }
-//            soundBlock(flag)
-//        }
+        let flag = HeadSetUtil.hasSoundCard()
+        warningView.isHidden = flag
+        HeadSetUtil.addSoundCardObserver {[weak self] flag in
+            self?.warningView.isHidden = flag
+            if(!flag) {
+                guard let delegate = self?.delegate else {return}
+                delegate.didUpdateSoundSetting(false)
+            }
+        }
         
         volGainSlider.addTarget(self, action: #selector(gain), for: .valueChanged)
         volGainSlider.addTarget(self, action: #selector(gainSend), for: .touchUpInside)
