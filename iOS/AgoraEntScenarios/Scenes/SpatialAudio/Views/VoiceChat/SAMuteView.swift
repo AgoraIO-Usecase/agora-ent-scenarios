@@ -149,7 +149,7 @@ class SAMuteView: UIView {
         addSubview(muteBtn)
 
         sepView.frame = CGRect(x: ScreenWidth / 2.0, y: 180, width: 1, height: 20)
-        sepView.backgroundColor = .separator
+        sepView.backgroundColor = .lightGray
         addSubview(sepView)
     }
 
