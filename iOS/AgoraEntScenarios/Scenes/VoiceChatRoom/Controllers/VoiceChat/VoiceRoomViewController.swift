@@ -70,6 +70,10 @@ class VoiceRoomViewController: VRBaseViewController {
             guard let self = self, self.isOwner == true else { return }
             self.musicListView.show_present()
         }
+        view.onUpdateBGMClosure = { [weak self] model in
+            guard let self = self, self.isOwner == false else { return }
+            self.roomInfo?.room?.backgroundMusic = model
+        }
         return view
     }()
     var isShowPreSentView: Bool = false
