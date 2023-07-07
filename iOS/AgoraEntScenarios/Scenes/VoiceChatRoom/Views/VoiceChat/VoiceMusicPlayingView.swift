@@ -419,6 +419,7 @@ class AutoScrollLabel: UIView {
 class VoiceMusicPlayingView: UIView {
     var onClickAccompanyButtonClosure: ((Bool) -> Void)?
     var onClickBGMClosure: ((VoiceMusicModel?) -> Void)?
+    var onUpdateBGMClosure: ((VoiceMusicModel?) -> Void)?
     private lazy var titleLabel: AutoScrollLabel = {
         let label = AutoScrollLabel()
         label.text = ""
@@ -480,6 +481,11 @@ class VoiceMusicPlayingView: UIView {
             self.isHidden = songName == nil
             self.titleLabel.text = "\(songName ?? "")-\(singerName ?? "")"
             self.accompanyButton.isSelected = !isOrigin
+            let model = VoiceMusicModel()
+            model.name = songName
+            model.singer = singerName
+            model.status = .playing
+            self.onUpdateBGMClosure?(model)
         }
         ChatRoomServiceImp.getSharedInstance().fetchRoomBGM(roomId: roomId) { songName, singerName, isOrigin in
             if songName?.isEmpty == false {
@@ -487,6 +493,11 @@ class VoiceMusicPlayingView: UIView {
             }
             self.isHidden = songName == nil
             self.accompanyButton.isSelected = !isOrigin
+            let model = VoiceMusicModel()
+            model.name = songName
+            model.singer = singerName
+            model.status = .playing
+            self.onUpdateBGMClosure?(model)
         }
     }
     
