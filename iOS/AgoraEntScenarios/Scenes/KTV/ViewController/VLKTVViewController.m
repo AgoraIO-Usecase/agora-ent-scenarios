@@ -1124,6 +1124,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                       channelName:self.roomModel.roomNo
                                                          localUid:[VLUserCenter.user.id integerValue]
                                                         chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
+                                                             type: KTVTypeNormal
                                                         maxCacheSize:10
     ];
     self.ktvApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
@@ -2059,10 +2060,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setTrackMode:(KTVPlayerTrackMode)trackMode {
     KTVLogInfo(@"setTrackMode: %ld", trackMode);
     _trackMode = trackMode;
-//    [[self.ktvApi getMediaPlayer] selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1];
+    [[self.ktvApi getMediaPlayer] selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1];
 //
     [self.MVView setOriginBtnState: trackMode == KTVPlayerTrackModeOrigin ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc];
-    [[self.ktvApi getMediaPlayer] selectMultiAudioTrack:trackMode == KTVPlayerTrackModeAcc ? 1 : 0 publishTrackIndex:trackMode == KTVPlayerTrackModeOrigin ? 0 : 1 ];
+ //   [[self.ktvApi getMediaPlayer] selectMultiAudioTrack:trackMode == KTVPlayerTrackModeAcc ? 1 : 0 publishTrackIndex:trackMode == KTVPlayerTrackModeOrigin ? 0 : 1 ];
     VLKTVMVViewActionType type = VLKTVMVViewActionTypeSingAcc;
     switch (trackMode) {
         case KTVPlayerTrackModeOrigin:
