@@ -65,21 +65,13 @@ class SoundCardSettingViewController: UIViewController {
         
         switch effectType {
             case 0:
-            iconView.image = UIImage.sceneImage(name: "shuaige")
-                typeLabel.text = "性感欧巴"
-                descLabel.text = "悦耳 | 磁性"
+                iconView.image = UIImage.sceneImage(name: "shuaige")
+                typeLabel.text = "成熟大叔"
+                descLabel.text = "低沉 | 高混响"
             case 1:
                 iconView.image = UIImage.sceneImage(name: "meinv")
-                typeLabel.text = "温柔御姐"
-                descLabel.text = "柔美 | 磁性"
-            case 2:
-                iconView.image = UIImage.sceneImage(name: "zhengtai")
-                typeLabel.text = "阳光正太"
-                descLabel.text = "洪亮 | 饱满"
-            case 3:
-                iconView.image = UIImage.sceneImage(name: "girl")
-                typeLabel.text = "甜美嗲气"
-                descLabel.text = "夹子音 | 萝莉"
+                typeLabel.text = "女播音员"
+                descLabel.text = "厚重 | 高混响"
             default:
                 break
         }
@@ -100,8 +92,8 @@ class SoundCardSettingViewController: UIViewController {
     
     @IBAction func showDropMenu(_ sender: UIButton) {
         sender.layoutIfNeeded()
-        let dropdownFrame = CGRect(x: sender.frame.minX - 30, y: sender.frame.maxY + 10, width: 110, height: 180)
-        dropdownMenu = DropdownMenu(frame: dropdownFrame, items: ["性感欧巴", "温柔御姐", "阳光正太", "甜美嗲气"], selectIndex: self.effectType)
+        let dropdownFrame = CGRect(x: sender.frame.minX - 30, y: sender.frame.maxY + 10, width: 110, height: 90)
+        dropdownMenu = DropdownMenu(frame: dropdownFrame, items: ["成熟大叔", "女播音员"], selectIndex: self.effectType)
         dropdownMenu?.delegate = self
         self.view.addSubview(dropdownMenu!)
     }
@@ -114,8 +106,8 @@ class SoundCardSettingViewController: UIViewController {
         print("switch \(swich.isOn)")
         if swich.isOn {
             iconView.image = UIImage.sceneImage(name: "shuaige")
-            typeLabel.text = "性感欧巴"
-            descLabel.text = "悦耳 | 磁性"
+            typeLabel.text = "成熟大叔"
+            descLabel.text = "低沉 | 高混响"
             gainLabel.text = "1.0"
             volGainSlider.value = 1/3.0
             micTypeLabel.text = "4"
@@ -201,26 +193,18 @@ extension SoundCardSettingViewController: DropdownMenuDelegate {
     
     func setEffectDescWith(index: Int) {
         gainLabel.text = "1.0"
-        volGainSlider.value = 0.5
+        volGainSlider.value = 1/3.0
         micTypeLabel.text = "4"
         micTypeSlider.value = 1
         switch index {
         case 0:
             iconView.image = UIImage.sceneImage(name: "shuaige")
-            typeLabel.text = "性感欧巴"
-            descLabel.text = "悦耳 | 磁性"
+            typeLabel.text = "成熟大叔"
+            descLabel.text = "低沉 | 高混响"
         case 1:
             iconView.image = UIImage.sceneImage(name: "meinv")
-            typeLabel.text = "温柔御姐"
-            descLabel.text = "柔美 | 磁性"
-        case 2:
-            iconView.image = UIImage.sceneImage(name: "zhengtai")
-            typeLabel.text = "阳光正太"
-            descLabel.text = "洪亮 | 饱满"
-        case 3:
-            iconView.image = UIImage.sceneImage(name: "girl")
-            typeLabel.text = "甜美嗲气"
-            descLabel.text = "夹子音 | 萝莉"
+            typeLabel.text = "女播音员"
+            descLabel.text = "厚重 | 高混响"
         default:
             break
         }

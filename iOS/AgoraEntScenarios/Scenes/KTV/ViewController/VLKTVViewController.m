@@ -569,7 +569,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         self.gainValue = 1.0;
         self.effectType = 0;
         self.typeValue = 4;
-        [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":0}}"];
+        [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":2}}"];
     } else {
         [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":-1,\"gain\":-1.0,\"gender\":-1,\"effect\":-1}}"];
     }
@@ -581,16 +581,10 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     self.typeValue = 4;
     switch (value) {
         case 0:
-            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":0}}"];
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":2}}"];
             break;
         case 1:
-            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":0}}"];
-            break;
-        case 2:
-            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":1}}"];
-            break;
-        case 3:
-            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":1}}"];
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":2}}"];
             break;
         default:
             break;
