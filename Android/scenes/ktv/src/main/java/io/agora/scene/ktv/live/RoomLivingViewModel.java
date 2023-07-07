@@ -1241,9 +1241,9 @@ public class RoomLivingViewModel extends ViewModel {
             @Override
             public void onAIAECChanged(boolean enable) {
                 if (enable) {
-                    mRtcEngine.setParameters("{\"che.audio.ains_mode\": 1}");
+                    mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\": 1}");
                 } else {
-                    mRtcEngine.setParameters("{\"che.audio.ains_mode\": 0}");
+                    mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\": 0}");
                 }
             }
 
