@@ -15,6 +15,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.sensetime.effects.STRenderKit
+import io.agora.beauty.sensetime.*
 import io.agora.rtc2.Constants
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoCanvas
@@ -41,7 +43,8 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     private val mThumbnailId by lazy { getRandomThumbnailId() }
     private val mRoomId by lazy { getRandomRoomId() }
     private val mBeautyProcessor by lazy { RtcEngineInstance.beautyProcessor }
-
+    private val mSenseTimeBeautyAPI by lazy { RtcEngineInstance.mSenseTimeApi }
+    private val mSTRenderKit by lazy { STRenderKit(this, null) }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
 
     private var isFinishToLiveDetail = false
@@ -101,6 +104,21 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             showPresetDialog()
         }
         requestCameraPermission(true)
+        mBeautyProcessor.setSTRenderKit(mSTRenderKit)
+        mSenseTimeBeautyAPI.initialize(
+            Config(
+                mRtcEngine,
+                mSTRenderKit,
+                captureMode = CaptureMode.Custom,
+                statsEnable = true,
+                eventCallback = object: IEventCallback {
+                    override fun onBeautyStats(stats: BeautyStats) {
+                        ShowLogger.d("hugo", "BeautyStats stats = $stats")
+                    }
+                }
+            )
+        )
+        mSenseTimeBeautyAPI.setBeautyPreset(BeautyPreset.CUSTOM)
     }
 
     private var toggleVideoRun: Runnable? = null
@@ -138,9 +156,13 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             binding.flVideoContainer.addView(this)
         })
         videoCanvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
-        mRtcEngine.setupLocalVideo(
-            videoCanvas
-        )
+//        mRtcEngine.setupLocalVideo(
+//            videoCanvas
+//        )
+        mSenseTimeBeautyAPI.enable(true)
+        mSenseTimeBeautyAPI.setupLocalVideo(SurfaceView(this).apply {
+            binding.flVideoContainer.addView(this)
+        }, Constants.RENDER_MODE_HIDDEN)
         val cacheQualityResolution = PictureQualityDialog.getCacheQualityResolution()
         mRtcEngine.setCameraCapturerConfiguration(
             CameraCapturerConfiguration(

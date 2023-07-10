@@ -11,8 +11,9 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(path: ":scenes:show:aars:SenseArSourceManager")
-    implementation project(path: ":scenes:show:aars:STMobileJNI")
+//    implementation project(path: ":scenes:show:aars:SenseArSourceManager")
+//    implementation project(path: ":scenes:show:aars:STMobileJNI")
+    implementation "com.github.AgoraIO-Community.BeautyAPI:SenseTime:1.0.0.1"
     implementation project(":common:base")
     implementation project(':common:ui-widget')
 

@@ -1,12 +1,13 @@
 package io.agora.scene.show.beauty
 
 import android.util.Log
+import com.sensetime.effects.STRenderKit
 import io.agora.base.VideoFrame
 import io.agora.rtc2.video.IVideoFrameObserver
 import java.util.concurrent.Executors
 
 
-abstract class IBeautyProcessor: IVideoFrameObserver {
+abstract class IBeautyProcessor {
     private val workerExecutor = Executors.newSingleThreadExecutor()
 
     @Volatile
@@ -19,6 +20,8 @@ abstract class IBeautyProcessor: IVideoFrameObserver {
     protected abstract fun setEffectAfterCached(itemId: Int, intensity: Float)
 
     protected abstract fun setStickerAfterCached(itemId: Int)
+
+    abstract fun setSTRenderKit(kit: STRenderKit)
 
     protected fun restore(){
         BeautyCache.restoreByOperation(this)
@@ -105,29 +108,4 @@ abstract class IBeautyProcessor: IVideoFrameObserver {
             setFaceBeautifyAfterCached(itemId, intensity)
         }
     }
-
-
-    // IVideoFrameObserver implement
-    override fun onPreEncodeVideoFrame(type: Int, videoFrame: VideoFrame?): Boolean = false
-
-    override fun onCaptureVideoFrame(type: Int, videoFrame: VideoFrame?): Boolean = false
-
-    override fun onMediaPlayerVideoFrame(videoFrame: VideoFrame?, mediaPlayerId: Int) = false
-
-    override fun onRenderVideoFrame(
-        channelId: String?,
-        uid: Int,
-        videoFrame: VideoFrame?
-    ) = false
-
-    override fun getVideoFrameProcessMode() = IVideoFrameObserver.PROCESS_MODE_READ_WRITE
-
-    override fun getVideoFormatPreference() = IVideoFrameObserver.VIDEO_PIXEL_DEFAULT
-
-    override fun getRotationApplied() = false
-
-    override fun getMirrorApplied() =  false
-
-    override fun getObservedFramePosition() = IVideoFrameObserver.POSITION_POST_CAPTURER
-
 }

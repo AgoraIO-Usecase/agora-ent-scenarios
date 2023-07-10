@@ -1,10 +1,16 @@
 package io.agora.scene.show
 
+import android.util.Log
+import com.sensetime.effects.STRenderKit
+import io.agora.base.VideoFrame
+import io.agora.beauty.sensetime.SenseTimeBeautyAPI
+import io.agora.beauty.sensetime.createSenseTimeBeautyAPI
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.CameraCapturerConfiguration
+import io.agora.rtc2.video.IVideoFrameObserver
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
@@ -28,6 +34,16 @@ object RtcEngineInstance {
     val debugSettingModel = DebugSettingModel().apply {  }
 
     private val workingExecutor = Executors.newSingleThreadExecutor()
+
+    private var innerSenseTimeApi: SenseTimeBeautyAPI? = null
+    val mSenseTimeApi: SenseTimeBeautyAPI
+        get() {
+            if (innerSenseTimeApi == null) {
+                innerSenseTimeApi = createSenseTimeBeautyAPI()
+            }
+            return innerSenseTimeApi!!
+        }
+
 
     private var innerBeautyProcessor: IBeautyProcessor? = null
     val beautyProcessor: IBeautyProcessor
@@ -55,7 +71,53 @@ object RtcEngineInstance {
                     }
                 }
                 innerRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
-                    registerVideoFrameObserver(beautyProcessor)
+                    //registerVideoFrameObserver(beautyProcessor)
+                    registerVideoFrameObserver(object : IVideoFrameObserver {
+                        private var shouldMirror = true
+                        override fun onCaptureVideoFrame(
+                            type: Int,
+                            videoFrame: VideoFrame?
+                        ): Boolean {
+                            shouldMirror = false
+                            val ret = mSenseTimeApi.onFrame(videoFrame!!)
+                            Log.d("hugo", "mSenseTimeApi.onFrame: " + ret)
+                            return when(ret) {
+                                io.agora.beauty.sensetime.ErrorCode.ERROR_OK.value -> true
+                                io.agora.beauty.sensetime.ErrorCode.ERROR_FRAME_SKIPPED.value -> false
+                                else -> {
+                                    shouldMirror = videoFrame.sourceType == VideoFrame.SourceType.kFrontCamera
+                                    true
+                                }
+                            }
+                        }
+
+                        override fun onPreEncodeVideoFrame(
+                            type: Int,
+                            videoFrame: VideoFrame?
+                        ): Boolean = false
+
+                        override fun onMediaPlayerVideoFrame(
+                            videoFrame: VideoFrame?,
+                            mediaPlayerId: Int
+                        ): Boolean = false
+
+                        override fun onRenderVideoFrame(
+                            channelId: String?,
+                            uid: Int,
+                            videoFrame: VideoFrame?
+                        ): Boolean = false
+
+                        override fun getVideoFrameProcessMode(): Int = IVideoFrameObserver.PROCESS_MODE_READ_WRITE
+
+                        override fun getVideoFormatPreference(): Int = IVideoFrameObserver.VIDEO_PIXEL_DEFAULT
+
+                        override fun getRotationApplied(): Boolean = false
+
+                        override fun getMirrorApplied(): Boolean = shouldMirror
+
+                        override fun getObservedFramePosition(): Int = IVideoFrameObserver.POSITION_POST_CAPTURER
+
+                    })
                     enableVideo()
                 }
             }
@@ -84,6 +146,7 @@ object RtcEngineInstance {
             processor.release()
             innerBeautyProcessor = null
         }
+        innerSenseTimeApi?.release()
         debugSettingModel.apply {
             pvcEnabled = true
             autoFocusFaceModeEnabled = true
