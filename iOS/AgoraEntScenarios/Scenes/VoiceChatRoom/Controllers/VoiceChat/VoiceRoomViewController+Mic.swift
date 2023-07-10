@@ -141,8 +141,8 @@ extension VoiceRoomViewController {
 
 
     func showMuteView(with index: Int) {
-        let isHairScreen = SwiftyFitsize.isFullScreen
-        let muteView = VMMuteView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34))
+        let isHairScreen =  Screen.isFullScreen
+        let muteView = VMMuteView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264 : 264 - 34))
         guard let mic_info = roomInfo?.mic_info?[index] else { return }
         muteView.isOwner = isOwner
         muteView.micInfo = mic_info
@@ -156,7 +156,7 @@ extension VoiceRoomViewController {
                 self?.unmuteLocal(with: index)
             }
         }
-        let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34)), custom: muteView)
+        let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: isHairScreen ? 264 : 264 - 34)), custom: muteView)
         presentViewController(vc)
     }
 

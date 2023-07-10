@@ -54,7 +54,6 @@ class AgoraChatRoomBaseAlienCollectionViewCell: UICollectionViewCell {
     public var clickVBlock: (() -> Void)?
     override init(frame: CGRect) {
         super.init(frame: frame)
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
     }
 
@@ -67,7 +66,7 @@ class AgoraChatRoomBaseAlienCollectionViewCell: UICollectionViewCell {
         cornerView.layer.cornerRadius = 33
         cornerView.layer.masksToBounds = true
         cornerView.layer.borderColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.2).cgColor
-        cornerView.layer.borderWidth = 1~
+        cornerView.layer.borderWidth = 1
         cornerView.backgroundColor = .clear
         contentView.addSubview(cornerView)
 
