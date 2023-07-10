@@ -235,7 +235,12 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
     @Override
     public boolean onCaptureVideoFrame(int type, VideoFrame videoFrame) {
         if (videoFrame == null) return false;
+        if (!isEnable()|| isReleased){
+            shouldMirror = videoFrame.getSourceType() ==VideoFrame.SourceType.kFrontCamera;
+            return true;
+        }
         shouldMirror = false;
+
         int ret = getSenseTimeBeautyAPI().onFrame(videoFrame);
         if (ret == ErrorCode.ERROR_OK.getValue()) {
             return true;

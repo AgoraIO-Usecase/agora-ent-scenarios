@@ -62,53 +62,6 @@ object RtcEngineInstance {
                 }
                 innerRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
                     registerVideoFrameObserver(beautyProcessor)
-                    registerVideoFrameObserver(object : IVideoFrameObserver {
-                        private var shouldMirror = true
-                        override fun onCaptureVideoFrame(
-                            type: Int,
-                            videoFrame: VideoFrame?
-                        ): Boolean {
-
-                            shouldMirror = false
-                            val ret = beautyProcessor.getSenseTimeBeautyAPI().onFrame(videoFrame!!)
-                            Log.d("hugo", "mSenseTimeApi.onFrame: " + ret)
-                            return when(ret) {
-                                io.agora.beauty.sensetime.ErrorCode.ERROR_OK.value -> true
-                                io.agora.beauty.sensetime.ErrorCode.ERROR_FRAME_SKIPPED.value -> false
-                                else -> {
-                                    shouldMirror = videoFrame.sourceType == VideoFrame.SourceType.kFrontCamera
-                                    true
-                                }
-                            }
-                        }
-
-                        override fun onPreEncodeVideoFrame(
-                            type: Int,
-                            videoFrame: VideoFrame?
-                        ): Boolean = true
-
-                        override fun onMediaPlayerVideoFrame(
-                            videoFrame: VideoFrame?,
-                            mediaPlayerId: Int
-                        ): Boolean = true
-
-                        override fun onRenderVideoFrame(
-                            channelId: String?,
-                            uid: Int,
-                            videoFrame: VideoFrame?
-                        ): Boolean = true
-
-                        override fun getVideoFrameProcessMode(): Int = IVideoFrameObserver.PROCESS_MODE_READ_WRITE
-
-                        override fun getVideoFormatPreference(): Int = IVideoFrameObserver.VIDEO_PIXEL_DEFAULT
-
-                        override fun getRotationApplied(): Boolean = false
-
-                        override fun getMirrorApplied(): Boolean = shouldMirror
-
-                        override fun getObservedFramePosition(): Int = IVideoFrameObserver.POSITION_POST_CAPTURER
-
-                    })
                     enableVideo()
                 }
             }
