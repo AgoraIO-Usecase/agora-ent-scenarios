@@ -25,7 +25,7 @@ PODS:
   - HWWeakTimer (1.0)
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
-  - KTVApi (1.0.0.2):
+  - KTVApi (1.0.0.5):
     - AgoraRtcEngine_Special_iOS (= 4.1.1.142)
   - LEEAlert (1.6.4)
   - LSTPopView (0.3.10):
@@ -75,7 +75,7 @@ DEPENDENCIES:
   - HWWeakTimer (= 1.0)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
-  - KTVApi (= 1.0.0.2)
+  - KTVApi (= 1.0.0.5)
   - LEEAlert (= 1.6.4)
   - LSTPopView (= 0.3.10)
   - Masonry (= 1.1.0)
@@ -145,7 +145,7 @@ SPEC CHECKSUMS:
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
-  KTVApi: bfc0ba3906a81f137a888e83c6be3b80ce745045
+  KTVApi: 32f3beee205b3eaa81f20da54c9fcb7160cb8730
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
@@ -167,6 +167,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 804baf401515acb9832a1f0b04f31396f9969a96
+PODFILE CHECKSUM: a3498eba92a7c955a98854efa5566cc6514da2f4
 
 COCOAPODS: 1.12.1

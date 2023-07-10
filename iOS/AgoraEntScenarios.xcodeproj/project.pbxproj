@@ -565,8 +565,6 @@
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
 		E32C7EA92A20B03F00512523 /* ShowDebugPrivateParamsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E32C7EA82A20B03F00512523 /* ShowDebugPrivateParamsVC.swift */; };
-		E351447A2A57FD7F0054A0B8 /* KTVApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E35144782A57FD7F0054A0B8 /* KTVApi.swift */; };
-		E351447B2A57FD7F0054A0B8 /* KTVApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E35144792A57FD7F0054A0B8 /* KTVApiImpl.swift */; };
 		E357353929EFD35B009D54E1 /* KTVSkipView.m in Sources */ = {isa = PBXBuildFile; fileRef = E357353829EFD35B009D54E1 /* KTVSkipView.m */; };
 		E357353E29EFD631009D54E1 /* VLAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E357353C29EFD631009D54E1 /* VLAlert.m */; };
 		E357353F29EFD631009D54E1 /* VLKTVAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E357353D29EFD631009D54E1 /* VLKTVAlert.m */; };
@@ -1326,8 +1324,6 @@
 		DDDDDB3428FFD78B005F4E8B /* AppContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppContext.swift; sourceTree = "<group>"; };
 		DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneLocalizedString.swift; sourceTree = "<group>"; };
 		E32C7EA82A20B03F00512523 /* ShowDebugPrivateParamsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugPrivateParamsVC.swift; sourceTree = "<group>"; };
-		E35144782A57FD7F0054A0B8 /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
-		E35144792A57FD7F0054A0B8 /* KTVApiImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApiImpl.swift; sourceTree = "<group>"; };
 		E357353729EFD35B009D54E1 /* KTVSkipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KTVSkipView.h; sourceTree = "<group>"; };
 		E357353829EFD35B009D54E1 /* KTVSkipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KTVSkipView.m; sourceTree = "<group>"; };
 		E357353A29EFD631009D54E1 /* VLAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLAlert.h; sourceTree = "<group>"; };
@@ -3327,8 +3323,6 @@
 		E357354929EFD74A009D54E1 /* KTVAPI */ = {
 			isa = PBXGroup;
 			children = (
-				E35144782A57FD7F0054A0B8 /* KTVApi.swift */,
-				E35144792A57FD7F0054A0B8 /* KTVApiImpl.swift */,
 			);
 			path = KTVAPI;
 			sourceTree = "<group>";
@@ -3872,7 +3866,6 @@
 				DD36107E29B70CDC00CE7984 /* EffectsAttribute.m in Sources */,
 				DD619BAC29E3E262008F63E4 /* VoiceServiceProtocol.swift in Sources */,
 				DDA19A0128FFE579009D3E61 /* NSObject+Extension.m in Sources */,
-				E351447A2A57FD7F0054A0B8 /* KTVApi.swift in Sources */,
 				DD619AA829E3E247008F63E4 /* SAHorizontalCardCell.swift in Sources */,
 				DD0292F2295BF0DC00485225 /* AppContext+KTV.m in Sources */,
 				DD619BDE29E3E262008F63E4 /* VoiceRoomGiftsView.swift in Sources */,
@@ -4044,7 +4037,6 @@
 				DD0292E2295BF0DC00485225 /* VLKTVSettingView.m in Sources */,
 				DD619A6629E3E247008F63E4 /* SABusinessApi.swift in Sources */,
 				DD3610C429B70CDC00CE7984 /* ShowApplyView.swift in Sources */,
-				E351447B2A57FD7F0054A0B8 /* KTVApiImpl.swift in Sources */,
 				DD3610C329B70CDC00CE7984 /* ShowApplyAndInviteView.swift in Sources */,
 				DD36107829B70CDC00CE7984 /* BundleUtil.m in Sources */,
 				DDA19A0A28FFE579009D3E61 /* Screen.swift in Sources */,
