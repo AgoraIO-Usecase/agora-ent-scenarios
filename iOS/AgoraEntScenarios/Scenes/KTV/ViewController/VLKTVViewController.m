@@ -42,7 +42,7 @@
 @import AgoraLyricsScore;
 @import YYCategories;
 @import SDWebImage;
-
+@import KTVApi;
 
 NSInteger ktvApiStreamId = -1;
 NSInteger ktvStreamId = -1;

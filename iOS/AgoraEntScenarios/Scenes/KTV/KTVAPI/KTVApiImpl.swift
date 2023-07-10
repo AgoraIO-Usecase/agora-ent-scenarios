@@ -91,7 +91,7 @@ private func agoraPrint(_ message: String) {
     private var timer: Timer?
     private var isPause: Bool = false
     
-    public var remoteVolume: Int = 40
+    public var remoteVolume: Int = 30
     private var joinChorusNewRole: KTVSingRole = .audience
     private var oldPitch: Double = 0
     private var isWearingHeadPhones: Bool = false

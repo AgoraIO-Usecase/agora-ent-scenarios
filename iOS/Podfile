@@ -41,7 +41,8 @@ def all_pods
 #   pod 'AgoraRtcEngine_iOS', :path => './libs'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 # pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
-  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.142'
+#  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.142'
+  pod 'KTVApi', '1.0.0.5'
 
   #ThirdParty
   pod 'HWWeakTimer', '1.0'

@@ -48,7 +48,7 @@ UICollectionViewDataSource
         [self addSubViewConstraints];
         self.soundSlider.value = 1.0;
         self.accSlider.value = 0.5;
-        self.remoteSlider.value = 0.4;
+        self.remoteSlider.value = 0.3;
         self.setting.remoteVolume = 40;
         self.cellWidth = (CGRectGetWidth([UIScreen mainScreen].bounds) - 48) / 4.0;
         self.titles = @[@"原声", @"KTV",@"演唱会", @"录音棚", @"留声机", @"空旷", @"空灵", @"流行",@"R&B"];
