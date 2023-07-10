@@ -1283,7 +1283,8 @@ class LiveDetailFragment : Fragment() {
                             downBitrate = stats.receivedBitrate,
                             receiveFPS = stats.decoderOutputFrameRate,
                             downLossPackage = stats.packetLossRate,
-                            receiveVideoSize = Size(stats.width, stats.height)
+                            receiveVideoSize = Size(stats.width, stats.height),
+                            downDelay = stats.delay
                         )
                     }
                 }
@@ -1295,8 +1296,7 @@ class LiveDetailFragment : Fragment() {
                     runOnUiThread {
                         refreshStatisticInfo(
                             audioBitrate = stats.receivedBitrate,
-                            audioLossPackage = stats.audioLossRate,
-                            downDelay = stats.networkTransportDelay,
+                            audioLossPackage = stats.audioLossRate
                         )
                     }
                 }
@@ -1688,7 +1688,8 @@ class LiveDetailFragment : Fragment() {
                         downBitrate = stats.receivedBitrate,
                         receiveFPS = stats.decoderOutputFrameRate,
                         downLossPackage = stats.packetLossRate,
-                        receiveVideoSize = Size(stats.width, stats.height)
+                        receiveVideoSize = Size(stats.width, stats.height),
+                        downDelay = stats.delay
                     )
                 }
             },
@@ -1696,8 +1697,7 @@ class LiveDetailFragment : Fragment() {
                 activity?.runOnUiThread {
                     refreshStatisticInfo(
                         audioBitrate = stats.receivedBitrate,
-                        audioLossPackage = stats.audioLossRate,
-                        downDelay = stats.networkTransportDelay,
+                        audioLossPackage = stats.audioLossRate
                     )
                 }
             },
