@@ -24,7 +24,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
     public var directionType: SA3DUserDirectionType = .AgoraChatRoom3DUserDirectionTypeDown {
         didSet {
             rtcUserView.snp.updateConstraints { make in
-                make.top.equalTo(self.contentView).offset(directionType == .AgoraChatRoom3DUserDirectionTypeUp ? 0~ : 40~)
+                make.top.equalTo(self.contentView).offset(directionType == .AgoraChatRoom3DUserDirectionTypeUp ? 0 : 40)
             }
             contentView.layoutIfNeeded()
         }
@@ -119,7 +119,6 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
     }
 
@@ -138,7 +137,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
 
         rtcUserView.snp.makeConstraints { make in
             make.left.right.bottom.equalTo(self.contentView)
-            make.top.equalTo(self.contentView).offset(-20~)
+            make.top.equalTo(self.contentView).offset(-20)
         }
         layoutIfNeeded()
         

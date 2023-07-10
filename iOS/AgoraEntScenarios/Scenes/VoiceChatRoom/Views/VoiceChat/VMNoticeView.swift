@@ -122,7 +122,7 @@ class VMNoticeView: UIView {
         addSubview(limLabel)
         limLabel.isHidden = true
 
-        let isHairScreen = SwiftyFitsize.isFullScreen
+        let isHairScreen =  Screen.isFullScreen
         editBtn.frame = CGRect(x: 20, y: bounds.size.height - (isHairScreen ? 87 : 53), width: bounds.size.width - 40, height: 48)
         editBtn.setTitle(LanguageManager.localValue(key: "Edit"), for: .normal)
         editBtn.font(UIFont.systemFont(ofSize: 16))

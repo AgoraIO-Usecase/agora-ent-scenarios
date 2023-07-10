@@ -114,9 +114,9 @@ class SABaseRtcUserView: UIView {
         }
     }
 
-    public var iconWidth: CGFloat = 60~ {
+    public var iconWidth: CGFloat = 60 {
         didSet {
-            self.iconView.layer.cornerRadius = (iconWidth / 2.0)~
+            self.iconView.layer.cornerRadius = (iconWidth / 2.0)
             self.iconView.layer.masksToBounds = true
             self.iconView.snp.updateConstraints { make in
                 make.width.height.equalTo(iconWidth)
@@ -160,7 +160,6 @@ class SABaseRtcUserView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
     }
 

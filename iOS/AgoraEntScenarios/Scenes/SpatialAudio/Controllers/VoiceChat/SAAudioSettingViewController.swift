@@ -471,7 +471,7 @@ extension SAAudioSettingViewController: UITableViewDelegate, UITableViewDataSour
             visitBlock()
         }
         DispatchQueue.main.async {[weak self] in
-            self?.presentView.push(with: detailVC, frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 454~))
+            self?.presentView.push(with: detailVC, frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 454))
         }
     }
 

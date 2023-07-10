@@ -299,7 +299,6 @@ extension VoiceRoomViewController {
     }
 
     func layoutUI() {
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
 
         let bgImgView = UIImageView()
         bgImgView.image = UIImage("lbg")
@@ -327,16 +326,16 @@ extension VoiceRoomViewController {
             make.left.right.top.bottom.equalTo(self.view)
         }
 
-        let isHairScreen = SwiftyFitsize.isFullScreen
+        let isHairScreen =  Screen.isFullScreen
         headerView.snp.makeConstraints { make in
             make.left.top.right.equalTo(self.view)
-            make.height.equalTo(isHairScreen ? 140~ : 140~ - 25)
+            make.height.equalTo(isHairScreen ? 140 : 140 - 25)
         }
 
         rtcView.snp.makeConstraints { make in
             make.top.equalTo(self.headerView.snp.bottom)
             make.left.right.equalTo(self.view)
-            make.height.equalTo(240~)
+            make.height.equalTo(240)
         }
         if roomInfo?.room?.type ?? 0 == 1 {
             view.addSubViews([chatBar])
@@ -450,7 +449,7 @@ extension VoiceRoomViewController {
         inputBar.hiddenInputBar()
         if isShowPreSentView {
             UIView.animate(withDuration: 0.5, animations: {
-                self.preView.frame = CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 450~)
+                self.preView.frame = CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 450)
             }) { _ in
                 if self.preView == nil {return}
                 self.preView.removeFromSuperview()
@@ -491,8 +490,8 @@ extension VoiceRoomViewController {
             view.makeToast("Host Bot".localized())
             return
         }
-        let confirmView = VMConfirmView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40~, height: 220~), type: .addbot)
-        var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 40~, height: 220~))
+        let confirmView = VMConfirmView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40, height: 220), type: .addbot)
+        var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 40, height: 220))
         compent.destination = .center
         let vc = VoiceRoomAlertViewController(compent: compent, custom: confirmView)
         confirmView.resBlock = { [weak self] flag in
@@ -653,7 +652,7 @@ extension VoiceRoomViewController {
         default:
             detailStr = "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ".localized()
         }
-        return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40~)
+        return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40)
     }
 }
 

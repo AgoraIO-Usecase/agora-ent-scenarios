@@ -102,6 +102,11 @@ let page_size = 15
         VoiceRoomUserInfo.shared.currentRoomOwner = nil
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
+    
+    deinit {
+        VoiceRoomIMManager.shared?.logoutIM()
+        VoiceRoomIMManager.shared = nil
+    }
 }
 
 extension VRRoomsViewController {
