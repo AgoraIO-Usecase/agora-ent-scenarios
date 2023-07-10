@@ -1472,6 +1472,14 @@ class LiveDetailFragment : Fragment() {
             "show"
         )
 
+        if (!isRoomOwner) {
+            //mRtcEngine.setParameters("{\"engine.video.enable_hw_decoder\":\"true\"}")
+            mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
+        } else {
+            //mRtcEngine.setParameters("{\"engine.video.enable_hw_decoder\":\"false\"}")
+            mRtcEngine.setParameters("{\"che.hardware_decoding\": 0}")
+        }
+
         val channelMediaOptions = ChannelMediaOptions()
         channelMediaOptions.clientRoleType =
             if (isRoomOwner) Constants.CLIENT_ROLE_BROADCASTER else Constants.CLIENT_ROLE_AUDIENCE
