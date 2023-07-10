@@ -25,6 +25,7 @@
 @property (nonatomic) dispatch_queue_t renderQueue;
 ///贴纸id
 @property (nonatomic, assign) int stickerId;
+@property (nonatomic, assign) int filterId;
 
 @end
 
