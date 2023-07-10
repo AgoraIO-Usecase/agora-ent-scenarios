@@ -1473,10 +1473,10 @@ class LiveDetailFragment : Fragment() {
         )
 
         if (!isRoomOwner) {
-            //mRtcEngine.setParameters("{\"engine.video.enable_hw_decoder\":\"true\"}")
+            // 观众加入频道前默认开启硬编码
             mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
         } else {
-            //mRtcEngine.setParameters("{\"engine.video.enable_hw_decoder\":\"false\"}")
+            // 主播加入频道前默认开启软编码
             mRtcEngine.setParameters("{\"che.hardware_decoding\": 0}")
         }
 
