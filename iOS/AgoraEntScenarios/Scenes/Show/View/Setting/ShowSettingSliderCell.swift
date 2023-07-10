@@ -12,13 +12,7 @@ class ShowSettingSliderCell: ShowSettingBaseCell {
     var sliderValueChangingAction: ((_ value: Float)->())?   // 正在变化
     var sliderValueChangedAction: ((_ value: Float)->())?    // 变化结束
     
-    private var currentValue: Float = 0 {
-        didSet {
-            var limitValue = min(currentValue, slider.maximumValue)
-            limitValue = max(limitValue, slider.maximumValue)
-            valueLabel.text = String(format: "%.0f", slider.value)
-        }
-    }
+    private var currentValue: Float = 0
     
     private lazy var valueLabel: UILabel = {
         let label = UILabel()
@@ -59,9 +53,21 @@ class ShowSettingSliderCell: ShowSettingBaseCell {
         slider.minimumValue = minValue
         slider.maximumValue = maxValue
         slider.value = value
+        valueLabel.text = String(format: "%.0f", slider.value)
         currentValue = value
         self.sliderValueChangedAction = sliderValueChangedAction
         self.sliderValueChangingAction = sliderValueChangingAction
+    }
+    
+    func setEnabled(isEnabled: Bool) {
+        slider.isEnabled = isEnabled
+        if (isEnabled) {
+            slider.value = currentValue
+            valueLabel.text = String(format: "%.0f", currentValue)
+        } else {
+            slider.value = slider.minimumValue
+            valueLabel.text = "0"
+        }
     }
 }
 
@@ -69,11 +75,13 @@ extension ShowSettingSliderCell {
     
     @objc private func sliderValueDidChanged() {
         currentValue = slider.value
+        valueLabel.text = String(format: "%.0f", slider.value)
         self.sliderValueChangingAction?(slider.value)
     }
     
     @objc private func sliderDidTouchUp() {
         currentValue = slider.value
+        valueLabel.text = String(format: "%.0f", slider.value)
         self.sliderValueChangedAction?(slider.value)
     }
 }

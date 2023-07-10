@@ -122,6 +122,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             .PVC,
             .videoEncodeSize,
             .FPS,
+            .videoBitRateOn,
             .videoBitRate
         ]
         let insideSettings: [ShowSettingKey] = [
@@ -132,6 +133,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             .PVC,
             .videoEncodeSize,
             .FPS,
+            .videoBitRateOn,
             .videoBitRate
         ]
         let broadcasterVideoSettings: [ShowSettingKey] = isOutside ? outsideSettings : insideSettings

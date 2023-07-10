@@ -86,12 +86,15 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
             return cell
         }else if data.type == .slider {
             let cell = tableView.dequeueReusableCell(withIdentifier: SliderCellID, for: indexPath) as! ShowSettingSliderCell
-            cell.setTitle(data.title, value: data.floatValue, minValue: data.sliderValueScope.0, maxValue: data.sliderValueScope.1) {value in
-                
-            } sliderValueChangedAction: {[weak self] value in
-                self?.changeValue(value, forSettingKey: data)
+            
+            if data == .videoBitRate {
+                cell.setTitle(data.title, value: data.floatValue, minValue: data.sliderValueScope.0, maxValue: data.sliderValueScope.1) {value in
+                    
+                } sliderValueChangedAction: {[weak self] value in
+                    self?.changeValue(value, forSettingKey: data)
+                }
+                cell.setEnabled(isEnabled: !ShowSettingKey.videoBitRateOn.boolValue)
             }
-
             return cell
         }else if data.type == .label {
             let cell = tableView.dequeueReusableCell(withIdentifier: LabelCellID, for: indexPath) as! ShowSettingLabelCell

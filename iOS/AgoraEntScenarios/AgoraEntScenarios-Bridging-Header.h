@@ -16,7 +16,10 @@
 #import "BaseViewController.h"
 #import "AEACategoryView.h"
 #import "AEAListContainerView.h"
+@import YYModel;
+
 #import "BEFrameProcessor.h"
 #import "VideoProcessingManager.h"
-@import YYModel;
-#import "BundleUtil.h"
+#import "BeautyAPI.h"
+#import "BytesBeautyRender.h"
+#import "SenseBeautyRender.h"
