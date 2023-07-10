@@ -1472,6 +1472,14 @@ class LiveDetailFragment : Fragment() {
             "show"
         )
 
+        if (!isRoomOwner) {
+            // 观众加入频道前默认开启硬编码
+            mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
+        } else {
+            // 主播加入频道前默认开启软编码
+            mRtcEngine.setParameters("{\"che.hardware_decoding\": 0}")
+        }
+
         val channelMediaOptions = ChannelMediaOptions()
         channelMediaOptions.clientRoleType =
             if (isRoomOwner) Constants.CLIENT_ROLE_BROADCASTER else Constants.CLIENT_ROLE_AUDIENCE
