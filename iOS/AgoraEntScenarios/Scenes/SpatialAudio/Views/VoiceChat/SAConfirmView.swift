@@ -40,14 +40,14 @@ class SAConfirmView: UIView {
         layer.path = path.cgPath
         self.layer.mask = layer
 
-        titleLabel.frame = CGRect(x: bounds.size.width / 2.0 - 60~, y: 30~, width: 120~, height: 22~)
+        titleLabel.frame = CGRect(x: bounds.size.width / 2.0 - 60, y: 30, width: 120, height: 22)
         titleLabel.textAlignment = .center
         titleLabel.text = "Prompt".localized()
         titleLabel.textColor = UIColor(hex:"0x040925")
         titleLabel.font = UIFont.systemFont(ofSize: 16)
         addSubview(titleLabel)
 
-        contentLabel.frame = CGRect(x: bounds.size.width / 2.0 - 150~, y: 72~, width: 300~, height: 60~)
+        contentLabel.frame = CGRect(x: bounds.size.width / 2.0 - 150, y: 72, width: 300, height: 60)
         contentLabel.textAlignment = .center
         contentLabel.text = type == .addbot ? "Add Bot".localized() : "Exit Room".localized()
         contentLabel.numberOfLines = 0
@@ -56,16 +56,16 @@ class SAConfirmView: UIView {
         contentLabel.font = UIFont.systemFont(ofSize: 14)
         addSubview(contentLabel)
 
-        canBtn.frame = CGRect(x: 30~, y: 150~, width: 120~, height: 40~)
+        canBtn.frame = CGRect(x: 30, y: 150, width: 120, height: 40)
         canBtn.setTitle("Cancel".localized(), for: .normal)
         canBtn.setTitleColor(.black, for: .normal)
         canBtn.backgroundColor = UIColor(red: 239 / 255.0, green: 244 / 255.0, blue: 1, alpha: 1)
         canBtn.addTargetFor(self, action: #selector(can), for: .touchUpInside)
-        canBtn.layer.cornerRadius = 20~
+        canBtn.layer.cornerRadius = 20
         canBtn.layer.masksToBounds = true
         addSubview(canBtn)
 
-        subBtn.frame = CGRect(x: bounds.size.width - 150~, y: 150~, width: 120~, height: 40~)
+        subBtn.frame = CGRect(x: bounds.size.width - 150, y: 150, width: 120, height: 40)
         subBtn.setTitle("Submit".localized(), for: .normal)
         subBtn.addTargetFor(self, action: #selector(sub), for: .touchUpInside)
         subBtn.setTitleColor(.white, for: .normal)
@@ -77,7 +77,7 @@ class SAConfirmView: UIView {
         gl.endPoint = CGPoint(x: 0.66, y: 1)
         gl.colors = [UIColor(red: 33 / 255.0, green: 155 / 255.0, blue: 1, alpha: 1).cgColor, UIColor(red: 52 / 255.0, green: 93 / 255.0, blue: 1, alpha: 1).cgColor]
         gl.locations = [0, 1.0]
-        subBtn.layer.cornerRadius = 20~
+        subBtn.layer.cornerRadius = 20
         subBtn.layer.masksToBounds = true
         gl.frame = subBtn.bounds
         subBtn.layer.addSublayer(gl)

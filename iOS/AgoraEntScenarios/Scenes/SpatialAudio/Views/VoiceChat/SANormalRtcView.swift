@@ -29,7 +29,6 @@ class SANormalRtcView: UIView {
     override func draw(_ rect: CGRect) {
         // Drawing code
         if collectionView == nil {
-            SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
             layoutUI()
         }
     }
@@ -90,7 +89,7 @@ class SANormalRtcView: UIView {
 
     private func layoutUI() {
         let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.itemSize = CGSize(width: bounds.size.width / 4.0, height: 120~)
+        flowLayout.itemSize = CGSize(width: bounds.size.width / 4.0, height: 120)
         flowLayout.minimumLineSpacing = 0
         flowLayout.minimumInteritemSpacing = 0
         flowLayout.scrollDirection = .vertical
@@ -121,9 +120,9 @@ extension SANormalRtcView: UICollectionViewDelegate, UICollectionViewDataSource,
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if indexPath.item < 6 {
-            return CGSize(width: bounds.size.width / 4.0, height: 120~)
+            return CGSize(width: bounds.size.width / 4.0, height: 120)
         } else {
-            return CGSize(width: bounds.size.width / 2.0, height: 120~)
+            return CGSize(width: bounds.size.width / 2.0, height: 120)
         }
     }
 

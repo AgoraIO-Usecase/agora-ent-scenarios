@@ -119,7 +119,6 @@ class AgoraChatRoom3DMoveUserView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
     }
 
@@ -130,11 +129,11 @@ class AgoraChatRoom3DMoveUserView: UIView {
 
     fileprivate func layoutUI() {
         lineView.backgroundColor = .clear
-        lineView.layer.bounds = CGRect(x: 0, y: 0, width: 30~, height: 82~)
+        lineView.layer.bounds = CGRect(x: 0, y: 0, width: 30, height: 82)
         lineView.layer.anchorPoint = CGPoint(x: 0.5, y: 1)
         addSubview(lineView)
 
-        bgView.layer.cornerRadius = 40~
+        bgView.layer.cornerRadius = 40
         bgView.layer.masksToBounds = true
         bgView.backgroundColor = UIColor(red: 104 / 255.0, green: 128 / 255.0, blue: 1, alpha: 1)
         addSubview(bgView)
@@ -153,65 +152,65 @@ class AgoraChatRoom3DMoveUserView: UIView {
         }
 
         bgIconView.image = UIImage("icons／solid／add")
-        bgIconView.layer.cornerRadius = 15~
+        bgIconView.layer.cornerRadius = 15
         bgIconView.layer.masksToBounds = true
         addSubview(bgIconView)
 
         iconView.image = UIImage("avatar1")
-        iconView.layer.cornerRadius = 37~
+        iconView.layer.cornerRadius = 37
         iconView.layer.masksToBounds = true
         addSubview(iconView)
 
         addSubview(micView)
 
         nameBtn.setTitleColor(.white, for: .normal)
-        nameBtn.titleLabel?.font = UIFont.systemFont(ofSize: 11)~
+        nameBtn.titleLabel?.font = UIFont.systemFont(ofSize: 11)
         nameBtn.setTitle("", for: .normal)
         nameBtn.isUserInteractionEnabled = false
         addSubview(nameBtn)
 
         lineView.snp.makeConstraints { make in
             make.centerX.equalTo(self)
-            make.height.equalTo(82~)
-            make.width.equalTo(30~)
-            make.top.equalTo(self).offset(40~)
+            make.height.equalTo(82)
+            make.width.equalTo(30)
+            make.top.equalTo(self).offset(40)
         }
 
         svgaPlayer.snp.makeConstraints { make in
             make.left.right.equalTo(lineView)
-            make.height.equalTo(30~)
-            make.width.equalTo(30~)
+            make.height.equalTo(30)
+            make.width.equalTo(30)
             make.top.equalTo(8)
         }
 
         bgView.snp.makeConstraints { make in
             make.centerX.equalTo(self)
-            make.top.equalTo(self).offset(40~)
-            make.width.height.equalTo(82~)
+            make.top.equalTo(self).offset(40)
+            make.width.height.equalTo(82)
         }
 
         bgIconView.snp.makeConstraints { make in
             make.centerX.equalTo(self)
             make.centerY.equalTo(self.bgView)
-            make.width.height.equalTo(30~)
+            make.width.height.equalTo(30)
         }
 
         iconView.snp.makeConstraints { make in
             make.centerX.equalTo(self)
-            make.top.equalTo(self).offset(44~)
-            make.width.height.equalTo(74~)
+            make.top.equalTo(self).offset(44)
+            make.width.height.equalTo(74)
         }
 
         micView.snp.makeConstraints { make in
-            make.right.equalTo(self.iconView).offset(5~)
-            make.width.height.equalTo(18~)
-            make.bottom.equalTo(self.iconView.snp.bottom).offset(-5~)
+            make.right.equalTo(self.iconView).offset(5)
+            make.width.height.equalTo(18)
+            make.bottom.equalTo(self.iconView.snp.bottom).offset(-5)
         }
 
         nameBtn.snp.makeConstraints { make in
             make.centerX.equalTo(self)
-            make.top.equalTo(self.iconView.snp.bottom).offset(10~)
-            make.height.equalTo(20~)
+            make.top.equalTo(self.iconView.snp.bottom).offset(10)
+            make.height.equalTo(20)
         }
     }
 
