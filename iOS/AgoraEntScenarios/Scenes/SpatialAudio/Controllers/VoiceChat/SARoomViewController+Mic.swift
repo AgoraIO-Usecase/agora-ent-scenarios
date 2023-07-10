@@ -148,8 +148,8 @@ extension SARoomViewController {
 
 
     func showMuteView(with index: Int) {
-        let isHairScreen = SwiftyFitsize.isFullScreen
-        let muteView = SAMuteView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34))
+        let isHairScreen =  Screen.isFullScreen
+        let muteView = SAMuteView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264 : 264 - 34))
         guard let mic_info = roomInfo?.mic_info?[index] else { return }
         muteView.isOwner = isOwner
         muteView.micInfo = mic_info
@@ -163,7 +163,7 @@ extension SARoomViewController {
                 self?.unmuteLocal(with: index)
             }
         }
-        let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34)), custom: muteView)
+        let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: isHairScreen ? 264 : 264 - 34)), custom: muteView)
         sa_presentViewController(vc)
     }
 

@@ -337,7 +337,6 @@
 		DD619B8A29E3E262008F63E4 /* CrossZoomAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AF829E3E262008F63E4 /* CrossZoomAnimation.swift */; };
 		DD619B8B29E3E262008F63E4 /* CrossDissolveAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AF929E3E262008F63E4 /* CrossDissolveAnimation.swift */; };
 		DD619B8C29E3E262008F63E4 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AFA29E3E262008F63E4 /* Throttle.swift */; };
-		DD619B8D29E3E262008F63E4 /* SwiftyFitSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AFB29E3E262008F63E4 /* SwiftyFitSize.swift */; };
 		DD619B8E29E3E262008F63E4 /* VoiceRoomPasswordAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AFC29E3E262008F63E4 /* VoiceRoomPasswordAlert.swift */; };
 		DD619B8F29E3E262008F63E4 /* PresentedViewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AFE29E3E262008F63E4 /* PresentedViewType.swift */; };
 		DD619B9029E3E262008F63E4 /* PresentationEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AFF29E3E262008F63E4 /* PresentationEnums.swift */; };
@@ -1036,7 +1035,6 @@
 		DD619AF829E3E262008F63E4 /* CrossZoomAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrossZoomAnimation.swift; sourceTree = "<group>"; };
 		DD619AF929E3E262008F63E4 /* CrossDissolveAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrossDissolveAnimation.swift; sourceTree = "<group>"; };
 		DD619AFA29E3E262008F63E4 /* Throttle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Throttle.swift; sourceTree = "<group>"; };
-		DD619AFB29E3E262008F63E4 /* SwiftyFitSize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftyFitSize.swift; sourceTree = "<group>"; };
 		DD619AFC29E3E262008F63E4 /* VoiceRoomPasswordAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomPasswordAlert.swift; sourceTree = "<group>"; };
 		DD619AFD29E3E262008F63E4 /* Xcode14.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Xcode14.h; sourceTree = "<group>"; };
 		DD619AFE29E3E262008F63E4 /* PresentedViewType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentedViewType.swift; sourceTree = "<group>"; };
@@ -2454,7 +2452,6 @@
 				DD619AF429E3E262008F63E4 /* VoiceRoomEmojiManager.swift */,
 				DD619AF529E3E262008F63E4 /* Animation */,
 				DD619AFA29E3E262008F63E4 /* Throttle.swift */,
-				DD619AFB29E3E262008F63E4 /* SwiftyFitSize.swift */,
 				DD619AFC29E3E262008F63E4 /* VoiceRoomPasswordAlert.swift */,
 				DD619AFD29E3E262008F63E4 /* Xcode14.h */,
 				DD619AFE29E3E262008F63E4 /* PresentedViewType.swift */,
@@ -4076,6 +4073,7 @@
 				AB9DE31D2A582F85000673FF /* SenseBeautyRender.m in Sources */,
 				DD619B9329E3E262008F63E4 /* VRVerifyCodeTextView.swift in Sources */,
 				DD619B8D29E3E262008F63E4 /* SwiftyFitSize.swift in Sources */,
+				DD36108429B70CDC00CE7984 /* VideoProcessingManager.m in Sources */,
 				DD84178229090C520026B624 /* VLDiscoveryView.m in Sources */,
 				AB9DE3522A5BA71A000673FF /* BEEffectResourceHelper.m in Sources */,
 				DD619A6829E3E247008F63E4 /* SAVerifyCodeTextView.swift in Sources */,

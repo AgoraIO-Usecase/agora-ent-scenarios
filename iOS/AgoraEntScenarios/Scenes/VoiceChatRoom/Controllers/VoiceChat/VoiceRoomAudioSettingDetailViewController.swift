@@ -23,7 +23,7 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
     private var backBtn: UIButton = .init()
     public var roomInfo: VRRoomInfo?
     lazy var cover: UIView = {
-        UIView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 56~)).backgroundColor(.clear).setGradient([UIColor(red: 0.929, green: 0.906, blue: 1, alpha: 1), UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)])
+        UIView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 56)).backgroundColor(.clear).setGradient([UIColor(red: 0.929, green: 0.906, blue: 1, alpha: 1), UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)])
     }()
     let presentView: VoiceRoomPresentView = VoiceRoomPresentView.shared
     private let swIdentifier = "switch"
@@ -48,10 +48,10 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
     var soundEffect: Int = 1 {
         didSet {
 
-            let socialH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat."), fontSize: 13, width: self.view.bounds.size.width - 80~)
-            let ktvH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful."), fontSize: 13, width: self.view.bounds.size.width - 80~)
-            let gameH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. "), fontSize: 13, width: self.view.bounds.size.width - 80~)
-            let anchorH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. "), fontSize: 13, width: self.view.bounds.size.width - 80~)
+            let socialH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat."), fontSize: 13, width: self.view.bounds.size.width - 80)
+            let ktvH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful."), fontSize: 13, width: self.view.bounds.size.width - 80)
+            let gameH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. "), fontSize: 13, width: self.view.bounds.size.width - 80)
+            let anchorH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. "), fontSize: 13, width: self.view.bounds.size.width - 80)
             print("\(soundEffect)-----")
             switch soundEffect {
             case 1:
@@ -241,12 +241,12 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
         if settingType == .Noise && section == 2 {
             return textHeight(text: "AINS Sup".localized(), fontSize: 13, width: ScreenWidth - 40) + 15
         } else if settingType == .effect && section == 1 {
-            return 40~ + 12~ + otherSoundHeaderHeight + 10~
+            return 40 + 12 + otherSoundHeaderHeight + 10
         } else if settingType == .AIAEC || settingType == .AGC {
             return 0;
         }
         else {
-            return 40~
+            return 40
         }
     }
 
@@ -352,10 +352,10 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section == 0 {
-            let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 40~))
+            let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 40))
 
             headerView.backgroundColor = settingType == .effect ? .white : UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
-            let titleLabel: UILabel = .init(frame: CGRect(x: 20~, y: 5~, width: 300~, height: 30~))
+            let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 5, width: 300, height: 30))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             if settingType == .effect {
                 titleLabel.text = "Current Sound".localized()
@@ -375,10 +375,10 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
             headerView.addSubview(titleLabel)
             return headerView
         } else if section == 1 {
-            let headerHeight: CGFloat = (section == 1 && settingType == .effect) ? 40~ + 12 + otherSoundHeaderHeight + 10~ : 40~
+            let headerHeight: CGFloat = (section == 1 && settingType == .effect) ? 40 + 12 + otherSoundHeaderHeight + 10 : 40
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: headerHeight))
             headerView.backgroundColor = settingType == .effect ? .white : UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
-            let titleLabel: UILabel = .init(frame: CGRect(x: 20~, y: 5~, width: 300~, height: 30~))
+            let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 5, width: 300, height: 30))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             if settingType == .effect {
                 titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
@@ -386,7 +386,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
                 headerView.addSubview(titleLabel)
 
                 if section == 1 {
-                    let warningView = UIView(frame: CGRect(x: 20, y: 40~, width: screenWidth - 40~, height: 12 + otherSoundHeaderHeight))
+                    let warningView = UIView(frame: CGRect(x: 20, y: 40, width: screenWidth - 40, height: 12 + otherSoundHeaderHeight))
                     warningView.layer.cornerRadius = 5
                     warningView.layer.masksToBounds = true
                     warningView.backgroundColor = UIColor.HexColor(hex: 0xFFF7DC, alpha: 1)
@@ -415,7 +415,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
             let height = textHeight(text: "AINS Sup".localized(), fontSize: 13, width: ScreenWidth - 40)
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: height + 15))
             headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
-            let titleLabel: UILabel = .init(frame: CGRect(x: 20~, y: 5~, width: screenWidth - 40, height: height))
+            let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 5, width: screenWidth - 40, height: height))
             titleLabel.numberOfLines = 0
             titleLabel.lineBreakMode = .byCharWrapping
             titleLabel.font = UIFont.systemFont(ofSize: 13)

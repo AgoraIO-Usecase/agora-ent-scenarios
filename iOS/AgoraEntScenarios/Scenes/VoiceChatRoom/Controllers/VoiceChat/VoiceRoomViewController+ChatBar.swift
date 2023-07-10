@@ -304,8 +304,8 @@ extension VoiceRoomViewController {
     }
 
     func showApplyAlert(_ index: Int) {
-        let isHairScreen = SwiftyFitsize.isFullScreen
-        let manageView = VMManagerView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34))
+        let isHairScreen =  Screen.isFullScreen
+        let manageView = VMManagerView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264 : 264 - 34))
         let mic_info = ChatRoomServiceImp.getSharedInstance().mics[safe: index]
         manageView.micInfo = mic_info
         manageView.resBlock = { [weak self] state, flag in
@@ -330,7 +330,7 @@ extension VoiceRoomViewController {
                 }
             }
         }
-        let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34)), custom: manageView)
+        let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: isHairScreen ? 264 : 264 - 34)), custom: manageView)
         presentViewController(vc)
     }
 
@@ -403,8 +403,8 @@ extension VoiceRoomViewController {
     }
 
     func showExitRoomView() {
-        let confirmView = VMConfirmView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40~, height: 220~), type: .leave)
-        var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 40~, height: 220~))
+        let confirmView = VMConfirmView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40, height: 220), type: .leave)
+        var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 40, height: 220))
         compent.destination = .center
         let vc = VoiceRoomAlertViewController(compent: compent, custom: confirmView)
         confirmView.resBlock = { [weak self] flag in

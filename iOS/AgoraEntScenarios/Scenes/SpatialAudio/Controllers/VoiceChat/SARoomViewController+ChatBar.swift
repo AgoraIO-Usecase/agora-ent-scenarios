@@ -261,8 +261,8 @@ extension SARoomViewController {
     }
 
     func showApplyAlert(_ index: Int) {
-        let isHairScreen = SwiftyFitsize.isFullScreen
-        let manageView = SAVMManagerView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34))
+        let isHairScreen =  Screen.isFullScreen
+        let manageView = SAVMManagerView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264 : 264 - 34))
         //TODO: remove as!
         let mic_info = AppContext.saTmpServiceImp().mics[safe: index]
         manageView.micInfo = mic_info
@@ -288,7 +288,7 @@ extension SARoomViewController {
                 }
             }
         }
-        let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34)), custom: manageView)
+        let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: isHairScreen ? 264 : 264 - 34)), custom: manageView)
         sa_presentViewController(vc)
     }
 
@@ -363,8 +363,8 @@ extension SARoomViewController {
     }
 
     func showExitRoomView() {
-        let confirmView = SAConfirmView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40~, height: 220~), type: .leave)
-        var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 40~, height: 220~))
+        let confirmView = SAConfirmView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40, height: 220), type: .leave)
+        var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 40, height: 220))
         compent.destination = .center
         let vc = SAAlertViewController(compent: compent, custom: confirmView)
         confirmView.resBlock = { [weak self] flag in

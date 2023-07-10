@@ -210,8 +210,6 @@ extension SARoomViewController {
     }
 
     func layoutUI() {
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
-
         let bgImgView = UIImageView()
         bgImgView.image = UIImage("lbg")
         view.addSubview(bgImgView)
@@ -237,10 +235,10 @@ extension SARoomViewController {
             make.left.right.top.bottom.equalTo(view)
         }
 
-        let isHairScreen = SwiftyFitsize.isFullScreen
+        let isHairScreen =  Screen.isFullScreen
         headerView.snp.makeConstraints { make in
             make.left.top.right.equalTo(view)
-            make.height.equalTo(isHairScreen ? 140~ : 140~ - 25)
+            make.height.equalTo(isHairScreen ? 140 : 140 - 25)
         }
 
         sRtcView.snp.makeConstraints { make in
@@ -357,7 +355,7 @@ extension SARoomViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if isShowPreSentView {
             UIView.animate(withDuration: 0.5, animations: {
-                self.preView.frame = CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 450~)
+                self.preView.frame = CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 450)
             }) { _ in
                 if self.preView == nil {return}
                 self.preView.removeFromSuperview()
@@ -401,11 +399,11 @@ extension SARoomViewController {
         }
         let confirmView = SAConfirmView(frame: CGRect(x: 0,
                                                       y: 0,
-                                                      width: ScreenWidth - 40~,
-                                                      height: 220~),
+                                                      width: ScreenWidth - 40,
+                                                      height: 220),
                                         type: .addbot)
-        var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 40~,
-                                                                   height: 220~))
+        var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 40,
+                                                                   height: 220))
         compent.destination = .center
         let vc = SAAlertViewController(compent: compent, custom: confirmView)
         confirmView.resBlock = { [weak self] flag in
@@ -549,7 +547,7 @@ extension SARoomViewController {
         default:
             detailStr = "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ".localized()
         }
-        return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40~)
+        return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40)
     }
 }
 

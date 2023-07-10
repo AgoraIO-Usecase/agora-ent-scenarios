@@ -17,9 +17,9 @@ import ZSwiftBaseLib
         (self.userName ?? "") + (self.content ?? "")
     }
 
-    lazy var height: CGFloat? = UILabel(frame: CGRect(x: 0, y: 0, width: chatViewWidth - 54, height: 15~)).backgroundColor(.clear).numberOfLines(0).lineBreakMode(.byWordWrapping).attributedText(self.attributeContent).sizeThatFits(CGSize(width: chatViewWidth - 54, height: 9999)).height + 26
+    lazy var height: CGFloat? = UILabel(frame: CGRect(x: 0, y: 0, width: chatViewWidth - 54, height: 15)).backgroundColor(.clear).numberOfLines(0).lineBreakMode(.byWordWrapping).attributedText(self.attributeContent).sizeThatFits(CGSize(width: chatViewWidth - 54, height: 9999)).height + 26
 
-    lazy var width: CGFloat? = UILabel(frame: CGRect(x: 0, y: 0, width: chatViewWidth - 54, height: 15~)).backgroundColor(.clear).numberOfLines(0).lineBreakMode(.byWordWrapping).attributedText(self.attributeContent).sizeThatFits(CGSize(width: chatViewWidth - 54, height: 9999)).width
+    lazy var width: CGFloat? = UILabel(frame: CGRect(x: 0, y: 0, width: chatViewWidth - 54, height: 15)).backgroundColor(.clear).numberOfLines(0).lineBreakMode(.byWordWrapping).attributedText(self.attributeContent).sizeThatFits(CGSize(width: chatViewWidth - 54, height: 9999)).width
 
     lazy var attributeContent: NSAttributedString? = self.renderAttributeText()
 }
