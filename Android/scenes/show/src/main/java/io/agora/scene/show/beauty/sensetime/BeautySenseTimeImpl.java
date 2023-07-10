@@ -1,5 +1,6 @@
 package io.agora.scene.show.beauty.sensetime;
 
+import static io.agora.beauty.sensetime.SenseTimeBeautyAPIKt.createSenseTimeBeautyAPI;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_CLARITY;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_CONTRAST;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_SATURATION;
@@ -38,11 +39,15 @@ import com.sensetime.effects.utils.FileUtils;
 import com.sensetime.stmobile.params.STEffectBeautyType;
 
 import java.io.File;
-import java.nio.ByteBuffer;
 
-import io.agora.base.TextureBufferHelper;
-import io.agora.base.internal.video.EglBase;
-import io.agora.scene.show.ShowLogger;
+import io.agora.base.VideoFrame;
+import io.agora.beauty.sensetime.CaptureMode;
+import io.agora.beauty.sensetime.Config;
+import io.agora.beauty.sensetime.ErrorCode;
+import io.agora.beauty.sensetime.IEventCallback;
+import io.agora.beauty.sensetime.SenseTimeBeautyAPI;
+import io.agora.rtc2.RtcEngine;
+import io.agora.rtc2.video.IVideoFrameObserver;
 import io.agora.scene.show.beauty.BeautyCache;
 import io.agora.scene.show.beauty.IBeautyProcessor;
 
@@ -53,13 +58,37 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
     private volatile boolean sdkIsInit = false;
     private volatile boolean isReleased = false;
 
+    private volatile boolean shouldMirror = false;
+
+    @Override
+    public void initialize(@NonNull RtcEngine rtcEngine, @NonNull CaptureMode captureMode, boolean statsEnable, @NonNull IEventCallback eventCallback) {
+        getSenseTimeBeautyAPI().initialize(new Config(rtcEngine, mSTRenderer, eventCallback, captureMode, 1000, statsEnable));
+    }
+
+    private SenseTimeBeautyAPI innerSenseTimeApi;
+
+    @NonNull
+    @Override
+    public SenseTimeBeautyAPI getSenseTimeBeautyAPI() {
+        if (innerSenseTimeApi == null) {
+            innerSenseTimeApi = createSenseTimeBeautyAPI();
+        }
+        return innerSenseTimeApi;
+    }
+
     public BeautySenseTimeImpl(Context context) {
         mContext = context.getApplicationContext();
+        initST();
     }
 
     @Override
     public void release() {
         super.release();
+        unInitST();
+        if (innerSenseTimeApi != null) {
+            innerSenseTimeApi.release();
+            innerSenseTimeApi = null;
+        }
         isReleased = true;
         sdkIsInit = false;
     }
@@ -68,7 +97,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         if (sdkIsInit) {
             return;
         }
-        //mSTRenderer = new STRenderKit(mContext, null);
+        mSTRenderer = new STRenderKit(mContext, null);
         sdkIsInit = true;
         restore();
     }
@@ -203,10 +232,59 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         }
     }
 
+    @Override
+    public boolean onCaptureVideoFrame(int type, VideoFrame videoFrame) {
+        if (videoFrame == null) return false;
+        shouldMirror = false;
+        int ret = getSenseTimeBeautyAPI().onFrame(videoFrame);
+        if (ret == ErrorCode.ERROR_OK.getValue()) {
+            return true;
+        } else if (ret == ErrorCode.ERROR_FRAME_SKIPPED.getValue()) {
+            return false;
+        } else {
+            shouldMirror = videoFrame.getSourceType() == VideoFrame.SourceType.kFrontCamera;
+            return true;
+        }
+    }
 
     @Override
-    public void setSTRenderKit(@NonNull STRenderKit kit) {
-        this.mSTRenderer = kit;
-        sdkIsInit = true;
+    public boolean onPreEncodeVideoFrame(int type, VideoFrame videoFrame) {
+        return false;
+    }
+
+    @Override
+    public boolean onMediaPlayerVideoFrame(VideoFrame videoFrame, int mediaPlayerId) {
+        return false;
+    }
+
+    @Override
+    public boolean onRenderVideoFrame(String channelId, int uid, VideoFrame videoFrame) {
+        return false;
+    }
+
+    @Override
+    public int getVideoFrameProcessMode() {
+        return IVideoFrameObserver.PROCESS_MODE_READ_WRITE;
+    }
+
+    @Override
+    public int getVideoFormatPreference() {
+        return IVideoFrameObserver.VIDEO_PIXEL_DEFAULT;
+    }
+
+    @Override
+    public boolean getRotationApplied() {
+        return false;
+    }
+
+
+    @Override
+    public boolean getMirrorApplied() {
+        return shouldMirror;
+    }
+
+    @Override
+    public int getObservedFramePosition() {
+        return IVideoFrameObserver.POSITION_POST_CAPTURER;
     }
 }

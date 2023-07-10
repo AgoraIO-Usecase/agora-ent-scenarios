@@ -15,11 +15,9 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.sensetime.effects.STRenderKit
 import io.agora.beauty.sensetime.*
 import io.agora.rtc2.Constants
 import io.agora.rtc2.video.CameraCapturerConfiguration
-import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.TimeUtils
@@ -43,8 +41,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     private val mThumbnailId by lazy { getRandomThumbnailId() }
     private val mRoomId by lazy { getRandomRoomId() }
     private val mBeautyProcessor by lazy { RtcEngineInstance.beautyProcessor }
-    private val mSenseTimeBeautyAPI by lazy { RtcEngineInstance.mSenseTimeApi }
-    private val mSTRenderKit by lazy { STRenderKit(this, null) }
+
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
 
     private var isFinishToLiveDetail = false
@@ -104,21 +101,20 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             showPresetDialog()
         }
         requestCameraPermission(true)
-        mBeautyProcessor.setSTRenderKit(mSTRenderKit)
-        mSenseTimeBeautyAPI.initialize(
-            Config(
-                mRtcEngine,
-                mSTRenderKit,
-                captureMode = CaptureMode.Custom,
-                statsEnable = true,
-                eventCallback = object: IEventCallback {
-                    override fun onBeautyStats(stats: BeautyStats) {
-                        ShowLogger.d("hugo", "BeautyStats stats = $stats")
-                    }
+        mBeautyProcessor.initialize(
+            rtcEngine = mRtcEngine,
+            captureMode = CaptureMode.Custom,
+            statsEnable = true,
+            eventCallback = object : IEventCallback {
+                override fun onBeautyStats(stats: BeautyStats) {
+                    ShowLogger.d("hugo", "BeautyStats stats = $stats")
                 }
-            )
+            }
         )
-        mSenseTimeBeautyAPI.setBeautyPreset(BeautyPreset.CUSTOM)
+        mBeautyProcessor.getSenseTimeBeautyAPI().enable(true)
+        mBeautyProcessor.getSenseTimeBeautyAPI().setupLocalVideo(SurfaceView(this).apply {
+            binding.flVideoContainer.addView(this)
+        }, Constants.RENDER_MODE_HIDDEN)
     }
 
     private var toggleVideoRun: Runnable? = null
@@ -152,17 +148,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
     private fun initRtcEngine() {
-        val videoCanvas = VideoCanvas(SurfaceView(this).apply {
-            binding.flVideoContainer.addView(this)
-        })
-        videoCanvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
-//        mRtcEngine.setupLocalVideo(
-//            videoCanvas
-//        )
-        mSenseTimeBeautyAPI.enable(true)
-        mSenseTimeBeautyAPI.setupLocalVideo(SurfaceView(this).apply {
-            binding.flVideoContainer.addView(this)
-        }, Constants.RENDER_MODE_HIDDEN)
         val cacheQualityResolution = PictureQualityDialog.getCacheQualityResolution()
         mRtcEngine.setCameraCapturerConfiguration(
             CameraCapturerConfiguration(
@@ -230,9 +215,11 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
 
-    private fun getRandomRoomId() = (Random(TimeUtils.currentTimeMillis()).nextInt(10000) + 100000).toString()
+    private fun getRandomRoomId() =
+        (Random(TimeUtils.currentTimeMillis()).nextInt(10000) + 100000).toString()
 
-    private fun getRandomThumbnailId() = Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
+    private fun getRandomThumbnailId() =
+        Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
 
     @DrawableRes
     private fun getThumbnailIcon(thumbnailId: String) = when (thumbnailId) {
