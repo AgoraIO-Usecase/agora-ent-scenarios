@@ -14,7 +14,7 @@ abstract class IBeautyProcessor : IVideoFrameObserver {
     private val workerExecutor = Executors.newSingleThreadExecutor()
 
     @Volatile
-    private var isEnable = true
+    private var isBeautyEnable = true
 
     abstract fun initialize(
         rtcEngine: RtcEngine,
@@ -49,11 +49,11 @@ abstract class IBeautyProcessor : IVideoFrameObserver {
         BeautyCache.restoreByOperation(this)
     }
 
-    fun setEnable(enable: Boolean) {
-        isEnable = enable
+    open fun setBeautyEnable(enable: Boolean) {
+        isBeautyEnable = enable
     }
 
-    fun isEnable() = isEnable
+    fun isBeautyEnable() = isBeautyEnable
 
     // 设置绿幕强度（0 ～ 1）
     fun setBg(intensity: Float) {

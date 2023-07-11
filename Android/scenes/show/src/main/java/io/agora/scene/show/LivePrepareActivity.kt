@@ -95,12 +95,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 showPresetDialog()
             }
         }
-        toggleVideoRun = Runnable {
-            mBeautyProcessor.reset()
-            initRtcEngine()
-            showPresetDialog()
-        }
-        requestCameraPermission(true)
         mBeautyProcessor.initialize(
             rtcEngine = mRtcEngine,
             captureMode = CaptureMode.Custom,
@@ -111,10 +105,17 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 }
             }
         )
-        mBeautyProcessor.getSenseTimeBeautyAPI().enable(true)
+        mBeautyProcessor.setBeautyEnable(true)
         mBeautyProcessor.getSenseTimeBeautyAPI().setupLocalVideo(SurfaceView(this).apply {
             binding.flVideoContainer.addView(this)
         }, Constants.RENDER_MODE_HIDDEN)
+
+        toggleVideoRun = Runnable {
+            mBeautyProcessor.reset()
+            initRtcEngine()
+            showPresetDialog()
+        }
+        requestCameraPermission(true)
     }
 
     private var toggleVideoRun: Runnable? = null
@@ -158,7 +159,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 )
             )
         )
-        mRtcEngine.startPreview()
+//        mRtcEngine.startPreview()
     }
 
     private fun showPictureQualityDialog() {

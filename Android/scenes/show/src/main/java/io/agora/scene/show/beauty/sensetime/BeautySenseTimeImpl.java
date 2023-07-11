@@ -82,6 +82,12 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
     }
 
     @Override
+    public void setBeautyEnable(boolean beautyEnable) {
+        super.setBeautyEnable(beautyEnable);
+        getSenseTimeBeautyAPI().enable(beautyEnable);
+    }
+
+    @Override
     public void release() {
         super.release();
         unInitST();
@@ -235,10 +241,6 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
     @Override
     public boolean onCaptureVideoFrame(int type, VideoFrame videoFrame) {
         if (videoFrame == null) return false;
-        if (!isEnable()|| isReleased){
-            shouldMirror = videoFrame.getSourceType() ==VideoFrame.SourceType.kFrontCamera;
-            return true;
-        }
         shouldMirror = false;
 
         int ret = getSenseTimeBeautyAPI().onFrame(videoFrame);
