@@ -168,7 +168,8 @@
     <string name="show_setting_advance_resolution">分辨率</string>
     <string name="show_setting_advance_encode_resolution">编码分辨率</string>
     <string name="show_setting_advance_encode_resolution_tip">修改编码分辨率后，请在观众端查看画质变化效果</string>
-    <string name="show_setting_advance_bitrate">码率</string>
+    <string name="show_setting_advance_bitrate">码率自适应</string>
+    <string name="show_setting_advance_bitrate_tips">自适应开关打开后，算法将结合当前的分辨率和帧率自动为您匹配合适码率</string>
     <string name="show_setting_advance_ear_back">耳返</string>
     <string name="show_setting_advance_ear_back_tip">耳返</string>
     <string name="show_setting_advance_vocal_volume">人声音量</string>
