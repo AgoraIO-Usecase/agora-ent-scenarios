@@ -8,7 +8,16 @@ import io.agora.scene.base.utils.SPUtil
 
 object VideoSetting {
 
-    enum class SuperResolution(val value: Int) {
+    enum class BitRate constructor(val value: Int) {
+        BR_Low_1V1(1461),
+        BR_Medium_1V1(1461),
+        BR_High_1V1(2099),
+        BR_Low_PK(700),
+        BR_Medium_PK(800),
+        BR_High_PK(800)
+    }
+
+    enum class SuperResolution constructor(val value: Int) {
         //1倍：     n=6
         //1.33倍:  n=7
         //1.5倍：  n=8
@@ -24,7 +33,7 @@ object VideoSetting {
         SR_SUPER(20)
     }
 
-    enum class Resolution(val width: Int, val height: Int) {
+    enum class Resolution constructor(val width: Int, val height: Int) {
         V_1080P(1920, 1080),
         V_720P(1280, 720),
         V_540P(960, 540),
@@ -43,7 +52,7 @@ object VideoSetting {
         Resolution.V_720P
     )
 
-    enum class FrameRate(val fps: Int) {
+    enum class FrameRate constructor(val fps: Int) {
         FPS_1(1),
         FPS_7(7),
         FPS_10(10),
@@ -63,7 +72,7 @@ object VideoSetting {
         FrameRate.FPS_24
     )
 
-    enum class DeviceLevel(val value: Int) {
+    enum class DeviceLevel constructor(val value: Int) {
         Low(0),
         Medium(1),
         High(2)
@@ -94,7 +103,7 @@ object VideoSetting {
 
     }
 
-    enum class LiveMode(val value: Int) {
+    enum class LiveMode constructor(val value: Int) {
         OneVOne(0),
         PK(1)
     }
@@ -102,10 +111,8 @@ object VideoSetting {
     /**
      * 观众设置
      */
-    data class AudienceSetting(
-        val video: Video
-    ) {
-        data class Video(
+    data class AudienceSetting constructor(val video: Video) {
+        data class Video constructor(
             val SR: SuperResolution // 超分
         )
     }
@@ -113,11 +120,11 @@ object VideoSetting {
     /**
      * 主播设置
      */
-    data class BroadcastSetting(
+    data class BroadcastSetting constructor(
         val video: Video,
         val audio: Audio
     ) {
-        data class Video(
+        data class Video constructor(
             val H265: Boolean, // 画质增强
             val colorEnhance: Boolean, // 色彩增强
             val lowLightEnhance: Boolean, // 暗光增强
@@ -126,10 +133,11 @@ object VideoSetting {
             val captureResolution: Resolution, // 采集分辨率
             val encodeResolution: Resolution, // 编码分辨率
             val frameRate: FrameRate, // 帧率
-            val bitRate: Int // 码率
+            val bitRate: Int, // 码率
+            val bitRateStandard: Boolean // 码率自适应
         )
 
-        data class Audio(
+        data class Audio constructor(
             val inEarMonitoring: Boolean, // 耳返
             val recordingSignalVolume: Int, // 人声音量
             val audioMixingVolume: Int, // 音乐音量
@@ -151,7 +159,8 @@ object VideoSetting {
                 captureResolution = Resolution.V_1080P,
                 encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 1461
+                bitRate = BitRate.BR_Low_1V1.value,
+                bitRateStandard = true
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -166,7 +175,8 @@ object VideoSetting {
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_720P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 1461
+                bitRate = BitRate.BR_Medium_1V1.value,
+                bitRateStandard = true
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -181,7 +191,8 @@ object VideoSetting {
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_720P,
                 frameRate = FrameRate.FPS_24,
-                bitRate = 2099
+                bitRate = BitRate.BR_High_1V1.value,
+                bitRateStandard = true
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -196,7 +207,8 @@ object VideoSetting {
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_360P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 700
+                bitRate = BitRate.BR_Low_PK.value,
+                bitRateStandard = true
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -211,7 +223,8 @@ object VideoSetting {
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 800
+                bitRate = BitRate.BR_Medium_PK.value,
+                bitRateStandard = true
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -226,7 +239,8 @@ object VideoSetting {
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 800
+                bitRate = BitRate.BR_High_PK.value,
+                bitRateStandard = true
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -238,10 +252,7 @@ object VideoSetting {
 
     // 当前观众设备等级（高、中、低）
     private var currAudienceDeviceLevel: DeviceLevel = DeviceLevel.valueOf(
-        SPUtil.getString(
-            Constant.CURR_AUDIENCE_DEVICE_LEVEL,
-            DeviceLevel.Low.toString()
-        )
+        SPUtil.getString(Constant.CURR_AUDIENCE_DEVICE_LEVEL, DeviceLevel.Low.toString())
     )
 
     // 观众看播设置
@@ -331,23 +342,15 @@ object VideoSetting {
         )
     }
 
-    fun updateAudienceSetting(
-        isJoinedRoom: Boolean = true,
-    ) {
-        updateRTCAudioSetting(
-            isJoinedRoom
-        )
+    fun updateAudienceSetting() {
+        updateRTCAudioSetting()
     }
 
-    fun updateAudioSetting(isJoinedRoom: Boolean = false, SR: SuperResolution? = null) {
+    fun updateAudioSetting(SR: SuperResolution? = null) {
         setCurrAudienceSetting(
-            AudienceSetting(
-                AudienceSetting.Video(
-                    SR ?: currAudienceSetting.video.SR
-                )
-            )
+            AudienceSetting(AudienceSetting.Video(SR ?: currAudienceSetting.video.SR))
         )
-        updateRTCAudioSetting(isJoinedRoom, SR)
+        updateRTCAudioSetting(SR)
     }
 
     fun updateBroadcastSetting(
@@ -373,6 +376,7 @@ object VideoSetting {
                     DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevice1v1
                     DeviceLevel.High -> RecommendBroadcastSetting.HighDevice1v1
                 }
+
                 LiveMode.PK -> when (deviceLevel) {
                     DeviceLevel.Low -> RecommendBroadcastSetting.LowDevicePK
                     DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevicePK
@@ -402,6 +406,7 @@ object VideoSetting {
                     DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevice1v1
                     DeviceLevel.High -> RecommendBroadcastSetting.HighDevice1v1
                 }
+
                 LiveMode.PK -> when (deviceLevel) {
                     DeviceLevel.Low -> RecommendBroadcastSetting.LowDevicePK
                     DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevicePK
@@ -451,11 +456,13 @@ object VideoSetting {
         encoderResolution: Resolution? = null,
         frameRate: FrameRate? = null,
         bitRate: Int? = null,
+        bitRateStandard: Boolean? = null,
 
         inEarMonitoring: Boolean? = null,
         recordingSignalVolume: Int? = null,
         audioMixingVolume: Int? = null
     ) {
+
         setCurrBroadcastSetting(
             BroadcastSetting(
                 BroadcastSetting.Video(
@@ -467,7 +474,8 @@ object VideoSetting {
                     captureResolution ?: currBroadcastSetting.video.captureResolution,
                     encoderResolution ?: currBroadcastSetting.video.encodeResolution,
                     frameRate ?: currBroadcastSetting.video.frameRate,
-                    bitRate ?: currBroadcastSetting.video.bitRate
+                     bitRate ?: currBroadcastSetting.video.bitRate,
+                    bitRateStandard ?: currBroadcastSetting.video.bitRateStandard
                 ),
                 BroadcastSetting.Audio(
                     inEarMonitoring ?: currBroadcastSetting.audio.inEarMonitoring,
@@ -477,6 +485,16 @@ object VideoSetting {
             )
         )
 
+
+        var newBitRate = bitRate
+        bitRateStandard?.let {
+            newBitRate = if (it){  // 自适应打开设置码率为 0，sdk 算法处理
+                0
+            }else{
+                // 自适应关闭时候码率为推荐码率
+                getRecommendBroadcastSetting().video.bitRate
+            }
+        }
         updateRTCBroadcastSetting(
             rtcConnection,
             isJoinedRoom,
@@ -488,7 +506,8 @@ object VideoSetting {
             captureResolution,
             encoderResolution,
             frameRate,
-            bitRate,
+            newBitRate,
+
             inEarMonitoring,
             recordingSignalVolume,
             audioMixingVolume
@@ -505,10 +524,25 @@ object VideoSetting {
                 || currBroadcastSetting == RecommendBroadcastSetting.HighDevicePK
     }
 
+    // 推荐配置
+    fun getRecommendBroadcastSetting(): BroadcastSetting {
+        return if (isPkMode) {
+            when (currAudienceDeviceLevel) {
+                DeviceLevel.Low -> RecommendBroadcastSetting.LowDevicePK
+                DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevicePK
+                else -> RecommendBroadcastSetting.HighDevicePK
+            }
+        } else {
+            when (currAudienceDeviceLevel) {
+                DeviceLevel.Low -> RecommendBroadcastSetting.LowDevice1v1
+                DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevice1v1
+                else -> RecommendBroadcastSetting.HighDevice1v1
+            }
+        }
+    }
 
-    private fun updateRTCAudioSetting(
-        isJoinedRoom: Boolean, SR: SuperResolution? = null
-    ) {
+
+    private fun updateRTCAudioSetting(SR: SuperResolution? = null) {
         val rtcEngine = RtcEngineInstance.rtcEngine
         SR?.let {
             val enableSR = currAudienceEnhanceSwitch && SR != SuperResolution.SR_NONE
@@ -584,7 +618,7 @@ object VideoSetting {
             // rtcEngine.setParameters("{\"rtc.video.enable_pvc\":${it}}")
         }
         captureResolution?.let {
-            var fps: Int = frameRate?.fps ?: let { 15 }
+            val fps: Int = frameRate?.fps ?: let { 15 }
             rtcEngine.setCameraCapturerConfiguration(CameraCapturerConfiguration(
                 CameraCapturerConfiguration.CaptureFormat(it.width, it.height, fps)
             ).apply {
@@ -611,7 +645,9 @@ object VideoSetting {
         bitRate?.let {
             videoEncoderConfiguration.bitrate = it
             if (rtcConnection != null) {
-                rtcEngine.setVideoEncoderConfigurationEx(videoEncoderConfiguration, rtcConnection)
+                rtcEngine.setVideoEncoderConfigurationEx(
+                    videoEncoderConfiguration, rtcConnection
+                )
             } else {
                 rtcEngine.setVideoEncoderConfiguration(videoEncoderConfiguration)
             }
