@@ -3,7 +3,7 @@ apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
 android {
     defaultConfig {
-        if(isModular()){
+        if (isModular()) {
             applicationId "io.agora.scenes.show"
         }
     }
@@ -13,7 +13,12 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 //    implementation project(path: ":scenes:show:aars:SenseArSourceManager")
 //    implementation project(path: ":scenes:show:aars:STMobileJNI")
-    implementation "com.github.AgoraIO-Community.BeautyAPI:SenseTime:1.0.0.1"
+//    implementation "com.github.AgoraIO-Community.BeautyAPI:SenseTime:1.0.0.1"
+    implementation project(":lib_sensetime")
+    implementation project(":lib_sensetime_SenseArSourceManager")
+    implementation project(":lib_sensetime_STMobileJNI")
+    implementation project(":lib_sensetime_HardwareBuffer")
+
     implementation project(":common:base")
     implementation project(':common:ui-widget')
 
