@@ -85,10 +85,10 @@ final class AuditionEffectView: UIView {
             self.beforeAnimation.image = self.beforePlaceHolderImage
             self.afterAnimation.image = self.afterPlaceHolderImage
             if self.afterPlay.isSelected {
-                self.afterPlay.setImage(UIImage("play2"), for: .normal)
+                self.afterPlay.setImage(UIImage.sceneImage(name: "play2", bundleName: "VoiceChatRoomResource"), for: .normal)
             }
             if self.beforePlay.isSelected {
-                self.beforePlay.setImage(UIImage("play2"), for: .normal)
+                self.beforePlay.setImage(UIImage.sceneImage(name: "play2", bundleName: "VoiceChatRoomResource"), for: .normal)
             }
         }
     }
@@ -98,17 +98,17 @@ final class AuditionEffectView: UIView {
         switch type {
         case .AIAEC:
             text = "AIAEC Audition".localized()
-            self.beforePlaceHolderImage = UIImage("AIAECbefore")!
-            self.afterPlaceHolderImage = UIImage("AIAECafter")!
+            self.beforePlaceHolderImage = UIImage.sceneImage(name: "AIAECbefore", bundleName: "VoiceChatRoomResource")!
+            self.afterPlaceHolderImage = UIImage.sceneImage(name: "AIAECafter", bundleName: "VoiceChatRoomResource")!
         case .AGC:
             text = "AGC Audition".localized()
-            self.beforePlaceHolderImage = UIImage("AGCbefore")!
-            self.afterPlaceHolderImage = UIImage("AGCafter")!
+            self.beforePlaceHolderImage = UIImage.sceneImage(name: "AGCbefore", bundleName: "VoiceChatRoomResource")!
+            self.afterPlaceHolderImage = UIImage.sceneImage(name: "AGCafter", bundleName: "VoiceChatRoomResource")!
         default:
             text = ""
         }
-        self.afterPlay.setImage(UIImage("play2"), for: .normal)
-        self.beforePlay.setImage(UIImage("play2"), for: .normal)
+        self.afterPlay.setImage(UIImage.sceneImage(name: "play2", bundleName: "VoiceChatRoomResource"), for: .normal)
+        self.beforePlay.setImage(UIImage.sceneImage(name: "play2", bundleName: "VoiceChatRoomResource"), for: .normal)
         self.beforeAnimation.image = self.beforePlaceHolderImage
         self.afterAnimation.image = self.afterPlaceHolderImage
         self.title.text = text
@@ -145,11 +145,11 @@ final class AuditionEffectView: UIView {
         guard let path = Bundle.voiceRoomBundle.path(forResource: resourceName, ofType: "png") else { return }
         guard let wavPath = Bundle.voiceRoomBundle.path(forResource: wavName, ofType: type) else { return }
         VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
-        self.afterPlay.setImage(UIImage("play2"), for: .normal)
-        self.beforePlay.setImage(UIImage("play2"), for: .normal)
+        self.afterPlay.setImage(UIImage.sceneImage(name: "play2"), for: .normal)
+        self.beforePlay.setImage(UIImage.sceneImage(name: "play2"), for: .normal)
         if self.beforePlay.isSelected {
-            self.afterPlay.setImage(UIImage("play2"), for: .normal)
-            self.beforePlay.setImage(UIImage("zanting"), for: .normal)
+            self.afterPlay.setImage(UIImage.sceneImage(name: "play2"), for: .normal)
+            self.beforePlay.setImage(UIImage.sceneImage(name: "zanting"), for: .normal)
             self.afterAnimation.image = self.afterPlaceHolderImage
             self.beforeAnimation.sd_setImage(with: URL(fileURLWithPath: path), placeholderImage: self.beforePlaceHolderImage)
             VoiceRoomRTCManager.getSharedInstance().rtcKit.startAudioMixing(wavPath, loopback: false, cycle: 1)
@@ -157,8 +157,8 @@ final class AuditionEffectView: UIView {
             self.beforeAnimation.image = self.beforePlaceHolderImage
         }
         if self.afterPlay.isSelected {
-            self.beforePlay.setImage(UIImage("play2"), for: .normal)
-            self.afterPlay.setImage(UIImage("zanting"), for: .normal)
+            self.beforePlay.setImage(UIImage.sceneImage(name: "play2"), for: .normal)
+            self.afterPlay.setImage(UIImage.sceneImage(name: "zanting"), for: .normal)
             self.beforeAnimation.image = self.afterPlaceHolderImage
             self.afterAnimation.sd_setImage(with: URL(fileURLWithPath: path), placeholderImage: self.afterPlaceHolderImage)
             VoiceRoomRTCManager.getSharedInstance().rtcKit.startAudioMixing(wavPath, loopback: false, cycle: 1)

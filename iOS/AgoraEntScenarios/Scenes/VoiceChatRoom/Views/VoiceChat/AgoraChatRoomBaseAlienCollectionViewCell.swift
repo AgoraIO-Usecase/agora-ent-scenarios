@@ -98,7 +98,7 @@ class AgoraChatRoomBaseAlienCollectionViewCell: UICollectionViewCell {
         }
         contentView.addSubview(redAlienView)
 
-        linkView.image = UIImage("icons／solid／link")
+        linkView.image = UIImage.sceneImage(name: "icons／solid／link", bundleName: "VoiceChatRoomResource")
         contentView.addSubview(linkView)
 
         blueAlienView.micView.isHidden = true

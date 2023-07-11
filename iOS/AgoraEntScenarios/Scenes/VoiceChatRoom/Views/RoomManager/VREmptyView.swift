@@ -9,7 +9,7 @@ import UIKit
 import ZSwiftBaseLib
 
 public class VREmptyView: UIView {
-    var emptyImage = UIImage("empty")
+    var emptyImage = UIImage.sceneImage(name: "empty", bundleName: "VoiceChatRoomResource")
 
     lazy var image: UIImageView = .init(frame: CGRect(x: 90, y: 60, width: self.frame.width - 180, height: (231 / 397.0) * (self.frame.width - 180))).contentMode(.scaleAspectFit).image(self.emptyImage!)
 

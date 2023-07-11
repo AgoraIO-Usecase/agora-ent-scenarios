@@ -7,7 +7,7 @@
 #import "VLSelectedSongList.h"
 #import "VLSongList.h"
 #import "VLHotSpotBtn.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @interface VLPopSongList ()<VLSelectedSongListDelegate,VLSongListDelegate>
 

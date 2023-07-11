@@ -76,7 +76,7 @@ class VMAudioSettingView: UIView {
         addSubview(cover)
 
         lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20, y: 8, width: 40, height: 4)
-        lineImgView.image = UIImage("pop_indicator")
+        lineImgView.image = UIImage.sceneImage(name: "pop_indicator", bundleName: "VoiceChatRoomResource")
         addSubview(lineImgView)
 
         titleLabel.frame = CGRect(x: ScreenWidth / 2.0 - 60, y: 30, width: 120, height: 30)
@@ -155,7 +155,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             headerView.addSubview(titleLabel)
 
             let imgView: UIImageView = .init(frame: CGRect(x: width + 30, y: 6, width: 30, height: 20))
-            imgView.image = UIImage("new")
+            imgView.image = UIImage.sceneImage(name: "new", bundleName: "VoiceChatRoomResource")
             headerView.addSubview(imgView)
 
             return headerView
@@ -170,7 +170,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             headerView.addSubview(titleLabel)
 
             let imgView: UIImageView = .init(frame: CGRect(x: width + 30, y: 6, width: 30, height: 20))
-            imgView.image = UIImage("new")
+            imgView.image = UIImage.sceneImage(name: "new", bundleName: "VoiceChatRoomResource")
             headerView.addSubview(imgView)
 
             return headerView
@@ -198,7 +198,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             headerView.addSubview(titleLabel)
 
             let imgView: UIImageView = .init(frame: CGRect(x: width + 30, y: 6, width: 30, height: 20))
-            imgView.image = UIImage("new")
+            imgView.image =UIImage.sceneImage(name: "new")
             headerView.addSubview(imgView)
 
             return headerView

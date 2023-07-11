@@ -28,13 +28,13 @@ let page_size = 15
 
     private var currentUser: VLLoginModel?
 
-    private lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage("roomList")!)
+    private lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage.sceneImage(name: "roomList", bundleName: "VoiceChatRoomResource")!)
 
     private lazy var container: VoiceRoomPageContainer = {
         VoiceRoomPageContainer(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: ScreenHeight - ZNavgationHeight - 10 - CGFloat(ZBottombarHeight) - 30), viewControllers: [self.normal]).backgroundColor(.clear)
     }()
 
-    private lazy var create: VRRoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage("blur")!).backgroundColor(.clear)
+    private lazy var create: VRRoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage.sceneImage(name: "blur", bundleName: "VoiceChatRoomResource")!).backgroundColor(.clear)
     
     private var initialError: AgoraChatError?
     

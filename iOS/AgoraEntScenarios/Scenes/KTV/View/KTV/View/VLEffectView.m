@@ -6,7 +6,7 @@
 //
 
 #import "VLEffectView.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @interface VLEffectView()
 @property(nonatomic, weak) id <VLEffectViewDelegate>delegate;
 @property (nonatomic,strong) UIButton *selBtn;

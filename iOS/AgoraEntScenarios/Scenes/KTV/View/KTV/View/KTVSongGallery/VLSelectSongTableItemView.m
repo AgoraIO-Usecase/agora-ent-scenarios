@@ -12,7 +12,7 @@
 #import "VLUserCenter.h"
 #import "VLToast.h"
 #import "AppContext+KTV.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 #import "NSString+Helper.h"
 @import MJRefresh;
 

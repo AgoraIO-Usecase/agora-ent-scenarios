@@ -7,7 +7,7 @@
 #import "VLRoomSeatModel.h"
 #import "VLMacroDefine.h"
 #import "AgoraEntScenarios-Swift.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import YYCategories;
 
 @interface VLMicSeatCell()

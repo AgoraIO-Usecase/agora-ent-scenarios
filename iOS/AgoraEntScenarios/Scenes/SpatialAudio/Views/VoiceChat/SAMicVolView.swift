@@ -58,13 +58,13 @@ class SAMicVolView: UIView {
         micState = state
         switch state {
         case .on:
-            imageView.image = UIImage("micon")
+            imageView.image = UIImage.sceneImage(name: "micon", bundleName: "VoiceChatRoomResource")
             animateView.isHidden = false
         case .off:
-            imageView.image = UIImage("micoff")
+            imageView.image = UIImage.sceneImage(name: "micoff", bundleName: "VoiceChatRoomResource")
             animateView.isHidden = true
         case .forbidden:
-            imageView.image = UIImage("micoff")
+            imageView.image = UIImage.sceneImage(name: "micoff", bundleName: "VoiceChatRoomResource")
             animateView.isHidden = true
         }
     }
@@ -73,7 +73,7 @@ class SAMicVolView: UIView {
 private extension SAMicVolView {
     func layoutUI() {
         imageView = UIImageView()
-        imageView.image = UIImage(named: "micon")
+        imageView.image = UIImage.sceneImage(name:  "micon", bundleName: "VoiceChatRoomResource")
         addSubview(imageView)
 
         animateView = UIView()

@@ -10,7 +10,7 @@
 #import "AgoraEntScenarios-Swift.h"
 #import "AppContext+KTV.h"
 #import "VLMacroDefine.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 typedef void (^actionSuccess)(BOOL ifSuccess);
 

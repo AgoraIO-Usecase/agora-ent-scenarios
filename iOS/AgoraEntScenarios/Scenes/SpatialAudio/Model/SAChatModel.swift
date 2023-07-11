@@ -28,7 +28,7 @@ extension SAChatEntity {
     func renderAttributeText() -> NSAttributedString {
         if joined! == false {
             let attachment = NSTextAttachment()
-            attachment.image = UIImage("fangzhu")
+            attachment.image = UIImage.sceneImage(name: "fangzhu", bundleName: "VoiceChatRoomResource")
             attachment.bounds = CGRect(x: 0, y: -1.5, width: 14, height: 14)
             let host = NSMutableAttributedString(attachment: attachment)
             host.append(NSAttributedString(string: " "))
@@ -51,7 +51,7 @@ extension SAChatEntity {
             return text
         } else {
             let attachment = NSTextAttachment()
-            attachment.image = UIImage("shaking_hand")
+            attachment.image = UIImage.sceneImage(name: "shaking_hand", bundleName: "VoiceChatRoomResource")
             attachment.bounds = CGRect(x: 0, y: -4.5, width: 18, height: 18)
             let attributeText = NSMutableAttributedString {
                 AttributedText(self.userName!).foregroundColor(Color(0x8BB3FF)).font(.systemFont(ofSize: 13, weight: .semibold)).lineSpacing(5)

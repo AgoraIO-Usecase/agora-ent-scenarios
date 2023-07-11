@@ -675,7 +675,7 @@
 		AB9DE3652A5BAD81000673FF /* BundleUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BundleUtil.m; sourceTree = "<group>"; };
 		AB9DE3672A5BE683000673FF /* SenseBeautyManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SenseBeautyManager.swift; sourceTree = "<group>"; };
 		AB9DE3692A5BE6AA000673FF /* ByteBeautyManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteBeautyManager.swift; sourceTree = "<group>"; };
-		DD029247295BF0DC00485225 /* KTVMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KTVMacro.h; sourceTree = "<group>"; };
+		DD029247295BF0DC00485225 /* AESMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AESMacro.h; sourceTree = "<group>"; };
 		DD029248295BF0DC00485225 /* KTVLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLog.swift; sourceTree = "<group>"; };
 		DD02924B295BF0DC00485225 /* VLAddRoomModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAddRoomModel.m; sourceTree = "<group>"; };
 		DD02924D295BF0DC00485225 /* VLRoomListModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLRoomListModel.h; sourceTree = "<group>"; };
@@ -1551,7 +1551,6 @@
 		DD029246295BF0DC00485225 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				DD029247295BF0DC00485225 /* KTVMacro.h */,
 				DD029248295BF0DC00485225 /* KTVLog.swift */,
 			);
 			path = Utils;
@@ -2545,7 +2544,6 @@
 		DD619B2329E3E262008F63E4 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				DD619B2429E3E262008F63E4 /* VRBaseViewController.swift */,
 				DD619B2529E3E262008F63E4 /* VoiceChat */,
 				DD619B3229E3E262008F63E4 /* RoomManager */,
 			);
@@ -3146,6 +3144,7 @@
 				DDA1991428FFE579009D3E61 /* UIViewController+VL.m */,
 				DDA1991528FFE579009D3E61 /* BaseNavigationController.h */,
 				DDA1991628FFE579009D3E61 /* BaseViewController.h */,
+				DD619B2429E3E262008F63E4 /* VRBaseViewController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -3289,6 +3288,7 @@
 				DDA1994A28FFE579009D3E61 /* Screen.swift */,
 				DDA1994B28FFE579009D3E61 /* JSONObject.swift */,
 				DDA1994C28FFE579009D3E61 /* SyncUtil.swift */,
+				DD029247295BF0DC00485225 /* AESMacro.h */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -4072,8 +4072,6 @@
 				DD3610A029B70CDC00CE7984 /* ShowMusicEffectCell.swift in Sources */,
 				AB9DE31D2A582F85000673FF /* SenseBeautyRender.m in Sources */,
 				DD619B9329E3E262008F63E4 /* VRVerifyCodeTextView.swift in Sources */,
-				DD619B8D29E3E262008F63E4 /* SwiftyFitSize.swift in Sources */,
-				DD36108429B70CDC00CE7984 /* VideoProcessingManager.m in Sources */,
 				DD84178229090C520026B624 /* VLDiscoveryView.m in Sources */,
 				AB9DE3522A5BA71A000673FF /* BEEffectResourceHelper.m in Sources */,
 				DD619A6829E3E247008F63E4 /* SAVerifyCodeTextView.swift in Sources */,
@@ -4360,7 +4358,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = B8JXV8ZYC7;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -4401,7 +4399,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = B8JXV8ZYC7;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;

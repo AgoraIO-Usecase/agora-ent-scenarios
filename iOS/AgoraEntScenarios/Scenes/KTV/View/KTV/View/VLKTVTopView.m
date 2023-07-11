@@ -6,7 +6,7 @@
 #import "VLKTVTopView.h"
 #import "VLRoomListModel.h"
 #import "VLHotSpotBtn.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @interface VLKTVTopView ()
 

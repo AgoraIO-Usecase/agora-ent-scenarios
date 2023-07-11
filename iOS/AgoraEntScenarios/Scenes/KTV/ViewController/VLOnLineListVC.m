@@ -19,7 +19,7 @@
 #import "VLURLPathConfig.h"
 #import "VLToast.h"
 #import "AppContext+KTV.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 #import "VLAlert.h"
 
 @interface VLOnLineListVC ()<VLHomeOnLineListViewDelegate/*,AgoraRtmDelegate*/,VLPopScoreViewDelegate>

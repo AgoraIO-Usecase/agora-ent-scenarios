@@ -9,7 +9,7 @@
 #import "VLListEmptyView.h"
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 #import "AppContext+KTV.h"
 @import MJRefresh;
 

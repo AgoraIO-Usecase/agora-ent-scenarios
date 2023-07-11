@@ -11,7 +11,7 @@
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"
 #import "AppContext+KTV.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 #import "NSString+Helper.h"
 @import MJRefresh;
 
