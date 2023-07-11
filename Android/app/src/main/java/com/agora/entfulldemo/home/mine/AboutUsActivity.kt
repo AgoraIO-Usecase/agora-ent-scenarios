@@ -63,7 +63,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         adapter.scenes = mutableListOf<SceneInfo>()
         adapter.appInfo = AppInfo(
             this.getString(R.string.app_about_name),
-            "20230627-3.1.0-" + RtcEngine.getSdkVersion(),
+            "20230715-3.1.0-" + RtcEngine.getSdkVersion(),
             servicePhone,
             webSite
         )
@@ -117,7 +117,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             adapter.scenes = scenes
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_about_name),
-                "20230530-" + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
+                "20230715-" + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
