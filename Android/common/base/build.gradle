@@ -4,8 +4,7 @@ plugins {
     id 'kotlin-kapt'
 }
 
-if (project.property("AGORA_APP_ID").toString().isEmpty() ||
-        project.property("AGORA_APP_CERTIFICATE").toString().isEmpty()) {
+if (project.property("AGORA_APP_ID").toString().isEmpty()) {
     throw new GradleException("请在 gradle.properties 中配置完整的 Agora ID 和 Certificate")
 }
 

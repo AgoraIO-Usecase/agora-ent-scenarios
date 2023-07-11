@@ -108,6 +108,7 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
                 roomCreateViewModel.joinRoom(out.getRoomNo(), out.getPassword());
             }else{
                 hideLoadingView();
+                getBinding().btnCreate.setEnabled(true);
             }
         });
         getBinding().cbOpen.setOnCheckedChangeListener((compoundButton, b) -> {

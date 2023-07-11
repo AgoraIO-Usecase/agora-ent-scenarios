@@ -81,8 +81,8 @@ object TokenGenerator {
         postBody.put("uid", uid + "")
 
         val request = Request.Builder().url(
-            if (genType == TokenGeneratorType.token006) "https://toolbox.bj2.agoralab.co/v1/token006/generate"
-            else "https://toolbox.bj2.agoralab.co/v1/token/generate"
+            if (genType == TokenGeneratorType.token006) "https://toolbox.bj2.agoralab.co/v2/token006/generate"
+            else "https://toolbox.bj2.agoralab.co/v2/token/generate"
         ).addHeader("Content-Type", "application/json").post(postBody.toString().toRequestBody()).build()
         val execute = okHttpClient.newCall(request).execute()
         if (execute.isSuccessful) {
