@@ -29,7 +29,7 @@
 #import "VLKTVMVView.h"
 #import "UIView+VL.h"
 #import "AppContext+KTV.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 #import "LSTPopView+KTVModal.h"
 #import "HWWeakTimer.h"
 #import "VLAlert.h"

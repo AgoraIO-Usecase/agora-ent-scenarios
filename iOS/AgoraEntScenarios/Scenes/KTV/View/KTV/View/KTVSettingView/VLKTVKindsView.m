@@ -5,7 +5,7 @@
 
 #import "VLKTVKindsView.h"
 #import "VLKTVKindsCell.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import Masonry;
 
 @interface VLKTVKindsView() <UICollectionViewDataSource,UICollectionViewDelegate>

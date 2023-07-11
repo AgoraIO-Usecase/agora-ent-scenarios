@@ -23,7 +23,7 @@ public class VRCreateRoomView: UIView, HorizontalCardsDelegate, HorizontalCardsD
 
     var createAction: (() -> Void)?
 
-    lazy var menuBar: VRRoomMenuBar = .init(frame: CGRect(x: 20, y: 0, width: ScreenWidth - 40, height: 42), items: VRRoomMenuBar.entities1, indicatorImage: UIImage("indicator")!, indicatorFrame: CGRect(x: 0, y: 42 - 8, width: 14, height: 8)).backgroundColor(.clear)
+    lazy var menuBar: VRRoomMenuBar = .init(frame: CGRect(x: 20, y: 0, width: ScreenWidth - 40, height: 42), items: VRRoomMenuBar.entities1, indicatorImage:UIImage.sceneImage(name: "indicator", bundleName: "VoiceChatRoomResource")!, indicatorFrame: CGRect(x: 0, y: 42 - 8, width: 14, height: 8)).backgroundColor(.clear)
 
     lazy var audioEffectCards: HorizontalCardsView = {
         let cards = HorizontalCardsView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: self.cardHeight))

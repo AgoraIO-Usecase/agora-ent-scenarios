@@ -157,12 +157,12 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
         view.addSubview(cover)
 
         backBtn.frame = CGRect(x: 10, y: 30, width: 20, height: 30)
-        backBtn.setImage(UIImage("back"), for: .normal)
+        backBtn.setImage(UIImage.sceneImage(name: "back", bundleName: "VoiceChatRoomResource"), for: .normal)
         backBtn.addTargetFor(self, action: #selector(back), for: .touchUpInside)
         view.addSubview(backBtn)
 
         lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20, y: 8, width: 40, height: 4)
-        lineImgView.image = UIImage("pop_indicator")
+        lineImgView.image = UIImage.sceneImage(name: "pop_indicator", bundleName: "VoiceChatRoomResource")
         view.addSubview(lineImgView)
 
         titleLabel.frame = CGRect(x: ScreenWidth / 2.0 - 60, y: 25, width: 120, height: 30)
@@ -393,7 +393,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
                     headerView.addSubview(warningView)
 
                     let iconView: UIImageView = .init(frame: CGRect(x: 8, y: 7, width: 16, height: 16))
-                    iconView.image = UIImage("zhuyi")
+                    iconView.image = UIImage.sceneImage(name: "zhuyi", bundleName: "VoiceChatRoomResource")
                     warningView.addSubview(iconView)
 
                     let warningLabel = UILabel(frame: CGRect(x: 30, y: 6, width: screenWidth - 100, height: otherSoundHeaderHeight))

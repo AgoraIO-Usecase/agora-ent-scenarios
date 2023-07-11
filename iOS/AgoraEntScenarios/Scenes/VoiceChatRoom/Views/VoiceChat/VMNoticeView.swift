@@ -71,7 +71,7 @@ class VMNoticeView: UIView {
         addSubview(cover)
 
         lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20, y: 8, width: 40, height: 4)
-        lineImgView.image = UIImage("pop_indicator")
+        lineImgView.image = UIImage.sceneImage(name: "pop_indicator", bundleName: "VoiceChatRoomResource")
         addSubview(lineImgView)
 
         canBtn.frame = CGRect(x: 15, y: 18, width: 68, height: 30)
@@ -127,7 +127,7 @@ class VMNoticeView: UIView {
         editBtn.setTitle(LanguageManager.localValue(key: "Edit"), for: .normal)
         editBtn.font(UIFont.systemFont(ofSize: 16))
         editBtn.setTitleColor(.white, for: .normal)
-        let image = UIImage("blue_btn_bg")?.resizableImage(withCapInsets: UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16), resizingMode: .stretch)
+        let image = UIImage.sceneImage(name: "blue_btn_bg", bundleName: "VoiceChatRoomResource")?.resizableImage(withCapInsets: UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16), resizingMode: .stretch)
         editBtn.setBackgroundImage(image, for: .normal)
         editBtn.addTargetFor(self, action: #selector(edit), for: .touchUpInside)
         addSubview(editBtn)

@@ -12,7 +12,7 @@
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonDigest.h> // Need to import for CC_MD5 access
 #import "VLFontUtils.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import UIKit;
 
 //空字符串

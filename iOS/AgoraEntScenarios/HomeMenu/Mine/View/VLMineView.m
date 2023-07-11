@@ -12,7 +12,7 @@
 #import "MenuUtils.h"
 #import "VLMineCellModel.h"
 #import "AgoraEntScenarios-Bridging-Header.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @import SDWebImage;
 

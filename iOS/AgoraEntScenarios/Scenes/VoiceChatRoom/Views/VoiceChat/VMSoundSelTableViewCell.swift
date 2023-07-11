@@ -43,12 +43,12 @@ class VMSoundSelTableViewCell: UITableViewCell {
                 bgView.layer.borderWidth = 1
                 bgView.layer.borderColor = UIColor(red: 0, green: 159 / 255.0, blue: 1, alpha: 1).cgColor
                 selView.isHidden = false
-                iconView.image = UIImage("icons／Stock／listen")
+                iconView.image = UIImage.sceneImage(name: "icons／Stock／listen", bundleName: "VoiceChatRoomResource")
             } else {
                 bgView.layer.borderWidth = 1
                 bgView.layer.borderColor = UIColor.lightGray.cgColor
                 selView.isHidden = true
-                iconView.image = UIImage("icons／Stock／change")
+                iconView.image = UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource")
             }
         }
     }
@@ -86,7 +86,7 @@ class VMSoundSelTableViewCell: UITableViewCell {
         typeLabel.textColor = UIColor(red: 0, green: 159 / 255.0, blue: 1, alpha: 1)
         bgView.addSubview(typeLabel)
 
-        iconView.image = UIImage("icons／Stock／listen")
+        iconView.image = UIImage.sceneImage(name: "icons／Stock／listen", bundleName: "VoiceChatRoomResource")
 //        let tap = UITapGestureRecognizer(target: self, action: #selector(click))
 //        iconView.addGestureRecognizer(tap)
 //        iconView.isUserInteractionEnabled = true
@@ -100,7 +100,7 @@ class VMSoundSelTableViewCell: UITableViewCell {
         detailLabel.lineBreakMode = .byCharWrapping
         bgView.addSubview(detailLabel)
 
-        selView.image = UIImage("effect-check")
+        selView.image = UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource")
         addSubview(selView)
 
         usageLabel.text = LanguageManager.localValue(key: "Current Customer Usage")

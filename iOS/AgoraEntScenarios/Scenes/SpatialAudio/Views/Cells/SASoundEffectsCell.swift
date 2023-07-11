@@ -35,7 +35,7 @@ public class SASoundEffectsCell: UITableViewCell, UICollectionViewDelegate, UICo
 
     lazy var iconList: UICollectionView = .init(frame: CGRect(x: 20, y: self.customUsage.frame.maxY + 5, width: self.effectName.frame.width, height: 20), collectionViewLayout: self.flowLayout).delegate(self).dataSource(self).registerCell(SAIconCell.self, forCellReuseIdentifier: "VRIconCell").showsVerticalScrollIndicator(false).showsHorizontalScrollIndicator(false).isUserInteractionEnabled(false).backgroundColor(.white)
 
-    lazy var chooseSymbol: UIImageView = .init(frame: CGRect(x: self.background.frame.width - 32, y: self.frame.height - 31, width: 32, height: 31)).image(UIImage("dan-check")!).contentMode(.scaleAspectFit)
+    lazy var chooseSymbol: UIImageView = .init(frame: CGRect(x: self.background.frame.width - 32, y: self.frame.height - 31, width: 32, height: 31)).image(UIImage.sceneImage(name: "dan-check", bundleName: "VoiceChatRoomResource")!).contentMode(.scaleAspectFit)
 
     override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

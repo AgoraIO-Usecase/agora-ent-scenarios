@@ -10,7 +10,7 @@
 #import "VLRoomListModel.h"
 #import "VLSongItmModel.h"
 #import "VLHotSpotBtn.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 #define BASICVCINDEX 100
 

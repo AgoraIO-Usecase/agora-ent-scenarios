@@ -5,11 +5,11 @@
 //  Created by wushengtao on 2022/11/8.
 //
 
-#ifndef KTVMacro_h
-#define KTVMacro_h
+#ifndef AESMacro_h
+#define AESMacro_h
 
 @import YYCategories;
-#import "AgoraEntScenarios-Swift.h"
+#import "AgoraEntScenarios-swift.h"
 #import "QMUICommonDefines.h"
 #import "VLDeviceUtils.h"
 #import "QMUIHelper.h"

@@ -301,7 +301,7 @@ extension VoiceRoomViewController {
     func layoutUI() {
 
         let bgImgView = UIImageView()
-        bgImgView.image = UIImage("lbg")
+        bgImgView.image = UIImage.sceneImage(name: "lbg", bundleName: "VoiceChatRoomResource")
         view.addSubview(bgImgView)
 
         headerView = AgoraChatRoomHeaderView() 

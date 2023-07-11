@@ -198,7 +198,7 @@ extension SAAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             headerView.addSubview(titleLabel)
 
             let imgView: UIImageView = .init(frame: CGRect(x: width + 30, y: 6, width: 30, height: 20))
-            imgView.image = UIImage("new")
+            imgView.image =UIImage.sceneImage(name: "new")
             headerView.addSubview(imgView)
 
             return headerView
