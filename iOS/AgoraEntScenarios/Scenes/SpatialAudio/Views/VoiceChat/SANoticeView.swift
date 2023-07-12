@@ -25,7 +25,7 @@ class SANoticeView: UIView {
 
     var resBlock: ((Bool, String?) -> Void)?
 
-    var roleType: ROLE_TYPE = .owner {
+    var roleType: SAROLE_TYPE = .owner {
         didSet {
             if roleType == .owner {
                 canBtn.isHidden = true

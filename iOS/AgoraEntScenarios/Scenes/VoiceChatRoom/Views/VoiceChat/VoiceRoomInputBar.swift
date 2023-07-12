@@ -171,21 +171,3 @@ public class VoiceRoomInputBar: UIView, UITextViewDelegate {
         return attribute
     }
 }
-
-public extension NSAttributedString {
-    func toString() -> String {
-        let result = NSMutableAttributedString(attributedString: self)
-        var replaceList: [(NSRange, String)] = []
-        result.enumerateAttribute(.accessibilityTextCustom, in: NSRange(location: 0, length: result.length), using: { value, range, _ in
-            if let value = value as? String {
-                for i in range.location..<range.location + range.length {
-                    replaceList.append((NSRange(location: i, length: 1), value))
-                }
-            }
-        })
-        for i in replaceList.reversed() {
-            result.replaceCharacters(in: i.0, with: i.1)
-        }
-        return result.string
-    }
-}
