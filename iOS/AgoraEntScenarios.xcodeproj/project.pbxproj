@@ -587,6 +587,7 @@
 		E36B41C22A2452CC0034FACF /* VLVoicePerShowView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36B41C02A2452CC0034FACF /* VLVoicePerShowView.m */; };
 		E36B41C52A2453610034FACF /* VLVoiceShowView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36B41C32A2453610034FACF /* VLVoiceShowView.m */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
+		E3735C342A5E4AFF004737EF /* UITextView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */; };
 		E3BA36DA2A2DC17D00ACD073 /* HeadSetManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E3BA36D92A2DC17D00ACD073 /* HeadSetManager.m */; };
 		E3BA36DD2A2DCD8400ACD073 /* VLEarSettingView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3BA36DC2A2DCD8400ACD073 /* VLEarSettingView.m */; };
 		E3C82AD12A28A8E600728550 /* EffectCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E3C82AD02A28A8E600728550 /* EffectCollectionViewCell.m */; };
@@ -1361,6 +1362,7 @@
 		E36B41C42A2453610034FACF /* VLVoiceShowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLVoiceShowView.h; sourceTree = "<group>"; };
 		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
 		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
+		E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Extension.swift"; sourceTree = "<group>"; };
 		E3BA36D82A2DC17D00ACD073 /* HeadSetManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HeadSetManager.h; sourceTree = "<group>"; };
 		E3BA36D92A2DC17D00ACD073 /* HeadSetManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HeadSetManager.m; sourceTree = "<group>"; };
 		E3BA36DB2A2DCD8400ACD073 /* VLEarSettingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLEarSettingView.h; sourceTree = "<group>"; };
@@ -2410,7 +2412,6 @@
 				DD619AF329E3E262008F63E4 /* HorizontalTextCarousel.swift */,
 				DD619AF429E3E262008F63E4 /* VoiceRoomEmojiManager.swift */,
 				DD619AF529E3E262008F63E4 /* Animation */,
-				DD619AFA29E3E262008F63E4 /* Throttle.swift */,
 				DD619AFB29E3E262008F63E4 /* SwiftyFitSize.swift */,
 				DD619AFC29E3E262008F63E4 /* VoiceRoomPasswordAlert.swift */,
 				DD619AFD29E3E262008F63E4 /* Xcode14.h */,
@@ -2421,7 +2422,6 @@
 				DD619B0229E3E262008F63E4 /* VRVerifyCodeTextView.swift */,
 				DD619B0329E3E262008F63E4 /* VoiceRoomPageContainer.swift */,
 				DD619B0429E3E262008F63E4 /* Xcode14.m */,
-				DD619B0529E3E262008F63E4 /* Notification+Presentation.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -2444,7 +2444,6 @@
 				DD619B0829E3E262008F63E4 /* UIButtonLayoutExtension.swift */,
 				DD619B0929E3E262008F63E4 /* UIButton+Extension.swift */,
 				DD619B0A29E3E262008F63E4 /* ResourceBundleExtension.swift */,
-				DD619B0B29E3E262008F63E4 /* UIViewToastExtension.swift */,
 				DD619B0C29E3E262008F63E4 /* UIImageBundleExtension.swift */,
 				DD619B0D29E3E262008F63E4 /* String + Extension.swift */,
 			);
@@ -3119,6 +3118,9 @@
 				DDA1991A28FFE579009D3E61 /* AgoraExtension.swift */,
 				DDA1991B28FFE579009D3E61 /* UIImage+Color.swift */,
 				DDA1991C28FFE579009D3E61 /* Array+Extension.swift */,
+				E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */,
+				DD619B0B29E3E262008F63E4 /* UIViewToastExtension.swift */,
+				DD619B0529E3E262008F63E4 /* Notification+Presentation.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -3243,6 +3245,7 @@
 		DDA1994628FFE579009D3E61 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				DD619AFA29E3E262008F63E4 /* Throttle.swift */,
 				DDA1994728FFE579009D3E61 /* Config.swift */,
 				DDA1994828FFE579009D3E61 /* GCDTimer.swift */,
 				DDA1994928FFE579009D3E61 /* DeviceAssistant.swift */,
@@ -4063,6 +4066,7 @@
 				DD619AB729E3E247008F63E4 /* SANormalRtcView.swift in Sources */,
 				DD3610B829B70CDC00CE7984 /* ShowSettingBaseCell.swift in Sources */,
 				DD36109F29B70CDC00CE7984 /* ShowBaseViewController.swift in Sources */,
+				E3735C342A5E4AFF004737EF /* UITextView+Extension.swift in Sources */,
 				DD619AD529E3E247008F63E4 /* SABaseAlienCollectionViewCell.swift in Sources */,
 				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
 				DD619BF229E3E262008F63E4 /* AgoraChatRoom3DMoveUserView.swift in Sources */,
