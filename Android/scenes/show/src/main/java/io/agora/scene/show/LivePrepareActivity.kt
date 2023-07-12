@@ -15,9 +15,9 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import io.agora.beauty.sensetime.*
 import io.agora.rtc2.Constants
 import io.agora.rtc2.video.CameraCapturerConfiguration
-import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.TimeUtils
@@ -95,6 +95,21 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 showPresetDialog()
             }
         }
+        mBeautyProcessor.initialize(
+            rtcEngine = mRtcEngine,
+            captureMode = CaptureMode.Custom,
+            statsEnable = true,
+            eventCallback = object : IEventCallback {
+                override fun onBeautyStats(stats: BeautyStats) {
+                    ShowLogger.d("hugo", "BeautyStats stats = $stats")
+                }
+            }
+        )
+        mBeautyProcessor.setBeautyEnable(true)
+        mBeautyProcessor.getSenseTimeBeautyAPI().setupLocalVideo(SurfaceView(this).apply {
+            binding.flVideoContainer.addView(this)
+        }, Constants.RENDER_MODE_HIDDEN)
+
         toggleVideoRun = Runnable {
             mBeautyProcessor.reset()
             initRtcEngine()
@@ -134,13 +149,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
     private fun initRtcEngine() {
-        val videoCanvas = VideoCanvas(SurfaceView(this).apply {
-            binding.flVideoContainer.addView(this)
-        })
-        videoCanvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
-        mRtcEngine.setupLocalVideo(
-            videoCanvas
-        )
         val cacheQualityResolution = PictureQualityDialog.getCacheQualityResolution()
         mRtcEngine.setCameraCapturerConfiguration(
             CameraCapturerConfiguration(
@@ -151,7 +159,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 )
             )
         )
-        mRtcEngine.startPreview()
+//        mRtcEngine.startPreview()
     }
 
     private fun showPictureQualityDialog() {
@@ -208,9 +216,11 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
 
-    private fun getRandomRoomId() = (Random(TimeUtils.currentTimeMillis()).nextInt(10000) + 100000).toString()
+    private fun getRandomRoomId() =
+        (Random(TimeUtils.currentTimeMillis()).nextInt(10000) + 100000).toString()
 
-    private fun getRandomThumbnailId() = Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
+    private fun getRandomThumbnailId() =
+        Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
 
     @DrawableRes
     private fun getThumbnailIcon(thumbnailId: String) = when (thumbnailId) {
