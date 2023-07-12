@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.live
+package io.agora.scene.ktv.ktvapi
 
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayer
@@ -224,6 +224,11 @@ data class KTVLoadMusicConfiguration(
     val mainSingerUid: Int,
     val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
 )
+
+/**
+ * 获取 KTVApi 实例
+ */
+fun createKTVApi(): KTVApi = KTVApiImpl()
 
 interface KTVApi {
     /**

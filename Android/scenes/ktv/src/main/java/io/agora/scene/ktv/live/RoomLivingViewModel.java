@@ -13,6 +13,7 @@ import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_VOCAL_CONCERT_HARMONY;
 import static io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE.CONNECTION_STATE_CONNECTED;
 import static io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE.getValue;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
+import static io.agora.scene.ktv.ktvapi.KTVApiKt.createKTVApi;
 
 import android.text.TextUtils;
 import android.view.SurfaceView;
@@ -56,6 +57,20 @@ import io.agora.scene.ktv.KTVLogger;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingBean;
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingsDialog;
+import io.agora.scene.ktv.ktvapi.IKTVApiEventHandler;
+import io.agora.scene.ktv.ktvapi.ILrcView;
+import io.agora.scene.ktv.ktvapi.IMusicLoadStateListener;
+import io.agora.scene.ktv.ktvapi.ISwitchRoleStateListener;
+import io.agora.scene.ktv.ktvapi.KTVApi;
+import io.agora.scene.ktv.ktvapi.KTVApiConfig;
+import io.agora.scene.ktv.ktvapi.KTVApiImpl;
+import io.agora.scene.ktv.ktvapi.KTVLoadMusicConfiguration;
+import io.agora.scene.ktv.ktvapi.KTVLoadMusicMode;
+import io.agora.scene.ktv.ktvapi.KTVLoadSongFailReason;
+import io.agora.scene.ktv.ktvapi.KTVSingRole;
+import io.agora.scene.ktv.ktvapi.KTVType;
+import io.agora.scene.ktv.ktvapi.MusicLoadStatus;
+import io.agora.scene.ktv.ktvapi.SwitchRoleFailReason;
 import io.agora.scene.ktv.service.ChangeMVCoverInputModel;
 import io.agora.scene.ktv.service.ChooseSongInputModel;
 import io.agora.scene.ktv.service.JoinRoomOutputModel;
@@ -75,7 +90,7 @@ public class RoomLivingViewModel extends ViewModel {
 
     private final String TAG = "KTV_Scene_LOG";
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
-    private final KTVApi ktvApiProtocol = new KTVApiImpl();
+    private final KTVApi ktvApiProtocol = createKTVApi();
 
     // loading dialog
     private final MutableLiveData<Boolean> _loadingDialogVisible = new MutableLiveData<>(false);

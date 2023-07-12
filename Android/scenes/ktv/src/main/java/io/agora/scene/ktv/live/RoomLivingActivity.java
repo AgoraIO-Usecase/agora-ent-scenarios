@@ -403,9 +403,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 }
             }
 
-            if (!hasHighlighter && roomLivingViewModel.isRoomOwner() && chorusNowNum >= 0 && !roomLivingViewModel.mSetting.getHighLighterUid().equals("")) {
+            if (!hasHighlighter && roomLivingViewModel.isRoomOwner() && chorusNowNum >= 0 && !roomLivingViewModel.mSetting.getHighLighterUid().equals("") || (chorusNowNum == 0 && !roomLivingViewModel.mSetting.getHighLighterUid().equals(""))) {
                 // 人声突出者退出合唱
-                ToastUtils.showToast("人声突出功能已失效， 请重设");
+                ToastUtils.showToast("人声突出功能已失效");
                 getBinding().lrcControlView.setHighLightPersonHeadUrl("");
                 roomLivingViewModel.mSetting.setHighLighterUid("");
             }
