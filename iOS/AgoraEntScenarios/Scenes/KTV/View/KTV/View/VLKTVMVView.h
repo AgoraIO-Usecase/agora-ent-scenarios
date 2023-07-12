@@ -6,7 +6,6 @@
 #import <UIKit/UIKit.h>
 #import "AgoraEntScenarios-swift.h"
 #import "VLRoomSelSongModel.h"
-#import "KTVSkipView.h"
 @import ScoreEffectUI;
 @import AgoraLyricsScore;
 
