@@ -14,38 +14,17 @@ class ShowSettingSliderCell: ShowSettingBaseCell {
     
     private var currentValue: Float = 0
     
-    private lazy var valueLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .show_Ellipse5
-        label.font = .show_R_14
-        return label
-    }()
-
-    private lazy var slider: UISlider = {
-        let slider = UISlider()
-        slider.minimumTrackTintColor = .show_zi03
-        slider.maximumTrackTintColor = .show_Ellipse2
-        slider.addTarget(self, action: #selector(sliderValueDidChanged), for: .valueChanged)
-        slider.addTarget(self, action: #selector(sliderDidTouchUp), for: [.touchUpInside, .touchUpOutside])
-        return slider
-    }()
+    private let aSwitch = UISwitch()
+    
+    private let valueLabel = UILabel()
+    
+    private let slider = UISlider()
     
     override func createSubviews(){
         super.createSubviews()
         
-        contentView.addSubview(slider)
-        slider.snp.makeConstraints { make in
-            make.right.equalTo(-20)
-            make.centerY.equalTo(titleLabel)
-            make.width.equalTo(150)
-            make.height.equalTo(30)
-        }
-        
-        contentView.addSubview(valueLabel)
-        valueLabel.snp.makeConstraints { make in
-            make.right.equalTo(slider.snp.left).offset(-15)
-            make.centerY.equalTo(titleLabel)
-        }
+        createViews()
+        createConstrians()
     }
     
     func setTitle(_ title: String, value: Float, minValue: Float, maxValue: Float,sliderValueChangingAction: ((_ value: Float)->())?,sliderValueChangedAction: ((_ value: Float)->())?) {
@@ -59,7 +38,7 @@ class ShowSettingSliderCell: ShowSettingBaseCell {
         self.sliderValueChangingAction = sliderValueChangingAction
     }
     
-    func setEnabled(isEnabled: Bool) {
+    private func setSliderEnabled(isEnabled: Bool) {
         slider.isEnabled = isEnabled
         if (isEnabled) {
             slider.value = currentValue
@@ -69,9 +48,6 @@ class ShowSettingSliderCell: ShowSettingBaseCell {
             valueLabel.text = "0"
         }
     }
-}
-
-extension ShowSettingSliderCell {
     
     @objc private func sliderValueDidChanged() {
         currentValue = slider.value
@@ -83,6 +59,45 @@ extension ShowSettingSliderCell {
         currentValue = slider.value
         valueLabel.text = String(format: "%.0f", slider.value)
         self.sliderValueChangedAction?(slider.value)
+    }
+    
+    @objc private func switchValueChanged() {
+        setSliderEnabled(isEnabled: !aSwitch.isOn)
+    }
+}
+
+private extension ShowSettingSliderCell {
+    
+    func createViews() {
+        valueLabel.textColor = .show_Ellipse5
+        valueLabel.font = .show_R_14
+        contentView.addSubview(valueLabel)
+        
+        aSwitch.addTarget(self, action: #selector(switchValueChanged), for: .touchUpInside)
+        contentView.addSubview(aSwitch)
+        
+        slider.minimumTrackTintColor = .show_zi03
+        slider.maximumTrackTintColor = .show_Ellipse2
+        slider.addTarget(self, action: #selector(sliderValueDidChanged), for: .valueChanged)
+        slider.addTarget(self, action: #selector(sliderDidTouchUp), for: [.touchUpInside, .touchUpOutside])
+        contentView.addSubview(slider)
+    }
+    
+    func createConstrians() {
+        aSwitch.snp.makeConstraints { make in
+            make.right.equalTo(-20)
+            make.top.equalTo(10)
+        }
+        slider.snp.makeConstraints { make in
+            make.right.equalTo(-20)
+            make.top.equalTo(aSwitch.snp.bottom).offset(10)
+            make.width.equalTo(150)
+            make.height.equalTo(30)
+        }
+        valueLabel.snp.makeConstraints { make in
+            make.right.equalTo(slider.snp.left).offset(-15)
+            make.centerY.equalTo(slider)
+        }
     }
 }
 

@@ -237,14 +237,6 @@ class ShowAgoraKitManager: NSObject {
         delegateMap[roomId] = proxy
     }
     
-    func renewToken(origToken: String) {
-        AppContext.shared.rtcTokenMap?.forEach({ (key: String, value: String) in
-            if origToken == value {
-                self.renewToken(channelId: key)
-            }
-        })
-    }
-    
     func renewToken(channelId: String) {
         showLogger.info("renewToken with channelId: \(channelId)",
                         context: kShowLogBaseContext)
@@ -258,7 +250,7 @@ class ShowAgoraKitManager: NSObject {
             }
             let option = AgoraRtcChannelMediaOptions()
             option.token = token
-            AppContext.shared.rtcTokenMap?[channelId] = token
+            AppContext.shared.rtcToken = token
             self?.updateChannelEx(channelId: channelId, options: option)
         }
     }
@@ -402,7 +394,7 @@ class ShowAgoraKitManager: NSObject {
                        options:AgoraRtcChannelMediaOptions,
                        role: AgoraClientRole,
                        completion: (()->())?) {
-        if let rtcToken = AppContext.shared.rtcTokenMap?[targetChannelId] {
+        if let rtcToken = AppContext.shared.rtcToken {
             _joinChannelEx(currentChannelId: currentChannelId,
                            targetChannelId: targetChannelId,
                            ownerId: ownerId,
@@ -425,7 +417,7 @@ class ShowAgoraKitManager: NSObject {
                 showLogger.error("joinChannelEx fail: token is empty")
                 return
             }
-            AppContext.shared.rtcTokenMap?[targetChannelId] = token
+            AppContext.shared.rtcToken = token
             self?._joinChannelEx(currentChannelId: currentChannelId,
                                  targetChannelId: targetChannelId,
                                  ownerId: ownerId,

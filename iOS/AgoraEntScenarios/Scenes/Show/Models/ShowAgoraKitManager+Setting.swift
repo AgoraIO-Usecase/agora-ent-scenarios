@@ -310,14 +310,6 @@ extension ShowAgoraKitManager {
             }else{
                 agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
             }
-        case .videoBitRateOn:
-            let value = ShowSettingKey.videoBitRate.floatValue
-            videoEncoderConfig.bitrate = Int(value)
-            if let currentChannelId = currentChannelId {
-                updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
-            }else{
-                agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
-            }
         case .videoBitRate:
             videoEncoderConfig.bitrate = Int(sliderValue)
             if let currentChannelId = currentChannelId {
