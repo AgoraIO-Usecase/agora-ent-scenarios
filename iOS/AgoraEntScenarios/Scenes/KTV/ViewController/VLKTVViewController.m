@@ -511,7 +511,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 - (void)onVLKTVEarSettingViewSwitchChanged:(BOOL)flag{
     self.isEarOn = flag;
-    [self.RTCkit enableInEarMonitoring:flag includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFilters];
+    [self.RTCkit enableInEarMonitoring:flag includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFiltersWithNoiseSuppression];
 }
 
 #pragma mark - VLDebugViewDelegate
@@ -1397,7 +1397,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             //如果当前是关闭麦克风，并且耳返开启状态 需要关闭耳返
             if(self.isEarOn && self.isNowMicMuted){
                 self.isEarOn = false;
-                [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterNone];
+                [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFiltersWithNoiseSuppression];
             }
             self.checkType = checkAuthTypeAudio;
             [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
@@ -2087,7 +2087,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //        [self.RTCkit enableInEarMonitoring:NO includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFilters];
 //    }
     if(self.singRole != KTVSingRoleAudience){//主唱伴唱都能开启耳返
-        [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterNone];
+        [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFiltersWithNoiseSuppression];
     }
 }
 
