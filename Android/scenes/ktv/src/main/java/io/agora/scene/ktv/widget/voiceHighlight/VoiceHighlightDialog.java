@@ -53,7 +53,7 @@ public class VoiceHighlightDialog extends BaseBottomSheetDialogFragment<KtvDialo
         OnItemClickListener.super.onItemClick(data, view, position, viewType);
         Log.d("hugo", "onItemClick    " + position);
         if (hasHigher) {
-            ToastUtils.showToast("本首歌已设置过突出者，请下首歌再设置");
+            ToastUtils.showToast("每首歌仅可设置一次人声突出对象，请在下首歌再设置");
             return;
         }
         hasHigher = true;
