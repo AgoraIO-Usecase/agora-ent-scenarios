@@ -1,16 +1,27 @@
 package io.agora.scene.show.beauty
 
 import android.util.Log
+import com.sensetime.effects.STRenderKit
 import io.agora.base.VideoFrame
+import io.agora.beauty.sensetime.CaptureMode
+import io.agora.beauty.sensetime.IEventCallback
+import io.agora.beauty.sensetime.SenseTimeBeautyAPI
+import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.video.IVideoFrameObserver
 import java.util.concurrent.Executors
 
-
-abstract class IBeautyProcessor: IVideoFrameObserver {
+abstract class IBeautyProcessor : IVideoFrameObserver {
     private val workerExecutor = Executors.newSingleThreadExecutor()
 
     @Volatile
-    private var isEnable = true
+    private var isBeautyEnable = true
+
+    abstract fun initialize(
+        rtcEngine: RtcEngine,
+        captureMode: CaptureMode,
+        statsEnable: Boolean,
+        eventCallback: IEventCallback
+    )
 
     protected abstract fun setFaceBeautifyAfterCached(itemId: Int, intensity: Float)
 
@@ -20,35 +31,39 @@ abstract class IBeautyProcessor: IVideoFrameObserver {
 
     protected abstract fun setStickerAfterCached(itemId: Int)
 
-    protected fun restore(){
+    abstract fun getSenseTimeBeautyAPI(): SenseTimeBeautyAPI
+
+    protected fun restore() {
         BeautyCache.restoreByOperation(this)
     }
 
-
     // Publish Functions
-
-    open fun release(){
-        if(workerExecutor.isShutdown){
+    open fun release() {
+        if (workerExecutor.isShutdown) {
             workerExecutor.shutdownNow()
         }
     }
 
-    fun reset(){
+    fun reset() {
         BeautyCache.reset()
         BeautyCache.restoreByOperation(this)
     }
 
-    fun setEnable(enable: Boolean){
-        isEnable = enable
+    open fun setBeautyEnable(enable: Boolean) {
+        isBeautyEnable = enable
     }
 
-    fun isEnable() = isEnable
+    fun isBeautyEnable() = isBeautyEnable
 
     // 设置绿幕强度（0 ～ 1）
     fun setBg(intensity: Float) {
         Log.e("liu0208", "setBg    intensity = $intensity")
         // 保存绿幕强度值
-        BeautyCache.cacheItemValue(GROUP_ID_VIRTUAL_BG, ITEM_ID_VIRTUAL_BG_GREEN_SCREENSTRENGTH, intensity)
+        BeautyCache.cacheItemValue(
+            GROUP_ID_VIRTUAL_BG,
+            ITEM_ID_VIRTUAL_BG_GREEN_SCREENSTRENGTH,
+            intensity
+        )
     }
 
     // 获取绿幕强度（0 ～ 1）
@@ -58,7 +73,11 @@ abstract class IBeautyProcessor: IVideoFrameObserver {
 
     // 设置绿幕开关
     fun setGreenScreen(greenScreen: Boolean) {
-        BeautyCache.cacheItemValue(GROUP_ID_VIRTUAL_BG, ITEM_ID_VIRTUAL_BG_GREEN_SCREEN, if (greenScreen) 1f else 0f)
+        BeautyCache.cacheItemValue(
+            GROUP_ID_VIRTUAL_BG,
+            ITEM_ID_VIRTUAL_BG_GREEN_SCREEN,
+            if (greenScreen) 1f else 0f
+        )
     }
 
     // 获取绿幕开关
@@ -66,7 +85,7 @@ abstract class IBeautyProcessor: IVideoFrameObserver {
         return BeautyCache.getItemValue(ITEM_ID_VIRTUAL_BG_GREEN_SCREEN) == 1f
     }
 
-    fun setFaceBeautify(itemId: Int, intensity: Float){
+    fun setFaceBeautify(itemId: Int, intensity: Float) {
         BeautyCache.cacheItemValue(GROUP_ID_BEAUTY, itemId, intensity)
         BeautyCache.cacheOperation(GROUP_ID_BEAUTY, itemId)
         workerExecutor.execute {
@@ -74,7 +93,7 @@ abstract class IBeautyProcessor: IVideoFrameObserver {
         }
     }
 
-    fun setFilter(itemId: Int, intensity: Float){
+    fun setFilter(itemId: Int, intensity: Float) {
         BeautyCache.cacheItemValue(GROUP_ID_FILTER, itemId, intensity)
         BeautyCache.cacheOperation(GROUP_ID_FILTER, itemId)
         workerExecutor.execute {
@@ -82,52 +101,27 @@ abstract class IBeautyProcessor: IVideoFrameObserver {
         }
     }
 
-    fun setEffect(itemId: Int, intensity: Float){
+    fun setEffect(itemId: Int, intensity: Float) {
         BeautyCache.resetGroupValue(GROUP_ID_EFFECT)
         BeautyCache.cacheItemValue(GROUP_ID_EFFECT, itemId, intensity)
         BeautyCache.cacheOperation(GROUP_ID_EFFECT, itemId)
-        workerExecutor.execute{
+        workerExecutor.execute {
             setEffectAfterCached(itemId, intensity)
         }
     }
 
-    fun setSticker(itemId: Int){
+    fun setSticker(itemId: Int) {
         BeautyCache.cacheOperation(GROUP_ID_STICKER, itemId)
-        workerExecutor.execute{
+        workerExecutor.execute {
             setStickerAfterCached(itemId)
         }
     }
 
-    fun setAdjust(itemId: Int, intensity: Float){
+    fun setAdjust(itemId: Int, intensity: Float) {
         BeautyCache.cacheItemValue(GROUP_ID_ADJUST, itemId, intensity)
         BeautyCache.cacheOperation(GROUP_ID_ADJUST, itemId)
         workerExecutor.execute {
             setFaceBeautifyAfterCached(itemId, intensity)
         }
     }
-
-
-    // IVideoFrameObserver implement
-    override fun onPreEncodeVideoFrame(type: Int, videoFrame: VideoFrame?): Boolean = false
-
-    override fun onCaptureVideoFrame(type: Int, videoFrame: VideoFrame?): Boolean = false
-
-    override fun onMediaPlayerVideoFrame(videoFrame: VideoFrame?, mediaPlayerId: Int) = false
-
-    override fun onRenderVideoFrame(
-        channelId: String?,
-        uid: Int,
-        videoFrame: VideoFrame?
-    ) = false
-
-    override fun getVideoFrameProcessMode() = IVideoFrameObserver.PROCESS_MODE_READ_WRITE
-
-    override fun getVideoFormatPreference() = IVideoFrameObserver.VIDEO_PIXEL_DEFAULT
-
-    override fun getRotationApplied() = false
-
-    override fun getMirrorApplied() =  false
-
-    override fun getObservedFramePosition() = IVideoFrameObserver.POSITION_POST_CAPTURER
-
 }

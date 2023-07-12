@@ -1,10 +1,16 @@
 package io.agora.scene.show
 
+import android.util.Log
+import com.sensetime.effects.STRenderKit
+import io.agora.base.VideoFrame
+import io.agora.beauty.sensetime.SenseTimeBeautyAPI
+import io.agora.beauty.sensetime.createSenseTimeBeautyAPI
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.CameraCapturerConfiguration
+import io.agora.rtc2.video.IVideoFrameObserver
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
