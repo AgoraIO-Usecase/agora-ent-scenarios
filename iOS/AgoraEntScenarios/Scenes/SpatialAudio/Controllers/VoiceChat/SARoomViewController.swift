@@ -368,7 +368,7 @@ extension SARoomViewController {
         }
     }
 
-    func showNoticeView(with role: ROLE_TYPE) {
+    func showNoticeView(with role: SAROLE_TYPE) {
         let noticeView = SANoticeView(frame: CGRect(x: 0,
                                                     y: 0,
                                                     width: ScreenWidth,

@@ -82,7 +82,7 @@ class SAAudioSettingDetailViewController: UIViewController {
     
     private let soundDetail: [String] = ["Ex. Bird, car, subway sounds".localized(), "Ex. Fan, air conditioner, vacuum cleaner, printer sounds".localized(), "Ex. Keyboard tapping, mouse clicking sounds".localized(), "Ex. Door closing, chair squeaking, baby crying sounds".localized(), "Ex. Knocking sound".localized()]
 
-    var settingType: AUDIO_SETTING_TYPE = .Spatial {
+    var settingType: SA_AUDIO_SETTING_TYPE = .Spatial {
         didSet {
             if settingType == .Spatial {
                 titleLabel.text = "Spatial Setting".localized()
@@ -102,7 +102,7 @@ class SAAudioSettingDetailViewController: UIViewController {
 
     lazy var otherSoundHeaderHeight: CGFloat = textHeight(text: "otherSound".localized(), fontSize: 12, width: ScreenWidth - 100)
 
-    var resBlock: ((AUDIO_SETTING_TYPE) -> Void)?
+    var resBlock: ((SA_AUDIO_SETTING_TYPE) -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
