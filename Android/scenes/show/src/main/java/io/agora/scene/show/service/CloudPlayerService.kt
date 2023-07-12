@@ -2,6 +2,9 @@ package io.agora.scene.show.service
 
 import android.os.CountDownTimer
 import android.util.Base64
+import android.util.Log
+import com.moczul.ok2curl.CurlInterceptor
+import com.moczul.ok2curl.logger.Logger
 import io.agora.scene.base.BuildConfig
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
@@ -14,11 +17,16 @@ import org.json.JSONObject
 
 class CloudPlayerService {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
-    private val baseUrl = "https://toolbox.bj2.agoralab.co/v1/"
+    private val baseUrl = "${BuildConfig.TOOLBOX_SERVER_HOST}/v1/"
     private val okHttpClient by lazy {
         val builder = OkHttpClient.Builder()
         if (BuildConfig.DEBUG) {
             builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+                .addInterceptor(CurlInterceptor(object : Logger {
+                    override fun log(message: String) {
+                        Log.d("CurlInterceptor", message)
+                    }
+                }))
         }
         builder.build()
     }
@@ -101,7 +109,13 @@ class CloudPlayerService {
             JSONObject()
                 .put("appId", BuildConfig.AGORA_APP_ID)
                 .put("appCert", BuildConfig.AGORA_APP_CERTIFICATE)
-                .put("basicAuth", Base64.encodeToString("${BuildConfig.CLOUD_PLAYER_KEY}:${BuildConfig.CLOUD_PLAYER_SECRET}".toByteArray(Charsets.UTF_8), Base64.NO_WRAP))
+                .put(
+                    "basicAuth",
+                    Base64.encodeToString(
+                        "${BuildConfig.CLOUD_PLAYER_KEY}:${BuildConfig.CLOUD_PLAYER_SECRET}".toByteArray(Charsets.UTF_8),
+                        Base64.NO_WRAP
+                    )
+                )
                 .put("channelName", channelName)
                 .put("uid", uid)
                 .put("robotUid", robotUid)

@@ -6,13 +6,14 @@ import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import io.agora.scene.base.Constant
+import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowRoomItemBinding
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
-import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
 import io.agora.scene.show.widget.OnPresetAudienceDialogCallBack
 import io.agora.scene.show.widget.PresetAudienceDialog
 import io.agora.scene.widget.basic.BindingSingleAdapter
@@ -29,6 +30,7 @@ class RoomListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, true)
         setContentView(mBinding.root)
+        fetchService()
         initView()
     }
 
@@ -112,5 +114,25 @@ class RoomListActivity : AppCompatActivity() {
         super.onDestroy()
         mService.destroy()
         RtcEngineInstance.destroy()
+        RtcEngineInstance.setupGeneralToken("")
+    }
+
+
+    private fun fetchService(){
+        //启动机器人
+        mService.startCloudPlayer()
+        val localUId = UserManager.getInstance().user.id.toInt()
+        //获取token
+        TokenGenerator.generateToken("", localUId.toString(),
+            TokenGenerator.TokenGeneratorType.token007,
+            TokenGenerator.AgoraTokenType.rtc,
+            success = {
+                RtcEngineInstance.setupGeneralToken(it)
+                ShowLogger.d("RoomListActivity", "generateToken success：$it， uid：$localUId")
+            },
+            failure = {
+                ShowLogger.e("RoomListActivity", it, "generateToken failure：$it")
+                ToastUtils.showToast(it?.message?:"generate token failure")
+            })
     }
 }

@@ -1,20 +1,13 @@
 package io.agora.scene.show
 
-import android.util.Log
-import com.sensetime.effects.STRenderKit
-import io.agora.base.VideoFrame
-import io.agora.beauty.sensetime.SenseTimeBeautyAPI
-import io.agora.beauty.sensetime.createSenseTimeBeautyAPI
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.CameraCapturerConfiguration
-import io.agora.rtc2.video.IVideoFrameObserver
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.beauty.IBeautyProcessor
 import io.agora.scene.show.beauty.sensetime.BeautySenseTimeImpl
 import io.agora.scene.show.debugSettings.DebugSettingModel
@@ -31,7 +24,7 @@ object RtcEngineInstance {
     val videoCaptureConfiguration = CameraCapturerConfiguration(CameraCapturerConfiguration.CaptureFormat()).apply {
         followEncodeDimensionRatio = false
     }
-    val debugSettingModel = DebugSettingModel().apply {  }
+    val debugSettingModel = DebugSettingModel().apply { }
 
     private val workingExecutor = Executors.newSingleThreadExecutor()
 
@@ -43,6 +36,15 @@ object RtcEngineInstance {
             }
             return innerBeautyProcessor!!
         }
+
+    // 万能通用 token ,进入房间列表默认获取万能 token
+    private var generalToken: String = ""
+
+    fun setupGeneralToken(generalToken: String) {
+        this.generalToken = generalToken
+    }
+
+    fun generalToken(): String = generalToken
 
     private var innerRtcEngine: RtcEngineEx? = null
     val rtcEngine: RtcEngineEx
