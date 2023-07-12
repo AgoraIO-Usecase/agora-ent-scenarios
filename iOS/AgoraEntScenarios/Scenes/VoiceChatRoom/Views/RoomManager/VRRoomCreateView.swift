@@ -41,14 +41,3 @@ public class VRRoomCreateView: UIImageView {
     }
 }
 
-extension UIView {
-    @discardableResult
-    func setGradient(_ colors: [UIColor], _ points: [CGPoint]) -> Self {
-        let gradientColors: [CGColor] = colors.map { $0.cgColor }
-        let startPoint = points[0]
-        let endPoint = points[1]
-        let gradientLayer = CAGradientLayer().colors(gradientColors).startPoint(startPoint).endPoint(endPoint).frame(bounds).backgroundColor(UIColor.clear.cgColor)
-        layer.insertSublayer(gradientLayer, at: 0)
-        return self
-    }
-}

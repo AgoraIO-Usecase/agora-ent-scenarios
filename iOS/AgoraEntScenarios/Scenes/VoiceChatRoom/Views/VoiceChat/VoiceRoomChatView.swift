@@ -8,8 +8,6 @@
 import UIKit
 import ZSwiftBaseLib
 
-let chatViewWidth = ScreenWidth * (287 / 375.0)
-
 public class VoiceRoomChatView: UIView, UITableViewDelegate, UITableViewDataSource {
     var likeAction: ((UIButton) -> Void)?
 

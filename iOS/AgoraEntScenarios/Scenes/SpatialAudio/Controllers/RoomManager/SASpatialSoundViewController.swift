@@ -39,7 +39,7 @@ extension SASpatialSoundViewController {
     }
 
     @objc private func fetchRooms(cursor: String) {
-        SABusinessRequest.shared.sendGETRequest(api: .fetchRoomList(cursor: cursor, pageSize: page_size, type: 1), params: [:], classType: SARoomsEntity.self) { rooms, error in
+        SABusinessRequest.shared.sendGETRequest(api: .fetchRoomList(cursor: cursor, pageSize: sa_page_size, type: 1), params: [:], classType: SARoomsEntity.self) { rooms, error in
             self.roomList.refreshControl?.endRefreshing()
             if error == nil {
                 guard let total = rooms?.total else { return }
