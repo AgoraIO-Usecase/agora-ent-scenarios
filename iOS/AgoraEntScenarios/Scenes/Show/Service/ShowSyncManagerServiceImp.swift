@@ -235,26 +235,17 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     return
                 }
                 self?.roomId = channelName
-                NetworkManager.shared.generateTokens(channelName: channelName,
-                                                     uid: "\(UserInfo.userId)",
-                                                     tokenGeneratorType: .token007,
-                                                     tokenTypes: [.rtc]) { tokenMap in
-                    guard let self = self,
-                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue]
-                    else {
-                        agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
+                self?.checkTokenExists { success in
+                    guard success else {
+                        completion(NSError(domain: "error", code: -1, userInfo: nil), nil)
                         return
                     }
-                    var map = AppContext.shared.rtcTokenMap ?? [String: String]()
-                    map[channelName] = rtcToken
-                    AppContext.shared.rtcTokenMap = map
                     let output = ShowRoomDetailModel.yy_model(with: params!)
-                    self.roomList?.append(room)
-                    self._startCheckExpire()
-                    self._subscribeAll()
-//                    self._addUserIfNeed()
-                    self._getAllPKInvitationList(room: nil) { error, list in
+                    self?._startCheckExpire()
+                    self?._subscribeAll()
+                    self?._getAllPKInvitationList(room: nil) { error, list in
                     }
+                    self?.roomList?.append(room)
                     completion(nil, output)
                 }
             } fail: { error in
@@ -283,29 +274,39 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     return
                 }
                 self?.roomId = channelName
-                NetworkManager.shared.generateTokens(channelName: channelName,
-                                                     uid: "\(UserInfo.userId)",
-                                                     tokenGeneratorType: .token007,
-                                                     tokenTypes: [.rtc]) { tokenMap in
-                    guard let self = self,
-                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue]
-                    else {
-                        agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
+                self?.checkTokenExists { success in
+                    guard success else {
+                        completion(NSError(domain: "error", code: -1, userInfo: nil), nil)
                         return
                     }
-                    var map = AppContext.shared.rtcTokenMap ?? [String: String]()
-                    map[channelName] = rtcToken
-                    AppContext.shared.rtcTokenMap = map
                     let output = ShowRoomDetailModel.yy_model(with: params!)
-                    completion(nil, output)
-                    self._startCheckExpire()
-                    self._subscribeAll()
-//                    self._addUserIfNeed()
-                    self._getAllPKInvitationList(room: nil) { error, list in
+                    self?._startCheckExpire()
+                    self?._subscribeAll()
+                    self?._getAllPKInvitationList(room: nil) { error, list in
                     }
+                    completion(nil, output)
                 }
             } fail: { error in
                 completion(error.toNSError(), nil)
+            }
+        }
+    }
+    
+    private func checkTokenExists(complete: @escaping(Bool) -> Void) {
+        if (AppContext.shared.rtcToken != nil) {
+            complete(true)
+        } else {
+            NetworkManager.shared.generateTokens(channelName: "",
+                                                 uid: "\(UserInfo.userId)",
+                                                 tokenGeneratorType: .token007,
+                                                 tokenTypes: [.rtc]) { tokenMap in
+                guard let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue] else {
+                    agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
+                    complete(false)
+                    return
+                }
+                AppContext.shared.rtcToken = rtcToken
+                complete(true)
             }
         }
     }
@@ -1802,18 +1803,6 @@ extension ShowSyncManagerServiceImp {
 }
 
 
-private let robotRoomIds = ["1", "2", "3"]
-private let robotRoomOwnerHeaders = [
-    "https://download.agora.io/demo/release/bot1.png"
-]
-private let robotStreamURL = [
-    "https://download.agora.io/sdk/release/agora_test_video_10.mp4",
-    "https://download.agora.io/sdk/release/agora_test_video_11.mp4",
-    "https://download.agora.io/sdk/release/agora_test_video_12.mp4",
-]
-
-private let kRobotRoomStartId = 2023000
-private let kRobotUid = 2000000001
 class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
     deinit {
         agoraPrint("deinit-- ShowRobotSyncManagerServiceImp")
@@ -1852,32 +1841,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
                 var dataArray = results.map({ info in
                     return ShowRoomListModel.yy_model(with: info.toJson()!.toDictionary())!
                 })
-                
-                var robotIds = robotRoomIds
-                dataArray.forEach { room in
-                    let roomId = (Int(room.roomId) ?? 0) - kRobotRoomStartId
-                    guard roomId > 0, let idx = robotIds.firstIndex(of: "\(roomId)") else{
-                        return
-                    }
-                    robotIds.remove(at: idx)
-                }
-                
-                //create fake room
-                robotIds.forEach { robotId in
-                    let room = ShowRoomListModel()
-                    let robotId = Int(robotId) ?? 1
-                    let userId = "\(kRobotUid)"
-                    room.roomName = "Smooth \(robotId)"
-                    room.roomId = "\(robotId + kRobotRoomStartId)"
-                    room.thumbnailId = "1"
-                    room.ownerId = userId
-                    room.ownerName = userId
-                    room.ownerAvatar = robotRoomOwnerHeaders[(robotId - 1) % robotRoomOwnerHeaders.count]//VLUserCenter.user.headUrl
-                    room.createdAt = Date().millionsecondSince1970()
-                    dataArray.append(room)
-                }
-                
-//                let roomList = dataArray.sorted(by: { ($0.updatedAt > 0 ? $0.updatedAt : $0.createdAt) > ($1.updatedAt > 0 ? $1.updatedAt : $1.createdAt) })
+                dataArray = ShowRobotService.shared.generateRobotRoomsAppend(rooms: dataArray)
                 let roomList = dataArray.sorted(by: { $0.createdAt > $1.createdAt })
                 completion(nil, roomList)
             } fail: { error in
@@ -1891,37 +1855,15 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
                                    thumbnailId: String,
                                    completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
         super.createRoom(roomName: roomName, roomId: roomId, thumbnailId: thumbnailId, completion: completion)
-        
-        startCloudPlayer(roomId: roomId, robotUid: UInt(kRobotUid))
     }
     
     @objc override func joinRoom(room: ShowRoomListModel,
                         completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
         super.joinRoom(room: room, completion: completion)
-        
-        startCloudPlayer(roomId: room.roomId, robotUid: UInt(room.ownerId) ?? 0)
     }
     
     override func createMicSeatApply(completion: @escaping (NSError?) -> Void) {
         completion(ShowError.userCannotAccept.toNSError())
-    }
-    
-    
-    //MARK: private
-    private func startCloudPlayer(roomId: String?, robotUid: UInt) {
-        guard let roomId = roomId, roomId.count == 7 else {
-            return
-        }
-        let channelName = roomId
-        let idx = ((Int(channelName) ?? 1) - kRobotRoomStartId - 1) % robotStreamURL.count
-        agoraPrint("startCloudPlayer: \(roomId) /\(robotUid)")
-        NetworkManager.shared.startCloudPlayer(channelName: channelName,
-                                               uid: VLUserCenter.user.id,
-                                               robotUid: UInt(kRobotUid),
-                                               streamUrl: robotStreamURL[idx]) { msg in
-            guard let msg = msg else {return}
-            agoraPrint("startCloudPlayer fail \(channelName) \(msg)")
-        }
     }
     
 }

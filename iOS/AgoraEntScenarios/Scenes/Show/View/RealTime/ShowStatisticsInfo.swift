@@ -184,7 +184,7 @@ struct ShowStatisticsInfo {
 
         let fps = "接收帧率".show_localized+": \(fps) fps"
         let vSendLoss = "下行丢包率".show_localized+": \(info.videoStats.packetLossRate) %"
-        let lastmile = "延迟".show_localized+": \(info.audioStats.networkTransportDelay) ms"
+        let lastmile = "延迟".show_localized+": \(info.videoStats.delay) ms"
         
         let audioRecv = "ARecv: \(info.audioStats.receivedBitrate) kbps"
         let audioLoss = "ALoss: \(info.audioStats.audioLossRate) %"

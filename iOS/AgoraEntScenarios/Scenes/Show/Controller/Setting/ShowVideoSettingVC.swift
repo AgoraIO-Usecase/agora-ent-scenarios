@@ -64,7 +64,6 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let data = dataArray[indexPath.row]
-        var cell: UITableViewCell!
         if data.type == .aSwitch {
             let cell = tableView.dequeueReusableCell(withIdentifier: SwitchCellID, for: indexPath) as! ShowSettingSwitchCell
             var enable = true
@@ -84,19 +83,7 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
                 self?.changeValue(index, forSettingKey: data)
             }
             return cell
-        }else if data.type == .slider {
-            let cell = tableView.dequeueReusableCell(withIdentifier: SliderCellID, for: indexPath) as! ShowSettingSliderCell
-            
-            if data == .videoBitRate {
-                cell.setTitle(data.title, value: data.floatValue, minValue: data.sliderValueScope.0, maxValue: data.sliderValueScope.1) {value in
-                    
-                } sliderValueChangedAction: {[weak self] value in
-                    self?.changeValue(value, forSettingKey: data)
-                }
-                cell.setEnabled(isEnabled: !ShowSettingKey.videoBitRateOn.boolValue)
-            }
-            return cell
-        }else if data.type == .label {
+        } else if data.type == .label {
             let cell = tableView.dequeueReusableCell(withIdentifier: LabelCellID, for: indexPath) as! ShowSettingLabelCell
             let index = data.intValue % data.items.count
             let value = data.items[index]
@@ -119,10 +106,27 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
             }
 
             return cell
-        }else {
-            cell = UITableViewCell()
+        } else {
+            if data == .videoBitRate {
+                let cell = tableView.dequeueReusableCell(withIdentifier: SliderCellID, for: indexPath) as! ShowSettingSliderCell
+                cell.setTitle(data.title, value: data.floatValue, minValue: data.sliderValueScope.0, maxValue: data.sliderValueScope.1) {value in
+                    
+                } sliderValueChangedAction: {[weak self] value in
+                    self?.changeValue(value, forSettingKey: data)
+                }
+                return cell
+            }
         }
-        return cell
+        return UITableViewCell()
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let data = dataArray[indexPath.row]
+        if data == .videoBitRate {
+            return 100
+        } else {
+            return 48
+        }
     }
 }
 

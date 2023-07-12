@@ -151,7 +151,6 @@ enum ShowSettingKey: String, CaseIterable {
     case videoEncodeSize       // 视频编码分辨率
     case FPS                    // 帧率
     case H265                   // h265
-    case videoBitRateOn         // 视频码率开关
     case videoBitRate           // 视频码率
     case earmonitoring          // 耳返
     case recordingSignalVolume  // 人声音量
@@ -179,8 +178,6 @@ enum ShowSettingKey: String, CaseIterable {
             return "show_advance_setting_videoCaptureSize_title".show_localized
         case .FPS:
             return "show_advance_setting_FPS_title".show_localized
-        case .videoBitRateOn:
-            return "show_advance_setting_bitRate_on_title".show_localized
         case .videoBitRate:
             return "show_advance_setting_bitRate_title".show_localized
         case .H265:
@@ -220,8 +217,6 @@ enum ShowSettingKey: String, CaseIterable {
         case .FPS:
             return .label
         case .H265:
-            return .aSwitch
-        case .videoBitRateOn:
             return .aSwitch
         case .videoBitRate:
             return .slider

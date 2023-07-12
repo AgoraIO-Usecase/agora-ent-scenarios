@@ -36,9 +36,16 @@ class ShowRoomListVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setUpUI()
-        setUpNaviBar()
+        createViews()
 //        addRefresh()
+        ShowRobotService.shared.startCloudPlayers()
+        preGenerateToken()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        getRoomList()
     }
     
     @objc private func didClickSettingButton(){
@@ -53,54 +60,6 @@ class ShowRoomListVC: UIViewController {
                 }
                 self?.needUpdateAudiencePresetType = true
             }
-        }
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        getRoomList()
-    }
-    
-    private func setUpUI(){
-        // 背景图
-        let bgView = UIImageView()
-        bgView.image = UIImage.show_sceneImage(name: "show_list_Bg")
-        view.addSubview(bgView)
-        bgView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        
-        roomListView = ShowRoomListView()
-        roomListView.clickCreateButtonAction = { [weak self] in
-            self?.createRoom()
-        }
-        roomListView.joinRoomAction = { [weak self] room in
-            guard let wSelf = self else { return }
-            let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
-            let audencePresetType = ShowPresetType(rawValue: value)
-            // 如果是owner是自己 或者已经设置过观众模式
-            if AppContext.shared.isDebugMode == false {
-                if room.ownerId == VLUserCenter.user.id || audencePresetType != .unknown {
-                    wSelf.joinRoom(room)
-                }else{
-                    wSelf.showPresettingVC { [weak self] type in
-                        self?.needUpdateAudiencePresetType = true
-                        UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
-                        self?.joinRoom(room)
-                    }
-                }
-            }else {
-                wSelf.joinRoom(room)
-            }
-        }
-        roomListView.refreshValueChanged = { [weak self] in
-            self?.getRoomList()
-        }
-        
-        view.addSubview(roomListView)
-        roomListView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
         }
     }
     
@@ -120,14 +79,6 @@ class ShowRoomListVC: UIViewController {
 //        let audencePresetType = ShowPresetType(rawValue: value)
 //        vc.selectedType = audencePresetType
         present(vc, animated: true)
-    }
-    
-    private func setUpNaviBar() {
-        navigationController?.isNavigationBarHidden = true
-        naviBar.title = "navi_title_show_live".show_localized
-        view.addSubview(naviBar)
-        let saveButtonItem = ShowBarButtonItem(title: "room_list_audience_setting".show_localized, target: self, action: #selector(didClickSettingButton))
-        naviBar.rightItems = [saveButtonItem]
     }
     
     // 创建房间
@@ -178,5 +129,68 @@ class ShowRoomListVC: UIViewController {
             self.roomList = list
         }
     }
+    
+    // 预先获取万能token
+    private func preGenerateToken() {
+        AppContext.shared.rtcToken = nil
+        NetworkManager.shared.generateTokens(channelName: "",
+                                             uid: "\(UserInfo.userId)",
+                                             tokenGeneratorType: .token007,
+                                             tokenTypes: [.rtc]) { tokenMap in
+            guard let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue] else {
+                return
+            }
+            AppContext.shared.rtcToken = rtcToken
+        }
+    }
+    
+    private func createViews(){
+        // 背景图
+        let bgView = UIImageView()
+        bgView.image = UIImage.show_sceneImage(name: "show_list_Bg")
+        view.addSubview(bgView)
+        bgView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        roomListView = ShowRoomListView()
+        roomListView.clickCreateButtonAction = { [weak self] in
+            self?.createRoom()
+        }
+        roomListView.joinRoomAction = { [weak self] room in
+            guard let wSelf = self else { return }
+            let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
+            let audencePresetType = ShowPresetType(rawValue: value)
+            // 如果是owner是自己 或者已经设置过观众模式
+            if AppContext.shared.isDebugMode == false {
+                if room.ownerId == VLUserCenter.user.id || audencePresetType != .unknown {
+                    wSelf.joinRoom(room)
+                }else{
+                    wSelf.showPresettingVC { [weak self] type in
+                        self?.needUpdateAudiencePresetType = true
+                        UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
+                        self?.joinRoom(room)
+                    }
+                }
+            }else {
+                wSelf.joinRoom(room)
+            }
+        }
+        roomListView.refreshValueChanged = { [weak self] in
+            self?.getRoomList()
+        }
+        
+        view.addSubview(roomListView)
+        roomListView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        navigationController?.isNavigationBarHidden = true
+        naviBar.title = "navi_title_show_live".show_localized
+        view.addSubview(naviBar)
+        let saveButtonItem = ShowBarButtonItem(title: "room_list_audience_setting".show_localized, target: self, action: #selector(didClickSettingButton))
+        naviBar.rightItems = [saveButtonItem]
+    }
+    
 }
 

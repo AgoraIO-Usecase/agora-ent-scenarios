@@ -973,7 +973,9 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
         showLogger.warning("tokenPrivilegeWillExpire: \(roomId)",
                            context: kShowLogBaseContext)
-        agoraKitManager.renewToken(origToken: token)
+        if let channelId = currentChannelId {
+            agoraKitManager.renewToken(channelId: channelId)
+        }
     }
 }
 
