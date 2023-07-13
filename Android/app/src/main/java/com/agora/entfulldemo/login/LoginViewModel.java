@@ -3,6 +3,8 @@ package com.agora.entfulldemo.login;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.agora.entfulldemo.R;
+
 import io.agora.scene.base.Constant;
 import io.agora.scene.base.api.ApiException;
 import io.agora.scene.base.api.ApiManager;
@@ -26,7 +28,7 @@ public class LoginViewModel extends BaseRequestViewModel {
     public void requestLogin(String account, String vCode) {
         if (!account.equals(phone)) {
             getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL, null);
-            ToastUtils.showToast("验证码错误");
+            ToastUtils.showToast(R.string.app_vcode_wrong_tip);
             return;
         }
         ApiManager.getInstance().requestLogin(account, vCode)
@@ -39,7 +41,7 @@ public class LoginViewModel extends BaseRequestViewModel {
 
                     @Override
                     public void onSuccess(BaseResponse<User> data) {
-                        ToastUtils.showToast("登录成功");
+                        ToastUtils.showToast(R.string.app_login_success_tip);
                         ApiManager.token = (data.getData().token);
                         UserManager.getInstance().saveUserInfo(data.getData());
                         getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS, null);
@@ -72,7 +74,7 @@ public class LoginViewModel extends BaseRequestViewModel {
 
                     @Override
                     public void onSuccess(BaseResponse<String> stringBaseResponse) {
-                        ToastUtils.showToast("验证码发送成功");
+                        ToastUtils.showToast(R.string.app_vcode_send_success_tip);
                         getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_CODE_SUCCESS, null);
                     }
 
