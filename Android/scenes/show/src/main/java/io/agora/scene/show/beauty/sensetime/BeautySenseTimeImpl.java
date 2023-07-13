@@ -78,7 +78,11 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
 
     public BeautySenseTimeImpl(Context context) {
         mContext = context.getApplicationContext();
-        initST();
+        if (!sdkIsInit) {
+            mSTRenderer = new STRenderKit(mContext, null);
+            sdkIsInit = true;
+            restore();
+        }
     }
 
     @Override
@@ -94,26 +98,11 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
             innerSenseTimeApi.release();
             innerSenseTimeApi = null;
         }
-        unInitST();
-        isReleased = true;
-        sdkIsInit = false;
-    }
-
-    private void initST() {
         if (sdkIsInit) {
-            return;
+            mSTRenderer.release();
+            sdkIsInit = false;
         }
-        mSTRenderer = new STRenderKit(mContext, null);
-        sdkIsInit = true;
-        restore();
-    }
-
-    private void unInitST() {
-        if (!sdkIsInit) {
-            return;
-        }
-        mSTRenderer.release();
-        sdkIsInit = false;
+        isReleased = true;
     }
 
     @Override
