@@ -11,7 +11,7 @@
 #import "VLAudienceIndicator.h"
 #import "VLKTVMVIdleView.h"
 #import "VLOnLineListVC.h"
-
+#import "KTVDebugInfo.h"
 #import "VLKTVSettingView.h"
 //model
 #import "VLSongItmModel.h"
@@ -511,6 +511,10 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 - (void)didDumpModeChanged:(BOOL)enable {
     self.isDumpMode = enable;
+    NSString* key = @"dump enable";
+    BOOL status = ![KTVDebugInfo getSelectedStatusForKey:key];
+    [KTVDebugInfo setSelectedStatus:status forKey:key];
+    [KTVDebugManager reLoadParamAll];
 }
 
 -(void)didParamsSetWith:(NSString *)key value:(NSString *)value{
