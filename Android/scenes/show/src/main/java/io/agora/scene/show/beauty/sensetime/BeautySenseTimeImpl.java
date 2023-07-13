@@ -90,11 +90,11 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
     @Override
     public void release() {
         super.release();
-        unInitST();
         if (innerSenseTimeApi != null) {
             innerSenseTimeApi.release();
             innerSenseTimeApi = null;
         }
+        unInitST();
         isReleased = true;
         sdkIsInit = false;
     }
