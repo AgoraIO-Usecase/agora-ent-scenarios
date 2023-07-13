@@ -588,6 +588,8 @@
 		E36B41C52A2453610034FACF /* VLVoiceShowView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36B41C32A2453610034FACF /* VLVoiceShowView.m */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
 		E3735C342A5E4AFF004737EF /* UITextView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */; };
+		E3735CB92A5FD881004737EF /* KTVApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CB72A5FD881004737EF /* KTVApiImpl.swift */; };
+		E3735CBA2A5FD881004737EF /* KTVApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CB82A5FD881004737EF /* KTVApi.swift */; };
 		E3BA36DA2A2DC17D00ACD073 /* HeadSetManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E3BA36D92A2DC17D00ACD073 /* HeadSetManager.m */; };
 		E3BA36DD2A2DCD8400ACD073 /* VLEarSettingView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3BA36DC2A2DCD8400ACD073 /* VLEarSettingView.m */; };
 		E3C82AD12A28A8E600728550 /* EffectCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E3C82AD02A28A8E600728550 /* EffectCollectionViewCell.m */; };
@@ -1363,6 +1365,8 @@
 		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
 		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
 		E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Extension.swift"; sourceTree = "<group>"; };
+		E3735CB72A5FD881004737EF /* KTVApiImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApiImpl.swift; sourceTree = "<group>"; };
+		E3735CB82A5FD881004737EF /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
 		E3BA36D82A2DC17D00ACD073 /* HeadSetManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HeadSetManager.h; sourceTree = "<group>"; };
 		E3BA36D92A2DC17D00ACD073 /* HeadSetManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HeadSetManager.m; sourceTree = "<group>"; };
 		E3BA36DB2A2DCD8400ACD073 /* VLEarSettingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLEarSettingView.h; sourceTree = "<group>"; };
@@ -3326,6 +3330,8 @@
 		E357354929EFD74A009D54E1 /* KTVAPI */ = {
 			isa = PBXGroup;
 			children = (
+				E3735CB82A5FD881004737EF /* KTVApi.swift */,
+				E3735CB72A5FD881004737EF /* KTVApiImpl.swift */,
 			);
 			path = KTVAPI;
 			sourceTree = "<group>";
@@ -3857,6 +3863,7 @@
 				DD619A8729E3E247008F63E4 /* SAServiceModel.swift in Sources */,
 				DD9E545C2994FFF2007CB3C0 /* VLKTVRemoteVolumeView.m in Sources */,
 				DD619A6D29E3E247008F63E4 /* SAPageContainer.swift in Sources */,
+				E3735CBA2A5FD881004737EF /* KTVApi.swift in Sources */,
 				DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */,
 				DD0292C9295BF0DC00485225 /* VLKTVSelBgModel.m in Sources */,
 				DD619AB329E3E247008F63E4 /* SAConfirmView.swift in Sources */,
@@ -4041,6 +4048,7 @@
 				DD619A6629E3E247008F63E4 /* SABusinessApi.swift in Sources */,
 				DD3610C429B70CDC00CE7984 /* ShowApplyView.swift in Sources */,
 				DD3610C329B70CDC00CE7984 /* ShowApplyAndInviteView.swift in Sources */,
+				E3735CB92A5FD881004737EF /* KTVApiImpl.swift in Sources */,
 				DD36107829B70CDC00CE7984 /* BundleUtil.m in Sources */,
 				DDA19A0A28FFE579009D3E61 /* Screen.swift in Sources */,
 				DD84178329090C520026B624 /* VLAmusementTCell.m in Sources */,

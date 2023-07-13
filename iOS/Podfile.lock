@@ -17,7 +17,7 @@ PODS:
   - Agora-Scene-Utils (1.1.0)
   - Agora_Chat_iOS (1.0.8)
   - AgoraLyricsScore (1.1.1-beta-3)
-  - AgoraRtcEngine_Special_iOS (4.1.1.142)
+  - AgoraRtcEngine_iOS (1.0)
   - AgoraRtm_iOS (1.5.1)
   - AgoraSyncManager (2.0.8):
     - SocketRocket
@@ -25,8 +25,6 @@ PODS:
   - HWWeakTimer (1.0)
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
-  - KTVApi (1.0.0.5):
-    - AgoraRtcEngine_Special_iOS (= 4.1.1.142)
   - LEEAlert (1.6.4)
   - LSTPopView (0.3.10):
     - LSTPopView/Code (= 0.3.10)
@@ -69,13 +67,13 @@ DEPENDENCIES:
   - Agora-Scene-Utils (= 1.1.0)
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraLyricsScore (= 1.1.1-beta-3)
+  - AgoraRtcEngine_iOS (from `./libs`)
   - AgoraRtm_iOS (= 1.5.1)
   - AgoraSyncManager (= 2.0.8)
   - Bugly (= 2.5.93)
   - HWWeakTimer (= 1.0)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
-  - KTVApi (= 1.0.0.5)
   - LEEAlert (= 1.6.4)
   - LSTPopView (= 0.3.10)
   - Masonry (= 1.1.0)
@@ -101,14 +99,12 @@ SPEC REPOS:
     - Agora-Scene-Utils
     - Agora_Chat_iOS
     - AgoraLyricsScore
-    - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS
     - AgoraSyncManager
     - Bugly
     - HWWeakTimer
     - JXCategoryView
     - KakaJSON
-    - KTVApi
     - LEEAlert
     - LSTPopView
     - LSTTimer
@@ -130,6 +126,8 @@ SPEC REPOS:
     - ZSwiftBaseLib
 
 EXTERNAL SOURCES:
+  AgoraRtcEngine_iOS:
+    :path: "./libs"
   SenseLib:
     :path: sense.podspec
 
@@ -138,14 +136,13 @@ SPEC CHECKSUMS:
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
-  AgoraRtcEngine_Special_iOS: 6414e3cbb92076e18ca68364d1c9e6ae5174d381
+  AgoraRtcEngine_iOS: 7af3b344c55059556eeb05dc748ff124c593d4fb
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   AgoraSyncManager: 33b8ecf2cd80550f156612d6175a0b0ed1d48497
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
-  KTVApi: 32f3beee205b3eaa81f20da54c9fcb7160cb8730
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
@@ -167,6 +164,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 2f791a7b253517231c3bd4647f98252af79a46bc
+PODFILE CHECKSUM: f7280aab88cee3450a24edaef83a94a894761f6e
 
 COCOAPODS: 1.12.1
