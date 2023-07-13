@@ -42,7 +42,6 @@
 @import AgoraLyricsScore;
 @import YYCategories;
 @import SDWebImage;
-@import KTVApi;
 
 NSInteger ktvApiStreamId = -1;
 NSInteger ktvStreamId = -1;
@@ -2064,10 +2063,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setTrackMode:(KTVPlayerTrackMode)trackMode {
     KTVLogInfo(@"setTrackMode: %ld", trackMode);
     _trackMode = trackMode;
-    [[self.ktvApi getMediaPlayer] selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1];
+//    [[self.ktvApi getMediaPlayer] selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1];
 //
     [self.MVView setOriginBtnState: trackMode == KTVPlayerTrackModeOrigin ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc];
- //   [[self.ktvApi getMediaPlayer] selectMultiAudioTrack:trackMode == KTVPlayerTrackModeAcc ? 1 : 0 publishTrackIndex:trackMode == KTVPlayerTrackModeOrigin ? 0 : 1 ];
+    [[self.ktvApi getMediaPlayer] selectMultiAudioTrack:trackMode == KTVPlayerTrackModeAcc ? 1 : 0 publishTrackIndex:trackMode == KTVPlayerTrackModeOrigin ? 0 : 1 ];
     VLKTVMVViewActionType type = VLKTVMVViewActionTypeSingAcc;
     switch (trackMode) {
         case KTVPlayerTrackModeOrigin:

@@ -52,6 +52,7 @@ private func agoraPrint(_ message: String) {
     private var loadSongState: KTVLoadSongState = .idle
     private var lastNtpTime: Int = 0
     private var startHighTime: Int = 0
+    private var isRelease: Bool = false
     private var playerState: AgoraMediaPlayerState = .idle {
         didSet {
             agoraPrint("playerState did changed: \(oldValue.rawValue)->\(playerState.rawValue)")
@@ -205,6 +206,7 @@ extension KTVApiImpl: KTVApiDelegate {
     }
 
     func cleanCache() {
+        isRelease = true
         musicPlayer?.stop()
         freeTimer()
         agoraPrint("cleanCache")
@@ -687,7 +689,7 @@ extension KTVApiImpl {
             agoraPrint("startSing failed: canceled")
             return
         }
-       // musicPlayer?.setPlayerOption("enable_multi_audio_track", value: 1)
+        musicPlayer?.setPlayerOption("enable_multi_audio_track", value: 1)
         apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
         let ret = musicPlayer?.openMedia(songCode: songCode, startPos: startPos)
         agoraPrint("startSing->openMedia(\(songCode) fail: \(ret ?? -1)")
@@ -1223,7 +1225,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
     
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         agoraPrint("agoraRtcMediaPlayer didChangedToState: \(state.rawValue) \(self.songCode)")
-
+        if isRelease {return}
         if state == .openCompleted {
             self.localPlayerPosition = Date().milListamp
             print("localPlayerPosition:playerKit:openCompleted \(localPlayerPosition)")
