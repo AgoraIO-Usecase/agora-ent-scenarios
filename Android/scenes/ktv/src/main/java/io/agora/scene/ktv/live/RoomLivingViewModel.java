@@ -233,6 +233,10 @@ public class RoomLivingViewModel extends ViewModel {
         return false;
     }
 
+    public String getSDKBuildNum() {
+        return RtcEngineEx.getSdkVersion();
+    }
+
     // ======================= 断网重连相关 =======================
 
     public void initReConnectEvent() {
