@@ -30,7 +30,6 @@ import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION
-import io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE
 import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.component.AgoraApplication
@@ -887,7 +886,7 @@ class LiveDetailFragment : Fragment() {
         mLinkInvitationCountDownLatch = object : CountDownTimer(15 * 1000 - 1, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 dialog.getButton(DialogInterface.BUTTON_NEGATIVE).text =
-                    "取消(" + millisUntilFinished / 1000 + "s)"
+                    "${getString(R.string.show_setting_cancel)}(" + millisUntilFinished / 1000 + "s)"
             }
 
             override fun onFinish() {

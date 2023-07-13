@@ -126,9 +126,14 @@
     <string name="show_link_is_stopped">连麦已断开哦</string>
     <string name="show_interacting">互动中</string>
     <string name="show_tip1">主播正忙，已拒绝你的邀请</string>
+    <string name="show_to_the_audience">对观众%s</string>
+    <string name="show_link_to">与观众 %s 连麦中</string>
+    <string name="show_get_in_line">待上麦队列</string>
+
 
 
     <!-- pk   -->
+    <string name="show_pk_to">与主播 %s PK中</string>
     <string name="show_pking_request_message">PK邀请</string>
     <string name="show_online_boardcaster">在线主播</string>
     <string name="show_pking">正在pk</string>
