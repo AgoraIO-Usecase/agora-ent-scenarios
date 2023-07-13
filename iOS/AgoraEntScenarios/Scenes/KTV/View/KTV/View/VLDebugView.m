@@ -138,7 +138,6 @@
 }
 
 -(void)dumpModeChange:(UISwitch *)swich{
-    [KTVDebugInfo setSelectedStatus:swich.isOn forKey:@"dump enable"];
     if([_delegate respondsToSelector:@selector(didDumpModeChanged:)]){
         [self.delegate didDumpModeChanged:swich.isOn];
     }
