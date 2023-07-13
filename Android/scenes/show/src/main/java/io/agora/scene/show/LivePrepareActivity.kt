@@ -15,7 +15,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import io.agora.beauty.sensetime.*
+import io.agora.beautyapi.sensetime.*
 import io.agora.rtc2.Constants
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.scene.base.component.AgoraApplication
