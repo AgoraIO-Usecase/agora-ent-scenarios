@@ -15,7 +15,6 @@
 #import "VLKTVSettingView.h"
 //model
 #import "VLSongItmModel.h"
-#import "VLRoomSeatModel.h"
 #import "VLKTVSelBgModel.h"
 #import "UIViewController+VL.h"
 #import "VLPopScoreView.h"
@@ -226,13 +225,13 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             
             if (status == KTVSubscribeCreated || status == KTVSubscribeUpdated) {
                 //上麦消息 / 是否打开视频 / 是否静音
-                [model resetWithInfo:seatModel];
+                [model resetWith:seatModel];
                 [weakSelf setSeatsArray:weakSelf.seatsArray];
             } else if (status == KTVSubscribeDeleted) {
                 // 下麦消息
                 
                 // 下麦重置占位模型
-                [model resetWithInfo:nil];
+                [model resetWith:nil];
                 [weakSelf setSeatsArray:weakSelf.seatsArray];
             }
             

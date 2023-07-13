@@ -7,7 +7,6 @@
 #import <AgoraRtcKit/AgoraRtcKit.h>
 #import "VLCreateRoomView.h"
 #import "VLKTVViewController.h"
-#import "VLRoomSeatModel.h"
 #import "VLAddRoomModel.h"
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"

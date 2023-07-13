@@ -5,7 +5,6 @@
 
 #import "VLMicSeatList.h"
 #import "VLMicSeatCell.h"
-#import "VLRoomSeatModel.h"
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"
 #import "AESMacro.h"

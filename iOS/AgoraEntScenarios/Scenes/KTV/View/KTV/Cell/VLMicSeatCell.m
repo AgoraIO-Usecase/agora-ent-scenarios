@@ -4,7 +4,6 @@
 //
 
 #import "VLMicSeatCell.h"
-#import "VLRoomSeatModel.h"
 #import "VLMacroDefine.h"
 #import "AgoraEntScenarios-Swift.h"
 #import "AESMacro.h"
