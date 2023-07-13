@@ -6,7 +6,6 @@
 #import "VLSelectSongTableItemView.h"
 #import "VLSelectedSongListCell.h"
 #import "VLSongItmModel.h"
-#import "VLRoomSelSongModel.h"
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
 #import "VLUserCenter.h"
@@ -208,7 +207,7 @@ UITableViewDelegate
 //    inputModel.songUrl = model.songUrl;
     inputModel.imageUrl = model.imageUrl;
     inputModel.singer = model.singer;
-    [[AppContext ktvServiceImp] chooseSongWithInput:inputModel
+    [[AppContext ktvServiceImp] chooseSongWith:inputModel
                                          completion:^(NSError * error) {
         if (error != nil) {
             [self dianGeFailedWithModel:model];

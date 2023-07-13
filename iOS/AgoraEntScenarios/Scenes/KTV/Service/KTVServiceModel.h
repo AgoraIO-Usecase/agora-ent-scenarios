@@ -7,7 +7,6 @@
 
 #import <Foundation/Foundation.h>
 #import "VLRoomSeatModel.h"
-#import "VLRoomSelSongModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -4,7 +4,6 @@
 //
 
 #import "VLKTVTopView.h"
-#import "VLRoomListModel.h"
 #import "VLHotSpotBtn.h"
 #import "AESMacro.h"
 

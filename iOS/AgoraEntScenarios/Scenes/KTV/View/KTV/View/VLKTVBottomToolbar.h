@@ -6,7 +6,6 @@
 #import <UIKit/UIKit.h>
 #import "VLRoomSeatModel.h"
 #import "VLHotSpotBtn.h"
-#import "KTVServiceProtocol.h"
 
 typedef enum : NSUInteger {
     VLKTVBottomBtnClickTypeAudio = 0,       // 声音

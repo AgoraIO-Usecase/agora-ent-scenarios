@@ -13,10 +13,8 @@
 		DD0292C3295BF0DC00485225 /* VLAddRoomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD02924B295BF0DC00485225 /* VLAddRoomModel.m */; };
 		DD0292C4295BF0DC00485225 /* VLRoomSeatModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD02924E295BF0DC00485225 /* VLRoomSeatModel.m */; };
 		DD0292C5295BF0DC00485225 /* VLSongItmModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD02924F295BF0DC00485225 /* VLSongItmModel.m */; };
-		DD0292C7295BF0DC00485225 /* VLRoomListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029257295BF0DC00485225 /* VLRoomListModel.m */; };
 		DD0292C8295BF0DC00485225 /* VLBelcantoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029258295BF0DC00485225 /* VLBelcantoModel.m */; };
 		DD0292C9295BF0DC00485225 /* VLKTVSelBgModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029259295BF0DC00485225 /* VLKTVSelBgModel.m */; };
-		DD0292CA295BF0DC00485225 /* VLRoomSelSongModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD02925A295BF0DC00485225 /* VLRoomSelSongModel.m */; };
 		DD0292CB295BF0DC00485225 /* VLSongListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029260295BF0DC00485225 /* VLSongListCell.m */; };
 		DD0292CC295BF0DC00485225 /* VLSelectedSongListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029263295BF0DC00485225 /* VLSelectedSongListCell.m */; };
 		DD0292CD295BF0DC00485225 /* VLMicSeatCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029265295BF0DC00485225 /* VLMicSeatCell.m */; };
@@ -591,6 +589,10 @@
 		E3735CAA2A5E80FC004737EF /* KTVApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CA82A5E80FC004737EF /* KTVApiImpl.swift */; };
 		E3735CAB2A5E80FC004737EF /* KTVApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CA92A5E80FC004737EF /* KTVApi.swift */; };
 		E3735CAE2A5E8DDD004737EF /* KTVSkipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CAD2A5E8DDD004737EF /* KTVSkipView.swift */; };
+		E3735CB02A5FA3B3004737EF /* VLRoomSelSongModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CAF2A5FA3B3004737EF /* VLRoomSelSongModel.swift */; };
+		E3735CB22A5FA5E0004737EF /* KTVServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CB12A5FA5E0004737EF /* KTVServiceProtocol.swift */; };
+		E3735CB42A5FA785004737EF /* VLRoomListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CB32A5FA785004737EF /* VLRoomListModel.swift */; };
+		E3735CB62A5FD659004737EF /* KTVServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CB52A5FD659004737EF /* KTVServiceModel.swift */; };
 		E751D85D29F11723001354CA /* AUiMoreDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E751D85C29F11723001354CA /* AUiMoreDialog.swift */; };
 /* End PBXBuildFile section */
 
@@ -617,18 +619,14 @@
 		563C78B601810D421A3F783A /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
 		DD029248295BF0DC00485225 /* KTVLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLog.swift; sourceTree = "<group>"; };
 		DD02924B295BF0DC00485225 /* VLAddRoomModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAddRoomModel.m; sourceTree = "<group>"; };
-		DD02924D295BF0DC00485225 /* VLRoomListModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLRoomListModel.h; sourceTree = "<group>"; };
 		DD02924E295BF0DC00485225 /* VLRoomSeatModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLRoomSeatModel.m; sourceTree = "<group>"; };
 		DD02924F295BF0DC00485225 /* VLSongItmModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSongItmModel.m; sourceTree = "<group>"; };
 		DD029251295BF0DC00485225 /* VLKTVSelBgModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVSelBgModel.h; sourceTree = "<group>"; };
 		DD029252295BF0DC00485225 /* VLBelcantoModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLBelcantoModel.h; sourceTree = "<group>"; };
-		DD029253295BF0DC00485225 /* VLRoomSelSongModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLRoomSelSongModel.h; sourceTree = "<group>"; };
 		DD029255295BF0DC00485225 /* VLSongItmModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSongItmModel.h; sourceTree = "<group>"; };
 		DD029256295BF0DC00485225 /* VLRoomSeatModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLRoomSeatModel.h; sourceTree = "<group>"; };
-		DD029257295BF0DC00485225 /* VLRoomListModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLRoomListModel.m; sourceTree = "<group>"; };
 		DD029258295BF0DC00485225 /* VLBelcantoModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLBelcantoModel.m; sourceTree = "<group>"; };
 		DD029259295BF0DC00485225 /* VLKTVSelBgModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLKTVSelBgModel.m; sourceTree = "<group>"; };
-		DD02925A295BF0DC00485225 /* VLRoomSelSongModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLRoomSelSongModel.m; sourceTree = "<group>"; };
 		DD02925B295BF0DC00485225 /* VLAddRoomModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLAddRoomModel.h; sourceTree = "<group>"; };
 		DD02925D295BF0DC00485225 /* VLHomeOnLineListView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLHomeOnLineListView.h; sourceTree = "<group>"; };
 		DD029260295BF0DC00485225 /* VLSongListCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSongListCell.m; sourceTree = "<group>"; };
@@ -700,10 +698,8 @@
 		DD0292AC295BF0DC00485225 /* VLHomeOnLineListView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLHomeOnLineListView.m; sourceTree = "<group>"; };
 		DD0292AD295BF0DC00485225 /* VLHomeOnLineListCCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLHomeOnLineListCCell.h; sourceTree = "<group>"; };
 		DD0292AE295BF0DC00485225 /* VLCreateRoomView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCreateRoomView.h; sourceTree = "<group>"; };
-		DD0292B0295BF0DC00485225 /* KTVServiceModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KTVServiceModel.h; sourceTree = "<group>"; };
 		DD0292B1295BF0DC00485225 /* KTVSyncManagerServiceImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVSyncManagerServiceImp.swift; sourceTree = "<group>"; };
 		DD0292B2295BF0DC00485225 /* AppContext+KTV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "AppContext+KTV.m"; sourceTree = "<group>"; };
-		DD0292B3295BF0DC00485225 /* KTVServiceProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KTVServiceProtocol.h; sourceTree = "<group>"; };
 		DD0292B4295BF0DC00485225 /* KTVServiceModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KTVServiceModel.m; sourceTree = "<group>"; };
 		DD0292B5295BF0DC00485225 /* AppContext+KTV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AppContext+KTV.h"; sourceTree = "<group>"; };
 		DD0292BE295BF0DC00485225 /* VLCreateRoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCreateRoomViewController.h; sourceTree = "<group>"; };
@@ -1367,6 +1363,10 @@
 		E3735CA92A5E80FC004737EF /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
 		E3735CAC2A5E81B6004737EF /* AESMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AESMacro.h; sourceTree = "<group>"; };
 		E3735CAD2A5E8DDD004737EF /* KTVSkipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KTVSkipView.swift; sourceTree = "<group>"; };
+		E3735CAF2A5FA3B3004737EF /* VLRoomSelSongModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLRoomSelSongModel.swift; sourceTree = "<group>"; };
+		E3735CB12A5FA5E0004737EF /* KTVServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KTVServiceProtocol.swift; sourceTree = "<group>"; };
+		E3735CB32A5FA785004737EF /* VLRoomListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLRoomListModel.swift; sourceTree = "<group>"; };
+		E3735CB52A5FD659004737EF /* KTVServiceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KTVServiceModel.swift; sourceTree = "<group>"; };
 		E751D85C29F11723001354CA /* AUiMoreDialog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiMoreDialog.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -1459,18 +1459,16 @@
 		DD02924C295BF0DC00485225 /* KTV */ = {
 			isa = PBXGroup;
 			children = (
-				DD02924D295BF0DC00485225 /* VLRoomListModel.h */,
 				DD02924E295BF0DC00485225 /* VLRoomSeatModel.m */,
 				DD02924F295BF0DC00485225 /* VLSongItmModel.m */,
 				DD029251295BF0DC00485225 /* VLKTVSelBgModel.h */,
 				DD029252295BF0DC00485225 /* VLBelcantoModel.h */,
-				DD029253295BF0DC00485225 /* VLRoomSelSongModel.h */,
 				DD029255295BF0DC00485225 /* VLSongItmModel.h */,
 				DD029256295BF0DC00485225 /* VLRoomSeatModel.h */,
-				DD029257295BF0DC00485225 /* VLRoomListModel.m */,
 				DD029258295BF0DC00485225 /* VLBelcantoModel.m */,
 				DD029259295BF0DC00485225 /* VLKTVSelBgModel.m */,
-				DD02925A295BF0DC00485225 /* VLRoomSelSongModel.m */,
+				E3735CAF2A5FA3B3004737EF /* VLRoomSelSongModel.swift */,
+				E3735CB32A5FA785004737EF /* VLRoomListModel.swift */,
 			);
 			path = KTV;
 			sourceTree = "<group>";
@@ -1611,12 +1609,12 @@
 		DD0292AF295BF0DC00485225 /* Service */ = {
 			isa = PBXGroup;
 			children = (
-				DD0292B0295BF0DC00485225 /* KTVServiceModel.h */,
 				DD0292B1295BF0DC00485225 /* KTVSyncManagerServiceImp.swift */,
 				DD0292B2295BF0DC00485225 /* AppContext+KTV.m */,
-				DD0292B3295BF0DC00485225 /* KTVServiceProtocol.h */,
 				DD0292B4295BF0DC00485225 /* KTVServiceModel.m */,
 				DD0292B5295BF0DC00485225 /* AppContext+KTV.h */,
+				E3735CB12A5FA5E0004737EF /* KTVServiceProtocol.swift */,
+				E3735CB52A5FD659004737EF /* KTVServiceModel.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -3798,6 +3796,7 @@
 				DD3610B629B70CDC00CE7984 /* ShowDebugSetting1TFCell.swift in Sources */,
 				DD619C0229E3E262008F63E4 /* VRCreateRoomView.swift in Sources */,
 				DD619A9929E3E247008F63E4 /* SAApplyUsersViewController.swift in Sources */,
+				E3735CB62A5FD659004737EF /* KTVServiceModel.swift in Sources */,
 				DD0292D1295BF0DC00485225 /* VLSelectSongTableItemView.m in Sources */,
 				DD619ACA29E3E247008F63E4 /* SAChatBarCell.swift in Sources */,
 				DD619AC729E3E247008F63E4 /* SANoticeView.swift in Sources */,
@@ -3853,7 +3852,6 @@
 				E3735C932A5E7E75004737EF /* BEResourceHelper.m in Sources */,
 				DD619A6529E3E247008F63E4 /* SABusinessRequest.swift in Sources */,
 				E3735CA12A5E7E75004737EF /* FUBeautyRender.m in Sources */,
-				DD0292CA295BF0DC00485225 /* VLRoomSelSongModel.m in Sources */,
 				DD0292EF295BF0DC00485225 /* VLHomeOnLineListCCell.m in Sources */,
 				DD619A7D29E3E247008F63E4 /* String + SAExtension.swift in Sources */,
 				DD619C0829E3E84D008F63E4 /* SceneVersionCell.swift in Sources */,
@@ -3941,7 +3939,6 @@
 				DD619B9129E3E262008F63E4 /* PresentationSegue.swift in Sources */,
 				DD3610B729B70CDC00CE7984 /* ShowDebugSetting2TFCell.swift in Sources */,
 				DD619B8029E3E262008F63E4 /* VoiceRoomRequest.swift in Sources */,
-				DD0292C7295BF0DC00485225 /* VLRoomListModel.m in Sources */,
 				DD619B8429E3E262008F63E4 /* VerifyCodeView.swift in Sources */,
 				DD619ABE29E3E247008F63E4 /* SASwitchBar.swift in Sources */,
 				DD3610A129B70CDC00CE7984 /* ShowMusicTableHeaderView.swift in Sources */,
@@ -3995,6 +3992,7 @@
 				DD3610C129B70CDC00CE7984 /* ShowSegmentView.swift in Sources */,
 				DD6199CC29E3D36D008F63E4 /* AgoraEntAuthorizedManager.swift in Sources */,
 				E3735C902A5E7E75004737EF /* BEEffectManager.mm in Sources */,
+				E3735CB22A5FA5E0004737EF /* KTVServiceProtocol.swift in Sources */,
 				DDA199FC28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m in Sources */,
 				DD36108929B70CDC00CE7984 /* ShowRoomListVC.swift in Sources */,
 				DD36108F29B70CDC00CE7984 /* ShowBeautyFaceVC.swift in Sources */,
@@ -4043,6 +4041,7 @@
 				DD619BFE29E3E262008F63E4 /* VRRoomListView.swift in Sources */,
 				DD36106A29B70CDC00CE7984 /* ShowPresettingModel.swift in Sources */,
 				DD0292D4295BF0DC00485225 /* VLKTVMVIdleView.m in Sources */,
+				E3735CB02A5FA3B3004737EF /* VLRoomSelSongModel.swift in Sources */,
 				DD3610A929B70CDC00CE7984 /* ShowRealTimeDataView.swift in Sources */,
 				DD619AC229E3E247008F63E4 /* SASendGiftCell.swift in Sources */,
 				DD619AAD29E3E247008F63E4 /* SAChatView.swift in Sources */,
@@ -4112,6 +4111,7 @@
 				E3735C9C2A5E7E75004737EF /* BundleUtil.m in Sources */,
 				DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */,
 				DD619ABA29E3E247008F63E4 /* SAAudioSettingView.swift in Sources */,
+				E3735CB42A5FA785004737EF /* VLRoomListModel.swift in Sources */,
 				DD0292CE295BF0DC00485225 /* VLPopSongList.m in Sources */,
 				DD619BEE29E3E262008F63E4 /* VMSwitchTableViewCell.swift in Sources */,
 				DD36109329B70CDC00CE7984 /* ShowLiveViewController.swift in Sources */,

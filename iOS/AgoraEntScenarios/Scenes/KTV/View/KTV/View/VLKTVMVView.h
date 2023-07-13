@@ -5,7 +5,6 @@
 
 #import <UIKit/UIKit.h>
 #import "AgoraEntScenarios-swift.h"
-#import "VLRoomSelSongModel.h"
 @import ScoreEffectUI;
 @import AgoraLyricsScore;
 

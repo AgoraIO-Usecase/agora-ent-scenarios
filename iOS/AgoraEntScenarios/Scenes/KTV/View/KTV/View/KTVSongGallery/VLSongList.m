@@ -5,7 +5,6 @@
 
 #import "VLSongList.h"
 #import "VLSongListCell.h"
-#import "VLRoomSelSongModel.h"
 #import "VLUserCenter.h"
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
@@ -94,7 +93,7 @@
     KTVMakeSongTopInputModel* inputModel = [KTVMakeSongTopInputModel new];
     inputModel.songNo = model.songNo;
     inputModel.objectId = model.objectId;
-    [[AppContext ktvServiceImp] pinSongWithInput:inputModel
+    [[AppContext ktvServiceImp] pinSongWith:inputModel
                                       completion:^(NSError * error) {
     }];
 }
@@ -103,7 +102,7 @@
     KTVRemoveSongInputModel* inputModel = [KTVRemoveSongInputModel new];
     inputModel.songNo = model.songNo;
     inputModel.objectId = model.objectId;
-    [[AppContext ktvServiceImp] removeSongWithInput:inputModel
+    [[AppContext ktvServiceImp] removeSongWith:inputModel
                                          completion:^(NSError * error) {
         if (error != nil) {
             return;
