@@ -4,7 +4,6 @@
 //
 
 #import "VLDropOnLineView.h"
-#import "VLRoomSeatModel.h"
 #import "AESMacro.h"
 @import SDWebImage;
 

@@ -6,7 +6,6 @@
 #import "VLOnLineListVC.h"
 #import "VLHomeOnLineListView.h"
 #import "VLKTVViewController.h"
-#import "VLRoomSeatModel.h"
 
 #import "VLPopScoreView.h"
 #import "VLLoginViewController.h"
