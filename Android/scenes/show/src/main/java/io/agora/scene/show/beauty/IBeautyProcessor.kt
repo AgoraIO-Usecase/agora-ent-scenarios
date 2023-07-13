@@ -1,11 +1,9 @@
 package io.agora.scene.show.beauty
 
 import android.util.Log
-import com.sensetime.effects.STRenderKit
-import io.agora.base.VideoFrame
-import io.agora.beauty.sensetime.CaptureMode
-import io.agora.beauty.sensetime.IEventCallback
-import io.agora.beauty.sensetime.SenseTimeBeautyAPI
+import io.agora.beautyapi.sensetime.CaptureMode
+import io.agora.beautyapi.sensetime.IEventCallback
+import io.agora.beautyapi.sensetime.SenseTimeBeautyAPI
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.video.IVideoFrameObserver
 import java.util.concurrent.Executors

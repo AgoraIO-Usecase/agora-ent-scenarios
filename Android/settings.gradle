@@ -46,27 +46,9 @@ if (!isSpatialVoiceEmpty) {
 
 if (!isShowEmpty) {
     include ':scenes:show'
-//    include ':scenes:show:aars:SenseArSourceManager'
-//    include ':scenes:show:aars:STMobileJNI'
-
-    /**
-     * 引入美颜场景化 api, 美颜场景化项目根目录与声动互娱项目同级别，美颜场景化 api 需要做如下修改：
-     * 1.注掉发布 maven 相关脚本代码
-     * 2.rtc sdk 版本需与声动互娱项目版本一直，并需要把美颜场景画项目编译成功
-     * 3.注意商汤美颜只引用了 lib_sensetime ，所以需要把对应的商汤美颜用的引用的aar都引用进来
-     */
-    def syncPath = new File(settingsDir, '../../BeautyAPI/Android/lib_sensetime')
-    if (syncPath.exists()) {
-        include ':lib_sensetime'
-        project(':lib_sensetime').projectDir = syncPath
-
-        include ':lib_sensetime_SenseArSourceManager'
-        project(':lib_sensetime_SenseArSourceManager').projectDir = new File(settingsDir, '../../BeautyAPI/Android/lib_sensetime/libs/SenseArSourceManager')
-        include ':lib_sensetime_STMobileJNI'
-        project(':lib_sensetime_STMobileJNI').projectDir = new File(settingsDir, '../../BeautyAPI/Android/lib_sensetime/libs/STMobileJNI')
-        include ':lib_sensetime_HardwareBuffer'
-        project(':lib_sensetime_HardwareBuffer').projectDir = new File(settingsDir, '../../BeautyAPI/Android/lib_sensetime/libs/HardwareBuffer')
-    }
+    include ':scenes:show:aars:SenseArSourceManager'
+    include ':scenes:show:aars:STMobileJNI'
+    include ':scenes:show:aars:HardwareBuffer'
 }
 
 

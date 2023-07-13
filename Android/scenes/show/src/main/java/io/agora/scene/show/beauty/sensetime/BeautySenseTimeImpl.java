@@ -1,6 +1,6 @@
 package io.agora.scene.show.beauty.sensetime;
 
-import static io.agora.beauty.sensetime.SenseTimeBeautyAPIKt.createSenseTimeBeautyAPI;
+import static io.agora.beautyapi.sensetime.SenseTimeBeautyAPIKt.createSenseTimeBeautyAPI;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_CLARITY;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_CONTRAST;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_SATURATION;
@@ -34,18 +34,18 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.sensetime.effects.STRenderKit;
-import com.sensetime.effects.utils.FileUtils;
 import com.sensetime.stmobile.params.STEffectBeautyType;
 
 import java.io.File;
 
 import io.agora.base.VideoFrame;
-import io.agora.beauty.sensetime.CaptureMode;
-import io.agora.beauty.sensetime.Config;
-import io.agora.beauty.sensetime.ErrorCode;
-import io.agora.beauty.sensetime.IEventCallback;
-import io.agora.beauty.sensetime.SenseTimeBeautyAPI;
+import io.agora.beautyapi.sensetime.CaptureMode;
+import io.agora.beautyapi.sensetime.Config;
+import io.agora.beautyapi.sensetime.ErrorCode;
+import io.agora.beautyapi.sensetime.IEventCallback;
+import io.agora.beautyapi.sensetime.SenseTimeBeautyAPI;
+import io.agora.beautyapi.sensetime.utils.STRenderKit;
+import io.agora.beautyapi.sensetime.utils.utils.FileUtils;
 import io.agora.rtc2.RtcEngine;
 import io.agora.rtc2.video.IVideoFrameObserver;
 import io.agora.scene.show.beauty.BeautyCache;
