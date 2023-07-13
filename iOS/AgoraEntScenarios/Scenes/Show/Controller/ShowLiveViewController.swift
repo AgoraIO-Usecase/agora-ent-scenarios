@@ -238,20 +238,19 @@ class ShowLiveViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
+        
         setupUI()
         defaultConfig()
         guard let room = room else {return}
-        if room.ownerId == VLUserCenter.user.id {
+        if room.ownerId == VLUserCenter.user.id {// 自己的房间
             self.joinChannel()
             if self.loadingType == .loading {
                 self.updateLoadingType(loadingType: self.loadingType)
             }
             self._subscribeServiceEvent()
-            UIApplication.shared.isIdleTimerDisabled = true
             AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self)
-            
-        } else {
+        } else { // 自己是观众
+            self.joinChannel(needUpdateCavans: self.loadingType == .loading)
             AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
                 guard let self = self else { return }
                 showLogger.info("joinRoom: roomid = \(room.roomId)")
@@ -262,12 +261,10 @@ class ShowLiveViewController: UIViewController {
                     self._ensureRoomIsExst(roomId: room.roomId)
                     return
                 }
-                self.joinChannel(needUpdateCavans: self.loadingType == .loading)
                 if self.loadingType == .loading {
                     self.updateLoadingType(loadingType: self.loadingType)
                 }
                 self._subscribeServiceEvent()
-                UIApplication.shared.isIdleTimerDisabled = true
             }
         }
     }
@@ -275,6 +272,12 @@ class ShowLiveViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        UIApplication.shared.isIdleTimerDisabled = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        UIApplication.shared.isIdleTimerDisabled = false
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -291,6 +294,7 @@ class ShowLiveViewController: UIViewController {
     }
     
     private func setupUI(){
+        view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
         navigationController?.isNavigationBarHidden = true
         liveView.room = room
 //        if role == .audience {
@@ -325,21 +329,20 @@ class ShowLiveViewController: UIViewController {
         }
         currentChannelId = channelId
         self.joinStartDate = Date()
+        if needUpdateCavans {
+            if self.role == .audience {
+                self.agoraKitManager.setupRemoteVideo(channelId: channelId,
+                                                      uid: uid,
+                                                      canvasView: self.liveView.canvasView.localView)
+            } else {
+                self.agoraKitManager.setupLocalVideo(uid: uid, canvasView: self.liveView.canvasView.localView)
+            }
+        }
         agoraKitManager.joinChannelEx(currentChannelId: channelId,
                                       targetChannelId: channelId,
                                       ownerId: uid,
                                       options: self.channelOptions,
-                                      role: role) { [weak self] in
-            guard let self = self else { return }
-            if needUpdateCavans {
-                if self.role == .audience {
-                    self.agoraKitManager.setupRemoteVideo(channelId: channelId,
-                                                          uid: uid,
-                                                          canvasView: self.liveView.canvasView.localView)
-                } else {
-                    self.agoraKitManager.setupLocalVideo(uid: uid, canvasView: self.liveView.canvasView.localView)
-                }
-            }
+                                      role: role) {
         }
         
         liveView.canvasView.setLocalUserInfo(name: room?.ownerName ?? "", img: room?.ownerAvatar ?? "")
