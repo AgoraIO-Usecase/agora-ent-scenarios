@@ -2,6 +2,7 @@ package io.agora.scene.show
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -25,6 +26,8 @@ class RoomListActivity : AppCompatActivity() {
     private val mBinding by lazy { ShowRoomListActivityBinding.inflate(LayoutInflater.from(this)) }
     private lateinit var mRoomAdapter: BindingSingleAdapter<ShowRoomDetailModel, ShowRoomItemBinding>
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
+
+    private val roomDetailModelList = mutableListOf<ShowRoomDetailModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,8 +56,16 @@ class RoomListActivity : AppCompatActivity() {
         mBinding.smartRefreshLayout.setEnableRefresh(true)
         mBinding.smartRefreshLayout.setOnRefreshListener {
             mService.getRoomList(
-                { runOnUiThread { updateList(it) } },
-                { runOnUiThread { updateList(emptyList()) } })
+                success = {
+                    roomDetailModelList.clear()
+                    roomDetailModelList.addAll(it)
+                    preloadChannels()
+                    updateList(it)
+                },
+                error = {
+                    updateList(emptyList())
+                }
+            )
         }
         mBinding.smartRefreshLayout.autoRefresh()
 
@@ -73,7 +84,12 @@ class RoomListActivity : AppCompatActivity() {
         mBinding.smartRefreshLayout.finishRefresh()
     }
 
-    private fun updateRoomItem(list: List<ShowRoomDetailModel>, position: Int, binding: ShowRoomItemBinding, roomInfo: ShowRoomDetailModel) {
+    private fun updateRoomItem(
+        list: List<ShowRoomDetailModel>,
+        position: Int,
+        binding: ShowRoomItemBinding,
+        roomInfo: ShowRoomDetailModel
+    ) {
         binding.tvRoomName.text = roomInfo.roomName
         binding.tvRoomId.text = getString(R.string.show_room_id, roomInfo.roomId)
         binding.tvUserCount.text = getString(R.string.show_user_count, roomInfo.roomUserCount)
@@ -103,7 +119,12 @@ class RoomListActivity : AppCompatActivity() {
             }
             return
         }
-        LiveDetailActivity.launch(this, ArrayList(list), position, roomInfo.ownerId != UserManager.getInstance().user.id.toString())
+        LiveDetailActivity.launch(
+            this,
+            ArrayList(list),
+            position,
+            roomInfo.ownerId != UserManager.getInstance().user.id.toString()
+        )
     }
 
     private fun showAudienceSetting() {
@@ -118,7 +139,7 @@ class RoomListActivity : AppCompatActivity() {
     }
 
 
-    private fun fetchService(){
+    private fun fetchService() {
         //启动机器人
         mService.startCloudPlayer()
         val localUId = UserManager.getInstance().user.id.toInt()
@@ -128,11 +149,25 @@ class RoomListActivity : AppCompatActivity() {
             TokenGenerator.AgoraTokenType.rtc,
             success = {
                 RtcEngineInstance.setupGeneralToken(it)
+                preloadChannels()
                 ShowLogger.d("RoomListActivity", "generateToken success：$it， uid：$localUId")
             },
             failure = {
                 ShowLogger.e("RoomListActivity", it, "generateToken failure：$it")
-                ToastUtils.showToast(it?.message?:"generate token failure")
+                ToastUtils.showToast(it?.message ?: "generate token failure")
             })
+    }
+
+    private fun preloadChannels() {
+        val generalToken = RtcEngineInstance.generalToken()
+        if (roomDetailModelList.isNotEmpty() && generalToken.isNotEmpty()) {
+            // sdk 最多 preload 20个频道，超过 20 个，sdk 内部维护最新的 20 个频道预加载
+            roomDetailModelList.take(20).forEach { room->
+                val ret = RtcEngineInstance.rtcEngine.preloadChannel(
+                    generalToken, room.roomId, UserManager.getInstance().user.id.toInt()
+                )
+                Log.d("RoomListActivity", "call rtc sdk preloadChannel ${room.roomId} ret:$ret")
+            }
+        }
     }
 }

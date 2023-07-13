@@ -132,7 +132,9 @@ class ShowSyncManagerServiceImpl constructor(
                             runOnMainThread { success.invoke(sortedBy) }
                         }
                     } else {
-                        error?.invoke(exception!!) ?: errorHandler.invoke(exception!!)
+                        runOnMainThread {
+                            error?.invoke(exception!!) ?: errorHandler.invoke(exception!!)
+                        }
                     }
                 }
             })
