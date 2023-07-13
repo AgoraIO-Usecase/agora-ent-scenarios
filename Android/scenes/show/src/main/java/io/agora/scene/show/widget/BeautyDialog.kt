@@ -12,8 +12,6 @@ import androidx.core.view.isVisible
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
-import com.sensetime.effects.STRenderKit
-import io.agora.beauty.sensetime.*
 import io.agora.rtc2.video.SegmentationProperty
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.utils.FileUtils
