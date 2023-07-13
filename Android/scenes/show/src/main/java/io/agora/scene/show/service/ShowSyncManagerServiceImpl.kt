@@ -124,7 +124,7 @@ class ShowSyncManagerServiceImpl constructor(
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
-                    if (exception?.message?.contains("empty") ?: false) {
+                    if (exception?.message?.contains("empty") == true) {
                         workerExecutor.execute {
                             val roomList = appendRobotRooms(emptyList())
 
@@ -310,7 +310,7 @@ class ShowSyncManagerServiceImpl constructor(
             Sync.Instance().joinScene(
                 roomInfo.ownerId == UserManager.getInstance().user.id.toString() || roomInfo.isRobotRoom(),
                 true,
-                roomId, object : Sync.JoinSceneCallback {
+                roomId, object : JoinSceneCallback {
                     override fun onSuccess(sceneReference: SceneReference?) {
                         roomInfoController.sceneReference = sceneReference
 
@@ -418,10 +418,10 @@ class ShowSyncManagerServiceImpl constructor(
 
         ShowLogger.d(
             TAG,
-            "leaveRoom roomId=${roomId} ownerId=${roomDetail.ownerId} myId=${UserManager.getInstance().user.id.toString()}"
+            "leaveRoom roomId=${roomId} ownerId=${roomDetail.ownerId} myId=${UserManager.getInstance().user.id}"
         )
         if (roomDetail.isRobotRoom()) {
-            cloudPlayerService.stopHeartBeat(roomId)
+            // nothing
         } else if (roomDetail.ownerId == UserManager.getInstance().user.id.toString()
             || TimeUtils.currentTimeMillis() - roomDetail.createdAt.toLong() >= ROOM_AVAILABLE_DURATION
         ) {
@@ -857,7 +857,7 @@ class ShowSyncManagerServiceImpl constructor(
             error?.invoke(RuntimeException("InteractionInfoList is not empty, stop interacting first!"))
         }
         innerGetPKInvitationList(roomId, room, {
-            val invitation = it.filter { it.roomId == room.roomId }.getOrNull(0)
+            val invitation = it.filter { filterRoom -> filterRoom.roomId == room.roomId }.getOrNull(0)
             if (invitation == null) {
                 val pkInvitation = ShowPKInvitation(
                     room.ownerId,
@@ -874,8 +874,8 @@ class ShowSyncManagerServiceImpl constructor(
                 innerCreatePKInvitation(
                     roomInfoController.pkSceneReference,
                     pkInvitation,
-                    null,
-                    null
+                    success = {},
+                    error = {}
                 )
             }
         }, null)
@@ -1083,8 +1083,8 @@ class ShowSyncManagerServiceImpl constructor(
                 roomInfoController.sceneReference,
                 objId,
                 interaction,
-                null,
-                null
+                success = {},
+                error = {}
             )
         }
 
@@ -1095,7 +1095,7 @@ class ShowSyncManagerServiceImpl constructor(
                 roomInfoController.pKInvitationList.filter { it.userId == userId }.getOrNull(0)
             if (invitation != null) {
                 val index = roomInfoController.pKInvitationList.indexOf(invitation)
-                val invitation = ShowPKInvitation(
+                val newInvitation = ShowPKInvitation(
                     invitation.userId,
                     invitation.userName,
                     invitation.roomId,
@@ -1111,7 +1111,7 @@ class ShowSyncManagerServiceImpl constructor(
                 innerUpdatePKInvitation(
                     roomInfoController.sceneReference,
                     objId,
-                    invitation,
+                    newInvitation,
                     null,
                     null
                 )
@@ -1124,7 +1124,7 @@ class ShowSyncManagerServiceImpl constructor(
             if (invitation != null) {
                 val index = roomInfoController.pKCompetitorInvitationList.indexOf(invitation)
                 val objId = roomInfoController.objIdOfPKCompetitorInvitation[index]
-                val invitation = ShowPKInvitation(
+                val newInvitation = ShowPKInvitation(
                     invitation.userId,
                     invitation.userName,
                     invitation.roomId,
@@ -1139,7 +1139,7 @@ class ShowSyncManagerServiceImpl constructor(
                 innerUpdatePKInvitation(
                     roomInfoController.pkSceneReference,
                     objId,
-                    invitation,
+                    newInvitation,
                     null,
                     null
                 )
@@ -1683,7 +1683,7 @@ class ShowSyncManagerServiceImpl constructor(
             if (roomId != localRoomId) {
                 initSync {
                     Sync.Instance().joinScene(
-                        roomId, object : Sync.JoinSceneCallback {
+                        roomId, object : JoinSceneCallback {
                             override fun onSuccess(sceneReference: SceneReference?) {
                                 roomInfoController.pkSceneReference = sceneReference!!
                                 roomInfoController.pkSceneReference?.collection(
@@ -1839,8 +1839,8 @@ class ShowSyncManagerServiceImpl constructor(
                             roomInfoController.sceneReference,
                             objId,
                             interaction,
-                            null,
-                            null
+                            success = {},
+                            error = {}
                         )
                     }
                 }
@@ -1939,8 +1939,8 @@ class ShowSyncManagerServiceImpl constructor(
                             roomInfoController.sceneReference,
                             objId,
                             interaction,
-                            null,
-                            null
+                            success = {},
+                            error = {}
                         )
                     }
                 }
@@ -2091,16 +2091,15 @@ class ShowSyncManagerServiceImpl constructor(
                 val interactionInfo = roomInfoController.interactionInfoList.getOrNull(0)
                 if (interactionInfo != null && interactionInfo.userId != info.userId) {
                     stopInteraction(roomId, info)
-                    val userItem =
-                        roomInfoController.userList.filter { it.userId == info.userId }.getOrNull(0)
+                    val userItem = roomInfoController.userList.filter { it.userId == info.userId }.getOrNull(0)
                     if (userItem != null) {
-                        val userItem = ShowUser(
+                        val newUserItem = ShowUser(
                             userItem.userId,
                             userItem.avatar,
                             userItem.userName,
                             ShowRoomRequestStatus.idle.value,
                         )
-                        innerUpdateUserRoomRequestStatus(roomId, userItem, {}, {})
+                        innerUpdateUserRoomRequestStatus(roomId, newUserItem, {}, {})
                     }
                     return
                 }

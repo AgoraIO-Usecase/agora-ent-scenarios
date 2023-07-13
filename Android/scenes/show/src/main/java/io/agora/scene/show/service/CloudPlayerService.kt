@@ -17,6 +17,7 @@ import org.json.JSONObject
 
 class CloudPlayerService {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
+    private val tag = "CloudPlayerService"
     private val baseUrl = "${BuildConfig.TOOLBOX_SERVER_HOST}/v1/"
     private val okHttpClient by lazy {
         val builder = OkHttpClient.Builder()
@@ -24,7 +25,7 @@ class CloudPlayerService {
             builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
                 .addInterceptor(CurlInterceptor(object : Logger {
                     override fun log(message: String) {
-                        Log.d("CurlInterceptor", message)
+                        Log.d(tag, message)
                     }
                 }))
         }
@@ -50,6 +51,7 @@ class CloudPlayerService {
                 success.invoke()
             } catch (ex: Exception) {
                 failure.invoke(ex)
+                Log.e(tag, "start cloud player failure $ex")
             }
         }
     }
@@ -59,10 +61,7 @@ class CloudPlayerService {
         uid: String,
         failure: ((Exception) -> Unit)? = null
     ) {
-        if (heartBeatTimerMap[channelName] != null) {
-            return
-        }
-        reqHeatBeatAsync(channelName, uid, failure)
+        if (heartBeatTimerMap[channelName] != null) return
         heartBeatTimerMap[channelName] = object : CountDownTimer(Long.MAX_VALUE, 30 * 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 reqHeatBeatAsync(channelName, uid, failure)
@@ -77,6 +76,7 @@ class CloudPlayerService {
     fun stopHeartBeat(channelName: String) {
         val countDownTimer = heartBeatTimerMap.remove(channelName) ?: return
         countDownTimer.cancel()
+        Log.d(tag, "cloud player stop heartbeat $channelName")
     }
 
     private fun reqHeatBeatAsync(
@@ -91,6 +91,7 @@ class CloudPlayerService {
                 }
             } catch (ex: Exception) {
                 failure?.invoke(ex)
+                Log.e(tag, "cloud player heartbeat failure $ex")
             }
         }
     }
@@ -157,6 +158,7 @@ class CloudPlayerService {
             val _body = execute.body
                 ?: throw RuntimeException("$url error: httpCode=${execute.code}, httpMsg=${execute.message}, body is null")
             val bodyJson = JSONObject(_body.string())
+            Log.d(tag,"response $url $bodyJson")
             if (bodyJson["code"] != 0) {
                 throw RuntimeException("$url error: httpCode=${execute.code}, httpMsg=${execute.message}, reqCode=${bodyJson["code"]}, reqMsg=${bodyJson["message"]},")
             }
