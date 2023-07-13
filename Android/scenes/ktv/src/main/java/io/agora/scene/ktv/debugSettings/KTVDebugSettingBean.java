@@ -1,7 +1,5 @@
 package io.agora.scene.ktv.debugSettings;
 
-import io.agora.scene.ktv.widget.MusicSettingDialog;
-
 public class KTVDebugSettingBean {
     private final KTVDebugSettingsDialog.Callback mCallback;
 

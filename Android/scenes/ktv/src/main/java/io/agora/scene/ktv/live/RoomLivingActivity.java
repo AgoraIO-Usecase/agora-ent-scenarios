@@ -247,7 +247,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             getBinding().btnDebug.setVisibility(View.INVISIBLE);
         }
         getBinding().btnDebug.setOnClickListener(v -> {
-            KTVDebugSettingsDialog dialog = new KTVDebugSettingsDialog(roomLivingViewModel.mDebugSetting);
+            KTVDebugSettingsDialog dialog = new KTVDebugSettingsDialog(
+                    roomLivingViewModel.mDebugSetting,
+                    roomLivingViewModel.roomInfoLiveData.getValue().getRoomNo(),
+                    roomLivingViewModel.getSDKBuildNum());
             dialog.show(getSupportFragmentManager(), "debugSettings");
         });
         getBinding().ivMore.setOnClickListener(v -> {
