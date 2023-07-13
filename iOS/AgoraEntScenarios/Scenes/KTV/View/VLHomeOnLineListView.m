@@ -5,7 +5,6 @@
 
 #import "VLHomeOnLineListView.h"
 #import "VLHomeOnLineListCCell.h"
-#import "VLRoomListModel.h"
 #import "VLListEmptyView.h"
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
@@ -59,7 +58,7 @@
 - (void)getRoomListIfRefresh:(BOOL)ifRefresh {
     self.page = ifRefresh ? 0 : self.page;
     
-    [[AppContext ktvServiceImp] getRoomListWithPage:self.page
+    [[AppContext ktvServiceImp] getRoomListWith:self.page
                                          completion:^(NSError * error, NSArray<VLRoomListModel *> * roomArray) {
         if (error != nil) {
             [self.listCollectionView.mj_header endRefreshing];

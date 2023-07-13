@@ -4,7 +4,6 @@
 //
 
 #import "VLHomeOnLineListCCell.h"
-#import "VLRoomListModel.h"
 #import "VLHotSpotBtn.h"
 #import "VLMacroDefine.h"
 #import "VLFontUtils.h"
