@@ -1017,6 +1017,9 @@ public class RoomLivingViewModel extends ViewModel {
      * 退出合唱
      */
     public void leaveChorus() {
+        if (isHighlightSinger) {
+            syncCancelAudioHighLight();
+        }
         KTVLogger.d(TAG, "RoomLivingViewModel.leaveChorus() called");
         if (isOnSeat) {
             ktvServiceProtocol.leaveChorus(e -> {
@@ -1368,6 +1371,8 @@ public class RoomLivingViewModel extends ViewModel {
                                 mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF_HARMONY);
                             }
                         }
+                    } else if (jsonMsg.getString("cmd").equals("cancelVoiceHighlight")) {
+                        resetAudioPreset();
                     }
                 } catch (JSONException exp) {
                     KTVLogger.e(TAG, "onStreamMessage:" + exp);
@@ -1817,7 +1822,19 @@ public class RoomLivingViewModel extends ViewModel {
         JSONObject jsonMsg = new JSONObject(msg);
         int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
         if (ret < 0) {
-            KTVLogger.e(TAG, "syncVoiceHighlightResult() sendStreamMessage called returned: " + ret);
+            KTVLogger.e(TAG, "syncAudioPreset() sendStreamMessage called returned: " + ret);
+        }
+    }
+
+    public void syncCancelAudioHighLight() {
+        KTVLogger.d(TAG, "syncCancelAudioHighLight");
+        if (mRtcEngine == null) return;
+        Map<String, Object> msg = new HashMap<>();
+        msg.put("cmd", "cancelVoiceHighlight");
+        JSONObject jsonMsg = new JSONObject(msg);
+        int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
+        if (ret < 0) {
+            KTVLogger.e(TAG, "syncCancelAudioHighLight() sendStreamMessage called returned: " + ret);
         }
     }
 
