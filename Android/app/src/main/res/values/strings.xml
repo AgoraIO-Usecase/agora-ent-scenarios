@@ -67,6 +67,7 @@
     <string name="app_vcode_wrong_tip">验证码错误</string>
     <string name="app_login_success_tip">登陆成功</string>
     <string name="app_vcode_send_success_tip">验证码发送成功</string>
+    <string name="app_edit_success">修改成功</string>
 
 
 </resources>
