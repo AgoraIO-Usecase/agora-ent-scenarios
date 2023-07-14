@@ -153,5 +153,6 @@
     <string name="ktv_too_fast">操作太频繁</string>
     <string name="ktv_lrc_failed">歌词加载失败</string>
     <string name="ktv_retry">点击重试</string>
+    <string name="ktv_join_chorus_failed">加入合唱失败</string>
 
 </resources>

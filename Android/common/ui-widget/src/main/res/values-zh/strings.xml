@@ -48,5 +48,6 @@
     <string name="comm_permission_leak_other_title">没有运行所需权限</string>
     <string name="comm_permission_leak_other_content">请在设置中打开运行所需权限</string>
     <string name="comm_setting">设置</string>
+    <string name="comm_try_again">请重试</string>
 
 </resources>
