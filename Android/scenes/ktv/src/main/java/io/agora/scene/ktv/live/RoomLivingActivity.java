@@ -754,7 +754,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     private void showChangeMusicDialog() {
         if (UiUtils.isFastClick(2000)) {
-            ToastUtils.showToast("操作太频繁");
+            ToastUtils.showToast("Too fast");
             return;
         }
         if (changeMusicDialog == null) {
