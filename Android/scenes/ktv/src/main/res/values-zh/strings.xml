@@ -118,7 +118,7 @@
     <string name="ktv_voice_professional">专业主播</string>
     <string name="ktv_voice_quality">音质</string>
     <string name="ktv_voice_AINS">降低背景噪音</string>
-    <string name="ktv_low_latency">降低背景噪音</string>
+    <string name="ktv_low_latency">低延迟模式</string>
     <string name="ktv_AIAEC_switcher">AIAEC 开关（beta）</string>
     <string name="ktv_AIAEC_strength">AIAEC 强度选择（beta）</string>
 
