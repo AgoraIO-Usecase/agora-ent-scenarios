@@ -13,7 +13,7 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
-
+import java.util.UUID
 
 class CloudPlayerService {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
@@ -33,6 +33,7 @@ class CloudPlayerService {
     }
 
     private val heartBeatTimerMap = mutableMapOf<String, CountDownTimer>()
+    private val cloudPLayerTraceMap = mutableMapOf<String, String>()
 
     fun startCloudPlayer(
         channelName: String,
@@ -46,7 +47,9 @@ class CloudPlayerService {
         scope.launch(Dispatchers.Main) {
             try {
                 withContext(Dispatchers.IO) {
-                    reqStartCloudPlayer(channelName, uid, robotUid, streamUrl, streamRegion, channelName)
+                    val traceId = UUID.randomUUID().toString().replace("-","")
+                    cloudPLayerTraceMap[channelName] = traceId
+                    reqStartCloudPlayer(channelName, uid, robotUid, streamUrl, streamRegion, traceId)
                 }
                 success.invoke()
             } catch (ex: Exception) {
@@ -87,7 +90,7 @@ class CloudPlayerService {
         scope.launch(Dispatchers.Main) {
             try {
                 withContext(Dispatchers.IO) {
-                    reqHeatBeat(channelName, uid, channelName)
+                    reqHeatBeat(channelName, uid, cloudPLayerTraceMap[channelName] ?: "")
                 }
             } catch (ex: Exception) {
                 failure?.invoke(ex)
@@ -158,7 +161,7 @@ class CloudPlayerService {
             val _body = execute.body
                 ?: throw RuntimeException("$url error: httpCode=${execute.code}, httpMsg=${execute.message}, body is null")
             val bodyJson = JSONObject(_body.string())
-            Log.d(tag,"response $url $bodyJson")
+            Log.d(tag, "response $url $bodyJson")
             if (bodyJson["code"] != 0) {
                 throw RuntimeException("$url error: httpCode=${execute.code}, httpMsg=${execute.message}, reqCode=${bodyJson["code"]}, reqMsg=${bodyJson["message"]},")
             }
