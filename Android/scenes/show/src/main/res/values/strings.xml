@@ -202,7 +202,8 @@
     <string name="show_setting_audience">观众设置</string>
     <string name="show_living_end_title">直播结束</string>
     <string name="show_living_end_back_room_list">返回房间列表</string>
-    <string name="show_live_chat_coming">来了</string>
+    <string name="show_live_chat_coming">加入房间</string>
+    <string name="show_live_chat_leaving">离开房间</string>
     <string name="show_live_end_room_or_not">是否结束直播?</string>
     <string name="show_setting_opened">已打开</string>
     <string name="show_setting_closed">已关闭</string>

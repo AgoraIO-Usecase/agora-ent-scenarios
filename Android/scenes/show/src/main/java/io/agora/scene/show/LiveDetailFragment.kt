@@ -92,10 +92,7 @@ class LiveDetailFragment : Fragment() {
 
     val mRoomInfo by lazy { (arguments?.getParcelable(EXTRA_ROOM_DETAIL_INFO) as? ShowRoomDetailModel)!! }
     private val mBinding by lazy {
-        ShowLiveDetailFragmentBinding.inflate(
-            LayoutInflater.from(
-                requireContext()
-            )
+        ShowLiveDetailFragmentBinding.inflate(LayoutInflater.from(requireContext())
         )
     }
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
@@ -1006,18 +1003,21 @@ class LiveDetailFragment : Fragment() {
     //================== Service Operation ===============
 
     private fun initServiceWithJoinRoom() {
-        mService.joinRoom(mRoomInfo.roomId, {
-            initService()
-        }, {
-            if ((it as? RoomException)?.currRoomNo == mRoomInfo.roomId) {
-                runOnUiThread {
-                    destroy()
-                     // 进房Error
-                    showLivingEndLayout() // 进房Error
-                    ShowLogger.d("showLivingEndLayout","join room error!:${it.message}")
+        mService.joinRoom(mRoomInfo.roomId,
+            success = {
+                mService.sendChatMessage(mRoomInfo.roomId, getString(R.string.show_live_chat_coming))
+                initService()
+            },
+            error = {
+                if ((it as? RoomException)?.currRoomNo == mRoomInfo.roomId) {
+                    runOnUiThread {
+                        destroy()
+                        // 进房Error
+                        showLivingEndLayout() // 进房Error
+                        ShowLogger.d("showLivingEndLayout", "join room error!:${it.message}")
+                    }
                 }
-            }
-        })
+            })
     }
 
     private fun initService() {
@@ -1117,7 +1117,6 @@ class LiveDetailFragment : Fragment() {
             }
         }
 
-        mService.sendChatMessage(mRoomInfo.roomId, getString(R.string.show_live_chat_coming))
         mService.subscribePKInvitationChanged(mRoomInfo.roomId) { status, info ->
             mService.getAllPKUserList({ roomList ->
                 mService.getAllPKInvitationList(mRoomInfo.roomId, true, { invitationList ->
@@ -1194,6 +1193,7 @@ class LiveDetailFragment : Fragment() {
         ?: ShowInteractionStatus.idle.value) == ShowInteractionStatus.pking.value
 
     private fun destroyService() {
+        mService.sendChatMessage(mRoomInfo.roomId, getString(R.string.show_live_chat_leaving))
         if (interactionInfo != null &&
             ((interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) && isRoomOwner)
         ) {

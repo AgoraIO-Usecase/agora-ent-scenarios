@@ -118,7 +118,7 @@ class ShowSyncManagerServiceImpl constructor(
 
                         roomList = appendRobotRooms(roomList)
 
-                        val sortedBy = roomList.sortedBy { it.createdAt }
+                        val sortedBy = roomList.sortedByDescending { it.createdAt }
                         runOnMainThread { success.invoke(sortedBy) }
                     }
                 }

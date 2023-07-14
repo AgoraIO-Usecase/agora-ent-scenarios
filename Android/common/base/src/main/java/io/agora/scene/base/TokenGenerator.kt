@@ -17,9 +17,9 @@ object TokenGenerator {
         val builder = OkHttpClient.Builder()
         if (BuildConfig.DEBUG) {
             builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-                .addInterceptor(CurlInterceptor(object :Logger{
+                .addInterceptor(CurlInterceptor(object : Logger {
                     override fun log(message: String) {
-                        Log.d("CurlInterceptor",message)
+                        Log.d("CurlInterceptor", message)
                     }
                 }))
         }
@@ -82,7 +82,7 @@ object TokenGenerator {
         postBody.put("appId", BuildConfig.AGORA_APP_ID)
         postBody.put("appCertificate", BuildConfig.AGORA_APP_CERTIFICATE)
         postBody.put("channelName", channelName)
-        postBody.put("expire", if(expireSecond > 0) expireSecond else 1500)
+        postBody.put("expire", if (expireSecond > 0) expireSecond else 60 * 60 * 24)
         postBody.put("src", "Android")
         postBody.put("ts", System.currentTimeMillis().toString() + "")
         postBody.put("type", tokenType.value)
