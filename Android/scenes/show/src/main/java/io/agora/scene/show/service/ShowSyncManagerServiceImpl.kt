@@ -28,14 +28,13 @@ class ShowSyncManagerServiceImpl constructor(
     private val kCollectionIdPKInvitation = "show_pk_invitation_collection"
     private val kCollectionIdInteractionInfo = "show_interaction_collection"
 
-    private val kRobotIds = mutableListOf(1, 2, 3)
     private val kRobotAvatars = listOf("https://download.agora.io/demo/release/bot1.png")
-    private val kRobotRoomStartId = 2023000
     private val kRobotUid = 2000000001
+    private val kRobotVideoRoomIds = arrayListOf(2023004, 2023005, 2023006)
     private val kRobotVideoStreamUrls = arrayListOf(
-        "https://download.agora.io/sdk/release/agora_test_video_10.mp4",
-        "https://download.agora.io/sdk/release/agora_test_video_11.mp4",
-        "https://download.agora.io/sdk/release/agora_test_video_12.mp4"
+        "https://download.agora.io/sdk/release/agora_test_video_13.mp4",
+        "https://download.agora.io/sdk/release/agora_test_video_14.mp4",
+        "https://download.agora.io/sdk/release/agora_test_video_15.mp4"
     )
 
     @Volatile
@@ -93,8 +92,7 @@ class ShowSyncManagerServiceImpl constructor(
             roomMap.clear()
             Sync.Instance().destroy()
             syncInitialized = false
-            kRobotIds.forEach {
-                val roomId = it + kRobotRoomStartId
+            kRobotVideoRoomIds.forEach { roomId ->
                 cloudPlayerService.stopHeartBeat(roomId.toString())
             }
         }
@@ -146,19 +144,22 @@ class ShowSyncManagerServiceImpl constructor(
         val retRoomList = mutableListOf<ShowRoomDetailModel>()
         retRoomList.addAll(roomList)
 
-        val robotIds = ArrayList<Int>(kRobotIds)
-        retRoomList.forEach {
-            val robotId = it.roomId.toInt() - kRobotRoomStartId
-            if (robotId > 0) {
-                robotIds.firstOrNull { id -> id == robotId }?.let { id ->
-                    robotIds.remove(id)
+        val robotRoomIds = ArrayList(kRobotVideoRoomIds)
+        val kRobotRoomStartId = kRobotVideoRoomIds[0]
+        retRoomList.forEach { roomDetail ->
+            val differValue = roomDetail.roomId.toInt() - kRobotRoomStartId
+            if (differValue >= 0) {
+                robotRoomIds.firstOrNull { robotRoomId -> robotRoomId == roomDetail.roomId.toInt() }?.let { id ->
+                    robotRoomIds.remove(id)
                 }
             }
-        }
 
-        robotIds.forEach { robotId ->
+        }
+        for (i in 0 until robotRoomIds.size) {
+            val robotRoomId = robotRoomIds[i]
+            val robotId = robotRoomId % 10
             val roomInfo = ShowRoomDetailModel(
-                (robotId + kRobotRoomStartId).toString(), // roomId
+                robotRoomId.toString(), // roomId
                 "Smooth $robotId", // roomName
                 1,
                 "1",
@@ -173,7 +174,6 @@ class ShowSyncManagerServiceImpl constructor(
             roomMap[roomInfo.roomId] = roomInfo
             retRoomList.add(roomInfo)
         }
-
         return retRoomList
     }
 
@@ -340,6 +340,7 @@ class ShowSyncManagerServiceImpl constructor(
                     override fun onFail(exception: SyncManagerException?) {
                         exception ?: return
                         if (exception.code == -2000 && roomInfo.isRobotRoom()) {
+                            ShowLogger.d(TAG, "create robotRoom ${roomInfo.roomId}")
                             // 房间不存在，并且是假数据：创建房间
                             createRoomInner(
                                 roomId,
@@ -2157,14 +2158,13 @@ class ShowSyncManagerServiceImpl constructor(
     }
 
     override fun startCloudPlayer() {
-        kRobotIds.forEach {
-            val roomId = it + kRobotRoomStartId
+        for (i in 0 until kRobotVideoRoomIds.size) {
+            val roomId = kRobotVideoRoomIds[i]
             cloudPlayerService.startCloudPlayer(
                 roomId.toString(),
                 UserManager.getInstance().user.userNo,
                 kRobotUid,
-                //20230001->10.mp4,20230002->11.mp4,20230003->12.mp4,
-                kRobotVideoStreamUrls[(roomId + 1) % kRobotVideoStreamUrls.size],
+                kRobotVideoStreamUrls[i],
                 "cn",
                 success = {
                     cloudPlayerService.startHeartBeat(
