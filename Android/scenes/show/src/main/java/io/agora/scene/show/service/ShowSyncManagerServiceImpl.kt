@@ -6,6 +6,7 @@ import android.os.Looper
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
+import io.agora.scene.show.R
 import io.agora.scene.show.ShowLogger
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.EventListener
@@ -387,6 +388,8 @@ class ShowSyncManagerServiceImpl constructor(
         val roomDetail = roomMap[roomId] ?: return
         val sceneReference = roomInfoController.sceneReference ?: return
 
+        sendChatMessage(roomId, context.getString(R.string.show_live_chat_leaving))
+
         // 移除连麦申请
         val targetApply =
             roomInfoController.micSeatApplyList.filter { it.userId == UserManager.getInstance().user.id.toString() }
@@ -413,8 +416,8 @@ class ShowSyncManagerServiceImpl constructor(
         innerRemoveUser(
             roomId,
             UserManager.getInstance().user.id.toString(),
-            {},
-            { errorHandler.invoke(it) }
+            success = {},
+            error = { errorHandler.invoke(it) }
         )
         innerUpdateRoomUserCount(roomId, roomDetail.roomUserCount - 1, {}, {})
 
