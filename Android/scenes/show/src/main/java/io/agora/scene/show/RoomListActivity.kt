@@ -6,6 +6,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import io.agora.scene.base.Constant
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
@@ -29,6 +32,8 @@ class RoomListActivity : AppCompatActivity() {
 
     private val roomDetailModelList = mutableListOf<ShowRoomDetailModel>()
 
+    private var isFirstLoad = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, true)
@@ -51,6 +56,26 @@ class RoomListActivity : AppCompatActivity() {
             }
         }
         mBinding.rvRooms.adapter = mRoomAdapter
+        mBinding.rvRooms.addOnScrollListener(object : OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) { // 停止状态
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val firstVisibleItem = layoutManager.findFirstVisibleItemPosition() // 第一个可见 item
+                    val lastVisibleItem = layoutManager.findLastVisibleItemPosition()  // 最后一个可见 item
+                    Log.d("RoomListActivity", "firstVisible $firstVisibleItem, lastVisible $lastVisibleItem")
+                    val firstPreloadPosition = if (firstVisibleItem - 7 < 0) 0 else firstVisibleItem - 7
+                    val lastPreloadPosition = if (firstPreloadPosition + 19 >= roomDetailModelList.size)
+                        roomDetailModelList.size - 1 else firstPreloadPosition + 19
+                    preloadChannels(firstPreloadPosition, lastPreloadPosition)
+                }
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+            }
+        })
 
         mBinding.smartRefreshLayout.setEnableLoadMore(false)
         mBinding.smartRefreshLayout.setEnableRefresh(true)
@@ -59,7 +84,10 @@ class RoomListActivity : AppCompatActivity() {
                 success = {
                     roomDetailModelList.clear()
                     roomDetailModelList.addAll(it)
-                    preloadChannels()
+                    if (isFirstLoad) {
+                        preloadChannels()
+                        isFirstLoad = false
+                    }
                     updateList(it)
                 },
                 error = {
@@ -162,7 +190,22 @@ class RoomListActivity : AppCompatActivity() {
         val generalToken = RtcEngineInstance.generalToken()
         if (roomDetailModelList.isNotEmpty() && generalToken.isNotEmpty()) {
             // sdk 最多 preload 20个频道，超过 20 个，sdk 内部维护最新的 20 个频道预加载
-            roomDetailModelList.take(20).forEach { room->
+            roomDetailModelList.take(20).forEach { room ->
+                val ret = RtcEngineInstance.rtcEngine.preloadChannel(
+                    generalToken, room.roomId, UserManager.getInstance().user.id.toInt()
+                )
+                Log.d("RoomListActivity", "call rtc sdk preloadChannel ${room.roomId} ret:$ret")
+            }
+        }
+    }
+
+    private fun preloadChannels(from: Int, to: Int) {
+        val generalToken = RtcEngineInstance.generalToken()
+        if (roomDetailModelList.isNotEmpty() && generalToken.isNotEmpty()) {
+            val size = roomDetailModelList.size
+            for (i in from until to + 1) {
+                if (i >= size) return
+                val room = roomDetailModelList[i]
                 val ret = RtcEngineInstance.rtcEngine.preloadChannel(
                     generalToken, room.roomId, UserManager.getInstance().user.id.toInt()
                 )
