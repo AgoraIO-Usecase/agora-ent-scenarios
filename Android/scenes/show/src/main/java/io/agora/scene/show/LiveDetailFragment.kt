@@ -1193,7 +1193,6 @@ class LiveDetailFragment : Fragment() {
         ?: ShowInteractionStatus.idle.value) == ShowInteractionStatus.pking.value
 
     private fun destroyService() {
-        mService.sendChatMessage(mRoomInfo.roomId, getString(R.string.show_live_chat_leaving))
         if (interactionInfo != null &&
             ((interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) && isRoomOwner)
         ) {
