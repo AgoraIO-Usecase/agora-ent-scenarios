@@ -104,6 +104,7 @@
     <string name="ktv_your_score">你的得分</string>
     <string name="ktv_room_count">当前在线人数：%s</string>
     <string name="ktv_zc">主唱</string>
+    <string name="ktv_hc">合唱</string>
     <string name="ktv_song_ordering_person">点唱：</string>
     <string name="ktv_song_ordering_person_chorus">合唱：</string>
     <string name="ktv_people">人</string>
@@ -145,5 +146,12 @@
     <string name="ktv_skip_prelude">跳过前奏</string>
     <string name="ktv_skip_postlude">跳过尾奏</string>
     <string name="ktv_onseat_toast">加入合唱前，您需要先上麦</string>
+    <string name="ktv_load_failed_no_song">"加载失败，当前已无歌曲"</string>
+    <string name="ktv_load_failed">歌曲加载失败</string>
+    <string name="ktv_try">已尝试三次，请自动切歌</string>
+    <string name="ktv_load_failed_another_song">"加载失败，当前已切换到另一首歌"</string>
+    <string name="ktv_too_fast">操作太频繁</string>
+    <string name="ktv_lrc_failed">歌词加载失败</string>
+    <string name="ktv_retry">点击重试</string>
 
 </resources>
