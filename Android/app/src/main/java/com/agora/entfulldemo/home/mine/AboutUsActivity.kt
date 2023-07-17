@@ -20,6 +20,7 @@ import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.manager.PagePilotManager
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.base.utils.VersionUtils
 import io.agora.scene.widget.dialog.CommonDialog
 
 @Route(path = PagePathConstant.pageAboutUs)
@@ -58,46 +59,48 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     // 设置语聊App的信息
     private fun setupChatRoomAppInfo() {
         adapter.scenes = mutableListOf<SceneInfo>()
-        adapter.appInfo = AppInfo(
-            this.getString(R.string.app_about_name),
-            "20230110-2.1.0-" + RtcEngine.getSdkVersion(),
-            servicePhone,
-            webSite
-        )
+        if (VersionUtils.getVersion("io.agora.scene.voice.BuildConfig").isNotEmpty()) {
+            adapter.appInfo = AppInfo(
+                this.getString(R.string.app_about_name),
+                "20230110-" + VersionUtils.getVersion("io.agora.scene.voice.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+                servicePhone,
+                webSite
+            )
+        }
     }
 
     // 设置综合App的信息
     private fun setupFullAppInfo() {
         val scenes = mutableListOf<SceneInfo>()
-        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_VOICE.isNotEmpty()) {
+        if (VersionUtils.getVersion("io.agora.scene.voice.BuildConfig").isNotEmpty()) {
             scenes.add(
                 SceneInfo(
                     this.getString(R.string.app_about_chat_room),
-                    "YL-" + io.agora.scene.base.BuildConfig.VERSION_SCENE_VOICE
+                    "YL-" + VersionUtils.getVersion("io.agora.scene.voice.BuildConfig")
                 )
             )
         }
-        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_SPATIAL_VOICE.isNotEmpty()) {
+        if (VersionUtils.getVersion("io.agora.scene.voice.spatial.BuildConfig").isNotEmpty()) {
             scenes.add(
                 SceneInfo(
                     this.getString(R.string.app_about_chat_room_spatial),
-                    "YLKJ-" + io.agora.scene.base.BuildConfig.VERSION_SCENE_SPATIAL_VOICE
+                    "YLKJ-" + VersionUtils.getVersion("io.agora.scene.voice.spatial.BuildConfig")
                 )
             )
         }
-        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_KTV.isNotEmpty()) {
+        if (VersionUtils.getVersion("io.agora.scene.ktv.BuildConfig").isNotEmpty()) {
             scenes.add(
                 SceneInfo(
                     this.getString(R.string.app_about_karaoke),
-                    "KTV-" + io.agora.scene.base.BuildConfig.VERSION_SCENE_KTV
+                    "KTV-" + VersionUtils.getVersion("io.agora.scene.ktv.BuildConfig")
                 )
             )
         }
-        if (io.agora.scene.base.BuildConfig.VERSION_SCENE_SHOW.isNotEmpty()) {
+        if (VersionUtils.getVersion("io.agora.scene.show.BuildConfig").isNotEmpty()) {
             scenes.add(
                 SceneInfo(
                     this.getString(R.string.app_about_show),
-                    "ZB-" + io.agora.scene.base.BuildConfig.VERSION_SCENE_SHOW
+                    "ZB-" + VersionUtils.getVersion("io.agora.scene.show.BuildConfig")
                 )
             )
         }

@@ -67,12 +67,7 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
     }
 
     private void reportEnter(@NonNull ScenesModel scenesModel){
-        ReportApi.reportEnter(scenesModel.getScene(), new Function1<Boolean, Unit>() {
-            @Override
-            public Unit invoke(Boolean aBoolean) {
-                return null;
-            }
-        },null);
+        ReportApi.reportEnter(scenesModel.getScene().name(), aBoolean -> null,null);
     }
 
     private void goScene(@NonNull ScenesModel scenesModel) {
