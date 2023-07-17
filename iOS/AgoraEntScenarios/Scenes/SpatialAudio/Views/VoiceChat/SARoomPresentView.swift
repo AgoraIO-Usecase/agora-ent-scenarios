@@ -1,7 +1,4 @@
 //
-//  VoiceRoomPresentView.swift
-//  VoiceRoomPresentView
-//
 //  Created by CP on 2023/1/30.
 //
 

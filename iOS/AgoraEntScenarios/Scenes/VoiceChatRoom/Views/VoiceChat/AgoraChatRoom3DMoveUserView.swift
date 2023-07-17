@@ -21,7 +21,7 @@ class AgoraChatRoom3DMoveUserView: UIView {
             case .AgoraChatRoomBaseUserCellTypeAdd:
                 iconView.isHidden = true
                 micView.isHidden = true
-                bgIconView.image = UIImage("icons／solid／add")
+                bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeMute:
                 iconView.isHidden = false
                 micView.isHidden = false
@@ -33,29 +33,29 @@ class AgoraChatRoom3DMoveUserView: UIView {
             case .AgoraChatRoomBaseUserCellTypeLock:
                 iconView.isHidden = true
                 micView.isHidden = true
-                bgIconView.image = UIImage("icons／solid／lock")
+                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeNormalUser:
                 iconView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.on)
-                nameBtn.setImage(UIImage(""), for: .normal)
+                nameBtn.setImage(UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"), for: .normal)
             case .AgoraChatRoomBaseUserCellTypeMuteAndLock:
                 iconView.isHidden = true
                 micView.isHidden = false
                 micView.setState(.forbidden)
-                bgIconView.image = UIImage("icons／solid／lock")
+                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeAlienNonActive:
                 iconView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.on)
                 micView.isHidden = true
-                nameBtn.setImage(UIImage("guanfang"), for: .normal)
+                nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), for: .normal)
                 coverView.isHidden = false
                 activeButton.isHidden = false
             case .AgoraChatRoomBaseUserCellTypeAlienActive:
                 iconView.isHidden = false
                 micView.isHidden = false
-                nameBtn.setImage(UIImage("guanfang"), for: .normal)
+                nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), for: .normal)
                 coverView.isHidden = true
                 activeButton.isHidden = true
             }
@@ -151,12 +151,12 @@ class AgoraChatRoom3DMoveUserView: UIView {
             self?.svgaPlayer.startAnimation()
         }
 
-        bgIconView.image = UIImage("icons／solid／add")
+        bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
         bgIconView.layer.cornerRadius = 15
         bgIconView.layer.masksToBounds = true
         addSubview(bgIconView)
 
-        iconView.image = UIImage("avatar1")
+        iconView.image = UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource")
         iconView.layer.cornerRadius = 37
         iconView.layer.masksToBounds = true
         addSubview(iconView)

@@ -7,7 +7,7 @@
 #import "VLFontUtils.h"
 #import "MenuUtils.h"
 @import Masonry;
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @interface VLLoginInputPhoneView()
 

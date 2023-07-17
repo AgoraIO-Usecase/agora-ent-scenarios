@@ -211,7 +211,7 @@ extension SARoomViewController {
 
     func layoutUI() {
         let bgImgView = UIImageView()
-        bgImgView.image = UIImage("lbg")
+        bgImgView.image = UIImage.sceneImage(name: "lbg", bundleName: "VoiceChatRoomResource")
         view.addSubview(bgImgView)
 
         headerView = SARoomHeaderView()
@@ -367,7 +367,7 @@ extension SARoomViewController {
         }
     }
 
-    func showNoticeView(with role: ROLE_TYPE) {
+    func showNoticeView(with role: SAROLE_TYPE) {
         let noticeView = SANoticeView(frame: CGRect(x: 0,
                                                     y: 0,
                                                     width: ScreenWidth,

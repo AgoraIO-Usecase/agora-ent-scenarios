@@ -32,7 +32,7 @@ def all_pods
   pod 'JXCategoryView', '1.6.1'
 
   # 火山美颜
-#  pod 'BytedEffect', :path => 'bytedEffect.podspec'
+  pod 'BytedEffect', :path => 'bytedEffect.podspec'
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
   

@@ -4,11 +4,10 @@
 //
 
 #import "VLHomeOnLineListCCell.h"
-#import "VLRoomListModel.h"
 #import "VLHotSpotBtn.h"
 #import "VLMacroDefine.h"
 #import "VLFontUtils.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import Masonry;
 
 @interface VLHomeOnLineListCCell()

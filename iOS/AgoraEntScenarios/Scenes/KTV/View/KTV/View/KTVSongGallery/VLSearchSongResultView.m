@@ -11,7 +11,7 @@
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"
 #import "AppContext+KTV.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 #import "NSString+Helper.h"
 @import MJRefresh;
 
@@ -197,7 +197,7 @@ UITableViewDelegate
     inputModel.songNo = model.songNo;
 //    inputModel.songUrl = model.songUrl;
     inputModel.singer = model.singer;
-    [[AppContext ktvServiceImp] chooseSongWithInput:inputModel
+    [[AppContext ktvServiceImp] chooseSongWith:inputModel
                                          completion:^(NSError * error) {
         if (error != nil) {
             return;

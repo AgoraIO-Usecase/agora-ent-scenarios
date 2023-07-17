@@ -7,7 +7,7 @@
 
 import UIKit
 import ZSwiftBaseLib
-
+let sa_page_size = 15
 public class VRSpatialSoundViewController: UIViewController {
     public var didSelected: ((VRRoomEntity) -> Void)?
 
@@ -39,7 +39,7 @@ extension VRSpatialSoundViewController {
     }
 
     @objc private func fetchRooms(cursor: String) {
-        VoiceRoomBusinessRequest.shared.sendGETRequest(api: .fetchRoomList(cursor: cursor, pageSize: page_size, type: 1), params: [:], classType: VRRoomsEntity.self) { rooms, error in
+        VoiceRoomBusinessRequest.shared.sendGETRequest(api: .fetchRoomList(cursor: cursor, pageSize: sa_page_size, type: 1), params: [:], classType: VRRoomsEntity.self) { rooms, error in
             self.roomList.refreshControl?.endRefreshing()
             if error == nil {
                 guard let total = rooms?.total else { return }

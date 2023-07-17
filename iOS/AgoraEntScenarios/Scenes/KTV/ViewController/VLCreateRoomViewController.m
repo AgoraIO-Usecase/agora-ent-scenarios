@@ -7,15 +7,13 @@
 #import <AgoraRtcKit/AgoraRtcKit.h>
 #import "VLCreateRoomView.h"
 #import "VLKTVViewController.h"
-#import "VLRoomSeatModel.h"
-#import "VLRoomListModel.h"
 #import "VLAddRoomModel.h"
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"
 #import "VLToast.h"
 #import "VLURLPathConfig.h"
 #import "AppContext+KTV.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @interface VLCreateRoomViewController ()<VLCreateRoomViewDelegate/*,AgoraRtmDelegate*/>
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
@@ -71,7 +69,7 @@
 //    intputModel.userNo = VLUserCenter.user.id;
     VL(weakSelf);
     self.view.userInteractionEnabled = NO;
-    [[AppContext ktvServiceImp] createRoomWithInput:intputModel
+    [[AppContext ktvServiceImp] createRoomWith:intputModel
                                          completion:^(NSError * error, KTVCreateRoomOutputModel * outputModel) {
         weakSelf.view.userInteractionEnabled = YES;
         if (error != nil) {

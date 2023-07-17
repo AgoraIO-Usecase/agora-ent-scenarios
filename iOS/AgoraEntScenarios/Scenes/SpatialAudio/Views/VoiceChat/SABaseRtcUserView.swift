@@ -36,12 +36,12 @@ class SABaseRtcUserView: UIView {
             case .AgoraChatRoomBaseUserCellTypeAdd:
                 iconView.isHidden = true
                 micView.isHidden = true
-                bgIconView.image = UIImage("icons／solid／add")
+                bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeMute:
                 iconView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.forbidden)
-                bgIconView.image = UIImage("icons／solid／mute")
+                bgIconView.image = UIImage.sceneImage(name: "icons／solid／mute", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeForbidden:
                 iconView.isHidden = false
                 micView.isHidden = false
@@ -49,29 +49,29 @@ class SABaseRtcUserView: UIView {
             case .AgoraChatRoomBaseUserCellTypeLock:
                 iconView.isHidden = true
                 micView.isHidden = true
-                bgIconView.image = UIImage("icons／solid／lock")
+                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeNormalUser:
                 iconView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.on)
-                nameBtn.setImage(UIImage(""), for: .normal)
+                nameBtn.setImage(UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"), for: .normal)
             case .AgoraChatRoomBaseUserCellTypeMuteAndLock:
                 iconView.isHidden = true
                 micView.isHidden = false
                 micView.setState(.forbidden)
-                bgIconView.image = UIImage("icons／solid／lock")
+                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeAlienNonActive:
                 iconView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.on)
                 micView.isHidden = true
-                nameBtn.setImage(UIImage("guanfang"), for: .normal)
+                nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), for: .normal)
                 coverView.isHidden = false
                 activeButton.isHidden = false
             case .AgoraChatRoomBaseUserCellTypeAlienActive:
                 iconView.isHidden = false
                 micView.isHidden = false
-                nameBtn.setImage(UIImage("guanfang"), for: .normal)
+                nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), for: .normal)
                 coverView.isHidden = true
                 activeButton.isHidden = true
             }
@@ -174,12 +174,12 @@ class SABaseRtcUserView: UIView {
         bgView.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)
         addSubview(bgView)
         
-        bgIconView.image = UIImage("icons／solid／add")
+        bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
         bgIconView.layer.cornerRadius = 15
         bgIconView.layer.masksToBounds = true
         bgView.addSubview(bgIconView)
 
-        iconView.image = UIImage("")
+        iconView.image = UIImage(named: "")
         iconView.layer.cornerRadius = 30
         iconView.layer.masksToBounds = true
         bgView.addSubview(iconView)
@@ -207,7 +207,7 @@ class SABaseRtcUserView: UIView {
         activeButton.layer.masksToBounds = true
         activeButton.setTitle(sceneLocalized( "active"), for: .normal)
         activeButton.setTitleColor(.white, for: .normal)
-        activeButton.setBackgroundImage(UIImage("active"), for: .normal)
+        activeButton.setBackgroundImage(UIImage.sceneImage(name: "active", bundleName: "VoiceChatRoomResource"), for: .normal)
         activeButton.titleLabel?.font = UIFont.systemFont(ofSize: 9)
         activeButton.addTargetFor(self, action: #selector(active), for: .touchUpInside)
         addSubview(activeButton)

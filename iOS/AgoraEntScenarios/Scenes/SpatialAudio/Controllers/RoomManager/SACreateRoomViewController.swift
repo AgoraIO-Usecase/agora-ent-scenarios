@@ -11,7 +11,7 @@ import ZSwiftBaseLib
 import AgoraChat
 
 public final class SACreateRoomViewController: SABaseViewController {
-    lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage("roomList")!)
+    lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage.sceneImage(name: "roomList", bundleName: "VoiceChatRoomResource")!)
 
     lazy var container: SACreateRoomView = .init(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: ScreenHeight - ZNavgationHeight))
 

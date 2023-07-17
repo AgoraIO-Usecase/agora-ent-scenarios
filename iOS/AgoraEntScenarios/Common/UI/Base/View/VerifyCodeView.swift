@@ -1,5 +1,5 @@
 //
-//  VRVerifyCodeView.swift
+//  VerifyCodeView.swift
 //  VoiceRoomBaseUIKit
 //
 //  Created by 朱继超 on 2022/8/25.
@@ -8,7 +8,7 @@
 import UIKit
 import ZSwiftBaseLib
 
-public class VRVerifyCodeView: UIView {
+public class VerifyCodeView: UIView {
     @objc var beginEdit: (() -> Void)?
 
     /// 输入值改变
@@ -81,7 +81,7 @@ public class VRVerifyCodeView: UIView {
 
 // MARK: - 供外部调用方法
 
-public extension VRVerifyCodeView {
+public extension VerifyCodeView {
     /// 清除所有输入
     @objc func cleanCodes() {
         textFiled.text = ""
@@ -105,7 +105,7 @@ public extension VRVerifyCodeView {
 
 // MARK: - 键盘显示隐藏
 
-public extension VRVerifyCodeView {
+public extension VerifyCodeView {
     @objc func keyboardShow(note: Notification) {
         isInput = false
         textFiledDidChange(textFiled)
@@ -119,7 +119,7 @@ public extension VRVerifyCodeView {
 
 // MARK: - UITextViewDelegate
 
-extension VRVerifyCodeView: UITextFieldDelegate {
+extension VerifyCodeView: UITextFieldDelegate {
     public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         // 输入框已有的值
         var inputText = textFiled.text ?? ""

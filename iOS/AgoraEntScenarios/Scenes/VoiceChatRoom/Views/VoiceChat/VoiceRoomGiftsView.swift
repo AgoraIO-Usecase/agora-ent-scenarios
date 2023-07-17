@@ -82,8 +82,8 @@ public class VoiceRoomGiftsView: UIView, UICollectionViewDelegate, UICollectionV
         addSubViews([header, giftList, pageControl, contribution, lineLayer, disableView])
         disableView.isHidden = true
         bringSubviewToFront(disableView)
-        chooseQuantity.setImage(UIImage("arrow_down"), for: .normal)
-        chooseQuantity.setImage(UIImage("arrow_up"), for: .selected)
+        chooseQuantity.setImage(UIImage.sceneImage(name: "arrow_down", bundleName: "VoiceChatRoomResource"), for: .normal)
+        chooseQuantity.setImage(UIImage.sceneImage(name: "arrow_up", bundleName: "VoiceChatRoomResource"), for: .selected)
         chooseQuantity.imageEdgeInsets = UIEdgeInsets(top: 5, left: 55, bottom: 5, right: 10)
         chooseQuantity.titleEdgeInsets = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 30)
         lineLayer.addSubViews([chooseQuantity, send])

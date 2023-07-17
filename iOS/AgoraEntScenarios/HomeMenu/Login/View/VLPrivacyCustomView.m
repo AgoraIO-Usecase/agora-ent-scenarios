@@ -9,7 +9,7 @@
 #import "MenuUtils.h"
 #import "AttributedTextView.h"
 @import Masonry;
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @interface VLPrivacyCustomView()<UITextViewDelegate>
 @property (nonatomic, strong) UIButton *disButton;

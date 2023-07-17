@@ -54,7 +54,7 @@ class VMManagerView: UIView {
                 iconView.isHidden = true
                 roleBtn.isHidden = true
                 // micView.isHidden = true
-                addView.image = UIImage("icons／solid／lock")
+                addView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
                 lockBtn.setTitle(LanguageManager.localValue(key: "Unblock"), for: .normal)
                 inviteBtn.setTitleColor(UIColor.HexColor(hex: 0x979cbb, alpha: 1), for: .normal)
                 inviteBtn.isUserInteractionEnabled = false
@@ -64,7 +64,7 @@ class VMManagerView: UIView {
                 roleBtn.isHidden = true
 //                micView.isHidden = false
 //                micView.setState(.forbidden)
-                addView.image = UIImage("icons／solid／lock")
+                addView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
                 lockBtn.setTitle(LanguageManager.localValue(key: "Unblock"), for: .normal)
                 muteBtn.setTitle(LanguageManager.localValue(key: "Unmute"), for: .normal)
                 inviteBtn.setTitleColor(UIColor.HexColor(hex: 0x979cbb, alpha: 1), for: .normal)
@@ -79,7 +79,7 @@ class VMManagerView: UIView {
                 nameLabel.text = username
             } else if m_type == 0 {
                 iconView.isHidden = false
-                iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage("mine_avatar_placeHolder"))
+                iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage.sceneImage(name: "mine_avatar_placeHolder", bundleName: "VoiceChatRoomResource"))
                 nameLabel.text = username
 //                micView.setState(.on)
 //                micView.setVolume(100)
@@ -87,7 +87,7 @@ class VMManagerView: UIView {
                 inviteBtn.setTitle(LanguageManager.localValue(key: "Kick"), for: .normal)
             } else if m_type == 2 {
                 iconView.isHidden = false
-                iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage("mine_avatar_placeHolder"))
+                iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage.sceneImage(name: "mine_avatar_placeHolder", bundleName: "VoiceChatRoomResource"))
                 nameLabel.text = username
 //                micView.setState(.forbidden)
 //                micView.isHidden = false
@@ -121,7 +121,7 @@ class VMManagerView: UIView {
         addSubview(cover)
 
         lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20, y: 8, width: 40, height: 4)
-        lineImgView.image = UIImage("pop_indicator")
+        lineImgView.image = UIImage.sceneImage(name: "pop_indicator", bundleName: "VoiceChatRoomResource")
         addSubview(lineImgView)
 
         bgView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
@@ -131,11 +131,11 @@ class VMManagerView: UIView {
         addSubview(bgView)
 
         addView.frame = CGRect(x: ScreenWidth / 2 - 11, y: 61, width: 22, height: 22)
-        addView.image = UIImage("icons／solid／add")
+        addView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
         addSubview(addView)
 
         iconView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
-        iconView.image = UIImage("avatar1")
+        iconView.image = UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource")
         iconView.layer.cornerRadius = 32
         iconView.layer.masksToBounds = true
         addSubview(iconView)
@@ -151,7 +151,7 @@ class VMManagerView: UIView {
         addSubview(nameLabel)
 
         roleBtn.frame = CGRect(x: ScreenWidth / 2.0 - 50, y: 135, width: 100, height: 20)
-        roleBtn.setImage(UIImage("Landlord"), for: .normal)
+        roleBtn.setImage(UIImage.sceneImage(name: "Landlord", bundleName: "VoiceChatRoomResource"), for: .normal)
         roleBtn.setTitle(LanguageManager.localValue(key: "host"), for: .normal)
         roleBtn.setTitleColor(.black, for: .normal)
         roleBtn.font(UIFont.systemFont(ofSize: 11))

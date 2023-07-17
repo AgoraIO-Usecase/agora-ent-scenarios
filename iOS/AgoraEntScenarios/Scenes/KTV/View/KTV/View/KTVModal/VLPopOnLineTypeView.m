@@ -7,7 +7,7 @@
 #import "VLHotSpotBtn.h"
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import YYCategories;
 
 @interface VLPopOnLineTypeView ()
