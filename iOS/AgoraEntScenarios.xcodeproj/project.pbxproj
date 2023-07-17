@@ -178,13 +178,9 @@
 		DD619A7829E3E247008F63E4 /* SAPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199E529E3E246008F63E4 /* SAPresentationController.swift */; };
 		DD619A7929E3E247008F63E4 /* Notification+SAPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199E629E3E246008F63E4 /* Notification+SAPresentation.swift */; };
 		DD619A7A29E3E247008F63E4 /* SAPasswordAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199E729E3E246008F63E4 /* SAPasswordAlert.swift */; };
-		DD619A7B29E3E247008F63E4 /* UIViewToastExtensionSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199E929E3E246008F63E4 /* UIViewToastExtensionSA.swift */; };
-		DD619A7C29E3E247008F63E4 /* UIButton+SAExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199EA29E3E246008F63E4 /* UIButton+SAExtension.swift */; };
 		DD619A7D29E3E247008F63E4 /* String + SAExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199EB29E3E246008F63E4 /* String + SAExtension.swift */; };
 		DD619A7E29E3E247008F63E4 /* UIImageBundleExtensionSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199EC29E3E246008F63E4 /* UIImageBundleExtensionSA.swift */; };
-		DD619A7F29E3E247008F63E4 /* UIColor+saextension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199ED29E3E246008F63E4 /* UIColor+saextension.swift */; };
 		DD619A8029E3E247008F63E4 /* ResourceBundleExtensionSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199EE29E3E246008F63E4 /* ResourceBundleExtensionSA.swift */; };
-		DD619A8129E3E247008F63E4 /* UIButtonLayoutExtensionSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199EF29E3E246008F63E4 /* UIButtonLayoutExtensionSA.swift */; };
 		DD619A8329E3E247008F63E4 /* SAIMManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199F329E3E246008F63E4 /* SAIMManager.swift */; };
 		DD619A8429E3E247008F63E4 /* ActionSheetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199F529E3E246008F63E4 /* ActionSheetManager.swift */; };
 		DD619A8529E3E247008F63E4 /* SASceneConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199F729E3E246008F63E4 /* SASceneConfig.swift */; };
@@ -310,9 +306,6 @@
 		DD619B9429E3E262008F63E4 /* VoiceRoomPageContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0329E3E262008F63E4 /* VoiceRoomPageContainer.swift */; };
 		DD619B9529E3E262008F63E4 /* Xcode14.m in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0429E3E262008F63E4 /* Xcode14.m */; };
 		DD619B9629E3E262008F63E4 /* Notification+Presentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0529E3E262008F63E4 /* Notification+Presentation.swift */; };
-		DD619B9729E3E262008F63E4 /* UIColor+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0729E3E262008F63E4 /* UIColor+extension.swift */; };
-		DD619B9829E3E262008F63E4 /* UIButtonLayoutExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0829E3E262008F63E4 /* UIButtonLayoutExtension.swift */; };
-		DD619B9929E3E262008F63E4 /* UIButton+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0929E3E262008F63E4 /* UIButton+Extension.swift */; };
 		DD619B9A29E3E262008F63E4 /* ResourceBundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0A29E3E262008F63E4 /* ResourceBundleExtension.swift */; };
 		DD619B9B29E3E262008F63E4 /* UIViewToastExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0B29E3E262008F63E4 /* UIViewToastExtension.swift */; };
 		DD619B9C29E3E262008F63E4 /* UIImageBundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0C29E3E262008F63E4 /* UIImageBundleExtension.swift */; };
@@ -840,13 +833,9 @@
 		DD6199E529E3E246008F63E4 /* SAPresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAPresentationController.swift; sourceTree = "<group>"; };
 		DD6199E629E3E246008F63E4 /* Notification+SAPresentation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Notification+SAPresentation.swift"; sourceTree = "<group>"; };
 		DD6199E729E3E246008F63E4 /* SAPasswordAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAPasswordAlert.swift; sourceTree = "<group>"; };
-		DD6199E929E3E246008F63E4 /* UIViewToastExtensionSA.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewToastExtensionSA.swift; sourceTree = "<group>"; };
-		DD6199EA29E3E246008F63E4 /* UIButton+SAExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+SAExtension.swift"; sourceTree = "<group>"; };
 		DD6199EB29E3E246008F63E4 /* String + SAExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String + SAExtension.swift"; sourceTree = "<group>"; };
 		DD6199EC29E3E246008F63E4 /* UIImageBundleExtensionSA.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageBundleExtensionSA.swift; sourceTree = "<group>"; };
-		DD6199ED29E3E246008F63E4 /* UIColor+saextension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+saextension.swift"; sourceTree = "<group>"; };
 		DD6199EE29E3E246008F63E4 /* ResourceBundleExtensionSA.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceBundleExtensionSA.swift; sourceTree = "<group>"; };
-		DD6199EF29E3E246008F63E4 /* UIButtonLayoutExtensionSA.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIButtonLayoutExtensionSA.swift; sourceTree = "<group>"; };
 		DD6199F329E3E246008F63E4 /* SAIMManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAIMManager.swift; sourceTree = "<group>"; };
 		DD6199F529E3E246008F63E4 /* ActionSheetManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionSheetManager.swift; sourceTree = "<group>"; };
 		DD6199F729E3E246008F63E4 /* SASceneConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SASceneConfig.swift; sourceTree = "<group>"; };
@@ -973,9 +962,6 @@
 		DD619B0329E3E262008F63E4 /* VoiceRoomPageContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomPageContainer.swift; sourceTree = "<group>"; };
 		DD619B0429E3E262008F63E4 /* Xcode14.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Xcode14.m; sourceTree = "<group>"; };
 		DD619B0529E3E262008F63E4 /* Notification+Presentation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Notification+Presentation.swift"; sourceTree = "<group>"; };
-		DD619B0729E3E262008F63E4 /* UIColor+extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+extension.swift"; sourceTree = "<group>"; };
-		DD619B0829E3E262008F63E4 /* UIButtonLayoutExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIButtonLayoutExtension.swift; sourceTree = "<group>"; };
-		DD619B0929E3E262008F63E4 /* UIButton+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+Extension.swift"; sourceTree = "<group>"; };
 		DD619B0A29E3E262008F63E4 /* ResourceBundleExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceBundleExtension.swift; sourceTree = "<group>"; };
 		DD619B0B29E3E262008F63E4 /* UIViewToastExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewToastExtension.swift; sourceTree = "<group>"; };
 		DD619B0C29E3E262008F63E4 /* UIImageBundleExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageBundleExtension.swift; sourceTree = "<group>"; };
@@ -2075,13 +2061,9 @@
 		DD6199E829E3E246008F63E4 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				DD6199E929E3E246008F63E4 /* UIViewToastExtensionSA.swift */,
-				DD6199EA29E3E246008F63E4 /* UIButton+SAExtension.swift */,
 				DD6199EB29E3E246008F63E4 /* String + SAExtension.swift */,
 				DD6199EC29E3E246008F63E4 /* UIImageBundleExtensionSA.swift */,
-				DD6199ED29E3E246008F63E4 /* UIColor+saextension.swift */,
 				DD6199EE29E3E246008F63E4 /* ResourceBundleExtensionSA.swift */,
-				DD6199EF29E3E246008F63E4 /* UIButtonLayoutExtensionSA.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2349,9 +2331,6 @@
 		DD619B0629E3E262008F63E4 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				DD619B0729E3E262008F63E4 /* UIColor+extension.swift */,
-				DD619B0829E3E262008F63E4 /* UIButtonLayoutExtension.swift */,
-				DD619B0929E3E262008F63E4 /* UIButton+Extension.swift */,
 				DD619B0A29E3E262008F63E4 /* ResourceBundleExtension.swift */,
 				DD619B0C29E3E262008F63E4 /* UIImageBundleExtension.swift */,
 				DD619B0D29E3E262008F63E4 /* String + Extension.swift */,
@@ -3669,7 +3648,6 @@
 				DD0292E5295BF0DC00485225 /* VLKTVKindsCell.m in Sources */,
 				E3735CA72A5E8023004737EF /* VRBaseViewController.swift in Sources */,
 				DD619BCD29E3E262008F63E4 /* VMAudioSettingView.swift in Sources */,
-				DD619A7B29E3E247008F63E4 /* UIViewToastExtensionSA.swift in Sources */,
 				DD619BBD29E3E262008F63E4 /* VRSpatialSoundViewController.swift in Sources */,
 				DD619B9029E3E262008F63E4 /* PresentationEnums.swift in Sources */,
 				DD3610BB29B70CDC00CE7984 /* ShowPresettingHeaderView.swift in Sources */,
@@ -3728,7 +3706,6 @@
 				DD84179229090C520026B624 /* VLLoginInputPhoneView.m in Sources */,
 				DD36109A29B70CDC00CE7984 /* ShowPresentTransitioningDelegate.swift in Sources */,
 				DD619AB129E3E247008F63E4 /* SAGiftsView.swift in Sources */,
-				DD619B9829E3E262008F63E4 /* UIButtonLayoutExtension.swift in Sources */,
 				DD3610B029B70CDC00CE7984 /* ShowCanvasView.swift in Sources */,
 				DD0292DF295BF0DC00485225 /* LSTPopView+KTVModal.m in Sources */,
 				DD3610A229B70CDC00CE7984 /* ShowMusicItemCell.swift in Sources */,
@@ -3804,7 +3781,6 @@
 				DDA19A0328FFE579009D3E61 /* NSArray+JKSafeAccess.m in Sources */,
 				DD619ACD29E3E247008F63E4 /* SABaseUserCollectionViewCell.swift in Sources */,
 				053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */,
-				DD619B9729E3E262008F63E4 /* UIColor+extension.swift in Sources */,
 				DD619BE029E3E262008F63E4 /* VMUpstageView.swift in Sources */,
 				DD619B8929E3E262008F63E4 /* FlipHorizontalAnimation.swift in Sources */,
 				DD3610BD29B70CDC00CE7984 /* ShowPresettingCell.swift in Sources */,
@@ -3882,7 +3858,6 @@
 				DD3610B129B70CDC00CE7984 /* ShowChatInputView.swift in Sources */,
 				DD0292EA295BF0DC00485225 /* VLKTVBottomToolbar.m in Sources */,
 				DD84178529090C520026B624 /* VLUploadImageResModel.m in Sources */,
-				DD619A8129E3E247008F63E4 /* UIButtonLayoutExtensionSA.swift in Sources */,
 				DD0292CC295BF0DC00485225 /* VLSelectedSongListCell.m in Sources */,
 				DD619AD029E3E247008F63E4 /* SAANISSetTableViewCell.swift in Sources */,
 				DDA199E228FFE579009D3E61 /* VLCommonWebViewController.m in Sources */,
@@ -3931,7 +3906,6 @@
 				DD0292D8295BF0DC00485225 /* VLMicSeatList.m in Sources */,
 				DD619AA929E3E247008F63E4 /* SASoundEffectsCell.swift in Sources */,
 				DD619BA029E3E262008F63E4 /* AgoraSceneConfig.swift in Sources */,
-				DD619A7C29E3E247008F63E4 /* UIButton+SAExtension.swift in Sources */,
 				DD619BA329E3E262008F63E4 /* VRUser.swift in Sources */,
 				DD8417CC29090C520026B624 /* TemplateServiceProtocol.swift in Sources */,
 				DD619A7729E3E247008F63E4 /* SAThrottle.swift in Sources */,
@@ -3983,7 +3957,6 @@
 				DDA199EB28FFE579009D3E61 /* VLRequestRoute.m in Sources */,
 				DD619BE129E3E262008F63E4 /* VMNoticeView.swift in Sources */,
 				DD619A9329E3E247008F63E4 /* SABaseViewController.swift in Sources */,
-				DD619B9929E3E262008F63E4 /* UIButton+Extension.swift in Sources */,
 				DD0292DE295BF0DC00485225 /* VLPopOnLineTypeView.m in Sources */,
 				DD619ABC29E3E247008F63E4 /* SAChatCell.swift in Sources */,
 				DD36106529B70CDC00CE7984 /* ShowChatModel.swift in Sources */,
@@ -4105,7 +4078,6 @@
 				DD619A8429E3E247008F63E4 /* ActionSheetManager.swift in Sources */,
 				DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */,
 				DD619A9C29E3E247008F63E4 /* SAGiftersViewController.swift in Sources */,
-				DD619A7F29E3E247008F63E4 /* UIColor+saextension.swift in Sources */,
 				E3735C9C2A5E7E75004737EF /* BundleUtil.m in Sources */,
 				DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */,
 				DD619ABA29E3E247008F63E4 /* SAAudioSettingView.swift in Sources */,

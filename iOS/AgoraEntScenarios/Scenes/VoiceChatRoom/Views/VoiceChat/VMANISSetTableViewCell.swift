@@ -51,7 +51,7 @@ class VMANISSetTableViewCell: UITableViewCell {
         // titleLabel.frame = CGRect(x: 20~, y: 17~, width: 200~, height: 20~)
         titleLabel.text = "Your AINS".voice_localized()
         titleLabel.font = UIFont.systemFont(ofSize: 13)
-        titleLabel.textColor = UIColor.HexColor(hex: 0x3C4267, alpha: 1)
+        titleLabel.textColor = UIColor(hex: 0x3C4267, alpha: 1)
         contentView.addSubview(titleLabel)
 
         offBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
@@ -66,12 +66,12 @@ class VMANISSetTableViewCell: UITableViewCell {
 
         midBtn.backgroundColor = .white
         midBtn.setTitle(" \("Medium".voice_localized()) ".voice_localized(), for: .normal)
-        midBtn.setTitleColor(UIColor.HexColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
+        midBtn.setTitleColor(UIColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
         midBtn.font(UIFont.systemFont(ofSize: 11))
         midBtn.backgroundColor = .white
         midBtn.layer.cornerRadius = 3
         midBtn.layer.masksToBounds = true
-        midBtn.layer.borderColor = UIColor.HexColor(hex: 0x0A7AFF, alpha: 1).cgColor
+        midBtn.layer.borderColor = UIColor(hex: 0x0A7AFF, alpha: 1).cgColor
         midBtn.layer.borderWidth = 1
         midBtn.tag = 101
         midBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
@@ -132,8 +132,8 @@ class VMANISSetTableViewCell: UITableViewCell {
     private func setBtnStateWith(_ btn: UIButton) {
         if selBtn == btn { return }
         btn.backgroundColor = .white
-        btn.layer.borderColor = UIColor.HexColor(hex: 0x0A7AFF, alpha: 1).cgColor
-        btn.setTitleColor(UIColor.HexColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
+        btn.layer.borderColor = UIColor(hex: 0x0A7AFF, alpha: 1).cgColor
+        btn.setTitleColor(UIColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
         btn.layer.borderWidth = 1
 
         selBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)

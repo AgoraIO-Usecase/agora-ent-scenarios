@@ -203,7 +203,7 @@ extension SARoomViewController {
         player.tag(199)
         view.addSubview(player)
         let parser = SVGAParser()
-        guard let path = Bundle.voiceRoomBundle.path(forResource: "rocket", ofType: "svga") else { return }
+        guard let path = Bundle.voiceChat.path(forResource: "rocket", ofType: "svga") else { return }
         parser.parse(with: URL(fileURLWithPath: path)) { entity in
             player.videoItem = entity
             player.startAnimation()

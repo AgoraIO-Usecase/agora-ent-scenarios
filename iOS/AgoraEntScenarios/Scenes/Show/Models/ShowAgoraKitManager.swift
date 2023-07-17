@@ -545,24 +545,7 @@ class ShowAgoraKitManager {
 
 //MARK: private param
 extension ShowAgoraKitManager {
-//    func initClinetRole() {
-//        let clientRoleOptions = AgoraClientRoleOptions()
-//        clientRoleOptions.audienceLatencyLevel = AgoraAudienceLatencyLevelType.lowLatency
-//        agoraKit.setClientRole(AgoraClientRole.audience, options: clientRoleOptions)
-//    }
-//
-//    func initDefaultEncoderConfig(rtcengine : AgoraRtcEngineKit?) {
-//        agoraKit.setVideoEncoderConfiguration(AgoraVideoEncoderConfiguration(size: CGSize(width: 640, height: 360),
-//                                                                              frameRate: .fps30,
-//                                                                              bitrate: AgoraVideoBitrateStandard,
-//                                                                              orientationMode: .fixedPortrait,
-//                                                                              mirrorMode: .auto))
-//    }
-//
-//    func initEncoderConfig() -> Void {
-//        //todo
-//    }
-//
+    
     func initBroadcasterConfig() {
         engine?.setParameters("{\"rtc.enable_crypto_access\":false}")
         engine?.setParameters("{\"rtc.use_global_location_priority_domain\":true}")
