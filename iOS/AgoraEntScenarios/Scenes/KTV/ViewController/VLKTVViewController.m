@@ -644,6 +644,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 NSLog(@"effect:Off");
                 break;
         }
+    } else if([dict[@"cmd"] isEqualToString:@"cancelVoiceHighlight"]) {
+        //人生突出实效
+        [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
     }
 }
 
@@ -1270,6 +1273,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self stopPlaySong];
     self.isNowMicMuted = true;
     [self.MVView.gradeView reset];
+    [self.MVView.incentiveView reset];
+    if(self.isHighlightSinger){
+        [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
+        [self sendStreamMessageWithDict:@{@"cmd": @"cancelVoiceHighlight"} success:nil];
+        self.isHighlightSinger = false;
+    }
     [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:YES
                                                         completion:^(NSError * error) {
     }];
@@ -1664,7 +1673,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //人声突出设置
 - (void)voiceItemClickAction:(NSInteger)ItemIndex {
     if(self.voiceShowHasSeted){
-        [VLToast toast:@"本首歌已有突出者"];
+        [VLToast toast:@"每首歌仅可设置一次人声突出对象，请在下首歌再设置"];
         return;
     }
     self.voiceShowHasSeted = true;
@@ -1680,17 +1689,69 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)didAIAECGradeChangedWithIndex:(NSInteger)index{
     self.aecGrade = index;
-    [self.ktvApi onAINSModeChanged:index];
+    [self onAINSModeChangedWithMode:index];
 }
 
 -(void)didVolQualityGradeChangedWithIndex:(NSInteger)index {
     self.volGrade = index;
-    [self.ktvApi onAECLevelChangedWithLevel:index];
+    [self onAECLevelChangedWithLevel:index];
 }
 
 - (void)voiceDelaySelectedAction:(BOOL)isSelected{
     self.isDelay = isSelected;
-    [self.ktvApi enableLowLatencyMode:isSelected];
+    [self enableLowLatencyMode:isSelected];
+}
+
+- (void)onAECLevelChangedWithLevel:(NSInteger)level {
+    if (level == 0) {
+        [self.RTCkit setParameters:@"{\"che.audio.aec.split_srate_for_48k\": 16000}"];
+    } else if (level == 1) {
+        [self.RTCkit setParameters:@"{\"che.audio.aec.split_srate_for_48k\": 24000}"];
+    } else if (level == 2) {
+        [self.RTCkit setParameters:@"{\"che.audio.aec.split_srate_for_48k\": 48000}"];
+    }
+}
+
+- (void)onAINSModeChangedWithMode:(NSInteger)mode {
+    if (mode == 0) {
+        // 关闭
+        [self.RTCkit setParameters:@"{\"che.audio.ains_mode\": 0}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.lowerBound\": 80}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.lowerMask\": 50}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.statisticalbound\": 5}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.finallowermask\": 30}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.enhfactorstastical\": 200}"];
+    } else if (mode == 1) {
+        // 中
+        [self.RTCkit setParameters:@"{\"che.audio.ains_mode\": 2}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.lowerBound\": 80}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.lowerMask\": 50}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.statisticalbound\": 5}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.finallowermask\": 30}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.enhfactorstastical\": 200}"];
+    } else if (mode == 2) {
+        // 高
+        [self.RTCkit setParameters:@"{\"che.audio.ains_mode\": 2}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.lowerBound\": 10}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.lowerMask\": 10}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.statisticalbound\": 0}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.finallowermask\": 8}"];
+        [self.RTCkit setParameters:@"{\"che.audio.nsng.enhfactorstastical\": 200}"];
+    }
+}
+
+- (void)enableLowLatencyMode:(BOOL)enable {
+    if (enable) {
+      //  [self.RTCkit setParameters:@"{\"che.audio.aiaec.working_mode\": 0}"];
+        [self.RTCkit setParameters:@"{\"che.audio.ains_mode\": -1}"];
+//        [self.RTCkit setParameters:@"{\"che.audio.aec.nlp_size\": 128}"];
+//        [self.RTCkit setParameters:@"{\"che.audio.aec.nlp_size\": 64}"];
+    } else {
+     //   [self.RTCkit setParameters:@"{\"che.audio.aiaec.working_mode\": 0}"];
+        [self.RTCkit setParameters:@"{\"che.audio.ains_mode\": 0}"];
+//        [self.RTCkit setParameters:@"{\"che.audio.aiaec.working_mode\": 512}"];
+//        [self.RTCkit setParameters:@"{\"che.audio.aec.nlp_hop_size\": 64}"];
+    }
 }
 
 -(void)didAECStateChange:(BOOL)enable{
@@ -1762,7 +1823,21 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLRoomSelSongModel *topSong = [self.selSongsArray firstObject];
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"chorusSongCode == %@", topSong.chorusSongId];
     NSArray<VLRoomSeatModel *> *matchedSeats = [seatArray filteredArrayUsingPredicate:predicate];
-    [singerSeatArray addObject:seatArray.firstObject]; // 添加房主到列表中
+    //如果房主是观众则不添加到列表中，否则添加进去
+    BOOL flag = false;
+    VLRoomSeatModel *model = seatArray.firstObject;
+    if(model.isOwner || [self checkIfCosingerWith:0]){
+        flag = true;
+    }
+    if(flag){
+        [singerSeatArray addObject:seatArray.firstObject]; // 添加房主到列表中
+    }
+    
+    for(VLRoomSeatModel *seatModel in seatArray){
+        if(seatModel.isOwner && !seatModel.isMaster){
+            [singerSeatArray addObject:seatModel];
+        }
+    }
     if (matchedSeats.count > 0) {
         [singerSeatArray addObjectsFromArray:matchedSeats]; // 添加匹配到的表演者
     }
@@ -1893,16 +1968,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
     }
     
-    if(self.selectedVoiceShowIndex == -2){
-        //所有人切换为无音效
-        [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
-    }
-    
     if([self isRoomOwner]){
         [self.MVView setPerViewHidden:[self getChorusSingerArrayWithSeatArray:_seatsArray].count < 2];
         if(self.selSongsArray.count == 0){
             [self.MVView setPerViewAvatar:@""];
         }
+    }
+    
+    if([self getChorusSingerArrayWithSeatArray:_seatsArray].count < 2){
+        [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
     }
     
     self.roomPersonView.roomSeatsArray = self.seatsArray;
@@ -2162,6 +2236,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)onSingingScoreResultWithScore:(float)score {
+}
+
+- (void)onTokenPrivilegeWillExpire {
+    
 }
 
 #pragma mark KTVMusicLoadStateListener
