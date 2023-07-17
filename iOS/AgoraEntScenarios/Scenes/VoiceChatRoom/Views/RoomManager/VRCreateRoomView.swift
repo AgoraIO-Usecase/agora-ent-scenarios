@@ -88,7 +88,7 @@ public extension VRCreateRoomView {
                     createAction!()
                 }
             } else {
-                makeToast("4 Digit Password Required".localized(), point: center, title: nil, image: nil, completion: nil)
+                makeToast("4 Digit Password Required".voice_localized(), point: center, title: nil, image: nil, completion: nil)
             }
         }
     }

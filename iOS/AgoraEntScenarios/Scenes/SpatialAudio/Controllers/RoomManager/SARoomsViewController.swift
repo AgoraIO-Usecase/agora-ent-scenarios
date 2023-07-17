@@ -124,7 +124,7 @@ extension SARoomsViewController {
                     if room.roomPassword == alert.code {
                         self.loginIMThenPush(room: room)
                     } else {
-                        self.view.makeToast("Incorrect Password".localized())
+                        self.view.makeToast("Incorrect Password".spatial_localized())
                     }
                 }
                 vc.dismiss(animated: true)
@@ -135,7 +135,7 @@ extension SARoomsViewController {
     }
 
     private func loginIMThenPush(room: SARoomEntity) {
-        SVProgressHUD.show(withStatus: "Loading".localized())
+        SVProgressHUD.show(withStatus: "Loading".spatial_localized())
         AppContext.saServiceImp().joinRoom(room.room_id ?? "") { [weak self] error, room_entity, robot in
             SVProgressHUD.dismiss()
             guard let self = self else {return}

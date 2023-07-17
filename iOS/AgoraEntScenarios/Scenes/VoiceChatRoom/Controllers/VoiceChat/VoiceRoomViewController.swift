@@ -104,7 +104,7 @@ class VoiceRoomViewController: VRBaseViewController {
         SyncUtil.scene(id: self.roomInfo?.room?.room_id ?? "")?.subscribe(key: "",onDeleted: { 
             
             if self.isHeaderBack == false,$0.getId() == self.roomInfo?.room?.room_id ?? "" {
-                self.view.window?.makeToast("Time limit desc".localized())
+                self.view.window?.makeToast("Time limit desc".voice_localized())
                 self.quitRoom()
             }
         })
@@ -419,7 +419,7 @@ extension VoiceRoomViewController {
     
     func showEQOperation() {
         if !isOwner {
-            view.makeToast("Host Bot".localized())
+            view.makeToast("Host Bot".voice_localized())
             return
         }
         let confirmView = VREQOperationAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: (254/375.0)*ScreenWidth)).backgroundColor(.white).cornerRadius(20, [.topLeft, .topRight], .white, 0)
@@ -487,7 +487,7 @@ extension VoiceRoomViewController {
 
     func showActiveAlienView(_ active: Bool) {
         if !isOwner {
-            view.makeToast("Host Bot".localized())
+            view.makeToast("Host Bot".voice_localized())
             return
         }
         let confirmView = VMConfirmView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40, height: 220), type: .addbot)
@@ -504,7 +504,7 @@ extension VoiceRoomViewController {
 
     func activeAlien(_ flag: Bool) {
         if isOwner == false {
-            view.makeToast("Host Bot".localized())
+            view.makeToast("Host Bot".voice_localized())
             return
         }
         guard let mic: VRRoomMic = roomInfo?.mic_info?[6] else { return }
@@ -533,10 +533,10 @@ extension VoiceRoomViewController {
         ChatRoomServiceImp.getSharedInstance().updateAnnouncement(content: str) { result in
             if result {
                 // 如果返回的结果为true 表示上麦成功
-                self.view.makeToast("Notice Posted".localized())
+                self.view.makeToast("Notice Posted".voice_localized())
                 self.roomInfo?.room?.announcement = str
             } else {
-                self.view.makeToast("Post Failed".localized())
+                self.view.makeToast("Post Failed".voice_localized())
             }
         }
     }
@@ -644,13 +644,13 @@ extension VoiceRoomViewController {
         var detailStr: String = ""
         switch effect {
         case 1:
-            detailStr = "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat.".localized()
+            detailStr = "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat.".voice_localized()
         case 2:
-            detailStr = "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful.".localized()
+            detailStr = "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful.".voice_localized()
         case 3:
-            detailStr = "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. ".localized()
+            detailStr = "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. ".voice_localized()
         default:
-            detailStr = "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ".localized()
+            detailStr = "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ".voice_localized()
         }
         return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40)
     }

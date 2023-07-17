@@ -55,7 +55,7 @@ public class VoiceRoomGiftCell: UITableViewCell {
         }
         avatar.sd_setImage(with: URL(string: item.portrait ?? "")!, placeholderImage: UIImage(named: "mine_avatar_placeHolder"))
         userName.text = gift?.userName ?? ""
-        giftName.text = "Sent ".localized() + (gift?.gift_name ?? "")
+        giftName.text = "Sent ".voice_localized() + (gift?.gift_name ?? "")
         giftIcon.image = UIImage.sceneImage(name: "\(gift?.gift_id ?? "")", bundleName: "VoiceChatRoomResource")
         giftNumbers.text = "X \(gift?.gift_count ?? "1")"
     }

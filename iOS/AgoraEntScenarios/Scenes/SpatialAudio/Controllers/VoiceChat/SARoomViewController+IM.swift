@@ -130,7 +130,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
         self.roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
 //        self.roomInfo?.room?.member_list?.append(user)
 //        AppContext.saTmpServiceImp().userList = self.roomInfo?.room?.member_list ?? []
-        self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
+        self.convertShowText(userName: user.name ?? "", content: "Joined".spatial_localized(), joined: true)
     }
     
     func onRobotVolumeUpdated(roomId: String, volume: String) {
@@ -295,7 +295,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                 if let host: SAUser = roomInfo?.room?.owner {
                     if host.uid == fromId && status == -1 {
                         AppContext.saTmpServiceImp().userList.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
-                        view.makeToast("Removed Stage".localized())
+                        view.makeToast("Removed Stage".spatial_localized())
                     }  else {
                         rtckit.muteLocalAudioStream(mute: seatUser == nil)
                         self.refreshApplicants(chat_uid: fromId)
@@ -342,7 +342,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                                               ext: ["userName": SAUserInfo.shared.user?.name ?? ""]))
         SAIMManager.shared?.sendMessage(roomId: roomId, text: text, ext: ["userName": userName]) { message, error in
             if error != nil,error?.code == .moderationFailed {
-                self.view.makeToast("Content prohibited".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+                self.view.makeToast("Content prohibited".spatial_localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
             }
         }
     }

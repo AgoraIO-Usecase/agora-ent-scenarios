@@ -223,28 +223,28 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
                 switch ains_state {
                 case .high:
-                    cell.contentLabel.text = "High".localized()
+                    cell.contentLabel.text = "High".voice_localized()
                 case .mid:
-                    cell.contentLabel.text = "Medium".localized()
+                    cell.contentLabel.text = "Medium".voice_localized()
                 case .off:
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "Off".voice_localized()
                 }
                 
                 
             } else if indexPath.row == 1 {
                 if roomInfo?.room?.turn_AIAEC == true {
-                    cell.contentLabel.text = "On".localized()
+                    cell.contentLabel.text = "On".voice_localized()
                 } else {
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "Off".voice_localized()
                 }
             } else if indexPath.row == 2 {
                 if roomInfo?.room?.turn_AGC == true {
-                    cell.contentLabel.text = "On".localized()
+                    cell.contentLabel.text = "On".voice_localized()
                 } else {
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "Off".voice_localized()
                 }
             } else {
-                cell.contentLabel.text = "Other".localized()
+                cell.contentLabel.text = "Other".voice_localized()
 
             }
 //            else {
@@ -359,11 +359,11 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             } else if indexPath.row == 1 {
                 switch ains_state {
                 case .high:
-                    cell.contentLabel.text = "High".localized()
+                    cell.contentLabel.text = "High".voice_localized()
                 case .mid:
-                    cell.contentLabel.text = "Medium".localized()
+                    cell.contentLabel.text = "Medium".voice_localized()
                 case .off:
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "Off".voice_localized()
                 }
             }
             return cell
@@ -457,18 +457,18 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
     }
     
     private func getSoundType(with index: Int) -> String {
-        var soundType: String = "Social Chat".localized()
+        var soundType: String = "Social Chat".voice_localized()
         switch index {
         case 0:
-            soundType = "Social Chat".localized()
+            soundType = "Social Chat".voice_localized()
         case 1:
-            soundType = "Karaoke".localized()
+            soundType = "Karaoke".voice_localized()
         case 2:
-            soundType = "Gaming Buddy".localized()
+            soundType = "Gaming Buddy".voice_localized()
         case 3:
-            soundType = "Professional Podcaster".localized()
+            soundType = "Professional Podcaster".voice_localized()
         default:
-            soundType = "Social Chat".localized()
+            soundType = "Social Chat".voice_localized()
         }
         return soundType
     }

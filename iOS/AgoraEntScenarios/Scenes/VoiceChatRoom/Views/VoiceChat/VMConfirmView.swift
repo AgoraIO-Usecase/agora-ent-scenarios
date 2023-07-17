@@ -42,14 +42,14 @@ class VMConfirmView: UIView {
 
         titleLabel.frame = CGRect(x: bounds.size.width / 2.0 - 60, y: 30, width: 120, height: 22)
         titleLabel.textAlignment = .center
-        titleLabel.text = "Prompt".localized()
+        titleLabel.text = "Prompt".voice_localized()
         titleLabel.textColor = UIColor.HexColor(hex: 0x040925, alpha: 1)
         titleLabel.font = UIFont.systemFont(ofSize: 16)
         addSubview(titleLabel)
 
         contentLabel.frame = CGRect(x: bounds.size.width / 2.0 - 150, y: 72, width: 300, height: 60)
         contentLabel.textAlignment = .center
-        contentLabel.text = type == .addbot ? "Add Bot".localized() : "Exit Room".localized()
+        contentLabel.text = type == .addbot ? "Add Bot".voice_localized() : "Exit Room".voice_localized()
         contentLabel.numberOfLines = 0
         contentLabel.lineBreakMode = .byCharWrapping
         contentLabel.textColor = UIColor.HexColor(hex: 0x6C7192, alpha: 1)
@@ -57,7 +57,7 @@ class VMConfirmView: UIView {
         addSubview(contentLabel)
 
         canBtn.frame = CGRect(x: 30, y: 150, width: 120, height: 40)
-        canBtn.setTitle("Cancel".localized(), for: .normal)
+        canBtn.setTitle("Cancel".voice_localized(), for: .normal)
         canBtn.setTitleColor(.black, for: .normal)
         canBtn.backgroundColor = UIColor(red: 239 / 255.0, green: 244 / 255.0, blue: 1, alpha: 1)
         canBtn.addTargetFor(self, action: #selector(can), for: .touchUpInside)
@@ -66,7 +66,7 @@ class VMConfirmView: UIView {
         addSubview(canBtn)
 
         subBtn.frame = CGRect(x: bounds.size.width - 150, y: 150, width: 120, height: 40)
-        subBtn.setTitle("Submit".localized(), for: .normal)
+        subBtn.setTitle("Submit".voice_localized(), for: .normal)
         subBtn.addTargetFor(self, action: #selector(sub), for: .touchUpInside)
         subBtn.setTitleColor(.white, for: .normal)
         addSubview(subBtn)

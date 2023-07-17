@@ -61,7 +61,7 @@ class SARoomHeaderView: UIView {
         self.giftBtn.snp.updateConstraints { make in
             make.width.greaterThanOrEqualTo(gift_count >= 100 ? 50 : 40)
         }
-        soundSetLabel.text = "Beginner's Guide".localized_spatial()
+        soundSetLabel.text = "Beginner's Guide".spatial_localized()
         updateGiftList(with: room)
     }
     

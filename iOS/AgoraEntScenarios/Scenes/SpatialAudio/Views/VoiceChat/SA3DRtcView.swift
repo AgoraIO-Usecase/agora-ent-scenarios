@@ -494,7 +494,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 if let mic_info = micInfos?[6] {
                     cell.tag = 206
                     let member: SAUser = SAUser()
-                    member.name = "Agora Red".localized_spatial()
+                    member.name = "Agora Red".spatial_localized()
                     member.portrait = "red"
                     mic_info.member = member
                     cell.setArrowInfo(imageName: "sa_downleft_arrow", margin: 6)
@@ -507,7 +507,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 if let mic_info = micInfos?[3] {
                     cell.tag = 203
                     let member: SAUser = SAUser()
-                    member.name = "Agora Blue".localized_spatial()
+                    member.name = "Agora Blue".spatial_localized()
                     member.portrait = "blue"
                     mic_info.member = member
                     cell.setArrowInfo(imageName: "sa_upright_arrow", margin: -6)

@@ -20,12 +20,12 @@ extension SARoomViewController {
         actionView
             .section(section: 2)
             .rows(rows: [2, 1])
-            .title(title: "Audio Settings".localized_spatial())
-            .sectionHeader(title: "Bot Settings".localized_spatial(), desc: "Host Only".localized_spatial())
-            .switchCell(iconName: "icons／set／jiqi", title: "Agora Blue&Agora Red".localized_spatial(), isOn: isOpenSpatial, isEnabel: isOwner)
-            .sliderCell(iconName: "icons／set／laba", title: "Robot volume".localized_spatial(), value: volumn, isEnable: isOwner)
-            .sectionHeader(iconName: "new", title: "Spatial Audio".localized_spatial(), desc: nil)
-            .textCell(iconName: "icons／set／3D", title: "Spatial Audio".localized_spatial(), desc: nil, isShowArrow: true)
+            .title(title: "Audio Settings".spatial_localized())
+            .sectionHeader(title: "Bot Settings".spatial_localized(), desc: "Host Only".spatial_localized())
+            .switchCell(iconName: "icons／set／jiqi", title: "Agora Blue&Agora Red".spatial_localized(), isOn: isOpenSpatial, isEnabel: isOwner)
+            .sliderCell(iconName: "icons／set／laba", title: "Robot volume".spatial_localized(), value: volumn, isEnable: isOwner)
+            .sectionHeader(iconName: "new", title: "Spatial Audio".spatial_localized(), desc: nil)
+            .textCell(iconName: "icons／set／3D", title: "Spatial Audio".spatial_localized(), desc: nil, isShowArrow: true)
             .config()
         actionView.didCellItemClosure = { [weak self] indexPath in
             guard indexPath.section == 1 && indexPath.row == 0 else { return }
@@ -54,14 +54,14 @@ extension SARoomViewController {
         actionView
             .section(section: 2)
             .rows(rows: [2, 2])
-            .title(title: "Spatial Audio".localized_spatial())
-            .sectionHeader(iconName: "new", title: "Agora Blue Bot".localized_spatial(), desc: "Host Only".localized_spatial())
-            .sliderCell(title: "Attenuation factor volume".localized_spatial(), value: robotInfo.blue_robot_attenuation, isEnable: isOwner)
-            .switchCell(title: "Air Absorb".localized_spatial(), isOn: robotInfo.blue_robot_absorb, isEnabel: isOwner)
+            .title(title: "Spatial Audio".spatial_localized())
+            .sectionHeader(iconName: "new", title: "Agora Blue Bot".spatial_localized(), desc: "Host Only".spatial_localized())
+            .sliderCell(title: "Attenuation factor volume".spatial_localized(), value: robotInfo.blue_robot_attenuation, isEnable: isOwner)
+            .switchCell(title: "Air Absorb".spatial_localized(), isOn: robotInfo.blue_robot_absorb, isEnabel: isOwner)
 //            .switchCell(title: "Voice Blur".localized_spatial(), isOn: robotInfo.blue_robot_blur, isEnabel: isOwner)
-            .sectionHeader(iconName: "new", title: "Agora Red Bot".localized_spatial(), desc: "Host Only".localized_spatial())
-            .sliderCell(title: "Attenuation factor volume".localized_spatial(), value: robotInfo.red_robot_attenuation, isEnable: isOwner)
-            .switchCell(title: "Air Absorb".localized_spatial(), isOn: robotInfo.red_robot_absorb, isEnabel: isOwner)
+            .sectionHeader(iconName: "new", title: "Agora Red Bot".spatial_localized(), desc: "Host Only".spatial_localized())
+            .sliderCell(title: "Attenuation factor volume".spatial_localized(), value: robotInfo.red_robot_attenuation, isEnable: isOwner)
+            .switchCell(title: "Air Absorb".spatial_localized(), isOn: robotInfo.red_robot_absorb, isEnabel: isOwner)
 //            .switchCell(title: "Voice Blur".localized_spatial(), isOn: robotInfo.red_robot_blur, isEnabel: isOwner)
             .config()
         actionView.didSwitchValueChangeClosure = { [weak self] indexPath, isOn in
@@ -230,15 +230,15 @@ extension SARoomViewController {
             AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
         }
         guard let idx = local_index else {
-            view.makeToast("you have no wheat slots!".localized(), point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("you have no wheat slots!".spatial_localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
         if !isOwner, idx == 0 {
-            view.makeToast("you have no wheat slots!".localized(), point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("you have no wheat slots!".spatial_localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
         if let mic = roomInfo?.mic_info?[idx], mic.status == 2 && isOwner == false  {
-            view.makeToast("Banned".localized())
+            view.makeToast("Banned".spatial_localized())
             return
         }
         chatBar.micState = !chatBar.micState
@@ -294,14 +294,14 @@ extension SARoomViewController {
 
     func userApplyAlert(_ index: Int?) {
         if chatBar.handsState == .selected {
-            view.makeToast("Request Wait".localized())
+            view.makeToast("Request Wait".spatial_localized())
             return
         }
 
         if let mic_index = index {
             if let mic: SARoomMic = roomInfo?.mic_info?[mic_index] {
                 if mic.status == 3 || mic.status == 4 {
-                    view.makeToast("Mic Closed".localized())
+                    view.makeToast("Mic Closed".spatial_localized())
                     return
                 }
             }
@@ -328,9 +328,9 @@ extension SARoomViewController {
             if error == nil {
                 if flag {
                     self.chatBar.refresh(event: .handsUp, state: .selected, asCreator: false)
-                    self.view.makeToast("Apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+                    self.view.makeToast("Apply success!".spatial_localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 } else {
-                    self.view.makeToast("Apply failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+                    self.view.makeToast("Apply failed!".spatial_localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 }
             } else {
                 
@@ -342,10 +342,10 @@ extension SARoomViewController {
         AppContext.saServiceImp().cancelMicSeatApply(chat_uid: VLUserCenter.user.id) {[weak self] error, flag in
             guard let self = self else {return}
             if error == nil {
-                self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+                self.view.makeToast("Cancel apply success!".spatial_localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
             } else {
-                self.view.makeToast("Cancel apply failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+                self.view.makeToast("Cancel apply failed!".spatial_localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
             }
         }
     }
@@ -384,7 +384,7 @@ extension SARoomViewController {
         SAUserInfo.shared.currentRoomOwner = roomInfo?.room?.owner
         let entity = SAChatEntity()
         entity.userName = roomInfo?.room?.owner?.name
-        entity.content = "Welcome to the voice chat room! Pornography, gambling or violence is strictly prohibited in the room.".localized()
+        entity.content = "Welcome to the voice chat room! Pornography, gambling or violence is strictly prohibited in the room.".spatial_localized()
         entity.attributeContent = entity.attributeContent
         entity.uid = roomInfo?.room?.owner?.uid
         entity.width = entity.width

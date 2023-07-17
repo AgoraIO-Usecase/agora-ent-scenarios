@@ -56,7 +56,7 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
         let host = NSMutableAttributedString(attachment: attachment)
         space.append(host)
         space.append(NSAttributedString {
-            AttributedText("DemoTestDesc".localized()).foregroundColor(UIColor(0x3C4267)).font(.systemFont(ofSize: 12, weight: .regular)).lineBreakeMode(.byCharWrapping).alignment(.center)
+            AttributedText("DemoTestDesc".voice_localized()).foregroundColor(UIColor(0x3C4267)).font(.systemFont(ofSize: 12, weight: .regular)).lineBreakeMode(.byCharWrapping).alignment(.center)
         })
         return space
     }()
@@ -160,7 +160,7 @@ public extension VRCreateRoomInputView {
                 }
             } else {
                 if roomNameField.text?.isEmpty ?? true {
-                    superview?.superview?.makeToast("No Room Name".localized(), point: superview?.superview?.center ?? .zero, title: nil, image: nil, completion: nil)
+                    superview?.superview?.makeToast("No Room Name".voice_localized(), point: superview?.superview?.center ?? .zero, title: nil, image: nil, completion: nil)
                 }
             }
         } else {
@@ -169,7 +169,7 @@ public extension VRCreateRoomInputView {
                     action!()
                 }
             } else {
-                superview?.superview?.makeToast("No Room Name".localized(), point: superview?.superview?.center ?? .zero, title: nil, image: nil, completion: nil)
+                superview?.superview?.makeToast("No Room Name".voice_localized(), point: superview?.superview?.center ?? .zero, title: nil, image: nil, completion: nil)
             }
         }
     }

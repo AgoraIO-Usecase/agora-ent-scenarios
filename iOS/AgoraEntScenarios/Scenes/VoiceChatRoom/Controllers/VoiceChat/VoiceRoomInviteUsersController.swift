@@ -102,7 +102,7 @@ extension VoiceRoomInviteUsersController {
         let chat_uid: String = user?.chat_uid ?? ""
         ChatRoomServiceImp.getSharedInstance().startMicSeatInvitation(chatUid: chat_uid, index: idx < 0 ? nil:idx) { error, flag in
             SVProgressHUD.dismiss()
-            self.view.makeToast(flag == true ? "Invitation sent!".localized() : "Invited failed!".localized())
+            self.view.makeToast(flag == true ? "Invitation sent!".voice_localized() : "Invited failed!".voice_localized())
         }
 
     }

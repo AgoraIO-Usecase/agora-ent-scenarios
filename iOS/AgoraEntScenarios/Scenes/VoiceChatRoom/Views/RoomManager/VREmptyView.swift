@@ -25,7 +25,7 @@ public class VREmptyView: UIView {
             emptyImage = image!
         }
         addSubViews([self.image, text])
-        text.text = title.localized()
+        text.text = title.voice_localized()
     }
 
     @available(*, unavailable)

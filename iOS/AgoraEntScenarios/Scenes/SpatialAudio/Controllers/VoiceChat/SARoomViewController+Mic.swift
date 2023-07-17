@@ -106,7 +106,7 @@ extension SARoomViewController {
          */
         if let mic = roomInfo?.mic_info?[index] {
             if mic.status == 2 && isOwner == false {
-                view.makeToast("Banned".localized())
+                view.makeToast("Banned".spatial_localized())
                 return
             }
         }
@@ -124,7 +124,7 @@ extension SARoomViewController {
     func changeMic(from: Int, to: Int) {
         if let mic: SARoomMic = roomInfo?.mic_info?[to] {
             if mic.status == 3 || mic.status == 4 {
-                view.makeToast("Mic Closed".localized())
+                view.makeToast("Mic Closed".spatial_localized())
                 return
             }
         }
