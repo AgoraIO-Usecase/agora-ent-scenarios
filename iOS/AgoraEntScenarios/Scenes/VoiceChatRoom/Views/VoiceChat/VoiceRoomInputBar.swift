@@ -39,8 +39,8 @@ public class VoiceRoomInputBar: UIView, UITextViewDelegate {
 
     override public init(frame: CGRect) {
         super.init(frame: frame)
-        rightView.setImage(UIImage("face"), for: .normal)
-        rightView.setImage(UIImage("key"), for: .selected)
+        rightView.setImage(UIImage.sceneImage(name: "face", bundleName: "VoiceChatRoomResource"), for: .normal)
+        rightView.setImage(UIImage.sceneImage(name: "key", bundleName: "VoiceChatRoomResource"), for: .selected)
         addSubViews([inputContainer, inputField, send, line])
         inputField.tintColor = UIColor(0x009FFF)
         inputField.placeHolder = "Aa"
@@ -169,23 +169,5 @@ public class VoiceRoomInputBar: UIView, UITextViewDelegate {
         imageText.addAttributes([.accessibilityTextCustom: key], range: NSMakeRange(0, imageText.length))
         attribute.append(imageText)
         return attribute
-    }
-}
-
-public extension NSAttributedString {
-    func toString() -> String {
-        let result = NSMutableAttributedString(attributedString: self)
-        var replaceList: [(NSRange, String)] = []
-        result.enumerateAttribute(.accessibilityTextCustom, in: NSRange(location: 0, length: result.length), using: { value, range, _ in
-            if let value = value as? String {
-                for i in range.location..<range.location + range.length {
-                    replaceList.append((NSRange(location: i, length: 1), value))
-                }
-            }
-        })
-        for i in replaceList.reversed() {
-            result.replaceCharacters(in: i.0, with: i.1)
-        }
-        return result.string
     }
 }

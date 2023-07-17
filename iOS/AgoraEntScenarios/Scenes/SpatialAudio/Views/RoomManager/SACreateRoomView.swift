@@ -23,7 +23,7 @@ public class SACreateRoomView: UIView, SAHorizontalCardsDelegate, SAHorizontalCa
 
     var createAction: (() -> Void)?
 
-    lazy var menuBar: SARoomMenuBar = .init(frame: CGRect(x: 20, y: 0, width: ScreenWidth - 40, height: 42), items: SARoomMenuBar.entities1, indicatorImage: UIImage("indicator")!, indicatorFrame: CGRect(x: 0, y: 42 - 8, width: 14, height: 8)).backgroundColor(.clear)
+    lazy var menuBar: SARoomMenuBar = .init(frame: CGRect(x: 20, y: 0, width: ScreenWidth - 40, height: 42), items: SARoomMenuBar.entities1, indicatorImage:UIImage.sceneImage(name: "indicator", bundleName: "VoiceChatRoomResource")!, indicatorFrame: CGRect(x: 0, y: 42 - 8, width: 14, height: 8)).backgroundColor(.clear)
 
     lazy var audioEffectCards: SAHorizontalCardsView = {
         let cards = SAHorizontalCardsView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: self.cardHeight))

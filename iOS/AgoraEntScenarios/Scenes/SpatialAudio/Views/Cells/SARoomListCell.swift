@@ -12,7 +12,7 @@ import ZSwiftBaseLib
 public final class SARoomListCell: UITableViewCell {
     var entity = SARoomEntity()
 
-    lazy var background: UIImageView = .init(frame: CGRect(x: 20, y: 15, width: ScreenWidth - 40, height: self.frame.height - 15)).image(UIImage("normal_room") ?? UIImage()).backgroundColor(.clear)
+    lazy var background: UIImageView = .init(frame: CGRect(x: 20, y: 15, width: ScreenWidth - 40, height: self.frame.height - 15)).image(UIImage.sceneImage(name: "normal_room", bundleName: "VoiceChatRoomResource") ?? UIImage()).backgroundColor(.clear)
 
     lazy var accessSymbol: UIButton = .init(type: .custom).frame(CGRect(x: 0, y: 0, width: 68, height: 24)).font(UIFont.systemFont(ofSize: 10, weight: .regular)).backgroundColor(.clear)
 
@@ -53,8 +53,8 @@ public final class SARoomListCell: UITableViewCell {
     func setupViewsAttributes(room: SARoomEntity) {
         entity = room
         if let show = room.is_private, show == true {
-            accessSymbol.set(image: UIImage("suo"), title: sceneLocalized( "Private"), titlePosition: .right, additionalSpacing: 5, state: .normal)
-            accessSymbol.setBackgroundImage(UIImage("securityType"), for: .normal)
+            accessSymbol.set(image:UIImage.sceneImage(name: "suo", bundleName: "VoiceChatRoomResource"), title: sceneLocalized( "Private"), titlePosition: .right, additionalSpacing: 5, state: .normal)
+            accessSymbol.setBackgroundImage(UIImage.sceneImage(name: "securityType", bundleName: "VoiceChatRoomResource"), for: .normal)
             accessSymbol.isHidden = false
         } else {
             accessSymbol.isHidden = true

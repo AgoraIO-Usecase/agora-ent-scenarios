@@ -21,15 +21,15 @@ public class VREQOperationAlert: UIView {
         VoiceRoomAlertContainer(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: 60))
     }()
     private lazy var agoraBlue: UIImageView = {
-        UIImageView(frame: CGRect(x: self.frame.width/2.0-95, y: 36, width: 64, height: 64)).layerProperties(UIColor(0xDAD9E9), 1).cornerRadius(32).image(UIImage("blue")!)
+        UIImageView(frame: CGRect(x: self.frame.width/2.0-95, y: 36, width: 64, height: 64)).layerProperties(UIColor(0xDAD9E9), 1).cornerRadius(32).image(UIImage.sceneImage(name: "blue", bundleName: "VoiceChatRoomResource")!)
     }()
     
     private lazy var neckSymbol: UIImageView = {
-        UIImageView(frame: CGRect(x: self.frame.width/2.0-9, y: self.agoraBlue.frame.maxY+15, width: 18, height: 18)).layerProperties(UIColor(0xDAD9E9), 1).cornerRadius(32).image(UIImage("icons／solid／link")!)
+        UIImageView(frame: CGRect(x: self.frame.width/2.0-9, y: self.agoraBlue.frame.maxY+15, width: 18, height: 18)).layerProperties(UIColor(0xDAD9E9), 1).cornerRadius(32).image(UIImage.sceneImage(name: "icons／solid／link", bundleName: "VoiceChatRoomResource")!)
     }()
     
     private lazy var agoraRed: UIImageView = {
-        UIImageView(frame: CGRect(x: self.frame.width/2.0+31, y: 36, width: 64, height: 64)).layerProperties(UIColor(0xDAD9E9), 1).cornerRadius(32).image(UIImage("red")!)
+        UIImageView(frame: CGRect(x: self.frame.width/2.0+31, y: 36, width: 64, height: 64)).layerProperties(UIColor(0xDAD9E9), 1).cornerRadius(32).image(UIImage.sceneImage(name: "red", bundleName: "VoiceChatRoomResource")!)
     }()
     
     private lazy var blueName: UIButton = {
@@ -59,8 +59,8 @@ public class VREQOperationAlert: UIView {
     public override init(frame: CGRect) {
         super.init(frame: frame)
         self.addSubViews([self.header,self.agoraBlue,self.neckSymbol,self.agoraRed,self.blueName,self.redName,self.separateLine,self.closeBot,self.otherSetting,self.verticalLine])
-        self.blueName.set(image: UIImage("guanfang"), title: "Agora Blue".localized(), titlePosition: .right, additionalSpacing: 5, state: .normal)
-        self.redName.set(image: UIImage("guanfang"), title: "Agora Red".localized(), titlePosition: .right, additionalSpacing: 5, state: .normal)
+        self.blueName.set(image: UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), title: "Agora Blue".localized(), titlePosition: .right, additionalSpacing: 5, state: .normal)
+        self.redName.set(image: UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), title: "Agora Red".localized(), titlePosition: .right, additionalSpacing: 5, state: .normal)
     }
     
     required init?(coder: NSCoder) {

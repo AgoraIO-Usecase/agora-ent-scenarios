@@ -39,8 +39,8 @@ public class SAInputBar: UIView, UITextViewDelegate {
 
     override public init(frame: CGRect) {
         super.init(frame: frame)
-        rightView.setImage(UIImage("face"), for: .normal)
-        rightView.setImage(UIImage("key"), for: .selected)
+        rightView.setImage(UIImage.sceneImage(name: "face", bundleName: "VoiceChatRoomResource"), for: .normal)
+        rightView.setImage(UIImage.sceneImage(name: "key", bundleName: "VoiceChatRoomResource"), for: .selected)
         addSubViews([inputContainer, inputField, send, line])
         inputField.tintColor = UIColor(0x009FFF)
         inputField.placeHolder = "Aa"

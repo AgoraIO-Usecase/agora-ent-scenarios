@@ -31,8 +31,8 @@ public class VoiceRoomEmojiListView: UIView, UICollectionViewDelegate, UICollect
     override public init(frame: CGRect) {
         super.init(frame: frame)
         addSubViews([emojiList, deleteEmoji, separaLine])
-        deleteEmoji.setImage(UIImage("backspace_clr"), for: .normal)
-        deleteEmoji.setImage(UIImage("backspace"), for: .disabled)
+        deleteEmoji.setImage(UIImage.sceneImage(name: "backspace_clr", bundleName: "VoiceChatRoomResource"), for: .normal)
+        deleteEmoji.setImage(UIImage.sceneImage(name: "backspace", bundleName: "VoiceChatRoomResource"), for: .disabled)
         deleteEmoji.isEnabled = false
         deleteEmoji.isUserInteractionEnabled = false
     }

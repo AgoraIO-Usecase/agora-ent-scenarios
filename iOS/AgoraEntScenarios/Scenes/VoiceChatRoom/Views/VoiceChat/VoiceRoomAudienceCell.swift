@@ -29,7 +29,7 @@ public class VoiceRoomAudienceCell: UITableViewCell {
         operation.layer.shadowColor = UIColor(red: 0, green: 0.55, blue: 0.98, alpha: 0.2).cgColor
         operation.layer.shadowOffset = CGSize(width: 0, height: 4)
         operation.layer.shadowRadius = 8
-        operation.setBackgroundImage(UIImage("blue_btn_bg")?.resizableImage(withCapInsets: UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20), resizingMode: .stretch), for: .normal)
+        operation.setBackgroundImage(UIImage.sceneImage(name: "blue_btn_bg", bundleName: "VoiceChatRoomResource")?.resizableImage(withCapInsets: UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20), resizingMode: .stretch), for: .normal)
     }
 
     @available(*, unavailable)

@@ -6,9 +6,6 @@
 #import "VLOnLineListVC.h"
 #import "VLHomeOnLineListView.h"
 #import "VLKTVViewController.h"
-//#import "AgoraRtm.h"
-#import "VLRoomListModel.h"
-#import "VLRoomSeatModel.h"
 
 #import "VLPopScoreView.h"
 #import "VLLoginViewController.h"
@@ -19,7 +16,7 @@
 #import "VLURLPathConfig.h"
 #import "VLToast.h"
 #import "AppContext+KTV.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 #import "VLAlert.h"
 
 @interface VLOnLineListVC ()<VLHomeOnLineListViewDelegate/*,AgoraRtmDelegate*/,VLPopScoreViewDelegate>
@@ -123,8 +120,7 @@
     inputModel.password = inputText;
 
     VL(weakSelf);
-    [[AppContext ktvServiceImp] joinRoomWithInput:inputModel
-                                       completion:^(NSError * error, KTVJoinRoomOutputModel * outputModel) {
+    [[AppContext ktvServiceImp] joinRoomWith:inputModel completion:^(NSError * _Nullable error, KTVJoinRoomOutputModel * _Nullable outputModel) {
         if (error != nil) {
             [VLToast toast:error.description];
             return;
@@ -136,6 +132,7 @@
         ktvVC.seatsArray = outputModel.seatsArray;
         [weakSelf.navigationController pushViewController:ktvVC animated:YES];
     }];
+
 }
 
 //- (NSArray *)configureSeatsWithArray:(NSArray *)seatsArray songArray:(NSArray *)songArray {

@@ -33,7 +33,7 @@ class VMUpstageView: UIView {
         self.layer.mask = layer
 
         lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20, y: 8, width: 40, height: 4)
-        lineImgView.image = UIImage("pop_indicator")
+        lineImgView.image = UIImage.sceneImage(name: "pop_indicator", bundleName: "VoiceChatRoomResource")
         addSubview(lineImgView)
 
         titleLabel.frame = CGRect(x: ScreenWidth / 2.0 - 60, y: 50, width: 120, height: 30)

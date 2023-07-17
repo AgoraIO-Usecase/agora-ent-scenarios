@@ -50,14 +50,14 @@ class AgoraChatRoomBaseUserCollectionViewCell: UICollectionViewCell {
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true
             rtcUserView.bgIconView.isHidden = false
-            rtcUserView.bgIconView.image = UIImage("icons／solid／add")
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
         case 0:
             rtcUserView.iconView.isHidden = false
             rtcUserView.micView.isHidden = false
             if mic.member?.micStatus ?? 0 == 1 {
                 rtcUserView.micView.setState(.on)
                 rtcUserView.bgIconView.isHidden = true
-                rtcUserView.nameBtn.setImage(UIImage(""), for: .normal)
+                rtcUserView.nameBtn.setImage(UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"), for: .normal)
             } else {
                 rtcUserView.micView.setState(.off)
             }
@@ -71,7 +71,7 @@ class AgoraChatRoomBaseUserCollectionViewCell: UICollectionViewCell {
                 } else {
                     rtcUserView.micView.isHidden = true
                 }
-                rtcUserView.bgIconView.image = UIImage(bgIcon)
+                rtcUserView.bgIconView.image = UIImage.sceneImage(name: bgIcon, bundleName: "VoiceChatRoomResource")
                 rtcUserView.bgIconView.isHidden = mic.member != nil
             }
         case 2:
@@ -83,20 +83,20 @@ class AgoraChatRoomBaseUserCollectionViewCell: UICollectionViewCell {
         case 3:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true
-            rtcUserView.bgIconView.image = UIImage("icons／solid／lock")
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
             rtcUserView.bgIconView.isHidden = false
         case 4:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = false
             rtcUserView.micView.setState(.forbidden)
-            rtcUserView.bgIconView.image = UIImage("icons／solid／lock")
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
             rtcUserView.bgIconView.isHidden = false
         default:
             break
         }
         rtcUserView.iconView.isHidden = mic.member == nil
         if mic.member?.portrait != nil {
-            rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: UIImage("mine_avatar_placeHolder"))
+            rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"))
         }
         rtcUserView.nameBtn.setImage(UIImage(mic.mic_index == 0 ? "Landlord" : ""), for: .normal)
         rtcUserView.nameBtn.setTitle(mic.member?.name ?? "\(mic.mic_index)", for: .normal)

@@ -50,7 +50,7 @@ class VMMuteView: UIView {
             sepView.isHidden = isOwner
             roleBtn.isHidden = !isOwner
             muteBtn.frame = isOwner ? CGRect(x: 0, y: 170, width: bounds.size.width, height: 40) : CGRect(x: bounds.size.width / 2.0, y: 170, width: bounds.size.width / 2.0, height: 40)
-            iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage("mine_avatar_placeHolder"))
+            iconView.sd_setImage(with: URL(string: iconStr), placeholderImage:UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"))
             if m_type == 0 {
                 iconView.isHidden = false
                 nameLabel.text = username
@@ -89,7 +89,7 @@ class VMMuteView: UIView {
         addSubview(cover)
 
         lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20, y: 8, width: 40, height: 4)
-        lineImgView.image = UIImage("pop_indicator")
+        lineImgView.image = UIImage.sceneImage(name: "pop_indicator", bundleName: "VoiceChatRoomResource")
         addSubview(lineImgView)
 
         bgView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
@@ -99,11 +99,11 @@ class VMMuteView: UIView {
         addSubview(bgView)
 
         addView.frame = CGRect(x: ScreenWidth / 2 - 11, y: 61, width: 22, height: 22)
-        addView.image = UIImage("icons／solid／add")
+        addView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
         addSubview(addView)
 
         iconView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
-        iconView.image = UIImage("avatar1")
+        iconView.image = UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource")
         iconView.layer.cornerRadius = 32
         iconView.layer.masksToBounds = true
         addSubview(iconView)
@@ -117,7 +117,7 @@ class VMMuteView: UIView {
         addSubview(nameLabel)
 
         roleBtn.frame = CGRect(x: ScreenWidth / 2.0 - 50, y: 135, width: 100, height: 20)
-        roleBtn.setImage(UIImage("Landlord"), for: .normal)
+        roleBtn.setImage(UIImage.sceneImage(name: "Landlord", bundleName: "VoiceChatRoomResource"), for: .normal)
         roleBtn.setTitle(" \(LanguageManager.localValue(key: "host"))", for: .normal)
         roleBtn.setTitleColor(UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1), for: .normal)
         roleBtn.font(UIFont.systemFont(ofSize: 11))

@@ -10,7 +10,7 @@ import UIKit
 import ZSwiftBaseLib
 
 final class VRCreateRoomViewController: VRBaseViewController {
-    lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage("roomList")!)
+    lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage.sceneImage(name: "roomList", bundleName: "VoiceChatRoomResource")!)
 
     lazy var container: VRCreateRoomView = .init(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: ScreenHeight - ZNavgationHeight))
 

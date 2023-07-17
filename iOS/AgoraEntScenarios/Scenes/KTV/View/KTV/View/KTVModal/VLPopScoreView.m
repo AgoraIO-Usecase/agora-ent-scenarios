@@ -7,7 +7,7 @@
 #import "UIView+VL.h"
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import Masonry;
 
 @interface VLPopScoreView ()

@@ -54,7 +54,7 @@ class SASoundView: UIView {
 
         bgView.addSubview(cover)
 
-        lineImgView.image = UIImage("pop_indicator")
+        lineImgView.image = UIImage.sceneImage(name: "pop_indicator", bundleName: "VoiceChatRoomResource")
         bgView.addSubview(lineImgView)
 
         typeLabel.text = typeStr

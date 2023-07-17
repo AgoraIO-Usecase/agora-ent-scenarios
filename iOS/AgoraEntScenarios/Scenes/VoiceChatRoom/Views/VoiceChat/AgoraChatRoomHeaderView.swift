@@ -51,7 +51,7 @@ class AgoraChatRoomHeaderView: UIView {
     func updateHeader(with room_entity: VRRoomEntity?) {
         guard let room = room_entity else {return}
         guard let owner = room.owner else { return }
-        self.iconImgView.sd_setImage(with: URL(string: owner.portrait ?? ""), placeholderImage: UIImage("mine_avatar_placeHolder"))
+        self.iconImgView.sd_setImage(with: URL(string: owner.portrait ?? ""), placeholderImage:UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"))
         self.titleLabel.text = owner.name
         self.roomLabel.text = room.name
         self.lookBtn.setTitle(" \(room.click_count ?? 0)", for: .normal)
@@ -142,7 +142,7 @@ class AgoraChatRoomHeaderView: UIView {
         addSubview(soundSetLabel)
 
         let soundImgView = UIImageView()
-        soundImgView.image = UIImage("icons／outlined／arrow_right")
+        soundImgView.image = UIImage.sceneImage(name: "arrow_right", bundleName: "VoiceChatRoomResource")
         addSubview(soundImgView)
 
         soundClickBtn.backgroundColor = .clear
@@ -152,7 +152,7 @@ class AgoraChatRoomHeaderView: UIView {
 
         giftBtn.layer.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1).cgColor
         giftBtn.layer.cornerRadius = 11
-        giftBtn.setImage(UIImage("liwu"), for: .normal)
+        giftBtn.setImage(UIImage.sceneImage(name: "liwu", bundleName: "VoiceChatRoomResource"), for: .normal)
         giftBtn.setTitle(" 0", for: .normal)
         giftBtn.titleLabel?.font = UIFont.systemFont(ofSize: 10)
         giftBtn.isUserInteractionEnabled = false
@@ -175,7 +175,7 @@ class AgoraChatRoomHeaderView: UIView {
         noticeView.isUserInteractionEnabled = true
 
         let imgView = UIImageView()
-        imgView.image = UIImage("gonggao")
+        imgView.image = UIImage.sceneImage(name: "gonggao", bundleName: "VoiceChatRoomResource")
         noticeView.addSubview(imgView)
 
         let notiLabel = UILabel()
@@ -185,7 +185,7 @@ class AgoraChatRoomHeaderView: UIView {
         noticeView.addSubview(notiLabel)
 
         let arrowImgView = UIImageView()
-        arrowImgView.image = UIImage("icons／outlined／arrow_right")
+        arrowImgView.image = UIImage.sceneImage(name: "arrow_right", bundleName: "VoiceChatRoomResource")
         noticeView.addSubview(arrowImgView)
 
         let isHairScreen =  Screen.isFullScreen

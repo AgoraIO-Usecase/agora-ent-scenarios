@@ -39,7 +39,7 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
 
     lazy var privateChoice: UIButton = .init(type: .custom).frame(CGRect(x: self.publicChoice.frame.maxX + 20, y: self.roomEncryption.frame.maxY + 12, width: 90, height: 32)).title(LanguageManager.localValue(key: "Private"), .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x3C4267), .normal).backgroundColor(.clear).tag(22).addTargetFor(self, action: #selector(chooseEncryption(_:)), for: .touchUpInside)
 
-    lazy var pinCode: VRVerifyCodeView = .init(frame: CGRect(x: 0, y: self.publicChoice.frame.maxY + 15, width: ScreenWidth, height: self.PinHeight), codeNumbers: 4, space: 16, padding: 45)
+    lazy var pinCode: VerifyCodeView = .init(frame: CGRect(x: 0, y: self.publicChoice.frame.maxY + 15, width: ScreenWidth, height: self.PinHeight), codeNumbers: 4, space: 16, padding: 45)
 
     lazy var warnMessage: UILabel = .init(frame: CGRect(x: self.publicChoice.frame.minX, y: self.pinCode.frame.maxY + 12, width: ScreenWidth - 80, height: 20)).font(.systemFont(ofSize: 12, weight: .regular)).textColor(UIColor(0xFA396A)).text(self.codeMessage)
 
@@ -51,7 +51,7 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
             space = NSMutableAttributedString(string: "           ")
         }
         let attachment = NSTextAttachment()
-        attachment.image = UIImage("candel")
+        attachment.image = UIImage.sceneImage(name: "candel", bundleName: "VoiceChatRoomResource")
         attachment.bounds = CGRect(x: 0, y: -3, width: 14, height: 14)
         let host = NSMutableAttributedString(attachment: attachment)
         space.append(host)
@@ -96,8 +96,8 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
     }
 
     private func stateImage(button: UIButton) {
-        button.setImage(UIImage("selected"), for: .selected)
-        button.setImage(UIImage("unselected"), for: .normal)
+        button.setImage(UIImage.sceneImage(name: "selected", bundleName: "VoiceChatRoomResource"), for: .selected)
+        button.setImage(UIImage.sceneImage(name: "unselected", bundleName: "VoiceChatRoomResource"), for: .normal)
     }
 
     @available(*, unavailable)
@@ -109,7 +109,7 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
 public extension VRCreateRoomInputView {
     private func setupAttributes() {
         pinCode.alpha = 0
-        randomName.set(image: UIImage("random"), title: LanguageManager.localValue(key: "Random"), titlePosition: .right, additionalSpacing: 5, state: .normal)
+        randomName.set(image:UIImage.sceneImage(name: "random", bundleName: "VoiceChatRoomResource"), title: LanguageManager.localValue(key: "Random"), titlePosition: .right, additionalSpacing: 5, state: .normal)
         stateImage(button: publicChoice)
         stateImage(button: privateChoice)
         publicChoice.titleEdgeInsets = UIEdgeInsets(top: publicChoice.titleEdgeInsets.top, left: 10, bottom: publicChoice.titleEdgeInsets.bottom, right: publicChoice.titleEdgeInsets.right)

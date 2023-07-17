@@ -17,11 +17,11 @@ class VRSoundEffectsViewController: VRBaseViewController {
 
     var type = 0
 
-    lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage("roomList")!)
+    lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage.sceneImage(name: "roomList", bundleName: "VoiceChatRoomResource")!)
 
     lazy var effects: VRSoundEffectsList = .init(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: ScreenHeight - CGFloat(ZBottombarHeight) - CGFloat(ZTabbarHeight)), style: .plain).separatorStyle(.none).tableFooterView(UIView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 120))).backgroundColor(.clear)
 
-    lazy var done: UIImageView = .init(frame: CGRect(x: 0, y: ScreenHeight - CGFloat(ZBottombarHeight) - 70, width: ScreenWidth, height: 92)).image(UIImage("blur")!).isUserInteractionEnabled(true)
+    lazy var done: UIImageView = .init(frame: CGRect(x: 0, y: ScreenHeight - CGFloat(ZBottombarHeight) - 70, width: ScreenWidth, height: 92)).image(UIImage.sceneImage(name: "blur", bundleName: "VoiceChatRoomResource")!).isUserInteractionEnabled(true)
 
     lazy var createContainer: UIView = .init(frame: CGRect(x: 30, y: 15, width: ScreenWidth - 60, height: 50)).backgroundColor(.white)
 

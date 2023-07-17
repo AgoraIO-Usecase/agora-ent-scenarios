@@ -12,7 +12,7 @@
 #import "VLUserCenter.h"
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import Masonry;
 
 @interface VLKTVMVView () <VLKTVMVIdleViewDelegate, KaraokeDelegate>

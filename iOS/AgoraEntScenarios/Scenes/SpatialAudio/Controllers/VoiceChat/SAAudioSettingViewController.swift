@@ -45,7 +45,7 @@ class SAAudioSettingViewController: UIViewController {
         }
     }
 
-    var resBlock: ((AUDIO_SETTING_TYPE) -> Void)?
+    var resBlock: ((SA_AUDIO_SETTING_TYPE) -> Void)?
     var useRobotBlock: ((Bool) -> Void)?
     var volBlock: ((Int) -> Void)?
     var effectClickBlock: ((SASOUND_TYPE) -> Void)?
@@ -195,7 +195,7 @@ extension SAAudioSettingViewController: UITableViewDelegate, UITableViewDataSour
             headerView.addSubview(titleLabel)
 
             let imgView: UIImageView = .init(frame: CGRect(x: width + 30, y: 6, width: 30, height: 20))
-            imgView.image = UIImage("new")
+            imgView.image =UIImage.sceneImage(name: "new")
             headerView.addSubview(imgView)
 
             return headerView
@@ -401,7 +401,7 @@ extension SAAudioSettingViewController: UITableViewDelegate, UITableViewDataSour
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        var state: AUDIO_SETTING_TYPE = .Noise
+        var state: SA_AUDIO_SETTING_TYPE = .Noise
         if indexPath.section == 0 {
             switch indexPath.row {
             case 0:

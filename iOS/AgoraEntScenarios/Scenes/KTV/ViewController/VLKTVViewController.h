@@ -4,7 +4,6 @@
 //
 
 #import "BaseViewController.h"
-#import "KTVServiceProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @class VLRoomListModel;

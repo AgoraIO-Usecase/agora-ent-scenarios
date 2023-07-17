@@ -7,7 +7,7 @@
 #import "VLAddRoomModel.h"
 #import "VLMacroDefine.h"
 #import "VLToast.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 #import "MenuUtils.h"
 #import "AgoraEntScenarios-Swift.h"
 
@@ -126,7 +126,7 @@
     self.screatView.hidden = YES;
     [self addSubview:self.screatView];
 
-    VRVerifyCodeView *pwdView = [[VRVerifyCodeView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH-80, 55) codeNumbers:4 space:10 padding:10];
+    VerifyCodeView *pwdView = [[VerifyCodeView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH-80, 55) codeNumbers:4 space:10 padding:10];
     pwdView.inputFinish = ^(NSString * _Nonnull pwd) {
         weakSelf.addRoomModel.password = pwd;
     };

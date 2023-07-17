@@ -12,7 +12,7 @@ import ZSwiftBaseLib
 public final class VRRoomListCell: UITableViewCell {
     var entity = VRRoomEntity()
 
-    lazy var background: UIImageView = .init(frame: CGRect(x: 20, y: 15, width: ScreenWidth - 40, height: self.frame.height - 15)).image(UIImage("normal_room") ?? UIImage()).backgroundColor(.clear)
+    lazy var background: UIImageView = .init(frame: CGRect(x: 20, y: 15, width: ScreenWidth - 40, height: self.frame.height - 15)).image(UIImage.sceneImage(name: "normal_room", bundleName: "VoiceChatRoomResource") ?? UIImage()).backgroundColor(.clear)
 
     lazy var accessSymbol: UIButton = .init(type: .custom).frame(CGRect(x: 0, y: 0, width: 68, height: 24)).font(UIFont.systemFont(ofSize: 10, weight: .regular)).backgroundColor(.clear)
 
@@ -38,7 +38,7 @@ public final class VRRoomListCell: UITableViewCell {
         seenCount.titleEdgeInsets(UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5))
         ownerName.titleLabel?.lineBreakMode(.byTruncatingTail)
         ownerName.imageView?.contentMode = .scaleAspectFit
-        seenCount.setImage(UIImage("person_in_circle"), for: .normal)
+        seenCount.setImage(UIImage.sceneImage(name: "person_in_circle", bundleName: "VoiceChatRoomResource"), for: .normal)
         seenCount.imageView?.contentMode = .scaleAspectFit
         seenCount.contentHorizontalAlignment = .left
         seenCount.titleLabel?.lineBreakMode(.byTruncatingTail)
@@ -53,8 +53,8 @@ public final class VRRoomListCell: UITableViewCell {
     func setupViewsAttributes(room: VRRoomEntity) {
         entity = room
         if let show = room.is_private, show == true {
-            accessSymbol.set(image: UIImage("suo"), title: LanguageManager.localValue(key: "Private"), titlePosition: .right, additionalSpacing: 5, state: .normal)
-            accessSymbol.setBackgroundImage(UIImage("securityType"), for: .normal)
+            accessSymbol.set(image: UIImage.sceneImage(name: "suo", bundleName: "VoiceChatRoomResource"), title: LanguageManager.localValue(key: "Private"), titlePosition: .right, additionalSpacing: 5, state: .normal)
+            accessSymbol.setBackgroundImage(UIImage.sceneImage(name: "securityType", bundleName: "VoiceChatRoomResource"), for: .normal)
             accessSymbol.isHidden = false
         } else {
             accessSymbol.isHidden = true
@@ -68,9 +68,9 @@ public final class VRRoomListCell: UITableViewCell {
             self.ownerName.setImage(image, for: .normal)
         })
         print("avatar: \(room.owner?.portrait ?? "")")
-        var image = UIImage("normal_room")
+        var image = UIImage.sceneImage(name: "normal_room", bundleName: "VoiceChatRoomResource")
         if (room.type ?? 0) == 1 {
-            image = UIImage("specific_room")
+            image = UIImage.sceneImage(name: "specific_room", bundleName: "VoiceChatRoomResource")
         }
         background.image = image
     }

@@ -22,6 +22,8 @@ PODS:
   - AgoraSyncManager (2.0.8):
     - SocketRocket
   - Bugly (2.5.93)
+  - BytedEffect (4.3.0):
+    - SSZipArchive
   - HWWeakTimer (1.0)
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
@@ -71,6 +73,7 @@ DEPENDENCIES:
   - AgoraRtm_iOS (= 1.5.1)
   - AgoraSyncManager (~> 2.0.8)
   - Bugly (= 2.5.93)
+  - BytedEffect (from `bytedEffect.podspec`)
   - HWWeakTimer (= 1.0)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
@@ -127,6 +130,8 @@ SPEC REPOS:
     - ZSwiftBaseLib
 
 EXTERNAL SOURCES:
+  BytedEffect:
+    :path: bytedEffect.podspec
   SenseLib:
     :path: sense.podspec
 
@@ -139,6 +144,7 @@ SPEC CHECKSUMS:
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   AgoraSyncManager: 33b8ecf2cd80550f156612d6175a0b0ed1d48497
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
+  BytedEffect: 74b0bd8150ff1ab9c443d210a7ff7eb49ad3da44
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
@@ -163,6 +169,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 31093730100d5c6a40e56098ca0c45f9a928b109
+PODFILE CHECKSUM: 69d31a414fc246779a6b0034eceb6e909c2b8f37
 
 COCOAPODS: 1.12.1
