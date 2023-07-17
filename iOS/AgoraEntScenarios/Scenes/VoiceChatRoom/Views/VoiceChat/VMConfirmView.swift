@@ -43,7 +43,7 @@ class VMConfirmView: UIView {
         titleLabel.frame = CGRect(x: bounds.size.width / 2.0 - 60, y: 30, width: 120, height: 22)
         titleLabel.textAlignment = .center
         titleLabel.text = "Prompt".voice_localized()
-        titleLabel.textColor = UIColor.HexColor(hex: 0x040925, alpha: 1)
+        titleLabel.textColor = UIColor(hex: 0x040925, alpha: 1)
         titleLabel.font = UIFont.systemFont(ofSize: 16)
         addSubview(titleLabel)
 
@@ -52,7 +52,7 @@ class VMConfirmView: UIView {
         contentLabel.text = type == .addbot ? "Add Bot".voice_localized() : "Exit Room".voice_localized()
         contentLabel.numberOfLines = 0
         contentLabel.lineBreakMode = .byCharWrapping
-        contentLabel.textColor = UIColor.HexColor(hex: 0x6C7192, alpha: 1)
+        contentLabel.textColor = UIColor(hex: 0x6C7192, alpha: 1)
         contentLabel.font = UIFont.systemFont(ofSize: 14)
         addSubview(contentLabel)
 

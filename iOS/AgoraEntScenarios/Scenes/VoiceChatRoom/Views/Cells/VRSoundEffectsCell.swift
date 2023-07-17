@@ -78,7 +78,7 @@ extension VRSoundEffectsCell {
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VRIconCell", for: indexPath) as? VRIconCell
-        cell?.imageView.image = UIImage(images[entity?.index ?? 0][indexPath.row])
+        cell?.imageView.image = UIImage.voice_image(images[entity?.index ?? 0][indexPath.row])
         return cell ?? UICollectionViewCell()
     }
 

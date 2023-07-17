@@ -49,8 +49,8 @@ class VMANISSUPTableViewCell: UITableViewCell {
         didSet {
             if btn_state == .off {
                 noneBtn.backgroundColor = .white
-                noneBtn.layer.borderColor = UIColor.HexColor(hex: 0x0A7AFF, alpha: 1).cgColor
-                noneBtn.setTitleColor(UIColor.HexColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
+                noneBtn.layer.borderColor = UIColor(hex: 0x0A7AFF, alpha: 1).cgColor
+                noneBtn.setTitleColor(UIColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
                 noneBtn.layer.borderWidth = 1
 
                 anisBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
@@ -61,8 +61,8 @@ class VMANISSUPTableViewCell: UITableViewCell {
                 selBtn = noneBtn
             } else if btn_state == .middle {
                 anisBtn.backgroundColor = .white
-                anisBtn.layer.borderColor = UIColor.HexColor(hex: 0x0A7AFF, alpha: 1).cgColor
-                anisBtn.setTitleColor(UIColor.HexColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
+                anisBtn.layer.borderColor = UIColor(hex: 0x0A7AFF, alpha: 1).cgColor
+                anisBtn.setTitleColor(UIColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
                 anisBtn.layer.borderWidth = 1
 
                 noneBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
@@ -102,7 +102,7 @@ class VMANISSUPTableViewCell: UITableViewCell {
         titleLabel.frame = CGRect(x: 20, y: 10, width: 200, height: 20)
         titleLabel.text = "TV Sound"
         titleLabel.font = UIFont.systemFont(ofSize: 13)
-        titleLabel.textColor = UIColor.HexColor(hex: 0x3C4267, alpha: 1)
+        titleLabel.textColor = UIColor(hex: 0x3C4267, alpha: 1)
         contentView.addSubview(titleLabel)
 
         detailLabel.frame = CGRect(x: 20, y: 30, width: 150, height: 30)
@@ -144,8 +144,8 @@ class VMANISSUPTableViewCell: UITableViewCell {
         if !isTouchAble || isAudience { return }
 
         sender.backgroundColor = .white
-        sender.layer.borderColor = UIColor.HexColor(hex: 0x0A7AFF, alpha: 1).cgColor
-        sender.setTitleColor(UIColor.HexColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
+        sender.layer.borderColor = UIColor(hex: 0x0A7AFF, alpha: 1).cgColor
+        sender.setTitleColor(UIColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
         sender.layer.borderWidth = 1
         if selBtn != nil {
             selBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)

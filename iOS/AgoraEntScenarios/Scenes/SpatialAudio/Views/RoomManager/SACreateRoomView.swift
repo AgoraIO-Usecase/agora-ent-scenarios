@@ -108,7 +108,7 @@ public extension SACreateRoomView {
 
     func horizontalCardsView(_: SAHorizontalCardsView, viewForIndex index: Int) -> SAHorizontalCardView {
         let card = SAHorizontalCardView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 32, height: cardHeight)).backgroundColor(.clear).cornerRadius(25)
-        guard let title = datas[index]["title"], let detail = datas[index]["detail"], let image = UIImage(datas[index]["image"]!) else { return card }
+        guard let title = datas[index]["title"], let detail = datas[index]["detail"], let image = UIImage.spatial_image(datas[index]["image"]!) else { return card }
         return SASoundTypeCard(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40, height: cardHeight), title: title, note: detail, background: image).cornerRadius(25)
     }
 

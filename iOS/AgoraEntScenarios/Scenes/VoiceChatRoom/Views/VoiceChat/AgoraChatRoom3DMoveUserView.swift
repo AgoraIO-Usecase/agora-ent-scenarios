@@ -72,7 +72,7 @@ class AgoraChatRoom3DMoveUserView: UIView {
 
     public var iconImgUrl: String = "" {
         didSet {
-            iconView.image = UIImage(iconImgUrl)
+            iconView.image = UIImage.voice_image(iconImgUrl)
         }
     }
 

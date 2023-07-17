@@ -95,7 +95,7 @@ class VMAudioSettingView: UIView {
         addSubview(tableView)
         tableView.tableFooterView = UIView()
 
-        tableView.separatorColor = UIColor.HexColor(hex: 0xF6F6F6, alpha: 1)
+        tableView.separatorColor = UIColor(hex: 0xF6F6F6, alpha: 1)
 
         if #available(iOS 15.0, *) {
             tableView.sectionHeaderTopPadding = 0
@@ -217,7 +217,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
 
             guard !settingImage.isEmpty else { return cell}
 
-            cell.iconView.image = UIImage(settingImage[0 + indexPath.row])
+            cell.iconView.image = UIImage.voice_image(settingImage[0 + indexPath.row])
             cell.titleLabel.text = settingName[0 + indexPath.row]
             if indexPath.row == 0 {
                 cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
@@ -313,7 +313,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             if indexPath.row == 0 {
                 let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
                 guard !settingImage.isEmpty else { return cell}
-                cell.iconView.image = UIImage(settingImage[3])
+                cell.iconView.image = UIImage.voice_image(settingImage[3])
                 cell.titleLabel.text = settingName[3]
                // cell.isAudience = isAudience
                 cell.selectionStyle = .none
@@ -327,7 +327,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 let cell: VMSliderTableViewCell = tableView.dequeueReusableCell(withIdentifier: slIdentifier) as! VMSliderTableViewCell
                 guard !settingImage.isEmpty else { return cell}
 
-                cell.iconView.image = UIImage(settingImage[4])
+                cell.iconView.image = UIImage.voice_image(settingImage[4])
                 cell.titleLabel.text = settingName[4]
                 cell.isAudience = isAudience
                 cell.selectionStyle = .none
@@ -350,7 +350,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             }
             guard !settingImage.isEmpty else { return cell}
 
-            cell.iconView.image = UIImage(settingImage[5])
+            cell.iconView.image = UIImage.voice_image(settingImage[5])
             cell.titleLabel.text = settingName[5]
       
 

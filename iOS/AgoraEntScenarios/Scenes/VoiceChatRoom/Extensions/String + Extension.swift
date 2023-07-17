@@ -8,7 +8,9 @@
 import Foundation
 
 public extension String {
+    
     func voice_localized() -> String {
         return LanguageManager.localValue(key: self)
     }
+    
 }

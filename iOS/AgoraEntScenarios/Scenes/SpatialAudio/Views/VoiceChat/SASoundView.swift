@@ -97,7 +97,7 @@ class SASoundView: UIView {
         }
         for (index, value) in iconImgs.enumerated() {
             let imgView = UIImageView()
-            imgView.image = UIImage(value)
+            imgView.image = UIImage.spatial_image(value)
             imgView.tag = basetag + index
             addSubview(imgView)
         }
