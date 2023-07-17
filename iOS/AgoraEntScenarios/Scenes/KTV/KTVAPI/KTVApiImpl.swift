@@ -132,7 +132,7 @@ private func agoraPrint(_ message: String) {
     
     private func setParams() {
         guard let engine = self.apiConfig?.engine else {return}
-        engine.setParameters("{\"rtc.enable_nasa2\": false}")
+        engine.setParameters("{\"rtc.enable_nasa2\": true}")
         engine.setParameters("{\"rtc.ntp_delay_drop_threshold\": 1000}")
         engine.setParameters("{\"rtc.video.enable_sync_render_ntp\": true}")
         engine.setParameters("{\"rtc.net.maxS2LDelay\": 800}")
@@ -790,57 +790,57 @@ extension KTVApiImpl: AgoraRtcEngineDelegate {
         }
     }
     
-    @objc func onAECLevelChanged(level: Int) {
-        if level == 0 {
-            apiConfig?.engine?.setParameters("{\"che.audio.aec.split_srate_for_48k\": 16000}")
-        } else if level == 1 {
-            apiConfig?.engine?.setParameters("{\"che.audio.aec.split_srate_for_48k\": 24000}")
-        } else if level == 2 {
-            apiConfig?.engine?.setParameters("{\"che.audio.aec.split_srate_for_48k\": 48000}")
-        }
-    }
-    
-    @objc func onAINSModeChanged(_ mode: Int) {
-        if mode == 0 {
-            // 关闭
-            apiConfig?.engine?.setParameters("{\"che.audio.ains_mode\": 0}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.lowerBound\": 80}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.lowerMask\": 50}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.statisticalbound\": 5}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.finallowermask\": 30}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.enhfactorstastical\": 200}")
-        } else if mode == 1 {
-            // 中
-            apiConfig?.engine?.setParameters("{\"che.audio.ains_mode\": 2}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.lowerBound\": 80}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.lowerMask\": 50}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.statisticalbound\": 5}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.finallowermask\": 30}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.enhfactorstastical\": 200}")
-        } else if mode == 2 {
-            // 高
-            apiConfig?.engine?.setParameters("{\"che.audio.ains_mode\": 2}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.lowerBound\": 10}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.lowerMask\": 10}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.statisticalbound\": 0}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.finallowermask\": 8}")
-            apiConfig?.engine?.setParameters("{\"che.audio.nsng.enhfactorstastical\": 200}")
-        }
-    }
-    
-    @objc func enableLowLatencyMode(_ enable: Bool){
-        if enable {
-            apiConfig?.engine?.setParameters("{\"che.audio.aiaec.working_mode\": 0}")
-            apiConfig?.engine?.setParameters("{\"che.audio.ains_mode\": -1}")
-            apiConfig?.engine?.setParameters("{\"che.audio.aec.nlp_size\": 128}")
-            apiConfig?.engine?.setParameters("{\"che.audio.aec.nlp_size\": 64}")
-        } else {
-            apiConfig?.engine?.setParameters("{\"che.audio.aiaec.working_mode\": 0}")
-            apiConfig?.engine?.setParameters("{\"che.audio.ains_mode\": 0}")
-            apiConfig?.engine?.setParameters("{\"che.audio.aiaec.working_mode\": 512}")
-            apiConfig?.engine?.setParameters("{\"che.audio.aec.nlp_hop_size\": 64}")
-        }
-    }
+//    @objc func onAECLevelChanged(level: Int) {
+//        if level == 0 {
+//            apiConfig?.engine?.setParameters("{\"che.audio.aec.split_srate_for_48k\": 16000}")
+//        } else if level == 1 {
+//            apiConfig?.engine?.setParameters("{\"che.audio.aec.split_srate_for_48k\": 24000}")
+//        } else if level == 2 {
+//            apiConfig?.engine?.setParameters("{\"che.audio.aec.split_srate_for_48k\": 48000}")
+//        }
+//    }
+//
+//    @objc func onAINSModeChanged(_ mode: Int) {
+//        if mode == 0 {
+//            // 关闭
+//            apiConfig?.engine?.setParameters("{\"che.audio.ains_mode\": 0}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.lowerBound\": 80}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.lowerMask\": 50}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.statisticalbound\": 5}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.finallowermask\": 30}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.enhfactorstastical\": 200}")
+//        } else if mode == 1 {
+//            // 中
+//            apiConfig?.engine?.setParameters("{\"che.audio.ains_mode\": 2}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.lowerBound\": 80}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.lowerMask\": 50}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.statisticalbound\": 5}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.finallowermask\": 30}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.enhfactorstastical\": 200}")
+//        } else if mode == 2 {
+//            // 高
+//            apiConfig?.engine?.setParameters("{\"che.audio.ains_mode\": 2}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.lowerBound\": 10}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.lowerMask\": 10}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.statisticalbound\": 0}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.finallowermask\": 8}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.nsng.enhfactorstastical\": 200}")
+//        }
+//    }
+//
+//    @objc func enableLowLatencyMode(_ enable: Bool){
+//        if enable {
+//           // apiConfig?.engine?.setParameters("{\"che.audio.aiaec.working_mode\": 0}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.ains_mode\": -1}")
+////            apiConfig?.engine?.setParameters("{\"che.audio.aec.nlp_size\": 128}")
+////            apiConfig?.engine?.setParameters("{\"che.audio.aec.nlp_size\": 64}")
+//        } else {
+//           // apiConfig?.engine?.setParameters("{\"che.audio.aiaec.working_mode\": 0}")
+//            apiConfig?.engine?.setParameters("{\"che.audio.ains_mode\": 0}")
+////            apiConfig?.engine?.setParameters("{\"che.audio.aiaec.working_mode\": 512}")
+////            apiConfig?.engine?.setParameters("{\"che.audio.aec.nlp_hop_size\": 64}")
+//        }
+//    }
 }
 
 //需要外部转发的方法 主要是dataStream相关的
