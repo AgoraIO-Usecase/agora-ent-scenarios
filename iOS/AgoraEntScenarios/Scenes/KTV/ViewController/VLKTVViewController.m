@@ -502,6 +502,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                       uid:VLUserCenter.user.id
                                                 tokenType:TokenGeneratorTypeToken006
                                                      type:AgoraTokenTypeRtc
+                                                   expire:1500
                                                   success:^(NSString * token) {
         KTVLogInfo(@"tokenPrivilegeWillExpire rtc renewToken: %@", token);
         [self.RTCkit renewToken:token];
@@ -512,6 +513,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                       uid:VLUserCenter.user.id
                                                 tokenType:TokenGeneratorTypeToken006
                                                      type:AgoraTokenTypeRtm
+                                                   expire:1500
                                                   success:^(NSString * token) {
         KTVLogInfo(@"tokenPrivilegeWillExpire rtm renewToken: %@", token);
         //TODO(chenpan): mcc missing
