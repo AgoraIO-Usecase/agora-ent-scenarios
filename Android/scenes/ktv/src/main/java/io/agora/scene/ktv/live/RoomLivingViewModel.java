@@ -1200,15 +1200,17 @@ public class RoomLivingViewModel extends ViewModel {
             public void onLowLatencyModeChanged(boolean enable) {
                 KTVLogger.d(TAG, "onLowLatencyModeChanged: " + enable);
                 if (enable) {
-                    mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\": 0}");
+                    // 和超高音质同时开启会发生崩溃，先注释aec相关操作
+                    //mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\": 0}");
                     mRtcEngine.setParameters("{\"che.audio.ains_mode\": -1}");
-                    mRtcEngine.setParameters("{\"che.audio.aec.nlp_size\": 128}");
-                    mRtcEngine.setParameters("{\"che.audio.aec.nlp_hop_size\": 64}");
+                    //mRtcEngine.setParameters("{\"che.audio.aec.nlp_size\": 128}");
+                    //mRtcEngine.setParameters("{\"che.audio.aec.nlp_hop_size\": 64}");
                 } else {
-                    mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\": 0}");
-                    mRtcEngine.setParameters("{\"che.audio.ains_mode\": 0}");
+                    // 和超高音质同时开启会发生崩溃，先注释aec相关操作
+                    //mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\": 0}");
+                    //mRtcEngine.setParameters("{\"che.audio.ains_mode\": 0}");
                     mRtcEngine.setParameters("{\"che.audio.aec.nlp_size\": 512}");
-                    mRtcEngine.setParameters("{\"che.audio.aec.nlp_hop_size\": 64}");
+                    //mRtcEngine.setParameters("{\"che.audio.aec.nlp_hop_size\": 64}");
                 }
             }
 
