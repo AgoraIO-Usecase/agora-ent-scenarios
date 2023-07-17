@@ -33,7 +33,6 @@ class CloudPlayerService {
     }
 
     private val heartBeatTimerMap = mutableMapOf<String, CountDownTimer>()
-    private val cloudPLayerTraceMap = mutableMapOf<String, String>()
 
     fun startCloudPlayer(
         channelName: String,
@@ -48,7 +47,6 @@ class CloudPlayerService {
             try {
                 withContext(Dispatchers.IO) {
                     val traceId = UUID.randomUUID().toString().replace("-","")
-                    cloudPLayerTraceMap[channelName] = traceId
                     reqStartCloudPlayer(channelName, uid, robotUid, streamUrl, streamRegion, traceId)
                 }
                 success.invoke()
@@ -90,7 +88,8 @@ class CloudPlayerService {
         scope.launch(Dispatchers.Main) {
             try {
                 withContext(Dispatchers.IO) {
-                    reqHeatBeat(channelName, uid, cloudPLayerTraceMap[channelName] ?: "")
+                    val traceId = UUID.randomUUID().toString().replace("-","")
+                    reqHeatBeat(channelName, uid, traceId)
                 }
             } catch (ex: Exception) {
                 failure?.invoke(ex)
