@@ -2162,7 +2162,7 @@ class ShowSyncManagerServiceImpl constructor(
             val roomId = kRobotVideoRoomIds[i]
             cloudPlayerService.startCloudPlayer(
                 roomId.toString(),
-                UserManager.getInstance().user.userNo,
+                UserManager.getInstance().user.id.toString(),
                 kRobotUid,
                 kRobotVideoStreamUrls[i],
                 "cn",
