@@ -104,7 +104,7 @@ extension SAInviteUsersController {
         AppContext.saServiceImp().startMicSeatInvitation(chatUid: chat_uid, index: idx < 0 ? nil : idx) {[weak self] error, flag in
             SVProgressHUD.dismiss()
             guard let self = self else {return}
-            self.view.makeToast(flag == true ? "Invitation sent!".localized() : "Invited failed!".localized())
+            self.view.makeToast(flag == true ? "Invitation sent!".spatial_localized() : "Invited failed!".spatial_localized())
         }
 
     }

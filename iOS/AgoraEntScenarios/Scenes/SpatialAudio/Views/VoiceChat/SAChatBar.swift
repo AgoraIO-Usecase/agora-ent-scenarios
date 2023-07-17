@@ -68,7 +68,7 @@ public class SAChatBar: UIView, UICollectionViewDelegate, UICollectionViewDataSo
         }
         addSubViews([chatRaiser, toolBar])
         chatRaiser.setImage(UIImage.sceneImage(name:"chatraise"), for: .normal)
-        chatRaiser.setTitle(" " + "Let's Chat!".localized(), for: .normal)
+        chatRaiser.setTitle(" " + "Let's Chat!".spatial_localized(), for: .normal)
         chatRaiser.titleEdgeInsets = UIEdgeInsets(top: chatRaiser.titleEdgeInsets.top, left: 10, bottom: chatRaiser.titleEdgeInsets.bottom, right: 10)
         chatRaiser.imageEdgeInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 80)
         chatRaiser.contentHorizontalAlignment = .left

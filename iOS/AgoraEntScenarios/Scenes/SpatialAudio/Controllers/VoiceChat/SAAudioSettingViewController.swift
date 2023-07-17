@@ -220,28 +220,28 @@ extension SAAudioSettingViewController: UITableViewDelegate, UITableViewDataSour
                 //cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
                 switch ains_state {
                 case .high:
-                    cell.contentLabel.text = "High".localized()
+                    cell.contentLabel.text = "High".spatial_localized()
                 case .mid:
-                    cell.contentLabel.text = "Middle".localized()
+                    cell.contentLabel.text = "Middle".spatial_localized()
                 case .off:
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "Off".spatial_localized()
                 }
                 
                 
             } else if indexPath.row == 1 {
                 if roomInfo?.room?.turn_AIAEC == true {
-                    cell.contentLabel.text = "On".localized()
+                    cell.contentLabel.text = "On".spatial_localized()
                 } else {
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "Off".spatial_localized()
                 }
             } else if indexPath.row == 2 {
                 if roomInfo?.room?.turn_AGC == true {
-                    cell.contentLabel.text = "On".localized()
+                    cell.contentLabel.text = "On".spatial_localized()
                 } else {
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "Off".spatial_localized()
                 }
             } else {
-                cell.contentLabel.text = "Other".localized()
+                cell.contentLabel.text = "Other".spatial_localized()
 
             }
 //            else {
@@ -357,11 +357,11 @@ extension SAAudioSettingViewController: UITableViewDelegate, UITableViewDataSour
             } else if indexPath.row == 1 {
                 switch ains_state {
                 case .high:
-                    cell.contentLabel.text = "High".localized()
+                    cell.contentLabel.text = "High".spatial_localized()
                 case .mid:
-                    cell.contentLabel.text = "Middle".localized()
+                    cell.contentLabel.text = "Middle".spatial_localized()
                 case .off:
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "Off".spatial_localized()
                 }
             }
             return cell
@@ -483,18 +483,18 @@ extension SAAudioSettingViewController: UITableViewDelegate, UITableViewDataSour
     }
     
     private func getSoundType(with index: Int) -> String {
-        var soundType: String = "Social Chat".localized()
+        var soundType: String = "Social Chat".spatial_localized()
         switch index {
         case 1:
-            soundType = "Social Chat".localized()
+            soundType = "Social Chat".spatial_localized()
         case 2:
-            soundType = "Karaoke".localized()
+            soundType = "Karaoke".spatial_localized()
         case 3:
-            soundType = "Gaming Buddy".localized()
+            soundType = "Gaming Buddy".spatial_localized()
         case 4:
-            soundType = "Professional Podcaster".localized()
+            soundType = "Professional Podcaster".spatial_localized()
         default:
-            soundType = "Social Chat".localized()
+            soundType = "Social Chat".spatial_localized()
         }
         return soundType
     }

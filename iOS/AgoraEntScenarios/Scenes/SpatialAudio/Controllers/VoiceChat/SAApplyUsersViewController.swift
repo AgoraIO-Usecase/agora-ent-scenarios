@@ -96,7 +96,7 @@ extension SAApplyUsersViewController {
                 self.agreeApply!(mic)
             }
             self.tableView.reloadData()
-            let warningMessage = (error == nil ? "Agree success!".localized():"Agree failed!".localized())
+            let warningMessage = (error == nil ? "Agree success!".spatial_localized():"Agree failed!".spatial_localized())
             self.view.makeToast(warningMessage)
         })
     }

@@ -416,18 +416,18 @@ class AgoraChatRoomHeaderView: UIView {
     }
     
     private func getSoundType(with index: Int) -> String {
-        var soundType: String = "Social Chat".localized()
+        var soundType: String = "Social Chat".voice_localized()
         switch index {
         case 1:
-            soundType = "Social Chat".localized()
+            soundType = "Social Chat".voice_localized()
         case 2:
-            soundType = "Karaoke".localized()
+            soundType = "Karaoke".voice_localized()
         case 3:
-            soundType = "Gaming Buddy".localized()
+            soundType = "Gaming Buddy".voice_localized()
         case 4:
-            soundType = "Professional Podcaster".localized()
+            soundType = "Professional Podcaster".voice_localized()
         default:
-            soundType = "Social Chat".localized()
+            soundType = "Social Chat".voice_localized()
         }
         return soundType
     }

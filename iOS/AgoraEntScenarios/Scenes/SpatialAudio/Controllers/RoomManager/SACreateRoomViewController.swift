@@ -76,7 +76,7 @@ extension SACreateRoomViewController {
     
     private func entryRoom() {
 //        AgoraChatClient.shared().logout(false)
-        SVProgressHUD.show(withStatus: "Loading".localized())
+        SVProgressHUD.show(withStatus: "Loading".spatial_localized())
         self.view.window?.isUserInteractionEnabled = false
 //        let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
         let entity = self.createEntity()
@@ -107,7 +107,7 @@ extension SACreateRoomViewController {
                             if let room = room,error == nil {
                                 self.entryRoom(room: room)
                             } else {
-                                SVProgressHUD.showError(withStatus: "Create failed!".localized())
+                                SVProgressHUD.showError(withStatus: "Create failed!".spatial_localized())
                             }
                         }
 //                    }else {
@@ -122,7 +122,7 @@ extension SACreateRoomViewController {
 
     private func goLive() {
         if container.roomInput.name.isEmpty {
-            view.makeToast("No Room Name".localized(), point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("No Room Name".spatial_localized(), point: view.center, title: nil, image: nil, completion: nil)
         }
         entryRoom()
     }

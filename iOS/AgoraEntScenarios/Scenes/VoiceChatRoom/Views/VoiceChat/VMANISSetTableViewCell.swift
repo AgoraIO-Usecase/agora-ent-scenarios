@@ -49,13 +49,13 @@ class VMANISSetTableViewCell: UITableViewCell {
 
     private func layoutUI() {
         // titleLabel.frame = CGRect(x: 20~, y: 17~, width: 200~, height: 20~)
-        titleLabel.text = "Your AINS".localized()
+        titleLabel.text = "Your AINS".voice_localized()
         titleLabel.font = UIFont.systemFont(ofSize: 13)
         titleLabel.textColor = UIColor.HexColor(hex: 0x3C4267, alpha: 1)
         contentView.addSubview(titleLabel)
 
         offBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
-        offBtn.setTitle(" \("Off".localized()) ", for: .normal)
+        offBtn.setTitle(" \("Off".voice_localized()) ", for: .normal)
         offBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
         offBtn.font(UIFont.systemFont(ofSize: 11))
         offBtn.layer.cornerRadius = 3
@@ -65,7 +65,7 @@ class VMANISSetTableViewCell: UITableViewCell {
         addSubview(offBtn)
 
         midBtn.backgroundColor = .white
-        midBtn.setTitle(" \("Medium".localized()) ".localized(), for: .normal)
+        midBtn.setTitle(" \("Medium".voice_localized()) ".voice_localized(), for: .normal)
         midBtn.setTitleColor(UIColor.HexColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
         midBtn.font(UIFont.systemFont(ofSize: 11))
         midBtn.backgroundColor = .white
@@ -79,7 +79,7 @@ class VMANISSetTableViewCell: UITableViewCell {
         selBtn = midBtn
 
         highBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
-        highBtn.setTitle(" \("High".localized()) ".localized(), for: .normal)
+        highBtn.setTitle(" \("High".voice_localized()) ".voice_localized(), for: .normal)
         highBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
         highBtn.font(UIFont.systemFont(ofSize: 11))
         highBtn.layer.cornerRadius = 3

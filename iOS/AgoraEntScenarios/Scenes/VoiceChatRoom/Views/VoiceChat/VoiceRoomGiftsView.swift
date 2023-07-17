@@ -104,10 +104,10 @@ public class VoiceRoomGiftsView: UIView, UICollectionViewDelegate, UICollectionV
             self.pop.hide()
             self.chooseQuantity.isSelected = false
             self.gift_count = $0
-            self.contribution.text = "Contribution Total".localized() + ": " + "\(Int(self.gift_count)! * Int(self.current?.gift_price ?? "1")!)"
+            self.contribution.text = "Contribution Total".voice_localized() + ": " + "\(Int(self.gift_count)! * Int(self.current?.gift_price ?? "1")!)"
         }
         current = self.gifts.first
-        contribution.text = "Contribution Total".localized() + ": " + "1"
+        contribution.text = "Contribution Total".voice_localized() + ": " + "1"
     }
 
     @available(*, unavailable)
@@ -135,7 +135,7 @@ public extension VoiceRoomGiftsView {
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             self.disableView.isHidden = true
-            self.contribution.text = "Contribution Total".localized() + ": " + "\(self.current?.gift_price ?? "1")"
+            self.contribution.text = "Contribution Total".voice_localized() + ": " + "\(self.current?.gift_price ?? "1")"
         }
     }
 
@@ -179,7 +179,7 @@ public extension VoiceRoomGiftsView {
             }
         }
         let total = Int(gift_count)! * Int(gift!.gift_price ?? "1")!
-        contribution.text = "Contribution Total".localized() + ": " + "\(total)"
+        contribution.text = "Contribution Total".voice_localized() + ": " + "\(total)"
         giftList.reloadData()
     }
 }

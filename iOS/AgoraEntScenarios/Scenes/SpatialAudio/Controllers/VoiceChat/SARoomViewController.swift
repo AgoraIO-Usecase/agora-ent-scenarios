@@ -394,7 +394,7 @@ extension SARoomViewController {
 
     func showActiveAlienView(_ active: Bool) {
         if !isOwner {
-            view.makeToast("Host Bot".localized())
+            view.makeToast("Host Bot".spatial_localized())
             return
         }
         let confirmView = SAConfirmView(frame: CGRect(x: 0,
@@ -416,7 +416,7 @@ extension SARoomViewController {
 
     func activeAlien(_ flag: Bool) {
         if isOwner == false {
-            view.makeToast("Host Bot".localized())
+            view.makeToast("Host Bot".spatial_localized())
             return
         }
         guard let mic_blue: SARoomMic = roomInfo?.mic_info?[3] else { return }
@@ -446,10 +446,10 @@ extension SARoomViewController {
             guard let self = self else {return}
             if result {
                 // 如果返回的结果为true 表示上麦成功
-                self.view.makeToast("Notice Posted".localized())
+                self.view.makeToast("Notice Posted".spatial_localized())
                 self.roomInfo?.room?.announcement = str
             } else {
-                self.view.makeToast("Post Failed".localized())
+                self.view.makeToast("Post Failed".spatial_localized())
             }
         }
     }
@@ -539,13 +539,13 @@ extension SARoomViewController {
         var detailStr: String = ""
         switch effect {
         case 1:
-            detailStr = "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat.".localized()
+            detailStr = "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat.".spatial_localized()
         case 2:
-            detailStr = "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful.".localized()
+            detailStr = "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful.".spatial_localized()
         case 3:
-            detailStr = "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. ".localized()
+            detailStr = "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. ".spatial_localized()
         default:
-            detailStr = "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ".localized()
+            detailStr = "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ".spatial_localized()
         }
         return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40)
     }

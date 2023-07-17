@@ -88,7 +88,7 @@ extension VoiceRoomApplyUsersViewController {
                 self.agreeApply!(mic)
             }
             self.tableView.reloadData()
-            let warningMessage = (error == nil ? "Agree success!".localized():"Agree failed!".localized())
+            let warningMessage = (error == nil ? "Agree success!".voice_localized():"Agree failed!".voice_localized())
             self.view.makeToast(warningMessage)
         })
     }

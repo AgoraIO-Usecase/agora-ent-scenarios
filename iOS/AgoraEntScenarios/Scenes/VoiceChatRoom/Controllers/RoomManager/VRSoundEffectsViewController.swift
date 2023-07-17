@@ -49,7 +49,7 @@ class VRSoundEffectsViewController: VRBaseViewController {
 
     @objc func goLive() {
         if name.isEmpty {
-            view.makeToast("No Room Name".localized(), point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("No Room Name".voice_localized(), point: view.center, title: nil, image: nil, completion: nil)
         }
         Throttler.throttle(queue:.main,delay: 1,shouldRunLatest: true) {
             self.entryRoom()
@@ -57,7 +57,7 @@ class VRSoundEffectsViewController: VRBaseViewController {
     }
 
     @objc private func entryRoom() {
-        SVProgressHUD.show(withStatus: "Loading".localized())
+        SVProgressHUD.show(withStatus: "Loading".voice_localized())
         self.view.window?.isUserInteractionEnabled = false
         let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
         let entity = self.createEntity()
@@ -68,7 +68,7 @@ class VRSoundEffectsViewController: VRBaseViewController {
             if room_id.isEmpty {
                 SVProgressHUD.dismiss()
                 self.view.window?.isUserInteractionEnabled = true
-                self.view.window?.makeToast("illegal check".localized())
+                self.view.window?.makeToast("illegal check".voice_localized())
                 ChatRoomServiceImp.getSharedInstance().leaveRoom(entity.room_id ?? "") { error, value in
                 }
                 self.backAction()
@@ -81,7 +81,7 @@ class VRSoundEffectsViewController: VRBaseViewController {
                         self.createVoiceChatRoom(entity: entity)
                     }else {
                         self.view.window?.isUserInteractionEnabled = true
-                        SVProgressHUD.showError(withStatus: "LoginIM failed!".localized())
+                        SVProgressHUD.showError(withStatus: "LoginIM failed!".voice_localized())
                     }
                 })
             } else  {
@@ -97,7 +97,7 @@ class VRSoundEffectsViewController: VRBaseViewController {
             if let room = room,error == nil {
                 self.entryRoom(room: room)
             } else {
-                SVProgressHUD.showError(withStatus: "Create failed!".localized())
+                SVProgressHUD.showError(withStatus: "Create failed!".voice_localized())
             }
         }
     }

@@ -14,7 +14,7 @@ class SASpatialTipsView: UIView {
     }()
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "How to use 3D Spatial Audio Seat".localized_spatial()
+        label.text = "How to use 3D Spatial Audio Seat".spatial_localized()
         label.textColor = UIColor(hex: "#040925", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 16)
         return label
@@ -43,14 +43,14 @@ class SASpatialTipsView: UIView {
     }()
     private lazy var step1: UILabel = {
         let label = UILabel()
-        label.text = "Put on headsets".localized_spatial()
+        label.text = "Put on headsets".spatial_localized()
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = .systemFont(ofSize: 14)
         return label
     }()
     private lazy var step2: UILabel = {
         let label = UILabel()
-        label.text = "Move avatar around to hear different spatial audio effects".localized_spatial()
+        label.text = "Move avatar around to hear different spatial audio effects".spatial_localized()
         label.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
         label.font = .systemFont(ofSize: 14)
         label.numberOfLines = 2
@@ -62,7 +62,7 @@ class SASpatialTipsView: UIView {
     }()
     private lazy var okButton: UIButton = {
         let button = UIButton()
-        button.setTitle("I got it".localized_spatial(), for: .normal)
+        button.setTitle("I got it".spatial_localized(), for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16)
         button.setBackgroundImage(UIImage.sceneImage(name: "spatial_tips_got_button_bg"), for: .normal)
