@@ -1,11 +1,17 @@
 ext { ktv_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
+final def VERSION_SCENE_SHOW = "2.4.0"
+
 android {
     defaultConfig {
         if (isModular()) {
             applicationId "io.agora.scenes.show"
         }
+
+        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_SHOW}\""
+        buildConfigField "String", "CLOUD_PLAYER_KEY", "\"${CLOUD_PLAYER_KEY}\""
+        buildConfigField "String", "CLOUD_PLAYER_SECRET", "\"${CLOUD_PLAYER_SECRET}\""
     }
 }
 

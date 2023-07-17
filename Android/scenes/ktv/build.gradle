@@ -1,11 +1,13 @@
 ext { ktv_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
+final def VERSION_SCENE_KTV = "2.3.1"
 android {
     defaultConfig {
         if(isModular()){
             applicationId "io.agora.scenes.ktv"
         }
+        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_KTV}\""
     }
 }
 
