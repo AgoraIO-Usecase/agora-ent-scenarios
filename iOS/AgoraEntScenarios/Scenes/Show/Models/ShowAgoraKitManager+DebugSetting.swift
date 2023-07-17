@@ -80,7 +80,7 @@ extension ShowAgoraKitManager {
         videoEncoderConfig.dimensions = CGSize(width: 720, height: 1280)
         videoEncoderConfig.frameRate = .fps15
         videoEncoderConfig.bitrate = 1800
-        agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+        engine?.setVideoEncoderConfiguration(videoEncoderConfig)
         
         setExposureRange()
         setColorSpace()
@@ -172,7 +172,7 @@ extension ShowAgoraKitManager {
                 return
             }
             videoEncoderConfig.frameRate = fps
-            agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            engine?.setVideoEncoderConfiguration(videoEncoderConfig)
             showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeFrameRate = \(videoEncoderConfig.frameRate) ")
         case .bitRate:
             guard let value = Int(text) else {
@@ -180,7 +180,7 @@ extension ShowAgoraKitManager {
                 return
             }
             videoEncoderConfig.bitrate = value
-            agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            engine?.setVideoEncoderConfiguration(videoEncoderConfig)
             showLogger.info("***Debug*** setVideoEncoderConfiguration.bitrate = \(videoEncoderConfig.bitrate) ")
         }
     }
@@ -197,7 +197,7 @@ extension ShowAgoraKitManager {
             showLogger.info("***Debug*** setCameraCapturerConfiguration.captureVideoSize = \(captureConfig.dimensions) ")
         case .encodeVideoSize:
             videoEncoderConfig.dimensions = CGSize(width: value1, height: value2)
-            agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            engine?.setVideoEncoderConfiguration(videoEncoderConfig)
             showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeVideoSize = \(videoEncoderConfig.dimensions) ")
         case .exposureRange:
             exposureRangeX = value1
@@ -218,29 +218,29 @@ extension ShowAgoraKitManager {
         
         switch key {
         case .lowlightEnhance:
-            agoraKit.setLowlightEnhanceOptions(isOn, options: AgoraLowlightEnhanceOptions())
+            engine?.setLowlightEnhanceOptions(isOn, options: AgoraLowlightEnhanceOptions())
         case .colorEnhance:
-            agoraKit.setColorEnhanceOptions(isOn, options: AgoraColorEnhanceOptions())
+            engine?.setColorEnhanceOptions(isOn, options: AgoraColorEnhanceOptions())
         case .videoDenoiser:
-            agoraKit.setVideoDenoiserOptions(isOn, options: AgoraVideoDenoiserOptions())
+            engine?.setVideoDenoiserOptions(isOn, options: AgoraVideoDenoiserOptions())
         case .PVC:
-            agoraKit.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
+            engine?.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
         case .focusFace:
-            agoraKit.setCameraAutoFocusFaceModeEnabled(isOn)
+            engine?.setCameraAutoFocusFaceModeEnabled(isOn)
             showLogger.info("***Debug*** setCameraAutoFocusFaceModeEnabled  \(isOn)")
         case .encode:
             let index = indexValue % debugEncodeItems.count
-            agoraKit.setParameters("{\"engine.video.enable_hw_encoder\":\"\(debugEncodeItems[index])\"}")
+            engine?.setParameters("{\"engine.video.enable_hw_encoder\":\"\(debugEncodeItems[index])\"}")
             showLogger.info("***Debug*** engine.video.enable_hw_encoder  \(debugEncodeItems[index])")
         case .codeCType:
             let index = indexValue % debugCodeCTypeItems.count
-            agoraKit.setParameters("{\"engine.video.codec_type\":\"\(debugCodeCTypeItems[index])\"}")
+            engine?.setParameters("{\"engine.video.codec_type\":\"\(debugCodeCTypeItems[index])\"}")
             showLogger.info("***Debug*** engine.video.codec_type  \(debugCodeCTypeItems[index])")
 
         case .mirror, .renderMode:
             let index = ShowDebugSettingKey.renderMode.intValue % debugRenderModeItems.count
             let mirrorIsOn = ShowDebugSettingKey.mirror.boolValue
-            agoraKit.setLocalRenderMode(debugRenderModeItems[index], mirror: mirrorIsOn ? .enabled : .disabled)
+            engine?.setLocalRenderMode(debugRenderModeItems[index], mirror: mirrorIsOn ? .enabled : .disabled)
             showLogger.info("***Debug*** setLocalRenderMode  mirror = \(mirrorIsOn ? AgoraVideoMirrorMode.enabled : AgoraVideoMirrorMode.disabled), rendermode = \(debugRenderModeItems[index])")
         case .debugSR, .debugSrType:
             let srIsOn = ShowDebugSettingKey.debugSR.boolValue
@@ -248,7 +248,7 @@ extension ShowAgoraKitManager {
             setSuperResolutionOn(srIsOn, srType: debugSrTypeItems[index])
             showLogger.info("***Debug*** setSuperResolutionOn  srIsOn = \(srIsOn), srType = \(debugSrTypeItems[index])")
         case .debugPVC:
-            agoraKit.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
+            engine?.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
             showLogger.info("***Debug*** rtc.video.enable_pvc \(isOn)")
         }
     }
@@ -258,15 +258,15 @@ extension ShowAgoraKitManager {
     
     private func setExposureRange() {
         if let x = exposureRangeX, let y = exposureRangeY {
-            agoraKit.setCameraExposurePosition(CGPoint(x: x, y: y))
+            engine?.setCameraExposurePosition(CGPoint(x: x, y: y))
             showLogger.info("***Debug*** setCameraExposurePosition = \(CGPoint(x: x, y: y)) ")
         }
     }
     
     private func setColorSpace(){
         if let v1 = videoFullrangeExt, let v2 = matrixCoefficientsExt {
-            agoraKit.setParameters("{\"che.video.videoFullrangeExt\":\(v1)}")
-            agoraKit.setParameters("{\"che.video.matrixCoefficientsExt\":\(v2)}")
+            engine?.setParameters("{\"che.video.videoFullrangeExt\":\(v1)}")
+            engine?.setParameters("{\"che.video.matrixCoefficientsExt\":\(v2)}")
             showLogger.info("***Debug*** {\"che.video.videoFullrangeExt\":\(v1)} {\"che.video.matrixCoefficientsExt\":\(v2)} ")
         }
     }

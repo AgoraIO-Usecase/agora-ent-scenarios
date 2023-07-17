@@ -80,13 +80,13 @@ extension ShowAgoraKitManager {
         self.srIsOn = isOn
         self.srType = srType
         if srType == .none {
-            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
+            engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
         }else{
-            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
-            agoraKit.setParameters("{\"rtc.video.sr_type\":\(srType.rawValue)}")
-            agoraKit.setParameters("{\"rtc.video.sr_max_wh\":\(921600)}")
+            engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
+            engine?.setParameters("{\"rtc.video.sr_type\":\(srType.rawValue)}")
+            engine?.setParameters("{\"rtc.video.sr_max_wh\":\(921600)}")
             // enabled要放在srType之后 否则修改超分倍数可能不会立即生效
-            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
+            engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
         }
         showLogger.info("----- setSuperResolutionOn\(ShowSettingKey.SR.boolValue)  srType: \(srType)")
     }
@@ -183,7 +183,7 @@ extension ShowAgoraKitManager {
             videoEncoderConfig.bitrate = Int(bitRate)
             captureConfig.dimensions = captureSize.sizeValue
             captureConfig.frameRate = Int32(fps.rawValue)
-            agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            engine?.setVideoEncoderConfiguration(videoEncoderConfig)
             setH265On(h265On)
         }
        
@@ -287,17 +287,17 @@ extension ShowAgoraKitManager {
         
         switch key {
         case .lowlightEnhance:
-            agoraKit.setLowlightEnhanceOptions(isOn, options: AgoraLowlightEnhanceOptions())
+            engine?.setLowlightEnhanceOptions(isOn, options: AgoraLowlightEnhanceOptions())
         case .colorEnhance:
-            agoraKit.setColorEnhanceOptions(isOn, options: AgoraColorEnhanceOptions())
+            engine?.setColorEnhanceOptions(isOn, options: AgoraColorEnhanceOptions())
         case .videoDenoiser:
-            agoraKit.setVideoDenoiserOptions(isOn, options: AgoraVideoDenoiserOptions())
+            engine?.setVideoDenoiserOptions(isOn, options: AgoraVideoDenoiserOptions())
         case .beauty:
-            agoraKit.setBeautyEffectOptions(isOn, options: AgoraBeautyOptions())
+            engine?.setBeautyEffectOptions(isOn, options: AgoraBeautyOptions())
         case .PVC:
-            agoraKit.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
+            engine?.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
         case .SR:
-            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
+            engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
 //            setSuperResolutionOn(isOn)
         case .BFrame:
             
@@ -308,14 +308,14 @@ extension ShowAgoraKitManager {
             if let currentChannelId = currentChannelId{
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }else{
-                agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+                engine?.setVideoEncoderConfiguration(videoEncoderConfig)
             }
         case .videoBitRate:
             videoEncoderConfig.bitrate = Int(sliderValue)
             if let currentChannelId = currentChannelId {
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }else{
-                agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+                engine?.setVideoEncoderConfiguration(videoEncoderConfig)
             }
         case .FPS:
             let index = indexValue % fpsItems.count
@@ -323,7 +323,7 @@ extension ShowAgoraKitManager {
             if let currentChannelId = currentChannelId {
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }else{
-                agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+                engine?.setVideoEncoderConfiguration(videoEncoderConfig)
             }
             // 采集帧率
             captureConfig.frameRate = Int32(fpsItems[index].rawValue)
@@ -331,11 +331,11 @@ extension ShowAgoraKitManager {
         case .H265:
             setH265On(isOn)
         case .earmonitoring:
-            agoraKit.enable(inEarMonitoring: isOn)
+            engine?.enable(inEarMonitoring: isOn)
         case .recordingSignalVolume:
-            agoraKit.adjustRecordingSignalVolume(Int(sliderValue))
+            engine?.adjustRecordingSignalVolume(Int(sliderValue))
         case .musincVolume:
-            agoraKit.adjustAudioMixingVolume(Int(sliderValue))
+            engine?.adjustAudioMixingVolume(Int(sliderValue))
         case .audioBitRate:
             break
         case .captureVideoSize:

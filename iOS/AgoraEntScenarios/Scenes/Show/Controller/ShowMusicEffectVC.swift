@@ -11,7 +11,7 @@ import AgoraRtcKit
 class ShowMusicEffectVC: UIViewController {
     
     var musicManager: ShowMusicManager?
-    var agorakitManager: ShowAgoraKitManager?
+    
     var currentChannelId: String?
     
     
@@ -100,7 +100,7 @@ extension ShowMusicEffectVC: UITableViewDelegate, UITableViewDataSource {
                 let options = AgoraRtcChannelMediaOptions()
                 options.publishMediaPlayerAudioTrack = true
                 options.publishMediaPlayerId = Int(playerId)
-                self?.agorakitManager?.updateChannelEx(channelId: channelId, options: options)
+                ShowAgoraKitManager.shared.updateChannelEx(channelId: channelId, options: options)
             }
             tableView.reloadData()
         })

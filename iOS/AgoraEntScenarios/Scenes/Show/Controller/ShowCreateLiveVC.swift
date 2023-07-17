@@ -16,7 +16,7 @@ class ShowCreateLiveVC: UIViewController {
     private var localView: UIView!
     
     lazy var agoraKitManager: ShowAgoraKitManager = {
-        let manager = ShowAgoraKitManager()
+        let manager = ShowAgoraKitManager.shared
         if AppContext.shared.isDebugMode {
             manager.debugDefaultBroadcastorSetting()
         }else{
@@ -135,7 +135,6 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         if AppContext.shared.isDebugMode {
             let vc = ShowDebugSettingVC()
             vc.isBroadcastor = true
-            vc.settingManager = agoraKitManager
             self.navigationController?.pushViewController(vc, animated: true)
         }else{
             showPreset()

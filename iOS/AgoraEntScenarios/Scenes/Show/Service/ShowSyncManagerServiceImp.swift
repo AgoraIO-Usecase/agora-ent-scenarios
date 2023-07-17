@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import AgoraSyncManager
 
-private let kSceneId = "scene_show_3.0.0"
+private let kSceneId = "scene_show_3.0.1"
 
 private let SYNC_MANAGER_MESSAGE_COLLECTION = "show_message_collection"
 private let SYNC_MANAGER_SEAT_APPLY_COLLECTION = "show_seat_apply_collection"
@@ -296,12 +296,15 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         if (AppContext.shared.rtcToken != nil) {
             complete(true)
         } else {
-            NetworkManager.shared.generateTokens(channelName: "",
-                                                 uid: "\(UserInfo.userId)",
-                                                 tokenGeneratorType: .token007,
-                                                 tokenTypes: [.rtc]) { tokenMap in
-                guard let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue] else {
-                    agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
+            NetworkManager.shared.generateToken(
+                channelName: "",
+                uid: "\(UserInfo.userId)",
+                tokenType: .token007,
+                type: .rtc,
+                expire: 24 * 60 * 60
+            ) { token in
+                guard let rtcToken = token else {
+                    agoraAssert(false, "rtcToken == nil || rtmToken == nil")
                     complete(false)
                     return
                 }
