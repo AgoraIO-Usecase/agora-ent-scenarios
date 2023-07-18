@@ -7,10 +7,16 @@
 
 import UIKit
 
+protocol ShowSettingSliderCellDelegate: NSObjectProtocol {
+    
+    func onAutoBitRateChanged(isOn: Bool)
+    
+    func onBitRateValueChanged(value: Float)
+}
+
 class ShowSettingSliderCell: ShowSettingBaseCell {
     
-    var sliderValueChangingAction: ((_ value: Float)->())?   // 正在变化
-    var sliderValueChangedAction: ((_ value: Float)->())?    // 变化结束
+    weak var delegate: ShowSettingSliderCellDelegate?
     
     private var currentValue: Float = 0
     
@@ -27,42 +33,37 @@ class ShowSettingSliderCell: ShowSettingBaseCell {
         createConstrians()
     }
     
-    func setTitle(_ title: String, value: Float, minValue: Float, maxValue: Float,sliderValueChangingAction: ((_ value: Float)->())?,sliderValueChangedAction: ((_ value: Float)->())?) {
+    func setTitle(_ title: String, value: Float, minValue: Float, maxValue: Float) {
         titleLabel.text = title
-        slider.minimumValue = minValue
-        slider.maximumValue = maxValue
-        slider.value = value
-        valueLabel.text = String(format: "%.0f", slider.value)
-        currentValue = value
-        self.sliderValueChangedAction = sliderValueChangedAction
-        self.sliderValueChangingAction = sliderValueChangingAction
-    }
-    
-    private func setSliderEnabled(isEnabled: Bool) {
-        slider.isEnabled = isEnabled
-        if (isEnabled) {
-            slider.value = currentValue
-            valueLabel.text = String(format: "%.0f", currentValue)
+        if (value == 0) {
+            aSwitch.isOn = true
+            slider.isHidden = true
+            valueLabel.isHidden = true
         } else {
-            slider.value = slider.minimumValue
-            valueLabel.text = "0"
+            aSwitch.isOn = false
+            slider.isHidden = false
+            valueLabel.isHidden = false
+            slider.minimumValue = minValue
+            slider.maximumValue = maxValue
+            slider.value = value
+            valueLabel.text = String(format: "%.0f kbps", slider.value)
+            currentValue = value
         }
     }
     
     @objc private func sliderValueDidChanged() {
         currentValue = slider.value
-        valueLabel.text = String(format: "%.0f", slider.value)
-        self.sliderValueChangingAction?(slider.value)
+        valueLabel.text = String(format: "%.0f kbps", slider.value)
     }
     
     @objc private func sliderDidTouchUp() {
         currentValue = slider.value
-        valueLabel.text = String(format: "%.0f", slider.value)
-        self.sliderValueChangedAction?(slider.value)
+        valueLabel.text = String(format: "%.0f kbps", slider.value)
+        delegate?.onBitRateValueChanged(value: slider.value)
     }
     
     @objc private func switchValueChanged() {
-        setSliderEnabled(isEnabled: !aSwitch.isOn)
+        delegate?.onAutoBitRateChanged(isOn: aSwitch.isOn)
     }
 }
 
@@ -84,9 +85,13 @@ private extension ShowSettingSliderCell {
     }
     
     func createConstrians() {
+        titleLabel.snp.remakeConstraints { make in
+            make.top.equalTo(14)
+            make.left.equalTo(20)
+        }
         aSwitch.snp.makeConstraints { make in
             make.right.equalTo(-20)
-            make.top.equalTo(10)
+            make.centerY.equalTo(titleLabel)
         }
         slider.snp.makeConstraints { make in
             make.right.equalTo(-20)

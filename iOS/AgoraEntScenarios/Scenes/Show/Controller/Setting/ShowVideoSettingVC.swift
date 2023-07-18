@@ -19,7 +19,7 @@ class ShowVideoSettingVC: UIViewController {
     
     var isOutside = true // 频道外
     var dataArray = [ShowSettingKey]()
-    var settingManager: ShowAgoraKitManager!
+    
     var musicManager: ShowMusicManager!
     var willChangeSettingParams: ((_ key: ShowSettingKey, _ value: Any)->Bool)?
     var currentChannelId: String?
@@ -93,9 +93,9 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
                 vc.title = data.title
                 vc.defaultSelectedIndex = data.intValue
                 vc.dataArray = data.items
-                vc.didSelectedIndex = {[weak self] index in
+                vc.didSelectedIndex = { index in
                     data.writeValue(index)
-                    self?.settingManager.updateSettingForkey(data)
+                    ShowAgoraKitManager.shared.updateSettingForkey(data)
                     tableView.reloadData()
                 }
                 self?.present(vc, animated: true, completion: {
@@ -104,15 +104,14 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
             } detailButtonAction: {[weak self] in
                 self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
             }
-
             return cell
         } else {
             if data == .videoBitRate {
                 let cell = tableView.dequeueReusableCell(withIdentifier: SliderCellID, for: indexPath) as! ShowSettingSliderCell
-                cell.setTitle(data.title, value: data.floatValue, minValue: data.sliderValueScope.0, maxValue: data.sliderValueScope.1) {value in
-                    
-                } sliderValueChangedAction: {[weak self] value in
-                    self?.changeValue(value, forSettingKey: data)
+                cell.setTitle(data.title, value: data.floatValue, minValue: 200, maxValue: 4000)
+                cell.delegate = self
+                cell.clickDetailButonAction = { [weak self] in
+                    self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
                 }
                 return cell
             }
@@ -123,7 +122,11 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let data = dataArray[indexPath.row]
         if data == .videoBitRate {
-            return 100
+            if ShowSettingKey.videoBitRate.floatValue == 0 {
+                return 48
+            } else {
+                return 100
+            }
         } else {
             return 48
         }
@@ -137,9 +140,35 @@ extension ShowVideoSettingVC {
             if key == .musincVolume {
                 musicManager.setMusicVolume(value as! Float)
             }else{
-                settingManager.updateSettingForkey(key, currentChannelId: currentChannelId)
+                ShowAgoraKitManager.shared.updateSettingForkey(key, currentChannelId: currentChannelId)
             }
         }
         tableView.reloadData()
+    }
+}
+// MARK: - ShowSettingSliderCellDelegate
+extension ShowVideoSettingVC: ShowSettingSliderCellDelegate {
+    
+    func onAutoBitRateChanged(isOn: Bool) {
+        if (isOn) {
+            self.changeValue(0, forSettingKey: ShowSettingKey.videoBitRate)
+        } else {
+            // 根据机型设置码率
+            switch ShowAgoraKitManager.shared.broadcastorMachineType {
+            case .low:
+                self.changeValue(1461, forSettingKey: ShowSettingKey.videoBitRate)
+            case .medium:
+                self.changeValue(1800, forSettingKey: ShowSettingKey.videoBitRate)
+            case .high:
+                self.changeValue(2099, forSettingKey: ShowSettingKey.videoBitRate)
+            default:
+                return
+            }
+        }
+        tableView.reloadData()
+    }
+    
+    func onBitRateValueChanged(value: Float) {
+        self.changeValue(value, forSettingKey: ShowSettingKey.videoBitRate)
     }
 }
