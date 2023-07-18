@@ -17,7 +17,6 @@ PODS:
   - Agora-Scene-Utils (1.1.0)
   - Agora_Chat_iOS (1.0.8)
   - AgoraLyricsScore (1.1.1-beta-3)
-  - AgoraRtcEngine_Special_iOS (4.1.1.142)
   - AgoraRtm_iOS (1.5.1)
   - AgoraSyncManager (2.0.8):
     - SocketRocket
@@ -38,6 +37,7 @@ PODS:
   - MJRefresh (3.7.5)
   - Protobuf (3.22.1)
   - ScoreEffectUI (1.0.1)
+  - sdk (1.0)
   - SDWebImage (4.4.8):
     - SDWebImage/Core (= 4.4.8)
   - SDWebImage/Core (4.4.8)
@@ -69,7 +69,6 @@ DEPENDENCIES:
   - Agora-Scene-Utils (= 1.1.0)
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraLyricsScore (= 1.1.1-beta-3)
-  - AgoraRtcEngine_Special_iOS (= 4.1.1.142)
   - AgoraRtm_iOS (= 1.5.1)
   - AgoraSyncManager (~> 2.0.8)
   - Bugly (= 2.5.93)
@@ -83,6 +82,7 @@ DEPENDENCIES:
   - MJRefresh
   - Protobuf (= 3.22.1)
   - ScoreEffectUI (= 1.0.1)
+  - sdk (from `sdk.podspec`)
   - SDWebImage (~> 4.2)
   - SDWebImageAPNGCoder
   - SenseLib (from `sense.podspec`)
@@ -102,7 +102,6 @@ SPEC REPOS:
     - Agora-Scene-Utils
     - Agora_Chat_iOS
     - AgoraLyricsScore
-    - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS
     - AgoraSyncManager
     - Bugly
@@ -132,6 +131,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   BytedEffect:
     :path: bytedEffect.podspec
+  sdk:
+    :path: sdk.podspec
   SenseLib:
     :path: sense.podspec
 
@@ -140,7 +141,6 @@ SPEC CHECKSUMS:
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
-  AgoraRtcEngine_Special_iOS: 6414e3cbb92076e18ca68364d1c9e6ae5174d381
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   AgoraSyncManager: 33b8ecf2cd80550f156612d6175a0b0ed1d48497
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
@@ -155,6 +155,7 @@ SPEC CHECKSUMS:
   MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
   ScoreEffectUI: 1a3bbd83b17cfef1c16a3a4eede2854f89c9eb10
+  sdk: e3479e54702dcafc8c3e74a1baa05d7c2c8f753d
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
   SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
@@ -169,6 +170,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 69d31a414fc246779a6b0034eceb6e909c2b8f37
+PODFILE CHECKSUM: 45d28b8220f1f5949554b00c55928e206476fe9b
 
 COCOAPODS: 1.12.1

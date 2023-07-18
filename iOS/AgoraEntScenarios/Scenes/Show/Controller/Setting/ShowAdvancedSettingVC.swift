@@ -48,7 +48,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     private lazy var segmentedView: AEACategoryView = {
         let layout = AEACategoryViewLayout()
         layout.itemSize = CGSize(width: Screen.width * 0.5, height: 40)
-        let segmentedView = AEACategoryView(layout: layout)
+        let segmentedView = AEACategoryView(defaultLayout: layout)
         segmentedView.titles = titles
         segmentedView.delegate = self
         segmentedView.titleFont = .show_R_14
@@ -208,8 +208,7 @@ extension ShowAdvancedSettingVC {
 }
 
 extension ShowAdvancedSettingVC:  AEAListContainerViewDataSource{
-    
-    func listContainerView(_ listContainerView: AEAListContainerView, viewControllerFor index: Int) -> UIViewController {
+    func listContainerView(_ listContainerView: AEAListContainerView, viewControllerForIndex index: Int) -> UIViewController? {
         if index == 0 {
             return videoSettingVC ?? UIViewController()
         }
@@ -218,7 +217,7 @@ extension ShowAdvancedSettingVC:  AEAListContainerViewDataSource{
 }
 
 extension ShowAdvancedSettingVC: AEACategoryViewDelegate {
-    func categoryView(_ categoryView: AEACategoryView, didSelect item: AEACategoryItem, index: Int) {
+    func categoryView(_ categoryView: AEACategoryView, didSelect item: AEACategoryItem, at index: Int) {
         listContainerView.setSelectedIndex(index)
     }
 }
