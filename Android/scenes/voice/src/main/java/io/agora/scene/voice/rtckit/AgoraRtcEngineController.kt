@@ -399,7 +399,7 @@ class AgoraRtcEngineController {
 
     fun destroy() {
         VoiceBuddyFactory.get().rtcChannelTemp.reset()
-        soundCardManager().enable(false, callback = {})
+        soundCardManager().enable(false, force = true, callback = {})
 
         mBgmManager?.release()
         mBgmManager = null

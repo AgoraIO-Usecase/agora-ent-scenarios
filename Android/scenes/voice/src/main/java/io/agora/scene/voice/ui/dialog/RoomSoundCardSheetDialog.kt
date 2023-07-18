@@ -36,7 +36,7 @@ class RoomSoundCardSheetDialog constructor() : BaseSheetDialog<VoiceDialogVirtua
 
     private fun appContext(): Application = AgoraApplication.the()
 
-    private val soundCardManager :AgoraSoundCardManager by lazy{
+    private val soundCardManager: AgoraSoundCardManager by lazy {
         AgoraRtcEngineController.get().soundCardManager()
     }
 
@@ -74,18 +74,14 @@ class RoomSoundCardSheetDialog constructor() : BaseSheetDialog<VoiceDialogVirtua
             setOnApplyWindowInsets(root)
         }
         val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val isWiredHeadsetOn = audioManager.isWiredHeadsetOn
-        soundCardManager.enable(isWiredHeadsetOn, callback = {
-            isPlugIn = isWiredHeadsetOn
-            setupPresetSoundView(soundCardManager.presetSound())
-            setupGainView(soundCardManager.gainValue())
-            setupPresetView(soundCardManager.presetValue())
+        isPlugIn = audioManager.isWiredHeadsetOn
+        soundCardManager.enable(isPlugIn, true, callback = {
+            mOnSoundCardChange?.invoke()
         })
         initView()
     }
 
     private fun initView() {
-        val soundCardManager =
         binding?.apply {
             if (soundCardManager.isEnable()) {
                 groupSoundCardSwitch.visibility = View.VISIBLE
@@ -93,6 +89,8 @@ class RoomSoundCardSheetDialog constructor() : BaseSheetDialog<VoiceDialogVirtua
                 groupSoundCardAbnormal.isVisible = false
                 mcbSoundCardSwitch.isChecked = true
                 setupPresetSoundView(soundCardManager.presetSound())
+                setupGainView(soundCardManager.gainValue())
+                setupPresetView(soundCardManager.presetValue())
             } else {
                 groupSoundCardSwitch.visibility = View.VISIBLE
                 groupSoundCardSettings.visibility = View.INVISIBLE
@@ -109,7 +107,7 @@ class RoomSoundCardSheetDialog constructor() : BaseSheetDialog<VoiceDialogVirtua
                 } else {
                     groupSoundCardSettings.visibility = View.INVISIBLE
                 }
-                soundCardManager.enable(isChecked, callback = {
+                soundCardManager.enable(isChecked, force = true, callback = {
                     if (isChecked) {
                         setupPresetSoundView(soundCardManager.presetSound())
                         setupGainView(soundCardManager.gainValue())
@@ -133,7 +131,8 @@ class RoomSoundCardSheetDialog constructor() : BaseSheetDialog<VoiceDialogVirtua
                 }
             }
             val context = spinnerPresetSound.context
-            spinnerPresetSound.adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, presetSoundArray)
+            spinnerPresetSound.adapter =
+                ArrayAdapter(context, android.R.layout.simple_list_item_1, presetSoundArray)
             spinnerPresetSound.onItemSelectedListener = object : OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                     val presetSoundModel = presetSoundArray[position]
@@ -211,16 +210,21 @@ class RoomSoundCardSheetDialog constructor() : BaseSheetDialog<VoiceDialogVirtua
                 binding?.groupSoundCardSwitch?.visibility = View.VISIBLE
                 binding?.groupSoundCardSettings?.visibility = View.VISIBLE
                 binding?.groupSoundCardAbnormal?.visibility = View.INVISIBLE
+                binding?.mcbSoundCardSwitch?.isChecked = true
+
             } else {
                 // 未插入有线耳机
                 binding?.groupSoundCardSwitch?.visibility = View.INVISIBLE
                 binding?.groupSoundCardSettings?.visibility = View.INVISIBLE
                 binding?.groupSoundCardAbnormal?.visibility = View.VISIBLE
+                binding?.mcbSoundCardSwitch?.isChecked = false
             }
-            soundCardManager.enable(isPlugIn, callback = {
-                setupPresetSoundView(soundCardManager.presetSound())
-                setupGainView(soundCardManager.gainValue())
-                setupPresetView(soundCardManager.presetValue())
+            soundCardManager.enable(isPlugIn, force = true, callback = {
+                if (isPlugIn){
+                    setupPresetSoundView(soundCardManager.presetSound())
+                    setupGainView(soundCardManager.gainValue())
+                    setupPresetView(soundCardManager.presetValue())
+                }
             })
         }
     }

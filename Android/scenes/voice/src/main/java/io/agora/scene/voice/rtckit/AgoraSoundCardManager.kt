@@ -29,12 +29,12 @@ enum class AgoraPresetSound constructor(
 }
 
 class AgoraSoundCardManager constructor(private val rtcEngineEx: RtcEngineEx) {
-    private var presetSound: AgoraPresetSound = AgoraPresetSound.Oba
+    private var presetSound: AgoraPresetSound = AgoraPresetSound.Close
     private var isEnable: Boolean = false
-    private var gainValue: Float = 1.0f
-    private var presetValue: Int = 4
-    private var gender: Int = 0
-    private var effect: Int = 0
+    private var gainValue: Float = -1f
+    private var presetValue: Int = -1
+    private var gender: Int = -1
+    private var effect: Int = -1
 
     private val tag: String = "AgoraSoundCardManager"
 
@@ -49,20 +49,19 @@ class AgoraSoundCardManager constructor(private val rtcEngineEx: RtcEngineEx) {
     /**
      * 开启/关闭 虚拟声卡
      */
-    fun enable(enable: Boolean, callback: () -> Unit) {
-        this.isEnable = enable
-        presetSound = if (isEnable) {
-            AgoraPresetSound.Oba
-        } else {
-            AgoraPresetSound.Close
+    fun enable(enable: Boolean, force: Boolean, callback: () -> Unit) {
+        if (this.isEnable != enable || force) {
+            this.isEnable = enable
+            presetSound = if (isEnable) AgoraPresetSound.Oba else AgoraPresetSound.Close
+
+            gainValue = presetSound.gainValue
+            presetValue = presetSound.presetValue
+            gender = presetSound.gender
+            effect = presetSound.effect
+            setSoundCardParameters()
+            callback.invoke()
+            Log.d(tag, "enable $isEnable")
         }
-        gainValue = presetSound.gainValue
-        presetValue = presetSound.presetValue
-        gender = presetSound.gender
-        effect = presetSound.effect
-        setSoundCardParameters()
-        callback.invoke()
-        Log.d(tag,"enable $enable")
     }
 
     // 设置预设音效
@@ -74,21 +73,21 @@ class AgoraSoundCardManager constructor(private val rtcEngineEx: RtcEngineEx) {
         effect = presetSound.effect
         setSoundCardParameters()
         callback.invoke()
-        Log.d(tag,"setPresetSound $presetSound")
+        Log.d(tag, "setPresetSound $presetSound")
     }
 
     // 设置增益调节
     fun setGainValue(gainValue: Float) {
         this.gainValue = gainValue
         setSoundCardParameters()
-        Log.d(tag,"setGainValue $gainValue")
+        Log.d(tag, "setGainValue $gainValue")
     }
 
     // 预设值，麦克风类型
     fun setPresetValue(presetValue: Int) {
         this.presetValue = presetValue
         setSoundCardParameters()
-        Log.d(tag,"setPresetValue $presetValue")
+        Log.d(tag, "setPresetValue $presetValue")
     }
 
     private fun setSoundCardParameters() {
