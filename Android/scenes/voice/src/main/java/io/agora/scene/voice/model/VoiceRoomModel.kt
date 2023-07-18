@@ -53,6 +53,7 @@ data class RoomAudioSettingsBean constructor(
     var isAIAECOn: Boolean = false,
     var isAIAGCOn: Boolean = false,
     var isEarBckOn: Boolean = false,
+    var isSoundCardOn: Boolean = false,
     var voiceChangerMode: Int = 0,
 ) : BaseRoomBean
 

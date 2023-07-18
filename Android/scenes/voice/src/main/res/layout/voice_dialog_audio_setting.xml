@@ -197,6 +197,46 @@
             app:layout_constraintTop_toTopOf="@+id/tvInEar"
             tools:text="@string/voice_chatroom_off" />
 
+        <com.google.android.material.divider.MaterialDivider
+            style="@style/voice_bottom_sheet_divider_style"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvInEar" />
+
+        <!--  virtual sound card  -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivVirtualSoundCard"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/voice_icon_room_setting_ear_back"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/mtVirtualSoundCard"
+            app:layout_constraintBottom_toBottomOf="@+id/mtVirtualSoundCard"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtVirtualSoundCard"
+            style="@style/voice_bottom_sheet_text_style"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginStart="52dp"
+            android:text="@string/voice_chatroom_virtual_sound_card"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvInEar" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvVirtualSoundCardArrow"
+            style="@style/voice_bottom_sheet_right_text_style"
+            android:layout_width="200dp"
+            android:gravity="right"
+            android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/mtVirtualSoundCard"
+            app:layout_constraintTop_toTopOf="@+id/mtVirtualSoundCard"
+            tools:text="@string/voice_chatroom_off" />
+
         <!--  Bot Settings Title  -->
         <View
             style="@style/voice_bottom_sheet_subtitle_style"
@@ -215,7 +255,7 @@
             android:drawableEnd="@drawable/voice_icon_room_setting_new_tag"
             android:drawablePadding="5dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvInEar" />
+            app:layout_constraintTop_toBottomOf="@+id/mtVirtualSoundCard" />
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_height="wrap_content"

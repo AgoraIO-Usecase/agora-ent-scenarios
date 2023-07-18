@@ -10,6 +10,7 @@ data class RtcChannelTemp constructor(
     var AINSMode: Int = ConfigConstants.AINSMode.AINS_Medium,// 降噪模式
     var isAIAECOn: Boolean = false, // 回声消除
     var isAIAGCOn: Boolean = false, // 人声增强
+    var isSoundCardOn: Boolean = false, // 虚拟声卡
 ) {
     fun reset() {
         broadcaster = true
@@ -18,5 +19,6 @@ data class RtcChannelTemp constructor(
         AINSMode = ConfigConstants.AINSMode.AINS_Medium
         isAIAECOn = false
         isAIAGCOn = false
+        isSoundCardOn = false
     }
 }

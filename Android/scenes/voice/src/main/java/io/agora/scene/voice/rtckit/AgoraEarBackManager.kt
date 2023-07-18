@@ -2,22 +2,23 @@ package io.agora.scene.voice.rtckit
 
 import android.util.Log
 import io.agora.rtc2.RtcEngineEx
-import io.agora.scene.voice.R
+import io.agora.scene.voice.rtckit.AgoraRtcEngineController.Companion.get
 
 enum class AgoraEarBackMode {
     Default,
     OpenSL,
     Oboe
 }
-data class AgoraEarBackParams (
+
+data class AgoraEarBackParams(
     var isOn: Boolean = false,
     var isForbidden: Boolean = true,// 下麦时禁用耳返
     var volume: Int = 100,
     var mode: AgoraEarBackMode = AgoraEarBackMode.Default,
     var delay: Int = 0,
-){}
+) {}
 
-class AgoraEarBackManager(
+class AgoraEarBackManager constructor(
     private val mRtcEngine: RtcEngineEx,
 ) {
 
@@ -33,12 +34,14 @@ class AgoraEarBackManager(
             updateEnableInEarMonitoring()
         }
     }
+
     fun setForbidden(isOn: Boolean) {
         if (params.isForbidden != isOn) {
             params.isForbidden = isOn
             updateEnableInEarMonitoring()
         }
     }
+
     fun setVolume(value: Int) {
         params.volume = value
         mRtcEngine.setInEarMonitoringVolume(value)
@@ -57,9 +60,11 @@ class AgoraEarBackManager(
             AgoraEarBackMode.Default -> {
                 mRtcEngine.setParameters("{\"che.audio.opensl.mode\":0}")
             }
+
             AgoraEarBackMode.OpenSL -> {
                 mRtcEngine.setParameters("{\"che.audio.opensl.mode\":0}")
             }
+
             AgoraEarBackMode.Oboe -> {
                 mRtcEngine.setParameters("{\"che.audio.oboe.enable\":true}")
             }
@@ -76,7 +81,7 @@ class AgoraEarBackManager(
 
     fun updateEnableInEarMonitoring() {
         if (!params.isForbidden && params.isOn) {
-            mRtcEngine.enableInEarMonitoring(true)
+            mRtcEngine.enableInEarMonitoring(true, (1 shl 1) or (1 shl 2))
         } else {
             mRtcEngine.enableInEarMonitoring(false)
         }

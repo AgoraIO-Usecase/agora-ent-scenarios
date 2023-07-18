@@ -5,7 +5,6 @@ import android.util.Log
 import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
-import io.agora.musiccontentcenter.Music
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.TokenGenerator
@@ -44,6 +43,8 @@ class AgoraRtcEngineController {
 
     private var mEarBackManager: AgoraEarBackManager? = null
 
+    private var innerSoundCardManager: AgoraSoundCardManager? = null
+
     private var mRtmToken = ""
 
     private var micVolumeListener: RtcMicVolumeListener? = null
@@ -77,7 +78,7 @@ class AgoraRtcEngineController {
                 // 语音鉴定
                 AudioModeration.moderationAudio(channelId, rtcUid.toLong(),
                     AudioModeration.AgoraChannelType.broadcast, "voice", {})
-            },{
+            }, {
                 joinCallback?.onError(Constants.ERR_FAILED, "get token error")
             }
         )
@@ -97,6 +98,13 @@ class AgoraRtcEngineController {
 
     fun earBackManager(): AgoraEarBackManager? {
         return mEarBackManager
+    }
+
+    fun soundCardManager(): AgoraSoundCardManager {
+        if (innerSoundCardManager == null) {
+            innerSoundCardManager = AgoraSoundCardManager(rtcEngine!!)
+        }
+        return innerSoundCardManager!!
     }
 
     private fun initRtcEngine(context: Context): Boolean {
@@ -189,9 +197,11 @@ class AgoraRtcEngineController {
                     setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY)
                     setAudioScenario(Constants.AUDIO_SCENARIO_GAME_STREAMING)
                 }
+
                 ConfigConstants.SoundSelection.Gaming_Buddy -> { // 游戏陪玩
                     setChannelProfile(Constants.CHANNEL_PROFILE_COMMUNICATION)
                 }
+
                 else -> { //专业主播
                     setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY)
                     setAudioScenario(Constants.AUDIO_SCENARIO_GAME_STREAMING)
@@ -216,8 +226,8 @@ class AgoraRtcEngineController {
             joinCallback?.onError(status ?: IRtcEngineEventHandler.ErrorCode.ERR_FAILED, "")
             return false
         }
-        if (isBroadcaster){
-            mediaPlayer =  rtcEngine?.createMediaPlayer()?.apply {
+        if (isBroadcaster) {
+            mediaPlayer = rtcEngine?.createMediaPlayer()?.apply {
                 registerPlayerObserver(firstMediaPlayerObserver)
             }?.also {
                 val options = ChannelMediaOptions()
@@ -259,6 +269,7 @@ class AgoraRtcEngineController {
                     setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
                 }
             }
+
             ConfigConstants.AINSMode.AINS_High -> {
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.ains_mode\":2}")
@@ -269,6 +280,7 @@ class AgoraRtcEngineController {
                     setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
                 }
             }
+
             else -> {
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.ains_mode\":2}")
@@ -323,7 +335,8 @@ class AgoraRtcEngineController {
                         "\"max_size_bytes\":\"120000000\"," +
                         "\"uuid\":\"123456789\"," +
                         "\"duration\":\"1200000\"}" +
-                        "}")
+                        "}"
+            )
         } else {
             rtcEngine?.setParameters("{\"rtc.debug.enable\": false}")
         }
@@ -386,6 +399,7 @@ class AgoraRtcEngineController {
 
     fun destroy() {
         VoiceBuddyFactory.get().rtcChannelTemp.reset()
+        soundCardManager().enable(false, callback = {})
 
         mBgmManager?.release()
         mBgmManager = null
@@ -406,7 +420,7 @@ class AgoraRtcEngineController {
 
     private var soundSpeakerType = ConfigConstants.BotSpeaker.BotBlue
 
-    private var mediaPlayer:IMediaPlayer?=null
+    private var mediaPlayer: IMediaPlayer? = null
 
     private val firstMediaPlayerObserver = object : MediaPlayerObserver() {
         override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerError?) {
@@ -416,6 +430,7 @@ class AgoraRtcEngineController {
                 MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                     mediaPlayer?.play()
                 }
+
                 MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
                     // 结束播放回调--->> 播放下一个，取队列第一个播放
                     ThreadManager.getInstance().runOnMainThread {
@@ -425,12 +440,14 @@ class AgoraRtcEngineController {
                         }
                     }
                 }
+
                 MediaPlayerState.PLAYER_STATE_PLAYING -> {
                     // 开始播放回调--->>
                     ThreadManager.getInstance().runOnMainThread {
                         micVolumeListener?.onBotVolume(soundSpeakerType, false)
                     }
                 }
+
                 else -> {}
             }
         }

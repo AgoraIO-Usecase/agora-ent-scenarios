@@ -12,6 +12,7 @@ import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogAudioSettingBinding
 import io.agora.scene.voice.model.constructor.RoomAudioSettingsConstructor
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
+import io.agora.scene.voice.rtckit.AgoraSoundCardManager
 import io.agora.voice.common.constant.ConfigConstants.DISABLE_ALPHA
 import io.agora.voice.common.constant.ConfigConstants.ENABLE_ALPHA
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
@@ -69,6 +70,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             updateBotStateView()
             updateBGMView()
             updateEarBackState()
+            updateSoundCardView()
 
             mcbAgoraBot.setOnCheckedChangeListener { button, isChecked ->
                 if (!button.isPressed) return@setOnCheckedChangeListener
@@ -95,6 +97,9 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             tvInEarArrow.setOnClickListener {
                 audioSettingsListener?.onEarBackSetting()
             }
+            tvVirtualSoundCardArrow.setOnClickListener {
+                audioSettingsListener?.onSoundCardSetting()
+            }
             tvBGMArrow.setOnClickListener {
                 audioSettingsListener?.onBGMSetting()
             }
@@ -109,6 +114,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             }
         }
     }
+
     /**
      * 更新AINS
      */
@@ -119,6 +125,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             }
         }
     }
+
     /**
      * 更新AIAEC
      */
@@ -163,6 +170,17 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
     }
 
     /**
+     * 更新虚拟声卡
+     */
+    fun updateSoundCardView() {
+        if (AgoraRtcEngineController.get().soundCardManager().isEnable()) {
+            binding?.tvVirtualSoundCardArrow?.text = activity?.getString(R.string.voice_chatroom_on)
+        } else {
+            binding?.tvVirtualSoundCardArrow?.text = activity?.getString(R.string.voice_chatroom_off)
+        }
+    }
+
+    /**
      * 更新机器人ui
      */
     fun updateBotStateView() {
@@ -200,8 +218,12 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
         /**耳返设置*/
         fun onEarBackSetting()
 
+        /** 虚拟声卡设置*/
+        fun onSoundCardSetting()
+
         /** BGM 设置*/
         fun onBGMSetting()
+
         /**机器人开关*/
         fun onBotCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
 
