@@ -158,11 +158,14 @@ class ShowRoomListVC: UIViewController {
     }
     // 预先加载RTC
     private func preLoadVisibleItems() {
-        guard let token = AppContext.shared.rtcToken else {
+        guard let token = AppContext.shared.rtcToken,
+              let firstItem = collectionView.indexPathsForVisibleItems.first?.item else {
             return
         }
-        collectionView.indexPathsForVisibleItems.forEach { indexPath in
-            let room = roomList[indexPath.item]
+        let start = firstItem - 7 < 0 ? 0 : firstItem - 7
+        let end = start + 19 >= roomList.count ? roomList.count - 1 : start + 19
+        for i in start...end {
+            let room = roomList[i]
             ShowAgoraKitManager.shared.engine?.preloadChannel(byToken: token,
                                                               channelId: room.roomId,
                                                               uid: UInt(VLUserCenter.user.id) ?? 0)

@@ -260,8 +260,6 @@ enum ShowSettingKey: String, CaseIterable {
     // slider的取值区间
     var sliderValueScope: (Float, Float) {
         switch self {
-        case .videoBitRate:
-            return (200, 4000)
         case .recordingSignalVolume:
             return (0, 100)
         case .musincVolume:
