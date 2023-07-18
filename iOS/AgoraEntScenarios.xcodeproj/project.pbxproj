@@ -100,9 +100,6 @@
 		DD36109829B70CDC00CE7984 /* ShowVideoSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36101329B70CDC00CE7984 /* ShowVideoSettingVC.swift */; };
 		DD36109929B70CDC00CE7984 /* ShowCunstomNaviBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36101429B70CDC00CE7984 /* ShowCunstomNaviBar.swift */; };
 		DD36109A29B70CDC00CE7984 /* ShowPresentTransitioningDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36101629B70CDC00CE7984 /* ShowPresentTransitioningDelegate.swift */; };
-		DD36109B29B70CDC00CE7984 /* AEACategoryView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD36101A29B70CDC00CE7984 /* AEACategoryView.m */; };
-		DD36109C29B70CDC00CE7984 /* AEAListContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD36101B29B70CDC00CE7984 /* AEAListContainerView.m */; };
-		DD36109D29B70CDC00CE7984 /* AEACategoryTitleCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DD36101C29B70CDC00CE7984 /* AEACategoryTitleCell.m */; };
 		DD36109E29B70CDC00CE7984 /* ShowNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36101E29B70CDC00CE7984 /* ShowNavigationBar.swift */; };
 		DD36109F29B70CDC00CE7984 /* ShowBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36102029B70CDC00CE7984 /* ShowBaseViewController.swift */; };
 		DD3610A029B70CDC00CE7984 /* ShowMusicEffectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36102329B70CDC00CE7984 /* ShowMusicEffectCell.swift */; };
@@ -543,6 +540,9 @@
 		E357356A29EFD8B5009D54E1 /* VLSoundEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = E357356829EFD8B5009D54E1 /* VLSoundEffectView.m */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
+		E36EC8B32A6638440089A374 /* AEAListContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36EC8B22A6638440089A374 /* AEAListContainerView.swift */; };
+		E36EC8B52A663A600089A374 /* AEACategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36EC8B42A663A600089A374 /* AEACategoryView.swift */; };
+		E36EC8B72A663B880089A374 /* AEACategoryTitleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36EC8B62A663B880089A374 /* AEACategoryTitleCell.swift */; };
 		E3735C342A5E4AFF004737EF /* UITextView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */; };
 		E3735C852A5E7E75004737EF /* EffectsAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C3F2A5E7E75004737EF /* EffectsAttribute.m */; };
 		E3735C862A5E7E75004737EF /* Effects.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C412A5E7E75004737EF /* Effects.m */; };
@@ -748,12 +748,6 @@
 		DD36101329B70CDC00CE7984 /* ShowVideoSettingVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowVideoSettingVC.swift; sourceTree = "<group>"; };
 		DD36101429B70CDC00CE7984 /* ShowCunstomNaviBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowCunstomNaviBar.swift; sourceTree = "<group>"; };
 		DD36101629B70CDC00CE7984 /* ShowPresentTransitioningDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowPresentTransitioningDelegate.swift; sourceTree = "<group>"; };
-		DD36101829B70CDC00CE7984 /* AEACategoryTitleCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AEACategoryTitleCell.h; sourceTree = "<group>"; };
-		DD36101929B70CDC00CE7984 /* AEAListContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AEAListContainerView.h; sourceTree = "<group>"; };
-		DD36101A29B70CDC00CE7984 /* AEACategoryView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AEACategoryView.m; sourceTree = "<group>"; };
-		DD36101B29B70CDC00CE7984 /* AEAListContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AEAListContainerView.m; sourceTree = "<group>"; };
-		DD36101C29B70CDC00CE7984 /* AEACategoryTitleCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AEACategoryTitleCell.m; sourceTree = "<group>"; };
-		DD36101D29B70CDC00CE7984 /* AEACategoryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AEACategoryView.h; sourceTree = "<group>"; };
 		DD36101E29B70CDC00CE7984 /* ShowNavigationBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowNavigationBar.swift; sourceTree = "<group>"; };
 		DD36102029B70CDC00CE7984 /* ShowBaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowBaseViewController.swift; sourceTree = "<group>"; };
 		DD36102329B70CDC00CE7984 /* ShowMusicEffectCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowMusicEffectCell.swift; sourceTree = "<group>"; };
@@ -1277,6 +1271,9 @@
 		E358F803293494C100A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
 		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
+		E36EC8B22A6638440089A374 /* AEAListContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEAListContainerView.swift; sourceTree = "<group>"; };
+		E36EC8B42A663A600089A374 /* AEACategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEACategoryView.swift; sourceTree = "<group>"; };
+		E36EC8B62A663B880089A374 /* AEACategoryTitleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEACategoryTitleCell.swift; sourceTree = "<group>"; };
 		E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Extension.swift"; sourceTree = "<group>"; };
 		E3735C3E2A5E7E75004737EF /* EffectsLicense.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsLicense.h; sourceTree = "<group>"; };
 		E3735C3F2A5E7E75004737EF /* EffectsAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EffectsAttribute.m; sourceTree = "<group>"; };
@@ -1827,13 +1824,10 @@
 		DD36101729B70CDC00CE7984 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				DD36101829B70CDC00CE7984 /* AEACategoryTitleCell.h */,
-				DD36101929B70CDC00CE7984 /* AEAListContainerView.h */,
-				DD36101A29B70CDC00CE7984 /* AEACategoryView.m */,
-				DD36101B29B70CDC00CE7984 /* AEAListContainerView.m */,
-				DD36101C29B70CDC00CE7984 /* AEACategoryTitleCell.m */,
-				DD36101D29B70CDC00CE7984 /* AEACategoryView.h */,
 				DD36101E29B70CDC00CE7984 /* ShowNavigationBar.swift */,
+				E36EC8B22A6638440089A374 /* AEAListContainerView.swift */,
+				E36EC8B42A663A600089A374 /* AEACategoryView.swift */,
+				E36EC8B62A663B880089A374 /* AEACategoryTitleCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3606,6 +3600,7 @@
 				DD619C0429E3E81D008F63E4 /* AboutAgoraEntertainmentViewController.swift in Sources */,
 				DDA199ED28FFE579009D3E61 /* VLBaseView.m in Sources */,
 				DD3610CD29B70F3300CE7984 /* VLMineSwitchCell.swift in Sources */,
+				E36EC8B72A663B880089A374 /* AEACategoryTitleCell.swift in Sources */,
 				DD619AAF29E3E247008F63E4 /* SAEndLiveAlert.swift in Sources */,
 				DD0292D7295BF0DC00485225 /* VLAudioEffectPicker.m in Sources */,
 				DD3610C229B70CDC00CE7984 /* ShowInviteCell.swift in Sources */,
@@ -3736,7 +3731,6 @@
 				E3735CA32A5E7E75004737EF /* SenseBeautyRender.m in Sources */,
 				DD619BC529E3E262008F63E4 /* VRRoomMenuBarCell.swift in Sources */,
 				DDA199F228FFE579009D3E61 /* UIViewController+VL.m in Sources */,
-				DD36109B29B70CDC00CE7984 /* AEACategoryView.m in Sources */,
 				DD8417CB29090C520026B624 /* TemplateServiceImp.swift in Sources */,
 				DD36109229B70CDC00CE7984 /* ShowLivePagesViewController.swift in Sources */,
 				DD619BDC29E3E262008F63E4 /* AgoraMicVolView.swift in Sources */,
@@ -3851,6 +3845,7 @@
 				DD619AE529E3E247008F63E4 /* SARoomCreateView.swift in Sources */,
 				DD5EBDC6299F230100F36349 /* KTVDebugViewController.m in Sources */,
 				E3735CA02A5E7E75004737EF /* BeautyConfig.m in Sources */,
+				E36EC8B32A6638440089A374 /* AEAListContainerView.swift in Sources */,
 				E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */,
 				DD619BB229E3E262008F63E4 /* VoiceRoomApplyUsersViewController.swift in Sources */,
 				DD0292D0295BF0DC00485225 /* VLSongList.m in Sources */,
@@ -3892,12 +3887,10 @@
 				DD619A9D29E3E247008F63E4 /* SAAudiencesViewController.swift in Sources */,
 				DD619AE729E3E247008F63E4 /* SACreateRoomView.swift in Sources */,
 				DD619A9729E3E247008F63E4 /* SAAudioSettingViewController.swift in Sources */,
-				DD36109D29B70CDC00CE7984 /* AEACategoryTitleCell.m in Sources */,
 				DD0292CB295BF0DC00485225 /* VLSongListCell.m in Sources */,
 				DD36109929B70CDC00CE7984 /* ShowCunstomNaviBar.swift in Sources */,
 				DD84177F29090C520026B624 /* UIWindow+Router.m in Sources */,
 				DD3610AA29B70CDC00CE7984 /* ShowEmptyView.swift in Sources */,
-				DD36109C29B70CDC00CE7984 /* AEAListContainerView.m in Sources */,
 				DD619BCF29E3E262008F63E4 /* VMSoundView.swift in Sources */,
 				DD619A8E29E3E247008F63E4 /* SAAudiencesEntity.swift in Sources */,
 				DD84178729090C520026B624 /* VLMineTCell.m in Sources */,
@@ -4033,6 +4026,7 @@
 				DD84178E29090C520026B624 /* VLLoginInputVerifyCodeView.m in Sources */,
 				DD619B9629E3E262008F63E4 /* Notification+Presentation.swift in Sources */,
 				DD619A6E29E3E247008F63E4 /* SACrossDissolveAnimation.swift in Sources */,
+				E36EC8B52A663A600089A374 /* AEACategoryView.swift in Sources */,
 				DD0292E7295BF0DC00485225 /* VLKTVKindsView.m in Sources */,
 				DD3610A029B70CDC00CE7984 /* ShowMusicEffectCell.swift in Sources */,
 				DD619B9329E3E262008F63E4 /* VRVerifyCodeTextView.swift in Sources */,
@@ -4318,7 +4312,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = B8JXV8ZYC7;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -4360,7 +4354,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = B8JXV8ZYC7;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
