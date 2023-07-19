@@ -9,8 +9,8 @@ import UIKit
 import ZSwiftBaseLib
 
 public class SACreateRoomView: UIView, SAHorizontalCardsDelegate, SAHorizontalCardsDataSource {
-    private let datas = [["title": sceneLocalized("SA MODE"), "detail": sceneLocalized("SA MODE DETAIL") + "\n" + sceneLocalized(""), "image": "sa_mode"]]
-//    ,["title":sceneLocalized( "Spatial Audio Mode Room"),"detail":sceneLocalized( "Power natural conversations that make people feel like they're 'in the room' together"),"image":"sa_mode"]
+    private let datas = [["title": "spatial_SA_MODE".localized_spatial(), "detail": "spatial_SA_MODE_DETAIL".localized_spatial() + "\n" + sceneLocalized(""), "image": "sa_mode"]]
+//    ,["title":sceneLocalized( "spatial_voice_audio_mode_room"),"detail":sceneLocalized( "Power natural conversations that make people feel like they're 'in the room' together"),"image":"sa_mode"]
 
     var velocity = CGPoint.zero
 
@@ -62,16 +62,16 @@ public class SACreateRoomView: UIView, SAHorizontalCardsDelegate, SAHorizontalCa
 public extension SACreateRoomView {
     private func refreshBottom(index: Int) {
 //        if index > 0 {
-            roomInput.create.setTitle(sceneLocalized( "Go Live"), for: .normal)
+        roomInput.create.setTitle("spatial_voice_go_live".localized_spatial(), for: .normal)
 //        } else {
-//            roomInput.create.setTitle(sceneLocalized( "Next"), for: .normal)
+//            roomInput.create.setTitle(sceneLocalized( "spatial_voice_next"), for: .normal)
 //        }
     }
 
     @objc private func randomRoomName() {
-        var namePrefix = sceneLocalized( "Chat Room")
+        var namePrefix = "spatial_voice_chat_room".localized_spatial()
         if idx == 1 {
-            namePrefix = sceneLocalized( "Spatial Audio Mode Room")
+            namePrefix = "spatial_voice_audio_mode_room".localized_spatial()
         }
         roomInput.roomNameField.text = namePrefix + "-" + Date().z.dateString("MMdd") + "-\((1...100).randomElement() ?? 1)"
         roomInput.name = roomInput.roomNameField.text ?? ""
@@ -88,7 +88,7 @@ public extension SACreateRoomView {
                     createAction!()
                 }
             } else {
-                makeToast("4 Digit Password Required", point: center, title: nil, image: nil, completion: nil)
+                makeToast("spatial_voice_4_digit_password_required".localized_spatial(), point: center, title: nil, image: nil, completion: nil)
             }
         }
     }

@@ -17,7 +17,7 @@ public class SAApplyUsersViewController: UITableViewController {
     
     var agreeApply:((SARoomMic) -> Void)?
     
-    lazy var empty: SAEmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "No one raised hands yet", image: nil).backgroundColor(.white)
+    lazy var empty: SAEmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "spatial_voice_no_one_raised_hands_yet".localized_spatial(), image: nil).backgroundColor(.white)
 
     public convenience init(roomId: String) {
         self.init()
@@ -96,7 +96,7 @@ extension SAApplyUsersViewController {
                 self.agreeApply!(mic)
             }
             self.tableView.reloadData()
-            let warningMessage = (error == nil ? "Agree success!".localized():"Agree failed!".localized())
+            let warningMessage = (error == nil ? "spatial_voice_agree_success".localized_spatial():"spatial_voice_agree_failed".localized_spatial())
             self.view.makeToast(warningMessage)
         })
     }

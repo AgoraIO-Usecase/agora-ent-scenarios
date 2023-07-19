@@ -12,7 +12,7 @@ import ZSwiftBaseLib
 public class VoiceRoomGiftersViewController: UITableViewController {
     private var room_id = ""
     
-    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "Contribution empty", image: nil)
+    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "voice_contribution_empty", image: nil)
     
    // private var dataSource = VoiceRoomContributions()
     private var dataSource: [VRUser]?

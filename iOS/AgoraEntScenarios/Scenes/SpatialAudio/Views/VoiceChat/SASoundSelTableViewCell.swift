@@ -103,7 +103,7 @@ class SASoundSelTableViewCell: UITableViewCell {
         selView.image = UIImage.sceneImage(name: "effect-check")
         addSubview(selView)
 
-        usageLabel.text = sceneLocalized( "Current Customer Usage")
+        usageLabel.text = "spatial_voice_current_customer_usage".localized_spatial()
         usageLabel.font = UIFont.systemFont(ofSize: 11)
         usageLabel.textColor = UIColor(hex: "0x979CBB")
         bgView.addSubview(usageLabel)
@@ -179,20 +179,20 @@ class SASoundSelTableViewCell: UITableViewCell {
     private func setCellType(with type: SASOUND_TYPE) {
         cellType = type
         if type == .chat {
-            typeStr = sceneLocalized( "Social Chat")
-            detailStr = sceneLocalized( "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat.")
+            typeStr = "spatiaL_voice_social_chat".localized_spatial()
+            detailStr = "spatial_voice_chatroom_social_chat_introduce".localized_spatial()
             iconImgs = images[0]
         } else if type == .karaoke {
-            typeStr = sceneLocalized( "Karaoke")
-            detailStr = sceneLocalized( "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful.")
+            typeStr = "spatial_voice_karaoke".localized_spatial()
+            detailStr = "spatial_voice_chatroom_karaoke_introduce".localized_spatial()
             iconImgs = images[1]
         } else if type == .game {
-            typeStr = sceneLocalized( "Gaming Buddy")
-            detailStr = sceneLocalized( "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. ")
+            typeStr = "spatial_voice_gaming_buddy".localized_spatial()
+            detailStr = "spatial_voice_chatroom_gaming_buddy_introduce".localized_spatial()
             iconImgs = images[2]
         } else if type == .anchor {
-            typeStr = sceneLocalized( "Professional Podcaster")
-            detailStr = sceneLocalized( "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ")
+            typeStr = "spatial_voice_professional_podcaster".localized_spatial()
+            detailStr = "spatial_voice_chatroom_professional_broadcaster_introduce".localized_spatial()
             iconImgs = images[3]
         }
     }

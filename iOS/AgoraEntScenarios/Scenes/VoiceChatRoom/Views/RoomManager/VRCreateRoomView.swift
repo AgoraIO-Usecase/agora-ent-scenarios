@@ -9,8 +9,8 @@ import UIKit
 import ZSwiftBaseLib
 
 public class VRCreateRoomView: UIView, HorizontalCardsDelegate, HorizontalCardsDataSource {
-    private let datas = [["title": LanguageManager.localValue(key: "Chat Room"), "detail": LanguageManager.localValue(key: "Multi-audio chat scenario where anyone can unmute their mic and speak") + "\n" + LanguageManager.localValue(key: "Co-Watch / Team Chat / Gaming Buddy Chat"), "image": "chat_room"]]
-//    ,["title":LanguageManager.localValue(key: "Spatial Audio Mode Room"),"detail":LanguageManager.localValue(key: "Power natural conversations that make people feel like they're 'in the room' together"),"image":"sa_mode"]
+    private let datas = [["title": LanguageManager.localValue(key: "voice_chat_room"), "detail": LanguageManager.localValue(key: "voice_multi_audio_chat_scenario_where_anyone_can_unmute_their_mic_and_speak") + "\n" + LanguageManager.localValue(key: "voice_co_Watch_team_chat_gaming_buddy_chat"), "image": "chat_room"]]
+//    ,["title":LanguageManager.localValue(key: "voice_spatial_audio_mode_room"),"detail":LanguageManager.localValue(key: "Power natural conversations that make people feel like they're 'in the room' together"),"image":"sa_mode"]
 
     var velocity = CGPoint.zero
 
@@ -62,16 +62,16 @@ public class VRCreateRoomView: UIView, HorizontalCardsDelegate, HorizontalCardsD
 public extension VRCreateRoomView {
     private func refreshBottom(index: Int) {
         if index > 0 {
-            roomInput.create.setTitle(LanguageManager.localValue(key: "Go Live"), for: .normal)
+            roomInput.create.setTitle(LanguageManager.localValue(key: "voice_go_live"), for: .normal)
         } else {
-            roomInput.create.setTitle(LanguageManager.localValue(key: "Next"), for: .normal)
+            roomInput.create.setTitle(LanguageManager.localValue(key: "voice_next"), for: .normal)
         }
     }
 
     @objc private func randomRoomName() {
-        var namePrefix = LanguageManager.localValue(key: "Chat Room")
+        var namePrefix = LanguageManager.localValue(key: "voice_chat_room")
         if idx == 1 {
-            namePrefix = LanguageManager.localValue(key: "Spatial Audio Mode Room")
+            namePrefix = LanguageManager.localValue(key: "voice_spatial_audio_mode_room")
         }
         roomInput.roomNameField.text = namePrefix + "-" + Date().z.dateString("MMdd") + "-\((1...100).randomElement() ?? 1)"
         roomInput.name = roomInput.roomNameField.text ?? ""
@@ -88,7 +88,7 @@ public extension VRCreateRoomView {
                     createAction!()
                 }
             } else {
-                makeToast("4 Digit Password Required".localized(), point: center, title: nil, image: nil, completion: nil)
+                makeToast("voice_4_digit_password_required".localized(), point: center, title: nil, image: nil, completion: nil)
             }
         }
     }

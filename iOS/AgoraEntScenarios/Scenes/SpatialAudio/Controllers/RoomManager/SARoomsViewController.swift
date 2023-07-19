@@ -49,7 +49,7 @@ import AgoraChat
     override public func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        navigation.title.text = sceneLocalized( "Agora Chat Room")
+        navigation.title.text = "spatial_voice_app_name".localized_spatial()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -124,7 +124,7 @@ extension SARoomsViewController {
                     if room.roomPassword == alert.code {
                         self.loginIMThenPush(room: room)
                     } else {
-                        self.view.makeToast("Incorrect Password".localized())
+                        self.view.makeToast("spatial_voice_incorrect_password".localized_spatial())
                     }
                 }
                 vc.dismiss(animated: true)
@@ -135,7 +135,7 @@ extension SARoomsViewController {
     }
 
     private func loginIMThenPush(room: SARoomEntity) {
-        SVProgressHUD.show(withStatus: "Loading".localized())
+        SVProgressHUD.show(withStatus: "spatial_voice_loading".localized_spatial())
         AppContext.saServiceImp().joinRoom(room.room_id ?? "") { [weak self] error, room_entity, robot in
             SVProgressHUD.dismiss()
             guard let self = self else {return}

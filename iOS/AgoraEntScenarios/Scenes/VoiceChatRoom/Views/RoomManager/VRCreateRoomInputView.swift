@@ -17,27 +17,27 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
 
     private let PinHeight = ((ScreenWidth - 90 - 3 * 16) / 4.0) * (53 / 60.0)
 
-    private let codeMessage = LanguageManager.localValue(key: "Enter 4 Digit Password")
+    private let codeMessage = LanguageManager.localValue(key: "voice_enter_4_digit_password")
 
-    private let nameMessage = LanguageManager.localValue(key: "Please set a name")
+    private let nameMessage = LanguageManager.localValue(key: "voice_please_set_a_name")
 
     private var offset = CGFloat(ScreenHeight < 812 ? 150 : 120)
 
     var oldCenter: CGPoint = .zero
 
-    lazy var roomName: UILabel = .init(frame: CGRect(x: 40, y: 0, width: 80, height: 20)).font(.systemFont(ofSize: 14, weight: .regular)).text(LanguageManager.localValue(key: "Room Name")).textColor(.darkText).backgroundColor(.clear)
+    lazy var roomName: UILabel = .init(frame: CGRect(x: 40, y: 0, width: 80, height: 20)).font(.systemFont(ofSize: 14, weight: .regular)).text(LanguageManager.localValue(key: "voice_room_name")).textColor(.darkText).backgroundColor(.clear)
 
     lazy var randomName: UIButton = .init(type: .custom).frame(CGRect(x: ScreenWidth - 120, y: 0, width: 80, height: 20)).backgroundColor(.clear).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x3C4267), .normal)
 
     lazy var roomBackground: UIView = .init(frame: CGRect(x: 30, y: self.roomName.frame.maxY + 10, width: ScreenWidth - 60, height: 50)).cornerRadius(25).backgroundColor(.white)
 
-    lazy var roomNameField: UITextField = .init(frame: CGRect(x: 45, y: self.roomName.frame.maxY + 15, width: ScreenWidth - 90, height: 40)).placeholder(LanguageManager.localValue(key: "Set Room Name")).font(.systemFont(ofSize: 18, weight: .regular)).textColor(.darkText).delegate(self)
+    lazy var roomNameField: UITextField = .init(frame: CGRect(x: 45, y: self.roomName.frame.maxY + 15, width: ScreenWidth - 90, height: 40)).placeholder(LanguageManager.localValue(key: "voice_set_room_name")).font(.systemFont(ofSize: 18, weight: .regular)).textColor(.darkText).delegate(self)
 
-    lazy var roomEncryption: UILabel = .init(frame: CGRect(x: self.roomName.frame.minX, y: self.roomBackground.frame.maxY + 12, width: 150, height: 20)).font(.systemFont(ofSize: 14, weight: .regular)).textColor(.darkText).text(LanguageManager.localValue(key: "Room Access")).backgroundColor(.clear)
+    lazy var roomEncryption: UILabel = .init(frame: CGRect(x: self.roomName.frame.minX, y: self.roomBackground.frame.maxY + 12, width: 150, height: 20)).font(.systemFont(ofSize: 14, weight: .regular)).textColor(.darkText).text(LanguageManager.localValue(key: "voice_room_access")).backgroundColor(.clear)
 
-    lazy var publicChoice: UIButton = .init(type: .custom).frame(CGRect(x: self.roomEncryption.frame.minX, y: self.roomEncryption.frame.maxY + 12, width: 90, height: 32)).title(LanguageManager.localValue(key: "Public"), .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x3C4267), .normal).backgroundColor(.clear).tag(21).addTargetFor(self, action: #selector(chooseEncryption(_:)), for: .touchUpInside)
+    lazy var publicChoice: UIButton = .init(type: .custom).frame(CGRect(x: self.roomEncryption.frame.minX, y: self.roomEncryption.frame.maxY + 12, width: 90, height: 32)).title(LanguageManager.localValue(key: "voice_public"), .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x3C4267), .normal).backgroundColor(.clear).tag(21).addTargetFor(self, action: #selector(chooseEncryption(_:)), for: .touchUpInside)
 
-    lazy var privateChoice: UIButton = .init(type: .custom).frame(CGRect(x: self.publicChoice.frame.maxX + 20, y: self.roomEncryption.frame.maxY + 12, width: 90, height: 32)).title(LanguageManager.localValue(key: "Private"), .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x3C4267), .normal).backgroundColor(.clear).tag(22).addTargetFor(self, action: #selector(chooseEncryption(_:)), for: .touchUpInside)
+    lazy var privateChoice: UIButton = .init(type: .custom).frame(CGRect(x: self.publicChoice.frame.maxX + 20, y: self.roomEncryption.frame.maxY + 12, width: 90, height: 32)).title(LanguageManager.localValue(key: "voice_private"), .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x3C4267), .normal).backgroundColor(.clear).tag(22).addTargetFor(self, action: #selector(chooseEncryption(_:)), for: .touchUpInside)
 
     lazy var pinCode: VerifyCodeView = .init(frame: CGRect(x: 0, y: self.publicChoice.frame.maxY + 15, width: ScreenWidth, height: self.PinHeight), codeNumbers: 4, space: 16, padding: 45)
 
@@ -56,13 +56,13 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
         let host = NSMutableAttributedString(attachment: attachment)
         space.append(host)
         space.append(NSAttributedString {
-            AttributedText("DemoTestDesc".localized()).foregroundColor(UIColor(0x3C4267)).font(.systemFont(ofSize: 12, weight: .regular)).lineBreakeMode(.byCharWrapping).alignment(.center)
+            AttributedText("voice_demo_test_desc".localized()).foregroundColor(UIColor(0x3C4267)).font(.systemFont(ofSize: 12, weight: .regular)).lineBreakeMode(.byCharWrapping).alignment(.center)
         })
         return space
     }()
 
     lazy var create: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: 30, y: self.frame.height - CGFloat(ZTabbarHeight), width: ScreenWidth - 60, height: 48)).cornerRadius(24).title(LanguageManager.localValue(key: "Next"), .normal).textColor(.white, .normal).font(.systemFont(ofSize: 16, weight: .semibold)).addTargetFor(self, action: #selector(createAction), for: .touchUpInside).setGradient([UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1), UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)])
+        UIButton(type: .custom).frame(CGRect(x: 30, y: self.frame.height - CGFloat(ZTabbarHeight), width: ScreenWidth - 60, height: 48)).cornerRadius(24).title(LanguageManager.localValue(key: "voice_next"), .normal).textColor(.white, .normal).font(.systemFont(ofSize: 16, weight: .semibold)).addTargetFor(self, action: #selector(createAction), for: .touchUpInside).setGradient([UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1), UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)])
     }()
 
     lazy var createContainer: UIView = .init(frame: CGRect(x: 30, y: self.frame.height - CGFloat(ZTabbarHeight), width: ScreenWidth - 60, height: 48)).backgroundColor(.white)
@@ -109,7 +109,7 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
 public extension VRCreateRoomInputView {
     private func setupAttributes() {
         pinCode.alpha = 0
-        randomName.set(image:UIImage.sceneImage(name: "random", bundleName: "VoiceChatRoomResource"), title: LanguageManager.localValue(key: "Random"), titlePosition: .right, additionalSpacing: 5, state: .normal)
+        randomName.set(image:UIImage.sceneImage(name: "random", bundleName: "VoiceChatRoomResource"), title: LanguageManager.localValue(key: "voice_random"), titlePosition: .right, additionalSpacing: 5, state: .normal)
         stateImage(button: publicChoice)
         stateImage(button: privateChoice)
         publicChoice.titleEdgeInsets = UIEdgeInsets(top: publicChoice.titleEdgeInsets.top, left: 10, bottom: publicChoice.titleEdgeInsets.bottom, right: publicChoice.titleEdgeInsets.right)
@@ -160,7 +160,7 @@ public extension VRCreateRoomInputView {
                 }
             } else {
                 if roomNameField.text?.isEmpty ?? true {
-                    superview?.superview?.makeToast("No Room Name".localized(), point: superview?.superview?.center ?? .zero, title: nil, image: nil, completion: nil)
+                    superview?.superview?.makeToast("voice_no_room_name".localized(), point: superview?.superview?.center ?? .zero, title: nil, image: nil, completion: nil)
                 }
             }
         } else {
@@ -169,7 +169,7 @@ public extension VRCreateRoomInputView {
                     action!()
                 }
             } else {
-                superview?.superview?.makeToast("No Room Name".localized(), point: superview?.superview?.center ?? .zero, title: nil, image: nil, completion: nil)
+                superview?.superview?.makeToast("voice_no_room_name".localized(), point: superview?.superview?.center ?? .zero, title: nil, image: nil, completion: nil)
             }
         }
     }

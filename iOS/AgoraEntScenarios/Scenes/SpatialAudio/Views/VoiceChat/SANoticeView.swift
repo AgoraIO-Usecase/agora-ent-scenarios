@@ -21,7 +21,7 @@ class SANoticeView: UIView {
     private var limLabel: UILabel = .init()
     private var editBtn: UIButton = .init()
 
-    private let placeHolder: String = "Announce to chatroom, 140 character limit."
+    private let placeHolder: String = ""
 
     var resBlock: ((Bool, String?) -> Void)?
 
@@ -45,7 +45,7 @@ class SANoticeView: UIView {
 
     var noticeStr: String = "" {
         didSet {
-            let notice = noticeStr.count == 0 ? "Welcome" : noticeStr
+            let notice = noticeStr.count == 0 ? "spatial_voice_welcome".localized_spatial() : noticeStr
             tv.text = notice
             limLabel.text = "\(notice.count)/140"
         }
@@ -75,7 +75,7 @@ class SANoticeView: UIView {
         addSubview(lineImgView)
 
         canBtn.frame = CGRect(x: 15, y: 18, width: 68, height: 30)
-        canBtn.setTitle(sceneLocalized( "Cancel"), for: .normal)
+        canBtn.setTitle("spatial_voice_cancel".localized_spatial(), for: .normal)
         canBtn.setTitleColor(.lightGray, for: .normal)
         canBtn.font(UIFont.systemFont(ofSize: 13))
         canBtn.addTargetFor(self, action: #selector(can), for: .touchUpInside)
@@ -94,20 +94,20 @@ class SANoticeView: UIView {
         subBtn.layer.addSublayer(gl)
 
         subBtn.setTitleColor(.white, for: .normal)
-        subBtn.setTitle(sceneLocalized( "Post"), for: .normal)
+        subBtn.setTitle("spatial_voice_post".localized_spatial(), for: .normal)
         subBtn.font(UIFont.systemFont(ofSize: 13))
         subBtn.addTargetFor(self, action: #selector(sub), for: .touchUpInside)
         addSubview(subBtn)
 
         titleLabel.frame = CGRect(x: ScreenWidth / 2.0 - 40, y: 22, width: 80, height: 22)
         titleLabel.textAlignment = .center
-        titleLabel.text = sceneLocalized( "Notice")
+        titleLabel.text = "spatial_voice_notice".localized_spatial()
         titleLabel.textColor = .black
         titleLabel.font = UIFont.systemFont(ofSize: 16)
         addSubview(titleLabel)
 
         tv.frame = CGRect(x: 10, y: 60, width: ScreenWidth - 20, height: 160)
-        tv.text = "Welcome"
+        tv.text = "spatial_voice_welcome".localized_spatial()
         tv.setPlaceholder(text: placeHolder)
         tv.textColor = UIColor(red: 0.235, green: 0.257, blue: 0.403, alpha: 1)
         tv.font = UIFont.systemFont(ofSize: 14)
@@ -124,7 +124,7 @@ class SANoticeView: UIView {
 
         let isHairScreen =  Screen.isFullScreen
         editBtn.frame = CGRect(x: 20, y: bounds.size.height - (isHairScreen ? 87 : 53), width: bounds.size.width - 40, height: 48)
-        editBtn.setTitle(sceneLocalized( "Edit"), for: .normal)
+        editBtn.setTitle("spatial_voice_edit".localized_spatial(), for: .normal)
         editBtn.font(UIFont.systemFont(ofSize: 16))
         editBtn.setTitleColor(.white, for: .normal)
         let image = UIImage.sceneImage(name:"blue_btn_bg")?.resizableImage(withCapInsets: UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16), resizingMode: .stretch)

@@ -16,7 +16,7 @@ public class VoiceRoomInviteUsersController: UITableViewController {
 
     private var idx = 0
 
-    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "No audience yet", image: nil).backgroundColor(.white)
+    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "voice_no_audience_yet", image: nil).backgroundColor(.white)
 
     public convenience init(roomId: String, mic_index: Int?) {
         self.init()
@@ -102,7 +102,7 @@ extension VoiceRoomInviteUsersController {
         let chat_uid: String = user?.chat_uid ?? ""
         ChatRoomServiceImp.getSharedInstance().startMicSeatInvitation(chatUid: chat_uid, index: idx < 0 ? nil:idx) { error, flag in
             SVProgressHUD.dismiss()
-            self.view.makeToast(flag == true ? "Invitation sent!".localized() : "Invited failed!".localized())
+            self.view.makeToast(flag == true ? "voice_invitation_sent".localized() : "voice_invited_failed".localized())
         }
 
     }

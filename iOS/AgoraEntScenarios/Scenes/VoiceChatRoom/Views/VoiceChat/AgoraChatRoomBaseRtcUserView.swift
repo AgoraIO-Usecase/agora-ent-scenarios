@@ -182,7 +182,7 @@ class AgoraChatRoomBaseRtcUserView: UIView {
 
         activeButton.layer.cornerRadius = 8
         activeButton.layer.masksToBounds = true
-        activeButton.setTitle(LanguageManager.localValue(key: "active"), for: .normal)
+        activeButton.setTitle(LanguageManager.localValue(key: "voice_active"), for: .normal)
         activeButton.setTitleColor(.white, for: .normal)
         activeButton.setBackgroundImage(UIImage.sceneImage(name: "active", bundleName: "VoiceChatRoomResource"), for: .normal)
         activeButton.titleLabel?.font = UIFont.systemFont(ofSize: 9)

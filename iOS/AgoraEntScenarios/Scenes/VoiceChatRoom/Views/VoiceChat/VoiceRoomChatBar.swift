@@ -68,7 +68,7 @@ public class VoiceRoomChatBar: UIView, UICollectionViewDelegate, UICollectionVie
         }
         addSubViews([chatRaiser, toolBar])
         chatRaiser.setImage(UIImage.sceneImage(name: "chatraise", bundleName: "VoiceChatRoomResource"), for: .normal)
-        chatRaiser.setTitle(" " + "Let's Chat!".localized(), for: .normal)
+        chatRaiser.setTitle(" " + "voice_let's_chat!".localized(), for: .normal)
         chatRaiser.titleEdgeInsets = UIEdgeInsets(top: chatRaiser.titleEdgeInsets.top, left: 10, bottom: chatRaiser.titleEdgeInsets.bottom, right: 10)
         chatRaiser.imageEdgeInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 80)
         chatRaiser.contentHorizontalAlignment = .left

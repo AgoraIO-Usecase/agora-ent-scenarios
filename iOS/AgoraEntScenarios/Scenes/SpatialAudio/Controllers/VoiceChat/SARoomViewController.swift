@@ -18,7 +18,7 @@ public enum SAROLE_TYPE {
     case audience
 }
 
-let sa_giftMap = [["gift_id": "VoiceRoomGift1", "gift_name": sceneLocalized( "Sweet Heart"), "gift_price": "1", "gift_count": "1", "selected": true], ["gift_id": "VoiceRoomGift2", "gift_name": sceneLocalized( "Flower"), "gift_price": "5", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift3", "gift_name": sceneLocalized( "Crystal Box"), "gift_price": "10", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift4", "gift_name": sceneLocalized( "Super Agora"), "gift_price": "20", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift5", "gift_name": sceneLocalized( "Star"), "gift_price": "50", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift6", "gift_name": sceneLocalized( "Lollipop"), "gift_price": "100", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift7", "gift_name": sceneLocalized( "Diamond"), "gift_price": "500", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift8", "gift_name": sceneLocalized( "Crown"), "gift_price": "1000", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift9", "gift_name": sceneLocalized( "Rocket"), "gift_price": "1500", "gift_count": "1", "selected": false]]
+let sa_giftMap = [["gift_id": "VoiceRoomGift1", "gift_name": sceneLocalized( "spatial_voice_sweet_heart"), "gift_price": "1", "gift_count": "1", "selected": true], ["gift_id": "VoiceRoomGift2", "gift_name": sceneLocalized( "spatial_voice_flower"), "gift_price": "5", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift3", "gift_name": sceneLocalized( "spatial_voice_crystal_box"), "gift_price": "10", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift4", "gift_name": sceneLocalized( "spatial_voice_super_agora"), "gift_price": "20", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift5", "gift_name": sceneLocalized( "spatial_voice_star"), "gift_price": "50", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift6", "gift_name": sceneLocalized( "spatial_voice_lollipop"), "gift_price": "100", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift7", "gift_name": sceneLocalized( "spatial_voice_diamond"), "gift_price": "500", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift8", "gift_name": sceneLocalized( "spatial_voice_crown"), "gift_price": "1000", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift9", "gift_name": sceneLocalized( "spatial_voice_rocket"), "gift_price": "1500", "gift_count": "1", "selected": false]]
 
 fileprivate let ownerMic = ["index":0,"status":0,"member":["uid":SAUserInfo.shared.user?.uid ?? "","chat_uid":SAUserInfo.shared.user?.chat_uid ?? "","name":SAUserInfo.shared.user?.name ?? "","portrait":SAUserInfo.shared.user?.portrait ?? "","rtc_uid":SAUserInfo.shared.user?.rtc_uid ?? "","mic_index":0]] as [String : Any]
 
@@ -394,7 +394,7 @@ extension SARoomViewController {
 
     func showActiveAlienView(_ active: Bool) {
         if !isOwner {
-            view.makeToast("Host Bot".localized())
+            view.makeToast("spatial_voice_host_bot".localized())
             return
         }
         let confirmView = SAConfirmView(frame: CGRect(x: 0,
@@ -416,7 +416,7 @@ extension SARoomViewController {
 
     func activeAlien(_ flag: Bool) {
         if isOwner == false {
-            view.makeToast("Host Bot".localized())
+            view.makeToast("spatial_voice_host_bot".localized())
             return
         }
         guard let mic_blue: SARoomMic = roomInfo?.mic_info?[3] else { return }
@@ -446,10 +446,10 @@ extension SARoomViewController {
             guard let self = self else {return}
             if result {
                 // 如果返回的结果为true 表示上麦成功
-                self.view.makeToast("Notice Posted".localized())
+                self.view.makeToast("spatial_voice_notice_posted".localized())
                 self.roomInfo?.room?.announcement = str
             } else {
-                self.view.makeToast("Post Failed".localized())
+                self.view.makeToast("spatial_voice_post_failed".localized())
             }
         }
     }
@@ -487,7 +487,7 @@ extension SARoomViewController {
     func showEndLive() {
         var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 70, height: 190))
         compent.destination = .center
-        let micAlert = SAEndLiveAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 190), title: sceneLocalized( "End Live"), content: sceneLocalized( "The room will close after you leave."), cancel: sceneLocalized( "Cancel"), confirm: sceneLocalized( "Confirm")).cornerRadius(16).backgroundColor(.white)
+        let micAlert = SAEndLiveAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 190), title: "spatial_voice_end_live".localized_spatial(), content: "spatial_voice_the_room_will_close_after_you_leave.".localized_spatial(), cancel: "spatial_voice_cancel".localized_spatial(), confirm: "spatial_voice_confirm".localized_spatial()).cornerRadius(16).backgroundColor(.white)
         let vc = SAAlertViewController(compent: compent, custom: micAlert)
         micAlert.actionEvents = { [weak self] in
             vc.dismiss(animated: true)
@@ -513,7 +513,10 @@ extension SARoomViewController {
         dismiss(animated: false)
         var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 75, height: 200))
         compent.destination = .center
-        let micAlert = SAApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 75, height: 200), content: "Anchor Invited You On-Stage", cancel: "Decline", confirm: "Accept", position: .center).cornerRadius(16).backgroundColor(.white)
+        let micAlert = SAApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 75, height: 200), content: "spatial_voice_anchor_invited_you_on_stage".localized_spatial(),
+                                    cancel: "spatial_voice_decline".localized_spatial(),
+                                    confirm: "spatial_voice_accept".localized_spatial(),
+                                    position: .center).cornerRadius(16).backgroundColor(.white)
         let vc = SAAlertViewController(compent: compent, custom: micAlert)
         micAlert.actionEvents = { [weak self] in
             if $0 == 30 {
@@ -539,13 +542,13 @@ extension SARoomViewController {
         var detailStr: String = ""
         switch effect {
         case 1:
-            detailStr = "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat.".localized()
+            detailStr = "spatial_voice_chatroom_social_chat_introduce".localized_spatial()
         case 2:
-            detailStr = "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful.".localized()
+            detailStr = "spatial_voice_chatroom_karaoke_introduce".localized_spatial()
         case 3:
-            detailStr = "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. ".localized()
+            detailStr = "spatial_voice_chatroom_gaming_buddy_introduce".localized_spatial()
         default:
-            detailStr = "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ".localized()
+            detailStr = "spatial_voice_chatroom_professional_broadcaster_introduce".localized_spatial()
         }
         return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40)
     }
