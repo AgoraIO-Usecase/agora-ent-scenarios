@@ -110,7 +110,6 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         if (!sdkIsInit || isReleased) {
             return;
         }
-        Log.d("hugo", "setFaceBeautifyAfterCached, itemId: " + itemId + " intensity: " + intensity);
         mSTRenderer.setBeautyMode(STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH, STEffectBeautyType.SMOOTH2_MODE);
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_SMOOTH));
         mSTRenderer.setBeautyMode(STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN, STEffectBeautyType.WHITENING3_MODE);
