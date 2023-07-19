@@ -59,7 +59,7 @@ class SAMuteView: UIView {
                 iconView.isHidden = false
 //                micView.isHidden = false
 //                micView.setState(.forbidden)
-                muteBtn.setTitle(sceneLocalized( "Unmute"), for: .normal)
+                muteBtn.setTitle("spatial_voice_unmute".localized_spatial(), for: .normal)
                 nameLabel.text = username
             }
         }
@@ -116,7 +116,7 @@ class SAMuteView: UIView {
 
         roleBtn.frame = CGRect(x: ScreenWidth / 2.0 - 50, y: 135, width: 100, height: 20)
         roleBtn.setImage(UIImage.sceneImage(name: "Landlord"), for: .normal)
-        roleBtn.setTitle(" \(sceneLocalized( "host"))", for: .normal)
+        roleBtn.setTitle(" \("spatial_voice_host".localized_spatial())", for: .normal)
         roleBtn.setTitleColor(UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1), for: .normal)
         roleBtn.font(UIFont.systemFont(ofSize: 11))
         addSubview(roleBtn)
@@ -134,7 +134,7 @@ class SAMuteView: UIView {
 
         leaveBtn.frame = CGRect(x: 0, y: 170, width: ScreenWidth / 2.0, height: 40)
         leaveBtn.setTitleColor(UIColor(red: 21 / 255.0, green: 110 / 255.0, blue: 243 / 255.0, alpha: 1), for: .normal)
-        leaveBtn.setTitle(sceneLocalized( "Off-Stage"), for: .normal)
+        leaveBtn.setTitle("spatial_voice_off_stage".localized_spatial(), for: .normal)
         leaveBtn.font(UIFont.systemFont(ofSize: 14))
         leaveBtn.tag = 400
         leaveBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
@@ -142,7 +142,7 @@ class SAMuteView: UIView {
 
         muteBtn.frame = CGRect(x: ScreenWidth / 2, y: 170, width: ScreenWidth / 2.0, height: 40)
         muteBtn.setTitleColor(UIColor(red: 21 / 255.0, green: 110 / 255.0, blue: 243 / 255.0, alpha: 1), for: .normal)
-        muteBtn.setTitle(sceneLocalized( "Mute"), for: .normal)
+        muteBtn.setTitle("spatial_voice_mute".localized_spatial(), for: .normal)
         muteBtn.font(UIFont.systemFont(ofSize: 14))
         muteBtn.tag = 401
         muteBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)

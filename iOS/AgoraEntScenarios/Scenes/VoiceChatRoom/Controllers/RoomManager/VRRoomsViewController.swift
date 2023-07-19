@@ -55,7 +55,7 @@ let page_size = 15
     override public func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        navigation.title.text = LanguageManager.localValue(key: "Agora Chat Room")
+        navigation.title.text = LanguageManager.localValue(key: "voice_app_name")
     }
     
     
@@ -186,7 +186,7 @@ extension VRRoomsViewController {
                             }
                         }
                     } else {
-                        self.view.makeToast("Incorrect Password".localized())
+                        self.view.makeToast("voice_incorrect_password".localized())
                     }
                 }
                 vc.dismiss(animated: true)
@@ -212,7 +212,7 @@ extension VRRoomsViewController {
     }
 
     private func loginIMThenPush(room: VRRoomEntity) {
-        SVProgressHUD.show(withStatus: "Loading".localized())
+        SVProgressHUD.show(withStatus: "voice_loading".localized())
         NetworkManager.shared.generateToken(channelName: room.channel_id ?? "", uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
             VLUserCenter.user.agoraRTCToken = token ?? ""
             ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in

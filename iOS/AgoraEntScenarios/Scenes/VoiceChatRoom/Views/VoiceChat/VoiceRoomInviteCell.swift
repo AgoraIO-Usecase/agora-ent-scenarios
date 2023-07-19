@@ -18,7 +18,7 @@ public class VoiceRoomInviteCell: UITableViewCell {
 
     lazy var userName: UILabel = .init(frame: CGRect(x: self.avatar.frame.maxX + 9, y: self.avatar.center.y - 8, width: self.contentView.frame.width - self.avatar.frame.maxX - 95, height: 16)).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x333333)).text("UserName")
 
-    lazy var operation: UIButton = .init(type: .custom).frame(CGRect(x: self.contentView.frame.width - 80, y: self.avatar.center.y - 15, width: 65, height: 30)).title("Invite", .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(.white, .normal).addTargetFor(self, action: #selector(invite), for: .touchUpInside)
+    lazy var operation: UIButton = .init(type: .custom).frame(CGRect(x: self.contentView.frame.width - 80, y: self.avatar.center.y - 15, width: 65, height: 30)).title("voice_invite".localized(), .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(.white, .normal).addTargetFor(self, action: #selector(invite), for: .touchUpInside)
 
     override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -45,7 +45,7 @@ public class VoiceRoomInviteCell: UITableViewCell {
         userName.text = item?.name
         item?.invited = (item?.mic_index ?? 0 != -1)
         avatar.sd_setImage(with: URL(string: item?.portrait ?? "")!, placeholderImage: UIImage(named: "mine_avatar_placeHolder"))
-        operation.setTitle(item?.invited == true ? LanguageManager.localValue(key: "Invited") : LanguageManager.localValue(key: "Invite"), for: .normal)
+        operation.setTitle(item?.invited == true ? LanguageManager.localValue(key: "voice_invited") : LanguageManager.localValue(key: "voice_invite"), for: .normal)
         operation.setBackgroundImage(UIImage(item?.invited == true ? "" : "blue_btn_bg")?.resizableImage(withCapInsets: UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20), resizingMode: .stretch), for: .normal)
         var color = UIColor.white
         if item?.invited == true {

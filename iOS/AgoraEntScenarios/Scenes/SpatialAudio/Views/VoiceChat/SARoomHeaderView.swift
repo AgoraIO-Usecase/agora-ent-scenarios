@@ -61,7 +61,7 @@ class SARoomHeaderView: UIView {
         self.giftBtn.snp.updateConstraints { make in
             make.width.greaterThanOrEqualTo(gift_count >= 100 ? 50 : 40)
         }
-        soundSetLabel.text = "Beginner's Guide".localized_spatial()
+        soundSetLabel.text = "spatial_beginner_guide".localized_spatial()
         updateGiftList(with: room)
     }
     
@@ -176,7 +176,7 @@ class SARoomHeaderView: UIView {
         noticeView.addSubview(imgView)
 
         let notiLabel = UILabel()
-        notiLabel.text = sceneLocalized("Notice")
+        notiLabel.text = "spatial_voice_notice".localized_spatial()
         notiLabel.font = UIFont.systemFont(ofSize: 12)
         notiLabel.textColor = .white
         noticeView.addSubview(notiLabel)

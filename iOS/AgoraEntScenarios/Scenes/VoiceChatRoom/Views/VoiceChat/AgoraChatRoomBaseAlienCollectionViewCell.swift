@@ -71,7 +71,7 @@ class AgoraChatRoomBaseAlienCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(cornerView)
 
         blueAlienView.iconImgUrl = "blue"
-        blueAlienView.nameStr = LanguageManager.localValue(key: "blue")
+        blueAlienView.nameStr = LanguageManager.localValue(key: "voice_blue")
         blueAlienView.cellType = .AgoraChatRoomBaseUserCellTypeAlienNonActive
         blueAlienView.clickBlock = {
             guard let clickVBlock = self.clickVBlock else {
@@ -88,7 +88,7 @@ class AgoraChatRoomBaseAlienCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(blueCoverView)
 
         redAlienView.iconImgUrl = "red"
-        redAlienView.nameStr = LanguageManager.localValue(key: "red")
+        redAlienView.nameStr = LanguageManager.localValue(key: "voice_red")
         redAlienView.cellType = .AgoraChatRoomBaseUserCellTypeAlienNonActive
         redAlienView.clickBlock = {
             guard let clickVBlock = self.clickVBlock else {

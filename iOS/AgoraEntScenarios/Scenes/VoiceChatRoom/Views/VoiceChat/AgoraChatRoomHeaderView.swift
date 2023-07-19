@@ -179,7 +179,7 @@ class AgoraChatRoomHeaderView: UIView {
         noticeView.addSubview(imgView)
 
         let notiLabel = UILabel()
-        notiLabel.text = LanguageManager.localValue(key: "Notice")
+        notiLabel.text = LanguageManager.localValue(key: "voice_notice")
         notiLabel.font = UIFont.systemFont(ofSize: 12)
         notiLabel.textColor = .white
         noticeView.addSubview(notiLabel)
@@ -416,18 +416,18 @@ class AgoraChatRoomHeaderView: UIView {
     }
     
     private func getSoundType(with index: Int) -> String {
-        var soundType: String = "Social Chat".localized()
+        var soundType: String = "voice_social_chat".localized()
         switch index {
         case 1:
-            soundType = "Social Chat".localized()
+            soundType = "voice_social_chat".localized()
         case 2:
-            soundType = "Karaoke".localized()
+            soundType = "voice_karaoke".localized()
         case 3:
-            soundType = "Gaming Buddy".localized()
+            soundType = "voice_gaming_buddy".localized()
         case 4:
-            soundType = "Professional Podcaster".localized()
+            soundType = "voice_professional_podcaster".localized()
         default:
-            soundType = "Social Chat".localized()
+            soundType = "voice_social_chat".localized()
         }
         return soundType
     }

@@ -22,7 +22,7 @@ public class VoiceRoomInputBar: UIView, UITextViewDelegate {
     public lazy var inputField: PlaceHolderTextView = .init(frame: CGRect(x: 20, y: 14, width: ScreenWidth - 146, height: 34)).delegate(self).font(.systemFont(ofSize: 16, weight: .regular)).backgroundColor(.clear).textColor(.darkText)
 
     lazy var send: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: ScreenWidth - 82, y: 12, width: 67, height: 36)).cornerRadius(18).setGradient([UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1), UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).title(LanguageManager.localValue(key: "Send"), .normal).textColor(.white, .normal).font(.systemFont(ofSize: 16, weight: .regular)).addTargetFor(self, action: #selector(sendMessage), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: ScreenWidth - 82, y: 12, width: 67, height: 36)).cornerRadius(18).setGradient([UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1), UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).title(LanguageManager.localValue(key: "voice_send"), .normal).textColor(.white, .normal).font(.systemFont(ofSize: 16, weight: .regular)).addTargetFor(self, action: #selector(sendMessage), for: .touchUpInside)
     }()
 
     private var limitCount: Int {

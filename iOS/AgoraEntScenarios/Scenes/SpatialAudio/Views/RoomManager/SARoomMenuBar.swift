@@ -11,12 +11,12 @@ import ZSwiftBaseLib
 public final class SARoomMenuBar: UIView {
     var selectClosure: ((IndexPath) -> Void)?
 
-    static let menusMap = [["title": sceneLocalized("All"), "detail": "", "selected": true, "soundType": ""],
-                           ["title": sceneLocalized("Standard"), "detail": "", "selected": false, "soundType": ""],
-                           ["title": sceneLocalized("Spatial Audio"), "detail": "", "selected": false, "soundType": ""]]
+    static let menusMap = [["title": "spatial_voice_app_all".localized_spatial(), "detail": "", "selected": true, "soundType": ""],
+                           ["title": "spatial_voice_standard".localized_spatial(), "detail": "", "selected": false, "soundType": ""],
+                           ["title": "spatial_voice_spatial_audio".localized_spatial(), "detail": "", "selected": false, "soundType": ""]]
 
-    static let menusMap1 = [["title": sceneLocalized("Chat Room"), "detail": "", "selected": false, "soundType": 0],
-                            ["title": sceneLocalized("Spatial Audio Mode Room"), "detail": "", "selected": false, "soundType": 0]]
+    static let menusMap1 = [["title": "spatial_voice_chat_room".localized_spatial(), "detail": "", "selected": false, "soundType": 0],
+                            ["title": "spatial_voice_audio_mode_room".localized_spatial(), "detail": "", "selected": false, "soundType": 0]]
 
     private var indicatorImage = UIImage()
 

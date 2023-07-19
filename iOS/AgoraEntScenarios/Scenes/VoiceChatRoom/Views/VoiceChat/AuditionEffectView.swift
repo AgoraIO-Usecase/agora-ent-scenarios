@@ -27,7 +27,7 @@ final class AuditionEffectView: UIView {
     }()
     
     private lazy var before: UILabel = {
-        UILabel(frame: CGRect(x: 20, y: 28, width: self.whiteContainer.frame.width-40, height: 20)).font(.systemFont(ofSize: 13, weight: .semibold)).textColor(UIColor(0x3C4267)).text("Before".localized())
+        UILabel(frame: CGRect(x: 20, y: 28, width: self.whiteContainer.frame.width-40, height: 20)).font(.systemFont(ofSize: 13, weight: .semibold)).textColor(UIColor(0x3C4267)).text("voice_before".localized())
     }()
     
     private lazy var beforeAnimation: UIImageView = {
@@ -43,7 +43,7 @@ final class AuditionEffectView: UIView {
     }()
     
     private lazy var after: UILabel = {
-        UILabel(frame: CGRect(x: 20, y: self.before.frame.maxY+45, width: self.whiteContainer.frame.width-40, height: 20)).font(.systemFont(ofSize: 13, weight: .semibold)).textColor(UIColor(0x3C4267)).text("After".localized())
+        UILabel(frame: CGRect(x: 20, y: self.before.frame.maxY+45, width: self.whiteContainer.frame.width-40, height: 20)).font(.systemFont(ofSize: 13, weight: .semibold)).textColor(UIColor(0x3C4267)).text("voice_after".localized())
     }()
     
     private lazy var afterAnimation: UIImageView = {
@@ -97,11 +97,11 @@ final class AuditionEffectView: UIView {
         var text = ""
         switch type {
         case .AIAEC:
-            text = "AIAEC Audition".localized()
+            text = "voice_AIAEC_audition".localized()
             self.beforePlaceHolderImage = UIImage.sceneImage(name: "AIAECbefore", bundleName: "VoiceChatRoomResource")!
             self.afterPlaceHolderImage = UIImage.sceneImage(name: "AIAECafter", bundleName: "VoiceChatRoomResource")!
         case .AGC:
-            text = "AGC Audition".localized()
+            text = "voice_AGC_audition".localized()
             self.beforePlaceHolderImage = UIImage.sceneImage(name: "AGCbefore", bundleName: "VoiceChatRoomResource")!
             self.afterPlaceHolderImage = UIImage.sceneImage(name: "AGCafter", bundleName: "VoiceChatRoomResource")!
         default:

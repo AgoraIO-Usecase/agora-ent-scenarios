@@ -205,7 +205,7 @@ class SABaseRtcUserView: UIView {
 
         activeButton.layer.cornerRadius = 8
         activeButton.layer.masksToBounds = true
-        activeButton.setTitle(sceneLocalized( "active"), for: .normal)
+        activeButton.setTitle("spatial_voice_active".localized_spatial(), for: .normal)
         activeButton.setTitleColor(.white, for: .normal)
         activeButton.setBackgroundImage(UIImage.sceneImage(name: "active", bundleName: "VoiceChatRoomResource"), for: .normal)
         activeButton.titleLabel?.font = UIFont.systemFont(ofSize: 9)
