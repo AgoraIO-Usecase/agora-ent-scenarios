@@ -83,18 +83,20 @@ class RoomSoundCardSheetDialog constructor() : BaseSheetDialog<VoiceDialogVirtua
 
     private fun initView() {
         binding?.apply {
-            if (soundCardManager.isEnable()) {
+            if (isPlugIn) {
                 groupSoundCardSwitch.visibility = View.VISIBLE
-                groupSoundCardSettings.visibility = View.VISIBLE
+                groupSoundCardSettings.visibility = if (soundCardManager.isEnable()) View.VISIBLE else View.INVISIBLE
                 groupSoundCardAbnormal.isVisible = false
-                mcbSoundCardSwitch.isChecked = true
-                setupPresetSoundView(soundCardManager.presetSound())
-                setupGainView(soundCardManager.gainValue())
-                setupPresetView(soundCardManager.presetValue())
+                mcbSoundCardSwitch.isChecked = soundCardManager.isEnable()
+                if (soundCardManager.isEnable()){
+                    setupPresetSoundView(soundCardManager.presetSound())
+                    setupGainView(soundCardManager.gainValue())
+                    setupPresetView(soundCardManager.presetValue())
+                }
             } else {
-                groupSoundCardSwitch.visibility = View.VISIBLE
+                groupSoundCardSwitch.visibility = View.INVISIBLE
                 groupSoundCardSettings.visibility = View.INVISIBLE
-                groupSoundCardAbnormal.visibility = View.INVISIBLE
+                groupSoundCardAbnormal.visibility = View.VISIBLE
                 mcbSoundCardSwitch.isChecked = false
             }
 
