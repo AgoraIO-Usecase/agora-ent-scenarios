@@ -10,6 +10,7 @@
 #import "MenuUtils.h"
 #import "AESMacro.h"
 @import YYCategories;
+@import Pure1v1;
 
 @interface VLHomeView ()<UICollectionViewDelegate,UICollectionViewDataSource>
 
@@ -107,6 +108,7 @@
                 @"titleStr":NSLocalizedString(@"app_show_live", nil),
                 @"subTitleStr":@""
             },
+            [Pure1v1Context thumbnailInfo]
         ];
     }
     return _itemsArray;

@@ -1,0 +1,22 @@
+
+@objcMembers
+public class Pure1v1Context: NSObject {
+   public static func thumbnailInfo() -> [String: String] {
+        return [
+            "bgImgStr": UIImage.sceneImagePath(name: "Image/list_bg", bundleName: "Pure1v1")!,
+            "iconImgStr": UIImage.sceneImagePath(name: "Image/list_bg_icon", bundleName: "Pure1v1")!,
+            "titleStr": "1v1私密房",
+            "subTitleStr": ""
+        ]
+//        @{
+//            @"bgImg":UIImageMake(@"home_live_bg"),
+//            @"iconImg":UIImageMake(@"home_live_icon"),
+//            @"titleStr":NSLocalizedString(@"app_show_live", nil),
+//            @"subTitleStr":@""
+//        }
+    }
+    
+    public static func showScene() {
+        
+    }
+}
