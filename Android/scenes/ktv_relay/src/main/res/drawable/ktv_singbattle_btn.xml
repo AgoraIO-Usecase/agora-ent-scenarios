@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--按压效果-->
+    <item
+        android:state_pressed="true"
+        android:background="@mipmap/ktv_start_grasp_waiting">
+    </item>
+
+    <!--正常效果-->
+    <item
+        android:state_pressed="false"
+        android:drawable="@mipmap/ktv_start_grasp">
+    </item>
+</selector>

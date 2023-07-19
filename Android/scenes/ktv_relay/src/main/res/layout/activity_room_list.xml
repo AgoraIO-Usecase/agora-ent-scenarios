@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@mipmap/bg_app_def_white"
+    android:paddingBottom="20dp">
+
+    <io.agora.scene.widget.CommonTitleView
+        android:id="@+id/title_view"
+        style="@style/title_view"
+        app:ctv_centerText="@string/ktv_online"
+        tools:ignore="MissingConstraints" />
+
+
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
+        android:id="@+id/smart_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_view">
+
+        <com.scwang.smart.refresh.header.ClassicsHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRooms"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="20dp"
+            android:paddingBottom="50dp"
+            android:overScrollMode="never"
+            android:visibility="gone"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            tools:listitem="@layout/item_room_list"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
+            tools:visibility="visible"/>
+
+        <com.scwang.smart.refresh.footer.ClassicsFooter
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:visibility="gone"/>
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCreateRoom"
+        style="@style/def_btn_full"
+        android:layout_width="195dp"
+        android:layout_height="wrap_content"
+        android:drawableStart="@mipmap/icon_create_room"
+        android:gravity="center"
+        android:paddingHorizontal="50dp"
+        android:layout_marginBottom="10dp"
+        android:text="@string/ktv_create_room"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTips1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="47dp"
+        android:layout_marginTop="60dp"
+        android:gravity="center"
+        android:text="@string/ktv_create_tips4"
+        android:textColor="@color/def_text_color_3c4"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_view" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBgMobile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="31dp"
+        android:src="@mipmap/bg_mobile_pre"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTips1" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCreateRoom2"
+        android:layout_width="195dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/bg_def_button_solid"
+        android:drawableStart="@mipmap/icon_create_room"
+        android:gravity="center"
+        android:paddingHorizontal="50dp"
+        android:text="@string/ktv_create_room"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivBgMobile" />
+</androidx.constraintlayout.widget.ConstraintLayout>

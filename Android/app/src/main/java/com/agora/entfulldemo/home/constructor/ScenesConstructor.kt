@@ -44,6 +44,14 @@ object ScenesConstructor {
                 R.mipmap.bg_btn_home2,
                 R.mipmap.bg_btn_home_live,
                 true
+            ),
+            ScenesModel(
+                AgoraScenes.SingRelayGame,
+                "io.agora.scene.ktv.singrelay.create.RoomListActivity",
+                context.getString(R.string.app_sing_relay),
+                R.mipmap.bg_btn_home1,
+                R.mipmap.bg_btn_home_ktv,
+                true
             )
         )
     }

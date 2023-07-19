@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ktv_roundStyle">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="ktv_cornerTinyStyle">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
+
+
+    <style name="ktv_cornerNormalStyle">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/ktv_space_normal</item>
+    </style>
+
+    <style name="ktvSongRankBtnStyle">
+        <item name="android:layout_width">76dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_marginStart">3dp</item>
+        <item name="android:layout_marginEnd">3dp</item>
+        <item name="android:button">@null</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/grey_to_white</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="ktvSongEffectBtnStyle">
+        <item name="android:layout_width">90dp</item>
+        <item name="android:layout_height">52dp</item>
+        <item name="android:button">@null</item>
+        <item name="android:layout_marginStart">15dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="ktvScaleBtnStyle">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:button">@null</item>
+        <item name="android:layout_marginEnd">20dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/bg_rbtn_blue_selector</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/def_text_color_white</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="ktvBeautyBtnStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:button">@null</item>
+        <item name="android:layout_marginEnd">25dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:drawablePadding">10dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/grey_to_white</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="ktvBeautyInputStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:drawablePadding">15dp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:elevation">1dp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:maxLength">11</item>
+        <item name="android:textColorHint">#C7C7C7</item>
+        <item name="android:background">@drawable/bg_full_grey_r50</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+</resources>
