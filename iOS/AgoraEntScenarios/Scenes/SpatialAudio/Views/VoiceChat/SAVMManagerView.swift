@@ -125,7 +125,7 @@ class SAVMManagerView: UIView {
         addSubview(lineImgView)
 
         bgView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
-        bgView.backgroundColor = UIColor.HexColor(hex: 0xdad9e3, alpha: 1)
+        bgView.backgroundColor = UIColor(hex: 0xdad9e3, alpha: 1)
         bgView.layer.cornerRadius = 32
         bgView.layer.masksToBounds = true
         addSubview(bgView)
@@ -139,7 +139,7 @@ class SAVMManagerView: UIView {
         iconView.layer.cornerRadius = 32
         iconView.layer.masksToBounds = true
         addSubview(iconView)
-        iconView.layer.borderColor = UIColor.HexColor(hex: 0x979797, alpha: 1).cgColor
+        iconView.layer.borderColor = UIColor(hex: 0x979797, alpha: 1).cgColor
         iconView.layer.borderWidth = 0.5
         iconView.isHidden = true
 
@@ -147,7 +147,7 @@ class SAVMManagerView: UIView {
         nameLabel.text = ""
         nameLabel.textAlignment = .center
         nameLabel.font = UIFont.systemFont(ofSize: 14, weight: .bold)
-        nameLabel.textColor = UIColor.HexColor(hex: 0x333333, alpha: 1)
+        nameLabel.textColor = UIColor(hex: 0x333333, alpha: 1)
         addSubview(nameLabel)
 
         roleBtn.frame = CGRect(x: ScreenWidth / 2.0 - 50, y: 135, width: 100, height: 20)
@@ -159,7 +159,7 @@ class SAVMManagerView: UIView {
         roleBtn.isHidden = true
 
         lineView.frame = CGRect(x: 0, y: 160, width: ScreenWidth, height: 1)
-        lineView.backgroundColor = UIColor.HexColor(hex: 0x979797, alpha: 1)
+        lineView.backgroundColor = UIColor(hex: 0x979797, alpha: 1)
         addSubview(lineView)
 
         inviteBtn.frame = CGRect(x: 20, y: 170, width: ScreenWidth / 3.0 - 40, height: 40)
@@ -193,11 +193,11 @@ class SAVMManagerView: UIView {
         addSubview(lockBtn)
 
         sepView.frame = CGRect(x: ScreenWidth / 3.0, y: 180, width: 1, height: 20)
-        sepView.backgroundColor = UIColor.HexColor(hex: 0x979797, alpha: 1)
+        sepView.backgroundColor = UIColor(hex: 0x979797, alpha: 1)
         addSubview(sepView)
 
         sep2View.frame = CGRect(x: ScreenWidth / 3.0 * 2, y: 180, width: 1, height: 20)
-        sep2View.backgroundColor = UIColor.HexColor(hex: 0x979797, alpha: 1)
+        sep2View.backgroundColor = UIColor(hex: 0x979797, alpha: 1)
         addSubview(sep2View)
     }
 

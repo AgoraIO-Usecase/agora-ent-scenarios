@@ -256,7 +256,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             //房主关闭房间
             if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.id]) {
                 NSString *mes = @"连接超时，房间已解散";
-                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
                     [weakSelf leaveRoom];
                 }];
@@ -299,7 +299,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [[AppContext ktvServiceImp] subscribeRoomWillExpireWith:^{
         bool isOwner = [weakSelf.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
         NSString *mes = isOwner ? @"您已体验超过20分钟，当前房间已过期，请退出重新创建房间" : @"当前房间已过期,请退出";
-        [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
+        [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
             [[VLKTVAlert shared]dismiss];
             [weakSelf leaveRoom];
         }];
@@ -374,7 +374,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //用户弹框离开房间
 - (void)popForceLeaveRoom {
     VL(weakSelf);
-    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:KTVLocalizedString(@"房主已解散房间,请确认离开房间") buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
+    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:KTVLocalizedString(@"room_has_close") buttonTitle:KTVLocalizedString(@"confirm") completion:^(bool flag, NSString * _Nullable text) {
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
 //                [weakSelf destroyMediaPlayer];
@@ -498,6 +498,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                       uid:VLUserCenter.user.id
                                                 tokenType:TokenGeneratorTypeToken006
                                                      type:AgoraTokenTypeRtc
+                                                   expire:1500
                                                   success:^(NSString * token) {
         KTVLogInfo(@"tokenPrivilegeWillExpire rtc renewToken: %@", token);
         [self.RTCkit renewToken:token];
@@ -508,6 +509,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                       uid:VLUserCenter.user.id
                                                 tokenType:TokenGeneratorTypeToken006
                                                      type:AgoraTokenTypeRtm
+                                                   expire:1500
                                                   success:^(NSString * token) {
         KTVLogInfo(@"tokenPrivilegeWillExpire rtm renewToken: %@", token);
         //TODO(chenpan): mcc missing
@@ -1057,9 +1059,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 #pragma mark -- VLKTVTopViewDelegate
 - (void)onVLKTVTopView:(VLKTVTopView *)view closeBtnTapped:(id)sender {
     VL(weakSelf);
-    NSString *title = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"解散房间") : KTVLocalizedString(@"退出房间");
-    NSString *message = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"确定解散该房间吗？") : KTVLocalizedString(@"确定退出该房间吗？");
-    NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"取消"),KTVLocalizedString(@"确定"), nil];
+    NSString *title = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"ktv_disband_room") : KTVLocalizedString(@"ktv_exit_room");
+    NSString *message = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"ktv_confirm_disband_room") : KTVLocalizedString(@"ktv_confirm_exit_room");
+    NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"ktv_cancel"),KTVLocalizedString(@"ktv_confirm"), nil];
     [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
         if(flag == YES){
             [weakSelf leaveRoom];
@@ -1259,9 +1261,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         
         VL(weakSelf);
 
-        NSString *title = KTVLocalizedString(@"切换歌曲");
-        NSString *message = KTVLocalizedString(@"切换下一首歌歌曲？");
-        NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"取消"),KTVLocalizedString(@"确定"), nil];
+        NSString *title = KTVLocalizedString(@"ktv_change_song");
+        NSString *message = KTVLocalizedString(@"ktv_change_next_song");
+        NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"ktv_cancel"),KTVLocalizedString(@"ktv_confirm"), nil];
         [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
             if(flag == YES){
                 if (weakSelf.selSongsArray.count >= 1) {

@@ -99,10 +99,10 @@
         _disButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [_disButton addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
         if(_pass == 0) {
-            [_disButton setTitle:AGLocalizedString(@"不同意") forState:UIControlStateNormal];
+            [_disButton setTitle:AGLocalizedString(@"disagree") forState:UIControlStateNormal];
         }
         else {
-            [_disButton setTitle:AGLocalizedString(@"不同意并退出") forState:UIControlStateNormal];
+            [_disButton setTitle:AGLocalizedString(@"disagree_and_exit") forState:UIControlStateNormal];
         }
         
         [_disButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -123,10 +123,10 @@
         _agreeButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [_agreeButton addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
         if(_pass == 0) {
-            [_agreeButton setTitle:AGLocalizedString(@"同意") forState:UIControlStateNormal];
+            [_agreeButton setTitle:AGLocalizedString(@"agree") forState:UIControlStateNormal];
         }
         else {
-            [_agreeButton setTitle:AGLocalizedString(@"同意并继续") forState:UIControlStateNormal];
+            [_agreeButton setTitle:AGLocalizedString(@"agree_and_goon") forState:UIControlStateNormal];
         }
         
         [_agreeButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];

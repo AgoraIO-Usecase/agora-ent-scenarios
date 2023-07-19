@@ -163,7 +163,7 @@ public class VoiceRoomInputBar: UIView, UITextViewDelegate {
     func convertText(text: NSAttributedString?, key: String) -> NSAttributedString {
         let attribute = NSMutableAttributedString(attributedString: text!)
         let attachment = NSTextAttachment()
-        attachment.image = UIImage(key)
+        attachment.image = UIImage.voice_image(key)
         attachment.bounds = CGRect(x: 0, y: -3.5, width: 18, height: 18)
         let imageText = NSMutableAttributedString(attachment: attachment)
         imageText.addAttributes([.accessibilityTextCustom: key], range: NSMakeRange(0, imageText.length))

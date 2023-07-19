@@ -58,7 +58,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             } else {
                 rtcUserView.micView.isHidden = true
             }
-            rtcUserView.bgIconView.image = UIImage(bgIcon)
+            rtcUserView.bgIconView.image = UIImage.spatial_image(bgIcon)
             rtcUserView.bgIconView.isHidden = mic.member != nil
         case 2:
             bgIcon = mic.member == nil ? "icons／solid／mute" : ""
@@ -68,7 +68,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             } else {
                 rtcUserView.micView.isHidden = true
             }
-            rtcUserView.bgIconView.image = UIImage(bgIcon)
+            rtcUserView.bgIconView.image = UIImage.spatial_image(bgIcon)
             rtcUserView.bgIconView.isHidden = mic.member != nil
         case 3:
             rtcUserView.iconView.isHidden = true
@@ -99,9 +99,9 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
         if status != 5 && status != -2 {
             rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: nil)
         } else {
-            rtcUserView.iconView.image = UIImage(mic.member?.portrait ?? "")
+            rtcUserView.iconView.image = UIImage.spatial_image(mic.member?.portrait ?? "")
         }
-        rtcUserView.nameBtn.setImage(UIImage((mic.mic_index == 0 || mic.mic_index == 3 || mic.mic_index == 6) ? "Landlord" : ""), for: .normal)
+        rtcUserView.nameBtn.setImage(UIImage.spatial_image((mic.mic_index == 0 || mic.mic_index == 3 || mic.mic_index == 6) ? "Landlord" : ""), for: .normal)
         let title = mic.status == -1 ? "\(mic.mic_index)" : (mic.member?.name ?? "\(mic.mic_index)")
         rtcUserView.nameBtn.setTitle(title, for: .normal)
     }

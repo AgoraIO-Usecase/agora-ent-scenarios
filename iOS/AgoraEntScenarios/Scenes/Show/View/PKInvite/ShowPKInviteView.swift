@@ -25,12 +25,12 @@ class ShowPKInviteView: UIView {
             let pkInfo = interactionList?.filter({ $0.interactStatus == .pking }).first
             let pkTipsVisible = pkInfo == nil ? false : true
             _showTipsView(show: pkTipsVisible)
-            pkTipsLabel.text = String(format: "与主播%@PK中".show_localized, pkInfo?.userName ?? "")
+            pkTipsLabel.text = String(format: "show_pking_with_broadcastor".show_localized, pkInfo?.userName ?? "")
         }
     }
     private lazy var titleLabel: AGELabel = {
         let label = AGELabel(colorStyle: .black, fontStyle: .large)
-        label.text = "PK邀请".show_localized
+        label.text = "show_pking_request_message".show_localized
         return label
     }()
     private lazy var statckView: UIStackView = {
@@ -58,7 +58,7 @@ class ShowPKInviteView: UIView {
     }()
     private lazy var endButton: AGEButton = {
         let button = AGEButton()
-        button.setTitle("结束".show_localized, for: .normal)
+        button.setTitle("show_stop_pking".show_localized, for: .normal)
         button.setTitleColor(UIColor(hex: "#684BF2"), for: .normal)
         button.setImage(UIImage.show_sceneImage(name: "show_live_end"),
                         for: .normal,
@@ -70,7 +70,7 @@ class ShowPKInviteView: UIView {
     private lazy var tableView: AGETableView = {
         let view = AGETableView()
         view.rowHeight = 67
-        view.emptyTitle = "暂无主播在线".show_localized
+        view.emptyTitle = "show_empty_online_boardcaster".show_localized
         view.emptyTitleColor = UIColor(hex: "#989DBA")
         view.emptyImage = UIImage.show_sceneImage(name: "show_pkInviteViewEmpty")
         view.delegate = self

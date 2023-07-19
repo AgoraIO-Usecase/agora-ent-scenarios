@@ -78,7 +78,7 @@ class AgoraChatRoomBaseUserCollectionViewCell: UICollectionViewCell {
             bgIcon = "icons／solid／mute"
             rtcUserView.micView.isHidden = mic.member == nil
             rtcUserView.micView.setState(.off)
-            rtcUserView.bgIconView.image = UIImage(bgIcon)
+            rtcUserView.bgIconView.image = UIImage.voice_image(bgIcon)
             rtcUserView.bgIconView.isHidden = false
         case 3:
             rtcUserView.iconView.isHidden = true
@@ -98,7 +98,7 @@ class AgoraChatRoomBaseUserCollectionViewCell: UICollectionViewCell {
         if mic.member?.portrait != nil {
             rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"))
         }
-        rtcUserView.nameBtn.setImage(UIImage(mic.mic_index == 0 ? "Landlord" : ""), for: .normal)
+        rtcUserView.nameBtn.setImage(UIImage.voice_image(mic.mic_index == 0 ? "Landlord" : ""), for: .normal)
         rtcUserView.nameBtn.setTitle(mic.member?.name ?? "\(mic.mic_index)", for: .normal)
     }
 

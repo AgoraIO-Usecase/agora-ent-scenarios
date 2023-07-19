@@ -42,7 +42,7 @@
 
 - (void)commonUI {
     [self setBackgroundImage:@"online_list_BgIcon"];
-    [self setNaviTitleName:KTVLocalizedString(@"创建房间")];
+    [self setNaviTitleName:KTVLocalizedString(@"ktv_create_room")];
     [self setBackBtn];
 }
 

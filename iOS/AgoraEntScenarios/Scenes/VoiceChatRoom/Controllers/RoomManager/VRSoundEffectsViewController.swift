@@ -81,7 +81,7 @@ class VRSoundEffectsViewController: VRBaseViewController {
                         self.createVoiceChatRoom(entity: entity)
                     }else {
                         self.view.window?.isUserInteractionEnabled = true
-                        SVProgressHUD.showError(withStatus: "LoginIM failed!".localized())
+                        SVProgressHUD.showError(withStatus: "LoginIM failed!".voice_localized())
                     }
                 })
             } else  {

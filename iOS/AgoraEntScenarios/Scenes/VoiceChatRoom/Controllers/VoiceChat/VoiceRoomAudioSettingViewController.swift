@@ -111,7 +111,7 @@ class VoiceRoomAudioSettingViewController: UIViewController {
         tableView.tableFooterView = UIView()
         tableView.isScrollEnabled = false
 
-        tableView.separatorColor = UIColor.HexColor(hex: 0xF6F6F6, alpha: 1)
+        tableView.separatorColor = UIColor(hex: 0xF6F6F6, alpha: 1)
 
         if #available(iOS 15.0, *) {
             tableView.sectionHeaderTopPadding = 0
@@ -234,7 +234,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
 
             guard !settingImage.isEmpty else { return cell}
 
-            cell.iconView.image = UIImage(settingImage[0 + indexPath.row])
+            cell.iconView.image = UIImage.voice_image(settingImage[0 + indexPath.row])
             cell.titleLabel.text = settingName[0 + indexPath.row]
             if indexPath.row == 0 {
                 //cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
@@ -261,7 +261,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                     cell.contentLabel.text = "voice_off".localized()
                 }
             } else {
-                cell.contentLabel.text = "Other".localized()
+                cell.contentLabel.text = "Other".voice_localized()
 
             }
 //            else {
@@ -330,7 +330,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             if indexPath.row == 0 {
                 let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
                 guard !settingImage.isEmpty else { return cell}
-                cell.iconView.image = UIImage(settingImage[3])
+                cell.iconView.image = UIImage.voice_image(settingImage[3])
                 cell.titleLabel.text = settingName[3]
                 cell.swith.alpha = isAudience ? 0.5 : 1
                 cell.swith.isUserInteractionEnabled = !isAudience
@@ -346,7 +346,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 let cell: VMSliderTableViewCell = tableView.dequeueReusableCell(withIdentifier: slIdentifier) as! VMSliderTableViewCell
                 guard !settingImage.isEmpty else { return cell}
 
-                cell.iconView.image = UIImage(settingImage[4])
+                cell.iconView.image = UIImage.voice_image(settingImage[4])
                 cell.titleLabel.text = settingName[4]
                 cell.isAudience = isAudience
                 cell.selectionStyle = .none
@@ -369,7 +369,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             }
             guard !settingImage.isEmpty else { return cell}
 
-            cell.iconView.image = UIImage(settingImage[5])
+            cell.iconView.image = UIImage.voice_image(settingImage[5])
             cell.titleLabel.text = settingName[5]
       
 

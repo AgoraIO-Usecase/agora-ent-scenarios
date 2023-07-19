@@ -69,7 +69,7 @@ let page_size = 15
         else {
             navigationController?.popViewController(animated: true)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                SVProgressHUD.showError(withStatus: "voice_im_key_empty_error".localized())
+                SVProgressHUD.showError(withStatus: "voice_im_key_empty_error".voice_localized())
             }
             return
         }
@@ -130,7 +130,7 @@ extension VRRoomsViewController {
                             }
                         } else {
                             self?.loginError = error
-                            self?.view.makeToast("login failed!".localized(), point: CGPoint(x: ScreenWidth/2.0, y: ScreenHeight/2.0), title: nil, image: nil, completion: nil)
+                            self?.view.makeToast("login failed!".voice_localized(), point: CGPoint(x: ScreenWidth/2.0, y: ScreenHeight/2.0), title: nil, image: nil, completion: nil)
                         }
                     })
                 }

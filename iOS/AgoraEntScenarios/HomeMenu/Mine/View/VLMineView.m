@@ -58,7 +58,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
     self.dataArray = [self.itemsArray mutableCopy];
     BOOL developIsOn = [AppContext shared].isDebugMode;
     if (developIsOn) {
-        VLMineCellModel *model = [VLMineCellModel modelWithItemImg:@"mine_debug_icon" title:AGLocalizedString(@"开发者模式") style:VLMineCellStyleSwitch];
+        VLMineCellModel *model = [VLMineCellModel modelWithItemImg:@"mine_debug_icon" title:NSLocalizedString(@"app_debug_mode", nil) style:VLMineCellStyleSwitch];
         [self.dataArray addObject:model];
     }
     _mineTable.frame = CGRectMake(20, _mineTopView.bottom+VLREALVALUE_WIDTH(15), SCREEN_WIDTH-40, VLREALVALUE_WIDTH(58)* self.dataArray.count + 10);
@@ -142,7 +142,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
         _nickNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(_avatarImgView.right+15, _avatarImgView.top+5, 120, 23)];
         _nickNameLabel.font = [UIFont systemFontOfSize:18 weight:UIFontWeightSemibold];
         _nickNameLabel.textColor = UIColorMakeWithHex(@"#040925");
-        _nickNameLabel.text = AGLocalizedString(@"用户名");
+        _nickNameLabel.text = AGLocalizedString(@"userName");
         _nickNameLabel.userInteractionEnabled = YES;
     }
     return _nickNameLabel;
@@ -190,13 +190,13 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 - (NSArray *)itemsArray {
     if (!_itemsArray) {
         _itemsArray = @[
-            [VLMineCellModel modelWithItemImg:@"mine_screct_icon" title:AGLocalizedString(@"用户协议")],
-            [VLMineCellModel modelWithItemImg:@"mine_userRule_icon" title:AGLocalizedString(@"隐私政策")],
-            [VLMineCellModel modelWithItemImg:@"mine_userRule_icon" title:AGLocalizedString(@"个人信息收集清单")],
-            [VLMineCellModel modelWithItemImg:@"mine_userRule_icon" title:AGLocalizedString(@"第三方信息数据共享")],
-            [VLMineCellModel modelWithItemImg:@"mine_aboutus_icon" title:AGLocalizedString(@"关于我们")],
-            [VLMineCellModel modelWithItemImg:@"mine_logout_icon" title:AGLocalizedString(@"退出登录")],
-            [VLMineCellModel modelWithItemImg:@"mine_quit_icon" title:AGLocalizedString(@"注销账号")],
+            [VLMineCellModel modelWithItemImg:@"mine_screct_icon" title:NSLocalizedString(@"app_user_agreement", nil)],
+            [VLMineCellModel modelWithItemImg:@"mine_userRule_icon" title:NSLocalizedString(@"app_privacy_agreement", nil)],
+            [VLMineCellModel modelWithItemImg:@"mine_userRule_icon" title:NSLocalizedString(@"app_personal_info_collection_checklist", nil)],
+            [VLMineCellModel modelWithItemImg:@"mine_userRule_icon" title:NSLocalizedString(@"app_third_party_info_data_sharing", nil)],
+            [VLMineCellModel modelWithItemImg:@"mine_aboutus_icon" title:NSLocalizedString(@"app_about_us", nil)],
+            [VLMineCellModel modelWithItemImg:@"mine_logout_icon" title:NSLocalizedString(@"app_logout", nil)],
+            [VLMineCellModel modelWithItemImg:@"mine_quit_icon" title:NSLocalizedString(@"app_logoff_account", nil)],
         ];
     }
     return _itemsArray;
@@ -208,3 +208,4 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 }
 
 @end
+

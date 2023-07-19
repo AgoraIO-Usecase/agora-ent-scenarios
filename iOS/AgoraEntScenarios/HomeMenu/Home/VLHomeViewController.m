@@ -20,7 +20,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setBackgroundImage:@"home_bg_image"];
-    [self setNaviTitleName:AGLocalizedString(@"声网")];
+    [self setNaviTitleName:AGLocalizedString(@"agora")];
     
     [[NetworkManager shared] reportDeviceInfoWithSceneName: @""];
     

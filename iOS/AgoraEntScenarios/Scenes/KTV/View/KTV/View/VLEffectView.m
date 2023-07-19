@@ -35,7 +35,7 @@
 
 -(void)layoutUI {
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = KTVLocalizedString(@"音效");
+    titleLabel.text = KTVLocalizedString(@"ktv_voice_effect");
     titleLabel.font = UIFontMake(18);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");

@@ -94,7 +94,6 @@ class SAAudioSettingDetailViewController: UIViewController {
                 titleLabel.text = "spatial_voice_AIAEC".localized_spatial()
             } else if settingType == .AGC {
                 titleLabel.text = "spatial_voice_AGC".localized_spatial()
-
             }
             tableView.reloadData()
         }

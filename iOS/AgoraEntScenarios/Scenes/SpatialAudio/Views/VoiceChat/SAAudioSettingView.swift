@@ -251,7 +251,6 @@ extension SAAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 }
             } else {
                 cell.contentLabel.text = "Other".localized_spatial()
-
             }
 //            else {
 //                if roomInfo?.room?.t

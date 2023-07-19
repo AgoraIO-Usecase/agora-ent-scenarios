@@ -98,7 +98,7 @@ class SABaseRtcUserView: UIView {
 
     public var ownerIcon: String = "" {
         didSet {
-            nameBtn.setImage(UIImage(ownerIcon), for: .normal)
+            nameBtn.setImage(UIImage.spatial_image(ownerIcon), for: .normal)
         }
     }
 

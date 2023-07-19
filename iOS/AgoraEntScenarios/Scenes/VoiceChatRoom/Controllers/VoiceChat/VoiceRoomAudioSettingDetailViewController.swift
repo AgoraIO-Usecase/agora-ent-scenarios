@@ -103,7 +103,7 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
     var settingType: AUDIO_SETTING_TYPE = .Spatial {
         didSet {
             if settingType == .Spatial {
-                titleLabel.text = "Spatial Setting".localized()
+                titleLabel.text = "Spatial Setting".voice_localized()
             } else if settingType == .Noise {
                 titleLabel.text = "voice_noise_setting".localized()
             } else if settingType == .effect {
@@ -324,7 +324,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
             text.addAttribute(NSAttributedString.Key.font,
                               value: UIFont.systemFont(ofSize: 13),
                               range: NSRange(location: 0, length: text.length))
-            text.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.HexColor(hex: 0x3C4267, alpha: 1), range: NSRange(location: 0, length: text.length))
+            text.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(hex: 0x3C4267, alpha: 1), range: NSRange(location: 0, length: text.length))
 
             let interactableText = NSMutableAttributedString(string: "www.agora.io")
             interactableText.addAttribute(NSAttributedString.Key.font,
@@ -337,7 +337,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
             interactableText.addAttribute(NSAttributedString.Key.link,
                                           value: "SignInPseudoLink",
                                           range: NSRange(location: 0, length: interactableText.length))
-            interactableText.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.HexColor(hex: 0x3C4267, alpha: 1), range: NSRange(location: 0, length: interactableText.length))
+            interactableText.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(hex: 0x3C4267, alpha: 1), range: NSRange(location: 0, length: interactableText.length))
             text.append(interactableText)
             let paragraph = NSMutableParagraphStyle()
             paragraph.alignment = .center
@@ -393,7 +393,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
                     let warningView = UIView(frame: CGRect(x: 20, y: 40, width: screenWidth - 40, height: 12 + otherSoundHeaderHeight))
                     warningView.layer.cornerRadius = 5
                     warningView.layer.masksToBounds = true
-                    warningView.backgroundColor = UIColor.HexColor(hex: 0xFFF7DC, alpha: 1)
+                    warningView.backgroundColor = UIColor(hex: 0xFFF7DC, alpha: 1)
                     headerView.addSubview(warningView)
 
                     let iconView: UIImageView = .init(frame: CGRect(x: 8, y: 7, width: 16, height: 16))
@@ -401,16 +401,16 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
                     warningView.addSubview(iconView)
 
                     let warningLabel = UILabel(frame: CGRect(x: 30, y: 6, width: screenWidth - 100, height: otherSoundHeaderHeight))
-                    warningLabel.text = "otherSound".localized()
+                    warningLabel.text = "otherSound".voice_localized()
                     warningLabel.numberOfLines = 0
                     warningLabel.lineBreakMode = .byCharWrapping
                     warningLabel.font = UIFont.systemFont(ofSize: 12)
-                    warningLabel.textColor = UIColor.HexColor(hex: 0xE76D21, alpha: 1)
+                    warningLabel.textColor = UIColor(hex: 0xE76D21, alpha: 1)
                     warningView.addSubview(warningLabel)
                 }
             } else {
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-                titleLabel.text = settingType == .Spatial ? "Agora Red Bot" : "voice_AINS_definition".localized()
+                titleLabel.text = settingType == .Spatial ? "voice_red".voice_localized() : "voice_AINS_definition".voice_localized()
                 headerView.addSubview(titleLabel)
             }
 
@@ -507,7 +507,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
                  let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: tIdentifier)!
                  cell.textLabel?.text = "voice_AINS_AI_noise_suppression".localized()
                  cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
-                 cell.textLabel?.textColor = UIColor.HexColor(hex: 0x3C4267, alpha: 1)
+                 cell.textLabel?.textColor = UIColor(hex: 0x3C4267, alpha: 1)
                  cell.isUserInteractionEnabled = false
                  cell.selectionStyle = .none
                  return cell

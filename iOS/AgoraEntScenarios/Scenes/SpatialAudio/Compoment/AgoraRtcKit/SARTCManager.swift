@@ -250,7 +250,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
                 blueMediaPlayer?.stop()
                 delegate?.reportAlien?(with: .ended, musicType: musicType)
             } else {
-                let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "spatial_voice_lau".localized() : "EN"
+                let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "spatial_voice_lau".spatial_localized() : "EN"
                 musicPath = musicPath.replacingOccurrences(of: "CN", with: lanuagePath)
                 print("musicPath:\(musicPath)")
                 if musicPath.contains("-B-") {
@@ -409,7 +409,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
      */
     public func playMusic(with type: SARtcType.VMMUSIC_TYPE, isPlay: Bool) {
         if isPlay {
-            let lanuage = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "spatial_voice_lau".localized() : "EN"
+            let lanuage = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "spatial_voice_lau".spatial_localized() : "EN"
             let redPath = "https://download.agora.io/demo/test/spatial-\(lanuage)-red.wav"
             let bluePath = "https://download.agora.io/demo/test/spatial-\(lanuage)-blue.wav"
             blueMediaPlayer?.open(bluePath, startPos: 0)
