@@ -19,7 +19,6 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
     
-    var settingManager: ShowAgoraKitManager!
     var musicManager: ShowMusicManager!
     
     // 当前设置的预设值名称
@@ -151,7 +150,6 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         }
         
         let vc = ShowVideoSettingVC()
-        vc.settingManager = settingManager
         vc.musicManager = musicManager
         vc.isOutside = isOutside
         vc.currentChannelId = currentChannelId
@@ -196,7 +194,7 @@ extension ShowAdvancedSettingVC {
     @objc private func didClickPreSetBarButton() {
         let vc = ShowPresettingVC()
         vc.didSelectedPresetType = {[weak self] type, modeName in
-            self?.settingManager.updatePresetForType(type, mode: self?.mode ?? .single)
+            ShowAgoraKitManager.shared.updatePresetForType(type, mode: self?.mode ?? .single)
             self?.videoSettingVC?.reloadData()
             self?.audioSettingVC?.reloadData()
             let text1 = "show_presetting_update_toast1".show_localized
@@ -207,10 +205,6 @@ extension ShowAdvancedSettingVC {
         present(vc, animated: true)
     }
     
-    // 点击保存按钮
-    @objc private func didClickSaveBarButton() {
-        
-    }
 }
 
 extension ShowAdvancedSettingVC:  AEAListContainerViewDataSource{
