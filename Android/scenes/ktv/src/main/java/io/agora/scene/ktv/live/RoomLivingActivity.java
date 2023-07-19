@@ -225,11 +225,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
         getBinding().lrcControlView.post(() -> {
             // TODO workaround 先强制申请权限， 避免首次安装无声
-            if(roomLivingViewModel.isRoomOwner()){
+            if (roomLivingViewModel.isRoomOwner()) {
                 toggleAudioRun = () -> roomLivingViewModel.init();
                 requestRecordPermission();
-            }
-            else{
+            } else {
                 roomLivingViewModel.init();
             }
         });
@@ -394,7 +393,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 }
 
                 if (seatModel.getChorusSongCode() != null && roomLivingViewModel.songPlayingLiveData.getValue() != null && seatModel.getChorusSongCode().equals(roomLivingViewModel.songPlayingLiveData.getValue().getSongNo() + roomLivingViewModel.songPlayingLiveData.getValue().getCreateAt())) {
-                    chorusNowNum ++;
+                    chorusNowNum++;
                 }
 
                 if (roomLivingViewModel.mSetting.getHighLighterUid().equals(seatModel.getRtcUid()) && !seatModel.getChorusSongCode().equals("")) {
@@ -739,6 +738,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     private boolean showChooseSongDialogTag = false;
+
     private void showChooseSongDialog() {
         if (showChooseSongDialogTag) {
             return;
@@ -777,6 +777,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     private boolean showMoreDialogTag = false;
+
     private void showMoreDialog(View view) {
         if (showMoreDialogTag) {
             return;
@@ -797,6 +798,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     private boolean showVoiceHighlightDialogTag = false;
+
     private void showVoiceHighlightDialog() {
         if (showVoiceHighlightDialogTag) {
             return;
@@ -809,7 +811,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 public void onUserListLoad() {
                     List<VoiceHighlightBean> list = new ArrayList<>();
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        if (roomLivingViewModel.seatListLiveData.getValue() == null || roomLivingViewModel.songPlayingLiveData.getValue() == null) return;
+                        if (roomLivingViewModel.seatListLiveData.getValue() == null || roomLivingViewModel.songPlayingLiveData.getValue() == null)
+                            return;
                         AtomicBoolean hasChorus = new AtomicBoolean(false);
                         roomLivingViewModel.seatListLiveData.getValue().forEach(seat -> {
                             if (seat.getChorusSongCode().equals(roomLivingViewModel.songPlayingLiveData.getValue().getSongNo() + roomLivingViewModel.songPlayingLiveData.getValue().getCreateAt())) {
@@ -847,7 +850,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     private void showMusicSettingDialog() {
         //if (musicSettingDialog == null) {
-            musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting, roomLivingViewModel.playerMusicStatusLiveData.getValue() == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE);
+        musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting,
+                roomLivingViewModel.mSoundCardSettingBean,
+                roomLivingViewModel.playerMusicStatusLiveData.getValue() == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE);
         //}
         musicSettingDialog.show(getSupportFragmentManager(), MusicSettingDialog.TAG);
     }

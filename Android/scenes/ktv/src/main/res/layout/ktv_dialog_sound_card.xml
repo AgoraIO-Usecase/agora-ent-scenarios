@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:theme="@style/Theme.AppCompat"
+    android:paddingBottom="24dp"
+    android:background="@drawable/bg_full_blue_top_20">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_full_blue_top_20"
+        app:layout_constraintTop_toTopOf="@+id/ivBottomSheetTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/mtBottomSheetTitle"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBottomSheetTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBackIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="9dp"
+        android:src="@mipmap/back_empty_white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/mtBottomSheetTitle"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textSize="18sp"
+        android:text="@string/ktv_virtual_sound_card"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
+
+    <!-- 输入设备  -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtInputDevice"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/ktv_input_device"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:text="@string/ktv_external_mircrophone"
+        android:textColor="@color/grey_e1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/mtInputDevice"
+        app:layout_constraintBottom_toBottomOf="@id/mtInputDevice" />
+
+    <!--虚拟声卡开关  -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtSoundCardSwitch"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/ktv_sound_card_switch"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtInputDevice" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/mcbSoundCardSwitch"
+        android:layout_width="45dp"
+        android:layout_height="28dp"
+        android:layout_marginEnd="20dp"
+        android:checked="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/mtSoundCardSwitch"
+        app:layout_constraintBottom_toBottomOf="@+id/mtSoundCardSwitch"
+        android:button="@drawable/cb_def_selector" />
+
+    <!--  预设音效  -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtPresetSound"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/ktv_preset_sound"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtSoundCardSwitch" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutPresetSound"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:background="@drawable/ktv_bg_rect_radius32_blue"
+        android:padding="12dp"
+        app:layout_constraintCircleRadius="20dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/mtPresetSound">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivPresetSoundAvatar"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/portrait01"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearance="@style/ktv_roundStyle" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideHorizontal50"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtPresetSoundType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="11dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toTopOf="@id/guideHorizontal50"
+            app:layout_constraintStart_toEndOf="@id/ivPresetSoundAvatar"
+            tools:text="Susan Stark" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtPresetSoundTypeTips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="11dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:textColor="@color/grey_e1"
+            android:textSize="12sp"
+            app:layout_constraintStart_toEndOf="@id/ivPresetSoundAvatar"
+            app:layout_constraintTop_toBottomOf="@id/guideHorizontal50"
+            tools:text="Susan Stark" />
+
+        <Spinner
+            android:id="@+id/spinnerPresetSound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--  增益调节  -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtGainAdjust"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/ktv_gain_adjust"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutPresetSound" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtGainAdjustValue"
+        android:layout_height="wrap_content"
+        android:layout_width="30dp"
+        android:layout_marginEnd="20dp"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="3.1f"
+        android:gravity="end"
+        app:layout_constraintTop_toTopOf="@id/mtGainAdjust"
+        app:layout_constraintBottom_toBottomOf="@id/mtGainAdjust"/>
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/pbGainAdjustValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:contentDescription="@string/ktv_gain_adjust"
+        android:max="40"
+        tools:progress="10"
+        android:layout_marginStart="120dp"
+        android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
+        android:thumb="@mipmap/ic_seekbar_btn"
+        app:layout_constraintEnd_toStartOf="@id/mtGainAdjustValue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/mtGainAdjust"
+        app:layout_constraintBottom_toBottomOf="@id/mtGainAdjust"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtGainAdjustTips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:text="@string/ktv_gain_adjust_tips"
+        android:textColor="@color/grey_d5"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@id/mtGainAdjust"
+        app:layout_constraintTop_toBottomOf="@id/mtGainAdjust" />
+
+    <!--  麦克风类型  -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtMircoPhoneType"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/ktv_gain_adjust"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mtGainAdjustTips" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtMircoPhoneTypeValue"
+        android:layout_height="wrap_content"
+        android:layout_width="30dp"
+        android:layout_marginEnd="20dp"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="3.1f"
+        android:gravity="end"
+        app:layout_constraintTop_toTopOf="@id/mtMircoPhoneType"
+        app:layout_constraintBottom_toBottomOf="@id/mtMircoPhoneType"/>
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/pbMircoPhoneTypeValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:contentDescription="@string/ktv_mircrophone_type"
+        android:max="4"
+        tools:progress="2"
+        android:layout_marginStart="120dp"
+        android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
+        android:thumb="@mipmap/ic_seekbar_btn"
+        app:layout_constraintEnd_toStartOf="@id/mtMircoPhoneTypeValue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/mtMircoPhoneType"
+        app:layout_constraintBottom_toBottomOf="@id/mtMircoPhoneType"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtMircoPhoneTypeTips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:text="@string/ktv_gain_adjust_tips"
+        android:textColor="@color/grey_d5"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@id/mtMircoPhoneType"
+        app:layout_constraintTop_toBottomOf="@id/mtMircoPhoneType" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvSoundCardError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:drawableStart="@mipmap/ic_tip"
+        android:drawablePadding="5dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/ktv_sound_card_error"
+        android:textColor="@color/red_e0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mtInputDevice" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvSoundCardSupport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:lineSpacingExtra="3dp"
+        android:text="@string/ktv_sound_card_supports"
+        android:textColor="@color/grey_e5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSoundCardError" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupSoundCardAbnormal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="tvSoundCardError,tvSoundCardSupport"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupSoundCardSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="mtSoundCardSwitch,mcbSoundCardSwitch"
+        tools:visibility="invisible" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupSoundCardSettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="mtPresetSound,layoutPresetSound,
+mtGainAdjust,mtGainAdjustValue,pbGainAdjustValue,mtGainAdjustTips,
+mtMircoPhoneType,mtMircoPhoneTypeValue,pbMircoPhoneTypeValue,mtMircoPhoneTypeTips"
+        tools:visibility="invisible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
