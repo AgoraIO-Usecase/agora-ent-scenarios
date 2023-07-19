@@ -21,7 +21,7 @@ class VMNoticeView: UIView {
     private var limLabel: UILabel = .init()
     private var editBtn: UIButton = .init()
 
-    private let placeHolder: String = "voice_announce_to_chatroom_140_character_limit".localized()
+    private let placeHolder: String = "voice_announce_to_chatroom_140_character_limit".voice_localized()
 
     var resBlock: ((Bool, String?) -> Void)?
 
@@ -45,7 +45,7 @@ class VMNoticeView: UIView {
 
     var noticeStr: String = "" {
         didSet {
-            let notice = noticeStr.count == 0 ? "voice_welcome".localized() : noticeStr
+            let notice = noticeStr.count == 0 ? "voice_welcome".voice_localized() : noticeStr
             tv.text = notice
             limLabel.text = "\(notice.count)/140"
         }
@@ -107,7 +107,7 @@ class VMNoticeView: UIView {
         addSubview(titleLabel)
 
         tv.frame = CGRect(x: 10, y: 60, width: ScreenWidth - 20, height: 160)
-        tv.text = "voice_welcome".localized()
+        tv.text = "voice_welcome".voice_localized()
         tv.setPlaceholder(text: placeHolder)
         tv.textColor = UIColor(red: 0.235, green: 0.257, blue: 0.403, alpha: 1)
         tv.font = UIFont.systemFont(ofSize: 14)

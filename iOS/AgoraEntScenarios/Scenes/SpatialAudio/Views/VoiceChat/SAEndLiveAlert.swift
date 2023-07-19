@@ -16,10 +16,10 @@ public final class SAEndLiveAlert: UIView {
 
     lazy var content: UILabel = .init(frame: CGRect(x: 20, y: self.title.frame.maxY + 20, width: self.frame.width - 40, height: 28)).font(.systemFont(ofSize: 14, weight: .regular)).textAlignment(.center).textColor(UIColor(0x6C7192))
 
-    lazy var cancel: UIButton = .init(type: .custom).frame(CGRect(x: 28, y: self.content.frame.maxY + 35, width: (self.frame.width - 78) / 2.0, height: 40)).cornerRadius(20).backgroundColor(UIColor(0xEFF4FF)).textColor(UIColor(0x756E98), .normal).title("spatial_voice_cancel".localized_spatial(), .normal).font(.systemFont(ofSize: 16, weight: .semibold)).tag(30).addTargetFor(self, action: #selector(buttonAction(_:)), for: .touchUpInside)
+    lazy var cancel: UIButton = .init(type: .custom).frame(CGRect(x: 28, y: self.content.frame.maxY + 35, width: (self.frame.width - 78) / 2.0, height: 40)).cornerRadius(20).backgroundColor(UIColor(0xEFF4FF)).textColor(UIColor(0x756E98), .normal).title("spatial_voice_cancel".spatial_localized(), .normal).font(.systemFont(ofSize: 16, weight: .semibold)).tag(30).addTargetFor(self, action: #selector(buttonAction(_:)), for: .touchUpInside)
 
     lazy var confirm: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.cancel.frame.maxX + 22, y: self.content.frame.maxY + 35, width: (self.frame.width - 78) / 2.0, height: 40)).cornerRadius(20).textColor(.white, .normal).title("spatial_voice_confirm".localized_spatial(), .normal).font(.systemFont(ofSize: 16, weight: .semibold)).setGradient([UIColor(red: 0.13, green: 0.61, blue: 1, alpha: 1), UIColor(red: 0.2, green: 0.37, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).tag(31).addTargetFor(self, action: #selector(buttonAction(_:)), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: self.cancel.frame.maxX + 22, y: self.content.frame.maxY + 35, width: (self.frame.width - 78) / 2.0, height: 40)).cornerRadius(20).textColor(.white, .normal).title("spatial_voice_confirm".spatial_localized(), .normal).font(.systemFont(ofSize: 16, weight: .semibold)).setGradient([UIColor(red: 0.13, green: 0.61, blue: 1, alpha: 1), UIColor(red: 0.2, green: 0.37, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).tag(31).addTargetFor(self, action: #selector(buttonAction(_:)), for: .touchUpInside)
     }()
 
     lazy var confirmContainer: UIView = .init(frame: self.confirm.frame).backgroundColor(.white)

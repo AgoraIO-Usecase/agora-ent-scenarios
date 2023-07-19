@@ -71,7 +71,7 @@ class SABaseAlienCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(cornerView)
 
         blueAlienView.iconImgUrl = "blue"
-        blueAlienView.nameStr = "spatial_voice_blue".localized_spatial()
+        blueAlienView.nameStr = "spatial_voice_blue".spatial_localized()
         blueAlienView.cellType = .AgoraChatRoomBaseUserCellTypeAlienNonActive
         blueAlienView.clickBlock = {
             guard let clickVBlock = self.clickVBlock else {
@@ -88,7 +88,7 @@ class SABaseAlienCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(blueCoverView)
 
         redAlienView.iconImgUrl = "red"
-        redAlienView.nameStr = "spatial_voice_red".localized_spatial()
+        redAlienView.nameStr = "spatial_voice_red".spatial_localized()
         redAlienView.cellType = .AgoraChatRoomBaseUserCellTypeAlienNonActive
         redAlienView.clickBlock = {
             guard let clickVBlock = self.clickVBlock else {

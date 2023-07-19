@@ -130,7 +130,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
         self.roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
 //        self.roomInfo?.room?.member_list?.append(user)
 //        AppContext.saTmpServiceImp().userList = self.roomInfo?.room?.member_list ?? []
-        self.convertShowText(userName: user.name ?? "", content: "spatial_voice_joined".localized_spatial(), joined: true)
+        self.convertShowText(userName: user.name ?? "", content: "spatial_voice_joined".spatial_localized(), joined: true)
     }
     
     func onRobotVolumeUpdated(roomId: String, volume: String) {
@@ -295,7 +295,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                 if let host: SAUser = roomInfo?.room?.owner {
                     if host.uid == fromId && status == -1 {
                         AppContext.saTmpServiceImp().userList.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
-                        view.makeToast("spatial_voice_removed_stage".localized_spatial())
+                        view.makeToast("spatial_voice_removed_stage".spatial_localized())
                     }  else {
                         rtckit.muteLocalAudioStream(mute: seatUser == nil)
                         self.refreshApplicants(chat_uid: fromId)

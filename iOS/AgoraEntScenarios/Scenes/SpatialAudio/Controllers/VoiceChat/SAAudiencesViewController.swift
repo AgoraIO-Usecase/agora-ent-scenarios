@@ -11,7 +11,7 @@ import ZSwiftBaseLib
 public final class SAAudiencesViewController: UITableViewController {
     var datas: [SAUser]?
 
-    lazy var empty: SAEmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "spatial_voice_no_audience_yet".localized_spatial(), image: nil)
+    lazy var empty: SAEmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "spatial_voice_no_audience_yet".spatial_localized(), image: nil)
 
     override public func viewDidLoad() {
         super.viewDidLoad()

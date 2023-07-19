@@ -116,7 +116,7 @@ class VMANISSUPTableViewCell: UITableViewCell {
 
         noneBtn.frame = CGRect(x: screenWidth - 70, y: 12, width: 50, height: 30)
         noneBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
-        noneBtn.setTitle("voice_without_AINS".localized(), for: .normal)
+        noneBtn.setTitle("voice_without_AINS".voice_localized(), for: .normal)
         noneBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
         noneBtn.font(UIFont.systemFont(ofSize: 11))
         noneBtn.layer.cornerRadius = 3
@@ -126,7 +126,7 @@ class VMANISSUPTableViewCell: UITableViewCell {
 
         anisBtn.frame = CGRect(x: screenWidth - 130, y: 12, width: 50, height: 30)
         anisBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
-        anisBtn.setTitle("voice_with_AINS".localized(), for: .normal)
+        anisBtn.setTitle("voice_with_AINS".voice_localized(), for: .normal)
         anisBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
         anisBtn.font(UIFont.systemFont(ofSize: 11))
         anisBtn.layer.cornerRadius = 3

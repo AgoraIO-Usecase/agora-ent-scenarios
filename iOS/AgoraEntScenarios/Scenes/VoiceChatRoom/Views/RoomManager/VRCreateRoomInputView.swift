@@ -56,7 +56,7 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
         let host = NSMutableAttributedString(attachment: attachment)
         space.append(host)
         space.append(NSAttributedString {
-            AttributedText("voice_demo_test_desc".localized()).foregroundColor(UIColor(0x3C4267)).font(.systemFont(ofSize: 12, weight: .regular)).lineBreakeMode(.byCharWrapping).alignment(.center)
+            AttributedText("voice_demo_test_desc".voice_localized()).foregroundColor(UIColor(0x3C4267)).font(.systemFont(ofSize: 12, weight: .regular)).lineBreakeMode(.byCharWrapping).alignment(.center)
         })
         return space
     }()
@@ -160,7 +160,7 @@ public extension VRCreateRoomInputView {
                 }
             } else {
                 if roomNameField.text?.isEmpty ?? true {
-                    superview?.superview?.makeToast("voice_no_room_name".localized(), point: superview?.superview?.center ?? .zero, title: nil, image: nil, completion: nil)
+                    superview?.superview?.makeToast("voice_no_room_name".voice_localized(), point: superview?.superview?.center ?? .zero, title: nil, image: nil, completion: nil)
                 }
             }
         } else {
@@ -169,7 +169,7 @@ public extension VRCreateRoomInputView {
                     action!()
                 }
             } else {
-                superview?.superview?.makeToast("voice_no_room_name".localized(), point: superview?.superview?.center ?? .zero, title: nil, image: nil, completion: nil)
+                superview?.superview?.makeToast("voice_no_room_name".voice_localized(), point: superview?.superview?.center ?? .zero, title: nil, image: nil, completion: nil)
             }
         }
     }

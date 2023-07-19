@@ -68,7 +68,7 @@ public class SAChatBar: UIView, UICollectionViewDelegate, UICollectionViewDataSo
         }
         addSubViews([chatRaiser, toolBar])
         chatRaiser.setImage(UIImage.sceneImage(name:"chatraise"), for: .normal)
-        chatRaiser.setTitle(" " + "spatial_voice_let's_chat!".localized_spatial(), for: .normal)
+        chatRaiser.setTitle(" " + "spatial_voice_let's_chat!".spatial_localized(), for: .normal)
         chatRaiser.titleEdgeInsets = UIEdgeInsets(top: chatRaiser.titleEdgeInsets.top, left: 10, bottom: chatRaiser.titleEdgeInsets.bottom, right: 10)
         chatRaiser.imageEdgeInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 80)
         chatRaiser.contentHorizontalAlignment = .left
@@ -83,7 +83,7 @@ public class SAChatBar: UIView, UICollectionViewDelegate, UICollectionViewDataSo
             pop.cornerRadius = 12
             pop.shouldConsiderCutoutTapSeparately = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                pop.show(customView: UILabel(frame: CGRect(x: 0, y: 0, width: 140, height: 31)).text("Try Best Agora Sound".localized_spatial()).font(.systemFont(ofSize: 12, weight: .regular)).textAlignment(.center).backgroundColor(UIColor(0x0CA5FD)).textColor(.white), direction: .up, in: self, from: CGRect(x: self.frame.width - (style == .normal ? 110 : 55), y: self.toolBar.visibleCells[2].frame.origin.y, width: self.toolBar.visibleCells[2].frame.width, height: self.toolBar.visibleCells[2].frame.height))
+                pop.show(customView: UILabel(frame: CGRect(x: 0, y: 0, width: 140, height: 31)).text("spatial_voice_try_best_agora_sound".spatial_localized()).font(.systemFont(ofSize: 12, weight: .regular)).textAlignment(.center).backgroundColor(UIColor(0x0CA5FD)).textColor(.white), direction: .up, in: self, from: CGRect(x: self.frame.width - (style == .normal ? 110 : 55), y: self.toolBar.visibleCells[2].frame.origin.y, width: self.toolBar.visibleCells[2].frame.width, height: self.toolBar.visibleCells[2].frame.height))
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
                 pop.hide()

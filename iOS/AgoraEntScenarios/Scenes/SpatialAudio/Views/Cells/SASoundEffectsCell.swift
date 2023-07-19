@@ -23,7 +23,7 @@ public class SASoundEffectsCell: UITableViewCell, UICollectionViewDelegate, UICo
 
     lazy var line: UIView = .init(frame: CGRect(x: 20, y: self.effectDesc.frame.maxY + 6, width: self.effectDesc.frame.width, height: 1)).backgroundColor(UIColor(0xF6F6F6))
 
-    lazy var customUsage: UILabel = .init(frame: CGRect(x: 20, y: self.effectDesc.frame.maxY + 10, width: 200, height: 15)).font(.systemFont(ofSize: 11, weight: .regular)).textColor(UIColor(0xD8D8D8)).text("spatial_voice_current_customer_usage".localized_spatial())
+    lazy var customUsage: UILabel = .init(frame: CGRect(x: 20, y: self.effectDesc.frame.maxY + 10, width: 200, height: 15)).font(.systemFont(ofSize: 11, weight: .regular)).textColor(UIColor(0xD8D8D8)).text("spatial_voice_current_customer_usage".spatial_localized())
 
     lazy var flowLayout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
@@ -61,22 +61,22 @@ extension SASoundEffectsCell {
     static func items() -> [SARoomMenuBarEntity] {
         var items = [SARoomMenuBarEntity]()
         do {
-            for dic in [["title": "spatial_voice_chatroom_social_chat_introduce".localized_spatial(),
+            for dic in [["title": "spatial_voice_chatroom_social_chat_introduce".spatial_localized(),
                          "selected": true,
                          "index": 0,
                          "soundType": 1],
-                        ["title": "spatial_voice_karaoke".localized_spatial(),
-                         "detail": "spatial_voice_chatroom_karaoke_introduce".localized_spatial(),
+                        ["title": "spatial_voice_karaoke".spatial_localized(),
+                         "detail": "spatial_voice_chatroom_karaoke_introduce".spatial_localized(),
                          "selected": false,
                          "index": 1,
                          "soundType": 2],
-                        ["title": "spatial_voice_gaming_buddy".localized_spatial(),
-                         "detail": "spatial_voice_chatroom_gaming_buddy_introduce".localized_spatial(),
+                        ["title": "spatial_voice_gaming_buddy".spatial_localized(),
+                         "detail": "spatial_voice_chatroom_gaming_buddy_introduce".spatial_localized(),
                          "selected": false,
                          "index": 2,
                          "soundType": 3],
-                        ["title": "spatial_voice_professional_podcaster".localized_spatial(),
-                         "detail": "spatial_voice_chatroom_professional_broadcaster_introduce".localized_spatial(),
+                        ["title": "spatial_voice_professional_podcaster".spatial_localized(),
+                         "detail": "spatial_voice_chatroom_professional_broadcaster_introduce".spatial_localized(),
                          "selected":
                             false,
                          "index": 3,

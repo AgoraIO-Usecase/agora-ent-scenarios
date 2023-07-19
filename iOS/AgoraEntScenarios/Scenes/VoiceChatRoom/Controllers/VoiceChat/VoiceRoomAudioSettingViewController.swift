@@ -37,7 +37,7 @@ class VoiceRoomAudioSettingViewController: UIViewController {
 //    private var settingName: [String] = ["\(LanguageManager.localValue(key: "blue")) & \(LanguageManager.localValue(key: "red"))", LanguageManager.localValue(key: "Robot Volume"), LanguageManager.localValue(key: "Best Sound"), "AINS", "Spatial Audio"]
 //    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
     
-    private var settingName: [String] = [LanguageManager.localValue(key: "voice_AINS"),LanguageManager.localValue(key: "voice_AIAEC"),LanguageManager.localValue(key: "voice_AGC"),LanguageManager.localValue(key: "voice_agora_blue_and_red_bot"), LanguageManager.localValue(key: "voice_robot_volume"), LanguageManager.localValue(key: "voice_best_agora_sound"), "voice_spatial_audio".localized()]
+    private var settingName: [String] = [LanguageManager.localValue(key: "voice_AINS"),LanguageManager.localValue(key: "voice_AIAEC"),LanguageManager.localValue(key: "voice_AGC"),LanguageManager.localValue(key: "voice_agora_blue_and_red_bot"), LanguageManager.localValue(key: "voice_robot_volume"), LanguageManager.localValue(key: "voice_best_agora_sound"), "voice_spatial_audio".voice_localized()]
     
     
     
@@ -240,25 +240,25 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 //cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
                 switch ains_state {
                 case .high:
-                    cell.contentLabel.text = "voice_High".localized()
+                    cell.contentLabel.text = "voice_High".voice_localized()
                 case .mid:
-                    cell.contentLabel.text = "voice_Medium".localized()
+                    cell.contentLabel.text = "voice_Medium".voice_localized()
                 case .off:
-                    cell.contentLabel.text = "voice_off".localized()
+                    cell.contentLabel.text = "voice_off".voice_localized()
                 }
                 
                 
             } else if indexPath.row == 1 {
                 if roomInfo?.room?.turn_AIAEC == true {
-                    cell.contentLabel.text = "voice_on".localized()
+                    cell.contentLabel.text = "voice_on".voice_localized()
                 } else {
-                    cell.contentLabel.text = "voice_off".localized()
+                    cell.contentLabel.text = "voice_off".voice_localized()
                 }
             } else if indexPath.row == 2 {
                 if roomInfo?.room?.turn_AGC == true {
-                    cell.contentLabel.text = "voice_on".localized()
+                    cell.contentLabel.text = "voice_on".voice_localized()
                 } else {
-                    cell.contentLabel.text = "voice_off".localized()
+                    cell.contentLabel.text = "voice_off".voice_localized()
                 }
             } else {
                 cell.contentLabel.text = "Other".voice_localized()
@@ -378,11 +378,11 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             } else if indexPath.row == 1 {
                 switch ains_state {
                 case .high:
-                    cell.contentLabel.text = "voice_High".localized()
+                    cell.contentLabel.text = "voice_High".voice_localized()
                 case .mid:
-                    cell.contentLabel.text = "voice_Medium".localized()
+                    cell.contentLabel.text = "voice_Medium".voice_localized()
                 case .off:
-                    cell.contentLabel.text = "voice_off".localized()
+                    cell.contentLabel.text = "voice_off".voice_localized()
                 }
             }
             return cell
@@ -523,18 +523,18 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
     }
     
     private func getSoundType(with index: Int) -> String {
-        var soundType: String = "voice_social_chat".localized()
+        var soundType: String = "voice_social_chat".voice_localized()
         switch index {
         case 1:
-            soundType = "voice_social_chat".localized()
+            soundType = "voice_social_chat".voice_localized()
         case 2:
-            soundType = "voice_karaoke".localized()
+            soundType = "voice_karaoke".voice_localized()
         case 3:
-            soundType = "voice_gaming_buddy".localized()
+            soundType = "voice_gaming_buddy".voice_localized()
         case 4:
-            soundType = "voice_professional_podcaster".localized()
+            soundType = "voice_professional_podcaster".voice_localized()
         default:
-            soundType = "voice_social_chat".localized()
+            soundType = "voice_social_chat".voice_localized()
         }
         return soundType
     }

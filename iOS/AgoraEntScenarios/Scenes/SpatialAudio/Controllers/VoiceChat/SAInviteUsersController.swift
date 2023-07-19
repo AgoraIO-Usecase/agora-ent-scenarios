@@ -16,7 +16,7 @@ public class SAInviteUsersController: UITableViewController {
 
     private var idx = 0
 
-    lazy var empty: SAEmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "spatial_voice_no_audience_yet".localized_spatial(), image: nil).backgroundColor(.white)
+    lazy var empty: SAEmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "spatial_voice_no_audience_yet".spatial_localized(), image: nil).backgroundColor(.white)
 
     public convenience init(roomId: String, mic_index: Int?) {
         self.init()
@@ -104,7 +104,7 @@ extension SAInviteUsersController {
         AppContext.saServiceImp().startMicSeatInvitation(chatUid: chat_uid, index: idx < 0 ? nil : idx) {[weak self] error, flag in
             SVProgressHUD.dismiss()
             guard let self = self else {return}
-            self.view.makeToast(flag == true ? "spatial_voice_invitation_sent".localized_spatial() : "spatial_voice_invited_failed".localized_spatial())
+            self.view.makeToast(flag == true ? "spatial_voice_invitation_sent".spatial_localized() : "spatial_voice_invited_failed".spatial_localized())
         }
 
     }

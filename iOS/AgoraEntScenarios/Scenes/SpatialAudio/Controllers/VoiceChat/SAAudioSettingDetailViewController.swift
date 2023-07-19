@@ -40,10 +40,10 @@ class SAAudioSettingDetailViewController: UIViewController {
     var soundEffect: Int = 1 {
         didSet {
 
-            let socialH: CGFloat = textHeight(text: "spatial_voice_chatroom_social_chat_introduce".localized_spatial(), fontSize: 13, width: self.view.bounds.size.width - 80)
-            let ktvH: CGFloat = textHeight(text: "spatial_voice_chatroom_karaoke_introduce".localized_spatial(), fontSize: 13, width: self.view.bounds.size.width - 80)
-            let gameH: CGFloat = textHeight(text: "spatial_voice_chatroom_gaming_buddy_introduce".localized_spatial(), fontSize: 13, width: self.view.bounds.size.width - 80)
-            let anchorH: CGFloat = textHeight(text: "spatial_voice_chatroom_professional_broadcaster_introduce".localized_spatial(), fontSize: 13, width: self.view.bounds.size.width - 80)
+            let socialH: CGFloat = textHeight(text: "spatial_voice_chatroom_social_chat_introduce".spatial_localized(), fontSize: 13, width: self.view.bounds.size.width - 80)
+            let ktvH: CGFloat = textHeight(text: "spatial_voice_chatroom_karaoke_introduce".spatial_localized(), fontSize: 13, width: self.view.bounds.size.width - 80)
+            let gameH: CGFloat = textHeight(text: "spatial_voice_chatroom_gaming_buddy_introduce".spatial_localized(), fontSize: 13, width: self.view.bounds.size.width - 80)
+            let anchorH: CGFloat = textHeight(text: "spatial_voice_chatroom_professional_broadcaster_introduce".spatial_localized(), fontSize: 13, width: self.view.bounds.size.width - 80)
             print("\(soundEffect)-----")
             switch soundEffect {
             case 1:
@@ -73,33 +73,33 @@ class SAAudioSettingDetailViewController: UIViewController {
 
     private let settingName: [String] = ["Spatial Audio", "Attenuation factor", "Air absorb", "Voice blur"]
     
-    private let AIAECSettingName: [String] = ["spatial_voice_turn_on_AIAEC".localized_spatial()]
+    private let AIAECSettingName: [String] = ["spatial_voice_turn_on_AIAEC".spatial_localized()]
     
-    private let AGSettingName: [String] = ["spatial_voice_turn_on_AGC".localized_spatial()]
+    private let AGSettingName: [String] = ["spatial_voice_turn_on_AGC".spatial_localized()]
 
     
-    private let soundType: [String] = ["spatial_voice_TV_sound".localized_spatial(), "spatial_voice_kitchen_sound".localized_spatial(), "spatial_voice_street_sound".localized_spatial(), "spatial_voice_mashine_sound".localized_spatial(), "spatial_voice_office_sound".localized_spatial(), "spatial_voice_home_sound".localized_spatial(), "spatial_voice_construction_sound".localized_spatial(), "spatial_voice_alert_sound/Music".localized_spatial(), "spatial_voice_applause".localized_spatial(), "spatial_voice_wind_sound".localized_spatial(), "spatial_voice_mic_pop_filter".localized_spatial(), "spatial_voice_audio_feedback".localized_spatial(), "spatial_voice_microphone_finger_rub_sound".localized_spatial(), "spatial_voice_screen_tap_sound".localized_spatial()]
+    private let soundType: [String] = ["spatial_voice_TV_sound".spatial_localized(), "spatial_voice_kitchen_sound".spatial_localized(), "spatial_voice_street_sound".spatial_localized(), "spatial_voice_mashine_sound".spatial_localized(), "spatial_voice_office_sound".spatial_localized(), "spatial_voice_home_sound".spatial_localized(), "spatial_voice_construction_sound".spatial_localized(), "spatial_voice_alert_sound/Music".spatial_localized(), "spatial_voice_applause".spatial_localized(), "spatial_voice_wind_sound".spatial_localized(), "spatial_voice_mic_pop_filter".spatial_localized(), "spatial_voice_audio_feedback".spatial_localized(), "spatial_voice_microphone_finger_rub_sound".spatial_localized(), "spatial_voice_screen_tap_sound".spatial_localized()]
     
-    private let soundDetail: [String] = ["spatial_voice_ex_bird_car_subway_sounds".localized_spatial(), "spatial_voice_ex_fan_air_conditioner_vacuum_cleaner_printer_sounds".localized_spatial(), "spatial_voice_ex_keyboard_tapping_mouse_clicking_sounds".localized_spatial(), "spatial_voice_ex_door_closing_chair_squeaking_baby_crying_sounds".localized_spatial(), "spatial_voice_ex_knocking_sound".localized_spatial()]
+    private let soundDetail: [String] = ["spatial_voice_ex_bird_car_subway_sounds".spatial_localized(), "spatial_voice_ex_fan_air_conditioner_vacuum_cleaner_printer_sounds".spatial_localized(), "spatial_voice_ex_keyboard_tapping_mouse_clicking_sounds".spatial_localized(), "spatial_voice_ex_door_closing_chair_squeaking_baby_crying_sounds".spatial_localized(), "spatial_voice_ex_knocking_sound".spatial_localized()]
 
     var settingType: SA_AUDIO_SETTING_TYPE = .Spatial {
         didSet {
             if settingType == .Spatial {
-                titleLabel.text = "Spatial Setting".localized_spatial()
+                titleLabel.text = "Spatial Setting".spatial_localized()
             } else if settingType == .Noise {
-                titleLabel.text = "spatial_voice_noise_setting".localized_spatial()
+                titleLabel.text = "spatial_voice_noise_setting".spatial_localized()
             } else if settingType == .effect {
-                titleLabel.text = "spatial_voice_effect_setting".localized_spatial()
+                titleLabel.text = "spatial_voice_effect_setting".spatial_localized()
             } else if settingType == .AIAEC {
-                titleLabel.text = "spatial_voice_AIAEC".localized_spatial()
+                titleLabel.text = "spatial_voice_AIAEC".spatial_localized()
             } else if settingType == .AGC {
-                titleLabel.text = "spatial_voice_AGC".localized_spatial()
+                titleLabel.text = "spatial_voice_AGC".spatial_localized()
             }
             tableView.reloadData()
         }
     }
 
-    lazy var otherSoundHeaderHeight: CGFloat = textHeight(text: "spatial_voice_otherSound".localized_spatial(), fontSize: 12, width: ScreenWidth - 100)
+    lazy var otherSoundHeaderHeight: CGFloat = textHeight(text: "spatial_voice_otherSound".spatial_localized(), fontSize: 12, width: ScreenWidth - 100)
 
     var resBlock: ((SA_AUDIO_SETTING_TYPE) -> Void)?
 
@@ -198,7 +198,7 @@ extension SAAudioSettingDetailViewController: UITableViewDelegate, UITableViewDa
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if settingType == .Noise && section == 2 {
-            return textHeight(text: "spatial_voice_AINS_sup".localized_spatial(), fontSize: 13, width: ScreenWidth - 40) + 15
+            return textHeight(text: "spatial_voice_AINS_sup".spatial_localized(), fontSize: 13, width: ScreenWidth - 40) + 15
         } else if settingType == .effect && section == 1 {
             return 40 + 12 + otherSoundHeaderHeight + 10
         } else if settingType == .AIAEC || settingType == .AGC {
@@ -248,7 +248,7 @@ extension SAAudioSettingDetailViewController: UITableViewDelegate, UITableViewDa
             let titleLabel: UILabel = .init(frame: CGRect(x: 10, y: 5, width: screenWidth-20, height: 66))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.numberOfLines = 0
-            titleLabel.text = "spatial_voice_AIAEC_desc".localized_spatial()
+            titleLabel.text = "spatial_voice_AIAEC_desc".spatial_localized()
             titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
             footer.addSubview(titleLabel)
             return footer
@@ -259,7 +259,7 @@ extension SAAudioSettingDetailViewController: UITableViewDelegate, UITableViewDa
             let titleLabel: UILabel = .init(frame: CGRect(x: 10, y: 5, width: screenWidth-20, height: 60))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.numberOfLines = 0
-            titleLabel.text = "spatial_voice_AGC_desc".localized_spatial()
+            titleLabel.text = "spatial_voice_AGC_desc".spatial_localized()
             titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
             footer.addSubview(titleLabel)
             return footer
@@ -269,7 +269,7 @@ extension SAAudioSettingDetailViewController: UITableViewDelegate, UITableViewDa
             footer.backgroundColor = .white
             let textView = UITextView(frame: CGRect(x: 30, y: 0, width: screenWidth - 60, height: 40))
 
-            let text = NSMutableAttributedString(string: "spatial_voice_visit_more".localized_spatial())
+            let text = NSMutableAttributedString(string: "spatial_voice_visit_more".spatial_localized())
             text.addAttribute(NSAttributedString.Key.font,
                               value: UIFont.systemFont(ofSize: 13),
                               range: NSRange(location: 0, length: text.length))
@@ -311,10 +311,10 @@ extension SAAudioSettingDetailViewController: UITableViewDelegate, UITableViewDa
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 5, width: 300, height: 30))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             if settingType == .effect {
-                titleLabel.text = "spatial_voice_current_sound".localized_spatial()
+                titleLabel.text = "spatial_voice_current_sound".spatial_localized()
                 titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
             } else if settingType == .Spatial {
-                titleLabel.text = "spatial_voice_agora_blue".localized_spatial()
+                titleLabel.text = "spatial_voice_agora_blue".spatial_localized()
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
             } else if settingType == .AIAEC {
                 
@@ -322,7 +322,7 @@ extension SAAudioSettingDetailViewController: UITableViewDelegate, UITableViewDa
         
 
             } else {
-                titleLabel.text = "spatial_voice_AINS_settings".localized_spatial()
+                titleLabel.text = "spatial_voice_AINS_settings".spatial_localized()
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
             }
             headerView.addSubview(titleLabel)
@@ -335,7 +335,7 @@ extension SAAudioSettingDetailViewController: UITableViewDelegate, UITableViewDa
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             if settingType == .effect {
                 titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
-                titleLabel.text = "spatial_voice_other_sound".localized_spatial()
+                titleLabel.text = "spatial_voice_other_sound".spatial_localized()
                 headerView.addSubview(titleLabel)
 
                 if section == 1 {
@@ -350,7 +350,7 @@ extension SAAudioSettingDetailViewController: UITableViewDelegate, UITableViewDa
                     warningView.addSubview(iconView)
 
                     let warningLabel = UILabel(frame: CGRect(x: 30, y: 6, width: screenWidth - 100, height: otherSoundHeaderHeight))
-                    warningLabel.text = "spatial_voice_otherSound".localized_spatial()
+                    warningLabel.text = "spatial_voice_otherSound".spatial_localized()
                     warningLabel.numberOfLines = 0
                     warningLabel.lineBreakMode = .byCharWrapping
                     warningLabel.font = UIFont.systemFont(ofSize: 12)
@@ -359,13 +359,13 @@ extension SAAudioSettingDetailViewController: UITableViewDelegate, UITableViewDa
                 }
             } else {
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-                titleLabel.text = settingType == .Spatial ? "spatial_voice_red".localized_spatial() : "spatial_voice_AINS_definition".localized_spatial()
+                titleLabel.text = settingType == .Spatial ? "spatial_voice_red".spatial_localized() : "spatial_voice_AINS_definition".spatial_localized()
                 headerView.addSubview(titleLabel)
             }
 
             return headerView
         } else {
-            let height = textHeight(text: "spatial_voice_AINS_sup".localized_spatial(), fontSize: 13, width: ScreenWidth - 40)
+            let height = textHeight(text: "spatial_voice_AINS_sup".spatial_localized(), fontSize: 13, width: ScreenWidth - 40)
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: height + 15))
             headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 5, width: screenWidth - 40, height: height))
@@ -373,7 +373,7 @@ extension SAAudioSettingDetailViewController: UITableViewDelegate, UITableViewDa
             titleLabel.lineBreakMode = .byCharWrapping
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-            titleLabel.text = "spatial_voice_AINS_sup".localized_spatial()
+            titleLabel.text = "spatial_voice_AINS_sup".spatial_localized()
             headerView.addSubview(titleLabel)
             return headerView
         }
@@ -456,7 +456,7 @@ extension SAAudioSettingDetailViewController: UITableViewDelegate, UITableViewDa
                  return cell
              } else if indexPath.section == 1 {
                  let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: tIdentifier)!
-                 cell.textLabel?.text = "spatial_voice_AINS_AI_noise_suppression".localized_spatial()
+                 cell.textLabel?.text = "spatial_voice_AINS_AI_noise_suppression".spatial_localized()
                  cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
                  cell.textLabel?.textColor = UIColor(hex: "0x3C4267")
                  cell.isUserInteractionEnabled = false

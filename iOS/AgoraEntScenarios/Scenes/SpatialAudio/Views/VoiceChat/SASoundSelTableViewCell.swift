@@ -103,7 +103,7 @@ class SASoundSelTableViewCell: UITableViewCell {
         selView.image = UIImage.sceneImage(name: "effect-check")
         addSubview(selView)
 
-        usageLabel.text = "spatial_voice_current_customer_usage".localized_spatial()
+        usageLabel.text = "spatial_voice_current_customer_usage".spatial_localized()
         usageLabel.font = UIFont.systemFont(ofSize: 11)
         usageLabel.textColor = UIColor(hex: "0x979CBB")
         bgView.addSubview(usageLabel)
@@ -179,20 +179,20 @@ class SASoundSelTableViewCell: UITableViewCell {
     private func setCellType(with type: SASOUND_TYPE) {
         cellType = type
         if type == .chat {
-            typeStr = "spatiaL_voice_social_chat".localized_spatial()
-            detailStr = "spatial_voice_chatroom_social_chat_introduce".localized_spatial()
+            typeStr = "spatiaL_voice_social_chat".spatial_localized()
+            detailStr = "spatial_voice_chatroom_social_chat_introduce".spatial_localized()
             iconImgs = images[0]
         } else if type == .karaoke {
-            typeStr = "spatial_voice_karaoke".localized_spatial()
-            detailStr = "spatial_voice_chatroom_karaoke_introduce".localized_spatial()
+            typeStr = "spatial_voice_karaoke".spatial_localized()
+            detailStr = "spatial_voice_chatroom_karaoke_introduce".spatial_localized()
             iconImgs = images[1]
         } else if type == .game {
-            typeStr = "spatial_voice_gaming_buddy".localized_spatial()
-            detailStr = "spatial_voice_chatroom_gaming_buddy_introduce".localized_spatial()
+            typeStr = "spatial_voice_gaming_buddy".spatial_localized()
+            detailStr = "spatial_voice_chatroom_gaming_buddy_introduce".spatial_localized()
             iconImgs = images[2]
         } else if type == .anchor {
-            typeStr = "spatial_voice_professional_podcaster".localized_spatial()
-            detailStr = "spatial_voice_chatroom_professional_broadcaster_introduce".localized_spatial()
+            typeStr = "spatial_voice_professional_podcaster".spatial_localized()
+            detailStr = "spatial_voice_chatroom_professional_broadcaster_introduce".spatial_localized()
             iconImgs = images[3]
         }
     }

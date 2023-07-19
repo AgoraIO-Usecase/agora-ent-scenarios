@@ -76,7 +76,7 @@ class SASoundView: UIView {
         iconBgView.layer.masksToBounds = true
         bgView.addSubview(iconBgView)
 
-        usageLabel.text = "spatial_voice_CUS_use".localized_spatial()
+        usageLabel.text = "spatial_voice_CUS_use".spatial_localized()
         usageLabel.font = UIFont.systemFont(ofSize: 12)
         usageLabel.textColor = UIColor(red: 0.593, green: 0.612, blue: 0.732, alpha: 1)
         bgView.addSubview(usageLabel)
@@ -131,21 +131,21 @@ class SASoundView: UIView {
         soundEffect = effect
         switch effect {
         case 1:
-            detailStr = "spatial_voice_chatroom_social_chat_introduce".localized_spatial()
+            detailStr = "spatial_voice_chatroom_social_chat_introduce".spatial_localized()
             iconImgs = images[0]
-            typeStr = "spatiaL_voice_social_chat".localized_spatial()
+            typeStr = "spatiaL_voice_social_chat".spatial_localized()
         case 2:
-            detailStr = "spatial_voice_chatroom_karaoke_introduce".localized_spatial()
+            detailStr = "spatial_voice_chatroom_karaoke_introduce".spatial_localized()
             iconImgs = images[1]
-            typeStr = "spatial_voice_karaoke".localized_spatial()
+            typeStr = "spatial_voice_karaoke".spatial_localized()
         case 3:
-            detailStr = "spatial_voice_chatroom_gaming_buddy_introduce".localized_spatial()
+            detailStr = "spatial_voice_chatroom_gaming_buddy_introduce".spatial_localized()
             iconImgs = images[2]
-            typeStr = "spatial_voice_gaming_buddy".localized_spatial()
+            typeStr = "spatial_voice_gaming_buddy".spatial_localized()
         default:
-            detailStr = "spatial_voice_chatroom_professional_broadcaster_introduce".localized_spatial()
+            detailStr = "spatial_voice_chatroom_professional_broadcaster_introduce".spatial_localized()
             iconImgs = images[3]
-            typeStr = "spatial_voice_professional_podcaster".localized_spatial()
+            typeStr = "spatial_voice_professional_podcaster".spatial_localized()
         }
         cellHeight = textHeight(text: detailStr, fontSize: 13, width: bounds.size.width - 40)
     }
