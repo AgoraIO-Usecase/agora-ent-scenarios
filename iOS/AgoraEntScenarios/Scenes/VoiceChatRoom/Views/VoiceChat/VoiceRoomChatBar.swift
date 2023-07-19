@@ -165,7 +165,7 @@ extension VoiceRoomChatBar {
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VoiceRoomChatBarCell", for: indexPath) as? VoiceRoomChatBarCell
-        cell?.icon.image = UIImage(datas[indexPath.row])
+        cell?.icon.image = UIImage.voice_image(datas[indexPath.row])
         if indexPath.row == 1, creator, handsState != .selected {
             cell?.redDot.isHidden = false
         } else {

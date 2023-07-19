@@ -142,8 +142,8 @@ final class AuditionEffectView: UIView {
             resourceName += "After"
             wavName += "-After"
         }
-        guard let path = Bundle.voiceRoomBundle.path(forResource: resourceName, ofType: "png") else { return }
-        guard let wavPath = Bundle.voiceRoomBundle.path(forResource: wavName, ofType: type) else { return }
+        guard let path = Bundle.voiceChat.path(forResource: resourceName, ofType: "png") else { return }
+        guard let wavPath = Bundle.voiceChat.path(forResource: wavName, ofType: type) else { return }
         VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
         self.afterPlay.setImage(UIImage.sceneImage(name: "play2"), for: .normal)
         self.beforePlay.setImage(UIImage.sceneImage(name: "play2"), for: .normal)

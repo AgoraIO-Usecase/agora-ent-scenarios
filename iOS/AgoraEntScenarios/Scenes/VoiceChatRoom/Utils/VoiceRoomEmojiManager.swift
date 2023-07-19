@@ -25,7 +25,7 @@ fileprivate let manager = VoiceRoomEmojiManager()
         let text = NSMutableAttributedString(attributedString: input)
         for range in ranges.reversed() {
             if range.location != NSNotFound, range.length != NSNotFound {
-                let value = UIImage(symbol)
+                let value = UIImage.voice_image(symbol)
                 let attachment = NSTextAttachment()
                 attachment.image = value
                 attachment.bounds = CGRect(x: 0, y: -1.5, width: 14, height: 14)

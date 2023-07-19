@@ -108,7 +108,7 @@ public extension VRCreateRoomView {
 
     func horizontalCardsView(_: HorizontalCardsView, viewForIndex index: Int) -> HorizontalCardView {
         let card = HorizontalCardView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 32, height: cardHeight)).backgroundColor(.clear).cornerRadius(25)
-        guard let title = datas[index]["title"], let detail = datas[index]["detail"], let image = UIImage(datas[index]["image"]!) else { return card }
+        guard let title = datas[index]["title"], let detail = datas[index]["detail"], let image = UIImage.voice_image(datas[index]["image"]!) else { return card }
         return VRSoundTypeCard(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40, height: cardHeight), title: title, note: detail, background: image).cornerRadius(25)
     }
 

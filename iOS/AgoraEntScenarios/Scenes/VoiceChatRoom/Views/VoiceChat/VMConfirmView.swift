@@ -52,7 +52,7 @@ class VMConfirmView: UIView {
         contentLabel.text = type == .addbot ? "voice_add_bot".localized() : "voice_exit_room".localized()
         contentLabel.numberOfLines = 0
         contentLabel.lineBreakMode = .byCharWrapping
-        contentLabel.textColor = UIColor.HexColor(hex: 0x6C7192, alpha: 1)
+        contentLabel.textColor = UIColor(hex: 0x6C7192, alpha: 1)
         contentLabel.font = UIFont.systemFont(ofSize: 14)
         addSubview(contentLabel)
 

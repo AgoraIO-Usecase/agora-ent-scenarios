@@ -95,7 +95,7 @@ class VMSoundSelTableViewCell: UITableViewCell {
         detailLabel.text = detailStr
         detailLabel.textAlignment = .left
         detailLabel.numberOfLines = 0
-        detailLabel.textColor = UIColor.HexColor(hex: 0x3C4267, alpha: 1)
+        detailLabel.textColor = UIColor(hex: 0x3C4267, alpha: 1)
         detailLabel.font = UIFont.systemFont(ofSize: 13)
         detailLabel.lineBreakMode = .byCharWrapping
         bgView.addSubview(detailLabel)
@@ -105,10 +105,10 @@ class VMSoundSelTableViewCell: UITableViewCell {
 
         usageLabel.text = LanguageManager.localValue(key: "voice_current_customer_usage")
         usageLabel.font = UIFont.systemFont(ofSize: 11)
-        usageLabel.textColor = UIColor.HexColor(hex: 0x979CBB, alpha: 1)
+        usageLabel.textColor = UIColor(hex: 0x979CBB, alpha: 1)
         bgView.addSubview(usageLabel)
 
-        lineView.backgroundColor = UIColor.HexColor(hex: 0xF6F6F6, alpha: 1)
+        lineView.backgroundColor = UIColor(hex: 0xF6F6F6, alpha: 1)
         bgView.addSubview(lineView)
 
         guard let iconImgs = iconImgs else {
@@ -129,7 +129,7 @@ class VMSoundSelTableViewCell: UITableViewCell {
         }
         for (index, value) in iconImgs.enumerated() {
             let imgView = UIImageView()
-            imgView.image = UIImage(value)
+            imgView.image = UIImage.voice_image(value)
             imgView.tag = basetag + index
             addSubview(imgView)
         }

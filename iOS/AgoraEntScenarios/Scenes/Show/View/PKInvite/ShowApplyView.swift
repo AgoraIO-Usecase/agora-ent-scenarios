@@ -12,7 +12,7 @@ class ShowApplyView: UIView {
     private var roomId: String!
     private lazy var titleLabel: AGELabel = {
         let label = AGELabel(colorStyle: .black, fontStyle: .large)
-        label.text = "连麦申请".show_localized
+        label.text = "show_apply_onseat".show_localized
         return label
     }()
     private lazy var statckView: UIStackView = {
@@ -35,16 +35,16 @@ class ShowApplyView: UIView {
     }()
     private lazy var tipsLabel: AGELabel = {
         let label = AGELabel(colorStyle: .black, fontStyle: .middle)
-        let text = " 正在等待"
+        let text = " "+"show_onseat_waitting".show_localized
         let attrs = NSMutableAttributedString(string: text)
-        let attr = NSAttributedString(string: "0人", attributes: [.font: UIFont.systemFont(ofSize: 14, weight: .bold)])
+        let attr = NSAttributedString(string: "0" + "show_user_count".show_localized, attributes: [.font: UIFont.systemFont(ofSize: 14, weight: .bold)])
         attrs.insert(attr, at: 0)
         label.attributedText = attrs
         return label
     }()
     private lazy var revokeutton: AGEButton = {
         let button = AGEButton()
-        button.setTitle("撤回申请".show_localized, for: .normal)
+        button.setTitle("show_cancel_linking".show_localized, for: .normal)
         button.setTitleColor(UIColor(hex: "#684BF2"), for: .normal)
         button.setImage(UIImage.show_sceneImage(name: "show_live_withdraw"),
                         for: .normal,
@@ -57,7 +57,7 @@ class ShowApplyView: UIView {
     private lazy var tableView: AGETableView = {
         let view = AGETableView(frame: .zero, style: .plain)
         view.rowHeight = 67
-        view.emptyTitle = "暂无用户排麦".show_localized
+        view.emptyTitle = "show_no_user_apply_onseat".show_localized
         view.emptyTitleColor = UIColor(hex: "#989DBA")
         view.emptyImage = UIImage.show_sceneImage(name: "show_pkInviteViewEmpty")
         view.delegate = self
@@ -68,7 +68,7 @@ class ShowApplyView: UIView {
     private var tipsViewHeightCons: NSLayoutConstraint?
     var interactionModel: ShowInteractionInfo? {
         didSet {
-            self.revokeutton.setTitle("结束".show_localized, for: .normal)
+            self.revokeutton.setTitle("show_stop_pking".show_localized, for: .normal)
             self.revokeutton.setImage(UIImage.show_sceneImage(name: "show_live_end"),
                                       for: .normal,
                                       postion: .right,
@@ -94,7 +94,7 @@ class ShowApplyView: UIView {
             guard let list = list?.filter({ $0.userId != self?.interactionModel?.userId }) else { return }
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
             if seatUserModel == nil, autoApply, self?.interactionModel?.userId != VLUserCenter.user.id {
-                self?.revokeutton.setTitle("撤回申请".show_localized, for: .normal)
+                self?.revokeutton.setTitle("show_cancel_linking".show_localized, for: .normal)
                 self?.revokeutton.setImage(UIImage.show_sceneImage(name: "show_live_withdraw"),
                                           for: .normal,
                                           postion: .right,
@@ -119,9 +119,9 @@ class ShowApplyView: UIView {
     }
     
     private func setupTipsInfo(count: Int) {
-        let text = " "+"正在等待".show_localized
+        let text = " "+"show_onseat_waitting".show_localized
         let attrs = NSMutableAttributedString(string: text)
-        let attr = NSAttributedString(string: "\(count)"+"人".show_localized,
+        let attr = NSAttributedString(string: "\(count)"+"show_user_count".show_localized,
                                       attributes: [.font: UIFont.systemFont(ofSize: 14, weight: .bold)])
         attrs.insert(attr, at: 0)
         self.tipsLabel.attributedText = attrs
@@ -207,7 +207,7 @@ extension ShowApplyView: AGETableViewDelegate {
         let view = UIView()
         view.backgroundColor = .white
         let titleLabel = AGELabel(colorStyle: .black, fontStyle: .middle)
-        titleLabel.text = "待上麦队列".show_localized
+        titleLabel.text = "show_get_in_line".show_localized
         view.addSubview(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true

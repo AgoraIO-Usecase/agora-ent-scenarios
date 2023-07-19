@@ -90,7 +90,7 @@ class VMEQSettingView: UIView, UITextViewDelegate {
     var settingType: AUDIO_SETTING_TYPE = .Spatial {
         didSet {
             if settingType == .Spatial {
-                titleLabel.text = "Spatial Setting".localized()
+                titleLabel.text = "Spatial Setting".voice_localized()
             } else if settingType == .Noise {
                 titleLabel.text = "voice_noise_setting".localized()
             } else if settingType == .effect {
@@ -99,7 +99,6 @@ class VMEQSettingView: UIView, UITextViewDelegate {
                 titleLabel.text = "voice_AIAEC".localized()
             } else if settingType == .AGC {
                 titleLabel.text = "voice_AGC".localized()
-
             }
             tableView.reloadData()
         }
@@ -135,7 +134,7 @@ class VMEQSettingView: UIView, UITextViewDelegate {
         titleLabel.frame = CGRect(x: ScreenWidth / 2.0 - 60, y: 25, width: 120, height: 30)
         titleLabel.textAlignment = .center
         titleLabel.text = "Spatial Audio"
-        titleLabel.textColor = UIColor.HexColor(hex: 0x040925, alpha: 1)
+        titleLabel.textColor = UIColor(hex: 0x040925, alpha: 1)
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         addSubview(titleLabel)
 
@@ -276,12 +275,11 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             let footer = UIView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 40))
             footer.backgroundColor = .white
             let textView = UITextView(frame: CGRect(x: 30, y: 0, width: screenWidth - 60, height: 40))
-
             let text = NSMutableAttributedString(string: "voice_visit_more".localized())
             text.addAttribute(NSAttributedString.Key.font,
                               value: UIFont.systemFont(ofSize: 13),
                               range: NSRange(location: 0, length: text.length))
-            text.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.HexColor(hex: 0x3C4267, alpha: 1), range: NSRange(location: 0, length: text.length))
+            text.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(hex: 0x3C4267, alpha: 1), range: NSRange(location: 0, length: text.length))
 
             let interactableText = NSMutableAttributedString(string: "www.agora.io")
             interactableText.addAttribute(NSAttributedString.Key.font,
@@ -294,7 +292,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             interactableText.addAttribute(NSAttributedString.Key.link,
                                           value: "SignInPseudoLink",
                                           range: NSRange(location: 0, length: interactableText.length))
-            interactableText.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.HexColor(hex: 0x3C4267, alpha: 1), range: NSRange(location: 0, length: interactableText.length))
+            interactableText.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(hex: 0x3C4267, alpha: 1), range: NSRange(location: 0, length: interactableText.length))
             text.append(interactableText)
             let paragraph = NSMutableParagraphStyle()
             paragraph.alignment = .center
@@ -350,7 +348,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
                     let warningView = UIView(frame: CGRect(x: 20, y: 40, width: screenWidth - 40, height: 12 + otherSoundHeaderHeight))
                     warningView.layer.cornerRadius = 5
                     warningView.layer.masksToBounds = true
-                    warningView.backgroundColor = UIColor.HexColor(hex: 0xFFF7DC, alpha: 1)
+                    warningView.backgroundColor = UIColor(hex: 0xFFF7DC, alpha: 1)
                     headerView.addSubview(warningView)
 
                     let iconView: UIImageView = .init(frame: CGRect(x: 8, y: 7, width: 16, height: 16))
@@ -362,12 +360,12 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
                     warningLabel.numberOfLines = 0
                     warningLabel.lineBreakMode = .byCharWrapping
                     warningLabel.font = UIFont.systemFont(ofSize: 12)
-                    warningLabel.textColor = UIColor.HexColor(hex: 0xE76D21, alpha: 1)
+                    warningLabel.textColor = UIColor(hex: 0xE76D21, alpha: 1)
                     warningView.addSubview(warningLabel)
                 }
             } else {
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-                titleLabel.text = settingType == .Spatial ? "Agora Red Bot" : "voice_AINS_definition".localized()
+                titleLabel.text = settingType == .Spatial ? "voice_red".localized() : "voice_AINS_definition".localized()
                 headerView.addSubview(titleLabel)
             }
 
@@ -466,7 +464,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
                  let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: tIdentifier)!
                  cell.textLabel?.text = "voice_AINS_AI_noise_suppression".localized()
                  cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
-                 cell.textLabel?.textColor = UIColor.HexColor(hex: 0x3C4267, alpha: 1)
+                 cell.textLabel?.textColor = UIColor(hex: 0x3C4267, alpha: 1)
                  cell.isUserInteractionEnabled = false
                  cell.selectionStyle = .none
                  return cell

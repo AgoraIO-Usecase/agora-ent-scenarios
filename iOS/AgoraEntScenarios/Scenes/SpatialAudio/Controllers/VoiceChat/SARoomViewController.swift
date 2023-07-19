@@ -416,7 +416,7 @@ extension SARoomViewController {
 
     func activeAlien(_ flag: Bool) {
         if isOwner == false {
-            view.makeToast("spatial_voice_host_bot".localized())
+            view.makeToast("spatial_voice_host_bot".spatial_localized())
             return
         }
         guard let mic_blue: SARoomMic = roomInfo?.mic_info?[3] else { return }
@@ -446,10 +446,10 @@ extension SARoomViewController {
             guard let self = self else {return}
             if result {
                 // 如果返回的结果为true 表示上麦成功
-                self.view.makeToast("spatial_voice_notice_posted".localized())
+                self.view.makeToast("spatial_voice_notice_posted".spatial_localized())
                 self.roomInfo?.room?.announcement = str
             } else {
-                self.view.makeToast("spatial_voice_post_failed".localized())
+                self.view.makeToast("spatial_voice_post_failed".spatial_localized())
             }
         }
     }

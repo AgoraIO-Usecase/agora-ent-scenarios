@@ -20,13 +20,12 @@ class ShowLivePagesViewController: ViewController {
     private var currentVC: ShowLiveViewController?
     
     lazy var agoraKitManager: ShowAgoraKitManager = {
-        let manager = ShowAgoraKitManager()
+        let manager = ShowAgoraKitManager.shared
         if AppContext.shared.isDebugMode == false {
-            manager.defaultSetting()            
+            manager.defaultSetting()
         }
         return manager
     }()
-    
     
     fileprivate var roomVCMap: [String: ShowLiveViewController] = [:]
     
@@ -124,11 +123,10 @@ extension ShowLivePagesViewController {
             let room = roomList[idx]
             let roomId = room.roomId
             if roomId.isEmpty {return}
-            let vc = ShowLiveViewController(agoraKitManager: self.agoraKitManager)
+            let vc = ShowLiveViewController()
             vc.audiencePresetType = self.audiencePresetType
-//            vc?.selectedResolution = self.selectedResolution
             vc.room = room
-            vc.loadingType = .preload
+            vc.loadingType = .waiting
             vc.delegate = self
             self.roomVCMap[roomId] = vc
             //TODO: invoke viewdidload to join channel
@@ -222,14 +220,12 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
             if origVC == vc {
                 return cell
             }
-            
             vc?.view.removeFromSuperview()
         } else {
-            vc = ShowLiveViewController(agoraKitManager: self.agoraKitManager)
+            vc = ShowLiveViewController()
             vc?.audiencePresetType = self.audiencePresetType
-//            vc?.selectedResolution = self.selectedResolution
             vc?.room = room
-            vc?.loadingType = .preload
+            vc?.loadingType = .waiting
             vc?.delegate = self
         }
         
@@ -239,7 +235,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
         if let origVC = origVC {
             origVC.view.removeFromSuperview()
             origVC.removeFromParent()
-            origVC.loadingType = .idle
+            origVC.loadingType = .none
             AppContext.unloadShowServiceImp(origVC.room?.roomId ?? "")
             self.roomVCMap[origVC.room?.roomId ?? ""] = nil
             showLogger.info("remove cache vc: \(origVC.room?.roomId ?? "") cache vc count:\(self.roomVCMap.count)")
@@ -265,7 +261,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
 //            assert(false, "room at index \(idx) not found")
             return
         }
-        vc.loadingType = .loading
+        vc.loadingType = .playing
         currentVC = vc
         self.view.endEditing(true)
     }
@@ -277,7 +273,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
 //            assert(false, "room at index \(idx) not found")
             return
         }
-        vc.loadingType = .preload
+        vc.loadingType = .waiting
         self.view.endEditing(true)
     }
     

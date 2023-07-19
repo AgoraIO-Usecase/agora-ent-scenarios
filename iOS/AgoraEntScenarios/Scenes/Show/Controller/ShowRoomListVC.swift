@@ -10,9 +10,35 @@ import UIKit
 private let kAudienceShowPresetType = "kAudienceShowPresetType"
 
 class ShowRoomListVC: UIViewController {
-
-    private var roomListView: ShowRoomListView!
-    private var roomList: [ShowRoomListModel]?
+    
+    let backgroundView = UIImageView()
+    
+    private let collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+        let itemWidth = (Screen.width - 15 - 20 * 2) * 0.5
+        layout.itemSize = CGSize(width: itemWidth, height: 234.0 / 160.0 * itemWidth)
+        return UICollectionView(frame: .zero, collectionViewLayout: layout)
+    }()
+        
+    private lazy var refreshControl: UIRefreshControl = {
+        let ctrl = UIRefreshControl()
+        ctrl.addTarget(self, action: #selector(refreshControlValueChanged), for: .valueChanged)
+        return ctrl
+    }()
+    
+    private let emptyView = ShowEmptyView()
+    
+    private let createButton = UIButton(type: .custom)
+    
+    
+    private var roomList = [ShowRoomListModel]() {
+        didSet {
+            collectionView.reloadData()
+            emptyView.isHidden = roomList.count > 0
+            preLoadVisibleItems()
+        }
+    }
     
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
@@ -21,6 +47,7 @@ class ShowRoomListVC: UIViewController {
     
     deinit {
         AppContext.unloadShowServiceImp()
+        ShowAgoraKitManager.shared.destoryEngine()
         showLogger.info("deinit-- ShowRoomListVC")
     }
     
@@ -36,9 +63,31 @@ class ShowRoomListVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setUpUI()
-        setUpNaviBar()
-//        addRefresh()
+        createViews()
+        createConstrains()
+        // 提前启动rtc engine
+        ShowAgoraKitManager.shared.prepareEngine()
+        ShowRobotService.shared.startCloudPlayers()
+        preGenerateToken()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        fetchRoomList()
+    }
+    
+    // 点击创建按钮
+    @objc private func didClickCreateButton(){
+        let preVC = ShowCreateLiveVC()
+        let preNC = UINavigationController(rootViewController: preVC)
+        preNC.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        preNC.modalPresentationStyle = .fullScreen
+        present(preNC, animated: true)
+    }
+    
+    @objc private func refreshControlValueChanged() {
+        self.fetchRoomList()
     }
     
     @objc private func didClickSettingButton(){
@@ -56,54 +105,6 @@ class ShowRoomListVC: UIViewController {
         }
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        getRoomList()
-    }
-    
-    private func setUpUI(){
-        // 背景图
-        let bgView = UIImageView()
-        bgView.image = UIImage.show_sceneImage(name: "show_list_Bg")
-        view.addSubview(bgView)
-        bgView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        
-        roomListView = ShowRoomListView()
-        roomListView.clickCreateButtonAction = { [weak self] in
-            self?.createRoom()
-        }
-        roomListView.joinRoomAction = { [weak self] room in
-            guard let wSelf = self else { return }
-            let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
-            let audencePresetType = ShowPresetType(rawValue: value)
-            // 如果是owner是自己 或者已经设置过观众模式
-            if AppContext.shared.isDebugMode == false {
-                if room.ownerId == VLUserCenter.user.id || audencePresetType != .unknown {
-                    wSelf.joinRoom(room)
-                }else{
-                    wSelf.showPresettingVC { [weak self] type in
-                        self?.needUpdateAudiencePresetType = true
-                        UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
-                        self?.joinRoom(room)
-                    }
-                }
-            }else {
-                wSelf.joinRoom(room)
-            }
-        }
-        roomListView.refreshValueChanged = { [weak self] in
-            self?.getRoomList()
-        }
-        
-        view.addSubview(roomListView)
-        roomListView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-    }
-    
     private func showDebugSetVC(){
         let vc = ShowDebugSettingVC()
         vc.isBroadcastor = false
@@ -116,29 +117,8 @@ class ShowRoomListVC: UIViewController {
         vc.didSelectedPresetType = { type, modeName in
             selected?(type)
         }
-//        let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
-//        let audencePresetType = ShowPresetType(rawValue: value)
-//        vc.selectedType = audencePresetType
         present(vc, animated: true)
     }
-    
-    private func setUpNaviBar() {
-        navigationController?.isNavigationBarHidden = true
-        naviBar.title = "navi_title_show_live".show_localized
-        view.addSubview(naviBar)
-        let saveButtonItem = ShowBarButtonItem(title: "room_list_audience_setting".show_localized, target: self, action: #selector(didClickSettingButton))
-        naviBar.rightItems = [saveButtonItem]
-    }
-    
-    // 创建房间
-    private func createRoom(){
-        let preVC = ShowCreateLiveVC()
-        let preNC = UINavigationController(rootViewController: preVC)
-        preNC.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        preNC.modalPresentationStyle = .fullScreen
-        present(preNC, animated: true)
-    }
-    
     // 加入房间
     private func joinRoom(_ room: ShowRoomListModel){
         let vc = ShowLivePagesViewController()
@@ -158,24 +138,155 @@ class ShowRoomListVC: UIViewController {
                 self?.present(nc, animated: true)
             }
         } else {
-            vc.roomList = roomList?.filter({ $0.ownerId != VLUserCenter.user.id })
+            vc.roomList = roomList.filter({ $0.ownerId != VLUserCenter.user.id })
             vc.focusIndex = vc.roomList?.firstIndex(where: { $0.roomId == room.roomId }) ?? 0
             self.present(nc, animated: true)
         }
     }
     
-    private func getRoomList() {
+    private func fetchRoomList() {
         AppContext.showServiceImp("").getRoomList(page: 1) { [weak self] error, roomList in
             guard let self = self else {return}
-//            self.roomListView.collectionView.mj_header?.endRefreshing()
-            self.roomListView.endRefrshing()
+            self.refreshControl.endRefreshing()
             if let error = error {
                 ToastView.show(text: error.localizedDescription)
                 return
             }
             let list = roomList ?? []
-            self.roomListView.roomList = list
             self.roomList = list
+        }
+    }
+    // 预先加载RTC
+    private func preLoadVisibleItems() {
+        guard let token = AppContext.shared.rtcToken,
+              let firstItem = collectionView.indexPathsForVisibleItems.first?.item else {
+            return
+        }
+        let start = firstItem - 7 < 0 ? 0 : firstItem - 7
+        let end = start + 19 >= roomList.count ? roomList.count - 1 : start + 19
+        for i in start...end {
+            let room = roomList[i]
+            ShowAgoraKitManager.shared.engine?.preloadChannel(byToken: token,
+                                                              channelId: room.roomId,
+                                                              uid: UInt(VLUserCenter.user.id) ?? 0)
+        }
+    }
+    // 预先获取万能token
+    private func preGenerateToken() {
+        AppContext.shared.rtcToken = nil
+        NetworkManager.shared.generateToken(
+            channelName: "",
+            uid: "\(UserInfo.userId)",
+            tokenType: .token007,
+            type: .rtc,
+            expire: 24 * 60 * 60
+        ) { token in
+            guard let rtcToken = token else {
+                return
+            }
+            AppContext.shared.rtcToken = rtcToken
+            self.preLoadVisibleItems()
+        }
+    }
+    
+}
+// MARK: - UICollectionView Call Back
+extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return roomList.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell: ShowRoomListCell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(ShowRoomListCell.self), for: indexPath) as! ShowRoomListCell
+        let room = roomList[indexPath.item]
+        cell.setBgImge((room.thumbnailId?.isEmpty ?? true) ? "0" : room.thumbnailId ?? "0",
+                       name: room.roomName,
+                       id: room.roomId,
+                       count: room.roomUserCount)
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let room = roomList[indexPath.item]
+        let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
+        let audencePresetType = ShowPresetType(rawValue: value)
+        // 如果是owner是自己 或者已经设置过观众模式
+        if AppContext.shared.isDebugMode == false {
+            if room.ownerId == VLUserCenter.user.id || audencePresetType != .unknown {
+                joinRoom(room)
+            }else{
+                showPresettingVC { [weak self] type in
+                    self?.needUpdateAudiencePresetType = true
+                    UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
+                    self?.joinRoom(room)
+                }
+            }
+        }else {
+            joinRoom(room)
+        }
+    }
+    
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        preLoadVisibleItems()
+    }
+    
+}
+
+// MARK: - Creations
+extension ShowRoomListVC {
+    private func createViews(){
+        // 背景图
+        backgroundView.image = UIImage.show_sceneImage(name: "show_list_Bg")
+        view.addSubview(backgroundView)
+        
+        collectionView.backgroundColor = .clear
+        collectionView.register(ShowRoomListCell.self, forCellWithReuseIdentifier: NSStringFromClass(ShowRoomListCell.self))
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.refreshControl = self.refreshControl
+        view.addSubview(collectionView)
+        
+        // 空列表
+        emptyView.isHidden = true
+        collectionView.addSubview(emptyView)
+        
+        // 创建房间按钮
+        createButton.setTitleColor(.white, for: .normal)
+        createButton.setTitle("room_list_create_room".show_localized, for: .normal)
+        createButton.setImage(UIImage.show_sceneImage(name: "show_create_add"), for: .normal)
+        createButton.imageEdgeInsets(UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5))
+        createButton.titleEdgeInsets(UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 0))
+        createButton.backgroundColor = .show_btn_bg
+        createButton.titleLabel?.font = .show_btn_title
+        createButton.layer.cornerRadius = 48 * 0.5
+        createButton.layer.masksToBounds = true
+        createButton.addTarget(self, action: #selector(didClickCreateButton), for: .touchUpInside)
+        view.addSubview(createButton)
+        
+        navigationController?.isNavigationBarHidden = true
+        naviBar.title = "navi_title_show_live".show_localized
+        view.addSubview(naviBar)
+        let saveButtonItem = ShowBarButtonItem(title: "room_list_audience_setting".show_localized, target: self, action: #selector(didClickSettingButton))
+        naviBar.rightItems = [saveButtonItem]
+    }
+    
+    func createConstrains() {
+        backgroundView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        collectionView.snp.makeConstraints { make in
+            make.edges.equalTo(UIEdgeInsets(top:  Screen.safeAreaTopHeight() + 54, left: 0, bottom: 0, right: 0))
+        }
+        emptyView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(156)
+        }
+        createButton.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-max(Screen.safeAreaBottomHeight(), 10))
+            make.height.equalTo(48)
+            make.width.equalTo(195)
         }
     }
 }

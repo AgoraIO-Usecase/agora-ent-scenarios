@@ -74,7 +74,7 @@ class SAEQSettingView: UIView, UITextViewDelegate {
     private var selTag: Int?
 
     private let settingName: [String] = ["Spatial Audio", "Attenuation factor", "Air absorb", "Voice blur"]
-    
+
     private let AIAECSettingName: [String] = ["spatial_voice_turn_on_AIAEC".localized_spatial()]
     
     private let AGSettingName: [String] = ["spatial_voice_turn_on_AGC".localized_spatial()]
@@ -87,7 +87,7 @@ class SAEQSettingView: UIView, UITextViewDelegate {
     var settingType: SA_AUDIO_SETTING_TYPE = .Spatial {
         didSet {
             if settingType == .Spatial {
-                titleLabel.text = "Spatial Setting".localized_spatial()
+                titleLabel.text = "Spatial Setting".spatial_localized()
             } else if settingType == .Noise {
                 titleLabel.text = "spatial_voice_noise_setting".localized_spatial()
             } else if settingType == .effect {
@@ -96,7 +96,6 @@ class SAEQSettingView: UIView, UITextViewDelegate {
                 titleLabel.text = "spatial_voice_AIAEC".localized_spatial()
             } else if settingType == .AGC {
                 titleLabel.text = "spatial_voice_AGC".localized_spatial()
-
             }
             tableView.reloadData()
         }

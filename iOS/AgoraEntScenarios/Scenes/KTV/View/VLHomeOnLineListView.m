@@ -177,7 +177,7 @@ static const int INTERVAL = 1000; // 时间间隔为1秒
 //        _createBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_list_addIcon"]
 //                                                      title:KTVLocalizedString(@"创建房间")];
         _createBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_createBtn setTitle:KTVLocalizedString(@"创建房间") forState:UIControlStateNormal];
+        [_createBtn setTitle:KTVLocalizedString(@"ktv_create_room") forState:UIControlStateNormal];
         [_createBtn setImage:[UIImage sceneImageWithName:@"online_list_addIcon"] forState:UIControlStateNormal];
         _createBtn.frame = CGRectMake((SCREEN_WIDTH-195)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-48-kTopNavHeight, 195, 48);
         _createBtn.layer.cornerRadius = 24;

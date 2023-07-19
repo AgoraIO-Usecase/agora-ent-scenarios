@@ -56,7 +56,7 @@ public extension VoiceRoomEmojiListView {
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VoiceRoomEmojiCell", for: indexPath) as? VoiceRoomEmojiCell
-        cell?.icon.image = UIImage(VoiceRoomEmojiManager.shared.emojis[indexPath.row])
+        cell?.icon.image = UIImage.voice_image(VoiceRoomEmojiManager.shared.emojis[indexPath.row])
         return cell ?? VoiceRoomEmojiCell()
     }
 

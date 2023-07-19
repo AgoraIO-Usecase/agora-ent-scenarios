@@ -93,7 +93,7 @@ class VMMuteView: UIView {
         addSubview(lineImgView)
 
         bgView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
-        bgView.backgroundColor = UIColor.HexColor(hex: 0xdad9e9, alpha: 1)
+        bgView.backgroundColor = UIColor(hex: 0xdad9e9, alpha: 1)
         bgView.layer.cornerRadius = 32
         bgView.layer.masksToBounds = true
         addSubview(bgView)
@@ -111,7 +111,7 @@ class VMMuteView: UIView {
 
         nameLabel.frame = CGRect(x: ScreenWidth / 2.0 - 100, y: 110, width: 200, height: 20)
         nameLabel.text = ""
-        nameLabel.textColor = UIColor.HexColor(hex: 0x333333, alpha: 1)
+        nameLabel.textColor = UIColor(hex: 0x333333, alpha: 1)
         nameLabel.font = UIFont.systemFont(ofSize: 14, weight: .bold)
         nameLabel.textAlignment = .center
         addSubview(nameLabel)
@@ -125,7 +125,7 @@ class VMMuteView: UIView {
         roleBtn.isHidden = true
 
         lineView.frame = CGRect(x: 0, y: 160, width: ScreenWidth, height: 1)
-        lineView.backgroundColor = UIColor.HexColor(hex: 0x979797, alpha: 0.12)
+        lineView.backgroundColor = UIColor(hex: 0x979797, alpha: 0.12)
         addSubview(lineView)
 
 //        micView.frame = CGRect(x: self.bounds.size.width / 2.0 + 10, y: 85, width: 20, height: 20)

@@ -69,7 +69,7 @@ UITextFieldDelegate
     
     self.searchTF = [[UITextField alloc] initWithFrame:CGRectMake(searchIcon.right+8, 5, self.width-40-15-18-6-15, 30)];
     self.searchTF.textColor = UIColorMakeWithHex(@"#979CBB");
-    self.searchTF.placeholder = KTVLocalizedString(@"搜索歌曲,歌手");
+    self.searchTF.placeholder = KTVLocalizedString(@"ktv_dialog_music_list_search_hint");
     self.searchTF.font = UIFontMake(15);
     self.searchTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     self.searchTF.tintColor = UIColorMakeWithHex(@"#2753FF");
@@ -94,7 +94,7 @@ UITextFieldDelegate
     
     //取消
     VLHotSpotBtn *cancelButton = [[VLHotSpotBtn alloc] initWithFrame:CGRectMake(self.width-50, bgView.top, 30, 40)];
-    [cancelButton setTitle:KTVLocalizedString(@"取消")
+    [cancelButton setTitle:KTVLocalizedString(@"ktv_cancel")
                   forState:UIControlStateNormal];
     [cancelButton setTitleColor:UIColorMakeWithHex(@"#C6C4DE")
                        forState:UIControlStateNormal];
@@ -111,10 +111,10 @@ UITextFieldDelegate
     [self addSubview:self.categoryView];
     
     self.categoryView.titles = @[
-        KTVLocalizedString(@"嗨唱推荐"),
-        KTVLocalizedString(@"抖音热歌"),
-        KTVLocalizedString(@"New Songs List"),
-        KTVLocalizedString(@"KTV必唱")];
+        KTVLocalizedString(@"ktv_song_rank_2"),
+        KTVLocalizedString(@"ktv_song_rank_3"),
+        KTVLocalizedString(@"ktv_song_rank_7"),
+        KTVLocalizedString(@"ktv_song_rank_5")];
     self.categoryView.titleSelectedColor = UIColorWhite;
     self.categoryView.titleFont = UIFontMake(12);
     self.categoryView.titleColor = UIColorMakeWithHex(@"#979CBB");

@@ -80,13 +80,13 @@ class AgoraChatRoomBaseRtcUserView: UIView {
 
     public var iconImgUrl: String = "" {
         didSet {
-            iconView.image = UIImage(iconImgUrl)
+            iconView.image = UIImage.voice_image(iconImgUrl)
         }
     }
 
     public var ownerIcon: String = "" {
         didSet {
-            nameBtn.setImage(UIImage(ownerIcon), for: .normal)
+            nameBtn.setImage(UIImage.voice_image(ownerIcon), for: .normal)
         }
     }
 

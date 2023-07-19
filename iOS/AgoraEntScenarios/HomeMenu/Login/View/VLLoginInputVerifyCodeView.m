@@ -90,7 +90,7 @@
             dispatch_source_cancel(self.timer);
             dispatch_async(dispatch_get_main_queue(), ^{
                 //设置界面的按钮显示 根据自己需求设置（倒计时结束后调用）
-                [sender setTitle:AGLocalizedString(@"发送验证码") forState:UIControlStateNormal];
+                [sender setTitle:AGLocalizedString(@"send_v_code") forState:UIControlStateNormal];
                 //设置不可点击
                 sender.userInteractionEnabled = YES;
             });
@@ -100,7 +100,8 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                 //设置界面的按钮显示 根据自己需求设置
                 VLLog(@"verify timer%@",strTime);
-                [sender setTitle:[NSString stringWithFormat:AGLocalizedString(@"%@秒后可重新发送"), strTime] forState:UIControlStateNormal];
+                NSString *afterSendStr = AGLocalizedString(@"after_send_tip");
+                [sender setTitle:[NSString stringWithFormat:@"%@%@", strTime,afterSendStr] forState:UIControlStateNormal];
                     //设置可点击
                 sender.userInteractionEnabled = NO;
             });
@@ -121,7 +122,7 @@
 - (UILabel *)titleLabel {
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
-        _titleLabel.text = AGLocalizedString(@"验证码");
+        _titleLabel.text = AGLocalizedString(@"app_v_code");
         _titleLabel.textColor = UIColorMakeWithHex(@"#979CBB");
         _titleLabel.font = VLUIFontMake(14);
     }
@@ -131,7 +132,7 @@
 - (UITextField *)vTextField {
     if (!_vTextField) {
         _vTextField = [[UITextField alloc] init];
-        _vTextField.attributedPlaceholder = [[NSAttributedString alloc] initWithString:AGLocalizedString(@"请输入验验证码") attributes:@{NSFontAttributeName:VLUIFontMake(15),NSForegroundColorAttributeName:UIColorMakeWithHex(@"#979CBB")}];
+        _vTextField.attributedPlaceholder = [[NSAttributedString alloc] initWithString:AGLocalizedString(@"app_please_input_v_code") attributes:@{NSFontAttributeName:VLUIFontMake(15),NSForegroundColorAttributeName:UIColorMakeWithHex(@"#979CBB")}];
         _vTextField.keyboardType = UIKeyboardTypeNumberPad;
         _vTextField.textColor = UIColorMakeWithHex(@"#3C4267");
         _vTextField.font = VLUIFontMake(15);
@@ -142,7 +143,7 @@
 - (UIButton *)vSendbutton {
     if (!_vSendbutton) {
         _vSendbutton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_vSendbutton setTitle:AGLocalizedString(@"发送验证码") forState:UIControlStateNormal];
+        [_vSendbutton setTitle:AGLocalizedString(@"send_v_code") forState:UIControlStateNormal];
         [_vSendbutton setTitleColor:UIColorMakeWithHex(@"#009FFF") forState:UIControlStateNormal];
         _vSendbutton.titleLabel.font = VLUIFontMake(14);
         [_vSendbutton addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];

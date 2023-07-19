@@ -95,7 +95,7 @@ class VMAudioSettingView: UIView {
         addSubview(tableView)
         tableView.tableFooterView = UIView()
 
-        tableView.separatorColor = UIColor.HexColor(hex: 0xF6F6F6, alpha: 1)
+        tableView.separatorColor = UIColor(hex: 0xF6F6F6, alpha: 1)
 
         if #available(iOS 15.0, *) {
             tableView.sectionHeaderTopPadding = 0
@@ -217,34 +217,35 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
 
             guard !settingImage.isEmpty else { return cell}
 
-            cell.iconView.image = UIImage(settingImage[0 + indexPath.row])
+            cell.iconView.image = UIImage.voice_image(settingImage[0 + indexPath.row])
             cell.titleLabel.text = settingName[0 + indexPath.row]
             if indexPath.row == 0 {
                 cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
                 switch ains_state {
                 case .high:
-                    cell.contentLabel.text = "voice_High".localized()
+                    cell.contentLabel.text = "voice_High".voice_localized()
                 case .mid:
-                    cell.contentLabel.text = "voice_Medium".localized()
+                    cell.contentLabel.text = "voice_Medium".voice_localized()
                 case .off:
-                    cell.contentLabel.text = "voice_off".localized()
+                    cell.contentLabel.text = "voice_off".voice_localized()
                 }
                 
                 
             } else if indexPath.row == 1 {
                 if roomInfo?.room?.turn_AIAEC == true {
+<<<<<<< HEAD
                     cell.contentLabel.text = "voice_on".localized()
                 } else {
                     cell.contentLabel.text = "voice_off".localized()
                 }
             } else if indexPath.row == 2 {
                 if roomInfo?.room?.turn_AGC == true {
-                    cell.contentLabel.text = "voice_on".localized()
+                    cell.contentLabel.text = "voice_on".voice_localized()
                 } else {
-                    cell.contentLabel.text = "voice_off".localized()
+                    cell.contentLabel.text = "voice_off".voice_localized()
                 }
             } else {
-                cell.contentLabel.text = "Other".localized()
+                cell.contentLabel.text = "Other".voice_localized()
 
             }
 //            else {
@@ -313,7 +314,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             if indexPath.row == 0 {
                 let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
                 guard !settingImage.isEmpty else { return cell}
-                cell.iconView.image = UIImage(settingImage[3])
+                cell.iconView.image = UIImage.voice_image(settingImage[3])
                 cell.titleLabel.text = settingName[3]
                // cell.isAudience = isAudience
                 cell.selectionStyle = .none
@@ -327,7 +328,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 let cell: VMSliderTableViewCell = tableView.dequeueReusableCell(withIdentifier: slIdentifier) as! VMSliderTableViewCell
                 guard !settingImage.isEmpty else { return cell}
 
-                cell.iconView.image = UIImage(settingImage[4])
+                cell.iconView.image = UIImage.voice_image(settingImage[4])
                 cell.titleLabel.text = settingName[4]
                 cell.isAudience = isAudience
                 cell.selectionStyle = .none
@@ -350,7 +351,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             }
             guard !settingImage.isEmpty else { return cell}
 
-            cell.iconView.image = UIImage(settingImage[5])
+            cell.iconView.image = UIImage.voice_image(settingImage[5])
             cell.titleLabel.text = settingName[5]
       
 
@@ -359,11 +360,11 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             } else if indexPath.row == 1 {
                 switch ains_state {
                 case .high:
-                    cell.contentLabel.text = "voice_High".localized()
+                    cell.contentLabel.text = "voice_High".voice_localized()
                 case .mid:
-                    cell.contentLabel.text = "voice_Medium".localized()
+                    cell.contentLabel.text = "voice_Medium".voice_localized()
                 case .off:
-                    cell.contentLabel.text = "voice_off".localized()
+                    cell.contentLabel.text = "voice_off".voice_localized()
                 }
             }
             return cell
@@ -457,18 +458,18 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
     }
     
     private func getSoundType(with index: Int) -> String {
-        var soundType: String = "voice_social_chat".localized()
+        var soundType: String = "voice_social_chat".voice_localized()
         switch index {
         case 0:
-            soundType = "voice_social_chat".localized()
+            soundType = "voice_social_chat".voice_localized()
         case 1:
-            soundType = "voice_karaoke".localized()
+            soundType = "voice_karaoke".voice_localized()
         case 2:
-            soundType = "voice_gaming_buddy".localized()
+            soundType = "voice_gaming_buddy".voice_localized()
         case 3:
-            soundType = "voice_professional_podcaster".localized()
+            soundType = "voice_professional_podcaster".voice_localized()
         default:
-            soundType = "voice_social_chat".localized()
+            soundType = "voice_social_chat".voice_localized()
         }
         return soundType
     }

@@ -40,7 +40,7 @@ public class SASendGiftCell: UICollectionViewCell {
     }
 
     func refresh(item: SAGiftEntity) {
-        icon.image = UIImage(item.gift_id ?? "")
+        icon.image = UIImage.spatial_image(item.gift_id ?? "")
         name.text = item.gift_name
         displayValue.set(image:UIImage.sceneImage(name: "dollagora", bundleName: "VoiceChatRoomResource"), title: item.gift_price ?? "100", titlePosition: .right, additionalSpacing: 5, state: .normal)
         cover.isHidden = !item.selected

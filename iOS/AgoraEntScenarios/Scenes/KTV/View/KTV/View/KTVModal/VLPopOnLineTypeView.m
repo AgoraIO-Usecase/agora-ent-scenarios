@@ -51,7 +51,7 @@
 //    QMUIButton *audioBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"]
 //                                                            title:KTVLocalizedString(@"音频上麦")];
     UIButton *audioBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [audioBtn setTitle:KTVLocalizedString(@"音频上麦") forState:UIControlStateNormal];
+    [audioBtn setTitle:KTVLocalizedString(@"ktv_audio_onmic") forState:UIControlStateNormal];
     [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"] forState:UIControlStateNormal];
     audioBtn.frame = CGRectMake(margin, titleLabel.bottom+26, itemW, VLREALVALUE_WIDTH(72));
 //    audioBtn.imagePosition = QMUIButtonImagePositionLeft;
@@ -78,7 +78,7 @@
 //    QMUIButton *videoBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"]
 //                                                            title:KTVLocalizedString(@"视频上麦")];
     UIButton *videoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [audioBtn setTitle:KTVLocalizedString(@"视频上麦") forState:UIControlStateNormal];
+    [audioBtn setTitle:KTVLocalizedString(@"ktv_video_onmic") forState:UIControlStateNormal];
     [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"] forState:UIControlStateNormal];
     videoBtn.frame = CGRectMake(audioBtn.right+margin, audioBtn.top, itemW, VLREALVALUE_WIDTH(72));
 //    videoBtn.imagePosition = QMUIButtonImagePositionLeft;

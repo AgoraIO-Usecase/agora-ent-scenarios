@@ -128,12 +128,13 @@ class NetworkManager:NSObject {
                        uid: String,
                        tokenType: TokenGeneratorType,
                        type: AgoraTokenType,
+                       expire: UInt = 1500,
                        success: @escaping (String?) -> Void)
     {
         let params = ["appCertificate": KeyCenter.Certificate ?? "",
                       "appId": KeyCenter.AppId,
                       "channelName": channelName,
-                      "expire": 1500,
+                      "expire": expire,
                       "src": "iOS",
                       "ts": "".timeStamp,
                       "type": type.rawValue,
