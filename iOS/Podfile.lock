@@ -17,12 +17,17 @@ PODS:
   - Agora-Scene-Utils (1.1.0)
   - Agora_Chat_iOS (1.0.8)
   - AgoraLyricsScore (1.1.1-beta-3)
+  - AgoraRtcEngine_iOS (1.0)
   - AgoraRtm_iOS (1.5.1)
+  - AgoraRtmKit2 (1.0)
   - AgoraSyncManager (2.0.8):
     - SocketRocket
   - Bugly (2.5.93)
   - BytedEffect (4.3.0):
     - SSZipArchive
+  - CallAPI (0.1.0):
+    - AgoraRtcEngine_iOS
+    - AgoraRtmKit2
   - HWWeakTimer (1.0)
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
@@ -36,8 +41,9 @@ PODS:
   - Masonry (1.1.0)
   - MJRefresh (3.7.5)
   - Protobuf (3.22.1)
+  - Pure1v1 (0.1.0):
+    - CallAPI
   - ScoreEffectUI (1.0.1)
-  - sdk (1.0)
   - SDWebImage (4.4.8):
     - SDWebImage/Core (= 4.4.8)
   - SDWebImage/Core (4.4.8)
@@ -69,10 +75,13 @@ DEPENDENCIES:
   - Agora-Scene-Utils (= 1.1.0)
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraLyricsScore (= 1.1.1-beta-3)
+  - AgoraRtcEngine_iOS (from `libs`)
   - AgoraRtm_iOS (= 1.5.1)
+  - AgoraRtmKit2 (from `Rtm2`)
   - AgoraSyncManager (~> 2.0.8)
   - Bugly (= 2.5.93)
   - BytedEffect (from `bytedEffect.podspec`)
+  - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
   - HWWeakTimer (= 1.0)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
@@ -81,8 +90,8 @@ DEPENDENCIES:
   - Masonry (= 1.1.0)
   - MJRefresh
   - Protobuf (= 3.22.1)
+  - Pure1v1 (from `AgoraEntScenarios/Scenes/Pure1v1`)
   - ScoreEffectUI (= 1.0.1)
-  - sdk (from `sdk.podspec`)
   - SDWebImage (~> 4.2)
   - SDWebImageAPNGCoder
   - SenseLib (from `sense.podspec`)
@@ -129,10 +138,16 @@ SPEC REPOS:
     - ZSwiftBaseLib
 
 EXTERNAL SOURCES:
+  AgoraRtcEngine_iOS:
+    :path: libs
+  AgoraRtmKit2:
+    :path: Rtm2
   BytedEffect:
     :path: bytedEffect.podspec
-  sdk:
-    :path: sdk.podspec
+  CallAPI:
+    :path: AgoraEntScenarios/Common/API/CallAPI
+  Pure1v1:
+    :path: AgoraEntScenarios/Scenes/Pure1v1
   SenseLib:
     :path: sense.podspec
 
@@ -141,10 +156,13 @@ SPEC CHECKSUMS:
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
+  AgoraRtcEngine_iOS: 7af3b344c55059556eeb05dc748ff124c593d4fb
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
+  AgoraRtmKit2: 39e69530451d0e20f0674b7a05bcff0c119cc145
   AgoraSyncManager: 33b8ecf2cd80550f156612d6175a0b0ed1d48497
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   BytedEffect: 74b0bd8150ff1ab9c443d210a7ff7eb49ad3da44
+  CallAPI: 5583ca0d14897cdef5735c2319d15aab206ef4ed
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
@@ -154,8 +172,8 @@ SPEC CHECKSUMS:
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
+  Pure1v1: 4b00229177a944516417f9312fbf1062e1e31548
   ScoreEffectUI: 1a3bbd83b17cfef1c16a3a4eede2854f89c9eb10
-  sdk: e3479e54702dcafc8c3e74a1baa05d7c2c8f753d
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
   SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
@@ -170,6 +188,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 45d28b8220f1f5949554b00c55928e206476fe9b
+PODFILE CHECKSUM: bea0b4681e8d64ab634fb65f8da237d0d3468111
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.12.0
