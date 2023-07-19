@@ -313,7 +313,7 @@ static AFHTTPSessionManager *_sessionManager;
 
 #pragma mark - 处理token失效后切换登录界面
 + (void)setLoginVC {
-    [VLToast toast:AGLocalizedString(@"Token已失效，请重新登录")];
+    [VLToast toast:AGLocalizedString(@"app_expire")];
     // TODO: goto login page
     [[VLUserCenter center] logout];
     [[UIApplication sharedApplication].delegate.window configRootViewController];

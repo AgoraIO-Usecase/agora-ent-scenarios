@@ -29,7 +29,7 @@
     [self addSubview:bgImageView];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectZero];
-    titleLabel.text = KTVLocalizedString(@"当前无人演唱\n\n点击“点歌”一展歌喉");
+    titleLabel.text = KTVLocalizedString(@"ktv_room_no_sing");
     titleLabel.textColor = UIColorWhite;
     titleLabel.font = UIFontMake(14);
     titleLabel.numberOfLines = 0;

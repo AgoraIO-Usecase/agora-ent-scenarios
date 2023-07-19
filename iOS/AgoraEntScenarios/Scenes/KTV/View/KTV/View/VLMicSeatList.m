@@ -102,7 +102,7 @@
         cell.nickNameLabel.textColor = UIColorMakeWithHex(@"#AEABD0");
         cell.avatarImgView.layer.borderColor = UIColorClear.CGColor;
     }
-    cell.roomerLabel.text = KTVLocalizedString(@"房主");
+    cell.roomerLabel.text = KTVLocalizedString(@"ktv_room_owner");
     if (seatModel.headUrl.length > 0) {
         [cell.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.headUrl]];
     }else{

@@ -254,11 +254,11 @@
 
 - (void)_refreshOriginButton {
     if (self.originBtn.selected) {
-        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
-        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
+        [self.originBtn setTitle:KTVLocalizedString(@"ktv_room_original") forState:UIControlStateNormal];
+        [self.originBtn setTitle:KTVLocalizedString(@"ktv_room_original") forState:UIControlStateSelected];
     } else {
-        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
-        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
+        [self.originBtn setTitle:KTVLocalizedString(@"ktv_room_original") forState:UIControlStateNormal];
+        [self.originBtn setTitle:KTVLocalizedString(@"ktv_room_original") forState:UIControlStateSelected];
     }
     [self setNeedsLayout];
 }
@@ -531,7 +531,7 @@
     if (!_originBtn) {
         _originBtn.spacingBetweenImageAndTitle = 2;
         _originBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
+        [_originBtn setTitle:KTVLocalizedString(@"ktv_room_original") forState:UIControlStateNormal];
         _originBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
         _originBtn.titleLabel.font = UIFontMake(10.0);
         [self.originBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -547,7 +547,7 @@
     if (!_settingBtn) {
         _settingBtn = [[VLHotSpotBtn alloc] init];
         [_settingBtn setImage:[UIImage sceneImageWithName:@"ktv_subtitle_icon"] forState:UIControlStateNormal];
-        [self.settingBtn setTitle:@"调音" forState:UIControlStateNormal];
+        [self.settingBtn setTitle:KTVLocalizedString(@"ktv_room_player_tweak") forState:UIControlStateNormal];
         [self.settingBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.settingBtn.titleLabel.font = UIFontMake(10.0);
         [_settingBtn addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -570,7 +570,7 @@
         _scoreUnitLabel = [[UILabel alloc] init];
         _scoreUnitLabel.font = VLUIFontMake(10);
         _scoreUnitLabel.textColor = [UIColor whiteColor];
-        _scoreUnitLabel.text = KTVLocalizedString(@"分");
+        _scoreUnitLabel.text = KTVLocalizedString(@"ktv_score_formatter");
     }
     return _scoreUnitLabel;
 }
