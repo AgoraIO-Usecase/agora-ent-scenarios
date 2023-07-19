@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardBackgroundColor="@android:color/transparent"
+    tools:layout_height="320dp"
+    tools:theme="@style/Theme.MaterialComponents.Light">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/ilIDLE"
+            layout="@layout/ktv_layout_game_idle_view"
+            android:visibility="visible"
+            tools:visibility="visible" />
+
+        <include
+            android:id="@+id/ilActive"
+            layout="@layout/ktv_layout_game_active_view"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <io.agora.scene.ktv.singrelay.widget.rankList.RankListView
+            android:id="@+id/ilRank"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            tools:visibility="gone"/>
+
+        <Button
+            android:id="@+id/btGameAgain"
+            android:layout_width="100dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="270dp"
+            android:background="@mipmap/ktv_game_again"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
+    </FrameLayout>
+
+</androidx.cardview.widget.CardView>
