@@ -117,7 +117,7 @@ struct ShowStatisticsInfo {
     
     mutating func cleanRemoteDescription() -> (String, String){
         let sendTitle = "show_statistic_receive_title".show_localized + "\n"
-        let videoSize = "show_statistic_receive_resolution"+": 0 x 0"
+        let videoSize = "show_statistic_receive_resolution".show_localized+": 0 x 0"
         let videoSend = "show_statistic_bitrate".show_localized+": \(0) kbps"
         let downlink = "show_statistic_down_net_speech".show_localized+": \(downlink) KB/s"
 
