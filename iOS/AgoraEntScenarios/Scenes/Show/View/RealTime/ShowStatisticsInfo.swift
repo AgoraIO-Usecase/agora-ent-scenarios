@@ -133,7 +133,7 @@ struct ShowStatisticsInfo {
     
     mutating func cleanLocalDescription() -> (String, String){
         let sendTitle = "show_statistic_send_title".show_localized + "\n"
-        let videoSize = "show_statistic_encode_resolution"+": 0 x 0"
+        let videoSize = "show_statistic_encode_resolution".show_localized+": 0 x 0"
         let videoSend = "show_statistic_up_bitrate".show_localized+": 0 kbps"
         let uplink = "show_statistic_up_net_speech".show_localized+": \(uplink) KB/s"
         
@@ -156,7 +156,7 @@ struct ShowStatisticsInfo {
     
     private func localDescription(info: LocalInfo, audioOnly: Bool) -> (String, String) {
         let sendTitle = "show_statistic_send_title".show_localized + "\n"
-        let videoSize = "show_statistic_encode_resolution"+": \(info.videoStats.encodedFrameWidth) x \(info.videoStats.encodedFrameHeight)"
+        let videoSize = "show_statistic_encode_resolution".show_localized+": \(info.videoStats.encodedFrameWidth) x \(info.videoStats.encodedFrameHeight)"
         let videoSend = "show_statistic_up_bitrate".show_localized+": \(info.videoStats.sentBitrate) kbps"
         let uplink = "show_statistic_up_net_speech".show_localized+": \(uplink) KB/s"
         
@@ -178,7 +178,7 @@ struct ShowStatisticsInfo {
     
     private func remoteDescription(info: RemoteInfo, audioOnly: Bool) -> (String, String) {
         let sendTitle = "show_statistic_receive_title".show_localized + "\n"
-        let videoSize = "show_statistic_receive_resolution"+": \(info.videoStats.width) x \(info.videoStats.height)"
+        let videoSize = "show_statistic_receive_resolution".show_localized+": \(info.videoStats.width) x \(info.videoStats.height)"
         let videoSend = "show_statistic_bitrate".show_localized+": \(info.videoStats.receivedBitrate) kbps"
         let downlink = "show_statistic_down_net_speech".show_localized+": \(downlink) KB/s"
 
