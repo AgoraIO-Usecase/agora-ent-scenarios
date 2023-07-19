@@ -75,9 +75,9 @@ class RoomSoundCardSheetDialog constructor() : BaseSheetDialog<VoiceDialogVirtua
         }
         val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         isPlugIn = audioManager.isWiredHeadsetOn
-        soundCardManager.enable(isPlugIn, true, callback = {
-            mOnSoundCardChange?.invoke()
-        })
+//        soundCardManager.enable(isPlugIn, true, callback = {
+//            mOnSoundCardChange?.invoke()
+//        })
         initView()
     }
 
@@ -212,7 +212,7 @@ class RoomSoundCardSheetDialog constructor() : BaseSheetDialog<VoiceDialogVirtua
                 binding?.groupSoundCardSwitch?.visibility = View.VISIBLE
                 binding?.groupSoundCardSettings?.visibility = View.VISIBLE
                 binding?.groupSoundCardAbnormal?.visibility = View.INVISIBLE
-                binding?.mcbSoundCardSwitch?.isChecked = true
+                binding?.mcbSoundCardSwitch?.isChecked = soundCardManager.isEnable()
 
             } else {
                 // 未插入有线耳机
@@ -220,14 +220,9 @@ class RoomSoundCardSheetDialog constructor() : BaseSheetDialog<VoiceDialogVirtua
                 binding?.groupSoundCardSettings?.visibility = View.INVISIBLE
                 binding?.groupSoundCardAbnormal?.visibility = View.VISIBLE
                 binding?.mcbSoundCardSwitch?.isChecked = false
+                soundCardManager.enable(false, force = true, callback = {
+                })
             }
-            soundCardManager.enable(isPlugIn, force = true, callback = {
-                if (isPlugIn){
-                    setupPresetSoundView(soundCardManager.presetSound())
-                    setupGainView(soundCardManager.gainValue())
-                    setupPresetView(soundCardManager.presetValue())
-                }
-            })
         }
     }
 
