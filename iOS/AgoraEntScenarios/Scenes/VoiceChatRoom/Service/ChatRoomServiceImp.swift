@@ -751,7 +751,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     func limitError() -> VoiceRoomError {
         let error = VoiceRoomError()
         error.code = "403"
-        error.message = "Members reach limit!".voice_localized()
+        error.message = "voice_members_reach_limit".voice_localized()
         return error
     }
 

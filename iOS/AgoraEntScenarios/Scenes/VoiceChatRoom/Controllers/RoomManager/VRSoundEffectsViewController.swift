@@ -26,7 +26,7 @@ class VRSoundEffectsViewController: VRBaseViewController {
     lazy var createContainer: UIView = .init(frame: CGRect(x: 30, y: 15, width: ScreenWidth - 60, height: 50)).backgroundColor(.white)
 
     lazy var toLive: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: 30, y: 15, width: ScreenWidth - 60, height: 50)).title(LanguageManager.localValue(key: "Go Live"), .normal).font(.systemFont(ofSize: 16, weight: .semibold)).setGradient([UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1), UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).cornerRadius(25).addTargetFor(self, action: #selector(VRSoundEffectsViewController.goLive), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: 30, y: 15, width: ScreenWidth - 60, height: 50)).title(LanguageManager.localValue(key: "voice_go_live"), .normal).font(.systemFont(ofSize: 16, weight: .semibold)).setGradient([UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1), UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).cornerRadius(25).addTargetFor(self, action: #selector(VRSoundEffectsViewController.goLive), for: .touchUpInside)
     }()
     
     override func viewDidLoad() {
@@ -35,7 +35,7 @@ class VRSoundEffectsViewController: VRBaseViewController {
         view.addSubViews([background, effects, done])
         done.addSubViews([createContainer, toLive])
         view.bringSubviewToFront(navigation)
-        navigation.title.text = LanguageManager.localValue(key: "Sound Selection")
+        navigation.title.text = LanguageManager.localValue(key: "voice_sound_selection")
         createContainer.layer.cornerRadius = 25
         createContainer.layer.shadowRadius = 8
         createContainer.layer.shadowOffset = CGSize(width: 0, height: 4)
@@ -49,7 +49,7 @@ class VRSoundEffectsViewController: VRBaseViewController {
 
     @objc func goLive() {
         if name.isEmpty {
-            view.makeToast("No Room Name".voice_localized(), point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("voice_no_room_name".voice_localized(), point: view.center, title: nil, image: nil, completion: nil)
         }
         Throttler.throttle(queue:.main,delay: 1,shouldRunLatest: true) {
             self.entryRoom()
@@ -57,7 +57,7 @@ class VRSoundEffectsViewController: VRBaseViewController {
     }
 
     @objc private func entryRoom() {
-        SVProgressHUD.show(withStatus: "Loading".voice_localized())
+        SVProgressHUD.show(withStatus: "voice_loading".voice_localized())
         self.view.window?.isUserInteractionEnabled = false
         let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
         let entity = self.createEntity()
@@ -68,7 +68,7 @@ class VRSoundEffectsViewController: VRBaseViewController {
             if room_id.isEmpty {
                 SVProgressHUD.dismiss()
                 self.view.window?.isUserInteractionEnabled = true
-                self.view.window?.makeToast("illegal check".voice_localized())
+                self.view.window?.makeToast("voice_illegal_check".voice_localized())
                 ChatRoomServiceImp.getSharedInstance().leaveRoom(entity.room_id ?? "") { error, value in
                 }
                 self.backAction()
@@ -97,7 +97,7 @@ class VRSoundEffectsViewController: VRBaseViewController {
             if let room = room,error == nil {
                 self.entryRoom(room: room)
             } else {
-                SVProgressHUD.showError(withStatus: "Create failed!".voice_localized())
+                SVProgressHUD.showError(withStatus: "voice_create_failed".voice_localized())
             }
         }
     }

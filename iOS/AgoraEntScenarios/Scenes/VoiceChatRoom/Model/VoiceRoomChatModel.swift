@@ -56,7 +56,7 @@ extension VoiceRoomChatEntity {
             let attributeText = NSMutableAttributedString {
                 AttributedText(self.userName!).foregroundColor(Color(0x8BB3FF)).font(.systemFont(ofSize: 13, weight: .semibold)).lineSpacing(5)
                 Space()
-                AttributedText("Joined".voice_localized()).foregroundColor(self.joined! == false ? Color.white : Color(0xFCF0B3)).font(.systemFont(ofSize: 13, weight: .semibold)).lineSpacing(5)
+                AttributedText("voice_joined".voice_localized()).foregroundColor(self.joined! == false ? Color.white : Color(0xFCF0B3)).font(.systemFont(ofSize: 13, weight: .semibold)).lineSpacing(5)
                 Space()
             }
             attributeText.append(NSMutableAttributedString(attachment: attachment))

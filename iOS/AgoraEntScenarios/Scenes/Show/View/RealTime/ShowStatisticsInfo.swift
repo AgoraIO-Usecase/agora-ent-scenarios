@@ -116,14 +116,14 @@ struct ShowStatisticsInfo {
     }
     
     mutating func cleanRemoteDescription() -> (String, String){
-        let sendTitle = "接收\n".show_localized
-        let videoSize = "接收分辨率"+": 0 x 0"
-        let videoSend = "码率".show_localized+": \(0) kbps"
-        let downlink = "下行网络".show_localized+": \(downlink) KB/s"
+        let sendTitle = "show_statistic_receive_title".show_localized + "\n"
+        let videoSize = "show_statistic_receive_resolution".show_localized+": 0 x 0"
+        let videoSend = "show_statistic_bitrate".show_localized+": \(0) kbps"
+        let downlink = "show_statistic_down_net_speech".show_localized+": \(downlink) KB/s"
 
-        let fps = "接收帧率".show_localized+": \(0) fps"
-        let vSendLoss = "下行丢包率".show_localized+": \(0) %"
-        let lastmile = "延迟".show_localized+": \(0) ms"
+        let fps = "show_statistic_receive_fps".show_localized+": \(0) fps"
+        let vSendLoss = "show_statistic_down_loss_package".show_localized+": \(0) %"
+        let lastmile = "show_statistic_delay".show_localized+": \(0) ms"
         
         let leftInfo = [sendTitle, videoSize,   videoSend,  downlink].joined(separator: "\n\n")
         let rightInfo = [" \n",     fps,        vSendLoss,  lastmile].joined(separator: "\n\n")
@@ -132,13 +132,13 @@ struct ShowStatisticsInfo {
     }
     
     mutating func cleanLocalDescription() -> (String, String){
-        let sendTitle = "发送\n".show_localized
-        let videoSize = "编码分辨率"+": 0 x 0"
-        let videoSend = "发送码率".show_localized+": 0 kbps"
-        let uplink = "上行网络".show_localized+": \(uplink) KB/s"
+        let sendTitle = "show_statistic_send_title".show_localized + "\n"
+        let videoSize = "show_statistic_encode_resolution".show_localized+": 0 x 0"
+        let videoSend = "show_statistic_up_bitrate".show_localized+": 0 kbps"
+        let uplink = "show_statistic_up_net_speech".show_localized+": \(uplink) KB/s"
         
-        let fps = "编码帧率".show_localized+": 0 fps"
-        let vSendLoss = "上行丢包率".show_localized+": 0 %"
+        let fps = "show_advance_setting_FPS_title".show_localized+": 0 fps"
+        let vSendLoss = "show_statistic_up_loss_package".show_localized+": 0 %"
         
         let leftInfo =  [sendTitle, videoSize, videoSend,   uplink ].joined(separator: "\n\n")
         let rightInfo = [" \n",     fps,       vSendLoss,   " " ].joined(separator: "\n\n")
@@ -155,13 +155,13 @@ struct ShowStatisticsInfo {
     }
     
     private func localDescription(info: LocalInfo, audioOnly: Bool) -> (String, String) {
-        let sendTitle = "发送\n".show_localized
-        let videoSize = "编码分辨率"+": \(info.videoStats.encodedFrameWidth) x \(info.videoStats.encodedFrameHeight)"
-        let videoSend = "发送码率".show_localized+": \(info.videoStats.sentBitrate) kbps"
-        let uplink = "上行网络".show_localized+": \(uplink) KB/s"
+        let sendTitle = "show_statistic_send_title".show_localized + "\n"
+        let videoSize = "show_statistic_encode_resolution".show_localized+": \(info.videoStats.encodedFrameWidth) x \(info.videoStats.encodedFrameHeight)"
+        let videoSend = "show_statistic_up_bitrate".show_localized+": \(info.videoStats.sentBitrate) kbps"
+        let uplink = "show_statistic_up_net_speech".show_localized+": \(uplink) KB/s"
         
-        let fps = "编码帧率".show_localized+": \(fps) fps"
-        let vSendLoss = "上行丢包率".show_localized+": \(info.videoStats.txPacketLossRate) %"
+        let fps = "show_advance_setting_FPS_title".show_localized+": \(fps) fps"
+        let vSendLoss = "show_statistic_up_loss_package".show_localized+": \(info.videoStats.txPacketLossRate) %"
         
         let audioSend = "ASend: \(info.audioStats.sentBitrate) kbps"
         let cpu = "CPU: \(info.channelStats.cpuAppUsage)%/\(info.channelStats.cpuTotalUsage) %"
@@ -177,14 +177,14 @@ struct ShowStatisticsInfo {
     }
     
     private func remoteDescription(info: RemoteInfo, audioOnly: Bool) -> (String, String) {
-        let sendTitle = "接收\n".show_localized
-        let videoSize = "接收分辨率"+": \(info.videoStats.width) x \(info.videoStats.height)"
-        let videoSend = "码率".show_localized+": \(info.videoStats.receivedBitrate) kbps"
-        let downlink = "下行网络".show_localized+": \(downlink) KB/s"
+        let sendTitle = "show_statistic_receive_title".show_localized + "\n"
+        let videoSize = "show_statistic_receive_resolution".show_localized+": \(info.videoStats.width) x \(info.videoStats.height)"
+        let videoSend = "show_statistic_bitrate".show_localized+": \(info.videoStats.receivedBitrate) kbps"
+        let downlink = "show_statistic_down_net_speech".show_localized+": \(downlink) KB/s"
 
-        let fps = "接收帧率".show_localized+": \(fps) fps"
-        let vSendLoss = "下行丢包率".show_localized+": \(info.videoStats.packetLossRate) %"
-        let lastmile = "延迟".show_localized+": \(info.videoStats.delay) ms"
+        let fps = "show_statistic_receive_fps".show_localized+": \(fps) fps"
+        let vSendLoss = "show_statistic_down_loss_package".show_localized+": \(info.videoStats.packetLossRate) %"
+        let lastmile = "show_statistic_delay".show_localized+": \(info.videoStats.delay) ms"
         
         let audioRecv = "ARecv: \(info.audioStats.receivedBitrate) kbps"
         let audioLoss = "ALoss: \(info.audioStats.audioLossRate) %"

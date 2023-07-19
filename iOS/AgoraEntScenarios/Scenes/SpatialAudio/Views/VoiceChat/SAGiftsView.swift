@@ -51,10 +51,10 @@ public class SAGiftsView: UIView, UICollectionViewDelegate, UICollectionViewData
     lazy var chooseQuantity: UIButton = .init(type: .custom).frame(CGRect(x: 0, y: 0, width: 76, height: 40)).font(.systemFont(ofSize: 14, weight: .semibold)).textColor(.black, .normal).title("1", .normal).backgroundColor(.white).addTargetFor(self, action: #selector(chooseCount), for: .touchUpInside)
 
     lazy var send: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.chooseQuantity.frame.maxX, y: 0, width: 79, height: 40)).font(.systemFont(ofSize: 14, weight: .semibold)).setGradient([UIColor(0x219BFF), UIColor(0x345DFF)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).textColor(.white, .normal).title(sceneLocalized( "Send"), .normal).addTargetFor(self, action: #selector(sendAction), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: self.chooseQuantity.frame.maxX, y: 0, width: 79, height: 40)).font(.systemFont(ofSize: 14, weight: .semibold)).setGradient([UIColor(0x219BFF), UIColor(0x345DFF)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).textColor(.white, .normal).title("spatial_voice_send".spatial_localized(), .normal).addTargetFor(self, action: #selector(sendAction), for: .touchUpInside)
     }()
 
-    lazy var title: UILabel = .init(frame: CGRect(x: ScreenWidth / 2.0 - 30, y: 25.5, width: 60, height: 20)).textAlignment(.center).textColor(UIColor(0x040925)).font(.systemFont(ofSize: 16, weight: .semibold)).text(sceneLocalized( "Gifts"))
+    lazy var title: UILabel = .init(frame: CGRect(x: ScreenWidth / 2.0 - 30, y: 25.5, width: 60, height: 20)).textAlignment(.center).textColor(UIColor(0x040925)).font(.systemFont(ofSize: 16, weight: .semibold)).text("spatial_voice_gifts".spatial_localized())
 
     lazy var disableView: UIView = .init(frame: CGRect(x: ScreenWidth / 2.0, y: self.lineLayer.frame.minY, width: ScreenWidth / 2.0, height: 40)).backgroundColor(UIColor(white: 1, alpha: 0.7))
 
@@ -104,10 +104,10 @@ public class SAGiftsView: UIView, UICollectionViewDelegate, UICollectionViewData
             self.pop.hide()
             self.chooseQuantity.isSelected = false
             self.gift_count = $0
-            self.contribution.text = "Contribution Total".spatial_localized() + ": " + "\(Int(self.gift_count)! * Int(self.current?.gift_price ?? "1")!)"
+            self.contribution.text = "spatial_voice_contribution_total".spatial_localized() + ": " + "\(Int(self.gift_count)! * Int(self.current?.gift_price ?? "1")!)"
         }
         current = self.gifts.first
-        contribution.text = "Contribution Total".spatial_localized() + ": " + "1"
+        contribution.text = "spatial_voice_contribution_total".spatial_localized() + ": " + "1"
     }
 
     @available(*, unavailable)
@@ -135,7 +135,7 @@ public extension SAGiftsView {
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             self.disableView.isHidden = true
-            self.contribution.text = "Contribution Total".spatial_localized() + ": " + "\(self.current?.gift_price ?? "1")"
+            self.contribution.text = "spatial_voice_contribution_total".spatial_localized() + ": " + "\(self.current?.gift_price ?? "1")"
         }
     }
 
@@ -184,7 +184,7 @@ public extension SAGiftsView {
             }
         }
         let total = Int(gift_count)! * Int(gift!.gift_price ?? "1")!
-        contribution.text = "Contribution Total".spatial_localized() + ": " + "\(total)"
+        contribution.text = "spatial_voice_contribution_total".spatial_localized() + ": " + "\(total)"
         giftList.reloadData()
     }
 }

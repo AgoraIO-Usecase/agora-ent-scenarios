@@ -42,10 +42,10 @@ class VMEQSettingView: UIView, UITextViewDelegate {
     var soundEffect: Int = 1 {
         didSet {
 
-            let socialH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat."), fontSize: 13, width: bounds.size.width - 80)
-            let ktvH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful."), fontSize: 13, width: bounds.size.width - 80)
-            let gameH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. "), fontSize: 13, width: bounds.size.width - 80)
-            let anchorH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. "), fontSize: 13, width: bounds.size.width - 80)
+            let socialH: CGFloat = textHeight(text: LanguageManager.localValue(key: "voice_chatroom_social_chat_introduce"), fontSize: 13, width: bounds.size.width - 80)
+            let ktvH: CGFloat = textHeight(text: LanguageManager.localValue(key: "voice_chatroom_karaoke_introduce"), fontSize: 13, width: bounds.size.width - 80)
+            let gameH: CGFloat = textHeight(text: LanguageManager.localValue(key: "voice_chatroom_gaming_buddy_introduce"), fontSize: 13, width: bounds.size.width - 80)
+            let anchorH: CGFloat = textHeight(text: LanguageManager.localValue(key: "voice_chatroom_professional_broadcaster_introduce"), fontSize: 13, width: bounds.size.width - 80)
             print("\(soundEffect)-----")
             switch soundEffect {
             case 1:
@@ -73,34 +73,38 @@ class VMEQSettingView: UIView, UITextViewDelegate {
 
     private var selTag: Int?
 
-    private let settingName: [String] = ["Spatial Audio", "Attenuation factor", "Air absorb", "Voice blur"]
+    private let settingName: [String] = ["voice_spatial_audio", "Attenuation factor", "Air absorb", "Voice blur"]
     
-    private let AIAECSettingName: [String] = ["Turn on AIAEC".voice_localized()]
-    private let AGCSettingName: [String] = ["Turn on AGC".voice_localized()]
+    private let AIAECSettingName: [String] = ["voice_turn_on_AIAEC".voice_localized()]
+    private let AGCSettingName: [String] = ["voice_turn_on_AGC".voice_localized()]
 
     
-    private let soundType: [String] = ["TV Sound".voice_localized(), "Kitchen Sound".voice_localized(), "Street Sound".voice_localized(), "Mashine Sound".voice_localized(), "Office Sound".voice_localized(), "Home Sound".voice_localized(), "Construction Sound".voice_localized(), "Alert Sound/Music".voice_localized(), "Applause".voice_localized(), "Wind Sound".voice_localized(), "Mic Pop Filter".voice_localized(), "Audio Feedback".voice_localized(), "Microphone Finger Rub Sound".voice_localized(), "Screen Tap Sound".voice_localized()]
+    private let soundType: [String] = ["voice_TV_sound".voice_localized(), "voice_kitchen_sound".voice_localized(), "voice_street_sound".voice_localized(), "voice_mashine_sound".voice_localized(), "voice_office_sound".voice_localized(), "voice_home_sound".voice_localized(), "voice_construction_sound".voice_localized(), "voice_alert_sound/Music".voice_localized(), "voice_applause".voice_localized(), "voice_wind_sound".voice_localized(), "voice_mic_pop_filter".voice_localized(), "voice_audio_feedback".voice_localized(), "voice_microphone_finger_rub_sound".voice_localized(), "voice_screen_tap_sound".voice_localized()]
     
-    private let soundDetail: [String] = ["Ex. Bird, car, subway sounds".voice_localized(), "Ex. Fan, air conditioner, vacuum cleaner, printer sounds".voice_localized(), "Ex. Keyboard tapping, mouse clicking sounds".voice_localized(), "Ex. Door closing, chair squeaking, baby crying sounds".voice_localized(), "Ex. Knocking sound".voice_localized()]
+    private let soundDetail: [String] = ["voice_ex_bird_car_subway_sounds".voice_localized(),
+                                         "voice_ex_fan_air_conditioner_vacuum_cleaner_printer_sounds".voice_localized(),
+                                         "voice_ex_keyboard_tapping_mouse_clicking_sounds".voice_localized(),
+                                         "voice_ex_door_closing_chair_squeaking_baby_crying_sounds".voice_localized(),
+                                         "voice_ex_knocking_sound".voice_localized()]
 
     var settingType: AUDIO_SETTING_TYPE = .Spatial {
         didSet {
             if settingType == .Spatial {
                 titleLabel.text = "Spatial Setting".voice_localized()
             } else if settingType == .Noise {
-                titleLabel.text = "Noise Setting".voice_localized()
+                titleLabel.text = "voice_noise_setting".voice_localized()
             } else if settingType == .effect {
-                titleLabel.text = "Effect Setting".voice_localized()
+                titleLabel.text = "voice_effect_setting".voice_localized()
             } else if settingType == .AIAEC {
-                titleLabel.text = "AIAEC".voice_localized()
+                titleLabel.text = "voice_AIAEC".voice_localized()
             } else if settingType == .AGC {
-                titleLabel.text = "AGC".voice_localized()
+                titleLabel.text = "voice_AGC".voice_localized()
             }
             tableView.reloadData()
         }
     }
 
-    lazy var otherSoundHeaderHeight: CGFloat = textHeight(text: "otherSound".voice_localized(), fontSize: 12, width: ScreenWidth - 100)
+    lazy var otherSoundHeaderHeight: CGFloat = textHeight(text: "voice_otherSound".voice_localized(), fontSize: 12, width: ScreenWidth - 100)
 
     var resBlock: ((AUDIO_SETTING_TYPE) -> Void)?
 
@@ -201,7 +205,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if settingType == .Noise && section == 2 {
-            return textHeight(text: "AINS Sup".voice_localized(), fontSize: 13, width: ScreenWidth - 40) + 15
+            return textHeight(text: "voice_AINS_sup".voice_localized(), fontSize: 13, width: ScreenWidth - 40) + 15
         } else if settingType == .effect && section == 1 {
             return 40 + 12 + otherSoundHeaderHeight + 10
         } else if settingType == .AIAEC || settingType == .AGC {
@@ -251,7 +255,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             let titleLabel: UILabel = .init(frame: CGRect(x: 10, y: 5, width: screenWidth-20, height: 66))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.numberOfLines = 0
-            titleLabel.text = "AIAEC_desc".voice_localized()
+            titleLabel.text = "voice_AIAEC_desc".voice_localized()
             titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
             footer.addSubview(titleLabel)
             return footer
@@ -262,7 +266,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             let titleLabel: UILabel = .init(frame: CGRect(x: 10, y: 5, width: screenWidth-20, height: 60))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.numberOfLines = 0
-            titleLabel.text = "AGC_desc".voice_localized()
+            titleLabel.text = "voice_AGC_desc".voice_localized()
             titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
             footer.addSubview(titleLabel)
             return footer
@@ -271,8 +275,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             let footer = UIView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 40))
             footer.backgroundColor = .white
             let textView = UITextView(frame: CGRect(x: 30, y: 0, width: screenWidth - 60, height: 40))
-
-            let text = NSMutableAttributedString(string: "Visit More".voice_localized())
+            let text = NSMutableAttributedString(string: "voice_visit_more".voice_localized())
             text.addAttribute(NSAttributedString.Key.font,
                               value: UIFont.systemFont(ofSize: 13),
                               range: NSRange(location: 0, length: text.length))
@@ -314,10 +317,10 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 5, width: 300, height: 30))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             if settingType == .effect {
-                titleLabel.text = "Current Sound".voice_localized()
+                titleLabel.text = "voice_current_sound".voice_localized()
                 titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
             } else if settingType == .Spatial {
-                titleLabel.text = "Agora Blue Bot".voice_localized()
+                titleLabel.text = "voice_blue".voice_localized()
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
             } else if settingType == .AIAEC {
                 
@@ -325,7 +328,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
         
 
             } else {
-                titleLabel.text = "AINS Settings".voice_localized()
+                titleLabel.text = "voice_AINS_settings".voice_localized()
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
             }
             headerView.addSubview(titleLabel)
@@ -338,7 +341,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             if settingType == .effect {
                 titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
-                titleLabel.text = "Other Sound".voice_localized()
+                titleLabel.text = "voice_other_sound".voice_localized()
                 headerView.addSubview(titleLabel)
 
                 if section == 1 {
@@ -353,7 +356,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
                     warningView.addSubview(iconView)
 
                     let warningLabel = UILabel(frame: CGRect(x: 30, y: 6, width: screenWidth - 100, height: otherSoundHeaderHeight))
-                    warningLabel.text = "otherSound".voice_localized()
+                    warningLabel.text = "voice_otherSound".voice_localized()
                     warningLabel.numberOfLines = 0
                     warningLabel.lineBreakMode = .byCharWrapping
                     warningLabel.font = UIFont.systemFont(ofSize: 12)
@@ -362,13 +365,13 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
                 }
             } else {
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-                titleLabel.text = settingType == .Spatial ? "Agora Red Bot" : "AINS Definition".voice_localized()
+                titleLabel.text = settingType == .Spatial ? "voice_red".voice_localized() : "voice_AINS_definition".voice_localized()
                 headerView.addSubview(titleLabel)
             }
 
             return headerView
         } else {
-            let height = textHeight(text: "AINS Sup".voice_localized(), fontSize: 13, width: ScreenWidth - 40)
+            let height = textHeight(text: "voice_AINS_sup".voice_localized(), fontSize: 13, width: ScreenWidth - 40)
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: height + 15))
             headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 5, width: screenWidth - 40, height: height))
@@ -376,7 +379,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             titleLabel.lineBreakMode = .byCharWrapping
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-            titleLabel.text = "AINS Sup".voice_localized()
+            titleLabel.text = "voice_AINS_sup".voice_localized()
             headerView.addSubview(titleLabel)
             return headerView
         }
@@ -459,7 +462,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
                  return cell
              } else if indexPath.section == 1 {
                  let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: tIdentifier)!
-                 cell.textLabel?.text = "AINS: AI Noise Suppression".voice_localized()
+                 cell.textLabel?.text = "voice_AINS_AI_noise_suppression".voice_localized()
                  cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
                  cell.textLabel?.textColor = UIColor(hex: 0x3C4267, alpha: 1)
                  cell.isUserInteractionEnabled = false

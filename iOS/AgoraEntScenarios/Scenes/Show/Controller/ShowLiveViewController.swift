@@ -568,7 +568,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             ShowReceivePKAlertVC.present(name: invitation.userName, style: .mic) { result in
                 switch result {
                 case .accept:
-                    ToastView.showWait(text: "连麦中...".show_localized)
+                    ToastView.showWait(text: "show_is_onseat_doing".show_localized)
                     // 解决多人同时点击同意连麦导致的问题, 正常项目应该由后台处理
                     DispatchQueue.global().asyncAfter(deadline: .now() + Double.random(in: 0.1...2.0)) {
                         imp.getAllInterationList { _, list in
@@ -577,7 +577,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                             let isLink = !list.filter({ $0.interactStatus == .onSeat }).isEmpty
                             if isLink {
                                 imp.rejectMicSeatInvitation { _ in }
-                                ToastView.show(text: "主播已在连麦中, 暂时无法连麦".show_localized)
+                                ToastView.show(text: "show_broadcastor_is_onseat".show_localized)
                                 return
                             }
                             imp.acceptMicSeatInvitation { error in }

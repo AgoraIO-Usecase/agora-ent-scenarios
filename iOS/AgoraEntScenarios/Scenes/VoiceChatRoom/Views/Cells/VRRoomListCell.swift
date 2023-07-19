@@ -22,7 +22,7 @@ public final class VRRoomListCell: UITableViewCell {
 
     lazy var seenCount: UIButton = .init(type: .custom).frame(CGRect(x: self.roomName.frame.minX - 10, y: self.background.frame.height - 36, width: 55, height: 16)).isUserInteractionEnabled(false).font(UIFont.systemFont(ofSize: 10, weight: .regular))
 
-    lazy var entryRoom: UIButton = .init(type: .custom).frame(CGRect(x: self.background.frame.width - 72, y: self.background.frame.height - 40, width: 56, height: 24)).font(UIFont.systemFont(ofSize: 12, weight: .semibold)).backgroundColor(.clear).title(LanguageManager.localValue(key: "Enter"), .normal)
+    lazy var entryRoom: UIButton = .init(type: .custom).frame(CGRect(x: self.background.frame.width - 72, y: self.background.frame.height - 40, width: 56, height: 24)).font(UIFont.systemFont(ofSize: 12, weight: .semibold)).backgroundColor(.clear).title(LanguageManager.localValue(key: "voice_enter"), .normal)
 
     lazy var entryBlur: UIView = .init(frame: self.entryRoom.frame).backgroundColor(UIColor(white: 1, alpha: 0.3)).cornerRadius(self.entryRoom.frame.height / 2.0)
 
@@ -53,7 +53,7 @@ public final class VRRoomListCell: UITableViewCell {
     func setupViewsAttributes(room: VRRoomEntity) {
         entity = room
         if let show = room.is_private, show == true {
-            accessSymbol.set(image: UIImage.sceneImage(name: "suo", bundleName: "VoiceChatRoomResource"), title: LanguageManager.localValue(key: "Private"), titlePosition: .right, additionalSpacing: 5, state: .normal)
+            accessSymbol.set(image: UIImage.sceneImage(name: "suo", bundleName: "VoiceChatRoomResource"), title: LanguageManager.localValue(key: "voice_private"), titlePosition: .right, additionalSpacing: 5, state: .normal)
             accessSymbol.setBackgroundImage(UIImage.sceneImage(name: "securityType", bundleName: "VoiceChatRoomResource"), for: .normal)
             accessSymbol.isHidden = false
         } else {
