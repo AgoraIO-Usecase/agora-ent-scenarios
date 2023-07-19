@@ -1386,7 +1386,7 @@ public class RoomLivingViewModel extends ViewModel {
                 super.onAudioRouteChanged(routing);
                 KTVLogger.d(TAG, "onAudioRouteChanged, routing:" + routing);
                 if (mSetting == null) return;
-                if (routing == 0 || routing == 2 || routing == 5) {
+                if (routing == 0 || routing == 2 || routing == 5 || routing == 6) {
                     mSetting.setHasEarPhone(true);
                 } else {
                     mSetting.setHasEarPhone(false);

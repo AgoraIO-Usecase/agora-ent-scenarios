@@ -222,7 +222,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         if (!isPublishAudio) return // 必须为麦上者
         if (professionalModeOpen) {
             // 专业
-            if (audioRouting == 0 || audioRouting == 2 || audioRouting == 5) {
+            if (audioRouting == 0 || audioRouting == 2 || audioRouting == 5 || audioRouting == 6) {
                 // 耳机 关闭3A 关闭md
                 mRtcEngine.setParameters("{\"che.audio.aec.enable\": false}")
                 mRtcEngine.setParameters("{\"che.audio.agc.enable\": false}")
