@@ -99,7 +99,7 @@ extension VoiceRoomViewController {
          */
         if let mic = roomInfo?.mic_info?[index] {
             if mic.status == 2 && isOwner == false {
-                view.makeToast("Banned".voice_localized())
+                view.makeToast("voice_banned".voice_localized())
                 return
             }
         }
@@ -119,7 +119,7 @@ extension VoiceRoomViewController {
     func changeMic(from: Int, to: Int) {
         if let mic: VRRoomMic = roomInfo?.mic_info?[to] {
             if mic.status == 3 || mic.status == 4 {
-                view.makeToast("Mic Closed".voice_localized())
+                view.makeToast("voice_mic_closed".voice_localized())
                 return
             }
         }

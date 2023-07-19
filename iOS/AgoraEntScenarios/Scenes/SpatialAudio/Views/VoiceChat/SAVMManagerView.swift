@@ -55,7 +55,7 @@ class SAVMManagerView: UIView {
                 roleBtn.isHidden = true
                 // micView.isHidden = true
                 addView.image = UIImage.sceneImage(name: "icons／solid／lock")
-                lockBtn.setTitle(sceneLocalized( "Unblock"), for: .normal)
+                lockBtn.setTitle("spatial_voice_unblock".spatial_localized(), for: .normal)
                 inviteBtn.setTitleColor(UIColor(hex: 0x979cbb, alpha: 1), for: .normal)
                 inviteBtn.isUserInteractionEnabled = false
                 nameLabel.text = username
@@ -65,8 +65,8 @@ class SAVMManagerView: UIView {
 //                micView.isHidden = false
 //                micView.setState(.forbidden)
                 addView.image = UIImage.sceneImage(name:"icons／solid／lock")
-                lockBtn.setTitle(sceneLocalized( "Unblock"), for: .normal)
-                muteBtn.setTitle(sceneLocalized( "Unmute"), for: .normal)
+                lockBtn.setTitle("spatial_voice_unblock".spatial_localized(), for: .normal)
+                muteBtn.setTitle("spatial_voice_unmute".spatial_localized(), for: .normal)
                 inviteBtn.setTitleColor(UIColor(hex: 0x979cbb, alpha: 1), for: .normal)
                 inviteBtn.isUserInteractionEnabled = false
                 nameLabel.text = username
@@ -75,7 +75,7 @@ class SAVMManagerView: UIView {
                 roleBtn.isHidden = true
 //                micView.isHidden = false
 //                micView.setState(.forbidden)
-                muteBtn.setTitle(sceneLocalized( "Unmute"), for: .normal)
+                muteBtn.setTitle("spatial_voice_unmute".spatial_localized(), for: .normal)
                 nameLabel.text = username
             } else if m_type == 0 {
                 iconView.isHidden = false
@@ -84,15 +84,15 @@ class SAVMManagerView: UIView {
 //                micView.setState(.on)
 //                micView.setVolume(100)
                 // micView.isHidden = false
-                inviteBtn.setTitle(sceneLocalized( "Kick"), for: .normal)
+                inviteBtn.setTitle("spatial_voice_kick_micick".spatial_localized(), for: .normal)
             } else if m_type == 2 {
                 iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: nil)
                 iconView.isHidden = iconStr.count == 0
                 nameLabel.text = username
 //                micView.setState(.forbidden)
 //                micView.isHidden = false
-                inviteBtn.setTitle(sceneLocalized( micInfo?.member != nil ? "Kick" : "Invite"), for: .normal)
-                muteBtn.setTitle(sceneLocalized( "Unmute"), for: .normal)
+                inviteBtn.setTitle(micInfo?.member != nil ? "spatial_voice_kick_mic".spatial_localized() : "spatial_voice_invite".spatial_localized(), for: .normal)
+                muteBtn.setTitle("spatial_voice_unmute".spatial_localized(), for: .normal)
             }
 
             roleBtn.isHidden = !isOwner
@@ -152,7 +152,7 @@ class SAVMManagerView: UIView {
 
         roleBtn.frame = CGRect(x: ScreenWidth / 2.0 - 50, y: 135, width: 100, height: 20)
         roleBtn.setImage(UIImage.sceneImage(name:"Landlord"), for: .normal)
-        roleBtn.setTitle(sceneLocalized( "host"), for: .normal)
+        roleBtn.setTitle("spatial_voice_host".spatial_localized(), for: .normal)
         roleBtn.setTitleColor(.black, for: .normal)
         roleBtn.font(UIFont.systemFont(ofSize: 11))
         addSubview(roleBtn)
@@ -164,7 +164,7 @@ class SAVMManagerView: UIView {
 
         inviteBtn.frame = CGRect(x: 20, y: 170, width: ScreenWidth / 3.0 - 40, height: 40)
         inviteBtn.setTitleColor(UIColor(hex: 0x156ef3, alpha: 1), for: .normal)
-        inviteBtn.setTitle(sceneLocalized( "Invite"), for: .normal)
+        inviteBtn.setTitle("spatial_voice_invite".spatial_localized(), for: .normal)
         inviteBtn.font(UIFont.systemFont(ofSize: 14))
         inviteBtn.tag = 300
         inviteBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
@@ -178,7 +178,7 @@ class SAVMManagerView: UIView {
 
         muteBtn.frame = CGRect(x: ScreenWidth / 3.0 + 20, y: 170, width: ScreenWidth / 3.0 - 40, height: 40)
         muteBtn.setTitleColor(UIColor(hex: 0x156ef3, alpha: 1), for: .normal)
-        muteBtn.setTitle(sceneLocalized( "Mute"), for: .normal)
+        muteBtn.setTitle("spatial_voice_mute".spatial_localized(), for: .normal)
         muteBtn.font(UIFont.systemFont(ofSize: 14))
         muteBtn.tag = 301
         muteBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
@@ -186,7 +186,7 @@ class SAVMManagerView: UIView {
 
         lockBtn.frame = CGRect(x: ScreenWidth / 3.0 * 2 + 20, y: 170, width: ScreenWidth / 3.0 - 40, height: 40)
         lockBtn.setTitleColor(UIColor(hex: 0x156ef3, alpha: 1), for: .normal)
-        lockBtn.setTitle(sceneLocalized( "Block"), for: .normal)
+        lockBtn.setTitle("spatial_voice_block".spatial_localized(), for: .normal)
         lockBtn.font(UIFont.systemFont(ofSize: 14))
         lockBtn.tag = 302
         lockBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)

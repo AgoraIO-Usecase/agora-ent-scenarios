@@ -15,7 +15,7 @@ public final class VoiceRoomAudiencesViewController: UITableViewController {
     
     var kickClosure: ((VRUser?,VRRoomMic?) -> ())?
 
-    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "No audience yet", image: nil)
+    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "voice_no_audience_yet", image: nil)
 
     override public func viewDidLoad() {
         super.viewDidLoad()

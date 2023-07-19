@@ -103,7 +103,7 @@ class VMSoundSelTableViewCell: UITableViewCell {
         selView.image = UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource")
         addSubview(selView)
 
-        usageLabel.text = LanguageManager.localValue(key: "Current Customer Usage")
+        usageLabel.text = LanguageManager.localValue(key: "voice_current_customer_usage")
         usageLabel.font = UIFont.systemFont(ofSize: 11)
         usageLabel.textColor = UIColor(hex: 0x979CBB, alpha: 1)
         bgView.addSubview(usageLabel)
@@ -179,20 +179,20 @@ class VMSoundSelTableViewCell: UITableViewCell {
     private func setCellType(with type: SOUND_TYPE) {
         cellType = type
         if type == .chat {
-            typeStr = LanguageManager.localValue(key: "Social Chat")
-            detailStr = LanguageManager.localValue(key: "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat.")
+            typeStr = LanguageManager.localValue(key: "voice_social_chat")
+            detailStr = LanguageManager.localValue(key: "voice_chatroom_social_chat_introduce")
             iconImgs = images[0]
         } else if type == .karaoke {
-            typeStr = LanguageManager.localValue(key: "Karaoke")
-            detailStr = LanguageManager.localValue(key: "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful.")
+            typeStr = LanguageManager.localValue(key: "voice_karaoke")
+            detailStr = LanguageManager.localValue(key: "voice_chatroom_karaoke_introduce")
             iconImgs = images[1]
         } else if type == .game {
-            typeStr = LanguageManager.localValue(key: "Gaming Buddy")
-            detailStr = LanguageManager.localValue(key: "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. ")
+            typeStr = LanguageManager.localValue(key: "voice_gaming_buddy")
+            detailStr = LanguageManager.localValue(key: "voice_chatroom_gaming_buddy_introduce")
             iconImgs = images[2]
         } else if type == .anchor {
-            typeStr = LanguageManager.localValue(key: "Professional Podcaster")
-            detailStr = LanguageManager.localValue(key: "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ")
+            typeStr = LanguageManager.localValue(key: "voice_professional_podcaster")
+            detailStr = LanguageManager.localValue(key: "voice_chatroom_professional_broadcaster_introduce")
             iconImgs = images[3]
         }
     }

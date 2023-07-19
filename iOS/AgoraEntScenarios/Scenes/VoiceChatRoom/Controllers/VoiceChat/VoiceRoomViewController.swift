@@ -18,7 +18,7 @@ public enum ROLE_TYPE {
     case audience
 }
 
-let giftMap = [["gift_id": "VoiceRoomGift1", "gift_name": LanguageManager.localValue(key: "Sweet Heart"), "gift_price": "1", "gift_count": "1", "selected": true], ["gift_id": "VoiceRoomGift2", "gift_name": LanguageManager.localValue(key: "Flower"), "gift_price": "5", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift3", "gift_name": LanguageManager.localValue(key: "Crystal Box"), "gift_price": "10", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift4", "gift_name": LanguageManager.localValue(key: "Super Agora"), "gift_price": "20", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift5", "gift_name": LanguageManager.localValue(key: "Star"), "gift_price": "50", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift6", "gift_name": LanguageManager.localValue(key: "Lollipop"), "gift_price": "100", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift7", "gift_name": LanguageManager.localValue(key: "Diamond"), "gift_price": "500", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift8", "gift_name": LanguageManager.localValue(key: "Crown"), "gift_price": "1000", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift9", "gift_name": LanguageManager.localValue(key: "Rocket"), "gift_price": "1500", "gift_count": "1", "selected": false]]
+let giftMap = [["gift_id": "VoiceRoomGift1", "gift_name": LanguageManager.localValue(key: "voice_sweet_heart"), "gift_price": "1", "gift_count": "1", "selected": true], ["gift_id": "VoiceRoomGift2", "gift_name": LanguageManager.localValue(key: "voice_flower"), "gift_price": "5", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift3", "gift_name": LanguageManager.localValue(key: "voice_crystal_box"), "gift_price": "10", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift4", "gift_name": LanguageManager.localValue(key: "voice_super_agora"), "gift_price": "20", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift5", "gift_name": LanguageManager.localValue(key: "voice_star"), "gift_price": "50", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift6", "gift_name": LanguageManager.localValue(key: "voice_lollipop"), "gift_price": "100", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift7", "gift_name": LanguageManager.localValue(key: "voice_diamond"), "gift_price": "500", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift8", "gift_name": LanguageManager.localValue(key: "voice_crown"), "gift_price": "1000", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift9", "gift_name": LanguageManager.localValue(key: "voice_rocket"), "gift_price": "1500", "gift_count": "1", "selected": false]]
 
 fileprivate let ownerMic = ["index":0,"status":0,"member":["uid":VoiceRoomUserInfo.shared.user?.uid ?? "","chat_uid":VoiceRoomUserInfo.shared.user?.chat_uid ?? "","name":VoiceRoomUserInfo.shared.user?.name ?? "","portrait":VoiceRoomUserInfo.shared.user?.portrait ?? "","rtc_uid":VoiceRoomUserInfo.shared.user?.rtc_uid ?? "","mic_index":0]] as [String : Any]
 
@@ -104,7 +104,7 @@ class VoiceRoomViewController: VRBaseViewController {
         SyncUtil.scene(id: self.roomInfo?.room?.room_id ?? "")?.subscribe(key: "",onDeleted: { 
             
             if self.isHeaderBack == false,$0.getId() == self.roomInfo?.room?.room_id ?? "" {
-                self.view.window?.makeToast("Time limit desc".voice_localized())
+                self.view.window?.makeToast("voice_time_limit_desc".voice_localized())
                 self.quitRoom()
             }
         })
@@ -166,7 +166,7 @@ extension VoiceRoomViewController {
             guard let `self` = self else { return }
             if !joinSuccess {
                 if !IMJoinSuccess {
-                    self.view.window?.makeToast("Join IM failed!")
+                    self.view.window?.makeToast("voice_join_IM_failed")
                 } else {
                     self.view.window?.makeToast("Join RTC failed!")
                 }
@@ -419,7 +419,7 @@ extension VoiceRoomViewController {
     
     func showEQOperation() {
         if !isOwner {
-            view.makeToast("Host Bot".voice_localized())
+            view.makeToast("voice_host_bot".voice_localized())
             return
         }
         let confirmView = VREQOperationAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: (254/375.0)*ScreenWidth)).backgroundColor(.white).cornerRadius(20, [.topLeft, .topRight], .white, 0)
@@ -487,7 +487,7 @@ extension VoiceRoomViewController {
 
     func showActiveAlienView(_ active: Bool) {
         if !isOwner {
-            view.makeToast("Host Bot".voice_localized())
+            view.makeToast("voice_host_bot".voice_localized())
             return
         }
         let confirmView = VMConfirmView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40, height: 220), type: .addbot)
@@ -504,7 +504,7 @@ extension VoiceRoomViewController {
 
     func activeAlien(_ flag: Bool) {
         if isOwner == false {
-            view.makeToast("Host Bot".voice_localized())
+            view.makeToast("voice_host_bot".voice_localized())
             return
         }
         guard let mic: VRRoomMic = roomInfo?.mic_info?[6] else { return }
@@ -533,10 +533,10 @@ extension VoiceRoomViewController {
         ChatRoomServiceImp.getSharedInstance().updateAnnouncement(content: str) { result in
             if result {
                 // 如果返回的结果为true 表示上麦成功
-                self.view.makeToast("Notice Posted".voice_localized())
+                self.view.makeToast("voice_notice_posted".voice_localized())
                 self.roomInfo?.room?.announcement = str
             } else {
-                self.view.makeToast("Post Failed".voice_localized())
+                self.view.makeToast("voice_post_failed".voice_localized())
             }
         }
     }
@@ -580,7 +580,7 @@ extension VoiceRoomViewController {
         var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 70, height: 190))
         compent.destination = .center
         inputBar.hiddenInputBar()
-        let micAlert = VoiceRoomEndLiveAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 190), title: LanguageManager.localValue(key: "End Live"), content: LanguageManager.localValue(key: "The room will close after you leave."), cancel: LanguageManager.localValue(key: "Cancel"), confirm: LanguageManager.localValue(key: "Confirm")).cornerRadius(16).backgroundColor(.white)
+        let micAlert = VoiceRoomEndLiveAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 190), title: LanguageManager.localValue(key: "voice_end_live"), content: LanguageManager.localValue(key: "voice_the_room_will_close_after_you_leave."), cancel: LanguageManager.localValue(key: "voice_cancel"), confirm: LanguageManager.localValue(key: "voice_confirm")).cornerRadius(16).backgroundColor(.white)
         let vc = VoiceRoomAlertViewController(compent: compent, custom: micAlert)
         micAlert.actionEvents = { [weak self] in
             vc.dismiss(animated: true)
@@ -618,7 +618,7 @@ extension VoiceRoomViewController {
         inputBar.hiddenInputBar()
         var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 75, height: 200))
         compent.destination = .center
-        let micAlert = VoiceRoomApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 75, height: 200), content: "Anchor Invited You On-Stage", cancel: "Decline", confirm: "Accept", position: .center).cornerRadius(16).backgroundColor(.white)
+        let micAlert = VoiceRoomApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 75, height: 200), content: "voice_anchor_invited_you_on_stage", cancel: "voice_decline", confirm: "voice_accept", position: .center).cornerRadius(16).backgroundColor(.white)
         let vc = VoiceRoomAlertViewController(compent: compent, custom: micAlert)
         micAlert.actionEvents = { [weak self] in
             if $0 == 30 {
@@ -644,13 +644,13 @@ extension VoiceRoomViewController {
         var detailStr: String = ""
         switch effect {
         case 1:
-            detailStr = "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat.".voice_localized()
+            detailStr = "voice_chatroom_social_chat_introduce".voice_localized()
         case 2:
-            detailStr = "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful.".voice_localized()
+            detailStr = "voice_chatroom_karaoke_introduce".voice_localized()
         case 3:
-            detailStr = "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. ".voice_localized()
+            detailStr = "voice_chatroom_gaming_buddy_introduce".voice_localized()
         default:
-            detailStr = "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ".voice_localized()
+            detailStr = "voice_chatroom_professional_broadcaster_introduce".voice_localized()
         }
         return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40)
     }

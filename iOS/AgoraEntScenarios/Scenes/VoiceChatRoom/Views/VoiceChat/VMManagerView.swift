@@ -55,7 +55,7 @@ class VMManagerView: UIView {
                 roleBtn.isHidden = true
                 // micView.isHidden = true
                 addView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
-                lockBtn.setTitle(LanguageManager.localValue(key: "Unblock"), for: .normal)
+                lockBtn.setTitle(LanguageManager.localValue(key: "voice_unblock"), for: .normal)
                 inviteBtn.setTitleColor(UIColor(hex: 0x979cbb, alpha: 1), for: .normal)
                 inviteBtn.isUserInteractionEnabled = false
                 nameLabel.text = username
@@ -65,8 +65,8 @@ class VMManagerView: UIView {
 //                micView.isHidden = false
 //                micView.setState(.forbidden)
                 addView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
-                lockBtn.setTitle(LanguageManager.localValue(key: "Unblock"), for: .normal)
-                muteBtn.setTitle(LanguageManager.localValue(key: "Unmute"), for: .normal)
+                lockBtn.setTitle(LanguageManager.localValue(key: "voice_unblock"), for: .normal)
+                muteBtn.setTitle(LanguageManager.localValue(key: "voice_unmute"), for: .normal)
                 inviteBtn.setTitleColor(UIColor(hex: 0x979cbb, alpha: 1), for: .normal)
                 inviteBtn.isUserInteractionEnabled = false
                 nameLabel.text = username
@@ -75,7 +75,7 @@ class VMManagerView: UIView {
                 roleBtn.isHidden = true
 //                micView.isHidden = false
 //                micView.setState(.forbidden)
-                muteBtn.setTitle(LanguageManager.localValue(key: "Unmute"), for: .normal)
+                muteBtn.setTitle(LanguageManager.localValue(key: "voice_unmute"), for: .normal)
                 nameLabel.text = username
             } else if m_type == 0 {
                 iconView.isHidden = false
@@ -84,15 +84,15 @@ class VMManagerView: UIView {
 //                micView.setState(.on)
 //                micView.setVolume(100)
                 // micView.isHidden = false
-                inviteBtn.setTitle(LanguageManager.localValue(key: "Kick"), for: .normal)
+                inviteBtn.setTitle(LanguageManager.localValue(key: "voice_kick_mic"), for: .normal)
             } else if m_type == 2 {
                 iconView.isHidden = false
                 iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage.sceneImage(name: "mine_avatar_placeHolder", bundleName: "VoiceChatRoomResource"))
                 nameLabel.text = username
 //                micView.setState(.forbidden)
 //                micView.isHidden = false
-                inviteBtn.setTitle(LanguageManager.localValue(key: micInfo?.member != nil ? "Kick" : "Invite"), for: .normal)
-                muteBtn.setTitle(LanguageManager.localValue(key: "Unmute"), for: .normal)
+                inviteBtn.setTitle(LanguageManager.localValue(key: micInfo?.member != nil ? "voice_kick_mic" : "voice_invite"), for: .normal)
+                muteBtn.setTitle(LanguageManager.localValue(key: "voice_unmute"), for: .normal)
             }
 
             roleBtn.isHidden = !isOwner
@@ -152,7 +152,7 @@ class VMManagerView: UIView {
 
         roleBtn.frame = CGRect(x: ScreenWidth / 2.0 - 50, y: 135, width: 100, height: 20)
         roleBtn.setImage(UIImage.sceneImage(name: "Landlord", bundleName: "VoiceChatRoomResource"), for: .normal)
-        roleBtn.setTitle(LanguageManager.localValue(key: "host"), for: .normal)
+        roleBtn.setTitle(LanguageManager.localValue(key: "voice_host"), for: .normal)
         roleBtn.setTitleColor(.black, for: .normal)
         roleBtn.font(UIFont.systemFont(ofSize: 11))
         addSubview(roleBtn)
@@ -164,7 +164,7 @@ class VMManagerView: UIView {
 
         inviteBtn.frame = CGRect(x: 20, y: 170, width: ScreenWidth / 3.0 - 40, height: 40)
         inviteBtn.setTitleColor(UIColor(hex: 0x156ef3, alpha: 1), for: .normal)
-        inviteBtn.setTitle(LanguageManager.localValue(key: "Invite"), for: .normal)
+        inviteBtn.setTitle(LanguageManager.localValue(key: "voice_invite"), for: .normal)
         inviteBtn.font(UIFont.systemFont(ofSize: 14))
         inviteBtn.tag = 300
         inviteBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
@@ -178,7 +178,7 @@ class VMManagerView: UIView {
 
         muteBtn.frame = CGRect(x: ScreenWidth / 3.0 + 20, y: 170, width: ScreenWidth / 3.0 - 40, height: 40)
         muteBtn.setTitleColor(UIColor(hex: 0x156ef3, alpha: 1), for: .normal)
-        muteBtn.setTitle(LanguageManager.localValue(key: "Mute"), for: .normal)
+        muteBtn.setTitle(LanguageManager.localValue(key: "voice_mute"), for: .normal)
         muteBtn.font(UIFont.systemFont(ofSize: 14))
         muteBtn.tag = 301
         muteBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
@@ -186,7 +186,7 @@ class VMManagerView: UIView {
 
         lockBtn.frame = CGRect(x: ScreenWidth / 3.0 * 2 + 20, y: 170, width: ScreenWidth / 3.0 - 40, height: 40)
         lockBtn.setTitleColor(UIColor(hex: 0x156ef3, alpha: 1), for: .normal)
-        lockBtn.setTitle(LanguageManager.localValue(key: "Block"), for: .normal)
+        lockBtn.setTitle(LanguageManager.localValue(key: "voice_block"), for: .normal)
         lockBtn.font(UIFont.systemFont(ofSize: 14))
         lockBtn.tag = 302
         lockBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
