@@ -42,14 +42,14 @@ class SAConfirmView: UIView {
 
         titleLabel.frame = CGRect(x: bounds.size.width / 2.0 - 60, y: 30, width: 120, height: 22)
         titleLabel.textAlignment = .center
-        titleLabel.text = "spatial_voice_prompt".localized_spatial()
+        titleLabel.text = "spatial_voice_prompt".spatial_localized()
         titleLabel.textColor = UIColor(hex:"0x040925")
         titleLabel.font = UIFont.systemFont(ofSize: 16)
         addSubview(titleLabel)
 
         contentLabel.frame = CGRect(x: bounds.size.width / 2.0 - 150, y: 72, width: 300, height: 60)
         contentLabel.textAlignment = .center
-        contentLabel.text = type == .addbot ? "spatial_voice_add_bot".localized_spatial() : "spatial_voice_exit_room".localized_spatial()
+        contentLabel.text = type == .addbot ? "spatial_voice_add_bot".spatial_localized() : "spatial_voice_exit_room".spatial_localized()
         contentLabel.numberOfLines = 0
         contentLabel.lineBreakMode = .byCharWrapping
         contentLabel.textColor = UIColor(hex: "0x6C7192")
@@ -57,7 +57,7 @@ class SAConfirmView: UIView {
         addSubview(contentLabel)
 
         canBtn.frame = CGRect(x: 30, y: 150, width: 120, height: 40)
-        canBtn.setTitle("spatial_voice_cancel".localized_spatial(), for: .normal)
+        canBtn.setTitle("spatial_voice_cancel".spatial_localized(), for: .normal)
         canBtn.setTitleColor(.black, for: .normal)
         canBtn.backgroundColor = UIColor(red: 239 / 255.0, green: 244 / 255.0, blue: 1, alpha: 1)
         canBtn.addTargetFor(self, action: #selector(can), for: .touchUpInside)
@@ -66,7 +66,7 @@ class SAConfirmView: UIView {
         addSubview(canBtn)
 
         subBtn.frame = CGRect(x: bounds.size.width - 150, y: 150, width: 120, height: 40)
-        subBtn.setTitle("spatial_voice_submit".localized_spatial(), for: .normal)
+        subBtn.setTitle("spatial_voice_submit".spatial_localized(), for: .normal)
         subBtn.addTargetFor(self, action: #selector(sub), for: .touchUpInside)
         subBtn.setTitleColor(.white, for: .normal)
         addSubview(subBtn)

@@ -1,4 +1,4 @@
-g//
+//
 //  AgoraChatRoomHeaderView.swift
 //  VoiceChat4Swift
 //
@@ -61,7 +61,7 @@ class SARoomHeaderView: UIView {
         self.giftBtn.snp.updateConstraints { make in
             make.width.greaterThanOrEqualTo(gift_count >= 100 ? 50 : 40)
         }
-        soundSetLabel.text = "spatial_beginner_guide".localized_spatial()
+        soundSetLabel.text = "spatial_beginner_guide".spatial_localized()
         updateGiftList(with: room)
     }
     
@@ -176,7 +176,7 @@ class SARoomHeaderView: UIView {
         noticeView.addSubview(imgView)
 
         let notiLabel = UILabel()
-        notiLabel.text = "spatial_voice_notice".localized_spatial()
+        notiLabel.text = "spatial_voice_notice".spatial_localized()
         notiLabel.font = UIFont.systemFont(ofSize: 12)
         notiLabel.textColor = .white
         noticeView.addSubview(notiLabel)

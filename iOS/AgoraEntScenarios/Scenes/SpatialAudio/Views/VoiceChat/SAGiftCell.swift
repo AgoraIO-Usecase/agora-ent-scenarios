@@ -55,7 +55,7 @@ public class SAGiftCell: UITableViewCell {
         }
         avatar.sd_setImage(with: URL(string: item.portrait ?? "")!, placeholderImage: nil)
         userName.text = gift?.userName ?? ""
-        giftName.text = "spatial_voice_sent".localized_spatial() + (gift?.gift_name ?? "")
+        giftName.text = "spatial_voice_sent".spatial_localized() + (gift?.gift_name ?? "")
         giftIcon.image = UIImage.sceneImage(name:"\(gift?.gift_id ?? "")")
         giftNumbers.text = "X \(gift?.gift_count ?? "1")"
     }

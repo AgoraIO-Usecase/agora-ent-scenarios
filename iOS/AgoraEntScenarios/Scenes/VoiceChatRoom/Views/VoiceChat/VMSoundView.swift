@@ -76,7 +76,7 @@ class VMSoundView: UIView {
         iconBgView.layer.masksToBounds = true
         bgView.addSubview(iconBgView)
 
-        usageLabel.text = "voice_CUS_use".localized()
+        usageLabel.text = "voice_CUS_use".voice_localized()
         usageLabel.font = UIFont.systemFont(ofSize: 12)
         usageLabel.textColor = UIColor(red: 0.593, green: 0.612, blue: 0.732, alpha: 1)
         bgView.addSubview(usageLabel)
@@ -131,21 +131,21 @@ class VMSoundView: UIView {
         soundEffect = effect
         switch effect {
         case 1:
-            detailStr = "voice_chatroom_social_chat_introduce".localized()
+            detailStr = "voice_chatroom_social_chat_introduce".voice_localized()
             iconImgs = images[0]
-            typeStr = "voice_social_chat".localized()
+            typeStr = "voice_social_chat".voice_localized()
         case 2:
-            detailStr = "voice_chatroom_karaoke_introduce".localized()
+            detailStr = "voice_chatroom_karaoke_introduce".voice_localized()
             iconImgs = images[1]
-            typeStr = "voice_karaoke".localized()
+            typeStr = "voice_karaoke".voice_localized()
         case 3:
-            detailStr = "voice_chatroom_gaming_buddy_introduce".localized()
+            detailStr = "voice_chatroom_gaming_buddy_introduce".voice_localized()
             iconImgs = images[2]
-            typeStr = "voice_gaming_buddy".localized()
+            typeStr = "voice_gaming_buddy".voice_localized()
         default:
-            detailStr = "voice_chatroom_professional_broadcaster_introduce".localized()
+            detailStr = "voice_chatroom_professional_broadcaster_introduce".voice_localized()
             iconImgs = images[3]
-            typeStr = "voice_professional_podcaster".localized()
+            typeStr = "voice_professional_podcaster".voice_localized()
         }
         cellHeight = textHeight(text: detailStr, fontSize: 13, width: bounds.size.width - 40)
     }

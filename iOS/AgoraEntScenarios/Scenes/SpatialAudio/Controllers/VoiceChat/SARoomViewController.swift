@@ -394,7 +394,7 @@ extension SARoomViewController {
 
     func showActiveAlienView(_ active: Bool) {
         if !isOwner {
-            view.makeToast("spatial_voice_host_bot".localized())
+            view.makeToast("spatial_voice_host_bot".spatial_localized())
             return
         }
         let confirmView = SAConfirmView(frame: CGRect(x: 0,
@@ -487,7 +487,7 @@ extension SARoomViewController {
     func showEndLive() {
         var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 70, height: 190))
         compent.destination = .center
-        let micAlert = SAEndLiveAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 190), title: "spatial_voice_end_live".localized_spatial(), content: "spatial_voice_the_room_will_close_after_you_leave.".localized_spatial(), cancel: "spatial_voice_cancel".localized_spatial(), confirm: "spatial_voice_confirm".localized_spatial()).cornerRadius(16).backgroundColor(.white)
+        let micAlert = SAEndLiveAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 190), title: "spatial_voice_end_live".spatial_localized(), content: "spatial_voice_the_room_will_close_after_you_leave.".spatial_localized(), cancel: "spatial_voice_cancel".spatial_localized(), confirm: "spatial_voice_confirm".spatial_localized()).cornerRadius(16).backgroundColor(.white)
         let vc = SAAlertViewController(compent: compent, custom: micAlert)
         micAlert.actionEvents = { [weak self] in
             vc.dismiss(animated: true)
@@ -513,9 +513,9 @@ extension SARoomViewController {
         dismiss(animated: false)
         var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 75, height: 200))
         compent.destination = .center
-        let micAlert = SAApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 75, height: 200), content: "spatial_voice_anchor_invited_you_on_stage".localized_spatial(),
-                                    cancel: "spatial_voice_decline".localized_spatial(),
-                                    confirm: "spatial_voice_accept".localized_spatial(),
+        let micAlert = SAApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 75, height: 200), content: "spatial_voice_anchor_invited_you_on_stage".spatial_localized(),
+                                    cancel: "spatial_voice_decline".spatial_localized(),
+                                    confirm: "spatial_voice_accept".spatial_localized(),
                                     position: .center).cornerRadius(16).backgroundColor(.white)
         let vc = SAAlertViewController(compent: compent, custom: micAlert)
         micAlert.actionEvents = { [weak self] in
@@ -542,13 +542,13 @@ extension SARoomViewController {
         var detailStr: String = ""
         switch effect {
         case 1:
-            detailStr = "spatial_voice_chatroom_social_chat_introduce".localized_spatial()
+            detailStr = "spatial_voice_chatroom_social_chat_introduce".spatial_localized()
         case 2:
-            detailStr = "spatial_voice_chatroom_karaoke_introduce".localized_spatial()
+            detailStr = "spatial_voice_chatroom_karaoke_introduce".spatial_localized()
         case 3:
-            detailStr = "spatial_voice_chatroom_gaming_buddy_introduce".localized_spatial()
+            detailStr = "spatial_voice_chatroom_gaming_buddy_introduce".spatial_localized()
         default:
-            detailStr = "spatial_voice_chatroom_professional_broadcaster_introduce".localized_spatial()
+            detailStr = "spatial_voice_chatroom_professional_broadcaster_introduce".spatial_localized()
         }
         return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40)
     }

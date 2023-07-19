@@ -104,7 +104,7 @@ class VoiceRoomViewController: VRBaseViewController {
         SyncUtil.scene(id: self.roomInfo?.room?.room_id ?? "")?.subscribe(key: "",onDeleted: { 
             
             if self.isHeaderBack == false,$0.getId() == self.roomInfo?.room?.room_id ?? "" {
-                self.view.window?.makeToast("voice_time_limit_desc".localized())
+                self.view.window?.makeToast("voice_time_limit_desc".voice_localized())
                 self.quitRoom()
             }
         })
@@ -419,7 +419,7 @@ extension VoiceRoomViewController {
     
     func showEQOperation() {
         if !isOwner {
-            view.makeToast("voice_host_bot".localized())
+            view.makeToast("voice_host_bot".voice_localized())
             return
         }
         let confirmView = VREQOperationAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: (254/375.0)*ScreenWidth)).backgroundColor(.white).cornerRadius(20, [.topLeft, .topRight], .white, 0)
@@ -487,7 +487,7 @@ extension VoiceRoomViewController {
 
     func showActiveAlienView(_ active: Bool) {
         if !isOwner {
-            view.makeToast("voice_host_bot".localized())
+            view.makeToast("voice_host_bot".voice_localized())
             return
         }
         let confirmView = VMConfirmView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40, height: 220), type: .addbot)
@@ -504,7 +504,7 @@ extension VoiceRoomViewController {
 
     func activeAlien(_ flag: Bool) {
         if isOwner == false {
-            view.makeToast("voice_host_bot".localized())
+            view.makeToast("voice_host_bot".voice_localized())
             return
         }
         guard let mic: VRRoomMic = roomInfo?.mic_info?[6] else { return }
@@ -533,10 +533,10 @@ extension VoiceRoomViewController {
         ChatRoomServiceImp.getSharedInstance().updateAnnouncement(content: str) { result in
             if result {
                 // 如果返回的结果为true 表示上麦成功
-                self.view.makeToast("voice_notice_posted".localized())
+                self.view.makeToast("voice_notice_posted".voice_localized())
                 self.roomInfo?.room?.announcement = str
             } else {
-                self.view.makeToast("voice_post_failed".localized())
+                self.view.makeToast("voice_post_failed".voice_localized())
             }
         }
     }
@@ -644,13 +644,13 @@ extension VoiceRoomViewController {
         var detailStr: String = ""
         switch effect {
         case 1:
-            detailStr = "voice_chatroom_social_chat_introduce".localized()
+            detailStr = "voice_chatroom_social_chat_introduce".voice_localized()
         case 2:
-            detailStr = "voice_chatroom_karaoke_introduce".localized()
+            detailStr = "voice_chatroom_karaoke_introduce".voice_localized()
         case 3:
-            detailStr = "voice_chatroom_gaming_buddy_introduce".localized()
+            detailStr = "voice_chatroom_gaming_buddy_introduce".voice_localized()
         default:
-            detailStr = "voice_chatroom_professional_broadcaster_introduce".localized()
+            detailStr = "voice_chatroom_professional_broadcaster_introduce".voice_localized()
         }
         return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40)
     }

@@ -22,7 +22,7 @@ public final class SARoomListCell: UITableViewCell {
 
     lazy var seenCount: UIButton = .init(type: .custom).frame(CGRect(x: self.roomName.frame.minX - 10, y: self.background.frame.height - 36, width: 55, height: 16)).isUserInteractionEnabled(false).font(UIFont.systemFont(ofSize: 10, weight: .regular))
 
-    lazy var entryRoom: UIButton = .init(type: .custom).frame(CGRect(x: self.background.frame.width - 72, y: self.background.frame.height - 40, width: 56, height: 24)).font(UIFont.systemFont(ofSize: 12, weight: .semibold)).backgroundColor(.clear).title("spatial_voice_enter".localized_spatial(), .normal)
+    lazy var entryRoom: UIButton = .init(type: .custom).frame(CGRect(x: self.background.frame.width - 72, y: self.background.frame.height - 40, width: 56, height: 24)).font(UIFont.systemFont(ofSize: 12, weight: .semibold)).backgroundColor(.clear).title("spatial_voice_enter".spatial_localized(), .normal)
 
     lazy var entryBlur: UIView = .init(frame: self.entryRoom.frame).backgroundColor(UIColor(white: 1, alpha: 0.3)).cornerRadius(self.entryRoom.frame.height / 2.0)
 
@@ -53,7 +53,7 @@ public final class SARoomListCell: UITableViewCell {
     func setupViewsAttributes(room: SARoomEntity) {
         entity = room
         if let show = room.is_private, show == true {
-            accessSymbol.set(image:UIImage.sceneImage(name: "suo", bundleName: "VoiceChatRoomResource"), title: "Spatial_voice_private".localized_spatial(), titlePosition: .right, additionalSpacing: 5, state: .normal)
+            accessSymbol.set(image:UIImage.sceneImage(name: "suo", bundleName: "VoiceChatRoomResource"), title: "Spatial_voice_private".spatial_localized(), titlePosition: .right, additionalSpacing: 5, state: .normal)
             accessSymbol.setBackgroundImage(UIImage.sceneImage(name: "securityType", bundleName: "VoiceChatRoomResource"), for: .normal)
             accessSymbol.isHidden = false
         } else {

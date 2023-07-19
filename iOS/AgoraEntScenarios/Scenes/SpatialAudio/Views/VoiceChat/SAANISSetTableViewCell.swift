@@ -49,13 +49,13 @@ class SAANISSetTableViewCell: UITableViewCell {
 
     private func layoutUI() {
         // titleLabel.frame = CGRect(x: 20~, y: 17~, width: 200~, height: 20~)
-        titleLabel.text = "spatial_voice_your_AINS".localized_spatial()
+        titleLabel.text = "spatial_voice_your_AINS".spatial_localized()
         titleLabel.font = UIFont.systemFont(ofSize: 13)
         titleLabel.textColor = UIColor(hex: "0x3C4267")
         contentView.addSubview(titleLabel)
 
         offBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
-        offBtn.setTitle(" \("spatial_voice_off".localized_spatial()) ", for: .normal)
+        offBtn.setTitle(" \("spatial_voice_off".spatial_localized()) ", for: .normal)
         offBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
         offBtn.font(UIFont.systemFont(ofSize: 11))
         offBtn.layer.cornerRadius = 3
@@ -65,7 +65,7 @@ class SAANISSetTableViewCell: UITableViewCell {
         addSubview(offBtn)
 
         midBtn.backgroundColor = .white
-        midBtn.setTitle(" \("spatial_voice_Medium".localized_spatial()) ", for: .normal)
+        midBtn.setTitle(" \("spatial_voice_Medium".spatial_localized()) ", for: .normal)
         midBtn.setTitleColor(UIColor(hex: "0x0A7AFF"), for: .normal)
         midBtn.font(UIFont.systemFont(ofSize: 11))
         midBtn.backgroundColor = .white
@@ -79,7 +79,7 @@ class SAANISSetTableViewCell: UITableViewCell {
         selBtn = midBtn
 
         highBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
-        highBtn.setTitle(" \("spatial_voice_High".localized_spatial()) ", for: .normal)
+        highBtn.setTitle(" \("spatial_voice_High".spatial_localized()) ", for: .normal)
         highBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
         highBtn.font(UIFont.systemFont(ofSize: 11))
         highBtn.layer.cornerRadius = 3

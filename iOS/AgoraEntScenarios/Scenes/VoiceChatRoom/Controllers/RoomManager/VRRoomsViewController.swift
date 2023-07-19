@@ -186,7 +186,7 @@ extension VRRoomsViewController {
                             }
                         }
                     } else {
-                        self.view.makeToast("voice_incorrect_password".localized())
+                        self.view.makeToast("voice_incorrect_password".voice_localized())
                     }
                 }
                 vc.dismiss(animated: true)
@@ -212,7 +212,7 @@ extension VRRoomsViewController {
     }
 
     private func loginIMThenPush(room: VRRoomEntity) {
-        SVProgressHUD.show(withStatus: "voice_loading".localized())
+        SVProgressHUD.show(withStatus: "voice_loading".voice_localized())
         NetworkManager.shared.generateToken(channelName: room.channel_id ?? "", uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
             VLUserCenter.user.agoraRTCToken = token ?? ""
             ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in

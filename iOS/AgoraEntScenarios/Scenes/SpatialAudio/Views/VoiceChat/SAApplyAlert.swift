@@ -69,7 +69,7 @@ public class SACancelAlert: UIView {
 
     lazy var header: SAAlertContainer = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 60))
 
-    lazy var cancel: UIButton = .init(type: .custom).frame(CGRect(x: 28, y: self.header.frame.maxY + 9, width: self.frame.width - 56, height: 40)).cornerRadius(20).backgroundColor(UIColor(0xEFF4FF)).textColor(UIColor(0x756E98), .normal).title("spatial_voice_cancel_request".localized_spatial(), .normal).font(.systemFont(ofSize: 16, weight: .semibold)).tag(30).addTargetFor(self, action: #selector(buttonAction(_:)), for: .touchUpInside)
+    lazy var cancel: UIButton = .init(type: .custom).frame(CGRect(x: 28, y: self.header.frame.maxY + 9, width: self.frame.width - 56, height: 40)).cornerRadius(20).backgroundColor(UIColor(0xEFF4FF)).textColor(UIColor(0x756E98), .normal).title("spatial_voice_cancel_request".spatial_localized(), .normal).font(.systemFont(ofSize: 16, weight: .semibold)).tag(30).addTargetFor(self, action: #selector(buttonAction(_:)), for: .touchUpInside)
 
     override public init(frame: CGRect) {
         super.init(frame: frame)

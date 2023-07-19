@@ -455,7 +455,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
         } else if type == .ainsOff {
             path = SAConfig.NoneSound[index]
         }
-        let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "spatial_voice_lau".localized_spatial() : "EN"
+        let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "spatial_voice_lau".spatial_localized() : "EN"
         path = path.replacingOccurrences(of: "CN", with: lanuagePath)
         rtcKit.startAudioMixing(path, loopback: false, cycle: 1)
     }

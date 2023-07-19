@@ -56,7 +56,7 @@ class VMManagerView: UIView {
                 // micView.isHidden = true
                 addView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
                 lockBtn.setTitle(LanguageManager.localValue(key: "voice_unblock"), for: .normal)
-                inviteBtn.setTitleColor(UIColor.HexColor(hex: 0x979cbb, alpha: 1), for: .normal)
+                inviteBtn.setTitleColor(UIColor(hex: 0x979cbb, alpha: 1), for: .normal)
                 inviteBtn.isUserInteractionEnabled = false
                 nameLabel.text = username
             } else if m_type == 4 {
@@ -67,7 +67,7 @@ class VMManagerView: UIView {
                 addView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
                 lockBtn.setTitle(LanguageManager.localValue(key: "voice_unblock"), for: .normal)
                 muteBtn.setTitle(LanguageManager.localValue(key: "voice_unmute"), for: .normal)
-                inviteBtn.setTitleColor(UIColor.HexColor(hex: 0x979cbb, alpha: 1), for: .normal)
+                inviteBtn.setTitleColor(UIColor(hex: 0x979cbb, alpha: 1), for: .normal)
                 inviteBtn.isUserInteractionEnabled = false
                 nameLabel.text = username
             } else if m_type == 1 {
@@ -163,7 +163,7 @@ class VMManagerView: UIView {
         addSubview(lineView)
 
         inviteBtn.frame = CGRect(x: 20, y: 170, width: ScreenWidth / 3.0 - 40, height: 40)
-        inviteBtn.setTitleColor(UIColor.HexColor(hex: 0x156ef3, alpha: 1), for: .normal)
+        inviteBtn.setTitleColor(UIColor(hex: 0x156ef3, alpha: 1), for: .normal)
         inviteBtn.setTitle(LanguageManager.localValue(key: "voice_invite"), for: .normal)
         inviteBtn.font(UIFont.systemFont(ofSize: 14))
         inviteBtn.tag = 300
@@ -177,7 +177,7 @@ class VMManagerView: UIView {
 //        micView.isHidden = true
 
         muteBtn.frame = CGRect(x: ScreenWidth / 3.0 + 20, y: 170, width: ScreenWidth / 3.0 - 40, height: 40)
-        muteBtn.setTitleColor(UIColor.HexColor(hex: 0x156ef3, alpha: 1), for: .normal)
+        muteBtn.setTitleColor(UIColor(hex: 0x156ef3, alpha: 1), for: .normal)
         muteBtn.setTitle(LanguageManager.localValue(key: "voice_mute"), for: .normal)
         muteBtn.font(UIFont.systemFont(ofSize: 14))
         muteBtn.tag = 301
@@ -185,7 +185,7 @@ class VMManagerView: UIView {
         addSubview(muteBtn)
 
         lockBtn.frame = CGRect(x: ScreenWidth / 3.0 * 2 + 20, y: 170, width: ScreenWidth / 3.0 - 40, height: 40)
-        lockBtn.setTitleColor(UIColor.HexColor(hex: 0x156ef3, alpha: 1), for: .normal)
+        lockBtn.setTitleColor(UIColor(hex: 0x156ef3, alpha: 1), for: .normal)
         lockBtn.setTitle(LanguageManager.localValue(key: "voice_block"), for: .normal)
         lockBtn.font(UIFont.systemFont(ofSize: 14))
         lockBtn.tag = 302

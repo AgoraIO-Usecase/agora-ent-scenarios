@@ -20,7 +20,7 @@ public final class SACreateRoomViewController: SABaseViewController {
         // Do any additional setup after loading the view.
         view.addSubViews([background, container])
         view.bringSubviewToFront(navigation)
-        navigation.title.text = "spatial_voice_create_room".localized_spatial()
+        navigation.title.text = "spatial_voice_create_room".spatial_localized()
         container.createAction = { [weak self] in
             guard let self = self else { return }
             print("idx:\(self.container.idx)")
@@ -76,7 +76,7 @@ extension SACreateRoomViewController {
     
     private func entryRoom() {
 //        AgoraChatClient.shared().logout(false)
-        SVProgressHUD.show(withStatus: "spatial_voice_loading".localized_spatial())
+        SVProgressHUD.show(withStatus: "spatial_voice_loading".spatial_localized())
         self.view.window?.isUserInteractionEnabled = false
 //        let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
         let entity = self.createEntity()
@@ -107,7 +107,7 @@ extension SACreateRoomViewController {
                             if let room = room,error == nil {
                                 self.entryRoom(room: room)
                             } else {
-                                SVProgressHUD.showError(withStatus: "spatial_voice_create_failed".localized_spatial())
+                                SVProgressHUD.showError(withStatus: "spatial_voice_create_failed".spatial_localized())
                             }
                         }
 //                    }else {
@@ -122,7 +122,7 @@ extension SACreateRoomViewController {
 
     private func goLive() {
         if container.roomInput.name.isEmpty {
-            view.makeToast("spatial_voice_no_room_name".localized_spatial(), point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("spatial_voice_no_room_name".spatial_localized(), point: view.center, title: nil, image: nil, completion: nil)
         }
         entryRoom()
     }

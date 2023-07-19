@@ -87,31 +87,31 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
 
     private let settingName: [String] = ["voice_spatial_audio", "Attenuation factor", "Air absorb", "Voice blur"]
     
-    private let AIAECSettingName: [String] = ["voice_turn_on_AIAEC".localized()]
+    private let AIAECSettingName: [String] = ["voice_turn_on_AIAEC".voice_localized()]
     
-    private let AGCSettingName: [String] = ["voice_turn_on_AGC".localized()]
+    private let AGCSettingName: [String] = ["voice_turn_on_AGC".voice_localized()]
 
     
-    private let soundType: [String] = ["voice_TV_sound".localized(), "voice_kitchen_sound".localized(), "voice_street_sound".localized(), "voice_mashine_sound".localized(), "voice_office_sound".localized(), "voice_home_sound".localized(), "voice_construction_sound".localized(), "voice_alert_sound/Music".localized(), "voice_applause".localized(), "voice_wind_sound".localized(), "voice_mic_pop_filter".localized(), "voice_audio_feedback".localized(), "voice_microphone_finger_rub_sound".localized(), "voice_screen_tap_sound".localized()]
+    private let soundType: [String] = ["voice_TV_sound".voice_localized(), "voice_kitchen_sound".voice_localized(), "voice_street_sound".voice_localized(), "voice_mashine_sound".voice_localized(), "voice_office_sound".voice_localized(), "voice_home_sound".voice_localized(), "voice_construction_sound".voice_localized(), "voice_alert_sound/Music".voice_localized(), "voice_applause".voice_localized(), "voice_wind_sound".voice_localized(), "voice_mic_pop_filter".voice_localized(), "voice_audio_feedback".voice_localized(), "voice_microphone_finger_rub_sound".voice_localized(), "voice_screen_tap_sound".voice_localized()]
     
-    private let soundDetail: [String] = ["voice_ex_bird_car_subway_sounds".localized(),
-                                         "voice_ex_fan_air_conditioner_vacuum_cleaner_printer_sounds".localized(),
-                                         "voice_ex_keyboard_tapping_mouse_clicking_sounds".localized(),
-                                         "voice_ex_door_closing_chair_squeaking_baby_crying_sounds".localized(),
-                                         "voice_ex_knocking_sound".localized()]
+    private let soundDetail: [String] = ["voice_ex_bird_car_subway_sounds".voice_localized(),
+                                         "voice_ex_fan_air_conditioner_vacuum_cleaner_printer_sounds".voice_localized(),
+                                         "voice_ex_keyboard_tapping_mouse_clicking_sounds".voice_localized(),
+                                         "voice_ex_door_closing_chair_squeaking_baby_crying_sounds".voice_localized(),
+                                         "voice_ex_knocking_sound".voice_localized()]
 
     var settingType: AUDIO_SETTING_TYPE = .Spatial {
         didSet {
             if settingType == .Spatial {
                 titleLabel.text = "Spatial Setting".voice_localized()
             } else if settingType == .Noise {
-                titleLabel.text = "voice_noise_setting".localized()
+                titleLabel.text = "voice_noise_setting".voice_localized()
             } else if settingType == .effect {
-                titleLabel.text = "voice_effect_setting".localized()
+                titleLabel.text = "voice_effect_setting".voice_localized()
             } else if settingType == .AIAEC {
-                titleLabel.text = "voice_AIAEC".localized()
+                titleLabel.text = "voice_AIAEC".voice_localized()
             } else if settingType == .AGC {
-                titleLabel.text = "voice_AGC".localized()
+                titleLabel.text = "voice_AGC".voice_localized()
             }
             if tableView.tableFooterView == nil {
                 switch settingType {
@@ -131,7 +131,7 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
         }
     }
 
-    lazy var otherSoundHeaderHeight: CGFloat = textHeight(text: "voice_otherSound".localized(), fontSize: 12, width: ScreenWidth - 100)
+    lazy var otherSoundHeaderHeight: CGFloat = textHeight(text: "voice_otherSound".voice_localized(), fontSize: 12, width: ScreenWidth - 100)
 
     var resBlock: ((AUDIO_SETTING_TYPE) -> Void)?
 
@@ -171,8 +171,8 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
 
         titleLabel.frame = CGRect(x: ScreenWidth / 2.0 - 60, y: 25, width: 120, height: 30)
         titleLabel.textAlignment = .center
-        titleLabel.text = "voice_spatial_audio".localized()
-        titleLabel.textColor = UIColor.HexColor(hex: 0x040925, alpha: 1)
+        titleLabel.text = "voice_spatial_audio".voice_localized()
+        titleLabel.textColor = UIColor(hex: 0x040925, alpha: 1)
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(titleLabel)
 
@@ -243,7 +243,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if settingType == .Noise && section == 2 {
-            return textHeight(text: "voice_AINS_sup".localized(), fontSize: 13, width: ScreenWidth - 40) + 15
+            return textHeight(text: "voice_AINS_sup".voice_localized(), fontSize: 13, width: ScreenWidth - 40) + 15
         } else if settingType == .effect && section == 1 {
             return 40 + 12 + otherSoundHeaderHeight + 10
         } else if settingType == .AIAEC || settingType == .AGC {
@@ -282,9 +282,9 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
         } else if settingType == .AIAEC || settingType == .AGC {
             var detailStr: String = ""
             if settingType == .AIAEC {
-                detailStr = "voice_AIAEC_desc".localized()
+                detailStr = "voice_AIAEC_desc".voice_localized()
             } else {
-                detailStr = "voice_AGC_desc".localized()
+                detailStr = "voice_AGC_desc".voice_localized()
             }
             return textHeight(text: detailStr, fontSize: 13, width: screenWidth - 40) + 20;
         }
@@ -293,24 +293,24 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
 
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         if settingType == .AIAEC {
-            let height: CGFloat = textHeight(text: "voice_AIAEC_desc".localized(), fontSize: 13, width: screenWidth - 40) + 10
+            let height: CGFloat = textHeight(text: "voice_AIAEC_desc".voice_localized(), fontSize: 13, width: screenWidth - 40) + 10
             let footer: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: height))
             footer.backgroundColor = settingType == .AIAEC ? .white : UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 0, width: screenWidth-40, height: height))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.numberOfLines = 0
-            titleLabel.text = "voice_AIAEC_desc".localized()
+            titleLabel.text = "voice_AIAEC_desc".voice_localized()
             titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
             footer.addSubview(titleLabel)
             return footer
         } else if settingType == .AGC {
-            let height: CGFloat = textHeight(text: "voice_AGC_desc".localized(), fontSize: 13, width: screenWidth - 40) + 10
+            let height: CGFloat = textHeight(text: "voice_AGC_desc".voice_localized(), fontSize: 13, width: screenWidth - 40) + 10
             let footer: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: height))
             footer.backgroundColor = settingType == .AIAEC ? .white : UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 0, width: screenWidth-40, height: height))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.numberOfLines = 0
-            titleLabel.text = "voice_AGC_desc".localized()
+            titleLabel.text = "voice_AGC_desc".voice_localized()
             titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
             footer.addSubview(titleLabel)
             return footer
@@ -320,7 +320,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
             footer.backgroundColor = .white
             let textView = UITextView(frame: CGRect(x: 30, y: 0, width: screenWidth - 60, height: 40))
 
-            let text = NSMutableAttributedString(string: "voice_visit_more".localized())
+            let text = NSMutableAttributedString(string: "voice_visit_more".voice_localized())
             text.addAttribute(NSAttributedString.Key.font,
                               value: UIFont.systemFont(ofSize: 13),
                               range: NSRange(location: 0, length: text.length))
@@ -362,10 +362,10 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 5, width: 300, height: 30))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             if settingType == .effect {
-                titleLabel.text = "voice_current_sound".localized()
+                titleLabel.text = "voice_current_sound".voice_localized()
                 titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
             } else if settingType == .Spatial {
-                titleLabel.text = "voice_blue".localized()
+                titleLabel.text = "voice_blue".voice_localized()
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
             } else if settingType == .AIAEC {
                 
@@ -373,7 +373,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
         
 
             } else {
-                titleLabel.text = "voice_AINS_settings".localized()
+                titleLabel.text = "voice_AINS_settings".voice_localized()
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
             }
             headerView.addSubview(titleLabel)
@@ -386,7 +386,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             if settingType == .effect {
                 titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
-                titleLabel.text = "voice_other_sound".localized()
+                titleLabel.text = "voice_other_sound".voice_localized()
                 headerView.addSubview(titleLabel)
 
                 if section == 1 {
@@ -416,7 +416,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
 
             return headerView
         } else {
-            let height = textHeight(text: "voice_AINS_sup".localized(), fontSize: 13, width: ScreenWidth - 40)
+            let height = textHeight(text: "voice_AINS_sup".voice_localized(), fontSize: 13, width: ScreenWidth - 40)
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: height + 15))
             headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 5, width: screenWidth - 40, height: height))
@@ -424,7 +424,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
             titleLabel.lineBreakMode = .byCharWrapping
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-            titleLabel.text = "voice_AINS_sup".localized()
+            titleLabel.text = "voice_AINS_sup".voice_localized()
             headerView.addSubview(titleLabel)
             return headerView
         }
@@ -505,7 +505,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
                  return cell
              } else if indexPath.section == 1 {
                  let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: tIdentifier)!
-                 cell.textLabel?.text = "voice_AINS_AI_noise_suppression".localized()
+                 cell.textLabel?.text = "voice_AINS_AI_noise_suppression".voice_localized()
                  cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
                  cell.textLabel?.textColor = UIColor(hex: 0x3C4267, alpha: 1)
                  cell.isUserInteractionEnabled = false

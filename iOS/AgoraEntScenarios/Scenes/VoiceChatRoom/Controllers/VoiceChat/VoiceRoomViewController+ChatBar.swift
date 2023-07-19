@@ -63,7 +63,7 @@ extension VoiceRoomViewController {
              2.如果是主播先要判断是否开启机器人
              */
             if self!.isOwner == false {
-                self?.view.makeToast("voice_host_sound".localized())
+                self?.view.makeToast("voice_host_sound".voice_localized())
                 return
             }
 //            if self?.roomInfo?.room?.use_robot == false {
@@ -80,7 +80,7 @@ extension VoiceRoomViewController {
         }
         audioSetVC.soundBlock = { [weak self] index in
             if self?.isOwner == false {
-                self?.view.makeToast("voice_host_bot".localized())
+                self?.view.makeToast("voice_host_bot".voice_localized())
                 return
             }
             if let use_robot = self?.roomInfo?.room?.use_robot {
@@ -258,16 +258,16 @@ extension VoiceRoomViewController {
             checkAudioAuthorized()
         }
         guard let idx = local_index else {
-            view.makeToast("voice_you_have_no_wheat_slots".localized(), point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("voice_you_have_no_wheat_slots".voice_localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
         if !isOwner, idx == 0 {
-            view.makeToast("voice_you_have_no_wheat_slots".localized(), point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("voice_you_have_no_wheat_slots".voice_localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
         guard let mic = ChatRoomServiceImp.getSharedInstance().mics[safe: idx] else { return }
         if mic.status == 2 {
-            view.makeToast("voice_the_current_microphone_has_been_muted".localized(), point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("voice_the_current_microphone_has_been_muted".voice_localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
         chatBar.micState = !chatBar.micState
@@ -293,7 +293,7 @@ extension VoiceRoomViewController {
 
     func showUsers(position: VoiceRoomSwitchBarDirection) {
         let audience = VoiceRoomAudiencesViewController()
-        let contributes = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [VoiceRoomGiftersViewController(roomId: roomInfo?.room?.room_id ?? ""),audience], titles: ["voice_contribution_list".localized(),"voice_audience".localized()], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
+        let contributes = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [VoiceRoomGiftersViewController(roomId: roomInfo?.room?.room_id ?? ""),audience], titles: ["voice_contribution_list".voice_localized(),"voice_audience".voice_localized()], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
         audience.kickClosure = { [weak self] user,mic in
             if mic != nil{
                 self?.rtcView.updateUser(mic!)
@@ -336,14 +336,14 @@ extension VoiceRoomViewController {
 
     func userApplyAlert(_ index: Int?) {
         if chatBar.handsState == .selected {
-            view.makeToast("voice_request_wait".localized())
+            view.makeToast("voice_request_wait".voice_localized())
             return
         }
 
         if let mic_index = index {
             if let mic: VRRoomMic = roomInfo?.mic_info?[mic_index] {
                 if mic.status == 3 || mic.status == 4 {
-                    view.makeToast("voice_mic_closed".localized())
+                    view.makeToast("voice_mic_closed".voice_localized())
                     return
                 }
             }
@@ -369,9 +369,9 @@ extension VoiceRoomViewController {
             if error == nil {
                 if flag {
                     self.chatBar.refresh(event: .handsUp, state: .selected, asCreator: false)
-                    self.view.makeToast("voice_apply_success".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+                    self.view.makeToast("voice_apply_success".voice_localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 } else {
-                    self.view.makeToast("voice_apply_failed".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+                    self.view.makeToast("voice_apply_failed".voice_localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 }
             } else {
                 
@@ -382,10 +382,10 @@ extension VoiceRoomViewController {
     func cancelRequestSpeak(index: Int?) {
         ChatRoomServiceImp.getSharedInstance().cancelMicSeatApply(chat_uid: self.roomInfo?.room?.owner?.chat_uid ?? "") { error, flag in
             if error == nil {
-                self.view.makeToast("voice_cancel_apply_success".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+                self.view.makeToast("voice_cancel_apply_success".voice_localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
             } else {
-                self.view.makeToast("voice_cancel_apply_failed".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+                self.view.makeToast("voice_cancel_apply_failed".voice_localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
             }
         }
     }
@@ -424,7 +424,7 @@ extension VoiceRoomViewController {
         VoiceRoomUserInfo.shared.currentRoomOwner = roomInfo?.room?.owner
         let entity = VoiceRoomChatEntity()
         entity.userName = roomInfo?.room?.owner?.name
-        entity.content = "voice_room_welcome".localized()
+        entity.content = "voice_room_welcome".voice_localized()
         entity.attributeContent = entity.attributeContent
         entity.uid = roomInfo?.room?.owner?.uid
         entity.width = entity.width
