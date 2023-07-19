@@ -112,14 +112,14 @@
 
 + (NSArray<VLKTVKindsModel *> *)kinds {
     NSArray *titlesArray = @[
-        KTVLocalizedString(@"原唱"),
+        KTVLocalizedString(@"ktv_room_original"),
         KTVLocalizedString(@"KTV"),
-        KTVLocalizedString(@"演唱会"),
-        KTVLocalizedString(@"录音棚"),
-        KTVLocalizedString(@"留声机"),
-        KTVLocalizedString(@"空旷"),
-        KTVLocalizedString(@"空灵"),
-        KTVLocalizedString(@"流行"),
+        KTVLocalizedString(@"ktv_room_concert"),
+        KTVLocalizedString(@"ktv_room_recording studio"),
+        KTVLocalizedString(@"ktv_room_gramophone"),
+        KTVLocalizedString(@"ktv_room_spacious"),
+        KTVLocalizedString(@"ktv_room_ethereal"),
+        KTVLocalizedString(@"ktv_room_pop"),
         KTVLocalizedString(@"R&B")];
     NSArray *imagesArray = @[@"ktv_console_setting1",
                              @"ktv_console_setting2",

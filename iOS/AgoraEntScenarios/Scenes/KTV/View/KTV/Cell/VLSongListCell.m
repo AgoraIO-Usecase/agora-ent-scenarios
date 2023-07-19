@@ -73,7 +73,7 @@
 //    self.singingBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_singing_icon"]
 //                                                       title:KTVLocalizedString(@"演唱中")];
     self.singingBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.singingBtn setTitle:KTVLocalizedString(@"演唱中") forState:UIControlStateNormal];
+    [self.singingBtn setTitle:KTVLocalizedString(@"ktv_room_sing1") forState:UIControlStateNormal];
     [self.singingBtn setImage:[UIImage sceneImageWithName:@"ktv_singing_icon"] forState:UIControlStateNormal];
     self.singingBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
 //    self.singingBtn.imagePosition = QMUIButtonImagePositionLeft;
@@ -112,7 +112,9 @@
 //        self.typeLabel.text = KTVLocalizedString(@"独唱");
 //    }
     self.nameLabel.text = selSongModel.songName;
-    self.chooserLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"点唱: %@"), selSongModel.name];
+    NSString *localizedPropertyName = KTVLocalizedString(@"ktv_song_ordering_person");
+    NSString *formattedString = [NSString stringWithFormat:@"%@ %@", localizedPropertyName, selSongModel.name];
+    self.chooserLabel.text = formattedString;
     
     if (selSongModel.status == VLSongPlayStatusIdle) {
         if(!VLUserCenter.user.ifMaster) {

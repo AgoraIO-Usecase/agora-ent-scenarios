@@ -137,7 +137,7 @@ UITableViewDelegate
     self.emptyLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 60, SCREEN_WIDTH, 30)];
     self.emptyLabel.font = VLUIFontMake(13);
     self.emptyLabel.textColor = [UIColor colorWithHexString:@"#979CBB"];
-    self.emptyLabel.text = KTVLocalizedString(@"未找到相关结果");
+    self.emptyLabel.text = KTVLocalizedString(@"ktv_empty_search");
     self.emptyLabel.textAlignment = NSTextAlignmentCenter;
     [self addSubview:self.emptyLabel];
     self.emptyLabel.hidden = YES;

@@ -70,7 +70,7 @@
     
     self.singingBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.singingBtn setImage:[UIImage sceneImageWithName:@"ktv_seatsinging_icon"] forState:UIControlStateNormal];
-    [self.singingBtn setTitle:KTVLocalizedString(@"主唱") forState:UIControlStateNormal];
+    [self.singingBtn setTitle:KTVLocalizedString(@"ktv_zc") forState:UIControlStateNormal];
     self.singingBtn.frame = CGRectMake((self.width-36)*0.5, self.nickNameLabel.bottom+2, 36, 12);
     self.singingBtn.layer.cornerRadius = 6;
     self.singingBtn.layer.masksToBounds = YES;
@@ -87,7 +87,7 @@
     
     self.joinChorusBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.joinChorusBtn setImage:[UIImage sceneImageWithName:@"ic_hc"] forState:UIControlStateNormal];
-    [self.joinChorusBtn setTitle:KTVLocalizedString(@"合唱") forState:UIControlStateNormal];
+    [self.joinChorusBtn setTitle:KTVLocalizedString(@"ktv_hc") forState:UIControlStateNormal];
     self.joinChorusBtn.frame = CGRectMake((self.width-36)*0.5, self.nickNameLabel.bottom+2, 36, 12);
     self.joinChorusBtn.layer.cornerRadius = 6;
     self.joinChorusBtn.layer.masksToBounds = YES;

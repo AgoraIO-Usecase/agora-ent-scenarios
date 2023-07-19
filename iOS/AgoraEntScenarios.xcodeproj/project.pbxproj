@@ -543,6 +543,7 @@
 		E36EC8B32A6638440089A374 /* AEAListContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36EC8B22A6638440089A374 /* AEAListContainerView.swift */; };
 		E36EC8B52A663A600089A374 /* AEACategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36EC8B42A663A600089A374 /* AEACategoryView.swift */; };
 		E36EC8B72A663B880089A374 /* AEACategoryTitleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36EC8B62A663B880089A374 /* AEACategoryTitleCell.swift */; };
+		E36EC8BA2A6680F60089A374 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E36EC8BC2A6680F60089A374 /* Localizable.strings */; };
 		E3735C342A5E4AFF004737EF /* UITextView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */; };
 		E3735C852A5E7E75004737EF /* EffectsAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C3F2A5E7E75004737EF /* EffectsAttribute.m */; };
 		E3735C862A5E7E75004737EF /* Effects.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C412A5E7E75004737EF /* Effects.m */; };
@@ -1274,6 +1275,8 @@
 		E36EC8B22A6638440089A374 /* AEAListContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEAListContainerView.swift; sourceTree = "<group>"; };
 		E36EC8B42A663A600089A374 /* AEACategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEACategoryView.swift; sourceTree = "<group>"; };
 		E36EC8B62A663B880089A374 /* AEACategoryTitleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEACategoryTitleCell.swift; sourceTree = "<group>"; };
+		E36EC8BB2A6680F60089A374 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		E36EC8BD2A6680FB0089A374 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Extension.swift"; sourceTree = "<group>"; };
 		E3735C3E2A5E7E75004737EF /* EffectsLicense.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsLicense.h; sourceTree = "<group>"; };
 		E3735C3F2A5E7E75004737EF /* EffectsAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EffectsAttribute.m; sourceTree = "<group>"; };
@@ -2530,6 +2533,7 @@
 				DD84168D29090C520026B624 /* index.js */,
 				DD84168E29090C520026B624 /* img */,
 				DD84169F29090C520026B624 /* pages */,
+				E36EC8BC2A6680F60089A374 /* Localizable.strings */,
 			);
 			path = Resource;
 			sourceTree = "<group>";
@@ -3492,6 +3496,7 @@
 				DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */,
 				DD84176629090C520026B624 /* index.js in Resources */,
 				DD84176A29090C520026B624 /* ic_k.png in Resources */,
+				E36EC8BA2A6680F60089A374 /* Localizable.strings in Resources */,
 				DD84176D29090C520026B624 /* bg_index.png in Resources */,
 				DD84177029090C520026B624 /* ic_back.png in Resources */,
 				DD84176F29090C520026B624 /* ic_live.png in Resources */,
@@ -4181,6 +4186,15 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
+		E36EC8BC2A6680F60089A374 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E36EC8BB2A6680F60089A374 /* en */,
+				E36EC8BD2A6680FB0089A374 /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -4333,7 +4347,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.ktv;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.ktv.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4375,7 +4389,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.ktv;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.ktv.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
