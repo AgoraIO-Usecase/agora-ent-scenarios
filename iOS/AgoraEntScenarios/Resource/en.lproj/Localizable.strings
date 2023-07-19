@@ -1,4 +1,4 @@
-/* 
+/*
   AGLocalizable.strings
   AgoraEntScenarios
 
@@ -6,4 +6,140 @@
   
 */
 
+"app_name"="声动互娱";
+"app_title_home"="首页";
+"app_title_find"="发现";
+"app_title_mine"="我的";
+"app_action_settings"="设置";
+
+"app_exit"="退出";
+"app_user_agreement"="用户协议";
+"app_privacy_agreement"="隐私政策";
+"app_personal_info_collection_checklist"="个人信息收集清单";
+"app_third_party_info_data_sharing"="第三方信息数据共享";
+"app_and"="及";
+
+"app_confirm_deletion"="确认删除？";
+"app_about_us"="关于我们";
+
+"app_please_input_account"="请输入手机号";
+"app_error_pwd_tip"="8~20个字符，包含大、小写字母和数字";
+"app_please_input_pwd"="请输入密码";
+"app_please_input_v_code"="请输入验证码";
+"app_forget_password"="忘记密码";
+"app_login"="登录";
+"app_finish"="完成";
+"app_register_account"="注册账号";
+"app_welcome_experience"="欢迎体验声网服务";
+"app_mobile_number"="手机号";
+"app_v_code"="验证码";
+
+"app_plus_86"="+86";
+"app_logout"="退出登录";
+"app_logoff_account"="注销账号";
+"app_logoff"="注销";
+"app_debug_mode"="开发者模式";
+
+"app_voice_chat"="语聊房";
+"app_show_live"="秀场直播";
+"app_meta_live"="元直播";
+"app_meta_chatting"="元语聊";
+"app_interactive_games"="互动游戏";
+"app_coming_soon"="敬请期待";
+"app_voice_chat_spatial"="空间音频";
+
+"app_voice_chat_spatialTip"="—空间音频模式";
+
+"app_about_app"="关于声动互娱";
+"app_about_name"="声动互娱";
+"app_about_version"="版本号";
+"app_about_scene_version"="场景版本号";
+"app_about_chat_room"="语聊房";
+"app_about_chat_room_spatial"="语聊房-空间音频模式";
+"app_about_karaoke"="在线K歌";
+"app_about_show"="秀场直播";
+"app_about_customer_service"="联系客服";
+"app_about_official_website"="官网地址";
+"app_about_phone_cancel"="取消";
+"app_mine_current_version"="当前版本号：%s";
+
+"app_debug_open"="Debug模式已打开";
+"app_debug_off"="Debug模式已关闭";
+"app_exit_debug"="确定退出Debug模式么？";
+"app_exit_debug_tip"="退出debug模式后，设置页面将恢复成正常的设置页面哦～";
+"app_agree_tip"="请同意我们的隐私政策与用户协议";
+"app_input_phonenum_tip"="请输入正确手机号";
+"app_input_vcode_tip"="请输入验证码";
+"app_vcode_wrong_tip"="验证码错误";
+"app_login_success_tip"="登陆成功";
+"app_vcode_send_success_tip"="验证码发送成功";
+"app_edit_success"="修改成功";
+
+"room_has_close" = "房主已解散房间，请确认离开房间";
+"confirm_to_dismiss_room" = "确认解散该房间吗？";
+"confirm_to_exit_room" = "确认退出该房间吗？";
+"exit_room" = "退出房间";
+"dismiss_room" = "解散房间";
+
+"cancel" = "取消";
+"close" = "关闭";
+"agree" = "同意";
+"disagree" = "不同意";
+"confirm" = "确认";
+
+"edit_name" = "修改昵称";
+"input_edit_name" = "请输入昵称";
+"input_password" = "请输入房间密码";
+
+"i_know" = "我知道了";
+
+"avatar" = "头像";
+
+"select_from_album" = "相册中选择";
+"photograph" = "拍照";
+"complete_validation" = "完成验证";
+"drag_complete" = "拖动下方滑块完成拼图";
+
+"privacy_protection_tip1" = "声动互娱软件是一款用于向声网客户展示产品使用效果的测试产品，仅用于测试产品的功能、性能和可用性，而非提供给大众使用的正式产品。\n1.我们将依据《用户协议》及《隐私政策》来帮助您了解我们在收集、使用、存储您个人信息的情况以及您享有的相关权利。\n2.在您使用本测试软件时，我们将收集您的设备信息、日志信息等，同时根据不同使用场景，你可以授予我们获取您设备的麦克风权限、摄像头权限等信息。\n\n您可通过阅读完整的《用户协议》及《隐私政策》来了解详细信息。";
+"privacy_protection_tip2" = "同意 用户协议 及 隐私政策 后，声动互娱才能为您提供协作服务。";
+
+"send_v_code" = "发送验证码";
+"i_agree" = "我已阅读并同意";
+"ktv_online" = "在线K歌房";
+
+"time_up_exit_room" = "您已体验超过20分钟，当前房间已过期，请退出重新创建房间";
+"expire_exit_room" = "当前房间已过期，请退出";
+
+"report_room" = "举报";
+"report_room_success" = "举报成功";
+
+"comm_permission_leak_auido_title" = "没有麦克风权限";
+"comm_permission_leak_auido_content" = "请在设置中打开麦克风权限";
+"comm_permission_leak_camera_title" = "没有相机权限";
+"comm_permission_leak_camera_content" = "请在设置中打开相机权限";
+"comm_permission_leak_sdcard_title" = "没有照片和视频权限";
+"comm_permission_leak_sdcard_content" = "请在设置中打开照片和视频权限";
+"comm_permission_leak_other_title" = "没有运行所需权限";
+"comm_permission_leak_other_content" = "请在设置中打开运行所需权限";
+"comm_setting" = "设置";
+"comm_try_again" = "请重试";
+"app_expire" = "Token已失效，请重新登录";
+"agora" = "声网";
+"userName" = "用户名";
+"app_need_request_photo" = "声动互娱”想访问您的相册";
+"app_need_request_photo and upload avatar" = "声网需要您开启相册访问功能，读取照片上传头像";
+"app_upload_avatar" = "上传头像";
+"take_photo_and_upload" = "拍照上传";
+"local_upload" = "本地相册上传";
+"agree_and_goon" = "同意并继续";
+"disagree_and_exit" = "不同意并退出";
+"logout_tips" = "注销账号后，您将暂时无法使用该账号体验我们的服务，真的要注销吗？";
+"confirm_logout" = "确定退出登录?";
+"logout_tips" = "退出登陆后，我们还会继续保留您的账户数据，记得再来体验哦～";
+"not_allowed" = "不允许";
+"requset_ok" = "好";
+"personal_information" = "个人信息保护指引";
+"invalid_phone_number" = "手机号码格式错误";
+"validate_failed" = "验证码校验失败，请重试";
+"after_send_tip" = "秒后可重新发送";
 
