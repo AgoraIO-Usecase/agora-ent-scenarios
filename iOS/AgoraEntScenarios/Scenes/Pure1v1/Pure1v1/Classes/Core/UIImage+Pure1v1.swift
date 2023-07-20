@@ -54,7 +54,7 @@ extension UIImage {
     }
     
     @objc static func sceneImage(name: String) -> UIImage? {
-        let imagePath = UIImage.sceneImagePath(name: "Image\name", bundleName: "Pure1v1")
+        let imagePath = UIImage.sceneImagePath(name: "Image/\(name)", bundleName: "Pure1v1")
         let image = UIImage(contentsOfFile: imagePath ?? "")
         return image
     }

@@ -5,7 +5,7 @@
   Created by 朱继超 on 2022/9/19.
   
 */
-"Send"="Send";
-"Contribution Total"="Contribution Total";
-"Gifts" = "Gifts";
-"Sent " = "Sent ";
+
+"user_list_title"="1v1私密房";
+"user_list_waitting"="等待其他用户";
+"user_list_nodata_tips"="欢迎来到声网1V1私密房，目前暂无其它用户入场，你可邀约朋友入场体验。";
