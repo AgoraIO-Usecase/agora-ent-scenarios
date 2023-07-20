@@ -38,7 +38,7 @@ class SoundCardSettingBean constructor(private var parameterCallback: ((preset: 
     fun enable(enable: Boolean, force: Boolean, callback: () -> Unit) {
         if (this.isEnable != enable || force) {
             this.isEnable = enable
-            presetSound = if (isEnable) AgoraPresetSound.Oba else AgoraPresetSound.Close
+            presetSound = if (isEnable) AgoraPresetSound.Uncle else AgoraPresetSound.Close
 
             gainValue = presetSound.gainValue
             presetValue = presetSound.presetValue

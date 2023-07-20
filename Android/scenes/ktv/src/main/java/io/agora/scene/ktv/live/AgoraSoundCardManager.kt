@@ -21,6 +21,8 @@ enum class AgoraPresetSound constructor(
     val gender: Int,
     val effect: Int,
 ) {
+    Uncle(gainValue = 1.0f, presetValue = 4, gender = 0, effect = 2),
+    Announcer(gainValue = 1.0f, presetValue = 4, gender = 1, effect = 2),
     Oba(gainValue = 1.0f, presetValue = 4, gender = 0, effect = 0),
     Lady(gainValue = 1.0f, presetValue = 4, gender = 1, effect = 0),
     Boy(gainValue = 1.0f, presetValue = 4, gender = 0, effect = 1),
@@ -52,7 +54,7 @@ class AgoraSoundCardManager constructor(private val rtcEngineEx: RtcEngineEx) {
     fun enable(enable: Boolean, force: Boolean, callback: () -> Unit) {
         if (this.isEnable != enable || force) {
             this.isEnable = enable
-            presetSound = if (isEnable) AgoraPresetSound.Oba else AgoraPresetSound.Close
+            presetSound = if (isEnable) AgoraPresetSound.Uncle else AgoraPresetSound.Close
 
             gainValue = presetSound.gainValue
             presetValue = presetSound.presetValue

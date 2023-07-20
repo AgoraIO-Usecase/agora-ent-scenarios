@@ -42,6 +42,14 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
 
     private val presetSoundArray: Array<PresetSoundModel> = arrayOf(
         PresetSoundModel(
+            AgoraPresetSound.Uncle, appContext().getString(R.string.ktv_preset_sound_uncle),
+            appContext().getString(R.string.ktv_preset_sound_uncle_tips), io.agora.scene.base.R.mipmap.portrait01
+        ),
+        PresetSoundModel(
+            AgoraPresetSound.Announcer, appContext().getString(R.string.ktv_preset_sound_announcer),
+            appContext().getString(R.string.ktv_preset_sound_announcer_tips), io.agora.scene.base.R.mipmap.portrait01
+        ),
+        PresetSoundModel(
             AgoraPresetSound.Oba, appContext().getString(R.string.ktv_preset_sound_oba),
             appContext().getString(R.string.ktv_preset_sound_oba_tips), io.agora.scene.base.R.mipmap.portrait01
         ),
@@ -200,6 +208,16 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
     private fun setupPresetSoundView(presetSound: AgoraPresetSound) {
         binding?.apply {
             when (presetSound) {
+                AgoraPresetSound.Uncle -> {
+                    mtPresetSoundType.setText(R.string.ktv_preset_sound_uncle)
+                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_uncle_tips)
+                }
+
+                AgoraPresetSound.Announcer -> {
+                    mtPresetSoundType.setText(R.string.ktv_preset_sound_announcer)
+                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_announcer_tips)
+                }
+
                 AgoraPresetSound.Oba -> {
                     mtPresetSoundType.setText(R.string.ktv_preset_sound_oba)
                     mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_oba_tips)
