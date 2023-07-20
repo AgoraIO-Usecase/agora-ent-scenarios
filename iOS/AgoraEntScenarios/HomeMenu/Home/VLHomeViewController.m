@@ -11,6 +11,8 @@
 #import "AESMacro.h"
 #import "VLToast.h"
 
+@import Pure1v1;
+
 @interface VLHomeViewController ()<VLHomeViewDelegate>
 
 @end
@@ -77,7 +79,7 @@
 //        return;
 //    }
 
-    NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow"];
+    NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow", @"Pure1v1"];
     [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
     [[NetworkManager shared] reportDeviceInfoWithSceneName:sceneNames[tagValue]];
     [[NetworkManager shared] reportUserBehaviorWithSceneName:sceneNames[tagValue]];
@@ -100,6 +102,13 @@
             SARoomsViewController *roomVc = [[SARoomsViewController alloc] initWithUser:VLUserCenter.user];
             roomVc.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:roomVc animated:YES];
+        } break;
+        case 4: {
+            Pure1v1UserInfo* userInfo = [Pure1v1UserInfo new];
+            userInfo.userId = VLUserCenter.user.userNo;
+            userInfo.userName = VLUserCenter.user.name;
+            userInfo.avatar = VLUserCenter.user.headUrl;
+            [Pure1v1Context showSceneWithViewController:self appId:KeyCenter.AppId userInfo:userInfo];
         } break;
         default:
             break;

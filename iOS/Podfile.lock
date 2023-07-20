@@ -42,7 +42,10 @@ PODS:
   - MJRefresh (3.7.5)
   - Protobuf (3.22.1)
   - Pure1v1 (0.1.0):
+    - AgoraSyncManager
     - CallAPI
+    - YYCategories
+    - YYModel
   - ScoreEffectUI (1.0.1)
   - SDWebImage (4.4.8):
     - SDWebImage/Core (= 4.4.8)
@@ -51,7 +54,7 @@ PODS:
     - SDWebImage/Core (~> 4.2)
   - SenseLib (1.0)
   - SnapKit (5.6.0)
-  - SocketRocket (0.6.0)
+  - SocketRocket (0.7.0)
   - SSZipArchive (2.4.3)
   - SVGAPlayer (2.5.7):
     - SVGAPlayer/Core (= 2.5.7)
@@ -96,7 +99,7 @@ DEPENDENCIES:
   - SDWebImageAPNGCoder
   - SenseLib (from `sense.podspec`)
   - SnapKit
-  - SocketRocket (= 0.6.0)
+  - SocketRocket (= 0.7.0)
   - SVGAPlayer
   - SVProgressHUD (= 2.2.5)
   - SwiftyBeaver (= 1.9.5)
@@ -172,13 +175,13 @@ SPEC CHECKSUMS:
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  Pure1v1: 0bdf23db38f831187499953a0dae23ef7c64ce5f
+  Pure1v1: 19806e28a239a87b7d24760bc68c9d4bdb42f1f4
   ScoreEffectUI: 1a3bbd83b17cfef1c16a3a4eede2854f89c9eb10
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
   SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
-  SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
+  SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
@@ -188,6 +191,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: bea0b4681e8d64ab634fb65f8da237d0d3468111
+PODFILE CHECKSUM: c06e30b3f9f1cb8182bc0644685b61676856438d
 
 COCOAPODS: 1.12.0
