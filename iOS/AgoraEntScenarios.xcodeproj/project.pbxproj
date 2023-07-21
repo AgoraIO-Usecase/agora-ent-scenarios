@@ -655,6 +655,7 @@
 		E36B429C2A24B8290034FACF /* SBGDebugInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = E36B42552A24B8290034FACF /* SBGDebugInfo.m */; };
 		E36B429E2A259AA80034FACF /* SBGAttributeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36B429D2A259AA80034FACF /* SBGAttributeView.swift */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
+		E38C5CD72A6A834500662A9C /* LyricsCutter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E38C5CD62A6A834400662A9C /* LyricsCutter.swift */; };
 		E3BA36DF2A2E069100ACD073 /* SBGLrcNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3BA36DE2A2E069000ACD073 /* SBGLrcNameView.swift */; };
 		E751D85D29F11723001354CA /* AUiMoreDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E751D85C29F11723001354CA /* AUiMoreDialog.swift */; };
 /* End PBXBuildFile section */
@@ -1548,6 +1549,7 @@
 		E36B429D2A259AA80034FACF /* SBGAttributeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SBGAttributeView.swift; sourceTree = "<group>"; };
 		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
 		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
+		E38C5CD62A6A834400662A9C /* LyricsCutter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsCutter.swift; sourceTree = "<group>"; };
 		E3BA36DE2A2E069000ACD073 /* SBGLrcNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SBGLrcNameView.swift; sourceTree = "<group>"; };
 		E751D85C29F11723001354CA /* AUiMoreDialog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiMoreDialog.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3536,6 +3538,7 @@
 		E36B41C82A24B8290034FACF /* SBGAPI */ = {
 			isa = PBXGroup;
 			children = (
+				E38C5CD62A6A834400662A9C /* LyricsCutter.swift */,
 				E36B41CF2A24B8290034FACF /* SBGApi.swift */,
 				E36B41CB2A24B8290034FACF /* SBGApiImpl.swift */,
 				E36B41CE2A24B8290034FACF /* SBGLrcControl.swift */,
@@ -4313,6 +4316,7 @@
 				DD36108329B70CDC00CE7984 /* EffectsProcess.m in Sources */,
 				DD619AD029E3E247008F63E4 /* SAANISSetTableViewCell.swift in Sources */,
 				DDA199E228FFE579009D3E61 /* VLCommonWebViewController.m in Sources */,
+				E38C5CD72A6A834500662A9C /* LyricsCutter.swift in Sources */,
 				E357356A29EFD8B5009D54E1 /* VLSoundEffectView.m in Sources */,
 				DD36107129B70CDC00CE7984 /* BEOpenGLRenderHelper.m in Sources */,
 				DD619BB729E3E262008F63E4 /* VoiceRoomAlertViewController.swift in Sources */,

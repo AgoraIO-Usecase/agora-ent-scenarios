@@ -161,6 +161,7 @@ class VLSBGLyricView: UIView {
     private var isTaped: Bool = false
     private var songContent: String = ""
     private var downloadManager = AgoraDownLoadManager()
+    private var lyricModel: LyricModel? = nil
     private var bgImgView: UIImageView = {
         let imgView = UIImageView()
         imgView.image = UIImage.sceneImage(name: "ktv_mv_tempBg")
@@ -313,6 +314,7 @@ class VLSBGLyricView: UIView {
         incentiveView.reset()
         lrcView?.reset()
         self.songContent = ""
+        self.lyricModel = nil
         self.songNameView.setName(with: self.songContent, isCenter: true)
         self.currentLoadLrcPath = nil
     }
@@ -323,6 +325,7 @@ class VLSBGLyricView: UIView {
             self.incentiveView.reset()
             self.lrcView?.reset()
             self.songContent = ""
+            self.lyricModel = nil
             self.songNameView.setName(with: self.songContent, isCenter: true)
             self.currentLoadLrcPath = nil
         }
@@ -369,6 +372,11 @@ extension VLSBGLyricView: SBGLrcViewDelegate {
     func onHighPartTime(highStartTime: Int, highEndTime: Int) {
         self.highEndTime = highEndTime
         self.highStartTime = highStartTime
+        //如果model为空 说明顺序对的就不用管，如果model不为空 表示歌词先到，需要处理
+        guard let lyricModel = self.lyricModel else {return}
+        DispatchQueue.main.async {
+            self.dealWithModel(lyricModel)
+        }
     }
     
     public func onUpdatePitch(pitch: Float) {
@@ -427,26 +435,34 @@ extension VLSBGLyricView: SBGLrcViewDelegate {
             return
         }
         currentLoadLrcPath = url
-        totalCount = model.lines.count
+        self.lyricModel = model
+        if self.highEndTime != 0 {
+            dealWithModel(model)
+        }
+    }
+    
+    func dealWithModel(_ model: LyricModel) {
+        let lines = model.lines.map({
+            LyricsCutter.Line(beginTime: $0.beginTime, duration: $0.duration)
+        })
+        
+        if let res = LyricsCutter.handleFixTime(startTime: self.highStartTime, endTime: self.highEndTime, lines: lines) {
+            self.highStartTime = res.0
+            self.highEndTime = res.1
+        }
+        let realModel = LyricsCutter.cut(model:model, startTime: self.highStartTime, endTime: self.highEndTime)
+        totalCount = realModel.lines.count
         totalLines = 0
         lrcView.reset()
-        dealWithBattleSong(lyricsModel: model)
-        songContent = "\(model.name.trimmingCharacters(in: .whitespacesAndNewlines))-\(model.singer)"
+        localTotalScore = realModel.lines.count * 100
+        print("totalScore:\(localTotalScore), start:\(highStartTime), end:\(highEndTime), title:\(realModel.name), lineCount:\(realModel.lines.count)")
+        songContent = "\(realModel.name.trimmingCharacters(in: .whitespacesAndNewlines))-\(realModel.singer)"
         songNameView.isHidden = false
         songNameView.setName(with: songContent, isCenter: true)
-        lrcView?.setLyricData(data: model)
-    }
-
-    func dealWithBattleSong(lyricsModel: LyricModel?) {
-        guard let model = lyricsModel else {return}
-            var lineCount = 0
-            for item in model.lines.enumerated() {
-                if item.element.beginTime >= highStartTime, highEndTime >= item.element.beginTime + item.element.duration {
-                    print("\(item.offset) -> s: \(item.element.beginTime), e: \(item.element.beginTime + item.element.duration)")
-                    lineCount += 1
-                }
-            }
-        localTotalScore = lineCount * 100
+        lrcView?.setLyricData(data: realModel)
+        self.lyricModel = nil
+        self.highStartTime = 0
+        self.highEndTime = 0
     }
 }
 

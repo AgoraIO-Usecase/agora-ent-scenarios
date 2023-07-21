@@ -28,6 +28,8 @@ private func agoraPrint(_ message: String) {
     private var totalLines: Int = 0
     private var totalScore: Int = 0
     private var totalCount: Int = 0
+    private var startTime: Int = 0
+    private var endTime: Int = 0
     private var currentLoadLrcPath: String?
     private var downloadManager: AgoraDownLoadManager = AgoraDownLoadManager()
     @objc init(lrcView: KaraokeView) {
@@ -81,7 +83,8 @@ extension SBGLrcControl: KaraokeDelegate {
 extension SBGLrcControl: SBGLrcViewDelegate {
     
     func onHighPartTime(highStartTime: Int, highEndTime: Int) {
-        
+        self.startTime = highStartTime
+        self.endTime = highEndTime
     }
 
     func onUpdatePitch(pitch: Float) {
@@ -136,6 +139,15 @@ extension SBGLrcControl: SBGLrcViewDelegate {
         }
         currentLoadLrcPath = url
         lyricModel = model
+        let lines = model.lines.map({
+            LyricsCutter.Line(beginTime: $0.beginTime, duration: $0.duration)
+        })
+        
+        if let res = LyricsCutter.handleFixTime(startTime: self.startTime, endTime: self.endTime, lines: lines) {
+            self.startTime = res.0
+            self.endTime = res.1
+        }
+        lyricModel = LyricsCutter.cut(model:model, startTime: self.startTime, endTime: self.endTime)
         totalCount = model.lines.count
         totalLines = 0
         totalScore = 0
