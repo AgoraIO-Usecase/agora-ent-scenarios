@@ -5,7 +5,7 @@
 
 #import "VLHomeViewController.h"
 #import "VLHomeView.h"
-#import "VLOnLineListVC.h"
+#import "VLSROnLineListVC.h"
 #import "VLMacroDefine.h"
 #import "MenuUtils.h"
 #import "AESMacro.h"
@@ -89,7 +89,7 @@
         }
             break;
         case 2: {
-            VLOnLineListVC *vc = [[VLOnLineListVC alloc]init];
+            VLSROnLineListVC *vc = [[VLSROnLineListVC alloc]init];
             [self.navigationController pushViewController:vc animated:YES];
         } break;
         case 3: {
