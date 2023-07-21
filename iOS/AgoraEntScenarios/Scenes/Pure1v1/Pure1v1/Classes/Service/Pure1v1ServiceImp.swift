@@ -37,8 +37,9 @@ class Pure1v1ServiceImp: NSObject {
     private var networkDidChanged: ((Pure1v1ServiceNetworkStatus) -> Void)?
     private var roomExpiredDidChanged: (() -> Void)?
     
-    convenience init(user: Pure1v1UserInfo?) {
+    convenience init(appId: String, user: Pure1v1UserInfo?) {
         self.init()
+        self.appId = appId
         self.user = user
     }
     
@@ -84,14 +85,18 @@ class Pure1v1ServiceImp: NSObject {
 
 //user
 extension Pure1v1ServiceImp {
-    private func _addUserIfNeed() {
-        _getUserList { error, userList in
+    private func _addUserIfNeed(completion: @escaping ()->()) {
+        _getUserList {[weak self] error, userList in
+            guard let self = self else {return}
             // current user already add
-            if self.userList.contains(where: { $0.userId == self.user?.userId }) {
+            if let user = self.userList.first(where: { $0.userId == self.user?.userId}) {
+                self.user?.objectId = user.objectId
+                completion()
                 return
             }
             self._addUserInfo {
             }
+            completion()
         }
     }
 
@@ -122,8 +127,9 @@ extension Pure1v1ServiceImp {
         let scene = sceneRefs[kSceneId]
         scene?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .add(data: params, success: { object in
+            .add(data: params, success: {[weak self] object in
                 pure1v1Print("imp user add success...")
+                self?.user?.objectId = object.getId()
                 finished()
             }, fail: { error in
                 pure1v1Print("imp user add fail :\(error.message)...")
@@ -133,7 +139,7 @@ extension Pure1v1ServiceImp {
     }
     
     private func _removeUser(completion: @escaping (Error?) -> Void) {
-        guard let objectId = userList.filter({ $0.userId == self.user?.userId }).first?.objectId else {
+        guard let objectId = self.user?.objectId else {
 //            agoraAssert("_removeUser objectId = nil")
             completion(nil)
             return
@@ -175,8 +181,9 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
                     pure1v1Print("joinRoom success")
                     mainTreadTask {
                         self.sceneRefs[kSceneId] = sceneRef
-                        self._addUserIfNeed()
-                        completion(nil)
+                        self._addUserIfNeed {
+                            completion(nil)
+                        }
                     }
                 } fail: { error in
                     pure1v1Print("joinRoom fail2: \(error.localizedDescription)")
@@ -198,6 +205,7 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
         _removeUser { error in
         }
         manager.leaveScene(roomId: kDefaultRoomName)
+        completion(nil)
     }
     
     func getUserList(completion: @escaping ([Pure1v1UserInfo]) -> Void) {

@@ -8,15 +8,6 @@
 import Foundation
 
 class Pure1v1NaviBar: UIView {
-//    private lazy var gradientLayer: CAGradientLayer = {
-//        let layer = CAGradientLayer()
-//        layer.colors = [
-//            UIColor(hexString: "#F6F2FF")!.cgColor,
-//            UIColor(hexString: "#FFFFFF")!.cgColor,
-//        ]
-//
-//        return layer
-//    }()
     public lazy var backButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage.sceneImage(name: "navi_back"), for: .normal)

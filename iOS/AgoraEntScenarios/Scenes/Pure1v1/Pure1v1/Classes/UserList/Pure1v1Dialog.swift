@@ -9,6 +9,15 @@ import UIKit
 
 class Pure1v1Dialog: UIView {
     private lazy var iconView = UIImageView(image: UIImage.sceneImage(name: "dialog_icon"))
+    private lazy var gradientLayer: CAGradientLayer = {
+        let layer = CAGradientLayer()
+        layer.colors = [
+            UIColor(hexString: "#F6F2FF")!.cgColor,
+            UIColor(hexString: "#FFFFFF")!.cgColor,
+        ]
+
+        return layer
+    }()
     override init(frame: CGRect) {
         super.init(frame: frame)
         _loadSubView()
@@ -23,7 +32,14 @@ class Pure1v1Dialog: UIView {
         layer.cornerRadius = 20
         clipsToBounds = true
         
+        layer.addSublayer(gradientLayer)
+        
         addSubview(iconView)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        gradientLayer.frame = CGRect(x: 0, y: 0, width: aui_width, height: 58)
         iconView.aui_size = CGSize(width: 106, height: 100)
     }
 }

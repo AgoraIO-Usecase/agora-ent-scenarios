@@ -44,6 +44,7 @@ PODS:
   - Pure1v1 (0.1.0):
     - AgoraSyncManager
     - CallAPI
+    - SDWebImage
     - YYCategories
     - YYModel
   - ScoreEffectUI (1.0.1)
@@ -175,7 +176,7 @@ SPEC CHECKSUMS:
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  Pure1v1: 19806e28a239a87b7d24760bc68c9d4bdb42f1f4
+  Pure1v1: 9c2029b3db8dba8b2dfc2a3314b6617eb2ffb653
   ScoreEffectUI: 1a3bbd83b17cfef1c16a3a4eede2854f89c9eb10
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
