@@ -18,6 +18,14 @@ class Pure1v1Dialog: UIView {
 
         return layer
     }()
+    private lazy var contentView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 20
+        view.clipsToBounds = true
+        return view
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         _loadSubView()
@@ -28,22 +36,21 @@ class Pure1v1Dialog: UIView {
     }
     
     fileprivate func _loadSubView() {
-        backgroundColor = .white
-        layer.cornerRadius = 20
-        clipsToBounds = true
-        
-        layer.addSublayer(gradientLayer)
-        
-        addSubview(iconView)
+        backgroundColor = .clear
+        addSubview(contentView)
+        contentView.layer.addSublayer(gradientLayer)
+        contentView.addSubview(iconView)
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        gradientLayer.frame = CGRect(x: 0, y: 0, width: aui_width, height: 58)
+        contentView.frame = bounds
+        gradientLayer.frame = CGRect(x: 0, y: 0, width: contentView.aui_width, height: 58)
         iconView.aui_size = CGSize(width: 106, height: 100)
     }
 }
 
+//房间无人
 class Pure1v1NoDataDialog: Pure1v1Dialog {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -77,5 +84,94 @@ class Pure1v1NoDataDialog: Pure1v1Dialog {
         contentLabel.aui_width = self.aui_width - 60
         contentLabel.sizeToFit()
         contentLabel.aui_top = titleLabel.aui_bottom + 40
+    }
+}
+
+private let kDialogTag = 1112234567
+
+class Pure1v1CallerDialog: Pure1v1Dialog {
+    var cancelClosure: (()->())?
+    fileprivate var userInfo: Pure1v1UserInfo? {
+        didSet {
+            avatarView.sd_setImage(with: URL(string: userInfo?.avatar ?? ""))
+            userNameLabel.text = userInfo?.userName ?? ""
+        }
+    }
+    private lazy var avatarView: UIImageView = {
+        let view = UIImageView()
+        view.clipsToBounds = true
+        return view
+    }()
+    
+    private lazy var userNameLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.font = UIFont.systemFont(ofSize: 22)
+        return label
+    }()
+    
+    private lazy var stateLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.text = "call_state_waitting".pure1v1Localization()
+        return label
+    }()
+    
+    private lazy var cancelButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage.sceneImage(name: "call_reject"), for: .normal)
+        button.addTarget(self, action: #selector(_cancelAction), for: .touchUpInside)
+        return button
+    }()
+    
+    override func _loadSubView() {
+        super._loadSubView()
+        addSubview(avatarView)
+        addSubview(userNameLabel)
+        addSubview(stateLabel)
+        addSubview(cancelButton)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        avatarView.aui_size = CGSize(width: 72, height: 72)
+        avatarView.centerY = 0
+        avatarView.centerX = aui_width / 2
+        avatarView.layer.cornerRadius = avatarView.aui_width / 2
+        avatarView.layer.borderWidth = 5
+        avatarView.layer.borderColor = UIColor.white.cgColor
+        
+        userNameLabel.sizeToFit()
+        stateLabel.sizeToFit()
+        userNameLabel.centerX = avatarView.centerX
+        stateLabel.centerX = avatarView.centerX
+        userNameLabel.aui_top = 66
+        
+        stateLabel.aui_top = userNameLabel.aui_bottom + 18
+        
+        cancelButton.aui_size = CGSize(width: 70, height: 70)
+        cancelButton.centerX = aui_width / 2
+        cancelButton.aui_top = stateLabel.aui_bottom + 62
+    }
+    
+    static func show(user: Pure1v1UserInfo) -> Pure1v1CallerDialog? {
+        Pure1v1CallerDialog.hidden()
+        guard let window = getWindow() else {return nil}
+        let dialog = Pure1v1CallerDialog(frame: CGRect(x: 0, y: window.aui_height - 357, width: window.aui_width, height: 357))
+        dialog.userInfo = user
+        dialog.tag = kDialogTag
+        window.addSubview(dialog)
+        
+        return dialog
+    }
+    
+    static func hidden() {
+        getWindow()?.viewWithTag(kDialogTag)?.removeFromSuperview()
+    }
+    
+    @objc private func _cancelAction() {
+        cancelClosure?()
     }
 }

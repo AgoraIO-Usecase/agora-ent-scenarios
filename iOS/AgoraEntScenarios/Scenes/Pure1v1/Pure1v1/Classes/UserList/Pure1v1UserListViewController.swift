@@ -14,6 +14,10 @@ class Pure1v1UserListViewController: UIViewController {
     var appId: String = ""
     var appCertificate: String = ""
     var userInfo: Pure1v1UserInfo?
+    
+    private var callState: CallStateType = .idle
+    private var connectedUserId: UInt?
+    private lazy var callVC = Pure1v1CallViewController()
     private lazy var callAPI = CallApiImpl()
     private lazy var naviBar: Pure1v1NaviBar = Pure1v1NaviBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.aui_width, height: 44))
     private lazy var service: Pure1v1ServiceProtocol = Pure1v1ServiceImp(appId: appId, user: userInfo)
@@ -21,7 +25,8 @@ class Pure1v1UserListViewController: UIViewController {
     private lazy var listView: Pure1v1UserPagingListView = {
         let listView = Pure1v1UserPagingListView(frame: self.view.bounds)
         listView.callClosure = { [weak self] user in
-            
+            guard let user = user else {return}
+            self?._call(user: user)
         }
         return listView
     }()
@@ -68,8 +73,8 @@ class Pure1v1UserListViewController: UIViewController {
         config.userId = UInt(userInfo?.userId ?? "")!
         config.autoAccept = false
         config.rtcEngine = _createRtcEngine()
-//        config.localView = rightView
-//        config.remoteView = leftView
+        config.localView = callVC.smallCanvasView
+        config.remoteView = callVC.bigCanvasView
         
         callAPI.initialize(config: config, token: tokenConfig) { error in
             // Requires active call to prepareForCall
@@ -93,6 +98,12 @@ class Pure1v1UserListViewController: UIViewController {
         
         engine.setClientRole(.broadcaster)
         return engine
+    }
+    
+    private func _call(user: Pure1v1UserInfo) {
+        callAPI.call(roomId: user.userId, remoteUserId: UInt(user.userId)!) { err in
+            
+        }
     }
 }
 
@@ -118,8 +129,110 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                             eventReason: String,
                             elapsed: Int,
                             eventInfo: [String : Any]) {
+        let currentUid = userInfo?.userId ?? ""
+        let publisher = eventInfo[kPublisher] as? String ?? currentUid
+        guard publisher == currentUid else {
+            return
+        }
+        print("onCallStateChanged state: \(state.rawValue), stateReason: \(stateReason.rawValue), eventReason: \(eventReason), elapsed: \(elapsed) ms, eventInfo: \(eventInfo) publisher: \(publisher) / \(currentUid)")
         
+        self.callState = state
+        
+        switch state {
+        case .calling:
+            let fromUserId = eventInfo[kFromUserId] as? UInt ?? 0
+            let fromRoomId = eventInfo[kFromRoomId] as? String ?? ""
+            let toUserId = eventInfo[kRemoteUserId] as? UInt ?? 0
+            if let connectedUserId = connectedUserId, connectedUserId != fromUserId {
+                callAPI.reject(roomId: fromRoomId, remoteUserId: fromUserId, reason: "already calling") { err in
+                }
+                return
+            }
+            // 触发状态的用户是自己才处理
+            if currentUid == "\(toUserId)" {
+                connectedUserId = fromUserId
+                
+//                AUIAlertView()
+//                    .isShowCloseButton(isShow: true)
+//                    .title(title: "用户 \(fromUserId) 邀请您1对1通话")
+//                    .rightButton(title: "同意")
+//                    .leftButton(title: "拒绝")
+//                    .leftButtonTapClosure {[weak self] in
+//                        guard let self = self else { return }
+//                        self.api.reject(roomId: fromRoomId, remoteUserId: fromUserId, reason: "reject by user") { err in
+//                        }
+//                    }
+//                    .rightButtonTapClosure(onTap: {[weak self] text in
+//                        guard let self = self else { return }
+//                        NetworkManager.shared.generateTokens(channelName: fromRoomId,
+//                                                             uid: "\(toUserId)",
+//                                                             tokenGeneratorType: .token007,
+//                                                             tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
+//                            guard let self = self else {return}
+//                            guard tokens.count == 2 else {
+//                                print("generateTokens fail")
+//                                self.view.isUserInteractionEnabled = true
+//                                return
+//                            }
+//                            let rtcToken = tokens[AgoraTokenType.rtc.rawValue]!
+//                            self.api.accept(roomId: fromRoomId, remoteUserId: fromUserId, rtcToken: rtcToken) { err in
+//                            }
+//                        }
+//                    })
+//                    .show()
+                
+            } else if currentUid == "\(fromUserId)" {
+                connectedUserId = toUserId
+                
+                if let user = listView.userList.first {$0.userId == "\(toUserId)"} {
+                    let dialog = Pure1v1CallerDialog.show(user: user)
+                    dialog?.cancelClosure = {[weak self] in
+                        self?.callAPI.cancelCall(completion: { err in
+                        })
+                    }
+                }
+//                AUIAlertView()
+//                    .isShowCloseButton(isShow: true)
+//                    .title(title: "呼叫用户 \(toUserId) 中")
+//                    .rightButton(title: "取消")
+//                    .rightButtonTapClosure(onTap: {[weak self] text in
+//                        guard let self = self else { return }
+//                        self.api.cancelCall { err in
+//                        }
+//                    })
+//                    .show()
+            }
+            break
+        case .connected:
+//            AUIToast.show(text: "通话开始\(eventInfo[kDebugInfo] as? String ?? "")", postion: .bottom)
+//            AUIAlertManager.hiddenView()
+            Pure1v1CallerDialog.hidden()
+            break
+        case .prepared:
+//            switch stateReason {
+//            case .localHangup, .remoteHangup:
+//                AUIToast.show(text: "通话结束", postion: .bottom)
+//            case .localRejected, .remoteRejected:
+//                AUIToast.show(text: "通话被拒绝")
+//            case .callingTimeout:
+//                AUIToast.show(text: "无应答")
+//            case .localCancel, .remoteCancel:
+//                AUIToast.show(text: "通话被取消")
+//            default:
+//                break
+//            }
+//            AUIAlertManager.hiddenView()
+            connectedUserId = nil
+            Pure1v1CallerDialog.hidden()
+            break
+        case .failed:
+//            AUIToast.show(text: eventReason, postion: .bottom)
+//            AUIAlertManager.hiddenView()
+            connectedUserId = nil
+            Pure1v1CallerDialog.hidden()
+            break
+        default:
+            break
+        }
     }
-    
-    
 }
