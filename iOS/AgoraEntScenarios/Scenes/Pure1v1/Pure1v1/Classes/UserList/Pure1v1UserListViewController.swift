@@ -181,6 +181,10 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
 //                    })
 //                    .show()
                 
+                if let user = listView.userList.first {$0.userId == "\(fromUserId)"} {
+                    let dialog = Pure1v1CalleeDialog.show(user: user)
+                }
+                
             } else if currentUid == "\(fromUserId)" {
                 connectedUserId = toUserId
                 
