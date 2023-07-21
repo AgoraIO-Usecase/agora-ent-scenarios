@@ -177,7 +177,8 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
         binding?.cbSwitch?.isChecked = isOn
         binding?.vSettingMark?.visibility = if (isOn) View.INVISIBLE else View.VISIBLE
         binding?.clSetting?.alpha = if (isOn) 1f else 0.3f
-        binding?.vPingMark?.visibility = if (isOn) View.INVISIBLE else View.VISIBLE
+//        binding?.vPingMark?.visibility = if (isOn) View.INVISIBLE else View.VISIBLE
+        binding?.vPingMark?.visibility = View.VISIBLE
     }
 
     private fun setPing(value: Int) {
