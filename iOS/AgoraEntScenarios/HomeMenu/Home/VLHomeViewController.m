@@ -105,15 +105,17 @@
         } break;
         case 4: {
             Pure1v1UserInfo* userInfo = [Pure1v1UserInfo new];
-            userInfo.userId = VLUserCenter.user.userNo;
+            userInfo.userId = VLUserCenter.user.id;
             userInfo.userName = VLUserCenter.user.name;
             userInfo.avatar = VLUserCenter.user.headUrl;
-            [Pure1v1Context showSceneWithViewController:self appId:KeyCenter.AppId userInfo:userInfo];
+            [Pure1v1Context showSceneWithViewController:self
+                                                  appId:KeyCenter.AppId
+                                         appCertificate:KeyCenter.Certificate
+                                               userInfo:userInfo];
         } break;
         default:
             break;
     }
-
 }
 
 @end

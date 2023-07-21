@@ -16,10 +16,17 @@ public class Pure1v1Context: NSObject {
 //        }
     }
     
-    public static func showScene(viewController: UIViewController, appId: String, userInfo: Pure1v1UserInfo) {
+    public static func showScene(viewController: UIViewController,
+                                 appId: String,
+                                 appCertificate: String,
+                                 userInfo: Pure1v1UserInfo) {
         let vc = Pure1v1UserListViewController()
         vc.userInfo = userInfo
+        vc.appId = appId
+        vc.appCertificate = appCertificate
         vc.hidesBottomBarWhenPushed = true
         viewController.navigationController?.pushViewController(vc, animated: true)
     }
+    
+//    public static func 
 }

@@ -9,7 +9,6 @@ import UIKit
 
 
 class Pure1v1UserNoDataView: UIView {
-    
     private lazy var gradientLayer: CAGradientLayer = {
         let layer = CAGradientLayer()
         layer.colors = [
@@ -44,7 +43,6 @@ class Pure1v1UserNoDataView: UIView {
     }
     
     private func _loadSubView() {
-        
         layer.addSublayer(gradientLayer)
         gradientLayer.frame = bounds
         addSubview(noDataImageView)
