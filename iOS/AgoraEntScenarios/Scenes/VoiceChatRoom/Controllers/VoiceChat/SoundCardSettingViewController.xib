@@ -13,6 +13,7 @@
             <connections>
                 <outlet property="descLabel" destination="Zqw-FZ-ADt" id="OEL-gS-LY5"/>
                 <outlet property="deviceLabel" destination="ASW-Cn-Eyn" id="Xzs-eT-O57"/>
+                <outlet property="dropBtn" destination="VRR-fo-xzF" id="ZBM-it-JOQ"/>
                 <outlet property="gainLabel" destination="CfA-kD-JBM" id="sfb-Bs-vMq"/>
                 <outlet property="iconView" destination="wlI-5c-Z0j" id="6UL-sB-3JN"/>
                 <outlet property="micTypeLabel" destination="Ca8-Tw-FkZ" id="PcO-Pp-pAm"/>
@@ -131,7 +132,7 @@
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="c1G-fM-Mo6">
+                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.33333333333333331" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="c1G-fM-Mo6">
                             <rect key="frame" x="111" y="209.66666666666669" width="204" height="31"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="200" id="L82-eY-V43"/>

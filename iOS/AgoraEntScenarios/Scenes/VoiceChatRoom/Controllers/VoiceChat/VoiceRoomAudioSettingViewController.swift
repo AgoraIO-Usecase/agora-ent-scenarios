@@ -34,7 +34,7 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     private let slIdentifier = "slider"
     private let nIdentifier = "normal"
     private lazy var inEarView = VoiceRealInEarView()
-    private var useSoundCard: Bool = false
+    public var useSoundCard: Bool = false
 //    private var settingName: [String] = ["\(LanguageManager.localValue(key: "blue")) & \(LanguageManager.localValue(key: "red"))", LanguageManager.localValue(key: "Robot Volume"), LanguageManager.localValue(key: "Best Sound"), "AINS", "Spatial Audio"]
 //    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
     
@@ -67,6 +67,7 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     var gainValue: Double = 1.0
     var typeValue: Int = 2
     var effectType: Int = 0
+    public var soundResultBlock: ((Bool, Int, Double, Int) -> Void)?
     private var rtcKit: VoiceRoomRTCManager?
     private lazy var musicListView: VoiceMusicListView = {
         let view = VoiceMusicListView(rtcKit: rtcKit,
@@ -323,37 +324,38 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         }
     }
     
-    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        guard section == 2 else { return nil }
-        let view = UIView()
-        let label = UILabel()
-        label.text = "声网凤鸣AI引擎提供支持"
-        label.textColor = UIColor(hexString: "#6C7192")
-        label.font = .systemFont(ofSize: 12)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(label)
-        label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        
-        let logoImageView = UIImageView(image: UIImage.sceneImage(name: "AI_logo", bundleName: "VoiceChatRoomResource"))
-        logoImageView.contentMode = .scaleAspectFit
-        logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(logoImageView)
-        logoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        logoImageView.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: -10).isActive = true
-        
-        let lineView = UIView()
-        lineView.backgroundColor = UIColor(hexString: "#F6F6F6")
-        lineView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(lineView)
-        lineView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
-        lineView.topAnchor.constraint(equalTo: view.topAnchor, constant: 10).isActive = true
-        lineView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
-        lineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
-        return view
-    }
+//    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+//        guard section == 2 else { return nil }
+//        let view = UIView()
+//        let label = UILabel()
+//        label.text = "声网凤鸣AI引擎提供支持"
+//        label.textColor = UIColor(hexString: "#6C7192")
+//        label.font = .systemFont(ofSize: 12)
+//        label.translatesAutoresizingMaskIntoConstraints = false
+//        view.addSubview(label)
+//        label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+//        label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+//
+//        let logoImageView = UIImageView(image: UIImage.sceneImage(name: "AI_logo", bundleName: "VoiceChatRoomResource"))
+//        logoImageView.contentMode = .scaleAspectFit
+//        logoImageView.translatesAutoresizingMaskIntoConstraints = false
+//        view.addSubview(logoImageView)
+//        logoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+//        logoImageView.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: -10).isActive = true
+//
+//        let lineView = UIView()
+//        lineView.backgroundColor = UIColor(hexString: "#F6F6F6")
+//        lineView.translatesAutoresizingMaskIntoConstraints = false
+//        view.addSubview(lineView)
+//        lineView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
+//        lineView.topAnchor.constraint(equalTo: view.topAnchor, constant: 10).isActive = true
+//        lineView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
+//        lineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
+//        return view
+//    }
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        section == 2 ? 80.0 : 0.1
+       // section == 2 ? 80.0 : 0.1
+        return 0.1
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -552,7 +554,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 self?.setPreset(type)
             }
             DispatchQueue.main.async {[weak self] in
-                self?.presentView.push(with: VC, frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 454), maxHeight: heightType.rawValue)
+                self?.presentView.push(with: VC, frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 454), maxHeight: heightType.rawValue + 54)
             }
             return
         }
@@ -651,6 +653,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         } else {
             self.rtcKit?.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":-1,\"gain\":-1.0,\"gender\":-1,\"effect\":-1}}")
         }
+        sendCallBack()
     }
     
     private func setSoundEffect(_ type: Int) {
@@ -669,14 +672,21 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         default:
             break
         }
+        sendCallBack()
     }
     
     private func setGain(_ gain: Double) {
         self.rtcKit?.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":\(typeValue),\"gain\":\(gain),\"gender\":\(effectType / 2 == 0 ? 0 : 1),\"effect\":\(effectType > 1 ? 1 : 0)}}")
+        sendCallBack()
     }
     
     private func setPreset(_ preset: Int) {
         self.rtcKit?.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":\(preset),\"gain\":\(gainValue),\"gender\":\(effectType / 2 == 0 ? 0 : 1),\"effect\":\(effectType > 1 ? 1 : 0)}}")
+        sendCallBack()
     }
     
+    private func sendCallBack() {
+        guard let resBlock = soundResultBlock else {return}
+        resBlock(useSoundCard, effectType, gainValue, typeValue)
+    }
 }

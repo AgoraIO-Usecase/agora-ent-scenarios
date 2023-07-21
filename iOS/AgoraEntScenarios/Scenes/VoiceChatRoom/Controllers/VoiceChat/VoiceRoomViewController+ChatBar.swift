@@ -19,6 +19,19 @@ extension VoiceRoomViewController {
         audioSetVC.isAudience = !isOwner
         audioSetVC.ains_state = ains_state
         audioSetVC.isTouchAble = roomInfo?.room?.use_robot ?? false
+        
+        audioSetVC.useSoundCard = useSoundCard
+        audioSetVC.effectType = effectType
+        audioSetVC.gainValue = gainValue
+        audioSetVC.typeValue = typeValue
+        
+        audioSetVC.soundResultBlock = {[weak self] (useSoundCard, effectType, gainValue, typeValue) in
+            self?.useSoundCard = useSoundCard
+            self?.effectType = effectType
+            self?.gainValue = gainValue
+            self?.typeValue = typeValue
+        }
+        
         audioSetVC.useRobotBlock = { [weak self] flag in
             if flag == true {
                 self?.roomInfo?.room?.use_robot = true

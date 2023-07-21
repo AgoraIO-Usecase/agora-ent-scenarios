@@ -30,36 +30,66 @@ class SoundCardSettingViewController: UIViewController {
     var typeBlock: ((Int)-> Void)?
     var gainBlock: ((Double)-> Void)?
     
+    @IBOutlet weak var dropBtn: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
         iconView.layer.cornerRadius = 30
         iconView.layer.masksToBounds = true
         
-        let flag = HeadSetUtil.hasSoundCard()
+        let flag = HeadSetUtil.hasHeadset()
         warningView.isHidden = flag
-        HeadSetUtil.addSoundCardObserver {[weak self] flag in
+        HeadSetUtil.addHeadsetObserver {[weak self] flag in
             self?.warningView.isHidden = flag
             guard let soundBlock = self?.soundBlock else {
                 return
             }
             soundBlock(flag)
         }
+        
         volGainSlider.addTarget(self, action: #selector(gain), for: .valueChanged)
         volGainSlider.addTarget(self, action: #selector(gainSend), for: .touchUpInside)
         micTypeSlider.addTarget(self, action: #selector(micTypeChange), for: .valueChanged)
         micTypeSlider.addTarget(self, action: #selector(typeSend), for: .touchUpInside)
         soundSwitch.addTarget(self, action: #selector(change), for: .valueChanged)
-        
+ 
         soundSwitch.isOn = soundOpen
-        volGainSlider.value = Float(0.5 * gainValue)
+        volGainSlider.value = Float(1/3.0 * gainValue)
         gainLabel.text = String(format: "%.1ff",gainValue)
         
         micTypeSlider.value = Float(0.25 * Double(typeValue))
-        typeLabel.text = "\(typeValue)"
+        micTypeLabel.text = "\(typeValue)"
         
-        setEffectDescWith(index: effectType)
+        switch effectType {
+            case 0:
+                iconView.image = UIImage(named: "shuaige")
+                typeLabel.text = "性感欧巴"
+                descLabel.text = "悦耳 | 磁性"
+            case 1:
+                iconView.image = UIImage(named: "meinv")
+                typeLabel.text = "温柔御姐"
+                descLabel.text = "柔美 | 磁性"
+            case 2:
+                iconView.image = UIImage(named: "zhengtai")
+                typeLabel.text = "阳光正太"
+                descLabel.text = "洪亮 | 饱满"
+            case 3:
+                iconView.image = UIImage(named: "girl")
+                typeLabel.text = "甜美嗲气"
+                descLabel.text = "夹子音 | 萝莉"
+            default:
+                break
+        }
+        
+        volGainSlider.isUserInteractionEnabled = soundOpen
+        micTypeSlider.isUserInteractionEnabled = soundOpen
+        dropBtn.isUserInteractionEnabled = soundOpen
     }
-
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+    }
+    
     @IBAction func showDropMenu(_ sender: UIButton) {
         sender.layoutIfNeeded()
         let dropdownFrame = CGRect(x: sender.frame.minX - 30, y: sender.frame.maxY + 10, width: 110, height: 180)
@@ -83,10 +113,13 @@ class SoundCardSettingViewController: UIViewController {
             typeLabel.text = "性感欧巴"
             descLabel.text = "悦耳 | 磁性"
             gainLabel.text = "1.0"
-            volGainSlider.value = 0.5
+            volGainSlider.value = 1/3.0
             micTypeLabel.text = "4"
             micTypeSlider.value = 1
         }
+        volGainSlider.isUserInteractionEnabled = swich.isOn
+        micTypeSlider.isUserInteractionEnabled = swich.isOn
+        dropBtn.isUserInteractionEnabled = swich.isOn
         guard let changeBlock = soundBlock else {return}
         changeBlock(swich.isOn)
     }
@@ -120,18 +153,19 @@ class SoundCardSettingViewController: UIViewController {
     @objc func typeSend() {
         let typeValue = micTypeSlider.value
         let type = calculateType(for: typeValue)
+        micTypeLabel.text = "\(type)"
         print("send type:\(type)")
         guard let typeBlock = typeBlock else {return}
         typeBlock(type)
     }
     
     func calculateLevel(for value: Float) -> Int {
-        let stepSize: Float = 0.05
+        let stepSize: Float = 1/30
 
         if value <= 0 {
             return 0
         } else if value >= 1 {
-            return 20
+            return 30
         } else {
             let level = Int(value / stepSize)
             return level

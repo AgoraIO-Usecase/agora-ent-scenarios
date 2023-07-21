@@ -644,7 +644,7 @@ public let kMPK_RTC_UID: UInt = 1
      */
     @discardableResult
     public func enableinearmonitoring(enable: Bool) -> Int32 {
-        return rtcKit.enable(inEarMonitoring: enable, includeAudioFilters: .builtInAudioFilters)
+        return rtcKit.enable(inEarMonitoring: enable, includeAudioFilters: .builtInAudioFiltersWithNoiseSuppression)
     }
 
     /**

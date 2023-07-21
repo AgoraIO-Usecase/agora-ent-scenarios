@@ -87,6 +87,11 @@ class VoiceRoomViewController: VRBaseViewController {
     }
     var vmType: VMMUSIC_TYPE = .social
     var isHeaderBack = false
+    
+    var gainValue: Double = 1.0
+    var typeValue: Int = 2
+    var effectType: Int = 0
+    var useSoundCard: Bool = false
 
     public var roomInfo: VRRoomInfo? {
         didSet {
