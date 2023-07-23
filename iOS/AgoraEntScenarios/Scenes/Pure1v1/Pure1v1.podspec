@@ -49,4 +49,5 @@ TODO: Add long description of the pod here.
   s.dependency 'YYModel'
   s.dependency 'YYCategories'
   s.dependency 'SDWebImage'
+  s.dependency 'SnapKit'
 end

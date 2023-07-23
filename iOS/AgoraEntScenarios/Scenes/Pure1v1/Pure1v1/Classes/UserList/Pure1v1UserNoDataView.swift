@@ -53,6 +53,6 @@ class Pure1v1UserNoDataView: UIView {
         super.layoutSubviews()
         
         noDataImageView.frame = CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop + 50, width: self.aui_width, height: 500)
-        noDataDialogView.frame = CGRect(x: 0, y: self.aui_height - 328, width: self.aui_width, height: 328)
+        noDataDialogView.frame = bounds
     }
 }
