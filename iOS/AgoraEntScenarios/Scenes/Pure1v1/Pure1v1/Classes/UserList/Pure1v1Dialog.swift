@@ -18,7 +18,7 @@ class Pure1v1Dialog: UIView {
 
         return layer
     }()
-    private lazy var contentView: UIView = {
+    fileprivate lazy var contentView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
         view.layer.cornerRadius = 20
@@ -35,6 +35,10 @@ class Pure1v1Dialog: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func contentSize() ->CGSize {
+        return .zero
+    }
+    
     fileprivate func _loadSubView() {
         backgroundColor = .clear
         addSubview(contentView)
@@ -44,7 +48,8 @@ class Pure1v1Dialog: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        contentView.frame = bounds
+        let contentSize = contentSize()
+        contentView.frame = CGRect(x: 0, y: self.aui_height - contentSize.height, width: contentSize.width, height: contentSize.height)
         gradientLayer.frame = CGRect(x: 0, y: 0, width: contentView.aui_width, height: 58)
         iconView.aui_size = CGSize(width: 106, height: 100)
     }
@@ -69,8 +74,12 @@ class Pure1v1NoDataDialog: Pure1v1Dialog {
     }()
     override func _loadSubView() {
         super._loadSubView()
-        addSubview(titleLabel)
-        addSubview(contentLabel)
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(contentLabel)
+    }
+    
+    override func contentSize() -> CGSize {
+        return CGSize(width: self.width, height: 328)
     }
     
     override func layoutSubviews() {
@@ -92,6 +101,12 @@ private let kDialogTag = 1112234567
 //主叫弹窗
 class Pure1v1CallerDialog: Pure1v1Dialog {
     var cancelClosure: (()->())?
+    var stateTitle: String? {
+        didSet {
+            stateLabel.text = stateTitle
+            layoutIfNeeded()
+        }
+    }
     fileprivate var userInfo: Pure1v1UserInfo? {
         didSet {
             avatarView.sd_setImage(with: URL(string: userInfo?.avatar ?? ""))
@@ -128,17 +143,22 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
     
     override func _loadSubView() {
         super._loadSubView()
+        backgroundColor = UIColor(hexString: "#07070780")
         addSubview(avatarView)
         addSubview(userNameLabel)
         addSubview(stateLabel)
         addSubview(cancelButton)
     }
     
+    override func contentSize() -> CGSize {
+        return CGSize(width: self.aui_width, height: 357)
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         
         avatarView.aui_size = CGSize(width: 72, height: 72)
-        avatarView.centerY = 0
+        avatarView.centerY = contentView.aui_top
         avatarView.centerX = aui_width / 2
         avatarView.layer.cornerRadius = avatarView.aui_width / 2
         avatarView.layer.borderWidth = 5
@@ -160,7 +180,7 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
     static func show(user: Pure1v1UserInfo) -> Pure1v1CallerDialog? {
         Pure1v1CallerDialog.hidden()
         guard let window = getWindow() else {return nil}
-        let dialog = Pure1v1CallerDialog(frame: CGRect(x: 0, y: window.aui_height - 357, width: window.aui_width, height: 357))
+        let dialog = Pure1v1CallerDialog(frame: window.bounds)
         dialog.userInfo = user
         dialog.tag = kDialogTag
         window.addSubview(dialog)
@@ -181,6 +201,12 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
 class Pure1v1CalleeDialog: Pure1v1Dialog {
     var rejectClosure: (()->())?
     var acceptClosure: (()->())?
+    var stateTitle: String? {
+        didSet {
+            stateLabel.text = stateTitle
+            layoutIfNeeded()
+        }
+    }
     fileprivate var userInfo: Pure1v1UserInfo? {
         didSet {
             avatarView.sd_setImage(with: URL(string: userInfo?.avatar ?? ""))
@@ -224,11 +250,16 @@ class Pure1v1CalleeDialog: Pure1v1Dialog {
     
     override func _loadSubView() {
         super._loadSubView()
-        addSubview(avatarView)
-        addSubview(userNameLabel)
-        addSubview(stateLabel)
-        addSubview(rejectButton)
-        addSubview(acceptButton)
+        backgroundColor = UIColor(hexString: "#07070780")
+        contentView.addSubview(avatarView)
+        contentView.addSubview(userNameLabel)
+        contentView.addSubview(stateLabel)
+        contentView.addSubview(rejectButton)
+        contentView.addSubview(acceptButton)
+    }
+    
+    override func contentSize() -> CGSize {
+        return CGSize(width: aui_width, height: 403)
     }
     
     override func layoutSubviews() {
@@ -262,7 +293,7 @@ class Pure1v1CalleeDialog: Pure1v1Dialog {
     static func show(user: Pure1v1UserInfo) -> Pure1v1CalleeDialog? {
         Pure1v1CalleeDialog.hidden()
         guard let window = getWindow() else {return nil}
-        let dialog = Pure1v1CalleeDialog(frame: CGRect(x: 0, y: window.aui_height - 403, width: window.aui_width, height: 403))
+        let dialog = Pure1v1CalleeDialog(frame: window.bounds)
         dialog.userInfo = user
         dialog.tag = kDialogTag
         window.addSubview(dialog)

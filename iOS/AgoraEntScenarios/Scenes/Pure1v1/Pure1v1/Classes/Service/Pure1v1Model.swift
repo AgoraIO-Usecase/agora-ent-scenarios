@@ -14,4 +14,8 @@ public class Pure1v1UserInfo: NSObject {
     public var avatar: String = ""
     
     var objectId: String = ""
+    
+    func getRoomId() ->String {
+        return "\(userId)"
+    }
 }
