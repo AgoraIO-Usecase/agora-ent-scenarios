@@ -9,5 +9,5 @@ Pod::Spec.new do |spec|
    spec.author        = { "Agora Lab" => "developer@agora.io" } 
    spec.platform      = :ios,9.0 
    spec.source        = { :git => "" } 
-   spec.vendored_frameworks = "*.framework"
+   spec.vendored_frameworks = "*.xcframework"
 end 
