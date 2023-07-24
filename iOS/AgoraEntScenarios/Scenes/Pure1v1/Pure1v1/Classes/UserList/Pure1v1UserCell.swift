@@ -12,8 +12,7 @@ class Pure1v1UserCell: UICollectionViewCell {
     var callClosure: ((Pure1v1UserInfo?)->())?
     var userInfo: Pure1v1UserInfo? {
         didSet {
-            let uid = UInt(userInfo?.userId ?? "") ?? 0
-            bgImageView.image = UIImage.sceneImage(name: "user_bg\(uid % 3 + 1)")
+            bgImageView.image = userInfo?.bgImage()
             contentImageView.image = bgImageView.image
             nameLabel.text = userInfo?.userName
             avatarView.sd_setImage(with: URL(string: userInfo?.avatar ?? ""))
