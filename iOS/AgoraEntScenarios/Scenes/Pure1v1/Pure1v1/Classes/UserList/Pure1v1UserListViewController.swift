@@ -36,7 +36,7 @@ class Pure1v1UserListViewController: UIViewController {
         return listView
     }()
     
-    private var callDialog: Pure1v1Dialog?
+    private weak var callDialog: Pure1v1Dialog?
     
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -114,13 +114,23 @@ class Pure1v1NoDataDialog: Pure1v1Dialog {
 private let kDialogTag = 1112234567
 
 //主叫弹窗
-class Pure1v1CallerDialog: Pure1v1Dialog {
+class Pure1v1CallerDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
     var cancelClosure: (()->())?
-    var stateTitle: String? {
+    var stateTitle: String? = "call_state_waitting".pure1v1Localization() {
         didSet {
-            stateLabel.text = stateTitle
+            setNeedsLayout()
         }
     }
+    var renderStateTitle: String? {
+        set {
+            stateLabel.text = newValue
+            stateLabel.sizeToFit()
+        }
+        get {
+            return stateLabel.text
+        }
+    }
+    private var loadingBinder: Pure1v1TextLoadingBinder?
     fileprivate var userInfo: Pure1v1UserInfo? {
         didSet {
             avatarView.sd_setImage(with: URL(string: userInfo?.avatar ?? ""))
@@ -136,7 +146,7 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
     }()
     private lazy var bgMaskView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(hexString: "#07070780")
+        view.backgroundColor = UIColor(hexString: "#070707")?.withAlphaComponent(0.2)
         return view
     }()
     
@@ -156,9 +166,7 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
     private lazy var stateLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
-        label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 14)
-        label.text = "call_state_waitting".pure1v1Localization()
         return label
     }()
     
@@ -177,6 +185,8 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
         dialogView.addSubview(userNameLabel)
         dialogView.addSubview(stateLabel)
         dialogView.addSubview(cancelButton)
+        
+        loadingBinder = Pure1v1TextLoadingBinder(delegate: self)
     }
     
     override func contentSize() -> CGSize {
@@ -196,11 +206,10 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
         avatarView.layer.borderColor = UIColor.white.cgColor
         
         userNameLabel.sizeToFit()
-        stateLabel.aui_size = CGSize(width: aui_width, height: 18)
-        print("stateLabel.sizeToFit: \(stateLabel.text) \(stateLabel.aui_width)")
+        stateLabel.sizeToFit()
         userNameLabel.centerX = avatarView.centerX
         userNameLabel.aui_top = avatarView.aui_bottom + 18
-        stateLabel.aui_left = 0
+        stateLabel.aui_centerX = aui_width / 2
         stateLabel.aui_top = userNameLabel.aui_bottom + 18
         
         cancelButton.aui_size = CGSize(width: 70, height: 70)
@@ -249,23 +258,43 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
 }
 
 //被叫弹窗
-class Pure1v1CalleeDialog: Pure1v1Dialog {
+class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
     var rejectClosure: (()->())?
     var acceptClosure: (()->())?
-    var stateTitle: String? {
+    var stateTitle: String? = "call_state_waitting".pure1v1Localization() {
         didSet {
-            stateLabel.text = stateTitle
+            setNeedsLayout()
         }
     }
+    var renderStateTitle: String? {
+        set {
+            stateLabel.text = newValue
+            stateLabel.sizeToFit()
+        }
+        get {
+            return stateLabel.text
+        }
+    }
+    private var loadingBinder: Pure1v1TextLoadingBinder?
     fileprivate var userInfo: Pure1v1UserInfo? {
         didSet {
             avatarView.sd_setImage(with: URL(string: userInfo?.avatar ?? ""))
             userNameLabel.text = userInfo?.userName ?? ""
         }
     }
-    private lazy var avatarView: UIImageView = {
-        let view = UIImageView()
+    private lazy var avatarBgView: UIView = {
+        let view = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 88, height: 88)))
         view.clipsToBounds = true
+        view.layer.cornerRadius = view.aui_width / 2
+        view.backgroundColor = UIColor(hexString: "#3252F5")!.withAlphaComponent(0.4)
+        return view
+    }()
+    private lazy var avatarView: UIImageView = {
+        let view = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 75, height: 75)))
+        view.clipsToBounds = true
+        view.layer.cornerRadius = view.aui_width / 2
+        view.layer.borderColor = UIColor.white.cgColor
+        view.layer.borderWidth = 2
         return view
     }()
     
@@ -279,9 +308,7 @@ class Pure1v1CalleeDialog: Pure1v1Dialog {
     private lazy var stateLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
-        label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 14)
-        label.text = "call_state_waitting".pure1v1Localization()
         return label
     }()
     
@@ -301,12 +328,15 @@ class Pure1v1CalleeDialog: Pure1v1Dialog {
     
     override func _loadSubView() {
         super._loadSubView()
-        backgroundColor = UIColor(hexString: "#07070780")
+        backgroundColor = UIColor(hexString: "#070707")?.withAlphaComponent(0.2)
+        contentView.addSubview(avatarBgView)
         contentView.addSubview(avatarView)
         contentView.addSubview(userNameLabel)
         contentView.addSubview(stateLabel)
         contentView.addSubview(rejectButton)
         contentView.addSubview(acceptButton)
+        
+        loadingBinder = Pure1v1TextLoadingBinder(delegate: self)
     }
     
     override func contentSize() -> CGSize {
@@ -316,20 +346,16 @@ class Pure1v1CalleeDialog: Pure1v1Dialog {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        avatarView.aui_size = CGSize(width: 88, height: 88)
-        avatarView.aui_top = 34
-        avatarView.centerX = aui_width / 2
-        avatarView.layer.cornerRadius = avatarView.aui_width / 2
-        avatarView.layer.borderWidth = 6
-        avatarView.layer.borderColor = UIColor(hexString: "#3252F5")!.withAlphaComponent(0.4).cgColor
+        avatarBgView.aui_top = 34
+        avatarBgView.centerX = aui_width / 2
+        avatarView.aui_center = avatarBgView.aui_center
         
         userNameLabel.sizeToFit()
-        stateLabel.aui_size = CGSize(width: aui_width, height: 18)
-        userNameLabel.centerX = avatarView.centerX
-        stateLabel.centerX = avatarView.centerX
-        userNameLabel.aui_top = avatarView.aui_bottom + 27
-        stateLabel.aui_left = 0
+        stateLabel.sizeToFit()
+        userNameLabel.centerX = avatarBgView.centerX
+        userNameLabel.aui_top = avatarBgView.aui_bottom + 27
         stateLabel.aui_top = userNameLabel.aui_bottom + 18
+        stateLabel.aui_centerX = aui_width / 2
         
         let padding = (aui_width - 140 ) / 3
         rejectButton.aui_size = CGSize(width: 70, height: 70)
@@ -339,6 +365,8 @@ class Pure1v1CalleeDialog: Pure1v1Dialog {
         acceptButton.aui_size = rejectButton.aui_size
         acceptButton.aui_left = rejectButton.aui_right + padding
         acceptButton.aui_top = rejectButton.aui_top
+        
+        
     }
     
     override func showAnimation() {
@@ -355,6 +383,39 @@ class Pure1v1CalleeDialog: Pure1v1Dialog {
             self.dialogView.aui_top = self.aui_height
         } completion: { success in
             self.removeFromSuperview()
+        }
+    }
+    
+    //头像呼吸动画
+    private func _startAnimation() {
+        _removeAnimation()
+        
+        let keyAnim1 = CAKeyframeAnimation(keyPath: "transform.scale")
+        keyAnim1.duration = 1
+        keyAnim1.values = [1, 1.1, 1]
+        keyAnim1.beginTime = CACurrentMediaTime()
+        keyAnim1.repeatCount = Float.infinity
+        
+        let keyAnim2 = CAKeyframeAnimation(keyPath: "opacity")
+        keyAnim2.duration = 1
+        keyAnim2.values = [0, 1, 0]
+        keyAnim2.beginTime = CACurrentMediaTime()
+        keyAnim2.repeatCount = Float.infinity
+        
+        avatarView.layer.add(keyAnim1, forKey: "callee_animation_scale")
+        avatarBgView.layer.add(keyAnim2, forKey: "callee_animation_alpha")
+    }
+    
+    private func _removeAnimation() {
+        avatarView.layer.removeAllAnimations()
+        avatarBgView.layer.removeAllAnimations()
+    }
+    
+    override func willMove(toSuperview newSuperview: UIView?) {
+        if newSuperview == nil {
+            _removeAnimation()
+        } else {
+            _startAnimation()
         }
     }
     
@@ -378,6 +439,7 @@ class Pure1v1CalleeDialog: Pure1v1Dialog {
     }
     
     @objc private func _acceptAction() {
+        acceptButton.isEnabled = false
         acceptClosure?()
     }
 }
