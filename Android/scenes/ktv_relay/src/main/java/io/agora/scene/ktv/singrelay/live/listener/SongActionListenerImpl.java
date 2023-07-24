@@ -36,67 +36,6 @@ public class SongActionListenerImpl implements OnSongActionListener {
     }
 
     @Override
-    public void onChooseSongRefreshing(@NonNull SongDialog dialog, int index) {
-        // 点歌-列表刷新
-        mCurrPage = 1;
-        int songType = getSongType(index);
-        Log.e("liu0228", "index = " + index + "    songType = " + songType);
-        LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.getSongList(songType, mCurrPage), list -> {
-            if (dialog.isVisible()) {
-                dialog.setChooseRefreshingResult(transSongModel(list), index);
-            }
-        });
-    }
-
-    @Override
-    public void onChooseSongLoadMore(@NonNull SongDialog dialog, int index) {
-        // 点歌-列表加载更多
-        mCurrPage++;
-        LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.getSongList(getSongType(index), mCurrPage), list -> {
-            if (dialog.isVisible()) {
-                dialog.setChooseLoadMoreResult(transSongModel(list), list.size() > 0, index);
-            }
-        });
-    }
-
-    @Override
-    public void onChooseSongSearching(@NonNull SongDialog dialog, String condition) {
-        // 点歌-搜索
-        LiveDataUtils.observerThenRemove(mLifecycleOwner,
-                mViewModel.searchSong(condition),
-                list -> {
-                    if (dialog.isVisible()) {
-                        dialog.setChooseSearchResult(transSongModel(list));
-                    }
-                });
-    }
-
-    @Override
-    public void onChooseSongChosen(@NonNull SongDialog dialog, @NonNull SongItem songItem) {
-        // 点歌
-        RoomSelSongModel songModel = songItem.getTag(RoomSelSongModel.class);
-        LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.chooseSong(songModel), success -> {
-            if (success && dialog.isVisible()) {
-                dialog.setChooseSongItemStatus(songItem, true);
-            }
-        });
-    }
-
-    @Override
-    public void onChosenSongDeleteClicked(@NonNull SongDialog dialog, @NonNull SongItem song) {
-        // 删歌
-        RoomSelSongModel songModel = song.getTag(RoomSelSongModel.class);
-        mViewModel.deleteSong(songModel);
-    }
-
-    @Override
-    public void onChosenSongTopClicked(@NonNull SongDialog dialog, @NonNull SongItem song) {
-        // 置顶
-        RoomSelSongModel songModel = song.getTag(RoomSelSongModel.class);
-        mViewModel.topUpSong(songModel);
-    }
-
-    @Override
     public void onStartSingRelayGame(@NonNull SongDialog dialog) {
         mViewModel.startSingRelayGame();
     }

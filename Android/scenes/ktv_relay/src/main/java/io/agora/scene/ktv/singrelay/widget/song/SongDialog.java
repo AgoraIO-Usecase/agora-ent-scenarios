@@ -56,53 +56,6 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
             }
         });
 
-        songChooseFragment.setListener(new SongChooseFragment.Listener() {
-            @Override
-            public void onSongItemChosen(@NonNull SongItem songItem) {
-                if (UiUtils.isFastClick(500)) {
-                    return;
-                }
-                if (chooseSongListener != null) {
-                    chooseSongListener.onChooseSongChosen(SongDialog.this, songItem);
-                }
-            }
-
-            @Override
-            public void onSongsSearching(String condition) {
-                if (chooseSongListener != null) {
-                    chooseSongListener.onChooseSongSearching(SongDialog.this, condition);
-                }
-            }
-
-            @Override
-            public void onSongsRefreshing(int tagIndex) {
-                if (chooseSongListener != null) {
-                    chooseSongListener.onChooseSongRefreshing(SongDialog.this, tagIndex);
-                }
-            }
-
-            @Override
-            public void onSongsLoadMore(int tagIndex) {
-                if (chooseSongListener != null) {
-                    chooseSongListener.onChooseSongLoadMore(SongDialog.this, tagIndex);
-                }
-            }
-        });
-        songChosenFragment.setListener(new SongChosenFragment.Listener() {
-            @Override
-            public void onSongDeleteClicked(SongItem song) {
-                if (chooseSongListener != null) {
-                    chooseSongListener.onChosenSongDeleteClicked(SongDialog.this, song);
-                }
-            }
-
-            @Override
-            public void onSongTopClicked(SongItem song) {
-                if (chooseSongListener != null) {
-                    chooseSongListener.onChosenSongTopClicked(SongDialog.this, song);
-                }
-            }
-        });
         Fragment[] fragments = new Fragment[]{songChooseFragment, songChosenFragment};
         mBinding.pager.setSaveEnabled(false);
         mBinding.pager.setAdapter(new FragmentStateAdapter(getChildFragmentManager(), getViewLifecycleOwner().getLifecycle()) {
