@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.singrelay.live
+package io.agora.scene.ktv.singrelay.ktvapi
 
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayer

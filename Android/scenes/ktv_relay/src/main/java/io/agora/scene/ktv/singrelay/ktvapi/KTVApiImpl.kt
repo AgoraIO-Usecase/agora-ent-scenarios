@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.singrelay.live
+package io.agora.scene.ktv.singrelay.ktvapi
 
 import android.os.Handler
 import android.os.Looper
@@ -13,7 +13,6 @@ import io.agora.musiccontentcenter.*
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.ktv.singrelay.live.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.concurrent.*
@@ -41,7 +40,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private val TAG: String = "KTV_API_LOG"
 
     // 外部可修改
-    var songMode:KTVSongMode = KTVSongMode.SONG_CODE
+    var songMode: KTVSongMode = KTVSongMode.SONG_CODE
     var useCustomAudioSource:Boolean = false
 
     // 音频最佳实践
@@ -239,7 +238,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         } else if (this.singerRole == KTVSingRole.Audience && newRole == KTVSingRole.LeadSinger) {
             // 2、Audience -》LeadSinger
             becomeSoloSinger()
-            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object : OnJoinChorusStateListener {
+            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object :
+                OnJoinChorusStateListener {
                 override fun onJoinChorusSuccess() {
                     Log.d(TAG, "onJoinChorusSuccess")
                     singerRole = newRole
@@ -263,7 +263,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         } else if (this.singerRole == KTVSingRole.Audience && newRole == KTVSingRole.CoSinger) {
             // 4、Audience -》CoSinger
-            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object : OnJoinChorusStateListener {
+            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object :
+                OnJoinChorusStateListener {
                 override fun onJoinChorusSuccess() {
                     Log.d(TAG, "onJoinChorusSuccess")
                     singerRole = newRole
@@ -289,7 +290,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         } else if (this.singerRole == KTVSingRole.SoloSinger && newRole == KTVSingRole.LeadSinger) {
             // 6、SoloSinger -》LeadSinger
 
-            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object : OnJoinChorusStateListener {
+            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object :
+                OnJoinChorusStateListener {
                 override fun onJoinChorusSuccess() {
                     Log.d(TAG, "onJoinChorusSuccess")
                     singerRole = newRole
@@ -1181,13 +1183,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         if (position_ms in (0..2000)) {
             ToastUtils.showToast("第一段")
-        } else if (position_ms in (47000..48000)) {
+        } else if (position_ms in (32000..33000)) {
             ToastUtils.showToast("第二段")
-        } else if (position_ms in (71000..72000)) {
+        } else if (position_ms in (47000..48000)) {
             ToastUtils.showToast("第三段")
-        } else if (position_ms in (149000..150000)) {
+        } else if (position_ms in (81000..82000)) {
             ToastUtils.showToast("第四段")
-        }  else if (position_ms in (176000..177000)) {
+        }  else if (position_ms in (142000..143000)) {
             ToastUtils.showToast("第五段")
         }
 
