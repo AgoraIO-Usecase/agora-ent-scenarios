@@ -72,6 +72,11 @@ class Pure1v1UserListViewController: UIViewController {
         }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        listView.reloadData()
+    }
+    
     private func _showGuideIfNeed() {
         guard listView.userList.count > 1 else {return}
         if UserDefaults.standard.bool(forKey: kShowGuideAlreadyKey) == true {return}

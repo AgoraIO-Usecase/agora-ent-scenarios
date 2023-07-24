@@ -104,7 +104,6 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
     var stateTitle: String? {
         didSet {
             stateLabel.text = stateTitle
-            layoutIfNeeded()
         }
     }
     fileprivate var userInfo: Pure1v1UserInfo? {
@@ -129,6 +128,7 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
     private lazy var stateLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
+        label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 14)
         label.text = "call_state_waitting".pure1v1Localization()
         return label
@@ -165,11 +165,11 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
         avatarView.layer.borderColor = UIColor.white.cgColor
         
         userNameLabel.sizeToFit()
-        stateLabel.sizeToFit()
+        stateLabel.aui_size = CGSize(width: aui_width, height: 18)
+        print("stateLabel.sizeToFit: \(stateLabel.text) \(stateLabel.aui_width)")
         userNameLabel.centerX = avatarView.centerX
-        stateLabel.centerX = avatarView.centerX
         userNameLabel.aui_top = avatarView.aui_bottom + 18
-        
+        stateLabel.aui_left = 0
         stateLabel.aui_top = userNameLabel.aui_bottom + 18
         
         cancelButton.aui_size = CGSize(width: 70, height: 70)
@@ -204,7 +204,6 @@ class Pure1v1CalleeDialog: Pure1v1Dialog {
     var stateTitle: String? {
         didSet {
             stateLabel.text = stateTitle
-            layoutIfNeeded()
         }
     }
     fileprivate var userInfo: Pure1v1UserInfo? {
@@ -229,6 +228,7 @@ class Pure1v1CalleeDialog: Pure1v1Dialog {
     private lazy var stateLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
+        label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 14)
         label.text = "call_state_waitting".pure1v1Localization()
         return label
@@ -273,11 +273,11 @@ class Pure1v1CalleeDialog: Pure1v1Dialog {
         avatarView.layer.borderColor = UIColor(hexString: "#3252F5")!.withAlphaComponent(0.4).cgColor
         
         userNameLabel.sizeToFit()
-        stateLabel.sizeToFit()
+        stateLabel.aui_size = CGSize(width: aui_width, height: 18)
         userNameLabel.centerX = avatarView.centerX
         stateLabel.centerX = avatarView.centerX
         userNameLabel.aui_top = avatarView.aui_bottom + 27
-        
+        stateLabel.aui_left = 0
         stateLabel.aui_top = userNameLabel.aui_bottom + 18
         
         let padding = (aui_width - 140 ) / 3
