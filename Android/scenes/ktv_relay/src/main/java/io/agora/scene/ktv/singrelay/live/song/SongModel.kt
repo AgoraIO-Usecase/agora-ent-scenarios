@@ -1,6 +1,6 @@
 package io.agora.scene.ktv.singrelay.live.song
 
-object SongModel {
-    val song1 =
-
-}
+//object SongModel {
+//    val song1 =
+//
+//}
