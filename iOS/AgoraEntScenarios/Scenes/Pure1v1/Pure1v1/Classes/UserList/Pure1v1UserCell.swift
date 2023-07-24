@@ -33,6 +33,7 @@ class Pure1v1UserCell: UICollectionViewCell {
     // 背景图
     private lazy var bgImageView: UIImageView = {
         let view = UIImageView()
+        view.contentMode = .scaleAspectFill
         return view
     }()
     private lazy var blurView: UIVisualEffectView = {
@@ -44,6 +45,7 @@ class Pure1v1UserCell: UICollectionViewCell {
     // 内容容器
     private lazy var contentImageView: UIImageView = {
         let view = UIImageView()
+        view.contentMode = .scaleAspectFill
         view.layer.cornerRadius = 20
         view.clipsToBounds = true
         view.isUserInteractionEnabled = true

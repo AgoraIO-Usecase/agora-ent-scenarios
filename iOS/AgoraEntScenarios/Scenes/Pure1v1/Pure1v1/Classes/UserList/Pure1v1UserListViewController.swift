@@ -10,6 +10,7 @@ import YYCategories
 import CallAPI
 import AgoraRtcKit
 
+private let kShowGuideAlreadyKey = "already_show_guide"
 class Pure1v1UserListViewController: UIViewController {
     var appId: String = ""
     var appCertificate: String = ""
@@ -71,6 +72,16 @@ class Pure1v1UserListViewController: UIViewController {
         }
     }
     
+    private func _showGuideIfNeed() {
+        guard listView.userList.count > 1 else {return}
+        if UserDefaults.standard.bool(forKey: kShowGuideAlreadyKey) == true {return}
+        let guideView = Pure1v1GuideView(frame: self.view.bounds)
+        self.view.addSubview(guideView)
+        UserDefaults.standard.set(true, forKey: kShowGuideAlreadyKey)
+    }
+}
+
+extension Pure1v1UserListViewController {
     private func _initCallAPI(tokenConfig: CallTokenConfig) {
         let config = CallConfig()
         config.role = .caller  // Pure 1v1 can only be set as the caller
@@ -126,6 +137,7 @@ extension Pure1v1UserListViewController {
     @objc func _refreshAction() {
         service.getUserList {[weak self] list in
             self?.listView.userList = list.filter({$0.userId != self?.userInfo?.userId})
+            self?._showGuideIfNeed()
         }
     }
 }
