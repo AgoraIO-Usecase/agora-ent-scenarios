@@ -147,6 +147,7 @@ data class ChooseSongInputModel(
     val songNo: String,
     val singer: String,
     val imageUrl: String,
+    val relayList: List<Long>
 )
 
 data class MakeSongTopInputModel(

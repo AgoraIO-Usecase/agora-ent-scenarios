@@ -761,44 +761,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         return ret;
     }
 
-    private boolean showChooseSongDialogTag = false;
-    private void showChooseSongDialog() {
-        if (showChooseSongDialogTag) {
-            return;
-        }
-        showChooseSongDialogTag = true;
-
-        if (mChooseSongDialog == null) {
-            mChooseSongDialog = new SongDialog();
-            mChooseSongDialog.setChosenControllable(roomLivingViewModel.isRoomOwner());
-            showLoadingView();
-            LiveDataUtils.observerThenRemove(this, roomLivingViewModel.getSongTypes(), typeMap -> {
-
-                SongActionListenerImpl chooseSongListener = new SongActionListenerImpl(this, roomLivingViewModel, filterSongTypeMap(typeMap));
-                mChooseSongDialog.setChooseSongTabsTitle(chooseSongListener.getSongTypeTitles(this), chooseSongListener.getSongTypeList(), 0);
-                mChooseSongDialog.setChooseSongListener(chooseSongListener);
-                hideLoadingView();
-
-                if (!mChooseSongDialog.isAdded()) {
-                    roomLivingViewModel.getSongChosenList();
-                    mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
-                }
-
-                getBinding().getRoot().post(() -> showChooseSongDialogTag = false);
-            });
-            return;
-        }
-
-        if (!mChooseSongDialog.isAdded()) {
-            roomLivingViewModel.getSongChosenList();
-            mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
-        }
-
-        getBinding().getRoot().post(() -> {
-            showChooseSongDialogTag = false;
-        });
-    }
-
     private boolean showMoreDialogTag = false;
     private void showMoreDialog(View view) {
         if (showMoreDialogTag) {
