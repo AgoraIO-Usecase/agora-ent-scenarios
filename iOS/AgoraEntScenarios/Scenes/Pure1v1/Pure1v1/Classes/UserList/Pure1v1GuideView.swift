@@ -7,7 +7,6 @@
 
 import Foundation
 
-private let kGuideAnimationKey = "wave_animation"
 class Pure1v1GuideView: UIView {
     private lazy var gradientLayer: CAGradientLayer = {
         let layer = CAGradientLayer()
@@ -46,7 +45,7 @@ class Pure1v1GuideView: UIView {
         let size = CGSize(width: 14, height: 136)
         gradientLayer.cornerRadius = 7
         gradientLayer.frame = CGRect(origin: CGPoint(x: self.aui_width / 2 - size.width, y: (self.aui_height - size.height) / 2), size: size)
-        imageView.aui_top = gradientLayer.frame.origin.y
+        imageView.aui_top = gradientLayer.frame.origin.y + gradientLayer.frame.height
         imageView.aui_right = gradientLayer.frame.origin.x + gradientLayer.frame.size.width
         imageView.aui_size = CGSize(width: 84, height: 55)
     }
@@ -59,12 +58,23 @@ class Pure1v1GuideView: UIView {
     private func _startAnimation() {
         _removeAnimation()
         
-        let anim = CABasicAnimation(keyPath: "position")
-        anim.duration = 0.8
-        anim.repeatCount = Float.infinity
-        anim.fromValue = CGPoint(x: imageView.aui_centerX, y: gradientLayer.frame.origin.y)
-        anim.toValue = CGPoint(x: imageView.aui_centerX, y: gradientLayer.frame.origin.y + gradientLayer.frame.height)
-        imageView.layer.add(anim, forKey: kGuideAnimationKey)
+        let anim1 = CAKeyframeAnimation(keyPath: "position")
+        anim1.duration = 1.5
+        anim1.repeatCount = Float.infinity
+        anim1.values = [
+            CGPoint(x: imageView.aui_centerX, y: gradientLayer.frame.origin.y + gradientLayer.frame.height),
+            CGPoint(x: imageView.aui_centerX, y: gradientLayer.frame.origin.y + gradientLayer.frame.height / 2),
+            CGPoint(x: imageView.aui_centerX, y: gradientLayer.frame.origin.y),
+            CGPoint(x: imageView.aui_centerX, y: gradientLayer.frame.origin.y + gradientLayer.frame.height)
+        ]
+        
+        let anim2 = CAKeyframeAnimation(keyPath: "opacity")
+        anim2.duration = 1.5
+        anim2.repeatCount = Float.infinity
+        anim2.values = [1, 0.5, 0, 1]
+        
+        imageView.layer.add(anim1, forKey: "wave_image_move")
+        gradientLayer.add(anim2, forKey: "wave_image_alpha")
     }
     
     private func _removeAnimation() {
