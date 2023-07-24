@@ -238,7 +238,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
         case .connected:
 //            AUIToast.show(text: "通话开始\(eventInfo[kDebugInfo] as? String ?? "")", postion: .bottom)
 //            AUIAlertManager.hiddenView()
-            callDialog?.removeFromSuperview()
+            callDialog?.hiddenAnimation()
             guard let uid = connectedUserId, let user = listView.userList.first(where: {$0.userId == "\(uid)"}) else {
                 assert(false, "user not fount")
                 return
@@ -263,13 +263,13 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             }
 //            AUIAlertManager.hiddenView()
             connectedUserId = nil
-            callDialog?.removeFromSuperview()
+            callDialog?.hiddenAnimation()
             break
         case .failed:
 //            AUIToast.show(text: eventReason, postion: .bottom)
 //            AUIAlertManager.hiddenView()
             connectedUserId = nil
-            callDialog?.removeFromSuperview()
+            callDialog?.hiddenAnimation()
             break
         default:
             break

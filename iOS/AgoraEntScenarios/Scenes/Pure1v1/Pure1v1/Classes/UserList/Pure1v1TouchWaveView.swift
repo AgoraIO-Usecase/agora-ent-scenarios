@@ -7,7 +7,6 @@
 
 import Foundation
 
-private let kWaveAnimationKey = "wave_animation"
 class Pure1v1TouchWaveView: UIControl {
     private lazy var bgGradientLayer: CAGradientLayer = {
         let layer = CAGradientLayer()
@@ -61,11 +60,20 @@ class Pure1v1TouchWaveView: UIControl {
     func startAnimation() {
         removeAnimation()
         
-        let keyAnim = CAKeyframeAnimation(keyPath: "transform.scale")
-        keyAnim.duration = 1
-        keyAnim.values = [1, 1.3, 1]
-        keyAnim.repeatCount = Float.infinity
-        bgGradientLayer.add(keyAnim, forKey: kWaveAnimationKey)
+        let keyAnim1 = CAKeyframeAnimation(keyPath: "transform.scale")
+        keyAnim1.duration = 1
+        keyAnim1.values = [1, 1.26, 1]
+        keyAnim1.beginTime = CACurrentMediaTime()
+        keyAnim1.repeatCount = Float.infinity
+        
+        let keyAnim2 = CAKeyframeAnimation(keyPath: "opacity")
+        keyAnim2.duration = 1
+        keyAnim2.values = [0.5, 1, 0.5]
+        keyAnim2.beginTime = CACurrentMediaTime()
+        keyAnim2.repeatCount = Float.infinity
+        
+        bgGradientLayer.add(keyAnim1, forKey: "wave_animation_scale")
+        bgGradientLayer.add(keyAnim2, forKey: "wave_animation_opacity")
     }
     
     func removeAnimation() {

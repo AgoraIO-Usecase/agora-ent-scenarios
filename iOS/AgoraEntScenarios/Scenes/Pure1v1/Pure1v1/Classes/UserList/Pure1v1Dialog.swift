@@ -7,6 +7,7 @@
 
 import UIKit
 
+private let kDialogAnimationDuration = 0.3
 class Pure1v1Dialog: UIView {
     private lazy var iconView = UIImageView(image: UIImage.sceneImage(name: "dialog_icon"))
     private lazy var gradientLayer: CAGradientLayer = {
@@ -17,6 +18,11 @@ class Pure1v1Dialog: UIView {
         ]
 
         return layer
+    }()
+    fileprivate lazy var dialogView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
     }()
     fileprivate lazy var contentView: UIView = {
         let view = UIView()
@@ -41,7 +47,8 @@ class Pure1v1Dialog: UIView {
     
     fileprivate func _loadSubView() {
         backgroundColor = .clear
-        addSubview(contentView)
+        addSubview(dialogView)
+        dialogView.addSubview(contentView)
         contentView.layer.addSublayer(gradientLayer)
         contentView.addSubview(iconView)
     }
@@ -49,9 +56,17 @@ class Pure1v1Dialog: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         let contentSize = contentSize()
-        contentView.frame = CGRect(x: 0, y: self.aui_height - contentSize.height, width: contentSize.width, height: contentSize.height)
+        dialogView.frame = CGRect(x: 0, y: self.aui_height - contentSize.height, width: contentSize.width, height: contentSize.height)
+        contentView.frame = dialogView.bounds
         gradientLayer.frame = CGRect(x: 0, y: 0, width: contentView.aui_width, height: 58)
         iconView.aui_size = CGSize(width: 106, height: 100)
+    }
+    
+    func showAnimation() {
+        
+    }
+    
+    func hiddenAnimation() {
     }
 }
 
@@ -116,8 +131,12 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
     
     private lazy var bgImageView: UIImageView = {
         let view = UIImageView()
-        view.alpha = 0.5
         view.contentMode = .scaleAspectFill
+        return view
+    }()
+    private lazy var bgMaskView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(hexString: "#07070780")
         return view
     }()
     
@@ -152,12 +171,12 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
     
     override func _loadSubView() {
         addSubview(bgImageView)
+        bgImageView.addSubview(bgMaskView)
         super._loadSubView()
-        backgroundColor = UIColor(hexString: "#070707")
-        addSubview(avatarView)
-        addSubview(userNameLabel)
-        addSubview(stateLabel)
-        addSubview(cancelButton)
+        dialogView.addSubview(avatarView)
+        dialogView.addSubview(userNameLabel)
+        dialogView.addSubview(stateLabel)
+        dialogView.addSubview(cancelButton)
     }
     
     override func contentSize() -> CGSize {
@@ -167,6 +186,8 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
     override func layoutSubviews() {
         super.layoutSubviews()
         bgImageView.frame = bounds
+        bgMaskView.frame = bgImageView.bounds
+        
         avatarView.aui_size = CGSize(width: 72, height: 72)
         avatarView.centerY = contentView.aui_top
         avatarView.centerX = aui_width / 2
@@ -187,6 +208,26 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
         cancelButton.aui_top = stateLabel.aui_bottom + 62
     }
     
+    override func showAnimation() {
+        setNeedsLayout()
+        layoutIfNeeded()
+        bgImageView.alpha = 0
+        dialogView.aui_top = self.aui_height
+        UIView.animate(withDuration: kDialogAnimationDuration) {
+            self.bgImageView.alpha = 1
+            self.dialogView.aui_bottom = self.aui_height
+        }
+    }
+    
+    override func hiddenAnimation() {
+        UIView.animate(withDuration: kDialogAnimationDuration) {
+            self.bgImageView.alpha = 0
+            self.dialogView.aui_top = self.aui_height
+        } completion: { success in
+            self.removeFromSuperview()
+        }
+    }
+    
     static func show(user: Pure1v1UserInfo) -> Pure1v1CallerDialog? {
         Pure1v1CallerDialog.hidden()
         guard let window = getWindow() else {return nil}
@@ -194,7 +235,7 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
         dialog.userInfo = user
         dialog.tag = kDialogTag
         window.addSubview(dialog)
-        
+        dialog.showAnimation()
         return dialog
     }
     
@@ -300,6 +341,23 @@ class Pure1v1CalleeDialog: Pure1v1Dialog {
         acceptButton.aui_top = rejectButton.aui_top
     }
     
+    override func showAnimation() {
+        setNeedsLayout()
+        layoutIfNeeded()
+        dialogView.aui_top = self.aui_height
+        UIView.animate(withDuration: kDialogAnimationDuration) {
+            self.dialogView.aui_bottom = self.aui_height
+        }
+    }
+    
+    override func hiddenAnimation() {
+        UIView.animate(withDuration: kDialogAnimationDuration) {
+            self.dialogView.aui_top = self.aui_height
+        } completion: { success in
+            self.removeFromSuperview()
+        }
+    }
+    
     static func show(user: Pure1v1UserInfo) -> Pure1v1CalleeDialog? {
         Pure1v1CalleeDialog.hidden()
         guard let window = getWindow() else {return nil}
@@ -307,7 +365,7 @@ class Pure1v1CalleeDialog: Pure1v1Dialog {
         dialog.userInfo = user
         dialog.tag = kDialogTag
         window.addSubview(dialog)
-        
+        dialog.showAnimation()
         return dialog
     }
     
