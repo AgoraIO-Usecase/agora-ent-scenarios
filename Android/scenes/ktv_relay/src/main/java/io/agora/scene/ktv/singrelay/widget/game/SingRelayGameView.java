@@ -47,13 +47,30 @@ public class SingRelayGameView extends FrameLayout {
 
     private void init(Context context) {
         mBinding = KtvLayoutGameViewBinding.inflate(LayoutInflater.from(context), this, true);
-        //onGameWaitingStatus();
         initListener();
     }
 
     private void initListener() {
         mBinding.ilIDLE.btGameStart.setOnClickListener(View -> mSingRelayGameEventListener.onGameStartBtnClick());
         mBinding.btGameAgain.setOnClickListener(View -> mSingRelayGameEventListener.onGameAgainClick());
+        mBinding.ilIDLE.tvSongTab.setOnClickListener(view -> {
+            mBinding.ilIDLE.tvSongTab.setVisibility(View.GONE);
+            mBinding.ilIDLE.ivGameTips.setVisibility(View.VISIBLE);
+            mBinding.ilIDLE.ivGameTips.bringToFront();
+        });
+        mBinding.ilIDLE.ivGameTips.setOnClickListener(view -> {
+            mBinding.ilIDLE.ivGameTips.setVisibility(View.GONE);
+            mBinding.ilIDLE.tvSongTab.setVisibility(View.VISIBLE);
+        });
+        mBinding.ilActive.tvSongTab.setOnClickListener(view -> {
+            mBinding.ilActive.tvSongTab.setVisibility(View.GONE);
+            mBinding.ilActive.ivGameTips.setVisibility(View.VISIBLE);
+            mBinding.ilActive.ivGameTips.bringToFront();
+        });
+        mBinding.ilActive.ivGameTips.setOnClickListener(view -> {
+            mBinding.ilActive.ivGameTips.setVisibility(View.GONE);
+            mBinding.ilActive.tvSongTab.setVisibility(View.VISIBLE);
+        });
     }
 
     private CountDownTimer mCountDownLatch;
@@ -106,9 +123,10 @@ public class SingRelayGameView extends FrameLayout {
         mBinding.ilRank.setVisibility(GONE);
         if (isRoomOwner) {
             mBinding.btGameAgain.setVisibility(GONE);
-            mBinding.ilIDLE.messageText.setText(R.string.ktv_game_room_owner_idle);
+            mBinding.ilIDLE.messageText.setVisibility(GONE);
             mBinding.ilIDLE.btGameStart.setVisibility(View.VISIBLE);
         } else {
+            mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
             mBinding.ilIDLE.messageText.setText(R.string.ktv_game_room_owner_choosing_song);
             mBinding.ilIDLE.btGameStart.setVisibility(View.GONE);
         }
@@ -119,22 +137,15 @@ public class SingRelayGameView extends FrameLayout {
         KTVLogger.d(TAG, "onGameStartStatus");
         if (mBinding == null) return;
         mBinding.ilIDLE.btGameStart.setVisibility(View.GONE);
+        mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
         mBinding.ilIDLE.messageText.setText(R.string.ktv_game_start);
         startTimer();
     }
 
     // 预播放歌曲
-    private int songNum = 1;
-    private int nowNum = 0;
     public void onBattleGamePrepare(int leftSongNum) {
         KTVLogger.d(TAG, "onBattleGamePrepare");
         if (mBinding == null) return;
-        if (leftSongNum == -1) {
-            nowNum = 1;
-        } else {
-            nowNum = songNum - leftSongNum + 1;
-        }
-        mBinding.ilActive.tvSongTab.setText(nowNum + "/" + songNum);
         mBinding.ilIDLE.messageText.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
     }
@@ -170,12 +181,7 @@ public class SingRelayGameView extends FrameLayout {
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
         mBinding.getRoot().postDelayed(() -> {
-            if (nowNum < songNum) {
-                onNextSong();
-            } else {
-                // 已经是最后一首歌
-                if (mSingRelayGameEventListener != null) mSingRelayGameEventListener.onGameEnd();
-            }
+            if (mSingRelayGameEventListener != null) mSingRelayGameEventListener.onGameEnd();
         }, 5000);
     }
 
@@ -185,26 +191,7 @@ public class SingRelayGameView extends FrameLayout {
         if (mBinding == null) return;
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
-        if (score < 50) {
-            mBinding.ilIDLE.messageText.setText("");
-            mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_defeat_text_background);
-            mBinding.ilIDLE.scoreFailText.setVisibility(View.VISIBLE);
-            mBinding.ilIDLE.scoreFailText.setText("" + score);
-        } else {
-            mBinding.ilIDLE.messageText.setText("");
-            mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_win_text_background);
-            mBinding.ilIDLE.scoreSuccessText.setVisibility(View.VISIBLE);
-            mBinding.ilIDLE.scoreSuccessText.setText("" + score);
-        }
-
-        mBinding.getRoot().postDelayed(() -> {
-            if (nowNum < songNum) {
-                onNextSong();
-            } else {
-                // 已经是最后一首歌
-                if (mSingRelayGameEventListener != null) mSingRelayGameEventListener.onGameEnd();
-            }
-        }, 5000);
+        if (mSingRelayGameEventListener != null) mSingRelayGameEventListener.onGameEnd();
     }
 
     // 下一首
@@ -224,8 +211,6 @@ public class SingRelayGameView extends FrameLayout {
     public void onGameEnd(List<RankItem> list) {
         KTVLogger.d(TAG, "onGameEnd");
         if (mBinding == null) return;
-        nowNum = 0;
-        songNum = 0;
         mBinding.ilIDLE.scoreFailText.setVisibility(View.GONE);
         mBinding.ilIDLE.scoreSuccessText.setVisibility(View.GONE);
         mBinding.ilRank.setVisibility(View.VISIBLE);
