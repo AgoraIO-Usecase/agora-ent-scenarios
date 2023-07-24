@@ -80,6 +80,7 @@ class Pure1v1UserCell: UICollectionViewCell {
     }
     
     private func _loadSubview() {
+        clipsToBounds = true
         contentView.addSubview(bgImageView)
         bgImageView.addSubview(blurView)
         contentView.addSubview(contentImageView)
