@@ -110,8 +110,17 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
         didSet {
             avatarView.sd_setImage(with: URL(string: userInfo?.avatar ?? ""))
             userNameLabel.text = userInfo?.userName ?? ""
+            bgImageView.image = userInfo?.bgImage()
         }
     }
+    
+    private lazy var bgImageView: UIImageView = {
+        let view = UIImageView()
+        view.alpha = 0.5
+        view.contentMode = .scaleAspectFill
+        return view
+    }()
+    
     private lazy var avatarView: UIImageView = {
         let view = UIImageView()
         view.clipsToBounds = true
@@ -142,8 +151,9 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
     }()
     
     override func _loadSubView() {
+        addSubview(bgImageView)
         super._loadSubView()
-        backgroundColor = UIColor(hexString: "#07070780")
+        backgroundColor = UIColor(hexString: "#070707")
         addSubview(avatarView)
         addSubview(userNameLabel)
         addSubview(stateLabel)
@@ -156,7 +166,7 @@ class Pure1v1CallerDialog: Pure1v1Dialog {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
+        bgImageView.frame = bounds
         avatarView.aui_size = CGSize(width: 72, height: 72)
         avatarView.centerY = contentView.aui_top
         avatarView.centerX = aui_width / 2
