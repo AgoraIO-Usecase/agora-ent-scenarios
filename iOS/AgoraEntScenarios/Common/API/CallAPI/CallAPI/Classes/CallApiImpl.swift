@@ -893,7 +893,7 @@ extension CallApiImpl: AgoraRtmClientDelegate {
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, on event: AgoraRtmMessageEvent) {
         let message = event.message
 //        callPrint("on event message: \(message)")
-        guard let data = message.data(using: .utf8),
+        guard let data = message.getData() as? Data,
               let dic = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let messageAction = CallAction(rawValue: dic[kMessageAction] as? UInt ?? 0),
               let msgTs = dic[kMessageTs] as? Int,
