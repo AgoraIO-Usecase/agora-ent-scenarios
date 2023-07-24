@@ -17,6 +17,8 @@ class Pure1v1UserCell: UICollectionViewCell {
             contentImageView.image = bgImageView.image
             nameLabel.text = userInfo?.userName
             avatarView.sd_setImage(with: URL(string: userInfo?.avatar ?? ""))
+
+            callButton.startAnimation()
         }
     }
     

@@ -55,10 +55,12 @@ class Pure1v1TouchWaveView: UIControl {
         layer.addSublayer(bgGradientLayer)
         layer.addSublayer(contentGradientLayer)
         addSubview(contentImageView)
-        _startAnimation()
+        startAnimation()
     }
     
-    private func _startAnimation() {
+    func startAnimation() {
+        removeAnimation()
+        
         let keyAnim = CAKeyframeAnimation(keyPath: "transform.scale")
         keyAnim.duration = 1
         keyAnim.values = [1, 1.3, 1]
@@ -66,15 +68,15 @@ class Pure1v1TouchWaveView: UIControl {
         bgGradientLayer.add(keyAnim, forKey: kWaveAnimationKey)
     }
     
-    private func _removeAnimation() {
+    func removeAnimation() {
         bgGradientLayer.removeAllAnimations()
     }
     
     override func willMove(toSuperview newSuperview: UIView?) {
         if newSuperview == nil {
-            _removeAnimation()
+            removeAnimation()
         } else {
-            _startAnimation()
+            startAnimation()
         }
     }
     

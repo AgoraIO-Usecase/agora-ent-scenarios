@@ -57,6 +57,8 @@ class Pure1v1GuideView: UIView {
     }
     
     private func _startAnimation() {
+        _removeAnimation()
+        
         let anim = CABasicAnimation(keyPath: "position")
         anim.duration = 0.8
         anim.repeatCount = Float.infinity

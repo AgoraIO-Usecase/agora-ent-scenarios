@@ -12,7 +12,7 @@ class Pure1v1UserPagingListView: UIView {
     var userList: [Pure1v1UserInfo] = [] {
         didSet {
             self.isHidden = userList.count == 0 ? true : false
-            collectionView.reloadData()
+            reloadData()
         }
     }
     
@@ -44,6 +44,10 @@ class Pure1v1UserPagingListView: UIView {
     
     private func _loadSubview() {
         addSubview(collectionView)
+    }
+    
+    func reloadData() {
+        collectionView.reloadData()
     }
 }
 
