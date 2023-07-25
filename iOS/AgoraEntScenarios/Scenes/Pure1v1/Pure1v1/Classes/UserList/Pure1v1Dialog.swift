@@ -325,7 +325,9 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
         let button = UIButton(type: .custom)
         button.setImage(UIImage.sceneImage(name: "call_reject"), for: .normal)
         button.setTitle("call_title_reject".pure1v1Localization(), for: .normal)
+        button.setTitleColor(.black, for: .normal)
         button.addTarget(self, action: #selector(_rejectAction), for: .touchUpInside)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         return button
     }()
     
@@ -333,7 +335,9 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
         let button = UIButton(type: .custom)
         button.setImage(UIImage.sceneImage(name: "call_accept"), for: .normal)
         button.setTitle("call_title_accept".pure1v1Localization(), for: .normal)
+        button.setTitleColor(.black, for: .normal)
         button.addTarget(self, action: #selector(_acceptAction), for: .touchUpInside)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         return button
     }()
     
@@ -398,11 +402,13 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
         stateLabel.aui_centerX = aui_width / 2
         
         let padding = (aui_width - 140 ) / 3
-        rejectButton.aui_size = CGSize(width: 70, height: 70)
+        rejectButton.aui_size = CGSize(width: 70, height: 98)
+        rejectButton.adjustVerticallyAlign(spacing: 10)
         rejectButton.aui_left = padding
         rejectButton.aui_top = stateLabel.aui_bottom + 62
         
         acceptButton.aui_size = rejectButton.aui_size
+        acceptButton.adjustVerticallyAlign(spacing: 10)
         acceptButton.aui_left = rejectButton.aui_right + padding
         acceptButton.aui_top = rejectButton.aui_top
     }

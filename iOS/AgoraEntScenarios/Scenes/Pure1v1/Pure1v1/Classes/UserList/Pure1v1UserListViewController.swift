@@ -101,9 +101,7 @@ extension Pure1v1UserListViewController {
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
             guard let self = self else {return}
             // Requires active call to prepareForCall
-            let prepareConfig = PrepareConfig.callerConfig()
-            prepareConfig.autoLoginRTM = true
-            prepareConfig.autoSubscribeRTM = true
+            let prepareConfig = PrepareConfig.calleeConfig()
             self.callApi.prepareForCall(prepareConfig: prepareConfig) { err in
             }
         }
