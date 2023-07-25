@@ -45,6 +45,16 @@ class Pure1v1NaviBar: UIView {
         addSubview(refreshButton)
     }
     
+    func startRefreshAnimation() {
+        refreshButton.isEnabled = false
+        refreshButton.layer.startRotationAnimation(from: 0, to: Float.pi * 2, duration: 0.8, loop: true)
+    }
+    
+    func stopRefreshAnimation() {
+        refreshButton.isEnabled = true
+        refreshButton.layer.removeAllAnimations()
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
 //        gradientLayer.frame = bounds
