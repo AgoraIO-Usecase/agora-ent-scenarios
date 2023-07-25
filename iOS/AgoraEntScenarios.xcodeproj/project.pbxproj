@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053998C4290A83E0005143C7 /* HomeMenuCell.swift */; };
 		AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */; };
+		ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */; };
 		BF370B5409C9BBA693EEFB80 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */; };
 		DD0292C1295BF0DC00485225 /* KTVLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD029248295BF0DC00485225 /* KTVLog.swift */; };
 		DD0292C3295BF0DC00485225 /* VLAddRoomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD02924B295BF0DC00485225 /* VLAddRoomModel.m */; };
@@ -110,7 +111,7 @@
 		DD3610A529B70CDC00CE7984 /* ShowCreateLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36102A29B70CDC00CE7984 /* ShowCreateLiveView.swift */; };
 		DD3610A629B70CDC00CE7984 /* ShowBeautyFaceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36102B29B70CDC00CE7984 /* ShowBeautyFaceCell.swift */; };
 		DD3610A729B70CDC00CE7984 /* ShowSelectQualityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36102C29B70CDC00CE7984 /* ShowSelectQualityCell.swift */; };
-		DD3610A829B70CDC00CE7984 /* ShowStatisticsInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36102E29B70CDC00CE7984 /* ShowStatisticsInfo.swift */; };
+		DD3610A829B70CDC00CE7984 /* ShowDataPanelPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36102E29B70CDC00CE7984 /* ShowDataPanelPresenter.swift */; };
 		DD3610A929B70CDC00CE7984 /* ShowRealTimeDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36102F29B70CDC00CE7984 /* ShowRealTimeDataView.swift */; };
 		DD3610AA29B70CDC00CE7984 /* ShowEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36103129B70CDC00CE7984 /* ShowEmptyView.swift */; };
 		DD3610AB29B70CDC00CE7984 /* ShowRoomListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36103229B70CDC00CE7984 /* ShowRoomListView.swift */; };
@@ -612,6 +613,7 @@
 		4A3B186B38A56ACA440591ED /* Pods-AgoraEntScenarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.debug.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.debug.xcconfig"; sourceTree = "<group>"; };
 		563C78B601810D421A3F783A /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
 		AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRobotService.swift; sourceTree = "<group>"; };
+		ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNetStateSelectViewController.swift; sourceTree = "<group>"; };
 		DD029248295BF0DC00485225 /* KTVLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLog.swift; sourceTree = "<group>"; };
 		DD02924B295BF0DC00485225 /* VLAddRoomModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAddRoomModel.m; sourceTree = "<group>"; };
 		DD02924F295BF0DC00485225 /* VLSongItmModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSongItmModel.m; sourceTree = "<group>"; };
@@ -759,7 +761,7 @@
 		DD36102A29B70CDC00CE7984 /* ShowCreateLiveView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowCreateLiveView.swift; sourceTree = "<group>"; };
 		DD36102B29B70CDC00CE7984 /* ShowBeautyFaceCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceCell.swift; sourceTree = "<group>"; };
 		DD36102C29B70CDC00CE7984 /* ShowSelectQualityCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSelectQualityCell.swift; sourceTree = "<group>"; };
-		DD36102E29B70CDC00CE7984 /* ShowStatisticsInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowStatisticsInfo.swift; sourceTree = "<group>"; };
+		DD36102E29B70CDC00CE7984 /* ShowDataPanelPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDataPanelPresenter.swift; sourceTree = "<group>"; };
 		DD36102F29B70CDC00CE7984 /* ShowRealTimeDataView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowRealTimeDataView.swift; sourceTree = "<group>"; };
 		DD36103129B70CDC00CE7984 /* ShowEmptyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowEmptyView.swift; sourceTree = "<group>"; };
 		DD36103229B70CDC00CE7984 /* ShowRoomListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowRoomListView.swift; sourceTree = "<group>"; };
@@ -1810,6 +1812,7 @@
 				DD36101229B70CDC00CE7984 /* ShowPresettingVC.swift */,
 				DD36101329B70CDC00CE7984 /* ShowVideoSettingVC.swift */,
 				DD36101429B70CDC00CE7984 /* ShowCunstomNaviBar.swift */,
+				ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -1891,7 +1894,7 @@
 		DD36102D29B70CDC00CE7984 /* RealTime */ = {
 			isa = PBXGroup;
 			children = (
-				DD36102E29B70CDC00CE7984 /* ShowStatisticsInfo.swift */,
+				DD36102E29B70CDC00CE7984 /* ShowDataPanelPresenter.swift */,
 				DD36102F29B70CDC00CE7984 /* ShowRealTimeDataView.swift */,
 			);
 			path = RealTime;
@@ -3933,7 +3936,7 @@
 				DDA19A0228FFE579009D3E61 /* UIGestureRecognizer+VL.m in Sources */,
 				DD619AE429E3E247008F63E4 /* SASoundEffectsList.swift in Sources */,
 				DD0292DC295BF0DC00485225 /* VLPopScoreView.m in Sources */,
-				DD3610A829B70CDC00CE7984 /* ShowStatisticsInfo.swift in Sources */,
+				DD3610A829B70CDC00CE7984 /* ShowDataPanelPresenter.swift in Sources */,
 				DD619BB829E3E262008F63E4 /* VoiceRoomAudioSettingDetailViewController.swift in Sources */,
 				DD36108D29B70CDC00CE7984 /* ShowSelectQualityVC.swift in Sources */,
 				DD619AD729E3E247008F63E4 /* SAPopView.swift in Sources */,
@@ -4072,6 +4075,7 @@
 				E3735C342A5E4AFF004737EF /* UITextView+Extension.swift in Sources */,
 				DD619AD529E3E247008F63E4 /* SABaseAlienCollectionViewCell.swift in Sources */,
 				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
+				ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */,
 				DD619BF229E3E262008F63E4 /* AgoraChatRoom3DMoveUserView.swift in Sources */,
 				DD619B9229E3E262008F63E4 /* VRVerifyCodeNumberView.swift in Sources */,
 				DD619A8429E3E247008F63E4 /* ActionSheetManager.swift in Sources */,
@@ -4326,7 +4330,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = B8JXV8ZYC7;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -4368,7 +4372,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = B8JXV8ZYC7;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;

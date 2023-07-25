@@ -18,7 +18,7 @@ class ShowRealTimeDataView: UIView {
     }()
     private lazy var rightInfoLabel: AGELabel = {
         let label = AGELabel(colorStyle: .white, fontStyle: .small)
-        label.textAlignment = .right
+        label.textAlignment = .left
         label.numberOfLines = 0
         label.text = nil
         return label
@@ -29,69 +29,19 @@ class ShowRealTimeDataView: UIView {
         return button
     }()
     
-    private var audioOnly: Bool = false
     
-//    var statsInfo: ShowStatisticsInfo? {
-//        didSet{
-//            leftInfoLabel.text = statsInfo?.description(audioOnly: audioOnly).0
-//            rightInfoLabel.text = statsInfo?.description(audioOnly: audioOnly).1
-//        }
-//    }
-    
-    var receiveStatsInfo: ShowStatisticsInfo? {
-        didSet{
-            updateStatistisInfo()
-        }
-    }
-    
-    var sendStatsInfo: ShowStatisticsInfo? {
-        didSet{
-            updateStatistisInfo()
-        }
-    }
-    
-    func cleanRemoteDescription(){
-        let localLeftStr = sendStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
-        let localRightStr = sendStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
-        let remoteLeftStr = receiveStatsInfo?.cleanRemoteDescription().0 ?? ""
-        let remoteRightStr = receiveStatsInfo?.cleanRemoteDescription().1 ?? ""
-        leftInfoLabel.text = [localLeftStr, remoteLeftStr].joined(separator: "\n\n")
-        rightInfoLabel.text = [localRightStr, remoteRightStr].joined(separator: "\n\n")
-    }
-    
-    func cleanLocalDescription(){
-        let localLeftStr = sendStatsInfo?.cleanLocalDescription().0 ?? ""
-        let localRightStr = sendStatsInfo?.cleanLocalDescription().1 ?? ""
-        let remoteLeftStr = receiveStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
-        let remoteRightStr = receiveStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
-        leftInfoLabel.text = [localLeftStr, remoteLeftStr].joined(separator: "\n\n")
-        rightInfoLabel.text = [localRightStr, remoteRightStr].joined(separator: "\n\n")
-    }
-    
-    private func updateStatistisInfo(){
-        let localLeftStr = sendStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
-        let localRightStr = sendStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
-        let remoteLeftStr = receiveStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
-        let remoteRightStr = receiveStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
-        leftInfoLabel.text = [localLeftStr, remoteLeftStr].joined(separator: "\n\n")
-        rightInfoLabel.text = [localRightStr, remoteRightStr].joined(separator: "\n\n")
-    }
-    
-    init(audioOnly: Bool = false, isLocal: Bool) {
+    init(isLocal: Bool) {
         super.init(frame: .zero)
-        self.audioOnly = audioOnly
-//        if isLocal {
-//            statsInfo = ShowStatisticsInfo(type: .local(ShowStatisticsInfo.LocalInfo()))
-//        } else {
-//            statsInfo = ShowStatisticsInfo(type: .remote(ShowStatisticsInfo.RemoteInfo()))
-//        }
-        sendStatsInfo = ShowStatisticsInfo(type: .local(ShowStatisticsInfo.LocalInfo()))
-        receiveStatsInfo = ShowStatisticsInfo(type: .remote(ShowStatisticsInfo.RemoteInfo()))
         setupUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    public func update(left: String, right: String) {
+        leftInfoLabel.text = left
+        rightInfoLabel.text = right
     }
     
     private func setupUI() {
@@ -107,27 +57,24 @@ class ShowRealTimeDataView: UIView {
         addSubview(rightInfoLabel)
         addSubview(closeButton)
         
-        leftInfoLabel.leadingAnchor.constraint(equalTo: leadingAnchor,
-                                               constant: 15).isActive = true
-        leftInfoLabel.topAnchor.constraint(equalTo: topAnchor,
-                                           constant: 20).isActive = true
-        leftInfoLabel.bottomAnchor.constraint(equalTo: bottomAnchor,
-                                              constant: -20).isActive = true
-        
-        rightInfoLabel.trailingAnchor.constraint(equalTo: trailingAnchor,
-                                                 constant: -57).isActive = true
-        rightInfoLabel.topAnchor.constraint(equalTo: leftInfoLabel.topAnchor).isActive = true
-        rightInfoLabel.bottomAnchor.constraint(equalTo: leftInfoLabel.bottomAnchor).isActive = true
-        
-        closeButton.trailingAnchor.constraint(equalTo: trailingAnchor,
-                                              constant: -19).isActive = true
-        closeButton.topAnchor.constraint(equalTo: topAnchor,
-                                         constant: 13).isActive = true
+        leftInfoLabel.snp.makeConstraints { make in
+            make.left.equalTo(15)
+            make.top.equalTo(10)
+            make.bottom.equalTo(-10)
+        }
+        rightInfoLabel.snp.makeConstraints { make in
+            make.left.equalTo(self.snp.centerX)
+            make.top.equalTo(leftInfoLabel)
+            make.bottom.equalTo(leftInfoLabel)
+        }
+        closeButton.snp.makeConstraints { make in
+            make.top.equalTo(12)
+            make.right.equalTo(-15)
+        }
     }
     
     @objc
     private func onTapCloseButton() {
-//        AlertManager.hiddenView()
         removeFromSuperview()
     }
 }

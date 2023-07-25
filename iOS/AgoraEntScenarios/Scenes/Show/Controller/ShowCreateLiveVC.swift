@@ -8,8 +8,6 @@
 import UIKit
 import AgoraRtcKit
 
-private let kBroadcastorHasShowPreset = "kBroadcastorHasShowPreset"
-
 class ShowCreateLiveVC: UIViewController {
 
     private var createView: ShowCreateLiveView!
@@ -31,25 +29,13 @@ class ShowCreateLiveVC: UIViewController {
         showLogger.info("deinit-- ShowCreateLiveVC")
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        showLogger.info("init-- ShowCreateLiveVC")
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
-//        agoraKitManager.defaultSetting()
-        agoraKitManager.startPreview(canvasView: self.localView)
         configNaviBar()
-        if !UserDefaults.standard.bool(forKey: kBroadcastorHasShowPreset) {
-            showPreset()
-            UserDefaults.standard.set(true, forKey: kBroadcastorHasShowPreset)
-        }
+        
+        agoraKitManager.startPreview(canvasView: self.localView)
+        ShowNetStateSelectViewController.showInViewController(self)
     }
     
     func configNaviBar() {
@@ -106,14 +92,23 @@ class ShowCreateLiveVC: UIViewController {
     }
     
     private func showPreset() {
-        let vc = ShowPresettingVC()
-        vc.didSelectedPresetType = {[weak self] type, modeName in
-            self?.agoraKitManager.updatePresetForType(type, mode: .single)
-            let text1 = "show_presetting_update_toast1".show_localized
-            let text2 = "show_presetting_update_toast2".show_localized
-            ToastView.show(text: "\(text1)\"\(modeName)\"\(text2)")
+        if AppContext.shared.isDebugMode {
+            let vc = ShowPresettingVC()
+            vc.didSelectedPresetType = {[weak self] type, modeName in
+                var level = ShowAgoraKitManager.DeviceLevel.medium
+                switch type {
+                case .show_low:     level = .low
+                case .show_medium:  level = .medium
+                case .show_high:    level = .high
+                case .unknown:      level = .medium
+                }
+                ShowAgoraKitManager.shared.deviceLevel = level
+                ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)
+            }
+            present(vc, animated: true)
+        } else {
+            ShowNetStateSelectViewController.showInViewController(self)
         }
-        present(vc, animated: true)
     }
     
     @objc func didClickCancelButton(){
@@ -126,12 +121,6 @@ class ShowCreateLiveVC: UIViewController {
 extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     
     func onClickSettingBtnAction() {
-//        let vc = ShowAdvancedSettingVC()
-//        vc.mode = .signle
-//        vc.isBroadcaster = true
-//        vc.isOutside = true
-//        vc.settingManager = agoraKitManager
-//        self.navigationController?.pushViewController(vc, animated: true)
         if AppContext.shared.isDebugMode {
             let vc = ShowDebugSettingVC()
             vc.isBroadcastor = true
