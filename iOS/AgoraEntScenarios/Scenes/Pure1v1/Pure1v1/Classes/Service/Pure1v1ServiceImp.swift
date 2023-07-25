@@ -123,6 +123,7 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
                     pure1v1Print("createUser success")
                     mainTreadTask {
                         self.sceneRefs[user.getRoomId()] = sceneRef
+                        completion(nil)
                     }
                 } fail: { error in
                     pure1v1Print("createUser fail2: \(error.localizedDescription)")
