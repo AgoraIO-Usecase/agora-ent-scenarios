@@ -84,3 +84,16 @@ class SRMakeSongTopInputModel: NSObject {
     @objc var sort: NSNumber?
     @objc var objectId: String?
 }
+
+class RankModel: NSObject {
+    @objc var userName: String?
+    @objc var poster: String?
+    @objc var songNum: Int = 0
+    @objc var score: Int = 0
+}
+
+class SubRankModel : RankModel {
+    @objc var userId: String?
+    @objc var index: Int = 0
+    @objc var count: Int = 0
+}
