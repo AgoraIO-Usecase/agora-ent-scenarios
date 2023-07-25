@@ -18,9 +18,15 @@ class Pure1v1CallViewController: UIViewController {
                                      time: Int64(Date().timeIntervalSince1970 * 1000))
         }
     }
+    private lazy var moveViewModel: MoveGestureViewModel = MoveGestureViewModel()
     private lazy var roomInfoView: Pure1v1RoomInfoView = Pure1v1RoomInfoView()
     lazy var bigCanvasView: UIView = UIView()
-    lazy var smallCanvasView: UIView = UIView()
+    lazy var smallCanvasView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
+        view.addGestureRecognizer(moveViewModel.gesture)
+        return view
+    }()
     private lazy var hangupButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage.sceneImage(name: "call_reject"), for: .normal)
@@ -38,6 +44,7 @@ class Pure1v1CallViewController: UIViewController {
         view.addSubview(roomInfoView)
         view.addSubview(hangupButton)
         
+        moveViewModel.touchArea = view.bounds
         roomInfoView.frame = CGRect(x: 15, y: UIDevice.current.aui_SafeDistanceTop, width: 202, height: 40)
         bigCanvasView.frame = view.bounds
         smallCanvasView.frame = CGRect(x: view.aui_width - 25 - 109, y: 82 + UIDevice.current.aui_SafeDistanceTop, width: 109, height: 163)
