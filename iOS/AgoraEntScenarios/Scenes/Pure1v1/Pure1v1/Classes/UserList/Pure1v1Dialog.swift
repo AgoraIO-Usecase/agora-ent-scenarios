@@ -324,6 +324,7 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
     private lazy var rejectButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage.sceneImage(name: "call_reject"), for: .normal)
+        button.setTitle("call_title_reject".pure1v1Localization(), for: .normal)
         button.addTarget(self, action: #selector(_rejectAction), for: .touchUpInside)
         return button
     }()
@@ -331,13 +332,36 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
     private lazy var acceptButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage.sceneImage(name: "call_accept"), for: .normal)
+        button.setTitle("call_title_accept".pure1v1Localization(), for: .normal)
         button.addTarget(self, action: #selector(_acceptAction), for: .touchUpInside)
         return button
+    }()
+    
+    private lazy var tipsLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.textColor = .white
+        label.font = UIFont.systemFont(ofSize: 10)
+        label.backgroundColor = .white.withAlphaComponent(0.2)
+        label.clipsToBounds = true
+        
+        let textAttr = NSAttributedString(string: "call_usage_tips".pure1v1Localization())
+        let attach = NSTextAttachment()
+        attach.image = UIImage.sceneImage(name: "icon_notice")
+        let imageSize = CGSize(width: 14, height: 14)
+        attach.bounds = CGRect(origin: CGPoint(x: 0, y: (label.font.capHeight - imageSize.height).rounded() / 2), size: imageSize)
+        let imgAttr = NSAttributedString(attachment: attach)
+        let attr = NSMutableAttributedString()
+        attr.append(imgAttr)
+        attr.append(textAttr)
+        label.attributedText = attr
+        return label
     }()
     
     override func _loadSubView() {
         super._loadSubView()
         backgroundColor = UIColor(hexString: "#070707")?.withAlphaComponent(0.2)
+        addSubview(tipsLabel)
         contentView.addSubview(avatarBg1View)
         avatarBg1View.addSubview(avatarBg2View)
         contentView.addSubview(avatarView)
@@ -356,6 +380,11 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
         
+        tipsLabel.sizeToFit()
+        tipsLabel.aui_size = CGSize(width: tipsLabel.aui_width + 20, height: tipsLabel.aui_height + 20)
+        tipsLabel.layer.cornerRadius = tipsLabel.aui_height / 2
+        tipsLabel.aui_centerX = aui_width / 2
+        tipsLabel.aui_bottom = dialogView.aui_top - 24
         avatarBg1View.aui_top = 34
         avatarBg1View.centerX = aui_width / 2
         avatarBg2View.center = CGPoint(x: avatarBg1View.aui_width / 2, y: avatarBg1View.aui_height / 2)
