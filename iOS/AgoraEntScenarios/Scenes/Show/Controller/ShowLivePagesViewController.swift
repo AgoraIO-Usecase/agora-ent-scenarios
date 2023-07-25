@@ -9,11 +9,8 @@ import Foundation
 import UIKit
 
 class ShowLivePagesViewController: ViewController {
+    
     var roomList: [ShowRoomListModel]?
-    // 观众端预设类型
-    var audiencePresetType: ShowPresetType?
-    var needUpdateAudiencePresetType = false
-//    var selectedResolution = 1
     
     var focusIndex: Int = 0
     
@@ -61,8 +58,6 @@ class ShowLivePagesViewController: ViewController {
         collectionView.isScrollEnabled = roomList?.count ?? 0 > 1 ? true : false
         scroll(to: fakeCellIndex(with: focusIndex))
         preloadEnterRoom()
-        updateAudiencePresetType()
-//        addDebugButton()
     }
     
     private func addDebugButton(){
@@ -105,7 +100,7 @@ class ShowLivePagesViewController: ViewController {
     }
     
     @objc private func didClickDebugSuperButton(){
-        agoraKitManager.setOffSuperResolution()
+        agoraKitManager.setSuperResolutionOn(false)
     }
 }
 
@@ -124,7 +119,6 @@ extension ShowLivePagesViewController {
             let roomId = room.roomId
             if roomId.isEmpty {return}
             let vc = ShowLiveViewController()
-            vc.audiencePresetType = self.audiencePresetType
             vc.room = room
             vc.loadingType = .waiting
             vc.delegate = self
@@ -175,20 +169,6 @@ extension ShowLivePagesViewController {
     private func scroll(to index: Int) {
         collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredVertically, animated: false)
     }
-    
-    // 观众端模式设置
-    private func updateAudiencePresetType() {
-        // 如果是主播 不执行
-        if let room = roomList?[focusIndex], room.ownerId == VLUserCenter.user.id {
-            return
-        }
-        if needUpdateAudiencePresetType == false {
-            return
-        }
-        if let type = audiencePresetType {
-            agoraKitManager.updatePresetForType(type, mode: .single)
-        }
-    }
 }
 
 //MARK: live vc cache
@@ -223,7 +203,6 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
             vc?.view.removeFromSuperview()
         } else {
             vc = ShowLiveViewController()
-            vc?.audiencePresetType = self.audiencePresetType
             vc?.room = room
             vc?.loadingType = .waiting
             vc?.delegate = self

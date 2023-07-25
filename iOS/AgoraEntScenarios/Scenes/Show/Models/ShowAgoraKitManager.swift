@@ -56,8 +56,10 @@ class ShowAgoraKitManager {
     static var isOpenGreen: Bool = false
     static var isBlur: Bool = false
     
-    var srIsOn = false
-    var srType: SRType = .x1_33
+    public let rtcParam = ShowRTCParams()
+    public var deviceLevel: DeviceLevel = .medium
+    public var netCondition: NetCondition = .good
+    public var performanceMode: PerformanceMode = .smooth
     
     let videoEncoderConfig = AgoraVideoEncoderConfiguration()
     
@@ -260,6 +262,26 @@ class ShowAgoraKitManager {
             AppContext.shared.rtcToken = token
             self?.updateChannelEx(channelId: channelId, options: option)
         }
+    }
+    
+    // 耗时计算
+    private var callTimeStampsSaved: Date?
+    func callTimestampStart() {
+        print("callTimeStampsSaved  : start")
+        if callTimeStampsSaved == nil {
+            print("callTimeStampsSaved  : saved")
+            callTimeStampsSaved = Date()
+        }
+    }
+    
+    func callTimestampEnd() -> TimeInterval? {
+        print("callTimeStampsSaved  : end called")
+        guard let saved = callTimeStampsSaved else {
+            return nil
+        }
+        print("callTimeStampsSaved  : end value")
+        callTimeStampsSaved = nil
+        return -saved.timeIntervalSinceNow * 1000
     }
     
     //MARK: public sdk method
@@ -614,7 +636,4 @@ extension ShowAgoraKitManager {
         }
     }
     
-    func setOffSuperResolution() {
-        setSuperResolutionOn(false)
-    }
 }

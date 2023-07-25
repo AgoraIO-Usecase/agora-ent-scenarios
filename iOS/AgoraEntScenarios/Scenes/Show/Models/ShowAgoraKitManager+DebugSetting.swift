@@ -10,14 +10,11 @@ import AgoraRtcKit
 
 enum ShowDebug1TFSettingKey: String {
     
-    case captureFrameRate = "采集帧率"
     case encodeFrameRate = "编码帧率"
     case bitRate = "码率"
     
     var unit: String {
         switch self {
-        case .captureFrameRate:
-            return "fps"
         case .encodeFrameRate:
             return "fps"
         case .bitRate:
@@ -27,15 +24,12 @@ enum ShowDebug1TFSettingKey: String {
 }
 
 enum ShowDebug2TFSettingKey: String {
-    case captureVideoSize = "采集分辨率"
     case encodeVideoSize = "编码分辨率"
     case exposureRange = "曝光区域"
     case colorSpace = "颜色空间"
     
     var separator: String {
         switch self {
-        case .captureVideoSize:
-            return "x"
         case .encodeVideoSize:
             return "x"
         case .exposureRange:
@@ -50,10 +44,6 @@ extension ShowAgoraKitManager {
     
     private var debugDimensionsItems: [CGSize] {
         ShowAgoraVideoDimensions.allCases.map({$0.sizeValue})
-    }
-    
-    private var debugCaptureDimensionsItems: [CGSize] {
-        ShowAgoraCaptureVideoDimensions.allCases.map({$0.sizeValue})
     }
     
     private var debugEncodeItems: [Bool] {
@@ -73,10 +63,6 @@ extension ShowAgoraKitManager {
     }
     
     func debugDefaultBroadcastorSetting() {
-        captureConfig.dimensions = CGSize(width: 720, height: 1280)
-        captureConfig.frameRate = 15
-        updateCameraCaptureConfiguration()
-        
         videoEncoderConfig.dimensions = CGSize(width: 720, height: 1280)
         videoEncoderConfig.frameRate = .fps15
         videoEncoderConfig.bitrate = 1800
@@ -117,8 +103,6 @@ extension ShowAgoraKitManager {
     func debug1TFModelForKey(_ key: ShowDebug1TFSettingKey) -> ShowDebug1TFModel {
         var originalValue = ""
         switch key {
-        case .captureFrameRate:
-            originalValue = "\(captureConfig.frameRate)"
         case .encodeFrameRate:
             originalValue = "\(videoEncoderConfig.frameRate.rawValue)"
         case .bitRate:
@@ -130,9 +114,6 @@ extension ShowAgoraKitManager {
     func debug2TFModelForKey(_ key: ShowDebug2TFSettingKey) -> ShowDebug2TFModel{
         var text1 = "", text2 = ""
         switch key {
-        case .captureVideoSize:
-            text1 = "\(Int(captureConfig.dimensions.width))"
-            text2 = "\(Int(captureConfig.dimensions.height))"
         case .encodeVideoSize:
             text1 = "\(Int(videoEncoderConfig.dimensions.width))"
             text2 = "\(Int(videoEncoderConfig.dimensions.height))"
@@ -158,14 +139,6 @@ extension ShowAgoraKitManager {
         guard let text = model.tfText else { return }
         guard let title = model.title, let key =  ShowDebug1TFSettingKey(rawValue: title) else { return }
         switch key {
-        case .captureFrameRate:
-            guard let value = Int32(text) else {
-                showLogger.info("***Debug*** 采集帧率参数为空 ")
-                return
-            }
-            captureConfig.frameRate = value
-            updateCameraCaptureConfiguration()
-            showLogger.info("***Debug*** setCameraCapturerConfiguration.captureFrameRate = \(captureConfig.frameRate) ")
         case .encodeFrameRate:
             guard let value = Int(text), let fps = AgoraVideoFrameRate(rawValue: value) else {
                 showLogger.info("***Debug*** 编码帧率参数为空 ")
@@ -191,10 +164,6 @@ extension ShowAgoraKitManager {
         guard let value1 = Int(text1), let value2 = Int(text2) else {return}
         guard value1 > 0, value2 > 0 else { return }
         switch key {
-        case .captureVideoSize:
-            captureConfig.dimensions = CGSize(width: value1, height: value2)
-            updateCameraCaptureConfiguration()
-            showLogger.info("***Debug*** setCameraCapturerConfiguration.captureVideoSize = \(captureConfig.dimensions) ")
         case .encodeVideoSize:
             videoEncoderConfig.dimensions = CGSize(width: value1, height: value2)
             engine?.setVideoEncoderConfiguration(videoEncoderConfig)
@@ -245,8 +214,7 @@ extension ShowAgoraKitManager {
         case .debugSR, .debugSrType:
             let srIsOn = ShowDebugSettingKey.debugSR.boolValue
             let index = ShowDebugSettingKey.debugSrType.intValue % debugSrTypeItems.count
-            setSuperResolutionOn(srIsOn, srType: debugSrTypeItems[index])
-            showLogger.info("***Debug*** setSuperResolutionOn  srIsOn = \(srIsOn), srType = \(debugSrTypeItems[index])")
+            setDebugSuperResolutionOn(srIsOn, srType: debugSrTypeItems[index])
         case .debugPVC:
             engine?.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
             showLogger.info("***Debug*** rtc.video.enable_pvc \(isOn)")
@@ -305,7 +273,7 @@ enum ShowDebugSettingKey: String, CaseIterable {
         case .videoDenoiser:
             return "show_advance_setting_videoDenoiser_title".show_localized
         case .PVC:
-            return "show_advance_setting_PVC_title".show_localized
+            return "PVC"
         case .focusFace:
             return "人脸对焦"
         case .encode:
