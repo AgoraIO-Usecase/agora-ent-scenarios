@@ -135,18 +135,17 @@ class RoomListActivity : AppCompatActivity() {
 
     private fun goLiveDetailActivity(list: List<ShowRoomDetailModel>, position: Int, roomInfo: ShowRoomDetailModel) {
         // 进房前设置一些必要的设置
-        if (!SPUtil.getBoolean(Constant.IS_SET_SETTING, false)) {
-            PresetAudienceDialog(this, false).apply {
-                callBack = object : OnPresetAudienceDialogCallBack {
-                    override fun onClickConfirm() {
-                        SPUtil.putBoolean(Constant.IS_SET_SETTING, true)
-                        goLiveDetailActivity(list, position, roomInfo)
-                    }
-                }
-                show()
-            }
-            return
+        VideoSetting.setCurrAudienceEnhanceSwitch(true)
+        VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_AUTO)
+        val deviceScore = RtcEngineInstance.rtcEngine.queryDeviceScore()
+        val deviceLevel = if (deviceScore >= 85) {
+            VideoSetting.DeviceLevel.High
+        } else if (deviceScore >= 60) {
+            VideoSetting.DeviceLevel.Medium
+        } else {
+            VideoSetting.DeviceLevel.Low
         }
+        VideoSetting.updateBroadcastSetting(deviceLevel = deviceLevel, isByAudience = true)
         LiveDetailActivity.launch(
             this,
             ArrayList(list),

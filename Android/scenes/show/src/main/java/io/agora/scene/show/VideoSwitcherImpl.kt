@@ -30,6 +30,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
     private val preLoadRun = Runnable { preloadChannels() }
+    private var quickStartTime = 0L
 
     override fun setPreloadCount(count: Int) {
         preloadCount = count
@@ -181,7 +182,6 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
         connection: RtcConnection,
         container: VideoSwitcher.VideoCanvasContainer
     ) {
-
         remoteVideoCanvasList.firstOrNull {
             it.connection.isSameChannel(connection) && it.uid == container.uid && it.renderMode == container.renderMode && it.lifecycleOwner == container.lifecycleOwner
         }?.let {
@@ -373,6 +373,10 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
         val connectionWrap = connectionsJoined.firstOrNull { it.isSameChannel(connection) } ?: return
         connectionWrap.audioMixingPlayer?.adjustPlayoutVolume(volume)
         connectionWrap.audioMixingPlayer?.adjustPublishSignalVolume(volume)
+    }
+
+    override fun getFirstVideoFrameTime(): Long {
+        return quickStartTime
     }
 
     private fun leaveRtcChannel(connection: RtcConnectionWrap) {
@@ -624,6 +628,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
             ) {
                 val durationFromSubscribe = SystemClock.elapsedRealtime() - subscribeMediaTime
                 val durationFromJoiningRoom = SystemClock.elapsedRealtime() - joinChannelTime
+                quickStartTime = durationFromSubscribe
                 ShowLogger.d(
                     tag,
                     "video cost time : channel=${connection.channelId}, uid=$uid, durationFromJoiningRoom=$durationFromJoiningRoom, durationFromSubscribe=$durationFromSubscribe "

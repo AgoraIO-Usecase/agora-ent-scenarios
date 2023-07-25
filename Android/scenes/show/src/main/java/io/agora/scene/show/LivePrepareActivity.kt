@@ -26,6 +26,7 @@ import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
 import io.agora.scene.show.debugSettings.DebugSettingDialog
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.widget.BeautyDialog
+import io.agora.scene.show.widget.DevicePresetDialog
 import io.agora.scene.show.widget.PictureQualityDialog
 import io.agora.scene.show.widget.PresetDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
@@ -90,7 +91,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         }
         binding.tvSetting.setOnClickListener {
             if (AgoraApplication.the().isDebugModeOpen) {
-                showDebugModeDialog()
+                showDevicePresetDialog()
             } else {
                 showPresetDialog()
             }
@@ -101,7 +102,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             statsEnable = true,
             eventCallback = object : IEventCallback {
                 override fun onBeautyStats(stats: BeautyStats) {
-                    ShowLogger.d("hugo", "BeautyStats stats = $stats")
                 }
             }
         )
@@ -113,6 +113,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         toggleVideoRun = Runnable {
             mBeautyProcessor.reset()
             initRtcEngine()
+            //getDeviceScoreAndUpdateVideoProfile()
             showPresetDialog()
         }
         requestCameraPermission(true)
@@ -133,7 +134,8 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         }
     }
 
-    private fun showPresetDialog() = PresetDialog(this).show()
+    private fun showPresetDialog() = PresetDialog(this, mRtcEngine.queryDeviceScore()).show()
+    private fun showDevicePresetDialog() = DevicePresetDialog(this, mRtcEngine.queryDeviceScore()).show()
     private fun showDebugModeDialog() = DebugSettingDialog(this).show()
 
     override fun onResume() {
@@ -160,6 +162,20 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             )
         )
 //        mRtcEngine.startPreview()
+    }
+
+    private fun getDeviceScoreAndUpdateVideoProfile() {
+        val deviceScore = mRtcEngine.queryDeviceScore()
+        if (deviceScore >= 85) {
+            ToastUtils.showToast("高端机：$deviceScore")
+            VideoSetting.updateBroadcastSetting(VideoSetting.DeviceLevel.High)
+        } else if (deviceScore >= 60) {
+            ToastUtils.showToast("中端机：$deviceScore")
+            VideoSetting.updateBroadcastSetting(VideoSetting.DeviceLevel.Medium)
+        } else {
+            ToastUtils.showToast("低端机：$deviceScore")
+            VideoSetting.updateBroadcastSetting(VideoSetting.DeviceLevel.Low)
+        }
     }
 
     private fun showPictureQualityDialog() {
