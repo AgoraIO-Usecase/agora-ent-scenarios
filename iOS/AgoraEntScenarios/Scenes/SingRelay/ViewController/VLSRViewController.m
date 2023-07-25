@@ -103,6 +103,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) NSInteger retryCount;
 @property (nonatomic, assign) BOOL isJoinChorus;
 @property (nonatomic, assign) NSInteger coSingerDegree;
+@property (nonatomic, strong) VLSRStatusView *statusView;
 @end
 
 @implementation VLSRViewController
@@ -119,7 +120,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [self subscribeServiceEvent];
     
     // setup view
-    [self setBackgroundImage:@"SR_temp_mainbg"];
+    [self setBackgroundImage:@"sr_main_back"];
     
     UIView *bgView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
     bgView.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.6);
@@ -143,6 +144,13 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     CGFloat mvViewTop = topView.bottom;
     self.MVView = [[VLSRMVView alloc]initWithFrame:CGRectMake(15, mvViewTop, SCREEN_WIDTH - 30, musicHeight * 0.5) withDelegate:self];
     [self.view addSubview:self.MVView];
+    [self.MVView setHidden:true];
+    
+    self.statusView = [[VLSRStatusView alloc]initWithFrame:CGRectMake(15, mvViewTop, SCREEN_WIDTH - 30, musicHeight * 0.5)];
+    self.statusView.state = [self isRoomOwner] ? SBGStateOwnerOrderMusic : SBGStateAudienceWating;
+    self.statusView.delegate = self;
+    self.statusView.lrcView.delegate = self;
+    [self.view addSubview:self.statusView];
     
     //房间麦位视图
     VLSRMicSeatList *personView = [[VLSRMicSeatList alloc] initWithFrame:CGRectMake(0, self.MVView.bottom + 20, SCREEN_WIDTH, musicHeight * 0.5) withDelegate:self withRTCkit:self.RTCkit];
