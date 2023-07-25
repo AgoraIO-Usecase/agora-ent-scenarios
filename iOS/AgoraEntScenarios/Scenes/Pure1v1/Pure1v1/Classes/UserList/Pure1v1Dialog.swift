@@ -282,19 +282,28 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
             userNameLabel.text = userInfo?.userName ?? ""
         }
     }
-    private lazy var avatarBgView: UIView = {
-        let view = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 88, height: 88)))
+    private lazy var avatarBg2View: UIView = {
+        let view = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 91, height: 91)))
         view.clipsToBounds = true
         view.layer.cornerRadius = view.aui_width / 2
-        view.backgroundColor = UIColor(hexString: "#3252F5")!.withAlphaComponent(0.4)
+        view.backgroundColor = .white
+        view.layer.borderColor = UIColor(hexString: "#3252F5")!.withAlphaComponent(0.4).cgColor
+        view.layer.borderWidth = 6
+        return view
+    }()
+    private lazy var avatarBg1View: UIView = {
+        let view = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 103, height: 103)))
+        view.clipsToBounds = true
+        view.layer.cornerRadius = view.aui_width / 2
+        view.backgroundColor = .white
+        view.layer.borderColor = UIColor(hexString: "#3252F5")!.withAlphaComponent(0.1).cgColor
+        view.layer.borderWidth = 1
         return view
     }()
     private lazy var avatarView: UIImageView = {
         let view = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 75, height: 75)))
         view.clipsToBounds = true
         view.layer.cornerRadius = view.aui_width / 2
-        view.layer.borderColor = UIColor.white.cgColor
-        view.layer.borderWidth = 2
         return view
     }()
     
@@ -329,7 +338,8 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
     override func _loadSubView() {
         super._loadSubView()
         backgroundColor = UIColor(hexString: "#070707")?.withAlphaComponent(0.2)
-        contentView.addSubview(avatarBgView)
+        contentView.addSubview(avatarBg1View)
+        avatarBg1View.addSubview(avatarBg2View)
         contentView.addSubview(avatarView)
         contentView.addSubview(userNameLabel)
         contentView.addSubview(stateLabel)
@@ -346,14 +356,15 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        avatarBgView.aui_top = 34
-        avatarBgView.centerX = aui_width / 2
-        avatarView.aui_center = avatarBgView.aui_center
+        avatarBg1View.aui_top = 34
+        avatarBg1View.centerX = aui_width / 2
+        avatarBg2View.center = CGPoint(x: avatarBg1View.aui_width / 2, y: avatarBg1View.aui_height / 2)
+        avatarView.aui_center = avatarBg1View.aui_center
         
         userNameLabel.sizeToFit()
         stateLabel.sizeToFit()
-        userNameLabel.centerX = avatarBgView.centerX
-        userNameLabel.aui_top = avatarBgView.aui_bottom + 27
+        userNameLabel.centerX = avatarBg1View.centerX
+        userNameLabel.aui_top = avatarBg1View.aui_bottom + 27
         stateLabel.aui_top = userNameLabel.aui_bottom + 18
         stateLabel.aui_centerX = aui_width / 2
         
@@ -365,8 +376,6 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
         acceptButton.aui_size = rejectButton.aui_size
         acceptButton.aui_left = rejectButton.aui_right + padding
         acceptButton.aui_top = rejectButton.aui_top
-        
-        
     }
     
     override func showAnimation() {
@@ -391,24 +400,24 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
         _removeAnimation()
         
         let keyAnim1 = CAKeyframeAnimation(keyPath: "transform.scale")
-        keyAnim1.duration = 1
+        keyAnim1.duration = 2.5
         keyAnim1.values = [1, 1.1, 1]
         keyAnim1.beginTime = CACurrentMediaTime()
         keyAnim1.repeatCount = Float.infinity
         
         let keyAnim2 = CAKeyframeAnimation(keyPath: "opacity")
-        keyAnim2.duration = 1
+        keyAnim2.duration = 2.5
         keyAnim2.values = [0, 1, 0]
         keyAnim2.beginTime = CACurrentMediaTime()
         keyAnim2.repeatCount = Float.infinity
         
         avatarView.layer.add(keyAnim1, forKey: "callee_animation_scale")
-        avatarBgView.layer.add(keyAnim2, forKey: "callee_animation_alpha")
+        avatarBg1View.layer.add(keyAnim2, forKey: "callee_animation_alpha")
     }
     
     private func _removeAnimation() {
         avatarView.layer.removeAllAnimations()
-        avatarBgView.layer.removeAllAnimations()
+        avatarBg1View.layer.removeAllAnimations()
     }
     
     override func willMove(toSuperview newSuperview: UIView?) {

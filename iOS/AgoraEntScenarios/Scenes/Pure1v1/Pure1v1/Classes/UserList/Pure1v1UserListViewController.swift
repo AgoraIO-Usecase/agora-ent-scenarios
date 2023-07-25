@@ -140,9 +140,12 @@ extension Pure1v1UserListViewController {
     }
     
     @objc func _refreshAction() {
+        naviBar.startRefreshAnimation()
         service.getUserList {[weak self] list in
-            self?.listView.userList = list.filter({$0.userId != self?.userInfo?.userId})
-            self?._showGuideIfNeed()
+            guard let self = self else {return}
+            self.naviBar.stopRefreshAnimation()
+            self.listView.userList = list.filter({$0.userId != self.userInfo?.userId})
+            self._showGuideIfNeed()
         }
     }
 }
