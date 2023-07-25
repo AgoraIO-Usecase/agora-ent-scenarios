@@ -517,6 +517,7 @@ class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcC
     }
 
     private fun onSelectorChanged(itemId: Int, index: Int) {
+        if (index < 0) return
         when (itemId) {
             ITEM_ID_SELECTOR_RESOLUTION -> VideoSetting.updateBroadcastSetting(
                 encoderResolution = VideoSetting.ResolutionList[index],

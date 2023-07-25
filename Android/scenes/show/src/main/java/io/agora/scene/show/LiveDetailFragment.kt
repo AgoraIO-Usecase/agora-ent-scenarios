@@ -554,6 +554,53 @@ class LiveDetailFragment : Fragment() {
         topBinding.tvStatisticDownNet.isVisible = !isAudioOnlyMode
         downLinkBps?.let { topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, (it / 8192).toString()) }
         if (topBinding.tvStatisticDownNet.text.isEmpty()) topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, "--")
+        // 秒开时间
+        topBinding.tvQuickStartTime.isVisible = true
+        if (isRoomOwner) {
+            topBinding.tvQuickStartTime.text = getString(R.string.show_statistic_quick_start_time, "--")
+        } else {
+            topBinding.tvQuickStartTime.text = getString(R.string.show_statistic_quick_start_time, mRtcVideoSwitcher.getFirstVideoFrameTime())
+        }
+        // 机型等级
+        topBinding.tvStatisticDeviceGrade.isVisible = true
+        val score = mRtcEngine.queryDeviceScore()
+        if (score >= 85) {
+            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_high))
+        } else if (score >= 60) {
+            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_medium))
+        } else {
+            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_low))
+        }
+        // 超分开关
+        topBinding.tvStatisticSR.isVisible = true
+        if (isRoomOwner) {
+            topBinding.tvStatisticSR.text = getString(R.string.show_statistic_sr, "--")
+        } else {
+            topBinding.tvStatisticSR.text = getString(R.string.show_statistic_sr, if (VideoSetting.getCurrAudienceEnhanceSwitch()) "开" else "关")
+        }
+        // pvc开关
+        topBinding.tvStatisticPVC.isVisible = true
+        if (isRoomOwner) {
+            topBinding.tvStatisticPVC.text = getString(R.string.show_statistic_pvc, if (VideoSetting.getCurrBroadcastSetting().video.PVC) "开" else "关")
+        } else {
+            topBinding.tvStatisticPVC.text = getString(R.string.show_statistic_pvc, "--")
+        }
+
+        // 小流开关
+        topBinding.tvStatisticLowStream.isVisible = true
+        if (isRoomOwner) {
+            topBinding.tvStatisticLowStream.text = getString(R.string.show_statistic_low_stream, if (VideoSetting.getCurrLowStreamSetting() == null) "关" else "开")
+        } else {
+            topBinding.tvStatisticLowStream.text = getString(R.string.show_statistic_low_stream, "--")
+        }
+
+        // svc开关
+        topBinding.tvStatisticSVC.isVisible = true
+        if (isRoomOwner) {
+            topBinding.tvStatisticSVC.text = getString(R.string.show_statistic_svc, if (VideoSetting.getCurrLowStreamSetting()?.SVC == true) "开" else "关")
+        } else {
+            topBinding.tvStatisticSVC.text = getString(R.string.show_statistic_svc, "--")
+        }
     }
 
     private fun refreshViewDetailLayout(status: Int) {
@@ -672,8 +719,6 @@ class LiveDetailFragment : Fragment() {
 
     private fun showAdvanceSettingDialog() {
         AdvanceSettingDialog(requireContext(), mMainRtcConnection).apply {
-            setItemShowTextOnly(AdvanceSettingDialog.ITEM_ID_SWITCH_QUALITY_ENHANCE, true)
-            setItemShowTextOnly(AdvanceSettingDialog.ITEM_ID_SWITCH_BITRATE_SAVE, true)
             show()
         }
     }
@@ -1272,7 +1317,7 @@ class LiveDetailFragment : Fragment() {
                 }
             },
             onRemoteVideoStats = { stats ->
-                setEnhance(stats)
+                //setEnhance(stats)
                 // 连麦观众
                 val isLinkingAudience = isRoomOwner && isLinking() && stats.uid.toString() == interactionInfo?.userId
                 if (stats.uid == mRoomInfo.ownerId.toInt() || isLinkingAudience) {
@@ -1437,7 +1482,7 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun destroyRtcEngine(): Boolean {
-        return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection,true)
+        return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection,false)
     }
 
     private fun enableLocalAudio(enable: Boolean) {
@@ -1470,11 +1515,11 @@ class LiveDetailFragment : Fragment() {
             "show"
         )
 
-        if (!isRoomOwner) {
-            // 观众加入频道前默认开启硬编码
+        if (!isRoomOwner && mRtcEngine.queryDeviceScore() < 60) {
+            // 低端机观众加入频道前默认开启硬解码
             mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
         } else {
-            // 主播加入频道前默认开启软编码
+            // 主播加入频道前默认开启软解码
             mRtcEngine.setParameters("{\"che.hardware_decoding\": 0}")
         }
 
@@ -1680,7 +1725,7 @@ class LiveDetailFragment : Fragment() {
     private fun updatePKingMode() {
         val eventListener = VideoSwitcher.IChannelEventListener(
             onRemoteVideoStats = { stats ->
-                setEnhance(stats)
+                //setEnhance(stats)
                 activity?.runOnUiThread {
                     refreshStatisticInfo(
                         downBitrate = stats.receivedBitrate,
