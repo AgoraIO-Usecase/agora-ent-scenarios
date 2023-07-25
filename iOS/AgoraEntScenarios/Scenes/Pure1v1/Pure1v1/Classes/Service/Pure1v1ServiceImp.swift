@@ -25,9 +25,7 @@ private func mainTreadTask(_ task: (()->())?){
 }
 
 /// 房间内用户列表
-private let SYNC_SCENE_ROOM_USER_COLLECTION = "userCollection"
 private let kSceneId = "pure1v1_3.0.0"
-private let kDefaultRoomName = "pure1v1"
 class Pure1v1ServiceImp: NSObject {
     private var appId: String = ""
     private var user: Pure1v1UserInfo?
@@ -83,136 +81,69 @@ class Pure1v1ServiceImp: NSObject {
     }
 }
 
-//user
-extension Pure1v1ServiceImp {
-    private func _addUserIfNeed(completion: @escaping ()->()) {
-        _getUserList {[weak self] error, userList in
-            guard let self = self else {return}
-            // current user already add
-            if let user = self.userList.first(where: { $0.userId == self.user?.userId}) {
-                self.user?.objectId = user.objectId
-                completion()
+extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
+    func getUserList(completion: @escaping ([Pure1v1UserInfo]) -> Void) {
+        initScene { [weak self] error in
+            if let error = error {
+                pure1v1Print("getUserList fail1: \(error.localizedDescription)")
+                completion([])
                 return
             }
-            self._addUserInfo {
-            }
-            completion()
-        }
-    }
+            self?.manager.getScenes(success: { results in
+                pure1v1Print("getUserList == \(results.compactMap { $0.toJson() })")
 
-    private func _getUserList(finished: @escaping (Error?, [Pure1v1UserInfo]?) -> Void) {
-        pure1v1Print("imp user get...")
-        let scene = sceneRefs[kSceneId]
-        scene?
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .get(success: { [weak self] list in
-                pure1v1Print("imp user get success, count = \(list.count)...")
-                let users = list.compactMap({ Pure1v1UserInfo.yy_model(withJSON: $0.toJson()!)! })
-                self?.userList = users
-                finished(nil, users)
+                let userList = results.map({ info in
+                    return Pure1v1UserInfo.yy_model(withJSON: info.toJson())!
+                })
+                self?.userList = userList
+                completion(userList)
             }, fail: { error in
-                pure1v1Print("imp user get fail :\(error.message)...")
-                pure1v1Print("error = \(error.description)")
-                finished(error, nil)
+                completion([])
             })
-    }
-
-    private func _addUserInfo(finished: @escaping () -> Void) {
-        pure1v1Print("imp user add ...")
-        guard let params = user?.yy_modelToJSONObject() as? [String: Any] else {
-            finished()
-            return
         }
-
-        let scene = sceneRefs[kSceneId]
-        scene?
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .add(data: params, success: {[weak self] object in
-                pure1v1Print("imp user add success...")
-                self?.user?.objectId = object.getId()
-                finished()
-            }, fail: { error in
-                pure1v1Print("imp user add fail :\(error.message)...")
-                pure1v1Print(error.message)
-                finished()
-            })
     }
     
-    private func _removeUser(completion: @escaping (Error?) -> Void) {
-        guard let objectId = self.user?.objectId else {
-//            agoraAssert("_removeUser objectId = nil")
+    func enterRoom(completion: @escaping (Error?) -> Void) {
+        guard let user = self.user, !userList.contains(where: { $0.getRoomId() == user.getRoomId() }) else {
             completion(nil)
             return
         }
-        pure1v1Print("imp user delete... [\(objectId)]")
-        let scene = sceneRefs[kSceneId]
-        scene?
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .document(id: objectId)
-            .delete(success: {_ in
-                pure1v1Print("imp user delete success...")
-                completion(nil)
-            }, fail: { error in
-                pure1v1Print("imp user delete fail \(error.message)...")
-                completion(NSError(domain: error.message, code: error.code))
-            })
-    }
-}
-
-extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
-    func joinRoom(completion: @escaping (Error?) -> Void) {
-        guard let user = self.user else {
-            completion(nil)
-            return
-        }
-        pure1v1Print("joinRoom start")
-        let params = ["roomId": kDefaultRoomName]
-        let scene = Scene(id: kSceneId, userId: user.userId, isOwner: true, property: params)
+        pure1v1Print("createUser start")
         initScene {[weak self] error in
-            guard let self = self else {return}
             if let error = error {
-                pure1v1Print("joinRoom fail1: \(error.localizedDescription)")
+                pure1v1Print("createUser fail1: \(error.localizedDescription)")
                 completion(error)
                 return
             }
-            self.manager.createScene(scene: scene, success: {[weak self] in
+            let params = user.yy_modelToJSONObject() as? [String: Any]
+            let scene = Scene(id: user.getRoomId(), userId: user.userId, isOwner: true, property: params)
+            self?.manager.createScene(scene: scene, success: {[weak self] in
                 guard let self = self else {return}
-                self.manager.joinScene(sceneId: kSceneId) { sceneRef in
-                    pure1v1Print("joinRoom success")
+                self.manager.joinScene(sceneId: user.getRoomId()) { sceneRef in
+                    pure1v1Print("createUser success")
                     mainTreadTask {
-                        self.sceneRefs[kSceneId] = sceneRef
-                        self._addUserIfNeed {
-                            completion(nil)
-                        }
+                        self.sceneRefs[user.getRoomId()] = sceneRef
                     }
                 } fail: { error in
-                    pure1v1Print("joinRoom fail2: \(error.localizedDescription)")
+                    pure1v1Print("createUser fail2: \(error.localizedDescription)")
                     mainTreadTask {
                         completion(error)
                     }
                 }
             }) { error in
-                pure1v1Print("joinRoom fail3: \(error.localizedDescription)")
+                pure1v1Print("createUser fail3: \(error.localizedDescription)")
                 mainTreadTask {
                     completion(error)
                 }
             }
         }
-        
     }
     
     func leaveRoom(completion: @escaping (Error?) -> Void) {
-        _removeUser { error in
-        }
-        manager.leaveScene(roomId: kDefaultRoomName)
+        manager.leaveScene(roomId: user?.getRoomId() ?? "")
         completion(nil)
     }
     
-    func getUserList(completion: @escaping ([Pure1v1UserInfo]) -> Void) {
-        _getUserList { err, list in
-            completion(list ?? [])
-        }
-    }
     func subscribeNetworkStatusChanged(with changedBlock: @escaping (Pure1v1ServiceNetworkStatus) -> Void) {
         self.networkDidChanged = changedBlock
     }
