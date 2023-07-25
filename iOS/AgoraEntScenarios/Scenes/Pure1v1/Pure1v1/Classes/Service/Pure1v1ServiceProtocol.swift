@@ -17,17 +17,18 @@ import Foundation
 
 protocol Pure1v1ServiceProtocol: NSObjectProtocol {
     
-    /// 加入房间(默认所有人都进入一个房间，不需要房间id)
-    /// - Parameters:
-    ///   - completion: 完成回调
-    func joinRoom(completion: @escaping (Error?) -> Void)
     
-    /// 离开房间
-    /// - Parameter completion: 完成回调
+    /// 把自己加入1v1列表
+    /// - Parameter completion: <#completion description#>
+    func enterRoom(completion: @escaping (Error?) -> Void)
+    
+    
+    /// 把自己移除出1v1列表
+    /// - Parameter completion: <#completion description#>
     func leaveRoom(completion: @escaping (Error?) -> Void)
     
     
-    /// 获取用户列表
+    /// 获取1v1用户列表
     /// - Parameter completion: 完成回调
     func getUserList(completion: @escaping ([Pure1v1UserInfo]) -> Void)
     

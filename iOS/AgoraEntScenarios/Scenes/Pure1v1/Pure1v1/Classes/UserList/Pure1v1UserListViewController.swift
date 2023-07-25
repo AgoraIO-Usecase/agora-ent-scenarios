@@ -47,8 +47,8 @@ class Pure1v1UserListViewController: UIViewController {
         naviBar.backButton.addTarget(self, action: #selector(_backAction), for: .touchUpInside)
         naviBar.refreshButton.addTarget(self, action: #selector(_refreshAction), for: .touchUpInside)
         naviBar.refreshButton.isHidden = true
-        service.joinRoom {[weak self] error in
-            self?.naviBar.refreshButton.isHidden = false
+        naviBar.refreshButton.isHidden = false
+        service.enterRoom {[weak self] err in
             self?._refreshAction()
         }
         
