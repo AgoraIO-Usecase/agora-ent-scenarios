@@ -27,8 +27,13 @@ class ShowRealTimeDataView: UIView {
         return label
     }()
     private lazy var closeButton: UIButton = {
-        let button = UIButton()
-        button.setImage(nil, for: .normal)
+        let button = UIButton(type: .custom)
+        if #available(iOS 13.0, *) {
+            let image = UIImage(systemName: "xmark")?.withTintColor(.white, renderingMode: .alwaysOriginal)
+            button.setImage(image, for: .normal)
+        } else {
+            // Fallback on earlier versions
+        }
         button.addTarget(self, action: #selector(onTapCloseButton), for: .touchUpInside)
         return button
     }()

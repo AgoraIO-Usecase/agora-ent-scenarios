@@ -118,7 +118,7 @@ extension Pure1v1CallViewController: AgoraRtcEngineDelegate {
     }
     private func resetRealTimeIfNeeded() {
 //        if role == .broadcaster && interactionStatus != .pking && interactionStatus != .onSeat {
-            realTimeView.cleanRemoteDescription()
+//            realTimeView.cleanRemoteDescription()
 //        }
 //        if role == .audience && interactionStatus != .pking && interactionStatus != .onSeat {
 //            realTimeView.cleanLocalDescription()
