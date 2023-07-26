@@ -38,6 +38,10 @@ class Pure1v1UserListViewController: UIViewController {
     
     private weak var callDialog: Pure1v1Dialog?
     
+    deinit {
+        pure1v1Print("deinit-- Pure1v1UserListViewController")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
