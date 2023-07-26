@@ -24,7 +24,6 @@ class Pure1v1UserNoDataView: UIView {
     private lazy var noDataImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage.sceneImage(name: "user_empty")
-        imageView.contentMode = .scaleAspectFill
         return imageView
     }()
     
@@ -52,7 +51,12 @@ class Pure1v1UserNoDataView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        noDataImageView.frame = CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop + 50, width: self.aui_width, height: 500)
+        let padding = 0.0
+        let top = UIDevice.current.aui_SafeDistanceTop + 50
+        let width = self.aui_width - padding * 2
+        let imageSize = noDataImageView.image!
+        let height = width * imageSize.size.height / imageSize.size.width
+        noDataImageView.frame = CGRect(x: padding, y: top, width: width, height: height)
         noDataDialogView.frame = bounds
     }
 }
