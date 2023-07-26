@@ -14,3 +14,21 @@
 "call_title_accept"="立即接受";
 "call_title_reject"="拒绝";
 "call_usage_tips"=" 本产品仅用于功能体验，单次直播时长不超过20mins";
+"call_toast_hangup"="对方结束连线";
+"setting_statistic" = "实时数据";
+
+
+"show_statistic_bitrate" = "码率";
+"show_statistic_delay" = "延迟";
+"show_statistic_receive_title" = "接收";
+"show_statistic_send_title" = "发送";
+"show_statistic_receive_resolution" = "接收分辨率";
+"show_statistic_up_net_speech" = "上行网络";
+"show_setting_advance_framerate" = "帧率";
+"show_statistic_receive_fps" = "接收帧率";
+"show_statistic_down_loss_package" = "下行丢包率";
+"show_statistic_up_loss_package" = "上行丢包率";
+"show_statistic_up_bitrate" = "发送码率";
+"show_statistic_encode_resolution" = "编码分辨率";
+"show_statistic_loss_package" = "丢包率";
+"show_statistic_down_net_speech" = "下行网络";

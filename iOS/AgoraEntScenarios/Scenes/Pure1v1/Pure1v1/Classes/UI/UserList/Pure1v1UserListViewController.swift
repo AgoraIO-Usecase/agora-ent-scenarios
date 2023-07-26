@@ -253,6 +253,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 if navigationController?.viewControllers.last == callVC {
                     navigationController?.popViewController(animated: false)
                 }
+                AUIToast.show(text: "call_toast_hangup".pure1v1Localization())
 //            case .localRejected, .remoteRejected:
 //                AUIToast.show(text: "通话被拒绝")
 //            case .callingTimeout:
