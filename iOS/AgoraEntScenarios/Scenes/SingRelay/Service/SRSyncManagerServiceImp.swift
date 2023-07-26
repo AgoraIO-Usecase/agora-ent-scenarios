@@ -15,6 +15,8 @@ private let rSceneId = "scene_sr_3.0.0"
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
 // 选歌
 private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
+//接唱
+private let SYNC_MANAGER_UPDATE_GAME_STATE = "sing_relay_info"
 
 private func agoraAssert(_ message: String) {
     agoraAssert(false, message)
@@ -868,6 +870,115 @@ extension SRSyncManagerServiceImp {
             })
 
         userListCountDidChanged?(UInt(count))
+    }
+}
+
+// MARK: 抢唱的增删改查
+
+extension SRSyncManagerServiceImp {
+    
+    func innerSingRelayInfo(_ completion: @escaping (Error?, SingRelayModel?) -> Void) {
+        guard let channelName = roomNo else {
+            assertionFailure("channelName is nil")
+            completion(nil, nil)
+            return
+        }
+        
+        agoraPrint("Getting sing battle game info...")
+        SyncUtil
+            .scene(id: channelName)?
+            .collection(className: SYNC_MANAGER_UPDATE_GAME_STATE)
+            .get(success: { list in
+                agoraPrint("Got sing battle game info success...")
+                let models = list.compactMap({ SingRelayModel.yy_model(withJSON: $0.toJson()!) })
+                
+                completion(nil, models.first)
+            }, fail: { error in
+                agoraPrint("Got sing battle game info fail...")
+                agoraPrint("error = \(error.description)")
+                completion(error, nil)
+            })
+    }
+    
+    func innerAddSingRelayInfo(_ model: SingRelayModel, completion: @escaping (Error?) -> Void) {
+        guard let channelName = roomNo else {
+            assertionFailure("channelName is nil")
+            return
+        }
+        
+        agoraPrint("Adding sing battle game info...")
+        let params = mapConvert(model: model)
+        SyncUtil
+            .scene(id: channelName)?
+            .collection(className: SYNC_MANAGER_UPDATE_GAME_STATE)
+            .add(data: params, success: { _ in
+                agoraPrint("Add sing battle game info success...")
+                completion(nil)
+            }, fail: { error in
+                agoraPrint("Add sing battle game info fail :\(error.message)...")
+                agoraPrint(error.message)
+                completion(NSError(domain: error.message, code: error.code))
+            })
+    }
+
+    func innerUpdateSingRelayInfo(_ model: SingRelayModel, completion: @escaping (Error?) -> Void) {
+        guard let channelName = roomNo,
+              let objectId = model.objectId else {
+            assertionFailure("channelName or objectId is nil")
+            return
+        }
+
+        agoraPrint("Updating sing battle game info... [\(objectId)]")
+        let params = mapConvert(model: model)
+      print("[AgoraSyncManager] service update2")
+//        let params = mapConvert(model: <#T##NSObject#>)
+//        ]
+        SyncUtil
+            .scene(id: channelName)?
+            .collection(className: SYNC_MANAGER_UPDATE_GAME_STATE)
+            .update(id: objectId,
+                    data: params,
+                    success: {
+                completion(nil)
+                agoraPrint("Update sing battle game info success...\(model.objectId).....\(objectId)")
+            }, fail: { error in
+                completion(NSError(domain: error.message, code: error.code))
+                agoraPrint("Update sing battle game info fail...")
+            })
+    }
+
+    func innerSubscribeSingRelayInfo(completion: @escaping (SRSubscribe, SingRelayModel?, Error?) -> Void) {
+        guard let channelName = roomNo else {
+            assertionFailure("channelName is nil")
+            return
+        }
+        
+        agoraPrint("sbg state subscribe...")
+        SyncUtil.scene(id: channelName)?
+            .subscribe(key: SYNC_MANAGER_UPDATE_GAME_STATE,
+                       onCreated: { object in
+                        guard let jsonStr = object.toJson(),
+                            let model = SingRelayModel.yy_model(withJSON: jsonStr) else {
+                                return
+                        }
+                        agoraPrint("sbg state subscribe oncreated... [\(object.getId())]")
+                completion(.created , model, nil)
+            }, onUpdated: { object in
+                agoraPrint("sbg state subscribe onupdated... [\(object.getId())]")
+                guard let jsonStr = object.toJson(),
+                    let model = SingRelayModel.yy_model(withJSON: jsonStr) else {
+                        return
+                }
+                completion(.updated, model, nil)
+            }, onDeleted: { object in
+                agoraPrint("sbg state subscribe ondeleted... [\(object.getId())]")
+            }, onSubscribed: {
+    //            LogUtils.log(message: "subscribe message", level: .info)
+            }, fail: { error in
+                agoraPrint("imp seat subscribe fail...")
+                ToastView.show(text: error.message)
+                completion(.failed, nil, NSError(domain: error.message, code: error.code))
+            })
     }
 }
 

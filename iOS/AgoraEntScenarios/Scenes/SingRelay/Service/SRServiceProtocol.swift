@@ -19,6 +19,7 @@ import AgoraRtmKit
     case created // 创建
     case deleted // 删除
     case updated // 更新
+    case failed //失败
 }
 
 @objc protocol SRServiceProtocol: NSObjectProtocol {
@@ -156,4 +157,12 @@ import AgoraRtmKit
     
     /// 取消全部订阅
     func unsubscribeAll()
+    
+    func innerSingRelayInfo(_ completion: @escaping (Error?, SingRelayModel?) -> Void)
+    
+    func innerAddSingRelayInfo(_ model: SingRelayModel, completion: @escaping (Error?) -> Void)
+    
+    func innerUpdateSingRelayInfo(_ model: SingRelayModel, completion: @escaping (Error?) -> Void)
+    
+    func innerSubscribeSingRelayInfo(completion: @escaping (SRSubscribe, SingRelayModel?, Error?) -> Void)
 }

@@ -8,8 +8,7 @@
 import UIKit
 
 @objc enum SRClickAction: Int {
-    case chooseSong
-    case randomSelectSong
+    case startGame
     case sbg
     case nextSong
     case effect
@@ -407,7 +406,8 @@ class VLSRStatusView: UIView {
     }
     
     @objc private func startSr() {//开始游戏
-        
+        guard let delegate = delegate else {return}
+        delegate.didSrActionChanged(.startGame)
     }
     
     @objc func setFight(_ isSuccess: Bool, score: Int) {
@@ -463,13 +463,8 @@ class VLSRStatusView: UIView {
     
     @objc private func choose() {//点歌
         guard let delegate = delegate else {return}
-        delegate.didSrActionChanged(.chooseSong)
+        delegate.didSrActionChanged(.startGame)
     }
-    
-//    @objc private func randomChoose() {//随机点歌
-//        guard let delegate = delegate else {return}
-//        delegate.didSbgActionChanged(.randomSelectSong)
-//    }
     
     @objc private func again() {//再来一轮
         guard let delegate = delegate else {return}

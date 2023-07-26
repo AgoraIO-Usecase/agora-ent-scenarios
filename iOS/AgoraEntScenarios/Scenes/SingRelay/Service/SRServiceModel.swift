@@ -77,6 +77,7 @@ class SRChooseSongInputModel: NSObject {
     //@objc var songUrl: String?
     @objc var singer: String?
     @objc var imageUrl: String?
+    @objc var playCounts: [Int] = [Int]()
 }
 
 class SRMakeSongTopInputModel: NSObject {
@@ -96,4 +97,18 @@ class SubRankModel : RankModel {
     @objc var userId: String?
     @objc var index: Int = 0
     @objc var count: Int = 0
+}
+
+@objc enum SingRelayStatus: Int {
+    case idle = 0
+    case waiting = 1 // 等待中
+    case started = 2 // 已开始
+    case ended = 3 // 已结束
+}
+
+@objc class SingRelayModel: NSObject {
+    @objc var status: SingRelayStatus = .idle
+    @objc var objectId: String?
+    @objc var name: String?
+    @objc var rank: [String: Any] = [:]
 }
