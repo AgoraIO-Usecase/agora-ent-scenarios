@@ -7,23 +7,59 @@
 
 import Foundation
 
+enum NaviBarStyle: Int {
+    case dark = 0
+    case light
+    
+    func backImage() -> UIImage? {
+        switch self {
+        case .dark:
+            return UIImage.sceneImage(name: "navi_back")
+        default:
+            return UIImage.sceneImage(name: "navi_white")
+        }
+    }
+    
+    func refreshImage() -> UIImage? {
+        switch self {
+        case .dark:
+            return UIImage.sceneImage(name: "refresh_black")
+        default:
+            return UIImage.sceneImage(name: "refresh_white")
+        }
+    }
+    
+    func titleColor() -> UIColor {
+        switch self {
+        case .dark:
+            return .black
+        default:
+            return .white
+        }
+    }
+}
+
 class Pure1v1NaviBar: UIView {
+    public var style: NaviBarStyle = .dark {
+        didSet {
+            backButton.setImage(style.backImage(), for: .normal)
+            refreshButton.setImage(style.refreshImage(), for: .normal)
+            titleLabel.textColor = style.titleColor()
+        }
+    }
     public lazy var backButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage.sceneImage(name: "navi_back"), for: .normal)
         return button
     }()
     
     public lazy var refreshButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage.sceneImage(name: "refresh_black"), for: .normal)
         return button
     }()
     
     public lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
-        label.textColor = .black
+        label.font = UIFont.boldSystemFont(ofSize: 16)
         label.text = "user_list_title".pure1v1Localization()
         label.textAlignment = .center
         return label
@@ -40,6 +76,7 @@ class Pure1v1NaviBar: UIView {
     
     private func _loadSubview() {
 //        layer.addSublayer(gradientLayer)
+        style = .dark
         addSubview(titleLabel)
         addSubview(backButton)
         addSubview(refreshButton)
