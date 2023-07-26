@@ -11,9 +11,10 @@
 #import "VLSRAudienceIndicator.h"
 #import "VLSRMVIdleView.h"
 #import "VLSROnLineListVC.h"
-
+#import "AgoraEntScenarios-swift.h"
 #import "VLSRSettingView.h"
 //model
+#import "ChooseSongInputModel.h"
 #import "VLSRSongItmModel.h"
 #import "VLSRSelBgModel.h"
 #import "UIViewController+VL.h"
@@ -60,6 +61,8 @@ AgoraRtcEngineDelegate,
 VLSRPopScoreViewDelegate,
 SRLrcControlDelegate,
 SRApiEventHandlerDelegate,
+VLSRStatusViewDelegate,
+VLSRLrcViewDelegate,
 ISRMusicLoadStateListener
 >
 
@@ -104,6 +107,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) BOOL isJoinChorus;
 @property (nonatomic, assign) NSInteger coSingerDegree;
 @property (nonatomic, strong) VLSRStatusView *statusView;
+@property (nonatomic, strong) SingRelayModel *gameModel;
 @end
 
 @implementation VLSRViewController
@@ -222,6 +226,44 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         [weakSelf setRoomUsersCount:count];
     }];
     
+    /**
+     1.任何人进入房间都需要查询抢唱
+     2.如果是房主查询不到状态，房主需要创建抢唱状态
+     */
+    [[AppContext srServiceImp] innerSingRelayInfo:^(NSError * error, SingRelayModel * model) {
+        if(error == nil){
+            if(model.status == SingRelayStatusStarted){
+                if(self.gameModel.status == SingRelayStatusStarted){
+                    return;
+                }
+                NSString *mes = SRLocalizedString(@"当前房间正在游戏中，请退出");
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SRLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
+                    [[VLKTVAlert shared]dismiss];
+                    [weakSelf leaveRoom];
+                }];
+                return;
+            }
+            
+            if(model){
+                weakSelf.gameModel = model;
+            } else {
+                if([weakSelf isRoomOwner]){
+                    SingRelayModel *model = [[SingRelayModel alloc]init];
+                    model.status = SingRelayStatusWaiting;
+                    [[AppContext srServiceImp] innerAddSingRelayInfo:model completion:^(NSError * error) {
+                        if(error) {
+                            SRLogInfo(@"owner add sbg state error");
+                        } else {
+                            weakSelf.gameModel = model;
+                        }
+                    }];
+                }
+            }
+        } else {
+            
+        }
+    }];
+    
     [[AppContext srServiceImp] subscribeSeatListChangedWith:^(SRSubscribe status, VLSRRoomSeatModel* seatModel) {
         [AgoraEntAuthorizedManager checkMediaAuthorizedWithParent:self completion:^(BOOL granted) {
             if (!granted) { return; }
@@ -293,6 +335,9 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             //add new song
             SRLogInfo(@"song did updated: %@ status: %ld", song.name, songInfo.status);
             weakSelf.selSongsArray = [NSMutableArray arrayWithArray:songArray];
+            
+            //solo变leader， 上麦变合唱
+            [self loadAndPlaySong];
         }
     }];
     
@@ -311,6 +356,15 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             [[VLKTVAlert shared]dismiss];
             [weakSelf leaveRoom];
         }];
+    }];
+    
+    [[AppContext srServiceImp] innerSubscribeSingRelayInfoWithCompletion:^(SRSubscribe status, SingRelayModel * model, NSError * error) {
+        if(error == nil){
+            weakSelf.gameModel = model;
+            if(![weakSelf isOnMicSeat]){
+                [weakSelf.requestOnLineView setTipHidden:model.status == SingBattleGameStatusStarted];
+            }
+        }
     }];
 }
 
@@ -365,7 +419,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 //弹出音效
 - (void)popSetSoundEffectView {
-    LSTPopView* popView = 
+    LSTPopView* popView =
     [LSTPopView popSetSoundEffectViewWithParentView:self.view
                                           soundView:self.effectView
                                        withDelegate:self];
@@ -539,6 +593,58 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
     [self.SRApi switchSingerRoleWithNewRole:SRSingRoleAudience
                            onSwitchRoleState:^(SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
+    }];
+}
+
+-(void)loadAndPlaySRSong{
+    VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
+    /*
+     1.如果是房主切换到leaderSinger
+     2.合唱上麦
+     3.观众loadmusic
+     */
+    
+    SRSingRole role = SRSingRoleAudience;
+    if([self isRoomOwner]){
+        role = SRSingRoleLeadSinger;
+    } else if (![self isRoomOwner] && self.isOnMicSeat) {
+        role = SRSingRoleCoSinger;
+    } else {
+        role = SRSingRoleAudience;
+    }
+    
+    if(!model){
+        return;
+    }
+    [self markSongPlaying:model];
+
+    [self setPlayoutVolume:50];
+    [self.RTCkit adjustRecordingSignalVolume:role == SRSingRoleLeadSinger ? 100 : 0 ];
+
+    SRSongConfiguration* songConfig = [[SRSongConfiguration alloc] init];
+    songConfig.autoPlay = (role == SRSingRoleAudience || role == SRSingRoleCoSinger) ? NO : YES ;
+    songConfig.mode = (role == SRSingRoleAudience || role == SRSingRoleCoSinger) ? SRLoadMusicModeLoadLrcOnly : SRLoadMusicModeLoadMusicAndLrc;
+    songConfig.mainSingerUid = [model.userNo integerValue];
+    songConfig.songIdentifier = model.songNo;
+    
+    VL(weakSelf);
+    self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
+        if (!isSuccess) {
+            return;
+        }
+        if(role == SRSingRoleCoSinger){
+            [weakSelf.SRApi startSingWithSongCode:songCode startPos:0];
+        }
+    };
+
+    [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
+
+    [weakSelf.SRApi switchSingerRoleWithNewRole:role
+                           onSwitchRoleState:^( SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
+        if(state != SRSwitchRoleStateSuccess) {
+            SRLogError(@"switchSingerRole error: %ld", reason);
+            return;
+        }
     }];
 }
 
@@ -1102,6 +1208,42 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         default:
             break;
     }
+}
+
+#pragma mark - VLSRStatusViewDelegate
+- (void)didSrActionChanged:(enum SRClickAction)action{
+    switch(action) {
+        case SRClickActionStartGame:
+            //开始游戏后 卖上观众切换为合唱，房主切换成leadSinger
+            [self startGame];
+            break;
+        case SRClickActionSbg:
+            //抢唱操作
+            
+            break;
+        case SRClickActionNextSong:
+            //切歌
+            break;
+        case SRClickActionAac:
+            //伴奏
+            break;
+        case SRClickActionEffect:
+            //调音
+            break;
+        case SRClickActionOrigin:
+            //原唱
+            break;
+        case SRClickActionAgain:
+            
+            break;
+    }
+}
+
+-(void)startGame{//开始游戏 随机选歌
+    SRChooseSongInputModel *model = [self getRandomSongModel];
+    [[AppContext srServiceImp] chooseSongWith:model completion:^(NSError * _Nullable) {
+        
+    }];
 }
 
 #pragma mark - VLSRBottomViewDelegate
@@ -1859,9 +2001,100 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             SRLogInfo(@"onMusicLoadSuccessWithSongCode: %ld", self.singRole);
         }
         self.retryCount = 0;
+        
     });
 }
 
+-(NSMutableArray *)getChooseSongArray{
+    SRChooseSongInputModel *model = [[SRChooseSongInputModel alloc]init];
+    model.isChorus = false;
+    model.songName = @"勇气大爆发";
+    model.songNo = @"6805795303139450";
+    model.singer = @"贝乐虎；土豆王国小乐队；奶糖乐团";
+    model.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CASW1078064.jpg";
+    model.playCounts = @[@32000, @47000, @81433, @142000, @176000];
+
+    SRChooseSongInputModel *model1 = [[SRChooseSongInputModel alloc]init];
+    model1.isChorus = false;
+    model1.songName = @"美人鱼";
+    model1.songNo = @"6625526604232820";
+    model1.singer = @"林俊杰";
+    model1.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/661208.jpg";
+    model1.playCounts = @[@55000, @97000, @150000, @190000, @243000];
+    
+    SRChooseSongInputModel *model2 = [[SRChooseSongInputModel alloc]init];
+    model2.isChorus = false;
+    model2.songName = @"天外来物";
+    model2.songNo = @"6388433023669520";
+    model2.singer = @"薛之谦";
+    model2.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CJ1420004109.jpg";
+    model2.playCounts = @[@91000, @129000, @173000, @212000, @251000];
+    
+    SRChooseSongInputModel *model3 = [[SRChooseSongInputModel alloc]init];
+    model3.isChorus = false;
+    model3.songName = @"凄美地";
+    model3.songNo = @"6625526611288130";
+    model3.singer = @"郭顶";
+    model3.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/126936.jpg";
+    model3.playCounts = @[@44000, @89000, @132000, @192000, @244000];
+    
+    SRChooseSongInputModel *model4 = [[SRChooseSongInputModel alloc]init];
+    model4.isChorus = false;
+    model4.songName = @"一直很安静";
+    model4.songNo = @"6625526604594370";
+    model4.singer = @"张杰";
+    model4.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/792885.jpg";
+    model4.playCounts = @[@46000, @81000, @124000, @159000, @207000];
+    
+    SRChooseSongInputModel *model5 = [[SRChooseSongInputModel alloc]init];
+    model5.isChorus = false;
+    model5.songName = @"他不懂";
+    model5.songNo = @"6654550232746660";
+    model5.singer = @"阿桑";
+    model5.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/961853.jpg";
+    model5.playCounts = @[@57000, @76000, @130000, @148000, @210000];
+    
+    SRChooseSongInputModel *model6 = [[SRChooseSongInputModel alloc]init];
+    model6.isChorus = false;
+    model6.songName = @"一路向北";
+    model6.songNo = @"6357555536291690";
+    model6.singer = @"周杰伦";
+    model6.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/961979.jpg";
+    model6.playCounts = @[@90000, @118000, @194000, @222000, @262000];
+    
+    SRChooseSongInputModel *model7 = [[SRChooseSongInputModel alloc]init];
+    model7.isChorus = false;
+    model7.songName = @"天黑黑";
+    model7.songNo = @"6246262727285990";
+    model7.singer = @"孙燕姿";
+    model7.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/147907.jpg";
+    model7.playCounts = @[@51000, @85000, @122000, @176000, @223000];
+    
+    SRChooseSongInputModel *model8 = [[SRChooseSongInputModel alloc]init];
+    model8.isChorus = false;
+    model8.songName = @"起风了";
+    model8.songNo = @"6625526603305730";
+    model8.singer = @"买辣椒也用券";
+    model8.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/385062.jpg";
+    model8.playCounts = @[@63000, @109000, @154000, @194000, @274000];
+    
+    SRChooseSongInputModel *model9 = [[SRChooseSongInputModel alloc]init];
+    model9.isChorus = false;
+    model9.songName = @"这世界那么多人";
+    model9.songNo = @"6375711121105330";
+    model9.singer = @"莫文蔚";
+    model9.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CJ1420010039.jpg";
+    model9.playCounts = @[@91000, @147000, @191000, @235000, @295000];
+    
+    NSMutableArray *arrayM = [[NSMutableArray alloc]initWithObjects:model,model1, model2, model3, model4, model5, model6, model7, model8, model9, nil];
+    return arrayM;
+}
+
+-(SRChooseSongInputModel *)getRandomSongModel{
+    NSArray *array = [self getChooseSongArray];
+    int index = arc4random() % array.count;
+    return array[index];
+}
 @end
 
 

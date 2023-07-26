@@ -10,7 +10,8 @@
 @interface VLSRAudienceIndicator ()
 
 @property(nonatomic, weak) id <VLSRAudienceIndicatorDelegate>delegate;
-
+@property (nonatomic, strong) UIImageView *requestImgView;
+@property (nonatomic, strong) UILabel *tipsLabel;
 @end
 
 @implementation VLSRAudienceIndicator
@@ -32,6 +33,7 @@
     requestImgView.image = [UIImage sceneImageWithName:@"ktv_request_onlineIcon"];
     requestImgView.userInteractionEnabled = YES;
     [self addSubview:requestImgView];
+    self.requestImgView = requestImgView;
     
     UILabel *tipsLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-300)*0.5, requestImgView.bottom+20, 300, 20)];
     tipsLabel.text = KTVLocalizedString(@"ktv_room_before_speaker");
@@ -39,12 +41,18 @@
     tipsLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
     tipsLabel.font = UIFontMake(14);
     [self addSubview:tipsLabel];
+    self.tipsLabel = tipsLabel;
 }
 
 - (void)tapgesEvent {
     if ([self.delegate respondsToSelector:@selector(requestOnlineAction)]) {
         [self.delegate requestOnlineAction];
     }
+}
+
+-(void)setTipHidden:(BOOL)isHidden {
+    self.tipsLabel.hidden = isHidden;
+    self.requestImgView.hidden = isHidden;
 }
 
 @end
