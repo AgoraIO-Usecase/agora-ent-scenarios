@@ -10,7 +10,7 @@ import CallAPI
 import AgoraRtcKit
 
 class Pure1v1CallViewController: UIViewController {
-    var callApi: CallApiImpl?
+    var callApi: CallApiProtocol?
     var targetUser: Pure1v1UserInfo? {
         didSet {
             roomInfoView.setRoomInfo(avatar: targetUser?.avatar ?? "",
@@ -73,6 +73,8 @@ class Pure1v1CallViewController: UIViewController {
         hangupButton.aui_size = CGSize(width: 70, height: 70)
         hangupButton.aui_bottom = self.view.aui_height - 20 - UIDevice.current.aui_SafeDistanceBottom
         hangupButton.aui_centerX = self.view.aui_width / 2
+        
+        callApi?.addRTCListener?(listener: self)
     }
     
     @objc private func _hangupAction() {
@@ -103,12 +105,16 @@ extension Pure1v1CallViewController: ShowToolMenuViewControllerDelegate {
 
 extension Pure1v1CallViewController: AgoraRtcEngineDelegate {
     private func delayRefreshRealTimeInfo(_ task: (()->())?) {
-//        Throttler.throttle(delay: .seconds(1)) { [weak self] in
-            DispatchQueue.main.async {
-                task?()
-                self.resetRealTimeIfNeeded()
+        if #available(iOS 13.0, *) {
+            Throttler.throttle(delay: .seconds(1)) { [weak self] in
+                DispatchQueue.main.async {
+                    task?()
+                    self?.resetRealTimeIfNeeded()
+                }
             }
-//        }
+        } else {
+            // Fallback on earlier versions
+        }
     }
     private func resetRealTimeIfNeeded() {
 //        if role == .broadcaster && interactionStatus != .pking && interactionStatus != .onSeat {
@@ -174,5 +180,9 @@ extension Pure1v1CallViewController: AgoraRtcEngineDelegate {
             self?.realTimeView.sendStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
             self?.realTimeView.receiveStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
         }
+    }
+    
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
+        pure1v1Print("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
     }
 }

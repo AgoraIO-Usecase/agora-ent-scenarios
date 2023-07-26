@@ -52,7 +52,8 @@ enum CallCostType: String {
 }
 
 public class CallApiImpl: NSObject {
-    private var delegates:NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
+    private let delegates:NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
+    private let rtcProxy: CallAgoraExProxy = CallAgoraExProxy()
     private var config: CallConfig?
     private var tokenConfig: CallTokenConfig?
     private var messageManager: CallMessageManager?
@@ -149,11 +150,13 @@ public class CallApiImpl: NSObject {
     
     deinit {
         callPrint("deinit-- CallApiImpl")
+        rtcProxy.removeListener(self)
     }
     
     public override init() {
         super.init()
         callPrint("init-- CallApiImpl")
+        rtcProxy.addListener(self)
     }
     
     private func _messageDic(action: CallAction) -> [String: Any] {
@@ -464,11 +467,10 @@ extension CallApiImpl {
         mediaOptions.publishMicrophoneTrack = !joinOnly
         mediaOptions.autoSubscribeAudio = !joinOnly
         mediaOptions.autoSubscribeVideo = !joinOnly
-        let proxy = CallAgoraExProxy(delegate: self)
         let ret =
         config.rtcEngine.joinChannelEx(byToken: token,
                                        connection: connection,
-                                       delegate: proxy,
+                                       delegate: rtcProxy,
                                        mediaOptions: mediaOptions)
         callPrint("joinRTC roomId: \(roomId) uid: \(config.userId) ret = \(ret)")
         rtcConnection = connection
@@ -884,6 +886,14 @@ extension CallApiImpl: CallApiProtocol {
         
         _notifyState(state: .prepared, stateReason: .localHangup)
         _notifyEvent(event: .localHangup)
+    }
+    
+    public func addRTCListener(listener: AgoraRtcEngineDelegate) {
+        rtcProxy.addListener(listener)
+    }
+    
+    public func removeRTCListener(listener: AgoraRtcEngineDelegate) {
+        rtcProxy.removeListener(listener)
     }
 }
 

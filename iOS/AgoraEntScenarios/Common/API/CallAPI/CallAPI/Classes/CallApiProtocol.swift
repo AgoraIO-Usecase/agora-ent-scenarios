@@ -146,7 +146,7 @@ public class CallTokenConfig: NSObject {
     @objc optional func onOneForOneCache(oneForOneRoomId: String, fromUserId: UInt, toUserId: UInt)
 }
 
-public protocol CallApiProtocol: NSObjectProtocol {
+@objc public protocol CallApiProtocol: NSObjectProtocol {
     
     /// 初始化配置
     /// - Parameters:
@@ -215,4 +215,9 @@ public protocol CallApiProtocol: NSObjectProtocol {
     /// 获取callId，callId为通话过程中消息的标识，通过argus可以查询到从呼叫到通话的耗时和状态变迁的时间戳
     /// - Returns: callId，非呼叫到通话之外的消息为空
     func getCallId() -> String
+    
+    //
+    @objc optional func addRTCListener(listener: AgoraRtcEngineDelegate)
+    //
+    @objc optional func removeRTCListener(listener: AgoraRtcEngineDelegate)
 }
