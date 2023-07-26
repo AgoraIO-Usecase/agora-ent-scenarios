@@ -145,7 +145,7 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
     }
     
     func leaveRoom(completion: @escaping (Error?) -> Void) {
-        manager.leaveScene(roomId: user?.getRoomId() ?? "")
+        self.sceneRefs[user?.getRoomId() ?? ""]?.deleteScenes()
         completion(nil)
     }
     

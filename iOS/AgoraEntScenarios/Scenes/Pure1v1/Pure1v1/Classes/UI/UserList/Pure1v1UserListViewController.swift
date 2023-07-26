@@ -142,8 +142,10 @@ extension Pure1v1UserListViewController {
         service.getUserList {[weak self] list in
             guard let self = self else {return}
             self.naviBar.stopRefreshAnimation()
-            self.listView.userList = list.filter({$0.userId != self.userInfo?.userId})
+            let userList = list.filter({$0.userId != self.userInfo?.userId})
+            self.listView.userList = userList
             self._showGuideIfNeed()
+            self.naviBar.style = userList.count > 0 ? .light : .dark
         }
     }
 }
@@ -159,7 +161,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
         guard publisher == currentUid else {
             return
         }
-        print("onCallStateChanged state: \(state.rawValue), stateReason: \(stateReason.rawValue), eventReason: \(eventReason), elapsed: \(elapsed) ms, eventInfo: \(eventInfo) publisher: \(publisher) / \(currentUid)")
+        pure1v1Print("onCallStateChanged state: \(state.rawValue), stateReason: \(stateReason.rawValue), eventReason: \(eventReason), elapsed: \(elapsed) ms, eventInfo: \(eventInfo) publisher: \(publisher) / \(currentUid)")
         
         self.callState = state
         
