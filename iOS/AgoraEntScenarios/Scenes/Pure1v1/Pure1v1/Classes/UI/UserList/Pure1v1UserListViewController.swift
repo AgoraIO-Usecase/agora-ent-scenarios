@@ -115,7 +115,7 @@ extension Pure1v1UserListViewController {
         config.audioScenario = .gameStreaming
         config.areaCode = .global
         let engine = AgoraRtcEngineKit.sharedEngine(with: config,
-                                                    delegate: nil)
+                                                    delegate: callVC)
         
         engine.setClientRole(.broadcaster)
         return engine

@@ -30,5 +30,6 @@
 "show_statistic_up_loss_package" = "上行丢包率";
 "show_statistic_up_bitrate" = "发送码率";
 "show_statistic_encode_resolution" = "编码分辨率";
+"show_advance_setting_FPS_title" = "编码帧率";
 "show_statistic_loss_package" = "丢包率";
 "show_statistic_down_net_speech" = "下行网络";
