@@ -10,7 +10,12 @@ import CallAPI
 import AgoraRtcKit
 
 class Pure1v1CallViewController: UIViewController {
-    var callApi: CallApiProtocol?
+    var callApi: CallApiProtocol? {
+        didSet {
+            oldValue?.removeListener(listener: self)
+            callApi?.addListener(listener: self)
+        }
+    }
     var targetUser: Pure1v1UserInfo? {
         didSet {
             roomInfoView.setRoomInfo(avatar: targetUser?.avatar ?? "",
@@ -49,6 +54,11 @@ class Pure1v1CallViewController: UIViewController {
         }
         return realTimeView
     }()
+    
+    deinit {
+        pure1v1Print("deinit-- Pure1v1CallViewController")
+        callApi = nil
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -185,4 +195,23 @@ extension Pure1v1CallViewController: AgoraRtcEngineDelegate {
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         pure1v1Print("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
     }
+}
+
+extension Pure1v1CallViewController: CallApiListenerProtocol {
+        func onCallStateChanged(with state: CallStateType,
+                                stateReason: CallReason,
+                                eventReason: String,
+                                elapsed: Int,
+                                eventInfo: [String : Any]) {
+        }
+        
+        func onCallEventChanged(with event: CallEvent, elapsed: Int) {
+            pure1v1Print("onCallEventChanged: \(event.rawValue)")
+            switch event {
+            case .localLeave, .remoteLeave:
+                _hangupAction()
+            default:
+                break
+            }
+        }
 }
