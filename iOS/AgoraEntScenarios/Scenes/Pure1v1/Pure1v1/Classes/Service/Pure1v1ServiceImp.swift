@@ -13,6 +13,10 @@ func pure1v1Print(_ message: String) {
     print("[Pure1v1]\(message)")
 }
 
+func pure1v1Warn(_ message: String) {
+    print("[Pure1v1][Warning]\(message)")
+}
+
 
 private func mainTreadTask(_ task: (()->())?){
     if Thread.isMainThread {
