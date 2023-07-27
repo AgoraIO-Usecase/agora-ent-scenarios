@@ -23,6 +23,7 @@ private func apiErrorPrint(_ message: String) {
 class VideoLoaderApiImpl: NSObject {
     private var config: VideoLoaderConfig?
     
+    private let apiProxy = VideoLoaderApiProxy()
     private let rtcProxy = VideoLoaderAgoraExProxy()
     //[ex channelId: connection]
     private var exConnectionMap: [String: AgoraRtcConnection] = [:]
@@ -111,7 +112,7 @@ extension VideoLoaderApiImpl {
 }
 
 //MARK: VideoLoaderApiProtocol
-extension VideoLoaderApiImpl: VideoLoaderApiProtocol {
+extension VideoLoaderApiImpl: IVideoLoaderApi {
     func setup(config: VideoLoaderConfig) {
         self.config = config
     }
@@ -139,6 +140,8 @@ extension VideoLoaderApiImpl: VideoLoaderApiProtocol {
             apiErrorPrint("updateLoadingType fatal, map init fail")
             return
         }
+        let oldState = getRoomState(roomInfo: roomInfo)
+        
         exConnectionDeps[roomInfo.channelName] = map
         
         let realState = getRoomState(roomInfo: roomInfo)
@@ -160,6 +163,10 @@ extension VideoLoaderApiImpl: VideoLoaderApiProtocol {
 
         apiPrint("tagId[tagId] updateLoadingType \(roomInfo.channelName) want:\(newState.rawValue) real: \(realState.rawValue)")
         _updateChannelEx(channelId:roomInfo.channelName, options: mediaOptions)
+        if realState != oldState {
+            let api = apiProxy as IVideoLoaderApiListener
+            api.onStateDidChange?(newState: realState, oldState: oldState, channelName: roomInfo.channelName)
+        }
     }
     
     func getRoomState(roomInfo: RoomInfo) -> RoomStatus {
@@ -202,5 +209,21 @@ extension VideoLoaderApiImpl: VideoLoaderApiProtocol {
         }
         exConnectionMap.removeAll()
         exConnectionDeps.removeAll()
+    }
+    
+    func addListener(listener: IVideoLoaderApiListener) {
+        apiProxy.addListener(listener)
+    }
+    
+    func removeListener(listener: IVideoLoaderApiListener) {
+        apiProxy.addListener(listener)
+    }
+    
+    func addRTCListener(listener: AgoraRtcEngineDelegate) {
+        rtcProxy.addListener(listener)
+    }
+    
+    func removeRTCListener(listener: AgoraRtcEngineDelegate) {
+        rtcProxy.removeListener(listener)
     }
 }
