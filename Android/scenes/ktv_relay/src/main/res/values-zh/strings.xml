@@ -155,6 +155,7 @@
     <string name="ktv_game_nobody_grasp">本轮无人演唱 \n 即将播放下一首</string>
     <string name="ktv_tips">公告 ></string>
     <string name="ktv_relay">抢麦接唱</string>
+    <string name="ktv_seat_num">号麦</string>
 
 
 </resources>

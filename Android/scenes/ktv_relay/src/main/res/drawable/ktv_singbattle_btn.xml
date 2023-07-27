@@ -4,7 +4,7 @@
     <!--按压效果-->
     <item
         android:state_pressed="true"
-        android:background="@mipmap/ktv_start_grasp_waiting">
+        android:background="@mipmap/ktv_start_grasp_press">
     </item>
 
     <!--正常效果-->

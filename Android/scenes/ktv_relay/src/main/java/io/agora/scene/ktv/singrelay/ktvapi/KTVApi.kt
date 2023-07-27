@@ -187,6 +187,8 @@ abstract class IKTVApiEventHandler {
     open fun onChorusChannelAudioVolumeIndication(
         speakers: Array<out IRtcEngineEventHandler.AudioVolumeInfo>?,
         totalVolume: Int) {}
+
+    open fun onMusicPlayerPositionChanged(position_ms: Long, timestamp_ms: Long) {}
 }
 
 /**

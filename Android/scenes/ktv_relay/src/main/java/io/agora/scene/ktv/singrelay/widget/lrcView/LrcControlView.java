@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -101,6 +102,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     private boolean isOnSeat = false;
     public void onSeat(boolean isOnSeat) {
         this.isOnSeat = isOnSeat;
+        if (isOnSeat) {
+            mBinding.ilActive.singRelay.setVisibility(View.VISIBLE);
+        }
     }
 
     public LrcControlView(@NonNull Context context) {
@@ -173,6 +177,51 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         this.mOnKaraokeActionListener = karaokeActionListener;
     }
 
+    private CountDownTimer mCountDownLatch;
+
+    private void startTimer() {
+        if (mCountDownLatch != null) mCountDownLatch.cancel();
+
+        mCountDownLatch = new CountDownTimer(3 * 1000, 999) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                int second = (int) (millisUntilFinished / 1000);
+
+                if (second <= 2) {
+                    setCountDown(second);
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                onCountFinished();
+            }
+        }.start();
+    }
+
+    private void stopTimer() {
+        if (mCountDownLatch != null) {
+            mCountDownLatch.cancel();
+            mCountDownLatch = null;
+        }
+    }
+
+    private void setCountDown(int second) {
+        if (mBinding == null) return;
+        mBinding.ilActive.singRelay.setText("" + (second + 1));
+    }
+
+    private void onCountFinished() {
+        if (mBinding == null) return;
+        mBinding.ilActive.singRelay.setEnabled(true);
+        mBinding.ilActive.singRelay.setText("");
+        mBinding.ilActive.singRelay.setBackgroundResource(R.mipmap.ktv_start_grasp);
+    }
+
+    public void startTimerCount() {
+        startTimer();
+    }
+
 
     private boolean isMineOwner = false;
 
@@ -208,17 +257,46 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         if (mBinding == null) return;
         mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
         mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.INVISIBLE);
+        if (!isOnSeat) {
+            mBinding.ilActive.singRelay.setVisibility(View.GONE);
+        }
+
         if (this.mRole == Role.Singer) {
             mBinding.ilActive.lyricsView.enableDragging(false);
-            mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
+            mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
             mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
             mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+            if (isMineOwner) {
+                mBinding.ilActive.ivChangeSong.setVisibility(View.VISIBLE);
+            } else {
+                mBinding.ilActive.ivChangeSong.setVisibility(View.INVISIBLE);
+            }
         } else if (this.mRole == Role.Listener) {
             mBinding.ilActive.lyricsView.enableDragging(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
+            if (isMineOwner) {
+                mBinding.ilActive.ivChangeSong.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    public void changeMusicController(Role role) {
+        if (role == Role.Singer) {
+            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
+            mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
+            if (isMineOwner) {
+                mBinding.ilActive.ivChangeSong.setVisibility(View.VISIBLE);
+            } else {
+                mBinding.ilActive.ivChangeSong.setVisibility(View.INVISIBLE);
+            }
+        } else if (role == Role.Listener) {
+            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
+            if (isMineOwner) {
+                mBinding.ilActive.ivChangeSong.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -257,15 +335,21 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.comboView.getRoot().setVisibility(View.VISIBLE);
         mBinding.lineScore.setVisibility(View.VISIBLE);
         mBinding.ilActive.tvMusicName2.setVisibility(View.GONE);
-        mBinding.ilActive.singRelay.setVisibility(View.GONE);
 
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams)findViewById(R.id.lyricsView).getLayoutParams();
         params.topToBottom = R.id.scoringView;
         params.bottomToTop = R.id.bgd_control_layout_lrc;
         findViewById(R.id.lyricsView).requestLayout();
+
+        startTimer();
     }
 
-    public void onGraspDiasble() {
+    public void onGraspEnable() {
+        if (mBinding == null || !isOnSeat) return;
+        mBinding.ilActive.singRelay.setVisibility(View.VISIBLE);
+    }
+
+    public void onGraspDisable() {
         if (mBinding == null) return;
         mBinding.ilActive.singRelay.setVisibility(View.INVISIBLE);
     }
