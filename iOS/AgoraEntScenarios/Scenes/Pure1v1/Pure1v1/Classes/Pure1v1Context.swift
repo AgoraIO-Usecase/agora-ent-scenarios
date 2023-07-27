@@ -5,7 +5,7 @@ public class Pure1v1Context: NSObject {
         return [
             "bgImgStr": UIImage.sceneImagePath(name: "Image/list_bg", bundleName: "Pure1v1")!,
             "iconImgStr": UIImage.sceneImagePath(name: "Image/list_bg_icon", bundleName: "Pure1v1")!,
-            "titleStr": "1v1私密房",
+            "titleStr": "user_list_title".pure1v1Localization(),
             "subTitleStr": ""
         ]
 //        @{

@@ -55,6 +55,13 @@ PODS:
   - SDWebImageAPNGCoder (0.1.1):
     - SDWebImage/Core (~> 4.2)
   - SenseLib (1.0)
+  - ShowTo1v1 (0.1.0):
+    - AgoraSyncManager
+    - CallAPI
+    - SDWebImage
+    - SnapKit
+    - YYCategories
+    - YYModel
   - SnapKit (5.6.0)
   - SocketRocket (0.7.0)
   - SSZipArchive (2.4.3)
@@ -102,6 +109,7 @@ DEPENDENCIES:
   - SDWebImage (~> 4.2)
   - SDWebImageAPNGCoder
   - SenseLib (from `sense.podspec`)
+  - ShowTo1v1 (from `AgoraEntScenarios/Scenes/ShowTo1v1`)
   - SnapKit
   - SocketRocket (= 0.7.0)
   - SVGAPlayer
@@ -158,6 +166,8 @@ EXTERNAL SOURCES:
     :path: AgoraEntScenarios/Scenes/Pure1v1
   SenseLib:
     :path: sense.podspec
+  ShowTo1v1:
+    :path: AgoraEntScenarios/Scenes/ShowTo1v1
   VideoLoaderAPI:
     :path: AgoraEntScenarios/Common/API/VideoLoaderAPI
 
@@ -187,6 +197,7 @@ SPEC CHECKSUMS:
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
   SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
+  ShowTo1v1: 6a7936840a95cb8cee9842ce2871eca827438e5e
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
@@ -199,6 +210,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 519d85a3f28dbec47be74689b7f6809957fcbe2c
+PODFILE CHECKSUM: 9c18249c6821b8845f1e4bcfeec6603c4d5c7f78
 
 COCOAPODS: 1.12.0

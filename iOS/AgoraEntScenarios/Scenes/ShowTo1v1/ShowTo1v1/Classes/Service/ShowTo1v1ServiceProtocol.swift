@@ -1,26 +1,26 @@
 //
-//  Pure1v1ServiceProtocol.swift
-//  Pure1v1
+//  ShowTo1v1ServiceProtocol.swift
+//  ShowTo1v1
 //
-//  Created by wushengtao on 2023/7/20.
+//  Created by wushengtao on 2023/7/27.
 //
 
 import Foundation
 
 
-@objc enum Pure1v1ServiceNetworkStatus: Int {
+@objc enum ShowTo1v1ServiceNetworkStatus: Int {
     case connecting = 0 // 连接中
     case open // 已打开
     case fail // 失败
     case closed // 已关闭
 }
 
-protocol Pure1v1ServiceProtocol: NSObjectProtocol {
+protocol ShowTo1v1ServiceProtocol: NSObjectProtocol {
     
     
     /// 把自己加入1v1列表
     /// - Parameter completion: <#completion description#>
-    func enterRoom(completion: @escaping (Error?) -> Void)
+    func createRoom(completion: @escaping (Error?) -> Void)
     
     
     /// 把自己移除出1v1列表
@@ -30,12 +30,12 @@ protocol Pure1v1ServiceProtocol: NSObjectProtocol {
     
     /// 获取1v1用户列表
     /// - Parameter completion: 完成回调
-    func getUserList(completion: @escaping ([Pure1v1UserInfo]) -> Void)
+    func getUserList(completion: @escaping ([ShowTo1v1UserInfo]) -> Void)
     
     
     /// 订阅网络状态变化
     /// - Parameter changedBlock: 变化回调
-    func subscribeNetworkStatusChanged(with changedBlock: @escaping (Pure1v1ServiceNetworkStatus) -> Void)
+    func subscribeNetworkStatusChanged(with changedBlock: @escaping (ShowTo1v1ServiceNetworkStatus) -> Void)
     
     /// 订阅房间过期
     /// - Parameter changedBlock: 变化回调

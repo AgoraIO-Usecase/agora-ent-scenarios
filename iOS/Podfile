@@ -47,6 +47,7 @@ def all_pods
   pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
   pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
+  pod 'ShowTo1v1', :path => 'AgoraEntScenarios/Scenes/ShowTo1v1'
 
 
   #ThirdParty
