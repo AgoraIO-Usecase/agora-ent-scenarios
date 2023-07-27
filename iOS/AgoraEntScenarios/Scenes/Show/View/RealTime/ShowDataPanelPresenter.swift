@@ -150,6 +150,8 @@ class ShowDataPanelPresenter {
     
     private func otherData(send: Bool, receive: Bool) -> ShowPanelData {
         let params = ShowAgoraKitManager.shared.rtcParam
+        let onStr = "show_setting_switch_on".show_localized
+        let offStr = "show_setting_switch_off".show_localized
         // left:
         // 其他
         let title = "show_statistic_title_other".show_localized
@@ -157,17 +159,20 @@ class ShowDataPanelPresenter {
         let startup = receive ? "\(callTs) ms" : "--"
         let startupStr = "show_statistic_startup_time".show_localized + ": " + startup
         // 超分开关
-        let srStr = "show_statistic_SR_switch".show_localized + ": " + (params.sr ? "show_setting_switch_on".show_localized : "show_setting_switch_off".show_localized)
+        let sr = receive ? (params.sr ? onStr : offStr) : "--"
+        let srStr = "show_statistic_SR_switch".show_localized + ": " + sr
         // 小流开关
-        let microStream = send ? (params.simulcast ? "show_setting_switch_on".show_localized : "show_setting_switch_off".show_localized) : "--"
+        let microStream = send ? (params.simulcast ? onStr : offStr) : "--"
         let microStreamStr = "show_statistic_micro_stream_switch".show_localized + ": " + microStream
         // right:
         //机型等级
         let levelStr = "show_statistic_device_level".show_localized + ": " + ShowAgoraKitManager.shared.deviceLevel.description()
         //pvc开关
-        let pvcStr = "show_statistic_pvc_switch".show_localized + ": " + (params.pvc ? "show_setting_switch_on".show_localized : "show_setting_switch_off".show_localized)
+        let pvc = send ? (params.pvc ? onStr : offStr) : "--"
+        let pvcStr = "show_statistic_pvc_switch".show_localized + ": " + pvc
         //svc开关
-        let svcStr = "show_statistic_svc_switch".show_localized + ": " + (params.svc ? "show_setting_switch_on".show_localized : "show_setting_switch_off".show_localized)
+        let svc = send ? (params.svc ? onStr : offStr) : "--"
+        let svcStr = "show_statistic_svc_switch".show_localized + ": " + svc
         let left = [title, startupStr, srStr,  microStreamStr].joined(separator: "\n") + "\n"
         let right = ["  ", levelStr,  pvcStr, svcStr].joined(separator: "\n") + "\n"
         return ShowPanelData(left: left, right: right)
