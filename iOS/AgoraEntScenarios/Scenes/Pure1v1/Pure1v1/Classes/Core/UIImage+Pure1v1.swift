@@ -19,8 +19,8 @@ func getLang() -> String {
     return "en"
 }
 
-static let cache: NSCache: NSCache
 extension UIImage {
+    static private let agoraImageCache = NSCache<NSString, UIImage>()
     static func sceneImagePath(name: String, bundleName: String) -> String? {
         guard let bundlePath = Bundle.main.path(forResource: bundleName, ofType: "bundle"),
               let bundle = Bundle(path: bundlePath)
@@ -55,8 +55,16 @@ extension UIImage {
     }
     
     @objc static func sceneImage(name: String) -> UIImage? {
-        let imagePath = UIImage.sceneImagePath(name: "Image/\(name)", bundleName: "Pure1v1")
-        let image = UIImage(contentsOfFile: imagePath ?? "")
+        guard let imagePath = UIImage.sceneImagePath(name: "Image/\(name)", bundleName: "Pure1v1") else {
+            return nil
+        }
+        if let image = agoraImageCache.object(forKey: imagePath as NSString) {
+            return image
+        }
+        guard let image = UIImage(contentsOfFile: imagePath) else {
+            return nil
+        }
+        agoraImageCache.setObject(image, forKey: imagePath as NSString)
         return image
     }
 }
