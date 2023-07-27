@@ -45,6 +45,7 @@ def all_pods
 
   pod 'AgoraRtmKit2', :path => 'Rtm2'
   pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
+  pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
   pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
 
 
