@@ -21,6 +21,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/tvSongNumTab"
+        android:layout_width="41dp"
+        android:layout_height="20dp"
+        android:background="@drawable/ktv_skip_btn_bg"
+        android:gravity="center"
+        android:text="1/5"
+        android:textColor="@color/white"
+        android:textSize="10sp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toEndOf="@+id/tvSongTab"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/ivGameTips"
         android:layout_width="0dp"
@@ -32,6 +46,59 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/messageText"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="@mipmap/ktv_game_idle_text_background"
+        android:text="@string/ktv_game_room_owner_idle"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+    </androidx.appcompat.widget.AppCompatTextView>
+
+    <LinearLayout
+        android:id="@+id/tvBattleResultView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="@+id/messageText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/messageText"
+        tools:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:text="本轮由 "/>
+
+        <ImageView
+            android:id="@+id/ivHeader"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            tools:background="@mipmap/ktv_ic_song_default"/>
+
+        <TextView
+            android:id="@+id/tvBattleResultName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:text="抢到麦"/>
+
+    </LinearLayout>
 
     <io.agora.scene.ktv.singrelay.widget.lrcView.LrcControlView
         android:id="@+id/lrcControlView"

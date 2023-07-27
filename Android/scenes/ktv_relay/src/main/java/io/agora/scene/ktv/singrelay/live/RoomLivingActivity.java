@@ -34,6 +34,7 @@ import java.util.Objects;
 
 import io.agora.rtc2.Constants;
 import io.agora.scene.base.GlideApp;
+import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
@@ -166,7 +167,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     binding.tvHC.setVisibility(View.GONE);
                     binding.tvRoomOwner.setVisibility(View.GONE);
                     binding.ivMute.setVisibility(View.GONE);
-                    binding.tvUserName.setText(String.valueOf(position + 1));
+                    binding.tvUserName.setText(String.valueOf(position + 1) + getString(R.string.ktv_seat_num));
                     binding.flVideoContainer.removeAllViews();
                 } else {
                     binding.tvUserName.setText(item.getName());
@@ -330,15 +331,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.setMusic(null);
                 roomLivingViewModel.onSongPlaying();
                 getBinding().lrcControlView.onGamingStatus();
-                mRoomSpeakerAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onNextSong() {
-                roomLivingViewModel.onSongPlaying();
-                if (roomLivingViewModel.songsOrderedLiveData.getValue() != null) {
-                    getBinding().singRelayGameView.onBattleGamePrepare(roomLivingViewModel.songsOrderedLiveData.getValue().size());
-                }
                 mRoomSpeakerAdapter.notifyDataSetChanged();
             }
 
@@ -518,7 +510,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 if (roomLivingViewModel.songsOrderedLiveData.getValue() != null) {
                     getBinding().singRelayGameView.onGameStartStatus();
                 }
-                roomLivingViewModel.toggleMic(false);
+                if (!roomLivingViewModel.isRoomOwner()) {
+                    roomLivingViewModel.toggleMic(false);
+                }
                 getBinding().cbMic.setEnabled(false);
                 getBinding().groupEmptyPrompt.setVisibility(View.GONE);
             } else if (status == RoomLivingViewModel.GameStatus.ON_WAITING) {
@@ -535,21 +529,24 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         });
         roomLivingViewModel.graspStatusMutableLiveData.observe(this, model -> {
             if (model.status == RoomLivingViewModel.GraspStatus.SUCCESS) {
-                roomLivingViewModel.musicStop();
                 getBinding().singRelayGameView.onGraspSongSuccess(model.userName, model.headUrl);
-
-                // 抢唱成功， 更新麦克风状态
-                if (model.userId.equals(UserManager.getInstance().getUser().id.toString())) {
-                    roomLivingViewModel.toggleMic(true);
-                } else {
-                    roomLivingViewModel.toggleMic(false);
-                }
             } else if (model.status == RoomLivingViewModel.GraspStatus.EMPTY) {
                 getBinding().singRelayGameView.onNobodyGraspSong();
                 if (roomLivingViewModel.isRoomOwner()) {
                     roomLivingViewModel.musicStop();
                     roomLivingViewModel.changeMusic();
                 }
+            } else if (model.status == RoomLivingViewModel.GraspStatus.IDLE) {
+                getBinding().singRelayGameView.onGraspSongBegin();
+                if (roomLivingViewModel.songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0].equals(UserManager.getInstance().getUser().id.toString())) {
+                    getBinding().singRelayGameView.onNextPart(true);
+                    roomLivingViewModel.toggleMic(true);
+                } else {
+                    getBinding().singRelayGameView.onNextPart(false);
+                    roomLivingViewModel.toggleMic(false);
+                }
+            } else if (model.status == RoomLivingViewModel.GraspStatus.Mention) {
+                getBinding().singRelayGameView.onBattleGamePrepare(roomLivingViewModel.songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0].equals(UserManager.getInstance().getUser().id.toString()));
             }
         });
         roomLivingViewModel.playerMusicOpenDurationLiveData.observe(this, duration -> {

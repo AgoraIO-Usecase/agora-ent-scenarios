@@ -44,7 +44,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     var useCustomAudioSource:Boolean = false
 
     // 音频最佳实践
-    var remoteVolume: Int = 40 // 远端音频
+    var remoteVolume: Int = 100 // 远端音频
     var mpkPlayoutVolume: Int = 50
     var mpkPublishVolume: Int = 50
 
@@ -1180,19 +1180,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         localPlayerPosition = position_ms
         localPlayerSystemTime = timestamp_ms
 
-
-        if (position_ms in (0..2000)) {
-            ToastUtils.showToast("第一段")
-        } else if (position_ms in (32000..33000)) {
-            ToastUtils.showToast("第二段")
-        } else if (position_ms in (47000..48000)) {
-            ToastUtils.showToast("第三段")
-        } else if (position_ms in (81000..82000)) {
-            ToastUtils.showToast("第四段")
-        }  else if (position_ms in (142000..143000)) {
-            ToastUtils.showToast("第五段")
-        }
-
         if ((this.singerRole == KTVSingRole.SoloSinger || this.singerRole == KTVSingRole.LeadSinger) && position_ms > audioPlayoutDelay) {
             val msg: MutableMap<String?, Any?> = HashMap()
             msg["cmd"] = "setLrcTime"
@@ -1215,6 +1202,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             mLastReceivedPlayPosTime = null
             mReceivedPlayPosition = 0
         }
+
+        ktvApiEventHandlerList.forEach { it.onMusicPlayerPositionChanged(position_ms, timestamp_ms) }
     }
 
     override fun onPlayerEvent(

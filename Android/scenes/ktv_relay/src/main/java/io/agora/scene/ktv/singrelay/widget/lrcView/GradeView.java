@@ -136,7 +136,7 @@ public class GradeView extends View {
         }
         mCumulativeScoreBarPaint.setShader(mCumulativeLinearGradient);
         mCumulativeScoreBarPaint.setAntiAlias(true);
-        canvas.drawRoundRect(mCumulativeScoreBarRectF, mHeight / 2, mHeight / 2, mCumulativeScoreBarPaint);
+        //canvas.drawRoundRect(mCumulativeScoreBarRectF, mHeight / 2, mHeight / 2, mCumulativeScoreBarPaint);
     }
 
     public void setScore(int score, int cumulativeScore, int perfectScore) {

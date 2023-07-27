@@ -54,11 +54,11 @@
     <Button
         android:id="@+id/singRelay"
         android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:background="@mipmap/ktv_start_grasp_waiting"
+        android:layout_height="35dp"
+        android:layout_marginBottom="5dp"
+        android:background="@mipmap/ktv_start_grasp_press"
         android:gravity="center"
         android:text="3"
-        android:paddingBottom="8dp"
         android:textColor="@color/white"
         android:textSize="12sp"
         android:textStyle="bold"
@@ -223,5 +223,5 @@
         android:id="@+id/rlMusicControlMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="bgd_control_layout_lrc,switchOriginal,ivMusicMenu,ivChangeSong" />
+        app:constraint_referenced_ids="bgd_control_layout_lrc,switchOriginal,ivMusicMenu,ivChangeSong,ivMusicStart" />
 </androidx.constraintlayout.widget.ConstraintLayout>
