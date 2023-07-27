@@ -189,6 +189,14 @@ public class SingRelayGameView extends FrameLayout {
         mBinding.ilActive.tvBattleResultName.setText(" " + userName + " 抢到麦");
         mBinding.ilActive.tvBattleResultView.setVisibility(View.VISIBLE);
         mBinding.ilActive.tvBattleResultView.bringToFront();
+
+        GlideApp.with(mBinding.getRoot())
+                .load(headUrl)
+                .error(R.mipmap.userimage)
+                .transform(new CenterCropRoundCornerTransform(100))
+                .into(mBinding.ilActive.ivWinnerHeader);
+        mBinding.ilActive.ivWinnerName.setText(userName + " 演唱");
+        mBinding.ilActive.winnerTips.setVisibility(VISIBLE);
         mBinding.getRoot().postDelayed(() -> {
             if (mBinding == null) return;
             mBinding.ilActive.messageText.setVisibility(View.GONE);
@@ -211,6 +219,7 @@ public class SingRelayGameView extends FrameLayout {
     public void onNextPart(boolean isWinner) {
         KTVLogger.d(TAG, "onNextPart");
         if (mBinding == null) return;
+        mBinding.ilActive.winnerTips.setVisibility(GONE);
         if (isWinner) {
             mBinding.ilActive.lrcControlView.changeMusicController(LrcControlView.Role.Singer);
         } else {
