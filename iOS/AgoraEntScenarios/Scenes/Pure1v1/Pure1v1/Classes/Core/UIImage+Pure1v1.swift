@@ -19,6 +19,7 @@ func getLang() -> String {
     return "en"
 }
 
+static let cache: NSCache: NSCache
 extension UIImage {
     static func sceneImagePath(name: String, bundleName: String) -> String? {
         guard let bundlePath = Bundle.main.path(forResource: bundleName, ofType: "bundle"),

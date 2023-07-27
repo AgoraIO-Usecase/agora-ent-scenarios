@@ -57,7 +57,6 @@ class Pure1v1CallViewController: UIViewController {
     
     deinit {
         pure1v1Print("deinit-- Pure1v1CallViewController")
-        callApi = nil
     }
     
     override func viewDidLoad() {
@@ -89,7 +88,6 @@ class Pure1v1CallViewController: UIViewController {
     
     @objc private func _hangupAction() {
         callApi?.hangup(roomId: targetUser?.getRoomId() ?? "", completion: { err in
-            
         })
     }
 }
