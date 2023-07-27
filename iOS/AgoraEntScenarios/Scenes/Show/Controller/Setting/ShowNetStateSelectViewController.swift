@@ -7,7 +7,6 @@
 
 import Foundation
 
-private let TableHeaderHeight: CGFloat = 58
 private let ShowPresettingCellID = "ShowPresettingCellID"
 private let ShowPresettingHeaderViewID = "ShowPresettingHeaderViewID"
 class ShowNetStateSelectViewController: UIViewController {
@@ -20,13 +19,15 @@ class ShowNetStateSelectViewController: UIViewController {
         
     private var netConditions: [ShowAgoraKitManager.NetCondition] = [.good, .bad]
     
-    private var performances: [ShowAgoraKitManager.PerformanceMode] = [.smooth, .fluent]
+    private var performances: [ShowAgoraKitManager.PerformanceMode] = [.fluent, .smooth]
     
     private var aNetCondition: ShowAgoraKitManager.NetCondition = .good
     
-    private var aPerformance: ShowAgoraKitManager.PerformanceMode = .smooth
+    private var aPerformance: ShowAgoraKitManager.PerformanceMode = .fluent
     
     private let topBar = ShowNavigationBar()
+    
+    private let footerView = ShowNetStateFooterView(frame: CGRect(x: 0, y: 0, width: 100, height: 160))
 
     private let tableView: UITableView = UITableView(frame: .zero, style: .grouped)
     
@@ -79,9 +80,9 @@ extension ShowNetStateSelectViewController: UITableViewDelegate, UITableViewData
             let a = performances[indexPath.row]
             switch a {
             case .smooth:
-                cell.setTitle("show_presetting_performances_smooth".show_localized, desc: "show_presetting_performances_smooth_detail".show_localized)
+                cell.setTitle("show_presetting_performances_smooth".show_localized, desc: "show_presetting_performances_smooth".show_localized)
             case .fluent:
-                cell.setTitle("show_presetting_performances_fluent".show_localized, desc: "show_presetting_performances_fluent_detail".show_localized)
+                cell.setTitle("show_presetting_performances_fluent".show_localized, desc: "show_presetting_performances_fluent".show_localized)
             }
             cell.aSelected = (aPerformance == a)
         }
@@ -116,6 +117,7 @@ extension ShowNetStateSelectViewController {
     
     func createViews() {
         view.backgroundColor = .white
+        footerView.setDeviceLevel(text: ShowAgoraKitManager.shared.deviceLevel.description())
         
         tableView.backgroundColor = .white
         tableView.delegate = self
@@ -123,7 +125,8 @@ extension ShowNetStateSelectViewController {
         tableView.rowHeight = 60
         tableView.separatorStyle = .none
         tableView.sectionHeaderHeight = UITableView.automaticDimension
-        tableView.sectionFooterHeight = 15
+        tableView.sectionFooterHeight = 16
+        tableView.tableFooterView = footerView
         tableView.register(ShowPresettingCell.self, forCellReuseIdentifier: ShowPresettingCellID)
         tableView.register(ShowPresettingHeaderView.self, forHeaderFooterViewReuseIdentifier: ShowPresettingHeaderViewID)
         view.addSubview(tableView)
@@ -139,6 +142,85 @@ extension ShowNetStateSelectViewController {
         tableView.snp.makeConstraints { make in
             make.left.bottom.right.equalToSuperview()
             make.top.equalTo(topBar.snp.bottom)
+        }
+    }
+}
+// MARK: - ShowNetStateFooterView
+fileprivate class ShowNetStateFooterView: UITableViewHeaderFooterView {
+    
+    private let radiusView = UIView()
+    
+    public let infoLabel = UILabel()
+    
+    private let suggestLabel = UILabel()
+    
+    private let suggestInfoLabel = UILabel()
+    
+    override init(reuseIdentifier: String?) {
+        super.init(reuseIdentifier: reuseIdentifier)
+        createViews()
+        createConstrains()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setDeviceLevel(text: String) {
+        infoLabel.text = "show_presetting_info_device_level".show_localized + text
+    }
+    
+    private func createViews(){
+        radiusView.backgroundColor = .show_preset_bg
+        radiusView.layer.cornerRadius = 16
+        radiusView.clipsToBounds = true
+        contentView.addSubview(radiusView)
+        
+        infoLabel.font = UIFont.systemFont(ofSize: 16)
+        infoLabel.textColor = .show_chat_input_text
+        infoLabel.font = .show_R_14
+        infoLabel.numberOfLines = 0
+        infoLabel.textAlignment = .left
+        contentView.addSubview(infoLabel)
+        
+        suggestLabel.font = UIFont.systemFont(ofSize: 16)
+        suggestLabel.textColor = .show_chat_input_text
+        suggestLabel.font = .show_R_14
+        suggestLabel.numberOfLines = 1
+        suggestLabel.textAlignment = .left
+        suggestLabel.text = "show_presetting_info_suggest".show_localized
+        contentView.addSubview(suggestLabel)
+        
+        suggestInfoLabel.font = UIFont.systemFont(ofSize: 16)
+        suggestInfoLabel.textColor = .show_chat_input_text
+        suggestInfoLabel.font = .show_R_14
+        suggestInfoLabel.numberOfLines = 0
+        suggestInfoLabel.textAlignment = .left
+        suggestInfoLabel.text = "show_presetting_info_suggest_detail".show_localized
+        contentView.addSubview(suggestInfoLabel)
+    }
+    
+    private func createConstrains() {
+        radiusView.snp.makeConstraints { make in
+            make.top.equalTo(20)
+            make.left.equalTo(20)
+            make.right.equalTo(-20)
+            make.bottom.equalTo(-20)
+        }
+        infoLabel.snp.makeConstraints { make in
+            make.top.equalTo(radiusView).offset(20)
+            make.left.equalTo(radiusView).offset(20)
+            make.right.equalTo(radiusView).offset(-20)
+        }
+        suggestLabel.snp.makeConstraints { make in
+            make.top.equalTo(infoLabel.snp.bottom).offset(15)
+            make.left.equalTo(radiusView).offset(20)
+        }
+        suggestInfoLabel.snp.makeConstraints { make in
+            make.top.equalTo(suggestLabel)
+            make.left.equalTo(suggestLabel.snp.right)
+            make.right.equalTo(radiusView).offset(-20)
+            make.bottom.equalTo(radiusView).offset(-20)
         }
     }
 }

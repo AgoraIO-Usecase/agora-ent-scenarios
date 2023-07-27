@@ -135,6 +135,11 @@ extension ShowVideoSettingVC {
             let alert = UIAlertController(title: "show_presetting_alert_will_change_value_title".show_localized, message: "show_presetting_alert_will_change_value_message".show_localized, preferredStyle: .alert)
             let submit = UIAlertAction(title: "show_alert_confirm_btn_title".show_localized, style: .default) { _ in
                 key.writeValue(value)
+                if key == .musincVolume {
+                    self.musicManager.setMusicVolume(value as! Float)
+                } else {
+                    ShowAgoraKitManager.shared.updateSettingForkey(key, currentChannelId: self.currentChannelId)
+                }
                 self.tableView.reloadData()
             }
             let cancel = UIAlertAction(title: "show_alert_cancel_btn_title".show_localized, style: .cancel) { _ in

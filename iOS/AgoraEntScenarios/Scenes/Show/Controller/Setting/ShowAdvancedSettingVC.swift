@@ -6,7 +6,6 @@
 //
 
 import UIKit
-//import JXCategoryView
 import AgoraRtcKit
 
 class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {

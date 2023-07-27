@@ -16,13 +16,7 @@ class ShowLivePagesViewController: ViewController {
     
     private var currentVC: ShowLiveViewController?
     
-    lazy var agoraKitManager: ShowAgoraKitManager = {
-        let manager = ShowAgoraKitManager.shared
-        if AppContext.shared.isDebugMode == false {
-            manager.defaultSetting()
-        }
-        return manager
-    }()
+    let agoraKitManager = ShowAgoraKitManager.shared
     
     fileprivate var roomVCMap: [String: ShowLiveViewController] = [:]
     

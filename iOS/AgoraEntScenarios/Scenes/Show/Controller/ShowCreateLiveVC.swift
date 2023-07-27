@@ -12,16 +12,6 @@ class ShowCreateLiveVC: UIViewController {
 
     private var createView: ShowCreateLiveView!
     private var localView: UIView!
-    
-    lazy var agoraKitManager: ShowAgoraKitManager = {
-        let manager = ShowAgoraKitManager.shared
-        if AppContext.shared.isDebugMode {
-            manager.debugDefaultBroadcastorSetting()
-        }else{
-            manager.defaultSetting()
-        }
-        return manager
-    }()
         
     private lazy var beautyVC = ShowBeautySettingVC()
     
@@ -34,7 +24,7 @@ class ShowCreateLiveVC: UIViewController {
         setUpUI()
         configNaviBar()
         
-        agoraKitManager.startPreview(canvasView: self.localView)
+        ShowAgoraKitManager.shared.startPreview(canvasView: self.localView)
         ShowNetStateSelectViewController.showInViewController(self)
     }
     
@@ -62,7 +52,6 @@ class ShowCreateLiveVC: UIViewController {
     }
     
     private func setUpUI() {
-        
         // 画布
         localView = UIView()
         view.addSubview(localView)
@@ -94,7 +83,7 @@ class ShowCreateLiveVC: UIViewController {
     private func showPreset() {
         if AppContext.shared.isDebugMode {
             let vc = ShowPresettingVC()
-            vc.didSelectedPresetType = {[weak self] type, modeName in
+            vc.didSelectedPresetType = { type, modeName in
                 var level = ShowAgoraKitManager.DeviceLevel.medium
                 switch type {
                 case .show_low:     level = .low
@@ -113,7 +102,7 @@ class ShowCreateLiveVC: UIViewController {
     
     @objc func didClickCancelButton(){
         BeautyManager.shareManager.destroy()
-        agoraKitManager.cleanCapture()
+        ShowAgoraKitManager.shared.cleanCapture()
         dismiss(animated: true)
     }
 }
@@ -131,29 +120,12 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     }
     
     func onClickCameraBtnAction() {
-//        agoraKit?.switchCamera()
-        agoraKitManager.switchCamera()
+        ShowAgoraKitManager.shared.switchCamera()
     }
     
     func onClickBeautyBtnAction() {
         createView.hideBottomViews = true
         present(beautyVC, animated: true)
-    }
-    
-    func onClickQualityBtnAction() {
-        createView.hideBottomViews = true
-        let vc = ShowSelectQualityVC()
-//        vc.defalutSelectIndex = selectedResolution
-        present(vc, animated: true)
-        vc.dismissed = { [weak self] in
-            self?.createView.hideBottomViews = false
-        }
-        vc.selectedItem = {[weak self] resolution,index in
-            guard let wSelf = self else { return }
-//            wSelf.selectedResolution = index
-//            wSelf.agoraKitManager.setCaptureVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
-            wSelf.agoraKitManager.selectCaptureVideoDimensions(index: index)
-        }
     }
     
     func onClickStartBtnAction() {
@@ -177,7 +149,6 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
 //            liveVC.agoraKit = self?.agoraKitManager.agoraKit
             guard let wSelf = self, let detailModel = detailModel else { return }
             let liveVC = ShowLivePagesViewController()
-            liveVC.agoraKitManager = wSelf.agoraKitManager
             liveVC.roomList = [detailModel]
 //            liveVC.selectedResolution = wSelf.selectedResolution
             liveVC.focusIndex = liveVC.roomList?.firstIndex(where: { $0.roomId == roomId }) ?? 0

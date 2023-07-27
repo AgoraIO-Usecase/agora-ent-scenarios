@@ -952,7 +952,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
                 self?.dismiss(animated: true)
             }
         }else {
-            leaveRoom()
+            updateLoadingType(playState: .none)
             dismiss(animated: true)
         }
     }
@@ -1059,24 +1059,6 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
             } else {
                 ShowAgoraKitManager.shared.engine?.startPreview()
             }
-        }
-    }
-    
-    // 画质
-    func onClickHDButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-        settingMenuVC.dismiss(animated: false)
-        
-        let vc = ShowSelectQualityVC()
-//        vc.defalutSelectIndex = selectedResolution
-        present(vc, animated: false)
-        vc.dismissed = { [weak self] in
-            guard let wSelf = self else { return }
-            wSelf.present(wSelf.settingMenuVC, animated: false)
-        }
-        vc.selectedItem = {[weak self] resolution,index in
-//            wSelf.selectedResolution = index
-//            wSelf.agoraKitManager.setCaptureVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
-            ShowAgoraKitManager.shared.selectCaptureVideoDimensions(index: index)
         }
     }
     

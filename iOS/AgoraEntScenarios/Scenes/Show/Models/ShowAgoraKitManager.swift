@@ -440,7 +440,7 @@ class ShowAgoraKitManager {
         guard let engine = engine,
               let connection = exConnectionMap[channelId] else { return }
         let depMap: [String: ShowRoomRTCPlayState]? = exConnectionDeps[channelId]
-        guard let m = depMap, m.count != 0 else {
+        guard depMap?.count ?? 0 == 0 else {
             showLogger.info("leaveChannelEx break, depcount: \(depMap?.count ?? 0), roomId: \(roomId), channelId: \(channelId)", context: kShowLogBaseContext)
             return
         }
