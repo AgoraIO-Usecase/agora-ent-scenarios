@@ -1,19 +1,19 @@
 //
-//  VideoLoaderApiProxy.m
+//  VideoLoaderProxy.m
 //  VideoLoaderAPI
 //
 //  Created by wushengtao on 2023/7/27.
 //
 
 #import <objc/runtime.h>
-#import "VideoLoaderApiProxy.h"
+#import "VideoLoaderProxy.h"
 
-@interface VideoLoaderApiProxy ()
+@interface VideoLoaderProxy ()
 @property(nonatomic, strong) NSHashTable* listeners;
 
 @end
 
-@implementation VideoLoaderApiProxy
+@implementation VideoLoaderProxy
 
 - (instancetype)init {
     if (self = [super init]) {

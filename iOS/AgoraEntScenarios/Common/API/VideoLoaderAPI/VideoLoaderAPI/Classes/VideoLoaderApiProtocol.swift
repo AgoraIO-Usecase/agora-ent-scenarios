@@ -16,7 +16,6 @@ import AgoraRtcKit
 }
 
 
-
 /// 初始化配置信息
 public class VideoLoaderConfig: NSObject {
     public var rtcEngine: AgoraRtcEngineKit!    //rtc engine实例
@@ -37,11 +36,11 @@ public class VideoCanvasContainer: NSObject {
 //    public var renderMode: Int = Constants.RENDER_MODE_HIDDEN
 }
 
-@objc public protocol VideoLoaderApiListenerProtocol: NSObjectProtocol {
-    
+@objc public protocol IVideoLoaderApiListener: NSObjectProtocol {
+    @objc optional func onStateDidChange(newState: RoomStatus, oldState: RoomStatus, channelName: String)
 }
 
-@objc public protocol VideoLoaderApiProtocol: NSObjectProtocol {
+@objc public protocol IVideoLoaderApi: NSObjectProtocol {
     
     /// 初始化配置
     /// - Parameters:
@@ -72,4 +71,20 @@ public class VideoCanvasContainer: NSObject {
     
     /// 清除缓存
     func cleanCache()
+    
+    /// 添加api代理
+    /// - Parameter listener: <#listener description#>
+    func addListener(listener: IVideoLoaderApiListener)
+    
+    /// 移除api代理
+    /// - Parameter listener: <#listener description#>
+    func removeListener(listener: IVideoLoaderApiListener)
+    
+    /// 添加RTC代理
+    /// - Parameter listener: <#listener description#>
+    func addRTCListener(listener: AgoraRtcEngineDelegate)
+    
+    /// 移除RTC代理
+    /// - Parameter listener: <#listener description#>
+    func removeRTCListener(listener: AgoraRtcEngineDelegate)
 }

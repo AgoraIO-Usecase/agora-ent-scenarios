@@ -1,5 +1,5 @@
 //
-//  VideoLoaderApiProxy.h
+//  VideoLoaderProxy.h
 //  VideoLoaderAPI
 //
 //  Created by wushengtao on 2023/7/27.
@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VideoLoaderApiProxy : NSObject
+@interface VideoLoaderProxy : NSObject
 @property(nonatomic, weak) id<NSObject> delegate;
 
 - (void)addListener:(id <NSObject>)listener;

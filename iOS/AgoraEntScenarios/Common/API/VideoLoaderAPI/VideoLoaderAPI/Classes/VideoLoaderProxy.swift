@@ -8,5 +8,8 @@
 import Foundation
 import AgoraRtcKit
 
-class VideoLoaderAgoraExProxy: VideoLoaderApiProxy, AgoraRtcEngineDelegate {
+class VideoLoaderAgoraExProxy: VideoLoaderProxy, AgoraRtcEngineDelegate {
+}
+
+class VideoLoaderApiProxy: VideoLoaderProxy, IVideoLoaderApiListener {
 }
