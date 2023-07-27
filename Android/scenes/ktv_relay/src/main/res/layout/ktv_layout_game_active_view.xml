@@ -30,7 +30,7 @@
         android:text="1/5"
         android:textColor="@color/white"
         android:textSize="10sp"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="6dp"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toEndOf="@+id/tvSongTab"
         app:layout_constraintTop_toTopOf="parent" />
@@ -46,6 +46,48 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/winnerTips"
+        android:layout_width="170dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="6dp"
+        android:orientation="horizontal"
+        android:background="@drawable/ktv_relay_game_winner_bg"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@+id/tvSongNumTab"
+        app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/ktv_relay_winner_pic"
+            android:layout_gravity="center"
+            android:layout_marginStart="2dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="3dp"
+            android:text="下轮由"
+            android:textSize="12dp"
+            android:textColor="@color/white"/>
+        <ImageView
+            android:id="@+id/ivWinnerHeader"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="3dp"
+            tools:background="@mipmap/ktv_ic_song_default"/>
+        <TextView
+            android:id="@+id/ivWinnerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="3dp"
+            android:text="xxx 演唱"
+            android:textSize="12dp"
+            android:textColor="@color/white"/>
+    </LinearLayout>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/messageText"
