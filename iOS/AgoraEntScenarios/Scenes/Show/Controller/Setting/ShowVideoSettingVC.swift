@@ -17,11 +17,10 @@ class ShowVideoSettingVC: UIViewController {
     
     private let transDelegate = ShowPresentTransitioningDelegate()
     
-    var isOutside = true // 频道外
     var dataArray = [ShowSettingKey]()
     
     var musicManager: ShowMusicManager!
-    var willChangeSettingParams: ((_ key: ShowSettingKey, _ value: Any)->Bool)?
+    
     var currentChannelId: String?
     
     private lazy var tableView: UITableView = {
@@ -66,11 +65,7 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
         let data = dataArray[indexPath.row]
         if data.type == .aSwitch {
             let cell = tableView.dequeueReusableCell(withIdentifier: SwitchCellID, for: indexPath) as! ShowSettingSwitchCell
-            var enable = true
-            if data == .H265 || data == .PVC {
-                enable = isOutside
-            }
-            cell.setTitle(data.title,enable:enable, isOn: data.boolValue) {[weak self] isOn in
+            cell.setTitle(data.title, enable: true, isOn: data.boolValue) {[weak self] isOn in
                 self?.changeValue(isOn, forSettingKey: data)
             } detailButtonAction: {[weak self] in
                 self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
@@ -135,15 +130,33 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
 
 extension ShowVideoSettingVC {
     func changeValue(_ value: Any, forSettingKey key: ShowSettingKey) {
-        if let willChange = willChangeSettingParams, willChange(key,value) == true {
+        if ShowAgoraKitManager.shared.rtcParam.suggested {
+            ShowAgoraKitManager.shared.rtcParam.suggested = false
+            let alert = UIAlertController(title: "show_presetting_alert_will_change_value_title".show_localized, message: "show_presetting_alert_will_change_value_message".show_localized, preferredStyle: .alert)
+            let submit = UIAlertAction(title: "show_alert_confirm_btn_title".show_localized, style: .default) { _ in
+                key.writeValue(value)
+                if key == .musincVolume {
+                    self.musicManager.setMusicVolume(value as! Float)
+                } else {
+                    ShowAgoraKitManager.shared.updateSettingForkey(key, currentChannelId: self.currentChannelId)
+                }
+                self.tableView.reloadData()
+            }
+            let cancel = UIAlertAction(title: "show_alert_cancel_btn_title".show_localized, style: .cancel) { _ in
+                self.tableView.reloadData()
+            }
+            alert.addAction(submit)
+            alert.addAction(cancel)
+            present(alert, animated: true, completion: nil)
+        } else {
             key.writeValue(value)
             if key == .musincVolume {
                 musicManager.setMusicVolume(value as! Float)
-            }else{
+            } else {
                 ShowAgoraKitManager.shared.updateSettingForkey(key, currentChannelId: currentChannelId)
             }
+            tableView.reloadData()
         }
-        tableView.reloadData()
     }
 }
 // MARK: - ShowSettingSliderCellDelegate
@@ -154,15 +167,13 @@ extension ShowVideoSettingVC: ShowSettingSliderCellDelegate {
             self.changeValue(0, forSettingKey: ShowSettingKey.videoBitRate)
         } else {
             // 根据机型设置码率
-            switch ShowAgoraKitManager.shared.broadcastorMachineType {
+            switch ShowAgoraKitManager.shared.deviceLevel {
             case .low:
                 self.changeValue(1461, forSettingKey: ShowSettingKey.videoBitRate)
             case .medium:
                 self.changeValue(1800, forSettingKey: ShowSettingKey.videoBitRate)
             case .high:
                 self.changeValue(2099, forSettingKey: ShowSettingKey.videoBitRate)
-            default:
-                return
             }
         }
         tableView.reloadData()

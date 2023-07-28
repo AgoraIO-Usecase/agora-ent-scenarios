@@ -147,16 +147,6 @@ class BeautyManager: NSObject {
         }
     }
     
-    func processFrame(pixelBuffer: CVPixelBuffer?) -> CVPixelBuffer? {
-        switch BeautyModel.beautyType {
-        case .byte:
-            return ByteBeautyManager.shareManager.processFrame(pixelBuffer: pixelBuffer)
-            
-        case .sense:
-            return SenseBeautyManager.shareManager.processFrame(pixelBuffer: pixelBuffer)
-        }
-    }
-    
     func destroy() {
         switch BeautyModel.beautyType {
         case .byte:

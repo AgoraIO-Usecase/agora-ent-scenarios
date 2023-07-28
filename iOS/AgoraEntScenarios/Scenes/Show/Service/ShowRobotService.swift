@@ -20,7 +20,7 @@ class ShowRobotService {
         "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/release/show/video/bot5.mp4",
         "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/release/show/video/bot6.mp4"
     ]
-    private let robotRoomIds = ["4", "5", "6"]
+    private let robotRoomIds = ["1", "2", "3"]
     private let robotRoomOwnerHeaders = [
         "https://download.agora.io/demo/release/bot1.png"
     ]

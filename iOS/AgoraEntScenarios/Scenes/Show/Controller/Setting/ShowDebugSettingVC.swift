@@ -81,8 +81,6 @@ class ShowDebugSettingVC: UIViewController {
     private func createBroadcastorDataArray() -> [Any] {
         let settingManager = ShowAgoraKitManager.shared
         return [
-            settingManager.debug1TFModelForKey(.captureFrameRate),
-            settingManager.debug2TFModelForKey(.captureVideoSize),
             settingManager.debug1TFModelForKey(.encodeFrameRate),
             settingManager.debug2TFModelForKey(.encodeVideoSize),
             settingManager.debug1TFModelForKey(.bitRate),
@@ -118,7 +116,7 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
         let model = dataArray[indexPath.row]
         if let tf1Model = model as? ShowDebug1TFModel {
             let cell = tableView.dequeueReusableCell(withIdentifier: Debug1TFCellID, for: indexPath) as! ShowDebugSetting1TFCell
-            cell.setTitle(tf1Model.title, value: tf1Model.tfText, unit: tf1Model.unitText) {[weak self] textField in
+            cell.setTitle(tf1Model.title, value: tf1Model.tfText, unit: tf1Model.unitText) { textField in
                 tf1Model.tfText = textField.text
                 ShowAgoraKitManager.shared.updateDebugProfileFor1TFMode(tf1Model)
             } beginEditing: {
@@ -129,10 +127,10 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
         
         if let tf2Model = model as? ShowDebug2TFModel {
             let cell = tableView.dequeueReusableCell(withIdentifier: Debug2TFCellID, for: indexPath) as! ShowDebugSetting2TFCell
-            cell.setTitle(tf2Model.title, value1: tf2Model.tf1Text, value2: tf2Model.tf2Text, separator: tf2Model.separatorText) {[weak self] textField in
+            cell.setTitle(tf2Model.title, value1: tf2Model.tf1Text, value2: tf2Model.tf2Text, separator: tf2Model.separatorText) { textField in
                 tf2Model.tf1Text = textField.text
                 ShowAgoraKitManager.shared.updateDebugProfileFor2TFModel(tf2Model)
-            } tf2DidEndEditing: { [weak self] textField in
+            } tf2DidEndEditing: { textField in
                 tf2Model.tf2Text = textField.text
                 ShowAgoraKitManager.shared.updateDebugProfileFor2TFModel(tf2Model)
             } beginEditing: {
@@ -161,7 +159,7 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
                 vc.title = data.title
                 vc.defaultSelectedIndex = data.intValue
                 vc.dataArray = data.items
-                vc.didSelectedIndex = {[weak self] index in
+                vc.didSelectedIndex = { index in
                     data.writeValue(index)
                     ShowAgoraKitManager.shared.updateSettingForDebugkey(data)
                     tableView.reloadData()
