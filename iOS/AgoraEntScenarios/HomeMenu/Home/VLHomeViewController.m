@@ -12,6 +12,7 @@
 #import "VLToast.h"
 
 @import Pure1v1;
+@import ShowTo1v1;
 
 @interface VLHomeViewController ()<VLHomeViewDelegate>
 
@@ -79,7 +80,7 @@
 //        return;
 //    }
 
-    NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow", @"Pure1v1"];
+    NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow", @"Pure1v1", @"ShowTo1v1"];
     [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
     [[NetworkManager shared] reportDeviceInfoWithSceneName:sceneNames[tagValue]];
     [[NetworkManager shared] reportUserBehaviorWithSceneName:sceneNames[tagValue]];
@@ -109,6 +110,16 @@
             userInfo.userName = VLUserCenter.user.name;
             userInfo.avatar = VLUserCenter.user.headUrl;
             [Pure1v1Context showSceneWithViewController:self
+                                                  appId:KeyCenter.AppId
+                                         appCertificate:KeyCenter.Certificate
+                                               userInfo:userInfo];
+        } break;
+        case 5: {
+            ShowTo1v1UserInfo* userInfo = [ShowTo1v1UserInfo new];
+            userInfo.userId = VLUserCenter.user.id;
+            userInfo.userName = VLUserCenter.user.name;
+            userInfo.avatar = VLUserCenter.user.headUrl;
+            [ShowTo1v1Context showSceneWithViewController:self
                                                   appId:KeyCenter.AppId
                                          appCertificate:KeyCenter.Certificate
                                                userInfo:userInfo];
