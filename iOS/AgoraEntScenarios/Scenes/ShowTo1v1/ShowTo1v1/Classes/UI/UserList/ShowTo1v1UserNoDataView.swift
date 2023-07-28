@@ -28,7 +28,7 @@ class Pure1v1UserNoDataView: UIView {
         return imageView
     }()
     
-    private lazy var noDataDialogView: ShowTo1v1NoDataDialog = {
+    lazy var noDataDialogView: ShowTo1v1NoDataDialog = {
         let view = ShowTo1v1NoDataDialog()
         return view
     }()

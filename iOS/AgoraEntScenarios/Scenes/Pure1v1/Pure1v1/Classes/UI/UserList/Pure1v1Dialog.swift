@@ -84,7 +84,11 @@ class Pure1v1NoDataDialog: Pure1v1Dialog {
         label.textColor = .black
         label.numberOfLines = 0
         label.font = UIFont.systemFont(ofSize: 14)
-        label.text = "user_list_nodata_tips".pure1v1Localization()
+        let text = NSMutableAttributedString(string: "user_list_nodata_tips".pure1v1Localization())
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 5
+        text.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: text.length))
+        label.attributedText = text
         return label
     }()
     override func _loadSubView() {

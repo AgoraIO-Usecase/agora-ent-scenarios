@@ -72,6 +72,7 @@ class ShowTo1v1Dialog: UIView {
 
 //房间无人
 class ShowTo1v1NoDataDialog: ShowTo1v1Dialog {
+    var createClosure: (()->())?
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
@@ -79,34 +80,59 @@ class ShowTo1v1NoDataDialog: ShowTo1v1Dialog {
         label.text = "user_list_waitting".showTo1v1Localization()
         return label
     }()
+    private lazy var createButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.backgroundColor = UIColor(hexString: "#345DFF")
+        button.aui_size = CGSize(width: 175, height: 42)
+        button.layer.cornerRadius = button.aui_height / 2
+        button.clipsToBounds = true
+        button.setTitle("user_list_create_room".showTo1v1Localization(), for: .normal)
+        button.setImage(UIImage.sceneImage(name: "create_room"), for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.adjustHorizonAlign(spacing: 10)
+        button.addTarget(self, action: #selector(_createAction), for: .touchUpInside)
+        return button
+    }()
     private lazy var contentLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
         label.numberOfLines = 0
+        let text = NSMutableAttributedString(string: "user_list_nodata_tips".showTo1v1Localization())
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 5
+        text.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: text.length))
         label.font = UIFont.systemFont(ofSize: 14)
-        label.text = "user_list_nodata_tips".showTo1v1Localization()
+        label.attributedText = text
         return label
     }()
     override func _loadSubView() {
         super._loadSubView()
         contentView.addSubview(titleLabel)
         contentView.addSubview(contentLabel)
+        contentView.addSubview(createButton)
     }
     
     override func contentSize() -> CGSize {
-        return CGSize(width: self.width, height: 328)
+        return CGSize(width: self.width, height: 258)
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         
         titleLabel.sizeToFit()
-        titleLabel.aui_centerX = self.aui_width / 2
+        titleLabel.aui_centerX = contentView.aui_width / 2
         titleLabel.aui_top = 25
         
         contentLabel.aui_left = 30
-        contentLabel.aui_width = self.aui_width - 60
+        contentLabel.aui_width = contentView.aui_width - 60
         contentLabel.sizeToFit()
-        contentLabel.aui_top = titleLabel.aui_bottom + 40
+        contentLabel.aui_top = titleLabel.aui_bottom + 16
+        
+        createButton.aui_centerX = titleLabel.aui_centerX
+        createButton.aui_top = contentLabel.aui_bottom + 40
+    }
+    
+    @objc private func _createAction() {
+        createClosure?()
     }
 }
