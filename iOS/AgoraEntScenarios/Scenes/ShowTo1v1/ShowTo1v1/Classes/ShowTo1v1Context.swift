@@ -20,12 +20,12 @@ public class ShowTo1v1Context: NSObject {
                                  appId: String,
                                  appCertificate: String,
                                  userInfo: ShowTo1v1UserInfo) {
-//        let vc = Pure1v1UserListViewController()
-//        vc.userInfo = userInfo
-//        vc.appId = appId
-//        vc.appCertificate = appCertificate
-//        vc.hidesBottomBarWhenPushed = true
-//        viewController.navigationController?.pushViewController(vc, animated: true)
+        let vc = ShowTo1v1UserListViewController()
+        vc.userInfo = userInfo
+        vc.appId = appId
+        vc.appCertificate = appCertificate
+        vc.hidesBottomBarWhenPushed = true
+        viewController.navigationController?.pushViewController(vc, animated: true)
     }
     
 //    public static func 
