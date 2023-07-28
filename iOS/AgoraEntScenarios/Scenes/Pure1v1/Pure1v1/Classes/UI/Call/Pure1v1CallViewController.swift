@@ -24,6 +24,13 @@ class Pure1v1CallViewController: UIViewController {
                                      time: Int64(Date().timeIntervalSince1970 * 1000))
             
             smallCanvasView.aui_tl = CGPoint(x: view.aui_width - 25 - 109, y: 82 + UIDevice.current.aui_SafeDistanceTop)
+            roomInfoView.timerCallBack = {[weak self] duration in
+                if duration < 20 * 60 {
+                    return
+                }
+                self?.roomInfoView.setRoomInfo(avatar: nil, name: nil, id: nil, time: nil)
+                self?._hangupAction()
+            }
         }
     }
     private lazy var moveViewModel: MoveGestureViewModel = MoveGestureViewModel()

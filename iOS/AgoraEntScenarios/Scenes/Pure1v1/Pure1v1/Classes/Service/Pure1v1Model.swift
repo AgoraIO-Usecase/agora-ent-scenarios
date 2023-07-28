@@ -12,6 +12,7 @@ public class Pure1v1UserInfo: NSObject {
     public var userId: String = ""
     public var userName: String = ""
     public var avatar: String = ""
+    public var createdAt: Int64 = Int64(Date().timeIntervalSinceNow * 1000)
     
     var objectId: String = ""
     

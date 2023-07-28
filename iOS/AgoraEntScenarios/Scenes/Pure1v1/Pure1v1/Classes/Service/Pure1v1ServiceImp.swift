@@ -98,7 +98,7 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
 
                 let userList = results.map({ info in
                     return Pure1v1UserInfo.yy_model(withJSON: info.toJson())!
-                })
+                }).sorted {$0.createdAt < $1.createdAt}
                 self?.userList = userList
                 completion(userList)
             }, fail: { error in
@@ -151,10 +151,6 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
     
     func subscribeNetworkStatusChanged(with changedBlock: @escaping (Pure1v1ServiceNetworkStatus) -> Void) {
         self.networkDidChanged = changedBlock
-    }
-    
-    func subscribeRoomWillExpire(with changedBlock: @escaping () -> Void) {
-        self.roomExpiredDidChanged = changedBlock
     }
     
     func unsubscribeAll() {
