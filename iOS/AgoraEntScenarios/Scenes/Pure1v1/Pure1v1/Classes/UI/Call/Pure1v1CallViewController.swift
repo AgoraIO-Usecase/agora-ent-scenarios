@@ -22,13 +22,15 @@ class Pure1v1CallViewController: UIViewController {
                                      name: targetUser?.userName ?? "",
                                      id: targetUser?.userId ?? "",
                                      time: Int64(Date().timeIntervalSince1970 * 1000))
+            
+            smallCanvasView.aui_tl = CGPoint(x: view.aui_width - 25 - 109, y: 82 + UIDevice.current.aui_SafeDistanceTop)
         }
     }
     private lazy var moveViewModel: MoveGestureViewModel = MoveGestureViewModel()
     private lazy var roomInfoView: Pure1v1RoomInfoView = Pure1v1RoomInfoView()
     lazy var bigCanvasView: UIView = UIView()
     lazy var smallCanvasView: UIView = {
-        let view = UIView()
+        let view = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 109, height: 163)))
         view.backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
         view.addGestureRecognizer(moveViewModel.gesture)
         return view
@@ -73,7 +75,6 @@ class Pure1v1CallViewController: UIViewController {
         moveViewModel.touchArea = view.bounds
         roomInfoView.frame = CGRect(x: 15, y: UIDevice.current.aui_SafeDistanceTop, width: 202, height: 40)
         bigCanvasView.frame = view.bounds
-        smallCanvasView.frame = CGRect(x: view.aui_width - 25 - 109, y: 82 + UIDevice.current.aui_SafeDistanceTop, width: 109, height: 163)
         smallCanvasView.layer.cornerRadius = 20
         smallCanvasView.clipsToBounds = true
         
