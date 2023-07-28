@@ -127,6 +127,8 @@ extension Pure1v1UserListViewController {
     }
     
     private func _call(user: Pure1v1UserInfo) {
+        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
+        AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         callApi.call(roomId: user.userId, remoteUserId: UInt(user.userId)!) { err in
             
         }
@@ -200,6 +202,9 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                                 return
                             }
                             let rtcToken = tokens[AgoraTokenType.rtc.rawValue]!
+                            
+                            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
+                            AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
                             self.callApi.accept(roomId: fromRoomId, remoteUserId: fromUserId, rtcToken: rtcToken) { err in
                             }
                         }
