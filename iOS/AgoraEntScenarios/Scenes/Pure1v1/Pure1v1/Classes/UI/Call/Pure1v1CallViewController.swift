@@ -14,8 +14,13 @@ class Pure1v1CallViewController: UIViewController {
         didSet {
             oldValue?.removeListener(listener: self)
             callApi?.addListener(listener: self)
+            oldValue?.removeRTCListener?(listener: self)
+            callApi?.addRTCListener?(listener: self)
         }
     }
+    var appId: String = ""
+    var rtcEngine: AgoraRtcEngineKit?
+    var currentUser: Pure1v1UserInfo?
     var targetUser: Pure1v1UserInfo? {
         didSet {
             roomInfoView.setRoomInfo(avatar: targetUser?.avatar ?? "",
@@ -90,8 +95,6 @@ class Pure1v1CallViewController: UIViewController {
         hangupButton.aui_size = CGSize(width: 70, height: 70)
         hangupButton.aui_bottom = self.view.aui_height - 20 - UIDevice.current.aui_SafeDistanceBottom
         hangupButton.aui_centerX = self.view.aui_width / 2
-        
-        callApi?.addRTCListener?(listener: self)
     }
     
     @objc private func _hangupAction() {
@@ -210,6 +213,22 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
                                 eventReason: String,
                                 elapsed: Int,
                                 eventInfo: [String : Any]) {
+            let publisher = eventInfo[kPublisher] as? String ?? currentUser?.userId
+            guard publisher == currentUser?.userId else {
+                return
+            }
+            
+            switch state {
+            case .connected:
+//                guard let connection = eventInfo[kConnection] as? AgoraRtcConnection else {
+//                    return
+//                }
+//                setupContentInspectConfig(true, connection: connection)
+//                moderationAudio()
+                break
+            default:
+                break
+            }
         }
         
         func onCallEventChanged(with event: CallEvent, elapsed: Int) {
@@ -221,4 +240,48 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
                 break
             }
         }
+}
+
+extension Pure1v1CallViewController {
+    private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
+        let config = AgoraContentInspectConfig()
+        let dic: [String: String] = [
+            "id": currentUser?.userId ?? "",
+            "sceneName": "show",
+            "userNo": currentUser?.userId ?? ""
+        ]
+        
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
+            pure1v1Error("setupContentInspectConfig fail")
+            return
+        }
+        let jsonStr = String(data: jsonData, encoding: .utf8)
+        config.extraInfo = jsonStr
+        let module = AgoraContentInspectModule()
+        module.interval = 30
+        module.type = .imageModeration
+        config.modules = [module]
+        let ret = rtcEngine?.enableContentInspectEx(enable, config: config, connection: connection)
+        pure1v1Print("setupContentInspectConfig: \(ret ?? -1)")
+    }
+    
+    /// 语音审核
+    private func moderationAudio() {
+        let userInfo = ["id": currentUser?.userId ?? "",
+                        "sceneName": "show",
+                        "userNo": currentUser?.userId ?? "",
+                        "userName": currentUser?.userName ?? ""] as NSDictionary
+        let parasm: [String: Any] = ["appId": appId,
+                                     "channelName": targetUser?.userId ?? "",
+                                     "channelType": AgoraChannelProfile.liveBroadcasting.rawValue,
+                                     "traceId": NSString.withUUID().md5(),
+                                     "src": "iOS",
+                                     "payload": userInfo.yy_modelToJSONString()]
+        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/moderation/audio",
+                                          params: parasm) { response in
+            pure1v1Print("moderationAudio response === \(response)")
+        } failure: { errr in
+            pure1v1Error(errr)
+        }
+    }
 }
