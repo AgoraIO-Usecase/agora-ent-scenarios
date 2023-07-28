@@ -20,6 +20,7 @@ class Pure1v1UserListViewController: UIViewController {
     private var connectedUserId: UInt?
     private lazy var callVC: Pure1v1CallViewController = {
         let vc = Pure1v1CallViewController()
+        vc.modalPresentationStyle = .fullScreen
         vc.callApi = callApi
         return vc
     }()
@@ -251,14 +252,11 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 return
             }
             callVC.targetUser = user
-            navigationController?.pushViewController(callVC, animated: false)
+            present(callVC, animated: false)
             break
         case .prepared:
             switch stateReason {
-            case .localHangup, .remoteHangup:
-                if navigationController?.viewControllers.last == callVC {
-                    navigationController?.popViewController(animated: false)
-                }
+            case .remoteHangup:
                 AUIToast.show(text: "call_toast_hangup".pure1v1Localization())
 //            case .localRejected, .remoteRejected:
 //                AUIToast.show(text: "通话被拒绝")

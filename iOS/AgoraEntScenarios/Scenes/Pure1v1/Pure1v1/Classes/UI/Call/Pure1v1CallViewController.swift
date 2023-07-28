@@ -91,6 +91,10 @@ class Pure1v1CallViewController: UIViewController {
         callApi?.hangup(roomId: targetUser?.getRoomId() ?? "", completion: { err in
         })
     }
+    
+    private func _goBack() {
+        dismiss(animated: false)
+    }
 }
 
 extension Pure1v1CallViewController: Pure1v1RoomBottomBarDelegate {
@@ -209,6 +213,9 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
             switch event {
             case .localLeave, .remoteLeave:
                 _hangupAction()
+                _goBack()
+            case .localHangup, .remoteHangup:
+                _goBack()
             default:
                 break
             }
