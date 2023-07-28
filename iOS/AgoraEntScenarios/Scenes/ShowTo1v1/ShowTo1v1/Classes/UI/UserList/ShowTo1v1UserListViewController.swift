@@ -25,7 +25,13 @@ class ShowTo1v1UserListViewController: UIViewController {
     private let callApi = CallApiImpl()
     private lazy var naviBar: ShowTo1v1NaviBar = ShowTo1v1NaviBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.aui_width, height: 44))
     private lazy var service: ShowTo1v1ServiceProtocol = Pure1v1ServiceImp(appId: appId, user: userInfo)
-    private lazy var noDataView: Pure1v1UserNoDataView = Pure1v1UserNoDataView(frame: self.view.bounds)
+    private lazy var noDataView: Pure1v1UserNoDataView = {
+        let view = Pure1v1UserNoDataView(frame: self.view.bounds)
+        view.noDataDialogView.createClosure = {[weak self] in
+            
+        }
+        return view
+    }()
     private lazy var listView: ShowTo1v1UserPagingListView = {
         let listView = ShowTo1v1UserPagingListView(frame: self.view.bounds)
         listView.callClosure = { [weak self] user in
