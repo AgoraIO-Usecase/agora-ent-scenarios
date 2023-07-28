@@ -270,6 +270,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
 //            AUIAlertManager.hiddenView()
             connectedUserId = nil
             callDialog?.hiddenAnimation()
+            callVC.dismiss(animated: false)
             break
         case .failed:
 //            AUIToast.show(text: eventReason, postion: .bottom)
