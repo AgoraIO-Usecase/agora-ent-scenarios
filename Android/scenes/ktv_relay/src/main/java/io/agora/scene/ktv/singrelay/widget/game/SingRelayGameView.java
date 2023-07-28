@@ -100,6 +100,7 @@ public class SingRelayGameView extends FrameLayout {
                 mBinding.ilIDLE.messageText.setVisibility(View.GONE);
                 mBinding.ilIDLE.tvSongTab.setVisibility(View.GONE);
                 mBinding.ilIDLE.ivGameTips.setVisibility(View.GONE);
+                mBinding.ilActive.tvSongNumTab.setText(partNum + "/5");
                 mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
             }
         }.start();
@@ -151,6 +152,7 @@ public class SingRelayGameView extends FrameLayout {
     public void onBattleGamePrepare(boolean isWinner) {
         KTVLogger.d(TAG, "onBattleGamePrepare");
         if (mBinding == null) return;
+        mBinding.ilActive.lrcControlView.onGraspDisable();
         if (isWinner) {
             mBinding.ilActive.messageText.setText("下段演唱即将开始，准备演唱");
         } else {
@@ -167,7 +169,7 @@ public class SingRelayGameView extends FrameLayout {
     public void onGraspSongBegin() {
         if (mBinding == null) return;
         partNum ++;
-        mBinding.ilActive.tvSongNumTab.setText( partNum + "/5");
+        mBinding.ilActive.tvSongNumTab.setText(partNum + "/5");
         if (partNum != 5) {
             mBinding.ilActive.lrcControlView.onGraspEnable();
         }

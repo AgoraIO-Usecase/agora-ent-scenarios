@@ -219,11 +219,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.singRelay.setBackgroundResource(R.mipmap.ktv_start_grasp);
     }
 
-    public void startTimerCount() {
-        startTimer();
-    }
-
-
     private boolean isMineOwner = false;
 
     public void onPrepareStatus(boolean isMineOwner) {
@@ -342,12 +337,14 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         params.bottomToTop = R.id.bgd_control_layout_lrc;
         findViewById(R.id.lyricsView).requestLayout();
 
-        startTimer();
+        onGraspEnable();
     }
 
     public void onGraspEnable() {
         if (mBinding == null || !isOnSeat) return;
         mBinding.ilActive.singRelay.setVisibility(View.VISIBLE);
+        mBinding.ilActive.singRelay.setBackgroundResource(R.mipmap.ktv_start_grasp_press);
+        startTimer();
     }
 
     public void onGraspDisable() {
@@ -404,10 +401,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public void updateScore(double score, double cumulativeScore, double perfectScore) {
-        KTVLogger.d("hugo", "updateScore, score: " + score + " cumulativeScore: " + cumulativeScore + " perfectScore: " + totalScore);
-        mCumulativeScoreInPercentage = (int) ((cumulativeScore / totalScore) * 100);
+        KTVLogger.d("hugo", "updateScore, score: " + score + " cumulativeScore: " + cumulativeScore + " perfectScore: " + perfectScore);
+        mCumulativeScoreInPercentage = (int) ((cumulativeScore / perfectScore) * 100);
 
-        mBinding.gradeView.setScore((int) score, (int) cumulativeScore, (int) totalScore);
+        mBinding.gradeView.setScore((int) score, (int) cumulativeScore, (int) perfectScore);
 
         mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "" + (int) cumulativeScore));
         int gradeDrawable = mBinding.gradeView.getCumulativeDrawable();
@@ -680,7 +677,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
                                 if (mKaraokeView != null) {
                                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
-                                    dealWithBattleSong(lyricsModel);
                                     mKaraokeView.setLyricsData(lyricsModel);
                                 }
                             }
@@ -705,7 +701,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 if (mKaraokeView != null) {
                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
                     mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.INVISIBLE);
-                    dealWithBattleSong(lyricsModel);
                     mKaraokeView.setLyricsData(lyricsModel);
                 }
             }
@@ -720,20 +715,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         lrcUrl = null;
         mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
         mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
-    }
-
-    private int totalScore = 0;
-    private void dealWithBattleSong(LyricsModel lyricsModel) {
-        AtomicInteger lineCount = new AtomicInteger();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            lyricsModel.lines.forEach(line -> {
-                if (line.getStartTime() >= highStartTime && line.getEndTime() <= highEndTime) {
-                    lineCount.getAndIncrement();
-                }
-            });
-        }
-        totalScore = lineCount.get() * 100;
-        Log.d("hugo", "totalScore: " + totalScore);
     }
 
     public void onReceiveSingleLineScore(int score, int index, int cumulativeScore, int total) {
