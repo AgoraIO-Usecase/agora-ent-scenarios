@@ -16,12 +16,14 @@ class Pure1v1UserListViewController: UIViewController {
     var appCertificate: String = ""
     var userInfo: Pure1v1UserInfo?
     
+    private lazy var rtcEngine = _createRtcEngine()
     private var callState: CallStateType = .idle
     private var connectedUserId: UInt?
     private lazy var callVC: Pure1v1CallViewController = {
         let vc = Pure1v1CallViewController()
         vc.modalPresentationStyle = .fullScreen
         vc.callApi = callApi
+        vc.appId = appId
         return vc
     }()
     private let callApi = CallApiImpl()
@@ -99,7 +101,7 @@ extension Pure1v1UserListViewController {
         config.appId = appId
         config.userId = UInt(userInfo?.userId ?? "")!
         config.autoAccept = false
-        config.rtcEngine = _createRtcEngine()
+        config.rtcEngine = rtcEngine
         config.localView = callVC.smallCanvasView
         config.remoteView = callVC.bigCanvasView
         
@@ -137,6 +139,7 @@ extension Pure1v1UserListViewController {
 
 extension Pure1v1UserListViewController {
     @objc func _backAction() {
+        AgoraRtcEngineKit.destroy()
         callApi.deinitialize {
         }
         service.leaveRoom { err in
@@ -256,6 +259,9 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 assert(false, "user not fount")
                 return
             }
+            
+            callVC.rtcEngine = rtcEngine
+            callVC.currentUser = userInfo
             callVC.targetUser = user
             present(callVC, animated: false)
             break

@@ -156,7 +156,7 @@ public class CallApiImpl: NSObject {
     public override init() {
         super.init()
         callPrint("init-- CallApiImpl")
-        rtcProxy.addListener(self)
+        addRTCListener(listener: self)
     }
     
     private func _messageDic(action: CallAction) -> [String: Any] {

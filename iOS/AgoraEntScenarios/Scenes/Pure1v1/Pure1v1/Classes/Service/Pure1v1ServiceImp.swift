@@ -17,6 +17,10 @@ func pure1v1Warn(_ message: String) {
     print("[Pure1v1][Warning]\(message)")
 }
 
+func pure1v1Error(_ message: String) {
+    print("[Pure1v1][Error]\(message)")
+}
+
 
 private func mainTreadTask(_ task: (()->())?){
     if Thread.isMainThread {
