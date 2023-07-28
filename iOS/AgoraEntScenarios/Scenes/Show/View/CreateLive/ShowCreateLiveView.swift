@@ -10,7 +10,6 @@ import UIKit
 protocol ShowCreateLiveViewDelegate: NSObjectProtocol {
     func onClickCameraBtnAction()
     func onClickBeautyBtnAction()
-    func onClickQualityBtnAction()
     func onClickSettingBtnAction()
     func onClickStartBtnAction()
 }
@@ -205,10 +204,6 @@ class ShowCreateLiveView: UIView {
         let beautyButton = createButton(imgName: "show_create_beauty", title: "create_button_beauty".show_localized)
         beautyButton.addTarget(self, action: #selector(didClickBeautyButton), for: .touchUpInside)
         
-        // 画质
-//        let qualityButton = createButton(imgName: "show_create_quality", title: "create_button_quality".show_localized)
-//        qualityButton.addTarget(self, action: #selector(didClickQualityButton), for: .touchUpInside)
-        
         // 设置
         let settingButton = createButton(imgName: "show_setting", title: "create_button_settings".show_localized)
         settingButton.addTarget(self, action: #selector(didClickSettingButton), for: .touchUpInside)
@@ -246,12 +241,6 @@ extension ShowCreateLiveView {
     @objc private func didClickBeautyButton(){
         delegate?.onClickBeautyBtnAction()
     }
-    
-    // 点击画质按钮
-    @objc private func didClickQualityButton(){
-        delegate?.onClickQualityBtnAction()
-    }
-    
     // 点击设置按钮
     @objc private func didClickSettingButton(){
         delegate?.onClickSettingBtnAction()

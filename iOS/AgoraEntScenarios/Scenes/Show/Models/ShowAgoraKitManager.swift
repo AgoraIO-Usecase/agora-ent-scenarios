@@ -56,8 +56,10 @@ class ShowAgoraKitManager {
     static var isOpenGreen: Bool = false
     static var isBlur: Bool = false
     
-    var srIsOn = false
-    var srType: SRType = .x1_33
+    public let rtcParam = ShowRTCParams()
+    public var deviceLevel: DeviceLevel = .medium
+    public var netCondition: NetCondition = .good
+    public var performanceMode: PerformanceMode = .smooth
     
     let videoEncoderConfig = AgoraVideoEncoderConfiguration()
     
@@ -262,6 +264,26 @@ class ShowAgoraKitManager {
         }
     }
     
+    // 耗时计算
+    private var callTimeStampsSaved: Date?
+    func callTimestampStart() {
+        print("callTimeStampsSaved  : start")
+        if callTimeStampsSaved == nil {
+            print("callTimeStampsSaved  : saved")
+            callTimeStampsSaved = Date()
+        }
+    }
+    
+    func callTimestampEnd() -> TimeInterval? {
+        print("callTimeStampsSaved  : end called")
+        guard let saved = callTimeStampsSaved else {
+            return nil
+        }
+        print("callTimeStampsSaved  : end value")
+        callTimeStampsSaved = nil
+        return -saved.timeIntervalSinceNow * 1000
+    }
+    
     //MARK: public sdk method
     /// 初始化并预览
     /// - Parameter canvasView: 画布
@@ -418,7 +440,7 @@ class ShowAgoraKitManager {
         guard let engine = engine,
               let connection = exConnectionMap[channelId] else { return }
         let depMap: [String: ShowRoomRTCPlayState]? = exConnectionDeps[channelId]
-        guard let m = depMap, m.count != 0 else {
+        guard depMap?.count ?? 0 == 0 else {
             showLogger.info("leaveChannelEx break, depcount: \(depMap?.count ?? 0), roomId: \(roomId), channelId: \(channelId)", context: kShowLogBaseContext)
             return
         }
@@ -614,7 +636,4 @@ extension ShowAgoraKitManager {
         }
     }
     
-    func setOffSuperResolution() {
-        setSuperResolutionOn(false)
-    }
 }

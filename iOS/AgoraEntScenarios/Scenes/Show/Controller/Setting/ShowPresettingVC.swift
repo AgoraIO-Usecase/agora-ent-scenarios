@@ -29,9 +29,9 @@ class ShowPresettingVC: UIViewController {
             return [showMode]
         }else {
             // 超分模式
-            let qualityMode = ShowPresettingModel(title: "show_presetting_mode_qulity_title".show_localized, desc: "show_presetting_mode_qulity_desc".show_localized,standard: .douyin, optionsArray: [.quality_low,.quality_medium,.quality_high])
+            let qualityMode = ShowPresettingModel(title: "show_presetting_mode_qulity_title".show_localized, desc: "show_presetting_mode_qulity_desc".show_localized,standard: .douyin, optionsArray: [.show_low,.show_medium,.show_high])
             // 基础模式
-            let baseMode = ShowPresettingModel(title: "show_presetting_mode_base_title".show_localized, desc: "show_presetting_mode_base_title".show_localized,standard: .douyin, optionsArray: [.base_low,.base_medium,.base_high])
+            let baseMode = ShowPresettingModel(title: "show_presetting_mode_base_title".show_localized, desc: "show_presetting_mode_base_title".show_localized,standard: .douyin, optionsArray: [.show_low,.show_medium,.show_high])
             return [qualityMode,baseMode]
         }
     }
@@ -97,16 +97,6 @@ class ShowPresettingVC: UIViewController {
             make.left.bottom.right.equalToSuperview()
             make.top.equalTo(headerView.snp.bottom)
         }
-        
-        if let selectedType = selectedType, isBroadcaster == false {
-            for (i, mode) in dataArray.enumerated() {
-                if let row = mode.optionsArray.firstIndex(of: selectedType) {
-                    self.modeName = mode.title
-                    let indexPath = IndexPath(row: row, section: i)
-                    self.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
-                }
-            }
-        }
     }
     
     @objc private func didClickCloseButton() {
@@ -143,6 +133,7 @@ extension ShowPresettingVC: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: ShowPresettingCellID, for: indexPath) as! ShowPresettingCell
         cell.selectionStyle = .none
         cell.setTitle(type.title, desc: type.iosInfo)
+        cell.aSelected = (selectedType == type)
         return cell
     }
     
@@ -161,6 +152,6 @@ extension ShowPresettingVC: UITableViewDelegate, UITableViewDataSource {
         let model = dataArray[indexPath.section]
         selectedType = model.optionsArray[indexPath.row]
         modeName = model.title
-//        selectedIndexPath = indexPath
+        tableView.reloadData()
     }
 }
