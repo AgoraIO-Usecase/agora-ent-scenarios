@@ -1514,4 +1514,16 @@ public class RoomLivingViewModel extends ViewModel {
             partNum = 4;
         }
     }
+
+    public boolean isNextRoundSinger() {
+        if (songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0].equals(UserManager.getInstance().getUser().id.toString())) {
+            return true;
+        } else {
+            if (isRoomOwner() && (songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") || !songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum)))) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
 }

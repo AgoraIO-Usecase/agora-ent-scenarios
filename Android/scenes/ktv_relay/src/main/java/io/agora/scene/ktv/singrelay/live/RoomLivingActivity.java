@@ -538,7 +538,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 }
             } else if (model.status == RoomLivingViewModel.GraspStatus.IDLE) {
                 getBinding().singRelayGameView.onGraspSongBegin();
-                if (roomLivingViewModel.songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0].equals(UserManager.getInstance().getUser().id.toString())) {
+                if (roomLivingViewModel.isNextRoundSinger()) {
                     getBinding().singRelayGameView.onNextPart(true);
                     roomLivingViewModel.toggleMic(true);
                 } else {

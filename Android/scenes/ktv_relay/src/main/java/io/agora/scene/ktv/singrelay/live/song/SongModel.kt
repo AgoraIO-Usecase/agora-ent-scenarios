@@ -78,7 +78,7 @@ object SongModel {
 
     private val song10 = ChooseSongInputModel(
             "这世界那么多人",
-            "6375711121105330",
+            "6654550267486590",
             "莫文蔚",
             "https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CJ1420010039.jpg",
             listOf(91000, 147000, 191000, 235000, 295000)
@@ -86,7 +86,7 @@ object SongModel {
 
     fun getRandomGameSong() : ChooseSongInputModel {
         val songList = listOf(song1, song2, song3, song4, song5, song6, song7, song8, song9, song10)
-        return songList[0]
+        return songList[(0..9).random()]
     }
 
     fun getSongPartListWithSongCode(songCode: String): List<Long> {
