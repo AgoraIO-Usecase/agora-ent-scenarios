@@ -29,7 +29,7 @@ private func mainTreadTask(_ task: (()->())?){
 }
 
 /// 房间内用户列表
-private let kSceneId = "pure1v1_3.0.0"
+private let kSceneId = "scene_1v1PrivateVideo_3.6.0"
 class Pure1v1ServiceImp: NSObject {
     private var appId: String = ""
     private var user: Pure1v1UserInfo?
