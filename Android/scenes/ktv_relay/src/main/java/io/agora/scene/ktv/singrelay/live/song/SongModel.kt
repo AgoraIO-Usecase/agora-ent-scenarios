@@ -22,7 +22,7 @@ object SongModel {
 
     private val song3 = ChooseSongInputModel(
             "天外来物",
-            "6388433023669520",
+            "6654550266760610",
             "薛之谦",
             "https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CJ1420004109.jpg",
             listOf(91000, 129000, 173000, 212000, 251000)
@@ -54,7 +54,7 @@ object SongModel {
 
     private val song7 = ChooseSongInputModel(
             "一路向北",
-            "6357555536291690",
+            "6654550232990700",
             "周杰伦",
             "https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/961979.jpg",
             listOf(90000, 118000, 194000, 222000, 262000)
@@ -62,7 +62,7 @@ object SongModel {
 
     private val song8 = ChooseSongInputModel(
             "天黑黑",
-            "6246262727285990",
+            "6625526604489740",
             "孙燕姿",
             "https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/147907.jpg",
             listOf(51000, 85000, 122000, 176000, 223000)

@@ -401,7 +401,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public void updateScore(double score, double cumulativeScore, double perfectScore) {
-        KTVLogger.d("hugo", "updateScore, score: " + score + " cumulativeScore: " + cumulativeScore + " perfectScore: " + perfectScore);
         mCumulativeScoreInPercentage = (int) ((cumulativeScore / perfectScore) * 100);
 
         mBinding.gradeView.setScore((int) score, (int) cumulativeScore, (int) perfectScore);

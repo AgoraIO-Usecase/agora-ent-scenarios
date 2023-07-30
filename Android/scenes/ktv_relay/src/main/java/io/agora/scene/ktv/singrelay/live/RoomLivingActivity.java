@@ -83,7 +83,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     private CommonDialog exitDialog;
     private UserLeaveSeatMenuDialog mUserLeaveSeatMenuDialog;
-    private SongDialog mChooseSongDialog;
 
     // 房间存活时间，单位ms
     private KtvCommonDialog timeUpExitDialog;
@@ -130,14 +129,14 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         if (roomLivingViewModel.isRoomOwner()) {
                             if (!item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                                 if (roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                    ToastUtils.showToast("正在游戏中，游戏结束后方可踢人下麦");
+                                    ToastUtils.showToast(R.string.ktv_gaming_seat_tip1);
                                     return;
                                 }
                                 showUserLeaveSeatMenuDialog(item);
                             }
                         } else if (item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                             if (roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                ToastUtils.showToast("正在游戏中，游戏结束后方可下麦");
+                                ToastUtils.showToast(R.string.ktv_gaming_seat_tip2);
                                 return;
                             }
                             showUserLeaveSeatMenuDialog(item);
@@ -147,7 +146,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
                         if (seatLocal == null || seatLocal.getSeatIndex() < 0) {
                             if (roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                ToastUtils.showToast("游戏进行中，请在下局游戏开始前上麦");
+                                ToastUtils.showToast(R.string.ktv_gaming_seat_tip3);
                                 return;
                             }
                             toggleAudioRun = () -> {
@@ -167,7 +166,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     binding.tvHC.setVisibility(View.GONE);
                     binding.tvRoomOwner.setVisibility(View.GONE);
                     binding.ivMute.setVisibility(View.GONE);
-                    binding.tvUserName.setText(String.valueOf(position + 1) + getString(R.string.ktv_seat_num));
+                    binding.tvUserName.setText(getString(R.string.ktv_seat_num, String.valueOf(position + 1)));
                     binding.flVideoContainer.removeAllViews();
                 } else {
                     binding.tvUserName.setText(item.getName());
@@ -327,14 +326,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
 
             @Override
-            public void onStartSing() {
-                getBinding().lrcControlView.setMusic(null);
-                roomLivingViewModel.onSongPlaying();
-                getBinding().lrcControlView.onGamingStatus();
-                mRoomSpeakerAdapter.notifyDataSetChanged();
-            }
-
-            @Override
             public void onGameEnd() {
                 getBinding().singRelayGameView.onGameEnd(roomLivingViewModel.getRankList());
                 if (roomLivingViewModel.isRoomOwner()) {
@@ -456,9 +447,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.onIdleStatus();
                 mRoomSpeakerAdapter.notifyDataSetChanged();
             }
-            if (mChooseSongDialog != null) {
-                mChooseSongDialog.resetChosenSongList(SongActionListenerImpl.transSongModel(models));
-            }
         });
         roomLivingViewModel.songPlayingLiveData.observe(this, model -> {
             if (model == null) {
@@ -491,6 +479,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.onPauseStatus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_LRC_RESET) {
                 getBinding().lrcControlView.getLyricsView().reset();
+                getBinding().lrcControlView.getLyricsView().reset();
                 //TODO
                 //getBinding().singRelayGameView.onSongFinish(0);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_START) {
@@ -498,10 +487,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_END) {
                 getBinding().lrcControlView.setEnabled(true);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_LEAVE) {
-                getBinding().singRelayGameView.onSongFinish(0);
-                if (roomLivingViewModel.isRoomOwner()) {
-                    roomLivingViewModel.changeMusic();
-                }
+                getBinding().singRelayGameView.onSongFinish();
             }
         });
 
@@ -561,13 +547,13 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     roomLivingViewModel.syncSingingAverageScore(sc);
                 }
 
-                getBinding().singRelayGameView.onSongFinish(sc);
+                getBinding().singRelayGameView.onSongFinish();
                 if (roomLivingViewModel.isRoomOwner()) {
                     roomLivingViewModel.changeMusic();
                 }
             } else {
                 //if (getBinding().lrcControlView.getRole() != LrcControlView.Role.Listener) return;
-                getBinding().singRelayGameView.onSongFinish(score.getScore());
+                getBinding().singRelayGameView.onSongFinish();
                 if (roomLivingViewModel.isRoomOwner()) {
                     roomLivingViewModel.changeMusic();
                 }
@@ -807,7 +793,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 public void onRightButtonClick() {
                     setDarkStatusIcon(isBlackDarkStatus());
                     roomLivingViewModel.toggleMic(false);
-                    getBinding().singRelayGameView.onSongFinish(0);
+                    getBinding().singRelayGameView.onSongFinish();
                     roomLivingViewModel.syncSingingAverageScore(0);
                     roomLivingViewModel.resetMusicStatus();
                     if (roomLivingViewModel.isRoomOwner()) {
