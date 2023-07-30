@@ -1,5 +1,6 @@
 package io.agora.scene.ktv.singrelay.widget.game;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
@@ -20,6 +21,9 @@ import io.agora.scene.ktv.singrelay.widget.lrcView.LrcControlView;
 import io.agora.scene.ktv.singrelay.widget.rankList.RankItem;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
+/**
+ * 游戲View
+ */
 public class SingRelayGameView extends FrameLayout {
 
     private final String TAG = "SingRelayGameView_LOG";
@@ -81,18 +85,20 @@ public class SingRelayGameView extends FrameLayout {
         if (mCountDownLatch != null) mCountDownLatch.cancel();
 
         mCountDownLatch = new CountDownTimer(5 * 1000, 999) {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onTick(long millisUntilFinished) {
                 int second = (int) (millisUntilFinished / 1000);
                 if (mBinding == null) return;
                 KTVLogger.d("hugo", "pig" + second);
                 if (second <= 3 && second >= 1) {
-                    mBinding.ilIDLE.messageText.setText("" + second);
+                    mBinding.ilIDLE.messageText.setText(String.valueOf(second));
                 } else if (second < 1) {
                     mBinding.ilIDLE.messageText.setText("Go");
                 }
             }
 
+            @SuppressLint("SetTextI18n")
             @Override
             public void onFinish() {
                 if (mBinding == null || mSingRelayGameEventListener == null) return;
@@ -113,13 +119,14 @@ public class SingRelayGameView extends FrameLayout {
         }
     }
 
+    // 注册游戏事件
     public void setSingRelayGameEventListener(OnSingRelayGameEventListener listener) {
         this.mSingRelayGameEventListener = listener;
     }
 
+    // 设置房主
     public void setIsRoomOwner(boolean isRoomOwner) {
         this.isRoomOwner = isRoomOwner;
-        //onGameWaitingStatus();
     }
 
     // 游戏等待
@@ -127,6 +134,8 @@ public class SingRelayGameView extends FrameLayout {
         KTVLogger.d(TAG, "onGameWaitingStatus");
         if (mBinding == null) return;
         mBinding.ilRank.setVisibility(GONE);
+        mBinding.ilIDLE.ivGameTips.setVisibility(View.VISIBLE);
+        mBinding.ilIDLE.tvSongTab.setVisibility(View.GONE);
         if (isRoomOwner) {
             mBinding.btGameAgain.setVisibility(GONE);
             mBinding.ilIDLE.messageText.setVisibility(GONE);
@@ -150,13 +159,13 @@ public class SingRelayGameView extends FrameLayout {
 
     // 下一段前提示
     public void onBattleGamePrepare(boolean isWinner) {
-        KTVLogger.d(TAG, "onBattleGamePrepare");
+        KTVLogger.d(TAG, "onBattleGamePrepare， isWinner: " + isWinner);
         if (mBinding == null) return;
         mBinding.ilActive.lrcControlView.onGraspDisable();
         if (isWinner) {
-            mBinding.ilActive.messageText.setText("下段演唱即将开始，准备演唱");
+            mBinding.ilActive.messageText.setText(R.string.ktv_next_round_singer_tips);
         } else {
-            mBinding.ilActive.messageText.setText("下段演唱即将开始，准备抢唱");
+            mBinding.ilActive.messageText.setText(R.string.ktv_next_round_listener_tips);
         }
         mBinding.ilActive.messageText.setVisibility(View.VISIBLE);
         mBinding.ilActive.messageText.bringToFront();
@@ -166,7 +175,9 @@ public class SingRelayGameView extends FrameLayout {
         }, 3000);
     }
 
+    @SuppressLint("SetTextI18n")
     public void onGraspSongBegin() {
+        KTVLogger.d(TAG, "onGraspSongBegin");
         if (mBinding == null) return;
         partNum ++;
         mBinding.ilActive.tvSongNumTab.setText(partNum + "/5");
@@ -177,7 +188,7 @@ public class SingRelayGameView extends FrameLayout {
 
     // 抢唱成功
     public void onGraspSongSuccess(String userName, String headUrl) {
-        KTVLogger.d(TAG, "onGraspSongSuccess， headUrl：" + headUrl);
+        KTVLogger.d(TAG, "onGraspSongSuccess， userName：" + userName);
         if (mBinding == null) return;
         mBinding.ilActive.lrcControlView.onGraspDisable();
         GlideApp.with(mBinding.getRoot())
@@ -188,7 +199,7 @@ public class SingRelayGameView extends FrameLayout {
         mBinding.ilActive.messageText.setText("");
         mBinding.ilActive.messageText.setVisibility(View.VISIBLE);
         mBinding.ilActive.messageText.bringToFront();
-        mBinding.ilActive.tvBattleResultName.setText(" " + userName + " 抢到麦");
+        mBinding.ilActive.tvBattleResultName.setText(getResources().getString(R.string.ktv_winner_tip, userName));
         mBinding.ilActive.tvBattleResultView.setVisibility(View.VISIBLE);
         mBinding.ilActive.tvBattleResultView.bringToFront();
 
@@ -197,7 +208,7 @@ public class SingRelayGameView extends FrameLayout {
                 .error(R.mipmap.userimage)
                 .transform(new CenterCropRoundCornerTransform(100))
                 .into(mBinding.ilActive.ivWinnerHeader);
-        mBinding.ilActive.ivWinnerName.setText(userName + " 演唱");
+        mBinding.ilActive.ivWinnerName.setText(getResources().getString(R.string.ktv_next_round_singer, userName));
         mBinding.ilActive.winnerTips.setVisibility(VISIBLE);
         mBinding.getRoot().postDelayed(() -> {
             if (mBinding == null) return;
@@ -230,7 +241,7 @@ public class SingRelayGameView extends FrameLayout {
     }
 
     // 歌曲演唱结束
-    public void onSongFinish(int score) {
+    public void onSongFinish() {
         KTVLogger.d(TAG, "onSongFinish");
         if (mBinding == null) return;
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
@@ -263,11 +274,6 @@ public class SingRelayGameView extends FrameLayout {
          * 抢唱-游戏开始
          */
         default void onGameStart() {}
-
-        /**
-         * 抢唱-开始演唱
-         */
-        default void onStartSing() {}
 
         /**
          * 抢唱-游戏结束
