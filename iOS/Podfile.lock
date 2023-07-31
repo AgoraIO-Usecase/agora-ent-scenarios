@@ -19,15 +19,15 @@ PODS:
   - AgoraLyricsScore (1.1.1-beta-3)
   - AgoraRtcEngine_iOS (1.0)
   - AgoraRtm_iOS (1.5.1)
-  - AgoraRtmKit2 (1.0)
   - AgoraSyncManager (2.0.8):
     - SocketRocket
+  - AgRtmKit2_Test (0.2.0)
   - Bugly (2.5.93)
   - BytedEffect (4.3.0):
     - SSZipArchive
   - CallAPI (0.1.0):
     - AgoraRtcEngine_iOS
-    - AgoraRtmKit2
+    - AgRtmKit2_Test
   - HWWeakTimer (1.0)
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
@@ -82,8 +82,8 @@ DEPENDENCIES:
   - AgoraLyricsScore (= 1.1.1-beta-3)
   - AgoraRtcEngine_iOS (from `libs`)
   - AgoraRtm_iOS (= 1.5.1)
-  - AgoraRtmKit2 (from `Rtm2`)
   - AgoraSyncManager (~> 2.0.8)
+  - AgRtmKit2_Test
   - Bugly (= 2.5.93)
   - BytedEffect (from `bytedEffect.podspec`)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
@@ -118,6 +118,7 @@ SPEC REPOS:
     - AgoraLyricsScore
     - AgoraRtm_iOS
     - AgoraSyncManager
+    - AgRtmKit2_Test
     - Bugly
     - HWWeakTimer
     - JXCategoryView
@@ -145,8 +146,6 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   AgoraRtcEngine_iOS:
     :path: libs
-  AgoraRtmKit2:
-    :path: Rtm2
   BytedEffect:
     :path: bytedEffect.podspec
   CallAPI:
@@ -163,11 +162,11 @@ SPEC CHECKSUMS:
   AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
   AgoraRtcEngine_iOS: 7af3b344c55059556eeb05dc748ff124c593d4fb
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
-  AgoraRtmKit2: b0ef21effc06a7841d16141072e6f0bd5d9c00bb
   AgoraSyncManager: 33b8ecf2cd80550f156612d6175a0b0ed1d48497
+  AgRtmKit2_Test: 92d6b7a5c9718089dc52686117b7e18b72de48df
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   BytedEffect: 74b0bd8150ff1ab9c443d210a7ff7eb49ad3da44
-  CallAPI: 5583ca0d14897cdef5735c2319d15aab206ef4ed
+  CallAPI: a86e31907a87d4fefa31eebdfb2a037e07a25e85
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
@@ -193,6 +192,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: cc8c82313f6129b040013cdaebc99b68d7bb7aa9
+PODFILE CHECKSUM: c927a6f3085706fca66b9070b1f00ce3050660dc
 
 COCOAPODS: 1.12.0
