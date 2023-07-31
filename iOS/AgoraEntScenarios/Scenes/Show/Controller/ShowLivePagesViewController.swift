@@ -114,7 +114,7 @@ extension ShowLivePagesViewController {
             if roomId.isEmpty {return}
             let vc = ShowLiveViewController()
             vc.room = room
-            vc.loadingType = .waiting
+            vc.loadingType = .prejoined
             vc.delegate = self
             self.roomVCMap[roomId] = vc
             //TODO: invoke viewdidload to join channel
@@ -198,7 +198,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
         } else {
             vc = ShowLiveViewController()
             vc?.room = room
-            vc?.loadingType = .waiting
+            vc?.loadingType = .prejoined
             vc?.delegate = self
         }
         
@@ -208,7 +208,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
         if let origVC = origVC {
             origVC.view.removeFromSuperview()
             origVC.removeFromParent()
-            origVC.loadingType = .none
+            origVC.loadingType = .idle
             AppContext.unloadShowServiceImp(origVC.room?.roomId ?? "")
             self.roomVCMap[origVC.room?.roomId ?? ""] = nil
             showLogger.info("remove cache vc: \(origVC.room?.roomId ?? "") cache vc count:\(self.roomVCMap.count)")
@@ -234,7 +234,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
 //            assert(false, "room at index \(idx) not found")
             return
         }
-        vc.loadingType = .playing
+        vc.loadingType = .joined
         currentVC = vc
         self.view.endEditing(true)
     }
@@ -246,7 +246,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
 //            assert(false, "room at index \(idx) not found")
             return
         }
-        vc.loadingType = .waiting
+        vc.loadingType = .prejoined
         self.view.endEditing(true)
     }
     
