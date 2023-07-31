@@ -8,6 +8,7 @@
 import UIKit
 import AgoraRtcKit
 import SwiftUI
+import VideoLoaderAPI
 
 protocol ShowLiveViewControllerDelegate: NSObjectProtocol {
     func currentUserIsOnSeat()
@@ -17,12 +18,12 @@ protocol ShowLiveViewControllerDelegate: NSObjectProtocol {
 class ShowLiveViewController: UIViewController {
     weak var delegate: ShowLiveViewControllerDelegate?
     var room: ShowRoomListModel?
-    var loadingType: ShowRoomRTCPlayState = .waiting {
+    var loadingType: RoomStatus = .prejoined {
         didSet {
             if loadingType == oldValue {
                 return
             }
-            if (loadingType == .playing) {// 秒开计时
+            if (loadingType == .joined) {// 秒开计时
                 ShowAgoraKitManager.shared.callTimestampStart()
             }
             updateLoadingType(playState: loadingType)
@@ -227,13 +228,13 @@ class ShowLiveViewController: UIViewController {
         guard let room = room else {return}
         if room.ownerId == VLUserCenter.user.id {// 自己的房间
             self.joinChannel()
-            if self.loadingType == .playing {
+            if self.loadingType == .joined {
                 self.updateLoadingType(playState: self.loadingType)
             }
             self._subscribeServiceEvent()
             AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self)
         } else { // 自己是观众
-            self.joinChannel(needUpdateCavans: self.loadingType == .playing)
+            self.joinChannel(needUpdateCavans: self.loadingType == .joined)
             AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
                 guard let self = self else { return }
                 showLogger.info("joinRoom: roomid = \(room.roomId)")
@@ -244,7 +245,7 @@ class ShowLiveViewController: UIViewController {
                     self._ensureRoomIsExst(roomId: room.roomId)
                     return
                 }
-                if self.loadingType == .playing {
+                if self.loadingType == .joined {
                     self.updateLoadingType(playState: self.loadingType)
                 }
                 self._subscribeServiceEvent()
@@ -290,7 +291,7 @@ class ShowLiveViewController: UIViewController {
     }
     
     func leaveRoom(){
-        ShowAgoraKitManager.shared.setRtcDelegate(delegate: nil, roomId: roomId)
+        ShowAgoraKitManager.shared.removeRtcDelegate(delegate: self, roomId: roomId)
         ShowAgoraKitManager.shared.cleanCapture()
         ShowAgoraKitManager.shared.leaveChannelEx(roomId: roomId, channelId: roomId)
         AppContext.showServiceImp(roomId).unsubscribeEvent(delegate: self)
@@ -303,7 +304,7 @@ class ShowLiveViewController: UIViewController {
     }
     
     private func joinChannel(needUpdateCavans: Bool = true) {
-        ShowAgoraKitManager.shared.setRtcDelegate(delegate: self, roomId: roomId)
+        ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: roomId)
         guard let channelId = room?.roomId, let ownerId = room?.ownerId,  let uid: UInt = UInt(ownerId) else {
             return
         }
@@ -358,19 +359,19 @@ extension ShowLiveViewController {
     }
     
 
-    func updateLoadingType(playState: ShowRoomRTCPlayState) {
+    func updateLoadingType(playState: RoomStatus) {
         ShowAgoraKitManager.shared.updateLoadingType(roomId: roomId, channelId: roomId, playState: playState)
         if let targetRoomId = currentInteraction?.roomId, targetRoomId != roomId {
             ShowAgoraKitManager.shared.updateLoadingType(roomId: roomId, channelId: targetRoomId, playState: playState)
         }
-        if playState == .playing {
+        if playState == .joined {
             AppContext.showServiceImp(roomId).initRoom { error in
                 
             }
             sendMessageWithText("join_live_room".show_localized)
             
             updateVideoCavans()
-        } else if playState == .waiting {
+        } else if playState == .prejoined {
             AppContext.showServiceImp(roomId).deinitRoom { error in
                 
             }
@@ -400,8 +401,8 @@ extension ShowLiveViewController {
 extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     private func _joinRoom() {
-        self.joinChannel(needUpdateCavans: self.loadingType == .playing)
-        if self.loadingType == .playing {
+        self.joinChannel(needUpdateCavans: self.loadingType == .joined)
+        if self.loadingType == .joined {
             self.updateLoadingType(playState: self.loadingType)
         }
         self._subscribeServiceEvent()
@@ -711,7 +712,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                               targetChannelId: interactionRoomId,
                                               ownerId: uid,
                                               options: self.channelOptions,
-                                              role: role) {
+                                                         role: .audience) {
                     showLogger.info("\(self.roomId) updateLoadingType _onStartInteraction---------- \(self.roomId)")
                     if self.role == .broadcaster {
                         ShowAgoraKitManager.shared.setupRemoteVideo(channelId: interactionRoomId,
@@ -898,7 +899,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
                     self.throttleRefreshRealTimeInfo()
                 }
             }
-            if self.loadingType != .playing {
+            if self.loadingType != .joined {
                 self.updateLoadingType(playState: self.loadingType)
             }
         }
@@ -952,7 +953,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
                 self?.dismiss(animated: true)
             }
         }else {
-            updateLoadingType(playState: .none)
+            updateLoadingType(playState: .idle)
             dismiss(animated: true)
         }
     }
