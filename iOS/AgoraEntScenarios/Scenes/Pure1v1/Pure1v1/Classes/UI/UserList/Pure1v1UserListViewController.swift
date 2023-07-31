@@ -12,9 +12,17 @@ import AgoraRtcKit
 
 private let kShowGuideAlreadyKey = "already_show_guide"
 class Pure1v1UserListViewController: UIViewController {
-    var appId: String = ""
+    var appId: String = "" {
+        didSet {
+            callVC.appId = appId
+        }
+    }
     var appCertificate: String = ""
-    var userInfo: Pure1v1UserInfo?
+    var userInfo: Pure1v1UserInfo? {
+        didSet {
+            callVC.currentUser = userInfo
+        }
+    }
     
     private lazy var rtcEngine = _createRtcEngine()
     private var callState: CallStateType = .idle
@@ -23,7 +31,7 @@ class Pure1v1UserListViewController: UIViewController {
         let vc = Pure1v1CallViewController()
         vc.modalPresentationStyle = .fullScreen
         vc.callApi = callApi
-        vc.appId = appId
+        
         return vc
     }()
     private let callApi = CallApiImpl()
@@ -180,6 +188,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             let fromUserId = eventInfo[kFromUserId] as? UInt ?? 0
             let fromRoomId = eventInfo[kFromRoomId] as? String ?? ""
             let toUserId = eventInfo[kRemoteUserId] as? UInt ?? 0
+            pure1v1Print("calling: fromUserId: \(fromUserId) fromRoomId: \(fromRoomId) currentId: \(currentUid) toUserId: \(toUserId)")
             if let connectedUserId = connectedUserId, connectedUserId != fromUserId {
                 callApi.reject(roomId: fromRoomId, remoteUserId: fromUserId, reason: "already calling") { err in
                 }
@@ -190,7 +199,9 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 connectedUserId = fromUserId
                 
                 if let user = listView.userList.first {$0.userId == "\(fromUserId)"} {
+                    callDialog?.hiddenAnimation()
                     let dialog = Pure1v1CalleeDialog.show(user: user)
+                    assert(dialog != nil, "dialog = nil")
                     dialog?.acceptClosure = { [weak self] in
                         NetworkManager.shared.generateTokens(appId: self?.appId ?? "",
                                                              appCertificate: self?.appCertificate ?? "",
@@ -200,7 +211,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                                                              tokenTypes: [.rtc, .rtm]) { tokens in
                             guard let self = self else {return}
                             guard tokens.count == 2 else {
-                                print("generateTokens fail")
+                                pure1v1Print("generateTokens fail")
                                 self.view.isUserInteractionEnabled = true
                                 return
                             }
@@ -219,6 +230,9 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                     }
                     
                     callDialog = dialog
+                    callVC.targetUser = user
+                } else {
+                    pure1v1Print("callee user not found1")
                 }
                 
             } else if currentUid == "\(fromUserId)" {
@@ -231,17 +245,10 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                         })
                     }
                     callDialog = dialog
+                    callVC.targetUser = user
+                } else {
+                    pure1v1Print("caller user not found1")
                 }
-//                AUIAlertView()
-//                    .isShowCloseButton(isShow: true)
-//                    .title(title: "呼叫用户 \(toUserId) 中")
-//                    .rightButton(title: "取消")
-//                    .rightButtonTapClosure(onTap: {[weak self] text in
-//                        guard let self = self else { return }
-//                        self.api.cancelCall { err in
-//                        }
-//                    })
-//                    .show()
             }
             break
         case .connecting:
@@ -261,7 +268,6 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             }
             
             callVC.rtcEngine = rtcEngine
-            callVC.currentUser = userInfo
             callVC.targetUser = user
             present(callVC, animated: false)
             break

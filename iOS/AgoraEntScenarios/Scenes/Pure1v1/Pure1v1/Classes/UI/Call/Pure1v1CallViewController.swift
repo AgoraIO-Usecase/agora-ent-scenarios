@@ -220,11 +220,19 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
             
             switch state {
             case .connected:
-//                guard let connection = eventInfo[kConnection] as? AgoraRtcConnection else {
-//                    return
-//                }
-//                setupContentInspectConfig(true, connection: connection)
-//                moderationAudio()
+                let connection = AgoraRtcConnection()
+                assert(targetUser != nil, "targetUser == nil")
+                connection.channelId = targetUser?.getRoomId() ?? ""
+                connection.localUid = UInt(currentUser?.userId ?? "") ?? 0
+                setupContentInspectConfig(true, connection: connection)
+                moderationAudio()
+                break
+            case .prepared, .idle:
+//                guard let targetUser = targetUser, let currentUser = currentUser else {return}
+//                let connection = AgoraRtcConnection()
+//                connection.channelId = targetUser.getRoomId() ?? ""
+//                connection.localUid = UInt(currentUser.userId ?? "") ?? 0
+//                setupContentInspectConfig(false, connection: connection)
                 break
             default:
                 break
@@ -246,9 +254,9 @@ extension Pure1v1CallViewController {
     private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
         let config = AgoraContentInspectConfig()
         let dic: [String: String] = [
-            "id": currentUser?.userId ?? "",
-            "sceneName": "show",
-            "userNo": currentUser?.userId ?? ""
+            "id": "\(connection.localUid)",
+            "sceneName": "Pure1v1",
+            "userNo": "\(connection.localUid)"
         ]
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
@@ -262,7 +270,7 @@ extension Pure1v1CallViewController {
         module.type = .imageModeration
         config.modules = [module]
         let ret = rtcEngine?.enableContentInspectEx(enable, config: config, connection: connection)
-        pure1v1Print("setupContentInspectConfig: \(ret ?? -1)")
+        pure1v1Print("setupContentInspectConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret ?? -1)")
     }
     
     /// 语音审核

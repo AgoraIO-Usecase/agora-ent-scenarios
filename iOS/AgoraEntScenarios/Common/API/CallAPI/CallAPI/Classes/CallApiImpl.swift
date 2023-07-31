@@ -541,7 +541,8 @@ extension CallApiImpl {
             mediaOptions.publishCustomAudioTrack = false
             config?.rtcEngine.updateChannelEx(with: mediaOptions, connection: rtcConnection)
         } else {
-            config?.rtcEngine.leaveChannelEx(rtcConnection)
+            let ret = config?.rtcEngine.leaveChannelEx(rtcConnection)
+            callPrint("leave RTC channel[\(ret ?? -1)]")
             self.rtcConnection = nil
         }
     }
