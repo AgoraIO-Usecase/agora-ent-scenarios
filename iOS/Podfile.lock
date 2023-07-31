@@ -69,6 +69,8 @@ PODS:
     - Protobuf (~> 3.4)
   - SVProgressHUD (2.2.5)
   - SwiftyBeaver (1.9.5)
+  - VideoLoaderAPI (0.1.0):
+    - AgoraRtcEngine_iOS
   - YYCategories (1.0.4):
     - YYCategories/no-arc (= 1.0.4)
   - YYCategories/no-arc (1.0.4)
@@ -106,6 +108,7 @@ DEPENDENCIES:
   - SVGAPlayer
   - SVProgressHUD (= 2.2.5)
   - SwiftyBeaver (= 1.9.5)
+  - VideoLoaderAPI (from `AgoraEntScenarios/Common/API/VideoLoaderAPI`)
   - YYCategories (= 1.0.4)
   - YYModel (= 1.0.4)
   - Zip
@@ -155,6 +158,8 @@ EXTERNAL SOURCES:
     :path: AgoraEntScenarios/Scenes/Pure1v1
   SenseLib:
     :path: sense.podspec
+  VideoLoaderAPI:
+    :path: AgoraEntScenarios/Common/API/VideoLoaderAPI
 
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
@@ -188,11 +193,12 @@ SPEC CHECKSUMS:
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
+  VideoLoaderAPI: a15a125842baaea5a9a900d66fb99aa3dd42097e
   YYCategories: 6bcd4314c6661a561410dce4a793379ebd306abd
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: f01593c83fef21c5f512e0b56ea7951548d251e2
+PODFILE CHECKSUM: e3bd8158086deb7ab0a5105e10719877c8e6248f
 
 COCOAPODS: 1.12.0

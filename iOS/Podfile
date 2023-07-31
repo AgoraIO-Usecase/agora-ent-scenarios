@@ -49,6 +49,9 @@ def all_pods
   pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
 
 
+  pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
+
+
   #ThirdParty
   pod 'HWWeakTimer', '1.0'
   pod 'LSTPopView', '0.3.10'
