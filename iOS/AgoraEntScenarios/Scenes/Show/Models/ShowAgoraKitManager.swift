@@ -15,15 +15,7 @@ class ShowAgoraKitManager: NSObject {
     
     static let shared = ShowAgoraKitManager()
     
-    private lazy var videoLoader: IVideoLoaderApi = {
-        let loader = VideoLoaderApiImpl()
-        let config = VideoLoaderConfig()
-        config.rtcEngine = self.engine!
-        config.userId = UInt(VLUserCenter.user.id)!
-        loader.setup(config: config)
-        loader.addListener(listener: self)
-        return loader
-    }()
+    private var videoLoader: IVideoLoaderApi?
     
     // 是否开启绿幕功能
     static var isOpenGreen: Bool = false
@@ -66,10 +58,19 @@ class ShowAgoraKitManager: NSObject {
         BeautyManager.shareManager.configBeautyAPIWithRtcEngine(engine: engine)
         self.engine = engine
         
+        let loader = VideoLoaderApiImpl()
+        loader.addListener(listener: self)
+        let config = VideoLoaderConfig()
+        config.rtcEngine = engine
+        config.userId = UInt(VLUserCenter.user.id)!
+        loader.setup(config: config)
+        videoLoader = loader
+        
         showLogger.info("load AgoraRtcEngineKit, sdk version: \(AgoraRtcEngineKit.getSdkVersion())", context: kShowLogBaseContext)
     }
     
     func destoryEngine() {
+        videoLoader?.cleanCache()
         AgoraRtcEngineKit.destroy()
         showLogger.info("deinit-- ShowAgoraKitManager")
     }
@@ -135,7 +136,7 @@ class ShowAgoraKitManager: NSObject {
         if role == .audience {
             let roomInfo = _getRoomInfo(channelId: targetChannelId, uid: ownerId)
             let newState: RoomStatus = broadcasterConnection == nil ? .prejoined : .joined
-            videoLoader.switchRoomState(newState: newState, roomInfo: roomInfo, tagId: currentChannelId)
+            videoLoader?.switchRoomState(newState: newState, roomInfo: roomInfo, tagId: currentChannelId)
             return
         }
         
@@ -161,7 +162,7 @@ class ShowAgoraKitManager: NSObject {
         connection.channelId = targetChannelId
         connection.localUid = UInt(VLUserCenter.user.id) ?? 0
 
-        let proxy = videoLoader.getRTCListener(roomId: currentChannelId)
+        let proxy = videoLoader?.getRTCListener(roomId: currentChannelId)
         let date = Date()
         showLogger.info("try to join room[\(connection.channelId)] ex uid: \(connection.localUid)", context: kShowLogBaseContext)
         let ret =
@@ -200,11 +201,11 @@ class ShowAgoraKitManager: NSObject {
     
     //MARK: public method
     func addRtcDelegate(delegate: AgoraRtcEngineDelegate, roomId: String) {
-        videoLoader.addRTCListener(roomId: roomId, listener: delegate)
+        videoLoader?.addRTCListener(roomId: roomId, listener: delegate)
     }
     
     func removeRtcDelegate(delegate: AgoraRtcEngineDelegate, roomId: String) {
-        videoLoader.removeRTCListener(roomId: roomId, listener: delegate)
+        videoLoader?.removeRTCListener(roomId: roomId, listener: delegate)
     }
     
     func renewToken(channelId: String) {
@@ -316,7 +317,7 @@ class ShowAgoraKitManager: NSObject {
     
     func updateChannelEx(channelId: String, options: AgoraRtcChannelMediaOptions) {
         guard let engine = engine,
-              let connection = (broadcasterConnection?.channelId == channelId ? broadcasterConnection : nil) ?? videoLoader.getConnectionMap()[channelId] else {
+              let connection = (broadcasterConnection?.channelId == channelId ? broadcasterConnection : nil) ?? videoLoader?.getConnectionMap()[channelId] else {
             showLogger.error("updateChannelEx fail: connection is empty")
             return
         }
@@ -405,17 +406,7 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         let roomInfo = _getRoomInfo(channelId: channelId)
-        videoLoader.switchRoomState(newState: .idle, roomInfo: roomInfo, tagId: roomId)
-//        guard let engine = engine,
-//              let connection = exConnectionMap[channelId] else { return }
-//        let depMap: [String: ShowRoomRTCPlayState]? = exConnectionDeps[channelId]
-//        guard depMap?.count ?? 0 == 0 else {
-//            showLogger.info("leaveChannelEx break, depcount: \(depMap?.count ?? 0), roomId: \(roomId), channelId: \(channelId)", context: kShowLogBaseContext)
-//            return
-//        }
-//        showLogger.info("leaveChannelEx roomId: \(roomId), channelId: \(channelId)", context: kShowLogBaseContext)
-//        engine.leaveChannelEx(connection)
-//        exConnectionMap[channelId] = nil
+        videoLoader?.switchRoomState(newState: .idle, roomInfo: roomInfo, tagId: roomId)
     }
     
     func joinChannelEx(currentChannelId: String,
@@ -488,13 +479,13 @@ class ShowAgoraKitManager: NSObject {
         let container = VideoCanvasContainer()
         container.uid = uid
         container.container = canvasView
-        videoLoader.renderVideo(roomInfo: roomInfo, container: container)
+        videoLoader?.renderVideo(roomInfo: roomInfo, container: container)
     }
     
     func updateLoadingType(roomId: String, channelId: String, playState: RoomStatus) {
         if broadcasterConnection?.channelId == channelId {return}
         let roomInfo = _getRoomInfo(channelId: channelId)
-        videoLoader.switchRoomState(newState: playState, roomInfo: roomInfo, tagId: roomId)
+        videoLoader?.switchRoomState(newState: playState, roomInfo: roomInfo, tagId: roomId)
     }
 }
 
@@ -560,7 +551,7 @@ extension ShowAgoraKitManager {
     }
     
     func setOffMediaOptionsVideo(roomid: String) {
-        guard let connection = videoLoader.getConnectionMap()[roomid] else {
+        guard let connection = videoLoader?.getConnectionMap()[roomid] else {
             showLogger.info("setOffMediaOptionsVideo  connection 不存在 \(roomid)")
             return
         }
@@ -571,7 +562,7 @@ extension ShowAgoraKitManager {
     }
     
     func setOffMediaOptionsAudio() {
-        videoLoader.getConnectionMap().forEach { _, connention in
+        videoLoader?.getConnectionMap().forEach { _, connention in
             let mediaOptions = AgoraRtcChannelMediaOptions()
             mediaOptions.autoSubscribeAudio = false
             engine?.updateChannelEx(with: mediaOptions, connection: connention)
