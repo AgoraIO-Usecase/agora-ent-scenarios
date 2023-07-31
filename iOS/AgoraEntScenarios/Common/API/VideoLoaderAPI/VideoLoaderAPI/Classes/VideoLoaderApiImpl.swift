@@ -75,7 +75,7 @@ extension VideoLoaderApiImpl {
                                delegate: rtcProxy,
                                mediaOptions: mediaOptions) {[weak self] channelName, uid, elapsed in
             let cost = Int(-date.timeIntervalSinceNow * 1000)
-//                showLogger.info("join room[\(channelName)] ex success uid: \(uid) cost \(cost) ms", context: kShowLogBaseContext)
+            self?.apiPrint("join room[\(channelName)] ex success uid: \(uid) cost \(cost) ms")
         }
         engine.updateChannelEx(with: mediaOptions, connection: connection)
         exConnectionMap[channelId] = connection
