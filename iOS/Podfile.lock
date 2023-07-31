@@ -46,6 +46,7 @@ PODS:
     - CallAPI
     - SDWebImage
     - SnapKit
+    - SwiftyBeaver
     - YYCategories
     - YYModel
   - ScoreEffectUI (1.0.1)
@@ -176,7 +177,7 @@ SPEC CHECKSUMS:
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  Pure1v1: e7806edeba864148aebc4ca8a08a8697be048d8e
+  Pure1v1: 0bed5a5b654e0985cb361be2efcab8d15b43be5b
   ScoreEffectUI: 1a3bbd83b17cfef1c16a3a4eede2854f89c9eb10
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24

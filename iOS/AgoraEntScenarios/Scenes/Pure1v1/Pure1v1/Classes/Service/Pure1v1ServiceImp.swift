@@ -8,19 +8,7 @@
 import Foundation
 import AgoraSyncManager
 import YYModel
-
-func pure1v1Print(_ message: String) {
-    print("[Pure1v1]\(message)")
-}
-
-func pure1v1Warn(_ message: String) {
-    print("[Pure1v1][Warning]\(message)")
-}
-
-func pure1v1Error(_ message: String) {
-    print("[Pure1v1][Error]\(message)")
-}
-
+import SwiftyBeaver
 
 private func mainTreadTask(_ task: (()->())?){
     if Thread.isMainThread {
