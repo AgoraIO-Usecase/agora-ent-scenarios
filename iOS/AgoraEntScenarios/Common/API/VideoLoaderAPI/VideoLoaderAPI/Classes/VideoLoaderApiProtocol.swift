@@ -38,6 +38,10 @@ public class VideoCanvasContainer: NSObject {
 
 @objc public protocol IVideoLoaderApiListener: NSObjectProtocol {
     @objc optional func onStateDidChange(newState: RoomStatus, oldState: RoomStatus, channelName: String)
+    
+    @objc optional func debugInfo(_ message: String)
+    @objc optional func debugWarning(_ message: String)
+    @objc optional func debugError(_ message: String)
 }
 
 @objc public protocol IVideoLoaderApi: NSObjectProtocol {

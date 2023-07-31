@@ -11,7 +11,7 @@ import UIKit
 import YYCategories
 import VideoLoaderAPI
 
-class ShowAgoraKitManager {
+class ShowAgoraKitManager: NSObject {
     
     static let shared = ShowAgoraKitManager()
     
@@ -21,6 +21,7 @@ class ShowAgoraKitManager {
         config.rtcEngine = self.engine!
         config.userId = UInt(VLUserCenter.user.id)!
         loader.setup(config: config)
+        loader.addListener(listener: self)
         return loader
     }()
     
@@ -318,7 +319,7 @@ class ShowAgoraKitManager {
             showLogger.error("updateChannelEx fail: connection is empty")
             return
         }
-        showLogger.info("updateChannelEx: \(options.publishMicrophoneTrack) \(options.publishCameraTrack)")
+        showLogger.info("updateChannelEx[\(channelId)]: \(options.publishMicrophoneTrack) \(options.publishCameraTrack)")
         engine.updateChannelEx(with: options, connection: connection)
     }
     
@@ -472,6 +473,16 @@ class ShowAgoraKitManager {
     }
     
     func setupRemoteVideo(channelId: String, uid: UInt, canvasView: UIView) {
+        if let connection = broadcasterConnection, broadcasterConnection?.channelId == channelId {
+            let videoCanvas = AgoraRtcVideoCanvas()
+            videoCanvas.uid = uid
+            videoCanvas.view = canvasView
+            videoCanvas.renderMode = .hidden
+            let ret = engine?.setupRemoteVideoEx(videoCanvas, connection: connection)
+                    
+            showLogger.info("setupRemoteVideoEx ret = \(ret ?? -1), uid:\(uid) localuid: \(UserInfo.userId) channelId: \(channelId)", context: kShowLogBaseContext)
+            return
+        }
         let roomInfo = _getRoomInfo(channelId: channelId)
         let container = VideoCanvasContainer()
         container.uid = uid
@@ -480,6 +491,7 @@ class ShowAgoraKitManager {
     }
     
     func updateLoadingType(roomId: String, channelId: String, playState: RoomStatus) {
+        if broadcasterConnection?.channelId == channelId {return}
         let roomInfo = _getRoomInfo(channelId: channelId)
         videoLoader.switchRoomState(newState: playState, roomInfo: roomInfo, tagId: roomId)
     }
@@ -565,4 +577,17 @@ extension ShowAgoraKitManager {
         }
     }
     
+}
+
+
+extension ShowAgoraKitManager: IVideoLoaderApiListener {
+    public func debugInfo(_ message: String) {
+        showLogger.info(message, context: "VideoLoaderApi")
+    }
+    public func debugWarning(_ message: String) {
+        showLogger.warning(message, context: "VideoLoaderApi")
+    }
+    public func debugError(_ message: String) {
+        showLogger.error(message, context: "VideoLoaderApi")
+    }
 }

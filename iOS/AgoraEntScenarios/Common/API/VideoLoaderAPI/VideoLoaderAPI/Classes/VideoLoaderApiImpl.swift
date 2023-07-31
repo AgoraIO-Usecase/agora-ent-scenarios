@@ -8,18 +8,6 @@
 import Foundation
 import AgoraRtcKit
 
-private func apiPrint(_ message: String) {
-    print("[VideoLoaderApi]\(message)")
-}
-
-private func apiWarningPrint(_ message: String) {
-    print("[VideoLoaderApi][Warning]\(message)")
-}
-
-private func apiErrorPrint(_ message: String) {
-    print("[VideoLoaderApi][Error]\(message)")
-}
-
 public class VideoLoaderApiImpl: NSObject {
     private var config: VideoLoaderConfig?
     
@@ -111,6 +99,30 @@ extension VideoLoaderApiImpl {
         engine.leaveChannelEx(connection)
         exConnectionMap[channelId] = nil
     }
+    
+    private func apiPrint(_ message: String) {
+        let api = apiProxy as IVideoLoaderApiListener
+        api.debugInfo?(message)
+        #if DEBUG
+        print("[VideoLoaderApi]\(message)")
+        #endif
+    }
+
+    private func apiWarningPrint(_ message: String) {
+        let api = apiProxy as IVideoLoaderApiListener
+        api.debugWarning?(message)
+        #if DEBUG
+        print("[VideoLoaderApi][Warning]\(message)")
+        #endif
+    }
+
+    private func apiErrorPrint(_ message: String) {
+        let api = apiProxy as IVideoLoaderApiListener
+        api.debugError?(message)
+        #if DEBUG
+        print("[VideoLoaderApi][Error]\(message)")
+        #endif
+    }
 }
 
 //MARK: VideoLoaderApiProtocol
@@ -195,7 +207,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         guard let engine = config?.rtcEngine,
               let localUid = config?.userId,
               let connection = exConnectionMap[roomInfo.channelName] else {
-            apiErrorPrint("_joinChannelEx fail: connection is empty")
+            apiErrorPrint("renderVideo fail: connection is empty")
             return
         }
                 
