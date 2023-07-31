@@ -241,11 +241,11 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                         return
                     }
                     let output = ShowRoomDetailModel.yy_model(with: params!)
+                    self?.roomList?.append(room)
                     self?._startCheckExpire()
                     self?._subscribeAll()
                     self?._getAllPKInvitationList(room: nil) { error, list in
                     }
-                    self?.roomList?.append(room)
                     completion(nil, output)
                 }
             } fail: { error in
