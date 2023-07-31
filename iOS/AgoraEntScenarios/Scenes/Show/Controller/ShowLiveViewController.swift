@@ -712,7 +712,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                               targetChannelId: interactionRoomId,
                                               ownerId: uid,
                                               options: self.channelOptions,
-                                              role: role) {
+                                                         role: .audience) {
                     showLogger.info("\(self.roomId) updateLoadingType _onStartInteraction---------- \(self.roomId)")
                     if self.role == .broadcaster {
                         ShowAgoraKitManager.shared.setupRemoteVideo(channelId: interactionRoomId,

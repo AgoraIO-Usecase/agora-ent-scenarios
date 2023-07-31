@@ -134,7 +134,8 @@ class ShowAgoraKitManager: NSObject {
                                 role: AgoraClientRole) {
         if role == .audience {
             let roomInfo = _getRoomInfo(channelId: targetChannelId, uid: ownerId)
-            videoLoader.switchRoomState(newState: .prejoined, roomInfo: roomInfo, tagId: currentChannelId)
+            let newState: RoomStatus = broadcasterConnection == nil ? .prejoined : .joined
+            videoLoader.switchRoomState(newState: newState, roomInfo: roomInfo, tagId: currentChannelId)
             return
         }
         
@@ -315,7 +316,7 @@ class ShowAgoraKitManager: NSObject {
     
     func updateChannelEx(channelId: String, options: AgoraRtcChannelMediaOptions) {
         guard let engine = engine,
-              let connection = broadcasterConnection ?? videoLoader.getConnectionMap()[channelId] else {
+              let connection = (broadcasterConnection?.channelId == channelId ? broadcasterConnection : nil) ?? videoLoader.getConnectionMap()[channelId] else {
             showLogger.error("updateChannelEx fail: connection is empty")
             return
         }
@@ -398,7 +399,7 @@ class ShowAgoraKitManager: NSObject {
     }
     
     func leaveChannelEx(roomId: String, channelId: String) {
-        if let connection = broadcasterConnection {
+        if let connection = broadcasterConnection, connection.channelId == channelId {
             engine?.leaveChannelEx(connection)
             broadcasterConnection = nil
             return
