@@ -90,7 +90,6 @@ public class SingRelayGameView extends FrameLayout {
             public void onTick(long millisUntilFinished) {
                 int second = (int) (millisUntilFinished / 1000);
                 if (mBinding == null) return;
-                KTVLogger.d("hugo", "pig" + second);
                 if (second <= 3 && second >= 1) {
                     mBinding.ilIDLE.messageText.setText(String.valueOf(second));
                 } else if (second < 1) {
@@ -230,7 +229,7 @@ public class SingRelayGameView extends FrameLayout {
     }
 
     public void onNextPart(boolean isWinner) {
-        KTVLogger.d(TAG, "onNextPart");
+        KTVLogger.d(TAG, "onNextPart, isWinner:" + isWinner);
         if (mBinding == null) return;
         mBinding.ilActive.winnerTips.setVisibility(GONE);
         if (isWinner) {
@@ -253,12 +252,13 @@ public class SingRelayGameView extends FrameLayout {
     public void onGameEnd(List<RankItem> list) {
         KTVLogger.d(TAG, "onGameEnd");
         if (mBinding == null) return;
-        mBinding.ilIDLE.tvSongTab.setVisibility(View.VISIBLE);
         mBinding.ilRank.setVisibility(View.VISIBLE);
         mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_idle_text_background);
 
         if (isRoomOwner) {
             mBinding.btGameAgain.setVisibility(View.VISIBLE);
+        } else {
+            mBinding.ilIDLE.messageText.setVisibility(View.GONE);
         }
         mBinding.ilRank.resetRankList(list);
         partNum = 1;

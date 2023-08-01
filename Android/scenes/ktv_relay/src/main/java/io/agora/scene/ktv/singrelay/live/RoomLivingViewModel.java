@@ -167,8 +167,7 @@ public class RoomLivingViewModel extends ViewModel {
     final MutableLiveData<GraspModel> graspStatusMutableLiveData = new MutableLiveData<>();
 
     final MutableLiveData<Long> playerMusicOpenDurationLiveData = new MutableLiveData<>();
-    final MutableLiveData<ScoringAverageModel> playerMusicPlayCompleteLiveData = new MutableLiveData<>();
-    final MutableLiveData<Integer> playerMusicCountDownLiveData = new MutableLiveData<>();
+    final MutableLiveData<Boolean> playerMusicPlayCompleteLiveData = new MutableLiveData<>();
     final MutableLiveData<NetWorkEvent> networkStatusLiveData = new MutableLiveData<>();
 
     final MutableLiveData<ScoringAlgoControlModel> scoringAlgoControlLiveData = new MutableLiveData<>();
@@ -784,32 +783,21 @@ public class RoomLivingViewModel extends ViewModel {
                         lineScore.total = total;
                         mainSingerScoreLiveData.postValue(lineScore);
                     } else if (jsonMsg.getString("cmd").equals("SingingScore")) {
-                        KTVLogger.d("hugo", "onMessage/SingingScore: " + jsonMsg);
+                        KTVLogger.d(TAG, "onMessage/SingingScore: " + jsonMsg);
                         float score = (float) jsonMsg.getDouble("score");
-                        String userId = (String) jsonMsg.getString("userId");
-                        String userName = (String) jsonMsg.getString("userName");
-                        String poster = (String) jsonMsg.getString("poster");
-                        playerMusicPlayCompleteLiveData.postValue(new ScoringAverageModel(false, (int)score));
+                        int songNum = (int) jsonMsg.getDouble("num");
+                        String userId = jsonMsg.getString("userId");
+                        String userName = jsonMsg.getString("userName");
+                        String poster = jsonMsg.getString("poster");
 
                         // 本地演唱 计入rank
-                        if (rankMap.containsKey(userId)) {
-                            RankModel oldModel = rankMap.get(userId);
-                            RankModel model = new RankModel(
-                                    oldModel.getUserName(),
-                                    oldModel.getSongNum() + 1,
-                                    (int)(oldModel.getScore() * oldModel.getSongNum() + score),
-                                    poster
-                            );
-                            rankMap.put(userId, model);
-                        } else {
-                            RankModel model = new RankModel(
-                                    userName,
-                                    1,
-                                    (int)score,
-                                    poster
-                            );
-                            rankMap.put(userId, model);
-                        }
+                        RankModel model = new RankModel(
+                                userName,
+                                songNum,
+                                (int)score,
+                                poster
+                        );
+                        rankMap.put(userId, model);
                     } else if (jsonMsg.getString("cmd").equals("StartSingRelayCountDown")) {
                         KTVLogger.d(TAG, "StartSingRelayCountDown");
                         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_BATTLE);
@@ -857,7 +845,7 @@ public class RoomLivingViewModel extends ViewModel {
                            break;
                        case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
                            if (isLocal) {
-                               playerMusicPlayCompleteLiveData.postValue(new ScoringAverageModel(true, 0));
+                               playerMusicPlayCompleteLiveData.postValue(true);
                                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
                            }
                            break;
@@ -1084,12 +1072,12 @@ public class RoomLivingViewModel extends ViewModel {
                 roomInfoLiveData.getValue().getRoomNo(),
                 UserManager.getInstance().getUser().id.toString(),
                 UserManager.getInstance().getUser().name,
-                songPlayingLiveData.getValue().getSongNo() + "_" + partNum,
+                songPlayingLiveData.getValue().getSongNo() + "_" + (partNum + 1),
                 UserManager.getInstance().getUser().headUrl,
                 (userId) -> {
                     KTVLogger.d(TAG, "RoomLivingViewModel.graspSong() success " + userId);
                     // 更新Service抢唱结果
-                    ktvServiceProtocol.updateSongModel(songPlayingLiveData.getValue().getSongNo(), userId + "_" + partNum, UserManager.getInstance().getUser().name, UserManager.getInstance().getUser().headUrl, e -> {
+                    ktvServiceProtocol.updateSongModel(songPlayingLiveData.getValue().getSongNo(), userId + "_" + (partNum + 1), UserManager.getInstance().getUser().name, UserManager.getInstance().getUser().headUrl, e -> {
                         if (e == null) {
                             KTVLogger.d(TAG, "RoomLivingViewModel.updateSongModel() success " + userId);
                         }
@@ -1383,11 +1371,12 @@ public class RoomLivingViewModel extends ViewModel {
         }
     }
 
-    public void syncSingingAverageScore(double score) {
+    public void syncSingingAverageScore(double score, int singedNum) {
         if (mRtcEngine == null) return;
         Map<String, Object> msg = new HashMap<>();
         msg.put("cmd", "SingingScore");
         msg.put("score", score);
+        msg.put("num", singedNum);
         msg.put("userName", UserManager.getInstance().getUser().name);
         msg.put("userId", UserManager.getInstance().getUser().id.toString());
         msg.put("poster", UserManager.getInstance().getUser().headUrl);
@@ -1398,24 +1387,13 @@ public class RoomLivingViewModel extends ViewModel {
         }
 
         // 本地演唱 计入rank
-        if (rankMap.containsKey(UserManager.getInstance().getUser().id.toString())) {
-            RankModel oldModel = rankMap.get(UserManager.getInstance().getUser().id.toString());
-            RankModel model = new RankModel(
-                    oldModel.getUserName(),
-                    oldModel.getSongNum() + 1,
-                    (int)(oldModel.getScore() * oldModel.getSongNum() + score),
-                    UserManager.getInstance().getUser().headUrl
-            );
-            rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
-        } else {
-            RankModel model = new RankModel(
-                    UserManager.getInstance().getUser().name,
-                    1,
-                    (int)score,
-                    UserManager.getInstance().getUser().headUrl
-            );
-            rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
-        }
+        RankModel model = new RankModel(
+                UserManager.getInstance().getUser().name,
+                singedNum,
+                (int)score,
+                UserManager.getInstance().getUser().headUrl
+        );
+        rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
     }
 
     private void SyncStartSing() {

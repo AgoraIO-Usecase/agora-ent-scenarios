@@ -867,7 +867,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private fun loadLyric(songNo: Long, onLoadLyricCallback: (songNo: Long, lyricUrl: String?) -> Unit) {
         Log.d(TAG, "loadLyric: $songNo")
         val requestId = mMusicCenter.getLyric(songNo, 0)
-        if (requestId.isEmpty()) {
+        if (requestId == null || requestId.isEmpty()) {
             onLoadLyricCallback.invoke(songNo, null)
             return
         }

@@ -25,21 +25,14 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.card.MaterialCardView;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 import io.agora.rtc2.Constants;
 import io.agora.scene.base.GlideApp;
-import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.base.manager.UserManager;
-import io.agora.scene.base.utils.LiveDataUtils;
 import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.singrelay.R;
@@ -48,7 +41,6 @@ import io.agora.scene.ktv.singrelay.databinding.KtvItemRoomSpeakerBinding;
 import io.agora.scene.ktv.singrelay.debugSettings.KTVDebugSettingsDialog;
 import io.agora.scene.ktv.singrelay.live.fragment.dialog.MVFragment;
 import io.agora.scene.ktv.singrelay.live.listener.LrcActionListenerImpl;
-import io.agora.scene.ktv.singrelay.live.listener.SongActionListenerImpl;
 import io.agora.scene.ktv.singrelay.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.singrelay.service.RoomSeatModel;
 import io.agora.scene.ktv.singrelay.service.RoomSelSongModel;
@@ -58,8 +50,6 @@ import io.agora.scene.ktv.singrelay.widget.lrcView.LrcControlView;
 import io.agora.scene.ktv.singrelay.widget.MoreDialog;
 import io.agora.scene.ktv.singrelay.widget.MusicSettingDialog;
 import io.agora.scene.ktv.singrelay.widget.UserLeaveSeatMenuDialog;
-import io.agora.scene.ktv.singrelay.widget.rankList.RankItem;
-import io.agora.scene.ktv.singrelay.widget.song.SongDialog;
 import io.agora.scene.widget.DividerDecoration;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
@@ -209,7 +199,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     RoomSelSongModel songModel = roomLivingViewModel.songPlayingLiveData.getValue();
                     if (songModel != null && !songModel.getWinnerNo().equals("")) {
                         if (item.getUserNo().equals(songModel.getWinnerNo())) {
-                            binding.tvZC.setText("主唱");
+                            binding.tvZC.setText(R.string.ktv_zc);
                             binding.tvHC.setVisibility(View.GONE);
                             binding.tvZC.setVisibility(View.VISIBLE);
                         } else {
@@ -451,6 +441,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.songPlayingLiveData.observe(this, model -> {
             if (model == null) {
                 roomLivingViewModel.musicStop();
+                getBinding().singRelayGameView.onSongFinish();
                 return;
             }
             onMusicChanged(model);
@@ -541,22 +532,15 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.playerMusicPlayCompleteLiveData.observe(this, score -> {
             mRoomSpeakerAdapter.notifyDataSetChanged();
             roomLivingViewModel.toggleMic(false);
-            if (score.isLocal()) {
-                int sc = getBinding().lrcControlView.getCumulativeScoreInPercentage();
-                if (getBinding().lrcControlView.getRole() == LrcControlView.Role.Singer) {
-                    roomLivingViewModel.syncSingingAverageScore(sc);
-                }
 
-                getBinding().singRelayGameView.onSongFinish();
-                if (roomLivingViewModel.isRoomOwner()) {
-                    roomLivingViewModel.changeMusic();
-                }
-            } else {
-                //if (getBinding().lrcControlView.getRole() != LrcControlView.Role.Listener) return;
-                getBinding().singRelayGameView.onSongFinish();
-                if (roomLivingViewModel.isRoomOwner()) {
-                    roomLivingViewModel.changeMusic();
-                }
+            int sc = getBinding().lrcControlView.getCumulativeScoreInPercentage();
+            int num = getBinding().lrcControlView.getCumulativeSingedParts();
+            if (sc > 0) {
+                roomLivingViewModel.syncSingingAverageScore(sc, num);
+            }
+            getBinding().singRelayGameView.onSongFinish();
+            if (roomLivingViewModel.isRoomOwner()) {
+                roomLivingViewModel.changeMusic();
             }
         });
         roomLivingViewModel.networkStatusLiveData.observe(this, netWorkStatus ->
@@ -722,28 +706,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         moreDialog.dismiss();
     }
 
-    private LinkedHashMap<Integer, String> filterSongTypeMap(LinkedHashMap<Integer, String> typeMap) {
-        // 0 -> "项目热歌榜单"
-        // 1 -> "声网热歌榜"
-        // 2 -> "新歌榜" ("热门新歌")
-        // 3 -> "嗨唱推荐"
-        // 4 -> "抖音热歌"
-        // 5 -> "古风热歌"
-        // 6 -> "KTV必唱"
-        LinkedHashMap<Integer, String> ret = new LinkedHashMap<>();
-        for (Map.Entry<Integer, String> entry : typeMap.entrySet()) {
-            int key = entry.getKey();
-            String value = entry.getValue();
-            if (key == 2) {
-                value = getString(R.string.ktv_song_rank_7);
-                ret.put(key, value);
-            } else if (key == 3 || key == 4 || key == 6) {
-                ret.put(key, value);
-            }
-        }
-        return ret;
-    }
-
     private boolean showMoreDialogTag = false;
     private void showMoreDialog(View view) {
         if (showMoreDialogTag) {
@@ -794,7 +756,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     setDarkStatusIcon(isBlackDarkStatus());
                     roomLivingViewModel.toggleMic(false);
                     getBinding().singRelayGameView.onSongFinish();
-                    roomLivingViewModel.syncSingingAverageScore(0);
+                    roomLivingViewModel.syncSingingAverageScore(0, 0);
                     roomLivingViewModel.resetMusicStatus();
                     if (roomLivingViewModel.isRoomOwner()) {
                         roomLivingViewModel.changeMusic();

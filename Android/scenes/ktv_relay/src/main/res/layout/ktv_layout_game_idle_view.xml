@@ -26,7 +26,7 @@
     <ImageView
         android:id="@+id/ivGameTips"
         android:layout_width="0dp"
-        android:layout_height="120dp"
+        android:layout_height="110dp"
         android:background="@mipmap/ktv_game_tips"
         android:layout_marginTop="8dp"
         android:layout_marginHorizontal="10dp"

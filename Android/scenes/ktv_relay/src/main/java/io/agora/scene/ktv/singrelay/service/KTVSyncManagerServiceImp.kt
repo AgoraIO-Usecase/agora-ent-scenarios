@@ -145,7 +145,7 @@ class KTVSyncManagerServiceImp(
                 isPrivate = inputModel.isPrivate != 0,
                 password = inputModel.password,
                 creatorNo = UserManager.getInstance().user.id.toString(),
-                bgOption = "8",
+                bgOption = "0",
             )
             val scene = Scene()
             scene.id = roomListModel.roomNo
