@@ -433,6 +433,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.songsOrderedLiveData.observe(this, models -> {
             if (models == null || models.isEmpty()) {
                 // songs empty
+                //getBinding().singRelayGameView.onSongFinish();
                 getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
                 getBinding().lrcControlView.onIdleStatus();
                 mRoomSpeakerAdapter.notifyDataSetChanged();
@@ -441,7 +442,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.songPlayingLiveData.observe(this, model -> {
             if (model == null) {
                 roomLivingViewModel.musicStop();
-                getBinding().singRelayGameView.onSongFinish();
                 return;
             }
             onMusicChanged(model);
@@ -487,9 +487,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 if (roomLivingViewModel.songsOrderedLiveData.getValue() != null) {
                     getBinding().singRelayGameView.onGameStartStatus();
                 }
-                if (!roomLivingViewModel.isRoomOwner()) {
-                    roomLivingViewModel.toggleMic(false);
-                }
+                roomLivingViewModel.toggleMic(roomLivingViewModel.isRoomOwner());
                 getBinding().cbMic.setEnabled(false);
                 getBinding().groupEmptyPrompt.setVisibility(View.GONE);
             } else if (status == RoomLivingViewModel.GameStatus.ON_WAITING) {
@@ -507,12 +505,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.graspStatusMutableLiveData.observe(this, model -> {
             if (model.status == RoomLivingViewModel.GraspStatus.SUCCESS) {
                 getBinding().singRelayGameView.onGraspSongSuccess(model.userName, model.headUrl);
-            } else if (model.status == RoomLivingViewModel.GraspStatus.EMPTY) {
-                getBinding().singRelayGameView.onNobodyGraspSong();
-                if (roomLivingViewModel.isRoomOwner()) {
-                    roomLivingViewModel.musicStop();
-                    roomLivingViewModel.changeMusic();
-                }
             } else if (model.status == RoomLivingViewModel.GraspStatus.IDLE) {
                 getBinding().singRelayGameView.onGraspSongBegin();
                 if (roomLivingViewModel.isNextRoundSinger()) {

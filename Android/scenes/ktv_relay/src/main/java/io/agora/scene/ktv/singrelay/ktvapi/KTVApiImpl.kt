@@ -229,6 +229,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     ) {
         Log.d(TAG, "switchSingerRole oldRole: $singerRole, newRole: $newRole")
         val oldRole = singerRole
+
+        if ((oldRole == KTVSingRole.LeadSinger || oldRole == KTVSingRole.SoloSinger) && (newRole == KTVSingRole.CoSinger || newRole == KTVSingRole.Audience) && !isOnMicOpen) {
+            mRtcEngine.muteLocalAudioStream(true)
+        } else if (oldRole == KTVSingRole.Audience && (newRole == KTVSingRole.LeadSinger || newRole == KTVSingRole.SoloSinger) && !isOnMicOpen) {
+            mRtcEngine.muteLocalAudioStream(false)
+        }
+
         if (this.singerRole == KTVSingRole.Audience && newRole == KTVSingRole.SoloSinger) {
             // 1、Audience -》SoloSinger
             this.singerRole = newRole

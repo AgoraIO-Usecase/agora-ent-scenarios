@@ -216,18 +216,7 @@ public class SingRelayGameView extends FrameLayout {
         }, 5000);
     }
 
-    // 无人抢唱
-    public void onNobodyGraspSong() {
-        KTVLogger.d(TAG, "onNobodyGraspSong");
-        if (mBinding == null) return;
-        mBinding.ilIDLE.messageText.setText(R.string.ktv_game_nobody_grasp);
-        mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
-        mBinding.ilActive.getRoot().setVisibility(View.GONE);
-        mBinding.getRoot().postDelayed(() -> {
-            if (mSingRelayGameEventListener != null) mSingRelayGameEventListener.onGameEnd();
-        }, 5000);
-    }
-
+    // 下一段歌曲开始播放
     public void onNextPart(boolean isWinner) {
         KTVLogger.d(TAG, "onNextPart, isWinner:" + isWinner);
         if (mBinding == null) return;
@@ -243,8 +232,6 @@ public class SingRelayGameView extends FrameLayout {
     public void onSongFinish() {
         KTVLogger.d(TAG, "onSongFinish");
         if (mBinding == null) return;
-        mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
-        mBinding.ilActive.getRoot().setVisibility(View.GONE);
         if (mSingRelayGameEventListener != null) mSingRelayGameEventListener.onGameEnd();
     }
 
@@ -252,6 +239,8 @@ public class SingRelayGameView extends FrameLayout {
     public void onGameEnd(List<RankItem> list) {
         KTVLogger.d(TAG, "onGameEnd");
         if (mBinding == null) return;
+        mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
+        mBinding.ilActive.getRoot().setVisibility(View.GONE);
         mBinding.ilRank.setVisibility(View.VISIBLE);
         mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_idle_text_background);
 

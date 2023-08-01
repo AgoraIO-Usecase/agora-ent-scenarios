@@ -728,7 +728,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public void onReceiveSingleLineScore(int score, int index, int cumulativeScore, int total) {
-        if (mRole == Role.Listener) {
+        if (mRole == Role.Listener && !isOnSeat) {
             updateScore(score, cumulativeScore, /** Workaround(Hai_Guo)*/total);
         }
     }
