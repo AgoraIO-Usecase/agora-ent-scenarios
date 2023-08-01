@@ -70,9 +70,15 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     protected KaraokeView mKaraokeView;
 
     protected int mCumulativeScoreInPercentage;
-
+    protected int mCumulativeSingedLines;
     public int getCumulativeScoreInPercentage() {
         return mCumulativeScoreInPercentage;
+    }
+
+    protected int mCumulativeSingedParts;
+    public int getCumulativeSingedParts() {
+        if (isMineOwner) mCumulativeSingedParts++;
+        return mCumulativeSingedParts;
     }
 
     protected ComboControl mComboControl;
@@ -168,6 +174,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             @Override
             public void onLineFinished(KaraokeView view, LyricsLineModel line, int score, int cumulativeScore, int index, int total) {
                 if (mRole == Role.Singer && mOnKaraokeActionListener != null) {
+                    mCumulativeSingedLines ++;
                     mOnKaraokeActionListener.onLineFinished(line, score, cumulativeScore, index, total);
                 }
             }
@@ -280,7 +287,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public void changeMusicController(Role role) {
+        this.mRole = role;
         if (role == Role.Singer) {
+            mCumulativeSingedParts++;
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
             if (isMineOwner) {
@@ -391,7 +400,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             if (palette == null) {
                 return;
             }
-            int defaultColor = ContextCompat.getColor(getContext(), R.color.pink_b4);
+            int defaultColor = ContextCompat.getColor(getContext(), R.color.ktv_lrc_color);
             mBinding.ilActive.lyricsView.setCurrentLineHighlightedTextColor(defaultColor);
 
             defaultColor = ContextCompat.getColor(getContext(), R.color.white);
@@ -401,7 +410,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public void updateScore(double score, double cumulativeScore, double perfectScore) {
-        mCumulativeScoreInPercentage = (int) ((cumulativeScore / perfectScore) * 100);
+        if (mCumulativeSingedLines != 0) {
+            mCumulativeScoreInPercentage = (int) (cumulativeScore / mCumulativeSingedLines);
+        }
 
         mBinding.gradeView.setScore((int) score, (int) cumulativeScore, (int) perfectScore);
 

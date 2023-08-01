@@ -143,17 +143,17 @@ public class GradeView extends View {
         mCumulativeScore = cumulativeScore;
         mPerfectScore = perfectScore;
 
-        int startColor = Color.parseColor("#FF99F5FF");
+        int startColor = Color.parseColor("#FFE4FF99");
         if (mCumulativeScore <= perfectScore * 0.1) {
             buildDefaultCumulativeScoreBarStyle(startColor, startColor);
         } else {
             float currentWidthOfScoreBar = mWidth * cumulativeScore / perfectScore;
-            int middleColor = Color.parseColor("#FF1B6FFF");
+            int middleColor = Color.parseColor("#FFFF1B7B");
 
             if (mCumulativeScore > perfectScore * 0.1 && mCumulativeScore < perfectScore * 0.8) {
                 mCumulativeLinearGradient = new LinearGradient(0, 0, currentWidthOfScoreBar, mHeight, startColor, middleColor, Shader.TileMode.CLAMP);
             } else {
-                int endColor = Color.parseColor("#FFD598FF");
+                int endColor = Color.parseColor("#FF882BFF");
                 mCumulativeLinearGradient = new LinearGradient(0, 0, currentWidthOfScoreBar, mHeight, new int[]{startColor, middleColor, endColor}, null, Shader.TileMode.CLAMP);
             }
 
