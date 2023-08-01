@@ -607,7 +607,15 @@ public class RoomLivingViewModel extends ViewModel {
         }
 
         // 静音时将本地采集音量改为0
-        if (!isUnMute && mRtcEngine != null) mRtcEngine.adjustRecordingSignalVolume(0);
+        if (!isUnMute && mRtcEngine != null) {
+            if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
+                // 主唱
+                mRtcEngine.adjustRecordingSignalVolume(0);
+            } else {
+                // 其他人
+                mRtcEngine.muteLocalAudioStream(true);
+            }
+        }
         setMicVolume(micOldVolume);
     }
 
@@ -838,7 +846,7 @@ public class RoomLivingViewModel extends ViewModel {
                            playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
                            break;
                        case PLAYER_STATE_PLAYING:
-                           playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                           //playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                            break;
                        case PLAYER_STATE_PAUSED:
                            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
@@ -1089,30 +1097,6 @@ public class RoomLivingViewModel extends ViewModel {
         );
     }
 
-    public void onGraspFinish() {
-        KTVLogger.d(TAG, "RoomLivingViewModel.onGraspFinish() called");
-        if (songPlayingLiveData.getValue() == null) return;
-        KTVSingRelayGameService.INSTANCE.getWinnerInfo(
-                "scene_singrelay_3.4.0",
-                roomInfoLiveData.getValue().getRoomNo(),
-                songPlayingLiveData.getValue().getSongNo(),
-                (userId, userName) -> {
-                    KTVLogger.d(TAG, "RoomLivingViewModel.getWinnerInfo() called：" + userId + " success");
-                    return null;
-                },
-                e -> {
-                    if (e.getMessage().equals("961")) {
-                        KTVLogger.d(TAG, "RoomLivingViewModel.getWinnerInfo() nobody grasp");
-                        hasReceiveStartSingRelay = false;
-                        GraspModel model = new GraspModel();
-                        model.status = GraspStatus.EMPTY;
-                        graspStatusMutableLiveData.postValue(model);
-                    }
-                    return null;
-                }
-        );
-    }
-
     // ======================= settings =======================
     // ------------------ 音效调整 ------------------
     private int getEffectIndex(int index) {
@@ -1169,7 +1153,14 @@ public class RoomLivingViewModel extends ViewModel {
         KTVLogger.d(TAG, "unmute! setMicVolume: " + v);
         micVolume = v;
         if (mRtcEngine != null) {
-            mRtcEngine.adjustRecordingSignalVolume(v);
+            if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
+                // 主唱
+                mRtcEngine.adjustRecordingSignalVolume(v);
+            } else {
+                // 其他人
+                mRtcEngine.adjustRecordingSignalVolume(v);
+                mRtcEngine.muteLocalAudioStream(false);
+            }
         }
     }
 
@@ -1277,10 +1268,10 @@ public class RoomLivingViewModel extends ViewModel {
 
                         }
                     });
+                    SyncStartSing();
                 } else if (isOnSeat()) {
                     ktvApiProtocol.switchSingerRole(KTVSingRole.CoSinger, null);
                 }
-
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
             }
 
