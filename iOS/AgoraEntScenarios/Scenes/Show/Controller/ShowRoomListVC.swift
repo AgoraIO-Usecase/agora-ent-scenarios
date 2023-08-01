@@ -106,6 +106,7 @@ class ShowRoomListVC: UIViewController {
         } else {// (> 85)
             ShowAgoraKitManager.shared.deviceLevel = .high
         }
+        ShowAgoraKitManager.shared.deviceScore = Int(score)
         ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)
     }
     
