@@ -80,11 +80,11 @@ extension VideoLoaderApiImpl {
         engine.updateChannelEx(with: mediaOptions, connection: connection)
         exConnectionMap[channelId] = connection
             
-            if ret == 0 {
-                apiPrint("join room ex: channelId: \(channelId) ownerId: \(ownerId)")
-            }else{
-                apiErrorPrint("join room ex fail: channelId: \(channelId) ownerId: \(ownerId) token = \(token), \(ret)")
-            }
+        if ret == 0 {
+            apiPrint("join room ex: channelId: \(channelId) ownerId: \(ownerId)")
+        }else{
+            apiErrorPrint("join room ex fail: channelId: \(channelId) ownerId: \(ownerId) token = \(token), \(ret)")
+        }
     }
     
     func _leaveChannelEx(channelId: String) {
