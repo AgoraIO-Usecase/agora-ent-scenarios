@@ -23,6 +23,7 @@ class ShowAgoraKitManager: NSObject {
     
     public let rtcParam = ShowRTCParams()
     public var deviceLevel: DeviceLevel = .medium
+    public var deviceScore: Int = 100
     public var netCondition: NetCondition = .good
     public var performanceMode: PerformanceMode = .smooth
     
