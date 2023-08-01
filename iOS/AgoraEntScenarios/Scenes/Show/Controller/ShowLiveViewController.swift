@@ -228,25 +228,20 @@ class ShowLiveViewController: UIViewController {
         guard let room = room else {return}
         if room.ownerId == VLUserCenter.user.id {// 自己的房间
             self.joinChannel()
-            if self.loadingType == .joined {
-                self.updateLoadingType(playState: self.loadingType)
-            }
             self._subscribeServiceEvent()
             AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self)
         } else { // 自己是观众
             self.joinChannel(needUpdateCavans: self.loadingType == .joined)
             AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
                 guard let self = self else { return }
-                showLogger.info("joinRoom: roomid = \(room.roomId)")
+                showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
                 if let err = error {
-                    ToastView.show(text: err.localizedDescription)
-                    showLogger.info(" finishAlertVC joinRoom : roomid = \(room.roomId), error = \(err) ")
-//                    self.onRoomExpired()
-                    self._ensureRoomIsExst(roomId: room.roomId)
+                    if err.code == -1 {
+                        self.onRoomExpired()
+                    } else {
+                        ToastView.show(text: err.localizedDescription)
+                    }
                     return
-                }
-                if self.loadingType == .joined {
-                    self.updateLoadingType(playState: self.loadingType)
                 }
                 self._subscribeServiceEvent()
             }
@@ -309,15 +304,15 @@ class ShowLiveViewController: UIViewController {
             return
         }
         currentChannelId = channelId
-        if needUpdateCavans {
-            if self.role == .audience {
-                ShowAgoraKitManager.shared.setupRemoteVideo(channelId: channelId,
-                                                            uid: uid,
-                                                            canvasView: self.liveView.canvasView.localView)
-            } else {
-                ShowAgoraKitManager.shared.setupLocalVideo(uid: uid, canvasView: self.liveView.canvasView.localView)
-            }
-        }
+//        if needUpdateCavans {
+//            if self.role == .audience {
+//                ShowAgoraKitManager.shared.setupRemoteVideo(channelId: channelId,
+//                                                            uid: uid,
+//                                                            canvasView: self.liveView.canvasView.localView)
+//            } else {
+//                ShowAgoraKitManager.shared.setupLocalVideo(uid: uid, canvasView: self.liveView.canvasView.localView)
+//            }
+//        }
         ShowAgoraKitManager.shared.joinChannelEx(currentChannelId: channelId,
                                                  targetChannelId: channelId,
                                                  ownerId: uid,
@@ -369,67 +364,35 @@ extension ShowLiveViewController {
                 
             }
             sendMessageWithText("join_live_room".show_localized)
-            
-            updateVideoCavans()
+            updateRemoteCavans()
         } else if playState == .prejoined {
             AppContext.showServiceImp(roomId).deinitRoom { error in
                 
             }
             sendMessageWithText("leave_live_room".show_localized)
+            updateRemoteCavans()
         } else {
             leaveRoom()
         }
     }
     
-    func updateVideoCavans() {
-        if role == .audience {
-            let uid: UInt = UInt(room?.ownerId ?? "0") ?? 0
-            ShowAgoraKitManager.shared.setupRemoteVideo(channelId: roomId,
+    func updateRemoteCavans() {
+        guard role == .audience else { return }
+        let uid: UInt = UInt(room?.ownerId ?? "0") ?? 0
+        ShowAgoraKitManager.shared.setupRemoteVideo(channelId: roomId,
+                                                    uid: uid,
+                                                    canvasView: liveView.canvasView.localView)
+        if let targetRoomId = currentInteraction?.roomId, targetRoomId != roomId {
+            let uid = UInt(currentInteraction?.userId ?? "")!
+            ShowAgoraKitManager.shared.setupRemoteVideo(channelId: targetRoomId,
                                                         uid: uid,
-                                                        canvasView: liveView.canvasView.localView)
-            if let targetRoomId = currentInteraction?.roomId, targetRoomId != roomId {
-                let uid = UInt(currentInteraction?.userId ?? "")!
-                ShowAgoraKitManager.shared.setupRemoteVideo(channelId: targetRoomId,
-                                                            uid: uid,
-                                                            canvasView: liveView.canvasView.remoteView)
-            }
+                                                        canvasView: liveView.canvasView.remoteView)
         }
     }
 }
 
 //MARK: service subscribe
 extension ShowLiveViewController: ShowSubscribeServiceProtocol {
-    
-    private func _joinRoom() {
-        self.joinChannel(needUpdateCavans: self.loadingType == .joined)
-        if self.loadingType == .joined {
-            self.updateLoadingType(playState: self.loadingType)
-        }
-        self._subscribeServiceEvent()
-        UIApplication.shared.isIdleTimerDisabled = true
-    }
-    
-    private func _ensureRoomIsExst(roomId: String) {
-        if checking { return }
-        checking = true
-        AppContext.showServiceImp("").getRoomList(page: 1) { [weak self] error, roomList in
-            guard let self = self else { return }
-            self.checking = false
-            guard let list = roomList else {
-                self.onRoomExpired()
-                return
-            }
-            for item in list {
-                let aRoomId = item.roomId
-                if aRoomId == roomId {
-                    self._joinRoom()
-                    return
-                }
-            }
-            self.onRoomExpired()
-        }
-    }
-    
     private func _subscribeServiceEvent() {
         let service = AppContext.showServiceImp(roomId)
         
@@ -899,9 +862,9 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
                     self.throttleRefreshRealTimeInfo()
                 }
             }
-            if self.loadingType != .joined {
-                self.updateLoadingType(playState: self.loadingType)
-            }
+//            if self.loadingType != .joined {
+//                self.updateLoadingType(playState: self.loadingType)
+//            }
         }
     }
     
