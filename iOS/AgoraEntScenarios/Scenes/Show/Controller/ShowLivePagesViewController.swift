@@ -112,13 +112,14 @@ extension ShowLivePagesViewController {
             let room = roomList[idx]
             let roomId = room.roomId
             if roomId.isEmpty {return}
-            let vc = ShowLiveViewController()
-            vc.room = room
-            vc.loadingType = .prejoined
-            vc.delegate = self
-            self.roomVCMap[roomId] = vc
-            //TODO: invoke viewdidload to join channel
-            vc.view.frame = self.view.bounds
+            ShowAgoraKitManager.shared.updateLoadingType(roomId: roomId, channelId: roomId, playState: .prejoined)
+//            let vc = ShowLiveViewController()
+//            vc.room = room
+//            vc.loadingType = .prejoined
+//            vc.delegate = self
+//            self.roomVCMap[roomId] = vc
+//            //TODO: invoke viewdidload to join channel
+//            vc.view.frame = self.view.bounds
         }
     }
     

@@ -217,7 +217,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         videoCanvas.renderMode = .hidden
         let ret = engine.setupRemoteVideoEx(videoCanvas, connection: connection)
                 
-        apiPrint("setupRemoteVideoEx ret = \(ret), uid:\(roomInfo.uid) localuid: \(localUid) channelId: \(roomInfo.channelName)")
+        apiPrint("renderVideo ret = \(ret), uid:\(roomInfo.uid) localuid: \(localUid) channelId: \(roomInfo.channelName)")
     }
     
     public func cleanCache() {
