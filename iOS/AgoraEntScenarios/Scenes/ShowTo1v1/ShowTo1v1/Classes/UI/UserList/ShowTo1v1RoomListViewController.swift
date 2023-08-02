@@ -47,7 +47,16 @@ class ShowTo1v1RoomListViewController: UIViewController {
     }()
     
     deinit {
-        showTo1v1Print("deinit-- Pure1v1UserListViewController")
+        showTo1v1Print("deinit-- ShowTo1v1RoomListViewController")
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        showTo1v1Print("init-- ShowTo1v1RoomListViewController")
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
