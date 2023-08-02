@@ -24,6 +24,10 @@ class ShowCreateLiveVC: UIViewController {
         setUpUI()
         configNaviBar()
         
+        // 美颜设置
+        if let e = ShowAgoraKitManager.shared.engine {
+            BeautyManager.shareManager.configBeautyAPIWithRtcEngine(engine: e)
+        }
         ShowAgoraKitManager.shared.startPreview(canvasView: self.localView)
         ShowNetStateSelectViewController.showInViewController(self)
     }

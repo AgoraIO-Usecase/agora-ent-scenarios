@@ -84,6 +84,25 @@ extension ShowAgoraKitManager {
         engine?.setParameters("{\"rtc.video.sr_max_wh\":\(921598)}")
         engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
     }
+    /// 设置降噪
+    /// - Parameters:
+    ///   - isOn: 开关
+    func setDenoiserOn(_ isOn: Bool) {
+        let option = AgoraVideoDenoiserOptions()
+        switch deviceLevel {
+        case .high:
+            option.mode = .manual
+            option.level = .strength
+        case .medium:
+            option.mode = .manual
+            option.level = .highQuality
+        case .low:
+            option.mode = .manual
+            option.level = .fast
+        }
+        engine?.setVideoDenoiserOptions(isOn, options: option)
+    }
+    
     /** 设置小流参数
      */
     private func setSimulcastStream(isOn: Bool, dimensions: CGSize = CGSizeMake(360, 640), fps: Int32 = 5, svc: Bool = false) {
@@ -149,11 +168,11 @@ extension ShowAgoraKitManager {
             setSimulcastStream(isOn: true, dimensions: CGSizeMake(540, 960), fps: 15, svc: false)
         } else if (machine == .high && net == .bad && performance == .smooth && showMode == .single) {
             // 高端机，弱网，清晰，单播
-            _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 0, h265On: true)
+            _presetValuesWith(encodeSize: ._1080x1920, fps: .fps24, bitRate: 0, h265On: true)
             setSimulcastStream(isOn: false)
         } else if (machine == .high && net == .bad && performance == .fluent && showMode == .single) {
             // 高端机，弱网，流畅，单播
-            _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 0, h265On: true)
+            _presetValuesWith(encodeSize: ._1080x1920, fps: .fps24, bitRate: 0, h265On: true)
             setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, svc: true)
         } else if (machine == .medium && net == .good && performance == .smooth && showMode == .single) {
             // 中端机，好网，清晰，单播
@@ -253,7 +272,7 @@ extension ShowAgoraKitManager {
         case .colorEnhance:
             engine?.setColorEnhanceOptions(isOn, options: AgoraColorEnhanceOptions())
         case .videoDenoiser:
-            engine?.setVideoDenoiserOptions(isOn, options: AgoraVideoDenoiserOptions())
+            setDenoiserOn(isOn)
         case .beauty:
             engine?.setBeautyEffectOptions(isOn, options: AgoraBeautyOptions())
         case .PVC:
@@ -265,11 +284,12 @@ extension ShowAgoraKitManager {
             
            break
         case .videoEncodeSize:
-            let index = indexValue % dimensionsItems.count
-            videoEncoderConfig.dimensions = dimensionsItems[index]
             if let currentChannelId = currentChannelId{
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
-            }else{
+            } else {
+                let index = indexValue % dimensionsItems.count
+                let size = dimensionsItems[index]
+                videoEncoderConfig.dimensions = size
                 engine?.setVideoEncoderConfiguration(videoEncoderConfig)
             }
         case .videoBitRate:
@@ -289,7 +309,6 @@ extension ShowAgoraKitManager {
             }
             // 采集帧率
             captureConfig.frameRate = Int32(fpsItems[index].rawValue)
-            
         case .H265:
             setH265On(isOn)
         case .earmonitoring:
@@ -325,8 +344,8 @@ extension ShowAgoraKitManager {
     // 预设值：设备状况
     enum DeviceLevel: Int {
         case low = 0
-        case high
         case medium
+        case high
         
         func description() -> String {
             switch self {
