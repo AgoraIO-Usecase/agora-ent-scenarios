@@ -117,9 +117,9 @@ class PresetDialog constructor(context: Context, deviceScore: Int) : BottomFullD
 
         val broadcastStrategy = if (broadcastStrategyLevel == 0) VideoSetting.BroadcastStrategy.Smooth else VideoSetting.BroadcastStrategy.Clear
         val network = if (networkLevel == 0) VideoSetting.NetworkLevel.Good else VideoSetting.NetworkLevel.Normal
-        val deviceLevel = if (deviceScore >= 85) {
+        val deviceLevel = if (deviceScore >= 90) {
             VideoSetting.DeviceLevel.High
-        } else if (deviceScore >= 60) {
+        } else if (deviceScore >= 75) {
             VideoSetting.DeviceLevel.Medium
         } else {
             VideoSetting.DeviceLevel.Low
