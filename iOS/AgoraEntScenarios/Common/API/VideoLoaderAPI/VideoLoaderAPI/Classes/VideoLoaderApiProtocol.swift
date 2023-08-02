@@ -78,6 +78,9 @@ public class VideoCanvasContainer: NSObject {
     /// 清除缓存
     func cleanCache()
     
+    /// 退出某个频道外的其他频道
+    func leaveChannelWithout(roomId: String)
+    
     /// 添加api代理
     /// - Parameter listener: <#listener description#>
     func addListener(listener: IVideoLoaderApiListener)
