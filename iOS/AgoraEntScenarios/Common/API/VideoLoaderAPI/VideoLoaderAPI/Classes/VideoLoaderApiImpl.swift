@@ -19,12 +19,19 @@ public class VideoLoaderApiImpl: NSObject {
     private var exConnectionDeps: [String: [String: RoomStatus]] = [:]
     
     deinit {
+        #if DEBUG
+        print("deinit-- VideoLoaderApiImpl")
+        #endif
+        cleanCache()
         rtcProxys.forEach { key, value in
             value.removeAllListener()
         }
     }
     
     public override init() {
+        #if DEBUG
+        print("init-- VideoLoaderApiImpl")
+        #endif
         super.init()
     }
 }
