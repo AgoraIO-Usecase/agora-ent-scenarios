@@ -304,15 +304,15 @@ class ShowLiveViewController: UIViewController {
             return
         }
         currentChannelId = channelId
-//        if needUpdateCavans {
-//            if self.role == .audience {
-//                ShowAgoraKitManager.shared.setupRemoteVideo(channelId: channelId,
-//                                                            uid: uid,
-//                                                            canvasView: self.liveView.canvasView.localView)
-//            } else {
-//                ShowAgoraKitManager.shared.setupLocalVideo(uid: uid, canvasView: self.liveView.canvasView.localView)
-//            }
-//        }
+        if needUpdateCavans {
+            if self.role == .audience {
+                ShowAgoraKitManager.shared.setupRemoteVideo(channelId: channelId,
+                                                            uid: uid,
+                                                            canvasView: self.liveView.canvasView.localView)
+            } else {
+                ShowAgoraKitManager.shared.setupLocalVideo(uid: uid, canvasView: self.liveView.canvasView.localView)
+            }
+        }
         ShowAgoraKitManager.shared.joinChannelEx(currentChannelId: channelId,
                                                  targetChannelId: channelId,
                                                  ownerId: uid,
