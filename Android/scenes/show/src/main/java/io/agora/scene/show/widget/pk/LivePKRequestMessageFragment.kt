@@ -54,11 +54,12 @@ class LivePKRequestMessageFragment : BaseFragment() {
             binding.linkRequestListEmptyImg.visibility = View.GONE
             binding.linkRequestListEmpty.visibility = View.GONE
         }
-        if (interactionInfo == null) {
-            updateUI("", null)
-        } else {
-            updateUI(interactionInfo.userName, interactionInfo.interactStatus)
-        }
+        // TODO fix crash
+//        if (interactionInfo == null) {
+//            updateUI("", null)
+//        } else {
+//            updateUI(interactionInfo.userName, interactionInfo.interactStatus)
+//        }
         linkPKViewAdapter.resetAll(roomList)
         binding.smartRefreshLayout.finishRefresh()
     }

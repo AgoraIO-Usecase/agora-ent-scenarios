@@ -148,15 +148,15 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         TokenGenerator.expireSecond =
             ROOM_AVAILABLE_DURATION / 1000 + 10 // 20min + 10s，加10s防止临界条件下报token无效
 
-        // 设置预加载
+//        // 设置预加载
         val preloadCount = 3
-        mVideoSwitcher.setPreloadCount(preloadCount)
-        mVideoSwitcher.preloadConnections(mRoomInfoList.map {
-            RtcConnection(
-                it.roomId,
-                UserManager.getInstance().user.id.toInt()
-            )
-        })
+//        mVideoSwitcher.setPreloadCount(preloadCount)
+//        mVideoSwitcher.preloadConnections(mRoomInfoList.map {
+//            RtcConnection(
+//                it.roomId,
+//                UserManager.getInstance().user.id.toInt()
+//            )
+//        })
 
         // 设置vp当前页面外的页面数
         binding.viewPager2.offscreenPageLimit = preloadCount - 2
@@ -199,7 +199,7 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
                             binding.viewPager2.isUserInputEnabled = true
                             if(!hasPageSelected){
                                 if(preLoadPosition != POSITION_NONE){
-                                    vpFragments[preLoadPosition]?.stopLoadPage()
+                                    vpFragments[preLoadPosition]?.stopLoadPage(true)
                                 }
                                 vpFragments[currLoadPosition]?.reLoadPage()
                                 preLoadPosition = POSITION_NONE
@@ -242,13 +242,13 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
                     if (currLoadPosition != POSITION_NONE) {
                         if (preLoadPosition != POSITION_NONE) {
                             if (position == preLoadPosition) {
-                                vpFragments[currLoadPosition]?.stopLoadPage()
+                                vpFragments[currLoadPosition]?.stopLoadPage(true)
                             } else {
-                                vpFragments[preLoadPosition]?.stopLoadPage()
+                                vpFragments[preLoadPosition]?.stopLoadPage(true)
                                 vpFragments[currLoadPosition]?.reLoadPage()
                             }
                         } else if (currLoadPosition != position) {
-                            vpFragments[currLoadPosition]?.stopLoadPage()
+                            vpFragments[currLoadPosition]?.stopLoadPage(true)
                             vpFragments[position]?.startLoadPageSafely()
                         }
                     }
@@ -271,11 +271,11 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
 
     override fun onDestroy() {
         super.onDestroy()
-        vpFragments[currLoadPosition]?.stopLoadPage()
+        vpFragments[currLoadPosition]?.stopLoadPage(false)
         VideoSetting.resetBroadcastSetting()
         VideoSetting.resetAudienceSetting()
         TokenGenerator.expireSecond = -1
         RtcEngineInstance.beautyProcessor.reset()
-        RtcEngineInstance.destroy()
+        RtcEngineInstance.cleanCache()
     }
 }

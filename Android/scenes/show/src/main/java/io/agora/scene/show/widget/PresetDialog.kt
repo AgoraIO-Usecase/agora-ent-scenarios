@@ -3,7 +3,7 @@ package io.agora.scene.show.widget
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
-import io.agora.scene.base.utils.ToastUtils
+import androidx.core.view.isVisible
 import io.agora.scene.show.R
 import io.agora.scene.show.VideoSetting
 import io.agora.scene.show.databinding.ShowSettingPresetDialogBinding
@@ -28,20 +28,6 @@ class PresetDialog constructor(context: Context, deviceScore: Int) : BottomFullD
             dismiss()
         }
         mBinding.tvConfirm.setOnClickListener {
-//            val showSelectPosition = getGroupSelectedItem(
-//                mBinding.showChooseItemLowDevice,
-//                mBinding.showChooseItemMediumDevice,
-//                mBinding.showChooseItemHighDevice
-//            )
-//            if (showSelectPosition < 0) {
-//                ToastDialog(context).apply {
-//                    dismissDelayShort()
-//                    showMessage(context.getString(R.string.show_setting_preset_no_choise_tip))
-//                }
-//                return@setOnClickListener
-//            }
-//            onPresetShowModeSelected(showSelectPosition)
-
             // 网络设置
             val networkSelectPosition = getGroupSelectedItem(
                 mBinding.basicChooseItemGoodNetwork,
@@ -70,12 +56,6 @@ class PresetDialog constructor(context: Context, deviceScore: Int) : BottomFullD
             onPresetNetworkModeSelected(networkSelectPosition, broadcastStrategySelectPosition)
             dismiss()
         }
-//        groupItems(
-//            {}, -1,
-//            mBinding.showChooseItemLowDevice,
-//            mBinding.showChooseItemMediumDevice,
-//            mBinding.showChooseItemHighDevice
-//        )
         groupItems(
             {}, 0,
             mBinding.basicChooseItemGoodNetwork,
@@ -83,19 +63,24 @@ class PresetDialog constructor(context: Context, deviceScore: Int) : BottomFullD
         )
 
         groupItems(
-            {}, 0,
+            {
+                when (it) {
+                    0 -> mBinding.networkView.isVisible = true
+                    1 -> mBinding.networkView.isVisible = false
+                }
+            }, 0,
             mBinding.broadcastStrategyItemSmooth,
             mBinding.broadcastStrategyItemClear
         )
 
-        val deviceLevel = if (deviceScore >= 85) {
+        val deviceLevel = if (deviceScore >= 90) {
             "高端机"
-        } else if (deviceScore >= 60) {
+        } else if (deviceScore >= 75) {
             "中端机"
         } else {
             "低端机"
         }
-        mBinding.tvDeviceScore.text = "设备检测结果：$deviceLevel"
+        mBinding.tvDeviceScore.text = "设备检测结果：$deviceLevel（$deviceScore）"
     }
 
     private fun getGroupSelectedItem(vararg itemViews: View): Int {
@@ -124,33 +109,6 @@ class PresetDialog constructor(context: Context, deviceScore: Int) : BottomFullD
         }
     }
 
-    private fun onPresetShowModeSelected(level: Int){
-        val selectedLevel = level
-        if (selectedLevel < 0) {
-            // 没有选择默认使用低端机配置
-            return
-        }
-        when (selectedLevel) {
-            // 低端机
-            0 -> {
-                VideoSetting.updateBroadcastSetting(VideoSetting.DeviceLevel.Low)
-            }
-            // 中端机
-            1 -> {
-                VideoSetting.updateBroadcastSetting(VideoSetting.DeviceLevel.Medium)
-            }
-            // 高端机
-            2 -> {
-                VideoSetting.updateBroadcastSetting(VideoSetting.DeviceLevel.High)
-            }
-        }
-
-        ToastDialog(context).apply {
-            dismissDelayShort()
-            showMessage(context.getString(R.string.show_setting_preset_done))
-        }
-    }
-
     private fun onPresetNetworkModeSelected(networkLevel: Int, broadcastStrategyLevel: Int){
         if (networkLevel < 0 || broadcastStrategyLevel < 0) {
             // 没有选择默认使用好网络配置
@@ -173,6 +131,4 @@ class PresetDialog constructor(context: Context, deviceScore: Int) : BottomFullD
             showMessage(context.getString(R.string.show_setting_preset_done))
         }
     }
-
-
 }

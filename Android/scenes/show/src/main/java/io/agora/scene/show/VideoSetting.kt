@@ -214,26 +214,9 @@ object VideoSetting {
                 videoDenoiser = false,
                 PVC = true,
                 captureResolution = Resolution.V_720P,
-                encodeResolution = Resolution.V_720P,
+                encodeResolution = Resolution.V_1080P,
                 frameRate = FrameRate.FPS_24,
                 bitRate = BitRate.BR_High_1V1.value,
-                bitRateStandard = true,
-                hardwareVideoEncoder = true
-            ),
-            BroadcastSetting.Audio(false, 80, 30)
-        )
-
-        val HighDeviceNormalNetwork1v1 = BroadcastSetting(
-            BroadcastSetting.Video(
-                H265 = true,
-                colorEnhance = false,
-                lowLightEnhance = false,
-                videoDenoiser = false,
-                PVC = true,
-                captureResolution = Resolution.V_720P,
-                encodeResolution = Resolution.V_720P,
-                frameRate = FrameRate.FPS_15,
-                bitRate = BitRate.BR_Low_1V1.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -508,8 +491,9 @@ object VideoSetting {
             setCurrAudienceDeviceLevel(deviceLevel)
             return
         } else {
+            setCurrAudienceDeviceLevel(deviceLevel)
             liveMode = when (currBroadcastSetting) {
-                RecommendBroadcastSetting.LowDevice1v1, RecommendBroadcastSetting.MediumDevice1v1, RecommendBroadcastSetting.HighDevice1v1, RecommendBroadcastSetting.HighDeviceNormalNetwork1v1 -> LiveMode.OneVOne
+                RecommendBroadcastSetting.LowDevice1v1, RecommendBroadcastSetting.MediumDevice1v1, RecommendBroadcastSetting.HighDevice1v1 -> LiveMode.OneVOne
                 RecommendBroadcastSetting.LowDevicePK, RecommendBroadcastSetting.MediumDevicePK, RecommendBroadcastSetting.HighDevicePK -> LiveMode.PK
                 else -> LiveMode.OneVOne
             }
@@ -520,7 +504,7 @@ object VideoSetting {
                 LiveMode.OneVOne -> when (deviceLevel) {
                     DeviceLevel.Low -> RecommendBroadcastSetting.LowDevice1v1
                     DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevice1v1
-                    DeviceLevel.High -> if (networkLevel == NetworkLevel.Good) RecommendBroadcastSetting.HighDevice1v1 else RecommendBroadcastSetting.HighDeviceNormalNetwork1v1
+                    DeviceLevel.High -> RecommendBroadcastSetting.HighDevice1v1
                 }
 
                 LiveMode.PK -> when (deviceLevel) {
@@ -556,11 +540,10 @@ object VideoSetting {
         val deviceLevel = when (currBroadcastSetting) {
             RecommendBroadcastSetting.LowDevice1v1, RecommendBroadcastSetting.LowDevicePK -> DeviceLevel.Low
             RecommendBroadcastSetting.MediumDevice1v1, RecommendBroadcastSetting.MediumDevicePK -> DeviceLevel.Medium
-            RecommendBroadcastSetting.HighDevice1v1, RecommendBroadcastSetting.HighDeviceNormalNetwork1v1, RecommendBroadcastSetting.HighDevicePK -> DeviceLevel.High
+            RecommendBroadcastSetting.HighDevice1v1, RecommendBroadcastSetting.HighDevicePK -> DeviceLevel.High
             else -> return
         }
 
-        val networkLevel = NetworkLevel.Good
         updateBroadcastSetting(
             when (liveMode) {
                 LiveMode.OneVOne -> when (deviceLevel) {
@@ -575,19 +558,9 @@ object VideoSetting {
                     DeviceLevel.High -> RecommendBroadcastSetting.HighDevicePK
                 }
             },
-            if (getCurrLowStreamSetting() != null) when (liveMode) {
-                LiveMode.OneVOne -> when (deviceLevel) {
-                    DeviceLevel.Low -> if (networkLevel == NetworkLevel.Good) RecommendLowStreamVideoSetting.LowDeviceGoodNetwork1v1 else RecommendLowStreamVideoSetting.LowDeviceNormalNetwork1v1
-                    DeviceLevel.Medium -> if (networkLevel == NetworkLevel.Good) RecommendLowStreamVideoSetting.MiddleDeviceGoodNetwork1v1 else RecommendLowStreamVideoSetting.MiddleDeviceNormalNetwork1v1
-                    DeviceLevel.High -> if (networkLevel == NetworkLevel.Good) RecommendLowStreamVideoSetting.HighDeviceGoodNetwork1v1 else RecommendLowStreamVideoSetting.HighDeviceNormalNetwork1v1
-                }
-
-                LiveMode.PK -> when (deviceLevel) {
-                    DeviceLevel.Low -> RecommendLowStreamVideoSetting.PK
-                    DeviceLevel.Medium -> RecommendLowStreamVideoSetting.PK
-                    DeviceLevel.High -> RecommendLowStreamVideoSetting.PK
-                }
-            } else null,
+            if (getCurrLowStreamSetting() != null)
+                if (liveMode == LiveMode.PK) RecommendLowStreamVideoSetting.PK else getCurrLowStreamSetting()
+            else null,
             isJoinedRoom,
             rtcConnection
         )
@@ -630,6 +603,10 @@ object VideoSetting {
                 lowStreamSetting.SVC,
                 lowStreamSetting.enableHardwareEncoder
             )
+        }.run {
+            updateRTCLowStreamSetting(
+                rtcConnection,
+                false)
         }
     }
 
@@ -744,15 +721,15 @@ object VideoSetting {
                 "SR_Config -- enable=$enableSR sr_type=$SR currAudienceEnhanceSwitch=$currAudienceEnhanceSwitch"
             )
 
-            if (autoSR) {
-                // 设置最大分辨率
-                rtcEngine.setParameters("{\"rtc.video.sr_max_wh\":921598}")
-                // 超分开关
-                rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":$enableSR, \"mode\": 2}}")
-                return
-            }
-
             if (enableSR) {
+                if (autoSR) {
+                    // 设置最大分辨率
+                    rtcEngine.setParameters("{\"rtc.video.sr_max_wh\":921598}")
+                    // 超分开关
+                    rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":$enableSR, \"mode\": 2}}")
+                    return
+                }
+
                 // 设置最大分辨率
                 rtcEngine.setParameters("{\"rtc.video.sr_max_wh\":921598}")
                 // 在切换时必须先关闭sr再设置倍数再打开,，即
@@ -803,7 +780,7 @@ object VideoSetting {
             if (!isJoinedRoom) {
                 // 只能在加入房间前设置，否则rtc sdk会崩溃
                 rtcEngine.setParameters("{\"engine.video.enable_hw_encoder\":${it}}")
-                rtcEngine.setParameters("{\"che.video.videoCodecIndex\":\"${if (it) 2 else 1}\"}")
+                rtcEngine.setParameters("{\"che.video.videoCodecIndex\":${if(it) 2 else 1}}")
             }
         }
         colorEnhance?.let {
@@ -813,7 +790,11 @@ object VideoSetting {
             rtcEngine.setLowlightEnhanceOptions(it, LowLightEnhanceOptions())
         }
         videoDenoiser?.let {
-            rtcEngine.setVideoDenoiserOptions(it, VideoDenoiserOptions())
+            when (currAudienceDeviceLevel) {
+                DeviceLevel.High -> rtcEngine.setVideoDenoiserOptions(it, VideoDenoiserOptions(1, 2))
+                DeviceLevel.Medium -> rtcEngine.setVideoDenoiserOptions(it, VideoDenoiserOptions(1, 0))
+                DeviceLevel.Low -> rtcEngine.setVideoDenoiserOptions(it, VideoDenoiserOptions(1, 1))
+            }
         }
         PVC?.let {
             rtcEngine.setParameters("{\"rtc.video.enable_pvc\":${it}}")
@@ -866,7 +847,7 @@ object VideoSetting {
         audioMixingVolume?.let {
             // fix 播放用的是mpk
             if (rtcConnection != null) {
-                videoSwitcher.adjustAudioMixingVolume(rtcConnection, it)
+                //videoSwitcher.adjustAudioMixingVolume(rtcConnection, it)
             } else {
                 rtcEngine.adjustAudioMixingVolume(it)
             }
@@ -883,6 +864,7 @@ object VideoSetting {
         svc: Boolean? = null,
         enableHardwareEncoder: Boolean? = null,
     ) {
+        ShowLogger.d("VideoSettings", "updateRTCLowStreamSetting, enableLowStream:$enableLowStream, svc:$svc")
         val rtcEngine = RtcEngineInstance.rtcEngine
 
         if (enableLowStream) {
