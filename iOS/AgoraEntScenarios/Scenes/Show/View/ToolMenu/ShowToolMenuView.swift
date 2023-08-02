@@ -13,7 +13,6 @@ enum ShowToolMenuType: CaseIterable {
     case camera
     case mic
     case real_time_data
-    case HD
     case setting
     case mute_mic
     case end_pk
@@ -24,7 +23,6 @@ enum ShowToolMenuType: CaseIterable {
         case .camera: return "show_camera"
         case .mic, .mute_mic: return "show_mic"
         case .real_time_data: return "show_realtime"
-        case .HD: return "show_hd"
         case .setting: return "show_setting"
         case .end_pk: return "show_end_pk"
         }
@@ -44,7 +42,6 @@ enum ShowToolMenuType: CaseIterable {
         case .camera: return "show_setting_video_on".show_localized
         case .mic: return "show_setting_mic_on".show_localized
         case .real_time_data: return "show_setting_statistic".show_localized
-        case .HD: return "show_setting_quality".show_localized
         case .setting: return "show_setting_advance_setting".show_localized
         case .mute_mic: return "show_setting_mute".show_localized
         case .end_pk: return "show_setting_end_mic_seat".show_localized

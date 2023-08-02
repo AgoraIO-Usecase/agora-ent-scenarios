@@ -99,6 +99,8 @@ class Pure1v1UserCell: UICollectionViewCell {
         gradientLayer.frame = CGRect(x: 0, y: contentImageView.aui_height - 254, width: contentImageView.aui_width, height: 254)
         let wh = 32.0
         avatarView.frame = CGRect(x: 15, y: contentImageView.aui_height - 40 - wh, width: wh, height: wh)
+        avatarView.layer.cornerRadius = wh / 2
+        avatarView.clipsToBounds = true
         nameLabel.sizeToFit()
         nameLabel.aui_left = avatarView.aui_right + 10
         nameLabel.aui_centerY = avatarView.aui_centerY

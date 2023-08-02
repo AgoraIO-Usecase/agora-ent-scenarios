@@ -38,6 +38,10 @@ public class VideoCanvasContainer: NSObject {
 
 @objc public protocol IVideoLoaderApiListener: NSObjectProtocol {
     @objc optional func onStateDidChange(newState: RoomStatus, oldState: RoomStatus, channelName: String)
+    
+    @objc optional func debugInfo(_ message: String)
+    @objc optional func debugWarning(_ message: String)
+    @objc optional func debugError(_ message: String)
 }
 
 @objc public protocol IVideoLoaderApi: NSObjectProtocol {
@@ -63,6 +67,8 @@ public class VideoCanvasContainer: NSObject {
     /// - Returns: <#description#>
     func getRoomState(roomInfo: RoomInfo) -> RoomStatus
     
+    func getConnectionMap() -> [String: AgoraRtcConnection]
+    
     /// 渲染到指定画布上
     /// - Parameters:
     ///   - roomInfo: <#roomInfo description#>
@@ -82,9 +88,11 @@ public class VideoCanvasContainer: NSObject {
     
     /// 添加RTC代理
     /// - Parameter listener: <#listener description#>
-    func addRTCListener(listener: AgoraRtcEngineDelegate)
+    func addRTCListener(roomId: String, listener: AgoraRtcEngineDelegate)
     
     /// 移除RTC代理
     /// - Parameter listener: <#listener description#>
-    func removeRTCListener(listener: AgoraRtcEngineDelegate)
+    func removeRTCListener(roomId: String, listener: AgoraRtcEngineDelegate)
+    
+    func getRTCListener(roomId: String) -> AgoraRtcEngineDelegate?
 }

@@ -14,21 +14,35 @@ class Pure1v1CallViewController: UIViewController {
         didSet {
             oldValue?.removeListener(listener: self)
             callApi?.addListener(listener: self)
+            oldValue?.removeRTCListener?(listener: self)
+            callApi?.addRTCListener?(listener: self)
         }
     }
+    var appId: String = ""
+    var rtcEngine: AgoraRtcEngineKit?
+    var currentUser: Pure1v1UserInfo?
     var targetUser: Pure1v1UserInfo? {
         didSet {
             roomInfoView.setRoomInfo(avatar: targetUser?.avatar ?? "",
                                      name: targetUser?.userName ?? "",
                                      id: targetUser?.userId ?? "",
                                      time: Int64(Date().timeIntervalSince1970 * 1000))
+            
+            smallCanvasView.aui_tl = CGPoint(x: view.aui_width - 25 - 109, y: 82 + UIDevice.current.aui_SafeDistanceTop)
+            roomInfoView.timerCallBack = {[weak self] duration in
+                if duration < 20 * 60 {
+                    return
+                }
+                self?.roomInfoView.setRoomInfo(avatar: nil, name: nil, id: nil, time: nil)
+                self?._hangupAction()
+            }
         }
     }
     private lazy var moveViewModel: MoveGestureViewModel = MoveGestureViewModel()
     private lazy var roomInfoView: Pure1v1RoomInfoView = Pure1v1RoomInfoView()
     lazy var bigCanvasView: UIView = UIView()
     lazy var smallCanvasView: UIView = {
-        let view = UIView()
+        let view = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 109, height: 163)))
         view.backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
         view.addGestureRecognizer(moveViewModel.gesture)
         return view
@@ -73,7 +87,6 @@ class Pure1v1CallViewController: UIViewController {
         moveViewModel.touchArea = view.bounds
         roomInfoView.frame = CGRect(x: 15, y: UIDevice.current.aui_SafeDistanceTop, width: 202, height: 40)
         bigCanvasView.frame = view.bounds
-        smallCanvasView.frame = CGRect(x: view.aui_width - 25 - 109, y: 82 + UIDevice.current.aui_SafeDistanceTop, width: 109, height: 163)
         smallCanvasView.layer.cornerRadius = 20
         smallCanvasView.clipsToBounds = true
         
@@ -82,13 +95,12 @@ class Pure1v1CallViewController: UIViewController {
         hangupButton.aui_size = CGSize(width: 70, height: 70)
         hangupButton.aui_bottom = self.view.aui_height - 20 - UIDevice.current.aui_SafeDistanceBottom
         hangupButton.aui_centerX = self.view.aui_width / 2
-        
-        callApi?.addRTCListener?(listener: self)
     }
     
     @objc private func _hangupAction() {
         callApi?.hangup(roomId: targetUser?.getRoomId() ?? "", completion: { err in
         })
+        dismiss(animated: false)
     }
 }
 
@@ -201,6 +213,30 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
                                 eventReason: String,
                                 elapsed: Int,
                                 eventInfo: [String : Any]) {
+            let publisher = eventInfo[kPublisher] as? String ?? currentUser?.userId
+            guard publisher == currentUser?.userId else {
+                return
+            }
+            
+            switch state {
+            case .connected:
+                let connection = AgoraRtcConnection()
+                assert(targetUser != nil, "targetUser == nil")
+                connection.channelId = targetUser?.getRoomId() ?? ""
+                connection.localUid = UInt(currentUser?.userId ?? "") ?? 0
+                setupContentInspectConfig(true, connection: connection)
+                moderationAudio()
+                break
+            case .prepared, .idle:
+//                guard let targetUser = targetUser, let currentUser = currentUser else {return}
+//                let connection = AgoraRtcConnection()
+//                connection.channelId = targetUser.getRoomId() ?? ""
+//                connection.localUid = UInt(currentUser.userId ?? "") ?? 0
+//                setupContentInspectConfig(false, connection: connection)
+                break
+            default:
+                break
+            }
         }
         
         func onCallEventChanged(with event: CallEvent, elapsed: Int) {
@@ -212,4 +248,48 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
                 break
             }
         }
+}
+
+extension Pure1v1CallViewController {
+    private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
+        let config = AgoraContentInspectConfig()
+        let dic: [String: String] = [
+            "id": "\(connection.localUid)",
+            "sceneName": "Pure1v1",
+            "userNo": "\(connection.localUid)"
+        ]
+        
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
+            pure1v1Error("setupContentInspectConfig fail")
+            return
+        }
+        let jsonStr = String(data: jsonData, encoding: .utf8)
+        config.extraInfo = jsonStr
+        let module = AgoraContentInspectModule()
+        module.interval = 30
+        module.type = .imageModeration
+        config.modules = [module]
+        let ret = rtcEngine?.enableContentInspectEx(enable, config: config, connection: connection)
+        pure1v1Print("setupContentInspectConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret ?? -1)")
+    }
+    
+    /// 语音审核
+    private func moderationAudio() {
+        let userInfo = ["id": currentUser?.userId ?? "",
+                        "sceneName": "show",
+                        "userNo": currentUser?.userId ?? "",
+                        "userName": currentUser?.userName ?? ""] as NSDictionary
+        let parasm: [String: Any] = ["appId": appId,
+                                     "channelName": targetUser?.userId ?? "",
+                                     "channelType": AgoraChannelProfile.liveBroadcasting.rawValue,
+                                     "traceId": NSString.withUUID().md5(),
+                                     "src": "iOS",
+                                     "payload": userInfo.yy_modelToJSONString()]
+        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/moderation/audio",
+                                          params: parasm) { response in
+            pure1v1Print("moderationAudio response === \(response)")
+        } failure: { errr in
+            pure1v1Error(errr)
+        }
+    }
 }

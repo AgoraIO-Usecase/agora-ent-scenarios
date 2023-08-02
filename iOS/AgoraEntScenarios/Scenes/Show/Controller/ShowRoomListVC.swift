@@ -7,11 +7,10 @@
 
 import UIKit
 
-private let kAudienceShowPresetType = "kAudienceShowPresetType"
-
 class ShowRoomListVC: UIViewController {
     
     let backgroundView = UIImageView()
+    private var preloadRoom: ShowRoomListModel?
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -69,6 +68,8 @@ class ShowRoomListVC: UIViewController {
         ShowAgoraKitManager.shared.prepareEngine()
         ShowRobotService.shared.startCloudPlayers()
         preGenerateToken()
+        // 获取设备性能
+        checkDevice()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -90,41 +91,29 @@ class ShowRoomListVC: UIViewController {
         self.fetchRoomList()
     }
     
-    @objc private func didClickSettingButton(){
-        if AppContext.shared.isDebugMode {
-            showDebugSetVC()
-        }else {
-            showPresettingVC {[weak self] type in
-                let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
-                let audencePresetType = ShowPresetType(rawValue: value)
-                if audencePresetType != .unknown {
-                    UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
-                }
-                self?.needUpdateAudiencePresetType = true
-            }
-        }
-    }
-    
     private func showDebugSetVC(){
         let vc = ShowDebugSettingVC()
         vc.isBroadcastor = false
         navigationController?.pushViewController(vc, animated: true)
     }
     
-    private func showPresettingVC(selected:((_ type: ShowPresetType)->())? = nil) {
-        let vc = ShowPresettingVC()
-        vc.isBroadcaster = false
-        vc.didSelectedPresetType = { type, modeName in
-            selected?(type)
+    private func checkDevice() {
+         let score = ShowAgoraKitManager.shared.engine?.queryDeviceScore() ?? 0
+        if (score < 60) {// (0, 60)
+            ShowAgoraKitManager.shared.deviceLevel = .low
+        } else if (score <= 85) {// [60, 85]
+            ShowAgoraKitManager.shared.deviceLevel = .medium
+        } else {// (> 85)
+            ShowAgoraKitManager.shared.deviceLevel = .high
         }
-        present(vc, animated: true)
+        ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)
     }
+    
     // 加入房间
     private func joinRoom(_ room: ShowRoomListModel){
+        ShowAgoraKitManager.shared.callTimestampStart()
+        
         let vc = ShowLivePagesViewController()
-        let audencePresetType = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
-        vc.audiencePresetType = ShowPresetType(rawValue: audencePresetType)
-        vc.needUpdateAudiencePresetType = needUpdateAudiencePresetType
         let nc = UINavigationController(rootViewController: vc)
         nc.modalPresentationStyle = .fullScreen
         if room.ownerId == VLUserCenter.user.id {
@@ -207,30 +196,29 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    
+    func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
+        showLogger.info("didHighlightItemAt: \(indexPath.row)", context: "collectionView")
         let room = roomList[indexPath.item]
-        let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
-        let audencePresetType = ShowPresetType(rawValue: value)
-        // 如果是owner是自己 或者已经设置过观众模式
-        if AppContext.shared.isDebugMode == false {
-            if room.ownerId == VLUserCenter.user.id || audencePresetType != .unknown {
-                joinRoom(room)
-            }else{
-                showPresettingVC { [weak self] type in
-                    self?.needUpdateAudiencePresetType = true
-                    UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
-                    self?.joinRoom(room)
-                }
-            }
-        }else {
-            joinRoom(room)
-        }
+        ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .prejoined)
+        preloadRoom = room
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        showLogger.info("didSelectItemAt: \(indexPath.row)", context: "collectionView")
+        let room = roomList[indexPath.item]
+        joinRoom(room)
     }
     
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         preLoadVisibleItems()
     }
     
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+//        showLogger.info("scrollViewWillBeginDragging", context: "collectionView")
+        guard let room = preloadRoom else {return}
+        ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .idle)
+    }
 }
 
 // MARK: - Creations
@@ -267,8 +255,6 @@ extension ShowRoomListVC {
         navigationController?.isNavigationBarHidden = true
         naviBar.title = "navi_title_show_live".show_localized
         view.addSubview(naviBar)
-        let saveButtonItem = ShowBarButtonItem(title: "room_list_audience_setting".show_localized, target: self, action: #selector(didClickSettingButton))
-        naviBar.rightItems = [saveButtonItem]
     }
     
     func createConstrains() {

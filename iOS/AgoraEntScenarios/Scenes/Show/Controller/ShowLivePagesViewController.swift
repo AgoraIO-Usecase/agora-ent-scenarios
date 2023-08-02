@@ -9,23 +9,14 @@ import Foundation
 import UIKit
 
 class ShowLivePagesViewController: ViewController {
+    
     var roomList: [ShowRoomListModel]?
-    // 观众端预设类型
-    var audiencePresetType: ShowPresetType?
-    var needUpdateAudiencePresetType = false
-//    var selectedResolution = 1
     
     var focusIndex: Int = 0
     
     private var currentVC: ShowLiveViewController?
     
-    lazy var agoraKitManager: ShowAgoraKitManager = {
-        let manager = ShowAgoraKitManager.shared
-        if AppContext.shared.isDebugMode == false {
-            manager.defaultSetting()
-        }
-        return manager
-    }()
+    let agoraKitManager = ShowAgoraKitManager.shared
     
     fileprivate var roomVCMap: [String: ShowLiveViewController] = [:]
     
@@ -61,8 +52,6 @@ class ShowLivePagesViewController: ViewController {
         collectionView.isScrollEnabled = roomList?.count ?? 0 > 1 ? true : false
         scroll(to: fakeCellIndex(with: focusIndex))
         preloadEnterRoom()
-        updateAudiencePresetType()
-//        addDebugButton()
     }
     
     private func addDebugButton(){
@@ -105,7 +94,7 @@ class ShowLivePagesViewController: ViewController {
     }
     
     @objc private func didClickDebugSuperButton(){
-        agoraKitManager.setOffSuperResolution()
+        agoraKitManager.setSuperResolutionOn(false)
     }
 }
 
@@ -123,14 +112,14 @@ extension ShowLivePagesViewController {
             let room = roomList[idx]
             let roomId = room.roomId
             if roomId.isEmpty {return}
-            let vc = ShowLiveViewController()
-            vc.audiencePresetType = self.audiencePresetType
-            vc.room = room
-            vc.loadingType = .waiting
-            vc.delegate = self
-            self.roomVCMap[roomId] = vc
-            //TODO: invoke viewdidload to join channel
-            vc.view.frame = self.view.bounds
+            ShowAgoraKitManager.shared.updateLoadingType(roomId: roomId, channelId: roomId, playState: .prejoined)
+//            let vc = ShowLiveViewController()
+//            vc.room = room
+//            vc.loadingType = .prejoined
+//            vc.delegate = self
+//            self.roomVCMap[roomId] = vc
+//            //TODO: invoke viewdidload to join channel
+//            vc.view.frame = self.view.bounds
         }
     }
     
@@ -175,20 +164,6 @@ extension ShowLivePagesViewController {
     private func scroll(to index: Int) {
         collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredVertically, animated: false)
     }
-    
-    // 观众端模式设置
-    private func updateAudiencePresetType() {
-        // 如果是主播 不执行
-        if let room = roomList?[focusIndex], room.ownerId == VLUserCenter.user.id {
-            return
-        }
-        if needUpdateAudiencePresetType == false {
-            return
-        }
-        if let type = audiencePresetType {
-            agoraKitManager.updatePresetForType(type, mode: .single)
-        }
-    }
 }
 
 //MARK: live vc cache
@@ -223,9 +198,8 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
             vc?.view.removeFromSuperview()
         } else {
             vc = ShowLiveViewController()
-            vc?.audiencePresetType = self.audiencePresetType
             vc?.room = room
-            vc?.loadingType = .waiting
+            vc?.loadingType = .prejoined
             vc?.delegate = self
         }
         
@@ -235,7 +209,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
         if let origVC = origVC {
             origVC.view.removeFromSuperview()
             origVC.removeFromParent()
-            origVC.loadingType = .none
+            origVC.loadingType = .idle
             AppContext.unloadShowServiceImp(origVC.room?.roomId ?? "")
             self.roomVCMap[origVC.room?.roomId ?? ""] = nil
             showLogger.info("remove cache vc: \(origVC.room?.roomId ?? "") cache vc count:\(self.roomVCMap.count)")
@@ -261,7 +235,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
 //            assert(false, "room at index \(idx) not found")
             return
         }
-        vc.loadingType = .playing
+        vc.loadingType = .joined
         currentVC = vc
         self.view.endEditing(true)
     }
@@ -273,7 +247,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
 //            assert(false, "room at index \(idx) not found")
             return
         }
-        vc.loadingType = .waiting
+        vc.loadingType = .prejoined
         self.view.endEditing(true)
     }
     

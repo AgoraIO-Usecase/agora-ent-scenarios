@@ -89,6 +89,7 @@ class Pure1v1NoDataDialog: Pure1v1Dialog {
         paragraphStyle.lineSpacing = 5
         text.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: text.length))
         label.attributedText = text
+
         return label
     }()
     override func _loadSubView() {
@@ -469,7 +470,10 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
     
     static func show(user: Pure1v1UserInfo) -> Pure1v1CalleeDialog? {
         Pure1v1CalleeDialog.hidden()
-        guard let window = getWindow() else {return nil}
+        guard let window = getWindow() else {
+            assert(false, "get window fail")
+            return nil
+        }
         let dialog = Pure1v1CalleeDialog(frame: window.bounds)
         dialog.userInfo = user
         dialog.tag = kDialogTag

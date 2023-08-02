@@ -21,6 +21,7 @@ enum ShowPresetStandardType {
     }
 }
 
+
 enum ShowMode {
     case single // 单主播模式
     case pk // pk模式
@@ -31,20 +32,14 @@ enum ShowPresetType: Int {
     case show_low   // 秀场低端
     case show_medium    // 秀场终端
     case show_high      // 秀场高端
-    case quality_low    // 超分低端
-    case quality_medium // 超分中端
-    case quality_high   // 超分高端
-    case base_low       // 基础模式低端
-    case base_medium    // 基础模式中端
-    case base_high      // 基础模式高端
     
     var title: String {
         switch self {
-        case .show_low, .quality_low, .base_low:
+        case .show_low:
             return "show_presetting_device_level_low_title".show_localized
-        case .show_medium, .quality_medium, .base_medium:
+        case .show_medium:
             return "show_presetting_device_level_medium_title".show_localized
-        case .show_high, .quality_high, .base_high:
+        case .show_high:
             return "show_presetting_device_level_high_title".show_localized
         case .unknown:
             return ""
@@ -53,11 +48,11 @@ enum ShowPresetType: Int {
     
     var iosInfo: String {
         switch self {
-        case .show_low, .quality_low, .base_low:
+        case .show_low:
             return "show_presetting_device_level_low_desc".show_localized
-        case .show_medium, .quality_medium, .base_medium:
+        case .show_medium:
             return "show_presetting_device_level_medium_desc".show_localized
-        case .show_high, .quality_high, .base_high:
+        case .show_high:
             return "show_presetting_device_level_high_desc".show_localized
         case .unknown:
             return ""

@@ -39,15 +39,15 @@
     [self.listeners removeAllObjects];
 }
 
-- (id)forwardingTargetForSelector:(SEL)aSelector {
-    for (id listener in _listeners) {
-        if ([listener respondsToSelector:aSelector]) {
-            return listener;
-        }
-    }
-    
-    return nil;
-}
+//- (id)forwardingTargetForSelector:(SEL)aSelector {
+//    for (id listener in _listeners) {
+//        if ([listener respondsToSelector:aSelector]) {
+//            return listener;
+//        }
+//    }
+//    
+//    return nil;
+//}
 
 - (BOOL)respondsToSelector:(SEL)aSelector {
     return [self methodSignatureForSelector:aSelector] != nil;
