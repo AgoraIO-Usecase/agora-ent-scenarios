@@ -31,6 +31,13 @@ public class VideoLoaderApiImpl: NSObject {
 
 //MARK: private
 extension VideoLoaderApiImpl {
+    private func _getProxy(roomId: String) -> VideoLoaderAgoraExProxy {
+        let rtcProxy = rtcProxys[roomId] ?? VideoLoaderAgoraExProxy()
+        rtcProxys[roomId] = rtcProxy
+        
+        return rtcProxy
+    }
+    
     private func _updateChannelEx(channelId: String, options: AgoraRtcChannelMediaOptions) {
         guard let engine = config?.rtcEngine,
               let connection = exConnectionMap[channelId] else {
@@ -66,9 +73,9 @@ extension VideoLoaderApiImpl {
         connection.localUid = uid
         
         //TODO: retain cycle in joinChannelEx to use rtcProxy
-        let rtcProxy = rtcProxys[channelId]
+        let rtcProxy = _getProxy(roomId: channelId)
         let date = Date()
-//            showLogger.info("try to join room[\(connection.channelId)] ex uid: \(connection.localUid)", context: kShowLogBaseContext)
+        apiPrint("try to join room[\(connection.channelId)] ex uid: \(connection.localUid)")
         let ret =
         engine.joinChannelEx(byToken: token,
                                connection: connection,
@@ -81,7 +88,7 @@ extension VideoLoaderApiImpl {
         exConnectionMap[channelId] = connection
             
         if ret == 0 {
-            apiPrint("join room ex: channelId: \(channelId) ownerId: \(ownerId)")
+            apiPrint("join room ex: channelId: \(channelId) ownerId: \(ownerId) connection count: \(exConnectionMap.count)")
         }else{
             apiErrorPrint("join room ex fail: channelId: \(channelId) ownerId: \(ownerId) token = \(token), \(ret)")
         }
@@ -95,16 +102,16 @@ extension VideoLoaderApiImpl {
             apiPrint("leaveChannelEx break, depcount: \(depMap?.count ?? 0), channelId: \(channelId)")
             return
         }
-        apiPrint("leaveChannelEx channelId: \(channelId)")
         engine.leaveChannelEx(connection)
         exConnectionMap[channelId] = nil
+        apiPrint("leaveChannelEx channelId: \(channelId)  connection count: \(exConnectionMap.count)")
     }
     
     private func apiPrint(_ message: String) {
         let api = apiProxy as IVideoLoaderApiListener
         api.debugInfo?(message)
         #if DEBUG
-        print("[VideoLoaderApi]\(message)")
+//        print("[VideoLoaderApi]\(message)")
         #endif
     }
 
@@ -112,7 +119,7 @@ extension VideoLoaderApiImpl {
         let api = apiProxy as IVideoLoaderApiListener
         api.debugWarning?(message)
         #if DEBUG
-        print("[VideoLoaderApi][Warning]\(message)")
+//        print("[VideoLoaderApi][Warning]\(message)")
         #endif
     }
 
@@ -120,7 +127,7 @@ extension VideoLoaderApiImpl {
         let api = apiProxy as IVideoLoaderApiListener
         api.debugError?(message)
         #if DEBUG
-        print("[VideoLoaderApi][Error]\(message)")
+//        print("[VideoLoaderApi][Error]\(message)")
         #endif
     }
 }
@@ -227,6 +234,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         }
         exConnectionMap.removeAll()
         exConnectionDeps.removeAll()
+        apiPrint("cleanCache")
     }
     
     public func addListener(listener: IVideoLoaderApiListener) {
@@ -238,9 +246,8 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
     }
     
     public func addRTCListener(roomId: String, listener: AgoraRtcEngineDelegate) {
-        let rtcProxy = rtcProxys[roomId] ?? VideoLoaderAgoraExProxy()
+        let rtcProxy = _getProxy(roomId: roomId)
         rtcProxy.addListener(listener)
-        rtcProxys[roomId] = rtcProxy
     }
     
     public func removeRTCListener(roomId: String, listener: AgoraRtcEngineDelegate) {
