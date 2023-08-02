@@ -205,4 +205,11 @@ extension UIView {
             return CGPoint(x: self.aui_right, y: self.aui_bottom)
         }
     }
+    
+    func setCornerRadius(_ radius: CGFloat) {
+        let path = UIBezierPath(roundedRect: self.bounds, cornerRadius: radius)
+        let shape = CAShapeLayer()
+        shape.path = path.cgPath
+        self.layer.mask = shape
+    }
 }

@@ -6,8 +6,7 @@
 //
 
 import UIKit
-import AgoraRtcKit
 
-class BroadcasterViewController: UIViewController {
-    var engine: AgoraRtcEngineKit?
+class BroadcasterViewController: ShowTo1v1BaseRoomViewController {
+    
 }

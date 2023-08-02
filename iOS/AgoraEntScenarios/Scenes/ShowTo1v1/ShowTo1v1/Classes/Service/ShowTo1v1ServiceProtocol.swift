@@ -28,9 +28,9 @@ protocol ShowTo1v1ServiceProtocol: NSObjectProtocol {
     func leaveRoom(completion: @escaping (Error?) -> Void)
     
     
-    /// 获取1v1用户列表
+    /// 获取房间列表
     /// - Parameter completion: 完成回调
-    func getUserList(completion: @escaping ([ShowTo1v1UserInfo]) -> Void)
+    func getRoomList(completion: @escaping ([ShowTo1v1RoomInfo]) -> Void)
     
     
     /// 订阅网络状态变化

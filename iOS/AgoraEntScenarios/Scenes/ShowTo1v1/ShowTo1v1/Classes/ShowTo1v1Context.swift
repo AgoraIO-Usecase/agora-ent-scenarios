@@ -1,3 +1,18 @@
+import SwiftyBeaver
+
+let pure1v1Logger: SwiftyBeaver.Type = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "ShowTo1v1"))
+
+func showTo1v1Print(_ message: String) {
+    pure1v1Logger.info(message, context: "ShowTo1v1")
+}
+
+func showTo1v1Warn(_ message: String) {
+    pure1v1Logger.warning(message, context: "ShowTo1v1")
+}
+
+func showTo1v1Error(_ message: String) {
+    pure1v1Logger.error(message, context: "ShowTo1v1")
+}
 
 @objcMembers
 public class ShowTo1v1Context: NSObject {
@@ -20,7 +35,7 @@ public class ShowTo1v1Context: NSObject {
                                  appId: String,
                                  appCertificate: String,
                                  userInfo: ShowTo1v1UserInfo) {
-        let vc = ShowTo1v1UserListViewController()
+        let vc = ShowTo1v1RoomListViewController()
         vc.userInfo = userInfo
         vc.appId = appId
         vc.appCertificate = appCertificate
