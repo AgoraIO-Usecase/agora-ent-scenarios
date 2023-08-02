@@ -19,7 +19,7 @@ class ShowTo1v1UserPagingListView: UIView {
         }
     }
     
-    var delegate: UICollectionViewDelegate? {
+    weak var delegate: UICollectionViewDelegate? {
         didSet {
             if let delegate = oldValue {
                 proxy.removeListener(delegate)
