@@ -56,7 +56,7 @@ protocol CallMessageDelegate: NSObjectProtocol {
 }
 
 class CallMessageManager: NSObject {
-    public var delegate: CallMessageDelegate?
+    public weak var delegate: CallMessageDelegate?
     private var config: CallConfig!
     private var rtmClient: AgoraRtmClientKit!
     private var rtmDelegate: AgoraRtmClientDelegate?
