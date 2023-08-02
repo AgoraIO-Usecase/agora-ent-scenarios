@@ -10,6 +10,7 @@ import UIKit
 class ShowRoomListVC: UIViewController {
     
     let backgroundView = UIImageView()
+    private var preloadRoom: ShowRoomListModel?
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -195,7 +196,16 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
         return cell
     }
     
+    
+    func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
+        showLogger.info("didHighlightItemAt: \(indexPath.row)", context: "collectionView")
+        let room = roomList[indexPath.item]
+        ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .prejoined)
+        preloadRoom = room
+    }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        showLogger.info("didSelectItemAt: \(indexPath.row)", context: "collectionView")
         let room = roomList[indexPath.item]
         joinRoom(room)
     }
@@ -204,6 +214,11 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
         preLoadVisibleItems()
     }
     
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+//        showLogger.info("scrollViewWillBeginDragging", context: "collectionView")
+        guard let room = preloadRoom else {return}
+        ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .idle)
+    }
 }
 
 // MARK: - Creations
