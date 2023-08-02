@@ -24,6 +24,7 @@ class Pure1v1UserListViewController: UIViewController {
         }
     }
     
+    private let tokenConfig: CallTokenConfig = CallTokenConfig()
     private lazy var rtcEngine = _createRtcEngine()
     private var callState: CallStateType = .idle
     private var connectedUserId: UInt?
@@ -67,12 +68,24 @@ class Pure1v1UserListViewController: UIViewController {
             self?._refreshAction()
         }
         
+        _setupCallApiIfNeed()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        listView.reloadData()
+    }
+    
+    private func _setupCallApiIfNeed() {
         guard let userInfo = userInfo else {
             assert(false, "userInfo == nil")
             return
         }
         
-        let tokenConfig: CallTokenConfig = CallTokenConfig()
+        if tokenConfig.rtcToken.count > 0, tokenConfig.rtmToken.count > 0 {
+            return
+        }
+        
         tokenConfig.roomId = userInfo.getRoomId()
         NetworkManager.shared.generateTokens(appId: appId,
                                              appCertificate: appCertificate,
@@ -80,16 +93,16 @@ class Pure1v1UserListViewController: UIViewController {
                                              uid: userInfo.userId,
                                              tokenGeneratorType: .token007,
                                              tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
-            tokenConfig.rtcToken = tokens[AgoraTokenType.rtc.rawValue]!
-            tokenConfig.rtmToken = tokens[AgoraTokenType.rtm.rawValue]!
+            guard let self = self else {return}
+            guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue],
+                  let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
+                return
+            }
+            self.tokenConfig.rtcToken = rtcToken
+            self.tokenConfig.rtmToken = rtmToken
             
-            self?._initCallAPI(tokenConfig: tokenConfig)
+            self._initCallAPI(tokenConfig: self.tokenConfig)
         }
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        listView.reloadData()
     }
     
     private func _showGuideIfNeed() {
@@ -137,6 +150,7 @@ extension Pure1v1UserListViewController {
     }
     
     private func _call(user: Pure1v1UserInfo) {
+        _setupCallApiIfNeed()
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         callApi.call(roomId: user.userId, remoteUserId: UInt(user.userId)!) { err in
