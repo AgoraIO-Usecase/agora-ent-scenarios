@@ -475,7 +475,7 @@ class ShowAgoraKitManager: NSObject {
             showLogger.info("setupRemoteVideoEx ret = \(ret ?? -1), uid:\(uid) localuid: \(UserInfo.userId) channelId: \(channelId)", context: kShowLogBaseContext)
             return
         }
-        let roomInfo = _getRoomInfo(channelId: channelId)
+        let roomInfo = _getRoomInfo(channelId: channelId, uid: uid)
         let container = VideoCanvasContainer()
         container.uid = uid
         container.container = canvasView
