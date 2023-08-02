@@ -23,6 +23,7 @@ class ShowAgoraKitManager: NSObject {
     
     public let rtcParam = ShowRTCParams()
     public var deviceLevel: DeviceLevel = .medium
+    public var deviceScore: Int = 100
     public var netCondition: NetCondition = .good
     public var performanceMode: PerformanceMode = .smooth
     
@@ -38,8 +39,8 @@ class ShowAgoraKitManager: NSObject {
     
     public lazy var captureConfig: AgoraCameraCapturerConfiguration = {
         let config = AgoraCameraCapturerConfiguration()
+        config.followEncodeDimensionRatio = true
         config.cameraDirection = .front
-        config.dimensions = CGSize(width: 1280, height: 720)
         config.frameRate = 15
         return config
     }()
@@ -54,8 +55,6 @@ class ShowAgoraKitManager: NSObject {
     
     func prepareEngine() {
         let engine = AgoraRtcEngineKit.sharedEngine(with: engineConfig(), delegate: nil)
-        // 美颜设置
-        BeautyManager.shareManager.configBeautyAPIWithRtcEngine(engine: engine)
         self.engine = engine
         
         let loader = VideoLoaderApiImpl()
@@ -70,9 +69,12 @@ class ShowAgoraKitManager: NSObject {
     }
     
     func destoryEngine() {
-        videoLoader?.cleanCache()
         AgoraRtcEngineKit.destroy()
         showLogger.info("deinit-- ShowAgoraKitManager")
+    }
+    // 退出已加入的频道和子频道
+    func leaveAllRoom() {
+        videoLoader?.cleanCache()
     }
     
     //MARK: private
@@ -256,9 +258,7 @@ class ShowAgoraKitManager: NSObject {
         }
         engine.setClientRole(.broadcaster)
         let encodeRet = engine.setVideoEncoderConfiguration(videoEncoderConfig)
-        showLogger.info("----setVideoEncoderConfiguration width = \(videoEncoderConfig.dimensions.width), height = \(videoEncoderConfig.dimensions.height), ret = \(encodeRet)")
         let ret = engine.setCameraCapturerConfiguration(captureConfig)
-        showLogger.info("----setCaptureVideoDimensions width = \(captureConfig.dimensions.width), height = \(captureConfig.dimensions.height), ret = \(ret)")
         canvas.view = canvasView
         engine.setupLocalVideo(canvas)
         engine.enableVideo()
@@ -343,27 +343,6 @@ class ShowAgoraKitManager: NSObject {
         } else {
             setupRemoteVideo(channelId: channelId, uid: uid, canvasView: canvasView)
         }
-    }
-    
-    /// 设置分辨率
-    /// 设置采集分辨率
-    /// - Parameter size: 分辨率
-    func setCaptureVideoDimensions(_ size: CGSize){
-        captureConfig.dimensions = CGSize(width: size.width, height: size.height)
-        updateCameraCaptureConfiguration()
-    }
-    
-    /// 更新采集参数
-    /// - Returns:
-    func updateCameraCaptureConfiguration() {
-        guard let engine = engine else {
-            assert(true, "rtc engine not initlized")
-            return
-        }
-        engine.stopPreview()
-        let ret = engine.setCameraCapturerConfiguration(captureConfig)
-        engine.startPreview()
-        showLogger.info("setCaptureVideoDimensions = \(captureConfig.dimensions), framerate = \(captureConfig.frameRate)  ret = \(ret)")
     }
     
     /// 设置编码分辨率
@@ -523,21 +502,6 @@ extension ShowAgoraKitManager {
         engine?.setParameters("{\"che.video.maxQP\":35}")
     }
     
-//    func vqcEnable(enable: Bool) {
-//        if (enable) {
-//            agoraKit.setParameters("{\"rtc.video.degradation_preference\":3}") // on vqc balanced
-//        }else {
-//            agoraKit.setParameters("{\"rtc.video.degradation_preference\":100}") // off vqc
-//        }
-//    }
-//    
-//    func vprEnable(enable: Bool) {
-//        if (enable) {
-//            agoraKit.setParameters("{\"che.video.vpr.enable\":true}") // on
-//        }else {
-//            agoraKit.setParameters("{\"che.video.vpr.enable\":false}") // off
-//        }
-//    }
 }
 
 extension ShowAgoraKitManager {
