@@ -1,21 +1,14 @@
 //
-//  ShowTo1v1CallViewController.swift
+//  ShowTo1v1BaseRoomViewController.swift
 //  ShowTo1v1
 //
-//  Created by wushengtao on 2023/7/28.
+//  Created by wushengtao on 2023/8/2.
 //
 
-import Foundation
-import CallAPI
+import UIKit
 import AgoraRtcKit
 
-class ShowTo1v1CallViewController: UIViewController {
-    var callApi: CallApiProtocol? {
-        didSet {
-            oldValue?.removeListener(listener: self)
-            callApi?.addListener(listener: self)
-        }
-    }
+class ShowTo1v1BaseRoomViewController: UIViewController {
     var targetUser: ShowTo1v1UserInfo? {
         didSet {
             roomInfoView.setRoomInfo(avatar: targetUser?.avatar ?? "",
@@ -56,7 +49,7 @@ class ShowTo1v1CallViewController: UIViewController {
     }()
     
     deinit {
-        showTo1v1Print("deinit-- Pure1v1CallViewController")
+        showTo1v1Print("deinit-- ShowTo1v1BaseRoomViewController")
     }
     
     override func viewDidLoad() {
@@ -83,16 +76,14 @@ class ShowTo1v1CallViewController: UIViewController {
         hangupButton.aui_bottom = self.view.aui_height - 20 - UIDevice.current.aui_SafeDistanceBottom
         hangupButton.aui_centerX = self.view.aui_width / 2
         
-        callApi?.addRTCListener?(listener: self)
     }
     
-    @objc private func _hangupAction() {
-        callApi?.hangup(roomId: targetUser?.getRoomId() ?? "", completion: { err in
-        })
+    @objc func _hangupAction() {
+        
     }
 }
 
-extension ShowTo1v1CallViewController: ShowTo1v1RoomBottomBarDelegate {
+extension ShowTo1v1BaseRoomViewController: ShowTo1v1RoomBottomBarDelegate {
     func onClickSettingButton() {
         let settingMenuVC = ShowToolMenuViewController()
         settingMenuVC.type = ShowMenuType.idle_audience
@@ -101,7 +92,7 @@ extension ShowTo1v1CallViewController: ShowTo1v1RoomBottomBarDelegate {
     }
 }
 
-extension ShowTo1v1CallViewController: ShowToolMenuViewControllerDelegate {
+extension ShowTo1v1BaseRoomViewController: ShowToolMenuViewControllerDelegate {
     func onClickRealTimeDataButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
         view.addSubview(realTimeView)
         realTimeView.snp.makeConstraints { make in
@@ -111,7 +102,7 @@ extension ShowTo1v1CallViewController: ShowToolMenuViewControllerDelegate {
     }
 }
 
-extension ShowTo1v1CallViewController: AgoraRtcEngineDelegate {
+extension ShowTo1v1BaseRoomViewController: AgoraRtcEngineDelegate {
     private func delayRefreshRealTimeInfo(_ task: (()->())?) {
         if #available(iOS 13.0, *) {
             Throttler.throttle(delay: .seconds(1)) { [weak self] in
@@ -193,23 +184,4 @@ extension ShowTo1v1CallViewController: AgoraRtcEngineDelegate {
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         showTo1v1Warn("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
     }
-}
-
-extension ShowTo1v1CallViewController: CallApiListenerProtocol {
-        func onCallStateChanged(with state: CallStateType,
-                                stateReason: CallReason,
-                                eventReason: String,
-                                elapsed: Int,
-                                eventInfo: [String : Any]) {
-        }
-        
-        func onCallEventChanged(with event: CallEvent, elapsed: Int) {
-            showTo1v1Warn("onCallEventChanged: \(event.rawValue)")
-            switch event {
-            case .localLeave, .remoteLeave:
-                _hangupAction()
-            default:
-                break
-            }
-        }
 }
