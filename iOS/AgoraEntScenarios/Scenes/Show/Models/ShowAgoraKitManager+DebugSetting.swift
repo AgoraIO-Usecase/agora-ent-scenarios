@@ -63,7 +63,7 @@ extension ShowAgoraKitManager {
     }
     
     func debugDefaultBroadcastorSetting() {
-        videoEncoderConfig.dimensions = CGSize(width: 720, height: 1280)
+        videoEncoderConfig.dimensions = CGSize(width: 1920, height: 1080)
         videoEncoderConfig.frameRate = .fps15
         videoEncoderConfig.bitrate = 1800
         engine?.setVideoEncoderConfiguration(videoEncoderConfig)

@@ -54,29 +54,24 @@ class ShowNetStateSelectViewController: UIViewController {
 extension ShowNetStateSelectViewController: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        if (aPerformance == .smooth) {
+            return 1
+        } else {
+            return 2
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if (section == 0) {
-            return netConditions.count
-        } else {
             return performances.count
+        } else {
+            return netConditions.count
         }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ShowPresettingCellID, for: indexPath) as! ShowPresettingCell
         if indexPath.section == 0 {
-            let a = netConditions[indexPath.row]
-            switch a {
-            case .good:
-                cell.setTitle("show_presetting_net_good".show_localized, desc: "show_presetting_net_good_detail".show_localized)
-            case .bad:
-                cell.setTitle("show_presetting_net_bad".show_localized, desc: "show_presetting_net_bad_detail".show_localized)
-            }
-            cell.aSelected = (aNetCondition == a)
-        } else {
             let a = performances[indexPath.row]
             switch a {
             case .smooth:
@@ -85,6 +80,15 @@ extension ShowNetStateSelectViewController: UITableViewDelegate, UITableViewData
                 cell.setTitle("show_presetting_performances_fluent".show_localized, desc: "show_presetting_performances_fluent".show_localized)
             }
             cell.aSelected = (aPerformance == a)
+        } else {
+            let a = netConditions[indexPath.row]
+            switch a {
+            case .good:
+                cell.setTitle("show_presetting_net_good".show_localized, desc: "show_presetting_net_good_detail".show_localized)
+            case .bad:
+                cell.setTitle("show_presetting_net_bad".show_localized, desc: "show_presetting_net_bad_detail".show_localized)
+            }
+            cell.aSelected = (aNetCondition == a)
         }
         return cell
     }
@@ -92,9 +96,9 @@ extension ShowNetStateSelectViewController: UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: ShowPresettingHeaderViewID) as! ShowPresettingHeaderView
         if (section == 0) {
-            headerView.setTitle("show_presetting_net_title".show_localized, desc: "show_presetting_net_title_detail".show_localized, type: .douyin)
-        } else {
             headerView.setTitle("show_presetting_performances_title".show_localized, desc: "show_presetting_performances_title_detail".show_localized, type: .douyin)
+        } else {
+            headerView.setTitle("show_presetting_net_title".show_localized, desc: "show_presetting_net_title_detail".show_localized, type: .douyin)
         }
         return headerView
     }
@@ -105,9 +109,9 @@ extension ShowNetStateSelectViewController: UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
-            aNetCondition = netConditions[indexPath.row]
-        } else {
             aPerformance = performances[indexPath.row]
+        } else {
+            aNetCondition = netConditions[indexPath.row]
         }
         tableView.reloadData()
     }
@@ -117,7 +121,8 @@ extension ShowNetStateSelectViewController {
     
     func createViews() {
         view.backgroundColor = .white
-        footerView.setDeviceLevel(text: ShowAgoraKitManager.shared.deviceLevel.description())
+        let deviceStr = ShowAgoraKitManager.shared.deviceLevel.description() + "（\(ShowAgoraKitManager.shared.deviceScore)）"
+        footerView.setDeviceLevel(text: deviceStr)
         
         tableView.backgroundColor = .white
         tableView.delegate = self
