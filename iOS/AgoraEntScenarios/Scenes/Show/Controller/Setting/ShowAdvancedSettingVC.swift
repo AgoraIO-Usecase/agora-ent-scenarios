@@ -6,14 +6,12 @@
 //
 
 import UIKit
-//import JXCategoryView
 import AgoraRtcKit
 
 class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     
     var mode: ShowMode?
     var isBroadcaster = true
-    var isOutside = false
     var currentChannelId: String?
 
     // 自定义导航栏
@@ -21,8 +19,6 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     
     var musicManager: ShowMusicManager!
     
-    // 当前设置的预设值名称
-    var presetModeName: String?
     // 当前的观众预设类型
     var audiencePresetType: ShowPresetType?
 
@@ -70,7 +66,6 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        configCustomNaviBar()
         setUpUI()
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
@@ -78,6 +73,9 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     
     private func setUpUI() {
         view.backgroundColor = .white
+        
+        naviBar.title = "show_advanced_setting_title".show_localized
+        view.addSubview(naviBar)
         
         view.addSubview(segmentedView)
         segmentedView.snp.makeConstraints { make in
@@ -98,31 +96,8 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    private func configCustomNaviBar(){
-        // 标题
-        naviBar.title = "show_advanced_setting_title".show_localized
-        // 右边按钮
-        if isBroadcaster {
-            /*
-            let preSetButtonItem = ShowBarButtonItem(title: "show_advanced_setting_preset".show_localized, target: self, action: #selector(didClickPreSetBarButton))
-            naviBar.rightItems = [preSetButtonItem]
-             */
-        }
-        view.addSubview(naviBar)
-    }
-    
     private func createSettingVCForIndex(_ index: Int) -> ShowVideoSettingVC? {
         // 主播端设置
-        let outsideSettings: [ShowSettingKey] = [
-            .H265,
-            .colorEnhance,
-            .lowlightEnhance,
-            .videoDenoiser,
-            .PVC,
-            .videoEncodeSize,
-            .FPS,
-            .videoBitRate
-        ]
         let insideSettings: [ShowSettingKey] = [
             .H265,
             .colorEnhance,
@@ -133,7 +108,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             .FPS,
             .videoBitRate
         ]
-        let broadcasterVideoSettings: [ShowSettingKey] = isOutside ? outsideSettings : insideSettings
+        let broadcasterVideoSettings: [ShowSettingKey] = insideSettings
         // 观众端设置
         let audienceVideoSettings: [ShowSettingKey] = [
             .SR
@@ -151,60 +126,10 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         
         let vc = ShowVideoSettingVC()
         vc.musicManager = musicManager
-        vc.isOutside = isOutside
         vc.currentChannelId = currentChannelId
         vc.dataArray = settings[index]
-        vc.willChangeSettingParams = {[weak self] key, value in
-            guard let wSelf = self else { return false }
-            return wSelf.showModifyAlertIfNeeded(key,value: value)
-        }
         return vc
     }
-    
-    // 判断是否需要显示修改预设值的弹窗
-    private func showModifyAlertIfNeeded(_ key: ShowSettingKey, value: Any) -> Bool {
-        // 如果当前是观众低端机
-        if audiencePresetType == .quality_low || audiencePresetType == .base_high || audiencePresetType == .base_medium || audiencePresetType == .base_low {
-            // sr开关即将打开 则不运行打开
-            if key == .SR , let srValue = value as? Bool, srValue == true {
-//                let msg = "show_presetting_alert_will_change_sr_value_message".show_localized
-//                showAlert(title: "show_presetting_alert_will_change_value_title".show_localized, message: msg, confirmTitle: "OK", cancelTitle: nil)
-                ToastView.show(text: "show_presetting_alert_will_change_sr_value_message".show_localized)
-                return false
-            }
-        }
-        if presetModeName != nil {
-            let msg1 = "show_presetting_alert_will_change_value_message1".show_localized
-            let msg2 = "show_presetting_alert_will_change_value_message2".show_localized
-            showAlert(title:"show_presetting_alert_will_change_value_title".show_localized, message: "\(msg1)\"\(presetModeName!)\"\(msg2)") { [weak self] in
-                self?.presetModeName = nil
-                key.writeValue(value)
-                self?.videoSettingVC?.reloadData()
-                self?.audioSettingVC?.reloadData()
-            }
-        }
-        return presetModeName == nil
-    }
-  
-}
-
-
-extension ShowAdvancedSettingVC {
-    // 点击预设按钮
-    @objc private func didClickPreSetBarButton() {
-        let vc = ShowPresettingVC()
-        vc.didSelectedPresetType = {[weak self] type, modeName in
-            ShowAgoraKitManager.shared.updatePresetForType(type, mode: self?.mode ?? .single)
-            self?.videoSettingVC?.reloadData()
-            self?.audioSettingVC?.reloadData()
-            let text1 = "show_presetting_update_toast1".show_localized
-            let text2 = "show_presetting_update_toast2".show_localized
-            ToastView.show(text: "\(text1)\"\(modeName)\"\(text2)")
-            self?.presetModeName = modeName
-        }
-        present(vc, animated: true)
-    }
-    
 }
 
 extension ShowAdvancedSettingVC:  AEAListContainerViewDataSource{

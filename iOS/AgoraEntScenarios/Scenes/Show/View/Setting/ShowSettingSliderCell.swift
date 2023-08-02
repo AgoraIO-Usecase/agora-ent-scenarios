@@ -70,6 +70,8 @@ class ShowSettingSliderCell: ShowSettingBaseCell {
 private extension ShowSettingSliderCell {
     
     func createViews() {
+        detailButton.isHidden = false
+        
         valueLabel.textColor = .show_Ellipse5
         valueLabel.font = .show_R_14
         contentView.addSubview(valueLabel)

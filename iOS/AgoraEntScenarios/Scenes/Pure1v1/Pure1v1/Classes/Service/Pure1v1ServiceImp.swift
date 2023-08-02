@@ -8,15 +8,7 @@
 import Foundation
 import AgoraSyncManager
 import YYModel
-
-func pure1v1Print(_ message: String) {
-    print("[Pure1v1]\(message)")
-}
-
-func pure1v1Warn(_ message: String) {
-    print("[Pure1v1][Warning]\(message)")
-}
-
+import SwiftyBeaver
 
 private func mainTreadTask(_ task: (()->())?){
     if Thread.isMainThread {
@@ -29,7 +21,7 @@ private func mainTreadTask(_ task: (()->())?){
 }
 
 /// 房间内用户列表
-private let kSceneId = "pure1v1_3.0.0"
+private let kSceneId = "scene_1v1PrivateVideo_3.6.0"
 class Pure1v1ServiceImp: NSObject {
     private var appId: String = ""
     private var user: Pure1v1UserInfo?
@@ -98,7 +90,7 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
 
                 let userList = results.map({ info in
                     return Pure1v1UserInfo.yy_model(withJSON: info.toJson())!
-                })
+                }).sorted {$0.createdAt < $1.createdAt}
                 self?.userList = userList
                 completion(userList)
             }, fail: { error in
@@ -151,10 +143,6 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
     
     func subscribeNetworkStatusChanged(with changedBlock: @escaping (Pure1v1ServiceNetworkStatus) -> Void) {
         self.networkDidChanged = changedBlock
-    }
-    
-    func subscribeRoomWillExpire(with changedBlock: @escaping () -> Void) {
-        self.roomExpiredDidChanged = changedBlock
     }
     
     func unsubscribeAll() {

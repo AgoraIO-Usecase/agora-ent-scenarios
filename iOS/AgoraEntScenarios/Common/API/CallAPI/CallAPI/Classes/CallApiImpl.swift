@@ -156,7 +156,7 @@ public class CallApiImpl: NSObject {
     public override init() {
         super.init()
         callPrint("init-- CallApiImpl")
-        rtcProxy.addListener(self)
+        addRTCListener(listener: self)
     }
     
     private func _messageDic(action: CallAction) -> [String: Any] {
@@ -439,19 +439,24 @@ extension CallApiImpl {
         }
         
         if let connection = rtcConnection {
-            callWarningPrint("rtc join already")
-            
-            let mediaOptions = AgoraRtcChannelMediaOptions()
-            mediaOptions.clientRoleType = .broadcaster
-            mediaOptions.publishCameraTrack = !joinOnly
-            mediaOptions.publishMicrophoneTrack = !joinOnly
-            mediaOptions.autoSubscribeAudio = !joinOnly
-            mediaOptions.autoSubscribeVideo = !joinOnly
-            config.rtcEngine.updateChannelEx(with: mediaOptions, connection: connection)
-            
-            let errReason = "rtc join already"
-            completion?(NSError(domain: errReason, code: -1))
-            return
+            if connection.channelId == roomId {
+                callWarningPrint("rtc join already")
+                
+                let mediaOptions = AgoraRtcChannelMediaOptions()
+                mediaOptions.clientRoleType = .broadcaster
+                mediaOptions.publishCameraTrack = !joinOnly
+                mediaOptions.publishMicrophoneTrack = !joinOnly
+                mediaOptions.autoSubscribeAudio = !joinOnly
+                mediaOptions.autoSubscribeVideo = !joinOnly
+                config.rtcEngine.updateChannelEx(with: mediaOptions, connection: connection)
+                
+                let errReason = "rtc join already"
+                completion?(NSError(domain: errReason, code: -1))
+                return
+            } else {
+                callWarningPrint(" mismatch channel, leave first! tqarget: \(roomId) current: \(connection.channelId)")
+                config.rtcEngine.leaveChannelEx(connection)
+            }
         }
         
         //需要先开启音视频
@@ -472,7 +477,7 @@ extension CallApiImpl {
                                        connection: connection,
                                        delegate: rtcProxy,
                                        mediaOptions: mediaOptions)
-        callPrint("joinRTC roomId: \(roomId) uid: \(config.userId) ret = \(ret)")
+        callPrint("joinRTC channel roomId: \(roomId) uid: \(config.userId) ret = \(ret)")
         rtcConnection = connection
         joinRtcCompletion = { [weak self] err in
             guard let self = self else {return}
@@ -521,7 +526,7 @@ extension CallApiImpl {
     private func _leaveRTC(force: Bool = false) {
         joinRtcCompletion = nil
         guard let rtcConnection = self.rtcConnection else {
-            callWarningPrint("leave RTC failed, not joined the channel")
+            callWarningPrint("leave RTC channel failed, not joined the channel")
             return
         }
         //没有connection表示没有进行1v1
@@ -536,7 +541,8 @@ extension CallApiImpl {
             mediaOptions.publishCustomAudioTrack = false
             config?.rtcEngine.updateChannelEx(with: mediaOptions, connection: rtcConnection)
         } else {
-            config?.rtcEngine.leaveChannelEx(rtcConnection)
+            let ret = config?.rtcEngine.leaveChannelEx(rtcConnection)
+            callPrint("leave RTC channel[\(ret ?? -1)]")
             self.rtcConnection = nil
         }
     }
@@ -842,6 +848,15 @@ extension CallApiImpl: CallApiProtocol {
             _notifyEvent(event: .messageFailed)
             return
         }
+        //查询是否是calling状态，如果是prapared，表示可能被取消了
+        guard state == .calling else {
+            let errReason = "accept fail! current state is not calling"
+            completion?(NSError(domain: errReason, code: -1))
+            callWarningPrint(errReason)
+            _notifyState(state: .prepared, stateReason: .none, eventReason: errReason)
+            _notifyEvent(event: .stateMismatch)
+            return
+        }
         
         //先查询presence里是不是正在呼叫的被叫是自己，如果是则不再发送消息
         if let _fromRoomId = oneForOneMap?[kFromRoomId],
@@ -1020,7 +1035,7 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
     }
 
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
-        callPrint("didJoinChannel: \(uid), channel: \(channel) elapsed: \(elapsed)")
+        callPrint("join RTC channel, didJoinChannel: \(uid), channel: \(channel) elapsed: \(elapsed)")
         guard uid == config?.userId ?? 0 else {
             return
         }

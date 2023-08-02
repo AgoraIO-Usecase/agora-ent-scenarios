@@ -93,7 +93,8 @@ public class CallTokenConfig: NSObject {
     case rtmSetupFailed           //设置RTM失败
     case rtmSetupSuccessed        //设置RTM成功
     case messageFailed            //消息发送失败
-    case localRejected = 100       //本地用户拒绝
+    case stateMismatch            //状态流转异常
+    case localRejected = 100      //本地用户拒绝
     case remoteRejected           //远端用户拒绝
     case onCalling                //变成呼叫中
     case remoteAccepted           //远端用户接收

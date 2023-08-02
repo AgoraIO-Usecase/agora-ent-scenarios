@@ -12,15 +12,26 @@ import AgoraRtcKit
 
 private let kShowGuideAlreadyKey = "already_show_guide"
 class Pure1v1UserListViewController: UIViewController {
-    var appId: String = ""
+    var appId: String = "" {
+        didSet {
+            callVC.appId = appId
+        }
+    }
     var appCertificate: String = ""
-    var userInfo: Pure1v1UserInfo?
+    var userInfo: Pure1v1UserInfo? {
+        didSet {
+            callVC.currentUser = userInfo
+        }
+    }
     
+    private lazy var rtcEngine = _createRtcEngine()
     private var callState: CallStateType = .idle
     private var connectedUserId: UInt?
     private lazy var callVC: Pure1v1CallViewController = {
         let vc = Pure1v1CallViewController()
+        vc.modalPresentationStyle = .fullScreen
         vc.callApi = callApi
+        
         return vc
     }()
     private let callApi = CallApiImpl()
@@ -98,7 +109,7 @@ extension Pure1v1UserListViewController {
         config.appId = appId
         config.userId = UInt(userInfo?.userId ?? "")!
         config.autoAccept = false
-        config.rtcEngine = _createRtcEngine()
+        config.rtcEngine = rtcEngine
         config.localView = callVC.smallCanvasView
         config.remoteView = callVC.bigCanvasView
         
@@ -126,6 +137,8 @@ extension Pure1v1UserListViewController {
     }
     
     private func _call(user: Pure1v1UserInfo) {
+        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
+        AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         callApi.call(roomId: user.userId, remoteUserId: UInt(user.userId)!) { err in
             
         }
@@ -134,6 +147,7 @@ extension Pure1v1UserListViewController {
 
 extension Pure1v1UserListViewController {
     @objc func _backAction() {
+        AgoraRtcEngineKit.destroy()
         callApi.deinitialize {
         }
         service.leaveRoom { err in
@@ -174,6 +188,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             let fromUserId = eventInfo[kFromUserId] as? UInt ?? 0
             let fromRoomId = eventInfo[kFromRoomId] as? String ?? ""
             let toUserId = eventInfo[kRemoteUserId] as? UInt ?? 0
+            pure1v1Print("calling: fromUserId: \(fromUserId) fromRoomId: \(fromRoomId) currentId: \(currentUid) toUserId: \(toUserId)")
             if let connectedUserId = connectedUserId, connectedUserId != fromUserId {
                 callApi.reject(roomId: fromRoomId, remoteUserId: fromUserId, reason: "already calling") { err in
                 }
@@ -184,7 +199,9 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 connectedUserId = fromUserId
                 
                 if let user = listView.userList.first {$0.userId == "\(fromUserId)"} {
+                    callDialog?.hiddenAnimation()
                     let dialog = Pure1v1CalleeDialog.show(user: user)
+                    assert(dialog != nil, "dialog = nil")
                     dialog?.acceptClosure = { [weak self] in
                         NetworkManager.shared.generateTokens(appId: self?.appId ?? "",
                                                              appCertificate: self?.appCertificate ?? "",
@@ -194,11 +211,14 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                                                              tokenTypes: [.rtc, .rtm]) { tokens in
                             guard let self = self else {return}
                             guard tokens.count == 2 else {
-                                print("generateTokens fail")
+                                pure1v1Print("generateTokens fail")
                                 self.view.isUserInteractionEnabled = true
                                 return
                             }
                             let rtcToken = tokens[AgoraTokenType.rtc.rawValue]!
+                            
+                            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
+                            AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
                             self.callApi.accept(roomId: fromRoomId, remoteUserId: fromUserId, rtcToken: rtcToken) { err in
                             }
                         }
@@ -210,6 +230,9 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                     }
                     
                     callDialog = dialog
+                    callVC.targetUser = user
+                } else {
+                    pure1v1Print("callee user not found1")
                 }
                 
             } else if currentUid == "\(fromUserId)" {
@@ -222,17 +245,10 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                         })
                     }
                     callDialog = dialog
+                    callVC.targetUser = user
+                } else {
+                    pure1v1Print("caller user not found1")
                 }
-//                AUIAlertView()
-//                    .isShowCloseButton(isShow: true)
-//                    .title(title: "呼叫用户 \(toUserId) 中")
-//                    .rightButton(title: "取消")
-//                    .rightButtonTapClosure(onTap: {[weak self] text in
-//                        guard let self = self else { return }
-//                        self.api.cancelCall { err in
-//                        }
-//                    })
-//                    .show()
             }
             break
         case .connecting:
@@ -250,15 +266,14 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 assert(false, "user not fount")
                 return
             }
+            
+            callVC.rtcEngine = rtcEngine
             callVC.targetUser = user
-            navigationController?.pushViewController(callVC, animated: false)
+            present(callVC, animated: false)
             break
         case .prepared:
             switch stateReason {
-            case .localHangup, .remoteHangup:
-                if navigationController?.viewControllers.last == callVC {
-                    navigationController?.popViewController(animated: false)
-                }
+            case .remoteHangup:
                 AUIToast.show(text: "call_toast_hangup".pure1v1Localization())
 //            case .localRejected, .remoteRejected:
 //                AUIToast.show(text: "通话被拒绝")
@@ -272,6 +287,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
 //            AUIAlertManager.hiddenView()
             connectedUserId = nil
             callDialog?.hiddenAnimation()
+            callVC.dismiss(animated: false)
             break
         case .failed:
 //            AUIToast.show(text: eventReason, postion: .bottom)
