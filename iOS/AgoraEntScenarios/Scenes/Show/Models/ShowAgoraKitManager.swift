@@ -524,21 +524,6 @@ extension ShowAgoraKitManager {
         engine?.setParameters("{\"che.video.maxQP\":35}")
     }
     
-//    func vqcEnable(enable: Bool) {
-//        if (enable) {
-//            agoraKit.setParameters("{\"rtc.video.degradation_preference\":3}") // on vqc balanced
-//        }else {
-//            agoraKit.setParameters("{\"rtc.video.degradation_preference\":100}") // off vqc
-//        }
-//    }
-//    
-//    func vprEnable(enable: Bool) {
-//        if (enable) {
-//            agoraKit.setParameters("{\"che.video.vpr.enable\":true}") // on
-//        }else {
-//            agoraKit.setParameters("{\"che.video.vpr.enable\":false}") // off
-//        }
-//    }
 }
 
 extension ShowAgoraKitManager {
