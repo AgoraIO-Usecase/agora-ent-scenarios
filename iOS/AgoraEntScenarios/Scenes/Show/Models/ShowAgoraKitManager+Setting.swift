@@ -88,7 +88,7 @@ extension ShowAgoraKitManager {
     /// - Parameters:
     ///   - isOn: 开关
     func setDenoiserOn(_ isOn: Bool) {
-        var option = AgoraVideoDenoiserOptions()
+        let option = AgoraVideoDenoiserOptions()
         switch deviceLevel {
         case .high:
             option.mode = .manual
@@ -284,11 +284,12 @@ extension ShowAgoraKitManager {
             
            break
         case .videoEncodeSize:
-            let index = indexValue % dimensionsItems.count
-            videoEncoderConfig.dimensions = dimensionsItems[index]
             if let currentChannelId = currentChannelId{
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
-            }else{
+            } else {
+                let index = indexValue % dimensionsItems.count
+                let size = dimensionsItems[index]
+                videoEncoderConfig.dimensions = size
                 engine?.setVideoEncoderConfiguration(videoEncoderConfig)
             }
         case .videoBitRate:
@@ -308,7 +309,6 @@ extension ShowAgoraKitManager {
             }
             // 采集帧率
             captureConfig.frameRate = Int32(fpsItems[index].rawValue)
-            
         case .H265:
             setH265On(isOn)
         case .earmonitoring:

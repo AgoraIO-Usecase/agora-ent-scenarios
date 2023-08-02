@@ -39,6 +39,7 @@ class ShowLivePagesViewController: ViewController {
     
     deinit {
         showLogger.info("deinit-- ShowLivePagesViewController")
+        ShowAgoraKitManager.shared.leaveAllRoom()
         self.roomVCMap.forEach { (key: String, value: ShowLiveViewController) in
             value.leaveRoom()
             AppContext.unloadShowServiceImp(key)
