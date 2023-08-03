@@ -161,6 +161,7 @@ import AgoraRtcKit
     var chorusChannelToken: String
     var type: KTVType = .normal
     var maxCacheSize: Int = 10
+    var mccDomain: String? = nil
     @objc public
     init(appId: String,
          rtmToken: String,
@@ -170,7 +171,8 @@ import AgoraRtcKit
          chorusChannelName: String,
          chorusChannelToken: String,
          type: KTVType,
-         maxCacheSize: Int
+         maxCacheSize: Int,
+         mccDomain: String
     ) {
         self.appId = appId
         self.rtmToken = rtmToken
@@ -181,6 +183,7 @@ import AgoraRtcKit
         self.chorusChannelToken = chorusChannelToken
         self.type = type
         self.maxCacheSize = maxCacheSize
+        self.mccDomain = mccDomain
     }
 }
 

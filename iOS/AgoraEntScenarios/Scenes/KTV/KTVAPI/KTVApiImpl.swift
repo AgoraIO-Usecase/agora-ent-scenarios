@@ -117,7 +117,9 @@ private func agoraPrint(_ message: String) {
         contentCenterConfiguration.token = config.rtmToken
         contentCenterConfiguration.rtcEngine = config.engine
         contentCenterConfiguration.maxCacheSize = UInt(config.maxCacheSize)
-        
+        if let mccDomain = config.mccDomain {
+            contentCenterConfiguration.mccDomain = mccDomain
+        }
         mcc = AgoraMusicContentCenter.sharedContentCenter(config: contentCenterConfiguration)
         mcc?.register(self)
         // ------------------ 初始化音乐播放器实例 ------------------
