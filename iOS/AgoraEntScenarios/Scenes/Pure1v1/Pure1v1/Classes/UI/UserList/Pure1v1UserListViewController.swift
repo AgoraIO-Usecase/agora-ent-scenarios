@@ -280,7 +280,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 assert(false, "user not fount")
                 return
             }
-            
+            callVC.dismiss(animated: false)
             callVC.rtcEngine = rtcEngine
             callVC.targetUser = user
             present(callVC, animated: false)
