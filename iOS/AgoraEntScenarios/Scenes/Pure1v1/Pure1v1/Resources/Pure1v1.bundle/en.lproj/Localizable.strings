@@ -15,15 +15,15 @@
 "user_list_title"="1v1私密房";
 "user_list_waitting"="等待其他用户";
 "user_list_nodata_tips"="欢迎来到声网1V1私密房，目前暂无其它用户入场，你可邀约朋友入场体验。";
+"user_list_refresh_tips"="用户列表刷新中";
 "call_state_waitting"="等待对方接受";
 "call_state_connecting"="连接中";
 "call_title_accept"="立即接受";
 "call_title_reject"="拒绝";
 "call_usage_tips"=" 本产品仅用于功能体验，单次直播时长不超过20mins";
 "call_toast_hangup"="对方结束连线";
+
 "setting_statistic" = "实时数据";
-
-
 "show_statistic_bitrate" = "码率";
 "show_statistic_delay" = "延迟";
 "show_statistic_receive_title" = "接收";

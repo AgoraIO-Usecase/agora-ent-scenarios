@@ -92,6 +92,10 @@ class Pure1v1NaviBar: UIView {
         refreshButton.layer.removeAllAnimations()
     }
     
+    func refreshAnimationEnable() -> Bool {
+        refreshButton.isEnabled
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
 //        gradientLayer.frame = bounds
