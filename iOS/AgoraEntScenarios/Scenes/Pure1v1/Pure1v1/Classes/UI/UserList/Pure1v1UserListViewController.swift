@@ -31,8 +31,6 @@ class Pure1v1UserListViewController: UIViewController {
     private lazy var callVC: Pure1v1CallViewController = {
         let vc = Pure1v1CallViewController()
         vc.modalPresentationStyle = .fullScreen
-        vc.callApi = callApi
-        
         return vc
     }()
     private let callApi = CallApiImpl()
@@ -134,6 +132,9 @@ extension Pure1v1UserListViewController {
             }
         }
         callApi.addListener(listener: self)
+        
+        callVC.callApi = callApi
+        callVC.rtcEngine = rtcEngine
     }
     
     private func _createRtcEngine() ->AgoraRtcEngineKit {
@@ -143,7 +144,7 @@ extension Pure1v1UserListViewController {
         config.audioScenario = .gameStreaming
         config.areaCode = .global
         let engine = AgoraRtcEngineKit.sharedEngine(with: config,
-                                                    delegate: callVC)
+                                                    delegate: nil)
         
         engine.setClientRole(.broadcaster)
         return engine
@@ -286,7 +287,6 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 return
             }
             callVC.dismiss(animated: false)
-            callVC.rtcEngine = rtcEngine
             callVC.targetUser = user
             present(callVC, animated: false)
             break
