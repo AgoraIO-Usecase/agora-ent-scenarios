@@ -632,10 +632,15 @@ extension CallApiImpl {
             return
         }
         
+        
+        callingRoomId = fromRoomId
+        callingUserId = fromUserId
+        
         self.callId = callId
         let eventInfo = [kFromRoomId: fromRoomId, kFromUserId: fromUserId, kRemoteUserId: config?.userId ?? 0] as [String : Any]
         _notifyState(state: .calling, stateReason: .none, eventInfo: eventInfo)
         _notifyEvent(event: .onCalling)
+        
         guard config?.autoAccept ?? false else {
             return
         }
@@ -878,8 +883,6 @@ extension CallApiImpl: CallApiProtocol {
             _notifyEvent(event: .localAccepted)
         }
         
-        callingRoomId = roomId
-        callingUserId = remoteUserId
         
         callTs = _getNtpTimeInMs()
         //不等响应即加入频道，加快join速度，失败则leave
