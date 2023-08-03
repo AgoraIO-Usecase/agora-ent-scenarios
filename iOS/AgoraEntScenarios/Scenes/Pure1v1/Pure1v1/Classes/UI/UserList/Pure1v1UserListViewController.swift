@@ -68,7 +68,7 @@ class Pure1v1UserListViewController: UIViewController {
             self?._refreshAction()
         }
         
-        _setupCallApiIfNeed()
+        _setupCallApi()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -76,7 +76,7 @@ class Pure1v1UserListViewController: UIViewController {
         listView.reloadData()
     }
     
-    private func _setupCallApiIfNeed() {
+    private func _setupCallApi() {
         guard let userInfo = userInfo else {
             assert(false, "userInfo == nil")
             return
@@ -150,11 +150,14 @@ extension Pure1v1UserListViewController {
     }
     
     private func _call(user: Pure1v1UserInfo) {
-        _setupCallApiIfNeed()
+        if callState == .idle {
+            _setupCallApi()
+            AUIToast.show(text: "call_not_init".pure1v1Localization())
+            return
+        }
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         callApi.call(roomId: user.userId, remoteUserId: UInt(user.userId)!) { err in
-            
         }
     }
 }
