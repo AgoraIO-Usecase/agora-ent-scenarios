@@ -171,7 +171,6 @@ extension Pure1v1UserListViewController {
     
     @objc func _refreshAction() {
         guard naviBar.refreshAnimationEnable() else {return}
-        AUIToast.show(text: "user_list_refresh_tips".pure1v1Localization())
         naviBar.startRefreshAnimation()
         service.getUserList {[weak self] list in
             guard let self = self else {return}
@@ -180,6 +179,7 @@ extension Pure1v1UserListViewController {
             self.listView.userList = userList
             self._showGuideIfNeed()
             self.naviBar.style = userList.count > 0 ? .light : .dark
+            AUIToast.show(text: "user_list_refresh_tips".pure1v1Localization())
         }
     }
 }
