@@ -24,6 +24,8 @@
 "call_usage_tips"=" 本产品仅用于功能体验，单次直播时长不超过20mins";
 "call_toast_hangup"="对方结束连线";
 
+"call_content_inspect_warning"="监测到当前内容存在违规行为";
+
 "setting_statistic" = "实时数据";
 "show_statistic_bitrate" = "码率";
 "show_statistic_delay" = "延迟";

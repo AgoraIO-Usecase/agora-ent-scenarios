@@ -253,7 +253,7 @@ extension CallApiImpl {
             
             self.state = state
         }
-        delegates.objectEnumerator().forEach { element in
+        for element in delegates.allObjects {
             (element as? CallApiListenerProtocol)?.onCallStateChanged(with: state,
                                                                       stateReason: stateReason,
                                                                       eventReason: eventReason,
@@ -291,7 +291,7 @@ extension CallApiImpl {
     }
     
     private func _notifyOptionalFunc(closure: ((CallApiListenerProtocol)->())) {
-        delegates.objectEnumerator().forEach { element in
+        for element in delegates.allObjects {
             guard let target = element as? CallApiListenerProtocol else {return}
             closure(target)
         }
