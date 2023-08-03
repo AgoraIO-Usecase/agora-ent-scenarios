@@ -37,6 +37,7 @@ interface OnJoinChorusStateListener {
 class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver,
     IRtcEngineEventHandler() {
     private val TAG: String = "KTV_API_LOG"
+    var debugMode = false
 
     // 外部可修改
     var songMode: KTVSongMode = KTVSongMode.SONG_CODE
@@ -122,6 +123,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         contentCenterConfiguration.mccUid = ktvApiConfig.localUid.toLong()
         contentCenterConfiguration.token = config.rtmToken
         contentCenterConfiguration.maxCacheSize = config.maxCacheSize
+        if (debugMode) {
+            contentCenterConfiguration.mccDomain = "api-test.agora.io"
+        }
         mMusicCenter = IAgoraMusicContentCenter.create(mRtcEngine)
         mMusicCenter.initialize(contentCenterConfiguration)
 
