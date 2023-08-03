@@ -64,8 +64,6 @@ public class ProfileFragment extends BaseViewBindingFragment<FragmentProfileBind
                 mSetting.setAECLevel(0);
             } else if (checkedId == R.id.tvModeMiddle) {
                 mSetting.setAECLevel(1);
-            } else {
-                mSetting.setAECLevel(2);
             }
         });
 
@@ -83,7 +81,7 @@ public class ProfileFragment extends BaseViewBindingFragment<FragmentProfileBind
 
         if (this.mSetting.getAinsMode() == 0) {
             getBinding().rgAINSMode.check(R.id.tvAINSClose);
-        } else if (this.mSetting.getAECLevel() == 1) {
+        } else if (this.mSetting.getAinsMode() == 1) {
             getBinding().rgAINSMode.check(R.id.tvAINSMiddle);
         } else {
             getBinding().rgAINSMode.check(R.id.tvAINSHigh);

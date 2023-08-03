@@ -204,6 +204,9 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public void init() {
+        if (AgoraApplication.the().isDebugModeOpen()) {
+            ((KTVApiImpl)ktvApiProtocol).setDebugMode(true);
+        }
         if (isRoomOwner()) {
             ktvApiProtocol.setMicStatus(true);
             isOnSeat = true;
@@ -1208,8 +1211,8 @@ public class RoomLivingViewModel extends ViewModel {
                 } else {
                     // 和超高音质同时开启会发生崩溃，先注释aec相关操作
                     //mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\": 0}");
-                    //mRtcEngine.setParameters("{\"che.audio.ains_mode\": 0}");
-                    mRtcEngine.setParameters("{\"che.audio.aec.nlp_size\": 512}");
+                    mRtcEngine.setParameters("{\"che.audio.ains_mode\": 0}");
+                    //mRtcEngine.setParameters("{\"che.audio.aec.nlp_size\": 512}");
                     //mRtcEngine.setParameters("{\"che.audio.aec.nlp_hop_size\": 64}");
                 }
             }
