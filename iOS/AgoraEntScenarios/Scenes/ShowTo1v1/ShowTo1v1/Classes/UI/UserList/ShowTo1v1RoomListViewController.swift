@@ -97,6 +97,10 @@ extension ShowTo1v1RoomListViewController: UICollectionViewDelegate {
         container.uid = roomInfo.uid
         container.container = cell.canvasView
         videoLoaderApi.renderVideo(roomInfo: roomInfo, container: container)
+        guard let connection = videoLoaderApi.getConnectionMap()[room.roomId] else {return}
+        let options = AgoraRtcChannelMediaOptions()
+        options.autoSubscribeAudio = false
+        rtcEngine.updateChannelEx(with: options, connection: connection)
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
