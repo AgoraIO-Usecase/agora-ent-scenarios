@@ -428,7 +428,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
         // 歌词相关
         roomLivingViewModel.mainSingerScoreLiveData.observe(this, score -> {
-            getBinding().lrcControlView.onReceiveSingleLineScore(score.score, score.index, score.cumulativeScore, score.total);
+            getBinding().lrcControlView.onReceiveSingleLineScore(score.score, score.index, score.cumulativeScore, score.total, score.userName, score.poster);
         });
         roomLivingViewModel.songsOrderedLiveData.observe(this, models -> {
             if (models == null || models.isEmpty()) {

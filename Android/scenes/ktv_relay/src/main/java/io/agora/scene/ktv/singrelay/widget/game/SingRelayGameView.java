@@ -242,6 +242,7 @@ public class SingRelayGameView extends FrameLayout {
         KTVLogger.d(TAG, "onGameEnd");
         if (mBinding == null) return;
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
+        mBinding.ilActive.winnerTips.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
         mBinding.ilRank.setVisibility(View.VISIBLE);
         mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_idle_text_background);
