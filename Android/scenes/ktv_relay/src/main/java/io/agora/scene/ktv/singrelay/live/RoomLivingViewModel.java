@@ -5,6 +5,7 @@ import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPE
 
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
@@ -118,6 +119,8 @@ public class RoomLivingViewModel extends ViewModel {
         int index;
         int cumulativeScore;
         int total;
+        String userName;
+        String poster;
     }
 
     final MutableLiveData<LineScore> mainSingerScoreLiveData = new MutableLiveData<>();
@@ -648,7 +651,7 @@ public class RoomLivingViewModel extends ViewModel {
                         RoomSelSongModel value = songPlayingLiveData.getValue();
                         RoomSelSongModel songPlaying = data.get(0);
 
-                        if (value != null && value.getWinnerNo() != null && value.getWinnerNo().equals("") && !songPlaying.getWinnerNo().equals("")) {
+                        if (value != null && value.getWinnerNo() != null && value.getWinnerNo().equals("") && !songPlaying.getWinnerNo().equals("") && seatLocalLiveData.getValue() != null) {
                             // 所有人更新抢唱结果UI
                             hasReceiveStartSingRelay = false;
                             GraspModel model = new GraspModel();
@@ -1484,7 +1487,10 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public boolean isNextRoundSinger() {
-        if (songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0].equals(UserManager.getInstance().getUser().id.toString())) {
+        Log.d("hugo", "isNextRoundSinger: " + songsOrderedLiveData.getValue().get(0).getWinnerNo().equals(""));
+        Log.d("hugo", "isNextRoundSinger: " + songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1]);
+        Log.d("hugo", "isNextRoundSinger: " + partNum);
+        if (songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0].equals(UserManager.getInstance().getUser().id.toString()) && songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum))) {
             return true;
         } else {
             if (isRoomOwner() && (songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") || !songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum)))) {

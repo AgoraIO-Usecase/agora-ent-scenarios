@@ -12,7 +12,6 @@ import io.agora.mediaplayer.data.SrcInfo
 import io.agora.musiccontentcenter.*
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
-import io.agora.scene.base.utils.ToastUtils
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.concurrent.*
@@ -44,7 +43,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     var useCustomAudioSource:Boolean = false
 
     // 音频最佳实践
-    var remoteVolume: Int = 100 // 远端音频
+    var remoteVolume: Int = 30 // 远端音频
     var mpkPlayoutVolume: Int = 50
     var mpkPublishVolume: Int = 50
 
@@ -136,6 +135,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         startDisplayLrc()
         startSyncPitch()
         isRelease = false
+
+        if (config.type == KTVType.SingRelay) {
+            this.remoteVolume = 100
+        }
     }
 
     override fun renewInnerDataStreamId() {
@@ -837,7 +840,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     private val mSyncPitchTask = Runnable {
         if (!mStopSyncPitch) {
-            if (mediaPlayerState == MediaPlayerState.PLAYER_STATE_PLAYING &&
+
+            if (ktvApiConfig.type == KTVType.SingRelay &&
+                (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.SoloSinger || singerRole == KTVSingRole.CoSinger) &&
+                    isOnMicOpen) {
+                sendSyncPitch(pitch)
+            } else if (mediaPlayerState == MediaPlayerState.PLAYER_STATE_PLAYING &&
                 (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.SoloSinger)) {
                 sendSyncPitch(pitch)
             }
@@ -984,6 +992,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     if (this.songIdentifier == songId) {
                         mLastReceivedPlayPosTime = System.currentTimeMillis()
                         mReceivedPlayPosition = realPosition
+                        ktvApiEventHandlerList.forEach { it.onMusicPlayerPositionChanged(realPosition, 0) }
                     } else {
                         mLastReceivedPlayPosTime = null
                         mReceivedPlayPosition = 0
@@ -1020,6 +1029,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 ) }
             } else if (jsonMsg.getString("cmd") == "setVoicePitch") {
                 val pitch = jsonMsg.getDouble("pitch")
+                if (ktvApiConfig.type == KTVType.SingRelay && !isOnMicOpen && this.singerRole != KTVSingRole.Audience) {
+                    this.pitch = pitch
+                }
                 if (this.singerRole == KTVSingRole.Audience) {
                     this.pitch = pitch
                 }
@@ -1033,6 +1045,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         super.onAudioVolumeIndication(speakers, totalVolume)
         val allSpeakers = speakers ?: return
         // VideoPitch 回调, 用于同步各端音准
+        if (this.ktvApiConfig.type == KTVType.SingRelay && !isOnMicOpen) {
+            return
+        }
         if (this.singerRole != KTVSingRole.Audience) {
             for (info in allSpeakers) {
                 if (info.uid == 0) {
