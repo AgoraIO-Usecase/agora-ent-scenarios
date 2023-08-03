@@ -1132,6 +1132,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                         chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
                                                              type: KTVTypeNormal
                                                         maxCacheSize:10
+                                                        mccDomain: (AppContext.shared.isDebugMode) ? @"api-test.agora.io" : nil
     ];
     self.ktvApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
     [self.ktvApi renewInnerDataStreamId];

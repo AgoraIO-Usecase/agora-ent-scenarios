@@ -199,7 +199,8 @@
 //初始化音质Segmented控件
 - (void)initVolSegmentedControl
 {
-    NSArray *segmentedData = [[NSArray alloc]initWithObjects:@"标准音质",@"高音质",@"超高音质",nil];
+   // NSArray *segmentedData = [[NSArray alloc]initWithObjects:@"标准音质",@"高音质",@"超高音质",nil];
+    NSArray *segmentedData = [[NSArray alloc]initWithObjects:@"标准音质",@"高音质",nil];
     self.volSegment = [[UISegmentedControl alloc]initWithItems:segmentedData];
     self.volSegment.frame = CGRectMake(SCREEN_WIDTH - 309, 121, 289, 34);
     //这个是设置按下按钮时的颜色
