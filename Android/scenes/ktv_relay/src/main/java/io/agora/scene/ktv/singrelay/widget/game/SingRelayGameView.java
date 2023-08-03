@@ -147,9 +147,11 @@ public class SingRelayGameView extends FrameLayout {
     }
 
     // 游戏开始
-    public void onGameStartStatus() {
+    private boolean isGamer = false;
+    public void onGameStartStatus(boolean isGamer) {
         KTVLogger.d(TAG, "onGameStartStatus");
         if (mBinding == null) return;
+        this.isGamer = isGamer;
         mBinding.ilIDLE.btGameStart.setVisibility(View.GONE);
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
         mBinding.ilIDLE.messageText.setText(R.string.ktv_game_start);
@@ -159,7 +161,7 @@ public class SingRelayGameView extends FrameLayout {
     // 下一段前提示
     public void onBattleGamePrepare(boolean isWinner) {
         KTVLogger.d(TAG, "onBattleGamePrepare， isWinner: " + isWinner);
-        if (mBinding == null) return;
+        if (mBinding == null || !isGamer) return;
         mBinding.ilActive.lrcControlView.onGraspDisable();
         if (isWinner) {
             mBinding.ilActive.messageText.setText(R.string.ktv_next_round_singer_tips);
@@ -180,7 +182,7 @@ public class SingRelayGameView extends FrameLayout {
         if (mBinding == null) return;
         partNum ++;
         mBinding.ilActive.tvSongNumTab.setText(partNum + "/5");
-        if (partNum != 5) {
+        if (partNum != 5 && isGamer) {
             mBinding.ilActive.lrcControlView.onGraspEnable();
         }
     }
@@ -251,6 +253,7 @@ public class SingRelayGameView extends FrameLayout {
         }
         mBinding.ilRank.resetRankList(list);
         partNum = 1;
+        isGamer = false;
     }
 
     public interface OnSingRelayGameEventListener {

@@ -485,7 +485,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.singRelayGameStatusMutableLiveData.observe(this, status -> {
             if (status == RoomLivingViewModel.GameStatus.ON_START) {
                 if (roomLivingViewModel.songsOrderedLiveData.getValue() != null) {
-                    getBinding().singRelayGameView.onGameStartStatus();
+                    getBinding().singRelayGameView.onGameStartStatus(roomLivingViewModel.seatLocalLiveData.getValue() != null);
                 }
                 roomLivingViewModel.toggleMic(roomLivingViewModel.isRoomOwner());
                 getBinding().cbMic.setEnabled(false);
