@@ -2501,6 +2501,13 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                 [self.SBGApi.getMusicPlayer selectAudioTrack:self.trackMode == SBGPlayerTrackModeOrigin ? 0 : 1 ];
             }
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted || state == AgoraMediaPlayerStatePlayBackCompleted) {
+            
+            VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
+            if (model.winnerNo == nil || [model.winnerNo isEqualToString:@""]) {
+                //表示无人抢唱
+                return;
+            }
+            
             if(isLocal) {
                 SBGLogInfo(@"Playback all loop completed");
                 if(self.singRole != SBGSingRoleAudience){
