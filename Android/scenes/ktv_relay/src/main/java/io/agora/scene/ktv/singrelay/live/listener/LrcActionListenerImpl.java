@@ -3,7 +3,6 @@ package io.agora.scene.ktv.singrelay.live.listener;
 import android.content.Context;
 
 import io.agora.karaoke_view.v11.model.LyricsLineModel;
-import io.agora.karaoke_view.v11.model.LyricsModel;
 import io.agora.scene.ktv.singrelay.live.RoomLivingViewModel;
 import io.agora.scene.ktv.singrelay.widget.lrcView.LrcControlView;
 

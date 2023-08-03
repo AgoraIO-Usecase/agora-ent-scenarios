@@ -38,6 +38,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -55,6 +56,7 @@ import io.agora.scene.ktv.singrelay.R;
 import io.agora.scene.ktv.singrelay.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.singrelay.databinding.KtvLayoutLrcPrepareBinding;
 import io.agora.scene.ktv.singrelay.ktvapi.ILrcView;
+import io.agora.scene.ktv.singrelay.service.RankModel;
 import io.agora.scene.ktv.singrelay.service.RoomSelSongModel;
 import io.agora.scene.widget.basic.OutlineSpan;
 import io.agora.scene.widget.utils.UiUtils;
@@ -727,7 +729,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
     }
 
-    public void onReceiveSingleLineScore(int score, int index, int cumulativeScore, int total) {
+    public void onReceiveSingleLineScore(int score, int index, int cumulativeScore, int total, String userName, String poster) {
         if (mRole == Role.Listener) {
             updateScore(score, cumulativeScore, /** Workaround(Hai_Guo)*/total);
         }

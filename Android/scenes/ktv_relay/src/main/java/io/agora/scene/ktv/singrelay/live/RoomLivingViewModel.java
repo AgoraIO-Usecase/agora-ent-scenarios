@@ -1487,10 +1487,8 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public boolean isNextRoundSinger() {
-        Log.d("hugo", "isNextRoundSinger: " + songsOrderedLiveData.getValue().get(0).getWinnerNo().equals(""));
-        Log.d("hugo", "isNextRoundSinger: " + songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1]);
-        Log.d("hugo", "isNextRoundSinger: " + partNum);
-        if (songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0].equals(UserManager.getInstance().getUser().id.toString()) && songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum))) {
+        if (songsOrderedLiveData.getValue() == null) return false;
+        if (!songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") && songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0].equals(UserManager.getInstance().getUser().id.toString()) && songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum))) {
             return true;
         } else {
             if (isRoomOwner() && (songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") || !songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum)))) {
