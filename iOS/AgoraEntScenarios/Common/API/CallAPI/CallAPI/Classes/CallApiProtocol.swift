@@ -146,6 +146,9 @@ public class CallTokenConfig: NSObject {
     ///   - fromUserId: 发起呼叫的用户id
     ///   - toUserId: 接收呼叫的用户id
     @objc optional func onOneForOneCache(oneForOneRoomId: String, fromUserId: UInt, toUserId: UInt)
+    
+    @objc optional func debugInfo(message: String)
+    @objc optional func debugWarning(message: String)
 }
 
 @objc public protocol CallApiProtocol: NSObjectProtocol {

@@ -11,12 +11,6 @@ let kReceiptsKey: String = "receipts"      //回执的消息id
 let kReceiptsRoomIdKey: String = "receiptsRoomId"     //回执到哪个房间，因为没有点对点，所以单点消息通过不同房间发送消息
 let kMessageId: String = "messageId"     //发送的消息id
 
-private func callMessagePrint(_ message: String) {
-    #if DEBUG
-    callPrint("[CallApi][Message]\(message)")
-    #endif
-}
-
 /// 回执的消息队列对象
 private class CallQueueInfo: NSObject {
     var messageId: Int = 0
@@ -35,14 +29,14 @@ private class CallQueueInfo: NSObject {
     
     deinit {
         timer?.invalidate()
-        callMessagePrint("CallQueueInfo deinit \(messageId) cost: \(-Int(createDate.timeIntervalSinceNow * 1000)) ms")
+//        callMessagePrint("CallQueueInfo deinit \(messageId) cost: \(-Int(createDate.timeIntervalSinceNow * 1000)) ms")
     }
     
     func checkReceipt() {
         self.timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) {[weak self] timer in
             guard let self = self else {return}
             self.retryTimes -= 1
-            callMessagePrint("receipt timeout retry \(self.retryTimes)")
+//            callMessagePrint("receipt timeout retry \(self.retryTimes)")
             self.checkReceiptsFail?(self)
         }
     }
@@ -53,6 +47,9 @@ protocol CallMessageDelegate: NSObjectProtocol {
     /// 回执没有收到
     /// - Parameter message: <#message description#>
     func onMissReceipts(message: [String: Any])
+    
+    func debugInfo(message: String)
+    func debugWarning(message: String)
 }
 
 class CallMessageManager: NSObject {
@@ -214,8 +211,9 @@ extension CallMessageManager {
         let options = AgoraRtmPublishOptions()
         let date = Date()
         rtmClient.publish(roomId, message: data!, withOption: options) { [weak self] resp, err in
+            guard let self = self else {return}
             let error = err.errorCode == .ok ? nil : NSError(domain: err.reason, code: err.errorCode.rawValue)
-            callMessagePrint("_sendReceipts cost \(-date.timeIntervalSinceNow * 1000) ms")
+            self.callMessagePrint("_sendReceipts cost \(-date.timeIntervalSinceNow * 1000) ms")
             if error == nil {
                 completion?(nil)
                 return
@@ -223,7 +221,7 @@ extension CallMessageManager {
             if retryCount <= 1 {
                 completion?(error)
             } else {
-                self?._sendReceipts(roomId: roomId, messageId: messageId, retryCount: retryCount - 1, completion: completion)
+                self._sendReceipts(roomId: roomId, messageId: messageId, retryCount: retryCount - 1, completion: completion)
             }
         }
     }
@@ -239,7 +237,7 @@ extension CallMessageManager {
         let date = Date()
         rtmClient.publish(roomId, message: data!, withOption: options) { [weak self] resp, err in
             let error = err.errorCode == .ok ? nil : NSError(domain: err.reason, code: err.errorCode.rawValue)
-            callMessagePrint("publish cost \(-date.timeIntervalSinceNow * 1000) ms")
+            self?.callMessagePrint("publish cost \(-date.timeIntervalSinceNow * 1000) ms")
             if error == nil {
                 completion?(nil)
                 if error == nil {
@@ -255,7 +253,7 @@ extension CallMessageManager {
                         guard let self = self else {return}
                         guard info.retryTimes > 0 else {
                             let message = info.messageInfo ?? [:]
-                            callMessagePrint("get receipts fail, msg: \(message)")
+                            self.callMessagePrint("get receipts fail, msg: \(message)")
                             self.receiptsQueue = self.receiptsQueue.filter({$0.messageId != msgId})
                             self.delegate?.onMissReceipts(message: message)
                             return
@@ -281,8 +279,9 @@ extension CallMessageManager {
             return
         }
         
-        rtmClient.subscribe(withChannel: channelName, option: option) { resp, err in
-            callMessagePrint("subscribe \(channelName) finished = \(err.errorCode.rawValue)")
+        rtmClient.subscribe(withChannel: channelName, option: option) {[weak self] resp, err in
+            guard let self = self else {return}
+            self.callMessagePrint("subscribe \(channelName) finished = \(err.errorCode.rawValue)")
             guard err.errorCode == .ok else {
                 completion?(NSError(domain: err.reason, code: err.errorCode.rawValue))
                 return
@@ -299,8 +298,9 @@ extension CallMessageManager {
         }
         
         rtmClient.login(byToken: token) {[weak self] resp, error in
-            callPrint("login: \(resp) \(error.errorCode.rawValue)")
-            self?.isLoginedRTM = error.errorCode == .ok ? true : false
+            guard let self = self else {return}
+            self.callMessagePrint("login: \(error.errorCode.rawValue)")
+            self.isLoginedRTM = error.errorCode == .ok ? true : false
             completion(error)
         }
     }
@@ -438,8 +438,9 @@ extension CallMessageManager {
             items.append(item)
         }
         
-        presence.setState(roomId, channelType: .message, items: items, completion: { resp, error in
-            callWarningPrint("presence setState '\(roomId)' finished: \(error.errorCode.rawValue)")
+        presence.setState(roomId, channelType: .message, items: items, completion: {[weak self] resp, error in
+            guard let self = self else {return}
+            self.callWarningPrint("presence setState '\(roomId)' finished: \(error.errorCode.rawValue)")
             if error.errorCode == .ok {
                 completion(nil)
                 return
@@ -467,12 +468,13 @@ extension CallMessageManager {
         }
         callMessagePrint("_removePresenceState to '\(roomId)', keys: \(keys)")
         
-        presence.removeState(roomId, channelType: .message, items: keys, completion: { resp, error in
+        presence.removeState(roomId, channelType: .message, items: keys, completion: {[weak self] resp, error in
+            guard let self = self else {return}
             if error.errorCode == .ok {
                 completion(nil)
                 return
             }
-            callWarningPrint("presence removeState '\(roomId)' finished: \(error.errorCode.rawValue)")
+            self.callWarningPrint("presence removeState '\(roomId)' finished: \(error.errorCode.rawValue)")
             completion(NSError(domain: error.reason, code: error.errorCode.rawValue))
         })
     }
@@ -483,7 +485,7 @@ extension CallMessageManager: AgoraRtmClientDelegate {
     //收到RTM消息
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, on event: AgoraRtmMessageEvent) {
         let message = event.message
-        callMessagePrint("on event message: \(message)")
+        callMessagePrint("on event message: \(message.getType().rawValue)")
         if let data = message.getData() as? Data,
            let dic = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
             if let messageId = dic[kMessageId] as? Int,
@@ -505,5 +507,15 @@ extension CallMessageManager: AgoraRtmClientDelegate {
             snapshotDidRecv = nil
         }
         self.rtmDelegate?.rtmKit?(rtmKit, on: event)
+    }
+}
+
+extension CallMessageManager {
+    private func callMessagePrint(_ message: String) {
+        delegate?.debugInfo(message: "[MessageManager]\(message)")
+    }
+    
+    private func callWarningPrint(_ message: String) {
+        delegate?.debugWarning(message: "[MessageManager]\(message)")
     }
 }
