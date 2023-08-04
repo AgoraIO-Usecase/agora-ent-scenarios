@@ -7,6 +7,7 @@
 
 import Foundation
 import SDWebImage
+import FLAnimatedImage
 
 class Pure1v1UserCell: UICollectionViewCell {
     var callClosure: ((Pure1v1UserInfo?)->())?
@@ -29,6 +30,28 @@ class Pure1v1UserCell: UICollectionViewCell {
         ]
         
         return layer
+    }()
+    
+    private lazy var liveGradientLayer: CAGradientLayer = {
+        let layer = CAGradientLayer()
+        layer.cornerRadius = 10
+        layer.colors = [
+        UIColor(red: 1, green: 0.429, blue: 0.719, alpha: 1).cgColor,
+        UIColor(red: 0.921, green: 0.658, blue: 0.265, alpha: 1).cgColor
+        ]
+        layer.locations = [0, 1]
+        layer.startPoint = CGPoint(x: 0.25, y: 0.5)
+        layer.endPoint = CGPoint(x: 0.75, y: 0.5)
+
+        return layer
+    }()
+    
+    private lazy var liveAnimationView: FLAnimatedImageView = {
+        let view = FLAnimatedImageView(frame: CGRect(x: 0, y: 0, width: 36, height: 30))
+        let path = UIImage.sceneImagePath(name: "Image/user_list_cell_live.gif", bundleName: "Pure1v1")!
+        view.sd_setImage(with: URL.init(fileURLWithPath: path), placeholderImage: nil)
+        
+        return view
     }()
     
     // 背景图
@@ -84,6 +107,8 @@ class Pure1v1UserCell: UICollectionViewCell {
         bgImageView.addSubview(blurView)
         contentView.addSubview(contentImageView)
         contentImageView.layer.addSublayer(gradientLayer)
+        contentImageView.layer.addSublayer(liveGradientLayer)
+        contentImageView.addSubview(liveAnimationView)
         contentImageView.addSubview(nameLabel)
         contentImageView.addSubview(avatarView)
         contentImageView.addSubview(callButton)
@@ -104,6 +129,9 @@ class Pure1v1UserCell: UICollectionViewCell {
         nameLabel.sizeToFit()
         nameLabel.aui_left = avatarView.aui_right + 10
         nameLabel.aui_centerY = avatarView.aui_centerY
+        
+        liveAnimationView.aui_tl = CGPoint(x: 11, y: 10)
+        liveGradientLayer.frame = liveAnimationView.frame
         
         callButton.aui_size = CGSize(width: 76, height: 76)
         callButton.aui_right = contentImageView.aui_width - 15
