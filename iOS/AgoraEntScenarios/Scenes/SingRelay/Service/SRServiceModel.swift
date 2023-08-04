@@ -9,7 +9,7 @@ import Foundation
 class SRCreateRoomInputModel: NSObject {
     @objc var belCanto: String?
     @objc var icon: String?
-    @objc var isPrivate: NSNumber?
+    @objc var isPrivate: Bool = false
     @objc var name: String?
     @objc var password: String?
     @objc var soundEffect: String?

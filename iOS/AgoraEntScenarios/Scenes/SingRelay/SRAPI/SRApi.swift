@@ -69,6 +69,8 @@ import AgoraRtcKit
 @objc public enum SRType: Int {
     case normal
     case singbattle
+    case cantata
+    case singRelay
 }
 
 @objc public protocol ISRMusicLoadStateListener: NSObjectProtocol {

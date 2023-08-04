@@ -58,6 +58,7 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     moreBtn.tag = VLSRBottomBtnClickTypeMore;
     [moreBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:moreBtn];
+    [moreBtn setHidden:true];
    // moreBtn.alpha = 0;
     
     VLHotSpotBtn *dianGeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(self.width-20-70, (self.height-32)*0.5, 70, 32)];
@@ -65,6 +66,7 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     [dianGeBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     dianGeBtn.tag = VLSRBottomBtnClickTypeChoose;
     [self addSubview:dianGeBtn];
+    [dianGeBtn setHidden:true];
     
     for (VLSRRoomSeatModel *info in self.seatsArray) {
         if ([info.rtcUid integerValue] == [VLUserCenter.user.id integerValue]) {
@@ -94,6 +96,10 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
             break;
         }
     }
+}
+
+-(void)setAudioBtnEnabled:(BOOL)enabled {
+    _audioBtn.enabled = enabled;
 }
 
 - (void)bottomBtnClickEvent:(VLHotSpotBtn *)sender {

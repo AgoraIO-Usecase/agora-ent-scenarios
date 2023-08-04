@@ -525,7 +525,10 @@
 		E3735CA42A5E7E75004737EF /* BytesBeautyRender.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C822A5E7E75004737EF /* BytesBeautyRender.m */; };
 		E3735CA52A5E7E75004737EF /* SenseBeautyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C842A5E7E75004737EF /* SenseBeautyManager.swift */; };
 		E3735CA72A5E8023004737EF /* VRBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CA62A5E8023004737EF /* VRBaseViewController.swift */; };
+		E37DA1282A7A5C4A009CE195 /* SRNextWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E37DA1272A7A5C4A009CE195 /* SRNextWarningView.swift */; };
 		E38A4DFB2A70CE4700E7A72F /* ChooseSongInputModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E38A4DFA2A70CE4700E7A72F /* ChooseSongInputModel.m */; };
+		E38A4DFE2A720EC500E7A72F /* Networktool.swift in Sources */ = {isa = PBXBuildFile; fileRef = E38A4DFC2A720EC500E7A72F /* Networktool.swift */; };
+		E38A4DFF2A720EC500E7A72F /* SBGNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E38A4DFD2A720EC500E7A72F /* SBGNetworkManager.swift */; };
 		E38C5C882A68DA1000662A9C /* SRLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E38C5BFD2A68DA0F00662A9C /* SRLog.swift */; };
 		E38C5C892A68DA1000662A9C /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = E38C5BFE2A68DA0F00662A9C /* README.md */; };
 		E38C5C8A2A68DA1000662A9C /* VLSRAddRoomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E38C5C002A68DA0F00662A9C /* VLSRAddRoomModel.m */; };
@@ -1250,8 +1253,11 @@
 		E3735C842A5E7E75004737EF /* SenseBeautyManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SenseBeautyManager.swift; sourceTree = "<group>"; };
 		E3735CA62A5E8023004737EF /* VRBaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRBaseViewController.swift; sourceTree = "<group>"; };
 		E3735CAC2A5E81B6004737EF /* AESMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AESMacro.h; sourceTree = "<group>"; };
+		E37DA1272A7A5C4A009CE195 /* SRNextWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRNextWarningView.swift; sourceTree = "<group>"; };
 		E38A4DF92A70CE4700E7A72F /* ChooseSongInputModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChooseSongInputModel.h; sourceTree = "<group>"; };
 		E38A4DFA2A70CE4700E7A72F /* ChooseSongInputModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ChooseSongInputModel.m; sourceTree = "<group>"; };
+		E38A4DFC2A720EC500E7A72F /* Networktool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Networktool.swift; sourceTree = "<group>"; };
+		E38A4DFD2A720EC500E7A72F /* SBGNetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBGNetworkManager.swift; sourceTree = "<group>"; };
 		E38C5BFD2A68DA0F00662A9C /* SRLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SRLog.swift; sourceTree = "<group>"; };
 		E38C5BFE2A68DA0F00662A9C /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		E38C5C002A68DA0F00662A9C /* VLSRAddRoomModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSRAddRoomModel.m; sourceTree = "<group>"; };
@@ -3148,6 +3154,8 @@
 		E38C5BFC2A68DA0F00662A9C /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				E38A4DFC2A720EC500E7A72F /* Networktool.swift */,
+				E38A4DFD2A720EC500E7A72F /* SBGNetworkManager.swift */,
 				E38C5BFD2A68DA0F00662A9C /* SRLog.swift */,
 			);
 			path = Utils;
@@ -3255,6 +3263,7 @@
 				E38C5C5B2A68DA0F00662A9C /* VLSRTopView.m */,
 				E38C5C5C2A68DA0F00662A9C /* VLSRBottomToolbar.h */,
 				E36D827B2A6E7171007C8E98 /* SBGAttributeView.swift */,
+				E37DA1272A7A5C4A009CE195 /* SRNextWarningView.swift */,
 				E38C5C5D2A68DA0F00662A9C /* SRLrcControl.swift */,
 			);
 			path = View;
@@ -3698,6 +3707,7 @@
 				DD3610AE29B70CDC00CE7984 /* ShowRoomMembersCountView.swift in Sources */,
 				DD36106B29B70CDC00CE7984 /* ShowDebug1TFModel.swift in Sources */,
 				E38C5CAE2A68DA1000662A9C /* VLSRRemoteVolumeView.m in Sources */,
+				E38A4DFE2A720EC500E7A72F /* Networktool.swift in Sources */,
 				E3735C952A5E7E75004737EF /* BEGLTexture.m in Sources */,
 				DD619AA529E3E247008F63E4 /* SASpatialSoundViewController.swift in Sources */,
 				DD36105C29B70CDC00CE7984 /* UIViewController+Show.swift in Sources */,
@@ -3977,6 +3987,7 @@
 				E36D82742A6E206E007C8E98 /* SRGameRuleView.swift in Sources */,
 				DD36108E29B70CDC00CE7984 /* ShowBeautySettingVC.swift in Sources */,
 				DD619AAB29E3E247008F63E4 /* SABaseNavigationView.swift in Sources */,
+				E38A4DFF2A720EC500E7A72F /* SBGNetworkManager.swift in Sources */,
 				DD3610C529B70CDC00CE7984 /* ShowPKInviteView.swift in Sources */,
 				DD619BA129E3E262008F63E4 /* VoiceRoomRTCManager.swift in Sources */,
 				DD619BFC29E3E262008F63E4 /* VRCreateRoomInputView.swift in Sources */,
@@ -4029,6 +4040,7 @@
 				DDA199FE28FFE579009D3E61 /* UIDevice+JKHardware.m in Sources */,
 				DD619AB629E3E247008F63E4 /* SA3DMoveUserView.swift in Sources */,
 				DD619BC929E3E262008F63E4 /* VREQOperationAlert.swift in Sources */,
+				E37DA1282A7A5C4A009CE195 /* SRNextWarningView.swift in Sources */,
 				DD619A7829E3E247008F63E4 /* SAPresentationController.swift in Sources */,
 				DDA19A0928FFE579009D3E61 /* DeviceAssistant.swift in Sources */,
 				DD84178F29090C520026B624 /* VLPrivacyCustomView.m in Sources */,
@@ -4368,7 +4380,7 @@
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱-K歌";
+				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱-抢麦接唱";
 				INFOPLIST_KEY_NSCameraUsageDescription = "声网需要您开启相机功能，用于视频通话";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "声网需要您开启麦克风功能，用于视频通话";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "声网需要您开启相册功能，用于头像更新";
@@ -4379,13 +4391,13 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.ktv;
+				MARKETING_VERSION = 3.5.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.singrelay;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4410,7 +4422,7 @@
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱-K歌";
+				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱-抢麦接唱";
 				INFOPLIST_KEY_NSCameraUsageDescription = "声网需要您开启相机功能，用于视频通话";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "声网需要您开启麦克风功能，用于视频通话";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "声网需要您开启相册功能，用于头像更新";
@@ -4421,13 +4433,13 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.ktv;
+				MARKETING_VERSION = 3.5.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.singrelay;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

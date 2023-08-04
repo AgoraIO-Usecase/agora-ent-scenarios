@@ -48,9 +48,9 @@
     UILabel *roomTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(40, iconImgView.bottom+VLREALVALUE_WIDTH(40), 70, 20)];
     roomTitleLabel.font = UIFontMake(14);
     roomTitleLabel.textColor = UIColorMakeWithHex(@"#000000");
-    roomTitleLabel.text = AGLocalizedString(@"ktv_room_title");
+    roomTitleLabel.text = KTVLocalizedString(@"ktv_room_title");
     [self addSubview:roomTitleLabel];
-    
+   
 //    QMUIButton *randomBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_randomIcon"]
 //                                                             title:KTVLocalizedString(@"随机")];
     UIButton *randomBtn = [UIButton buttonWithType:UIButtonTypeCustom];

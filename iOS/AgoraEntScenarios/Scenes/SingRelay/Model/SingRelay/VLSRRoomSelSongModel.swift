@@ -34,6 +34,9 @@ class VLSRRoomSelSongModel: VLBaseModel {
     // 是谁点的歌
     @objc var userNo: String?
     
+    //谁抢到了歌曲
+    @objc var winnerNo: String = ""
+    
     /// 点歌人昵称
     @objc var name: String?
     

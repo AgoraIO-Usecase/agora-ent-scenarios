@@ -8,7 +8,6 @@
 import Foundation
 import AgoraLyricsScore
 
-
 private func agoraPrint(_ message: String) {
     SRLog.info(text: message, tag: "SRLrcControl")
 }

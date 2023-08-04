@@ -27,7 +27,11 @@ class SBGScoreCell: UITableViewCell {
     var score: SubRankModel = SubRankModel() {
         didSet {
             indexLabel.text = "\(score.index)"
-            nameLabel.text = score.userName == "" ? "暂无上榜" : "\(score.userName)"
+            if let userName = score.userName {
+                nameLabel.text = score.userName == "" ? "暂无上榜" : userName
+            } else {
+                nameLabel.text = "暂无上榜"
+            }
             sbgCountLabel.text = score.songNum == 0 ? "-" : "\(score.songNum)首"
             gradeLabel.text = score.songNum == 0 ? "-" : "\(score.score)分"
             if(score.index == 1){

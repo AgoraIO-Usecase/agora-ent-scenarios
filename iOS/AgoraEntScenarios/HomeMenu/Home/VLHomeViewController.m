@@ -77,33 +77,37 @@
 //        return;
 //    }
 
-    NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow"];
-    [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
-    [[NetworkManager shared] reportDeviceInfoWithSceneName:sceneNames[tagValue]];
-    [[NetworkManager shared] reportUserBehaviorWithSceneName:sceneNames[tagValue]];
-    switch (tagValue) {
-        case 0: {
-            VRRoomsViewController *vc = [[VRRoomsViewController alloc] initWithUser:VLUserCenter.user];
-            vc.hidesBottomBarWhenPushed = YES;
-            [self.navigationController pushViewController:vc animated:YES];
-        }
-            break;
-        case 2: {
+//    NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow"];
+//    [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
+//    [[NetworkManager shared] reportDeviceInfoWithSceneName:sceneNames[tagValue]];
+//    [[NetworkManager shared] reportUserBehaviorWithSceneName:sceneNames[tagValue]];
+        NSArray* sceneNames = @[@"SingRelay"];
+        [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
+//        [[NetworkManager shared] reportDeviceInfoWithSceneName:sceneNames[tagValue]];
+//        [[NetworkManager shared] reportUserBehaviorWithSceneName:sceneNames[tagValue]];
+//    switch (tagValue) {
+//        case 0: {
+//            VRRoomsViewController *vc = [[VRRoomsViewController alloc] initWithUser:VLUserCenter.user];
+//            vc.hidesBottomBarWhenPushed = YES;
+//            [self.navigationController pushViewController:vc animated:YES];
+//        }
+//            break;
+//        case 2: {
             VLSROnLineListVC *vc = [[VLSROnLineListVC alloc]init];
             [self.navigationController pushViewController:vc animated:YES];
-        } break;
-        case 3: {
-            ShowRoomListVC *vc = [ShowRoomListVC new];
-            [self.navigationController pushViewController:vc animated:YES];
-        } break;
-        case 1: {
-            SARoomsViewController *roomVc = [[SARoomsViewController alloc] initWithUser:VLUserCenter.user];
-            roomVc.hidesBottomBarWhenPushed = YES;
-            [self.navigationController pushViewController:roomVc animated:YES];
-        } break;
-        default:
-            break;
-    }
+//        } break;
+//        case 3: {
+//            ShowRoomListVC *vc = [ShowRoomListVC new];
+//            [self.navigationController pushViewController:vc animated:YES];
+//        } break;
+//        case 1: {
+//            SARoomsViewController *roomVc = [[SARoomsViewController alloc] initWithUser:VLUserCenter.user];
+//            roomVc.hidesBottomBarWhenPushed = YES;
+//            [self.navigationController pushViewController:roomVc animated:YES];
+//        } break;
+//        default:
+//            break;
+//    }
 
 }
 

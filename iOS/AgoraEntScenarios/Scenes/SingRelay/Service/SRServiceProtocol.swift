@@ -165,4 +165,6 @@ import AgoraRtmKit
     func innerUpdateSingRelayInfo(_ model: SingRelayModel, completion: @escaping (Error?) -> Void)
     
     func innerSubscribeSingRelayInfo(completion: @escaping (SRSubscribe, SingRelayModel?, Error?) -> Void)
+    
+    func updateChooseSong(withSongInfo songInfo: VLSRRoomSelSongModel, finished: @escaping (Error?) -> Void)
 }

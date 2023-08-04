@@ -9,14 +9,14 @@ import Foundation
 import YYCategories
 import SVProgressHUD
 
-private let rSceneId = "scene_sr_3.0.0"
+private let rSceneId = "scene_singrelay_3.5.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
 // 选歌
 private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 //接唱
-private let SYNC_MANAGER_UPDATE_GAME_STATE = "sing_relay_info"
+private let SYNC_MANAGER_UPDATE_GAME_STATE = "sing_battle_game_info"
 
 private func agoraAssert(_ message: String) {
     agoraAssert(false, message)
@@ -193,7 +193,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         let roomInfo = VLSRRoomListModel() // LiveRoomInfo(roomName: inputModel.name)
 //        roomInfo.id = VLUserCenter.user.id//NSString.withUUID().md5() ?? ""
         roomInfo.name = inputModel.name
-        roomInfo.isPrivate = ((inputModel.isPrivate?.boolValue) != nil)
+        roomInfo.isPrivate = inputModel.isPrivate == true
         roomInfo.password = inputModel.password
         roomInfo.creatorNo = VLUserCenter.user.id
         roomInfo.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id
@@ -1325,6 +1325,10 @@ extension SRSyncManagerServiceImp {
                 agoraPrint("imp song get fail \(error.description)...")
                 finished(error, nil)
             })
+    }
+    
+    func updateChooseSong(withSongInfo songInfo: VLSRRoomSelSongModel, finished: @escaping (Error?) -> Void) {
+        _updateChooseSong(songInfo: songInfo, finished: finished)
     }
 
     private func _updateChooseSong(songInfo: VLSRRoomSelSongModel,

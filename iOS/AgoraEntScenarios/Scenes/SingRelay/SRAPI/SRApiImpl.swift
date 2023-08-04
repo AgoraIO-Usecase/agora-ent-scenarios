@@ -318,7 +318,7 @@ extension SRApiImpl: SRApiDelegate {
 // 主要是角色切换，加入合唱，加入多频道，退出合唱，退出多频道
 extension SRApiImpl {
     private func switchSingerRole(oldRole: SRSingRole, newRole: SRSingRole, token: String, stateCallBack:@escaping ISwitchRoleStateListener) {
-    //    agoraPrint("switchSingerRole oldRole: \(oldRole.rawValue), newRole: \(newRole.rawValue)")
+        agoraPrint("switchSingerRole oldRole: \(oldRole.rawValue), newRole: \(newRole.rawValue)")
         if oldRole == .audience && newRole == .soloSinger {
             // 1、SRSingRoleAudience -》SRSingRoleMainSinger
             singerRole = newRole
@@ -868,8 +868,16 @@ extension SRApiImpl {
     }
 
     private func handleSetVoicePitchCommand(dict: [String: Any], role: SRSingRole) {
-        if role == .audience, let voicePitch = dict["pitch"] as? Double {
-            self.pitch = voicePitch
+        if apiConfig?.type == .singRelay {
+            if isNowMicMuted || singerRole == .audience {
+                if let voicePitch = dict["pitch"] as? Double {
+                    self.pitch = voicePitch
+                }
+            }
+        } else {
+            if role == .audience, let voicePitch = dict["pitch"] as? Double {
+                self.pitch = voicePitch
+            }
         }
     }
 
@@ -911,7 +919,14 @@ extension SRApiImpl {
         if musicPlayer?.getPlayerState() != .playing {pitch = 0}
         self.pitch = pitch
         //将主唱的pitch同步到观众
-        if isMainSinger() {
+        if (apiConfig?.type == .singRelay ) {
+            if ((singerRole == .coSinger || singerRole == .leadSinger || singerRole == .soloSinger) && !isNowMicMuted) {
+                let dict: [String: Any] = [ "cmd": "setVoicePitch",
+                                            "pitch": pitch,
+                ]
+                sendStreamMessageWithDict(dict, success: nil)
+            }
+        } else {
             let dict: [String: Any] = [ "cmd": "setVoicePitch",
                                         "pitch": pitch,
             ]
