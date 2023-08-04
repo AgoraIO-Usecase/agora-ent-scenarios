@@ -236,7 +236,7 @@ extension CallMessageManager {
         let options = AgoraRtmPublishOptions()
         let date = Date()
         rtmClient.publish(roomId, message: data!, withOption: options) { [weak self] resp, err in
-            let error = err.errorCode == .ok ? nil : NSError(domain: err.reason, code: err.errorCode.rawValue)
+            let error: NSError? = err.errorCode == .ok ? nil : NSError(domain: err.reason, code: err.errorCode.rawValue)
             self?.callMessagePrint("publish cost \(-date.timeIntervalSinceNow * 1000) ms")
             if error == nil {
                 completion?(nil)
@@ -266,6 +266,9 @@ extension CallMessageManager {
                 return
             }
             if retryCount <= 1 {
+                if let error = error {
+                    self?.callWarningPrint("_sendMessage: fail: \(error)")
+                }
                 completion?(error)
             } else {
                 self?._sendMessage(roomId: roomId, message: message, retryCount: retryCount - 1, completion: completion)

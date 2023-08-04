@@ -452,6 +452,7 @@ extension CallApiImpl {
             } else {
                 callWarningPrint(" mismatch channel, leave first! tqarget: \(roomId) current: \(connection.channelId)")
                 config.rtcEngine.leaveChannelEx(connection)
+                rtcConnection = nil
             }
         }
         
@@ -804,8 +805,8 @@ extension CallApiImpl: CallApiProtocol {
             messageManager?.sendMessage(roomId: roomId, fromRoomId: fromRoomId, message: message) {[weak self] err in
                 guard let self = self else { return }
                 
-                if let _ = err {
-                    self._notifyState(state: .prepared, stateReason: .messageFailed)
+                if let error = err {
+                    self._notifyState(state: .prepared, stateReason: .messageFailed, eventReason: error.localizedDescription)
                     self._notifyEvent(event: .messageFailed)
                     return
                 }
@@ -1005,6 +1006,10 @@ extension CallApiImpl: AgoraRtmClientDelegate {
 
 //MARK: AgoraRtcEngineDelegate
 extension CallApiImpl: AgoraRtcEngineDelegate {
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, connectionChangedTo state: AgoraConnectionState, reason: AgoraConnectionChangedReason) {
+        callPrint("connectionChangedTo: \(state.rawValue) reason: \(reason.rawValue)")
+    }
+    
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         callPrint("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
         guard callingUserId == uid, let roomId = callingRoomId, let config = config else {
