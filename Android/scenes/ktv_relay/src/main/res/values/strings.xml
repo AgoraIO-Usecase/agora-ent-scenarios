@@ -156,7 +156,7 @@
     <string name="ktv_tips">公告 ></string>
     <string name="ktv_relay">抢麦接唱</string>
     <string name="ktv_seat_num">%s号麦</string>
-    <string name="ktv_next_round_singer_tips">下段演唱即将开始，准备演唱</string>
+    <string name="ktv_next_round_singer_tips">下段演唱即将开始，准备抢唱</string>
     <string name="ktv_next_round_listener_tips">下段演唱即将开始，准备抢唱</string>
     <string name="ktv_next_round_singer"> %s 演唱</string>
     <string name="ktv_winner_tip"> %s 抢到麦</string>

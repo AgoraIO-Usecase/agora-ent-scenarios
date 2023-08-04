@@ -112,7 +112,7 @@ public class RoomLivingViewModel extends ViewModel {
     final MutableLiveData<List<RoomSelSongModel>> songsOrderedLiveData = new MutableLiveData<>();
     final MutableLiveData<RoomSelSongModel> songPlayingLiveData = new MutableLiveData<>();
     private List<Long> relayList = new ArrayList<>();
-    private int partNum = 0;
+    private int partNum = 1;
 
     class LineScore {
         int score;
@@ -867,8 +867,8 @@ public class RoomLivingViewModel extends ViewModel {
                @Override
                public void onMusicPlayerPositionChanged(long position_ms, long timestamp_ms) {
                    super.onMusicPlayerPositionChanged(position_ms, timestamp_ms);
-                   onNextPart(position_ms);
                    onNextPartMention(position_ms);
+                   onNextPart(position_ms);
                }
            }
         );
@@ -1083,12 +1083,12 @@ public class RoomLivingViewModel extends ViewModel {
                 roomInfoLiveData.getValue().getRoomNo(),
                 UserManager.getInstance().getUser().id.toString(),
                 UserManager.getInstance().getUser().name,
-                songPlayingLiveData.getValue().getSongNo() + "_" + (partNum + 1),
+                songPlayingLiveData.getValue().getSongNo() + "_" + partNum,
                 UserManager.getInstance().getUser().headUrl,
                 (userId) -> {
                     KTVLogger.d(TAG, "RoomLivingViewModel.graspSong() success " + userId);
                     // 更新Service抢唱结果
-                    ktvServiceProtocol.updateSongModel(songPlayingLiveData.getValue().getSongNo(), userId + "_" + (partNum + 1), UserManager.getInstance().getUser().name, UserManager.getInstance().getUser().headUrl, e -> {
+                    ktvServiceProtocol.updateSongModel(songPlayingLiveData.getValue().getSongNo(), userId + "_" + partNum, UserManager.getInstance().getUser().name, UserManager.getInstance().getUser().headUrl, e -> {
                         if (e == null) {
                             KTVLogger.d(TAG, "RoomLivingViewModel.updateSongModel() success " + userId);
                         }
@@ -1222,6 +1222,7 @@ public class RoomLivingViewModel extends ViewModel {
     public void musicStartPlay(@NonNull RoomSelSongModel music) {
         KTVLogger.d(TAG, "RoomLivingViewModel.musicStartPlay() called");
         if (music.getUserNo() == null) return;
+        partNum = 1;
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
 
         long songCode = Long.parseLong(music.getSongNo());
@@ -1439,59 +1440,57 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     private void onNextPart(long position_ms) {
-        if ((position_ms - relayList.get(1)) > 0 && (position_ms - relayList.get(1) < 1000)) {
+        if ((position_ms - relayList.get(0)) > 0 && (position_ms - relayList.get(0) < 1000)) {
             GraspModel graspModel = new GraspModel();
             graspModel.status = GraspStatus.IDLE;
             graspStatusMutableLiveData.postValue(graspModel);
-            partNum = 1;
+            partNum = 2;
+        } else if ((position_ms - relayList.get(1)) > 0 && (position_ms - relayList.get(1) < 1000)) {
+            GraspModel graspModel = new GraspModel();
+            graspModel.status = GraspStatus.IDLE;
+            graspStatusMutableLiveData.postValue(graspModel);
+            partNum = 3;
         } else if ((position_ms - relayList.get(2)) > 0 && (position_ms - relayList.get(2) < 1000)) {
             GraspModel graspModel = new GraspModel();
             graspModel.status = GraspStatus.IDLE;
             graspStatusMutableLiveData.postValue(graspModel);
-            partNum = 2;
+            partNum = 4;
         } else if ((position_ms - relayList.get(3)) > 0 && (position_ms - relayList.get(3) < 1000)) {
             GraspModel graspModel = new GraspModel();
             graspModel.status = GraspStatus.IDLE;
             graspStatusMutableLiveData.postValue(graspModel);
-            partNum = 3;
-        } else if ((position_ms - relayList.get(4)) > 0 && (position_ms - relayList.get(4) < 1000)) {
-            GraspModel graspModel = new GraspModel();
-            graspModel.status = GraspStatus.IDLE;
-            graspStatusMutableLiveData.postValue(graspModel);
-            partNum = 4;
+            partNum = 5;
         }
     }
 
     private void onNextPartMention(long position_ms) {
-        if ((position_ms - relayList.get(1)) > -4000 && (position_ms - relayList.get(1) < -3000)) {
+        if ((position_ms - relayList.get(0)) > -3000 && (position_ms - relayList.get(0) < -2000)) {
             GraspModel graspModel = new GraspModel();
             graspModel.status = GraspStatus.Mention;
             graspStatusMutableLiveData.postValue(graspModel);
-            partNum = 1;
-        } else if ((position_ms - relayList.get(2)) > -4000 && (position_ms - relayList.get(2) < -3000)) {
+        } else if ((position_ms - relayList.get(1)) > -3000 && (position_ms - relayList.get(1) < -2000)) {
             GraspModel graspModel = new GraspModel();
             graspModel.status = GraspStatus.Mention;
             graspStatusMutableLiveData.postValue(graspModel);
-            partNum = 2;
-        } else if ((position_ms - relayList.get(3)) > -4000 && (position_ms - relayList.get(3) < -3000)) {
+        } else if ((position_ms - relayList.get(2)) > -3000 && (position_ms - relayList.get(2) < -2000)) {
             GraspModel graspModel = new GraspModel();
             graspModel.status = GraspStatus.Mention;
             graspStatusMutableLiveData.postValue(graspModel);
-            partNum = 3;
-        } else if ((position_ms - relayList.get(4)) > -4000 && (position_ms - relayList.get(4) < -3000)) {
+        } else if ((position_ms - relayList.get(3)) > -3000 && (position_ms - relayList.get(3) < -2000)) {
             GraspModel graspModel = new GraspModel();
             graspModel.status = GraspStatus.Mention;
             graspStatusMutableLiveData.postValue(graspModel);
-            partNum = 4;
         }
     }
 
     public boolean isNextRoundSinger() {
         if (songsOrderedLiveData.getValue() == null) return false;
-        if (!songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") && songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0].equals(UserManager.getInstance().getUser().id.toString()) && songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum))) {
+        Log.d("hugo", "songsOrderedLiveData.getValue().get(0).getWinnerNo(): " + songsOrderedLiveData.getValue().get(0).getWinnerNo());
+        Log.d("hugo", "partNum: " + partNum);
+        if (!songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") && songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0].equals(UserManager.getInstance().getUser().id.toString()) && songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum - 1))) {
             return true;
         } else {
-            if (isRoomOwner() && (songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") || !songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum)))) {
+            if (isRoomOwner() && (songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") || !songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum - 1)))) {
                 return true;
             } else {
                 return false;

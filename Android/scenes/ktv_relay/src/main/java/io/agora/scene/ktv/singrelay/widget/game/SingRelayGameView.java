@@ -152,6 +152,8 @@ public class SingRelayGameView extends FrameLayout {
         KTVLogger.d(TAG, "onGameStartStatus");
         if (mBinding == null) return;
         this.isGamer = isGamer;
+        mBinding.ilIDLE.ivGameTips.setVisibility(View.GONE);
+        mBinding.ilIDLE.tvSongTab.setVisibility(View.VISIBLE);
         mBinding.ilIDLE.btGameStart.setVisibility(View.GONE);
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
         mBinding.ilIDLE.messageText.setText(R.string.ktv_game_start);
@@ -178,12 +180,14 @@ public class SingRelayGameView extends FrameLayout {
 
     @SuppressLint("SetTextI18n")
     public void onGraspSongBegin() {
-        KTVLogger.d(TAG, "onGraspSongBegin");
+        KTVLogger.d(TAG, "onGraspSongBegin: " + partNum);
         if (mBinding == null) return;
-        partNum ++;
+        this.partNum = partNum + 1;
         mBinding.ilActive.tvSongNumTab.setText(partNum + "/5");
-        if (partNum != 5 && isGamer) {
+        if (partNum < 5 && isGamer) {
             mBinding.ilActive.lrcControlView.onGraspEnable();
+        } else {
+            mBinding.ilActive.lrcControlView.onGraspDisable();
         }
     }
 
@@ -215,7 +219,7 @@ public class SingRelayGameView extends FrameLayout {
             if (mBinding == null) return;
             mBinding.ilActive.messageText.setVisibility(View.GONE);
             mBinding.ilActive.tvBattleResultView.setVisibility(View.GONE);
-        }, 5000);
+        }, 3000);
     }
 
     // 下一段歌曲开始播放
@@ -241,7 +245,8 @@ public class SingRelayGameView extends FrameLayout {
     public void onGameEnd(List<RankItem> list) {
         KTVLogger.d(TAG, "onGameEnd");
         if (mBinding == null) return;
-        mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
+        //mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
+        mBinding.ilIDLE.ivGameTips.setVisibility(View.GONE);
         mBinding.ilActive.winnerTips.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
         mBinding.ilRank.setVisibility(View.VISIBLE);
