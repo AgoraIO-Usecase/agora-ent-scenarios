@@ -17,6 +17,7 @@ func pure1v1Error(_ message: String, context: String? = nil) {
 @objcMembers
 public class Pure1v1Context: NSObject {
     
+    
     public static func thumbnailInfo() -> [String: String] {
         return [
             "bgImgStr": UIImage.sceneImagePath(name: "Image/list_bg", bundleName: "Pure1v1")!,
