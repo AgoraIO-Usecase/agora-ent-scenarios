@@ -123,7 +123,9 @@ extension Pure1v1UserListViewController {
         config.rtcEngine = rtcEngine
         config.localView = callVC.smallCanvasView
         config.remoteView = callVC.bigCanvasView
-        
+        if let userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any] {
+            config.userExtension = userExtension
+        }
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
             guard let self = self else {return}
             // Requires active call to prepareForCall
@@ -218,7 +220,12 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             if currentUid == "\(toUserId)" {
                 connectedUserId = fromUserId
                 
-                if let user = listView.userList.first {$0.userId == "\(fromUserId)"} {
+                //被叫不一定在userList能查到，需要从callapi里读取发送用户的user extension
+                var user = listView.userList.first {$0.userId == "\(fromUserId)"}
+                if user == nil, let userDic = (eventInfo[kFromUserExtension] as? [String: Any]) {
+                    user = Pure1v1UserInfo.yy_model(with: userDic)
+                }
+                if let user = user {
                     callDialog?.hiddenAnimation()
                     let dialog = Pure1v1CalleeDialog.show(user: user)
                     assert(dialog != nil, "dialog = nil")
@@ -257,7 +264,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 
             } else if currentUid == "\(fromUserId)" {
                 connectedUserId = toUserId
-                
+                //主叫userlist一定会有，因为需要点击
                 if let user = listView.userList.first {$0.userId == "\(toUserId)"} {
                     let dialog = Pure1v1CallerDialog.show(user: user)
                     dialog?.cancelClosure = {[weak self] in
@@ -282,12 +289,11 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
 //            AUIToast.show(text: "通话开始\(eventInfo[kDebugInfo] as? String ?? "")", postion: .bottom)
 //            AUIAlertManager.hiddenView()
             callDialog?.hiddenAnimation()
-            guard let uid = connectedUserId, let user = listView.userList.first(where: {$0.userId == "\(uid)"}) else {
+            guard let uid = connectedUserId else {
                 assert(false, "user not fount")
                 return
             }
             callVC.dismiss(animated: false)
-            callVC.targetUser = user
             present(callVC, animated: false)
             break
         case .prepared:

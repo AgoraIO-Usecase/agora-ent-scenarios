@@ -20,6 +20,7 @@ public let kMessageTs = "message_timestamp"
 public let kCallId = "callId"
 public let kRemoteUserId = "remoteUserId"
 public let kFromUserId = "fromUserId"
+public let kFromUserExtension = "fromUserExtension"
 public let kFromRoomId = "fromRoomId"
 public let kCalleeState = "state"      //当前呼叫状态
 public let kPublisher = "publisher"    //状态触发的用户uid，目前可以抛出当前用户和主叫的状态，如果无publisher，默认是当前用户
@@ -167,6 +168,9 @@ public class CallApiImpl: NSObject {
         dic[kFromUserId] = config?.userId ?? 0
         if  callId.count > 0 {
             dic[kCallId] = callId
+        }
+        if let userExtension = config?.userExtension {
+            dic[kFromUserExtension] = userExtension
         }
         return dic
     }
@@ -625,7 +629,7 @@ extension CallApiImpl {
     }
     
     //收到呼叫消息
-    private func _onCall(fromRoomId: String, fromUserId: UInt, callId: String) {
+    private func _onCall(fromRoomId: String, fromUserId: UInt, callId: String, userExtension: [String: Any]) {
         //如果不是prepared状态或者不是接收的正在接听的用户的呼叫
         guard state == .prepared || callingUserId == fromUserId else {
             _reject(roomId: fromRoomId, remoteUserId: fromUserId, reason: "callee is currently on call")
@@ -633,7 +637,7 @@ extension CallApiImpl {
         }
         
         self.callId = callId
-        let eventInfo = [kFromRoomId: fromRoomId, kFromUserId: fromUserId, kRemoteUserId: config?.userId ?? 0] as [String : Any]
+        let eventInfo = [kFromRoomId: fromRoomId, kFromUserId: fromUserId, kRemoteUserId: config?.userId ?? 0, kFromUserExtension: userExtension] as [String : Any]
         _notifyState(state: .calling, stateReason: .none, eventInfo: eventInfo)
         _notifyEvent(event: .onCalling)
         guard config?.autoAccept ?? false else {
@@ -650,8 +654,9 @@ extension CallApiImpl {
     private func _onCall(message: [String: Any]) {
         let fromRoomId = message[kFromRoomId] as? String ?? ""
         let fromUserId = message[kFromUserId] as? UInt ?? 0
+        let userExtension = message[kFromUserExtension] as? [String: Any] ?? [:]
         let callId = message[kCallId] as? String ?? ""
-        _onCall(fromRoomId: fromRoomId, fromUserId: fromUserId, callId: callId)
+        _onCall(fromRoomId: fromRoomId, fromUserId: fromUserId, callId: callId, userExtension: userExtension)
     }
     
     //收到取消呼叫消息
