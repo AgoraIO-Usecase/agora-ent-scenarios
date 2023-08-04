@@ -1764,9 +1764,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
--(void)didAECLevelSetWith:(NSInteger)level{
+-(void)didAECLevelSetWith:(int)level{
     self.aecLevel = level;
-    [self.RTCkit setParameters:[NSString stringWithFormat:@"{\"che.audio.aiaec.postprocessing_strategy\":%ld}", (long)level]];
+    [self.RTCkit setParameters:[NSString stringWithFormat:@"{\"che.audio.aiaec.postprocessing_strategy\":%i}", level]];
 }
 
 #pragma mark --
@@ -1823,7 +1823,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     VLRoomSelSongModel *topSong = [self.selSongsArray firstObject];
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"chorusSongCode == %@", topSong.chorusSongId];
-    NSArray<VLRoomSeatModel *> *matchedSeats = [seatArray filteredArrayUsingPredicate:predicate];
+    NSMutableArray *chorusArray = [NSMutableArray arrayWithArray: seatArray];
+    if(chorusArray.count > 1){
+        [chorusArray removeFirstObject];
+    }
+    NSArray<VLRoomSeatModel *> *matchedSeats = [chorusArray filteredArrayUsingPredicate:predicate];
     //如果房主是观众则不添加到列表中，否则添加进去
     BOOL flag = false;
     VLRoomSeatModel *model = seatArray.firstObject;
@@ -1962,7 +1966,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //判断突出人声的人是否退出合唱
     if([self getChorusSingerArrayWithSeatArray:self.seatsArray].count >= 1 && self.selectedVoiceShowIndex != -1){
         BOOL flag = [self checkIfCosingerWith:self.selectedVoiceShowIndex];
-        if(!flag && self.selectedVoiceShowIndex != -2){//表示突出的人退出合唱
+        if(!flag && self.selectedVoiceShowIndex != -2 && ![self isRoomOwner]){//表示突出的人退出合唱
             [VLToast toast:@"人声突出功能已失效，请重设"];
             self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
             [self.MVView setPerViewAvatar:@""];

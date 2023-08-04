@@ -151,7 +151,7 @@
 -(void)aecSet{
     [_aecTF resignFirstResponder];
     if([self.delegate respondsToSelector:@selector(didAECLevelSetWith:)]){
-        [self.delegate didAECLevelSetWith:[_aecTF.text integerValue]];
+        [self.delegate didAECLevelSetWith:[_aecTF.text intValue]];
     }
 }
 
