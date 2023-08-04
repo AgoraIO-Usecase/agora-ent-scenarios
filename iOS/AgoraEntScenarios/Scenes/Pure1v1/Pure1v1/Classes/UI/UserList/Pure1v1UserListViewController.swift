@@ -121,8 +121,8 @@ extension Pure1v1UserListViewController {
         config.userId = UInt(userInfo?.userId ?? "")!
         config.autoAccept = false
         config.rtcEngine = rtcEngine
-        config.localView = callVC.smallCanvasView
-        config.remoteView = callVC.bigCanvasView
+        config.localView = callVC.smallCanvasView.canvasView
+        config.remoteView = callVC.bigCanvasView.canvasView
         if let userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any] {
             config.userExtension = userExtension
         }
