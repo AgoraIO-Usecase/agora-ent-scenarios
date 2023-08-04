@@ -449,11 +449,11 @@ extension CallApiImpl {
                 let errReason = "rtc join already"
                 completion?(NSError(domain: errReason, code: -1))
                 return
-            } else {
-                callWarningPrint(" mismatch channel, leave first! tqarget: \(roomId) current: \(connection.channelId)")
-                config.rtcEngine.leaveChannelEx(connection)
-                rtcConnection = nil
             }
+            
+            callWarningPrint(" mismatch channel, leave first! tqarget: \(roomId) current: \(connection.channelId)")
+            config.rtcEngine.leaveChannelEx(connection)
+            rtcConnection = nil
         }
         
         //需要先开启音视频
@@ -925,7 +925,7 @@ extension CallApiImpl: AgoraRtmClientDelegate {
               let msgTs = dic[kMessageTs] as? Int,
               let userId = dic[kFromUserId] as? UInt,
               let messageVersion = dic[kMessageVersion] as? String else {
-            callWarningPrint("fail to parse message: \(message)")
+            callWarningPrint("fail to parse message: \(message.getType().rawValue)")
             return
         }
         
@@ -1007,7 +1007,7 @@ extension CallApiImpl: AgoraRtmClientDelegate {
 //MARK: AgoraRtcEngineDelegate
 extension CallApiImpl: AgoraRtcEngineDelegate {
     public func rtcEngine(_ engine: AgoraRtcEngineKit, connectionChangedTo state: AgoraConnectionState, reason: AgoraConnectionChangedReason) {
-        callPrint("connectionChangedTo: \(state.rawValue) reason: \(reason.rawValue)")
+        callPrint("connectionChangedTo state: \(state.rawValue) reason: \(reason.rawValue)")
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
