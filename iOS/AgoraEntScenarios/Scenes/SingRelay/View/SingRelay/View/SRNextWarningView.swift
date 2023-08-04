@@ -1,13 +1,13 @@
 //
-//  SBGAttributeView.swift
+//  SRNextWarningView.swift
 //  AgoraEntScenarios
 //
-//  Created by CP on 2023/5/30.
+//  Created by CP on 2023/8/2.
 //
 
-import UIKit
-
-class SBGAttributeView: UIView {
+import Foundation
+class SRNextWarningView: UIView {
+    var imgView: UIImageView!
     var contentView: UIView!
     var preLabel: UILabel!
     var icon: UIImageView!
@@ -25,16 +25,22 @@ class SBGAttributeView: UIView {
         contentView = UIView(frame: .zero)
         addSubview(contentView)
         
+        imgView = UIImageView()
+        imgView.image = UIImage.sceneImage(name: "micwithbackground")
+        contentView.addSubview(imgView)
+        
         preLabel = UILabel(frame: .zero)
         preLabel.text = "下轮由 "
         preLabel.textColor = .white
+        preLabel.font = UIFont.systemFont(ofSize: 12)
         contentView.addSubview(preLabel)
         
         icon = UIImageView(frame: .zero)
         contentView.addSubview(icon)
         
         endLabel = UILabel(frame: .zero)
-        endLabel.text = " 抢到麦"
+        endLabel.text = " 演唱"
+        endLabel.font = UIFont.systemFont(ofSize: 12)
         endLabel.textColor = .white
         contentView.addSubview(endLabel)
     }
@@ -45,14 +51,20 @@ class SBGAttributeView: UIView {
             return
         }
         icon.image = image
-        endLabel.text = " \(owner) 抢到麦"
-        let endWidth = textAutoWidth(text: endLabel.text ?? "", height: 25, fontSize: 18)
-        let preWidth = textAutoWidth(text: preLabel.text ?? "", height: 25, fontSize: 18)
-        let totalWidth = endWidth + preWidth + 25
-        contentView.frame = CGRect(x: self.bounds.width / 2.0 - totalWidth / 2.0, y: self.bounds.height / 2.0 - 12.5, width: totalWidth, height: 25)
-        preLabel.frame = CGRect(x: 0, y: 0, width: preWidth, height: 25)
-        icon.frame = CGRect(x: preWidth, y: 0, width: 25, height: 25)
-        endLabel.frame = CGRect(x: preWidth + 25, y: 0, width: endWidth, height: 25)
+        endLabel.text = " \(owner) 演唱"
+        imgView.frame = CGRect(x: 2, y: 5, width: 32, height: 16)
+        let endWidth = textAutoWidth(text: endLabel.text ?? "", height: 20, fontSize: 12)
+        let preWidth = textAutoWidth(text: preLabel.text ?? "", height: 20, fontSize: 12)
+        let totalWidth = endWidth + preWidth + 40 + 16
+        contentView.frame = CGRect(x: self.bounds.width / 2.0 - totalWidth / 2.0, y: self.bounds.height / 2.0 - 12.5, width: totalWidth, height: 20)
+        preLabel.frame = CGRect(x: 40, y: 6, width: preWidth, height: 12)
+        icon.frame = CGRect(x: preWidth + 40, y: 5, width: 16, height: 16)
+        endLabel.frame = CGRect(x: preWidth + 40 + 16, y: 6, width: endWidth, height: 12)
+        self.layer.cornerRadius = 10
+        self.layer.masksToBounds = true
+        self.layer.borderColor = UIColor.white.cgColor
+        self.layer.borderWidth = 1
+        self.backgroundColor = .systemBlue
     }
     
     func textAutoWidth(text: String, height:CGFloat, fontSize:CGFloat) ->CGFloat{
@@ -62,5 +74,3 @@ class SBGAttributeView: UIView {
         return rect.width
     }
 }
-
-

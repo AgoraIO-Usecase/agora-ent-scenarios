@@ -1,6 +1,6 @@
 source 'https://github.com/CocoaPods/Specs.git'
 
-platform :ios, '12.0'
+platform :ios, '13.0'
 inhibit_all_warnings!
 #plugin 'cocoapods-pod-sign'
 #skip_pod_bundle_sign # 用来跳过Xcode对bundle资源的签名
@@ -38,11 +38,11 @@ def all_pods
   
   pod 'AgoraSyncManager', '~> 2.0.8'
 
-  pod 'sdk', :path => 'sdk.podspec'
+#  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 # pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
-#  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.142'
+  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.12'
 
 
   #ThirdParty
@@ -73,6 +73,7 @@ def all_pods
   pod 'Agora_Chat_iOS', '1.0.8'
   pod 'SwiftyBeaver', '1.9.5'
   pod 'Protobuf', '3.22.1'
+#  pod 'AUIKitCore', :path => './AUIKit'
  #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
 
   #bugly

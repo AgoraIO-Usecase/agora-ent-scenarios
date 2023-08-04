@@ -62,7 +62,7 @@
     SRCreateRoomInputModel* intputModel = [SRCreateRoomInputModel new];
     intputModel.belCanto = @"0";
     intputModel.icon = [NSString stringWithFormat:@"%@",roomModel.icon];
-    intputModel.isPrivate = roomModel.isPrivate ? @(1) : @(0);
+    intputModel.isPrivate = roomModel.isPrivate;
     intputModel.name = [NSString stringWithFormat:@"%@",roomModel.name];
     intputModel.password = roomModel.password.length > 0 ? [NSString stringWithFormat:@"%@",roomModel.password] : @"";
     intputModel.soundEffect = @"0";

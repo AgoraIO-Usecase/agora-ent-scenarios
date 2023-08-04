@@ -6,7 +6,7 @@
   
 */
 
-"app_name"="声动互娱";
+"app_name"="声动互娱-抢麦接唱";
 "app_title_home"="首页";
 "app_title_find"="发现";
 "app_title_mine"="我的";
@@ -57,6 +57,7 @@
 "app_about_chat_room"="语聊房";
 "app_about_chat_room_spatial"="语聊房-空间音频模式";
 "app_about_karaoke"="在线K歌";
+"app_about_singrelay"="抢麦接唱";
 "app_about_show"="秀场直播";
 "app_about_customer_service"="联系客服";
 "app_about_official_website"="官网地址";
@@ -106,7 +107,7 @@
 "send_v_code" = "发送验证码";
 "i_agree" = "我已阅读并同意";
 "ktv_online" = "在线K歌房";
-
+"ktv_singRelay" = "抢麦接唱";
 "time_up_exit_room" = "您已体验超过20分钟，当前房间已过期，请退出重新创建房间";
 "expire_exit_room" = "当前房间已过期，请退出";
 

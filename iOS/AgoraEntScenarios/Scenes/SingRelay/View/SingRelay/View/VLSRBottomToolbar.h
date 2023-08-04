@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLSRBottomToolbar : UIView
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLSRBottomToolbarDelegate>)delegate withRoomNo:(NSString *)roomNo withData:(NSArray <VLSRRoomSeatModel *> *)seatsArray;
-
+-(void)setAudioBtnEnabled:(BOOL)enabled;
 - (void)updateAudioBtn:(BOOL)audioMuted;
 - (void)updateVideoBtn:(BOOL)videoMuted;
 - (void)resetBtnStatus;

@@ -36,9 +36,9 @@ class SRLrcNameView: UIView {
     public func setName(with name: String, isCenter: Bool) {
         icon.image = UIImage.sceneImage(name: "ktv_bigMusic_icon")
         endLabel.text = name
-        let endWidth = textAutoWidth(text: endLabel.text ?? "", height: 20, fontSize: 12)
+        let endWidth = textAutoWidth(text: endLabel.text ?? "", height: 20, fontSize: 12) > self.bounds.width ? self.bounds.width : textAutoWidth(text: endLabel.text ?? "", height: 20, fontSize: 12)
         let totalWidth = endWidth + 28
-        contentView.frame = CGRect(x: isCenter ? self.bounds.width / 2.0 - totalWidth / 2.0 : 0, y: self.bounds.height / 2.0 - 14, width: totalWidth, height: 28)
+        contentView.frame = CGRect(x: 0, y: self.bounds.height / 2.0 - 14, width: totalWidth, height: 28)
         icon.frame = CGRect(x: 0, y: 1, width: 28, height: 28)
         endLabel.frame = CGRect(x: 33, y: 4, width: endWidth, height: 20)
     }

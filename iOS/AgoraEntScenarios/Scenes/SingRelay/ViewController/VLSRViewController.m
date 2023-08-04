@@ -68,7 +68,7 @@ ISRMusicLoadStateListener
 
 typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) BOOL isEnterSeatNotFirst;
-@property (nonatomic, strong) VLSRMVView *MVView;
+//@property (nonatomic, strong) VLSRMVView *MVView;
 @property (nonatomic, strong) VLSRSelBgModel *choosedBgModel;
 @property (nonatomic, strong) VLSRBottomToolbar *bottomView;
 @property (nonatomic, strong) VLSRBelcantoModel *selBelcantoModel;
@@ -108,6 +108,15 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) NSInteger coSingerDegree;
 @property (nonatomic, strong) VLSRStatusView *statusView;
 @property (nonatomic, strong) SingRelayModel *gameModel;
+@property (nonatomic, strong) NSMutableArray *scoreArray;//保存分数信息
+//@property (nonatomic, assign) BOOL hasReady;
+@property (nonatomic, assign) BOOL indexReturned;
+@property (nonatomic, strong) NSString *nextWinNo; //下一个抢唱的用户
+@property (nonatomic, strong) NSString *currentUserNo; //当前抢唱的用户
+@property (nonatomic, strong) NSMutableArray<NSNumber *> *chooseArray;
+@property (nonatomic, assign) NSInteger currentIndex;
+@property (nonatomic, assign) NSInteger segmentScore;
+@property (nonatomic, assign) NSInteger sumScore;
 @end
 
 @implementation VLSRViewController
@@ -146,9 +155,9 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     
     //MV视图(显示歌词...)
     CGFloat mvViewTop = topView.bottom;
-    self.MVView = [[VLSRMVView alloc]initWithFrame:CGRectMake(15, mvViewTop, SCREEN_WIDTH - 30, musicHeight * 0.5) withDelegate:self];
-    [self.view addSubview:self.MVView];
-    [self.MVView setHidden:true];
+//    self.MVView = [[VLSRMVView alloc]initWithFrame:CGRectMake(15, mvViewTop, SCREEN_WIDTH - 30, musicHeight * 0.5) withDelegate:self];
+//    [self.view addSubview:self.MVView];
+//    [self.MVView setHidden:true];
     
     self.statusView = [[VLSRStatusView alloc]initWithFrame:CGRectMake(15, mvViewTop, SCREEN_WIDTH - 30, musicHeight * 0.5)];
     self.statusView.state = [self isRoomOwner] ? SBGStateOwnerOrderMusic : SBGStateAudienceWating;
@@ -157,7 +166,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [self.view addSubview:self.statusView];
     
     //房间麦位视图
-    VLSRMicSeatList *personView = [[VLSRMicSeatList alloc] initWithFrame:CGRectMake(0, self.MVView.bottom + 20, SCREEN_WIDTH, musicHeight * 0.5) withDelegate:self withRTCkit:self.RTCkit];
+    VLSRMicSeatList *personView = [[VLSRMicSeatList alloc] initWithFrame:CGRectMake(0, self.statusView.bottom + 20, SCREEN_WIDTH, musicHeight * 0.5) withDelegate:self withRTCkit:self.RTCkit];
     self.roomPersonView = personView;
     self.roomPersonView.roomSeatsArray = self.seatsArray;
     [self.view addSubview:personView];
@@ -179,6 +188,8 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     //add debug
     [self.topView addGestureRecognizer:[SRDebugManager createStartGesture]];
     
+    self.chooseArray = [NSMutableArray arrayWithObjects:@(NO), @(NO), @(NO), @(NO), @(NO), nil];
+    self.currentIndex = 1;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -286,7 +297,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             }
             
             VLSRRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
-            [weakSelf.MVView updateUIWithSong:song role:weakSelf.singRole];
+           // [weakSelf.MVView updateUIWithSong:song role:weakSelf.singRole];
             [weakSelf.roomPersonView reloadSeatIndex:model.seatIndex];
             
             [weakSelf onSeatFull];
@@ -306,7 +317,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             //房主关闭房间
             if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.id]) {
                 NSString *mes = @"连接超时，房间已解散";
-                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SRLocalizedString(@"SR_confirm") completion:^(bool flag, NSString * _Nullable text) {
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SRLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
                     [weakSelf leaveRoom];
                 }];
@@ -328,16 +339,32 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
                 weakSelf.selSongsArray = songArray;
                 SRLogInfo(@"removeSelSongWithSongNo fail, reload it");
             }
-            //清除合唱者总分
-            weakSelf.coSingerDegree = 0;
         } else {
             VLSRRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
             //add new song
             SRLogInfo(@"song did updated: %@ status: %ld", song.name, songInfo.status);
             weakSelf.selSongsArray = [NSMutableArray arrayWithArray:songArray];
             
-            //solo变leader， 上麦变合唱
-            [self loadAndPlaySong];
+            if(status == SRSubscribeUpdated && ![songInfo.winnerNo isEqualToString:@""]){
+                //主线程刷新UI
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    //展示谁抢到麦的视图
+                    [self.statusView hideSRBtn];
+
+                    if([self isOnMicSeat]){
+                        [self.statusView setMicOwnerWith:songInfo.name url:songInfo.imageUrl];
+                        [self.statusView showNextMicOwnerWith:songInfo.name url:songInfo.imageUrl];
+                    }
+                });
+                //延迟三秒执行下面的逻辑
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [self.statusView hideMicOwner];
+                    NSString *realWinNo = [songInfo.winnerNo componentsSeparatedByString:@"_"][0];
+                    self.nextWinNo = realWinNo;
+                    [self.statusView hideSRBtn];
+                });
+                
+            }
         }
     }];
     
@@ -362,7 +389,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         if(error == nil){
             weakSelf.gameModel = model;
             if(![weakSelf isOnMicSeat]){
-                [weakSelf.requestOnLineView setTipHidden:model.status == SingBattleGameStatusStarted];
+                [weakSelf.requestOnLineView setTipHidden:model.status == SingRelayStatusStarted];
             }
         }
     }];
@@ -486,6 +513,9 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine
 reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
       totalVolume:(NSInteger)totalVolume {
+    if(speakers.count == 0){
+        return;
+    }
     [self.SRApi didSRAPIReceiveAudioVolumeIndicationWith:speakers totalVolume:totalVolume];
 }
 
@@ -495,39 +525,32 @@ receiveStreamMessageFromUid:(NSUInteger)uid
              data:(NSData * _Nonnull)data {    //接收到对方的RTC消息
     
     NSDictionary *dict = [VLGlobalHelper dictionaryForJsonData:data];
-//    SRLogInfo(@"receiveStreamMessageFromUid:%@,streamID:%d,uid:%d",dict,(int)streamId,(int)uid);
     [self.SRApi didSRAPIReceiveStreamMessageFromUid:uid streamId:streamId data:data];
-    if ([dict[@"cmd"] isEqualToString:@"SingingScore"]) {
-        //伴唱显示自己的分数，观众显示主唱的分数
-        int score = [dict[@"score"] intValue];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if(self.singRole == SRSingRoleCoSinger){
-                [self showScoreViewWithScore:[self.lrcControl getAvgScore]];
-                return;
-            }
-
-            [self showScoreViewWithScore:score];
-        });
-        
-        SRLogInfo(@"score: %ds",score);
-        return;
-    } else if([dict[@"cmd"] isEqualToString:@"singleLineScore"]) {//观众接收主唱的分数
-        NSLog(@"index: %li", [dict[@"index"] integerValue]);
-        if(self.singRole != SRSingRoleAudience){
-            return;
-        }
+   if([dict[@"cmd"] isEqualToString:@"singleLineScore"]) {//主唱和合唱都可能发分数
         //观众使用主唱的分数来显示
         NSInteger index = [dict[@"index"] integerValue];
         NSInteger score = [dict[@"score"] integerValue];
         NSInteger cumulativeScore = [dict[@"cumulativeScore"] integerValue];
         NSInteger total = [dict[@"total"] integerValue];
+       self.sumScore = cumulativeScore;
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.MVView.lineScoreView showScoreViewWithScore:score];
-            [self.MVView.gradeView setScoreWithCumulativeScore:cumulativeScore totalScore:total];
-            [self.MVView.incentiveView showWithScore:score];
+            [self.statusView.lrcView updateScoreWith:score cumulativeScore:cumulativeScore totalScore:total];
+            NSLog(@"score:%li--%li---%li---%li", index, score, cumulativeScore, total);
         });
-        NSLog(@"index: %li, score: %li, cumulativeScore: %li, total: %li", index, score, cumulativeScore, total);
-    }
+   } else if([dict[@"cmd"] isEqualToString:@"SingingScore"]) {
+       int score = [dict[@"score"] intValue];
+       NSString *userName = dict[@"userName"];
+       NSString *userId = dict[@"userId"];
+       NSString *poster = dict[@"poster"];
+       //把用户信息存进数组，需要在这里合并数据
+       SubRankModel *model = [[SubRankModel alloc]init];
+       model.userName = userName;
+       model.poster = poster;
+       model.score = score;
+       model.songNum = 1;
+       model.userId = userId;
+       [self.scoreArray addObject:model];
+   }
 }
 
 // Network quality callbacks
@@ -552,6 +575,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [self.topView setNetworkQuality:3];
         }
     }
+}
+
+-(NSMutableArray *)scoreArray {
+    if(!_scoreArray){
+       _scoreArray = [NSMutableArray array];
+    }
+    return _scoreArray;
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine tokenPrivilegeWillExpire:(NSString *)token {
@@ -590,7 +620,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 #pragma mark - action utils / business
 - (void)stopPlaySong {
     self.isPause = false;
-    self.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
+   // self.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
     [self.SRApi switchSingerRoleWithNewRole:SRSingRoleAudience
                            onSwitchRoleState:^(SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
     }];
@@ -612,6 +642,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else {
         role = SRSingRoleAudience;
     }
+    self.singRole = role;
     
     if(!model){
         return;
@@ -623,7 +654,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
     SRSongConfiguration* songConfig = [[SRSongConfiguration alloc] init];
     songConfig.autoPlay = (role == SRSingRoleAudience || role == SRSingRoleCoSinger) ? NO : YES ;
-    songConfig.mode = (role == SRSingRoleAudience || role == SRSingRoleCoSinger) ? SRLoadMusicModeLoadLrcOnly : SRLoadMusicModeLoadMusicAndLrc;
+    songConfig.mode = (role == SRSingRoleAudience) ? SRLoadMusicModeLoadLrcOnly : SRLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
     
@@ -648,60 +679,60 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
-- (void)loadAndPlaySong{
-    //清空分数
-    [self.MVView.gradeView reset];
-    
-    VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
-    
-    //TODO: fix score view visible problem while owner reopen the room
-    [self.MVView updateUIWithSong:model role:self.singRole];
-    [self setCoSingerStateWith:self.singRole];
-    if(!model){
-        return;
-    }
-    [self markSongPlaying:model];
-    
-    //TODO: will remove SR api adjust playout volume method
-    [self setPlayoutVolume:50];
-    
-//    self.retryCount = 0;
-    
-    
-    SRSingRole role = [self getUserSingRole];
-    SRSongConfiguration* songConfig = [[SRSongConfiguration alloc] init];
-    songConfig.autoPlay = (role == SRSingRoleAudience || role == SRSingRoleCoSinger) ? NO : YES ;
-    songConfig.mode = (role == SRSingRoleAudience || role == SRSingRoleCoSinger) ? SRLoadMusicModeLoadLrcOnly : SRLoadMusicModeLoadMusicAndLrc;
-    songConfig.mainSingerUid = [model.userNo integerValue];
-    songConfig.songIdentifier = model.songNo;
-    
-    self.MVView.loadingType = VLSRMVViewStateLoading;
-    [self.MVView setBotViewHidden:true];
-    VL(weakSelf);
-    self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
-        if (!isSuccess) {
-            return;
-        }
-        [weakSelf.MVView setBotViewHidden:false];
-        [weakSelf.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPlay];
-        if(role == SRSingRoleCoSinger){
-            [weakSelf.SRApi startSingWithSongCode:songCode startPos:0];
-        }
-    };
-    
-    [self.lrcControl resetShowOnce];
-    [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
-
-    [weakSelf.SRApi switchSingerRoleWithNewRole:role
-                           onSwitchRoleState:^( SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
-        if(state != SRSwitchRoleStateSuccess) {
-            //TODO(chenpan): error toast and retry?
-            SRLogError(@"switchSingerRole error: %ld", reason);
-            return;
-        }
-    }];
-    
-}
+//- (void)loadAndPlaySong{
+//    //清空分数
+//    [self.MVView.gradeView reset];
+//    [self.MVView.incentiveView reset];
+//    VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
+//
+//    //TODO: fix score view visible problem while owner reopen the room
+//    [self.MVView updateUIWithSong:model role:self.singRole];
+//    [self setCoSingerStateWith:self.singRole];
+//    if(!model){
+//        return;
+//    }
+//    [self markSongPlaying:model];
+//
+//    //TODO: will remove SR api adjust playout volume method
+//    [self setPlayoutVolume:50];
+//
+////    self.retryCount = 0;
+//
+//
+//    SRSingRole role = [self getUserSingRole];
+//    SRSongConfiguration* songConfig = [[SRSongConfiguration alloc] init];
+//    songConfig.autoPlay = (role == SRSingRoleAudience || role == SRSingRoleCoSinger) ? NO : YES ;
+//    songConfig.mode = (role == SRSingRoleAudience || role == SRSingRoleCoSinger) ? SRLoadMusicModeLoadLrcOnly : SRLoadMusicModeLoadMusicAndLrc;
+//    songConfig.mainSingerUid = [model.userNo integerValue];
+//    songConfig.songIdentifier = model.songNo;
+//
+//    self.MVView.loadingType = VLSRMVViewStateLoading;
+//    [self.MVView setBotViewHidden:true];
+//    VL(weakSelf);
+//    self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
+//        if (!isSuccess) {
+//            return;
+//        }
+//        [weakSelf.MVView setBotViewHidden:false];
+//        [weakSelf.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPlay];
+//        if(role == SRSingRoleCoSinger){
+//            [weakSelf.SRApi startSingWithSongCode:songCode startPos:0];
+//        }
+//    };
+//
+//    [self.lrcControl resetShowOnce];
+//    [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
+//
+//    [weakSelf.SRApi switchSingerRoleWithNewRole:role
+//                           onSwitchRoleState:^( SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
+//        if(state != SRSwitchRoleStateSuccess) {
+//            //TODO(chenpan): error toast and retry?
+//            SRLogError(@"switchSingerRole error: %ld", reason);
+//            return;
+//        }
+//    }];
+//
+//}
 
 - (void)enterSeatWithIndex:(NSInteger)index completion:(void(^)(NSError*))completion {
     
@@ -773,7 +804,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)joinChorus {
     
-    [self.MVView.gradeView reset];
+   // [self.MVView.gradeView reset];
 
     if([self getOnMicUserCount] == 8 && !_isOnMicSeat){
         [VLToast toast:@"“麦位已满，请在他人下麦后重试"];
@@ -781,14 +812,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     
     if(self.RTCkit.getConnectionState != AgoraConnectionStateConnected){
-        self.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
+      //  self.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
         [VLToast toast:@"加入合唱失败，reson:连接已断开"];
         return;
     }
     
     if (![self getJoinChorusEnable]) {
         SRLogInfo(@"getJoinChorusEnable false");
-        self.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
+      //  self.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
         return;
     }
     
@@ -804,7 +835,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 [self enterSeatWithIndex:i completion:^(NSError *error) {
                     if(error){
                         SRLogError(@"enterSeat error:%@", error.description);
-                        weakSelf.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
+                   //     weakSelf.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
                         weakSelf.isJoinChorus = false;
                         return;
                     }
@@ -843,7 +874,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [weakSelf.SRApi switchSingerRoleWithNewRole:role
                                    onSwitchRoleState:^( SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
             if (state == SRSwitchRoleStateFail && reason != SRSwitchRoleFailReasonNoPermission) {
-                weakSelf.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
+           //     weakSelf.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
                 [VLToast toast:[NSString stringWithFormat:@"join chorus fail: %ld", reason]];
                 weakSelf.isJoinChorus = false;
                 SRLogInfo(@"join chorus fail");
@@ -851,7 +882,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 return;
             }
 
-            weakSelf.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForLeave;
+          //  weakSelf.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForLeave;
             weakSelf.isJoinChorus = false;
             
             weakSelf.isNowMicMuted = role == SRSingRoleAudience;
@@ -863,7 +894,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [[AppContext srServiceImp] joinChorusWith:inputModel
                                                  completion:^(NSError * error) {
             }];
-            [weakSelf.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPlay];
+         //   [weakSelf.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPlay];
             
             //开麦
             [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:NO
@@ -1022,20 +1053,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                       channelName:self.roomModel.roomNo
                                                          localUid:[VLUserCenter.user.id integerValue]
                                                         chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
-                                                             type:SRTypeNormal
+                                                             type:SRTypeSingRelay
                                                         maxCacheSize:10
     ];
     self.SRApi = [[SRApiImpl alloc] initWithConfig: apiConfig];
     [self.SRApi renewInnerDataStreamId];
-    SRLrcControl* lrcControl = [[SRLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
-    [self.SRApi setLrcViewWithView:lrcControl];
-    self.lrcControl = lrcControl;
-    self.lrcControl.delegate = self;
-    VL(weakSelf);
-    lrcControl.skipCallBack = ^(NSInteger time, BOOL flag) {
-        NSInteger seekTime = flag ? [weakSelf.SRApi getMediaPlayer].getDuration - 800 : time;
-        [weakSelf.SRApi seekSingWithTime:seekTime];
-    };
+//    SRLrcControl* lrcControl = [[SRLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
+//    [self.SRApi setLrcViewWithView:lrcControl];
+//    self.lrcControl = lrcControl;
+//    self.lrcControl.delegate = self;
+    [self.SRApi setLrcViewWithView:self.statusView.lrcView];
     [self.SRApi setMicStatusWithIsOnMicOpen:!self.isNowMicMuted];
     [self.SRApi addEventHandlerWithSRApiEventHandler:self];
 //    VL(weakSelf);
@@ -1113,27 +1140,42 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
 }
 
-- (void)didLrcViewDragedToPos:(NSInteger)pos score:(NSInteger)score totalScore:(NSInteger)totalScore{
-    [self.SRApi.getMediaPlayer seekToPosition:pos];
-    [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
+- (void)didDragTo:(NSInteger)progress{
+    [self.SRApi seekSingWithTime:progress];
 }
 
 - (void)didLrcViewScorllFinishedWith:(NSInteger)score totalScore:(NSInteger)totalScore lineScore:(NSInteger)lineScore lineIndex:(NSInteger)lineIndex{
-    if(self.singRole == SRSingRoleAudience){
-        return;
-    }
-    
-    NSInteger realScore = self.singRole == SRSingRoleCoSinger ? self.coSingerDegree + lineScore : score;
-    [self.MVView.lineScoreView showScoreViewWithScore:lineScore];
-    [self.MVView.gradeView setScoreWithCumulativeScore:realScore totalScore:totalScore];
-    [self.MVView.incentiveView showWithScore:lineScore];
-    //将主唱的分数同步给观众
-    if(self.singRole == SRSingRoleSoloSinger || self.singRole == SRSingRoleLeadSinger){
-        [self sendMainSingerLineScoreToAudienceWith:score totalScore:totalScore lineScore:lineScore lineIndex:lineIndex];
-    } else {
-        self.coSingerDegree += lineScore;
+    self.segmentScore += lineScore;
+    if([self.currentUserNo isEqualToString:VLUserCenter.user.id]){
+        self.sumScore += lineScore;
+        [self.statusView.lrcView updateScoreWith:lineScore cumulativeScore:self.sumScore totalScore:totalScore];
+        
+        //将分数同步给他人
+        [self sendMainSingerLineScoreToAudienceWith:self.sumScore totalScore:totalScore lineScore:lineScore lineIndex:lineIndex];
     }
 }
+
+//- (void)didLrcViewDragedToPos:(NSInteger)pos score:(NSInteger)score totalScore:(NSInteger)totalScore{
+//    [self.SRApi.getMediaPlayer seekToPosition:pos];
+//    [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
+//}
+//
+//- (void)didLrcViewScorllFinishedWith:(NSInteger)score totalScore:(NSInteger)totalScore lineScore:(NSInteger)lineScore lineIndex:(NSInteger)lineIndex{
+//    if(self.singRole == SRSingRoleAudience){
+//        return;
+//    }
+//
+//    NSInteger realScore = self.singRole == SRSingRoleCoSinger ? self.coSingerDegree + lineScore : score;
+//    [self.MVView.lineScoreView showScoreViewWithScore:lineScore];
+//    [self.MVView.gradeView setScoreWithCumulativeScore:realScore totalScore:totalScore];
+//    [self.MVView.incentiveView showWithScore:lineScore];
+//    //将主唱的分数同步给观众
+//    if(self.singRole == SRSingRoleSoloSinger || self.singRole == SRSingRoleLeadSinger){
+//        [self sendMainSingerLineScoreToAudienceWith:score totalScore:totalScore lineScore:lineScore lineIndex:lineIndex];
+//    } else {
+//        self.coSingerDegree += lineScore;
+//    }
+//}
 
 -(void)sendMainSingerLineScoreToAudienceWith:(NSInteger)cumulativeScore totalScore:(NSInteger)totalScore lineScore:(NSInteger)lineScore lineIndex:(NSInteger)lineIndex{
     NSDictionary *dict = @{
@@ -1142,10 +1184,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         @"index":@(lineIndex),
         @"cumulativeScore":@(cumulativeScore),
         @"total":@(totalScore),
-        
     };
     [self sendStreamMessageWithDict:dict success:nil];
-    NSLog(@"index: %li, score: %li, cumulativeScore: %li, total: %li", lineIndex, lineScore, cumulativeScore, totalScore);
 }
 
 - (void)didSongLoadedWith:(LyricModel *)model{
@@ -1154,7 +1194,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)didJoinChours {
     //加入合唱
-    self.MVView.joinCoSingerState = SRJoinCoSingerStateJoinNow;
+  //  self.MVView.joinCoSingerState = SRJoinCoSingerStateJoinNow;
     [self joinChorus];
 }
 
@@ -1164,7 +1204,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
     [self stopPlaySong];
     self.isNowMicMuted = true;
-    [self.MVView.gradeView reset];
+   // [self.MVView.gradeView reset];
     [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:YES
                                                         completion:^(NSError * error) {
     }];
@@ -1219,31 +1259,254 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             break;
         case SRClickActionSbg:
             //抢唱操作
-            
-            break;
-        case SRClickActionNextSong:
-            //切歌
-            break;
-        case SRClickActionAac:
-            //伴奏
-            break;
-        case SRClickActionEffect:
-            //调音
-            break;
-        case SRClickActionOrigin:
-            //原唱
+            [self startSBGGrapWith:self.currentIndex];
             break;
         case SRClickActionAgain:
-            
+            [self renewGame];
+            break;
+        default:
             break;
     }
 }
 
+- (void)didLrcViewActionChangedWithState:(enum SRClickAction)state{
+    switch(state) {
+        case SRClickActionNextSong:
+            //切歌
+            [self changeToNextSong];
+            break;
+        case SRClickActionAac:
+            //伴奏
+            [self.SRApi.getMusicPlayer selectAudioTrack:1];
+            break;
+        case SRClickActionEffect:
+            //调音
+            [self showSettingView];
+            break;
+        case SRClickActionOrigin:
+            //原唱
+            [self.SRApi.getMusicPlayer selectAudioTrack:0];
+            break;
+        case SRClickActionAgain:
+            break;
+        default:
+            break;
+    }
+}
+
+- (void)didLrcProgressChanged:(NSInteger)progress{
+    [self handleProgress:progress];
+}
+
+-(void)handleProgress:(CGFloat)progress {
+    VLSRRoomSelSongModel * model = self.selSongsArray.firstObject;
+    NSArray *array = nil;
+    for(SRChooseSongInputModel *chooseModel in [self getChooseSongArray]){
+        if([chooseModel.songNo isEqualToString:model.songNo]){
+            array = chooseModel.playCounts;
+        }
+    }
+
+    for (NSInteger i = 0; i < array.count; i++) {
+        NSInteger lowerBound = [array[i] integerValue];
+        NSInteger upperBound = (i < (array.count - 1)) ? [array[i+1] integerValue] : NSIntegerMax;
+        
+        //每段开始前3秒需要提示即将开始抢唱
+        if(lowerBound - progress >= 3000 && lowerBound - progress <= 3050 && i < array.count - 1){
+            if([self isOnMicSeat]){
+                [self.statusView showContentViewWith:@"下段演唱即将开始，准备抢唱"];
+            }
+        }
+        
+        if (progress >= lowerBound && progress < upperBound) {
+            NSUInteger index = i + 1;
+            [self performBusinessLogicWithIndex:index pro:progress];
+        }
+    }
+}
+
+-(void)performBusinessLogicWithIndex:(NSInteger)index pro:(NSInteger)pro {
+    // 在这里处理对应的业务逻辑，使用传入的index
+    if (index > 0 && [self.chooseArray[index - 1] isEqualToNumber:@(NO)]) {
+        self.chooseArray[index - 1] = @(YES);
+        self.currentIndex = index + 1;
+
+        NSLog(@"index:%li, pro:%li, score:%li", (long)index, (long)pro, self.segmentScore);
+        [self.statusView hideContentView];
+        if([self isOnMicSeat]){
+            [self.statusView hideNextMicOwner];
+        }
+        [self sendScoreToServiceWith:self.currentUserNo];
+        self.segmentScore = 0;
+        self.currentUserNo = self.nextWinNo ? self.nextWinNo : self.seatsArray.firstObject.userNo;
+        self.isNowMicMuted = ![self.currentUserNo isEqualToString:VLUserCenter.user.id];
+        //开麦
+        [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:self.isNowMicMuted
+                                                            completion:^(NSError * error) {
+        }];
+        if(index < 4){
+            [self updatePlayerStatus];
+        } else {
+//            if (index == 4) {
+//                [self updatePlayerStatus];
+//            }
+            [self.statusView hideSRBtn];
+        }
+        
+        if(index < 5){
+            self.statusView.numStr = [NSString stringWithFormat:@"%li/5", index + 1];
+            self.nextWinNo = nil;
+        }
+    }
+}
+
+-(void)sendScoreToServiceWith:(NSString *)userNo{
+    //发送分段数据到服务器
+    VLSRRoomSeatModel *seatModel = nil;
+    for(VLSRRoomSeatModel *model in self.seatsArray) {
+        if([model.userNo isEqualToString:userNo]){
+            seatModel = model;
+        }
+    }
+    
+    if(seatModel){
+        SubRankModel *model = [[SubRankModel alloc]init];
+        model.userName = seatModel.name;
+        model.poster = seatModel.headUrl;
+        model.score = self.segmentScore;
+        model.songNum = 1;
+        model.userId = seatModel.userNo;
+        NSLog(@"seatModel:%@--%@---%li", seatModel.name, seatModel.userNo, self.segmentScore);
+        [self.scoreArray addObject:model];
+    }
+}
+
+-(void)updatePlayerStatus{
+    
+    if(self.nextWinNo == nil || [self.nextWinNo isEqualToString:@""]){
+        //表示无人抢唱 那么还是房主唱
+        VLSRRoomSeatModel *model = self.seatsArray.firstObject;
+        self.nextWinNo = model.userNo;
+    }
+    
+    [self.RTCkit adjustRecordingSignalVolume: [self.currentUserNo isEqualToString:VLUserCenter.user.id] ? 100 : 0];
+    [self updateSBGCountDown];
+
+}
+
+- (void)changeToNextSong {
+    NSString *title = SRLocalizedString(@"切换歌曲");
+    NSString *message = SRLocalizedString(@"切换下一首歌歌曲？");
+    NSArray *array = [[NSArray alloc]initWithObjects:SRLocalizedString(@"取消"),SRLocalizedString(@"确定"), nil];
+    kWeakSelf(self);
+    [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+        if(flag == YES){
+
+            [weakself.statusView.lrcView resetLrc];
+            [weakself.SRApi stopSing];
+            [weakself removeCurrentSongWithSync:YES];
+            
+            
+            weakself.isNowMicMuted = true;
+            [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:weakself.isNowMicMuted completion:^(NSError * err) {
+                
+            }];
+            
+            weakself.gameModel.status = SingRelayStatusEnded;
+            if([weakself isRoomOwner]){
+////                //房主把分数给到服务端
+//                weakself.gameModel.rank = [weakself convertScoreArrayToRank];
+//                NSLog(@"model: %@", weakself.gameModel.rank);
+                [[AppContext srServiceImp] innerUpdateSingRelayInfo:weakself.gameModel completion:^(NSError * err) {
+
+                }];
+            }
+        }
+        [[VLAlert shared] dismiss];
+    }];
+}
+
 -(void)startGame{//开始游戏 随机选歌
     SRChooseSongInputModel *model = [self getRandomSongModel];
-    [[AppContext srServiceImp] chooseSongWith:model completion:^(NSError * _Nullable) {
+    [[AppContext srServiceImp] chooseSongWith:model completion:^(NSError * err) {
         
     }];
+    self.gameModel.status = SingRelayStatusStarted;
+    [[AppContext srServiceImp] innerUpdateSingRelayInfo:self.gameModel completion:^(NSError * error) {
+        
+    }];
+}
+
+-(void)renewGame{//再来一轮
+    self.gameModel.status = SingRelayStatusWaiting;
+    self.statusView.state = [self isRoomOwner] ? SBGStateOwnerOrderMusic : SBGStateAudienceWating;
+    [[AppContext srServiceImp] innerUpdateSingRelayInfo:self.gameModel completion:^(NSError * error) {
+        
+    }];
+}
+
+-(void)startSBGGrapWith:(int)index {
+    VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
+    kWeakSelf(self);
+    [[SRNetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"sing_battle_game_info" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+        if(flag){
+            //抢唱成功
+            NSLog(@"抢唱成功");
+            VLSRRoomSelSongModel *model = weakself.selSongsArray.firstObject;
+            model.winnerNo = [NSString stringWithFormat:@"%@_%i", VLUserCenter.user.id,index];
+            model.name = VLUserCenter.user.name;
+            model.imageUrl = VLUserCenter.user.headUrl;
+            [[AppContext srServiceImp] updateChooseSongWithSongInfo:model finished:^(NSError * error) {
+                
+            }];
+        }
+    }];
+}
+
+-(NSDictionary *)convertScoreArrayToRank {
+    NSMutableDictionary *muDict = [NSMutableDictionary dictionary];
+    //先进性数组合并
+    NSArray *mergeModels = mergeModelsWithSameUserIds(self.scoreArray);
+ //   NSArray *updateScoreModels = updateScoreWith(mergeModels);
+    NSInteger count = mergeModels.count;
+    if(count == 0){
+        return muDict;
+    }
+    for(SubRankModel *model in mergeModels){
+        RankModel *model1 = [[RankModel alloc]init];
+        model1.userName = model.userName;
+        model1.poster = model.poster;
+        model1.score = model.score;
+        model1.songNum = model.songNum;
+        NSLog(@"name:%@", model.userName);
+        [muDict setValue:model1 forKey:model.userId];
+    }
+    return muDict;
+}
+
+// 合并相同 user id 的模型，并累加分数
+NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *models) {
+    NSMutableDictionary *userDict = [NSMutableDictionary dictionary];
+    for (SubRankModel *model in models) {
+        NSLog(@"结果:%li---%li", model.score, model.songNum);
+        SubRankModel *existModel = [userDict objectForKey:model.userId];
+        if (!existModel) { // 新用户
+            [userDict setObject:model forKey:model.userId];
+        } else { // 已有该用户，累加分数
+            existModel.score += model.score;
+            existModel.songNum += model.songNum;
+        }
+    }
+    return [userDict allValues];
+}
+
+-(void)onKaraokeViewWithScore:(NSInteger)score totalScore:(NSInteger)totalScore lineScore:(NSInteger)lineScore lineIndex:(NSInteger)lineIndex {
+    if(self.singRole == SRSingRoleAudience){
+        return;
+    }
+
+   [self sendMainSingerLineScoreToAudienceWith:score totalScore:totalScore lineScore:lineScore lineIndex:lineIndex];
+   [self.statusView.lrcView updateScoreWith:lineScore cumulativeScore:score totalScore:totalScore];
 }
 
 #pragma mark - VLSRBottomViewDelegate
@@ -1290,6 +1553,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                    atIndex:(NSInteger)seatIndex {
     if(VLUserCenter.user.ifMaster) {
         //is owner
+        if(self.gameModel.status == SingRelayStatusStarted){
+            if(seatIndex != 0){
+                [VLToast toast:@"正在游戏中，游戏结束后方可踢人下麦"];
+            } else {
+                [VLToast toast:@"正在游戏中，游戏结束后方可下麦"];
+            }
+            return;
+        }
         if ([model.userNo isEqualToString:VLUserCenter.user.id]) {
             //self, return
             return;
@@ -1298,6 +1569,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return [self popDropLineViewWithSeatModel:model];
         }
     } else {
+        
+        if(self.gameModel.status == SingRelayStatusStarted){
+            if([self isOnMicSeat]){
+                [VLToast toast:@"正在游戏中，游戏结束后方可下麦"];
+            } else {
+                [VLToast toast:@"游戏进行中，请在下局游戏开始前上麦"];
+            }
+            return;
+        }
+        
         if (model.userNo.length > 0) {
             //occupied
             if ([model.userNo isEqualToString:VLUserCenter.user.id]) {//点击的是自己
@@ -1380,6 +1661,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 #pragma mark VLDropOnLineViewDelegate
 - (void)onVLDropOnLineView:(VLSRDropOnLineView *)view action:(VLSRRoomSeatModel *)seatModel {
     [self leaveSeatWithSeatModel:seatModel withCompletion:^(NSError *error) {
+        self.statusView.state = SBGStateAudienceWating;
         [[LSTPopView getPopViewWithCustomView:view] dismiss];
     }];
 }
@@ -1411,9 +1693,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         
         VL(weakSelf);
 
-        NSString *title = SRLocalizedString(@"SR_change_song");
-        NSString *message = SRLocalizedString(@"SR_change_next_song");
-        NSArray *array = [[NSArray alloc]initWithObjects:SRLocalizedString(@"SR_cancel"),SRLocalizedString(@"SR_confirm"), nil];
+        NSString *title = SRLocalizedString(@"ktv_change_song");
+        NSString *message = SRLocalizedString(@"ktv_change_next_song");
+        NSArray *array = [[NSArray alloc]initWithObjects:SRLocalizedString(@"ktv_cancel"),SRLocalizedString(@"ktv_confirm"), nil];
         [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
             if(flag == YES){
                 if (weakSelf.selSongsArray.count >= 1) {
@@ -1444,14 +1726,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
     
-    self.MVView.loadingType = VLSRMVViewStateLoading;
-    [self.MVView setBotViewHidden:true];
+    //self.MVView.loadingType = VLSRMVViewStateLoading;
+  //  [self.MVView setBotViewHidden:true];
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
         if (!isSuccess) {
             return;
         }
-        [weakSelf.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPlay];
+       // [weakSelf.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPlay];
     };
     
     [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
@@ -1555,7 +1837,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VL(weakSelf);
     [self refreshChoosedSongList:^{
         //请求歌词和歌曲
-        [weakSelf loadAndPlaySong];
+      //  [weakSelf loadAndPlaySong];
     }];
 }
 
@@ -1686,7 +1968,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)setChoosedBgModel:(VLSRSelBgModel *)choosedBgModel {
     _choosedBgModel = choosedBgModel;
-    [self.MVView changeBgViewByModel:choosedBgModel];
+   // [self.MVView changeBgViewByModel:choosedBgModel];
 }
 
 - (void)setSeatsArray:(NSArray<VLSRRoomSeatModel *> *)seatsArray {
@@ -1701,16 +1983,121 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self onSeatFull];
 }
 
+-(void)setGameModel:(SingRelayModel *)gameModel {
+    _gameModel = gameModel;
+    kWeakSelf(self);
+    if(gameModel.status == SingRelayStatusWaiting){
+        /**
+         1.房主是选歌状态
+         2.观众是等待状态
+         */
+        self.statusView.state = [self isRoomOwner] ? SBGStateOwnerOrderMusic : SBGStateAudienceWating;
+    } else if(gameModel.status == SingRelayStatusStarted){
+        /**
+         1.嗨唱开始
+         2.所有人开始倒计时
+         3.倒计时结束后，所有人开始抢唱
+         4.抢唱时间为10S，时间内有人抢唱则变成抢唱中
+         5.无人抢唱显示无人抢唱状态
+         */
+        [self updateSBGUI];
+        //关闭卖位 等待解锁
+        self.isNowMicMuted = ![self isRoomOwner];
+        [_bottomView setAudioBtnEnabled:false];
+        [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:self.isNowMicMuted
+                                                            completion:^(NSError * error) {
+        }];
+    } else if(gameModel.status == SingRelayStatusEnded){
+        self.chooseArray = [NSMutableArray arrayWithObjects:@(NO), @(NO), @(NO), @(NO), @(NO), nil];
+        self.currentUserNo = self.seatsArray.firstObject.userNo;
+        self.nextWinNo = nil;
+        self.segmentScore = 0;
+        self.sumScore = 0;
+        [self.statusView resetLrcView];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSArray *mergeModels = mergeModelsWithSameUserIds(self.scoreArray);
+            self.statusView.dataSource = sortModels(mergeModels, NO);
+            self.statusView.state = [self isRoomOwner] ? SBGStateResultOwner : SBGStateResultAudience;
+            [self.scoreArray removeAllObjects];
+        });
+
+    }
+}
+
+// 组合：合并相同 user id 的模型 -> 按分数排序 -> 分配索引
+NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascending) {
+    NSArray<SubRankModel *> *sortedByCountModels = sortModelsByCountAndScore(models, ascending);
+    NSArray<SubRankModel *> *resultModels = assignIndexesToModelsInArray(sortedByCountModels);
+    return resultModels;
+}
+
+NSArray<SubRankModel *> *sortModelsByCountAndScore(NSArray<SubRankModel *> *models, BOOL ascending) {
+    NSSortDescriptor *countSorter = [NSSortDescriptor sortDescriptorWithKey:@"songNum" ascending:ascending];
+    NSSortDescriptor *scoreSorter = [NSSortDescriptor sortDescriptorWithKey:@"score" ascending:ascending];
+    NSArray *sortedArray = [models sortedArrayUsingDescriptors:@[scoreSorter, countSorter]];
+    
+    return sortedArray;
+}
+
+// 对数组中每个元素进行索引赋值，并返回结果数组
+NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *array) {
+    if (!array || array.count == 0) return nil;
+    NSMutableArray<SubRankModel *> *resultArray = [NSMutableArray arrayWithCapacity:array.count];
+    for (NSInteger i = 0; i < array.count; i++) {
+        SubRankModel *model = array[i];
+        model.index = i + 1; // 索引从1开始计算
+        [resultArray addObject:model];
+    }
+    return resultArray;
+}
+
+- (void)updateSBGUI {
+    int count = 5;
+   // if(!self.hasReady){
+        for (NSInteger i = count; i >= 0; i--) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)((count - i) * 1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                // 在此处更新 UI
+                NSLog(@"count:%li", (long)i);
+                //self.hasReady = true;
+                self.currentUserNo = self.seatsArray.firstObject.userNo;
+                if(i >= 0){
+                    if(i == 5){
+                        self.statusView.state = ([self isRoomOwner] || self.isOnMicSeat) ? SBGStateOwnerPrepare : SBGStateAudiencePrepare;
+                    } else {
+                        if(i > 1){
+                            self.statusView.contentStr = [NSString stringWithFormat:@"%li", i - 1];
+                        } else if (i == 1) {
+                            self.statusView.contentStr = @"Go";
+                        } else {
+                            [self loadAndPlaySRSong];
+                            [self updateWatingUI];
+                        }
+                    }
+                }
+            });
+        }
+//    } else {
+//        [self loadAndPlaySRSong];
+//        [self updateWatingUI];
+//    }
+}
+
+-(void)updateWatingUI{
+    self.statusView.state = SBGStatePlayerUnsredAndPlaying;
+    [self.statusView hideSRBtn];
+}
+
+
 -(void)onSeatFull{
     if(self.singRole != SRSingRoleAudience){
         return;
     }
     NSInteger count = [self getOnMicUserCount];
     if(!_isOnMicSeat && count >=8){
-        self.MVView.joinCoSingerState = SRJoinCoSingerStateIdle;
+      //  self.MVView.joinCoSingerState = SRJoinCoSingerStateIdle;
     } else {
         if(!self.isJoinChorus){
-            self.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
+           // self.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
         }
     }
 }
@@ -1835,11 +2222,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     SRLogInfo(@"setSelSongsArray orig top: songName: %@, status: %ld",
                originalTopSong.songName, originalTopSong.status);
     if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
-        [self.MVView reset];
+      //  [self.MVView reset];
         [self.lrcControl resetLrc];
         //song changes
         [self stopPlaySong];
-        [self loadAndPlaySong];
+        //[self loadAndPlaySong];
     }
 }
 
@@ -1848,7 +2235,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     _trackMode = trackMode;
     [[self.SRApi getMediaPlayer] selectAudioTrack:self.trackMode == SRPlayerTrackModeOrigin ? 0 : 1];
     
-    [self.MVView setOriginBtnState: trackMode == SRPlayerTrackModeOrigin ? VLSRMVViewActionTypeSingOrigin : VLSRMVViewActionTypeSingAcc];
+   // [self.MVView setOriginBtnState: trackMode == SRPlayerTrackModeOrigin ? VLSRMVViewActionTypeSingOrigin : VLSRMVViewActionTypeSingAcc];
 }
 
 - (void)setSingRole:(SRSingRole)singRole {
@@ -1858,7 +2245,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     SRLogInfo(@"setSingRole: %ld", singRole);
     
     VLSRRoomSelSongModel *song = self.selSongsArray.firstObject;
-    [self.MVView updateUIWithSong:song role:singRole];
+   // [self.MVView updateUIWithSong:song role:singRole];
     [self setCoSingerStateWith:singRole];
 
 }
@@ -1867,11 +2254,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     switch (role) {
         case SRSingRoleSoloSinger:
         case SRSingRoleLeadSinger: {
-            self.MVView.joinCoSingerState = SRJoinCoSingerStateIdle;
+        //    self.MVView.joinCoSingerState = SRJoinCoSingerStateIdle;
         } break;
         case SRSingRoleCoSinger: {
 //        case SRSingRoleFollowSinger:
-            self.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForLeave;
+            //self.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForLeave;
         } break;
         case SRSingRoleAudience:
         default: {
@@ -1889,29 +2276,47 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 //track has to be selected after loaded
                 self.trackMode = self.trackMode;
             }
-            [self.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPlay];
+         //   [self.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPlay];
             //显示跳过前奏
             if(self.singRole == SRSingRoleSoloSinger || self.singRole == SRSingRoleLeadSinger){
                 [self.lrcControl showPreludeEnd];
             }
         } else if(state == AgoraMediaPlayerStatePaused) {
-            [self.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPause];
+           // [self.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPause];
             [self.lrcControl hideSkipViewWithFlag:true];
         } else if(state == AgoraMediaPlayerStateStopped) {
 
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted || state == AgoraMediaPlayerStatePlayBackCompleted) {
             if(isLocal) {
                 SRLogInfo(@"Playback all loop completed");
-               // if(self.singRole != SRSingRoleAudience){
-                    //伴唱和房主都用自己的分数
+
                     if(self.singRole == SRSingRoleLeadSinger || self.singRole == SRSingRoleSoloSinger){
-                        [self syncChoruScore:[self.lrcControl getAvgScore]];
-                        [self showScoreViewWithScore: [self.lrcControl getAvgScore]];
+                        [self.SRApi stopSing];
                         [self removeCurrentSongWithSync:YES];
+                        
+                        self.gameModel.status = SingRelayStatusEnded;
+                        [[AppContext srServiceImp] innerUpdateSingRelayInfo:self.gameModel completion:^(NSError * error) {
+                                        
+                        }];
                     }
+//                    if([self.currentUserNo isEqualToString: VLUserCenter.user.id]){
+//                        NSLog(@"index:5, score:%li",self.segmentScore);
+//                        SubRankModel *model = [[SubRankModel alloc]init];
+//                        VLSRRoomSelSongModel *currentSong = self.selSongsArray.firstObject;
+//                        model.userName = VLUserCenter.user.name;
+//                        model.poster = currentSong.imageUrl;
+//                        model.score = self.segmentScore;
+//                        model.songNum = 1;
+//                        model.userId = VLUserCenter.user.id;
+//                        [self.scoreArray addObject:model];
+//
+//                        self.gameModel.status = SingRelayStatusEnded;
+//                        self.gameModel.rank = [self convertScoreArrayToRank];
+//                        [[AppContext srServiceImp] innerUpdateSingRelayInfo:self.gameModel completion:^(NSError * err) {
+//
+//                        }];
+//                    }
                 }
-                
-            //}
         }
         
         //判断伴唱是否是暂停状态
@@ -1948,15 +2353,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         
         if(status == AgoraMusicContentCenterPreloadStatusError){
             [VLToast toast:@"加载歌曲失败，请切歌"];
-            [self.MVView setBotViewHidden:false];
-            self.MVView.loadingType = VLSRMVViewStateIdle;
+//            [self.MVView setBotViewHidden:false];
+//            self.MVView.loadingType = VLSRMVViewStateIdle;
+            self.statusView.state = SBGStateOwnerUnSredAndPlaying;
             return;
         }
         
         if (status == AgoraMusicContentCenterPreloadStatusOK){
-            self.MVView.loadingType = VLSRMVViewStateIdle;
+           // self.MVView.loadingType = VLSRMVViewStateIdle;
         }
-        self.MVView.loadingProgress = percent;
+       // self.MVView.loadingProgress = percent;
     });
 }
 
@@ -1968,9 +2374,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             self.loadMusicCallBack = nil;
         }
         if (reason == SRLoadSongFailReasonNoLyricUrl) {
-            self.MVView.loadingType = VLSRMVViewStateLoadFail;
+          //  self.MVView.loadingType = VLSRMVViewStateLoadFail;
         } else {
-            self.MVView.loadingType = VLSRMVViewStateIdle;
+           // self.MVView.loadingType = VLSRMVViewStateIdle;
 //            if(reason == SRLoadSongFailReasonMusicPreloadFail){
 //                if(self.retryCount < 3){
 //                    self.retryCount++;
@@ -1996,12 +2402,81 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             self.loadMusicCallBack(YES, songCode);
             self.loadMusicCallBack = nil;
         }
-        self.MVView.loadingType = VLSRMVViewStateIdle;
+       // self.MVView.loadingType = VLSRMVViewStateIdle;
         if(lyricUrl.length > 0){
             SRLogInfo(@"onMusicLoadSuccessWithSongCode: %ld", self.singRole);
         }
         self.retryCount = 0;
+        //        VLSRRoomSelSongModel *model = self.selSongsArray.firstObject;
+        //        if([model.winnerNo isEqualToString:@""] || model.winnerNo == nil){
+        //            NSLog(@"加载成功的歌曲为:%@---%@", model.songName, model.winnerNo);
+        //            //如果是主唱歌曲加载成功 发送ds告诉观众同步进度
+        if(self.singRole == SRSingRoleLeadSinger){
+            NSDictionary *dict = @{
+                @"cmd":@"StartSingBattleCountDown"
+            };
+            [self sendStreamMessageWithDict:dict success:nil];
+        }
+        if(self.singRole == SRSingRoleLeadSinger || self.singRole == SRSingRoleCoSinger){
+            [self updateSBGCountDown];
+        }
         
+        if(self.singRole == SRSingRoleAudience){
+            self.statusView.state = SBGStateAudiencePlaying;
+        }
+        self.statusView.numStr = @"1/5";
+       // }
+    });
+}
+
+-(void)updateSBGCountDown {
+    int count = 3;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        for (int i = count; i >= 0; i--) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)((count - i) * 1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                if(self.gameModel.status == SingRelayStatusEnded){
+                    return;
+                }
+                // 在此处更新 UI
+                if (i == 0) {
+                    NSLog(@"%@", [NSString stringWithFormat:@"compare:%@--%@", self.seatsArray.firstObject.userNo, VLUserCenter.user.id]);
+                    if([self isOnMicSeat]){
+                        if([self isRoomOwner]){
+                            if([self.currentUserNo isEqualToString:VLUserCenter.user.id]){
+                                self.statusView.state = SBGStateOwnerSredAndPlaying;
+                            } else {
+                                self.statusView.state = SBGStateOwnerUnSredAndPlaying;
+                            }
+                        } else {
+                            if([self.currentUserNo isEqualToString:VLUserCenter.user.id]){
+                                self.statusView.state = SBGStatePlayerSredAndPlaying;
+                            } else {
+                                self.statusView.state = SBGStatePlayerUnsredAndPlaying;
+                            }
+                        }
+                    }
+                } else {
+                    if([self isOnMicSeat]){
+                        if([self isRoomOwner]){
+                            if([self.currentUserNo isEqualToString:VLUserCenter.user.id]){
+                                self.statusView.state = SBGStateTimedownOwnersred;
+                            } else {
+                                self.statusView.state = SBGStateTimedownOwnerunsred;
+                            }
+                        } else {
+                            if([self.currentUserNo isEqualToString:VLUserCenter.user.id]){
+                                self.statusView.state = SBGStateTimedownPlayersred;
+                            } else {
+                                self.statusView.state = SBGStateTimedownPlayerunsred;
+                            }
+                        }
+                    } else {
+                        self.statusView.state = SBGStateAudiencePlaying;
+                    }
+                    self.statusView.countTime = i;
+                }
+            });
+        }
     });
 }
 
@@ -2025,7 +2500,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     SRChooseSongInputModel *model2 = [[SRChooseSongInputModel alloc]init];
     model2.isChorus = false;
     model2.songName = @"天外来物";
-    model2.songNo = @"6388433023669520";
+    model2.songNo = @"6654550266760610";
     model2.singer = @"薛之谦";
     model2.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CJ1420004109.jpg";
     model2.playCounts = @[@91000, @129000, @173000, @212000, @251000];
@@ -2041,23 +2516,23 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     SRChooseSongInputModel *model4 = [[SRChooseSongInputModel alloc]init];
     model4.isChorus = false;
     model4.songName = @"一直很安静";
-    model4.songNo = @"6625526604594370";
-    model4.singer = @"张杰";
-    model4.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/792885.jpg";
-    model4.playCounts = @[@46000, @81000, @124000, @159000, @207000];
+    model4.songNo = @"6654550232746660";
+    model4.singer = @"阿桑";
+    model4.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/961853.jpg";
+    model4.playCounts = @[@57000, @76000, @130000, @148000, @210000];
     
     SRChooseSongInputModel *model5 = [[SRChooseSongInputModel alloc]init];
     model5.isChorus = false;
     model5.songName = @"他不懂";
-    model5.songNo = @"6654550232746660";
-    model5.singer = @"阿桑";
-    model5.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/961853.jpg";
-    model5.playCounts = @[@57000, @76000, @130000, @148000, @210000];
+    model5.songNo = @"6625526604594370";
+    model5.singer = @"张杰";
+    model5.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/792885.jpg";
+    model5.playCounts = @[@46000, @81000, @124000, @159000, @207000];
     
     SRChooseSongInputModel *model6 = [[SRChooseSongInputModel alloc]init];
     model6.isChorus = false;
     model6.songName = @"一路向北";
-    model6.songNo = @"6357555536291690";
+    model6.songNo = @"6654550232990700";
     model6.singer = @"周杰伦";
     model6.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/961979.jpg";
     model6.playCounts = @[@90000, @118000, @194000, @222000, @262000];
@@ -2065,7 +2540,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     SRChooseSongInputModel *model7 = [[SRChooseSongInputModel alloc]init];
     model7.isChorus = false;
     model7.songName = @"天黑黑";
-    model7.songNo = @"6246262727285990";
+    model7.songNo = @"6625526604489740";
     model7.singer = @"孙燕姿";
     model7.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/147907.jpg";
     model7.playCounts = @[@51000, @85000, @122000, @176000, @223000];
@@ -2081,7 +2556,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     SRChooseSongInputModel *model9 = [[SRChooseSongInputModel alloc]init];
     model9.isChorus = false;
     model9.songName = @"这世界那么多人";
-    model9.songNo = @"6375711121105330";
+    model9.songNo = @"6654550267486590";
     model9.singer = @"莫文蔚";
     model9.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CJ1420010039.jpg";
     model9.playCounts = @[@91000, @147000, @191000, @235000, @295000];
@@ -2093,7 +2568,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(SRChooseSongInputModel *)getRandomSongModel{
     NSArray *array = [self getChooseSongArray];
     int index = arc4random() % array.count;
-    return array[index];
+    return array[3];
 }
 @end
 

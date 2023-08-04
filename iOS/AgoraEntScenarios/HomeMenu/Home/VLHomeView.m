@@ -83,30 +83,30 @@
 - (NSArray *)itemsArray {
     if (!_itemsArray) {
         _itemsArray = @[
+//            @{
+//                @"bgImgStr":@"home_talk_bg",
+//                @"iconImgStr":@"home_talk_icon",
+//                @"titleStr":NSLocalizedString(@"app_voice_chat", nil),
+//                @"subTitleStr":@""
+//            },
+//            @{
+//                @"bgImgStr":@"spatial_bg",
+//                @"iconImgStr":@"home_talk_icon",
+//                @"titleStr":NSLocalizedString(@"app_voice_chat_spatial", nil),
+//                @"subTitleStr":NSLocalizedString(@"app_voice_chat_spatialTip", nil)
+//            },
             @{
-                @"bgImgStr":@"home_talk_bg",
-                @"iconImgStr":@"home_talk_icon",
-                @"titleStr":NSLocalizedString(@"app_voice_chat", nil),
+                @"bgImgStr":@"ktv_sr_bg",
+                @"iconImgStr":@"",
+                @"titleStr":NSLocalizedString(@"app_about_singrelay", nil),
                 @"subTitleStr":@""
             },
-            @{
-                @"bgImgStr":@"spatial_bg",
-                @"iconImgStr":@"home_talk_icon",
-                @"titleStr":NSLocalizedString(@"app_voice_chat_spatial", nil),
-                @"subTitleStr":NSLocalizedString(@"app_voice_chat_spatialTip", nil)
-            },
-            @{
-                @"bgImgStr":@"home_KTV_bg",
-                @"iconImgStr":@"home_KTV_icon",
-                @"titleStr":NSLocalizedString(@"app_about_karaoke", nil),
-                @"subTitleStr":@""
-            },
-            @{
-                @"bgImgStr":@"home_live_bg",
-                @"iconImgStr":@"home_live_icon",
-                @"titleStr":NSLocalizedString(@"app_show_live", nil),
-                @"subTitleStr":@""
-            },
+//            @{
+//                @"bgImgStr":@"home_live_bg",
+//                @"iconImgStr":@"home_live_icon",
+//                @"titleStr":NSLocalizedString(@"app_show_live", nil),
+//                @"subTitleStr":@""
+//            },
         ];
     }
     return _itemsArray;

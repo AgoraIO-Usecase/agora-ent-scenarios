@@ -12,6 +12,9 @@ import ScoreEffectUI
 @objc protocol VLSRLrcViewDelegate: NSObjectProtocol {
     func onKaraokeView(score: Int, totalScore: Int, lineScore: Int, lineIndex: Int)
     func didLrcViewActionChanged(state: SRClickAction)
+    func didLrcProgressChanged(_ progress: Int)
+    func didDragTo(_ progress: Int)
+    func didLrcViewScorllFinished(with score: Int, totalScore: Int, lineScore: Int, lineIndex:Int)
 }
 
 @objc public enum singingState: Int {
@@ -41,44 +44,45 @@ class VLSRLyricView: UIView {
         didSet {
             if state == .broadcasterWithSinging {
                 songNameView.isHidden = false
-                songNameView.setName(with: songContent, isCenter: true)
-//                SRBtn.isHidden = true
+                songNameView.setName(with: songContent, isCenter: false)
+              //  songNameView.frame = CGRect(x: 20, y:8, width:self.bounds.width - 150 , height: 20)
+                lrcView.scoringEnabled = true
+                lrcView.isHidden = false
                 incentiveView.isHidden = false
                 lineScoreView.isHidden = false
-                lrcView.scoringEnabled = false
                 gradeView.isHidden = false
                 nextBtn.isHidden = false
                 effectBtn.isHidden = false
                 originBtn.isHidden = false
             } else if state == .broadcasterWithoutSinging {
                 songNameView.isHidden = false
-                songNameView.setName(with: songContent, isCenter: true)
-//                SRBtn.isHidden = true
+                songNameView.setName(with: songContent, isCenter: false)
+               // songNameView.frame = CGRect(x: 20, y:8, width:self.bounds.width - 150 , height: 20)
                 incentiveView.isHidden = false
                 lineScoreView.isHidden = false
-                lrcView.scoringEnabled = false
+                lrcView.scoringEnabled = true
+                gradeView.isHidden = false
+                nextBtn.isHidden = false
+                effectBtn.isHidden = true
+                originBtn.isHidden = true
+            } else if state == .playerWithSinging {
+                songNameView.isHidden = false
+                songNameView.setName(with: songContent, isCenter: false)
+              //  songNameView.frame = CGRect(x: 20, y:8, width:self.bounds.width - 150 , height: 20)
+                incentiveView.isHidden = false
+                lineScoreView.isHidden = false
+                lrcView.scoringEnabled = true
                 gradeView.isHidden = false
                 nextBtn.isHidden = true
                 effectBtn.isHidden = false
                 originBtn.isHidden = false
-            } else if state == .playerWithSinging {
-                songNameView.isHidden = false
-                songNameView.setName(with: songContent, isCenter: true)
-//                SRBtn.isHidden = true
-                incentiveView.isHidden = false
-                lineScoreView.isHidden = false
-                lrcView.scoringEnabled = false
-                gradeView.isHidden = false
-                nextBtn.isHidden = true
-                effectBtn.isHidden = false
-                originBtn.isHidden = true
             } else if state == .playerWithoutSinging {
                 songNameView.isHidden = false
-                songNameView.setName(with: songContent, isCenter: true)
-//                SRBtn.isHidden = true
+                songNameView.setName(with: songContent, isCenter: false)
+               // songNameView.frame = CGRect(x: 20, y:8, width:self.bounds.width - 150 , height: 20)
                 incentiveView.isHidden = false
                 lineScoreView.isHidden = false
-                lrcView.scoringEnabled = false
+                lrcView.scoringEnabled = true
                 gradeView.isHidden = false
                 nextBtn.isHidden = true
                 effectBtn.isHidden = true
@@ -86,10 +90,11 @@ class VLSRLyricView: UIView {
             } else if state == .singingAudience {
                 songNameView.isHidden = false
                 songNameView.setName(with: songContent, isCenter: true)
-//                SRBtn.isHidden = true
+               // songNameView.frame = CGRect(x: 75, y:8, width:self.bounds.width - 150 , height: 20)
+                lrcView.scoringEnabled = true
+                lrcView.isHidden = false
                 incentiveView.isHidden = false
                 lineScoreView.isHidden = false
-                lrcView.scoringEnabled = true
                 gradeView.isHidden = false
                 nextBtn.isHidden = true
                 effectBtn.isHidden = true
@@ -124,6 +129,7 @@ class VLSRLyricView: UIView {
     private var totalLines: Int = 0
     private var localTotalScore: Int = 0
     private var totalCount: Int = 0
+    private var totalScore: Int = 0
     private var progress: Int = 0
     private var highStartTime: Int = 0
     private var highEndTime: Int = 0
@@ -136,7 +142,7 @@ class VLSRLyricView: UIView {
     private var lyricModel: LyricModel? = nil
     private var bgImgView: UIImageView = {
         let imgView = UIImageView()
-        imgView.image = UIImage.sceneImage(name: "ktv_mv_tempBg")
+        imgView.image = UIImage.sceneImage(name: "sr_bg_lrc")
         return imgView
     }()
     
@@ -174,6 +180,7 @@ class VLSRLyricView: UIView {
         btn.setImage(UIImage.sceneImage(name: "acc"), for: .selected)
         btn.adjustImageTitlePosition(.top)
         btn.addTarget(self, action: #selector(trackChoose), for: .touchUpInside)
+        btn.isSelected = true
         btn.layoutIfNeeded()
         return btn
     }()
@@ -214,7 +221,7 @@ class VLSRLyricView: UIView {
         lrcView.scoringView.viewHeight = 60
         lrcView.scoringView.topSpaces = 5
         lrcView.lyricsView.textNormalColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
-        lrcView.lyricsView.textHighlightedColor = UIColor(hex: "#FF8AB4")
+        lrcView.lyricsView.textHighlightedColor = UIColor(hex: "#EEFF25")
         lrcView.lyricsView.lyricLineSpacing = 6
         lrcView.lyricsView.draggable = false
         lrcView.delegate = self
@@ -228,6 +235,7 @@ class VLSRLyricView: UIView {
         
         //addSubview(songNameBtn)
        // addSubview(songNameLabel)
+        
         addSubview(songNameView)
         
         addSubview(nextBtn)
@@ -262,22 +270,9 @@ class VLSRLyricView: UIView {
         originBtn.isSelected = index == 1
     }
     
-//    @objc func SR() {
-//        if isTaped {//防止暴力点击
-//            return
-//        }
-//        guard let delegate = delegate else {return}
-//        delegate.didLrcViewActionChanged(state: .SR)
-//        isTaped = true
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//            self.isTaped = false
-//        }
-//    }
-    
     @objc public func updateScore(with lineScore: Int, cumulativeScore: Int, totalScore: Int) {
-        if localTotalScore == 0 {return}
         lineScoreView.showScoreView(score: lineScore)
-        gradeView.setScore(cumulativeScore: cumulativeScore, totalScore: localTotalScore)
+        gradeView.setScore(cumulativeScore: cumulativeScore, totalScore: totalScore)
         incentiveView.show(score: lineScore)
     }
     
@@ -313,9 +308,8 @@ class VLSRLyricView: UIView {
         nextBtn.frame = CGRect(x: 20, y: self.bounds.height - 70, width: 30, height: 50)
         originBtn.frame = CGRect(x: self.bounds.width - 50, y: self.bounds.height - 70, width: 30, height: 50)
         effectBtn.frame = CGRect(x: self.bounds.width - 100, y: self.bounds.height - 70, width: 30, height: 50)
-        
-        //songNameBtn.frame = CGRect(x: state == .singingBroadcaster ? 20 : (self.bounds.width / 2.0 - 50) , y: 8, width: 100, height: 20)
-        songNameView.frame = CGRect(x: 20, y:8, width:self.bounds.width - 40 , height: 20)
+
+        songNameView.frame = CGRect(x: 20, y:8, width:self.bounds.width - 150 , height: 20)
         //SRBtn.frame = CGRect(x: self.bounds.width / 2.0 - 60, y: self.bounds.height - 70, width: 110, height: 50)
         self.bgImgView.layer.cornerRadius = 10
         self.bgImgView.layer.masksToBounds = true
@@ -326,48 +320,42 @@ class VLSRLyricView: UIView {
 }
 
 extension VLSRLyricView: KaraokeDelegate {
-    public func onKaraokeView(view: KaraokeView, didFinishLineWith model: LyricLineModel, score: Int, cumulativeScore: Int, lineIndex: Int, lineCount: Int) {
-        //歌词打分
-        totalLines = lineCount
-        guard let delegate = self.delegate else {
-            return
-        }
-        delegate.onKaraokeView(score: cumulativeScore, totalScore: localTotalScore, lineScore: score, lineIndex: lineIndex)
-        if localTotalScore == 0 {return}
-        finalScore = Int(Double(cumulativeScore) / Double(localTotalScore) * 100)
-       // updateScore(with: score, cumulativeScore: cumulativeScore, totalScore: localTotalScore)
+    
+    func onKaraokeView(view: KaraokeView, didDragTo position: Int) {
+        delegate?.didDragTo(position)
     }
+
+    func onKaraokeView(view: KaraokeView,
+                           didFinishLineWith model: LyricLineModel,
+                           score: Int,
+                           cumulativeScore: Int,
+                           lineIndex: Int,
+                           lineCount: Int) {
+            totalLines = lineCount
+            totalScore += score
+            guard let delegate = delegate else {
+                return
+            }
+            delegate.didLrcViewScorllFinished(with: totalScore,
+                                              totalScore: lineCount * 100,
+                                              lineScore: score,
+                                              lineIndex: lineIndex)
+     }
+
 }
 
 extension VLSRLyricView: SRLrcViewDelegate {
 
     func onUpdatePitch(pitch: Float) {
+        print("pitch:\(pitch)")
         lrcView?.setPitch(pitch: Double(pitch))
     }
 
     func onUpdateProgress(progress: Int) {
         self.progress = progress
         lrcView?.setProgress(progress: progress)
-//        guard let model = lyricModel else {
-//            return
-//        }
-//        let preludeEndPosition = model.preludeEndPosition
-//        let duration = model.duration - 500
-//        if progress > model.duration {
-//            return
-//        }
-//        if !isMainSinger {
-//            return
-//        }
-//        if preludeEndPosition < progress && !hasShowPreludeEndPosition {
-//            skipBtn.isHidden = true
-//            hasShowPreludeEndPosition = true
-//            hasShowOnce = true
-//        } else if duration < progress && !hasShowEndPosition {
-//            skipBtn.setSkipType(.epilogue)
-//            skipBtn.isHidden = false
-//            hasShowEndPosition = true
-//        }
+        guard let delegate = self.delegate else {return}
+        delegate.didLrcProgressChanged(progress)
     }
 
     func onDownloadLrcData(url: String) {
@@ -418,7 +406,11 @@ extension VLSRLyricView: SRLrcViewDelegate {
         lyricModel = model
         totalCount = model.lines.count
         totalLines = 0
-       // totalScore = 0
+        originBtn.isSelected = true
+        songContent = "\(model.name.trimmingCharacters(in: .whitespacesAndNewlines))-\(model.singer)"
+        songNameView.isHidden = false
+        songNameView.setName(with: songContent, isCenter: true)
+        totalScore = 0
         lrcView?.setLyricData(data: model)
     }
 }
@@ -464,7 +456,7 @@ extension UIButton {
             break
             
         case .right:
-            imageEdgeInsets = UIEdgeInsets(top: 0, left: labelWidth! + spacing / 2, bottom: 0, right: -labelWidth! - spacing / 2)
+            imageEdgeInsets = UIEdgeInsets(top: 0, left: labelWidth! + spacing / 2, bottom: 0, right: -labelWidth! - spacing / 2 + 30)
             titleEdgeInsets = UIEdgeInsets(top: 0, left: -imageWidth! - spacing / 2, bottom: 0, right: imageWidth! + spacing / 2)
             break
         }
