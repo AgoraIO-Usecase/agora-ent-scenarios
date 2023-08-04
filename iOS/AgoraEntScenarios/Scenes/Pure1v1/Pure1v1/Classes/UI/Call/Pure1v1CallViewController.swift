@@ -214,39 +214,46 @@ extension Pure1v1CallViewController: AgoraRtcEngineDelegate {
 }
 
 extension Pure1v1CallViewController: CallApiListenerProtocol {
-        func onCallStateChanged(with state: CallStateType,
-                                stateReason: CallReason,
-                                eventReason: String,
-                                elapsed: Int,
-                                eventInfo: [String : Any]) {
-            let publisher = eventInfo[kPublisher] as? String ?? currentUser?.userId
-            guard publisher == currentUser?.userId else {
-                return
-            }
-            
-            switch state {
-            case .connected:
-                let connection = AgoraRtcConnection()
-                assert(targetUser != nil, "targetUser == nil")
-                connection.channelId = targetUser?.getRoomId() ?? ""
-                connection.localUid = UInt(currentUser?.userId ?? "") ?? 0
-                setupContentInspectConfig(true, connection: connection)
-                moderationAudio()
-                break
-            default:
-                break
-            }
+    func onCallStateChanged(with state: CallStateType,
+                            stateReason: CallReason,
+                            eventReason: String,
+                            elapsed: Int,
+                            eventInfo: [String : Any]) {
+        let publisher = eventInfo[kPublisher] as? String ?? currentUser?.userId
+        guard publisher == currentUser?.userId else {
+            return
         }
         
-        func onCallEventChanged(with event: CallEvent, elapsed: Int) {
-            pure1v1Print("onCallEventChanged: \(event.rawValue)")
-            switch event {
-            case .localLeave, .remoteLeave:
-                _hangupAction()
-            default:
-                break
-            }
+        switch state {
+        case .connected:
+            let connection = AgoraRtcConnection()
+            assert(targetUser != nil, "targetUser == nil")
+            connection.channelId = targetUser?.getRoomId() ?? ""
+            connection.localUid = UInt(currentUser?.userId ?? "") ?? 0
+            setupContentInspectConfig(true, connection: connection)
+            moderationAudio()
+            break
+        default:
+            break
         }
+    }
+    
+    func onCallEventChanged(with event: CallEvent, elapsed: Int) {
+        pure1v1Print("onCallEventChanged: \(event.rawValue)")
+        switch event {
+        case .localLeave, .remoteLeave:
+            _hangupAction()
+        default:
+            break
+        }
+    }
+    
+    func debugInfo(message: String) {
+        pure1v1Print(message, context: "CallApi")
+    }
+    func debugWarning(message: String) {
+        pure1v1Warn(message, context: "CallApi")
+    }
 }
 
 extension Pure1v1CallViewController {

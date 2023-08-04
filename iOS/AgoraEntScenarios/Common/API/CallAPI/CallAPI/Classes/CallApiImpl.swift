@@ -28,14 +28,6 @@ public let kPublisher = "publisher"    //状态触发的用户uid，目前可以
 public let kDebugInfo = "debugInfo"    //测试信息，目前是会在主叫onBegin时抛出分步耗时
 public let kDebugInfoMap = "debugInfoMap"    //测试信息，目前是会在主叫onBegin时抛出分步耗时
 
-func callWarningPrint(_ message: String) {
-    callPrint("[CallApi][Warning] \(message)")
-}
-
-func callProfilePrint(_ message: String) {
-    callPrint("[CallApi][Profile] \(message)")
-}
-
 enum CallAction: UInt {
     case call = 0
     case cancelCall = 1
@@ -337,7 +329,7 @@ extension CallApiImpl {
             guard let self = self else {return}
             rtmError = err
             if let err = err {
-                callWarningPrint("_rtmInitialize failed: \(err.localizedDescription)")
+                self.callWarningPrint("_rtmInitialize failed: \(err.localizedDescription)")
                 self._notifyEvent(event: .rtmSetupFailed)
             } else {
                 self._notifyEvent(event: .rtmSetupSuccessed)
@@ -1078,9 +1070,49 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
 }
 
 extension CallApiImpl: CallMessageDelegate {
+    func debugInfo(message: String) {
+        callPrint(message)
+    }
+    
+    func debugWarning(message: String) {
+        callWarningPrint(message)
+    }
+    
     func onMissReceipts(message: [String : Any]) {
         callWarningPrint("onMissReceipts: \(message)")
         _notifyEvent(event: .missingReceipts)
 //        _notifyState(state: state, stateReason: .missingReceipts, eventInfo: message)
+    }
+}
+
+#if DEBUG
+let formatter = DateFormatter()
+#endif
+func debugPrint(_ message: String) {
+#if DEBUG
+//    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+//    let timeString = formatter.string(from: Date())
+//    print("\(timeString) \(message)")
+#endif
+}
+
+extension CallApiImpl {
+    func callPrint(_ message: String) {
+        for element in delegates.allObjects {
+            (element as? CallApiListenerProtocol)?.debugInfo?(message: message)
+        }
+    
+        debugPrint("[CallApi]\(message)")
+    }
+
+    func callWarningPrint(_ message: String) {
+        for element in delegates.allObjects {
+            (element as? CallApiListenerProtocol)?.debugWarning?(message: message)
+        }
+        callPrint("[Warning]\(message)")
+    }
+
+    func callProfilePrint(_ message: String) {
+        callPrint("[Profile]\(message)")
     }
 }
