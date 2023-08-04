@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didVolQualityGradeChangedWithIndex:(NSInteger)index;
 - (void)voiceDelaySelectedAction:(BOOL)isSelected;
 -(void)didAECStateChange:(BOOL)enable;
--(void)didAECLevelSetWith:(NSInteger)level;
+-(void)didAECLevelSetWith:(int)level;
 @end
 
 @interface VLVoicePerShowView : UIView
