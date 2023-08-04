@@ -25,6 +25,7 @@ public enum CallMode: UInt {
 public class CallConfig: NSObject {
     public var appId: String = ""               //声网App Id
     public var userId: UInt = 0                 //用户id
+    public var userExtension: [String: Any]?    //用户扩展字段,用在呼叫上，对端收到calling时可以通过kFromUserExtension字段读到
     public var ownerRoomId: String?             //房主房间id，秀场转1v1可用
     public var rtcEngine: AgoraRtcEngineKit!    //rtc engine实例
     public var mode: CallMode = .showTo1v1      //模式
