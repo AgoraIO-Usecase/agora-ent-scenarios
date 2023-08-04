@@ -20,7 +20,12 @@ class Pure1v1CallViewController: UIViewController {
     }
     var appId: String = ""
     var rtcEngine: AgoraRtcEngineKit?
-    var currentUser: Pure1v1UserInfo?
+    var currentUser: Pure1v1UserInfo? {
+        didSet {
+            smallCanvasView.titleLabel.text = currentUser?.userName ?? ""
+            smallCanvasView.sizeToFit()
+        }
+    }
     var targetUser: Pure1v1UserInfo? {
         didSet {
             roomInfoView.setRoomInfo(avatar: targetUser?.avatar ?? "",
@@ -40,9 +45,9 @@ class Pure1v1CallViewController: UIViewController {
     }
     private lazy var moveViewModel: MoveGestureViewModel = MoveGestureViewModel()
     private lazy var roomInfoView: Pure1v1RoomInfoView = Pure1v1RoomInfoView()
-    lazy var bigCanvasView: UIView = UIView()
-    lazy var smallCanvasView: UIView = {
-        let view = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 109, height: 163)))
+    lazy var bigCanvasView: Pure1v1CanvasView = Pure1v1CanvasView()
+    lazy var smallCanvasView: Pure1v1CanvasView = {
+        let view = Pure1v1CanvasView(frame: CGRect(origin: .zero, size: CGSize(width: 109, height: 163)))
         view.backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
         view.addGestureRecognizer(moveViewModel.gesture)
         return view
