@@ -744,12 +744,26 @@ extension CallApiImpl: CallApiProtocol {
         if let roomId = tokenConfig?.roomId, roomId != config.roomId {
             callWarningPrint("renewToken failed, roomid missmatch")
         }
+        callPrint("renewToken with roomId[\(config.roomId)]")
         self.tokenConfig = config
         messageManager?.renewToken(rtmToken: config.rtmToken)
-        guard let connection = rtcConnection else { return }
+        guard let connection = rtcConnection, connection.channelId == config.roomId else {
+            callWarningPrint("renewToken fail! connection.channelId[\(rtcConnection?.channelId)] != config.roomId[\(config.roomId)]")
+            return
+        }
         let options = AgoraRtcChannelMediaOptions()
         options.token = config.rtcToken
+        let ret =
         self.config?.rtcEngine.updateChannelEx(with: options, connection: connection)
+        callPrint("rtc[\(config.roomId)] renewToken ret = \(ret)")
+    }
+    
+    public func renewRemoteCallerChannelToken(roomId: String, token: String) {
+        guard let connection = rtcConnection, connection.channelId == roomId, let rtcEngine = self.config?.rtcEngine else { return }
+        let options = AgoraRtcChannelMediaOptions()
+        options.token = token
+        let ret = rtcEngine.updateChannelEx(with: options, connection: connection)
+        callPrint("rtc[\(roomId)] renewRemoteCallerChannelToken ret = \(ret)")
     }
     
     public func prepareForCall(prepareConfig: PrepareConfig, completion: ((NSError?) -> ())?) {

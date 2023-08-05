@@ -169,6 +169,10 @@ public class CallTokenConfig: NSObject {
     /// - Parameter config: <#config description#>
     func renewToken(with config: CallTokenConfig)
     
+    /// 更新呼叫token
+    /// - Parameter token: <#token description#>
+    func renewRemoteCallerChannelToken(roomId: String, token: String)
+    
     /// 连接(对RTM进行login和subscribe)， 观众调用
     /// - Parameters:
     ///   - config: <#config description#>
