@@ -367,7 +367,9 @@ extension CallMessageManager {
         guard isLoginedRTM else {
             return
         }
-        rtmClient?.renewToken(rtmToken)
+        rtmClient?.renewToken(rtmToken,completion: {[weak self] resp, err in
+            self?.callMessagePrint("rtm renewToken: \(err.errorCode.rawValue)")
+        })
     }
     
     /// 发送频道消息
