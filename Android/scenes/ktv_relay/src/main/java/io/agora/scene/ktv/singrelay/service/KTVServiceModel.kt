@@ -172,7 +172,8 @@ data class RankModel(
     val userName: String,
     val songNum: Int = 0,
     val score: Int = 0,
-    val poster: String
+    val poster: String,
+    val lines: Int
 )
 
 enum class SingRelayGameStatus(val value: Int) {

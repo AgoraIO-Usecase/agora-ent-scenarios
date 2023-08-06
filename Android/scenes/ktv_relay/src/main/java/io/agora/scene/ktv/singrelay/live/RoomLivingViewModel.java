@@ -152,7 +152,7 @@ public class RoomLivingViewModel extends ViewModel {
         ON_END,
         ON_ERROR
     }
-    final MutableLiveData<GameStatus> singRelayGameStatusMutableLiveData = new MutableLiveData<>();
+    final MutableLiveData<GameStatus> singRelayGameStatusMutableLiveData = new MutableLiveData<>(GameStatus.ON_WAITING);
 
     enum GraspStatus {
         IDLE,
@@ -206,6 +206,8 @@ public class RoomLivingViewModel extends ViewModel {
      * 是否开启耳返
      */
     private boolean isOpnEar = false;
+
+    private final List<String> singerList = new ArrayList<>();
 
     public RoomLivingViewModel(JoinRoomOutputModel roomInfo) {
         this.roomInfoLiveData = new MutableLiveData<>(roomInfo);
@@ -646,11 +648,21 @@ public class RoomLivingViewModel extends ViewModel {
                 songNum = data.size();
                 songsOrderedLiveData.postValue(data);
 
-                if (singRelayGameStatusMutableLiveData.getValue() == GameStatus.ON_START) {
+                if (singRelayGameStatusMutableLiveData.getValue() == GameStatus.ON_WAITING) {
+                    // 歌曲选择成功后，开始游戏
+                    ktvServiceProtocol.startSingRelayGame(err -> {
+                        if (err != null) {
+                            KTVLogger.e(TAG, "RoomLivingViewModel.startSingRelayGame() failed: " + err.getMessage());
+                            ToastUtils.showToast(err.getMessage());
+                        }
+                        return null;
+                    });
+                } else if (singRelayGameStatusMutableLiveData.getValue() == GameStatus.ON_START) {
                     if (data.size() > 0){
                         RoomSelSongModel value = songPlayingLiveData.getValue();
                         RoomSelSongModel songPlaying = data.get(0);
 
+                        // TODO ios端 winnerNo 有概率为 null
                         if (value != null && value.getWinnerNo() != null && value.getWinnerNo().equals("") && !songPlaying.getWinnerNo().equals("") && seatLocalLiveData.getValue() != null) {
                             // 所有人更新抢唱结果UI
                             hasReceiveStartSingRelay = false;
@@ -677,6 +689,9 @@ public class RoomLivingViewModel extends ViewModel {
         });
     }
 
+    /**
+     * 开始播放歌曲
+     */
     public void onSongPlaying() {
         KTVLogger.d(TAG, "RoomLivingViewModel.onSongPlaying()");
         if (singRelayGameStatusMutableLiveData.getValue() == GameStatus.ON_START) {
@@ -700,6 +715,13 @@ public class RoomLivingViewModel extends ViewModel {
                 songPlayingLiveData.postValue(null);
             }
         }
+    }
+
+    /**
+     * 自动点歌
+     */
+    public void autoSelectMusic() {
+        ktvServiceProtocol.chooseSong(SongModel.INSTANCE.getRandomGameSong(), e -> null);
     }
 
     /**
@@ -793,6 +815,42 @@ public class RoomLivingViewModel extends ViewModel {
                         lineScore.cumulativeScore = cumulativeScore;
                         lineScore.total = total;
                         mainSingerScoreLiveData.postValue(lineScore);
+
+                        // 本地演唱 计入rank
+                        String senderUid = String.valueOf(uid);
+                        int singNum = 0;
+                        for (int i = 0; i < singerList.size(); i++) {
+                            if (singerList.get(i).equals(senderUid)) {
+                                singNum = singNum + 1;
+                            }
+                        }
+                        if (rankMap.containsKey(senderUid)) {
+                            RankModel oldModel = rankMap.get(senderUid);
+                            if (oldModel != null) {
+                                RankModel model = new RankModel(
+                                        oldModel.getUserName(),
+                                        singNum,
+                                        (int)((oldModel.getScore() * oldModel.getLines() + score) / (oldModel.getLines() + 1)),
+                                        oldModel.getPoster(),
+                                        oldModel.getLines() + 1
+                                );
+                                rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
+                            }
+                        } else {
+                            if (seatListLiveData.getValue() == null) return;
+                            for (int i = 0; i < seatListLiveData.getValue().size(); i++) {
+                                if (seatListLiveData.getValue().get(i).getRtcUid().equals(senderUid)) {
+                                    rankMap.put(senderUid, new RankModel(
+                                            seatListLiveData.getValue().get(i).getName(),
+                                            singNum,
+                                            score,
+                                            seatListLiveData.getValue().get(i).getHeadUrl(),
+                                            1
+                                    ));
+                                    break;
+                                }
+                            }
+                        }
                     } else if (jsonMsg.getString("cmd").equals("SingingScore")) {
                         KTVLogger.d(TAG, "onMessage/SingingScore: " + jsonMsg);
                         float score = (float) jsonMsg.getDouble("score");
@@ -806,7 +864,8 @@ public class RoomLivingViewModel extends ViewModel {
                                 userName,
                                 songNum,
                                 (int)score,
-                                poster
+                                poster,
+                                0
                         );
                         rankMap.put(userId, model);
                     } else if (jsonMsg.getString("cmd").equals("StartSingRelayCountDown")) {
@@ -867,8 +926,23 @@ public class RoomLivingViewModel extends ViewModel {
                @Override
                public void onMusicPlayerPositionChanged(long position_ms, long timestamp_ms) {
                    super.onMusicPlayerPositionChanged(position_ms, timestamp_ms);
-                   onNextPartMention(position_ms);
-                   onNextPart(position_ms);
+                   Log.d("position", "position: " + position_ms);
+                   for (int i = 0; i < relayList.size() - 1; i++) {
+                       if ((position_ms - relayList.get(i)) > 0 && (position_ms - relayList.get(i) < 1000)) {
+                           // 下一段
+                           GraspModel graspModel = new GraspModel();
+                           graspModel.status = GraspStatus.IDLE;
+                           graspStatusMutableLiveData.postValue(graspModel);
+                           partNum = i + 2;
+                           break;
+                       } else if ((position_ms - relayList.get(i)) > -3000 && (position_ms - relayList.get(i) < -2000)) {
+                           // 提前3s下一段提示
+                           GraspModel graspModel = new GraspModel();
+                           graspModel.status = GraspStatus.Mention;
+                           graspStatusMutableLiveData.postValue(graspModel);
+                           break;
+                       }
+                   }
                }
            }
         );
@@ -1213,6 +1287,7 @@ public class RoomLivingViewModel extends ViewModel {
     public void resetMusicStatus() {
         KTVLogger.d(TAG, "RoomLivingViewModel.resetMusicStatus() called");
         retryTimes = 0;
+        singerList.clear();
         mAudioTrackMode = KTVPlayerTrackMode.Acc;
         ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
     }
@@ -1222,6 +1297,7 @@ public class RoomLivingViewModel extends ViewModel {
     public void musicStartPlay(@NonNull RoomSelSongModel music) {
         KTVLogger.d(TAG, "RoomLivingViewModel.musicStartPlay() called");
         if (music.getUserNo() == null) return;
+        singerList.add(roomInfoLiveData.getValue().getCreatorNo());
         partNum = 1;
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
 
@@ -1364,6 +1440,35 @@ public class RoomLivingViewModel extends ViewModel {
         if (ret < 0) {
             KTVLogger.e(TAG, "syncSingleLineScore() sendStreamMessage called returned: " + ret);
         }
+
+        // 本地演唱 计入rank
+        int singNum = 0;
+        for (int i = 0; i < singerList.size(); i++) {
+            if (singerList.get(i).equals(UserManager.getInstance().getUser().id.toString())) {
+                singNum = singNum + 1;
+            }
+        }
+        if (rankMap.containsKey(UserManager.getInstance().getUser().id.toString())) {
+            RankModel oldModel = rankMap.get(UserManager.getInstance().getUser().id.toString());
+            if (oldModel != null) {
+                RankModel model = new RankModel(
+                        UserManager.getInstance().getUser().name,
+                        singNum,
+                        (int)((oldModel.getScore() * oldModel.getLines() + score) / (oldModel.getLines() + 1)),
+                        UserManager.getInstance().getUser().headUrl,
+                        oldModel.getLines() + 1
+                );
+                rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
+            }
+        } else {
+            rankMap.put(UserManager.getInstance().getUser().id.toString(), new RankModel(
+                    UserManager.getInstance().getUser().name,
+                    singNum,
+                    (int)score,
+                    UserManager.getInstance().getUser().headUrl,
+                    1
+            ));
+        }
     }
 
     public void syncSingingAverageScore(double score, int singedNum) {
@@ -1380,15 +1485,6 @@ public class RoomLivingViewModel extends ViewModel {
         if (ret < 0) {
             KTVLogger.e(TAG, "syncSingingAverageScore() sendStreamMessage called returned: " + ret);
         }
-
-        // 本地演唱 计入rank
-        RankModel model = new RankModel(
-                UserManager.getInstance().getUser().name,
-                singedNum,
-                (int)score,
-                UserManager.getInstance().getUser().headUrl
-        );
-        rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
     }
 
     private void SyncStartSing() {
@@ -1433,60 +1529,8 @@ public class RoomLivingViewModel extends ViewModel {
         }
     }
 
-    public void autoSelectMusic() {
-        List<ChooseSongInputModel> musicList = new ArrayList<>();
-        musicList.add(SongModel.INSTANCE.getRandomGameSong());
-        ktvServiceProtocol.autoChooseSongAndStartGame(musicList, e -> null);
-    }
-
-    private void onNextPart(long position_ms) {
-        if ((position_ms - relayList.get(0)) > 0 && (position_ms - relayList.get(0) < 1000)) {
-            GraspModel graspModel = new GraspModel();
-            graspModel.status = GraspStatus.IDLE;
-            graspStatusMutableLiveData.postValue(graspModel);
-            partNum = 2;
-        } else if ((position_ms - relayList.get(1)) > 0 && (position_ms - relayList.get(1) < 1000)) {
-            GraspModel graspModel = new GraspModel();
-            graspModel.status = GraspStatus.IDLE;
-            graspStatusMutableLiveData.postValue(graspModel);
-            partNum = 3;
-        } else if ((position_ms - relayList.get(2)) > 0 && (position_ms - relayList.get(2) < 1000)) {
-            GraspModel graspModel = new GraspModel();
-            graspModel.status = GraspStatus.IDLE;
-            graspStatusMutableLiveData.postValue(graspModel);
-            partNum = 4;
-        } else if ((position_ms - relayList.get(3)) > 0 && (position_ms - relayList.get(3) < 1000)) {
-            GraspModel graspModel = new GraspModel();
-            graspModel.status = GraspStatus.IDLE;
-            graspStatusMutableLiveData.postValue(graspModel);
-            partNum = 5;
-        }
-    }
-
-    private void onNextPartMention(long position_ms) {
-        if ((position_ms - relayList.get(0)) > -3000 && (position_ms - relayList.get(0) < -2000)) {
-            GraspModel graspModel = new GraspModel();
-            graspModel.status = GraspStatus.Mention;
-            graspStatusMutableLiveData.postValue(graspModel);
-        } else if ((position_ms - relayList.get(1)) > -3000 && (position_ms - relayList.get(1) < -2000)) {
-            GraspModel graspModel = new GraspModel();
-            graspModel.status = GraspStatus.Mention;
-            graspStatusMutableLiveData.postValue(graspModel);
-        } else if ((position_ms - relayList.get(2)) > -3000 && (position_ms - relayList.get(2) < -2000)) {
-            GraspModel graspModel = new GraspModel();
-            graspModel.status = GraspStatus.Mention;
-            graspStatusMutableLiveData.postValue(graspModel);
-        } else if ((position_ms - relayList.get(3)) > -3000 && (position_ms - relayList.get(3) < -2000)) {
-            GraspModel graspModel = new GraspModel();
-            graspModel.status = GraspStatus.Mention;
-            graspStatusMutableLiveData.postValue(graspModel);
-        }
-    }
-
     public boolean isNextRoundSinger() {
         if (songsOrderedLiveData.getValue() == null) return false;
-        Log.d("hugo", "songsOrderedLiveData.getValue().get(0).getWinnerNo(): " + songsOrderedLiveData.getValue().get(0).getWinnerNo());
-        Log.d("hugo", "partNum: " + partNum);
         if (!songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") && songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0].equals(UserManager.getInstance().getUser().id.toString()) && songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum - 1))) {
             return true;
         } else {
@@ -1495,6 +1539,15 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 return false;
             }
+        }
+    }
+
+    public void plusSingPartNum() {
+        if (songsOrderedLiveData.getValue() == null || roomInfoLiveData.getValue() == null) return;
+        if ((songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") || !songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum - 1)))) {
+            singerList.add(roomInfoLiveData.getValue().getCreatorNo());
+        } else {
+            singerList.add(songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0]);
         }
     }
 }

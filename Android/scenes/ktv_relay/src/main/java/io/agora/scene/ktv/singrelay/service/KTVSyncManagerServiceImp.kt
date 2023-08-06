@@ -538,27 +538,11 @@ class KTVSyncManagerServiceImp(
             name = UserManager.getInstance().user.name,
 
             status = RoomSelSongModel.STATUS_IDLE,
-            createAt = System.currentTimeMillis().toLong(),
+            createAt = System.currentTimeMillis(),
             pinAt = 0.0
         )
         //net request and notify others
         innerAddChooseSongInfo(song, completion)
-    }
-
-    override fun autoChooseSongAndStartGame(
-        list: List<ChooseSongInputModel>,
-        completion: (error: Exception?) -> Unit
-    ) {
-
-        val countDown = CountDownLatch(1)
-        chooseSong(list[0]) {
-            countDown.countDown()
-        }
-
-        Thread {
-            countDown.await()
-            startSingRelayGame(completion)
-        }.start()
     }
 
     override fun makeSongTop(

@@ -153,13 +153,6 @@ interface KTVServiceProtocol {
     )
 
     /**
-     * 点歌
-     */
-    fun autoChooseSongAndStartGame(
-        list: List<ChooseSongInputModel>, completion: (error: Exception?) -> Unit
-    )
-
-    /**
      * 置顶歌曲
      */
     fun makeSongTop(
