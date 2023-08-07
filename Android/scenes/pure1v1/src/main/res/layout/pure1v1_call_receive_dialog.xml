@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black_30_percent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clContent"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:layout_gravity="bottom">
+
+        <View
+            android:id="@+id/vContent"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:background="@drawable/pure1v1_bottom_dialog_card"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="106dp"
+            android:layout_height="100dp"
+            android:src="@drawable/pure1v1_calling_corner_bg"
+            app:layout_constraintStart_toStartOf="@+id/vContent"
+            app:layout_constraintTop_toTopOf="@+id/vContent"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivCircle1"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/pure1v1_receive_circle_1"
+            app:layout_constraintEnd_toEndOf="@id/ivUserAvatar"
+            app:layout_constraintStart_toStartOf="@id/ivUserAvatar"
+            app:layout_constraintTop_toTopOf="@id/ivUserAvatar"
+            app:layout_constraintBottom_toBottomOf="@+id/ivUserAvatar"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivCircle2"
+            android:layout_width="87dp"
+            android:layout_height="82dp"
+            android:src="@drawable/pure1v1_receive_circle_2"
+            app:layout_constraintEnd_toEndOf="@id/ivUserAvatar"
+            app:layout_constraintStart_toStartOf="@id/ivUserAvatar"
+            app:layout_constraintTop_toTopOf="@id/ivUserAvatar"
+            app:layout_constraintBottom_toBottomOf="@+id/ivUserAvatar"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivUserAvatar"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_marginTop="40dp"
+            app:layout_constraintTop_toTopOf="@id/vContent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="27dp"
+            android:textColor="@color/black"
+            android:textSize="18dp"
+            android:text="000000000"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivUserAvatar"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvConnectInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:textColor="#3F3F3F"
+            android:textSize="14dp"
+            android:text="@string/pure1v1_call_receive_invitation"
+            app:layout_constraintTop_toBottomOf="@+id/tvUserName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#3F3F3F"
+            android:textSize="14dp"
+            android:text="   "
+            app:layout_constraintTop_toTopOf="@+id/tvConnectInfo"
+            app:layout_constraintStart_toEndOf="@+id/tvConnectInfo"
+            app:layout_constraintBottom_toBottomOf="@+id/tvConnectInfo"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivReject"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_marginStart="72dp"
+            android:layout_marginBottom="72dp"
+            android:src="@drawable/pure1v1_call_hangup"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivAccept"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_marginEnd="72dp"
+            android:layout_marginBottom="72dp"
+            android:src="@drawable/pure1v1_call_accept"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/pure1v1_call_receive_reject"
+            android:textColor="@color/black"
+            android:textSize="12dp"
+            app:layout_constraintTop_toBottomOf="@+id/ivReject"
+            app:layout_constraintStart_toStartOf="@+id/ivReject"
+            app:layout_constraintEnd_toEndOf="@+id/ivReject"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/black"
+            android:textSize="12dp"
+            android:text="@string/pure1v1_call_receive_accept"
+            app:layout_constraintTop_toBottomOf="@+id/ivAccept"
+            app:layout_constraintStart_toStartOf="@+id/ivAccept"
+            app:layout_constraintEnd_toEndOf="@+id/ivAccept"
+            />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginBottom="24dp"
+            app:cardElevation="0dp"
+            app:cardCornerRadius="18dp"
+            android:backgroundTint="@color/white_20_percent"
+            app:layout_constraintBottom_toTopOf="@id/vContent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            >
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:gravity="center"
+                android:text="@string/pure1v1_call_dialog_info"
+                android:textColor="@color/white"
+                android:textSize="11dp"
+                android:drawableLeft="@drawable/pure1v1_calling_notice"
+                android:drawablePadding="5dp"
+                />
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
