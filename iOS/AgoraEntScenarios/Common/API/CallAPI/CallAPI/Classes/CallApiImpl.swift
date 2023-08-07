@@ -57,6 +57,14 @@ public class CallApiImpl: NSObject {
     private var recvMessageTsMap: [UInt: Int] = [:]
     private var oneForOneMap: [String: String]?
     
+    private var reportInfoList: [CallReportInfo] = []
+    private var isChannelJoined: Bool = false {
+        didSet {
+            guard isChannelJoined else {return}
+            _flushReport()
+        }
+    }
+    
     /// 当前状态
     private var state: CallStateType = .idle {
         didSet {
@@ -559,6 +567,17 @@ extension CallApiImpl {
         callId = ""
     }
     
+    private func _flushReport() {
+        reportInfoList.forEach { info in
+            self._sendCustomReportMessage(msgId: info.msgId,
+                                          category: info.category,
+                                          event: info.event,
+                                          label: info.label,
+                                          value: info.value)
+        }
+        reportInfoList.removeAll()
+    }
+    
     private func _reportCostEvent(type: CallCostType) {
         _reportEvent(key: type.rawValue, value: _getCost(), messageId: "")
     }
@@ -570,13 +589,31 @@ extension CallApiImpl {
         
         let msgId = "uid=\(config.userId)&messageId=\(messageId)"
         let category = "\(config.mode.rawValue)"
+        if isChannelJoined {
+            _sendCustomReportMessage(msgId: msgId, category: category, event: key, label: callId, value: value)
+            return
+        }
+        
+        let info = CallReportInfo(msgId: msgId, category: category, event: key, label: callId, value: value)
+        reportInfoList.append(info)
+        callPrint("sendCustomReportMessage not join channel cache it! msgId: \(msgId) category: \(category) event: \(key) label: \(callId) value: \(value)")
+    }
+    
+    private func _sendCustomReportMessage(msgId: String,
+                                          category: String,
+                                          event: String,
+                                          label: String,
+                                          value: Int) {
+        guard let config = config, isChannelJoined else {
+            return
+        }
         let ret =
         config.rtcEngine.sendCustomReportMessage(msgId,
                                                  category: category,
-                                                 event: key,
-                                                 label: callId,
+                                                 event: event,
+                                                 label: label,
                                                  value: value)
-        callPrint("sendCustomReportMessage msgId: \(msgId) category: \(category) event: \(key) label: \(callId) value: \(value) : \(ret)")
+        callPrint("sendCustomReportMessage msgId: \(msgId) category: \(category) event: \(event) label: \(label) value: \(value) : \(ret)")
     }
 }
 
@@ -1063,6 +1100,7 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didLeaveChannelWith stats: AgoraChannelStats) {
         callPrint("didLeaveChannelWith")
+        isChannelJoined = false
         _notifyEvent(event: .localLeave)
 //        _notifyState(state: state, stateReason: .localLeave)
     }
@@ -1072,6 +1110,7 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
         guard uid == config?.userId ?? 0 else {
             return
         }
+        isChannelJoined = true
         joinRtcCompletion?(nil)
         joinRtcCompletion = nil
         
@@ -1123,9 +1162,9 @@ let formatter = DateFormatter()
 #endif
 func debugPrint(_ message: String) {
 #if DEBUG
-//    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
-//    let timeString = formatter.string(from: Date())
-//    print("\(timeString) \(message)")
+    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+    let timeString = formatter.string(from: Date())
+    print("\(timeString) \(message)")
 #endif
 }
 
