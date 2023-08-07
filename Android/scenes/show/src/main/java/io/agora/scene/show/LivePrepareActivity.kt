@@ -166,10 +166,10 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
     private fun getDeviceScoreAndUpdateVideoProfile() {
         val deviceScore = mRtcEngine.queryDeviceScore()
-        if (deviceScore >= 85) {
+        if (deviceScore >= 90) {
             ToastUtils.showToast("高端机：$deviceScore")
             VideoSetting.updateBroadcastSetting(VideoSetting.DeviceLevel.High)
-        } else if (deviceScore >= 60) {
+        } else if (deviceScore >= 75) {
             ToastUtils.showToast("中端机：$deviceScore")
             VideoSetting.updateBroadcastSetting(VideoSetting.DeviceLevel.Medium)
         } else {

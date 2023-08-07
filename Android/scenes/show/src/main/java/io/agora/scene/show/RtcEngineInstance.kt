@@ -11,6 +11,7 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.show.beauty.IBeautyProcessor
 import io.agora.scene.show.beauty.sensetime.BeautySenseTimeImpl
 import io.agora.scene.show.debugSettings.DebugSettingModel
+import io.agora.scene.show.videoSwitcherAPI.VideoSwitcherAPIImpl
 import java.util.concurrent.Executors
 
 object RtcEngineInstance {
@@ -74,10 +75,25 @@ object RtcEngineInstance {
     val videoSwitcher: VideoSwitcher
         get() {
             if (innerVideoSwitcher == null) {
-                innerVideoSwitcher = VideoSwitcherImpl(rtcEngine)
+                innerVideoSwitcher = VideoSwitcherImpl(rtcEngine, VideoSwitcherAPIImpl(rtcEngine))
             }
             return innerVideoSwitcher!!
         }
+
+    fun cleanCache() {
+        innerVideoSwitcher?.let {
+            it.unloadConnections()
+            //innerVideoSwitcher = null
+        }
+//        innerRtcEngine?.let {
+//            workingExecutor.execute { RtcEngine.destroy() }
+//            innerRtcEngine = null
+//        }
+//        innerBeautyProcessor?.let { processor ->
+//            processor.release()
+//            innerBeautyProcessor = null
+//        }
+    }
 
     fun destroy() {
         innerVideoSwitcher?.let {

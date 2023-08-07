@@ -6,28 +6,12 @@ import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
+import io.agora.scene.show.videoSwitcherAPI.VideoSwitcherAPI
 
 /**
  *
  */
 interface VideoSwitcher {
-
-    data class IChannelEventListener(
-        var onTokenGenerateFailedException: ((error: Throwable)->Unit)? = null,
-        var onChannelJoined: ((connection: RtcConnection)->Unit)? = null,
-        var onUserJoined: ((uid: Int) -> Unit)? = null,
-        var onUserOffline: ((uid: Int) -> Unit)? = null,
-        var onLocalVideoStateChanged: ((state: Int) -> Unit)? = null,
-        var onRemoteVideoStateChanged: ((uid: Int, state: Int) -> Unit)? = null,
-        var onRtcStats: ((stats: IRtcEngineEventHandler.RtcStats) -> Unit)? = null,
-        var onLocalVideoStats: ((stats: IRtcEngineEventHandler.LocalVideoStats) -> Unit)? = null,
-        var onRemoteVideoStats: ((stats: IRtcEngineEventHandler.RemoteVideoStats) -> Unit)? = null,
-        var onLocalAudioStats: ((stats: IRtcEngineEventHandler.LocalAudioStats) -> Unit)? = null,
-        var onRemoteAudioStats: ((stats: IRtcEngineEventHandler.RemoteAudioStats) -> Unit)? = null,
-        var onUplinkNetworkInfoUpdated: ((info: IRtcEngineEventHandler.UplinkNetworkInfo) -> Unit)? = null,
-        var onDownlinkNetworkInfoUpdated: ((info: IRtcEngineEventHandler.DownlinkNetworkInfo) -> Unit)? = null,
-        var onContentInspectResult: ((result: Int) -> Unit)? = null,
-    )
 
     data class VideoCanvasContainer(
         val lifecycleOwner: LifecycleOwner,
@@ -55,11 +39,22 @@ interface VideoSwitcher {
     /**
      * 加入频道并预先加入预加载连接列表里在该connection上下不超过最大预加载连接数的频道
      */
+    fun preJoinChannel(
+        connection: RtcConnection,
+        mediaOptions: ChannelMediaOptions,
+        eventListener: VideoSwitcherAPI.IChannelEventListener?
+    )
+
+    /**
+     * 加入频道并预先加入预加载连接列表里在该connection上下不超过最大预加载连接数的频道
+     */
     fun joinChannel(
         connection: RtcConnection,
         mediaOptions: ChannelMediaOptions,
-        eventListener: IChannelEventListener
+        eventListener: VideoSwitcherAPI.IChannelEventListener?
     )
+
+    fun setChannelEvent(channelName: String, uid: Int, eventHandler: VideoSwitcherAPI.IChannelEventListener?)
 
     /**
      * 离开频道，如果在已预加载的频道则只取消订阅音视频流
@@ -76,6 +71,8 @@ interface VideoSwitcher {
      * 渲染本地视频，相比于RtcEngineEx.setupLocalVideo，这里会缓存渲染视图，减少渲染时不断重复创建渲染视图，提高渲染速度
      */
     fun setupLocalVideo(container: VideoCanvasContainer)
+
+    fun getFirstVideoFrameTime(): Long
 
     /**
      * 开启混音
@@ -97,7 +94,4 @@ interface VideoSwitcher {
      * @param volume 0～100
      */
     fun adjustAudioMixingVolume(connection: RtcConnection, volume: Int)
-
-    fun getFirstVideoFrameTime(): Long
-
 }
