@@ -18,7 +18,6 @@ PODS:
   - Agora_Chat_iOS (1.0.8)
   - AgoraLyricsScore (1.1.1-beta-3)
   - AgoraRtcEngine_iOS (1.0)
-  - AgoraRtm_iOS (1.5.1)
   - AgoraSyncManager (2.0.8):
     - SocketRocket
   - AgRtmKit2_Test (0.2.0)
@@ -28,6 +27,7 @@ PODS:
   - CallAPI (0.1.0):
     - AgoraRtcEngine_iOS
     - AgRtmKit2_Test
+  - FLAnimatedImage (1.0.17)
   - HWWeakTimer (1.0)
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
@@ -44,7 +44,9 @@ PODS:
   - Pure1v1 (0.1.0):
     - AgoraSyncManager
     - CallAPI
+    - FLAnimatedImage
     - SDWebImage
+    - SDWebImage/GIF
     - SnapKit
     - SwiftyBeaver
     - YYCategories
@@ -53,6 +55,9 @@ PODS:
   - SDWebImage (4.4.8):
     - SDWebImage/Core (= 4.4.8)
   - SDWebImage/Core (4.4.8)
+  - SDWebImage/GIF (4.4.8):
+    - FLAnimatedImage (~> 1.0)
+    - SDWebImage/Core
   - SDWebImageAPNGCoder (0.1.1):
     - SDWebImage/Core (~> 4.2)
   - SenseLib (1.0)
@@ -93,7 +98,6 @@ DEPENDENCIES:
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraLyricsScore (= 1.1.1-beta-3)
   - AgoraRtcEngine_iOS (from `AgoraRtcEngine_iOS.podspec`)
-  - AgoraRtm_iOS (= 1.5.1)
   - AgoraSyncManager (~> 2.0.8)
   - AgRtmKit2_Test
   - Bugly (= 2.5.93)
@@ -130,10 +134,10 @@ SPEC REPOS:
     - Agora-Scene-Utils
     - Agora_Chat_iOS
     - AgoraLyricsScore
-    - AgoraRtm_iOS
     - AgoraSyncManager
     - AgRtmKit2_Test
     - Bugly
+    - FLAnimatedImage
     - HWWeakTimer
     - JXCategoryView
     - KakaJSON
@@ -179,12 +183,12 @@ SPEC CHECKSUMS:
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
   AgoraRtcEngine_iOS: 269d802dafda7090586f8a46db8a684be5019f4f
-  AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   AgoraSyncManager: 33b8ecf2cd80550f156612d6175a0b0ed1d48497
   AgRtmKit2_Test: 92d6b7a5c9718089dc52686117b7e18b72de48df
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   BytedEffect: 74b0bd8150ff1ab9c443d210a7ff7eb49ad3da44
   CallAPI: a86e31907a87d4fefa31eebdfb2a037e07a25e85
+  FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
@@ -194,7 +198,7 @@ SPEC CHECKSUMS:
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  Pure1v1: 0bed5a5b654e0985cb361be2efcab8d15b43be5b
+  Pure1v1: a29e30be7dfe87afdda85cfd5b8845e719c29d3f
   ScoreEffectUI: 1a3bbd83b17cfef1c16a3a4eede2854f89c9eb10
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
@@ -212,6 +216,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: ad670312d865bf996667cabe0c4f97a679e97064
+PODFILE CHECKSUM: 7514b756194c6aea95bcf107e5b5857274510699
 
 COCOAPODS: 1.12.0

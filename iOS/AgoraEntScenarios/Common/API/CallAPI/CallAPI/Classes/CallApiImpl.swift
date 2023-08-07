@@ -20,20 +20,13 @@ public let kMessageTs = "message_timestamp"
 public let kCallId = "callId"
 public let kRemoteUserId = "remoteUserId"
 public let kFromUserId = "fromUserId"
+public let kFromUserExtension = "fromUserExtension"
 public let kFromRoomId = "fromRoomId"
 public let kCalleeState = "state"      //当前呼叫状态
 public let kPublisher = "publisher"    //状态触发的用户uid，目前可以抛出当前用户和主叫的状态，如果无publisher，默认是当前用户
 
 public let kDebugInfo = "debugInfo"    //测试信息，目前是会在主叫onBegin时抛出分步耗时
 public let kDebugInfoMap = "debugInfoMap"    //测试信息，目前是会在主叫onBegin时抛出分步耗时
-
-func callWarningPrint(_ message: String) {
-    callPrint("[CallApi][Warning] \(message)")
-}
-
-func callProfilePrint(_ message: String) {
-    callPrint("[CallApi][Profile] \(message)")
-}
 
 enum CallAction: UInt {
     case call = 0
@@ -63,6 +56,14 @@ public class CallApiImpl: NSObject {
     
     private var recvMessageTsMap: [UInt: Int] = [:]
     private var oneForOneMap: [String: String]?
+    
+    private var reportInfoList: [CallReportInfo] = []
+    private var isChannelJoined: Bool = false {
+        didSet {
+            guard isChannelJoined else {return}
+            _flushReport()
+        }
+    }
     
     /// 当前状态
     private var state: CallStateType = .idle {
@@ -168,6 +169,9 @@ public class CallApiImpl: NSObject {
         if  callId.count > 0 {
             dic[kCallId] = callId
         }
+        if let userExtension = config?.userExtension {
+            dic[kFromUserExtension] = userExtension
+        }
         return dic
     }
     
@@ -231,6 +235,12 @@ extension CallApiImpl {
         }
     }
     
+    private func _notifyTokenPrivilegeWillExpire() {
+        for element in delegates.allObjects {
+            (element as? CallApiListenerProtocol)?.tokenPrivilegeWillExpire?()
+        }
+    }
+    
     //外部状态通知
     private func _notifyState(state: CallStateType,
                               stateReason: CallReason = .none,
@@ -253,7 +263,7 @@ extension CallApiImpl {
             
             self.state = state
         }
-        delegates.objectEnumerator().forEach { element in
+        for element in delegates.allObjects {
             (element as? CallApiListenerProtocol)?.onCallStateChanged(with: state,
                                                                       stateReason: stateReason,
                                                                       eventReason: eventReason,
@@ -291,7 +301,7 @@ extension CallApiImpl {
     }
     
     private func _notifyOptionalFunc(closure: ((CallApiListenerProtocol)->())) {
-        delegates.objectEnumerator().forEach { element in
+        for element in delegates.allObjects {
             guard let target = element as? CallApiListenerProtocol else {return}
             closure(target)
         }
@@ -333,7 +343,7 @@ extension CallApiImpl {
             guard let self = self else {return}
             rtmError = err
             if let err = err {
-                callWarningPrint("_rtmInitialize failed: \(err.localizedDescription)")
+                self.callWarningPrint("_rtmInitialize failed: \(err.localizedDescription)")
                 self._notifyEvent(event: .rtmSetupFailed)
             } else {
                 self._notifyEvent(event: .rtmSetupSuccessed)
@@ -453,10 +463,11 @@ extension CallApiImpl {
                 let errReason = "rtc join already"
                 completion?(NSError(domain: errReason, code: -1))
                 return
-            } else {
-                callWarningPrint(" mismatch channel, leave first! tqarget: \(roomId) current: \(connection.channelId)")
-                config.rtcEngine.leaveChannelEx(connection)
             }
+            
+            callWarningPrint(" mismatch channel, leave first! tqarget: \(roomId) current: \(connection.channelId)")
+            config.rtcEngine.leaveChannelEx(connection)
+            rtcConnection = nil
         }
         
         //需要先开启音视频
@@ -556,6 +567,17 @@ extension CallApiImpl {
         callId = ""
     }
     
+    private func _flushReport() {
+        reportInfoList.forEach { info in
+            self._sendCustomReportMessage(msgId: info.msgId,
+                                          category: info.category,
+                                          event: info.event,
+                                          label: info.label,
+                                          value: info.value)
+        }
+        reportInfoList.removeAll()
+    }
+    
     private func _reportCostEvent(type: CallCostType) {
         _reportEvent(key: type.rawValue, value: _getCost(), messageId: "")
     }
@@ -567,13 +589,31 @@ extension CallApiImpl {
         
         let msgId = "uid=\(config.userId)&messageId=\(messageId)"
         let category = "\(config.mode.rawValue)"
+        if isChannelJoined {
+            _sendCustomReportMessage(msgId: msgId, category: category, event: key, label: callId, value: value)
+            return
+        }
+        
+        let info = CallReportInfo(msgId: msgId, category: category, event: key, label: callId, value: value)
+        reportInfoList.append(info)
+        callPrint("sendCustomReportMessage not join channel cache it! msgId: \(msgId) category: \(category) event: \(key) label: \(callId) value: \(value)")
+    }
+    
+    private func _sendCustomReportMessage(msgId: String,
+                                          category: String,
+                                          event: String,
+                                          label: String,
+                                          value: Int) {
+        guard let config = config, isChannelJoined else {
+            return
+        }
         let ret =
         config.rtcEngine.sendCustomReportMessage(msgId,
                                                  category: category,
-                                                 event: key,
-                                                 label: callId,
+                                                 event: event,
+                                                 label: label,
                                                  value: value)
-        callPrint("sendCustomReportMessage msgId: \(msgId) category: \(category) event: \(key) label: \(callId) value: \(value) : \(ret)")
+        callPrint("sendCustomReportMessage msgId: \(msgId) category: \(category) event: \(event) label: \(label) value: \(value) : \(ret)")
     }
 }
 
@@ -625,7 +665,7 @@ extension CallApiImpl {
     }
     
     //收到呼叫消息
-    private func _onCall(fromRoomId: String, fromUserId: UInt, callId: String) {
+    private func _onCall(fromRoomId: String, fromUserId: UInt, callId: String, userExtension: [String: Any]) {
         //如果不是prepared状态或者不是接收的正在接听的用户的呼叫
         guard state == .prepared || callingUserId == fromUserId else {
             _reject(roomId: fromRoomId, remoteUserId: fromUserId, reason: "callee is currently on call")
@@ -633,10 +673,13 @@ extension CallApiImpl {
         }
         
         self.callId = callId
-        let eventInfo = [kFromRoomId: fromRoomId, kFromUserId: fromUserId, kRemoteUserId: config?.userId ?? 0] as [String : Any]
+        let eventInfo = [kFromRoomId: fromRoomId, kFromUserId: fromUserId, kRemoteUserId: config?.userId ?? 0, kFromUserExtension: userExtension] as [String : Any]
         _notifyState(state: .calling, stateReason: .none, eventInfo: eventInfo)
         _notifyEvent(event: .onCalling)
         guard config?.autoAccept ?? false else {
+            //fix receive '_onCall' twice will reject
+            callingRoomId = fromRoomId
+            callingUserId = fromUserId
             return
         }
         
@@ -647,8 +690,9 @@ extension CallApiImpl {
     private func _onCall(message: [String: Any]) {
         let fromRoomId = message[kFromRoomId] as? String ?? ""
         let fromUserId = message[kFromUserId] as? UInt ?? 0
+        let userExtension = message[kFromUserExtension] as? [String: Any] ?? [:]
         let callId = message[kCallId] as? String ?? ""
-        _onCall(fromRoomId: fromRoomId, fromUserId: fromUserId, callId: callId)
+        _onCall(fromRoomId: fromRoomId, fromUserId: fromUserId, callId: callId, userExtension: userExtension)
     }
     
     //收到取消呼叫消息
@@ -743,12 +787,26 @@ extension CallApiImpl: CallApiProtocol {
         if let roomId = tokenConfig?.roomId, roomId != config.roomId {
             callWarningPrint("renewToken failed, roomid missmatch")
         }
+        callPrint("renewToken with roomId[\(config.roomId)]")
         self.tokenConfig = config
         messageManager?.renewToken(rtmToken: config.rtmToken)
-        guard let connection = rtcConnection else { return }
+        guard let connection = rtcConnection, connection.channelId == config.roomId else {
+            callWarningPrint("renewToken fail! connection.channelId[\(rtcConnection?.channelId)] != config.roomId[\(config.roomId)]")
+            return
+        }
         let options = AgoraRtcChannelMediaOptions()
         options.token = config.rtcToken
+        let ret =
         self.config?.rtcEngine.updateChannelEx(with: options, connection: connection)
+        callPrint("rtc[\(config.roomId)] renewToken ret = \(ret)")
+    }
+    
+    public func renewRemoteCallerChannelToken(roomId: String, token: String) {
+        guard let connection = rtcConnection, connection.channelId == roomId, let rtcEngine = self.config?.rtcEngine else { return }
+        let options = AgoraRtcChannelMediaOptions()
+        options.token = token
+        let ret = rtcEngine.updateChannelEx(with: options, connection: connection)
+        callPrint("rtc[\(roomId)] renewRemoteCallerChannelToken ret = \(ret)")
     }
     
     public func prepareForCall(prepareConfig: PrepareConfig, completion: ((NSError?) -> ())?) {
@@ -804,8 +862,8 @@ extension CallApiImpl: CallApiProtocol {
             messageManager?.sendMessage(roomId: roomId, fromRoomId: fromRoomId, message: message) {[weak self] err in
                 guard let self = self else { return }
                 
-                if let _ = err {
-                    self._notifyState(state: .prepared, stateReason: .messageFailed)
+                if let error = err {
+                    self._notifyState(state: .prepared, stateReason: .messageFailed, eventReason: error.localizedDescription)
                     self._notifyEvent(event: .messageFailed)
                     return
                 }
@@ -914,6 +972,10 @@ extension CallApiImpl: CallApiProtocol {
 
 //MARK: AgoraRtmClientDelegate
 extension CallApiImpl: AgoraRtmClientDelegate {
+    public func rtmKit(_ rtmKit: AgoraRtmClientKit, onTokenPrivilegeWillExpire channel: String?) {
+        _notifyTokenPrivilegeWillExpire()
+    }
+    
     //收到RTM消息
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, on event: AgoraRtmMessageEvent) {
         let message = event.message
@@ -924,7 +986,7 @@ extension CallApiImpl: AgoraRtmClientDelegate {
               let msgTs = dic[kMessageTs] as? Int,
               let userId = dic[kFromUserId] as? UInt,
               let messageVersion = dic[kMessageVersion] as? String else {
-            callWarningPrint("fail to parse message: \(message)")
+            callWarningPrint("fail to parse message: \(message.getType().rawValue)")
             return
         }
         
@@ -1005,6 +1067,14 @@ extension CallApiImpl: AgoraRtmClientDelegate {
 
 //MARK: AgoraRtcEngineDelegate
 extension CallApiImpl: AgoraRtcEngineDelegate {
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
+        _notifyTokenPrivilegeWillExpire()
+    }
+    
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, connectionChangedTo state: AgoraConnectionState, reason: AgoraConnectionChangedReason) {
+        callPrint("connectionChangedTo state: \(state.rawValue) reason: \(reason.rawValue)")
+    }
+    
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         callPrint("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
         guard callingUserId == uid, let roomId = callingRoomId, let config = config else {
@@ -1030,6 +1100,7 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didLeaveChannelWith stats: AgoraChannelStats) {
         callPrint("didLeaveChannelWith")
+        isChannelJoined = false
         _notifyEvent(event: .localLeave)
 //        _notifyState(state: state, stateReason: .localLeave)
     }
@@ -1039,6 +1110,7 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
         guard uid == config?.userId ?? 0 else {
             return
         }
+        isChannelJoined = true
         joinRtcCompletion?(nil)
         joinRtcCompletion = nil
         
@@ -1070,9 +1142,49 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
 }
 
 extension CallApiImpl: CallMessageDelegate {
+    func debugInfo(message: String) {
+        callPrint(message)
+    }
+    
+    func debugWarning(message: String) {
+        callWarningPrint(message)
+    }
+    
     func onMissReceipts(message: [String : Any]) {
         callWarningPrint("onMissReceipts: \(message)")
         _notifyEvent(event: .missingReceipts)
 //        _notifyState(state: state, stateReason: .missingReceipts, eventInfo: message)
+    }
+}
+
+#if DEBUG
+let formatter = DateFormatter()
+#endif
+func debugPrint(_ message: String) {
+#if DEBUG
+    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+    let timeString = formatter.string(from: Date())
+    print("\(timeString) \(message)")
+#endif
+}
+
+extension CallApiImpl {
+    func callPrint(_ message: String) {
+        for element in delegates.allObjects {
+            (element as? CallApiListenerProtocol)?.debugInfo?(message: message)
+        }
+    
+        debugPrint("[CallApi]\(message)")
+    }
+
+    func callWarningPrint(_ message: String) {
+        for element in delegates.allObjects {
+            (element as? CallApiListenerProtocol)?.debugWarning?(message: message)
+        }
+        callPrint("[Warning]\(message)")
+    }
+
+    func callProfilePrint(_ message: String) {
+        callPrint("[Profile]\(message)")
     }
 }

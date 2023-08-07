@@ -20,7 +20,12 @@ class Pure1v1CallViewController: UIViewController {
     }
     var appId: String = ""
     var rtcEngine: AgoraRtcEngineKit?
-    var currentUser: Pure1v1UserInfo?
+    var currentUser: Pure1v1UserInfo? {
+        didSet {
+            smallCanvasView.titleLabel.text = currentUser?.userName ?? ""
+            smallCanvasView.sizeToFit()
+        }
+    }
     var targetUser: Pure1v1UserInfo? {
         didSet {
             roomInfoView.setRoomInfo(avatar: targetUser?.avatar ?? "",
@@ -40,9 +45,9 @@ class Pure1v1CallViewController: UIViewController {
     }
     private lazy var moveViewModel: MoveGestureViewModel = MoveGestureViewModel()
     private lazy var roomInfoView: Pure1v1RoomInfoView = Pure1v1RoomInfoView()
-    lazy var bigCanvasView: UIView = UIView()
-    lazy var smallCanvasView: UIView = {
-        let view = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 109, height: 163)))
+    lazy var bigCanvasView: Pure1v1CanvasView = Pure1v1CanvasView()
+    lazy var smallCanvasView: Pure1v1CanvasView = {
+        let view = Pure1v1CanvasView(frame: CGRect(origin: .zero, size: CGSize(width: 109, height: 163)))
         view.backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
         view.addGestureRecognizer(moveViewModel.gesture)
         return view
@@ -205,53 +210,60 @@ extension Pure1v1CallViewController: AgoraRtcEngineDelegate {
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         pure1v1Print("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
     }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
+        pure1v1Warn("contentInspectResult: \(result.rawValue)")
+        guard result != .neutral else { return }
+        AUIToast.show(text: "call_content_inspect_warning".pure1v1Localization())
+    }
 }
 
 extension Pure1v1CallViewController: CallApiListenerProtocol {
-        func onCallStateChanged(with state: CallStateType,
-                                stateReason: CallReason,
-                                eventReason: String,
-                                elapsed: Int,
-                                eventInfo: [String : Any]) {
-            let publisher = eventInfo[kPublisher] as? String ?? currentUser?.userId
-            guard publisher == currentUser?.userId else {
-                return
-            }
-            
-            switch state {
-            case .connected:
-                let connection = AgoraRtcConnection()
-                assert(targetUser != nil, "targetUser == nil")
-                connection.channelId = targetUser?.getRoomId() ?? ""
-                connection.localUid = UInt(currentUser?.userId ?? "") ?? 0
-                setupContentInspectConfig(true, connection: connection)
-                moderationAudio()
-                break
-            case .prepared, .idle:
-//                guard let targetUser = targetUser, let currentUser = currentUser else {return}
-//                let connection = AgoraRtcConnection()
-//                connection.channelId = targetUser.getRoomId() ?? ""
-//                connection.localUid = UInt(currentUser.userId ?? "") ?? 0
-//                setupContentInspectConfig(false, connection: connection)
-                break
-            default:
-                break
-            }
+    func onCallStateChanged(with state: CallStateType,
+                            stateReason: CallReason,
+                            eventReason: String,
+                            elapsed: Int,
+                            eventInfo: [String : Any]) {
+        let publisher = eventInfo[kPublisher] as? String ?? currentUser?.userId
+        guard publisher == currentUser?.userId else {
+            return
         }
         
-        func onCallEventChanged(with event: CallEvent, elapsed: Int) {
-            pure1v1Print("onCallEventChanged: \(event.rawValue)")
-            switch event {
-            case .localLeave, .remoteLeave:
-                _hangupAction()
-            default:
-                break
-            }
+        switch state {
+        case .connected:
+            let connection = AgoraRtcConnection()
+            assert(targetUser != nil, "targetUser == nil")
+            connection.channelId = targetUser?.getRoomId() ?? ""
+            connection.localUid = UInt(currentUser?.userId ?? "") ?? 0
+            setupContentInspectConfig(true, connection: connection)
+            moderationAudio()
+            break
+        default:
+            break
         }
+    }
+    
+    func onCallEventChanged(with event: CallEvent, elapsed: Int) {
+        pure1v1Print("onCallEventChanged: \(event.rawValue)")
+        switch event {
+        case .localLeave, .remoteLeave:
+            _hangupAction()
+        default:
+            break
+        }
+    }
+    
+    func debugInfo(message: String) {
+        pure1v1Print(message, context: "CallApi")
+    }
+    func debugWarning(message: String) {
+        pure1v1Warn(message, context: "CallApi")
+    }
 }
 
 extension Pure1v1CallViewController {
     private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
+        guard let rtcEngine = rtcEngine else {return}
         let config = AgoraContentInspectConfig()
         let dic: [String: String] = [
             "id": "\(connection.localUid)",
@@ -269,8 +281,8 @@ extension Pure1v1CallViewController {
         module.interval = 30
         module.type = .imageModeration
         config.modules = [module]
-        let ret = rtcEngine?.enableContentInspectEx(enable, config: config, connection: connection)
-        pure1v1Print("setupContentInspectConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret ?? -1)")
+        let ret = rtcEngine.enableContentInspectEx(enable, config: config, connection: connection)
+        pure1v1Print("setupContentInspectConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
     }
     
     /// 语音审核
