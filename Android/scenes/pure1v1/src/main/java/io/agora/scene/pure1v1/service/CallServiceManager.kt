@@ -20,6 +20,8 @@ class CallServiceManager {
 
     private val TAG = "CallServiceManager_LOG"
 
+    var rtcEngine: RtcEngineEx? = null
+
     var callApi: ICallApi? = null
 
     var sceneService: Pure1v1ServiceImp? = null
@@ -55,6 +57,7 @@ class CallServiceManager {
     }
 
     fun cleanUp() {
+        rtcEngine = null
         tokenConfig = null
         localUser = null
         remoteUser = null
@@ -102,12 +105,14 @@ class CallServiceManager {
         val user = localUser ?: return
         val localView = localCanvas ?: return
         val remoteView = remoteCanvas ?: return
-
+        val engine = createRtcEngine()
+        rtcEngine = engine
         val config = CallConfig(
             BuildConfig.AGORA_APP_ID,
             user.userId.toInt(),
             null,
-            createRtcEngine(),
+            null,
+            engine,
             CallMode.Pure1v1,
             CallRole.CALLER,
             localView,

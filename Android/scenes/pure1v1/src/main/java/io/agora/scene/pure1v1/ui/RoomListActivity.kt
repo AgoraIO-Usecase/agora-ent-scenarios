@@ -16,8 +16,12 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import io.agora.rtc2.RtcConnection
+import io.agora.rtc2.video.ContentInspectConfig
+import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.GlideOptions
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.callAPI.*
@@ -27,6 +31,8 @@ import io.agora.scene.pure1v1.service.CallServiceManager
 import io.agora.scene.pure1v1.service.PermissionHelp
 import io.agora.scene.pure1v1.service.UserInfo
 import io.agora.scene.widget.utils.BlurTransformation
+import org.json.JSONException
+import org.json.JSONObject
 
 class RoomListActivity : AppCompatActivity(), ICallApiListener {
 
@@ -139,14 +145,14 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
         eventInfo: Map<String, Any>
     ) {
         val currentUid = CallServiceManager.instance.localUser?.userId ?: ""
-        val publisher = eventInfo[kPublisher] as? String ?: currentUid
+        val publisher = eventInfo[CallApiImpl.kPublisher] as? String ?: currentUid
         if (publisher != currentUid) {return}
         callState = state
         when (state) {
             CallStateType.Calling -> {
-                val fromUserId = eventInfo[kFromUserId] as? Int ?: 0
-                val fromRoomId = eventInfo[kFromRoomId] as? String ?: ""
-                val toUserId = eventInfo[kRemoteUserId] as? Int ?: 0
+                val fromUserId = eventInfo[CallApiImpl.kFromUserId] as? Int ?: 0
+                val fromRoomId = eventInfo[CallApiImpl.kFromRoomId] as? String ?: ""
+                val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
                 val remoteUser = CallServiceManager.instance.remoteUser
                 if (remoteUser != null && remoteUser.userId != fromUserId.toString())  {
                     CallServiceManager.instance.callApi?.reject(fromRoomId, fromUserId, "already calling") { err ->
@@ -187,9 +193,15 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
             }
             CallStateType.Connected -> {
                 if (CallServiceManager.instance.remoteUser == null) { return }
+                // 进入通话页面
                 callDialog?.dismiss()
                 val intent = Intent(this, CallDetailActivity::class.java)
                 startActivity(intent)
+                // 开启鉴黄鉴暴
+                val channelId = CallServiceManager.instance.remoteUser?.getRoomId() ?: ""
+                val localUid = CallServiceManager.instance.localUser?.userId?.toInt() ?: 0
+                setupContentInspectConfig(true, RtcConnection(channelId, localUid))
+                moderationAudio()
             }
             CallStateType.Prepared -> {
                 when(stateReason) {
@@ -216,6 +228,31 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
             { finish() },
             true
         )
+    }
+
+    private fun setupContentInspectConfig(enable: Boolean, connection: RtcConnection) {
+        val contentInspectConfig = ContentInspectConfig()
+        try {
+            val jsonObject = JSONObject()
+            jsonObject.put("sceneName", "Pure1v1")
+            jsonObject.put("id", UserManager.getInstance().user.id)
+            jsonObject.put("userNo", UserManager.getInstance().user.userNo)
+            contentInspectConfig.extraInfo = jsonObject.toString()
+            val module = ContentInspectConfig.ContentInspectModule()
+            module.interval = 30
+            module.type = ContentInspectConfig.CONTENT_INSPECT_TYPE_IMAGE_MODERATION
+            contentInspectConfig.modules = arrayOf( module)
+            contentInspectConfig.moduleCount = 1
+            CallServiceManager.instance.rtcEngine?.enableContentInspectEx(enable, contentInspectConfig, connection)
+        }
+        catch (_: JSONException) {
+        }
+    }
+    /// 语音审核
+    private fun moderationAudio() {
+        val channelName = CallServiceManager.instance.remoteUser?.userId ?: ""
+        val uid = CallServiceManager.instance.localUser?.userId?.toLong() ?: 0
+        AudioModeration.moderationAudio(channelName, uid, AudioModeration.AgoraChannelType.broadcast, "Pure1v1")
     }
 
     private fun setupView() {

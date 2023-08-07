@@ -92,7 +92,6 @@ class CallMessageManager(
             return
         }
         val rtmClient = this.rtmClient
-
         if (prepareConfig.autoLoginRTM && !isLoginedRTM) {
             loginRTM(rtmClient, rtmToken) { err ->
                 if (err != null) {
@@ -119,7 +118,7 @@ class CallMessageManager(
 
     /// 更新RTM token
     /// - Parameter rtmToken: <#rtmToken description#>
-    public fun renewToken(rtmToken: String) {
+    fun renewToken(rtmToken: String) {
         if (!isLoginedRTM) { return }
         rtmClient.renewToken(rtmToken, object : ResultCallback<Void> {
             override fun onSuccess(responseInfo: Void?) {
@@ -136,7 +135,7 @@ class CallMessageManager(
     ///   - message: 发送的消息字典
     ///   - retryCount: 重试次数
     ///   - completion: <#completion description#>
-    public fun sendMessage(roomId: String, fromRoomId: String, message: Map<String, Any>, retryCount: Int = 3,completion: ((AGError?)-> Unit)?) {
+    fun sendMessage(roomId: String, fromRoomId: String, message: Map<String, Any>, retryCount: Int = 3,completion: ((AGError?)-> Unit)?) {
         messageId += 1
         messageId %= Int.MAX_VALUE
         val map = message.toMutableMap()
@@ -147,7 +146,7 @@ class CallMessageManager(
         _sendMessage(roomId, map, retryCount, completion)
     }
 
-    public fun setPresenceState(attr:Map<String, Any>, retryCount: Int = 3, completion: ((AGError?) -> Unit)?) {
+    fun setPresenceState(attr:Map<String, Any>, retryCount: Int = 3, completion: ((AGError?) -> Unit)?) {
         if (config.mode != CallMode.ShowTo1v1) {
             completion?.invoke(AGError("can not be set presence in 'pure 1v1' mode", -1))
             return
@@ -193,7 +192,7 @@ class CallMessageManager(
     /// - Parameters:
     ///   - keys: 需要清理的presence的key 数组
     ///   - completion: <#completion description#>
-    public fun removePresenceState(keys: ArrayList<String>, completion: ((AGError?) -> Unit)?) {
+    fun removePresenceState(keys: ArrayList<String>, completion: ((AGError?) -> Unit)?) {
         val presence = rtmClient.presence ?: run {
             completion?.invoke(AGError("not presence", -1))
             return
@@ -359,8 +358,6 @@ class CallMessageManager(
             override fun onFailure(errorInfo: ErrorInfo?) {
                 if (retryCount <= 1) {
                     val msg = errorInfo?.errorReason ?: "error"
-                    val co = errorInfo?.errorCode
-                    co?.name
                     completion?.invoke(AGError(msg, -1))
                 } else {
                     _sendMessage(roomId, message, retryCount - 1, completion)
@@ -404,6 +401,11 @@ class CallMessageManager(
         Log.d(TAG, "login ret: $ret")
     }
     //MARK: AgoraRtmClientDelegate
+    override fun onTokenPrivilegeWillExpire(channelName: String?) {
+        Log.d(TAG, "rtm onTokenPrivilegeWillExpire[${channelName ?: "nil"}]")
+        rtmListener?.onTokenPrivilegeWillExpire(channelName)
+    }
+
     override fun onMessageEvent(event: MessageEvent?) {
         val message = event?.message?.data as? ByteArray ?: return
         val jsonString = String(message, Charsets.ISO_8859_1)
@@ -440,8 +442,6 @@ class CallMessageManager(
         state: RtmConstants.RtmConnectionState?,
         reason: RtmConstants.RtmConnectionChangeReason?
     ) {}
-    override fun onTokenPrivilegeWillExpire(channelName: String?) {}
-
     private fun jsonStringToMap(jsonString: String): Map<String, Any> {
         val json = JSONObject(jsonString)
         val map = mutableMapOf<String, Any>()
