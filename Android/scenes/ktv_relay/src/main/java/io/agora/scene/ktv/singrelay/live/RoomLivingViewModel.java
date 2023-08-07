@@ -648,7 +648,7 @@ public class RoomLivingViewModel extends ViewModel {
                 songNum = data.size();
                 songsOrderedLiveData.postValue(data);
 
-                if (singRelayGameStatusMutableLiveData.getValue() == GameStatus.ON_WAITING) {
+                if (singRelayGameStatusMutableLiveData.getValue() == GameStatus.ON_WAITING && data.size() > 0) {
                     // 歌曲选择成功后，开始游戏
                     ktvServiceProtocol.startSingRelayGame(err -> {
                         if (err != null) {
