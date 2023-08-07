@@ -147,6 +147,10 @@ public class CallTokenConfig: NSObject {
     ///   - toUserId: 接收呼叫的用户id
     @objc optional func onOneForOneCache(oneForOneRoomId: String, fromUserId: UInt, toUserId: UInt)
     
+    
+    /// token快要过期了
+    @objc optional func tokenPrivilegeWillExpire()
+    
     @objc optional func debugInfo(message: String)
     @objc optional func debugWarning(message: String)
 }

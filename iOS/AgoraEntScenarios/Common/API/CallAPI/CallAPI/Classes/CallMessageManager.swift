@@ -487,6 +487,10 @@ extension CallMessageManager {
 
 //MARK: AgoraRtmClientDelegate
 extension CallMessageManager: AgoraRtmClientDelegate {
+    func rtmKit(_ rtmKit: AgoraRtmClientKit, onTokenPrivilegeWillExpire channel: String?) {
+        callMessagePrint("rtm onTokenPrivilegeWillExpire[\(channel ?? "nil")]")
+        self.rtmDelegate?.rtmKit?(rtmKit, onTokenPrivilegeWillExpire: channel)
+    }
     //收到RTM消息
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, on event: AgoraRtmMessageEvent) {
         let message = event.message
