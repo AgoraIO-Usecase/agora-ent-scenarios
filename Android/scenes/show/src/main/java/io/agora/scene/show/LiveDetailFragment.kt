@@ -510,7 +510,8 @@ class LiveDetailFragment : Fragment() {
         // 上行丢包率、下行丢包率
         upLossPackage: Int? = null, downLossPackage: Int? = null,
         // 上行码率、下行码率
-        upBitrate: Int? = null, downBitrate: Int? = null
+        upBitrate: Int? = null, downBitrate: Int? = null,
+        codecType: Int? = null
     ) {
         activity ?: return
         val topBinding = mBinding.topLayout
@@ -565,11 +566,22 @@ class LiveDetailFragment : Fragment() {
         topBinding.tvStatisticDeviceGrade.isVisible = true
         val score = mRtcEngine.queryDeviceScore()
         if (score >= 90) {
-            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_high))
+            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_high)) + "（$score）"
         } else if (score >= 75) {
-            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_medium))
+            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_medium)) + "（$score）"
         } else {
-            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_low))
+            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_low)) + "（$score）"
+        }
+        // H265开关
+        topBinding.tvStatisticH265.isVisible = true
+        if (isRoomOwner) {
+            // TODO 本期不做实时数据反馈
+//            codecType?.let {
+//                topBinding.tvStatisticH265.text = getString(R.string.show_statistic_h265, if (it == 3) "开" else "关")
+//            }
+            topBinding.tvStatisticH265.text = getString(R.string.show_statistic_h265, "开")
+        } else {
+            topBinding.tvStatisticSR.text = getString(R.string.show_statistic_h265, "--")
         }
         // 超分开关
         topBinding.tvStatisticSR.isVisible = true
@@ -1306,7 +1318,8 @@ class LiveDetailFragment : Fragment() {
                         upBitrate = stats.sentBitrate,
                         encodeFps = stats.encoderOutputFrameRate,
                         upLossPackage = stats.txPacketLossRate,
-                        encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight)
+                        encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight),
+                        codecType = stats.codecType
                     )
                 }
             },
@@ -1490,6 +1503,7 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun destroyRtcEngine(isScrolling: Boolean): Boolean {
+        if (isRoomOwner) mRtcEngine.stopPreview()
         return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection, !isScrolling)
     }
 

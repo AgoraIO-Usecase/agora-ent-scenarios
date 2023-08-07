@@ -37,6 +37,7 @@ import com.sensetime.stmobile.STMobileAnimalNative;
 import com.sensetime.stmobile.STMobileEffectNative;
 import com.sensetime.stmobile.STMobileEffectParams;
 import com.sensetime.stmobile.STMobileHumanActionNative;
+import com.sensetime.stmobile.params.STEffectBeautyGroup;
 import com.sensetime.stmobile.params.STEffectBeautyType;
 import com.sensetime.stmobile.params.STHumanActionParamsType;
 
@@ -45,7 +46,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import io.agora.beautyapi.sensetime.utils.processor.IBeautyProcessor;
 import io.agora.beautyapi.sensetime.utils.processor.IBeautyProcessorKt;
@@ -80,6 +83,7 @@ public class STRenderKit {
     private IBeautyProcessor mProcessor;
     private String mCurrentSticker;
     private final LinkedHashMap<Integer, String> mCurrentStickerMaps = new LinkedHashMap<>();
+    private final LinkedHashMap<Integer, String> mCurrentStyleMaps = new LinkedHashMap<>();
 
     private boolean isSensorEnable;
     private final String mResourcePath;
@@ -292,6 +296,13 @@ public class STRenderKit {
         mChangeStickerManagerHandler.sendMessage(msg);
     }
 
+    public void removeStickers(){
+        Set<Map.Entry<Integer, String>> entries = new LinkedHashSet<>(mCurrentStickerMaps.entrySet());
+        for (Map.Entry<Integer, String> entry : entries) {
+            removeSticker(entry.getKey());
+        }
+    }
+
     public void removeSticker(String path) {
         int packageId = -1;
         for (Map.Entry<Integer, String> entry : mCurrentStickerMaps.entrySet()) {
@@ -310,6 +321,23 @@ public class STRenderKit {
         if (result == 0) {
             mCurrentStickerMaps.remove(packageId);
         }
+    }
+
+    public void cleanStyle(){
+        for (Integer packageId : mCurrentStyleMaps.keySet()) {
+            mSTMobileEffectNative.removeEffect(packageId);
+        }
+        mCurrentStyleMaps.clear();
+    }
+
+    public void setStyle(String stylePath, float filterStrength, float makeupStrength){
+        cleanStyle();
+
+        int packageId = mSTMobileEffectNative.addPackage(stylePath);
+        //updateHumanActionDetectConfig(); // TODO
+        setPackageBeautyGroupStrength(packageId, STEffectBeautyGroup.EFFECT_BEAUTY_GROUP_FILTER, filterStrength);
+        setPackageBeautyGroupStrength(packageId, STEffectBeautyGroup.EFFECT_BEAUTY_GROUP_MAKEUP, makeupStrength);
+        mCurrentStyleMaps.put(packageId, stylePath);
     }
 
     public void release() {

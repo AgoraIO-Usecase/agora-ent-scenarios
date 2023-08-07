@@ -69,7 +69,8 @@ class LivePKRequestMessageFragment : BaseFragment() {
      */
     fun setPKInvitationItemStatus(userName: String, status: Int?) {
         if (mBinding == null) return
-        updateUI(userName, status)
+        // TODO fix crash
+        //updateUI(userName, status)
     }
 
     fun setListener(listener: Listener) {

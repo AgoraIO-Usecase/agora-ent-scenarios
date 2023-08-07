@@ -163,7 +163,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         } else if (itemId == ITEM_ID_EFFECT_CWEI) {
             setStyleItem("style_lightly" + File.separator + "wanneng.zip", intensity);
         } else if (itemId == ITEM_ID_EFFECT_NONE) {
-            //mSTRenderer.cleanStyle();
+            mSTRenderer.cleanStyle();
         }
     }
 
@@ -174,7 +174,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         }
 
         if (itemId == ITEM_ID_STICKER_NONE) {
-            //mSTRenderer.removeStickers();
+            mSTRenderer.removeStickers();
         } else if (itemId == ITEM_ID_STICKER_HUAHUA) {
             setStickerItem("sticker_face_shape" + File.separator + "lianxingface.zip");
         }
@@ -187,7 +187,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         String fileName = split[1];
         String path = FileUtils.getFilePath(mContext, className + File.separator + fileName);
         FileUtils.copyFileIfNeed(mContext, fileName, className);
-        //mSTRenderer.setStyle(path, strength, strength);
+        mSTRenderer.setStyle(path, strength, strength);
     }
 
     private void setFilterItem(String filterPath, float strength) {
