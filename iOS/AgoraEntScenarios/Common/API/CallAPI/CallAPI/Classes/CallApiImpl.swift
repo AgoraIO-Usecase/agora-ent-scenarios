@@ -227,6 +227,12 @@ extension CallApiImpl {
         }
     }
     
+    private func _notifyTokenPrivilegeWillExpire() {
+        for element in delegates.allObjects {
+            (element as? CallApiListenerProtocol)?.tokenPrivilegeWillExpire?()
+        }
+    }
+    
     //外部状态通知
     private func _notifyState(state: CallStateType,
                               stateReason: CallReason = .none,
@@ -929,6 +935,10 @@ extension CallApiImpl: CallApiProtocol {
 
 //MARK: AgoraRtmClientDelegate
 extension CallApiImpl: AgoraRtmClientDelegate {
+    public func rtmKit(_ rtmKit: AgoraRtmClientKit, onTokenPrivilegeWillExpire channel: String?) {
+        _notifyTokenPrivilegeWillExpire()
+    }
+    
     //收到RTM消息
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, on event: AgoraRtmMessageEvent) {
         let message = event.message
@@ -1020,6 +1030,10 @@ extension CallApiImpl: AgoraRtmClientDelegate {
 
 //MARK: AgoraRtcEngineDelegate
 extension CallApiImpl: AgoraRtcEngineDelegate {
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
+        _notifyTokenPrivilegeWillExpire()
+    }
+    
     public func rtcEngine(_ engine: AgoraRtcEngineKit, connectionChangedTo state: AgoraConnectionState, reason: AgoraConnectionChangedReason) {
         callPrint("connectionChangedTo state: \(state.rawValue) reason: \(reason.rawValue)")
     }
