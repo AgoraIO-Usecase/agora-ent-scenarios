@@ -207,6 +207,10 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
         
         switch state {
         case .calling:
+            if presentedViewController == callVC {
+                return
+            }
+            
             let fromUserId = eventInfo[kFromUserId] as? UInt ?? 0
             let fromRoomId = eventInfo[kFromRoomId] as? String ?? ""
             let toUserId = eventInfo[kRemoteUserId] as? UInt ?? 0
