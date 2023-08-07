@@ -22,6 +22,8 @@ open class CallConfig(
     var appId: String = "",
     //用户id
     var userId: Int = 0,
+    //用户扩展字段,用在呼叫上，对端收到calling时可以通过kFromUserExtension字段读到
+    var userExtension: Map<String, Any>? = null,
     //房主房间id，秀场转1v1可用
     var ownerRoomId: String? = null,
     //rtc engine实例
@@ -157,6 +159,9 @@ public interface ICallApiListener {
      * @param toUserId 接收呼叫的用户id
      */
     fun onOneForOneCache(oneForOneRoomId: String, fromUserId: Int, toUserId: Int) {}
+
+    /// token快要过期了
+    fun tokenPrivilegeWillExpire() {}
 }
 
 data class AGError(
@@ -174,6 +179,9 @@ public interface ICallApi {
 
     // 更新 rtc/rtm 的token
     fun renewToken(config: CallTokenConfig)
+
+    // 更新呼叫token
+    fun renewRemoteCallerChannelToken(roomId: String, token: String)
 
     // 连接(对RTM进行login和subscribe)， 观众调用
     fun prepareForCall(prepareConfig: PrepareConfig, completion: ((AGError?) -> Unit)?)

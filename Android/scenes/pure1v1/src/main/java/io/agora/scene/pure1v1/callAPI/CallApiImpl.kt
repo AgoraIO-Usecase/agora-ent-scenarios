@@ -32,18 +32,18 @@ enum class CallCostType(val value: String) {
     RecvFirstFrame("recvFirstFrame")
 }
 
-val kRemoteUserId = "remoteUserId"
-val kFromUserId = "fromUserId"
-val kFromRoomId = "fromRoomId"
-val kPublisher = "publisher"
-
 class CallApiImpl(
     private val context: Context
 ): ICallApi, RtmEventListener, CallMessageListener, IRtcEngineEventHandler() {
 
     companion object {
+        val kPublisher = "publisher"
         val kDebugInfo = "debugInfo"    //测试信息，目前是会在主叫onBegin时抛出分步耗时
         val kDebugInfoMap = "debugInfoMap"    //测试信息，目前是会在主叫onBegin时抛出分步耗时
+        val kRemoteUserId = "remoteUserId"
+        val kFromUserId = "fromUserId"
+        val kFromRoomId = "fromRoomId"
+        val kFromUserExtension = "fromUserExtension"
     }
 
     private val kRetryCount: Int = 3
@@ -55,7 +55,6 @@ class CallApiImpl(
 
     private val kCallId = "callId"
     private val kCalleeState = "state"      //当前呼叫状态
-    private val kPublisher = "publisher"
     private val kDebugInfo = "debugInfo"
     private val kDebugInfoMap = "debugInfoMap"    //测试信息，目前是会在主叫onBegin时抛出分步耗时
 
@@ -70,6 +69,13 @@ class CallApiImpl(
     private var recvMessageTsMap = mutableMapOf<Int, Long>()
     private var oneForOneMap: Map<String, String>? = null
 
+    private var reportInfoList = mutableListOf<CallReportInfo>()
+    private var isChannelJoined = false
+        set(value) {
+            field = value
+            if (!isChannelJoined) { return }
+            _flushReport()
+        }
     private val mHandler = Handler(Looper.getMainLooper())
     private var timeOutRunnable: Runnable? = null
     /// 当前状态
@@ -157,6 +163,10 @@ class CallApiImpl(
         if (callId.isNotBlank()) {
             dic[kCallId] = callId
         }
+        val ext = config?.userExtension
+        if (ext != null) {
+            dic[kFromUserExtension] = ext
+        }
         return dic
     }
     //获取ntp时间
@@ -203,6 +213,12 @@ class CallApiImpl(
         } else if (prevState != CallStateType.Idle && state == CallStateType.Prepared) {
             _leaveRTC()
             _cleanCallCache()
+        }
+    }
+
+    private fun _notifyTokenPrivilegeWillExpire() {
+        delegates.forEach { listener ->
+            listener.tokenPrivilegeWillExpire()
         }
     }
 
@@ -416,9 +432,7 @@ class CallApiImpl(
             )
             val elapsed = System.currentTimeMillis() - startTime
             _notifyState(CallStateType.Connecting, CallReason.RecvRemoteFirstFrame, elapsed = elapsed)
-            _notifyState(
-                CallStateType.Connected,
-                CallReason.RecvRemoteFirstFrame, elapsed = elapsed, eventInfo = eventInfo)
+            _notifyState(CallStateType.Connected, CallReason.RecvRemoteFirstFrame, elapsed = elapsed, eventInfo = eventInfo)
             _notifyEvent(CallEvent.RecvRemoteFirstFrame, elapsed)
         }
         if (ret != Constants.ERR_OK) {
@@ -461,7 +475,12 @@ class CallApiImpl(
         oneForOneMap = null
         callId = ""
     }
-
+    private fun _flushReport() {
+        reportInfoList.forEach { info ->
+            _sendCustomReportMessage(info.msgId, info.category, info.event, info.label, info.value)
+        }
+        reportInfoList.clear()
+    }
     private fun _reportCostEvent(type: CallCostType) {
         _reportEvent(type.value, _getCost().toInt(), "")
     }
@@ -471,8 +490,26 @@ class CallApiImpl(
         val engine = cfg.rtcEngine ?: return
         val msgId = "uid=${cfg.userId}&messageId=$messageId"
         val category = "${cfg.mode.value}"
-        val ret = engine.sendCustomReportMessage(msgId, category, key, callId, value)
-        Log.d(TAG, "sendCustomReportMessage msgId: $msgId category: $category event: $key label: $callId value: $value : $ret")
+        if (isChannelJoined) {
+            _sendCustomReportMessage(msgId, category, key, callId, value)
+            return
+        }
+        val info = CallReportInfo(msgId, category, key, callId, value)
+        reportInfoList.add(info)
+        Log.d(TAG, "sendCustomReportMessage not join channel cache it! msgId: $msgId category: $category event: $key label: $callId value: $value")
+    }
+
+    private fun _sendCustomReportMessage(msgId: String,
+                                         category: String,
+                                         event: String,
+                                         label: String,
+                                         value: Int) {
+        val c = config
+        if (c != null && isChannelJoined) else {
+            return
+        }
+        val ret = c.rtcEngine?.sendCustomReportMessage(msgId, category, event, label, value)
+        Log.d(TAG, "sendCustomReportMessage msgId: $msgId category: $category event: $event label: $label value: $value : $ret")
     }
 
     //MARK: on Message
@@ -522,7 +559,7 @@ class CallApiImpl(
     }
 
     //收到呼叫消息
-    private fun _onCall(fromRoomId: String, fromUserId: Int, callId: String) {
+    private fun _onCall(fromRoomId: String, fromUserId: Int, callId: String, userExtension: Map<String, Any>) {
         //如果不是prepared状态或者不是接收的正在接听的用户的呼叫
         if (!(state == CallStateType.Prepared || callingUserId == fromUserId)) {
             _reject(fromRoomId, fromUserId, "callee is currently on call")
@@ -533,10 +570,13 @@ class CallApiImpl(
             Pair(kFromRoomId, fromRoomId),
             Pair(kFromUserId, fromUserId),
             Pair(kRemoteUserId, config?.userId ?: 0),
+            Pair(kFromUserExtension, userExtension)
         )
         _notifyState(CallStateType.Calling, CallReason.None, eventInfo = eventInfo)
         _notifyEvent(CallEvent.OnCalling)
         if (config?.autoAccept == false) {
+            callingRoomId = fromRoomId
+            callingUserId = fromUserId
             return
         }
         accept(fromRoomId, fromUserId, tokenConfig?.rtcToken ?: "") {
@@ -545,8 +585,9 @@ class CallApiImpl(
     private fun _onCall(message: Map<String, Any>) {
         val fromRoomId = message[kFromRoomId] as String
         val fromUserId = message[kFromUserId] as Int
-        val callId = message[kCallId] as? String ?: ""
-        _onCall(fromRoomId, fromUserId, callId)
+        val callId = message[kCallId] as String
+        val userExtension = message[kFromUserExtension] as Map<String, Any>
+        _onCall(fromRoomId, fromUserId, callId, userExtension)
     }
 
     private fun _onCancel(message: Map<String, Any>) {
@@ -586,11 +627,11 @@ class CallApiImpl(
     }
 
     override fun addRTCListener(listener: IRtcEngineEventHandler) {
-        TODO("Not yet implemented")
+        config?.rtcEngine?.addHandler(listener)
     }
 
     override fun removeRTCListener(listener: IRtcEngineEventHandler) {
-        TODO("Not yet implemented")
+        config?.rtcEngine?.removeHandler(listener)
     }
 
     override fun initialize(
@@ -640,12 +681,30 @@ class CallApiImpl(
         if (tokenConfig?.roomId != config.roomId) {
             Log.e(TAG, "renewToken failed, roomid missmatch")
         }
+        Log.e(TAG, "renewToken with roomId[${config.roomId}]")
         this.tokenConfig = config
         messageManager?.renewToken(config.rtmToken)
-        val connection = rtcConnection ?: return
+        val connection = rtcConnection
+        if (connection == null || connection.channelId != config.roomId) {
+            Log.e(TAG, "renewToken fail! connection.channelId[${rtcConnection?.channelId}] != config.roomId[${config.roomId}]")
+            return
+        }
         val options = ChannelMediaOptions()
         options.token = config.rtcToken
-        this.config?.rtcEngine?.updateChannelMediaOptionsEx(options, connection)
+        val ret = this.config?.rtcEngine?.updateChannelMediaOptionsEx(options, connection)
+        Log.e(TAG, "rtc[${config.roomId}] renewToken ret = $ret")
+    }
+
+    override fun renewRemoteCallerChannelToken(roomId: String, token: String) {
+        val connection = rtcConnection
+        val engine = config?.rtcEngine
+        if (connection != null && connection.channelId == roomId && engine != null) else {
+            return
+        }
+        val options = ChannelMediaOptions()
+        options.token = token
+        val ret = engine.updateChannelMediaOptionsEx(options, connection)
+        Log.e(TAG, "rtc[$roomId] renewRemoteCallerChannelToken ret = $ret")
     }
 
     override fun prepareForCall(prepareConfig: PrepareConfig, completion: ((AGError?) -> Unit)?) {
@@ -695,7 +754,7 @@ class CallApiImpl(
             message[kFromRoomId] = fromRoomId
             messageManager?.sendMessage(roomId, fromRoomId, message.toMap()) { err ->
                 if (err != null) {
-                    _notifyState(CallStateType.Prepared, CallReason.MessageFailed)
+                    _notifyState(CallStateType.Prepared, CallReason.MessageFailed, err.msg)
                     _notifyEvent(CallEvent.MessageFailed)
                     return@sendMessage
                 }
@@ -791,6 +850,9 @@ class CallApiImpl(
     }
 
     //MARK: AgoraRtmClientDelegate
+    override fun onTokenPrivilegeWillExpire(channelName: String?) {
+        _notifyTokenPrivilegeWillExpire()
+    }
     override fun onMessageEvent(event: MessageEvent?) {
         val message = event?.message?.data as? ByteArray ?: return
         val jsonString = String(message, Charsets.ISO_8859_1)
@@ -881,9 +943,12 @@ class CallApiImpl(
         channelName: String?,
         state: RtmConstants.RtmConnectionState?,
         reason: RtmConstants.RtmConnectionChangeReason?) {}
-    override fun onTokenPrivilegeWillExpire(channelName: String?) {}
 
     // IRtcEngineEventHandler
+    override fun onConnectionStateChanged(state: Int, reason: Int) {
+        super.onConnectionStateChanged(state, reason)
+        Log.d(TAG, "connectionChangedTo state: $state reason: $reason")
+    }
     override fun onUserJoined(uid: Int, elapsed: Int) {
         super.onUserJoined(uid, elapsed)
         Log.d(TAG, "didJoinedOfUid: $uid elapsed: $elapsed")
@@ -907,6 +972,7 @@ class CallApiImpl(
     }
     override fun onLeaveChannel(stats: RtcStats?) {
         Log.d(TAG, "didLeaveChannel: $stats")
+        isChannelJoined = false
         _notifyEvent(CallEvent.LocalLeave)
     }
 
@@ -916,6 +982,7 @@ class CallApiImpl(
         if (uid == config?.userId) else {
             return
         }
+        isChannelJoined = true
         joinRtcCompletion?.invoke(null)
         joinRtcCompletion = null
 
@@ -939,6 +1006,7 @@ class CallApiImpl(
         }
     }
 
+    // CallMessageListener
     override fun onMissReceipts(message: Map<String, Any>) {
         Log.d(TAG, "onMissReceipts: $message")
         _notifyEvent(CallEvent.MissingReceipts)
