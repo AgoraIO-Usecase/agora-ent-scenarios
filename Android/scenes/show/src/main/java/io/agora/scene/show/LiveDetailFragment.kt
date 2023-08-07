@@ -29,8 +29,7 @@ import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.ContentInspectConfig
-import io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION
-import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
+import io.agora.rtc2.video.ContentInspectConfig.*
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
@@ -51,6 +50,7 @@ import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowRoomRequestStatus
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.service.ShowUser
+import io.agora.scene.show.videoSwitcherAPI.VideoSwitcherAPI
 import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
 import io.agora.scene.show.widget.AdvanceSettingDialog
 import io.agora.scene.show.widget.BeautyDialog
@@ -125,7 +125,7 @@ class LiveDetailFragment : Fragment() {
     private var isPageLoaded = false
 
     private val timerRoomEndRun = Runnable {
-        destroy() // 房间到了限制时间
+        destroy(false) // 房间到了限制时间
         showLivingEndLayout() // 房间到了限制时间
         ShowLogger.d("showLivingEndLayout","timer end!")
     }
@@ -157,7 +157,7 @@ class LiveDetailFragment : Fragment() {
         ShowLogger.d(TAG, "Fragment Lifecycle: onAttach")
         onMeLinkingListener = (activity as? LiveDetailActivity)
         if (isPageLoaded) {
-            startLoadPage()
+            startLoadPage(false)
         }
     }
 
@@ -178,26 +178,26 @@ class LiveDetailFragment : Fragment() {
     fun startLoadPageSafely(){
         isPageLoaded = true
         activity ?: return
-        startLoadPage()
+        startLoadPage(true)
     }
 
     fun reLoadPage() {
         updatePKingMode()
     }
 
-    private fun startLoadPage(){
+    private fun startLoadPage(isScrolling: Boolean){
         ShowLogger.d(TAG, "Fragment PageLoad start load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = true
 
         if (mRoomInfo.isRobotRoom()) {
-            initRtcEngine {}
+            initRtcEngine(isScrolling) {}
             initServiceWithJoinRoom()
         } else {
             val roomLeftTime =
                 ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong())
             if (roomLeftTime > 0) {
                 mBinding.root.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
-                initRtcEngine {}
+                initRtcEngine(isScrolling) {}
                 initServiceWithJoinRoom()
             }
         }
@@ -205,17 +205,17 @@ class LiveDetailFragment : Fragment() {
         startTopLayoutTimer()
     }
 
-    fun stopLoadPage(){
+    fun stopLoadPage(isScrolling: Boolean){
         ShowLogger.d(TAG, "Fragment PageLoad stop load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = false
-        destroy() // 切页或activity销毁
+        destroy(isScrolling) // 切页或activity销毁
     }
 
-    private fun destroy(): Boolean {
+    private fun destroy(isScrolling: Boolean): Boolean {
         mBinding.root.removeCallbacks(timerRoomEndRun)
         releaseCountdown()
         destroyService()
-        return destroyRtcEngine()
+        return destroyRtcEngine(isScrolling)
     }
 
     private fun onBackPressed() {
@@ -564,9 +564,9 @@ class LiveDetailFragment : Fragment() {
         // 机型等级
         topBinding.tvStatisticDeviceGrade.isVisible = true
         val score = mRtcEngine.queryDeviceScore()
-        if (score >= 85) {
+        if (score >= 90) {
             topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_high))
-        } else if (score >= 60) {
+        } else if (score >= 75) {
             topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_medium))
         } else {
             topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_low))
@@ -719,6 +719,8 @@ class LiveDetailFragment : Fragment() {
 
     private fun showAdvanceSettingDialog() {
         AdvanceSettingDialog(requireContext(), mMainRtcConnection).apply {
+            setItemShowTextOnly(AdvanceSettingDialog.ITEM_ID_SWITCH_QUALITY_ENHANCE, true)
+            setItemShowTextOnly(AdvanceSettingDialog.ITEM_ID_SWITCH_BITRATE_SAVE, true)
             show()
         }
     }
@@ -1056,7 +1058,7 @@ class LiveDetailFragment : Fragment() {
             error = {
                 if ((it as? RoomException)?.currRoomNo == mRoomInfo.roomId) {
                     runOnUiThread {
-                        destroy()
+                        destroy(false)
                         // 进房Error
                         showLivingEndLayout() // 进房Error
                         ShowLogger.d("showLivingEndLayout", "join room error!:${it.message}")
@@ -1073,7 +1075,7 @@ class LiveDetailFragment : Fragment() {
         }
         mService.subscribeCurrRoomEvent(mRoomInfo.roomId) { status, _ ->
             if (status == ShowServiceProtocol.ShowSubscribeStatus.deleted) {
-                destroy() // 房间被房主关闭
+                destroy(false) // 房间被房主关闭
                 showLivingEndLayout()// 房间被房主关闭
                 ShowLogger.d("showLivingEndLayout","room delete by owner!")
             }
@@ -1273,8 +1275,8 @@ class LiveDetailFragment : Fragment() {
 
     //================== RTC Operation ===================
 
-    private fun initRtcEngine(onJoinChannelSuccess: () -> Unit) {
-        val eventListener = VideoSwitcher.IChannelEventListener(
+    private fun initRtcEngine(isScrolling: Boolean, onJoinChannelSuccess: () -> Unit) {
+        val eventListener = VideoSwitcherAPI.IChannelEventListener(
             onUserOffline = { uid ->
                 if (interactionInfo != null && interactionInfo!!.userId == uid.toString()) {
                     mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!)
@@ -1372,8 +1374,14 @@ class LiveDetailFragment : Fragment() {
         if (activity is LiveDetailActivity){
             (activity as LiveDetailActivity).toggleSelfVideo(isRoomOwner || isMeLinking(), callback = {
                 // Render host video
+                if (isScrolling || isRoomOwner) {
+                    ShowLogger.d("hugo", "joinRoom from scroll")
+                    joinChannel(eventListener)
+                } else {
+                    ShowLogger.d("hugo", "joinRoom from click")
+                    mRtcVideoSwitcher.setChannelEvent(mRoomInfo.roomId, UserManager.getInstance().user.id.toInt(), eventListener)
+                }
                 initVideoView()
-                joinChannel(eventListener)
             })
             (activity as LiveDetailActivity).toggleSelfAudio(isRoomOwner || isMeLinking(), callback = {
               // nothing
@@ -1388,11 +1396,11 @@ class LiveDetailFragment : Fragment() {
             val jsonObject = JSONObject()
             jsonObject.put("sceneName", "show")
             jsonObject.put("id", UserManager.getInstance().user.id)
-            jsonObject.put("userNo", UserManager.getInstance().getUser().userNo)
+            jsonObject.put("userNo", UserManager.getInstance().user.userNo)
             contentInspectConfig.extraInfo = jsonObject.toString()
             val module = ContentInspectModule()
-            module.interval = 30
-            module.type = CONTENT_INSPECT_TYPE_MODERATION
+            module.interval = 10
+            module.type = CONTENT_INSPECT_TYPE_IMAGE_MODERATION
             contentInspectConfig.modules = arrayOf( module)
             contentInspectConfig.moduleCount = 1
             mRtcEngine.enableContentInspectEx(true, contentInspectConfig, mMainRtcConnection)
@@ -1481,8 +1489,8 @@ class LiveDetailFragment : Fragment() {
         VideoSetting.updateAudioSetting(SR = superResolution)
     }
 
-    private fun destroyRtcEngine(): Boolean {
-        return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection,false)
+    private fun destroyRtcEngine(isScrolling: Boolean): Boolean {
+        return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection, !isScrolling)
     }
 
     private fun enableLocalAudio(enable: Boolean) {
@@ -1503,23 +1511,25 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private fun joinChannel(eventListener: VideoSwitcher.IChannelEventListener) {
+    private fun joinChannel(eventListener: VideoSwitcherAPI.IChannelEventListener) {
         val rtcConnection = mMainRtcConnection
         val uid = UserManager.getInstance().user.id
         val channelName = mRoomInfo.roomId
 
-        AudioModeration.moderationAudio(
-            channelName,
-            uid,
-            AudioModeration.AgoraChannelType.broadcast,
-            "show"
-        )
+//        AudioModeration.moderationAudio(
+//            channelName,
+//            uid,
+//            AudioModeration.AgoraChannelType.broadcast,
+//            "show"
+//        )
 
-        if (!isRoomOwner && mRtcEngine.queryDeviceScore() < 60) {
-            // 低端机观众加入频道前默认开启硬解码
+        if (!isRoomOwner && mRtcEngine.queryDeviceScore() < 75) {
+            // 低端机观众加入频道前默认开启硬解
             mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
+            // 低端机观众加入频道前默认开启下行零拷贝
+            mRtcEngine.setParameters("\"rtc.video.decoder_out_byte_frame\": true")
         } else {
-            // 主播加入频道前默认开启软解码
+            // 主播加入频道前默认关闭硬解
             mRtcEngine.setParameters("{\"che.hardware_decoding\": 0}")
         }
 
@@ -1723,7 +1733,7 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun updatePKingMode() {
-        val eventListener = VideoSwitcher.IChannelEventListener(
+        val eventListener = VideoSwitcherAPI.IChannelEventListener(
             onRemoteVideoStats = { stats ->
                 //setEnhance(stats)
                 activity?.runOnUiThread {
