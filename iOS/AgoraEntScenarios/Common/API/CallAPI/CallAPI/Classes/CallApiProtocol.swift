@@ -25,6 +25,7 @@ public enum CallMode: UInt {
 public class CallConfig: NSObject {
     public var appId: String = ""               //声网App Id
     public var userId: UInt = 0                 //用户id
+    public var userExtension: [String: Any]?    //用户扩展字段,用在呼叫上，对端收到calling时可以通过kFromUserExtension字段读到
     public var ownerRoomId: String?             //房主房间id，秀场转1v1可用
     public var rtcEngine: AgoraRtcEngineKit!    //rtc engine实例
     public var mode: CallMode = .showTo1v1      //模式
@@ -145,6 +146,13 @@ public class CallTokenConfig: NSObject {
     ///   - fromUserId: 发起呼叫的用户id
     ///   - toUserId: 接收呼叫的用户id
     @objc optional func onOneForOneCache(oneForOneRoomId: String, fromUserId: UInt, toUserId: UInt)
+    
+    
+    /// token快要过期了
+    @objc optional func tokenPrivilegeWillExpire()
+    
+    @objc optional func debugInfo(message: String)
+    @objc optional func debugWarning(message: String)
 }
 
 @objc public protocol CallApiProtocol: NSObjectProtocol {
@@ -164,6 +172,10 @@ public class CallTokenConfig: NSObject {
     /// 更新rtc/rtm的token
     /// - Parameter config: <#config description#>
     func renewToken(with config: CallTokenConfig)
+    
+    /// 更新呼叫token
+    /// - Parameter token: <#token description#>
+    func renewRemoteCallerChannelToken(roomId: String, token: String)
     
     /// 连接(对RTM进行login和subscribe)， 观众调用
     /// - Parameters:

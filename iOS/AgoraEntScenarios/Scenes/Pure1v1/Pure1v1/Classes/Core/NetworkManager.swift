@@ -100,7 +100,7 @@ class NetworkManager:NSObject {
         let params = ["appCertificate": appCertificate ?? "",
                       "appId": appId,
                       "channelName": channelName,
-                      "expire": 150000,
+                      "expire": 1500,
                       "src": "iOS",
                       "ts": 0,
                       "type": type.rawValue,

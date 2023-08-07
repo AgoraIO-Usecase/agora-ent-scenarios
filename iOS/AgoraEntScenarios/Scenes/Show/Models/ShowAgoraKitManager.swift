@@ -257,8 +257,8 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         engine.setClientRole(.broadcaster)
-        let encodeRet = engine.setVideoEncoderConfiguration(videoEncoderConfig)
-        let ret = engine.setCameraCapturerConfiguration(captureConfig)
+        engine.setVideoEncoderConfiguration(videoEncoderConfig)
+        engine.setCameraCapturerConfiguration(captureConfig)
         canvas.view = canvasView
         engine.setupLocalVideo(canvas)
         engine.enableVideo()
@@ -339,6 +339,7 @@ class ShowAgoraKitManager: NSObject {
         options.audienceLatencyLevel = role == .audience ? .lowLatency : .ultraLowLatency
         updateChannelEx(channelId:channelId, options: options)
         if "\(uid)" == VLUserCenter.user.id {
+            videoLoader?.leaveChannelWithout(roomId: channelId)
             setupLocalVideo(uid: uid, canvasView: canvasView)
         } else {
             setupRemoteVideo(channelId: channelId, uid: uid, canvasView: canvasView)

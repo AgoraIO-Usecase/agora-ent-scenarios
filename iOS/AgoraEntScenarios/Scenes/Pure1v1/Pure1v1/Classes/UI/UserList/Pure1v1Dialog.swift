@@ -121,7 +121,7 @@ private let kDialogTag = 1112234567
 //主叫弹窗
 class Pure1v1CallerDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
     var cancelClosure: (()->())?
-    var stateTitle: String? = "call_state_waitting".pure1v1Localization() {
+    var stateTitle: String? = "call_state_caller_waitting".pure1v1Localization() {
         didSet {
             setNeedsLayout()
         }
@@ -266,7 +266,7 @@ class Pure1v1CallerDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
 class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
     var rejectClosure: (()->())?
     var acceptClosure: (()->())?
-    var stateTitle: String? = "call_state_waitting".pure1v1Localization() {
+    var stateTitle: String? = "call_state_callee_waitting".pure1v1Localization() {
         didSet {
             setNeedsLayout()
         }

@@ -31,8 +31,6 @@ class Pure1v1UserListViewController: UIViewController {
     private lazy var callVC: Pure1v1CallViewController = {
         let vc = Pure1v1CallViewController()
         vc.modalPresentationStyle = .fullScreen
-        vc.callApi = callApi
-        
         return vc
     }()
     private let callApi = CallApiImpl()
@@ -68,7 +66,7 @@ class Pure1v1UserListViewController: UIViewController {
             self?._refreshAction()
         }
         
-        _setupCallApiIfNeed()
+        _setupCallApi()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -76,7 +74,7 @@ class Pure1v1UserListViewController: UIViewController {
         listView.reloadData()
     }
     
-    private func _setupCallApiIfNeed() {
+    private func _setupCallApi() {
         guard let userInfo = userInfo else {
             assert(false, "userInfo == nil")
             return
@@ -123,9 +121,11 @@ extension Pure1v1UserListViewController {
         config.userId = UInt(userInfo?.userId ?? "")!
         config.autoAccept = false
         config.rtcEngine = rtcEngine
-        config.localView = callVC.smallCanvasView
-        config.remoteView = callVC.bigCanvasView
-        
+        config.localView = callVC.smallCanvasView.canvasView
+        config.remoteView = callVC.bigCanvasView.canvasView
+        if let userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any] {
+            config.userExtension = userExtension
+        }
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
             guard let self = self else {return}
             // Requires active call to prepareForCall
@@ -134,6 +134,9 @@ extension Pure1v1UserListViewController {
             }
         }
         callApi.addListener(listener: self)
+        
+        callVC.callApi = callApi
+        callVC.rtcEngine = rtcEngine
     }
     
     private func _createRtcEngine() ->AgoraRtcEngineKit {
@@ -143,18 +146,21 @@ extension Pure1v1UserListViewController {
         config.audioScenario = .gameStreaming
         config.areaCode = .global
         let engine = AgoraRtcEngineKit.sharedEngine(with: config,
-                                                    delegate: callVC)
+                                                    delegate: nil)
         
         engine.setClientRole(.broadcaster)
         return engine
     }
     
     private func _call(user: Pure1v1UserInfo) {
-        _setupCallApiIfNeed()
+        if callState == .idle {
+            _setupCallApi()
+            AUIToast.show(text: "call_not_init".pure1v1Localization())
+            return
+        }
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         callApi.call(roomId: user.userId, remoteUserId: UInt(user.userId)!) { err in
-            
         }
     }
 }
@@ -170,6 +176,7 @@ extension Pure1v1UserListViewController {
     }
     
     @objc func _refreshAction() {
+        guard naviBar.refreshAnimationEnable() else {return}
         naviBar.startRefreshAnimation()
         service.getUserList {[weak self] list in
             guard let self = self else {return}
@@ -178,6 +185,7 @@ extension Pure1v1UserListViewController {
             self.listView.userList = userList
             self._showGuideIfNeed()
             self.naviBar.style = userList.count > 0 ? .light : .dark
+            AUIToast.show(text: "user_list_refresh_tips".pure1v1Localization())
         }
     }
 }
@@ -199,6 +207,10 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
         
         switch state {
         case .calling:
+            if presentedViewController == callVC {
+                return
+            }
+            
             let fromUserId = eventInfo[kFromUserId] as? UInt ?? 0
             let fromRoomId = eventInfo[kFromRoomId] as? String ?? ""
             let toUserId = eventInfo[kRemoteUserId] as? UInt ?? 0
@@ -212,7 +224,12 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             if currentUid == "\(toUserId)" {
                 connectedUserId = fromUserId
                 
-                if let user = listView.userList.first {$0.userId == "\(fromUserId)"} {
+                //被叫不一定在userList能查到，需要从callapi里读取发送用户的user extension
+                var user = listView.userList.first {$0.userId == "\(fromUserId)"}
+                if user == nil, let userDic = (eventInfo[kFromUserExtension] as? [String: Any]) {
+                    user = Pure1v1UserInfo.yy_model(with: userDic)
+                }
+                if let user = user {
                     callDialog?.hiddenAnimation()
                     let dialog = Pure1v1CalleeDialog.show(user: user)
                     assert(dialog != nil, "dialog = nil")
@@ -222,9 +239,9 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                                                              channelName: fromRoomId,
                                                              uid: "\(toUserId)",
                                                              tokenGeneratorType: .token007,
-                                                             tokenTypes: [.rtc, .rtm]) { tokens in
+                                                             tokenTypes: [.rtc]) { tokens in
                             guard let self = self else {return}
-                            guard tokens.count == 2 else {
+                            guard tokens.count == 1 else {
                                 pure1v1Print("generateTokens fail")
                                 self.view.isUserInteractionEnabled = true
                                 return
@@ -251,7 +268,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 
             } else if currentUid == "\(fromUserId)" {
                 connectedUserId = toUserId
-                
+                //主叫userlist一定会有，因为需要点击
                 if let user = listView.userList.first {$0.userId == "\(toUserId)"} {
                     let dialog = Pure1v1CallerDialog.show(user: user)
                     dialog?.cancelClosure = {[weak self] in
@@ -276,13 +293,11 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
 //            AUIToast.show(text: "通话开始\(eventInfo[kDebugInfo] as? String ?? "")", postion: .bottom)
 //            AUIAlertManager.hiddenView()
             callDialog?.hiddenAnimation()
-            guard let uid = connectedUserId, let user = listView.userList.first(where: {$0.userId == "\(uid)"}) else {
+            guard let uid = connectedUserId else {
                 assert(false, "user not fount")
                 return
             }
-            
-            callVC.rtcEngine = rtcEngine
-            callVC.targetUser = user
+            callVC.dismiss(animated: false)
             present(callVC, animated: false)
             break
         case .prepared:
@@ -304,13 +319,54 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             callVC.dismiss(animated: false)
             break
         case .failed:
-//            AUIToast.show(text: eventReason, postion: .bottom)
+            AUIToast.show(text: eventReason)
 //            AUIAlertManager.hiddenView()
             connectedUserId = nil
             callDialog?.hiddenAnimation()
             break
         default:
             break
+        }
+    }
+    
+    func tokenPrivilegeWillExpire() {
+        pure1v1Warn("tokenPrivilegeWillExpire")
+        guard let userInfo = userInfo else {return}
+        
+        //renew token, include caller token(current room)
+        NetworkManager.shared.generateTokens(appId: appId,
+                                             appCertificate: appCertificate,
+                                             channelName: tokenConfig.roomId,
+                                             uid: userInfo.userId,
+                                             tokenGeneratorType: .token007,
+                                             tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
+            guard let self = self else {return}
+            guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue],
+                  let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
+                return
+            }
+            self.tokenConfig.rtcToken = rtcToken
+            self.tokenConfig.rtmToken = rtmToken
+            self.callApi.renewToken(with: self.tokenConfig)
+        }
+            
+        //renew other caller room(current user is callee)
+        if let uid = connectedUserId {
+            //calling token
+            let channelName = "\(uid)"
+            NetworkManager.shared.generateTokens(appId: appId,
+                                                 appCertificate: appCertificate,
+                                                 channelName: channelName,
+                                                 uid: userInfo.userId,
+                                                 tokenGeneratorType: .token007,
+                                                 tokenTypes: [.rtc]) {[weak self] tokens in
+                guard let self = self else {return}
+                guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue] else {
+                    return
+                }
+                
+                self.callApi.renewRemoteCallerChannelToken(roomId: channelName, token: rtcToken)
+            }
         }
     }
 }
