@@ -63,7 +63,7 @@ def all_pods
   pod 'AgoraLyricsScore', '1.1.1-beta-3'
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'cc0951f11f5fa6113ec2b9df2a509efa881d5bd7'
 #  pod 'AgoraLyricsScore', :path => '../../AgoraLyricsScore/AgoraLyricsScore.podspec'
-  pod 'AgoraRtm_iOS', '1.5.1'
+#  pod 'AgoraRtm_iOS', '1.5.1'
   pod 'Zip'
   pod 'MJRefresh'
   
