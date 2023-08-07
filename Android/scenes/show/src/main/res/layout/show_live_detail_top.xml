@@ -275,11 +275,11 @@
         <TableRow android:paddingVertical="3dp">
 
             <TextView
-                android:id="@+id/tvStatisticSR"
+                android:id="@+id/tvStatisticH265"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/show_statistic_sr" />
+                tools:text="@string/show_statistic_h265" />
 
             <TextView
                 android:id="@+id/tvStatisticPVC"
@@ -292,11 +292,11 @@
         <TableRow android:paddingVertical="3dp">
 
             <TextView
-                android:id="@+id/tvStatisticLowStream"
+                android:id="@+id/tvStatisticSR"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/show_statistic_low_stream" />
+                tools:text="@string/show_statistic_sr" />
 
             <TextView
                 android:id="@+id/tvStatisticSVC"
@@ -304,7 +304,16 @@
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 tools:text="@string/show_statistic_svc" />
+        </TableRow>
 
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvStatisticLowStream"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_low_stream" />
         </TableRow>
 
     </TableLayout>

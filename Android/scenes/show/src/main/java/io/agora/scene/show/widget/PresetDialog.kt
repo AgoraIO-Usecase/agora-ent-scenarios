@@ -25,6 +25,32 @@ class PresetDialog constructor(context: Context, deviceScore: Int) : BottomFullD
     init {
         setContentView(mBinding.root)
         mBinding.ivClose.setOnClickListener {
+            // 网络设置
+            val networkSelectPosition = getGroupSelectedItem(
+                mBinding.basicChooseItemGoodNetwork,
+                mBinding.basicChooseItemNormalNetwork
+            )
+            if (networkSelectPosition < 0) {
+                ToastDialog(context).apply {
+                    dismissDelayShort()
+                    showMessage(context.getString(R.string.show_setting_preset_no_choise_tip))
+                }
+                return@setOnClickListener
+            }
+
+            // 画质设置
+            val broadcastStrategySelectPosition = getGroupSelectedItem(
+                mBinding.broadcastStrategyItemSmooth,
+                mBinding.broadcastStrategyItemClear
+            )
+            if (broadcastStrategySelectPosition < 0) {
+                ToastDialog(context).apply {
+                    dismissDelayShort()
+                    showMessage(context.getString(R.string.show_setting_preset_no_choise_tip))
+                }
+                return@setOnClickListener
+            }
+            onPresetNetworkModeSelected(networkSelectPosition, broadcastStrategySelectPosition)
             dismiss()
         }
         mBinding.tvConfirm.setOnClickListener {

@@ -106,6 +106,7 @@
     <string name="show_statistic_quick_start_time">秒开耗时：%s ms</string>
     <string name="show_device_grade">机型等级：%s</string>
     <string name="show_statistic_sr">超分开关：%s</string>
+    <string name="show_statistic_h265">H265开关：%s</string>
     <string name="show_statistic_pvc">pvc开关：%s</string>
     <string name="show_statistic_low_stream">小流开关：%s</string>
     <string name="show_statistic_svc">svc开关：%s</string>

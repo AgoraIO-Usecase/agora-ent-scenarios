@@ -1,23 +1,22 @@
 package io.agora.scene.show
 
+import android.os.Build
+import android.os.Build.VERSION
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import android.view.SurfaceView
 import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import io.agora.mediaplayer.IMediaPlayer
-import io.agora.mediaplayer.IMediaPlayerObserver
-import io.agora.mediaplayer.data.PlayerUpdatedInfo
-import io.agora.mediaplayer.data.SrcInfo
 import io.agora.rtc2.*
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.videoSwitcherAPI.VideoSwitcherAPI
-import io.agora.scene.show.videoSwitcherAPI.VideoSwitcherAPIImpl
 import java.util.*
 
 class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private val api: VideoSwitcherAPI) : VideoSwitcher {
@@ -219,9 +218,16 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
             }
         }
         var videoView = container.container.getChildAt(container.viewIndex)
-        if (!(videoView is TextureView)) {
-            videoView = TextureView(container.container.context)
-            container.container.addView(videoView, container.viewIndex)
+        if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            if (videoView !is SurfaceView) {
+                videoView = SurfaceView(container.container.context)
+                container.container.addView(videoView, container.viewIndex)
+            }
+        } else {
+            if (videoView !is TextureView) {
+                videoView = TextureView(container.container.context)
+                container.container.addView(videoView, container.viewIndex)
+            }
         }
 
         val local = LocalVideoCanvasWrap(

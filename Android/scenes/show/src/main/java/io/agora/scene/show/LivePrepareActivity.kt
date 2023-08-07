@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.SurfaceView
 import android.view.View
@@ -64,7 +65,9 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         binding.tvRoomId.text = getString(R.string.show_room_id, mRoomId)
         binding.etRoomName.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                mInputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    mInputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
+                }
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false

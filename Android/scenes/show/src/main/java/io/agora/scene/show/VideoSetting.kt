@@ -43,7 +43,8 @@ object VideoSetting {
         V_540P(960, 540),
         V_480P(856, 480),
         V_360P(640, 360),
-        V_240P(360, 240)
+        V_240P(320, 240),
+        V_180P(360, 180),
     }
 
     fun Resolution.toIndex() = ResolutionList.indexOf(this)
@@ -179,7 +180,7 @@ object VideoSetting {
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = true,
-                captureResolution = Resolution.V_1080P,
+                captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_720P,
                 frameRate = FrameRate.FPS_15,
                 bitRate = BitRate.BR_Low_1V1.value,
@@ -213,10 +214,27 @@ object VideoSetting {
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = true,
-                captureResolution = Resolution.V_720P,
+                captureResolution = Resolution.V_1080P,
                 encodeResolution = Resolution.V_1080P,
                 frameRate = FrameRate.FPS_24,
                 bitRate = BitRate.BR_High_1V1.value,
+                bitRateStandard = true,
+                hardwareVideoEncoder = true
+            ),
+            BroadcastSetting.Audio(false, 80, 30)
+        )
+
+        val Audience1v1 = BroadcastSetting(
+            BroadcastSetting.Video(
+                H265 = true,
+                colorEnhance = false,
+                lowLightEnhance = false,
+                videoDenoiser = false,
+                PVC = true,
+                captureResolution = Resolution.V_180P,
+                encodeResolution = Resolution.V_180P,
+                frameRate = FrameRate.FPS_15,
+                bitRate = BitRate.BR_STANDRAD.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -230,7 +248,7 @@ object VideoSetting {
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = true,
-                captureResolution = Resolution.V_720P,
+                captureResolution = Resolution.V_540P,
                 encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
                 bitRate = BitRate.BR_Low_PK.value,
@@ -247,7 +265,7 @@ object VideoSetting {
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = true,
-                captureResolution = Resolution.V_720P,
+                captureResolution = Resolution.V_540P,
                 encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
                 bitRate = BitRate.BR_Medium_PK.value,
@@ -460,7 +478,13 @@ object VideoSetting {
     }
 
     fun updateAudienceSetting() {
-        updateRTCAudioSetting()
+        //updateRTCAudioSetting()
+        updateBroadcastSetting(
+            RecommendBroadcastSetting.Audience1v1,
+            null,
+            false,
+            null
+        )
     }
 
     fun updateAudioSetting(SR: SuperResolution? = null) {
@@ -847,7 +871,7 @@ object VideoSetting {
         audioMixingVolume?.let {
             // fix 播放用的是mpk
             if (rtcConnection != null) {
-                //videoSwitcher.adjustAudioMixingVolume(rtcConnection, it)
+                videoSwitcher.adjustAudioMixingVolume(rtcConnection, it)
             } else {
                 rtcEngine.adjustAudioMixingVolume(it)
             }
