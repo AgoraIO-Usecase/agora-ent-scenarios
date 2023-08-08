@@ -31,9 +31,6 @@ class ShowTo1v1RoomListViewController: UIViewController {
     private lazy var service: ShowTo1v1ServiceProtocol = ShowTo1v1ServiceImp(appId: appId, user: userInfo)
     private lazy var noDataView: Pure1v1UserNoDataView = {
         let view = Pure1v1UserNoDataView(frame: self.view.bounds)
-        view.noDataDialogView.createClosure = {[weak self] in
-            
-        }
         return view
     }()
     private lazy var listView: ShowTo1v1UserPagingListView = {
@@ -44,6 +41,23 @@ class ShowTo1v1RoomListViewController: UIViewController {
             self?._call(user: user)
         }
         return listView
+    }()
+    
+    private lazy var createButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.frame = CGRect(x: (self.view.aui_width - 175) / 2,
+                              y: self.view.aui_height - UIDevice.current.aui_SafeDistanceBottom - 42 - 19,
+                              width: 175,
+                              height: 42)
+        button.backgroundColor = UIColor(hexString: "#345dff")
+        button.setCornerRadius(21)
+        button.setTitle("user_list_create_room".showTo1v1Localization(), for: .normal)
+        button.setImage(UIImage.sceneImage(name: "create_room"), for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        button.setTitleColor(.white, for: .normal)
+        button.adjustHorizonAlign(spacing: 10)
+        button.addTarget(self, action: #selector(_createAction), for: .touchUpInside)
+        return button
     }()
     
     deinit {
@@ -65,6 +79,7 @@ class ShowTo1v1RoomListViewController: UIViewController {
         view.addSubview(noDataView)
         view.addSubview(listView)
         view.addSubview(naviBar)
+        view.addSubview(createButton)
         naviBar.backButton.addTarget(self, action: #selector(_backAction), for: .touchUpInside)
         naviBar.refreshButton.addTarget(self, action: #selector(_refreshAction), for: .touchUpInside)
         naviBar.refreshButton.isHidden = true
@@ -221,6 +236,10 @@ extension ShowTo1v1RoomListViewController {
             
             self.rtcEngine(self.rtcEngine, tokenPrivilegeWillExpire: "")
         }
+    }
+    
+    @objc private func _createAction() {
+
     }
 }
 
