@@ -1,6 +1,7 @@
 package io.agora.scene.show
 
 import io.agora.base.internal.video.HardwareVideoEncoder
+import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.SimulcastStreamConfig
 import io.agora.rtc2.video.*
@@ -617,7 +618,12 @@ object VideoSetting {
             currBroadcastSetting.audio.recordingSignalVolume,
             currBroadcastSetting.audio.audioMixingVolume
         )
-        lowStreamSetting?.let {
+
+        if (lowStreamSetting == null) {
+            updateRTCLowStreamSetting(
+                rtcConnection,
+                false)
+        } else {
             updateRTCLowStreamSetting(
                 rtcConnection,
                 true,
@@ -627,10 +633,6 @@ object VideoSetting {
                 lowStreamSetting.SVC,
                 lowStreamSetting.enableHardwareEncoder
             )
-        }.run {
-            updateRTCLowStreamSetting(
-                rtcConnection,
-                false)
         }
     }
 
@@ -897,7 +899,8 @@ object VideoSetting {
             val fps = frameRate ?: return
             val enableSVC = svc ?: return
 
-            rtcEngine.enableDualStreamMode(true, SimulcastStreamConfig(
+            rtcEngine.setDualStreamMode(
+                Constants.SimulcastStreamMode.ENABLE_SIMULCAST_STREAM, SimulcastStreamConfig(
                 VideoEncoderConfiguration.VideoDimensions(resolution.width, resolution.height),
                 br,
                 fps.fps))
@@ -912,7 +915,7 @@ object VideoSetting {
             }
 
         } else {
-            rtcEngine.enableDualStreamMode(false, SimulcastStreamConfig())
+            rtcEngine.setDualStreamMode(Constants.SimulcastStreamMode.DISABLE_SIMULCAST_STREAM, SimulcastStreamConfig())
         }
     }
 }

@@ -249,6 +249,7 @@ class LiveDetailFragment : Fragment() {
                     )
                 )
             } else {
+//                mRtcEngine.setRemoteVideoStreamType(mRoomInfo.ownerId.toInt(), 1)
                 mRtcVideoSwitcher.setupRemoteVideo(
                     mMainRtcConnection,
                     VideoSwitcher.VideoCanvasContainer(
@@ -581,7 +582,7 @@ class LiveDetailFragment : Fragment() {
 //            }
             topBinding.tvStatisticH265.text = getString(R.string.show_statistic_h265, "开")
         } else {
-            topBinding.tvStatisticSR.text = getString(R.string.show_statistic_h265, "--")
+            topBinding.tvStatisticH265.text = getString(R.string.show_statistic_h265, "--")
         }
         // 超分开关
         topBinding.tvStatisticSR.isVisible = true
@@ -1750,15 +1751,16 @@ class LiveDetailFragment : Fragment() {
         val eventListener = VideoSwitcherAPI.IChannelEventListener(
             onRemoteVideoStats = { stats ->
                 //setEnhance(stats)
-                activity?.runOnUiThread {
-                    refreshStatisticInfo(
-                        downBitrate = stats.receivedBitrate,
-                        receiveFPS = stats.decoderOutputFrameRate,
-                        downLossPackage = stats.packetLossRate,
-                        receiveVideoSize = Size(stats.width, stats.height),
-                        downDelay = stats.delay
-                    )
-                }
+                // 观众端只显示房主的接收数据
+//                activity?.runOnUiThread {
+//                    refreshStatisticInfo(
+//                        downBitrate = stats.receivedBitrate,
+//                        receiveFPS = stats.decoderOutputFrameRate,
+//                        downLossPackage = stats.packetLossRate,
+//                        receiveVideoSize = Size(stats.width, stats.height),
+//                        downDelay = stats.delay
+//                    )
+//                }
             },
             onRemoteAudioStats = { stats ->
                 activity?.runOnUiThread {
