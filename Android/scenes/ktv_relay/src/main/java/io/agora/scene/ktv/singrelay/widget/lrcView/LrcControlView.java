@@ -343,11 +343,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.lineScore.setVisibility(View.VISIBLE);
         mBinding.ilActive.tvMusicName2.setVisibility(View.GONE);
 
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams)findViewById(R.id.lyricsView).getLayoutParams();
-        params.topToBottom = R.id.scoringView;
-        params.bottomToTop = R.id.bgd_control_layout_lrc;
-        findViewById(R.id.lyricsView).requestLayout();
-
         onGraspEnable();
     }
 
@@ -360,7 +355,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     public void onGraspDisable() {
         if (mBinding == null) return;
-        mBinding.ilActive.singRelay.setVisibility(View.INVISIBLE);
+        mBinding.ilActive.singRelay.setVisibility(View.GONE);
     }
 
     public void setRole(@NonNull Role mRole) {
