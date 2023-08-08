@@ -134,6 +134,7 @@ class ShowTo1v1RoomCell: UICollectionViewCell {
         gradientLayer.frame = CGRect(x: 0, y: contentImageView.aui_height - 254, width: contentImageView.aui_width, height: 254)
         let wh = 32.0
         avatarView.frame = CGRect(x: 15, y: contentImageView.aui_height - 76 - wh, width: wh, height: wh)
+        avatarView.setCornerRadius(16)
         userNameLabel.sizeToFit()
         userNameLabel.aui_left = avatarView.aui_right + 10
         userNameLabel.aui_centerY = avatarView.aui_centerY

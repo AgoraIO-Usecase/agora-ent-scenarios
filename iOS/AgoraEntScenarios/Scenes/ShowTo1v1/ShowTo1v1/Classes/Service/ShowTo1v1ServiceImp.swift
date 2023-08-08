@@ -147,6 +147,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
         room.userName = user.userName
         room.avatar = user.avatar
         room.roomName = roomName
+        room.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
         room.roomId = "\(arc4random_uniform(899999) + 100000)"
         initScene {[weak self] error in
             if let error = error {
@@ -214,8 +215,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     }
     
     func leaveRoom(roomInfo: ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void) {
-        guard let user = user else {return}
-        self.sceneRefs[user.userId]?.deleteScenes()
+        self.sceneRefs[roomInfo.roomId]?.deleteScenes()
         completion(nil)
     }
     

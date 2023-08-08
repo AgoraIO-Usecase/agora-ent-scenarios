@@ -10,6 +10,7 @@ import CallAPI
 import AgoraRtcKit
 
 class ShowTo1v1BaseRoomViewController: UIViewController {
+    var onBackClosure: (()->())?
     var callApi: CallApiProtocol? {
         didSet {
 //            oldValue?.removeListener(listener: self)
@@ -57,6 +58,7 @@ class ShowTo1v1BaseRoomViewController: UIViewController {
     
     @objc func onBackAction() {
         dismiss(animated: false)
+        onBackClosure?()
     }
 }
 
