@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.pure1v1.callAPI.CallEvent
@@ -23,6 +25,7 @@ class CallDetailActivity : AppCompatActivity(), ICallApiListener {
 
     private val startTime = System.currentTimeMillis()
     private val timerHandler = Handler(Looper.getMainLooper())
+    private var dashboard: DashboardFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +53,14 @@ class CallDetailActivity : AppCompatActivity(), ICallApiListener {
         binding.ivHangup.setOnClickListener {
             onHangup()
         }
+        binding.ivSetting.setOnClickListener {
+            onClickSetting()
+        }
+        binding.ivClose.setOnClickListener {
+            binding.ivClose.visibility = View.INVISIBLE
+            binding.flDashboard.visibility = View.INVISIBLE
+            dashboard?.updateVisible(false)
+        }
         CallServiceManager.instance.remoteUser?.let { userInfo ->
             Glide.with(this)
                 .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
@@ -66,6 +77,23 @@ class CallDetailActivity : AppCompatActivity(), ICallApiListener {
         CallServiceManager.instance.remoteCanvas?.let { canvas ->
             binding.vDragWindow.canvasContainer.addView(canvas)
         }
+        val fragment = DashboardFragment()
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        fragmentTransaction.add(binding.flDashboard.id, fragment)
+        fragmentTransaction.commit()
+        dashboard = fragment
+    }
+
+    private fun onClickSetting() {
+        val dialog = CallDetailSettingDialog(this)
+        dialog.setListener(object: CallDetailSettingDialog.CallDetailSettingItemListener {
+            override fun onClickDashboard() {
+                binding.flDashboard.visibility = View.VISIBLE
+                binding.ivClose.visibility = View.VISIBLE
+                dashboard?.updateVisible(true)
+            }
+        })
+        dialog.show()
     }
 
     private fun onHangup() {

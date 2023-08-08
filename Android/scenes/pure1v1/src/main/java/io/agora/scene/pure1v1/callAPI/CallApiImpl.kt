@@ -60,6 +60,7 @@ class CallApiImpl(
 
     private val TAG = "CallApiImpl_LOG"
     private val delegates = mutableListOf<ICallApiListener>()
+    private val rtcListeners = mutableListOf<IRtcEngineEventHandler>()
 
     private var config: CallConfig? = null
     private var tokenConfig: CallTokenConfig? = null
@@ -627,11 +628,14 @@ class CallApiImpl(
     }
 
     override fun addRTCListener(listener: IRtcEngineEventHandler) {
-        config?.rtcEngine?.addHandler(listener)
+        if (rtcListeners.contains(listener)) {
+            return
+        }
+        rtcListeners.add(listener)
     }
 
     override fun removeRTCListener(listener: IRtcEngineEventHandler) {
-        config?.rtcEngine?.removeHandler(listener)
+        rtcListeners.remove(listener)
     }
 
     override fun initialize(
@@ -1003,6 +1007,41 @@ class CallApiImpl(
         if ((state == 2) && (reason == 6 || reason == 4 || reason == 3 )) {
             timeProfiling("6.呼叫-收到对端[$uid] 首帧")
             firstFrameCompletion?.invoke()
+        }
+    }
+    override fun onRtcStats(stats: RtcStats?) {
+        rtcListeners.forEach { listener ->
+            listener.onRtcStats(stats)
+        }
+    }
+    override fun onLocalVideoStats(source: Constants.VideoSourceType?, stats: LocalVideoStats?) {
+        rtcListeners.forEach { listener ->
+            listener.onLocalVideoStats(source, stats)
+        }
+    }
+    override fun onLocalAudioStats(stats: LocalAudioStats?) {
+        rtcListeners.forEach { listener ->
+            listener.onLocalAudioStats(stats)
+        }
+    }
+    override fun onRemoteVideoStats(stats: RemoteVideoStats?) {
+        rtcListeners.forEach { listener ->
+            listener.onRemoteVideoStats(stats)
+        }
+    }
+    override fun onRemoteAudioStats(stats: RemoteAudioStats?) {
+        rtcListeners.forEach { listener ->
+            listener.onRemoteAudioStats(stats)
+        }
+    }
+    override fun onUplinkNetworkInfoUpdated(info: UplinkNetworkInfo?) {
+        rtcListeners.forEach { listener ->
+            listener.onUplinkNetworkInfoUpdated(info)
+        }
+    }
+    override fun onDownlinkNetworkInfoUpdated(info: DownlinkNetworkInfo?) {
+        rtcListeners.forEach { listener ->
+            listener.onDownlinkNetworkInfoUpdated(info)
         }
     }
 

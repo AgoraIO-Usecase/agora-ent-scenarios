@@ -27,7 +27,7 @@ class CallReceiveDialog(
         fun onReceiveViewDidClickReject()
     }
 
-    private val binding: Pure1v1CallReceiveDialogBinding = Pure1v1CallReceiveDialogBinding.inflate(LayoutInflater.from(context))
+    private val binding = Pure1v1CallReceiveDialogBinding.inflate(LayoutInflater.from(context))
 
     private var listener: CallReceiveDialogListener? = null
 
