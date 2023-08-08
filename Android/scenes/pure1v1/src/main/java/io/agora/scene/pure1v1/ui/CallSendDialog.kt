@@ -23,7 +23,7 @@ class CallSendDialog(
         fun onSendViewDidClickHangup()
     }
 
-    private val binding: Pure1v1CallSendDialogBinding = Pure1v1CallSendDialogBinding.inflate(LayoutInflater.from(context))
+    private val binding = Pure1v1CallSendDialogBinding.inflate(LayoutInflater.from(context))
 
     private var listener: CallSendDialogListener? = null
 
