@@ -12,7 +12,7 @@ import SnapKit
 private let bgViewHeight: CGFloat = 40
 private let imgViewHeight: CGFloat = 32
 
-class Pure1v1RoomInfoView: UIView {
+class ShowTo1v1RoomInfoView: UIView {
     
     private var startTime: Int64!
     
@@ -124,7 +124,7 @@ class Pure1v1RoomInfoView: UIView {
         
         addSubview(timeLabel)
         timeLabel.snp.makeConstraints { make in
-            make.bottom.equalTo(idLabel)
+            make.centerY.equalTo(idLabel)
             make.left.equalTo(indicatorImageView.snp.right).offset(4)
         }
     }
