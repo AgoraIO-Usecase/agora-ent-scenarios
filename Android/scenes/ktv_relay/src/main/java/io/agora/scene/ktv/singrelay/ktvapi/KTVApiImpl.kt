@@ -498,6 +498,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             Log.e(TAG, "startSing failed: canceled")
             return
         }
+        mPlayer.setPlayerOption("enable_multi_audio_track", 1)
         mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
         mPlayer.open(songCode, startPos)
     }
@@ -508,6 +509,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             Log.e(TAG, "startSing failed: canceled")
             return
         }
+        // 导唱
+        mPlayer.setPlayerOption("enable_multi_audio_track", 1)
         mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
         mPlayer.open(url, startPos)
     }
@@ -585,6 +588,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 mRtcEngine.updateChannelMediaOptions(channelMediaOption)
 
                 // 预加载歌曲成功
+                // 导唱
+                mPlayer.setPlayerOption("enable_multi_audio_track", 1)
                 if (songMode == KTVSongMode.SONG_CODE) {
                     mPlayer.open(songCode, 0) // TODO open failed
                 } else {
@@ -1171,7 +1176,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                 duration = mPlayer.duration
                 this.localPlayerPosition = 0
-                mPlayer.selectAudioTrack(1)
+                // 伴奏
+                mPlayer.selectMultiAudioTrack(1, 1)
                 if (this.singerRole == KTVSingRole.SoloSinger ||
                     this.singerRole == KTVSingRole.LeadSinger
                 ) {

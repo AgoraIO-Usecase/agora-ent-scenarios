@@ -644,6 +644,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     @Override
     public void onDownloadLrcData(String url) {
+        KTVLogger.d("LrcView", "onDownloadLrcData: " + url);
         this.lrcUrl = url;
         downloadAndSetLrcData();
     }

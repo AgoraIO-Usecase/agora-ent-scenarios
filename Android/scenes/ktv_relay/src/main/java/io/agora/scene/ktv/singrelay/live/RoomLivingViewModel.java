@@ -1249,10 +1249,16 @@ public class RoomLivingViewModel extends ViewModel {
     protected KTVPlayerTrackMode mAudioTrackMode = KTVPlayerTrackMode.Acc;
     public void musicToggleOriginal() {
         if (mAudioTrackMode == KTVPlayerTrackMode.Origin) {
-            ktvApiProtocol.getMediaPlayer().selectAudioTrack(1);
+            ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(1, 1);
             mAudioTrackMode = KTVPlayerTrackMode.Acc;
         } else {
-            ktvApiProtocol.getMediaPlayer().selectAudioTrack(0);
+            if (isRoomOwner()) {
+                // 主唱（房主）开导唱
+                ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(0, 1);
+            } else {
+                // 其他游戏者开原唱
+                ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(0, 0);
+            }
             mAudioTrackMode = KTVPlayerTrackMode.Origin;
         }
     }
