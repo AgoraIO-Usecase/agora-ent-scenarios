@@ -104,6 +104,7 @@ class PresetDialog constructor(context: Context, deviceScore: Int) : BottomFullD
         } else if (deviceScore >= 75) {
             "中端机"
         } else {
+            mBinding.tvBeautyTips.isVisible = true
             "低端机"
         }
         mBinding.tvDeviceScore.text = "设备检测结果：$deviceLevel（$deviceScore）"

@@ -44,18 +44,17 @@ object VideoSetting {
         V_540P(960, 540),
         V_480P(856, 480),
         V_360P(640, 360),
-        V_240P(320, 240),
         V_180P(360, 180),
     }
 
     fun Resolution.toIndex() = ResolutionList.indexOf(this)
 
     val ResolutionList = listOf(
-        Resolution.V_240P,
         Resolution.V_360P,
         Resolution.V_480P,
         Resolution.V_540P,
-        Resolution.V_720P
+        Resolution.V_720P,
+        Resolution.V_1080P
     )
 
     enum class FrameRate constructor(val fps: Int) {
@@ -871,13 +870,14 @@ object VideoSetting {
             rtcEngine.adjustRecordingSignalVolume(it)
         }
         audioMixingVolume?.let {
-            // fix 播放用的是mpk
             if (rtcConnection != null) {
                 videoSwitcher.adjustAudioMixingVolume(rtcConnection, it)
             } else {
                 rtcEngine.adjustAudioMixingVolume(it)
             }
         }
+        // 默认开启人脸自动对焦
+        rtcEngine.setCameraAutoFocusFaceModeEnabled(true)
     }
 
     private fun updateRTCLowStreamSetting(
@@ -900,10 +900,7 @@ object VideoSetting {
             val enableSVC = svc ?: return
 
             rtcEngine.setDualStreamMode(
-                Constants.SimulcastStreamMode.ENABLE_SIMULCAST_STREAM, SimulcastStreamConfig(
-                VideoEncoderConfiguration.VideoDimensions(resolution.width, resolution.height),
-                br,
-                fps.fps))
+                Constants.SimulcastStreamMode.ENABLE_SIMULCAST_STREAM)
 
             // 1、SVC必须在enableDualStreamModeEx后设置才生效
             // 2、小流开SVC默认软编码
@@ -915,7 +912,7 @@ object VideoSetting {
             }
 
         } else {
-            rtcEngine.setDualStreamMode(Constants.SimulcastStreamMode.DISABLE_SIMULCAST_STREAM, SimulcastStreamConfig())
+            rtcEngine.setDualStreamMode(Constants.SimulcastStreamMode.DISABLE_SIMULCAST_STREAM)
         }
     }
 }
