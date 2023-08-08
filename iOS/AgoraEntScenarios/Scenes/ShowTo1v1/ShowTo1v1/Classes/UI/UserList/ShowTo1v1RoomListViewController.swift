@@ -224,7 +224,7 @@ extension ShowTo1v1RoomListViewController {
         service.getRoomList {[weak self] list in
             guard let self = self else {return}
             self.naviBar.stopRefreshAnimation()
-            let roomList = list.filter({$0.userId != self.userInfo?.userId})
+            let roomList = list
             let oldList = self.listView.roomList
             self.listView.roomList = roomList
             self._showGuideIfNeed()
@@ -270,6 +270,11 @@ extension ShowTo1v1RoomListViewController {
         vc.roomInfo = roomInfo
         vc.rtcEngine = self.rtcEngine
         vc.broadcasterToken = self.tokenConfig.rtcToken
+        vc.onBackClosure = {[weak self] in
+            self?.service.leaveRoom(roomInfo: roomInfo, completion: { err in
+            
+            })
+        }
         self.present(vc, animated: false)
     }
 }

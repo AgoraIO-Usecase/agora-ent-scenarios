@@ -18,7 +18,7 @@ class BroadcasterViewController: ShowTo1v1BaseRoomViewController {
             roomInfoView.setRoomInfo(avatar: roomInfo?.avatar ?? "",
                                      name: roomInfo?.roomName ?? "",
                                      id: roomInfo?.userName ?? "",
-                                     time: Int64(Date().timeIntervalSince1970 * 1000))
+                                     time: Int64(roomInfo?.createdAt ?? Int64(Date().timeIntervalSince1970) * 1000))
         }
     }
     var broadcasterToken: String? {
