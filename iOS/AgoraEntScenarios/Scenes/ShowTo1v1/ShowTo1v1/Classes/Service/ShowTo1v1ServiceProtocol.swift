@@ -18,14 +18,23 @@ import Foundation
 protocol ShowTo1v1ServiceProtocol: NSObjectProtocol {
     
     
-    /// 把自己加入1v1列表
-    /// - Parameter completion: <#completion description#>
-    func createRoom(completion: @escaping (Error?) -> Void)
+    /// 创建房间
+    /// - Parameters:
+    ///   - roomName: <#roomName description#>
+    ///   - completion: <#completion description#>
+    func createRoom(roomName: String, completion: @escaping (ShowTo1v1RoomInfo?, Error?) -> Void)
     
+    /// 加入一个房间
+    /// - Parameters:
+    ///   - roomInfo: <#roomInfo description#>
+    ///   - completion: <#completion description#>
+    func joinRoom(roomInfo:ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void)
     
-    /// 把自己移除出1v1列表
-    /// - Parameter completion: <#completion description#>
-    func leaveRoom(completion: @escaping (Error?) -> Void)
+    /// 离开房间
+    /// - Parameters:
+    ///   - roomInfo: <#roomInfo description#>
+    ///   - completion: <#completion description#>
+    func leaveRoom(roomInfo:ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void)
     
     
     /// 获取房间列表

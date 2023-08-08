@@ -12,6 +12,7 @@ class CollectionViewDelegateProxy: CallApiProxy, UICollectionViewDelegate {}
 
 class ShowTo1v1UserPagingListView: UIView {
     var callClosure: ((ShowTo1v1RoomInfo?)->())?
+    var tapClosure: ((ShowTo1v1RoomInfo?)->())?
     var roomList: [ShowTo1v1RoomInfo] = [] {
         didSet {
             self.isHidden = roomList.count == 0 ? true : false
@@ -36,7 +37,7 @@ class ShowTo1v1UserPagingListView: UIView {
         return proxy
     }()
     
-    private lazy var collectionView: UICollectionView = {
+    lazy var collectionView: UICollectionView = {
         // 列表
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0
@@ -71,6 +72,15 @@ class ShowTo1v1UserPagingListView: UIView {
     
     func reloadData() {
         collectionView.reloadData()
+    }
+    
+    func reloadCurrentItem() {
+        guard let cell = collectionView.visibleCells.first,
+              let indexPath = collectionView.indexPath(for: cell) else {
+            return
+        }
+        showTo1v1Print("reloadCurrentItem: \(indexPath.row)")
+        collectionView.delegate?.collectionView?(collectionView, willDisplay: cell, forItemAt: indexPath)
     }
 }
 
@@ -124,6 +134,9 @@ extension ShowTo1v1UserPagingListView: UICollectionViewDataSource, UICollectionV
         cell.roomInfo = roomInfo
         cell.callClosure = { [weak self] room in
             self?.callClosure?(room)
+        }
+        cell.tapClosure = { [weak self] room in
+            self?.tapClosure?(room)
         }
         showTo1v1Print("load user: \(roomInfo.userName) \(realCellIndex(with: indexPath.row)) / \(indexPath.row)")
         return cell

@@ -10,6 +10,7 @@ import SDWebImage
 
 class ShowTo1v1RoomCell: UICollectionViewCell {
     var callClosure: ((ShowTo1v1RoomInfo?)->())?
+    var tapClosure: ((ShowTo1v1RoomInfo?)->())?
     var roomInfo: ShowTo1v1RoomInfo? {
         didSet {
             bgImageView.image = roomInfo?.bgImage()
@@ -59,6 +60,11 @@ class ShowTo1v1RoomCell: UICollectionViewCell {
     lazy var canvasView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(hexString: "#0038ff")
+        let tapGes = UITapGestureRecognizer {[weak self] ges in
+            guard let self = self else {return}
+            self.tapClosure?(self.roomInfo)
+        }
+        view.addGestureRecognizer(tapGes)
         return view
     }()
     

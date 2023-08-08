@@ -36,9 +36,13 @@ class ShowTo1v1RoomListViewController: UIViewController {
     private lazy var listView: ShowTo1v1UserPagingListView = {
         let listView = ShowTo1v1UserPagingListView(frame: self.view.bounds)
         listView.delegate = self
-        listView.callClosure = { [weak self] user in
-            guard let user = user else {return}
+        listView.callClosure = { [weak self] roomInfo in
+            guard let user = roomInfo else {return}
             self?._call(user: user)
+        }
+        listView.tapClosure = { [weak self] roomInfo in
+            guard let roomInfo = roomInfo else {return}
+            self?._showBroadcasterVC(roomInfo: roomInfo)
         }
         return listView
     }()
@@ -89,9 +93,10 @@ class ShowTo1v1RoomListViewController: UIViewController {
         _setupAPI()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        listView.reloadData()
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+//        videoLoaderApi.cleanCache()
+        listView.reloadCurrentItem()
     }
     
     private func _showGuideIfNeed() {
@@ -211,8 +216,6 @@ extension ShowTo1v1RoomListViewController {
     @objc func _backAction() {
         callApi.deinitialize {
         }
-        service.leaveRoom { err in
-        }
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -239,7 +242,35 @@ extension ShowTo1v1RoomListViewController {
     }
     
     @objc private func _createAction() {
-
+        guard let userInfo = userInfo else {return}
+        CreateRoomDialog.show(user: userInfo) {[weak self] roomName in
+            if roomName.count == 0 {
+                AUIToast.show(text: "create_room_name_empty_tips".showTo1v1Localization())
+                return 
+            }
+            self?.service.createRoom(roomName: roomName) { roomInfo, error in
+                guard let self = self else {return}
+                if let error = error {
+                    AUIToast.show(text: error.localizedDescription)
+                    return
+                }
+                guard let roomInfo = roomInfo else {return}
+                self._showBroadcasterVC(roomInfo: roomInfo)
+                CreateRoomDialog.hidden()
+            }
+        }
+    }
+    
+    private func _showBroadcasterVC(roomInfo: ShowTo1v1RoomInfo) {
+        let vc = BroadcasterViewController()
+        vc.modalPresentationStyle = .fullScreen
+        vc.videoLoader = self.videoLoaderApi
+        vc.callApi = self.callApi
+        vc.currentUser = self.userInfo
+        vc.roomInfo = roomInfo
+        vc.rtcEngine = self.rtcEngine
+        vc.broadcasterToken = self.tokenConfig.rtcToken
+        self.present(vc, animated: false)
     }
 }
 

@@ -136,36 +136,76 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
         }
     }
     
-    func createRoom(completion: @escaping (Error?) -> Void) {
-        guard let user = self.user, !roomList.contains(where: { $0.userId == user.userId }) else {
-            completion(nil)
+    func createRoom(roomName: String, completion: @escaping (ShowTo1v1RoomInfo?, Error?) -> Void) {
+        showTo1v1Print("createRoom start")
+        guard let user = self.user else {
+            completion(nil, nil)
             return
         }
-        showTo1v1Print("createUser start")
+        let room = ShowTo1v1RoomInfo()
+        room.userId = user.userId
+        room.userName = user.userName
+        room.avatar = user.avatar
+        room.roomName = roomName
+        room.roomId = "\(arc4random_uniform(899999) + 100000)"
         initScene {[weak self] error in
             if let error = error {
-                showTo1v1Print("createUser fail1: \(error.localizedDescription)")
+                showTo1v1Print("createRoom fail1: \(error.localizedDescription)")
+                completion(nil, error)
+                return
+            }
+            
+            let params = room.yy_modelToJSONObject() as? [String: Any]
+            let scene = Scene(id: room.roomId, userId: room.userId, isOwner: true, property: params)
+            self?.manager.createScene(scene: scene, success: {[weak self] in
+                guard let self = self else {return}
+                self.manager.joinScene(sceneId: room.roomId) { sceneRef in
+                    showTo1v1Print("createRoom success")
+                    mainTreadTask {
+                        self.sceneRefs[room.roomId] = sceneRef
+                        completion(room, nil)
+                    }
+                } fail: { error in
+                    showTo1v1Print("createRoom fail2: \(error.localizedDescription)")
+                    mainTreadTask {
+                        completion(nil, error)
+                    }
+                }
+            }) { error in
+                showTo1v1Print("createRoom fail3: \(error.localizedDescription)")
+                mainTreadTask {
+                    completion(nil, error)
+                }
+            }
+        }
+    }
+    
+    func joinRoom(roomInfo:ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void) {
+        initScene {[weak self] error in
+            if let error = error {
+                showTo1v1Print("joinRoom fail1: \(error.localizedDescription)")
                 completion(error)
                 return
             }
-            let params = user.yy_modelToJSONObject() as? [String: Any]
-            let scene = Scene(id: user.userId, userId: user.userId, isOwner: true, property: params)
+            
+            let params = roomInfo.yy_modelToJSONObject() as? [String: Any]
+            let scene = Scene(id: roomInfo.roomId, userId: roomInfo.userId, isOwner: false, property: params)
             self?.manager.createScene(scene: scene, success: {[weak self] in
                 guard let self = self else {return}
-                self.manager.joinScene(sceneId: user.userId) { sceneRef in
-                    showTo1v1Print("createUser success")
+                self.manager.joinScene(sceneId: roomInfo.roomId) { sceneRef in
+                    showTo1v1Print("joinRoom success")
                     mainTreadTask {
-                        self.sceneRefs[user.userId] = sceneRef
+                        self.sceneRefs[roomInfo.roomId] = sceneRef
                         completion(nil)
                     }
                 } fail: { error in
-                    showTo1v1Print("createUser fail2: \(error.localizedDescription)")
+                    showTo1v1Print("joinRoom fail2: \(error.localizedDescription)")
                     mainTreadTask {
                         completion(error)
                     }
                 }
             }) { error in
-                showTo1v1Print("createUser fail3: \(error.localizedDescription)")
+                showTo1v1Print("joinRoom fail3: \(error.localizedDescription)")
                 mainTreadTask {
                     completion(error)
                 }
@@ -173,7 +213,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
         }
     }
     
-    func leaveRoom(completion: @escaping (Error?) -> Void) {
+    func leaveRoom(roomInfo: ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void) {
         guard let user = user else {return}
         self.sceneRefs[user.userId]?.deleteScenes()
         completion(nil)
