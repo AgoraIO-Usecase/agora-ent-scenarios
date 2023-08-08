@@ -208,6 +208,7 @@ class CallApiImpl(
             _leaveRTC(force = true)
             _cleanCallCache()
             delegates.clear()
+            rtcListeners.clear()
             config = null
             tokenConfig = null
             messageManager = null
