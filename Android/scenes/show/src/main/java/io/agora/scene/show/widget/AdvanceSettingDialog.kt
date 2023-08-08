@@ -229,6 +229,13 @@ class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcC
             R.string.show_setting_advance_quality_h265,
             R.string.show_setting_advance_quality_h265_tip
         )
+        // 码率节省
+        setupSwitchItem(
+            ITEM_ID_SWITCH_BITRATE_SAVE,
+            binding.bitrateSave,
+            R.string.show_setting_advance_bitrate_save,
+            R.string.show_setting_advance_bitrate_save_tip
+        )
         setupSwitchItem(
             ITEM_ID_SWITCH_COLOR_ENHANCE,
             binding.colorEnhance,
@@ -246,13 +253,6 @@ class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcC
             binding.videoNoiseReduction,
             R.string.show_setting_advance_video_noise_reduce,
             R.string.show_setting_advance_video_noise_reduce_tip
-        )
-        // 码率节省
-        setupSwitchItem(
-            ITEM_ID_SWITCH_BITRATE_SAVE,
-            binding.bitrateSave,
-            R.string.show_setting_advance_bitrate_save,
-            R.string.show_setting_advance_bitrate_save_tip
         )
         // 编码分辨率
         setupSelectorItem(
