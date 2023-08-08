@@ -13,10 +13,10 @@ class ShowTo1v1BaseRoomViewController: UIViewController {
     var onBackClosure: (()->())?
     var callApi: CallApiProtocol? {
         didSet {
-//            oldValue?.removeListener(listener: self)
-//            oldValue?.removeRTCListener?(listener: self.realTimeView)
-//            callApi?.addListener(listener: self)
-//            callApi?.addRTCListener?(listener: self.realTimeView)
+            oldValue?.removeListener(listener: self)
+            oldValue?.removeRTCListener?(listener: self.realTimeView)
+            callApi?.addListener(listener: self)
+            callApi?.addRTCListener?(listener: self.realTimeView)
         }
     }
     lazy var roomInfoView: ShowTo1v1RoomInfoView = ShowTo1v1RoomInfoView()
@@ -27,13 +27,8 @@ class ShowTo1v1BaseRoomViewController: UIViewController {
         return bar
     }()
     
-    private lazy var realTimeView: ShowRealTimeDataView = {
+    lazy var realTimeView: ShowRealTimeDataView = {
         let realTimeView = ShowRealTimeDataView(isLocal: true)
-        view.addSubview(realTimeView)
-        realTimeView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(UIDevice.current.aui_SafeDistanceTop + 50)
-        }
         return realTimeView
     }()
     
@@ -49,6 +44,13 @@ class ShowTo1v1BaseRoomViewController: UIViewController {
         
         view.addSubview(roomInfoView)
         view.addSubview(bottomBar)
+        view.addSubview(realTimeView)
+        
+        
+        realTimeView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(UIDevice.current.aui_SafeDistanceTop + 50)
+        }
         
         roomInfoView.frame = CGRect(x: 15, y: UIDevice.current.aui_SafeDistanceTop, width: 202, height: 40)
         bigCanvasView.frame = view.bounds

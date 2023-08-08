@@ -15,10 +15,11 @@ class BroadcasterViewController: ShowTo1v1BaseRoomViewController {
     var currentUser: ShowTo1v1UserInfo?
     var roomInfo: ShowTo1v1RoomInfo? {
         didSet {
+            let createdAt = roomInfo?.createdAt ?? 0
             roomInfoView.setRoomInfo(avatar: roomInfo?.avatar ?? "",
                                      name: roomInfo?.roomName ?? "",
                                      id: roomInfo?.userName ?? "",
-                                     time: Int64(roomInfo?.createdAt ?? Int64(Date().timeIntervalSince1970) * 1000))
+                                     time: Int64(createdAt > 0 ? createdAt : Int64(Date().timeIntervalSince1970) * 1000))
         }
     }
     var broadcasterToken: String? {
@@ -67,6 +68,8 @@ class BroadcasterViewController: ShowTo1v1BaseRoomViewController {
             canvas.view = bigCanvasView
             canvas.uid = uid
             rtcEngine?.setupLocalVideo(canvas)
+            
+            rtcEngine?.delegate = self.realTimeView
         } else {
             guard let token = broadcasterToken else {
                 assert(false, "render fail")
@@ -77,6 +80,8 @@ class BroadcasterViewController: ShowTo1v1BaseRoomViewController {
             container.container = bigCanvasView
             container.uid = roomInfo.getUIntUserId()
             videoLoader?.renderVideo(roomInfo: room, container: container)
+            
+            videoLoader?.addRTCListener(roomId: room.channelName, listener: self.realTimeView)
         }
     }
     
@@ -84,12 +89,16 @@ class BroadcasterViewController: ShowTo1v1BaseRoomViewController {
         guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.userId) else {return}
         if currentUser.userId == roomInfo.userId {
             rtcEngine?.leaveChannel()
+            
+            rtcEngine?.delegate = nil
         } else {
             let room = roomInfo.createRoomInfo(token: "")
             let container = VideoCanvasContainer()
             container.container = nil
             container.uid = roomInfo.getUIntUserId()
             videoLoader?.renderVideo(roomInfo: room, container: container)
+            
+            videoLoader?.removeRTCListener(roomId: room.channelName, listener: self.realTimeView)
         }
     }
     
