@@ -58,7 +58,7 @@ class ShowTo1v1RoomCell: UICollectionViewCell {
     
     lazy var canvasView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(red: 0, green: 0.22, blue: 1, alpha: 0.7)
+        view.backgroundColor = UIColor(hexString: "#0038ff")
         return view
     }()
     
