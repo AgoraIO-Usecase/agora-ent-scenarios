@@ -30,6 +30,8 @@ class ShowTo1v1ServiceImp: NSObject {
     private var networkDidChanged: ((ShowTo1v1ServiceNetworkStatus) -> Void)?
     private var roomExpiredDidChanged: (() -> Void)?
     
+    private var refreshRoomListClosure: (([ShowTo1v1RoomInfo])->Void)?
+    
     convenience init(appId: String, user: ShowTo1v1UserInfo?) {
         self.init()
         self.appId = appId
@@ -106,23 +108,30 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     }
     
     func getRoomList(completion: @escaping ([ShowTo1v1RoomInfo]) -> Void) {
+        refreshRoomListClosure = completion
         initScene { [weak self] error in
             if let error = error {
                 showTo1v1Print("getUserList fail1: \(error.localizedDescription)")
-                completion([])
+                self?.refreshRoomListClosure?([])
+                self?.refreshRoomListClosure = nil
                 return
             }
             self?.manager.getScenes(success: { results in
                 guard let self = self else {return}
-                showTo1v1Print("getUserList == \(results.compactMap { $0.toJson() })")
+                showTo1v1Print("getUserList == \(results.count)")
 
-                let roomList = results.map({ info in
+                let roomList = results.filter({$0.getId().count > 0}).map({ info in
                     return ShowTo1v1RoomInfo.yy_model(withJSON: info.toJson())!
                 })
+                
                 self.roomList = self.getRobotRoomList() + roomList
-                completion(self.roomList)
+//                completion(self.roomList)
+                self.refreshRoomListClosure?(self.roomList)
+                self.refreshRoomListClosure = nil
             }, fail: { error in
-                completion([])
+//                completion([])
+                self?.refreshRoomListClosure?([])
+                self?.refreshRoomListClosure = nil
             })
         }
     }
