@@ -17,8 +17,8 @@ class ShowTo1v1RoomListViewController: UIViewController {
     var appCertificate: String = ""
     var userInfo: ShowTo1v1UserInfo?
     
+    private let tokenConfig: CallTokenConfig = CallTokenConfig()
     private var videoLoaderApi: IVideoLoaderApi = VideoLoaderApiImpl()
-    private var rtcToken: String = ""
     private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
     private var callState: CallStateType = .idle
     private lazy var callVC: ShowTo1v1CallViewController = {
@@ -91,7 +91,7 @@ class ShowTo1v1RoomListViewController: UIViewController {
 extension ShowTo1v1RoomListViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? ShowTo1v1RoomCell, let room = cell.roomInfo else {return}
-        let roomInfo = room.createRoomInfo(token: rtcToken)
+        let roomInfo = room.createRoomInfo(token: tokenConfig.rtcToken)
         videoLoaderApi.switchRoomState(newState: .joined, roomInfo: roomInfo, tagId: roomInfo.channelName)
         let container = VideoCanvasContainer()
         container.uid = roomInfo.uid
@@ -105,11 +105,11 @@ extension ShowTo1v1RoomListViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? ShowTo1v1RoomCell, let room = cell.roomInfo else {return}
-        let roomInfo = room.createRoomInfo(token: rtcToken)
+        let roomInfo = room.createRoomInfo(token: tokenConfig.rtcToken)
         videoLoaderApi.switchRoomState(newState: .prejoined, roomInfo: roomInfo, tagId: roomInfo.channelName)
         let container = VideoCanvasContainer()
         container.uid = roomInfo.uid
-        container.container = cell.canvasView
+        container.container = nil
         videoLoaderApi.renderVideo(roomInfo: roomInfo, container: container)
     }
 }
@@ -121,7 +121,6 @@ extension ShowTo1v1RoomListViewController {
             return
         }
         
-        let tokenConfig: CallTokenConfig = CallTokenConfig()
         tokenConfig.roomId = userInfo.userId
         NetworkManager.shared.generateTokens(appId: appId,
                                              appCertificate: appCertificate,
@@ -129,11 +128,11 @@ extension ShowTo1v1RoomListViewController {
                                              uid: userInfo.userId,
                                              tokenGeneratorType: .token007,
                                              tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
-            tokenConfig.rtcToken = tokens[AgoraTokenType.rtc.rawValue]!
-            tokenConfig.rtmToken = tokens[AgoraTokenType.rtm.rawValue]!
+            guard let self = self else {return}
+            self.tokenConfig.rtcToken = tokens[AgoraTokenType.rtc.rawValue]!
+            self.tokenConfig.rtmToken = tokens[AgoraTokenType.rtm.rawValue]!
             
-            self?._initCallerAPI(tokenConfig: tokenConfig)
-            self?.rtcToken = tokenConfig.rtcToken
+            self._initCallerAPI(tokenConfig: self.tokenConfig)
         }
         
         let config = VideoLoaderConfig()
@@ -208,9 +207,19 @@ extension ShowTo1v1RoomListViewController {
             guard let self = self else {return}
             self.naviBar.stopRefreshAnimation()
             let roomList = list.filter({$0.userId != self.userInfo?.userId})
+            let oldList = self.listView.roomList
             self.listView.roomList = roomList
             self._showGuideIfNeed()
             self.naviBar.style = roomList.count > 0 ? .light : .dark
+            self.videoLoaderApi.cleanCache()
+            oldList.forEach { info in
+                self.videoLoaderApi.removeRTCListener(roomId: info.roomId, listener: self)
+            }
+            roomList.forEach { info in
+                self.videoLoaderApi.addRTCListener(roomId: info.roomId, listener: self)
+            }
+            
+            self.rtcEngine(self.rtcEngine, tokenPrivilegeWillExpire: "")
         }
     }
 }
@@ -283,5 +292,39 @@ extension ShowTo1v1RoomListViewController: IVideoLoaderApiListener {
     
     func debugError(_ message: String) {
         showTo1v1Error(message)
+    }
+}
+
+extension ShowTo1v1RoomListViewController: AgoraRtcEngineDelegate {
+    func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
+        guard let userInfo = userInfo else {
+            assert(false, "userInfo == nil")
+            return
+        }
+        showTo1v1Print("tokenPrivilegeWillExpire")
+        NetworkManager.shared.generateTokens(appId: appId,
+                                             appCertificate: appCertificate,
+                                             channelName: ""/*tokenConfig.roomId*/,
+                                             uid: userInfo.userId,
+                                             tokenGeneratorType: .token007,
+                                             tokenTypes: [.rtc, .rtm]) {[weak self, weak engine] tokens in
+            guard let self = self, let engine = engine else {return}
+            guard tokens.count == 2 else {
+                self.rtcEngine(engine, tokenPrivilegeWillExpire: token)
+                return
+            }
+            self.tokenConfig.rtcToken = tokens[AgoraTokenType.rtc.rawValue]!
+            self.tokenConfig.rtmToken = tokens[AgoraTokenType.rtm.rawValue]!
+            //renew callapi
+            self.callApi.renewToken(with: self.tokenConfig)
+            
+            //renew videoloader
+            self.videoLoaderApi.getConnectionMap().forEach { (channelId, connection) in
+                let mediaOptions = AgoraRtcChannelMediaOptions()
+                mediaOptions.token = self.tokenConfig.rtcToken
+                let ret = self.rtcEngine.updateChannelEx(with: mediaOptions, connection: connection)
+                showTo1v1Print("renew token tokenPrivilegeWillExpire: \(channelId) \(ret)")
+            }
+        }
     }
 }
