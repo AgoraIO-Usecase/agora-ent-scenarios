@@ -12,7 +12,7 @@ protocol TextLoadingBinderDelegate: NSObject {
     var renderStateTitle: String? {get set}
 }
 
-private let loadingExtText = ["", ".", "..", "..."]
+private let loadingExtText = ["   ", ".  ", ".. ", "..."]
 class TextLoadingBinder: NSObject {
     private weak var delegate: TextLoadingBinderDelegate?
     private var timer:Timer!
