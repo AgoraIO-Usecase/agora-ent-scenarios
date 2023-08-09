@@ -1382,6 +1382,8 @@ class LiveDetailFragment : Fragment() {
             onChannelJoined = {
                 onJoinChannelSuccess.invoke()
                 enableContentInspectEx()
+//                mRtcEngine.setDualStreamMode(
+//                    Constants.SimulcastStreamMode.ENABLE_SIMULCAST_STREAM)
             }
         )
 

@@ -507,7 +507,8 @@ object VideoSetting {
         networkLevel: NetworkLevel = NetworkLevel.Good,
         broadcastStrategy: BroadcastStrategy = BroadcastStrategy.Smooth,
         isJoinedRoom: Boolean = false,
-        isByAudience: Boolean = false
+        isByAudience: Boolean = false,
+        rtcConnection: RtcConnection? = null
     ) {
         ShowLogger.d("VideoSettings", "updateBroadcastSetting, deviceLevel:$deviceLevel networkLevel:$networkLevel broadcastStrategy:$broadcastStrategy")
         var liveMode = LiveMode.OneVOne
@@ -550,7 +551,8 @@ object VideoSetting {
                     DeviceLevel.High -> RecommendLowStreamVideoSetting.PK
                 }
             } else null,
-            isJoinedRoom
+            isJoinedRoom,
+            rtcConnection
         )
     }
 
@@ -893,14 +895,18 @@ object VideoSetting {
         ShowLogger.d("VideoSettings", "updateRTCLowStreamSetting, enableLowStream:$enableLowStream, svc:$svc")
         val rtcEngine = RtcEngineInstance.rtcEngine
 
+        val connection = rtcConnection ?: return
         if (enableLowStream) {
             val resolution = encoderResolution ?: return
             val br = bitRate ?: return
             val fps = frameRate ?: return
             val enableSVC = svc ?: return
 
-            rtcEngine.setDualStreamMode(
-                Constants.SimulcastStreamMode.ENABLE_SIMULCAST_STREAM)
+            rtcEngine.setDualStreamModeEx(
+                Constants.SimulcastStreamMode.ENABLE_SIMULCAST_STREAM, SimulcastStreamConfig(
+                    VideoEncoderConfiguration.VideoDimensions(
+                        resolution.width, resolution.height
+                ), -1, fps.fps), connection)
 
             // 1、SVC必须在enableDualStreamModeEx后设置才生效
             // 2、小流开SVC默认软编码
@@ -912,7 +918,7 @@ object VideoSetting {
             }
 
         } else {
-            rtcEngine.setDualStreamMode(Constants.SimulcastStreamMode.DISABLE_SIMULCAST_STREAM)
+            rtcEngine.setDualStreamModeEx(Constants.SimulcastStreamMode.DISABLE_SIMULCAST_STREAM,SimulcastStreamConfig(), connection)
         }
     }
 }

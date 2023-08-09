@@ -4,11 +4,12 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
+import io.agora.rtc2.RtcConnection
 import io.agora.scene.show.R
 import io.agora.scene.show.VideoSetting
 import io.agora.scene.show.databinding.ShowSettingPresetDialogBinding
 
-class PresetDialog constructor(context: Context, deviceScore: Int) : BottomFullDialog(context) {
+class PresetDialog constructor(context: Context, deviceScore: Int, rtcConnection: RtcConnection) : BottomFullDialog(context) {
 
     private val mBinding by lazy {
         ShowSettingPresetDialogBinding.inflate(
@@ -20,6 +21,10 @@ class PresetDialog constructor(context: Context, deviceScore: Int) : BottomFullD
 
     private val deviceScore by lazy {
         deviceScore
+    }
+
+    private val rtcConnection by lazy {
+        rtcConnection
     }
 
     init {
@@ -152,7 +157,7 @@ class PresetDialog constructor(context: Context, deviceScore: Int) : BottomFullD
             VideoSetting.DeviceLevel.Low
         }
 
-        VideoSetting.updateBroadcastSetting(deviceLevel, network, broadcastStrategy)
+        VideoSetting.updateBroadcastSetting(deviceLevel, network, broadcastStrategy, isJoinedRoom = false, isByAudience = false, rtcConnection)
         ToastDialog(context).apply {
             dismissDelayShort()
             showMessage(context.getString(R.string.show_setting_preset_done))

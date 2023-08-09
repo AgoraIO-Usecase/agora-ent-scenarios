@@ -18,9 +18,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import io.agora.beautyapi.sensetime.*
 import io.agora.rtc2.Constants
+import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
@@ -142,7 +144,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         }
     }
 
-    private fun showPresetDialog() = PresetDialog(this, mRtcEngine.queryDeviceScore()).show()
+    private fun showPresetDialog() = PresetDialog(this, mRtcEngine.queryDeviceScore(), RtcConnection(mRoomId, UserManager.getInstance().user.id.toInt())).show()
     private fun showDevicePresetDialog() = DevicePresetDialog(this, mRtcEngine.queryDeviceScore()).show()
     private fun showDebugModeDialog() = DebugSettingDialog(this).show()
 
