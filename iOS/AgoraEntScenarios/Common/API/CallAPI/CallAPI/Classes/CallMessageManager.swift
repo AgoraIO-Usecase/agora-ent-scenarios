@@ -56,7 +56,7 @@ class CallMessageManager: NSObject {
     public weak var delegate: CallMessageDelegate?
     private var config: CallConfig!
     private var rtmClient: AgoraRtmClientKit!
-    private var rtmDelegate: AgoraRtmClientDelegate?
+    private weak var rtmDelegate: AgoraRtmClientDelegate?
     
     private var snapshotTimer: Timer?
     private var snapshotDidRecv: ((NSError?)->())?
@@ -74,7 +74,7 @@ class CallMessageManager: NSObject {
     deinit {
         callMessagePrint("deinit-- CallMessageManager ")
         self.rtmClient?.logout()
-//        self.rtmClient?.destroy()
+        self.rtmClient?.destroy()
     }
     
     init(config: CallConfig, delegate: AgoraRtmClientDelegate?) {
