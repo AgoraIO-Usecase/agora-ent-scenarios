@@ -7,6 +7,7 @@
 
 import Foundation
 import SDWebImage
+import FLAnimatedImage
 
 class ShowTo1v1RoomCell: UICollectionViewCell {
     var callClosure: ((ShowTo1v1RoomInfo?)->())?
@@ -43,6 +44,8 @@ class ShowTo1v1RoomCell: UICollectionViewCell {
         
         return layer
     }()
+    
+    private lazy var liveTagView: LiveTagView = LiveTagView()
     
     // 背景图
     private lazy var bgImageView: UIImageView = {
@@ -117,6 +120,7 @@ class ShowTo1v1RoomCell: UICollectionViewCell {
         bgImageView.addSubview(blurView)
         contentView.addSubview(contentImageView)
         contentImageView.layer.addSublayer(gradientLayer)
+        contentImageView.addSubview(liveTagView)
         contentImageView.addSubview(canvasView)
         contentImageView.addSubview(userNameLabel)
         contentImageView.addSubview(avatarView)
@@ -147,6 +151,9 @@ class ShowTo1v1RoomCell: UICollectionViewCell {
         callButton.aui_size = CGSize(width: 76, height: 76)
         callButton.aui_right = contentImageView.aui_width - 15
         callButton.aui_centerY = avatarView.aui_centerY
+        
+        liveTagView.sizeToFit()
+        liveTagView.aui_tl = CGPoint(x: 11, y: 10)
     }
     
     @objc func _callAction() {

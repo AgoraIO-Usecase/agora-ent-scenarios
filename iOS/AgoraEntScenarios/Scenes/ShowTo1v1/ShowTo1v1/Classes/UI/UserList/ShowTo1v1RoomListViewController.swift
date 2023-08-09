@@ -17,6 +17,7 @@ class ShowTo1v1RoomListViewController: UIViewController {
     var appCertificate: String = ""
     var userInfo: ShowTo1v1UserInfo?
     
+    private weak var createRoomDialog: CreateRoomDialog?
     private let tokenConfig: CallTokenConfig = CallTokenConfig()
     private var videoLoaderApi: IVideoLoaderApi = VideoLoaderApiImpl()
     private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
@@ -243,13 +244,16 @@ extension ShowTo1v1RoomListViewController {
     
     @objc private func _createAction() {
         guard let userInfo = userInfo else {return}
+        createRoomDialog =
         CreateRoomDialog.show(user: userInfo) {[weak self] roomName in
             if roomName.count == 0 {
                 AUIToast.show(text: "create_room_name_empty_tips".showTo1v1Localization())
                 return 
             }
+            self?.createRoomDialog?.isUserInteractionEnabled = false
             self?.service.createRoom(roomName: roomName) { roomInfo, error in
                 guard let self = self else {return}
+                self.createRoomDialog?.isUserInteractionEnabled = true
                 if let error = error {
                     AUIToast.show(text: error.localizedDescription)
                     return
