@@ -824,6 +824,7 @@ object VideoSetting {
             }
         }
         PVC?.let {
+            rtcEngine.setParameters("{\"rtc.video.pvc_max_support_resolution\": 2073600}")
             rtcEngine.setParameters("{\"rtc.video.enable_pvc\":${it}}")
         }
         captureResolution?.let {
