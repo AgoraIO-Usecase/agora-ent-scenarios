@@ -251,9 +251,11 @@ extension ShowTo1v1RoomListViewController {
                 return 
             }
             self?.createRoomDialog?.isUserInteractionEnabled = false
+            self?.createRoomDialog?.isLoading = true
             self?.service.createRoom(roomName: roomName) { roomInfo, error in
                 guard let self = self else {return}
                 self.createRoomDialog?.isUserInteractionEnabled = true
+                self.createRoomDialog?.isLoading = false
                 if let error = error {
                     AUIToast.show(text: error.localizedDescription)
                     return

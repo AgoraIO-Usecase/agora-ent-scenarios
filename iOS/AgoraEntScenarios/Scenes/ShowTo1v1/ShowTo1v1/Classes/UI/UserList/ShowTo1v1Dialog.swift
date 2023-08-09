@@ -124,9 +124,28 @@ class ShowTo1v1NoDataDialog: ShowTo1v1Dialog {
 
 private let kDialogTag = 1112234567
 //创建房间弹窗
-class CreateRoomDialog: ShowTo1v1Dialog {
+class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
+    var stateTitle: String? = "user_list_creating".showTo1v1Localization() 
+    var renderStateTitle: String? {
+        set {
+            createButton.setTitle(newValue ?? "", for: .disabled)
+        }
+        get {
+            return createButton.title(for: .disabled)
+        }
+    }
+    
+    var isLoading: Bool = false {
+        didSet {
+            createButton.isEnabled = !isLoading
+            createButton.isLoading = isLoading
+            loadingBinder = isLoading ? TextLoadingBinder(delegate: self) : nil
+        }
+    }
     var userInfo: ShowTo1v1UserInfo?
     var createClosure: ((String)->())?
+    
+    private var loadingBinder: TextLoadingBinder?
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "create_room_title".showTo1v1Localization()
@@ -177,19 +196,19 @@ class CreateRoomDialog: ShowTo1v1Dialog {
         return label
     }()
     
-    private lazy var createButton: UIButton = {
-        let button = UIButton(type: .custom)
+    private lazy var createButton: LoadingButton = {
+        let button = LoadingButton(type: .custom)
         button.frame = CGRect(x: 0,
                               y: 0,
                               width: 175,
                               height: 42)
-        button.backgroundColor = UIColor(hexString: "#345dff")
+        button.setBackgroundImage(UIImage.init(color: UIColor(hexString: "#345dff")!), for: .normal)
+        button.setBackgroundImage(UIImage.init(color: UIColor(red: 0.204, green: 0.365, blue: 1, alpha: 1)), for: .normal)
         button.setCornerRadius(21)
-        button.setTitle("user_list_create_room".showTo1v1Localization(), for: .normal)
-        button.setImage(UIImage.sceneImage(name: "create_room"), for: .normal)
+        button.setTitle("user_list_create".showTo1v1Localization(), for: .normal)
+        button.setTitle("user_list_creating".showTo1v1Localization(), for: .disabled)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         button.setTitleColor(.white, for: .normal)
-        button.adjustHorizonAlign(spacing: 10)
         button.addTarget(self, action: #selector(_createAction), for: .touchUpInside)
         return button
     }()
@@ -203,6 +222,7 @@ class CreateRoomDialog: ShowTo1v1Dialog {
         dialogView.addSubview(createButton)
         
         iconView.isHidden = true
+        
     }
     
     override func contentSize() -> CGSize {
