@@ -60,8 +60,8 @@ class ShowTo1v1RoomCell: UICollectionViewCell {
         return visualEffectView
     }()
     
-    lazy var canvasView: UIView = {
-        let view = UIView()
+    lazy var canvasView: ThumnbnailCanvasView = {
+        let view = ThumnbnailCanvasView()
         view.backgroundColor = UIColor(hexString: "#0038ff")
         let tapGes = UITapGestureRecognizer {[weak self] ges in
             guard let self = self else {return}
