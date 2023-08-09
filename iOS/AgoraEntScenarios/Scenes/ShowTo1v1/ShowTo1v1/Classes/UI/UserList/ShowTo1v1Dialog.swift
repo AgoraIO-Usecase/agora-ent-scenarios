@@ -41,12 +41,6 @@ class ShowTo1v1Dialog: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event)
-        guard let point = touches.first?.location(in: self), !dialogView.frame.contains(point) else {return}
-        hiddenAnimation()
-    }
-    
     func contentSize() ->CGSize {
         return .zero
     }
@@ -244,6 +238,12 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
         createButton.aui_bottom = dialogView.aui_height - UIDevice.current.aui_SafeDistanceBottom - 19
     }
     
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        guard let point = touches.first?.location(in: self), !dialogView.frame.contains(point) else {return}
+        hiddenAnimation()
+    }
+    
     override func showAnimation() {
         setNeedsLayout()
         layoutIfNeeded()
@@ -279,5 +279,149 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
     
     @objc private func _createAction() {
         createClosure?(textField.text ?? "")
+    }
+}
+
+//主叫弹窗
+class CallerDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
+    var cancelClosure: (()->())?
+    var stateTitle: String? = "call_state_connecting".showTo1v1Localization() {
+        didSet {
+            setNeedsLayout()
+        }
+    }
+    var renderStateTitle: String? {
+        set {
+            stateLabel.text = newValue
+            stateLabel.sizeToFit()
+        }
+        get {
+            return stateLabel.text
+        }
+    }
+    private var loadingBinder: TextLoadingBinder?
+    fileprivate var userInfo: ShowTo1v1UserInfo? {
+        didSet {
+            avatarView.sd_setImage(with: URL(string: userInfo?.avatar ?? ""))
+            userNameLabel.text = userInfo?.userName ?? ""
+            bgImageView.image = userInfo?.bgImage()
+        }
+    }
+    
+    private lazy var bgImageView: UIImageView = {
+        let view = UIImageView()
+        view.contentMode = .scaleAspectFill
+        return view
+    }()
+    private lazy var bgMaskView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(hexString: "#070707")?.withAlphaComponent(0.2)
+        return view
+    }()
+    
+    private lazy var avatarView: UIImageView = {
+        let view = UIImageView()
+        view.clipsToBounds = true
+        return view
+    }()
+    
+    private lazy var userNameLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.font = UIFont.systemFont(ofSize: 22)
+        return label
+    }()
+    
+    private lazy var stateLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.font = UIFont.systemFont(ofSize: 14)
+        return label
+    }()
+    
+    private lazy var cancelButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage.sceneImage(name: "call_reject"), for: .normal)
+        button.addTarget(self, action: #selector(_cancelAction), for: .touchUpInside)
+        return button
+    }()
+    
+    override func _loadSubView() {
+        addSubview(bgImageView)
+        bgImageView.addSubview(bgMaskView)
+        super._loadSubView()
+        dialogView.addSubview(avatarView)
+        dialogView.addSubview(userNameLabel)
+        dialogView.addSubview(stateLabel)
+        dialogView.addSubview(cancelButton)
+        
+        loadingBinder = TextLoadingBinder(delegate: self)
+    }
+    
+    override func contentSize() -> CGSize {
+        return CGSize(width: self.aui_width, height: 357)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        bgImageView.frame = bounds
+        bgMaskView.frame = bgImageView.bounds
+        
+        avatarView.aui_size = CGSize(width: 72, height: 72)
+        avatarView.centerY = contentView.aui_top
+        avatarView.centerX = aui_width / 2
+        avatarView.layer.cornerRadius = avatarView.aui_width / 2
+        avatarView.layer.borderWidth = 5
+        avatarView.layer.borderColor = UIColor.white.cgColor
+        
+        userNameLabel.sizeToFit()
+        stateLabel.sizeToFit()
+        userNameLabel.centerX = avatarView.centerX
+        userNameLabel.aui_top = avatarView.aui_bottom + 18
+        stateLabel.aui_centerX = aui_width / 2
+        stateLabel.aui_top = userNameLabel.aui_bottom + 18
+        
+        cancelButton.aui_size = CGSize(width: 70, height: 70)
+        cancelButton.centerX = aui_width / 2
+        cancelButton.aui_top = stateLabel.aui_bottom + 62
+    }
+    
+    override func showAnimation() {
+        setNeedsLayout()
+        layoutIfNeeded()
+        bgImageView.alpha = 0
+        dialogView.aui_top = self.aui_height
+        UIView.animate(withDuration: kDialogAnimationDuration) {
+            self.bgImageView.alpha = 1
+            self.dialogView.aui_bottom = self.aui_height
+        }
+    }
+    
+    override func hiddenAnimation() {
+        UIView.animate(withDuration: kDialogAnimationDuration) {
+            self.bgImageView.alpha = 0
+            self.dialogView.aui_top = self.aui_height
+        } completion: { success in
+            self.removeFromSuperview()
+        }
+    }
+    
+    static func show(user: ShowTo1v1UserInfo) -> CallerDialog? {
+        CallerDialog.hidden()
+        guard let window = getWindow() else {return nil}
+        let dialog = CallerDialog(frame: window.bounds)
+        dialog.userInfo = user
+        dialog.tag = kDialogTag
+        window.addSubview(dialog)
+        dialog.showAnimation()
+        return dialog
+    }
+    
+    static func hidden() {
+        getWindow()?.viewWithTag(kDialogTag)?.removeFromSuperview()
+    }
+    
+    @objc private func _cancelAction() {
+        cancelClosure?()
     }
 }

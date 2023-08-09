@@ -7,7 +7,16 @@
 */
 
 
+"authorized_microphone_fail"="麦克风权限未设置,请设置麦克风权限";
+"authorized_camera_fail"="摄像头权限未设置,请设置摄像头权限";
+"authorized_title"="提示";
+"authorized_ok"="确定";
+"authorized_cancel"="取消";
+
 "user_list_title"="秀场转1V1私密房";
+"room_list_refresh_tips"="房间列表已刷新";
+"call_not_init"="网络异常";
+"call_state_connecting"="连接中";
 "user_list_waitting"="暂无主播在线，你来创建一个吧！";
 "user_list_create_room"="创建房间";
 "user_list_live_tag"="Live";
