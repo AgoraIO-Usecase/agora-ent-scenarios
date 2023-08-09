@@ -64,7 +64,9 @@ PODS:
   - ShowTo1v1 (0.1.0):
     - AgoraSyncManager
     - CallAPI
+    - FLAnimatedImage
     - SDWebImage
+    - SDWebImage/GIF
     - SnapKit
     - SwiftyBeaver
     - VideoLoaderAPI
@@ -203,7 +205,7 @@ SPEC CHECKSUMS:
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
   SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
-  ShowTo1v1: 8226b8c0bdc8e1c275ccb169923a1091eb3bcce5
+  ShowTo1v1: 4da6561d6f12576ce61d05add891595d18bc08d0
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
