@@ -28,7 +28,6 @@ class BroadcasterViewController: BaseRoomViewController {
             rtcEngine?.renewToken(broadcasterToken)
         }
     }
-    var rtcEngine: AgoraRtcEngineKit?
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .custom)
         button.aui_size = CGSize(width: 32, height: 32)

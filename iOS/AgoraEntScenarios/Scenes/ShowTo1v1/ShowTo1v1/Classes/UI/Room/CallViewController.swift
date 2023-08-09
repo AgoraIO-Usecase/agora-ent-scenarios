@@ -27,8 +27,8 @@ class CallViewController: BaseRoomViewController {
         return button
     }()
     
-    lazy var smallCanvasView: UIView = {
-        let view = UIView()
+    lazy var smallCanvasView: CallCanvasView = {
+        let view = CallCanvasView(frame: CGRect(origin: .zero, size: CGSize(width: 109, height: 163)))
         view.backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
         view.addGestureRecognizer(moveViewModel.gesture)
         return view

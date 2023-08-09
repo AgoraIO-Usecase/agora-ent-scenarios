@@ -1,6 +1,6 @@
 //
-//  Pure1v1Model.swift
-//  Pure1v1
+//  ShowTo1v1Model.swift
+//  ShowTo1v1
 //
 //  Created by wushengtao on 2023/7/27.
 //
@@ -17,6 +17,16 @@ public class ShowTo1v1UserInfo: NSObject {
     func getUIntUserId() -> UInt {
         return UInt(userId) ?? 0
     }
+    
+    func get1V1ChannelId() ->String {
+        return "1v1_\(userId)"
+    }
+    
+    func bgImage() ->UIImage? {
+        let uid = getUIntUserId()
+        let image = UIImage.sceneImage(name: "user_bg\(uid % 9 + 1)")
+        return image
+    }
 }
 
 @objcMembers
@@ -27,12 +37,6 @@ public class ShowTo1v1RoomInfo: ShowTo1v1UserInfo {
     public var createdAt: Int64 = 0
     
     var objectId: String = ""
-    
-    func bgImage() ->UIImage? {
-        let uid = getUIntUserId()
-        let image = UIImage.sceneImage(name: "user_bg\(uid % 9 + 1)")
-        return image
-    }
     
     func createRoomInfo(token: String) -> RoomInfo {
         let room = RoomInfo()

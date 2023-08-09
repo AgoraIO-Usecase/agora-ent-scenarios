@@ -11,6 +11,7 @@ import AgoraRtcKit
 
 class BaseRoomViewController: UIViewController {
     var onBackClosure: (()->())?
+    var rtcEngine: AgoraRtcEngineKit?
     var callApi: CallApiProtocol? {
         didSet {
             oldValue?.removeListener(listener: self)
@@ -20,7 +21,7 @@ class BaseRoomViewController: UIViewController {
         }
     }
     lazy var roomInfoView: RoomInfoView = RoomInfoView()
-    lazy var bigCanvasView: UIView = UIView()
+    lazy var bigCanvasView = CallCanvasView()
     private lazy var bottomBar: RoomBottomBar = {
         let bar = RoomBottomBar(frame: .zero)
         bar.delegate = self

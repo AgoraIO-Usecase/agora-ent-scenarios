@@ -17,6 +17,8 @@ class RoomListViewController: UIViewController {
     var appCertificate: String = ""
     var userInfo: ShowTo1v1UserInfo?
     
+    private weak var callDialog: ShowTo1v1Dialog?
+    private var connectedUserId: UInt?
     private weak var createRoomDialog: CreateRoomDialog?
     private let tokenConfig: CallTokenConfig = CallTokenConfig()
     private var videoLoaderApi: IVideoLoaderApi = VideoLoaderApiImpl()
@@ -24,7 +26,7 @@ class RoomListViewController: UIViewController {
     private var callState: CallStateType = .idle
     private lazy var callVC: CallViewController = {
         let vc = CallViewController()
-        vc.callApi = callApi
+        vc.modalPresentationStyle = .fullScreen
         return vc
     }()
     private let callApi = CallApiImpl()
@@ -38,8 +40,8 @@ class RoomListViewController: UIViewController {
         let listView = RoomPagingListView(frame: self.view.bounds)
         listView.delegate = self
         listView.callClosure = { [weak self] roomInfo in
-            guard let user = roomInfo else {return}
-            self?._call(user: user)
+            guard let roomInfo = roomInfo else {return}
+            self?._call(room: roomInfo)
         }
         listView.tapClosure = { [weak self] roomInfo in
             guard let roomInfo = roomInfo else {return}
@@ -107,6 +109,35 @@ class RoomListViewController: UIViewController {
         self.view.addSubview(guideView)
         UserDefaults.standard.set(true, forKey: kShowGuideAlreadyKey)
     }
+    
+    private func _setupCallApi() {
+        guard let userInfo = userInfo else {
+            assert(false, "userInfo == nil")
+            return
+        }
+        
+        if tokenConfig.rtcToken.count > 0, tokenConfig.rtmToken.count > 0 {
+            return
+        }
+        //设置主叫频道
+        tokenConfig.roomId = userInfo.get1V1ChannelId()
+        NetworkManager.shared.generateTokens(appId: appId,
+                                             appCertificate: appCertificate,
+                                             channelName: tokenConfig.roomId,
+                                             uid: userInfo.userId,
+                                             tokenGeneratorType: .token007,
+                                             tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
+            guard let self = self else {return}
+            guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue],
+                  let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
+                return
+            }
+            self.tokenConfig.rtcToken = rtcToken
+            self.tokenConfig.rtmToken = rtmToken
+            
+//            self._initCallAPI(tokenConfig: self.tokenConfig)
+        }
+    }
 }
 
 extension RoomListViewController: UICollectionViewDelegate {
@@ -152,8 +183,6 @@ extension RoomListViewController {
             guard let self = self else {return}
             self.tokenConfig.rtcToken = tokens[AgoraTokenType.rtc.rawValue]!
             self.tokenConfig.rtmToken = tokens[AgoraTokenType.rtm.rawValue]!
-            
-            self._initCallerAPI(tokenConfig: self.tokenConfig)
         }
         
         let config = VideoLoaderConfig()
@@ -163,30 +192,32 @@ extension RoomListViewController {
         videoLoaderApi.addListener(listener: self)
     }
     
-    private func _initCallerAPI(tokenConfig: CallTokenConfig) {
+    private func _initCallerAPI(tokenConfig: CallTokenConfig, room: ShowTo1v1RoomInfo) {
         let config = CallConfig()
         config.role = .caller  // Pure 1v1 can only be set as the caller
         config.mode = .showTo1v1
         config.appId = appId
-        config.userId = UInt(userInfo?.userId ?? "")!
+        config.userId = userInfo!.getUIntUserId()
         config.rtcEngine = _createRtcEngine()
         config.localView = callVC.smallCanvasView
         config.remoteView = callVC.bigCanvasView
+        config.ownerRoomId = room.roomId
         
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
         }
         callApi.addListener(listener: self)
     }
     
-    private func _initCalleeAPI(tokenConfig: CallTokenConfig) {
+    private func _initCalleeAPI(tokenConfig: CallTokenConfig, room: ShowTo1v1RoomInfo) {
         let config = CallConfig()
         config.role = .callee  // Pure 1v1 can only be set as the caller
         config.mode = .showTo1v1
         config.appId = appId
-        config.userId = UInt(userInfo?.userId ?? "")!
+        config.userId = userInfo!.getUIntUserId()
         config.rtcEngine = _createRtcEngine()
         config.localView = callVC.smallCanvasView
         config.remoteView = callVC.bigCanvasView
+        config.ownerRoomId = room.roomId
         
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
         }
@@ -206,9 +237,14 @@ extension RoomListViewController {
         return engine
     }
     
-    private func _call(user: ShowTo1v1UserInfo) {
-        callApi.call(roomId: user.userId, remoteUserId: UInt(user.userId)!) { err in
-            
+    private func _call(room: ShowTo1v1RoomInfo) {
+        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
+        AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
+        
+        callApi.deinitialize {
+        }
+        self._initCallerAPI(tokenConfig: self.tokenConfig, room: room)
+        callApi.call(roomId: room.roomId, remoteUserId: room.getUIntUserId()) { err in
         }
     }
 }
@@ -300,36 +336,80 @@ extension RoomListViewController: CallApiListenerProtocol {
         self.callState = state
         
         switch state {
+            case .calling:
+            if presentedViewController == callVC {
+                return
+            }
+            
+            let fromUserId = eventInfo[kFromUserId] as? UInt ?? 0
+            let fromRoomId = eventInfo[kFromRoomId] as? String ?? ""
+            let toUserId = eventInfo[kRemoteUserId] as? UInt ?? 0
+            showTo1v1Print("calling: fromUserId: \(fromUserId) fromRoomId: \(fromRoomId) currentId: \(currentUid) toUserId: \(toUserId)")
+            if let connectedUserId = connectedUserId, connectedUserId != fromUserId {
+                callApi.reject(roomId: fromRoomId, remoteUserId: fromUserId, reason: "already calling") { err in
+                }
+                return
+            }
+            // 触发状态的用户是自己才处理
+            if currentUid == "\(toUserId)" {
+                connectedUserId = fromUserId
+                
+                //被叫不一定在userList能查到，需要从callapi里读取发送用户的user extension
+                var user: ShowTo1v1UserInfo? = listView.roomList.first {$0.userId == "\(fromUserId)"}
+                if user == nil, let userDic = (eventInfo[kFromUserExtension] as? [String: Any]) {
+                    user = ShowTo1v1UserInfo.yy_model(with: userDic) as! ShowTo1v1UserInfo
+                }
+                if let user = user {
+                    //TODO: search parent
+                    AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
+                    AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
+                    
+                    callVC.targetUser = user
+                } else {
+                    showTo1v1Print("callee user not found1")
+                }
+            } else if currentUid == "\(fromUserId)" {
+                connectedUserId = toUserId
+                //主叫userlist一定会有，因为需要点击
+                if let user = listView.roomList.first {$0.userId == "\(toUserId)"} {
+                    let dialog = CallerDialog.show(user: user)
+                    dialog?.cancelClosure = {[weak self] in
+                        self?.callApi.cancelCall(completion: { err in
+                        })
+                    }
+                    callDialog = dialog
+                    callVC.targetUser = user
+                } else {
+                    showTo1v1Print("caller user not found1")
+                }
+            }
+            break
         case .connected:
-            var connectedUserId:String? = ""
-            guard let uid = connectedUserId, let user = listView.roomList.first(where: {$0.userId == "\(uid)"}) else {
+            callDialog?.hiddenAnimation()
+            connectedUserId = nil
+            guard let uid = connectedUserId else {
                 assert(false, "user not fount")
                 return
             }
-            callVC.targetUser = user
-            navigationController?.pushViewController(callVC, animated: false)
+            callVC.dismiss(animated: false)
+            present(callVC, animated: false)
             break
         case .prepared:
+            callDialog?.hiddenAnimation()
+            connectedUserId = nil
             switch stateReason {
             case .localHangup, .remoteHangup:
                 if navigationController?.viewControllers.last == callVC {
                     navigationController?.popViewController(animated: false)
                 }
                 AUIToast.show(text: "call_toast_hangup".showTo1v1Localization())
-//            case .localRejected, .remoteRejected:
-//                AUIToast.show(text: "通话被拒绝")
-//            case .callingTimeout:
-//                AUIToast.show(text: "无应答")
-//            case .localCancel, .remoteCancel:
-//                AUIToast.show(text: "通话被取消")
             default:
                 break
             }
-//            AUIAlertManager.hiddenView()
             break
         case .failed:
-//            AUIToast.show(text: eventReason, postion: .bottom)
-//            AUIAlertManager.hiddenView()
+            callDialog?.hiddenAnimation()
+            connectedUserId = nil
             break
         default:
             break
@@ -339,7 +419,6 @@ extension RoomListViewController: CallApiListenerProtocol {
 
 extension RoomListViewController: IVideoLoaderApiListener {
     func onStateDidChange(newState: RoomStatus, oldState: RoomStatus, channelName: String) {
-        
     }
     
     func debugInfo(_ message: String) {
