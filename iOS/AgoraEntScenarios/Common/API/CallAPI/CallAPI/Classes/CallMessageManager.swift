@@ -58,7 +58,8 @@ class CallMessageManager: NSObject {
     private var rtmClient: AgoraRtmClientKit!
     private var rtmDelegate: AgoraRtmClientDelegate?
     
-    private var snapshotDidRecv: (()->())?
+    private var snapshotTimer: Timer?
+    private var snapshotDidRecv: ((NSError?)->())?
     
     /// RTM是否已经登录
     private var isLoginedRTM: Bool = false
@@ -73,7 +74,7 @@ class CallMessageManager: NSObject {
     deinit {
         callMessagePrint("deinit-- CallMessageManager ")
         self.rtmClient?.logout()
-        self.rtmClient?.destroy()
+//        self.rtmClient?.destroy()
     }
     
     init(config: CallConfig, delegate: AgoraRtmClientDelegate?) {
@@ -141,6 +142,7 @@ extension CallMessageManager {
             
             var error1: NSError? = nil
             var error2: NSError? = nil
+            var error3: NSError? = nil
             let options1 = AgoraRtmSubscribeOptions()
             options1.withMessage = true
             options1.withMetadata = false
@@ -162,12 +164,24 @@ extension CallMessageManager {
             }
             
             group.enter()
-            snapshotDidRecv = {
+            callMessagePrint("waiting for snapshot")
+            //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
+            snapshotDidRecv = {[weak self] err in
+                //暂时忽略改error
+//                error3 = err
+                self?.callMessagePrint("recv snapshot")
+                self?.snapshotTimer?.invalidate()
                 group.leave()
             }
+            //房主可能不在线，snapshot拿不到
+            snapshotTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false, block: {[weak self] timer in
+                self?.snapshotDidRecv?(NSError(domain: "snapshot recv timeout", code: -1))
+                self?.snapshotDidRecv = nil
+            })
+            snapshotTimer?.fire()
             
             group.notify(queue: DispatchQueue.main) {
-                completion?(error1 ?? error2)
+                completion?(error1 ?? error2 ?? error3)
             }
         } else {
             let group = DispatchGroup()
@@ -184,7 +198,7 @@ extension CallMessageManager {
             }
             
             group.enter()
-            snapshotDidRecv = {
+            snapshotDidRecv = { err in
                 group.leave()
             }
             
@@ -282,9 +296,11 @@ extension CallMessageManager {
             return
         }
         
+        callMessagePrint("will subscribe[\(channelName)]")
+        rtmClient.unsubscribe(withChannel: channelName)
         rtmClient.subscribe(withChannel: channelName, option: option) {[weak self] resp, err in
             guard let self = self else {return}
-            self.callMessagePrint("subscribe \(channelName) finished = \(err.errorCode.rawValue)")
+            self.callMessagePrint("subscribe[\(channelName)] finished = \(err.errorCode.rawValue)")
             guard err.errorCode == .ok else {
                 completion?(NSError(domain: err.reason, code: err.errorCode.rawValue))
                 return
@@ -512,7 +528,7 @@ extension CallMessageManager: AgoraRtmClientDelegate {
     //收到RTM的presence
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, on event: AgoraRtmPresenceEvent) {
         if event.type == .snapshot {
-            snapshotDidRecv?()
+            snapshotDidRecv?(nil)
             snapshotDidRecv = nil
         }
         self.rtmDelegate?.rtmKit?(rtmKit, on: event)
@@ -522,9 +538,15 @@ extension CallMessageManager: AgoraRtmClientDelegate {
 extension CallMessageManager {
     private func callMessagePrint(_ message: String) {
         delegate?.debugInfo(message: "[MessageManager]\(message)")
+        #if DEBUG
+        print("[CallApi][MessageManager]\(message)")
+        #endif
     }
     
     private func callWarningPrint(_ message: String) {
         delegate?.debugWarning(message: "[MessageManager]\(message)")
+        #if DEBUG
+        print("[CallApi][Warning][MessageManager]\(message)")
+        #endif
     }
 }

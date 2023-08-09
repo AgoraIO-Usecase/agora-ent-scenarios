@@ -384,6 +384,7 @@ extension CallApiImpl {
     
     
     private func _deinitialize() {
+        isPreparing = false
         _notifyState(state: .idle)
         _notifyEvent(event: .deinitialize)
     }
