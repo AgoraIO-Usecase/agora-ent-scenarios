@@ -58,8 +58,7 @@ class CallMessageManager: NSObject {
     private var rtmClient: AgoraRtmClientKit!
     private weak var rtmDelegate: AgoraRtmClientDelegate?
     
-    private var snapshotTimer: Timer?
-    private var snapshotDidRecv: ((NSError?)->())?
+    private var snapshotDidRecv: (()->())?
     
     /// RTM是否已经登录
     private var isLoginedRTM: Bool = false
@@ -142,7 +141,6 @@ extension CallMessageManager {
             
             var error1: NSError? = nil
             var error2: NSError? = nil
-            var error3: NSError? = nil
             let options1 = AgoraRtmSubscribeOptions()
             options1.withMessage = true
             options1.withMetadata = false
@@ -166,22 +164,15 @@ extension CallMessageManager {
             group.enter()
             callMessagePrint("waiting for snapshot")
             //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
-            snapshotDidRecv = {[weak self] err in
+            snapshotDidRecv = {[weak self] in
                 //暂时忽略改error
 //                error3 = err
                 self?.callMessagePrint("recv snapshot")
-                self?.snapshotTimer?.invalidate()
                 group.leave()
             }
-            //房主可能不在线，snapshot拿不到
-            snapshotTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false, block: {[weak self] timer in
-                self?.snapshotDidRecv?(NSError(domain: "snapshot recv timeout", code: -1))
-                self?.snapshotDidRecv = nil
-            })
-            snapshotTimer?.fire()
             
             group.notify(queue: DispatchQueue.main) {
-                completion?(error1 ?? error2 ?? error3)
+                completion?(error1 ?? error2)
             }
         } else {
             let group = DispatchGroup()
@@ -198,7 +189,7 @@ extension CallMessageManager {
             }
             
             group.enter()
-            snapshotDidRecv = { err in
+            snapshotDidRecv = {
                 group.leave()
             }
             
@@ -529,7 +520,7 @@ extension CallMessageManager: AgoraRtmClientDelegate {
     //收到RTM的presence
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, on event: AgoraRtmPresenceEvent) {
         if event.type == .snapshot {
-            snapshotDidRecv?(nil)
+            snapshotDidRecv?()
             snapshotDidRecv = nil
         }
         self.rtmDelegate?.rtmKit?(rtmKit, on: event)
