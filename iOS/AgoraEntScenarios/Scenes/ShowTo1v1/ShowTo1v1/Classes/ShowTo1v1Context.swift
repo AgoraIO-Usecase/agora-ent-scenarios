@@ -35,7 +35,7 @@ public class ShowTo1v1Context: NSObject {
                                  appId: String,
                                  appCertificate: String,
                                  userInfo: ShowTo1v1UserInfo) {
-        let vc = ShowTo1v1RoomListViewController()
+        let vc = RoomListViewController()
         vc.userInfo = userInfo
         vc.appId = appId
         vc.appCertificate = appCertificate

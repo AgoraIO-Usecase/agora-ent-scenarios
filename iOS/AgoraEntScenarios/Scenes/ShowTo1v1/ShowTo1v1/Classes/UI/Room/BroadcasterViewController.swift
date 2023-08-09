@@ -9,7 +9,7 @@ import UIKit
 import AgoraRtcKit
 import VideoLoaderAPI
 
-class BroadcasterViewController: ShowTo1v1BaseRoomViewController {
+class BroadcasterViewController: BaseRoomViewController {
     var videoLoader: IVideoLoaderApi?
     
     var currentUser: ShowTo1v1UserInfo?
