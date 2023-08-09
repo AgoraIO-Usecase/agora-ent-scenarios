@@ -472,8 +472,8 @@ extension CallApiImpl {
         }
         
         //需要先开启音视频
-        config.rtcEngine.enableAudio()
-        config.rtcEngine.enableVideo()
+        config.rtcEngine.enableLocalAudio(true)
+        config.rtcEngine.enableLocalVideo(true)
         
         let connection = AgoraRtcConnection()
         connection.channelId = roomId

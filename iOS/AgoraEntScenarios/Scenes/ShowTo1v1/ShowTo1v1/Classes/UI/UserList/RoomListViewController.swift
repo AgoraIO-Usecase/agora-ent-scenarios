@@ -173,7 +173,7 @@ extension RoomListViewController {
             return
         }
         
-        tokenConfig.roomId = userInfo.userId
+        tokenConfig.roomId = userInfo.get1V1ChannelId()
         NetworkManager.shared.generateTokens(appId: appId,
                                              appCertificate: appCertificate,
                                              channelName: ""/*tokenConfig.roomId*/,
