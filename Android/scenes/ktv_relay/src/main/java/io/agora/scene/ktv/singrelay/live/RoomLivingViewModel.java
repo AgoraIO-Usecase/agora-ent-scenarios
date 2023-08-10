@@ -209,6 +209,8 @@ public class RoomLivingViewModel extends ViewModel {
 
     private final List<String> singerList = new ArrayList<>();
 
+    private int prepareNum = 0;
+
     public RoomLivingViewModel(JoinRoomOutputModel roomInfo) {
         this.roomInfoLiveData = new MutableLiveData<>(roomInfo);
     }
@@ -665,7 +667,6 @@ public class RoomLivingViewModel extends ViewModel {
                         // TODO ios端 winnerNo 有概率为 null
                         if (value != null && value.getWinnerNo() != null && value.getWinnerNo().equals("") && !songPlaying.getWinnerNo().equals("") && seatLocalLiveData.getValue() != null) {
                             // 所有人更新抢唱结果UI
-                            hasReceiveStartSingRelay = false;
                             GraspModel model = new GraspModel();
                             model.status = GraspStatus.SUCCESS;
                             model.userId = songPlaying.getWinnerNo();
@@ -859,19 +860,30 @@ public class RoomLivingViewModel extends ViewModel {
                         String userName = jsonMsg.getString("userName");
                         String poster = jsonMsg.getString("poster");
 
-                        // 本地演唱 计入rank
-                        RankModel model = new RankModel(
-                                userName,
-                                songNum,
-                                (int)score,
-                                poster,
-                                0
-                        );
-                        rankMap.put(userId, model);
-                    } else if (jsonMsg.getString("cmd").equals("StartSingRelayCountDown")) {
-                        KTVLogger.d(TAG, "StartSingRelayCountDown");
-                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_BATTLE);
-                        hasReceiveStartSingRelay = true;
+//                        // 本地演唱 计入rank
+//                        RankModel model = new RankModel(
+//                                userName,
+//                                songNum,
+//                                (int)score,
+//                                poster,
+//                                0
+//                        );
+//                        rankMap.put(userId, model);
+                    } else if (jsonMsg.getString("cmd").equals("CoSingerLoadSuccess") && isRoomOwner()) {
+                        prepareNum = prepareNum + 1;
+                        if (seatListLiveData.getValue() != null && prepareNum == seatListLiveData.getValue().size() && songPlayingLiveData.getValue() != null) {
+                            ktvApiProtocol.switchSingerRole(KTVSingRole.LeadSinger, new ISwitchRoleStateListener() {
+                                @Override
+                                public void onSwitchRoleSuccess() {
+                                    ktvApiProtocol.startSing(Long.parseLong(songPlayingLiveData.getValue().getSongNo()), 0);
+                                }
+
+                                @Override
+                                public void onSwitchRoleFail(@NonNull SwitchRoleFailReason reason) {
+
+                                }
+                            });
+                        }
                     }
                 } catch (JSONException exp) {
                     KTVLogger.e(TAG, "onStreamMessage:" + exp);
@@ -927,8 +939,11 @@ public class RoomLivingViewModel extends ViewModel {
                public void onMusicPlayerPositionChanged(long position_ms, long timestamp_ms) {
                    super.onMusicPlayerPositionChanged(position_ms, timestamp_ms);
                    Log.d("position", "position: " + position_ms);
+                   if (Math.abs(position_ms - 1000) < 500 && isOnSeat) {
+                       playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_BATTLE);
+                   }
                    for (int i = 0; i < relayList.size() - 1; i++) {
-                       if ((position_ms - relayList.get(i)) > 0 && (position_ms - relayList.get(i) < 1000)) {
+                       if (Math.abs(position_ms - relayList.get(i)) < 500) {
                            // 下一段
                            GraspModel graspModel = new GraspModel();
                            graspModel.status = GraspStatus.IDLE;
@@ -1293,6 +1308,7 @@ public class RoomLivingViewModel extends ViewModel {
     public void resetMusicStatus() {
         KTVLogger.d(TAG, "RoomLivingViewModel.resetMusicStatus() called");
         retryTimes = 0;
+        prepareNum = 0;
         singerList.clear();
         mAudioTrackMode = KTVPlayerTrackMode.Acc;
         ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
@@ -1318,7 +1334,6 @@ public class RoomLivingViewModel extends ViewModel {
         }
     }
 
-    private boolean hasReceiveStartSingRelay = false;
     private void loadMusic(KTVLoadMusicConfiguration config, Long songCode) {
 
         ktvApiProtocol.loadMusic(songCode, config, new IMusicLoadStateListener() {
@@ -1343,19 +1358,22 @@ public class RoomLivingViewModel extends ViewModel {
                 ktvApiProtocol.getMediaPlayer().adjustPublishSignalVolume(50);
 
                 if (isRoomOwner()) {
-                    ktvApiProtocol.switchSingerRole(KTVSingRole.LeadSinger, new ISwitchRoleStateListener() {
-                        @Override
-                        public void onSwitchRoleSuccess() {
-                            ktvApiProtocol.startSing(songCode, 0);
-                        }
+                    prepareNum = prepareNum + 1;
+                    if (seatListLiveData.getValue() != null && prepareNum == seatListLiveData.getValue().size()) {
+                        ktvApiProtocol.switchSingerRole(KTVSingRole.LeadSinger, new ISwitchRoleStateListener() {
+                            @Override
+                            public void onSwitchRoleSuccess() {
+                                ktvApiProtocol.startSing(songCode, 0);
+                            }
 
-                        @Override
-                        public void onSwitchRoleFail(@NonNull SwitchRoleFailReason reason) {
+                            @Override
+                            public void onSwitchRoleFail(@NonNull SwitchRoleFailReason reason) {
 
-                        }
-                    });
-                    SyncStartSing();
+                            }
+                        });
+                    }
                 } else if (isOnSeat()) {
+                    SyncPrepareReady();
                     ktvApiProtocol.switchSingerRole(KTVSingRole.CoSinger, null);
                 }
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
@@ -1493,14 +1511,14 @@ public class RoomLivingViewModel extends ViewModel {
         }
     }
 
-    private void SyncStartSing() {
+    private void SyncPrepareReady() {
         if (mRtcEngine == null) return;
         Map<String, Object> msg = new HashMap<>();
-        msg.put("cmd", "StartSingRelayCountDown");
+        msg.put("cmd", "CoSingerLoadSuccess");
         JSONObject jsonMsg = new JSONObject(msg);
         int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
         if (ret < 0) {
-            KTVLogger.e(TAG, "SyncStartSing() sendStreamMessage called returned: " + ret);
+            KTVLogger.e(TAG, "SyncPrepareReady() sendStreamMessage called returned: " + ret);
         }
     }
 
