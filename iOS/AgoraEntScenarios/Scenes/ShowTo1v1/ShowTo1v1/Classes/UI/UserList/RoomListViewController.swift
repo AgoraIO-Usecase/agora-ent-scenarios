@@ -11,6 +11,19 @@ import CallAPI
 import AgoraRtcKit
 import VideoLoaderAPI
 
+private let randomRoomName = [
+"Test Room 1",
+"Test Room 2",
+"Test Room 3",
+"Test Room 4",
+"Test Room 5",
+"Test Room 6",
+"Test Room 7",
+"Test Room 8",
+"Test Room 9",
+"Test Room 10",
+]
+
 private let kShowGuideAlreadyKey = "already_show_guide_show1v1"
 class RoomListViewController: UIViewController {
     var appId: String = ""
@@ -300,10 +313,10 @@ extension RoomListViewController {
     @objc private func _createAction() {
         guard let userInfo = userInfo else {return}
         createRoomDialog =
-        CreateRoomDialog.show(user: userInfo) {[weak self] roomName in
+        CreateRoomDialog.show(user: userInfo, createClosure: {[weak self] roomName in
             if roomName.count == 0 {
                 AUIToast.show(text: "create_room_name_empty_tips".showTo1v1Localization())
-                return 
+                return
             }
             self?.createRoomDialog?.isUserInteractionEnabled = false
             self?.createRoomDialog?.isLoading = true
@@ -319,7 +332,11 @@ extension RoomListViewController {
                 self._showBroadcasterVC(roomInfo: roomInfo)
                 CreateRoomDialog.hidden()
             }
-        }
+        }, randomClosure: {
+            let roomNameIdx = Int(arc4random()) % randomRoomName.count
+            let roomName = randomRoomName[roomNameIdx]
+            return roomName
+        })
     }
     
     private func _showBroadcasterVC(roomInfo: ShowTo1v1RoomInfo) {
