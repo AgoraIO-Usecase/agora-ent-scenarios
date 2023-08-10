@@ -59,10 +59,10 @@ extension ShowAgoraKitManager {
     }
     
     func debugDefaultBroadcastorSetting() {
-        videoEncoderConfig.dimensions = CGSize(width: 1920, height: 1080)
-        videoEncoderConfig.frameRate = .fps15
-        videoEncoderConfig.bitrate = 1800
-        engine?.setVideoEncoderConfiguration(videoEncoderConfig)
+        encoderConfig.dimensions = CGSize(width: 1920, height: 1080)
+        encoderConfig.frameRate = .fps15
+        encoderConfig.bitrate = 1800
+        engine?.setVideoEncoderConfiguration(encoderConfig)
         
         setExposureRange()
         setColorSpace()
@@ -100,9 +100,9 @@ extension ShowAgoraKitManager {
         var originalValue = ""
         switch key {
         case .encodeFrameRate:
-            originalValue = "\(videoEncoderConfig.frameRate.rawValue)"
+            originalValue = "\(encoderConfig.frameRate.rawValue)"
         case .bitRate:
-            originalValue = "\(videoEncoderConfig.bitrate)"
+            originalValue = "\(encoderConfig.bitrate)"
         }
         return ShowDebug1TFModel(title: key.rawValue, tfText: originalValue, unitText: key.unit)
     }
@@ -111,8 +111,8 @@ extension ShowAgoraKitManager {
         var text1 = "", text2 = ""
         switch key {
         case .encodeVideoSize:
-            text1 = "\(Int(videoEncoderConfig.dimensions.width))"
-            text2 = "\(Int(videoEncoderConfig.dimensions.height))"
+            text1 = "\(Int(encoderConfig.dimensions.width))"
+            text2 = "\(Int(encoderConfig.dimensions.height))"
         case .exposureRange:
             if let exposureRangeX = exposureRangeX {
                 text1 = "\(exposureRangeX)"
@@ -140,17 +140,17 @@ extension ShowAgoraKitManager {
                 showLogger.info("***Debug*** 编码帧率参数为空 ")
                 return
             }
-            videoEncoderConfig.frameRate = fps
-            engine?.setVideoEncoderConfiguration(videoEncoderConfig)
-            showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeFrameRate = \(videoEncoderConfig.frameRate) ")
+            encoderConfig.frameRate = fps
+            engine?.setVideoEncoderConfiguration(encoderConfig)
+            showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeFrameRate = \(encoderConfig.frameRate) ")
         case .bitRate:
             guard let value = Int(text) else {
                 showLogger.info("***Debug*** 码率参数为空")
                 return
             }
-            videoEncoderConfig.bitrate = value
-            engine?.setVideoEncoderConfiguration(videoEncoderConfig)
-            showLogger.info("***Debug*** setVideoEncoderConfiguration.bitrate = \(videoEncoderConfig.bitrate) ")
+            encoderConfig.bitrate = value
+            engine?.setVideoEncoderConfiguration(encoderConfig)
+            showLogger.info("***Debug*** setVideoEncoderConfiguration.bitrate = \(encoderConfig.bitrate) ")
         }
     }
     
@@ -161,9 +161,9 @@ extension ShowAgoraKitManager {
         guard value1 > 0, value2 > 0 else { return }
         switch key {
         case .encodeVideoSize:
-            videoEncoderConfig.dimensions = CGSize(width: value1, height: value2)
-            engine?.setVideoEncoderConfiguration(videoEncoderConfig)
-            showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeVideoSize = \(videoEncoderConfig.dimensions) ")
+            encoderConfig.dimensions = CGSize(width: value1, height: value2)
+            engine?.setVideoEncoderConfiguration(encoderConfig)
+            showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeVideoSize = \(encoderConfig.dimensions) ")
         case .exposureRange:
             exposureRangeX = value1
             exposureRangeY = value2

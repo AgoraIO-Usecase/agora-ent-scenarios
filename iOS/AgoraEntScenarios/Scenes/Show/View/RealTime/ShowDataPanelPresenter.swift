@@ -159,13 +159,13 @@ class ShowDataPanelPresenter {
         let startup = receive ? "\(callTs) ms" : "--"
         let startupStr = "show_statistic_startup_time".show_localized + ": " + startup
         // h265开关
-        let h265 = receive ? onStr : "--"
+        let h265 = send ? onStr : "--"
         let h265Str = "H265" + ": " + h265
         // 超分开关
         let sr = receive ? (params.sr ? onStr : offStr) : "--"
         let srStr = "show_statistic_SR_switch".show_localized + ": " + sr
         // 小流开关
-        let microStream = send ? (params.simulcast ? onStr : offStr) : "--"
+        let microStream = send ? ((params.dualStream != nil) ? onStr : offStr) : "--"
         let microStreamStr = "show_statistic_micro_stream_switch".show_localized + ": " + microStream
         // right:
         //机型等级
