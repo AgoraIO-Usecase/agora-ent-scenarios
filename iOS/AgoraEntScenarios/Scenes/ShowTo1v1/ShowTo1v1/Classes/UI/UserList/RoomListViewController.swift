@@ -438,6 +438,8 @@ extension RoomListViewController: CallApiListenerProtocol {
             case .localHangup, .remoteHangup:
                 callVC.dismiss(animated: false)
                 AUIToast.show(text: "call_toast_hangup".showTo1v1Localization())
+            case .remoteRejected:
+                AUIToast.show(text: "call_user_busy_tips".showTo1v1Localization())
             default:
                 break
             }

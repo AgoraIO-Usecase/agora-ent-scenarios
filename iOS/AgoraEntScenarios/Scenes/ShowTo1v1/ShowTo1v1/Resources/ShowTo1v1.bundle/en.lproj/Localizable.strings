@@ -32,6 +32,7 @@
 "call_usage_tips"=" 本产品仅用于功能体验，单次直播时长不超过20mins";
 "call_toast_hangup"="对方结束连线";
 "setting_statistic" = "实时数据";
+"call_user_busy_tips"="我很快回来，一会再连线我把";
 
 
 "show_statistic_bitrate" = "码率";
