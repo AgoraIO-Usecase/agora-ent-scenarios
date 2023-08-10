@@ -15,7 +15,11 @@ private let kShowGuideAlreadyKey = "already_show_guide_show1v1"
 class RoomListViewController: UIViewController {
     var appId: String = ""
     var appCertificate: String = ""
-    var userInfo: ShowTo1v1UserInfo?
+    var userInfo: ShowTo1v1UserInfo? {
+        didSet {
+            callVC.currentUser = userInfo
+        }
+    }
     
     private weak var callDialog: ShowTo1v1Dialog?
     private var connectedUserId: UInt?
@@ -27,6 +31,7 @@ class RoomListViewController: UIViewController {
     private lazy var callVC: CallViewController = {
         let vc = CallViewController()
         vc.modalPresentationStyle = .fullScreen
+        vc.callApi = callApi
         return vc
     }()
     private let callApi = CallApiImpl()
@@ -202,10 +207,17 @@ extension RoomListViewController {
         config.localView = callVC.smallCanvasView
         config.remoteView = callVC.bigCanvasView
         config.ownerRoomId = room.roomId
+        if let userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any] {
+            config.userExtension = userExtension
+        }
         
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
         }
         callApi.addListener(listener: self)
+        
+        //reset callVC
+        callVC.callApi = callApi
+        callVC.roomInfo = room
     }
     
     private func _initCalleeAPI(tokenConfig: CallTokenConfig, room: ShowTo1v1RoomInfo) {
@@ -222,6 +234,10 @@ extension RoomListViewController {
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
         }
         callApi.addListener(listener: self)
+        
+        //reset callVC
+        callVC.callApi = callApi
+        callVC.roomInfo = room
     }
     
     private func _createRtcEngine() ->AgoraRtcEngineKit {
@@ -304,6 +320,11 @@ extension RoomListViewController {
     }
     
     private func _showBroadcasterVC(roomInfo: ShowTo1v1RoomInfo) {
+        guard roomInfo.userId == userInfo?.userId else {return}
+        callApi.deinitialize {
+        }
+        self._initCalleeAPI(tokenConfig: self.tokenConfig, room: roomInfo)
+        
         let vc = BroadcasterViewController()
         vc.modalPresentationStyle = .fullScreen
         vc.videoLoader = self.videoLoaderApi
@@ -317,6 +338,7 @@ extension RoomListViewController {
             })
         }
         self.present(vc, animated: false)
+        
     }
 }
 
@@ -386,22 +408,15 @@ extension RoomListViewController: CallApiListenerProtocol {
             break
         case .connected:
             callDialog?.hiddenAnimation()
-            connectedUserId = nil
-            guard let uid = connectedUserId else {
-                assert(false, "user not fount")
-                return
-            }
             callVC.dismiss(animated: false)
-            present(callVC, animated: false)
+            _topViewController().present(callVC, animated: false)
             break
         case .prepared:
             callDialog?.hiddenAnimation()
             connectedUserId = nil
             switch stateReason {
             case .localHangup, .remoteHangup:
-                if navigationController?.viewControllers.last == callVC {
-                    navigationController?.popViewController(animated: false)
-                }
+                callVC.dismiss(animated: false)
                 AUIToast.show(text: "call_toast_hangup".showTo1v1Localization())
             default:
                 break
@@ -414,6 +429,13 @@ extension RoomListViewController: CallApiListenerProtocol {
         default:
             break
         }
+    }
+    
+    func debugInfo(message: String) {
+        showTo1v1Print(message, context: "CallApi")
+    }
+    func debugWarning(message: String) {
+        showTo1v1Print(message, context: "CallApi")
     }
 }
 
@@ -465,5 +487,17 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
                 showTo1v1Print("renew token tokenPrivilegeWillExpire: \(channelId) \(ret)")
             }
         }
+    }
+}
+
+
+extension UIViewController {
+    func _topViewController() -> UIViewController {
+        let viewController = self
+
+        if let presentedController = viewController.presentedViewController {
+            return presentedController._topViewController()
+        }
+        return viewController
     }
 }

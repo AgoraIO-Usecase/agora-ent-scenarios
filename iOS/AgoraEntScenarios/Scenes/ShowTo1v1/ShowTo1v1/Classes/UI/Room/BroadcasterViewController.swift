@@ -8,12 +8,13 @@
 import UIKit
 import AgoraRtcKit
 import VideoLoaderAPI
+import CallAPI
 
 class BroadcasterViewController: BaseRoomViewController {
     var videoLoader: IVideoLoaderApi?
     
     var currentUser: ShowTo1v1UserInfo?
-    var roomInfo: ShowTo1v1RoomInfo? {
+    override var roomInfo: ShowTo1v1RoomInfo? {
         didSet {
             let createdAt = roomInfo?.createdAt ?? 0
             roomInfoView.setRoomInfo(avatar: roomInfo?.avatar ?? "",
@@ -35,6 +36,20 @@ class BroadcasterViewController: BaseRoomViewController {
         button.addTarget(self, action: #selector(onBackAction), for: .touchUpInside)
         return button
     }()
+    
+    deinit {
+        showTo1v1Print("deinit-- BroadcasterViewController")
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        showTo1v1Print("init-- BroadcasterViewController")
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -49,24 +64,23 @@ class BroadcasterViewController: BaseRoomViewController {
         guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.userId) else {return}
         if currentUser.userId == roomInfo.userId {
             videoLoader?.cleanCache()
-            let channelId = "broadcaster_\(uid)"
+            let channelId = roomInfo.roomId
             rtcEngine?.setClientRole(.broadcaster)
-            rtcEngine?.enableAudio()
-            rtcEngine?.enableVideo()
+            rtcEngine?.enableLocalVideo(true)
+            rtcEngine?.enableLocalAudio(true)
             let mediaOptions = AgoraRtcChannelMediaOptions()
             mediaOptions.publishCameraTrack = true
             mediaOptions.publishMicrophoneTrack = true
-            showTo1v1Print("broadcaster joinChannel: \(channelId) \(uid)")
+            showTo1v1Print("broadcaster joinChannel[\(channelId)] \(uid)")
             rtcEngine?.joinChannel(byToken: broadcasterToken,
                                    channelId: channelId,
                                    uid: uid,
-                                   mediaOptions: mediaOptions, joinSuccess: { channelId, uid, elapsed in
-                showTo1v1Print("broadcaster joinChannel success: \(channelId) \(uid)")
+                                   mediaOptions: mediaOptions,
+                                   joinSuccess: { channelId, uid, elapsed in
+                showTo1v1Print("broadcaster joinChannel[\(channelId)] success:  \(uid)")
             })
-            let canvas = AgoraRtcVideoCanvas()
-            canvas.view = bigCanvasView
-            canvas.uid = uid
-            rtcEngine?.setupLocalVideo(canvas)
+            
+            _setupCanvas(view: bigCanvasView)
             
             rtcEngine?.delegate = self.realTimeView
         } else {
@@ -101,9 +115,55 @@ class BroadcasterViewController: BaseRoomViewController {
         }
     }
     
+    private func _publishMedia(_ publish: Bool) {
+        guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.userId) else {return}
+        if currentUser.userId == roomInfo.userId {
+            let mediaOptions = AgoraRtcChannelMediaOptions()
+            mediaOptions.publishCameraTrack = publish
+            mediaOptions.publishMicrophoneTrack = publish
+            rtcEngine?.updateChannel(with: mediaOptions)
+        }
+    }
+    
+    private func _setupCanvas(view: UIView?) {
+        guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.userId) else {return}
+        if currentUser.userId == roomInfo.userId {
+            let canvas = AgoraRtcVideoCanvas()
+            canvas.view = view
+            canvas.uid = uid
+            rtcEngine?.setupLocalVideo(canvas)
+        }
+    }
+    
     override func onBackAction() {
         super.onBackAction()
         
         _leaveRTCChannel()
+    }
+}
+
+extension BroadcasterViewController {
+    override func onCallStateChanged(with state: CallStateType,
+                            stateReason: CallReason,
+                            eventReason: String,
+                            elapsed: Int,
+                            eventInfo: [String : Any]) {
+        let publisher = eventInfo[kPublisher] as? String ?? currentUser?.userId
+        guard publisher == currentUser?.userId else {
+            return
+        }
+        
+        switch state {
+        case .calling:
+            _publishMedia(false)
+            _setupCanvas(view: nil)
+            break
+        case .prepared, .idle, .failed:
+            _publishMedia(true)
+            _setupCanvas(view: bigCanvasView)
+            break
+        default:
+            break
+        }
     }
 }

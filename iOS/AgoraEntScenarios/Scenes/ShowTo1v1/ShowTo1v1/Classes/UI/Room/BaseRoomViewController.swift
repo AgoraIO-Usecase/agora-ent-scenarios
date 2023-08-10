@@ -12,6 +12,7 @@ import AgoraRtcKit
 class BaseRoomViewController: UIViewController {
     var onBackClosure: (()->())?
     var rtcEngine: AgoraRtcEngineKit?
+    var roomInfo: ShowTo1v1RoomInfo?
     var callApi: CallApiProtocol? {
         didSet {
             oldValue?.removeListener(listener: self)
@@ -34,6 +35,7 @@ class BaseRoomViewController: UIViewController {
     }()
     
     deinit {
+        callApi = nil
         showTo1v1Print("deinit-- ShowTo1v1BaseRoomViewController")
     }
     

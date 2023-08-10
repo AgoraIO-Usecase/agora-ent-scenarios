@@ -207,6 +207,10 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
         return button
     }()
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     override func _loadSubView() {
         super._loadSubView()
         dialogView.addSubview(titleLabel)
@@ -217,6 +221,22 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
         
         iconView.isHidden = true
         
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardShow(note:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardHidden(note:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc private func keyboardShow(note: Notification) {
+        let keyboardHeight = (note.userInfo?["UIKeyboardBoundsUserInfoKey"] as? CGRect)?.height ?? 0
+        UIView.animate(withDuration: kDialogAnimationDuration) {
+            self.dialogView.aui_bottom = self.aui_height - keyboardHeight
+        }
+    }
+
+    @objc private func keyboardHidden(note: Notification) {
+        UIView.animate(withDuration: kDialogAnimationDuration) {
+            self.dialogView.aui_bottom = self.aui_height
+        }
     }
     
     override func contentSize() -> CGSize {

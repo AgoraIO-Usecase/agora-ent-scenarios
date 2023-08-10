@@ -19,6 +19,13 @@ class CallViewController: BaseRoomViewController {
         }
     }
     
+    var currentUser: ShowTo1v1UserInfo? {
+        didSet {
+            smallCanvasView.titleLabel.text = currentUser?.userName ?? ""
+            smallCanvasView.sizeToFit()
+        }
+    }
+    
     private lazy var moveViewModel: MoveGestureViewModel = MoveGestureViewModel()
     private lazy var hangupButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -41,7 +48,7 @@ class CallViewController: BaseRoomViewController {
     }()
     
     deinit {
-        showTo1v1Print("deinit-- Pure1v1CallViewController")
+        showTo1v1Print("deinit-- CallViewController")
     }
     
     override func viewDidLoad() {
@@ -53,11 +60,19 @@ class CallViewController: BaseRoomViewController {
         smallCanvasView.frame = CGRect(x: view.aui_width - 25 - 109, y: 82 + UIDevice.current.aui_SafeDistanceTop, width: 109, height: 163)
         smallCanvasView.layer.cornerRadius = 20
         smallCanvasView.clipsToBounds = true
+        
+        
+        view.addSubview(hangupButton)
+        
+        hangupButton.aui_size = CGSize(width: 70, height: 70)
+        hangupButton.aui_bottom = self.view.aui_height - 20 - UIDevice.current.aui_SafeDistanceBottom
+        hangupButton.aui_centerX = self.view.aui_width / 2
     }
     
     @objc private func _hangupAction() {
-        callApi?.hangup(roomId: targetUser?.userId ?? "", completion: { err in
+        callApi?.hangup(roomId: roomInfo?.roomId ?? "", completion: { err in
         })
+        dismiss(animated: false)
     }
 }
 
@@ -76,17 +91,24 @@ extension CallViewController: AgoraRtcEngineDelegate {
 
 extension CallViewController {
     override func onCallStateChanged(with state: CallStateType,
-                                stateReason: CallReason,
-                                eventReason: String,
-                                elapsed: Int,
-                                eventInfo: [String : Any]) {
-    }
-    
-    func onCallEventChanged(with event: CallEvent, elapsed: Int) {
-        showTo1v1Warn("onCallEventChanged: \(event.rawValue)")
-        switch event {
-        case .localLeave, .remoteLeave:
-            _hangupAction()
+                            stateReason: CallReason,
+                            eventReason: String,
+                            elapsed: Int,
+                            eventInfo: [String : Any]) {
+        let publisher = eventInfo[kPublisher] as? String ?? currentUser?.userId
+        guard publisher == currentUser?.userId else {
+            return
+        }
+        
+        switch state {
+        case .connected:
+//            let connection = AgoraRtcConnection()
+//            assert(targetUser != nil, "targetUser == nil")
+//            connection.channelId = targetUser?.getRoomId() ?? ""
+//            connection.localUid = UInt(currentUser?.userId ?? "") ?? 0
+//            setupContentInspectConfig(true, connection: connection)
+//            moderationAudio()
+            break
         default:
             break
         }
