@@ -62,7 +62,6 @@ class CallViewController: BaseRoomViewController {
         smallCanvasView.layer.cornerRadius = 20
         smallCanvasView.clipsToBounds = true
         
-        
         view.addSubview(hangupButton)
         
         hangupButton.aui_size = CGSize(width: 70, height: 70)
@@ -77,8 +76,15 @@ class CallViewController: BaseRoomViewController {
     }
     
     @objc private func _hangupAction() {
-        callApi?.hangup(roomId: roomInfo?.roomId ?? "", completion: { err in
-        })
+        if roomInfo?.userId == currentUser?.userId {
+            //房主拒绝找对方roomId
+            callApi?.hangup(roomId: targetUser?.get1V1ChannelId() ?? "", completion: { err in
+            })
+        } else {
+            //观众挂断找房间id，因为可能房主创建了多个房间造成多个房间呼叫一个频道串了
+            callApi?.hangup(roomId: roomInfo?.roomId ?? "", completion: { err in
+            })
+        }
         dismiss(animated: false)
     }
 }
