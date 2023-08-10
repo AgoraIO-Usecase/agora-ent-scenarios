@@ -35,7 +35,7 @@ class ShowRTCParams {
     
     var sr = false
     var srType: SRType = .x1_33
-    var simulcast = false
+    var dualStream: AgoraSimulcastStreamConfig?
     var pvc = false
     var svc = false
     var musicVolume: Int = 30
@@ -97,25 +97,36 @@ extension ShowAgoraKitManager {
     /** 设置小流参数
      */
     private func setSimulcastStream(isOn: Bool, dimensions: CGSize = CGSizeMake(360, 640), fps: Int32 = 5, svc: Bool = false) {
-        rtcParam.simulcast = isOn
+        if isOn {
+            let config = AgoraSimulcastStreamConfig()
+            config.dimensions = dimensions
+            config.framerate = fps
+            rtcParam.dualStream = config
+        } else {
+            rtcParam.dualStream = nil
+        }
         rtcParam.svc = svc
-        guard isOn else {// 关小流
-            engine?.enableDualStreamMode(false)
+    }
+    /** 应用小流设置
+     * 在joinChannel成功之后主播应用之前对小流的配置
+     */
+    func applySimulcastStream(connection: AgoraRtcConnection) {
+        guard let simulcastConfig = rtcParam.dualStream else {
+            engine?.setDualStreamModeEx(.disableSimulcastStream,
+                                        streamConfig: AgoraSimulcastStreamConfig(),
+                                        connection: connection)
             return
         }
-        // 开启并设置小流
-        let simulcastStreamConfig = AgoraSimulcastStreamConfig()
-        simulcastStreamConfig.dimensions = dimensions
-        simulcastStreamConfig.framerate = fps
-        engine?.enableDualStreamMode(true, streamConfig: simulcastStreamConfig)
+        engine?.setDualStreamModeEx(.enableSimulcastStream, streamConfig: simulcastConfig, connection: connection)
         // 小流SVC 开关
-        if (svc) {
+        if (rtcParam.svc) {
             engine?.setParameters("\"che.video.minor_stream_num_temporal_layers\": 2")
             engine?.setParameters("\"rtc.video.high_low_video_ratio_enabled\": true")
         } else {
             engine?.setParameters("\"rtc.video.high_low_video_ratio_enabled\": false")
         }
     }
+    
     
     // 预设模式
     private func _presetValuesWith(encodeSize: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool) {
@@ -126,8 +137,6 @@ extension ShowAgoraKitManager {
         ShowSettingKey.lowlightEnhance.writeValue(false)
         ShowSettingKey.colorEnhance.writeValue(false)
         ShowSettingKey.videoDenoiser.writeValue(false)
-        ShowSettingKey.PVC.writeValue(false)
-        ShowSettingKey.SR.writeValue(true)
         
         updateSettingForkey(.videoEncodeSize)
         updateSettingForkey(.videoBitRate)
@@ -136,7 +145,9 @@ extension ShowAgoraKitManager {
         updateSettingForkey(.lowlightEnhance)
         updateSettingForkey(.colorEnhance)
         updateSettingForkey(.videoDenoiser)
+        rtcParam.pvc = true
         updateSettingForkey(.PVC)
+        rtcParam.sr = true
         updateSettingForkey(.SR)
         updateSettingForkey(.recordingSignalVolume)
     }
@@ -254,62 +265,77 @@ extension ShowAgoraKitManager {
     /// 更新设置
     /// - Parameter key: 要更新的key
     func updateSettingForkey(_ key: ShowSettingKey, currentChannelId:String? = nil) {
-        let isOn = key.boolValue
-        let indexValue = key.intValue
-        let sliderValue = key.floatValue
-        
         switch key {
         case .lowlightEnhance:
+            let isOn = key.boolValue
             engine?.setLowlightEnhanceOptions(isOn, options: AgoraLowlightEnhanceOptions())
         case .colorEnhance:
+            let isOn = key.boolValue
             engine?.setColorEnhanceOptions(isOn, options: AgoraColorEnhanceOptions())
         case .videoDenoiser:
+            let isOn = key.boolValue
             setDenoiserOn(isOn)
         case .beauty:
+            let isOn = key.boolValue
             engine?.setBeautyEffectOptions(isOn, options: AgoraBeautyOptions())
         case .PVC:
-            rtcParam.pvc = isOn
+            let isOn = rtcParam.pvc
             engine?.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
         case .SR:
+            let isOn = rtcParam.sr
             setSuperResolutionOn(isOn)
         case .BFrame:
             
            break
         case .videoEncodeSize:
+            let indexValue = key.intValue
+            let dimensions = ShowAgoraVideoDimensions.values()
+            let index = indexValue % dimensions.count
+            let size = dimensions[index]
+            encoderConfig.dimensions = size
+            captureConfig.dimensions = size
+            
             if let currentChannelId = currentChannelId{
+                engine?.setCameraCapturerConfiguration(captureConfig)
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             } else {
-                let dimensions = ShowAgoraVideoDimensions.values()
-                let index = indexValue % dimensions.count
-                let size = dimensions[index]
-                videoEncoderConfig.dimensions = size
-                engine?.setVideoEncoderConfiguration(videoEncoderConfig)
+                engine?.setCameraCapturerConfiguration(captureConfig)
+                engine?.setVideoEncoderConfiguration(encoderConfig)
             }
         case .videoBitRate:
-            videoEncoderConfig.bitrate = Int(sliderValue)
+            let sliderValue = key.floatValue
+            encoderConfig.bitrate = Int(sliderValue)
             if let currentChannelId = currentChannelId {
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }else{
-                engine?.setVideoEncoderConfiguration(videoEncoderConfig)
+                engine?.setVideoEncoderConfiguration(encoderConfig)
             }
         case .FPS:
+            let indexValue = key.intValue
             let index = indexValue % fpsItems.count
-            videoEncoderConfig.frameRate = fpsItems[index]
+            encoderConfig.frameRate = fpsItems[index]
             if let currentChannelId = currentChannelId {
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }else{
-                engine?.setVideoEncoderConfiguration(videoEncoderConfig)
+                engine?.setVideoEncoderConfiguration(encoderConfig)
             }
             // 采集帧率
             captureConfig.frameRate = Int32(fpsItems[index].rawValue)
         case .H265:
-            setH265On(isOn)
+            let isOn = key.boolValue
+            encoderConfig.codecType = isOn ? .H265 : .H264
+            if let channelId = currentChannelId {
+                updateVideoEncoderConfigurationForConnenction(currentChannelId: channelId)
+            }
         case .earmonitoring:
+            let isOn = key.boolValue
             engine?.enable(inEarMonitoring: isOn)
         case .recordingSignalVolume:
-            engine?.adjustRecordingSignalVolume(rtcParam.recordingSignalVolume)
+            let value = rtcParam.recordingSignalVolume
+            engine?.adjustRecordingSignalVolume(value)
         case .musicVolume:
-            engine?.adjustAudioMixingVolume(rtcParam.musicVolume)
+            let value = rtcParam.musicVolume
+            engine?.adjustAudioMixingVolume(value)
         case .audioBitRate:
             break
         }

@@ -29,18 +29,17 @@ class ShowAgoraKitManager: NSObject {
     
     private var broadcasterConnection: AgoraRtcConnection?
     
-    let videoEncoderConfig = AgoraVideoEncoderConfiguration()
-    
     var exposureRangeX: Int?
     var exposureRangeY: Int?
     var matrixCoefficientsExt: Int?
     var videoFullrangeExt: Int?
     
+    let encoderConfig = AgoraVideoEncoderConfiguration()
+    
     public lazy var captureConfig: AgoraCameraCapturerConfiguration = {
         let config = AgoraCameraCapturerConfiguration()
         config.followEncodeDimensionRatio = true
         config.cameraDirection = .front
-        
         config.frameRate = 15
         return config
     }()
@@ -190,7 +189,8 @@ class ShowAgoraKitManager: NSObject {
             let cost = Int(-date.timeIntervalSinceNow * 1000)
             showLogger.info("join room[\(channelName)] ex success uid: \(uid) cost \(cost) ms", context: kShowLogBaseContext)
             self?.setupContentInspectConfig(true, connection: connection)
-            self?.moderationAudio(channelName: targetChannelId, role: role)
+//            self?.moderationAudio(channelName: targetChannelId, role: role)
+            self?.applySimulcastStream(connection: connection)
         }
         engine.updateChannelEx(with: mediaOptions, connection: connection)
         broadcasterConnection = connection
@@ -212,8 +212,8 @@ class ShowAgoraKitManager: NSObject {
         let connection = AgoraRtcConnection()
         connection.channelId = currentChannelId
         connection.localUid = UInt(VLUserCenter.user.id) ?? 0
-        let encoderRet = engine.setVideoEncoderConfigurationEx(videoEncoderConfig, connection: connection)
-        showLogger.info("setVideoEncoderConfigurationEx  dimensions = \(videoEncoderConfig.dimensions), bitrate = \(videoEncoderConfig.bitrate), fps = \(videoEncoderConfig.frameRate),  encoderRet = \(encoderRet)", context: kShowLogBaseContext)
+        let encoderRet = engine.setVideoEncoderConfigurationEx(encoderConfig, connection: connection)
+        showLogger.info("setVideoEncoderConfigurationEx  dimensions = \(encoderConfig.dimensions), bitrate = \(encoderConfig.bitrate), fps = \(encoderConfig.frameRate),  encoderRet = \(encoderRet)", context: kShowLogBaseContext)
     }
     
     //MARK: public method
@@ -272,7 +272,7 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         engine.setClientRole(.broadcaster)
-        engine.setVideoEncoderConfiguration(videoEncoderConfig)
+        engine.setVideoEncoderConfiguration(encoderConfig)
         engine.setCameraCapturerConfiguration(captureConfig)
         canvas.view = canvasView
         engine.setupLocalVideo(canvas)
@@ -368,19 +368,8 @@ class ShowAgoraKitManager: NSObject {
             assert(true, "rtc engine not initlized")
             return
         }
-        videoEncoderConfig.dimensions = CGSize(width: size.width, height: size.height)
-        engine.setVideoEncoderConfiguration(videoEncoderConfig)
-    }
-    
-    /// 设置265
-    /// - Parameter isOn: 开关
-    func setH265On(_ isOn: Bool) {
-        guard let engine = engine else {
-            assert(true, "rtc engine not initlized")
-            return
-        }
-        engine.setParameters("{\"engine.video.enable_hw_encoder\":\(isOn)}")
-        engine.setParameters("{\"engine.video.codec_type\":\"\(isOn ? 3 : 2)\"}")
+        encoderConfig.dimensions = CGSize(width: size.width, height: size.height)
+        engine.setVideoEncoderConfiguration(encoderConfig)
     }
     
     func cleanCapture() {
