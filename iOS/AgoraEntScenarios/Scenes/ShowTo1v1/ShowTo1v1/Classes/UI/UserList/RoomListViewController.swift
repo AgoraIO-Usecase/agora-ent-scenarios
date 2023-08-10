@@ -197,7 +197,10 @@ extension RoomListViewController {
         videoLoaderApi.addListener(listener: self)
     }
     
-    private func _initCallerAPI(tokenConfig: CallTokenConfig, room: ShowTo1v1RoomInfo) {
+    private func _reinitCallerAPI(tokenConfig: CallTokenConfig, room: ShowTo1v1RoomInfo) {
+        callApi.deinitialize {
+        }
+        
         let config = CallConfig()
         config.role = .caller  // Pure 1v1 can only be set as the caller
         config.mode = .showTo1v1
@@ -220,7 +223,7 @@ extension RoomListViewController {
         callVC.roomInfo = room
     }
     
-    private func _initCalleeAPI(tokenConfig: CallTokenConfig, room: ShowTo1v1RoomInfo) {
+    private func _reinitCalleeAPI(tokenConfig: CallTokenConfig, room: ShowTo1v1RoomInfo) {
         let config = CallConfig()
         config.role = .callee  // Pure 1v1 can only be set as the caller
         config.mode = .showTo1v1
@@ -257,9 +260,7 @@ extension RoomListViewController {
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         
-        callApi.deinitialize {
-        }
-        self._initCallerAPI(tokenConfig: self.tokenConfig, room: room)
+        self._reinitCallerAPI(tokenConfig: self.tokenConfig, room: room)
         callApi.call(roomId: room.roomId, remoteUserId: room.getUIntUserId()) { err in
         }
     }
@@ -320,10 +321,11 @@ extension RoomListViewController {
     }
     
     private func _showBroadcasterVC(roomInfo: ShowTo1v1RoomInfo) {
-        guard roomInfo.userId == userInfo?.userId else {return}
-        callApi.deinitialize {
+        if roomInfo.userId == userInfo?.userId {
+            self._reinitCalleeAPI(tokenConfig: self.tokenConfig, room: roomInfo)
+        } else {
+            self._reinitCallerAPI(tokenConfig: self.tokenConfig, room: roomInfo)
         }
-        self._initCalleeAPI(tokenConfig: self.tokenConfig, room: roomInfo)
         
         let vc = BroadcasterViewController()
         vc.modalPresentationStyle = .fullScreen
@@ -338,7 +340,6 @@ extension RoomListViewController {
             })
         }
         self.present(vc, animated: false)
-        
     }
 }
 
@@ -411,7 +412,7 @@ extension RoomListViewController: CallApiListenerProtocol {
             callVC.dismiss(animated: false)
             _topViewController().present(callVC, animated: false)
             break
-        case .prepared:
+        case .prepared, .failed:
             callDialog?.hiddenAnimation()
             connectedUserId = nil
             switch stateReason {
@@ -421,10 +422,6 @@ extension RoomListViewController: CallApiListenerProtocol {
             default:
                 break
             }
-            break
-        case .failed:
-            callDialog?.hiddenAnimation()
-            connectedUserId = nil
             break
         default:
             break

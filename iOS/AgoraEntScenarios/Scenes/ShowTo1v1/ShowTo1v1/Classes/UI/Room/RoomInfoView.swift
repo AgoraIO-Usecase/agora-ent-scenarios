@@ -13,15 +13,10 @@ private let bgViewHeight: CGFloat = 40
 private let imgViewHeight: CGFloat = 32
 
 class RoomInfoView: UIView {
-    
+    var timerCallBack: ((Int64)->())?
     private var startTime: Int64!
     
-    private lazy var timer: Timer = {
-        let timer = Timer.scheduledTimer(withTimeInterval: 1, block: {[weak self] t in
-            self?.updateTime()
-        }, repeats: true)
-        return timer
-    }()
+    private var timer: Timer?
     
     // 背景
     private lazy var bgView: UIView = {
@@ -124,7 +119,7 @@ class RoomInfoView: UIView {
         
         addSubview(timeLabel)
         timeLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(idLabel)
+            make.bottom.equalTo(idLabel)
             make.left.equalTo(indicatorImageView.snp.right).offset(4)
         }
     }
@@ -133,10 +128,15 @@ class RoomInfoView: UIView {
         headImgView.sd_setImage(with: URL(string: avatar ?? ""))
         nameLabel.text = name
         idLabel.text = id
+        timer?.invalidate()
         if let startTime = time {
             self.startTime = startTime
             updateTime()
-            timer.fire()
+            
+            timer = Timer.scheduledTimer(withTimeInterval: 1, block: {[weak self] t in
+                self?.updateTime()
+            }, repeats: true)
+            timer?.fire()
         }
     }
     
@@ -147,5 +147,7 @@ class RoomInfoView: UIView {
         let hours = duration / 3600
         let durationStr = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
         timeLabel.text = durationStr
+        
+        timerCallBack?(duration)
     }
 }

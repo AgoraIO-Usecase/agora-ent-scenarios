@@ -21,15 +21,15 @@ class BaseRoomViewController: UIViewController {
             callApi?.addRTCListener?(listener: self.realTimeView)
         }
     }
-    lazy var roomInfoView: RoomInfoView = RoomInfoView()
-    lazy var bigCanvasView = CallCanvasView()
-    private lazy var bottomBar: RoomBottomBar = {
+    private(set) lazy var roomInfoView: RoomInfoView = RoomInfoView()
+    private(set) lazy var bigCanvasView = CallCanvasView()
+    private(set) lazy var bottomBar: RoomBottomBar = {
         let bar = RoomBottomBar(frame: .zero)
         bar.delegate = self
         return bar
     }()
     
-    lazy var realTimeView: ShowRealTimeDataView = {
+    private(set) lazy var realTimeView: ShowRealTimeDataView = {
         let realTimeView = ShowRealTimeDataView(isLocal: true)
         return realTimeView
     }()
@@ -47,18 +47,16 @@ class BaseRoomViewController: UIViewController {
         
         view.addSubview(roomInfoView)
         view.addSubview(bottomBar)
-        view.addSubview(realTimeView)
-        
-        
-        realTimeView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(UIDevice.current.aui_SafeDistanceTop + 50)
-        }
         
         roomInfoView.frame = CGRect(x: 15, y: UIDevice.current.aui_SafeDistanceTop, width: 202, height: 40)
         bigCanvasView.frame = view.bounds
         
         bottomBar.frame = CGRect(x: 0, y: view.aui_height - UIDevice.current.aui_SafeDistanceBottom - 50, width: view.aui_width, height: 40)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        _showRealTimeView()
     }
     
     @objc func onBackAction() {
@@ -68,21 +66,27 @@ class BaseRoomViewController: UIViewController {
 }
 
 extension BaseRoomViewController: RoomBottomBarDelegate {
-    func onClickSettingButton() {
-        let settingMenuVC = ShowToolMenuViewController()
-        settingMenuVC.type = ShowMenuType.idle_audience
-        settingMenuVC.delegate = self
-        present(settingMenuVC, animated: true)
+    public func onClick(actionType: RoomBottomBarType) {
+        if actionType == .more {
+            let settingMenuVC = ShowToolMenuViewController()
+            settingMenuVC.type = ShowMenuType.idle_audience
+            settingMenuVC.delegate = self
+            present(settingMenuVC, animated: true)
+        }
     }
 }
 
 extension BaseRoomViewController: ShowToolMenuViewControllerDelegate {
-    func onClickRealTimeDataButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+    func _showRealTimeView() {
         view.addSubview(realTimeView)
         realTimeView.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalTo(UIDevice.current.aui_SafeDistanceTop + 50)
         }
+    }
+    
+    func onClickRealTimeDataButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+        _showRealTimeView()
     }
 }
 
