@@ -35,12 +35,12 @@ class ShowAgoraKitManager: NSObject {
     var exposureRangeY: Int?
     var matrixCoefficientsExt: Int?
     var videoFullrangeExt: Int?
-    var isFrontCamera = true
     
     public lazy var captureConfig: AgoraCameraCapturerConfiguration = {
         let config = AgoraCameraCapturerConfiguration()
         config.followEncodeDimensionRatio = true
         config.cameraDirection = .front
+        
         config.frameRate = 15
         return config
     }()
@@ -52,6 +52,17 @@ class ShowAgoraKitManager: NSObject {
     }()
     
     public var engine: AgoraRtcEngineKit?
+    
+    private var player: AgoraRtcMediaPlayerProtocol?
+    func mediaPlayer() -> AgoraRtcMediaPlayerProtocol? {
+        if let p = player {
+            return p
+        } else {
+            player = engine?.createMediaPlayer(with: self)
+            player?.setLoopCount(-1)
+            return player
+        }
+    }
     
     func prepareEngine() {
         let engine = AgoraRtcEngineKit.sharedEngine(with: engineConfig(), delegate: nil)
@@ -75,6 +86,10 @@ class ShowAgoraKitManager: NSObject {
     // 退出已加入的频道和子频道
     func leaveAllRoom() {
         videoLoader?.cleanCache()
+        if let p = player {
+            engine?.destroyMediaPlayer(p)
+            player = nil
+        }
     }
     
     //MARK: private
@@ -271,8 +286,8 @@ class ShowAgoraKitManager: NSObject {
             assert(true, "rtc engine not initlized")
             return
         }
-        isFrontCamera = !isFrontCamera
         engine.switchCamera()
+        engine.setLocalRenderMode(.hidden, mirror: .enabled)
     }
     
     /// 开启虚化背景
@@ -535,8 +550,7 @@ extension ShowAgoraKitManager {
     }
     
 }
-
-
+// MARK: - IVideoLoaderApiListener
 extension ShowAgoraKitManager: IVideoLoaderApiListener {
     public func debugInfo(_ message: String) {
         showLogger.info(message, context: "VideoLoaderApi")
@@ -546,5 +560,14 @@ extension ShowAgoraKitManager: IVideoLoaderApiListener {
     }
     public func debugError(_ message: String) {
         showLogger.error(message, context: "VideoLoaderApi")
+    }
+}
+// MARK: - AgoraRtcMediaPlayerDelegate
+extension ShowAgoraKitManager: AgoraRtcMediaPlayerDelegate {
+    
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+        if state == .openCompleted {
+            playerKit.play()
+        }
     }
 }

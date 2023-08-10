@@ -38,21 +38,12 @@ class ShowRTCParams {
     var simulcast = false
     var pvc = false
     var svc = false
+    var musicVolume: Int = 30
+    var recordingSignalVolume: Int = 80
 }
 
 // MARK: - Extension
 extension ShowAgoraKitManager {
-    
-    private var dimensionsItems: [CGSize] {
-        ShowAgoraVideoDimensions.allCases.map({$0.sizeValue})
-    }
-    
-    // 默认设置
-    func defaultSetting() {
-        // 默认音量设置
-        ShowSettingKey.recordingSignalVolume.writeValue(80)
-        ShowSettingKey.musincVolume.writeValue(30)
-    }
     
     /// 设置超分 不保存数据
     /// - Parameters:
@@ -128,14 +119,14 @@ extension ShowAgoraKitManager {
     
     // 预设模式
     private func _presetValuesWith(encodeSize: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool) {
-        ShowSettingKey.videoEncodeSize.writeValue(dimensionsItems.firstIndex(of: encodeSize.sizeValue))
+        ShowSettingKey.videoEncodeSize.writeValue(ShowAgoraVideoDimensions.values().firstIndex(of: encodeSize.sizeValue))
         ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: fps))
         ShowSettingKey.videoBitRate.writeValue(bitRate)
         ShowSettingKey.H265.writeValue(h265On)
         ShowSettingKey.lowlightEnhance.writeValue(false)
         ShowSettingKey.colorEnhance.writeValue(false)
         ShowSettingKey.videoDenoiser.writeValue(false)
-        ShowSettingKey.PVC.writeValue(true)
+        ShowSettingKey.PVC.writeValue(false)
         ShowSettingKey.SR.writeValue(true)
         
         updateSettingForkey(.videoEncodeSize)
@@ -147,6 +138,7 @@ extension ShowAgoraKitManager {
         updateSettingForkey(.videoDenoiser)
         updateSettingForkey(.PVC)
         updateSettingForkey(.SR)
+        updateSettingForkey(.recordingSignalVolume)
     }
 
     /// 更新配置信息 该设置不会保存到本地
@@ -287,8 +279,9 @@ extension ShowAgoraKitManager {
             if let currentChannelId = currentChannelId{
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             } else {
-                let index = indexValue % dimensionsItems.count
-                let size = dimensionsItems[index]
+                let dimensions = ShowAgoraVideoDimensions.values()
+                let index = indexValue % dimensions.count
+                let size = dimensions[index]
                 videoEncoderConfig.dimensions = size
                 engine?.setVideoEncoderConfiguration(videoEncoderConfig)
             }
@@ -314,9 +307,9 @@ extension ShowAgoraKitManager {
         case .earmonitoring:
             engine?.enable(inEarMonitoring: isOn)
         case .recordingSignalVolume:
-            engine?.adjustRecordingSignalVolume(Int(sliderValue))
-        case .musincVolume:
-            engine?.adjustAudioMixingVolume(Int(sliderValue))
+            engine?.adjustRecordingSignalVolume(rtcParam.recordingSignalVolume)
+        case .musicVolume:
+            engine?.adjustAudioMixingVolume(rtcParam.musicVolume)
         case .audioBitRate:
             break
         }

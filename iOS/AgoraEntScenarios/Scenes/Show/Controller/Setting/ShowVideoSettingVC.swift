@@ -8,18 +8,19 @@
 import UIKit
 import ZSwiftBaseLib
 
-private let SwitchCellID = "SwitchCellID"
-private let SegmentCellID = "SegmentCellID"
-private let SliderCellID = "SliderCellID"
-private let LabelCellID = "LabelCellID"
-
 class ShowVideoSettingVC: UIViewController {
     
+    private let kSwitchCell = "ShowSettingSwitchCell"
+    private let kSegmentCell = "ShowSettingSegmentCell"
+    private let kSliderCell = "ShowSettingSliderCell"
+    private let kLabelCell = "ShowSettingLabelCell"
+    private let kBitrateCell = "ShowSettingBitrateCell"
+
     private let transDelegate = ShowPresentTransitioningDelegate()
     
     var dataArray = [ShowSettingKey]()
     
-    var musicManager: ShowMusicManager!
+    var musicManager: ShowMusicPresenter!
     
     var currentChannelId: String?
     
@@ -30,10 +31,11 @@ class ShowVideoSettingVC: UIViewController {
         tableView.allowsSelection = false
         tableView.rowHeight = 47
         tableView.separatorStyle = .none
-        tableView.registerCell(ShowSettingSwitchCell.self, forCellReuseIdentifier: SwitchCellID)
-        tableView.registerCell(ShowSettingSegmentCell.self, forCellReuseIdentifier: SegmentCellID)
-        tableView.registerCell(ShowSettingSliderCell.self, forCellReuseIdentifier: SliderCellID)
-        tableView.registerCell(ShowSettingLabelCell.self, forCellReuseIdentifier: LabelCellID)
+        tableView.registerCell(ShowSettingBitrateCell.self, forCellReuseIdentifier: kBitrateCell)
+        tableView.registerCell(ShowSettingSwitchCell.self, forCellReuseIdentifier: kSwitchCell)
+        tableView.registerCell(ShowSettingSegmentCell.self, forCellReuseIdentifier: kSegmentCell)
+        tableView.registerCell(ShowSettingSliderCell.self, forCellReuseIdentifier: kSliderCell)
+        tableView.registerCell(ShowSettingLabelCell.self, forCellReuseIdentifier: kLabelCell)
         return tableView
     }()
 
@@ -52,8 +54,42 @@ class ShowVideoSettingVC: UIViewController {
     func reloadData(){
         tableView.reloadData()
     }
+    
+    private func barrierValueChange(complete: (() -> Void)?) {
+        if ShowAgoraKitManager.shared.rtcParam.suggested {
+            ShowAgoraKitManager.shared.rtcParam.suggested = false
+            let alert = UIAlertController(
+                title: "show_presetting_alert_will_change_value_title".show_localized,
+                message: "show_presetting_alert_will_change_value_message".show_localized,
+                preferredStyle: .alert)
+            let submit = UIAlertAction(
+                title: "show_alert_confirm_btn_title".show_localized,
+                style: .default) { _ in
+                    complete?()
+                    self.tableView.reloadData()
+                }
+            let cancel = UIAlertAction(
+                title: "show_alert_cancel_btn_title".show_localized,
+                style: .cancel) { _ in
+                    self.tableView.reloadData()
+                }
+            alert.addAction(submit)
+            alert.addAction(cancel)
+            present(alert, animated: true, completion: nil)
+        } else {
+            complete?()
+            tableView.reloadData()
+        }
+    }
+    
+    private func onValueChanged(_ value: Any, forSettingKey key: ShowSettingKey) {
+        barrierValueChange {
+            key.writeValue(value)
+            ShowAgoraKitManager.shared.updateSettingForkey(key, currentChannelId: self.currentChannelId)
+        }
+    }
 }
-
+// MARK: - TableView Call Back
 extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -61,25 +97,28 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         let data = dataArray[indexPath.row]
         if data.type == .aSwitch {
-            let cell = tableView.dequeueReusableCell(withIdentifier: SwitchCellID, for: indexPath) as! ShowSettingSwitchCell
-            cell.setTitle(data.title, enable: true, isOn: data.boolValue) {[weak self] isOn in
-                self?.changeValue(isOn, forSettingKey: data)
+            let cell = tableView.dequeueReusableCell(withIdentifier: kSwitchCell, for: indexPath) as! ShowSettingSwitchCell
+            var enable = true
+            if data == .H265 || data == .PVC {
+                enable = false
+            }
+            cell.setTitle(data.title,enable:enable, isOn: data.boolValue) {[weak self] isOn in
+                self?.onValueChanged(isOn, forSettingKey: data)
             } detailButtonAction: {[weak self] in
                 self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
             }
             return cell
         }else if data.type == .segment {
-            let cell = tableView.dequeueReusableCell(withIdentifier: SegmentCellID, for: indexPath) as! ShowSettingSegmentCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: kSegmentCell, for: indexPath) as! ShowSettingSegmentCell
             
             cell.setTitle(data.title, items: data.items, defaultSelectIndex: data.intValue) {[weak self] index in
-                self?.changeValue(index, forSettingKey: data)
+                self?.onValueChanged(index, forSettingKey: data)
             }
             return cell
         } else if data.type == .label {
-            let cell = tableView.dequeueReusableCell(withIdentifier: LabelCellID, for: indexPath) as! ShowSettingLabelCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: kLabelCell, for: indexPath) as! ShowSettingLabelCell
             let index = data.intValue % data.items.count
             let value = data.items[index]
             cell.setTitle(data.title, value: value) { [weak self] in
@@ -102,12 +141,26 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
             return cell
         } else {
             if data == .videoBitRate {
-                let cell = tableView.dequeueReusableCell(withIdentifier: SliderCellID, for: indexPath) as! ShowSettingSliderCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: kBitrateCell, for: indexPath) as! ShowSettingBitrateCell
                 cell.setTitle(data.title, value: data.floatValue, minValue: 200, maxValue: 4000)
                 cell.delegate = self
                 cell.clickDetailButonAction = { [weak self] in
                     self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
                 }
+                return cell
+            } else if data == .musicVolume {
+                let cell = tableView.dequeueReusableCell(withIdentifier: kSliderCell, for: indexPath) as! ShowSettingSliderCell
+                let value = ShowAgoraKitManager.shared.rtcParam.musicVolume
+                cell.setTitle(data.title, value: Float(value), minValue: 0, maxValue: 100)
+                cell.delegate = self
+                cell.indexPath = indexPath
+                return cell
+            } else if data == .recordingSignalVolume {
+                let cell = tableView.dequeueReusableCell(withIdentifier: kSliderCell, for: indexPath) as! ShowSettingSliderCell
+                let value = ShowAgoraKitManager.shared.rtcParam.recordingSignalVolume
+                cell.setTitle(data.title, value: Float(value), minValue: 0, maxValue: 100)
+                cell.delegate = self
+                cell.indexPath = indexPath
                 return cell
             }
         }
@@ -128,58 +181,43 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
-extension ShowVideoSettingVC {
-    func changeValue(_ value: Any, forSettingKey key: ShowSettingKey) {
-        if ShowAgoraKitManager.shared.rtcParam.suggested {
-            ShowAgoraKitManager.shared.rtcParam.suggested = false
-            let alert = UIAlertController(title: "show_presetting_alert_will_change_value_title".show_localized, message: "show_presetting_alert_will_change_value_message".show_localized, preferredStyle: .alert)
-            let submit = UIAlertAction(title: "show_alert_confirm_btn_title".show_localized, style: .default) { _ in
-                key.writeValue(value)
-                if key == .musincVolume {
-                    self.musicManager.setMusicVolume(value as! Float)
-                } else {
-                    ShowAgoraKitManager.shared.updateSettingForkey(key, currentChannelId: self.currentChannelId)
-                }
-                self.tableView.reloadData()
-            }
-            let cancel = UIAlertAction(title: "show_alert_cancel_btn_title".show_localized, style: .cancel) { _ in
-                self.tableView.reloadData()
-            }
-            alert.addAction(submit)
-            alert.addAction(cancel)
-            present(alert, animated: true, completion: nil)
+// MARK: - ShowSettingSliderCellDelegate
+extension ShowVideoSettingVC: ShowSettingBitrateCellDelegate {
+    
+    func onAutoBitRateChanged(isOn: Bool) {
+        if (isOn) {
+            self.onValueChanged(0, forSettingKey: ShowSettingKey.videoBitRate)
         } else {
-            key.writeValue(value)
-            if key == .musincVolume {
-                musicManager.setMusicVolume(value as! Float)
-            } else {
-                ShowAgoraKitManager.shared.updateSettingForkey(key, currentChannelId: currentChannelId)
+            // 根据机型设置码率
+            switch ShowAgoraKitManager.shared.deviceLevel {
+            case .low:
+                self.onValueChanged(1461, forSettingKey: ShowSettingKey.videoBitRate)
+            case .medium:
+                self.onValueChanged(1800, forSettingKey: ShowSettingKey.videoBitRate)
+            case .high:
+                self.onValueChanged(2099, forSettingKey: ShowSettingKey.videoBitRate)
             }
-            tableView.reloadData()
         }
+    }
+    
+    func onBitRateValueChanged(value: Float) {
+        onValueChanged(value, forSettingKey: ShowSettingKey.videoBitRate)
     }
 }
 // MARK: - ShowSettingSliderCellDelegate
 extension ShowVideoSettingVC: ShowSettingSliderCellDelegate {
     
-    func onAutoBitRateChanged(isOn: Bool) {
-        if (isOn) {
-            self.changeValue(0, forSettingKey: ShowSettingKey.videoBitRate)
-        } else {
-            // 根据机型设置码率
-            switch ShowAgoraKitManager.shared.deviceLevel {
-            case .low:
-                self.changeValue(1461, forSettingKey: ShowSettingKey.videoBitRate)
-            case .medium:
-                self.changeValue(1800, forSettingKey: ShowSettingKey.videoBitRate)
-            case .high:
-                self.changeValue(2099, forSettingKey: ShowSettingKey.videoBitRate)
+    func onCellSliderValueChanged(value: Float, at index: IndexPath) {
+        let key = dataArray[index.row]
+        barrierValueChange {
+            if key == .musicVolume {
+                let v = Int(value)
+                ShowAgoraKitManager.shared.rtcParam.musicVolume = v
+                self.musicManager.setMusicVolume(v)
+            } else if key == .recordingSignalVolume {
+                ShowAgoraKitManager.shared.rtcParam.recordingSignalVolume = Int(value)
+                ShowAgoraKitManager.shared.updateSettingForkey(key, currentChannelId: self.currentChannelId)
             }
         }
-        tableView.reloadData()
-    }
-    
-    func onBitRateValueChanged(value: Float) {
-        self.changeValue(value, forSettingKey: ShowSettingKey.videoBitRate)
     }
 }

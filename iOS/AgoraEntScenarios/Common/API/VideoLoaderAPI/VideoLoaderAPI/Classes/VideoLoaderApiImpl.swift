@@ -251,8 +251,8 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
                 engine.leaveChannelEx(connection)
             }
         }
-        exConnectionMap.removeAll()
-        exConnectionDeps.removeAll()
+        exConnectionMap = exConnectionMap.filter { $0.key == roomId }
+        exConnectionDeps = exConnectionDeps.filter { $0.key == roomId }
     }
     
     public func addListener(listener: IVideoLoaderApiListener) {
