@@ -183,7 +183,7 @@ public class CallApiImpl: NSObject {
         if localNtpTime == 0 {
             localNtpTime = Int(round(Date().timeIntervalSince1970 * 1000.0))
         } else {
-            callPrint("ts delta = \(localNtpTime - Int(round(Date().timeIntervalSince1970 * 1000.0))) ms")
+//            callPrint("ts delta = \(localNtpTime - Int(round(Date().timeIntervalSince1970 * 1000.0))) ms")
         }
 
         return localNtpTime
@@ -1082,7 +1082,7 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
             return
         }
         
-        self.timeProfiling(message: "5.呼叫-对端[\(roomId)] 加入房间")
+        self.timeProfiling(message: "5.呼叫-对端[\(uid)] 加入房间")
         self._setupRemoteVideo(roomId: roomId, uid: uid, canvasView: config.remoteView)
         
         _notifyEvent(event: .remoteJoin, elapsed: _getNtpTimeInMs() - (callTs ?? 0))

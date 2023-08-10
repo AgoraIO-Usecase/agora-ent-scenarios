@@ -146,8 +146,10 @@ extension CallMessageManager {
             options1.withMetadata = false
             options1.withPresence = false
             group.enter()
-            _subscribe(channelName: roomId, option: options1) { error in
+            callMessagePrint("1/3 will _subscribe[\(roomId)]")
+            _subscribe(channelName: roomId, option: options1) {[weak self] error in
                 error1 = error
+                self?.callMessagePrint("1/3 _subscribe[\(roomId)]: \(error?.localizedDescription ?? "success")")
                 group.leave()
             }
             
@@ -156,18 +158,20 @@ extension CallMessageManager {
             options2.withMetadata = false
             options2.withPresence = true
             group.enter()
-            _subscribe(channelName: ownerRoomId, option: options2) { error in
+            callMessagePrint("2/3 will _subscribe[\(ownerRoomId)]")
+            _subscribe(channelName: ownerRoomId, option: options2) {[weak self] error in
                 error2 = error
+                self?.callMessagePrint("2/3 _subscribe[\(ownerRoomId)]: \(error?.localizedDescription ?? "success")")
                 group.leave()
             }
             
             group.enter()
-            callMessagePrint("waiting for snapshot")
+            callMessagePrint("3/3 waiting for snapshot")
             //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
             snapshotDidRecv = {[weak self] in
                 //暂时忽略改error
 //                error3 = err
-                self?.callMessagePrint("recv snapshot")
+                self?.callMessagePrint("3/3 recv snapshot")
                 group.leave()
             }
             
@@ -218,7 +222,7 @@ extension CallMessageManager {
         rtmClient.publish(roomId, message: data!, withOption: options) { [weak self] resp, err in
             guard let self = self else {return}
             let error = err.errorCode == .ok ? nil : NSError(domain: err.reason, code: err.errorCode.rawValue)
-            self.callMessagePrint("_sendReceipts cost \(-date.timeIntervalSinceNow * 1000) ms")
+//            self.callMessagePrint("_sendReceipts cost \(-date.timeIntervalSinceNow * 1000) ms")
             if error == nil {
                 completion?(nil)
                 return
@@ -258,7 +262,7 @@ extension CallMessageManager {
                         guard let self = self else {return}
                         guard info.retryTimes > 0 else {
                             let message = info.messageInfo ?? [:]
-                            self.callMessagePrint("get receipts fail, msg: \(message)")
+//                            self.callMessagePrint("get receipts fail, msg: \(message)")
                             self.receiptsQueue = self.receiptsQueue.filter({$0.messageId != msgId})
                             self.delegate?.onMissReceipts(message: message)
                             return
