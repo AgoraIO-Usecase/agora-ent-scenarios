@@ -16,8 +16,19 @@ import Foundation
 }
 
 protocol ShowTo1v1ServiceListenerProtocol: NSObjectProtocol {
+    
+    /// 网络状况变化
+    /// - Parameter status: <#status description#>
     func onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus)
+    
+    /// 用户变化
+    /// - Parameter userList: <#userList description#>
     func onUserListDidChanged(userList: [ShowTo1v1UserInfo])
+    
+    
+    /// <#Description#>
+    /// - Parameter roomInfo: <#roomInfo description#>
+    func onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo)
 }
 
 protocol ShowTo1v1ServiceProtocol: NSObjectProtocol {
