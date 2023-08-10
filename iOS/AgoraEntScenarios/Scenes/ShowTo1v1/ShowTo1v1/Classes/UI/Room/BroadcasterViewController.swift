@@ -12,7 +12,6 @@ import CallAPI
 
 class BroadcasterViewController: BaseRoomViewController {
     var videoLoader: IVideoLoaderApi?
-    
     var currentUser: ShowTo1v1UserInfo?
     override var roomInfo: ShowTo1v1RoomInfo? {
         didSet {
@@ -83,6 +82,8 @@ class BroadcasterViewController: BaseRoomViewController {
             _setupCanvas(view: bigCanvasView)
             
             rtcEngine?.delegate = self.realTimeView
+            
+            bottomBar.buttonTypes = [.more]
         } else {
             guard let token = broadcasterToken else {
                 assert(false, "render fail")
@@ -95,6 +96,9 @@ class BroadcasterViewController: BaseRoomViewController {
             videoLoader?.renderVideo(roomInfo: room, container: container)
             
             videoLoader?.addRTCListener(roomId: room.channelName, listener: self.realTimeView)
+            
+            
+            bottomBar.buttonTypes = [.call, .more]
         }
     }
     
@@ -139,6 +143,18 @@ class BroadcasterViewController: BaseRoomViewController {
         super.onBackAction()
         
         _leaveRTCChannel()
+    }
+    
+    override func onClick(actionType: RoomBottomBarType) {
+        if actionType == .call {
+            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
+            AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
+            
+            callApi?.call(roomId: roomInfo!.roomId, remoteUserId: roomInfo!.getUIntUserId()) { err in
+            }
+            return
+        }
+        super.onClick(actionType: actionType)
     }
 }
 

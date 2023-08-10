@@ -16,6 +16,14 @@ class CallViewController: BaseRoomViewController {
                                      name: targetUser?.userName ?? "",
                                      id: targetUser?.userId ?? "",
                                      time: Int64(Date().timeIntervalSince1970 * 1000))
+            
+            roomInfoView.timerCallBack = {[weak self] duration in
+                if duration < 20 * 60 {
+                    return
+                }
+                self?.roomInfoView.setRoomInfo(avatar: nil, name: nil, id: nil, time: nil)
+                self?._hangupAction()
+            }
         }
     }
     
@@ -34,17 +42,11 @@ class CallViewController: BaseRoomViewController {
         return button
     }()
     
-    lazy var smallCanvasView: CallCanvasView = {
+    private(set) lazy var smallCanvasView: CallCanvasView = {
         let view = CallCanvasView(frame: CGRect(origin: .zero, size: CGSize(width: 109, height: 163)))
         view.backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
         view.addGestureRecognizer(moveViewModel.gesture)
         return view
-    }()
-    
-    private lazy var bottomBar: RoomBottomBar = {
-        let bar = RoomBottomBar(frame: .zero)
-        bar.delegate = self
-        return bar
     }()
     
     deinit {
@@ -57,7 +59,6 @@ class CallViewController: BaseRoomViewController {
         
         moveViewModel.touchArea = view.bounds
         bigCanvasView.frame = view.bounds
-        smallCanvasView.frame = CGRect(x: view.aui_width - 25 - 109, y: 82 + UIDevice.current.aui_SafeDistanceTop, width: 109, height: 163)
         smallCanvasView.layer.cornerRadius = 20
         smallCanvasView.clipsToBounds = true
         
@@ -67,6 +68,12 @@ class CallViewController: BaseRoomViewController {
         hangupButton.aui_size = CGSize(width: 70, height: 70)
         hangupButton.aui_bottom = self.view.aui_height - 20 - UIDevice.current.aui_SafeDistanceBottom
         hangupButton.aui_centerX = self.view.aui_width / 2
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        smallCanvasView.aui_tl = CGPoint(x: view.aui_width - 25 - 109, y: 82 + UIDevice.current.aui_SafeDistanceTop)
     }
     
     @objc private func _hangupAction() {
