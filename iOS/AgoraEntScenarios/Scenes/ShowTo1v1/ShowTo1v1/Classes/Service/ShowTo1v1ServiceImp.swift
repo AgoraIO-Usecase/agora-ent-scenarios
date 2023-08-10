@@ -93,17 +93,17 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     private func getRobotRoomList() -> [ShowTo1v1RoomInfo] {
         var list = [ShowTo1v1RoomInfo]()
         //create fake room
-        robotRoomIds.forEach { robotId in
-            let room = ShowTo1v1RoomInfo()
-            let userId = "\(kRobotUid)"
-            room.roomName = "Smooth \(robotId)"
-            room.roomId = "\((Int(robotId) ?? 1) + kRobotRoomStartId)"
-            room.userId = userId
-            room.userName = userId
-            room.avatar = robotRoomOwnerHeaders[((Int(robotId) ?? 1) - 1) % robotRoomOwnerHeaders.count]
-            room.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
-            list.append(room)
-        }
+//        robotRoomIds.forEach { robotId in
+//            let room = ShowTo1v1RoomInfo()
+//            let userId = "\(kRobotUid)"
+//            room.roomName = "Smooth \(robotId)"
+//            room.roomId = "\((Int(robotId) ?? 1) + kRobotRoomStartId)"
+//            room.userId = userId
+//            room.userName = userId
+//            room.avatar = robotRoomOwnerHeaders[((Int(robotId) ?? 1) - 1) % robotRoomOwnerHeaders.count]
+//            room.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+//            list.append(room)
+//        }
         return list
     }
     
