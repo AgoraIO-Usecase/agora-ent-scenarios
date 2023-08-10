@@ -111,9 +111,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     private boolean isOnSeat = false;
     public void onSeat(boolean isOnSeat) {
         this.isOnSeat = isOnSeat;
-        if (isOnSeat) {
-            mBinding.ilActive.singRelay.setVisibility(View.VISIBLE);
-        }
+//        if (isOnSeat) {
+//            mBinding.ilActive.singRelay.setVisibility(View.VISIBLE);
+//        }
     }
 
     public LrcControlView(@NonNull Context context) {
@@ -342,8 +342,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.comboView.getRoot().setVisibility(View.VISIBLE);
         mBinding.lineScore.setVisibility(View.VISIBLE);
         mBinding.ilActive.tvMusicName2.setVisibility(View.GONE);
-
-        onGraspEnable();
     }
 
     public void onGraspEnable() {
