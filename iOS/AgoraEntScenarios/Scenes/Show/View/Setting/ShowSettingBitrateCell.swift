@@ -7,18 +7,21 @@
 
 import UIKit
 
-protocol ShowSettingSliderCellDelegate: NSObjectProtocol {
-        
-    func onCellSliderValueChanged(value: Float, at index: IndexPath)
+protocol ShowSettingBitrateCellDelegate: NSObjectProtocol {
+    
+    func onAutoBitRateChanged(isOn: Bool)
+    
+    func onBitRateValueChanged(value: Float)
 }
 
-class ShowSettingSliderCell: ShowSettingBaseCell {
+class ShowSettingBitrateCell: ShowSettingBaseCell {
     
-    weak var delegate: ShowSettingSliderCellDelegate?
-    
-    var indexPath: IndexPath?
+    weak var delegate: ShowSettingBitrateCellDelegate?
     
     private var currentValue: Float = 0
+    
+    private let aSwitch = UISwitch()
+    
     
     private let valueLabel = UILabel()
     
@@ -33,37 +36,49 @@ class ShowSettingSliderCell: ShowSettingBaseCell {
     
     func setTitle(_ title: String, value: Float, minValue: Float, maxValue: Float) {
         titleLabel.text = title
-        slider.isHidden = false
-        valueLabel.isHidden = false
-        slider.minimumValue = minValue
-        slider.maximumValue = maxValue
-        slider.value = value
-        valueLabel.text = String(format: "%.0f", slider.value)
-        currentValue = value
+        if (value == 0) {
+            aSwitch.isOn = true
+            slider.isHidden = true
+            valueLabel.isHidden = true
+        } else {
+            aSwitch.isOn = false
+            slider.isHidden = false
+            valueLabel.isHidden = false
+            slider.minimumValue = minValue
+            slider.maximumValue = maxValue
+            slider.value = value
+            valueLabel.text = String(format: "%.0f kbps", slider.value)
+            currentValue = value
+        }
     }
     
     @objc private func sliderValueDidChanged() {
         currentValue = slider.value
-        valueLabel.text = String(format: "%.0f", slider.value)
+        valueLabel.text = String(format: "%.0f kbps", slider.value)
     }
     
     @objc private func sliderDidTouchUp() {
         currentValue = slider.value
-        valueLabel.text = String(format: "%.0f", slider.value)
-        if let i = indexPath {
-            delegate?.onCellSliderValueChanged(value: slider.value, at: i)
-        }
+        valueLabel.text = String(format: "%.0f kbps", slider.value)
+        delegate?.onBitRateValueChanged(value: slider.value)
+    }
+    
+    @objc private func switchValueChanged() {
+        delegate?.onAutoBitRateChanged(isOn: aSwitch.isOn)
     }
 }
 
-private extension ShowSettingSliderCell {
+private extension ShowSettingBitrateCell {
     
     func createViews() {
-        detailButton.isHidden = true
+        detailButton.isHidden = false
         
         valueLabel.textColor = .show_Ellipse5
         valueLabel.font = .show_R_14
         contentView.addSubview(valueLabel)
+        
+        aSwitch.addTarget(self, action: #selector(switchValueChanged), for: .touchUpInside)
+        contentView.addSubview(aSwitch)
         
         slider.minimumTrackTintColor = .show_zi03
         slider.maximumTrackTintColor = .show_Ellipse2
@@ -77,15 +92,19 @@ private extension ShowSettingSliderCell {
             make.top.equalTo(14)
             make.left.equalTo(20)
         }
+        aSwitch.snp.makeConstraints { make in
+            make.right.equalTo(-20)
+            make.centerY.equalTo(titleLabel)
+        }
         slider.snp.makeConstraints { make in
             make.right.equalTo(-20)
-            make.centerY.equalToSuperview()
+            make.top.equalTo(aSwitch.snp.bottom).offset(10)
             make.width.equalTo(150)
             make.height.equalTo(30)
         }
         valueLabel.snp.makeConstraints { make in
             make.right.equalTo(slider.snp.left).offset(-15)
-            make.centerY.equalToSuperview()
+            make.centerY.equalTo(slider)
         }
     }
 }

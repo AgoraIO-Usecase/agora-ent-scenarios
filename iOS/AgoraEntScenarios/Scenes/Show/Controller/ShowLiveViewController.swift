@@ -75,13 +75,11 @@ class ShowLiveViewController: UIViewController {
         return room?.ownerId == VLUserCenter.user.id ? .broadcaster : .audience
     }
     
-    //TODO:
     let channelOptions:AgoraRtcChannelMediaOptions = AgoraRtcChannelMediaOptions()
     
     // 音乐
-    private lazy var musicManager: ShowMusicManager? = {
-         let engine = ShowAgoraKitManager.shared.engine
-        return ShowMusicManager(agoraKit: engine!)
+    private lazy var musicPresenter: ShowMusicPresenter? = {
+        return ShowMusicPresenter()
     }()
     
     private lazy var liveView: ShowRoomLiveView = {
@@ -130,7 +128,6 @@ class ShowLiveViewController: UIViewController {
     //get current interaction status
     private var interactionStatus: ShowInteractionStatus {
         return currentInteraction?.interactStatus ?? .idle
-//        return interactionList?.filter({ $0.interactStatus != .idle }).first?.interactStatus ?? .idle
     }
     
     private var seatInteraction: ShowInteractionInfo? {
@@ -138,7 +135,6 @@ class ShowLiveViewController: UIViewController {
             if currentInteraction?.interactStatus == .onSeat {
                 return currentInteraction
             }
-            
             return nil
         }
     }
@@ -150,15 +146,9 @@ class ShowLiveViewController: UIViewController {
                 liveView.canvasView.isLocalMuteMic = interaction.ownerMuteAudio
                 liveView.canvasView.isRemoteMuteMic = interaction.muteAudio
                 
-//                let options = self.channelOptions
                 if role == .broadcaster {
-//                    options.publishMicrophoneTrack = !interaction.ownerMuteAudio
-//                    agoraKitManager.agoraKit.updateChannel(with: options)
                     self.muteLocalAudio = interaction.ownerMuteAudio
-                    
                 } else if interaction.userId == VLUserCenter.user.id {
-//                    options.publishMicrophoneTrack = !interaction.muteAudio
-//                    agoraKitManager.agoraKit.updateChannel(with: options)
                     self.muteLocalAudio = interaction.muteAudio
                 }
             } else if role == .broadcaster {
@@ -728,14 +718,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             ShowAgoraKitManager.shared.leaveChannelEx(roomId: self.roomId, channelId: interaction.roomId)
             liveView.canvasView.canvasType = .none
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
-//            if interaction.userId == VLUserCenter.user.id {
-//                let options = self.channelOptions
-//                options.publishCameraTrack = false
-//                options.publishMicrophoneTrack = false
-//                options.clientRoleType = .audience
-//                agoraKitManager.agoraKit.updateChannel(with: options)
-//                self.muteLocalVideo = true
-//            }
         case .onSeat:
             self.muteLocalVideo = false
             self.muteLocalAudio = false
@@ -952,7 +934,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickMusicButton() {
         let vc = ShowMusicEffectVC()
-        vc.musicManager = musicManager
+        vc.musicManager = musicPresenter
         vc.currentChannelId = currentChannelId
         present(vc, animated: true)
     }
@@ -983,13 +965,13 @@ extension ShowLiveViewController {
                 return
             }
             DispatchQueue.main.async {
-                var receive = false
-                var send = false
-                if self.role == .audience && self.interactionStatus != .pking && self.interactionStatus != .onSeat {
-                    receive = true
-                }
+                var receive = true
+                var send = true
                 if self.role == .broadcaster && self.interactionStatus != .pking && self.interactionStatus != .onSeat {
-                    send = true
+                    receive = false
+                }
+                if self.role == .audience && self.interactionStatus != .pking && self.interactionStatus != .onSeat {
+                    send = false
                 }
                 let data = self.panelPresenter.generatePanelData(audioOnly: false, send: send, receive: receive)
                 self.realTimeView.update(left: data.left, right: data.right)
@@ -1012,9 +994,6 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 开关摄像头
     func onClickCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-//        let option = self.channelOptions
-//        option.publishCameraTrack = !selected
-//        agoraKitManager.agoraKit.updateChannel(with: option)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self) { granted in
             guard granted else { return }
             self.muteLocalVideo = selected
@@ -1035,15 +1014,6 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 麦克风开关
     func onClickMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-//        let options = self.channelOptions
-//        options.publishMicrophoneTrack = !selected
-//        if role == .broadcaster {
-//            agoraKitManager.agoraKit.updateChannel(with: options)
-//        }
-//        guard let info = currentInteraction else { return }
-//        if info.userId == VLUserCenter.user.id {
-//            agoraKitManager.agoraKit.updateChannel(with: options)
-//        }
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self) { granted in
             guard granted else { return }
             let uid = menu.type == .managerMic ? self.currentInteraction?.userId ?? "" : VLUserCenter.user.id
@@ -1058,12 +1028,10 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
         let uid = menu.type == .managerMic ? currentInteraction?.userId ?? "" : VLUserCenter.user.id
         AppContext.showServiceImp(roomId).muteAudio(mute: selected, userId: uid) { err in
         }
-        
         self.muteLocalAudio = selected
     }
     
     func onClickRealTimeDataButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-//        AlertManager.show(view: realTimeView, alertPostion: .top)
         view.addSubview(realTimeView)
         realTimeView.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
@@ -1089,7 +1057,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
                 let vc = ShowAdvancedSettingVC()
                 vc.mode = wSelf.interactionStatus == .pking ? .pk : .single // 根据当前模式设置
                 vc.isBroadcaster = wSelf.role == .broadcaster
-                vc.musicManager = wSelf.musicManager
+                vc.musicManager = wSelf.musicPresenter
                 vc.currentChannelId = wSelf.currentChannelId
                 wSelf.navigationController?.pushViewController(vc, animated: true)
             }

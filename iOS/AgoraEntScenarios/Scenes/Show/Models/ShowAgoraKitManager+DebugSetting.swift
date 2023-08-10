@@ -42,10 +42,6 @@ enum ShowDebug2TFSettingKey: String {
 
 extension ShowAgoraKitManager {
     
-    private var debugDimensionsItems: [CGSize] {
-        ShowAgoraVideoDimensions.allCases.map({$0.sizeValue})
-    }
-    
     private var debugEncodeItems: [Bool] {
         ShowAgoraEncode.allCases.map({$0.encodeValue})
     }

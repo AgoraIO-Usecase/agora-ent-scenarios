@@ -114,13 +114,7 @@ class ShowCreateLiveVC: UIViewController {
 extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     
     func onClickSettingBtnAction() {
-        if AppContext.shared.isDebugMode {
-            let vc = ShowDebugSettingVC()
-            vc.isBroadcastor = true
-            self.navigationController?.pushViewController(vc, animated: true)
-        }else{
-            showPreset()
-        }
+        showPreset()
     }
     
     func onClickCameraBtnAction() {

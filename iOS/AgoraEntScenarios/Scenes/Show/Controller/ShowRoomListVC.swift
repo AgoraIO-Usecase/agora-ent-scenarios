@@ -91,17 +91,11 @@ class ShowRoomListVC: UIViewController {
         self.fetchRoomList()
     }
     
-    private func showDebugSetVC(){
-        let vc = ShowDebugSettingVC()
-        vc.isBroadcastor = false
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
     private func checkDevice() {
          let score = ShowAgoraKitManager.shared.engine?.queryDeviceScore() ?? 0
-        if (score <= 75) {// (0, 75]
+        if (score < 75) {// (0, 75)
             ShowAgoraKitManager.shared.deviceLevel = .low
-        } else if (score <= 90) {// (75, 90]
+        } else if (score < 90) {// (75, 90)
             ShowAgoraKitManager.shared.deviceLevel = .medium
         } else {// (> 90)
             ShowAgoraKitManager.shared.deviceLevel = .high
