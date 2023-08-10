@@ -20,7 +20,8 @@ import AgoraRtcKit
                                ["title": NSLocalizedString("app_about_chat_room_spatial", comment: ""), "detail":"YLKJ-2.1.0"],
                                ["title": NSLocalizedString("app_about_karaoke", comment: ""),"detail":"KTV-2.3.0"],
                                ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-2.4.0"],
-                               ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"1V1-2.4.0"]],
+                               ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"1V1-3.6.0"],
+                               ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"LiveTo1V1-3.7.0"]],
                   "sectionName": NSLocalizedString("app_mine_current_version", comment: "")]]
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220),

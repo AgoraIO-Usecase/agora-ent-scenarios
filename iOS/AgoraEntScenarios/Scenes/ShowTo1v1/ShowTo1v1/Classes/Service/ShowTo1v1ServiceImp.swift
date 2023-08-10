@@ -26,7 +26,7 @@ extension SyncError {
 }
 
 /// 房间内用户列表
-private let kSceneId = "showTo1v1_3.6.0"
+private let kSceneId = "scene_Livetoprivate_3.7.0"
 private let SYNC_SCENE_ROOM_USER_COLLECTION = "userCollection"
 class ShowTo1v1ServiceImp: NSObject {
     private var appId: String = ""
