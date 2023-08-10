@@ -35,10 +35,10 @@ public class ShowTo1v1Context: NSObject {
                                  appId: String,
                                  appCertificate: String,
                                  userInfo: ShowTo1v1UserInfo) {
+        showTo1v1AppId = appId
+        showTo1v1AppCertificate = appCertificate
         let vc = RoomListViewController()
         vc.userInfo = userInfo
-        vc.appId = appId
-        vc.appCertificate = appCertificate
         vc.hidesBottomBarWhenPushed = true
         viewController.navigationController?.pushViewController(vc, animated: true)
     }

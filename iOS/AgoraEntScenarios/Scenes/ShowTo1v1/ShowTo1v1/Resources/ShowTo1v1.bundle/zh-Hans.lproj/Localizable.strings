@@ -34,6 +34,7 @@
 "setting_statistic" = "实时数据";
 "call_user_empty_tips"="Hi，我暂时有事，很快回来...";
 "call_user_busy_tips"="我很快回来，一会再连线我把";
+"call_content_inspect_warning"="监测到当前内容存在违规行为";
 
 
 "show_statistic_bitrate" = "码率";

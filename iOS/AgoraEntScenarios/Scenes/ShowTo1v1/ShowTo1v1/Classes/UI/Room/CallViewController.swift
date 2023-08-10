@@ -115,12 +115,28 @@ extension CallViewController {
         
         switch state {
         case .connected:
-//            let connection = AgoraRtcConnection()
-//            assert(targetUser != nil, "targetUser == nil")
-//            connection.channelId = targetUser?.getRoomId() ?? ""
-//            connection.localUid = UInt(currentUser?.userId ?? "") ?? 0
-//            setupContentInspectConfig(true, connection: connection)
-//            moderationAudio()
+            var channelId: String?
+            if roomInfo?.userId == currentUser?.userId {
+                //房主找对端
+                channelId = targetUser?.get1V1ChannelId()
+            } else {
+                //观众找自己
+                channelId = currentUser?.get1V1ChannelId()
+            }
+            //鉴权
+            if let channelId = channelId,
+               let userInfo = currentUser,
+               let uid = UInt(userInfo.userId) {
+                let connection = AgoraRtcConnection()
+                connection.channelId = channelId
+                connection.localUid = uid
+                callApi?.setupContentInspectExConfig(rtcEngine: rtcEngine!,
+                                                   enable: true,
+                                                   connection: connection)
+                callApi?.moderationAudio(appId: showTo1v1AppId!,
+                                         channelName: channelId,
+                                         user: userInfo)
+            }
             break
         default:
             break

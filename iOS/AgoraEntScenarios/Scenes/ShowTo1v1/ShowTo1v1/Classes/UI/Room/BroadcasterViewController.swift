@@ -117,8 +117,11 @@ class BroadcasterViewController: BaseRoomViewController {
                                    channelId: channelId,
                                    uid: uid,
                                    mediaOptions: mediaOptions,
-                                   joinSuccess: { channelId, uid, elapsed in
+                                   joinSuccess: {[weak self] channelId, uid, elapsed in
                 showTo1v1Print("broadcaster joinChannel[\(channelId)] success:  \(uid)")
+                guard let self = self, let rtcEngine = self.rtcEngine else {return}
+                self.callApi?.setupContentInspectConfig(rtcEngine: rtcEngine, enable: true, uid: "\(uid)", channelId: channelId)
+                self.callApi?.moderationAudio(appId: showTo1v1AppId!, channelName: channelId, user: self.currentUser!)
             })
             
             _setupCanvas(view: bigCanvasView)
