@@ -145,6 +145,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
                         self._addUserIfNeed(channelName: roomInfo.roomId) { err in
                         }
                         self._subscribeUsersChanged(channelName: roomInfo.roomId)
+                        self.subscribeRoomStatusChanged(channelName: roomInfo.roomId)
                         completion(roomInfo, nil)
                     }
                 } fail: { error in
@@ -181,6 +182,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
                         self._addUserIfNeed(channelName: roomInfo.roomId) { err in
                         }
                         self._subscribeUsersChanged(channelName: roomInfo.roomId)
+                        self.subscribeRoomStatusChanged(channelName: roomInfo.roomId)
                         completion(nil)
                     }
                 } fail: { error in
@@ -210,11 +212,34 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     }
 }
 
+//MARK: room
+extension ShowTo1v1ServiceImp {
+    func subscribeRoomStatusChanged(channelName: String) {
+        guard let scene = sceneRefs[channelName] else {return}
+        showTo1v1Print("imp room subscribe...")
+        scene
+            .subscribe(key: "",
+                       onCreated: { _ in
+                       }, onUpdated: { _ in
+                       }, onDeleted: { [weak self] object in
+                           guard let self = self else {return}
+                           guard let model = self.roomList.filter({ $0.objectId == object.getId()}).first,
+                                 model.roomId == channelName
+                           else {
+                               return
+                           }
+                           showTo1v1Print("imp room subscribe onDeleted...")
+                           self.listener?.onRoomDidDestroy(roomInfo: model)
+                       }, onSubscribed: {}, fail: { error in
+                       })
+    }
+}
+
 //MARK: user
 extension ShowTo1v1ServiceImp {
     private func _getUserList(channelName: String, finished: @escaping (NSError?, [ShowTo1v1UserInfo]?) -> Void) {
-        showTo1v1Print("imp user get...")
         guard let scene = sceneRefs[channelName] else {return}
+        showTo1v1Print("imp user get...")
         scene
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .get(success: { [weak self] list in

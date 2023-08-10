@@ -225,13 +225,15 @@ extension BroadcasterViewController {
 }
 
 extension BroadcasterViewController: ShowTo1v1ServiceListenerProtocol {
+    func onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo) {
+        presentedViewController?.dismiss(animated: false)
+        dismiss(animated: false)
+    }
+    
     func onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus) {
-        
     }
     
     func onUserListDidChanged(userList: [ShowTo1v1UserInfo]) {
         userCountView.count = userList.count
     }
-    
-    
 }
