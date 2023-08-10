@@ -111,9 +111,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     private boolean isOnSeat = false;
     public void onSeat(boolean isOnSeat) {
         this.isOnSeat = isOnSeat;
-//        if (isOnSeat) {
-//            mBinding.ilActive.singRelay.setVisibility(View.VISIBLE);
-//        }
     }
 
     public LrcControlView(@NonNull Context context) {

@@ -835,7 +835,8 @@ public class RoomLivingViewModel extends ViewModel {
                                         oldModel.getPoster(),
                                         oldModel.getLines() + 1
                                 );
-                                rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
+                                rankMap.remove(senderUid);
+                                rankMap.put(senderUid, model);
                             }
                         } else {
                             if (seatListLiveData.getValue() == null) return;
@@ -1482,6 +1483,7 @@ public class RoomLivingViewModel extends ViewModel {
                         UserManager.getInstance().getUser().headUrl,
                         oldModel.getLines() + 1
                 );
+                rankMap.remove(UserManager.getInstance().getUser().id.toString());
                 rankMap.put(UserManager.getInstance().getUser().id.toString(), model);
             }
         } else {

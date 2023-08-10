@@ -183,13 +183,10 @@ public class SingRelayGameView extends FrameLayout {
         if (mBinding == null) return;
         KTVLogger.d(TAG, "onGraspSongBegin: " + partNum);
         this.partNum = partNum + 1;
-        KTVLogger.d(TAG, "onGraspSongBegin: " + partNum);
         mBinding.ilActive.tvSongNumTab.setText(partNum + "/5");
         if (partNum < 5 && isGamer) {
-            KTVLogger.d(TAG, "onGraspEnable: " + isGamer);
             mBinding.ilActive.lrcControlView.onGraspEnable();
         } else {
-            KTVLogger.d(TAG, "onGraspDisable: " + isGamer);
             mBinding.ilActive.lrcControlView.onGraspDisable();
         }
     }
