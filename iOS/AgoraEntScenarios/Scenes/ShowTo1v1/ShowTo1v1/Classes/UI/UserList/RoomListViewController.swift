@@ -26,8 +26,6 @@ private let randomRoomName = [
 
 private let kShowGuideAlreadyKey = "already_show_guide_show1v1"
 class RoomListViewController: UIViewController {
-    var appId: String = ""
-    var appCertificate: String = ""
     var userInfo: ShowTo1v1UserInfo? {
         didSet {
             callVC.currentUser = userInfo
@@ -49,7 +47,7 @@ class RoomListViewController: UIViewController {
     }()
     private let callApi = CallApiImpl()
     private lazy var naviBar = NaviBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.aui_width, height: 44))
-    private lazy var service: ShowTo1v1ServiceProtocol = ShowTo1v1ServiceImp(appId: appId, user: userInfo)
+    private lazy var service: ShowTo1v1ServiceProtocol = ShowTo1v1ServiceImp(appId: showTo1v1AppId!, user: userInfo)
     private lazy var noDataView: RoomNoDataView = {
         let view = RoomNoDataView(frame: self.view.bounds)
         return view
@@ -146,8 +144,8 @@ class RoomListViewController: UIViewController {
         }
         //设置主叫频道
         tokenConfig.roomId = userInfo.get1V1ChannelId()
-        NetworkManager.shared.generateTokens(appId: appId,
-                                             appCertificate: appCertificate,
+        NetworkManager.shared.generateTokens(appId: showTo1v1AppId!,
+                                             appCertificate: showTo1v1AppCertificate!,
                                              channelName: tokenConfig.roomId,
                                              uid: userInfo.userId,
                                              tokenGeneratorType: .token007,
@@ -199,8 +197,8 @@ extension RoomListViewController {
         }
         
         tokenConfig.roomId = userInfo.get1V1ChannelId()
-        NetworkManager.shared.generateTokens(appId: appId,
-                                             appCertificate: appCertificate,
+        NetworkManager.shared.generateTokens(appId: showTo1v1AppId!,
+                                             appCertificate: showTo1v1AppCertificate!,
                                              channelName: ""/*tokenConfig.roomId*/,
                                              uid: userInfo.userId,
                                              tokenGeneratorType: .token007,
@@ -224,9 +222,9 @@ extension RoomListViewController {
         let config = CallConfig()
         config.role = .caller  // Pure 1v1 can only be set as the caller
         config.mode = .showTo1v1
-        config.appId = appId
+        config.appId = showTo1v1AppId!
         config.userId = userInfo!.getUIntUserId()
-        config.rtcEngine = _createRtcEngine()
+        config.rtcEngine = rtcEngine
         config.localView = callVC.smallCanvasView.canvasView
         config.remoteView = callVC.bigCanvasView.canvasView
         config.ownerRoomId = room.roomId
@@ -241,15 +239,16 @@ extension RoomListViewController {
         //reset callVC
         callVC.callApi = callApi
         callVC.roomInfo = room
+        callVC.rtcEngine = rtcEngine
     }
     
     private func _reinitCalleeAPI(tokenConfig: CallTokenConfig, room: ShowTo1v1RoomInfo) {
         let config = CallConfig()
         config.role = .callee  // Pure 1v1 can only be set as the caller
         config.mode = .showTo1v1
-        config.appId = appId
+        config.appId = showTo1v1AppId!
         config.userId = userInfo!.getUIntUserId()
-        config.rtcEngine = _createRtcEngine()
+        config.rtcEngine = rtcEngine
         config.localView = callVC.smallCanvasView
         config.remoteView = callVC.bigCanvasView
         config.ownerRoomId = room.roomId
@@ -261,11 +260,12 @@ extension RoomListViewController {
         //reset callVC
         callVC.callApi = callApi
         callVC.roomInfo = room
+        callVC.rtcEngine = rtcEngine
     }
     
     private func _createRtcEngine() ->AgoraRtcEngineKit {
         let config = AgoraRtcEngineConfig()
-        config.appId = appId
+        config.appId = showTo1v1AppCertificate!
         config.channelProfile = .liveBroadcasting
         config.audioScenario = .gameStreaming
         config.areaCode = .global
@@ -490,8 +490,8 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
             return
         }
         showTo1v1Print("tokenPrivilegeWillExpire")
-        NetworkManager.shared.generateTokens(appId: appId,
-                                             appCertificate: appCertificate,
+        NetworkManager.shared.generateTokens(appId: showTo1v1AppId!,
+                                             appCertificate: showTo1v1AppCertificate!,
                                              channelName: ""/*tokenConfig.roomId*/,
                                              uid: userInfo.userId,
                                              tokenGeneratorType: .token007,
@@ -514,6 +514,12 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
                 showTo1v1Print("renew token tokenPrivilegeWillExpire: \(channelId) \(ret)")
             }
         }
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
+        showTo1v1Warn("contentInspectResult: \(result.rawValue)")
+        guard result != .neutral else { return }
+        AUIToast.show(text: "call_content_inspect_warning".showTo1v1Localization())
     }
 }
 
