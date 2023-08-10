@@ -292,6 +292,8 @@ extension RoomListViewController {
             }
             
             self.rtcEngine(self.rtcEngine, tokenPrivilegeWillExpire: "")
+            
+            AUIToast.show(text: "room_list_refresh_tips".showTo1v1Localization())
         }
     }
     
