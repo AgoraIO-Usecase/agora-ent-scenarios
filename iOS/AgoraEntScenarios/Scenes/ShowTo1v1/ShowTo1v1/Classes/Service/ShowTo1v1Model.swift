@@ -14,6 +14,8 @@ public class ShowTo1v1UserInfo: NSObject {
     public var userName: String = ""
     public var avatar: String = ""
     
+    var objectId: String = ""
+    
     func getUIntUserId() -> UInt {
         return UInt(userId) ?? 0
     }
@@ -36,7 +38,6 @@ public class ShowTo1v1RoomInfo: ShowTo1v1UserInfo {
     
     public var createdAt: Int64 = 0
     
-    var objectId: String = ""
     
     func createRoomInfo(token: String) -> RoomInfo {
         let room = RoomInfo()

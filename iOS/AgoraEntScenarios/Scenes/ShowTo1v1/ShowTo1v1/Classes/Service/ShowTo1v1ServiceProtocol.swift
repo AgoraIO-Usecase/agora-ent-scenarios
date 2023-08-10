@@ -15,8 +15,12 @@ import Foundation
     case closed // 已关闭
 }
 
+protocol ShowTo1v1ServiceListenerProtocol: NSObjectProtocol {
+    func onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus)
+    func onUserListDidChanged(userList: [ShowTo1v1UserInfo])
+}
+
 protocol ShowTo1v1ServiceProtocol: NSObjectProtocol {
-    
     
     /// 创建房间
     /// - Parameters:
@@ -36,20 +40,12 @@ protocol ShowTo1v1ServiceProtocol: NSObjectProtocol {
     ///   - completion: <#completion description#>
     func leaveRoom(roomInfo:ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void)
     
-    
     /// 获取房间列表
     /// - Parameter completion: 完成回调
     func getRoomList(completion: @escaping ([ShowTo1v1RoomInfo]) -> Void)
     
+    /// 订阅回调变化
+    /// - Parameter listener: <#listener description#>
+    func subscribeListener(listener: ShowTo1v1ServiceListenerProtocol?)
     
-    /// 订阅网络状态变化
-    /// - Parameter changedBlock: 变化回调
-    func subscribeNetworkStatusChanged(with changedBlock: @escaping (ShowTo1v1ServiceNetworkStatus) -> Void)
-    
-    /// 订阅房间过期
-    /// - Parameter changedBlock: 变化回调
-    func subscribeRoomWillExpire(with changedBlock: @escaping () -> Void)
-    
-    /// 取消全部订阅
-    func unsubscribeAll()
 }

@@ -63,7 +63,14 @@ class RoomListViewController: UIViewController {
         }
         listView.tapClosure = { [weak self] roomInfo in
             guard let roomInfo = roomInfo else {return}
-            self?._showBroadcasterVC(roomInfo: roomInfo)
+            self?.service.joinRoom(roomInfo: roomInfo, completion: { err in
+                if let error = err {
+                    AUIToast.show(text: error.localizedDescription)
+                    return
+                }
+                self?._showBroadcasterVC(roomInfo: roomInfo)
+            })
+            
         }
         return listView
     }()
@@ -355,9 +362,11 @@ extension RoomListViewController {
         vc.rtcEngine = self.rtcEngine
         vc.broadcasterToken = self.tokenConfig.rtcToken
         vc.onBackClosure = {[weak self] in
+            self?.service.subscribeListener(listener: nil)
             self?.service.leaveRoom(roomInfo: roomInfo, completion: { err in
             })
         }
+        service.subscribeListener(listener: vc)
         self.present(vc, animated: false)
     }
 }
