@@ -10,6 +10,7 @@ import AgoraRtcKit
 import VideoLoaderAPI
 import CallAPI
 
+private let kNormalIconSize = CGSize(width: 32, height: 32)
 class BroadcasterViewController: BaseRoomViewController {
     var videoLoader: IVideoLoaderApi?
     var currentUser: ShowTo1v1UserInfo?
@@ -32,11 +33,13 @@ class BroadcasterViewController: BaseRoomViewController {
     }
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.aui_size = CGSize(width: 32, height: 32)
+        button.aui_size = kNormalIconSize
         button.setImage(UIImage.sceneImage(name: "live_close"), for: .normal)
         button.addTarget(self, action: #selector(onBackAction), for: .touchUpInside)
         return button
     }()
+    
+    private lazy var userCountView: RoomMembersCountView = RoomMembersCountView(frame: CGRect(origin: .zero, size: kNormalIconSize))
     
     // 背景图
     private lazy var bgImageView: UIImageView = {
@@ -55,7 +58,6 @@ class BroadcasterViewController: BaseRoomViewController {
         let text = AUILabelAttrInfo(size: .zero, content: "call_user_empty_tips".showTo1v1Localization())
         
         let label = UILabel.createAttrLabel(font: UIFont.systemFont(ofSize: 13), attrInfos: [info1, info2, info3, text])
-//        let label = UILabel()
         label.textAlignment = .left
         label.textColor = .white
         label.backgroundColor = UIColor(red: 0, green: 0.22, blue: 1, alpha: 0.5)
@@ -63,30 +65,6 @@ class BroadcasterViewController: BaseRoomViewController {
         label.layer.cornerRadius = 13.5
         label.layer.borderColor = UIColor(red: 0.419, green: 0.513, blue: 0.846, alpha: 1).cgColor
         label.layer.borderWidth = 1.5
-//
-//        let textAttr = NSAttributedString(string: "call_user_empty_tips".showTo1v1Localization())
-//        let attach = NSTextAttachment()
-//        attach.image = UIImage.sceneImage(name: "icon_user_leave")!
-//        let imageSize = CGSize(width: 28, height: 28)
-//        attach.bounds = CGRect(origin: CGPoint(x: 0, y: (label.font.capHeight - imageSize.height).rounded() / 2), size: imageSize)
-//        let imgAttr = NSAttributedString(attachment: attach)
-//
-//        let attachSpace1 = NSTextAttachment()
-//        attachSpace1.image = UIImage(color: UIColor.clear)
-//        attachSpace1.bounds = CGRect(origin: .zero, size: CGSize(width: 7, height: 38))
-//        let attachSpace2 = NSTextAttachment()
-//        attachSpace2.image = UIImage(color: UIColor.clear)
-//        attachSpace2.bounds = CGRect(origin: .zero, size: CGSize(width: 16, height: 38))
-//
-//        let imgAttr1 = NSAttributedString(attachment: attachSpace1)
-//        let imgAttr2 = NSAttributedString(attachment: attachSpace2)
-//
-//        let attr = NSMutableAttributedString()
-//        attr.append(imgAttr1)
-//        attr.append(imgAttr)
-//        attr.append(imgAttr2)
-//        attr.append(textAttr)
-//        label.attributedText = attr
         return label
     }()
     
@@ -115,6 +93,10 @@ class BroadcasterViewController: BaseRoomViewController {
         closeButton.aui_right = view.aui_width - 15
         closeButton.aui_centerY = roomInfoView.aui_centerY
         view.addSubview(closeButton)
+        
+        userCountView.aui_right = closeButton.aui_left - 15
+        userCountView.aui_centerY = closeButton.aui_centerY
+        view.addSubview(userCountView)
         
         joinRTCChannel()
     }
@@ -240,4 +222,16 @@ extension BroadcasterViewController {
             break
         }
     }
+}
+
+extension BroadcasterViewController: ShowTo1v1ServiceListenerProtocol {
+    func onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus) {
+        
+    }
+    
+    func onUserListDidChanged(userList: [ShowTo1v1UserInfo]) {
+        userCountView.count = userList.count
+    }
+    
+    
 }

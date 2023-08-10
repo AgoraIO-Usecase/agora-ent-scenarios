@@ -19,16 +19,24 @@ private func mainTreadTask(_ task: (()->())?){
     }
 }
 
+extension SyncError {
+    func toNSError() ->NSError {
+        return NSError(domain: self.message, code: code, userInfo: nil)
+    }
+}
+
 /// 房间内用户列表
 private let kSceneId = "showTo1v1_3.6.0"
+private let SYNC_SCENE_ROOM_USER_COLLECTION = "userCollection"
 class ShowTo1v1ServiceImp: NSObject {
     private var appId: String = ""
     private var user: ShowTo1v1UserInfo?
     private var sceneRefs: [String: SceneReference] = [:]
     private var syncUtilsInited: Bool = false
     private var roomList: [ShowTo1v1RoomInfo] = []
-    private var networkDidChanged: ((ShowTo1v1ServiceNetworkStatus) -> Void)?
-    private var roomExpiredDidChanged: (() -> Void)?
+    private weak var listener: ShowTo1v1ServiceListenerProtocol?
+    
+    private var userList: [ShowTo1v1UserInfo] = []
     
     private var refreshRoomListClosure: (([ShowTo1v1RoomInfo])->Void)?
     
@@ -68,7 +76,7 @@ class ShowTo1v1ServiceImp: NSObject {
             }
             
             showTo1v1Print("subscribeConnectState: \(state) \(self.syncUtilsInited)")
-            self.networkDidChanged?(ShowTo1v1ServiceNetworkStatus(rawValue: state.rawValue) ?? .fail)
+            self.listener?.onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus(rawValue: state.rawValue) ?? .fail)
             guard !self.syncUtilsInited else {
                 return
             }
@@ -78,35 +86,7 @@ class ShowTo1v1ServiceImp: NSObject {
     }
 }
 
-private let kRobotRoomStartId = 2023000
-private let kRobotUid = 2000000001
-private let robotStreamURL = [
-    "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/release/show/video/bot4.mp4",
-    "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/release/show/video/bot5.mp4",
-    "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/release/show/video/bot6.mp4"
-]
-private let robotRoomIds = ["1", "2", "3"]
-private let robotRoomOwnerHeaders = [
-    "https://download.agora.io/demo/release/bot1.png"
-]
 extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
-    private func getRobotRoomList() -> [ShowTo1v1RoomInfo] {
-        var list = [ShowTo1v1RoomInfo]()
-        //create fake room
-//        robotRoomIds.forEach { robotId in
-//            let room = ShowTo1v1RoomInfo()
-//            let userId = "\(kRobotUid)"
-//            room.roomName = "Smooth \(robotId)"
-//            room.roomId = "\((Int(robotId) ?? 1) + kRobotRoomStartId)"
-//            room.userId = userId
-//            room.userName = userId
-//            room.avatar = robotRoomOwnerHeaders[((Int(robotId) ?? 1) - 1) % robotRoomOwnerHeaders.count]
-//            room.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
-//            list.append(room)
-//        }
-        return list
-    }
-    
     func getRoomList(completion: @escaping ([ShowTo1v1RoomInfo]) -> Void) {
         refreshRoomListClosure = completion
         initScene { [weak self] error in
@@ -124,12 +104,10 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
                     return ShowTo1v1RoomInfo.yy_model(withJSON: info.toJson())!
                 })
                 
-                self.roomList = self.getRobotRoomList() + roomList
-//                completion(self.roomList)
+                self.roomList = roomList
                 self.refreshRoomListClosure?(self.roomList)
                 self.refreshRoomListClosure = nil
             }, fail: { error in
-//                completion([])
                 self?.refreshRoomListClosure?([])
                 self?.refreshRoomListClosure = nil
             })
@@ -142,13 +120,13 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
             completion(nil, nil)
             return
         }
-        let room = ShowTo1v1RoomInfo()
-        room.userId = user.userId
-        room.userName = user.userName
-        room.avatar = user.avatar
-        room.roomName = roomName
-        room.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
-        room.roomId = "\(arc4random_uniform(899999) + 100000)"
+        let roomInfo = ShowTo1v1RoomInfo()
+        roomInfo.userId = user.userId
+        roomInfo.userName = user.userName
+        roomInfo.avatar = user.avatar
+        roomInfo.roomName = roomName
+        roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+        roomInfo.roomId = "\(arc4random_uniform(899999) + 100000)"
         initScene {[weak self] error in
             if let error = error {
                 showTo1v1Print("createRoom fail1: \(error.localizedDescription)")
@@ -156,15 +134,18 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
                 return
             }
             
-            let params = room.yy_modelToJSONObject() as? [String: Any]
-            let scene = Scene(id: room.roomId, userId: room.userId, isOwner: true, property: params)
+            let params = roomInfo.yy_modelToJSONObject() as? [String: Any]
+            let scene = Scene(id: roomInfo.roomId, userId: roomInfo.userId, isOwner: true, property: params)
             self?.manager.createScene(scene: scene, success: {[weak self] in
                 guard let self = self else {return}
-                self.manager.joinScene(sceneId: room.roomId) { sceneRef in
+                self.manager.joinScene(sceneId: roomInfo.roomId) { sceneRef in
                     showTo1v1Print("createRoom success")
                     mainTreadTask {
-                        self.sceneRefs[room.roomId] = sceneRef
-                        completion(room, nil)
+                        self.sceneRefs[roomInfo.roomId] = sceneRef
+                        self._addUserIfNeed(channelName: roomInfo.roomId) { err in
+                        }
+                        self._subscribeUsersChanged(channelName: roomInfo.roomId)
+                        completion(roomInfo, nil)
                     }
                 } fail: { error in
                     showTo1v1Print("createRoom fail2: \(error.localizedDescription)")
@@ -197,6 +178,9 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
                     showTo1v1Print("joinRoom success")
                     mainTreadTask {
                         self.sceneRefs[roomInfo.roomId] = sceneRef
+                        self._addUserIfNeed(channelName: roomInfo.roomId) { err in
+                        }
+                        self._subscribeUsersChanged(channelName: roomInfo.roomId)
                         completion(nil)
                     }
                 } fail: { error in
@@ -215,20 +199,127 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     }
     
     func leaveRoom(roomInfo: ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void) {
+        self._removeUser(channelName: roomInfo.roomId) { err in
+        }
         self.sceneRefs[roomInfo.roomId]?.deleteScenes()
         completion(nil)
     }
     
-    func subscribeNetworkStatusChanged(with changedBlock: @escaping (ShowTo1v1ServiceNetworkStatus) -> Void) {
-        self.networkDidChanged = changedBlock
+    func subscribeListener(listener: ShowTo1v1ServiceListenerProtocol?) {
+        self.listener = listener
+    }
+}
+
+//MARK: user
+extension ShowTo1v1ServiceImp {
+    private func _getUserList(channelName: String, finished: @escaping (NSError?, [ShowTo1v1UserInfo]?) -> Void) {
+        showTo1v1Print("imp user get...")
+        guard let scene = sceneRefs[channelName] else {return}
+        scene
+            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+            .get(success: { [weak self] list in
+                showTo1v1Print("imp user get success...")
+                let users = list.compactMap({ ShowTo1v1UserInfo.yy_model(withJSON: $0.toJson()!)! })
+                self?.userList = users
+                finished(nil, users)
+            }, fail: { error in
+                showTo1v1Print("imp user get fail :\(error.message)...")
+                finished(error.toNSError(), nil)
+            })
     }
     
-    func subscribeRoomWillExpire(with changedBlock: @escaping () -> Void) {
-        self.roomExpiredDidChanged = changedBlock
+    fileprivate func _addUserIfNeed(channelName: String, finished: @escaping (NSError?) -> Void) {
+        _getUserList(channelName: channelName) {[weak self] error, userList in
+            guard let self = self else {
+                finished(NSError(domain: "unknown error", code: -1))
+                return
+            }
+            // current user already add
+            if self.userList.contains(where: { $0.userId == self.user?.userId }) {
+                finished(nil)
+                return
+            }
+            self._addUserInfo(channelName: channelName, finished: finished)
+        }
     }
     
-    func unsubscribeAll() {
-        networkDidChanged = nil
-        roomExpiredDidChanged = nil
+    private func _addUserInfo(channelName: String, finished: @escaping (NSError?) -> Void) {
+        guard let scene = sceneRefs[channelName], let model = user else {return}
+        let params = model.yy_modelToJSONObject() as! [String: Any]
+        showTo1v1Print("imp user add ...")
+        scene
+            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+            .add(data: params, success: { [weak self] object in
+                showTo1v1Print("imp user add success...")
+                guard let self = self,
+                      let jsonStr = object.toJson(),
+                      let model = ShowTo1v1UserInfo.yy_model(withJSON: jsonStr) else {
+                    return
+                }
+                
+                if self.userList.contains(where: { $0.userId == model.userId }) {
+                    return
+                }
+                
+                self.userList.append(model)
+                finished(nil)
+            }, fail: { error in
+                showTo1v1Warn("imp user add fail :\(error.message)...")
+                finished(error.toNSError())
+            })
+    }
+    
+    private func _removeUser(channelName: String, completion: @escaping (NSError?) -> Void) {
+        guard let scene = sceneRefs[channelName],
+              let objectId = userList.filter({ $0.userId == self.user?.userId }).first?.objectId else {
+            showTo1v1Print("_removeUser objectId = nil")
+            return
+        }
+        showTo1v1Print("imp user delete... [\(objectId)]")
+        scene
+            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+            .delete(id: objectId,
+                    success: { _ in
+                showTo1v1Print("imp user delete success...")
+            }, fail: { error in
+                showTo1v1Warn("imp user delete fail \(error.message)...")
+                completion(error.toNSError())
+            })
+    }
+    
+    private func _subscribeUsersChanged(channelName: String) {
+        guard let scene = sceneRefs[channelName]else {return}
+        showTo1v1Print("imp user subscribe ...")
+        scene
+            .subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION,
+                       onCreated: { _ in
+                       }, onUpdated: { [weak self] object in
+                           showTo1v1Print("imp user subscribe onUpdated...")
+                           guard let self = self,
+                                 let jsonStr = object.toJson(),
+                                 let model = ShowTo1v1UserInfo.yy_model(withJSON: jsonStr) else { return }
+                           defer{
+                               self.listener?.onUserListDidChanged(userList: self.userList)
+                           }
+                           if self.userList.contains(where: { $0.userId == model.userId }) {
+                               return
+                           }
+                           self.userList.append(model)
+                           
+                       }, onDeleted: { [weak self] object in
+                           showTo1v1Print("imp user subscribe onDeleted... [\(object.getId())]")
+                           guard let self = self else { return }
+                           defer{
+                               self.listener?.onUserListDidChanged(userList: self.userList)
+                           }
+                           guard let index = self.userList.firstIndex(where: { object.getId() == $0.objectId }) else{
+                               return
+                           }
+                           let model = self.userList[index]
+                           self.userList.remove(at: index)
+                       }, onSubscribed: {
+                       }, fail: { error in
+                           showTo1v1Warn("imp user subscribe fail \(error.message)...")
+                       })
     }
 }
