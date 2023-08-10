@@ -138,6 +138,7 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
     }
     var userInfo: ShowTo1v1UserInfo?
     var createClosure: ((String)->())?
+    var randomClosure: (()->(String))?
     
     private var loadingBinder: TextLoadingBinder?
     private lazy var titleLabel: UILabel = {
@@ -166,6 +167,7 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
         button.adjustHorizonAlign(spacing: 3)
         button.sizeToFit()
         button.aui_size = CGSize(width: button.aui_width + 6, height: button.aui_height)
+        button.addTarget(self, action: #selector(_randomAction), for: .touchUpInside)
         return button
     }()
     
@@ -281,12 +283,15 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
         }
     }
     
-    static func show(user: ShowTo1v1UserInfo, createClosure: @escaping (String)->()) -> CreateRoomDialog? {
+    static func show(user: ShowTo1v1UserInfo,
+                     createClosure: @escaping (String)->(),
+                     randomClosure: @escaping ()->(String)) -> CreateRoomDialog? {
         CreateRoomDialog.hidden()
         guard let window = getWindow() else {return nil}
         let dialog = CreateRoomDialog(frame: window.bounds)
         dialog.userInfo = user
         dialog.createClosure = createClosure
+        dialog.randomClosure = randomClosure
         dialog.tag = kDialogTag
         window.addSubview(dialog)
         dialog.showAnimation()
@@ -299,6 +304,11 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
     
     @objc private func _createAction() {
         createClosure?(textField.text ?? "")
+    }
+    
+    @objc private func _randomAction() {
+        let text = randomClosure?()
+        textField.text = text
     }
 }
 
