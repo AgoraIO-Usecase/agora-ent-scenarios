@@ -220,8 +220,8 @@ extension RoomListViewController {
         config.appId = appId
         config.userId = userInfo!.getUIntUserId()
         config.rtcEngine = _createRtcEngine()
-        config.localView = callVC.smallCanvasView
-        config.remoteView = callVC.bigCanvasView
+        config.localView = callVC.smallCanvasView.canvasView
+        config.remoteView = callVC.bigCanvasView.canvasView
         config.ownerRoomId = room.roomId
         if let userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any] {
             config.userExtension = userExtension
