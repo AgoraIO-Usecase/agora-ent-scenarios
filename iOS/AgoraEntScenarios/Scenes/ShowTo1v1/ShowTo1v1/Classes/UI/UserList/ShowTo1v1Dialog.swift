@@ -229,7 +229,7 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
     @objc private func keyboardShow(note: Notification) {
         let keyboardHeight = (note.userInfo?["UIKeyboardBoundsUserInfoKey"] as? CGRect)?.height ?? 0
         UIView.animate(withDuration: kDialogAnimationDuration) {
-            self.dialogView.aui_bottom = self.aui_height - keyboardHeight
+            self.dialogView.aui_bottom = self.aui_height + (self.dialogView.aui_height - self.createButton.aui_bottom) - keyboardHeight
         }
     }
 
