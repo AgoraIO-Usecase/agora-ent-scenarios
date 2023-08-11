@@ -158,9 +158,13 @@ extension Pure1v1UserListViewController {
             AUIToast.show(text: "call_not_init".pure1v1Localization())
             return
         }
+        guard let remoteUserId = UInt(user.userId) else {
+            pure1v1Warn("_call fail, userId invalid: \(user.userId) \(user.userName)")
+            return
+        }
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
-        callApi.call(roomId: user.userId, remoteUserId: UInt(user.userId)!) { err in
+        callApi.call(roomId: user.userId, remoteUserId: remoteUserId) { err in
         }
     }
 }
