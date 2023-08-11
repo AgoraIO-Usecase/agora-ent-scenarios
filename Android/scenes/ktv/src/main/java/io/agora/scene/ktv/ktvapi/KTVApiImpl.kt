@@ -111,9 +111,21 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private var audioRouting = 0
     private var isPublishAudio = false // 通过是否发音频流判断
 
+    // 数据上报
+    private fun reportCallScenarioApi(event: String, params: JSONObject) {
+        mRtcEngine.sendCustomReportMessage(
+            "scenarioAPI",
+            "ktv",
+            event,
+            params.toString(),
+            0)
+    }
+
     override fun initialize(
         config: KTVApiConfig
     ) {
+        reportCallScenarioApi("initialize", JSONObject().put("config", config))
+
         this.mRtcEngine = config.engine as RtcEngineEx
         this.ktvApiConfig = config
 
@@ -147,6 +159,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun renewInnerDataStreamId() {
+        reportCallScenarioApi("renewInnerDataStreamId", JSONObject())
+
         val innerCfg = DataStreamConfig()
         innerCfg.syncWithAudio = true
         innerCfg.ordered = false
@@ -178,14 +192,17 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
+        reportCallScenarioApi("addEventHandler", JSONObject())
         ktvApiEventHandlerList.add(ktvApiEventHandler)
     }
 
     override fun removeEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
+        reportCallScenarioApi("removeEventHandler", JSONObject())
         ktvApiEventHandlerList.remove(ktvApiEventHandler)
     }
 
     override fun release() {
+        reportCallScenarioApi("release", JSONObject())
         if (isRelease) return
         isRelease = true
         singerRole = KTVSingRole.Audience
@@ -217,6 +234,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun enableProfessionalStreamerMode(enable: Boolean) {
+        reportCallScenarioApi("enableProfessionalStreamerMode", JSONObject())
         this.professionalModeOpen = enable
         processAudioProfessionalProfile()
     }
@@ -252,6 +270,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun renewToken(rtmToken: String, chorusChannelRtcToken: String) {
+        reportCallScenarioApi("renewToken", JSONObject().put("rtmToken", rtmToken).put("chorusChannelRtcToken", chorusChannelRtcToken))
         // 更新RtmToken
         mMusicCenter.renewToken(rtmToken)
         // 更新合唱频道RtcToken
@@ -275,6 +294,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         newRole: KTVSingRole,
         switchRoleStateListener: ISwitchRoleStateListener?
     ) {
+        reportCallScenarioApi("switchSingerRole", JSONObject().put("newRole", newRole))
+
         Log.d(TAG, "switchSingerRole oldRole: $singerRole, newRole: $newRole")
         val oldRole = singerRole
         if (this.singerRole == KTVSingRole.Audience && newRole == KTVSingRole.SoloSinger) {
@@ -375,6 +396,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun fetchMusicCharts(onMusicChartResultListener: (requestId: String?, status: Int, list: Array<out MusicChartInfo>?) -> Unit) {
+        reportCallScenarioApi("fetchMusicCharts", JSONObject())
         val requestId = mMusicCenter.musicCharts
         musicChartsCallbackMap[requestId] = onMusicChartResultListener
     }
@@ -386,6 +408,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         jsonOption: String,
         onMusicCollectionResultListener: (requestId: String?, status: Int, page: Int, pageSize: Int, total: Int, list: Array<out Music>?) -> Unit
     ) {
+        reportCallScenarioApi("searchMusicByMusicChartId", JSONObject())
         val requestId =
             mMusicCenter.getMusicCollectionByMusicChartId(musicChartId, page, pageSize, jsonOption)
         musicCollectionCallbackMap[requestId] = onMusicCollectionResultListener
@@ -398,6 +421,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         jsonOption: String,
         onMusicCollectionResultListener: (requestId: String?, status: Int, page: Int, pageSize: Int, total: Int, list: Array<out Music>?) -> Unit
     ) {
+        reportCallScenarioApi("searchMusicByKeyword", JSONObject())
         val requestId = mMusicCenter.searchMusic(keyword, page, pageSize, jsonOption)
         musicCollectionCallbackMap[requestId] = onMusicCollectionResultListener
     }
@@ -407,6 +431,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         config: KTVLoadMusicConfiguration,
         musicLoadStateListener: IMusicLoadStateListener
     ) {
+        reportCallScenarioApi("loadMusic", JSONObject().put("songCode", songCode).put("config", config))
         Log.d(TAG, "loadMusic called: songCode $songCode")
         if (this.ktvApiConfig.type == KTVType.SingBattle) {
             mMusicCenter.getSongSimpleInfo(songCode);
@@ -515,6 +540,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         url: String,
         config: KTVLoadMusicConfiguration
     ) {
+        reportCallScenarioApi("loadMusic", JSONObject().put("url", url).put("config", config))
         Log.d(TAG, "loadMusic called: songCode $songCode")
         this.songMode = KTVSongMode.SONG_URL
         this.songIdentifier = config.songIdentifier
@@ -531,6 +557,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun startSing(songCode: Long, startPos: Long) {
+        reportCallScenarioApi("startSing", JSONObject().put("songCode", songCode).put("startPos", startPos))
         Log.d(TAG, "playSong called: $singerRole")
         if (this.songCode != songCode) {
             Log.e(TAG, "startSing failed: canceled")
@@ -544,6 +571,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun startSing(url: String, startPos: Long) {
+        reportCallScenarioApi("startSing", JSONObject().put("url", url).put("startPos", startPos))
         Log.d(TAG, "playSong called: $singerRole")
         if (this.songUrl != url) {
             Log.e(TAG, "startSing failed: canceled")
@@ -557,31 +585,37 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun resumeSing() {
+        reportCallScenarioApi("resumeSing", JSONObject())
         Log.d(TAG, "resumePlay called")
         mPlayer.resume()
     }
 
     override fun pauseSing() {
+        reportCallScenarioApi("pauseSing", JSONObject())
         Log.d(TAG, "pausePlay called")
         mPlayer.pause()
     }
 
     override fun seekSing(time: Long) {
+        reportCallScenarioApi("seekSing", JSONObject().put("time", time))
         Log.d(TAG, "seek called")
         mPlayer.seek(time)
         syncPlayProgress(time)
     }
 
     override fun setLrcView(view: ILrcView) {
+        reportCallScenarioApi("setLrcView", JSONObject())
         Log.d(TAG, "setLrcView called")
         this.lrcView = view
     }
 
     override fun setMicStatus(isOnMicOpen: Boolean) {
+        reportCallScenarioApi("setMicStatus", JSONObject().put("isOnMicOpen", isOnMicOpen))
         this.isOnMicOpen = isOnMicOpen
     }
 
     override fun setAudioPlayoutDelay(audioPlayoutDelay: Int) {
+        reportCallScenarioApi("setAudioPlayoutDelay", JSONObject().put("audioPlayoutDelay", audioPlayoutDelay))
         this.audioPlayoutDelay = audioPlayoutDelay
     }
 
