@@ -165,7 +165,7 @@ class ShowDataPanelPresenter {
         let sr = receive ? (params.sr ? onStr : offStr) : "--"
         let srStr = "show_statistic_SR_switch".show_localized + ": " + sr
         // 小流开关
-        let microStream = send ? ((params.dualStream != nil) ? onStr : offStr) : "--"
+        let microStream = send ? ((localVideoStats.dualStreamEnabled) ? onStr : offStr) : "--"
         let microStreamStr = "show_statistic_micro_stream_switch".show_localized + ": " + microStream
         // right:
         //机型等级
