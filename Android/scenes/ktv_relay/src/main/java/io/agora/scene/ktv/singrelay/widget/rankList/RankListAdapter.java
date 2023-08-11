@@ -39,7 +39,7 @@ public class RankListAdapter extends BindingSingleAdapter<RankItem, KtvItemRankL
         if (item.songNum == -1) {
             mBinding.tvSongNum.setText("-");
         } else {
-            mBinding.tvSongNum.setText(item.songNum + "首");
+            mBinding.tvSongNum.setText(item.songNum + "段");
         }
 
         if (item.score == -1) {
