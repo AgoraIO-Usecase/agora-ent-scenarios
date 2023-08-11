@@ -210,6 +210,7 @@ public class RoomLivingViewModel extends ViewModel {
     private final List<String> singerList = new ArrayList<>();
 
     private int prepareNum = 0;
+    private boolean hasRecievedFirstPosition = false;
 
     public RoomLivingViewModel(JoinRoomOutputModel roomInfo) {
         this.roomInfoLiveData = new MutableLiveData<>(roomInfo);
@@ -652,6 +653,7 @@ public class RoomLivingViewModel extends ViewModel {
 
                 if (singRelayGameStatusMutableLiveData.getValue() == GameStatus.ON_WAITING && data.size() > 0) {
                     // 歌曲选择成功后，开始游戏
+                    KTVLogger.d(TAG, "RoomLivingViewModel.startSingRelayGame");
                     ktvServiceProtocol.startSingRelayGame(err -> {
                         if (err != null) {
                             KTVLogger.e(TAG, "RoomLivingViewModel.startSingRelayGame() failed: " + err.getMessage());
@@ -700,16 +702,8 @@ public class RoomLivingViewModel extends ViewModel {
                 RoomSelSongModel value = songPlayingLiveData.getValue();
                 RoomSelSongModel songPlaying = songsOrderedLiveData.getValue().get(0);
 
-                if (value == null || !value.getSongNo().equals(songPlaying.getSongNo())) {
-                    // 无已点歌曲， 直接将列表第一个设置为当前播放歌曲
-                    KTVLogger.d(TAG, "RoomLivingViewModel.onSongPlaying() chosen song list is empty");
-                    songPlayingLiveData.postValue(songPlaying);
-                    relayList = SongModel.INSTANCE.getSongPartListWithSongCode(songPlaying.getSongNo());
-                } else if (!value.getWinnerNo().equals(songPlaying.getWinnerNo())) {
-                    KTVLogger.d(TAG, "RoomLivingViewModel.onSongPlaying() has winner");
-                    songPlayingLiveData.postValue(songPlaying);
-                    relayList = SongModel.INSTANCE.getSongPartListWithSongCode(songPlaying.getSongNo());
-                }
+                songPlayingLiveData.postValue(songPlaying);
+                relayList = SongModel.INSTANCE.getSongPartListWithSongCode(songPlaying.getSongNo());
             } else {
                 KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() return is emptyList");
                 //gameSong = null;
@@ -940,7 +934,8 @@ public class RoomLivingViewModel extends ViewModel {
                public void onMusicPlayerPositionChanged(long position_ms, long timestamp_ms) {
                    super.onMusicPlayerPositionChanged(position_ms, timestamp_ms);
                    Log.d("position", "position: " + position_ms);
-                   if (Math.abs(position_ms - 1000) < 500 && isOnSeat) {
+                   if (!hasRecievedFirstPosition && isOnSeat) {
+                       hasRecievedFirstPosition = true;
                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_BATTLE);
                    }
                    for (int i = 0; i < relayList.size() - 1; i++) {
@@ -1308,6 +1303,7 @@ public class RoomLivingViewModel extends ViewModel {
     // ------------------ 重置歌曲状态(歌曲切换时) ------------------
     public void resetMusicStatus() {
         KTVLogger.d(TAG, "RoomLivingViewModel.resetMusicStatus() called");
+        hasRecievedFirstPosition = false;
         retryTimes = 0;
         prepareNum = 0;
         singerList.clear();
