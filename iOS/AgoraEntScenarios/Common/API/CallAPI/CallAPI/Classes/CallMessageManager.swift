@@ -56,7 +56,7 @@ class CallMessageManager: NSObject {
     public weak var delegate: CallMessageDelegate?
     private var config: CallConfig!
     private var rtmClient: AgoraRtmClientKit!
-    private var rtmDelegate: AgoraRtmClientDelegate?
+    private weak var rtmDelegate: AgoraRtmClientDelegate?
     
     private var snapshotDidRecv: (()->())?
     
@@ -146,8 +146,10 @@ extension CallMessageManager {
             options1.withMetadata = false
             options1.withPresence = false
             group.enter()
-            _subscribe(channelName: roomId, option: options1) { error in
+            callMessagePrint("1/3 will _subscribe[\(roomId)]")
+            _subscribe(channelName: roomId, option: options1) {[weak self] error in
                 error1 = error
+                self?.callMessagePrint("1/3 _subscribe[\(roomId)]: \(error?.localizedDescription ?? "success")")
                 group.leave()
             }
             
@@ -156,13 +158,18 @@ extension CallMessageManager {
             options2.withMetadata = false
             options2.withPresence = true
             group.enter()
-            _subscribe(channelName: ownerRoomId, option: options2) { error in
+            callMessagePrint("2/3 will _subscribe[\(ownerRoomId)]")
+            _subscribe(channelName: ownerRoomId, option: options2) {[weak self] error in
                 error2 = error
+                self?.callMessagePrint("2/3 _subscribe[\(ownerRoomId)]: \(error?.localizedDescription ?? "success")")
                 group.leave()
             }
             
             group.enter()
-            snapshotDidRecv = {
+            callMessagePrint("3/3 waiting for snapshot")
+            //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
+            snapshotDidRecv = {[weak self] in
+                self?.callMessagePrint("3/3 recv snapshot")
                 group.leave()
             }
             
@@ -213,7 +220,7 @@ extension CallMessageManager {
         rtmClient.publish(roomId, message: data!, withOption: options) { [weak self] resp, err in
             guard let self = self else {return}
             let error = err.errorCode == .ok ? nil : NSError(domain: err.reason, code: err.errorCode.rawValue)
-            self.callMessagePrint("_sendReceipts cost \(-date.timeIntervalSinceNow * 1000) ms")
+//            self.callMessagePrint("_sendReceipts cost \(-date.timeIntervalSinceNow * 1000) ms")
             if error == nil {
                 completion?(nil)
                 return
@@ -253,7 +260,7 @@ extension CallMessageManager {
                         guard let self = self else {return}
                         guard info.retryTimes > 0 else {
                             let message = info.messageInfo ?? [:]
-                            self.callMessagePrint("get receipts fail, msg: \(message)")
+//                            self.callMessagePrint("get receipts fail, msg: \(message)")
                             self.receiptsQueue = self.receiptsQueue.filter({$0.messageId != msgId})
                             self.delegate?.onMissReceipts(message: message)
                             return
@@ -282,9 +289,11 @@ extension CallMessageManager {
             return
         }
         
+        callMessagePrint("will subscribe[\(channelName)]")
+        rtmClient.unsubscribe(withChannel: channelName)
         rtmClient.subscribe(withChannel: channelName, option: option) {[weak self] resp, err in
             guard let self = self else {return}
-            self.callMessagePrint("subscribe \(channelName) finished = \(err.errorCode.rawValue)")
+            self.callMessagePrint("subscribe[\(channelName)] finished = \(err.errorCode.rawValue)")
             guard err.errorCode == .ok else {
                 completion?(NSError(domain: err.reason, code: err.errorCode.rawValue))
                 return
@@ -300,6 +309,7 @@ extension CallMessageManager {
             return
         }
         
+        self.callMessagePrint("will login")
         rtmClient.login(byToken: token) {[weak self] resp, error in
             guard let self = self else {return}
             self.callMessagePrint("login: \(error.errorCode.rawValue)")
@@ -522,9 +532,17 @@ extension CallMessageManager: AgoraRtmClientDelegate {
 extension CallMessageManager {
     private func callMessagePrint(_ message: String) {
         delegate?.debugInfo(message: "[MessageManager]\(message)")
+        #if DEBUG
+        if let _ = delegate {return}
+        print("[CallApi][MessageManager]\(message)")
+        #endif
     }
     
     private func callWarningPrint(_ message: String) {
         delegate?.debugWarning(message: "[MessageManager]\(message)")
+        #if DEBUG
+        if let _ = delegate {return}
+        print("[CallApi][Warning][MessageManager]\(message)")
+        #endif
     }
 }

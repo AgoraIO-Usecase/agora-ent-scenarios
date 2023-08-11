@@ -183,7 +183,7 @@ public class CallApiImpl: NSObject {
         if localNtpTime == 0 {
             localNtpTime = Int(round(Date().timeIntervalSince1970 * 1000.0))
         } else {
-            callPrint("ts delta = \(localNtpTime - Int(round(Date().timeIntervalSince1970 * 1000.0))) ms")
+//            callPrint("ts delta = \(localNtpTime - Int(round(Date().timeIntervalSince1970 * 1000.0))) ms")
         }
 
         return localNtpTime
@@ -384,6 +384,7 @@ extension CallApiImpl {
     
     
     private func _deinitialize() {
+        isPreparing = false
         _notifyState(state: .idle)
         _notifyEvent(event: .deinitialize)
     }
@@ -470,9 +471,9 @@ extension CallApiImpl {
             rtcConnection = nil
         }
         
-        //需要先开启音视频
-        config.rtcEngine.enableAudio()
-        config.rtcEngine.enableVideo()
+        //需要先开启音视频，使用enableLocalAudio而不是enableAudio，否则会导致外部mute的频道变成unmute
+        config.rtcEngine.enableLocalAudio(true)
+        config.rtcEngine.enableLocalVideo(true)
         
         let connection = AgoraRtcConnection()
         connection.channelId = roomId
@@ -1081,7 +1082,7 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
             return
         }
         
-        self.timeProfiling(message: "5.呼叫-对端[\(roomId)] 加入房间")
+        self.timeProfiling(message: "5.呼叫-对端[\(uid)] 加入房间")
         self._setupRemoteVideo(roomId: roomId, uid: uid, canvasView: config.remoteView)
         
         _notifyEvent(event: .remoteJoin, elapsed: _getNtpTimeInMs() - (callTs ?? 0))
@@ -1173,6 +1174,7 @@ extension CallApiImpl {
         for element in delegates.allObjects {
             (element as? CallApiListenerProtocol)?.debugInfo?(message: message)
         }
+        guard delegates.count == 0 else {return}
     
         debugPrint("[CallApi]\(message)")
     }
