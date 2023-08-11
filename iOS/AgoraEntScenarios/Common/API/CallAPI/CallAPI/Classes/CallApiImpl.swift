@@ -583,6 +583,23 @@ extension CallApiImpl {
         _reportEvent(key: type.rawValue, value: _getCost(), messageId: "")
     }
     
+    private func _reportMethod(event: String, label: String = "") {
+        guard let config = config else {
+            return
+        }
+        
+        let msgId = "scenarioAPI"
+        let category = "3"
+        if isChannelJoined {
+            _sendCustomReportMessage(msgId: msgId, category: category, event: event, label: label, value: 0)
+            return
+        }
+        
+        let info = CallReportInfo(msgId: msgId, category: category, event: event, label: label, value: 0)
+        reportInfoList.append(info)
+        callPrint("sendCustomReportMessage not join channel cache it! event: \(event) label: \(label)")
+    }
+    
     private func _reportEvent(key: String, value: Int, messageId: String) {
         guard let config = config else {
             return
@@ -735,12 +752,14 @@ extension CallApiImpl {
 //MARK: CallApiProtocol
 extension CallApiImpl: CallApiProtocol {
     public func getCallId() -> String {
+        _reportMethod(event: "\(#function)")
         return callId
     }
     
     public func initialize(config: CallConfig,
                            token: CallTokenConfig,
                            completion: @escaping ((NSError?)->())) {
+        _reportMethod(event: "\(#function)", label: "appId=\(config.appId)&userId=\(config.userId)&ownerRoomId=\(config.ownerRoomId)&mode=\(config.mode.rawValue)&role=\(config.role.rawValue)&autoAccept=\(config.autoAccept)&roomId=\(token.roomId)&rtcToken=\(token.rtcToken)&rtmToken=\(token.rtmToken)")
         if state != .idle {
             callWarningPrint("must invoke 'deinitialize' to clean state")
             return
@@ -770,6 +789,7 @@ extension CallApiImpl: CallApiProtocol {
     }
     
     public func deinitialize(completion: @escaping (()->())) {
+        _reportMethod(event: "\(#function)")
         callPrint("deinitialize")
         
         if let callingRoomId = self.callingRoomId {
@@ -785,6 +805,7 @@ extension CallApiImpl: CallApiProtocol {
     }
     
     public func renewToken(with config: CallTokenConfig) {
+        _reportMethod(event: "\(#function)", label: "roomId=\(config.roomId)&rtcToken=\(config.rtcToken)&rtmToken=\(config.rtmToken)")
         if let roomId = tokenConfig?.roomId, roomId != config.roomId {
             callWarningPrint("renewToken failed, roomid missmatch")
         }
@@ -803,6 +824,7 @@ extension CallApiImpl: CallApiProtocol {
     }
     
     public func renewRemoteCallerChannelToken(roomId: String, token: String) {
+        _reportMethod(event: "\(#function)", label: "roomId=\(roomId)&token=\(token)")
         guard let connection = rtcConnection, connection.channelId == roomId, let rtcEngine = self.config?.rtcEngine else { return }
         let options = AgoraRtcChannelMediaOptions()
         options.token = token
@@ -811,10 +833,12 @@ extension CallApiImpl: CallApiProtocol {
     }
     
     public func prepareForCall(prepareConfig: PrepareConfig, completion: ((NSError?) -> ())?) {
+        _reportMethod(event: "\(#function)", label: "autoLoginRTM=\(prepareConfig.autoLoginRTM)&autoSubscribeRTM=\(prepareConfig.autoSubscribeRTM)&autoJoinRTC=\(prepareConfig.autoJoinRTC)")
         _prepareForCall(prepareConfig: prepareConfig, completion: completion)
     }
     
     public func addListener(listener: CallApiListenerProtocol) {
+        _reportMethod(event: "\(#function)")
         if delegates.contains(listener) {
             return
         }
@@ -822,11 +846,13 @@ extension CallApiImpl: CallApiProtocol {
     }
     
     public func removeListener(listener: CallApiListenerProtocol) {
+        _reportMethod(event: "\(#function)")
         delegates.remove(listener)
     }
     
     //呼叫
     public func call(roomId: String, remoteUserId: UInt, completion: ((NSError?) -> ())?) {
+        _reportMethod(event: "\(#function)", label: "roomId=\(roomId)&remoteUserId=\(remoteUserId)")
         guard let fromRoomId = tokenConfig?.roomId else {
             completion?(NSError(domain: "call fail! config or roomId is empty", code: -1))
             callWarningPrint("call fail! config or roomId is empty")
@@ -884,6 +910,7 @@ extension CallApiImpl: CallApiProtocol {
     
     //取消呼叫
     public func cancelCall(completion: ((NSError?) -> ())?) {
+        _reportMethod(event: "\(#function)")
         guard let roomId = callingRoomId, let fromRoomId = tokenConfig?.roomId else {
             completion?(NSError(domain: "cancelCall fail! callingRoomId is empty", code: -1))
             callWarningPrint("cancelCall fail! callingRoomId is empty")
@@ -899,6 +926,7 @@ extension CallApiImpl: CallApiProtocol {
     
     //接受
     public func accept(roomId: String, remoteUserId: UInt, rtcToken: String, completion: ((NSError?) -> ())?) {
+        _reportMethod(event: "\(#function)", label: "roomId=\(roomId)&remoteUserId=\(remoteUserId)&rtcToken=\(rtcToken)")
         guard let fromRoomId = tokenConfig?.roomId else {
             let errReason = "accept fail! current userId or roomId is empty"
             completion?(NSError(domain: errReason, code: -1))
@@ -947,6 +975,7 @@ extension CallApiImpl: CallApiProtocol {
     
     //拒绝
     public func reject(roomId: String, remoteUserId: UInt, reason: String?, completion: ((NSError?) -> ())?) {
+        _reportMethod(event: "\(#function)", label: "roomId=\(roomId)&remoteUserId=\(remoteUserId)&reason=\(reason)")
         _reject(roomId: roomId, remoteUserId: remoteUserId, reason: reason) { (err, message) in
         }
         _notifyState(state: .prepared, stateReason: .localRejected)
@@ -955,6 +984,7 @@ extension CallApiImpl: CallApiProtocol {
     
     //挂断
     public func hangup(roomId: String, completion: ((NSError?) -> ())?) {
+        _reportMethod(event: "\(#function)", label: "roomId=\(roomId)")
         _hangup(roomId: roomId) { err, message in
         }
         
@@ -963,10 +993,12 @@ extension CallApiImpl: CallApiProtocol {
     }
     
     public func addRTCListener(listener: AgoraRtcEngineDelegate) {
+        _reportMethod(event: "\(#function)")
         rtcProxy.addListener(listener)
     }
     
     public func removeRTCListener(listener: AgoraRtcEngineDelegate) {
+        _reportMethod(event: "\(#function)")
         rtcProxy.removeListener(listener)
     }
 }
