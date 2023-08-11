@@ -126,9 +126,6 @@ class Pure1v1UserCell: UICollectionViewCell {
         avatarView.frame = CGRect(x: 15, y: contentImageView.aui_height - 40 - wh, width: wh, height: wh)
         avatarView.layer.cornerRadius = wh / 2
         avatarView.clipsToBounds = true
-        nameLabel.sizeToFit()
-        nameLabel.aui_left = avatarView.aui_right + 10
-        nameLabel.aui_centerY = avatarView.aui_centerY
         
         liveAnimationView.aui_tl = CGPoint(x: 11, y: 10)
         liveGradientLayer.frame = liveAnimationView.frame
@@ -136,6 +133,11 @@ class Pure1v1UserCell: UICollectionViewCell {
         callButton.aui_size = CGSize(width: 76, height: 76)
         callButton.aui_right = contentImageView.aui_width - 15
         callButton.aui_centerY = avatarView.aui_centerY
+        
+        
+        nameLabel.aui_left = avatarView.aui_right + 10
+        nameLabel.aui_size = CGSize(width: callButton.aui_left - nameLabel.aui_left - 10, height: avatarView.aui_height)
+        nameLabel.aui_centerY = avatarView.aui_centerY
     }
     
     @objc func _callAction() {
