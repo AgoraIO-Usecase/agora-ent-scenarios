@@ -101,6 +101,7 @@ extension ShowAgoraKitManager {
             let config = AgoraSimulcastStreamConfig()
             config.dimensions = dimensions
             config.framerate = fps
+            config.kBitrate = 65
             rtcParam.dualStream = config
         } else {
             rtcParam.dualStream = nil
@@ -126,7 +127,6 @@ extension ShowAgoraKitManager {
             engine?.setParameters("\"rtc.video.high_low_video_ratio_enabled\": false")
         }
     }
-    
     
     // 预设模式
     private func _presetValuesWith(encodeSize: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool) {
