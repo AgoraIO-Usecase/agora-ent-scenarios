@@ -574,7 +574,6 @@
 		E3735C9D2A5E7E75004737EF /* BeautyLoad.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C732A5E7E75004737EF /* BeautyLoad.m */; };
 		E3735C9E2A5E7E75004737EF /* BeautyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C742A5E7E75004737EF /* BeautyModel.swift */; };
 		E3735C9F2A5E7E75004737EF /* BeautyResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E3735C752A5E7E75004737EF /* BeautyResource.bundle */; };
-		E3735CA02A5E7E75004737EF /* BeautyConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C772A5E7E75004737EF /* BeautyConfig.m */; };
 		E3735CA12A5E7E75004737EF /* FUBeautyRender.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C7A2A5E7E75004737EF /* FUBeautyRender.m */; };
 		E3735CA22A5E7E75004737EF /* BeautyAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C7D2A5E7E75004737EF /* BeautyAPI.m */; };
 		E3735CA32A5E7E75004737EF /* SenseBeautyRender.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C802A5E7E75004737EF /* SenseBeautyRender.m */; };
@@ -1335,11 +1334,9 @@
 		E3735C732A5E7E75004737EF /* BeautyLoad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BeautyLoad.m; sourceTree = "<group>"; };
 		E3735C742A5E7E75004737EF /* BeautyModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeautyModel.swift; sourceTree = "<group>"; };
 		E3735C752A5E7E75004737EF /* BeautyResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = BeautyResource.bundle; sourceTree = "<group>"; };
-		E3735C772A5E7E75004737EF /* BeautyConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BeautyConfig.m; sourceTree = "<group>"; };
 		E3735C782A5E7E75004737EF /* BeautyAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BeautyAPI.h; sourceTree = "<group>"; };
 		E3735C7A2A5E7E75004737EF /* FUBeautyRender.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FUBeautyRender.m; sourceTree = "<group>"; };
 		E3735C7B2A5E7E75004737EF /* FUBeautyRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FUBeautyRender.h; sourceTree = "<group>"; };
-		E3735C7C2A5E7E75004737EF /* BeautyConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BeautyConfig.h; sourceTree = "<group>"; };
 		E3735C7D2A5E7E75004737EF /* BeautyAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BeautyAPI.m; sourceTree = "<group>"; };
 		E3735C7F2A5E7E75004737EF /* SenseBeautyRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenseBeautyRender.h; sourceTree = "<group>"; };
 		E3735C802A5E7E75004737EF /* SenseBeautyRender.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SenseBeautyRender.m; sourceTree = "<group>"; };
@@ -3322,11 +3319,9 @@
 		E3735C762A5E7E75004737EF /* BeautyAPI */ = {
 			isa = PBXGroup;
 			children = (
-				E3735C772A5E7E75004737EF /* BeautyConfig.m */,
 				E3735C782A5E7E75004737EF /* BeautyAPI.h */,
-				E3735C792A5E7E75004737EF /* FURender */,
-				E3735C7C2A5E7E75004737EF /* BeautyConfig.h */,
 				E3735C7D2A5E7E75004737EF /* BeautyAPI.m */,
+				E3735C792A5E7E75004737EF /* FURender */,
 				E3735C7E2A5E7E75004737EF /* SenseRender */,
 				E3735C812A5E7E75004737EF /* BytesRender */,
 			);
@@ -3336,8 +3331,8 @@
 		E3735C792A5E7E75004737EF /* FURender */ = {
 			isa = PBXGroup;
 			children = (
-				E3735C7A2A5E7E75004737EF /* FUBeautyRender.m */,
 				E3735C7B2A5E7E75004737EF /* FUBeautyRender.h */,
+				E3735C7A2A5E7E75004737EF /* FUBeautyRender.m */,
 			);
 			path = FURender;
 			sourceTree = "<group>";
@@ -3354,8 +3349,8 @@
 		E3735C812A5E7E75004737EF /* BytesRender */ = {
 			isa = PBXGroup;
 			children = (
-				E3735C822A5E7E75004737EF /* BytesBeautyRender.m */,
 				E3735C832A5E7E75004737EF /* BytesBeautyRender.h */,
+				E3735C822A5E7E75004737EF /* BytesBeautyRender.m */,
 			);
 			path = BytesRender;
 			sourceTree = "<group>";
@@ -3855,7 +3850,6 @@
 				DDA19A0528FFE579009D3E61 /* NSObject+JKAppInfo.m in Sources */,
 				DD619AE529E3E247008F63E4 /* SARoomCreateView.swift in Sources */,
 				DD5EBDC6299F230100F36349 /* KTVDebugViewController.m in Sources */,
-				E3735CA02A5E7E75004737EF /* BeautyConfig.m in Sources */,
 				E36EC8B32A6638440089A374 /* AEAListContainerView.swift in Sources */,
 				E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */,
 				DD619BB229E3E262008F63E4 /* VoiceRoomApplyUsersViewController.swift in Sources */,
