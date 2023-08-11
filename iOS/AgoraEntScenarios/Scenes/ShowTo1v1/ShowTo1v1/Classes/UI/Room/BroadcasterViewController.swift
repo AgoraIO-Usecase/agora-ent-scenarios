@@ -10,6 +10,10 @@ import AgoraRtcKit
 import VideoLoaderAPI
 import CallAPI
 
+
+class CallAgoraExProxy: CallApiProxy, AgoraRtcEngineDelegate {
+}
+
 private let kNormalIconSize = CGSize(width: 32, height: 32)
 class BroadcasterViewController: BaseRoomViewController {
     var videoLoader: IVideoLoaderApi?
@@ -31,6 +35,7 @@ class BroadcasterViewController: BaseRoomViewController {
             rtcEngine?.renewToken(broadcasterToken)
         }
     }
+    private lazy var rtcProxy: CallAgoraExProxy = CallAgoraExProxy()
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .custom)
         button.aui_size = kNormalIconSize
@@ -120,13 +125,17 @@ class BroadcasterViewController: BaseRoomViewController {
                                    joinSuccess: {[weak self] channelId, uid, elapsed in
                 showTo1v1Print("broadcaster joinChannel[\(channelId)] success:  \(uid)")
                 guard let self = self, let rtcEngine = self.rtcEngine else {return}
+//                self.callApi?.setupContentInspectConfig(rtcEngine: rtcEngine, enable: true, uid: "\(uid)", channelId: channelId)
+//                self.callApi?.moderationAudio(appId: showTo1v1AppId!, channelName: channelId, user: self.currentUser!)
                 self.callApi?.setupContentInspectConfig(rtcEngine: rtcEngine, enable: true, uid: "\(uid)", channelId: channelId)
                 self.callApi?.moderationAudio(appId: showTo1v1AppId!, channelName: channelId, user: self.currentUser!)
             })
             
             _setupCanvas(view: bigCanvasView)
             
-            rtcEngine?.delegate = self.realTimeView
+            rtcEngine?.delegate = rtcProxy
+            rtcProxy.addListener(self.realTimeView)
+            rtcProxy.addListener(callApi!)
             
             bottomBar.buttonTypes = [.more]
         } else {
@@ -153,6 +162,7 @@ class BroadcasterViewController: BaseRoomViewController {
             rtcEngine?.leaveChannel()
             
             rtcEngine?.delegate = nil
+            rtcProxy.removeAllListener()
         } else {
             let room = roomInfo.createRoomInfo(token: "")
             let container = VideoCanvasContainer()
