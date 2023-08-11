@@ -20,6 +20,12 @@ private func mainTreadTask(_ task: (()->())?){
     }
 }
 
+extension SyncError {
+    func toNSError() ->NSError {
+        return NSError(domain: self.message, code: code, userInfo: nil)
+    }
+}
+
 /// 房间内用户列表
 private let kSceneId = "scene_1v1PrivateVideo_3.6.0"
 class Pure1v1ServiceImp: NSObject {
@@ -30,6 +36,8 @@ class Pure1v1ServiceImp: NSObject {
     private var userList: [Pure1v1UserInfo] = []
     private var networkDidChanged: ((Pure1v1ServiceNetworkStatus) -> Void)?
     private var roomExpiredDidChanged: (() -> Void)?
+    private var state: SocketConnectState = .connecting
+    private var refreshRoomListClosure: (([Pure1v1UserInfo], NSError?)->())?
     
     convenience init(appId: String, user: Pure1v1UserInfo?) {
         self.init()
@@ -62,8 +70,9 @@ class Pure1v1ServiceImp: NSObject {
                 return
             }
             
+            self.state = state
             defer {
-                completion(state == .open ? nil : NSError(domain: "network error", code: 1000))
+                completion(state == .open ? nil : NSError(domain: "network error", code: -1))
             }
             
             pure1v1Print("subscribeConnectState: \(state) \(self.syncUtilsInited)")
@@ -78,23 +87,32 @@ class Pure1v1ServiceImp: NSObject {
 }
 
 extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
-    func getUserList(completion: @escaping ([Pure1v1UserInfo]) -> Void) {
+    func getUserList(completion: @escaping ([Pure1v1UserInfo], NSError?) -> Void) {
+        self.refreshRoomListClosure = completion
         initScene { [weak self] error in
             if let error = error {
                 pure1v1Print("getUserList fail1: \(error.localizedDescription)")
-                completion([])
+                completion([], error)
                 return
             }
             self?.manager.getScenes(success: { results in
                 pure1v1Print("getUserList == \(results.compactMap { $0.toJson() })")
+                guard let self = self else {return}
+                guard self.state == .open else {
+                    self.refreshRoomListClosure?([], NSError(domain: "network error", code: -1))
+                    self.refreshRoomListClosure = nil
+                    return
+                }
 
                 let userList = results.map({ info in
                     return Pure1v1UserInfo.yy_model(withJSON: info.toJson())!
                 }).sorted {$0.createdAt < $1.createdAt}
-                self?.userList = userList
-                completion(userList)
+                self.userList = userList
+                self.refreshRoomListClosure?(userList, nil)
+                self.refreshRoomListClosure = nil
             }, fail: { error in
-                completion([])
+                self?.refreshRoomListClosure?([], error.toNSError())
+                self?.refreshRoomListClosure = nil
             })
         }
     }

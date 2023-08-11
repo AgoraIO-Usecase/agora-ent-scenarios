@@ -178,9 +178,13 @@ extension Pure1v1UserListViewController {
     @objc func _refreshAction() {
         guard naviBar.refreshAnimationEnable() else {return}
         naviBar.startRefreshAnimation()
-        service.getUserList {[weak self] list in
+        service.getUserList {[weak self] list, error in
             guard let self = self else {return}
             self.naviBar.stopRefreshAnimation()
+            if let error = error {
+                AUIToast.show(text: error.localizedDescription)
+                return
+            }
             let userList = list.filter({$0.userId != self.userInfo?.userId})
             self.listView.userList = userList
             self._showGuideIfNeed()
