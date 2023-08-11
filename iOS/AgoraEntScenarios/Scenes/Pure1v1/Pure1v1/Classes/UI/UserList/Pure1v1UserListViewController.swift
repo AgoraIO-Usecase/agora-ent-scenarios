@@ -12,12 +12,6 @@ import AgoraRtcKit
 
 private let kShowGuideAlreadyKey = "already_show_guide"
 class Pure1v1UserListViewController: UIViewController {
-    var appId: String = "" {
-        didSet {
-            callVC.appId = appId
-        }
-    }
-    var appCertificate: String = ""
     var userInfo: Pure1v1UserInfo? {
         didSet {
             callVC.currentUser = userInfo
@@ -28,6 +22,7 @@ class Pure1v1UserListViewController: UIViewController {
     private lazy var rtcEngine = _createRtcEngine()
     private var callState: CallStateType = .idle
     private var connectedUserId: UInt?
+    private var connectedChannelId: String?
     private lazy var callVC: Pure1v1CallViewController = {
         let vc = Pure1v1CallViewController()
         vc.modalPresentationStyle = .fullScreen
@@ -35,7 +30,7 @@ class Pure1v1UserListViewController: UIViewController {
     }()
     private let callApi = CallApiImpl()
     private lazy var naviBar: Pure1v1NaviBar = Pure1v1NaviBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.aui_width, height: 44))
-    private lazy var service: Pure1v1ServiceProtocol = Pure1v1ServiceImp(appId: appId, user: userInfo)
+    private lazy var service: Pure1v1ServiceProtocol = Pure1v1ServiceImp(appId: pure1V1AppId!, user: userInfo)
     private lazy var noDataView: Pure1v1UserNoDataView = Pure1v1UserNoDataView(frame: self.view.bounds)
     private lazy var listView: Pure1v1UserPagingListView = {
         let listView = Pure1v1UserPagingListView(frame: self.view.bounds)
@@ -85,8 +80,8 @@ class Pure1v1UserListViewController: UIViewController {
         }
         
         tokenConfig.roomId = userInfo.getRoomId()
-        NetworkManager.shared.generateTokens(appId: appId,
-                                             appCertificate: appCertificate,
+        NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
+                                             appCertificate: pure1V1AppCertificate!,
                                              channelName: tokenConfig.roomId,
                                              uid: userInfo.userId,
                                              tokenGeneratorType: .token007,
@@ -117,7 +112,7 @@ extension Pure1v1UserListViewController {
         let config = CallConfig()
         config.role = .caller  // Pure 1v1 can only be set as the caller
         config.mode = .pure1v1
-        config.appId = appId
+        config.appId = pure1V1AppId!
         config.userId = UInt(userInfo?.userId ?? "")!
         config.autoAccept = false
         config.rtcEngine = rtcEngine
@@ -141,7 +136,7 @@ extension Pure1v1UserListViewController {
     
     private func _createRtcEngine() ->AgoraRtcEngineKit {
         let config = AgoraRtcEngineConfig()
-        config.appId = appId
+        config.appId = pure1V1AppId!
         config.channelProfile = .liveBroadcasting
         config.audioScenario = .gameStreaming
         config.areaCode = .global
@@ -231,6 +226,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             // 触发状态的用户是自己才处理
             if currentUid == "\(toUserId)" {
                 connectedUserId = fromUserId
+                connectedChannelId = fromRoomId
                 
                 //被叫不一定在userList能查到，需要从callapi里读取发送用户的user extension
                 var user = listView.userList.first {$0.userId == "\(fromUserId)"}
@@ -242,8 +238,8 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                     let dialog = Pure1v1CalleeDialog.show(user: user)
                     assert(dialog != nil, "dialog = nil")
                     dialog?.acceptClosure = { [weak self] in
-                        NetworkManager.shared.generateTokens(appId: self?.appId ?? "",
-                                                             appCertificate: self?.appCertificate ?? "",
+                        NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
+                                                             appCertificate: pure1V1AppCertificate!,
                                                              channelName: fromRoomId,
                                                              uid: "\(toUserId)",
                                                              tokenGeneratorType: .token007,
@@ -276,6 +272,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 
             } else if currentUid == "\(fromUserId)" {
                 connectedUserId = toUserId
+                connectedChannelId = fromRoomId
                 //主叫userlist一定会有，因为需要点击
                 if let user = listView.userList.first {$0.userId == "\(toUserId)"} {
                     let dialog = Pure1v1CallerDialog.show(user: user)
@@ -307,6 +304,13 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             }
             callVC.dismiss(animated: false)
             present(callVC, animated: false)
+            
+            //setup content inspect
+            let connection = AgoraRtcConnection()
+            connection.channelId = "\(connectedChannelId ?? "")"
+            connection.localUid = UInt(userInfo?.userId ?? "") ?? 0
+            setupContentInspectConfig(true, connection: connection)
+            moderationAudio(channelName: connection.channelId)
             break
         case .prepared:
             switch stateReason {
@@ -323,6 +327,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             }
 //            AUIAlertManager.hiddenView()
             connectedUserId = nil
+            connectedChannelId = nil
             callDialog?.hiddenAnimation()
             callVC.dismiss(animated: false)
             break
@@ -330,6 +335,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             AUIToast.show(text: eventReason)
 //            AUIAlertManager.hiddenView()
             connectedUserId = nil
+            connectedChannelId = nil
             callDialog?.hiddenAnimation()
             break
         default:
@@ -342,8 +348,8 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
         guard let userInfo = userInfo else {return}
         
         //renew token, include caller token(current room)
-        NetworkManager.shared.generateTokens(appId: appId,
-                                             appCertificate: appCertificate,
+        NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
+                                             appCertificate: pure1V1AppCertificate!,
                                              channelName: tokenConfig.roomId,
                                              uid: userInfo.userId,
                                              tokenGeneratorType: .token007,
@@ -362,8 +368,8 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
         if let uid = connectedUserId {
             //calling token
             let channelName = "\(uid)"
-            NetworkManager.shared.generateTokens(appId: appId,
-                                                 appCertificate: appCertificate,
+            NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
+                                                 appCertificate: pure1V1AppCertificate!,
                                                  channelName: channelName,
                                                  uid: userInfo.userId,
                                                  tokenGeneratorType: .token007,
@@ -375,6 +381,50 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 
                 self.callApi.renewRemoteCallerChannelToken(roomId: channelName, token: rtcToken)
             }
+        }
+    }
+}
+
+extension Pure1v1UserListViewController {
+    private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
+        let config = AgoraContentInspectConfig()
+        let dic: [String: String] = [
+            "id": "\(connection.localUid)",
+            "sceneName": "Pure1v1",
+            "userNo": "\(connection.localUid)"
+        ]
+        
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
+            pure1v1Error("setupContentInspectConfig fail")
+            return
+        }
+        let jsonStr = String(data: jsonData, encoding: .utf8)
+        config.extraInfo = jsonStr
+        let module = AgoraContentInspectModule()
+        module.interval = 30
+        module.type = .imageModeration
+        config.modules = [module]
+        let ret = rtcEngine.enableContentInspectEx(enable, config: config, connection: connection)
+        pure1v1Print("setupContentInspectConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
+    }
+    
+    /// 语音审核
+    private func moderationAudio(channelName: String) {
+        let userInfo = ["id": userInfo?.userId ?? "",
+                        "sceneName": "Pure1v1",
+                        "userNo": userInfo?.userId ?? "",
+                        "userName": userInfo?.userName ?? ""] as NSDictionary
+        let parasm: [String: Any] = ["appId": pure1V1AppId!,
+                                     "channelName": channelName,
+                                     "channelType": AgoraChannelProfile.liveBroadcasting.rawValue,
+                                     "traceId": NSString.withUUID().md5(),
+                                     "src": "iOS",
+                                     "payload": userInfo.yy_modelToJSONString()]
+        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/moderation/audio",
+                                          params: parasm) { response in
+            pure1v1Print("moderationAudio response === \(response)")
+        } failure: { errr in
+            pure1v1Error(errr)
         }
     }
 }
