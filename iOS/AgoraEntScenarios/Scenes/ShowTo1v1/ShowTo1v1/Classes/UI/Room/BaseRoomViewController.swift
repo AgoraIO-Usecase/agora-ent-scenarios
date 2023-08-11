@@ -13,12 +13,12 @@ class BaseRoomViewController: UIViewController {
     var onBackClosure: (()->())?
     var rtcEngine: AgoraRtcEngineKit?
     var roomInfo: ShowTo1v1RoomInfo?
-    var callApi: CallApiProtocol? {
+    var callApi: CallApiImpl? {
         didSet {
             oldValue?.removeListener(listener: self)
-            oldValue?.removeRTCListener?(listener: self.realTimeView)
+            oldValue?.removeRTCListener(listener: self.realTimeView)
             callApi?.addListener(listener: self)
-            callApi?.addRTCListener?(listener: self.realTimeView)
+            callApi?.addRTCListener(listener: self.realTimeView)
         }
     }
     private(set) lazy var roomInfoView: RoomInfoView = RoomInfoView()

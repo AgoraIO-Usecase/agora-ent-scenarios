@@ -515,12 +515,6 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
             }
         }
     }
-    
-    func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
-        showTo1v1Warn("contentInspectResult: \(result.rawValue)")
-        guard result != .neutral else { return }
-        AUIToast.show(text: "call_content_inspect_warning".showTo1v1Localization())
-    }
 }
 
 
