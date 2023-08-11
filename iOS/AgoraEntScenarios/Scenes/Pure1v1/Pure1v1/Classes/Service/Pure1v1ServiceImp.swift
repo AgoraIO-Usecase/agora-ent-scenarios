@@ -103,8 +103,8 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
                     self.refreshRoomListClosure = nil
                     return
                 }
-
-                let userList = results.map({ info in
+                
+                let userList = results.filter({$0.getId().count > 0}).map({ info in
                     return Pure1v1UserInfo.yy_model(withJSON: info.toJson())!
                 }).sorted {$0.createdAt < $1.createdAt}
                 self.userList = userList
