@@ -39,16 +39,6 @@
     [self.listeners removeAllObjects];
 }
 
-- (id)forwardingTargetForSelector:(SEL)aSelector {
-    for (id listener in self.listeners.objectEnumerator) {
-        if ([listener respondsToSelector:aSelector]) {
-            return listener;
-        }
-    }
-    
-    return nil;
-}
-
 - (BOOL)respondsToSelector:(SEL)aSelector {
     return [self methodSignatureForSelector:aSelector] != nil;
 }

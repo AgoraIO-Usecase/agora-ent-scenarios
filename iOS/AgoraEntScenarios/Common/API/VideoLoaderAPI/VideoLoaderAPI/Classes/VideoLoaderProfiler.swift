@@ -12,6 +12,8 @@ class VideoLoaderProfiler: NSObject, AgoraRtcEngineDelegate {
     var roomId: String!
     var startTime: Int64 = 0
     
+    var printClosure: ((String)->())?
+    
     init(roomId: String) {
         self.roomId = roomId
     }
@@ -22,10 +24,11 @@ class VideoLoaderProfiler: NSObject, AgoraRtcEngineDelegate {
                           elapsed: Int) {
         let channelId = ""//self.room?.roomId ?? ""
         let cost = Int64(Date().timeIntervalSince1970 * 1000) - startTime
+        let roomId = roomId ?? ""
         DispatchQueue.main.async {
             if state == .decoding /*2*/,
                ( reason == .remoteUnmuted /*6*/ || reason == .localUnmuted /*4*/ || reason == .localMuted /*3*/ )   {
-                print("[VideoLoaderProfiler] show first frame (\(uid)) cost: \(cost) ms")
+                self.printClosure?("room[\(roomId)] show first frame! cost: \(cost) ms")
             }
         }
     }

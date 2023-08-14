@@ -41,6 +41,9 @@ public class VideoLoaderApiImpl: NSObject {
 extension VideoLoaderApiImpl {
     private func _getProfiler(roomId: String) -> VideoLoaderProfiler {
         let profiler = profilerMap[roomId] ?? VideoLoaderProfiler(roomId: roomId)
+        profiler.printClosure = { [weak self] message in
+            self?.apiPrint(message)
+        }
         profilerMap[roomId] = profiler
         return profiler
     }
@@ -49,8 +52,6 @@ extension VideoLoaderApiImpl {
         var rtcProxy = rtcProxys[roomId]
         if rtcProxy == nil {
             let proxy = VideoLoaderAgoraExProxy()
-            let profiler = _getProfiler(roomId: roomId)
-            proxy.addListener(profiler)
             rtcProxys[roomId] = proxy
             rtcProxy = proxy
         }
@@ -93,6 +94,9 @@ extension VideoLoaderApiImpl {
         
         //TODO: retain cycle in joinChannelEx to use rtcProxy
         let rtcProxy = _getProxy(roomId: channelId)
+        let profiler = _getProfiler(roomId: channelId)
+        addRTCListener(roomId: channelId, listener: profiler)
+        
         let date = Date()
         apiPrint("try to join room[\(connection.channelId)] ex uid: \(connection.localUid)")
         let ret =
@@ -122,6 +126,9 @@ extension VideoLoaderApiImpl {
             apiPrint("leaveChannelEx break, depcount: \(depMap?.count ?? 0), channelId: \(channelId)")
             return
         }
+        
+        let profiler = _getProfiler(roomId: channelId)
+        removeRTCListener(roomId: channelId, listener: profiler)
         
         engine.leaveChannelEx(connection)
         exConnectionMap[channelId] = nil
@@ -197,6 +204,8 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         
         let mediaOptions = AgoraRtcChannelMediaOptions()
         if realState == .joined {
+            let profiler = _getProfiler(roomId: roomInfo.channelName)
+            profiler.startTime = Int64(NSDate().timeIntervalSince1970 * 1000)
             mediaOptions.autoSubscribeAudio = true
             mediaOptions.autoSubscribeVideo = true
         } else {
@@ -204,7 +213,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
             mediaOptions.autoSubscribeVideo = false
         }
 
-        apiPrint("tagId[\(tagId)] updateLoadingType \(roomInfo.channelName) want:\(newState.rawValue) real: \(realState.rawValue)")
+        apiPrint("tagId[\(tagId)] updateLoadingType[\(roomInfo.channelName)] want:\(newState.rawValue) real: \(realState.rawValue)")
         _updateChannelEx(channelId:roomInfo.channelName, options: mediaOptions)
         if realState != oldState {
             let api = apiProxy as IVideoLoaderApiListener
@@ -246,7 +255,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         videoCanvas.renderMode = .hidden
         let ret = engine.setupRemoteVideoEx(videoCanvas, connection: connection)
                 
-        apiPrint("renderVideo ret = \(ret), uid:\(roomInfo.uid) localuid: \(localUid) channelId: \(roomInfo.channelName)")
+        apiPrint("renderVideo[\(roomInfo.channelName)] ret = \(ret), uid:\(roomInfo.uid) localuid: \(localUid) ")
     }
     
     public func cleanCache() {
@@ -256,6 +265,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         }
         exConnectionMap.removeAll()
         exConnectionDeps.removeAll()
+        profilerMap.removeAll()
         apiPrint("cleanCache")
     }
     // 退出某个频道之外的其他频道
@@ -280,11 +290,13 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
     
     public func addRTCListener(roomId: String, listener: AgoraRtcEngineDelegate) {
         let rtcProxy = _getProxy(roomId: roomId)
+        print("[VideoLoaderProfiler] addRTCListener: \(roomId)")
         rtcProxy.addListener(listener)
     }
     
     public func removeRTCListener(roomId: String, listener: AgoraRtcEngineDelegate) {
         let rtcProxy = _getProxy(roomId: roomId)
+        print("[VideoLoaderProfiler] removeRTCListener: \(roomId)")
         rtcProxy.removeListener(listener)
     }
     
