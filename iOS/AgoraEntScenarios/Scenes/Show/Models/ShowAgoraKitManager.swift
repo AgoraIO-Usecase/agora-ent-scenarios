@@ -471,6 +471,16 @@ class ShowAgoraKitManager: NSObject {
         let roomInfo = _getRoomInfo(channelId: channelId)
         videoLoader?.switchRoomState(newState: playState, roomInfo: roomInfo, tagId: roomId)
     }
+    
+    func cleanChannel(without roomIds: [String]) {
+        guard let videoLoader = videoLoader else {return}
+        for (key, _) in videoLoader.getConnectionMap() {
+            if roomIds.contains(key) {continue}
+            let roomInfo = RoomInfo()
+            roomInfo.channelName = key
+            videoLoader.switchRoomState(newState: .idle, roomInfo: roomInfo, tagId: key)
+        }
+    }
 }
 
 //MARK: private param
