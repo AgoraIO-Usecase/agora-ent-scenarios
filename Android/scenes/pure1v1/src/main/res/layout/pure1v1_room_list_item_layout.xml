@@ -47,6 +47,7 @@
         >
 
         <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivLivingBG"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginTop="10dp"
@@ -54,6 +55,16 @@
             android:src="@drawable/pure1v1_room_item_living"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivLiving"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:layout_constraintStart_toStartOf="@+id/ivLivingBG"
+            app:layout_constraintEnd_toEndOf="@+id/ivLivingBG"
+            app:layout_constraintTop_toTopOf="@+id/ivLivingBG"
+            app:layout_constraintBottom_toBottomOf="@+id/ivLivingBG"
             />
 
         <androidx.appcompat.widget.AppCompatImageView
