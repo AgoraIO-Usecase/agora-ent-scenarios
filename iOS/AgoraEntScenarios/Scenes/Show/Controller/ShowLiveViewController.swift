@@ -367,7 +367,7 @@ extension ShowLiveViewController {
     }
     
     func updateRemoteCavans() {
-        guard role == .audience else { return }
+        guard role == .audience, loadingType == .joined else { return }
         let uid: UInt = UInt(room?.ownerId ?? "0") ?? 0
         ShowAgoraKitManager.shared.setupRemoteVideo(channelId: roomId,
                                                     uid: uid,
