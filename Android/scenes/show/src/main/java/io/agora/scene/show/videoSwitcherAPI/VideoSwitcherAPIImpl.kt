@@ -48,7 +48,8 @@ class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : Vid
             if (it.key.isSameChannel(RtcConnection(roomInfo.channelName, roomInfo.uid))) {
                 val oldState = it.value
                 if (oldState == newState) {
-                    // TODO 回调 已经是该状态
+                    it.key.rtcEventHandler?.setEventListener(roomInfo.eventHandler)
+                    ShowLogger.d(tag, "switchRoomState is already this state")
                     return
                 }
                 roomStateMap[it.key] = newState

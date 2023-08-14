@@ -1754,15 +1754,17 @@ class LiveDetailFragment : Fragment() {
             onRemoteVideoStats = { stats ->
                 //setEnhance(stats)
                 // 观众端只显示房主的接收数据
-//                activity?.runOnUiThread {
-//                    refreshStatisticInfo(
-//                        downBitrate = stats.receivedBitrate,
-//                        receiveFPS = stats.decoderOutputFrameRate,
-//                        downLossPackage = stats.packetLossRate,
-//                        receiveVideoSize = Size(stats.width, stats.height),
-//                        downDelay = stats.delay
-//                    )
-//                }
+                if (isRoomOwner) {
+                    activity?.runOnUiThread {
+                        refreshStatisticInfo(
+                            downBitrate = stats.receivedBitrate,
+                            receiveFPS = stats.decoderOutputFrameRate,
+                            downLossPackage = stats.packetLossRate,
+                            receiveVideoSize = Size(stats.width, stats.height),
+                            downDelay = stats.delay
+                        )
+                    }
+                }
             },
             onRemoteAudioStats = { stats ->
                 activity?.runOnUiThread {
