@@ -4,12 +4,23 @@ import android.os.Parcel
 import android.os.Parcelable
 
 class UserInfo(
-    public var userId: String = "",
-    public var userName: String = "",
-    public var avatar: String = "",
-    public var createdAt: Long = System.currentTimeMillis(),
+    var userId: String = "",
+    var userName: String = "",
+    var avatar: String = "",
+    var createdAt: Long = System.currentTimeMillis(),
     var objectId: String = "",
 ) : Parcelable {
+    constructor(map: Map<String, Any>): this(
+        map["userId"] as? String ?: "",
+        map["userName"] as? String ?: "",
+        map["avatar"] as? String ?: "",
+        map["createdAt"] as? Long ?: System.currentTimeMillis(),
+        map["objectId"] as? String ?: ""
+    )
+
+    fun getRoomId(): String {
+        return userId
+    }
 
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
@@ -18,10 +29,6 @@ class UserInfo(
         parcel.readLong(),
         parcel.readString() ?: ""
     ) {
-    }
-
-    fun getRoomId(): String {
-        return userId
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

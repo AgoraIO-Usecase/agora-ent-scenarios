@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -79,11 +81,16 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
     private fun fetchRoomList() {
         val anim = AnimationUtils.loadAnimation(this, R.anim.pure1v1_center_rotation)
         binding.ivRefresh.startAnimation(anim)
+        binding.ivRefresh.isEnabled = false
         CallServiceManager.instance.sceneService?.getUserList { list ->
-            binding.ivRefresh.clearAnimation()
-            dataList = list
-            adapter?.refresh(list)
-            if (list.size > 1) {
+            Toast.makeText(this, getText(R.string.pure1v1_room_list_refresh), Toast.LENGTH_SHORT).show()
+            Handler().postDelayed({
+                binding.ivRefresh.clearAnimation()
+                binding.ivRefresh.isEnabled = true
+            }, 1000)
+            dataList = list.filter { it.userId != CallServiceManager.instance.localUser?.userId}
+            adapter?.refresh(dataList)
+            if (dataList.size > 1) {
                 // 设置无限轮播中间位置
                 binding.viewPager2.setCurrentItem(
                     ((Int.MAX_VALUE / 2) / list.size) * list.size,
@@ -161,7 +168,12 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
                 }
                 // 触发状态的用户是自己才处理
                 if (currentUid == toUserId.toString()) {
-                    val user = dataList.firstOrNull { it.userId == fromUserId.toString() } ?: return
+                    var user = dataList.firstOrNull { it.userId == fromUserId.toString() }
+                    if (user == null) {
+                        val userMap = eventInfo[CallApiImpl.kFromUserExtension] as Map<String, Any>
+                        user = UserInfo(userMap)
+                    }
+                    if (user.userId.isEmpty()) { return } // 检验数据是否有效
                     CallServiceManager.instance.remoteUser = user
                     val dialog = CallReceiveDialog(this, user)
                     dialog.setListener(object : CallReceiveDialog.CallReceiveDialogListener {
@@ -207,7 +219,15 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
                 when(stateReason) {
                     CallReason.RemoteHangup -> {
                         Toast.makeText(this, getText(R.string.pure1v1_call_toast_hangup), Toast.LENGTH_SHORT).show()
-                    } else -> {}
+                    }
+                    CallReason.LocalRejected,
+                    CallReason.RemoteRejected -> {
+                        Toast.makeText(this, getText(R.string.pure1v1_call_toast_rejected), Toast.LENGTH_SHORT).show()
+                    }
+                    CallReason.CallingTimeout -> {
+                        Toast.makeText(this, getText(R.string.pure1v1_call_toast_no_answer), Toast.LENGTH_SHORT).show()
+                    }
+                    else -> {}
                 }
                 CallServiceManager.instance.remoteUser = null
                 callDialog?.dismiss()
@@ -241,9 +261,10 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
             val module = ContentInspectConfig.ContentInspectModule()
             module.interval = 30
             module.type = ContentInspectConfig.CONTENT_INSPECT_TYPE_IMAGE_MODERATION
-            contentInspectConfig.modules = arrayOf( module)
+            contentInspectConfig.modules = arrayOf(module)
             contentInspectConfig.moduleCount = 1
-            CallServiceManager.instance.rtcEngine?.enableContentInspectEx(enable, contentInspectConfig, connection)
+            val ret = CallServiceManager.instance.rtcEngine?.enableContentInspectEx(enable, contentInspectConfig, connection)
+            Log.d(tag, "$ret")
         }
         catch (_: JSONException) {
         }
