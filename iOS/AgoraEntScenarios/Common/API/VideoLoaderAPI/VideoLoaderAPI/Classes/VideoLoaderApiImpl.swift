@@ -112,9 +112,9 @@ extension VideoLoaderApiImpl {
         exConnectionMap[channelId] = connection
             
         if ret == 0 {
-            apiPrint("join room ex: channelId: \(channelId) ownerId: \(ownerId) connection count: \(exConnectionMap.count)")
+            apiPrint("join room ex[\(channelId)]: ownerId: \(ownerId) connection count: \(exConnectionMap.count)")
         }else{
-            apiErrorPrint("join room ex fail: channelId: \(channelId) ownerId: \(ownerId) token = \(token), \(ret)")
+            apiErrorPrint("join room ex fail[\(channelId)]: ownerId: \(ownerId) token = \(token), \(ret)")
         }
     }
     
