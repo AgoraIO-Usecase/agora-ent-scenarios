@@ -11,7 +11,6 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.pure1v1.callAPI.*
 
 class CallServiceManager {
-
     companion object {
         val instance: CallServiceManager by lazy {
             CallServiceManager()

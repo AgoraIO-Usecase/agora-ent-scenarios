@@ -588,8 +588,12 @@ class CallApiImpl(
         val fromRoomId = message[kFromRoomId] as String
         val fromUserId = message[kFromUserId] as Int
         val callId = message[kCallId] as String
-        val userExtension = message[kFromUserExtension] as Map<String, Any>
-        _onCall(fromRoomId, fromUserId, callId, userExtension)
+        val userExtJson = message[kFromUserExtension] as JSONObject
+        val userExtMap = mutableMapOf<String, Any>()
+        for (key in userExtJson.keys()) {
+            userExtMap[key] = userExtJson.get(key)
+        }
+        _onCall(fromRoomId, fromUserId, callId, userExtMap.toMap())
     }
 
     private fun _onCancel(message: Map<String, Any>) {
@@ -1045,7 +1049,11 @@ class CallApiImpl(
             listener.onDownlinkNetworkInfoUpdated(info)
         }
     }
-
+    override fun onContentInspectResult(result: Int) {
+        rtcListeners.forEach { listener ->
+            listener.onContentInspectResult(result)
+        }
+    }
     // CallMessageListener
     override fun onMissReceipts(message: Map<String, Any>) {
         Log.d(TAG, "onMissReceipts: $message")
