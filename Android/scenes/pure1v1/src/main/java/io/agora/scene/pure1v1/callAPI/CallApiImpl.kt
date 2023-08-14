@@ -588,10 +588,12 @@ class CallApiImpl(
         val fromRoomId = message[kFromRoomId] as String
         val fromUserId = message[kFromUserId] as Int
         val callId = message[kCallId] as String
-        val userExtJson = message[kFromUserExtension] as JSONObject
+        val userExtJson = message[kFromUserExtension] as? JSONObject
         val userExtMap = mutableMapOf<String, Any>()
-        for (key in userExtJson.keys()) {
-            userExtMap[key] = userExtJson.get(key)
+        if (userExtJson != null) {
+            for (key in userExtJson.keys()) {
+                userExtMap[key] = userExtJson.get(key)
+            }
         }
         _onCall(fromRoomId, fromUserId, callId, userExtMap.toMap())
     }

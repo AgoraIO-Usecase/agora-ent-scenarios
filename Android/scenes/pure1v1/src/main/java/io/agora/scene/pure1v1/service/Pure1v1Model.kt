@@ -18,6 +18,16 @@ class UserInfo(
         map["objectId"] as? String ?: ""
     )
 
+    fun toMap(): Map<String, Any> {
+        return mapOf(
+            Pair("userId", this.userId),
+            Pair("userName", this.userName),
+            Pair("avatar", this.avatar),
+            Pair("createdAt", this.createdAt),
+            Pair("objectId", this.objectId)
+        )
+    }
+
     fun getRoomId(): String {
         return userId
     }
