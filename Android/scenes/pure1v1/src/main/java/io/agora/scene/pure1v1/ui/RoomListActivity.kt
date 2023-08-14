@@ -338,6 +338,10 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
                     ))
                 .into(holder.binding.ivBackground)
             Glide.with(context)
+                .asGif()
+                .load(R.drawable.pure1v1_wave_living)
+                .into(holder.binding.ivLiving)
+            Glide.with(context)
                 .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
                 .into(holder.binding.ivUserAvatar)
             holder.binding.tvUserName.text = userInfo.userName
