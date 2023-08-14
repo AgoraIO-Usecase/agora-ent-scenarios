@@ -539,7 +539,7 @@ class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : Vid
         ) {
             super.onLocalVideoStats(source, stats)
             stats ?: return
-            //ShowLogger.d("hugo", "onLocalVideoStats, dualStreamEnabled:${stats.dualStreamEnabled}, captureFrameWidth:${stats.captureFrameWidth}")
+            //ShowLogger.d("hugo", "onLocalVideoStats, dualStreamEnabled:${stats.dualStreamEnabled}, captureFrameWidth:${stats.captureFrameWidth}, captureFrameHeight:${stats.captureFrameHeight}, codecType:${stats.codecType}, hwEncoderAccelerating:${stats.hwEncoderAccelerating}")
             eventListener?.onLocalVideoStats?.invoke(stats)
         }
 

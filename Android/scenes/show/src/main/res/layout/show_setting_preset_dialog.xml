@@ -488,23 +488,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:textSize="15dp"
                     android:textColor="@color/black"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"/>
-
-                <TextView
-                    android:id="@+id/tvBroadcastTips"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center"
-                    android:text="@string/show_broadcast_tips"
-                    android:textSize="15dp"
-                    android:textColor="@color/black"
-                    app:layout_constraintStart_toStartOf="@id/tvDeviceScore"
-                    app:layout_constraintTop_toBottomOf="@id/tvDeviceScore"/>
 
                 <TextView
                     android:id="@+id/tvBeautyTips"
@@ -516,8 +504,21 @@
                     android:textSize="15dp"
                     android:textColor="@color/black"
                     android:visibility="gone"
-                    app:layout_constraintStart_toStartOf="@id/tvBroadcastTips"
-                    app:layout_constraintTop_toBottomOf="@id/tvBroadcastTips"/>
+                    app:layout_constraintStart_toStartOf="@id/tvDeviceScore"
+                    app:layout_constraintTop_toBottomOf="@id/tvDeviceScore"/>
+
+                <TextView
+                    android:id="@+id/tvBroadcastTips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="@string/show_broadcast_tips"
+                    android:textSize="15dp"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toStartOf="@id/tvBeautyTips"
+                    app:layout_constraintTop_toBottomOf="@id/tvBeautyTips"/>
+
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
