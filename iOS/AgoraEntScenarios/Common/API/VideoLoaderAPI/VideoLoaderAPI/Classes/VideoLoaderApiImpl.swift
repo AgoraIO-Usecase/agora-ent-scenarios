@@ -168,7 +168,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
     
     public func preloadRoom(preloadRoomList: [RoomInfo]) {
         guard let rtcEngine = self.config?.rtcEngine else {return}
-        apiErrorPrint("preloadRoom: \(preloadRoomList.count)")
+        apiPrint("preloadRoom: \(preloadRoomList.count)")
         preloadRoomList.forEach { roomInfo in
             rtcEngine.preloadChannel(byToken: roomInfo.token, channelId: roomInfo.channelName, uid: roomInfo.uid)
         }
