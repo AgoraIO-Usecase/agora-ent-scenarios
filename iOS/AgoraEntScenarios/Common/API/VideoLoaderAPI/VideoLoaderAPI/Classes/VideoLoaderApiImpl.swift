@@ -147,6 +147,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
     
     public func preloadRoom(preloadRoomList: [RoomInfo]) {
         guard let rtcEngine = self.config?.rtcEngine else {return}
+        apiErrorPrint("preloadRoom: \(preloadRoomList.count)")
         preloadRoomList.forEach { roomInfo in
             rtcEngine.preloadChannel(byToken: roomInfo.token, channelId: roomInfo.channelName, uid: roomInfo.uid)
         }
@@ -165,7 +166,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         }
         
         guard let map = map else {
-            apiErrorPrint("updateLoadingType fatal, map init fail")
+            apiErrorPrint("switchRoomState fatal, map init fail")
             return
         }
         let oldState = getRoomState(roomInfo: roomInfo)
