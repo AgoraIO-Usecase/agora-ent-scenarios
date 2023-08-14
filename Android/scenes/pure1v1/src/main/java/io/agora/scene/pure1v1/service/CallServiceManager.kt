@@ -29,6 +29,8 @@ class CallServiceManager {
 
     var remoteUser: UserInfo? = null
 
+    var connectedChannelId: String? = null
+
     var localCanvas: TextureView? = null
 
     var remoteCanvas: TextureView? = null
@@ -109,7 +111,7 @@ class CallServiceManager {
         val config = CallConfig(
             BuildConfig.AGORA_APP_ID,
             user.userId.toInt(),
-            null,
+            user.toMap(),
             null,
             engine,
             CallMode.Pure1v1,

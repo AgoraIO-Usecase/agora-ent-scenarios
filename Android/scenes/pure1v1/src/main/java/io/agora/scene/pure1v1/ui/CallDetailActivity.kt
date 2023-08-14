@@ -3,6 +3,7 @@ package io.agora.scene.pure1v1.ui
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +21,8 @@ import java.util.concurrent.TimeUnit
 
 class CallDetailActivity : AppCompatActivity(), ICallApiListener {
 
-    private val binding = Pure1v1CallDetailActivityBinding.inflate(layoutInflater)
+    private val tag = "CallDetailActivity_LOG"
+    private lateinit var binding: Pure1v1CallDetailActivityBinding
 
     private val startTime = System.currentTimeMillis()
     private var timerHandler: Handler? = null
@@ -29,6 +31,7 @@ class CallDetailActivity : AppCompatActivity(), ICallApiListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = Pure1v1CallDetailActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupView()
@@ -47,6 +50,7 @@ class CallDetailActivity : AppCompatActivity(), ICallApiListener {
     private fun setupRTCListener() {
         val handler = object: IRtcEngineEventHandler() {
             override fun onContentInspectResult(result: Int) {
+                Log.d(tag, "onContentInspectResult = $result")
                 if (result > 1) {
                     Toast.makeText(this@CallDetailActivity, getText(R.string.pure1v1_call_content_inspect), Toast.LENGTH_SHORT).show()
                 }

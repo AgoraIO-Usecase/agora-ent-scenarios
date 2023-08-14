@@ -122,6 +122,7 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
         binding.vGuidance.visibility = View.VISIBLE
         binding.vGuidance.setOnClickListener {
             SPUtil.putBoolean(kRoomListSwipeGuide, true)
+            guided = true
             binding.vGuidance.visibility = View.GONE
         }
     }
@@ -168,6 +169,7 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
                 }
                 // 触发状态的用户是自己才处理
                 if (currentUid == toUserId.toString()) {
+                    CallServiceManager.instance.connectedChannelId = fromRoomId
                     var user = dataList.firstOrNull { it.userId == fromUserId.toString() }
                     if (user == null) {
                         val userMap = eventInfo[CallApiImpl.kFromUserExtension] as Map<String, Any>
@@ -195,6 +197,7 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
                     dialog.show()
                     callDialog = dialog
                 } else if (currentUid == fromUserId.toString()) {
+                    CallServiceManager.instance.connectedChannelId = fromRoomId
                     val user = dataList.firstOrNull { it.userId == toUserId.toString() } ?: return
                     CallServiceManager.instance.remoteUser = user
                     onCallSend(user)
@@ -230,10 +233,13 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
                     else -> {}
                 }
                 CallServiceManager.instance.remoteUser = null
+                CallServiceManager.instance.connectedChannelId = null
                 callDialog?.dismiss()
             }
             CallStateType.Failed -> {
+                Toast.makeText(this, eventReason, Toast.LENGTH_SHORT).show()
                 CallServiceManager.instance.remoteUser = null
+                CallServiceManager.instance.connectedChannelId = null
                 callDialog?.dismiss()
             }
             else -> {
@@ -249,7 +255,6 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
             true
         )
     }
-
     private fun setupContentInspectConfig(enable: Boolean, connection: RtcConnection) {
         val contentInspectConfig = ContentInspectConfig()
         try {
@@ -271,7 +276,7 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
     }
     /// 语音审核
     private fun moderationAudio() {
-        val channelName = CallServiceManager.instance.remoteUser?.userId ?: ""
+        val channelName = CallServiceManager.instance.connectedChannelId ?: return
         val uid = CallServiceManager.instance.localUser?.userId?.toLong() ?: 0
         AudioModeration.moderationAudio(channelName, uid, AudioModeration.AgoraChannelType.broadcast, "Pure1v1")
     }
