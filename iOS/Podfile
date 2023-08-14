@@ -17,7 +17,7 @@ def all_pods
 #  pod 'MBProgressHUD', '~> 1.1.0'
   pod 'SVProgressHUD', '2.2.5'
   # 加载图片
-  pod 'SDWebImage', '~> 4.2'
+  pod 'SDWebImage', '4.4.8'
   pod 'SDWebImageAPNGCoder'
   # Model
   pod 'YYModel', '1.0.4'

@@ -85,7 +85,7 @@ DEPENDENCIES:
   - Protobuf (= 3.22.1)
   - ScoreEffectUI (= 1.0.1)
   - sdk (from `sdk.podspec`)
-  - SDWebImage (~> 4.2)
+  - SDWebImage (= 4.4.8)
   - SDWebImageAPNGCoder
   - SenseLib (from `sense.podspec`)
   - SnapKit
@@ -176,6 +176,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 2e436ee644923450d3024dc4db50bf0e87a6e4ec
+PODFILE CHECKSUM: 6db6129a3a33c3f10e155b3fab4ed11155a0551a
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.12.1
