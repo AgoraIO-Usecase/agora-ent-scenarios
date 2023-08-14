@@ -364,6 +364,11 @@ object VideoSetting {
         SPUtil.getString(Constant.CURR_AUDIENCE_DEVICE_LEVEL, DeviceLevel.Low.toString())
     )
 
+    // 当前主播网络设置
+    private var currNetworkLevel: NetworkLevel = NetworkLevel.valueOf(
+        SPUtil.getString(Constant.CURR_BROADCAST_NETWORK_LEVEL, NetworkLevel.Good.toString())
+    )
+
     // 观众看播设置
     private var currAudiencePlaySetting: Int =
         SPUtil.getInt(Constant.CURR_AUDIENCE_PLAY_SETTING, AudiencePlaySetting.BASE_LOW)
@@ -451,6 +456,11 @@ object VideoSetting {
         SPUtil.putString(Constant.CURR_AUDIENCE_DEVICE_LEVEL, deviceLevel.toString())
     }
 
+    fun setCurrNetworkLevel(networkLevel: NetworkLevel) {
+        currNetworkLevel = networkLevel
+        SPUtil.putString(Constant.CURR_BROADCAST_NETWORK_LEVEL, networkLevel.toString())
+    }
+
     fun setCurrAudiencePlaySetting(currAudiencePlaySetting: Int) {
         this.currAudiencePlaySetting = currAudiencePlaySetting
         SPUtil.putInt(Constant.CURR_AUDIENCE_PLAY_SETTING, currAudiencePlaySetting)
@@ -517,6 +527,7 @@ object VideoSetting {
             return
         } else {
             setCurrAudienceDeviceLevel(deviceLevel)
+            setCurrNetworkLevel(networkLevel)
             liveMode = when (currBroadcastSetting) {
                 RecommendBroadcastSetting.LowDevice1v1, RecommendBroadcastSetting.MediumDevice1v1, RecommendBroadcastSetting.HighDevice1v1 -> LiveMode.OneVOne
                 RecommendBroadcastSetting.LowDevicePK, RecommendBroadcastSetting.MediumDevicePK, RecommendBroadcastSetting.HighDevicePK -> LiveMode.PK
@@ -570,6 +581,8 @@ object VideoSetting {
             else -> return
         }
 
+        val networkLevel = currNetworkLevel
+
         updateBroadcastSetting(
             when (liveMode) {
                 LiveMode.OneVOne -> when (deviceLevel) {
@@ -585,7 +598,12 @@ object VideoSetting {
                 }
             },
             if (getCurrLowStreamSetting() != null)
-                if (liveMode == LiveMode.PK) RecommendLowStreamVideoSetting.PK else getCurrLowStreamSetting()
+                if (liveMode == LiveMode.PK) RecommendLowStreamVideoSetting.PK
+                else when (deviceLevel) {
+                    DeviceLevel.Low -> if (networkLevel == NetworkLevel.Good) RecommendLowStreamVideoSetting.LowDeviceGoodNetwork1v1 else RecommendLowStreamVideoSetting.LowDeviceNormalNetwork1v1
+                    DeviceLevel.Medium -> if (networkLevel == NetworkLevel.Good) RecommendLowStreamVideoSetting.MiddleDeviceGoodNetwork1v1 else RecommendLowStreamVideoSetting.MiddleDeviceNormalNetwork1v1
+                    DeviceLevel.High -> if (networkLevel == NetworkLevel.Good) RecommendLowStreamVideoSetting.HighDeviceGoodNetwork1v1 else RecommendLowStreamVideoSetting.HighDeviceNormalNetwork1v1
+                }
             else null,
             isJoinedRoom,
             rtcConnection
@@ -800,6 +818,7 @@ object VideoSetting {
         recordingSignalVolume: Int? = null,
         audioMixingVolume: Int? = null
     ) {
+        ShowLogger.d("VideoSettings", "updateRTCBroadcastSetting, frameRate:$frameRate")
         val rtcEngine = RtcEngineInstance.rtcEngine
         val videoEncoderConfiguration = RtcEngineInstance.videoEncoderConfiguration
         val videoSwitcher = RtcEngineInstance.videoSwitcher
@@ -824,11 +843,12 @@ object VideoSetting {
             }
         }
         PVC?.let {
-            rtcEngine.setParameters("{\"rtc.video.pvc_max_support_resolution\": 2073600}")
+            //rtcEngine.setParameters("{\"rtc.video.pvc_max_support_resolution\": 2073600}")
+            //rtcEngine.setParameters("{\"rtc.video.maxCosttime4AIExt\": {\"pvc_max\": 20}}")
             rtcEngine.setParameters("{\"rtc.video.enable_pvc\":${it}}")
         }
         captureResolution?.let {
-            val fps: Int = frameRate?.fps ?: let { 15 }
+            val fps: Int = frameRate?.fps.let { getCurrBroadcastSetting().video.frameRate.fps }
             rtcEngine.setCameraCapturerConfiguration(CameraCapturerConfiguration(
                 CameraCapturerConfiguration.CaptureFormat(it.width, it.height, fps)
             ).apply {
