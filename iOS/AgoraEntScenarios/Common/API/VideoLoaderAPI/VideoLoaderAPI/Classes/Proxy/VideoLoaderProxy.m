@@ -40,7 +40,7 @@
 }
 
 - (id)forwardingTargetForSelector:(SEL)aSelector {
-    for (id listener in _listeners) {
+    for (id listener in self.listeners.objectEnumerator) {
         if ([listener respondsToSelector:aSelector]) {
             return listener;
         }
