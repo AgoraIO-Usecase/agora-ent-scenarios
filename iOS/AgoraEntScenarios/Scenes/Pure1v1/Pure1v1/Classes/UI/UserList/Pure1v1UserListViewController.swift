@@ -316,8 +316,8 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             switch stateReason {
             case .remoteHangup:
                 AUIToast.show(text: "call_toast_hangup".pure1v1Localization())
-//            case .localRejected, .remoteRejected:
-//                AUIToast.show(text: "通话被拒绝")
+            case .remoteRejected:
+                AUIToast.show(text: "call_toast_reject".pure1v1Localization())
 //            case .callingTimeout:
 //                AUIToast.show(text: "无应答")
 //            case .localCancel, .remoteCancel:
