@@ -104,7 +104,7 @@ DEPENDENCIES:
   - Protobuf (= 3.22.1)
   - Pure1v1 (from `AgoraEntScenarios/Scenes/Pure1v1`)
   - ScoreEffectUI (= 1.0.1)
-  - SDWebImage (~> 4.2)
+  - SDWebImage (= 4.4.8)
   - SDWebImageAPNGCoder
   - SenseLib (from `sense.podspec`)
   - SnapKit
@@ -203,6 +203,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 197817f4049f1add565a5bd1944bbb7836e6859d
+PODFILE CHECKSUM: f702bfaf18839dda29403b565686136633933530
 
 COCOAPODS: 1.12.1

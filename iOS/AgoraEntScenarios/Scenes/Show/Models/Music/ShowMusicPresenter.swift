@@ -11,17 +11,10 @@ import AgoraRtcKit
 private let defaultBeautyVoiceIndex = 0
 private let defaultMixVoiceIndex = 0
 
-class ShowMusicManager: NSObject {
+class ShowMusicPresenter: NSObject {
     
     lazy var dataArray: [ShowMusicConfigData] = {
         return [musicBg, beautyVoice, mixVoice]
-    }()
-    
-    private var agoraKit: AgoraRtcEngineKit!
-    lazy var player: AgoraRtcMediaPlayerProtocol? = {
-        let player = agoraKit.createMediaPlayer(with: self)
-        player?.setLoopCount(-1)
-        return player
     }()
     
     // 美声选项
@@ -45,9 +38,6 @@ class ShowMusicManager: NSObject {
             .roomAcousSpatial
         ]
     }()
-    
-    // 混响选项
-//    private lazy var mixPresets:
     
     // 背景音乐
     private lazy var musicBg: ShowMusicConfigData = {
@@ -73,7 +63,6 @@ class ShowMusicManager: NSObject {
     // 美声
     private lazy var beautyVoice: ShowMusicConfigData = {
         var beautyVoiceDataArray = [ShowMusicEffectCell.CellData]()
-        
         let titles = [
             "show_music_setting_beaty_yuansheng".show_localized,
             "show_music_setting_beaty_tianmei".show_localized,
@@ -120,74 +109,66 @@ class ShowMusicManager: NSObject {
         return ShowMusicConfigData(title: "show_music_setting_mix_title".show_localized, dataArray: mixVoiceDataArray, type: .mixture)
     }()
     
-    init(agoraKit: AgoraRtcEngineKit) {
-        self.agoraKit = agoraKit
-    }
 }
 
-
-extension ShowMusicManager {
+extension ShowMusicPresenter {
     // 选择音乐播放源
     func setMusicIndex(_ index: Int?) {
-        if index != nil  {
-            playMusic(index: index!)
-        }else{
-//            agoraKit.stopAudioMixing()
-            player?.stop()
+        guard let player = ShowAgoraKitManager.shared.mediaPlayer() else {
+            return
+        }
+        if let i = index  {
+            let musicNames = ["happy", "romantic", "relax"]
+            guard let path = Bundle.main.path(forResource: "showResource", ofType: "bundle"),
+                  let bundle = Bundle(path: path) else {
+                return
+            }
+            let musicPath = bundle.path(forResource: musicNames[i], ofType: "wav") ?? ""
+            player.stop()
+            let source = AgoraMediaSource()
+            source.url = musicPath
+            player.open(with: source)
+            setMusicVolume(ShowAgoraKitManager.shared.rtcParam.musicVolume)
+        } else {
+            player.stop()
         }
     }
     
     // 选择音乐美声
     func setBeautyIndex(_ index: Int?) {
+        guard let engine = ShowAgoraKitManager.shared.engine else {
+            return
+        }
         switch index {
         case 1: // 甜美
-            agoraKit.setVoiceConversionPreset(.sweet)
+            engine.setVoiceConversionPreset(.sweet)
         case 2: // 中性
-            agoraKit.setVoiceConversionPreset(.neutral)
+            engine.setVoiceConversionPreset(.neutral)
         case 3: // 稳重
-            agoraKit.setVoiceConversionPreset(.changerSolid)
+            engine.setVoiceConversionPreset(.changerSolid)
         case 4: //
-            agoraKit.setAudioEffectPreset(.voiceChangerEffectHulk)
+            engine.setAudioEffectPreset(.voiceChangerEffectHulk)
         default:
-            agoraKit.setAudioEffectPreset(.off)
-            agoraKit.setVoiceConversionPreset(.off)
+            engine.setAudioEffectPreset(.off)
+            engine.setVoiceConversionPreset(.off)
         }
     }
     
     // 选择混响
     func setMixIndex(_ index: Int?){
-        agoraKit.setAudioEffectPreset(mixPresets[index ?? 0])
-    }
-    
-    func setMusicVolume(_ volume: Float) {
-        player?.adjustPlayoutVolume(Int32(volume))
-        player?.adjustPublishSignalVolume(Int32(volume))
-    }
-
-}
-
-extension ShowMusicManager {
-    
-    private func playMusic(index: Int) {
-        let musicNames = ["happy","romantic","relax"]
-        guard let path = Bundle.main.path(forResource: "showResource", ofType: "bundle"),  let bundle = Bundle(path: path) else {
+        guard let engine = ShowAgoraKitManager.shared.engine else {
             return
         }
-       let musicPath = bundle.path(forResource: musicNames[index], ofType: "wav") ?? ""
-//        agoraKit.startAudioMixing(musicPath, loopback: false, cycle: -1)
-        player?.stop()
-        let source = AgoraMediaSource()
-        source.url = musicPath
-        player?.open(with: source)
-        setMusicVolume(ShowSettingKey.musincVolume.floatValue)
+        engine.setAudioEffectPreset(mixPresets[index ?? 0])
     }
+    
+    func setMusicVolume(_ volume: Int) {
+        guard let player = ShowAgoraKitManager.shared.mediaPlayer() else {
+            return
+        }
+        player.adjustPlayoutVolume(Int32(volume))
+        player.adjustPublishSignalVolume(Int32(volume))
+    }
+
 }
 
-extension ShowMusicManager: AgoraRtcMediaPlayerDelegate {
-    
-    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
-        if state == .openCompleted {
-            playerKit.play()
-        }
-    }
-}

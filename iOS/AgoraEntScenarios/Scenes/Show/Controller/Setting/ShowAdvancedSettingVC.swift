@@ -17,7 +17,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
     
-    var musicManager: ShowMusicManager!
+    var musicManager: ShowMusicPresenter!
     
     // 当前的观众预设类型
     var audiencePresetType: ShowPresetType?
@@ -117,7 +117,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         let audioSettings: [ShowSettingKey]  = [
             .earmonitoring,
             .recordingSignalVolume,
-            .musincVolume,
+            .musicVolume,
         ]
         let settings = isBroadcaster ? [broadcasterVideoSettings, audioSettings] : [audienceVideoSettings]
         if settings.count <= index {
@@ -142,7 +142,7 @@ extension ShowAdvancedSettingVC:  AEAListContainerViewDataSource{
 }
 
 extension ShowAdvancedSettingVC: AEACategoryViewDelegate {
-    func categoryView(_ categoryView: AEACategoryView, didSelect item: AEACategoryItem, at index: Int) {
+    func categoryView(_ categoryView: AEACategoryView, didSelectItemat index: Int) {
         listContainerView.setSelectedIndex(index)
     }
 }

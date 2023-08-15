@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053998C4290A83E0005143C7 /* HomeMenuCell.swift */; };
 		AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */; };
+		ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */; };
 		ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */; };
 		BF370B5409C9BBA693EEFB80 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */; };
 		DD0292C1295BF0DC00485225 /* KTVLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD029248295BF0DC00485225 /* KTVLog.swift */; };
@@ -73,7 +74,7 @@
 		DD36105E29B70CDC00CE7984 /* ShowThrottle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FB429B70CDC00CE7984 /* ShowThrottle.swift */; };
 		DD36105F29B70CDC00CE7984 /* UIImage+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FB529B70CDC00CE7984 /* UIImage+Show.swift */; };
 		DD36106029B70CDC00CE7984 /* UIView+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FB629B70CDC00CE7984 /* UIView+Show.swift */; };
-		DD36106129B70CDC00CE7984 /* ShowMusicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FB929B70CDC00CE7984 /* ShowMusicManager.swift */; };
+		DD36106129B70CDC00CE7984 /* ShowMusicPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FB929B70CDC00CE7984 /* ShowMusicPresenter.swift */; };
 		DD36106229B70CDC00CE7984 /* ShowMusicModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FBA29B70CDC00CE7984 /* ShowMusicModel.swift */; };
 		DD36106329B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FBB29B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift */; };
 		DD36106429B70CDC00CE7984 /* ShowAgoraKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FBC29B70CDC00CE7984 /* ShowAgoraKitManager.swift */; };
@@ -573,7 +574,6 @@
 		E3735C9D2A5E7E75004737EF /* BeautyLoad.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C732A5E7E75004737EF /* BeautyLoad.m */; };
 		E3735C9E2A5E7E75004737EF /* BeautyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C742A5E7E75004737EF /* BeautyModel.swift */; };
 		E3735C9F2A5E7E75004737EF /* BeautyResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E3735C752A5E7E75004737EF /* BeautyResource.bundle */; };
-		E3735CA02A5E7E75004737EF /* BeautyConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C772A5E7E75004737EF /* BeautyConfig.m */; };
 		E3735CA12A5E7E75004737EF /* FUBeautyRender.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C7A2A5E7E75004737EF /* FUBeautyRender.m */; };
 		E3735CA22A5E7E75004737EF /* BeautyAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C7D2A5E7E75004737EF /* BeautyAPI.m */; };
 		E3735CA32A5E7E75004737EF /* SenseBeautyRender.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C802A5E7E75004737EF /* SenseBeautyRender.m */; };
@@ -613,6 +613,7 @@
 		4A3B186B38A56ACA440591ED /* Pods-AgoraEntScenarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.debug.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.debug.xcconfig"; sourceTree = "<group>"; };
 		563C78B601810D421A3F783A /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
 		AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRobotService.swift; sourceTree = "<group>"; };
+		ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingBitrateCell.swift; sourceTree = "<group>"; };
 		ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNetStateSelectViewController.swift; sourceTree = "<group>"; };
 		DD029248295BF0DC00485225 /* KTVLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLog.swift; sourceTree = "<group>"; };
 		DD02924B295BF0DC00485225 /* VLAddRoomModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAddRoomModel.m; sourceTree = "<group>"; };
@@ -723,7 +724,7 @@
 		DD360FB429B70CDC00CE7984 /* ShowThrottle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowThrottle.swift; sourceTree = "<group>"; };
 		DD360FB529B70CDC00CE7984 /* UIImage+Show.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Show.swift"; sourceTree = "<group>"; };
 		DD360FB629B70CDC00CE7984 /* UIView+Show.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Show.swift"; sourceTree = "<group>"; };
-		DD360FB929B70CDC00CE7984 /* ShowMusicManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowMusicManager.swift; sourceTree = "<group>"; };
+		DD360FB929B70CDC00CE7984 /* ShowMusicPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowMusicPresenter.swift; sourceTree = "<group>"; };
 		DD360FBA29B70CDC00CE7984 /* ShowMusicModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowMusicModel.swift; sourceTree = "<group>"; };
 		DD360FBB29B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ShowAgoraKitManager+Setting.swift"; sourceTree = "<group>"; };
 		DD360FBC29B70CDC00CE7984 /* ShowAgoraKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowAgoraKitManager.swift; sourceTree = "<group>"; };
@@ -1333,11 +1334,9 @@
 		E3735C732A5E7E75004737EF /* BeautyLoad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BeautyLoad.m; sourceTree = "<group>"; };
 		E3735C742A5E7E75004737EF /* BeautyModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeautyModel.swift; sourceTree = "<group>"; };
 		E3735C752A5E7E75004737EF /* BeautyResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = BeautyResource.bundle; sourceTree = "<group>"; };
-		E3735C772A5E7E75004737EF /* BeautyConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BeautyConfig.m; sourceTree = "<group>"; };
 		E3735C782A5E7E75004737EF /* BeautyAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BeautyAPI.h; sourceTree = "<group>"; };
 		E3735C7A2A5E7E75004737EF /* FUBeautyRender.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FUBeautyRender.m; sourceTree = "<group>"; };
 		E3735C7B2A5E7E75004737EF /* FUBeautyRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FUBeautyRender.h; sourceTree = "<group>"; };
-		E3735C7C2A5E7E75004737EF /* BeautyConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BeautyConfig.h; sourceTree = "<group>"; };
 		E3735C7D2A5E7E75004737EF /* BeautyAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BeautyAPI.m; sourceTree = "<group>"; };
 		E3735C7F2A5E7E75004737EF /* SenseBeautyRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenseBeautyRender.h; sourceTree = "<group>"; };
 		E3735C802A5E7E75004737EF /* SenseBeautyRender.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SenseBeautyRender.m; sourceTree = "<group>"; };
@@ -1734,7 +1733,7 @@
 		DD360FB829B70CDC00CE7984 /* Music */ = {
 			isa = PBXGroup;
 			children = (
-				DD360FB929B70CDC00CE7984 /* ShowMusicManager.swift */,
+				DD360FB929B70CDC00CE7984 /* ShowMusicPresenter.swift */,
 				DD360FBA29B70CDC00CE7984 /* ShowMusicModel.swift */,
 			);
 			path = Music;
@@ -1938,6 +1937,7 @@
 				DD36104529B70CDC00CE7984 /* ShowSettingActionSheetFooterView.swift */,
 				DD36104629B70CDC00CE7984 /* ShowPresettingCell.swift */,
 				DD36104729B70CDC00CE7984 /* ShowSettingSliderCell.swift */,
+				ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */,
 				DD36104829B70CDC00CE7984 /* ShowSettingActionSheetCell.swift */,
 				DD36104929B70CDC00CE7984 /* ShowSettingHeaderView.swift */,
 			);
@@ -3319,11 +3319,9 @@
 		E3735C762A5E7E75004737EF /* BeautyAPI */ = {
 			isa = PBXGroup;
 			children = (
-				E3735C772A5E7E75004737EF /* BeautyConfig.m */,
 				E3735C782A5E7E75004737EF /* BeautyAPI.h */,
-				E3735C792A5E7E75004737EF /* FURender */,
-				E3735C7C2A5E7E75004737EF /* BeautyConfig.h */,
 				E3735C7D2A5E7E75004737EF /* BeautyAPI.m */,
+				E3735C792A5E7E75004737EF /* FURender */,
 				E3735C7E2A5E7E75004737EF /* SenseRender */,
 				E3735C812A5E7E75004737EF /* BytesRender */,
 			);
@@ -3333,8 +3331,8 @@
 		E3735C792A5E7E75004737EF /* FURender */ = {
 			isa = PBXGroup;
 			children = (
-				E3735C7A2A5E7E75004737EF /* FUBeautyRender.m */,
 				E3735C7B2A5E7E75004737EF /* FUBeautyRender.h */,
+				E3735C7A2A5E7E75004737EF /* FUBeautyRender.m */,
 			);
 			path = FURender;
 			sourceTree = "<group>";
@@ -3351,8 +3349,8 @@
 		E3735C812A5E7E75004737EF /* BytesRender */ = {
 			isa = PBXGroup;
 			children = (
-				E3735C822A5E7E75004737EF /* BytesBeautyRender.m */,
 				E3735C832A5E7E75004737EF /* BytesBeautyRender.h */,
+				E3735C822A5E7E75004737EF /* BytesBeautyRender.m */,
 			);
 			path = BytesRender;
 			sourceTree = "<group>";
@@ -3369,7 +3367,7 @@
 				DD2A43C428FFCEE7004CEDCF /* Frameworks */,
 				DD2A43C528FFCEE7004CEDCF /* Resources */,
 				AD4E4CC20B1F880834B4962F /* [CP] Embed Pods Frameworks */,
-				38F440C94F7856A3EF72ED84 /* [CP] Copy Pods Resources */,
+				6C1ECED3E3776FBAE3C63786 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -3523,7 +3521,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		38F440C94F7856A3EF72ED84 /* [CP] Copy Pods Resources */ = {
+		6C1ECED3E3776FBAE3C63786 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3702,7 +3700,7 @@
 				DD619A8A29E3E247008F63E4 /* SAChatModel.swift in Sources */,
 				DD619ADA29E3E247008F63E4 /* SAInputBar.swift in Sources */,
 				DD619BAA29E3E262008F63E4 /* ChatRoomServiceImp.swift in Sources */,
-				DD36106129B70CDC00CE7984 /* ShowMusicManager.swift in Sources */,
+				DD36106129B70CDC00CE7984 /* ShowMusicPresenter.swift in Sources */,
 				DD36109429B70CDC00CE7984 /* ShowSettingActionSheetVC.swift in Sources */,
 				DD619A7129E3E247008F63E4 /* SACrossZoomAnimation.swift in Sources */,
 				DD3610B329B70CDC00CE7984 /* ShowRoomInfoView.swift in Sources */,
@@ -3852,7 +3850,6 @@
 				DDA19A0528FFE579009D3E61 /* NSObject+JKAppInfo.m in Sources */,
 				DD619AE529E3E247008F63E4 /* SARoomCreateView.swift in Sources */,
 				DD5EBDC6299F230100F36349 /* KTVDebugViewController.m in Sources */,
-				E3735CA02A5E7E75004737EF /* BeautyConfig.m in Sources */,
 				E36EC8B32A6638440089A374 /* AEAListContainerView.swift in Sources */,
 				E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */,
 				DD619BB229E3E262008F63E4 /* VoiceRoomApplyUsersViewController.swift in Sources */,
@@ -3913,6 +3910,7 @@
 				DD619B9129E3E262008F63E4 /* PresentationSegue.swift in Sources */,
 				DD3610B729B70CDC00CE7984 /* ShowDebugSetting2TFCell.swift in Sources */,
 				DD619B8029E3E262008F63E4 /* VoiceRoomRequest.swift in Sources */,
+				ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */,
 				DD619B8429E3E262008F63E4 /* VerifyCodeView.swift in Sources */,
 				DD619ABE29E3E247008F63E4 /* SASwitchBar.swift in Sources */,
 				DD3610A129B70CDC00CE7984 /* ShowMusicTableHeaderView.swift in Sources */,

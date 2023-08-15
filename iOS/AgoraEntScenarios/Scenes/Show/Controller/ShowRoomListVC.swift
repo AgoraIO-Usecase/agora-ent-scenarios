@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import VideoLoaderAPI
 
 class ShowRoomListVC: UIViewController {
     
@@ -91,17 +92,11 @@ class ShowRoomListVC: UIViewController {
         self.fetchRoomList()
     }
     
-    private func showDebugSetVC(){
-        let vc = ShowDebugSettingVC()
-        vc.isBroadcastor = false
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
     private func checkDevice() {
          let score = ShowAgoraKitManager.shared.engine?.queryDeviceScore() ?? 0
-        if (score <= 75) {// (0, 75]
+        if (score < 75) {// (0, 75)
             ShowAgoraKitManager.shared.deviceLevel = .low
-        } else if (score <= 90) {// (75, 90]
+        } else if (score < 90) {// (75, 90)
             ShowAgoraKitManager.shared.deviceLevel = .medium
         } else {// (> 90)
             ShowAgoraKitManager.shared.deviceLevel = .high
@@ -144,22 +139,27 @@ class ShowRoomListVC: UIViewController {
             }
             let list = roomList ?? []
             self.roomList = list
+            self.preLoadVisibleItems()
         }
     }
     // 预先加载RTC
     private func preLoadVisibleItems() {
-        guard let token = AppContext.shared.rtcToken,
-              let firstItem = collectionView.indexPathsForVisibleItems.first?.item else {
+        guard let token = AppContext.shared.rtcToken, roomList.count > 0 else {
             return
         }
+        let firstItem = collectionView.indexPathsForVisibleItems.first?.item ?? 0
         let start = firstItem - 7 < 0 ? 0 : firstItem - 7
         let end = start + 19 >= roomList.count ? roomList.count - 1 : start + 19
+        var preloadRoomList: [RoomInfo] = []
         for i in start...end {
             let room = roomList[i]
-            ShowAgoraKitManager.shared.engine?.preloadChannel(byToken: token,
-                                                              channelId: room.roomId,
-                                                              uid: UInt(VLUserCenter.user.id) ?? 0)
+            let preloadItem = RoomInfo()
+            preloadItem.channelName = room.roomId
+            preloadItem.uid = UInt(VLUserCenter.user.id) ?? 0
+            preloadItem.token = token
+            preloadRoomList.append(preloadItem)
         }
+        ShowAgoraKitManager.shared.preloadRoom(preloadRoomList: preloadRoomList)
     }
     // 预先获取万能token
     private func preGenerateToken() {
