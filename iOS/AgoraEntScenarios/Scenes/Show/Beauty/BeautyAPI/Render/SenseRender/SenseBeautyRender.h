@@ -8,7 +8,7 @@
 #define Sensetime "st_mobile_common.h"
 
 #import <Foundation/Foundation.h>
-#if __has_include("VideoProcessingManager.h") 
+#if __has_include("VideoProcessingManager.h")
 #import "VideoProcessingManager.h"
 #endif
 #import "BeautyAPI.h"

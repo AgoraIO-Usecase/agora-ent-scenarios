@@ -10,7 +10,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VideoLoaderProxy : NSObject
-@property(nonatomic, weak) id<NSObject> delegate;
 
 - (void)addListener:(id <NSObject>)listener;
 - (void)removeListener:(id <NSObject>)listener;

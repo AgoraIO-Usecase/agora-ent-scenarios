@@ -29,13 +29,12 @@ class ShowAgoraKitManager: NSObject {
     
     private var broadcasterConnection: AgoraRtcConnection?
     
-    let videoEncoderConfig = AgoraVideoEncoderConfiguration()
-    
     var exposureRangeX: Int?
     var exposureRangeY: Int?
     var matrixCoefficientsExt: Int?
     var videoFullrangeExt: Int?
-    var isFrontCamera = true
+    
+    let encoderConfig = AgoraVideoEncoderConfiguration()
     
     public lazy var captureConfig: AgoraCameraCapturerConfiguration = {
         let config = AgoraCameraCapturerConfiguration()
@@ -52,6 +51,17 @@ class ShowAgoraKitManager: NSObject {
     }()
     
     public var engine: AgoraRtcEngineKit?
+    
+    private var player: AgoraRtcMediaPlayerProtocol?
+    func mediaPlayer() -> AgoraRtcMediaPlayerProtocol? {
+        if let p = player {
+            return p
+        } else {
+            player = engine?.createMediaPlayer(with: self)
+            player?.setLoopCount(-1)
+            return player
+        }
+    }
     
     func prepareEngine() {
         let engine = AgoraRtcEngineKit.sharedEngine(with: engineConfig(), delegate: nil)
@@ -75,6 +85,10 @@ class ShowAgoraKitManager: NSObject {
     // 退出已加入的频道和子频道
     func leaveAllRoom() {
         videoLoader?.cleanCache()
+        if let p = player {
+            engine?.destroyMediaPlayer(p)
+            player = nil
+        }
     }
     
     //MARK: private
@@ -175,7 +189,8 @@ class ShowAgoraKitManager: NSObject {
             let cost = Int(-date.timeIntervalSinceNow * 1000)
             showLogger.info("join room[\(channelName)] ex success uid: \(uid) cost \(cost) ms", context: kShowLogBaseContext)
             self?.setupContentInspectConfig(true, connection: connection)
-            self?.moderationAudio(channelName: targetChannelId, role: role)
+//            self?.moderationAudio(channelName: targetChannelId, role: role)
+            self?.applySimulcastStream(connection: connection)
         }
         engine.updateChannelEx(with: mediaOptions, connection: connection)
         broadcasterConnection = connection
@@ -197,8 +212,8 @@ class ShowAgoraKitManager: NSObject {
         let connection = AgoraRtcConnection()
         connection.channelId = currentChannelId
         connection.localUid = UInt(VLUserCenter.user.id) ?? 0
-        let encoderRet = engine.setVideoEncoderConfigurationEx(videoEncoderConfig, connection: connection)
-        showLogger.info("setVideoEncoderConfigurationEx  dimensions = \(videoEncoderConfig.dimensions), bitrate = \(videoEncoderConfig.bitrate), fps = \(videoEncoderConfig.frameRate),  encoderRet = \(encoderRet)", context: kShowLogBaseContext)
+        let encoderRet = engine.setVideoEncoderConfigurationEx(encoderConfig, connection: connection)
+        showLogger.info("setVideoEncoderConfigurationEx  dimensions = \(encoderConfig.dimensions), bitrate = \(encoderConfig.bitrate), fps = \(encoderConfig.frameRate),  encoderRet = \(encoderRet)", context: kShowLogBaseContext)
     }
     
     //MARK: public method
@@ -257,7 +272,7 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         engine.setClientRole(.broadcaster)
-        engine.setVideoEncoderConfiguration(videoEncoderConfig)
+        engine.setVideoEncoderConfiguration(encoderConfig)
         engine.setCameraCapturerConfiguration(captureConfig)
         canvas.view = canvasView
         engine.setupLocalVideo(canvas)
@@ -271,8 +286,8 @@ class ShowAgoraKitManager: NSObject {
             assert(true, "rtc engine not initlized")
             return
         }
-        isFrontCamera = !isFrontCamera
         engine.switchCamera()
+        engine.setLocalRenderMode(.hidden, mirror: .enabled)
     }
     
     /// 开启虚化背景
@@ -315,6 +330,13 @@ class ShowAgoraKitManager: NSObject {
         engine.enableVirtualBackground(isOn, backData: source, segData: seg)
     }
     
+    
+    /// 预加载
+    /// - Parameter preloadRoomList: <#preloadRoomList description#>
+    public func preloadRoom(preloadRoomList: [RoomInfo]) {
+        videoLoader?.preloadRoom(preloadRoomList: preloadRoomList)
+    }
+    
     func updateChannelEx(channelId: String, options: AgoraRtcChannelMediaOptions) {
         guard let engine = engine,
               let connection = (broadcasterConnection?.channelId == channelId ? broadcasterConnection : nil) ?? videoLoader?.getConnectionMap()[channelId] else {
@@ -353,19 +375,8 @@ class ShowAgoraKitManager: NSObject {
             assert(true, "rtc engine not initlized")
             return
         }
-        videoEncoderConfig.dimensions = CGSize(width: size.width, height: size.height)
-        engine.setVideoEncoderConfiguration(videoEncoderConfig)
-    }
-    
-    /// 设置265
-    /// - Parameter isOn: 开关
-    func setH265On(_ isOn: Bool) {
-        guard let engine = engine else {
-            assert(true, "rtc engine not initlized")
-            return
-        }
-        engine.setParameters("{\"engine.video.enable_hw_encoder\":\(isOn)}")
-        engine.setParameters("{\"engine.video.codec_type\":\"\(isOn ? 3 : 2)\"}")
+        encoderConfig.dimensions = CGSize(width: size.width, height: size.height)
+        engine.setVideoEncoderConfiguration(encoderConfig)
     }
     
     func cleanCapture() {
@@ -467,6 +478,16 @@ class ShowAgoraKitManager: NSObject {
         let roomInfo = _getRoomInfo(channelId: channelId)
         videoLoader?.switchRoomState(newState: playState, roomInfo: roomInfo, tagId: roomId)
     }
+    
+    func cleanChannel(without roomIds: [String]) {
+        guard let videoLoader = videoLoader else {return}
+        for (key, _) in videoLoader.getConnectionMap() {
+            if roomIds.contains(key) {continue}
+            let roomInfo = RoomInfo()
+            roomInfo.channelName = key
+            videoLoader.switchRoomState(newState: .idle, roomInfo: roomInfo, tagId: key)
+        }
+    }
 }
 
 //MARK: private param
@@ -535,8 +556,7 @@ extension ShowAgoraKitManager {
     }
     
 }
-
-
+// MARK: - IVideoLoaderApiListener
 extension ShowAgoraKitManager: IVideoLoaderApiListener {
     public func debugInfo(_ message: String) {
         showLogger.info(message, context: "VideoLoaderApi")
@@ -546,5 +566,14 @@ extension ShowAgoraKitManager: IVideoLoaderApiListener {
     }
     public func debugError(_ message: String) {
         showLogger.error(message, context: "VideoLoaderApi")
+    }
+}
+// MARK: - AgoraRtcMediaPlayerDelegate
+extension ShowAgoraKitManager: AgoraRtcMediaPlayerDelegate {
+    
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+        if state == .openCompleted {
+            playerKit.play()
+        }
     }
 }
