@@ -101,12 +101,11 @@ class ShowRoomListVC: UIViewController {
             ShowAgoraKitManager.shared.deviceLevel = .high
         }
         ShowAgoraKitManager.shared.deviceScore = Int(score)
-        ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)
     }
     
     // 加入房间
     private func joinRoom(_ room: ShowRoomListModel){
-        ShowAgoraKitManager.shared.callTimestampStart()
+        ShowAgoraKitManager.shared.callTimestampStart(clean: true)
         
         let vc = ShowLivePagesViewController()
         let nc = UINavigationController(rootViewController: vc)

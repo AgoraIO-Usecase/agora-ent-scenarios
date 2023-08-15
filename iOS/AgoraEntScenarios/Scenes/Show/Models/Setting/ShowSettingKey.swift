@@ -168,7 +168,7 @@ enum ShowSettingKey: String, CaseIterable {
         case .beauty:
             return .aSwitch
         case .PVC:
-            return .aSwitch
+            return .custom
         case .SR:
             return .aSwitch
         case .BFrame:

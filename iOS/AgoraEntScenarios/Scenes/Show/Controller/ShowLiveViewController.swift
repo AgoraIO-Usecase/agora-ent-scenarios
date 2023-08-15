@@ -24,7 +24,7 @@ class ShowLiveViewController: UIViewController {
                 return
             }
             if (loadingType == .joined) {// 秒开计时
-                ShowAgoraKitManager.shared.callTimestampStart()
+                ShowAgoraKitManager.shared.callTimestampStart(clean: false)
             }
             updateLoadingType(playState: loadingType)
             remoteVideoWidth = nil
@@ -433,12 +433,14 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onRoomExpired() {
         leaveRoom()
-        ShowReceiveLiveFinishAlertVC.show(topVC: self,
-                                          ownerUrl: room?.ownerAvatar ?? "",
-                                          ownerName: room?.ownerName ?? "") { [weak self] in
-            if self?.presentedViewController != nil {
-                self?.presentedViewController?.dismiss(animated: false)
-            }
+        
+        let finishView = ShowReceiveFinishView()
+        finishView.headImg = room?.ownerAvatar ?? ""
+        finishView.headName = room?.ownerName ?? ""
+        finishView.delegate = self
+        self.view.addSubview(finishView)
+        finishView.snp.makeConstraints { make in
+            make.left.right.top.bottom.equalToSuperview()
         }
     }
     
@@ -474,14 +476,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         if apply.status == .accepted {
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: apply.userName ?? "", img: apply.avatar)
-//            if apply.userId == VLUserCenter.user.id {
-//                agoraKitManager.switchRole(role: .broadcaster,
-//                                           uid: apply.userId,
-//                                           canvasView: liveView.canvasView.remoteView)
-//            }
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
-            
         } else if apply.status == .rejected {
             applyView.getAllMicSeatList(autoApply: false)
             liveView.bottomBar.linkButton.isShowRedDot = false
@@ -543,13 +539,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
 
     func onMicSeatInvitationAccepted(invitation: ShowMicSeatInvitation) {
-//        liveView.canvasView.canvasType = .joint_broadcasting
         liveView.canvasView.setRemoteUserInfo(name: invitation.userName ?? "", img: invitation.avatar)
-//        ToastView.show(text: "seat invitation \(invitation.userId ?? "") did accept")
-//        guard invitation.userId == VLUserCenter.user.id else { return }
-//        agoraKitManager.switchRole(role: .broadcaster,
-//                                   uid: invitation.userId,
-//                                   canvasView: liveView.canvasView.remoteView)
     }
     
     func onMicSeatInvitationRejected(invitation: ShowMicSeatInvitation) {
@@ -683,11 +673,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             self.muteLocalAudio = false
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
-            let role: AgoraClientRole = (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : .audience
-            if role == .broadcaster {
-                ShowAgoraKitManager.shared.updateVideoProfileForMode(.pk)
+            if role == .audience {
+                ShowAgoraKitManager.shared.updateAudienceProfile()
             }
-            ShowAgoraKitManager.shared.switchRole(role: role,
+            let toRole: AgoraClientRole = (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : .audience
+            ShowAgoraKitManager.shared.switchRole(role: toRole,
                                        channelId: roomId,
                                        options: self.channelOptions,
                                        uid: interaction.userId,
@@ -695,7 +685,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
             AlertManager.hiddenView()
-            if role == .broadcaster {
+            if toRole == .broadcaster {
                 self.delegate?.currentUserIsOnSeat()
                 // 创建默认美颜效果
                 ShowBeautyFaceVC.beautyData.forEach({
@@ -1065,4 +1055,9 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     }
     
 }
-
+// MARK: - ShowReceiveFinishViewDelegate
+extension ShowLiveViewController: ShowReceiveFinishViewDelegate {
+    func onClickFinishButton() {
+        onClickCloseButton()
+    }
+}
