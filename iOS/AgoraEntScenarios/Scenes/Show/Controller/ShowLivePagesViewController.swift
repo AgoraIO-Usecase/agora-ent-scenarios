@@ -29,6 +29,7 @@ class ShowLivePagesViewController: ViewController {
         layout.itemSize = self.view.bounds.size
         let collectionView = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(UICollectionViewCell.self))
+        collectionView.scrollsToTop = false
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.isPagingEnabled = true
