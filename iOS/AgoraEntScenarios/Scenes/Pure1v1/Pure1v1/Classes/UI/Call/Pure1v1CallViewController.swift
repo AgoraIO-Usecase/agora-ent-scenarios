@@ -18,7 +18,6 @@ class Pure1v1CallViewController: UIViewController {
             callApi?.addRTCListener?(listener: self)
         }
     }
-    var appId: String = ""
     var rtcEngine: AgoraRtcEngineKit?
     var currentUser: Pure1v1UserInfo? {
         didSet {
@@ -224,23 +223,6 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
                             eventReason: String,
                             elapsed: Int,
                             eventInfo: [String : Any]) {
-        let publisher = eventInfo[kPublisher] as? String ?? currentUser?.userId
-        guard publisher == currentUser?.userId else {
-            return
-        }
-        
-        switch state {
-        case .connected:
-            let connection = AgoraRtcConnection()
-            assert(targetUser != nil, "targetUser == nil")
-            connection.channelId = targetUser?.getRoomId() ?? ""
-            connection.localUid = UInt(currentUser?.userId ?? "") ?? 0
-            setupContentInspectConfig(true, connection: connection)
-            moderationAudio()
-            break
-        default:
-            break
-        }
     }
     
     func onCallEventChanged(with event: CallEvent, elapsed: Int) {
@@ -261,47 +243,3 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
     }
 }
 
-extension Pure1v1CallViewController {
-    private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
-        guard let rtcEngine = rtcEngine else {return}
-        let config = AgoraContentInspectConfig()
-        let dic: [String: String] = [
-            "id": "\(connection.localUid)",
-            "sceneName": "Pure1v1",
-            "userNo": "\(connection.localUid)"
-        ]
-        
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
-            pure1v1Error("setupContentInspectConfig fail")
-            return
-        }
-        let jsonStr = String(data: jsonData, encoding: .utf8)
-        config.extraInfo = jsonStr
-        let module = AgoraContentInspectModule()
-        module.interval = 30
-        module.type = .imageModeration
-        config.modules = [module]
-        let ret = rtcEngine.enableContentInspectEx(enable, config: config, connection: connection)
-        pure1v1Print("setupContentInspectConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
-    }
-    
-    /// 语音审核
-    private func moderationAudio() {
-        let userInfo = ["id": currentUser?.userId ?? "",
-                        "sceneName": "show",
-                        "userNo": currentUser?.userId ?? "",
-                        "userName": currentUser?.userName ?? ""] as NSDictionary
-        let parasm: [String: Any] = ["appId": appId,
-                                     "channelName": targetUser?.userId ?? "",
-                                     "channelType": AgoraChannelProfile.liveBroadcasting.rawValue,
-                                     "traceId": NSString.withUUID().md5(),
-                                     "src": "iOS",
-                                     "payload": userInfo.yy_modelToJSONString()]
-        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/moderation/audio",
-                                          params: parasm) { response in
-            pure1v1Print("moderationAudio response === \(response)")
-        } failure: { errr in
-            pure1v1Error(errr)
-        }
-    }
-}

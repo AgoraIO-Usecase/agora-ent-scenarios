@@ -30,7 +30,7 @@ protocol Pure1v1ServiceProtocol: NSObjectProtocol {
     
     /// 获取1v1用户列表
     /// - Parameter completion: 完成回调
-    func getUserList(completion: @escaping ([Pure1v1UserInfo]) -> Void)
+    func getUserList(completion: @escaping ([Pure1v1UserInfo], NSError?) -> Void)
     
     /// 订阅网络状态变化
     /// - Parameter changedBlock: 变化回调

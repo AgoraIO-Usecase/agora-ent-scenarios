@@ -21,7 +21,7 @@ class AEACategoryItem: NSObject {
 }
 
 protocol AEACategoryViewDelegate: AnyObject {
-    func categoryView(_ categoryView: AEACategoryView, didSelect item: AEACategoryItem, at index: Int)
+    func categoryView(_ categoryView: AEACategoryView, didSelectItemat index: Int)
 }
 
 class AEACategoryViewLayout: NSObject {
@@ -200,9 +200,7 @@ class AEACategoryView: UIView, UICollectionViewDataSource, UICollectionViewDeleg
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let item = dataArray[indexPath.item] as? AEACategoryItem {
-            delegate?.categoryView(self, didSelect: item, at: indexPath.item)
-        }
+        delegate?.categoryView(self, didSelectItemat: indexPath.item)
         
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
         selectedIndex = indexPath.item

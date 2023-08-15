@@ -2,7 +2,7 @@
 //  ShowStatisticsInfo.swift
 //  AgoraEntScenarios
 //
-//  Created by zhaoyongqiang on 2022/11/9.
+//  Created by HeZhengQing on 2022/11/9.
 //
 
 import Foundation
@@ -158,22 +158,28 @@ class ShowDataPanelPresenter {
         // 秒开耗时
         let startup = receive ? "\(callTs) ms" : "--"
         let startupStr = "show_statistic_startup_time".show_localized + ": " + startup
+        // h265开关
+        let h265 = send ? onStr : "--"
+        let h265Str = "H265" + ": " + h265
         // 超分开关
         let sr = receive ? (params.sr ? onStr : offStr) : "--"
         let srStr = "show_statistic_SR_switch".show_localized + ": " + sr
         // 小流开关
-        let microStream = send ? (params.simulcast ? onStr : offStr) : "--"
+        let microStream = send ? ((localVideoStats.dualStreamEnabled) ? onStr : offStr) : "--"
         let microStreamStr = "show_statistic_micro_stream_switch".show_localized + ": " + microStream
         // right:
         //机型等级
-        let levelStr = "show_statistic_device_level".show_localized + ": " + ShowAgoraKitManager.shared.deviceLevel.description()
+        let levelStr = "show_statistic_device_level".show_localized
+        + ": "
+        + ShowAgoraKitManager.shared.deviceLevel.description()
+        + "(\(ShowAgoraKitManager.shared.deviceScore))"
         //pvc开关
         let pvc = send ? (params.pvc ? onStr : offStr) : "--"
         let pvcStr = "show_statistic_pvc_switch".show_localized + ": " + pvc
         //svc开关
         let svc = send ? (params.svc ? onStr : offStr) : "--"
         let svcStr = "show_statistic_svc_switch".show_localized + ": " + svc
-        let left = [title, startupStr, srStr,  microStreamStr].joined(separator: "\n") + "\n"
+        let left = [title, startupStr, h265Str, srStr,  microStreamStr].joined(separator: "\n") + "\n"
         let right = ["  ", levelStr,  pvcStr, svcStr].joined(separator: "\n") + "\n"
         return ShowPanelData(left: left, right: right)
     }

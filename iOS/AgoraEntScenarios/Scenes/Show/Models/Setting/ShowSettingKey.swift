@@ -71,20 +71,21 @@ enum ShowAgoraCodeCType: String, CaseIterable {
 }
 
 enum ShowAgoraVideoDimensions: String, CaseIterable {
-    
-    case _240x360 = "240x360"
     case _360x640 = "360x640"
     case _480x856 = "480x856"
     case _540x960 = "540x960"
     case _720x1280 = "720x1280"
     case _1080x1920 = "1080x1920"
-    
     var sizeValue: CGSize {
         let arr: [String] = rawValue.split(separator: "x").compactMap{"\($0)"}
         guard let first = arr.first, let width = Float(first), let last = arr.last, let height = Float(last) else {
             return CGSize(width: 360, height: 640)
         }
         return CGSize(width: CGFloat(width), height: CGFloat(height))
+    }
+    
+    static func values() -> [CGSize] {
+        return ShowAgoraVideoDimensions.allCases.map({$0.sizeValue})
     }
 }
 
@@ -101,6 +102,7 @@ enum ShowSettingKey: String, CaseIterable {
         case segment
         case slider
         case label
+        case custom
     }
     
     case lowlightEnhance        // 暗光增强
@@ -116,7 +118,7 @@ enum ShowSettingKey: String, CaseIterable {
     case videoBitRate           // 视频码率
     case earmonitoring          // 耳返
     case recordingSignalVolume  // 人声音量
-    case musincVolume           // 音乐音量
+    case musicVolume           // 音乐音量
     case audioBitRate           // 音频码率
     
     var title: String {
@@ -147,7 +149,7 @@ enum ShowSettingKey: String, CaseIterable {
             return "show_advance_setting_earmonitoring_title".show_localized
         case .recordingSignalVolume:
             return "show_advance_setting_recordingVolume_title".show_localized
-        case .musincVolume:
+        case .musicVolume:
             return "show_advance_setting_musicVolume_title".show_localized
         case .audioBitRate:
             return "show_advance_setting_audio_bitRate_title".show_localized
@@ -178,12 +180,12 @@ enum ShowSettingKey: String, CaseIterable {
         case .H265:
             return .aSwitch
         case .videoBitRate:
-            return .slider
+            return .custom
         case .earmonitoring:
             return .aSwitch
         case .recordingSignalVolume:
             return .slider
-        case .musincVolume:
+        case .musicVolume:
             return .slider
         case .audioBitRate:
             return .label
@@ -213,18 +215,6 @@ enum ShowSettingKey: String, CaseIterable {
             return "show_advance_setting_fps_tips".show_localized
         default:
             return ""
-        }
-    }
-    
-    // slider的取值区间
-    var sliderValueScope: (Float, Float) {
-        switch self {
-        case .recordingSignalVolume:
-            return (0, 100)
-        case .musincVolume:
-            return (0, 100)
-        default:
-            return (0,0)
         }
     }
     

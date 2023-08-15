@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+private let kPagesVCTag = "PagesVC"
 class ShowLivePagesViewController: ViewController {
     
     var roomList: [ShowRoomListModel]?
@@ -38,7 +39,7 @@ class ShowLivePagesViewController: ViewController {
     }()
     
     deinit {
-        showLogger.info("deinit-- ShowLivePagesViewController")
+        showLogger.info("deinit-- ShowLivePagesViewController", context: kPagesVCTag)
         ShowAgoraKitManager.shared.leaveAllRoom()
         self.roomVCMap.forEach { (key: String, value: ShowLiveViewController) in
             value.leaveRoom()
@@ -100,7 +101,7 @@ class ShowLivePagesViewController: ViewController {
 }
 
 
-private let kPageCacheHalfCount = 5
+private let kPageCacheHalfCount = 999999
 //MARK: private
 extension ShowLivePagesViewController {
     fileprivate func preloadEnterRoom() {
@@ -108,19 +109,12 @@ extension ShowLivePagesViewController {
         let prevIdx = (focusIndex + roomList.count - 1) % roomList.count
         let nextIdx = (focusIndex + 1) % roomList.count
         let preloadIdxs = [prevIdx, nextIdx]
-        showLogger.info("preloadEnterRoom: \(prevIdx) and \(nextIdx)", context: kShowLogBaseContext)
+        showLogger.info("preloadEnterRoom: \(prevIdx) and \(nextIdx)", context: kPagesVCTag)
         preloadIdxs.forEach { idx in
             let room = roomList[idx]
             let roomId = room.roomId
             if roomId.isEmpty {return}
             ShowAgoraKitManager.shared.updateLoadingType(roomId: roomId, channelId: roomId, playState: .prejoined)
-//            let vc = ShowLiveViewController()
-//            vc.room = room
-//            vc.loadingType = .prejoined
-//            vc.delegate = self
-//            self.roomVCMap[roomId] = vc
-//            //TODO: invoke viewdidload to join channel
-//            vc.view.frame = self.view.bounds
         }
     }
     
@@ -137,7 +131,7 @@ extension ShowLivePagesViewController {
         }
         
         guard let realCount = roomList?.count else {
-            showLogger.error("realCellIndex roomList?.count == nil", context: kShowLogBaseContext)
+            showLogger.error("realCellIndex roomList?.count == nil", context: kPagesVCTag)
             return 0
         }
         let offset = kPageCacheHalfCount
@@ -153,7 +147,7 @@ extension ShowLivePagesViewController {
         }
         
         guard let _ = roomList?.count else {
-            showLogger.error("fakeCellIndex roomList?.count == nil", context: kShowLogBaseContext)
+            showLogger.error("fakeCellIndex roomList?.count == nil", context: kPagesVCTag)
             return 0
         }
         let offset = kPageCacheHalfCount
@@ -180,7 +174,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
                                                                             for: indexPath)
         let idx = realCellIndex(with: indexPath.row)
         defer {
-            showLogger.info("collectionView cellForItemAt: \(idx)/\(indexPath.row)  cache vc count: \(self.roomVCMap.count)")
+            showLogger.info("collectionView cellForItemAt: \(idx)/\(indexPath.row)  cache vc count: \(self.roomVCMap.count)", context: kPagesVCTag)
         }
         
         guard let room = self.roomList?[idx]  else {
@@ -210,10 +204,10 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
         if let origVC = origVC {
             origVC.view.removeFromSuperview()
             origVC.removeFromParent()
-            origVC.loadingType = .idle
+//            origVC.loadingType = .idle
             AppContext.unloadShowServiceImp(origVC.room?.roomId ?? "")
             self.roomVCMap[origVC.room?.roomId ?? ""] = nil
-            showLogger.info("remove cache vc: \(origVC.room?.roomId ?? "") cache vc count:\(self.roomVCMap.count)")
+            showLogger.info("remove cache vc: \(origVC.room?.roomId ?? "") cache vc count:\(self.roomVCMap.count)", context: kPagesVCTag)
         }
         
         vc.view.frame = self.view.bounds
@@ -231,11 +225,11 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         let idx = realCellIndex(with: indexPath.row)
-        showLogger.info("collectionView willDisplay: \(idx)/\(indexPath.row)  cache vc count: \(self.roomVCMap.count)")
         guard let room = self.roomList?[idx], let vc = self.roomVCMap[room.roomId] else {
 //            assert(false, "room at index \(idx) not found")
             return
         }
+        showLogger.info("willDisplay[\(room.roomId)]: \(idx)/\(indexPath.row)  cache vc count: \(self.roomVCMap.count)", context: kPagesVCTag)
         vc.loadingType = .joined
         currentVC = vc
         self.view.endEditing(true)
@@ -243,23 +237,56 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         let idx = realCellIndex(with: indexPath.row)
-        showLogger.info("collectionView didEndDisplaying: \(idx)/\(indexPath.row)  cache vc count: \(self.roomVCMap.count)")
+        if let visibleCellIndex = collectionView.indexPathsForVisibleItems.first?.row, idx == realCellIndex(with: visibleCellIndex) {
+            showLogger.info("didEndDisplaying break: \(idx)/\(indexPath.row)", context: kPagesVCTag)
+            return
+        }
         guard let room = self.roomList?[idx], let vc = self.roomVCMap[room.roomId] else {
 //            assert(false, "room at index \(idx) not found")
             return
         }
+        showLogger.info("didEndDisplaying[\(room.roomId)]: \(idx)/\(indexPath.row)  cache vc count: \(self.roomVCMap.count)", context: kPagesVCTag)
         vc.loadingType = .prejoined
         self.view.endEditing(true)
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let currentIndex = Int(scrollView.contentOffset.y / scrollView.height)
+        cleanIdleRoom()
         if currentIndex > 0, currentIndex < fakeCellCount() - 1 {return}
         let realIndex = realCellIndex(with: currentIndex)
         let toIndex = fakeCellIndex(with: realIndex)
-        showLogger.info("collectionView scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)")
+        showLogger.info("scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)", context: kPagesVCTag)
         
         scroll(to: toIndex)
+    }
+    
+    func cleanIdleRoom() {
+        var visibleCell: UICollectionViewCell?
+        var visibleIndex: Int?
+        for (i, cell) in collectionView.visibleCells.enumerated() {
+            if cell.convert(cell.bounds.origin, from: self.view) == .zero {
+                visibleIndex = collectionView.indexPathsForVisibleItems[i].row
+                visibleCell = cell
+            }
+        }
+        
+        guard let visibleCellIndex = visibleIndex, let roomList = roomList else {return}
+        let visibleIndexs = [visibleCellIndex + roomList.count - 1, visibleCellIndex, visibleCellIndex + 1]
+        var visibleRoomIds: [String] = []
+        visibleIndexs.forEach { index in
+            let realIndex = self.realCellIndex(with: index)
+            let room = self.roomList?[realIndex]
+            visibleRoomIds.append(room?.roomId ?? "")
+        }
+        
+        showLogger.info("cleanIdleRoom without \(visibleRoomIds))", context: kPagesVCTag)
+        ShowAgoraKitManager.shared.cleanChannel(without: visibleRoomIds)
+        
+        //refresh visibleCell canvas after scroll to prevent adjacent rooms of pk from causing no display of images
+        showLogger.info("updateRemoteCavans: \(currentVC?.room?.roomId ?? "")", context: kPagesVCTag)
+        let currentVC = visibleCell?.contentView.viewWithTag(kShowLiveRoomViewTag)?.next as? ShowLiveViewController
+        currentVC?.updateRemoteCavans()
     }
 }
 

@@ -169,8 +169,6 @@ extension CallMessageManager {
             callMessagePrint("3/3 waiting for snapshot")
             //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
             snapshotDidRecv = {[weak self] in
-                //暂时忽略改error
-//                error3 = err
                 self?.callMessagePrint("3/3 recv snapshot")
                 group.leave()
             }
@@ -535,6 +533,7 @@ extension CallMessageManager {
     private func callMessagePrint(_ message: String) {
         delegate?.debugInfo(message: "[MessageManager]\(message)")
         #if DEBUG
+        if let _ = delegate {return}
         print("[CallApi][MessageManager]\(message)")
         #endif
     }
@@ -542,6 +541,7 @@ extension CallMessageManager {
     private func callWarningPrint(_ message: String) {
         delegate?.debugWarning(message: "[MessageManager]\(message)")
         #if DEBUG
+        if let _ = delegate {return}
         print("[CallApi][Warning][MessageManager]\(message)")
         #endif
     }
