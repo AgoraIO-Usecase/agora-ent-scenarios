@@ -25,6 +25,9 @@ class VideoLoaderProfiler: NSObject, AgoraRtcEngineDelegate {
         let channelId = ""//self.room?.roomId ?? ""
         let cost = Int64(Date().timeIntervalSince1970 * 1000) - startTime
         let roomId = roomId ?? ""
+        #if DEBUG
+        printClosure?("remoteVideoStateChangedOfUid[\(roomId)]: \(uid) state: \(state.rawValue) reason: \(reason.rawValue)")
+        #endif
         DispatchQueue.main.async {
             if state == .decoding /*2*/,
                ( reason == .remoteUnmuted /*6*/ || reason == .localUnmuted /*4*/ || reason == .localMuted /*3*/ )   {

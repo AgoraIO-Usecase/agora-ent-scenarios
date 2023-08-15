@@ -45,7 +45,7 @@ PODS:
     - SDWebImage/Core (~> 4.2)
   - SenseLib (1.0)
   - SnapKit (5.6.0)
-  - SocketRocket (0.6.0)
+  - SocketRocket (0.7.0)
   - SSZipArchive (2.4.3)
   - SVGAPlayer (2.5.7):
     - SVGAPlayer/Core (= 2.5.7)
@@ -89,7 +89,7 @@ DEPENDENCIES:
   - SDWebImageAPNGCoder
   - SenseLib (from `sense.podspec`)
   - SnapKit
-  - SocketRocket (= 0.6.0)
+  - SocketRocket (= 0.7.0)
   - SVGAPlayer
   - SVProgressHUD (= 2.2.5)
   - SwiftyBeaver (= 1.9.5)
@@ -165,7 +165,7 @@ SPEC CHECKSUMS:
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
   SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
-  SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
+  SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
@@ -176,6 +176,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 6db6129a3a33c3f10e155b3fab4ed11155a0551a
+PODFILE CHECKSUM: c04932af2ce04d1af1601c0eec20576b2a08af20
 
 COCOAPODS: 1.12.1

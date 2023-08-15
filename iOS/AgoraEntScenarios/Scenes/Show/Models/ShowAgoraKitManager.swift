@@ -328,6 +328,13 @@ class ShowAgoraKitManager: NSObject {
         engine.enableVirtualBackground(isOn, backData: source, segData: seg)
     }
     
+    
+    /// 预加载
+    /// - Parameter preloadRoomList: <#preloadRoomList description#>
+    public func preloadRoom(preloadRoomList: [RoomInfo]) {
+        videoLoader?.preloadRoom(preloadRoomList: preloadRoomList)
+    }
+    
     func updateChannelEx(channelId: String, options: AgoraRtcChannelMediaOptions) {
         guard let engine = engine,
               let connection = (broadcasterConnection?.channelId == channelId ? broadcasterConnection : nil) ?? videoLoader?.getConnectionMap()[channelId] else {
