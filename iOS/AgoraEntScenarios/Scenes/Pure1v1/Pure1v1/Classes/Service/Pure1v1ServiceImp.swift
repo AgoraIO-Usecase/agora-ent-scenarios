@@ -59,6 +59,14 @@ class Pure1v1ServiceImp: NSObject {
         return manager
     }()
     
+    private func checkState() -> NSError? {
+        guard syncUtilsInited else {
+            return NSError(domain: "initializing", code: -1)
+        }
+        
+        return state == .open ? nil : NSError(domain: "network error", code: -1)
+    }
+    
     private func initScene(completion: @escaping (NSError?) -> Void) {
         if syncUtilsInited {
             completion(nil)
@@ -123,33 +131,32 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
             return
         }
         pure1v1Print("createUser start")
-        initScene {[weak self] error in
-            if let error = error {
-                pure1v1Print("createUser fail1: \(error.localizedDescription)")
-                completion(error)
-                return
-            }
-            let params = user.yy_modelToJSONObject() as? [String: Any]
-            let scene = Scene(id: user.getRoomId(), userId: user.userId, isOwner: true, property: params)
-            self?.manager.createScene(scene: scene, success: {[weak self] in
-                guard let self = self else {return}
-                self.manager.joinScene(sceneId: user.getRoomId()) { sceneRef in
-                    pure1v1Print("createUser success")
-                    mainTreadTask {
-                        self.sceneRefs[user.getRoomId()] = sceneRef
-                        completion(nil)
-                    }
-                } fail: { error in
-                    pure1v1Print("createUser fail2: \(error.localizedDescription)")
-                    mainTreadTask {
-                        completion(error)
-                    }
+        if let error = checkState() {
+            pure1v1Print("enterRoom fail1: \(error.localizedDescription)")
+            completion(error)
+            return
+        }
+        
+        let params = user.yy_modelToJSONObject() as? [String: Any]
+        let scene = Scene(id: user.getRoomId(), userId: user.userId, isOwner: true, property: params)
+        manager.createScene(scene: scene, success: {[weak self] in
+            guard let self = self else {return}
+            self.manager.joinScene(sceneId: user.getRoomId()) { sceneRef in
+                pure1v1Print("createUser success")
+                mainTreadTask {
+                    self.sceneRefs[user.getRoomId()] = sceneRef
+                    completion(nil)
                 }
-            }) { error in
-                pure1v1Print("createUser fail3: \(error.localizedDescription)")
+            } fail: { error in
+                pure1v1Print("createUser fail2: \(error.localizedDescription)")
                 mainTreadTask {
                     completion(error)
                 }
+            }
+        }) { error in
+            pure1v1Print("createUser fail3: \(error.localizedDescription)")
+            mainTreadTask {
+                completion(error)
             }
         }
     }
