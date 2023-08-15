@@ -17,7 +17,7 @@ import java.util.concurrent.Executors
 object RtcEngineInstance {
 
     val videoEncoderConfiguration = VideoEncoderConfiguration().apply {
-        orientationMode = VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT
+        orientationMode = VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_ADAPTIVE
     }
     val virtualBackgroundSource = VirtualBackgroundSource().apply {
         backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR
