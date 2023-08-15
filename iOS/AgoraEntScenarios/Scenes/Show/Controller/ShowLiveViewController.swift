@@ -289,11 +289,11 @@ class ShowLiveViewController: UIViewController {
     }
     
     private func joinChannel(needUpdateCavans: Bool = true) {
-        ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: roomId)
         guard let channelId = room?.roomId, let ownerId = room?.ownerId,  let uid: UInt = UInt(ownerId) else {
             return
         }
         currentChannelId = channelId
+        ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: channelId)
         if needUpdateCavans {
             if self.role == .audience {
                 ShowAgoraKitManager.shared.setupRemoteVideo(channelId: channelId,
@@ -658,6 +658,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             let interactionRoomId = interaction.roomId
             if interactionRoomId.isEmpty { return }
             if roomId != interaction.roomId {
+                ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: interactionRoomId)
+                
                 let uid = UInt(interaction.userId)!
                 ShowAgoraKitManager.shared.updateVideoProfileForMode(.pk)
                 currentChannelId = roomId
@@ -712,6 +714,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _onStopInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
+            ShowAgoraKitManager.shared.removeRtcDelegate(delegate: self, roomId: interaction.roomId)
+            
             self.muteLocalVideo = false
             self.muteLocalAudio = false
             ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)
