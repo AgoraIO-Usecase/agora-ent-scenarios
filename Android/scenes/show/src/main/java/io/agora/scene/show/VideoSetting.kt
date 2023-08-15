@@ -6,6 +6,7 @@ import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.SimulcastStreamConfig
 import io.agora.rtc2.video.*
 import io.agora.scene.base.Constant
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.GsonUtil
 import io.agora.scene.base.utils.SPUtil
 
@@ -843,17 +844,22 @@ object VideoSetting {
             }
         }
         PVC?.let {
+            // 1080p 有可能pvc自动关闭，设置私参提高pvc最大支持分辨率限制
             //rtcEngine.setParameters("{\"rtc.video.pvc_max_support_resolution\": 2073600}")
+            // pvc 单帧耗时超过一定时间限制会自动关闭， 设置私参提高pvc最大支持单帧耗时
             //rtcEngine.setParameters("{\"rtc.video.maxCosttime4AIExt\": {\"pvc_max\": 20}}")
             rtcEngine.setParameters("{\"rtc.video.enable_pvc\":${it}}")
         }
-        captureResolution?.let {
-            val fps: Int = frameRate?.fps.let { getCurrBroadcastSetting().video.frameRate.fps }
-            rtcEngine.setCameraCapturerConfiguration(CameraCapturerConfiguration(
-                CameraCapturerConfiguration.CaptureFormat(it.width, it.height, fps)
-            ).apply {
-                followEncodeDimensionRatio = true
-            })
+        // 开发者模式下采集分辨率由开发者模式高级设置决定
+        if (!AgoraApplication.the().isDebugModeOpen) {
+            captureResolution?.let {
+                val fps: Int = frameRate?.fps.let { getCurrBroadcastSetting().video.frameRate.fps }
+                rtcEngine.setCameraCapturerConfiguration(CameraCapturerConfiguration(
+                    CameraCapturerConfiguration.CaptureFormat(it.width, it.height, fps)
+                ).apply {
+                    followEncodeDimensionRatio = true
+                })
+            }
         }
         encoderResolution?.let {
             videoEncoderConfiguration.dimensions =

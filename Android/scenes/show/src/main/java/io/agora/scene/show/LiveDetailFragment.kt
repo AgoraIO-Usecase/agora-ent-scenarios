@@ -1533,17 +1533,17 @@ class LiveDetailFragment : Fragment() {
         val uid = UserManager.getInstance().user.id
         val channelName = mRoomInfo.roomId
 
-//        AudioModeration.moderationAudio(
-//            channelName,
-//            uid,
-//            AudioModeration.AgoraChannelType.broadcast,
-//            "show"
-//        )
+        AudioModeration.moderationAudio(
+            channelName,
+            uid,
+            AudioModeration.AgoraChannelType.broadcast,
+            "show"
+        )
 
         if (!isRoomOwner && mRtcEngine.queryDeviceScore() < 75) {
-            // 低端机观众加入频道前默认开启硬解
+            // 低端机观众加入频道前默认开启硬解（解决看高分辨率卡顿问题），但是在410分支硬解码会带来200ms的秒开耗时增加
             mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
-            // 低端机观众加入频道前默认开启下行零拷贝
+            // 低端机观众加入频道前默认开启下行零拷贝，下行零拷贝和超分有冲突， 低端机默认关闭超分
             mRtcEngine.setParameters("\"rtc.video.decoder_out_byte_frame\": true")
         } else {
             // 主播加入频道前默认关闭硬解
