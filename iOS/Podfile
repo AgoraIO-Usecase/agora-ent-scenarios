@@ -49,7 +49,7 @@ def all_pods
   #ThirdParty
   pod 'HWWeakTimer', '1.0'
   pod 'LSTPopView', '0.3.10'
-  pod 'SocketRocket', '0.6.0'
+  pod 'SocketRocket', '0.7.0'
   pod 'Agora-Scene-Utils', '1.1.0'
   
   #歌词组件

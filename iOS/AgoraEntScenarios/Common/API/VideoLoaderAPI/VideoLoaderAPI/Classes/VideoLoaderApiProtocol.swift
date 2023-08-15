@@ -25,7 +25,7 @@ public class VideoLoaderConfig: NSObject {
 //房间信息
 public class RoomInfo: NSObject {
     public var channelName: String = ""   //频道名
-    public var uid: UInt = 0               //频道对应的uid
+    public var uid: UInt = 0              //频道对应的uid
     public var token: String = ""         //频道对应的token
 }
 

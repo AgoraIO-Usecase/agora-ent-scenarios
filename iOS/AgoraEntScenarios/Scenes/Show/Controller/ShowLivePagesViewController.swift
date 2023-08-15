@@ -29,6 +29,7 @@ class ShowLivePagesViewController: ViewController {
         layout.itemSize = self.view.bounds.size
         let collectionView = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(UICollectionViewCell.self))
+        collectionView.scrollsToTop = false
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.isPagingEnabled = true
@@ -237,7 +238,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         let idx = realCellIndex(with: indexPath.row)
-        if let visibleCellIndex = collectionView.indexPathsForVisibleItems.first?.row, idx == realCellIndex(with: visibleCellIndex) {
+        if let visibleCellIndex = _getVisibleCellTuple().0, idx == realCellIndex(with: visibleCellIndex) {
             showLogger.info("didEndDisplaying break: \(idx)/\(indexPath.row)", context: kPagesVCTag)
             return
         }
@@ -261,15 +262,20 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
         scroll(to: toIndex)
     }
     
-    func cleanIdleRoom() {
-        var visibleCell: UICollectionViewCell?
-        var visibleIndex: Int?
+    private func _getVisibleCellTuple() -> (Int?, UICollectionViewCell?) {
         for (i, cell) in collectionView.visibleCells.enumerated() {
             if cell.convert(cell.bounds.origin, from: self.view) == .zero {
-                visibleIndex = collectionView.indexPathsForVisibleItems[i].row
-                visibleCell = cell
+                return (collectionView.indexPathsForVisibleItems[i].row, cell)
             }
         }
+        
+        return (nil, nil)
+    }
+    
+    private func cleanIdleRoom() {
+        let tuple = _getVisibleCellTuple()
+        let visibleCell: UICollectionViewCell? = tuple.1
+        let visibleIndex: Int? = tuple.0
         
         guard let visibleCellIndex = visibleIndex, let roomList = roomList else {return}
         let visibleIndexs = [visibleCellIndex + roomList.count - 1, visibleCellIndex, visibleCellIndex + 1]
