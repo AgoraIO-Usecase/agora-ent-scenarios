@@ -223,15 +223,17 @@ class ShowLiveViewController: UIViewController {
         } else { // 自己是观众
             self.joinChannel(needUpdateCavans: self.loadingType == .joined)
             AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
+                guard let self = self else {return}
                 showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
                 showLogger.info("joinRoom[\(room.roomId)] roomModel: \(detailModel?.roomId ?? "null")")
                 if detailModel == nil {
-                    self?.onRoomExpired()
+                    self.onRoomExpired()
                     if let err = error {
                         ToastView.show(text: err.localizedDescription)
                     }
                 } else {
-                    self?._subscribeServiceEvent()
+                    self._subscribeServiceEvent()
+                    self.updateLoadingType(playState: self.loadingType)
                 }
             }
         }
