@@ -223,17 +223,16 @@ class ShowLiveViewController: UIViewController {
         } else { // 自己是观众
             self.joinChannel(needUpdateCavans: self.loadingType == .joined)
             AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
-                guard let self = self else { return }
                 showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
-                if let err = error {
-                    if err.code == -1 {
-                        self.onRoomExpired()
-                    } else {
+                showLogger.info("joinRoom[\(room.roomId)] roomModel: \(detailModel?.roomId ?? "null")")
+                if detailModel == nil {
+                    self?.onRoomExpired()
+                    if let err = error {
                         ToastView.show(text: err.localizedDescription)
                     }
-                    return
+                } else {
+                    self?._subscribeServiceEvent()
                 }
-                self._subscribeServiceEvent()
             }
         }
     }
@@ -838,9 +837,6 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
                     self.throttleRefreshRealTimeInfo()
                 }
             }
-//            if self.loadingType != .joined {
-//                self.updateLoadingType(playState: self.loadingType)
-//            }
         }
     }
     
@@ -967,7 +963,7 @@ extension ShowLiveViewController {
                 if self.role == .audience && self.interactionStatus != .pking && self.interactionStatus != .onSeat {
                     send = false
                 }
-                let data = self.panelPresenter.generatePanelData(audioOnly: false, send: send, receive: receive)
+                let data = self.panelPresenter.generatePanelData(audioOnly: false, send: send, receive: receive, audience: (self.role == .audience))
                 self.realTimeView.update(left: data.left, right: data.right)
             }
         }
