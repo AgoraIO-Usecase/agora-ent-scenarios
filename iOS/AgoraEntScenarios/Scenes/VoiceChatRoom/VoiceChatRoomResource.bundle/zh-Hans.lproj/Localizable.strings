@@ -161,7 +161,7 @@
 "voice_you_have_no_wheat_slots" = "只有上麦用户才可以设置麦克风";
 "voice_members_reach_limit" = "房间人数超过限制";
 "voice_content_prohibited" = "内容禁止发送";
-"voice_im_key_empty_error" = "参数非法，请检查 KeyCenter.swift中的 ’IMAppKey’ / ‘IMClientId’ / ‘IMClientSecret’";
+"voice_im_key_empty_error" = "参数非法，请检查 KeyCenter.swift中的 ’IMAppKey’";
 "voice_AIAEC" = "AI回声消除";
 "voice_AGC" = "人声自动增益";
 "voice_agora_blue_and_red_bot" = "声蓝羽&声红颜";
