@@ -11,15 +11,27 @@ private let ShowPresettingCellID = "ShowPresettingCellID"
 private let ShowPresettingHeaderViewID = "ShowPresettingHeaderViewID"
 class ShowNetStateSelectViewController: UIViewController {
     
+    private enum SectionType {
+        case deviceLevel
+        case netCondition
+        case performance
+    }
+    
     public static func showInViewController(_ viewController: UIViewController) {
         let vc = ShowNetStateSelectViewController()
         vc.modalPresentationStyle = .fullScreen
         viewController.present(vc, animated: true)
     }
-        
+    
+    private var sections: [SectionType] = [.performance, .netCondition]
+    
+    private var deviceLevels: [ShowAgoraKitManager.DeviceLevel] = [.high, .medium, .low]
+    
     private var netConditions: [ShowAgoraKitManager.NetCondition] = [.good, .bad]
     
     private var performances: [ShowAgoraKitManager.PerformanceMode] = [.fluent, .smooth]
+    
+    private var aDeviceLevel: ShowAgoraKitManager.DeviceLevel = .high
     
     private var aNetCondition: ShowAgoraKitManager.NetCondition = .good
     
@@ -34,8 +46,11 @@ class ShowNetStateSelectViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        aDeviceLevel = ShowAgoraKitManager.shared.deviceLevel
+        
         createViews()
         createConstrains()
+        updateSections()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -45,8 +60,24 @@ class ShowNetStateSelectViewController: UIViewController {
     @objc private func onClickSubmit() {
         ShowAgoraKitManager.shared.netCondition = aNetCondition
         ShowAgoraKitManager.shared.performanceMode = aPerformance
+        ShowAgoraKitManager.shared.deviceLevel = aDeviceLevel
         ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)
         dismiss(animated: true)
+    }
+    
+    private func updateSections() {
+        var temp: [SectionType] = []
+        if AppContext.shared.isDebugMode {
+            temp.append(.deviceLevel)
+        }
+        temp.append(.performance)
+        if aPerformance == .fluent {
+            temp.append(.netCondition)
+        }
+        sections = temp
+        let deviceStr = aDeviceLevel.description() + "（\(ShowAgoraKitManager.shared.deviceScore)）"
+        footerView.setDeviceLevel(text: deviceStr)
+        tableView.reloadData()
     }
 }
 
@@ -54,39 +85,59 @@ class ShowNetStateSelectViewController: UIViewController {
 extension ShowNetStateSelectViewController: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        if (aPerformance == .smooth) {
-            return 1
-        } else {
-            return 2
-        }
+        return sections.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if (section == 0) {
+        let sectionType = sections[section]
+        if (sectionType == .deviceLevel) {
+            return deviceLevels.count
+        } else if (sectionType == .performance) {
             return performances.count
-        } else {
+        } else if (sectionType == .netCondition) {
             return netConditions.count
+        } else {
+            return 0
         }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ShowPresettingCellID, for: indexPath) as! ShowPresettingCell
-        if indexPath.section == 0 {
+        let sectionType = sections[indexPath.section]
+        if (sectionType == .deviceLevel) {
+            let a = deviceLevels[indexPath.row]
+            switch a {
+            case .high:
+                cell.setTitle("show_presetting_device_level_high_title".show_localized,
+                              desc: "show_presetting_device_level_high_desc".show_localized)
+            case .medium:
+                cell.setTitle("show_presetting_device_level_medium_title".show_localized,
+                              desc: "show_presetting_device_level_medium_desc".show_localized)
+            case .low:
+                cell.setTitle("show_presetting_device_level_low_title".show_localized,
+                              desc: "show_presetting_device_level_low_desc".show_localized)
+            }
+            cell.aSelected = (aDeviceLevel == a)
+        } else if (sectionType == .performance) {
             let a = performances[indexPath.row]
             switch a {
             case .smooth:
-                cell.setTitle("show_presetting_performances_smooth".show_localized, desc: "show_presetting_performances_smooth".show_localized)
+                cell.setTitle("show_presetting_performances_smooth".show_localized,
+                              desc: "show_presetting_performances_smooth".show_localized)
             case .fluent:
-                cell.setTitle("show_presetting_performances_fluent".show_localized, desc: "show_presetting_performances_fluent".show_localized)
+                cell.setTitle("show_presetting_performances_fluent".show_localized,
+                              desc: "show_presetting_performances_fluent".show_localized)
             }
             cell.aSelected = (aPerformance == a)
         } else {
             let a = netConditions[indexPath.row]
             switch a {
             case .good:
-                cell.setTitle("show_presetting_net_good".show_localized, desc: "show_presetting_net_good_detail".show_localized)
+                cell.setTitle("show_presetting_net_good".show_localized,
+                              desc: "show_presetting_net_good_detail".show_localized)
             case .bad:
-                cell.setTitle("show_presetting_net_bad".show_localized, desc: "show_presetting_net_bad_detail".show_localized)
+                cell.setTitle("show_presetting_net_bad".show_localized,
+                              desc: "show_presetting_net_bad_detail".show_localized)
             }
             cell.aSelected = (aNetCondition == a)
         }
@@ -95,10 +146,16 @@ extension ShowNetStateSelectViewController: UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: ShowPresettingHeaderViewID) as! ShowPresettingHeaderView
-        if (section == 0) {
-            headerView.setTitle("show_presetting_performances_title".show_localized, desc: "show_presetting_performances_title_detail".show_localized, type: .douyin)
-        } else {
-            headerView.setTitle("show_presetting_net_title".show_localized, desc: "show_presetting_net_title_detail".show_localized, type: .douyin)
+        let sectionType = sections[section]
+        if (sectionType == .deviceLevel) {
+            headerView.setTitle("show_presetting_mode_show_title".show_localized,
+                                desc: "show_presetting_mode_show_desc".show_localized)
+        } else if (sectionType == .performance) {
+            headerView.setTitle("show_presetting_performances_title".show_localized,
+                                desc: "show_presetting_performances_title_detail".show_localized)
+        } else if (sectionType == .netCondition) {
+            headerView.setTitle("show_presetting_net_title".show_localized,
+                                desc: "show_presetting_net_title_detail".show_localized)
         }
         return headerView
     }
@@ -108,12 +165,15 @@ extension ShowNetStateSelectViewController: UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.section == 0 {
+        let sectionType = sections[indexPath.section]
+        if (sectionType == .deviceLevel) {
+            aDeviceLevel = deviceLevels[indexPath.row]
+        } else if (sectionType == .performance) {
             aPerformance = performances[indexPath.row]
-        } else {
+        } else if (sectionType == .netCondition) {
             aNetCondition = netConditions[indexPath.row]
         }
-        tableView.reloadData()
+        updateSections()
     }
 }
 // MARK: - Creations
@@ -121,7 +181,7 @@ extension ShowNetStateSelectViewController {
     
     func createViews() {
         view.backgroundColor = .white
-        let deviceStr = ShowAgoraKitManager.shared.deviceLevel.description() + "（\(ShowAgoraKitManager.shared.deviceScore)）"
+        let deviceStr = aDeviceLevel.description() + "（\(ShowAgoraKitManager.shared.deviceScore)）"
         footerView.setDeviceLevel(text: deviceStr)
         
         tableView.backgroundColor = .white
