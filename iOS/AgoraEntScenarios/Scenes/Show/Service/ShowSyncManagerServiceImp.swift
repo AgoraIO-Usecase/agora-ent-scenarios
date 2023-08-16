@@ -1841,7 +1841,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
             }
             SyncUtil.fetchAll { results in
                 agoraPrint("result == \(results.compactMap { $0.toJson() })")
-                var dataArray = results.map({ info in
+                var dataArray = results.filter({$0.getId().count > 0}).map({ info in
                     return ShowRoomListModel.yy_model(with: info.toJson()!.toDictionary())!
                 })
                 dataArray = ShowRobotService.shared.generateRobotRoomsAppend(rooms: dataArray)
