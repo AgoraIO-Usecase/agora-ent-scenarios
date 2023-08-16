@@ -82,7 +82,6 @@
 		DD36106729B70CDC00CE7984 /* ShowAgoraKitManager+DebugSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FBF29B70CDC00CE7984 /* ShowAgoraKitManager+DebugSetting.swift */; };
 		DD36106829B70CDC00CE7984 /* ShowDebug2TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FC129B70CDC00CE7984 /* ShowDebug2TFModel.swift */; };
 		DD36106929B70CDC00CE7984 /* ShowSettingKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FC229B70CDC00CE7984 /* ShowSettingKey.swift */; };
-		DD36106A29B70CDC00CE7984 /* ShowPresettingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FC329B70CDC00CE7984 /* ShowPresettingModel.swift */; };
 		DD36106B29B70CDC00CE7984 /* ShowDebug1TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FC429B70CDC00CE7984 /* ShowDebug1TFModel.swift */; };
 		DD36108929B70CDC00CE7984 /* ShowRoomListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36100129B70CDC00CE7984 /* ShowRoomListVC.swift */; };
 		DD36108B29B70CDC00CE7984 /* ShowReceivePKAlertVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36100429B70CDC00CE7984 /* ShowReceivePKAlertVC.swift */; };
@@ -97,7 +96,6 @@
 		DD36109429B70CDC00CE7984 /* ShowSettingActionSheetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36100F29B70CDC00CE7984 /* ShowSettingActionSheetVC.swift */; };
 		DD36109529B70CDC00CE7984 /* ShowDebugSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36101029B70CDC00CE7984 /* ShowDebugSettingVC.swift */; };
 		DD36109629B70CDC00CE7984 /* ShowAdvancedSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36101129B70CDC00CE7984 /* ShowAdvancedSettingVC.swift */; };
-		DD36109729B70CDC00CE7984 /* ShowPresettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36101229B70CDC00CE7984 /* ShowPresettingVC.swift */; };
 		DD36109829B70CDC00CE7984 /* ShowVideoSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36101329B70CDC00CE7984 /* ShowVideoSettingVC.swift */; };
 		DD36109929B70CDC00CE7984 /* ShowCunstomNaviBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36101429B70CDC00CE7984 /* ShowCunstomNaviBar.swift */; };
 		DD36109A29B70CDC00CE7984 /* ShowPresentTransitioningDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36101629B70CDC00CE7984 /* ShowPresentTransitioningDelegate.swift */; };
@@ -731,7 +729,6 @@
 		DD360FBF29B70CDC00CE7984 /* ShowAgoraKitManager+DebugSetting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ShowAgoraKitManager+DebugSetting.swift"; sourceTree = "<group>"; };
 		DD360FC129B70CDC00CE7984 /* ShowDebug2TFModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebug2TFModel.swift; sourceTree = "<group>"; };
 		DD360FC229B70CDC00CE7984 /* ShowSettingKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingKey.swift; sourceTree = "<group>"; };
-		DD360FC329B70CDC00CE7984 /* ShowPresettingModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowPresettingModel.swift; sourceTree = "<group>"; };
 		DD360FC429B70CDC00CE7984 /* ShowDebug1TFModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebug1TFModel.swift; sourceTree = "<group>"; };
 		DD36100129B70CDC00CE7984 /* ShowRoomListVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowRoomListVC.swift; sourceTree = "<group>"; };
 		DD36100429B70CDC00CE7984 /* ShowReceivePKAlertVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowReceivePKAlertVC.swift; sourceTree = "<group>"; };
@@ -746,7 +743,6 @@
 		DD36100F29B70CDC00CE7984 /* ShowSettingActionSheetVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingActionSheetVC.swift; sourceTree = "<group>"; };
 		DD36101029B70CDC00CE7984 /* ShowDebugSettingVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugSettingVC.swift; sourceTree = "<group>"; };
 		DD36101129B70CDC00CE7984 /* ShowAdvancedSettingVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowAdvancedSettingVC.swift; sourceTree = "<group>"; };
-		DD36101229B70CDC00CE7984 /* ShowPresettingVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowPresettingVC.swift; sourceTree = "<group>"; };
 		DD36101329B70CDC00CE7984 /* ShowVideoSettingVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowVideoSettingVC.swift; sourceTree = "<group>"; };
 		DD36101429B70CDC00CE7984 /* ShowCunstomNaviBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowCunstomNaviBar.swift; sourceTree = "<group>"; };
 		DD36101629B70CDC00CE7984 /* ShowPresentTransitioningDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowPresentTransitioningDelegate.swift; sourceTree = "<group>"; };
@@ -1743,7 +1739,6 @@
 				E32C7EA82A20B03F00512523 /* ShowDebugPrivateParamsVC.swift */,
 				DD360FC129B70CDC00CE7984 /* ShowDebug2TFModel.swift */,
 				DD360FC229B70CDC00CE7984 /* ShowSettingKey.swift */,
-				DD360FC329B70CDC00CE7984 /* ShowPresettingModel.swift */,
 				DD360FC429B70CDC00CE7984 /* ShowDebug1TFModel.swift */,
 			);
 			path = Setting;
@@ -1805,7 +1800,6 @@
 				DD36100F29B70CDC00CE7984 /* ShowSettingActionSheetVC.swift */,
 				DD36101029B70CDC00CE7984 /* ShowDebugSettingVC.swift */,
 				DD36101129B70CDC00CE7984 /* ShowAdvancedSettingVC.swift */,
-				DD36101229B70CDC00CE7984 /* ShowPresettingVC.swift */,
 				DD36101329B70CDC00CE7984 /* ShowVideoSettingVC.swift */,
 				DD36101429B70CDC00CE7984 /* ShowCunstomNaviBar.swift */,
 				ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */,
@@ -3641,7 +3635,6 @@
 				DD36105E29B70CDC00CE7984 /* ShowThrottle.swift in Sources */,
 				DD619A6B29E3E247008F63E4 /* SAVerifyCodeView.swift in Sources */,
 				DDA199E928FFE579009D3E61 /* VLResponseDataModel.m in Sources */,
-				DD36109729B70CDC00CE7984 /* ShowPresettingVC.swift in Sources */,
 				DD0292E5295BF0DC00485225 /* VLKTVKindsCell.m in Sources */,
 				E3735CA72A5E8023004737EF /* VRBaseViewController.swift in Sources */,
 				DD619BCD29E3E262008F63E4 /* VMAudioSettingView.swift in Sources */,
@@ -4004,7 +3997,6 @@
 				DD3610A529B70CDC00CE7984 /* ShowCreateLiveView.swift in Sources */,
 				DD0292D9295BF0DC00485225 /* VLDropOnLineView.m in Sources */,
 				DD619BFE29E3E262008F63E4 /* VRRoomListView.swift in Sources */,
-				DD36106A29B70CDC00CE7984 /* ShowPresettingModel.swift in Sources */,
 				DD0292D4295BF0DC00485225 /* VLKTVMVIdleView.m in Sources */,
 				E3735CB02A5FA3B3004737EF /* VLRoomSelSongModel.swift in Sources */,
 				DD3610A929B70CDC00CE7984 /* ShowRealTimeDataView.swift in Sources */,
