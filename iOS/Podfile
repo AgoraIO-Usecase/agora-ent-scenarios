@@ -43,8 +43,6 @@ def all_pods
 # pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
 #  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.142'
 
-#  pod 'AgoraRtmKit2', :path => 'Rtm2'
-  pod 'AgRtmKit2_Test'
   pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
   pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
 
