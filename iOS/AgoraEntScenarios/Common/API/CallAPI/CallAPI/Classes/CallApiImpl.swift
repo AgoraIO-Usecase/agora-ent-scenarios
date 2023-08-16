@@ -7,7 +7,7 @@
 
 import Foundation
 import AgoraRtcKit
-import AgoraRtmKit2
+import AgoraRtmKit
 
 private let kRetryCount: Int = 3
 private let kCallTimeoutInterval = 15.0
