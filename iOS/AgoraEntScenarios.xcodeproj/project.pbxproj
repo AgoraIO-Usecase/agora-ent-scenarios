@@ -85,7 +85,6 @@
 		DD36106A29B70CDC00CE7984 /* ShowPresettingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FC329B70CDC00CE7984 /* ShowPresettingModel.swift */; };
 		DD36106B29B70CDC00CE7984 /* ShowDebug1TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FC429B70CDC00CE7984 /* ShowDebug1TFModel.swift */; };
 		DD36108929B70CDC00CE7984 /* ShowRoomListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36100129B70CDC00CE7984 /* ShowRoomListVC.swift */; };
-		DD36108A29B70CDC00CE7984 /* ShowReceiveLiveFinishAlertVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36100329B70CDC00CE7984 /* ShowReceiveLiveFinishAlertVC.swift */; };
 		DD36108B29B70CDC00CE7984 /* ShowReceivePKAlertVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36100429B70CDC00CE7984 /* ShowReceivePKAlertVC.swift */; };
 		DD36108C29B70CDC00CE7984 /* ShowMusicEffectVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36100529B70CDC00CE7984 /* ShowMusicEffectVC.swift */; };
 		DD36108D29B70CDC00CE7984 /* ShowSelectQualityVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36100729B70CDC00CE7984 /* ShowSelectQualityVC.swift */; };
@@ -735,7 +734,6 @@
 		DD360FC329B70CDC00CE7984 /* ShowPresettingModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowPresettingModel.swift; sourceTree = "<group>"; };
 		DD360FC429B70CDC00CE7984 /* ShowDebug1TFModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebug1TFModel.swift; sourceTree = "<group>"; };
 		DD36100129B70CDC00CE7984 /* ShowRoomListVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowRoomListVC.swift; sourceTree = "<group>"; };
-		DD36100329B70CDC00CE7984 /* ShowReceiveLiveFinishAlertVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowReceiveLiveFinishAlertVC.swift; sourceTree = "<group>"; };
 		DD36100429B70CDC00CE7984 /* ShowReceivePKAlertVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowReceivePKAlertVC.swift; sourceTree = "<group>"; };
 		DD36100529B70CDC00CE7984 /* ShowMusicEffectVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowMusicEffectVC.swift; sourceTree = "<group>"; };
 		DD36100729B70CDC00CE7984 /* ShowSelectQualityVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSelectQualityVC.swift; sourceTree = "<group>"; };
@@ -1786,7 +1784,6 @@
 		DD36100229B70CDC00CE7984 /* Alert */ = {
 			isa = PBXGroup;
 			children = (
-				DD36100329B70CDC00CE7984 /* ShowReceiveLiveFinishAlertVC.swift */,
 				DD36100429B70CDC00CE7984 /* ShowReceivePKAlertVC.swift */,
 			);
 			path = Alert;
@@ -3628,7 +3625,6 @@
 				DD36108B29B70CDC00CE7984 /* ShowReceivePKAlertVC.swift in Sources */,
 				DD619BE429E3E262008F63E4 /* VoiceRoomSwitchBar.swift in Sources */,
 				DD619BC829E3E262008F63E4 /* VoiceRoomSendGiftCell.swift in Sources */,
-				DD36108A29B70CDC00CE7984 /* ShowReceiveLiveFinishAlertVC.swift in Sources */,
 				DD0292D2295BF0DC00485225 /* VLSearchSongResultView.m in Sources */,
 				DD3610BC29B70CDC00CE7984 /* ShowSettingActionSheetFooterView.swift in Sources */,
 				DD619A7929E3E247008F63E4 /* Notification+SAPresentation.swift in Sources */,
@@ -4328,7 +4324,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = B8JXV8ZYC7;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -4370,7 +4366,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = B8JXV8ZYC7;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;

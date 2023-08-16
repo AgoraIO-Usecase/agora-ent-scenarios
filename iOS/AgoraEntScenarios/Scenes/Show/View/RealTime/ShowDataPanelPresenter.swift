@@ -64,10 +64,10 @@ class ShowDataPanelPresenter {
         callTs = Int(ts)
     }
     
-    func generatePanelData(audioOnly: Bool, send: Bool, receive: Bool) -> ShowPanelData {
+    func generatePanelData(audioOnly: Bool, send: Bool, receive: Bool, audience: Bool) -> ShowPanelData {
         let sendPanel = send ? sendData(audioOnly: audioOnly) : cleanSendData()
         let receivePanel = receive ? receiveData(audioOnly: audioOnly) : cleanReceiveData()
-        let otherPanel = otherData(send: send, receive: receive)
+        let otherPanel = otherData(audience: audience)
         return ShowPanelData(
             left: [sendPanel.left, receivePanel.left, otherPanel.left].joined(separator: "\n"),
             right: [sendPanel.right, receivePanel.right, otherPanel.right].joined(separator: "\n")
@@ -148,7 +148,7 @@ class ShowDataPanelPresenter {
         return ShowPanelData(left: leftInfo, right: rightInfo)
     }
     
-    private func otherData(send: Bool, receive: Bool) -> ShowPanelData {
+    private func otherData(audience: Bool) -> ShowPanelData {
         let params = ShowAgoraKitManager.shared.rtcParam
         let onStr = "show_setting_switch_on".show_localized
         let offStr = "show_setting_switch_off".show_localized
@@ -156,16 +156,16 @@ class ShowDataPanelPresenter {
         // 其他
         let title = "show_statistic_title_other".show_localized
         // 秒开耗时
-        let startup = receive ? "\(callTs) ms" : "--"
+        let startup = audience ? "\(callTs) ms" : "--"
         let startupStr = "show_statistic_startup_time".show_localized + ": " + startup
         // h265开关
-        let h265 = send ? onStr : "--"
+        let h265 = !audience ? onStr : "--"
         let h265Str = "H265" + ": " + h265
         // 超分开关
-        let sr = receive ? (params.sr ? onStr : offStr) : "--"
+        let sr = audience ? (params.sr ? onStr : offStr) : "--"
         let srStr = "show_statistic_SR_switch".show_localized + ": " + sr
         // 小流开关
-        let microStream = send ? ((localVideoStats.dualStreamEnabled) ? onStr : offStr) : "--"
+        let microStream = !audience ? ((localVideoStats.dualStreamEnabled) ? onStr : offStr) : "--"
         let microStreamStr = "show_statistic_micro_stream_switch".show_localized + ": " + microStream
         // right:
         //机型等级
@@ -174,10 +174,10 @@ class ShowDataPanelPresenter {
         + ShowAgoraKitManager.shared.deviceLevel.description()
         + "(\(ShowAgoraKitManager.shared.deviceScore))"
         //pvc开关
-        let pvc = send ? (params.pvc ? onStr : offStr) : "--"
+        let pvc = !audience ? (params.pvc ? onStr : offStr) : "--"
         let pvcStr = "show_statistic_pvc_switch".show_localized + ": " + pvc
         //svc开关
-        let svc = send ? (params.svc ? onStr : offStr) : "--"
+        let svc = !audience ? (params.svc ? onStr : offStr) : "--"
         let svcStr = "show_statistic_svc_switch".show_localized + ": " + svc
         let left = [title, startupStr, h265Str, srStr,  microStreamStr].joined(separator: "\n") + "\n"
         let right = ["  ", levelStr,  pvcStr, svcStr].joined(separator: "\n") + "\n"

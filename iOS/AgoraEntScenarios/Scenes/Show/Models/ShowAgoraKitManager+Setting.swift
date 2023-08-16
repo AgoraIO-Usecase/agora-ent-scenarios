@@ -45,6 +45,10 @@ class ShowRTCParams {
 // MARK: - Extension
 extension ShowAgoraKitManager {
     
+    func updateAudienceProfile() {
+        _presetValuesWith(encodeSize: ._360x640, fps: .fps15, bitRate: 0, h265On: true)
+    }
+    
     /// 设置超分 不保存数据
     /// - Parameters:
     ///   - isOn: 开关
@@ -103,10 +107,11 @@ extension ShowAgoraKitManager {
             config.framerate = fps
             config.kBitrate = 65
             rtcParam.dualStream = config
+            rtcParam.svc = svc
         } else {
             rtcParam.dualStream = nil
+            rtcParam.svc = false
         }
-        rtcParam.svc = svc
     }
     /** 应用小流设置
      * 在joinChannel成功之后主播应用之前对小流的配置
@@ -145,7 +150,7 @@ extension ShowAgoraKitManager {
         updateSettingForkey(.lowlightEnhance)
         updateSettingForkey(.colorEnhance)
         updateSettingForkey(.videoDenoiser)
-        rtcParam.pvc = true
+        rtcParam.pvc = false
         updateSettingForkey(.PVC)
         rtcParam.sr = true
         updateSettingForkey(.SR)
@@ -226,7 +231,7 @@ extension ShowAgoraKitManager {
         } else if (machine == .high && net == .bad && performance == .fluent && showMode == .pk) {
             // 高端机，弱网，流畅，pk
             _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, svc: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, svc: false)
         } else if (machine == .medium && net == .good && performance == .smooth && showMode == .pk) {
             // 中端机，好网，清晰，pk
             _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
@@ -242,7 +247,7 @@ extension ShowAgoraKitManager {
         } else if (machine == .medium && net == .bad && performance == .fluent && showMode == .pk) {
             // 中端机，弱网，流畅，pk
             _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, svc: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, svc: false)
         } else if (machine == .low && net == .good && performance == .smooth && showMode == .pk) {
             // 低端机，好网，清晰，pk
             _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
@@ -258,7 +263,7 @@ extension ShowAgoraKitManager {
         } else if (machine == .low && net == .bad && performance == .fluent && showMode == .pk) {
             // 低端机，弱网，流畅，pk
             _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, svc: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, svc: false)
         }
     }
     
