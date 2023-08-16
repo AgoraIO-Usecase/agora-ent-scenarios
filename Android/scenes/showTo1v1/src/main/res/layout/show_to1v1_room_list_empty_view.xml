@@ -9,13 +9,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/showto1v1_bg" />
+        android:src="@drawable/show_to1v1_bg" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="44dp"
-        android:src="@drawable/showto1v1_empty"
+        android:src="@drawable/show_to1v1_empty"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -32,7 +32,7 @@
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="106dp"
         android:layout_height="100dp"
-        android:src="@drawable/showto1v1_icon_create"
+        android:src="@drawable/show_to1v1_icon_create"
         app:layout_constraintStart_toStartOf="@+id/vContent"
         app:layout_constraintTop_toTopOf="@+id/vContent" />
 
@@ -66,12 +66,12 @@
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnCreateRoom"
         android:layout_width="175dp"
-        android:layout_height="wrap_content"
+        android:layout_height="42dp"
         android:layout_marginTop="40dp"
         android:background="@drawable/bg_def_button_solid"
         android:drawableStart="@mipmap/icon_create_room"
-        android:gravity="center"
-        android:paddingHorizontal="36dp"
+        android:gravity="center_vertical"
+        android:paddingStart="30dp"
         android:text="@string/show_to1v1_create_room"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"

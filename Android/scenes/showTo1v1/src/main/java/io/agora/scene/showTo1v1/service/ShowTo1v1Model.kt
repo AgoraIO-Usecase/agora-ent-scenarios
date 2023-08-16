@@ -1,5 +1,7 @@
 package io.agora.scene.showTo1v1.service
 
+import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPI
+
 open class ShowTo1v1UserInfo constructor(
     val userId: String,
     val userName: String,
@@ -26,4 +28,12 @@ class ShowTo1v1RoomInfo constructor(
     var createdAt: Long, userId: String, userName: String, avatar: String,
 ) : ShowTo1v1UserInfo(userId, userName, avatar) {
 
+    fun createRoomInfo(token: String): VideoSwitcherAPI.RoomInfo {
+        return VideoSwitcherAPI.RoomInfo(
+            channelName = roomId,
+            uid = getIntUserId(),
+            token = token,
+            eventHandler = null
+        )
+    }
 }
