@@ -5,7 +5,7 @@
 //  Created by wushengtao on 2023/6/9.
 //
 
-import AgoraRtmKit2
+import AgoraRtmKit
 
 let kReceiptsKey: String = "receipts"      //回执的消息id
 let kReceiptsRoomIdKey: String = "receiptsRoomId"     //回执到哪个房间，因为没有点对点，所以单点消息通过不同房间发送消息
