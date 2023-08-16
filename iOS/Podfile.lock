@@ -21,7 +21,6 @@ PODS:
   - AgoraRtm_iOS (2.1.4)
   - AgoraSyncManager (2.0.8):
     - SocketRocket
-  - AgRtmKit2_Test (0.2.0)
   - Bugly (2.5.93)
   - BytedEffect (4.3.0):
     - SSZipArchive
@@ -91,7 +90,6 @@ DEPENDENCIES:
   - AgoraLyricsScore (= 1.1.1-beta-3)
   - AgoraRtcEngine_iOS (from `AgoraRtcEngine_iOS.podspec`)
   - AgoraSyncManager (~> 2.0.8)
-  - AgRtmKit2_Test
   - Bugly (= 2.5.93)
   - BytedEffect (from `bytedEffect.podspec`)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
@@ -127,7 +125,6 @@ SPEC REPOS:
     - AgoraLyricsScore
     - AgoraRtm_iOS
     - AgoraSyncManager
-    - AgRtmKit2_Test
     - Bugly
     - FLAnimatedImage
     - HWWeakTimer
@@ -175,7 +172,6 @@ SPEC CHECKSUMS:
   AgoraRtcEngine_iOS: 269d802dafda7090586f8a46db8a684be5019f4f
   AgoraRtm_iOS: 11b767ee81a7202dcf09e045cd2d359b5abbc965
   AgoraSyncManager: 33b8ecf2cd80550f156612d6175a0b0ed1d48497
-  AgRtmKit2_Test: 92d6b7a5c9718089dc52686117b7e18b72de48df
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   BytedEffect: 74b0bd8150ff1ab9c443d210a7ff7eb49ad3da44
   CallAPI: 66081c949cb13a280e89d3b4c195113204a46197
@@ -206,6 +202,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: f702bfaf18839dda29403b565686136633933530
+PODFILE CHECKSUM: 00e2e4566353b9f5c3a382bd8efa570708378744
 
 COCOAPODS: 1.12.1
