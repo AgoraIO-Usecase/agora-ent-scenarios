@@ -6,6 +6,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 import io.agora.scene.base.GlideApp;
+import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.ktv.singrelay.R;
 import io.agora.scene.ktv.singrelay.databinding.KtvItemRankListBinding;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
@@ -49,6 +50,7 @@ public class RankListAdapter extends BindingSingleAdapter<RankItem, KtvItemRankL
         }
 
         if (item.poster.equals("")) {
+            KTVLogger.d("hugo", "hugo");
             mBinding.ivHeader.setVisibility(View.INVISIBLE);
         } else {
             GlideApp.with(mBinding.getRoot())
