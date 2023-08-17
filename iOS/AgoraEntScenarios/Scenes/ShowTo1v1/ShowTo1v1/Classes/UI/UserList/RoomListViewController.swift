@@ -24,6 +24,16 @@ private let randomRoomName = [
 "Test Room 10",
 ]
 
+extension CallTokenConfig {
+    func tokenIsEmpty() -> Bool {
+        if rtcToken.count > 0, rtmToken.count > 0 {
+            return false
+        }
+        
+        return true
+    }
+}
+
 private let kShowGuideAlreadyKey = "already_show_guide_show1v1"
 class RoomListViewController: UIViewController {
     var userInfo: ShowTo1v1UserInfo? {
@@ -132,35 +142,6 @@ class RoomListViewController: UIViewController {
         self.view.addSubview(guideView)
         UserDefaults.standard.set(true, forKey: kShowGuideAlreadyKey)
     }
-    
-    private func _setupCallApi() {
-        guard let userInfo = userInfo else {
-            assert(false, "userInfo == nil")
-            return
-        }
-        
-        if tokenConfig.rtcToken.count > 0, tokenConfig.rtmToken.count > 0 {
-            return
-        }
-        //设置主叫频道
-        tokenConfig.roomId = userInfo.get1V1ChannelId()
-        NetworkManager.shared.generateTokens(appId: showTo1v1AppId!,
-                                             appCertificate: showTo1v1AppCertificate!,
-                                             channelName: tokenConfig.roomId,
-                                             uid: userInfo.userId,
-                                             tokenGeneratorType: .token007,
-                                             tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
-            guard let self = self else {return}
-            guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue],
-                  let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
-                return
-            }
-            self.tokenConfig.rtcToken = rtcToken
-            self.tokenConfig.rtmToken = rtmToken
-            
-//            self._initCallAPI(tokenConfig: self.tokenConfig)
-        }
-    }
 }
 
 extension RoomListViewController: UICollectionViewDelegate {
@@ -190,13 +171,12 @@ extension RoomListViewController: UICollectionViewDelegate {
 }
 
 extension RoomListViewController {
-    private func _setupAPI() {
+    private func renewTokens(completion: ((Bool)->Void)?) {
         guard let userInfo = userInfo else {
             assert(false, "userInfo == nil")
+            completion?(false)
             return
         }
-        
-        tokenConfig.roomId = userInfo.get1V1ChannelId()
         NetworkManager.shared.generateTokens(appId: showTo1v1AppId!,
                                              appCertificate: showTo1v1AppCertificate!,
                                              channelName: ""/*tokenConfig.roomId*/,
@@ -204,8 +184,24 @@ extension RoomListViewController {
                                              tokenGeneratorType: .token007,
                                              tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
             guard let self = self else {return}
-            self.tokenConfig.rtcToken = tokens[AgoraTokenType.rtc.rawValue]!
-            self.tokenConfig.rtmToken = tokens[AgoraTokenType.rtm.rawValue]!
+            guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue],
+                  let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
+                completion?(false)
+                return
+            }
+            self.tokenConfig.rtcToken = rtcToken
+            self.tokenConfig.rtmToken = rtmToken
+            completion?(true)
+        }
+    }
+    private func _setupAPI() {
+        guard let userInfo = userInfo else {
+            assert(false, "userInfo == nil")
+            return
+        }
+        
+        tokenConfig.roomId = userInfo.get1V1ChannelId()
+        renewTokens { flag in
         }
         
         let config = VideoLoaderConfig()
@@ -277,6 +273,13 @@ extension RoomListViewController {
     }
     
     private func _call(room: ShowTo1v1RoomInfo) {
+        if self.tokenConfig.tokenIsEmpty() {
+            renewTokens { success in
+                self._call(room: room)
+            }
+            return
+        }
+        
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         
@@ -490,19 +493,13 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
             return
         }
         showTo1v1Print("tokenPrivilegeWillExpire")
-        NetworkManager.shared.generateTokens(appId: showTo1v1AppId!,
-                                             appCertificate: showTo1v1AppCertificate!,
-                                             channelName: ""/*tokenConfig.roomId*/,
-                                             uid: userInfo.userId,
-                                             tokenGeneratorType: .token007,
-                                             tokenTypes: [.rtc, .rtm]) {[weak self, weak engine] tokens in
+        renewTokens {[weak self, weak engine] success in
             guard let self = self, let engine = engine else {return}
-            guard tokens.count == 2 else {
+            guard success else {
                 self.rtcEngine(engine, tokenPrivilegeWillExpire: token)
                 return
             }
-            self.tokenConfig.rtcToken = tokens[AgoraTokenType.rtc.rawValue]!
-            self.tokenConfig.rtmToken = tokens[AgoraTokenType.rtm.rawValue]!
+            
             //renew callapi
             self.callApi.renewToken(with: self.tokenConfig)
             
