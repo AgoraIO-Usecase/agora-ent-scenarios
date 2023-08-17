@@ -211,6 +211,7 @@ public class RoomLivingViewModel extends ViewModel {
 
     private int prepareNum = 0;
     private boolean hasRecievedFirstPosition = false;
+    private Long mLastPostSongPartChangeStatusTime = 0L;
 
     public RoomLivingViewModel(JoinRoomOutputModel roomInfo) {
         this.roomInfoLiveData = new MutableLiveData<>(roomInfo);
@@ -933,7 +934,7 @@ public class RoomLivingViewModel extends ViewModel {
                @Override
                public void onMusicPlayerPositionChanged(long position_ms, long timestamp_ms) {
                    super.onMusicPlayerPositionChanged(position_ms, timestamp_ms);
-                   Log.d("position", "position: " + position_ms);
+                   //Log.d("position", "position: " + position_ms);
                    if (!hasRecievedFirstPosition && isOnSeat) {
                        hasRecievedFirstPosition = true;
                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_BATTLE);
@@ -941,9 +942,12 @@ public class RoomLivingViewModel extends ViewModel {
                    for (int i = 0; i < relayList.size() - 1; i++) {
                        if (Math.abs(position_ms - relayList.get(i)) < 500) {
                            // 下一段
+                           // workaround：防止因为mpk position回调时间不准造成的段时间内重复上报段落切换事件的bug
+                           if (System.currentTimeMillis() - mLastPostSongPartChangeStatusTime < 5000) break;
                            GraspModel graspModel = new GraspModel();
                            graspModel.status = GraspStatus.IDLE;
                            graspStatusMutableLiveData.postValue(graspModel);
+                           mLastPostSongPartChangeStatusTime = System.currentTimeMillis();
                            partNum = i + 2;
                            break;
                        } else if ((position_ms - relayList.get(i)) > -3000 && (position_ms - relayList.get(i) < -2000)) {
@@ -1307,6 +1311,7 @@ public class RoomLivingViewModel extends ViewModel {
         retryTimes = 0;
         prepareNum = 0;
         singerList.clear();
+        mLastPostSongPartChangeStatusTime = 0L;
         mAudioTrackMode = KTVPlayerTrackMode.Acc;
         ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
     }

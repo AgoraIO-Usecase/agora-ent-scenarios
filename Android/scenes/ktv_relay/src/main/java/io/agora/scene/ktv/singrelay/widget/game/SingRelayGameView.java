@@ -165,10 +165,10 @@ public class SingRelayGameView extends FrameLayout {
         KTVLogger.d(TAG, "onBattleGamePrepare， isWinner: " + isWinner);
         if (mBinding == null || !isGamer) return;
         mBinding.ilActive.lrcControlView.onGraspDisable();
-        if (isWinner) {
-            mBinding.ilActive.messageText.setText(R.string.ktv_next_round_singer_tips);
-        } else {
+        if (partNum == 4) {
             mBinding.ilActive.messageText.setText(R.string.ktv_next_round_listener_tips);
+        } else {
+            mBinding.ilActive.messageText.setText(R.string.ktv_next_round_singer_tips);
         }
         mBinding.ilActive.messageText.setVisibility(View.VISIBLE);
         mBinding.ilActive.messageText.bringToFront();

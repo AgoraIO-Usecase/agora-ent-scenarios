@@ -156,10 +156,10 @@
     <string name="ktv_tips">公告 ></string>
     <string name="ktv_relay">抢麦接唱</string>
     <string name="ktv_seat_num">%s号麦</string>
-    <string name="ktv_next_round_singer_tips">下段演唱即将开始</string>
+    <string name="ktv_next_round_singer_tips">下段演唱即将开始，准备抢唱</string>
     <string name="ktv_next_round_listener_tips">下段演唱即将开始</string>
     <string name="ktv_next_round_singer"> %s 演唱</string>
-    <string name="ktv_winner_tip"> %s 抢到麦</string>
+    <string name="ktv_winner_tip"> %s 演唱</string>
     <string name="ktv_gaming_seat_tip1">正在游戏中，游戏结束后方可踢人下麦</string>
     <string name="ktv_gaming_seat_tip2">正在游戏中，游戏结束后方可下麦</string>
     <string name="ktv_gaming_seat_tip3">游戏进行中，请在下局游戏开始前上麦</string>

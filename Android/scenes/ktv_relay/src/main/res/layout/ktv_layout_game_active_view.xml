@@ -123,7 +123,7 @@
             android:textSize="16dp"
             android:textStyle="bold"
             android:textColor="@color/white"
-            android:text="本轮由 "/>
+            android:text="下段由 "/>
 
         <ImageView
             android:id="@+id/ivHeader"
@@ -138,7 +138,7 @@
             android:textSize="16dp"
             android:textStyle="bold"
             android:textColor="@color/white"
-            android:text="抢到麦"/>
+            android:text="演唱"/>
 
     </LinearLayout>
 
