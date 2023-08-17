@@ -135,7 +135,7 @@ class ShowAgoraKitManager: NSObject {
                                      "traceId": NSString.withUUID().md5(),
                                      "src": "iOS",
                                      "payload": JSONObject.toJsonString(dict: userInfo) ?? ""]
-        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/moderation/audio",
+        NetworkManager.shared.postRequest(urlString: "https://service.agora.io/toolbox/v1/moderation/audio",
                                           params: parasm) { response in
             showLogger.info("response === \(response)")
         } failure: { errr in
@@ -245,8 +245,11 @@ class ShowAgoraKitManager: NSObject {
     
     // 耗时计算
     private var callTimeStampsSaved: Date?
-    func callTimestampStart() {
+    func callTimestampStart(clean: Bool) {
         print("callTimeStampsSaved  : start")
+        if (clean) {
+            callTimeStampsSaved = nil
+        }
         if callTimeStampsSaved == nil {
             print("callTimeStampsSaved  : saved")
             callTimeStampsSaved = Date()
@@ -282,12 +285,7 @@ class ShowAgoraKitManager: NSObject {
     
     /// 切换摄像头
     func switchCamera(_ channelId: String? = nil) {
-        guard let engine = engine else {
-            assert(true, "rtc engine not initlized")
-            return
-        }
-        engine.switchCamera()
-        engine.setLocalRenderMode(.hidden, mirror: .enabled)
+        BeautyManager.shareManager.beautyAPI.switchCamera()
     }
     
     /// 开启虚化背景

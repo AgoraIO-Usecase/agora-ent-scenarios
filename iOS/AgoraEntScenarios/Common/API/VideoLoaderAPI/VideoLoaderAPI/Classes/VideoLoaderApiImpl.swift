@@ -8,6 +8,16 @@
 import Foundation
 import AgoraRtcKit
 
+#if DEBUG
+func createDateFormatter()-> DateFormatter {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+    return formatter
+}
+
+let formatter = createDateFormatter()
+#endif
+
 public class VideoLoaderApiImpl: NSObject {
     private var config: VideoLoaderConfig?
     
@@ -139,7 +149,7 @@ extension VideoLoaderApiImpl {
         let api = apiProxy as IVideoLoaderApiListener
         api.debugInfo?(message)
         #if DEBUG
-//        print("[VideoLoaderApi]\(message)")
+        print("\(formatter.string(from: Date()))[VideoLoaderApi]\(message)")
         #endif
     }
 
@@ -147,7 +157,7 @@ extension VideoLoaderApiImpl {
         let api = apiProxy as IVideoLoaderApiListener
         api.debugWarning?(message)
         #if DEBUG
-//        print("[VideoLoaderApi][Warning]\(message)")
+        print("\(formatter.string(from: Date()))[VideoLoaderApi][Warning]\(message)")
         #endif
     }
 
@@ -155,7 +165,7 @@ extension VideoLoaderApiImpl {
         let api = apiProxy as IVideoLoaderApiListener
         api.debugError?(message)
         #if DEBUG
-//        print("[VideoLoaderApi][Error]\(message)")
+        print("\(formatter.string(from: Date()))[VideoLoaderApi][Error]\(message)")
         #endif
     }
 }
@@ -289,13 +299,13 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
     
     public func addRTCListener(roomId: String, listener: AgoraRtcEngineDelegate) {
         let rtcProxy = _getProxy(roomId: roomId)
-        print("[VideoLoaderProfiler] addRTCListener: \(roomId)")
+        apiPrint("[VideoLoaderProfiler] addRTCListener: \(roomId)")
         rtcProxy.addListener(listener)
     }
     
     public func removeRTCListener(roomId: String, listener: AgoraRtcEngineDelegate) {
         let rtcProxy = _getProxy(roomId: roomId)
-        print("[VideoLoaderProfiler] removeRTCListener: \(roomId)")
+        apiPrint("[VideoLoaderProfiler] removeRTCListener: \(roomId)")
         rtcProxy.removeListener(listener)
     }
     

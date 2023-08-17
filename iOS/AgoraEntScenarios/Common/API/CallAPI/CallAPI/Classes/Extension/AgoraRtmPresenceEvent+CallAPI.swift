@@ -5,14 +5,16 @@
 //  Created by wushengtao on 2023/6/1.
 //
 
-import AgoraRtmKit2
+import AgoraRtmKit
 
 let kUserIdKey = "userId"
 extension AgoraRtmPresenceEvent {
     func snapshotList() -> [[String: String]] {
         var userList: [[String: String]] = [[String: String]]()
-        self.snapshot.forEach { user in
+        let snapshotList = snapshot as NSArray
+        snapshotList.forEach { user in
             var userMap: [String: String] = [:]
+            let user = user as! AgoraRtmUserState
             userMap[kUserIdKey] = user.userId
             user.states.forEach { item in
                 userMap[item.key] = item.value

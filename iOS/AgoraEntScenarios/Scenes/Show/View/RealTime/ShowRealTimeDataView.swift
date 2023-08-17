@@ -50,9 +50,6 @@ class ShowRealTimeDataView: UIView {
         layer.masksToBounds = true
         widthAnchor.constraint(equalToConstant: Screen.width - 30).isActive = true
         
-        leftInfoLabel.translatesAutoresizingMaskIntoConstraints = false
-        rightInfoLabel.translatesAutoresizingMaskIntoConstraints = false
-        closeButton.translatesAutoresizingMaskIntoConstraints = false
         addSubview(leftInfoLabel)
         addSubview(rightInfoLabel)
         addSubview(closeButton)
@@ -64,8 +61,7 @@ class ShowRealTimeDataView: UIView {
         }
         rightInfoLabel.snp.makeConstraints { make in
             make.left.equalTo(self.snp.centerX)
-            make.top.equalTo(leftInfoLabel)
-            make.bottom.equalTo(leftInfoLabel)
+            make.top.bottom.equalTo(leftInfoLabel)
         }
         closeButton.snp.makeConstraints { make in
             make.top.equalTo(12)

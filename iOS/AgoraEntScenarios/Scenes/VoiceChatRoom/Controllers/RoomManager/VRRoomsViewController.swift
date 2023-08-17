@@ -62,11 +62,7 @@ let page_size = 15
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-        guard let imKey = KeyCenter.IMAppKey,
-              let imCID = KeyCenter.IMClientId,
-              let imCS = KeyCenter.IMClientSecret,
-              !imKey.isEmpty, !imCID.isEmpty, !imCS.isEmpty
-        else {
+        guard let imKey = KeyCenter.IMAppKey, !imKey.isEmpty else {
             navigationController?.popViewController(animated: true)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 SVProgressHUD.showError(withStatus: "voice_im_key_empty_error".voice_localized())

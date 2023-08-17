@@ -79,7 +79,7 @@ class NetworkManager:NSObject {
 
     @objc static let shared = NetworkManager()
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
-    private let baseServerUrl: String = "https://toolbox.bj2.agoralab.co/v1/"
+    private let baseServerUrl: String = "https://service.agora.io/toolbox"
     
     private func basicAuth(key: String, password: String) -> String {
         let loginString = String(format: "%@:%@", key, password)
@@ -141,8 +141,8 @@ class NetworkManager:NSObject {
                       "uid": uid] as [String: Any]
 //        ToastView.showWait(text: "loading...", view: nil)
         let url = tokenType == .token006 ?
-        "\(baseServerUrl)token006/generate"
-        : "\(baseServerUrl)token/generate"
+        "\(baseServerUrl)/v2/token006/generate"
+        : "\(baseServerUrl)/v2/token/generate"
         NetworkManager.shared.postRequest(urlString: url,
                                           params: params,
                                           success: { response in
@@ -209,7 +209,7 @@ class NetworkManager:NSObject {
                       "user": userParams,
                       "type":type] as [String: Any]
  
-        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)webdemo/im/chat/create",
+        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)/v1/webdemo/im/chat/create",
                                           params: params,
                                           success: { response in
             let data = response["data"] as? [String: String]
@@ -238,7 +238,7 @@ class NetworkManager:NSObject {
                       "traceId": UUID().uuidString.md5Encrypt,
                       "payload": payload] as [String: Any]
                       
-        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)moderation/audio",
+        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)/v1/moderation/audio",
                                           params: params,
                                           success: { response in
             let code = response["code"] as? Int
@@ -281,7 +281,7 @@ class NetworkManager:NSObject {
                                         "src": "iOS",
                                         "traceId": NSString.withUUID().md5() ?? ""]
                       
-        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)cloud-player/start",
+        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)/v1/cloud-player/start",
                                           params: params,
                                           success: { response in
             let code = response["code"] as? Int
@@ -302,7 +302,7 @@ class NetworkManager:NSObject {
                                         "src": "iOS",
                                         "traceId": NSString.withUUID().md5() ?? ""]
                       
-        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)heartbeat",
+        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)/v1/heartbeat",
                                           params: params,
                                           success: { response in
             let code = response["code"] as? Int

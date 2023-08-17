@@ -155,7 +155,7 @@
 "voice_mic_closed" = "Mic closed by host";
 "voice_create_failed" = "Create failed";
 "voice_members_reach_limit" = "Members reach limit!";
-"voice_im_key_empty_error" = "Invalid Parameter, Please check ’IMAppKey’ / ‘IMClientId’ / ‘IMClientSecret’ in KeyCenter.swift";
+"voice_im_key_empty_error" = "Invalid Parameter, Please check ’IMAppKey’ in KeyCenter.swift";
 "voice_AIAEC_desc" = "When you turn on accompaniment singing, AIAEC can greatly improve your singing effect. It is strongly recommended that you turn it on when singing";
 "voice_AGC_desc" = "After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing";
 "voice_personal_audio_settings" = "Personal audio Settings";
