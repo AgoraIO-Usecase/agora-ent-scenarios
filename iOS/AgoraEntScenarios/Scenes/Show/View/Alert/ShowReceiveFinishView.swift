@@ -11,7 +11,7 @@ private let HeadImgViewHeight: CGFloat = 61
 private let BackButtonHeight: CGFloat = 40
 
 protocol ShowReceiveFinishViewDelegate: NSObjectProtocol {
-    func onClickBackButton()
+    func onClickFinishButton()
 }
 
 
@@ -34,8 +34,6 @@ class ShowReceiveFinishView: UIView {
     private lazy var bgView: UIView = {
         let view = UIView()
         view.backgroundColor = .show_end_bg
-        view.layer.cornerRadius = 20
-        view.layer.masksToBounds = true
         return view
     }()
     
@@ -135,6 +133,6 @@ class ShowReceiveFinishView: UIView {
 extension ShowReceiveFinishView {
     
     @objc private func didClickBackButton() {
-        delegate?.onClickBackButton()
+        delegate?.onClickFinishButton()
     }
 }

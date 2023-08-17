@@ -63,7 +63,7 @@ class KeyCenter: NSObject {
      如需使用语聊房场景，需要设置该参数。
      详见获取环信即时通讯IM的信息(http://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E8%8E%B7%E5%8F%96%E7%8E%AF%E4%BF%A1%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF-im-%E7%9A%84%E4%BF%A1%E6%81%AF)。
      */
-    static var IMAppKey: String? = "81399972#1019272"
+    static var IMAppKey: String? = <# You IM App Key #>
     
     /**
      EaseMob Client ID.
@@ -76,7 +76,7 @@ class KeyCenter: NSObject {
      详见 环信即时通讯云控制台(https://console.easemob.com/user/login/)的应用详情页面。
      */
     
-    static var IMClientId: String? = "YXA6tczxcixPTCqT1sN1hSBU1g"
+    static var IMClientId: String? = <# You IM Client ID #>
     
     /**
      EaseMob Client Secret.
@@ -89,12 +89,12 @@ class KeyCenter: NSObject {
      详见 环信即时通讯云控制台( https://console.easemob.com/user/login/ )的应用详情页面。
      */
     
-    static var IMClientSecret: String? = "****************************"
+    static var IMClientSecret: String? = <# You IM Client Secret #>
   
     static let CloudPlayerKey: String? = nil
     static let CloudPlayerSecret: String? = nil
 
-    static var baseServerUrl: String? = "https://toolbox.bj2.agoralab.co/v1/"
+    static var baseServerUrl: String? = "https://service.agora.io/toolbox/"
     static var onlineBaseServerUrl: String? = baseServerUrl
 
 }
