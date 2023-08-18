@@ -900,12 +900,12 @@ extension ShowSyncManagerServiceImp {
         model.userName = VLUserCenter.user.name
 
         let params = model.yy_modelToJSONObject() as! [String: Any]
-        agoraPrint("imp user add ...")
+        agoraPrint("imp user add ...\(channelName)")
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .add(data: params, success: { [weak self] object in
-                agoraPrint("imp user add success...")
+                agoraPrint("imp user add success...\(channelName)")
                 guard let self = self,
                       let jsonStr = object.toJson(),
                       let model = ShowUser.yy_model(withJSON: jsonStr) else {
@@ -946,7 +946,7 @@ extension ShowSyncManagerServiceImp {
 
     private func _subscribeOnlineUsersChanged() {
         guard let channelName = roomId else {
-            agoraAssert("channelName = nil")
+            agoraPrint("channelName = nil")
             return
         }
         agoraPrint("imp user subscribe ...")

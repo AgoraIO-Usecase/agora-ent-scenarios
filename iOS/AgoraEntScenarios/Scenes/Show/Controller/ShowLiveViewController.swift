@@ -17,7 +17,21 @@ protocol ShowLiveViewControllerDelegate: NSObjectProtocol {
 
 class ShowLiveViewController: UIViewController {
     weak var delegate: ShowLiveViewControllerDelegate?
-    var room: ShowRoomListModel?
+    var room: ShowRoomListModel? {
+        didSet{
+            if oldValue?.roomId != room?.roomId {
+                liveView.room = room
+                if oldValue != nil {
+                    _leavRoom(oldValue!)
+                }
+                if room != nil {
+                    _joinRoom(room!)
+                }
+                loadingType = .prejoined
+            }
+        }
+    }
+    
     var loadingType: RoomStatus = .prejoined {
         didSet {
             if loadingType == oldValue {
@@ -207,6 +221,8 @@ class ShowLiveViewController: UIViewController {
     
     deinit {
         let roomId = room?.roomId ?? ""
+        leaveRoom()
+        AppContext.unloadShowServiceImp(roomId)
         showLogger.info("deinit-- ShowLiveViewController \(roomId)")
     }
     
@@ -221,21 +237,21 @@ class ShowLiveViewController: UIViewController {
             self._subscribeServiceEvent()
             AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self)
         } else { // 自己是观众
-            self.joinChannel(needUpdateCavans: self.loadingType == .joined)
-            AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
-                guard let self = self else {return}
-                showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
-                showLogger.info("joinRoom[\(room.roomId)] roomModel: \(detailModel?.roomId ?? "null")")
-                if detailModel == nil {
-                    self.onRoomExpired()
-                    if let err = error {
-                        ToastView.show(text: err.localizedDescription)
-                    }
-                } else {
-                    self._subscribeServiceEvent()
-                    self.updateLoadingType(playState: self.loadingType)
-                }
-            }
+//            self.joinChannel(needUpdateCavans: self.loadingType == .joined)
+//            AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
+//                guard let self = self else {return}
+//                showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
+//                showLogger.info("joinRoom[\(room.roomId)] roomModel: \(detailModel?.roomId ?? "null")")
+//                if detailModel == nil {
+//                    self.onRoomExpired()
+//                    if let err = error {
+//                        ToastView.show(text: err.localizedDescription)
+//                    }
+//                } else {
+//                    self._subscribeServiceEvent()
+//                    self.updateLoadingType(playState: self.loadingType)
+//                }
+//            }
         }
     }
     
@@ -321,7 +337,7 @@ class ShowLiveViewController: UIViewController {
         let showMsg = ShowMessage()
         showMsg.userId = VLUserCenter.user.id
         showMsg.userName = VLUserCenter.user.name
-        showMsg.message = text
+        showMsg.message = text + "room id = \(roomId)"
         showMsg.createAt = Date().millionsecondSince1970()
         
         AppContext.showServiceImp(roomId).sendChatMessage(message: showMsg) { error in
@@ -344,6 +360,34 @@ extension ShowLiveViewController {
         }
     }
     
+    func _joinRoom(_ room: ShowRoomListModel){
+        
+        ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: room.roomId)
+        AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
+            guard let self = self else {return}
+            showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
+            showLogger.info("joinRoom[\(room.roomId)] roomModel: \(detailModel?.roomId ?? "null")")
+            if detailModel == nil {
+                self.onRoomExpired()
+                if let err = error {
+                    ToastView.show(text: "room == \(room.roomId) error = \(err.localizedDescription)" )
+                }
+            } else {
+                self._subscribeServiceEvent()
+                self.updateLoadingType(playState: self.loadingType)
+            }
+        }
+    }
+    
+    func _leavRoom(_ room: ShowRoomListModel){
+        AppContext.unloadShowServiceImp(room.roomId)
+        ShowAgoraKitManager.shared.removeRtcDelegate(delegate: self, roomId: room.roomId)
+        AppContext.showServiceImp(roomId).unsubscribeEvent(delegate: self)
+        AppContext.showServiceImp(roomId).leaveRoom { error in
+
+        }
+    }
+    
 
     func updateLoadingType(playState: RoomStatus) {
         ShowAgoraKitManager.shared.updateLoadingType(roomId: roomId, channelId: roomId, playState: playState)
@@ -355,21 +399,21 @@ extension ShowLiveViewController {
                 
             }
             sendMessageWithText("join_live_room".show_localized)
-            updateRemoteCavans()
         } else if playState == .prejoined {
             AppContext.showServiceImp(roomId).deinitRoom { error in
                 
             }
             sendMessageWithText("leave_live_room".show_localized)
-            updateRemoteCavans()
         } else {
-            leaveRoom()
+
         }
+        updateRemoteCavans()
     }
     
     func updateRemoteCavans() {
         guard role == .audience, loadingType == .joined else { return }
         let uid: UInt = UInt(room?.ownerId ?? "0") ?? 0
+        print(" roomId ====== \(roomId) ")
         ShowAgoraKitManager.shared.setupRemoteVideo(channelId: roomId,
                                                     uid: uid,
                                                     canvasView: liveView.canvasView.localView)
@@ -433,6 +477,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onRoomExpired() {
+        /*
         leaveRoom()
         
         let finishView = ShowReceiveFinishView()
@@ -443,6 +488,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         finishView.snp.makeConstraints { make in
             make.left.right.top.bottom.equalToSuperview()
         }
+         */
     }
     
     func onUserCountChanged(userCount: Int) {
