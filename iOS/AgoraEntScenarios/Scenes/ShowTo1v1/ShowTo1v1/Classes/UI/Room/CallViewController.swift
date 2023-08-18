@@ -148,4 +148,14 @@ extension CallViewController {
             break
         }
     }
+    
+    func onCallEventChanged(with event: CallEvent, elapsed: Int) {
+        showTo1v1Print("onCallEventChanged: \(event.rawValue)")
+        switch event {
+        case .localLeave, .remoteLeave:
+            _hangupAction()
+        default:
+            break
+        }
+    }
 }
