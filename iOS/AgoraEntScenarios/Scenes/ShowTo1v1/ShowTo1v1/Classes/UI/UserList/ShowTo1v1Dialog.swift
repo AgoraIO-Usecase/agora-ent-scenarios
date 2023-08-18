@@ -317,9 +317,9 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate, UITextFieldD
         if (textField.text ?? "").isEmpty {
             return true
         }
-        
-        if let text = textField.text, text.count >= 20,!string.isEmpty {
-            textField.text = (text as NSString).substring(to: 20)
+        let maxLength = 24
+        if let text = textField.text, text.count >= maxLength,!string.isEmpty {
+            textField.text = (text as NSString).substring(to: maxLength)
             return false
         }
         
