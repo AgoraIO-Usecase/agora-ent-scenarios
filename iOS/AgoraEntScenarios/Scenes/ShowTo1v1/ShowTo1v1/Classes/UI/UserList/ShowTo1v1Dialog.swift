@@ -118,7 +118,7 @@ class ShowTo1v1NoDataDialog: ShowTo1v1Dialog {
 
 private let kDialogTag = 1112234567
 //创建房间弹窗
-class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
+class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate, UITextFieldDelegate {
     var stateTitle: String? = "user_list_creating".showTo1v1Localization() 
     var renderStateTitle: String? {
         set {
@@ -156,6 +156,7 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 20, height: 10))
         tf.leftView = paddingView
         tf.leftViewMode = .always
+        tf.delegate = self
         return tf
     }()
     private lazy var randomButton: UIButton = {
@@ -309,6 +310,20 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
     @objc private func _randomAction() {
         let text = randomClosure?()
         textField.text = text
+    }
+    
+    //MARK: UITextFieldDelegate
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if (textField.text ?? "").isEmpty {
+            return true
+        }
+        
+        if let text = textField.text, text.count >= 20,!string.isEmpty {
+            textField.text = (text as NSString).substring(to: 20)
+            return false
+        }
+        
+        return true
     }
 }
 
