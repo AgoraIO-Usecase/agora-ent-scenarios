@@ -25,7 +25,13 @@ class BroadcasterViewController: BaseRoomViewController {
                                      name: roomInfo?.roomName ?? "",
                                      id: roomInfo?.userName ?? "",
                                      time: Int64(createdAt > 0 ? createdAt : Int64(Date().timeIntervalSince1970) * 1000))
-            
+            roomInfoView.timerCallBack = {[weak self] duration in
+                if duration < 60 * 20 {
+                    return
+                }
+                self?.roomInfoView.setRoomInfo(avatar: nil, name: nil, id: nil, time: nil)
+                self?.onBackAction()
+            }
             bgImageView.image = roomInfo?.bgImage()
         }
     }
@@ -195,6 +201,7 @@ class BroadcasterViewController: BaseRoomViewController {
     }
     
     override func onBackAction() {
+        presentedViewController?.dismiss(animated: false)
         super.onBackAction()
         
         _leaveRTCChannel()
