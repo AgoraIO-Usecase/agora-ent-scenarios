@@ -150,7 +150,7 @@ class ShowPKInviteView: UIView {
             return
         }
         
-        AppContext.showServiceImp(roomId).stopInteraction(interaction: pkInfo) { error in
+        AppContext.showServiceImp(roomId)?.stopInteraction(interaction: pkInfo) { error in
         }
     }
     
