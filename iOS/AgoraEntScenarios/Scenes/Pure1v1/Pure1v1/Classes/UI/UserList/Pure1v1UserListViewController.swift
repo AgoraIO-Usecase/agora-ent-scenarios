@@ -57,9 +57,7 @@ class Pure1v1UserListViewController: UIViewController {
         naviBar.refreshButton.addTarget(self, action: #selector(_refreshAction), for: .touchUpInside)
         naviBar.refreshButton.isHidden = true
         naviBar.refreshButton.isHidden = false
-        service.enterRoom {[weak self] err in
-            self?._refreshAction()
-        }
+        _refreshAction()
         
         _setupCallApi()
     }
@@ -177,18 +175,25 @@ extension Pure1v1UserListViewController {
     @objc func _refreshAction() {
         guard naviBar.refreshAnimationEnable() else {return}
         naviBar.startRefreshAnimation()
-        service.getUserList {[weak self] list, error in
-            guard let self = self else {return}
-            self.naviBar.stopRefreshAnimation()
+        service.enterRoom {[weak self] error in
             if let error = error {
+                self?.naviBar.stopRefreshAnimation()
                 AUIToast.show(text: error.localizedDescription)
                 return
             }
-            let userList = list.filter({$0.userId != self.userInfo?.userId})
-            self.listView.userList = userList
-            self._showGuideIfNeed()
-            self.naviBar.style = userList.count > 0 ? .light : .dark
-            AUIToast.show(text: "user_list_refresh_tips".pure1v1Localization())
+            self?.service.getUserList { list, error in
+                guard let self = self else {return}
+                self.naviBar.stopRefreshAnimation()
+                if let error = error {
+                    AUIToast.show(text: error.localizedDescription)
+                    return
+                }
+                let userList = list.filter({$0.userId != self.userInfo?.userId})
+                self.listView.userList = userList
+                self._showGuideIfNeed()
+                self.naviBar.style = userList.count > 0 ? .light : .dark
+                AUIToast.show(text: "user_list_refresh_tips".pure1v1Localization())
+            }
         }
     }
 }

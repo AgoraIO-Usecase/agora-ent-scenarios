@@ -38,6 +38,7 @@ class Pure1v1ServiceImp: NSObject {
     private var roomExpiredDidChanged: (() -> Void)?
     private var state: SocketConnectState = .connecting
     private var refreshRoomListClosure: (([Pure1v1UserInfo], NSError?)->())?
+    private var enterRoomClosure: ((NSError?)->())?
     
     convenience init(appId: String, user: Pure1v1UserInfo?) {
         self.init()
@@ -92,6 +93,16 @@ class Pure1v1ServiceImp: NSObject {
             self.syncUtilsInited = true
         }
     }
+    
+    private func _notifyRefreshListCompletion(_ userList: [Pure1v1UserInfo], _ error: NSError?) {
+        refreshRoomListClosure?(userList, error)
+        refreshRoomListClosure = nil
+    }
+    
+    private func _notifyEnterCompletion(_ error: NSError?) {
+        enterRoomClosure?(error)
+        enterRoomClosure = nil
+    }
 }
 
 extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
@@ -107,8 +118,7 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
                 pure1v1Print("getUserList == \(results.compactMap { $0.toJson() })")
                 guard let self = self else {return}
                 guard self.state == .open else {
-                    self.refreshRoomListClosure?([], NSError(domain: "network error", code: -1))
-                    self.refreshRoomListClosure = nil
+                    self._notifyRefreshListCompletion([], NSError(domain: "network error", code: -1))
                     return
                 }
                 
@@ -116,52 +126,52 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
                     return Pure1v1UserInfo.yy_model(withJSON: info.toJson())!
                 }).sorted {$0.createdAt < $1.createdAt}
                 self.userList = userList
-                self.refreshRoomListClosure?(userList, nil)
-                self.refreshRoomListClosure = nil
+                self._notifyRefreshListCompletion(userList, nil)
             }, fail: { error in
-                self?.refreshRoomListClosure?([], error.toNSError())
-                self?.refreshRoomListClosure = nil
+                self?._notifyRefreshListCompletion([], error.toNSError())
             })
         }
     }
     
-    func enterRoom(completion: @escaping (Error?) -> Void) {
+    func enterRoom(completion: @escaping (NSError?) -> Void) {
         guard let user = self.user, !userList.contains(where: { $0.getRoomId() == user.getRoomId() }) else {
             completion(nil)
             return
         }
-        pure1v1Print("createUser start")
-        if let error = checkState() {
-            pure1v1Print("enterRoom fail1: \(error.localizedDescription)")
-            completion(error)
-            return
-        }
-        
-        let params = user.yy_modelToJSONObject() as? [String: Any]
-        let scene = Scene(id: user.getRoomId(), userId: user.userId, isOwner: true, property: params)
-        manager.createScene(scene: scene, success: {[weak self] in
-            guard let self = self else {return}
-            self.manager.joinScene(sceneId: user.getRoomId()) { sceneRef in
-                pure1v1Print("createUser success")
+        self.enterRoomClosure = completion
+        initScene { [weak self] error in
+            if let error = error {
                 mainTreadTask {
-                    self.sceneRefs[user.getRoomId()] = sceneRef
-                    completion(nil)
+                    self?._notifyEnterCompletion(error)
                 }
-            } fail: { error in
-                pure1v1Print("createUser fail2: \(error.localizedDescription)")
-                mainTreadTask {
-                    completion(error)
-                }
+                return
             }
-        }) { error in
-            pure1v1Print("createUser fail3: \(error.localizedDescription)")
-            mainTreadTask {
-                completion(error)
+            let params = user.yy_modelToJSONObject() as? [String: Any]
+            let scene = Scene(id: user.getRoomId(), userId: user.userId, isOwner: true, property: params)
+            self?.manager.createScene(scene: scene, success: {[weak self] in
+                guard let self = self else {return}
+                self.manager.joinScene(sceneId: user.getRoomId()) { sceneRef in
+                    pure1v1Print("createUser success")
+                    mainTreadTask {
+                        self.sceneRefs[user.getRoomId()] = sceneRef
+                        self._notifyEnterCompletion(nil)
+                    }
+                } fail: { error in
+                    pure1v1Print("createUser fail2: \(error.localizedDescription)")
+                    mainTreadTask {
+                        self._notifyEnterCompletion(error.toNSError())
+                    }
+                }
+            }) { error in
+                pure1v1Print("createUser fail3: \(error.localizedDescription)")
+                mainTreadTask {
+                    self?._notifyEnterCompletion(error.toNSError())
+                }
             }
         }
     }
     
-    func leaveRoom(completion: @escaping (Error?) -> Void) {
+    func leaveRoom(completion: @escaping (NSError?) -> Void) {
         self.sceneRefs[user?.getRoomId() ?? ""]?.deleteScenes()
         completion(nil)
     }
