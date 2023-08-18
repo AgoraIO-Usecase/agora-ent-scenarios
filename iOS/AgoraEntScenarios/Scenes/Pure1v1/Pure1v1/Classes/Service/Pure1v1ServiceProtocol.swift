@@ -20,12 +20,12 @@ protocol Pure1v1ServiceProtocol: NSObjectProtocol {
     
     /// 把自己加入1v1列表
     /// - Parameter completion: <#completion description#>
-    func enterRoom(completion: @escaping (Error?) -> Void)
+    func enterRoom(completion: @escaping (NSError?) -> Void)
     
     
     /// 把自己移除出1v1列表
     /// - Parameter completion: <#completion description#>
-    func leaveRoom(completion: @escaping (Error?) -> Void)
+    func leaveRoom(completion: @escaping (NSError?) -> Void)
     
     
     /// 获取1v1用户列表
