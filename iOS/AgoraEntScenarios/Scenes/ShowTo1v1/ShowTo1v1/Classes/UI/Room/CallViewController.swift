@@ -17,13 +17,13 @@ class CallViewController: BaseRoomViewController {
                                      id: targetUser?.userId ?? "",
                                      time: Int64(Date().timeIntervalSince1970 * 1000))
             
-            roomInfoView.timerCallBack = {[weak self] duration in
-                if duration < 20 * 60 {
-                    return
-                }
-                self?.roomInfoView.setRoomInfo(avatar: nil, name: nil, id: nil, time: nil)
-                self?._hangupAction()
-            }
+//            roomInfoView.timerCallBack = {[weak self] duration in
+//                if duration < 20 * 60 {
+//                    return
+//                }
+//                self?.roomInfoView.setRoomInfo(avatar: nil, name: nil, id: nil, time: nil)
+//                self?._hangupAction()
+//            }
         }
     }
     
@@ -73,6 +73,12 @@ class CallViewController: BaseRoomViewController {
         super.viewWillAppear(animated)
         
         smallCanvasView.aui_tl = CGPoint(x: view.aui_width - 25 - 109, y: 82 + UIDevice.current.aui_SafeDistanceTop)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        _hangupAction()
+        roomInfoView.setRoomInfo(avatar: nil, name: nil, id: nil, time: nil)
     }
     
     @objc private func _hangupAction() {
