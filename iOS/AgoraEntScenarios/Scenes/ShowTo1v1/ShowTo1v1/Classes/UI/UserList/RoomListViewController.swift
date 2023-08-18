@@ -461,10 +461,10 @@ extension RoomListViewController: CallApiListenerProtocol {
         }
     }
     
-    func debugInfo(message: String) {
+    func callDebugInfo(message: String) {
         showTo1v1Print(message, context: "CallApi")
     }
-    func debugWarning(message: String) {
+    func callDebugWarning(message: String) {
         showTo1v1Print(message, context: "CallApi")
     }
 }
@@ -474,15 +474,15 @@ extension RoomListViewController: IVideoLoaderApiListener {
     }
     
     func debugInfo(_ message: String) {
-        showTo1v1Print(message)
+        showTo1v1Print(message, context: "VideoLoaderApi")
     }
     
     func debugWarning(_ message: String) {
-        showTo1v1Warn(message)
+        showTo1v1Warn(message, context: "VideoLoaderApi")
     }
     
     func debugError(_ message: String) {
-        showTo1v1Error(message)
+        showTo1v1Error(message, context: "VideoLoaderApi")
     }
 }
 

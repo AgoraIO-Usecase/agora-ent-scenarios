@@ -235,10 +235,10 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
         }
     }
     
-    func debugInfo(message: String) {
+    func callDebugInfo(message: String) {
         pure1v1Print(message, context: "CallApi")
     }
-    func debugWarning(message: String) {
+    func callDebugWarning(message: String) {
         pure1v1Warn(message, context: "CallApi")
     }
 }

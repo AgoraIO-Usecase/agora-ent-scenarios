@@ -1204,7 +1204,7 @@ func debugPrint(_ message: String) {
 extension CallApiImpl {
     func callPrint(_ message: String) {
         for element in delegates.allObjects {
-            (element as? CallApiListenerProtocol)?.debugInfo?(message: message)
+            (element as? CallApiListenerProtocol)?.callDebugInfo?(message: message)
         }
         guard delegates.count == 0 else {return}
     
@@ -1213,7 +1213,7 @@ extension CallApiImpl {
 
     func callWarningPrint(_ message: String) {
         for element in delegates.allObjects {
-            (element as? CallApiListenerProtocol)?.debugWarning?(message: message)
+            (element as? CallApiListenerProtocol)?.callDebugWarning?(message: message)
         }
         callPrint("[Warning]\(message)")
     }
