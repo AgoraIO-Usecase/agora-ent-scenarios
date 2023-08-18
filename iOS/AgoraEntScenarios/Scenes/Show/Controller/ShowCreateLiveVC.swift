@@ -127,7 +127,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         }
         
         let roomId = createView.roomNo
-        AppContext.showServiceImp(createView.roomNo).createRoom(roomName: roomName,
+        AppContext.showServiceImp(createView.roomNo)?.createRoom(roomName: roomName,
                                                                 roomId: roomId,
                                                                 thumbnailId: createView.roomBg) { [weak self] err, detailModel in
             if err != nil {

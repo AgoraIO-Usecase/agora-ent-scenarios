@@ -112,7 +112,7 @@ class ShowRoomListVC: UIViewController {
         let nc = UINavigationController(rootViewController: vc)
         nc.modalPresentationStyle = .fullScreen
         if room.ownerId == VLUserCenter.user.id {
-            AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, model in
+            AppContext.showServiceImp(room.roomId)?.joinRoom(room: room) {[weak self] error, model in
                 if let error = error {
                     ToastView.show(text: error.localizedDescription)
                     return
@@ -129,7 +129,7 @@ class ShowRoomListVC: UIViewController {
     }
     
     private func fetchRoomList() {
-        AppContext.showServiceImp("").getRoomList(page: 1) { [weak self] error, roomList in
+        AppContext.showServiceImp("")?.getRoomList(page: 1) { [weak self] error, roomList in
             guard let self = self else {return}
             self.refreshControl.endRefreshing()
             if let error = error {
