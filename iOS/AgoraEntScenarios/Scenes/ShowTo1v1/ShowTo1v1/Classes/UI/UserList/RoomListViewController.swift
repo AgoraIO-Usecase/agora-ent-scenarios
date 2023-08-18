@@ -12,16 +12,16 @@ import AgoraRtcKit
 import VideoLoaderAPI
 
 private let randomRoomName = [
-"Test Room 1",
-"Test Room 2",
-"Test Room 3",
-"Test Room 4",
-"Test Room 5",
-"Test Room 6",
-"Test Room 7",
-"Test Room 8",
-"Test Room 9",
-"Test Room 10",
+    "show_create_room_name1".showTo1v1Localization(),
+    "show_create_room_name2".showTo1v1Localization(),
+    "show_create_room_name3".showTo1v1Localization(),
+    "show_create_room_name4".showTo1v1Localization(),
+    "show_create_room_name5".showTo1v1Localization(),
+    "show_create_room_name6".showTo1v1Localization(),
+    "show_create_room_name7".showTo1v1Localization(),
+    "show_create_room_name8".showTo1v1Localization(),
+    "show_create_room_name9".showTo1v1Localization(),
+    "show_create_room_name10".showTo1v1Localization(),
 ]
 
 extension CallTokenConfig {
@@ -345,7 +345,7 @@ extension RoomListViewController {
         }, randomClosure: {
             let roomNameIdx = Int(arc4random()) % randomRoomName.count
             let roomName = randomRoomName[roomNameIdx]
-            return roomName
+            return "\(roomName)\(Int(arc4random()) % 1000000)"
         })
     }
     
