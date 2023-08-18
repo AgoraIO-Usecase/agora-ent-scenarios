@@ -8,6 +8,11 @@
 import Foundation
 import AgoraRtcKit
 
+enum ShowMode {
+    case single // 单主播模式
+    case pk // pk模式
+}
+
 private let fpsItems: [AgoraVideoFrameRate] = [
     .fps1,
     .fps7,
