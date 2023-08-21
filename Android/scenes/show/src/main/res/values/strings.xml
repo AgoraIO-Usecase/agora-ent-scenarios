@@ -250,6 +250,7 @@
     <string name="show_video_quailty_smooth">流畅优先</string>
     <string name="show_video_quailty_clear">高清优先</string>
     <string name="show_video_quailty_tips">针对不同目标观众端的画质适配策略</string>
+    <string name="show_audience_sr_tips">低端机不建议打开，后台已默认关闭超分</string>
 
     <string-array name="show_encoder">
         <item>硬编码</item>
