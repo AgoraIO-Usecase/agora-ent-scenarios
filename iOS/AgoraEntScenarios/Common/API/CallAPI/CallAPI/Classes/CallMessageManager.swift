@@ -72,15 +72,19 @@ class CallMessageManager: NSObject {
     
     deinit {
         callMessagePrint("deinit-- CallMessageManager ")
-        self.rtmClient?.logout()
-        self.rtmClient?.destroy()
     }
     
-    init(config: CallConfig, delegate: AgoraRtmClientDelegate?) {
+    init(config: CallConfig, rtmDelegate: AgoraRtmClientDelegate?, delegate: CallMessageDelegate?) {
         super.init()
         self.config = config
-        self.rtmClient = _createRtmClient(delegate: delegate)
+        self.delegate = delegate
+        self.rtmClient = _createRtmClient(delegate: rtmDelegate)
         callMessagePrint("init-- CallMessageManager ")
+    }
+    
+    func logout() {
+        self.rtmClient?.logout()
+        self.rtmClient?.destroy()
     }
 }
 
@@ -531,18 +535,20 @@ extension CallMessageManager: AgoraRtmClientDelegate {
 
 extension CallMessageManager {
     private func callMessagePrint(_ message: String) {
-        delegate?.debugInfo(message: "[MessageManager]\(message)")
+        let tag = "[MessageManager][\(String.init(format: "%p", self))][\(String.init(format: "%p", rtmClient))]"
+        delegate?.debugInfo(message: "\(tag)\(message)")
         #if DEBUG
         if let _ = delegate {return}
-        print("[CallApi][MessageManager]\(message)")
+        print("[CallApi]\(tag)\(message)")
         #endif
     }
     
     private func callWarningPrint(_ message: String) {
-        delegate?.debugWarning(message: "[MessageManager]\(message)")
+        let tag = "[MessageManager][\(String.init(format: "%p", self))][\(String.init(format: "%p", rtmClient))]"
+        delegate?.debugWarning(message: "\(tag)\(message)")
         #if DEBUG
         if let _ = delegate {return}
-        print("[CallApi][Warning][MessageManager]\(message)")
+        print("[CallApi][Warning]\(tag)\(message)")
         #endif
     }
 }

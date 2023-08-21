@@ -178,6 +178,7 @@ public class CallApiImpl: NSObject {
     //获取ntp时间
     private func _getNtpTimeInMs() -> Int {
         let ntpTime: UInt64 = config?.rtcEngine.getNtpWallTimeInMs() ?? 0
+//        let ntpTime: UInt64 = UInt64(config?.rtcEngine.getNtpTimeInMs() ?? 0)
         var localNtpTime: Int = Int(ntpTime > Int.max ? 0 : ntpTime)
 
         if localNtpTime == 0 {
@@ -225,10 +226,11 @@ extension CallApiImpl {
         if prevState != state, state == .idle {
             _leaveRTC(force: true)
             _cleanCallCache()
-            delegates.removeAllObjects()
             config = nil
             tokenConfig = nil
+            messageManager?.logout()
             messageManager = nil
+            delegates.removeAllObjects()
         } else if prevState != .idle, state == .prepared {
             _leaveRTC()
             _cleanCallCache()
@@ -584,12 +586,8 @@ extension CallApiImpl {
     }
     
     private func _reportMethod(event: String, label: String = "") {
-        guard let config = config else {
-            return
-        }
-        
         let msgId = "scenarioAPI"
-        let category = "3"
+        let category = "3_iOS_0.2.0"
         if isChannelJoined {
             _sendCustomReportMessage(msgId: msgId, category: category, event: event, label: label, value: 0)
             return
@@ -767,8 +765,7 @@ extension CallApiImpl: CallApiProtocol {
         self.config = config
         self.tokenConfig = token
         
-        self.messageManager = CallMessageManager(config: config, delegate: self)
-        messageManager?.delegate = self
+        self.messageManager = CallMessageManager(config: config, rtmDelegate: self, delegate: self)
 //        config.rtcEngine.setCameraCapturerConfiguration(captureConfig)
         
         //纯1v1需要设置成caller
