@@ -60,6 +60,8 @@ class CallMessageManager: NSObject {
     
     private var snapshotDidRecv: (()->())?
     
+    private var loginSuccess: ((AgoraRtmErrorInfo?)->())?
+    
     /// RTM是否已经登录
     private var isLoginedRTM: Bool = false
     /// RTM 是否已经订阅频道
@@ -316,11 +318,13 @@ extension CallMessageManager {
         }
         
         self.callMessagePrint("will login")
+        self.loginSuccess = completion
         rtmClient.login(byToken: token) {[weak self] resp, error in
             guard let self = self else {return}
             self.callMessagePrint("login: \(error.errorCode.rawValue)")
             self.isLoginedRTM = error.errorCode == .ok ? true : false
-            completion(error)
+            self.loginSuccess?(error)
+            self.loginSuccess = nil
         }
     }
 }
