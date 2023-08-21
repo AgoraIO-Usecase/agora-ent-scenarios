@@ -188,18 +188,13 @@ class ShowLiveViewController: UIViewController {
                 return
             }
             
-            var toastTitle = ""
             if let info = oldValue {
                 _onStopInteraction(interaction: info)
-                toastTitle = info.interactStatus.toastTitle
             }
             if let info = currentInteraction {
                 _onStartInteraction(interaction: info)
-                return
             }
             
-            ToastView.show(text: interruptInteractionReason ?? toastTitle)
-            interruptInteractionReason = nil
         }
     }
     
@@ -681,6 +676,13 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onInterationEnded(interaction: ShowInteractionInfo) {
+        var toastTitle = ""
+        if let info = currentInteraction {
+            toastTitle = info.interactStatus.toastTitle
+        }
+        ToastView.show(text: interruptInteractionReason ?? toastTitle)
+        interruptInteractionReason = nil
+        
         self.currentInteraction = nil
         //TODO:
         _refreshPKUserList()
