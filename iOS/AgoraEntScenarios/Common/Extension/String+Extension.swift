@@ -20,12 +20,12 @@ public extension String {
         let result = UnsafeMutablePointer<CUnsignedChar>.allocate(capacity: digestLen)
 //        CC_SHA256(str!, strLen, result)
         CC_MD5(str!, strLen, result)
-        result.deallocate()
 
         let hash = NSMutableString()
         for i in 0..<digestLen {
             hash.appendFormat("%02x", result[i])
         }
+        result.deallocate()
         let value = hash as String
         return value // [1, 16]
     }
