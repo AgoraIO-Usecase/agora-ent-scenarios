@@ -228,9 +228,9 @@ extension RoomListViewController {
             config.userExtension = userExtension
         }
         
+        callApi.addListener(listener: self)
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
         }
-        callApi.addListener(listener: self)
         
         //reset callVC
         callVC.callApi = callApi
