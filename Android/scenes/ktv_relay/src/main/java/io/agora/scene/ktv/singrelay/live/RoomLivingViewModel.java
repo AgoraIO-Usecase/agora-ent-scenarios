@@ -1127,11 +1127,11 @@ public class RoomLivingViewModel extends ViewModel {
                 } else if (info.getStatus() == SingRelayGameStatus.started.getValue()) {
                     singRelayGameStatusMutableLiveData.postValue(GameStatus.ON_ERROR);
                 } else if (info.getStatus() == SingRelayGameStatus.ended.getValue()) {
-                    singRelayGameStatusMutableLiveData.postValue(GameStatus.ON_END);
                     KTVLogger.d(TAG, "rank: " + info.getRank());
                     if (info.getRank() != null) {
                         rankMap.putAll(info.getRank());
                     }
+                    singRelayGameStatusMutableLiveData.postValue(GameStatus.ON_END);
                 }
             } else {
                 ktvServiceProtocol.prepareSingRelayGame(error -> null);

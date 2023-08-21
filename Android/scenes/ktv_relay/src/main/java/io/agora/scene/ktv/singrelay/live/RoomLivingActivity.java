@@ -317,7 +317,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
             @Override
             public void onGameEnd() {
-                getBinding().singRelayGameView.onGameEnd(roomLivingViewModel.getRankList());
                 if (roomLivingViewModel.isRoomOwner()) {
                     roomLivingViewModel.finishSingRelayGame();
                 }
