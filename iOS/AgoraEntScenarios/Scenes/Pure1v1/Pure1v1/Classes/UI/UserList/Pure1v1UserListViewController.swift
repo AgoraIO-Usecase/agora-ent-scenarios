@@ -74,6 +74,7 @@ class Pure1v1UserListViewController: UIViewController {
         }
         
         if tokenConfig.rtcToken.count > 0, tokenConfig.rtmToken.count > 0 {
+            _initCallAPI(tokenConfig: self.tokenConfig)
             return
         }
         
