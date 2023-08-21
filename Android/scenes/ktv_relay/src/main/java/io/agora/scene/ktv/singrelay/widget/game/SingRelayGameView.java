@@ -257,6 +257,7 @@ public class SingRelayGameView extends FrameLayout {
         } else {
             mBinding.ilIDLE.messageText.setVisibility(View.GONE);
         }
+        mBinding.ilActive.lrcControlView.onGraspDisable();
         mBinding.ilRank.resetRankList(list);
         partNum = 1;
         isGamer = false;
