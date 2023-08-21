@@ -24,6 +24,7 @@ class Pure1v1UserPagingListView: UIView {
         layout.sectionInset = .zero
         layout.itemSize = self.aui_size
         let collectionView = UICollectionView(frame: self.bounds, collectionViewLayout: layout)
+        collectionView.scrollsToTop = false
         collectionView.backgroundColor = .clear
         collectionView.register(Pure1v1UserCell.self, forCellWithReuseIdentifier: NSStringFromClass(Pure1v1UserCell.self))
         collectionView.delegate = self
