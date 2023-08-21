@@ -151,8 +151,8 @@ public class CallTokenConfig: NSObject {
     /// token快要过期了
     @objc optional func tokenPrivilegeWillExpire()
     
-    @objc optional func debugInfo(message: String)
-    @objc optional func debugWarning(message: String)
+    @objc optional func callDebugInfo(message: String)
+    @objc optional func callDebugWarning(message: String)
 }
 
 @objc public protocol CallApiProtocol: NSObjectProtocol {

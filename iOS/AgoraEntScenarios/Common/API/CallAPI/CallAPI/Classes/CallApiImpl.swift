@@ -178,6 +178,7 @@ public class CallApiImpl: NSObject {
     //获取ntp时间
     private func _getNtpTimeInMs() -> Int {
         let ntpTime: UInt64 = config?.rtcEngine.getNtpWallTimeInMs() ?? 0
+//        let ntpTime: UInt64 = UInt64(config?.rtcEngine.getNtpTimeInMs() ?? 0)
         var localNtpTime: Int = Int(ntpTime > Int.max ? 0 : ntpTime)
 
         if localNtpTime == 0 {
@@ -584,12 +585,8 @@ extension CallApiImpl {
     }
     
     private func _reportMethod(event: String, label: String = "") {
-        guard let config = config else {
-            return
-        }
-        
         let msgId = "scenarioAPI"
-        let category = "3"
+        let category = "3_iOS_0.2.0"
         if isChannelJoined {
             _sendCustomReportMessage(msgId: msgId, category: category, event: event, label: label, value: 0)
             return
@@ -767,7 +764,7 @@ extension CallApiImpl: CallApiProtocol {
         self.config = config
         self.tokenConfig = token
         
-        self.messageManager = CallMessageManager(config: config, delegate: self)
+        self.messageManager = CallMessageManager(config: config, rtmDelegate: self, delegate: self)
         messageManager?.delegate = self
 //        config.rtcEngine.setCameraCapturerConfiguration(captureConfig)
         
@@ -1204,7 +1201,7 @@ func debugPrint(_ message: String) {
 extension CallApiImpl {
     func callPrint(_ message: String) {
         for element in delegates.allObjects {
-            (element as? CallApiListenerProtocol)?.debugInfo?(message: message)
+            (element as? CallApiListenerProtocol)?.callDebugInfo?(message: message)
         }
         guard delegates.count == 0 else {return}
     
@@ -1213,7 +1210,7 @@ extension CallApiImpl {
 
     func callWarningPrint(_ message: String) {
         for element in delegates.allObjects {
-            (element as? CallApiListenerProtocol)?.debugWarning?(message: message)
+            (element as? CallApiListenerProtocol)?.callDebugWarning?(message: message)
         }
         callPrint("[Warning]\(message)")
     }
