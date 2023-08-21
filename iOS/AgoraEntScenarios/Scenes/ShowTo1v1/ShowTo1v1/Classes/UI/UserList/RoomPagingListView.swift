@@ -45,6 +45,7 @@ class RoomPagingListView: UIView {
         layout.sectionInset = .zero
         layout.itemSize = self.aui_size
         let collectionView = UICollectionView(frame: self.bounds, collectionViewLayout: layout)
+        collectionView.scrollsToTop = false
         collectionView.backgroundColor = .clear
         collectionView.register(RoomListCell.self, forCellWithReuseIdentifier: NSStringFromClass(RoomListCell.self))
         collectionView.delegate = proxy
