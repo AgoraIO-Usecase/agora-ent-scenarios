@@ -71,7 +71,9 @@ class CallMessageManager: NSObject {
     private var receiptsQueue: [CallQueueInfo] = []
     
     deinit {
-        callMessagePrint("deinit-- CallMessageManager ")
+        #if DEBUG
+        print("deinit-- CallMessageManager ")
+        #endif
     }
     
     init(config: CallConfig, rtmDelegate: AgoraRtmClientDelegate?, delegate: CallMessageDelegate?) {
