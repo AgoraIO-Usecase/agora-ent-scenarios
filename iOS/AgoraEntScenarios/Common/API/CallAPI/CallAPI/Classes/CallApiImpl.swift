@@ -226,10 +226,11 @@ extension CallApiImpl {
         if prevState != state, state == .idle {
             _leaveRTC(force: true)
             _cleanCallCache()
-            delegates.removeAllObjects()
             config = nil
             tokenConfig = nil
+            messageManager?.logout()
             messageManager = nil
+            delegates.removeAllObjects()
         } else if prevState != .idle, state == .prepared {
             _leaveRTC()
             _cleanCallCache()
@@ -765,7 +766,6 @@ extension CallApiImpl: CallApiProtocol {
         self.tokenConfig = token
         
         self.messageManager = CallMessageManager(config: config, rtmDelegate: self, delegate: self)
-        messageManager?.delegate = self
 //        config.rtcEngine.setCameraCapturerConfiguration(captureConfig)
         
         //纯1v1需要设置成caller
