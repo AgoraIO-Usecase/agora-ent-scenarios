@@ -345,7 +345,7 @@ extension CallApiImpl {
         messageManager.rtmInitialize(prepareConfig: prepareConfig, tokenConfig: tokenConfig) {[weak self] err in
             guard let self = self else {return}
             rtmError = err
-            self.callWarningPrint("prepareForCall[\(tag)] rtmInitialize completion: \(err?.localizedDescription ?? "")")
+            self.callWarningPrint("prepareForCall[\(tag)] rtmInitialize completion: \(err?.localizedDescription ?? "success")")
             group.leave()
         }
         
@@ -353,7 +353,7 @@ extension CallApiImpl {
             group.enter()
             _joinRTC(roomId: tokenConfig?.roomId ?? "", token: tokenConfig?.rtcToken ?? "", joinOnly: true) { err in
                 rtcError = err
-                self.callWarningPrint("prepareForCall[\(tag)] joinRTC completion: \(err?.localizedDescription ?? "")")
+                self.callWarningPrint("prepareForCall[\(tag)] joinRTC completion: \(err?.localizedDescription ?? "success")")
                 group.leave()
             }
         }
