@@ -101,7 +101,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         }
         mBeautyProcessor.initialize(
             rtcEngine = mRtcEngine,
-            captureMode = CaptureMode.Custom,
+            captureMode = CaptureMode.Agora,
             statsEnable = true,
             eventCallback = object : IEventCallback {
                 override fun onBeautyStats(stats: BeautyStats) {
