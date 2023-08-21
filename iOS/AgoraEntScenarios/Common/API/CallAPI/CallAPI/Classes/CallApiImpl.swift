@@ -500,6 +500,12 @@ extension CallApiImpl {
             }
             
             self.rtcConnection = nil
+            if error.code == AgoraErrorCode.tokenExpired.rawValue {
+                completion?(error)
+                self._notifyTokenPrivilegeWillExpire()
+                return
+            }
+            
             if retryCount <= 1 {
                 completion?(error)
             } else {

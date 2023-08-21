@@ -317,7 +317,7 @@ extension CallMessageManager {
             return
         }
         
-        self.callMessagePrint("will login")
+        callMessagePrint("will login")
         self.loginSuccess = completion
         rtmClient.login(byToken: token) {[weak self] resp, error in
             guard let self = self else {return}
