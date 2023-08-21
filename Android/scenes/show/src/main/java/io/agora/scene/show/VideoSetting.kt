@@ -9,6 +9,7 @@ import io.agora.scene.base.Constant
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.GsonUtil
 import io.agora.scene.base.utils.SPUtil
+import io.agora.scene.base.utils.ToastUtils
 
 object VideoSetting {
 
@@ -759,6 +760,9 @@ object VideoSetting {
 
     private fun updateRTCAudioSetting(SR: SuperResolution? = null) {
         val rtcEngine = RtcEngineInstance.rtcEngine
+        if (currAudienceDeviceLevel == DeviceLevel.Low) {
+            ToastUtils.showToast(R.string.show_audience_sr_tips)
+        }
         SR?.let {
             val enableSR = currAudienceEnhanceSwitch && SR != SuperResolution.SR_NONE
             val autoSR = currAudienceEnhanceSwitch && SR == SuperResolution.SR_AUTO
