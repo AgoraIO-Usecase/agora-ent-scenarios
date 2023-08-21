@@ -339,17 +339,13 @@ extension CallApiImpl {
         var rtcError: NSError? = nil
         let date = Date()
         isPreparing = true
-        callPrint("prepareForCall")
+        let tag = UUID().uuidString
+        callPrint("prepareForCall[\(tag)]")
         group.enter()
         messageManager.rtmInitialize(prepareConfig: prepareConfig, tokenConfig: tokenConfig) {[weak self] err in
             guard let self = self else {return}
             rtmError = err
-            if let err = err {
-                self.callWarningPrint("_rtmInitialize failed: \(err.localizedDescription)")
-                self._notifyEvent(event: .rtmSetupFailed)
-            } else {
-                self._notifyEvent(event: .rtmSetupSuccessed)
-            }
+            self.callWarningPrint("prepareForCall[\(tag)] rtmInitialize completion: \(err?.localizedDescription ?? "")")
             group.leave()
         }
         
@@ -357,6 +353,7 @@ extension CallApiImpl {
             group.enter()
             _joinRTC(roomId: tokenConfig?.roomId ?? "", token: tokenConfig?.rtcToken ?? "", joinOnly: true) { err in
                 rtcError = err
+                self.callWarningPrint("prepareForCall[\(tag)] joinRTC completion: \(err?.localizedDescription ?? "")")
                 group.leave()
             }
         }
@@ -373,6 +370,7 @@ extension CallApiImpl {
                 } else {
                     self.isPreparing = false
                     self._prepareForCall(prepareConfig: prepareConfig, retryCount: retryCount - 1, completion: completion)
+                    self._notifyEvent(event: .rtmSetupSuccessed)
                 }
                 return
             }
@@ -595,7 +593,7 @@ extension CallApiImpl {
         
         let info = CallReportInfo(msgId: msgId, category: category, event: event, label: label, value: 0)
         reportInfoList.append(info)
-        callPrint("sendCustomReportMessage not join channel cache it! event: \(event) label: \(label)")
+//        callPrint("sendCustomReportMessage not join channel cache it! event: \(event) label: \(label)")
     }
     
     private func _reportEvent(key: String, value: Int, messageId: String) {
@@ -629,7 +627,7 @@ extension CallApiImpl {
                                                  event: event,
                                                  label: label,
                                                  value: value)
-        callPrint("sendCustomReportMessage msgId: \(msgId) category: \(category) event: \(event) label: \(label) value: \(value) : \(ret)")
+        callPrint("sendCustomReportMessage msgId: \(msgId) category: \(category) event: \(event) : \(ret)")
     }
 }
 
