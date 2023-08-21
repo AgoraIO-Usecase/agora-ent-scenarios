@@ -38,16 +38,13 @@ import com.sensetime.stmobile.params.STEffectBeautyType;
 
 import java.io.File;
 
-import io.agora.base.VideoFrame;
 import io.agora.beautyapi.sensetime.CaptureMode;
 import io.agora.beautyapi.sensetime.Config;
-import io.agora.beautyapi.sensetime.ErrorCode;
 import io.agora.beautyapi.sensetime.IEventCallback;
 import io.agora.beautyapi.sensetime.SenseTimeBeautyAPI;
 import io.agora.beautyapi.sensetime.utils.STRenderKit;
 import io.agora.beautyapi.sensetime.utils.utils.FileUtils;
 import io.agora.rtc2.RtcEngine;
-import io.agora.rtc2.video.IVideoFrameObserver;
 import io.agora.scene.show.beauty.BeautyCache;
 import io.agora.scene.show.beauty.IBeautyProcessor;
 
@@ -224,62 +221,5 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         } else {
             mSTRenderer.removeMakeupByType(type);
         }
-    }
-
-    @Override
-    public boolean onCaptureVideoFrame(int type, VideoFrame videoFrame) {
-        if (videoFrame == null) return false;
-        shouldMirror = false;
-
-        int ret = getSenseTimeBeautyAPI().onFrame(videoFrame);
-        if (ret == ErrorCode.ERROR_OK.getValue()) {
-            return true;
-        } else if (ret == ErrorCode.ERROR_FRAME_SKIPPED.getValue()) {
-            return false;
-        } else {
-            shouldMirror = videoFrame.getSourceType() == VideoFrame.SourceType.kFrontCamera;
-            return true;
-        }
-    }
-
-    @Override
-    public boolean onPreEncodeVideoFrame(int type, VideoFrame videoFrame) {
-        return false;
-    }
-
-    @Override
-    public boolean onMediaPlayerVideoFrame(VideoFrame videoFrame, int mediaPlayerId) {
-        return false;
-    }
-
-    @Override
-    public boolean onRenderVideoFrame(String channelId, int uid, VideoFrame videoFrame) {
-        return false;
-    }
-
-    @Override
-    public int getVideoFrameProcessMode() {
-        return IVideoFrameObserver.PROCESS_MODE_READ_WRITE;
-    }
-
-    @Override
-    public int getVideoFormatPreference() {
-        return IVideoFrameObserver.VIDEO_PIXEL_DEFAULT;
-    }
-
-    @Override
-    public boolean getRotationApplied() {
-        return false;
-    }
-
-
-    @Override
-    public boolean getMirrorApplied() {
-        return shouldMirror;
-    }
-
-    @Override
-    public int getObservedFramePosition() {
-        return IVideoFrameObserver.POSITION_POST_CAPTURER;
     }
 }

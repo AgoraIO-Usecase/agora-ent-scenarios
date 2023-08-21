@@ -64,7 +64,6 @@ object RtcEngineInstance {
                     }
                 }
                 innerRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
-                    registerVideoFrameObserver(beautyProcessor)
                     enableVideo()
                 }
             }
