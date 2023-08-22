@@ -67,6 +67,9 @@ class CallMessageManager: NSObject {
     /// RTM 是否已经订阅频道
     public private(set) var isSubscribedRTM: Bool = false
     
+    private var prepareConfig: PrepareConfig?
+    private var tokenConfig: CallTokenConfig?
+    
     // 消息id
     private var messageId: Int = 0
     //待接收回执队列，保存没有接收到回执或者等待未超时的消息
@@ -346,6 +349,8 @@ extension CallMessageManager {
                               tokenConfig: CallTokenConfig?,
                               completion: ((NSError?) -> ())?) {
         callMessagePrint("_rtmInitialize")
+        self.prepareConfig = prepareConfig
+        self.tokenConfig = tokenConfig
         guard let rtmToken = tokenConfig?.rtmToken else {
             let reason = "RTM Token is Empty"
             completion?(NSError(domain: reason, code: -1))
@@ -391,6 +396,12 @@ extension CallMessageManager {
     /// - Parameter rtmToken: <#rtmToken description#>
     public func renewToken(rtmToken: String) {
         guard isLoginedRTM else {
+            if let prepareConfig = prepareConfig, prepareConfig.autoLoginRTM {
+                callMessagePrint("renewToken need to reinit")
+                self.rtmClient.logout()
+                rtmInitialize(prepareConfig: prepareConfig, tokenConfig: tokenConfig) { err in
+                }
+            }
             return
         }
         rtmClient?.renewToken(rtmToken,completion: {[weak self] resp, err in
