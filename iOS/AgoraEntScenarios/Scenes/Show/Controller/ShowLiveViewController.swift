@@ -49,6 +49,10 @@ class ShowLiveViewController: UIViewController {
         
     private var checking = false
     
+    private var isJoined = false
+    
+    private var isAdded = false
+    
     private var roomId: String {
         get {
             guard let roomId = room?.roomId else {
@@ -358,10 +362,12 @@ extension ShowLiveViewController {
     func _joinRoom(_ room: ShowRoomListModel){
         
         ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: room.roomId)
+        isJoined = false
         AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
             guard let self = self else {return}
             showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
             showLogger.info("joinRoom[\(room.roomId)] roomModel: \(detailModel?.roomId ?? "null")")
+            self.isJoined = true
             if detailModel == nil {
                 self.onRoomExpired()
                 if let err = error {
@@ -389,18 +395,27 @@ extension ShowLiveViewController {
         if let targetRoomId = currentInteraction?.roomId, targetRoomId != roomId {
             ShowAgoraKitManager.shared.updateLoadingType(roomId: roomId, channelId: targetRoomId, playState: playState)
         }
-        if playState == .joined {
-            AppContext.showServiceImp(roomId).initRoom { error in
-                
-            }
-            sendMessageWithText("join_live_room".show_localized)
-        } else if playState == .prejoined {
-            AppContext.showServiceImp(roomId).deinitRoom { error in
-                
-            }
-            sendMessageWithText("leave_live_room".show_localized)
-        } else {
+        if isJoined {
+            if playState == .joined {
+                if !isAdded {
+                    AppContext.showServiceImp(roomId).initRoom { error in
+                        
+                    }
+                    sendMessageWithText("join_live_room".show_localized)
+                    isAdded = true
+                }
 
+            } else if playState == .prejoined {
+                if isAdded {
+                    AppContext.showServiceImp(roomId).deinitRoom { error in
+                        
+                    }
+                    sendMessageWithText("leave_live_room".show_localized)
+                    isAdded = false
+                }
+            } else {
+
+            }
         }
         updateRemoteCavans()
     }
