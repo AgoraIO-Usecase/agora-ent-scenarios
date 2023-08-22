@@ -19,7 +19,7 @@ private let SYNC_MANAGER_INTERACTION_COLLECTION = "show_interaction_collection"
 
 
 enum ShowError: Int, Error {
-    case unknown = 0                   //unknown error
+    case unknown = 1                   //unknown error
     case networkError                  //network fail
     case pkInteractionMaximumReach     //pk interaction reach the maximum
     case seatInteractionMaximumReach   //seat interaction reach the maximum
@@ -100,6 +100,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     private var isAdded = false
     
     private var isJoined = false
+    
+    private var joinRetry = 0
     
     private var createPkInvitationClosure: ((NSError?) -> Void)?
     
@@ -241,7 +243,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 self?.roomId = channelName
                 self?.checkTokenExists { success in
                     guard success else {
-                        completion(NSError(domain: "error", code: -1, userInfo: nil), nil)
+                        completion(ShowError.unknown.toNSError(), nil)
                         return
                     }
                     let output = ShowRoomDetailModel.yy_model(with: params!)
@@ -264,7 +266,9 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         let params = room.yy_modelToJSONObject() as? [String: Any]
         initScene { [weak self] error in
             if let error = error  {
-                completion(error, nil)
+                self?._joinRoomRetry(room: room, completion: completion, reachLimitTask: {
+                    completion(error, nil)
+                })
                 return
             }
             SyncUtilsWrapper.joinSceneByQueue(id: room.roomId,
@@ -281,7 +285,9 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 self?.roomId = channelName
                 self?.checkTokenExists { success in
                     guard success else {
-                        completion(NSError(domain: "error", code: -1, userInfo: nil), nil)
+                        self?._joinRoomRetry(room: room, completion: completion, reachLimitTask: {
+                            completion(ShowError.unknown.toNSError(), nil)
+                        })
                         return
                     }
                     let output = ShowRoomDetailModel.yy_model(with: params!)
@@ -293,8 +299,20 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     completion(nil, output)
                 }
             } fail: { error in
-                completion(error.toNSError(), nil)
+                self?._joinRoomRetry(room: room, completion: completion, reachLimitTask: {
+                    completion(error.toNSError(), nil)
+                })
             }
+        }
+    }
+    
+    private func _joinRoomRetry(room: ShowRoomListModel,
+                               completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void, reachLimitTask:(()->Void)?){
+        if joinRetry == 3 {
+            reachLimitTask?()
+        }else {
+            joinRetry += 1
+            joinRoom(room: room, completion: completion)
         }
     }
     

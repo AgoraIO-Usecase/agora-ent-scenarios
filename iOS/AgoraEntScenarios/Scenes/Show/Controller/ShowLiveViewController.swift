@@ -67,6 +67,8 @@ class ShowLiveViewController: UIViewController {
     private var remoteVideoWidth: UInt?
     private var currentMode: ShowMode?
     
+    private var joinRetry = 0
+    
     private var interruptInteractionReason: String?
     
     //TODO: remove
@@ -124,6 +126,8 @@ class ShowLiveViewController: UIViewController {
     private lazy var pkInviteView = ShowPKInviteView(roomId: roomId)
     
     private lazy var panelPresenter = ShowDataPanelPresenter()
+    
+    private var finishView: ShowReceiveFinishView?
     
     //pk user list (room list)
     private var pkUserInvitationList: [ShowPKUserInfo]? {
@@ -359,17 +363,18 @@ extension ShowLiveViewController {
     }
     
     func _joinRoom(_ room: ShowRoomListModel){
-        
+        finishView?.removeFromSuperview()
         ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: room.roomId)
         AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
             guard let self = self else {return}
-            showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
-            showLogger.info("joinRoom[\(room.roomId)] roomModel: \(detailModel?.roomId ?? "null")")
-            if detailModel == nil {
-                self.onRoomExpired()
-                if let err = error {
-                    ToastView.show(text: "room == \(room.roomId) error = \(err.localizedDescription)" )
+            guard self.room?.roomId == room.roomId else { return }
+            if let err = error {
+                showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
+                showLogger.info("joinRoom[\(room.roomId)] roomModel: \(detailModel?.roomId ?? "null")")
+                if err.code == -1 {
+                    self.onRoomExpired()
                 }
+//                ToastView.show(text: "room == \(room.roomId) error = \(err.localizedDescription)" )
             } else {
                 self._subscribeServiceEvent()
                 self.updateLoadingType(playState: self.loadingType)
@@ -467,18 +472,16 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onRoomExpired() {
-        /*
-        leaveRoom()
-        
-        let finishView = ShowReceiveFinishView()
-        finishView.headImg = room?.ownerAvatar ?? ""
-        finishView.headName = room?.ownerName ?? ""
-        finishView.delegate = self
-        self.view.addSubview(finishView)
-        finishView.snp.makeConstraints { make in
+//        leaveRoom()
+        finishView?.removeFromSuperview()
+        finishView = ShowReceiveFinishView()
+        finishView?.headImg = room?.ownerAvatar ?? ""
+        finishView?.headName = room?.ownerName ?? ""
+        finishView?.delegate = self
+        self.view.addSubview(finishView!)
+        finishView?.snp.makeConstraints { make in
             make.left.right.top.bottom.equalToSuperview()
         }
-         */
     }
     
     func onUserCountChanged(userCount: Int) {
