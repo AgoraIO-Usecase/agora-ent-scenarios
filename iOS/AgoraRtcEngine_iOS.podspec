@@ -1,6 +1,6 @@
 # AgoraRtcEngine
 Pod::Spec.new do |spec| 
-   spec.name          = "AgoraRtcEngine_iOS" 
+   spec.name          = "AgoraRtcEngine_Special_iOS" 
    spec.version       = "1.0" 
    spec.summary       = "Agora iOS SDK" 
    spec.description   = "iOS library for agora A/V communication, broadcasting and data channel service." 
