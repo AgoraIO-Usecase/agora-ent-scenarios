@@ -100,6 +100,7 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
             binding.tvRoomNum.text = userInfo.getRoomId()
         }
         CallServiceManager.instance.remoteCanvas?.let { canvas ->
+            binding.llContainer.removeAllViews()
             binding.llContainer.addView(canvas)
         }
         CallServiceManager.instance.localUser?.let { userInfo ->
