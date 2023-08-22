@@ -499,13 +499,13 @@ extension CallApiImpl {
                 return
             }
             
-            self.rtcConnection = nil
             if error.code == AgoraErrorCode.tokenExpired.rawValue {
                 completion?(error)
                 self._notifyTokenPrivilegeWillExpire()
                 return
             }
             
+            self.rtcConnection = nil
             if retryCount <= 1 {
                 completion?(error)
             } else {
