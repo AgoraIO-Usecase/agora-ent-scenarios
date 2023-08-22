@@ -251,6 +251,7 @@ extension CallMessageManager {
         let options = AgoraRtmPublishOptions()
         let date = Date()
         rtmClient.publish(roomId, message: data!, withOption: options) { [weak self] resp, err in
+            
             let error: NSError? = err.errorCode == .ok ? nil : NSError(domain: err.reason, code: err.errorCode.rawValue)
             self?.callMessagePrint("publish cost \(-date.timeIntervalSinceNow * 1000) ms")
             if error == nil {
@@ -321,6 +322,11 @@ extension CallMessageManager {
         self.loginSuccess = completion
         rtmClient.login(byToken: token) {[weak self] resp, error in
             guard let self = self else {return}
+            
+            if error.errorCode == .tokenExpired {
+                self.rtmDelegate?.rtmKit?(self.rtmClient, onTokenPrivilegeWillExpire: nil)
+            }
+            
             self.callMessagePrint("login: \(error.errorCode.rawValue)")
             self.isLoginedRTM = error.errorCode == .ok ? true : false
             self.loginSuccess?(error)
