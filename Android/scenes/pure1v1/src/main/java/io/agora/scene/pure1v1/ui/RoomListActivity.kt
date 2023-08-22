@@ -3,6 +3,7 @@ package io.agora.scene.pure1v1.ui
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.nfc.Tag
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -27,6 +28,7 @@ import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
+import io.agora.scene.pure1v1.Pure1v1Logger
 import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.callAPI.*
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListActivityBinding
@@ -247,6 +249,14 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             }
             else -> {
             }
+        }
+    }
+
+    override fun onCallLogger(tag: String, level: Int, message: String) {
+        when (level) {
+            Log.ERROR -> Pure1v1Logger.e(tag, message)
+            Log.WARN -> Pure1v1Logger.w(tag, message)
+            else -> Pure1v1Logger.d(tag, message)
         }
     }
 
