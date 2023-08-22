@@ -49,9 +49,9 @@ class ShowLiveViewController: UIViewController {
         
     private var checking = false
     
-    private var isJoined = false
+   
     
-    private var isAdded = false
+//    private var isAdded = false
     
     private var roomId: String {
         get {
@@ -295,10 +295,9 @@ class ShowLiveViewController: UIViewController {
         ShowAgoraKitManager.shared.removeRtcDelegate(delegate: self, roomId: roomId)
         ShowAgoraKitManager.shared.cleanCapture()
         ShowAgoraKitManager.shared.leaveChannelEx(roomId: roomId, channelId: roomId)
-        AppContext.showServiceImp(roomId).unsubscribeEvent(delegate: self)
-        
         AppContext.showServiceImp(roomId).leaveRoom {_ in
         }
+        AppContext.showServiceImp(roomId).unsubscribeEvent(delegate: self)
         if role == .broadcaster {
             BeautyManager.shareManager.destroy()
         }
@@ -336,7 +335,7 @@ class ShowLiveViewController: UIViewController {
         let showMsg = ShowMessage()
         showMsg.userId = VLUserCenter.user.id
         showMsg.userName = VLUserCenter.user.name
-        showMsg.message = text + "room id = \(roomId)"
+        showMsg.message = text
         showMsg.createAt = Date().millionsecondSince1970()
         
         AppContext.showServiceImp(roomId).sendChatMessage(message: showMsg) { error in
@@ -362,12 +361,10 @@ extension ShowLiveViewController {
     func _joinRoom(_ room: ShowRoomListModel){
         
         ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: room.roomId)
-        isJoined = false
         AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
             guard let self = self else {return}
             showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
             showLogger.info("joinRoom[\(room.roomId)] roomModel: \(detailModel?.roomId ?? "null")")
-            self.isJoined = true
             if detailModel == nil {
                 self.onRoomExpired()
                 if let err = error {
@@ -381,12 +378,11 @@ extension ShowLiveViewController {
     }
     
     func _leavRoom(_ room: ShowRoomListModel){
-        AppContext.unloadShowServiceImp(room.roomId)
         ShowAgoraKitManager.shared.removeRtcDelegate(delegate: self, roomId: room.roomId)
         AppContext.showServiceImp(roomId).unsubscribeEvent(delegate: self)
         AppContext.showServiceImp(roomId).leaveRoom { error in
-
         }
+        AppContext.unloadShowServiceImp(room.roomId)
     }
     
 
@@ -395,28 +391,12 @@ extension ShowLiveViewController {
         if let targetRoomId = currentInteraction?.roomId, targetRoomId != roomId {
             ShowAgoraKitManager.shared.updateLoadingType(roomId: roomId, channelId: targetRoomId, playState: playState)
         }
-        if isJoined {
-            if playState == .joined {
-                if !isAdded {
-                    AppContext.showServiceImp(roomId).initRoom { error in
-                        
-                    }
-                    sendMessageWithText("join_live_room".show_localized)
-                    isAdded = true
-                }
-
-            } else if playState == .prejoined {
-                if isAdded {
-                    AppContext.showServiceImp(roomId).deinitRoom { error in
-                        
-                    }
-                    sendMessageWithText("leave_live_room".show_localized)
-                    isAdded = false
-                }
-            } else {
-
-            }
-        }
+        if playState == .joined {
+            AppContext.showServiceImp(roomId).initRoom { error in }
+        } else if playState == .prejoined {
+            AppContext.showServiceImp(roomId).deinitRoom { error in }
+        } else {}
+        
         updateRemoteCavans()
     }
     

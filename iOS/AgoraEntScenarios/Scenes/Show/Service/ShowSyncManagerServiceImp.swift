@@ -97,6 +97,10 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     private var userMuteLocalAudio:Bool = false
     
+    private var isAdded = false
+    
+    private var isJoined = false
+    
     private var createPkInvitationClosure: ((NSError?) -> Void)?
     
     //create pk invitation map
@@ -256,6 +260,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     @objc func joinRoom(room: ShowRoomListModel,
                         completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
+        isJoined = false
         let params = room.yy_modelToJSONObject() as? [String: Any]
         initScene { [weak self] error in
             if let error = error  {
@@ -284,6 +289,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     self?._subscribeAll()
                     self?._getAllPKInvitationList(room: nil) { error, list in
                     }
+                    self?.isJoined = true
                     completion(nil, output)
                 }
             } fail: { error in
@@ -315,6 +321,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func leaveRoom(completion: @escaping (NSError?) -> Void) {
+        isJoined = false
         defer {
             self.pkCreatedInvitationMap.values.forEach { invitation in
                 let pkRoomId = invitation.roomId
@@ -364,11 +371,20 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func initRoom(completion: @escaping (NSError?) -> Void) {
-        _addUserIfNeed(finished: completion)
+        if isJoined , !isAdded {
+            _addUserIfNeed(finished: completion)
+            _sendMessageWithText("join_live_room".show_localized)
+            isAdded = true
+        }
     }
     
     func deinitRoom(completion: @escaping (NSError?) -> Void) {
-        _removeUser(completion: completion)
+        
+        if isJoined , isAdded {
+            _removeUser(completion: completion)
+            _sendMessageWithText("leave_live_room".show_localized)
+            isAdded = false
+        }
     }
     
     func getAllUserList(completion: @escaping (NSError?, [ShowUser]?) -> Void) {
@@ -377,6 +393,15 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     func sendChatMessage(message: ShowMessage, completion: ((NSError?) -> Void)?) {
         _addMessage(message: message, finished: completion)
+    }
+    
+    private func _sendMessageWithText(_ text: String) {
+        let showMsg = ShowMessage()
+        showMsg.userId = VLUserCenter.user.id
+        showMsg.userName = VLUserCenter.user.name
+        showMsg.message = text
+        showMsg.createAt = Date().millionsecondSince1970()
+        sendChatMessage(message: showMsg) { error in }
     }
     
     func getAllMicSeatApplyList(completion: @escaping (NSError?, [ShowMicSeatApply]?) -> Void) {
