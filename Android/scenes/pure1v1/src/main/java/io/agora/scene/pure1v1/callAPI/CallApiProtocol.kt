@@ -162,6 +162,11 @@ public interface ICallApiListener {
 
     /// token快要过期了
     fun tokenPrivilegeWillExpire() {}
+
+    /**
+     * 抛出日志给上层
+     */
+    fun onCallLogger(tag: String, level: Int, message: String) {}
 }
 
 data class AGError(
