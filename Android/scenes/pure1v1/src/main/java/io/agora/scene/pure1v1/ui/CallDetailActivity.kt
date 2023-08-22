@@ -4,12 +4,15 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.IRtcEngineEventHandler
+import io.agora.scene.base.component.BaseBindingActivity
 import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.callAPI.CallEvent
 import io.agora.scene.pure1v1.callAPI.CallReason
@@ -19,21 +22,22 @@ import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailActivityBinding
 import io.agora.scene.pure1v1.service.CallServiceManager
 import java.util.concurrent.TimeUnit
 
-class CallDetailActivity : AppCompatActivity(), ICallApiListener {
+class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>(), ICallApiListener {
 
     private val tag = "CallDetailActivity_LOG"
-    private lateinit var binding: Pure1v1CallDetailActivityBinding
 
     private val startTime = System.currentTimeMillis()
     private var timerHandler: Handler? = null
     private var dashboard: DashboardFragment? = null
     private var rtcEventHandler: IRtcEngineEventHandler? = null
 
+    override fun getViewBinding(inflater: LayoutInflater): Pure1v1CallDetailActivityBinding {
+        return Pure1v1CallDetailActivityBinding.inflate(inflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = Pure1v1CallDetailActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setupView()
         CallServiceManager.instance.callApi?.addListener(this)
         setupRTCListener()
