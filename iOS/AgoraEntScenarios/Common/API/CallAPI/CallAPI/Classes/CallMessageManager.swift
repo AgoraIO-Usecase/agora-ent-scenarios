@@ -60,10 +60,15 @@ class CallMessageManager: NSObject {
     
     private var snapshotDidRecv: (()->())?
     
+    private var loginSuccess: ((AgoraRtmErrorInfo?)->())?
+    
     /// RTM是否已经登录
     private var isLoginedRTM: Bool = false
     /// RTM 是否已经订阅频道
     public private(set) var isSubscribedRTM: Bool = false
+    
+    private var prepareConfig: PrepareConfig?
+    private var tokenConfig: CallTokenConfig?
     
     // 消息id
     private var messageId: Int = 0
@@ -249,6 +254,7 @@ extension CallMessageManager {
         let options = AgoraRtmPublishOptions()
         let date = Date()
         rtmClient.publish(roomId, message: data!, withOption: options) { [weak self] resp, err in
+            
             let error: NSError? = err.errorCode == .ok ? nil : NSError(domain: err.reason, code: err.errorCode.rawValue)
             self?.callMessagePrint("publish cost \(-date.timeIntervalSinceNow * 1000) ms")
             if error == nil {
@@ -315,12 +321,19 @@ extension CallMessageManager {
             return
         }
         
-        self.callMessagePrint("will login")
+        callMessagePrint("will login")
+        self.loginSuccess = completion
         rtmClient.login(byToken: token) {[weak self] resp, error in
             guard let self = self else {return}
+            
+            if error.errorCode == .tokenExpired {
+                self.rtmDelegate?.rtmKit?(self.rtmClient, onTokenPrivilegeWillExpire: nil)
+            }
+            
             self.callMessagePrint("login: \(error.errorCode.rawValue)")
             self.isLoginedRTM = error.errorCode == .ok ? true : false
-            completion(error)
+            self.loginSuccess?(error)
+            self.loginSuccess = nil
         }
     }
 }
@@ -336,6 +349,8 @@ extension CallMessageManager {
                               tokenConfig: CallTokenConfig?,
                               completion: ((NSError?) -> ())?) {
         callMessagePrint("_rtmInitialize")
+        self.prepareConfig = prepareConfig
+        self.tokenConfig = tokenConfig
         guard let rtmToken = tokenConfig?.rtmToken else {
             let reason = "RTM Token is Empty"
             completion?(NSError(domain: reason, code: -1))
@@ -381,6 +396,12 @@ extension CallMessageManager {
     /// - Parameter rtmToken: <#rtmToken description#>
     public func renewToken(rtmToken: String) {
         guard isLoginedRTM else {
+            if let prepareConfig = prepareConfig, prepareConfig.autoLoginRTM {
+                callMessagePrint("renewToken need to reinit")
+                self.rtmClient.logout()
+                rtmInitialize(prepareConfig: prepareConfig, tokenConfig: tokenConfig) { err in
+                }
+            }
             return
         }
         rtmClient?.renewToken(rtmToken,completion: {[weak self] resp, err in
