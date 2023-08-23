@@ -18,7 +18,12 @@ private let kDebugModeKey = "kDebugModeKey"
 extension AppContext {
     static private var _showServiceImpMap: [String: ShowSyncManagerServiceImp] = [String: ShowSyncManagerServiceImp]()
     
-    static func showServiceImp(_ roomId: String) -> ShowServiceProtocol {
+    static private var _showExpiredImp: [String] = [String]()
+    
+    static func showServiceImp(_ roomId: String) -> ShowServiceProtocol? {
+//        if _showExpiredImp.contains(roomId) {
+//            return nil
+//        }
         let showServiceImp = _showServiceImpMap[roomId]
         guard let showServiceImp = showServiceImp else {
             let imp = roomId.count == 6 ? ShowSyncManagerServiceImp() : ShowRobotSyncManagerServiceImp()
@@ -28,6 +33,12 @@ extension AppContext {
         return showServiceImp
     }
     
+    static func expireShowImp(_ roomId: String) {
+        if !_showExpiredImp.contains(roomId) {
+            _showExpiredImp.append(roomId)
+        }
+    }
+    
     static func unloadShowServiceImp(_ roomId: String) {
         _showServiceImpMap[roomId] = nil
     }
@@ -35,6 +46,7 @@ extension AppContext {
     static func unloadShowServiceImp() {
         _showServiceImpMap = [String: ShowSyncManagerServiceImp]()
         SyncUtilsWrapper.cleanScene()
+        _showExpiredImp.removeAll()
     }
     
     public var showRoomList: [ShowRoomListModel]? {
@@ -54,15 +66,5 @@ extension AppContext {
             return self.extDic[kRtcToken] as? String
         }
     }
-    
-//    @objc public var isDebugMode: Bool{
-//        set{
-//            UserDefaults.standard.set(newValue, forKey: kDebugModeKey)
-//        }
-//        
-//        get {
-//            return UserDefaults.standard.bool(forKey: kDebugModeKey)
-//        }
-//    }
 }
 

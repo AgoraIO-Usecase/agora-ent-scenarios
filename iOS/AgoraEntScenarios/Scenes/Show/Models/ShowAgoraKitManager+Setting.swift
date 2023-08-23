@@ -8,6 +8,11 @@
 import Foundation
 import AgoraRtcKit
 
+enum ShowMode {
+    case single // 单主播模式
+    case pk // pk模式
+}
+
 private let fpsItems: [AgoraVideoFrameRate] = [
     .fps1,
     .fps7,
@@ -150,7 +155,7 @@ extension ShowAgoraKitManager {
         updateSettingForkey(.lowlightEnhance)
         updateSettingForkey(.colorEnhance)
         updateSettingForkey(.videoDenoiser)
-        rtcParam.pvc = false
+        rtcParam.pvc = true
         updateSettingForkey(.PVC)
         rtcParam.sr = true
         updateSettingForkey(.SR)
@@ -319,13 +324,14 @@ extension ShowAgoraKitManager {
             let indexValue = key.intValue
             let index = indexValue % fpsItems.count
             encoderConfig.frameRate = fpsItems[index]
+            // 采集帧率
+            captureConfig.frameRate = Int32(fpsItems[index].rawValue)
+            engine?.setCameraCapturerConfiguration(captureConfig)
             if let currentChannelId = currentChannelId {
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }else{
                 engine?.setVideoEncoderConfiguration(encoderConfig)
             }
-            // 采集帧率
-            captureConfig.frameRate = Int32(fpsItems[index].rawValue)
         case .H265:
             let isOn = key.boolValue
             encoderConfig.codecType = isOn ? .H265 : .H264

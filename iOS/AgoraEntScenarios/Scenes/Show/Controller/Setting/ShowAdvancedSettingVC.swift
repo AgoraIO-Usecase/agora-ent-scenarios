@@ -18,9 +18,6 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     private let naviBar = ShowNavigationBar()
     
     var musicManager: ShowMusicPresenter!
-    
-    // 当前的观众预设类型
-    var audiencePresetType: ShowPresetType?
 
     private let titles = ["show_advance_setting_video_title".show_localized,
                           "show_advance_setting_audio_title".show_localized]

@@ -71,7 +71,6 @@ class ShowCreateLiveVC: UIViewController {
             make.edges.equalToSuperview()
         }
         
-//        beautyVC.transitioningDelegate = transDelegate
         beautyVC.dismissed = { [weak self] in
             self?.createView.hideBottomViews = false
         }
@@ -86,19 +85,9 @@ class ShowCreateLiveVC: UIViewController {
     
     private func showPreset() {
         if AppContext.shared.isDebugMode {
-            let vc = ShowPresettingVC()
-            vc.didSelectedPresetType = { type, modeName in
-                var level = ShowAgoraKitManager.DeviceLevel.medium
-                switch type {
-                case .show_low:     level = .low
-                case .show_medium:  level = .medium
-                case .show_high:    level = .high
-                case .unknown:      level = .medium
-                }
-                ShowAgoraKitManager.shared.deviceLevel = level
-                ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)
-            }
-            present(vc, animated: true)
+            let vc = ShowDebugSettingVC()
+            vc.isBroadcastor = true
+            self.navigationController?.pushViewController(vc, animated: true)
         } else {
             ShowNetStateSelectViewController.showInViewController(self)
         }
@@ -138,17 +127,15 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         }
         
         let roomId = createView.roomNo
-        AppContext.showServiceImp(createView.roomNo).createRoom(roomName: roomName,
+        AppContext.showServiceImp(createView.roomNo)?.createRoom(roomName: roomName,
                                                                 roomId: roomId,
                                                                 thumbnailId: createView.roomBg) { [weak self] err, detailModel in
             if err != nil {
                 ToastView.show(text: err!.localizedDescription)
             }
-//            liveVC.agoraKit = self?.agoraKitManager.agoraKit
             guard let wSelf = self, let detailModel = detailModel else { return }
             let liveVC = ShowLivePagesViewController()
             liveVC.roomList = [detailModel]
-//            liveVC.selectedResolution = wSelf.selectedResolution
             liveVC.focusIndex = liveVC.roomList?.firstIndex(where: { $0.roomId == roomId }) ?? 0
             
             wSelf.navigationController?.pushViewController(liveVC, animated: false)

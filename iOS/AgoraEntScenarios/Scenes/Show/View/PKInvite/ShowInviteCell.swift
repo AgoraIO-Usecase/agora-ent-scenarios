@@ -151,7 +151,7 @@ class ShowPKInviteViewCell: ShowInviteCell {
             return
         }
 
-        AppContext.showServiceImp(roomId!).createPKInvitation(room: invitation) {[weak self] error in
+        AppContext.showServiceImp(roomId!)?.createPKInvitation(room: invitation) {[weak self] error in
             if let err = error {
                 ToastView.show(text: err.localizedDescription)
                 return
@@ -246,11 +246,11 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
     fileprivate override func onTapStatusButton(sender: UIButton) {
         super.onTapStatusButton(sender: sender)
         if let model = seatApplyModel, sender.tag == 1 {
-            AppContext.showServiceImp(roomId!).acceptMicSeatApply(apply: model) {[weak self] _ in
+            AppContext.showServiceImp(roomId!)?.acceptMicSeatApply(apply: model) {[weak self] _ in
                 self?.refreshDataClosure?()
             }
         } else if let model = seatInvitationModel {
-            AppContext.showServiceImp(roomId!).createMicSeatInvitation(user: model) {[weak self] error in
+            AppContext.showServiceImp(roomId!)?.createMicSeatInvitation(user: model) {[weak self] error in
                 if let err = error {
                     ToastView.show(text: err.localizedDescription)
                     return
