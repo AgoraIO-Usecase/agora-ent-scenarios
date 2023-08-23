@@ -44,12 +44,6 @@ class ShowAgoraKitManager: NSObject {
         return config
     }()
     
-    private lazy var canvas: AgoraRtcVideoCanvas = {
-        let canvas = AgoraRtcVideoCanvas()
-        canvas.mirrorMode = .disabled
-        return canvas
-    }()
-    
     public var engine: AgoraRtcEngineKit?
     
     private var player: AgoraRtcMediaPlayerProtocol?
@@ -277,8 +271,7 @@ class ShowAgoraKitManager: NSObject {
         engine.setClientRole(.broadcaster)
         engine.setVideoEncoderConfiguration(encoderConfig)
         engine.setCameraCapturerConfiguration(captureConfig)
-        canvas.view = canvasView
-        engine.setupLocalVideo(canvas)
+        BeautyManager.shareManager.beautyAPI.setupLocalVideo(canvasView, renderMode: .hidden)
         engine.enableVideo()
         engine.startPreview()
     }
@@ -442,14 +435,15 @@ class ShowAgoraKitManager: NSObject {
             assert(true, "rtc engine not initlized")
             return
         }
+        let canvas = AgoraRtcVideoCanvas()
         canvas.view = canvasView
         canvas.uid = uid
         canvas.mirrorMode = .disabled
+        engine.setupLocalVideo(canvas)
+        engine.startPreview()
         engine.setDefaultAudioRouteToSpeakerphone(true)
         engine.enableAudio()
         engine.enableVideo()
-        engine.setupLocalVideo(canvas)
-        engine.startPreview()
         showLogger.info("setupLocalVideo target uid:\(uid), user uid\(UserInfo.userId)", context: kShowLogBaseContext)
     }
     
