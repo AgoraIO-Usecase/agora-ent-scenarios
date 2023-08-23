@@ -203,7 +203,11 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     func leaveRoom(roomInfo: ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void) {
         self._removeUser(channelName: roomInfo.roomId) { err in
         }
-        self.sceneRefs[roomInfo.roomId]?.deleteScenes()
+        if roomInfo.userId == user?.userId {
+            sceneRefs[roomInfo.roomId]?.deleteScenes()
+        } else {
+            manager.leaveScene(roomId: roomInfo.roomId)
+        }
         completion(nil)
     }
     
