@@ -234,6 +234,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.clActive.setBackgroundResource(backgroundResId);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
+        mBinding.ilActive.singRelay.setVisibility(View.GONE);
 
         changeViewByRole();
     }
@@ -261,6 +262,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.INVISIBLE);
         if (!isOnSeat) {
             mBinding.ilActive.singRelay.setVisibility(View.GONE);
+            mBinding.ilActive.singRelay.setEnabled(false);
         }
 
         if (this.mRole == Role.Singer) {
@@ -351,6 +353,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     public void onGraspDisable() {
         if (mBinding == null) return;
         mBinding.ilActive.singRelay.setVisibility(View.GONE);
+        mBinding.ilActive.singRelay.setEnabled(false);
     }
 
     public void setRole(@NonNull Role mRole) {

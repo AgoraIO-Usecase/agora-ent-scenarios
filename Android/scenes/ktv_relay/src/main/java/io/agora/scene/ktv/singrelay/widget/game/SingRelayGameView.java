@@ -178,6 +178,7 @@ public class SingRelayGameView extends FrameLayout {
         }, 3000);
     }
 
+    // 开始抢唱倒计时
     @SuppressLint("SetTextI18n")
     public void onGraspSongBegin() {
         if (mBinding == null) return;
