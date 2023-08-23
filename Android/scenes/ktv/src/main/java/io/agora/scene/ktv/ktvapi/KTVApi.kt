@@ -19,6 +19,16 @@ enum class KTVType(val value: Int)  {
 }
 
 /**
+ * KTV歌曲类型
+ * @param SONG_CODE mcc版权歌单songCode
+ * @param SONG_URL 本地歌曲地址url
+ */
+enum class KTVSongType(val value: Int) {
+    SONG_CODE(0),
+    SONG_URL(1)
+}
+
+/**
  * 在KTVApi中的身份
  * @param SoloSinger 独唱者: 当前只有自己在唱歌
  * @param CoSinger 合唱者: 加入合唱需要通过调用switchSingerRole将切换身份成合唱
@@ -199,7 +209,7 @@ abstract class IKTVApiEventHandler {
  * @param maxCacheSize 最大缓存歌曲数
  * @param type KTV场景
  */
-data class KTVApiConfig(
+data class KTVApiConfig constructor(
     val appId: String,
     val rtmToken: String,
     val engine: RtcEngine,
@@ -208,7 +218,8 @@ data class KTVApiConfig(
     val chorusChannelName: String,
     val chorusChannelToken: String,
     val maxCacheSize: Int = 10,
-    val type: KTVType = KTVType.Normal
+    val type: KTVType = KTVType.Normal,
+    val musicType: KTVSongType = KTVSongType.SONG_CODE
 )
 
 /**
@@ -367,6 +378,34 @@ interface KTVApi {
         url: String,
         config: KTVLoadMusicConfiguration
     )
+
+    /**
+     * 加载歌曲，同时只能为一首歌loadSong，同步调用， 一般使用此loadSong是歌曲已经preload成功（url为本地文件地址）
+     * @param config 加载歌曲配置，config.autoPlay = true，默认播放url1
+     * @param url1 歌曲地址1
+     * @param url2 歌曲地址2
+     *
+     *
+     * 推荐调用：
+     * 歌曲开始时：
+     * 主唱 loadMusic(KTVLoadMusicConfiguration(autoPlay=true, mode=LOAD_MUSIC_AND_LRC, url, mainSingerUid)) switchSingerRole(SoloSinger)
+     * 观众 loadMusic(KTVLoadMusicConfiguration(autoPlay=false, mode=LOAD_LRC_ONLY, url, mainSingerUid))
+     * 加入合唱时：
+     * 准备加入合唱者：loadMusic(KTVLoadMusicConfiguration(autoPlay=false, mode=LOAD_MUSIC_ONLY, url, mainSingerUid))
+     * loadMusic成功后switchSingerRole(CoSinger)
+     */
+    fun load2Music(
+        url1: String,
+        url2: String,
+        config: KTVLoadMusicConfiguration
+    )
+
+    /**
+     * 多文件切换播放资源
+     * @param url 需要切换的播放资源，需要为 load2Music 中 参数 url1，url2 中的一个
+     * @param syncPts 是否同步切换前后的起始播放位置: true 同步，false 不同步，从 0 开始
+     */
+    fun switchPlaySrc(url: String, syncPts: Boolean)
 
     /**
      * 异步切换演唱身份，结果会通过回调通知业务层

@@ -57,7 +57,7 @@ object AudioModeration {
         payload.put("sceneName", sceneName)
         postBody.put("payload", payload.toString())
 
-        val request = Request.Builder().url("https://toolbox.bj2.agoralab.co/v1/moderation/audio"
+        val request = Request.Builder().url("https://service.agora.io/toolbox/v1/moderation/audio"
         ).addHeader("Content-Type", "application/json").post(postBody.toString().toRequestBody()).build()
         val execute = okHttpClient.newCall(request).execute()
         if (execute.isSuccessful) {
