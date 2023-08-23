@@ -17,7 +17,22 @@ protocol ShowLiveViewControllerDelegate: NSObjectProtocol {
 
 class ShowLiveViewController: UIViewController {
     weak var delegate: ShowLiveViewControllerDelegate?
-    var room: ShowRoomListModel?
+    var room: ShowRoomListModel? {
+        didSet{
+            if oldValue?.roomId != room?.roomId {
+                liveView.room = room
+                if let oldRoom = oldValue {
+                    _leavRoom(oldRoom)
+                }
+                if let room = room {
+                    serviceImp = AppContext.showServiceImp(room.roomId)
+                    _joinRoom(room)
+                }
+                loadingType = .prejoined
+            }
+        }
+    }
+    
     var loadingType: RoomStatus = .prejoined {
         didSet {
             if loadingType == oldValue {
@@ -35,6 +50,10 @@ class ShowLiveViewController: UIViewController {
         
     private var checking = false
     
+   
+    
+//    private var isAdded = false
+    
     private var roomId: String {
         get {
             guard let roomId = room?.roomId else {
@@ -48,6 +67,8 @@ class ShowLiveViewController: UIViewController {
     
     private var remoteVideoWidth: UInt?
     private var currentMode: ShowMode?
+    
+    private var joinRetry = 0
     
     private var interruptInteractionReason: String?
     
@@ -107,6 +128,8 @@ class ShowLiveViewController: UIViewController {
     
     private lazy var panelPresenter = ShowDataPanelPresenter()
     
+    private var finishView: ShowReceiveFinishView?
+    
     //pk user list (room list)
     private var pkUserInvitationList: [ShowPKUserInfo]? {
         didSet {
@@ -143,6 +166,8 @@ class ShowLiveViewController: UIViewController {
         didSet {
             //update audio status
             if let interaction = currentInteraction {
+                liveView.canvasView.setLocalUserInfo(name: room?.ownerName ?? "")
+                liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
                 liveView.canvasView.isLocalMuteMic = interaction.ownerMuteAudio
                 liveView.canvasView.isRemoteMuteMic = interaction.muteAudio
                 
@@ -174,18 +199,13 @@ class ShowLiveViewController: UIViewController {
                 return
             }
             
-            var toastTitle = ""
             if let info = oldValue {
                 _onStopInteraction(interaction: info)
-                toastTitle = info.interactStatus.toastTitle
             }
             if let info = currentInteraction {
                 _onStartInteraction(interaction: info)
-                return
             }
             
-            ToastView.show(text: interruptInteractionReason ?? toastTitle)
-            interruptInteractionReason = nil
         }
     }
     
@@ -209,6 +229,8 @@ class ShowLiveViewController: UIViewController {
     
     deinit {
         let roomId = room?.roomId ?? ""
+        leaveRoom()
+        AppContext.unloadShowServiceImp(roomId)
         showLogger.info("deinit-- ShowLiveViewController \(roomId)")
     }
     
@@ -216,27 +238,11 @@ class ShowLiveViewController: UIViewController {
         super.viewDidLoad()
         
         guard let room = room else {return}
-        serviceImp = AppContext.showServiceImp(room.roomId)
         setupUI()
         if room.ownerId == VLUserCenter.user.id {// 自己的房间
             self.joinChannel()
             self._subscribeServiceEvent()
             AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self)
-        } else { // 自己是观众
-            if let imp = serviceImp {
-                self.joinChannel(needUpdateCavans: self.loadingType == .joined)
-                imp.joinRoom(room: room) {[weak self] error, detailModel in
-                    guard let self = self else {return}
-                    if detailModel == nil || error != nil {
-                        self.onRoomExpired()
-                    } else {
-                        self._subscribeServiceEvent()
-                        self.updateLoadingType(playState: self.loadingType)
-                    }
-                }
-            } else {
-                self.onRoomExpired()
-            }
         }
     }
     
@@ -272,10 +278,12 @@ class ShowLiveViewController: UIViewController {
         ShowAgoraKitManager.shared.removeRtcDelegate(delegate: self, roomId: roomId)
         ShowAgoraKitManager.shared.cleanCapture()
         ShowAgoraKitManager.shared.leaveChannelEx(roomId: roomId, channelId: roomId)
+
         serviceImp?.unsubscribeEvent(delegate: self)
         
         serviceImp?.leaveRoom {_ in
         }
+        serviceImp?.unsubscribeEvent(delegate: self)
         if role == .broadcaster {
             BeautyManager.shareManager.destroy()
         }
@@ -336,6 +344,33 @@ extension ShowLiveViewController {
         }
     }
     
+    func _joinRoom(_ room: ShowRoomListModel){
+        finishView?.removeFromSuperview()
+        ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: room.roomId)
+        serviceImp?.joinRoom(room: room) {[weak self] error, detailModel in
+            guard let self = self else {return}
+            guard self.room?.roomId == room.roomId else { return }
+            if let err = error {
+                showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
+                if err.code == -1 {
+                    self.onRoomExpired()
+                }
+//                ToastView.show(text: "room == \(room.roomId) error = \(err.localizedDescription)" )
+            } else {
+                self._subscribeServiceEvent()
+                self.updateLoadingType(playState: self.loadingType)
+            }
+        }
+    }
+    
+    func _leavRoom(_ room: ShowRoomListModel){
+        ShowAgoraKitManager.shared.removeRtcDelegate(delegate: self, roomId: room.roomId)
+        AppContext.showServiceImp(room.roomId)?.unsubscribeEvent(delegate: self)
+        AppContext.showServiceImp(room.roomId)?.leaveRoom { error in
+        }
+        AppContext.unloadShowServiceImp(room.roomId)
+    }
+    
 
     func updateLoadingType(playState: RoomStatus) {
         ShowAgoraKitManager.shared.updateLoadingType(roomId: roomId, channelId: roomId, playState: playState)
@@ -343,20 +378,12 @@ extension ShowLiveViewController {
             ShowAgoraKitManager.shared.updateLoadingType(roomId: roomId, channelId: targetRoomId, playState: playState)
         }
         if playState == .joined {
-            serviceImp?.initRoom { error in
-                
-            }
-            sendMessageWithText("join_live_room".show_localized)
-            updateRemoteCavans()
+            serviceImp?.initRoom { error in }
         } else if playState == .prejoined {
-            serviceImp?.deinitRoom { error in
-                
-            }
-            sendMessageWithText("leave_live_room".show_localized)
-            updateRemoteCavans()
-        } else {
-            leaveRoom()
-        }
+            serviceImp?.deinitRoom { error in }
+        } else {}
+        
+        updateRemoteCavans()
     }
     
     func updateRemoteCavans() {
@@ -423,13 +450,14 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onRoomExpired() {
         AppContext.expireShowImp(roomId)
-        leaveRoom()
-        let finishView = ShowReceiveFinishView()
-        finishView.headImg = room?.ownerAvatar ?? ""
-        finishView.headName = room?.ownerName ?? ""
-        finishView.delegate = self
-        self.view.addSubview(finishView)
-        finishView.snp.makeConstraints { make in
+//        leaveRoom()
+        finishView?.removeFromSuperview()
+        finishView = ShowReceiveFinishView()
+        finishView?.headImg = room?.ownerAvatar ?? ""
+        finishView?.headName = room?.ownerName ?? ""
+        finishView?.delegate = self
+        self.view.addSubview(finishView!)
+        finishView?.snp.makeConstraints { make in
             make.left.right.top.bottom.equalToSuperview()
         }
     }
@@ -622,6 +650,13 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onInterationEnded(interaction: ShowInteractionInfo) {
+        var toastTitle = ""
+        if let info = currentInteraction {
+            toastTitle = info.interactStatus.toastTitle
+        }
+        ToastView.show(text: interruptInteractionReason ?? toastTitle)
+        interruptInteractionReason = nil
+        
         self.currentInteraction = nil
         //TODO:
         _refreshPKUserList()
@@ -954,7 +989,7 @@ extension ShowLiveViewController {
                 if self.role == .broadcaster && self.interactionStatus != .pking && self.interactionStatus != .onSeat {
                     receive = false
                 }
-                if self.role == .audience && self.interactionStatus != .pking && self.interactionStatus != .onSeat {
+                if self.role == .audience && self.currentInteraction?.userId != VLUserCenter.user.id {
                     send = false
                 }
                 let data = self.panelPresenter.generatePanelData(audioOnly: false, send: send, receive: receive, audience: (self.role == .audience))

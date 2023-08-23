@@ -21,9 +21,9 @@ extension AppContext {
     static private var _showExpiredImp: [String] = [String]()
     
     static func showServiceImp(_ roomId: String) -> ShowServiceProtocol? {
-        if _showExpiredImp.contains(roomId) {
-            return nil
-        }
+//        if _showExpiredImp.contains(roomId) {
+//            return nil
+//        }
         let showServiceImp = _showServiceImpMap[roomId]
         guard let showServiceImp = showServiceImp else {
             let imp = roomId.count == 6 ? ShowSyncManagerServiceImp() : ShowRobotSyncManagerServiceImp()
