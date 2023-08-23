@@ -16,14 +16,6 @@ class CallViewController: BaseRoomViewController {
                                      name: targetUser?.userName ?? "",
                                      id: targetUser?.userId ?? "",
                                      time: Int64(Date().timeIntervalSince1970 * 1000))
-            
-//            roomInfoView.timerCallBack = {[weak self] duration in
-//                if duration < 20 * 60 {
-//                    return
-//                }
-//                self?.roomInfoView.setRoomInfo(avatar: nil, name: nil, id: nil, time: nil)
-//                self?._hangupAction()
-//            }
         }
     }
     
