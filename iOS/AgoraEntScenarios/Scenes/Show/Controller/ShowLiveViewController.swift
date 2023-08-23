@@ -352,7 +352,6 @@ extension ShowLiveViewController {
             guard self.room?.roomId == room.roomId else { return }
             if let err = error {
                 showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
-                showLogger.info("joinRoom[\(room.roomId)] roomModel: \(detailModel?.roomId ?? "null")")
                 if err.code == -1 {
                     self.onRoomExpired()
                 }
@@ -390,7 +389,6 @@ extension ShowLiveViewController {
     func updateRemoteCavans() {
         guard role == .audience, loadingType == .joined else { return }
         let uid: UInt = UInt(room?.ownerId ?? "0") ?? 0
-        print(" roomId ====== \(roomId) ")
         ShowAgoraKitManager.shared.setupRemoteVideo(channelId: roomId,
                                                     uid: uid,
                                                     canvasView: liveView.canvasView.localView)
