@@ -323,6 +323,7 @@ extension CallMessageManager {
         
         callMessagePrint("will login")
         self.loginSuccess = completion
+        rtmClient.logout()
         rtmClient.login(byToken: token) {[weak self] resp, error in
             guard let self = self else {return}
             
@@ -330,7 +331,7 @@ extension CallMessageManager {
                 self.rtmDelegate?.rtmKit?(self.rtmClient, onTokenPrivilegeWillExpire: nil)
             }
             
-            self.callMessagePrint("login: \(error.errorCode.rawValue)")
+            self.callMessagePrint("login completion: \(error.errorCode.rawValue)")
             self.isLoginedRTM = error.errorCode == .ok ? true : false
             self.loginSuccess?(error)
             self.loginSuccess = nil
