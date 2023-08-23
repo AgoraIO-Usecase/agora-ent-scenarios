@@ -168,7 +168,8 @@ extension CallMessageManager {
             let options2 = AgoraRtmSubscribeOptions()
             options2.withMessage = false
             options2.withMetadata = false
-            options2.withPresence = true
+            //TODO(RTM Team): timeout to reconnect bug('presence = true' can not recv subscribe completion)
+//            options2.withPresence = true
             group.enter()
             callMessagePrint("2/3 will _subscribe[\(ownerRoomId)]")
             _subscribe(channelName: ownerRoomId, option: options2) {[weak self] error in
@@ -194,11 +195,12 @@ extension CallMessageManager {
             let options = AgoraRtmSubscribeOptions()
             options.withMessage = true
             options.withMetadata = false
-            if config.mode == .showTo1v1 {
-                options.withPresence = true
-            } else {
-                options.withPresence = false
-            }
+            //TODO(RTM Team): timeout to reconnect bug('presence = true' can not recv subscribe completion)
+//            if config.mode == .showTo1v1 {
+//                options.withPresence = true
+//            } else {
+//                options.withPresence = false
+//            }
             group.enter()
             var err: NSError? = nil
             _subscribe(channelName: roomId, option: options) { error in
@@ -334,6 +336,7 @@ extension CallMessageManager {
         rtmClient.login(byToken: token) {[weak self] resp, error in
             guard let self = self else {return}
             
+            //TODO(RTM Team): timeout to reconnect bug (callback multi times)
             if error.errorCode == .tokenExpired {
                 self.rtmDelegate?.rtmKit?(self.rtmClient, onTokenPrivilegeWillExpire: nil)
             }
