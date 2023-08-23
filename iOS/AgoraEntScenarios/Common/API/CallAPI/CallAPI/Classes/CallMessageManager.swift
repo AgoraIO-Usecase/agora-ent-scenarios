@@ -132,17 +132,18 @@ extension CallMessageManager {
         }
         
         /*
-         纯1v1
-         订阅自己频道的presence和消息
-         
-         秀场转1v1
+         纯1v1:
+            订阅自己频道的message，用于收消息
+         秀场转1v1:
          1.主叫
-            a.订阅被叫频道的presence，用来写入presence
+            a.订阅被叫频道的presence，用户读取呼叫信息
             b.订阅自己频道的message, 用来收消息
          2.被叫
-            a.订阅自己频道的presence和消息
+            a.订阅自己频道的presence,用于写入呼叫信息
+            b.订阅自己频道的message，用来收消息
          */
         if config?.role == .caller, config.mode == .showTo1v1 {
+            //秀场转1v1主叫
             guard let ownerRoomId = config?.ownerRoomId else {
                 completion?(NSError(domain: "ownerRoomId is nil, please invoke 'initialize' to setup config", code: -1))
                 return
@@ -193,7 +194,11 @@ extension CallMessageManager {
             let options = AgoraRtmSubscribeOptions()
             options.withMessage = true
             options.withMetadata = false
-            options.withPresence = true
+            if config.mode == .showTo1v1 {
+                options.withPresence = true
+            } else {
+                options.withPresence = false
+            }
             group.enter()
             var err: NSError? = nil
             _subscribe(channelName: roomId, option: options) { error in
@@ -201,9 +206,11 @@ extension CallMessageManager {
                 group.leave()
             }
             
-            group.enter()
-            snapshotDidRecv = {
-                group.leave()
+            if options.withPresence {
+                group.enter()
+                snapshotDidRecv = {
+                    group.leave()
+                }
             }
             
             group.notify(queue: DispatchQueue.main) {
