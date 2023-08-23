@@ -131,20 +131,20 @@ class ShowApplyAndInviteView: UIView {
     }
     
     private func getApplyList() {
-        AppContext.showServiceImp(roomId).getAllMicSeatApplyList {[weak self] _, list in
+        AppContext.showServiceImp(roomId)?.getAllMicSeatApplyList {[weak self] _, list in
             guard let list = list?.filterDuplicates({ $0.userId }) else { return }
             self?.tableView.dataArray = list.filter({ $0.status == .waitting })
         }
     }
     private func getInviteList() {
-        AppContext.showServiceImp(roomId).getAllUserList {[weak self] _, list in
+        AppContext.showServiceImp(roomId)?.getAllUserList {[weak self] _, list in
             guard let list = list?.filter({$0.userId != VLUserCenter.user.id}) else { return }
             self?.tableView.dataArray = list.filter({ $0.status != .accepted })
         }
     }
     
     private func getApplyPKInfo() {
-        AppContext.showServiceImp(roomId).getCurrentApplyUser(roomId: roomId) {[weak self] roomModel in
+        AppContext.showServiceImp(roomId)?.getCurrentApplyUser(roomId: roomId) {[weak self] roomModel in
             self?.tipsContainerView.isHidden = roomModel == nil
             self?.tipsLabel.text = String(format: "show_pking_with_broadcastor".show_localized, roomModel?.ownerName ?? "")
         }
@@ -212,7 +212,7 @@ class ShowApplyAndInviteView: UIView {
     private func onTapEndButton(sender: AGEButton) {
         updateLayout(isHidden: true)
         if let model = seatMicModel {
-            AppContext.showServiceImp(roomId).stopInteraction(interaction: model) { _ in }
+            AppContext.showServiceImp(roomId)?.stopInteraction(interaction: model) { _ in }
         }
         applyStatusClosure?(.idle)
     }

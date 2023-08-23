@@ -19,7 +19,7 @@ private let SYNC_MANAGER_INTERACTION_COLLECTION = "show_interaction_collection"
 
 
 enum ShowError: Int, Error {
-    case unknown = 0                   //unknown error
+    case unknown = 1                   //unknown error
     case networkError                  //network fail
     case pkInteractionMaximumReach     //pk interaction reach the maximum
     case seatInteractionMaximumReach   //seat interaction reach the maximum
@@ -96,6 +96,12 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     private weak var subscribeDelegate: ShowSubscribeServiceProtocol?
     
     private var userMuteLocalAudio:Bool = false
+    
+    private var isAdded = false
+    
+    private var isJoined = false
+    
+    private var joinRetry = 0
     
     private var createPkInvitationClosure: ((NSError?) -> Void)?
     
@@ -237,7 +243,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 self?.roomId = channelName
                 self?.checkTokenExists { success in
                     guard success else {
-                        completion(NSError(domain: "error", code: -1, userInfo: nil), nil)
+                        completion(ShowError.unknown.toNSError(), nil)
                         return
                     }
                     let output = ShowRoomDetailModel.yy_model(with: params!)
@@ -256,10 +262,13 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     @objc func joinRoom(room: ShowRoomListModel,
                         completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
+        isJoined = false
         let params = room.yy_modelToJSONObject() as? [String: Any]
         initScene { [weak self] error in
             if let error = error  {
-                completion(error, nil)
+                self?._joinRoomRetry(room: room, completion: completion, reachLimitTask: {
+                    completion(error, nil)
+                })
                 return
             }
             SyncUtilsWrapper.joinSceneByQueue(id: room.roomId,
@@ -276,7 +285,9 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 self?.roomId = channelName
                 self?.checkTokenExists { success in
                     guard success else {
-                        completion(NSError(domain: "error", code: -1, userInfo: nil), nil)
+                        self?._joinRoomRetry(room: room, completion: completion, reachLimitTask: {
+                            completion(ShowError.unknown.toNSError(), nil)
+                        })
                         return
                     }
                     let output = ShowRoomDetailModel.yy_model(with: params!)
@@ -284,11 +295,24 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     self?._subscribeAll()
                     self?._getAllPKInvitationList(room: nil) { error, list in
                     }
+                    self?.isJoined = true
                     completion(nil, output)
                 }
             } fail: { error in
-                completion(error.toNSError(), nil)
+                self?._joinRoomRetry(room: room, completion: completion, reachLimitTask: {
+                    completion(error.toNSError(), nil)
+                })
             }
+        }
+    }
+    
+    private func _joinRoomRetry(room: ShowRoomListModel,
+                               completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void, reachLimitTask:(()->Void)?){
+        if joinRetry == 3 {
+            reachLimitTask?()
+        }else {
+            joinRetry += 1
+            joinRoom(room: room, completion: completion)
         }
     }
     
@@ -315,6 +339,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func leaveRoom(completion: @escaping (NSError?) -> Void) {
+        isJoined = false
         defer {
             self.pkCreatedInvitationMap.values.forEach { invitation in
                 let pkRoomId = invitation.roomId
@@ -364,11 +389,20 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func initRoom(completion: @escaping (NSError?) -> Void) {
-        _addUserIfNeed(finished: completion)
+        if isJoined , !isAdded {
+            _addUserIfNeed(finished: completion)
+            _sendMessageWithText("join_live_room".show_localized)
+            isAdded = true
+        }
     }
     
     func deinitRoom(completion: @escaping (NSError?) -> Void) {
-        _removeUser(completion: completion)
+        
+        if isJoined , isAdded {
+            _removeUser(completion: completion)
+            _sendMessageWithText("leave_live_room".show_localized)
+            isAdded = false
+        }
     }
     
     func getAllUserList(completion: @escaping (NSError?, [ShowUser]?) -> Void) {
@@ -377,6 +411,15 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     func sendChatMessage(message: ShowMessage, completion: ((NSError?) -> Void)?) {
         _addMessage(message: message, finished: completion)
+    }
+    
+    private func _sendMessageWithText(_ text: String) {
+        let showMsg = ShowMessage()
+        showMsg.userId = VLUserCenter.user.id
+        showMsg.userName = VLUserCenter.user.name
+        showMsg.message = text
+        showMsg.createAt = Date().millionsecondSince1970()
+        sendChatMessage(message: showMsg) { error in }
     }
     
     func getAllMicSeatApplyList(completion: @escaping (NSError?, [ShowMicSeatApply]?) -> Void) {
@@ -900,12 +943,12 @@ extension ShowSyncManagerServiceImp {
         model.userName = VLUserCenter.user.name
 
         let params = model.yy_modelToJSONObject() as! [String: Any]
-        agoraPrint("imp user add ...")
+        agoraPrint("imp user add ...\(channelName)")
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .add(data: params, success: { [weak self] object in
-                agoraPrint("imp user add success...")
+                agoraPrint("imp user add success...\(channelName)")
                 guard let self = self,
                       let jsonStr = object.toJson(),
                       let model = ShowUser.yy_model(withJSON: jsonStr) else {
@@ -946,7 +989,7 @@ extension ShowSyncManagerServiceImp {
 
     private func _subscribeOnlineUsersChanged() {
         guard let channelName = roomId else {
-            agoraAssert("channelName = nil")
+            agoraPrint("channelName = nil")
             return
         }
         agoraPrint("imp user subscribe ...")
