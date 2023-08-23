@@ -113,9 +113,9 @@ class ShowToolMenuView: UIView {
             case .idle_broadcaster:
                 updateToolType(type: [.switch_camera, .camera, .mic, .real_time_data, .setting])
             case .pking:
-                updateToolType(type: [.switch_camera, .camera, .mute_mic, .end_pk])
+                updateToolType(type: [.switch_camera, .camera, .mute_mic, .end_pk, .real_time_data])
             case .managerMic:
-                updateToolType(type: [.mute_mic, .end_pk])
+                updateToolType(type: [.mute_mic, .end_pk, .real_time_data])
             case .idle_audience:
                 updateToolType(type: [.real_time_data, .setting])
             }

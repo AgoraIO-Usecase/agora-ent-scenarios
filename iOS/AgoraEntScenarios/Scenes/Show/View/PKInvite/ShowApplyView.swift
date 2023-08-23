@@ -89,7 +89,9 @@ class ShowApplyView: UIView {
     }
     
     func getAllMicSeatList(autoApply: Bool) {
-        let imp = AppContext.showServiceImp(roomId)
+        guard let imp = AppContext.showServiceImp(roomId) else {
+            return
+        }
         imp.getAllMicSeatApplyList {[weak self] _, list in
             guard let list = list?.filter({ $0.userId != self?.interactionModel?.userId }) else { return }
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
@@ -182,12 +184,12 @@ class ShowApplyView: UIView {
     private func onTapRevokeButton(sender: AGEButton) {
         if sender.tag == 0, let dataArray = tableView.dataArray, dataArray.count > 0 {
 //            revokeutton.isHidden = true
-            AppContext.showServiceImp(roomId).cancelMicSeatApply { _ in }
+            AppContext.showServiceImp(roomId)?.cancelMicSeatApply { _ in }
             let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
             tableView.dataArray?.remove(at: index)
             setupTipsInfo(count: dataArray.count)
         } else if let interactionModel = interactionModel {
-            AppContext.showServiceImp(roomId).stopInteraction(interaction: interactionModel) { _ in }
+            AppContext.showServiceImp(roomId)?.stopInteraction(interaction: interactionModel) { _ in }
             AlertManager.hiddenView()
         }
     }
