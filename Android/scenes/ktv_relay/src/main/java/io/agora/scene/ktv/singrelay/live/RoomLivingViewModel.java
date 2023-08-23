@@ -849,12 +849,12 @@ public class RoomLivingViewModel extends ViewModel {
                             }
                         }
                     } else if (jsonMsg.getString("cmd").equals("SingingScore")) {
-                        KTVLogger.d(TAG, "onMessage/SingingScore: " + jsonMsg);
-                        float score = (float) jsonMsg.getDouble("score");
-                        int songNum = (int) jsonMsg.getDouble("num");
-                        String userId = jsonMsg.getString("userId");
-                        String userName = jsonMsg.getString("userName");
-                        String poster = jsonMsg.getString("poster");
+//                        KTVLogger.d(TAG, "onMessage/SingingScore: " + jsonMsg);
+//                        float score = (float) jsonMsg.getDouble("score");
+//                        int songNum = (int) jsonMsg.getDouble("num");
+//                        String userId = jsonMsg.getString("userId");
+//                        String userName = jsonMsg.getString("userName");
+//                        String poster = jsonMsg.getString("poster");
 
 //                        // 本地演唱 计入rank
 //                        RankModel model = new RankModel(
