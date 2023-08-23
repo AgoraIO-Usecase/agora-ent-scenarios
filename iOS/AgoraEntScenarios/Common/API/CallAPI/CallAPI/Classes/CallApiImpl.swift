@@ -768,7 +768,7 @@ extension CallApiImpl: CallApiProtocol {
         }
         self.config = config
         self.tokenConfig = token
-        
+        self.messageManager?.logout()
         self.messageManager = CallMessageManager(config: config, rtmDelegate: self, delegate: self)
 //        config.rtcEngine.setCameraCapturerConfiguration(captureConfig)
         
