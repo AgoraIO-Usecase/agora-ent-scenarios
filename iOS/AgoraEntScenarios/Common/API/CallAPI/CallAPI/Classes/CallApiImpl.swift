@@ -624,15 +624,16 @@ extension CallApiImpl {
                                           event: String,
                                           label: String,
                                           value: Int) {
-        guard let config = config, isChannelJoined else {
+        guard let config = config, isChannelJoined, let rtcConnection = rtcConnection else {
             return
         }
         let ret =
-        config.rtcEngine.sendCustomReportMessage(msgId,
-                                                 category: category,
-                                                 event: event,
-                                                 label: label,
-                                                 value: value)
+        config.rtcEngine.sendCustomReportMessageEx(msgId,
+                                                   category: category,
+                                                   event: event,
+                                                   label: label,
+                                                   value: value,
+                                                   connection: rtcConnection)
         callPrint("sendCustomReportMessage msgId: \(msgId) category: \(category) event: \(event) : \(ret)")
     }
 }
