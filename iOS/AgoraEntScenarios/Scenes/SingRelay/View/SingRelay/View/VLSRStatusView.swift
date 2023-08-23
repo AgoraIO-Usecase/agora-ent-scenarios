@@ -103,6 +103,7 @@ class VLSRStatusView: UIView {
 
    @objc var state: SBGState = .ownerOrderMusic {
         didSet {
+            print("state111:\(state)")
             if state == .ownerOrderMusic {
                 numLabel.isHidden = true
                 contentImgView.isHidden = true
@@ -393,7 +394,7 @@ class VLSRStatusView: UIView {
         return btn
     }()
     
-    private lazy var srBtn: UIButton = { //抢唱按钮
+    @objc public lazy var srBtn: UIButton = { //抢唱按钮
         let btn = UIButton()
         btn.setBackgroundImage(UIImage.sceneImage(name: "sr"), for: .normal)
         btn.setBackgroundImage(UIImage.sceneImage(name: "timedown"), for: .disabled)
@@ -599,6 +600,8 @@ class VLSRStatusView: UIView {
         }
     }
     
+    private var loadingView: SRKaraokeLoadingView!
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         layoutUI()
@@ -617,7 +620,7 @@ class VLSRStatusView: UIView {
         addSubview(noticeBtn)
         
         addSubview(lrcView)
-        
+
         addSubview(orderBtn)
         
        // addSubview(randomBtn)
@@ -635,10 +638,15 @@ class VLSRStatusView: UIView {
         contentImgView.addSubview(attributeView)
         attributeView.isHidden = true
         
+        loadingView = SRKaraokeLoadingView(frame: CGRect(x: 0, y: 20, width: self.bounds.width, height: self.bounds.height - 20))
+        addSubview(loadingView)
+        loadingView.isHidden = true
+        
         addSubview(srBtn)
 
         addSubview(notiView)
         notiView.isHidden = true
+        
     }
     
     @objc private func choose() {//点歌
@@ -658,7 +666,9 @@ class VLSRStatusView: UIView {
     
     @objc private func nextSong() {//切歌
         guard let delegate = delegate else {return}
-        delegate.didSrActionChanged(.nextSong)
+        if srBtn.isEnabled {
+            delegate.didSrActionChanged(.nextSong)
+        }
     }
     
     @objc private func effect() {//调音
@@ -669,6 +679,17 @@ class VLSRStatusView: UIView {
     @objc private func trackChange() {//原唱
         guard let delegate = delegate else {return}
         delegate.didSrActionChanged(.origin)
+    }
+    
+    @objc public func updateLoadingView(with progress: Int) {
+        DispatchQueue.main.async {[weak self] in
+            if progress == 100 {
+                self?.loadingView.isHidden = true
+            } else {
+                self?.loadingView.isHidden = false
+                self?.loadingView.setProgress(progress)
+            }
+        }
     }
     
     override func layoutSubviews() {

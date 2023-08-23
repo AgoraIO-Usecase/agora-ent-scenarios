@@ -36,7 +36,7 @@
     self.requestImgView = requestImgView;
     
     UILabel *tipsLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-300)*0.5, requestImgView.bottom+20, 300, 20)];
-    tipsLabel.text = KTVLocalizedString(@"ktv_room_before_speaker");
+    tipsLabel.text = KTVLocalizedString(@"ktv_room_before_gameStart");
     tipsLabel.textAlignment = NSTextAlignmentCenter;
     tipsLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
     tipsLabel.font = UIFontMake(14);

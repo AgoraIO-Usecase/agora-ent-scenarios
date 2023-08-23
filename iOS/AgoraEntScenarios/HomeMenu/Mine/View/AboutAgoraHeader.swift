@@ -18,7 +18,7 @@ final class AboutAgoraHeader: UIView {
     var delegate: AboutAgoraHeaderDelegate?
     
     private lazy var icon: UIImageView = {
-        UIImageView(frame: CGRect(x: self.frame.width/2.0-37, y: 42, width: 74, height: 74)).backgroundColor(.white).image(UIImage(named: "app_icon")!)
+        UIImageView(frame: CGRect(x: self.frame.width/2.0-37, y: 42, width: 74, height: 74)).backgroundColor(.white).image(UIImage(named: "about_icon")!)
     }()
     
     private lazy var appName: UILabel = {
