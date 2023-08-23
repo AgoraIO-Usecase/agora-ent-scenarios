@@ -532,7 +532,7 @@ extension CallMessageManager: AgoraRtmClientDelegate {
     //收到RTM消息
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, on event: AgoraRtmMessageEvent) {
         let message = event.message
-        callMessagePrint("on event message: \(message.getType().rawValue)")
+//        callMessagePrint("on event message: \(message.getType().rawValue)")
         if let data = message.getData() as? Data,
            let dic = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
             if let messageId = dic[kMessageId] as? Int,
