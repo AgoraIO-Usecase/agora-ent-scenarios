@@ -132,17 +132,18 @@ extension CallMessageManager {
         }
         
         /*
-         纯1v1
-         订阅自己频道的presence和消息
-         
-         秀场转1v1
+         纯1v1:
+            订阅自己频道的message，用于收消息
+         秀场转1v1:
          1.主叫
-            a.订阅被叫频道的presence，用来写入presence
+            a.订阅被叫频道的presence，用户读取呼叫信息
             b.订阅自己频道的message, 用来收消息
          2.被叫
-            a.订阅自己频道的presence和消息
+            a.订阅自己频道的presence,用于写入呼叫信息
+            b.订阅自己频道的message，用来收消息
          */
         if config?.role == .caller, config.mode == .showTo1v1 {
+            //秀场转1v1主叫
             guard let ownerRoomId = config?.ownerRoomId else {
                 completion?(NSError(domain: "ownerRoomId is nil, please invoke 'initialize' to setup config", code: -1))
                 return
@@ -167,7 +168,8 @@ extension CallMessageManager {
             let options2 = AgoraRtmSubscribeOptions()
             options2.withMessage = false
             options2.withMetadata = false
-            options2.withPresence = true
+            //TODO(RTM Team): timeout to reconnect bug('presence = true' can not recv subscribe completion)
+//            options2.withPresence = true
             group.enter()
             callMessagePrint("2/3 will _subscribe[\(ownerRoomId)]")
             _subscribe(channelName: ownerRoomId, option: options2) {[weak self] error in
@@ -176,12 +178,14 @@ extension CallMessageManager {
                 group.leave()
             }
             
-            group.enter()
-            callMessagePrint("3/3 waiting for snapshot")
-            //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
-            snapshotDidRecv = {[weak self] in
-                self?.callMessagePrint("3/3 recv snapshot")
-                group.leave()
+            if options2.withPresence {
+                group.enter()
+                callMessagePrint("3/3 waiting for snapshot")
+                //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
+                snapshotDidRecv = {[weak self] in
+                    self?.callMessagePrint("3/3 recv snapshot")
+                    group.leave()
+                }
             }
             
             group.notify(queue: DispatchQueue.main) {
@@ -193,7 +197,12 @@ extension CallMessageManager {
             let options = AgoraRtmSubscribeOptions()
             options.withMessage = true
             options.withMetadata = false
-            options.withPresence = true
+            //TODO(RTM Team): timeout to reconnect bug('presence = true' can not recv subscribe completion)
+//            if config.mode == .showTo1v1 {
+//                options.withPresence = true
+//            } else {
+//                options.withPresence = false
+//            }
             group.enter()
             var err: NSError? = nil
             _subscribe(channelName: roomId, option: options) { error in
@@ -201,9 +210,11 @@ extension CallMessageManager {
                 group.leave()
             }
             
-            group.enter()
-            snapshotDidRecv = {
-                group.leave()
+            if options.withPresence {
+                group.enter()
+                snapshotDidRecv = {
+                    group.leave()
+                }
             }
             
             group.notify(queue: DispatchQueue.main) {
@@ -327,6 +338,7 @@ extension CallMessageManager {
         rtmClient.login(byToken: token) {[weak self] resp, error in
             guard let self = self else {return}
             
+            //TODO(RTM Team): timeout to reconnect bug (callback multi times)
             if error.errorCode == .tokenExpired {
                 self.rtmDelegate?.rtmKit?(self.rtmClient, onTokenPrivilegeWillExpire: nil)
             }
