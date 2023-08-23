@@ -936,7 +936,17 @@ extension CallApiImpl: CallApiProtocol {
             _notifyEvent(event: .messageFailed)
             return
         }
-        //查询是否是calling状态，如果是prapared，表示可能被取消了
+        
+        var isCaching = false
+        if let _fromRoomId = oneForOneMap?[kFromRoomId],
+           let _callerUserId = UInt(oneForOneMap?[kFromUserId] ?? ""),
+           _fromRoomId == roomId,
+           _callerUserId == remoteUserId {
+            isCaching = true
+            _notifyState(state: .calling, stateReason: .none)
+        }
+        
+        //查询是否是calling状态，如果是prapared，表示可能被主叫取消了
         guard state == .calling else {
             let errReason = "accept fail! current state is not calling"
             completion?(NSError(domain: errReason, code: -1))
@@ -947,11 +957,7 @@ extension CallApiImpl: CallApiProtocol {
         }
         
         //先查询presence里是不是正在呼叫的被叫是自己，如果是则不再发送消息
-        if let _fromRoomId = oneForOneMap?[kFromRoomId],
-           let _callerUserId = UInt(oneForOneMap?[kFromUserId] ?? ""),
-           _fromRoomId == roomId,
-           _callerUserId == remoteUserId {
-            _notifyState(state: .calling, stateReason: .none)
+        if isCaching {
             _notifyState(state: .connecting, stateReason: .localAccepted)
             _notifyEvent(event: .localAccepted)
         } else {
