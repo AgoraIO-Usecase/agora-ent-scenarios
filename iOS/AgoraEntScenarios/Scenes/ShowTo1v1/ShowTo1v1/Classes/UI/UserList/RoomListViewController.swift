@@ -239,14 +239,17 @@ extension RoomListViewController {
     }
     
     private func _reinitCalleeAPI(tokenConfig: CallTokenConfig, room: ShowTo1v1RoomInfo) {
+        callApi.deinitialize {
+        }
+        
         let config = CallConfig()
         config.role = .callee  // Pure 1v1 can only be set as the caller
         config.mode = .showTo1v1
         config.appId = showTo1v1AppId!
         config.userId = userInfo!.getUIntUserId()
         config.rtcEngine = rtcEngine
-        config.localView = callVC.smallCanvasView
-        config.remoteView = callVC.bigCanvasView
+        config.localView = callVC.smallCanvasView.canvasView
+        config.remoteView = callVC.bigCanvasView.canvasView
         config.ownerRoomId = room.roomId
         
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
