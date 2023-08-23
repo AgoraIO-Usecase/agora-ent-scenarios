@@ -178,12 +178,14 @@ extension CallMessageManager {
                 group.leave()
             }
             
-            group.enter()
-            callMessagePrint("3/3 waiting for snapshot")
-            //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
-            snapshotDidRecv = {[weak self] in
-                self?.callMessagePrint("3/3 recv snapshot")
-                group.leave()
+            if options2.withPresence {
+                group.enter()
+                callMessagePrint("3/3 waiting for snapshot")
+                //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
+                snapshotDidRecv = {[weak self] in
+                    self?.callMessagePrint("3/3 recv snapshot")
+                    group.leave()
+                }
             }
             
             group.notify(queue: DispatchQueue.main) {
