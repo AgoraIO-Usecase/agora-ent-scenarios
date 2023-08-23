@@ -599,6 +599,7 @@
 		E38C5CCF2A68DA1000662A9C /* SRDebugManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E38C5C842A68DA0F00662A9C /* SRDebugManager.m */; };
 		E38C5CD02A68DA1000662A9C /* SRDebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E38C5C852A68DA0F00662A9C /* SRDebugViewController.m */; };
 		E38C5CD12A68DA1000662A9C /* SRDebugInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = E38C5C872A68DA0F00662A9C /* SRDebugInfo.m */; };
+		E3ED273D2A837DCA0087B7AA /* SRKaraokeLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED273C2A837DCA0087B7AA /* SRKaraokeLoadingView.swift */; };
 		E751D85D29F11723001354CA /* AUiMoreDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E751D85C29F11723001354CA /* AUiMoreDialog.swift */; };
 /* End PBXBuildFile section */
 
@@ -1377,6 +1378,7 @@
 		E38C5C852A68DA0F00662A9C /* SRDebugViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRDebugViewController.m; sourceTree = "<group>"; };
 		E38C5C862A68DA0F00662A9C /* SRDebugManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRDebugManager.h; sourceTree = "<group>"; };
 		E38C5C872A68DA0F00662A9C /* SRDebugInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRDebugInfo.m; sourceTree = "<group>"; };
+		E3ED273C2A837DCA0087B7AA /* SRKaraokeLoadingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SRKaraokeLoadingView.swift; sourceTree = "<group>"; };
 		E751D85C29F11723001354CA /* AUiMoreDialog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiMoreDialog.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -3254,6 +3256,7 @@
 				E38C5C582A68DA0F00662A9C /* KTVSkipView.m */,
 				E36D82732A6E206E007C8E98 /* SRGameRuleView.swift */,
 				E36D82752A6E4961007C8E98 /* VLSRLyricView.swift */,
+				E3ED273C2A837DCA0087B7AA /* SRKaraokeLoadingView.swift */,
 				E36D82792A6E4EC7007C8E98 /* SRLrcNameView.swift */,
 				E36D82762A6E4961007C8E98 /* VLSRStatusView.swift */,
 				E36D827E2A6E71FA007C8E98 /* SBGScoreCell.swift */,
@@ -3623,6 +3626,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E3735C9A2A5E7E75004737EF /* ByteBeautyManager.swift in Sources */,
+				E3ED273D2A837DCA0087B7AA /* SRKaraokeLoadingView.swift in Sources */,
 				E38C5CAF2A68DA1000662A9C /* VLSRItemBaseView.m in Sources */,
 				E38C5CAC2A68DA1000662A9C /* VLSRSliderView.m in Sources */,
 				E38C5C972A68DA1000662A9C /* VLSRSongList.m in Sources */,

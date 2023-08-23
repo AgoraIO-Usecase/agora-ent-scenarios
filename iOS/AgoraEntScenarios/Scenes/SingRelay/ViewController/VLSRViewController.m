@@ -116,7 +116,11 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, strong) NSMutableArray<NSNumber *> *chooseArray;
 @property (nonatomic, assign) NSInteger currentIndex;
 @property (nonatomic, assign) NSInteger segmentScore;
+@property (nonatomic, assign) NSInteger segmentCount;
 @property (nonatomic, assign) NSInteger sumScore;
+@property (nonatomic, assign) NSInteger cosingerLoadCount; //合唱歌曲加载成功的个数
+@property (nonatomic, assign) BOOL MainSingerPlayFlag; //主唱歌曲加载成功
+@property (nonatomic, assign) BOOL hasCountDown; //已经倒计时过
 @end
 
 @implementation VLSRViewController
@@ -533,23 +537,42 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         NSInteger cumulativeScore = [dict[@"cumulativeScore"] integerValue];
         NSInteger total = [dict[@"total"] integerValue];
        self.sumScore = cumulativeScore;
+       self.segmentScore += score;
+       self.segmentCount += 1;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.statusView.lrcView updateScoreWith:score cumulativeScore:cumulativeScore totalScore:total];
             NSLog(@"score:%li--%li---%li---%li", index, score, cumulativeScore, total);
         });
    } else if([dict[@"cmd"] isEqualToString:@"SingingScore"]) {
-       int score = [dict[@"score"] intValue];
-       NSString *userName = dict[@"userName"];
-       NSString *userId = dict[@"userId"];
-       NSString *poster = dict[@"poster"];
-       //把用户信息存进数组，需要在这里合并数据
-       SubRankModel *model = [[SubRankModel alloc]init];
-       model.userName = userName;
-       model.poster = poster;
-       model.score = score;
-       model.songNum = 1;
-       model.userId = userId;
-       [self.scoreArray addObject:model];
+//       int score = [dict[@"score"] intValue];
+//       NSString *userName = dict[@"userName"];
+//       NSString *userId = dict[@"userId"];
+//       NSString *poster = dict[@"poster"];
+//       //把用户信息存进数组，需要在这里合并数据
+//       SubRankModel *model = [[SubRankModel alloc]init];
+//       model.userName = userName;
+//       model.poster = poster;
+//       model.score = score;
+//       model.songNum = 1;
+//       model.userId = userId;
+//       [self.scoreArray addObject:model];
+   } else if([dict[@"cmd"] isEqualToString:@"CoSingerLoadSuccess"]) {
+       if([self isRoomOwner]) {
+           self.cosingerLoadCount++;
+           NSLog(@"coCount:%li---%li", [self getOnMicUserCount], self.cosingerLoadCount);
+           if(self.cosingerLoadCount == [self getOnMicUserCount] - 1 && self.MainSingerPlayFlag == true){//如果所有合唱者都加载好了，主唱也加载好了，主唱开始
+               VLSRRoomSelSongModel *model = self.selSongsArray.firstObject;
+               [self.SRApi switchSingerRoleWithNewRole:SRSingRoleLeadSinger
+                                         onSwitchRoleState:^( SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
+                   if(state != SRSwitchRoleStateSuccess) {
+                       SRLogError(@"switchSingerRole error: %ld", reason);
+                       return;
+                   }
+                   [self.SRApi startSingWithSongCode:[model.songNo integerValue] startPos:0];
+               }];
+           }
+       }
+       
    }
 }
 
@@ -621,9 +644,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)stopPlaySong {
     self.isPause = false;
    // self.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
-    [self.SRApi switchSingerRoleWithNewRole:SRSingRoleAudience
-                           onSwitchRoleState:^(SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
-    }];
+//    [self.SRApi switchSingerRoleWithNewRole:SRSingRoleAudience
+//                           onSwitchRoleState:^(SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
+//    }];
 }
 
 -(void)loadAndPlaySRSong{
@@ -650,10 +673,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self markSongPlaying:model];
 
     [self setPlayoutVolume:50];
-    [self.RTCkit adjustRecordingSignalVolume:role == SRSingRoleLeadSinger ? 100 : 0 ];
+    //[self.RTCkit adjustRecordingSignalVolume:role == SRSingRoleLeadSinger ? 100 : 0 ];
+    if([self isRoomOwner]){
+        self.isNowMicMuted = false;
+        [self.RTCkit muteRecordingSignal:self.isNowMicMuted];
+    } else {
+        self.isNowMicMuted = true;
+        [self.RTCkit muteLocalAudioStream:self.isNowMicMuted];
+    }
 
     SRSongConfiguration* songConfig = [[SRSongConfiguration alloc] init];
-    songConfig.autoPlay = (role == SRSingRoleAudience || role == SRSingRoleCoSinger) ? NO : YES ;
+    songConfig.autoPlay = NO;
     songConfig.mode = (role == SRSingRoleAudience) ? SRLoadMusicModeLoadLrcOnly : SRLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -663,76 +693,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if (!isSuccess) {
             return;
         }
-        if(role == SRSingRoleCoSinger){
-            [weakSelf.SRApi startSingWithSongCode:songCode startPos:0];
-        }
+//        if(role == SRSingRoleCoSinger){
+//            [weakSelf.SRApi startSingWithSongCode:songCode startPos:0];
+//        }
     };
 
     [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
 
-    [weakSelf.SRApi switchSingerRoleWithNewRole:role
-                           onSwitchRoleState:^( SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
-        if(state != SRSwitchRoleStateSuccess) {
-            SRLogError(@"switchSingerRole error: %ld", reason);
-            return;
-        }
-    }];
 }
-
-//- (void)loadAndPlaySong{
-//    //清空分数
-//    [self.MVView.gradeView reset];
-//    [self.MVView.incentiveView reset];
-//    VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
-//
-//    //TODO: fix score view visible problem while owner reopen the room
-//    [self.MVView updateUIWithSong:model role:self.singRole];
-//    [self setCoSingerStateWith:self.singRole];
-//    if(!model){
-//        return;
-//    }
-//    [self markSongPlaying:model];
-//
-//    //TODO: will remove SR api adjust playout volume method
-//    [self setPlayoutVolume:50];
-//
-////    self.retryCount = 0;
-//
-//
-//    SRSingRole role = [self getUserSingRole];
-//    SRSongConfiguration* songConfig = [[SRSongConfiguration alloc] init];
-//    songConfig.autoPlay = (role == SRSingRoleAudience || role == SRSingRoleCoSinger) ? NO : YES ;
-//    songConfig.mode = (role == SRSingRoleAudience || role == SRSingRoleCoSinger) ? SRLoadMusicModeLoadLrcOnly : SRLoadMusicModeLoadMusicAndLrc;
-//    songConfig.mainSingerUid = [model.userNo integerValue];
-//    songConfig.songIdentifier = model.songNo;
-//
-//    self.MVView.loadingType = VLSRMVViewStateLoading;
-//    [self.MVView setBotViewHidden:true];
-//    VL(weakSelf);
-//    self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
-//        if (!isSuccess) {
-//            return;
-//        }
-//        [weakSelf.MVView setBotViewHidden:false];
-//        [weakSelf.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPlay];
-//        if(role == SRSingRoleCoSinger){
-//            [weakSelf.SRApi startSingWithSongCode:songCode startPos:0];
-//        }
-//    };
-//
-//    [self.lrcControl resetShowOnce];
-//    [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
-//
-//    [weakSelf.SRApi switchSingerRoleWithNewRole:role
-//                           onSwitchRoleState:^( SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
-//        if(state != SRSwitchRoleStateSuccess) {
-//            //TODO(chenpan): error toast and retry?
-//            SRLogError(@"switchSingerRole error: %ld", reason);
-//            return;
-//        }
-//    }];
-//
-//}
 
 - (void)enterSeatWithIndex:(NSInteger)index completion:(void(^)(NSError*))completion {
     
@@ -1145,9 +1113,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)didLrcViewScorllFinishedWith:(NSInteger)score totalScore:(NSInteger)totalScore lineScore:(NSInteger)lineScore lineIndex:(NSInteger)lineIndex{
-    self.segmentScore += lineScore;
+    
     if([self.currentUserNo isEqualToString:VLUserCenter.user.id]){
         self.sumScore += lineScore;
+        self.segmentScore += lineScore;
+        self.segmentCount += 1;
         [self.statusView.lrcView updateScoreWith:lineScore cumulativeScore:self.sumScore totalScore:totalScore];
         
         //将分数同步给他人
@@ -1273,11 +1243,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     switch(state) {
         case SRClickActionNextSong:
             //切歌
-            [self changeToNextSong];
+            if(self.statusView.srBtn.isEnabled){
+                [self changeToNextSong];
+            }
             break;
         case SRClickActionAac:
             //伴奏
-            [self.SRApi.getMusicPlayer selectAudioTrack:1];
+            self.trackMode = SRPlayerTrackModeAcc;
             break;
         case SRClickActionEffect:
             //调音
@@ -1285,7 +1257,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             break;
         case SRClickActionOrigin:
             //原唱
-            [self.SRApi.getMusicPlayer selectAudioTrack:0];
+            self.trackMode = SRPlayerTrackModeOrigin;
+           // [self.SRApi.getMusicPlayer selectAudioTrack:0];
             break;
         case SRClickActionAgain:
             break;
@@ -1312,10 +1285,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         NSInteger upperBound = (i < (array.count - 1)) ? [array[i+1] integerValue] : NSIntegerMax;
         
         //每段开始前3秒需要提示即将开始抢唱
-        if(lowerBound - progress >= 3000 && lowerBound - progress <= 3050 && i < array.count - 1){
-            if([self isOnMicSeat]){
-                [self.statusView showContentViewWith:@"下段演唱即将开始，准备抢唱"];
+        if(lowerBound - progress >= 3000 && lowerBound - progress <= 3050){
+            if(i < array.count - 1){
+                if([self isOnMicSeat]){
+                    [self.statusView showContentViewWith: i < (array.count - 2) ? @"下段演唱即将开始，准备抢唱" : @"下段演唱即将开始"];
+                }
             }
+        }
+        
+        if(self.scoreArray.count == 5){//超过五个的数据不需要了。这个时候的progerss是无用数据
+            return;
         }
         
         if (progress >= lowerBound && progress < upperBound) {
@@ -1338,6 +1317,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
         [self sendScoreToServiceWith:self.currentUserNo];
         self.segmentScore = 0;
+        self.segmentCount = 0;
         self.currentUserNo = self.nextWinNo ? self.nextWinNo : self.seatsArray.firstObject.userNo;
         self.isNowMicMuted = ![self.currentUserNo isEqualToString:VLUserCenter.user.id];
         //开麦
@@ -1347,9 +1327,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(index < 4){
             [self updatePlayerStatus];
         } else {
-//            if (index == 4) {
-//                [self updatePlayerStatus];
-//            }
+            if (index == 4) {
+                [self updateLastStatus];
+            }
             [self.statusView hideSRBtn];
         }
         
@@ -1375,23 +1355,49 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         model.poster = seatModel.headUrl;
         model.score = self.segmentScore;
         model.songNum = 1;
+        model.segCount = self.segmentCount;
         model.userId = seatModel.userNo;
-        NSLog(@"seatModel:%@--%@---%li", seatModel.name, seatModel.userNo, self.segmentScore);
+        NSLog(@"index:seatModel:%@--%@---%li---%li---%li", seatModel.name, seatModel.userNo, model.score, self.sumScore, self.segmentCount);
         [self.scoreArray addObject:model];
     }
 }
 
--(void)updatePlayerStatus{
-    
+-(void)updateMicStatus {
     if(self.nextWinNo == nil || [self.nextWinNo isEqualToString:@""]){
         //表示无人抢唱 那么还是房主唱
         VLSRRoomSeatModel *model = self.seatsArray.firstObject;
         self.nextWinNo = model.userNo;
     }
-    
-    [self.RTCkit adjustRecordingSignalVolume: [self.currentUserNo isEqualToString:VLUserCenter.user.id] ? 100 : 0];
-    [self updateSBGCountDown];
+    self.isNowMicMuted = ![self.currentUserNo isEqualToString:VLUserCenter.user.id];
+    if([self isRoomOwner]){
+        [self.RTCkit muteRecordingSignal:self.isNowMicMuted];
+    } else {
+        [self.RTCkit muteLocalAudioStream:self.isNowMicMuted];
+    }
+}
 
+-(void)updatePlayerStatus{
+    [self updateMicStatus];
+    [self updateSBGCountDown];
+}
+
+-(void)updateLastStatus {
+    [self updateMicStatus];
+    if([self isOnMicSeat]){
+        if([self isRoomOwner]){
+            if([self.currentUserNo isEqualToString:VLUserCenter.user.id]){
+                self.statusView.state = SBGStateOwnerSredAndPlaying;
+            } else {
+                self.statusView.state = SBGStateOwnerUnSredAndPlaying;
+            }
+        } else {
+            if([self.currentUserNo isEqualToString:VLUserCenter.user.id]){
+                self.statusView.state = SBGStatePlayerSredAndPlaying;
+            } else {
+                self.statusView.state = SBGStatePlayerUnsredAndPlaying;
+            }
+        }
+    }
 }
 
 - (void)changeToNextSong {
@@ -1401,11 +1407,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     kWeakSelf(self);
     [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
         if(flag == YES){
-
-            [weakself.statusView.lrcView resetLrc];
             [weakself.SRApi stopSing];
             [weakself removeCurrentSongWithSync:YES];
-            
             
             weakself.isNowMicMuted = true;
             [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:weakself.isNowMicMuted completion:^(NSError * err) {
@@ -1494,10 +1497,18 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
             [userDict setObject:model forKey:model.userId];
         } else { // 已有该用户，累加分数
             existModel.score += model.score;
+            existModel.segCount += model.segCount;
             existModel.songNum += model.songNum;
         }
     }
-    return [userDict allValues];
+    
+    NSMutableArray *finaModels = [NSMutableArray array];
+    for(SubRankModel *model in [userDict allValues]){
+        SubRankModel *newModel = model;
+        newModel.score = (int)model.score / model.segCount;
+        [finaModels addObject:newModel];
+    }
+    return finaModels;
 }
 
 -(void)onKaraokeViewWithScore:(NSInteger)score totalScore:(NSInteger)totalScore lineScore:(NSInteger)lineScore lineIndex:(NSInteger)lineIndex {
@@ -1710,7 +1721,7 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
     } else if (type == VLSRMVViewActionTypeSingAcc) { // 伴奏
         self.trackMode = SRPlayerTrackModeAcc;
     } else if (type == VLSRMVViewActionTypeRetryLrc) {  //歌词重试
-        [self reloadMusic];
+       // [self reloadMusic];
     }
 }
 
@@ -1976,11 +1987,18 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
     
     //update booleans
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
+    [self updateMediaOptionWithStatus];
     
     self.roomPersonView.roomSeatsArray = self.seatsArray;
     [self.roomPersonView updateSingBtnWithChoosedSongArray:_selSongsArray];
     self.chorusNum = [self getChorusNumWithSeatArray:seatsArray];
     [self onSeatFull];
+}
+
+-(void)updateMediaOptionWithStatus{
+    AgoraRtcChannelMediaOptions *options = [[AgoraRtcChannelMediaOptions alloc]init];
+    options.publishCameraTrack = self.isOnMicSeat;
+    options.clientRoleType = self.isOnMicSeat ? AgoraClientRoleBroadcaster : AgoraClientRoleAudience;
 }
 
 -(void)setGameModel:(SingRelayModel *)gameModel {
@@ -2008,13 +2026,24 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
                                                             completion:^(NSError * error) {
         }];
     } else if(gameModel.status == SingRelayStatusEnded){
+        [_bottomView setAudioBtnEnabled:true];
         self.chooseArray = [NSMutableArray arrayWithObjects:@(NO), @(NO), @(NO), @(NO), @(NO), nil];
         self.currentUserNo = self.seatsArray.firstObject.userNo;
         self.nextWinNo = nil;
         self.segmentScore = 0;
+        self.segmentCount = 0;
         self.sumScore = 0;
+        self.cosingerLoadCount = 0;
+        self.MainSingerPlayFlag = false;
+        self.hasCountDown = false;
+        self.currentIndex = 0;
+        [self.SRApi stopSing];
         [self.statusView resetLrcView];
+        [self.SRApi switchSingerRoleWithNewRole:SRSingRoleAudience onSwitchRoleState:^(SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
+
+        }];
         dispatch_async(dispatch_get_main_queue(), ^{
+            [self.statusView hideNextMicOwner];
             NSArray *mergeModels = mergeModelsWithSameUserIds(self.scoreArray);
             self.statusView.dataSource = sortModels(mergeModels, NO);
             self.statusView.state = [self isRoomOwner] ? SBGStateResultOwner : SBGStateResultAudience;
@@ -2052,6 +2081,7 @@ NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *a
 }
 
 - (void)updateSBGUI {
+    NSLog(@"loadAndPlaySRSongupdateSBGUI");
     int count = 5;
    // if(!self.hasReady){
         for (NSInteger i = count; i >= 0; i--) {
@@ -2069,7 +2099,10 @@ NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *a
                         } else if (i == 1) {
                             self.statusView.contentStr = @"Go";
                         } else {
-                            [self loadAndPlaySRSong];
+                            NSLog(@"loadAndPlaySRSong%li", i);
+                            if(!self.MainSingerPlayFlag){
+                                [self loadAndPlaySRSong];
+                            }
                             [self updateWatingUI];
                         }
                     }
@@ -2144,7 +2177,12 @@ NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *a
     self.isNowCameraMuted = info.isVideoMuted;
     
     self.bottomView.hidden = !_isOnMicSeat;
+    
     self.requestOnLineView.hidden = !self.bottomView.hidden;
+    
+    if(![self isOnMicSeat]){
+        [self.requestOnLineView setTipHidden:self.gameModel.status == SingRelayStatusStarted];
+    }
 }
 
 - (void)setIsNowMicMuted:(BOOL)isNowMicMuted {
@@ -2152,7 +2190,12 @@ NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *a
     _isNowMicMuted = isNowMicMuted;
     
     [self.SRApi setMicStatusWithIsOnMicOpen:!isNowMicMuted];
-    [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
+    //[self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
+    if([self isRoomOwner]){
+        [self.RTCkit muteRecordingSignal:isNowMicMuted];
+    } else {
+        [self.RTCkit muteLocalAudioStream:isNowMicMuted];
+    }
     if(oldValue != isNowMicMuted) {
         [self.bottomView updateAudioBtn:isNowMicMuted];
     }
@@ -2233,7 +2276,14 @@ NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *a
 - (void)setTrackMode:(SRPlayerTrackMode)trackMode {
     SRLogInfo(@"setTrackMode: %ld", trackMode);
     _trackMode = trackMode;
-    [[self.SRApi getMediaPlayer] selectAudioTrack:self.trackMode == SRPlayerTrackModeOrigin ? 0 : 1];
+    if([self isOnMicSeat]){
+        if([self isRoomOwner]){
+            [[self.SRApi getMediaPlayer] selectMultiAudioTrack:trackMode == SRPlayerTrackModeAcc ? 1 : 0 publishTrackIndex: 1 ];
+        } else {
+            [[self.SRApi getMediaPlayer] selectAudioTrack:self.trackMode == SRPlayerTrackModeOrigin ? 0 : 1];
+        }
+    }
+    
     
    // [self.MVView setOriginBtnState: trackMode == SRPlayerTrackModeOrigin ? VLSRMVViewActionTypeSingOrigin : VLSRMVViewActionTypeSingAcc];
 }
@@ -2276,11 +2326,7 @@ NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *a
                 //track has to be selected after loaded
                 self.trackMode = self.trackMode;
             }
-         //   [self.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPlay];
-            //显示跳过前奏
-            if(self.singRole == SRSingRoleSoloSinger || self.singRole == SRSingRoleLeadSinger){
-                [self.lrcControl showPreludeEnd];
-            }
+            
         } else if(state == AgoraMediaPlayerStatePaused) {
            // [self.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPause];
             [self.lrcControl hideSkipViewWithFlag:true];
@@ -2340,6 +2386,14 @@ NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *a
     
 }
 
+- (void)onMusicPlayerProgressChangedWith:(NSInteger)progress{
+    //if(self.singRole == SRSingRoleLeadSinger){
+        if(labs(progress - 1000) < 500 && !self.hasCountDown) {
+            [self updateSBGCountDown];
+            self.hasCountDown = true;
+        }
+    //}
+}
 
 #pragma mark SRMusicLoadStateListener
 
@@ -2350,7 +2404,7 @@ NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *a
                                lyricUrl:(NSString *)lyricUrl {
     SRLogInfo(@"load: %li, %li", status, percent);
     dispatch_async_on_main_queue(^{
-        
+        [self.statusView updateLoadingViewWith:percent];
         if(status == AgoraMusicContentCenterPreloadStatusError){
             [VLToast toast:@"加载歌曲失败，请切歌"];
 //            [self.MVView setBotViewHidden:false];
@@ -2367,7 +2421,7 @@ NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *a
 }
 
 - (void)onMusicLoadFailWithSongCode:(NSInteger)songCode reason:(enum SRLoadSongFailReason)reason{
-    
+    [self.statusView updateLoadingViewWith:100];
     dispatch_async_on_main_queue(^{
         if(self.loadMusicCallBack) {
             self.loadMusicCallBack(NO, songCode);
@@ -2397,6 +2451,8 @@ NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *a
 }
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
+    [self.statusView updateLoadingViewWith:100];
+    self.trackMode = SRPlayerTrackModeAcc;//切换为伴奏
     dispatch_async_on_main_queue(^{
         if(self.loadMusicCallBack){
             self.loadMusicCallBack(YES, songCode);
@@ -2411,14 +2467,34 @@ NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *a
         //        if([model.winnerNo isEqualToString:@""] || model.winnerNo == nil){
         //            NSLog(@"加载成功的歌曲为:%@---%@", model.songName, model.winnerNo);
         //            //如果是主唱歌曲加载成功 发送ds告诉观众同步进度
-        if(self.singRole == SRSingRoleLeadSinger){
+        if([self isRoomOwner]){
+            self.MainSingerPlayFlag = true;
+            NSLog(@"coCount:%li---%li", [self getOnMicUserCount], self.cosingerLoadCount);
+            if(self.cosingerLoadCount == [self getOnMicUserCount] - 1){
+                VLSRRoomSelSongModel *model = self.selSongsArray.firstObject;
+                [self.SRApi switchSingerRoleWithNewRole:SRSingRoleLeadSinger
+                                          onSwitchRoleState:^( SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
+                    if(state != SRSwitchRoleStateSuccess) {
+                        SRLogError(@"switchSingerRole error: %ld", reason);
+                        return;
+                    }
+                    [self.SRApi startSingWithSongCode:[model.songNo integerValue] startPos:0];
+                }];
+            }
+        } else if(self.singRole == SRSingRoleCoSinger) {
             NSDictionary *dict = @{
-                @"cmd":@"StartSingBattleCountDown"
+                @"cmd":@"CoSingerLoadSuccess"
             };
-            [self sendStreamMessageWithDict:dict success:nil];
-        }
-        if(self.singRole == SRSingRoleLeadSinger || self.singRole == SRSingRoleCoSinger){
-            [self updateSBGCountDown];
+           [self sendStreamMessageWithDict:dict success:nil];
+            //如果是合唱 需要swithRole
+            if([self isOnMicSeat] && ![self isRoomOwner]){
+                [self.SRApi switchSingerRoleWithNewRole:SRSingRoleCoSinger onSwitchRoleState:^( SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
+                    if(state != SRSwitchRoleStateSuccess) {
+                        SRLogError(@"switchSingerRole error: %ld", reason);
+                        return;
+                    }
+                }];
+            }
         }
         
         if(self.singRole == SRSingRoleAudience){
@@ -2568,7 +2644,7 @@ NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *a
 -(SRChooseSongInputModel *)getRandomSongModel{
     NSArray *array = [self getChooseSongArray];
     int index = arc4random() % array.count;
-    return array[3];
+    return array[index];
 }
 @end
 

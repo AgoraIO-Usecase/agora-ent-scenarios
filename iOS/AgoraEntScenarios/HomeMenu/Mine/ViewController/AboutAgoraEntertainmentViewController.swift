@@ -20,7 +20,8 @@ import AgoraRtcKit
 //                               ["title": NSLocalizedString("app_about_chat_room_spatial", comment: ""), "detail":"YLKJ-2.1.0"],
 //                               ["title": NSLocalizedString("app_about_karaoke", comment: ""),"detail":"KTV-2.3.0"],
 //                               ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-2.4.0"]],
-                 ["contents": [["title": NSLocalizedString("app_about_singrelay", comment: ""), "detail":"QM-3.5.0"]],
+                 ["contents": [],
+                // ["contents": [["title": NSLocalizedString("app_about_singrelay", comment: ""), "detail":"QM-3.5.0"]],
                  //                               ["title": NSLocalizedString("app_about_chat_room_spatial", comment: ""), "detail":"YLKJ-2.1.0"],
                  //                               ["title": NSLocalizedString("app_about_karaoke", comment: ""),"detail":"KTV-2.3.0"],
                  //                               ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-2.4.0"]],
@@ -28,7 +29,7 @@ import AgoraRtcKit
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220),
                                        name: NSLocalizedString("app_about_name", comment: ""),
-                                       versionText: NSLocalizedString("app_about_version", comment: "")+": "+"20230530-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
+                                       versionText: NSLocalizedString("app_about_version", comment: "")+": "+"20230830-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
     
     lazy var infoList: UITableView = {
         UITableView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ScreenHeight-ZNavgationHeight), style: .plain)

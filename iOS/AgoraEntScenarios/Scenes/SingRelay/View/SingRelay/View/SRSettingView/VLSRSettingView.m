@@ -65,6 +65,7 @@ VLSRRemoteVolumeViewDelegate
     [self addSubview:self.soundSlider];
     [self addSubview:self.accSlider];
     [self addSubview:self.remoteVolumeView];
+    [self.remoteVolumeView setHidden:YES];
 //    [self addSubview:self.kindsView];
 }
 

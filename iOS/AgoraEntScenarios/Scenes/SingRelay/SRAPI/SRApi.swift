@@ -153,6 +153,9 @@ import AgoraRtcKit
     func onChorusChannelAudioVolumeIndication(
         speakers: [AgoraRtcAudioVolumeInfo],
         totalVolume: Int)
+    
+    //MPK时间回调 只给房主用
+    func onMusicPlayerProgressChanged(with progress: Int)
 }
 
 @objc open class SRApiConfig: NSObject{

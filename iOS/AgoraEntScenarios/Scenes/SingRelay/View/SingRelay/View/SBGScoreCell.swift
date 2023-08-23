@@ -32,7 +32,7 @@ class SBGScoreCell: UITableViewCell {
             } else {
                 nameLabel.text = "暂无上榜"
             }
-            sbgCountLabel.text = score.songNum == 0 ? "-" : "\(score.songNum)首"
+            sbgCountLabel.text = score.songNum == 0 ? "-" : "\(score.songNum)段"
             gradeLabel.text = score.songNum == 0 ? "-" : "\(score.score)分"
             if(score.index == 1){
                 iconView.image = UIImage.sceneImage(name: "sbg-rank1")

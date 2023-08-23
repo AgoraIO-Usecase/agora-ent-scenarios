@@ -377,6 +377,7 @@ extension VLSRLyricView: SRLrcViewDelegate {
             }
             guard let lrcurl = lrcurl else {
                 print("downloadLrcFile fail, lrcurl is nil")
+                callBack(nil)
                 return
             }
 

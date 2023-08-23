@@ -169,6 +169,8 @@ extension SRApiImpl: SRApiDelegate {
         agoraPrint("loadMusic songCode:\(songCode) ")
         self.songMode = .songCode
         self.songCode = songCode
+        self.localPlayerPosition = 0
+        self.remotePlayerPosition = 0
         self.songIdentifier = config.songIdentifier
         _loadMusic(config: config, mode: config.mode, onMusicLoadStateListener: onMusicLoadStateListener)
     }
@@ -176,6 +178,8 @@ extension SRApiImpl: SRApiDelegate {
     func loadMusic(config: SRSongConfiguration, url: String) {
         self.songMode = .songUrl
         self.songUrl = url
+        self.localPlayerPosition = 0
+        self.remotePlayerPosition = 0
         self.songIdentifier = config.songIdentifier
         if config.autoPlay {
             // 主唱自动播放歌曲
@@ -319,6 +323,7 @@ extension SRApiImpl: SRApiDelegate {
 extension SRApiImpl {
     private func switchSingerRole(oldRole: SRSingRole, newRole: SRSingRole, token: String, stateCallBack:@escaping ISwitchRoleStateListener) {
         agoraPrint("switchSingerRole oldRole: \(oldRole.rawValue), newRole: \(newRole.rawValue)")
+        print("switchSingerRole oldRole: \(oldRole.rawValue), newRole: \(newRole.rawValue)")
         if oldRole == .audience && newRole == .soloSinger {
             // 1、SRSingRoleAudience -》SRSingRoleMainSinger
             singerRole = newRole
@@ -450,7 +455,9 @@ extension SRApiImpl {
             apiConfig?.engine?.updateChannel(with: mediaOption)
             
             if self.songMode == .songCode {
-                musicPlayer?.openMedia(songCode: self.songCode , startPos: 0)
+               let ret = musicPlayer?.openMedia(songCode: self.songCode , startPos: 0)
+                print("ret = \(ret)")
+            
             } else {
                 musicPlayer?.open(self.songUrl, startPos: 0)
             }
@@ -667,8 +674,8 @@ extension SRApiImpl {
             callback(.OK, songCode)
             return
         }
-        let err = self.mcc?.preload(songCode: songCode, jsonOption: nil)
-        if err != 0 {
+        let err = self.mcc?.preload(songCode: songCode)
+        if err == nil {
             musicCallbacks.removeValue(forKey: String(songCode))
             callback(.error, songCode)
             return
@@ -689,6 +696,7 @@ extension SRApiImpl {
             agoraPrint("startSing failed: canceled")
             return
         }
+        musicPlayer?.setPlayerOption("enable_multi_audio_track", value: 1)
         apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
         let ret = musicPlayer?.openMedia(songCode: songCode, startPos: startPos)
         agoraPrint("startSing->openMedia(\(songCode) fail: \(ret ?? -1)")
@@ -721,6 +729,7 @@ extension SRApiImpl {
         if musicPlayer?.getPlayerState() != .stopped {
             musicPlayer?.stop()
         }
+        
         apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":true}")
         apiConfig?.engine?.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         apiConfig?.engine?.setParameters("{\"che.audio.custom_bitrate\": 48000}")
@@ -825,6 +834,7 @@ extension SRApiImpl {
             agoraPrint("[setLrcTime] recv state: \(self.playerState.rawValue)->\(state.rawValue) role: \(singerRole.rawValue) role: \(singerRole.rawValue)")
             
             if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
+            //if state == .playing, singerRole == .coSinger {
                 //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
                 self.localPlayerPosition = self.lastMainSingerUpdateTime - Double(position)
                 print("localPlayerPosition:playerKit:handleSetLrcTimeCommand \(localPlayerPosition)")
@@ -854,8 +864,9 @@ extension SRApiImpl {
     private func handlePlayerStateCommand(dict: [String: Any], role: SRSingRole) {
         let mainSingerState: Int = dict["state"] as? Int ?? 0
         let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
-
-        if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
+        print("cosinger:state\(self.playerState.rawValue)")
+       // if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
+        if state == .playing, singerRole == .coSinger {
             //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
             self.localPlayerPosition = getPlayerCurrentTime()
             print("localPlayerPosition:playerKit:handlePlayerStateCommand \(localPlayerPosition)")
@@ -1126,6 +1137,7 @@ extension SRApiImpl {
     }
     
     private func setProgress(with pos: Int) {
+        print("didChangedToState time:\(pos)")
         lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
         lrcControl?.onUpdateProgress(progress: pos > 200 ? pos - 200 : pos)
     }
@@ -1153,6 +1165,9 @@ extension SRApiImpl: AgoraRtcMediaPlayerDelegate {
             agoraPrint("position_ms:\(position_ms), ntp:\(getNtpTimeInMs()), delta:\(self.getNtpTimeInMs() - position_ms), autoPlayoutDelay:\(self.audioPlayoutDelay)")
             sendStreamMessageWithDict(dict, success: nil)
         }
+        getEventHander { delegate in
+            delegate.onMusicPlayerProgressChanged(with: position_ms)
+        }
     }
 
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {
@@ -1161,6 +1176,7 @@ extension SRApiImpl: AgoraRtcMediaPlayerDelegate {
     
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         agoraPrint("agoraRtcMediaPlayer didChangedToState: \(state.rawValue) \(self.songCode)")
+        print("agoraRtcMediaPlayer didChangedToState: \(state.rawValue) \(self.songCode)")
         if isRelease {return}
         if state == .openCompleted {
             self.localPlayerPosition = Date().milListamp
