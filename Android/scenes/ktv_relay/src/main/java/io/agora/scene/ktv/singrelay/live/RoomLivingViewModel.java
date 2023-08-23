@@ -826,7 +826,7 @@ public class RoomLivingViewModel extends ViewModel {
                                 RankModel model = new RankModel(
                                         oldModel.getUserName(),
                                         singNum,
-                                        (int)((oldModel.getScore() * oldModel.getLines() + score) / (oldModel.getLines() + 1)),
+                                        oldModel.getScore() + score,
                                         oldModel.getPoster(),
                                         oldModel.getLines() + 1
                                 );
@@ -1480,7 +1480,7 @@ public class RoomLivingViewModel extends ViewModel {
                 RankModel model = new RankModel(
                         UserManager.getInstance().getUser().name,
                         singNum,
-                        (int)((oldModel.getScore() * oldModel.getLines() + score) / (oldModel.getLines() + 1)),
+                        oldModel.getScore() + score,
                         UserManager.getInstance().getUser().headUrl,
                         oldModel.getLines() + 1
                 );
@@ -1534,7 +1534,7 @@ public class RoomLivingViewModel extends ViewModel {
                 item.rank = i.get();
                 item.userName = model.getUserName();
                 item.songNum = model.getSongNum();
-                item.score = model.getScore();
+                item.score = (int)(model.getScore() / model.getLines());
                 item.poster = model.getPoster();
                 rankItemList.add(item);
                 i.getAndIncrement();
