@@ -170,6 +170,7 @@ extension CallMessageManager {
             options2.withMetadata = false
             //TODO(RTM Team): timeout to reconnect bug('presence = true' can not recv subscribe completion)
 //            options2.withPresence = true
+            options2.withPresence = false
             group.enter()
             callMessagePrint("2/3 will _subscribe[\(ownerRoomId)]")
             _subscribe(channelName: ownerRoomId, option: options2) {[weak self] error in
@@ -180,10 +181,10 @@ extension CallMessageManager {
             
             if options2.withPresence {
                 group.enter()
-                callMessagePrint("3/3 waiting for snapshot")
+                callMessagePrint("waiting for snapshot")
                 //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
                 snapshotDidRecv = {[weak self] in
-                    self?.callMessagePrint("3/3 recv snapshot")
+                    self?.callMessagePrint("recv snapshot")
                     group.leave()
                 }
             }
@@ -203,6 +204,7 @@ extension CallMessageManager {
 //            } else {
 //                options.withPresence = false
 //            }
+            options.withPresence = false
             group.enter()
             var err: NSError? = nil
             _subscribe(channelName: roomId, option: options) { error in
@@ -312,7 +314,7 @@ extension CallMessageManager {
             return
         }
         
-        callMessagePrint("will subscribe[\(channelName)]")
+        callMessagePrint("will subscribe[\(channelName)] message: \(option.withMessage) presence: \(option.withPresence)")
         rtmClient.unsubscribe(withChannel: channelName)
         rtmClient.subscribe(withChannel: channelName, option: option) {[weak self] resp, err in
             guard let self = self else {return}
