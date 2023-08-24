@@ -232,7 +232,7 @@ object VideoSetting {
                 colorEnhance = false,
                 lowLightEnhance = false,
                 videoDenoiser = false,
-                PVC = false,
+                PVC = true,
                 captureResolution = Resolution.V_180P,
                 encodeResolution = Resolution.V_180P,
                 frameRate = FrameRate.FPS_15,
@@ -303,7 +303,7 @@ object VideoSetting {
         val LowDeviceGoodNetwork1v1 = LowStreamVideoSetting(
             encodeResolution = Resolution.V_360P,
             frameRate = FrameRate.FPS_15,
-            bitRate = BitRate.BR_STANDRAD.value,
+            bitRate = 680,
             SVC = false,
             enableHardwareEncoder = true,
         )
@@ -311,7 +311,7 @@ object VideoSetting {
         val LowDeviceNormalNetwork1v1 = LowStreamVideoSetting(
             encodeResolution = Resolution.V_360P,
             frameRate = FrameRate.FPS_15,
-            bitRate = BitRate.BR_STANDRAD.value,
+            bitRate = 748,
             SVC = true,
             enableHardwareEncoder = false,
         )
@@ -319,7 +319,7 @@ object VideoSetting {
         val MiddleDeviceGoodNetwork1v1 = LowStreamVideoSetting(
             encodeResolution = Resolution.V_360P,
             frameRate = FrameRate.FPS_15,
-            bitRate = BitRate.BR_STANDRAD.value,
+            bitRate = 680,
             SVC = false,
             enableHardwareEncoder = true,
         )
@@ -327,7 +327,7 @@ object VideoSetting {
         val MiddleDeviceNormalNetwork1v1 = LowStreamVideoSetting(
             encodeResolution = Resolution.V_360P,
             frameRate = FrameRate.FPS_15,
-            bitRate = BitRate.BR_STANDRAD.value,
+            bitRate = 748,
             SVC = true,
             enableHardwareEncoder = false,
         )
@@ -335,7 +335,7 @@ object VideoSetting {
         val HighDeviceGoodNetwork1v1 = LowStreamVideoSetting(
             encodeResolution = Resolution.V_540P,
             frameRate = FrameRate.FPS_15,
-            bitRate = BitRate.BR_STANDRAD.value,
+            bitRate = 1100,
             SVC = false,
             enableHardwareEncoder = true,
         )
@@ -343,7 +343,7 @@ object VideoSetting {
         val HighDeviceNormalNetwork1v1 = LowStreamVideoSetting(
             encodeResolution = Resolution.V_360P,
             frameRate = FrameRate.FPS_15,
-            bitRate = BitRate.BR_STANDRAD.value,
+            bitRate = 748,
             SVC = true,
             enableHardwareEncoder = false,
         )
@@ -351,7 +351,7 @@ object VideoSetting {
         val PK = LowStreamVideoSetting(
             encodeResolution = Resolution.V_360P,
             frameRate = FrameRate.FPS_15,
-            bitRate = BitRate.BR_STANDRAD.value,
+            bitRate = 680,
             SVC = false,
             enableHardwareEncoder = true,
         )
@@ -490,13 +490,10 @@ object VideoSetting {
     }
 
     fun updateAudienceSetting() {
-        //updateRTCAudioSetting()
-        updateBroadcastSetting(
-            RecommendBroadcastSetting.Audience1v1,
-            null,
-            false,
-            null
-        )
+        if (currAudienceDeviceLevel != DeviceLevel.Low) {
+            setCurrAudienceEnhanceSwitch(true)
+            updateAudioSetting(SR = SuperResolution.SR_AUTO)
+        }
     }
 
     fun updateAudioSetting(SR: SuperResolution? = null) {
@@ -571,32 +568,36 @@ object VideoSetting {
 
     fun updateBroadcastSetting(
         liveMode: LiveMode,
+        isLinkAudience: Boolean = false,
         isJoinedRoom: Boolean = true,
         rtcConnection: RtcConnection? = null
     ) {
-        ShowLogger.d("VideoSettings", "updateBroadcastSetting2")
+        ShowLogger.d("VideoSettings", "updateBroadcastSetting2, liveMode: $liveMode, isLinkAudience: $isLinkAudience, isPKMode: $isPkMode")
 
         val deviceLevel = when (currBroadcastSetting) {
             RecommendBroadcastSetting.LowDevice1v1, RecommendBroadcastSetting.LowDevicePK -> DeviceLevel.Low
             RecommendBroadcastSetting.MediumDevice1v1, RecommendBroadcastSetting.MediumDevicePK -> DeviceLevel.Medium
             RecommendBroadcastSetting.HighDevice1v1, RecommendBroadcastSetting.HighDevicePK -> DeviceLevel.High
+            RecommendBroadcastSetting.Audience1v1 -> DeviceLevel.High
             else -> return
         }
 
         val networkLevel = currNetworkLevel
 
         updateBroadcastSetting(
-            when (liveMode) {
-                LiveMode.OneVOne -> when (deviceLevel) {
-                    DeviceLevel.Low -> RecommendBroadcastSetting.LowDevice1v1
-                    DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevice1v1
-                    DeviceLevel.High -> RecommendBroadcastSetting.HighDevice1v1
-                }
+            if (isLinkAudience) RecommendBroadcastSetting.Audience1v1 else {
+                when (liveMode) {
+                    LiveMode.OneVOne -> when (deviceLevel) {
+                        DeviceLevel.Low -> RecommendBroadcastSetting.LowDevice1v1
+                        DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevice1v1
+                        DeviceLevel.High -> RecommendBroadcastSetting.HighDevice1v1
+                    }
 
-                LiveMode.PK -> when (deviceLevel) {
-                    DeviceLevel.Low -> RecommendBroadcastSetting.LowDevicePK
-                    DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevicePK
-                    DeviceLevel.High -> RecommendBroadcastSetting.HighDevicePK
+                    LiveMode.PK -> when (deviceLevel) {
+                        DeviceLevel.Low -> RecommendBroadcastSetting.LowDevicePK
+                        DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevicePK
+                        DeviceLevel.High -> RecommendBroadcastSetting.HighDevicePK
+                    }
                 }
             },
             if (getCurrLowStreamSetting() != null)
@@ -610,6 +611,11 @@ object VideoSetting {
             isJoinedRoom,
             rtcConnection
         )
+
+        if (isLinkAudience && isPkMode) {
+            setCurrAudienceEnhanceSwitch(false)
+            updateAudioSetting(SR = SuperResolution.SR_NONE)
+        }
     }
 
     private fun updateBroadcastSetting(
@@ -937,7 +943,7 @@ object VideoSetting {
                 Constants.SimulcastStreamMode.ENABLE_SIMULCAST_STREAM, SimulcastStreamConfig(
                     VideoEncoderConfiguration.VideoDimensions(
                         resolution.width, resolution.height
-                ), -1, fps.fps), connection)
+                ), br, fps.fps), connection)
 
             // 1、SVC必须在enableDualStreamModeEx后设置才生效
             // 2、小流开SVC默认软编码
