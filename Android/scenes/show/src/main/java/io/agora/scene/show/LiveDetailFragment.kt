@@ -1576,6 +1576,7 @@ class LiveDetailFragment : Fragment() {
                     ShowInteractionStatus.pking.value -> VideoSetting.LiveMode.PK
                     else -> VideoSetting.LiveMode.OneVOne
                 },
+                isLinkAudience = !isRoomOwner,
                 rtcConnection = mMainRtcConnection
             )
         } else {
