@@ -74,6 +74,7 @@
     [self addSubview:inputBgView];
 
     self.inputTF = [[UITextField alloc] initWithFrame:CGRectMake(30, 9, inputBgView.width - 60, 30)];
+    self.inputTF.accessibilityIdentifier = @"ktv_create_room_textfield_id";
     self.inputTF.textColor = UIColorMakeWithHex(@"#040925");
     self.inputTF.font = UIFontBoldMake(18);
     self.inputTF.clearButtonMode = UITextFieldViewModeWhileEditing;
@@ -144,6 +145,7 @@
     createBtn.layer.masksToBounds = YES;
     [createBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
     [createBtn setTitle:KTVLocalizedString(@"创建") forState:UIControlStateNormal];
+    createBtn.accessibilityIdentifier = @"ktv_create_room_button_id";
     createBtn.titleLabel.font = UIFontBoldMake(16.0);
     createBtn.adjustsImageWhenHighlighted = NO;
     [createBtn addTarget:self action:@selector(createBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
