@@ -40,7 +40,30 @@ enum ShowDebug2TFSettingKey: String {
     }
 }
 
-extension ShowAgoraKitManager {
+class ShowDebugAgoraKitManager {
+    
+    static let shared = ShowDebugAgoraKitManager()
+    
+    let encoderConfig = AgoraVideoEncoderConfiguration()
+    
+    public var engine: AgoraRtcEngineKit?
+    
+    var exposureRangeX: Int?
+    var exposureRangeY: Int?
+    var matrixCoefficientsExt: Int?
+    var videoFullrangeExt: Int?
+    
+    private init() {
+        engine = AgoraRtcEngineKit.sharedEngine(with: AgoraRtcEngineConfig(), delegate: nil)
+    }
+    
+    private func engineConfig() -> AgoraRtcEngineConfig {
+        let config = AgoraRtcEngineConfig()
+         config.appId = KeyCenter.AppId
+         config.channelProfile = .liveBroadcasting
+         config.areaCode = .global
+         return config
+    }
     
     private var debugEncodeItems: [Bool] {
         ShowAgoraEncode.allCases.map({$0.encodeValue})
@@ -218,7 +241,7 @@ extension ShowAgoraKitManager {
     }
 }
 
-extension ShowAgoraKitManager {
+extension ShowDebugAgoraKitManager {
     
     private func setExposureRange() {
         if let x = exposureRangeX, let y = exposureRangeY {
@@ -232,6 +255,22 @@ extension ShowAgoraKitManager {
             engine?.setParameters("{\"che.video.videoFullrangeExt\":\(v1)}")
             engine?.setParameters("{\"che.video.matrixCoefficientsExt\":\(v2)}")
             showLogger.info("***Debug*** {\"che.video.videoFullrangeExt\":\(v1)} {\"che.video.matrixCoefficientsExt\":\(v2)} ")
+        }
+    }
+    
+    /// 设置超分 不保存数据
+    /// - Parameters:
+    ///   - isOn: 开关
+    ///   - srType: 默认1.5倍
+    func setDebugSuperResolutionOn(_ isOn: Bool, srType:SRType = .none) {
+        if srType == .none {
+            engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
+        }else{
+            engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
+            engine?.setParameters("{\"rtc.video.sr_type\":\(srType.rawValue)}")
+            engine?.setParameters("{\"rtc.video.sr_max_wh\":\(921598)}")
+            // enabled要放在srType之后 否则修改超分倍数可能不会立即生效
+            engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
         }
     }
 }

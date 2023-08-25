@@ -79,7 +79,7 @@
 		DD36106329B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FBB29B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift */; };
 		DD36106429B70CDC00CE7984 /* ShowAgoraKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FBC29B70CDC00CE7984 /* ShowAgoraKitManager.swift */; };
 		DD36106529B70CDC00CE7984 /* ShowChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FBD29B70CDC00CE7984 /* ShowChatModel.swift */; };
-		DD36106729B70CDC00CE7984 /* ShowAgoraKitManager+DebugSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FBF29B70CDC00CE7984 /* ShowAgoraKitManager+DebugSetting.swift */; };
+		DD36106729B70CDC00CE7984 /* ShowDebugAgoraKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FBF29B70CDC00CE7984 /* ShowDebugAgoraKitManager.swift */; };
 		DD36106829B70CDC00CE7984 /* ShowDebug2TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FC129B70CDC00CE7984 /* ShowDebug2TFModel.swift */; };
 		DD36106929B70CDC00CE7984 /* ShowSettingKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FC229B70CDC00CE7984 /* ShowSettingKey.swift */; };
 		DD36106B29B70CDC00CE7984 /* ShowDebug1TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD360FC429B70CDC00CE7984 /* ShowDebug1TFModel.swift */; };
@@ -726,7 +726,7 @@
 		DD360FBB29B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ShowAgoraKitManager+Setting.swift"; sourceTree = "<group>"; };
 		DD360FBC29B70CDC00CE7984 /* ShowAgoraKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowAgoraKitManager.swift; sourceTree = "<group>"; };
 		DD360FBD29B70CDC00CE7984 /* ShowChatModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowChatModel.swift; sourceTree = "<group>"; };
-		DD360FBF29B70CDC00CE7984 /* ShowAgoraKitManager+DebugSetting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ShowAgoraKitManager+DebugSetting.swift"; sourceTree = "<group>"; };
+		DD360FBF29B70CDC00CE7984 /* ShowDebugAgoraKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugAgoraKitManager.swift; sourceTree = "<group>"; };
 		DD360FC129B70CDC00CE7984 /* ShowDebug2TFModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebug2TFModel.swift; sourceTree = "<group>"; };
 		DD360FC229B70CDC00CE7984 /* ShowSettingKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingKey.swift; sourceTree = "<group>"; };
 		DD360FC429B70CDC00CE7984 /* ShowDebug1TFModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebug1TFModel.swift; sourceTree = "<group>"; };
@@ -1402,6 +1402,18 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		A81929172A96F64E00DAC148 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				E32C7EA82A20B03F00512523 /* ShowDebugPrivateParamsVC.swift */,
+				DD36101029B70CDC00CE7984 /* ShowDebugSettingVC.swift */,
+				DD360FC429B70CDC00CE7984 /* ShowDebug1TFModel.swift */,
+				DD360FC129B70CDC00CE7984 /* ShowDebug2TFModel.swift */,
+				DD360FBF29B70CDC00CE7984 /* ShowDebugAgoraKitManager.swift */,
+			);
+			path = Debug;
+			sourceTree = "<group>";
+		};
 		DD029245295BF0DC00485225 /* KTV */ = {
 			isa = PBXGroup;
 			children = (
@@ -1684,6 +1696,7 @@
 		DD360FAC29B70CDC00CE7984 /* Show */ = {
 			isa = PBXGroup;
 			children = (
+				A81929172A96F64E00DAC148 /* Debug */,
 				DD360FAD29B70CDC00CE7984 /* showResource.bundle */,
 				DD360FAE29B70CDC00CE7984 /* Utils */,
 				DD360FB729B70CDC00CE7984 /* Models */,
@@ -1718,7 +1731,6 @@
 				DD360FBB29B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift */,
 				DD360FBC29B70CDC00CE7984 /* ShowAgoraKitManager.swift */,
 				DD360FBD29B70CDC00CE7984 /* ShowChatModel.swift */,
-				DD360FBF29B70CDC00CE7984 /* ShowAgoraKitManager+DebugSetting.swift */,
 				DD360FC029B70CDC00CE7984 /* Setting */,
 			);
 			path = Models;
@@ -1736,10 +1748,7 @@
 		DD360FC029B70CDC00CE7984 /* Setting */ = {
 			isa = PBXGroup;
 			children = (
-				E32C7EA82A20B03F00512523 /* ShowDebugPrivateParamsVC.swift */,
-				DD360FC129B70CDC00CE7984 /* ShowDebug2TFModel.swift */,
 				DD360FC229B70CDC00CE7984 /* ShowSettingKey.swift */,
-				DD360FC429B70CDC00CE7984 /* ShowDebug1TFModel.swift */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -1798,7 +1807,6 @@
 			isa = PBXGroup;
 			children = (
 				DD36100F29B70CDC00CE7984 /* ShowSettingActionSheetVC.swift */,
-				DD36101029B70CDC00CE7984 /* ShowDebugSettingVC.swift */,
 				DD36101129B70CDC00CE7984 /* ShowAdvancedSettingVC.swift */,
 				DD36101329B70CDC00CE7984 /* ShowVideoSettingVC.swift */,
 				DD36101429B70CDC00CE7984 /* ShowCunstomNaviBar.swift */,
@@ -3685,7 +3693,7 @@
 				DD36105F29B70CDC00CE7984 /* UIImage+Show.swift in Sources */,
 				DD0292C1295BF0DC00485225 /* KTVLog.swift in Sources */,
 				DD619AB829E3E247008F63E4 /* SAPraiseEmitterView.swift in Sources */,
-				DD36106729B70CDC00CE7984 /* ShowAgoraKitManager+DebugSetting.swift in Sources */,
+				DD36106729B70CDC00CE7984 /* ShowDebugAgoraKitManager.swift in Sources */,
 				DD619A8A29E3E247008F63E4 /* SAChatModel.swift in Sources */,
 				DD619ADA29E3E247008F63E4 /* SAInputBar.swift in Sources */,
 				DD619BAA29E3E262008F63E4 /* ChatRoomServiceImp.swift in Sources */,
@@ -4356,9 +4364,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = JDPG69R49Z;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;

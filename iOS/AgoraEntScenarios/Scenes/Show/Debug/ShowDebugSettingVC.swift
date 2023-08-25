@@ -79,7 +79,7 @@ class ShowDebugSettingVC: UIViewController {
     }
     
     private func createBroadcastorDataArray() -> [Any] {
-        let settingManager = ShowAgoraKitManager.shared
+        let settingManager = ShowDebugAgoraKitManager.shared
         return [
             settingManager.debug1TFModelForKey(.encodeFrameRate),
             settingManager.debug2TFModelForKey(.encodeVideoSize),
@@ -118,7 +118,7 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: Debug1TFCellID, for: indexPath) as! ShowDebugSetting1TFCell
             cell.setTitle(tf1Model.title, value: tf1Model.tfText, unit: tf1Model.unitText) { textField in
                 tf1Model.tfText = textField.text
-                ShowAgoraKitManager.shared.updateDebugProfileFor1TFMode(tf1Model)
+                ShowDebugAgoraKitManager.shared.updateDebugProfileFor1TFMode(tf1Model)
             } beginEditing: {
                 tableView.scrollToRow(at: indexPath, at: .top, animated: true)
             }
@@ -129,10 +129,10 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: Debug2TFCellID, for: indexPath) as! ShowDebugSetting2TFCell
             cell.setTitle(tf2Model.title, value1: tf2Model.tf1Text, value2: tf2Model.tf2Text, separator: tf2Model.separatorText) { textField in
                 tf2Model.tf1Text = textField.text
-                ShowAgoraKitManager.shared.updateDebugProfileFor2TFModel(tf2Model)
+                ShowDebugAgoraKitManager.shared.updateDebugProfileFor2TFModel(tf2Model)
             } tf2DidEndEditing: { textField in
                 tf2Model.tf2Text = textField.text
-                ShowAgoraKitManager.shared.updateDebugProfileFor2TFModel(tf2Model)
+                ShowDebugAgoraKitManager.shared.updateDebugProfileFor2TFModel(tf2Model)
             } beginEditing: {
                 tableView.scrollToRow(at: indexPath, at: .top, animated: true)
             }
@@ -161,7 +161,7 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
                 vc.dataArray = data.items
                 vc.didSelectedIndex = { index in
                     data.writeValue(index)
-                    ShowAgoraKitManager.shared.updateSettingForDebugkey(data)
+                    ShowDebugAgoraKitManager.shared.updateSettingForDebugkey(data)
                     tableView.reloadData()
                 }
                 self?.present(vc, animated: true, completion: {
@@ -182,7 +182,7 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
 extension ShowDebugSettingVC {
     func changeValue(_ value: Any, forSettingKey key: ShowDebugSettingKey) {
         key.writeValue(value)
-        ShowAgoraKitManager.shared.updateSettingForDebugkey(key)
+        ShowDebugAgoraKitManager.shared.updateSettingForDebugkey(key)
         tableView.reloadData()
     }
 }

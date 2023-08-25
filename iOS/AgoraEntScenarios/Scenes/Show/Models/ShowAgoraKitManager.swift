@@ -29,20 +29,20 @@ class ShowAgoraKitManager: NSObject {
     
     private var broadcasterConnection: AgoraRtcConnection?
     
-    var exposureRangeX: Int?
-    var exposureRangeY: Int?
-    var matrixCoefficientsExt: Int?
-    var videoFullrangeExt: Int?
+//    var exposureRangeX: Int?
+//    var exposureRangeY: Int?
+//    var matrixCoefficientsExt: Int?
+//    var videoFullrangeExt: Int?
     
-    let encoderConfig = AgoraVideoEncoderConfiguration()
+//    let encoderConfig = AgoraVideoEncoderConfiguration()
     
-    public lazy var captureConfig: AgoraCameraCapturerConfiguration = {
-        let config = AgoraCameraCapturerConfiguration()
-        config.followEncodeDimensionRatio = true
-        config.cameraDirection = .front
-        config.frameRate = 15
-        return config
-    }()
+//    public lazy var captureConfig: AgoraCameraCapturerConfiguration = {
+//        let config = AgoraCameraCapturerConfiguration()
+//        config.followEncodeDimensionRatio = true
+//        config.cameraDirection = .front
+//        config.frameRate = 15
+//        return config
+//    }()
     
     public var engine: AgoraRtcEngineKit?
     
@@ -206,6 +206,7 @@ class ShowAgoraKitManager: NSObject {
         let connection = AgoraRtcConnection()
         connection.channelId = currentChannelId
         connection.localUid = UInt(VLUserCenter.user.id) ?? 0
+        let encoderConfig = getEncoderConfig()
         let encoderRet = engine.setVideoEncoderConfigurationEx(encoderConfig, connection: connection)
         showLogger.info("setVideoEncoderConfigurationEx  dimensions = \(encoderConfig.dimensions), bitrate = \(encoderConfig.bitrate), fps = \(encoderConfig.frameRate),  encoderRet = \(encoderRet)", context: kShowLogBaseContext)
     }
@@ -269,6 +270,8 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         engine.setClientRole(.broadcaster)
+        let encoderConfig = getEncoderConfig()
+        let captureConfig = getCaptureConfig()
         engine.setVideoEncoderConfiguration(encoderConfig)
         engine.setCameraCapturerConfiguration(captureConfig)
         BeautyManager.shareManager.beautyAPI.setupLocalVideo(canvasView, renderMode: .hidden)
@@ -359,17 +362,7 @@ class ShowAgoraKitManager: NSObject {
         }
     }
     
-    /// 设置编码分辨率
-    /// - Parameter size: 分辨率
-    func setVideoDimensions(_ size: CGSize){
-        guard let engine = engine else {
-            assert(true, "rtc engine not initlized")
-            return
-        }
-        encoderConfig.dimensions = CGSize(width: size.width, height: size.height)
-        engine.setVideoEncoderConfiguration(encoderConfig)
-    }
-    
+
     func cleanCapture() {
         guard let engine = engine else {
             assert(true, "rtc engine not initlized")
