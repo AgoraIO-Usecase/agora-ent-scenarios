@@ -339,12 +339,7 @@ extension CallMessageManager {
         rtmClient.logout()
         rtmClient.login(byToken: token) {[weak self] resp, error in
             guard let self = self else {return}
-            
             //TODO(RTM Team): timeout to reconnect bug (callback multi times)
-            if error.errorCode == .tokenExpired {
-                self.rtmDelegate?.rtmKit?(self.rtmClient, onTokenPrivilegeWillExpire: nil)
-            }
-            
             self.callMessagePrint("login completion: \(error.errorCode.rawValue)")
             self.isLoginedRTM = error.errorCode == .ok ? true : false
             self.loginSuccess?(error)
@@ -539,10 +534,18 @@ extension CallMessageManager {
 
 //MARK: AgoraRtmClientDelegate
 extension CallMessageManager: AgoraRtmClientDelegate {
+    func rtmKit(_ kit: AgoraRtmClientKit, channel channelName: String, connectionStateChanged state: AgoraRtmClientConnectionState, reason: AgoraRtmClientConnectionChangeReason) {
+        callMessagePrint("rtm connectionStateChanged: \(state.rawValue) reason: \(reason.rawValue)")
+        if reason == .changedTokenExpired {
+            self.rtmDelegate?.rtmKit?(kit, onTokenPrivilegeWillExpire: nil)
+        }
+    }
+    
     func rtmKit(_ rtmKit: AgoraRtmClientKit, onTokenPrivilegeWillExpire channel: String?) {
         callMessagePrint("rtm onTokenPrivilegeWillExpire[\(channel ?? "nil")]")
         self.rtmDelegate?.rtmKit?(rtmKit, onTokenPrivilegeWillExpire: channel)
     }
+    
     //收到RTM消息
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, on event: AgoraRtmMessageEvent) {
         let message = event.message
