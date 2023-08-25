@@ -260,7 +260,7 @@ class CallMessageManager(
             }
             var error1: AGError? = null
             var error2: AGError? = null
-            var tryCount = 2
+            var tryCount = 3
             val tryToInvoke = {
                 if (tryCount == 0) {
                     completion?.invoke(error1 ?: error2)
@@ -270,8 +270,10 @@ class CallMessageManager(
             options1.withMessage = true
             options1.withMetadata = false
             options1.withPresence = false
+            Log.d(TAG, "1/3 will _subscribe[$roomId]")
             _subscribe(roomId, options1) { error ->
                 error1 = error
+                Log.d(TAG, "1/3 _subscribe[$roomId]: ${error?.msg ?: "success"}")
                 tryCount -= 1
                 tryToInvoke.invoke()
             }
@@ -280,17 +282,42 @@ class CallMessageManager(
             options2.withMessage = false
             options2.withMetadata = false
             options2.withPresence = true
+            Log.d(TAG, "2/3 will _subscribe[$ownerRoomId]")
             _subscribe(ownerRoomId, options2) { error ->
                 error2 = error
+                Log.d(TAG, "2/3 _subscribe[$ownerRoomId]: ${error?.msg ?: "success"}")
+                tryCount -= 1
+                tryToInvoke.invoke()
+            }
+
+            Log.d(TAG, "3/3 waiting for snapshot")
+            //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
+            snapshotDidRecv = {
+                Log.d(TAG, "3/3 recv snapshot")
                 tryCount -= 1
                 tryToInvoke.invoke()
             }
         } else {
+            var error: AGError? = null
+            var tryCount = 2
+            val tryToInvoke = {
+                if (tryCount == 0) {
+                    completion?.invoke(error)
+                }
+            }
             val options = SubscribeOptions()
             options.withMessage = true
             options.withMetadata = false
             options.withPresence = true
-            _subscribe(roomId, options, completion)
+            _subscribe(roomId, options) { e ->
+                error = e
+                tryCount -= 1
+                tryToInvoke.invoke()
+            }
+            snapshotDidRecv = {
+                tryCount -= 1
+                tryToInvoke.invoke()
+            }
         }
     }
 
@@ -367,13 +394,22 @@ class CallMessageManager(
     }
 
     private fun _subscribe(channelName: String, option: SubscribeOptions, completion: ((AGError?) -> Unit)?) {
+        Log.d(TAG, "will subscribe[$channelName]")
+        rtmClient.unsubscribe(channelName, object: ResultCallback<Void> {
+            override fun onSuccess(responseInfo: Void?) {
+            }
+            override fun onFailure(errorInfo: ErrorInfo?) {
+            }
+        })
         rtmClient.subscribe(channelName, option, object: ResultCallback<Void> {
             override fun onSuccess(responseInfo: Void?) {
+                Log.d(TAG, "subscribe[$channelName] finished = success")
                 completion?.invoke(null)
             }
             override fun onFailure(errorInfo: ErrorInfo?) {
                 val msg = errorInfo?.errorReason ?: "error"
                 val errorCode = RtmConstants.RtmErrorCode.getValue(errorInfo?.errorCode)
+                Log.d(TAG, "subscribe[$channelName] finished = failed: $msg")
                 completion?.invoke(AGError(msg, errorCode))
             }
         })
@@ -384,6 +420,7 @@ class CallMessageManager(
             completion(null)
             return
         }
+        Log.d(TAG, "will login")
         val ret = rtmClient.login(token, object : ResultCallback<Void?> {
             override fun onSuccess(p0: Void?) {
                 Log.d(TAG, "login success")
@@ -408,7 +445,7 @@ class CallMessageManager(
 
     override fun onMessageEvent(event: MessageEvent?) {
         val message = event?.message?.data as? ByteArray ?: return
-        val jsonString = String(message)
+        val jsonString = String(message, Charsets.ISO_8859_1)
         Log.d(TAG, "on event message: $jsonString")
         val map = jsonStringToMap(jsonString)
         val messageId = map[kMessageId] as? Int
