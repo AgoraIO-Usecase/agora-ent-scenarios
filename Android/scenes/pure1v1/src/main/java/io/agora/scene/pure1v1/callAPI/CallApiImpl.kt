@@ -1053,7 +1053,7 @@ class CallApiImpl(
 
     override fun onMessageEvent(event: MessageEvent?) {
         val message = event?.message?.data as? ByteArray ?: return
-        val jsonString = String(message, Charsets.ISO_8859_1)
+        val jsonString = String(message)
         val msg1 = "on event message: $jsonString"
         Log.d(TAG, msg1)
         delegates.forEach { listener ->

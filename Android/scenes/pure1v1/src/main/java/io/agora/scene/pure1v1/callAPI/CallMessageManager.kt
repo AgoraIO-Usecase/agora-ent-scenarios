@@ -408,7 +408,7 @@ class CallMessageManager(
 
     override fun onMessageEvent(event: MessageEvent?) {
         val message = event?.message?.data as? ByteArray ?: return
-        val jsonString = String(message, Charsets.ISO_8859_1)
+        val jsonString = String(message)
         Log.d(TAG, "on event message: $jsonString")
         val map = jsonStringToMap(jsonString)
         val messageId = map[kMessageId] as? Int
