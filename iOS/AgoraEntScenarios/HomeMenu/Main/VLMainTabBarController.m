@@ -80,17 +80,19 @@
 }
 
 - (UITabBarItem*)tabBarItemsWithIndex:(NSUInteger)index {
-    NSArray* tabBarItems = @[
-        [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"首页")
-                                      image:[self tabbarImageWithImageNamed:@"Tab_home_normal"]
-                              selectedImage:[self tabbarImageWithImageNamed:@"Tab_home_sel"]],
-      //  [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"发现")
-//                                      image:[self tabbarImageWithImageNamed:@"Tab_discovery_normal"]
-//                              selectedImage:[self tabbarImageWithImageNamed:@"Tab_discovery_sel"]],
-        [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"我的")
-                                      image:[self tabbarImageWithImageNamed:@"Tab_mine_normal"]
-                              selectedImage:[self tabbarImageWithImageNamed:@"Tab_mine_sel"]]
-    ];
+    UITabBarItem* item1 = [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"首页")
+                                                        image:[self tabbarImageWithImageNamed:@"Tab_home_normal"]
+                                                selectedImage:[self tabbarImageWithImageNamed:@"Tab_home_sel"]];
+    item1.accessibilityIdentifier = @"main_tabbar_home_bar_id";
+//    UITabBarItem* item2 = [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"发现")
+//                                                        image:[self tabbarImageWithImageNamed:@"Tab_discovery_normal"]
+//                                                selectedImage:[self tabbarImageWithImageNamed:@"Tab_discovery_sel"]];
+    
+    UITabBarItem* item3 = [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"我的")
+                                                        image:[self tabbarImageWithImageNamed:@"Tab_mine_normal"]
+                                                selectedImage:[self tabbarImageWithImageNamed:@"Tab_mine_sel"]];
+    item3.accessibilityIdentifier = @"main_tabbar_mine_bar_id";
+    NSArray* tabBarItems = @[item1, item3];
     
     return [tabBarItems objectAtIndex:index];
 }
