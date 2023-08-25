@@ -287,6 +287,7 @@ UICollectionViewDataSource
 - (VLKTVSliderView *)accSlider {
     if (!_accSlider) {
         _accSlider = [[VLKTVSliderView alloc] initWithMax:1 min:0];
+        _accSlider.accessibilityIdentifier = @"ktv_room_setting_acc_slider_id";
         _accSlider.titleLabel.text = KTVLocalizedString(@"伴奏音量");
         _accSlider.delegate = self;
     }
