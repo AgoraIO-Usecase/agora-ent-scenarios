@@ -236,7 +236,8 @@
     <string name="show_beauty_green_screen_tip">为了保证虚拟背景最佳效果，请确认实际环境已搭建绿幕，否则虚拟背景不生效哦</string>
     <string name="show_live_detail_living_end">直播已结束</string>
     <string name="show_live_detail_try_to_move">滑动换个主播试试看</string>
-    <string name="show_broadcast_tips">开播建议：请确保开播环境网络状态良好\n上行带宽>=3M</string>
+    <string name="show_broadcast_header">开播建议：</string>
+    <string name="show_broadcast_tips">请确保开播环境网络状态良好\n上行带宽>=3M</string>
     <string name="show_beauty_tips">为保证最佳体验，已默认关闭AI高级美颜\n如需体验请手动打开</string>
     <string name="show_network_quailty">目标观众的网络状况</string>
     <string name="show_network_quailty_tips">针对目标投放地区的网络状况的视频策略</string>
