@@ -67,6 +67,7 @@ import io.agora.scene.ktv.ktvapi.KTVApiImpl;
 import io.agora.scene.ktv.ktvapi.KTVLoadMusicConfiguration;
 import io.agora.scene.ktv.ktvapi.KTVLoadMusicMode;
 import io.agora.scene.ktv.ktvapi.KTVLoadSongFailReason;
+import io.agora.scene.ktv.ktvapi.KTVMusicType;
 import io.agora.scene.ktv.ktvapi.KTVSingRole;
 import io.agora.scene.ktv.ktvapi.KTVSongType;
 import io.agora.scene.ktv.ktvapi.KTVType;
@@ -1425,7 +1426,7 @@ public class RoomLivingViewModel extends ViewModel {
                 roomInfoLiveData.getValue().getRoomNo(),
                 UserManager.getInstance().getUser().id.intValue(),
                 roomInfoLiveData.getValue().getRoomNo() + "_ex",
-                roomInfoLiveData.getValue().getAgoraChorusToken(), 10, KTVType.Normal, KTVSongType.SONG_CODE)
+                roomInfoLiveData.getValue().getAgoraChorusToken(), 10, KTVType.Normal, KTVMusicType.SONG_CODE)
         );
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {

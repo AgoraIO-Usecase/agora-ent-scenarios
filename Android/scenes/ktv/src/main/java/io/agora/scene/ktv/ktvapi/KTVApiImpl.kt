@@ -125,7 +125,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         this.ktvApiConfig = config
 
         // ------------------ 初始化内容中心 ------------------
-        if (config.musicType == KTVSongType.SONG_CODE) {
+        if (config.musicType == KTVMusicType.SONG_CODE) {
             val contentCenterConfiguration = MusicContentCenterConfiguration()
             contentCenterConfiguration.appId = config.appId
             contentCenterConfiguration.mccUid = ktvApiConfig.localUid.toLong()
@@ -224,7 +224,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mRtcEngine.removeHandler(this)
         mPlayer.unRegisterPlayerObserver(this)
 
-        if (ktvApiConfig.musicType == KTVSongType.SONG_CODE) {
+        if (ktvApiConfig.musicType == KTVMusicType.SONG_CODE) {
             mMusicCenter.unregisterEventHandler()
         }
 
@@ -312,8 +312,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         } else if (this.singerRole == KTVSingRole.Audience && newRole == KTVSingRole.LeadSinger) {
             // 2、Audience -》LeadSinger
             becomeSoloSinger()
-            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object :
-                OnJoinChorusStateListener {
+            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object : OnJoinChorusStateListener {
                 override fun onJoinChorusSuccess() {
                     Log.d(TAG, "onJoinChorusSuccess")
                     singerRole = newRole
@@ -337,8 +336,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         } else if (this.singerRole == KTVSingRole.Audience && newRole == KTVSingRole.CoSinger) {
             // 4、Audience -》CoSinger
-            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object :
-                OnJoinChorusStateListener {
+            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object : OnJoinChorusStateListener {
                 override fun onJoinChorusSuccess() {
                     Log.d(TAG, "onJoinChorusSuccess")
                     singerRole = newRole
@@ -364,8 +362,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         } else if (this.singerRole == KTVSingRole.SoloSinger && newRole == KTVSingRole.LeadSinger) {
             // 6、SoloSinger -》LeadSinger
 
-            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object :
-                OnJoinChorusStateListener {
+            joinChorus(newRole, ktvApiConfig.chorusChannelToken, object : OnJoinChorusStateListener {
                 override fun onJoinChorusSuccess() {
                     Log.d(TAG, "onJoinChorusSuccess")
                     singerRole = newRole
@@ -694,7 +691,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 // 预加载歌曲成功
                 // 导唱
                 mPlayer.setPlayerOption("enable_multi_audio_track", 1)
-                if (ktvApiConfig.musicType == KTVSongType.SONG_CODE) {
+                if (ktvApiConfig.musicType == KTVMusicType.SONG_CODE) {
                     (mPlayer as IAgoraMusicPlayer).open(songCode, 0) // TODO open failed
                 } else {
                     mPlayer.open(songUrl, 0) // TODO open failed
