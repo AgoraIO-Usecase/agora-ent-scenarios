@@ -17,6 +17,10 @@ import AgoraRtcKit
 //    case followSinger       //跟唱
 }
 
+@objc public enum loadMusicType: Int {
+    case mcc
+    case local
+}
 
 /// 歌曲状态
 @objc public enum KTVPlayerTrackMode: Int {
@@ -161,7 +165,8 @@ import AgoraRtcKit
     var chorusChannelToken: String
     var type: KTVType = .normal
     var maxCacheSize: Int = 10
-    var mccDomain: String? = nil
+    var musicType: loadMusicType = .mcc
+    var isDebugMode: Bool = false
     @objc public
     init(appId: String,
          rtmToken: String,
@@ -172,7 +177,8 @@ import AgoraRtcKit
          chorusChannelToken: String,
          type: KTVType,
          maxCacheSize: Int,
-         mccDomain: String
+         musicType: loadMusicType,
+         isDebugMode: Bool
     ) {
         self.appId = appId
         self.rtmToken = rtmToken
@@ -183,7 +189,8 @@ import AgoraRtcKit
         self.chorusChannelToken = chorusChannelToken
         self.type = type
         self.maxCacheSize = maxCacheSize
-        self.mccDomain = mccDomain
+        self.musicType = musicType
+        self.isDebugMode = isDebugMode
     }
 }
 
@@ -193,6 +200,23 @@ import AgoraRtcKit
     public var autoPlay: Bool = false   //是否加载完成自动播放
     public var mainSingerUid: Int = 0     //主唱uid
     public var mode: KTVLoadMusicMode = .loadMusicAndLrc
+    
+    func printObjectContent() -> String {
+        var content = ""
+        
+        let mirror = Mirror(reflecting: self)
+        for child in mirror.children {
+            if let propertyName = child.label {
+                if let propertyValue = child.value as? CustomStringConvertible {
+                    content += "\(propertyName): \(propertyValue)\n"
+                } else {
+                    content += "\(propertyName): \(child.value)\n"
+                }
+            }
+        }
+        
+        return content
+   }
 }
 
 
@@ -332,9 +356,7 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     /// - Parameter isOnMicOpen: <#isOnMicOpen description#>
     func setMicStatus(isOnMicOpen: Bool)
     
-    /// 获取mpk实例
-    /// - Returns: <#description#>
-    func getMediaPlayer() -> AgoraMusicPlayerProtocol?
+    func getMusicPlayer() -> AgoraRtcMediaPlayerProtocol?
     
     /// 获取MCC实例
     /// - Returns: <#description#>
@@ -347,4 +369,34 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
      创建dataStreamID
      */
     func renewInnerDataStreamId()
+    
+    
+  /**
+   * 加载歌曲，同时只能为一首歌loadSong，同步调用， 一般使用此loadSong是歌曲已经preload成功（url为本地文件地址）
+   * @param config 加载歌曲配置，config.autoPlay = true，默认播放url1
+   * @param url1 歌曲地址1
+   * @param url2 歌曲地址2
+   *
+   *
+   * 推荐调用：
+   * 歌曲开始时：
+   * 主唱 loadMusic(KTVSongConfiguration(autoPlay=true, mode=LOAD_MUSIC_AND_LRC, url, mainSingerUid)) switchSingerRole(SoloSinger)
+   * 观众 loadMusic(KTVSongConfiguration(autoPlay=false, mode=LOAD_LRC_ONLY, url, mainSingerUid))
+   * 加入合唱时：
+   * 准备加入合唱者：loadMusic(KTVSongConfiguration(autoPlay=false, mode=LOAD_MUSIC_ONLY, url, mainSingerUid))
+   * loadMusic成功后switchSingerRole(CoSinger)
+   */
+  func load2Music(
+      url1: String,
+      url2: String,
+      config: KTVSongConfiguration
+  )
+  
+  /**
+   * 多文件切换播放资源
+   * @param url 需要切换的播放资源，需要为 load2Music 中 参数 url1，url2 中的一个
+   * @param syncPts 是否同步切换前后的起始播放位置: true 同步，false 不同步，从 0 开始
+   */
+  func switchPlaySrc(url: String, syncPts: Bool)
+      
 }
