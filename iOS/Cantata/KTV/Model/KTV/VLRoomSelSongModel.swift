@@ -12,8 +12,7 @@ import AgoraCommon
     case playing = 2 //正在播放
 }
 
-
-public class VLRoomSelSongModel: VLBaseModel {
+@objc public class VLRoomSelSongModel: VLBaseModel {
     @objc public var imageUrl: String?
     
     /// 是否原唱

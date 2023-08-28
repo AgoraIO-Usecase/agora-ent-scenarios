@@ -13,7 +13,7 @@ import AgoraCommon
 }
 
 
-public class VLRoomSelSongModel: VLBaseModel {
+class VLRoomSelSongModel: VLBaseModel {
     @objc var imageUrl: String?
     
     /// 是否原唱

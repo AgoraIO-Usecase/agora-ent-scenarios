@@ -8,7 +8,7 @@
 #import "VLKTVViewController.h"
 
 #import "VLPopScoreView.h"
-#import "VLLoginViewController.h"
+//#import "VLLoginViewController.h"
 #import "VLCreateRoomViewController.h"
 #import "LSTPopView.h"
 #import "VLUserCenter.h"
@@ -16,7 +16,6 @@
 #import "VLURLPathConfig.h"
 #import "VLToast.h"
 #import "AppContext+KTV.h"
-#import "AESMacro.h"
 #import "VLAlert.h"
 
 @interface VLOnLineListVC ()<VLHomeOnLineListViewDelegate/*,AgoraRtmDelegate*/,VLPopScoreViewDelegate>
@@ -64,12 +63,12 @@
     [self.view addSubview:listView];
 }
 
-- (BOOL)checkIsLogin {
-    if (![VLUserCenter center].isLogin) {
-        VLLoginViewController *loginVC = [[VLLoginViewController alloc] init];
-        [self.navigationController pushViewController:loginVC animated:YES];
-        return NO;
-    }
+- (BOOL)checkIsLogin { //cp todo
+//    if (![VLUserCenter center].isLogin) {
+//        VLLoginViewController *loginVC = [[VLLoginViewController alloc] init];
+//        [self.navigationController pushViewController:loginVC animated:YES];
+//        return NO;
+//    }
     return YES;
 }
 
@@ -114,7 +113,7 @@
         return;
     }
     
-    KTVJoinRoomInputModel* inputModel = [KTVJoinRoomInputModel new];
+    KTVJoinRoomInputModel* inputModel = [[KTVJoinRoomInputModel alloc]init];
     inputModel.roomNo = listModel.roomNo;
 //    inputModel.userNo = VLUserCenter.user.id;
     inputModel.password = inputText;
