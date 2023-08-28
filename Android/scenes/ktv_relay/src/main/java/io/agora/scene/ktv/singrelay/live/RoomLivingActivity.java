@@ -198,7 +198,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
                     RoomSelSongModel songModel = roomLivingViewModel.songPlayingLiveData.getValue();
                     if (songModel != null) {
-                        if (item.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_FALSE()) {
+                        if (item.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_FALSE() && roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
                             binding.tvZC.setText(R.string.ktv_zc);
                             binding.tvHC.setVisibility(View.GONE);
                             binding.tvZC.setVisibility(View.VISIBLE);
