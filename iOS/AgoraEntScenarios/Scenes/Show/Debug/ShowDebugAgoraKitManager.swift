@@ -7,6 +7,13 @@
 import Foundation
 import AgoraRtcKit
 
+private let userDefaultKeyTag = "debug"
+// 存储编码配置的key
+private let kEncodeWidth = "kEncodeWidth"
+private let kEncodeHeight = "kEncodeHeight"
+private let kEncodeFPS = "kEncodeFPS"
+private let kEncodeBitrate = "kEncodeBitrate"
+
 
 enum ShowDebug1TFSettingKey: String {
     
@@ -86,6 +93,7 @@ class ShowDebugAgoraKitManager {
         encoderConfig.frameRate = .fps15
         encoderConfig.bitrate = 1800
         engine?.setVideoEncoderConfiguration(encoderConfig)
+        saveVideoEncoderConfiguration()
         
         setExposureRange()
         setColorSpace()
@@ -165,6 +173,7 @@ class ShowDebugAgoraKitManager {
             }
             encoderConfig.frameRate = fps
             engine?.setVideoEncoderConfiguration(encoderConfig)
+            saveVideoEncoderConfiguration()
             showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeFrameRate = \(encoderConfig.frameRate) ")
         case .bitRate:
             guard let value = Int(text) else {
@@ -173,6 +182,7 @@ class ShowDebugAgoraKitManager {
             }
             encoderConfig.bitrate = value
             engine?.setVideoEncoderConfiguration(encoderConfig)
+            saveVideoEncoderConfiguration()
             showLogger.info("***Debug*** setVideoEncoderConfiguration.bitrate = \(encoderConfig.bitrate) ")
         }
     }
@@ -186,6 +196,7 @@ class ShowDebugAgoraKitManager {
         case .encodeVideoSize:
             encoderConfig.dimensions = CGSize(width: value1, height: value2)
             engine?.setVideoEncoderConfiguration(encoderConfig)
+            saveVideoEncoderConfiguration()
             showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeVideoSize = \(encoderConfig.dimensions) ")
         case .exposureRange:
             exposureRangeX = value1
@@ -211,8 +222,6 @@ class ShowDebugAgoraKitManager {
             engine?.setColorEnhanceOptions(isOn, options: AgoraColorEnhanceOptions())
         case .videoDenoiser:
             engine?.setVideoDenoiserOptions(isOn, options: AgoraVideoDenoiserOptions())
-        case .PVC:
-            engine?.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
         case .focusFace:
             engine?.setCameraAutoFocusFaceModeEnabled(isOn)
             showLogger.info("***Debug*** setCameraAutoFocusFaceModeEnabled  \(isOn)")
@@ -273,9 +282,15 @@ extension ShowDebugAgoraKitManager {
             engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
         }
     }
+    
+    func saveVideoEncoderConfiguration() {
+        UserDefaults.standard.set(encoderConfig.dimensions.width, forKey: kEncodeWidth)
+        UserDefaults.standard.set(encoderConfig.dimensions.height, forKey: kEncodeHeight)
+        UserDefaults.standard.set(encoderConfig.frameRate.rawValue, forKey: kEncodeFPS)
+        UserDefaults.standard.set(encoderConfig.bitrate, forKey: kEncodeBitrate)
+        UserDefaults.standard.synchronize()
+    }
 }
-
-private let userDefaultKeyTag = "debug"
 
 enum ShowDebugSettingKey: String, CaseIterable {
     
@@ -289,7 +304,6 @@ enum ShowDebugSettingKey: String, CaseIterable {
     case lowlightEnhance        // 暗光增强
     case colorEnhance           // 色彩增强
     case videoDenoiser          // 降噪
-    case PVC                    // pvc
     case focusFace              // 人脸对焦
     case encode                 // 硬编/软编
     case codeCType                // 编码器
@@ -307,8 +321,6 @@ enum ShowDebugSettingKey: String, CaseIterable {
             return "show_advance_setting_colorEnhance_title".show_localized
         case .videoDenoiser:
             return "show_advance_setting_videoDenoiser_title".show_localized
-        case .PVC:
-            return "PVC"
         case .focusFace:
             return "人脸对焦"
         case .encode:
@@ -336,8 +348,6 @@ enum ShowDebugSettingKey: String, CaseIterable {
         case .colorEnhance:
             return .aSwitch
         case .videoDenoiser:
-            return .aSwitch
-        case .PVC:
             return .aSwitch
         case .focusFace:
             return .aSwitch
@@ -367,8 +377,6 @@ enum ShowDebugSettingKey: String, CaseIterable {
             return "show_advance_setting_colorEnhance_tips".show_localized
         case .videoDenoiser:
             return "show_advance_setting_videoDenoiser_tips".show_localized
-        case .PVC:
-            return "show_advance_setting_PVC_tips".show_localized
         default:
             return ""
         }

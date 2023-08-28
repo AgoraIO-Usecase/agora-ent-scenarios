@@ -8,6 +8,11 @@
 import Foundation
 import AgoraRtcKit
 
+private let kEncodeWidth = "kEncodeWidth"
+private let kEncodeHeight = "kEncodeHeight"
+private let kEncodeFPS = "kEncodeFPS"
+private let kEncodeBitrate = "kEncodeBitrate"
+
 enum ShowMode {
     case single // 单主播模式
     case pk // pk模式
@@ -140,6 +145,9 @@ extension ShowAgoraKitManager {
     
     // 预设模式
     private func _presetValuesWith(encodeSize: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool) {
+        if AppContext.shared.isDebugMode {
+            return
+        }
         ShowSettingKey.videoEncodeSize.writeValue(ShowAgoraVideoDimensions.values().firstIndex(of: encodeSize.sizeValue))
         ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: fps))
         ShowSettingKey.videoBitRate.writeValue(bitRate)
@@ -335,10 +343,19 @@ extension ShowAgoraKitManager {
     }
 
     func getEncoderConfig() -> AgoraVideoEncoderConfiguration {
-        if AppContext.shared.isDebugMode {
-            return ShowDebugAgoraKitManager.shared.encoderConfig
-        }
         let encoderConfig = AgoraVideoEncoderConfiguration()
+        if AppContext.shared.isDebugMode {
+            if let encodeWidth: CGFloat = UserDefaults.standard.value(forKey: kEncodeWidth) as? CGFloat ,let encodeHeight: CGFloat = UserDefaults.standard.value(forKey: kEncodeHeight) as? CGFloat {
+                encoderConfig.dimensions = CGSize(width: encodeWidth, height: encodeHeight)
+            }
+            if let fps: Int = UserDefaults.standard.value(forKey: kEncodeFPS) as? Int {
+                encoderConfig.frameRate =  AgoraVideoFrameRate(rawValue: fps) ?? .fps15
+            }
+            if let bitrate: Int = UserDefaults.standard.value(forKey: kEncodeBitrate) as? Int {
+                encoderConfig.bitrate = bitrate
+            }
+            return encoderConfig
+        }
         let indexValue = ShowSettingKey.videoEncodeSize.intValue
         let dimensions = ShowAgoraVideoDimensions.values()
         let index = indexValue % dimensions.count
@@ -358,20 +375,20 @@ extension ShowAgoraKitManager {
     }
     
     func getCaptureConfig() -> AgoraCameraCapturerConfiguration {
-        if AppContext.shared.isDebugMode {
-            let encoderConfig = ShowDebugAgoraKitManager.shared.encoderConfig
-            let config = AgoraCameraCapturerConfiguration()
-            config.followEncodeDimensionRatio = true
-            config.cameraDirection = .front
-            config.frameRate = Int32(encoderConfig.frameRate.rawValue)
-            config.dimensions = encoderConfig.dimensions
-            return config
-        }
         let config = AgoraCameraCapturerConfiguration()
         config.followEncodeDimensionRatio = true
         config.cameraDirection = .front
-        config.frameRate = 15
         
+        if AppContext.shared.isDebugMode {
+            if let encodeWidth: CGFloat = UserDefaults.standard.value(forKey: kEncodeWidth) as? CGFloat ,let encodeHeight: CGFloat = UserDefaults.standard.value(forKey: kEncodeHeight) as? CGFloat {
+                config.dimensions = CGSize(width: encodeWidth, height: encodeHeight)
+            }
+            if let fps: Int = UserDefaults.standard.value(forKey: kEncodeFPS) as? Int {
+                config.frameRate = Int32(fps)
+            }
+            return config
+        }
+       
         let indexValue = ShowSettingKey.videoEncodeSize.intValue
         let dimensions = ShowAgoraVideoDimensions.values()
         let index = indexValue % dimensions.count
