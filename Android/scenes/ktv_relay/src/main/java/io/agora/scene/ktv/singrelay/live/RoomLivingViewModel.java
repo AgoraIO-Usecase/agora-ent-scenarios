@@ -442,7 +442,7 @@ public class RoomLivingViewModel extends ViewModel {
                 if (index != -1) {
                     value.remove(index);
                     value.add(index, roomSeatModel);
-                    seatListLiveData.postValue(value);
+                    seatListLiveData.setValue(value);
 
                     if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                         seatLocalLiveData.setValue(roomSeatModel);
