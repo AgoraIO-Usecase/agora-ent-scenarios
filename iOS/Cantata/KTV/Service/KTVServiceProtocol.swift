@@ -7,6 +7,7 @@
 
 import Foundation
 import AgoraRtmKit
+import AgoraCommon
 
 @objc public enum KTVServiceNetworkStatus: Int {
     case connecting = 0 // 连接中

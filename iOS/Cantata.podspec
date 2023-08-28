@@ -39,12 +39,10 @@ TODO: Add long description of the pod here.
     s.prefix_header_contents = '
     #if __has_include(<Cantata/Cantata-Swift.h>)
         #import <Cantata/Cantata-Swift.h>
-    #else
-        #import "Cantata-Swift.h"
     #endif
   '
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
+   s.public_header_files = 'Cantata/**/CantataPlugin.h'
   s.dependency 'AgoraRtcEngine_Special_iOS'
   s.dependency 'AgoraCommon'
   s.dependency 'LSTPopView'
