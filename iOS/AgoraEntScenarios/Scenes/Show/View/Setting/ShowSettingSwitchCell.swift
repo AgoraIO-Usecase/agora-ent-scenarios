@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import AgoraCommon
 class ShowSettingSwitchCell: ShowSettingBaseCell {
     
     private var valueChangedAction: ((_ isOn: Bool)->())?

@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import AgoraCommon
 class ShowRoomListView: UIView {
     
     var roomList = [ShowRoomListModel]() {

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AgoraCommon
 
 let kShowLogBaseContext = "AgoraKit"
 let showLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig(sceneName: "Show"))

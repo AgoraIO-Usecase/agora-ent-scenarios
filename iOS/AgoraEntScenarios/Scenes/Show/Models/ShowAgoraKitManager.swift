@@ -10,7 +10,7 @@ import AgoraRtcKit
 import UIKit
 import YYCategories
 import VideoLoaderAPI
-
+import AgoraCommon
 class ShowAgoraKitManager: NSObject {
     
     static let shared = ShowAgoraKitManager()
@@ -126,7 +126,7 @@ class ShowAgoraKitManager: NSObject {
         let parasm: [String: Any] = ["appId": KeyCenter.AppId,
                                      "channelName": channelName,
                                      "channelType": engineConfig().channelProfile.rawValue,
-                                     "traceId": NSString.withUUID().md5(),
+                                     "traceId": NSString.withUUID().md5Encrypt,
                                      "src": "iOS",
                                      "payload": JSONObject.toJsonString(dict: userInfo) ?? ""]
         NetworkManager.shared.postRequest(urlString: "https://service.agora.io/toolbox/v1/moderation/audio",

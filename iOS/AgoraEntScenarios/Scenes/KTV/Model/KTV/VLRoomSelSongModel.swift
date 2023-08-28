@@ -6,14 +6,14 @@
 //
 
 import Foundation
-
+import AgoraCommon
 @objc enum VLSongPlayStatus: Int {
     case idle = 0 //未播放
     case playing = 2 //正在播放
 }
 
 
-class VLRoomSelSongModel: VLBaseModel {
+public class VLRoomSelSongModel: VLBaseModel {
     @objc var imageUrl: String?
     
     /// 是否原唱

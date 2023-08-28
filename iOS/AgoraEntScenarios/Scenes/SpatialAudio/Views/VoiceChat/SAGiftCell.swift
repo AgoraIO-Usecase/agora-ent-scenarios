@@ -8,7 +8,7 @@
 import UIKit
 import ZSwiftBaseLib
 import SDWebImage
-
+import AgoraCommon
 public class SAGiftCell: UITableViewCell {
     var gift: SAGiftEntity?
 

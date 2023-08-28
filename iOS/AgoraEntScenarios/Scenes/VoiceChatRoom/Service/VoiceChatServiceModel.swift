@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import AgoraCommon
 @objcMembers
 class VoiceChatBaseInfo: NSObject {
     var objectId: String?    //SyncManager获取到的对象带的唯一标识，用于差改删

@@ -7,7 +7,7 @@
 
 import UIKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 public class VoiceRoomChatView: UIView, UITableViewDelegate, UITableViewDataSource {
     var likeAction: ((UIButton) -> Void)?
 

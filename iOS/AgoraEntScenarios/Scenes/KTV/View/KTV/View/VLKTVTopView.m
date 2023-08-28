@@ -5,8 +5,8 @@
 
 #import "VLKTVTopView.h"
 #import "VLHotSpotBtn.h"
-#import "AESMacro.h"
-
+#import "AgoraEntScenarios-Swift.h"
+@import AgoraCommon;
 @interface VLKTVTopView ()
 
 @property(nonatomic, weak) id <VLKTVTopViewDelegate>delegate;

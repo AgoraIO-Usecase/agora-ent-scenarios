@@ -7,7 +7,7 @@
 import UIKit
 import Agora_Scene_Utils
 import AgoraRtcKit
-
+import AgoraCommon
 class ShowRealTimeDataView: UIView {
     private lazy var leftInfoLabel: AGELabel = {
         let label = AGELabel(colorStyle: .white, fontStyle: .small)

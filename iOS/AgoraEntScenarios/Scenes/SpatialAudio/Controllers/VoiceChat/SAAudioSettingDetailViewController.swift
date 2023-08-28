@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import AgoraCommon
 class SAAudioSettingDetailViewController: UIViewController {
     private var screenWidth: CGFloat = UIScreen.main.bounds.size.width
     private var lineImgView: UIImageView = .init()

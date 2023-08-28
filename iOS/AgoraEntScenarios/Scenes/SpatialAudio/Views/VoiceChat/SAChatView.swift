@@ -7,7 +7,7 @@
 
 import UIKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 public class SAChatView: UIView, UITableViewDelegate, UITableViewDataSource {
     var likeAction: ((UIButton) -> Void)?
 

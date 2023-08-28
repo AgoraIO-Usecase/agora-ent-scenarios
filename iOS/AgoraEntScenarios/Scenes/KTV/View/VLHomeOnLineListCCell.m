@@ -7,7 +7,8 @@
 #import "VLHotSpotBtn.h"
 #import "VLMacroDefine.h"
 #import "VLFontUtils.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
+@import AgoraCommon;
 @import Masonry;
 
 @interface VLHomeOnLineListCCell()

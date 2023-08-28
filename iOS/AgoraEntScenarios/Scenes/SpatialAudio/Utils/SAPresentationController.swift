@@ -49,7 +49,11 @@ public final class SAPresentationController: UIPresentationController {
         component = (presentedViewController as? SAPresentedViewType)?.presentedViewComponent ?? SAPresentedViewComponent(contentSize: CGSize(width: 240, height: 200))
         super.init(presentedViewController: presentedViewController, presenting: presentingViewController)
     }
-
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override public var frameOfPresentedViewInContainerView: CGRect {
         let containerbounds = containerView?.bounds ?? UIScreen.main.bounds
         let containerWidth = containerbounds.width

@@ -7,6 +7,7 @@
 
 import SnapKit
 import UIKit
+import AgoraCommon
 
 public enum AgoraChatRoomBaseUserCellType {
     case AgoraChatRoomBaseUserCellTypeAdd

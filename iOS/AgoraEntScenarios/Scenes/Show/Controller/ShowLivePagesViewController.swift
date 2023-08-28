@@ -7,7 +7,7 @@
 
 import Foundation
 import UIKit
-
+import AgoraCommon
 private let kPagesVCTag = "PagesVC"
 class ShowLivePagesViewController: ViewController {
     

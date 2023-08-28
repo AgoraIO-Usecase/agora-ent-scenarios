@@ -14,7 +14,11 @@ public class CrossZoomAnimation: PresentationAnimation {
         self.scale = scale
         super.init(options: options, origin: origin)
     }
-
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override public func beforeAnimation(animationContext: AnimationContext) {
         animationContext.animatingView?.frame = animationContext.finalFrame
         let translate = calculateTranslate(animationContext: animationContext)

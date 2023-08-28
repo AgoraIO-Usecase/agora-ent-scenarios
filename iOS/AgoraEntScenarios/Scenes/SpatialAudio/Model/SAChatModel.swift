@@ -7,7 +7,7 @@
 
 import Foundation
 import ZSwiftBaseLib
-
+import AgoraCommon
 @objcMembers open class SAChatEntity: NSObject, Codable {
     var uid: String? = ""
     var userName: String? = ""

@@ -8,7 +8,7 @@
 import UIKit
 import WebKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 class VoiceRoomHelpViewController: VRBaseViewController, WKNavigationDelegate {
     lazy var webView: WKWebView = {
         let preferences = WKPreferences()
@@ -25,7 +25,7 @@ class VoiceRoomHelpViewController: VRBaseViewController, WKNavigationDelegate {
         return webView
     }()
 
-    override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         navigation.title.text = "Agora"
         let urlStr = "https://www.agora.io"

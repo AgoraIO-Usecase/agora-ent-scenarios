@@ -7,7 +7,7 @@
 
 import Foundation
 import KakaJSON
-
+import AgoraCommon
 @objcMembers
 class SABaseInfo: NSObject {
     var objectId: String?    //SyncManager获取到的对象带的唯一标识，用于差改删
@@ -96,7 +96,14 @@ public class SARobotAudioInfo: NSObject, Convertible {
     
     var objectId: String = ""
     
-    override public required init() {}
+    override public required init() {
+        super.init()
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }

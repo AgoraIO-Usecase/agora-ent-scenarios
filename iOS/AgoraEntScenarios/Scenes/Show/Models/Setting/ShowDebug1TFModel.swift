@@ -16,5 +16,10 @@ class ShowDebug1TFModel: NSObject {
         self.title = title
         self.tfText = tfText
         self.unitText = unitText
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

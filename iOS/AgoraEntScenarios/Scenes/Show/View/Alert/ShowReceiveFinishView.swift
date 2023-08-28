@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import AgoraCommon
 private let HeadImgViewHeight: CGFloat = 61
 private let BackButtonHeight: CGFloat = 40
 

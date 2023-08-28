@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import AgoraCommon
 class ShowDebugPrivateParamsVC: UIViewController {
     
     // 自定义导航栏

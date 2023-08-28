@@ -18,5 +18,10 @@ class ShowDebug2TFModel: NSObject {
         self.tf1Text = tf1Text
         self.tf2Text = tf2Text
         self.separatorText = separatorText
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

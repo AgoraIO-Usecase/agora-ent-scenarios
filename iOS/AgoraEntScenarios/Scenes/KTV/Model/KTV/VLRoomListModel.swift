@@ -6,11 +6,11 @@
 //
 
 import Foundation
-
+import AgoraCommon
 class VLRoomListModel: VLBaseModel {
     
     //@property (nonatomic, copy) NSString *id;
-    @objc var name: String?
+    @objc public var name: String?
     @objc var isPrivate: Bool = false
     @objc var password: String?
     @objc var creator: String?
@@ -23,7 +23,7 @@ class VLRoomListModel: VLBaseModel {
     @objc var updatedAt: Int64 = 0
     @objc var status: String?
     @objc var deletedAt: String?
-    @objc var roomPeopleNum: String?
+    @objc public var roomPeopleNum: String?
     @objc var icon: String?
     
     ///新加字段 当前房间的创建者

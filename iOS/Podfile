@@ -35,16 +35,17 @@ def all_pods
   pod 'BytedEffect', :path => 'bytedEffect.podspec'
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
-  
+  pod 'Cantata', :path => 'Cantata.podspec'
+  pod 'AgoraCommon', :path => 'AgoraCommon.podspec'
   pod 'AgoraSyncManager', '~> 2.0.8'
 
-  pod 'sdk', :path => 'sdk.podspec'
+#  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 # pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
-#  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.142'
+  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.147'
 
-  pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
+  pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/ThirdParty/VideoLoaderAPI/VideoLoaderAPI.podspec'
 
   #ThirdParty
   pod 'HWWeakTimer', '1.0'

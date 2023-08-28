@@ -7,7 +7,7 @@
 
 import UIKit
 import Agora_Scene_Utils
-
+import AgoraCommon
 enum ShowToolMenuType: CaseIterable {
     case switch_camera
     case camera

@@ -9,7 +9,7 @@ import SVProgressHUD
 import UIKit
 import ZSwiftBaseLib
 import AgoraChat
-
+import AgoraCommon
 let bottomSafeHeight = safeAreaExist ? 33 : 0
 let page_size = 15
 
@@ -52,7 +52,7 @@ let page_size = 15
         self.showContent()
     }
 
-    override public func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         navigation.title.text = LanguageManager.localValue(key: "voice_app_name")

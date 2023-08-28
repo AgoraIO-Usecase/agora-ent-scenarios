@@ -55,7 +55,11 @@ public struct SARequestHTTPMethod: RawRepresentable, Equatable, Hashable {
         super.init()
         session = URLSession(configuration: config, delegate: self, delegateQueue: .main)
     }
-
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func constructRequest(method: SARequestHTTPMethod,
                                  uri: String,
                                  params: [String: Any],

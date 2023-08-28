@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import AgoraCommon
 // MARK: - about mic 
 extension VoiceRoomViewController {
     

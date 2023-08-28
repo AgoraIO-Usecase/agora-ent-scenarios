@@ -7,10 +7,10 @@
 #import "VLMicSeatCell.h"
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 @import YYCategories;
 @import SDWebImage;
-
+@import AgoraCommon;
 @interface VLMicSeatList ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
 @property(nonatomic, weak) id <VLMicSeatListDelegate>delegate;

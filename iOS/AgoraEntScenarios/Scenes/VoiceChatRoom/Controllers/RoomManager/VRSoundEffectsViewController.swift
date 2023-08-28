@@ -9,7 +9,7 @@ import SVProgressHUD
 import UIKit
 import ZSwiftBaseLib
 import AgoraChat
-
+import AgoraCommon
 class VRSoundEffectsViewController: VRBaseViewController {
     var code = ""
 

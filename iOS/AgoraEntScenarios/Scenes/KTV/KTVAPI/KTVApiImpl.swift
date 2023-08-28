@@ -127,6 +127,10 @@ class KTVApiImpl: NSObject{
         initTimer()
     }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     private func setParams() {
         guard let engine = self.apiConfig?.engine else {return}
         engine.setParameters("{\"rtc.enable_nasa2\": false}")

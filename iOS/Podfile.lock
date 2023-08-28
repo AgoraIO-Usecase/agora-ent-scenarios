@@ -16,13 +16,35 @@ PODS:
     - AFNetworking/NSURLSession
   - Agora-Scene-Utils (1.1.0)
   - Agora_Chat_iOS (1.0.8)
+  - AgoraCommon (0.1.0):
+    - AFNetworking
+    - AgoraRtcEngine_Special_iOS
+    - AgoraRtm_iOS
+    - AgoraSyncManager
+    - Bugly
+    - Masonry
+    - SocketRocket
+    - SVProgressHUD
+    - SwiftyBeaver
+    - YYCategories
+    - YYModel
+    - ZSwiftBaseLib
   - AgoraLyricsScore (1.1.1-beta-3)
+  - AgoraRtcEngine_Special_iOS (4.1.1.147)
   - AgoraRtm_iOS (1.5.1)
   - AgoraSyncManager (2.0.8):
     - SocketRocket
   - Bugly (2.5.93)
   - BytedEffect (4.3.0):
     - SSZipArchive
+  - Cantata (0.1.0):
+    - AgoraCommon
+    - AgoraLyricsScore
+    - AgoraRtcEngine_Special_iOS
+    - JXCategoryView
+    - LSTPopView
+    - ScoreEffectUI
+    - SDWebImage
   - HWWeakTimer (1.0)
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
@@ -37,7 +59,6 @@ PODS:
   - MJRefresh (3.7.5)
   - Protobuf (3.22.1)
   - ScoreEffectUI (1.0.1)
-  - sdk (1.0)
   - SDWebImage (4.4.8):
     - SDWebImage/Core (= 4.4.8)
   - SDWebImage/Core (4.4.8)
@@ -58,7 +79,7 @@ PODS:
   - SVProgressHUD (2.2.5)
   - SwiftyBeaver (1.9.5)
   - VideoLoaderAPI (0.1.0):
-    - sdk
+    - AgoraRtcEngine_Special_iOS
   - YYCategories (1.0.4):
     - YYCategories/no-arc (= 1.0.4)
   - YYCategories/no-arc (1.0.4)
@@ -70,11 +91,14 @@ DEPENDENCIES:
   - AFNetworking (= 4.0.1)
   - Agora-Scene-Utils (= 1.1.0)
   - Agora_Chat_iOS (= 1.0.8)
+  - AgoraCommon (from `AgoraCommon.podspec`)
   - AgoraLyricsScore (= 1.1.1-beta-3)
+  - AgoraRtcEngine_Special_iOS (= 4.1.1.147)
   - AgoraRtm_iOS (= 1.5.1)
   - AgoraSyncManager (~> 2.0.8)
   - Bugly (= 2.5.93)
   - BytedEffect (from `bytedEffect.podspec`)
+  - Cantata (from `Cantata.podspec`)
   - HWWeakTimer (= 1.0)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
@@ -84,7 +108,6 @@ DEPENDENCIES:
   - MJRefresh
   - Protobuf (= 3.22.1)
   - ScoreEffectUI (= 1.0.1)
-  - sdk (from `sdk.podspec`)
   - SDWebImage (= 4.4.8)
   - SDWebImageAPNGCoder
   - SenseLib (from `sense.podspec`)
@@ -93,7 +116,7 @@ DEPENDENCIES:
   - SVGAPlayer
   - SVProgressHUD (= 2.2.5)
   - SwiftyBeaver (= 1.9.5)
-  - VideoLoaderAPI (from `AgoraEntScenarios/Common/API/VideoLoaderAPI`)
+  - VideoLoaderAPI (from `AgoraEntScenarios/ThirdParty/VideoLoaderAPI/VideoLoaderAPI.podspec`)
   - YYCategories (= 1.0.4)
   - YYModel (= 1.0.4)
   - Zip
@@ -105,6 +128,7 @@ SPEC REPOS:
     - Agora-Scene-Utils
     - Agora_Chat_iOS
     - AgoraLyricsScore
+    - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS
     - AgoraSyncManager
     - Bugly
@@ -132,24 +156,29 @@ SPEC REPOS:
     - ZSwiftBaseLib
 
 EXTERNAL SOURCES:
+  AgoraCommon:
+    :path: AgoraCommon.podspec
   BytedEffect:
     :path: bytedEffect.podspec
-  sdk:
-    :path: sdk.podspec
+  Cantata:
+    :path: Cantata.podspec
   SenseLib:
     :path: sense.podspec
   VideoLoaderAPI:
-    :path: AgoraEntScenarios/Common/API/VideoLoaderAPI
+    :path: AgoraEntScenarios/ThirdParty/VideoLoaderAPI/VideoLoaderAPI.podspec
 
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
+  AgoraCommon: a3d821bb74301f85de8f9ad06960045d4b959a47
   AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
+  AgoraRtcEngine_Special_iOS: 3428f19a20422295817e3083e6fcc92a86576ea7
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   AgoraSyncManager: 33b8ecf2cd80550f156612d6175a0b0ed1d48497
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   BytedEffect: 74b0bd8150ff1ab9c443d210a7ff7eb49ad3da44
+  Cantata: 8aea747e8c09e31397dcf7c58391c40b5ccb8fbe
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
@@ -160,7 +189,6 @@ SPEC CHECKSUMS:
   MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
   ScoreEffectUI: 1a3bbd83b17cfef1c16a3a4eede2854f89c9eb10
-  sdk: e3479e54702dcafc8c3e74a1baa05d7c2c8f753d
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
   SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
@@ -170,12 +198,12 @@ SPEC CHECKSUMS:
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
-  VideoLoaderAPI: d67c503b08d8fbc6773112e4c101da953bbd7f47
+  VideoLoaderAPI: d50ad8f8767ddaad5328c4cf64dd9c5d8ee32d3e
   YYCategories: 6bcd4314c6661a561410dce4a793379ebd306abd
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: c04932af2ce04d1af1601c0eec20576b2a08af20
+PODFILE CHECKSUM: 6ac8a031c0e922bcd5974d604d0620ce6c9349cf
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.12.1

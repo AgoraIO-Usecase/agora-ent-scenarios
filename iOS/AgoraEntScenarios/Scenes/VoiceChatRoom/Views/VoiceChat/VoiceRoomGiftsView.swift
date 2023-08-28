@@ -7,7 +7,7 @@
 
 import UIKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 public class VoiceRoomGiftsView: UIView, UICollectionViewDelegate, UICollectionViewDataSource {
     var gifts = [VoiceRoomGiftEntity]() {
         willSet {

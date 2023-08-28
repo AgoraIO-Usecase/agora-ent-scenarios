@@ -9,7 +9,7 @@ import Foundation
 import SVGAPlayer
 import KakaJSON
 import ZSwiftBaseLib
-
+import AgoraCommon
 extension VoiceRoomViewController {
     
     func showEQView() {

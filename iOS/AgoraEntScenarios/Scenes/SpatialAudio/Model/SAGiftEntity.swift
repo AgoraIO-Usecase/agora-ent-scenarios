@@ -34,8 +34,14 @@ import UIKit
     var gift_count: String? = "0"
     var selected = false
 
-    override public required init() {}
-
+    override public required init() {
+        super.init()
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }

@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import AgoraCommon
 private let cellHeight: CGFloat = 48
 private let lineSpacing: CGFloat = 15
 

@@ -39,8 +39,13 @@ open class PresentationAnimation: NSObject {
     public init(options: AnimationOptions = .normal(duration: 0.3), origin: PresentationOrigin? = nil) {
         self.options = options
         self.origin = origin
+        super.init()
     }
-
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     /// 计算动画view初始Frame
     ///
     /// - Parameters:

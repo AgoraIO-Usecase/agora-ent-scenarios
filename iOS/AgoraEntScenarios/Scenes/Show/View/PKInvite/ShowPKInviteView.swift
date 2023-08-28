@@ -7,7 +7,7 @@
 
 import UIKit
 import Agora_Scene_Utils
-
+import AgoraCommon
 class ShowPKInviteView: UIView {
     var roomId: String!
     var pkUserInvitationList: [ShowPKUserInfo]? {

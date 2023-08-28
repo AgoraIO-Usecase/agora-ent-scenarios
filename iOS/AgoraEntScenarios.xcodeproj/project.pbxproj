@@ -55,8 +55,6 @@
 		DD0292F1295BF0DC00485225 /* KTVSyncManagerServiceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0292B1295BF0DC00485225 /* KTVSyncManagerServiceImp.swift */; };
 		DD0292F2295BF0DC00485225 /* AppContext+KTV.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0292B2295BF0DC00485225 /* AppContext+KTV.m */; };
 		DD0292F8295BF0DC00485225 /* KtvResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DD0292C0295BF0DC00485225 /* KtvResource.bundle */; };
-		DD1603442963CAFD00182A04 /* AgoraEntLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1603432963CAFD00182A04 /* AgoraEntLog.swift */; };
-		DD220BC9295B48FD00F57F30 /* QMUIHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DD220BC7295B48FD00F57F30 /* QMUIHelper.m */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
 		DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */; };
 		DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DD2A43D028FFCEE7004CEDCF /* Main.storyboard */; };
@@ -150,7 +148,6 @@
 		DD5EBDC3299F201D00F36349 /* KTVDebugManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DD5EBDC2299F201D00F36349 /* KTVDebugManager.m */; };
 		DD5EBDC6299F230100F36349 /* KTVDebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD5EBDC5299F230100F36349 /* KTVDebugViewController.m */; };
 		DD5EBDC9299F491F00F36349 /* KTVDebugInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = DD5EBDC8299F491F00F36349 /* KTVDebugInfo.m */; };
-		DD6199CC29E3D36D008F63E4 /* AgoraEntAuthorizedManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199CB29E3D36D008F63E4 /* AgoraEntAuthorizedManager.swift */; };
 		DD619A6429E3E247008F63E4 /* SARequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199CF29E3E246008F63E4 /* SARequest.swift */; };
 		DD619A6529E3E247008F63E4 /* SABusinessRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199D029E3E246008F63E4 /* SABusinessRequest.swift */; };
 		DD619A6629E3E247008F63E4 /* SABusinessApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199D129E3E246008F63E4 /* SABusinessApi.swift */; };
@@ -284,7 +281,6 @@
 		DD619B8129E3E262008F63E4 /* VoiceRoomBusinessRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AED29E3E262008F63E4 /* VoiceRoomBusinessRequest.swift */; };
 		DD619B8229E3E262008F63E4 /* PresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AEF29E3E262008F63E4 /* PresentationController.swift */; };
 		DD619B8329E3E262008F63E4 /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AF029E3E262008F63E4 /* LanguageManager.swift */; };
-		DD619B8429E3E262008F63E4 /* VerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AF129E3E262008F63E4 /* VerifyCodeView.swift */; };
 		DD619B8529E3E262008F63E4 /* UIViewController+Presentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AF229E3E262008F63E4 /* UIViewController+Presentation.swift */; };
 		DD619B8629E3E262008F63E4 /* HorizontalTextCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AF329E3E262008F63E4 /* HorizontalTextCarousel.swift */; };
 		DD619B8729E3E262008F63E4 /* VoiceRoomEmojiManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AF429E3E262008F63E4 /* VoiceRoomEmojiManager.swift */; };
@@ -292,18 +288,14 @@
 		DD619B8929E3E262008F63E4 /* FlipHorizontalAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AF729E3E262008F63E4 /* FlipHorizontalAnimation.swift */; };
 		DD619B8A29E3E262008F63E4 /* CrossZoomAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AF829E3E262008F63E4 /* CrossZoomAnimation.swift */; };
 		DD619B8B29E3E262008F63E4 /* CrossDissolveAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AF929E3E262008F63E4 /* CrossDissolveAnimation.swift */; };
-		DD619B8C29E3E262008F63E4 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AFA29E3E262008F63E4 /* Throttle.swift */; };
 		DD619B8E29E3E262008F63E4 /* VoiceRoomPasswordAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AFC29E3E262008F63E4 /* VoiceRoomPasswordAlert.swift */; };
 		DD619B8F29E3E262008F63E4 /* PresentedViewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AFE29E3E262008F63E4 /* PresentedViewType.swift */; };
 		DD619B9029E3E262008F63E4 /* PresentationEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AFF29E3E262008F63E4 /* PresentationEnums.swift */; };
 		DD619B9129E3E262008F63E4 /* PresentationSegue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0029E3E262008F63E4 /* PresentationSegue.swift */; };
 		DD619B9229E3E262008F63E4 /* VRVerifyCodeNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0129E3E262008F63E4 /* VRVerifyCodeNumberView.swift */; };
-		DD619B9329E3E262008F63E4 /* VRVerifyCodeTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0229E3E262008F63E4 /* VRVerifyCodeTextView.swift */; };
 		DD619B9429E3E262008F63E4 /* VoiceRoomPageContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0329E3E262008F63E4 /* VoiceRoomPageContainer.swift */; };
 		DD619B9529E3E262008F63E4 /* Xcode14.m in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0429E3E262008F63E4 /* Xcode14.m */; };
-		DD619B9629E3E262008F63E4 /* Notification+Presentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0529E3E262008F63E4 /* Notification+Presentation.swift */; };
 		DD619B9A29E3E262008F63E4 /* ResourceBundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0A29E3E262008F63E4 /* ResourceBundleExtension.swift */; };
-		DD619B9B29E3E262008F63E4 /* UIViewToastExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0B29E3E262008F63E4 /* UIViewToastExtension.swift */; };
 		DD619B9C29E3E262008F63E4 /* UIImageBundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0C29E3E262008F63E4 /* UIImageBundleExtension.swift */; };
 		DD619B9D29E3E262008F63E4 /* String + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B0D29E3E262008F63E4 /* String + Extension.swift */; };
 		DD619B9F29E3E262008F63E4 /* VoiceRoomIMManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B1129E3E262008F63E4 /* VoiceRoomIMManager.swift */; };
@@ -344,7 +336,6 @@
 		DD619BC329E3E262008F63E4 /* VRRoomListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B3D29E3E262008F63E4 /* VRRoomListCell.swift */; };
 		DD619BC429E3E262008F63E4 /* VRCreateRoomCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B3E29E3E262008F63E4 /* VRCreateRoomCardCell.swift */; };
 		DD619BC529E3E262008F63E4 /* VRRoomMenuBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B3F29E3E262008F63E4 /* VRRoomMenuBarCell.swift */; };
-		DD619BC629E3E262008F63E4 /* BaseNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B4029E3E262008F63E4 /* BaseNavigationView.swift */; };
 		DD619BC729E3E262008F63E4 /* VoiceRoomApplyAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B4229E3E262008F63E4 /* VoiceRoomApplyAlert.swift */; };
 		DD619BC829E3E262008F63E4 /* VoiceRoomSendGiftCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B4329E3E262008F63E4 /* VoiceRoomSendGiftCell.swift */; };
 		DD619BC929E3E262008F63E4 /* VREQOperationAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619B4429E3E262008F63E4 /* VREQOperationAlert.swift */; };
@@ -409,7 +400,6 @@
 		DD619C0829E3E84D008F63E4 /* SceneVersionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619C0529E3E84C008F63E4 /* SceneVersionCell.swift */; };
 		DD619C0929E3E84D008F63E4 /* AboutAgoraHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619C0629E3E84C008F63E4 /* AboutAgoraHeader.swift */; };
 		DD619C0A29E3E84D008F63E4 /* ContactInfoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619C0729E3E84C008F63E4 /* ContactInfoCell.swift */; };
-		DD64C68C295C142A00EAB750 /* UIButton+EntLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD64C68B295C142A00EAB750 /* UIButton+EntLayout.swift */; };
 		DD84176229090C520026B624 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = DD84168729090C520026B624 /* index.html */; };
 		DD84176329090C520026B624 /* util.js in Resources */ = {isa = PBXBuildFile; fileRef = DD84168929090C520026B624 /* util.js */; };
 		DD84176429090C520026B624 /* intro.css in Resources */ = {isa = PBXBuildFile; fileRef = DD84168B29090C520026B624 /* intro.css */; };
@@ -439,7 +429,6 @@
 		DD84177C29090C520026B624 /* VLHomeItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416A929090C520026B624 /* VLHomeItemView.m */; };
 		DD84177D29090C520026B624 /* VLHomeItemModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416AA29090C520026B624 /* VLHomeItemModel.m */; };
 		DD84177E29090C520026B624 /* VLHomeView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416AF29090C520026B624 /* VLHomeView.m */; };
-		DD84177F29090C520026B624 /* UIWindow+Router.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416B029090C520026B624 /* UIWindow+Router.m */; };
 		DD84178029090C520026B624 /* VLDiscoveryHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416B329090C520026B624 /* VLDiscoveryHeaderView.m */; };
 		DD84178129090C520026B624 /* VLDiscoveryItemTCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416B529090C520026B624 /* VLDiscoveryItemTCell.m */; };
 		DD84178229090C520026B624 /* VLDiscoveryView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416B829090C520026B624 /* VLDiscoveryView.m */; };
@@ -465,64 +454,11 @@
 		DD8417CB29090C520026B624 /* TemplateServiceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD84176029090C520026B624 /* TemplateServiceImp.swift */; };
 		DD8417CC29090C520026B624 /* TemplateServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD84176129090C520026B624 /* TemplateServiceProtocol.swift */; };
 		DD9E545C2994FFF2007CB3C0 /* VLKTVRemoteVolumeView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD9E545B2994FFF2007CB3C0 /* VLKTVRemoteVolumeView.m */; };
-		DDA199DD28FFE579009D3E61 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA198DF28FFE579009D3E61 /* ToastView.swift */; };
-		DDA199DE28FFE579009D3E61 /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA198E028FFE579009D3E61 /* AlertManager.swift */; };
-		DDA199DF28FFE579009D3E61 /* VLHotSpotBtn.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198E228FFE579009D3E61 /* VLHotSpotBtn.m */; };
-		DDA199E028FFE579009D3E61 /* VLEmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198E528FFE579009D3E61 /* VLEmptyView.m */; };
-		DDA199E128FFE579009D3E61 /* VLToast.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198E928FFE579009D3E61 /* VLToast.m */; };
-		DDA199E228FFE579009D3E61 /* VLCommonWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198EC28FFE579009D3E61 /* VLCommonWebViewController.m */; };
-		DDA199E328FFE579009D3E61 /* VLLocalWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198ED28FFE579009D3E61 /* VLLocalWebViewController.m */; };
-		DDA199E428FFE579009D3E61 /* VLDeviceUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198F228FFE579009D3E61 /* VLDeviceUtils.m */; };
-		DDA199E528FFE579009D3E61 /* UILabel+Font.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198F528FFE579009D3E61 /* UILabel+Font.m */; };
-		DDA199E628FFE579009D3E61 /* UIButton+Font.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198F628FFE579009D3E61 /* UIButton+Font.m */; };
-		DDA199E728FFE579009D3E61 /* VLFontUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198F728FFE579009D3E61 /* VLFontUtils.m */; };
-		DDA199E828FFE579009D3E61 /* UITextField+Font.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198F928FFE579009D3E61 /* UITextField+Font.m */; };
-		DDA199E928FFE579009D3E61 /* VLResponseDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198FE28FFE579009D3E61 /* VLResponseDataModel.m */; };
-		DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1990128FFE579009D3E61 /* VLBaseModel.m */; };
-		DDA199EB28FFE579009D3E61 /* VLRequestRoute.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1990428FFE579009D3E61 /* VLRequestRoute.m */; };
-		DDA199EC28FFE579009D3E61 /* VLAPIRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1990628FFE579009D3E61 /* VLAPIRequest.m */; };
-		DDA199ED28FFE579009D3E61 /* VLBaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1990B28FFE579009D3E61 /* VLBaseView.m */; };
-		DDA199EE28FFE579009D3E61 /* VLUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1990C28FFE579009D3E61 /* VLUIView.m */; };
-		DDA199EF28FFE579009D3E61 /* VLBaseTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1990E28FFE579009D3E61 /* VLBaseTableView.m */; };
-		DDA199F028FFE579009D3E61 /* BaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1991228FFE579009D3E61 /* BaseViewController.m */; };
-		DDA199F128FFE579009D3E61 /* BaseNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1991328FFE579009D3E61 /* BaseNavigationController.m */; };
-		DDA199F228FFE579009D3E61 /* UIViewController+VL.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1991428FFE579009D3E61 /* UIViewController+VL.m */; };
-		DDA199F328FFE579009D3E61 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1991828FFE579009D3E61 /* UIColor+Extension.swift */; };
-		DDA199F428FFE579009D3E61 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1991928FFE579009D3E61 /* String+Extension.swift */; };
-		DDA199F528FFE579009D3E61 /* AgoraExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1991A28FFE579009D3E61 /* AgoraExtension.swift */; };
-		DDA199F628FFE579009D3E61 /* UIImage+Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1991B28FFE579009D3E61 /* UIImage+Color.swift */; };
-		DDA199F728FFE579009D3E61 /* Array+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1991C28FFE579009D3E61 /* Array+Extension.swift */; };
-		DDA199F828FFE579009D3E61 /* NSDictionary+JKSafeAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1991F28FFE579009D3E61 /* NSDictionary+JKSafeAccess.m */; };
-		DDA199F928FFE579009D3E61 /* NSDictionary+dictToModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1992228FFE579009D3E61 /* NSDictionary+dictToModel.m */; };
-		DDA199FA28FFE579009D3E61 /* UIColor+JKWeb.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1992428FFE579009D3E61 /* UIColor+JKWeb.m */; };
-		DDA199FB28FFE579009D3E61 /* UIColor+JKGradient.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1992628FFE579009D3E61 /* UIColor+JKGradient.m */; };
-		DDA199FC28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1992A28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m */; };
-		DDA199FD28FFE579009D3E61 /* UIView+VL.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1992D28FFE579009D3E61 /* UIView+VL.m */; };
-		DDA199FE28FFE579009D3E61 /* UIDevice+JKHardware.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1992F28FFE579009D3E61 /* UIDevice+JKHardware.m */; };
-		DDA199FF28FFE579009D3E61 /* NSString+Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1993228FFE579009D3E61 /* NSString+Helper.m */; };
-		DDA19A0028FFE579009D3E61 /* NSString+Emoji.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1993428FFE579009D3E61 /* NSString+Emoji.m */; };
-		DDA19A0128FFE579009D3E61 /* NSObject+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1993528FFE579009D3E61 /* NSObject+Extension.m */; };
-		DDA19A0228FFE579009D3E61 /* UIGestureRecognizer+VL.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1993928FFE579009D3E61 /* UIGestureRecognizer+VL.m */; };
-		DDA19A0328FFE579009D3E61 /* NSArray+JKSafeAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1993C28FFE579009D3E61 /* NSArray+JKSafeAccess.m */; };
-		DDA19A0428FFE579009D3E61 /* CALayer+JKBorderColor.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994028FFE579009D3E61 /* CALayer+JKBorderColor.m */; };
-		DDA19A0528FFE579009D3E61 /* NSObject+JKAppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994228FFE579009D3E61 /* NSObject+JKAppInfo.m */; };
-		DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994428FFE579009D3E61 /* NSObject+JKAutoCoding.m */; };
-		DDA19A0728FFE579009D3E61 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994728FFE579009D3E61 /* Config.swift */; };
-		DDA19A0828FFE579009D3E61 /* GCDTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994828FFE579009D3E61 /* GCDTimer.swift */; };
-		DDA19A0928FFE579009D3E61 /* DeviceAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994928FFE579009D3E61 /* DeviceAssistant.swift */; };
-		DDA19A0A28FFE579009D3E61 /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994A28FFE579009D3E61 /* Screen.swift */; };
-		DDA19A0B28FFE579009D3E61 /* JSONObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994B28FFE579009D3E61 /* JSONObject.swift */; };
-		DDA19A0C28FFE579009D3E61 /* SyncUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994C28FFE579009D3E61 /* SyncUtil.swift */; };
-		DDA19A0D28FFE579009D3E61 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994F28FFE579009D3E61 /* NetworkManager.swift */; };
-		DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995928FFE579009D3E61 /* VLUserCenter.m */; };
-		DDA19A1028FFE579009D3E61 /* VLGlobalHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995B28FFE579009D3E61 /* VLGlobalHelper.m */; };
 		DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */; };
-		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
-		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
-		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
+		E3104A882A97532C00FB3490 /* AUiMoreDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3104A872A97532C00FB3490 /* AUiMoreDialog.swift */; };
 		E32C7EA92A20B03F00512523 /* ShowDebugPrivateParamsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E32C7EA82A20B03F00512523 /* ShowDebugPrivateParamsVC.swift */; };
-		E357353E29EFD631009D54E1 /* VLAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E357353C29EFD631009D54E1 /* VLAlert.m */; };
-		E357353F29EFD631009D54E1 /* VLKTVAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E357353D29EFD631009D54E1 /* VLKTVAlert.m */; };
+		E34CB3F42A98AE4C00AB1B25 /* UIWindow+Router.m in Sources */ = {isa = PBXBuildFile; fileRef = E34CB3F22A98AE4B00AB1B25 /* UIWindow+Router.m */; };
+		E34CB4FA2A98B12C00AB1B25 /* VLAPIRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E34CB4F92A98B12C00AB1B25 /* VLAPIRequest.m */; };
 		E357354629EFD719009D54E1 /* VLOnLineListVC.m in Sources */ = {isa = PBXBuildFile; fileRef = E357354129EFD718009D54E1 /* VLOnLineListVC.m */; };
 		E357354729EFD719009D54E1 /* VLKTVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E357354229EFD718009D54E1 /* VLKTVViewController.m */; };
 		E357354829EFD719009D54E1 /* VLCreateRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E357354329EFD718009D54E1 /* VLCreateRoomViewController.m */; };
@@ -538,12 +474,10 @@
 		E357356929EFD8B5009D54E1 /* VLEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = E357356729EFD8B4009D54E1 /* VLEffectView.m */; };
 		E357356A29EFD8B5009D54E1 /* VLSoundEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = E357356829EFD8B5009D54E1 /* VLSoundEffectView.m */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
-		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
 		E36EC8B32A6638440089A374 /* AEAListContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36EC8B22A6638440089A374 /* AEAListContainerView.swift */; };
 		E36EC8B52A663A600089A374 /* AEACategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36EC8B42A663A600089A374 /* AEACategoryView.swift */; };
 		E36EC8B72A663B880089A374 /* AEACategoryTitleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36EC8B62A663B880089A374 /* AEACategoryTitleCell.swift */; };
 		E36EC8BA2A6680F60089A374 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E36EC8BC2A6680F60089A374 /* Localizable.strings */; };
-		E3735C342A5E4AFF004737EF /* UITextView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */; };
 		E3735C852A5E7E75004737EF /* EffectsAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C3F2A5E7E75004737EF /* EffectsAttribute.m */; };
 		E3735C862A5E7E75004737EF /* Effects.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C412A5E7E75004737EF /* Effects.m */; };
 		E3735C872A5E7E75004737EF /* EffectsDetector.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C422A5E7E75004737EF /* EffectsDetector.m */; };
@@ -576,7 +510,6 @@
 		E3735CA32A5E7E75004737EF /* SenseBeautyRender.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C802A5E7E75004737EF /* SenseBeautyRender.m */; };
 		E3735CA42A5E7E75004737EF /* BytesBeautyRender.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C822A5E7E75004737EF /* BytesBeautyRender.m */; };
 		E3735CA52A5E7E75004737EF /* SenseBeautyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C842A5E7E75004737EF /* SenseBeautyManager.swift */; };
-		E3735CA72A5E8023004737EF /* VRBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CA62A5E8023004737EF /* VRBaseViewController.swift */; };
 		E3735CAA2A5E80FC004737EF /* KTVApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CA82A5E80FC004737EF /* KTVApiImpl.swift */; };
 		E3735CAB2A5E80FC004737EF /* KTVApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CA92A5E80FC004737EF /* KTVApi.swift */; };
 		E3735CAE2A5E8DDD004737EF /* KTVSkipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CAD2A5E8DDD004737EF /* KTVSkipView.swift */; };
@@ -585,7 +518,6 @@
 		E3735CB42A5FA785004737EF /* VLRoomListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CB32A5FA785004737EF /* VLRoomListModel.swift */; };
 		E3735CB62A5FD659004737EF /* KTVServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CB52A5FD659004737EF /* KTVServiceModel.swift */; };
 		E3735CBC2A5FE47E004737EF /* VLRoomSeatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CBB2A5FE47E004737EF /* VLRoomSeatModel.swift */; };
-		E751D85D29F11723001354CA /* AUiMoreDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E751D85C29F11723001354CA /* AUiMoreDialog.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -696,11 +628,7 @@
 		DD0292B5295BF0DC00485225 /* AppContext+KTV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AppContext+KTV.h"; sourceTree = "<group>"; };
 		DD0292BE295BF0DC00485225 /* VLCreateRoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCreateRoomViewController.h; sourceTree = "<group>"; };
 		DD0292C0295BF0DC00485225 /* KtvResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = KtvResource.bundle; sourceTree = "<group>"; };
-		DD1603432963CAFD00182A04 /* AgoraEntLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraEntLog.swift; sourceTree = "<group>"; };
 		DD220BC1295B340A00F57F30 /* MenuUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuUtils.h; sourceTree = "<group>"; };
-		DD220BC3295B48FD00F57F30 /* QMUICommonDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMUICommonDefines.h; sourceTree = "<group>"; };
-		DD220BC5295B48FD00F57F30 /* QMUIHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMUIHelper.h; sourceTree = "<group>"; };
-		DD220BC7295B48FD00F57F30 /* QMUIHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QMUIHelper.m; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -801,7 +729,6 @@
 		DD5EBDC5299F230100F36349 /* KTVDebugViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KTVDebugViewController.m; sourceTree = "<group>"; };
 		DD5EBDC7299F491F00F36349 /* KTVDebugInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KTVDebugInfo.h; sourceTree = "<group>"; };
 		DD5EBDC8299F491F00F36349 /* KTVDebugInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KTVDebugInfo.m; sourceTree = "<group>"; };
-		DD6199CB29E3D36D008F63E4 /* AgoraEntAuthorizedManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraEntAuthorizedManager.swift; sourceTree = "<group>"; };
 		DD6199CF29E3E246008F63E4 /* SARequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SARequest.swift; sourceTree = "<group>"; };
 		DD6199D029E3E246008F63E4 /* SABusinessRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SABusinessRequest.swift; sourceTree = "<group>"; };
 		DD6199D129E3E246008F63E4 /* SABusinessApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SABusinessApi.swift; sourceTree = "<group>"; };
@@ -935,7 +862,6 @@
 		DD619AED29E3E262008F63E4 /* VoiceRoomBusinessRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessRequest.swift; sourceTree = "<group>"; };
 		DD619AEF29E3E262008F63E4 /* PresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentationController.swift; sourceTree = "<group>"; };
 		DD619AF029E3E262008F63E4 /* LanguageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
-		DD619AF129E3E262008F63E4 /* VerifyCodeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerifyCodeView.swift; sourceTree = "<group>"; };
 		DD619AF229E3E262008F63E4 /* UIViewController+Presentation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Presentation.swift"; sourceTree = "<group>"; };
 		DD619AF329E3E262008F63E4 /* HorizontalTextCarousel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalTextCarousel.swift; sourceTree = "<group>"; };
 		DD619AF429E3E262008F63E4 /* VoiceRoomEmojiManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomEmojiManager.swift; sourceTree = "<group>"; };
@@ -943,19 +869,15 @@
 		DD619AF729E3E262008F63E4 /* FlipHorizontalAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlipHorizontalAnimation.swift; sourceTree = "<group>"; };
 		DD619AF829E3E262008F63E4 /* CrossZoomAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrossZoomAnimation.swift; sourceTree = "<group>"; };
 		DD619AF929E3E262008F63E4 /* CrossDissolveAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrossDissolveAnimation.swift; sourceTree = "<group>"; };
-		DD619AFA29E3E262008F63E4 /* Throttle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Throttle.swift; sourceTree = "<group>"; };
 		DD619AFC29E3E262008F63E4 /* VoiceRoomPasswordAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomPasswordAlert.swift; sourceTree = "<group>"; };
 		DD619AFD29E3E262008F63E4 /* Xcode14.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Xcode14.h; sourceTree = "<group>"; };
 		DD619AFE29E3E262008F63E4 /* PresentedViewType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentedViewType.swift; sourceTree = "<group>"; };
 		DD619AFF29E3E262008F63E4 /* PresentationEnums.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentationEnums.swift; sourceTree = "<group>"; };
 		DD619B0029E3E262008F63E4 /* PresentationSegue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentationSegue.swift; sourceTree = "<group>"; };
 		DD619B0129E3E262008F63E4 /* VRVerifyCodeNumberView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRVerifyCodeNumberView.swift; sourceTree = "<group>"; };
-		DD619B0229E3E262008F63E4 /* VRVerifyCodeTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRVerifyCodeTextView.swift; sourceTree = "<group>"; };
 		DD619B0329E3E262008F63E4 /* VoiceRoomPageContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomPageContainer.swift; sourceTree = "<group>"; };
 		DD619B0429E3E262008F63E4 /* Xcode14.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Xcode14.m; sourceTree = "<group>"; };
-		DD619B0529E3E262008F63E4 /* Notification+Presentation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Notification+Presentation.swift"; sourceTree = "<group>"; };
 		DD619B0A29E3E262008F63E4 /* ResourceBundleExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceBundleExtension.swift; sourceTree = "<group>"; };
-		DD619B0B29E3E262008F63E4 /* UIViewToastExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewToastExtension.swift; sourceTree = "<group>"; };
 		DD619B0C29E3E262008F63E4 /* UIImageBundleExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageBundleExtension.swift; sourceTree = "<group>"; };
 		DD619B0D29E3E262008F63E4 /* String + Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String + Extension.swift"; sourceTree = "<group>"; };
 		DD619B1129E3E262008F63E4 /* VoiceRoomIMManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomIMManager.swift; sourceTree = "<group>"; };
@@ -996,7 +918,6 @@
 		DD619B3D29E3E262008F63E4 /* VRRoomListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRRoomListCell.swift; sourceTree = "<group>"; };
 		DD619B3E29E3E262008F63E4 /* VRCreateRoomCardCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRCreateRoomCardCell.swift; sourceTree = "<group>"; };
 		DD619B3F29E3E262008F63E4 /* VRRoomMenuBarCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRRoomMenuBarCell.swift; sourceTree = "<group>"; };
-		DD619B4029E3E262008F63E4 /* BaseNavigationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseNavigationView.swift; sourceTree = "<group>"; };
 		DD619B4229E3E262008F63E4 /* VoiceRoomApplyAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomApplyAlert.swift; sourceTree = "<group>"; };
 		DD619B4329E3E262008F63E4 /* VoiceRoomSendGiftCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomSendGiftCell.swift; sourceTree = "<group>"; };
 		DD619B4429E3E262008F63E4 /* VREQOperationAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VREQOperationAlert.swift; sourceTree = "<group>"; };
@@ -1061,7 +982,6 @@
 		DD619C0529E3E84C008F63E4 /* SceneVersionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneVersionCell.swift; sourceTree = "<group>"; };
 		DD619C0629E3E84C008F63E4 /* AboutAgoraHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutAgoraHeader.swift; sourceTree = "<group>"; };
 		DD619C0729E3E84C008F63E4 /* ContactInfoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactInfoCell.swift; sourceTree = "<group>"; };
-		DD64C68B295C142A00EAB750 /* UIButton+EntLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+EntLayout.swift"; sourceTree = "<group>"; };
 		DD84168729090C520026B624 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
 		DD84168929090C520026B624 /* util.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = util.js; sourceTree = "<group>"; };
 		DD84168B29090C520026B624 /* intro.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = intro.css; sourceTree = "<group>"; };
@@ -1095,7 +1015,6 @@
 		DD8416AD29090C520026B624 /* VLHomeItemModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLHomeItemModel.h; sourceTree = "<group>"; };
 		DD8416AE29090C520026B624 /* VLHomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLHomeViewController.h; sourceTree = "<group>"; };
 		DD8416AF29090C520026B624 /* VLHomeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLHomeView.m; sourceTree = "<group>"; };
-		DD8416B029090C520026B624 /* UIWindow+Router.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWindow+Router.m"; sourceTree = "<group>"; };
 		DD8416B329090C520026B624 /* VLDiscoveryHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLDiscoveryHeaderView.m; sourceTree = "<group>"; };
 		DD8416B429090C520026B624 /* VLDiscoveryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLDiscoveryView.h; sourceTree = "<group>"; };
 		DD8416B529090C520026B624 /* VLDiscoveryItemTCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLDiscoveryItemTCell.m; sourceTree = "<group>"; };
@@ -1118,7 +1037,6 @@
 		DD8416CC29090C520026B624 /* VLMainRootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLMainRootViewController.h; sourceTree = "<group>"; };
 		DD8416CD29090C520026B624 /* VLMainTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLMainTabBarController.h; sourceTree = "<group>"; };
 		DD8416CE29090C520026B624 /* VLMainRootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLMainRootViewController.m; sourceTree = "<group>"; };
-		DD8416CF29090C520026B624 /* UIWindow+Router.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow+Router.h"; sourceTree = "<group>"; };
 		DD8416D229090C520026B624 /* VLLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLLoginViewController.m; sourceTree = "<group>"; };
 		DD8416D329090C520026B624 /* VLLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLLoginViewController.h; sourceTree = "<group>"; };
 		DD8416D529090C520026B624 /* VLLoginModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLLoginModel.h; sourceTree = "<group>"; };
@@ -1141,109 +1059,14 @@
 		DD84176129090C520026B624 /* TemplateServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateServiceProtocol.swift; sourceTree = "<group>"; };
 		DD9E545A2994FFF2007CB3C0 /* VLKTVRemoteVolumeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLKTVRemoteVolumeView.h; sourceTree = "<group>"; };
 		DD9E545B2994FFF2007CB3C0 /* VLKTVRemoteVolumeView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLKTVRemoteVolumeView.m; sourceTree = "<group>"; };
-		DDA198DF28FFE579009D3E61 /* ToastView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
-		DDA198E028FFE579009D3E61 /* AlertManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
-		DDA198E228FFE579009D3E61 /* VLHotSpotBtn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLHotSpotBtn.m; sourceTree = "<group>"; };
-		DDA198E328FFE579009D3E61 /* VLHotSpotBtn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLHotSpotBtn.h; sourceTree = "<group>"; };
-		DDA198E528FFE579009D3E61 /* VLEmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLEmptyView.m; sourceTree = "<group>"; };
-		DDA198E628FFE579009D3E61 /* VLEmptyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLEmptyView.h; sourceTree = "<group>"; };
-		DDA198E828FFE579009D3E61 /* VLToast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLToast.h; sourceTree = "<group>"; };
-		DDA198E928FFE579009D3E61 /* VLToast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLToast.m; sourceTree = "<group>"; };
-		DDA198EB28FFE579009D3E61 /* VLLocalWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLLocalWebViewController.h; sourceTree = "<group>"; };
-		DDA198EC28FFE579009D3E61 /* VLCommonWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCommonWebViewController.m; sourceTree = "<group>"; };
-		DDA198ED28FFE579009D3E61 /* VLLocalWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLLocalWebViewController.m; sourceTree = "<group>"; };
-		DDA198EE28FFE579009D3E61 /* VLCommonWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCommonWebViewController.h; sourceTree = "<group>"; };
-		DDA198F028FFE579009D3E61 /* UIButton+Font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+Font.h"; sourceTree = "<group>"; };
-		DDA198F128FFE579009D3E61 /* UILabel+Font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+Font.h"; sourceTree = "<group>"; };
-		DDA198F228FFE579009D3E61 /* VLDeviceUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLDeviceUtils.m; sourceTree = "<group>"; };
-		DDA198F328FFE579009D3E61 /* VLFontUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFontUtils.h; sourceTree = "<group>"; };
-		DDA198F428FFE579009D3E61 /* UITextField+Font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextField+Font.h"; sourceTree = "<group>"; };
-		DDA198F528FFE579009D3E61 /* UILabel+Font.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UILabel+Font.m"; sourceTree = "<group>"; };
-		DDA198F628FFE579009D3E61 /* UIButton+Font.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+Font.m"; sourceTree = "<group>"; };
-		DDA198F728FFE579009D3E61 /* VLFontUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFontUtils.m; sourceTree = "<group>"; };
-		DDA198F828FFE579009D3E61 /* VLDeviceUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLDeviceUtils.h; sourceTree = "<group>"; };
-		DDA198F928FFE579009D3E61 /* UITextField+Font.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextField+Font.m"; sourceTree = "<group>"; };
-		DDA198FC28FFE579009D3E61 /* VLNetworkConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLNetworkConfig.h; sourceTree = "<group>"; };
-		DDA198FE28FFE579009D3E61 /* VLResponseDataModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLResponseDataModel.m; sourceTree = "<group>"; };
-		DDA198FF28FFE579009D3E61 /* VLBaseModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLBaseModel.h; sourceTree = "<group>"; };
-		DDA1990028FFE579009D3E61 /* VLResponseDataModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLResponseDataModel.h; sourceTree = "<group>"; };
-		DDA1990128FFE579009D3E61 /* VLBaseModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLBaseModel.m; sourceTree = "<group>"; };
-		DDA1990328FFE579009D3E61 /* VLAPIRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLAPIRequest.h; sourceTree = "<group>"; };
-		DDA1990428FFE579009D3E61 /* VLRequestRoute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLRequestRoute.m; sourceTree = "<group>"; };
-		DDA1990528FFE579009D3E61 /* VLRequestRoute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLRequestRoute.h; sourceTree = "<group>"; };
-		DDA1990628FFE579009D3E61 /* VLAPIRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAPIRequest.m; sourceTree = "<group>"; };
-		DDA1990728FFE579009D3E61 /* VLBaseHander.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLBaseHander.h; sourceTree = "<group>"; };
-		DDA1990A28FFE579009D3E61 /* VLBaseTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLBaseTableView.h; sourceTree = "<group>"; };
-		DDA1990B28FFE579009D3E61 /* VLBaseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLBaseView.m; sourceTree = "<group>"; };
-		DDA1990C28FFE579009D3E61 /* VLUIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLUIView.m; sourceTree = "<group>"; };
-		DDA1990D28FFE579009D3E61 /* VLBaseView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLBaseView.h; sourceTree = "<group>"; };
-		DDA1990E28FFE579009D3E61 /* VLBaseTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLBaseTableView.m; sourceTree = "<group>"; };
-		DDA1990F28FFE579009D3E61 /* VLUIView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLUIView.h; sourceTree = "<group>"; };
-		DDA1991128FFE579009D3E61 /* UIViewController+VL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+VL.h"; sourceTree = "<group>"; };
-		DDA1991228FFE579009D3E61 /* BaseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseViewController.m; sourceTree = "<group>"; };
-		DDA1991328FFE579009D3E61 /* BaseNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseNavigationController.m; sourceTree = "<group>"; };
-		DDA1991428FFE579009D3E61 /* UIViewController+VL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+VL.m"; sourceTree = "<group>"; };
-		DDA1991528FFE579009D3E61 /* BaseNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseNavigationController.h; sourceTree = "<group>"; };
-		DDA1991628FFE579009D3E61 /* BaseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseViewController.h; sourceTree = "<group>"; };
-		DDA1991828FFE579009D3E61 /* UIColor+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
-		DDA1991928FFE579009D3E61 /* String+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
-		DDA1991A28FFE579009D3E61 /* AgoraExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraExtension.swift; sourceTree = "<group>"; };
-		DDA1991B28FFE579009D3E61 /* UIImage+Color.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Color.swift"; sourceTree = "<group>"; };
-		DDA1991C28FFE579009D3E61 /* Array+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Extension.swift"; sourceTree = "<group>"; };
-		DDA1991F28FFE579009D3E61 /* NSDictionary+JKSafeAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+JKSafeAccess.m"; sourceTree = "<group>"; };
-		DDA1992028FFE579009D3E61 /* NSDictionary+dictToModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+dictToModel.h"; sourceTree = "<group>"; };
-		DDA1992128FFE579009D3E61 /* NSDictionary+JKSafeAccess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+JKSafeAccess.h"; sourceTree = "<group>"; };
-		DDA1992228FFE579009D3E61 /* NSDictionary+dictToModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+dictToModel.m"; sourceTree = "<group>"; };
-		DDA1992428FFE579009D3E61 /* UIColor+JKWeb.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+JKWeb.m"; sourceTree = "<group>"; };
-		DDA1992528FFE579009D3E61 /* UIColor+JKGradient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+JKGradient.h"; sourceTree = "<group>"; };
-		DDA1992628FFE579009D3E61 /* UIColor+JKGradient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+JKGradient.m"; sourceTree = "<group>"; };
-		DDA1992728FFE579009D3E61 /* UIColor+JKWeb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+JKWeb.h"; sourceTree = "<group>"; };
-		DDA1992928FFE579009D3E61 /* UISplitViewController+JKQuickAccess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UISplitViewController+JKQuickAccess.h"; sourceTree = "<group>"; };
-		DDA1992A28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UISplitViewController+JKQuickAccess.m"; sourceTree = "<group>"; };
-		DDA1992C28FFE579009D3E61 /* UIView+VL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+VL.h"; sourceTree = "<group>"; };
-		DDA1992D28FFE579009D3E61 /* UIView+VL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+VL.m"; sourceTree = "<group>"; };
-		DDA1992F28FFE579009D3E61 /* UIDevice+JKHardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+JKHardware.m"; sourceTree = "<group>"; };
-		DDA1993028FFE579009D3E61 /* UIDevice+JKHardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+JKHardware.h"; sourceTree = "<group>"; };
-		DDA1993228FFE579009D3E61 /* NSString+Helper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Helper.m"; sourceTree = "<group>"; };
-		DDA1993328FFE579009D3E61 /* NSObject+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+Extension.h"; sourceTree = "<group>"; };
-		DDA1993428FFE579009D3E61 /* NSString+Emoji.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Emoji.m"; sourceTree = "<group>"; };
-		DDA1993528FFE579009D3E61 /* NSObject+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+Extension.m"; sourceTree = "<group>"; };
-		DDA1993628FFE579009D3E61 /* NSString+Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Helper.h"; sourceTree = "<group>"; };
-		DDA1993728FFE579009D3E61 /* NSString+Emoji.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Emoji.h"; sourceTree = "<group>"; };
-		DDA1993928FFE579009D3E61 /* UIGestureRecognizer+VL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIGestureRecognizer+VL.m"; sourceTree = "<group>"; };
-		DDA1993A28FFE579009D3E61 /* UIGestureRecognizer+VL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIGestureRecognizer+VL.h"; sourceTree = "<group>"; };
-		DDA1993C28FFE579009D3E61 /* NSArray+JKSafeAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+JKSafeAccess.m"; sourceTree = "<group>"; };
-		DDA1993D28FFE579009D3E61 /* NSArray+JKSafeAccess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+JKSafeAccess.h"; sourceTree = "<group>"; };
-		DDA1993F28FFE579009D3E61 /* CALayer+JKBorderColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+JKBorderColor.h"; sourceTree = "<group>"; };
-		DDA1994028FFE579009D3E61 /* CALayer+JKBorderColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+JKBorderColor.m"; sourceTree = "<group>"; };
-		DDA1994228FFE579009D3E61 /* NSObject+JKAppInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+JKAppInfo.m"; sourceTree = "<group>"; };
-		DDA1994328FFE579009D3E61 /* NSObject+JKAutoCoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+JKAutoCoding.h"; sourceTree = "<group>"; };
-		DDA1994428FFE579009D3E61 /* NSObject+JKAutoCoding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+JKAutoCoding.m"; sourceTree = "<group>"; };
-		DDA1994528FFE579009D3E61 /* NSObject+JKAppInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+JKAppInfo.h"; sourceTree = "<group>"; };
-		DDA1994728FFE579009D3E61 /* Config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
-		DDA1994828FFE579009D3E61 /* GCDTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GCDTimer.swift; sourceTree = "<group>"; };
-		DDA1994928FFE579009D3E61 /* DeviceAssistant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceAssistant.swift; sourceTree = "<group>"; };
-		DDA1994A28FFE579009D3E61 /* Screen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
-		DDA1994B28FFE579009D3E61 /* JSONObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONObject.swift; sourceTree = "<group>"; };
-		DDA1994C28FFE579009D3E61 /* SyncUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncUtil.swift; sourceTree = "<group>"; };
-		DDA1994F28FFE579009D3E61 /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
-		DDA1995428FFE579009D3E61 /* VLURLPathConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLURLPathConfig.h; sourceTree = "<group>"; };
-		DDA1995528FFE579009D3E61 /* VLMacroDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLMacroDefine.h; sourceTree = "<group>"; };
-		DDA1995628FFE579009D3E61 /* VLColorDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLColorDefine.h; sourceTree = "<group>"; };
-		DDA1995828FFE579009D3E61 /* VLUserCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLUserCenter.h; sourceTree = "<group>"; };
-		DDA1995928FFE579009D3E61 /* VLUserCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLUserCenter.m; sourceTree = "<group>"; };
-		DDA1995B28FFE579009D3E61 /* VLGlobalHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLGlobalHelper.m; sourceTree = "<group>"; };
-		DDA1995C28FFE579009D3E61 /* VLGlobalHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLGlobalHelper.h; sourceTree = "<group>"; };
 		DDDDDA2928FFD5DD005F4E8B /* AgoraEntScenarios-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AgoraEntScenarios-Bridging-Header.h"; sourceTree = "<group>"; };
 		DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
-		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
-		DDDDDB3428FFD78B005F4E8B /* AppContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppContext.swift; sourceTree = "<group>"; };
-		DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneLocalizedString.swift; sourceTree = "<group>"; };
+		E3104A872A97532C00FB3490 /* AUiMoreDialog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiMoreDialog.swift; sourceTree = "<group>"; };
 		E32C7EA82A20B03F00512523 /* ShowDebugPrivateParamsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugPrivateParamsVC.swift; sourceTree = "<group>"; };
-		E357353A29EFD631009D54E1 /* VLAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLAlert.h; sourceTree = "<group>"; };
-		E357353B29EFD631009D54E1 /* VLKTVAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVAlert.h; sourceTree = "<group>"; };
-		E357353C29EFD631009D54E1 /* VLAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAlert.m; sourceTree = "<group>"; };
-		E357353D29EFD631009D54E1 /* VLKTVAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLKTVAlert.m; sourceTree = "<group>"; };
+		E34CB3F22A98AE4B00AB1B25 /* UIWindow+Router.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWindow+Router.m"; sourceTree = "<group>"; };
+		E34CB3F32A98AE4B00AB1B25 /* UIWindow+Router.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow+Router.h"; sourceTree = "<group>"; };
+		E34CB4F82A98B12C00AB1B25 /* VLAPIRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLAPIRequest.h; sourceTree = "<group>"; };
+		E34CB4F92A98B12C00AB1B25 /* VLAPIRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAPIRequest.m; sourceTree = "<group>"; };
 		E357354029EFD718009D54E1 /* VLOnLineListVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLOnLineListVC.h; sourceTree = "<group>"; };
 		E357354129EFD718009D54E1 /* VLOnLineListVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLOnLineListVC.m; sourceTree = "<group>"; };
 		E357354229EFD718009D54E1 /* VLKTVViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLKTVViewController.m; sourceTree = "<group>"; };
@@ -1267,14 +1090,11 @@
 		E358F7FC293493AD00A7EBD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E358F801293494BC00A7EBD1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E358F803293494C100A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
-		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
 		E36EC8B22A6638440089A374 /* AEAListContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEAListContainerView.swift; sourceTree = "<group>"; };
 		E36EC8B42A663A600089A374 /* AEACategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEACategoryView.swift; sourceTree = "<group>"; };
 		E36EC8B62A663B880089A374 /* AEACategoryTitleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEACategoryTitleCell.swift; sourceTree = "<group>"; };
 		E36EC8BB2A6680F60089A374 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E36EC8BD2A6680FB0089A374 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Extension.swift"; sourceTree = "<group>"; };
 		E3735C3E2A5E7E75004737EF /* EffectsLicense.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsLicense.h; sourceTree = "<group>"; };
 		E3735C3F2A5E7E75004737EF /* EffectsAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EffectsAttribute.m; sourceTree = "<group>"; };
 		E3735C402A5E7E75004737EF /* EFMotionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EFMotionManager.h; sourceTree = "<group>"; };
@@ -1337,17 +1157,14 @@
 		E3735C822A5E7E75004737EF /* BytesBeautyRender.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BytesBeautyRender.m; sourceTree = "<group>"; };
 		E3735C832A5E7E75004737EF /* BytesBeautyRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BytesBeautyRender.h; sourceTree = "<group>"; };
 		E3735C842A5E7E75004737EF /* SenseBeautyManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SenseBeautyManager.swift; sourceTree = "<group>"; };
-		E3735CA62A5E8023004737EF /* VRBaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRBaseViewController.swift; sourceTree = "<group>"; };
 		E3735CA82A5E80FC004737EF /* KTVApiImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApiImpl.swift; sourceTree = "<group>"; };
 		E3735CA92A5E80FC004737EF /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
-		E3735CAC2A5E81B6004737EF /* AESMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AESMacro.h; sourceTree = "<group>"; };
 		E3735CAD2A5E8DDD004737EF /* KTVSkipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KTVSkipView.swift; sourceTree = "<group>"; };
 		E3735CAF2A5FA3B3004737EF /* VLRoomSelSongModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLRoomSelSongModel.swift; sourceTree = "<group>"; };
 		E3735CB12A5FA5E0004737EF /* KTVServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KTVServiceProtocol.swift; sourceTree = "<group>"; };
 		E3735CB32A5FA785004737EF /* VLRoomListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLRoomListModel.swift; sourceTree = "<group>"; };
 		E3735CB52A5FD659004737EF /* KTVServiceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KTVServiceModel.swift; sourceTree = "<group>"; };
 		E3735CBB2A5FE47E004737EF /* VLRoomSeatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLRoomSeatModel.swift; sourceTree = "<group>"; };
-		E751D85C29F11723001354CA /* AUiMoreDialog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiMoreDialog.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -1380,6 +1197,8 @@
 		053998C0290A81DC005143C7 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				E34CB3F32A98AE4B00AB1B25 /* UIWindow+Router.h */,
+				E34CB3F22A98AE4B00AB1B25 /* UIWindow+Router.m */,
 				053998C4290A83E0005143C7 /* HomeMenuCell.swift */,
 			);
 			path = Cells;
@@ -1610,16 +1429,6 @@
 			path = ViewController;
 			sourceTree = "<group>";
 		};
-		DD220BC2295B48FD00F57F30 /* QMUI */ = {
-			isa = PBXGroup;
-			children = (
-				DD220BC3295B48FD00F57F30 /* QMUICommonDefines.h */,
-				DD220BC5295B48FD00F57F30 /* QMUIHelper.h */,
-				DD220BC7295B48FD00F57F30 /* QMUIHelper.m */,
-			);
-			path = QMUI;
-			sourceTree = "<group>";
-		};
 		DD2A43BE28FFCEE7004CEDCF = {
 			isa = PBXGroup;
 			children = (
@@ -1646,9 +1455,6 @@
 			isa = PBXGroup;
 			children = (
 				DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */,
-				DDA198DC28FFE579009D3E61 /* Common */,
-				DDA1997928FFE579009D3E61 /* ThirdParty */,
-				DDDDDB3228FFD78B005F4E8B /* Context */,
 				DD8416A629090C520026B624 /* HomeMenu */,
 				DD8416E429090C520026B624 /* Scenes */,
 				DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */,
@@ -1981,14 +1787,6 @@
 			path = Debug;
 			sourceTree = "<group>";
 		};
-		DD6199CA29E3D36D008F63E4 /* Authorized */ = {
-			isa = PBXGroup;
-			children = (
-				DD6199CB29E3D36D008F63E4 /* AgoraEntAuthorizedManager.swift */,
-			);
-			path = Authorized;
-			sourceTree = "<group>";
-		};
 		DD6199CD29E3E246008F63E4 /* SpatialAudio */ = {
 			isa = PBXGroup;
 			children = (
@@ -2301,7 +2099,6 @@
 				DD619AFF29E3E262008F63E4 /* PresentationEnums.swift */,
 				DD619B0029E3E262008F63E4 /* PresentationSegue.swift */,
 				DD619B0129E3E262008F63E4 /* VRVerifyCodeNumberView.swift */,
-				DD619B0229E3E262008F63E4 /* VRVerifyCodeTextView.swift */,
 				DD619B0329E3E262008F63E4 /* VoiceRoomPageContainer.swift */,
 				DD619B0429E3E262008F63E4 /* Xcode14.m */,
 			);
@@ -2425,7 +2222,6 @@
 			isa = PBXGroup;
 			children = (
 				DD619B3A29E3E262008F63E4 /* Cells */,
-				DD619B4029E3E262008F63E4 /* BaseNavigationView.swift */,
 				DD619B4129E3E262008F63E4 /* VoiceChat */,
 				DD619B7429E3E262008F63E4 /* RoomManager */,
 			);
@@ -2603,8 +2399,6 @@
 			isa = PBXGroup;
 			children = (
 				DD220BC1295B340A00F57F30 /* MenuUtils.h */,
-				DD8416CF29090C520026B624 /* UIWindow+Router.h */,
-				DD8416B029090C520026B624 /* UIWindow+Router.m */,
 				DD8416A729090C520026B624 /* Home */,
 				DD8416B129090C520026B624 /* Discovery */,
 				DD8416BE29090C520026B624 /* Mine */,
@@ -2617,6 +2411,8 @@
 		DD8416A729090C520026B624 /* Home */ = {
 			isa = PBXGroup;
 			children = (
+				E34CB4FB2A98B1E600AB1B25 /* Window */,
+				E34CB4F72A98B12C00AB1B25 /* NetWork */,
 				053998C0290A81DC005143C7 /* Cells */,
 				DD8416A829090C520026B624 /* VLHomeViewController.m */,
 				DD8416A929090C520026B624 /* VLHomeItemView.m */,
@@ -2751,6 +2547,7 @@
 		DD8416D729090C520026B624 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				E3104A872A97532C00FB3490 /* AUiMoreDialog.swift */,
 				DD8416D829090C520026B624 /* VLPopImageVerifyView.m */,
 				DD8416D929090C520026B624 /* VLLoginInputVerifyCodeView.m */,
 				DD8416DA29090C520026B624 /* VLPrivacyCustomView.m */,
@@ -2814,396 +2611,23 @@
 			path = Service;
 			sourceTree = "<group>";
 		};
-		DDA198DC28FFE579009D3E61 /* Common */ = {
+		E34CB4F72A98B12C00AB1B25 /* NetWork */ = {
 			isa = PBXGroup;
 			children = (
-				DDA198DD28FFE579009D3E61 /* UI */,
-				DDA1991728FFE579009D3E61 /* Extension */,
-				DDA1991D28FFE579009D3E61 /* Category */,
-				DDA1994628FFE579009D3E61 /* Utils */,
-				DDA1994D28FFE579009D3E61 /* Manager */,
+				E34CB4F82A98B12C00AB1B25 /* VLAPIRequest.h */,
+				E34CB4F92A98B12C00AB1B25 /* VLAPIRequest.m */,
 			);
-			path = Common;
-			sourceTree = "<group>";
+			name = NetWork;
+			path = AgoraEntScenarios/Common/NetWork;
+			sourceTree = SOURCE_ROOT;
 		};
-		DDA198DD28FFE579009D3E61 /* UI */ = {
+		E34CB4FB2A98B1E600AB1B25 /* Window */ = {
 			isa = PBXGroup;
 			children = (
-				DDA198DE28FFE579009D3E61 /* ToastView */,
-				DDA198E128FFE579009D3E61 /* VLHotSpotBtn */,
-				DDA198E428FFE579009D3E61 /* VLEmptyView */,
-				DDA198E728FFE579009D3E61 /* Toast */,
-				DDA198EA28FFE579009D3E61 /* WebView */,
-				DDA198EF28FFE579009D3E61 /* VLFont */,
-				DDA198FA28FFE579009D3E61 /* VLNetwork */,
-				DDA1990828FFE579009D3E61 /* Base */,
 			);
-			path = UI;
-			sourceTree = "<group>";
-		};
-		DDA198DE28FFE579009D3E61 /* ToastView */ = {
-			isa = PBXGroup;
-			children = (
-				E751D85C29F11723001354CA /* AUiMoreDialog.swift */,
-				DDA198DF28FFE579009D3E61 /* ToastView.swift */,
-				DDA198E028FFE579009D3E61 /* AlertManager.swift */,
-			);
-			path = ToastView;
-			sourceTree = "<group>";
-		};
-		DDA198E128FFE579009D3E61 /* VLHotSpotBtn */ = {
-			isa = PBXGroup;
-			children = (
-				DDA198E228FFE579009D3E61 /* VLHotSpotBtn.m */,
-				DDA198E328FFE579009D3E61 /* VLHotSpotBtn.h */,
-			);
-			path = VLHotSpotBtn;
-			sourceTree = "<group>";
-		};
-		DDA198E428FFE579009D3E61 /* VLEmptyView */ = {
-			isa = PBXGroup;
-			children = (
-				DDA198E528FFE579009D3E61 /* VLEmptyView.m */,
-				DDA198E628FFE579009D3E61 /* VLEmptyView.h */,
-			);
-			path = VLEmptyView;
-			sourceTree = "<group>";
-		};
-		DDA198E728FFE579009D3E61 /* Toast */ = {
-			isa = PBXGroup;
-			children = (
-				E357353A29EFD631009D54E1 /* VLAlert.h */,
-				E357353C29EFD631009D54E1 /* VLAlert.m */,
-				E357353B29EFD631009D54E1 /* VLKTVAlert.h */,
-				E357353D29EFD631009D54E1 /* VLKTVAlert.m */,
-				DDA198E828FFE579009D3E61 /* VLToast.h */,
-				DDA198E928FFE579009D3E61 /* VLToast.m */,
-			);
-			path = Toast;
-			sourceTree = "<group>";
-		};
-		DDA198EA28FFE579009D3E61 /* WebView */ = {
-			isa = PBXGroup;
-			children = (
-				DDA198EB28FFE579009D3E61 /* VLLocalWebViewController.h */,
-				DDA198EC28FFE579009D3E61 /* VLCommonWebViewController.m */,
-				DDA198ED28FFE579009D3E61 /* VLLocalWebViewController.m */,
-				DDA198EE28FFE579009D3E61 /* VLCommonWebViewController.h */,
-			);
-			path = WebView;
-			sourceTree = "<group>";
-		};
-		DDA198EF28FFE579009D3E61 /* VLFont */ = {
-			isa = PBXGroup;
-			children = (
-				DDA198F028FFE579009D3E61 /* UIButton+Font.h */,
-				DDA198F128FFE579009D3E61 /* UILabel+Font.h */,
-				DDA198F228FFE579009D3E61 /* VLDeviceUtils.m */,
-				DDA198F328FFE579009D3E61 /* VLFontUtils.h */,
-				DDA198F428FFE579009D3E61 /* UITextField+Font.h */,
-				DDA198F528FFE579009D3E61 /* UILabel+Font.m */,
-				DDA198F628FFE579009D3E61 /* UIButton+Font.m */,
-				DDA198F728FFE579009D3E61 /* VLFontUtils.m */,
-				DDA198F828FFE579009D3E61 /* VLDeviceUtils.h */,
-				DDA198F928FFE579009D3E61 /* UITextField+Font.m */,
-			);
-			path = VLFont;
-			sourceTree = "<group>";
-		};
-		DDA198FA28FFE579009D3E61 /* VLNetwork */ = {
-			isa = PBXGroup;
-			children = (
-				DDA198FB28FFE579009D3E61 /* Configure */,
-				DDA198FD28FFE579009D3E61 /* Model */,
-				DDA1990228FFE579009D3E61 /* Request */,
-			);
-			path = VLNetwork;
-			sourceTree = "<group>";
-		};
-		DDA198FB28FFE579009D3E61 /* Configure */ = {
-			isa = PBXGroup;
-			children = (
-				DDA198FC28FFE579009D3E61 /* VLNetworkConfig.h */,
-			);
-			path = Configure;
-			sourceTree = "<group>";
-		};
-		DDA198FD28FFE579009D3E61 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				DDA198FE28FFE579009D3E61 /* VLResponseDataModel.m */,
-				DDA198FF28FFE579009D3E61 /* VLBaseModel.h */,
-				DDA1990028FFE579009D3E61 /* VLResponseDataModel.h */,
-				DDA1990128FFE579009D3E61 /* VLBaseModel.m */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		DDA1990228FFE579009D3E61 /* Request */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1990328FFE579009D3E61 /* VLAPIRequest.h */,
-				DDA1990428FFE579009D3E61 /* VLRequestRoute.m */,
-				DDA1990528FFE579009D3E61 /* VLRequestRoute.h */,
-				DDA1990628FFE579009D3E61 /* VLAPIRequest.m */,
-				DDA1990728FFE579009D3E61 /* VLBaseHander.h */,
-			);
-			path = Request;
-			sourceTree = "<group>";
-		};
-		DDA1990828FFE579009D3E61 /* Base */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1990928FFE579009D3E61 /* View */,
-				DDA1991028FFE579009D3E61 /* ViewController */,
-			);
-			path = Base;
-			sourceTree = "<group>";
-		};
-		DDA1990928FFE579009D3E61 /* View */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1990A28FFE579009D3E61 /* VLBaseTableView.h */,
-				DDA1990B28FFE579009D3E61 /* VLBaseView.m */,
-				DDA1990C28FFE579009D3E61 /* VLUIView.m */,
-				DDA1990D28FFE579009D3E61 /* VLBaseView.h */,
-				DDA1990E28FFE579009D3E61 /* VLBaseTableView.m */,
-				DDA1990F28FFE579009D3E61 /* VLUIView.h */,
-				E36BE99529656C43003FCFBF /* AttributedTextView.h */,
-				E36BE99629656C43003FCFBF /* AttributedTextView.m */,
-				DD619AF129E3E262008F63E4 /* VerifyCodeView.swift */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		DDA1991028FFE579009D3E61 /* ViewController */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1991128FFE579009D3E61 /* UIViewController+VL.h */,
-				DDA1991228FFE579009D3E61 /* BaseViewController.m */,
-				DDA1991328FFE579009D3E61 /* BaseNavigationController.m */,
-				DDA1991428FFE579009D3E61 /* UIViewController+VL.m */,
-				DDA1991528FFE579009D3E61 /* BaseNavigationController.h */,
-				DDA1991628FFE579009D3E61 /* BaseViewController.h */,
-				E3735CA62A5E8023004737EF /* VRBaseViewController.swift */,
-			);
-			path = ViewController;
-			sourceTree = "<group>";
-		};
-		DDA1991728FFE579009D3E61 /* Extension */ = {
-			isa = PBXGroup;
-			children = (
-				DD64C68B295C142A00EAB750 /* UIButton+EntLayout.swift */,
-				DDA1991828FFE579009D3E61 /* UIColor+Extension.swift */,
-				DDA1991928FFE579009D3E61 /* String+Extension.swift */,
-				DDA1991A28FFE579009D3E61 /* AgoraExtension.swift */,
-				DDA1991B28FFE579009D3E61 /* UIImage+Color.swift */,
-				DDA1991C28FFE579009D3E61 /* Array+Extension.swift */,
-				E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */,
-				DD619B0B29E3E262008F63E4 /* UIViewToastExtension.swift */,
-				DD619B0529E3E262008F63E4 /* Notification+Presentation.swift */,
-			);
-			path = Extension;
-			sourceTree = "<group>";
-		};
-		DDA1991D28FFE579009D3E61 /* Category */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1991E28FFE579009D3E61 /* NSDictionary */,
-				DDA1992328FFE579009D3E61 /* UIColor */,
-				DDA1992828FFE579009D3E61 /* UISplitViewController */,
-				DDA1992B28FFE579009D3E61 /* UIView */,
-				DDA1992E28FFE579009D3E61 /* UIDevice */,
-				DDA1993128FFE579009D3E61 /* NSString */,
-				DDA1993828FFE579009D3E61 /* UIGestureRecognizer */,
-				DDA1993B28FFE579009D3E61 /* NSArray */,
-				DDA1993E28FFE579009D3E61 /* CALayer */,
-				DDA1994128FFE579009D3E61 /* NSObject */,
-			);
-			path = Category;
-			sourceTree = "<group>";
-		};
-		DDA1991E28FFE579009D3E61 /* NSDictionary */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1991F28FFE579009D3E61 /* NSDictionary+JKSafeAccess.m */,
-				DDA1992028FFE579009D3E61 /* NSDictionary+dictToModel.h */,
-				DDA1992128FFE579009D3E61 /* NSDictionary+JKSafeAccess.h */,
-				DDA1992228FFE579009D3E61 /* NSDictionary+dictToModel.m */,
-			);
-			path = NSDictionary;
-			sourceTree = "<group>";
-		};
-		DDA1992328FFE579009D3E61 /* UIColor */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1992428FFE579009D3E61 /* UIColor+JKWeb.m */,
-				DDA1992528FFE579009D3E61 /* UIColor+JKGradient.h */,
-				DDA1992628FFE579009D3E61 /* UIColor+JKGradient.m */,
-				DDA1992728FFE579009D3E61 /* UIColor+JKWeb.h */,
-			);
-			path = UIColor;
-			sourceTree = "<group>";
-		};
-		DDA1992828FFE579009D3E61 /* UISplitViewController */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1992928FFE579009D3E61 /* UISplitViewController+JKQuickAccess.h */,
-				DDA1992A28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m */,
-			);
-			path = UISplitViewController;
-			sourceTree = "<group>";
-		};
-		DDA1992B28FFE579009D3E61 /* UIView */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1992C28FFE579009D3E61 /* UIView+VL.h */,
-				DDA1992D28FFE579009D3E61 /* UIView+VL.m */,
-			);
-			path = UIView;
-			sourceTree = "<group>";
-		};
-		DDA1992E28FFE579009D3E61 /* UIDevice */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1992F28FFE579009D3E61 /* UIDevice+JKHardware.m */,
-				DDA1993028FFE579009D3E61 /* UIDevice+JKHardware.h */,
-			);
-			path = UIDevice;
-			sourceTree = "<group>";
-		};
-		DDA1993128FFE579009D3E61 /* NSString */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1993228FFE579009D3E61 /* NSString+Helper.m */,
-				DDA1993328FFE579009D3E61 /* NSObject+Extension.h */,
-				DDA1993428FFE579009D3E61 /* NSString+Emoji.m */,
-				DDA1993528FFE579009D3E61 /* NSObject+Extension.m */,
-				DDA1993628FFE579009D3E61 /* NSString+Helper.h */,
-				DDA1993728FFE579009D3E61 /* NSString+Emoji.h */,
-			);
-			path = NSString;
-			sourceTree = "<group>";
-		};
-		DDA1993828FFE579009D3E61 /* UIGestureRecognizer */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1993928FFE579009D3E61 /* UIGestureRecognizer+VL.m */,
-				DDA1993A28FFE579009D3E61 /* UIGestureRecognizer+VL.h */,
-			);
-			path = UIGestureRecognizer;
-			sourceTree = "<group>";
-		};
-		DDA1993B28FFE579009D3E61 /* NSArray */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1993C28FFE579009D3E61 /* NSArray+JKSafeAccess.m */,
-				DDA1993D28FFE579009D3E61 /* NSArray+JKSafeAccess.h */,
-			);
-			path = NSArray;
-			sourceTree = "<group>";
-		};
-		DDA1993E28FFE579009D3E61 /* CALayer */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1993F28FFE579009D3E61 /* CALayer+JKBorderColor.h */,
-				DDA1994028FFE579009D3E61 /* CALayer+JKBorderColor.m */,
-			);
-			path = CALayer;
-			sourceTree = "<group>";
-		};
-		DDA1994128FFE579009D3E61 /* NSObject */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1994228FFE579009D3E61 /* NSObject+JKAppInfo.m */,
-				DDA1994328FFE579009D3E61 /* NSObject+JKAutoCoding.h */,
-				DDA1994428FFE579009D3E61 /* NSObject+JKAutoCoding.m */,
-				DDA1994528FFE579009D3E61 /* NSObject+JKAppInfo.h */,
-			);
-			path = NSObject;
-			sourceTree = "<group>";
-		};
-		DDA1994628FFE579009D3E61 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				DD619AFA29E3E262008F63E4 /* Throttle.swift */,
-				DDA1994728FFE579009D3E61 /* Config.swift */,
-				DDA1994828FFE579009D3E61 /* GCDTimer.swift */,
-				DDA1994928FFE579009D3E61 /* DeviceAssistant.swift */,
-				DDA1994A28FFE579009D3E61 /* Screen.swift */,
-				DDA1994B28FFE579009D3E61 /* JSONObject.swift */,
-				DDA1994C28FFE579009D3E61 /* SyncUtil.swift */,
-				E3735CAC2A5E81B6004737EF /* AESMacro.h */,
-			);
-			path = Utils;
-			sourceTree = "<group>";
-		};
-		DDA1994D28FFE579009D3E61 /* Manager */ = {
-			isa = PBXGroup;
-			children = (
-				DD6199CA29E3D36D008F63E4 /* Authorized */,
-				DDA1994E28FFE579009D3E61 /* NetworkManager */,
-				DDA1995328FFE579009D3E61 /* VLDefine */,
-				DDA1995A28FFE579009D3E61 /* Helper */,
-			);
-			path = Manager;
-			sourceTree = "<group>";
-		};
-		DDA1994E28FFE579009D3E61 /* NetworkManager */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1994F28FFE579009D3E61 /* NetworkManager.swift */,
-			);
-			path = NetworkManager;
-			sourceTree = "<group>";
-		};
-		DDA1995328FFE579009D3E61 /* VLDefine */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1995428FFE579009D3E61 /* VLURLPathConfig.h */,
-				DDA1995528FFE579009D3E61 /* VLMacroDefine.h */,
-				DDA1995628FFE579009D3E61 /* VLColorDefine.h */,
-			);
-			path = VLDefine;
-			sourceTree = "<group>";
-		};
-		DDA1995728FFE579009D3E61 /* UserCenter */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1995828FFE579009D3E61 /* VLUserCenter.h */,
-				DDA1995928FFE579009D3E61 /* VLUserCenter.m */,
-			);
-			path = UserCenter;
-			sourceTree = "<group>";
-		};
-		DDA1995A28FFE579009D3E61 /* Helper */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1995728FFE579009D3E61 /* UserCenter */,
-				DDA1995B28FFE579009D3E61 /* VLGlobalHelper.m */,
-				DDA1995C28FFE579009D3E61 /* VLGlobalHelper.h */,
-			);
-			path = Helper;
-			sourceTree = "<group>";
-		};
-		DDA1997928FFE579009D3E61 /* ThirdParty */ = {
-			isa = PBXGroup;
-			children = (
-				DD220BC2295B48FD00F57F30 /* QMUI */,
-			);
-			path = ThirdParty;
-			sourceTree = "<group>";
-		};
-		DDDDDB3228FFD78B005F4E8B /* Context */ = {
-			isa = PBXGroup;
-			children = (
-				DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */,
-				DDDDDB3428FFD78B005F4E8B /* AppContext.swift */,
-				DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */,
-				DD1603432963CAFD00182A04 /* AgoraEntLog.swift */,
-			);
-			path = Context;
-			sourceTree = "<group>";
+			name = Window;
+			path = AgoraEntScenarios/Common/Window;
+			sourceTree = SOURCE_ROOT;
 		};
 		E357354929EFD74A009D54E1 /* KTVAPI */ = {
 			isa = PBXGroup;
@@ -3578,38 +3002,30 @@
 				E3735C9A2A5E7E75004737EF /* ByteBeautyManager.swift in Sources */,
 				DD619BEB29E3E262008F63E4 /* VMANISSetTableViewCell.swift in Sources */,
 				DD619BFB29E3E262008F63E4 /* VRSoundTypeCard.swift in Sources */,
-				DDA199DD28FFE579009D3E61 /* ToastView.swift in Sources */,
-				DDA199E528FFE579009D3E61 /* UILabel+Font.m in Sources */,
-				DDA199F528FFE579009D3E61 /* AgoraExtension.swift in Sources */,
 				DD619AE829E3E247008F63E4 /* SASoundTypeCard.swift in Sources */,
 				DD619A6C29E3E247008F63E4 /* SAVerifyCodeNumberView.swift in Sources */,
 				DD5EBDC9299F491F00F36349 /* KTVDebugInfo.m in Sources */,
 				DD619A7429E3E247008F63E4 /* SAPresentationEnums.swift in Sources */,
 				DD619BB429E3E262008F63E4 /* VoiceRoomViewController+IM.swift in Sources */,
 				DD619BA429E3E262008F63E4 /* VoiceRoomGiftEntity.swift in Sources */,
-				DDA199E128FFE579009D3E61 /* VLToast.m in Sources */,
 				DD619ABD29E3E247008F63E4 /* SAApplyAlert.swift in Sources */,
 				E357355D29EFD74A009D54E1 /* AgoraMiguXmlLrcParse.swift in Sources */,
 				DD619C0929E3E84D008F63E4 /* AboutAgoraHeader.swift in Sources */,
-				DDA199F028FFE579009D3E61 /* BaseViewController.m in Sources */,
 				DD619ACE29E3E247008F63E4 /* SAUserView.swift in Sources */,
 				E3735C852A5E7E75004737EF /* EffectsAttribute.m in Sources */,
 				DD619C0429E3E81D008F63E4 /* AboutAgoraEntertainmentViewController.swift in Sources */,
-				DDA199ED28FFE579009D3E61 /* VLBaseView.m in Sources */,
 				DD3610CD29B70F3300CE7984 /* VLMineSwitchCell.swift in Sources */,
 				E36EC8B72A663B880089A374 /* AEACategoryTitleCell.swift in Sources */,
 				DD619AAF29E3E247008F63E4 /* SAEndLiveAlert.swift in Sources */,
 				DD0292D7295BF0DC00485225 /* VLAudioEffectPicker.m in Sources */,
 				DD3610C229B70CDC00CE7984 /* ShowInviteCell.swift in Sources */,
 				DD8417CA29090C520026B624 /* TemplateServiceModel.swift in Sources */,
-				E751D85D29F11723001354CA /* AUiMoreDialog.swift in Sources */,
 				DD619AC929E3E247008F63E4 /* SARoomHeaderView.swift in Sources */,
 				DD619B8629E3E262008F63E4 /* HorizontalTextCarousel.swift in Sources */,
 				DD619AC829E3E247008F63E4 /* SAApplyCell.swift in Sources */,
 				E3735C8C2A5E7E75004737EF /* EFMotionManager.m in Sources */,
 				DD619ADE29E3E247008F63E4 /* SA3DRtcView.swift in Sources */,
 				DD0292F0295BF0DC00485225 /* VLHomeOnLineListView.m in Sources */,
-				DDA199F328FFE579009D3E61 /* UIColor+Extension.swift in Sources */,
 				DD3610B929B70CDC00CE7984 /* ShowSettingSwitchCell.swift in Sources */,
 				DD619BE929E3E262008F63E4 /* AgoraChatRoomNormalRtcView.swift in Sources */,
 				DD619ADD29E3E247008F63E4 /* SAPopTip.swift in Sources */,
@@ -3628,22 +3044,18 @@
 				DD619B9A29E3E262008F63E4 /* ResourceBundleExtension.swift in Sources */,
 				DD619AE129E3E247008F63E4 /* SACreateRoomInputView.swift in Sources */,
 				DD619BFF29E3E262008F63E4 /* VRSoundEffectsList.swift in Sources */,
-				DDA199FD28FFE579009D3E61 /* UIView+VL.m in Sources */,
 				DD0292E6295BF0DC00485225 /* VLKTVSliderView.m in Sources */,
 				DD619BBA29E3E262008F63E4 /* VoiceRoomAudioSettingViewController.swift in Sources */,
 				DD619AA229E3E247008F63E4 /* SASoundEffectsViewController.swift in Sources */,
 				DD36105E29B70CDC00CE7984 /* ShowThrottle.swift in Sources */,
 				DD619A6B29E3E247008F63E4 /* SAVerifyCodeView.swift in Sources */,
-				DDA199E928FFE579009D3E61 /* VLResponseDataModel.m in Sources */,
 				DD0292E5295BF0DC00485225 /* VLKTVKindsCell.m in Sources */,
-				E3735CA72A5E8023004737EF /* VRBaseViewController.swift in Sources */,
 				DD619BCD29E3E262008F63E4 /* VMAudioSettingView.swift in Sources */,
 				DD619BBD29E3E262008F63E4 /* VRSpatialSoundViewController.swift in Sources */,
 				DD619B9029E3E262008F63E4 /* PresentationEnums.swift in Sources */,
 				DD3610BB29B70CDC00CE7984 /* ShowPresettingHeaderView.swift in Sources */,
 				E3735C972A5E7E75004737EF /* BEPixelBufferInfo.m in Sources */,
 				DD0292C5295BF0DC00485225 /* VLSongItmModel.m in Sources */,
-				DDA199EF28FFE579009D3E61 /* VLBaseTableView.m in Sources */,
 				DD84177C29090C520026B624 /* VLHomeItemView.m in Sources */,
 				DD619AC529E3E247008F63E4 /* SAGifterCell.swift in Sources */,
 				E3735C9D2A5E7E75004737EF /* BeautyLoad.m in Sources */,
@@ -3659,8 +3071,8 @@
 				DD36105C29B70CDC00CE7984 /* UIViewController+Show.swift in Sources */,
 				DD619AAC29E3E247008F63E4 /* SASpatialTipsView.swift in Sources */,
 				DD619AC129E3E247008F63E4 /* SA3DUserCollectionViewCell.swift in Sources */,
+				E34CB3F42A98AE4C00AB1B25 /* UIWindow+Router.m in Sources */,
 				DD619BE729E3E262008F63E4 /* VMManagerView.swift in Sources */,
-				DDA199E328FFE579009D3E61 /* VLLocalWebViewController.m in Sources */,
 				DD619BA829E3E262008F63E4 /* VoiceRoomAudiencesEntity.swift in Sources */,
 				DD619AB029E3E247008F63E4 /* SAGiftView.swift in Sources */,
 				DD619AA029E3E247008F63E4 /* SAAllRoomsViewController.swift in Sources */,
@@ -3668,17 +3080,11 @@
 				DD84177E29090C520026B624 /* VLHomeView.m in Sources */,
 				DD619B8229E3E262008F63E4 /* PresentationController.swift in Sources */,
 				DD36108C29B70CDC00CE7984 /* ShowMusicEffectVC.swift in Sources */,
-				DDA199E428FFE579009D3E61 /* VLDeviceUtils.m in Sources */,
 				DD84177D29090C520026B624 /* VLHomeItemModel.m in Sources */,
 				DD619BC029E3E262008F63E4 /* VRSoundEffectsViewController.swift in Sources */,
 				DD84178429090C520026B624 /* VLDiscoveryViewController.m in Sources */,
 				DD3610C629B70CDC00CE7984 /* ShowToolMenuView.swift in Sources */,
-				DDA199F628FFE579009D3E61 /* UIImage+Color.swift in Sources */,
-				DDA19A0D28FFE579009D3E61 /* NetworkManager.swift in Sources */,
-				E357353E29EFD631009D54E1 /* VLAlert.m in Sources */,
 				DD619AC429E3E247008F63E4 /* SAUpstageView.swift in Sources */,
-				DDA199F928FFE579009D3E61 /* NSDictionary+dictToModel.m in Sources */,
-				DDA19A0428FFE579009D3E61 /* CALayer+JKBorderColor.m in Sources */,
 				DD619AB529E3E247008F63E4 /* SAANISSUPTableViewCell.swift in Sources */,
 				E357356129EFD74A009D54E1 /* AgoraCacheFileHandle.swift in Sources */,
 				DD619A9F29E3E247008F63E4 /* SARoomViewController+IM.swift in Sources */,
@@ -3709,7 +3115,6 @@
 				DD84178629090C520026B624 /* VLMineView.m in Sources */,
 				DD619A7229E3E247008F63E4 /* SAPresentationSegue.swift in Sources */,
 				DD619A6A29E3E247008F63E4 /* SAEmojiManager.swift in Sources */,
-				DDA199E728FFE579009D3E61 /* VLFontUtils.m in Sources */,
 				E357356429EFD74A009D54E1 /* AgoraDownLoadManager.swift in Sources */,
 				DD36109029B70CDC00CE7984 /* ShowCreateLiveVC.swift in Sources */,
 				DD0292DD295BF0DC00485225 /* VLPopSelBgView.m in Sources */,
@@ -3725,7 +3130,6 @@
 				E3735C8A2A5E7E75004737EF /* VideoProcessingManager.m in Sources */,
 				E3735CA32A5E7E75004737EF /* SenseBeautyRender.m in Sources */,
 				DD619BC529E3E262008F63E4 /* VRRoomMenuBarCell.swift in Sources */,
-				DDA199F228FFE579009D3E61 /* UIViewController+VL.m in Sources */,
 				DD8417CB29090C520026B624 /* TemplateServiceImp.swift in Sources */,
 				DD36109229B70CDC00CE7984 /* ShowLivePagesViewController.swift in Sources */,
 				DD619BDC29E3E262008F63E4 /* AgoraMicVolView.swift in Sources */,
@@ -3733,12 +3137,9 @@
 				DD619BE329E3E262008F63E4 /* VMPresentView.swift in Sources */,
 				DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */,
 				DD84178129090C520026B624 /* VLDiscoveryItemTCell.m in Sources */,
-				DDA199F428FFE579009D3E61 /* String+Extension.swift in Sources */,
 				E357355C29EFD74A009D54E1 /* KTVLrcControl.swift in Sources */,
 				DD3610BF29B70CDC00CE7984 /* ShowSettingActionSheetCell.swift in Sources */,
 				DD619BCC29E3E262008F63E4 /* AgoraChatRoomBaseAlienCollectionViewCell.swift in Sources */,
-				DDA199DE28FFE579009D3E61 /* AlertManager.swift in Sources */,
-				DDA199EE28FFE579009D3E61 /* VLUIView.m in Sources */,
 				DD619A9B29E3E247008F63E4 /* SAAudioSettingDetailViewController.swift in Sources */,
 				DD3610C829B70CDC00CE7984 /* ShowServiceModel.swift in Sources */,
 				DD619BD329E3E262008F63E4 /* VoiceRoomChatCell.swift in Sources */,
@@ -3754,7 +3155,6 @@
 				DD84177B29090C520026B624 /* VLHomeViewController.m in Sources */,
 				E357356329EFD74A009D54E1 /* AgoraURLExtention.swift in Sources */,
 				DD619BA529E3E262008F63E4 /* VoiceServiceModel.swift in Sources */,
-				E357353F29EFD631009D54E1 /* VLKTVAlert.m in Sources */,
 				DD619BAF29E3E262008F63E4 /* VoiceRoomAudiencesViewController.swift in Sources */,
 				DD619A9629E3E247008F63E4 /* SARoomViewController+Mic.swift in Sources */,
 				DD3610B629B70CDC00CE7984 /* ShowDebugSetting1TFCell.swift in Sources */,
@@ -3764,10 +3164,9 @@
 				DD0292D1295BF0DC00485225 /* VLSelectSongTableItemView.m in Sources */,
 				DD619ACA29E3E247008F63E4 /* SAChatBarCell.swift in Sources */,
 				DD619AC729E3E247008F63E4 /* SANoticeView.swift in Sources */,
-				DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */,
 				DD619BC229E3E262008F63E4 /* HorizontalCardCell.swift in Sources */,
+				E34CB4FA2A98B12C00AB1B25 /* VLAPIRequest.m in Sources */,
 				DD619A9229E3E247008F63E4 /* SpatialAudioSyncSerciceImp.swift in Sources */,
-				DDA19A0328FFE579009D3E61 /* NSArray+JKSafeAccess.m in Sources */,
 				DD619ACD29E3E247008F63E4 /* SABaseUserCollectionViewCell.swift in Sources */,
 				053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */,
 				DD619BE029E3E262008F63E4 /* VMUpstageView.swift in Sources */,
@@ -3783,7 +3182,6 @@
 				DD3610AC29B70CDC00CE7984 /* ShowRoomListCell.swift in Sources */,
 				DD5EBDC3299F201D00F36349 /* KTVDebugManager.m in Sources */,
 				DD619A8929E3E247008F63E4 /* SAGiftEntity.swift in Sources */,
-				DDA199F828FFE579009D3E61 /* NSDictionary+JKSafeAccess.m in Sources */,
 				DD619A8F29E3E247008F63E4 /* SpatialAudioServiceProtocol.swift in Sources */,
 				DD619BE629E3E262008F63E4 /* VoiceRoomPresentView.swift in Sources */,
 				DD36109E29B70CDC00CE7984 /* ShowNavigationBar.swift in Sources */,
@@ -3801,8 +3199,6 @@
 				DD619A8329E3E247008F63E4 /* SAIMManager.swift in Sources */,
 				DD3610C029B70CDC00CE7984 /* ShowSettingHeaderView.swift in Sources */,
 				DD619BD429E3E262008F63E4 /* VMANISSUPTableViewCell.swift in Sources */,
-				DDA199EC28FFE579009D3E61 /* VLAPIRequest.m in Sources */,
-				DDA19A0828FFE579009D3E61 /* GCDTimer.swift in Sources */,
 				DD0292D3295BF0DC00485225 /* VLSearchEmptyView.m in Sources */,
 				DD619BDB29E3E262008F63E4 /* VoiceRoomInputBar.swift in Sources */,
 				DD619BD929E3E262008F63E4 /* VoiceRoomGifterCell.swift in Sources */,
@@ -3819,7 +3215,6 @@
 				DD0292EF295BF0DC00485225 /* VLHomeOnLineListCCell.m in Sources */,
 				DD619A7D29E3E247008F63E4 /* String + SAExtension.swift in Sources */,
 				DD619C0829E3E84D008F63E4 /* SceneVersionCell.swift in Sources */,
-				DDA19A0B28FFE579009D3E61 /* JSONObject.swift in Sources */,
 				DD619BD629E3E262008F63E4 /* VoiceRoomChatView.swift in Sources */,
 				DD619AC329E3E247008F63E4 /* SAPresentView.swift in Sources */,
 				DD619B8329E3E262008F63E4 /* LanguageManager.swift in Sources */,
@@ -3827,20 +3222,16 @@
 				DD0292E8295BF0DC00485225 /* VLKTVItemBaseView.m in Sources */,
 				DD619BB929E3E262008F63E4 /* VoiceRoomInviteUsersController.swift in Sources */,
 				DD619A6F29E3E247008F63E4 /* SAFlipHorizontalAnimation.swift in Sources */,
-				DDA19A0C28FFE579009D3E61 /* SyncUtil.swift in Sources */,
 				DD0292E3295BF0DC00485225 /* VLKTVTonesView.m in Sources */,
 				DD84178829090C520026B624 /* VLMineViewController.m in Sources */,
 				DD619C0A29E3E84D008F63E4 /* ContactInfoCell.swift in Sources */,
-				DDA199FA28FFE579009D3E61 /* UIColor+JKWeb.m in Sources */,
 				DD619B8729E3E262008F63E4 /* VoiceRoomEmojiManager.swift in Sources */,
 				DD619ABB29E3E247008F63E4 /* SAVMManagerView.swift in Sources */,
 				DD619BC329E3E262008F63E4 /* VRRoomListCell.swift in Sources */,
 				DD619BEC29E3E262008F63E4 /* VoiceRoomAlertContainer.swift in Sources */,
-				DDA19A0528FFE579009D3E61 /* NSObject+JKAppInfo.m in Sources */,
 				DD619AE529E3E247008F63E4 /* SARoomCreateView.swift in Sources */,
 				DD5EBDC6299F230100F36349 /* KTVDebugViewController.m in Sources */,
 				E36EC8B32A6638440089A374 /* AEAListContainerView.swift in Sources */,
-				E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */,
 				DD619BB229E3E262008F63E4 /* VoiceRoomApplyUsersViewController.swift in Sources */,
 				DD0292D0295BF0DC00485225 /* VLSongList.m in Sources */,
 				DD0292ED295BF0DC00485225 /* VLKTVTopView.m in Sources */,
@@ -3849,7 +3240,6 @@
 				DD84178529090C520026B624 /* VLUploadImageResModel.m in Sources */,
 				DD0292CC295BF0DC00485225 /* VLSelectedSongListCell.m in Sources */,
 				DD619AD029E3E247008F63E4 /* SAANISSetTableViewCell.swift in Sources */,
-				DDA199E228FFE579009D3E61 /* VLCommonWebViewController.m in Sources */,
 				E357356A29EFD8B5009D54E1 /* VLSoundEffectView.m in Sources */,
 				DD619BB729E3E262008F63E4 /* VoiceRoomAlertViewController.swift in Sources */,
 				DD619A8729E3E247008F63E4 /* SAServiceModel.swift in Sources */,
@@ -3858,19 +3248,14 @@
 				DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */,
 				DD0292C9295BF0DC00485225 /* VLKTVSelBgModel.m in Sources */,
 				DD619AB329E3E247008F63E4 /* SAConfirmView.swift in Sources */,
-				DD64C68C295C142A00EAB750 /* UIButton+EntLayout.swift in Sources */,
-				DDA199E828FFE579009D3E61 /* UITextField+Font.m in Sources */,
 				DD619AA129E3E247008F63E4 /* SANormalRoomsViewController.swift in Sources */,
 				DD0292F1295BF0DC00485225 /* KTVSyncManagerServiceImp.swift in Sources */,
-				DDA199DF28FFE579009D3E61 /* VLHotSpotBtn.m in Sources */,
 				DD619BAC29E3E262008F63E4 /* VoiceServiceProtocol.swift in Sources */,
-				DDA19A0128FFE579009D3E61 /* NSObject+Extension.m in Sources */,
 				DD619AA829E3E247008F63E4 /* SAHorizontalCardCell.swift in Sources */,
 				DD0292F2295BF0DC00485225 /* AppContext+KTV.m in Sources */,
 				E3735C912A5E7E75004737EF /* BEFrameProcessor.mm in Sources */,
 				DD619BDE29E3E262008F63E4 /* VoiceRoomGiftsView.swift in Sources */,
 				DD3610C729B70CDC00CE7984 /* ShowSubscribeServiceProtocol.swift in Sources */,
-				DDA199E028FFE579009D3E61 /* VLEmptyView.m in Sources */,
 				DD619BB629E3E262008F63E4 /* VoiceRoomGiftersViewController.swift in Sources */,
 				DD619A9529E3E247008F63E4 /* SAAlertViewController.swift in Sources */,
 				DD619BF829E3E262008F63E4 /* VMConfirmView.swift in Sources */,
@@ -3883,7 +3268,6 @@
 				DD619A9729E3E247008F63E4 /* SAAudioSettingViewController.swift in Sources */,
 				DD0292CB295BF0DC00485225 /* VLSongListCell.m in Sources */,
 				DD36109929B70CDC00CE7984 /* ShowCunstomNaviBar.swift in Sources */,
-				DD84177F29090C520026B624 /* UIWindow+Router.m in Sources */,
 				DD3610AA29B70CDC00CE7984 /* ShowEmptyView.swift in Sources */,
 				DD619BCF29E3E262008F63E4 /* VMSoundView.swift in Sources */,
 				DD619A8E29E3E247008F63E4 /* SAAudiencesEntity.swift in Sources */,
@@ -3900,7 +3284,6 @@
 				DD3610B729B70CDC00CE7984 /* ShowDebugSetting2TFCell.swift in Sources */,
 				DD619B8029E3E262008F63E4 /* VoiceRoomRequest.swift in Sources */,
 				ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */,
-				DD619B8429E3E262008F63E4 /* VerifyCodeView.swift in Sources */,
 				DD619ABE29E3E247008F63E4 /* SASwitchBar.swift in Sources */,
 				DD3610A129B70CDC00CE7984 /* ShowMusicTableHeaderView.swift in Sources */,
 				DD36109129B70CDC00CE7984 /* ShowToolMenuViewController.swift in Sources */,
@@ -3914,13 +3297,10 @@
 				DD619A9A29E3E247008F63E4 /* SAInviteUsersController.swift in Sources */,
 				DD0292DA295BF0DC00485225 /* VLPopMoreSelView.m in Sources */,
 				DD36105B29B70CDC00CE7984 /* Date+Show.swift in Sources */,
-				DD619BC629E3E262008F63E4 /* BaseNavigationView.swift in Sources */,
 				DD619B9C29E3E262008F63E4 /* UIImageBundleExtension.swift in Sources */,
 				DD619A7A29E3E247008F63E4 /* SAPasswordAlert.swift in Sources */,
 				DD619BAB29E3E262008F63E4 /* VoiceChatServiceModel.swift in Sources */,
 				DD619AD329E3E247008F63E4 /* SAPopTip+Transitions.swift in Sources */,
-				DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */,
-				DDA19A0228FFE579009D3E61 /* UIGestureRecognizer+VL.m in Sources */,
 				DD619AE429E3E247008F63E4 /* SASoundEffectsList.swift in Sources */,
 				DD0292DC295BF0DC00485225 /* VLPopScoreView.m in Sources */,
 				DD3610A829B70CDC00CE7984 /* ShowDataPanelPresenter.swift in Sources */,
@@ -3940,54 +3320,44 @@
 				DD3610A629B70CDC00CE7984 /* ShowBeautyFaceCell.swift in Sources */,
 				DD619A9E29E3E247008F63E4 /* SARoomViewController+ChatBar.swift in Sources */,
 				DD619ADB29E3E247008F63E4 /* SAChatBar.swift in Sources */,
-				DDA19A0028FFE579009D3E61 /* NSString+Emoji.m in Sources */,
 				DD619BC129E3E262008F63E4 /* VRSoundEffectsCell.swift in Sources */,
-				DDA199EB28FFE579009D3E61 /* VLRequestRoute.m in Sources */,
 				DD619BE129E3E262008F63E4 /* VMNoticeView.swift in Sources */,
 				DD619A9329E3E247008F63E4 /* SABaseViewController.swift in Sources */,
 				DD0292DE295BF0DC00485225 /* VLPopOnLineTypeView.m in Sources */,
 				DD619ABC29E3E247008F63E4 /* SAChatCell.swift in Sources */,
 				DD36106529B70CDC00CE7984 /* ShowChatModel.swift in Sources */,
 				DD3610C129B70CDC00CE7984 /* ShowSegmentView.swift in Sources */,
-				DD6199CC29E3D36D008F63E4 /* AgoraEntAuthorizedManager.swift in Sources */,
 				E3735C902A5E7E75004737EF /* BEEffectManager.mm in Sources */,
 				E3735CB22A5FA5E0004737EF /* KTVServiceProtocol.swift in Sources */,
-				DDA199FC28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m in Sources */,
 				DD36108929B70CDC00CE7984 /* ShowRoomListVC.swift in Sources */,
 				DD36108F29B70CDC00CE7984 /* ShowBeautyFaceVC.swift in Sources */,
 				DD619C0129E3E262008F63E4 /* VRRoomCreateView.swift in Sources */,
 				DD0292C8295BF0DC00485225 /* VLBelcantoModel.m in Sources */,
 				DD619B8E29E3E262008F63E4 /* VoiceRoomPasswordAlert.swift in Sources */,
 				DD3610CB29B70CDC00CE7984 /* ShowServiceProtocol.swift in Sources */,
-				DDA19A0728FFE579009D3E61 /* Config.swift in Sources */,
 				DD619AB929E3E247008F63E4 /* SAEQSettingView.swift in Sources */,
 				DD619BB029E3E262008F63E4 /* VoiceRoomViewController+ChatBar.swift in Sources */,
 				DD36105A29B70CDC00CE7984 /* UIFont+Show.swift in Sources */,
 				DD3610AD29B70CDC00CE7984 /* ShowRoomBottomBar.swift in Sources */,
 				DD3610A329B70CDC00CE7984 /* ShowReceiveFinishView.swift in Sources */,
 				DD619BBF29E3E262008F63E4 /* VRNormalRoomsViewController.swift in Sources */,
-				DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */,
 				DD3610A729B70CDC00CE7984 /* ShowSelectQualityCell.swift in Sources */,
 				DD619A8029E3E247008F63E4 /* ResourceBundleExtensionSA.swift in Sources */,
-				DDA199F728FFE579009D3E61 /* Array+Extension.swift in Sources */,
 				DD619B8829E3E262008F63E4 /* PresentationAnimation.swift in Sources */,
 				DD619AA729E3E247008F63E4 /* SACreateRoomCardCell.swift in Sources */,
 				E3735C982A5E7E75004737EF /* BEImageUtils.m in Sources */,
 				DD3610BA29B70CDC00CE7984 /* ShowSettingSegmentCell.swift in Sources */,
 				DD619BDA29E3E262008F63E4 /* VoiceRoomChatBarCell.swift in Sources */,
 				DD619BDD29E3E262008F63E4 /* VoiceRoomChatBar.swift in Sources */,
-				DDA199FE28FFE579009D3E61 /* UIDevice+JKHardware.m in Sources */,
 				DD619AB629E3E247008F63E4 /* SA3DMoveUserView.swift in Sources */,
 				E357356929EFD8B5009D54E1 /* VLEffectView.m in Sources */,
 				DD619BC929E3E262008F63E4 /* VREQOperationAlert.swift in Sources */,
 				DD619A7829E3E247008F63E4 /* SAPresentationController.swift in Sources */,
-				DDA19A0928FFE579009D3E61 /* DeviceAssistant.swift in Sources */,
 				DD84178F29090C520026B624 /* VLPrivacyCustomView.m in Sources */,
 				DD84178C29090C520026B624 /* VLLoginModel.m in Sources */,
 				E3735C9B2A5E7E75004737EF /* BeautyManager.swift in Sources */,
 				E357354629EFD719009D54E1 /* VLOnLineListVC.m in Sources */,
 				DD619A7029E3E247008F63E4 /* SAPresentationAnimation.swift in Sources */,
-				DD1603442963CAFD00182A04 /* AgoraEntLog.swift in Sources */,
 				DD619BB129E3E262008F63E4 /* VoiceRoomViewController+Mic.swift in Sources */,
 				DD0292D6295BF0DC00485225 /* VLBadNetWorkView.m in Sources */,
 				DD619BEA29E3E262008F63E4 /* PopTip+Transitions.swift in Sources */,
@@ -4003,13 +3373,10 @@
 				DD619AC229E3E247008F63E4 /* SASendGiftCell.swift in Sources */,
 				DD619AAD29E3E247008F63E4 /* SAChatView.swift in Sources */,
 				DD619BF129E3E262008F63E4 /* VMEQSettingView.swift in Sources */,
-				DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */,
 				DD619BF529E3E262008F63E4 /* VoiceRoomInviteCell.swift in Sources */,
-				DD619B9B29E3E262008F63E4 /* UIViewToastExtension.swift in Sources */,
 				DD619BD829E3E262008F63E4 /* PopTip+Draw.swift in Sources */,
 				DD619A7529E3E247008F63E4 /* SAPresentedViewType.swift in Sources */,
 				DD619B7F29E3E262008F63E4 /* VoiceRoomBusinessApi.swift in Sources */,
-				DDA199FB28FFE579009D3E61 /* UIColor+JKGradient.m in Sources */,
 				E32C7EA92A20B03F00512523 /* ShowDebugPrivateParamsVC.swift in Sources */,
 				DD619AE329E3E247008F63E4 /* SAEmptyView.swift in Sources */,
 				DD0292D5295BF0DC00485225 /* VLSoundEffectView.m in Sources */,
@@ -4018,12 +3385,10 @@
 				DD0292CD295BF0DC00485225 /* VLMicSeatCell.m in Sources */,
 				DD0292E4295BF0DC00485225 /* VLKTVSwitcherView.m in Sources */,
 				DD84178E29090C520026B624 /* VLLoginInputVerifyCodeView.m in Sources */,
-				DD619B9629E3E262008F63E4 /* Notification+Presentation.swift in Sources */,
 				DD619A6E29E3E247008F63E4 /* SACrossDissolveAnimation.swift in Sources */,
 				E36EC8B52A663A600089A374 /* AEACategoryView.swift in Sources */,
 				DD0292E7295BF0DC00485225 /* VLKTVKindsView.m in Sources */,
 				DD3610A029B70CDC00CE7984 /* ShowMusicEffectCell.swift in Sources */,
-				DD619B9329E3E262008F63E4 /* VRVerifyCodeTextView.swift in Sources */,
 				DD84178229090C520026B624 /* VLDiscoveryView.m in Sources */,
 				DD619A6829E3E247008F63E4 /* SAVerifyCodeTextView.swift in Sources */,
 				DD0292E2295BF0DC00485225 /* VLKTVSettingView.m in Sources */,
@@ -4031,10 +3396,8 @@
 				DD3610C429B70CDC00CE7984 /* ShowApplyView.swift in Sources */,
 				AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */,
 				DD3610C329B70CDC00CE7984 /* ShowApplyAndInviteView.swift in Sources */,
-				DDA19A0A28FFE579009D3E61 /* Screen.swift in Sources */,
 				DD84178329090C520026B624 /* VLAmusementTCell.m in Sources */,
 				DD3610BE29B70CDC00CE7984 /* ShowSettingSliderCell.swift in Sources */,
-				DDA199F128FFE579009D3E61 /* BaseNavigationController.m in Sources */,
 				E3735C8E2A5E7E75004737EF /* BELicenseHelper.mm in Sources */,
 				DD619ACC29E3E247008F63E4 /* SAUserListView.swift in Sources */,
 				DD619A7E29E3E247008F63E4 /* UIImageBundleExtensionSA.swift in Sources */,
@@ -4058,17 +3421,15 @@
 				DD619AB729E3E247008F63E4 /* SANormalRtcView.swift in Sources */,
 				DD3610B829B70CDC00CE7984 /* ShowSettingBaseCell.swift in Sources */,
 				DD36109F29B70CDC00CE7984 /* ShowBaseViewController.swift in Sources */,
-				E3735C342A5E4AFF004737EF /* UITextView+Extension.swift in Sources */,
 				DD619AD529E3E247008F63E4 /* SABaseAlienCollectionViewCell.swift in Sources */,
-				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
 				ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */,
 				DD619BF229E3E262008F63E4 /* AgoraChatRoom3DMoveUserView.swift in Sources */,
 				DD619B9229E3E262008F63E4 /* VRVerifyCodeNumberView.swift in Sources */,
+				E3104A882A97532C00FB3490 /* AUiMoreDialog.swift in Sources */,
 				DD619A8429E3E247008F63E4 /* ActionSheetManager.swift in Sources */,
 				DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */,
 				DD619A9C29E3E247008F63E4 /* SAGiftersViewController.swift in Sources */,
 				E3735C9C2A5E7E75004737EF /* BundleUtil.m in Sources */,
-				DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */,
 				DD619ABA29E3E247008F63E4 /* SAAudioSettingView.swift in Sources */,
 				E3735CB42A5FA785004737EF /* VLRoomListModel.swift in Sources */,
 				DD0292CE295BF0DC00485225 /* VLPopSongList.m in Sources */,
@@ -4082,16 +3443,13 @@
 				DD619B9D29E3E262008F63E4 /* String + Extension.swift in Sources */,
 				DD619BD229E3E262008F63E4 /* VoiceRoomGiftCell.swift in Sources */,
 				DD36106229B70CDC00CE7984 /* ShowMusicModel.swift in Sources */,
-				DDA19A1028FFE579009D3E61 /* VLGlobalHelper.m in Sources */,
 				DD619AD229E3E247008F63E4 /* SASoundSelTableViewCell.swift in Sources */,
-				DDA199E628FFE579009D3E61 /* UIButton+Font.m in Sources */,
 				DD619BF929E3E262008F63E4 /* HorizontalCardView.swift in Sources */,
 				DD36105929B70CDC00CE7984 /* NSString+Show.swift in Sources */,
 				DD619C0029E3E262008F63E4 /* VRRoomMenuBar.swift in Sources */,
 				DD619BF729E3E262008F63E4 /* AgoraChatRoomBaseRtcUserView.swift in Sources */,
 				DD84178A29090C520026B624 /* VLMainRootViewController.m in Sources */,
 				DD619B9F29E3E262008F63E4 /* VoiceRoomIMManager.swift in Sources */,
-				DD220BC9295B48FD00F57F30 /* QMUIHelper.m in Sources */,
 				DD619ACB29E3E247008F63E4 /* SAMicVolView.swift in Sources */,
 				E357354829EFD719009D54E1 /* VLCreateRoomViewController.m in Sources */,
 				DD619BF429E3E262008F63E4 /* VoiceRoomUserView.swift in Sources */,
@@ -4101,7 +3459,6 @@
 				DD619AD929E3E247008F63E4 /* SAPopTip+Draw.swift in Sources */,
 				DD619B8F29E3E262008F63E4 /* PresentedViewType.swift in Sources */,
 				DD619A8629E3E247008F63E4 /* SARTCManager.swift in Sources */,
-				DD619B8C29E3E262008F63E4 /* Throttle.swift in Sources */,
 				DD619AD629E3E247008F63E4 /* SAEmojiListView.swift in Sources */,
 				E3735C8B2A5E7E75004737EF /* EffectsLicense.m in Sources */,
 				DD619AC029E3E247008F63E4 /* SAAlertContainer.swift in Sources */,
@@ -4109,7 +3466,6 @@
 				DD619BFA29E3E262008F63E4 /* VREmptyView.swift in Sources */,
 				DD3610C929B70CDC00CE7984 /* AppContext+Show.swift in Sources */,
 				DD619AE229E3E247008F63E4 /* SAHorizontalCardView.swift in Sources */,
-				DDA199FF28FFE579009D3E61 /* NSString+Helper.m in Sources */,
 				DD36106029B70CDC00CE7984 /* UIView+Show.swift in Sources */,
 				DD619AB429E3E247008F63E4 /* SAMuteView.swift in Sources */,
 				DD619BD729E3E262008F63E4 /* VMSliderTableViewCell.swift in Sources */,
@@ -4316,7 +3672,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = JDPG69R49Z;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -4358,7 +3714,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = JDPG69R49Z;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;

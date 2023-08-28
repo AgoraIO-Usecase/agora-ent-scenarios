@@ -6,31 +6,31 @@
 //
 
 import Foundation
-
-class VLRoomSeatModel: VLBaseModel {
+import AgoraCommon
+public class VLRoomSeatModel: VLBaseModel {
     /// 是否是房主
-    @objc var isMaster: Bool = false
+    @objc public var isMaster: Bool = false
     /// 头像
-    @objc var headUrl: String?
+    @objc public var headUrl: String?
     /// userNO
-    @objc var userNo: String?
+    @objc public var userNo: String?
     // rtc uid(rtc join with uid)
-    @objc var rtcUid: String?
+    @objc public var rtcUid: String?
     /// 昵称
-    @objc var name: String?
+    @objc public var name: String?
     /// 在哪个座位
-    @objc var seatIndex: Int = 0
+    @objc public var seatIndex: Int = 0
     /// 合唱歌曲code
-    @objc var chorusSongCode: String?
+    @objc public var chorusSongCode: String?
     /// 是否自己静音
-    @objc var isAudioMuted: Int = 0
+    @objc public var isAudioMuted: Int = 0
     /// 是否开启视频
-    @objc var isVideoMuted: Int = 0
+    @objc public var isVideoMuted: Int = 0
     /// 新增, 判断当前歌曲是否是自己点的
-    @objc var isOwner: Bool = false
+    @objc public var isOwner: Bool = false
 
     /// for sync manager
-    @objc var objectId: String?
+    @objc public var objectId: String?
     
     override init() {
         super.init()

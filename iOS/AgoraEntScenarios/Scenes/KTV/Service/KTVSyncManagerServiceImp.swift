@@ -8,6 +8,7 @@
 import Foundation
 import YYCategories
 import SVProgressHUD
+import AgoraCommon
 
 private let kSceneId = "scene_ktv_3.0.1"
 

@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import AgoraRtcKit
 class BeautyManager: NSObject {
     private static var _sharedManager: BeautyManager?
     static var shareManager: BeautyManager {
@@ -32,6 +32,10 @@ class BeautyManager: NSObject {
         case .sense:
             beautyAPI.beautyRender = SenseBeautyManager.shareManager.render
         }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     var isEnableBeauty: Bool = true {

@@ -7,7 +7,7 @@
 
 import UIKit
 import AgoraRtcKit
-
+import AgoraCommon
 class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     
     var mode: ShowMode?

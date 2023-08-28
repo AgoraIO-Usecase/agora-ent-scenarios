@@ -7,6 +7,7 @@
 
 #import "AgoraEntScenarios-Swift.h"
 @import AgoraRtcKit;
+@import AgoraCommon;
 NS_ASSUME_NONNULL_BEGIN
 
 @interface AppContext (KTV)

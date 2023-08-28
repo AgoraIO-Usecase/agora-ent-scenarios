@@ -12,7 +12,7 @@ import SnapKit
 import SVGAPlayer
 import UIKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 public enum SAROLE_TYPE {
     case owner
     case audience

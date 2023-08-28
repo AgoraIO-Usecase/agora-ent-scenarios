@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import AgoraCommon
 struct ShowBarButtonItem {
     var title: String?
     var image: UIImage?

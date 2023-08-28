@@ -7,7 +7,7 @@
 
 import UIKit
 import Agora_Scene_Utils
-
+import AgoraCommon
 enum ShowApplyAndInviteType: String, CaseIterable {
     case apply
     case invite

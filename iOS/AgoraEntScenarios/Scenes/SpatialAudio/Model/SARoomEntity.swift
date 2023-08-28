@@ -13,8 +13,14 @@ import KakaJSON
     public var cursor: String? // 下一次请求房间列表的cursor
     public var rooms: [SARoomEntity]? // 房间信息数组
 
-    override public required init() {}
-
+    override public required init() {
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }
@@ -45,8 +51,14 @@ import KakaJSON
     
     public var objectId: String?
 
-    override public required init() {}
-
+    override public required init() {
+        super.init()
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }
@@ -61,8 +73,14 @@ import KakaJSON
     
     var objectId: String?
 
-    override public required init() {}
-
+    override public required init() {
+        super.init()
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }
@@ -81,8 +99,14 @@ import KakaJSON
 @objc open class SAUsers: NSObject, Convertible {
     var ranking_list: [SAUser]?
 
-    override public required init() {}
-
+    override public required init() {
+        super.init()
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }
@@ -93,8 +117,14 @@ import KakaJSON
     var mic_info: [SARoomMic]?
     var robotInfo: SARobotAudioInfo = SARobotAudioInfo()
 
-    override public required init() {}
-
+    override public required init() {
+        super.init()
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }

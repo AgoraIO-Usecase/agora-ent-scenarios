@@ -10,7 +10,7 @@ import KakaJSON
 import ZSwiftBaseLib
 import AgoraChat.AgoraChatError
 import AgoraSyncManager
-
+import AgoraCommon
 private let kSceneId = "scene_chatRoom_3.0.1"
 
 

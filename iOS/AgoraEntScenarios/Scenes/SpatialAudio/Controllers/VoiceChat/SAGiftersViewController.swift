@@ -8,7 +8,7 @@
 import KakaJSON
 import UIKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 public class SAGiftersViewController: UITableViewController {
     private var room_id = ""
 
@@ -82,8 +82,14 @@ extension SAGiftersViewController {
 public class SAContributions: NSObject, Convertible {
     var ranking_list: [SAUser]?
 
-    override public required init() {}
-
+    override public required init() {
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }

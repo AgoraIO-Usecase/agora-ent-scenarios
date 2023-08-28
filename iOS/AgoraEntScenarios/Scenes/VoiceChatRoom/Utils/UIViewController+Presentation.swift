@@ -6,13 +6,13 @@
 //
 
 import Foundation
-
+import AgoraCommon
 /// 遵守PresentationViewType协议的UIViewController
 public typealias PresentationViewController = UIViewController & PresentedViewType
 
 extension VRBaseViewController {
     /// 自定义present方法
-    func presentViewController(_ viewController: PresentationViewController, animated: Bool = true) {
+    public func presentViewController(_ viewController: PresentationViewController, animated: Bool = true) {
         dismiss(animated: false)
         viewController.modalPresentationStyle = .custom
         viewController.transitioningDelegate = self

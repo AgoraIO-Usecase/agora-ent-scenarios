@@ -21,8 +21,14 @@ public final class SALanguageManager: NSObject {
 
     static let shared = SALanguageManager()
 
-    override private init() {}
-
+    override private init() {
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     lazy var bundle: Bundle = {
         guard let bundlePath = Bundle.main.path(forResource: "SpatialAudioResource", ofType: "bundle"), let bundle = Bundle(path: bundlePath) else {
             assertionFailure("vrcm bundle == nil")

@@ -54,13 +54,13 @@ import Foundation
 }
 
 @objcMembers
-class ShowBaseInfo: NSObject {
+public class ShowBaseInfo: NSObject {
     var objectId: String?    //SyncManager获取到的对象带的唯一标识，用于差改删
 }
 
 /// 房间列表信息
 @objcMembers
-class ShowRoomListModel: ShowBaseInfo {
+public class ShowRoomListModel: ShowBaseInfo {
     var roomId: String = ""                                //房间号
     var roomName: String?                              //房间名
     var roomUserCount: Int = 1                         //房间人数

@@ -4,7 +4,7 @@
 //
 
 #import "VLDropOnLineView.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 @import SDWebImage;
 
 @interface VLDropOnLineView ()

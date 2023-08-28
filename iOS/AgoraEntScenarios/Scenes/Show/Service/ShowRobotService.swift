@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import AgoraCommon
 // 机器人相关
 class ShowRobotService {
     

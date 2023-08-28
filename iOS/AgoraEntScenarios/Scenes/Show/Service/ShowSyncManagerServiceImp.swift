@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 import AgoraSyncManager
-
+import AgoraCommon
 private let kSceneId = "scene_show_3.0.1"
 
 private let SYNC_MANAGER_MESSAGE_COLLECTION = "show_message_collection"
@@ -71,7 +71,7 @@ private func agoraPrint(_ message: String) {
     showLogger.info(message, context: "Service")
 }
 
-class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
+public class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     private let uniqueId: String = NSString.withUUID().md5()!
     fileprivate var roomList: [ShowRoomListModel]? {
         set {

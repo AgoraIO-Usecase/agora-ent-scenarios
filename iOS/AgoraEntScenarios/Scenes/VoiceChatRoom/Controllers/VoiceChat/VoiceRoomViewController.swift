@@ -12,7 +12,7 @@ import SnapKit
 import SVGAPlayer
 import UIKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 public enum ROLE_TYPE {
     case owner
     case audience
@@ -69,7 +69,7 @@ class VoiceRoomViewController: VRBaseViewController {
         roomInfo = info
     }
 
-    override func viewWillAppear(_ animated: Bool) {
+    override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigation.isHidden = true
         UIApplication.shared.isIdleTimerDisabled = true

@@ -13,8 +13,14 @@ class SABaseRoomModel: NSObject, Convertible  {
     var password: String = ""
     var soundEffect: Int = 0
     
-    override public required init() {}
-
+    override public required init() {
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }
@@ -28,8 +34,14 @@ class SAVoiceUserModel: NSObject, Convertible  {
     var rtcUid: Int = 0
     var micIndex: Int = 0
     
-    override public required init() {}
-
+    override public required init() {
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }
@@ -40,8 +52,14 @@ class SAUserRankModel: NSObject, Convertible  {
     var name: String?
     var portrait: String = ""
     var amount: Int = 0
-    override public required init() {}
-
+    override public required init() {
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }

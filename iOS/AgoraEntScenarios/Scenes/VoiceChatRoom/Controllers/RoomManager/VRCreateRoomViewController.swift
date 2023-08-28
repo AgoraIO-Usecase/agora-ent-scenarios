@@ -8,13 +8,13 @@
 import SVProgressHUD
 import UIKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 final class VRCreateRoomViewController: VRBaseViewController {
     lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage.sceneImage(name: "roomList", bundleName: "VoiceChatRoomResource")!)
 
     lazy var container: VRCreateRoomView = .init(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: ScreenHeight - ZNavgationHeight))
 
-    override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.addSubViews([background, container])

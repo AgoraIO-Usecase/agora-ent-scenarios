@@ -15,8 +15,14 @@ import KakaJSON
 
     var members: [VRUser]?
 
-    override public required init() {}
-
+    override public required init() {
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }
@@ -42,8 +48,14 @@ import KakaJSON
 
     var members: [VRUser]?
 
-    override public required init() {}
-
+    override public required init() {
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }
@@ -57,8 +69,14 @@ import KakaJSON
 
     var created_at: UInt64?
 
-    override public required init() {}
-
+    override public required init() {
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }

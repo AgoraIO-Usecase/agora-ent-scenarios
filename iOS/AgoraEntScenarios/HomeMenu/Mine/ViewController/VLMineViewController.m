@@ -20,10 +20,9 @@
 #import "MenuUtils.h"
 #import <Photos/Photos.h>
 #import "AgoraEntScenarios-Swift.h"
-#import "AESMacro.h"
+@import AgoraCommon;
 @import Masonry;
 @import LEEAlert;
-
 typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     photoLibrary = 0,
     camera = 1,
@@ -338,7 +337,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 //            VLLoginModel *userInfo = [VLLoginModel vj_modelWithDictionary:response.data];
         }
     } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-        
     }];
 }
 

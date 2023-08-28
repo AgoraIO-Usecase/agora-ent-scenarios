@@ -8,6 +8,7 @@
 import Foundation
 import SVGAPlayer
 import KakaJSON
+import AgoraCommon
 //import ZSwiftBaseLib
 
 extension SARoomViewController {

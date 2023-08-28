@@ -7,7 +7,7 @@
 
 import UIKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 public class SANormalRoomsViewController: UIViewController {
     public var didSelected: ((SARoomEntity) -> Void)?
     
