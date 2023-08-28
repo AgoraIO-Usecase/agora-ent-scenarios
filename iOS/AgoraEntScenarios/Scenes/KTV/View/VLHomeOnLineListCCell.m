@@ -68,6 +68,7 @@
     self.joinBtn.layer.cornerRadius = 12;
     [self.joinBtn setBackgroundColor:UIColorWhite];
     self.joinBtn.layer.masksToBounds = YES;
+    self.joinBtn.accessibilityIdentifier = @"ktv_join_room_button_id";
     [self.joinBtn setTitle:KTVLocalizedString(@"加入") forState:UIControlStateNormal];
     [self.joinBtn setTitleColor:UIColorMakeWithHex(@"#009FFF") forState:UIControlStateNormal];
     self.joinBtn.titleLabel.font = VLUIFontMake(12);

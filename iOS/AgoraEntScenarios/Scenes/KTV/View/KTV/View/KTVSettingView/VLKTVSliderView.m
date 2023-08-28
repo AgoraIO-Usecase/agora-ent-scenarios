@@ -21,6 +21,12 @@
 
 @implementation VLKTVSliderView
 
+- (void)setAccessibilityIdentifier:(NSString *)accessibilityIdentifier {
+    [super setAccessibilityIdentifier:accessibilityIdentifier];
+    self.addButton.accessibilityIdentifier = [NSString stringWithFormat:@"%@_add_button_id", accessibilityIdentifier];
+    self.reduceButton.accessibilityIdentifier = [NSString stringWithFormat:@"%@_reduce_button_id", accessibilityIdentifier];
+}
+
 - (instancetype)initWithMax:(float)max min:(float)min {
     if (self = [super init]) {
         self.max = max;

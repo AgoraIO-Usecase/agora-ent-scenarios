@@ -51,6 +51,9 @@ static VLAlert *_alert = nil;
         self.cancleBtn.hidden = type == ALERTYPECONFIRM;
         self.titleLabel.text = title;
         self.mesLabel.text = message;
+    
+        self.confirmBtn.accessibilityIdentifier = @"ktv_alert_confirm_button_id";
+        self.cancleBtn.accessibilityIdentifier = @"ktv_alert_cancel_button_id";
         
         [self.cancleBtn setTitle:buttonTitles[0] forState:UIControlStateNormal];
         [self.confirmBtn setTitle:buttonTitles[type == ALERTYPECONFIRM ? 0 : 1] forState:UIControlStateNormal];
