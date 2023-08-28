@@ -1132,7 +1132,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                         chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
                                                              type: KTVTypeNormal
                                                         maxCacheSize:10
-                                                        mccDomain: (AppContext.shared.isDebugMode) ? @"api-test.agora.io" : nil
+                                                        musicType:loadMusicTypeMcc
+                                                        isDebugMode: (AppContext.shared.isDebugMode) ? true : false
     ];
     self.ktvApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
     [self.ktvApi renewInnerDataStreamId];
@@ -1142,7 +1143,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.lrcControl.delegate = self;
     VL(weakSelf);
     lrcControl.skipCallBack = ^(NSInteger time, BOOL flag) {
-        NSInteger seekTime = flag ? [weakSelf.ktvApi getMediaPlayer].getDuration - 800 : time;
+        NSInteger seekTime = flag ? [weakSelf.ktvApi getMusicPlayer].getDuration - 800 : time;
         [weakSelf.ktvApi seekSingWithTime:seekTime];
     };
     [self.ktvApi setMicStatusWithIsOnMicOpen:!self.isNowMicMuted];
@@ -1197,7 +1198,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [option setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     [option setAutoSubscribeAudio:YES];
     [option setAutoSubscribeVideo:YES];
-    [option setPublishMediaPlayerId:[[self.ktvApi getMediaPlayer] getMediaPlayerId]];
+    [option setPublishMediaPlayerId:[[self.ktvApi getMusicPlayer] getMediaPlayerId]];
     [option setEnableAudioRecordingOrPlayout:YES];
     return option;
 }
@@ -1219,7 +1220,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 #pragma mark -- VLKTVAPIDelegate
 
 - (void)didLrcViewDragedToPos:(NSInteger)pos score:(NSInteger)score totalScore:(NSInteger)totalScore{
-    [self.ktvApi.getMediaPlayer seekToPosition:pos];
+    [self.ktvApi.getMusicPlayer seekToPosition:pos];
     [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
 }
 
@@ -1531,7 +1532,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)onKTVMView:(VLKTVMVView *)view lrcViewDidScrolled:(NSInteger)position {
-    [[self.ktvApi getMediaPlayer] seekToPosition:position];
+    [[self.ktvApi getMusicPlayer] seekToPosition:position];
 }
 
 - (void)reloadMusic{
@@ -1574,7 +1575,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         // 调整当前播放的媒体资源的音调
         // 按半音音阶调整本地播放的音乐文件的音调，默认值为 0，即不调整音调。取值范围为 [-12,12]，每相邻两个值的音高距离相差半音。取值的绝对值越大，音调升高或降低得越多
         NSInteger value = setting.toneValue * 2 - 12;
-        [[self.ktvApi getMediaPlayer] setAudioPitch:value];
+        [[self.ktvApi getMusicPlayer] setAudioPitch:value];
     } else if (type == VLKTVValueDidChangedTypeSound) { // 音量
         // 调节音频采集信号音量、取值范围为 [0,400]impl
         // 0、静音 100、默认原始音量 400、原始音量的4倍、自带溢出保护
@@ -2087,11 +2088,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     // 调节本地播放音量 取值范围为 [0,100]
     // 0、无声。 100、（默认）媒体文件的原始播放音量
 //    [self.ktvApi adjustPlayoutVolume:playoutVolume];
-    [[self.ktvApi getMediaPlayer] adjustPlayoutVolume:playoutVolume];
+    [[self.ktvApi getMusicPlayer] adjustPlayoutVolume:playoutVolume];
     
     // 调节远端用户听到的音量 取值范围[0、400]
     // 100: （默认）媒体文件的原始音量。400: 原始音量的四倍（自带溢出保护）
-    [[self.ktvApi getMediaPlayer] adjustPublishSignalVolume:playoutVolume];
+    [[self.ktvApi getMusicPlayer] adjustPublishSignalVolume:playoutVolume];
     
     //update ui
     [self.settingView setAccValue: (float)playoutVolume / 100.0];
@@ -2145,7 +2146,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //    [[self.ktvApi getMediaPlayer] selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1];
 //
     [self.MVView setOriginBtnState: trackMode == KTVPlayerTrackModeOrigin ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc];
-    [[self.ktvApi getMediaPlayer] selectMultiAudioTrack:trackMode == KTVPlayerTrackModeAcc ? 1 : 0 publishTrackIndex:trackMode == KTVPlayerTrackModeOrigin ? 0 : 1 ];
+    [[self.ktvApi getMusicPlayer] selectMultiAudioTrack:trackMode == KTVPlayerTrackModeAcc ? 1 : 0 publishTrackIndex:trackMode == KTVPlayerTrackModeOrigin ? 0 : 1 ];
     VLKTVMVViewActionType type = VLKTVMVViewActionTypeSingAcc;
     switch (trackMode) {
         case KTVPlayerTrackModeOrigin:

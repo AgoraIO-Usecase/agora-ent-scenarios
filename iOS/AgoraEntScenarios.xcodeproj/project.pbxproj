@@ -564,6 +564,17 @@
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
+		E3104A7A2A974E1D00FB3490 /* AgoraSyncManagerLocal.podspec in Resources */ = {isa = PBXBuildFile; fileRef = E3104A6B2A974E1D00FB3490 /* AgoraSyncManagerLocal.podspec */; };
+		E3104A7B2A974E1D00FB3490 /* AgoraSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3104A6D2A974E1D00FB3490 /* AgoraSyncManager.swift */; };
+		E3104A7C2A974E1D00FB3490 /* RtmSyncManager+Info.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3104A6F2A974E1D00FB3490 /* RtmSyncManager+Info.swift */; };
+		E3104A7D2A974E1D00FB3490 /* RtmSyncManager+ISyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3104A702A974E1D00FB3490 /* RtmSyncManager+ISyncManager.swift */; };
+		E3104A7E2A974E1D00FB3490 /* RethinkSyncManager+ISyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3104A722A974E1D00FB3490 /* RethinkSyncManager+ISyncManager.swift */; };
+		E3104A7F2A974E1D00FB3490 /* RethinkSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3104A732A974E1D00FB3490 /* RethinkSyncManager.swift */; };
+		E3104A802A974E1D00FB3490 /* Protocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3104A742A974E1D00FB3490 /* Protocols.swift */; };
+		E3104A812A974E1D00FB3490 /* CollectionReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3104A752A974E1D00FB3490 /* CollectionReference.swift */; };
+		E3104A822A974E1D00FB3490 /* DocumentReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3104A762A974E1D00FB3490 /* DocumentReference.swift */; };
+		E3104A832A974E1D00FB3490 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3104A782A974E1D00FB3490 /* Models.swift */; };
+		E3104A842A974E1D00FB3490 /* AgoraSyncManager.podspec in Resources */ = {isa = PBXBuildFile; fileRef = E3104A792A974E1D00FB3490 /* AgoraSyncManager.podspec */; };
 		E32C7EA92A20B03F00512523 /* ShowDebugPrivateParamsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E32C7EA82A20B03F00512523 /* ShowDebugPrivateParamsVC.swift */; };
 		E357353929EFD35B009D54E1 /* KTVSkipView.m in Sources */ = {isa = PBXBuildFile; fileRef = E357353829EFD35B009D54E1 /* KTVSkipView.m */; };
 		E357353E29EFD631009D54E1 /* VLAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E357353C29EFD631009D54E1 /* VLAlert.m */; };
@@ -588,11 +599,11 @@
 		E36B41C52A2453610034FACF /* VLVoiceShowView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36B41C32A2453610034FACF /* VLVoiceShowView.m */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
 		E3735C342A5E4AFF004737EF /* UITextView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */; };
-		E3735CB92A5FD881004737EF /* KTVApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CB72A5FD881004737EF /* KTVApiImpl.swift */; };
-		E3735CBA2A5FD881004737EF /* KTVApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CB82A5FD881004737EF /* KTVApi.swift */; };
 		E3BA36DA2A2DC17D00ACD073 /* HeadSetManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E3BA36D92A2DC17D00ACD073 /* HeadSetManager.m */; };
 		E3BA36DD2A2DCD8400ACD073 /* VLEarSettingView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3BA36DC2A2DCD8400ACD073 /* VLEarSettingView.m */; };
 		E3C82AD12A28A8E600728550 /* EffectCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E3C82AD02A28A8E600728550 /* EffectCollectionViewCell.m */; };
+		E3CB4D6B2A962ECE00322389 /* KTVApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3CB4D692A962ECE00322389 /* KTVApi.swift */; };
+		E3CB4D6C2A962ECE00322389 /* KTVApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3CB4D6A2A962ECE00322389 /* KTVApiImpl.swift */; };
 		E751D85D29F11723001354CA /* AUiMoreDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E751D85C29F11723001354CA /* AUiMoreDialog.swift */; };
 /* End PBXBuildFile section */
 
@@ -1326,6 +1337,17 @@
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
 		DDDDDB3428FFD78B005F4E8B /* AppContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppContext.swift; sourceTree = "<group>"; };
 		DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneLocalizedString.swift; sourceTree = "<group>"; };
+		E3104A6B2A974E1D00FB3490 /* AgoraSyncManagerLocal.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AgoraSyncManagerLocal.podspec; sourceTree = "<group>"; };
+		E3104A6D2A974E1D00FB3490 /* AgoraSyncManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraSyncManager.swift; sourceTree = "<group>"; };
+		E3104A6F2A974E1D00FB3490 /* RtmSyncManager+Info.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RtmSyncManager+Info.swift"; sourceTree = "<group>"; };
+		E3104A702A974E1D00FB3490 /* RtmSyncManager+ISyncManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RtmSyncManager+ISyncManager.swift"; sourceTree = "<group>"; };
+		E3104A722A974E1D00FB3490 /* RethinkSyncManager+ISyncManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RethinkSyncManager+ISyncManager.swift"; sourceTree = "<group>"; };
+		E3104A732A974E1D00FB3490 /* RethinkSyncManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RethinkSyncManager.swift; sourceTree = "<group>"; };
+		E3104A742A974E1D00FB3490 /* Protocols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Protocols.swift; sourceTree = "<group>"; };
+		E3104A752A974E1D00FB3490 /* CollectionReference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionReference.swift; sourceTree = "<group>"; };
+		E3104A762A974E1D00FB3490 /* DocumentReference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentReference.swift; sourceTree = "<group>"; };
+		E3104A782A974E1D00FB3490 /* Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		E3104A792A974E1D00FB3490 /* AgoraSyncManager.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AgoraSyncManager.podspec; sourceTree = "<group>"; };
 		E32C7EA82A20B03F00512523 /* ShowDebugPrivateParamsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugPrivateParamsVC.swift; sourceTree = "<group>"; };
 		E357353729EFD35B009D54E1 /* KTVSkipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KTVSkipView.h; sourceTree = "<group>"; };
 		E357353829EFD35B009D54E1 /* KTVSkipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KTVSkipView.m; sourceTree = "<group>"; };
@@ -1365,14 +1387,14 @@
 		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
 		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
 		E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Extension.swift"; sourceTree = "<group>"; };
-		E3735CB72A5FD881004737EF /* KTVApiImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApiImpl.swift; sourceTree = "<group>"; };
-		E3735CB82A5FD881004737EF /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
 		E3BA36D82A2DC17D00ACD073 /* HeadSetManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HeadSetManager.h; sourceTree = "<group>"; };
 		E3BA36D92A2DC17D00ACD073 /* HeadSetManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HeadSetManager.m; sourceTree = "<group>"; };
 		E3BA36DB2A2DCD8400ACD073 /* VLEarSettingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLEarSettingView.h; sourceTree = "<group>"; };
 		E3BA36DC2A2DCD8400ACD073 /* VLEarSettingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLEarSettingView.m; sourceTree = "<group>"; };
 		E3C82ACF2A28A8E600728550 /* EffectCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EffectCollectionViewCell.h; sourceTree = "<group>"; };
 		E3C82AD02A28A8E600728550 /* EffectCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EffectCollectionViewCell.m; sourceTree = "<group>"; };
+		E3CB4D692A962ECE00322389 /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
+		E3CB4D6A2A962ECE00322389 /* KTVApiImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApiImpl.swift; sourceTree = "<group>"; };
 		E751D85C29F11723001354CA /* AUiMoreDialog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiMoreDialog.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -3263,6 +3285,7 @@
 		DDA1994D28FFE579009D3E61 /* Manager */ = {
 			isa = PBXGroup;
 			children = (
+				E3104A6A2A974E1D00FB3490 /* AgoraSyncManager */,
 				DD6199CA29E3D36D008F63E4 /* Authorized */,
 				DDA1994E28FFE579009D3E61 /* NetworkManager */,
 				DDA1995328FFE579009D3E61 /* VLDefine */,
@@ -3327,11 +3350,61 @@
 			path = Context;
 			sourceTree = "<group>";
 		};
+		E3104A6A2A974E1D00FB3490 /* AgoraSyncManager */ = {
+			isa = PBXGroup;
+			children = (
+				E3104A6B2A974E1D00FB3490 /* AgoraSyncManagerLocal.podspec */,
+				E3104A6C2A974E1D00FB3490 /* SyncManager */,
+				E3104A772A974E1D00FB3490 /* Objects */,
+				E3104A792A974E1D00FB3490 /* AgoraSyncManager.podspec */,
+			);
+			path = AgoraSyncManager;
+			sourceTree = "<group>";
+		};
+		E3104A6C2A974E1D00FB3490 /* SyncManager */ = {
+			isa = PBXGroup;
+			children = (
+				E3104A6D2A974E1D00FB3490 /* AgoraSyncManager.swift */,
+				E3104A6E2A974E1D00FB3490 /* RtmManager */,
+				E3104A712A974E1D00FB3490 /* RethinkDB */,
+				E3104A742A974E1D00FB3490 /* Protocols.swift */,
+				E3104A752A974E1D00FB3490 /* CollectionReference.swift */,
+				E3104A762A974E1D00FB3490 /* DocumentReference.swift */,
+			);
+			path = SyncManager;
+			sourceTree = "<group>";
+		};
+		E3104A6E2A974E1D00FB3490 /* RtmManager */ = {
+			isa = PBXGroup;
+			children = (
+				E3104A6F2A974E1D00FB3490 /* RtmSyncManager+Info.swift */,
+				E3104A702A974E1D00FB3490 /* RtmSyncManager+ISyncManager.swift */,
+			);
+			path = RtmManager;
+			sourceTree = "<group>";
+		};
+		E3104A712A974E1D00FB3490 /* RethinkDB */ = {
+			isa = PBXGroup;
+			children = (
+				E3104A722A974E1D00FB3490 /* RethinkSyncManager+ISyncManager.swift */,
+				E3104A732A974E1D00FB3490 /* RethinkSyncManager.swift */,
+			);
+			path = RethinkDB;
+			sourceTree = "<group>";
+		};
+		E3104A772A974E1D00FB3490 /* Objects */ = {
+			isa = PBXGroup;
+			children = (
+				E3104A782A974E1D00FB3490 /* Models.swift */,
+			);
+			path = Objects;
+			sourceTree = "<group>";
+		};
 		E357354929EFD74A009D54E1 /* KTVAPI */ = {
 			isa = PBXGroup;
 			children = (
-				E3735CB82A5FD881004737EF /* KTVApi.swift */,
-				E3735CB72A5FD881004737EF /* KTVApiImpl.swift */,
+				E3CB4D692A962ECE00322389 /* KTVApi.swift */,
+				E3CB4D6A2A962ECE00322389 /* KTVApiImpl.swift */,
 			);
 			path = KTVAPI;
 			sourceTree = "<group>";
@@ -3484,7 +3557,9 @@
 				DD84177429090C520026B624 /* product3.png in Resources */,
 				DD84177729090C520026B624 /* entertainment.html in Resources */,
 				DD84179029090C520026B624 /* Media.xcassets in Resources */,
+				E3104A842A974E1D00FB3490 /* AgoraSyncManager.podspec in Resources */,
 				DD84176229090C520026B624 /* index.html in Resources */,
+				E3104A7A2A974E1D00FB3490 /* AgoraSyncManagerLocal.podspec in Resources */,
 				DD2A43D428FFCEE7004CEDCF /* Assets.xcassets in Resources */,
 				DD84177829090C520026B624 /* entertainment.js in Resources */,
 				E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */,
@@ -3590,6 +3665,7 @@
 				DD619A7429E3E247008F63E4 /* SAPresentationEnums.swift in Sources */,
 				DD619BB429E3E262008F63E4 /* VoiceRoomViewController+IM.swift in Sources */,
 				DD619BA429E3E262008F63E4 /* VoiceRoomGiftEntity.swift in Sources */,
+				E3104A7D2A974E1D00FB3490 /* RtmSyncManager+ISyncManager.swift in Sources */,
 				DDA199E128FFE579009D3E61 /* VLToast.m in Sources */,
 				DD619ABD29E3E247008F63E4 /* SAApplyAlert.swift in Sources */,
 				E357355D29EFD74A009D54E1 /* AgoraMiguXmlLrcParse.swift in Sources */,
@@ -3615,6 +3691,7 @@
 				DD3610B929B70CDC00CE7984 /* ShowSettingSwitchCell.swift in Sources */,
 				DD619BE929E3E262008F63E4 /* AgoraChatRoomNormalRtcView.swift in Sources */,
 				DD619ADD29E3E247008F63E4 /* SAPopTip.swift in Sources */,
+				E3104A7C2A974E1D00FB3490 /* RtmSyncManager+Info.swift in Sources */,
 				DD3610B529B70CDC00CE7984 /* ShowSettingLabelCell.swift in Sources */,
 				DD619B9529E3E262008F63E4 /* Xcode14.m in Sources */,
 				DD36106329B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift in Sources */,
@@ -3691,6 +3768,7 @@
 				DD36106729B70CDC00CE7984 /* ShowAgoraKitManager+DebugSetting.swift in Sources */,
 				DD36107529B70CDC00CE7984 /* BEResourceHelper.m in Sources */,
 				DD619A8A29E3E247008F63E4 /* SAChatModel.swift in Sources */,
+				E3104A7E2A974E1D00FB3490 /* RethinkSyncManager+ISyncManager.swift in Sources */,
 				DD619ADA29E3E247008F63E4 /* SAInputBar.swift in Sources */,
 				DD619BAA29E3E262008F63E4 /* ChatRoomServiceImp.swift in Sources */,
 				DD36106129B70CDC00CE7984 /* ShowMusicManager.swift in Sources */,
@@ -3723,10 +3801,12 @@
 				DD619BCB29E3E262008F63E4 /* PopTip.swift in Sources */,
 				DD619BCE29E3E262008F63E4 /* AgoraChatRoomBaseUserCollectionViewCell.swift in Sources */,
 				DD619BA629E3E262008F63E4 /* VRRoomEntity.swift in Sources */,
+				E3CB4D6B2A962ECE00322389 /* KTVApi.swift in Sources */,
 				DD619BA929E3E262008F63E4 /* VoiceRoomChatModel.swift in Sources */,
 				DD619A7629E3E247008F63E4 /* SALanagerManager.swift in Sources */,
 				DD619AA329E3E247008F63E4 /* SACreateRoomViewController.swift in Sources */,
 				DD619BC529E3E262008F63E4 /* VRRoomMenuBarCell.swift in Sources */,
+				E3104A7F2A974E1D00FB3490 /* RethinkSyncManager.swift in Sources */,
 				DDA199F228FFE579009D3E61 /* UIViewController+VL.m in Sources */,
 				DD36109B29B70CDC00CE7984 /* AEACategoryView.m in Sources */,
 				DD36107729B70CDC00CE7984 /* ByteBeautyManager.swift in Sources */,
@@ -3779,6 +3859,7 @@
 				DD619ACD29E3E247008F63E4 /* SABaseUserCollectionViewCell.swift in Sources */,
 				053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */,
 				DD619B9729E3E262008F63E4 /* UIColor+extension.swift in Sources */,
+				E3104A812A974E1D00FB3490 /* CollectionReference.swift in Sources */,
 				DD619BE029E3E262008F63E4 /* VMUpstageView.swift in Sources */,
 				DD619B8929E3E262008F63E4 /* FlipHorizontalAnimation.swift in Sources */,
 				DD3610BD29B70CDC00CE7984 /* ShowPresettingCell.swift in Sources */,
@@ -3840,6 +3921,7 @@
 				DD619ABB29E3E247008F63E4 /* SAVMManagerView.swift in Sources */,
 				DD619BC329E3E262008F63E4 /* VRRoomListCell.swift in Sources */,
 				DD619BEC29E3E262008F63E4 /* VoiceRoomAlertContainer.swift in Sources */,
+				E3CB4D6C2A962ECE00322389 /* KTVApiImpl.swift in Sources */,
 				DDA19A0528FFE579009D3E61 /* NSObject+JKAppInfo.m in Sources */,
 				DD619AE529E3E247008F63E4 /* SARoomCreateView.swift in Sources */,
 				DD5EBDC6299F230100F36349 /* KTVDebugViewController.m in Sources */,
@@ -3855,6 +3937,7 @@
 				DD619A8129E3E247008F63E4 /* UIButtonLayoutExtensionSA.swift in Sources */,
 				DD0292CC295BF0DC00485225 /* VLSelectedSongListCell.m in Sources */,
 				DD36108329B70CDC00CE7984 /* EffectsProcess.m in Sources */,
+				E3104A822A974E1D00FB3490 /* DocumentReference.swift in Sources */,
 				DD619AD029E3E247008F63E4 /* SAANISSetTableViewCell.swift in Sources */,
 				DDA199E228FFE579009D3E61 /* VLCommonWebViewController.m in Sources */,
 				E357356A29EFD8B5009D54E1 /* VLSoundEffectView.m in Sources */,
@@ -3863,7 +3946,6 @@
 				DD619A8729E3E247008F63E4 /* SAServiceModel.swift in Sources */,
 				DD9E545C2994FFF2007CB3C0 /* VLKTVRemoteVolumeView.m in Sources */,
 				DD619A6D29E3E247008F63E4 /* SAPageContainer.swift in Sources */,
-				E3735CBA2A5FD881004737EF /* KTVApi.swift in Sources */,
 				DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */,
 				DD0292C9295BF0DC00485225 /* VLKTVSelBgModel.m in Sources */,
 				DD619AB329E3E247008F63E4 /* SAConfirmView.swift in Sources */,
@@ -3961,6 +4043,7 @@
 				DD619A9329E3E247008F63E4 /* SABaseViewController.swift in Sources */,
 				DD0292F3295BF0DC00485225 /* KTVServiceModel.m in Sources */,
 				DD619B9929E3E262008F63E4 /* UIButton+Extension.swift in Sources */,
+				E3104A802A974E1D00FB3490 /* Protocols.swift in Sources */,
 				DD0292DE295BF0DC00485225 /* VLPopOnLineTypeView.m in Sources */,
 				DD619ABC29E3E247008F63E4 /* SAChatCell.swift in Sources */,
 				DD36106529B70CDC00CE7984 /* ShowChatModel.swift in Sources */,
@@ -3993,6 +4076,7 @@
 				DD619BDD29E3E262008F63E4 /* VoiceRoomChatBar.swift in Sources */,
 				DDA199FE28FFE579009D3E61 /* UIDevice+JKHardware.m in Sources */,
 				DD619AB629E3E247008F63E4 /* SA3DMoveUserView.swift in Sources */,
+				E3104A7B2A974E1D00FB3490 /* AgoraSyncManager.swift in Sources */,
 				E357356929EFD8B5009D54E1 /* VLEffectView.m in Sources */,
 				DD619BC929E3E262008F63E4 /* VREQOperationAlert.swift in Sources */,
 				DD619A7829E3E247008F63E4 /* SAPresentationController.swift in Sources */,
@@ -4048,7 +4132,6 @@
 				DD619A6629E3E247008F63E4 /* SABusinessApi.swift in Sources */,
 				DD3610C429B70CDC00CE7984 /* ShowApplyView.swift in Sources */,
 				DD3610C329B70CDC00CE7984 /* ShowApplyAndInviteView.swift in Sources */,
-				E3735CB92A5FD881004737EF /* KTVApiImpl.swift in Sources */,
 				DD36107829B70CDC00CE7984 /* BundleUtil.m in Sources */,
 				DDA19A0A28FFE579009D3E61 /* Screen.swift in Sources */,
 				DD84178329090C520026B624 /* VLAmusementTCell.m in Sources */,
@@ -4126,6 +4209,7 @@
 				DD36106029B70CDC00CE7984 /* UIView+Show.swift in Sources */,
 				DD619AB429E3E247008F63E4 /* SAMuteView.swift in Sources */,
 				DD619BD729E3E262008F63E4 /* VMSliderTableViewCell.swift in Sources */,
+				E3104A832A974E1D00FB3490 /* Models.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
