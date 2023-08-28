@@ -939,20 +939,23 @@ object VideoSetting {
             val fps = frameRate ?: return
             val enableSVC = svc ?: return
 
+            // 1、小流开SVC需要软编码，关SVC改为硬编码
+            // 2、小流开启的私有参数需要在setDualStreamModeEx前设置
+            if (enableSVC) {
+                rtcEngine.setParameters("\"che.video.minor_stream_num_temporal_layers\": 2")
+                rtcEngine.setParameters("\"rtc.video.high_low_video_ratio_enabled\": true")
+                rtcEngine.setParameters("\"che.video.enable_264_fix_svc_nego\": false")
+                rtcEngine.setParameters("\"rtc.video.low_stream_enable_hw_encoder\": false")
+            } else {
+                rtcEngine.setParameters("\"rtc.video.high_low_video_ratio_enabled\": false")
+                rtcEngine.setParameters("\"rtc.video.low_stream_enable_hw_encoder\": true")
+            }
+
             rtcEngine.setDualStreamModeEx(
                 Constants.SimulcastStreamMode.ENABLE_SIMULCAST_STREAM, SimulcastStreamConfig(
                     VideoEncoderConfiguration.VideoDimensions(
                         resolution.width, resolution.height
                 ), br, fps.fps), connection)
-
-            // 1、SVC必须在enableDualStreamModeEx后设置才生效
-            // 2、小流开SVC默认软编码
-            if (enableSVC) {
-                rtcEngine.setParameters("\"che.video.minor_stream_num_temporal_layers\": 2")
-                rtcEngine.setParameters("\"rtc.video.high_low_video_ratio_enabled\": true")
-            } else {
-                rtcEngine.setParameters("\"rtc.video.high_low_video_ratio_enabled\": false")
-            }
 
         } else {
             rtcEngine.setDualStreamModeEx(Constants.SimulcastStreamMode.DISABLE_SIMULCAST_STREAM,SimulcastStreamConfig(), connection)
