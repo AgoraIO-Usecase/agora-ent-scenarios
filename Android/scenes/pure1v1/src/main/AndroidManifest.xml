@@ -17,6 +17,7 @@
             android:name=".ui.CallDetailActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:launchMode="singleTask"
             android:theme="@style/Pure1v1Theme.NoActionBar" />
         <activity
             android:name=".ui.RoomListActivity"

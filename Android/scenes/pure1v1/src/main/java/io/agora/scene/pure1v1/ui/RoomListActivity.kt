@@ -3,12 +3,14 @@ package io.agora.scene.pure1v1.ui
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.nfc.Tag
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.ScaleAnimation
@@ -23,8 +25,10 @@ import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.GlideOptions
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
+import io.agora.scene.pure1v1.Pure1v1Logger
 import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.callAPI.*
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListActivityBinding
@@ -36,13 +40,11 @@ import io.agora.scene.widget.utils.BlurTransformation
 import org.json.JSONException
 import org.json.JSONObject
 
-class RoomListActivity : AppCompatActivity(), ICallApiListener {
+class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>(), ICallApiListener {
 
     private val tag = "RoomListActivity_LOG"
 
     private val kRoomListSwipeGuide = "io.agora.RoomListSwipeGuide"
-
-    private lateinit var binding: Pure1v1RoomListActivityBinding
 
     private var adapter: RoomListAdapter? = null
 
@@ -52,6 +54,10 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
 
     private var callDialog: CallDialog? = null
 
+    override fun getViewBinding(inflater: LayoutInflater): Pure1v1RoomListActivityBinding {
+       return Pure1v1RoomListActivityBinding.inflate(inflater)
+    }
+
     override fun onDestroy() {
         CallServiceManager.instance.cleanUp()
         super.onDestroy()
@@ -59,9 +65,7 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = Pure1v1RoomListActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setupView()
 
         CallServiceManager.instance.setup(this)
@@ -84,16 +88,17 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
         binding.ivRefresh.isEnabled = false
         CallServiceManager.instance.sceneService?.getUserList { list ->
             Toast.makeText(this, getText(R.string.pure1v1_room_list_refresh), Toast.LENGTH_SHORT).show()
-            Handler().postDelayed({
+            binding.ivRefresh.postDelayed({
                 binding.ivRefresh.clearAnimation()
                 binding.ivRefresh.isEnabled = true
-            }, 1000)
+            },1000)
+
             dataList = list.filter { it.userId != CallServiceManager.instance.localUser?.userId}
             adapter?.refresh(dataList)
             if (dataList.size > 1) {
                 // 设置无限轮播中间位置
                 binding.viewPager2.setCurrentItem(
-                    ((Int.MAX_VALUE / 2) / list.size) * list.size,
+                    ((Int.MAX_VALUE / 2) / (dataList.size)) * dataList.size,
                     false
                 )
             }
@@ -244,6 +249,14 @@ class RoomListActivity : AppCompatActivity(), ICallApiListener {
             }
             else -> {
             }
+        }
+    }
+
+    override fun onCallLogger(tag: String, level: Int, message: String) {
+        when (level) {
+            Log.ERROR -> Pure1v1Logger.e(tag, message)
+            Log.WARN -> Pure1v1Logger.w(tag, message)
+            else -> Pure1v1Logger.d(tag, message)
         }
     }
 
