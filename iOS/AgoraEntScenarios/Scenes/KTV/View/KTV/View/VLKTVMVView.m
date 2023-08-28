@@ -627,6 +627,7 @@
     if (!_settingBtn) {
         _settingBtn = [[VLHotSpotBtn alloc] init];
         [_settingBtn setImage:[UIImage sceneImageWithName:@"ktv_subtitle_icon"] forState:UIControlStateNormal];
+        _settingBtn.accessibilityIdentifier = @"ktv_room_setting_button_id";
         [self.settingBtn setTitle:@"调音" forState:UIControlStateNormal];
         [self.settingBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.settingBtn.titleLabel.font = UIFontMake(10.0);
