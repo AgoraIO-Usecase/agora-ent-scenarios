@@ -24,7 +24,7 @@ open class CallConfig(
     var userId: Int = 0,
     //用户扩展字段,用在呼叫上，对端收到calling时可以通过kFromUserExtension字段读到
     var userExtension: Map<String, Any>? = null,
-    //房主房间id，秀场转1v1可用
+    //房主房间id，秀场转1v1可用，用于订阅房主频道
     var ownerRoomId: String? = null,
     //rtc engine实例
     var rtcEngine: RtcEngineEx? = null,
@@ -132,7 +132,7 @@ enum class CallStateType(val value: Int) {
     }
 }
 
-public interface ICallApiListener {
+interface ICallApiListener {
     /**
      * 状态响应回调
      * @param state 状态类型
@@ -169,7 +169,7 @@ data class AGError(
     val code: Int
 )
 
-public interface ICallApi {
+interface ICallApi {
 
     // 初始化配置
     fun initialize(config: CallConfig, token: CallTokenConfig, completion: ((AGError?) -> Unit))

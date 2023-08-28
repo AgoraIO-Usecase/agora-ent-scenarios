@@ -14,7 +14,8 @@ import io.agora.syncmanager.rtm.Sync
 import io.agora.syncmanager.rtm.SyncManagerException
 import kotlin.random.Random
 
-class ShowTo1v1ServiceImpl constructor(private val errorHandler: ((Exception?) -> Unit)?) : ShowTo1v1ServiceProtocol {
+class ShowTo1v1ServiceImpl constructor(private val user: UserInfo, private val errorHandler: ((Exception?) -> Unit)?) :
+    ShowTo1v1ServiceProtocol {
 
     companion object {
         private const val TAG = "Show1v1_LOG"

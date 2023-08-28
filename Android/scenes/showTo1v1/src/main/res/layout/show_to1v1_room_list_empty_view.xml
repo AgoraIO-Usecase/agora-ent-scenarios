@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/emptyRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_constraintTop_toTopOf="parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    app:layout_constraintTop_toTopOf="parent">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
         android:src="@drawable/show_to1v1_bg" />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -16,9 +16,9 @@
         android:layout_height="match_parent"
         android:layout_marginTop="44dp"
         android:src="@drawable/show_to1v1_empty"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/vContent"
@@ -40,12 +40,12 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="30dp"
+        android:text="@string/show_to1v1_room_list_empty_title"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:text="@string/show_to1v1_room_list_empty_title"
-        android:layout_marginStart="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/vContent" />
 
@@ -56,26 +56,31 @@
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="14dp"
         android:lineSpacingExtra="3dp"
-        android:textSize="16sp"
-        android:textColor="#363B4E"
         android:text="@string/show_to1v1_room_list_empty_content"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textColor="#363B4E"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnCreateRoom"
+    <LinearLayout
+        android:id="@+id/layoutCreateRoom"
         android:layout_width="175dp"
         android:layout_height="42dp"
         android:layout_marginTop="40dp"
         android:background="@drawable/bg_def_button_solid"
-        android:drawableStart="@mipmap/icon_create_room"
-        android:gravity="center_vertical"
-        android:paddingStart="30dp"
-        android:text="@string/show_to1v1_create_room"
-        android:textColor="@color/white"
+        android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvContent" />
+        app:layout_constraintTop_toBottomOf="@id/tvContent">
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@mipmap/icon_create_room"
+            android:drawablePadding="5dp"
+            android:text="@string/show_to1v1_create_room"
+            android:textColor="@color/white" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

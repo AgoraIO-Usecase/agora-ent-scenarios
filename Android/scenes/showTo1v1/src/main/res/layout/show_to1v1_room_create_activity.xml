@@ -18,7 +18,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginTop="30dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="15dp"
         android:src="@drawable/show_to1v1_detail_close"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="34dp"
             android:text="@string/show_to1v1_room_name"
             android:textColor="@color/black"
             android:textSize="16sp"
@@ -83,35 +83,27 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/etRoomName" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnCreateRoom"
+        <LinearLayout
+            android:id="@+id/layoutRoomCreating"
             android:layout_width="match_parent"
             android:layout_height="42dp"
             android:layout_marginHorizontal="30dp"
             android:layout_marginTop="18dp"
-            android:layout_marginBottom="44dp"
+            android:layout_marginBottom="29dp"
             android:background="@drawable/bg_def_button_solid"
             android:gravity="center"
-            android:text="@string/show_to1v1_create"
-            android:textColor="@color/white"
-            android:textSize="16sp"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvContent"
-            tools:alpha="0.6"
-            tools:text=" " />
+            app:layout_constraintTop_toBottomOf="@id/tvContent">
 
-        <LinearLayout
-            android:id="@+id/layoutRoomCreating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="@id/btnCreateRoom"
-            app:layout_constraintEnd_toEndOf="@id/btnCreateRoom"
-            app:layout_constraintStart_toStartOf="@id/btnCreateRoom"
-            app:layout_constraintTop_toTopOf="@id/btnCreateRoom">
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/show_to1v1_create"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
 
             <ProgressBar
                 android:id="@+id/progressLoading"
@@ -120,6 +112,7 @@
                 android:indeterminateBehavior="repeat"
                 android:indeterminateDrawable="@drawable/show_to1v1_progressbar_loading"
                 android:indeterminateDuration="500"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -131,7 +124,8 @@
                 android:layout_marginStart="5dp"
                 android:text="@string/show_to1v1_creating"
                 android:textColor="@color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:visibility="gone" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

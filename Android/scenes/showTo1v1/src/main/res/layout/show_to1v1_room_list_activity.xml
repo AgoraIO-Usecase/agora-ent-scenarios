@@ -6,6 +6,7 @@
     android:layout_height="match_parent">
 
     <include
+        android:id="@+id/emptyInclude"
         layout="@layout/show_to1v1_room_list_empty_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

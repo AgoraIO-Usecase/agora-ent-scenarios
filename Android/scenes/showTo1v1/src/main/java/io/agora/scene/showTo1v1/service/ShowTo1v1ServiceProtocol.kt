@@ -28,12 +28,13 @@ interface ShowTo1v1ServiceProtocol {
     fun createRoom(roomName: String, completion: (error: Exception?, roomInfo: ShowTo1v1RoomInfo?) -> Unit)
 
     // 加入房间
-    fun joinRoom(roomInfo: ShowTo1v1RoomInfo,completion: (error: Exception?) -> Unit)
+    fun joinRoom(roomInfo: ShowTo1v1RoomInfo, completion: (error: Exception?) -> Unit)
+
     // 离开房间
-    fun leaveRoom(roomInfo: ShowTo1v1RoomInfo,completion: (error: Exception?) -> Unit)
+    fun leaveRoom(roomInfo: ShowTo1v1RoomInfo, completion: (error: Exception?) -> Unit)
 
     // 获取房间列表
-    fun getRoomList(completion: (error: Exception?,roomList: List<ShowTo1v1RoomInfo>?) -> Unit)
+    fun getRoomList(completion: (error: Exception?, roomList: List<ShowTo1v1RoomInfo>?) -> Unit)
 
     // 订阅回调
     fun subscribeListener(listener: ShowTo1v1ServiceListenerProtocol)
