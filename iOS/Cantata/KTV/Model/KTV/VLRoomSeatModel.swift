@@ -41,7 +41,7 @@ import AgoraCommon
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc func reset(with seatInfo: VLRoomSeatModel?) {
+    @objc public func reset(with seatInfo: VLRoomSeatModel?) {
         self.isMaster = seatInfo?.isMaster ?? false
         self.headUrl = seatInfo?.headUrl ?? ""
         self.name = seatInfo?.name ?? ""

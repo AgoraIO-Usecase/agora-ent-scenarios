@@ -5,8 +5,10 @@
 
 #import <UIKit/UIKit.h>
 #import "VLHotSpotBtn.h"
+
 @import AgoraCommon;
 NS_ASSUME_NONNULL_BEGIN
+@class VLRoomSelSongModel;
 @interface VLSongListCell : UITableViewCell
 
 @property (nonatomic, strong) UIImageView *picImgView;

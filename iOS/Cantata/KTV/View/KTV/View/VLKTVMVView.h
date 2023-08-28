@@ -74,7 +74,8 @@ typedef enum : NSUInteger {
 /// 当前用户上麦下麦
 /// @param song 歌曲信息
 /// @param role 当前用户角色
-- (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song role:(KTVSingRole)role;
+- (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song
+                    role:(NSInteger)role;
 
 //- (void)cleanMusicText;
 - (int)getSongScore;

@@ -157,7 +157,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     // MARK: protocol method
     
     // MARK: room info
-    func getRoomList(with page: UInt, completion: @escaping (Error?, [VLRoomListModel]?) -> Void) {
+    public func getRoomList(with page: UInt, completion: @escaping (Error?, [VLRoomListModel]?) -> Void) {
         initScene { [weak self] error in
             if let error = error  {
                 _hideLoadingIfNeed()
@@ -186,7 +186,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         }
     }
 
-    func createRoom(with inputModel: KTVCreateRoomInputModel,
+    public func createRoom(with inputModel: KTVCreateRoomInputModel,
                     completion: @escaping (Error?, KTVCreateRoomOutputModel?) -> Void)
     {
         let roomInfo = VLRoomListModel() // LiveRoomInfo(roomName: inputModel.name)
@@ -279,7 +279,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         }
     }
 
-    func joinRoom(with inputModel: KTVJoinRoomInputModel,
+    public func joinRoom(with inputModel: KTVJoinRoomInputModel,
                   completion: @escaping (Error?, KTVJoinRoomOutputModel?) -> Void)
     {
         guard let roomInfo = roomList?.filter({ $0.roomNo == inputModel.roomNo }).first else {
@@ -365,7 +365,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         }
     }
     
-    func leaveRoom(completion: @escaping (Error?) -> Void) {
+    public func leaveRoom(completion: @escaping (Error?) -> Void) {
         guard let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first else {
             agoraAssert("leaveRoom channelName = nil")
             completion(nil)
@@ -380,7 +380,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         _leaveRoom(completion: completion)
     }
 
-    func changeMVCover(with inputModel: KTVChangeMVCoverInputModel,
+    public func changeMVCover(with inputModel: KTVChangeMVCoverInputModel,
                        completion: @escaping (Error?) -> Void) {
         guard let channelName = roomNo,
               let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first
@@ -414,14 +414,14 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     }
     
     // MARK: mic seat
-    func enterSeat(with inputModel: KTVOnSeatInputModel,
+    public func enterSeat(with inputModel: KTVOnSeatInputModel,
                    completion: @escaping (Error?) -> Void) {
         let seatInfo = _getUserSeatInfo(seatIndex: Int(inputModel.seatIndex))
         _addSeatInfo(seatInfo: seatInfo,
                      finished: completion)
     }
 
-    func leaveSeat(with inputModel: KTVOutSeatInputModel,
+    public func leaveSeat(with inputModel: KTVOutSeatInputModel,
                    completion: @escaping (Error?) -> Void) {
         let seatInfo = seatMap["\(inputModel.seatIndex)"]!
         _removeSeat(seatInfo: seatInfo) { error in
@@ -432,7 +432,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         completion(nil)
     }
     
-    func updateSeatAudioMuteStatus(with muted: Bool,
+    public func updateSeatAudioMuteStatus(with muted: Bool,
                                    completion: @escaping (Error?) -> Void) {
         guard let seatInfo = self.seatMap
             .filter({ $0.value.userNo == VLUserCenter.user.id })
@@ -447,7 +447,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     finished: completion)
     }
 
-    func updateSeatVideoMuteStatus(with muted: Bool,
+    public func updateSeatVideoMuteStatus(with muted: Bool,
                                    completion: @escaping (Error?) -> Void) {
         guard let seatInfo = self.seatMap
             .filter({ $0.value.userNo == VLUserCenter.user.id })
@@ -464,17 +464,17 @@ private func mapConvert(model: NSObject) ->[String: Any] {
 
     
     // MARK: choose songs
-    func removeSong(with inputModel: KTVRemoveSongInputModel,
+    public func removeSong(with inputModel: KTVRemoveSongInputModel,
                     completion: @escaping (Error?) -> Void) {
         _removeChooseSong(songId: inputModel.objectId,
                           completion: completion)
     }
 
-    func getChoosedSongsList(completion: @escaping (Error?, [VLRoomSelSongModel]?) -> Void) {
+    public func getChoosedSongsList(completion: @escaping (Error?, [VLRoomSelSongModel]?) -> Void) {
         _getChooseSongInfo(finished: completion)
     }
 
-    func joinChorus(with inputModel: KTVJoinChorusInputModel,
+    public func joinChorus(with inputModel: KTVJoinChorusInputModel,
                         completion: @escaping (Error?) -> Void) {
         guard let topSong = self.songList.filter({ $0.songNo == inputModel.songNo}).first else {
             agoraAssert("join Chorus fail")
@@ -485,18 +485,18 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         _markSeatChoursStatus(songCode: topSong.chorusSongId(),  completion: completion)
     }
     
-    func coSingerLeaveChorus(completion: @escaping (Error?) -> Void) {
+    public func coSingerLeaveChorus(completion: @escaping (Error?) -> Void) {
         //TODO: _markSeatToPlaying without callback
         _markSeatChoursStatus(songCode: "", completion: completion)
     }
 
-    func markSongDidPlay(with inputModel: VLRoomSelSongModel,
+    public func markSongDidPlay(with inputModel: VLRoomSelSongModel,
                          completion: @escaping (Error?) -> Void) {
         inputModel.status = .playing
         _updateChooseSong(songInfo: inputModel, finished: completion)
     }
 
-    func chooseSong(with inputModel: KTVChooseSongInputModel,
+    public func chooseSong(with inputModel: KTVChooseSongInputModel,
                     completion: @escaping (Error?) -> Void)
     {
         //添加歌曲前先判断
@@ -532,7 +532,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         }
     }
     
-    func pinSong(with inputModel: KTVMakeSongTopInputModel,
+    public func pinSong(with inputModel: KTVMakeSongTopInputModel,
                  completion: @escaping (Error?) -> Void) {
 //        assert(false)
         guard let topSong = songList.first,
@@ -561,29 +561,29 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     
     
     //MARK: about lyrics
-    func enterSoloMode() {
+    public func enterSoloMode() {
         _markSoloSongIfNeed()
     }
 
     //MARK: subscribe
-    func subscribeUserListCountChanged(with changedBlock: @escaping (UInt) -> Void) {
+    public func subscribeUserListCountChanged(with changedBlock: @escaping (UInt) -> Void) {
 //        _unsubscribeAll()
         userListCountDidChanged = changedBlock
         _subscribeOnlineUsers {
         }
     }
     
-    func subscribeUserChanged(with changedBlock: @escaping (KTVSubscribe, VLLoginModel) -> Void) {
+    public func subscribeUserChanged(with changedBlock: @escaping (KTVSubscribe, VLLoginModel) -> Void) {
         userDidChanged = changedBlock
     }
 
-    func subscribeSeatListChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomSeatModel) -> Void) {
+    public func subscribeSeatListChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomSeatModel) -> Void) {
         seatListDidChanged = changedBlock
         _subscribeSeats {
         }
     }
     
-    func subscribeRoomStatusChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomListModel) -> Void) {
+    public func subscribeRoomStatusChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomListModel) -> Void) {
         roomStatusDidChanged = changedBlock
 
         guard let channelName = roomNo else {
@@ -616,17 +616,17 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                        })
     }
 
-    func subscribeChooseSongChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomSelSongModel, [VLRoomSelSongModel]) -> Void) {
+    public func subscribeChooseSongChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomSelSongModel, [VLRoomSelSongModel]) -> Void) {
         chooseSongDidChanged = changedBlock
         _subscribeChooseSong {
         }
     }
     
-    func subscribeNetworkStatusChanged(with changedBlock: @escaping (KTVServiceNetworkStatus) -> Void) {
+    public func subscribeNetworkStatusChanged(with changedBlock: @escaping (KTVServiceNetworkStatus) -> Void) {
         networkDidChanged = changedBlock
     }
     
-    func subscribeRoomWillExpire(with changedBlock: @escaping () -> Void) {
+    public func subscribeRoomWillExpire(with changedBlock: @escaping () -> Void) {
         roomExpiredDidChanged = changedBlock
         Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] timer in
             guard let self = self else { return }
@@ -642,7 +642,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         }
     }
     
-    func unsubscribeAll() {
+    public func unsubscribeAll() {
         _unsubscribeAll()
     }
 }

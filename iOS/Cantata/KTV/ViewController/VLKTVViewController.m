@@ -27,7 +27,7 @@
 #import "UIView+VL.h"
 #import "AppContext+KTV.h"
 #import "LSTPopView+KTVModal.h"
-#import "HWWeakTimer.h"
+//#import "HWWeakTimer.h"
 #import "VLAlert.h"
 #import "VLKTVAlert.h"
 #import "KTVDebugManager.h"
@@ -1070,9 +1070,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)onVLKTVTopView:(VLKTVTopView *)view moreBtnTapped:(id)sender {
+#if DEBUG
+#else
+#warning fix it by chenpan
     AUiMoreDialog* dialog = [[AUiMoreDialog alloc] initWithFrame:self.view.bounds];
     [self.view addSubview:dialog];
     [dialog show];
+#endif
 }
 
 #pragma mark - VLPopMoreSelViewDelegate

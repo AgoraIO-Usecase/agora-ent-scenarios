@@ -8,14 +8,14 @@
 import Foundation
 import AgoraRtmKit
 
-@objc enum KTVServiceNetworkStatus: Int {
+@objc public enum KTVServiceNetworkStatus: Int {
     case connecting = 0 // 连接中
     case open // 已打开
     case fail // 失败
     case closed // 已关闭
 }
 
-@objc enum KTVSubscribe: Int {
+@objc public enum KTVSubscribe: Int {
     case created // 创建
     case deleted // 删除
     case updated // 更新

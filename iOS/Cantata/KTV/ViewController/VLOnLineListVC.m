@@ -8,7 +8,7 @@
 #import "VLKTVViewController.h"
 
 #import "VLPopScoreView.h"
-#import "VLLoginViewController.h"
+//#import "VLLoginViewController.h"
 #import "VLCreateRoomViewController.h"
 #import "LSTPopView.h"
 #import "VLUserCenter.h"
@@ -65,11 +65,15 @@
 }
 
 - (BOOL)checkIsLogin {
+#if DEBUG
+#else
+#warning  fix it by  chenpan
     if (![VLUserCenter center].isLogin) {
         VLLoginViewController *loginVC = [[VLLoginViewController alloc] init];
         [self.navigationController pushViewController:loginVC animated:YES];
         return NO;
     }
+#endif
     return YES;
 }
 

@@ -28,7 +28,7 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/AgoraIO-Community/VideoLoaderAPI.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
     
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '13.0'
   
   s.xcconfig = {'ENABLE_BITCODE' => 'NO'}
   
@@ -53,5 +53,7 @@ TODO: Add long description of the pod here.
   s.dependency 'AgoraLyricsScore'
   s.dependency 'AgoraCommon'
   s.dependency 'SDWebImage'
+  s.dependency 'Zip'
+  s.dependency 'MJRefresh'
 end
 

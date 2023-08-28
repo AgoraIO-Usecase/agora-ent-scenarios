@@ -18,7 +18,7 @@ private func agoraPrint(_ message: String) {
     func didLrcViewScorllFinished(with score: Int, totalScore: Int, lineScore: Int, lineIndex:Int)
 }
 
-@objc class KTVLrcControl: NSObject {
+@objc public class KTVLrcControl: NSObject {
 
     @objc public weak var lrcView: KaraokeView?
     @objc public weak var delegate: KTVLrcControlDelegate?
@@ -42,7 +42,7 @@ private func agoraPrint(_ message: String) {
         }
     }
 
-    @objc init(lrcView: KaraokeView) {
+    @objc public init(lrcView: KaraokeView) {
         self.lrcView = lrcView
         super.init()
         setupSkipBtn()
@@ -108,7 +108,7 @@ private func agoraPrint(_ message: String) {
 
 extension KTVLrcControl: KaraokeDelegate {
 
-    func onKaraokeView(view: KaraokeView, didDragTo position: Int) {
+    public func onKaraokeView(view: KaraokeView, didDragTo position: Int) {
         totalScore = view.scoringView.getCumulativeScore()
         guard let delegate = delegate else {
             return
@@ -118,7 +118,7 @@ extension KTVLrcControl: KaraokeDelegate {
                                     totalScore: totalCount * 100)
     }
 
-    func onKaraokeView(view: KaraokeView,
+    public func onKaraokeView(view: KaraokeView,
                        didFinishLineWith model: LyricLineModel,
                        score: Int,
                        cumulativeScore: Int,
@@ -138,11 +138,11 @@ extension KTVLrcControl: KaraokeDelegate {
 
 extension KTVLrcControl: KTVLrcViewDelegate {
 
-    func onUpdatePitch(pitch: Float) {
+    public func onUpdatePitch(pitch: Float) {
         lrcView?.setPitch(pitch: Double(pitch))
     }
 
-    func onUpdateProgress(progress: Int) {
+    public func onUpdateProgress(progress: Int) {
         self.progress = progress
         lrcView?.setProgress(progress: progress)
         guard let model = lyricModel else {
@@ -167,7 +167,7 @@ extension KTVLrcControl: KTVLrcViewDelegate {
         }
     }
 
-    func onDownloadLrcData(url: String) {
+    public func onDownloadLrcData(url: String) {
         //开始歌词下载
         startDownloadLrc(with: url) {[weak self] url in
             guard let self = self, let url = url else {return}
@@ -175,7 +175,7 @@ extension KTVLrcControl: KTVLrcViewDelegate {
         }
     }
     
-    func onHighPartTime(highStartTime: Int, highEndTime: Int) {
+    public func onHighPartTime(highStartTime: Int, highEndTime: Int) {
     }
     
     func startDownloadLrc(with url: String, callBack: @escaping LyricCallback) {
@@ -221,11 +221,11 @@ extension KTVLrcControl: KTVLrcViewDelegate {
 }
 
 extension KTVLrcControl: AgoraLrcDownloadDelegate {
-    func downloadLrcFinished(url: String) {
+    public func downloadLrcFinished(url: String) {
         agoraPrint("download lrc finished \(url)")
     }
     
-    func downloadLrcError(url: String, error: Error?) {
+    public func downloadLrcError(url: String, error: Error?) {
         agoraPrint("download lrc fail \(url): \(String(describing: error))")
     }
 }

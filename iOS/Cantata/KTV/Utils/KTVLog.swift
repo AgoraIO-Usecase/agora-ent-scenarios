@@ -10,7 +10,7 @@ import UIKit
 import SwiftyBeaver
 import AgoraCommon
 @objc public class KTVLog: NSObject {
-    fileprivate public static let log: SwiftyBeaver.Type = {
+    fileprivate static let log: SwiftyBeaver.Type = {
         let config = AgoraEntLogConfig(sceneName: "KTV")
         let log = AgoraEntLog.createLog(config: config)
         return log

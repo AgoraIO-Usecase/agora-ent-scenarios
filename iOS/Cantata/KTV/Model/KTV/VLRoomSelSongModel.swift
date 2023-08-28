@@ -13,7 +13,7 @@ import AgoraCommon
 }
 
 
-public class VLRoomSelSongModel: VLBaseModel {
+@objc public class VLRoomSelSongModel: VLBaseModel {
     @objc public var imageUrl: String?
     
     /// 是否原唱
@@ -40,9 +40,9 @@ public class VLRoomSelSongModel: VLBaseModel {
     @objc public var objectId: String?
     
     @objc public func isSongOwner() -> Bool {
-        if VLUserCenter.user.id == self.userNo {
-            return true
-        }
+//        if VLUserCenter.user.id == self.userNo {
+//            return true
+//        }
         return false
     }
 

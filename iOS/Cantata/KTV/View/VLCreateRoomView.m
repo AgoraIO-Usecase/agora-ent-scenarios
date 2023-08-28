@@ -8,7 +8,7 @@
 #import "VLMacroDefine.h"
 #import "VLToast.h"
 #import "AESMacro.h"
-#import "MenuUtils.h"
+//#import "MenuUtils.h"
 
 @interface VLCreateRoomView ()
 
@@ -47,7 +47,11 @@
     UILabel *roomTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(40, iconImgView.bottom+VLREALVALUE_WIDTH(40), 70, 20)];
     roomTitleLabel.font = UIFontMake(14);
     roomTitleLabel.textColor = UIColorMakeWithHex(@"#000000");
+#if DEBUG
+#else
+#warning fix it by chenpan
     roomTitleLabel.text = AGLocalizedString(@"ktv_room_title");
+#endif
     [self addSubview:roomTitleLabel];
     
 //    QMUIButton *randomBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_randomIcon"]
