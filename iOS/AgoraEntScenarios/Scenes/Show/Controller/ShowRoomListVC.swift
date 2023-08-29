@@ -108,6 +108,8 @@ class ShowRoomListVC: UIViewController {
     private func joinRoom(_ room: ShowRoomListModel){
         ShowAgoraKitManager.shared.callTimestampStart(clean: true)
         
+        ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .joined)
+        
         let vc = ShowLivePagesViewController()
         let nc = UINavigationController(rootViewController: vc)
         nc.modalPresentationStyle = .fullScreen
