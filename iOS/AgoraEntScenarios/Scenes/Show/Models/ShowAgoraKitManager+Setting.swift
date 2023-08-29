@@ -155,7 +155,7 @@ extension ShowAgoraKitManager {
         updateSettingForkey(.lowlightEnhance)
         updateSettingForkey(.colorEnhance)
         updateSettingForkey(.videoDenoiser)
-        rtcParam.pvc = true
+        rtcParam.pvc = false
         updateSettingForkey(.PVC)
         rtcParam.sr = true
         updateSettingForkey(.SR)
