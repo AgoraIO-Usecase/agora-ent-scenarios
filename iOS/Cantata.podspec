@@ -42,6 +42,10 @@ TODO: Add long description of the pod here.
         #import "Cantata-Prefix.h"
     #endif
   '
+  s.static_framework = false
+#  s.pod_target_xcconfig = {
+ #   'SWIFT_OBJC_BRIDGING_HEADER' => 'Cantata/KTV/**/Cantata-Bridging-Header.h'
+ # }
 
    s.public_header_files = 'Cantata/**/CantataPlugin.h'
   s.dependency 'AgoraRtcEngine_Special_iOS'

@@ -10,7 +10,7 @@
 #import "MenuUtils.h"
 #import "AESMacro.h"
 #import "VLToast.h"
-
+@import Cantata;
 @interface VLHomeViewController ()<VLHomeViewDelegate>
 
 @end
@@ -89,7 +89,8 @@
         }
             break;
         case 2: {
-            VLOnLineListVC *vc = [[VLOnLineListVC alloc]init];
+            //VLOnLineListVC *vc = [[VLOnLineListVC alloc]init];
+            UIViewController *vc = [CantataPlugin getCantataRootViewCOntroller];
             [self.navigationController pushViewController:vc animated:YES];
         } break;
         case 3: {

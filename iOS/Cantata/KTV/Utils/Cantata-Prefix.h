@@ -74,6 +74,8 @@
 #define kProfileKey Prefix(kProfileKey)
 #define ktvApiStreamId Prefix(ktvApiStreamId)
 #define ktvStreamId Prefix(ktvStreamId)
+
+#import "VLKTVTopView.h"
 #endif /* Cantata_Prefix_pch */
 
 
