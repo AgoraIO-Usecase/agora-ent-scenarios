@@ -464,10 +464,10 @@ public class RoomLivingViewModel extends ViewModel {
                         iterator.remove();
                     }
                 }
-                seatListLiveData.postValue(value);
+                seatListLiveData.setValue(value);
 
                 if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
-                    seatLocalLiveData.postValue(null);
+                    seatLocalLiveData.setValue(null);
                 }
 
 
@@ -707,7 +707,6 @@ public class RoomLivingViewModel extends ViewModel {
                 relayList = SongModel.INSTANCE.getSongPartListWithSongCode(songPlaying.getSongNo());
             } else {
                 KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() return is emptyList");
-                //gameSong = null;
                 songPlayingLiveData.postValue(null);
             }
         }
@@ -725,7 +724,6 @@ public class RoomLivingViewModel extends ViewModel {
      */
     public void changeMusic() {
         KTVLogger.d(TAG, "RoomLivingViewModel.changeMusic() called");
-        //gameSong = null;
         RoomSelSongModel musicModel = songPlayingLiveData.getValue();
         if (musicModel == null) {
             KTVLogger.e(TAG, "RoomLivingViewModel.changeMusic() failed, no song is playing now!");
@@ -1116,6 +1114,7 @@ public class RoomLivingViewModel extends ViewModel {
                 singRelayGameStatusMutableLiveData.postValue(GameStatus.ON_START);
                 rankMap.clear();
             } else if (gameModel.getStatus() == SingRelayGameStatus.ended.getValue()) {
+                songPlayingLiveData.postValue(null);
                 singRelayGameStatusMutableLiveData.postValue(GameStatus.ON_END);
             }
             return null;
@@ -1557,7 +1556,9 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public boolean isNextRoundSinger() {
-        if (songsOrderedLiveData.getValue() == null) return false;
+        // 当前无歌曲
+        if (songsOrderedLiveData.getValue() == null || songsOrderedLiveData.getValue().size() == 0) return false;
+
         if (!songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") && songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0].equals(UserManager.getInstance().getUser().id.toString()) && songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum - 1))) {
             return true;
         } else {
