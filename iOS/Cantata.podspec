@@ -39,6 +39,7 @@ TODO: Add long description of the pod here.
     s.prefix_header_contents = '
     #if __has_include(<Cantata/Cantata-Swift.h>)
         #import <Cantata/Cantata-Swift.h>
+        #import "Cantata-Prefix.h"
     #endif
   '
 

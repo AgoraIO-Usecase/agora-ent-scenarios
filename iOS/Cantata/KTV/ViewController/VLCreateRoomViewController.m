@@ -12,7 +12,7 @@
 #import "VLUserCenter.h"
 #import "VLToast.h"
 #import "VLURLPathConfig.h"
-#import "AppContext+KTV.h"
+#import "AppContext+DHCKTV.h"
 #import "AESMacro.h"
 
 @interface VLCreateRoomViewController ()<VLCreateRoomViewDelegate/*,AgoraRtmDelegate*/>

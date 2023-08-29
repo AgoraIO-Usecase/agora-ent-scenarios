@@ -15,7 +15,7 @@
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
 #import "VLToast.h"
-#import "AppContext+KTV.h"
+#import "AppContext+DHCKTV.h"
 #import "AESMacro.h"
 #import "VLAlert.h"
 

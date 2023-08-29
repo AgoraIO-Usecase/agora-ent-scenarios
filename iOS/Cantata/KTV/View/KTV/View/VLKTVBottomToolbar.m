@@ -7,7 +7,7 @@
 #import "VLHotSpotBtn.h"
 #import "VLUserCenter.h"
 #import "VLURLPathConfig.h"
-#import "AppContext+KTV.h"
+#import "AppContext+DHCKTV.h"
 #import "VLMacroDefine.h"
 #import "AESMacro.h"
 

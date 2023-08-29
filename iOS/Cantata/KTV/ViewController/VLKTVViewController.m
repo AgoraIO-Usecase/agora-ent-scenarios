@@ -25,7 +25,7 @@
 #import "VLToast.h"
 #import "VLKTVMVView.h"
 #import "UIView+VL.h"
-#import "AppContext+KTV.h"
+#import "AppContext+DHCKTV.h"
 #import "LSTPopView+KTVModal.h"
 //#import "HWWeakTimer.h"
 #import "VLAlert.h"

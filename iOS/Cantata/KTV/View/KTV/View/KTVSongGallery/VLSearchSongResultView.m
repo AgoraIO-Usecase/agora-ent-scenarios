@@ -10,7 +10,7 @@
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"
-#import "AppContext+KTV.h"
+#import "AppContext+DHCKTV.h"
 #import "AESMacro.h"
 #import "NSString+Helper.h"
 @import MJRefresh;
