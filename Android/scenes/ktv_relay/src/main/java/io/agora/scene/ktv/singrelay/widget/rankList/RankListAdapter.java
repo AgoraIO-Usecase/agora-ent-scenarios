@@ -53,6 +53,7 @@ public class RankListAdapter extends BindingSingleAdapter<RankItem, KtvItemRankL
             KTVLogger.d("hugo", "hugo");
             mBinding.ivHeader.setVisibility(View.INVISIBLE);
         } else {
+            mBinding.ivHeader.setVisibility(View.VISIBLE);
             GlideApp.with(mBinding.getRoot())
                     .load(item.poster)
                     .error(R.mipmap.userimage)

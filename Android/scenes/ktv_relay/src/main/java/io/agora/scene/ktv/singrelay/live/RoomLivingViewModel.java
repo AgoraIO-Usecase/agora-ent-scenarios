@@ -166,6 +166,7 @@ public class RoomLivingViewModel extends ViewModel {
         String userId;
         String userName;
         String headUrl;
+        int partNum;
     }
     final MutableLiveData<GraspModel> graspStatusMutableLiveData = new MutableLiveData<>();
 
@@ -675,6 +676,7 @@ public class RoomLivingViewModel extends ViewModel {
                             model.userId = songPlaying.getWinnerNo();
                             model.userName = songPlaying.getName();
                             model.headUrl = songPlaying.getImageUrl();
+                            model.partNum = partNum;
                             graspStatusMutableLiveData.postValue(model);
                         }
                     } else {
@@ -944,6 +946,12 @@ public class RoomLivingViewModel extends ViewModel {
                            if (System.currentTimeMillis() - mLastPostSongPartChangeStatusTime < 5000) break;
                            GraspModel graspModel = new GraspModel();
                            graspModel.status = GraspStatus.IDLE;
+                           if (graspStatusMutableLiveData.getValue() != null) {
+                               graspModel.userId = graspStatusMutableLiveData.getValue().userId;
+                               graspModel.userName = graspStatusMutableLiveData.getValue().userName;
+                               graspModel.headUrl = graspStatusMutableLiveData.getValue().headUrl;
+                               graspModel.partNum = graspStatusMutableLiveData.getValue().partNum;
+                           }
                            graspStatusMutableLiveData.postValue(graspModel);
                            mLastPostSongPartChangeStatusTime = System.currentTimeMillis();
                            partNum = i + 2;
@@ -952,6 +960,12 @@ public class RoomLivingViewModel extends ViewModel {
                            // 提前3s下一段提示
                            GraspModel graspModel = new GraspModel();
                            graspModel.status = GraspStatus.Mention;
+                           if (graspStatusMutableLiveData.getValue() != null) {
+                               graspModel.userId = graspStatusMutableLiveData.getValue().userId;
+                               graspModel.userName = graspStatusMutableLiveData.getValue().userName;
+                               graspModel.headUrl = graspStatusMutableLiveData.getValue().headUrl;
+                               graspModel.partNum = graspStatusMutableLiveData.getValue().partNum;
+                           }
                            graspStatusMutableLiveData.postValue(graspModel);
                            break;
                        }
@@ -1556,17 +1570,24 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public boolean isNextRoundSinger() {
+        KTVLogger.d(TAG, "RoomLivingViewModel.isNextRoundSinger() called");
         // 当前无歌曲
         if (songsOrderedLiveData.getValue() == null || songsOrderedLiveData.getValue().size() == 0) return false;
-
-        if (!songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") && songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0].equals(UserManager.getInstance().getUser().id.toString()) && songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum - 1))) {
-            return true;
+        // 无抢唱记录
+        if (graspStatusMutableLiveData.getValue() == null || graspStatusMutableLiveData.getValue().userId == null) {
+            KTVLogger.d(TAG, "RoomLivingViewModel.isNextRoundSinger() no grasp record1");
+            return isRoomOwner();
+        }
+        // 有抢唱记录
+        // 本段有人抢
+        KTVLogger.d(TAG, "RoomLivingViewModel.isNextRoundSinger() debug， graspStatusMutableLiveData.getValue().partNum：" + graspStatusMutableLiveData.getValue().partNum + " partNum：" + partNum);
+        if (graspStatusMutableLiveData.getValue().partNum == (partNum - 1)) {
+            KTVLogger.d(TAG, "RoomLivingViewModel.isNextRoundSinger() has grasp record， graspStatusMutableLiveData.getValue().userId：" + graspStatusMutableLiveData.getValue().userId);
+            return graspStatusMutableLiveData.getValue().userId.split("_")[0].equals(UserManager.getInstance().getUser().id.toString());
         } else {
-            if (isRoomOwner() && (songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") || !songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum - 1)))) {
-                return true;
-            } else {
-                return false;
-            }
+            // 本段无人抢
+            KTVLogger.d(TAG, "RoomLivingViewModel.isNextRoundSinger() no grasp record2");
+            return isRoomOwner();
         }
     }
 
