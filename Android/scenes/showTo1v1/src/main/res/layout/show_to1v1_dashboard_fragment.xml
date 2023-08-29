@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/show_to1v1_dashboard_corner_radius"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.DashboardFragment">
+    tools:context=".ui.fragment.DashboardFragment">
 
     <TableLayout
         android:id="@+id/tlStatistic"
@@ -18,7 +18,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/pure1v1_dashboard_up"
+            android:text="@string/show_to1v1_dashboard_up"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -29,14 +29,14 @@
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/pure1v1_dashboard_encode_resolution" />
+                tools:text="@string/show_to1v1_dashboard_encode_resolution" />
 
             <TextView
                 android:id="@+id/tvStatisticEncodeFPS"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/pure1v1_dashboard_encode_fps" />
+                tools:text="@string/show_to1v1_dashboard_encode_fps" />
         </TableRow>
 
         <TableRow android:paddingVertical="3dp">
@@ -46,14 +46,14 @@
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/pure1v1_dashboard_up_bitrate" />
+                tools:text="@string/show_to1v1_dashboard_up_bitrate" />
 
             <TextView
                 android:id="@+id/tvStatisticUpLossPackage"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/pure1v1_dashboard_up_loss_package" />
+                tools:text="@string/show_to1v1_dashboard_up_loss_package" />
         </TableRow>
 
         <TableRow android:paddingVertical="3dp">
@@ -63,14 +63,14 @@
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/pure1v1_dashboard_up_net_speech" />
+                tools:text="@string/show_to1v1_dashboard_up_net_speech" />
         </TableRow>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="@string/pure1v1_dashboard_down"
+            android:text="@string/show_to1v1_dashboard_down"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -82,14 +82,14 @@
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/pure1v1_dashboard_receive_resolution" />
+                tools:text="@string/show_to1v1_dashboard_receive_resolution" />
 
             <TextView
                 android:id="@+id/tvStatisticReceiveFPS"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/pure1v1_dashboard_receive_fps" />
+                tools:text="@string/show_to1v1_dashboard_receive_fps" />
         </TableRow>
 
         <TableRow android:paddingVertical="3dp">
@@ -99,14 +99,14 @@
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/pure1v1_dashboard_down_bitrate" />
+                tools:text="@string/show_to1v1_dashboard_down_bitrate" />
 
             <TextView
                 android:id="@+id/tvStatisticDownLossPackage"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/pure1v1_dashboard_down_loss_package" />
+                tools:text="@string/show_to1v1_dashboard_down_loss_package" />
         </TableRow>
 
         <TableRow android:paddingVertical="3dp">
@@ -116,14 +116,14 @@
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/pure1v1_dashboard_down_net_speech" />
+                tools:text="@string/show_to1v1_dashboard_down_net_speech" />
 
             <TextView
                 android:id="@+id/tvStatisticDownDelay"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/pure1v1_dashboard_delay" />
+                tools:text="@string/show_to1v1_dashboard_delay" />
 
         </TableRow>
 

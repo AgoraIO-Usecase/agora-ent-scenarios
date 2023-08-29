@@ -10,11 +10,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallSendDialogBinding
-import io.agora.scene.showTo1v1.service.UserInfo
+import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 
 class CallSendDialog constructor(
     private val context: Context,
-    private val userInfo: UserInfo
+    private val userInfo: ShowTo1v1UserInfo
 ) : CallDialog(context, userInfo) {
 
     interface CallSendDialogListener {

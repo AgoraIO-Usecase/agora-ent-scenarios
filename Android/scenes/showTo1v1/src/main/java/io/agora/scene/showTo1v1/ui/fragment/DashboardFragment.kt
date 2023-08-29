@@ -1,4 +1,4 @@
-package io.agora.scene.showTo1v1.ui
+package io.agora.scene.showTo1v1.ui.fragment
 
 import android.os.Bundle
 import android.util.Log
@@ -11,7 +11,6 @@ import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1DashboardFragmentBinding
-import io.agora.scene.showTo1v1.service.CallServiceManager
 
 class DashboardFragment : Fragment() {
 
@@ -23,7 +22,6 @@ class DashboardFragment : Fragment() {
 
     override fun onDestroy() {
         handler?.let {
-            CallServiceManager.instance.callApi?.removeRTCListener(it)
             handler = null
         }
         super.onDestroy()
@@ -132,7 +130,6 @@ class DashboardFragment : Fragment() {
                 }
             }
         }
-        CallServiceManager.instance.callApi?.addRTCListener(rtcListener)
         handler = rtcListener
     }
 

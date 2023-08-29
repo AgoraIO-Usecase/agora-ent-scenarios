@@ -1,5 +1,6 @@
 package io.agora.scene.showTo1v1.service
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -14,8 +15,9 @@ import io.agora.syncmanager.rtm.Sync
 import io.agora.syncmanager.rtm.SyncManagerException
 import kotlin.random.Random
 
-class ShowTo1v1ServiceImpl constructor(private val user: UserInfo, private val errorHandler: ((Exception?) -> Unit)?) :
-    ShowTo1v1ServiceProtocol {
+class ShowTo1v1ServiceImpl constructor(
+    private val context: Context, private val errorHandler: ((Exception) -> Unit)
+) : ShowTo1v1ServiceProtocol {
 
     companion object {
         private const val TAG = "Show1v1_LOG"
@@ -71,8 +73,8 @@ class ShowTo1v1ServiceImpl constructor(private val user: UserInfo, private val e
                     }
                 }
 
-                override fun onFail(exception: SyncManagerException?) {
-                    Log.e(TAG, "initScene:${exception?.toString()}")
+                override fun onFail(exception: SyncManagerException) {
+                    Log.e(TAG, "initScene:$exception")
                     runOnMainThread { errorHandler?.invoke(exception) }
                 }
             }
@@ -130,7 +132,7 @@ class ShowTo1v1ServiceImpl constructor(private val user: UserInfo, private val e
                 Log.d(TAG, "subscribeRoomStatusChanged subscribe onDeleted:${roomInfo}")
             }
 
-            override fun onSubscribeError(ex: SyncManagerException?) {
+            override fun onSubscribeError(ex: SyncManagerException) {
                 errorHandler?.invoke(ex)
             }
 
@@ -146,6 +148,7 @@ class ShowTo1v1ServiceImpl constructor(private val user: UserInfo, private val e
                 userId = UserManager.getInstance().user.id.toString(),
                 userName = UserManager.getInstance().user.name,
                 avatar = UserManager.getInstance().user.headUrl,
+                objectId = ""
             )
             val scene = Scene()
             scene.id = roomInfo.roomId
@@ -218,7 +221,7 @@ class ShowTo1v1ServiceImpl constructor(private val user: UserInfo, private val e
         })
     }
 
-    override fun getRoomList(completion: (error: Exception?, roomList: List<ShowTo1v1RoomInfo>?) -> Unit) {
+    override fun getRoomList(completion: (error: Exception?, roomList: List<ShowTo1v1RoomInfo>) -> Unit) {
         initScene {
             Sync.Instance().getScenes(object : Sync.DataListCallback {
                 override fun onSuccess(result: MutableList<IObject>?) {
@@ -237,7 +240,7 @@ class ShowTo1v1ServiceImpl constructor(private val user: UserInfo, private val e
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
-                    runOnMainThread { completion.invoke(exception, null) }
+                    runOnMainThread { completion.invoke(exception, emptyList()) }
                 }
             })
         }

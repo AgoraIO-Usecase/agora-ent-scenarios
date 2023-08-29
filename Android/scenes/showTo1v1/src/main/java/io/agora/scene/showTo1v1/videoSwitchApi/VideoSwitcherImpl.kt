@@ -17,6 +17,7 @@ import io.agora.rtc2.*
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.showTo1v1.RtcEngineInstance
 import java.util.*
 
 class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private val api: VideoSwitcherAPI) :

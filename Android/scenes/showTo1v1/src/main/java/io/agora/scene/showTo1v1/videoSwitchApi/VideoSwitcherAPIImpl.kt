@@ -14,6 +14,7 @@ import io.agora.mediaplayer.data.PlayerUpdatedInfo
 import io.agora.mediaplayer.data.SrcInfo
 import io.agora.rtc2.*
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.scene.showTo1v1.RtcEngineInstance
 import java.util.*
 
 class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : VideoSwitcherAPI {

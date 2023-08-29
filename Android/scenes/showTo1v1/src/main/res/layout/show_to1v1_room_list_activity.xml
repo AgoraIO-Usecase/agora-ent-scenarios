@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/show_to1v1_bg">
 
     <include
         android:id="@+id/emptyInclude"
@@ -17,43 +18,14 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:overScrollMode="never"
-        app:layout_scrollEffect="none"
-        tools:layout_editor_absoluteX="4dp"
-        tools:layout_editor_absoluteY="4dp" />
+        app:layout_scrollEffect="none" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivBack"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="44dp"
-        android:src="@drawable/show_to1v1_room_list_back_dark"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivRefresh"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="20dp"
-        android:src="@drawable/show_to1v1_room_list_refresh_dark"
-        app:layout_constraintBottom_toBottomOf="@+id/ivBack"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/ivBack" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvRoomTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/show_to1v1_name"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/ivBack"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/ivBack" />
-
+    <io.agora.scene.widget.CommonTitleView
+        android:id="@+id/title_view"
+        style="@style/title_view"
+        app:ctv_centerText="@string/show_to1v1_name"
+        app:ctv_rightImageSrc="@drawable/show_to1v1_room_list_refresh_dark"
+        tools:ignore="MissingConstraints" />
 
     <io.agora.scene.showTo1v1.ui.RoomListGuideView
         android:id="@+id/vGuidance"

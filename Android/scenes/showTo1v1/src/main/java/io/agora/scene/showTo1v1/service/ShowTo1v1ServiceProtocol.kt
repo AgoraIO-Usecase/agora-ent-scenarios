@@ -1,5 +1,8 @@
 package io.agora.scene.showTo1v1.service
 
+import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.base.utils.ToastUtils
+
 enum class ShowTo1v1ServiceNetworkStatus {
     Connecting, // 连接中
     Open,       //已打开
@@ -24,6 +27,21 @@ interface ShowTo1v1ServiceListenerProtocol {
 
 interface ShowTo1v1ServiceProtocol {
 
+    companion object {
+
+        private val instance by lazy {
+            ShowTo1v1ServiceImpl(AgoraApplication.the()) {
+                if (it.message != "action error") {
+                    ToastUtils.showToast(it.message)
+                }
+            }
+        }
+
+        fun getImplInstance(): ShowTo1v1ServiceProtocol {
+            return instance
+        }
+    }
+
     // 创建房间
     fun createRoom(roomName: String, completion: (error: Exception?, roomInfo: ShowTo1v1RoomInfo?) -> Unit)
 
@@ -34,7 +52,7 @@ interface ShowTo1v1ServiceProtocol {
     fun leaveRoom(roomInfo: ShowTo1v1RoomInfo, completion: (error: Exception?) -> Unit)
 
     // 获取房间列表
-    fun getRoomList(completion: (error: Exception?, roomList: List<ShowTo1v1RoomInfo>?) -> Unit)
+    fun getRoomList(completion: (error: Exception?, roomList: List<ShowTo1v1RoomInfo>) -> Unit)
 
     // 订阅回调
     fun subscribeListener(listener: ShowTo1v1ServiceListenerProtocol)

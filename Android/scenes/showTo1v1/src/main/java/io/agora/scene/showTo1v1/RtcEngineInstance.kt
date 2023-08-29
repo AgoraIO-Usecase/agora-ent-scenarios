@@ -1,4 +1,4 @@
-package io.agora.scene.showTo1v1.videoSwitchApi
+package io.agora.scene.showTo1v1
 
 import android.util.Log
 import io.agora.rtc2.IRtcEngineEventHandler
@@ -9,6 +9,9 @@ import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
+import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPIImpl
+import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherImpl
 import java.util.concurrent.Executors
 
 object RtcEngineInstance {
