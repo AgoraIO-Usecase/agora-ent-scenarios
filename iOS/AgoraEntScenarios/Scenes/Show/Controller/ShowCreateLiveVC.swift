@@ -96,6 +96,7 @@ class ShowCreateLiveVC: UIViewController {
     @objc func didClickCancelButton(){
         BeautyManager.shareManager.destroy()
         ShowAgoraKitManager.shared.cleanCapture()
+        ShowBeautyFaceVC.resetData()
         dismiss(animated: true)
     }
 }
