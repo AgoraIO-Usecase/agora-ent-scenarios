@@ -252,7 +252,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         }
     }
 
-    override fun onCallLogger(tag: String, level: Int, message: String) {
+    fun onCallLogger(tag: String, level: Int, message: String) {
         when (level) {
             Log.ERROR -> Pure1v1Logger.e(tag, message)
             Log.WARN -> Pure1v1Logger.w(tag, message)
