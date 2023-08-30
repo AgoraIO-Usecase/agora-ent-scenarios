@@ -106,7 +106,7 @@ class ShowRoomListVC: UIViewController {
     
     // 加入房间
     private func joinRoom(_ room: ShowRoomListModel){
-        ShowAgoraKitManager.shared.callTimestampStart(clean: true)
+        ShowAgoraKitManager.shared.callTimestampStart(clean: true, roomId: room.roomId)
         
         ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .joined)
         
