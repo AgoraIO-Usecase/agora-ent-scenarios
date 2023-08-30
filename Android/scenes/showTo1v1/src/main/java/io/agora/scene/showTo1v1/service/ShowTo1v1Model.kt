@@ -28,7 +28,7 @@ open class ShowTo1v1UserInfo constructor(
 class ShowTo1v1RoomInfo constructor(
     val roomId: String,
     val roomName: String,
-    var createdAt: Long, userId: String, userName: String, avatar: String, objectId: String
+    var createdAt: Long, userId: String, userName: String, avatar: String, objectId: String=""
 ) : ShowTo1v1UserInfo(userId, userName, avatar, objectId), Parcelable {
 
     constructor(parcel: Parcel) : this(

@@ -27,7 +27,7 @@
         app:ctv_rightImageSrc="@drawable/show_to1v1_room_list_refresh_dark"
         tools:ignore="MissingConstraints" />
 
-    <io.agora.scene.showTo1v1.ui.RoomListGuideView
+    <io.agora.scene.showTo1v1.ui.view.RoomListGuideView
         android:id="@+id/vGuidance"
         android:visibility="gone"
         android:layout_width="match_parent"

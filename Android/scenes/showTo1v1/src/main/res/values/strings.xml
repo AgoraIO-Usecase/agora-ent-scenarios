@@ -6,6 +6,8 @@
     <string name="show_to1v1_room_name">房间名称</string>
     <string name="show_to1v1_random">随机</string>
     <string name="show_to1v1_room_name_hint">填写房间名称，吸引更多观众</string>
+    <string name="show_to1v1_room_name_empty_tips">请输入房间名</string>
+    <string name="show_to1v1_room_list_refreshed">列表已刷新</string>
     <string name="show_to1v1_create_room_tips">本产品仅用于功能体验，单次直播时长不超过20mins</string>
     <string name="show_to1v1_create">创建</string>
     <string name="show_to1v1_creating">创建中…</string>
@@ -34,4 +36,17 @@
     <string name="show_to1v1_dashboard_receive_resolution">接收分辨率: %s</string>
     <string name="show_to1v1_dashboard_receive_fps">接收帧率: %s fps</string>
     <string name="show_to1v1_dashboard_down_loss_package">下行丢包率: %s ％</string>
+
+    <string-array name="show_to1v1_room_name">
+        <item>小可爱是我呀</item>
+        <item>我是你的小可爱</item>
+        <item>一往情深</item>
+        <item>情不知所起</item>
+        <item>沪上挖掘机</item>
+        <item>张江推土机</item>
+        <item>川沙妲己痴迷粉丝</item>
+        <item>疯狂星期几</item>
+        <item>小黄鸭</item>
+        <item>西二旗老板娘</item>
+    </string-array>
 </resources>

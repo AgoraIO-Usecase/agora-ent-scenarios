@@ -14,8 +14,8 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="90dp"
         android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="90dp"
         android:layout_marginBottom="82dp"
         app:cardCornerRadius="20dp"
         app:cardElevation="0dp">
@@ -133,39 +133,50 @@
             app:layout_constraintTop_toBottomOf="@id/ivUserAvatar"
             tools:text="房间主题" />
 
-        <FrameLayout
-            android:id="@+id/layoutVideoContainer"
+        <androidx.cardview.widget.CardView
             android:layout_width="109dp"
             android:layout_height="163dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:background="@drawable/show_to1v1_broadcast_bg"
+            app:cardCornerRadius="25dp"
+            app:cardElevation="0dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivComeSoon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="40dp"
-            android:src="@drawable/show_to1v1_come_soon"
-            app:layout_constraintEnd_toEndOf="@id/layoutVideoContainer"
-            app:layout_constraintStart_toStartOf="@id/layoutVideoContainer"
-            app:layout_constraintTop_toTopOf="@id/layoutVideoContainer" />
+            <LinearLayout
+                android:id="@+id/layoutVideoEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/show_to1v1_broadcast_bg"
+                android:gravity="center"
+                android:orientation="vertical">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvComeSoon"
-            android:layout_width="89dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
-            android:gravity="center"
-            android:text="@string/show_to1v1_come_soon"
-            android:textColor="@color/white"
-            android:textSize="13sp"
-            app:layout_constraintEnd_toEndOf="@id/layoutVideoContainer"
-            app:layout_constraintStart_toStartOf="@id/layoutVideoContainer"
-            app:layout_constraintTop_toTopOf="@id/layoutVideoContainer" />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivComeSoon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/show_to1v1_come_soon" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvComeSoon"
+                    android:layout_width="89dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center"
+                    android:text="@string/show_to1v1_come_soon"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutVideoContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical" />
+        </androidx.cardview.widget.CardView>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <LinearLayout
         android:id="@+id/layoutCreateRoom"

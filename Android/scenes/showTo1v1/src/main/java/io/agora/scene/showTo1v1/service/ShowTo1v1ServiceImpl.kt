@@ -141,14 +141,14 @@ class ShowTo1v1ServiceImpl constructor(
 
     override fun createRoom(roomName: String, completion: (error: Exception?, roomInfo: ShowTo1v1RoomInfo?) -> Unit) {
         initScene {
+            val roomId = (Random(System.currentTimeMillis()).nextInt(100000) + 1000000).toString()
             val roomInfo = ShowTo1v1RoomInfo(
-                roomId = (Random(System.currentTimeMillis()).nextInt(100000) + 1000000).toString(),
+                roomId = roomId,
                 roomName = roomName,
                 createdAt = System.currentTimeMillis(),
                 userId = UserManager.getInstance().user.id.toString(),
                 userName = UserManager.getInstance().user.name,
                 avatar = UserManager.getInstance().user.headUrl,
-                objectId = ""
             )
             val scene = Scene()
             scene.id = roomInfo.roomId

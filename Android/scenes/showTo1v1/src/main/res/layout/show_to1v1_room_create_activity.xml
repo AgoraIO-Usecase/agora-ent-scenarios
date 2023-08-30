@@ -5,23 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivRoomBg"
+    <FrameLayout
+        android:id="@+id/flVideoContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/show_to1v1_user_bg1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:background="@color/black_80_percent" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivRefresh"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="15dp"
-        android:src="@drawable/show_to1v1_detail_close"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <io.agora.scene.widget.CommonTitleView
+        android:id="@+id/title_view"
+        style="@style/title_view"
+        app:ctv_centerText=""
+        app:ctv_hideLeftImage="true"
+        app:ctv_rightImageSrc="@drawable/show_to1v1_detail_close"
+        tools:ignore="MissingConstraints" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -65,6 +61,7 @@
             android:background="@drawable/show_to1v1_input_corner_radius"
             android:gravity="center_vertical"
             android:hint="@string/show_to1v1_room_name_hint"
+            android:textSize="14sp"
             android:paddingHorizontal="20dp"
             app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
@@ -99,6 +96,7 @@
             app:layout_constraintTop_toBottomOf="@id/tvContent">
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCreate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/show_to1v1_create"

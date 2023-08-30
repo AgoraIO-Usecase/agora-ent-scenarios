@@ -25,6 +25,7 @@ import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
+import io.agora.scene.showTo1v1.ui.RoomCreateActivity
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPI
 import io.agora.scene.widget.utils.BlurTransformation
@@ -81,6 +82,13 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     override fun initView() {
         super.initView()
+        // setupRemoteVideo
+        activity?.let {
+            mRtcVideoSwitcher.setupRemoteVideo(
+                mMainRtcConnection,
+                VideoSwitcher.VideoCanvasContainer(it, binding.layoutVideoContainer, mRoomInfo.userId.toInt())
+            )
+        }
         binding.tvUserName.text = mRoomInfo.userName
         binding.tvRoomName.text = mRoomInfo.roomName
         val resourceName = "show_to1v1_user_bg${mRoomInfo.userId.toInt() % 9 + 1}"
@@ -104,6 +112,10 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
                 .asGif()
                 .load(R.drawable.show_to1v1_wave_living)
                 .into(binding.ivLiving)
+
+            binding.layoutCreateRoom.setOnClickListener {
+                RoomCreateActivity.launch(context)
+            }
         }
         binding.ivConnectBG.breathAnim()
     }
@@ -155,14 +167,6 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
                 mRoomInfo.roomId, UserManager.getInstance().user.id.toInt(), eventListener
             )
         }
-        // setupRemoteVideo
-        activity?.let {
-            mRtcVideoSwitcher.setupRemoteVideo(
-                mMainRtcConnection,
-                VideoSwitcher.VideoCanvasContainer(it, binding.layoutVideoContainer, mRoomInfo.userId.toInt())
-            )
-        }
-
     }
 
     private fun joinChannel(eventListener: VideoSwitcherAPI.IChannelEventListener) {

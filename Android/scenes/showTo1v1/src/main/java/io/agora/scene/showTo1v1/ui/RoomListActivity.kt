@@ -9,6 +9,7 @@ import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import androidx.core.content.ContextCompat
+import androidx.core.util.forEach
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -22,6 +23,7 @@ import io.agora.scene.base.GlideOptions
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.RtcEngineInstance
@@ -40,57 +42,18 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     companion object {
         private const val TAG = "RoomListActivity"
+        private const val kRoomListSwipeGuide = "showTo1v1_SwipeGuide"
 
         private const val POSITION_NONE = -1
     }
 
     private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
-    private val mRtcVideoSwitcher by lazy { RtcEngineInstance.videoSwitcher }
-    private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
 
     private var fragmentAdapter: FragmentStateAdapter? = null
     private val mRoomInfoList = mutableListOf<ShowTo1v1RoomInfo>()
 
     private val vpFragments = SparseArray<RoomListFragment>()
     private var currLoadPosition = POSITION_NONE
-
-    private var toggleVideoRun: Runnable? = null
-    private var toggleAudioRun: Runnable? = null
-
-    override fun getPermissions() {
-        toggleVideoRun?.let {
-            it.run()
-            toggleVideoRun = null
-        }
-        toggleAudioRun?.let {
-            it.run()
-            toggleAudioRun = null
-        }
-    }
-
-    fun toggleSelfVideo(isOpen: Boolean, callback: () -> Unit) {
-        if (isOpen) {
-            toggleVideoRun = Runnable { callback.invoke() }
-            requestCameraPermission(true)
-        } else {
-            callback.invoke()
-        }
-    }
-
-    fun toggleSelfAudio(isOpen: Boolean, callback: () -> Unit) {
-        if (isOpen) {
-            toggleAudioRun = Runnable {
-                callback.invoke()
-            }
-            requestRecordPermission(true)
-        } else {
-            callback.invoke()
-        }
-    }
-
-    override fun onPermissionDined(permission: String?) {
-        PermissionLeakDialog(this).show(permission, { getPermissions() }) { launchAppSetting(permission) }
-    }
 
     override fun getViewBinding(inflater: LayoutInflater): ShowTo1v1RoomListActivityBinding {
         return ShowTo1v1RoomListActivityBinding.inflate(inflater)
@@ -100,7 +63,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setOnApplyWindowInsetsListener()
-        StatusBarUtil.hideStatusBar(window, true)
         fetchService()
     }
 
@@ -114,11 +76,27 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         }
     }
 
+    private var guided = SPUtil.getBoolean(kRoomListSwipeGuide, false)
+    private fun mayShowGuideView() {
+        if (mRoomInfoList.isEmpty() || guided) {
+            return
+        }
+        binding.vGuidance.visibility = View.VISIBLE
+        binding.vGuidance.setOnClickListener {
+            SPUtil.putBoolean(kRoomListSwipeGuide, true)
+            guided = true
+            binding.vGuidance.visibility = View.GONE
+        }
+    }
+
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
         binding.titleView.setLeftClick { finish() }
         binding.titleView.setRightIconClick {
             fetchRoomList()
+        }
+        binding.emptyInclude.layoutCreateRoom.setOnClickListener {
+            RoomCreateActivity.launch(this)
         }
     }
 
@@ -143,6 +121,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             }
             binding.viewPager2.adapter = fragmentAdapter
             binding.viewPager2.registerOnPageChangeCallback(onPageChangeCallback)
+            binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2 - Int.MAX_VALUE / 2 % mRoomInfoList.size, false)
         }
     }
 
@@ -231,6 +210,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             success = {
                 RtcEngineInstance.setupGeneralToken(it)
                 ShowTo1v1Logger.d(TAG, "generateToken success：$it， uid：$localUId")
+                fetchRoomList()
             },
             failure = {
                 ShowTo1v1Logger.e(TAG, it, "generateToken failure：$it")
@@ -243,23 +223,33 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             if (error == null) { // success
                 mRoomInfoList.clear()
                 mRoomInfoList.addAll(roomList)
+                vpFragments[currLoadPosition]?.stopLoadPage(false)
                 updateListView()
-                if (mRoomInfoList.isNotEmpty()) {
-                    initViewPage()
-                }
+                initViewPage()
+                ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
             } else {
                 updateListView()
             }
+            mayShowGuideView()
+
         })
     }
 
     private fun updateListView() {
         if (mRoomInfoList.isEmpty()) {
             StatusBarUtil.hideStatusBar(window, true)
-            binding.emptyInclude.emptyRoot.isVisible = true
+            binding.emptyInclude.root.isVisible = true
+            binding.viewPager2.isVisible = false
         } else {
             StatusBarUtil.hideStatusBar(window, false)
-            binding.emptyInclude.emptyRoot.isVisible = false
+            binding.emptyInclude.root.isVisible = false
+            binding.viewPager2.isVisible = true
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        vpFragments[currLoadPosition]?.stopLoadPage(false)
+        RtcEngineInstance.cleanCache()
     }
 }
