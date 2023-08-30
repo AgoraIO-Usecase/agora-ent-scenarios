@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">声动互娱-1V1</string>
+    <string name="app_name">声动互娱-1v1私密房</string>
     <string name="app_title_home">首页</string>
     <string name="app_title_find">发现</string>
     <string name="app_title_mine">我的</string>
@@ -53,6 +53,7 @@
     <string name="app_about_chat_room_spatial">语聊房-空间音频模式</string>
     <string name="app_about_karaoke">在线K歌</string>
     <string name="app_about_show">秀场直播</string>
+    <string name="app_about_pure1v1">声动互娱-1v1私密房</string>
     <string name="app_about_customer_service">联系客服</string>
     <string name="app_about_official_website">官网地址</string>
     <string name="app_about_phone_cancel">取消</string>

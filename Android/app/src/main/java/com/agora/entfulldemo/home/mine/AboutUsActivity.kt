@@ -104,6 +104,14 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 )
             )
         }
+        if (VersionUtils.getVersion("io.agora.scene.pure1v1.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_pure1v1),
+                    VersionUtils.getVersion("io.agora.scene.pure1v1.BuildConfig")
+                )
+            )
+        }
         if (scenes.size == 1) {
             adapter.scenes = mutableListOf()
             val scene = scenes[0]
