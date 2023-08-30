@@ -39,6 +39,7 @@ import io.agora.scene.pure1v1.service.UserInfo
 import io.agora.scene.widget.utils.BlurTransformation
 import org.json.JSONException
 import org.json.JSONObject
+import java.lang.reflect.Proxy
 
 class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>(), ICallApiListener {
 
@@ -86,13 +87,16 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         val anim = AnimationUtils.loadAnimation(this, R.anim.pure1v1_center_rotation)
         binding.ivRefresh.startAnimation(anim)
         binding.ivRefresh.isEnabled = false
-        CallServiceManager.instance.sceneService?.getUserList { list ->
-            Toast.makeText(this, getText(R.string.pure1v1_room_list_refresh), Toast.LENGTH_SHORT).show()
+        CallServiceManager.instance.sceneService?.getUserList { msg, list ->
             binding.ivRefresh.postDelayed({
                 binding.ivRefresh.clearAnimation()
                 binding.ivRefresh.isEnabled = true
             },1000)
-
+            if (msg != null ) {
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, getText(R.string.pure1v1_room_list_refresh), Toast.LENGTH_SHORT).show()
+            }
             dataList = list.filter { it.userId != CallServiceManager.instance.localUser?.userId}
             adapter?.refresh(dataList)
             if (dataList.size > 1) {

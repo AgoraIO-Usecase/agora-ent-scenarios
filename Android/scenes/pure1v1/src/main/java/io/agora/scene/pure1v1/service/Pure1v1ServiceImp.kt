@@ -25,7 +25,7 @@ class Pure1v1ServiceImp(
     private var userList: List<UserInfo> = emptyList()
 
     // MARK: - Public
-    fun getUserList(completion: (List<UserInfo>) -> Unit) {
+    fun getUserList(completion: (String?, List<UserInfo>) -> Unit) {
         initScene {
             Instance().getScenes(object : Sync.DataListCallback {
                 override fun onSuccess(result: MutableList<IObject>?) {
@@ -38,10 +38,11 @@ class Pure1v1ServiceImp(
                     //按照创建时间顺序排序
                     ret.sortBy { it.createdAt }
                     userList = ret.toList()
-                    runOnMainThread { completion.invoke(userList) }
+                    runOnMainThread { completion.invoke(null, userList) }
                 }
                 override fun onFail(exception: SyncManagerException?) {
-                    runOnMainThread { completion.invoke(emptyList()) }
+                    val msg = exception?.localizedMessage ?: "Refresh User List Failed"
+                    runOnMainThread { completion.invoke(msg, userList) }
                 }
             })
         }
