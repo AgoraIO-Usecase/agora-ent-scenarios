@@ -85,8 +85,10 @@ class ShowSyncManagerServiceImpl constructor(
 
     override fun destroy() {
         if (syncInitialized) {
-            roomInfoControllers.forEach {
-                cleanRoomInfoController(it)
+            synchronized(roomInfoControllers){
+                roomInfoControllers.forEach {
+                    cleanRoomInfoController(it)
+                }
             }
             roomInfoControllers.clear()
             roomMap.clear()
@@ -457,16 +459,20 @@ class ShowSyncManagerServiceImpl constructor(
         infoController.onReconnectSubscriber = null
 
         infoController.sceneReference?.let { ref ->
-            infoController.eventListeners.forEach {
-                ref.unsubscribe(it)
+            synchronized(infoController.eventListeners) {
+                infoController.eventListeners.forEach {
+                    ref.unsubscribe(it)
+                }
             }
         }
         infoController.eventListeners.clear()
         infoController.sceneReference = null
 
         infoController.pkSceneReference?.let { ref ->
-            infoController.pkEventListeners.forEach {
-                ref.unsubscribe(it)
+            synchronized(infoController.pkEventListeners){
+                infoController.pkEventListeners.forEach {
+                    ref.unsubscribe(it)
+                }
             }
         }
         infoController.pkEventListeners.clear()
@@ -1965,8 +1971,10 @@ class ShowSyncManagerServiceImpl constructor(
                 val invitation = roomInfoController.pKCompetitorInvitationList[index]
 
                 val sceneReference = roomInfoController.pkSceneReference ?: return
-                roomInfoController.pkEventListeners.forEach {
-                    sceneReference.unsubscribe(it)
+                synchronized(roomInfoController.pkEventListeners) {
+                    roomInfoController.pkEventListeners.forEach {
+                        sceneReference.unsubscribe(it)
+                    }
                 }
 
                 roomInfoController.pkSceneReference = null
