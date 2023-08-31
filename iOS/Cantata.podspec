@@ -47,9 +47,7 @@ TODO: Add long description of the pod here.
  # }
  
   s.resource = 'Cantata/**/*.bundle'
-
-#  s.public_header_files = ['Cantata/**/CantataPlugin.h','Cantata/**/VLKTVTopView.h', 'Cantata/**/VLKTVSelBgModel.h']
-  s.public_header_files = ['Cantata/Cantata.h', 'Cantata/**/CantataPlugin.h','Cantata/**/VLKTVTopView.h']
+  s.public_header_files = ['Cantata/**/CantataPlugin.h','Cantata/**/VLKTVTopView.h']
   s.dependency 'AgoraRtcEngine_Special_iOS'
   s.dependency 'AgoraCommon'
   s.dependency 'LSTPopView'

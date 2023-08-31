@@ -10,6 +10,7 @@
 #import "MenuUtils.h"
 #import "AESMacro.h"
 #import "VLToast.h"
+@import AgoraCommon;
 @import Cantata;
 @interface VLHomeViewController ()<VLHomeViewDelegate>
 
@@ -21,7 +22,7 @@
     [super viewDidLoad];
     [self setBackgroundImage:@"home_bg_image"];
     [self setNaviTitleName:AGLocalizedString(@"agora")];
-    
+
     [[NetworkManager shared] reportDeviceInfoWithSceneName: @""];
     
     [self setUpUI];
