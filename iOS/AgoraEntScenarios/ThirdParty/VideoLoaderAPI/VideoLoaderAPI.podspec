@@ -41,6 +41,6 @@ TODO: Add long description of the pod here.
   #   'VideoLoaderAPI' => ['VideoLoaderAPI/Assets/*.png']
   # }
 
-  s.public_header_files = 'Cantata/KTV/CantataPlugin.h'
+#  s.public_header_files = 'Cantata/KTV/CantataPlugin.h'
   s.dependency 'AgoraRtcEngine_Special_iOS'
 end
