@@ -39,7 +39,7 @@ class ShowLiveViewController: UIViewController {
                 return
             }
             if (loadingType == .joined) {// 秒开计时
-                ShowAgoraKitManager.shared.callTimestampStart(clean: false)
+                ShowAgoraKitManager.shared.callTimestampStart(clean: false, roomId: room?.roomId)
             }
             updateLoadingType(playState: loadingType)
             remoteVideoWidth = nil
@@ -277,6 +277,7 @@ class ShowLiveViewController: UIViewController {
     func leaveRoom(){
         ShowAgoraKitManager.shared.removeRtcDelegate(delegate: self, roomId: roomId)
         ShowAgoraKitManager.shared.cleanCapture()
+        ShowBeautyFaceVC.resetData()
         ShowAgoraKitManager.shared.leaveChannelEx(roomId: roomId, channelId: roomId)
 
         serviceImp?.unsubscribeEvent(delegate: self)
@@ -818,7 +819,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
             }
         }
         panelPresenter.updateVideoStats(stats)
-        if let ts = ShowAgoraKitManager.shared.callTimestampEnd() {
+        if let ts = ShowAgoraKitManager.shared.callTimestampEnd(roomId) {
             panelPresenter.updateTimestamp(ts)
         }
         throttleRefreshRealTimeInfo()
@@ -861,7 +862,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
             if state == .decoding /*2*/,
                ( reason == .remoteUnmuted /*6*/ || reason == .localUnmuted /*4*/ || reason == .localMuted /*3*/ )   {
                 showLogger.info("show first frame (\(channelId))", context: kShowLogBaseContext)
-                if let ts = ShowAgoraKitManager.shared.callTimestampEnd() {
+                if let ts = ShowAgoraKitManager.shared.callTimestampEnd(channelId) {
                     self.panelPresenter.updateTimestamp(ts)
                     self.throttleRefreshRealTimeInfo()
                 }
