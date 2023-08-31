@@ -3,6 +3,9 @@ package io.agora.scene.showTo1v1.service
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.ToastUtils
 
+// 房间存活时间，单位ms
+const val ROOM_AVAILABLE_DURATION: Long = 60 * 20 * 1000// 20min
+
 enum class ShowTo1v1ServiceNetworkStatus {
     Connecting, // 连接中
     Open,       //已打开

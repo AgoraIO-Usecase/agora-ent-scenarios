@@ -22,6 +22,7 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.RtcEngineInstance
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
+import io.agora.scene.showTo1v1.callAPI.ICallApi
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
@@ -45,6 +46,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     }
 
     private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
+    private val mCallApi by lazy { ICallApi.getImplInstance() }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
     private val mRtcVideoSwitcher by lazy { RtcEngineInstance.videoSwitcher }
 
@@ -135,7 +137,6 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         isPageLoaded = true
 
         initRtcEngine(isScrolling) {}
-        initServiceWithJoinRoom()
     }
 
     fun stopLoadPage(isScrolling: Boolean) {
@@ -190,22 +191,6 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         // 如果是观众 把 ChannelMediaOptions 的 audienceLatencyLevel 设置为 AUDIENCE_LATENCY_LEVEL_LOW_LATENCY（超低延时）
         channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
         mRtcVideoSwitcher.joinChannel(rtcConnection, channelMediaOptions, eventListener)
-    }
-
-
-    //================== Service Operation ===============
-    private fun initServiceWithJoinRoom() {
-        mService.joinRoom(mRoomInfo, completion = { error ->
-            if (error == null) { // success
-                initService()
-            } else { //failed
-
-            }
-        })
-    }
-
-    private fun initService() {
-
     }
 
     private fun runOnUiThread(run: Runnable) {

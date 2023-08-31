@@ -17,6 +17,7 @@
     <string name="show_to1v1_call_connecting">连接中…</string>
     <string name="show_to1v1_call_dialog_info">本产品仅用于功能体验，单次直播时长不超过20mins</string>
     <string name="show_to1v1_dashboard_item">实时数据</string>
+    <string name="show_to1v1_ending_tips">对方结束连线</string>
 
     <!--    dashboard-->
     <string name="show_to1v1_dashboard_bitrate">码率: %s kbps</string>

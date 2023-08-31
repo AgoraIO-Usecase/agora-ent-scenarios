@@ -21,68 +21,82 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cvRoomInfo"
-            android:layout_width="200dp"
+            android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_marginStart="15dp"
             android:backgroundTint="@color/black_20_percent"
             app:cardCornerRadius="20dp"
             app:cardElevation="-1dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" >
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivUserAvatar"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="5dp"
-            android:src="@drawable/show_to1v1_room_item_icon_sample"
-            app:layout_constraintBottom_toBottomOf="@+id/cvRoomInfo"
-            app:layout_constraintStart_toStartOf="@+id/cvRoomInfo"
-            app:layout_constraintTop_toTopOf="@+id/cvRoomInfo" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvRoomName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="3dp"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            app:layout_constraintStart_toEndOf="@+id/ivUserAvatar"
-            app:layout_constraintTop_toTopOf="@+id/cvRoomInfo"
-            tools:text="房间名称" />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivUserAvatar"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="5dp"
+                    android:src="@drawable/show_to1v1_room_item_icon_sample"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvRoomNum"
-            android:layout_width="72dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            android:textColor="@color/white"
-            android:textSize="11sp"
-            app:layout_constraintBottom_toBottomOf="@+id/cvRoomInfo"
-            app:layout_constraintStart_toStartOf="@+id/tvRoomName"
-            tools:text="000000" />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvRoomName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="3dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:maxLength="14"
+                    app:layout_constraintStart_toEndOf="@+id/ivUserAvatar"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="房间名称" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivConnect"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:src="@drawable/show_to1v1_room_detail_connection"
-            app:layout_constraintBottom_toBottomOf="@+id/tvRoomNum"
-            app:layout_constraintStart_toEndOf="@+id/tvRoomNum"
-            app:layout_constraintTop_toTopOf="@+id/tvRoomNum" />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvNickname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="3dp"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    app:layout_constraintStart_toEndOf="@+id/ivUserAvatar"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    tools:text="用户昵称" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:text="00:00:00"
-            android:textColor="@color/white"
-            android:textSize="11sp"
-            app:layout_constraintBottom_toBottomOf="@+id/ivConnect"
-            app:layout_constraintStart_toEndOf="@+id/ivConnect"
-            app:layout_constraintTop_toTopOf="@+id/ivConnect" />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvRoomNum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    android:layout_marginStart="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tvNickname"
+                    tools:text="000000" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="00:00:00"
+                    android:drawableStart="@drawable/show_to1v1_dot"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    android:gravity="center"
+                    android:drawablePadding="3dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="15dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/tvRoomNum" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivClose"
@@ -185,9 +199,8 @@
         android:id="@+id/flDashboard"
         android:layout_width="match_parent"
         android:layout_height="400dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="120dp"
-        android:layout_marginEnd="16dp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -199,7 +212,7 @@
             android:layout_gravity="end"
             android:elevation="2dp"
             android:padding="10dp"
-            android:src="@drawable/show_to1v1_detail_close" />
+            android:src="@drawable/show_to1v1_dashboard_close" />
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

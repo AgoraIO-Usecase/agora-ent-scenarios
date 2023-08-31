@@ -10,9 +10,12 @@ import android.view.ViewGroup
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.scene.showTo1v1.R
+import io.agora.scene.showTo1v1.callAPI.ICallApi
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1DashboardFragmentBinding
 
 class DashboardFragment : Fragment() {
+
+    private val mCallApi by lazy { ICallApi.getImplInstance() }
 
     private lateinit var binding: ShowTo1v1DashboardFragmentBinding
 
@@ -22,6 +25,7 @@ class DashboardFragment : Fragment() {
 
     override fun onDestroy() {
         handler?.let {
+            mCallApi.removeRTCListener(it)
             handler = null
         }
         super.onDestroy()
@@ -130,6 +134,7 @@ class DashboardFragment : Fragment() {
                 }
             }
         }
+        mCallApi.addRTCListener(rtcListener)
         handler = rtcListener
     }
 

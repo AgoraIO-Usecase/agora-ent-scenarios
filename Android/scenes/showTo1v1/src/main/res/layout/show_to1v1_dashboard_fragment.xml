@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:text="@string/show_to1v1_dashboard_up"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <TableRow android:paddingVertical="3dp">
@@ -72,7 +72,7 @@
             android:layout_marginTop="20dp"
             android:text="@string/show_to1v1_dashboard_down"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <TableRow android:paddingVertical="3dp">

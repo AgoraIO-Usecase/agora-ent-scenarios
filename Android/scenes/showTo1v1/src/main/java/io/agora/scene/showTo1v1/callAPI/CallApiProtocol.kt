@@ -3,6 +3,10 @@ package io.agora.scene.showTo1v1.callAPI
 import android.view.TextureView
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngineEx
+import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceImpl
+import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 
 enum class CallRole(val value: Int) {
     // 被叫
@@ -170,6 +174,17 @@ data class AGError(
 )
 
 interface ICallApi {
+
+    companion object {
+
+        private val instance by lazy {
+            CallApiImpl(AgoraApplication.the())
+        }
+
+        fun getImplInstance(): ICallApi {
+            return instance
+        }
+    }
 
     // 初始化配置
     fun initialize(config: CallConfig, token: CallTokenConfig, completion: ((AGError?) -> Unit))

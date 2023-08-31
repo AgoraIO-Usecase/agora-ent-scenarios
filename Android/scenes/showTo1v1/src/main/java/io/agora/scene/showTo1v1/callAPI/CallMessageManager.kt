@@ -73,11 +73,16 @@ class CallMessageManager(
     private var rtmClient = _createRtmClient()
 
     private var snapshotDidRecv: (() -> Unit)? = null
+
+    private var loginSuccess: ((ErrorInfo?)-> Unit)? = null
     // RTM是否已经登录
     private var isLoginedRTM = false
     // RTM 是否已经订阅频道
     var isSubscribedRTM = false
         private set
+
+    private var prepareConfig: PrepareConfig? = null
+    private var tokenConfig: CallTokenConfig? = null
     // 消息id
     private var messageId: Int = 0
     // 待接收回执队列，保存没有接收到回执或者等待未超时的消息
@@ -85,7 +90,17 @@ class CallMessageManager(
 
     private val mHandler = Handler(Looper.getMainLooper())
 
+    fun logout() {
+        rtmClient.logout(object : ResultCallback<Void> {
+            override fun onSuccess(responseInfo: Void?) {}
+            override fun onFailure(errorInfo: ErrorInfo?) {}
+        })
+        RtmClient.release()
+    }
+
     fun rtmInitialize(prepareConfig: PrepareConfig, tokenConfig: CallTokenConfig?, completion: (AGError?) -> Unit) {
+        this.prepareConfig = prepareConfig
+        this.tokenConfig = tokenConfig
         val rtmToken = tokenConfig?.rtmToken ?: run {
             val reason = "RTM Token is Empty"
             completion(AGError(reason, -1))
@@ -119,7 +134,19 @@ class CallMessageManager(
     /// 更新RTM token
     /// - Parameter rtmToken: <#rtmToken description#>
     fun renewToken(rtmToken: String) {
-        if (!isLoginedRTM) { return }
+        if (!isLoginedRTM) {
+            val prepareConfig = prepareConfig
+            if (prepareConfig != null && prepareConfig.autoJoinRTC) {
+                Log.e(TAG, "renewToken need to reinit")
+                rtmClient.logout(object : ResultCallback<Void> {
+                    override fun onSuccess(responseInfo: Void?) {}
+                    override fun onFailure(errorInfo: ErrorInfo?) {}
+                })
+                rtmInitialize(prepareConfig, tokenConfig) { _ ->
+                }
+            }
+            return
+        }
         rtmClient.renewToken(rtmToken, object : ResultCallback<Void> {
             override fun onSuccess(responseInfo: Void?) {
             }
@@ -243,17 +270,18 @@ class CallMessageManager(
             return
         }
         /*
-         纯1v1
-         订阅自己频道的presence和消息
-
-         秀场转1v1
+         纯1v1:
+            订阅自己频道的message，用于收消息
+         秀场转1v1:
          1.主叫
-            a.订阅被叫频道的presence，用来写入presence
+            a.订阅被叫频道的presence，用户读取呼叫信息
             b.订阅自己频道的message, 用来收消息
          2.被叫
-            a.订阅自己频道的presence和消息
+            a.订阅自己频道的presence,用于写入呼叫信息
+            b.订阅自己频道的message，用来收消息
          */
         if (config.role == CallRole.CALLER && config.mode == CallMode.ShowTo1v1) {
+            //秀场转1v1主叫
             val ownerRoomId = config.ownerRoomId ?: run {
                 completion?.invoke(AGError("ownerRoomId is nil, please invoke 'initialize' to setup config", -1))
                 return
@@ -281,7 +309,7 @@ class CallMessageManager(
             val options2 = SubscribeOptions()
             options2.withMessage = false
             options2.withMetadata = false
-            options2.withPresence = true
+            options2.withPresence = false
             Log.d(TAG, "2/3 will _subscribe[$ownerRoomId]")
             _subscribe(ownerRoomId, options2) { error ->
                 error2 = error
@@ -289,11 +317,15 @@ class CallMessageManager(
                 tryCount -= 1
                 tryToInvoke.invoke()
             }
-
-            Log.d(TAG, "3/3 waiting for snapshot")
-            //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
-            snapshotDidRecv = {
-                Log.d(TAG, "3/3 recv snapshot")
+            if (options2.withPresence) {
+                Log.d(TAG, "3/3 waiting for snapshot")
+                //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
+                snapshotDidRecv = {
+                    Log.d(TAG, "3/3 recv snapshot")
+                    tryCount -= 1
+                    tryToInvoke.invoke()
+                }
+            } else {
                 tryCount -= 1
                 tryToInvoke.invoke()
             }
@@ -308,13 +340,18 @@ class CallMessageManager(
             val options = SubscribeOptions()
             options.withMessage = true
             options.withMetadata = false
-            options.withPresence = true
+            options.withPresence = false
             _subscribe(roomId, options) { e ->
                 error = e
                 tryCount -= 1
                 tryToInvoke.invoke()
             }
-            snapshotDidRecv = {
+            if (options.withPresence) {
+                snapshotDidRecv = {
+                    tryCount -= 1
+                    tryToInvoke.invoke()
+                }
+            } else {
                 tryCount -= 1
                 tryToInvoke.invoke()
             }
@@ -394,7 +431,7 @@ class CallMessageManager(
     }
 
     private fun _subscribe(channelName: String, option: SubscribeOptions, completion: ((AGError?) -> Unit)?) {
-        Log.d(TAG, "will subscribe[$channelName]")
+        Log.d(TAG, "will subscribe[$channelName] message: ${option.withMessage} presence: ${option.withPresence}")
         rtmClient.unsubscribe(channelName, object: ResultCallback<Void> {
             override fun onSuccess(responseInfo: Void?) {
             }
@@ -421,6 +458,11 @@ class CallMessageManager(
             return
         }
         Log.d(TAG, "will login")
+        loginSuccess = completion
+        rtmClient.logout(object : ResultCallback<Void?> {
+            override fun onSuccess(responseInfo: Void?) {}
+            override fun onFailure(errorInfo: ErrorInfo?) {}
+        })
         val ret = rtmClient.login(token, object : ResultCallback<Void?> {
             override fun onSuccess(p0: Void?) {
                 Log.d(TAG, "login success")
@@ -445,7 +487,7 @@ class CallMessageManager(
 
     override fun onMessageEvent(event: MessageEvent?) {
         val message = event?.message?.data as? ByteArray ?: return
-        val jsonString = String(message, Charsets.ISO_8859_1)
+        val jsonString = String(message, Charsets.UTF_8)
         Log.d(TAG, "on event message: $jsonString")
         val map = jsonStringToMap(jsonString)
         val messageId = map[kMessageId] as? Int

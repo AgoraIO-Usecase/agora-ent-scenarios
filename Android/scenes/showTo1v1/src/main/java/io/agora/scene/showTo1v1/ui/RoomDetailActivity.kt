@@ -13,17 +13,27 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcConnection
 import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.base.utils.TimeUtils
+import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.RtcEngineInstance
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
+import io.agora.scene.showTo1v1.callAPI.ICallApi
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallDetailActivityBinding
+import io.agora.scene.showTo1v1.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
+import io.agora.scene.showTo1v1.ui.dialog.CallDetailSettingDialog
+import io.agora.scene.showTo1v1.ui.fragment.DashboardFragment
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPI
 import io.agora.scene.widget.dialog.PermissionLeakDialog
@@ -43,7 +53,10 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         }
     }
 
+    private var dashboard: DashboardFragment? = null
+
     private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
+    private val mCallApi by lazy { ICallApi.getImplInstance() }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
     private val mRtcVideoSwitcher by lazy { RtcEngineInstance.videoSwitcher }
 
@@ -60,6 +73,18 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         )
     }
 
+    private val timerRoomEndRun = Runnable {
+        destroy() // 房间到了限制时间
+        ToastUtils.showToast(R.string.show_to1v1_ending_tips)
+        ShowTo1v1Logger.d(TAG, "timer end!")
+    }
+
+    private val timerLinkingEndRun = Runnable {
+        destroy() // 房间到了限制时间
+        ToastUtils.showToast(R.string.show_to1v1_ending_tips)
+        ShowTo1v1Logger.d(TAG, "timer linking end!")
+    }
+
 
     override fun getViewBinding(inflater: LayoutInflater): ShowTo1v1CallDetailActivityBinding {
         return ShowTo1v1CallDetailActivityBinding.inflate(inflater)
@@ -70,11 +95,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setOnApplyWindowInsetsListener()
         StatusBarUtil.hideStatusBar(window, true)
-        toggleSelfAudio(true) {
-            initRtcEngine()
-        }
-        toggleSelfVideo(true) {}
     }
+
 
     private fun setOnApplyWindowInsetsListener() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v: View, insets: WindowInsetsCompat ->
@@ -87,24 +109,59 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     override fun init() {
         super.init()
+        val roomLeftTime =
+            ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong())
+        if (roomLeftTime > 0) {
+            binding.root.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
+            initRtcEngine()
+            initServiceWithJoinRoom()
+        }
     }
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
+        Glide.with(this)
+            .load(mRoomInfo.avatar).apply(RequestOptions.circleCropTransform())
+            .into(binding.ivUserAvatar)
+        binding.tvRoomName.text = mRoomInfo.roomName
+        binding.tvNickname.text = mRoomInfo.userName
+        binding.tvRoomNum.text = mRoomInfo.roomId
+
         binding.ivClose.setOnClickListener {
             finish()
+        }
+        binding.ivSetting.setOnClickListener {
+            val dialog = CallDetailSettingDialog(this)
+            dialog.setListener(object : CallDetailSettingDialog.CallDetailSettingItemListener {
+                override fun onClickDashboard() {
+                    binding.flDashboard.visibility = View.VISIBLE
+                    binding.ivClose.visibility = View.VISIBLE
+                    dashboard?.updateVisible(true)
+                }
+            })
+            dialog.show()
+        }
+        binding.ivDashboardClose.setOnClickListener {
+            binding.ivClose.visibility = View.INVISIBLE
+            binding.flDashboard.visibility = View.INVISIBLE
+            dashboard?.updateVisible(false)
         }
         binding.ivDashboardClose.setOnClickListener {
             binding.flDashboard.isVisible = false
         }
-        if (isRoomOwner){
-            binding.layoutCallPrivatelyBg.isVisible =false
-            binding.layoutCallPrivately.isVisible =false
-        }else{
-            binding.layoutCallPrivatelyBg.isVisible =true
-            binding.layoutCallPrivately.isVisible =true
+        if (isRoomOwner) {
+            binding.layoutCallPrivatelyBg.isVisible = false
+            binding.layoutCallPrivately.isVisible = false
+        } else {
+            binding.layoutCallPrivatelyBg.isVisible = true
+            binding.layoutCallPrivately.isVisible = true
             binding.layoutCallPrivatelyBg.breathAnim()
         }
+        val fragment = DashboardFragment()
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        fragmentTransaction.add(binding.flDashboard.id, fragment)
+        fragmentTransaction.commit()
+        dashboard = fragment
     }
 
     private var toggleVideoRun: Runnable? = null
@@ -147,23 +204,27 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     private fun initRtcEngine() {
         val eventListener = VideoSwitcherAPI.IChannelEventListener(
-            onUserOffline = { uid ->
+            onChannelJoined = { connection ->
 
             },
         )
-
-        if (isRoomOwner) {
-            ShowTo1v1Logger.d(TAG, "joinRoom from scroll")
-            joinChannel(eventListener)
-        } else {
-            ShowTo1v1Logger.d(TAG, "joinRoom from click")
-            mRtcVideoSwitcher.setChannelEvent(
-                mRoomInfo.roomId,
-                UserManager.getInstance().user.id.toInt(),
-                eventListener
-            )
+        toggleSelfVideo(true) {
+            if (isRoomOwner) {
+                ShowTo1v1Logger.d(TAG, "joinRoom from scroll")
+                joinChannel(eventListener)
+            } else {
+                ShowTo1v1Logger.d(TAG, "joinRoom from click")
+                mRtcVideoSwitcher.setChannelEvent(
+                    mRoomInfo.roomId,
+                    UserManager.getInstance().user.id.toInt(),
+                    eventListener
+                )
+            }
+            initVideoView()
         }
-        initVideoView()
+        toggleSelfAudio(true) {
+
+        }
     }
 
     private fun joinChannel(eventListener: VideoSwitcherAPI.IChannelEventListener) {
@@ -226,11 +287,31 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         }
     }
 
+
+    //================== Service Operation ===============
+    private fun initServiceWithJoinRoom() {
+        mService.joinRoom(mRoomInfo, completion = { error ->
+            if (error == null) { // success
+                initService()
+            } else { //failed
+
+            }
+        })
+    }
+
+    private fun initService() {
+
+    }
+
+    private fun destroy(): Boolean {
+        mService.leaveRoom(mRoomInfo, completion = {})
+        return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection, true)
+    }
 }
 
 private fun View.breathAnim() {
     val scaleAnima = ScaleAnimation(
-        0.8f, 1f, 0.8f, 1f,
+        0.9f, 1f, 0.8f, 1f,
         Animation.RELATIVE_TO_SELF, 0.5f,
         Animation.RELATIVE_TO_SELF, 0.5f
     )
