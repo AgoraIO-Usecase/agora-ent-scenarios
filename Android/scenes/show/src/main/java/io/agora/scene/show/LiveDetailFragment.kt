@@ -383,6 +383,7 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun refreshBottomLayout() {
+        val context = context ?: return
         val bottomLayout = mBinding.bottomLayout
         if (isRoomOwner) {
             // 房主
@@ -415,7 +416,7 @@ class LiveDetailFragment : Fragment() {
                 bottomLayout.flPK.isVisible = true
                 bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList =
-                    ColorStateList.valueOf(requireContext().resources.getColor(R.color.grey_7e))
+                    ColorStateList.valueOf(context.resources.getColor(R.color.grey_7e))
                 mSettingDialog.apply {
                     resetSettingsItem(false)
                 }
@@ -458,7 +459,7 @@ class LiveDetailFragment : Fragment() {
 
                 bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList =
-                    ColorStateList.valueOf(requireContext().resources.getColor(R.color.grey_7e))
+                    ColorStateList.valueOf(context.resources.getColor(R.color.grey_7e))
             }
         }
     }
