@@ -93,7 +93,8 @@
     if (![self checkIsLogin]) return;
     
     VLCreateRoomViewController *createRoomVC = [[VLCreateRoomViewController alloc]init];
-    [self.navigationController pushViewController:createRoomVC animated:YES];
+    CantataMainViewController *VC = [[CantataMainViewController alloc]init];
+    [self.navigationController pushViewController:VC animated:YES];
 
 }
 

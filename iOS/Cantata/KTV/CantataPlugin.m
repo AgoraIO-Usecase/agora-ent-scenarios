@@ -7,6 +7,7 @@
 
 #import "CantataPlugin.h"
 #import "VLOnLineListVC.h"
+
 @implementation CantataPlugin
 +(UIViewController *)getCantataRootViewCOntroller{
     VLOnLineListVC *vc = [[VLOnLineListVC alloc]init];
