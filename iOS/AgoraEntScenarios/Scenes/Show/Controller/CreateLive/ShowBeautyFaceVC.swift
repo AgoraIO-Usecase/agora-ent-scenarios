@@ -28,12 +28,12 @@ class ShowBeautyFaceVC: UIViewController {
         collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
-    static let beautyData = BeautyModel.createBeautyData()
-    static let styleData = BeautyModel.createStyleData()
-    static let adjustData = BeautyModel.createAdjustData()
-    static let filterData = BeautyModel.createFilterData()
-    static let stickerData = BeautyModel.createStickerData()
-    static let backgroundData = BeautyModel.createBackgroundData()
+    static var beautyData = BeautyModel.createBeautyData()
+    static var styleData = BeautyModel.createStyleData()
+    static var adjustData = BeautyModel.createAdjustData()
+    static var filterData = BeautyModel.createFilterData()
+    static var stickerData = BeautyModel.createStickerData()
+    static var backgroundData = BeautyModel.createBackgroundData()
      
     private lazy var dataArray: [BeautyModel] = {
         switch type {
@@ -70,6 +70,15 @@ class ShowBeautyFaceVC: UIViewController {
     
     func reloadData() {
         collectionView.reloadData()
+    }
+    
+    static func resetData(){
+        beautyData = BeautyModel.createBeautyData()
+        styleData = BeautyModel.createStyleData()
+        adjustData = BeautyModel.createAdjustData()
+        filterData = BeautyModel.createFilterData()
+        stickerData = BeautyModel.createStickerData()
+        backgroundData = BeautyModel.createBackgroundData()
     }
     
     private func setBeautyHandler(value: CGFloat, isReset: Bool) {
