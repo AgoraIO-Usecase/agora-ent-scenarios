@@ -5,6 +5,27 @@
 
 #import <UIKit/UIKit.h>
 NS_ASSUME_NONNULL_BEGIN
+#if DEBUG
+@class VLRoomListModel;
+@class VLKTVTopView;
+@protocol VLKTVTopViewDelegate <NSObject>
+
+- (void)onVLKTVTopView:(VLKTVTopView*)view closeBtnTapped:(id)sender;
+
+- (void)onVLKTVTopView:(VLKTVTopView*)view moreBtnTapped:(id)sender;
+
+@end
+
+@interface VLKTVTopView : UIView
+
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id)delegate;
+
+- (void)setNetworkQuality:(int)quality;
+
+@property (nonatomic, strong) VLRoomListModel *listModel;
+
+@end
+#else
 @class VLRoomListModel, VLKTVTopView;
 @protocol VLKTVTopViewDelegate <NSObject>
 
@@ -23,5 +44,5 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) VLRoomListModel *listModel;
 
 @end
-
+#endif
 NS_ASSUME_NONNULL_END

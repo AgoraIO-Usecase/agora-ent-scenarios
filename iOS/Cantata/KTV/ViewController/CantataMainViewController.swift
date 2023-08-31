@@ -54,7 +54,7 @@ extension CantataMainViewController {
         view.backgroundColor = .white
         
         //头部布局
-        topView = VLKTVTopView(frame: CGRect(x: 0, y: ZStatusBarHeight, width: ScreenWidth, height: 60), with: self)
+        topView = VLKTVTopView(frame: CGRect(x: 0, y: ZStatusBarHeight, width: ScreenWidth, height: 60), withDelegate: self)
         view.addSubview(topView)
 
         let mainBgView = UIImageView(frame: CGRect(x: 0, y: topView.frame.maxY, width: ScreenWidth, height: 550))
@@ -199,7 +199,7 @@ extension CantataMainViewController {
 }
 
 //头部视图代理
-extension CantataMainViewController: VLKTVTopViewDelegate {
+extension CantataMainViewController {
     public func onVLKTVTopView(_ view: VLKTVTopView, closeBtnTapped sender: Any) {
 
     }
