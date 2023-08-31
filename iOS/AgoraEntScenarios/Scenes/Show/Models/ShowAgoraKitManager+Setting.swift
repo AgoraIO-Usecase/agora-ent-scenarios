@@ -128,14 +128,17 @@ extension ShowAgoraKitManager {
                                         connection: connection)
             return
         }
-        engine?.setDualStreamModeEx(.enableSimulcastStream, streamConfig: simulcastConfig, connection: connection)
         // 小流SVC 开关
         if (rtcParam.svc) {
-            engine?.setParameters("\"che.video.minor_stream_num_temporal_layers\": 2")
-            engine?.setParameters("\"rtc.video.high_low_video_ratio_enabled\": true")
+            engine?.setParameters("{\"che.video.minor_stream_num_temporal_layers\": 2}")
+            engine?.setParameters("{\"rtc.video.high_low_video_ratio_enabled\": true}")
+            engine?.setParameters("{\"che.video.enable_264_fix_svc_nego\": false}")
+            engine?.setParameters("{\"rtc.video.low_stream_enable_hw_encoder\": false}")
         } else {
-            engine?.setParameters("\"rtc.video.high_low_video_ratio_enabled\": false")
+            engine?.setParameters("{\"rtc.video.high_low_video_ratio_enabled\": false}")
+            engine?.setParameters("{\"rtc.video.low_stream_enable_hw_encoder\": true}")
         }
+        engine?.setDualStreamModeEx(.enableSimulcastStream, streamConfig: simulcastConfig, connection: connection)
     }
     
     // 预设模式
