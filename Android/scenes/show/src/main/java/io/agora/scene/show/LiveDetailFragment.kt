@@ -1544,7 +1544,7 @@ class LiveDetailFragment : Fragment() {
             // 低端机观众加入频道前默认开启硬解（解决看高分辨率卡顿问题），但是在410分支硬解码会带来200ms的秒开耗时增加
             mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
             // 低端机观众加入频道前默认开启下行零拷贝，下行零拷贝和超分有冲突， 低端机默认关闭超分
-            mRtcEngine.setParameters("\"rtc.video.decoder_out_byte_frame\": true")
+            mRtcEngine.setParameters("{\"rtc.video.decoder_out_byte_frame\": true}")
         } else {
             // 主播加入频道前默认关闭硬解
             mRtcEngine.setParameters("{\"che.hardware_decoding\": 0}")
@@ -1560,6 +1560,8 @@ class LiveDetailFragment : Fragment() {
         // 如果是观众 把 ChannelMediaOptions 的 audienceLatencyLevel 设置为 AUDIENCE_LATENCY_LEVEL_LOW_LATENCY（超低延时）
         if (!isRoomOwner) {
             channelMediaOptions.audienceLatencyLevel = AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+            // 观众开启JB平滑出帧
+            mRtcEngine.setParameters("{\"rtc.video.jb_smooth_scene\":1}")
         }
         mRtcVideoSwitcher.joinChannel(
             rtcConnection,

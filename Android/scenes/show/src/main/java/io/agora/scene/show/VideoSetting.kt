@@ -646,20 +646,23 @@ object VideoSetting {
             currBroadcastSetting.audio.audioMixingVolume
         )
 
-        if (lowStreamSetting == null) {
-            updateRTCLowStreamSetting(
-                rtcConnection,
-                false)
-        } else {
-            updateRTCLowStreamSetting(
-                rtcConnection,
-                true,
-                lowStreamSetting.encodeResolution,
-                lowStreamSetting.frameRate,
-                lowStreamSetting.bitRate,
-                lowStreamSetting.SVC,
-                lowStreamSetting.enableHardwareEncoder
-            )
+        if (isJoinedRoom) {
+            if (lowStreamSetting == null) {
+                updateRTCLowStreamSetting(
+                    rtcConnection,
+                    false,
+                    isJoinedRoom = isJoinedRoom)
+            } else {
+                updateRTCLowStreamSetting(
+                    rtcConnection,
+                    true,
+                    lowStreamSetting.encodeResolution,
+                    lowStreamSetting.frameRate,
+                    lowStreamSetting.bitRate,
+                    lowStreamSetting.SVC,
+                    lowStreamSetting.enableHardwareEncoder,
+                    isJoinedRoom = isJoinedRoom)
+            }
         }
     }
 
@@ -928,6 +931,7 @@ object VideoSetting {
         bitRate: Int? = null,
         svc: Boolean? = null,
         enableHardwareEncoder: Boolean? = null,
+        isJoinedRoom: Boolean = false
     ) {
         ShowLogger.d("VideoSettings", "updateRTCLowStreamSetting, enableLowStream:$enableLowStream, svc:$svc")
         val rtcEngine = RtcEngineInstance.rtcEngine
@@ -942,21 +946,20 @@ object VideoSetting {
             // 1、小流开SVC需要软编码，关SVC改为硬编码
             // 2、小流开启的私有参数需要在setDualStreamModeEx前设置
             if (enableSVC) {
-                rtcEngine.setParameters("\"che.video.minor_stream_num_temporal_layers\": 2")
-                rtcEngine.setParameters("\"rtc.video.high_low_video_ratio_enabled\": true")
-                rtcEngine.setParameters("\"che.video.enable_264_fix_svc_nego\": false")
-                rtcEngine.setParameters("\"rtc.video.low_stream_enable_hw_encoder\": false")
+                rtcEngine.setParameters("{\"che.video.minor_stream_num_temporal_layers\": 2}")
+                rtcEngine.setParameters("{\"rtc.video.high_low_video_ratio_enabled\": true}")
+                rtcEngine.setParameters("{\"che.video.enable_264_fix_svc_nego\": false}")
+                rtcEngine.setParameters("{\"rtc.video.low_stream_enable_hw_encoder\": false}")
             } else {
-                rtcEngine.setParameters("\"rtc.video.high_low_video_ratio_enabled\": false")
-                rtcEngine.setParameters("\"rtc.video.low_stream_enable_hw_encoder\": true")
+                rtcEngine.setParameters("{\"rtc.video.high_low_video_ratio_enabled\": false}")
+                rtcEngine.setParameters("{\"rtc.video.low_stream_enable_hw_encoder\": true}")
             }
 
             rtcEngine.setDualStreamModeEx(
                 Constants.SimulcastStreamMode.ENABLE_SIMULCAST_STREAM, SimulcastStreamConfig(
                     VideoEncoderConfiguration.VideoDimensions(
                         resolution.width, resolution.height
-                ), br, fps.fps), connection)
-
+                    ), br, fps.fps), connection)
         } else {
             rtcEngine.setDualStreamModeEx(Constants.SimulcastStreamMode.DISABLE_SIMULCAST_STREAM,SimulcastStreamConfig(), connection)
         }
