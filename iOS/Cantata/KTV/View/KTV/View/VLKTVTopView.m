@@ -17,7 +17,7 @@
 
 @implementation VLKTVTopView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVTopViewDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id)delegate {
     if (self = [super initWithFrame:frame]) {
         self.delegate = delegate;
         [self setupView];
