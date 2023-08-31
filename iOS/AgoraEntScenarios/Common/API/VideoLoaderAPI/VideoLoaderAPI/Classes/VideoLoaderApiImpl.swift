@@ -214,8 +214,6 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         
         let mediaOptions = AgoraRtcChannelMediaOptions()
         if realState == .joined {
-            let profiler = _getProfiler(roomId: roomInfo.channelName)
-            profiler.startTime = Int64(NSDate().timeIntervalSince1970 * 1000)
             mediaOptions.autoSubscribeAudio = true
             mediaOptions.autoSubscribeVideo = true
         } else {
@@ -226,6 +224,10 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         apiPrint("tagId[\(tagId)] updateLoadingType[\(roomInfo.channelName)] want:\(newState.rawValue) real: \(realState.rawValue)")
         _updateChannelEx(channelId:roomInfo.channelName, options: mediaOptions)
         if realState != oldState {
+            if realState == .joined {
+                let profiler = _getProfiler(roomId: roomInfo.channelName)
+                profiler.startTime = Int64(NSDate().timeIntervalSince1970 * 1000)
+            }
             let api = apiProxy as IVideoLoaderApiListener
             api.onStateDidChange?(newState: realState, oldState: oldState, channelName: roomInfo.channelName)
         }
