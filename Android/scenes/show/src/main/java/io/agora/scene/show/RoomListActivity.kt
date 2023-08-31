@@ -178,13 +178,6 @@ class RoomListActivity : AppCompatActivity() {
                     val isRoomOwner =
                         roomInfo.ownerId == UserManager.getInstance().user.id.toString()
 
-//                    AudioModeration.moderationAudio(
-//                        channelName,
-//                        uid,
-//                        AudioModeration.AgoraChannelType.broadcast,
-//                        "show"
-//                    )
-
                     if (!isRoomOwner && mRtcEngine.queryDeviceScore() < 75) {
                         // 低端机观众加入频道前默认开启硬解
                         mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
