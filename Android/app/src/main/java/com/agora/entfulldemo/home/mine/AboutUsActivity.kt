@@ -4,7 +4,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
@@ -34,10 +36,6 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val kKtvRoomAppID = "io.agora.ktv"
     private val kChatRoomAppID = "io.agora.chatroom"
     private val kFullAppID = "io.agora.AgoraVoice"
-
-    private var counts = 0
-    private val debugModeOpenTime: Long = 2000
-    private var beginTime: Long = 0
 
     private val adapter = AboutUsAdapter()
 
@@ -172,17 +170,9 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private fun setupDebugMode() {
         binding.tvDebugMode.visibility = View.INVISIBLE
         adapter.onClickVersionListener = {
-            if (counts == 0 || System.currentTimeMillis() - beginTime > debugModeOpenTime) {
-                beginTime = System.currentTimeMillis();
-                counts = 0
-            }
-            counts++
-            if (counts > 5) {
-                counts = 0;
-                binding.tvDebugMode.visibility = View.VISIBLE
-                AgoraApplication.the().enableDebugMode(true)
-                ToastUtils.showToast("Debug模式已打开");
-            }
+            binding.tvDebugMode.visibility = View.VISIBLE
+            AgoraApplication.the().enableDebugMode(true)
+            ToastUtils.showToast("Debug模式已打开");
         }
         binding.tvDebugMode.setOnClickListener {
             showDebugModeCloseDialog()
@@ -203,7 +193,6 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         dialog.onButtonClickListener = object : OnButtonClickListener {
             override fun onLeftButtonClick() {}
             override fun onRightButtonClick() {
-                counts = 0
                 binding.tvDebugMode.visibility = View.GONE
                 AgoraApplication.the().enableDebugMode(false)
                 ToastUtils.showToast("Debug模式已关闭")
@@ -261,9 +250,25 @@ private class AboutUsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>()
                 current.binding.tvHomeWebSite.text = it.webSite
             }
             current.binding.tvSceneSubTitle.visibility = if (scenes.size > 1) View.VISIBLE else View.INVISIBLE
-            current.binding.tvVersion.setOnClickListener {
-                onClickVersionListener?.invoke()
-            }
+
+            val handler = Handler()
+            current.binding.tvVersion.setOnLongClickListener(object : View.OnLongClickListener {
+                override fun onLongClick(v: View?): Boolean {
+                    handler.postDelayed({
+                        onClickVersionListener?.invoke()
+                    }, 5000)
+                    current.binding.tvVersion.setOnTouchListener(object : View.OnTouchListener {
+                        override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                            if (event?.action == MotionEvent.ACTION_UP) {
+                                handler.removeCallbacksAndMessages(null)
+                            }
+                            return false
+                        }
+
+                    })
+                    return true
+                }
+            })
             current.binding.vServicePhone.setOnClickListener {
                 onClickPhoneListener?.invoke()
             }
