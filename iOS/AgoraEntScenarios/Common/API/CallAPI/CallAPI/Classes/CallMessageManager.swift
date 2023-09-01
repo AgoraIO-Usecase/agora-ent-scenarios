@@ -258,9 +258,13 @@ extension CallMessageManager {
     }
     
     private func _sendMessage(roomId: String,
-                             message: [String: Any],
-                             retryCount: Int = 3,
-                             completion: ((NSError?)-> Void)?) {
+                              message: [String: Any],
+                              retryCount: Int = 3,
+                              completion: ((NSError?)-> Void)?) {
+        if roomId.count == 0 {
+            completion?(NSError(domain: "send message fail! roomId is empty", code: -1))
+            return
+        }
         callMessagePrint("_sendMessage to '\(roomId)', message: \(message), retryCount: \(retryCount)")
         let msgId = message[kMessageId] as? Int ?? 0
         let data = try? JSONSerialization.data(withJSONObject: message) as? NSData
