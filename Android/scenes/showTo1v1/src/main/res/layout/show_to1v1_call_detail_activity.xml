@@ -110,6 +110,10 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <include
+        android:visibility="invisible"
+        layout="@layout/show_to1v1_room_auto_connected_view" />
+
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivHangup"

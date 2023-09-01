@@ -7,21 +7,21 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.agora.scene.showTo1v1.callAPI.ICallApi
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.scene.showTo1v1.R
-import io.agora.scene.showTo1v1.callAPI.ICallApi
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1DashboardFragmentBinding
 
 class DashboardFragment : Fragment() {
-
-    private val mCallApi by lazy { ICallApi.getImplInstance() }
 
     private lateinit var binding: ShowTo1v1DashboardFragmentBinding
 
     private var handler: IRtcEngineEventHandler? = null
 
     private var isBoardVisible = false
+
+    private val mCallApi by lazy { ICallApi.getImplInstance() }
 
     override fun onDestroy() {
         handler?.let {

@@ -9,7 +9,30 @@ open class ShowTo1v1UserInfo constructor(
     val userName: String,
     var avatar: String,
     var objectId: String = ""
-) {
+) : Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readString()?:"",
+        parcel.readString()?:"",
+        parcel.readString()?:"",
+        parcel.readString()?:""
+    ) {
+    }
+
+    constructor(map: Map<String, Any>): this(
+        map["userId"] as? String ?: "",
+        map["userName"] as? String ?: "",
+        map["avatar"] as? String ?: "",
+        map["objectId"] as? String ?: ""
+    )
+
+    fun toMap(): Map<String, Any> {
+        return mapOf(
+            Pair("userId", this.userId),
+            Pair("userName", this.userName),
+            Pair("avatar", this.avatar),
+            Pair("objectId", this.objectId)
+        )
+    }
 
     fun getIntUserId(): Int {
         return userId.toIntOrNull() ?: 0
@@ -22,6 +45,27 @@ open class ShowTo1v1UserInfo constructor(
     fun bgImage(): String {
         val uid = getIntUserId()
         return "user_bg${uid % 9 + 1}"
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(userId)
+        parcel.writeString(userName)
+        parcel.writeString(avatar)
+        parcel.writeString(objectId)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<ShowTo1v1UserInfo> {
+        override fun createFromParcel(parcel: Parcel): ShowTo1v1UserInfo {
+            return ShowTo1v1UserInfo(parcel)
+        }
+
+        override fun newArray(size: Int): Array<ShowTo1v1UserInfo?> {
+            return arrayOfNulls(size)
+        }
     }
 }
 
@@ -65,12 +109,12 @@ class ShowTo1v1RoomInfo constructor(
         }
     }
 
-    fun createRoomInfo(token: String): VideoSwitcherAPI.RoomInfo {
-        return VideoSwitcherAPI.RoomInfo(
-            channelName = roomId,
-            uid = getIntUserId(),
-            token = token,
-            eventHandler = null
-        )
-    }
+//    fun createRoomInfo(token: String): VideoSwitcherAPI.RoomInfo {
+//        return VideoSwitcherAPI.RoomInfo(
+//            channelName = roomId,
+//            uid = getIntUserId(),
+//            token = token,
+//            eventHandler = null
+//        )
+//    }
 }

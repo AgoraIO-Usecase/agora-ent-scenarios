@@ -3,7 +3,6 @@ package io.agora.scene.showTo1v1.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -12,14 +11,16 @@ import android.view.animation.ScaleAnimation
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.core.widget.doAfterTextChanged
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import io.agora.scene.showTo1v1.callAPI.CallReason
+import io.agora.scene.showTo1v1.callAPI.CallStateType
+import io.agora.scene.showTo1v1.callAPI.ICallApi
+import io.agora.scene.showTo1v1.callAPI.ICallApiListener
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcConnection
 import io.agora.scene.base.AudioModeration
-import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
@@ -27,7 +28,6 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.RtcEngineInstance
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
-import io.agora.scene.showTo1v1.callAPI.ICallApi
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallDetailActivityBinding
 import io.agora.scene.showTo1v1.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
@@ -39,7 +39,7 @@ import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPI
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 
-class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBinding>() {
+class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBinding>() , ICallApiListener {
 
     companion object {
         private const val TAG = "RoomDetailActivity"
@@ -306,6 +306,16 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     private fun destroy(): Boolean {
         mService.leaveRoom(mRoomInfo, completion = {})
         return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection, true)
+    }
+
+    override fun onCallStateChanged(
+        state: CallStateType,
+        stateReason: CallReason,
+        eventReason: String,
+        elapsed: Long,
+        eventInfo: Map<String, Any>
+    ) {
+
     }
 }
 

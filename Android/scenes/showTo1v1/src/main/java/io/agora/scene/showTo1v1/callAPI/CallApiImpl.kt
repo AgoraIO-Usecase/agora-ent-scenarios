@@ -11,7 +11,7 @@ import io.agora.rtm2.*
 import org.json.JSONObject
 import java.util.UUID
 
-enum class CallAction(val value: Int) {
+enum class CallAction constructor(val value: Int) {
     Call(0),
     CancelCall(1),
     Accept(2),
@@ -24,7 +24,7 @@ enum class CallAction(val value: Int) {
         }
     }
 }
-enum class CallCostType(val value: String) {
+enum class CallCostType constructor(val value: String) {
     RecvCalling("recvCalling"),
     AcceptCall("acceptCall"),
     LocalUserJoinChannel("localUserJoinChannel"),
@@ -32,7 +32,7 @@ enum class CallCostType(val value: String) {
     RecvFirstFrame("recvFirstFrame")
 }
 
-class CallApiImpl(
+class CallApiImpl constructor(
     private val context: Context
 ): ICallApi, RtmEventListener, CallMessageListener, IRtcEngineEventHandler() {
 
@@ -683,12 +683,19 @@ class CallApiImpl(
         Log.d(TAG, "deinitialize")
         val callingRoomId = this.callingRoomId
         if (callingRoomId != null) {
-            val roomId = if (config?.role == CallRole.CALLEE) callingRoomId else config?.ownerRoomId ?: ""
-            _hangup(roomId) { err, msg ->
-                runOnUiThread {
-                    _deinitialize()
-                    completion.invoke()
+            var roomId = ""
+            if (config?.mode == CallMode.Pure1v1) {
+                roomId = callingRoomId
+            } else {
+                if (config?.role == CallRole.CALLEE) {
+                    roomId = callingRoomId
+                } else {
+                    roomId = config?.ownerRoomId ?: ""
                 }
+            }
+            _hangup(roomId) { err, msg ->
+                _deinitialize()
+                completion.invoke()
             }
         } else {
             _deinitialize()
@@ -1066,7 +1073,7 @@ class CallApiImpl(
         if (Thread.currentThread() === Looper.getMainLooper().thread) {
             runnable.run()
         } else {
-            Handler(Looper.getMainLooper()).post(runnable)
+            mHandler.post(runnable)
         }
     }
 }

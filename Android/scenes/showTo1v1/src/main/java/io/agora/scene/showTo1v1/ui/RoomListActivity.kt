@@ -4,12 +4,9 @@ import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
 import android.view.LayoutInflater
+import android.view.TextureView
 import android.view.View
 import android.view.WindowManager
-import android.view.animation.Animation
-import android.view.animation.ScaleAnimation
-import androidx.core.content.ContextCompat
-import androidx.core.util.forEach
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -17,9 +14,20 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.bumptech.glide.Glide
-import io.agora.scene.base.GlideApp
-import io.agora.scene.base.GlideOptions
+import io.agora.scene.showTo1v1.callAPI.CallApiImpl
+import io.agora.scene.showTo1v1.callAPI.CallConfig
+import io.agora.scene.showTo1v1.callAPI.CallMode
+import io.agora.scene.showTo1v1.callAPI.CallReason
+import io.agora.scene.showTo1v1.callAPI.CallRole
+import io.agora.scene.showTo1v1.callAPI.CallStateType
+import io.agora.scene.showTo1v1.callAPI.CallTokenConfig
+import io.agora.scene.showTo1v1.callAPI.ICallApi
+import io.agora.scene.showTo1v1.callAPI.ICallApiListener
+import io.agora.scene.showTo1v1.callAPI.PrepareConfig
+import io.agora.rtc2.RtcConnection
+import io.agora.rtc2.video.ContentInspectConfig
+import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
@@ -31,14 +39,17 @@ import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
+import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
+import io.agora.scene.showTo1v1.ui.dialog.CallDialog
+import io.agora.scene.showTo1v1.ui.dialog.CallDialogState
+import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
 import io.agora.scene.showTo1v1.ui.fragment.RoomListFragment
-import io.agora.scene.widget.basic.BindingSingleAdapter
-import io.agora.scene.widget.basic.BindingViewHolder
-import io.agora.scene.widget.dialog.PermissionLeakDialog
-import io.agora.scene.widget.utils.BlurTransformation
 import io.agora.scene.widget.utils.StatusBarUtil
+import org.json.JSONException
+import org.json.JSONObject
 
-class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBinding>() {
+class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBinding>(), ICallApiListener,
+    RoomListFragment.OnClickCallingListener {
 
     companion object {
         private const val TAG = "RoomListActivity"
@@ -48,12 +59,46 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     }
 
     private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
-
-    private var fragmentAdapter: FragmentStateAdapter? = null
+    private val mCallApi by lazy { ICallApi.getImplInstance() }
+    private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
+    private var mFragmentAdapter: FragmentStateAdapter? = null
     private val mRoomInfoList = mutableListOf<ShowTo1v1RoomInfo>()
 
-    private val vpFragments = SparseArray<RoomListFragment>()
-    private var currLoadPosition = POSITION_NONE
+    private val mVpFragments = SparseArray<RoomListFragment>()
+    private var mCurrLoadPosition = POSITION_NONE
+
+    //本地用户
+    private val mCurrentUser by lazy {
+        ShowTo1v1UserInfo(
+            userId = UserManager.getInstance().user.id.toString(),
+            userName = UserManager.getInstance().user.name,
+            avatar = UserManager.getInstance().user.headUrl
+        )
+    }
+
+    // 1v1 tokenConfig
+    private val mCallTokenConfig by lazy {
+        CallTokenConfig().apply {
+            roomId = mCurrentUser.get1v1ChannelId()
+        }
+    }
+
+    // 当前呼叫状态
+    private var mCallState = CallStateType.Idle
+
+    // 当前呼叫的房间
+    private var mRoomInfo: ShowTo1v1RoomInfo? = null
+
+    // 远端用户
+    private var mRemoteUser: ShowTo1v1UserInfo? = null
+
+    // 连接的用户
+    private var mConnectedChannelId: String? = null
+
+    @Volatile
+    private var mCallApiInit = false
+
+    private var mCallDialog: CallDialog? = null
 
     override fun getViewBinding(inflater: LayoutInflater): ShowTo1v1RoomListActivityBinding {
         return ShowTo1v1RoomListActivityBinding.inflate(inflater)
@@ -64,6 +109,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setOnApplyWindowInsetsListener()
         fetchService()
+        setupCallApi()
     }
 
     private fun setOnApplyWindowInsetsListener() {
@@ -101,25 +147,25 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     }
 
     private fun initViewPage() {
-        if (fragmentAdapter == null) {
+        if (mFragmentAdapter == null) {
             // 设置预加载
             val preloadCount = 3
             binding.viewPager2.offscreenPageLimit = preloadCount - 2
-            fragmentAdapter = object : FragmentStateAdapter(this) {
+            mFragmentAdapter = object : FragmentStateAdapter(this) {
                 override fun getItemCount() = Int.MAX_VALUE
 
                 override fun createFragment(position: Int): Fragment {
                     val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
 
                     return RoomListFragment.newInstance(roomInfo).also {
-                        vpFragments.put(position, it)
+                        mVpFragments.put(position, it)
                         if (position == binding.viewPager2.currentItem) {
                             it.startLoadPageSafely()
                         }
                     }
                 }
             }
-            binding.viewPager2.adapter = fragmentAdapter
+            binding.viewPager2.adapter = mFragmentAdapter
             binding.viewPager2.registerOnPageChangeCallback(onPageChangeCallback)
             binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2 - Int.MAX_VALUE / 2 % mRoomInfoList.size, false)
         }
@@ -143,7 +189,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     binding.viewPager2.isUserInputEnabled = true
                     if (!hasPageSelected) {
                         if (preLoadPosition != POSITION_NONE) {
-                            vpFragments[preLoadPosition]?.stopLoadPage(true)
+                            mVpFragments[preLoadPosition]?.stopLoadPage(true)
                         }
                         preLoadPosition = POSITION_NONE
                         lastOffset = 0f
@@ -165,11 +211,11 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 if (lastOffset > 0f) {
                     val isMoveUp = (positionOffset - lastOffset) > 0
                     if (isMoveUp && positionOffset >= PRE_LOAD_OFFSET && preLoadPosition == POSITION_NONE) {
-                        preLoadPosition = currLoadPosition + 1
-                        vpFragments[preLoadPosition]?.startLoadPageSafely()
+                        preLoadPosition = mCurrLoadPosition + 1
+                        mVpFragments[preLoadPosition]?.startLoadPageSafely()
                     } else if (!isMoveUp && positionOffset <= (1 - PRE_LOAD_OFFSET) && preLoadPosition == POSITION_NONE) {
-                        preLoadPosition = currLoadPosition - 1
-                        vpFragments[preLoadPosition]?.startLoadPageSafely()
+                        preLoadPosition = mCurrLoadPosition - 1
+                        mVpFragments[preLoadPosition]?.startLoadPageSafely()
                     }
                 }
                 lastOffset = positionOffset
@@ -180,21 +226,21 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             super.onPageSelected(position)
             Log.d(
                 TAG,
-                "PageChange onPageSelected position=$position, currLoadPosition=$currLoadPosition, preLoadPosition=$preLoadPosition"
+                "PageChange onPageSelected position=$position, currLoadPosition=$mCurrLoadPosition, preLoadPosition=$preLoadPosition"
             )
-            if (currLoadPosition != POSITION_NONE) {
+            if (mCurrLoadPosition != POSITION_NONE) {
                 if (preLoadPosition != POSITION_NONE) {
                     if (position == preLoadPosition) {
-                        vpFragments[currLoadPosition]?.stopLoadPage(true)
+                        mVpFragments[mCurrLoadPosition]?.stopLoadPage(true)
                     } else {
-                        vpFragments[preLoadPosition]?.stopLoadPage(true)
+                        mVpFragments[preLoadPosition]?.stopLoadPage(true)
                     }
-                } else if (currLoadPosition != position) {
-                    vpFragments[currLoadPosition]?.stopLoadPage(true)
-                    vpFragments[position]?.startLoadPageSafely()
+                } else if (mCurrLoadPosition != position) {
+                    mVpFragments[mCurrLoadPosition]?.stopLoadPage(true)
+                    mVpFragments[position]?.startLoadPageSafely()
                 }
             }
-            currLoadPosition = position
+            mCurrLoadPosition = position
             preLoadPosition = POSITION_NONE
             lastOffset = 0f
             hasPageSelected = true
@@ -223,7 +269,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             if (error == null) { // success
                 mRoomInfoList.clear()
                 mRoomInfoList.addAll(roomList)
-                vpFragments[currLoadPosition]?.stopLoadPage(false)
+                mVpFragments[mCurrLoadPosition]?.stopLoadPage(false)
                 updateListView()
                 initViewPage()
                 ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
@@ -249,7 +295,154 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     override fun onDestroy() {
         super.onDestroy()
-        vpFragments[currLoadPosition]?.stopLoadPage(false)
+        mVpFragments[mCurrLoadPosition]?.stopLoadPage(false)
         RtcEngineInstance.cleanCache()
+    }
+
+    private fun setupCallApi() {
+        TokenGenerator.generateTokens(
+            mCallTokenConfig.roomId,
+            mCurrentUser.userId,
+            TokenGenerator.TokenGeneratorType.token007,
+            arrayOf(
+                TokenGenerator.AgoraTokenType.rtc,
+                TokenGenerator.AgoraTokenType.rtm
+            ), { ret ->
+                val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc]
+                val rtmToken = ret[TokenGenerator.AgoraTokenType.rtm]
+                if (rtcToken == null || rtmToken == null) {
+                    return@generateTokens
+                }
+                mCallTokenConfig.rtcToken = rtcToken
+                mCallTokenConfig.rtmToken = rtmToken
+            })
+    }
+
+    private fun reInitCallApi(role: CallRole, userInfo: ShowTo1v1UserInfo) {
+        val config = CallConfig(
+            appId = BuildConfig.AGORA_APP_ID,
+            userId = userInfo.userId.toInt(),
+            userExtension = userInfo.toMap(),
+            ownerRoomId = userInfo.userId,
+            rtcEngine = mRtcEngine,
+            mode = CallMode.ShowTo1v1,
+            role = CallRole.CALLER,
+            localView = TextureView(this),
+            remoteView = TextureView(this),
+            autoAccept = true
+        )
+        mCallApi.initialize(config, mCallTokenConfig) {
+            val prepareConfig = PrepareConfig.calleeConfig()
+            mCallApi.prepareForCall(prepareConfig) { err ->
+                if (err == null) {
+                    mCallApiInit = true
+                }
+            }
+        }
+        mCallApi.addListener(this)
+    }
+
+    override fun onClickCall(roomInfo: ShowTo1v1RoomInfo) {
+        mRoomInfo = roomInfo
+        mCallApi.call(roomInfo.roomId, roomInfo.getIntUserId(), null)
+    }
+
+    private fun onCallSend(user: ShowTo1v1UserInfo) {
+        val dialog = CallSendDialog(this, user)
+        dialog.setListener(object : CallSendDialog.CallSendDialogListener {
+            override fun onSendViewDidClickHangup() {
+                mCallApi.cancelCall(null)
+            }
+        })
+        dialog.show()
+        mCallDialog = dialog
+    }
+
+    override fun onCallStateChanged(
+        state: CallStateType, stateReason: CallReason, eventReason: String, elapsed: Long, eventInfo: Map<String, Any>
+    ) {
+        val publisher = eventInfo[CallApiImpl.kPublisher] ?: mCurrentUser.userId
+        if (publisher != mCurrentUser.userId) return
+        mCallState = state
+        when (state) {
+            CallStateType.Prepared -> {
+                if (stateReason == CallReason.CallingTimeout || stateReason == CallReason.LocalRejected ||
+                    stateReason == CallReason.RemoteRejected
+                ) {
+
+                }
+            }
+
+            CallStateType.Calling -> {
+                val fromUserId = eventInfo[CallApiImpl.kFromUserId] as? Int ?: 0
+                val fromRoomId = eventInfo[CallApiImpl.kFromRoomId] as? String ?: ""
+                val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
+                if (mRemoteUser != null && mRemoteUser!!.userId != fromUserId.toString()) {
+                    mCallApi.reject(fromRoomId, fromUserId, "already calling") { err ->
+                    }
+                    return
+                }
+                // 触发状态的用户是自己才处理
+                if (mCurrentUser.userId == toUserId.toString()) {
+                    // 收到大哥拨打电话
+                    // nothing
+                } else if (mCurrentUser.userId == fromUserId.toString()) {
+                    // 大哥播放电话
+                    mConnectedChannelId = fromRoomId
+                    val remoteUser = mRoomInfoList.firstOrNull {
+                        it.userId == toUserId.toString() && it.roomId == fromRoomId
+                    } ?: return
+                    mRemoteUser = remoteUser
+                    onCallSend(remoteUser)
+                }
+            }
+
+            CallStateType.Connecting -> mCallDialog?.updateCallState(CallDialogState.Connecting)
+            CallStateType.Connected -> {
+                if (mRemoteUser == null) return
+                mCallDialog?.let {
+                    if (it.isShowing) it.dismiss()
+                }
+                mRoomInfo?.let { roomInfo ->
+                    RoomDetailActivity.launch(this, roomInfo)
+                    // 开启鉴黄鉴暴
+                    val channelId = mRemoteUser?.get1v1ChannelId() ?: ""
+                    val localUid = mCurrentUser.userId.toInt()
+                    enableContentInspectEx(RtcConnection(channelId, localUid))
+                    val channelName = mConnectedChannelId ?: return
+                    val uid = mCurrentUser.userId.toLong()
+                    AudioModeration.moderationAudio(
+                        channelName, uid, AudioModeration.AgoraChannelType.broadcast,
+                        "ShowTo1v1"
+                    )
+                }
+            }
+
+            CallStateType.Failed -> {
+                mCallDialog?.let {
+                    if (it.isShowing) it.dismiss()
+                }
+                ToastUtils.showToast(eventReason)
+            }
+        }
+    }
+
+    private fun enableContentInspectEx(connection: RtcConnection) {
+        val contentInspectConfig = ContentInspectConfig()
+        try {
+            val jsonObject = JSONObject()
+            jsonObject.put("sceneName", "ShowTo1v1")
+            jsonObject.put("id", UserManager.getInstance().user.id)
+            jsonObject.put("userNo", UserManager.getInstance().user.userNo)
+            contentInspectConfig.extraInfo = jsonObject.toString()
+            val module = ContentInspectConfig.ContentInspectModule()
+            module.interval = 30
+            module.type = ContentInspectConfig.CONTENT_INSPECT_TYPE_IMAGE_MODERATION
+            contentInspectConfig.modules = arrayOf(module)
+            contentInspectConfig.moduleCount = 1
+            val ret = mRtcEngine.enableContentInspectEx(true, contentInspectConfig, connection)
+            Log.d(TAG, "enableContentInspectEx $ret")
+        } catch (_: JSONException) {
+        }
     }
 }

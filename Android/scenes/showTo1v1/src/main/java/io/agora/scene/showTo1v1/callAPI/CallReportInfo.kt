@@ -1,6 +1,6 @@
 package io.agora.scene.showTo1v1.callAPI
 
-data class CallReportInfo(
+data class CallReportInfo constructor(
     var msgId: String,
     var category: String,
     var event: String,

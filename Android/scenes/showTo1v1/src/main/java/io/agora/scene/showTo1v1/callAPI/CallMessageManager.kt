@@ -9,7 +9,7 @@ import io.agora.rtm2.*
 import org.json.JSONObject
 
 /// 回执的消息队列对象
-private class CallQueueInfo {
+private class CallQueueInfo constructor(){
 
     val TAG = "CALL_QUEUE_LOG"
     var messageId: Int = 0
@@ -309,7 +309,7 @@ class CallMessageManager(
             val options2 = SubscribeOptions()
             options2.withMessage = false
             options2.withMetadata = false
-            options2.withPresence = false
+            options2.withPresence = true
             Log.d(TAG, "2/3 will _subscribe[$ownerRoomId]")
             _subscribe(ownerRoomId, options2) { error ->
                 error2 = error
@@ -340,7 +340,7 @@ class CallMessageManager(
             val options = SubscribeOptions()
             options.withMessage = true
             options.withMetadata = false
-            options.withPresence = false
+            options.withPresence = config.mode == CallMode.ShowTo1v1
             _subscribe(roomId, options) { e ->
                 error = e
                 tryCount -= 1
@@ -388,6 +388,10 @@ class CallMessageManager(
     }
 
     private fun _sendMessage(roomId: String, message: Map<String, Any>, retryCount: Int = 3, completion:((AGError?)->Unit)?) {
+        if (roomId.isEmpty()) {
+            completion?.invoke(AGError("send message fail! roomId is empty", -1))
+            return
+        }
         Log.d(TAG, "_sendMessage to '$roomId', message: $message, retryCount: $retryCount")
         val msgId = message[kMessageId] as? Int ?: 0
         val json = Gson().toJson(message)
@@ -480,6 +484,14 @@ class CallMessageManager(
         Log.d(TAG, "login ret: $ret")
     }
     //MARK: AgoraRtmClientDelegate
+    override fun onConnectionStateChange(channelName: String?,
+                                         state: RtmConstants.RtmConnectionState?,
+                                         reason: RtmConstants.RtmConnectionChangeReason?) {
+        Log.d(TAG, "rtm connectionStateChanged: $state reason: $reason")
+        if (reason == RtmConstants.RtmConnectionChangeReason.TOKEN_EXPIRED) {
+            rtmListener?.onTokenPrivilegeWillExpire(channelName)
+        }
+    }
     override fun onTokenPrivilegeWillExpire(channelName: String?) {
         Log.d(TAG, "rtm onTokenPrivilegeWillExpire[${channelName ?: "nil"}]")
         rtmListener?.onTokenPrivilegeWillExpire(channelName)
@@ -516,11 +528,6 @@ class CallMessageManager(
     override fun onTopicEvent(event: TopicEvent?) {}
     override fun onLockEvent(event: LockEvent?) {}
     override fun onStorageEvent(event: StorageEvent?) {}
-    override fun onConnectionStateChange(
-        channelName: String?,
-        state: RtmConstants.RtmConnectionState?,
-        reason: RtmConstants.RtmConnectionChangeReason?
-    ) {}
     private fun jsonStringToMap(jsonString: String): Map<String, Any> {
         val json = JSONObject(jsonString)
         val map = mutableMapOf<String, Any>()

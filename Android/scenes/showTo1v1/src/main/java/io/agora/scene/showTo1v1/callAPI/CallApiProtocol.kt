@@ -4,11 +4,8 @@ import android.view.TextureView
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngineEx
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceImpl
-import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 
-enum class CallRole(val value: Int) {
+enum class CallRole constructor(val value: Int) {
     // 被叫
     CALLEE(0),
     // 主叫
@@ -16,12 +13,12 @@ enum class CallRole(val value: Int) {
 }
 
 /// 模式
-enum class CallMode(val value: Int) {
+enum class CallMode constructor(val value: Int) {
     ShowTo1v1(0),       //秀场转1v1
     Pure1v1(1)          //纯1v1
 }
 
-open class CallConfig(
+open class CallConfig constructor(
     //声网App Id
     var appId: String = "",
     //用户id
@@ -44,7 +41,7 @@ open class CallConfig(
     var autoAccept: Boolean = true,
 ){}
 
-open class PrepareConfig {
+open class PrepareConfig constructor(){
     var autoLoginRTM: Boolean = true        //是否自动登录RTM
     var autoSubscribeRTM: Boolean = true    //是否自动订阅RTM，如果为true，则autoLoginRTM必定为true
     var autoJoinRTC: Boolean = false        //是否自动登录RTC
@@ -176,14 +173,11 @@ data class AGError(
 interface ICallApi {
 
     companion object {
-
         private val instance by lazy {
             CallApiImpl(AgoraApplication.the())
         }
 
-        fun getImplInstance(): ICallApi {
-            return instance
-        }
+        fun getImplInstance(): ICallApi = instance
     }
 
     // 初始化配置

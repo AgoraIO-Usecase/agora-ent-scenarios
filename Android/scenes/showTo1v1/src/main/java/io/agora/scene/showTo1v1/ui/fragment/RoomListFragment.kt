@@ -22,11 +22,11 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.RtcEngineInstance
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
-import io.agora.scene.showTo1v1.callAPI.ICallApi
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 import io.agora.scene.showTo1v1.ui.RoomCreateActivity
+import io.agora.scene.showTo1v1.ui.RoomListActivity
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPI
 import io.agora.scene.widget.utils.BlurTransformation
@@ -46,7 +46,6 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     }
 
     private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
-    private val mCallApi by lazy { ICallApi.getImplInstance() }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
     private val mRtcVideoSwitcher by lazy { RtcEngineInstance.videoSwitcher }
 
@@ -58,12 +57,15 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         RtcConnection(mRoomInfo.roomId, UserManager.getInstance().user.id.toInt())
     }
 
+    private var onClickCallingListener: OnClickCallingListener? = null
+
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): ShowTo1v1RoomListFragmentBinding {
         return ShowTo1v1RoomListFragmentBinding.inflate(inflater)
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        onClickCallingListener = activity as? RoomListActivity
         if (isPageLoaded) {
             startLoadPage(false)
         }
@@ -118,6 +120,9 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
             binding.layoutCreateRoom.setOnClickListener {
                 RoomCreateActivity.launch(context)
             }
+        }
+        binding.ivConnect.setOnClickListener {
+            onClickCallingListener?.onClickCall(mRoomInfo)
         }
         binding.ivConnectBG.breathAnim()
     }
@@ -200,6 +205,10 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         } else {
             activity.runOnUiThread(run)
         }
+    }
+
+    interface OnClickCallingListener {
+        fun onClickCall(roomInfo: ShowTo1v1RoomInfo)
     }
 }
 
