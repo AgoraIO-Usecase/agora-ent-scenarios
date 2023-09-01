@@ -19,7 +19,7 @@ public class VoiceRoomError: Error, Convertible {
         property.name
     }
 }
-
+/*
 @objc public class VoiceRoomBusinessRequest: NSObject {
     @UserDefault("VoiceRoomBusinessUserToken", defaultValue: "") public var userToken
 
@@ -436,3 +436,4 @@ public extension VoiceRoomBusinessRequest {
         return uri
     }
 }
+*/

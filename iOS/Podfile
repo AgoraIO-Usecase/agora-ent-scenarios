@@ -38,11 +38,10 @@ def all_pods
   
   pod 'AgoraSyncManager', '~> 2.0.8'
 
-  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 # pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
-#  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.142'
+  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.13'
 
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
 
@@ -51,6 +50,7 @@ def all_pods
   pod 'LSTPopView', '0.3.10'
   pod 'SocketRocket', '0.7.0'
   pod 'Agora-Scene-Utils', '1.1.0'
+  pod 'Alamofire'
   
   #歌词组件
   pod "ScoreEffectUI", '1.0.1'

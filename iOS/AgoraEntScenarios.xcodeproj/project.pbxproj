@@ -8,6 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053998C4290A83E0005143C7 /* HomeMenuCell.swift */; };
+		A82006D22A9EF7FD00FC18CA /* AUINetworkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82006D12A9EF7FD00FC18CA /* AUINetworkModel.swift */; };
+		A82006D42A9EF80800FC18CA /* AUINetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82006D32A9EF80800FC18CA /* AUINetworking.swift */; };
+		A82006D62A9EF9B000FC18CA /* AUIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82006D52A9EF9B000FC18CA /* AUIError.swift */; };
+		A82006DA2A9F4FC100FC18CA /* VoiceRoomBusinessRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82006D72A9F4FC000FC18CA /* VoiceRoomBusinessRequest.swift */; };
+		A82006DB2A9F4FC100FC18CA /* VoiceRoomBusinessApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82006D82A9F4FC000FC18CA /* VoiceRoomBusinessApi.swift */; };
+		A82006DC2A9F4FC100FC18CA /* VoiceRoomRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82006D92A9F4FC000FC18CA /* VoiceRoomRequest.swift */; };
+		A82006DE2A9F6C3200FC18CA /* TestModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82006DD2A9F6C3200FC18CA /* TestModel.swift */; };
 		AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */; };
 		ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */; };
 		ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */; };
@@ -279,9 +286,6 @@
 		DD619AE629E3E247008F63E4 /* SAHorizontalCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A6129E3E247008F63E4 /* SAHorizontalCardsView.swift */; };
 		DD619AE729E3E247008F63E4 /* SACreateRoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A6229E3E247008F63E4 /* SACreateRoomView.swift */; };
 		DD619AE829E3E247008F63E4 /* SASoundTypeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A6329E3E247008F63E4 /* SASoundTypeCard.swift */; };
-		DD619B7F29E3E262008F63E4 /* VoiceRoomBusinessApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AEB29E3E262008F63E4 /* VoiceRoomBusinessApi.swift */; };
-		DD619B8029E3E262008F63E4 /* VoiceRoomRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AEC29E3E262008F63E4 /* VoiceRoomRequest.swift */; };
-		DD619B8129E3E262008F63E4 /* VoiceRoomBusinessRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AED29E3E262008F63E4 /* VoiceRoomBusinessRequest.swift */; };
 		DD619B8229E3E262008F63E4 /* PresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AEF29E3E262008F63E4 /* PresentationController.swift */; };
 		DD619B8329E3E262008F63E4 /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AF029E3E262008F63E4 /* LanguageManager.swift */; };
 		DD619B8429E3E262008F63E4 /* VerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619AF129E3E262008F63E4 /* VerifyCodeView.swift */; };
@@ -609,6 +613,13 @@
 		053998C4290A83E0005143C7 /* HomeMenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMenuCell.swift; sourceTree = "<group>"; };
 		4A3B186B38A56ACA440591ED /* Pods-AgoraEntScenarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.debug.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.debug.xcconfig"; sourceTree = "<group>"; };
 		563C78B601810D421A3F783A /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
+		A82006D12A9EF7FD00FC18CA /* AUINetworkModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUINetworkModel.swift; sourceTree = "<group>"; };
+		A82006D32A9EF80800FC18CA /* AUINetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUINetworking.swift; sourceTree = "<group>"; };
+		A82006D52A9EF9B000FC18CA /* AUIError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUIError.swift; sourceTree = "<group>"; };
+		A82006D72A9F4FC000FC18CA /* VoiceRoomBusinessRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessRequest.swift; sourceTree = "<group>"; };
+		A82006D82A9F4FC000FC18CA /* VoiceRoomBusinessApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessApi.swift; sourceTree = "<group>"; };
+		A82006D92A9F4FC000FC18CA /* VoiceRoomRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomRequest.swift; sourceTree = "<group>"; };
+		A82006DD2A9F6C3200FC18CA /* TestModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestModel.swift; sourceTree = "<group>"; };
 		AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRobotService.swift; sourceTree = "<group>"; };
 		ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingBitrateCell.swift; sourceTree = "<group>"; };
 		ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNetStateSelectViewController.swift; sourceTree = "<group>"; };
@@ -930,9 +941,6 @@
 		DD619A6129E3E247008F63E4 /* SAHorizontalCardsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAHorizontalCardsView.swift; sourceTree = "<group>"; };
 		DD619A6229E3E247008F63E4 /* SACreateRoomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SACreateRoomView.swift; sourceTree = "<group>"; };
 		DD619A6329E3E247008F63E4 /* SASoundTypeCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SASoundTypeCard.swift; sourceTree = "<group>"; };
-		DD619AEB29E3E262008F63E4 /* VoiceRoomBusinessApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessApi.swift; sourceTree = "<group>"; };
-		DD619AEC29E3E262008F63E4 /* VoiceRoomRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomRequest.swift; sourceTree = "<group>"; };
-		DD619AED29E3E262008F63E4 /* VoiceRoomBusinessRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessRequest.swift; sourceTree = "<group>"; };
 		DD619AEF29E3E262008F63E4 /* PresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentationController.swift; sourceTree = "<group>"; };
 		DD619AF029E3E262008F63E4 /* LanguageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
 		DD619AF129E3E262008F63E4 /* VerifyCodeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerifyCodeView.swift; sourceTree = "<group>"; };
@@ -1400,6 +1408,17 @@
 				FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A82006D02A9EF7E800FC18CA /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				A82006D52A9EF9B000FC18CA /* AUIError.swift */,
+				A82006D32A9EF80800FC18CA /* AUINetworking.swift */,
+				A82006D12A9EF7FD00FC18CA /* AUINetworkModel.swift */,
+				A82006DD2A9F6C3200FC18CA /* TestModel.swift */,
+			);
+			path = Network;
 			sourceTree = "<group>";
 		};
 		DD029245295BF0DC00485225 /* KTV */ = {
@@ -2279,9 +2298,9 @@
 		DD619AEA29E3E262008F63E4 /* Network */ = {
 			isa = PBXGroup;
 			children = (
-				DD619AEB29E3E262008F63E4 /* VoiceRoomBusinessApi.swift */,
-				DD619AEC29E3E262008F63E4 /* VoiceRoomRequest.swift */,
-				DD619AED29E3E262008F63E4 /* VoiceRoomBusinessRequest.swift */,
+				A82006D82A9F4FC000FC18CA /* VoiceRoomBusinessApi.swift */,
+				A82006D72A9F4FC000FC18CA /* VoiceRoomBusinessRequest.swift */,
+				A82006D92A9F4FC000FC18CA /* VoiceRoomRequest.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -2817,6 +2836,7 @@
 		DDA198DC28FFE579009D3E61 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				A82006D02A9EF7E800FC18CA /* Network */,
 				DDA198DD28FFE579009D3E61 /* UI */,
 				DDA1991728FFE579009D3E61 /* Extension */,
 				DDA1991D28FFE579009D3E61 /* Category */,
@@ -3766,6 +3786,7 @@
 				DD619AC729E3E247008F63E4 /* SANoticeView.swift in Sources */,
 				DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */,
 				DD619BC229E3E262008F63E4 /* HorizontalCardCell.swift in Sources */,
+				A82006D62A9EF9B000FC18CA /* AUIError.swift in Sources */,
 				DD619A9229E3E247008F63E4 /* SpatialAudioSyncSerciceImp.swift in Sources */,
 				DDA19A0328FFE579009D3E61 /* NSArray+JKSafeAccess.m in Sources */,
 				DD619ACD29E3E247008F63E4 /* SABaseUserCollectionViewCell.swift in Sources */,
@@ -3792,6 +3813,7 @@
 				DD619A8C29E3E247008F63E4 /* SARoomEntity.swift in Sources */,
 				DD36106829B70CDC00CE7984 /* ShowDebug2TFModel.swift in Sources */,
 				E3735CBC2A5FE47E004737EF /* VLRoomSeatModel.swift in Sources */,
+				A82006D22A9EF7FD00FC18CA /* AUINetworkModel.swift in Sources */,
 				DD619ADF29E3E247008F63E4 /* SARoomListView.swift in Sources */,
 				DD619BB529E3E262008F63E4 /* VoiceRoomViewController.swift in Sources */,
 				DD619A6429E3E247008F63E4 /* SARequest.swift in Sources */,
@@ -3898,11 +3920,11 @@
 				DD619A7729E3E247008F63E4 /* SAThrottle.swift in Sources */,
 				DD619B9129E3E262008F63E4 /* PresentationSegue.swift in Sources */,
 				DD3610B729B70CDC00CE7984 /* ShowDebugSetting2TFCell.swift in Sources */,
-				DD619B8029E3E262008F63E4 /* VoiceRoomRequest.swift in Sources */,
 				ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */,
 				DD619B8429E3E262008F63E4 /* VerifyCodeView.swift in Sources */,
 				DD619ABE29E3E247008F63E4 /* SASwitchBar.swift in Sources */,
 				DD3610A129B70CDC00CE7984 /* ShowMusicTableHeaderView.swift in Sources */,
+				A82006D42A9EF80800FC18CA /* AUINetworking.swift in Sources */,
 				DD36109129B70CDC00CE7984 /* ShowToolMenuViewController.swift in Sources */,
 				DD619A8D29E3E247008F63E4 /* SAPositionInfo.swift in Sources */,
 				E3735CAE2A5E8DDD004737EF /* KTVSkipView.swift in Sources */,
@@ -3977,6 +3999,7 @@
 				DD619BDA29E3E262008F63E4 /* VoiceRoomChatBarCell.swift in Sources */,
 				DD619BDD29E3E262008F63E4 /* VoiceRoomChatBar.swift in Sources */,
 				DDA199FE28FFE579009D3E61 /* UIDevice+JKHardware.m in Sources */,
+				A82006DC2A9F4FC100FC18CA /* VoiceRoomRequest.swift in Sources */,
 				DD619AB629E3E247008F63E4 /* SA3DMoveUserView.swift in Sources */,
 				E357356929EFD8B5009D54E1 /* VLEffectView.m in Sources */,
 				DD619BC929E3E262008F63E4 /* VREQOperationAlert.swift in Sources */,
@@ -4007,12 +4030,13 @@
 				DD619BF529E3E262008F63E4 /* VoiceRoomInviteCell.swift in Sources */,
 				DD619B9B29E3E262008F63E4 /* UIViewToastExtension.swift in Sources */,
 				DD619BD829E3E262008F63E4 /* PopTip+Draw.swift in Sources */,
+				A82006DA2A9F4FC100FC18CA /* VoiceRoomBusinessRequest.swift in Sources */,
 				DD619A7529E3E247008F63E4 /* SAPresentedViewType.swift in Sources */,
-				DD619B7F29E3E262008F63E4 /* VoiceRoomBusinessApi.swift in Sources */,
 				DDA199FB28FFE579009D3E61 /* UIColor+JKGradient.m in Sources */,
 				E32C7EA92A20B03F00512523 /* ShowDebugPrivateParamsVC.swift in Sources */,
 				DD619AE329E3E247008F63E4 /* SAEmptyView.swift in Sources */,
 				DD0292D5295BF0DC00485225 /* VLSoundEffectView.m in Sources */,
+				A82006DE2A9F6C3200FC18CA /* TestModel.swift in Sources */,
 				DD3610B229B70CDC00CE7984 /* ShowRoomChatCell.swift in Sources */,
 				E3735C9E2A5E7E75004737EF /* BeautyModel.swift in Sources */,
 				DD0292CD295BF0DC00485225 /* VLMicSeatCell.m in Sources */,
@@ -4052,7 +4076,6 @@
 				E3735C882A5E7E75004737EF /* EffectsAnimal.m in Sources */,
 				DD619AE629E3E247008F63E4 /* SAHorizontalCardsView.swift in Sources */,
 				DD619BE829E3E262008F63E4 /* VMNorSetTableViewCell.swift in Sources */,
-				DD619B8129E3E262008F63E4 /* VoiceRoomBusinessRequest.swift in Sources */,
 				DD36106929B70CDC00CE7984 /* ShowSettingKey.swift in Sources */,
 				DD0292E1295BF0DC00485225 /* VLListEmptyView.m in Sources */,
 				DD619AB729E3E247008F63E4 /* SANormalRtcView.swift in Sources */,
@@ -4080,6 +4103,7 @@
 				DD3610B429B70CDC00CE7984 /* ShowPresettingFooterView.swift in Sources */,
 				DD3610D029B70F3800CE7984 /* VLMineCellModel.m in Sources */,
 				DD619B9D29E3E262008F63E4 /* String + Extension.swift in Sources */,
+				A82006DB2A9F4FC100FC18CA /* VoiceRoomBusinessApi.swift in Sources */,
 				DD619BD229E3E262008F63E4 /* VoiceRoomGiftCell.swift in Sources */,
 				DD36106229B70CDC00CE7984 /* ShowMusicModel.swift in Sources */,
 				DDA19A1028FFE579009D3E61 /* VLGlobalHelper.m in Sources */,
@@ -4314,11 +4338,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YS397FG5PA;
+				DEVELOPMENT_TEAM = JDPG69R49Z;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -4342,7 +4364,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -4361,7 +4382,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = JDPG69R49Z;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;

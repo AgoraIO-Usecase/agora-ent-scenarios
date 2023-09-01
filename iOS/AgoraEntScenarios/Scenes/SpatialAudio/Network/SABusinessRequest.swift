@@ -19,7 +19,7 @@ public class SAError: Error, Convertible {
         property.name
     }
 }
-
+/*
 @objc public class SABusinessRequest: NSObject {
     @UserDefault("SABusinessUserToken", defaultValue: "") public var userToken
 
@@ -436,3 +436,4 @@ public extension SABusinessRequest {
         return uri
     }
 }
+*/
