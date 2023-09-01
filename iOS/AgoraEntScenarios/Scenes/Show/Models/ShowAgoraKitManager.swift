@@ -130,7 +130,8 @@ class ShowAgoraKitManager: NSObject {
                                      "traceId": NSString.withUUID().md5(),
                                      "src": "iOS",
                                      "payload": JSONObject.toJsonString(dict: userInfo) ?? ""]
-        NetworkManager.shared.postRequest(urlString: "https://service.agora.io/toolbox/v1/moderation/audio",
+        let baseURL = KeyCenter.baseServerUrl ?? ""
+        NetworkManager.shared.postRequest(urlString: "\(baseURL)v1/moderation/audio",
                                           params: parasm) { response in
             showLogger.info("response === \(response)")
         } failure: { errr in

@@ -720,6 +720,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                                              value: $0.value)
                 })
             }
+            ShowAgoraKitManager.shared.setPVCon(true)
+            ShowAgoraKitManager.shared.setSuperResolutionOn(false)
         default:
             break
         }
@@ -753,7 +755,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                        uid: uid,
                                        canvasView: canvasView)
             self.delegate?.currentUserIsOffSeat()
-            
+            ShowAgoraKitManager.shared.setPVCon(false)
+            ShowAgoraKitManager.shared.setSuperResolutionOn(true)
         default:
             break
         }
