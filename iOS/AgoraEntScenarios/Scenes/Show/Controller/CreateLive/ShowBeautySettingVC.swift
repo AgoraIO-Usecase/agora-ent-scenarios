@@ -60,7 +60,7 @@ class ShowBeautySettingVC: UIViewController {
         }
         compareButton.addTarget(self, action: #selector(didClickCompareButton(sender:)), for: .touchUpInside)
         compareButton.backgroundColor = UIColor(hex: "#000000", alpha: 0.25)
-        compareButton.isSelected = true
+        compareButton.isSelected = BeautyManager.shareManager.isEnableBeauty
         compareButton.cornerRadius(18)
         return compareButton
     }()

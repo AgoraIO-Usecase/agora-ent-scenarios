@@ -7,6 +7,7 @@
 
 import UIKit
 import AgoraRtcKit
+import SVProgressHUD
 
 class ShowCreateLiveVC: UIViewController {
 
@@ -128,9 +129,11 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         }
         
         let roomId = createView.roomNo
+        SVProgressHUD.show()
         AppContext.showServiceImp(createView.roomNo)?.createRoom(roomName: roomName,
                                                                 roomId: roomId,
                                                                 thumbnailId: createView.roomBg) { [weak self] err, detailModel in
+            SVProgressHUD.dismiss()
             if err != nil {
                 ToastView.show(text: err!.localizedDescription)
             }
