@@ -5,7 +5,6 @@
 
 #import "VLSelectSongTableItemView.h"
 #import "VLSelectedSongListCell.h"
-#import "VLSongItmModel.h"
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
 #import "VLUserCenter.h"

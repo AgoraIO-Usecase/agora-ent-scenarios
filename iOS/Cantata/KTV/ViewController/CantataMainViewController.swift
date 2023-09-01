@@ -15,6 +15,7 @@ public class CantataMainViewController: BaseViewController {
     @objc public var seatsArray: [VLRoomSeatModel]?
     private var chorusMicView: ChorusMicView!
     private var topView: VLKTVTopView!
+    private var botView: VLBottomView!
     public override func viewDidLoad() {
         super.viewDidLoad()
         layoutUI()
@@ -53,18 +54,27 @@ extension CantataMainViewController {
         
         view.backgroundColor = .white
         
+        let bgView = UIImageView(frame: self.view.bounds)
+        bgView.image = UIImage.sceneImage(name: "dhc_main_bg", bundleName: "DHCResource")
+        view.addSubview(bgView)
+        
         //头部布局
         topView = VLKTVTopView(frame: CGRect(x: 0, y: ZStatusBarHeight, width: ScreenWidth, height: 60), withDelegate: self)
         view.addSubview(topView)
 
-        let mainBgView = UIImageView(frame: CGRect(x: 0, y: topView.frame.maxY, width: ScreenWidth, height: 550))
+        let mainBgView = UIImageView(frame: CGRect(x: 0, y: topView.frame.maxY, width: ScreenWidth, height: 500))
+        mainBgView.contentMode = .scaleAspectFill
         mainBgView.image = UIImage.sceneImage(name: "dhc_bg", bundleName: "DHCResource")
         view.addSubview(mainBgView)
         
         //麦位
-        let chorusMicView = ChorusMicView(frame: CGRect(x: 0, y: 140, width: ScreenWidth, height: 350), topMicCount: 8)
+        let chorusMicView = ChorusMicView(frame: CGRect(x: 0, y: 140, width: ScreenWidth, height: 320), topMicCount: 8)
         mainBgView.addSubview(chorusMicView)
         chorusMicView.backgroundColor = .clear
+        
+        botView = VLBottomView(frame: CGRect(x: 0, y: ScreenHeight - CGFloat(ZBottombarHeight) - 50, width: ScreenWidth, height: 50))
+        botView.delegate = self
+        view.addSubview(botView)
     }
 }
 
@@ -206,5 +216,16 @@ extension CantataMainViewController {
 
     public func onVLKTVTopView(_ view: VLKTVTopView, moreBtnTapped sender: Any) {
 
+    }
+}
+
+//底部视图代理
+extension CantataMainViewController: VLBottomViewDelegate {
+    public func didBottomChooseSong() {
+        
+    }
+    
+    public func didBottomViewAudioStateChangeTo(enable: Bool) {
+        
     }
 }

@@ -14,7 +14,6 @@
 
 #import "VLKTVSettingView.h"
 //model
-#import "VLSongItmModel.h"
 #import "VLKTVSelBgModel.h"
 #import "UIViewController+VL.h"
 #import "VLPopScoreView.h"

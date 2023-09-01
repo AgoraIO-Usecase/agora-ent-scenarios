@@ -7,7 +7,6 @@
 #import <JXCategoryView/JXCategoryView.h>
 #import "VLSelectSongTableItemView.h"
 #import "VLSearchSongResultView.h"
-#import "VLSongItmModel.h"
 #import "VLHotSpotBtn.h"
 #import "AESMacro.h"
 @import AgoraCommon;

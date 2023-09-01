@@ -24,6 +24,7 @@ class ChorusMicView: UIView {
         let bgView = UIImageView(frame: self.bounds)
         
         bgView.image = UIImage.sceneImage(name: "module", bundleName: "DHCResource")
+        bgView.contentMode = .center
         self.addSubview(bgView)
     }
     
@@ -34,7 +35,7 @@ class ChorusMicView: UIView {
         centralMicView = MicView(frame: CGRect(x: (bounds.width - centralMicSize) / 2, y: (bounds.height - centralMicSize) / 2 - 10, width: centralMicSize, height: centralMicSize + 20))
         if let centralMicView = centralMicView {
             addSubview(centralMicView)
-            centralMicView.scoreLabel.textColor = .black
+            centralMicView.scoreLabel.textColor = .white
             centralMicView.scoreLabel.text = "admin"
             //设置gif图片为 centralMicView.gradeImageView的背景图
             let bundlePath = Bundle.main.path(forResource: "DHCResource", ofType: "bundle") ?? ""
@@ -66,7 +67,7 @@ class ChorusMicView: UIView {
                 if isMicFrameValid(micFrame) {
                     isValidPosition = true
                     micView = MicView(frame: micFrame)
-                    micView?.scoreLabel.textColor = .black
+                    micView?.scoreLabel.textColor = .white
                     micView?.scoreLabel.text = "\(i)号麦"
                 }
             }

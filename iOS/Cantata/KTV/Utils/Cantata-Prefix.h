@@ -55,7 +55,6 @@
 #define VLSelectedSongList Prefix(VLSelectedSongList)
 #define VLSelectedSongListCell Prefix(VLSelectedSongListCell)
 #define VLSelectSongTableItemView Prefix(VLSelectSongTableItemView)
-#define VLSongItmModel Prefix(VLSongItmModel)
 
 #define VLKTVKindsView Prefix(VLKTVKindsView)
 #define VLKTVSettingView Prefix(VLKTVSettingView)
