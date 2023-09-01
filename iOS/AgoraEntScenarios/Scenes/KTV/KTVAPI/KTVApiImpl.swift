@@ -1198,7 +1198,7 @@ extension KTVApiImpl {
     }
     
     private func sendCustomMessage(with event: String, label: String) {
-        apiConfig?.engine?.sendCustomReportMessage("scenarioAPI", category: "ktv", event: "", label: label, value: 0)
+        apiConfig?.engine?.sendCustomReportMessage("scenarioAPI", category: "ktv_ios_3.3.0", event: event, label: label, value: 0)
     }
 
     private func sendStreamMessageWithDict(_ dict: [String: Any], success: ((_ success: Bool) -> Void)?) {
