@@ -23,7 +23,7 @@ typedef enum : NSUInteger {
 @interface VLSRMicSeatList : UIView
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLSRMicSeatListDelegate>)delegate withRTCkit:(AgoraRtcEngineKit *)RTCkit;
-
+@property (nonatomic, strong) UICollectionView *personCollectionView;
 @property (nonatomic, strong) NSArray *roomSeatsArray;
 
 
@@ -31,5 +31,6 @@ typedef enum : NSUInteger {
 
 - (void)updateSingBtnWithChoosedSongArray:(NSArray *)choosedSongArray;
 - (void)updateIfNeeded;
+-(void)updateMicOwnerWith: (NSInteger)old new:(NSInteger)new;
 @end
 

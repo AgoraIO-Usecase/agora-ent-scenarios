@@ -26,7 +26,7 @@ class SBGAttributeView: UIView {
         addSubview(contentView)
         
         preLabel = UILabel(frame: .zero)
-        preLabel.text = "下轮由 "
+        preLabel.text = "下段由 "
         preLabel.textColor = .white
         contentView.addSubview(preLabel)
         

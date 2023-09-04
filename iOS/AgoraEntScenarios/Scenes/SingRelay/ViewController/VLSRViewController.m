@@ -133,7 +133,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = UIColor.blackColor;
-
+    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"MICOWNERINDEX"];
     [self subscribeServiceEvent];
     
     // setup view
@@ -564,10 +564,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                VLSRRoomSelSongModel *model = self.selSongsArray.firstObject;
                [self.SRApi switchSingerRoleWithNewRole:SRSingRoleLeadSinger
                                          onSwitchRoleState:^( SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
-                   if(state != SRSwitchRoleStateSuccess) {
-                       SRLogError(@"switchSingerRole error: %ld", reason);
-                       return;
-                   }
+//                   if(state != SRSwitchRoleStateSuccess) {
+//                       SRLogError(@"switchSingerRole error: %ld", reason);
+//                       return;
+//                   }
                    [self.SRApi startSingWithSongCode:[model.songNo integerValue] startPos:0];
                }];
            }
@@ -1289,11 +1289,24 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             if(i < array.count - 1){
                 if([self isOnMicSeat]){
                     [self.statusView showContentViewWith: i < (array.count - 2) ? @"下段演唱即将开始，准备抢唱" : @"下段演唱即将开始"];
+                    if(self.nextWinNo){
+                        for(int i=0;i<self.seatsArray.count;i++) {
+                            if([self.seatsArray[i].userNo isEqualToString:self.nextWinNo]){
+                                [[NSUserDefaults standardUserDefaults]setObject:@(i) forKey:@"MICOWNERINDEX"];
+                                [[NSUserDefaults standardUserDefaults]synchronize];
+                            }
+                        }
+                    } else {
+                        [[NSUserDefaults standardUserDefaults]setObject:@(0) forKey:@"MICOWNERINDEX"];
+                        [[NSUserDefaults standardUserDefaults]synchronize];
+                    }
                 }
             }
         }
         
         if(self.scoreArray.count == 5){//超过五个的数据不需要了。这个时候的progerss是无用数据
+            [[NSUserDefaults standardUserDefaults]setObject:nil forKey:@"MICOWNERINDEX"];
+            [[NSUserDefaults standardUserDefaults]synchronize];
             return;
         }
         
@@ -1320,6 +1333,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         self.segmentCount = 0;
         self.currentUserNo = self.nextWinNo ? self.nextWinNo : self.seatsArray.firstObject.userNo;
         self.isNowMicMuted = ![self.currentUserNo isEqualToString:VLUserCenter.user.id];
+        
         //开麦
         [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:self.isNowMicMuted
                                                             completion:^(NSError * error) {
@@ -1337,6 +1351,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             self.statusView.numStr = [NSString stringWithFormat:@"%li/5", index + 1];
             self.nextWinNo = nil;
         }
+        [self.roomPersonView.personCollectionView reloadData];
     }
 }
 
@@ -1409,7 +1424,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(flag == YES){
             [weakself.SRApi stopSing];
             [weakself removeCurrentSongWithSync:YES];
-            
+            [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"MICOWNERINDEX"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
             weakself.isNowMicMuted = true;
             [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:weakself.isNowMicMuted completion:^(NSError * err) {
                 
@@ -1983,8 +1999,9 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
 }
 
 - (void)setSeatsArray:(NSArray<VLSRRoomSeatModel *> *)seatsArray {
+    //判断需要显示谁为主唱
     _seatsArray = seatsArray;
-    
+
     //update booleans
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     [self updateMediaOptionWithStatus];
@@ -1993,6 +2010,7 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
     [self.roomPersonView updateSingBtnWithChoosedSongArray:_selSongsArray];
     self.chorusNum = [self getChorusNumWithSeatArray:seatsArray];
     [self onSeatFull];
+    
 }
 
 -(void)updateMediaOptionWithStatus{
@@ -2022,10 +2040,13 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
         //关闭卖位 等待解锁
         self.isNowMicMuted = ![self isRoomOwner];
         [_bottomView setAudioBtnEnabled:false];
+        [[NSUserDefaults standardUserDefaults] setObject:@(0) forKey:@"MICOWNERINDEX"];
         [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:self.isNowMicMuted
                                                             completion:^(NSError * error) {
         }];
     } else if(gameModel.status == SingRelayStatusEnded){
+        [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"MICOWNERINDEX"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
         [_bottomView setAudioBtnEnabled:true];
         self.chooseArray = [NSMutableArray arrayWithObjects:@(NO), @(NO), @(NO), @(NO), @(NO), nil];
         self.currentUserNo = self.seatsArray.firstObject.userNo;
@@ -2047,6 +2068,7 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
             NSArray *mergeModels = mergeModelsWithSameUserIds(self.scoreArray);
             self.statusView.dataSource = sortModels(mergeModels, NO);
             self.statusView.state = [self isRoomOwner] ? SBGStateResultOwner : SBGStateResultAudience;
+            [self.roomPersonView.personCollectionView reloadData];
             [self.scoreArray removeAllObjects];
         });
 
@@ -2474,10 +2496,10 @@ NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *a
                 VLSRRoomSelSongModel *model = self.selSongsArray.firstObject;
                 [self.SRApi switchSingerRoleWithNewRole:SRSingRoleLeadSinger
                                           onSwitchRoleState:^( SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
-                    if(state != SRSwitchRoleStateSuccess) {
-                        SRLogError(@"switchSingerRole error: %ld", reason);
-                        return;
-                    }
+//                    if(state != SRSwitchRoleStateSuccess) {
+//                        SRLogError(@"switchSingerRole error: %ld", reason);
+//                        return;
+//                    }
                     [self.SRApi startSingWithSongCode:[model.songNo integerValue] startPos:0];
                 }];
             }
