@@ -15,7 +15,6 @@
 
 @property(nonatomic, weak) id <VLSRMicSeatListDelegate>delegate;
 
-@property (nonatomic, strong) UICollectionView *personCollectionView;
 @property (nonatomic, copy) NSString *currentPlayingSongCode;
 @end
 
@@ -108,7 +107,18 @@
     }else{
         cell.avatarImgView.image = [UIImage sceneImageWithName:@"ktv_emptySeat_icon"];
     }
-    cell.singingBtn.hidden = !seatModel.isOwner;
+    
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"MICOWNERINDEX"]){
+        NSInteger index = [[[NSUserDefaults standardUserDefaults] objectForKey:@"MICOWNERINDEX"] integerValue];
+        if(seatModel.seatIndex == index){
+            cell.singingBtn.hidden = false;
+        } else {
+            cell.singingBtn.hidden = true;
+        }
+    } else {
+        cell.singingBtn.hidden = true;
+    }
+    
     
     cell.muteImgView.hidden = !seatModel.isAudioMuted;
     

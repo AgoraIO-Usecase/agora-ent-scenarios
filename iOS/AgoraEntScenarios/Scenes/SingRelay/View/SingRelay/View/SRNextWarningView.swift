@@ -30,7 +30,7 @@ class SRNextWarningView: UIView {
         contentView.addSubview(imgView)
         
         preLabel = UILabel(frame: .zero)
-        preLabel.text = "下轮由 "
+        preLabel.text = "下段由 "
         preLabel.textColor = .white
         preLabel.font = UIFont.systemFont(ofSize: 12)
         contentView.addSubview(preLabel)
