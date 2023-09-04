@@ -1,0 +1,287 @@
+//
+//  DHCLRCControl.swift
+//  Cantata
+//
+//  Created by CP on 2023/9/4.
+//
+
+import UIKit
+import AgoraLyricsScore
+
+public enum DHCGameEvent: Int {
+    case pause
+    case play
+    case next
+    case leave
+    case join
+    case effect
+    case origin
+    case acc
+}
+
+public enum DHCGameState: Int {
+    case noSong
+    case ownerSing //房主主唱
+    case chorusSing //非房主主唱
+    case ownerChorus //房主加入合唱
+    case joinChorus //加入合唱
+    case nextSong //下一首 结算
+    case nextGame //下一轮 结算
+}
+
+public protocol DHCGameDelegate: NSObjectProtocol {
+    func didGameEventChanged(with event: DHCGameEvent)
+}
+
+class DHCLRCControl: UIView {
+    @objc public weak var lrcView: KaraokeView!
+    private var musicNameBtn: UIButton!
+    private var pauseBtn: UIButton!
+    private var nextBtn: UIButton!
+    private var originBtn: UIButton! //原唱/伴奏
+    private var effectBtn: UIButton! //调音
+    private var joinChorusBtn: UIButton! //加入合唱
+    private var leaveChorusBtn: UIButton! //离开合唱
+    private var resultView: UIView! //结算界面
+    private var noSongLabel: UILabel!
+    weak var delegate: DHCGameDelegate?
+    
+    public var controlState: DHCGameState = .noSong {
+        didSet {
+            switch controlState {
+            case .noSong:
+                pauseBtn.isHidden = true
+                nextBtn.isHidden = true
+                originBtn.isHidden = true
+                effectBtn.isHidden = true
+                joinChorusBtn.isHidden = true
+                leaveChorusBtn.isHidden = true
+                musicNameBtn.isHidden = true
+            case .ownerSing:
+                pauseBtn.isHidden = false
+                nextBtn.isHidden = false
+                originBtn.isHidden = false
+                effectBtn.isHidden = false
+                joinChorusBtn.isHidden = true
+                leaveChorusBtn.isHidden = true
+                musicNameBtn.isHidden = false
+            case .chorusSing:
+                pauseBtn.isHidden = false
+                nextBtn.isHidden = false
+                originBtn.isHidden = false
+                effectBtn.isHidden = false
+                joinChorusBtn.isHidden = true
+                leaveChorusBtn.isHidden = true
+                musicNameBtn.isHidden = false
+            case .ownerChorus:
+                pauseBtn.isHidden = false
+                nextBtn.isHidden = false
+                originBtn.isHidden = false
+                effectBtn.isHidden = false
+                joinChorusBtn.isHidden = true
+                leaveChorusBtn.isHidden = true
+                musicNameBtn.isHidden = false
+            case .joinChorus:
+                pauseBtn.isHidden = false
+                nextBtn.isHidden = false
+                originBtn.isHidden = false
+                effectBtn.isHidden = false
+                joinChorusBtn.isHidden = true
+                leaveChorusBtn.isHidden = true
+                musicNameBtn.isHidden = false
+            case .nextSong:
+                pauseBtn.isHidden = true
+                nextBtn.isHidden = true
+                originBtn.isHidden = true
+                effectBtn.isHidden = true
+                joinChorusBtn.isHidden = true
+                leaveChorusBtn.isHidden = true
+                musicNameBtn.isHidden = true
+            case .nextGame:
+                pauseBtn.isHidden = true
+                nextBtn.isHidden = true
+                originBtn.isHidden = true
+                effectBtn.isHidden = true
+                joinChorusBtn.isHidden = true
+                leaveChorusBtn.isHidden = true
+                musicNameBtn.isHidden = true
+            }
+        }
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        layoutUI()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func layoutUI() {
+        musicNameBtn = UIButton(type: .system)
+        addSubview(musicNameBtn)
+        
+        noSongLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 50))
+        noSongLabel.center = self.center
+        noSongLabel.text = "当前无人点歌，\n快选择歌曲一起合唱吧!"
+        noSongLabel.textColor = .white
+        noSongLabel.font = UIFont.systemFont(ofSize: 13)
+        noSongLabel.textAlignment = .center
+        noSongLabel.numberOfLines = 0
+        addSubview(noSongLabel)
+        
+//        lrcView = KaraokeView(frame: .zero, loggers: [FileLogger()])
+//        lrcView.scoringView.viewHeight = 60
+//        lrcView.scoringView.topSpaces = 5
+//        lrcView.lyricsView.textNormalColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
+//        lrcView.lyricsView.textHighlightedColor = UIColor(hexString: "#EEFF25")!
+//        lrcView.lyricsView.lyricLineSpacing = 6
+//        lrcView.lyricsView.draggable = false
+//        lrcView.delegate = self
+//        addSubview(lrcView!)
+//        lrcView.isHidden = true
+
+        pauseBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 34, height: 40))
+        pauseBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
+        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "暂停", image: UIImage.sceneImage(name: "ktv_pause_icon", bundleName: "DHCResource")!, spacing: 0, for: .selected)
+        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "播放", image: UIImage.sceneImage(name: "ktv_pause_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        pauseBtn.addTarget(self, action: #selector(pause), for: .touchUpInside)
+        addSubview(pauseBtn)
+        
+        nextBtn = UIButton(frame: CGRect(x: 74, y: self.bounds.maxY - 50, width: 34, height: 40))
+        nextBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
+        pauseBtn.addTarget(self, action: #selector(nextSong), for: .touchUpInside)
+        nextBtn.setVerticalLayoutWithCenterAlignment(title: "切歌", image: UIImage.sceneImage(name: "ktv_playNext_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        addSubview(nextBtn)
+        
+        originBtn = UIButton(frame: CGRect(x: self.bounds.width - 54, y: self.bounds.maxY - 50, width: 34, height: 40))
+        originBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
+        pauseBtn.addTarget(self, action: #selector(trackChange), for: .touchUpInside)
+        originBtn.setVerticalLayoutWithCenterAlignment(title: "原唱", image: UIImage.sceneImage(name: "original", bundleName: "DHCResource")!, spacing: 0, for: .selected)
+        originBtn.setVerticalLayoutWithCenterAlignment(title: "伴奏", image: UIImage.sceneImage(name: "acc", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        addSubview(originBtn)
+        
+        effectBtn = UIButton(frame: CGRect(x: self.bounds.width - 108, y: self.bounds.maxY - 50, width: 34, height: 40))
+        effectBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
+        pauseBtn.addTarget(self, action: #selector(effectChange), for: .touchUpInside)
+        effectBtn.setVerticalLayoutWithCenterAlignment(title: "调音", image: UIImage.sceneImage(name: "ktv_subtitle_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        addSubview(effectBtn)
+        
+        leaveChorusBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 34, height: 40))
+        leaveChorusBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
+        pauseBtn.addTarget(self, action: #selector(leaveChorus), for: .touchUpInside)
+        leaveChorusBtn.setVerticalLayoutWithCenterAlignment(title: "退出合唱", image: UIImage.sceneImage(name: "Union", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        addSubview(leaveChorusBtn)
+        leaveChorusBtn.isHidden = true
+        
+        joinChorusBtn = UIButton(frame: CGRect(x: centerX - 61, y: self.bounds.maxY - 50 , width: 122, height: 38))
+        pauseBtn.addTarget(self, action: #selector(joinChorus), for: .touchUpInside)
+        joinChorusBtn.setImage(UIImage.sceneImage(name: "join", bundleName: "DHCResource"), for: .normal)
+        addSubview(joinChorusBtn)
+    }
+    
+    @objc private func pause( btn: UIButton) {
+        guard let delegate = self.delegate else {return}
+        btn.isSelected = !btn.isSelected
+        delegate.didGameEventChanged(with: btn.isSelected ? .play : .pause)
+    }
+    
+    @objc private func nextSong( btn: UIButton) {
+        guard let delegate = self.delegate else {return}
+        delegate.didGameEventChanged(with: .next)
+    }
+    
+    @objc private func trackChange( btn: UIButton) {
+        guard let delegate = self.delegate else {return}
+        delegate.didGameEventChanged(with: btn.isSelected ? .origin : .acc)
+    }
+    
+    @objc private func effectChange( btn: UIButton) {
+        guard let delegate = self.delegate else {return}
+        delegate.didGameEventChanged(with: .effect)
+    }
+    
+    @objc private func leaveChorus( btn: UIButton) {
+        guard let delegate = self.delegate else {return}
+        delegate.didGameEventChanged(with: .leave)
+    }
+    
+    @objc private func joinChorus( btn: UIButton) {
+        guard let delegate = self.delegate else {return}
+        delegate.didGameEventChanged(with: .join)
+    }
+
+    public func updateButtonLayout(button: UIButton, title: String, image: UIImage, imageInsets: UIEdgeInsets, x: CGFloat, y: CGFloat) {
+        let titleAttributedString = NSAttributedString(string: title)
+
+        let imageAttachment = NSTextAttachment()
+        imageAttachment.image = image
+        imageAttachment.bounds = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
+        let imageAttributedString = NSAttributedString(attachment: imageAttachment)
+
+        let attributedString = NSMutableAttributedString()
+        attributedString.append(imageAttributedString)
+        attributedString.append(titleAttributedString)
+
+        let size = attributedString.size()
+
+        let buttonWidth = size.width + image.size.width + imageInsets.left + imageInsets.right
+        let buttonHeight = max(size.height, image.size.height)
+
+        button.frame = CGRect(x: x, y: y, width: buttonWidth, height: buttonHeight)
+        button.setAttributedTitleWithImage(title: title, image: image, imageInsets: imageInsets)
+    }
+}
+
+extension DHCLRCControl: KaraokeDelegate {
+    func onKaraokeView(view: KaraokeView, didFinishLineWith model: LyricLineModel, score: Int, cumulativeScore: Int, lineIndex: Int, lineCount: Int) {
+        
+    }
+}
+
+extension UIButton {
+    func setAttributedTitleWithImage(title: String, image: UIImage, imageInsets: UIEdgeInsets) {
+        let attributedString = NSMutableAttributedString()
+        
+        // 创建附带图片的文本附件
+        let imageAttachment = NSTextAttachment()
+        imageAttachment.image = image
+        imageAttachment.bounds = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
+        let imageAttributedString = NSAttributedString(attachment: imageAttachment)
+        attributedString.append(imageAttributedString)
+        
+        // 创建带有文本的富文本
+        let titleAttributedString = NSAttributedString(string: title)
+        attributedString.append(titleAttributedString)
+        
+        // 设置按钮的富文本标题和图片间距
+        self.setAttributedTitle(attributedString, for: .normal)
+        self.titleEdgeInsets = UIEdgeInsets(top: 0, left: image.size.width + imageInsets.left, bottom: 0, right: -image.size.width - imageInsets.right)
+        self.imageEdgeInsets = UIEdgeInsets(top: imageInsets.top, left: -imageInsets.left, bottom: imageInsets.bottom, right: imageInsets.right)
+    }
+}
+
+extension UIButton {
+    func setVerticalLayoutWithCenterAlignment(title: String, image: UIImage, spacing: CGFloat, for state: UIControl.State) {
+        self.setTitle(title, for: state)
+        self.setImage(image, for: state)
+        
+        // 设置图片和标题的布局
+        self.imageView?.contentMode = .scaleAspectFit
+        self.titleLabel?.textAlignment = .center
+        
+        // 计算图片和标题的实际大小
+        let imageSize = image.size
+        let titleSize = (title as NSString).size(withAttributes: [NSAttributedString.Key.font: self.titleLabel!.font!])
+        
+        // 设置内边距以及垂直间距
+        let imageInsets = UIEdgeInsets(top: -(titleSize.height + spacing), left: 0, bottom: 0, right: -titleSize.width)
+        let titleInsets = UIEdgeInsets(top: 0, left: -imageSize.width, bottom: -(imageSize.height + spacing), right: 0)
+        
+        // 设置按钮的布局
+        self.imageEdgeInsets = imageInsets
+        self.titleEdgeInsets = titleInsets
+        self.contentEdgeInsets = UIEdgeInsets(top: spacing/2, left: 0, bottom: spacing/2, right: 0)
+    }
+}

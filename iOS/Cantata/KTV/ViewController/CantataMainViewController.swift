@@ -16,6 +16,7 @@ public class CantataMainViewController: BaseViewController {
     private var chorusMicView: ChorusMicView!
     private var topView: VLKTVTopView!
     private var botView: VLBottomView!
+    private var lrcControlView: DHCLRCControl!
     public override func viewDidLoad() {
         super.viewDidLoad()
         layoutUI()
@@ -62,10 +63,15 @@ extension CantataMainViewController {
         topView = VLKTVTopView(frame: CGRect(x: 0, y: ZStatusBarHeight, width: ScreenWidth, height: 60), withDelegate: self)
         view.addSubview(topView)
 
-        let mainBgView = UIImageView(frame: CGRect(x: 0, y: topView.frame.maxY, width: ScreenWidth, height: 500))
+        let mainBgView = UIImageView(frame: CGRect(x: 0, y: topView.frame.maxY, width: ScreenWidth, height: 520))
         mainBgView.contentMode = .scaleAspectFill
         mainBgView.image = UIImage.sceneImage(name: "dhc_bg", bundleName: "DHCResource")
         view.addSubview(mainBgView)
+        
+        lrcControlView = DHCLRCControl(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 520))
+        lrcControlView.delegate = self
+        lrcControlView.backgroundColor = .clear
+        mainBgView.addSubview(lrcControlView)
         
         //麦位
         let chorusMicView = ChorusMicView(frame: CGRect(x: 0, y: 140, width: ScreenWidth, height: 320), topMicCount: 8)
@@ -206,6 +212,12 @@ extension CantataMainViewController {
 //加载RTC模块
 extension CantataMainViewController {
     
+}
+
+extension CantataMainViewController: DHCGameDelegate {
+    public func didGameEventChanged(with event: DHCGameEvent) {
+        
+    }
 }
 
 //头部视图代理
