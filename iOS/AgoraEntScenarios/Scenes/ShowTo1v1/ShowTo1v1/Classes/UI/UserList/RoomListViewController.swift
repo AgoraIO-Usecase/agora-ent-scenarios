@@ -200,7 +200,6 @@ extension RoomListViewController {
             return
         }
         
-        tokenConfig.roomId = userInfo.get1V1ChannelId()
         renewTokens { flag in
         }
         
@@ -211,7 +210,8 @@ extension RoomListViewController {
         videoLoaderApi.addListener(listener: self)
     }
     
-    private func _reinitCallerAPI(tokenConfig: CallTokenConfig, room: ShowTo1v1RoomInfo) {
+    private func _reinitCallerAPI(room: ShowTo1v1RoomInfo) {
+        tokenConfig.roomId = userInfo!.get1V1ChannelId()
         callApi.deinitialize {
         }
         
@@ -238,7 +238,8 @@ extension RoomListViewController {
         callVC.rtcEngine = rtcEngine
     }
     
-    private func _reinitCalleeAPI(tokenConfig: CallTokenConfig, room: ShowTo1v1RoomInfo) {
+    private func _reinitCalleeAPI(room: ShowTo1v1RoomInfo) {
+        tokenConfig.roomId = room.roomId
         callApi.deinitialize {
         }
         
@@ -286,7 +287,7 @@ extension RoomListViewController {
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         
-        self._reinitCallerAPI(tokenConfig: self.tokenConfig, room: room)
+        self._reinitCallerAPI(room: room)
         callApi.call(roomId: room.roomId, remoteUserId: room.getUIntUserId()) { err in
         }
     }
@@ -354,9 +355,9 @@ extension RoomListViewController {
     
     private func _showBroadcasterVC(roomInfo: ShowTo1v1RoomInfo) {
         if roomInfo.userId == userInfo?.userId {
-            self._reinitCalleeAPI(tokenConfig: self.tokenConfig, room: roomInfo)
+            self._reinitCalleeAPI(room: roomInfo)
         } else {
-            self._reinitCallerAPI(tokenConfig: self.tokenConfig, room: roomInfo)
+            self._reinitCallerAPI(room: roomInfo)
         }
         
         let vc = BroadcasterViewController()
