@@ -7,6 +7,8 @@
 
 import UIKit
 
+
+
 class DHCResultView: UIView {
     
     private lazy var resultTitleLabel: UILabel = { //本轮评分
@@ -28,13 +30,19 @@ class DHCResultView: UIView {
     
     private lazy var tableView: UITableView = { //分数的tableView
             let tableView = UITableView()
-            tableView.registerCell(SBGScoreTitleCell.self, forCellReuseIdentifier: "title")
-            tableView.registerCell(SBGScoreCell.self, forCellReuseIdentifier: "score")
+            tableView.registerCell(DHCScoreTitleCell.self, forCellReuseIdentifier: "title")
+            tableView.registerCell(DHCScoreCell.self, forCellReuseIdentifier: "score")
             tableView.dataSource = self
             tableView.delegate = self
             tableView.backgroundColor = .clear
             return tableView
     }()
+    
+    @objc public var dataSource: [SubRankModel]? {
+        didSet {
+            
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -47,5 +55,28 @@ class DHCResultView: UIView {
     
     private func layoutUI() {
         
+    }
+}
+
+extension DHCResultView: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return (dataSource?.count ?? 3) + 1
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if indexPath.row == 0 {
+            let cell : DHCScoreTitleCell = tableView.dequeueReusableCell(withIdentifier: "title") as! DHCScoreTitleCell
+            return cell
+        } else {
+            let cell : DHCScoreCell = tableView.dequeueReusableCell(withIdentifier: "score") as! DHCScoreCell
+            if let model: SubRankModel = dataSource?[indexPath.row - 1] {
+                cell.score = model
+            }
+            return cell
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return indexPath.row == 0 ? 28 : 38
     }
 }
