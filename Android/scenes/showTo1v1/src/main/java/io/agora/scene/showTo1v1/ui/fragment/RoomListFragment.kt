@@ -95,11 +95,10 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         }
         binding.tvUserName.text = mRoomInfo.userName
         binding.tvRoomName.text = mRoomInfo.roomName
-        val resourceName = "show_to1v1_user_bg${mRoomInfo.userId.toInt() % 9 + 1}"
         context?.let { context ->
-            var resourceId: Int = 0
+            var resourceId: Int
             try {
-                resourceId = resources.getIdentifier(resourceName, "drawable", context.packageName)
+                resourceId = resources.getIdentifier(mRoomInfo.bgImage(), "drawable", context.packageName)
             } catch (e: Exception) {
                 resourceId = R.drawable.show_to1v1_user_bg1
                 Log.e(TAG, "getResources ${e.message}")

@@ -44,7 +44,7 @@ open class ShowTo1v1UserInfo constructor(
 
     fun bgImage(): String {
         val uid = getIntUserId()
-        return "user_bg${uid % 9 + 1}"
+        return "show_to1v1_user_bg${uid % 9 + 1}"
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

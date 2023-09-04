@@ -142,6 +142,8 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             fetchRoomList()
         }
         binding.emptyInclude.layoutCreateRoom.setOnClickListener {
+            mCallApi.removeListener(this)
+            mCallApi.deinitialize {  }
             RoomCreateActivity.launch(this)
         }
     }
@@ -296,6 +298,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     override fun onDestroy() {
         super.onDestroy()
         mVpFragments[mCurrLoadPosition]?.stopLoadPage(false)
+        mCallApi.removeListener(this)
         RtcEngineInstance.cleanCache()
     }
 
@@ -326,7 +329,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             ownerRoomId = userInfo.userId,
             rtcEngine = mRtcEngine,
             mode = CallMode.ShowTo1v1,
-            role = CallRole.CALLER,
+            role = role,
             localView = TextureView(this),
             remoteView = TextureView(this),
             autoAccept = true
@@ -344,6 +347,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     override fun onClickCall(roomInfo: ShowTo1v1RoomInfo) {
         mRoomInfo = roomInfo
+        reInitCallApi(CallRole.CALLER, roomInfo)
         mCallApi.call(roomInfo.roomId, roomInfo.getIntUserId(), null)
     }
 
