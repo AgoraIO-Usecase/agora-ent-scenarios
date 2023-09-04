@@ -4,18 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.TextureView
 import android.view.View
 import android.view.WindowManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
-import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.R
-import io.agora.scene.showTo1v1.RtcEngineInstance
+import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomCreateActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
@@ -35,8 +33,9 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
     }
 
     private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
-    private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
-    private val mRtcVideoSwitcher by lazy { RtcEngineInstance.videoSwitcher }
+    private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
+    private val mRtcEngine by lazy { mShowTo1v1Manger.rtcEngine }
+    private val mRtcVideoSwitcher by lazy { mShowTo1v1Manger.videoSwitcher }
 
     private lateinit var roomNameArray: Array<String>
     private val random = Random()

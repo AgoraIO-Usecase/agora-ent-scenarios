@@ -20,7 +20,7 @@ import io.agora.scene.base.GlideOptions
 import io.agora.scene.base.component.BaseBindingFragment
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.showTo1v1.R
-import io.agora.scene.showTo1v1.RtcEngineInstance
+import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
@@ -46,8 +46,9 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     }
 
     private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
-    private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
-    private val mRtcVideoSwitcher by lazy { RtcEngineInstance.videoSwitcher }
+    private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
+    private val mRtcEngine by lazy { mShowTo1v1Manger.rtcEngine }
+    private val mRtcVideoSwitcher by lazy { mShowTo1v1Manger.videoSwitcher }
 
     private val mRoomInfo by lazy { (arguments?.getParcelable(EXTRA_ROOM_DETAIL_INFO) as? ShowTo1v1RoomInfo)!! }
 

@@ -17,7 +17,7 @@ import io.agora.rtc2.*
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.showTo1v1.RtcEngineInstance
+import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import java.util.*
 
 class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private val api: VideoSwitcherAPI) :
@@ -49,7 +49,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
                 VideoSwitcherAPI.RoomInfo(
                     it.channelId,
                     it.localUid,
-                    RtcEngineInstance.generalToken(),
+                    ShowTo1v1Manger.getImpl().generalToken(),
                     null
                 )
             )
@@ -74,7 +74,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
             VideoSwitcherAPI.RoomStatus.PREJOINED, VideoSwitcherAPI.RoomInfo(
                 connection.channelId,
                 connection.localUid,
-                RtcEngineInstance.generalToken(),
+                ShowTo1v1Manger.getImpl().generalToken(),
                 eventListener
             ), mediaOptions
         )
@@ -89,7 +89,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
             VideoSwitcherAPI.RoomStatus.JOINED, VideoSwitcherAPI.RoomInfo(
                 connection.channelId,
                 connection.localUid,
-                RtcEngineInstance.generalToken(),
+                ShowTo1v1Manger.getImpl().generalToken(),
                 eventListener
             ), mediaOptions
         )
@@ -156,7 +156,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
                     VideoSwitcherAPI.RoomStatus.PREJOINED, VideoSwitcherAPI.RoomInfo(
                         conn.channelId,
                         conn.localUid,
-                        RtcEngineInstance.generalToken(),
+                        ShowTo1v1Manger.getImpl().generalToken(),
                         null
                     ), null
                 )
@@ -185,7 +185,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
                 VideoSwitcherAPI.RoomStatus.IDLE, VideoSwitcherAPI.RoomInfo(
                     connection.channelId,
                     connection.localUid,
-                    RtcEngineInstance.generalToken(),
+                    ShowTo1v1Manger.getImpl().generalToken(),
                     null
                 ), null
             )
@@ -196,7 +196,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
                 VideoSwitcherAPI.RoomStatus.PREJOINED, VideoSwitcherAPI.RoomInfo(
                     connection.channelId,
                     connection.localUid,
-                    RtcEngineInstance.generalToken(),
+                    ShowTo1v1Manger.getImpl().generalToken(),
                     null
                 ), null
             )
@@ -212,7 +212,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
             VideoSwitcherAPI.RoomInfo(
                 connection.channelId,
                 connection.localUid,
-                RtcEngineInstance.generalToken(),
+                ShowTo1v1Manger.getImpl().generalToken(),
                 null
             ), container
         )
@@ -295,7 +295,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
     ) {
         val joinChannelTime = SystemClock.elapsedRealtime()
         Log.d(tag, "joinChannelEx start : channelId=${connection.channelId}, uid=${connection.localUid}")
-        val generalToken = RtcEngineInstance.generalToken()
+        val generalToken =  ShowTo1v1Manger.getImpl().generalToken()
         if (generalToken.isNotEmpty()) {
             val eventHandler = RtcEngineEventHandlerImpl(joinChannelTime, connection)
             eventHandler.setEventListener(eventListener)
@@ -312,7 +312,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
                         "joinChannelEx generate token : channel ${connection.channelId} uid=${connection.localUid} token success cost " +
                                 "time : ${SystemClock.elapsedRealtime() - joinChannelTime} ms"
                     )
-                    RtcEngineInstance.setupGeneralToken(it)
+                    ShowTo1v1Manger.getImpl().setupGeneralToken(it)
                     val eventHandler = RtcEngineEventHandlerImpl(joinChannelTime, connection)
                     eventHandler.setEventListener(eventListener)
                     connection.rtcEventHandler = eventHandler

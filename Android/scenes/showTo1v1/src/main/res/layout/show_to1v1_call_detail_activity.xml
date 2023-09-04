@@ -149,43 +149,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/layoutCallPrivatelyBg"
-        android:layout_width="157dp"
-        android:layout_height="54dp"
-        android:orientation="horizontal"
-        android:src="@drawable/show_to1v1_room_detail_call_bg"
-        app:layout_constraintEnd_toEndOf="@+id/layoutCallPrivately"
-        app:layout_constraintTop_toTopOf="@+id/layoutCallPrivately"
-        app:layout_constraintBottom_toBottomOf="@+id/layoutCallPrivately"
-        app:layout_constraintStart_toStartOf="@+id/layoutCallPrivately"/>
-    
-    <LinearLayout
-        android:id="@+id/layoutCallPrivately"
-        android:layout_width="141dp"
-        android:layout_height="38dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toStartOf="@id/ivSetting"
-        app:layout_constraintTop_toTopOf="@id/ivSetting"
-        android:layout_marginEnd="15dp"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="@id/ivSetting"
-        android:background="@drawable/show_to1v1_room_detail_call">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/show_to1v1_linking"/>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:layout_marginStart="5dp"
-            android:text="@string/show_to1v1_call_privately"/>
-    </LinearLayout>
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -218,5 +181,42 @@
             android:padding="10dp"
             android:src="@drawable/show_to1v1_dashboard_close" />
     </FrameLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/layoutCallPrivatelyBg"
+        android:layout_width="157dp"
+        android:layout_height="54dp"
+        android:orientation="horizontal"
+        android:src="@drawable/show_to1v1_room_detail_call_bg"
+        app:layout_constraintEnd_toEndOf="@+id/layoutCallPrivately"
+        app:layout_constraintTop_toTopOf="@+id/layoutCallPrivately"
+        app:layout_constraintBottom_toBottomOf="@+id/layoutCallPrivately"
+        app:layout_constraintStart_toStartOf="@+id/layoutCallPrivately"/>
+
+    <LinearLayout
+        android:id="@+id/layoutCallPrivately"
+        android:layout_width="141dp"
+        android:layout_height="38dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toStartOf="@id/ivSetting"
+        app:layout_constraintTop_toTopOf="@id/ivSetting"
+        android:layout_marginEnd="15dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@id/ivSetting"
+        android:background="@drawable/show_to1v1_room_detail_call">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/show_to1v1_linking"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:layout_marginStart="5dp"
+            android:text="@string/show_to1v1_call_privately"/>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

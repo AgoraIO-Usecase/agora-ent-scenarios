@@ -14,7 +14,7 @@ import io.agora.mediaplayer.data.PlayerUpdatedInfo
 import io.agora.mediaplayer.data.SrcInfo
 import io.agora.rtc2.*
 import io.agora.rtc2.video.VideoCanvas
-import io.agora.scene.showTo1v1.RtcEngineInstance
+import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import java.util.*
 
 class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : VideoSwitcherAPI {
@@ -274,7 +274,7 @@ class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : Vid
         roomStateMap.forEach {
             switchRoomState(
                 VideoSwitcherAPI.RoomStatus.IDLE,
-                VideoSwitcherAPI.RoomInfo(it.key.channelId, it.key.localUid, RtcEngineInstance.generalToken(), null),
+                VideoSwitcherAPI.RoomInfo(it.key.channelId, it.key.localUid, ShowTo1v1Manger.getImpl().generalToken(), null),
                 null
             )
         }
