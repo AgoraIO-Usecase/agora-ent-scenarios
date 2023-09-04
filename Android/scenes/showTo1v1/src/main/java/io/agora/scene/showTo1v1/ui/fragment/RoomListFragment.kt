@@ -47,8 +47,8 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
-    private val mRtcEngine by lazy { mShowTo1v1Manger.rtcEngine }
-    private val mRtcVideoSwitcher by lazy { mShowTo1v1Manger.videoSwitcher }
+    private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
+    private val mRtcVideoSwitcher by lazy { mShowTo1v1Manger.mVideoSwitcher }
 
     private val mRoomInfo by lazy { (arguments?.getParcelable(EXTRA_ROOM_DETAIL_INFO) as? ShowTo1v1RoomInfo)!! }
 

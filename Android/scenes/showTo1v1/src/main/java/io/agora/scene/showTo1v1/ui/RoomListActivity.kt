@@ -60,7 +60,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
     private val mCallApi by lazy { ICallApi.getImplInstance() }
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
-    private val mRtcEngine by lazy { mShowTo1v1Manger.rtcEngine }
+    private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
     private var mFragmentAdapter: FragmentStateAdapter? = null
     private val mRoomInfoList = mutableListOf<ShowTo1v1RoomInfo>()
 
@@ -72,6 +72,9 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     private var mCallDialog: CallDialog? = null
 
+    // 当前呼叫的房间
+    private var mRoomInfo: ShowTo1v1RoomInfo? = null
+
     override fun getViewBinding(inflater: LayoutInflater): ShowTo1v1RoomListActivityBinding {
         return ShowTo1v1RoomListActivityBinding.inflate(inflater)
     }
@@ -81,7 +84,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setOnApplyWindowInsetsListener()
         fetchService()
-        mShowTo1v1Manger.checkCallTokenConfig(callback = {})
     }
 
     private fun setOnApplyWindowInsetsListener() {
@@ -142,6 +144,8 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             binding.viewPager2.adapter = mFragmentAdapter
             binding.viewPager2.registerOnPageChangeCallback(onPageChangeCallback)
             binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2 - Int.MAX_VALUE / 2 % mRoomInfoList.size, false)
+        } else {
+            mFragmentAdapter?.notifyDataSetChanged()
         }
     }
 
@@ -274,36 +278,18 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         mShowTo1v1Manger.cleanCache()
     }
 
-    private fun reInitCallApi(role: CallRole, userInfo: ShowTo1v1UserInfo) {
-        mShowTo1v1Manger.checkCallTokenConfig {
-            mCallApi.deinitialize { }
-            val config = CallConfig(
-                appId = BuildConfig.AGORA_APP_ID,
-                userId = userInfo.userId.toInt(),
-                userExtension = userInfo.toMap(),
-                ownerRoomId = userInfo.userId,
-                rtcEngine = mRtcEngine,
-                mode = CallMode.ShowTo1v1,
-                role = role,
-                localView = TextureView(this),
-                remoteView = TextureView(this),
-                autoAccept = true
-            )
-            mCallApi.initialize(config, mShowTo1v1Manger.mCallTokenConfig) {
-                val prepareConfig = PrepareConfig.calleeConfig()
-                mCallApi.prepareForCall(prepareConfig) { err ->
-
-                }
-            }
-            mCallApi.removeListener(this)
+    private fun reInitCallApi(roomId: String, callback: () -> Unit) {
+        mShowTo1v1Manger.reInitCallApi(CallRole.CALLER, roomId, callback = {
+            callback.invoke()
             mCallApi.addListener(this)
-        }
+        })
     }
 
     override fun onClickCall(roomInfo: ShowTo1v1RoomInfo) {
-        mShowTo1v1Manger.mRoomInfo = roomInfo
-        reInitCallApi(CallRole.CALLER, roomInfo)
-        mCallApi.call(roomInfo.roomId, roomInfo.getIntUserId(), null)
+        mRoomInfo = roomInfo
+        reInitCallApi(roomInfo.roomId, callback = {
+            mCallApi.call(roomInfo.get1v1ChannelId(), roomInfo.getIntUserId(), null)
+        })
     }
 
     private fun onCallSend(user: ShowTo1v1UserInfo) {
@@ -328,7 +314,12 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 if (stateReason == CallReason.CallingTimeout || stateReason == CallReason.LocalRejected ||
                     stateReason == CallReason.RemoteRejected
                 ) {
-
+                    mShowTo1v1Manger.mRemoteUser = null
+                    ToastUtils.showToast(getString(R.string.show_to1v1_no_answer))
+                    mCallDialog?.let {
+                        if (it.isShowing) it.dismiss()
+                        mCallDialog = null
+                    }
                 }
             }
 
@@ -346,10 +337,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     // 收到大哥拨打电话
                     // nothing
                 } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {
-                    // 大哥播放电话
+                    // 大哥拨打电话
                     mShowTo1v1Manger.mConnectedChannelId = fromRoomId
                     val remoteUser = mRoomInfoList.firstOrNull {
-                        it.userId == toUserId.toString() && it.roomId == fromRoomId
+                        it.userId == toUserId.toString()
                     } ?: return
                     mShowTo1v1Manger.mRemoteUser = remoteUser
                     onCallSend(remoteUser)
@@ -361,8 +352,9 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 if (mShowTo1v1Manger.mRemoteUser == null) return
                 mCallDialog?.let {
                     if (it.isShowing) it.dismiss()
+                    mCallDialog = null
                 }
-                mShowTo1v1Manger.mRoomInfo?.let { roomInfo ->
+                mRoomInfo?.let { roomInfo ->
                     RoomDetailActivity.launch(this, roomInfo)
                     // 开启鉴黄鉴暴
                     val channelId = mShowTo1v1Manger.mRemoteUser?.get1v1ChannelId() ?: ""
@@ -371,8 +363,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     val channelName = mShowTo1v1Manger.mConnectedChannelId ?: return
                     val uid = mShowTo1v1Manger.mCurrentUser.userId.toLong()
                     AudioModeration.moderationAudio(
-                        channelName, uid, AudioModeration.AgoraChannelType.broadcast,
-                        "ShowTo1v1"
+                        channelName, uid, AudioModeration.AgoraChannelType.broadcast, "ShowTo1v1"
                     )
                 }
             }
@@ -380,7 +371,9 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             CallStateType.Failed -> {
                 mCallDialog?.let {
                     if (it.isShowing) it.dismiss()
+                    mCallDialog = null
                 }
+                mShowTo1v1Manger.mRemoteUser = null
                 ToastUtils.showToast(eventReason)
             }
         }

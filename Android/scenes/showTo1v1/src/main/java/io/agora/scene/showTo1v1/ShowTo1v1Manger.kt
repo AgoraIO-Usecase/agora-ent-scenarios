@@ -1,6 +1,7 @@
 package io.agora.scene.showTo1v1
 
 import android.util.Log
+import android.view.TextureView
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
@@ -8,10 +9,15 @@ import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
+import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.showTo1v1.callAPI.CallConfig
+import io.agora.scene.showTo1v1.callAPI.CallMode
+import io.agora.scene.showTo1v1.callAPI.CallRole
 import io.agora.scene.showTo1v1.callAPI.CallTokenConfig
+import io.agora.scene.showTo1v1.callAPI.ICallApi
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
@@ -44,14 +50,13 @@ class ShowTo1v1Manger constructor() {
 
     private val workingExecutor = Executors.newSingleThreadExecutor()
 
-    // 当前呼叫的房间
-     var mRoomInfo: ShowTo1v1RoomInfo? = null
+    val mCallApi by lazy { ICallApi.getImplInstance() }
 
     // 远端用户
-     var mRemoteUser: ShowTo1v1UserInfo? = null
+    var mRemoteUser: ShowTo1v1UserInfo? = null
 
     // 连接的用户
-     var mConnectedChannelId: String? = null
+    var mConnectedChannelId: String? = null
 
     private var innerCurrentUser: ShowTo1v1UserInfo? = null
 
@@ -74,21 +79,71 @@ class ShowTo1v1Manger constructor() {
     val mCallTokenConfig: CallTokenConfig
         get() {
             if (innerCallTokenConfig == null) {
-                innerCallTokenConfig = CallTokenConfig().apply {
-                    roomId = mCurrentUser.get1v1ChannelId()
-                }
+                innerCallTokenConfig = CallTokenConfig()
             }
             return innerCallTokenConfig!!
         }
 
+    private var innerLocalVideoView: TextureView? = null
+
+    val mLocalVideoView: TextureView
+        get() {
+            if (innerLocalVideoView == null) {
+                innerLocalVideoView = TextureView(AgoraApplication.the())
+            }
+            return innerLocalVideoView!!
+        }
+
+    private var innerRemoteVideoView: TextureView? = null
+
+    val mRemoteVideoView: TextureView
+        get() {
+            if (innerRemoteVideoView == null) {
+                innerRemoteVideoView = TextureView(AgoraApplication.the())
+            }
+            return innerRemoteVideoView!!
+        }
+
+    /**
+     * @param role 呼叫/被叫
+     * @param ownerRoomId 呼叫/被叫房间 id
+     */
+    fun reInitCallApi(role: CallRole, ownerRoomId: String, callback: () -> Unit) {
+        if (role == CallRole.CALLER) {
+            mCallTokenConfig.roomId = mCurrentUser.get1v1ChannelId()
+        } else {
+            mCallTokenConfig.roomId = ownerRoomId
+        }
+        checkCallTokenConfig(role) {
+            mCallApi.deinitialize {
+                val config = CallConfig(
+                    appId = BuildConfig.AGORA_APP_ID,
+                    userId = mCurrentUser.getIntUserId(),
+                    userExtension = mCurrentUser.toMap(),
+                    ownerRoomId = ownerRoomId,
+                    rtcEngine = mRtcEngine,
+                    mode = CallMode.ShowTo1v1,
+                    role = role,
+                    localView = mLocalVideoView,
+                    remoteView = mRemoteVideoView,
+                    autoAccept = true
+                )
+                mCallApi.initialize(config, mCallTokenConfig) {
+                    callback.invoke()
+                }
+            }
+        }
+    }
+
+
     // call api tokenConfig
-    fun checkCallTokenConfig(callback: () -> Unit) {
+    private fun checkCallTokenConfig(role: CallRole, callback: () -> Unit) {
         if (mCallTokenConfig.rtcToken.isNotEmpty() && mCallTokenConfig.rtmToken.isNotEmpty()) {
             callback.invoke()
             return
         }
         TokenGenerator.generateTokens(
-            mCallTokenConfig.roomId,
+            if (role == CallRole.CALLEE) "" else mCallTokenConfig.roomId, // 被叫万能 token
             mCurrentUser.userId,
             TokenGenerator.TokenGeneratorType.token007,
             arrayOf(
@@ -117,7 +172,7 @@ class ShowTo1v1Manger constructor() {
     fun generalToken(): String = mGeneralToken
 
     private var innerRtcEngine: RtcEngineEx? = null
-    val rtcEngine: RtcEngineEx
+    val mRtcEngine: RtcEngineEx
         get() {
             if (innerRtcEngine == null) {
                 val config = RtcEngineConfig()
@@ -137,10 +192,10 @@ class ShowTo1v1Manger constructor() {
         }
 
     private var innerVideoSwitcher: VideoSwitcher? = null
-    val videoSwitcher: VideoSwitcher
+    val mVideoSwitcher: VideoSwitcher
         get() {
             if (innerVideoSwitcher == null) {
-                innerVideoSwitcher = VideoSwitcherImpl(rtcEngine, VideoSwitcherAPIImpl(rtcEngine))
+                innerVideoSwitcher = VideoSwitcherImpl(mRtcEngine, VideoSwitcherAPIImpl(mRtcEngine))
             }
             return innerVideoSwitcher!!
         }

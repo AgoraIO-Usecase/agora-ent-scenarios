@@ -65,7 +65,7 @@ open class PrepareConfig constructor(){
 
 /** token renew时的配置
  */
-open class CallTokenConfig {
+open class CallTokenConfig constructor(){
     var roomId: String = ""     // 频道名(主叫需要设置为1v1的频道，被叫需要设置为自己的广播频道)
     var rtcToken: String = ""   // rtc token，被叫需要使用万能token
     var rtmToken: String = ""   // rtm token

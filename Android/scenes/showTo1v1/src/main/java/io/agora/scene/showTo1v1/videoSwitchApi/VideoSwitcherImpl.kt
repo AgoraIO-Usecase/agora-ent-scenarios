@@ -295,7 +295,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
     ) {
         val joinChannelTime = SystemClock.elapsedRealtime()
         Log.d(tag, "joinChannelEx start : channelId=${connection.channelId}, uid=${connection.localUid}")
-        val generalToken =  ShowTo1v1Manger.getImpl().generalToken()
+        val generalToken = ShowTo1v1Manger.getImpl().generalToken()
         if (generalToken.isNotEmpty()) {
             val eventHandler = RtcEngineEventHandlerImpl(joinChannelTime, connection)
             eventHandler.setEventListener(eventListener)
