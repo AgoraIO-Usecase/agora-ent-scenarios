@@ -285,11 +285,15 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         })
     }
 
-    override fun onClickCall(roomInfo: ShowTo1v1RoomInfo) {
+    override fun onClickCall(needCall: Boolean, roomInfo: ShowTo1v1RoomInfo) {
         mRoomInfo = roomInfo
-        reInitCallApi(roomInfo.roomId, callback = {
-            mCallApi.call(roomInfo.get1v1ChannelId(), roomInfo.getIntUserId(), null)
-        })
+        if (needCall) {
+            reInitCallApi(roomInfo.roomId, callback = {
+                mCallApi.call(roomInfo.get1v1ChannelId(), roomInfo.getIntUserId(), null)
+            })
+        } else {
+            RoomDetailActivity.launch(this, false, roomInfo)
+        }
     }
 
     private fun onCallSend(user: ShowTo1v1UserInfo) {
@@ -355,7 +359,8 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     mCallDialog = null
                 }
                 mRoomInfo?.let { roomInfo ->
-                    RoomDetailActivity.launch(this, roomInfo)
+                    mCallApi.removeListener(this)
+                    RoomDetailActivity.launch(this, true, roomInfo)
                     // 开启鉴黄鉴暴
                     val channelId = mShowTo1v1Manger.mRemoteUser?.get1v1ChannelId() ?: ""
                     val localUid = mShowTo1v1Manger.mCurrentUser.userId.toInt()

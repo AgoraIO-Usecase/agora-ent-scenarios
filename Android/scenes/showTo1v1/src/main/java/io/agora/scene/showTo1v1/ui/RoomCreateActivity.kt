@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.TextureView
 import android.view.View
 import android.view.WindowManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.R
@@ -37,6 +39,8 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
     private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
     private val mRtcVideoSwitcher by lazy { mShowTo1v1Manger.mVideoSwitcher }
 
+    private val mTextureView by lazy { TextureView(this) }
+
     private lateinit var roomNameArray: Array<String>
     private val random = Random()
 
@@ -61,9 +65,7 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
 
     private fun initRtcEngine() {
         mRtcEngine.startPreview()
-        mRtcVideoSwitcher.setupLocalVideo(
-            VideoSwitcher.VideoCanvasContainer(this, binding.flVideoContainer, 0)
-        )
+        mRtcEngine.setupLocalVideo(VideoCanvas(mTextureView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
     }
 
     private fun setOnApplyWindowInsetsListener() {
@@ -104,7 +106,7 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
             mService.createRoom(roomName, completion = { error, roomInfo ->
                 if (error == null && roomInfo != null) { // success
                     isFinishToLiveDetail = true
-                    RoomDetailActivity.launch(this, roomInfo)
+                    RoomDetailActivity.launch(this, false, roomInfo)
                     finish()
                 } else { //failed
                     ToastUtils.showToast(error?.message)
@@ -171,7 +173,7 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
 
     override fun onPause() {
         super.onPause()
-        if (isFinishToLiveDetail){
+        if (isFinishToLiveDetail) {
             mRtcEngine.stopPreview()
         }
     }

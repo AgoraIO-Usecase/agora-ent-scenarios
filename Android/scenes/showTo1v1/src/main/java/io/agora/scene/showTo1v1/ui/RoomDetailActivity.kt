@@ -25,7 +25,6 @@ import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.AudioModeration
-import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
@@ -33,12 +32,8 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
-import io.agora.scene.showTo1v1.callAPI.AGError
 import io.agora.scene.showTo1v1.callAPI.CallApiImpl
-import io.agora.scene.showTo1v1.callAPI.CallConfig
-import io.agora.scene.showTo1v1.callAPI.CallMode
 import io.agora.scene.showTo1v1.callAPI.CallRole
-import io.agora.scene.showTo1v1.callAPI.PrepareConfig
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallDetailActivityBinding
 import io.agora.scene.showTo1v1.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
@@ -49,9 +44,7 @@ import io.agora.scene.showTo1v1.ui.dialog.CallDialog
 import io.agora.scene.showTo1v1.ui.dialog.CallDialogState
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
 import io.agora.scene.showTo1v1.ui.fragment.DashboardFragment
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPI
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherImpl
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 import org.json.JSONException
@@ -65,9 +58,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     companion object {
         private const val TAG = "RoomDetailActivity"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
+        private const val EXTRA_ROOM_NEED_CALL = "needCall"
 
-        fun launch(context: Context, roomInfo: ShowTo1v1RoomInfo) {
+        fun launch(context: Context, needCall: Boolean, roomInfo: ShowTo1v1RoomInfo) {
             val intent = Intent(context, RoomDetailActivity::class.java).apply {
+                putExtra(EXTRA_ROOM_NEED_CALL, needCall)
                 putExtra(EXTRA_ROOM_DETAIL_INFO, roomInfo)
             }
             context.startActivity(intent)
@@ -86,6 +81,10 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         (intent.getParcelableExtra(EXTRA_ROOM_DETAIL_INFO) as? ShowTo1v1RoomInfo)!!
     }
 
+    private val mNeedCall: Boolean by lazy {
+        intent.getBooleanExtra(EXTRA_ROOM_NEED_CALL, false)
+    }
+
     private val isRoomOwner by lazy { mRoomInfo.userId == UserManager.getInstance().user.id.toString() }
 
     private val mMainRtcConnection by lazy {
@@ -102,14 +101,16 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     private val timerRoomEndRun = Runnable {
         destroy() // 房间到了限制时间
-        ToastUtils.showToast(R.string.show_to1v1_ending_tips)
+        ToastUtils.showToast(R.string.show_to1v1_end_tips)
         ShowTo1v1Logger.d(TAG, "timer end!")
+        onHangup()
     }
 
     private val timerLinkingEndRun = Runnable {
-        destroy() // 房间到了限制时间
-        ToastUtils.showToast(R.string.show_to1v1_ending_tips)
+        destroy() // 拨打电话时间到了
+        ToastUtils.showToast(R.string.show_to1v1_end_linking_tips)
         ShowTo1v1Logger.d(TAG, "timer linking end!")
+        onHangup()
     }
 
     private val dataFormat by lazy {
@@ -204,9 +205,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             binding.layoutCallPrivatelyBg.isVisible = false
             binding.layoutCallPrivately.isVisible = false
         } else {
-            binding.layoutCallPrivatelyBg.isVisible = true
-            binding.layoutCallPrivately.isVisible = true
-            binding.layoutCallPrivatelyBg.breathAnim()
+            binding.layoutCallPrivatelyBg.isVisible = mNeedCall
+            binding.layoutCallPrivately.isVisible = mNeedCall
+            if (mNeedCall) {
+                binding.layoutCallPrivatelyBg.breathAnim()
+            }
         }
         val fragment = DashboardFragment()
         val fragmentTransaction = supportFragmentManager.beginTransaction()
@@ -351,22 +354,27 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     private fun setupVideoView(publish: Boolean) {
         if (isRoomOwner) {
             if (publish) {
-                mRtcVideoSwitcher.setupLocalVideo(
-                    VideoSwitcher.VideoCanvasContainer(this, binding.llContainer, 0)
-                )
+                binding.llContainer.removeAllViews()
+                mRtcEngine.setupLocalVideo(VideoCanvas(mTextureView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
+                mRtcEngine.startPreview()
+                binding.llContainer.addView(mTextureView)
             } else {
                 mRtcEngine.setupLocalVideo(VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, 0))
+                mRtcEngine.stopPreview()
                 binding.llContainer.removeAllViews()
             }
         } else {
             if (publish) {
-                mRtcVideoSwitcher.setupRemoteVideo(
-                    mMainRtcConnection,
-                    VideoSwitcher.VideoCanvasContainer(this, binding.llContainer, mRoomInfo.getIntUserId())
+                binding.llContainer.removeAllViews()
+                mRtcEngine.setupRemoteVideoEx(
+                    VideoCanvas(
+                        mTextureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()
+                    ), mMainRtcConnection
                 )
+                binding.llContainer.addView(mTextureView)
             } else {
                 mRtcEngine.setupRemoteVideoEx(
-                    VideoCanvas(null, VideoCanvas.RENDER_MODE_FIT, mRoomInfo.getIntUserId()), mMainRtcConnection
+                    VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()), mMainRtcConnection
                 )
                 binding.llContainer.removeAllViews()
             }
@@ -399,7 +407,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         options.publishCameraTrack = publish
         options.autoSubscribeVideo = publish
         options.autoSubscribeAudio = publish
-        mRtcEngine.updateChannelMediaOptions(options)
+        mRtcEngine.updateChannelMediaOptionsEx(options, mMainRtcConnection)
     }
 
     private fun updateCallState(state: CallStateType) {
@@ -447,7 +455,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             CallStateType.Prepared -> {
                 when (stateReason) {
                     CallReason.RemoteHangup -> {
-                        ToastUtils.showToast(getString(R.string.show_to1v1_ending_tips))
+                        ToastUtils.showToast(getString(R.string.show_to1v1_end_linking_tips))
                     }
 
                     CallReason.CallingTimeout -> {
@@ -465,7 +473,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
 
             CallStateType.Calling -> {
-                publishMedia(false)
                 val fromUserId = eventInfo[CallApiImpl.kFromUserId] as? Int ?: 0
                 val fromRoomId = eventInfo[CallApiImpl.kFromRoomId] as? String ?: ""
                 val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
@@ -507,7 +514,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
 
             CallStateType.Failed -> {
-                publishMedia(true)
                 mCallDialog?.let {
                     if (it.isShowing) it.dismiss()
                     mCallDialog = null
@@ -534,6 +540,13 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             Log.d(TAG, "enableContentInspectEx $ret")
         } catch (_: JSONException) {
         }
+    }
+
+    private fun onHangup() {
+        mCallApi.hangup(mRoomInfo.roomId, completion = {
+
+        })
+        finish()
     }
 }
 

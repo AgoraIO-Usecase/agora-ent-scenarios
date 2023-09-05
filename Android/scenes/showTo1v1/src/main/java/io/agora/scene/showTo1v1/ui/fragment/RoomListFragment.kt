@@ -122,7 +122,10 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
             }
         }
         binding.ivConnect.setOnClickListener {
-            onClickCallingListener?.onClickCall(mRoomInfo)
+            onClickCallingListener?.onClickCall(true, mRoomInfo)
+        }
+        binding.layoutVideoContainer.setOnClickListener {
+            onClickCallingListener?.onClickCall(false, mRoomInfo)
         }
         binding.ivConnectBG.breathAnim()
     }
@@ -208,7 +211,12 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     }
 
     interface OnClickCallingListener {
-        fun onClickCall(roomInfo: ShowTo1v1RoomInfo)
+        /**
+         * 点击连接或者点击小窗进入直播页面
+         * @param needCall true 需要直接 call; false 不需要 call
+         * @param roomInfo 房间数据
+         */
+        fun onClickCall(needCall: Boolean, roomInfo: ShowTo1v1RoomInfo)
     }
 }
 
