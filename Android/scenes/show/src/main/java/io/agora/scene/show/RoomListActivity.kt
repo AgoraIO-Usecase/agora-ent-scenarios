@@ -168,6 +168,8 @@ class RoomListActivity : AppCompatActivity() {
                                 // 低端机观众加入频道前默认开启下行零拷贝，下行零拷贝和超分有冲突， 低端机默认关闭超分
                                 mRtcEngine.setParameters("{\"rtc.video.decoder_out_byte_frame\": true}")
                             }
+                            // 观众开启JB平滑出帧
+                            mRtcEngine.setParameters("{\"rtc.video.jb_smooth_scene\":1}")
 
                             val channelMediaOptions = ChannelMediaOptions()
                             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
