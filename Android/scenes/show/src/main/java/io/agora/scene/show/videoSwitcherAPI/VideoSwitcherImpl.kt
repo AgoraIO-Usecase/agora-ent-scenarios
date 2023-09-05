@@ -40,7 +40,6 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
     private val preLoadRun = Runnable { preloadChannels() }
 
     private val roomStateMap = Collections.synchronizedMap(mutableMapOf<RtcConnectionWrap, RoomStatus>())
-    private val viewMap = Collections.synchronizedMap(mutableMapOf<RtcConnectionWrap, TextureView>())
     private val remoteVideoCanvasList = Collections.synchronizedList(mutableListOf<RemoteVideoCanvasWrap>())
     private var quickStartTime = 0L
     private var needSubscribe = false
@@ -97,13 +96,11 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
     ) {
         switchRoomState(RoomStatus.JOINED, connection, token, eventListener, mediaOptions)
         if (needPreJoin ?: return) {
-            connectionsJoined.clear()
             connectionsJoined.add(connection)
         }
         mainHandler.removeCallbacks(preLoadRun)
         if (needPreJoin) {
-            mainHandler.post(preLoadRun)
-            //mainHandler.postDelayed(preLoadRun, 500)
+            mainHandler.postDelayed(preLoadRun, 500)
         }
     }
 
@@ -123,7 +120,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
         val size = connectionsForPreloading.size
         val index =
             connectionsForPreloading.indexOfFirst { it.channelId == connectionsJoined.firstOrNull()?.channelId }
-        ShowLogger.d(tag, "switchRoomState, index: $index")
+        ShowLogger.d(tag, "switchRoomState, index: $index, connectionsJoined:$connectionsJoined")
 
         // joined房间的上下两个房间
         val connPreLoaded = mutableListOf<RtcConnection>()
@@ -152,14 +149,16 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
         // 非prejoin房间需要退出频道
         roomStateMap.forEach { room ->
             if (room.value == RoomStatus.PREJOINED && connPreLoaded.none {room.key.channelId == it.channelId}) {
+                ShowLogger.d(tag, "switchRoomState idle1")
                 switchRoomState(RoomStatus.IDLE, room.key, RtcEngineInstance.generalToken(), null, null)
             }
         }
     }
 
     override fun leaveChannel(connection: RtcConnection, force: Boolean): Boolean {
-        connectionsJoined.remove(connection)
+        connectionsJoined.removeIf { it.channelId == connection.channelId }
         if (force) {
+            ShowLogger.d(tag, "switchRoomState idle2")
             switchRoomState(RoomStatus.IDLE, connection, null, null, null)
         } else {
             switchRoomState(RoomStatus.PREJOINED, connection, null, null, null)

@@ -184,24 +184,21 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
                 private var lastOffset = 0f
                 private var scrollStatus: Int = ViewPager2.SCROLL_STATE_IDLE
 
-                private var hasPageSelected = false
-
                 override fun onPageScrollStateChanged(state: Int) {
                     super.onPageScrollStateChanged(state)
-                    Log.d(TAG, "PageChange onPageScrollStateChanged state=$state hasPageSelected=$hasPageSelected")
+                    Log.d(TAG, "PageChange onPageScrollStateChanged state=$state")
                     when(state){
-                        ViewPager2.SCROLL_STATE_SETTLING -> binding.viewPager2.isUserInputEnabled = false
+                        ViewPager2.SCROLL_STATE_SETTLING -> {
+                            binding.viewPager2.isUserInputEnabled = false
+                        }
                         ViewPager2.SCROLL_STATE_IDLE -> {
                             binding.viewPager2.isUserInputEnabled = true
-                            if(!hasPageSelected){
-                                if(preLoadPosition != POSITION_NONE){
-                                    vpFragments[preLoadPosition]?.stopLoadPage(true)
-                                }
-                                vpFragments[currLoadPosition]?.reLoadPage()
-                                preLoadPosition = POSITION_NONE
-                                lastOffset = 0f
+                            if(preLoadPosition != POSITION_NONE){
+                                vpFragments[preLoadPosition]?.stopLoadPage(true)
                             }
-                            hasPageSelected = false
+                            vpFragments[currLoadPosition]?.reLoadPage()
+                            preLoadPosition = POSITION_NONE
+                            lastOffset = 0f
                         }
                     }
                     scrollStatus = state
@@ -213,7 +210,7 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
                     positionOffsetPixels: Int
                 ) {
                     super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                    Log.d(TAG, "PageChange onPageScrolled positionOffset=$positionOffset")
+                    Log.d(TAG, "PageChange onPageScrolled positionOffset=$positionOffset, scrollStatus=$scrollStatus, preLoadPosition=$preLoadPosition")
                     if (scrollStatus == ViewPager2.SCROLL_STATE_DRAGGING) {
                         if (lastOffset > 0f) {
                             val isMoveUp = (positionOffset - lastOffset) > 0
@@ -251,7 +248,6 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
                     currLoadPosition = position
                     preLoadPosition = POSITION_NONE
                     lastOffset = 0f
-                    hasPageSelected = true
                 }
 
             })
