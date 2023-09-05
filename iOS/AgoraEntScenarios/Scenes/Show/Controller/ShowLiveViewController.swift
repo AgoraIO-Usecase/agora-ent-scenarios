@@ -529,7 +529,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 case .accept:
                     ToastView.showWait(text: "show_is_onseat_doing".show_localized)
                     // 解决多人同时点击同意连麦导致的问题, 正常项目应该由后台处理
-                    DispatchQueue.global().asyncAfter(deadline: .now() + Double.random(in: 0.1...2.0)) {
+//                    DispatchQueue.global().asyncAfter(deadline: .now() + Double.random(in: 0.1...2.0)) {
                         self.serviceImp?.getAllInterationList { _, list in
                             ToastView.hidden()
                             guard let list = list?.filterDuplicates({ $0.userId }) else { return }
@@ -541,7 +541,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                             }
                             self.serviceImp?.acceptMicSeatInvitation { error in }
                         }
-                    }
+//                    }
 
                 default:
                     ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: false)
