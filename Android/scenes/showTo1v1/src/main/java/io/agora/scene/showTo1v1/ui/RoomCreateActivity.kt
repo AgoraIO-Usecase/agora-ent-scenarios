@@ -26,7 +26,7 @@ import java.util.Random
 class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBinding>() {
 
     companion object {
-        private const val TAG = "RoomCreateActivity"
+        private const val TAG = "ShowTo1v1_RoomCreateActivity"
 
         fun launch(context: Context) {
             val intent = Intent(context, RoomCreateActivity::class.java)
@@ -37,7 +37,6 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
     private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
     private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
-    private val mRtcVideoSwitcher by lazy { mShowTo1v1Manger.mVideoSwitcher }
 
     private val mTextureView by lazy { TextureView(this) }
 
@@ -66,6 +65,7 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
     private fun initRtcEngine() {
         mRtcEngine.startPreview()
         mRtcEngine.setupLocalVideo(VideoCanvas(mTextureView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
+        binding.flVideoContainer.addView(mTextureView)
     }
 
     private fun setOnApplyWindowInsetsListener() {

@@ -11,6 +11,7 @@ import io.agora.scene.showTo1v1.callAPI.ICallApi
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.scene.showTo1v1.R
+import io.agora.scene.showTo1v1.callAPI.CallStateType
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1DashboardFragmentBinding
 
 class DashboardFragment : Fragment() {
@@ -22,6 +23,8 @@ class DashboardFragment : Fragment() {
     private var isBoardVisible = false
 
     private val mCallApi by lazy { ICallApi.getImplInstance() }
+
+    private var mCallState = CallStateType.Idle
 
     override fun onDestroy() {
         handler?.let {
@@ -49,12 +52,15 @@ class DashboardFragment : Fragment() {
         isBoardVisible = b
     }
 
+    fun updateCallState(callState: CallStateType) {
+        mCallState = callState
+    }
+
     private fun setupRTCListener() {
         val rtcListener = object : IRtcEngineEventHandler() {
             override fun onRtcStats(stats: RtcStats?) {
-                if (stats == null) {
-                    return
-                }
+                stats ?: return
+                if (mCallState != CallStateType.Connected) return
                 activity?.runOnUiThread {
                     refreshDashboardInfo(
                         cpuAppUsage = stats.cpuAppUsage,
@@ -64,9 +70,8 @@ class DashboardFragment : Fragment() {
             }
 
             override fun onLocalVideoStats(source: Constants.VideoSourceType?, stats: LocalVideoStats?) {
-                if (stats == null) {
-                    return
-                }
+                stats ?: return
+                if (mCallState != CallStateType.Connected) return
                 activity?.runOnUiThread {
                     refreshDashboardInfo(
                         upBitrate = stats.sentBitrate,
@@ -78,9 +83,8 @@ class DashboardFragment : Fragment() {
             }
 
             override fun onLocalAudioStats(stats: LocalAudioStats?) {
-                if (stats == null) {
-                    return
-                }
+                stats ?: return
+                if (mCallState != CallStateType.Connected) return
                 activity?.runOnUiThread {
                     refreshDashboardInfo(
                         audioBitrate = stats.sentBitrate,
@@ -90,9 +94,8 @@ class DashboardFragment : Fragment() {
             }
 
             override fun onRemoteVideoStats(stats: RemoteVideoStats?) {
-                if (stats == null) {
-                    return
-                }
+                stats ?: return
+                if (mCallState != CallStateType.Connected) return
                 activity?.runOnUiThread {
                     refreshDashboardInfo(
                         downBitrate = stats.receivedBitrate,
@@ -105,9 +108,8 @@ class DashboardFragment : Fragment() {
             }
 
             override fun onRemoteAudioStats(stats: RemoteAudioStats?) {
-                if (stats == null) {
-                    return
-                }
+                stats ?: return
+                if (mCallState != CallStateType.Connected) return
                 activity?.runOnUiThread {
                     refreshDashboardInfo(
                         audioBitrate = stats.receivedBitrate,
@@ -117,18 +119,16 @@ class DashboardFragment : Fragment() {
             }
 
             override fun onUplinkNetworkInfoUpdated(info: UplinkNetworkInfo?) {
-                if (info == null) {
-                    return
-                }
+                info ?: return
+                if (mCallState != CallStateType.Connected) return
                 activity?.runOnUiThread {
                     refreshDashboardInfo(upLinkBps = info.video_encoder_target_bitrate_bps)
                 }
             }
 
             override fun onDownlinkNetworkInfoUpdated(info: DownlinkNetworkInfo?) {
-                if (info == null) {
-                    return
-                }
+                info ?: return
+                if (mCallState != CallStateType.Connected) return
                 activity?.runOnUiThread {
                     refreshDashboardInfo(downLinkBps = info.bandwidth_estimation_bps)
                 }
@@ -138,7 +138,7 @@ class DashboardFragment : Fragment() {
         handler = rtcListener
     }
 
-    private fun refreshDashboardInfo(
+    fun refreshDashboardInfo(
         upLinkBps: Int? = null, downLinkBps: Int? = null,
         audioBitrate: Int? = null, audioLossPackage: Int? = null,
         cpuAppUsage: Double? = null, cpuTotalUsage: Double? = null,

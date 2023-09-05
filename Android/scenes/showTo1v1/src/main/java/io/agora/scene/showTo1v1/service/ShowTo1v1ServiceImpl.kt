@@ -133,7 +133,7 @@ class ShowTo1v1ServiceImpl constructor(
             }
 
             override fun onSubscribeError(ex: SyncManagerException) {
-                errorHandler?.invoke(ex)
+                errorHandler.invoke(ex)
             }
 
         })

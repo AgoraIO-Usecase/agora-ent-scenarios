@@ -7,6 +7,12 @@
     android:background="@color/black"
     tools:background="@color/text_color_66">
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivRoomCover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY" />
+
     <LinearLayout
         android:id="@+id/llContainer"
         android:layout_width="match_parent"
@@ -28,7 +34,7 @@
             app:cardCornerRadius="20dp"
             app:cardElevation="-1dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" >
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
@@ -50,9 +56,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="3dp"
+                    android:maxLength="14"
                     android:textColor="@color/white"
                     android:textSize="14sp"
-                    android:maxLength="14"
                     app:layout_constraintStart_toEndOf="@+id/ivUserAvatar"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="房间名称" />
@@ -65,17 +71,17 @@
                     android:layout_marginTop="3dp"
                     android:textColor="@color/white"
                     android:textSize="11sp"
-                    app:layout_constraintStart_toEndOf="@+id/ivUserAvatar"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/ivUserAvatar"
                     tools:text="用户昵称" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvRoomNum"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
                     android:textColor="@color/white"
                     android:textSize="11sp"
-                    android:layout_marginStart="10dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@id/tvNickname"
                     tools:text="000000" />
@@ -85,15 +91,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:text="00:00:00"
+                    android:layout_marginEnd="15dp"
                     android:drawableStart="@drawable/show_to1v1_dot"
+                    android:drawablePadding="3dp"
+                    android:gravity="center"
+                    android:text="00:00:00"
                     android:textColor="@color/white"
                     android:textSize="11sp"
-                    android:gravity="center"
-                    android:drawablePadding="3dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginEnd="15dp"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/tvRoomNum" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
@@ -104,16 +110,31 @@
             android:layout_height="44dp"
             android:elevation="2dp"
             android:padding="10dp"
-            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/show_to1v1_detail_close"
             app:layout_constraintEnd_toEndOf="parent"
-            android:src="@drawable/show_to1v1_detail_close" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <include
-        android:visibility="invisible"
-        layout="@layout/show_to1v1_room_auto_connected_view" />
+        android:id="@+id/includeComeSoonView"
+        layout="@layout/show_to1v1_room_come_soon_view"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="15dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/layoutTop" />
 
+    <include
+        android:id="@+id/includeConnectedView"
+        layout="@layout/show_to1v1_room_auto_connected_view"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivHangup"
@@ -121,7 +142,7 @@
         android:layout_height="70dp"
         android:layout_marginBottom="64dp"
         android:src="@drawable/show_to1v1_call_hangup"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -134,7 +155,7 @@
         android:text="@string/show_to1v1_hangup"
         android:textColor="@color/white"
         android:textSize="12sp"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@id/ivHangup"
         app:layout_constraintStart_toStartOf="@id/ivHangup"
         app:layout_constraintTop_toBottomOf="@id/ivHangup" />
@@ -188,35 +209,35 @@
         android:layout_height="54dp"
         android:orientation="horizontal"
         android:src="@drawable/show_to1v1_room_detail_call_bg"
-        app:layout_constraintEnd_toEndOf="@+id/layoutCallPrivately"
-        app:layout_constraintTop_toTopOf="@+id/layoutCallPrivately"
         app:layout_constraintBottom_toBottomOf="@+id/layoutCallPrivately"
-        app:layout_constraintStart_toStartOf="@+id/layoutCallPrivately"/>
+        app:layout_constraintEnd_toEndOf="@+id/layoutCallPrivately"
+        app:layout_constraintStart_toStartOf="@+id/layoutCallPrivately"
+        app:layout_constraintTop_toTopOf="@+id/layoutCallPrivately" />
 
     <LinearLayout
         android:id="@+id/layoutCallPrivately"
         android:layout_width="141dp"
         android:layout_height="38dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toStartOf="@id/ivSetting"
-        app:layout_constraintTop_toTopOf="@id/ivSetting"
         android:layout_marginEnd="15dp"
+        android:background="@drawable/show_to1v1_room_detail_call"
         android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="@id/ivSetting"
-        android:background="@drawable/show_to1v1_room_detail_call">
+        app:layout_constraintEnd_toStartOf="@id/ivSetting"
+        app:layout_constraintTop_toTopOf="@id/ivSetting">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/show_to1v1_linking"/>
+            android:src="@drawable/show_to1v1_linking" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="14sp"
             android:layout_marginStart="5dp"
-            android:text="@string/show_to1v1_call_privately"/>
+            android:text="@string/show_to1v1_call_privately"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

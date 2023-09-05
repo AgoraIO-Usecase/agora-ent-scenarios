@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
 import android.view.LayoutInflater
-import android.view.TextureView
 import android.view.View
 import android.view.WindowManager
 import androidx.core.view.ViewCompat
@@ -15,26 +14,20 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import io.agora.scene.showTo1v1.callAPI.CallApiImpl
-import io.agora.scene.showTo1v1.callAPI.CallConfig
-import io.agora.scene.showTo1v1.callAPI.CallMode
 import io.agora.scene.showTo1v1.callAPI.CallReason
 import io.agora.scene.showTo1v1.callAPI.CallRole
 import io.agora.scene.showTo1v1.callAPI.CallStateType
 import io.agora.scene.showTo1v1.callAPI.ICallApi
 import io.agora.scene.showTo1v1.callAPI.ICallApiListener
-import io.agora.scene.showTo1v1.callAPI.PrepareConfig
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.scene.base.AudioModeration
-import io.agora.scene.base.BuildConfig
-import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
-import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
@@ -51,7 +44,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     RoomListFragment.OnClickCallingListener {
 
     companion object {
-        private const val TAG = "RoomListActivity"
+        private const val TAG = "ShowTo1v1_RoomList"
         private const val kRoomListSwipeGuide = "showTo1v1_SwipeGuide"
 
         private const val POSITION_NONE = -1
@@ -83,7 +76,11 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setOnApplyWindowInsetsListener()
-        fetchService()
+        mShowTo1v1Manger.renewTokens {
+            if (it) {
+                fetchRoomList()
+            }
+        }
     }
 
     private fun setOnApplyWindowInsetsListener() {
@@ -94,6 +91,12 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             binding.emptyInclude.root.setPaddingRelative(0, inset.top, 0, 0)
             WindowInsetsCompat.CONSUMED
         }
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.d("onRestart", "onRestart")
+        fetchRoomList()
     }
 
     private var guided = SPUtil.getBoolean(kRoomListSwipeGuide, false)
@@ -120,6 +123,9 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             mCallApi.deinitialize { }
             RoomCreateActivity.launch(this)
         }
+        binding.layoutCreateRoom2.setOnClickListener {
+            RoomCreateActivity.launch(this)
+        }
     }
 
     private fun initViewPage() {
@@ -136,7 +142,9 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     return RoomListFragment.newInstance(roomInfo).also {
                         mVpFragments.put(position, it)
                         if (position == binding.viewPager2.currentItem) {
-                            it.startLoadPageSafely()
+                            binding.viewPager2.postDelayed({
+                                it.startLoadPageSafely()
+                            }, 1000)
                         }
                     }
                 }
@@ -225,29 +233,14 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         }
     }
 
-    private fun fetchService() {
-        //获取token
-        val localUId = UserManager.getInstance().user.id.toInt()
-        TokenGenerator.generateToken("", localUId.toString(),
-            TokenGenerator.TokenGeneratorType.token007,
-            TokenGenerator.AgoraTokenType.rtc,
-            success = {
-                mShowTo1v1Manger.setupGeneralToken(it)
-                ShowTo1v1Logger.d(TAG, "generateToken success：$it， uid：$localUId")
-                fetchRoomList()
-            },
-            failure = {
-                ShowTo1v1Logger.e(TAG, it, "generateToken failure：$it")
-                ToastUtils.showToast(it?.message ?: "generate token failure")
-            })
-    }
-
     private fun fetchRoomList() {
         mService.getRoomList(completion = { error, roomList ->
             if (error == null) { // success
                 mRoomInfoList.clear()
                 mRoomInfoList.addAll(roomList)
                 mVpFragments[mCurrLoadPosition]?.stopLoadPage(false)
+                mShowTo1v1Manger.cleanCache()
+                mVpFragments.clear()
                 updateListView()
                 initViewPage()
                 ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
@@ -264,10 +257,13 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             StatusBarUtil.hideStatusBar(window, true)
             binding.emptyInclude.root.isVisible = true
             binding.viewPager2.isVisible = false
+            binding.layoutCreateRoom2.isVisible = false
         } else {
             StatusBarUtil.hideStatusBar(window, false)
             binding.emptyInclude.root.isVisible = false
             binding.viewPager2.isVisible = true
+            binding.layoutCreateRoom2.isVisible = true
+            binding.viewPager2.isUserInputEnabled = mRoomInfoList.size != 1
         }
     }
 
@@ -275,7 +271,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         super.onDestroy()
         mVpFragments[mCurrLoadPosition]?.stopLoadPage(false)
         mCallApi.removeListener(this)
-        mShowTo1v1Manger.cleanCache()
+        mShowTo1v1Manger.destroy()
     }
 
     private fun reInitCallApi(roomId: String, callback: () -> Unit) {
@@ -289,7 +285,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         mRoomInfo = roomInfo
         if (needCall) {
             reInitCallApi(roomInfo.roomId, callback = {
-                mCallApi.call(roomInfo.get1v1ChannelId(), roomInfo.getIntUserId(), null)
+                mCallApi.call(roomInfo.roomId, roomInfo.getIntUserId(), null)
             })
         } else {
             RoomDetailActivity.launch(this, false, roomInfo)
@@ -353,7 +349,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
             CallStateType.Connecting -> mCallDialog?.updateCallState(CallDialogState.Connecting)
             CallStateType.Connected -> {
-                if (mShowTo1v1Manger.mRemoteUser == null) return
                 mCallDialog?.let {
                     if (it.isShowing) it.dismiss()
                     mCallDialog = null
@@ -382,6 +377,11 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 ToastUtils.showToast(eventReason)
             }
         }
+    }
+
+    override fun tokenPrivilegeWillExpire() {
+        super.tokenPrivilegeWillExpire()
+        mShowTo1v1Manger.renewTokens {}
     }
 
     private fun enableContentInspectEx(connection: RtcConnection) {

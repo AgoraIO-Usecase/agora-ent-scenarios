@@ -25,17 +25,17 @@ import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
-import io.agora.scene.showTo1v1.ui.RoomCreateActivity
 import io.agora.scene.showTo1v1.ui.RoomListActivity
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPI
 import io.agora.scene.widget.utils.BlurTransformation
+import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 
 class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>() {
 
     companion object {
 
-        private const val TAG = "RoomListFragment"
+        private const val TAG = "ShowTo1v1_RoomList"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
         fun newInstance(romInfo: ShowTo1v1RoomInfo) = RoomListFragment().apply {
@@ -111,15 +111,13 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
                 .into(binding.ivBackground)
             GlideApp.with(this)
                 .load(mRoomInfo.avatar)
+                .error(R.mipmap.userimage)
+                .transform(CenterCropRoundCornerTransform(100))
                 .into(binding.ivUserAvatar)
             Glide.with(this)
                 .asGif()
                 .load(R.drawable.show_to1v1_wave_living)
                 .into(binding.ivLiving)
-
-            binding.layoutCreateRoom.setOnClickListener {
-                RoomCreateActivity.launch(context)
-            }
         }
         binding.ivConnect.setOnClickListener {
             onClickCallingListener?.onClickCall(true, mRoomInfo)
@@ -164,6 +162,10 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         val eventListener = VideoSwitcherAPI.IChannelEventListener(
             onChannelJoined = {
                 onJoinChannelSuccess.invoke()
+                // 静音
+                val options = ChannelMediaOptions()
+                options.autoSubscribeAudio = false
+                mRtcEngine.updateChannelMediaOptionsEx(options, mMainRtcConnection)
             }
         )
 
@@ -199,15 +201,6 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         // 如果是观众 把 ChannelMediaOptions 的 audienceLatencyLevel 设置为 AUDIENCE_LATENCY_LEVEL_LOW_LATENCY（超低延时）
         channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
         mRtcVideoSwitcher.joinChannel(rtcConnection, channelMediaOptions, eventListener)
-    }
-
-    private fun runOnUiThread(run: Runnable) {
-        val activity = activity ?: return
-        if (Thread.currentThread() == Looper.getMainLooper().thread) {
-            run.run()
-        } else {
-            activity.runOnUiThread(run)
-        }
     }
 
     interface OnClickCallingListener {

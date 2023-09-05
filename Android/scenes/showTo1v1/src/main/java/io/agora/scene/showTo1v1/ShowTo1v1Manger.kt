@@ -114,7 +114,7 @@ class ShowTo1v1Manger constructor() {
         } else {
             mCallTokenConfig.roomId = ownerRoomId
         }
-        checkCallTokenConfig(role) {
+        checkCallTokenConfig {
             mCallApi.deinitialize {
                 val config = CallConfig(
                     appId = BuildConfig.AGORA_APP_ID,
@@ -135,30 +135,43 @@ class ShowTo1v1Manger constructor() {
         }
     }
 
-
-    // call api tokenConfig
-    private fun checkCallTokenConfig(role: CallRole, callback: () -> Unit) {
-        if (mCallTokenConfig.rtcToken.isNotEmpty() && mCallTokenConfig.rtmToken.isNotEmpty()) {
-            callback.invoke()
-            return
-        }
+    fun renewTokens(callback: ((Boolean)) -> Unit) {
         TokenGenerator.generateTokens(
-            if (role == CallRole.CALLEE) "" else mCallTokenConfig.roomId, // 被叫万能 token
-            mCurrentUser.userId,
+            "", // 万能 token
+            UserManager.getInstance().user.id.toString(),
             TokenGenerator.TokenGeneratorType.token007,
             arrayOf(
                 TokenGenerator.AgoraTokenType.rtc,
                 TokenGenerator.AgoraTokenType.rtm
-            ), { ret ->
+            ),
+            success = { ret ->
                 val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc]
                 val rtmToken = ret[TokenGenerator.AgoraTokenType.rtm]
                 if (rtcToken == null || rtmToken == null) {
+                    callback.invoke(false)
                     return@generateTokens
                 }
                 mCallTokenConfig.rtcToken = rtcToken
                 mCallTokenConfig.rtmToken = rtmToken
-                callback.invoke()
+                setupGeneralToken(rtcToken)
+                mCallApi.renewToken(mCallTokenConfig)
+                callback.invoke(true)
+            },
+            failure = {
+                callback.invoke(false)
             })
+    }
+
+
+    // call api tokenConfig
+    private fun checkCallTokenConfig(callback: () -> Unit) {
+        if (mCallTokenConfig.rtcToken.isNotEmpty() && mCallTokenConfig.rtmToken.isNotEmpty()) {
+            callback.invoke()
+            return
+        }
+        renewTokens {
+            callback.invoke()
+        }
     }
 
 

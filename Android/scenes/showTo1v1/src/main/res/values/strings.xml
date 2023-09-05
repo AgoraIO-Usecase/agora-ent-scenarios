@@ -21,6 +21,7 @@
     <string name="show_to1v1_end_tips">直播结束</string>
     <string name="show_to1v1_no_answer">我很快回来，一会再连线我吧</string>
     <string name="show_to1v1_auto_connected">呼入，已自动接听…</string>
+    <string name="show_to1v1_come_soon1">Hi，我暂时有事，很快回来…</string>
 
     <!--    dashboard-->
     <string name="show_to1v1_dashboard_bitrate">码率: %s kbps</string>
