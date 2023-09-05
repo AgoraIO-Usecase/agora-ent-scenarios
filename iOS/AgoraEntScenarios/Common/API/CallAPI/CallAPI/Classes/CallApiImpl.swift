@@ -794,8 +794,19 @@ extension CallApiImpl: CallApiProtocol {
         _reportMethod(event: "\(#function)")
         callPrint("deinitialize")
         
-        if let callingRoomId = rtcConnection?.channelId {
-            _hangup(roomId: callingRoomId) {[weak self] err, message in
+        if let callingRoomId = self.callingRoomId {
+            var roomId = ""
+            if config?.mode == .pure1v1 {
+                roomId = callingRoomId
+            } else {
+                if config?.role == .callee {
+                    roomId = callingRoomId
+                } else {
+                    roomId = config?.ownerRoomId ?? ""
+                }
+            }
+            
+            _hangup(roomId: roomId) {[weak self] err, message in
                 self?._deinitialize()
                 completion()
             }
