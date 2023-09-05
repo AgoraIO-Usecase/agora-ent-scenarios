@@ -22,6 +22,7 @@ interface VideoSwitcherAPI {
         var onUplinkNetworkInfoUpdated: ((info: IRtcEngineEventHandler.UplinkNetworkInfo) -> Unit)? = null,
         var onDownlinkNetworkInfoUpdated: ((info: IRtcEngineEventHandler.DownlinkNetworkInfo) -> Unit)? = null,
         var onContentInspectResult: ((result: Int) -> Unit)? = null,
+        var onFirstRemoteVideoFrame: ((uid: Int, width: Int, height: Int, elapsed: Int)->Unit)? = null,
     )
 
     /**

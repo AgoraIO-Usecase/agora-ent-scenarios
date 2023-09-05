@@ -782,7 +782,7 @@ class ShowSyncManagerServiceImpl constructor(
             ShowInteractionStatus.onSeat.value,
             muteAudio = false,
             ownerMuteAudio = false,
-            createdAt = 0.0 //TODO
+            createdAt = TimeUtils.currentTimeMillis().toDouble()
         )
         innerCreateInteraction(roomId, interaction, { }, { })
     }
@@ -922,7 +922,7 @@ class ShowSyncManagerServiceImpl constructor(
             ShowRoomRequestStatus.accepted.value,
             userMuteAudio = false,
             fromUserMuteAudio = false,
-            createAt = targetInvitation.createAt
+            createAt = TimeUtils.currentTimeMillis().toDouble()
         )
 
         val indexOf = roomInfoController.pKInvitationList.indexOf(targetInvitation)

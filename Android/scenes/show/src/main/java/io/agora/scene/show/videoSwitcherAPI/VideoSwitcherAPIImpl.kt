@@ -11,12 +11,17 @@ import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.IMediaPlayerObserver
 import io.agora.mediaplayer.data.PlayerUpdatedInfo
 import io.agora.mediaplayer.data.SrcInfo
-import io.agora.rtc2.*
+import io.agora.rtc2.ChannelMediaOptions
+import io.agora.rtc2.Constants
+import io.agora.rtc2.IRtcEngineEventHandler
+import io.agora.rtc2.RtcConnection
+import io.agora.rtc2.RtcEngine
+import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.show.RtcEngineInstance
 import io.agora.scene.show.ShowLogger
 import io.agora.scene.show.VideoSwitcher
-import java.util.*
+import java.util.Collections
 
 class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : VideoSwitcherAPI {
     private val tag = "VideoSwitcherAPIImpl"
@@ -61,11 +66,12 @@ class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : Vid
                         eventHandler.setEventListener(roomInfo.eventHandler)
                         it.key.rtcEventHandler = eventHandler
 
-                        val options = ChannelMediaOptions()
-                        options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-                        options.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
-                        options.autoSubscribeVideo = false
-                        options.autoSubscribeAudio = false
+                        val options = mediaOptions ?: ChannelMediaOptions().apply {
+                            clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+                            audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+                            autoSubscribeVideo = false
+                            autoSubscribeAudio = false
+                        }
                         // TODO eventHandler
                         val ret = rtcEngine.joinChannelEx(roomInfo.token, RtcConnection(roomInfo.channelName, roomInfo.uid), options, it.key.rtcEventHandler)
                         ShowLogger.d(tag, "joinChannelEx0, roomInfo:$roomInfo, ret:$ret")
@@ -74,11 +80,12 @@ class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : Vid
                         // 保持在频道内, 收流
                         it.key.rtcEventHandler?.subscribeMediaTime = SystemClock.elapsedRealtime()
                         it.key.rtcEventHandler?.setEventListener(roomInfo.eventHandler)
-                        val options = ChannelMediaOptions()
-                        options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-                        options.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
-                        options.autoSubscribeVideo = true
-                        options.autoSubscribeAudio = true
+                        val options = mediaOptions ?: ChannelMediaOptions().apply {
+                            clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+                            audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+                            autoSubscribeVideo = true
+                            autoSubscribeAudio = true
+                        }
                         val ret = rtcEngine.updateChannelMediaOptionsEx(options, RtcConnection(roomInfo.channelName, roomInfo.uid))
                         if (ret == -8) {
                             needSubscribe = true
@@ -88,11 +95,12 @@ class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : Vid
                     }
                     oldState == VideoSwitcherAPI.RoomStatus.JOINED && newState == VideoSwitcherAPI.RoomStatus.PREJOINED -> {
                         // 保持在频道内，不收流
-                        val options = ChannelMediaOptions()
-                        options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-                        options.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
-                        options.autoSubscribeVideo = false
-                        options.autoSubscribeAudio = false
+                        val options = mediaOptions ?: ChannelMediaOptions().apply {
+                            clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+                            audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+                            autoSubscribeVideo = false
+                            autoSubscribeAudio = false
+                        }
                         val ret = rtcEngine.updateChannelMediaOptionsEx(options, RtcConnection(roomInfo.channelName, roomInfo.uid))
                         it.key.audioMixingPlayer?.stop()
                         ShowLogger.d(tag, "updateChannelMediaOptionsEx, roomInfo:$roomInfo, ret:$ret")
@@ -104,13 +112,13 @@ class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : Vid
                         eventHandler.setEventListener(roomInfo.eventHandler)
                         it.key.rtcEventHandler = eventHandler
 
-                        mediaOptions?.let {
-                            mediaOptions.autoSubscribeVideo = true
-                            mediaOptions.autoSubscribeAudio = true
-                            // TODO eventHandler
-                            val ret = rtcEngine.joinChannelEx(roomInfo.token, rtcConnection, mediaOptions, eventHandler)
-                            ShowLogger.d(tag, "joinChannelEx1, roomInfo:$roomInfo, ret:$ret")
+                        val options = mediaOptions ?: ChannelMediaOptions().apply {
+                            autoSubscribeVideo = true
+                            autoSubscribeAudio = true
                         }
+                        // TODO eventHandler
+                        val ret = rtcEngine.joinChannelEx(roomInfo.token, rtcConnection, options, eventHandler)
+                        ShowLogger.d(tag, "joinChannelEx1, roomInfo:$roomInfo, ret:$ret")
                     }
                     newState == VideoSwitcherAPI.RoomStatus.IDLE -> {
                         // 退出频道
@@ -126,23 +134,24 @@ class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : Vid
         eventHandler.setEventListener(roomInfo.eventHandler)
         rtcConnectionWrap.rtcEventHandler = eventHandler
         if (newState == VideoSwitcherAPI.RoomStatus.PREJOINED) {
-            // 加入频道但不收流
-            mediaOptions?.let {
-                mediaOptions.autoSubscribeVideo = false
-                mediaOptions.autoSubscribeAudio = false
-                // TODO eventHandler
-                val ret = rtcEngine.joinChannelEx(roomInfo.token, rtcConnection, mediaOptions, rtcConnectionWrap.rtcEventHandler)
-                ShowLogger.d(tag, "joinChannelEx2, roomInfo:$roomInfo, ret:$ret")
+
+            val options = mediaOptions ?: ChannelMediaOptions().apply {
+                // 加入频道但不收流
+                autoSubscribeVideo = false
+                autoSubscribeAudio = false
             }
+            // TODO eventHandler
+            val ret = rtcEngine.joinChannelEx(roomInfo.token, rtcConnection, options, rtcConnectionWrap.rtcEventHandler)
+            ShowLogger.d(tag, "joinChannelEx2, roomInfo:$roomInfo, ret:$ret")
         } else if (newState == VideoSwitcherAPI.RoomStatus.JOINED) {
-            // 加入频道且收流
-            mediaOptions?.let {
-                mediaOptions.autoSubscribeVideo = true
-                mediaOptions.autoSubscribeAudio = true
-                // TODO eventHandler
-                val ret = rtcEngine.joinChannelEx(roomInfo.token, rtcConnection, mediaOptions, rtcConnectionWrap.rtcEventHandler)
-                ShowLogger.d(tag, "joinChannelEx3, roomInfo:$roomInfo, ret:$ret")
+            val options = mediaOptions ?: ChannelMediaOptions().apply {
+                // 加入频道且收流
+                autoSubscribeVideo = true
+                autoSubscribeAudio = true
             }
+            // TODO eventHandler
+            val ret = rtcEngine.joinChannelEx(roomInfo.token, rtcConnection, options, rtcConnectionWrap.rtcEventHandler)
+            ShowLogger.d(tag, "joinChannelEx3, roomInfo:$roomInfo, ret:$ret")
         }
         roomStateMap[RtcConnectionWrap(RtcConnection(roomInfo.channelName, roomInfo.uid))] = newState
     }
@@ -215,10 +224,10 @@ class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : Vid
                     container.uid
                 )
                 //if (connectionWrap.rtcEventHandler?.isJoinChannelSuccess == true) {
-                    rtcEngine.setupRemoteVideoEx(
-                        remoteVideoCanvasWrap,
-                        connectionWrap
-                    )
+                rtcEngine.setupRemoteVideoEx(
+                    remoteVideoCanvasWrap,
+                    connectionWrap
+                )
                 //}
                 return
             }
@@ -233,10 +242,10 @@ class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : Vid
             container.uid
         )
         //if (connectionWrap.rtcEventHandler?.isJoinChannelSuccess == true) {
-            rtcEngine.setupRemoteVideoEx(
-                remoteVideoCanvasWrap,
-                connectionWrap
-            )
+        rtcEngine.setupRemoteVideoEx(
+            remoteVideoCanvasWrap,
+            connectionWrap
+        )
         //}
     }
 
@@ -471,6 +480,7 @@ class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : Vid
                 tag,
                 "$uid first remote video frame cost time : ${SystemClock.elapsedRealtime() - joinChannelTime} ms"
             )
+            eventListener?.onFirstRemoteVideoFrame?.invoke(uid, width, height, elapsed)
         }
 
         override fun onFirstLocalVideoFrame(
