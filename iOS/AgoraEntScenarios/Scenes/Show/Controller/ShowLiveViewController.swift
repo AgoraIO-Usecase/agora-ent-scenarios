@@ -523,6 +523,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     func onMicSeatInvitationUpdated(invitation: ShowMicSeatInvitation) {
         guard invitation.userId == VLUserCenter.user.id else { return }
         if invitation.status == .waitting {
+            ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: true)
             ShowReceivePKAlertVC.present(name: invitation.userName, style: .mic) { result in
                 switch result {
                 case .accept:
@@ -543,6 +544,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                     }
 
                 default:
+                    ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: false)
                     self.serviceImp?.rejectMicSeatInvitation { error in
                     }
                     break
@@ -563,15 +565,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     func onMicSeatInvitationRejected(invitation: ShowMicSeatInvitation) {
         guard role == .broadcaster else { return }
         AlertManager.hiddenView()
-        let alertVC = UIAlertController(title: "\(invitation.userName ?? "")拒绝了您的连麦邀请", message: nil, preferredStyle: .alert)
-        let agree = UIAlertAction(title: "确定", style: .default, handler: nil)
+        let alertVC = UIAlertController(title: "\(invitation.userName ?? "")" + "show_reject_broadcasting".show_localized, message: nil, preferredStyle: .alert)
+        let agree = UIAlertAction(title: "show_sure".show_localized, style: .default, handler: nil)
         alertVC.addAction(agree)
         present(alertVC, animated: true, completion: nil)
     }
     
     func onPKInvitationUpdated(invitation: ShowPKInvitation) {
         if invitation.status == .ended, invitation.userId == VLUserCenter.user.id {
-            ToastView.show(text: "PK已断开哦".show_localized)
+            ToastView.show(text: "show_end_broadcasting".show_localized)
         }
         if invitation.fromRoomId == room?.roomId {
             //send invitation
@@ -583,6 +585,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         
         //recv invitation
         if invitation.status == .waitting {
+            let uid = UInt(VLUserCenter.user.id)!
+            ShowAgoraKitManager.shared.joinChannelEx(currentChannelId: roomId,
+                                                     targetChannelId: invitation.fromRoomId,
+                                                     ownerId: uid,
+                                                     options: self.channelOptions,
+                                                     role: .audience) {
+                showLogger.info("\(self.roomId) updateLoadingType _onStartInteraction---------- \(self.roomId)")
+                ShowAgoraKitManager.shared.updateMediaOptionsEx(channelId: invitation.fromRoomId, publishCamera: true, publishMic: false)
+            }
             ShowReceivePKAlertVC.present(name: invitation.fromName) { result in
                 switch result {
                 case .accept:
@@ -594,6 +605,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                     self.serviceImp?.rejectPKInvitation { error in
                         
                     }
+                    ShowAgoraKitManager.shared.updateMediaOptionsEx(channelId: invitation.fromRoomId, publishCamera: false, publishMic: false)
+                    ShowAgoraKitManager.shared.leaveChannelEx(roomId: invitation.fromRoomId, channelId: self.roomId)
                     break
                 }
             }
@@ -944,6 +957,8 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
                 guard granted else { return }
                 self.applyView.getAllMicSeatList(autoApply: self.role == .audience)
                 AlertManager.show(view: self.applyView, alertPostion: .bottom)
+                guard self.role == .audience else { return }
+                ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: true)
             }
         }
     }
