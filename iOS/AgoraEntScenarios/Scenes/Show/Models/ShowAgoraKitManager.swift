@@ -224,7 +224,7 @@ class ShowAgoraKitManager: NSObject {
     func renewToken(channelId: String) {
         showLogger.info("renewToken with channelId: \(channelId)",
                         context: kShowLogBaseContext)
-        NetworkManager.shared.generateToken(channelName: channelId,
+        NetworkManager.shared.generateToken(channelName: "",
                                             uid: UserInfo.userId,
                                             tokenType: .token007,
                                             type: .rtc) {[weak self] token in
@@ -368,6 +368,25 @@ class ShowAgoraKitManager: NSObject {
         }
     }
     
+    func updateMediaOptions(publishCamera: Bool) {
+        let mediaOptions = AgoraRtcChannelMediaOptions()
+        mediaOptions.publishCameraTrack = publishCamera
+        mediaOptions.publishMicrophoneTrack = false
+        mediaOptions.clientRoleType = publishCamera ? .broadcaster : .audience
+        engine?.updateChannel(with: mediaOptions)
+    }
+    func updateMediaOptionsEx(channelId: String, publishCamera: Bool, publishMic: Bool = false) {
+        let mediaOptions = AgoraRtcChannelMediaOptions()
+        mediaOptions.publishCameraTrack = publishCamera
+        mediaOptions.publishMicrophoneTrack = publishMic
+        mediaOptions.autoSubscribeAudio = publishMic
+        mediaOptions.autoSubscribeVideo = publishCamera
+        mediaOptions.clientRoleType = publishCamera ? .broadcaster : .audience
+        let uid = Int(VLUserCenter.user.id) ?? 0
+        let connection = AgoraRtcConnection(channelId: channelId, localUid: uid)
+        engine?.updateChannelEx(with: mediaOptions, connection: connection)
+    }
+    
     /// 设置编码分辨率
     /// - Parameter size: 分辨率
     func setVideoDimensions(_ size: CGSize){
@@ -417,7 +436,7 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         
-        NetworkManager.shared.generateToken(channelName: targetChannelId,
+        NetworkManager.shared.generateToken(channelName: "",
                                             uid: VLUserCenter.user.id,
                                             tokenType: .token007,
                                             type: .rtc) {[weak self] token in
