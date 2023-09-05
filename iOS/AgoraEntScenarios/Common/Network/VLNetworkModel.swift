@@ -41,8 +41,12 @@ open class VLCommonNetworkModel: AUINetworkModel {
     
     public override func getHeaders() -> HTTPHeaders {
         var headers = super.getHeaders()
-        let header = HTTPHeader(name: "Authorization", value: getToken())
-        headers.add(header)
+        headers.add(HTTPHeader(name: "Authorization", value: getToken()))
+        headers.add(HTTPHeader(name: "Content-Type", value: "application/json"))
+        headers.add(HTTPHeader(name: "appProject", value: "agora_ent_demo"))
+        headers.add(HTTPHeader(name: "appOs", value: "iOS"))
+        headers.add(HTTPHeader(name: "versionName", value: UIApplication.shared.appVersion ?? ""))
+        
         return headers
     }
     
@@ -79,26 +83,17 @@ open class VLUploadUserInfoNetworkModel: VLCommonNetworkModel {
 @objcMembers
 open class VLGetUserInfoNetworkModel: VLCommonNetworkModel {
     
-    public var userNo: String?
+    public var userNo: String? {
+        didSet{
+            if let userNo = userNo{
+                interfaceName = "/api-login/users/getUserInfo?userNo=\(userNo)"
+            }
+        }
+    }
     
     public override init() {
         super.init()
-        interfaceName = "/api-login/users/getUserInfo"
         method = .get
-    }
-    
-    public override func parse(data: Data?) throws -> Any {
-        var dic: Any? = nil
-        do {
-            try dic = super.parse(data: data)
-        } catch let err {
-            throw err
-        }
-        guard let dic = dic as? [String: Any] else {
-            throw AUICommonError.networkParseFail.toNSError()
-        }
-        let rooms = dic.kj.model(VLResponseData.self)
-        return rooms
     }
 }
 
@@ -111,19 +106,5 @@ open class VLDetoryUserInfoNetworkModel: VLCommonNetworkModel {
         super.init()
         interfaceName = "/api-login/users/cancellation"
         method = .get
-    }
-    
-    public override func parse(data: Data?) throws -> Any {
-        var dic: Any? = nil
-        do {
-            try dic = super.parse(data: data)
-        } catch let err {
-            throw err
-        }
-        guard let dic = dic as? [String: Any] else {
-            throw AUICommonError.networkParseFail.toNSError()
-        }
-        let rooms = dic.kj.model(VLResponseData.self)
-        return rooms
     }
 }

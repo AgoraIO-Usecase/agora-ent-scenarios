@@ -27,11 +27,13 @@ open class AUINetworking: NSObject {
         
         let dataReq = AF.request(url,
                                  method: model.method.getAfMethod(),
-                                 parameters: model.getParameters(),
+                                 parameters: model.method == .get ? nil : model.getParameters(),
                                  encoding: JSONEncoding.default,
                                  headers: model.getHeaders(),
                                  interceptor: nil,
-                                 requestModifier: nil).response {[weak self] resp in
+                                 requestModifier: nil)
+        
+        dataReq.response {[weak self] resp in
             guard let self = self else {return}
             
             guard let data = resp.data else {

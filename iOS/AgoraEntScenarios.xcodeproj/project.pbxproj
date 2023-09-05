@@ -14,7 +14,8 @@
 		A82006DA2A9F4FC100FC18CA /* VoiceRoomBusinessRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82006D72A9F4FC000FC18CA /* VoiceRoomBusinessRequest.swift */; };
 		A82006DB2A9F4FC100FC18CA /* VoiceRoomBusinessApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82006D82A9F4FC000FC18CA /* VoiceRoomBusinessApi.swift */; };
 		A82006DC2A9F4FC100FC18CA /* VoiceRoomRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82006D92A9F4FC000FC18CA /* VoiceRoomRequest.swift */; };
-		A82006DE2A9F6C3200FC18CA /* TestModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82006DD2A9F6C3200FC18CA /* TestModel.swift */; };
+		A82006DE2A9F6C3200FC18CA /* VLNetworkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82006DD2A9F6C3200FC18CA /* VLNetworkModel.swift */; };
+		A82006E02AA1B95D00FC18CA /* NetworkManagerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82006DF2AA1B95D00FC18CA /* NetworkManagerModel.swift */; };
 		AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */; };
 		ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */; };
 		ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */; };
@@ -619,7 +620,8 @@
 		A82006D72A9F4FC000FC18CA /* VoiceRoomBusinessRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessRequest.swift; sourceTree = "<group>"; };
 		A82006D82A9F4FC000FC18CA /* VoiceRoomBusinessApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessApi.swift; sourceTree = "<group>"; };
 		A82006D92A9F4FC000FC18CA /* VoiceRoomRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomRequest.swift; sourceTree = "<group>"; };
-		A82006DD2A9F6C3200FC18CA /* TestModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestModel.swift; sourceTree = "<group>"; };
+		A82006DD2A9F6C3200FC18CA /* VLNetworkModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLNetworkModel.swift; sourceTree = "<group>"; };
+		A82006DF2AA1B95D00FC18CA /* NetworkManagerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManagerModel.swift; sourceTree = "<group>"; };
 		AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRobotService.swift; sourceTree = "<group>"; };
 		ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingBitrateCell.swift; sourceTree = "<group>"; };
 		ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNetStateSelectViewController.swift; sourceTree = "<group>"; };
@@ -1416,7 +1418,8 @@
 				A82006D52A9EF9B000FC18CA /* AUIError.swift */,
 				A82006D32A9EF80800FC18CA /* AUINetworking.swift */,
 				A82006D12A9EF7FD00FC18CA /* AUINetworkModel.swift */,
-				A82006DD2A9F6C3200FC18CA /* TestModel.swift */,
+				A82006DD2A9F6C3200FC18CA /* VLNetworkModel.swift */,
+				A82006DF2AA1B95D00FC18CA /* NetworkManagerModel.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -3730,6 +3733,7 @@
 				DD619A7229E3E247008F63E4 /* SAPresentationSegue.swift in Sources */,
 				DD619A6A29E3E247008F63E4 /* SAEmojiManager.swift in Sources */,
 				DDA199E728FFE579009D3E61 /* VLFontUtils.m in Sources */,
+				A82006E02AA1B95D00FC18CA /* NetworkManagerModel.swift in Sources */,
 				E357356429EFD74A009D54E1 /* AgoraDownLoadManager.swift in Sources */,
 				DD36109029B70CDC00CE7984 /* ShowCreateLiveVC.swift in Sources */,
 				DD0292DD295BF0DC00485225 /* VLPopSelBgView.m in Sources */,
@@ -4036,7 +4040,7 @@
 				E32C7EA92A20B03F00512523 /* ShowDebugPrivateParamsVC.swift in Sources */,
 				DD619AE329E3E247008F63E4 /* SAEmptyView.swift in Sources */,
 				DD0292D5295BF0DC00485225 /* VLSoundEffectView.m in Sources */,
-				A82006DE2A9F6C3200FC18CA /* TestModel.swift in Sources */,
+				A82006DE2A9F6C3200FC18CA /* VLNetworkModel.swift in Sources */,
 				DD3610B229B70CDC00CE7984 /* ShowRoomChatCell.swift in Sources */,
 				E3735C9E2A5E7E75004737EF /* BeautyModel.swift in Sources */,
 				DD0292CD295BF0DC00485225 /* VLMicSeatCell.m in Sources */,
