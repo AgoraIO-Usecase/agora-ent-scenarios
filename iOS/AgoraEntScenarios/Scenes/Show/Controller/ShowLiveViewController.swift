@@ -356,7 +356,6 @@ extension ShowLiveViewController {
                 if err.code == -1 {
                     self.onRoomExpired()
                 }
-//                ToastView.show(text: "room == \(room.roomId) error = \(err.localizedDescription)" )
             } else {
                 self._subscribeServiceEvent()
                 self.updateLoadingType(playState: self.loadingType)
@@ -451,6 +450,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onRoomExpired() {
         AppContext.expireShowImp(roomId)
+        serviceImp = nil
 //        leaveRoom()
         finishView?.removeFromSuperview()
         finishView = ShowReceiveFinishView()
