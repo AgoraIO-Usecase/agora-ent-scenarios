@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Looper
@@ -11,15 +12,15 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.util.Size
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import io.agora.rtc2.ChannelMediaOptions
@@ -31,6 +32,7 @@ import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_IMAGE_MODERATION
 import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
+import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
@@ -51,7 +53,7 @@ import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowRoomRequestStatus
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.service.ShowUser
-import io.agora.scene.show.videoSwitcherAPI.VideoSwitcherAPI
+import io.agora.scene.show.videoSwitcherAPI.VideoSwitcher
 import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
 import io.agora.scene.show.widget.AdvanceSettingDialog
 import io.agora.scene.show.widget.BeautyDialog
@@ -109,7 +111,7 @@ class LiveDetailFragment : Fragment() {
     private val mPKDialog by lazy { LivePKDialog() }
     private val mBeautyProcessor by lazy { RtcEngineInstance.beautyProcessor }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
-    private val mRtcVideoSwitcher by lazy { RtcEngineInstance.videoSwitcher }
+    private val mRtcVideoSwitcher by lazy { VideoSwitcher.getImplInstance(mRtcEngine) }
     private fun showDebugModeDialog() = DebugSettingDialog(requireContext()).show()
     private fun showAudienceDebugModeDialog() = DebugAudienceSettingDialog(requireContext()).show()
 
@@ -124,6 +126,8 @@ class LiveDetailFragment : Fragment() {
 
     private var isAudioOnlyMode = false
     private var isPageLoaded = false
+
+    private var localVideoCanvas: LocalVideoCanvasWrap? = null
 
     private val timerRoomEndRun = Runnable {
         destroy(false) // 房间到了限制时间
@@ -242,7 +246,7 @@ class LiveDetailFragment : Fragment() {
     private fun initVideoView() {
         activity?.let {
             if (isRoomOwner) {
-                mRtcVideoSwitcher.setupLocalVideo(
+                setupLocalVideo(
                     VideoSwitcher.VideoCanvasContainer(
                         it,
                         mBinding.videoLinkingLayout.videoContainer,
@@ -260,6 +264,18 @@ class LiveDetailFragment : Fragment() {
                 )
             }
         }
+    }
+
+    private fun initAudioModeration() {
+        val uid = UserManager.getInstance().user.id
+        val channelName = mRoomInfo.roomId
+
+        AudioModeration.moderationAudio(
+            channelName,
+            uid,
+            AudioModeration.AgoraChannelType.broadcast,
+            "show"
+        )
     }
 
     private fun initLivingEndLayout() {
@@ -1305,7 +1321,7 @@ class LiveDetailFragment : Fragment() {
     //================== RTC Operation ===================
 
     private fun initRtcEngine(isScrolling: Boolean, onJoinChannelSuccess: () -> Unit) {
-        val eventListener = VideoSwitcherAPI.IChannelEventListener(
+        val eventListener = VideoSwitcher.IChannelEventListener(
             onUserOffline = { uid ->
                 if (interactionInfo != null && interactionInfo!!.userId == uid.toString()) {
                     mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!)
@@ -1428,6 +1444,7 @@ class LiveDetailFragment : Fragment() {
                     mRtcVideoSwitcher.setChannelEvent(mRoomInfo.roomId, UserManager.getInstance().user.id.toInt(), eventListener)
                 }
                 initVideoView()
+                initAudioModeration()
             })
             (activity as LiveDetailActivity).toggleSelfAudio(isRoomOwner || isMeLinking(), callback = {
                 // nothing
@@ -1558,17 +1575,8 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private fun joinChannel(eventListener: VideoSwitcherAPI.IChannelEventListener) {
+    private fun joinChannel(eventListener: VideoSwitcher.IChannelEventListener) {
         val rtcConnection = mMainRtcConnection
-        val uid = UserManager.getInstance().user.id
-        val channelName = mRoomInfo.roomId
-
-        AudioModeration.moderationAudio(
-            channelName,
-            uid,
-            AudioModeration.AgoraChannelType.broadcast,
-            "show"
-        )
 
         if (!isRoomOwner && mRtcEngine.queryDeviceScore() < 75) {
             // 低端机观众加入频道前默认开启硬解（解决看高分辨率卡顿问题），但是在410分支硬解码会带来200ms的秒开耗时增加
@@ -1596,8 +1604,44 @@ class LiveDetailFragment : Fragment() {
         mRtcVideoSwitcher.joinChannel(
             rtcConnection,
             channelMediaOptions,
-            eventListener
+            RtcEngineInstance.generalToken(),
+            eventListener,
+            !isRoomOwner
         )
+    }
+
+    private fun setupLocalVideo(container: VideoSwitcher.VideoCanvasContainer) {
+        localVideoCanvas?.let {
+            if (it.lifecycleOwner == container.lifecycleOwner && it.renderMode == container.renderMode && it.uid == container.uid) {
+                val videoView = it.view
+                val viewIndex = container.container.indexOfChild(videoView)
+                if (viewIndex == container.viewIndex) {
+                    return
+                }
+                (videoView.parent as? ViewGroup)?.removeView(videoView)
+                container.container.addView(videoView, container.viewIndex)
+                return
+            }
+        }
+        var videoView = container.container.getChildAt(container.viewIndex)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            if (videoView !is SurfaceView) {
+                videoView = SurfaceView(container.container.context)
+                container.container.addView(videoView, container.viewIndex)
+            }
+        } else {
+            if (videoView !is TextureView) {
+                videoView = TextureView(container.container.context)
+                container.container.addView(videoView, container.viewIndex)
+            }
+        }
+
+        val local = LocalVideoCanvasWrap(
+            container.lifecycleOwner,
+            videoView, container.renderMode, container.uid
+        )
+        local.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
+        mRtcEngine.setupLocalVideo(local)
     }
 
     private fun updateVideoSetting(isPkMode:Boolean) {
@@ -1648,7 +1692,7 @@ class LiveDetailFragment : Fragment() {
         if (isRoomOwner) {
             enableLocalAudio(true)
             activity?.let {
-                mRtcVideoSwitcher.setupLocalVideo(VideoSwitcher.VideoCanvasContainer(it, mBinding.videoLinkingLayout.videoContainer, 0))
+                setupLocalVideo(VideoSwitcher.VideoCanvasContainer(it, mBinding.videoLinkingLayout.videoContainer, 0))
             }
             refreshStatisticInfo(
                 receiveVideoSize = Size(0, 0),
@@ -1725,7 +1769,7 @@ class LiveDetailFragment : Fragment() {
             mPKSettingsDialog.resetItemStatus(LivePKSettingsDialog.ITEM_ID_CAMERA, true)
             enableLocalVideo(true)
             activity?.let {
-                mRtcVideoSwitcher.setupLocalVideo(
+                setupLocalVideo(
                     VideoSwitcher.VideoCanvasContainer(
                         it,
                         mBinding.videoLinkingLayout.videoContainer,
@@ -1774,7 +1818,7 @@ class LiveDetailFragment : Fragment() {
                                     mRoomInfo.ownerId.toInt()
                                 )
                             )
-                            mRtcVideoSwitcher.setupLocalVideo(
+                            setupLocalVideo(
                                 VideoSwitcher.VideoCanvasContainer(
                                     context,
                                     mBinding.videoLinkingAudienceLayout.videoContainer,
@@ -1832,7 +1876,7 @@ class LiveDetailFragment : Fragment() {
             UserManager.getInstance().user.id.toInt()
         )
         mRtcVideoSwitcher.joinChannel(
-            pkRtcConnection, channelMediaOptions, null
+            pkRtcConnection, channelMediaOptions, RtcEngineInstance.generalToken(), null, false
         )
         prepareRkRoomId = pkRoomId
     }
@@ -1842,7 +1886,7 @@ class LiveDetailFragment : Fragment() {
         if (interactionInfo == null) return
         if (interactionInfo?.interactStatus != ShowInteractionStatus.pking.value) return
         ShowLogger.d(TAG, "Interaction >> updatePKingMode pkRoomId=${interactionInfo!!.roomId}")
-        val eventListener = VideoSwitcherAPI.IChannelEventListener(
+        val eventListener = VideoSwitcher.IChannelEventListener(
             onRemoteVideoStats = { stats ->
                 //setEnhance(stats)
                 // 观众端只显示房主的接收数据
@@ -1901,7 +1945,7 @@ class LiveDetailFragment : Fragment() {
                 showPKSettingsDialog()
             }
             activity?.let {
-                mRtcVideoSwitcher.setupLocalVideo(
+                setupLocalVideo(
                     VideoSwitcher.VideoCanvasContainer(
                         it,
                         mBinding.videoPKLayout.iBroadcasterAView,
@@ -1932,7 +1976,7 @@ class LiveDetailFragment : Fragment() {
                 UserManager.getInstance().user.id.toInt()
             )
             mRtcVideoSwitcher.joinChannel(
-                pkRtcConnection, channelMediaOptions, eventListener
+                pkRtcConnection, channelMediaOptions, RtcEngineInstance.generalToken(), eventListener, false
             )
             activity?.let {
                 mRtcVideoSwitcher.setupRemoteVideo(
@@ -1961,7 +2005,7 @@ class LiveDetailFragment : Fragment() {
                 UserManager.getInstance().user.id.toInt()
             )
             mRtcVideoSwitcher.joinChannel(
-                pkRtcConnection, channelMediaOptions, eventListener
+                pkRtcConnection, channelMediaOptions, RtcEngineInstance.generalToken(), eventListener, false
             )
             activity?.let {
                 mRtcVideoSwitcher.setupRemoteVideo(
@@ -2010,5 +2054,35 @@ class LiveDetailFragment : Fragment() {
 
     interface OnMeLinkingListener {
         fun onMeLinking(isLinking: Boolean)
+    }
+
+    inner class LocalVideoCanvasWrap constructor(
+        val lifecycleOwner: LifecycleOwner,
+        view: View,
+        renderMode: Int,
+        uid: Int
+    ) : DefaultLifecycleObserver, VideoCanvas(view, renderMode, uid) {
+
+        init {
+            lifecycleOwner.lifecycle.addObserver(this)
+            if (localVideoCanvas != this) {
+                localVideoCanvas?.release()
+                localVideoCanvas = this
+            }
+        }
+
+        override fun onDestroy(owner: LifecycleOwner) {
+            super.onDestroy(owner)
+            if (lifecycleOwner == owner) {
+                release()
+            }
+        }
+
+        fun release() {
+            lifecycleOwner.lifecycle.removeObserver(this)
+            view = null
+            mRtcEngine.setupLocalVideo(this)
+            localVideoCanvas = null
+        }
     }
 }

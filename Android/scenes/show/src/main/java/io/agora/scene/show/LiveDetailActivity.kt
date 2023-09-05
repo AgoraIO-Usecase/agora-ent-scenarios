@@ -65,8 +65,6 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         )
     }
 
-    private val mVideoSwitcher by lazy { RtcEngineInstance.videoSwitcher }
-
     private val POSITION_NONE = -1
     private val vpFragments = SparseArray<LiveDetailFragment>()
     private var currLoadPosition = POSITION_NONE

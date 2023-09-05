@@ -10,6 +10,7 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.GsonUtil
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.show.videoSwitcherAPI.VideoSwitcher
 
 object VideoSetting {
 
@@ -185,7 +186,7 @@ object VideoSetting {
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_720P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = BitRate.BR_Low_1V1.value,
+                bitRate = BitRate.BR_STANDRAD.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -202,7 +203,7 @@ object VideoSetting {
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_720P,
                 frameRate = FrameRate.FPS_24,
-                bitRate = BitRate.BR_Medium_1V1.value,
+                bitRate = BitRate.BR_STANDRAD.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -219,7 +220,7 @@ object VideoSetting {
                 captureResolution = Resolution.V_1080P,
                 encodeResolution = Resolution.V_1080P,
                 frameRate = FrameRate.FPS_24,
-                bitRate = BitRate.BR_High_1V1.value,
+                bitRate = BitRate.BR_STANDRAD.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -253,7 +254,7 @@ object VideoSetting {
                 captureResolution = Resolution.V_540P,
                 encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = BitRate.BR_Low_PK.value,
+                bitRate = BitRate.BR_STANDRAD.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -270,7 +271,7 @@ object VideoSetting {
                 captureResolution = Resolution.V_540P,
                 encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = BitRate.BR_Medium_PK.value,
+                bitRate = BitRate.BR_STANDRAD.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -287,7 +288,7 @@ object VideoSetting {
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_720P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = BitRate.BR_High_PK.value,
+                bitRate = BitRate.BR_STANDRAD.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -835,7 +836,7 @@ object VideoSetting {
         ShowLogger.d("VideoSettings", "updateRTCBroadcastSetting, frameRate:$frameRate")
         val rtcEngine = RtcEngineInstance.rtcEngine
         val videoEncoderConfiguration = RtcEngineInstance.videoEncoderConfiguration
-        val videoSwitcher = RtcEngineInstance.videoSwitcher
+        val videoSwitcher = VideoSwitcher.getImplInstance(rtcEngine)
         h265?.let {
             if (!isJoinedRoom) {
                 // 只能在加入房间前设置，否则rtc sdk会崩溃
