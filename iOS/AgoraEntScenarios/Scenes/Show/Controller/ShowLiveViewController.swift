@@ -47,12 +47,6 @@ class ShowLiveViewController: UIViewController {
         }
     }
     private var currentChannelId: String?
-        
-    private var checking = false
-    
-   
-    
-//    private var isAdded = false
     
     private var roomId: String {
         get {
@@ -265,9 +259,6 @@ class ShowLiveViewController: UIViewController {
         view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
         navigationController?.isNavigationBarHidden = true
         liveView.room = room
-//        if role == .audience {
-//            liveView.roomUserCount += 1
-//        }
         view.addSubview(liveView)
         liveView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -326,7 +317,6 @@ class ShowLiveViewController: UIViewController {
         showMsg.createAt = Date().millionsecondSince1970()
         
         serviceImp?.sendChatMessage(message: showMsg) { error in
-//            showLogger.info("发送消息状态 \(error?.localizedDescription ?? "") text = \(text)")
         }
     }
 }
@@ -348,18 +338,22 @@ extension ShowLiveViewController {
     func _joinRoom(_ room: ShowRoomListModel){
         finishView?.removeFromSuperview()
         ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: room.roomId)
-        serviceImp?.joinRoom(room: room) {[weak self] error, detailModel in
-            guard let self = self else {return}
-            guard self.room?.roomId == room.roomId else { return }
-            if let err = error {
-                showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
-                if err.code == -1 {
-                    self.onRoomExpired()
+        if let service = serviceImp {
+            service.joinRoom(room: room) {[weak self] error, detailModel in
+                guard let self = self else {return}
+                guard self.room?.roomId == room.roomId else { return }
+                if let err = error {
+                    showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
+                    if err.code == -1 {
+                        self.onRoomExpired()
+                    }
+                } else {
+                    self._subscribeServiceEvent()
+                    self.updateLoadingType(playState: self.loadingType)
                 }
-            } else {
-                self._subscribeServiceEvent()
-                self.updateLoadingType(playState: self.loadingType)
             }
+        } else {
+            self.onRoomExpired()
         }
     }
     
@@ -451,7 +445,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     func onRoomExpired() {
         AppContext.expireShowImp(roomId)
         serviceImp = nil
-//        leaveRoom()
         finishView?.removeFromSuperview()
         finishView = ShowReceiveFinishView()
         finishView?.headImg = room?.ownerAvatar ?? ""
