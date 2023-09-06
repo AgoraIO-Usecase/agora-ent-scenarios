@@ -49,6 +49,7 @@ import io.agora.scene.showTo1v1.ui.dialog.CallDialog
 import io.agora.scene.showTo1v1.ui.dialog.CallDialogState
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
 import io.agora.scene.showTo1v1.ui.fragment.DashboardFragment
+import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPI
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
@@ -120,10 +121,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     private var mCallState = CallStateType.Idle
 
     private val timerRoomEndRun = Runnable {
-        destroy() // 房间到了限制时间
         ToastUtils.showToast(R.string.show_to1v1_end_tips)
         Log.d(TAG, "timer end!")
-        onHangup()
+        onBackPressed()
     }
 
     private val dataFormat by lazy {
@@ -196,9 +196,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         binding.tvRoomNum.text = mRoomInfo.roomId
 
         binding.ivClose.setOnClickListener {
-            destroy()
             Log.d(TAG, "click close end!")
-            onHangup()
+            onBackPressed()
         }
         binding.ivSetting.setOnClickListener {
             val dialog = CallDetailSettingDialog(this)
@@ -217,6 +216,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             mDashboardFragment?.updateVisible(false)
         }
         binding.ivHangup.setOnClickListener {
+            if (mCallConnected) destroy()
             onHangup(finish = mCallConnected)
         }
         binding.layoutCallPrivately.setOnClickListener {
@@ -403,6 +403,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 updateCallState(CallStateType.Connected)
             } else {
                 setupVideoView(true)
+                if (!isRoomOwner) publishMedia(true)
             }
         }
         toggleSelfAudio(true) {
@@ -460,9 +461,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         if (isRoomOwner) {
             if (publish) {
                 binding.llContainer.removeAllViews()
-                mRtcEngine.setupLocalVideo(VideoCanvas(mTextureView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
+                mRtcVideoSwitcher.setupLocalVideo(VideoSwitcher.VideoCanvasContainer(this, binding.llContainer, 0))
                 mRtcEngine.startPreview()
-                binding.llContainer.addView(mTextureView)
             } else {
                 mRtcEngine.setupLocalVideo(VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, 0))
                 mRtcEngine.stopPreview()
@@ -471,10 +471,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         } else {
             if (publish) {
                 binding.llContainer.removeAllViews()
-                mRtcEngine.setupRemoteVideoEx(
-                    VideoCanvas(
-                        mTextureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()
-                    ), mMainRtcConnection
+                mRtcVideoSwitcher.setupRemoteVideo(
+                    mMainRtcConnection,
+                    VideoSwitcher.VideoCanvasContainer(this, binding.llContainer, mRoomInfo.getIntUserId())
                 )
                 binding.llContainer.addView(mTextureView)
             } else {
@@ -506,14 +505,12 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
             override fun onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo) {
                 if (mRoomInfo.roomId == roomInfo.roomId) {
-                    destroy()
-                    onHangup()
+                    onBackPressed()
                 }
             }
 
             override fun onRoomTimeUp() {
-                destroy()
-                onHangup()
+                onBackPressed()
             }
         })
     }
@@ -524,9 +521,16 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         super.onBackPressed()
     }
 
-    private fun destroy(): Boolean {
+    private fun destroy() {
         mService.leaveRoom(mRoomInfo, completion = {})
-        return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection, true)
+        if (isRoomOwner) {
+            mRtcVideoSwitcher.leaveChannel(mMainRtcConnection, true)
+        } else {
+            val options = ChannelMediaOptions()
+            options.autoSubscribeVideo = true
+            options.autoSubscribeAudio = false
+            mRtcEngine.updateChannelMediaOptionsEx(options, mMainRtcConnection)
+        }
     }
 
     private fun publishMedia(publish: Boolean) {
@@ -539,6 +543,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     private fun updateCallState(state: CallStateType) {
+        if (isGoingFinish) return
         mCallState = state
         mDashboardFragment?.updateCallState(mCallState)
         when (mCallState) {
@@ -718,11 +723,15 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         }
     }
 
+    private var isGoingFinish = false
     private fun onHangup(finish: Boolean = true) {
         mCallApi.hangup(mRoomInfo.roomId, completion = {
 
         })
-        if (finish) finish()
+        if (finish) {
+            isGoingFinish = true
+            finish()
+        }
     }
 }
 

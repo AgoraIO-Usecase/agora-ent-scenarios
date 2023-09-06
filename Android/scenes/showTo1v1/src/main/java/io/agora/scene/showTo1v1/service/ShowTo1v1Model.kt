@@ -11,14 +11,14 @@ open class ShowTo1v1UserInfo constructor(
     var objectId: String = ""
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readString()?:"",
-        parcel.readString()?:"",
-        parcel.readString()?:"",
-        parcel.readString()?:""
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.readString() ?: ""
     ) {
     }
 
-    constructor(map: Map<String, Any>): this(
+    constructor(map: Map<String, Any>) : this(
         map["userId"] as? String ?: "",
         map["userName"] as? String ?: "",
         map["avatar"] as? String ?: "",
@@ -72,7 +72,7 @@ open class ShowTo1v1UserInfo constructor(
 class ShowTo1v1RoomInfo constructor(
     val roomId: String,
     val roomName: String,
-    var createdAt: Long, userId: String, userName: String, avatar: String, objectId: String=""
+    var createdAt: Long, userId: String, userName: String, avatar: String, objectId: String = ""
 ) : ShowTo1v1UserInfo(userId, userName, avatar, objectId), Parcelable {
 
     constructor(parcel: Parcel) : this(
@@ -109,12 +109,13 @@ class ShowTo1v1RoomInfo constructor(
         }
     }
 
-//    fun createRoomInfo(token: String): VideoSwitcherAPI.RoomInfo {
-//        return VideoSwitcherAPI.RoomInfo(
-//            channelName = roomId,
-//            uid = getIntUserId(),
-//            token = token,
-//            eventHandler = null
-//        )
-//    }
+    fun createRoomInfo(token: String, channelEventListener: VideoSwitcherAPI.IChannelEventListener)
+            : VideoSwitcherAPI.RoomInfo {
+        return VideoSwitcherAPI.RoomInfo(
+            channelName = roomId,
+            uid = getIntUserId(),
+            token = token,
+            eventHandler = channelEventListener
+        )
+    }
 }

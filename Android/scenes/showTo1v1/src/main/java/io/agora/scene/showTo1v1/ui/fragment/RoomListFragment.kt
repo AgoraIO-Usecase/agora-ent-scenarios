@@ -1,6 +1,7 @@
 package io.agora.scene.showTo1v1.ui.fragment
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -51,6 +52,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     private val mRoomInfo by lazy { (arguments?.getParcelable(EXTRA_ROOM_DETAIL_INFO) as? ShowTo1v1RoomInfo)!! }
 
     private var isPageLoaded = false
+    private var mIsForce = false
 
     private val mMainRtcConnection by lazy {
         RtcConnection(mRoomInfo.roomId, UserManager.getInstance().user.id.toInt())
@@ -66,7 +68,8 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         super.onAttach(context)
         onClickCallingListener = activity as? RoomListActivity
         if (isPageLoaded) {
-            startLoadPage(false)
+            startLoadPage(mIsForce)
+            mIsForce = false
         }
     }
 
@@ -128,18 +131,24 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         activity?.finish()
     }
 
-    fun startLoadPageSafely() {
+    fun startLoadPageSafely(force: Boolean = false) {
         Log.d(TAG, "Fragment PageLoad startLoadPageSafely, roomId=${mRoomInfo.roomId}")
+        mIsForce = force
         isPageLoaded = true
         activity ?: return
         startLoadPage(true)
+    }
+
+    fun onReloadPage() {
+        Log.d(TAG, "onActivityRestart, roomId=${mRoomInfo.roomId}")
+        startLoadPage(false)
     }
 
     private fun startLoadPage(isScrolling: Boolean) {
         Log.d(TAG, "Fragment PageLoad start load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = true
 
-        initRtcEngine(isScrolling) {}
+        initRtcEngine(isScrolling)
     }
 
     fun stopLoadPage(isScrolling: Boolean) {
@@ -155,17 +164,16 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     //================== RTC Operation ===================
 
-    private fun initRtcEngine(isScrolling: Boolean, onJoinChannelSuccess: () -> Unit) {
-        val eventListener = VideoSwitcherAPI.IChannelEventListener(
-            onChannelJoined = {
-                onJoinChannelSuccess.invoke()
-                // 静音
-                val options = ChannelMediaOptions()
-                options.autoSubscribeAudio = false
-                mRtcEngine.updateChannelMediaOptionsEx(options, mMainRtcConnection)
-            }
-        )
+    private val eventListener = VideoSwitcherAPI.IChannelEventListener(
+        onChannelJoined = {
+            // 静音
+            val options = ChannelMediaOptions()
+            options.autoSubscribeAudio = false
+            mRtcEngine.updateChannelMediaOptionsEx(options, mMainRtcConnection)
+        }
+    )
 
+    private fun initRtcEngine(isScrolling: Boolean) {
         if (isScrolling) {
             Log.d(TAG, "joinRoom from scroll")
             joinChannel(eventListener)

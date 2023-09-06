@@ -10,26 +10,24 @@ import android.view.animation.AnimationUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import io.agora.scene.showTo1v1.callAPI.CallApiImpl
-import io.agora.scene.showTo1v1.callAPI.CallReason
-import io.agora.scene.showTo1v1.callAPI.CallRole
-import io.agora.scene.showTo1v1.callAPI.CallStateType
-import io.agora.scene.showTo1v1.callAPI.ICallApi
-import io.agora.scene.showTo1v1.callAPI.ICallApiListener
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.ContentInspectConfig
-import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
+import io.agora.scene.showTo1v1.callAPI.CallApiImpl
+import io.agora.scene.showTo1v1.callAPI.CallReason
+import io.agora.scene.showTo1v1.callAPI.CallRole
+import io.agora.scene.showTo1v1.callAPI.CallStateType
+import io.agora.scene.showTo1v1.callAPI.ICallApi
+import io.agora.scene.showTo1v1.callAPI.ICallApiListener
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
@@ -97,8 +95,8 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     override fun onRestart() {
         super.onRestart()
-        Log.d("onRestart", "onRestart")
-        fetchRoomList()
+        Log.d(TAG, "onRestart")
+        mVpFragments[mCurrLoadPosition]?.onReloadPage()
     }
 
     private var guided = SPUtil.getBoolean(kRoomListSwipeGuide, false)
@@ -137,14 +135,18 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             val preloadCount = 3
             binding.viewPager2.offscreenPageLimit = preloadCount - 2
             mFragmentAdapter = object : FragmentStateAdapter(this) {
-                override fun getItemCount() = Int.MAX_VALUE
+                override fun getItemCount(): Int {
+                    return if (mRoomInfoList.size <= 1) mRoomInfoList.size else Int.MAX_VALUE
+                }
 
                 override fun createFragment(position: Int): Fragment {
                     val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
-
                     return RoomListFragment.newInstance(roomInfo).also {
                         Log.d(TAG, "createFragment position:$position")
                         mVpFragments.put(position, it)
+                        if (position == binding.viewPager2.currentItem) {
+                            it.startLoadPageSafely(true)
+                        }
                     }
                 }
             }
@@ -237,22 +239,15 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         binding.titleView.rightIcon.startAnimation(anim)
         binding.titleView.rightIcon.isEnabled = false
         mService.getRoomList(completion = { error, roomList ->
-            if (error == null) { // success
-                mRoomInfoList.clear()
-                mRoomInfoList.addAll(roomList)
-                updateListView()
-                ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
-                initOrUpdateViewPage()
-                binding.viewPager2.postDelayed({
-                    mVpFragments[binding.viewPager2.currentItem]?.startLoadPageSafely()
-                },1000)
-            } else {
-                updateListView()
-            }
+            mRoomInfoList.clear()
+            mRoomInfoList.addAll(roomList)
+            updateListView()
+            initOrUpdateViewPage()
+            ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
             binding.root.postDelayed({
                 binding.titleView.rightIcon.isEnabled = true
                 binding.titleView.rightIcon.clearAnimation()
-            }, 1000)
+            }, 500)
             mayShowGuideView()
         })
     }
@@ -268,7 +263,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             binding.emptyInclude.root.isVisible = false
             binding.viewPager2.isVisible = true
             binding.layoutCreateRoom2.isVisible = true
-            binding.viewPager2.isUserInputEnabled = mRoomInfoList.size != 1
         }
     }
 

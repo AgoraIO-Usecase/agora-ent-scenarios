@@ -21,6 +21,7 @@ import io.agora.scene.showTo1v1.callAPI.ICallApi
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
+import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPI
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPIImpl
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherImpl
 import java.util.concurrent.Executors
@@ -212,12 +213,6 @@ class ShowTo1v1Manger constructor() {
             }
             return innerVideoSwitcher!!
         }
-
-    fun cleanCache() {
-        innerVideoSwitcher?.let {
-            it.unloadConnections()
-        }
-    }
 
     fun destroy() {
         innerCurrentUser = null

@@ -213,13 +213,13 @@ class VideoSwitcherAPIImpl constructor(private val rtcEngine: RtcEngineEx) : Vid
             val viewIndex = container.container.indexOfChild(videoView)
 
             if (viewIndex == container.viewIndex) {
-                if (it.connection.rtcEventHandler?.isJoinChannelSuccess == true) {
+                //if (it.connection.rtcEventHandler?.isJoinChannelSuccess == true) {
                     rtcEngine.setupRemoteVideoEx(
                         it,
                         it.connection
                     )
-                }
-                return
+                //}
+                //return
             }
             it.release()
         }
