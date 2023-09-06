@@ -41,6 +41,7 @@ class ShowTo1v1ServiceImpl constructor(
     private val roomMap = mutableMapOf<String, ShowTo1v1RoomInfo>() // key: roomNo
 
     private val objIdOfRoomNo = mutableMapOf<String, String>() // objectId of room no
+    private val objIdOfUserId = mutableMapOf<String, String>() // objectId of user no
 
     private val currentRoomUserList = mutableListOf<ShowTo1v1UserInfo>()
 
@@ -153,6 +154,7 @@ class ShowTo1v1ServiceImpl constructor(
                 userId = UserManager.getInstance().user.id.toString(),
                 userName = UserManager.getInstance().user.name,
                 avatar = UserManager.getInstance().user.headUrl,
+                objectId = roomId
             )
             val scene = Scene()
             scene.id = roomInfo.roomId
@@ -220,43 +222,45 @@ class ShowTo1v1ServiceImpl constructor(
         })
     }
 
-    private fun subscribeUserChanged(channelId: String) {
-        val sceneReference = mSceneReferenceMap[channelId] ?: return
-        Log.d(TAG, "subscribeRoomStatusChanged $channelId")
-        sceneReference.subscribe(SYNC_SCENE_ROOM_USER_COLLECTION, object : Sync.EventListener {
-            override fun onCreated(item: IObject?) {
+    private fun subscribeUserChanged(roomId: String) {
+        val sceneReference = mSceneReferenceMap[roomId] ?: return
+        Log.d(TAG, "subscribeUserChanged $roomId")
+        sceneReference.collection(SYNC_SCENE_ROOM_USER_COLLECTION)
+            .subscribe(object : Sync.EventListener {
+                override fun onCreated(item: IObject?) {
 
-            }
+                }
 
-            override fun onUpdated(item: IObject?) {
-                item ?: return
-                Log.d(TAG, "subscribeUserChanged onUpdated:${item}")
-                val updateUser = item.toObject(ShowTo1v1UserInfo::class.java)
-                if (currentRoomUserList.find { it.userId == updateUser.userId } != null) {
-                    return
+                override fun onUpdated(item: IObject?) {
+                    item ?: return
+                    Log.d(TAG, "subscribeUserChanged onUpdated:${item}")
+                    val updateUser = item.toObject(ShowTo1v1UserInfo::class.java)
+                    updateUser.objectId = item.id
+                    if (currentRoomUserList.find { it.userId == updateUser.userId } != null) {
+                        return
+                    }
+                    currentRoomUserList.add(updateUser)
+                    runOnMainThread {
+                        mShowTo1v1ServiceListener?.onUserListDidChanged(currentRoomUserList)
+                    }
                 }
-                currentRoomUserList.add(updateUser)
-                runOnMainThread {
-                    mShowTo1v1ServiceListener?.onUserListDidChanged(currentRoomUserList)
-                }
-            }
 
-            override fun onDeleted(item: IObject?) {
-                val objectId = item?.id ?: return
-                val index = currentRoomUserList.indexOfFirst { it.objectId == objectId }
-                if (index >= 0) {
-                    currentRoomUserList.removeAt(index)
+                override fun onDeleted(item: IObject?) {
+                    item ?: return
+                    Log.d(TAG, "subscribeUserChanged onDeleted:${item.id}")
+                    val index = currentRoomUserList.indexOfFirst { it.objectId == item.id }
+                    if (index >= 0) {
+                        currentRoomUserList.removeAt(index)
+                    }
+                    runOnMainThread {
+                        mShowTo1v1ServiceListener?.onUserListDidChanged(currentRoomUserList)
+                    }
                 }
-                runOnMainThread {
-                    mShowTo1v1ServiceListener?.onUserListDidChanged(currentRoomUserList)
-                }
-                Log.d(TAG, "subscribeUserChanged onDeleted:$objectId")
-            }
 
-            override fun onSubscribeError(ex: SyncManagerException) {
-                errorHandler.invoke(ex)
-            }
-        })
+                override fun onSubscribeError(ex: SyncManagerException) {
+                    errorHandler.invoke(ex)
+                }
+            })
     }
 
     private fun getUserList(
@@ -267,14 +271,16 @@ class ShowTo1v1ServiceImpl constructor(
         sceneReference.collection(SYNC_SCENE_ROOM_USER_COLLECTION)
             .get(object : DataListCallback {
                 override fun onSuccess(result: MutableList<IObject>?) {
-                    Log.d(TAG, "getUserList onSuccess roomId:$roomId")
+                    Log.d(TAG, "getUserList onSuccess roomId:$roomId userCount:${result?.size}")
                     val ret = mutableListOf<ShowTo1v1UserInfo>()
                     result?.forEach {
                         val obj = it.toObject(ShowTo1v1UserInfo::class.java)
+                        obj.objectId = it.id
                         ret.add(obj)
                     }
                     currentRoomUserList.clear()
                     currentRoomUserList.addAll(ret)
+                    mShowTo1v1ServiceListener?.onUserListDidChanged(currentRoomUserList)
                     completion.invoke(null, ret)
                 }
 
@@ -291,11 +297,13 @@ class ShowTo1v1ServiceImpl constructor(
         sceneReference.collection(SYNC_SCENE_ROOM_USER_COLLECTION)
             .add(userInfo, object : Sync.DataItemCallback {
                 override fun onSuccess(result: IObject?) {
-                    Log.d(TAG, "innerAddUserInfo onSuccess roomId:$roomId")
+                    Log.d(TAG, "innerAddUserInfo onSuccess roomId:$roomId objectId:${result?.id}")
                     result?.let { res ->
                         val addUser = res.toObject(ShowTo1v1UserInfo::class.java)
+                        objIdOfUserId[roomId] = result.id
                         if (currentRoomUserList.find { it.userId == addUser.userId } != null) return@let
                         currentRoomUserList.add(addUser)
+                        mShowTo1v1ServiceListener?.onUserListDidChanged(currentRoomUserList)
                     }
                     completion.invoke(result!!.id, null)
                 }
@@ -310,12 +318,13 @@ class ShowTo1v1ServiceImpl constructor(
 
     private fun innerRemoveUserInfo(roomId: String, completion: (error: Exception?) -> Unit) {
         val sceneReference = mSceneReferenceMap[roomId] ?: return
-        val objectId = currentRoomUserList.find { it.userId == userInfo.userId }?.objectId ?: return
+        val objectId = objIdOfUserId[roomId] ?: return
         sceneReference.collection(SYNC_SCENE_ROOM_USER_COLLECTION)
             .delete(objectId, object : Sync.Callback {
                 override fun onSuccess() {
-                    Log.d(TAG, "innerRemoveUserInfo onSuccess roomId:$roomId")
+                    Log.d(TAG, "innerRemoveUserInfo onSuccess roomId:$roomId objectId:$objectId")
                     completion.invoke(null)
+                    objIdOfUserId.remove(roomId)
                 }
 
                 override fun onFail(exception: SyncManagerException?) {

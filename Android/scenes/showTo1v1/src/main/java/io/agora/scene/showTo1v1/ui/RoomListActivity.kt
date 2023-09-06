@@ -145,9 +145,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     return RoomListFragment.newInstance(roomInfo).also {
                         Log.d(TAG, "createFragment position:$position")
                         mVpFragments.put(position, it)
-                        if (position == binding.viewPager2.currentItem) {
-                            it.startLoadPageSafely()
-                        }
                     }
                 }
             }
@@ -246,6 +243,9 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 updateListView()
                 ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
                 initOrUpdateViewPage()
+                binding.viewPager2.postDelayed({
+                    mVpFragments[binding.viewPager2.currentItem]?.startLoadPageSafely()
+                },1000)
             } else {
                 updateListView()
             }
