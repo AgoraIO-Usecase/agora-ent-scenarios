@@ -2,7 +2,6 @@ package io.agora.scene.showTo1v1.ui.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -21,7 +20,6 @@ import io.agora.scene.base.component.BaseBindingFragment
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
-import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
@@ -35,7 +33,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     companion object {
 
-        private const val TAG = "ShowTo1v1_RoomList"
+        private const val TAG = "ShowTo1v1_ListFragment"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
         fun newInstance(romInfo: ShowTo1v1RoomInfo) = RoomListFragment().apply {
@@ -73,13 +71,11 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        ShowTo1v1Logger.d(TAG, "Fragment Lifecycle: onCreateView")
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        ShowTo1v1Logger.d(TAG, "Fragment Lifecycle: onViewCreated")
         activity?.onBackPressedDispatcher?.addCallback(enabled = isVisible) {
             onBackPressed()
         }
@@ -133,20 +129,21 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     }
 
     fun startLoadPageSafely() {
+        Log.d(TAG, "Fragment PageLoad startLoadPageSafely, roomId=${mRoomInfo.roomId}")
         isPageLoaded = true
         activity ?: return
         startLoadPage(true)
     }
 
     private fun startLoadPage(isScrolling: Boolean) {
-        ShowTo1v1Logger.d(TAG, "Fragment PageLoad start load, roomId=${mRoomInfo.roomId}")
+        Log.d(TAG, "Fragment PageLoad start load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = true
 
         initRtcEngine(isScrolling) {}
     }
 
     fun stopLoadPage(isScrolling: Boolean) {
-        ShowTo1v1Logger.d(TAG, "Fragment PageLoad stop load, roomId=${mRoomInfo.roomId}")
+        Log.d(TAG, "Fragment PageLoad stop load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = false
         destroy(isScrolling) // 切页或activity销毁
     }
@@ -170,10 +167,10 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         )
 
         if (isScrolling) {
-            ShowTo1v1Logger.d(TAG, "joinRoom from scroll")
+            Log.d(TAG, "joinRoom from scroll")
             joinChannel(eventListener)
         } else {
-            ShowTo1v1Logger.d(TAG, "joinRoom from click")
+            Log.d(TAG, "joinRoom from click")
             mRtcVideoSwitcher.setChannelEvent(
                 mRoomInfo.roomId, UserManager.getInstance().user.id.toInt(), eventListener
             )

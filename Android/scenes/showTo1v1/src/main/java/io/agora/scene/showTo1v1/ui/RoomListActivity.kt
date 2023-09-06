@@ -6,9 +6,11 @@ import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.AnimationUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -44,7 +46,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     RoomListFragment.OnClickCallingListener {
 
     companion object {
-        private const val TAG = "ShowTo1v1_RoomList"
+        private const val TAG = "ShowTo1v1_ListActivity"
         private const val kRoomListSwipeGuide = "showTo1v1_SwipeGuide"
 
         private const val POSITION_NONE = -1
@@ -126,10 +128,11 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         binding.layoutCreateRoom2.setOnClickListener {
             RoomCreateActivity.launch(this)
         }
+        initOrUpdateViewPage()
     }
 
-    private fun initViewPage() {
-        if (mFragmentAdapter == null) {
+    private fun initOrUpdateViewPage() {
+        if (mFragmentAdapter == null && mRoomInfoList.size > 0) {
             // 设置预加载
             val preloadCount = 3
             binding.viewPager2.offscreenPageLimit = preloadCount - 2
@@ -140,11 +143,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
 
                     return RoomListFragment.newInstance(roomInfo).also {
+                        Log.d(TAG, "createFragment position:$position")
                         mVpFragments.put(position, it)
                         if (position == binding.viewPager2.currentItem) {
-                            binding.viewPager2.postDelayed({
-                                it.startLoadPageSafely()
-                            }, 1000)
+                            it.startLoadPageSafely()
                         }
                     }
                 }
@@ -192,7 +194,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
             super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-            Log.d(TAG, "PageChange onPageScrolled positionOffset=$positionOffset")
+//            Log.d(TAG, "PageChange onPageScrolled positionOffset=$positionOffset")
             if (scrollStatus == ViewPager2.SCROLL_STATE_DRAGGING) {
                 if (lastOffset > 0f) {
                     val isMoveUp = (positionOffset - lastOffset) > 0
@@ -234,21 +236,24 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     }
 
     private fun fetchRoomList() {
+        val anim = AnimationUtils.loadAnimation(this, R.anim.show_to1v1_center_rotation)
+        binding.titleView.rightIcon.startAnimation(anim)
+        binding.titleView.rightIcon.isEnabled = false
         mService.getRoomList(completion = { error, roomList ->
             if (error == null) { // success
                 mRoomInfoList.clear()
                 mRoomInfoList.addAll(roomList)
-                mVpFragments[mCurrLoadPosition]?.stopLoadPage(false)
-                mShowTo1v1Manger.cleanCache()
-                mVpFragments.clear()
                 updateListView()
-                initViewPage()
                 ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
+                initOrUpdateViewPage()
             } else {
                 updateListView()
             }
+            binding.root.postDelayed({
+                binding.titleView.rightIcon.isEnabled = true
+                binding.titleView.rightIcon.clearAnimation()
+            }, 1000)
             mayShowGuideView()
-
         })
     }
 
@@ -356,15 +361,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 mRoomInfo?.let { roomInfo ->
                     mCallApi.removeListener(this)
                     RoomDetailActivity.launch(this, true, roomInfo)
-                    // 开启鉴黄鉴暴
-                    val channelId = mShowTo1v1Manger.mRemoteUser?.get1v1ChannelId() ?: ""
-                    val localUid = mShowTo1v1Manger.mCurrentUser.userId.toInt()
-                    enableContentInspectEx(RtcConnection(channelId, localUid))
-                    val channelName = mShowTo1v1Manger.mConnectedChannelId ?: return
-                    val uid = mShowTo1v1Manger.mCurrentUser.userId.toLong()
-                    AudioModeration.moderationAudio(
-                        channelName, uid, AudioModeration.AgoraChannelType.broadcast, "ShowTo1v1"
-                    )
                 }
             }
 

@@ -220,6 +220,10 @@ class ShowTo1v1Manger constructor() {
     }
 
     fun destroy() {
+        innerCurrentUser = null
+        innerCallTokenConfig = null
+        innerLocalVideoView = null
+        innerRemoteVideoView = null
         innerVideoSwitcher?.let {
             it.unloadConnections()
             innerVideoSwitcher = null

@@ -4,14 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
     tools:background="@color/text_color_66">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivRoomCover"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitXY" />
+        android:scaleType="centerCrop" />
+
+    <include
+        android:id="@+id/includeComeSoonView"
+        layout="@layout/show_to1v1_room_come_soon_view"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="15dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/layoutTop" />
 
     <LinearLayout
         android:id="@+id/llContainer"
@@ -109,22 +118,38 @@
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:elevation="2dp"
-            android:padding="10dp"
+            android:padding="6dp"
             android:src="@drawable/show_to1v1_detail_close"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:id="@+id/layoutNumCount"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="15dp"
+            android:background="@drawable/show_to1v1_black20_corner"
+            app:layout_constraintTop_toTopOf="@id/ivClose"
+            android:orientation="vertical"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="@id/ivClose"
+            app:layout_constraintEnd_toStartOf="@id/ivClose">
 
-    <include
-        android:id="@+id/includeComeSoonView"
-        layout="@layout/show_to1v1_room_come_soon_view"
-        android:layout_width="match_parent"
-        android:layout_height="42dp"
-        android:layout_marginHorizontal="15dp"
-        android:layout_marginTop="15dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/layoutTop" />
+            <ImageView
+                android:src="@drawable/show_to1v1_icon_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="11sp"
+                android:id="@+id/tvNumCount"
+                android:text="1"/>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <include
         android:id="@+id/includeConnectedView"

@@ -35,7 +35,6 @@ import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
-import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.callAPI.CallApiImpl
 import io.agora.scene.showTo1v1.callAPI.CallRole
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallDetailActivityBinding
@@ -56,9 +55,19 @@ import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 import io.agora.scene.widget.utils.StatusBarUtil
 import org.json.JSONException
 import org.json.JSONObject
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
+
+fun Int.number2K(): String {
+    if (this < 1000) return this.toString()
+    val format = DecimalFormat("0.#")
+    //未保留小数的舍弃规则，RoundingMode.FLOOR表示直接舍弃。
+    format.roundingMode = RoundingMode.FLOOR
+    return "${format.format(this / 1000f)}k"
+}
 
 class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBinding>(), ICallApiListener {
 
@@ -66,6 +75,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         private const val TAG = "ShowTo1v1_RoomDetail"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
         private const val EXTRA_ROOM_CALL_CONNECTED = "callConnected"
+        private const val ContentInspectName = "ShowTo1v1"
 
         /**
          * @param callConnected true 已经连接
@@ -112,7 +122,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     private val timerRoomEndRun = Runnable {
         destroy() // 房间到了限制时间
         ToastUtils.showToast(R.string.show_to1v1_end_tips)
-        ShowTo1v1Logger.d(TAG, "timer end!")
+        Log.d(TAG, "timer end!")
         onHangup()
     }
 
@@ -187,7 +197,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         binding.ivClose.setOnClickListener {
             destroy()
-            ShowTo1v1Logger.d(TAG, "click close end!")
+            Log.d(TAG, "click close end!")
             onHangup()
         }
         binding.ivSetting.setOnClickListener {
@@ -207,7 +217,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             mDashboardFragment?.updateVisible(false)
         }
         binding.ivHangup.setOnClickListener {
-            onHangup(finish = false)
+            onHangup(finish = mCallConnected)
         }
         binding.layoutCallPrivately.setOnClickListener {
             reInitCallApi(CallRole.CALLER, callback = {
@@ -221,6 +231,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         } else {
             binding.layoutCallPrivatelyBg.isVisible = !mCallConnected
             binding.layoutCallPrivately.isVisible = !mCallConnected
+            binding.includeComeSoonView.root.isVisible = true
             if (!mCallConnected) {
                 binding.layoutCallPrivatelyBg.breathAnim()
             }
@@ -387,9 +398,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         toggleSelfVideo(true) {
             joinChannel(eventListener)
             if (mCallConnected) {
-                updateCallState(CallStateType.Connected)
                 publishMedia(false)
                 setupVideoView(false)
+                updateCallState(CallStateType.Connected)
             } else {
                 setupVideoView(true)
             }
@@ -437,6 +448,12 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             channelMediaOptions,
             eventListener
         )
+        if (isRoomOwner) {
+            enableContentInspectEx(mMainRtcConnection)
+            AudioModeration.moderationAudio(
+                channelName, uid, AudioModeration.AgoraChannelType.broadcast, ContentInspectName
+            )
+        }
     }
 
     private fun setupVideoView(publish: Boolean) {
@@ -483,8 +500,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
             }
 
-            override fun onUserListDidChanged(userList: ShowTo1v1UserInfo) {
-
+            override fun onUserListDidChanged(userList: List<ShowTo1v1UserInfo>) {
+                binding.tvNumCount.text = userList.size.number2K()
             }
 
             override fun onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo) {
@@ -528,16 +545,16 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             CallStateType.Calling -> {
                 publishMedia(false)
                 setupVideoView(false)
-                binding.vDragWindow.isVisible = true
             }
 
             CallStateType.Prepared,
             CallStateType.Idle,
             CallStateType.Failed -> {
                 mTimeLinkAt = 0
+
                 publishMedia(true)
                 setupVideoView(true)
-                binding.vDragWindow.isVisible = false
+
                 binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
                     R.drawable.show_to1v1_dot, 0, 0, 0
                 )
@@ -546,14 +563,18 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     binding.layoutCallPrivately.isVisible = true
                     binding.layoutCallPrivatelyBg.breathAnim()
                 }
+                binding.vDragWindow.isVisible = false
+                binding.layoutNumCount.isVisible = true
                 binding.ivHangup.isVisible = false
                 binding.tvHangup.isVisible = false
             }
 
             CallStateType.Connected -> {
                 mTimeLinkAt = System.currentTimeMillis()
+                binding.layoutNumCount.isVisible = false
                 binding.ivHangup.isVisible = true
                 binding.tvHangup.isVisible = true
+                binding.vDragWindow.isVisible = true
                 if (isRoomOwner) {
                     binding.llContainer.removeAllViews()
                     (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
@@ -601,7 +622,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         state: CallStateType, stateReason: CallReason, eventReason: String, elapsed: Long, eventInfo: Map<String, Any>
     ) {
         val publisher = eventInfo[CallApiImpl.kPublisher] ?: mShowTo1v1Manger.mCurrentUser.userId
-        if (publisher != mShowTo1v1Manger.mCurrentUser.userId && publisher != mRoomInfo.userId) return
+        if (publisher != mShowTo1v1Manger.mCurrentUser.userId) return
         updateCallState(state)
         when (state) {
             CallStateType.Prepared -> {
@@ -682,7 +703,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         val contentInspectConfig = ContentInspectConfig()
         try {
             val jsonObject = JSONObject()
-            jsonObject.put("sceneName", "ShowTo1v1")
+            jsonObject.put("sceneName", ContentInspectName)
             jsonObject.put("id", UserManager.getInstance().user.id)
             jsonObject.put("userNo", UserManager.getInstance().user.userNo)
             contentInspectConfig.extraInfo = jsonObject.toString()
