@@ -143,7 +143,6 @@ extension ShowAgoraKitManager {
             engine?.setParameters("{\"rtc.video.low_stream_enable_hw_encoder\": false}")
         } else {
             engine?.setParameters("{\"rtc.video.high_low_video_ratio_enabled\": false}")
-            engine?.setParameters("{\"rtc.video.low_stream_enable_hw_encoder\": true}")
         }
         engine?.setDualStreamModeEx(.enableSimulcastStream, streamConfig: simulcastConfig, connection: connection)
     }

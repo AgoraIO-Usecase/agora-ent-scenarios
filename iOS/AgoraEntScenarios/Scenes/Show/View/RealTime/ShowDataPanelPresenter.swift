@@ -20,8 +20,6 @@ class ShowDataPanelPresenter {
     private var localAudioStats = AgoraRtcLocalAudioStats()
     private var remoteVideoStats = AgoraRtcRemoteVideoStats()
     private var remoteAudioStats = AgoraRtcRemoteAudioStats()
-    private var dimension = CGSize.zero
-    private var fps: UInt = 0
     private var uplink: Int32 = 0
     private var downlink: Int32 = 0
     private var callTs: Int = 0
@@ -32,9 +30,6 @@ class ShowDataPanelPresenter {
     
     func updateLocalVideoStats(_ stats: AgoraRtcLocalVideoStats) {
         localVideoStats = stats
-        dimension = CGSize(width: Int(stats.encodedFrameWidth),
-                           height: Int(stats.encodedFrameHeight))
-        fps = stats.sentFrameRate
     }
     
     func updateLocalAudioStats(_ stats: AgoraRtcLocalAudioStats) {
@@ -51,9 +46,6 @@ class ShowDataPanelPresenter {
     
     func updateVideoStats(_ stats: AgoraRtcRemoteVideoStats) {
         remoteVideoStats = stats
-        dimension = CGSize(width: Int(stats.width),
-                           height: Int(stats.height))
-        fps = UInt(stats.rendererOutputFrameRate)
     }
     
     func updateAudioStats(_ stats: AgoraRtcRemoteAudioStats) {
@@ -64,10 +56,10 @@ class ShowDataPanelPresenter {
         callTs = Int(ts)
     }
     
-    func generatePanelData(audioOnly: Bool, send: Bool, receive: Bool, audience: Bool) -> ShowPanelData {
+    func generatePanelData(audioOnly: Bool, send: Bool, receive: Bool) -> ShowPanelData {
         let sendPanel = send ? sendData(audioOnly: audioOnly) : cleanSendData()
         let receivePanel = receive ? receiveData(audioOnly: audioOnly) : cleanReceiveData()
-        let otherPanel = otherData(audience: audience)
+        let otherPanel = otherData(send: send, receive: receive)
         return ShowPanelData(
             left: [sendPanel.left, receivePanel.left, otherPanel.left].joined(separator: "\n"),
             right: [sendPanel.right, receivePanel.right, otherPanel.right].joined(separator: "\n")
@@ -110,7 +102,7 @@ class ShowDataPanelPresenter {
         let videoSend = "show_statistic_up_bitrate".show_localized+": \(localVideoStats.sentBitrate) kbps"
         let uplink = "show_statistic_up_net_speech".show_localized+": \(uplink) KB/s"
         
-        let fps = "show_advance_setting_FPS_title".show_localized+": \(fps) fps"
+        let fps = "show_advance_setting_FPS_title".show_localized+": \(localVideoStats.sentFrameRate) fps"
         let vSendLoss = "show_statistic_up_loss_package".show_localized+": \(localVideoStats.txPacketLossRate) %"
         
         let audioSend = "ASend: \(localAudioStats.sentBitrate) kbps"
@@ -132,7 +124,7 @@ class ShowDataPanelPresenter {
         let videoSend = "show_statistic_bitrate".show_localized+": \(remoteVideoStats.receivedBitrate) kbps"
         let downlink = "show_statistic_down_net_speech".show_localized+": \(downlink) KB/s"
 
-        let fps = "show_statistic_receive_fps".show_localized+": \(fps) fps"
+        let fps = "show_statistic_receive_fps".show_localized+": \(remoteVideoStats.rendererOutputFrameRate) fps"
         let vSendLoss = "show_statistic_down_loss_package".show_localized+": \(remoteVideoStats.packetLossRate) %"
         let lastmile = "show_statistic_delay".show_localized+": \(remoteVideoStats.delay) ms"
         
@@ -148,7 +140,7 @@ class ShowDataPanelPresenter {
         return ShowPanelData(left: leftInfo, right: rightInfo)
     }
     
-    private func otherData(audience: Bool) -> ShowPanelData {
+    private func otherData(send: Bool, receive: Bool) -> ShowPanelData {
         let params = ShowAgoraKitManager.shared.rtcParam
         let onStr = "show_setting_switch_on".show_localized
         let offStr = "show_setting_switch_off".show_localized
@@ -156,16 +148,16 @@ class ShowDataPanelPresenter {
         // 其他
         let title = "show_statistic_title_other".show_localized
         // 秒开耗时
-        let startup = audience ? "\(callTs) ms" : "--"
+        let startup = receive ? "\(callTs) ms" : "--"
         let startupStr = "show_statistic_startup_time".show_localized + ": " + startup
         // h265开关
-        let h265 = !audience ? onStr : "--"
+        let h265 = send ? onStr : "--"
         let h265Str = "H265" + ": " + h265
         // 超分开关
-        let sr = audience ? (params.sr ? onStr : offStr) : "--"
+        let sr = receive ? (params.sr ? onStr : offStr) : "--"
         let srStr = "show_statistic_SR_switch".show_localized + ": " + sr
         // 小流开关
-        let microStream = !audience ? ((localVideoStats.dualStreamEnabled) ? onStr : offStr) : "--"
+        let microStream = send ? ((localVideoStats.dualStreamEnabled) ? onStr : offStr) : "--"
         let microStreamStr = "show_statistic_micro_stream_switch".show_localized + ": " + microStream
         // right:
         //机型等级
@@ -174,10 +166,10 @@ class ShowDataPanelPresenter {
         + ShowAgoraKitManager.shared.deviceLevel.description()
         + "(\(ShowAgoraKitManager.shared.deviceScore))"
         //pvc开关
-        let pvc = !audience ? (params.pvc ? onStr : offStr) : "--"
+        let pvc = send ? (params.pvc ? onStr : offStr) : "--"
         let pvcStr = "show_statistic_pvc_switch".show_localized + ": " + pvc
         //svc开关
-        let svc = !audience ? (params.svc ? onStr : offStr) : "--"
+        let svc = send ? (params.svc ? onStr : offStr) : "--"
         let svcStr = "show_statistic_svc_switch".show_localized + ": " + svc
         let left = [title, startupStr, h265Str, srStr,  microStreamStr].joined(separator: "\n") + "\n"
         let right = ["  ", levelStr,  pvcStr, svcStr].joined(separator: "\n") + "\n"

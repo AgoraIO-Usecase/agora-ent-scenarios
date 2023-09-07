@@ -651,21 +651,19 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onInteractionBegan(interaction: ShowInteractionInfo) {
         self.currentInteraction = interaction
-        //TODO:
+        
         _refreshPKUserList()
         _refreshInteractionList()
     }
     
     func onInterationEnded(interaction: ShowInteractionInfo) {
-        var toastTitle = ""
-        if let info = currentInteraction {
-            toastTitle = info.interactStatus.toastTitle
+        if let toastStr = currentInteraction?.interactStatus.toastTitle ?? interruptInteractionReason {
+            ToastView.show(text: toastStr)
         }
-        ToastView.show(text: interruptInteractionReason ?? toastTitle)
         interruptInteractionReason = nil
         
         self.currentInteraction = nil
-        //TODO:
+        
         _refreshPKUserList()
         _refreshInteractionList()
     }
@@ -707,6 +705,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             if role == .audience {
                 ShowAgoraKitManager.shared.updateAudienceProfile()
+                ShowAgoraKitManager.shared.setPVCon(true)
+                ShowAgoraKitManager.shared.setSuperResolutionOn(false)
             }
             let toRole: AgoraClientRole = (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : .audience
             ShowAgoraKitManager.shared.switchRole(role: toRole,
@@ -726,8 +726,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                                              value: $0.value)
                 })
             }
-            ShowAgoraKitManager.shared.setPVCon(true)
-            ShowAgoraKitManager.shared.setSuperResolutionOn(false)
         default:
             break
         }
@@ -753,6 +751,10 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.bottomBar.linkButton.isShowRedDot = false
             liveView.bottomBar.linkButton.isSelected = false
             currentInteraction?.ownerMuteAudio = false
+            if role == .audience {
+                ShowAgoraKitManager.shared.setPVCon(false)
+                ShowAgoraKitManager.shared.setSuperResolutionOn(true)
+            }
             let canvasView = role == .broadcaster ? nil : UIView()
             let uid = role == .broadcaster ? VLUserCenter.user.id : interaction.userId
             ShowAgoraKitManager.shared.switchRole(role: role,
@@ -761,8 +763,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                        uid: uid,
                                        canvasView: canvasView)
             self.delegate?.currentUserIsOffSeat()
-            ShowAgoraKitManager.shared.setPVCon(false)
-            ShowAgoraKitManager.shared.setSuperResolutionOn(true)
         default:
             break
         }
@@ -1004,7 +1004,7 @@ extension ShowLiveViewController {
                 if self.role == .audience && self.currentInteraction?.userId != VLUserCenter.user.id {
                     send = false
                 }
-                let data = self.panelPresenter.generatePanelData(audioOnly: false, send: send, receive: receive, audience: (self.role == .audience))
+                let data = self.panelPresenter.generatePanelData(audioOnly: false, send: send, receive: receive)
                 self.realTimeView.update(left: data.left, right: data.right)
             }
         }
