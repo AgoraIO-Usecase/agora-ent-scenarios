@@ -86,7 +86,7 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
         super.initView(savedInstanceState)
         enableCrateRoomButton(true)
         binding.titleView.setRightIconClick {
-            finish()
+            onBackPressed()
         }
         binding.tvRandom.setOnClickListener {
             val nameIndex = random.nextInt(roomNameArray.size)
@@ -176,5 +176,10 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
         if (isFinishToLiveDetail) {
             mRtcEngine.stopPreview()
         }
+    }
+
+    override fun onBackPressed() {
+        mRtcEngine.stopPreview()
+        super.onBackPressed()
     }
 }

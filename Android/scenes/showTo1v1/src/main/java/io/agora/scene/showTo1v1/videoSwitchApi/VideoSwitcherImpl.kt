@@ -1,122 +1,106 @@
-package io.agora.scene.showTo1v1.videoSwitchApi
+package io.agora.scene.show.videoSwitcherAPI
 
-import android.os.Build
-import android.os.Build.VERSION
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
-import android.util.Log
-import android.view.SurfaceView
 import android.view.TextureView
 import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import io.agora.mediaplayer.IMediaPlayer
+import io.agora.mediaplayer.IMediaPlayerObserver
+import io.agora.mediaplayer.data.PlayerUpdatedInfo
+import io.agora.mediaplayer.data.SrcInfo
 import io.agora.rtc2.*
 import io.agora.rtc2.video.VideoCanvas
-import io.agora.scene.base.TokenGenerator
-import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
+import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import java.util.*
 
-class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private val api: VideoSwitcherAPI) :
-    VideoSwitcher {
+/**
+ * 房间状态
+ * @param IDLE 默认状态
+ * @param PREJOINED 预加入房间状态
+ * @param JOINED 已进入房间状态
+ */
+enum class RoomStatus {
+    IDLE,
+    PREJOINED,
+    JOINED,
+}
+
+class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     private val tag = "VideoSwitcherImpl"
     private var preloadCount = 3
 
-    private val connectionsForPreloading = Collections.synchronizedList(mutableListOf<RtcConnectionWrap>())
-    private val connectionsPreloaded = Collections.synchronizedList(mutableListOf<RtcConnectionWrap>())
-    private val connectionsJoined = Collections.synchronizedList(mutableListOf<RtcConnectionWrap>())
-    private val remoteVideoCanvasList = Collections.synchronizedList(mutableListOf<RemoteVideoCanvasWrap>())
-    private var localVideoCanvas: LocalVideoCanvasWrap? = null
+    private val connectionsForPreloading = Collections.synchronizedList(mutableListOf<RtcConnection>())
+    private val connectionsJoined = Collections.synchronizedList(mutableListOf<RtcConnection>())
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
     private val preLoadRun = Runnable { preloadChannels() }
+
+    private val roomStateMap = Collections.synchronizedMap(mutableMapOf<RtcConnectionWrap, RoomStatus>())
+    private val remoteVideoCanvasList = Collections.synchronizedList(mutableListOf<RemoteVideoCanvasWrap>())
     private var quickStartTime = 0L
+    private var needSubscribe = false
+    private var needSubscribeConnection: RtcConnection? = null
 
     override fun setPreloadCount(count: Int) {
         preloadCount = count
-        Log.d(tag, "setPreloadCount count=$count")
+        ShowTo1v1Logger.d(tag, "setPreloadCount count=$count")
     }
 
     override fun preloadConnections(connections: List<RtcConnection>) {
         connectionsForPreloading.clear()
-        connectionsForPreloading.addAll(connections.map { RtcConnectionWrap(it) })
-        val roomList = mutableListOf<VideoSwitcherAPI.RoomInfo>()
+        connectionsForPreloading.addAll(connections.map { it })
         connections.forEach {
-            roomList.add(
-                VideoSwitcherAPI.RoomInfo(
-                    it.channelId,
-                    it.localUid,
-                    ShowTo1v1Manger.getImpl().generalToken(),
-                    null
-                )
-            )
+            rtcEngine.preloadChannel(ShowTo1v1Manger.getImpl().generalToken(), it.channelId, it.localUid)
+            var hasConnection = false
+            roomStateMap.forEach { room ->
+                if (room.key.isSameChannel(it)) {
+                    hasConnection = true
+                }
+            }
+            if (!hasConnection) {
+                roomStateMap[RtcConnectionWrap(it)] = RoomStatus.IDLE
+            }
         }
-        api.preloadRoom(roomList)
-        Log.d(tag, "preloadConnections connections=$connectionsForPreloading")
+        ShowTo1v1Logger.d(tag, "preloadConnections connections=$connectionsForPreloading")
     }
 
     override fun unloadConnections() {
         mainHandler.removeCallbacksAndMessages(null)
 
-        api.cleanCache()
+        roomStateMap.forEach {
+            switchRoomState(RoomStatus.IDLE, it.key, null, null, null)
+        }
+        connectionsJoined.clear()
+        roomStateMap.clear()
     }
 
     override fun preJoinChannel(
         connection: RtcConnection,
         mediaOptions: ChannelMediaOptions,
-        eventListener: VideoSwitcherAPI.IChannelEventListener?
+        token: String?,
+        eventListener: VideoSwitcher.IChannelEventListener?
     ) {
-        Log.d("hugo", "111111")
-        api.switchRoomState(
-            VideoSwitcherAPI.RoomStatus.PREJOINED, VideoSwitcherAPI.RoomInfo(
-                connection.channelId,
-                connection.localUid,
-                ShowTo1v1Manger.getImpl().generalToken(),
-                eventListener
-            ), mediaOptions
-        )
+        switchRoomState(RoomStatus.PREJOINED, connection, token, eventListener, mediaOptions)
     }
 
     override fun joinChannel(
         connection: RtcConnection,
         mediaOptions: ChannelMediaOptions,
-        eventListener: VideoSwitcherAPI.IChannelEventListener?
+        token: String?,
+        eventListener: VideoSwitcher.IChannelEventListener?,
+        needPreJoin: Boolean?
     ) {
-        api.switchRoomState(
-            VideoSwitcherAPI.RoomStatus.JOINED, VideoSwitcherAPI.RoomInfo(
-                connection.channelId,
-                connection.localUid,
-                ShowTo1v1Manger.getImpl().generalToken(),
-                eventListener
-            ), mediaOptions
-        )
-//        connectionsJoined.firstOrNull { it.isSameChannel(connection) }
-//            ?.let {
-//                Log.d(tag, "joinChannel joined connection=$it")
-//                it.rtcEventHandler?.setEventListener(eventListener)
-//                return
-//            }
-//
-//        connectionsPreloaded.firstOrNull { it.isSameChannel(connection) }
-//            ?.let {
-//                Log.d(tag, "joinChannel preloaded connection=$it")
-//                it.rtcEventHandler?.setEventListener(eventListener)
-//                it.rtcEventHandler?.subscribeMediaTime = SystemClock.elapsedRealtime()
-//                it.mediaOptions = mediaOptions
-//                rtcEngine.updateChannelMediaOptionsEx(mediaOptions, it)
-//                connectionsPreloaded.remove(it)
-//                connectionsJoined.add(it)
-//                return
-//            }
-//
-        val connectionWrap = RtcConnectionWrap(connection)
-        connectionsJoined.add(connectionWrap)
-//
+        switchRoomState(RoomStatus.JOINED, connection, token, eventListener, mediaOptions)
+        if (needPreJoin ?: return) {
+            connectionsJoined.add(connection)
+        }
         mainHandler.removeCallbacks(preLoadRun)
-        if (connectionsJoined.size == 1 || connectionsPreloaded.size <= 0) {
+        if (needPreJoin) {
             mainHandler.postDelayed(preLoadRun, 500)
         }
     }
@@ -124,15 +108,22 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
     override fun setChannelEvent(
         channelName: String,
         uid: Int,
-        eventHandler: VideoSwitcherAPI.IChannelEventListener?
+        eventHandler: VideoSwitcher.IChannelEventListener?
     ) {
-        api.setRoomEvent(channelName, uid, eventHandler)
+        roomStateMap.forEach {
+            if (it.key.isSameChannel(RtcConnection(channelName, uid))) {
+                it.key.rtcEventHandler?.setEventListener(eventHandler)
+            }
+        }
     }
 
     private fun preloadChannels() {
         val size = connectionsForPreloading.size
         val index =
-            connectionsForPreloading.indexOfFirst { it.isSameChannel(connectionsJoined.firstOrNull()) }
+            connectionsForPreloading.indexOfFirst { it.channelId == connectionsJoined.firstOrNull()?.channelId }
+        ShowTo1v1Logger.d(tag, "switchRoomState, index: $index, connectionsJoined:$connectionsJoined")
+
+        // joined房间的上下两个房间
         val connPreLoaded = mutableListOf<RtcConnection>()
         for (i in (index - (preloadCount - 1) / 2)..(index + preloadCount / 2)) {
             if (i == index) {
@@ -147,122 +138,368 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
                 continue
             }
             val conn = connectionsForPreloading[realIndex]
-            if (connectionsJoined.any { it.isSameChannel(conn) }) {
+            if (connectionsJoined.any { it.channelId == conn.channelId }) {
                 continue
             }
-            if (api.getRoomState(conn.channelId, conn.localUid) != VideoSwitcherAPI.RoomStatus.PREJOINED) {
-                Log.d("hugo", "22222")
-                api.switchRoomState(
-                    VideoSwitcherAPI.RoomStatus.PREJOINED, VideoSwitcherAPI.RoomInfo(
-                        conn.channelId,
-                        conn.localUid,
-                        ShowTo1v1Manger.getImpl().generalToken(),
-                        null
-                    ), null
-                )
+            if (getRoomState(conn.channelId, conn.localUid) != RoomStatus.PREJOINED) {
+                switchRoomState(RoomStatus.PREJOINED, conn, ShowTo1v1Manger.getImpl().generalToken(), null, null)
             }
             connPreLoaded.add(conn)
         }
 
-        if (connectionsPreloaded.size > preloadCount) {
-            connectionsPreloaded.iterator().let { connIterator ->
-                while (connIterator.hasNext()) {
-                    val next = connIterator.next()
-                    if (connPreLoaded.none { next.isSameChannel(it) }) {
-                        leaveRtcChannel(next)
-                        connIterator.remove()
-                    }
-                }
+        // 非prejoin房间需要退出频道
+        roomStateMap.forEach { room ->
+            if (room.value == RoomStatus.PREJOINED && connPreLoaded.none {room.key.channelId == it.channelId}) {
+                ShowTo1v1Logger.d(tag, "switchRoomState idle1")
+                switchRoomState(RoomStatus.IDLE, room.key, ShowTo1v1Manger.getImpl().generalToken(), null, null)
             }
         }
     }
 
-
     override fun leaveChannel(connection: RtcConnection, force: Boolean): Boolean {
+        connectionsJoined.removeIf { it.channelId == connection.channelId }
         if (force) {
-            Log.d("hugo", "4444")
-            api.switchRoomState(
-                VideoSwitcherAPI.RoomStatus.IDLE, VideoSwitcherAPI.RoomInfo(
-                    connection.channelId,
-                    connection.localUid,
-                    ShowTo1v1Manger.getImpl().generalToken(),
-                    null
-                ), null
-            )
-            return true
+            ShowTo1v1Logger.d(tag, "switchRoomState idle2")
+            switchRoomState(RoomStatus.IDLE, connection, null, null, null)
         } else {
-            Log.d("hugo", "3333")
-            api.switchRoomState(
-                VideoSwitcherAPI.RoomStatus.PREJOINED, VideoSwitcherAPI.RoomInfo(
-                    connection.channelId,
-                    connection.localUid,
-                    ShowTo1v1Manger.getImpl().generalToken(),
-                    null
-                ), null
-            )
-            return true
+            switchRoomState(RoomStatus.PREJOINED, connection, null, null, null)
         }
+        return true
     }
 
     override fun setupRemoteVideo(
         connection: RtcConnection,
         container: VideoSwitcher.VideoCanvasContainer
     ) {
-        api.renderVideo(
-            VideoSwitcherAPI.RoomInfo(
-                connection.channelId,
-                connection.localUid,
-                ShowTo1v1Manger.getImpl().generalToken(),
-                null
-            ), container
-        )
-    }
+        remoteVideoCanvasList.firstOrNull {
+            it.connection.channelId == connection.channelId && it.uid == container.uid && it.renderMode == container.renderMode && it.lifecycleOwner == container.lifecycleOwner
+        }?.let {
+            val videoView = it.view
+            val viewIndex = container.container.indexOfChild(videoView)
+            if (viewIndex == container.viewIndex) {
+                    ShowTo1v1Logger.d("hugo", "setupRemoteVideoEx111")
+                    rtcEngine.setupRemoteVideoEx(
+                        it,
+                        it.connection
+                    )
+                return
+            }
+            it.release()
+        }
 
-    override fun setupLocalVideo(container: VideoSwitcher.VideoCanvasContainer) {
-        localVideoCanvas?.let {
-            if (it.lifecycleOwner == container.lifecycleOwner && it.renderMode == container.renderMode && it.uid == container.uid) {
-                val videoView = it.view
-                val viewIndex = container.container.indexOfChild(videoView)
-                if (viewIndex == container.viewIndex) {
-                    return
-                }
-                (videoView.parent as? ViewGroup)?.removeView(videoView)
-                container.container.addView(videoView, container.viewIndex)
+        var videoView = container.container.getChildAt(container.viewIndex)
+        if (videoView !is TextureView) {
+            ShowTo1v1Logger.d("hugo", "setupRemoteVideoEx2221")
+            videoView = TextureView(container.container.context)
+            container.container.addView(videoView, container.viewIndex)
+        } else {
+            ShowTo1v1Logger.d("hugo", "setupRemoteVideoEx2222")
+            container.container.removeViewInLayout(videoView)
+            videoView = TextureView(container.container.context)
+            container.container.addView(videoView, container.viewIndex)
+        }
+
+        roomStateMap.forEach {
+            if (it.key.isSameChannel(connection)) {
+                val connectionWrap = it.key
+                val remoteVideoCanvasWrap = RemoteVideoCanvasWrap(
+                    connectionWrap,
+                    container.lifecycleOwner,
+                    videoView,
+                    container.renderMode,
+                    container.uid
+                )
+                //if (connectionWrap.rtcEventHandler?.isJoinChannelSuccess == true) {
+
+
+                val ret = rtcEngine.setupRemoteVideoEx(
+                    remoteVideoCanvasWrap,
+                    connectionWrap
+                )
+                ShowTo1v1Logger.d("hugo", "setupRemoteVideoEx222: $ret")
+                //}
                 return
             }
         }
-        var videoView = container.container.getChildAt(container.viewIndex)
-        if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            if (videoView !is SurfaceView) {
-                videoView = SurfaceView(container.container.context)
-                container.container.addView(videoView, container.viewIndex)
-            }
-        } else {
-            if (videoView !is TextureView) {
-                videoView = TextureView(container.container.context)
-                container.container.addView(videoView, container.viewIndex)
-            }
-        }
 
-        val local = LocalVideoCanvasWrap(
+        val connectionWrap = RtcConnectionWrap(connection)
+        val remoteVideoCanvasWrap = RemoteVideoCanvasWrap(
+            connectionWrap,
             container.lifecycleOwner,
-            videoView, container.renderMode, container.uid
+            videoView,
+            container.renderMode,
+            container.uid
         )
-        local.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
-        rtcEngine.setupLocalVideo(local)
+        //if (connectionWrap.rtcEventHandler?.isJoinChannelSuccess == true) {
+        ShowTo1v1Logger.d("hugo", "setupRemoteVideoEx333")
+        rtcEngine.setupRemoteVideoEx(
+            remoteVideoCanvasWrap,
+            connectionWrap
+        )
+        //}
     }
 
     override fun getFirstVideoFrameTime(): Long {
-        return api.getQuickStartTime()
+        return quickStartTime
+    }
+
+    override fun startAudioMixing(
+        connection: RtcConnection,
+        filePath: String,
+        loopbackOnly: Boolean,
+        cycle: Int
+    ) {
+        // 判断connetion是否加入了频道，即connectionsJoined是否包含，不包含则直接返回
+        roomStateMap.forEach {
+            if (it.key.isSameChannel(connection) && it.value == RoomStatus.JOINED) {
+                val connectionWrap = it.key
+                // 播放使用MPK，rtcEngine.createMediaPlayer
+                // 使用一个Map缓存起来key:RtcConnection, value:MediaPlayer
+                // 从缓存里取MediaPlayer，如不存在则重新创建
+                // val mediaPlayer = rtcEngine.createMediaPlayer()
+                val mediaPlayer = connectionWrap.audioMixingPlayer ?: rtcEngine.createMediaPlayer().apply {
+                    registerPlayerObserver(object : IMediaPlayerObserver {
+                        override fun onPlayerStateChanged(
+                            state: io.agora.mediaplayer.Constants.MediaPlayerState?,
+                            error: io.agora.mediaplayer.Constants.MediaPlayerError?
+                        ) {
+                            if(error == io.agora.mediaplayer.Constants.MediaPlayerError.PLAYER_ERROR_NONE){
+                                if(state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED){
+                                    play()
+                                }
+                            }
+                        }
+
+                        override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
+
+                        }
+
+                        override fun onPlayerEvent(
+                            eventCode: io.agora.mediaplayer.Constants.MediaPlayerEvent?,
+                            elapsedTime: Long,
+                            message: String?
+                        ) {
+
+                        }
+
+                        override fun onMetaData(
+                            type: io.agora.mediaplayer.Constants.MediaPlayerMetadataType?,
+                            data: ByteArray?
+                        ) {
+
+                        }
+
+                        override fun onPlayBufferUpdated(playCachedBuffer: Long) {
+
+                        }
+
+                        override fun onPreloadEvent(
+                            src: String?,
+                            event: io.agora.mediaplayer.Constants.MediaPlayerPreloadEvent?
+                        ) {
+
+                        }
+
+                        override fun onAgoraCDNTokenWillExpire() {
+
+                        }
+
+                        override fun onPlayerSrcInfoChanged(from: SrcInfo?, to: SrcInfo?) {
+
+                        }
+
+                        override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {
+
+                        }
+
+                        override fun onAudioVolumeIndication(volume: Int) {
+
+                        }
+                    })
+                }
+                connectionWrap.audioMixingPlayer = mediaPlayer
+                mediaPlayer.stop()
+                mediaPlayer.open(filePath, 0)
+                mediaPlayer.setLoopCount(if (cycle >= 0) 0 else Int.MAX_VALUE)
+
+                // 开始推流，使用updateChannelMediaOptionEx
+                // 使用一个Map缓存ChannelMediaOptions--key:RtcConnection, value:ChannelMediaOptions
+                // val channelMediaOptions = ChannelMediaOptions()
+                // channelMediaOptions.publishMediaPlayerId = mediaPlayer.getId()
+                // channelMediaOptions.publishMediaPlayerAudioTrack = true
+                // rtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, connection)
+                if(!loopbackOnly){
+                    val mediaOptions = connectionWrap.mediaOptions
+                    mediaOptions.publishMediaPlayerId = mediaPlayer.mediaPlayerId
+                    // TODO: 没开启麦克风权限情况下，publishMediaPlayerAudioTrack = true 会自动停止音频播放
+                    mediaOptions.publishMediaPlayerAudioTrack = true
+                    rtcEngine.updateChannelMediaOptionsEx(mediaOptions, connectionWrap)
+                }
+            }
+        }
+    }
+
+    override fun stopAudioMixing(connection: RtcConnection) {
+        // 判断connetion是否加入了频道，即connectionsJoined是否包含，不包含则直接返回
+        roomStateMap.forEach {
+            if (it.key.isSameChannel(connection) && it.value == RoomStatus.JOINED) {
+                val connectionWrap =
+                    it.key
+
+                // 停止播放，拿到connection对应的MediaPlayer并停止释放
+                connectionWrap.audioMixingPlayer?.stop()
+
+                // 停止推流，使用updateChannelMediaOptionEx
+                val mediaOptions = connectionWrap.mediaOptions
+                if (mediaOptions.isPublishMediaPlayerAudioTrack) {
+                    mediaOptions.publishMediaPlayerAudioTrack = false
+                    rtcEngine.updateChannelMediaOptionsEx(mediaOptions, connectionWrap)
+                }
+            }
+        }
+    }
+
+    override fun adjustAudioMixingVolume(connection: RtcConnection, volume: Int) {
+        roomStateMap.forEach {
+            if (it.key.isSameChannel(connection) && it.value == RoomStatus.JOINED) {
+                val connectionWrap =
+                    it.key
+                connectionWrap.audioMixingPlayer?.adjustPlayoutVolume(volume)
+                connectionWrap.audioMixingPlayer?.adjustPublishSignalVolume(volume)
+            }
+        }
+    }
+
+    private fun switchRoomState(
+        newState: RoomStatus,
+        connection: RtcConnection,
+        token: String?,
+        eventListener: VideoSwitcher.IChannelEventListener?,
+        mediaOptions: ChannelMediaOptions?) {
+        ShowTo1v1Logger.d(tag, "switchRoomState, newState: $newState, connection: $connection, roomStateMap: $roomStateMap")
+        // roomStateMap 无当前房间记录
+        if (roomStateMap.none {it.key.isSameChannel(connection)}) {
+            val rtcConnectionWrap = RtcConnectionWrap(connection)
+            val eventHandler = RtcEngineEventHandlerImpl(SystemClock.elapsedRealtime(), connection)
+            eventHandler.setEventListener(eventListener)
+            rtcConnectionWrap.rtcEventHandler = eventHandler
+            if (newState == RoomStatus.PREJOINED) {
+                // 加入频道但不收流
+                val options = mediaOptions ?: ChannelMediaOptions().apply {
+                    clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+                    audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+                    autoSubscribeVideo = false
+                    autoSubscribeAudio = false
+                }
+                val ret = rtcEngine.joinChannelEx(token, connection, options, rtcConnectionWrap.rtcEventHandler)
+                ShowTo1v1Logger.d(tag, "joinChannelEx2, connection:$connection, ret:$ret")
+            } else if (newState == RoomStatus.JOINED) {
+                // 加入频道且收流
+                val options = mediaOptions ?: ChannelMediaOptions().apply {
+                    // 加入频道且收流
+                    autoSubscribeVideo = true
+                    autoSubscribeAudio = true
+                }
+                val ret = rtcEngine.joinChannelEx(token, connection, options, rtcConnectionWrap.rtcEventHandler)
+                ShowTo1v1Logger.d(tag, "joinChannelEx3, connection:$connection, ret:$ret")
+            }
+            roomStateMap[RtcConnectionWrap(connection)] = newState
+            return
+        }
+
+        roomStateMap.forEach {
+            if (it.key.isSameChannel(connection)) {
+                val oldState = it.value
+                if (oldState == newState) {
+                    if (eventListener != null) {
+                        it.key.rtcEventHandler?.subscribeMediaTime = SystemClock.elapsedRealtime()
+                        it.key.rtcEventHandler?.setEventListener(eventListener)
+                    }
+                    ShowTo1v1Logger.d(tag, "switchRoomState is already this state")
+                    return
+                }
+                roomStateMap[it.key] = newState
+                when {
+                    oldState == RoomStatus.IDLE && newState == RoomStatus.PREJOINED -> {
+                        // 加入频道但不收流
+                        val eventHandler = RtcEngineEventHandlerImpl(SystemClock.elapsedRealtime(), connection)
+                        eventHandler.setEventListener(eventListener)
+                        it.key.rtcEventHandler = eventHandler
+
+                        val options = mediaOptions ?: ChannelMediaOptions().apply {
+                            clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+                            audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+                            autoSubscribeVideo = false
+                            autoSubscribeAudio = false
+                        }
+                        val ret = rtcEngine.joinChannelEx(token, connection, options, it.key.rtcEventHandler)
+                        ShowTo1v1Logger.d(tag, "joinChannelEx0, connection:$connection, ret:$ret")
+                    }
+                    oldState == RoomStatus.PREJOINED && newState == RoomStatus.JOINED -> {
+                        // 保持在频道内, 收流
+                        it.key.rtcEventHandler?.subscribeMediaTime = SystemClock.elapsedRealtime()
+                        it.key.rtcEventHandler?.setEventListener(eventListener)
+                        val options = mediaOptions ?: ChannelMediaOptions().apply {
+                            clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+                            audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+                            autoSubscribeVideo = true
+                            autoSubscribeAudio = true
+                        }
+                        val ret = rtcEngine.updateChannelMediaOptionsEx(options, connection)
+                        if (ret == -8) {
+                            needSubscribe = true
+                            needSubscribeConnection = connection
+                        }
+                        ShowTo1v1Logger.d(tag, "updateChannelMediaOptionsEx, connection:$connection, ret:$ret")
+                    }
+                    oldState == RoomStatus.JOINED && newState == RoomStatus.PREJOINED -> {
+                        // 保持在频道内，不收流
+                        val options = mediaOptions ?: ChannelMediaOptions().apply {
+                            clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+                            audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+                            autoSubscribeVideo = false
+                            autoSubscribeAudio = false
+                        }
+                        val ret = rtcEngine.updateChannelMediaOptionsEx(options, connection)
+                        it.key.audioMixingPlayer?.stop()
+                        ShowTo1v1Logger.d(tag, "updateChannelMediaOptionsEx, connection:$connection, ret:$ret")
+                    }
+                    oldState == RoomStatus.IDLE && newState == RoomStatus.JOINED -> {
+                        // 加入频道，且收流
+                        val eventHandler = RtcEngineEventHandlerImpl(SystemClock.elapsedRealtime(), connection)
+                        eventHandler.setEventListener(eventListener)
+                        it.key.rtcEventHandler = eventHandler
+
+                        val options = mediaOptions ?: ChannelMediaOptions().apply {
+                            autoSubscribeVideo = true
+                            autoSubscribeAudio = true
+                        }
+                        // TODO eventHandler
+                        val ret = rtcEngine.joinChannelEx(token, connection, options, eventHandler)
+                        ShowTo1v1Logger.d(tag, "joinChannelEx1, connection:$connection, ret:$ret")
+                    }
+                    newState == RoomStatus.IDLE -> {
+                        // 退出频道
+                        leaveRtcChannel(it.key)
+                    }
+                }
+                return
+            }
+        }
+    }
+
+    private fun getRoomState(channelName: String, uid: Int): RoomStatus? {
+        roomStateMap.forEach {
+            if (it.key.isSameChannel(RtcConnection(channelName, uid))) {
+                return it.value
+            }
+        }
+        return null
     }
 
     private fun leaveRtcChannel(connection: RtcConnectionWrap) {
-        val options = LeaveChannelOptions()
-        options.stopAllEffect = false
-        options.stopAudioMixing = false
-        options.stopMicrophoneRecording = false
         val ret = rtcEngine.leaveChannelEx(connection)
-        Log.d(
+        ShowTo1v1Logger.d(
             tag,
             "leaveChannel ret : connection=$connection, code=$ret, message=${RtcEngine.getErrorDescription(ret)}"
         )
@@ -272,139 +509,6 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
         remoteVideoCanvasList.filter { it.connection.isSameChannel(connection) }.forEach { it.release() }
     }
 
-    override fun startAudioMixing(
-        connection: RtcConnection,
-        filePath: String,
-        loopbackOnly: Boolean,
-        cycle: Int
-    ) {
-        api.startAudioMixing(connection, filePath, loopbackOnly, cycle)
-    }
-
-    override fun stopAudioMixing(connection: RtcConnection) {
-        api.stopAudioMixing(connection)
-    }
-
-    override fun adjustAudioMixingVolume(connection: RtcConnection, volume: Int) {
-        api.adjustAudioMixingVolume(connection, volume)
-    }
-
-    private fun joinRtcChannel(
-        connection: RtcConnectionWrap,
-        eventListener: VideoSwitcherAPI.IChannelEventListener? = null
-    ) {
-        val joinChannelTime = SystemClock.elapsedRealtime()
-        Log.d(tag, "joinChannelEx start : channelId=${connection.channelId}, uid=${connection.localUid}")
-        val generalToken = ShowTo1v1Manger.getImpl().generalToken()
-        if (generalToken.isNotEmpty()) {
-            val eventHandler = RtcEngineEventHandlerImpl(joinChannelTime, connection)
-            eventHandler.setEventListener(eventListener)
-            connection.rtcEventHandler = eventHandler
-            val ret = rtcEngine.joinChannelEx(generalToken, connection, connection.mediaOptions, eventHandler)
-            Log.d(tag, "joinChannelEx ret:channel=${connection.channelId} uid=${connection.localUid} code=$ret")
-        } else {
-            TokenGenerator.generateToken("", connection.localUid.toString(),
-                TokenGenerator.TokenGeneratorType.token007,
-                TokenGenerator.AgoraTokenType.rtc,
-                success = {
-                    Log.d(
-                        tag,
-                        "joinChannelEx generate token : channel ${connection.channelId} uid=${connection.localUid} token success cost " +
-                                "time : ${SystemClock.elapsedRealtime() - joinChannelTime} ms"
-                    )
-                    ShowTo1v1Manger.getImpl().setupGeneralToken(it)
-                    val eventHandler = RtcEngineEventHandlerImpl(joinChannelTime, connection)
-                    eventHandler.setEventListener(eventListener)
-                    connection.rtcEventHandler = eventHandler
-                    val ret = rtcEngine.joinChannelEx(it, connection, connection.mediaOptions, eventHandler)
-                    Log.d(tag, "joinChannelEx ret : channel=${connection.channelId} code=$ret")
-                },
-                failure = {
-                    Log.e(tag, "joinChannelEx generate token failed $it")
-                    ToastUtils.showToast(it!!.message)
-                    eventListener?.onTokenGenerateFailedException?.invoke(it)
-                })
-        }
-    }
-
-    inner class LocalVideoCanvasWrap constructor(
-        val lifecycleOwner: LifecycleOwner,
-        view: View,
-        renderMode: Int,
-        uid: Int
-    ) : DefaultLifecycleObserver, VideoCanvas(view, renderMode, uid) {
-
-        init {
-            lifecycleOwner.lifecycle.addObserver(this)
-            if (localVideoCanvas != this) {
-                localVideoCanvas?.release()
-                localVideoCanvas = this
-            }
-        }
-
-        override fun onDestroy(owner: LifecycleOwner) {
-            super.onDestroy(owner)
-            if (lifecycleOwner == owner) {
-                release()
-            }
-        }
-
-        fun release() {
-            lifecycleOwner.lifecycle.removeObserver(this)
-            view = null
-            rtcEngine.setupLocalVideo(this)
-            localVideoCanvas = null
-        }
-
-    }
-
-    inner class RtcConnectionWrap constructor(connection: RtcConnection) :
-        RtcConnection(connection.channelId, connection.localUid) {
-
-        var mediaOptions = ChannelMediaOptions()
-        var rtcEventHandler: RtcEngineEventHandlerImpl? = null
-        var audioMixingPlayer: IMediaPlayer? = null
-
-        fun isSameChannel(connection: RtcConnection?) =
-            connection != null && channelId == connection.channelId && localUid == connection.localUid
-
-
-        override fun toString(): String {
-            return "{channelId=$channelId, localUid=$localUid, mediaOptions=$mediaOptions, rtcEnventHandler=$rtcEventHandler, audioMixingPlayer=$audioMixingPlayer}"
-        }
-
-    }
-
-    inner class RemoteVideoCanvasWrap constructor(
-        val connection: RtcConnectionWrap,
-        val lifecycleOwner: LifecycleOwner,
-        view: View,
-        renderMode: Int,
-        uid: Int
-    ) : DefaultLifecycleObserver, VideoCanvas(view, renderMode, uid) {
-
-        init {
-            lifecycleOwner.lifecycle.addObserver(this)
-            remoteVideoCanvasList.add(this)
-        }
-
-        override fun onDestroy(owner: LifecycleOwner) {
-            super.onDestroy(owner)
-            if (lifecycleOwner == owner) {
-                release()
-            }
-        }
-
-        fun release() {
-            lifecycleOwner.lifecycle.removeObserver(this)
-            view = null
-            rtcEngine.setupRemoteVideoEx(this, connection)
-            remoteVideoCanvasList.remove(this)
-        }
-
-    }
-
-
     inner class RtcEngineEventHandlerImpl constructor(
         private val joinChannelTime: Long,
         private val connection: RtcConnection,
@@ -412,10 +516,10 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
 
         private var firstRemoteUid: Int = 0
         var isJoinChannelSuccess = false
-        private var eventListener: VideoSwitcherAPI.IChannelEventListener? = null
+        private var eventListener: VideoSwitcher.IChannelEventListener? = null
         var subscribeMediaTime: Long = joinChannelTime
 
-        fun setEventListener(listener: VideoSwitcherAPI.IChannelEventListener?) {
+        fun setEventListener(listener: VideoSwitcher.IChannelEventListener?) {
             eventListener = listener
             if (isJoinChannelSuccess) {
                 eventListener?.onChannelJoined?.invoke(connection)
@@ -427,8 +531,11 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
 
         override fun onError(err: Int) {
             super.onError(err)
-            Log.e(
-                tag, "channel ${connection.channelId} error : code=$err, message=${RtcEngine.getErrorDescription(err)}"
+            ShowTo1v1Logger.e(
+                tag,
+                message = "channel ${connection.channelId} error : code=$err, message=${
+                    RtcEngine.getErrorDescription(err)
+                }"
             )
         }
 
@@ -438,14 +545,25 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
             elapsed: Int
         ) {
             super.onJoinChannelSuccess(channel, uid, elapsed)
-            isJoinChannelSuccess = true
-            eventListener?.onChannelJoined?.invoke(connection)
-            remoteVideoCanvasList.filter { canvas -> canvas.connection.isSameChannel(connection) }.forEach {
+            ShowTo1v1Logger.d(tag, "onJoinChannelSuccess, needSubscribe:$needSubscribe, needSubscribeConnection:$needSubscribeConnection")
+            if (needSubscribe && needSubscribeConnection!= null && channel == needSubscribeConnection?.channelId) {
+                needSubscribe = false
+                needSubscribeConnection = null
                 runOnUiThread {
-                    rtcEngine.setupRemoteVideoEx(it, connection)
+                    val options = ChannelMediaOptions()
+                    options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+                    options.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+                    options.autoSubscribeVideo = true
+                    options.autoSubscribeAudio = true
+                    val ret = rtcEngine.updateChannelMediaOptionsEx(options, needSubscribeConnection)
+                    ShowTo1v1Logger.d(tag, "updateChannelMediaOptionsEx2, channel:$channel, ret:$ret")
                 }
             }
-            Log.d(
+
+
+            isJoinChannelSuccess = true
+            eventListener?.onChannelJoined?.invoke(connection)
+            ShowTo1v1Logger.d(
                 tag,
                 "join channel $channel success cost time : ${SystemClock.elapsedRealtime() - joinChannelTime} ms"
             )
@@ -453,7 +571,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
 
         override fun onLeaveChannel(stats: RtcStats?) {
             super.onLeaveChannel(stats)
-            Log.d(
+            ShowTo1v1Logger.d(
                 tag,
                 "leave channel ${connection.channelId} success"
             )
@@ -467,10 +585,11 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
             elapsed: Int
         ) {
             super.onFirstRemoteVideoFrame(uid, width, height, elapsed)
-            Log.d(
+            ShowTo1v1Logger.d(
                 tag,
                 "$uid first remote video frame cost time : ${SystemClock.elapsedRealtime() - joinChannelTime} ms"
             )
+            eventListener?.onFirstRemoteVideoFrame?.invoke(uid, width, height, elapsed)
         }
 
         override fun onFirstLocalVideoFrame(
@@ -480,12 +599,11 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
             elapsed: Int
         ) {
             super.onFirstLocalVideoFrame(source, width, height, elapsed)
-            Log.d(
+            ShowTo1v1Logger.d(
                 tag,
                 "$source first local video frame cost time : ${SystemClock.elapsedRealtime() - joinChannelTime} ms"
             )
         }
-
 
         override fun onUserJoined(uid: Int, elapsed: Int) {
             super.onUserJoined(uid, elapsed)
@@ -520,7 +638,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
                 val durationFromSubscribe = SystemClock.elapsedRealtime() - subscribeMediaTime
                 val durationFromJoiningRoom = SystemClock.elapsedRealtime() - joinChannelTime
                 quickStartTime = durationFromSubscribe
-                Log.d(
+                ShowTo1v1Logger.d(
                     tag,
                     "video cost time : channel=${connection.channelId}, uid=$uid, durationFromJoiningRoom=$durationFromJoiningRoom, durationFromSubscribe=$durationFromSubscribe "
                 )
@@ -540,6 +658,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
         ) {
             super.onLocalVideoStats(source, stats)
             stats ?: return
+            //ShowTo1v1Logger.d(tag, "onLocalVideoStats, dualStreamEnabled:${stats.dualStreamEnabled}, captureFrameWidth:${stats.captureFrameWidth}, captureFrameHeight:${stats.captureFrameHeight}, codecType:${stats.codecType}, hwEncoderAccelerating:${stats.hwEncoderAccelerating}")
             eventListener?.onLocalVideoStats?.invoke(stats)
         }
 
@@ -580,6 +699,49 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
 
     }
 
+    inner class RtcConnectionWrap constructor(connection: RtcConnection) :
+        RtcConnection(connection.channelId, connection.localUid) {
+
+        var mediaOptions = ChannelMediaOptions()
+        var rtcEventHandler: RtcEngineEventHandlerImpl? = null
+        var audioMixingPlayer : IMediaPlayer? = null
+
+        fun isSameChannel(connection: RtcConnection?) =
+            connection != null && channelId == connection.channelId && localUid == connection.localUid
+
+        override fun toString(): String {
+            return "{channelId=$channelId, localUid=$localUid"
+        }
+    }
+
+    inner class RemoteVideoCanvasWrap constructor(
+        val connection: RtcConnectionWrap,
+        val lifecycleOwner: LifecycleOwner,
+        view: View,
+        renderMode: Int,
+        uid: Int
+    ) : DefaultLifecycleObserver, VideoCanvas(view, renderMode, uid) {
+
+        init {
+            lifecycleOwner.lifecycle.addObserver(this)
+            remoteVideoCanvasList.add(this)
+        }
+
+        override fun onDestroy(owner: LifecycleOwner) {
+            super.onDestroy(owner)
+            if (lifecycleOwner == owner) {
+                release()
+            }
+        }
+
+        fun release() {
+            lifecycleOwner.lifecycle.removeObserver(this)
+            view = null
+            rtcEngine.setupRemoteVideoEx(this, connection)
+            remoteVideoCanvasList.remove(this)
+        }
+    }
+
     private fun runOnUiThread(run: () -> Unit) {
         if (Thread.currentThread() == mainHandler.looper.thread) {
             run.invoke()
@@ -587,5 +749,4 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx, private 
             mainHandler.post(run)
         }
     }
-
 }

@@ -4,12 +4,50 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
+import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
+import io.agora.rtc2.RtcEngineEx
+import io.agora.scene.show.videoSwitcherAPI.VideoSwitcherImpl
 
 /**
  *
  */
 interface VideoSwitcher {
+
+    companion object {
+        private var rtcEngine: RtcEngineEx? = null
+        private var instance: VideoSwitcher? = null
+
+        fun getImplInstance(engine: RtcEngineEx): VideoSwitcher {
+            rtcEngine = engine
+            if (instance == null) {
+                instance = VideoSwitcherImpl(rtcEngine!!)
+            }
+            return instance as VideoSwitcher
+        }
+
+        fun release() {
+            instance = null
+        }
+    }
+
+    data class IChannelEventListener(
+        var onTokenGenerateFailedException: ((error: Throwable)->Unit)? = null,
+        var onChannelJoined: ((connection: RtcConnection)->Unit)? = null,
+        var onUserJoined: ((uid: Int) -> Unit)? = null,
+        var onUserOffline: ((uid: Int) -> Unit)? = null,
+        var onLocalVideoStateChanged: ((state: Int) -> Unit)? = null,
+        var onRemoteVideoStateChanged: ((uid: Int, state: Int) -> Unit)? = null,
+        var onRtcStats: ((stats: IRtcEngineEventHandler.RtcStats) -> Unit)? = null,
+        var onLocalVideoStats: ((stats: IRtcEngineEventHandler.LocalVideoStats) -> Unit)? = null,
+        var onRemoteVideoStats: ((stats: IRtcEngineEventHandler.RemoteVideoStats) -> Unit)? = null,
+        var onLocalAudioStats: ((stats: IRtcEngineEventHandler.LocalAudioStats) -> Unit)? = null,
+        var onRemoteAudioStats: ((stats: IRtcEngineEventHandler.RemoteAudioStats) -> Unit)? = null,
+        var onUplinkNetworkInfoUpdated: ((info: IRtcEngineEventHandler.UplinkNetworkInfo) -> Unit)? = null,
+        var onDownlinkNetworkInfoUpdated: ((info: IRtcEngineEventHandler.DownlinkNetworkInfo) -> Unit)? = null,
+        var onContentInspectResult: ((result: Int) -> Unit)? = null,
+        var onFirstRemoteVideoFrame: ((uid: Int, width: Int, height: Int, elapsed: Int)->Unit)? = null,
+    )
 
     data class VideoCanvasContainer(
         val lifecycleOwner: LifecycleOwner,
@@ -40,7 +78,8 @@ interface VideoSwitcher {
     fun preJoinChannel(
         connection: RtcConnection,
         mediaOptions: ChannelMediaOptions,
-        eventListener: VideoSwitcherAPI.IChannelEventListener?
+        token: String?,
+        eventListener: IChannelEventListener?
     )
 
     /**
@@ -49,16 +88,18 @@ interface VideoSwitcher {
     fun joinChannel(
         connection: RtcConnection,
         mediaOptions: ChannelMediaOptions,
-        eventListener: VideoSwitcherAPI.IChannelEventListener?
+        token: String?,
+        eventListener: IChannelEventListener?,
+        needPreJoin: Boolean?
     )
 
-    fun setChannelEvent(channelName: String, uid: Int, eventHandler: VideoSwitcherAPI.IChannelEventListener?)
+    fun setChannelEvent(channelName: String, uid: Int, eventHandler: IChannelEventListener?)
 
     /**
      * 离开频道，如果在已预加载的频道则只取消订阅音视频流
      * @param force 强制离开
      */
-    fun leaveChannel(connection: RtcConnection,force: Boolean): Boolean
+    fun leaveChannel(connection: RtcConnection, force: Boolean): Boolean
 
     /**
      * 渲染远端视频，相比于RtcEngineEx.setupRemoteVideoEx，这里会缓存渲染视图，减少渲染时不断重复创建渲染视图，提高渲染速度
@@ -66,10 +107,8 @@ interface VideoSwitcher {
     fun setupRemoteVideo(connection: RtcConnection, container: VideoCanvasContainer)
 
     /**
-     * 渲染本地视频，相比于RtcEngineEx.setupLocalVideo，这里会缓存渲染视图，减少渲染时不断重复创建渲染视图，提高渲染速度
+     * 获取秒开耗时
      */
-    fun setupLocalVideo(container: VideoCanvasContainer)
-
     fun getFirstVideoFrameTime(): Long
 
     /**

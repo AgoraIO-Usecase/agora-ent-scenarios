@@ -44,7 +44,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     RoomListFragment.OnClickCallingListener {
 
     companion object {
-        private const val TAG = "ShowTo1v1_ListActivity"
+        private const val TAG = "ShowTo1v1_List"
         private const val kRoomListSwipeGuide = "showTo1v1_SwipeGuide"
 
         private const val POSITION_NONE = -1
@@ -96,7 +96,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     override fun onRestart() {
         super.onRestart()
         Log.d(TAG, "onRestart")
-        mVpFragments[mCurrLoadPosition]?.onReloadPage()
+        mVpFragments[mCurrLoadPosition]?.onResumePage()
     }
 
     private var guided = SPUtil.getBoolean(kRoomListSwipeGuide, false)
@@ -144,9 +144,9 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     return RoomListFragment.newInstance(roomInfo).also {
                         Log.d(TAG, "createFragment position:$position")
                         mVpFragments.put(position, it)
-                        if (position == binding.viewPager2.currentItem) {
-                            it.startLoadPageSafely(true)
-                        }
+//                        if (position == binding.viewPager2.currentItem) {
+//                            it.startLoadPageSafely()
+//                        }
                     }
                 }
             }
@@ -165,23 +165,19 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         private var lastOffset = 0f
         private var scrollStatus: Int = ViewPager2.SCROLL_STATE_IDLE
 
-        private var hasPageSelected = false
-
         override fun onPageScrollStateChanged(state: Int) {
             super.onPageScrollStateChanged(state)
-            Log.d(TAG, "PageChange onPageScrollStateChanged state=$state hasPageSelected=$hasPageSelected")
+            Log.d(TAG, "PageChange onPageScrollStateChanged state=$state")
             when (state) {
                 ViewPager2.SCROLL_STATE_SETTLING -> binding.viewPager2.isUserInputEnabled = false
                 ViewPager2.SCROLL_STATE_IDLE -> {
                     binding.viewPager2.isUserInputEnabled = true
-                    if (!hasPageSelected) {
-                        if (preLoadPosition != POSITION_NONE) {
-                            mVpFragments[preLoadPosition]?.stopLoadPage(true)
-                        }
-                        preLoadPosition = POSITION_NONE
-                        lastOffset = 0f
+                    if (preLoadPosition != POSITION_NONE) {
+                        mVpFragments[preLoadPosition]?.stopLoadPage(true)
                     }
-                    hasPageSelected = false
+                    mVpFragments[mCurrLoadPosition]?.onReloadPage()
+                    preLoadPosition = POSITION_NONE
+                    lastOffset = 0f
                 }
 
                 else -> {
@@ -193,7 +189,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
             super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-//            Log.d(TAG, "PageChange onPageScrolled positionOffset=$positionOffset")
+//            Log.d(TAG, "PageChange onPageScrolled positionOffset=$positionOffset, scrollStatus=$scrollStatus, preLoadPosition=$preLoadPosition")
             if (scrollStatus == ViewPager2.SCROLL_STATE_DRAGGING) {
                 if (lastOffset > 0f) {
                     val isMoveUp = (positionOffset - lastOffset) > 0
@@ -215,22 +211,26 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 TAG,
                 "PageChange onPageSelected position=$position, currLoadPosition=$mCurrLoadPosition, preLoadPosition=$preLoadPosition"
             )
-            if (mCurrLoadPosition != POSITION_NONE) {
-                if (preLoadPosition != POSITION_NONE) {
-                    if (position == preLoadPosition) {
+            if (position==0){
+                mVpFragments[position]?.startLoadPageSafely()
+            }else{
+                if (mCurrLoadPosition != POSITION_NONE) {
+                    if (preLoadPosition != POSITION_NONE) {
+                        if (position == preLoadPosition) {
+                            mVpFragments[mCurrLoadPosition]?.stopLoadPage(true)
+                        } else {
+                            mVpFragments[preLoadPosition]?.stopLoadPage(true)
+                            mVpFragments[mCurrLoadPosition]?.onReloadPage()
+                        }
+                    } else if (mCurrLoadPosition != position) {
                         mVpFragments[mCurrLoadPosition]?.stopLoadPage(true)
-                    } else {
-                        mVpFragments[preLoadPosition]?.stopLoadPage(true)
+                        mVpFragments[position]?.startLoadPageSafely()
                     }
-                } else if (mCurrLoadPosition != position) {
-                    mVpFragments[mCurrLoadPosition]?.stopLoadPage(true)
-                    mVpFragments[position]?.startLoadPageSafely()
                 }
             }
             mCurrLoadPosition = position
             preLoadPosition = POSITION_NONE
             lastOffset = 0f
-            hasPageSelected = true
         }
     }
 

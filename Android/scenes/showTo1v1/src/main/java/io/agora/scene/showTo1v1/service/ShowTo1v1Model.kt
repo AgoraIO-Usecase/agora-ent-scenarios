@@ -2,7 +2,6 @@ package io.agora.scene.showTo1v1.service
 
 import android.os.Parcel
 import android.os.Parcelable
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPI
 
 open class ShowTo1v1UserInfo constructor(
     val userId: String,
@@ -107,15 +106,5 @@ class ShowTo1v1RoomInfo constructor(
         override fun newArray(size: Int): Array<ShowTo1v1RoomInfo?> {
             return arrayOfNulls(size)
         }
-    }
-
-    fun createRoomInfo(token: String, channelEventListener: VideoSwitcherAPI.IChannelEventListener)
-            : VideoSwitcherAPI.RoomInfo {
-        return VideoSwitcherAPI.RoomInfo(
-            channelName = roomId,
-            uid = getIntUserId(),
-            token = token,
-            eventHandler = channelEventListener
-        )
     }
 }

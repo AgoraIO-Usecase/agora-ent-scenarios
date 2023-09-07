@@ -1,7 +1,6 @@
 package io.agora.scene.showTo1v1.ui.fragment
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,14 +18,13 @@ import io.agora.scene.base.GlideApp
 import io.agora.scene.base.GlideOptions
 import io.agora.scene.base.component.BaseBindingFragment
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 import io.agora.scene.showTo1v1.ui.RoomListActivity
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPI
 import io.agora.scene.widget.utils.BlurTransformation
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 
@@ -34,7 +32,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     companion object {
 
-        private const val TAG = "ShowTo1v1_ListFragment"
+        private const val TAG = "ShowTo1v1_List"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
         fun newInstance(romInfo: ShowTo1v1RoomInfo) = RoomListFragment().apply {
@@ -52,7 +50,6 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     private val mRoomInfo by lazy { (arguments?.getParcelable(EXTRA_ROOM_DETAIL_INFO) as? ShowTo1v1RoomInfo)!! }
 
     private var isPageLoaded = false
-    private var mIsForce = false
 
     private val mMainRtcConnection by lazy {
         RtcConnection(mRoomInfo.roomId, UserManager.getInstance().user.id.toInt())
@@ -68,8 +65,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         super.onAttach(context)
         onClickCallingListener = activity as? RoomListActivity
         if (isPageLoaded) {
-            startLoadPage(mIsForce)
-            mIsForce = false
+            startLoadPage(false)
         }
     }
 
@@ -86,13 +82,6 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     override fun initView() {
         super.initView()
-        // setupRemoteVideo
-        activity?.let {
-            mRtcVideoSwitcher.setupRemoteVideo(
-                mMainRtcConnection,
-                VideoSwitcher.VideoCanvasContainer(it, binding.layoutVideoContainer, mRoomInfo.userId.toInt())
-            )
-        }
         binding.tvUserName.text = mRoomInfo.userName
         binding.tvRoomName.text = mRoomInfo.roomName
         context?.let { context ->
@@ -131,17 +120,27 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         activity?.finish()
     }
 
-    fun startLoadPageSafely(force: Boolean = false) {
+    fun startLoadPageSafely() {
         Log.d(TAG, "Fragment PageLoad startLoadPageSafely, roomId=${mRoomInfo.roomId}")
-        mIsForce = force
         isPageLoaded = true
         activity ?: return
         startLoadPage(true)
     }
 
     fun onReloadPage() {
-        Log.d(TAG, "onActivityRestart, roomId=${mRoomInfo.roomId}")
-        startLoadPage(false)
+        Log.d(TAG, "onReloadPage, roomId=${mRoomInfo.roomId}")
+//        startLoadPage(false)
+    }
+
+    fun onResumePage() {
+        Log.d(TAG, "onResumePage, roomId=${mRoomInfo.roomId}")
+
+        activity?.let {
+            mRtcVideoSwitcher.setupRemoteVideo(
+                mMainRtcConnection,
+                VideoSwitcher.VideoCanvasContainer(it, binding.layoutVideoContainer, mRoomInfo.userId.toInt())
+            )
+        }
     }
 
     private fun startLoadPage(isScrolling: Boolean) {
@@ -149,7 +148,17 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         isPageLoaded = true
 
         initRtcEngine(isScrolling)
+
+
+        // setupRemoteVideo
+        activity?.let {
+            mRtcVideoSwitcher.setupRemoteVideo(
+                mMainRtcConnection,
+                VideoSwitcher.VideoCanvasContainer(it, binding.layoutVideoContainer, mRoomInfo.userId.toInt())
+            )
+        }
     }
+
 
     fun stopLoadPage(isScrolling: Boolean) {
         Log.d(TAG, "Fragment PageLoad stop load, roomId=${mRoomInfo.roomId}")
@@ -164,7 +173,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     //================== RTC Operation ===================
 
-    private val eventListener = VideoSwitcherAPI.IChannelEventListener(
+    private val eventListener = VideoSwitcher.IChannelEventListener(
         onChannelJoined = {
             // 静音
             val options = ChannelMediaOptions()
@@ -185,7 +194,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         }
     }
 
-    private fun joinChannel(eventListener: VideoSwitcherAPI.IChannelEventListener) {
+    private fun joinChannel(eventListener: VideoSwitcher.IChannelEventListener) {
         val rtcConnection = mMainRtcConnection
         if (mRtcEngine.queryDeviceScore() < 75) {
             // 低端机观众加入频道前默认开启硬解（解决看高分辨率卡顿问题），但是在410分支硬解码会带来200ms的秒开耗时增加
@@ -205,7 +214,10 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         channelMediaOptions.publishMicrophoneTrack = false
         // 如果是观众 把 ChannelMediaOptions 的 audienceLatencyLevel 设置为 AUDIENCE_LATENCY_LEVEL_LOW_LATENCY（超低延时）
         channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
-        mRtcVideoSwitcher.joinChannel(rtcConnection, channelMediaOptions, eventListener)
+        mRtcVideoSwitcher.joinChannel(
+            rtcConnection, channelMediaOptions, mShowTo1v1Manger.generalToken(),
+            eventListener, true
+        )
     }
 
     interface OnClickCallingListener {

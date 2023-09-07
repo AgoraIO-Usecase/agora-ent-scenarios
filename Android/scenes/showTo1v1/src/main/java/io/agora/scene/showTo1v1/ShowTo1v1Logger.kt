@@ -1,5 +1,6 @@
 package io.agora.scene.showTo1v1
 
+import android.util.Log
 import io.agora.scene.base.EntLogger
 
 object ShowTo1v1Logger {
@@ -8,15 +9,15 @@ object ShowTo1v1Logger {
 
     @JvmStatic
     fun d(tag: String, message: String) {
-        entLogger.d(tag, message)
+        Log.d(tag, message)
     }
 
     @JvmStatic
     fun e(tag: String, throwable: Throwable? = null, message: String = "") {
         if (throwable != null) {
-            entLogger.e(tag, throwable, message)
+            Log.e(tag, message)
         } else {
-            entLogger.e(tag, message)
+            Log.e(tag, message)
         }
     }
 

@@ -23,11 +23,19 @@
         app:layout_constraintTop_toBottomOf="@+id/layoutTop" />
 
     <LinearLayout
-        android:id="@+id/llContainer"
+        android:id="@+id/llVideoContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical" />
 
+    <LinearLayout
+        android:id="@+id/llCallContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"/>
+
+<!--    头部-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTop"
         android:layout_width="match_parent"

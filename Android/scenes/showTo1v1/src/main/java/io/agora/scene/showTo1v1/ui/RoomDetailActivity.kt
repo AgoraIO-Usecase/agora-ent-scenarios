@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.util.Size
 import android.view.LayoutInflater
 import android.view.TextureView
 import android.view.View
@@ -33,6 +32,7 @@ import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.scene.showTo1v1.callAPI.CallApiImpl
@@ -49,8 +49,6 @@ import io.agora.scene.showTo1v1.ui.dialog.CallDialog
 import io.agora.scene.showTo1v1.ui.dialog.CallDialogState
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
 import io.agora.scene.showTo1v1.ui.fragment.DashboardFragment
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPI
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 import io.agora.scene.widget.utils.StatusBarUtil
@@ -73,7 +71,7 @@ fun Int.number2K(): String {
 class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBinding>(), ICallApiListener {
 
     companion object {
-        private const val TAG = "ShowTo1v1_RoomDetail"
+        private const val TAG = "ShowTo1v1_Detail"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
         private const val EXTRA_ROOM_CALL_CONNECTED = "callConnected"
         private const val ContentInspectName = "ShowTo1v1"
@@ -96,7 +94,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     private val mCallApi by lazy { ICallApi.getImplInstance() }
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
     private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
-    private val mRtcVideoSwitcher by lazy { mShowTo1v1Manger.mVideoSwitcher }
 
     private val mRoomInfo: ShowTo1v1RoomInfo by lazy {
         (intent.getParcelableExtra(EXTRA_ROOM_DETAIL_INFO) as? ShowTo1v1RoomInfo)!!
@@ -204,20 +201,23 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             dialog.setListener(object : CallDetailSettingDialog.CallDetailSettingItemListener {
                 override fun onClickDashboard() {
                     binding.flDashboard.visibility = View.VISIBLE
-                    binding.ivClose.visibility = View.VISIBLE
+                    binding.ivDashboardClose.visibility = View.VISIBLE
                     mDashboardFragment?.updateVisible(true)
                 }
             })
             dialog.show()
         }
         binding.ivDashboardClose.setOnClickListener {
-            binding.ivClose.visibility = View.INVISIBLE
+            binding.ivDashboardClose.visibility = View.INVISIBLE
             binding.flDashboard.visibility = View.INVISIBLE
             mDashboardFragment?.updateVisible(false)
         }
         binding.ivHangup.setOnClickListener {
-            if (mCallConnected) destroy()
-            onHangup(finish = mCallConnected)
+            if (mCallConnected) {
+                onBackPressed()
+            } else {
+                onHangup()
+            }
         }
         binding.layoutCallPrivately.setOnClickListener {
             reInitCallApi(CallRole.CALLER, callback = {
@@ -245,7 +245,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         }
         val drawable = ContextCompat.getDrawable(this, resourceId)
         Glide.with(this).load(drawable).into(binding.ivRoomCover)
-        val fragment = DashboardFragment()
+        val fragment = DashboardFragment.newInstance(mRoomInfo)
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         fragmentTransaction.add(binding.flDashboard.id, fragment)
         fragmentTransaction.commit()
@@ -317,93 +317,17 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     private fun initRtcEngine() {
-        val eventListener = VideoSwitcherAPI.IChannelEventListener(
+
+        val eventListener = VideoSwitcher.IChannelEventListener(
             onChannelJoined = {
 
-            },
-
-            onRtcStats = { stats ->
-                if (mCallState == CallStateType.Connected) return@IChannelEventListener
-                mDashboardFragment?.apply {
-                    runOnUiThread {
-                        refreshDashboardInfo(
-                            cpuAppUsage = stats.cpuAppUsage,
-                            cpuTotalUsage = stats.cpuTotalUsage,
-                        )
-                    }
-                }
-            },
-            onLocalVideoStats = { stats ->
-                if (mCallState == CallStateType.Connected) return@IChannelEventListener
-                mDashboardFragment?.apply {
-                    runOnUiThread {
-                        refreshDashboardInfo(
-                            upBitrate = stats.sentBitrate,
-                            encodeFps = stats.encoderOutputFrameRate,
-                            upLossPackage = stats.txPacketLossRate,
-                            encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight)
-                        )
-                    }
-                }
-            },
-            onLocalAudioStats = { stats ->
-                if (mCallState == CallStateType.Connected) return@IChannelEventListener
-                mDashboardFragment?.apply {
-                    runOnUiThread {
-                        refreshDashboardInfo(
-                            audioBitrate = stats.sentBitrate,
-                            audioLossPackage = stats.txPacketLossRate
-                        )
-                    }
-                }
-            },
-            onRemoteVideoStats = { stats ->
-                if (mCallState == CallStateType.Connected) return@IChannelEventListener
-                mDashboardFragment?.apply {
-                    runOnUiThread {
-                        refreshDashboardInfo(
-                            downBitrate = stats.receivedBitrate,
-                            receiveFPS = stats.decoderOutputFrameRate,
-                            downLossPackage = stats.packetLossRate,
-                            receiveVideoSize = Size(stats.width, stats.height),
-                            downDelay = stats.delay
-                        )
-                    }
-                }
-            },
-            onRemoteAudioStats = { stats ->
-                if (mCallState == CallStateType.Connected) return@IChannelEventListener
-                mDashboardFragment?.apply {
-                    runOnUiThread {
-                        refreshDashboardInfo(
-                            audioBitrate = stats.receivedBitrate,
-                            audioLossPackage = stats.audioLossRate
-                        )
-                    }
-                }
-            },
-            onUplinkNetworkInfoUpdated = { info ->
-                if (mCallState == CallStateType.Connected) return@IChannelEventListener
-                mDashboardFragment?.apply {
-                    refreshDashboardInfo(upLinkBps = info.video_encoder_target_bitrate_bps)
-                }
-            },
-            onDownlinkNetworkInfoUpdated = { info ->
-                if (mCallState == CallStateType.Connected) return@IChannelEventListener
-                mDashboardFragment?.apply {
-                    refreshDashboardInfo(downLinkBps = info.bandwidth_estimation_bps)
-                }
-            }
-        )
+            })
         toggleSelfVideo(true) {
             joinChannel(eventListener)
             if (mCallConnected) {
-                publishMedia(false)
-                setupVideoView(false)
                 updateCallState(CallStateType.Connected)
             } else {
-                setupVideoView(true)
-                if (!isRoomOwner) publishMedia(true)
+                updateCallState(CallStateType.Idle)
             }
         }
         toggleSelfAudio(true) {
@@ -411,7 +335,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         }
     }
 
-    private fun joinChannel(eventListener: VideoSwitcherAPI.IChannelEventListener) {
+    private fun joinChannel(eventListener: VideoSwitcher.IChannelEventListener) {
         val rtcConnection = mMainRtcConnection
         val uid = UserManager.getInstance().user.id
         val channelName = mRoomInfo.roomId
@@ -444,10 +368,12 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         if (!isRoomOwner) {
             channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
         }
-        mRtcVideoSwitcher.joinChannel(
+        mShowTo1v1Manger.mVideoSwitcher.joinChannel(
             rtcConnection,
             channelMediaOptions,
-            eventListener
+            mShowTo1v1Manger.generalToken(),
+            eventListener,
+            false
         )
         if (isRoomOwner) {
             enableContentInspectEx(mMainRtcConnection)
@@ -458,29 +384,32 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     private fun setupVideoView(publish: Boolean) {
+        (mTextureView.parent as? ViewGroup)?.removeView(mTextureView)
         if (isRoomOwner) {
             if (publish) {
-                binding.llContainer.removeAllViews()
-                mRtcVideoSwitcher.setupLocalVideo(VideoSwitcher.VideoCanvasContainer(this, binding.llContainer, 0))
+                binding.llVideoContainer.isVisible = true
+                mRtcEngine.setupLocalVideo(VideoCanvas(mTextureView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
+                binding.llVideoContainer.addView(mTextureView)
                 mRtcEngine.startPreview()
             } else {
+                binding.llVideoContainer.isVisible = false
                 mRtcEngine.setupLocalVideo(VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, 0))
-                mRtcEngine.stopPreview()
-                binding.llContainer.removeAllViews()
             }
         } else {
             if (publish) {
-                binding.llContainer.removeAllViews()
-                mRtcVideoSwitcher.setupRemoteVideo(
-                    mMainRtcConnection,
-                    VideoSwitcher.VideoCanvasContainer(this, binding.llContainer, mRoomInfo.getIntUserId())
-                )
-                binding.llContainer.addView(mTextureView)
-            } else {
+                binding.llVideoContainer.isVisible = true
+                (mTextureView.parent as? ViewGroup)?.removeView(mTextureView)
                 mRtcEngine.setupRemoteVideoEx(
-                    VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()), mMainRtcConnection
+                    VideoCanvas(mTextureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
+                    mMainRtcConnection
                 )
-                binding.llContainer.removeAllViews()
+                binding.llVideoContainer.addView(mTextureView)
+            } else {
+                binding.llVideoContainer.isVisible = false
+                mRtcEngine.setupRemoteVideoEx(
+                    VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
+                    mMainRtcConnection
+                )
             }
         }
     }
@@ -516,6 +445,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     override fun onBackPressed() {
+        if (isGoingFinish) return
+        isGoingFinish = true
         destroy()
         onHangup()
         super.onBackPressed()
@@ -524,7 +455,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     private fun destroy() {
         mService.leaveRoom(mRoomInfo, completion = {})
         if (isRoomOwner) {
-            mRtcVideoSwitcher.leaveChannel(mMainRtcConnection, true)
+            mShowTo1v1Manger.mVideoSwitcher.leaveChannel(mMainRtcConnection, true)
+            mRtcEngine.stopPreview()
         } else {
             val options = ChannelMediaOptions()
             options.autoSubscribeVideo = true
@@ -572,20 +504,24 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 binding.layoutNumCount.isVisible = true
                 binding.ivHangup.isVisible = false
                 binding.tvHangup.isVisible = false
+
+                binding.llCallContainer.isVisible = false
             }
 
             CallStateType.Connected -> {
+
+
                 mTimeLinkAt = System.currentTimeMillis()
                 binding.layoutNumCount.isVisible = false
                 binding.ivHangup.isVisible = true
                 binding.tvHangup.isVisible = true
                 binding.vDragWindow.isVisible = true
-                if (isRoomOwner) {
-                    binding.llContainer.removeAllViews()
-                    (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
-                    binding.llContainer.addView(mShowTo1v1Manger.mLocalVideoView)
 
-                    binding.vDragWindow.canvasContainer.removeAllViews()
+                binding.llCallContainer.isVisible = true
+                if (isRoomOwner) {
+                    (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
+                    binding.llCallContainer.addView(mShowTo1v1Manger.mLocalVideoView)
+
                     (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
                     binding.vDragWindow.canvasContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
 
@@ -601,11 +537,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     }
                     binding.root.postDelayed(connectedRun, 5000)
                 } else {
-                    binding.llContainer.removeAllViews()
                     (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
-                    binding.llContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
+                    binding.llCallContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
 
-                    binding.vDragWindow.canvasContainer.removeAllViews()
                     (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
                     binding.vDragWindow.canvasContainer.addView(mShowTo1v1Manger.mLocalVideoView)
 
@@ -724,13 +658,13 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     private var isGoingFinish = false
-    private fun onHangup(finish: Boolean = true) {
-        mCallApi.hangup(mRoomInfo.roomId, completion = {
-
-        })
-        if (finish) {
-            isGoingFinish = true
-            finish()
+    private fun onHangup() {
+        if (isRoomOwner) {
+            mShowTo1v1Manger.mRemoteUser?.get1v1ChannelId()?.let {
+                mCallApi.hangup(it, null)
+            }
+        } else {
+            mCallApi.hangup(mRoomInfo.roomId, null)
         }
     }
 }

@@ -13,17 +13,13 @@ import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import io.agora.scene.showTo1v1.callAPI.CallConfig
 import io.agora.scene.showTo1v1.callAPI.CallMode
 import io.agora.scene.showTo1v1.callAPI.CallRole
 import io.agora.scene.showTo1v1.callAPI.CallTokenConfig
 import io.agora.scene.showTo1v1.callAPI.ICallApi
-import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPI
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherAPIImpl
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcherImpl
 import java.util.concurrent.Executors
 
 class ShowTo1v1Manger constructor() {
@@ -155,7 +151,7 @@ class ShowTo1v1Manger constructor() {
                 mCallTokenConfig.rtcToken = rtcToken
                 mCallTokenConfig.rtmToken = rtmToken
                 setupGeneralToken(rtcToken)
-                mCallApi.renewToken(mCallTokenConfig)
+//                mCallApi.renewToken(mCallTokenConfig)
                 callback.invoke(true)
             },
             failure = {
@@ -209,7 +205,7 @@ class ShowTo1v1Manger constructor() {
     val mVideoSwitcher: VideoSwitcher
         get() {
             if (innerVideoSwitcher == null) {
-                innerVideoSwitcher = VideoSwitcherImpl(mRtcEngine, VideoSwitcherAPIImpl(mRtcEngine))
+                innerVideoSwitcher = VideoSwitcher.getImplInstance(mRtcEngine)
             }
             return innerVideoSwitcher!!
         }
@@ -220,7 +216,7 @@ class ShowTo1v1Manger constructor() {
         innerLocalVideoView = null
         innerRemoteVideoView = null
         innerVideoSwitcher?.let {
-            it.unloadConnections()
+            VideoSwitcher.release()
             innerVideoSwitcher = null
         }
         innerRtcEngine?.let {

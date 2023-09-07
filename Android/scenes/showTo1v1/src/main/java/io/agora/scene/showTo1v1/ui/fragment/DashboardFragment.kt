@@ -7,30 +7,52 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.agora.scene.showTo1v1.callAPI.ICallApi
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
+import io.agora.rtc2.RtcConnection
 import io.agora.scene.showTo1v1.R
+import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.scene.showTo1v1.callAPI.CallStateType
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1DashboardFragmentBinding
+import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 
 class DashboardFragment : Fragment() {
 
+    companion object {
+
+        private const val TAG = "ShowTo1v1_DashboardFragment"
+        private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
+
+        fun newInstance(romInfo: ShowTo1v1RoomInfo) = DashboardFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(EXTRA_ROOM_DETAIL_INFO, romInfo)
+            }
+        }
+    }
+
     private lateinit var binding: ShowTo1v1DashboardFragmentBinding
 
-    private var handler: IRtcEngineEventHandler? = null
+
+    private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
+    private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
+
+    private val mRoomInfo by lazy { (arguments?.getParcelable(EXTRA_ROOM_DETAIL_INFO) as? ShowTo1v1RoomInfo)!! }
+
+    private val mShowTo1v1RtcConnection by lazy {
+        RtcConnection("", mShowTo1v1Manger.mCurrentUser.getIntUserId())
+    }
+
+    private val mMainRtcConnection by lazy {
+        RtcConnection(mRoomInfo.roomId, mShowTo1v1Manger.mCurrentUser.getIntUserId())
+    }
 
     private var isBoardVisible = false
-
-    private val mCallApi by lazy { ICallApi.getImplInstance() }
 
     private var mCallState = CallStateType.Idle
 
     override fun onDestroy() {
-        handler?.let {
-            mCallApi.removeRTCListener(it)
-            handler = null
-        }
+        mRtcEngine.removeHandlerEx(showTo1v1RtcListener, mShowTo1v1RtcConnection)
+        mRtcEngine.removeHandlerEx(mainRtcListener, mShowTo1v1RtcConnection)
         super.onDestroy()
     }
 
@@ -44,8 +66,7 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        setupRTCListener()
+        mRtcEngine.addHandlerEx(mainRtcListener,mMainRtcConnection)
     }
 
     fun updateVisible(b: Boolean) {
@@ -54,88 +75,170 @@ class DashboardFragment : Fragment() {
 
     fun updateCallState(callState: CallStateType) {
         mCallState = callState
+        if (mCallState == CallStateType.Connected) {
+            mShowTo1v1Manger.mConnectedChannelId?.let {
+                mShowTo1v1RtcConnection.channelId = it
+                mRtcEngine.addHandlerEx(showTo1v1RtcListener, mShowTo1v1RtcConnection)
+            }
+        } else {
+            mRtcEngine.removeHandlerEx(showTo1v1RtcListener, mShowTo1v1RtcConnection)
+        }
     }
 
-    private fun setupRTCListener() {
-        val rtcListener = object : IRtcEngineEventHandler() {
-            override fun onRtcStats(stats: RtcStats?) {
-                stats ?: return
-                if (mCallState != CallStateType.Connected) return
-                activity?.runOnUiThread {
-                    refreshDashboardInfo(
-                        cpuAppUsage = stats.cpuAppUsage,
-                        cpuTotalUsage = stats.cpuTotalUsage,
-                    )
-                }
-            }
-
-            override fun onLocalVideoStats(source: Constants.VideoSourceType?, stats: LocalVideoStats?) {
-                stats ?: return
-                if (mCallState != CallStateType.Connected) return
-                activity?.runOnUiThread {
-                    refreshDashboardInfo(
-                        upBitrate = stats.sentBitrate,
-                        encodeFps = stats.encoderOutputFrameRate,
-                        upLossPackage = stats.txPacketLossRate,
-                        encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight)
-                    )
-                }
-            }
-
-            override fun onLocalAudioStats(stats: LocalAudioStats?) {
-                stats ?: return
-                if (mCallState != CallStateType.Connected) return
-                activity?.runOnUiThread {
-                    refreshDashboardInfo(
-                        audioBitrate = stats.sentBitrate,
-                        audioLossPackage = stats.txPacketLossRate
-                    )
-                }
-            }
-
-            override fun onRemoteVideoStats(stats: RemoteVideoStats?) {
-                stats ?: return
-                if (mCallState != CallStateType.Connected) return
-                activity?.runOnUiThread {
-                    refreshDashboardInfo(
-                        downBitrate = stats.receivedBitrate,
-                        receiveFPS = stats.decoderOutputFrameRate,
-                        downLossPackage = stats.packetLossRate,
-                        receiveVideoSize = Size(stats.width, stats.height),
-                        downDelay = stats.delay
-                    )
-                }
-            }
-
-            override fun onRemoteAudioStats(stats: RemoteAudioStats?) {
-                stats ?: return
-                if (mCallState != CallStateType.Connected) return
-                activity?.runOnUiThread {
-                    refreshDashboardInfo(
-                        audioBitrate = stats.receivedBitrate,
-                        audioLossPackage = stats.audioLossRate
-                    )
-                }
-            }
-
-            override fun onUplinkNetworkInfoUpdated(info: UplinkNetworkInfo?) {
-                info ?: return
-                if (mCallState != CallStateType.Connected) return
-                activity?.runOnUiThread {
-                    refreshDashboardInfo(upLinkBps = info.video_encoder_target_bitrate_bps)
-                }
-            }
-
-            override fun onDownlinkNetworkInfoUpdated(info: DownlinkNetworkInfo?) {
-                info ?: return
-                if (mCallState != CallStateType.Connected) return
-                activity?.runOnUiThread {
-                    refreshDashboardInfo(downLinkBps = info.bandwidth_estimation_bps)
-                }
+    private val mainRtcListener = object : IRtcEngineEventHandler() {
+        override fun onRtcStats(stats: RtcStats?) {
+            stats ?: return
+            if (mCallState == CallStateType.Connected) return
+            activity?.runOnUiThread {
+                refreshDashboardInfo(
+                    cpuAppUsage = stats.cpuAppUsage,
+                    cpuTotalUsage = stats.cpuTotalUsage,
+                )
             }
         }
-        mCallApi.addRTCListener(rtcListener)
-        handler = rtcListener
+
+        override fun onLocalVideoStats(source: Constants.VideoSourceType?, stats: LocalVideoStats?) {
+            stats ?: return
+            if (mCallState == CallStateType.Connected) return
+            activity?.runOnUiThread {
+                refreshDashboardInfo(
+                    upBitrate = stats.sentBitrate,
+                    encodeFps = stats.encoderOutputFrameRate,
+                    upLossPackage = stats.txPacketLossRate,
+                    encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight)
+                )
+            }
+        }
+
+        override fun onLocalAudioStats(stats: LocalAudioStats?) {
+            stats ?: return
+            if (mCallState == CallStateType.Connected) return
+            activity?.runOnUiThread {
+                refreshDashboardInfo(
+                    audioBitrate = stats.sentBitrate,
+                    audioLossPackage = stats.txPacketLossRate
+                )
+            }
+        }
+
+        override fun onRemoteVideoStats(stats: RemoteVideoStats?) {
+            stats ?: return
+            if (mCallState == CallStateType.Connected) return
+            activity?.runOnUiThread {
+                refreshDashboardInfo(
+                    downBitrate = stats.receivedBitrate,
+                    receiveFPS = stats.decoderOutputFrameRate,
+                    downLossPackage = stats.packetLossRate,
+                    receiveVideoSize = Size(stats.width, stats.height),
+                    downDelay = stats.delay
+                )
+            }
+        }
+
+        override fun onRemoteAudioStats(stats: RemoteAudioStats?) {
+            stats ?: return
+            if (mCallState == CallStateType.Connected) return
+            activity?.runOnUiThread {
+                refreshDashboardInfo(
+                    audioBitrate = stats.receivedBitrate,
+                    audioLossPackage = stats.audioLossRate
+                )
+            }
+        }
+
+        override fun onUplinkNetworkInfoUpdated(info: UplinkNetworkInfo?) {
+            info ?: return
+            if (mCallState == CallStateType.Connected) return
+            activity?.runOnUiThread {
+                refreshDashboardInfo(upLinkBps = info.video_encoder_target_bitrate_bps)
+            }
+        }
+
+        override fun onDownlinkNetworkInfoUpdated(info: DownlinkNetworkInfo?) {
+            info ?: return
+            if (mCallState == CallStateType.Connected) return
+            activity?.runOnUiThread {
+                refreshDashboardInfo(downLinkBps = info.bandwidth_estimation_bps)
+            }
+        }
+    }
+
+    private val showTo1v1RtcListener = object : IRtcEngineEventHandler() {
+        override fun onRtcStats(stats: RtcStats?) {
+            stats ?: return
+            if (mCallState != CallStateType.Connected) return
+            activity?.runOnUiThread {
+                refreshDashboardInfo(
+                    cpuAppUsage = stats.cpuAppUsage,
+                    cpuTotalUsage = stats.cpuTotalUsage,
+                )
+            }
+        }
+
+        override fun onLocalVideoStats(source: Constants.VideoSourceType?, stats: LocalVideoStats?) {
+            stats ?: return
+            if (mCallState != CallStateType.Connected) return
+            activity?.runOnUiThread {
+                refreshDashboardInfo(
+                    upBitrate = stats.sentBitrate,
+                    encodeFps = stats.encoderOutputFrameRate,
+                    upLossPackage = stats.txPacketLossRate,
+                    encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight)
+                )
+            }
+        }
+
+        override fun onLocalAudioStats(stats: LocalAudioStats?) {
+            stats ?: return
+            if (mCallState != CallStateType.Connected) return
+            activity?.runOnUiThread {
+                refreshDashboardInfo(
+                    audioBitrate = stats.sentBitrate,
+                    audioLossPackage = stats.txPacketLossRate
+                )
+            }
+        }
+
+        override fun onRemoteVideoStats(stats: RemoteVideoStats?) {
+            stats ?: return
+            if (mCallState != CallStateType.Connected) return
+            activity?.runOnUiThread {
+                refreshDashboardInfo(
+                    downBitrate = stats.receivedBitrate,
+                    receiveFPS = stats.decoderOutputFrameRate,
+                    downLossPackage = stats.packetLossRate,
+                    receiveVideoSize = Size(stats.width, stats.height),
+                    downDelay = stats.delay
+                )
+            }
+        }
+
+        override fun onRemoteAudioStats(stats: RemoteAudioStats?) {
+            stats ?: return
+            if (mCallState != CallStateType.Connected) return
+            activity?.runOnUiThread {
+                refreshDashboardInfo(
+                    audioBitrate = stats.receivedBitrate,
+                    audioLossPackage = stats.audioLossRate
+                )
+            }
+        }
+
+        override fun onUplinkNetworkInfoUpdated(info: UplinkNetworkInfo?) {
+            info ?: return
+            if (mCallState != CallStateType.Connected) return
+            activity?.runOnUiThread {
+                refreshDashboardInfo(upLinkBps = info.video_encoder_target_bitrate_bps)
+            }
+        }
+
+        override fun onDownlinkNetworkInfoUpdated(info: DownlinkNetworkInfo?) {
+            info ?: return
+            if (mCallState != CallStateType.Connected) return
+            activity?.runOnUiThread {
+                refreshDashboardInfo(downLinkBps = info.bandwidth_estimation_bps)
+            }
+        }
     }
 
     fun refreshDashboardInfo(
