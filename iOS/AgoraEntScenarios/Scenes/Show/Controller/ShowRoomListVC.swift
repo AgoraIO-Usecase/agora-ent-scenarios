@@ -94,9 +94,9 @@ class ShowRoomListVC: UIViewController {
     
     private func checkDevice() {
          let score = ShowAgoraKitManager.shared.engine?.queryDeviceScore() ?? 0
-        if (score < 75) {// (0, 75)
+        if (score < 85) {// (0, 85)
             ShowAgoraKitManager.shared.deviceLevel = .low
-        } else if (score < 90) {// (75, 90)
+        } else if (score < 90) {// [85, 90)
             ShowAgoraKitManager.shared.deviceLevel = .medium
         } else {// (> 90)
             ShowAgoraKitManager.shared.deviceLevel = .high
