@@ -18,9 +18,7 @@ class ShowLivePagesViewController: ViewController {
     private var currentVC: ShowLiveViewController?
     
     let agoraKitManager = ShowAgoraKitManager.shared
-    
-//    fileprivate var roomVCMap: [String: ShowLiveViewController] = [:]
-    
+        
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0
@@ -42,11 +40,7 @@ class ShowLivePagesViewController: ViewController {
     deinit {
         showLogger.info("deinit-- ShowLivePagesViewController", context: kPagesVCTag)
         ShowAgoraKitManager.shared.leaveAllRoom()
-        // TODO: 放到ShowLiveViewController里做
-//        self.roomVCMap.forEach { (key: String, value: ShowLiveViewController) in
-//            value.leaveRoom()
-//            AppContext.unloadShowServiceImp(key)
-//        }
+        AppContext.unloadShowServiceImp()
     }
     
     override func viewDidLoad() {
@@ -161,11 +155,6 @@ extension ShowLivePagesViewController {
     private func scroll(to index: Int) {
         collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredVertically, animated: false)
     }
-}
-
-//MARK: live vc cache
-extension ShowLiveViewController {
-    
 }
 
 let kShowLiveRoomViewTag = 12345
