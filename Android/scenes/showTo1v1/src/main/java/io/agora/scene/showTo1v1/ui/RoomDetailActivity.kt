@@ -10,10 +10,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.view.animation.ScaleAnimation
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.contains
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -49,6 +51,7 @@ import io.agora.scene.showTo1v1.ui.dialog.CallDialog
 import io.agora.scene.showTo1v1.ui.dialog.CallDialogState
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
 import io.agora.scene.showTo1v1.ui.fragment.DashboardFragment
+import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 import io.agora.scene.widget.utils.StatusBarUtil
@@ -71,7 +74,7 @@ fun Int.number2K(): String {
 class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBinding>(), ICallApiListener {
 
     companion object {
-        private const val TAG = "ShowTo1v1_Detail"
+        private const val TAG = "ShowTo1v1"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
         private const val EXTRA_ROOM_CALL_CONNECTED = "callConnected"
         private const val ContentInspectName = "ShowTo1v1"
@@ -138,11 +141,10 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         }
     }
 
-    private val connectedRun = Runnable { binding.includeConnectedView.root.isVisible = false }
-
     private var mTimeLinkAt: Long = 0
 
-    private val mTextureView by lazy { TextureView(this) }
+    // 秀场 textureView
+    private val mShowTextureView by lazy { TextureView(this) }
     override fun getViewBinding(inflater: LayoutInflater): ShowTo1v1CallDetailActivityBinding {
         return ShowTo1v1CallDetailActivityBinding.inflate(inflater)
     }
@@ -192,38 +194,69 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         binding.tvNickname.text = mRoomInfo.userName
         binding.tvRoomNum.text = mRoomInfo.roomId
 
-        binding.ivClose.setOnClickListener {
-            Log.d(TAG, "click close end!")
-            onBackPressed()
-        }
-        binding.ivSetting.setOnClickListener {
-            val dialog = CallDetailSettingDialog(this)
-            dialog.setListener(object : CallDetailSettingDialog.CallDetailSettingItemListener {
-                override fun onClickDashboard() {
-                    binding.flDashboard.visibility = View.VISIBLE
-                    binding.ivDashboardClose.visibility = View.VISIBLE
-                    mDashboardFragment?.updateVisible(true)
-                }
-            })
-            dialog.show()
-        }
-        binding.ivDashboardClose.setOnClickListener {
-            binding.ivDashboardClose.visibility = View.INVISIBLE
-            binding.flDashboard.visibility = View.INVISIBLE
-            mDashboardFragment?.updateVisible(false)
-        }
-        binding.ivHangup.setOnClickListener {
-            if (mCallConnected) {
+        binding.ivClose.setOnClickListener(object : OnClickJackingListener() {
+            override fun onClickJacking(view: View) {
+                Log.d(TAG, "click close end!")
                 onBackPressed()
-            } else {
-                onHangup()
             }
-        }
-        binding.layoutCallPrivately.setOnClickListener {
-            reInitCallApi(CallRole.CALLER, callback = {
-                mCallApi.call(mRoomInfo.roomId, mRoomInfo.getIntUserId(), null)
-            })
-        }
+        })
+
+        binding.ivSetting.setOnClickListener(object : OnClickJackingListener() {
+            override fun onClickJacking(view: View) {
+                Log.d(TAG, "click setting")
+                val dialog = CallDetailSettingDialog(this@RoomDetailActivity)
+                dialog.setListener(object : CallDetailSettingDialog.CallDetailSettingItemListener {
+                    override fun onClickDashboard() {
+                        binding.flDashboard.visibility = View.VISIBLE
+                        binding.ivDashboardClose.visibility = View.VISIBLE
+                        mDashboardFragment?.updateVisible(true)
+                    }
+                })
+                dialog.show()
+            }
+        })
+        binding.ivDashboardClose.setOnClickListener(object : OnClickJackingListener() {
+            override fun onClickJacking(view: View) {
+                Log.d(TAG, "click dashboard close")
+                binding.ivDashboardClose.visibility = View.INVISIBLE
+                binding.flDashboard.visibility = View.INVISIBLE
+                mDashboardFragment?.updateVisible(false)
+            }
+        })
+
+        binding.ivHangup.setOnClickListener(object : OnClickJackingListener() {
+            override fun onClickJacking(view: View) {
+                Log.d(TAG, "click hangup")
+                if (mCallConnected) {
+                    onBackPressed()
+                } else {
+                    onHangup()
+                }
+            }
+        })
+        binding.layoutCallPrivately.setOnClickListener(object : OnClickJackingListener() {
+            override fun onClickJacking(view: View) {
+                Log.d(TAG, "click call privately")
+                reInitCallApi(CallRole.CALLER, callback = {
+                    mCallApi.call(mRoomInfo.roomId, mRoomInfo.getIntUserId(), null)
+                })
+            }
+        })
+
+        binding.includeConnectedView.root.setOnClickListener(object : OnClickJackingListener() {
+            override fun onClickJacking(view: View) {
+                Log.d(TAG, "click close connection view")
+                binding.root.removeCallbacks(connectedRun)
+                animateConnectedViewClose()
+            }
+
+        })
+        binding.vDragWindow.setOnClickListener(object : OnClickJackingListener() {
+            override fun onClickJacking(view: View) {
+                Log.d(TAG, "click switch video")
+                switchVideoView()
+            }
+        })
         binding.vDragWindow.isVisible = false
         if (isRoomOwner) {
             binding.layoutCallPrivatelyBg.isVisible = false
@@ -323,6 +356,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
             })
         toggleSelfVideo(true) {
+            if (isRoomOwner) {
+                mRtcEngine.startPreview()
+            }
             joinChannel(eventListener)
             if (mCallConnected) {
                 updateCallState(CallStateType.Connected)
@@ -384,32 +420,32 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     private fun setupVideoView(publish: Boolean) {
-        (mTextureView.parent as? ViewGroup)?.removeView(mTextureView)
+
         if (isRoomOwner) {
             if (publish) {
                 binding.llVideoContainer.isVisible = true
-                mRtcEngine.setupLocalVideo(VideoCanvas(mTextureView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
-                binding.llVideoContainer.addView(mTextureView)
-                mRtcEngine.startPreview()
-            } else {
-                binding.llVideoContainer.isVisible = false
-                mRtcEngine.setupLocalVideo(VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, 0))
+                if (binding.llVideoContainer.contains(mShowTextureView)) {
+                    mRtcEngine.setupLocalVideo(VideoCanvas(mShowTextureView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
+                    return
+                } else {
+                    (mShowTextureView.parent as? ViewGroup)?.removeView(mShowTextureView)
+                    mRtcEngine.setupLocalVideo(VideoCanvas(mShowTextureView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
+                    binding.llVideoContainer.addView(mShowTextureView)
+                }
             }
         } else {
             if (publish) {
                 binding.llVideoContainer.isVisible = true
-                (mTextureView.parent as? ViewGroup)?.removeView(mTextureView)
-                mRtcEngine.setupRemoteVideoEx(
-                    VideoCanvas(mTextureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
-                    mMainRtcConnection
-                )
-                binding.llVideoContainer.addView(mTextureView)
-            } else {
-                binding.llVideoContainer.isVisible = false
-                mRtcEngine.setupRemoteVideoEx(
-                    VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
-                    mMainRtcConnection
-                )
+                if (binding.llVideoContainer.contains(mShowTextureView)) {
+                    return
+                } else {
+                    (mShowTextureView.parent as? ViewGroup)?.removeView(mShowTextureView)
+                    mRtcEngine.setupRemoteVideoEx(
+                        VideoCanvas(mShowTextureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
+                        mMainRtcConnection
+                    )
+                    binding.llVideoContainer.addView(mShowTextureView)
+                }
             }
         }
     }
@@ -506,11 +542,10 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 binding.tvHangup.isVisible = false
 
                 binding.llCallContainer.isVisible = false
+                animateConnectedViewClose()
             }
 
             CallStateType.Connected -> {
-
-
                 mTimeLinkAt = System.currentTimeMillis()
                 binding.layoutNumCount.isVisible = false
                 binding.ivHangup.isVisible = true
@@ -518,14 +553,26 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 binding.vDragWindow.isVisible = true
 
                 binding.llCallContainer.isVisible = true
+                binding.llVideoContainer.isVisible = false
                 if (isRoomOwner) {
-                    (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
-                    binding.llCallContainer.addView(mShowTo1v1Manger.mLocalVideoView)
+                    if (binding.llCallContainer.contains(mShowTo1v1Manger.mLocalVideoView)) {
+                        // nothing
+                        Log.d(TAG,"roomOwner already add localVideo")
+                    } else {
+                        (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
+                        if (binding.llCallContainer.childCount > 0) binding.llCallContainer.removeAllViews()
+                        binding.llCallContainer.addView(mShowTo1v1Manger.mLocalVideoView)
+                    }
+                    if (binding.vDragWindow.canvasContainer.contains(mShowTo1v1Manger.mRemoteVideoView)) {
+                        // nothing
+                        Log.d(TAG,"roomOwner already add remoteVideo")
+                    } else {
+                        (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
+                        if (binding.vDragWindow.canvasContainer.childCount > 0) binding.vDragWindow.canvasContainer.removeAllViews()
+                        binding.vDragWindow.canvasContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
+                    }
 
-                    (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
-                    binding.vDragWindow.canvasContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
-
-                    binding.includeConnectedView.root.isVisible = true
+                    animateConnectedView()
                     mShowTo1v1Manger.mRemoteUser?.let {
                         GlideApp.with(this)
                             .load(it.avatar)
@@ -537,11 +584,22 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     }
                     binding.root.postDelayed(connectedRun, 5000)
                 } else {
-                    (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
-                    binding.llCallContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
-
-                    (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
-                    binding.vDragWindow.canvasContainer.addView(mShowTo1v1Manger.mLocalVideoView)
+                    if (binding.llCallContainer.contains(mShowTo1v1Manger.mRemoteVideoView)) {
+                        // nothing
+                        Log.d(TAG,"caller already add remoteVideo")
+                    } else {
+                        (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
+                        if (binding.llCallContainer.childCount > 0) binding.llCallContainer.removeAllViews()
+                        binding.llCallContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
+                    }
+                    if (binding.vDragWindow.canvasContainer.contains(mShowTo1v1Manger.mLocalVideoView)) {
+                        // nothing
+                        Log.d(TAG,"caller already add localVideo")
+                    } else {
+                        (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
+                        if (binding.vDragWindow.canvasContainer.childCount > 0) binding.vDragWindow.canvasContainer.removeAllViews()
+                        binding.vDragWindow.canvasContainer.addView(mShowTo1v1Manger.mLocalVideoView)
+                    }
 
                     binding.vDragWindow.setUserName(mShowTo1v1Manger.mCurrentUser.userName)
                     binding.layoutCallPrivatelyBg.isVisible = false
@@ -554,6 +612,54 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
 
             else -> {}
+        }
+    }
+
+    private val connectedRun = Runnable {
+        animateConnectedViewClose()
+    }
+
+    private fun animateConnectedViewClose() {
+        if (!binding.includeConnectedView.root.isVisible) return
+
+        val anim = AnimationUtils.loadAnimation(this, R.anim.show_to1v1_slide_to_top)
+        anim.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {
+            }
+
+            override fun onAnimationEnd(animation: Animation?) {
+                binding.includeConnectedView.root.isVisible = false
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {
+            }
+        })
+        binding.includeConnectedView.root.startAnimation(anim)
+    }
+
+    private fun animateConnectedView() {
+        binding.includeConnectedView.root.isVisible = true
+        val anim = AnimationUtils.loadAnimation(this, R.anim.show_to1v1_slide_from_top)
+        binding.includeConnectedView.root.startAnimation(anim)
+    }
+
+    // 大小切换
+    private fun switchVideoView() {
+        if (mCallState != CallStateType.Connected) return
+        if (binding.llCallContainer.contains(mShowTo1v1Manger.mLocalVideoView)) {
+            // 大屏幕自己
+            binding.llCallContainer.removeView(mShowTo1v1Manger.mLocalVideoView)
+            binding.vDragWindow.canvasContainer.removeView(mShowTo1v1Manger.mRemoteVideoView)
+
+            binding.llCallContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
+            binding.vDragWindow.canvasContainer.addView(mShowTo1v1Manger.mLocalVideoView)
+        } else if (binding.vDragWindow.canvasContainer.contains(mShowTo1v1Manger.mLocalVideoView)) {
+            // 小窗是自己
+            binding.llCallContainer.removeView(mShowTo1v1Manger.mRemoteVideoView)
+            binding.vDragWindow.canvasContainer.removeView(mShowTo1v1Manger.mLocalVideoView)
+
+            binding.llCallContainer.addView(mShowTo1v1Manger.mLocalVideoView)
+            binding.vDragWindow.canvasContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
         }
     }
 

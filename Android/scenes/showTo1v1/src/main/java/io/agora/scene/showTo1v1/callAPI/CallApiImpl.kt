@@ -351,7 +351,8 @@ class CallApiImpl constructor(
         videoCanvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
 
         engine.setDefaultAudioRoutetoSpeakerphone(true)
-        engine.setupLocalVideo(videoCanvas)
+        val ret =  engine.setupLocalVideo(videoCanvas)
+        Log.d(TAG, "_setupLocalVideo ret: $ret, uid: $uid")
         engine.startPreview()
     }
 

@@ -36,6 +36,7 @@ import io.agora.scene.showTo1v1.ui.dialog.CallDialog
 import io.agora.scene.showTo1v1.ui.dialog.CallDialogState
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
 import io.agora.scene.showTo1v1.ui.fragment.RoomListFragment
+import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.widget.utils.StatusBarUtil
 import org.json.JSONException
 import org.json.JSONObject
@@ -118,14 +119,20 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         binding.titleView.setRightIconClick {
             fetchRoomList()
         }
-        binding.emptyInclude.layoutCreateRoom.setOnClickListener {
-            mCallApi.removeListener(this)
-            mCallApi.deinitialize { }
-            RoomCreateActivity.launch(this)
-        }
-        binding.layoutCreateRoom2.setOnClickListener {
-            RoomCreateActivity.launch(this)
-        }
+        binding.emptyInclude.layoutCreateRoom.setOnClickListener(object :OnClickJackingListener(){
+            override fun onClickJacking(view: View) {
+                Log.d(TAG,"click create room empty")
+                mCallApi.removeListener(this@RoomListActivity)
+                mCallApi.deinitialize { }
+                RoomCreateActivity.launch(this@RoomListActivity)
+            }
+        })
+        binding.layoutCreateRoom2.setOnClickListener(object :OnClickJackingListener(){
+            override fun onClickJacking(view: View) {
+                Log.d(TAG,"click create room")
+                RoomCreateActivity.launch(this@RoomListActivity)
+            }
+        })
         initOrUpdateViewPage()
     }
 

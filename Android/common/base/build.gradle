@@ -84,6 +84,6 @@ dependencies {
 
 
 //    api rootProject.ext.deps.rtm
-    api rootProject.ext.deps.rtc
+//    api rootProject.ext.deps.rtc
     api rootProject.ext.deps.ok2curl
 }

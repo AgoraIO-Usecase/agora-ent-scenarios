@@ -25,6 +25,7 @@ import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 import io.agora.scene.showTo1v1.ui.RoomListActivity
+import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.widget.utils.BlurTransformation
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 
@@ -32,7 +33,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     companion object {
 
-        private const val TAG = "ShowTo1v1_List"
+        private const val TAG = "ShowTo1v1"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
         fun newInstance(romInfo: ShowTo1v1RoomInfo) = RoomListFragment().apply {
@@ -107,12 +108,18 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
                 .load(R.drawable.show_to1v1_wave_living)
                 .into(binding.ivLiving)
         }
-        binding.ivConnect.setOnClickListener {
-            onClickCallingListener?.onClickCall(true, mRoomInfo)
-        }
-        binding.layoutVideoContainer.setOnClickListener {
-            onClickCallingListener?.onClickCall(false, mRoomInfo)
-        }
+        binding.ivConnect.setOnClickListener(object :OnClickJackingListener(){
+            override fun onClickJacking(view: View) {
+                Log.d(TAG,"click call")
+                onClickCallingListener?.onClickCall(true, mRoomInfo)
+            }
+        })
+        binding.layoutVideoContainer.setOnClickListener(object :OnClickJackingListener(){
+            override fun onClickJacking(view: View) {
+                Log.d(TAG,"click video container")
+                onClickCallingListener?.onClickCall(false, mRoomInfo)
+            }
+        })
         binding.ivConnectBG.breathAnim()
     }
 
