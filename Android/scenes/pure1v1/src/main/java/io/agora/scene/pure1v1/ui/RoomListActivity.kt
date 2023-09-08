@@ -3,9 +3,7 @@ package io.agora.scene.pure1v1.ui
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.nfc.Tag
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +13,6 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.ScaleAnimation
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -39,7 +36,6 @@ import io.agora.scene.pure1v1.service.UserInfo
 import io.agora.scene.widget.utils.BlurTransformation
 import org.json.JSONException
 import org.json.JSONObject
-import java.lang.reflect.Proxy
 
 class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>(), ICallApiListener {
 
@@ -83,6 +79,11 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         super.onBackPressed()
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        fetchRoomLiving()
+    }
+
     private fun fetchRoomList() {
         val anim = AnimationUtils.loadAnimation(this, R.anim.pure1v1_center_rotation)
         binding.ivRefresh.startAnimation(anim)
@@ -108,6 +109,17 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             }
             updateView()
             mayShowGuideView()
+        }
+    }
+
+    private fun fetchRoomLiving() {
+        CallServiceManager.instance.sceneService?.getUserList { msg, list ->
+            val living = list.any { it.userId == CallServiceManager.instance.localUser?.userId }
+            if (!living) {
+                CallServiceManager.instance.sceneService?.enterRoom { e ->
+                    fetchRoomList()
+                }
+            }
         }
     }
 
@@ -137,12 +149,17 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     private fun call(user: UserInfo) {
+        showCallSendDialog(user)
         CallServiceManager.instance.startupCallApiIfNeed()
-        CallServiceManager.instance.callApi?.call(user.userId, user.userId.toInt()) { er ->
+        CallServiceManager.instance.callApi?.call(user.userId, user.userId.toInt()) { error ->
+            if (error != null) {
+                finishCallDialog()
+            }
         }
     }
 
-    private fun onCallSend(user: UserInfo) {
+    private fun showCallSendDialog(user: UserInfo) {
+        if (callDialog != null) { return }
         val dialog = CallSendDialog(this, user)
         dialog.setListener(object : CallSendDialog.CallSendDialogListener {
             override fun onSendViewDidClickHangup() {
@@ -152,6 +169,11 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         })
         dialog.show()
         callDialog = dialog
+    }
+
+    private fun finishCallDialog() {
+        callDialog?.dismiss()
+        callDialog = null
     }
 
     override fun onCallStateChanged(
@@ -209,7 +231,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     CallServiceManager.instance.connectedChannelId = fromRoomId
                     val user = dataList.firstOrNull { it.userId == toUserId.toString() } ?: return
                     CallServiceManager.instance.remoteUser = user
-                    onCallSend(user)
+                    showCallSendDialog(user)
                 }
             }
             CallStateType.Connecting -> {
@@ -218,7 +240,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             CallStateType.Connected -> {
                 if (CallServiceManager.instance.remoteUser == null) { return }
                 // 进入通话页面
-                callDialog?.dismiss()
+                finishCallDialog()
                 val intent = Intent(this, CallDetailActivity::class.java)
                 startActivity(intent)
                 // 开启鉴黄鉴暴
@@ -232,7 +254,9 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     CallReason.RemoteHangup -> {
                         Toast.makeText(this, getText(R.string.pure1v1_call_toast_hangup), Toast.LENGTH_SHORT).show()
                     }
-                    CallReason.LocalRejected,
+                    CallReason.LocalRejected -> {
+                        Toast.makeText(this, getText(R.string.pure1v1_call_local_rejected), Toast.LENGTH_SHORT).show()
+                    }
                     CallReason.RemoteRejected -> {
                         Toast.makeText(this, getText(R.string.pure1v1_call_toast_rejected), Toast.LENGTH_SHORT).show()
                     }
@@ -243,13 +267,13 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 }
                 CallServiceManager.instance.remoteUser = null
                 CallServiceManager.instance.connectedChannelId = null
-                callDialog?.dismiss()
+                finishCallDialog()
             }
             CallStateType.Failed -> {
                 Toast.makeText(this, eventReason, Toast.LENGTH_SHORT).show()
                 CallServiceManager.instance.remoteUser = null
                 CallServiceManager.instance.connectedChannelId = null
-                callDialog?.dismiss()
+                finishCallDialog()
             }
             else -> {
             }
@@ -329,6 +353,9 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
         private var handler: UserItemActionHandler? = null
 
+        private var lastClickTime: Long = 0
+        private val clickInterval = 1000
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserItemViewHolder {
             val binding = Pure1v1RoomListItemLayoutBinding.inflate(LayoutInflater.from(context))
             val view = binding.root
@@ -342,7 +369,11 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         override fun onBindViewHolder(holder: UserItemViewHolder, position: Int) {
             val userInfo = dataList[position % dataList.size]
             holder.binding.ivConnect.setOnClickListener {
-                handler?.onClickCall(userInfo)
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastClickTime >= clickInterval) {
+                    handler?.onClickCall(userInfo)
+                    lastClickTime = currentTime
+                }
             }
             val resourceName = "pure1v1_user_bg${userInfo.userId.toInt() % 9 + 1}"
             val resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)

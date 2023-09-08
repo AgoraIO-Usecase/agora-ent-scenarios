@@ -31,6 +31,8 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
     private var dashboard: DashboardFragment? = null
     private var rtcEventHandler: IRtcEngineEventHandler? = null
 
+    private var showRemoteCanvas = true
+
     override fun getViewBinding(inflater: LayoutInflater): Pure1v1CallDetailActivityBinding {
         return Pure1v1CallDetailActivityBinding.inflate(inflater)
     }
@@ -39,6 +41,7 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setupView()
+        updateCanvas()
         CallServiceManager.instance.callApi?.addListener(this)
         setupRTCListener()
 
@@ -81,6 +84,10 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
     }
 
     private fun setupView() {
+        binding.vDragWindow.setOnViewClick {
+            showRemoteCanvas = !showRemoteCanvas
+            updateCanvas()
+        }
         binding.ivHangup.setOnClickListener {
             onHangup()
         }
@@ -99,21 +106,39 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
             binding.tvRoomName.text = userInfo.userName
             binding.tvRoomNum.text = userInfo.getRoomId()
         }
-        CallServiceManager.instance.remoteCanvas?.let { canvas ->
-            binding.llContainer.removeAllViews()
-            binding.llContainer.addView(canvas)
-        }
-        CallServiceManager.instance.localUser?.let { userInfo ->
-            binding.vDragWindow.setUserName(userInfo.userName)
-        }
-        CallServiceManager.instance.localCanvas?.let { canvas ->
-            binding.vDragWindow.canvasContainer.addView(canvas)
-        }
         val fragment = DashboardFragment()
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         fragmentTransaction.add(binding.flDashboard.id, fragment)
         fragmentTransaction.commit()
         dashboard = fragment
+    }
+
+    private fun updateCanvas() {
+        if (showRemoteCanvas) {
+            binding.vDragWindow.canvasContainer.removeAllViews()
+            binding.llContainer.removeAllViews()
+            CallServiceManager.instance.remoteCanvas?.let { canvas ->
+                binding.llContainer.addView(canvas)
+            }
+            CallServiceManager.instance.localUser?.let { userInfo ->
+                binding.vDragWindow.setUserName(userInfo.userName)
+            }
+            CallServiceManager.instance.localCanvas?.let { canvas ->
+                binding.vDragWindow.canvasContainer.addView(canvas)
+            }
+        } else {
+            binding.vDragWindow.canvasContainer.removeAllViews()
+            binding.llContainer.removeAllViews()
+            CallServiceManager.instance.remoteCanvas?.let { canvas ->
+                binding.vDragWindow.canvasContainer.addView(canvas)
+            }
+            CallServiceManager.instance.remoteUser?.let { userInfo ->
+                binding.vDragWindow.setUserName(userInfo.userName)
+            }
+            CallServiceManager.instance.localCanvas?.let { canvas ->
+                binding.llContainer.addView(canvas)
+            }
+        }
     }
 
     private fun onClickSetting() {

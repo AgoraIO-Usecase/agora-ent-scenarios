@@ -2,6 +2,7 @@ package io.agora.scene.pure1v1.ui
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -15,9 +16,14 @@ class CallDraggableView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
+    private val TAG = "CallDraggableView"
     private val binding: Pure1v1DraggableViewBinding
     private var startX = 0f
     private var startY = 0f
+
+    private var onViewClick: (() -> Unit)? = null
+    private var touchDownTime: Long = 0
+    private val clickInterval = 150
 
     init {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -32,15 +38,22 @@ class CallDraggableView @JvmOverloads constructor(
     val canvasContainer: ViewGroup
         get() { return binding.llContainer }
 
+    fun setOnViewClick(action: (() -> Unit)) {
+        onViewClick = action
+    }
+
     private fun setupDragAction() {
         setOnTouchListener(object: OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent): Boolean {
+                Log.d(TAG, "draggabel view action $event)")
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
                         // 记录按下的起始位置
                         startX = event.rawX
                         startY = event.rawY
-                        true
+
+                        touchDownTime = System.currentTimeMillis()
+                        return true
                     }
                     MotionEvent.ACTION_MOVE -> {
                         // 计算偏移量
@@ -68,11 +81,17 @@ class CallDraggableView @JvmOverloads constructor(
                         // 更新起始位置
                         startX = event.rawX
                         startY = event.rawY
-
-                        true
+                        return true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        val currentTime = System.currentTimeMillis()
+                        if (currentTime - touchDownTime < clickInterval) {
+                            onViewClick?.invoke()
+                        }
+                        return true
                     }
                     else -> {
-                        false
+                        return false
                     }
                 }
                 return true

@@ -11,6 +11,7 @@
     <string name="pure1v1_call_waiting_acceptance">等待对方接受</string>
     <string name="pure1v1_call_connecting">连接中…</string>
     <string name="pure1v1_call_toast_hangup">对方结束连线</string>
+    <string name="pure1v1_call_local_rejected">已拒绝</string>
     <string name="pure1v1_call_toast_rejected">对方已拒绝</string>
     <string name="pure1v1_call_toast_no_answer">无应答</string>
     <string name="pure1v1_call_content_inspect">监测到当前内容存在违规行为</string>
