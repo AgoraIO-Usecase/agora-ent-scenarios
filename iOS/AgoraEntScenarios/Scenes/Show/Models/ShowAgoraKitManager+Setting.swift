@@ -50,8 +50,16 @@ class ShowRTCParams {
 // MARK: - Extension
 extension ShowAgoraKitManager {
     
-    func updateAudienceProfile() {
+    func setupAudienceProfile() {
+        setSuperResolutionOn(true)
+        setPVCon(false)
         _presetValuesWith(encodeSize: ._360x640, fps: .fps15, bitRate: 0, h265On: true)
+    }
+    
+    func setupBroadcasterProfile() {
+        setSuperResolutionOn(false)
+        setPVCon(false)
+        updateVideoProfileForMode(.single)
     }
     
     /// 设置超分 不保存数据
@@ -164,10 +172,6 @@ extension ShowAgoraKitManager {
         updateSettingForkey(.lowlightEnhance)
         updateSettingForkey(.colorEnhance)
         updateSettingForkey(.videoDenoiser)
-        rtcParam.pvc = false
-        updateSettingForkey(.PVC)
-        rtcParam.sr = true
-        updateSettingForkey(.SR)
         updateSettingForkey(.recordingSignalVolume)
     }
 
@@ -298,13 +302,10 @@ extension ShowAgoraKitManager {
             let isOn = key.boolValue
             engine?.setBeautyEffectOptions(isOn, options: AgoraBeautyOptions())
         case .PVC:
-            let isOn = rtcParam.pvc
-            engine?.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
+            break
         case .SR:
-            let isOn = rtcParam.sr
-            setSuperResolutionOn(isOn)
+            break
         case .BFrame:
-            
            break
         case .videoEncodeSize:
             let indexValue = key.intValue

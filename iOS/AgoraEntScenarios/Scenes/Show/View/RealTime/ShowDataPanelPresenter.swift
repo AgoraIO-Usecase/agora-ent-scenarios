@@ -56,10 +56,10 @@ class ShowDataPanelPresenter {
         callTs = Int(ts)
     }
     
-    func generatePanelData(audioOnly: Bool, send: Bool, receive: Bool) -> ShowPanelData {
-        let sendPanel = send ? sendData(audioOnly: audioOnly) : cleanSendData()
-        let receivePanel = receive ? receiveData(audioOnly: audioOnly) : cleanReceiveData()
-        let otherPanel = otherData(send: send, receive: receive)
+    func generatePanelData(send: Bool, receive: Bool, audience: Bool) -> ShowPanelData {
+        let sendPanel = send ? sendData() : cleanSendData()
+        let receivePanel = receive ? receiveData() : cleanReceiveData()
+        let otherPanel = otherData(send: send, receive: receive, audience: audience)
         return ShowPanelData(
             left: [sendPanel.left, receivePanel.left, otherPanel.left].joined(separator: "\n"),
             right: [sendPanel.right, receivePanel.right, otherPanel.right].joined(separator: "\n")
@@ -96,7 +96,7 @@ class ShowDataPanelPresenter {
         return ShowPanelData(left: leftInfo, right: rightInfo)
     }
     
-    private func sendData(audioOnly: Bool) -> ShowPanelData {
+    private func sendData() -> ShowPanelData {
         let sendTitle = "show_statistic_send_title".show_localized
         let videoSize = "show_statistic_encode_resolution".show_localized+": \(localVideoStats.encodedFrameHeight) x \(localVideoStats.encodedFrameWidth)"
         let videoSend = "show_statistic_up_bitrate".show_localized+": \(localVideoStats.sentBitrate) kbps"
@@ -104,21 +104,14 @@ class ShowDataPanelPresenter {
         
         let fps = "show_advance_setting_FPS_title".show_localized+": \(localVideoStats.sentFrameRate) fps"
         let vSendLoss = "show_statistic_up_loss_package".show_localized+": \(localVideoStats.txPacketLossRate) %"
-        
-        let audioSend = "ASend: \(localAudioStats.sentBitrate) kbps"
-        let cpu = "CPU: \(channelStats.cpuAppUsage)%/\(channelStats.cpuTotalUsage) %"
-        let aSendLoss = "ASend Loss: \(localAudioStats.txPacketLossRate) %"
-        
-        if audioOnly {
-            return ShowPanelData(left: [audioSend, cpu, aSendLoss].joined(separator: "\n"), right: "")
-        }
+                
         let leftInfo =  [sendTitle, videoSize, videoSend,   uplink ].joined(separator: "\n") + "\n"
         let rightInfo = ["   ",     fps,       vSendLoss,   " " ].joined(separator: "\n") + "\n"
 
         return ShowPanelData(left: leftInfo, right: rightInfo)
     }
     
-    private func receiveData(audioOnly: Bool) -> ShowPanelData {
+    private func receiveData() -> ShowPanelData {
         let sendTitle = "show_statistic_receive_title".show_localized
         let videoSize = "show_statistic_receive_resolution".show_localized+": \(remoteVideoStats.height) x \(remoteVideoStats.width)"
         let videoSend = "show_statistic_bitrate".show_localized+": \(remoteVideoStats.receivedBitrate) kbps"
@@ -128,47 +121,41 @@ class ShowDataPanelPresenter {
         let vSendLoss = "show_statistic_down_loss_package".show_localized+": \(remoteVideoStats.packetLossRate) %"
         let lastmile = "show_statistic_delay".show_localized+": \(remoteVideoStats.delay) ms"
         
-        let audioRecv = "ARecv: \(remoteAudioStats.receivedBitrate) kbps"
-        let audioLoss = "ALoss: \(remoteAudioStats.audioLossRate) %"
-        
-        if audioOnly {
-            return ShowPanelData(left: [audioRecv, audioLoss, vSendLoss].joined(separator: "\n") + "\n", right: "\n")
-        }
         let leftInfo = [sendTitle, videoSize,   videoSend,  downlink].joined(separator: "\n") + "\n"
         let rightInfo = ["  ",     fps,        vSendLoss,  lastmile].joined(separator: "\n") + "\n"
 
         return ShowPanelData(left: leftInfo, right: rightInfo)
     }
     
-    private func otherData(send: Bool, receive: Bool) -> ShowPanelData {
+    private func otherData(send: Bool, receive: Bool, audience: Bool) -> ShowPanelData {
         let params = ShowAgoraKitManager.shared.rtcParam
         let onStr = "show_setting_switch_on".show_localized
         let offStr = "show_setting_switch_off".show_localized
         // left:
-        // 其他
+        // others
         let title = "show_statistic_title_other".show_localized
-        // 秒开耗时
-        let startup = receive ? "\(callTs) ms" : "--"
+        // fast open time
+        let startup = audience ? "\(callTs) ms" : "--"
         let startupStr = "show_statistic_startup_time".show_localized + ": " + startup
-        // h265开关
+        // h265 switch
         let h265 = send ? onStr : "--"
         let h265Str = "H265" + ": " + h265
-        // 超分开关
-        let sr = receive ? (params.sr ? onStr : offStr) : "--"
+        // super resolution switch
+        let sr = audience ? (params.sr ? onStr : offStr) : "--"
         let srStr = "show_statistic_SR_switch".show_localized + ": " + sr
-        // 小流开关
+        // micro stream switch
         let microStream = send ? ((localVideoStats.dualStreamEnabled) ? onStr : offStr) : "--"
         let microStreamStr = "show_statistic_micro_stream_switch".show_localized + ": " + microStream
         // right:
-        //机型等级
+        // device cpu level
         let levelStr = "show_statistic_device_level".show_localized
         + ": "
         + ShowAgoraKitManager.shared.deviceLevel.description()
         + "(\(ShowAgoraKitManager.shared.deviceScore))"
-        //pvc开关
+        //pvc switch
         let pvc = send ? (params.pvc ? onStr : offStr) : "--"
         let pvcStr = "show_statistic_pvc_switch".show_localized + ": " + pvc
-        //svc开关
+        //svc switch
         let svc = send ? (params.svc ? onStr : offStr) : "--"
         let svcStr = "show_statistic_svc_switch".show_localized + ": " + svc
         let left = [title, startupStr, h265Str, srStr,  microStreamStr].joined(separator: "\n") + "\n"
