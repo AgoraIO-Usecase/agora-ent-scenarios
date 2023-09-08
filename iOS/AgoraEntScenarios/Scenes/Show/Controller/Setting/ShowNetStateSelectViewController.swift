@@ -61,7 +61,7 @@ class ShowNetStateSelectViewController: UIViewController {
         ShowAgoraKitManager.shared.netCondition = aNetCondition
         ShowAgoraKitManager.shared.performanceMode = aPerformance
         ShowAgoraKitManager.shared.deviceLevel = aDeviceLevel
-        ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)
+        ShowAgoraKitManager.shared.setupBroadcasterProfile()
         dismiss(animated: true)
     }
     

@@ -704,7 +704,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             if role == .audience {
-                ShowAgoraKitManager.shared.updateAudienceProfile()
                 ShowAgoraKitManager.shared.setPVCon(true)
                 ShowAgoraKitManager.shared.setSuperResolutionOn(false)
             }
@@ -1004,7 +1003,7 @@ extension ShowLiveViewController {
                 if self.role == .audience && self.currentInteraction?.userId != VLUserCenter.user.id {
                     send = false
                 }
-                let data = self.panelPresenter.generatePanelData(audioOnly: false, send: send, receive: receive)
+                let data = self.panelPresenter.generatePanelData(send: send, receive: receive, audience: (self.role == .audience))
                 self.realTimeView.update(left: data.left, right: data.right)
             }
         }
