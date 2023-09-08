@@ -1187,7 +1187,8 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
                    reason: AgoraVideoRemoteReason,
                    elapsed: Int) {
         let channelId = tokenConfig?.roomId ?? ""
-        callPrint("didLiveRtcRemoteVideoStateChanged channelId: \(channelId) uid: \(uid) state: \(state.rawValue) reason: \(reason.rawValue)")
+        guard uid == callingUserId else {return}
+        callPrint("didLiveRtcRemoteVideoStateChanged channelId: \(channelId)/\(callingRoomId ?? "") uid: \(uid)/\(callingUserId ?? 0) state: \(state.rawValue) reason: \(reason.rawValue)")
         if state == .decoding /*2*/,
            ( reason == .remoteUnmuted /*6*/ || reason == .localUnmuted /*4*/ || reason == .localMuted /*3*/ )   {
             DispatchQueue.main.async {
