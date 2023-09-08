@@ -3,7 +3,7 @@ package io.agora.scene.showTo1v1.callAPI
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 
-class CallProxy constructor(): IRtcEngineEventHandler() {
+class CallProxy: IRtcEngineEventHandler() {
 
     private val listeners = mutableListOf<IRtcEngineEventHandler>()
 

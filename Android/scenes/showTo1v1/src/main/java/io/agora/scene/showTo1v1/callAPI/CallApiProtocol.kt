@@ -4,25 +4,21 @@ import android.view.TextureView
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngineEx
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceImpl
-import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 
-enum class CallRole constructor(val value: Int) {
+enum class CallRole(val value: Int) {
     // 被叫
     CALLEE(0),
-
     // 主叫
     CALLER(1)
 }
 
 /// 模式
-enum class CallMode constructor(val value: Int) {
+enum class CallMode(val value: Int) {
     ShowTo1v1(0),       //秀场转1v1
     Pure1v1(1)          //纯1v1
 }
 
-open class CallConfig constructor(
+open class CallConfig(
     //声网App Id
     var appId: String = "",
     //用户id
@@ -43,9 +39,9 @@ open class CallConfig constructor(
     var remoteView: TextureView,
     //是否收到被叫后自动接受，秀场转1v1可用
     var autoAccept: Boolean = true,
-) {}
+){}
 
-open class PrepareConfig constructor() {
+open class PrepareConfig {
     var autoLoginRTM: Boolean = true        //是否自动登录RTM
     var autoSubscribeRTM: Boolean = true    //是否自动订阅RTM，如果为true，则autoLoginRTM必定为true
     var autoJoinRTC: Boolean = false        //是否自动登录RTC
@@ -58,7 +54,6 @@ open class PrepareConfig constructor() {
             config.autoSubscribeRTM = false
             return config
         }
-
         /// 被叫默认配置
         /// - Returns: <#description#>
         fun calleeConfig(): PrepareConfig {
@@ -70,13 +65,12 @@ open class PrepareConfig constructor() {
 
 /** token renew时的配置
  */
-open class CallTokenConfig constructor() {
-    var roomId: String = ""     // 频道名(主叫需要设置为1v1的频道；被叫需要设置为自己的广播频道，与ownerRoomId保持一致即可)
+open class CallTokenConfig {
+    var roomId: String = ""     // 频道名(主叫需要设置为1v1的频道，被叫需要设置为自己的广播频道)
     var rtcToken: String = ""   // rtc token，被叫需要使用万能token
     var rtmToken: String = ""   // rtm token
 }
-
-enum class CallReason constructor(val value: Int) {
+enum class CallReason(val value: Int) {
     None(0),
     JoinRTCFailed(1),           // 加入RTC失败
     RtmSetupFailed(2),          // 设置RTM失败
@@ -91,10 +85,10 @@ enum class CallReason constructor(val value: Int) {
     LocalCancel(11),            // 本地用户取消呼叫
     RemoteCancel(12),           // 远端用户取消呼叫
     RecvRemoteFirstFrame(13),   // 收到远端首帧
-    CallingTimeout(14)         // 呼叫超时
+    CallingTimeout (14)         // 呼叫超时
 }
 
-enum class CallEvent constructor(val value: Int) {
+enum class CallEvent(val value: Int) {
     None(0),
     Deinitialize(1),                // 调用了deinitialize
     MissingReceipts(2),             // 没有收到消息回执
@@ -124,7 +118,7 @@ enum class CallEvent constructor(val value: Int) {
 /**
  * 呼叫状态类型
  */
-enum class CallStateType constructor(val value: Int) {
+enum class CallStateType(val value: Int) {
     Idle(0),            // 空闲
     Prepared(1),        // 创建1v1环境完成
     Calling(2),         // 呼叫中
@@ -148,13 +142,11 @@ interface ICallApiListener {
      * @param elapsed 从触发到回调的耗时(只有呼叫到通话中间事件可统计)
      * @param eventInfo 扩展信息，不同事件类型参数不同，其中key为“publisher”为状态变更者id，空则表示是自己的状态变更
      */
-    fun onCallStateChanged(
-        state: CallStateType,
-        stateReason: CallReason,
-        eventReason: String,
-        elapsed: Long,
-        eventInfo: Map<String, Any>
-    )
+    fun onCallStateChanged(state: CallStateType,
+                           stateReason: CallReason,
+                           eventReason: String,
+                           elapsed: Long,
+                           eventInfo: Map<String, Any>)
 
     /** 内部详细事件变更回调
      * @param event: 事件
@@ -241,7 +233,6 @@ interface ICallApi {
 
     //
     fun addRTCListener(listener: IRtcEngineEventHandler)
-
     //
     fun removeRTCListener(listener: IRtcEngineEventHandler)
 }

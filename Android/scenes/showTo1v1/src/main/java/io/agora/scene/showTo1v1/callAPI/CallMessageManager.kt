@@ -9,7 +9,7 @@ import io.agora.rtm2.*
 import org.json.JSONObject
 
 /// 回执的消息队列对象
-private class CallQueueInfo constructor(){
+private class CallQueueInfo {
 
     val TAG = "CALL_QUEUE_LOG"
     var messageId: Int = 0

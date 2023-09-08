@@ -11,7 +11,7 @@ import io.agora.rtm2.*
 import org.json.JSONObject
 import java.util.UUID
 
-enum class CallAction constructor(val value: Int) {
+enum class CallAction(val value: Int) {
     Call(0),
     CancelCall(1),
     Accept(2),
@@ -24,7 +24,7 @@ enum class CallAction constructor(val value: Int) {
         }
     }
 }
-enum class CallCostType constructor(val value: String) {
+enum class CallCostType(val value: String) {
     RecvCalling("recvCalling"),
     AcceptCall("acceptCall"),
     LocalUserJoinChannel("localUserJoinChannel"),
@@ -32,7 +32,7 @@ enum class CallCostType constructor(val value: String) {
     RecvFirstFrame("recvFirstFrame")
 }
 
-class CallApiImpl constructor(
+class CallApiImpl(
     private val context: Context
 ): ICallApi, RtmEventListener, CallMessageListener, IRtcEngineEventHandler() {
 
@@ -351,8 +351,7 @@ class CallApiImpl constructor(
         videoCanvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
 
         engine.setDefaultAudioRoutetoSpeakerphone(true)
-        val ret =  engine.setupLocalVideo(videoCanvas)
-        Log.d(TAG, "_setupLocalVideo ret: $ret, uid: $uid")
+        engine.setupLocalVideo(videoCanvas)
         engine.startPreview()
     }
 
@@ -1078,4 +1077,3 @@ class CallApiImpl constructor(
         }
     }
 }
-

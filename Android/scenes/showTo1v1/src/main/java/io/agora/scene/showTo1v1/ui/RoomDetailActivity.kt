@@ -251,12 +251,10 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
 
         })
-        binding.vDragWindow.setOnClickListener(object : OnClickJackingListener() {
-            override fun onClickJacking(view: View) {
-                Log.d(TAG, "click switch video")
-                switchVideoView()
-            }
-        })
+        binding.vDragWindow.setOnViewClick {
+            Log.d(TAG, "click switch video")
+            switchVideoView()
+        }
         binding.vDragWindow.isVisible = false
         if (isRoomOwner) {
             binding.layoutCallPrivatelyBg.isVisible = false
