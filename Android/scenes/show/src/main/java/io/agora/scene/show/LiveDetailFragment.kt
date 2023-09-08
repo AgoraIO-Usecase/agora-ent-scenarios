@@ -1875,8 +1875,8 @@ class LiveDetailFragment : Fragment() {
             pkRoomId,
             UserManager.getInstance().user.id.toInt()
         )
-        mRtcVideoSwitcher.joinChannel(
-            pkRtcConnection, channelMediaOptions, RtcEngineInstance.generalToken(), null, false
+        mRtcVideoSwitcher.preJoinChannel(
+            pkRtcConnection, channelMediaOptions, RtcEngineInstance.generalToken(), null
         )
         prepareRkRoomId = pkRoomId
     }
