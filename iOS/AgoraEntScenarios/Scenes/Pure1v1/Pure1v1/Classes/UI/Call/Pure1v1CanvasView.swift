@@ -10,6 +10,8 @@ import Foundation
 class Pure1v1CanvasView: UIView {
     lazy var canvasView = UIView()
     
+    var tapClosure: (()->())?
+    
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 12)
@@ -21,6 +23,11 @@ class Pure1v1CanvasView: UIView {
         super.init(frame: frame)
         addSubview(canvasView)
         addSubview(titleLabel)
+        
+        let tapGes = UITapGestureRecognizer {[weak self] _ in
+            self?.tapClosure?()
+        }
+        addGestureRecognizer(tapGes)
     }
     
     required init?(coder: NSCoder) {
