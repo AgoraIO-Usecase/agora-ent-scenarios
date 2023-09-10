@@ -51,7 +51,6 @@ class RoomListViewController: UIViewController {
     private var callState: CallStateType = .idle
     private lazy var callVC: CallViewController = {
         let vc = CallViewController()
-        vc.modalPresentationStyle = .fullScreen
         vc.callApi = callApi
         return vc
     }()
@@ -200,7 +199,8 @@ extension RoomListViewController {
             return
         }
         
-        renewTokens { flag in
+        renewTokens {[weak self] flag in
+            self?._reinitCallerAPI()
         }
         
         let config = VideoLoaderConfig()
@@ -210,7 +210,7 @@ extension RoomListViewController {
         videoLoaderApi.addListener(listener: self)
     }
     
-    private func _reinitCallerAPI(room: ShowTo1v1RoomInfo) {
+    private func _reinitCallerAPI() {
         tokenConfig.roomId = userInfo!.get1V1ChannelId()
         callApi.deinitialize {
         }
@@ -223,7 +223,6 @@ extension RoomListViewController {
         config.rtcEngine = rtcEngine
         config.localView = callVC.smallCanvasView.canvasView
         config.remoteView = callVC.bigCanvasView.canvasView
-        config.ownerRoomId = room.roomId
         if let userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any] {
             config.userExtension = userExtension
         }
@@ -231,11 +230,6 @@ extension RoomListViewController {
         callApi.addListener(listener: self)
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
         }
-        
-        //reset callVC
-        callVC.callApi = callApi
-        callVC.roomInfo = room
-        callVC.rtcEngine = rtcEngine
     }
     
     private func _reinitCalleeAPI(room: ShowTo1v1RoomInfo) {
@@ -251,7 +245,6 @@ extension RoomListViewController {
         config.rtcEngine = rtcEngine
         config.localView = callVC.smallCanvasView.canvasView
         config.remoteView = callVC.bigCanvasView.canvasView
-        config.ownerRoomId = room.roomId
         
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
         }
@@ -287,9 +280,13 @@ extension RoomListViewController {
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         
-        self._reinitCallerAPI(room: room)
         callApi.call(roomId: room.roomId, remoteUserId: room.getUIntUserId()) { err in
         }
+        
+        //reset callVC
+        callVC.callApi = callApi
+        callVC.roomInfo = room
+        callVC.rtcEngine = rtcEngine
     }
 }
 
@@ -357,11 +354,10 @@ extension RoomListViewController {
         if roomInfo.userId == userInfo?.userId {
             self._reinitCalleeAPI(room: roomInfo)
         } else {
-            self._reinitCallerAPI(room: roomInfo)
+//            self._reinitCallerAPI(room: roomInfo)
         }
         
         let vc = BroadcasterViewController()
-        vc.modalPresentationStyle = .fullScreen
         vc.videoLoader = self.videoLoaderApi
         vc.callApi = self.callApi
         vc.currentUser = self.userInfo
@@ -374,7 +370,7 @@ extension RoomListViewController {
             })
         }
         service.subscribeListener(listener: vc)
-        self.present(vc, animated: false)
+        self.navigationController?.pushViewController(vc, animated: false)
     }
 }
 
@@ -395,7 +391,7 @@ extension RoomListViewController: CallApiListenerProtocol {
         
         switch state {
             case .calling:
-            if presentedViewController == callVC {
+            if navigationController?.visibleViewController == callVC {
                 return
             }
             
@@ -444,8 +440,10 @@ extension RoomListViewController: CallApiListenerProtocol {
             break
         case .connected:
             callDialog?.hiddenAnimation()
-            callVC.dismiss(animated: false)
-            _topViewController().present(callVC, animated: false)
+            if navigationController?.visibleViewController == callVC {
+                return
+            }
+            navigationController?.pushViewController(callVC, animated: false)
             break
         case .prepared, .failed:
             callDialog?.hiddenAnimation()
@@ -515,17 +513,5 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
                 showTo1v1Print("renew token tokenPrivilegeWillExpire: \(channelId) \(ret)")
             }
         }
-    }
-}
-
-
-extension UIViewController {
-    func _topViewController() -> UIViewController {
-        let viewController = self
-
-        if let presentedController = viewController.presentedViewController {
-            return presentedController._topViewController()
-        }
-        return viewController
     }
 }

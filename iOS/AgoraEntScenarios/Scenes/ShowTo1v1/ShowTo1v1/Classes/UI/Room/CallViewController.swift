@@ -83,7 +83,8 @@ class CallViewController: BaseRoomViewController {
             callApi?.hangup(roomId: roomInfo?.roomId ?? "", completion: { err in
             })
         }
-        dismiss(animated: false)
+        guard navigationController?.viewControllers.contains(self) ?? false else {return}
+        navigationController?.popViewController(animated: false)
     }
 }
 
