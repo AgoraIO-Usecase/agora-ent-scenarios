@@ -58,8 +58,6 @@ class CallMessageManager: NSObject {
     private var rtmClient: AgoraRtmClientKit!
     private weak var rtmDelegate: AgoraRtmClientDelegate?
     
-    private var snapshotDidRecv: (()->())?
-    
     private var loginSuccess: ((AgoraRtmErrorInfo?)->())?
     
     /// RTM是否已经登录
@@ -97,7 +95,6 @@ class CallMessageManager: NSObject {
 
 //MARK: private method
 extension CallMessageManager {
-    
     //创建RTM
     private func _createRtmClient(delegate: AgoraRtmClientDelegate?) -> AgoraRtmClientKit {
         let rtmConfig = AgoraRtmClientConfig()
@@ -120,109 +117,22 @@ extension CallMessageManager {
     ///   - prepareConfig: <#prepareConfig description#>
     ///   - completion: <#completion description#>
     private func _subscribeRTM(tokenConfig: CallTokenConfig?, completion: ((NSError?)->())?) {
-        var roomId: String? = nil
-        if config.mode == .showTo1v1 {
-            roomId = config.role == .caller ? tokenConfig?.roomId : config.ownerRoomId
-        } else {
-            roomId = tokenConfig?.roomId
-        }
+        var roomId = tokenConfig?.roomId
         guard let roomId = roomId else {
             completion?(NSError(domain: "channelName is Empty", code: -1))
             return
         }
         
         /*
-         纯1v1:
-            订阅自己频道的message，用于收消息
-         秀场转1v1:
-         1.主叫
-            a.订阅被叫频道的presence，用户读取呼叫信息
-            b.订阅自己频道的message, 用来收消息
-         2.被叫
-            a.订阅自己频道的presence,用于写入呼叫信息
-            b.订阅自己频道的message，用来收消息
+         移除所有的presence，所有缓存由调用的业务服务器去控制
+         订阅自己频道的message，用来收消息
          */
-        if config?.role == .caller, config.mode == .showTo1v1 {
-            //秀场转1v1主叫
-            guard let ownerRoomId = config?.ownerRoomId else {
-                completion?(NSError(domain: "ownerRoomId is nil, please invoke 'initialize' to setup config", code: -1))
-                return
-            }
-            
-            let group = DispatchGroup()
-            
-            var error1: NSError? = nil
-            var error2: NSError? = nil
-            let options1 = AgoraRtmSubscribeOptions()
-            options1.withMessage = true
-            options1.withMetadata = false
-            options1.withPresence = false
-            group.enter()
-            callMessagePrint("1/3 will _subscribe[\(roomId)]")
-            _subscribe(channelName: roomId, option: options1) {[weak self] error in
-                error1 = error
-                self?.callMessagePrint("1/3 _subscribe[\(roomId)]: \(error?.localizedDescription ?? "success")")
-                group.leave()
-            }
-            
-            let options2 = AgoraRtmSubscribeOptions()
-            options2.withMessage = false
-            options2.withMetadata = false
-            //TODO(RTM Team): timeout to reconnect bug('presence = true' can not recv subscribe completion)
-//            options2.withPresence = true
-            options2.withPresence = false
-            group.enter()
-            callMessagePrint("2/3 will _subscribe[\(ownerRoomId)]")
-            _subscribe(channelName: ownerRoomId, option: options2) {[weak self] error in
-                error2 = error
-                self?.callMessagePrint("2/3 _subscribe[\(ownerRoomId)]: \(error?.localizedDescription ?? "success")")
-                group.leave()
-            }
-            
-            if options2.withPresence {
-                group.enter()
-                callMessagePrint("waiting for snapshot")
-                //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
-                snapshotDidRecv = {[weak self] in
-                    self?.callMessagePrint("recv snapshot")
-                    group.leave()
-                }
-            }
-            
-            group.notify(queue: DispatchQueue.main) {
-                completion?(error1 ?? error2)
-            }
-        } else {
-            let group = DispatchGroup()
-            
-            let options = AgoraRtmSubscribeOptions()
-            options.withMessage = true
-            options.withMetadata = false
-            //TODO(RTM Team): timeout to reconnect bug('presence = true' can not recv subscribe completion)
-//            if config.mode == .showTo1v1 {
-//                options.withPresence = true
-//            } else {
-//                options.withPresence = false
-//            }
-            options.withPresence = false
-            group.enter()
-            var err: NSError? = nil
-            _subscribe(channelName: roomId, option: options) { error in
-                err = error
-                group.leave()
-            }
-            
-            if options.withPresence {
-                group.enter()
-                snapshotDidRecv = {
-                    group.leave()
-                }
-            }
-            
-            group.notify(queue: DispatchQueue.main) {
-                completion?(err)
-            }
-        }
+        let options = AgoraRtmSubscribeOptions()
+        options.withMessage = true
+        options.withMetadata = false
+        options.withPresence = false
+        var err: NSError? = nil
+        _subscribe(channelName: roomId, option: options, completion: completion)
     }
     
     /// 发送回执消息
@@ -231,10 +141,7 @@ extension CallMessageManager {
     ///   - messageId: 回执的消息id
     ///   - retryCount: 重试次数
     ///   - completion: <#completion description#>
-    public func _sendReceipts(roomId: String,
-                              messageId: Int,
-                              retryCount: Int = 3,
-                              completion: ((NSError?)-> Void)? = nil) {
+    public func _sendReceipts(roomId: String, messageId: Int, retryCount: Int = 3, completion: ((NSError?)-> Void)? = nil) {
         var message: [String: Any] = [:]
         message[kReceiptsKey] = messageId
         callMessagePrint("_sendReceipts to '\(roomId)', message: \(message), retryCount: \(retryCount)")
@@ -257,10 +164,7 @@ extension CallMessageManager {
         }
     }
     
-    private func _sendMessage(roomId: String,
-                              message: [String: Any],
-                              retryCount: Int = 3,
-                              completion: ((NSError?)-> Void)?) {
+    private func _sendMessage(roomId: String, message: [String: Any], retryCount: Int = 3, completion: ((NSError?)-> Void)?) {
         if roomId.count == 0 {
             completion?(NSError(domain: "send message fail! roomId is empty", code: -1))
             return
@@ -359,9 +263,7 @@ extension CallMessageManager {
     ///   - prepareConfig: <#prepareConfig description#>
     ///   - tokenConfig: <#tokenConfig description#>
     ///   - completion: <#completion description#>
-    public func rtmInitialize(prepareConfig: PrepareConfig,
-                              tokenConfig: CallTokenConfig?,
-                              completion: ((NSError?) -> ())?) {
+    public func rtmInitialize(prepareConfig: PrepareConfig, tokenConfig: CallTokenConfig?, completion: ((NSError?) -> ())?) {
         callMessagePrint("_rtmInitialize")
         self.prepareConfig = prepareConfig
         self.tokenConfig = tokenConfig
@@ -383,12 +285,10 @@ extension CallMessageManager {
                     completion?(NSError(domain: err.reason, code: err.errorCode.rawValue))
                     return
                 }
-                //TODO: workaround to fixed on presence err(AgoraRtmPresenceEventTypeErrorOutOfService)
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.2) {
-                    self?.rtmInitialize(prepareConfig: prepareConfig,
-                                        tokenConfig: tokenConfig,
-                                        completion: completion)
-                }
+                
+                self?.rtmInitialize(prepareConfig: prepareConfig,
+                                    tokenConfig: tokenConfig,
+                                    completion: completion)
             }
         } else if isLoginedRTM, prepareConfig.autoSubscribeRTM {
             _subscribeRTM(tokenConfig: tokenConfig) {[weak self] error in
@@ -444,96 +344,6 @@ extension CallMessageManager {
         assert(fromRoomId.count > 0, "kReceiptsRoomIdKey is empty")
         _sendMessage(roomId: roomId, message: message, completion: completion)
     }
-    
-    /// 设置presence的属性信息
-    /// - Parameters:
-    ///   - attr: <#attr description#>
-    ///   - retryCount: <#retryCount description#>
-    ///   - completion: <#completion description#>
-    public func setPresenceState(attr:[String: Any], retryCount: Int = 3, completion: @escaping (Error?)->()) {
-        guard config.mode == .showTo1v1 else {
-            completion(NSError(domain: "can not be set presence in 'pure 1v1' mode", code: -1))
-            return
-        }
-        func _retry() -> Bool {
-            if retryCount <= 1 {
-                return false
-            }
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
-                self.setPresenceState(attr: attr, retryCount: retryCount - 1, completion: completion)
-            }
-            
-            return true
-        }
-        
-        guard let presence = rtmClient?.getPresence() else {
-            completion(NSError(domain: "not presence", code: -1))
-            return
-        }
-        guard let roomId = config?.ownerRoomId else {
-            completion(NSError(domain: "ownweRoomId isEmpty", code: -1))
-            return
-        }
-        callMessagePrint("_setPresenceState to '\(roomId)', attr: \(attr)")
-        
-        var items: [AgoraRtmStateItem] = []
-        attr.forEach { (key: String, value: Any) in
-            let item = AgoraRtmStateItem()
-            item.key = key
-            if let val = value as? String {
-                item.value = val
-            } else if let val = value as? UInt {
-                item.value = "\(val)"
-            } else if let val = value as? Double {
-                item.value = "\(val)"
-            } else {
-                callWarningPrint("setPresenceState missmatch item: \(key): \(value)")
-                return
-            }
-            
-            items.append(item)
-        }
-        
-        presence.setState(roomId, channelType: .message, items: items, completion: {[weak self] resp, error in
-            guard let self = self else {return}
-            self.callWarningPrint("presence setState '\(roomId)' finished: \(error.errorCode.rawValue)")
-            if error.errorCode == .ok {
-                completion(nil)
-                return
-            }
-            if _retry() {
-                return
-            }
-            completion(NSError(domain: error.reason, code: error.errorCode.rawValue))
-        })
-    }
-    
-    
-    /// 清理presence信息
-    /// - Parameters:
-    ///   - keys: 需要清理的presence的key 数组
-    ///   - completion: <#completion description#>
-    public func removePresenceState(keys: [String], completion: @escaping (Error?)->()) {
-        guard let presence = rtmClient?.getPresence() else {
-            completion(NSError(domain: "not presence", code: -1))
-            return
-        }
-        guard let roomId = config?.ownerRoomId else {
-            completion(NSError(domain: "ownweRoomId isEmpty", code: -1))
-            return
-        }
-        callMessagePrint("_removePresenceState to '\(roomId)', keys: \(keys)")
-        
-        presence.removeState(roomId, channelType: .message, items: keys, completion: {[weak self] resp, error in
-            guard let self = self else {return}
-            if error.errorCode == .ok {
-                completion(nil)
-                return
-            }
-            self.callWarningPrint("presence removeState '\(roomId)' finished: \(error.errorCode.rawValue)")
-            completion(NSError(domain: error.reason, code: error.errorCode.rawValue))
-        })
-    }
 }
 
 //MARK: AgoraRtmClientDelegate
@@ -565,15 +375,6 @@ extension CallMessageManager: AgoraRtmClientDelegate {
             }
         }
         
-        self.rtmDelegate?.rtmKit?(rtmKit, on: event)
-    }
-    
-    //收到RTM的presence
-    public func rtmKit(_ rtmKit: AgoraRtmClientKit, on event: AgoraRtmPresenceEvent) {
-        if event.type == .snapshot {
-            snapshotDidRecv?()
-            snapshotDidRecv = nil
-        }
         self.rtmDelegate?.rtmKit?(rtmKit, on: event)
     }
 }
