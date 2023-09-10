@@ -9,6 +9,7 @@ import Foundation
 
 class CallCanvasView: UIView {
     lazy var canvasView = UIView()
+    var tapClosure: (()->())?
     
     lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -21,6 +22,11 @@ class CallCanvasView: UIView {
         super.init(frame: frame)
         addSubview(canvasView)
         addSubview(titleLabel)
+        
+        let tapGes = UITapGestureRecognizer {[weak self] _ in
+            self?.tapClosure?()
+        }
+        addGestureRecognizer(tapGes)
     }
     
     required init?(coder: NSCoder) {

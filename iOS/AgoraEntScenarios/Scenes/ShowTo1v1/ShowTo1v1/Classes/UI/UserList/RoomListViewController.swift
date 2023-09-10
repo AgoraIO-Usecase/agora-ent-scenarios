@@ -221,8 +221,8 @@ extension RoomListViewController {
         config.appId = showTo1v1AppId!
         config.userId = userInfo!.getUIntUserId()
         config.rtcEngine = rtcEngine
-        config.localView = callVC.smallCanvasView.canvasView
-        config.remoteView = callVC.bigCanvasView.canvasView
+        config.localView = callVC.localCanvasView.canvasView
+        config.remoteView = callVC.remoteCanvasView.canvasView
         if let userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any] {
             config.userExtension = userExtension
         }
@@ -243,8 +243,8 @@ extension RoomListViewController {
         config.appId = showTo1v1AppId!
         config.userId = userInfo!.getUIntUserId()
         config.rtcEngine = rtcEngine
-        config.localView = callVC.smallCanvasView.canvasView
-        config.remoteView = callVC.bigCanvasView.canvasView
+        config.localView = callVC.localCanvasView.canvasView
+        config.remoteView = callVC.remoteCanvasView.canvasView
         
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
         }
