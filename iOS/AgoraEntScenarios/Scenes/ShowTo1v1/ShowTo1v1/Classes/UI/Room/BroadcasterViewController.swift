@@ -137,7 +137,7 @@ class BroadcasterViewController: BaseRoomViewController {
                 self.callApi?.moderationAudio(appId: showTo1v1AppId!, channelName: channelId, user: self.currentUser!)
             })
             
-            _setupCanvas(view: bigCanvasView)
+            _setupCanvas(view: remoteCanvasView)
             
             rtcEngine?.delegate = rtcProxy
             rtcProxy.addListener(self.realTimeView)
@@ -151,7 +151,7 @@ class BroadcasterViewController: BaseRoomViewController {
             }
             let room = roomInfo.createRoomInfo(token: token)
             let container = VideoCanvasContainer()
-            container.container = bigCanvasView
+            container.container = remoteCanvasView
             container.uid = roomInfo.getUIntUserId()
             videoLoader?.renderVideo(roomInfo: room, container: container)
             
@@ -244,7 +244,7 @@ extension BroadcasterViewController {
             break
         case .prepared, .idle, .failed:
             _publishMedia(true)
-            _setupCanvas(view: bigCanvasView)
+            _setupCanvas(view: remoteCanvasView)
             break
         default:
             break
