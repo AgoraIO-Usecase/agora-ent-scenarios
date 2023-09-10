@@ -60,7 +60,6 @@ class BaseRoomViewController: UIViewController {
     }
     
     @objc func onBackAction() {
-        dismiss(animated: false)
         onBackClosure?()
     }
 }

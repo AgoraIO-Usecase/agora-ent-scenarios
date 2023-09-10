@@ -201,9 +201,17 @@ class BroadcasterViewController: BaseRoomViewController {
     }
     
     override func onBackAction() {
-        presentedViewController?.dismiss(animated: false)
-        super.onBackAction()
+        guard let navigationController = navigationController else {return}
+        var parentVC: UIViewController? = nil
+        for vc in navigationController.viewControllers {
+            if vc == self {
+                guard let parentVC = parentVC else {return}
+                navigationController.popToViewController(parentVC, animated: false)
+            }
+            parentVC = vc
+        }
         
+        super.onBackAction()
         _leaveRTCChannel()
     }
     
@@ -246,8 +254,7 @@ extension BroadcasterViewController {
 
 extension BroadcasterViewController: ShowTo1v1ServiceListenerProtocol {
     func onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo) {
-        presentedViewController?.dismiss(animated: false)
-        dismiss(animated: false)
+        onBackAction()
     }
     
     func onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus) {
