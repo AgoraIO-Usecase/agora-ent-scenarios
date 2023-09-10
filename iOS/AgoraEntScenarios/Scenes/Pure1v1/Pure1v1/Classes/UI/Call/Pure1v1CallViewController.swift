@@ -49,9 +49,8 @@ class Pure1v1CallViewController: UIViewController {
         return view
     }()
     lazy var localCanvasView: Pure1v1CanvasView = {
-        let view = Pure1v1CanvasView(frame: CGRect(origin: .zero, size: CGSize(width: 109, height: 163)))
+        let view = Pure1v1CanvasView(frame: .zero)
         view.backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
-        view.addGestureRecognizer(moveViewModel.gesture)
         view.tapClosure = {[weak self] in
             guard let self = self else {return}
             self._switchCanvasAction(canvasView: self.localCanvasView)
@@ -112,7 +111,7 @@ class Pure1v1CallViewController: UIViewController {
     
     private func _resetCanvas() {
         remoteCanvasView.frame = view.bounds
-        localCanvasView.aui_tl = CGPoint(x: canvasContainerView.aui_width - 25 - 109, y: 82 + UIDevice.current.aui_SafeDistanceTop)
+        localCanvasView.frame = CGRect(origin: CGPoint(x: canvasContainerView.aui_width - 25 - 109, y: 82 + UIDevice.current.aui_SafeDistanceTop), size: CGSize(width: 109, height: 163))
         canvasContainerView.bringSubviewToFront(localCanvasView)
         _updateCanvas()
     }
@@ -125,6 +124,9 @@ class Pure1v1CallViewController: UIViewController {
             remoteCanvasView.titleLabel.text = ""
             localCanvasView.titleLabel.text = currentUser?.userName ?? ""
             localCanvasView.sizeToFit()
+            
+            remoteCanvasView.removeGestureRecognizer(moveViewModel.gesture)
+            localCanvasView.addGestureRecognizer(moveViewModel.gesture)
         } else {
             remoteCanvasView.layer.cornerRadius = 20
             localCanvasView.layer.cornerRadius = 0
@@ -132,6 +134,8 @@ class Pure1v1CallViewController: UIViewController {
             localCanvasView.titleLabel.text = ""
             remoteCanvasView.titleLabel.text = targetUser?.userName ?? ""
             remoteCanvasView.sizeToFit()
+            localCanvasView.removeGestureRecognizer(moveViewModel.gesture)
+            remoteCanvasView.addGestureRecognizer(moveViewModel.gesture)
         }
     }
     
