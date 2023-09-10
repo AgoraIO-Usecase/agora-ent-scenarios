@@ -26,7 +26,6 @@ public class CallConfig: NSObject {
     public var appId: String = ""               //声网App Id
     public var userId: UInt = 0                 //用户id
     public var userExtension: [String: Any]?    //[可选]用户扩展字段,用在呼叫上，对端收到calling时可以通过kFromUserExtension字段读到
-    public var ownerRoomId: String?             //[可选]房主房间id，秀场转1v1可用，用于订阅房主频道
     public var rtcEngine: AgoraRtcEngineKit!    //rtc engine实例
     public var mode: CallMode = .showTo1v1      //模式
     public var role: CallRole = .callee         //角色，纯1v1需要设置成caller
@@ -61,7 +60,7 @@ public class PrepareConfig: NSObject {
 
 /// token renew时的配置
 public class CallTokenConfig: NSObject {
-    public var roomId: String = ""            //频道名(主叫需要设置为1v1的频道，被叫需要设置为自己的广播频道,与ownerRoomId保持一致即可)
+    public var roomId: String = ""            //频道名(主叫需要设置为1v1的频道，被叫可设置为自己的广播频道)
     public var rtcToken: String = ""          //rtc token，被叫需要使用万能token，token创建的时候channel name为空字符串
     public var rtmToken: String = ""          //rtm token
 }
@@ -139,14 +138,6 @@ public class CallTokenConfig: NSObject {
     ///   - event: 事件
     ///   - elapsed: 耗时(只有呼叫到通话中间事件可统计)
     @objc optional func onCallEventChanged(with event: CallEvent, elapsed: Int)
-    
-    /// 第一次进入房间时获取到的1v1信息，用于异常退出之后重连，秀场转1v1模式可用
-    /// - Parameters:
-    ///   - oneForOneRoomId: 1v1频道号
-    ///   - fromUserId: 发起呼叫的用户id
-    ///   - toUserId: 接收呼叫的用户id
-    @objc optional func onOneForOneCache(oneForOneRoomId: String, fromUserId: UInt, toUserId: UInt)
-    
     
     /// token快要过期了(需要外部获取新token调用renewToken更新)
     @objc optional func tokenPrivilegeWillExpire()
