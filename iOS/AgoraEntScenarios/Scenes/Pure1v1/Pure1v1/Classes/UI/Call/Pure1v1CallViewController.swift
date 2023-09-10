@@ -19,20 +19,13 @@ class Pure1v1CallViewController: UIViewController {
         }
     }
     var rtcEngine: AgoraRtcEngineKit?
-    var currentUser: Pure1v1UserInfo? {
-        didSet {
-            smallCanvasView.titleLabel.text = currentUser?.userName ?? ""
-            smallCanvasView.sizeToFit()
-        }
-    }
+    var currentUser: Pure1v1UserInfo?
     var targetUser: Pure1v1UserInfo? {
         didSet {
             roomInfoView.setRoomInfo(avatar: targetUser?.avatar ?? "",
                                      name: targetUser?.userName ?? "",
                                      id: targetUser?.userId ?? "",
                                      time: Int64(Date().timeIntervalSince1970 * 1000))
-            
-            smallCanvasView.aui_tl = CGPoint(x: view.aui_width - 25 - 109, y: 82 + UIDevice.current.aui_SafeDistanceTop)
             roomInfoView.timerCallBack = {[weak self] duration in
                 if duration < 20 * 60 {
                     return
@@ -40,15 +33,30 @@ class Pure1v1CallViewController: UIViewController {
                 self?.roomInfoView.setRoomInfo(avatar: nil, name: nil, id: nil, time: nil)
                 self?._hangupAction()
             }
+            _resetCanvas()
         }
     }
     private lazy var moveViewModel: MoveGestureViewModel = MoveGestureViewModel()
     private lazy var roomInfoView: Pure1v1RoomInfoView = Pure1v1RoomInfoView()
-    lazy var bigCanvasView: Pure1v1CanvasView = Pure1v1CanvasView()
-    lazy var smallCanvasView: Pure1v1CanvasView = {
+    lazy var canvasContainerView = UIView()
+    lazy var remoteCanvasView: Pure1v1CanvasView = {
+        let view = Pure1v1CanvasView()
+        view.tapClosure = {[weak self] in
+            guard let self = self else {return}
+            self._switchCanvasAction(canvasView: self.remoteCanvasView)
+        }
+        view.clipsToBounds = true
+        return view
+    }()
+    lazy var localCanvasView: Pure1v1CanvasView = {
         let view = Pure1v1CanvasView(frame: CGRect(origin: .zero, size: CGSize(width: 109, height: 163)))
         view.backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
         view.addGestureRecognizer(moveViewModel.gesture)
+        view.tapClosure = {[weak self] in
+            guard let self = self else {return}
+            self._switchCanvasAction(canvasView: self.localCanvasView)
+        }
+        view.clipsToBounds = true
         return view
     }()
     private lazy var hangupButton: UIButton = {
@@ -81,8 +89,12 @@ class Pure1v1CallViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .black
         
-        view.addSubview(bigCanvasView)
-        view.addSubview(smallCanvasView)
+        canvasContainerView.frame = view.bounds
+        view.addSubview(canvasContainerView)
+        canvasContainerView.addSubview(remoteCanvasView)
+        canvasContainerView.addSubview(localCanvasView)
+        
+        _resetCanvas()
         
         view.addSubview(roomInfoView)
         view.addSubview(bottomBar)
@@ -90,15 +102,51 @@ class Pure1v1CallViewController: UIViewController {
         
         moveViewModel.touchArea = view.bounds
         roomInfoView.frame = CGRect(x: 15, y: UIDevice.current.aui_SafeDistanceTop, width: 202, height: 40)
-        bigCanvasView.frame = view.bounds
-        smallCanvasView.layer.cornerRadius = 20
-        smallCanvasView.clipsToBounds = true
         
         bottomBar.frame = CGRect(x: 0, y: view.aui_height - UIDevice.current.aui_SafeDistanceBottom - 50, width: view.aui_width, height: 40)
         
         hangupButton.aui_size = CGSize(width: 70, height: 70)
         hangupButton.aui_bottom = self.view.aui_height - 20 - UIDevice.current.aui_SafeDistanceBottom
         hangupButton.aui_centerX = self.view.aui_width / 2
+    }
+    
+    private func _resetCanvas() {
+        remoteCanvasView.frame = view.bounds
+        localCanvasView.aui_tl = CGPoint(x: canvasContainerView.aui_width - 25 - 109, y: 82 + UIDevice.current.aui_SafeDistanceTop)
+        canvasContainerView.bringSubviewToFront(localCanvasView)
+        _updateCanvas()
+    }
+    
+    private func _updateCanvas() {
+        if canvasContainerView.subviews.first == remoteCanvasView {
+            localCanvasView.layer.cornerRadius = 20
+            remoteCanvasView.layer.cornerRadius = 0
+            
+            remoteCanvasView.titleLabel.text = ""
+            localCanvasView.titleLabel.text = currentUser?.userName ?? ""
+            localCanvasView.sizeToFit()
+        } else {
+            remoteCanvasView.layer.cornerRadius = 20
+            localCanvasView.layer.cornerRadius = 0
+            
+            localCanvasView.titleLabel.text = ""
+            remoteCanvasView.titleLabel.text = targetUser?.userName ?? ""
+            remoteCanvasView.sizeToFit()
+        }
+    }
+    
+    private func _switchCanvasAction(canvasView: Pure1v1CanvasView) {
+        guard canvasView == canvasContainerView.subviews.last else {return}
+        
+        let localFrame = localCanvasView.frame
+        localCanvasView.frame = remoteCanvasView.frame
+        remoteCanvasView.frame = localFrame
+        if canvasView == remoteCanvasView {
+            canvasContainerView.bringSubviewToFront(localCanvasView)
+        } else {
+            canvasContainerView.bringSubviewToFront(remoteCanvasView)
+        }
+        _updateCanvas()
     }
     
     @objc private func _hangupAction() {

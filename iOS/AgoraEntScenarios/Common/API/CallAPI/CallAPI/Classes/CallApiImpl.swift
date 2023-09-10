@@ -718,6 +718,12 @@ extension CallApiImpl {
     
     //收到取消呼叫消息
     private func _onCancel(message: [String: Any]) {
+        let fromUserId = message[kFromUserId] as? UInt ?? 0
+        //如果不是接收的正在接听的用户的呼叫
+        guard callingUserId == fromUserId else {
+            return
+        }
+        
         _notifyState(state: .prepared, stateReason: .remoteCancel, eventInfo: message)
         _notifyEvent(event: .remoteCancel)
     }
@@ -1181,7 +1187,8 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
                    reason: AgoraVideoRemoteReason,
                    elapsed: Int) {
         let channelId = tokenConfig?.roomId ?? ""
-        callPrint("didLiveRtcRemoteVideoStateChanged channelId: \(channelId) uid: \(uid) state: \(state.rawValue) reason: \(reason.rawValue)")
+        guard uid == callingUserId else {return}
+        callPrint("didLiveRtcRemoteVideoStateChanged channelId: \(channelId)/\(callingRoomId ?? "") uid: \(uid)/\(callingUserId ?? 0) state: \(state.rawValue) reason: \(reason.rawValue)")
         if state == .decoding /*2*/,
            ( reason == .remoteUnmuted /*6*/ || reason == .localUnmuted /*4*/ || reason == .localMuted /*3*/ )   {
             DispatchQueue.main.async {
