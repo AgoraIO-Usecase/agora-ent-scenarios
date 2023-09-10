@@ -115,8 +115,8 @@ extension Pure1v1UserListViewController {
         config.userId = UInt(userInfo?.userId ?? "")!
         config.autoAccept = false
         config.rtcEngine = rtcEngine
-        config.localView = callVC.smallCanvasView.canvasView
-        config.remoteView = callVC.bigCanvasView.canvasView
+        config.localView = callVC.localCanvasView.canvasView
+        config.remoteView = callVC.remoteCanvasView.canvasView
         if let userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any] {
             config.userExtension = userExtension
         }
@@ -158,7 +158,7 @@ extension Pure1v1UserListViewController {
         }
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
-        callApi.call(roomId: user.userId, remoteUserId: remoteUserId) { err in
+        callApi.call(roomId: user.getRoomId(), remoteUserId: remoteUserId) { err in
         }
     }
 }
@@ -371,9 +371,8 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
         }
             
         //renew other caller room(current user is callee)
-        if let uid = connectedUserId {
+        if let channelName = connectedChannelId {
             //calling token
-            let channelName = "\(uid)"
             NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
                                                  appCertificate: pure1V1AppCertificate!,
                                                  channelName: channelName,

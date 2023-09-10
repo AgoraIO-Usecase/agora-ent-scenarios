@@ -134,6 +134,7 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
     }
     
     func enterRoom(completion: @escaping (NSError?) -> Void) {
+        //比较通过roomid，一个人可能会有不同的roomid，但是create scene通过uid，保证不同roomId会被覆盖，保证一个用户不会展示多个
         guard let user = self.user, !userList.contains(where: { $0.getRoomId() == user.getRoomId() }) else {
             completion(nil)
             return
@@ -147,13 +148,13 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
                 return
             }
             let params = user.yy_modelToJSONObject() as? [String: Any]
-            let scene = Scene(id: user.getRoomId(), userId: user.userId, isOwner: true, property: params)
+            let scene = Scene(id: user.userId, userId: user.userId, isOwner: true, property: params)
             self?.manager.createScene(scene: scene, success: {[weak self] in
                 guard let self = self else {return}
-                self.manager.joinScene(sceneId: user.getRoomId()) { sceneRef in
+                self.manager.joinScene(sceneId: user.userId) { sceneRef in
                     pure1v1Print("createUser success")
                     mainTreadTask {
-                        self.sceneRefs[user.getRoomId()] = sceneRef
+                        self.sceneRefs[user.userId] = sceneRef
                         self._notifyEnterCompletion(nil)
                     }
                 } fail: { error in
@@ -172,7 +173,7 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
     }
     
     func leaveRoom(completion: @escaping (NSError?) -> Void) {
-        self.sceneRefs[user?.getRoomId() ?? ""]?.deleteScenes()
+        self.sceneRefs[user?.userId ?? ""]?.deleteScenes()
         completion(nil)
     }
     
