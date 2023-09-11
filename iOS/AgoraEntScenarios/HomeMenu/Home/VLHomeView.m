@@ -85,7 +85,7 @@
 - (NSArray *)itemsArray {
     if (!_itemsArray) {
         _itemsArray = @[
-            @{
+            /*@{
                 @"bgImgStr":@"home_talk_bg",
                 @"iconImgStr":@"home_talk_icon",
                 @"titleStr":NSLocalizedString(@"app_voice_chat", nil),
@@ -109,7 +109,7 @@
                 @"titleStr":NSLocalizedString(@"app_show_live", nil),
                 @"subTitleStr":@""
             },
-            [Pure1v1Context thumbnailInfo],
+            [Pure1v1Context thumbnailInfo],*/
             [ShowTo1v1Context thumbnailInfo]
         ];
     }
