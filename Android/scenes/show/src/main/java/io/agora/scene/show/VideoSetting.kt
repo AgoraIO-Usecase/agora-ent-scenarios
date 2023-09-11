@@ -723,11 +723,11 @@ object VideoSetting {
 
         var newBitRate = bitRate
         bitRateStandard?.let {
-            newBitRate = if (it){  // 自适应打开设置码率为 0，sdk 算法处理
+            newBitRate = if (it) {  // 自适应打开设置码率为 0，sdk 算法处理
                 0
-            }else{
+            } else {
                 // 自适应关闭时候码率为推荐码率
-                getRecommendBroadcastSetting().video.bitRate
+                getRecommendBroadcastSetting().video.bitRateRecommand
             }
         }
         updateRTCBroadcastSetting(

@@ -88,7 +88,11 @@ class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcC
             ITEM_ID_SWITCH_BITRATE,
             VideoSetting.getCurrBroadcastSetting().video.bitRateStandard.toInt()
         )
-        put(ITEM_ID_SEEKBAR_BITRATE, VideoSetting.getCurrBroadcastSetting().video.bitRate)
+        if (VideoSetting.getCurrBroadcastSetting().video.bitRateStandard) {
+            put(ITEM_ID_SEEKBAR_BITRATE, VideoSetting.getCurrBroadcastSetting().video.bitRateRecommand)
+        } else {
+            put(ITEM_ID_SEEKBAR_BITRATE, VideoSetting.getCurrBroadcastSetting().video.bitRate)
+        }
         put(
             ITEM_ID_SEEKBAR_VOCAL_VOLUME,
             VideoSetting.getCurrBroadcastSetting().audio.recordingSignalVolume
@@ -431,8 +435,17 @@ class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcC
                 binding.slider.visibility = if (isChecked) View.GONE else View.VISIBLE
                 binding.tvValue.visibility = if (isChecked) View.GONE else View.VISIBLE
                 if (!isChecked) { // 关闭时候设置推荐默认值
-                    binding.slider.value =
-                        VideoSetting.getRecommendBroadcastSetting().video.bitRateRecommand.toFloat()
+                    if (VideoSetting.getCurrBroadcastSetting().video.bitRate == 0) {
+                        binding.slider.value =
+                            VideoSetting.getCurrBroadcastSetting().video.bitRateRecommand.toFloat()
+                        VideoSetting.updateBroadcastSetting(
+                            bitRate = VideoSetting.getCurrBroadcastSetting().video.bitRateRecommand
+                        )
+                    } else {
+                        binding.slider.value =
+                            VideoSetting.getCurrBroadcastSetting().video.bitRate.toFloat()
+                    }
+
                     binding.tvValue.text =
                         String.format(Locale.US, valueFormat, binding.slider.value.toInt())
                 }
@@ -448,7 +461,9 @@ class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcC
         binding.tvValue.text = String.format(Locale.US, valueFormat, binding.slider.value.toInt())
         binding.slider.clearOnChangeListeners()
         binding.slider.clearOnSliderTouchListeners()
-        onSeekbarChanged(itemIdSeekbar, defaultValue.toInt())
+        if (!binding.switchCompat.isChecked) {
+            onSeekbarChanged(itemIdSeekbar, defaultValue.toInt())
+        }
         var changed = false
         binding.slider.addOnChangeListener { status, nValue, fromUser ->
             if (fromUser) {
