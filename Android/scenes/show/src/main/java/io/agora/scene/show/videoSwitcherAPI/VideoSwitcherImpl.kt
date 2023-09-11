@@ -177,13 +177,11 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
             val viewIndex = container.container.indexOfChild(videoView)
 
             if (viewIndex == container.viewIndex) {
-                if (it.connection.rtcEventHandler?.isJoinChannelSuccess == true) {
-                    ShowLogger.d("hugo", "setupRemoteVideoEx111")
-                    rtcEngine.setupRemoteVideoEx(
-                        it,
-                        it.connection
-                    )
-                }
+                ShowLogger.d("hugo", "setupRemoteVideoEx111")
+                rtcEngine.setupRemoteVideoEx(
+                    it,
+                    it.connection
+                )
                 return
             }
             it.release()
@@ -211,13 +209,11 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
                     container.renderMode,
                     container.uid
                 )
-                //if (connectionWrap.rtcEventHandler?.isJoinChannelSuccess == true) {
                 ShowLogger.d("hugo", "setupRemoteVideoEx222")
                 rtcEngine.setupRemoteVideoEx(
                     remoteVideoCanvasWrap,
                     connectionWrap
                 )
-                //}
                 return
             }
         }
@@ -230,13 +226,11 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
             container.renderMode,
             container.uid
         )
-        //if (connectionWrap.rtcEventHandler?.isJoinChannelSuccess == true) {
         ShowLogger.d("hugo", "setupRemoteVideoEx333")
         rtcEngine.setupRemoteVideoEx(
             remoteVideoCanvasWrap,
             connectionWrap
         )
-        //}
     }
 
     override fun getFirstVideoFrameTime(): Long {
@@ -737,7 +731,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
         fun release() {
             lifecycleOwner.lifecycle.removeObserver(this)
             view = null
-            rtcEngine.setupRemoteVideoEx(this, connection)
+            //rtcEngine.setupRemoteVideoEx(this, connection)
             remoteVideoCanvasList.remove(this)
         }
     }
