@@ -238,7 +238,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             override fun onClickJacking(view: View) {
                 Log.d(TAG, "click call privately")
                 reInitCallApi(CallRole.CALLER, callback = {
-                    mCallApi.call(mRoomInfo.roomId, mRoomInfo.getIntUserId(), null)
+                    mCallApi.call(mRoomInfo.roomId, mRoomInfo.getIntUserId(), completion = {
+                        if (it!=null){
+                            mCallDialog
+                        }
+                    })
                 })
             }
         })
@@ -678,6 +682,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 when (stateReason) {
                     CallReason.RemoteHangup -> {
                         ToastUtils.showToast(getString(R.string.show_to1v1_end_linking_tips))
+                        if (mCallConnected && !isRoomOwner){
+                            onBackPressed()
+                        }
                     }
 
                     CallReason.CallingTimeout -> {
@@ -686,10 +693,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
                     else -> {}
                 }
-                mCallDialog?.let {
-                    if (it.isShowing) it.dismiss()
-                    mCallDialog = null
-                }
+                finishCallDialog()
                 mShowTo1v1Manger.mRemoteUser = null
                 mShowTo1v1Manger.mConnectedChannelId = null
             }
@@ -722,10 +726,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
             CallStateType.Connecting -> mCallDialog?.updateCallState(CallDialogState.Connecting)
             CallStateType.Connected -> {
-                mCallDialog?.let {
-                    if (it.isShowing) it.dismiss()
-                    mCallDialog = null
-                }
+                finishCallDialog()
                 // 开启鉴黄鉴暴
                 val channelId = mShowTo1v1Manger.mRemoteUser?.get1v1ChannelId() ?: ""
                 val localUid = mShowTo1v1Manger.mCurrentUser.userId.toInt()
@@ -739,10 +740,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
 
             CallStateType.Failed -> {
-                mCallDialog?.let {
-                    if (it.isShowing) it.dismiss()
-                    mCallDialog = null
-                }
+                finishCallDialog()
                 ToastUtils.showToast(eventReason)
             }
         }
@@ -775,6 +773,13 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
         } else {
             mCallApi.hangup(mRoomInfo.roomId, null)
+        }
+    }
+
+    private fun finishCallDialog(){
+        mCallDialog?.let {
+            if (it.isShowing) it.dismiss()
+            mCallDialog = null
         }
     }
 }

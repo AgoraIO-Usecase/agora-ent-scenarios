@@ -119,19 +119,18 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvRoomName"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
             android:drawableStart="@drawable/show_to1v1_subtract"
             android:drawablePadding="9dp"
             android:ellipsize="end"
-            android:maxLength="12"
             android:maxLines="1"
             android:textColor="@color/white"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@id/ivUserAvatar"
             app:layout_constraintTop_toBottomOf="@id/ivUserAvatar"
-            tools:text="房间主题" />
+            tools:text="房间主题房间主题房间主题房间主题房间主题" />
 
         <androidx.cardview.widget.CardView
             android:layout_width="109dp"
