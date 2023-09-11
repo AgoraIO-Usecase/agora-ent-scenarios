@@ -651,6 +651,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
             binding.llCallContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
             binding.vDragWindow.canvasContainer.addView(mShowTo1v1Manger.mLocalVideoView)
+
+            binding.vDragWindow.setUserName(mShowTo1v1Manger.mCurrentUser.userName)
         } else if (binding.vDragWindow.canvasContainer.contains(mShowTo1v1Manger.mLocalVideoView)) {
             // 小窗是自己
             binding.llCallContainer.removeView(mShowTo1v1Manger.mRemoteVideoView)
@@ -658,6 +660,10 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
             binding.llCallContainer.addView(mShowTo1v1Manger.mLocalVideoView)
             binding.vDragWindow.canvasContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
+
+            mShowTo1v1Manger.mRemoteUser?.let {
+                binding.vDragWindow.setUserName(it.userName)
+            }
         }
     }
 
