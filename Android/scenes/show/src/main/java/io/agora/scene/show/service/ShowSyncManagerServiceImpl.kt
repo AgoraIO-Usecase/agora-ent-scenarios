@@ -20,7 +20,7 @@ class ShowSyncManagerServiceImpl constructor(
     private val errorHandler: (Exception) -> Unit
 ) : ShowServiceProtocol {
     private val TAG = "ShowSyncManagerServiceImpl"
-    private val kSceneId = "scene_show_3.0.1"
+    private val kSceneId = "scene_show_3.2.0"
     private val kCollectionIdUser = "userCollection"
     private val kCollectionIdMessage = "show_message_collection"
     private val kCollectionIdSeatApply = "show_seat_apply_collection"
