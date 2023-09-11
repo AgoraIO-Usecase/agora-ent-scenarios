@@ -114,7 +114,7 @@ class RoomListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         view.addSubview(noDataView)
         view.addSubview(listView)
         view.addSubview(naviBar)
