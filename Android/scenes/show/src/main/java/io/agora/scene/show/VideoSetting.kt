@@ -152,6 +152,7 @@ object VideoSetting {
             val encodeResolution: Resolution, // 编码分辨率
             val frameRate: FrameRate, // 帧率
             val bitRate: Int, // 码率
+            val bitRateRecommand: Int,
             val bitRateStandard: Boolean, // 码率自适应
             val hardwareVideoEncoder: Boolean
         )
@@ -187,6 +188,7 @@ object VideoSetting {
                 encodeResolution = Resolution.V_720P,
                 frameRate = FrameRate.FPS_15,
                 bitRate = BitRate.BR_STANDRAD.value,
+                bitRateRecommand = BitRate.BR_Low_1V1.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -204,6 +206,7 @@ object VideoSetting {
                 encodeResolution = Resolution.V_720P,
                 frameRate = FrameRate.FPS_24,
                 bitRate = BitRate.BR_STANDRAD.value,
+                bitRateRecommand = BitRate.BR_Medium_1V1.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -221,6 +224,7 @@ object VideoSetting {
                 encodeResolution = Resolution.V_1080P,
                 frameRate = FrameRate.FPS_24,
                 bitRate = BitRate.BR_STANDRAD.value,
+                bitRateRecommand = BitRate.BR_High_1V1.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -238,6 +242,7 @@ object VideoSetting {
                 encodeResolution = Resolution.V_180P,
                 frameRate = FrameRate.FPS_15,
                 bitRate = BitRate.BR_STANDRAD.value,
+                bitRateRecommand = BitRate.BR_STANDRAD.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -255,6 +260,7 @@ object VideoSetting {
                 encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
                 bitRate = BitRate.BR_STANDRAD.value,
+                bitRateRecommand = BitRate.BR_Low_PK.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -272,6 +278,7 @@ object VideoSetting {
                 encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
                 bitRate = BitRate.BR_STANDRAD.value,
+                bitRateRecommand = BitRate.BR_Medium_PK.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -289,6 +296,7 @@ object VideoSetting {
                 encodeResolution = Resolution.V_720P,
                 frameRate = FrameRate.FPS_15,
                 bitRate = BitRate.BR_STANDRAD.value,
+                bitRateRecommand = BitRate.BR_High_PK.value,
                 bitRateStandard = true,
                 hardwareVideoEncoder = true
             ),
@@ -680,6 +688,7 @@ object VideoSetting {
         encoderResolution: Resolution? = null,
         frameRate: FrameRate? = null,
         bitRate: Int? = null,
+        bitRateRecommand: Int? = null,
         bitRateStandard: Boolean? = null,
 
         inEarMonitoring: Boolean? = null,
@@ -699,6 +708,7 @@ object VideoSetting {
                     encoderResolution ?: currBroadcastSetting.video.encodeResolution,
                     frameRate ?: currBroadcastSetting.video.frameRate,
                      bitRate ?: currBroadcastSetting.video.bitRate,
+                    bitRateRecommand ?: currBroadcastSetting.video.bitRateRecommand,
                     bitRateStandard ?: currBroadcastSetting.video.bitRateStandard,
                     true
                 ),

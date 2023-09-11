@@ -432,7 +432,7 @@ class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcC
                 binding.tvValue.visibility = if (isChecked) View.GONE else View.VISIBLE
                 if (!isChecked) { // 关闭时候设置推荐默认值
                     binding.slider.value =
-                        VideoSetting.getRecommendBroadcastSetting().video.bitRate.toFloat()
+                        VideoSetting.getRecommendBroadcastSetting().video.bitRateRecommand.toFloat()
                     binding.tvValue.text =
                         String.format(Locale.US, valueFormat, binding.slider.value.toInt())
                 }
