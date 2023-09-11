@@ -49,7 +49,7 @@ class Pure1v1UserListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         view.addSubview(noDataView)
         view.addSubview(listView)
         view.addSubview(naviBar)
