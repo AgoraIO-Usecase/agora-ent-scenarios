@@ -23,10 +23,8 @@ open class CallConfig(
     var appId: String = "",
     //用户id
     var userId: Int = 0,
-    //用户扩展字段,用在呼叫上，对端收到calling时可以通过kFromUserExtension字段读到
+    //[可选]用户扩展字段,用在呼叫上，对端收到calling时可以通过kFromUserExtension字段读到
     var userExtension: Map<String, Any>? = null,
-    //房主房间id，秀场转1v1可用，用于订阅房主频道
-    var ownerRoomId: String? = null,
     //rtc engine实例
     var rtcEngine: RtcEngineEx? = null,
     // 模式
@@ -66,7 +64,7 @@ open class PrepareConfig {
 /** token renew时的配置
  */
 open class CallTokenConfig {
-    var roomId: String = ""     // 频道名(主叫需要设置为1v1的频道，被叫需要设置为自己的广播频道)
+    var roomId: String = ""     //频道名(主叫需要设置为1v1的频道，被叫可设置为自己的广播频道)
     var rtcToken: String = ""   // rtc token，被叫需要使用万能token
     var rtmToken: String = ""   // rtm token
 }
@@ -148,20 +146,15 @@ interface ICallApiListener {
                            elapsed: Long,
                            eventInfo: Map<String, Any>)
 
-    /** 内部详细事件变更回调
+    /**
+     * 内部详细事件变更回调
      * @param event: 事件
      * @param elapsed: 耗时(只有呼叫到通话中间事件可统计)
      */
     fun onCallEventChanged(event: CallEvent, elapsed: Long) {}
 
-    /** 第一次进入房间时获取到的1v1信息，用于异常退出之后重连，秀场转1v1模式可用
-     * @param oneForOneRoomId 1v1频道号
-     * @param fromUserId 发起呼叫的用户id
-     * @param toUserId 接收呼叫的用户id
+    /** token快要过期了(需要外部获取新token调用renewToken更新)
      */
-    fun onOneForOneCache(oneForOneRoomId: String, fromUserId: Int, toUserId: Int) {}
-
-    /// token快要过期了
     fun tokenPrivilegeWillExpire() {}
 }
 
@@ -184,46 +177,77 @@ interface ICallApi {
 
     }
 
-    // 初始化配置
+    /** 初始化配置 */
     fun initialize(config: CallConfig, token: CallTokenConfig, completion: ((AGError?) -> Unit))
 
-    // 释放缓存
+    /** 释放缓存 */
     fun deinitialize(completion: (() -> Unit))
 
-    // 更新 rtc/rtm 的token
+    /** 更新 rtc/rtm 的token*
+     */
     fun renewToken(config: CallTokenConfig)
 
-    // 更新呼叫token
+    /** 更新呼叫token
+     *
+     * @param roomId
+     * @param token
+     */
     fun renewRemoteCallerChannelToken(roomId: String, token: String)
 
-    // 连接(对RTM进行login和subscribe)， 观众调用
+    /** 连接(对RTM进行login和subscribe)， 观众调用
+     *
+     * @param prepareConfig
+     * @param completion
+     */
     fun prepareForCall(prepareConfig: PrepareConfig, completion: ((AGError?) -> Unit)?)
 
-    // 监听远端处理的回调
+    /** 监听远端处理的回调
+     *
+     * @param listener
+     */
     fun addListener(listener: ICallApiListener)
 
-    // 取消监听远端回调
+    /** 取消监听远端回调
+     * @param listener
+     */
     fun removeListener(listener: ICallApiListener)
 
-    // 发起通话，加 RTC 频道并且发流，并且发 rtm 频道消息 申请链接，调用后被叫会收到onCall
+    /** 发起通话，加 RTC 频道并且发流，并且发 rtm 频道消息 申请链接，调用后被叫会收到onCall
+     *
+     * @param roomId 目标主播频道号
+     * @param remoteUserId 呼叫的用户id
+     * @param completion
+     */
     fun call(roomId: String, remoteUserId: Int, completion: ((AGError?) -> Unit)?)
 
-    // 取消正在发起的通话，未接通的时候可用，调用后被叫会收到onCancel
+    /** 取消正在发起的通话，未接通的时候可用，调用后被叫会收到onCancel
+     *
+     * @param completion
+     */
     fun cancelCall(completion: ((AGError?) -> Unit)?)
 
     /** 接受通话，调用后主叫会收到onAccept
      *
      * @param roomId: 频道号
      * @param remoteUserId: 呼叫的用户id
-     * @param rtcToken: roomId对应的token
+     * @param rtcToken: roomId对应的rtc token
      * @param completion: <#completion description#>
      */
     fun accept(roomId: String, remoteUserId: Int, rtcToken: String, completion: ((AGError?) -> Unit)?)
 
-    // 被叫拒绝通话，调用后主叫会收到onReject
+    /** 被叫拒绝通话，调用后主叫会收到onReject
+     *
+     * @param roomId 频道号
+     * @param remoteUserId 呼叫的用户id
+     * @param reason 拒绝原因
+     * @param completion
+     */
     fun reject(roomId: String, remoteUserId: Int, reason: String?, completion: ((AGError?) -> Unit)?)
 
-    // 结束通话，调用后被叫会收到onHangup
+    /** 结束通话，调用后被叫会收到onHangup
+     * @param roomId 频道号
+     * @param completion
+     */
     fun hangup(roomId: String, completion: ((AGError?) -> Unit)?)
 
     /** 获取callId，callId为通话过程中消息的标识，通过argus可以查询到从呼叫到通话的耗时和状态变迁的时间戳
@@ -231,8 +255,8 @@ interface ICallApi {
      */
     fun getCallId(): String
 
-    //
+    /** 添加RTC接口回调 */
     fun addRTCListener(listener: IRtcEngineEventHandler)
-    //
+    /** 移除RTC接口回调 */
     fun removeRTCListener(listener: IRtcEngineEventHandler)
 }

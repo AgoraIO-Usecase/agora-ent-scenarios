@@ -117,7 +117,6 @@ class ShowTo1v1Manger constructor() {
                     appId = BuildConfig.AGORA_APP_ID,
                     userId = mCurrentUser.getIntUserId(),
                     userExtension = mCurrentUser.toMap(),
-                    ownerRoomId = ownerRoomId,
                     rtcEngine = mRtcEngine,
                     mode = CallMode.ShowTo1v1,
                     role = role,
