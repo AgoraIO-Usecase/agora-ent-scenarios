@@ -79,13 +79,13 @@
 //        return;
 //    }
 
-    NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow", @"Pure1v1"];
+    NSArray* sceneNames = @[/*@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow",*/ @"Pure1v1"];
     [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
     [[NetworkManager shared] reportDeviceInfoWithSceneName:sceneNames[tagValue]];
     [[NetworkManager shared] reportUserBehaviorWithSceneName:sceneNames[tagValue]];
     switch (tagValue) {
         case 0: {
-            VRRoomsViewController *vc = [[VRRoomsViewController alloc] initWithUser:VLUserCenter.user];
+       /*     VRRoomsViewController *vc = [[VRRoomsViewController alloc] initWithUser:VLUserCenter.user];
             vc.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:vc animated:YES];
         }
@@ -103,7 +103,7 @@
             roomVc.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:roomVc animated:YES];
         } break;
-        case 4: {
+        case 4: {*/
             Pure1v1UserInfo* userInfo = [Pure1v1UserInfo new];
             userInfo.userId = VLUserCenter.user.id;
             userInfo.userName = VLUserCenter.user.name;
