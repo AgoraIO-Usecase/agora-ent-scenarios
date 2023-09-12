@@ -7,7 +7,6 @@
 
 import Foundation
 
-// 机器人相关
 class ShowRobotService {
     
     static let shared = ShowRobotService()
@@ -24,7 +23,6 @@ class ShowRobotService {
     private let robotRoomOwnerHeaders = [
         "https://download.agora.io/demo/release/bot1.png"
     ]
-    // 开启机器人
     public func startCloudPlayers() {
         robotRoomIds.forEach { robotId in
             let roomId = robotRoomId(from: robotId)
@@ -34,6 +32,15 @@ class ShowRobotService {
                                                    robotUid: UInt(kRobotUid),
                                                    streamUrl: robotStreamURL[idx]) { msg in
                 guard let _ = msg else {return}
+                self.playerHeartBeat()
+            }
+        }
+    }
+    
+    public func playerHeartBeat() {
+        robotRoomIds.forEach { robotId in
+            let roomId = robotRoomId(from: robotId)
+            NetworkManager.shared.cloudPlayerHeartbeat(channelName: roomId, uid: VLUserCenter.user.id) { _ in
             }
         }
     }
@@ -63,7 +70,6 @@ class ShowRobotService {
         }
         return dataArray
     }
-    // 生成机器人房间id
     private func robotRoomId(from robotId: String) -> String {
         return "\((Int(robotId) ?? 1) + kRobotRoomStartId)"
     }
