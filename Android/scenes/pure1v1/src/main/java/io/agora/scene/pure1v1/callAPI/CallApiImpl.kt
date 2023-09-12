@@ -68,7 +68,6 @@ class CallApiImpl(
     private var prepareConfig: PrepareConfig? = null
     private var callId: String = ""
     private var recvMessageTsMap = mutableMapOf<Int, Long>()
-    private var oneForOneMap: Map<String, String>? = null
 
     private var reportInfoList = mutableListOf<CallReportInfo>()
     private var isChannelJoined = false
@@ -99,32 +98,6 @@ class CallApiImpl(
                         timeOutRunnable = null
                     }
                     else -> {}
-                }
-            } else {
-                val attr = mutableMapOf<String, Any>(Pair(kCalleeState, value.value))
-                when(value) {
-                    CallStateType.Connected -> {
-                        val callingRoomId = callingRoomId
-                        val callingUserId = callingUserId
-                        val userId = config?.userId
-                        if (callingRoomId != null && callingUserId != null && userId != null) {
-                            attr[kFromRoomId] = callingRoomId
-                            attr[kFromUserId] = callingUserId
-                            attr[kRemoteUserId] = userId
-                            messageManager?.setPresenceState(attr) { err ->
-                            }
-                        } else {
-                            Log.e(TAG, "setPresenceState fail, roomId is empty")
-                        }
-                        return
-                    }
-                    CallStateType.Prepared -> {
-                        messageManager?.removePresenceState(arrayListOf(kFromRoomId, kRemoteUserId, kFromUserId)) { err ->
-                        }
-                    }
-                    else -> {}
-                }
-                messageManager?.setPresenceState(attr) { err ->
                 }
             }
         }
@@ -175,8 +148,6 @@ class CallApiImpl(
         var localNtpTime = config?.rtcEngine?.ntpWallTimeInMs ?: 0
         if (localNtpTime == "0".toLong()) {
             localNtpTime = System.currentTimeMillis()
-        } else {
-            Log.d(TAG, "ts delta = ${localNtpTime - System.currentTimeMillis()} ms")
         }
         return localNtpTime
     }
@@ -191,10 +162,9 @@ class CallApiImpl(
     }
 
     private fun timeProfiling(message: String, ts: Int? = null) {
-        var msg = ""
         val cost = _getCost(ts)
         callCostMap[message] = (callCostMap[message] ?: 0) + cost
-        msg = "$message: $cost ms"
+        val msg = "$message: $cost ms"
         Log.d(TAG, msg)
         callCost = "$callCost\n$msg"
     }
@@ -226,14 +196,9 @@ class CallApiImpl(
     }
 
     private fun _notifyState(state: CallStateType, stateReason: CallReason = CallReason.None, eventReason: String = "", isLocalUser: Boolean = true, elapsed: Long = 0, eventInfo: Map<String, Any> = emptyMap()) {
-        if (isLocalUser) {
-            Log.d(TAG, "_notifyState  $state, stateReason: $stateReason, eventReason: $eventReason, elapsed: $elapsed ms, eventInfo: $eventInfo")
-            _processState(this.state, state, stateReason, eventReason, elapsed)
-            if (this.state == state) {
-                return
-            }
-            this.state = state
-        }
+        Log.d(TAG, "_notifyState  $state, stateReason: $stateReason, eventReason: $eventReason, elapsed: $elapsed ms, eventInfo: $eventInfo")
+        _processState(this.state, state, stateReason, eventReason, elapsed)
+        this.state = state
         runOnUiThread {
             delegates.forEach {
                 it.onCallStateChanged(state, stateReason, eventReason, elapsed, eventInfo)
@@ -479,7 +444,6 @@ class CallApiImpl(
         timeOutRunnable?.let { mHandler.removeCallbacks(it) }
         timeOutRunnable = null
 
-        oneForOneMap = null
         callId = ""
     }
     private fun _flushReport() {
@@ -524,9 +488,7 @@ class CallApiImpl(
                                          label: String,
                                          value: Int) {
         val c = config
-        if (c != null && isChannelJoined && rtcConnection != null) else {
-            return
-        }
+        if (c != null && isChannelJoined && rtcConnection != null) else { return }
         val ret = c.rtcEngine?.sendCustomReportMessageEx(msgId, category, event, label, value, rtcConnection)
         Log.d(TAG, "sendCustomReportMessage msgId: $msgId category: $category event: $event label: $label value: $value : $ret")
     }
@@ -616,6 +578,11 @@ class CallApiImpl(
     }
 
     private fun _onCancel(message: Map<String, Any>) {
+        val fromUserId = message[kFromUserId] as? Int ?: 0
+        //如果不是接收的正在接听的用户的呼叫
+        if (callingUserId != fromUserId) {
+            return
+        }
         _notifyState(CallStateType.Prepared, CallReason.RemoteCancel, eventInfo = message)
         _notifyEvent(CallEvent.RemoteCancel)
     }
@@ -627,7 +594,6 @@ class CallApiImpl(
 
     private fun _onAccept(message: Map<String, Any>) {
         timeProfiling("2.呼叫-被叫收到呼叫", message[kMessageTs] as? Int)
-
         timeProfiling("3.呼叫-收到被叫同意")
         if (state != CallStateType.Calling) {
             return
@@ -655,7 +621,7 @@ class CallApiImpl(
     override fun initialize(config: CallConfig,
                             token: CallTokenConfig,
                             completion: (AGError?) -> Unit) {
-        _reportMethod("initialize", "appId=${config.appId}&userId=${config.userId}&ownerRoomId=${config.ownerRoomId}&mode=${config.mode.value}&role=${config.role.value}&autoAccept=${config.autoAccept}&roomId=${token.roomId}&rtcToken=${token.rtcToken}&rtmToken=${token.rtmToken}")
+        _reportMethod("initialize", "appId=${config.appId}&userId=${config.userId}&mode=${config.mode.value}&role=${config.role.value}&autoAccept=${config.autoAccept}&roomId=${token.roomId}&rtcToken=${token.rtcToken}&rtmToken=${token.rtmToken}")
         if (state != CallStateType.Idle) {
             Log.e(TAG, "must invoke 'deinitialize' to clean state")
             return
@@ -680,19 +646,12 @@ class CallApiImpl(
     }
 
     override fun deinitialize(completion: (() -> Unit)) {
+        _reportMethod("deinitialize")
         Log.d(TAG, "deinitialize")
         val callingRoomId = this.callingRoomId
         if (callingRoomId != null) {
-            var roomId = ""
-            if (config?.mode == CallMode.Pure1v1) {
-                roomId = callingRoomId
-            } else {
-                if (config?.role == CallRole.CALLEE) {
-                    roomId = callingRoomId
-                } else {
-                    roomId = config?.ownerRoomId ?: ""
-                }
-            }
+            var roomId = callingRoomId
+            //秀场转1v1主叫挂断的是房主id
             _hangup(roomId) { err, msg ->
                 _deinitialize()
                 completion.invoke()
@@ -772,29 +731,22 @@ class CallApiImpl(
             return
         }
         callTs = _getNtpTimeInMs()
-        //先查询presence正在呼叫的主叫是否是自己，如果是则不在发送消息
-        val _fromRoomId = oneForOneMap?.get(kFromRoomId)
-        val _calleeUserId = oneForOneMap?.get(kRemoteUserId)?.toIntOrNull()
-        if (_fromRoomId == fromRoomId && _calleeUserId == remoteUserId) {
-            _notifyState(CallStateType.Calling)
-            _notifyEvent(CallEvent.OnCalling)
-        } else {
-            //发送呼叫消息
-            callId = UUID.randomUUID().toString()
-            val message = _messageDic(CallAction.Call).toMutableMap()
-            message[kRemoteUserId] = remoteUserId
-            message[kFromRoomId] = fromRoomId
-            messageManager?.sendMessage(roomId, fromRoomId, message.toMap()) { err ->
-                if (err != null) {
-                    _notifyState(CallStateType.Prepared, CallReason.MessageFailed, err.msg)
-                    _notifyEvent(CallEvent.MessageFailed)
-                    return@sendMessage
-                }
-                timeProfiling("1.呼叫-呼叫回调")
+        //发送呼叫消息
+        callId = UUID.randomUUID().toString()
+        val message = _messageDic(CallAction.Call).toMutableMap()
+        message[kRemoteUserId] = remoteUserId
+        message[kFromRoomId] = fromRoomId
+        messageManager?.sendMessage(roomId, fromRoomId, message.toMap()) { err ->
+            if (err != null) {
+                _notifyState(CallStateType.Prepared, CallReason.MessageFailed, err.msg)
+                _notifyEvent(CallEvent.MessageFailed)
+                return@sendMessage
             }
-            _notifyState(CallStateType.Calling, eventInfo = message)
-            _notifyEvent(CallEvent.OnCalling)
+            timeProfiling("1.呼叫-呼叫回调")
         }
+        _notifyState(CallStateType.Calling, eventInfo = message)
+        _notifyEvent(CallEvent.OnCalling)
+
         callingRoomId = roomId
         callingUserId = remoteUserId
         //不等响应即加入频道，加快join速度，失败则leave
@@ -830,13 +782,6 @@ class CallApiImpl(
             _notifyEvent(CallEvent.MessageFailed)
             return
         }
-        var isCaching = false
-        val _fromRoomId = oneForOneMap?.get(kFromRoomId)
-        val _callerUserId = oneForOneMap?.get(kFromUserId)?.toIntOrNull()
-        if (_fromRoomId == roomId && _callerUserId == remoteUserId) {
-            isCaching = true
-            _notifyState(CallStateType.Calling, CallReason.None)
-        }
         //查询是否是calling状态，如果是prapared，表示可能被取消了
         if (state == CallStateType.Calling) else {
             val errReason = "accept fail! current state is not calling"
@@ -847,18 +792,13 @@ class CallApiImpl(
             return
         }
         //先查询presence里是不是正在呼叫的被叫是自己，如果是则不再发送消息
-        if (isCaching) {
-            _notifyState(CallStateType.Connecting, CallReason.LocalAccepted)
-            _notifyEvent(CallEvent.LocalAccepted)
-        } else {
-            val message = _messageDic(CallAction.Accept).toMutableMap()
-            message[kRemoteUserId] = remoteUserId
-            message[kFromRoomId] = fromRoomId
-            messageManager?.sendMessage(roomId, fromRoomId, message.toMap()) { err ->
-            }
-            _notifyState(CallStateType.Connecting, CallReason.LocalAccepted, eventInfo = message)
-            _notifyEvent(CallEvent.LocalAccepted)
+        val message = _messageDic(CallAction.Accept).toMutableMap()
+        message[kRemoteUserId] = remoteUserId
+        message[kFromRoomId] = fromRoomId
+        messageManager?.sendMessage(roomId, fromRoomId, message.toMap()) { err ->
         }
+        _notifyState(CallStateType.Connecting, CallReason.LocalAccepted, eventInfo = message)
+        _notifyEvent(CallEvent.LocalAccepted)
 
         callingRoomId = roomId
         callingUserId = remoteUserId
@@ -873,16 +813,14 @@ class CallApiImpl(
                         reason: String?,
                         completion: ((AGError?) -> Unit)?) {
         _reportMethod("reject", "roomId=$roomId&remoteUserId=$remoteUserId&reason=$reason")
-        _reject(roomId, remoteUserId, reason) { err, message ->
-        }
+        _reject(roomId, remoteUserId, reason)
         _notifyState(CallStateType.Prepared, CallReason.LocalRejected)
         _notifyEvent(CallEvent.LocalRejected)
     }
 
     override fun hangup(roomId: String, completion: ((AGError?) -> Unit)?) {
         _reportMethod("hangup", "roomId=$roomId")
-        _hangup(roomId) { err, message ->
-        }
+        _hangup(roomId)
         _notifyState(CallStateType.Prepared, CallReason.LocalHangup)
         _notifyEvent(CallEvent.LocalHangup)
     }
@@ -930,58 +868,7 @@ class CallApiImpl(
         recvMessageTsMap[userId] = msgTs
         _process(CallAction.fromValue(messageAction), map)
     }
-
-    override fun onPresenceEvent(event: PresenceEvent?) {
-        event ?: return
-        val map = mutableMapOf<String, String>()
-        event.stateItems.forEach {item ->
-            map[item.key] = item.value
-        }
-        val userId = event.publisher ?: ""
-        Log.d(TAG, "onPresenceEvent $userId channelName: ${event.channelName} event_type: ${event.type} userInfo: $map")
-        when (event.type) {
-            RtmConstants.RtmPresenceEventType.REMOTE_STATE_CHANGED -> {
-                val stateValue = map[kCalleeState]
-                val state = CallStateType.fromValue(stateValue?.toIntOrNull() ?: 0)
-                if (userId == config?.userId.toString() || config?.role != CallRole.CALLER) {
-                    return
-                }
-                _notifyState(state, isLocalUser = false, eventInfo = mapOf(Pair(kPublisher, userId)))
-            }
-            RtmConstants.RtmPresenceEventType.SNAPSHOT -> {
-                val userList = arrayListOf<Map<String, String>>()
-                event.snapshot.userStateList.forEach { user ->
-                    Log.d(TAG, "onPresenceEvent user ${user.userId}  user.states.count: ${user.states.count()}")
-                    if (user.states.isNotEmpty()) {
-                        val userMap = mutableMapOf<String, String>()
-                        userMap["userId"] = user.userId
-                        user.states.forEach { item ->
-                            userMap[item.key] = item.value
-                        }
-                        userList.add(userMap)
-                    }
-                }
-                Log.d(TAG, "onPresenceEvent SNAPSHOT userList: $userList")
-                val currentUser = userList.firstOrNull { it[kFromUserId] != null } ?: return
-                val roomId = currentUser[kFromRoomId]
-                val callerUserId = currentUser[kFromUserId]?.toIntOrNull()
-                val calleeUserId = currentUser[kRemoteUserId]?.toIntOrNull()
-                if (roomId == null || callerUserId == null || calleeUserId == null) {
-                    oneForOneMap = null
-                    return
-                }
-                //不自动恢复，由外部驱动
-                oneForOneMap = currentUser
-
-                runOnUiThread {
-                    delegates.forEach { listener ->
-                        listener.onOneForOneCache(roomId, callerUserId, calleeUserId)
-                    }
-                }
-            }
-            else -> {}
-        }
-    }
+    override fun onPresenceEvent(event: PresenceEvent?) {}
     override fun onTopicEvent(event: TopicEvent?) {}
     override fun onLockEvent(event: LockEvent?) {}
     override fun onStorageEvent(event: StorageEvent?) {}
@@ -1045,7 +932,8 @@ class CallApiImpl(
     override fun onRemoteVideoStateChanged(uid: Int, state: Int, reason: Int, elapsed: Int) {
         super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
         val channelId = tokenConfig?.roomId ?: ""
-        Log.d(TAG, "didLiveRtcRemoteVideoStateChanged channelId: $channelId uid: $uid state: $state reason: $reason")
+        if (uid == callingUserId) else {return}
+        Log.d(TAG, "didLiveRtcRemoteVideoStateChanged channelId: $channelId/${callingRoomId ?: ""} uid: $uid/${callingUserId ?: 0} state: $state reason: $reason")
         if ((state == 2) && (reason == 6 || reason == 4 || reason == 3 )) {
             timeProfiling("6.呼叫-收到对端[$uid] 首帧")
             firstFrameCompletion?.invoke()
@@ -1077,3 +965,4 @@ class CallApiImpl(
         }
     }
 }
+

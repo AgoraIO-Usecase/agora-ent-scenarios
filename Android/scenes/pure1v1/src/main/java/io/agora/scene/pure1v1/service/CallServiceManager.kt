@@ -112,7 +112,6 @@ class CallServiceManager {
             BuildConfig.AGORA_APP_ID,
             user.userId.toInt(),
             user.toMap(),
-            null,
             engine,
             CallMode.Pure1v1,
             CallRole.CALLER,

@@ -7,8 +7,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import android.widget.FrameLayout
+import android.widget.FrameLayout.LayoutParams
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.IRtcEngineEventHandler
@@ -31,8 +32,6 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
     private var dashboard: DashboardFragment? = null
     private var rtcEventHandler: IRtcEngineEventHandler? = null
 
-    private var showRemoteCanvas = true
-
     override fun getViewBinding(inflater: LayoutInflater): Pure1v1CallDetailActivityBinding {
         return Pure1v1CallDetailActivityBinding.inflate(inflater)
     }
@@ -41,7 +40,6 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setupView()
-        updateCanvas()
         CallServiceManager.instance.callApi?.addListener(this)
         setupRTCListener()
 
@@ -84,9 +82,22 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
     }
 
     private fun setupView() {
-        binding.vDragWindow.setOnViewClick {
-            showRemoteCanvas = !showRemoteCanvas
-            updateCanvas()
+        binding.vDragWindow1.setSmallType(false)
+        binding.vDragWindow2.setSmallType(true)
+        CallServiceManager.instance.remoteCanvas?.let { canvas ->
+            binding.vDragWindow1.canvasContainer.addView(canvas)
+        }
+        CallServiceManager.instance.remoteUser?.let { userInfo ->
+            binding.vDragWindow1.setUserName(userInfo.userName)
+        }
+        CallServiceManager.instance.localCanvas?.let { canvas ->
+            binding.vDragWindow2.canvasContainer.addView(canvas)
+        }
+        CallServiceManager.instance.localUser?.let { userInfo ->
+            binding.vDragWindow2.setUserName(userInfo.userName)
+        }
+        binding.vDragWindow2.setOnViewClick {
+            exchangeDragWindow()
         }
         binding.ivHangup.setOnClickListener {
             onHangup()
@@ -104,7 +115,7 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
                 .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
                 .into(binding.ivUserAvatar)
             binding.tvRoomName.text = userInfo.userName
-            binding.tvRoomNum.text = userInfo.getRoomId()
+            binding.tvRoomNum.text = userInfo.userId
         }
         val fragment = DashboardFragment()
         val fragmentTransaction = supportFragmentManager.beginTransaction()
@@ -113,31 +124,31 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
         dashboard = fragment
     }
 
-    private fun updateCanvas() {
-        if (showRemoteCanvas) {
-            binding.vDragWindow.canvasContainer.removeAllViews()
-            binding.llContainer.removeAllViews()
-            CallServiceManager.instance.remoteCanvas?.let { canvas ->
-                binding.llContainer.addView(canvas)
+    private fun exchangeDragWindow() {
+        val params1 = LayoutParams(binding.vDragWindow1.width, binding.vDragWindow1.height)
+        params1.topMargin = binding.vDragWindow1.top
+        params1.leftMargin = binding.vDragWindow1.left
+        val params2 = LayoutParams(binding.vDragWindow2.width, binding.vDragWindow2.height)
+        params2.topMargin = binding.vDragWindow2.top
+        params2.leftMargin = binding.vDragWindow2.left
+        binding.vDragWindow1.layoutParams = params2
+        binding.vDragWindow2.layoutParams = params1
+        if (binding.vDragWindow1.layoutParams.height > binding.vDragWindow2.layoutParams.height) {
+            binding.vDragWindow2.bringToFront()
+            binding.vDragWindow2.setSmallType(true)
+            binding.vDragWindow2.setOnViewClick {
+                exchangeDragWindow()
             }
-            CallServiceManager.instance.localUser?.let { userInfo ->
-                binding.vDragWindow.setUserName(userInfo.userName)
-            }
-            CallServiceManager.instance.localCanvas?.let { canvas ->
-                binding.vDragWindow.canvasContainer.addView(canvas)
-            }
+            binding.vDragWindow1.setOnViewClick(null)
+            binding.vDragWindow1.setSmallType(false)
         } else {
-            binding.vDragWindow.canvasContainer.removeAllViews()
-            binding.llContainer.removeAllViews()
-            CallServiceManager.instance.remoteCanvas?.let { canvas ->
-                binding.vDragWindow.canvasContainer.addView(canvas)
+            binding.vDragWindow1.bringToFront()
+            binding.vDragWindow1.setSmallType(true)
+            binding.vDragWindow1.setOnViewClick {
+                exchangeDragWindow()
             }
-            CallServiceManager.instance.remoteUser?.let { userInfo ->
-                binding.vDragWindow.setUserName(userInfo.userName)
-            }
-            CallServiceManager.instance.localCanvas?.let { canvas ->
-                binding.llContainer.addView(canvas)
-            }
+            binding.vDragWindow2.setOnViewClick(null)
+            binding.vDragWindow2.setSmallType(false)
         }
     }
 
@@ -158,8 +169,8 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
             CallServiceManager.instance.callApi?.hangup(userInfo.getRoomId()) {
             }
         }
-        binding.llContainer.removeAllViews()
-        binding.vDragWindow.canvasContainer.removeAllViews()
+        binding.vDragWindow1.canvasContainer.removeAllViews()
+        binding.vDragWindow2.canvasContainer.removeAllViews()
         timerHandler?.removeCallbacksAndMessages(null)
         timerHandler = null
         finish()

@@ -7,14 +7,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.CallDetailActivity">
 
-    <LinearLayout
-        android:id="@+id/llContainer"
+    <FrameLayout
+        android:id="@+id/vDragContent"
+        android:elevation="-2dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:elevation="-2dp"
-        android:orientation="vertical"
-        />
-    
+        >
+
+        <io.agora.scene.pure1v1.ui.CallDraggableView
+            android:id="@+id/vDragWindow1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            />
+
+        <io.agora.scene.pure1v1.ui.CallDraggableView
+            android:id="@+id/vDragWindow2"
+            android:layout_gravity="right"
+            android:background="@drawable/pure1v1_draggable_view_radius"
+            android:layout_width="@dimen/pure1v1_drag_view_width"
+            android:layout_height="@dimen/pure1v1_drag_view_height"
+            android:layout_marginTop="126dp"
+            android:layout_marginEnd="25dp"
+            />
+    </FrameLayout>
+
     <androidx.cardview.widget.CardView
         android:id="@+id/cvRoomInfo"
         android:layout_width="200dp"
@@ -106,20 +124,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         />
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-        <io.agora.scene.pure1v1.ui.CallDraggableView
-            android:id="@+id/vDragWindow"
-            android:layout_gravity="right"
-            android:layout_width="@dimen/pure1v1_drag_view_width"
-            android:layout_height="@dimen/pure1v1_drag_view_height"
-            android:layout_marginTop="126dp"
-            android:layout_marginEnd="25dp"
-            />
-    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/flDashboard"
