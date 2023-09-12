@@ -669,7 +669,7 @@ public class RoomLivingViewModel extends ViewModel {
                         RoomSelSongModel songPlaying = data.get(0);
 
                         // TODO ios端 winnerNo 有概率为 null
-                        if (value != null && value.getWinnerNo() != null && value.getWinnerNo().equals("") && !songPlaying.getWinnerNo().equals("") && seatLocalLiveData.getValue() != null) {
+                        if (value != null && value.getWinnerNo() != null && !songPlaying.getWinnerNo().equals("") && seatLocalLiveData.getValue() != null) {
                             // 所有人更新抢唱结果UI
                             GraspModel model = new GraspModel();
                             model.status = GraspStatus.SUCCESS;

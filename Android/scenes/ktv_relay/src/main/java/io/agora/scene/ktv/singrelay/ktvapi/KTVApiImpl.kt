@@ -168,6 +168,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         // Android Only
         mRtcEngine.setParameters("{\"che.audio.enable_estimated_device_delay\":false}")
+
+        // ENT-1036
+        mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\":1}")
     }
 
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
