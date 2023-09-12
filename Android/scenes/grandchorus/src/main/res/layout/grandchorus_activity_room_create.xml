@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/superLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/bg_app_def_white">
+
+    <io.agora.scene.widget.CommonTitleView
+        android:id="@+id/title_view"
+        style="@style/title_view"
+        app:ctv_centerText="@string/grandchorus_create_room"
+        tools:ignore="MissingConstraints" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivRoomCover"
+        android:layout_width="104dp"
+        android:layout_height="104dp"
+        android:layout_marginTop="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_view" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        android:text="@string/grandchorus_room_title"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivRoomCover" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btnRandom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="50dp"
+        android:drawableStart="@mipmap/ic_random"
+        android:drawablePadding="3dp"
+        android:text="@string/grandchorus_random"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivRoomCover" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etRoomName"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_full_radius_white_50"
+        android:maxLength="12"
+        android:maxLines="1"
+        android:paddingHorizontal="31dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/btnRandom"
+        tools:text="周杰伦三年二班" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="30dp"
+        android:text="@string/grandchorus_room_is_encryption"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etRoomName" />
+
+    <androidx.appcompat.widget.AppCompatRadioButton
+        android:id="@+id/cbOpen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="61dp"
+        android:button="@drawable/bg_cb_check_status_def"
+        android:checked="true"
+        android:text="@string/grandchorus_open"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etRoomName" />
+
+    <androidx.appcompat.widget.AppCompatRadioButton
+        android:id="@+id/cbUnOpen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="61dp"
+        android:button="@drawable/bg_cb_check_status_def"
+        android:text="@string/grandchorus_encryption"
+        app:layout_constraintStart_toEndOf="@id/cbOpen"
+        app:layout_constraintTop_toBottomOf="@id/etRoomName" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etCode1"
+        style="@style/input_v_code"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="25dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@id/cbOpen"
+        app:layout_constraintTop_toBottomOf="@id/cbOpen" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etCode2"
+        style="@style/input_v_code"
+        android:enabled="false"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@id/etCode3"
+        app:layout_constraintStart_toEndOf="@id/etCode1"
+        app:layout_constraintTop_toTopOf="@id/etCode1" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etCode3"
+        style="@style/input_v_code"
+        android:enabled="false"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@id/etCode4"
+        app:layout_constraintStart_toEndOf="@id/etCode2"
+        app:layout_constraintTop_toTopOf="@id/etCode2" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etCode4"
+        style="@style/input_v_code"
+        android:enabled="false"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/etRoomName"
+        app:layout_constraintTop_toTopOf="@id/etCode3" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvSet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/grandchorus_please_input_4_pwd"
+        android:textColor="@color/red_fa"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@id/etCode1"
+        app:layout_constraintTop_toBottomOf="@id/etCode1" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:drawableStart="@mipmap/ic_tip"
+        android:text="@string/grandchorus_create_tips2"
+        android:textColor="@color/def_text_grey_6c7"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/btnCreate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="@string/grandchorus_create_tips3"
+        android:textColor="@color/def_text_grey_6c7"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/btnCreate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCreate"
+        style="@style/def_btn_full"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/bg_def_button_solid"
+        android:gravity="center"
+        android:text="@string/grandchorus_create"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

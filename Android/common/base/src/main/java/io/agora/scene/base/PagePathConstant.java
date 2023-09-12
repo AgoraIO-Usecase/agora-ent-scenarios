@@ -8,4 +8,5 @@ public class PagePathConstant {
     public static final String pagePhoneLoginRegister = "/app/phoneLoginRegister";
     public static final String pageKTVRoomList = "/ktv/pageRoomList";
     public static final String pageVoiceChat = "/voice/VoiceRoomListActivity";
+    public static final String pageGrandChorus = "/grandchorus/VoiceRoomListActivity";
 }
