@@ -220,6 +220,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     private void onCountFinished() {
         if (mBinding == null) return;
+        mBinding.ilActive.ivChangeSong.setEnabled(true);
         mBinding.ilActive.singRelay.setEnabled(true);
         mBinding.ilActive.singRelay.setText("");
         mBinding.ilActive.singRelay.setBackgroundResource(R.mipmap.ktv_start_grasp);
@@ -253,6 +254,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         mBinding.ilActive.ivMusicStart.setIconResource(R.mipmap.ktv_ic_pause);
         mBinding.ilActive.ivMusicStart.setText(R.string.ktv_room_player_pause);
+
+        mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
+        mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
     }
 
     private void changeViewByRole() {
@@ -347,6 +351,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         if (mBinding == null || !isOnSeat) return;
         mBinding.ilActive.singRelay.setVisibility(View.VISIBLE);
         mBinding.ilActive.singRelay.setBackgroundResource(R.mipmap.ktv_start_grasp_press);
+        mBinding.ilActive.ivChangeSong.setEnabled(false);
         startTimer();
     }
 
