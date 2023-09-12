@@ -49,6 +49,7 @@ class Pure1v1ServiceImp(
     }
 
     fun enterRoom(completion: (Error?) -> Unit) {
+        //比较通过roomid，一个人可能会有不同的roomid，但是create scene通过uid，保证不同roomId会被覆盖，保证一个用户不会展示多个
         val containsUser = userList.any { it.getRoomId() == user?.getRoomId() }
         val u = user
         if (u == null || containsUser) {
@@ -58,15 +59,15 @@ class Pure1v1ServiceImp(
         Log.d(TAG, "createUser start")
         initScene {
             val scene = Scene()
-            scene.id = u.getRoomId()
+            scene.id = u.userId
             scene.userId = u.userId
             scene.property = GsonUtils.covertToMap(u)
             Instance().createScene(scene, object : Sync.Callback {
                 override fun onSuccess() {
-                    Instance().joinScene(true, true, u.getRoomId(), object : JoinSceneCallback {
+                    Instance().joinScene(true, true, u.userId, object : JoinSceneCallback {
                         override fun onSuccess(sceneReference: SceneReference?) {
                             if (sceneReference != null) {
-                                sceneRefs[u.getRoomId()] = sceneReference
+                                sceneRefs[u.userId] = sceneReference
                                 runOnMainThread { completion.invoke(null) }
                             } else {
                                 runOnMainThread { completion.invoke(java.lang.Error("error")) }
@@ -88,7 +89,7 @@ class Pure1v1ServiceImp(
     }
 
     fun leaveRoom(completion: (Error?) -> Unit) {
-        sceneRefs[user?.getRoomId() ?: ""]?.delete(object : Sync.Callback {
+        sceneRefs[user?.userId ?: ""]?.delete(object : Sync.Callback {
             override fun onSuccess() {
                 runOnMainThread {
                     completion.invoke(null)
