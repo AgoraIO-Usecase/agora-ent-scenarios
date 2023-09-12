@@ -29,7 +29,7 @@ class UserInfo(
     }
 
     fun getRoomId(): String {
-        return userId
+        return "${userId}_${createdAt}"
     }
 
     constructor(parcel: Parcel) : this(

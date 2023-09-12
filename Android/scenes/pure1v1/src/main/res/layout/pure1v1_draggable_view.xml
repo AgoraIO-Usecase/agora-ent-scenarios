@@ -4,19 +4,13 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.cardview.widget.CardView
+    <LinearLayout
+        android:id="@+id/llContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:cardElevation="0dp"
-        app:cardCornerRadius="20dp"
-        >
-        <LinearLayout
-            android:id="@+id/llContainer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            />
-    </androidx.cardview.widget.CardView>
+        android:orientation="vertical"
+        android:background="@drawable/pure1v1_draggable_view_radius"
+        />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvUserName"

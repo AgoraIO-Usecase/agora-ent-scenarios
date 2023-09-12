@@ -72,8 +72,6 @@ class CallMessageManager(
 
     private var rtmClient = _createRtmClient()
 
-    private var snapshotDidRecv: (() -> Unit)? = null
-
     private var loginSuccess: ((ErrorInfo?)-> Unit)? = null
     // RTM是否已经登录
     private var isLoginedRTM = false
@@ -113,9 +111,7 @@ class CallMessageManager(
                     val errorCode = RtmConstants.RtmErrorCode.getValue(err.errorCode)
                     completion.invoke(AGError(err.errorReason, errorCode))
                 }
-                mHandler.postDelayed({
-                    rtmInitialize(prepareConfig, tokenConfig, completion)
-                }, 200)
+                rtmInitialize(prepareConfig, tokenConfig, completion)
             }
         } else if (isLoginedRTM && prepareConfig.autoSubscribeRTM) {
             _subscribeRTM(tokenConfig) { error ->
@@ -173,75 +169,6 @@ class CallMessageManager(
         _sendMessage(roomId, map, retryCount, completion)
     }
 
-    fun setPresenceState(attr:Map<String, Any>, retryCount: Int = 3, completion: ((AGError?) -> Unit)?) {
-        if (config.mode != CallMode.ShowTo1v1) {
-            completion?.invoke(AGError("can not be set presence in 'pure 1v1' mode", -1))
-            return
-        }
-        val presence = rtmClient.presence ?: run {
-            completion?.invoke(AGError("not presence", -1))
-            return
-        }
-        val roomId = config.ownerRoomId ?: run  {
-            completion?.invoke(AGError("ownerRoomId isEmpty", -1))
-            return
-        }
-        fun _retry(): Boolean {
-            if (retryCount <= 1) {
-                return false
-            }
-            Handler(Looper.getMainLooper()).postDelayed({
-                setPresenceState(attr, retryCount - 1, completion)
-            }, 1000)
-            return true
-        }
-        Log.d(TAG, "_setPresenceState: to $roomId, attr: $attr")
-        val items = ArrayList<StateItem>()
-        attr.forEach { e ->
-            items.add(StateItem(e.key, e.value.toString()))
-        }
-
-        presence.setState(roomId, RtmConstants.RtmChannelType.MESSAGE, items, object : ResultCallback<Void> {
-            override fun onSuccess(responseInfo: Void?) {
-                completion?.invoke(null)
-            }
-            override fun onFailure(errorInfo: ErrorInfo?) {
-                if (!_retry()) {
-                    val msg = errorInfo?.errorReason ?: "error"
-                    val errorCode = RtmConstants.RtmErrorCode.getValue(errorInfo?.errorCode)
-                    completion?.invoke(AGError(msg, errorCode))
-                }
-            }
-        })
-    }
-
-    /// 清理presence信息
-    /// - Parameters:
-    ///   - keys: 需要清理的presence的key 数组
-    ///   - completion: <#completion description#>
-    fun removePresenceState(keys: ArrayList<String>, completion: ((AGError?) -> Unit)?) {
-        val presence = rtmClient.presence ?: run {
-            completion?.invoke(AGError("not presence", -1))
-            return
-        }
-        val roomId = config.ownerRoomId ?: run  {
-            completion?.invoke(AGError("ownerRoomId isEmpty", -1))
-            return
-        }
-        Log.d(TAG, "_removePresenceState: to $roomId, attr: $keys")
-
-        presence.removeState(roomId, RtmConstants.RtmChannelType.MESSAGE, keys, object: ResultCallback<Void> {
-            override fun onSuccess(responseInfo: Void?) {
-                completion?.invoke(null)
-            }
-            override fun onFailure(errorInfo: ErrorInfo?) {
-                Log.e(TAG, "presence removeState $roomId finished: ${errorInfo?.errorCode}")
-                val e = AGError(errorInfo?.errorReason ?: "error", RtmConstants.RtmErrorCode.getValue(errorInfo?.errorCode))
-                completion?.invoke(e)
-            }
-        })
-    }
-
     private fun _createRtmClient(): RtmClient {
         val rtmConfig = RtmConfig()
         rtmConfig.userId = config.userId.toString()
@@ -260,102 +187,19 @@ class CallMessageManager(
     ///   - roomId: 频道号
     ///   - completion: <#completion description#>
     private fun _subscribeRTM(tokenConfig: CallTokenConfig?, completion: ((AGError?) -> Unit)?) {
-        val roomId = if (config.mode == CallMode.ShowTo1v1) {
-            if (config.role == CallRole.CALLER) tokenConfig?.roomId else config.ownerRoomId
-        } else {
-            tokenConfig?.roomId
-        }
-        roomId ?: run {
+        val roomId = tokenConfig?.roomId ?: run {
             completion?.invoke(AGError("channelName is Empty", -1))
             return
         }
         /*
-         纯1v1:
-            订阅自己频道的message，用于收消息
-         秀场转1v1:
-         1.主叫
-            a.订阅被叫频道的presence，用户读取呼叫信息
-            b.订阅自己频道的message, 用来收消息
-         2.被叫
-            a.订阅自己频道的presence,用于写入呼叫信息
-            b.订阅自己频道的message，用来收消息
+         移除所有的presence，所有缓存由调用的业务服务器去控制
+         订阅自己频道的message，用来收消息
          */
-        if (config.role == CallRole.CALLER && config.mode == CallMode.ShowTo1v1) {
-            //秀场转1v1主叫
-            val ownerRoomId = config.ownerRoomId ?: run {
-                completion?.invoke(AGError("ownerRoomId is nil, please invoke 'initialize' to setup config", -1))
-                return
-            }
-            var error1: AGError? = null
-            var error2: AGError? = null
-            var tryCount = 3
-            val tryToInvoke = {
-                if (tryCount == 0) {
-                    completion?.invoke(error1 ?: error2)
-                }
-            }
-            val options1 = SubscribeOptions()
-            options1.withMessage = true
-            options1.withMetadata = false
-            options1.withPresence = false
-            Log.d(TAG, "1/3 will _subscribe[$roomId]")
-            _subscribe(roomId, options1) { error ->
-                error1 = error
-                Log.d(TAG, "1/3 _subscribe[$roomId]: ${error?.msg ?: "success"}")
-                tryCount -= 1
-                tryToInvoke.invoke()
-            }
-
-            val options2 = SubscribeOptions()
-            options2.withMessage = false
-            options2.withMetadata = false
-            options2.withPresence = true
-            Log.d(TAG, "2/3 will _subscribe[$ownerRoomId]")
-            _subscribe(ownerRoomId, options2) { error ->
-                error2 = error
-                Log.d(TAG, "2/3 _subscribe[$ownerRoomId]: ${error?.msg ?: "success"}")
-                tryCount -= 1
-                tryToInvoke.invoke()
-            }
-            if (options2.withPresence) {
-                Log.d(TAG, "3/3 waiting for snapshot")
-                //保证snapshot完成才认为subscribe完成，否则presence服务不一定成功导致后续写presence可能不成功
-                snapshotDidRecv = {
-                    Log.d(TAG, "3/3 recv snapshot")
-                    tryCount -= 1
-                    tryToInvoke.invoke()
-                }
-            } else {
-                tryCount -= 1
-                tryToInvoke.invoke()
-            }
-        } else {
-            var error: AGError? = null
-            var tryCount = 2
-            val tryToInvoke = {
-                if (tryCount == 0) {
-                    completion?.invoke(error)
-                }
-            }
-            val options = SubscribeOptions()
-            options.withMessage = true
-            options.withMetadata = false
-            options.withPresence = config.mode == CallMode.ShowTo1v1
-            _subscribe(roomId, options) { e ->
-                error = e
-                tryCount -= 1
-                tryToInvoke.invoke()
-            }
-            if (options.withPresence) {
-                snapshotDidRecv = {
-                    tryCount -= 1
-                    tryToInvoke.invoke()
-                }
-            } else {
-                tryCount -= 1
-                tryToInvoke.invoke()
-            }
-        }
+        val options = SubscribeOptions()
+        options.withMessage = true
+        options.withMetadata = false
+        options.withPresence = false
+        _subscribe(roomId, options, completion)
     }
 
     /// 发送回执消息
@@ -517,11 +361,6 @@ class CallMessageManager(
     }
 
     override fun onPresenceEvent(event: PresenceEvent?) {
-        event ?: return
-        if (event.type == RtmConstants.RtmPresenceEventType.SNAPSHOT) {
-            snapshotDidRecv?.invoke()
-            snapshotDidRecv = null
-        }
         rtmListener?.onPresenceEvent(event)
     }
 

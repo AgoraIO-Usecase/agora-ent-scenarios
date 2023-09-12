@@ -151,7 +151,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     private fun call(user: UserInfo) {
         showCallSendDialog(user)
         CallServiceManager.instance.startupCallApiIfNeed()
-        CallServiceManager.instance.callApi?.call(user.userId, user.userId.toInt()) { error ->
+        CallServiceManager.instance.callApi?.call(user.getRoomId(), user.userId.toInt()) { error ->
             if (error != null) {
                 finishCallDialog()
             }
