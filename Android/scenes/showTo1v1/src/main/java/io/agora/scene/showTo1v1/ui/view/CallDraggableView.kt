@@ -7,14 +7,14 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.FrameLayout
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1DraggableViewBinding
 
 class CallDraggableView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val TAG = "CallDraggableView"
     private val binding: ShowTo1v1DraggableViewBinding
@@ -35,10 +35,15 @@ class CallDraggableView @JvmOverloads constructor(
         binding.tvUserName.text = name
     }
 
+    fun setSmallType(small: Boolean) {
+        binding.tvUserName.visibility = if (small) View.VISIBLE else View.INVISIBLE
+        binding.llContainer.clipToOutline = small
+    }
+
     val canvasContainer: ViewGroup
         get() { return binding.llContainer }
 
-    fun setOnViewClick(action: (() -> Unit)) {
+    fun setOnViewClick(action: (() -> Unit)?) {
         onViewClick = action
     }
 
