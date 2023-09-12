@@ -44,7 +44,16 @@ object ScenesConstructor {
                 R.mipmap.bg_btn_home2,
                 R.mipmap.bg_btn_home_live,
                 true
-            )
+            ),
+            ScenesModel(
+                AgoraScenes.GrandChorus,
+                "io.agora.scene.grandchorus.ui.activity.RoomListActivity",
+                context.getString(R.string.app_grand_chorus),
+                R.mipmap.bg_btn_home8,
+                R.mipmap.bg_btn_home_grandchorus,
+                true,
+                context.getString(R.string.app_grand_chorus_tip)
+            ),
         )
     }
 }

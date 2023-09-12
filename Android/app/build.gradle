@@ -33,6 +33,9 @@ dependencies {
     if (isProjectLibrary(':scenes:show')) {
         runtimeOnly project(':scenes:show')
     }
+    if (isProjectLibrary(':scenes:grandchorus')) {
+        runtimeOnly project(':scenes:grandchorus')
+    }
 
     //glide 图片加载
     api rootProject.ext.deps.glide

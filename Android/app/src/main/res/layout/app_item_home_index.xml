@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:padding="5dp"
-    android:background="@mipmap/bg_app_def_white"
     android:gravity="center">
 
     <androidx.appcompat.widget.AppCompatImageView
