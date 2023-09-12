@@ -184,6 +184,8 @@ class RoomListActivity : AppCompatActivity() {
                                 RtcEngineInstance.generalToken(),
                                 null
                             )
+                            //启动机器人
+                            mService.startCloudPlayer()
                         }
                         MotionEvent.ACTION_CANCEL -> {
                             ShowLogger.d("hugo", "ACTION_CANCEL")
@@ -245,6 +247,8 @@ class RoomListActivity : AppCompatActivity() {
                             RtcEngineInstance.generalToken(),
                             null
                         )
+                        //启动机器人
+                        mService.startCloudPlayer()
                     }
                     MotionEvent.ACTION_CANCEL -> {
                         ShowLogger.d("hugo", "ACTION_CANCEL")
