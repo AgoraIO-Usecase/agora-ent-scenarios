@@ -1864,16 +1864,10 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
     
     override func _checkRoomExpire() {
         guard let room = self.room else { return }
-        let roomId = room.roomId
         if room.roomId.count == 6 {
             return super._checkRoomExpire()
         }
-        
-        NetworkManager.shared.cloudPlayerHeartbeat(channelName: roomId, uid: room.ownerId) { msg in
-            guard let msg = msg else {return}
-            agoraAssert("cloudPlayerHeartbeat fail: \(roomId) \(msg)")
-        }
-        
+        ShowRobotService.shared.playerHeartBeat()
     }
     
     @objc override func _getRoomList(page: Int, completion: @escaping (NSError?, [ShowRoomListModel]?) -> Void) {

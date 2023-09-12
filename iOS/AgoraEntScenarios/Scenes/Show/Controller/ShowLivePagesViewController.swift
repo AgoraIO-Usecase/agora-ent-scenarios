@@ -197,6 +197,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
 //            assert(false, "room at index \(idx) not found")
             return
         }
+        ShowRobotService.shared.startCloudPlayers()
         showLogger.info("willDisplay[\(room.roomId)]: \(idx)/\(indexPath.row)  cache vc count: \(self.children.count)", context: kPagesVCTag)
         vc.loadingType = .joined
         currentVC = vc

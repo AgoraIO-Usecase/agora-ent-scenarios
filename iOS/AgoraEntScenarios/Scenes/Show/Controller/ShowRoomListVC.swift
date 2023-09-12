@@ -40,7 +40,6 @@ class ShowRoomListVC: UIViewController {
         }
     }
     
-    // 自定义导航栏
     private let naviBar = ShowNavigationBar()
     
     private var needUpdateAudiencePresetType = false
@@ -63,13 +62,12 @@ class ShowRoomListVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        AppContext.shared.sceneImageBundleName = "showResource"
         createViews()
         createConstrains()
-        // 提前启动rtc engine
         ShowAgoraKitManager.shared.prepareEngine()
         ShowRobotService.shared.startCloudPlayers()
         preGenerateToken()
-        // 获取设备性能
         checkDevice()
     }
     
@@ -79,7 +77,6 @@ class ShowRoomListVC: UIViewController {
         fetchRoomList()
     }
     
-    // 点击创建按钮
     @objc private func didClickCreateButton(){
         let preVC = ShowCreateLiveVC()
         let preNC = UINavigationController(rootViewController: preVC)
@@ -104,7 +101,6 @@ class ShowRoomListVC: UIViewController {
         ShowAgoraKitManager.shared.deviceScore = Int(score)
     }
     
-    // 加入房间
     private func joinRoom(_ room: ShowRoomListModel){
         ShowAgoraKitManager.shared.callTimestampStart(clean: true, roomId: room.roomId)
         ShowAgoraKitManager.shared.setupAudienceProfile()
@@ -135,7 +131,7 @@ class ShowRoomListVC: UIViewController {
             guard let self = self else {return}
             self.refreshControl.endRefreshing()
             if let error = error {
-                ToastView.show(text: error.localizedDescription)
+                LogUtil.log(error.localizedDescription)
                 return
             }
             let list = roomList ?? []
@@ -143,7 +139,7 @@ class ShowRoomListVC: UIViewController {
             self.preLoadVisibleItems()
         }
     }
-    // 预先加载RTC
+    
     private func preLoadVisibleItems() {
         guard let token = AppContext.shared.rtcToken, roomList.count > 0 else {
             return
@@ -162,7 +158,7 @@ class ShowRoomListVC: UIViewController {
         }
         ShowAgoraKitManager.shared.preloadRoom(preloadRoomList: preloadRoomList)
     }
-    // 预先获取万能token
+
     private func preGenerateToken() {
         AppContext.shared.rtcToken = nil
         NetworkManager.shared.generateToken(
@@ -226,7 +222,6 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
 // MARK: - Creations
 extension ShowRoomListVC {
     private func createViews(){
-        // 背景图
         backgroundView.image = UIImage.show_sceneImage(name: "show_list_Bg")
         view.addSubview(backgroundView)
         
@@ -237,11 +232,9 @@ extension ShowRoomListVC {
         collectionView.refreshControl = self.refreshControl
         view.addSubview(collectionView)
         
-        // 空列表
         emptyView.isHidden = true
         collectionView.addSubview(emptyView)
         
-        // 创建房间按钮
         createButton.setTitleColor(.white, for: .normal)
         createButton.setTitle("room_list_create_room".show_localized, for: .normal)
         createButton.setImage(UIImage.show_sceneImage(name: "show_create_add"), for: .normal)
