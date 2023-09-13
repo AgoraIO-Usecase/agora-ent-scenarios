@@ -898,22 +898,21 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return YES;
     }]]];
     
-    if(removed != nil) {
-        //did remove
+    if (removed != nil) {
+        // 已删除
         self.selSongsArray = updatedList;
-
-        if(sync) {
+        
+        if (sync) {
             SRRemoveSongInputModel* inputModel = [SRRemoveSongInputModel new];
             inputModel.songNo = removed.songNo;
             inputModel.objectId = removed.objectId;
-            [[AppContext srServiceImp] removeSongWith:inputModel
-                                                 completion:^(NSError * error) {
+            
+            [[AppContext srServiceImp] removeSongWith:inputModel completion:^(NSError * error) {
                 if (error) {
-                    SRLogInfo(@"deleteSongEvent fail: %@ %ld", removed.songName, error.code);
+                    SRLogInfo(@"deleteSongEvent fail: %@ %ld", removed.songName, (long)error.code);
                 }
             }];
         }
-        
         return YES;
     } else {
         return NO;

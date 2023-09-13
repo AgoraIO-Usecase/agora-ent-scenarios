@@ -36,13 +36,13 @@ def all_pods
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
   
-  pod 'AgoraSyncManager', '~> 2.0.8'
+  pod 'AgoraSyncManager', '~> 2.1.0'
 
-#  pod 'sdk', :path => 'sdk.podspec'
+  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 # pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
-  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.147'
+#  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.147'
 
 
   #ThirdParty
