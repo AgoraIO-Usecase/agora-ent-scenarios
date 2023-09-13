@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import AgoraRtmKit
 import AgoraCommon
 
 @objc public enum KTVServiceNetworkStatus: Int {

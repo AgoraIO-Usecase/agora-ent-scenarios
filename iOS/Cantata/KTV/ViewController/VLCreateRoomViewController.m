@@ -62,7 +62,7 @@
     KTVCreateRoomInputModel* intputModel = [KTVCreateRoomInputModel new];
     intputModel.belCanto = @"0";
     intputModel.icon = [NSString stringWithFormat:@"%@",roomModel.icon];
-    intputModel.isPrivate = roomModel.isPrivate ? @(1) : @(0);
+    intputModel.isPrivate = roomModel.isPrivate == true ? @(1) : @(0);
     intputModel.name = [NSString stringWithFormat:@"%@",roomModel.name];
     intputModel.password = roomModel.password.length > 0 ? [NSString stringWithFormat:@"%@",roomModel.password] : @"";
     intputModel.soundEffect = @"0";
@@ -90,10 +90,10 @@
         listModel.name = outputModel.name;
         listModel.bgOption = 0;
         listModel.creatorNo = VLUserCenter.user.id;
-        VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
-        ktvVC.roomModel = listModel;
-        ktvVC.seatsArray = outputModel.seatsArray;
-        [weakSelf.navigationController pushViewController:ktvVC animated:YES];
+        CantataMainViewController *VC = [[CantataMainViewController alloc]init];
+        VC.roomModel = listModel;
+        VC.seatsArray = outputModel.seatsArray;
+        [weakSelf.navigationController pushViewController:VC animated:YES];
     }];
 }
 

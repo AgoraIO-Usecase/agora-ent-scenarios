@@ -1,5 +1,11 @@
 import UIKit
 import AgoraCommon
+import SDWebImage
+
+protocol ChorusMicViewDelegate: NSObjectProtocol {
+    func didChorusMicViewClicked(with index: Int)
+}
+
 class ChorusMicView: UIView {
 
     private let centralMicSize: CGFloat = 100.0 // 中间大麦位的大小
@@ -9,6 +15,16 @@ class ChorusMicView: UIView {
     private var centralMicView: MicView? // 中间大麦位视图
     private var sideMicViews: [MicView] = [] // 周边麦位视图数组
     private let boundaryInset: CGFloat = 20.0 // 边界缩进值
+    
+    public weak var delegate: ChorusMicViewDelegate?
+    
+    public var seatArray: [VLRoomSeatModel]? {
+        didSet {
+            guard let array = seatArray else {return}
+            //根据array更新麦位
+            updateAllMics(with: array)
+        }
+    }
 
     init(frame: CGRect, topMicCount: Int) {
         super.init(frame: frame)
@@ -18,6 +34,22 @@ class ChorusMicView: UIView {
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func updateAllMics(with seatArray: [VLRoomSeatModel]) {
+        for i in seatArray {
+            guard let headUrl = i.headUrl else {return}
+            let index = i.seatIndex
+            guard let micView = self.viewWithTag(1000 + index) as? MicView else {return}
+            micView.updateMicName(i.name ?? "")
+            micView.updateMicImage(with: headUrl)
+        }
+    }
+    
+    public func updateMics(with model: VLRoomSeatModel) {
+        guard let micView = self.viewWithTag(1000 + model.seatIndex) as? MicView else {return}
+        micView.updateMicName(model.name?.count ?? 0 > 0 ? model.name! :  "\(model.seatIndex)号麦")
+        micView.updateMicImage(with: model.headUrl?.count ?? 0 > 0 ? model.headUrl! : "")
     }
 
     private func addBGView() {
@@ -33,6 +65,10 @@ class ChorusMicView: UIView {
         
         // 添加中间大麦位视图
         centralMicView = MicView(frame: CGRect(x: (bounds.width - centralMicSize) / 2, y: (bounds.height - centralMicSize) / 2 - 10, width: centralMicSize, height: centralMicSize + 20))
+        centralMicView?.clickBlock = {[weak self] index in
+            guard let self = self, let delegate = self.delegate else {return}
+            delegate.didChorusMicViewClicked(with: index)
+        }
         if let centralMicView = centralMicView {
             addSubview(centralMicView)
             centralMicView.scoreLabel.textColor = .white
@@ -44,6 +80,7 @@ class ChorusMicView: UIView {
             centralMicView.gradeImageView
             let random = nonzeroRandom(in: 5...15)
             centralMicView.addFloatingAnimation(random, random)
+            centralMicView.tag = 1000
         }
         
         let maxRadius = min(bounds.width, bounds.height) / 2 - centralMicSize - sideMicSize - boundaryInset * 2 // 考虑到边界缩进值
@@ -68,12 +105,17 @@ class ChorusMicView: UIView {
                     isValidPosition = true
                     micView = MicView(frame: micFrame)
                     micView?.scoreLabel.textColor = .white
-                    micView?.scoreLabel.text = "\(i)号麦"
+                    micView?.scoreLabel.text = "\(i+1)号麦"
                 }
             }
             
             if let micView = micView {
+                micView.clickBlock = {[weak self] index in
+                    guard let self = self, let delegate = self.delegate else {return}
+                    delegate.didChorusMicViewClicked(with: index)
+                }
                 sideMicViews.append(micView)
+                micView.tag = 1001 + i
                 addSubview(micView)
                 // 添加浮动效果
                 let randomX = nonzeroRandom(in: -20...20)
@@ -119,18 +161,14 @@ class MicView: UIView {
     private let micImageView: UIImageView
     public let scoreLabel: UILabel
     public let gradeImageView: UIImageView
-    
-    var isTaken: Bool = false {
-        didSet {
-            updateMicImage()
-        }
-    }
+    public let coverBtn: UIButton
+    public var clickBlock:((Int)-> Void)?
     
     override init(frame: CGRect) {
         micImageView = UIImageView()
         scoreLabel = UILabel()
         gradeImageView = UIImageView()
-        
+        coverBtn = UIButton()
         super.init(frame: frame)
         
         self.frame = frame
@@ -140,10 +178,15 @@ class MicView: UIView {
         
         scoreLabel.font = UIFont.systemFont(ofSize: 12)
         scoreLabel.textAlignment = .center
+
+        coverBtn.isUserInteractionEnabled = true
+        coverBtn.addTarget(self, action: #selector(micClick), for: .touchUpInside)
         
         addSubview(micImageView)
         addSubview(scoreLabel)
         addSubview(gradeImageView)
+        addSubview(coverBtn)
+
     }
     
     override func layoutSubviews() {
@@ -151,18 +194,29 @@ class MicView: UIView {
         micImageView.frame = CGRect(x: 0, y: 0, width: frame.width, height: frame.height - 20)
         scoreLabel.frame = CGRect(x: 0, y: frame.height - 20, width: frame.width, height: 20)
         gradeImageView.frame = CGRect(x: 0, y: frame.height - 50, width: frame.width, height: 20)
+        coverBtn.frame = self.bounds
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func updateMicImage() {
-        micImageView.image = isTaken ? UIImage(named: "mic_taken") : UIImage.sceneImage(name: "ktv_emptySeat_icon")
+    func updateMicImage(with url: String) {
+        if url == "" {
+            micImageView.image = UIImage.sceneImage(name: "ktv_emptySeat_icon")
+            return
+        }
+        guard let headUrl = URL(string: url) else {return}
+        micImageView.sd_setImage(with: headUrl)
     }
     
-    func setScore(_ score: Float) {
-        scoreLabel.text = "admin"
+    func updateMicName(_ name: String) {
+        scoreLabel.text = name
+    }
+    
+    @objc private func micClick() {
+        guard let clickBlock = self.clickBlock else {return}
+        clickBlock(self.tag)
     }
 }
 

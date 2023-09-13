@@ -11,7 +11,7 @@
 #import "UIView+VL.h"
 #import "VLEffectView.h"
 
-@implementation LSTPopView (KTVModal)
+@implementation LSTPopView (DHCModal)
 
 #pragma mark private method
 //公共弹窗视图设置
@@ -81,7 +81,7 @@
 //弹出下麦视图
 + (LSTPopView*)popDropLineViewWithParentView:(UIView*)parentView
                                withSeatModel:(VLRoomSeatModel *)seatModel
-                               withDelegate:(id<VLDropOnLineViewDelegate>)delegate {
+                               withDelegate:(id)delegate {
     CGFloat popViewH = 212 + kSafeAreaBottomHeight + 32;
     VLDropOnLineView* dropLineView = [[VLDropOnLineView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
                                                                withDelegate:delegate];

@@ -54,7 +54,6 @@ TODO: Add long description of the pod here.
   s.dependency 'SwiftyBeaver'
   s.dependency 'Bugly'
   s.dependency 'SocketRocket'
-  s.dependency 'AgoraRtm_iOS'
   s.dependency 'AgoraSyncManager'
   s.dependency 'ZSwiftBaseLib'
   s.dependency 'SVProgressHUD'

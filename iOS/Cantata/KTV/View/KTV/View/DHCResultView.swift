@@ -38,9 +38,24 @@ class DHCResultView: UIView {
             return tableView
     }()
     
+    private lazy var nextLabel: UILabel = { //下一首歌提示
+        let label = UILabel()
+        label.text = "下一首歌:七里香"
+        label.textAlignment = .center
+        label.textColor = .white
+        label.font = UIFont.systemFont(ofSize: 15)
+        return label
+     }()
+    
+    private lazy var nextBtn: UIButton = { //下一首歌提示
+        let btn = UIButton()
+        btn.setTitle("下一首", for: .normal)
+        return btn
+     }()
+    
     @objc public var dataSource: [SubRankModel]? {
         didSet {
-            
+            tableView.reloadData()
         }
     }
     

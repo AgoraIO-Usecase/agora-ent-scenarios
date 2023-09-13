@@ -1,6 +1,6 @@
 source 'https://github.com/CocoaPods/Specs.git'
-
-platform :ios, '12.0'
+source "https://gitee.com/fanpeng11/auikit-test-specs.git"
+platform :ios, '13.0'
 inhibit_all_warnings!
 #plugin 'cocoapods-pod-sign'
 #skip_pod_bundle_sign # 用来跳过Xcode对bundle资源的签名
@@ -17,7 +17,7 @@ def all_pods
 #  pod 'MBProgressHUD', '~> 1.1.0'
   pod 'SVProgressHUD', '2.2.5'
   # 加载图片
-  pod 'SDWebImage', '4.4.8'
+  pod 'SDWebImage'
   pod 'SDWebImageAPNGCoder'
   # Model
   pod 'YYModel', '1.0.4'
@@ -30,7 +30,7 @@ def all_pods
   pod 'LEEAlert', '1.6.4'
   #滚动视图
   pod 'JXCategoryView', '1.6.1'
-
+  
   # 火山美颜
   pod 'BytedEffect', :path => 'bytedEffect.podspec'
   # 商汤美颜
@@ -38,12 +38,12 @@ def all_pods
   pod 'Cantata', :path => 'Cantata.podspec'
   pod 'AgoraCommon', :path => 'AgoraCommon.podspec'
   pod 'AgoraSyncManager', '~> 2.0.8'
-
+  pod 'AUIKitCore','0.5.3-beta', :subspecs => ['UI']
 #  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 # pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
-  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.147'
+  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.142'
 
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/ThirdParty/VideoLoaderAPI/VideoLoaderAPI.podspec'
 
@@ -58,7 +58,7 @@ def all_pods
   pod 'AgoraLyricsScore', '1.1.1-beta-3'
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'cc0951f11f5fa6113ec2b9df2a509efa881d5bd7'
 #  pod 'AgoraLyricsScore', :path => '../../AgoraLyricsScore/AgoraLyricsScore.podspec'
-  pod 'AgoraRtm_iOS', '1.5.1'
+ # pod 'AgoraRtm_iOS', '1.5.1'
   pod 'Zip'
   pod 'MJRefresh'
   
@@ -68,7 +68,7 @@ def all_pods
 
   #VoiceChatRoom rely
   pod 'ZSwiftBaseLib', '0.1.6.1'
-
+ # pod 'AUIKitCore','0.5.0'
   pod 'SnapKit'
   pod 'SVGAPlayer'
   pod 'KakaJSON'

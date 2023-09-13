@@ -41,6 +41,10 @@ class VLBottomView: UIView {
         self.addSubview(musicChooseBtn)
     }
     
+    public func updateMicState(_ isOpen: Bool) {
+        audioBtn.isSelected = isOpen ? false : true
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         audioBtn.frame = CGRect(x: 25, y: 13, width: 24, height: 24)

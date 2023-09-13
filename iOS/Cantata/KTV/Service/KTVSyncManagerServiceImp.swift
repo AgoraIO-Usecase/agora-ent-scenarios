@@ -192,7 +192,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         let roomInfo = VLRoomListModel() // LiveRoomInfo(roomName: inputModel.name)
 //        roomInfo.id = VLUserCenter.user.id//NSString.withUUID().md5() ?? ""
         roomInfo.name = inputModel.name
-        roomInfo.isPrivate = ((inputModel.isPrivate?.boolValue) != nil)
+        roomInfo.isPrivate = inputModel.isPrivate?.intValue != 0
         roomInfo.password = inputModel.password
         roomInfo.creatorNo = VLUserCenter.user.id
         roomInfo.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id

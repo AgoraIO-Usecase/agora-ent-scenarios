@@ -93,8 +93,7 @@
     if (![self checkIsLogin]) return;
     
     VLCreateRoomViewController *createRoomVC = [[VLCreateRoomViewController alloc]init];
-    CantataMainViewController *VC = [[CantataMainViewController alloc]init];
-    [self.navigationController pushViewController:VC animated:YES];
+    [self.navigationController pushViewController:createRoomVC animated:YES];
 
 }
 
@@ -132,7 +131,7 @@
         }
         
         listModel.creatorNo = outputModel.creatorNo;
-        VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
+        CantataMainViewController *ktvVC = [[CantataMainViewController alloc]init];
         ktvVC.roomModel = listModel;
         ktvVC.seatsArray = outputModel.seatsArray;
         [weakSelf.navigationController pushViewController:ktvVC animated:YES];

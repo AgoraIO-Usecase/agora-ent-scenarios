@@ -8,6 +8,20 @@
 import UIKit
 import AgoraLyricsScore
 
+class RankModel: NSObject {
+    @objc var userName: String?
+    @objc var poster: String?
+    @objc var songNum: Int = 0
+    @objc var score: Int = 0
+}
+
+class SubRankModel : RankModel {
+    @objc var userId: String?
+    @objc var index: Int = 0
+    @objc var count: Int = 0
+    @objc var segCount: Int = 0
+}
+
 public enum DHCGameEvent: Int {
     case pause
     case play
@@ -34,7 +48,7 @@ public protocol DHCGameDelegate: NSObjectProtocol {
 }
 
 class DHCLRCControl: UIView {
-    @objc public weak var lrcView: KaraokeView!
+    @objc public var lrcView: KaraokeView!
     private var musicNameBtn: UIButton!
     private var pauseBtn: UIButton!
     private var nextBtn: UIButton!
@@ -130,17 +144,18 @@ class DHCLRCControl: UIView {
         noSongLabel.textAlignment = .center
         noSongLabel.numberOfLines = 0
         addSubview(noSongLabel)
+        noSongLabel.isHidden = true
         
-//        lrcView = KaraokeView(frame: .zero, loggers: [FileLogger()])
-//        lrcView.scoringView.viewHeight = 60
-//        lrcView.scoringView.topSpaces = 5
-//        lrcView.lyricsView.textNormalColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
-//        lrcView.lyricsView.textHighlightedColor = UIColor(hexString: "#EEFF25")!
-//        lrcView.lyricsView.lyricLineSpacing = 6
-//        lrcView.lyricsView.draggable = false
-//        lrcView.delegate = self
-//        addSubview(lrcView!)
-//        lrcView.isHidden = true
+        lrcView = KaraokeView(frame: .zero, loggers: [FileLogger()])
+        lrcView.scoringView.viewHeight = 60
+        lrcView.scoringView.topSpaces = 5
+        lrcView.lyricsView.textNormalColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
+        lrcView.lyricsView.textHighlightedColor = UIColor(hexString: "#EEFF25")!
+        lrcView.lyricsView.lyricLineSpacing = 6
+        lrcView.lyricsView.draggable = false
+        lrcView.delegate = self
+        addSubview(lrcView!)
+        lrcView.isHidden = true
 
         pauseBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 34, height: 40))
         pauseBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
@@ -238,6 +253,26 @@ extension DHCLRCControl: KaraokeDelegate {
     func onKaraokeView(view: KaraokeView, didFinishLineWith model: LyricLineModel, score: Int, cumulativeScore: Int, lineIndex: Int, lineCount: Int) {
         
     }
+}
+
+extension DHCLRCControl: KTVLrcViewDelegate {
+    func onUpdatePitch(pitch: Float) {
+        
+    }
+    
+    func onUpdateProgress(progress: Int) {
+        
+    }
+    
+    func onDownloadLrcData(url: String) {
+        
+    }
+    
+    func onHighPartTime(highStartTime: Int, highEndTime: Int) {
+        
+    }
+    
+    
 }
 
 extension UIButton {

@@ -455,7 +455,6 @@
 		DD8417CC29090C520026B624 /* TemplateServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD84176129090C520026B624 /* TemplateServiceProtocol.swift */; };
 		DD9E545C2994FFF2007CB3C0 /* VLKTVRemoteVolumeView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD9E545B2994FFF2007CB3C0 /* VLKTVRemoteVolumeView.m */; };
 		DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */; };
-		E3104A882A97532C00FB3490 /* AUiMoreDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3104A872A97532C00FB3490 /* AUiMoreDialog.swift */; };
 		E32C7EA92A20B03F00512523 /* ShowDebugPrivateParamsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E32C7EA82A20B03F00512523 /* ShowDebugPrivateParamsVC.swift */; };
 		E34CB3F42A98AE4C00AB1B25 /* UIWindow+Router.m in Sources */ = {isa = PBXBuildFile; fileRef = E34CB3F22A98AE4B00AB1B25 /* UIWindow+Router.m */; };
 		E34CB4FA2A98B12C00AB1B25 /* VLAPIRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E34CB4F92A98B12C00AB1B25 /* VLAPIRequest.m */; };
@@ -1061,7 +1060,6 @@
 		DD9E545B2994FFF2007CB3C0 /* VLKTVRemoteVolumeView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLKTVRemoteVolumeView.m; sourceTree = "<group>"; };
 		DDDDDA2928FFD5DD005F4E8B /* AgoraEntScenarios-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AgoraEntScenarios-Bridging-Header.h"; sourceTree = "<group>"; };
 		DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
-		E3104A872A97532C00FB3490 /* AUiMoreDialog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiMoreDialog.swift; sourceTree = "<group>"; };
 		E32C7EA82A20B03F00512523 /* ShowDebugPrivateParamsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugPrivateParamsVC.swift; sourceTree = "<group>"; };
 		E34CB3F22A98AE4B00AB1B25 /* UIWindow+Router.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWindow+Router.m"; sourceTree = "<group>"; };
 		E34CB3F32A98AE4B00AB1B25 /* UIWindow+Router.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow+Router.h"; sourceTree = "<group>"; };
@@ -2547,7 +2545,6 @@
 		DD8416D729090C520026B624 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				E3104A872A97532C00FB3490 /* AUiMoreDialog.swift */,
 				DD8416D829090C520026B624 /* VLPopImageVerifyView.m */,
 				DD8416D929090C520026B624 /* VLLoginInputVerifyCodeView.m */,
 				DD8416DA29090C520026B624 /* VLPrivacyCustomView.m */,
@@ -3425,7 +3422,6 @@
 				ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */,
 				DD619BF229E3E262008F63E4 /* AgoraChatRoom3DMoveUserView.swift in Sources */,
 				DD619B9229E3E262008F63E4 /* VRVerifyCodeNumberView.swift in Sources */,
-				E3104A882A97532C00FB3490 /* AUiMoreDialog.swift in Sources */,
 				DD619A8429E3E247008F63E4 /* ActionSheetManager.swift in Sources */,
 				DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */,
 				DD619A9C29E3E247008F63E4 /* SAGiftersViewController.swift in Sources */,

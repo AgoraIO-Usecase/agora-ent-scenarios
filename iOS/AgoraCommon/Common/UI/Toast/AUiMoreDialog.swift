@@ -20,7 +20,8 @@ import AgoraCommon
     private lazy var reportButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage.sceneImage(name: "report_icon", bundleName: "VoiceChatRoomResource"), for: .normal)
-        button.setTitle("voice_report".voice_localized(), for: .normal)
+        //cp todo
+        button.setTitle("voice_report".toSceneLocalization(bundleName: "DHCResource"), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         button.setTitleColor(.gray, for: .normal)
         button.contentHorizontalAlignment = .center;
@@ -63,7 +64,7 @@ import AgoraCommon
         }
     }
     
-    @objc func show() {
+    @objc public func show() {
         contentView.bottom = 0
         UIView.animate(withDuration: 0.3, delay: 0) {
             self.contentView.top = 0
@@ -81,7 +82,7 @@ import AgoraCommon
     @objc private func onAction(_ sender: UIButton) {
         //TODO: mock success
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.2) {
-            ToastView.show(text: "voice_report_success".voice_localized())
+            ToastView.show(text: "voice_report_success".toSceneLocalization(bundleName: "DHCResource"))
         }
     }
 }

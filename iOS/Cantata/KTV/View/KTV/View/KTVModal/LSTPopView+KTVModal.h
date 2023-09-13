@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 //弹出下麦视图
 + (LSTPopView*)popDropLineViewWithParentView:(UIView*)parentView
                                withSeatModel:(VLRoomSeatModel *)seatModel
-                                withDelegate:(id<VLDropOnLineViewDelegate>)delegate;
+                                withDelegate:(id)delegate;
 
 //弹出美声视图
 + (LSTPopView*)popBelcantoViewWithParentView:(UIView*)parentView
@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
                                         isChorus:(BOOL)isChorus
                                  chooseSongArray: (NSArray*)chooseSongArray
                                       withRoomNo:(NSString*)roomNo
-                                    withDelegate:(id<VLPopSongListDelegate>)delegate;
+                                    withDelegate:(id)delegate;
 
 //弹出音效
 + (LSTPopView*)popSetSoundEffectViewWithParentView:(UIView*)parentView
