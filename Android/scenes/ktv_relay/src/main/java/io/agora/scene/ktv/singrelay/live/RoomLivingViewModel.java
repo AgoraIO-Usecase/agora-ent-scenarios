@@ -848,23 +848,6 @@ public class RoomLivingViewModel extends ViewModel {
                                 }
                             }
                         }
-                    } else if (jsonMsg.getString("cmd").equals("SingingScore")) {
-//                        KTVLogger.d(TAG, "onMessage/SingingScore: " + jsonMsg);
-//                        float score = (float) jsonMsg.getDouble("score");
-//                        int songNum = (int) jsonMsg.getDouble("num");
-//                        String userId = jsonMsg.getString("userId");
-//                        String userName = jsonMsg.getString("userName");
-//                        String poster = jsonMsg.getString("poster");
-
-//                        // 本地演唱 计入rank
-//                        RankModel model = new RankModel(
-//                                userName,
-//                                songNum,
-//                                (int)score,
-//                                poster,
-//                                0
-//                        );
-//                        rankMap.put(userId, model);
                     } else if (jsonMsg.getString("cmd").equals("CoSingerLoadSuccess") && isRoomOwner()) {
                         prepareNum = prepareNum + 1;
                         if (seatListLiveData.getValue() != null && prepareNum == seatListLiveData.getValue().size() && songPlayingLiveData.getValue() != null) {
@@ -888,6 +871,7 @@ public class RoomLivingViewModel extends ViewModel {
         };
         config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING;
         config.mAudioScenario = Constants.AUDIO_SCENARIO_GAME_STREAMING;
+        config.addExtension("agora_ai_echo_cancellation_extension");
         try {
             mRtcEngine = (RtcEngineEx) RtcEngine.create(config);
         } catch (Exception e) {
@@ -1504,26 +1488,10 @@ public class RoomLivingViewModel extends ViewModel {
             rankMap.put(UserManager.getInstance().getUser().id.toString(), new RankModel(
                     UserManager.getInstance().getUser().name,
                     singNum,
-                    (int)score,
+                    (int) score,
                     UserManager.getInstance().getUser().headUrl,
                     1
             ));
-        }
-    }
-
-    public void syncSingingAverageScore(double score, int singedNum) {
-        if (mRtcEngine == null) return;
-        Map<String, Object> msg = new HashMap<>();
-        msg.put("cmd", "SingingScore");
-        msg.put("score", score);
-        msg.put("num", singedNum);
-        msg.put("userName", UserManager.getInstance().getUser().name);
-        msg.put("userId", UserManager.getInstance().getUser().id.toString());
-        msg.put("poster", UserManager.getInstance().getUser().headUrl);
-        JSONObject jsonMsg = new JSONObject(msg);
-        int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
-        if (ret < 0) {
-            KTVLogger.e(TAG, "syncSingingAverageScore() sendStreamMessage called returned: " + ret);
         }
     }
 

@@ -524,12 +524,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.playerMusicPlayCompleteLiveData.observe(this, score -> {
             mRoomSpeakerAdapter.notifyDataSetChanged();
             roomLivingViewModel.toggleMic(false);
-
-            int sc = getBinding().lrcControlView.getCumulativeScoreInPercentage();
-            int num = getBinding().lrcControlView.getCumulativeSingedParts();
-            if (sc > 0) {
-                roomLivingViewModel.syncSingingAverageScore(sc, num);
-            }
             getBinding().singRelayGameView.onSongFinish();
             if (roomLivingViewModel.isRoomOwner()) {
                 roomLivingViewModel.changeMusic();
@@ -748,7 +742,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     setDarkStatusIcon(isBlackDarkStatus());
                     roomLivingViewModel.toggleMic(false);
                     getBinding().singRelayGameView.onSongFinish();
-                    roomLivingViewModel.syncSingingAverageScore(0, 0);
                     roomLivingViewModel.resetMusicStatus();
                     if (roomLivingViewModel.isRoomOwner()) {
                         roomLivingViewModel.changeMusic();
