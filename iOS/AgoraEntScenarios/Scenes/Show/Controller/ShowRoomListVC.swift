@@ -140,7 +140,7 @@ class ShowRoomListVC: UIViewController {
     }
     
     private func preLoadVisibleItems() {
-        guard let token = AppContext.shared.rtcToken, roomList.count > 0 else {
+        guard let token = AppContext.shared.rtcToken, token.count > 0, roomList.count > 0 else {
             return
         }
         let firstItem = collectionView.indexPathsForVisibleItems.first?.item ?? 0
@@ -197,7 +197,7 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
     func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
         showLogger.info("didHighlightItemAt: \(indexPath.row)", context: "collectionView")
         let room = roomList[indexPath.item]
-        if (AppContext.shared.rtcToken != nil) {
+        if let token = AppContext.shared.rtcToken, token.count > 0 {
             ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .prejoined)
             preloadRoom = room
         } else { // fetch token when token is not exist
