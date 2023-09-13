@@ -13,11 +13,11 @@ class ShowRobotService {
     
     private let kRobotRoomStartId = 2023000
     private let kRobotUid = 2000000001
-
+    
     private let robotStreamURL = [
-        "https://download.agora.io/sdk/release/agora_test_video_10.mp4",
-        "https://download.agora.io/sdk/release/agora_test_video_11.mp4",
-        "https://download.agora.io/sdk/release/agora_test_video_12.mp4"
+        "https://download.agora.io/demo/test/agora_test_video_10.mp4",
+        "https://download.agora.io/demo/test/agora_test_video_11.mp4",
+        "https://download.agora.io/demo/test/agora_test_video_12.mp4"
     ]
     private let robotRoomIds = ["1", "2", "3"]
     private let robotRoomOwnerHeaders = [
