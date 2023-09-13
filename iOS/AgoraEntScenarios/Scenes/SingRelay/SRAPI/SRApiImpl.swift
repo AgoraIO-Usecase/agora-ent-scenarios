@@ -143,6 +143,7 @@ class SRApiImpl: NSObject{
         engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
         engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
+        engine.setParameters("{\"che.audio.aiaec.working_mode\":1}")
     }
     
     func renewInnerDataStreamId() {

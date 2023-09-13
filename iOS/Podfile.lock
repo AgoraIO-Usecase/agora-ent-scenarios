@@ -17,9 +17,8 @@ PODS:
   - Agora-Scene-Utils (1.1.0)
   - Agora_Chat_iOS (1.0.8)
   - AgoraLyricsScore (1.1.1-beta-3)
-  - AgoraRtcEngine_Special_iOS (4.1.1.147)
   - AgoraRtm_iOS (1.5.1)
-  - AgoraSyncManager (2.0.8):
+  - AgoraSyncManager (2.1.0):
     - SocketRocket
   - Bugly (2.5.93)
   - BytedEffect (4.3.0):
@@ -38,6 +37,7 @@ PODS:
   - MJRefresh (3.7.5)
   - Protobuf (3.22.1)
   - ScoreEffectUI (1.0.1)
+  - sdk (1.0)
   - SDWebImage (4.4.8):
     - SDWebImage/Core (= 4.4.8)
   - SDWebImage/Core (4.4.8)
@@ -69,9 +69,8 @@ DEPENDENCIES:
   - Agora-Scene-Utils (= 1.1.0)
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraLyricsScore (= 1.1.1-beta-3)
-  - AgoraRtcEngine_Special_iOS (= 4.1.1.147)
   - AgoraRtm_iOS (= 1.5.1)
-  - AgoraSyncManager (~> 2.0.8)
+  - AgoraSyncManager (~> 2.1.0)
   - Bugly (= 2.5.93)
   - BytedEffect (from `bytedEffect.podspec`)
   - HWWeakTimer (= 1.0)
@@ -83,6 +82,7 @@ DEPENDENCIES:
   - MJRefresh
   - Protobuf (= 3.22.1)
   - ScoreEffectUI (= 1.0.1)
+  - sdk (from `sdk.podspec`)
   - SDWebImage (~> 4.2)
   - SDWebImageAPNGCoder
   - SenseLib (from `sense.podspec`)
@@ -102,7 +102,6 @@ SPEC REPOS:
     - Agora-Scene-Utils
     - Agora_Chat_iOS
     - AgoraLyricsScore
-    - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS
     - AgoraSyncManager
     - Bugly
@@ -132,6 +131,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   BytedEffect:
     :path: bytedEffect.podspec
+  sdk:
+    :path: sdk.podspec
   SenseLib:
     :path: sense.podspec
 
@@ -140,9 +141,8 @@ SPEC CHECKSUMS:
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
-  AgoraRtcEngine_Special_iOS: 3428f19a20422295817e3083e6fcc92a86576ea7
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
-  AgoraSyncManager: 33b8ecf2cd80550f156612d6175a0b0ed1d48497
+  AgoraSyncManager: caa8e0a80d1247bac95f9a869d400878d5081a3d
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   BytedEffect: 74b0bd8150ff1ab9c443d210a7ff7eb49ad3da44
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
@@ -155,6 +155,7 @@ SPEC CHECKSUMS:
   MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
   ScoreEffectUI: 1a3bbd83b17cfef1c16a3a4eede2854f89c9eb10
+  sdk: e3479e54702dcafc8c3e74a1baa05d7c2c8f753d
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
   SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
@@ -169,6 +170,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: fb37003fed452184f55746bdc150eb9565e48dc4
+PODFILE CHECKSUM: 6c42b86650878f74f9135dbe05fbaf2e5b8c176c
 
 COCOAPODS: 1.12.1
