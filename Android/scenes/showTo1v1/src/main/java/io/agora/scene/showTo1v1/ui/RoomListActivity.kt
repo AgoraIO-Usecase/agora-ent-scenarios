@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
-import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -17,10 +16,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import io.agora.rtc2.RtcConnection
-import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.scene.base.component.BaseViewBindingActivity
-import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.R
@@ -41,8 +37,6 @@ import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
 import io.agora.scene.showTo1v1.ui.fragment.RoomListFragment
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.widget.utils.StatusBarUtil
-import org.json.JSONException
-import org.json.JSONObject
 
 class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBinding>(), ICallApiListener,
     RoomListFragment.OnFragmentListener {
@@ -57,15 +51,13 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
     private val mCallApi by lazy { ICallApi.getImplInstance() }
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
-    private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
+
     private var mFragmentAdapter: FragmentStateAdapter? = null
     private val mRoomInfoList = mutableListOf<ShowTo1v1RoomInfo>()
 
     private val mVpFragments = SparseArray<RoomListFragment>()
     private var mCurrLoadPosition = POSITION_NONE
-
-    // 是否是第一次加载
-    private var mIsFirstLoad = true
+    private var mLoadConnection = false
 
     // 当前呼叫状态
     private var mCallState = CallStateType.Idle
@@ -149,35 +141,30 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             binding.viewPager2.offscreenPageLimit = preloadCount - 2
             mFragmentAdapter = object : FragmentStateAdapter(this) {
 
-                override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-                    super.onAttachedToRecyclerView(recyclerView)
-                    Log.d(TAG, "onAttachedToRecyclerView")
-                }
-
-                override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-                    super.onDetachedFromRecyclerView(recyclerView)
-                    Log.d(TAG, "onDetachedFromRecyclerView")
-                }
-
                 override fun getItemCount(): Int {
                     return if (mRoomInfoList.size <= 1) mRoomInfoList.size else Int.MAX_VALUE
                 }
 
                 override fun createFragment(position: Int): Fragment {
-                    val actualPosition = position % mRoomInfoList.size
-                    val roomInfo = mRoomInfoList[actualPosition]
+                    val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
                     return RoomListFragment.newInstance(roomInfo).also {
-                        Log.d(TAG, "createFragment position:$position,actualPosition:$actualPosition")
-                        mVpFragments.put(position, it)
+                        Log.d(TAG, "createFragment position:$position")
+                        mVpFragments[position] = it
                     }
+                }
+
+                override fun getItemId(position: Int): Long {
+                    // 防止 fragment 变了不刷新
+                    val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
+                    return (roomInfo.roomId.hashCode() + position).toLong()
+
                 }
             }
             binding.viewPager2.adapter = mFragmentAdapter
             binding.viewPager2.registerOnPageChangeCallback(onPageChangeCallback)
-            mCurrLoadPosition =
-                if (mRoomInfoList.size == 1) 0 else Int.MAX_VALUE / 2 - (Int.MAX_VALUE / 2) % mRoomInfoList.size
-            Log.d(TAG, "currentItem:$mCurrLoadPosition")
-            binding.viewPager2.setCurrentItem(mCurrLoadPosition, false)
+            binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2, false)
+            mCurrLoadPosition = binding.viewPager2.currentItem
+            Log.d(TAG, "after setCurrentItem mCurrLoadPosition:$mCurrLoadPosition")
         } else {
             mFragmentAdapter?.notifyDataSetChanged()
         }
@@ -234,7 +221,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             super.onPageSelected(position)
             Log.d(
                 TAG,
-                "PageChange onPageSelected position=$position, currLoadPosition=$mCurrLoadPosition, preLoadPosition=$preLoadPosition"
+                "PageChange onPageSelected position=$position,currLoadPosition=$mCurrLoadPosition,preLoadPosition=$preLoadPosition"
             )
             if (mCurrLoadPosition != POSITION_NONE) {
                 if (preLoadPosition != POSITION_NONE) {
@@ -260,6 +247,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         binding.titleView.rightIcon.startAnimation(anim)
         binding.titleView.rightIcon.isEnabled = false
         mService.getRoomList(completion = { error, roomList ->
+            mLoadConnection = false
             mRoomInfoList.clear()
             mRoomInfoList.addAll(roomList)
             updateListView()
@@ -313,10 +301,9 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     }
 
     override fun onFragmentViewCreated() {
-        if (mIsFirstLoad) {
-            mIsFirstLoad = false
-            mVpFragments[mCurrLoadPosition]?.startLoadPageSafely()
-        }
+        if (mLoadConnection) return
+        mLoadConnection = true
+        mVpFragments[mCurrLoadPosition]?.startLoadPageSafely()
     }
 
     private fun onCallSend(user: ShowTo1v1UserInfo) {

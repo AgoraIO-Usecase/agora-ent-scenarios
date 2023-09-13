@@ -585,7 +585,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 mShowTo1v1Manger.mCurrentUser.let {
                     binding.vDragSmallWindow.setUserName(it.userName)
                 }
-                binding.layoutCall.isVisible = true
+
+                binding.layoutCall.post {
+                    binding.layoutCall.isVisible = true
+                }
+
                 binding.llVideoContainer.isVisible = false
                 binding.layoutNumCount.isVisible = false
                 binding.ivHangup.isVisible = true
