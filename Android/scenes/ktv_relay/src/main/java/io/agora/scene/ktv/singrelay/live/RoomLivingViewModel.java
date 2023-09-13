@@ -5,7 +5,6 @@ import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPE
 
 import android.os.Build;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
@@ -18,17 +17,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.agora.musiccontentcenter.Music;
-import io.agora.musiccontentcenter.MusicChartInfo;
 import io.agora.rtc2.ChannelMediaOptions;
 import io.agora.rtc2.Constants;
 import io.agora.rtc2.DataStreamConfig;
@@ -63,11 +57,9 @@ import io.agora.scene.ktv.singrelay.ktvapi.MusicLoadStatus;
 import io.agora.scene.ktv.singrelay.ktvapi.SwitchRoleFailReason;
 import io.agora.scene.ktv.singrelay.live.song.SongModel;
 import io.agora.scene.ktv.singrelay.service.ChangeMVCoverInputModel;
-import io.agora.scene.ktv.singrelay.service.ChooseSongInputModel;
 import io.agora.scene.ktv.singrelay.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.singrelay.service.KTVServiceProtocol;
 import io.agora.scene.ktv.singrelay.service.KTVSingRelayGameService;
-import io.agora.scene.ktv.singrelay.service.MakeSongTopInputModel;
 import io.agora.scene.ktv.singrelay.service.OnSeatInputModel;
 import io.agora.scene.ktv.singrelay.service.OutSeatInputModel;
 import io.agora.scene.ktv.singrelay.service.RankModel;
@@ -75,7 +67,6 @@ import io.agora.scene.ktv.singrelay.service.RemoveSongInputModel;
 import io.agora.scene.ktv.singrelay.service.RoomSeatModel;
 import io.agora.scene.ktv.singrelay.service.RoomSelSongModel;
 import io.agora.scene.ktv.singrelay.service.ScoringAlgoControlModel;
-import io.agora.scene.ktv.singrelay.service.ScoringAverageModel;
 import io.agora.scene.ktv.singrelay.service.SingRelayGameStatus;
 import io.agora.scene.ktv.singrelay.widget.MusicSettingBean;
 import io.agora.scene.ktv.singrelay.widget.MusicSettingDialog;
@@ -114,7 +105,7 @@ public class RoomLivingViewModel extends ViewModel {
     private List<Long> relayList = new ArrayList<>();
     private int partNum = 1;
 
-    class LineScore {
+    static class LineScore {
         int score;
         int index;
         int cumulativeScore;
@@ -618,7 +609,7 @@ public class RoomLivingViewModel extends ViewModel {
 
         // 静音时将本地采集音量改为0
         if (!isUnMute && mRtcEngine != null) {
-            if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
+            if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getUserNo() != null && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                 // 主唱
                 mRtcEngine.adjustRecordingSignalVolume(0);
             } else {
@@ -894,13 +885,10 @@ public class RoomLivingViewModel extends ViewModel {
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
                @Override
-               public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, io.agora.mediaplayer.Constants.MediaPlayerError error,  boolean isLocal) {
+               public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, @NonNull io.agora.mediaplayer.Constants.MediaPlayerError error, boolean isLocal) {
                    switch (state) {
                        case PLAYER_STATE_OPEN_COMPLETED:
                            playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
-                           break;
-                       case PLAYER_STATE_PLAYING:
-                           //playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                            break;
                        case PLAYER_STATE_PAUSED:
                            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
@@ -918,7 +906,6 @@ public class RoomLivingViewModel extends ViewModel {
                @Override
                public void onMusicPlayerPositionChanged(long position_ms, long timestamp_ms) {
                    super.onMusicPlayerPositionChanged(position_ms, timestamp_ms);
-                   //Log.d("position", "position: " + position_ms);
                    if (!hasRecievedFirstPosition && isOnSeat) {
                        hasRecievedFirstPosition = true;
                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_BATTLE);
@@ -1019,6 +1006,7 @@ public class RoomLivingViewModel extends ViewModel {
         mSetting = new MusicSettingBean(false, 100, 50, 0, new MusicSettingDialog.Callback() {
             @Override
             public void onEarChanged(boolean isEar) {
+                if (seatLocalLiveData.getValue() == null) return;
                 int isMuted = seatLocalLiveData.getValue().isAudioMuted();
                 if (isMuted == 1) {
                     isOpnEar = isEar;
@@ -1164,6 +1152,7 @@ public class RoomLivingViewModel extends ViewModel {
     // ------------------ 开始抢唱 ------------------
     public void graspSong() {
         KTVLogger.d(TAG, "RoomLivingViewModel.graspSong() called");
+        if (roomInfoLiveData.getValue() == null || songPlayingLiveData.getValue() == null) return;
         KTVSingRelayGameService.INSTANCE.graspSong(
                 "scene_singrelay_3.5.0",
                 roomInfoLiveData.getValue().getRoomNo(),
@@ -1242,7 +1231,7 @@ public class RoomLivingViewModel extends ViewModel {
         KTVLogger.d(TAG, "unmute! setMicVolume: " + v);
         micVolume = v;
         if (mRtcEngine != null) {
-            if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
+            if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getUserNo() != null && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                 // 主唱
                 mRtcEngine.adjustRecordingSignalVolume(v);
             } else {
@@ -1317,7 +1306,7 @@ public class RoomLivingViewModel extends ViewModel {
     private int retryTimes = 0;
     public void musicStartPlay(@NonNull RoomSelSongModel music) {
         KTVLogger.d(TAG, "RoomLivingViewModel.musicStartPlay() called");
-        if (music.getUserNo() == null) return;
+        if (music.getUserNo() == null || roomInfoLiveData.getValue() == null) return;
         singerList.add(roomInfoLiveData.getValue().getCreatorNo());
         partNum = 1;
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
@@ -1417,17 +1406,13 @@ public class RoomLivingViewModel extends ViewModel {
 
     // ------------------ 重新获取歌词url ------------------
     public void reGetLrcUrl() {
-        if (songPlayingLiveData.getValue() == null) return;
+        if (songPlayingLiveData.getValue() == null || songPlayingLiveData.getValue().getUserNo() == null) return;
         loadMusic(new KTVLoadMusicConfiguration(songPlayingLiveData.getValue().getSongNo(), true, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_LRC_ONLY), Long.parseLong(songPlayingLiveData.getValue().getSongNo()));
     }
 
     // ------------------ 歌曲seek ------------------
     public void musicSeek(long time) {
         ktvApiProtocol.seekSing(time);
-    }
-
-    public Long getSongDuration() {
-        return ktvApiProtocol.getMediaPlayer().getDuration();
     }
 
     // ------------------ 歌曲结束播放 ------------------
