@@ -744,7 +744,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         case .onSeat:
             self.muteLocalVideo = false
             self.muteLocalAudio = false
-            ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             liveView.canvasView.canvasType = .none
             liveView.bottomBar.linkButton.isShowRedDot = false
@@ -753,6 +752,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             if role == .audience {
                 ShowAgoraKitManager.shared.setPVCon(false)
                 ShowAgoraKitManager.shared.setSuperResolutionOn(true)
+            } else {
+                ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)
             }
             let canvasView = role == .broadcaster ? nil : UIView()
             let uid = role == .broadcaster ? VLUserCenter.user.id : interaction.userId
