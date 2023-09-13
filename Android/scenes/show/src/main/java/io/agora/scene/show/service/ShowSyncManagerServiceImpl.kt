@@ -32,9 +32,9 @@ class ShowSyncManagerServiceImpl constructor(
     private val kRobotUid = 2000000001
     private val kRobotVideoRoomIds = arrayListOf(2023001, 2023002, 2023003)
     private val kRobotVideoStreamUrls = arrayListOf(
-        "https://download.agora.io/sdk/release/agora_test_video_10.mp4",
-        "https://download.agora.io/sdk/release/agora_test_video_11.mp4",
-        "https://download.agora.io/sdk/release/agora_test_video_12.mp4"
+        "https://download.agora.io/demo/test/agora_test_video_10.mp4",
+        "https://download.agora.io/demo/test/agora_test_video_11.mp4",
+        "https://download.agora.io/demo/test/agora_test_video_12.mp4"
     )
 
     @Volatile
