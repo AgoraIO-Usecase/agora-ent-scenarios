@@ -256,7 +256,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
 
         })
-        binding.vDragWindow2.setOnViewClick {
+        binding.vDragSmallWindow.setOnViewClick {
             Log.d(TAG, "click switch video")
             exchangeDragWindow()
         }
@@ -544,47 +544,53 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     binding.layoutCallPrivatelyBg.breathAnim()
                 }
                 binding.layoutCall.isVisible = false
-                binding.vDragWindow1.canvasContainer.removeAllViews()
-                binding.vDragWindow2.canvasContainer.removeAllViews()
+                binding.vDragBigWindow.canvasContainer.removeAllViews()
+                binding.vDragSmallWindow.canvasContainer.removeAllViews()
 
                 binding.layoutNumCount.isVisible = true
                 binding.ivHangup.isVisible = false
                 binding.tvHangup.isVisible = false
+                if (exchanged){
+                    // 恢复默认窗口
+                    exchangeDragWindow()
+                }
 
                 animateConnectedViewClose()
             }
 
             CallStateType.Connected -> {
                 mTimeLinkAt = System.currentTimeMillis()
+                if (exchanged){
+                    binding.vDragBigWindow.setSmallType(true)
+                    binding.vDragSmallWindow.setSmallType(false)
+                }else{
+                    binding.vDragBigWindow.setSmallType(false)
+                    binding.vDragSmallWindow.setSmallType(true)
+                }
+                // 默认远端都是大窗, 本地是小窗
+                (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
+                if (binding.vDragBigWindow.canvasContainer.childCount > 0) {
+                    binding.vDragBigWindow.canvasContainer.removeAllViews()
+                }
+                binding.vDragBigWindow.canvasContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
+                mShowTo1v1Manger.mRemoteUser?.let {
+                    binding.vDragBigWindow.setUserName(it.userName)
+                }
+
+                (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
+                if (binding.vDragSmallWindow.canvasContainer.childCount > 0) {
+                    binding.vDragSmallWindow.canvasContainer.removeAllViews()
+                }
+                binding.vDragSmallWindow.canvasContainer.addView(mShowTo1v1Manger.mLocalVideoView)
+                mShowTo1v1Manger.mCurrentUser.let {
+                    binding.vDragSmallWindow.setUserName(it.userName)
+                }
+                binding.layoutCall.isVisible = true
+                binding.llVideoContainer.isVisible = false
                 binding.layoutNumCount.isVisible = false
                 binding.ivHangup.isVisible = true
                 binding.tvHangup.isVisible = true
-
-                binding.layoutCall.isVisible = true
-
-                binding.llVideoContainer.isVisible = false
-
-                if (exchanged){
-                    binding.vDragWindow1.setSmallType(true)
-                    binding.vDragWindow2.setSmallType(false)
-                }else{
-                    binding.vDragWindow1.setSmallType(false)
-                    binding.vDragWindow2.setSmallType(true)
-                }
-
                 if (isRoomOwner) {
-                    (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
-                    if (binding.vDragWindow1.canvasContainer.childCount > 0) {
-                        binding.vDragWindow1.canvasContainer.removeAllViews()
-                    }
-                    binding.vDragWindow1.canvasContainer.addView(mShowTo1v1Manger.mLocalVideoView)
-
-                    (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
-                    if (binding.vDragWindow2.canvasContainer.childCount > 0) {
-                        binding.vDragWindow2.canvasContainer.removeAllViews()
-                    }
-                    binding.vDragWindow2.canvasContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
-
                     animateConnectedView()
                     mShowTo1v1Manger.mRemoteUser?.let {
                         GlideApp.with(this)
@@ -593,37 +599,13 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                             .transform(CenterCropRoundCornerTransform(100))
                             .into(binding.includeConnectedView.ivUserAvatar)
                         binding.includeConnectedView.tvNickname.text = it.userName
-                        binding.vDragWindow2.setUserName(it.userName)
-                    }
-                    mShowTo1v1Manger.mCurrentUser.let {
-                        binding.vDragWindow1.setUserName(it.userName)
                     }
                     binding.root.postDelayed(connectedRun, 5000)
                 } else {
-                    (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
-                    if (binding.vDragWindow1.canvasContainer.childCount > 0) {
-                        binding.vDragWindow1.canvasContainer.removeAllViews()
-                    }
-                    binding.vDragWindow1.canvasContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
-
-                    (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
-                    if (binding.vDragWindow2.canvasContainer.childCount > 0) {
-                        binding.vDragWindow2.canvasContainer.removeAllViews()
-                    }
-                    binding.vDragWindow2.canvasContainer.addView(mShowTo1v1Manger.mLocalVideoView)
-
-                    mShowTo1v1Manger.mCurrentUser.let {
-                        binding.vDragWindow2.setUserName(it.userName)
-                    }
-                    mShowTo1v1Manger.mRemoteUser?.let {
-                        binding.vDragWindow1.setUserName(it.userName)
-                    }
-
                     binding.layoutCallPrivatelyBg.isVisible = false
                     binding.layoutCallPrivately.isVisible = false
                     binding.layoutCallPrivatelyBg.clearAnimation()
                 }
-
                 binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
                     R.drawable.show_to1v1_room_detail_connection, 0, 0, 0
                 )
@@ -664,30 +646,30 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     private var  exchanged= false
 
     private fun exchangeDragWindow() {
-        val params1 = FrameLayout.LayoutParams(binding.vDragWindow1.width, binding.vDragWindow1.height)
-        params1.topMargin = binding.vDragWindow1.top
-        params1.leftMargin = binding.vDragWindow1.left
-        val params2 = FrameLayout.LayoutParams(binding.vDragWindow2.width, binding.vDragWindow2.height)
-        params2.topMargin = binding.vDragWindow2.top
-        params2.leftMargin = binding.vDragWindow2.left
-        binding.vDragWindow1.layoutParams = params2
-        binding.vDragWindow2.layoutParams = params1
-        if (binding.vDragWindow1.layoutParams.height > binding.vDragWindow2.layoutParams.height) {
-            binding.vDragWindow2.bringToFront()
-            binding.vDragWindow2.setSmallType(true)
-            binding.vDragWindow2.setOnViewClick {
+        val paramsBig = FrameLayout.LayoutParams(binding.vDragBigWindow.width, binding.vDragBigWindow.height)
+        paramsBig.topMargin = binding.vDragBigWindow.top
+        paramsBig.leftMargin = binding.vDragBigWindow.left
+        val paramsSmall = FrameLayout.LayoutParams(binding.vDragSmallWindow.width, binding.vDragSmallWindow.height)
+        paramsSmall.topMargin = binding.vDragSmallWindow.top
+        paramsSmall.leftMargin = binding.vDragSmallWindow.left
+        binding.vDragBigWindow.layoutParams = paramsSmall
+        binding.vDragSmallWindow.layoutParams = paramsBig
+        if (binding.vDragBigWindow.layoutParams.height > binding.vDragSmallWindow.layoutParams.height) {
+            binding.vDragSmallWindow.bringToFront()
+            binding.vDragSmallWindow.setSmallType(true)
+            binding.vDragSmallWindow.setOnViewClick {
                 exchangeDragWindow()
             }
-            binding.vDragWindow1.setOnViewClick(null)
-            binding.vDragWindow1.setSmallType(false)
+            binding.vDragBigWindow.setOnViewClick(null)
+            binding.vDragBigWindow.setSmallType(false)
         } else {
-            binding.vDragWindow1.bringToFront()
-            binding.vDragWindow1.setSmallType(true)
-            binding.vDragWindow1.setOnViewClick {
+            binding.vDragBigWindow.bringToFront()
+            binding.vDragBigWindow.setSmallType(true)
+            binding.vDragBigWindow.setOnViewClick {
                 exchangeDragWindow()
             }
-            binding.vDragWindow2.setOnViewClick(null)
-            binding.vDragWindow2.setSmallType(false)
+            binding.vDragSmallWindow.setOnViewClick(null)
+            binding.vDragSmallWindow.setSmallType(false)
         }
         exchanged = !exchanged
     }

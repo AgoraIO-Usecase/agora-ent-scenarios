@@ -34,13 +34,13 @@
         android:layout_height="match_parent">
 
         <io.agora.scene.showTo1v1.ui.view.CallDraggableView
-            android:id="@+id/vDragWindow1"
+            android:id="@+id/vDragBigWindow"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="end"/>
 
         <io.agora.scene.showTo1v1.ui.view.CallDraggableView
-            android:id="@+id/vDragWindow2"
+            android:id="@+id/vDragSmallWindow"
             android:layout_width="@dimen/show_to1v1_drag_view_width"
             android:layout_height="@dimen/show_to1v1_drag_view_height"
             android:layout_gravity="end"
