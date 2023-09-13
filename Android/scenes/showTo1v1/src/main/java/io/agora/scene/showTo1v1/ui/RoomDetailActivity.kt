@@ -26,6 +26,7 @@ import io.agora.scene.showTo1v1.callAPI.ICallApi
 import io.agora.scene.showTo1v1.callAPI.ICallApiListener
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
+import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.VideoCanvas
@@ -350,23 +351,32 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     override fun onDestroy() {
         super.onDestroy()
+        mRtcEngine.removeHandlerEx(mainRtcListener, mMainRtcConnection)
         binding.root.removeCallbacks(timerRoomEndRun)
         binding.root.removeCallbacks(timerRoomRun)
         binding.root.removeCallbacks(connectedRun)
         mCallApi.removeListener(this)
     }
 
+    private val mainRtcListener = object : IRtcEngineEventHandler() {
+        override fun onUserOffline(uid: Int, reason: Int) {
+            super.onUserOffline(uid, reason)
+            if (!isRoomOwner && uid == mRoomInfo.getIntUserId()) {
+                runOnUiThread {
+                    ToastUtils.showToast(R.string.show_to1v1_end_tips)
+                    onBackPressed()
+                }
+            }
+        }
+    }
+
     private fun initRtcEngine() {
-
-        val eventListener = VideoSwitcher.IChannelEventListener(
-            onChannelJoined = {
-
-            })
+        mRtcEngine.addHandlerEx(mainRtcListener, mMainRtcConnection)
         toggleSelfVideo(true) {
             if (isRoomOwner) {
                 mRtcEngine.startPreview()
             }
-            joinChannel(eventListener)
+            joinChannel()
             if (mCallConnected) {
                 updateCallState(CallStateType.Connected)
             } else {
@@ -378,7 +388,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         }
     }
 
-    private fun joinChannel(eventListener: VideoSwitcher.IChannelEventListener) {
+    private fun joinChannel() {
         val rtcConnection = mMainRtcConnection
         val uid = UserManager.getInstance().user.id
         val channelName = mRoomInfo.roomId
@@ -415,7 +425,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             rtcConnection,
             channelMediaOptions,
             mShowTo1v1Manger.generalToken(),
-            eventListener,
+            null,
             false
         )
         if (isRoomOwner) {
@@ -550,7 +560,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 binding.layoutNumCount.isVisible = true
                 binding.ivHangup.isVisible = false
                 binding.tvHangup.isVisible = false
-                if (exchanged){
+                if (exchanged) {
                     // 恢复默认窗口
                     exchangeDragWindow()
                 }
@@ -560,10 +570,10 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
             CallStateType.Connected -> {
                 mTimeLinkAt = System.currentTimeMillis()
-                if (exchanged){
+                if (exchanged) {
                     binding.vDragBigWindow.setSmallType(true)
                     binding.vDragSmallWindow.setSmallType(false)
-                }else{
+                } else {
                     binding.vDragBigWindow.setSmallType(false)
                     binding.vDragSmallWindow.setSmallType(true)
                 }
@@ -647,7 +657,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         binding.includeConnectedView.root.startAnimation(anim)
     }
 
-    private var  exchanged= false
+    private var exchanged = false
 
     private fun exchangeDragWindow() {
         val paramsBig = FrameLayout.LayoutParams(binding.vDragBigWindow.width, binding.vDragBigWindow.height)
