@@ -56,7 +56,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         RtcConnection(mRoomInfo.roomId, UserManager.getInstance().user.id.toInt())
     }
 
-    private var onClickCallingListener: OnClickCallingListener? = null
+    private var onFragmentListener: OnFragmentListener? = null
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): ShowTo1v1RoomListFragmentBinding {
         return ShowTo1v1RoomListFragmentBinding.inflate(inflater)
@@ -64,7 +64,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        onClickCallingListener = activity as? RoomListActivity
+        onFragmentListener = activity as? RoomListActivity
         if (isPageLoaded) {
             startLoadPage(false)
         }
@@ -79,6 +79,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         activity?.onBackPressedDispatcher?.addCallback(enabled = isVisible) {
             onBackPressed()
         }
+        onFragmentListener?.onFragmentViewCreated()
     }
 
     override fun initView() {
@@ -108,16 +109,16 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
                 .load(R.drawable.show_to1v1_wave_living)
                 .into(binding.ivLiving)
         }
-        binding.ivConnect.setOnClickListener(object :OnClickJackingListener(){
+        binding.ivConnect.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG,"click call")
-                onClickCallingListener?.onClickCall(true, mRoomInfo)
+                Log.d(TAG, "click call")
+                onFragmentListener?.onFragmentClickCall(true, mRoomInfo)
             }
         })
-        binding.layoutVideoContainer.setOnClickListener(object :OnClickJackingListener(){
+        binding.layoutVideoContainer.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG,"click video container")
-                onClickCallingListener?.onClickCall(false, mRoomInfo)
+                Log.d(TAG, "click video container")
+                onFragmentListener?.onFragmentClickCall(false, mRoomInfo)
             }
         })
         binding.ivConnectBG.breathAnim()
@@ -227,13 +228,18 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         )
     }
 
-    interface OnClickCallingListener {
+    interface OnFragmentListener {
         /**
          * 点击连接或者点击小窗进入直播页面
          * @param needCall true 需要直接 call; false 不需要 call
          * @param roomInfo 房间数据
          */
-        fun onClickCall(needCall: Boolean, roomInfo: ShowTo1v1RoomInfo)
+        fun onFragmentClickCall(needCall: Boolean, roomInfo: ShowTo1v1RoomInfo)
+
+        /**
+         * fragment onViewCreated 回调
+         */
+        fun onFragmentViewCreated()
     }
 }
 

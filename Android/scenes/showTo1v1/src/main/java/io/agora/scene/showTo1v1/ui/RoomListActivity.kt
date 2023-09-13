@@ -7,11 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.adapter.FragmentViewHolder
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import io.agora.rtc2.RtcConnection
@@ -42,7 +45,7 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBinding>(), ICallApiListener,
-    RoomListFragment.OnClickCallingListener {
+    RoomListFragment.OnFragmentListener {
 
     companion object {
         private const val TAG = "ShowTo1v1_List"
@@ -60,6 +63,9 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     private val mVpFragments = SparseArray<RoomListFragment>()
     private var mCurrLoadPosition = POSITION_NONE
+
+    // 是否是第一次加载
+    private var mIsFirstLoad = true
 
     // 当前呼叫状态
     private var mCallState = CallStateType.Idle
@@ -119,17 +125,17 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         binding.titleView.setRightIconClick {
             fetchRoomList()
         }
-        binding.emptyInclude.layoutCreateRoom.setOnClickListener(object :OnClickJackingListener(){
+        binding.emptyInclude.layoutCreateRoom.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG,"click create room empty")
+                Log.d(TAG, "click create room empty")
                 mCallApi.removeListener(this@RoomListActivity)
                 mCallApi.deinitialize { }
                 RoomCreateActivity.launch(this@RoomListActivity)
             }
         })
-        binding.layoutCreateRoom2.setOnClickListener(object :OnClickJackingListener(){
+        binding.layoutCreateRoom2.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG,"click create room")
+                Log.d(TAG, "click create room")
                 RoomCreateActivity.launch(this@RoomListActivity)
             }
         })
@@ -142,24 +148,36 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             val preloadCount = 3
             binding.viewPager2.offscreenPageLimit = preloadCount - 2
             mFragmentAdapter = object : FragmentStateAdapter(this) {
+
+                override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+                    super.onAttachedToRecyclerView(recyclerView)
+                    Log.d(TAG, "onAttachedToRecyclerView")
+                }
+
+                override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+                    super.onDetachedFromRecyclerView(recyclerView)
+                    Log.d(TAG, "onDetachedFromRecyclerView")
+                }
+
                 override fun getItemCount(): Int {
                     return if (mRoomInfoList.size <= 1) mRoomInfoList.size else Int.MAX_VALUE
                 }
 
                 override fun createFragment(position: Int): Fragment {
-                    val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
+                    val actualPosition = position % mRoomInfoList.size
+                    val roomInfo = mRoomInfoList[actualPosition]
                     return RoomListFragment.newInstance(roomInfo).also {
-                        Log.d(TAG, "createFragment position:$position")
+                        Log.d(TAG, "createFragment position:$position,actualPosition:$actualPosition")
                         mVpFragments.put(position, it)
-//                        if (position == binding.viewPager2.currentItem) {
-//                            it.startLoadPageSafely()
-//                        }
                     }
                 }
             }
             binding.viewPager2.adapter = mFragmentAdapter
             binding.viewPager2.registerOnPageChangeCallback(onPageChangeCallback)
-            binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2 - Int.MAX_VALUE / 2 % mRoomInfoList.size, false)
+            mCurrLoadPosition =
+                if (mRoomInfoList.size == 1) 0 else Int.MAX_VALUE / 2 - (Int.MAX_VALUE / 2) % mRoomInfoList.size
+            Log.d(TAG, "currentItem:$mCurrLoadPosition")
+            binding.viewPager2.setCurrentItem(mCurrLoadPosition, false)
         } else {
             mFragmentAdapter?.notifyDataSetChanged()
         }
@@ -218,21 +236,17 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 TAG,
                 "PageChange onPageSelected position=$position, currLoadPosition=$mCurrLoadPosition, preLoadPosition=$preLoadPosition"
             )
-            if (position==0){
-                mVpFragments[position]?.startLoadPageSafely()
-            }else{
-                if (mCurrLoadPosition != POSITION_NONE) {
-                    if (preLoadPosition != POSITION_NONE) {
-                        if (position == preLoadPosition) {
-                            mVpFragments[mCurrLoadPosition]?.stopLoadPage(true)
-                        } else {
-                            mVpFragments[preLoadPosition]?.stopLoadPage(true)
-                            mVpFragments[mCurrLoadPosition]?.onReloadPage()
-                        }
-                    } else if (mCurrLoadPosition != position) {
+            if (mCurrLoadPosition != POSITION_NONE) {
+                if (preLoadPosition != POSITION_NONE) {
+                    if (position == preLoadPosition) {
                         mVpFragments[mCurrLoadPosition]?.stopLoadPage(true)
-                        mVpFragments[position]?.startLoadPageSafely()
+                    } else {
+                        mVpFragments[preLoadPosition]?.stopLoadPage(true)
+                        mVpFragments[mCurrLoadPosition]?.onReloadPage()
                     }
+                } else if (mCurrLoadPosition != position) {
+                    mVpFragments[mCurrLoadPosition]?.stopLoadPage(true)
+                    mVpFragments[position]?.startLoadPageSafely()
                 }
             }
             mCurrLoadPosition = position
@@ -287,7 +301,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         })
     }
 
-    override fun onClickCall(needCall: Boolean, roomInfo: ShowTo1v1RoomInfo) {
+    override fun onFragmentClickCall(needCall: Boolean, roomInfo: ShowTo1v1RoomInfo) {
         mRoomInfo = roomInfo
         if (needCall) {
             reInitCallApi(roomInfo.roomId, callback = {
@@ -295,6 +309,13 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             })
         } else {
             RoomDetailActivity.launch(this, false, roomInfo)
+        }
+    }
+
+    override fun onFragmentViewCreated() {
+        if (mIsFirstLoad) {
+            mIsFirstLoad = false
+            mVpFragments[mCurrLoadPosition]?.startLoadPageSafely()
         }
     }
 
@@ -379,24 +400,5 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     override fun tokenPrivilegeWillExpire() {
         super.tokenPrivilegeWillExpire()
         mShowTo1v1Manger.renewTokens {}
-    }
-
-    private fun enableContentInspectEx(connection: RtcConnection) {
-        val contentInspectConfig = ContentInspectConfig()
-        try {
-            val jsonObject = JSONObject()
-            jsonObject.put("sceneName", "ShowTo1v1")
-            jsonObject.put("id", UserManager.getInstance().user.id)
-            jsonObject.put("userNo", UserManager.getInstance().user.userNo)
-            contentInspectConfig.extraInfo = jsonObject.toString()
-            val module = ContentInspectConfig.ContentInspectModule()
-            module.interval = 30
-            module.type = ContentInspectConfig.CONTENT_INSPECT_TYPE_IMAGE_MODERATION
-            contentInspectConfig.modules = arrayOf(module)
-            contentInspectConfig.moduleCount = 1
-            val ret = mRtcEngine.enableContentInspectEx(true, contentInspectConfig, connection)
-            Log.d(TAG, "enableContentInspectEx $ret")
-        } catch (_: JSONException) {
-        }
     }
 }
