@@ -705,7 +705,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         }
                     }
 
-                    CallReason.CallingTimeout -> {
+                    CallReason.CallingTimeout,
+                    CallReason.LocalRejected,
+                    CallReason.RemoteRejected -> {
                         ToastUtils.showToast(getString(R.string.show_to1v1_no_answer))
                     }
 

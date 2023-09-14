@@ -256,6 +256,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             binding.root.postDelayed({
                 binding.titleView.rightIcon.isEnabled = true
                 binding.titleView.rightIcon.clearAnimation()
+//                mVpFragments[mCurrLoadPosition]?.onResumePage()
             }, 500)
             mayShowGuideView()
         })

@@ -1,10 +1,12 @@
 package io.agora.scene.show.videoSwitcherAPI
 
+import android.graphics.SurfaceTexture
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.view.TextureView
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import io.agora.mediaplayer.IMediaPlayer
@@ -149,7 +151,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
 
         // 非prejoin房间需要退出频道
         roomStateMap.forEach { room ->
-            if (room.value == RoomStatus.PREJOINED && connPreLoaded.none {room.key.channelId == it.channelId}) {
+            if (room.value == RoomStatus.PREJOINED && connPreLoaded.none { room.key.channelId == it.channelId }) {
                 ShowTo1v1Logger.d(tag, "switchRoomState idle1")
                 switchRoomState(RoomStatus.IDLE, room.key, ShowTo1v1Manger.getImpl().generalToken(), null, null)
             }
@@ -177,11 +179,9 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
             val videoView = it.view
             val viewIndex = container.container.indexOfChild(videoView)
             if (viewIndex == container.viewIndex) {
-                    ShowTo1v1Logger.d("hugo", "setupRemoteVideoEx111")
-                    rtcEngine.setupRemoteVideoEx(
-                        it,
-                        it.connection
-                    )
+                ShowTo1v1Logger.d("hugo", "setupRemoteVideoEx111")
+                rtcEngine.setupRemoteVideoEx(it, it.connection)
+                videoView.requestLayout()
                 return
             }
             it.release()
@@ -198,6 +198,9 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
             videoView = TextureView(container.container.context)
             container.container.addView(videoView, container.viewIndex)
         }
+
+        videoView.isVisible = false
+        videoView.isVisible = true
 
         roomStateMap.forEach {
             if (it.key.isSameChannel(connection)) {
@@ -263,8 +266,8 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
                             state: io.agora.mediaplayer.Constants.MediaPlayerState?,
                             error: io.agora.mediaplayer.Constants.MediaPlayerError?
                         ) {
-                            if(error == io.agora.mediaplayer.Constants.MediaPlayerError.PLAYER_ERROR_NONE){
-                                if(state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED){
+                            if (error == io.agora.mediaplayer.Constants.MediaPlayerError.PLAYER_ERROR_NONE) {
+                                if (state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
                                     play()
                                 }
                             }
@@ -328,7 +331,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
                 // channelMediaOptions.publishMediaPlayerId = mediaPlayer.getId()
                 // channelMediaOptions.publishMediaPlayerAudioTrack = true
                 // rtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, connection)
-                if(!loopbackOnly){
+                if (!loopbackOnly) {
                     val mediaOptions = connectionWrap.mediaOptions
                     mediaOptions.publishMediaPlayerId = mediaPlayer.mediaPlayerId
                     // TODO: 没开启麦克风权限情况下，publishMediaPlayerAudioTrack = true 会自动停止音频播放
@@ -375,10 +378,14 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
         connection: RtcConnection,
         token: String?,
         eventListener: VideoSwitcher.IChannelEventListener?,
-        mediaOptions: ChannelMediaOptions?) {
-        ShowTo1v1Logger.d(tag, "switchRoomState, newState: $newState, connection: $connection, roomStateMap: $roomStateMap")
+        mediaOptions: ChannelMediaOptions?
+    ) {
+        ShowTo1v1Logger.d(
+            tag,
+            "switchRoomState, newState: $newState, connection: $connection, roomStateMap: $roomStateMap"
+        )
         // roomStateMap 无当前房间记录
-        if (roomStateMap.none {it.key.isSameChannel(connection)}) {
+        if (roomStateMap.none { it.key.isSameChannel(connection) }) {
             val rtcConnectionWrap = RtcConnectionWrap(connection)
             val eventHandler = RtcEngineEventHandlerImpl(SystemClock.elapsedRealtime(), connection)
             eventHandler.setEventListener(eventListener)
@@ -435,6 +442,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
                         val ret = rtcEngine.joinChannelEx(token, connection, options, it.key.rtcEventHandler)
                         ShowTo1v1Logger.d(tag, "joinChannelEx0, connection:$connection, ret:$ret")
                     }
+
                     oldState == RoomStatus.PREJOINED && newState == RoomStatus.JOINED -> {
                         // 保持在频道内, 收流
                         it.key.rtcEventHandler?.subscribeMediaTime = SystemClock.elapsedRealtime()
@@ -452,6 +460,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
                         }
                         ShowTo1v1Logger.d(tag, "updateChannelMediaOptionsEx, connection:$connection, ret:$ret")
                     }
+
                     oldState == RoomStatus.JOINED && newState == RoomStatus.PREJOINED -> {
                         // 保持在频道内，不收流
                         val options = mediaOptions ?: ChannelMediaOptions().apply {
@@ -464,6 +473,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
                         it.key.audioMixingPlayer?.stop()
                         ShowTo1v1Logger.d(tag, "updateChannelMediaOptionsEx, connection:$connection, ret:$ret")
                     }
+
                     oldState == RoomStatus.IDLE && newState == RoomStatus.JOINED -> {
                         // 加入频道，且收流
                         val eventHandler = RtcEngineEventHandlerImpl(SystemClock.elapsedRealtime(), connection)
@@ -478,6 +488,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
                         val ret = rtcEngine.joinChannelEx(token, connection, options, eventHandler)
                         ShowTo1v1Logger.d(tag, "joinChannelEx1, connection:$connection, ret:$ret")
                     }
+
                     newState == RoomStatus.IDLE -> {
                         // 退出频道
                         leaveRtcChannel(it.key)
@@ -545,8 +556,11 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
             elapsed: Int
         ) {
             super.onJoinChannelSuccess(channel, uid, elapsed)
-            ShowTo1v1Logger.d(tag, "onJoinChannelSuccess, needSubscribe:$needSubscribe, needSubscribeConnection:$needSubscribeConnection")
-            if (needSubscribe && needSubscribeConnection!= null && channel == needSubscribeConnection?.channelId) {
+            ShowTo1v1Logger.d(
+                tag,
+                "onJoinChannelSuccess, needSubscribe:$needSubscribe, needSubscribeConnection:$needSubscribeConnection"
+            )
+            if (needSubscribe && needSubscribeConnection != null && channel == needSubscribeConnection?.channelId) {
                 needSubscribe = false
                 needSubscribeConnection = null
                 runOnUiThread {
@@ -704,7 +718,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
 
         var mediaOptions = ChannelMediaOptions()
         var rtcEventHandler: RtcEngineEventHandlerImpl? = null
-        var audioMixingPlayer : IMediaPlayer? = null
+        var audioMixingPlayer: IMediaPlayer? = null
 
         fun isSameChannel(connection: RtcConnection?) =
             connection != null && channelId == connection.channelId && localUid == connection.localUid
