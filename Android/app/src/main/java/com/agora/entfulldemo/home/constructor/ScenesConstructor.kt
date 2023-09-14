@@ -47,7 +47,7 @@ object ScenesConstructor {
             ),
             ScenesModel(
                 AgoraScenes.GrandChorus,
-                "io.agora.scene.grandchorus.ui.activity.RoomListActivity",
+                "io.agora.scene.cantata.ui.activity.RoomListActivity",
                 context.getString(R.string.app_grand_chorus),
                 R.mipmap.bg_btn_home8,
                 R.mipmap.bg_btn_home_grandchorus,

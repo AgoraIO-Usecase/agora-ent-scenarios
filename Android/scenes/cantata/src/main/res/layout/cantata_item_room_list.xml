@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="170dp"
+    android:layout_marginTop="20dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/bg_room"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivRoomCover"
+        android:layout_width="84dp"
+        android:layout_height="84dp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivLock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="6dp"
+        android:src="@mipmap/ic_online_list_lock"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/ivRoomCover"
+        app:layout_constraintStart_toStartOf="@id/ivRoomCover" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRoomName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/def_text_color_040"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/ivRoomCover"
+        app:layout_constraintTop_toBottomOf="@id/ivRoomCover" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPersonNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:drawableStart="@mipmap/icon_user_small"
+        android:textColor="@color/def_text_grey_6c7"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/ivRoomCover" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btnJoin"
+        android:layout_width="44dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_def_button_white"
+        android:gravity="center"
+        android:text="@string/cantata_join"
+        android:textColor="@color/blue_9F"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
