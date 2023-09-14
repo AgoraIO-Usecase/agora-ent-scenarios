@@ -187,6 +187,9 @@ class LiveDetailFragment : Fragment() {
     }
 
     fun reLoadPage() {
+        if (!isRoomOwner) {
+            mRtcVideoSwitcher.preJoinChannel(mMainRtcConnection)
+        }
         updatePKingMode()
     }
 

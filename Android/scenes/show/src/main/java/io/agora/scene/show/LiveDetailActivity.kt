@@ -240,7 +240,8 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
                                 vpFragments[preLoadPosition]?.stopLoadPage(true)
                                 vpFragments[currLoadPosition]?.reLoadPage()
                             }
-                        } else if (currLoadPosition != position) {
+                        }
+                        if (currLoadPosition != position) {
                             vpFragments[currLoadPosition]?.stopLoadPage(true)
                             vpFragments[position]?.startLoadPageSafely()
                         }

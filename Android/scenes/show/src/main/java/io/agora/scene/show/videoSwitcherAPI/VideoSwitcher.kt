@@ -82,6 +82,13 @@ interface VideoSwitcher {
     )
 
     /**
+     * 加载当前频道的上下频道
+     */
+    fun preJoinChannel(
+        connection: RtcConnection
+    )
+
+    /**
      * 加入频道并预先加入预加载连接列表里在该connection上下不超过最大预加载连接数的频道
      */
     fun joinChannel(
