@@ -37,7 +37,6 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
     private val connectionsJoined = Collections.synchronizedList(mutableListOf<RtcConnection>())
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
-    private val preLoadRun = Runnable { preloadChannels() }
 
     private val roomStateMap = Collections.synchronizedMap(mutableMapOf<RtcConnectionWrap, RoomStatus>())
     private val remoteVideoCanvasList = Collections.synchronizedList(mutableListOf<RemoteVideoCanvasWrap>())
@@ -87,6 +86,16 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
         switchRoomState(RoomStatus.PREJOINED, connection, token, eventListener, mediaOptions)
     }
 
+    /**
+     * 加载当前频道的上下频道
+     */
+    override fun preJoinChannel(
+        connection: RtcConnection
+    ) {
+        connectionsJoined.add(connection)
+        preloadChannels()
+    }
+
     override fun joinChannel(
         connection: RtcConnection,
         mediaOptions: ChannelMediaOptions,
@@ -95,13 +104,6 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
         needPreJoin: Boolean?
     ) {
         switchRoomState(RoomStatus.JOINED, connection, token, eventListener, mediaOptions)
-        if (needPreJoin ?: return) {
-            connectionsJoined.add(connection)
-        }
-        mainHandler.removeCallbacks(preLoadRun)
-        if (needPreJoin) {
-            mainHandler.postDelayed(preLoadRun, 500)
-        }
     }
 
     override fun setChannelEvent(
@@ -161,7 +163,7 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
             ShowLogger.d(tag, "switchRoomState idle2")
             switchRoomState(RoomStatus.IDLE, connection, null, null, null)
         } else {
-            switchRoomState(RoomStatus.PREJOINED, connection, null, null, null)
+            switchRoomState(RoomStatus.PREJOINED, connection, RtcEngineInstance.generalToken(), null, null)
         }
         return true
     }

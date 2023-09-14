@@ -28,7 +28,7 @@
 
         <activity
             android:name=".LiveDetailActivity"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing" />
 
