@@ -66,7 +66,7 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mRtcEngine.addHandlerEx(mainRtcListener,mMainRtcConnection)
+        mRtcEngine.addHandlerEx(mainRtcListener, mMainRtcConnection)
     }
 
     fun updateVisible(b: Boolean) {
@@ -163,7 +163,14 @@ class DashboardFragment : Fragment() {
         }
     }
 
+    var iRtcCallListener: IRtcEngineEventHandler? = null
+
     private val showTo1v1RtcListener = object : IRtcEngineEventHandler() {
+        override fun onUserOffline(uid: Int, reason: Int) {
+            super.onUserOffline(uid, reason)
+            iRtcCallListener?.onUserOffline(uid, reason)
+        }
+
         override fun onRtcStats(stats: RtcStats?) {
             stats ?: return
             if (mCallState != CallStateType.Connected) return

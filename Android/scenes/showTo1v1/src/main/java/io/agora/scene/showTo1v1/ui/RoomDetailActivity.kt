@@ -291,6 +291,18 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         binding.flDashboard.visibility = View.VISIBLE
         binding.ivDashboardClose.visibility = View.VISIBLE
         mDashboardFragment?.updateVisible(true)
+        mDashboardFragment?.iRtcCallListener = object : IRtcEngineEventHandler() {
+            override fun onUserOffline(uid: Int, reason: Int) {
+                super.onUserOffline(uid, reason)
+                if (isRoomOwner && uid == mShowTo1v1Manger.mRemoteUser?.getIntUserId()) {
+                    runOnUiThread {
+                        // 主叫方离线，挂断
+                        ToastUtils.showToast(R.string.show_to1v1_end_linking_tips)
+                        onHangup()
+                    }
+                }
+            }
+        }
     }
 
     private fun reInitCallApi(role: CallRole, callback: (() -> Unit)? = null) {
@@ -363,6 +375,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             super.onUserOffline(uid, reason)
             if (!isRoomOwner && uid == mRoomInfo.getIntUserId()) {
                 runOnUiThread {
+                    // 主播离线，退出房间
                     ToastUtils.showToast(R.string.show_to1v1_end_tips)
                     onBackPressed()
                 }
