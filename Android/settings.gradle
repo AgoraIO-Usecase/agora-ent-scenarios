@@ -43,4 +43,4 @@ include ':scenes:show:aars:SenseArSourceManager'
 include ':scenes:show:aars:STMobileJNI'
 include ':scenes:show:aars:HardwareBuffer'
 
-include ':scenes:grandchorus'
+include ':scenes:cantata'

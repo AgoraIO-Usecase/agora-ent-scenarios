@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="cantata_list_empty_size">16sp</dimen>
+    <dimen name="cantata_space_small">8dp</dimen>
+    <dimen name="cantata_space_normal">12dp</dimen>
+</resources>
