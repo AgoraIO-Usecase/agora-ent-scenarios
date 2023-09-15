@@ -208,6 +208,8 @@ extension RoomListViewController {
         config.userId = UInt(userInfo.userId) ?? 0
         videoLoaderApi.setup(config: config)
         videoLoaderApi.addListener(listener: self)
+        
+        callVC.rtcEngine = rtcEngine
     }
     
     private func _reinitCallerAPI() {
