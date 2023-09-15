@@ -241,19 +241,13 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     return
                 }
                 self?.roomId = channelName
-                self?.checkTokenExists { success in
-                    guard success else {
-                        completion(ShowError.unknown.toNSError(), nil)
-                        return
-                    }
-                    let output = ShowRoomDetailModel.yy_model(with: params!)
-                    self?.roomList?.append(room)
-                    self?._startCheckExpire()
-                    self?._subscribeAll()
-                    self?._getAllPKInvitationList(room: nil) { error, list in
-                    }
-                    completion(nil, output)
+                let output = ShowRoomDetailModel.yy_model(with: params!)
+                self?.roomList?.append(room)
+                self?._startCheckExpire()
+                self?._subscribeAll()
+                self?._getAllPKInvitationList(room: nil) { error, list in
                 }
+                completion(nil, output)
             } fail: { error in
                 completion(error.toNSError(), nil)
             }
@@ -283,21 +277,13 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     return
                 }
                 self?.roomId = channelName
-                self?.checkTokenExists { success in
-                    guard success else {
-                        self?._joinRoomRetry(room: room, completion: completion, reachLimitTask: {
-                            completion(ShowError.unknown.toNSError(), nil)
-                        })
-                        return
-                    }
-                    let output = ShowRoomDetailModel.yy_model(with: params!)
-                    self?._startCheckExpire()
-                    self?._subscribeAll()
-                    self?._getAllPKInvitationList(room: nil) { error, list in
-                    }
-                    self?.isJoined = true
-                    completion(nil, output)
+                let output = ShowRoomDetailModel.yy_model(with: params!)
+                self?._startCheckExpire()
+                self?._subscribeAll()
+                self?._getAllPKInvitationList(room: nil) { error, list in
                 }
+                self?.isJoined = true
+                completion(nil, output)
             } fail: { error in
                 self?._joinRoomRetry(room: room, completion: completion, reachLimitTask: {
                     completion(error.toNSError(), nil)
@@ -313,28 +299,6 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         }else {
             joinRetry += 1
             joinRoom(room: room, completion: completion)
-        }
-    }
-    
-    private func checkTokenExists(complete: @escaping(Bool) -> Void) {
-        if (AppContext.shared.rtcToken != nil) {
-            complete(true)
-        } else {
-            NetworkManager.shared.generateToken(
-                channelName: "",
-                uid: "\(UserInfo.userId)",
-                tokenType: .token007,
-                type: .rtc,
-                expire: 24 * 60 * 60
-            ) { token in
-                guard let rtcToken = token else {
-                    agoraAssert(false, "rtcToken == nil || rtmToken == nil")
-                    complete(false)
-                    return
-                }
-                AppContext.shared.rtcToken = rtcToken
-                complete(true)
-            }
         }
     }
     

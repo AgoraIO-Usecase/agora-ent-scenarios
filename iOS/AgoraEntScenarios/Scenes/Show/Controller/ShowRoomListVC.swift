@@ -36,7 +36,6 @@ class ShowRoomListVC: UIViewController {
         didSet {
             collectionView.reloadData()
             emptyView.isHidden = roomList.count > 0
-            preLoadVisibleItems()
         }
     }
     
@@ -141,7 +140,7 @@ class ShowRoomListVC: UIViewController {
     }
     
     private func preLoadVisibleItems() {
-        guard let token = AppContext.shared.rtcToken, roomList.count > 0 else {
+        guard let token = AppContext.shared.rtcToken, token.count > 0, roomList.count > 0 else {
             return
         }
         let firstItem = collectionView.indexPathsForVisibleItems.first?.item ?? 0
@@ -198,14 +197,33 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
     func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
         showLogger.info("didHighlightItemAt: \(indexPath.row)", context: "collectionView")
         let room = roomList[indexPath.item]
-        ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .prejoined)
-        preloadRoom = room
+        if let token = AppContext.shared.rtcToken, token.count > 0 {
+            ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .prejoined)
+            preloadRoom = room
+        } else { // fetch token when token is not exist
+            NetworkManager.shared.generateToken(
+                channelName: "",
+                uid: "\(UserInfo.userId)",
+                tokenType: .token007,
+                type: .rtc,
+                expire: 24 * 60 * 60
+            ) { token in
+                guard let rtcToken = token else {
+                    return
+                }
+                AppContext.shared.rtcToken = rtcToken
+            }
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         showLogger.info("didSelectItemAt: \(indexPath.row)", context: "collectionView")
-        let room = roomList[indexPath.item]
-        joinRoom(room)
+        if (AppContext.shared.rtcToken != nil) {
+            let room = roomList[indexPath.item]
+            joinRoom(room)
+        } else {
+            ToastView.show(text: "Token is not exit, try again!")
+        }
     }
     
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
