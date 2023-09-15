@@ -363,7 +363,7 @@ extension CallApiImpl {
     //设置本地画面
     private func _setupLocalVideo(uid: UInt, canvasView: UIView) {
         guard let engine = config?.rtcEngine else {
-            callWarningPrint("_setupRemoteVideo fail: engine is empty")
+            callWarningPrint("_setupLocalVideo fail: engine is empty")
             return
         }
         canvas.view = canvasView
@@ -417,6 +417,7 @@ extension CallApiImpl {
                 
                 let errReason = "rtc join already"
                 completion?(NSError(domain: errReason, code: -1))
+                _setupLocalVideo(uid: config.userId, canvasView: config.localView)
                 return
             }
             
