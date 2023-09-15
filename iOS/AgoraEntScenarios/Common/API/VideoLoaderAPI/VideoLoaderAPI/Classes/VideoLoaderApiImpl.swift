@@ -280,17 +280,6 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         profilerMap.removeAll()
         apiPrint("cleanCache")
     }
-    // 退出某个频道之外的其他频道
-    public func leaveChannelWithout(roomId: String) {
-        guard let engine = self.config?.rtcEngine else {return}
-        exConnectionMap.forEach { rid, connection in
-            if (roomId != rid) {
-                engine.leaveChannelEx(connection)
-            }
-        }
-        exConnectionMap = exConnectionMap.filter { $0.key == roomId }
-        exConnectionDeps = exConnectionDeps.filter { $0.key == roomId }
-    }
     
     public func addListener(listener: IVideoLoaderApiListener) {
         apiProxy.addListener(listener)
