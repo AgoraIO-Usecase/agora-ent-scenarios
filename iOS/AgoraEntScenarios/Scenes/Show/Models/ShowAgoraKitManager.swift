@@ -361,8 +361,11 @@ class ShowAgoraKitManager: NSObject {
         options.audienceLatencyLevel = role == .audience ? .lowLatency : .ultraLowLatency
         updateChannelEx(channelId:channelId, options: options)
         if "\(uid)" == VLUserCenter.user.id {
-            videoLoader?.leaveChannelWithout(roomId: channelId)
-            setupLocalVideo(uid: uid, canvasView: canvasView)
+            if role == .broadcaster {
+                setupLocalVideo(uid: uid, canvasView: canvasView)
+            } else {
+                cleanCapture()
+            }
         } else {
             setupRemoteVideo(channelId: channelId, uid: uid, canvasView: canvasView)
         }
@@ -470,8 +473,8 @@ class ShowAgoraKitManager: NSObject {
         engine.setupLocalVideo(canvas)
         engine.startPreview()
         engine.setDefaultAudioRouteToSpeakerphone(true)
-        engine.enableAudio()
-        engine.enableVideo()
+        engine.enableLocalAudio(true)
+        engine.enableLocalVideo(true)
         showLogger.info("setupLocalVideo target uid:\(uid), user uid\(UserInfo.userId)", context: kShowLogBaseContext)
     }
     
@@ -482,7 +485,6 @@ class ShowAgoraKitManager: NSObject {
             videoCanvas.view = canvasView
             videoCanvas.renderMode = .hidden
             let ret = engine?.setupRemoteVideoEx(videoCanvas, connection: connection)
-                    
             showLogger.info("setupRemoteVideoEx ret = \(ret ?? -1), uid:\(uid) localuid: \(UserInfo.userId) channelId: \(channelId)", context: kShowLogBaseContext)
             return
         }
