@@ -635,6 +635,14 @@ extension CallApiImpl {
             return
         }
         
+        if callingUserId == fromUserId, callingRoomId != fromRoomId {
+            //如果主叫换了room id呼叫
+            _reject(roomId: fromRoomId, remoteUserId: fromUserId, reason: "callee is being occupied by another channel of the caller")
+            _notifyState(state: .prepared, stateReason: .cancelByCallerRecall)
+            _notifyEvent(event: .cancelByCallerRecall)
+            return
+        }
+        
         self.callId = callId
         let eventInfo = [kFromRoomId: fromRoomId, kFromUserId: fromUserId, kRemoteUserId: config?.userId ?? 0, kFromUserExtension: userExtension] as [String : Any]
         _notifyState(state: .calling, stateReason: .none, eventInfo: eventInfo)
