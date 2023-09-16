@@ -81,6 +81,7 @@ public class CallTokenConfig: NSObject {
     case remoteCancel         //远端用户取消呼叫
     case recvRemoteFirstFrame //收到远端首帧
     case callingTimeout       //呼叫超时
+    case cancelByCallerRecall //同样的主叫呼叫不同频道导致取消
 }
 
 @objc public enum CallEvent: UInt {
@@ -108,6 +109,7 @@ public class CallTokenConfig: NSObject {
     case localJoin                //本地用户加入RTC频道
     case localLeave               //本地用户离开RTC频道
     case recvRemoteFirstFrame     //收到远端首帧
+    case cancelByCallerRecall     //同样的主叫呼叫不同频道导致取消
 }
 
 @objc public enum CallStateType: UInt {
