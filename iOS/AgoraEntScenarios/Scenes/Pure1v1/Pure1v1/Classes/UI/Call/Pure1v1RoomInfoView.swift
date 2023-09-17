@@ -124,20 +124,25 @@ class Pure1v1RoomInfoView: UIView {
         }
     }
     
-    func setRoomInfo(avatar: String?, name: String?, id: String?, time: Int64?) {
+    func setRoomInfo(avatar: String?, name: String?, id: String?) {
         headImgView.sd_setImage(with: URL(string: avatar ?? ""))
         nameLabel.text = name
         idLabel.text = id
+    }
+    
+    func startTime(_ time: Int64) {
+        stopTime()
+        self.startTime = time
+        updateTime()
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 1, block: {[weak self] t in
+            self?.updateTime()
+        }, repeats: true)
+        timer?.fire()
+    }
+    
+    func stopTime() {
         timer?.invalidate()
-        if let startTime = time {
-            self.startTime = startTime
-            updateTime()
-            
-            timer = Timer.scheduledTimer(withTimeInterval: 1, block: {[weak self] t in
-                self?.updateTime()
-            }, repeats: true)
-            timer?.fire()
-        }
     }
     
     private func updateTime(){
