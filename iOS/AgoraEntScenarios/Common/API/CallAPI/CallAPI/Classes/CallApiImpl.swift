@@ -70,21 +70,18 @@ public class CallApiImpl: NSObject {
             if oldValue == state {
                 return
             }
-            if config?.role == .caller {
-                switch state {
-                case .calling:
-                    //开启定时器，如果超时无响应，调用no response
-                    timer = Timer.scheduledTimer(withTimeInterval: kCallTimeoutInterval, repeats: false, block: {[weak self] timer in
-                        self?._notifyState(state: .prepared, stateReason: .callingTimeout)
-                        self?._notifyEvent(event: .callingTimeout)
-                    })
-                case .idle, .prepared, .failed, .connected:
-                    timer = nil
-                default:
-                    break
-                }
-                
-                return
+            
+            switch state {
+            case .calling:
+                //开启定时器，如果超时无响应，调用no response
+                timer = Timer.scheduledTimer(withTimeInterval: kCallTimeoutInterval, repeats: false, block: {[weak self] timer in
+                    self?._notifyState(state: .prepared, stateReason: .callingTimeout)
+                    self?._notifyEvent(event: .callingTimeout)
+                })
+            case .idle, .prepared, .failed, .connected:
+                timer = nil
+            default:
+                break
             }
         }
     }
