@@ -14,8 +14,8 @@ class Pure1v1CallViewController: UIViewController {
         didSet {
             oldValue?.removeListener(listener: self)
             callApi?.addListener(listener: self)
-            oldValue?.removeRTCListener?(listener: self)
-            callApi?.addRTCListener?(listener: self)
+            oldValue?.removeRTCListener?(listener: self.realTimeView)
+            callApi?.addRTCListener?(listener: self.realTimeView)
         }
     }
     var rtcEngine: AgoraRtcEngineKit?
@@ -176,96 +176,6 @@ extension Pure1v1CallViewController: ShowToolMenuViewControllerDelegate {
             make.centerX.equalToSuperview()
             make.top.equalTo(UIDevice.current.aui_SafeDistanceTop + 50)
         }
-    }
-}
-
-extension Pure1v1CallViewController: AgoraRtcEngineDelegate {
-    private func delayRefreshRealTimeInfo(_ task: (()->())?) {
-        if #available(iOS 13.0, *) {
-            Throttler.throttle(delay: .seconds(1)) { [weak self] in
-                DispatchQueue.main.async {
-                    task?()
-                    self?.resetRealTimeIfNeeded()
-                }
-            }
-        } else {
-            // Fallback on earlier versions
-        }
-    }
-    private func resetRealTimeIfNeeded() {
-//        if role == .broadcaster && interactionStatus != .pking && interactionStatus != .onSeat {
-//            realTimeView.cleanRemoteDescription()
-//        }
-//        if role == .audience && interactionStatus != .pking && interactionStatus != .onSeat {
-//            realTimeView.cleanLocalDescription()
-//        }
-    }
-    
-    func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
-        pure1v1Warn("rtcEngine warningCode == \(warningCode.rawValue)")
-    }
-    func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
-        pure1v1Warn("rtcEngine errorCode == \(errorCode.rawValue)")
-    }
-
-    func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
-        delayRefreshRealTimeInfo { [weak self] in
-            self?.realTimeView.sendStatsInfo?.updateChannelStats(stats)
-            self?.realTimeView.receiveStatsInfo?.updateChannelStats(stats)
-        }
-    }
-
-    func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioStats stats: AgoraRtcLocalAudioStats) {
-        delayRefreshRealTimeInfo { [weak self] in
-            self?.realTimeView.sendStatsInfo?.updateLocalAudioStats(stats)
-            self?.realTimeView.receiveStatsInfo?.updateLocalAudioStats(stats)
-        }
-    }
-    
-    func rtcEngine(_ engine: AgoraRtcEngineKit, localVideoStats stats: AgoraRtcLocalVideoStats, sourceType: AgoraVideoSourceType) {
-        delayRefreshRealTimeInfo { [weak self] in
-            self?.realTimeView.sendStatsInfo?.updateLocalVideoStats(stats)
-            self?.realTimeView.receiveStatsInfo?.updateLocalVideoStats(stats)
-        }
-    }
-    
-    func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
-        delayRefreshRealTimeInfo { [weak self] in
-            self?.realTimeView.sendStatsInfo?.updateVideoStats(stats)
-            self?.realTimeView.receiveStatsInfo?.updateVideoStats(stats)
-        }
-    }
-    
-    func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
-        delayRefreshRealTimeInfo { [weak self] in
-            self?.realTimeView.sendStatsInfo?.updateAudioStats(stats)
-            self?.realTimeView.receiveStatsInfo?.updateAudioStats(stats)
-        }
-        
-    }
-    
-    func rtcEngine(_ engine: AgoraRtcEngineKit, uplinkNetworkInfoUpdate networkInfo: AgoraUplinkNetworkInfo) {
-        delayRefreshRealTimeInfo { [weak self] in
-            self?.realTimeView.sendStatsInfo?.updateUplinkNetworkInfo(networkInfo)
-            self?.realTimeView.receiveStatsInfo?.updateUplinkNetworkInfo(networkInfo)
-        }
-    }
-    
-    func rtcEngine(_ engine: AgoraRtcEngineKit, downlinkNetworkInfoUpdate networkInfo: AgoraDownlinkNetworkInfo) {
-        delayRefreshRealTimeInfo { [weak self] in
-            self?.realTimeView.sendStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
-            self?.realTimeView.receiveStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
-        }
-    }
-    
-    public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        pure1v1Print("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
-    }
-    
-    func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
-        pure1v1Warn("contentInspectResult: \(result.rawValue)")
-        guard result != .neutral else { return }
-        AUIToast.show(text: "call_content_inspect_warning".pure1v1Localization())
     }
 }
 
