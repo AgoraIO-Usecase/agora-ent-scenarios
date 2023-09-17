@@ -70,21 +70,18 @@ public class CallApiImpl: NSObject {
             if oldValue == state {
                 return
             }
-            if config?.role == .caller {
-                switch state {
-                case .calling:
-                    //开启定时器，如果超时无响应，调用no response
-                    timer = Timer.scheduledTimer(withTimeInterval: kCallTimeoutInterval, repeats: false, block: {[weak self] timer in
-                        self?._notifyState(state: .prepared, stateReason: .callingTimeout)
-                        self?._notifyEvent(event: .callingTimeout)
-                    })
-                case .idle, .prepared, .failed, .connected:
-                    timer = nil
-                default:
-                    break
-                }
-                
-                return
+            
+            switch state {
+            case .calling:
+                //开启定时器，如果超时无响应，调用no response
+                timer = Timer.scheduledTimer(withTimeInterval: kCallTimeoutInterval, repeats: false, block: {[weak self] timer in
+                    self?._notifyState(state: .prepared, stateReason: .callingTimeout)
+                    self?._notifyEvent(event: .callingTimeout)
+                })
+            case .idle, .prepared, .failed, .connected:
+                timer = nil
+            default:
+                break
             }
         }
     }
@@ -632,6 +629,14 @@ extension CallApiImpl {
         //如果不是prepared状态或者不是接收的正在接听的用户的呼叫
         guard state == .prepared || callingUserId == fromUserId else {
             _reject(roomId: fromRoomId, remoteUserId: fromUserId, reason: "callee is currently on call")
+            return
+        }
+        
+        if callingUserId == fromUserId, callingRoomId != fromRoomId {
+            //如果主叫换了room id呼叫
+            _reject(roomId: fromRoomId, remoteUserId: fromUserId, reason: "callee is being occupied by another channel of the caller")
+            _notifyState(state: .prepared, stateReason: .cancelByCallerRecall)
+            _notifyEvent(event: .cancelByCallerRecall)
             return
         }
         
