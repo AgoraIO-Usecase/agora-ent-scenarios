@@ -23,13 +23,13 @@ class BroadcasterViewController: BaseRoomViewController {
             let createdAt = roomInfo?.createdAt ?? 0
             roomInfoView.setRoomInfo(avatar: roomInfo?.avatar ?? "",
                                      name: roomInfo?.roomName ?? "",
-                                     id: roomInfo?.userName ?? "",
-                                     time: Int64(createdAt > 0 ? createdAt : Int64(Date().timeIntervalSince1970) * 1000))
+                                     id: roomInfo?.userName ?? "")
+            roomInfoView.startTime(Int64(createdAt > 0 ? createdAt : Int64(Date().timeIntervalSince1970) * 1000))
             roomInfoView.timerCallBack = {[weak self] duration in
                 if duration < 60 * 20 {
                     return
                 }
-                self?.roomInfoView.setRoomInfo(avatar: nil, name: nil, id: nil, time: nil)
+                self?.roomInfoView.stopTime()
                 self?.onBackAction()
             }
             bgImageView.image = roomInfo?.bgImage()

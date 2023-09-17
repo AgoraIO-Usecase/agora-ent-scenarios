@@ -12,10 +12,7 @@ import AgoraRtcKit
 class CallViewController: BaseRoomViewController {
     var targetUser: ShowTo1v1UserInfo? {
         didSet {
-            roomInfoView.setRoomInfo(avatar: targetUser?.avatar ?? "",
-                                     name: targetUser?.userName ?? "",
-                                     id: targetUser?.userId ?? "",
-                                     time: Int64(Date().timeIntervalSince1970 * 1000))
+            roomInfoView.startTime(Int64(Date().timeIntervalSince1970 * 1000))
             _resetCanvas()
         }
     }
@@ -62,7 +59,7 @@ class CallViewController: BaseRoomViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         _hangupAction()
-        roomInfoView.setRoomInfo(avatar: nil, name: nil, id: nil, time: nil)
+        roomInfoView.stopTime()
     }
     
     private func _resetCanvas() {
@@ -83,6 +80,10 @@ class CallViewController: BaseRoomViewController {
             
             remoteCanvasView.removeGestureRecognizer(moveViewModel.gesture)
             localCanvasView.addGestureRecognizer(moveViewModel.gesture)
+            
+            roomInfoView.setRoomInfo(avatar: targetUser?.avatar ?? "",
+                                     name: targetUser?.userName ?? "",
+                                     id: targetUser?.userId ?? "")
         } else {
             remoteCanvasView.layer.cornerRadius = 20
             localCanvasView.layer.cornerRadius = 0
@@ -92,6 +93,10 @@ class CallViewController: BaseRoomViewController {
             remoteCanvasView.sizeToFit()
             localCanvasView.removeGestureRecognizer(moveViewModel.gesture)
             remoteCanvasView.addGestureRecognizer(moveViewModel.gesture)
+            
+            roomInfoView.setRoomInfo(avatar: currentUser?.avatar ?? "",
+                                     name: currentUser?.userName ?? "",
+                                     id: currentUser?.userId ?? "")
         }
     }
     
