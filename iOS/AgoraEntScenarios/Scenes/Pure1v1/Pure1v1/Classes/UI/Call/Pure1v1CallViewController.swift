@@ -22,15 +22,12 @@ class Pure1v1CallViewController: UIViewController {
     var currentUser: Pure1v1UserInfo?
     var targetUser: Pure1v1UserInfo? {
         didSet {
-            roomInfoView.setRoomInfo(avatar: targetUser?.avatar ?? "",
-                                     name: targetUser?.userName ?? "",
-                                     id: targetUser?.userId ?? "",
-                                     time: Int64(Date().timeIntervalSince1970 * 1000))
+            roomInfoView.startTime(Int64(Date().timeIntervalSince1970 * 1000))
             roomInfoView.timerCallBack = {[weak self] duration in
                 if duration < 20 * 60 {
                     return
                 }
-                self?.roomInfoView.setRoomInfo(avatar: nil, name: nil, id: nil, time: nil)
+                self?.roomInfoView.stopTime()
                 self?._hangupAction()
             }
             _resetCanvas()
@@ -127,6 +124,11 @@ class Pure1v1CallViewController: UIViewController {
             
             remoteCanvasView.removeGestureRecognizer(moveViewModel.gesture)
             localCanvasView.addGestureRecognizer(moveViewModel.gesture)
+            
+            
+            roomInfoView.setRoomInfo(avatar: targetUser?.avatar ?? "",
+                                     name: targetUser?.userName ?? "",
+                                     id: targetUser?.userId ?? "")
         } else {
             remoteCanvasView.layer.cornerRadius = 20
             localCanvasView.layer.cornerRadius = 0
@@ -136,6 +138,11 @@ class Pure1v1CallViewController: UIViewController {
             remoteCanvasView.sizeToFit()
             localCanvasView.removeGestureRecognizer(moveViewModel.gesture)
             remoteCanvasView.addGestureRecognizer(moveViewModel.gesture)
+            
+            
+            roomInfoView.setRoomInfo(avatar: currentUser?.avatar ?? "",
+                                     name: currentUser?.userName ?? "",
+                                     id: currentUser?.userId ?? "")
         }
     }
     
