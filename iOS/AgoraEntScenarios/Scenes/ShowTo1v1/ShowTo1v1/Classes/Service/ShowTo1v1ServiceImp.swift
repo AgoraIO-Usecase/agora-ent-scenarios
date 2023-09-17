@@ -125,7 +125,6 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
         roomInfo.userName = user.userName
         roomInfo.avatar = user.avatar
         roomInfo.roomName = roomName
-        roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
         roomInfo.roomId = "\(arc4random_uniform(899999) + 100000)"
         initScene {[weak self] error in
             if let error = error {

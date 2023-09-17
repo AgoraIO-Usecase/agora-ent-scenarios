@@ -14,6 +14,8 @@ public class ShowTo1v1UserInfo: NSObject {
     public var userName: String = ""
     public var avatar: String = ""
     
+    public var createdAt: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
+    
     var objectId: String = ""
     
     func getUIntUserId() -> UInt {
@@ -21,7 +23,7 @@ public class ShowTo1v1UserInfo: NSObject {
     }
     
     func get1V1ChannelId() ->String {
-        return "1v1_\(userId)"
+        return "1v1_\(userId)_\(createdAt)"
     }
     
     func bgImage() ->UIImage? {
@@ -35,8 +37,6 @@ public class ShowTo1v1UserInfo: NSObject {
 public class ShowTo1v1RoomInfo: ShowTo1v1UserInfo {
     public var roomId: String = ""
     public var roomName: String = ""
-    
-    public var createdAt: Int64 = 0
     
     
     func createRoomInfo(token: String) -> RoomInfo {
