@@ -38,9 +38,6 @@ class ShowLiveViewController: UIViewController {
             if loadingType == oldValue {
                 return
             }
-            if (loadingType == .joined) {// 秒开计时
-                ShowAgoraKitManager.shared.callTimestampStart(clean: false, roomId: room?.roomId)
-            }
             updateLoadingType(playState: loadingType)
             remoteVideoWidth = nil
             currentMode = nil
@@ -830,7 +827,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
             }
         }
         panelPresenter.updateVideoStats(stats)
-        if let ts = ShowAgoraKitManager.shared.callTimestampEnd(roomId) {
+        if let ts = ShowAgoraKitManager.shared.callTimestampEnd() {
             panelPresenter.updateTimestamp(ts)
         }
         throttleRefreshRealTimeInfo()
@@ -873,7 +870,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
             if state == .decoding /*2*/,
                ( reason == .remoteUnmuted /*6*/ || reason == .localUnmuted /*4*/ || reason == .localMuted /*3*/ )   {
                 showLogger.info("show first frame (\(channelId))", context: kShowLogBaseContext)
-                if let ts = ShowAgoraKitManager.shared.callTimestampEnd(channelId) {
+                if let ts = ShowAgoraKitManager.shared.callTimestampEnd() {
                     self.panelPresenter.updateTimestamp(ts)
                     self.throttleRefreshRealTimeInfo()
                 }

@@ -73,13 +73,11 @@ class ShowAgoraKitManager: NSObject {
     }
     
     func destoryEngine() {
-        cleanTimestampMap()
         AgoraRtcEngineKit.destroy()
         showLogger.info("deinit-- ShowAgoraKitManager")
     }
     // 退出已加入的频道和子频道
     func leaveAllRoom() {
-        cleanTimestampMap()
         videoLoader?.cleanCache()
         if let p = player {
             engine?.destroyMediaPlayer(p)
@@ -241,34 +239,23 @@ class ShowAgoraKitManager: NSObject {
     }
     
     // 耗时计算
-    private var savedTimestampMap: [String: Date] = [String: Date]()
-    
-    func callTimestampStart(clean: Bool, roomId: String?) {
-        guard let roomId = roomId else {return}
+    private var callTimeStampsSaved: Date?
+
+    func callTimestampStart() {
         showLogger.info("callTimeStampsSaved  : start")
-        if (clean) {
-            savedTimestampMap[roomId] = nil
-        }
-        if savedTimestampMap[roomId] == nil {
-            showLogger.info("callTimeStampsSaved  : saved")
-            savedTimestampMap[roomId] = Date()
-        }
+        callTimeStampsSaved = nil
+        showLogger.info("callTimeStampsSaved  : saved")
+        callTimeStampsSaved = Date()
     }
     
-    func callTimestampEnd(_ roomId: String?) -> TimeInterval? {
-        guard let roomId = roomId else {return nil}
+    func callTimestampEnd() -> TimeInterval? {
         showLogger.info("callTimeStampsSaved  : end called")
-        guard let saved = savedTimestampMap[roomId] else {
+        guard let saved = callTimeStampsSaved else {
             return nil
         }
         showLogger.info("callTimeStampsSaved  : end value")
-        savedTimestampMap[roomId] = nil
-        let currentDate = Date().timeIntervalSinceNow
-        return (currentDate - saved.timeIntervalSinceNow) * 1000
-    }
-    
-    private func cleanTimestampMap(){
-        savedTimestampMap.removeAll()
+        callTimeStampsSaved = nil
+        return -saved.timeIntervalSinceNow * 1000
     }
     
     //MARK: public sdk method
