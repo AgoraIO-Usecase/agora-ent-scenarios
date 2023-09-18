@@ -256,7 +256,7 @@ class ShowLiveViewController: UIViewController {
     }
         
     private func setupUI(){
-        view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
+        view.layer.contents = UIImage.show_sceneImage(name: "show_live_room_bg")?.cgImage
         navigationController?.isNavigationBarHidden = true
         liveView.room = room
         view.addSubview(liveView)
@@ -671,6 +671,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _onStartInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
+            view.layer.contents = UIImage.show_sceneImage(name: "show_live_pk_bg")?.cgImage
             self.muteLocalVideo = false
             self.muteLocalAudio = false
             let interactionRoomId = interaction.roomId
@@ -733,6 +734,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _onStopInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
+            view.layer.contents = UIImage.show_sceneImage(name: "show_live_room_bg")?.cgImage
             ShowAgoraKitManager.shared.removeRtcDelegate(delegate: self, roomId: interaction.roomId)
             
             self.muteLocalVideo = false

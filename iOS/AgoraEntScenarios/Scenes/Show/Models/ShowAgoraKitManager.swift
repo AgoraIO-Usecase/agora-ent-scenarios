@@ -73,6 +73,7 @@ class ShowAgoraKitManager: NSObject {
     }
     
     func destoryEngine() {
+        cleanTimestampMap()
         AgoraRtcEngineKit.destroy()
         showLogger.info("deinit-- ShowAgoraKitManager")
     }
@@ -262,7 +263,8 @@ class ShowAgoraKitManager: NSObject {
         }
         showLogger.info("callTimeStampsSaved  : end value")
         savedTimestampMap[roomId] = nil
-        return -saved.timeIntervalSinceNow * 1000
+        let currentDate = Date().timeIntervalSinceNow
+        return (currentDate - saved.timeIntervalSinceNow) * 1000
     }
     
     private func cleanTimestampMap(){
