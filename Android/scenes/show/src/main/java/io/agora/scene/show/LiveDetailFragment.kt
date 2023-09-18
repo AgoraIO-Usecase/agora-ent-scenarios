@@ -1446,6 +1446,9 @@ class LiveDetailFragment : Fragment() {
                     ShowLogger.d("hugo", "joinRoom from click")
                     mRtcVideoSwitcher.setChannelEvent(mRoomInfo.roomId, UserManager.getInstance().user.id.toInt(), eventListener)
                 }
+                if (!isRoomOwner) {
+                    mRtcEngine.adjustUserPlaybackSignalVolumeEx(mRoomInfo.ownerId.toInt(), 100, mMainRtcConnection)
+                }
                 initVideoView()
                 initAudioModeration()
             })
