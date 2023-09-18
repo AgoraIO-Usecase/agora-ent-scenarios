@@ -1,5 +1,6 @@
 package io.agora.scene.pure1v1.ui
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -33,6 +34,7 @@ import io.agora.scene.pure1v1.databinding.Pure1v1RoomListItemLayoutBinding
 import io.agora.scene.pure1v1.service.CallServiceManager
 import io.agora.scene.pure1v1.service.PermissionHelp
 import io.agora.scene.pure1v1.service.UserInfo
+import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.BlurTransformation
 import org.json.JSONException
 import org.json.JSONObject
@@ -50,6 +52,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     private var callState = CallStateType.Idle
 
     private var callDialog: CallDialog? = null
+
+    private val permissionHelp = PermissionHelp(this)
 
     override fun getViewBinding(inflater: LayoutInflater): Pure1v1RoomListActivityBinding {
        return Pure1v1RoomListActivityBinding.inflate(inflater)
@@ -71,7 +75,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         }
         CallServiceManager.instance.startupCallApiIfNeed()
         CallServiceManager.instance.callApi?.addListener(this)
-        mediaPermission()
     }
 
     override fun onBackPressed() {
@@ -149,13 +152,28 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     private fun call(user: UserInfo) {
-        showCallSendDialog(user)
-        CallServiceManager.instance.startupCallApiIfNeed()
-        CallServiceManager.instance.callApi?.call(user.getRoomId(), user.userId.toInt()) { error ->
-            if (error != null) {
-                finishCallDialog()
+        permissionHelp.checkCameraAndMicPerms({
+            showCallSendDialog(user)
+            CallServiceManager.instance.startupCallApiIfNeed()
+            CallServiceManager.instance.callApi?.call(user.getRoomId(), user.userId.toInt()) { error ->
+                if (error != null) {
+                    finishCallDialog()
+                }
             }
-        }
+        }, {
+            PermissionLeakDialog(this).show("", { getPermissions() }
+            ) { launchAppSetting(Manifest.permission.CAMERA) }
+        }, false)
+    }
+
+    private fun connectCallDetail() {
+        val intent = Intent(this, CallDetailActivity::class.java)
+        startActivity(intent)
+        // 开启鉴黄鉴暴
+        val channelId = CallServiceManager.instance.remoteUser?.getRoomId() ?: ""
+        val localUid = CallServiceManager.instance.localUser?.userId?.toInt() ?: 0
+        setupContentInspectConfig(true, RtcConnection(channelId, localUid))
+        moderationAudio()
     }
 
     private fun showCallSendDialog(user: UserInfo) {
@@ -210,15 +228,22 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     CallServiceManager.instance.remoteUser = user
                     val dialog = CallReceiveDialog(this, user)
                     dialog.setListener(object : CallReceiveDialog.CallReceiveDialogListener {
-                        override fun onReceiveViewDidClickAccept() {
-                            TokenGenerator.generateTokens(
-                                fromRoomId, toUserId.toString(),
-                                TokenGenerator.TokenGeneratorType.token007,
-                                arrayOf(TokenGenerator.AgoraTokenType.rtc), { ret ->
-                                    val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc] ?: return@generateTokens
-                                    CallServiceManager.instance.callApi?.accept(fromRoomId, fromUserId, rtcToken) {
-                                    }
-                                })
+                        override fun onReceiveViewDidClickAccept() { // 点击接通
+                            // 获取多媒体权限
+                            permissionHelp.checkCameraAndMicPerms({
+                                // 获取token
+                                TokenGenerator.generateTokens(
+                                    fromRoomId, toUserId.toString(),
+                                    TokenGenerator.TokenGeneratorType.token007,
+                                    arrayOf(TokenGenerator.AgoraTokenType.rtc), { ret ->
+                                        val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc] ?: return@generateTokens
+                                        CallServiceManager.instance.callApi?.accept(fromRoomId, fromUserId, rtcToken) {
+                                        }
+                                    })
+                            }, {
+                                PermissionLeakDialog(this@RoomListActivity).show("", { getPermissions() }
+                                ) { launchAppSetting(Manifest.permission.CAMERA) }
+                            }, false)
                         }
                         override fun onReceiveViewDidClickReject() {
                             CallServiceManager.instance.callApi?.reject(fromRoomId, fromUserId, "reject by user") {
@@ -241,13 +266,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 if (CallServiceManager.instance.remoteUser == null) { return }
                 // 进入通话页面
                 finishCallDialog()
-                val intent = Intent(this, CallDetailActivity::class.java)
-                startActivity(intent)
-                // 开启鉴黄鉴暴
-                val channelId = CallServiceManager.instance.remoteUser?.getRoomId() ?: ""
-                val localUid = CallServiceManager.instance.localUser?.userId?.toInt() ?: 0
-                setupContentInspectConfig(true, RtcConnection(channelId, localUid))
-                moderationAudio()
+                connectCallDetail()
             }
             CallStateType.Prepared -> {
                 when(stateReason) {
@@ -288,14 +307,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         }
     }
 
-    private fun mediaPermission() {
-        PermissionHelp(this).checkCameraAndMicPerms(
-            {
-            },
-            { finish() },
-            true
-        )
-    }
     private fun setupContentInspectConfig(enable: Boolean, connection: RtcConnection) {
         val contentInspectConfig = ContentInspectConfig()
         try {

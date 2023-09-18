@@ -57,7 +57,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/cvRoomInfo"
         />
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvRoomName"
+        android:id="@+id/tvRoomTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"

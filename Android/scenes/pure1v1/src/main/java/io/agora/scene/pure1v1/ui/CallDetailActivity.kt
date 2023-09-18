@@ -114,7 +114,7 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
             Glide.with(this)
                 .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
                 .into(binding.ivUserAvatar)
-            binding.tvRoomName.text = userInfo.userName
+            binding.tvRoomTitle.text = userInfo.userName
             binding.tvRoomNum.text = userInfo.userId
         }
         val fragment = DashboardFragment()
@@ -141,6 +141,13 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
             }
             binding.vDragWindow1.setOnViewClick(null)
             binding.vDragWindow1.setSmallType(false)
+            CallServiceManager.instance.remoteUser?.let { userInfo ->
+                Glide.with(this)
+                    .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
+                    .into(binding.ivUserAvatar)
+                binding.tvRoomTitle.text = userInfo.userName
+                binding.tvRoomNum.text = userInfo.userId
+            }
         } else {
             binding.vDragWindow1.bringToFront()
             binding.vDragWindow1.setSmallType(true)
@@ -149,6 +156,13 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
             }
             binding.vDragWindow2.setOnViewClick(null)
             binding.vDragWindow2.setSmallType(false)
+            CallServiceManager.instance.localUser?.let { userInfo ->
+                Glide.with(this)
+                    .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
+                    .into(binding.ivUserAvatar)
+                binding.tvRoomTitle.text = userInfo.userName
+                binding.tvRoomNum.text = userInfo.userId
+            }
         }
     }
 

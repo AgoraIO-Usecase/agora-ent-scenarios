@@ -958,7 +958,7 @@ class CallApiImpl(
     }
 
     private fun runOnUiThread(runnable: Runnable) {
-        if (Thread.currentThread() === Looper.getMainLooper().thread) {
+        if (Thread.currentThread() == Looper.getMainLooper().thread) {
             runnable.run()
         } else {
             mHandler.post(runnable)
