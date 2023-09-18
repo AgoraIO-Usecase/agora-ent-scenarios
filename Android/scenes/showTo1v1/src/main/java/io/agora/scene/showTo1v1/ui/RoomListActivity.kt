@@ -36,6 +36,7 @@ import io.agora.scene.showTo1v1.ui.dialog.CallDialogState
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
 import io.agora.scene.showTo1v1.ui.fragment.RoomListFragment
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
+import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 
 class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBinding>(), ICallApiListener,
@@ -290,15 +291,58 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         })
     }
 
+    private var toggleVideoRun: Runnable? = null
+    private var toggleAudioRun: Runnable? = null
+
+    override fun getPermissions() {
+        toggleVideoRun?.let {
+            it.run()
+            toggleVideoRun = null
+        }
+        toggleAudioRun?.let {
+            it.run()
+            toggleAudioRun = null
+        }
+    }
+
+    private fun toggleSelfVideo(isOpen: Boolean, callback: () -> Unit) {
+        if (isOpen) {
+            toggleVideoRun = Runnable { callback.invoke() }
+            requestCameraPermission(true)
+        } else {
+            callback.invoke()
+        }
+    }
+
+    private fun toggleSelfAudio(isOpen: Boolean, callback: () -> Unit) {
+        if (isOpen) {
+            toggleAudioRun = Runnable {
+                callback.invoke()
+            }
+            requestRecordPermission(true)
+        } else {
+            callback.invoke()
+        }
+    }
+
     override fun onFragmentClickCall(needCall: Boolean, roomInfo: ShowTo1v1RoomInfo) {
         mRoomInfo = roomInfo
         if (needCall) {
-            reInitCallApi(roomInfo.roomId, callback = {
-                mCallApi.call(roomInfo.roomId, roomInfo.getIntUserId(), null)
-            })
+            toggleSelfVideo(true) {
+                reInitCallApi(roomInfo.roomId, callback = {
+                    mCallApi.call(roomInfo.roomId, roomInfo.getIntUserId(), null)
+                })
+            }
+            toggleSelfAudio(true) {
+
+            }
         } else {
             RoomDetailActivity.launch(this, false, roomInfo)
         }
+    }
+
+    override fun onPermissionDined(permission: String?) {
+        PermissionLeakDialog(this).show(permission, {  }) { launchAppSetting(permission) }
     }
 
     override fun onFragmentViewCreated() {

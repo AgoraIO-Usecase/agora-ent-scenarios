@@ -54,12 +54,10 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setOnApplyWindowInsetsListener()
         StatusBarUtil.hideStatusBar(window, true)
-        toggleSelfVideo(true) {
+        toggleVideoRun = Runnable {
             initRtcEngine()
         }
-        toggleSelfAudio(true) {
-
-        }
+        requestCameraPermission(true)
     }
 
     private fun initRtcEngine() {
@@ -134,36 +132,11 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
     }
 
     private var toggleVideoRun: Runnable? = null
-    private var toggleAudioRun: Runnable? = null
 
     override fun getPermissions() {
         toggleVideoRun?.let {
             it.run()
             toggleVideoRun = null
-        }
-        toggleAudioRun?.let {
-            it.run()
-            toggleAudioRun = null
-        }
-    }
-
-    private fun toggleSelfVideo(isOpen: Boolean, callback: () -> Unit) {
-        if (isOpen) {
-            toggleVideoRun = Runnable { callback.invoke() }
-            requestCameraPermission(true)
-        } else {
-            callback.invoke()
-        }
-    }
-
-    private fun toggleSelfAudio(isOpen: Boolean, callback: () -> Unit) {
-        if (isOpen) {
-            toggleAudioRun = Runnable {
-                callback.invoke()
-            }
-            requestRecordPermission(true)
-        } else {
-            callback.invoke()
         }
     }
 

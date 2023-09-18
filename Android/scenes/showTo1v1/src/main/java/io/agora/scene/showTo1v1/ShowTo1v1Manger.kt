@@ -65,6 +65,7 @@ class ShowTo1v1Manger constructor() {
                     userId = UserManager.getInstance().user.id.toString(),
                     userName = UserManager.getInstance().user.name,
                     avatar = UserManager.getInstance().user.headUrl,
+                    createdAt = System.currentTimeMillis()
                 )
             }
             return innerCurrentUser!!

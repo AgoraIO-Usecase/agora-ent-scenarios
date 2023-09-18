@@ -7,13 +7,15 @@ open class ShowTo1v1UserInfo constructor(
     val userId: String,
     val userName: String,
     var avatar: String,
-    var objectId: String = ""
+    var objectId: String = "",
+    var createdAt: Long
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
-        parcel.readString() ?: ""
+        parcel.readString() ?: "",
+        parcel.readLong()
     ) {
     }
 
@@ -21,7 +23,8 @@ open class ShowTo1v1UserInfo constructor(
         map["userId"] as? String ?: "",
         map["userName"] as? String ?: "",
         map["avatar"] as? String ?: "",
-        map["objectId"] as? String ?: ""
+        map["objectId"] as? String ?: "",
+        map["createdAt"] as? Long ?: 0L
     )
 
     fun toMap(): Map<String, Any> {
@@ -29,7 +32,8 @@ open class ShowTo1v1UserInfo constructor(
             Pair("userId", this.userId),
             Pair("userName", this.userName),
             Pair("avatar", this.avatar),
-            Pair("objectId", this.objectId)
+            Pair("objectId", this.objectId),
+            Pair("createdAt", this.createdAt)
         )
     }
 
@@ -38,7 +42,7 @@ open class ShowTo1v1UserInfo constructor(
     }
 
     fun get1v1ChannelId(): String {
-        return "1v1_$userId"
+        return "1v1_${userId}_${createdAt}"
     }
 
     fun bgImage(): String {
@@ -71,27 +75,27 @@ open class ShowTo1v1UserInfo constructor(
 class ShowTo1v1RoomInfo constructor(
     val roomId: String,
     val roomName: String,
-    var createdAt: Long, userId: String, userName: String, avatar: String, objectId: String = ""
-) : ShowTo1v1UserInfo(userId, userName, avatar, objectId), Parcelable {
+    userId: String, userName: String, avatar: String, objectId: String = "", createdAt: Long
+) : ShowTo1v1UserInfo(userId, userName, avatar, objectId, createdAt), Parcelable {
 
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readString() ?: "",
-        parcel.readLong(),
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
-        parcel.readString() ?: ""
+        parcel.readString() ?: "",
+        parcel.readLong()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(roomId)
         parcel.writeString(roomName)
-        parcel.writeLong(createdAt)
         parcel.writeString(userId)
         parcel.writeString(userName)
         parcel.writeString(avatar)
         parcel.writeString(objectId)
+        parcel.writeLong(createdAt)
     }
 
     override fun describeContents(): Int {

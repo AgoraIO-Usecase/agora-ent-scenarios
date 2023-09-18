@@ -83,22 +83,22 @@ class CallApiImpl(
         set(value) {
             if (field == value) { return }
             field = value
-            if (config?.role == CallRole.CALLER) {
-                when(value) {
-                    CallStateType.Calling -> {
-                        val runnable = Runnable {
-                            _notifyState(CallStateType.Prepared, CallReason.CallingTimeout)
-                            _notifyEvent(CallEvent.CallingTimeout)
-                        }
-                        mHandler.postDelayed(runnable, kCallTimeoutInterval)
-                        timeOutRunnable = runnable
+
+            when(value) {
+                CallStateType.Calling -> {
+                    //开启定时器，如果超时无响应，调用no response
+                    val runnable = Runnable {
+                        _notifyState(CallStateType.Prepared, CallReason.CallingTimeout)
+                        _notifyEvent(CallEvent.CallingTimeout)
                     }
-                    CallStateType.Idle, CallStateType.Prepared, CallStateType.Failed, CallStateType.Connected -> {
-                        timeOutRunnable?.let { mHandler.removeCallbacks(it) }
-                        timeOutRunnable = null
-                    }
-                    else -> {}
+                    mHandler.postDelayed(runnable, kCallTimeoutInterval)
+                    timeOutRunnable = runnable
                 }
+                CallStateType.Idle, CallStateType.Prepared, CallStateType.Failed, CallStateType.Connected -> {
+                    timeOutRunnable?.let { mHandler.removeCallbacks(it) }
+                    timeOutRunnable = null
+                }
+                else -> {}
             }
         }
 
@@ -307,7 +307,7 @@ class CallApiImpl(
 
     private fun _setupLocalVideo(uid: Int, view: TextureView) {
         val engine = config?.rtcEngine ?: run {
-            Log.d(TAG, "_setupRemoteVideo fail: engine is empty")
+            Log.d(TAG, "_setupLocalVideo fail: engine is empty")
             return
         }
         val videoCanvas = VideoCanvas(view)
@@ -355,11 +355,12 @@ class CallApiImpl(
                 mediaOptions.autoSubscribeVideo = !joinOnly
                 config.rtcEngine?.updateChannelMediaOptionsEx(mediaOptions, c)
                 completion?.invoke(AGError("rtc join already", -1))
-            } else {
-                Log.d(TAG, " mismatch channel, leave first! target: $roomId current: ${c.channelId}")
-                engine.leaveChannelEx(c)
+                _setupLocalVideo(config.userId, config.localView)
+                return
             }
-            return
+            Log.d(TAG, " mismatch channel, leave first! target: $roomId current: ${c.channelId}")
+            engine.leaveChannelEx(c)
+            rtcConnection = null
         }
         //需要先开启音视频，使用enableLocalAudio而不是enableAudio，否则会导致外部mute的频道变成unmute
         engine.enableLocalVideo(true)
@@ -544,6 +545,13 @@ class CallApiImpl(
         //如果不是prepared状态或者不是接收的正在接听的用户的呼叫
         if (!(state == CallStateType.Prepared || callingUserId == fromUserId)) {
             _reject(fromRoomId, fromUserId, "callee is currently on call")
+            return
+        }
+        if (callingUserId == fromUserId && callingRoomId != fromRoomId) {
+            //如果主叫换了room id呼叫
+            _reject(fromRoomId, fromUserId, "callee is being occupied by another channel of the caller")
+            _notifyState(CallStateType.Prepared, CallReason.CancelByCallerRecall)
+            _notifyEvent(CallEvent.CancelByCallerRecall)
             return
         }
         this.callId = callId
@@ -958,7 +966,7 @@ class CallApiImpl(
     }
 
     private fun runOnUiThread(runnable: Runnable) {
-        if (Thread.currentThread() === Looper.getMainLooper().thread) {
+        if (Thread.currentThread() == Looper.getMainLooper().thread) {
             runnable.run()
         } else {
             mHandler.post(runnable)

@@ -3,6 +3,8 @@ package io.agora.scene.showTo1v1.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.TextureView
@@ -36,10 +38,10 @@ import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.scene.showTo1v1.callAPI.CallApiImpl
+import io.agora.scene.showTo1v1.callAPI.CallEvent
 import io.agora.scene.showTo1v1.callAPI.CallRole
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallDetailActivityBinding
 import io.agora.scene.showTo1v1.service.ROOM_AVAILABLE_DURATION
@@ -117,7 +119,12 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         )
     }
 
+    private val mainHandler: Handler by lazy {
+        Handler(Looper.getMainLooper())
+    }
+
     private var mCallDialog: CallDialog? = null
+    private var mCallSettingDialogs: CallDetailSettingDialog? = null
 
     // 当前呼叫状态
     private var mCallState = CallStateType.Idle
@@ -159,7 +166,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         val roomLeftTime = ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt)
         if (roomLeftTime > 0) {
-            binding.root.postDelayed(timerRoomEndRun, roomLeftTime)
+            mainHandler.postDelayed(timerRoomEndRun, roomLeftTime)
             initRtcEngine()
             initServiceWithJoinRoom()
 
@@ -171,7 +178,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             } else {
                 reInitCallApi(CallRole.CALLER)
             }
-            binding.root.post(timerRoomRun)
+            mainHandler.post(timerRoomRun)
         } else {
             ToastUtils.showToast(getString(R.string.show_to1v1_end_tips))
             finish()
@@ -206,15 +213,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         binding.ivSetting.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
                 Log.d(TAG, "click setting")
-                val dialog = CallDetailSettingDialog(this@RoomDetailActivity)
-                dialog.setListener(object : CallDetailSettingDialog.CallDetailSettingItemListener {
-                    override fun onClickDashboard() {
-                        binding.flDashboard.visibility = View.VISIBLE
-                        binding.ivDashboardClose.visibility = View.VISIBLE
-                        mDashboardFragment?.updateVisible(true)
-                    }
-                })
-                dialog.show()
+                onShowSettingDialog()
             }
         })
         binding.ivDashboardClose.setOnClickListener(object : OnClickJackingListener() {
@@ -239,20 +238,23 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         binding.layoutCallPrivately.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
                 Log.d(TAG, "click call privately")
-                reInitCallApi(CallRole.CALLER, callback = {
-                    mCallApi.call(mRoomInfo.roomId, mRoomInfo.getIntUserId(), completion = {
-                        if (it != null) {
-                            mCallDialog
-                        }
+                toggleSelfVideo(true) {
+                    reInitCallApi(CallRole.CALLER, callback = {
+                        mCallApi.call(mRoomInfo.roomId, mRoomInfo.getIntUserId(), completion = {
+                            if (it != null) {
+                                mCallDialog
+                            }
+                        })
                     })
-                })
+                }
+                toggleSelfAudio(true) {}
             }
         })
 
         binding.includeConnectedView.root.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
                 Log.d(TAG, "click close connection view")
-                binding.root.removeCallbacks(connectedRun)
+                mainHandler.removeCallbacks(connectedRun)
                 animateConnectedViewClose()
             }
 
@@ -323,6 +325,22 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         mCallDialog = dialog
     }
 
+    private fun onShowSettingDialog(needShow: Boolean = true) {
+        val dialog = CallDetailSettingDialog(this@RoomDetailActivity)
+        dialog.setListener(object : CallDetailSettingDialog.CallDetailSettingItemListener {
+            override fun onClickDashboard() {
+                binding.flDashboard.visibility = View.VISIBLE
+                binding.ivDashboardClose.visibility = View.VISIBLE
+                mDashboardFragment?.updateVisible(true)
+            }
+        })
+        dialog.show()
+        if (!needShow) {
+            dialog.dismiss()
+        }
+        mCallSettingDialogs = dialog
+    }
+
     private var toggleVideoRun: Runnable? = null
     private var toggleAudioRun: Runnable? = null
 
@@ -358,15 +376,23 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     override fun onPermissionDined(permission: String?) {
-        PermissionLeakDialog(this).show(permission, { getPermissions() }) { launchAppSetting(permission) }
+        PermissionLeakDialog(this).show(
+            permission,
+            {
+                if (isRoomOwner) getPermissions()
+            },
+            {
+                launchAppSetting(permission)
+            }
+        )
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mRtcEngine.removeHandlerEx(mainRtcListener, mMainRtcConnection)
-        binding.root.removeCallbacks(timerRoomEndRun)
-        binding.root.removeCallbacks(timerRoomRun)
-        binding.root.removeCallbacks(connectedRun)
+        mainHandler.removeCallbacks(timerRoomEndRun)
+        mainHandler.removeCallbacks(timerRoomRun)
+        mainHandler.removeCallbacks(connectedRun)
         mCallApi.removeListener(this)
     }
 
@@ -385,7 +411,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     private fun initRtcEngine() {
         mRtcEngine.addHandlerEx(mainRtcListener, mMainRtcConnection)
-        toggleSelfVideo(true) {
+        toggleSelfVideo(isRoomOwner) {
             if (isRoomOwner) {
                 mRtcEngine.startPreview()
             }
@@ -396,7 +422,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 updateCallState(CallStateType.Idle)
             }
         }
-        toggleSelfAudio(true) {
+        toggleSelfAudio(isRoomOwner) {
 
         }
     }
@@ -413,15 +439,15 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             "show"
         )
 
-        if (!isRoomOwner && mRtcEngine.queryDeviceScore() < 75) {
-            // 低端机观众加入频道前默认开启硬解（解决看高分辨率卡顿问题），但是在410分支硬解码会带来200ms的秒开耗时增加
-            mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
-            // 低端机观众加入频道前默认开启下行零拷贝，下行零拷贝和超分有冲突， 低端机默认关闭超分
-            mRtcEngine.setParameters("\"rtc.video.decoder_out_byte_frame\": true")
-        } else {
-            // 主播加入频道前默认关闭硬解
-            mRtcEngine.setParameters("{\"che.hardware_decoding\": 0}")
-        }
+//        if (!isRoomOwner && mRtcEngine.queryDeviceScore() < 75) {
+//            // 低端机观众加入频道前默认开启硬解（解决看高分辨率卡顿问题），但是在410分支硬解码会带来200ms的秒开耗时增加
+//            mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
+//            // 低端机观众加入频道前默认开启下行零拷贝，下行零拷贝和超分有冲突， 低端机默认关闭超分
+//            mRtcEngine.setParameters("\"rtc.video.decoder_out_byte_frame\": true")
+//        } else {
+//            // 主播加入频道前默认关闭硬解
+//            mRtcEngine.setParameters("{\"che.hardware_decoding\": 0}")
+//        }
 
         val channelMediaOptions = ChannelMediaOptions()
         channelMediaOptions.clientRoleType =
@@ -462,11 +488,17 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     mRtcEngine.setupLocalVideo(VideoCanvas(mShowTextureView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
                     binding.llVideoContainer.addView(mShowTextureView)
                 }
+            } else {
+                mRtcEngine.setupLocalVideo(VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, 0))
             }
         } else {
             if (publish) {
                 binding.llVideoContainer.isVisible = true
                 if (binding.llVideoContainer.contains(mShowTextureView)) {
+                    mRtcEngine.setupRemoteVideoEx(
+                        VideoCanvas(mShowTextureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
+                        mMainRtcConnection
+                    )
                     return
                 } else {
                     (mShowTextureView.parent as? ViewGroup)?.removeView(mShowTextureView)
@@ -476,6 +508,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     )
                     binding.llVideoContainer.addView(mShowTextureView)
                 }
+            } else {
+                mRtcEngine.setupRemoteVideoEx(
+                    VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
+                    mMainRtcConnection
+                )
             }
         }
     }
@@ -541,6 +578,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     private fun updateCallState(state: CallStateType) {
+        Log.d(TAG, "updateCallState currentThread:${Thread.currentThread().name}")
         if (isGoingFinish) return
         mCallState = state
         mDashboardFragment?.updateCallState(mCallState)
@@ -567,8 +605,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     binding.layoutCallPrivatelyBg.breathAnim()
                 }
                 binding.layoutCall.isVisible = false
-                binding.vDragBigWindow.canvasContainer.removeAllViews()
-                binding.vDragSmallWindow.canvasContainer.removeAllViews()
 
                 binding.layoutNumCount.isVisible = true
                 binding.ivHangup.isVisible = false
@@ -590,28 +626,34 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     binding.vDragBigWindow.setSmallType(false)
                     binding.vDragSmallWindow.setSmallType(true)
                 }
+
                 // 默认远端都是大窗, 本地是小窗
-                (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
-                if (binding.vDragBigWindow.canvasContainer.childCount > 0) {
-                    binding.vDragBigWindow.canvasContainer.removeAllViews()
+                if (binding.vDragBigWindow.canvasContainer.contains(mShowTo1v1Manger.mRemoteVideoView)) {
+
+                } else {
+                    (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
+                    if (binding.vDragBigWindow.canvasContainer.childCount > 0) {
+                        binding.vDragBigWindow.canvasContainer.removeAllViews()
+                    }
+                    binding.vDragBigWindow.canvasContainerAddView(mShowTo1v1Manger.mRemoteVideoView)
                 }
-                binding.vDragBigWindow.canvasContainer.addView(mShowTo1v1Manger.mRemoteVideoView)
                 mShowTo1v1Manger.mRemoteUser?.let {
                     binding.vDragBigWindow.setUserName(it.userName)
                 }
 
-                (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
-                if (binding.vDragSmallWindow.canvasContainer.childCount > 0) {
-                    binding.vDragSmallWindow.canvasContainer.removeAllViews()
+                if (binding.vDragSmallWindow.canvasContainer.contains(mShowTo1v1Manger.mLocalVideoView)) {
+
+                } else {
+                    (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
+                    if (binding.vDragSmallWindow.canvasContainer.childCount > 0) {
+                        binding.vDragSmallWindow.canvasContainer.removeAllViews()
+                    }
+                    binding.vDragSmallWindow.canvasContainerAddView(mShowTo1v1Manger.mLocalVideoView)
                 }
-                binding.vDragSmallWindow.canvasContainer.addView(mShowTo1v1Manger.mLocalVideoView)
                 mShowTo1v1Manger.mCurrentUser.let {
                     binding.vDragSmallWindow.setUserName(it.userName)
                 }
-
-                binding.layoutCall.post {
-                    binding.layoutCall.isVisible = true
-                }
+                binding.layoutCall.isVisible = true
 
                 binding.llVideoContainer.isVisible = false
                 binding.layoutNumCount.isVisible = false
@@ -627,7 +669,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                             .into(binding.includeConnectedView.ivUserAvatar)
                         binding.includeConnectedView.tvNickname.text = it.userName
                     }
-                    binding.root.postDelayed(connectedRun, 5000)
+                    mainHandler.postDelayed(connectedRun, 5000)
                 } else {
                     binding.layoutCallPrivatelyBg.isVisible = false
                     binding.layoutCallPrivately.isVisible = false
@@ -648,6 +690,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     private fun animateConnectedViewClose() {
         if (!binding.includeConnectedView.root.isVisible) return
+        binding.includeConnectedView.root.isVisible = false
 
         val anim = AnimationUtils.loadAnimation(this, R.anim.show_to1v1_slide_to_top)
         anim.setAnimationListener(object : Animation.AnimationListener {
@@ -707,6 +750,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     ) {
         val publisher = eventInfo[CallApiImpl.kPublisher] ?: mShowTo1v1Manger.mCurrentUser.userId
         if (publisher != mShowTo1v1Manger.mCurrentUser.userId) return
+        Log.d(TAG, "state:$state")
         updateCallState(state)
         when (state) {
             CallStateType.Prepared -> {
@@ -770,6 +814,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     channelName, uid, AudioModeration.AgoraChannelType.broadcast,
                     "ShowTo1v1"
                 )
+
+                // todo workaround 1v1 视频没有渲染，展示 dialog 后会重新渲染 view
+                onShowSettingDialog(false)
             }
 
             CallStateType.Failed -> {
@@ -777,6 +824,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 ToastUtils.showToast(eventReason)
             }
         }
+    }
+
+    override fun onCallEventChanged(event: CallEvent, elapsed: Long) {
+        super.onCallEventChanged(event, elapsed)
+        Log.d(TAG, "onCallEventChanged event:$event,elapsed:$elapsed")
     }
 
     private fun enableContentInspectEx(connection: RtcConnection) {

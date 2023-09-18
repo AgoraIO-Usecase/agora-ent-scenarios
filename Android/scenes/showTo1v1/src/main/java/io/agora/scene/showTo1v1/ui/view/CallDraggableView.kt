@@ -8,6 +8,8 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.core.view.contains
+import androidx.core.view.isVisible
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1DraggableViewBinding
 
 class CallDraggableView @JvmOverloads constructor(
@@ -42,6 +44,13 @@ class CallDraggableView @JvmOverloads constructor(
 
     val canvasContainer: ViewGroup
         get() { return binding.llContainer }
+
+    fun canvasContainerAddView(view:View){
+        if (!canvasContainer.contains(view)) {
+            canvasContainer.addView(view)
+        }
+        canvasContainer.isVisible = true
+    }
 
     fun setOnViewClick(action: (() -> Unit)?) {
         onViewClick = action

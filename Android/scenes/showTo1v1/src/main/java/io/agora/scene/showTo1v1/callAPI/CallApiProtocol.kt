@@ -83,7 +83,8 @@ enum class CallReason(val value: Int) {
     LocalCancel(11),            // 本地用户取消呼叫
     RemoteCancel(12),           // 远端用户取消呼叫
     RecvRemoteFirstFrame(13),   // 收到远端首帧
-    CallingTimeout (14)         // 呼叫超时
+    CallingTimeout (14),        // 呼叫超时
+    CancelByCallerRecall(15)    // 同样的主叫呼叫不同频道导致取消
 }
 
 enum class CallEvent(val value: Int) {
@@ -110,7 +111,8 @@ enum class CallEvent(val value: Int) {
     RemoteCancel(110),              // 远端用户取消呼叫
     LocalJoin(111),                 // 本地用户加入RTC频道
     LocalLeave(112),                // 本地用户离开RTC频道
-    RecvRemoteFirstFrame(113)       // 收到远端首帧
+    RecvRemoteFirstFrame(113),      // 收到远端首帧
+    CancelByCallerRecall(114)       // 同样的主叫呼叫不同频道导致取消
 }
 
 /**

@@ -22,7 +22,7 @@
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/layoutTop" />
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/llVideoContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
