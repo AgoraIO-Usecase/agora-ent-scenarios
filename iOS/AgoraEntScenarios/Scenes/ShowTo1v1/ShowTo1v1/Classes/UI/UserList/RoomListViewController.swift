@@ -412,7 +412,7 @@ extension RoomListViewController: CallApiListenerProtocol {
                 
                 //被叫不一定在userList能查到，需要从callapi里读取发送用户的user extension
                 var user: ShowTo1v1UserInfo? = listView.roomList.first {$0.userId == "\(fromUserId)"}
-                if user == nil, let userDic = (eventInfo[kFromUserExtension] as? [String: Any]) {
+                if let userDic = (eventInfo[kFromUserExtension] as? [String: Any]) {
                     user = ShowTo1v1UserInfo.yy_model(with: userDic) as! ShowTo1v1UserInfo
                 }
                 if let user = user {
