@@ -230,6 +230,10 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
         scroll(to: toIndex)
     }
     
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        ShowAgoraKitManager.shared.callTimestampStart()
+    }
+    
     private func _getVisibleCellTuple() -> (Int?, UICollectionViewCell?) {
         for (i, cell) in collectionView.visibleCells.enumerated() {
             if cell.convert(cell.bounds.origin, from: self.view) == .zero {
