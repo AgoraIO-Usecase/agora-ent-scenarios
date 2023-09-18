@@ -199,7 +199,6 @@ class RoomListActivity : AppCompatActivity() {
                     }
                     MotionEvent.ACTION_UP -> {
                         if (RtcEngineInstance.generalToken() != "") {
-                            mRtcEngine.adjustUserPlaybackSignalVolumeEx(roomInfo.ownerId.toInt(), 100, rtcConnection)
                             goLiveDetailActivity(list, position, roomInfo)
                         }
                     }
