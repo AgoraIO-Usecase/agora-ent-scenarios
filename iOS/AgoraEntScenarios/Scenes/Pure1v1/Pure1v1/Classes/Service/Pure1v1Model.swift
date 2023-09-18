@@ -27,3 +27,14 @@ public class Pure1v1UserInfo: NSObject {
         return image
     }
 }
+
+class Pure1v1CalleeTokenConfig: NSObject {
+    var callerRoomId: String?   //主叫频道的token
+    var callerToken: String?    //主叫频道的token
+    var isAccept: Bool?     //是否接受主叫呼叫
+    
+    func isValide(roomId: String) -> Bool {
+        guard let _ = callerToken, roomId == callerRoomId, isAccept == true else {return false}
+        return true
+    }
+}

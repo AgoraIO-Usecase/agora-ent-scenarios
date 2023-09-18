@@ -10,6 +10,8 @@ import YYCategories
 import CallAPI
 import AgoraRtcKit
 
+
+
 private let kShowGuideAlreadyKey = "already_show_guide"
 class Pure1v1UserListViewController: UIViewController {
     var userInfo: Pure1v1UserInfo? {
@@ -17,6 +19,8 @@ class Pure1v1UserListViewController: UIViewController {
             callVC.currentUser = userInfo
         }
     }
+    
+    private var calleeTokenConfig: Pure1v1CalleeTokenConfig = Pure1v1CalleeTokenConfig()
     
     private let tokenConfig: CallTokenConfig = CallTokenConfig()
     private lazy var rtcEngine = _createRtcEngine()
@@ -243,25 +247,36 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                     callDialog?.hiddenAnimation()
                     let dialog = Pure1v1CalleeDialog.show(user: user)
                     assert(dialog != nil, "dialog = nil")
+                    
+                    self.calleeTokenConfig = Pure1v1CalleeTokenConfig()
+                    NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
+                                                         appCertificate: pure1V1AppCertificate!,
+                                                         channelName: fromRoomId,
+                                                         uid: "\(toUserId)",
+                                                         tokenGeneratorType: .token007,
+                                                         tokenTypes: [.rtc]) {[weak self] tokens in
+                        guard let self = self else {return}
+                        guard tokens.count == 1 else {
+                            pure1v1Print("generateTokens fail")
+                            self.view.isUserInteractionEnabled = true
+                            return
+                        }
+                        
+                        self.calleeTokenConfig.callerRoomId = fromRoomId
+                        self.calleeTokenConfig.callerToken =  tokens[AgoraTokenType.rtc.rawValue]!
+                        
+                        guard self.calleeTokenConfig.isValide(roomId: fromRoomId) else {return}
+                        self.callApi.accept(roomId: fromRoomId, remoteUserId: fromUserId, rtcToken: self.calleeTokenConfig.callerToken ?? "") { err in
+                        }
+                    }
+                    
                     dialog?.acceptClosure = { [weak self] in
-                        NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
-                                                             appCertificate: pure1V1AppCertificate!,
-                                                             channelName: fromRoomId,
-                                                             uid: "\(toUserId)",
-                                                             tokenGeneratorType: .token007,
-                                                             tokenTypes: [.rtc]) { tokens in
-                            guard let self = self else {return}
-                            guard tokens.count == 1 else {
-                                pure1v1Print("generateTokens fail")
-                                self.view.isUserInteractionEnabled = true
-                                return
-                            }
-                            let rtcToken = tokens[AgoraTokenType.rtc.rawValue]!
-                            
-                            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
-                            AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
-                            self.callApi.accept(roomId: fromRoomId, remoteUserId: fromUserId, rtcToken: rtcToken) { err in
-                            }
+                        guard let self = self else {return}
+                        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
+                        AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
+                        self.calleeTokenConfig.isAccept = true
+                        guard self.calleeTokenConfig.isValide(roomId: fromRoomId) else {return}
+                        self.callApi.accept(roomId: fromRoomId, remoteUserId: fromUserId, rtcToken: self.calleeTokenConfig.callerToken ?? "") { err in
                         }
                     }
                     
