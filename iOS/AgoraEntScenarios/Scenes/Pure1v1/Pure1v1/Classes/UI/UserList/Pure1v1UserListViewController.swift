@@ -248,14 +248,14 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                     let dialog = Pure1v1CalleeDialog.show(user: user)
                     assert(dialog != nil, "dialog = nil")
                     
-                    self.calleeTokenConfig = Pure1v1CalleeTokenConfig()
+                    self.calleeTokenConfig = Pure1v1CalleeTokenConfig(callerRoomId: fromRoomId)
                     NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
                                                          appCertificate: pure1V1AppCertificate!,
                                                          channelName: fromRoomId,
                                                          uid: "\(toUserId)",
                                                          tokenGeneratorType: .token007,
                                                          tokenTypes: [.rtc]) {[weak self] tokens in
-                        guard let self = self else {return}
+                        guard let self = self, self.calleeTokenConfig.callerRoomId == fromRoomId else {return}
                         guard tokens.count == 1 else {
                             pure1v1Print("generateTokens fail")
                             self.view.isUserInteractionEnabled = true

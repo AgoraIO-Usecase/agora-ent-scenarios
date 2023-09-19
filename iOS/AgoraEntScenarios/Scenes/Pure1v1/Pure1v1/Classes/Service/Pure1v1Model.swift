@@ -33,6 +33,12 @@ class Pure1v1CalleeTokenConfig: NSObject {
     var callerToken: String?    //主叫频道的token
     var isAccept: Bool?     //是否接受主叫呼叫
     
+    init(callerRoomId: String? = nil, callerToken: String? = nil, isAccept: Bool? = nil) {
+        self.callerRoomId = callerRoomId
+        self.callerToken = callerToken
+        self.isAccept = isAccept
+    }
+    
     func isValide(roomId: String) -> Bool {
         guard let _ = callerToken, roomId == callerRoomId, isAccept == true else {return false}
         return true
