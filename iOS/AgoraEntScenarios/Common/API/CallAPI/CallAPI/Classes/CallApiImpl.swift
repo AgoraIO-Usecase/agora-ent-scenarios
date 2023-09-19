@@ -486,6 +486,7 @@ extension CallApiImpl {
         }
         
         if ret != 0 {
+            rtcConnection = nil
             joinRtcCompletion?(NSError(domain: "join rtc fail!", code: Int(ret)))
             return
         }
