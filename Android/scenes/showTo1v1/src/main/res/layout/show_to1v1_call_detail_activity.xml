@@ -37,7 +37,7 @@
             android:id="@+id/vDragBigWindow"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="end"/>
+            android:layout_gravity="end" />
 
         <io.agora.scene.showTo1v1.ui.view.CallDraggableView
             android:id="@+id/vDragSmallWindow"
@@ -48,7 +48,7 @@
             android:layout_marginEnd="25dp" />
     </FrameLayout>
 
-<!--    头部-->
+    <!--    头部-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTop"
         android:layout_width="match_parent"
@@ -67,8 +67,11 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutRoomTop"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                tools:visibility="invisible">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/ivUserAvatar"
@@ -86,8 +89,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="3dp"
-                    android:maxLength="14"
                     android:ellipsize="end"
+                    android:maxLength="14"
                     android:textColor="@color/white"
                     android:textSize="14sp"
                     app:layout_constraintStart_toEndOf="@+id/ivUserAvatar"
@@ -133,6 +136,64 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/tvRoomNum" />
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutCallingTop"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                tools:visibility="visible"
+                android:visibility="invisible">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivCallingAvatar"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="5dp"
+                    android:src="@drawable/show_to1v1_room_item_icon_sample"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCallingNickname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="3dp"
+                    android:ellipsize="end"
+                    android:maxLength="14"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toEndOf="@+id/ivCallingAvatar"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="用户昵称" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCallingUid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/tvCallingNickname"
+                    tools:text="000000" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCallingTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="15dp"
+                    android:drawableStart="@drawable/show_to1v1_room_detail_connection"
+                    android:drawablePadding="3dp"
+                    android:gravity="center"
+                    android:text="00:00:00"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/tvCallingUid" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -151,24 +212,24 @@
             android:layout_height="32dp"
             android:layout_marginEnd="15dp"
             android:background="@drawable/show_to1v1_black20_corner"
-            app:layout_constraintTop_toTopOf="@id/ivClose"
-            android:orientation="vertical"
             android:gravity="center"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="@id/ivClose"
-            app:layout_constraintEnd_toStartOf="@id/ivClose">
+            app:layout_constraintEnd_toStartOf="@id/ivClose"
+            app:layout_constraintTop_toTopOf="@id/ivClose">
 
             <ImageView
-                android:src="@drawable/show_to1v1_icon_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:textSize="11sp"
+                android:src="@drawable/show_to1v1_icon_count" />
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvNumCount"
-                android:text="1"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textColor="@color/white"
+                android:textSize="11sp" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

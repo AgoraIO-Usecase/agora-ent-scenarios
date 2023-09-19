@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.contains
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -142,7 +143,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     private val timerRoomRun = object : Runnable {
         override fun run() {
             if (mCallState == CallStateType.Connected && mTimeLinkAt > 0) {
-                binding.tvTime.text = dataFormat.format(Date(TimeUtils.currentTimeMillis() - mTimeLinkAt))
+                binding.tvCallingTime.text = dataFormat.format(Date(TimeUtils.currentTimeMillis() - mTimeLinkAt))
             } else {
                 binding.tvTime.text = dataFormat.format(Date(TimeUtils.currentTimeMillis() - mRoomInfo.createdAt))
             }
@@ -584,6 +585,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         mDashboardFragment?.updateCallState(mCallState)
         when (mCallState) {
             CallStateType.Calling -> {
+                mTimeLinkAt = System.currentTimeMillis()
                 publishMedia(false)
                 setupVideoView(false)
             }
@@ -596,9 +598,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 publishMedia(true)
                 setupVideoView(true)
 
-                binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.show_to1v1_dot, 0, 0, 0
-                )
                 if (!isRoomOwner) {
                     binding.layoutCallPrivatelyBg.isVisible = true
                     binding.layoutCallPrivately.isVisible = true
@@ -609,6 +608,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 binding.layoutNumCount.isVisible = true
                 binding.ivHangup.isVisible = false
                 binding.tvHangup.isVisible = false
+                binding.layoutCallingTop.isInvisible = true
+                binding.layoutRoomTop.isInvisible = false
                 if (exchanged) {
                     // 恢复默认窗口
                     exchangeDragWindow()
@@ -639,6 +640,14 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 }
                 mShowTo1v1Manger.mRemoteUser?.let {
                     binding.vDragBigWindow.setUserName(it.userName)
+                    // 左上角是大窗的房间和昵称
+                    binding.tvCallingNickname.text = it.userName
+                    binding.tvCallingUid.text = it.userId
+                    GlideApp.with(this)
+                        .load(it.avatar)
+                        .error(R.mipmap.userimage)
+                        .transform(CenterCropRoundCornerTransform(100))
+                        .into(binding.ivCallingAvatar)
                 }
 
                 if (binding.vDragSmallWindow.canvasContainer.contains(mShowTo1v1Manger.mLocalVideoView)) {
@@ -654,8 +663,10 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     binding.vDragSmallWindow.setUserName(it.userName)
                 }
                 binding.layoutCall.isVisible = true
+                binding.layoutCallingTop.isInvisible = false
 
                 binding.llVideoContainer.isVisible = false
+                binding.layoutRoomTop.isInvisible = true
                 binding.layoutNumCount.isVisible = false
                 binding.ivHangup.isVisible = true
                 binding.tvHangup.isVisible = true
@@ -675,9 +686,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     binding.layoutCallPrivately.isVisible = false
                     binding.layoutCallPrivatelyBg.clearAnimation()
                 }
-                binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.show_to1v1_room_detail_connection, 0, 0, 0
-                )
             }
 
             else -> {}
@@ -732,6 +740,16 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
             binding.vDragBigWindow.setOnViewClick(null)
             binding.vDragBigWindow.setSmallType(false)
+
+            mShowTo1v1Manger.mRemoteUser?.let {
+                binding.tvCallingNickname.text = it.userName
+                binding.tvCallingUid.text = it.userId
+                GlideApp.with(this)
+                    .load(it.avatar)
+                    .error(R.mipmap.userimage)
+                    .transform(CenterCropRoundCornerTransform(100))
+                    .into(binding.ivCallingAvatar)
+            }
         } else {
             binding.vDragBigWindow.bringToFront()
             binding.vDragBigWindow.setSmallType(true)
@@ -740,6 +758,15 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
             binding.vDragSmallWindow.setOnViewClick(null)
             binding.vDragSmallWindow.setSmallType(false)
+            mShowTo1v1Manger.mCurrentUser.let {
+                binding.tvCallingNickname.text = it.userName
+                binding.tvCallingUid.text = it.userId
+                GlideApp.with(this)
+                    .load(it.avatar)
+                    .error(R.mipmap.userimage)
+                    .transform(CenterCropRoundCornerTransform(100))
+                    .into(binding.ivCallingAvatar)
+            }
         }
         exchanged = !exchanged
     }
