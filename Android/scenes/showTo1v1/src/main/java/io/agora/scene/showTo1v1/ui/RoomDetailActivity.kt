@@ -378,9 +378,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     override fun onDestroy() {
         super.onDestroy()
-        if (isRoomOwner) {
-            mShowTo1v1Manger.deInitialize(this@RoomDetailActivity)
-        }
+        Log.d(TAG, "RoomDetail onDestroy")
         mRtcEngine.removeHandlerEx(mainRtcListener, mMainRtcConnection)
         mainHandler.removeCallbacks(timerRoomEndRun)
         mainHandler.removeCallbacks(timerRoomRun)
@@ -538,10 +536,30 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         })
     }
 
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "RoomDetail onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "RoomDetail onStop")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.d(TAG, "RoomDetail onRestart")
+    }
+
     override fun onBackPressed() {
+        Log.d(TAG, "RoomDetail onBackPressed")
         if (isGoingFinish) return
-        onHangup()
-        mCallApi.removeListener(this)
+        if (isRoomOwner) {
+            mShowTo1v1Manger.deInitialize(this@RoomDetailActivity)
+        }else{
+            onHangup()
+            mCallApi.removeListener(this)
+        }
         isGoingFinish = true
         destroy()
         super.onBackPressed()
@@ -879,12 +897,12 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     private var isGoingFinish = false
     private fun onHangup() {
-        if (isRoomOwner) {
-            mShowTo1v1Manger.mRemoteUser?.get1v1ChannelId()?.let {
-                mCallApi.hangup(it, null)
+        mShowTo1v1Manger.mRemoteUser?.let {
+            if (isRoomOwner){
+                mCallApi.hangup(it.get1v1ChannelId(), null)
+            }else{
+                mCallApi.hangup(mRoomInfo.roomId, null)
             }
-        } else {
-            mCallApi.hangup(mRoomInfo.roomId, null)
         }
     }
 
