@@ -240,22 +240,23 @@ class ShowAgoraKitManager: NSObject {
     
     // 耗时计算
     private var callTimeStampsSaved: Date?
+    private var callTimestampEndSaved: TimeInterval?
 
     func callTimestampStart() {
         showLogger.info("callTimeStampsSaved  : start")
-        callTimeStampsSaved = nil
-        showLogger.info("callTimeStampsSaved  : saved")
         callTimeStampsSaved = Date()
     }
     
     func callTimestampEnd() -> TimeInterval? {
-        showLogger.info("callTimeStampsSaved  : end called")
         guard let saved = callTimeStampsSaved else {
-            return nil
+            showLogger.info("callTimeStampsSaved  : end no value")
+            return callTimestampEndSaved
         }
-        showLogger.info("callTimeStampsSaved  : end value")
+        let value = -saved.timeIntervalSinceNow * 1000
         callTimeStampsSaved = nil
-        return -saved.timeIntervalSinceNow * 1000
+        callTimestampEndSaved = value
+        showLogger.info("callTimeStampsSaved  : end value \(value)")
+        return value
     }
     
     //MARK: public sdk method

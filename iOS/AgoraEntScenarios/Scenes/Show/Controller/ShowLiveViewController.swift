@@ -827,9 +827,6 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
             }
         }
         panelPresenter.updateVideoStats(stats)
-        if let ts = ShowAgoraKitManager.shared.callTimestampEnd() {
-            panelPresenter.updateTimestamp(ts)
-        }
         throttleRefreshRealTimeInfo()
     }
     
@@ -872,7 +869,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
                 showLogger.info("show first frame (\(channelId))", context: kShowLogBaseContext)
                 if let ts = ShowAgoraKitManager.shared.callTimestampEnd() {
                     self.panelPresenter.updateTimestamp(ts)
-                    self.throttleRefreshRealTimeInfo()
+                    self.refreshRealTimeInfo()
                 }
             }
         }
@@ -994,18 +991,22 @@ extension ShowLiveViewController {
             guard let `self` = self else {
                 return
             }
-            DispatchQueue.main.async {
-                var receive = true
-                var send = true
-                if self.role == .broadcaster && self.interactionStatus != .pking && self.interactionStatus != .onSeat {
-                    receive = false
-                }
-                if self.role == .audience && self.currentInteraction?.userId != VLUserCenter.user.id {
-                    send = false
-                }
-                let data = self.panelPresenter.generatePanelData(send: send, receive: receive, audience: (self.role == .audience))
-                self.realTimeView.update(left: data.left, right: data.right)
+            self.refreshRealTimeInfo()
+        }
+    }
+    
+    private func refreshRealTimeInfo() {
+        DispatchQueue.main.async {
+            var receive = true
+            var send = true
+            if self.role == .broadcaster && self.interactionStatus != .pking && self.interactionStatus != .onSeat {
+                receive = false
             }
+            if self.role == .audience && self.currentInteraction?.userId != VLUserCenter.user.id {
+                send = false
+            }
+            let data = self.panelPresenter.generatePanelData(send: send, receive: receive, audience: (self.role == .audience))
+            self.realTimeView.update(left: data.left, right: data.right)
         }
     }
 }
