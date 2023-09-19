@@ -37,13 +37,13 @@ def all_pods
   pod 'SenseLib', :path => 'sense.podspec'
   pod 'Cantata', :path => 'Cantata.podspec'
   pod 'AgoraCommon', :path => 'AgoraCommon.podspec'
-  pod 'AgoraSyncManager', '~> 2.0.8'
+  pod 'AgoraSyncManager', '~> 2.1.0'
   pod 'AUIKitCore','0.5.3-beta', :subspecs => ['UI']
 #  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 # pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
-  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.142'
+  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.147'
 
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/ThirdParty/VideoLoaderAPI/VideoLoaderAPI.podspec'
 

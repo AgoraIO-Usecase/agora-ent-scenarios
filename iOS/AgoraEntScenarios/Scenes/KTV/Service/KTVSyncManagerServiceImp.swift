@@ -222,24 +222,33 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 self?.roomNo = channelName
                 
                 let playerRTCUid = UserInfo.userId//VLUserCenter.user.agoraPlayerRTCUid;
-                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
+                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:], tokenMap3:[Int: String] = [:]
                 
                 let dispatchGroup = DispatchGroup()
                 dispatchGroup.enter()
                 NetworkManager.shared.generateTokens(channelName: channelName ?? "",
                                                      uid: "\(UserInfo.userId)",
-                                                     tokenGeneratorType: .token006,
+                                                     tokenGeneratorType: .token007,
                                                      tokenTypes: [.rtc, .rtm]) { tokenMap in
                     tokenMap1 = tokenMap
                     dispatchGroup.leave()
                 }
                 
                 dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ex",
+                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ad",
                                                      uid: "\(playerRTCUid)",
-                                                     tokenGeneratorType: .token006,
+                                                     tokenGeneratorType: .token007,
                                                      tokenTypes: [.rtc]) { tokenMap in
                     tokenMap2 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.enter()
+                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")",
+                                                     uid: "\(2023)",
+                                                     tokenGeneratorType: .token007,
+                                                     tokenTypes: [.rtc]) { tokenMap in
+                    tokenMap3 = tokenMap
                     dispatchGroup.leave()
                 }
                 
@@ -248,7 +257,8 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     guard let self = self,
                           let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
                           let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
-                          let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
+                          let audienceToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue],
+                          let rtcPlayerToken = tokenMap3[NetworkManager.AgoraTokenType.rtc.rawValue]
                     else {
                         agoraAssert(tokenMap1.count == 2, "rtcToken == nil || rtmToken == nil")
                         agoraAssert(tokenMap2.count == 1, "playerRtcToken == nil")
@@ -259,6 +269,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
+                    VLUserCenter.user.audienceChannelToken = audienceToken
                     self.roomList?.append(roomInfo)
                     self._autoOnSeatIfNeed { seatArray in
                         agoraPrint("createRoom _autoOnSeatIfNeed cost: \(-date.timeIntervalSinceNow * 1000) ms")

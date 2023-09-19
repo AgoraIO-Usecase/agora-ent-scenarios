@@ -40,9 +40,9 @@ import AgoraCommon
     @objc public var objectId: String?
     
     @objc public func isSongOwner() -> Bool {
-//        if VLUserCenter.user.id == self.userNo {
-//            return true
-//        }
+        if VLUserCenter.user.id == self.userNo {
+            return true
+        }
         return false
     }
 

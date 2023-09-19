@@ -146,25 +146,25 @@ UITableViewDelegate
         };
         NSString *extra = [NSString convertToJsonData:dict];
         
-        [[AppContext shared].ktvAPI searchMusicWithMusicChartId:chartId
-                                                           page:self.page
-                                                       pageSize:20
-                                                     jsonOption:extra
-                                                     completion:^(NSString * requestId, AgoraMusicContentCenterStatusCode status, AgoraMusicCollection * result) {
-            NSMutableArray* songArray = [NSMutableArray array];
-            [result.musicList enumerateObjectsUsingBlock:^(AgoraMusic * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                VLSongItmModel* model = [VLSongItmModel new];
-                model.songNo = [NSString stringWithFormat:@"%ld", obj.songCode];
-                model.songName = obj.name;
-                model.singer = obj.singer;
-                model.imageUrl = obj.poster;
-                [songArray addObject:model];
-            }];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self appendDatasWithSongList:songArray];
-            });
-        }];
+//        [[AppContext shared].ktvAPI searchMusicWithMusicChartId:chartId
+//                                                           page:self.page
+//                                                       pageSize:20
+//                                                     jsonOption:extra
+//                                                     completion:^(NSString * requestId, AgoraMusicContentCenterStatusCode status, AgoraMusicCollection * result) {
+//            NSMutableArray* songArray = [NSMutableArray array];
+//            [result.musicList enumerateObjectsUsingBlock:^(AgoraMusic * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+//                VLSongItmModel* model = [VLSongItmModel new];
+//                model.songNo = [NSString stringWithFormat:@"%ld", obj.songCode];
+//                model.songName = obj.name;
+//                model.singer = obj.singer;
+//                model.imageUrl = obj.poster;
+//                [songArray addObject:model];
+//            }];
+//
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                [self appendDatasWithSongList:songArray];
+//            });
+//        }];
     }];
 }
 

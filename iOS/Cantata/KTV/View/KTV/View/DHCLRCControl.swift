@@ -31,6 +31,7 @@ public enum DHCGameEvent: Int {
     case effect
     case origin
     case acc
+    case showChorus
 }
 
 public enum DHCGameState: Int {
@@ -39,6 +40,7 @@ public enum DHCGameState: Int {
     case chorusSing //非房主主唱
     case ownerChorus //房主加入合唱
     case joinChorus //加入合唱
+    case beforeJoinChorus //加入合唱loading的时候
     case nextSong //下一首 结算
     case nextGame //下一轮 结算
 }
@@ -58,8 +60,9 @@ class DHCLRCControl: UIView {
     private var leaveChorusBtn: UIButton! //离开合唱
     private var resultView: UIView! //结算界面
     private var noSongLabel: UILabel!
+    private var chorusNumBtn: UIButton!
     weak var delegate: DHCGameDelegate?
-    
+    private var downloadManager = AgoraDownLoadManager()
     public var controlState: DHCGameState = .noSong {
         didSet {
             switch controlState {
@@ -71,6 +74,9 @@ class DHCLRCControl: UIView {
                 joinChorusBtn.isHidden = true
                 leaveChorusBtn.isHidden = true
                 musicNameBtn.isHidden = true
+                noSongLabel.isHidden = false
+                lrcView.isHidden = true
+                chorusNumBtn.isHidden = true
             case .ownerSing:
                 pauseBtn.isHidden = false
                 nextBtn.isHidden = false
@@ -79,14 +85,20 @@ class DHCLRCControl: UIView {
                 joinChorusBtn.isHidden = true
                 leaveChorusBtn.isHidden = true
                 musicNameBtn.isHidden = false
+                noSongLabel.isHidden = true
+                lrcView.isHidden = false
+                chorusNumBtn.isHidden = false
             case .chorusSing:
-                pauseBtn.isHidden = false
-                nextBtn.isHidden = false
+                pauseBtn.isHidden = true
+                nextBtn.isHidden = true
                 originBtn.isHidden = false
                 effectBtn.isHidden = false
                 joinChorusBtn.isHidden = true
-                leaveChorusBtn.isHidden = true
+                leaveChorusBtn.isHidden = false
                 musicNameBtn.isHidden = false
+                noSongLabel.isHidden = true
+                lrcView.isHidden = false
+                chorusNumBtn.isHidden = false
             case .ownerChorus:
                 pauseBtn.isHidden = false
                 nextBtn.isHidden = false
@@ -95,14 +107,33 @@ class DHCLRCControl: UIView {
                 joinChorusBtn.isHidden = true
                 leaveChorusBtn.isHidden = true
                 musicNameBtn.isHidden = false
+                noSongLabel.isHidden = true
+                lrcView.isHidden = false
+                chorusNumBtn.isHidden = false
             case .joinChorus:
-                pauseBtn.isHidden = false
-                nextBtn.isHidden = false
-                originBtn.isHidden = false
-                effectBtn.isHidden = false
-                joinChorusBtn.isHidden = true
+                pauseBtn.isHidden = true
+                nextBtn.isHidden = true
+                originBtn.isHidden = true
+                effectBtn.isHidden = true
+                joinChorusBtn.isHidden = false
+                leaveChorusBtn.isHidden = true
+                joinChorusBtn.isSelected = false
+                musicNameBtn.isHidden = false
+                noSongLabel.isHidden = true
+                lrcView.isHidden = false
+                chorusNumBtn.isHidden = false
+            case .beforeJoinChorus:
+                pauseBtn.isHidden = true
+                nextBtn.isHidden = true
+                originBtn.isHidden = true
+                effectBtn.isHidden = true
+                joinChorusBtn.isHidden = false
+                joinChorusBtn.isSelected = true
                 leaveChorusBtn.isHidden = true
                 musicNameBtn.isHidden = false
+                noSongLabel.isHidden = true
+                lrcView.isHidden = false
+                chorusNumBtn.isHidden = false
             case .nextSong:
                 pauseBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -111,6 +142,9 @@ class DHCLRCControl: UIView {
                 joinChorusBtn.isHidden = true
                 leaveChorusBtn.isHidden = true
                 musicNameBtn.isHidden = true
+                noSongLabel.isHidden = true
+                lrcView.isHidden = true
+                chorusNumBtn.isHidden = true
             case .nextGame:
                 pauseBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -119,6 +153,9 @@ class DHCLRCControl: UIView {
                 joinChorusBtn.isHidden = true
                 leaveChorusBtn.isHidden = true
                 musicNameBtn.isHidden = true
+                noSongLabel.isHidden = true
+                lrcView.isHidden = true
+                chorusNumBtn.isHidden = true
             }
         }
     }
@@ -133,8 +170,21 @@ class DHCLRCControl: UIView {
     }
     
     private func layoutUI() {
-        musicNameBtn = UIButton(type: .system)
+        musicNameBtn = UIButton(frame: CGRect(x: 20, y: 0, width: 300, height: 30))
+        musicNameBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
+        musicNameBtn.contentMode = .scaleAspectFit
+        musicNameBtn.setImage(UIImage.sceneImage(name: "ktv_currentPlay_icon", bundleName: "DHCResource"), for: .normal)
+        musicNameBtn.contentHorizontalAlignment = .left
+        let spacing: CGFloat = 10
+        musicNameBtn.imageEdgeInsets = UIEdgeInsets(top: 0, left: -spacing, bottom: 0, right: 0)
+        musicNameBtn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         addSubview(musicNameBtn)
+        musicNameBtn.isHidden = true
+        
+        chorusNumBtn = UIButton(frame: CGRect(x: self.bounds.width - 80, y: 0, width: 60, height: 30))
+        chorusNumBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
+        chorusNumBtn.addTarget(self, action: #selector(showChorus), for: .touchUpInside)
+        addSubview(chorusNumBtn)
         
         noSongLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 50))
         noSongLabel.center = self.center
@@ -146,16 +196,14 @@ class DHCLRCControl: UIView {
         addSubview(noSongLabel)
         noSongLabel.isHidden = true
         
-        lrcView = KaraokeView(frame: .zero, loggers: [FileLogger()])
-        lrcView.scoringView.viewHeight = 60
-        lrcView.scoringView.topSpaces = 5
+        lrcView = KaraokeView(frame: CGRectMake(0, 30, self.bounds.width, 110), loggers: [FileLogger()])
+        lrcView.scoringEnabled = false
         lrcView.lyricsView.textNormalColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
         lrcView.lyricsView.textHighlightedColor = UIColor(hexString: "#EEFF25")!
         lrcView.lyricsView.lyricLineSpacing = 6
         lrcView.lyricsView.draggable = false
         lrcView.delegate = self
         addSubview(lrcView!)
-        lrcView.isHidden = true
 
         pauseBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 34, height: 40))
         pauseBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
@@ -183,16 +231,17 @@ class DHCLRCControl: UIView {
         effectBtn.setVerticalLayoutWithCenterAlignment(title: "调音", image: UIImage.sceneImage(name: "ktv_subtitle_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         addSubview(effectBtn)
         
-        leaveChorusBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 34, height: 40))
+        leaveChorusBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 50, height: 40))
         leaveChorusBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         pauseBtn.addTarget(self, action: #selector(leaveChorus), for: .touchUpInside)
-        leaveChorusBtn.setVerticalLayoutWithCenterAlignment(title: "退出合唱", image: UIImage.sceneImage(name: "Union", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        leaveChorusBtn.setVerticalLayoutWithCenterAlignment(title: "退出合唱", image: UIImage.sceneImage(name: "ic_leave_chorus", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         addSubview(leaveChorusBtn)
         leaveChorusBtn.isHidden = true
         
         joinChorusBtn = UIButton(frame: CGRect(x: centerX - 61, y: self.bounds.maxY - 50 , width: 122, height: 38))
-        pauseBtn.addTarget(self, action: #selector(joinChorus), for: .touchUpInside)
+        joinChorusBtn.addTarget(self, action: #selector(joinChorus), for: .touchUpInside)
         joinChorusBtn.setImage(UIImage.sceneImage(name: "join", bundleName: "DHCResource"), for: .normal)
+        joinChorusBtn.setImage(UIImage.sceneImage(name: "ic_join_chorus_loading", bundleName: "DHCResource"), for: .selected)
         addSubview(joinChorusBtn)
     }
     
@@ -226,6 +275,11 @@ class DHCLRCControl: UIView {
         guard let delegate = self.delegate else {return}
         delegate.didGameEventChanged(with: .join)
     }
+    
+    @objc private func showChorus() {
+        guard let delegate = self.delegate else {return}
+        delegate.didGameEventChanged(with: .showChorus)
+    }
 
     public func updateButtonLayout(button: UIButton, title: String, image: UIImage, imageInsets: UIEdgeInsets, x: CGFloat, y: CGFloat) {
         let titleAttributedString = NSAttributedString(string: title)
@@ -257,22 +311,64 @@ extension DHCLRCControl: KaraokeDelegate {
 
 extension DHCLRCControl: KTVLrcViewDelegate {
     func onUpdatePitch(pitch: Float) {
-        
+        lrcView.setPitch(pitch: Double(pitch))
     }
     
     func onUpdateProgress(progress: Int) {
-        
+        lrcView.setProgress(progress: progress)
     }
     
     func onDownloadLrcData(url: String) {
-        
+        //开始歌词下载
+        startDownloadLrc(with: url) {[weak self] url in
+            guard let self = self, let url = url else {return}
+            self.resetLrcData(with: url)
+        }
+    }
+    
+    func startDownloadLrc(with url: String, callBack: @escaping LyricCallback) {
+        var path: String? = nil
+        downloadManager.downloadLrcFile(urlString: url) { lrcurl in
+            defer {
+                callBack(path)
+            }
+            guard let lrcurl = lrcurl else {
+                print("downloadLrcFile fail, lrcurl is nil")
+                return
+            }
+
+            let curSong = URL(string: url)?.lastPathComponent.components(separatedBy: ".").first
+            let loadSong = URL(string: lrcurl)?.lastPathComponent.components(separatedBy: ".").first
+            guard curSong == loadSong else {
+                print("downloadLrcFile fail, missmatch, cur:\(curSong ?? "") load:\(loadSong ?? "")")
+                return
+            }
+            path = lrcurl
+        } failure: {
+            callBack(nil)
+            print("歌词解析失败")
+        }
+    }
+    
+    func resetLrcData(with url: String) {
+        let musicUrl = URL(fileURLWithPath: url)
+        guard let data = try? Data(contentsOf: musicUrl),
+              let model = KaraokeView.parseLyricData(data: data) else {
+            return
+        }
+        lrcView?.setLyricData(data: model)
+        musicNameBtn.setTitle("\(model.name)-\(model.singer)", for: .normal)
+        musicNameBtn.isHidden = false
     }
     
     func onHighPartTime(highStartTime: Int, highEndTime: Int) {
         
     }
     
-    
+    public func setChoursNum(with count: Int) {
+        chorusNumBtn.setTitle("\(count)人合唱中", for: .normal)
+    }
+
 }
 
 extension UIButton {

@@ -11,7 +11,6 @@
 #import "VLDropOnLineView.h"
 #import "VLAudioEffectPicker.h"
 #import "VLBadNetWorkView.h"
-#import "VLPopSongList.h"
 #import "VLEffectView.h"
 #import "VLKTVSettingView.h"
 

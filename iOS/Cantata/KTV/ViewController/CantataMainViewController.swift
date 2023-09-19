@@ -11,21 +11,34 @@ import AgoraRtcKit
 import LSTPopView
 import AUIKitCore
 
-private let kChartIds = [3, 4, 2, 6]
-let kListPageCount: Int = 10
-
 @objcMembers
 public class CantataMainViewController: BaseViewController{
 
     private var RtcKit: AgoraRtcEngineKit!
     
     @objc public var roomModel: VLRoomListModel?
-    @objc public var selSongArray: [VLRoomSelSongModel]?
+    @objc public var selSongArray: [VLRoomSelSongModel]? {
+        didSet {
+            if let newSongs = self.selSongArray {
+                if let oldSongs = oldValue {
+                    let oldFirst = oldSongs.first
+                    let newFirst = newSongs.first
+                    if oldFirst?.songNo != newFirst?.songNo{
+                        loadAndPlaySong()
+                    }
+                } else {
+                    if newSongs.count > 0 {
+                        loadAndPlaySong()
+                    }
+                }
+            }
+        }
+    }
     @objc public var seatsArray: [VLRoomSeatModel]?
     
-    private var ktvApi: KTVApiImpl!
+    var ktvApi: KTVApiImpl!
     private var singerRole: KTVSingRole = .audience
-    private var isRoomOwner: Bool = false
+    public var isRoomOwner: Bool = false
     private var isEarOn: Bool = false
     private var isNowMicMuted: Bool = false
     private var isEnterSeatNotFirst: Bool = false
@@ -36,38 +49,47 @@ public class CantataMainViewController: BaseViewController{
     private var botView: VLBottomView!
     private var lrcControlView: DHCLRCControl!
     private var isBrodCaster: Bool = false
-    
-    private var isSearchMode: Bool = false
-    private var searchKeyWord: String?
-    
+    private var settingView: VLKTVSettingView!
+    public var searchKeyWord: String?
+    private var loadMusicCallBack:((Bool, String)->Void)?
+    private var connection: AgoraRtcConnection?
     //歌曲列表相关
-    private lazy var jukeBoxView: AUIJukeBoxView = AUIJukeBoxView()
+    public lazy var jukeBoxView: AUIJukeBoxView = AUIJukeBoxView()
     //歌曲查询列表
-    private var searchMusicList: [AUIMusicModel]?
+    public var searchMusicList: [AUIMusicModel]?
     //点歌列表
-    private var musicListMap: [Int: [AUIMusicModel]] = [:]
+    public var musicListMap: [Int: [AUIMusicModel]] = [:]
     //已点列表
-    private var addedMusicList: [AUIChooseMusicModel] = [] {
+    public var addedMusicList: [AUIChooseMusicModel] = [] {
         didSet {
             if let topSong = addedMusicList.first,
                 topSong.userId == selSongArray?.first?.userNo,
-                !topSong.isPlaying {
-//                self.updatePlayStatus(songCode: topSong.songCode, playStatus: .playing) { error in
-//
-//                }
+               !topSong.isPlaying {
+                var top = topSong
+                top.status = AUIPlayStatus.playing.rawValue
+                self.addedMusicList[0] = top
+                self.jukeBoxView.addedMusicTableView.reloadData()
             }
             self.jukeBoxView.selectedSongCount = addedMusicList.count
         }
     }
-    private var chooseSongList: [AUIChooseMusicModel] = []
+    public var chooseSongList: [AUIChooseMusicModel] = []
     /// 已点歌曲key的map
-    private var addedMusicSet: NSMutableSet = NSMutableSet()
+    public var addedMusicSet: NSMutableSet = NSMutableSet()
     
     /// 可置顶歌曲key
-    private var pinEnableSet: NSMutableSet = NSMutableSet()
+    public var pinEnableSet: NSMutableSet = NSMutableSet()
     
     /// 可删除歌曲key
-    private var deleteEnableSet: NSMutableSet = NSMutableSet()
+    public var deleteEnableSet: NSMutableSet = NSMutableSet()
+    
+    private var playoutVolume: Int = 0 {
+        didSet {
+            ktvApi.getMusicPlayer()?.adjustPlayoutVolume(Int32(playoutVolume))
+            ktvApi.getMusicPlayer()?.adjustPublishSignalVolume(Int32(playoutVolume))
+           // settingView.setAccValue(Float(playoutVolume) /  100.0)
+        }
+    }
     
     
     public override func viewDidLoad() {
@@ -87,7 +109,7 @@ public class CantataMainViewController: BaseViewController{
 
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
+        refreshChoosedSongList()
     }
 
     public override func viewWillDisappear(_ animated: Bool) {
@@ -132,6 +154,7 @@ extension CantataMainViewController {
         
         lrcControlView = DHCLRCControl(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 520))
         lrcControlView.delegate = self
+        lrcControlView.controlState = .noSong
         lrcControlView.backgroundColor = .clear
         mainBgView.addSubview(lrcControlView)
         
@@ -140,6 +163,7 @@ extension CantataMainViewController {
         mainBgView.addSubview(chorusMicView)
         chorusMicView.delegate = self
         chorusMicView.backgroundColor = .clear
+        chorusMicView.isHidden = true
         if let seatsArray = self.seatsArray {
             chorusMicView.seatArray = seatsArray
         }
@@ -162,6 +186,7 @@ extension CantataMainViewController {
         RtcKit.enableAudioVolumeIndication(50, smooth: 10, reportVad: true)
         RtcKit.enableAudio()
         RtcKit.setEnableSpeakerphone(true)
+        RtcKit.delegate = self
   
         isNowMicMuted = checkAudicMicIsMuted()
         isBrodCaster = checkIsOnMicSeat()
@@ -176,7 +201,13 @@ extension CantataMainViewController {
         
         loadKtvApi()
         
-        let ret = RtcKit.joinChannel(byToken: VLUserCenter.user.agoraRTCToken, channelId: roomModel?.roomNo ?? "", uid: UInt(VLUserCenter.user.id) ?? 0 , mediaOptions: updateChannelMediaOption())
+        guard let roomNo = roomModel?.roomNo else {return}
+        var realChannelId: String = roomNo
+        realChannelId = "\(realChannelId)_ad"
+    
+        let connection = AgoraRtcConnection(channelId: realChannelId, localUid: Int(VLUserCenter.user.id) ?? 0)
+        self.connection = connection
+        let ret = RtcKit.joinChannelEx(byToken: VLUserCenter.user.audienceChannelToken, connection: connection, delegate: self, mediaOptions: updateChannelMediaOption())
         
         let model = getCurrentUserMicSeat()
         if let currentModel = model {
@@ -191,12 +222,240 @@ extension CantataMainViewController {
     
     private func loadKtvApi() {
         let exChannelToken = VLUserCenter.user.agoraPlayerRTCToken
-        let apiConfig = KTVApiConfig(appId: AppContext.shared.appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, channelName: self.roomModel?.roomNo ?? "", localUid: Int(VLUserCenter.user.id) ?? 0, chorusChannelName: "\(self.roomModel?.roomNo)_ex", chorusChannelToken: exChannelToken, type: .normal, maxCacheSize: 10)
-        self.ktvApi = KTVApiImpl(config: apiConfig)
+        let rtcToken = VLUserCenter.user.agoraRTCToken
+        guard let roomNo = roomModel?.roomNo else {return}
+        let apiConfig = KTVApiConfig(appId: AppContext.shared.appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, channelName: roomNo, localUid: Int(VLUserCenter.user.id) ?? 0, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken, type: .cantata, maxCacheSize: 10, musicType: .mcc, isDebugMode: false)
+        let giantConfig = GiantChorusConfiguration(audienceChannelToken: VLUserCenter.user.audienceChannelToken, musicStreamUid: 2023, musicChannelToken: exChannelToken, topN: 6)
+        self.ktvApi = KTVApiImpl(config: apiConfig, giantConfig: giantConfig)
         self.ktvApi.renewInnerDataStreamId()
         self.ktvApi.setLrcView(view: lrcControlView)
         self.ktvApi.setMicStatus(isOnMicOpen: !self.isNowMicMuted)
         self.ktvApi.addEventHandler(ktvApiEventHandler: self)
+    }
+    
+    private func getMusicChannelToken() -> String{
+        let apiManager = ApiManager()
+        let token = apiManager.fetchCloudToken()
+        return token
+    }
+    
+    private func loadAndPlaySong() {
+        
+        chorusMicView.isHidden = false
+        
+        guard let model = self.selSongArray?.first else {return}
+        markSong(with: model)
+        
+        let role = getUserSingRole()
+        
+        if isRoomOwner {
+            if VLUserCenter.user.id == model.userNo {
+                self.lrcControlView.controlState = .ownerSing
+            } else {
+                self.lrcControlView.controlState = .ownerChorus
+            }
+        } else {
+            if VLUserCenter.user.id == model.userNo {
+                self.lrcControlView.controlState = .chorusSing
+            } else {
+                self.lrcControlView.controlState = .joinChorus
+            }
+        }
+        
+        //获取合唱用户
+        guard let seatsArray = self.seatsArray else {return}
+        let count = getChorusNum(with: seatsArray)
+        lrcControlView.setChoursNum(with: count)
+        
+        let config = KTVSongConfiguration()
+        config.autoPlay = (role == .audience || role == .coSinger) ? false : true
+        config.mode = (role == .audience || role == .coSinger) == true ? .loadLrcOnly : .loadMusicAndLrc
+        config.mainSingerUid = Int(model.userNo ?? "") ?? 0
+        config.songIdentifier = model.songNo ?? ""
+        
+        self.loadMusicCallBack = {[weak self] flag, songCode in
+            
+        }
+        
+        self.ktvApi.loadMusic(songCode: Int(model.songNo ?? "") ?? 0, config: config, onMusicLoadStateListener: self)
+        self.ktvApi.switchSingerRole2(newRole: role) { state, reason in
+            if state != .success {
+                print("switch failed:\(role)----\(state.rawValue)")
+            }
+        }
+    }
+    
+    private func checkChorus() {
+        guard let conn = self.connection else {return}
+//        if self.RtcKit.getConnectionStateEx(conn) != .connected {
+//            VLToast.toast("加入合唱失败，reson:连接已断开")
+//            return
+//        }
+        
+        let model = self.getCurrentUserMicSeat()
+        //没有上麦需要先上麦
+        if model == nil {
+            guard let seatArray = self.seatsArray else {return}
+            
+            for i in 1..<seatArray.count {
+                let seat = seatArray[i]
+                let rtcUid = seat.rtcUid ?? ""
+                if rtcUid == "" {
+                // cp todo    KTVLogError("before enterSeat error")
+                    self.lrcControlView.controlState = .beforeJoinChorus
+                    self.enterSeat(withIndex: i) {[weak self] error in
+                        guard let self = self else {return}
+                        if let error = error {
+                            // cp todo  KTVLogError("enterSeat error: \(error.localizedDescription)")
+                            self.lrcControlView.controlState = .joinChorus
+                            return
+                        }
+                        //加入合唱
+                        self.joinChorus()
+                    }
+                    
+                    return
+                }
+            }
+            
+            VLToast.toast("麦位已满，请在他人下麦后重试")
+            return
+        }
+        joinChorus()
+    }
+    
+    private func joinChorus() {
+        
+        guard let selSongArray = self.selSongArray, let model = selSongArray.first as? VLRoomSelSongModel else {
+            return
+        }
+
+        let role: KTVSingRole = .coSinger
+        let songConfig = KTVSongConfiguration()
+        songConfig.autoPlay = false
+        songConfig.mode = .loadMusicOnly
+        songConfig.mainSingerUid = Int(model.userNo ?? "0") ?? 0
+        songConfig.songIdentifier = model.songNo ?? ""
+
+        self.loadMusicCallBack = { [weak self] isSuccess, songCode in
+            guard let weakSelf = self else {
+                return
+            }
+
+            print("before switch role, load music success")
+            
+            weakSelf.ktvApi.switchSingerRole2(newRole: role) { state, reason in
+                if state == .fail && reason != .noPermission {
+                    weakSelf.lrcControlView.controlState = .joinChorus
+                    VLToast.toast(String(format: "join chorus fail: %ld", reason.rawValue))
+                // cp todo    KTVLogInfo("join chorus fail")
+                    // TODO: error toast?
+                    return
+                }
+                
+                weakSelf.lrcControlView.controlState = .chorusSing
+                
+                weakSelf.isNowMicMuted = role == .audience
+                
+                let inputModel = KTVJoinChorusInputModel()
+                inputModel.isChorus = true
+                inputModel.songNo = model.songNo
+                AppContext.ktvServiceImp()?.joinChorus(with: inputModel) { error in
+                    // completion block
+                }
+
+                // 开麦
+                AppContext.ktvServiceImp()?.updateSeatAudioMuteStatus(with: false) { error in
+                    // completion block
+                }
+            }
+        }
+
+        if let songCode = Int(model.songNo ?? "0") {
+        // cp todo    KTVLogInfo("before songCode:%li", songCode)
+            self.ktvApi.loadMusic(songCode: songCode, config: songConfig, onMusicLoadStateListener: self)
+        }
+    }
+    
+    func enterSeat(withIndex index: Int, completion: @escaping (Error?) -> Void) {
+        let inputModel = KTVOnSeatInputModel()
+        inputModel.seatIndex = UInt(index)
+        
+        AppContext.ktvServiceImp()?.enterSeat(with: inputModel) { error in
+            completion(error)
+        }
+        
+        self.checkEnterSeatAudioAuthorized()
+    }
+    
+    private func leaveChorus() {
+        //先下麦然后切换角色
+        AppContext.ktvServiceImp()?.coSingerLeaveChorus { [weak self] error in
+            guard let weakSelf = self else { return }
+            
+            weakSelf.stopPlaySong()
+            weakSelf.isNowMicMuted = true
+
+            AppContext.ktvServiceImp()?.updateSeatAudioMuteStatus(with: true) { error in
+                // completion block
+            }
+        }
+    }
+    
+    private func getUserSingRole() -> KTVSingRole {
+        guard let songModel = selSongArray?.first else {
+            return .audience
+        }
+        
+        let currentSongIsJoinSing = getCurrentUserMicSeat()?.chorusSongCode == songModel.chorusSongId()
+        let currentSongIsSongOwner = songModel.isSongOwner()
+        
+        guard let seatArray = self.seatsArray else {return .audience}
+        let currentSongIsChorus = getChorusNum(with: seatArray) > 0
+        
+        if currentSongIsSongOwner {
+            return .leadSinger
+        } else if currentSongIsJoinSing {
+            return .coSinger
+        } else {
+            return .audience
+        }
+    }
+    
+    func getOnMicUserCount() -> Int {
+        var num = 0
+        if let seatsArray = self.seatsArray {
+            for model in seatsArray {
+                if let rtcUid = model.rtcUid {
+                    num += 1
+                }
+            }
+        }
+        return num
+    }
+    
+    private func getChorusNum(with seatArray: [VLRoomSeatModel]) -> Int {
+        var chorusNum = 0
+        guard let topSong = selSongArray?.first else {
+            return chorusNum
+        }
+        
+        for seat in seatArray {
+            if seat.chorusSongCode == topSong.chorusSongId() {
+                chorusNum += 1
+            }
+        }
+        
+        return chorusNum
+    }
+    
+    private func markSong(with model: VLRoomSelSongModel) {
+        if model.status == .playing {
+            return;
+        }
+        AppContext.ktvServiceImp()?.markSongDidPlay(with: model, completion: { _ in
+            
+        })
     }
     
     private func setupContentInspectConfig() {
@@ -232,12 +491,11 @@ extension CantataMainViewController {
     private func updateChannelMediaOption() -> AgoraRtcChannelMediaOptions {
 
         let option = AgoraRtcChannelMediaOptions()
-        option.clientRoleType = (isBrodCaster ? .broadcaster : .audience)
-        option.publishMicrophoneTrack = isBrodCaster && !isNowMicMuted
+        option.clientRoleType = .audience
+        option.publishMicrophoneTrack = false
         option.publishCustomAudioTrack = false
         option.channelProfile = .liveBroadcasting
         option.autoSubscribeAudio = true
-      // cp todo  option.publishMediaPlayerId = ktvApi.getMediaPlayer().getMediaPlayerId()
         option.enableAudioRecordingOrPlayout = true
         return option
     }
@@ -245,6 +503,29 @@ extension CantataMainViewController {
     private func leaveRtcChannel() {
         RtcKit.leaveChannel()
     }
+}
+
+//ktvapi模块
+extension CantataMainViewController: IMusicLoadStateListener {
+    public func onMusicLoadFail(songCode: Int, reason: KTVLoadSongFailReason) {
+        if let loadMusicCallBack = self.loadMusicCallBack {
+            loadMusicCallBack(false, "\(songCode)")
+            self.loadMusicCallBack = nil
+        }
+    }
+    
+    public func onMusicLoadProgress(songCode: Int, percent: Int, status: AgoraMusicContentCenterPreloadStatus, msg: String?, lyricUrl: String?) {
+        
+    }
+    
+    public func onMusicLoadSuccess(songCode: Int, lyricUrl: String) {
+        if let loadMusicCallBack = self.loadMusicCallBack {
+            loadMusicCallBack(true, "\(songCode)")
+            self.loadMusicCallBack = nil
+        }
+    }
+    
+    
 }
 
 //订阅消息模块
@@ -294,6 +575,9 @@ extension CantataMainViewController {
                 //更新RTC身份
                 //上麦主播，下麦观众 更新当前观众即可
                 self.updateRTCOption(with: model)
+                guard let seatsArray = self.seatsArray else {return}
+                let count = self.getChorusNum(with: seatsArray)
+                self.lrcControlView.setChoursNum(with: count == 0 ? 1 : count)
             }
         }
 
@@ -573,6 +857,17 @@ extension CantataMainViewController {
         return song
     }
     
+    func refreshChoosedSongList() {
+        AppContext.ktvServiceImp()?.getChoosedSongsList {[weak self] (error, songArray) in
+            guard let self = self else {return}
+            if let error = error {
+                return
+            }
+
+            self.selSongArray = songArray
+        }
+    }
+    
 }
 
 //加载RTC模块
@@ -590,6 +885,10 @@ extension CantataMainViewController: AgoraRtcEngineDelegate {
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
+        
+    }
+    
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
         
     }
     
@@ -632,7 +931,9 @@ extension CantataMainViewController: AgoraRtcEngineDelegate {
 
 extension CantataMainViewController: DHCGameDelegate {
     public func didGameEventChanged(with event: DHCGameEvent) {
-        
+        if event == .join {
+            checkChorus()
+        }
     }
 }
 
@@ -751,11 +1052,6 @@ extension CantataMainViewController: VLBottomViewDelegate {
 
 }
 
-//主要处理各种数组
-extension CantataMainViewController {
-    
-}
-
 //弹窗相关
 extension CantataMainViewController {
     private func popDropLineView(with seatModel: VLRoomSeatModel) {
@@ -771,336 +1067,3 @@ extension CantataMainViewController {
 
 }
 
-extension CantataMainViewController: AUIJukeBoxViewDelegate {
-    
-    //这个用户应该是无感知的
-    public func cleanSearchText(view: AUIJukeBoxView) {
-        self.searchMusicList = nil
-        self.searchKeyWord = nil
-    }
-    
-    public func search(view: AUIJukeBoxView, text: String, completion: @escaping ([AUIJukeBoxItemDataProtocol]?)->()) {
-        self.searchKeyWord = text
-        self.searchMusic(keyword: text, page: 1, pageSize: kListPageCount, completion: {[weak self] error, list in
-            guard let self = self else {return}
-            if let err = error {
-                AUIToast.show(text:err.localizedDescription)
-                return
-            }
-            self.searchMusicList = list ?? []
-            completion(list)
-        })
-    }
-    
-    public func onSegmentedChanged(view: AUIJukeBoxView, segmentIndex: Int) -> Bool {
-        return false
-    }
-    
-    public func onTabsDidChanged(view: AUIJukeBoxView, tabIndex: Int) -> Bool {
-        return false
-    }
-    
-    public func onSelectSong(view: AUIJukeBoxView, tabIndex: Int, index: Int) {
-        guard let model = searchMusicList == nil ? musicListMap[tabIndex]?[index] : searchMusicList?[index] else {return}
-        let inputModel = KTVChooseSongInputModel()
-        inputModel.songNo = model.songCode
-        inputModel.songName = model.name
-        inputModel.singer = model.singer
-        AppContext.ktvServiceImp()?.chooseSong(with: inputModel, completion: { err in
-            if err == nil {
-                let addModel: AUIChooseMusicModel = AUIChooseMusicModel()
-                addModel.songCode = model.songCode
-                addModel.name = model.name
-                addModel.singer = model.singer
-                addModel.poster = model.poster
-                addModel.duration = model.duration
-                self.addedMusicList.append(addModel)
-                self._notifySongDidAdded(song: addModel)
-                self.jukeBoxView.addedMusicTableView.reloadData()
-                self.jukeBoxView.allMusicTableView.reloadData()
-            }
-        })
-    }
-    
-    public func onRemoveSong(view: AUIJukeBoxView, index: Int) {
-        let song = self.addedMusicList[index]
-        let removeModel = KTVRemoveSongInputModel()
-        removeModel.songNo = song.songCode
-        
-        guard let selSongArray = self.selSongArray else {return}
-        for i in selSongArray {
-            if i.songNo == song.songCode {
-                removeModel.objectId = i.objectId
-                AppContext.ktvServiceImp()?.removeSong(with: removeModel, completion: { err in
-                    if err == nil {
-                        self.addedMusicList.remove(at: index)
-                        self._notifySongDidRemove(song: song)
-                        self.jukeBoxView.addedMusicTableView.reloadData()
-                        self.jukeBoxView.allMusicTableView.reloadData()
-                    }
-                })
-                return
-            }
-        }
-    }
-    
-    public func onNextSong(view: AUIJukeBoxView, index: Int) {
-        AUIAlertView.theme_defaultAlert()
-            .isShowCloseButton(isShow: false)
-            .title(title: aui_localized("switchToNextSong"))
-            .rightButton(title: "确认")
-            .rightButtonTapClosure(onTap: {[weak self] text in
-                guard let self = self else { return }
-                self.onRemoveSong(view: view, index: index)
-            })
-            .leftButton(title: "取消")
-            .show()
-    }
-    
-    public func onPinSong(view: AUIJukeBoxView, index: Int) {
-        let song = self.addedMusicList[index]
-        self.pinSong(songCode: song.songCode, completion: { error in
-            guard let err = error else {return}
-            AUIToast.show(text:err.localizedDescription)
-        })
-    }
-    
-    public func songIsSelected(view: AUIJukeBoxView, songCode: String) -> Bool {
-        return addedMusicSet.contains(songCode)
-    }
-    
-    public func pingEnable(view: AUIJukeBoxView, songCode: String) -> Bool {
-        return pinEnableSet.contains(songCode)
-    }
-    
-    public func deleteEnable(view: AUIJukeBoxView, songCode: String) -> Bool {
-        return deleteEnableSet.contains(songCode)
-    }
-    
-    public func getSearchMusicList(view: AUIJukeBoxView) -> [AUIJukeBoxItemDataProtocol]? {
-        return self.searchMusicList
-    }
-    
-    public func getMusicList(view: AUIJukeBoxView, tabIndex: Int) -> [AUIJukeBoxItemDataProtocol] {
-        return self.musicListMap[tabIndex] ?? []
-    }
-    
-    public func getSelectedSongList(view: AUIJukeBoxView) -> [AUIJukeBoxItemSelectedDataProtocol] {
-        return self.addedMusicList
-    }
-    
-    public func onRefreshMusicList(view: AUIJukeBoxView, tabIndex: Int, completion: @escaping ([AUIJukeBoxItemDataProtocol]?)->()) {
-        let idx = tabIndex
-        aui_info("onRefreshMusicList tabIndex: \(idx)", tag: "AUIJukeBoxViewBinder")
-        self.getMusicList(chartId: kChartIds[idx],
-                                           page: 1,
-                                           pageSize: kListPageCount,
-                                           completion: {[weak self] error, list in
-            guard let self = self else {return}
-            if let err = error {
-                AUIToast.show(text:err.localizedDescription)
-                return
-            }
-            self.musicListMap[idx] = list ?? []
-            completion(list)
-        })
-    }
-    
-    public func onLoadMoreMusicList(view: AUIJukeBoxView, tabIndex: Int, completion: @escaping ([AUIJukeBoxItemDataProtocol]?)->()) {
-        
-        //如果searchMusicList为空，表示为id搜索，否则为关键字搜索
-        if let searchList = self.searchMusicList, let keyword = self.searchKeyWord {
-            let page = 1 + searchList.count / kListPageCount
-            self.searchMusic(keyword: keyword, page: page, pageSize: kListPageCount, completion: {[weak self] error, list in
-                guard let self = self else {return}
-                if let err = error {
-                    AUIToast.show(text:err.localizedDescription)
-                    return
-                }
-                self.searchMusicList? += list ?? []
-                completion(list)
-            })
-            return
-        }
-
-        let idx = tabIndex
-        let musicListCount = musicListMap[idx]?.count ?? 0
-        let page = 1 + musicListCount / kListPageCount
-        if musicListCount % kListPageCount > 0 {
-            //no more data
-            completion(nil)
-            return
-        }
-        aui_info("onLoadMoreMusicList tabIndex: \(idx) page: \(page)", tag: "AUIJukeBoxViewBinder")
-        self.getMusicList(chartId: kChartIds[idx],
-                                           page: page,
-                                           pageSize: kListPageCount,
-                                           completion: {[weak self] error, list in
-            guard let self = self else {return}
-            if let err = error {
-                AUIToast.show(text:err.localizedDescription)
-                return
-            }
-            if let list = list {
-                let musicList = self.musicListMap[idx] ?? []
-                self.musicListMap[idx] = musicList + list
-            }
-            completion(list)
-        })
-    }
-    
-    public func onRefreshAddedMusicList(view: AUIJukeBoxView, completion: @escaping ([AUIJukeBoxItemSelectedDataProtocol]?) -> ()) {
-        aui_info("onRefreshAddedMusicList", tag: "AUIJukeBoxViewBinder")
-        //暂时不需要上拉刷新
-    }
-
-    public func pinSong(songCode: String, completion: AUICallback?) {
-        aui_info("pinSong: \(songCode)", tag: "AUIMusicServiceImpl")
-        var model = VLRoomSelSongModel()
-        guard let selSongArray = self.selSongArray else {return}
-        for i in selSongArray {
-            if i.songNo == songCode {
-                let model =  KTVMakeSongTopInputModel()
-                model.objectId = i.objectId
-                model.songNo = i.songNo
-                AppContext.ktvServiceImp()?.pinSong(with: model, completion: { err in
-                    
-                })
-                break
-            }
-        }
-    }
-    
-    public func searchMusic(keyword: String,
-                            page: Int,
-                            pageSize: Int,
-                            completion: @escaping AUIMusicListCompletion) {
-        aui_info("searchMusic with keyword: \(keyword)", tag: "AUIMusicServiceImpl")
-        let jsonOption = "{\"needLyric\":true,\"pitchType\":1}"
-        self.ktvApi.searchMusic(keyword: keyword,
-                                page: page,
-                                pageSize: pageSize,
-                                jsonOption: jsonOption) { requestId, status, collection in
-            aui_info("searchMusic with keyword: \(keyword) status: \(status.rawValue) count: \(collection.count)", tag: "AUIMusicServiceImpl")
-            guard status == .OK else {
-                //TODO:
-                DispatchQueue.main.async {
-                    completion(nil, nil)
-                }
-                return
-            }
-            
-            var musicList: [AUIMusicModel] = []
-            collection.musicList.forEach { music in
-                let model = AUIMusicModel()
-                model.songCode = "\(music.songCode)"
-                model.name = music.name
-                model.singer = music.singer
-                model.poster = music.poster
-                model.releaseTime = music.releaseTime
-                model.duration = music.durationS
-                musicList.append(model)
-            }
-            
-            DispatchQueue.main.async {
-                completion(nil, musicList)
-            }
-        }
-    }
-
-    public func getMusicList(chartId: Int,
-                             page: Int,
-                             pageSize: Int,
-                             completion: @escaping AUIMusicListCompletion) {
-        aui_info("getMusicList with chartId: \(chartId)", tag: "AUIMusicServiceImpl")
-        let jsonOption = "{\"needLyric\":true,\"pitchType\":1}"
-        self.ktvApi.searchMusic(musicChartId: chartId,
-                                page: page,
-                                pageSize: pageSize,
-                                jsonOption: jsonOption) { requestId, status, collection in
-            aui_info("getMusicList with chartId: \(chartId) status: \(status.rawValue) count: \(collection.count)", tag: "AUIMusicServiceImpl")
-            guard status == .OK else {
-                //TODO:
-                DispatchQueue.main.async {
-                    completion(nil, nil)
-                }
-                return
-            }
-            
-            var musicList: [AUIMusicModel] = []
-            collection.musicList.forEach { music in
-                let model = AUIMusicModel()
-                model.songCode = "\(music.songCode)"
-                model.name = music.name
-                model.singer = music.singer
-                model.poster = music.poster
-                model.releaseTime = music.releaseTime
-                model.duration = music.durationS
-                musicList.append(model)
-            }
-            
-            DispatchQueue.main.async {
-                completion(nil, musicList)
-            }
-        }
-    }
-    
-    //将选择歌曲的模型转换为UIKit的模型 进行数据的传输显示
-    public func getAllChooseSongList(completion: AUIChooseSongListCompletion?) {
-        aui_info("getAllChooseSongList", tag: "AUIMusicServiceImpl")
-        
-        var songList = [AUIChooseMusicModel]()
-        guard let selSongArray = self.selSongArray else {return}
-        for i in selSongArray {
-            let model = AUIChooseMusicModel()
-            model.songCode = i.songNo ?? ""
-            model.createAt = i.createAt
-            model.singer = i.singer ?? ""
-            model.poster = i.imageUrl ?? ""
-            model.name = i.songName ?? ""
-            model.createAt = i.createAt
-            model.pinAt = i.pinAt
-            model.status =  i.status == .idle ? 0 : 1
-            let owner = AUIUserThumbnailInfo()
-            owner.userId = i.userNo ?? ""
-            owner.userName = i.name ?? ""
-            model.owner = owner
-            songList.append(model)
-        }
-        
-        self.chooseSongList = songList
-        completion?(nil, self.chooseSongList)
-//        self.rtmManager.getMetadata(channelName: self.channelName) { error, map in
-//            aui_info("getAllChooseSongList error: \(error?.localizedDescription ?? "success")", tag: "AUIMusicServiceImpl")
-//            if let error = error {
-//                //TODO: error
-//                completion?(error, nil)
-//                return
-//            }
-//            let kChooseSongKey = "song"
-//            guard let jsonStr = map?[kChooseSongKey] else {
-//                //TODO: error
-//                completion?(nil, nil)
-//                return
-//            }
-//
-//            self.chooseSongList = NSArray.yy_modelArray(with: AUIChooseMusicModel.self, json: jsonStr) as? [AUIChooseMusicModel] ?? []
-//            completion?(nil, self.chooseSongList)
-//        }
-    }
-    
-    public func _notifySongDidAdded(song: AUIChooseMusicModel) {
-        addedMusicSet.add(song.songCode)
-        if isRoomOwner ?? false == true {
-            deleteEnableSet.add(song.songCode)
-            pinEnableSet.add(song.songCode)
-        } else if song.owner?.userId == VLUserCenter.user.id {
-            deleteEnableSet.add(song.songCode)
-        }
-    }
-    public func _notifySongDidRemove(song: AUIChooseMusicModel) {
-        addedMusicSet.remove(song.songCode)
-        deleteEnableSet.remove(song.songCode)
-        pinEnableSet.remove(song.songCode)
-    }
-}
