@@ -1416,6 +1416,10 @@ public class RoomLivingViewModel extends ViewModel {
         }
         mRtcEngine.loadExtensionProvider("agora_drm_loader");
 
+        if (AgoraApplication.the().isDebugModeOpen()) {
+            // 调查问题和抓取测试网络状态
+            mRtcEngine.setParameters("{\"che.audio.neteq.dump_level\": 1}");
+        }
 
         // ------------------ 场景化api初始化 ------------------
         ktvApiProtocol.initialize(new KTVApiConfig(
