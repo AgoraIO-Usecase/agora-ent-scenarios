@@ -36,7 +36,7 @@ class KeyCenter: NSObject {
      进入声网控制台(https://console.agora.io/)，创建一个带证书鉴权的项目，进入项目配置页，即可看到APP证书。
      注意：如果项目没有开启证书鉴权，这个字段留空。
      */
-    static let Certificate: String? = <#YOUR Certificate#>
+    static let Certificate: String? = nil
 
     /**
      Token.
@@ -76,7 +76,7 @@ class KeyCenter: NSObject {
      详见 环信即时通讯云控制台(https://console.easemob.com/user/login/)的应用详情页面。
      */
     
-    static var IMClientId: String? = <# You IM Client ID #>
+    static var IMClientId: String? = nil
     
     /**
      EaseMob Client Secret.
@@ -89,7 +89,7 @@ class KeyCenter: NSObject {
      详见 环信即时通讯云控制台( https://console.easemob.com/user/login/ )的应用详情页面。
      */
     
-    static var IMClientSecret: String? = <# You IM Client Secret #>
+    static var IMClientSecret: String? = nil
   
     static let CloudPlayerKey: String? = nil
     static let CloudPlayerSecret: String? = nil
