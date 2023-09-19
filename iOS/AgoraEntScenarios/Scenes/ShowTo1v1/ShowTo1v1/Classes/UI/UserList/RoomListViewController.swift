@@ -370,6 +370,7 @@ extension RoomListViewController {
             self?.service.subscribeListener(listener: nil)
             self?.service.leaveRoom(roomInfo: roomInfo, completion: { err in
             })
+            self?._reinitCallerAPI()
         }
         service.subscribeListener(listener: vc)
         self.navigationController?.pushViewController(vc, animated: false)
