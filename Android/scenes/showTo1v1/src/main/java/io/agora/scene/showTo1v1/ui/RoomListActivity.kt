@@ -1,5 +1,6 @@
 package io.agora.scene.showTo1v1.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
@@ -93,10 +94,30 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume")
+        mVpFragments[mCurrLoadPosition]?.onResumePage()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Log.d(TAG, "onNewIntent")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop")
+    }
+
     override fun onRestart() {
         super.onRestart()
         Log.d(TAG, "onRestart")
-        mVpFragments[mCurrLoadPosition]?.onResumePage()
     }
 
     private var guided = SPUtil.getBoolean(kRoomListSwipeGuide, false)
@@ -121,14 +142,14 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         binding.emptyInclude.layoutCreateRoom.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
                 Log.d(TAG, "click create room empty")
-                mCallApi.removeListener(this@RoomListActivity)
-                mCallApi.deinitialize { }
+                mShowTo1v1Manger.deInitialize(this@RoomListActivity)
                 RoomCreateActivity.launch(this@RoomListActivity)
             }
         })
         binding.layoutCreateRoom2.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
                 Log.d(TAG, "click create room")
+                mShowTo1v1Manger.deInitialize(this@RoomListActivity)
                 RoomCreateActivity.launch(this@RoomListActivity)
             }
         })
@@ -280,14 +301,13 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     override fun onDestroy() {
         super.onDestroy()
         mVpFragments[mCurrLoadPosition]?.stopLoadPage(false)
-        mCallApi.removeListener(this)
-        mShowTo1v1Manger.destroy()
+        mShowTo1v1Manger.deInitialize(this)
     }
 
     private fun reInitCallApi(roomId: String, callback: () -> Unit) {
+        mCallApi.addListener(this)
         mShowTo1v1Manger.reInitCallApi(CallRole.CALLER, roomId, callback = {
             callback.invoke()
-            mCallApi.addListener(this)
         })
     }
 
@@ -330,13 +350,18 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         if (needCall) {
             toggleSelfVideo(true) {
                 reInitCallApi(roomInfo.roomId, callback = {
-                    mCallApi.call(roomInfo.roomId, roomInfo.getIntUserId(), null)
+                    mCallApi.call(roomInfo.roomId, roomInfo.getIntUserId(), completion = {
+                        if (it!=null){
+                            mShowTo1v1Manger.deInitialize(this@RoomListActivity)
+                        }
+                    })
                 })
             }
             toggleSelfAudio(true) {
 
             }
         } else {
+            mCallApi.removeListener(this)
             RoomDetailActivity.launch(this, false, roomInfo)
         }
     }
@@ -368,11 +393,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         val publisher = eventInfo[CallApiImpl.kPublisher] ?: mShowTo1v1Manger.mCurrentUser.userId
         if (publisher != mShowTo1v1Manger.mCurrentUser.userId) return
         mCallState = state
+        Log.d(TAG,"_notifyState RooList state:${state.name},stateReason:${stateReason.name}")
         when (state) {
             CallStateType.Prepared -> {
-                if (stateReason == CallReason.CallingTimeout || stateReason == CallReason.LocalRejected ||
-                    stateReason == CallReason.RemoteRejected
-                ) {
+                if (stateReason == CallReason.CallingTimeout  || stateReason == CallReason.RemoteRejected) {
                     mShowTo1v1Manger.mRemoteUser = null
                     ToastUtils.showToast(getString(R.string.show_to1v1_no_answer))
                     mCallDialog?.let {
@@ -386,11 +410,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 val fromUserId = eventInfo[CallApiImpl.kFromUserId] as? Int ?: 0
                 val fromRoomId = eventInfo[CallApiImpl.kFromRoomId] as? String ?: ""
                 val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
-                if (mShowTo1v1Manger.mRemoteUser != null && mShowTo1v1Manger.mRemoteUser!!.userId != fromUserId.toString()) {
-                    mCallApi.reject(fromRoomId, fromUserId, "already calling") { err ->
-                    }
-                    return
-                }
                 // 触发状态的用户是自己才处理
                 if (mShowTo1v1Manger.mCurrentUser.userId == toUserId.toString()) {
                     // 收到大哥拨打电话

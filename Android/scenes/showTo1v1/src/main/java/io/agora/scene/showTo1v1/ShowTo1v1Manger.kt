@@ -19,6 +19,7 @@ import io.agora.scene.showTo1v1.callAPI.CallMode
 import io.agora.scene.showTo1v1.callAPI.CallRole
 import io.agora.scene.showTo1v1.callAPI.CallTokenConfig
 import io.agora.scene.showTo1v1.callAPI.ICallApi
+import io.agora.scene.showTo1v1.callAPI.ICallApiListener
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import java.util.concurrent.Executors
 
@@ -102,6 +103,9 @@ class ShowTo1v1Manger constructor() {
             return innerRemoteVideoView!!
         }
 
+    @Volatile
+    private var isCallApiInit = false
+
     /**
      * @param role 呼叫/被叫
      * @param ownerRoomId 呼叫/被叫房间 id
@@ -110,26 +114,39 @@ class ShowTo1v1Manger constructor() {
         if (role == CallRole.CALLER) {
             mCallTokenConfig.roomId = mCurrentUser.get1v1ChannelId()
         } else {
+            isCallApiInit = false
             mCallTokenConfig.roomId = ownerRoomId
         }
-        checkCallTokenConfig {
-            mCallApi.deinitialize {
-                val config = CallConfig(
-                    appId = BuildConfig.AGORA_APP_ID,
-                    userId = mCurrentUser.getIntUserId(),
-                    userExtension = mCurrentUser.toMap(),
-                    rtcEngine = mRtcEngine,
-                    mode = CallMode.ShowTo1v1,
-                    role = role,
-                    localView = mLocalVideoView,
-                    remoteView = mRemoteVideoView,
-                    autoAccept = true
-                )
-                mCallApi.initialize(config, mCallTokenConfig) {
-                    callback.invoke()
+        checkCallTokenConfig { renewToken ->
+            val config = CallConfig(
+                appId = BuildConfig.AGORA_APP_ID,
+                userId = mCurrentUser.getIntUserId(),
+                userExtension = mCurrentUser.toMap(),
+                rtcEngine = mRtcEngine,
+                mode = CallMode.ShowTo1v1,
+                role = role,
+                localView = mLocalVideoView,
+                remoteView = mRemoteVideoView,
+                autoAccept = true
+            )
+            if (isCallApiInit && !renewToken) {
+                callback.invoke()
+            } else {
+                mCallApi.deinitialize {
+                    mCallApi.initialize(config, mCallTokenConfig) {
+                        isCallApiInit = true
+                        callback.invoke()
+                    }
                 }
             }
         }
+    }
+
+    fun deInitialize(listener: ICallApiListener) {
+        mCallApi.deinitialize {
+            isCallApiInit = false
+        }
+        mCallApi.removeListener(listener)
     }
 
     fun renewTokens(callback: ((Boolean)) -> Unit) {
@@ -161,13 +178,13 @@ class ShowTo1v1Manger constructor() {
 
 
     // call api tokenConfig
-    private fun checkCallTokenConfig(callback: () -> Unit) {
+    private fun checkCallTokenConfig(callback: (Boolean) -> Unit) {
         if (mCallTokenConfig.rtcToken.isNotEmpty() && mCallTokenConfig.rtmToken.isNotEmpty()) {
-            callback.invoke()
+            callback.invoke(false)
             return
         }
         renewTokens {
-            callback.invoke()
+            callback.invoke(true)
         }
     }
 
@@ -211,6 +228,8 @@ class ShowTo1v1Manger constructor() {
         }
 
     fun destroy() {
+        isCallApiInit = false
+        mCallApi.deinitialize {}
         innerCurrentUser = null
         innerCallTokenConfig = null
         innerLocalVideoView = null

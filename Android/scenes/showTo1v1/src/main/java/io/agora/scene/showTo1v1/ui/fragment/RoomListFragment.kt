@@ -33,7 +33,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     companion object {
 
-        private const val TAG = "ShowTo1v1"
+        private const val TAG = "ShowTo1v1_List"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
         fun newInstance(romInfo: ShowTo1v1RoomInfo) = RoomListFragment().apply {
@@ -175,7 +175,6 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     }
 
     private fun destroy(isScrolling: Boolean): Boolean {
-        mService.leaveRoom(mRoomInfo, completion = {})
         return return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection, !isScrolling)
     }
 

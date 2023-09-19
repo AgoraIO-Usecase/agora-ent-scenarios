@@ -163,13 +163,7 @@ class DashboardFragment : Fragment() {
         }
     }
 
-    var iRtcCallListener: IRtcEngineEventHandler? = null
-
     private val showTo1v1RtcListener = object : IRtcEngineEventHandler() {
-        override fun onUserOffline(uid: Int, reason: Int) {
-            super.onUserOffline(uid, reason)
-            iRtcCallListener?.onUserOffline(uid, reason)
-        }
 
         override fun onRtcStats(stats: RtcStats?) {
             stats ?: return

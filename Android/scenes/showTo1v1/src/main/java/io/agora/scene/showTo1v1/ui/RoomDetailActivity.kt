@@ -79,7 +79,7 @@ fun Int.number2K(): String {
 class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBinding>(), ICallApiListener {
 
     companion object {
-        private const val TAG = "ShowTo1v1"
+        private const val TAG = "ShowTo1v1_List"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
         private const val EXTRA_ROOM_CALL_CONNECTED = "callConnected"
         private const val ContentInspectName = "ShowTo1v1"
@@ -243,7 +243,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     reInitCallApi(CallRole.CALLER, callback = {
                         mCallApi.call(mRoomInfo.roomId, mRoomInfo.getIntUserId(), completion = {
                             if (it != null) {
-                                mCallDialog
+                                mShowTo1v1Manger.deInitialize(this@RoomDetailActivity)
                             }
                         })
                     })
@@ -294,24 +294,12 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         binding.flDashboard.visibility = View.VISIBLE
         binding.ivDashboardClose.visibility = View.VISIBLE
         mDashboardFragment?.updateVisible(true)
-        mDashboardFragment?.iRtcCallListener = object : IRtcEngineEventHandler() {
-            override fun onUserOffline(uid: Int, reason: Int) {
-                super.onUserOffline(uid, reason)
-                if (isRoomOwner && uid == mShowTo1v1Manger.mRemoteUser?.getIntUserId()) {
-                    runOnUiThread {
-                        // 主叫方离线，挂断
-                        ToastUtils.showToast(R.string.show_to1v1_end_linking_tips)
-                        onHangup()
-                    }
-                }
-            }
-        }
     }
 
     private fun reInitCallApi(role: CallRole, callback: (() -> Unit)? = null) {
+        mCallApi.addListener(this)
         mShowTo1v1Manger.reInitCallApi(role, mRoomInfo.roomId, callback = {
             callback?.invoke()
-            mCallApi.addListener(this)
         })
     }
 
@@ -390,11 +378,13 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     override fun onDestroy() {
         super.onDestroy()
+        if (isRoomOwner) {
+            mShowTo1v1Manger.deInitialize(this@RoomDetailActivity)
+        }
         mRtcEngine.removeHandlerEx(mainRtcListener, mMainRtcConnection)
         mainHandler.removeCallbacks(timerRoomEndRun)
         mainHandler.removeCallbacks(timerRoomRun)
         mainHandler.removeCallbacks(connectedRun)
-        mCallApi.removeListener(this)
     }
 
     private val mainRtcListener = object : IRtcEngineEventHandler() {
@@ -550,9 +540,10 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     override fun onBackPressed() {
         if (isGoingFinish) return
+        onHangup()
+        mCallApi.removeListener(this)
         isGoingFinish = true
         destroy()
-        onHangup()
         super.onBackPressed()
     }
 
@@ -579,7 +570,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     private fun updateCallState(state: CallStateType) {
-        Log.d(TAG, "updateCallState currentThread:${Thread.currentThread().name}")
         if (isGoingFinish) return
         mCallState = state
         mDashboardFragment?.updateCallState(mCallState)
@@ -777,22 +767,23 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     ) {
         val publisher = eventInfo[CallApiImpl.kPublisher] ?: mShowTo1v1Manger.mCurrentUser.userId
         if (publisher != mShowTo1v1Manger.mCurrentUser.userId) return
-        Log.d(TAG, "state:$state")
+        Log.d(TAG, "RoomDetail state:$state")
         updateCallState(state)
         when (state) {
             CallStateType.Prepared -> {
                 when (stateReason) {
                     CallReason.RemoteHangup -> {
-                        ToastUtils.showToast(getString(R.string.show_to1v1_end_linking_tips))
+                        ToastUtils.showToast(R.string.show_to1v1_end_linking_tips)
                         if (mCallConnected && !isRoomOwner) {
                             onBackPressed()
                         }
                     }
 
                     CallReason.CallingTimeout,
-                    CallReason.LocalRejected,
                     CallReason.RemoteRejected -> {
-                        ToastUtils.showToast(getString(R.string.show_to1v1_no_answer))
+                        if (!isRoomOwner){
+                            ToastUtils.showToast(getString(R.string.show_to1v1_no_answer))
+                        }
                     }
 
                     else -> {}
@@ -855,7 +846,16 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     override fun onCallEventChanged(event: CallEvent, elapsed: Long) {
         super.onCallEventChanged(event, elapsed)
-        Log.d(TAG, "onCallEventChanged event:$event,elapsed:$elapsed")
+        when (event) {
+            CallEvent.LocalLeave -> {
+                onHangup()
+            }
+
+            CallEvent.RemoteLeave -> {
+                // 主叫方离线，挂断
+                onHangup()
+            }
+        }
     }
 
     private fun enableContentInspectEx(connection: RtcConnection) {

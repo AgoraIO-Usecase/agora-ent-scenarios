@@ -409,6 +409,7 @@ class CallApiImpl(
             _notifyEvent(CallEvent.RecvRemoteFirstFrame, elapsed)
         }
         if (ret != Constants.ERR_OK) {
+            rtcConnection = null
             completion?.invoke(AGError("join rtc failed!", ret))
             return
         }
@@ -496,20 +497,21 @@ class CallApiImpl(
 
     //MARK: on Message
     private fun _process(reason: CallAction, message: Map<String, Any>) {
-        when (reason) {
-            CallAction.Call -> {
-                _onCall(message)
-                return
+        runOnUiThread {
+            when (reason) {
+                CallAction.Call -> {
+                    _onCall(message)
+                }
+                CallAction.CancelCall -> _onCancel(message)
+                CallAction.Reject -> _onReject(message)
+                CallAction.Accept -> {
+                    _onAccept(message)
+                }
+                CallAction.Hangup -> _onHangup(message)
+                else -> {}
             }
-            CallAction.CancelCall -> _onCancel(message)
-            CallAction.Reject -> _onReject(message)
-            CallAction.Accept -> {
-                _onAccept(message)
-                return
-            }
-            CallAction.Hangup -> _onHangup(message)
-            else -> {}
         }
+
     }
     private fun _reject(roomId: String, remoteUserId: Int, reason: String?, completion: ((AGError?, Map<String, Any>) -> Unit)? = null) {
         val userId = config?.userId
