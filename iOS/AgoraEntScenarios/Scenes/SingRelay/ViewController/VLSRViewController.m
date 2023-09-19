@@ -1331,7 +1331,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         self.segmentScore = 0;
         self.segmentCount = 0;
         self.currentUserNo = self.nextWinNo ? self.nextWinNo : self.seatsArray.firstObject.userNo;
-        self.isNowMicMuted = ![self.currentUserNo isEqualToString:VLUserCenter.user.id];
+     //   self.isNowMicMuted = ![self.currentUserNo isEqualToString:VLUserCenter.user.id];
         
         //开麦
         [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:self.isNowMicMuted
@@ -1383,11 +1383,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         self.nextWinNo = model.userNo;
     }
     self.isNowMicMuted = ![self.currentUserNo isEqualToString:VLUserCenter.user.id];
-    if([self isRoomOwner]){
-        [self.RTCkit muteRecordingSignal:self.isNowMicMuted];
-    } else {
-        [self.RTCkit muteLocalAudioStream:self.isNowMicMuted];
-    }
 }
 
 -(void)updatePlayerStatus{
@@ -2209,7 +2204,7 @@ NSArray<SubRankModel *> *assignIndexesToModelsInArray(NSArray<SubRankModel *> *a
 - (void)setIsNowMicMuted:(BOOL)isNowMicMuted {
     BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
-    
+    NSLog(@"我进来了");
     [self.SRApi setMicStatusWithIsOnMicOpen:!isNowMicMuted];
     //[self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
     if([self isRoomOwner]){
