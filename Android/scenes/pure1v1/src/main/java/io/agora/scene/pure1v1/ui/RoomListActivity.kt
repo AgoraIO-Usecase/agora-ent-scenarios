@@ -96,6 +96,18 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 binding.ivRefresh.clearAnimation()
                 binding.ivRefresh.isEnabled = true
             },1000)
+            // 用户是否在线
+            val living = list.any { it.userId == CallServiceManager.instance.localUser?.userId }
+            if (!living) {
+                CallServiceManager.instance.sceneService?.enterRoom { e ->
+                    if (e != null) {
+                        Toast.makeText(this, getText(R.string.pure1v1_room_list_local_offline), Toast.LENGTH_SHORT).show()
+                    } else {
+                        fetchRoomList()
+                    }
+                }
+                return@getUserList
+            }
             if (msg != null ) {
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
             } else {
@@ -225,6 +237,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                         user = UserInfo(userMap)
                     }
                     if (user.userId.isEmpty()) { return } // 检验数据是否有效
+                    CallServiceManager.instance.fetchAcceptCallToken(fromRoomId, null)
                     CallServiceManager.instance.remoteUser = user
                     val dialog = CallReceiveDialog(this, user)
                     dialog.setListener(object : CallReceiveDialog.CallReceiveDialogListener {
@@ -232,14 +245,14 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                             // 获取多媒体权限
                             permissionHelp.checkCameraAndMicPerms({
                                 // 获取token
-                                TokenGenerator.generateTokens(
-                                    fromRoomId, toUserId.toString(),
-                                    TokenGenerator.TokenGeneratorType.token007,
-                                    arrayOf(TokenGenerator.AgoraTokenType.rtc), { ret ->
-                                        val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc] ?: return@generateTokens
+                                CallServiceManager.instance.fetchAcceptCallToken(fromRoomId) { rtcToken ->
+                                    if (rtcToken != null) {
                                         CallServiceManager.instance.callApi?.accept(fromRoomId, fromUserId, rtcToken) {
                                         }
-                                    })
+                                    } else {
+                                        Toast.makeText(this@RoomListActivity, "Fetch RTC token failed", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
                             }, {
                                 PermissionLeakDialog(this@RoomListActivity).show("", { getPermissions() }
                                 ) { launchAppSetting(Manifest.permission.CAMERA) }
@@ -265,8 +278,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             CallStateType.Connected -> {
                 if (CallServiceManager.instance.remoteUser == null) { return }
                 // 进入通话页面
-                finishCallDialog()
                 connectCallDetail()
+                finishCallDialog()
             }
             CallStateType.Prepared -> {
                 when(stateReason) {
@@ -286,12 +299,14 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 }
                 CallServiceManager.instance.remoteUser = null
                 CallServiceManager.instance.connectedChannelId = null
+                CallServiceManager.instance.resetAcceptCallToken()
                 finishCallDialog()
             }
             CallStateType.Failed -> {
                 Toast.makeText(this, eventReason, Toast.LENGTH_SHORT).show()
                 CallServiceManager.instance.remoteUser = null
                 CallServiceManager.instance.connectedChannelId = null
+                CallServiceManager.instance.resetAcceptCallToken()
                 finishCallDialog()
             }
             else -> {

@@ -36,6 +36,8 @@ class CallServiceManager {
     var remoteCanvas: TextureView? = null
 
     private var tokenConfig: CallTokenConfig? = null
+    // 接通使用的rtc token
+    private var acceptToken: String? = null
 
     private var mContext: Context? = null
 
@@ -99,6 +101,34 @@ class CallServiceManager {
                 tokenConfig.rtmToken = rtmToken
                 initialize(tokenConfig)
             })
+    }
+
+    fun fetchAcceptCallToken(fromRoomId: String, complete: ((String?) -> Unit)?) {
+        val user = localUser ?: run {
+            complete?.invoke(null)
+            return
+        }
+        val token = acceptToken
+        if (token != null) {
+            complete?.invoke(token)
+        } else {
+            TokenGenerator.generateTokens(
+                fromRoomId, user.userId,
+                TokenGenerator.TokenGeneratorType.token007,
+                arrayOf(TokenGenerator.AgoraTokenType.rtc), { ret ->
+                    val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc]
+                    if (rtcToken != null) {
+                        acceptToken = rtcToken
+                        complete?.invoke(rtcToken)
+                    } else {
+                        complete?.invoke(null)
+                    }
+                })
+        }
+    }
+
+    fun resetAcceptCallToken() {
+        acceptToken = null
     }
 
     private fun initialize(tokenConfig: CallTokenConfig) {
