@@ -964,7 +964,6 @@ extension CallApiImpl: AgoraRtmClientDelegate {
         //TODO: compatible other message version
         guard kCurrentMessageVersion == messageVersion else { return }
         
-        callPrint("on event message: \(dic)")
         let origMsgTs = recvMessageTsMap[userId] ?? 0
         //对应用户的消息拦截老的消息
         if origMsgTs > msgTs {
