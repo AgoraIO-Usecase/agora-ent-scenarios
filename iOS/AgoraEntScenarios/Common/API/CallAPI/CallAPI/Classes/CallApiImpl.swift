@@ -214,7 +214,7 @@ extension CallApiImpl {
                               eventReason: String = "",
                               elapsed: Int = 0,
                               eventInfo: [String: Any] = [:]) {
-        callPrint("_notifyState  state: \(state.rawValue), stateReason: '\(stateReason.rawValue)', eventReason: \(eventReason), elapsed: \(elapsed) ms, eventInfo: \(eventInfo)")
+        callPrint("_notifyState  state: \(state.rawValue), stateReason: '\(stateReason.rawValue)', eventReason: \(eventReason), elapsed: \(elapsed) ms")
         
         _processState(prevState: self.state,
                       state: state,
@@ -576,7 +576,7 @@ extension CallApiImpl {
                                           value: Int) {
         guard let config = config, isChannelJoined, let rtcConnection = rtcConnection else { return }
         let ret = config.rtcEngine.sendCustomReportMessageEx(msgId, category: category, event: event, label: label, value: value, connection: rtcConnection)
-        callPrint("sendCustomReportMessage msgId: \(msgId) category: \(category) event: \(event) : \(ret)")
+//        callPrint("sendCustomReportMessage msgId: \(msgId) category: \(category) event: \(event) : \(ret)")
     }
 }
 
