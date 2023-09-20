@@ -850,7 +850,10 @@ extension CallApiImpl: CallApiProtocol {
         callingRoomId = roomId
         callingUserId = remoteUserId
         //不等响应即加入频道，加快join速度，失败则leave
-        _joinRTCAndNotify(roomId: fromRoomId, token: tokenConfig?.rtcToken ?? "")
+        _joinRTCAndNotify(roomId: fromRoomId, token: tokenConfig?.rtcToken ?? "") {[weak self] error in
+            self?.cancelCall(completion: { err in
+            })
+        }
     }
     
     //取消呼叫
@@ -904,7 +907,10 @@ extension CallApiImpl: CallApiProtocol {
         
         callTs = _getNtpTimeInMs()
         //不等响应即加入频道，加快join速度，失败则leave
-        _joinRTCAndNotify(roomId: roomId, token: rtcToken)
+        _joinRTCAndNotify(roomId: roomId, token: rtcToken) {[weak self] error in
+            self?.cancelCall(completion: { err in
+            })
+        }
     }
     
     //拒绝
