@@ -159,6 +159,8 @@ extension CallViewController {
             if roomInfo?.userId == currentUser?.userId {
                 //房主找对端
                 channelId = targetUser?.get1V1ChannelId()
+                
+                ConnectedToastView.show(user: targetUser!, canvasView: self.view)
             } else {
                 //观众找自己
                 channelId = currentUser?.get1V1ChannelId()
