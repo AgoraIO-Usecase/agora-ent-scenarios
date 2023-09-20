@@ -38,10 +38,10 @@ def all_pods
   
   pod 'AgoraSyncManager', '2.1.1'
 
-  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
+#  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 # pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
-#  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.142'
+  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.16'
 
   pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
   pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
