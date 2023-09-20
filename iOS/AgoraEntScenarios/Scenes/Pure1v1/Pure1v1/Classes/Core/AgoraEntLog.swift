@@ -29,7 +29,7 @@ import SwiftyBeaver
         let file = FileDestination()  // log to default swiftybeaver.log file
         let dateString = NSDate().string(withFormat: "yyyy-MM-dd", timeZone: nil, locale: nil) ?? ""
         let logDir = logsDir()
-        file.logFileURL = URL(fileURLWithPath: "\(logDir)/agora_ent_\(config.sceneName)_ios_\(dateString)_log.txt")
+        file.logFileURL = URL(fileURLWithPath: "\(logDir)/agora_ent_\(config.sceneName)_ios_\(dateString)_log.log")
         
         // use custom format and set console output to short time, log level & message
         console.format = "$Dyyyy-MM-dd HH:mm:ss.SSS[Agora][$L][\(config.sceneName)][$X]$d $M"

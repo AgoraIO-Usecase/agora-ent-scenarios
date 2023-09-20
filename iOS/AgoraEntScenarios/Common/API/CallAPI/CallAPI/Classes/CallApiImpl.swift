@@ -418,7 +418,7 @@ extension CallApiImpl {
                 return
             }
             
-            callWarningPrint(" mismatch channel, leave first! tqarget: \(roomId) current: \(connection.channelId)")
+            callWarningPrint("mismatch channel, leave first! tqarget: \(roomId) current: \(connection.channelId)")
             config.rtcEngine.leaveChannelEx(connection)
             rtcConnection = nil
         }
@@ -544,6 +544,7 @@ extension CallApiImpl {
     private func _reportMethod(event: String, label: String = "") {
         let msgId = "scenarioAPI"
         let category = "3_iOS_0.2.0"
+        callPrint("_reportMethod event\(event)")
         if isChannelJoined {
             _sendCustomReportMessage(msgId: msgId, category: category, event: event, label: label, value: 0)
             return
@@ -742,7 +743,6 @@ extension CallApiImpl: CallApiProtocol {
     
     public func deinitialize(completion: @escaping (()->())) {
         _reportMethod(event: "\(#function)")
-        callPrint("deinitialize")
         
         if let callingRoomId = self.callingRoomId {
             var roomId = callingRoomId
@@ -943,7 +943,6 @@ extension CallApiImpl: AgoraRtmClientDelegate {
     //收到RTM消息
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, on event: AgoraRtmMessageEvent) {
         let message = event.message
-//        callPrint("on event message: \(message)")
         guard let data = message.getData() as? Data,
               let dic = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let messageAction = CallAction(rawValue: dic[kMessageAction] as? UInt ?? 0),
@@ -957,6 +956,7 @@ extension CallApiImpl: AgoraRtmClientDelegate {
         //TODO: compatible other message version
         guard kCurrentMessageVersion == messageVersion else { return }
         
+        callPrint("on event message: \(dic)")
         let origMsgTs = recvMessageTsMap[userId] ?? 0
         //对应用户的消息拦截老的消息
         if origMsgTs > msgTs {
