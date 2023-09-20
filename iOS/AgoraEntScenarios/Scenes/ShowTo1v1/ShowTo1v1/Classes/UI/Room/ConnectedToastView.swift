@@ -40,7 +40,7 @@ class ConnectedToastView: UIView {
         canvasView.addSubview(connectedView)
         
         UIView.animate(withDuration: 0.3) {
-            connectedView.aui_top = 0
+            connectedView.aui_top = UIDevice.current.aui_SafeDistanceTop
         } completion: { success in
             UIView.animate(withDuration: 0.3, delay: 1) {
                 connectedView.aui_top = -80
