@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams
 import android.widget.Toast
 import com.bumptech.glide.Glide
@@ -45,6 +44,7 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
 
         timerHandler = Handler(Looper.getMainLooper())
         updateTime()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     override fun onBackPressed() {
@@ -188,6 +188,7 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
         timerHandler?.removeCallbacksAndMessages(null)
         timerHandler = null
         finish()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     override fun onCallStateChanged(

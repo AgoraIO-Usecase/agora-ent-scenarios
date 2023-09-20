@@ -77,7 +77,7 @@
         android:textSize="10dp"
         android:text="000000"
         app:layout_constraintBottom_toBottomOf="@+id/cvRoomInfo"
-        app:layout_constraintStart_toStartOf="@+id/tvRoomName"
+        app:layout_constraintStart_toStartOf="@+id/tvRoomTitle"
         />
     
     <androidx.appcompat.widget.AppCompatImageView
