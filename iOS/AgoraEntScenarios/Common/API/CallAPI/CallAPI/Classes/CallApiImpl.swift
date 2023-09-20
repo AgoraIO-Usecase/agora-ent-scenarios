@@ -214,7 +214,7 @@ extension CallApiImpl {
                               eventReason: String = "",
                               elapsed: Int = 0,
                               eventInfo: [String: Any] = [:]) {
-        callPrint("_notifyState  state: \(state.rawValue), stateReason: '\(stateReason.rawValue)', eventReason: \(eventReason), elapsed: \(elapsed) ms, eventInfo: \(eventInfo)")
+        callPrint("_notifyState  state: \(state.rawValue), stateReason: '\(stateReason.rawValue)', eventReason: \(eventReason), elapsed: \(elapsed) ms")
         
         _processState(prevState: self.state,
                       state: state,
@@ -418,7 +418,7 @@ extension CallApiImpl {
                 return
             }
             
-            callWarningPrint("mismatch channel, leave first! tqarget: \(roomId) current: \(connection.channelId)")
+            callWarningPrint("mismatch channel, leave first! target: \(roomId) current: \(connection.channelId)")
             config.rtcEngine.leaveChannelEx(connection)
             rtcConnection = nil
         }
@@ -576,7 +576,7 @@ extension CallApiImpl {
                                           value: Int) {
         guard let config = config, isChannelJoined, let rtcConnection = rtcConnection else { return }
         let ret = config.rtcEngine.sendCustomReportMessageEx(msgId, category: category, event: event, label: label, value: value, connection: rtcConnection)
-        callPrint("sendCustomReportMessage msgId: \(msgId) category: \(category) event: \(event) : \(ret)")
+//        callPrint("sendCustomReportMessage msgId: \(msgId) category: \(category) event: \(event) : \(ret)")
     }
 }
 
@@ -850,7 +850,11 @@ extension CallApiImpl: CallApiProtocol {
         callingRoomId = roomId
         callingUserId = remoteUserId
         //不等响应即加入频道，加快join速度，失败则leave
-        _joinRTCAndNotify(roomId: fromRoomId, token: tokenConfig?.rtcToken ?? "")
+        _joinRTCAndNotify(roomId: fromRoomId, token: tokenConfig?.rtcToken ?? "") {[weak self] error in
+            guard let error = error else {return}
+            self?.cancelCall(completion: { err in
+            })
+        }
     }
     
     //取消呼叫
@@ -904,7 +908,11 @@ extension CallApiImpl: CallApiProtocol {
         
         callTs = _getNtpTimeInMs()
         //不等响应即加入频道，加快join速度，失败则leave
-        _joinRTCAndNotify(roomId: roomId, token: rtcToken)
+        _joinRTCAndNotify(roomId: roomId, token: rtcToken) {[weak self] error in
+            guard let error = error else {return}
+            self?.cancelCall(completion: { err in
+            })
+        }
     }
     
     //拒绝
@@ -956,7 +964,6 @@ extension CallApiImpl: AgoraRtmClientDelegate {
         //TODO: compatible other message version
         guard kCurrentMessageVersion == messageVersion else { return }
         
-        callPrint("on event message: \(dic)")
         let origMsgTs = recvMessageTsMap[userId] ?? 0
         //对应用户的消息拦截老的消息
         if origMsgTs > msgTs {
@@ -1025,8 +1032,8 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
         callWarningPrint("didOccurError: \(errorCode.rawValue)")
-        joinRtcCompletion?(NSError(domain: "join RTC fail", code: errorCode.rawValue))
-        joinRtcCompletion = nil
+//        joinRtcCompletion?(NSError(domain: "join RTC fail", code: errorCode.rawValue))
+//        joinRtcCompletion = nil
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit,
