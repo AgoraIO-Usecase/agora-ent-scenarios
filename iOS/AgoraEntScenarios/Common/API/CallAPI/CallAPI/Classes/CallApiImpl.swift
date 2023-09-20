@@ -851,6 +851,7 @@ extension CallApiImpl: CallApiProtocol {
         callingUserId = remoteUserId
         //不等响应即加入频道，加快join速度，失败则leave
         _joinRTCAndNotify(roomId: fromRoomId, token: tokenConfig?.rtcToken ?? "") {[weak self] error in
+            guard let error = error else {return}
             self?.cancelCall(completion: { err in
             })
         }
@@ -908,6 +909,7 @@ extension CallApiImpl: CallApiProtocol {
         callTs = _getNtpTimeInMs()
         //不等响应即加入频道，加快join速度，失败则leave
         _joinRTCAndNotify(roomId: roomId, token: rtcToken) {[weak self] error in
+            guard let error = error else {return}
             self?.cancelCall(completion: { err in
             })
         }
@@ -1031,8 +1033,8 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
         callWarningPrint("didOccurError: \(errorCode.rawValue)")
-        joinRtcCompletion?(NSError(domain: "join RTC fail", code: errorCode.rawValue))
-        joinRtcCompletion = nil
+//        joinRtcCompletion?(NSError(domain: "join RTC fail", code: errorCode.rawValue))
+//        joinRtcCompletion = nil
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit,
