@@ -69,15 +69,28 @@ class RoomListViewController: UIViewController {
             self?._call(room: roomInfo)
         }
         listView.tapClosure = { [weak self] roomInfo in
-            guard let roomInfo = roomInfo else {return}
-            self?.service.joinRoom(roomInfo: roomInfo, completion: { err in
+            guard let roomInfo = roomInfo, let self = self else {return}
+            var success1: Bool = false
+            var success2: Bool = false
+            let group = DispatchGroup()
+            group.enter()
+            self.renewTokens { success in
+                success1 = success
+                group.leave()
+            }
+            group.enter()
+            self.service.joinRoom(roomInfo: roomInfo, completion: { err in
+                success2 = err == nil ? true : false
+                group.leave()
                 if let error = err {
                     AUIToast.show(text: error.localizedDescription)
                     return
                 }
-                self?._showBroadcasterVC(roomInfo: roomInfo)
             })
-            
+            group.notify(queue: DispatchQueue.main) {[weak self] in
+                guard success1, success2 else {return}
+                self?._showBroadcasterVC(roomInfo: roomInfo)
+            }
         }
         return listView
     }()
@@ -173,9 +186,11 @@ extension RoomListViewController {
     private func renewTokens(completion: ((Bool)->Void)?) {
         guard let userInfo = userInfo else {
             assert(false, "userInfo == nil")
+            debugError("renewTokens fail,userInfo == nil")
             completion?(false)
             return
         }
+        debugInfo("renewTokens")
         NetworkManager.shared.generateTokens(appId: showTo1v1AppId!,
                                              appCertificate: showTo1v1AppCertificate!,
                                              channelName: ""/*tokenConfig.roomId*/,
@@ -185,11 +200,13 @@ extension RoomListViewController {
             guard let self = self else {return}
             guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue],
                   let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
+                debugInfo("renewTokens fail")
                 completion?(false)
                 return
             }
             self.tokenConfig.rtcToken = rtcToken
             self.tokenConfig.rtmToken = rtmToken
+            debugInfo("renewTokens success")
             completion?(true)
         }
     }
@@ -200,7 +217,8 @@ extension RoomListViewController {
         }
         
         renewTokens {[weak self] flag in
-            self?._reinitCallerAPI()
+            self?._reinitCallerAPI(completion: { err in
+            })
         }
         
         let config = VideoLoaderConfig()
@@ -212,7 +230,7 @@ extension RoomListViewController {
         callVC.rtcEngine = rtcEngine
     }
     
-    private func _reinitCallerAPI() {
+    private func _reinitCallerAPI(completion: @escaping ((Error?)->())) {
         tokenConfig.roomId = userInfo!.get1V1ChannelId()
         callApi.deinitialize {
         }
@@ -231,10 +249,14 @@ extension RoomListViewController {
         
         callApi.addListener(listener: self)
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
+            if let err = error {
+                showTo1v1Error("_reinitCallerAPI initialize api fail: \(err.localizedDescription)")
+            }
+            completion(error)
         }
     }
     
-    private func _reinitCalleeAPI(room: ShowTo1v1RoomInfo) {
+    private func _reinitCalleeAPI(room: ShowTo1v1RoomInfo, completion: @escaping ((Error?)->())) {
         tokenConfig.roomId = room.roomId
         callApi.deinitialize {
         }
@@ -249,6 +271,10 @@ extension RoomListViewController {
         config.remoteView = callVC.remoteCanvasView.canvasView
         
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
+            if let err = error {
+                showTo1v1Error("_reinitCalleeAPI initialize api fail: \(err.localizedDescription)")
+            }
+            completion(error)
         }
         callApi.addListener(listener: self)
         
@@ -327,13 +353,27 @@ extension RoomListViewController {
         guard let userInfo = userInfo else {return}
         createRoomDialog =
         CreateRoomDialog.show(user: userInfo, createClosure: {[weak self] roomName in
+            guard let self = self else {return}
             if roomName.count == 0 {
                 AUIToast.show(text: "create_room_name_empty_tips".showTo1v1Localization())
                 return
             }
-            self?.createRoomDialog?.isUserInteractionEnabled = false
-            self?.createRoomDialog?.isLoading = true
-            self?.service.createRoom(roomName: roomName) { roomInfo, error in
+            self.createRoomDialog?.isUserInteractionEnabled = false
+            self.createRoomDialog?.isLoading = true
+            
+            var success1: Bool = false
+            var createRoomInfo: ShowTo1v1RoomInfo? = nil
+            let group = DispatchGroup()
+            group.enter()
+            self.renewTokens { success in
+                success1 = success
+                group.leave()
+            }
+            group.enter()
+            self.service.createRoom(roomName: roomName) {[weak self] roomInfo, error in
+                defer {
+                    group.leave()
+                }
                 guard let self = self else {return}
                 self.createRoomDialog?.isUserInteractionEnabled = true
                 self.createRoomDialog?.isLoading = false
@@ -341,10 +381,20 @@ extension RoomListViewController {
                     AUIToast.show(text: error.localizedDescription)
                     return
                 }
-                guard let roomInfo = roomInfo else {return}
-                self._showBroadcasterVC(roomInfo: roomInfo)
+                createRoomInfo = roomInfo
                 CreateRoomDialog.hidden()
             }
+            group.notify(queue: DispatchQueue.main) {[weak self] in
+                guard let roomInfo = createRoomInfo else {return}
+                guard success1 else {
+                    self?.service.leaveRoom(roomInfo: roomInfo, completion: { err in
+                    })
+                    return
+                }
+                self?._showBroadcasterVC(roomInfo: roomInfo)
+            }
+            
+            
         }, randomClosure: {
             let roomNameIdx = Int(arc4random()) % randomRoomName.count
             let roomName = randomRoomName[roomNameIdx]
@@ -354,9 +404,16 @@ extension RoomListViewController {
     
     private func _showBroadcasterVC(roomInfo: ShowTo1v1RoomInfo) {
         if roomInfo.userId == userInfo?.userId {
-            self._reinitCalleeAPI(room: roomInfo)
-        } else {
-//            self._reinitCallerAPI(room: roomInfo)
+            self._reinitCalleeAPI(room: roomInfo) {[weak self] err in
+                if let _ = err {
+                    //失败默认重试一次
+                    self?.renewTokens(completion: { success in
+                        guard success else {return}
+                        self?._reinitCalleeAPI(room: roomInfo, completion: { err in
+                        })
+                    })
+                }
+            }
         }
         
         let vc = BroadcasterViewController()
@@ -370,7 +427,16 @@ extension RoomListViewController {
             self?.service.subscribeListener(listener: nil)
             self?.service.leaveRoom(roomInfo: roomInfo, completion: { err in
             })
-            self?._reinitCallerAPI()
+            self?._reinitCallerAPI { err in
+                if let _ = err {
+                    //失败默认重试一次
+                    self?.renewTokens(completion: { success in
+                        guard success else {return}
+                        self?._reinitCalleeAPI(room: roomInfo, completion: { err in
+                        })
+                    })
+                }
+            }
         }
         service.subscribeListener(listener: vc)
         self.navigationController?.pushViewController(vc, animated: false)
