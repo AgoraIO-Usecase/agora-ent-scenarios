@@ -13,7 +13,7 @@ import io.agora.scene.base.component.ISingleCallback
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.cantata.databinding.CantataActivityRoomListBinding
 import io.agora.scene.cantata.databinding.CantataItemRoomListBinding
-import io.agora.scene.cantata.service.GrandChorusServiceProtocol
+import io.agora.scene.cantata.service.CantataServiceProtocol
 import io.agora.scene.cantata.service.JoinRoomOutputModel
 import io.agora.scene.cantata.service.RoomListModel
 import io.agora.scene.cantata.ui.holder.RoomHolder
@@ -46,7 +46,7 @@ class RoomListActivity : BaseViewBindingActivity<CantataActivityRoomListBinding>
 
     override fun onDestroy() {
         super.onDestroy()
-        GrandChorusServiceProtocol.getImplInstance().reset()
+        CantataServiceProtocol.getImplInstance().reset()
     }
 
 

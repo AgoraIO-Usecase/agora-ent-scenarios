@@ -38,6 +38,7 @@ import io.agora.scene.cantata.databinding.CantataLayoutLrcControlViewBinding
 import io.agora.scene.cantata.databinding.CantataLayoutLrcPrepareBinding
 import io.agora.scene.cantata.ktvapi.ILrcView
 import io.agora.scene.cantata.service.RoomSelSongModel
+import io.agora.scene.cantata.ui.widget.OnClickJackingListener
 import io.agora.scene.widget.basic.OutlineSpan
 import io.agora.scene.widget.utils.UiUtils
 import java.io.File
@@ -46,7 +47,7 @@ import java.io.File
  * 歌词控制View
  */
 class LrcControlView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
-    FrameLayout(context, attrs, defStyleAttr), View.OnClickListener, ILrcView {
+    FrameLayout(context, attrs, defStyleAttr), ILrcView {
     private val mBinding: CantataLayoutLrcControlViewBinding by lazy {
         CantataLayoutLrcControlViewBinding.inflate(LayoutInflater.from(context), this, true)
     }
@@ -55,7 +56,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         CantataLayoutLrcPrepareBinding.bind(mBinding.root)
     }
     var karaokeView: KaraokeView? = null
-    private var cumulativeScoreInPercentage = 0
+    var cumulativeScoreInPercentage = 0
     private var mComboControl: ComboControl? = null
     val lyricsView: LyricsView
         get() = mBinding.ilActive.lyricsView
@@ -83,17 +84,17 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
 
     private var chorusScore = 0
     private fun initListener() {
-        mBinding.ilActive.switchOriginal.setOnClickListener(this)
-        mBinding.ilActive.ivMusicMenu.setOnClickListener(this)
-        mBinding.ilActive.ivMusicStart.setOnClickListener(this)
-        mBinding.ilActive.ivChangeSong.setOnClickListener(this)
-        mBinding.ilActive.ivSkipPostludeSkip.setOnClickListener(this)
-        mBinding.ilActive.ivSkipPreludeSkip.setOnClickListener(this)
-        mBinding.ilActive.ivSkipPostludeCancel.setOnClickListener(this)
-        mBinding.ilActive.ivSkipPreludeCancel.setOnClickListener(this)
-        mBinding.ilActive.ivJoinChorusBtn.setOnClickListener(this)
-        mBinding.ilActive.ivLeaveChorus.setOnClickListener(this)
-        mBinding.ilActive.downloadLrcFailedBtn.setOnClickListener(this)
+        mBinding.ilActive.switchOriginal.setOnClickListener(onClickJackingListener)
+        mBinding.ilActive.ivMusicMenu.setOnClickListener(onClickJackingListener)
+        mBinding.ilActive.ivMusicStart.setOnClickListener(onClickJackingListener)
+        mBinding.ilActive.ivChangeSong.setOnClickListener(onClickJackingListener)
+        mBinding.ilActive.ivSkipPostludeSkip.setOnClickListener(onClickJackingListener)
+        mBinding.ilActive.ivSkipPreludeSkip.setOnClickListener(onClickJackingListener)
+        mBinding.ilActive.ivSkipPostludeCancel.setOnClickListener(onClickJackingListener)
+        mBinding.ilActive.ivSkipPreludeCancel.setOnClickListener(onClickJackingListener)
+        mBinding.ilActive.ivJoinChorusBtn.setOnClickListener(onClickJackingListener)
+        mBinding.ilActive.ivLeaveChorus.setOnClickListener(onClickJackingListener)
+        mBinding.ilActive.downloadLrcFailedBtn.setOnClickListener(onClickJackingListener)
         karaokeView?.setKaraokeEvent(object : KaraokeEvent {
             override fun onDragTo(view: KaraokeView, position: Long) {
                 mOnKaraokeActionListener?.onDragTo(position)
@@ -263,6 +264,11 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
             String.format(resources.getString(R.string.cantata_score_formatter), "0")
     }
 
+    fun setCountDown(time: Int) {
+
+    }
+
+
     private var backgroundResId = R.drawable.cantata_mv_bg
     fun setLrcViewBackground(@DrawableRes resId: Int) {
         backgroundResId = resId
@@ -382,171 +388,173 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         }
     }
 
-    override fun onClick(v: View) {
-        if (v === mBinding.ilActive.switchOriginal) {
-            mOnKaraokeActionListener?.onSwitchOriginalClick()
-            val withOriginal = mBinding.ilActive.switchOriginal.isChecked
-            mBinding.ilActive.switchOriginal.setIconResource(if (withOriginal) R.mipmap.ic_play_original_on else R.mipmap.ic_play_original_off)
-        } else if (v === mBinding.ilActive.ivMusicMenu) {
-            mOnKaraokeActionListener?.onMenuClick()
-        } else if (v === mBinding.ilActive.ivMusicStart) {
-            mOnKaraokeActionListener?.onPlayClick()
-        } else if (v === mBinding.ilActive.ivChangeSong) {
-            mOnKaraokeActionListener?.onChangeMusicClick()
-        } else if (v === mBinding.ilActive.ivSkipPreludeSkip) {
-            mOnKaraokeActionListener?.onSkipPreludeClick()
-            mBinding.ilActive.ivSkipPrelude.visibility = INVISIBLE
-        } else if (v === mBinding.ilActive.ivSkipPostludeSkip) {
-            mOnKaraokeActionListener?.onSkipPostludeClick()
-        } else if (v === mBinding.ilActive.ivSkipPreludeCancel) {
-            mBinding.ilActive.ivSkipPrelude.visibility = INVISIBLE
-        } else if (v === mBinding.ilActive.ivSkipPostludeCancel) {
-            mBinding.ilActive.ivSkipPostlude.visibility = INVISIBLE
-        } else if (v === mBinding.ilActive.ivJoinChorusBtn) {
-            if (UiUtils.isFastClick(2000)) {
-                ToastUtils.showToast(R.string.cantata_too_fast)
-                return
-            }
-            mOnKaraokeActionListener?.onJoinChorus()
-            mBinding.ilActive.ivJoinChorusLoading.visibility = VISIBLE
-            if (isMineOwner) {
-                mBinding.ilActive.ivChangeSong.visibility = INVISIBLE
-            }
-        } else if (v === mBinding.ilActive.ivLeaveChorus) {
-            mOnKaraokeActionListener?.onLeaveChorus()
-        } else if (v === mBinding.ilActive.downloadLrcFailedBtn) {
-            mBinding.ilActive.downloadLrcFailedView.visibility = INVISIBLE
-            mBinding.ilActive.downloadLrcFailedBtn.visibility = INVISIBLE
-            if (lrcUrl == null) {
-                mOnKaraokeActionListener!!.onReGetLrcUrl()
-            } else {
-                downloadAndSetLrcData()
-            }
-        }
-    }
+    private val onClickJackingListener = object : OnClickJackingListener() {
 
-    fun setSwitchOriginalChecked(checked: Boolean) {
-        mBinding.ilActive.switchOriginal.isChecked = checked
-    }
-
-    // ------------------ ILrcView ------------------
-    override fun onUpdatePitch(pitch: Float) {
-        karaokeView?.setPitch(pitch)
-    }
-
-    override fun onUpdateProgress(progress: Long) {
-        if (karaokeView?.lyricsData == null) return
-        if (mRole == Role.Singer) {
-            if (progress >= karaokeView!!.lyricsData.startOfVerse - 2000) {
+        override fun onClickJacking(v: View) {
+            if (v === mBinding.ilActive.switchOriginal) {
+                mOnKaraokeActionListener?.onSwitchOriginalClick()
+                val withOriginal = mBinding.ilActive.switchOriginal.isChecked
+                mBinding.ilActive.switchOriginal.setIconResource(if (withOriginal) R.mipmap.ic_play_original_on else R.mipmap.ic_play_original_off)
+            } else if (v === mBinding.ilActive.ivMusicMenu) {
+                mOnKaraokeActionListener?.onMenuClick()
+            } else if (v === mBinding.ilActive.ivMusicStart) {
+                mOnKaraokeActionListener?.onPlayClick()
+            } else if (v === mBinding.ilActive.ivChangeSong) {
+                mOnKaraokeActionListener?.onChangeMusicClick()
+            } else if (v === mBinding.ilActive.ivSkipPreludeSkip) {
+                mOnKaraokeActionListener?.onSkipPreludeClick()
                 mBinding.ilActive.ivSkipPrelude.visibility = INVISIBLE
-            }
-            if (progress >= karaokeView!!.lyricsData.duration) {
-                mBinding.ilActive.ivSkipPostlude.visibility = VISIBLE
-            } else {
+            } else if (v === mBinding.ilActive.ivSkipPostludeSkip) {
+                mOnKaraokeActionListener?.onSkipPostludeClick()
+            } else if (v === mBinding.ilActive.ivSkipPreludeCancel) {
+                mBinding.ilActive.ivSkipPrelude.visibility = INVISIBLE
+            } else if (v === mBinding.ilActive.ivSkipPostludeCancel) {
                 mBinding.ilActive.ivSkipPostlude.visibility = INVISIBLE
+            } else if (v === mBinding.ilActive.ivJoinChorusBtn) {
+                if (UiUtils.isFastClick(2000)) {
+                    ToastUtils.showToast(R.string.cantata_too_fast)
+                    return
+                }
+                mOnKaraokeActionListener?.onJoinChorus()
+                mBinding.ilActive.ivJoinChorusLoading.visibility = VISIBLE
+                if (isMineOwner) {
+                    mBinding.ilActive.ivChangeSong.visibility = INVISIBLE
+                }
+            } else if (v === mBinding.ilActive.ivLeaveChorus) {
+                mOnKaraokeActionListener?.onLeaveChorus()
+            } else if (v === mBinding.ilActive.downloadLrcFailedBtn) {
+                mBinding.ilActive.downloadLrcFailedView.visibility = INVISIBLE
+                mBinding.ilActive.downloadLrcFailedBtn.visibility = INVISIBLE
+                if (lrcUrl == null) {
+                    mOnKaraokeActionListener!!.onReGetLrcUrl()
+                } else {
+                    downloadAndSetLrcData()
+                }
             }
+        }}
+
+        fun setSwitchOriginalChecked(checked: Boolean) {
+            mBinding.ilActive.switchOriginal.isChecked = checked
         }
-        karaokeView!!.setProgress(progress)
-    }
 
-    private var lrcUrl: String? = null
+        // ------------------ ILrcView ------------------
+        override fun onUpdatePitch(pitch: Float) {
+            karaokeView?.setPitch(pitch)
+        }
+
+        override fun onUpdateProgress(progress: Long) {
+            if (karaokeView?.lyricsData == null) return
+            if (mRole == Role.Singer) {
+                if (progress >= karaokeView!!.lyricsData.startOfVerse - 2000) {
+                    mBinding.ilActive.ivSkipPrelude.visibility = INVISIBLE
+                }
+                if (progress >= karaokeView!!.lyricsData.duration) {
+                    mBinding.ilActive.ivSkipPostlude.visibility = VISIBLE
+                } else {
+                    mBinding.ilActive.ivSkipPostlude.visibility = INVISIBLE
+                }
+            }
+            karaokeView!!.setProgress(progress)
+        }
+
+        private var lrcUrl: String? = null
 
 
-    override fun onDownloadLrcData(url: String?) {
-        lrcUrl = url
-        downloadAndSetLrcData()
-    }
+        override fun onDownloadLrcData(url: String?) {
+            lrcUrl = url
+            downloadAndSetLrcData()
+        }
 
-    private fun downloadAndSetLrcData() {
-        DownloadUtils.getInstance().download(context, lrcUrl, { file: File ->
-            if (file.name.endsWith(".zip")) {
-                ZipUtils.unzipOnlyPlainXmlFilesAsync(file.absolutePath,
-                    file.absolutePath.replace(".zip", ""),
-                    object : UnZipCallback {
-                        override fun onFileUnZipped(unZipFilePaths: List<String>) {
-                            var xmlPath = ""
-                            for (path in unZipFilePaths) {
-                                if (path.endsWith(".xml")) {
-                                    xmlPath = path
-                                    break
+        private fun downloadAndSetLrcData() {
+            DownloadUtils.getInstance().download(context, lrcUrl, { file: File ->
+                if (file.name.endsWith(".zip")) {
+                    ZipUtils.unzipOnlyPlainXmlFilesAsync(file.absolutePath,
+                        file.absolutePath.replace(".zip", ""),
+                        object : UnZipCallback {
+                            override fun onFileUnZipped(unZipFilePaths: List<String>) {
+                                var xmlPath = ""
+                                for (path in unZipFilePaths) {
+                                    if (path.endsWith(".xml")) {
+                                        xmlPath = path
+                                        break
+                                    }
+                                }
+                                if (TextUtils.isEmpty(xmlPath)) {
+                                    ToastUtils.showToast("The xml file not exist!")
+                                    mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
+                                    mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
+                                    return
+                                }
+                                val xmlFile = File(xmlPath)
+                                val lyricsModel = KaraokeView.parseLyricsData(xmlFile)
+                                if (lyricsModel == null) {
+                                    ToastUtils.showToast("Unexpected content from $xmlPath")
+                                    mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
+                                    mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
+                                    return
+                                }
+                                if (karaokeView != null) {
+                                    mBinding.ilActive.downloadLrcFailedView.visibility = INVISIBLE
+                                    karaokeView?.lyricsData = lyricsModel
                                 }
                             }
-                            if (TextUtils.isEmpty(xmlPath)) {
-                                ToastUtils.showToast("The xml file not exist!")
-                                mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
-                                mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
-                                return
-                            }
-                            val xmlFile = File(xmlPath)
-                            val lyricsModel = KaraokeView.parseLyricsData(xmlFile)
-                            if (lyricsModel == null) {
-                                ToastUtils.showToast("Unexpected content from $xmlPath")
-                                mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
-                                mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
-                                return
-                            }
-                            if (karaokeView != null) {
-                                mBinding.ilActive.downloadLrcFailedView.visibility = INVISIBLE
-                                karaokeView?.lyricsData = lyricsModel
-                            }
-                        }
 
-                        override fun onError(e: Exception) {
-                            mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
-                            mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
-                            ToastUtils.showToast(e.message)
-                        }
-                    })
-            } else {
-                val lyricsModel = KaraokeView.parseLyricsData(file)
-                if (lyricsModel == null) {
-                    ToastUtils.showToast("Unexpected content from $file")
-                    mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
-                    mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
-                    return@download
+                            override fun onError(e: Exception) {
+                                mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
+                                mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
+                                ToastUtils.showToast(e.message)
+                            }
+                        })
+                } else {
+                    val lyricsModel = KaraokeView.parseLyricsData(file)
+                    if (lyricsModel == null) {
+                        ToastUtils.showToast("Unexpected content from $file")
+                        mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
+                        mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
+                        return@download
+                    }
+                    if (karaokeView != null) {
+                        mBinding.ilActive.downloadLrcFailedView.visibility = INVISIBLE
+                        mBinding.ilActive.downloadLrcFailedBtn.visibility = INVISIBLE
+                        karaokeView!!.lyricsData = lyricsModel
+                    }
                 }
-                if (karaokeView != null) {
-                    mBinding.ilActive.downloadLrcFailedView.visibility = INVISIBLE
-                    mBinding.ilActive.downloadLrcFailedBtn.visibility = INVISIBLE
-                    karaokeView!!.lyricsData = lyricsModel
-                }
+            }) { exception: Exception ->
+                ToastUtils.showToast(exception.message)
+                mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
+                mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
             }
-        }) { exception: Exception ->
-            ToastUtils.showToast(exception.message)
+        }
+
+        fun onNoLrc() {
+            lrcUrl = null
             mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
             mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
         }
-    }
 
-    fun onNoLrc() {
-        lrcUrl = null
-        mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
-        mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
-    }
+        fun onReceiveSingleLineScore(score: Int, index: Int, cumulativeScore: Int, total: Int) {
+            if (mRole == Role.Listener) {
+                updateScore(
+                    score.toDouble(), cumulativeScore.toDouble(),
+                    /** Workaround(Hai_Guo) */
+                    total.toDouble()
+                )
+            }
+        }
 
-    fun onReceiveSingleLineScore(score: Int, index: Int, cumulativeScore: Int, total: Int) {
-        if (mRole == Role.Listener) {
-            updateScore(
-                score.toDouble(), cumulativeScore.toDouble(),
-                /** Workaround(Hai_Guo) */
-                total.toDouble()
-            )
+        interface OnKaraokeEventListener {
+            fun onSwitchOriginalClick() {}
+            fun onMenuClick() {}
+            fun onPlayClick() {}
+            fun onChangeMusicClick() {}
+            fun onStartSing() {}
+            fun onJoinChorus() {}
+            fun onLeaveChorus() {}
+            fun onDragTo(position: Long) {}
+            fun onRefPitchUpdate(refPitch: Float, numberOfRefPitches: Int) {}
+            fun onLineFinished(line: LyricsLineModel?, score: Int, cumulativeScore: Int, index: Int, total: Int) {}
+            fun onSkipPreludeClick() {}
+            fun onSkipPostludeClick() {}
+            fun onReGetLrcUrl() {}
         }
     }
-
-    interface OnKaraokeEventListener {
-        fun onSwitchOriginalClick() {}
-        fun onMenuClick() {}
-        fun onPlayClick() {}
-        fun onChangeMusicClick() {}
-        fun onStartSing() {}
-        fun onJoinChorus() {}
-        fun onLeaveChorus() {}
-        fun onDragTo(position: Long) {}
-        fun onRefPitchUpdate(refPitch: Float, numberOfRefPitches: Int) {}
-        fun onLineFinished(line: LyricsLineModel?, score: Int, cumulativeScore: Int, index: Int, total: Int) {}
-        fun onSkipPreludeClick() {}
-        fun onSkipPostludeClick() {}
-        fun onReGetLrcUrl() {}
-    }
-}

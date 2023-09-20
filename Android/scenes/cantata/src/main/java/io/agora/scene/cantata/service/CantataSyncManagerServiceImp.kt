@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import io.agora.scene.cantata.GrandChorusLogger
+import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.manager.UserManager
@@ -18,10 +18,10 @@ import kotlin.random.Random
  *
  *
  */
-class GrandChorusSyncManagerServiceImp(
+class CantataSyncManagerServiceImp(
     private val context: Context,
     private val errorHandler: ((Exception?) -> Unit)?
-) : GrandChorusServiceProtocol {
+) : CantataServiceProtocol {
     private val TAG = "KTV_Service_LOG"
     private val kSceneId = "scene_grand_chorus_3.8.0"
     private val kCollectionIdChooseSong = "choose_song"
@@ -41,13 +41,13 @@ class GrandChorusSyncManagerServiceImp(
     private var mSceneReference: SceneReference? = null
 
     // subscribers
-    private var roomStatusSubscriber: ((GrandChorusServiceProtocol.KTVSubscribe, RoomListModel?) -> Unit)? =
+    private var roomStatusSubscriber: ((CantataServiceProtocol.KTVSubscribe, RoomListModel?) -> Unit)? =
         null
     private var roomUserCountSubscriber: ((Int) -> Unit)? =
         null
-    private var seatListChangeSubscriber: ((GrandChorusServiceProtocol.KTVSubscribe, RoomSeatModel?) -> Unit)? =
+    private var seatListChangeSubscriber: ((CantataServiceProtocol.KTVSubscribe, RoomSeatModel?) -> Unit)? =
         null
-    private var chooseSongSubscriber: ((GrandChorusServiceProtocol.KTVSubscribe, RoomSelSongModel?) -> Unit)? =
+    private var chooseSongSubscriber: ((CantataServiceProtocol.KTVSubscribe, RoomSelSongModel?) -> Unit)? =
         null
     private var onReconnectSubscriber: (() -> Unit)? = null
     private var roomTimeUpSubscriber: (() -> Unit)? = null
@@ -72,7 +72,7 @@ class GrandChorusSyncManagerServiceImp(
     private val ROOM_AVAILABLE_DURATION : Long = 20 * 60 * 1000 // 20min
     private val timerRoomEndRun = Runnable {
         runOnMainThread {
-            GrandChorusLogger.d(TAG, "time up exit room!")
+            CantataLogger.d(TAG, "time up exit room!")
             roomTimeUpSubscriber?.invoke()
         }
     }
@@ -246,7 +246,7 @@ class GrandChorusSyncManagerServiceImp(
                                             // 定时删除房间
                                             val expireLeftTime =
                                                 ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - cacheRoom.createdAt.toLong())
-                                            GrandChorusLogger.d(TAG, "expireLeftTime: $expireLeftTime")
+                                            CantataLogger.d(TAG, "expireLeftTime: $expireLeftTime")
                                             mainHandler.postDelayed(timerRoomEndRun, expireLeftTime)
                                         },
                                         {
@@ -387,7 +387,7 @@ class GrandChorusSyncManagerServiceImp(
             })
     }
 
-    override fun subscribeRoomStatus(changedBlock: (GrandChorusServiceProtocol.KTVSubscribe, RoomListModel?) -> Unit) {
+    override fun subscribeRoomStatus(changedBlock: (CantataServiceProtocol.KTVSubscribe, RoomListModel?) -> Unit) {
         roomStatusSubscriber = changedBlock
     }
 
@@ -504,7 +504,7 @@ class GrandChorusSyncManagerServiceImp(
         }
     }
 
-    override fun subscribeSeatList(changedBlock: (GrandChorusServiceProtocol.KTVSubscribe, RoomSeatModel?) -> Unit) {
+    override fun subscribeSeatList(changedBlock: (CantataServiceProtocol.KTVSubscribe, RoomSeatModel?) -> Unit) {
         seatListChangeSubscriber = changedBlock
     }
 
@@ -721,7 +721,7 @@ class GrandChorusSyncManagerServiceImp(
         }
     }
 
-    override fun subscribeChooseSong(changedBlock: (GrandChorusServiceProtocol.KTVSubscribe, RoomSelSongModel?) -> Unit) {
+    override fun subscribeChooseSong(changedBlock: (CantataServiceProtocol.KTVSubscribe, RoomSelSongModel?) -> Unit) {
         chooseSongSubscriber = changedBlock
     }
 
@@ -783,7 +783,7 @@ class GrandChorusSyncManagerServiceImp(
                             if (roomInfo == null) {
                                 runOnMainThread {
                                     roomStatusSubscriber?.invoke(
-                                        GrandChorusServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                                        CantataServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
                                         oldRoomInfo
                                     )
                                 }
@@ -991,7 +991,7 @@ class GrandChorusSyncManagerServiceImp(
                     outList.add(seat)
                     runOnMainThread {
                         seatListChangeSubscriber?.invoke(
-                            GrandChorusServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                            CantataServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
                             seat
                         )
                     }
@@ -1020,7 +1020,7 @@ class GrandChorusSyncManagerServiceImp(
                     outList.add(targetSeatInfo)
                     runOnMainThread{
                         seatListChangeSubscriber?.invoke(
-                            GrandChorusServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                            CantataServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
                             targetSeatInfo
                         )
                         completion.invoke(null, outList)
@@ -1120,7 +1120,7 @@ class GrandChorusSyncManagerServiceImp(
                     seatMap[obj.seatIndex.toString()] = obj
                     runOnMainThread{
                         seatListChangeSubscriber?.invoke(
-                            GrandChorusServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                            CantataServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
                             obj
                         )
                     }
@@ -1128,7 +1128,7 @@ class GrandChorusSyncManagerServiceImp(
                     seatMap[obj.seatIndex.toString()] = obj
                     runOnMainThread{
                         seatListChangeSubscriber?.invoke(
-                            GrandChorusServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                            CantataServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
                             obj
                         )
                     }
@@ -1144,7 +1144,7 @@ class GrandChorusSyncManagerServiceImp(
                             seatMap.remove(entry.key)
                             runOnMainThread{
                                 seatListChangeSubscriber?.invoke(
-                                    GrandChorusServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                                    CantataServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
                                     seat
                                 )
                             }
@@ -1303,7 +1303,7 @@ class GrandChorusSyncManagerServiceImp(
             override fun onUpdated(item: IObject?) {
                 val songInfo = item?.toObject(RoomSelSongModel::class.java) ?: return
                 chooseSongSubscriber?.invoke(
-                    GrandChorusServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                    CantataServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
                     songInfo
                 )
             }
@@ -1311,7 +1311,7 @@ class GrandChorusSyncManagerServiceImp(
             override fun onDeleted(item: IObject?) {
                 //item ?: return
                 chooseSongSubscriber?.invoke(
-                    GrandChorusServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                    CantataServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
                     null
                 )
             }
@@ -1336,7 +1336,7 @@ class GrandChorusSyncManagerServiceImp(
                 roomMap[roomInfo.roomNo] = roomInfo
                 runOnMainThread {
                     roomStatusSubscriber?.invoke(
-                        GrandChorusServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                        CantataServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
                         roomInfo
                     )
                 }
@@ -1352,7 +1352,7 @@ class GrandChorusSyncManagerServiceImp(
                 resetCacheInfo(true)
                 runOnMainThread {
                     roomStatusSubscriber?.invoke(
-                        GrandChorusServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                        CantataServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
                         roomInfo
                     )
                 }

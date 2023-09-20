@@ -2,7 +2,7 @@ package io.agora.scene.cantata
 
 import io.agora.scene.base.EntLogger
 
-object GrandChorusLogger {
+object CantataLogger {
 
     private val entLogger = EntLogger(EntLogger.Config("KTV"))
 

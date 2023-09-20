@@ -1,9 +1,9 @@
 package io.agora.scene.cantata.service
 
-import io.agora.scene.cantata.GrandChorusLogger
+import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.base.component.AgoraApplication
 
-interface GrandChorusServiceProtocol {
+interface CantataServiceProtocol {
 
     enum class KTVSubscribe {
         KTVSubscribeCreated,      //创建
@@ -14,12 +14,12 @@ interface GrandChorusServiceProtocol {
     companion object {
         private val instance by lazy {
             // KTVServiceImp()
-            GrandChorusSyncManagerServiceImp(AgoraApplication.the()) { error ->
-                error?.message?.let { GrandChorusLogger.e("SyncManager", it) }
+            CantataSyncManagerServiceImp(AgoraApplication.the()) { error ->
+                error?.message?.let { CantataLogger.e("SyncManager", it) }
             }
         }
 
-        fun getImplInstance(): GrandChorusServiceProtocol = instance
+        fun getImplInstance(): CantataServiceProtocol = instance
     }
 
     fun reset()
@@ -50,34 +50,24 @@ interface GrandChorusServiceProtocol {
     /**
      * 离开房间
      */
-    fun leaveRoom(
-        completion: (error: Exception?) -> Unit
-    )
+    fun leaveRoom(completion: (error: Exception?) -> Unit)
 
     /**
      * 切换MV封面
      */
-    fun changeMVCover(
-        inputModel: ChangeMVCoverInputModel, completion: (error: Exception?) -> Unit
-    )
+    fun changeMVCover(inputModel: ChangeMVCoverInputModel, completion: (error: Exception?) -> Unit)
 
     /**
      * room status did changed
      */
-    fun subscribeRoomStatus(
-        changedBlock: (KTVSubscribe, RoomListModel?) -> Unit
-    )
+    fun subscribeRoomStatus(changedBlock: (KTVSubscribe, RoomListModel?) -> Unit)
 
     /**
      * user count did changed
      */
-    fun subscribeUserListCount(
-        changedBlock: (count: Int) -> Unit
-    )
+    fun subscribeUserListCount(changedBlock: (count: Int) -> Unit)
 
-    fun subscribeRoomTimeUp(
-        onRoomTimeUp: () -> Unit
-    )
+    fun subscribeRoomTimeUp(onRoomTimeUp: () -> Unit)
 
 
     // ===================== 麦位相关 =================================
@@ -85,21 +75,14 @@ interface GrandChorusServiceProtocol {
     /**
      * 获取麦位列表
      */
-    fun getSeatStatusList(
-        completion: (error: Exception?, list: List<RoomSeatModel>?) -> Unit
-    )
+    fun getSeatStatusList(completion: (error: Exception?, list: List<RoomSeatModel>?) -> Unit)
 
     /**
      * 上麦
      */
-    fun onSeat(
-        inputModel: OnSeatInputModel,
-        completion: (error: Exception?) -> Unit
-    )
+    fun onSeat(inputModel: OnSeatInputModel, completion: (error: Exception?) -> Unit)
 
-    fun autoOnSeat(
-        completion: (error: Exception?) -> Unit
-    )
+    fun autoOnSeat(completion: (error: Exception?) -> Unit)
 
     /**
      * 下麦
