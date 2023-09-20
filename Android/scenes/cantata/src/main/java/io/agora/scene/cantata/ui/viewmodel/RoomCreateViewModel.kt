@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.service.CreateRoomInputModel
 import io.agora.scene.cantata.service.CreateRoomOutputModel
-import io.agora.scene.cantata.service.GrandChorusServiceProtocol.Companion.getImplInstance
+import io.agora.scene.cantata.service.CantataServiceProtocol.Companion.getImplInstance
 import io.agora.scene.cantata.service.JoinRoomInputModel
 import io.agora.scene.cantata.service.JoinRoomOutputModel
 import io.agora.scene.cantata.service.RoomListModel

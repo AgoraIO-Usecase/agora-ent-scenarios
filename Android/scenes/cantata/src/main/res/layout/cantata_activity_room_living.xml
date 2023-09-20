@@ -143,6 +143,7 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <io.agora.scene.cantata.ui.widget.lrcView.LrcControlView
+        android:id="@+id/lrcControlView"
         android:layout_width="match_parent"
         android:layout_height="500dp"
         android:layout_marginTop="12dp"
@@ -248,4 +249,10 @@
         android:visibility="visible"
         app:constraint_referenced_ids="iBtnChooseSong,cbMic"
         tools:visibility="visible" />
+
+    <io.agora.scene.cantata.ui.widget.chorusView.ChorusMicView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintBottom_toBottomOf="@id/lrcControlView"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
