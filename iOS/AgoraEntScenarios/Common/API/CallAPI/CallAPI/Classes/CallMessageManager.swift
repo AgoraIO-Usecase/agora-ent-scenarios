@@ -88,6 +88,7 @@ class CallMessageManager: NSObject {
     }
     
     func logout() {
+        callMessagePrint("logout")
         self.rtmClient?.logout()
         self.rtmClient?.destroy()
     }
@@ -144,7 +145,7 @@ extension CallMessageManager {
     public func _sendReceipts(roomId: String, messageId: Int, retryCount: Int = 3, completion: ((NSError?)-> Void)? = nil) {
         var message: [String: Any] = [:]
         message[kReceiptsKey] = messageId
-        callMessagePrint("_sendReceipts to '\(roomId)', message: \(message), retryCount: \(retryCount)")
+        callMessagePrint("_sendReceipts to '\(roomId)', retryCount: \(retryCount), message: \(message)")
         let data = try? JSONSerialization.data(withJSONObject: message) as? NSData
         let options = AgoraRtmPublishOptions()
         let date = Date()
@@ -169,7 +170,7 @@ extension CallMessageManager {
             completion?(NSError(domain: "send message fail! roomId is empty", code: -1))
             return
         }
-        callMessagePrint("_sendMessage to '\(roomId)', message: \(message), retryCount: \(retryCount)")
+        callMessagePrint("_sendMessage to '\(roomId)', retryCount: \(retryCount), message: \(message)")
         let msgId = message[kMessageId] as? Int ?? 0
         let data = try? JSONSerialization.data(withJSONObject: message) as? NSData
         let options = AgoraRtmPublishOptions()
@@ -363,7 +364,6 @@ extension CallMessageManager: AgoraRtmClientDelegate {
     //收到RTM消息
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, on event: AgoraRtmMessageEvent) {
         let message = event.message
-//        callMessagePrint("on event message: \(message.getType().rawValue)")
         if let data = message.getData() as? Data,
            let dic = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
             if let messageId = dic[kMessageId] as? Int,
@@ -373,6 +373,8 @@ extension CallMessageManager: AgoraRtmClientDelegate {
                 callMessagePrint("recv receipts \(receiptsId)")
                 receiptsQueue = receiptsQueue.filter({$0.messageId != receiptsId})
             }
+            
+            callMessagePrint("on event message: \(String(data: data, encoding: .utf8) ?? "")")
         }
         
         self.rtmDelegate?.rtmKit?(rtmKit, on: event)
