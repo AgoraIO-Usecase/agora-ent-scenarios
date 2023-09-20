@@ -60,9 +60,9 @@ class ShowTo1v1ServiceImp: NSObject {
         return manager
     }()
     
-    private func initScene(completion: @escaping (NSError?) -> Void) {
+    private func initScene(_ reqId: String, completion: @escaping (String, NSError?) -> Void) {
         if syncUtilsInited {
-            completion(nil)
+            completion(reqId, nil)
             return
         }
 
@@ -72,7 +72,7 @@ class ShowTo1v1ServiceImp: NSObject {
             }
             
             defer {
-                completion(state == .open ? nil : NSError(domain: "network error", code: 1000))
+                completion(reqId, state == .open ? nil : NSError(domain: "network error", code: 1000))
             }
             
             showTo1v1Print("subscribeConnectState: \(state) \(self.syncUtilsInited)")
@@ -89,7 +89,9 @@ class ShowTo1v1ServiceImp: NSObject {
 extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     func getRoomList(completion: @escaping ([ShowTo1v1RoomInfo]) -> Void) {
         refreshRoomListClosure = completion
-        initScene { [weak self] error in
+        let reqId = NSString.withUUID()
+        initScene(reqId) { [weak self] rid, error in
+            guard reqId == rid else {return}
             if let error = error {
                 showTo1v1Print("getUserList fail1: \(error.localizedDescription)")
                 self?.refreshRoomListClosure?([])
@@ -126,7 +128,9 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
         roomInfo.avatar = user.avatar
         roomInfo.roomName = roomName
         roomInfo.roomId = "\(arc4random_uniform(899999) + 100000)"
-        initScene {[weak self] error in
+        let reqId = NSString.withUUID()
+        initScene(reqId) {[weak self] rid, error in
+            guard reqId == rid else {return}
             if let error = error {
                 showTo1v1Print("createRoom fail1: \(error.localizedDescription)")
                 completion(nil, error)
@@ -163,7 +167,9 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     }
     
     func joinRoom(roomInfo:ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void) {
-        initScene {[weak self] error in
+        let reqId = NSString.withUUID()
+        initScene(reqId) {[weak self] rid, error in
+            guard reqId == rid else {return}
             if let error = error {
                 showTo1v1Print("joinRoom fail1: \(error.localizedDescription)")
                 completion(error)
