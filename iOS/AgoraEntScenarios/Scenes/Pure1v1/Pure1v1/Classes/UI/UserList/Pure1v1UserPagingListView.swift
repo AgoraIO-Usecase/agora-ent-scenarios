@@ -106,7 +106,7 @@ extension Pure1v1UserPagingListView: UICollectionViewDataSource, UICollectionVie
         cell.callClosure = { [weak self] user in
             self?.callClosure?(user)
         }
-        pure1v1Print("load user: \(user.userName) \(realCellIndex(with: indexPath.row)) / \(indexPath.row)")
+//        pure1v1Print("load user: \(user.userName) \(realCellIndex(with: indexPath.row)) / \(indexPath.row)")
         return cell
     }
     
