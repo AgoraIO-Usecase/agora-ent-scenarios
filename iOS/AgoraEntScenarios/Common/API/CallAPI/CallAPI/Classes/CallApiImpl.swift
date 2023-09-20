@@ -418,7 +418,7 @@ extension CallApiImpl {
                 return
             }
             
-            callWarningPrint("mismatch channel, leave first! tqarget: \(roomId) current: \(connection.channelId)")
+            callWarningPrint("mismatch channel, leave first! target: \(roomId) current: \(connection.channelId)")
             config.rtcEngine.leaveChannelEx(connection)
             rtcConnection = nil
         }
