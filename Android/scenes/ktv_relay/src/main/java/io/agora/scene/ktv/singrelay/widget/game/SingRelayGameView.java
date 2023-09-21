@@ -135,6 +135,7 @@ public class SingRelayGameView extends FrameLayout {
         mBinding.ilRank.setVisibility(GONE);
         mBinding.ilIDLE.ivGameTips.setVisibility(View.VISIBLE);
         mBinding.ilIDLE.tvSongTab.setVisibility(View.GONE);
+        mBinding.ilActive.getRoot().setVisibility(View.GONE);
         if (isRoomOwner) {
             mBinding.btGameAgain.setVisibility(GONE);
             mBinding.ilIDLE.messageText.setVisibility(GONE);

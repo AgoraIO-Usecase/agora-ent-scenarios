@@ -6,6 +6,7 @@ import android.os.Looper
 import android.text.TextUtils
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
+import io.agora.scene.base.api.model.User
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.ktv.singrelay.KTVLogger
 import io.agora.syncmanager.rtm.*
@@ -66,6 +67,7 @@ class KTVSyncManagerServiceImp(
     private val roomMap = mutableMapOf<String, RoomListModel>() // key: roomNo
     private val userMap = mutableMapOf<String, VLLoginModel?>() // key: userNo
     private val seatMap = mutableMapOf<String, RoomSeatModel?>() // key: seatIndex
+    private var localSeatModel: RoomSeatModel? = null
     private val songChosenList = ArrayList<RoomSelSongModel>()
 
     private var SingRelayGameInfo: SingRelayGameModel? = null
@@ -467,50 +469,38 @@ class KTVSyncManagerServiceImp(
     }
 
     override fun updateSeatAudioMuteStatus(mute: Boolean, completion: (error: Exception?) -> Unit) {
-        seatMap.forEach {
-            if (it.value?.userNo == UserManager.getInstance().user.id.toString()) {
-                val originSeatInfo = it.value
-                if (originSeatInfo != null) {
-                    val seatInfo = RoomSeatModel(
-                        originSeatInfo.isMaster,
-                        originSeatInfo.headUrl,
-                        originSeatInfo.userNo,
-                        originSeatInfo.rtcUid,
-                        originSeatInfo.name,
-                        originSeatInfo.seatIndex,
-                        originSeatInfo.chorusSongCode,
-                        if (mute) RoomSeatModel.MUTED_VALUE_TRUE else RoomSeatModel.MUTED_VALUE_FALSE, // update this
-                        originSeatInfo.isVideoMuted
-                    )
-                    innerUpdateSeat(seatInfo, completion)
-                }
-            }
-        }
+        val model = localSeatModel ?: return
+        val seatInfo = RoomSeatModel(
+            model.isMaster,
+            model.headUrl,
+            model.userNo,
+            model.rtcUid,
+            model.name,
+            model.seatIndex,
+            model.chorusSongCode,
+            if (mute) RoomSeatModel.MUTED_VALUE_TRUE else RoomSeatModel.MUTED_VALUE_FALSE, // update this
+            model.isVideoMuted
+        )
+        innerUpdateSeat(seatInfo, completion)
     }
 
     override fun updateSeatVideoMuteStatus(
         mute: Boolean,
         completion: (error: Exception?) -> Unit
     ) {
-        seatMap.forEach {
-            if (it.value?.userNo == UserManager.getInstance().user.id.toString()) {
-                val originSeatInfo = it.value
-                if (originSeatInfo != null) {
-                    val seatInfo = RoomSeatModel(
-                        originSeatInfo.isMaster,
-                        originSeatInfo.headUrl,
-                        originSeatInfo.userNo,
-                        originSeatInfo.rtcUid,
-                        originSeatInfo.name,
-                        originSeatInfo.seatIndex,
-                        originSeatInfo.chorusSongCode,
-                        originSeatInfo.isAudioMuted,
-                        if (mute) 1 else 0// update this
-                    )
-                    innerUpdateSeat(seatInfo, completion)
-                }
-            }
-        }
+        val model = localSeatModel ?: return
+        val seatInfo = RoomSeatModel(
+            model.isMaster,
+            model.headUrl,
+            model.userNo,
+            model.rtcUid,
+            model.name,
+            model.seatIndex,
+            model.chorusSongCode,
+            model.isAudioMuted,
+            if (mute) 1 else 0// update this
+        )
+        innerUpdateSeat(seatInfo, completion)
     }
 
     override fun subscribeSeatList(changedBlock: (KTVServiceProtocol.KTVSubscribe, RoomSeatModel?) -> Unit) {
@@ -710,25 +700,19 @@ class KTVSyncManagerServiceImp(
     override fun leaveChorus(
         completion: (error: Exception?) -> Unit
     ) {
-        seatMap.forEach {
-            if (it.value?.userNo == UserManager.getInstance().user.id.toString()) {
-                val originSeatInfo = it.value
-                if (originSeatInfo != null) {
-                    val seatInfo = RoomSeatModel(
-                        originSeatInfo.isMaster,
-                        originSeatInfo.headUrl,
-                        originSeatInfo.userNo,
-                        originSeatInfo.rtcUid,
-                        originSeatInfo.name,
-                        originSeatInfo.seatIndex,
-                        "",
-                        RoomSeatModel.MUTED_VALUE_TRUE,
-                        originSeatInfo.isVideoMuted
-                    )
-                    innerUpdateSeat(seatInfo, completion)
-                }
-            }
-        }
+        val model = localSeatModel ?: return
+        val seatInfo = RoomSeatModel(
+            model.isMaster,
+            model.headUrl,
+            model.userNo,
+            model.rtcUid,
+            model.name,
+            model.seatIndex,
+            "",
+            RoomSeatModel.MUTED_VALUE_TRUE,
+            model.isVideoMuted
+        )
+        innerUpdateSeat(seatInfo, completion)
     }
 
     override fun subscribeChooseSong(changedBlock: (KTVServiceProtocol.KTVSubscribe, RoomSelSongModel?) -> Unit) {
@@ -1149,6 +1133,10 @@ class KTVSyncManagerServiceImp(
         completion: (error: Exception?) -> Unit
     ) {
         val objectId = objIdOfSeatIndex[seatInfo.seatIndex] ?: return
+        if (seatInfo.rtcUid == UserManager.getInstance().user.id.toString()) {
+            localSeatModel = seatInfo
+        }
+        seatMap[seatInfo.seatIndex.toString()] = seatInfo
         mSceneReference?.collection(kCollectionIdSeatInfo)
             ?.update(objectId, seatInfo, object : Callback {
                 override fun onSuccess() {
@@ -1206,6 +1194,10 @@ class KTVSyncManagerServiceImp(
                 val obj = item?.toObject(RoomSeatModel::class.java) ?: return
                 objIdOfSeatIndex[obj.seatIndex] = item.id
 
+                if (obj.rtcUid == UserManager.getInstance().user.id.toString()) {
+                    localSeatModel = obj
+                }
+
                 if (seatMap.containsKey(obj.seatIndex.toString())) {
                     seatMap[obj.seatIndex.toString()] = obj
                     runOnMainThread{
@@ -1231,6 +1223,9 @@ class KTVSyncManagerServiceImp(
                 seatMap.forEach { entry ->
                     entry.value?.let { seat ->
                         if (objIdOfSeatIndex[seat.seatIndex] == item.id) {
+                            if (seat.rtcUid == UserManager.getInstance().user.id.toString()) {
+                                localSeatModel = null
+                            }
                             seatMap.remove(entry.key)
                             runOnMainThread{
                                 seatListChangeSubscriber?.invoke(
