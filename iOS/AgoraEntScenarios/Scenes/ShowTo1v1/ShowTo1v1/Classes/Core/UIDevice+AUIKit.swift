@@ -17,7 +17,7 @@ public func getWindow()-> UIWindow? {
         // Get its associated windows
             .flatMap({ $0 as? UIWindowScene })?.windows
         // Finally, keep only the key window
-            .first(where: \.isKeyWindow)
+            .first(where: \.isKeyWindow) ?? UIApplication.shared.keyWindow
     } else {
         return UIApplication.shared.keyWindow
     }
@@ -26,13 +26,11 @@ public func getWindow()-> UIWindow? {
 extension UIDevice {
     public var aui_SafeDistanceTop: CGFloat {
         let window = getWindow()
-        
         return window?.safeAreaInsets.top ?? 0
     }
     
     public var aui_SafeDistanceBottom: CGFloat {
         let window = getWindow()
-        
         return window?.safeAreaInsets.bottom ?? 0
     }
 }
