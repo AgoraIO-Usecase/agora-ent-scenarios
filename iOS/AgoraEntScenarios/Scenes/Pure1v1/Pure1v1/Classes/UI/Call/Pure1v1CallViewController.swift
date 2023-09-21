@@ -161,7 +161,7 @@ class Pure1v1CallViewController: UIViewController {
     }
     
     @objc private func _hangupAction() {
-        callApi?.hangup(roomId: targetUser?.getRoomId() ?? "", completion: { err in
+        callApi?.hangup(userId: UInt(targetUser?.userId ?? "") ?? 0, completion: { err in
         })
         dismiss(animated: false)
     }

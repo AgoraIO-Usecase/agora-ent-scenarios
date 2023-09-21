@@ -26,7 +26,7 @@ PODS:
     - SSZipArchive
   - CallAPI (0.1.0):
     - AgoraRtcEngine_Special_iOS
-    - AgoraRtm_iOS (~> 2.1.4)
+    - AgoraRtm_iOS (= 2.1.4)
   - FLAnimatedImage (1.0.17)
   - HWWeakTimer (1.0)
   - JXCategoryView (1.6.1)
@@ -173,7 +173,7 @@ SPEC CHECKSUMS:
   AgoraSyncManager: 11d417798cba6d95dcdb23e47125dedaf6c5dce9
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   BytedEffect: 74b0bd8150ff1ab9c443d210a7ff7eb49ad3da44
-  CallAPI: be058c891736f0999c7723cf3c45ec360a5da189
+  CallAPI: f40f9694c310b613f20958fabdbe69f8bc1d6ca5
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2

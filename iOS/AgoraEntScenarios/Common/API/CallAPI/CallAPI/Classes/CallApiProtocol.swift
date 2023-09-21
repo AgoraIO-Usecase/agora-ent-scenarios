@@ -212,17 +212,16 @@ public class CallTokenConfig: NSObject {
     
     /// 被叫拒绝通话，调用后主叫会收到onReject
     /// - Parameters:
-    ///   - roomId: 频道号
     ///   - remoteUserId: 呼叫的用户id
     ///   - reason: 拒绝原因
     ///   - completion: <#completion description#>
-    func reject(roomId: String, remoteUserId: UInt, reason: String?, completion: ((NSError?)->())?)
+    func reject(remoteUserId: UInt, reason: String?, completion: ((NSError?)->())?)
     
     /// 结束通话，调用后被叫会收到onHangup
     /// - Parameters:
-    ///   - roomId: 频道号
+    ///   - userId: 用户id
     ///   - completion: <#completion description#>
-    func hangup(roomId: String, completion: ((NSError?)->())?)
+    func hangup(userId: UInt, completion: ((NSError?)->())?)
     
     /// 获取callId，callId为通话过程中消息的标识，通过argus可以查询到从呼叫到通话的耗时和状态变迁的时间戳
     /// - Returns: callId，非呼叫到通话之外的消息为空

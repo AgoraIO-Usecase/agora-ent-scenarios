@@ -115,15 +115,9 @@ extension CallMessageManager {
     
     /// 根据策略订阅频道消息
     /// - Parameters:
-    ///   - prepareConfig: <#prepareConfig description#>
+    ///   - roomId: <#prepareConfig description#>
     ///   - completion: <#completion description#>
-    private func _subscribeRTM(tokenConfig: CallTokenConfig?, completion: ((NSError?)->())?) {
-        var roomId = tokenConfig?.roomId
-        guard let roomId = roomId else {
-            completion?(NSError(domain: "channelName is Empty", code: -1))
-            return
-        }
-        
+    private func _subscribeRTM(userId: String, completion: ((NSError?)->())?) {
         /*
          移除所有的presence，所有缓存由调用的业务服务器去控制
          订阅自己频道的message，用来收消息
@@ -132,8 +126,7 @@ extension CallMessageManager {
         options.withMessage = true
         options.withMetadata = false
         options.withPresence = false
-        var err: NSError? = nil
-        _subscribe(channelName: roomId, option: options, completion: completion)
+        _subscribe(channelName: userId, option: options, completion: completion)
     }
     
     /// 发送回执消息
@@ -145,11 +138,11 @@ extension CallMessageManager {
         var message: [String: Any] = [:]
         message[kReceiptsKey] = messageId
         callMessagePrint("_sendReceipts to '\(roomId)', message: \(message)")
-        let data = try? JSONSerialization.data(withJSONObject: message) as? NSData
+        let data = try? JSONSerialization.data(withJSONObject: message) as NSData
         let options = AgoraRtmPublishOptions()
-        let date = Date()
-        rtmClient.publish(roomId, message: data!, withOption: options) { [weak self] resp, err in
-            guard let self = self else {return}
+//        let date = Date()
+        rtmClient.publish(roomId, message: data!, withOption: options) { resp, err in
+//            guard let self = self else {return}
             let error = err.errorCode == .ok ? nil : NSError(domain: err.reason, code: err.errorCode.rawValue)
 //            self.callMessagePrint("_sendReceipts cost \(-date.timeIntervalSinceNow * 1000) ms")
             if error == nil {
@@ -160,17 +153,17 @@ extension CallMessageManager {
         }
     }
     
-    private func _sendMessage(roomId: String, message: [String: Any], completion: ((NSError?)-> Void)?) {
-        if roomId.count == 0 {
+    private func _sendMessage(userId: String, message: [String: Any], completion: ((NSError?)-> Void)?) {
+        if userId.count == 0 {
             completion?(NSError(domain: "send message fail! roomId is empty", code: -1))
             return
         }
-        callMessagePrint("_sendMessage to '\(roomId)', message: \(message)")
+        callMessagePrint("_sendMessage to '\(userId)', message: \(message)")
         let msgId = message[kMessageId] as? Int ?? 0
-        let data = try? JSONSerialization.data(withJSONObject: message) as? NSData
+        let data = try? JSONSerialization.data(withJSONObject: message) as NSData
         let options = AgoraRtmPublishOptions()
         let date = Date()
-        rtmClient.publish(roomId, message: data!, withOption: options) { [weak self] resp, err in
+        rtmClient.publish(userId, message: data!, withOption: options) { [weak self] resp, err in
             
             let error: NSError? = err.errorCode == .ok ? nil : NSError(domain: err.reason, code: err.errorCode.rawValue)
             self?.callMessagePrint("publish cost \(-date.timeIntervalSinceNow * 1000) ms")
@@ -194,7 +187,7 @@ extension CallMessageManager {
                             self.delegate?.onMissReceipts(message: message)
                             return
                         }
-                        self._sendMessage(roomId: roomId, message: message, completion: completion)
+                        self._sendMessage(userId: userId, message: message, completion: completion)
                     }
                     self?.receiptsQueue.append(receiptInfo)
                     receiptInfo.checkReceipt()
@@ -283,7 +276,7 @@ extension CallMessageManager {
                                     completion: completion)
             }
         } else if isLoginedRTM, prepareConfig.autoSubscribeRTM {
-            _subscribeRTM(tokenConfig: tokenConfig) {[weak self] error in
+            _subscribeRTM(userId: "\(config.userId)") {[weak self] error in
                 guard let self = self else {return}
                 if let error = error {
                     completion?(error)
@@ -317,12 +310,12 @@ extension CallMessageManager {
     
     /// 发送频道消息
     /// - Parameters:
-    ///   - roomId: 往哪个频道发送消息
-    ///   - fromRoomId: 哪个频道发送的，用来给对端发送回执
+    ///   - userId: 往哪个用户发送消息
+    ///   - fromUserId: 哪个用户发送的，用来给对端发送回执
     ///   - message: 发送的消息字典
     ///   - completion: <#completion description#>
-    public func sendMessage(roomId: String,
-                            fromRoomId: String,
+    public func sendMessage(userId: String,
+                            fromUserId: String,
                             message: [String: Any],
                             completion: ((NSError?)-> Void)?) {
         messageId += 1
@@ -330,9 +323,9 @@ extension CallMessageManager {
         var message = message
         let msgId = messageId
         message[kMessageId] = msgId
-        message[kReceiptsRoomIdKey] = fromRoomId
-        assert(fromRoomId.count > 0, "kReceiptsRoomIdKey is empty")
-        _sendMessage(roomId: roomId, message: message, completion: completion)
+        message[kReceiptsRoomIdKey] = fromUserId
+        assert(fromUserId.count > 0, "kReceiptsRoomIdKey is empty")
+        _sendMessage(userId: userId, message: message, completion: completion)
     }
 }
 
