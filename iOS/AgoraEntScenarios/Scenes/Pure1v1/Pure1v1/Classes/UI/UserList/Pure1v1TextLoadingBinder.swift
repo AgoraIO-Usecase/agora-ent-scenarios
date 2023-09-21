@@ -33,7 +33,7 @@ class Pure1v1TextLoadingBinder: NSObject {
             guard let self = self else{return}
             let range = (self.loadingRange + 1) % loadingExtText.count
             self.loadingRange = range
-            print("loading text: \(range)")
+//            print("loading text: \(range)")
         }, repeats: true)
         self.timer?.fire()
     }
