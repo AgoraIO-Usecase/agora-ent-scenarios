@@ -452,7 +452,7 @@ extension CallApiImpl {
         let date = Date()
         firstFrameCompletion = { [weak self] in
             guard let self = self else { return }
-            let eventInfo = [
+            let eventInfo: [String : Any] = [
                 kFromRoomId: self.callingRoomId ?? "",
                 kFromUserId: self.callingUserId ?? 0,
                 kRemoteUserId: config.userId,
@@ -560,7 +560,7 @@ extension CallApiImpl {
                                           label: String,
                                           value: Int) {
         guard let config = config, isChannelJoined, let rtcConnection = rtcConnection else { return }
-        let ret = config.rtcEngine.sendCustomReportMessageEx(msgId, category: category, event: event, label: label, value: value, connection: rtcConnection)
+        let _ = config.rtcEngine.sendCustomReportMessageEx(msgId, category: category, event: event, label: label, value: value, connection: rtcConnection)
 //        callPrint("sendCustomReportMessage msgId: \(msgId) category: \(category) event: \(event) : \(ret)")
     }
 }
@@ -584,8 +584,8 @@ extension CallApiImpl {
         }
     }
     
-    private func _reject(roomId: String, remoteUserId: UInt, reason: String?, completion: ((NSError?, [String: Any]) -> ())? = nil) {
-        guard let fromRoomId = tokenConfig?.roomId else {
+    private func _reject(remoteUserId: UInt, reason: String?, completion: ((NSError?, [String: Any]) -> ())? = nil) {
+        guard let fromRoomId = tokenConfig?.roomId, let fromUserId = config?.userId else {
             completion?(NSError(domain: "reject fail! current userId or roomId is empty", code: -1), [:])
             callWarningPrint("reject fail! current userId or roomId is empty")
             return
@@ -593,19 +593,19 @@ extension CallApiImpl {
         var message: [String: Any] = _messageDic(action: .reject)
         message[kRemoteUserId] = remoteUserId
         message[kFromRoomId] = fromRoomId
-        messageManager?.sendMessage(roomId: roomId, fromRoomId: fromRoomId, message: message) { error in
+        messageManager?.sendMessage(userId: "\(remoteUserId)", fromUserId: "\(fromUserId)", message: message) { error in
             completion?(error, message)
         }
     }
     
-    private func _hangup(roomId: String, completion: ((NSError?, [String: Any]) -> ())? = nil) {
-        guard let fromRoomId = tokenConfig?.roomId else {
-            completion?(NSError(domain: "reject fail! current roomId is empty", code: -1), [:])
-            callWarningPrint("reject fail! current roomId is empty")
+    private func _hangup(userId: String, completion: ((NSError?, [String: Any]) -> ())? = nil) {
+        guard let fromUserId = config?.userId else {
+            completion?(NSError(domain: "reject fail! current userId is empty", code: -1), [:])
+            callWarningPrint("reject fail! current userId is empty")
             return
         }
         let message: [String: Any] = _messageDic(action: .hangup)
-        messageManager?.sendMessage(roomId: roomId, fromRoomId: fromRoomId, message: message) { err in
+        messageManager?.sendMessage(userId: userId, fromUserId: "\(fromUserId)", message: message) { err in
             completion?(err, message)
         }
     }
@@ -614,13 +614,13 @@ extension CallApiImpl {
     private func _onCall(fromRoomId: String, fromUserId: UInt, callId: String, userExtension: [String: Any]) {
         //如果不是prepared状态或者不是接收的正在接听的用户的呼叫
         guard state == .prepared || callingUserId == fromUserId else {
-            _reject(roomId: fromRoomId, remoteUserId: fromUserId, reason: "callee is currently on call")
+            _reject(remoteUserId: fromUserId, reason: "callee is currently on call")
             return
         }
         
         if callingUserId == fromUserId, callingRoomId != fromRoomId {
             //如果主叫换了room id呼叫
-            _reject(roomId: fromRoomId, remoteUserId: fromUserId, reason: "callee is being occupied by another channel of the caller")
+            _reject(remoteUserId: fromUserId, reason: "callee is being occupied by another channel of the caller")
             _notifyState(state: .prepared, stateReason: .cancelByCallerRecall)
             _notifyEvent(event: .cancelByCallerRecall)
             return
@@ -651,11 +651,8 @@ extension CallApiImpl {
     
     //收到取消呼叫消息
     private func _onCancel(message: [String: Any]) {
-        let fromUserId = message[kFromUserId] as? UInt ?? 0
         //如果不是接收的正在接听的用户的呼叫
-        guard callingUserId == fromUserId else {
-            return
-        }
+        guard let fromUserId = message[kFromUserId] as? UInt, callingUserId == fromUserId else { return }
         
         _notifyState(state: .prepared, stateReason: .remoteCancel, eventInfo: message)
         _notifyEvent(event: .remoteCancel)
@@ -663,6 +660,7 @@ extension CallApiImpl {
     
     //收到拒绝消息
     private func _onReject(message: [String: Any]) {
+        guard let fromUserId = message[kFromUserId] as? UInt, fromUserId == callingUserId else { return }
         _notifyState(state: .prepared, stateReason: .remoteRejected, eventInfo: message)
         _notifyEvent(event: .remoteRejected)
     }
@@ -681,9 +679,7 @@ extension CallApiImpl {
     
     //收到挂断消息
     private func _onHangup(message: [String: Any]) {
-        guard let fromUserId = message[kFromUserId] as? UInt, fromUserId == callingUserId else {
-            return
-        }
+        guard let fromUserId = message[kFromUserId] as? UInt, fromUserId == callingUserId else { return }
         _notifyState(state: .prepared, stateReason: .remoteHangup)
         _notifyEvent(event: .remoteHangup)
     }
@@ -728,13 +724,13 @@ extension CallApiImpl: CallApiProtocol {
     public func deinitialize(completion: @escaping (()->())) {
         _reportMethod(event: "\(#function)")
         
-        if let callingRoomId = self.callingRoomId {
-            var roomId = callingRoomId
+        if let callingUserId = self.callingUserId {
+//            var roomId = callingRoomId
             //秀场转1v1主叫挂断的是房主id
 //            if config?.mode == .showTo1v1, config?.role == .caller {
 //                roomId = config?.ownerRoomId ?? ""
 //            }
-            _hangup(roomId: roomId) {[weak self] err, message in
+            _hangup(userId: "\(callingUserId)") {[weak self] err, message in
                 self?._deinitialize()
                 completion()
             }
@@ -753,7 +749,7 @@ extension CallApiImpl: CallApiProtocol {
         self.tokenConfig = config
         messageManager?.renewToken(rtmToken: config.rtmToken)
         guard let connection = rtcConnection, connection.channelId == config.roomId else {
-            callWarningPrint("renewToken fail! connection.channelId[\(rtcConnection?.channelId)] != config.roomId[\(config.roomId)]")
+            callWarningPrint("renewToken fail! connection.channelId[\(rtcConnection?.channelId ?? "")] != config.roomId[\(config.roomId)]")
             return
         }
         let options = AgoraRtcChannelMediaOptions()
@@ -793,7 +789,7 @@ extension CallApiImpl: CallApiProtocol {
     //呼叫
     public func call(roomId: String, remoteUserId: UInt, completion: ((NSError?) -> ())?) {
         _reportMethod(event: "\(#function)", label: "roomId=\(roomId)&remoteUserId=\(remoteUserId)")
-        guard let fromRoomId = tokenConfig?.roomId else {
+        guard let fromRoomId = tokenConfig?.roomId, let fromUserId = config?.userId else {
             completion?(NSError(domain: "call fail! config or roomId is empty", code: -1))
             callWarningPrint("call fail! config or roomId is empty")
             return
@@ -818,7 +814,7 @@ extension CallApiImpl: CallApiProtocol {
         var message: [String: Any] = _messageDic(action: .call)
         message[kRemoteUserId] = remoteUserId
         message[kFromRoomId] = fromRoomId
-        messageManager?.sendMessage(roomId: roomId, fromRoomId: fromRoomId, message: message) {[weak self] err in
+        messageManager?.sendMessage(userId: "\(remoteUserId)", fromUserId: "\(fromUserId)", message: message) {[weak self] err in
             guard let self = self else { return }
             if let error = err {
                 self._notifyState(state: .prepared, stateReason: .messageFailed, eventReason: error.localizedDescription)
@@ -835,7 +831,7 @@ extension CallApiImpl: CallApiProtocol {
         callingUserId = remoteUserId
         //不等响应即加入频道，加快join速度，失败则leave
         _joinRTCAndNotify(roomId: fromRoomId, token: tokenConfig?.rtcToken ?? "") {[weak self] error in
-            guard let error = error else {return}
+            guard let _ = error else {return}
             self?.cancelCall(completion: { err in
             })
         }
@@ -844,13 +840,13 @@ extension CallApiImpl: CallApiProtocol {
     //取消呼叫
     public func cancelCall(completion: ((NSError?) -> ())?) {
         _reportMethod(event: "\(#function)")
-        guard let roomId = callingRoomId, let fromRoomId = tokenConfig?.roomId else {
-            completion?(NSError(domain: "cancelCall fail! callingRoomId is empty", code: -1))
-            callWarningPrint("cancelCall fail! callingRoomId is empty")
+        guard let userId = callingUserId, let fromUserId = config?.userId else {
+            completion?(NSError(domain: "cancelCall fail! callingUserId is empty", code: -1))
+            callWarningPrint("cancelCall fail! callingUserId is empty")
             return
         }
         let message: [String: Any] = _messageDic(action: .cancelCall)
-        messageManager?.sendMessage(roomId: roomId, fromRoomId: fromRoomId, message: message) { err in
+        messageManager?.sendMessage(userId: "\(userId)", fromUserId: "\(fromUserId)", message: message) { err in
         }
         _notifyState(state: .prepared, stateReason: .localCancel)
         _notifyEvent(event: .localCancel)
@@ -859,7 +855,7 @@ extension CallApiImpl: CallApiProtocol {
     //接受
     public func accept(roomId: String, remoteUserId: UInt, rtcToken: String, completion: ((NSError?) -> ())?) {
         _reportMethod(event: "\(#function)", label: "roomId=\(roomId)&remoteUserId=\(remoteUserId)&rtcToken=\(rtcToken)")
-        guard let fromRoomId = tokenConfig?.roomId else {
+        guard let fromRoomId = tokenConfig?.roomId, let fromUserId = config?.userId else {
             let errReason = "accept fail! current userId or roomId is empty"
             completion?(NSError(domain: errReason, code: -1))
             callWarningPrint(errReason)
@@ -881,7 +877,7 @@ extension CallApiImpl: CallApiProtocol {
         var message: [String: Any] = _messageDic(action: .accept)
         message[kRemoteUserId] = remoteUserId
         message[kFromRoomId] = fromRoomId
-        messageManager?.sendMessage(roomId: roomId, fromRoomId: fromRoomId, message: message) { err in
+        messageManager?.sendMessage(userId: "\(remoteUserId)", fromUserId: "\(fromUserId)", message: message) { err in
         }
         _notifyState(state: .connecting, stateReason: .localAccepted, eventInfo: message)
         _notifyEvent(event: .localAccepted)
@@ -892,24 +888,24 @@ extension CallApiImpl: CallApiProtocol {
         callTs = _getNtpTimeInMs()
         //不等响应即加入频道，加快join速度，失败则leave
         _joinRTCAndNotify(roomId: roomId, token: rtcToken) {[weak self] error in
-            guard let error = error else {return}
+            guard let _ = error else {return}
             self?.cancelCall(completion: { err in
             })
         }
     }
     
     //拒绝
-    public func reject(roomId: String, remoteUserId: UInt, reason: String?, completion: ((NSError?) -> ())?) {
-        _reportMethod(event: "\(#function)", label: "roomId=\(roomId)&remoteUserId=\(remoteUserId)&reason=\(reason)")
-        _reject(roomId: roomId, remoteUserId: remoteUserId, reason: reason)
+    public func reject(remoteUserId: UInt, reason: String?, completion: ((NSError?) -> ())?) {
+        _reportMethod(event: "\(#function)", label: "remoteUserId=\(remoteUserId)&reason=\(reason ?? "")")
+        _reject(remoteUserId: remoteUserId, reason: reason)
         _notifyState(state: .prepared, stateReason: .localRejected)
         _notifyEvent(event: .localRejected)
     }
     
     //挂断
-    public func hangup(roomId: String, completion: ((NSError?) -> ())?) {
-        _reportMethod(event: "\(#function)", label: "roomId=\(roomId)")
-        _hangup(roomId: roomId)
+    public func hangup(userId: UInt, completion: ((NSError?) -> ())?) {
+        _reportMethod(event: "\(#function)", label: "userId=\(userId)")
+        _hangup(userId: "\(userId)")
         _notifyState(state: .prepared, stateReason: .localHangup)
         _notifyEvent(event: .localHangup)
     }
