@@ -469,7 +469,7 @@ extension RoomListViewController: CallApiListenerProtocol {
             let toUserId = eventInfo[kRemoteUserId] as? UInt ?? 0
             showTo1v1Print("calling: fromUserId: \(fromUserId) fromRoomId: \(fromRoomId) currentId: \(currentUid) toUserId: \(toUserId)")
             if let connectedUserId = connectedUserId, connectedUserId != fromUserId {
-                callApi.reject(roomId: fromRoomId, remoteUserId: fromUserId, reason: "already calling") { err in
+                callApi.reject(remoteUserId: fromUserId, reason: "already calling") { err in
                 }
                 return
             }

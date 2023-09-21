@@ -115,14 +115,7 @@ class CallViewController: BaseRoomViewController {
     }
     
     @objc private func _hangupAction() {
-        if roomInfo?.userId == currentUser?.userId {
-            //房主拒绝找对方roomId
-            callApi?.hangup(roomId: targetUser?.get1V1ChannelId() ?? "", completion: { err in
-            })
-        } else {
-            //观众挂断找房间id，因为可能房主创建了多个房间造成多个房间呼叫一个频道串了
-            callApi?.hangup(roomId: roomInfo?.roomId ?? "", completion: { err in
-            })
+        callApi?.hangup(userId: UInt(targetUser?.userId ?? "") ?? 0) { err in
         }
         guard navigationController?.viewControllers.contains(self) ?? false else {return}
         navigationController?.popViewController(animated: false)
