@@ -745,6 +745,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     roomLivingViewModel.resetMusicStatus();
                     if (roomLivingViewModel.isRoomOwner()) {
                         roomLivingViewModel.changeMusic();
+                        roomLivingViewModel.prepareSingRelayGame();
                     }
                 }
             });

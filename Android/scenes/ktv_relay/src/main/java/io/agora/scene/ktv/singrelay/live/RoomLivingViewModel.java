@@ -580,11 +580,11 @@ public class RoomLivingViewModel extends ViewModel {
      */
     public void toggleMic(boolean isUnMute) {
         KTVLogger.d(TAG, "RoomLivingViewModel.toggleMic() called：" + isUnMute);
+        updateVolumeStatus(isUnMute);
         ktvServiceProtocol.updateSeatAudioMuteStatus(!isUnMute, e -> {
             if (e == null) {
                 // success
                 KTVLogger.d(TAG, "RoomLivingViewModel.toggleMic() success");
-                updateVolumeStatus(isUnMute);
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.toggleMic() failed: " + e.getMessage());
@@ -644,7 +644,7 @@ public class RoomLivingViewModel extends ViewModel {
                 songNum = data.size();
                 songsOrderedLiveData.postValue(data);
 
-                if (singRelayGameStatusMutableLiveData.getValue() == GameStatus.ON_WAITING && data.size() > 0) {
+                if (singRelayGameStatusMutableLiveData.getValue() == GameStatus.ON_WAITING && data.size() > 0 && isRoomOwner()) {
                     // 歌曲选择成功后，开始游戏
                     KTVLogger.d(TAG, "RoomLivingViewModel.startSingRelayGame");
                     ktvServiceProtocol.startSingRelayGame(err -> {
