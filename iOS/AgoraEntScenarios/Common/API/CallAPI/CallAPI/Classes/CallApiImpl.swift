@@ -315,15 +315,15 @@ extension CallApiImpl {
             guard let self = self else {return}
             self.isPreparing = false
             if let err = rtmError ?? rtcError {
-                completion?(err)
                 self._notifyState(state: .failed,
                                   stateReason: err == rtmError ? .rtmSetupFailed : .joinRTCFailed,
                                   eventReason: err.localizedDescription)
+                completion?(err)
                 return
             }
             self.preparedTs = self._getNtpTimeInMs()
-            completion?(nil)
             self._notifyState(state: .prepared, elapsed: Int(-date.timeIntervalSinceNow * 1000))
+            completion?(nil)
         }
     }
     
