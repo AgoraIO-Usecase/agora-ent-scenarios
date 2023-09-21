@@ -1546,7 +1546,7 @@ public class RoomLivingViewModel extends ViewModel {
 
     public void plusSingPartNum() {
         if (songsOrderedLiveData.getValue() == null || roomInfoLiveData.getValue() == null) return;
-        if ((songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") || !songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum - 1)))) {
+        if ((songsOrderedLiveData.getValue().get(0).getWinnerNo().equals("") || (songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_").length != 0 && !songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[1].equals(String.valueOf(partNum - 1))))) {
             singerList.add(roomInfoLiveData.getValue().getCreatorNo());
         } else {
             singerList.add(songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0]);
