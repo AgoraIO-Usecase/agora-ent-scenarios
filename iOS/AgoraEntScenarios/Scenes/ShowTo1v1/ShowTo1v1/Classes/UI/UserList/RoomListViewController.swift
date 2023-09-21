@@ -49,11 +49,7 @@ class RoomListViewController: UIViewController {
     private var videoLoaderApi: IVideoLoaderApi = VideoLoaderApiImpl()
     private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
     private var callState: CallStateType = .idle
-    private lazy var callVC: CallViewController = {
-        let vc = CallViewController()
-        vc.callApi = callApi
-        return vc
-    }()
+    private lazy var callVC: CallViewController = CallViewController()
     private let callApi = CallApiImpl()
     private lazy var naviBar = NaviBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.aui_width, height: 44))
     private lazy var service: ShowTo1v1ServiceProtocol = ShowTo1v1ServiceImp(appId: showTo1v1AppId!, user: userInfo)
@@ -234,6 +230,7 @@ extension RoomListViewController {
         tokenConfig.roomId = userInfo!.get1V1ChannelId()
         callApi.deinitialize {
         }
+        callVC.callApi = callApi
         
         let config = CallConfig()
         config.role = .caller  // Pure 1v1 can only be set as the caller
@@ -260,6 +257,7 @@ extension RoomListViewController {
         tokenConfig.roomId = room.roomId
         callApi.deinitialize {
         }
+        callVC.callApi = callApi
         
         let config = CallConfig()
         config.role = .callee  // Pure 1v1 can only be set as the caller
@@ -403,7 +401,8 @@ extension RoomListViewController {
     }
     
     private func _showBroadcasterVC(roomInfo: ShowTo1v1RoomInfo) {
-        if roomInfo.userId == userInfo?.userId {
+        let isBroadcaster = roomInfo.userId == userInfo?.userId
+        if isBroadcaster {
             self._reinitCalleeAPI(room: roomInfo) {[weak self] err in
                 if let _ = err {
                     //失败默认重试一次
@@ -427,14 +426,18 @@ extension RoomListViewController {
             self?.service.subscribeListener(listener: nil)
             self?.service.leaveRoom(roomInfo: roomInfo, completion: { err in
             })
-            self?._reinitCallerAPI { err in
-                if let _ = err {
-                    //失败默认重试一次
-                    self?.renewTokens(completion: { success in
-                        guard success else {return}
-                        self?._reinitCalleeAPI(room: roomInfo, completion: { err in
+            
+            //主播回到列表页面要从callee变成caller
+            if isBroadcaster {
+                self?._reinitCallerAPI { err in
+                    if let _ = err {
+                        //失败默认重试一次
+                        self?.renewTokens(completion: { success in
+                            guard success else {return}
+                            self?._reinitCalleeAPI(room: roomInfo, completion: { err in
+                            })
                         })
-                    })
+                    }
                 }
             }
         }
