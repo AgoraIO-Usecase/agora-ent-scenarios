@@ -140,12 +140,11 @@ extension CallMessageManager {
     /// - Parameters:
     ///   - roomId: 回执消息发往的频道
     ///   - messageId: 回执的消息id
-    ///   - retryCount: 重试次数
     ///   - completion: <#completion description#>
-    public func _sendReceipts(roomId: String, messageId: Int, retryCount: Int = 3, completion: ((NSError?)-> Void)? = nil) {
+    public func _sendReceipts(roomId: String, messageId: Int, completion: ((NSError?)-> Void)? = nil) {
         var message: [String: Any] = [:]
         message[kReceiptsKey] = messageId
-        callMessagePrint("_sendReceipts to '\(roomId)', retryCount: \(retryCount), message: \(message)")
+        callMessagePrint("_sendReceipts to '\(roomId)', message: \(message)")
         let data = try? JSONSerialization.data(withJSONObject: message) as? NSData
         let options = AgoraRtmPublishOptions()
         let date = Date()
@@ -157,20 +156,16 @@ extension CallMessageManager {
                 completion?(nil)
                 return
             }
-            if retryCount <= 1 {
-                completion?(error)
-            } else {
-                self._sendReceipts(roomId: roomId, messageId: messageId, retryCount: retryCount - 1, completion: completion)
-            }
+            completion?(error)
         }
     }
     
-    private func _sendMessage(roomId: String, message: [String: Any], retryCount: Int = 3, completion: ((NSError?)-> Void)?) {
+    private func _sendMessage(roomId: String, message: [String: Any], completion: ((NSError?)-> Void)?) {
         if roomId.count == 0 {
             completion?(NSError(domain: "send message fail! roomId is empty", code: -1))
             return
         }
-        callMessagePrint("_sendMessage to '\(roomId)', retryCount: \(retryCount), message: \(message)")
+        callMessagePrint("_sendMessage to '\(roomId)', message: \(message)")
         let msgId = message[kMessageId] as? Int ?? 0
         let data = try? JSONSerialization.data(withJSONObject: message) as? NSData
         let options = AgoraRtmPublishOptions()
@@ -206,14 +201,10 @@ extension CallMessageManager {
                 }
                 return
             }
-            if retryCount <= 1 {
-                if let error = error {
-                    self?.callWarningPrint("_sendMessage: fail: \(error)")
-                }
-                completion?(error)
-            } else {
-                self?._sendMessage(roomId: roomId, message: message, retryCount: retryCount - 1, completion: completion)
+            if let error = error {
+                self?.callWarningPrint("_sendMessage: fail: \(error)")
             }
+            completion?(error)
         }
     }
     
@@ -329,12 +320,10 @@ extension CallMessageManager {
     ///   - roomId: 往哪个频道发送消息
     ///   - fromRoomId: 哪个频道发送的，用来给对端发送回执
     ///   - message: 发送的消息字典
-    ///   - retryCount: 重试次数
     ///   - completion: <#completion description#>
     public func sendMessage(roomId: String,
                             fromRoomId: String,
                             message: [String: Any],
-                            retryCount: Int = 3,
                             completion: ((NSError?)-> Void)?) {
         messageId += 1
         messageId %= Int.max
@@ -375,6 +364,8 @@ extension CallMessageManager: AgoraRtmClientDelegate {
             }
             
             callMessagePrint("on event message: \(String(data: data, encoding: .utf8) ?? "")")
+        } else {
+            callWarningPrint("on event message parse fail, \(message.getType().rawValue) \(message.getData())")
         }
         
         self.rtmDelegate?.rtmKit?(rtmKit, on: event)
