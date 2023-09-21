@@ -9,16 +9,80 @@ import Foundation
 import SDWebImage
 import FLAnimatedImage
 
+class PureUserInfoView: UIView {
+    lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .white
+        label.font = UIFont.systemFont(ofSize: 14)
+        return label
+    }()
+    
+    // 用户名称
+    lazy var nameLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .white
+        label.font = UIFont.systemFont(ofSize: 20)
+        return label
+    }()
+    
+    // 头像
+    lazy var avatarView: UIImageView = UIImageView()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        _loadSubViews()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func _loadSubViews() {
+        addSubview(titleLabel)
+        addSubview(avatarView)
+        addSubview(nameLabel)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        let wh = 32.0
+        titleLabel.sizeToFit()
+        titleLabel.frame = CGRect(origin: CGPoint(x: 15, y: 0), size: titleLabel.size)
+        
+        avatarView.frame = CGRect(x: 15, y: aui_height - wh, width: wh, height: wh)
+        avatarView.layer.cornerRadius = wh / 2
+        avatarView.clipsToBounds = true
+        
+        nameLabel.aui_left = avatarView.aui_right + 10
+        nameLabel.aui_size = CGSize(width: aui_width - nameLabel.aui_left - 10, height: avatarView.aui_height)
+        nameLabel.aui_centerY = avatarView.aui_centerY
+    }
+    
+    func setInfo(title: String, avatarUrl: String, avatarName: String) {
+        titleLabel.text = title
+        nameLabel.text = avatarName
+        avatarView.sd_setImage(with: URL(string: avatarUrl))
+    }
+}
+
 class Pure1v1UserCell: UICollectionViewCell {
     var callClosure: ((Pure1v1UserInfo?)->())?
     var userInfo: Pure1v1UserInfo? {
         didSet {
             bgImageView.image = userInfo?.bgImage()
             contentImageView.image = bgImageView.image
-            nameLabel.text = userInfo?.userName ?? ""
-            avatarView.sd_setImage(with: URL(string: userInfo?.avatar ?? ""))
-
+            remoteUserView.setInfo(title: "user_list_cell_remote_user".pure1v1Localization(),
+                                   avatarUrl: userInfo?.avatar ?? "",
+                                   avatarName: userInfo?.userName ?? "")
             callButton.startAnimation()
+        }
+    }
+    var localUserInfo: Pure1v1UserInfo? {
+        didSet {
+            localUserView.setInfo(title: "user_list_cell_local_user".pure1v1Localization(),
+                                  avatarUrl: localUserInfo?.avatar ?? "",
+                                  avatarName: localUserInfo?.userName ?? "")
         }
     }
     
@@ -75,22 +139,15 @@ class Pure1v1UserCell: UICollectionViewCell {
         view.isUserInteractionEnabled = true
         return view
     }()
-    // 用户名称
-    private lazy var nameLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .white
-        label.font = UIFont.systemFont(ofSize: 20)
-        return label
-    }()
-    
-    // 头像
-    private lazy var avatarView: UIImageView = UIImageView()
     //呼叫按钮
     private lazy var callButton: Pure1v1TouchWaveView = {
         let button =  Pure1v1TouchWaveView()
         button.addTarget(self, action: #selector(_callAction), for: .touchUpInside)
         return button
     }()
+    
+    private lazy var remoteUserView = PureUserInfoView()
+    private lazy var localUserView = PureUserInfoView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -109,8 +166,8 @@ class Pure1v1UserCell: UICollectionViewCell {
         contentImageView.layer.addSublayer(gradientLayer)
         contentImageView.layer.addSublayer(liveGradientLayer)
         contentImageView.addSubview(liveAnimationView)
-        contentImageView.addSubview(nameLabel)
-        contentImageView.addSubview(avatarView)
+        contentImageView.addSubview(localUserView)
+        contentImageView.addSubview(remoteUserView)
         contentImageView.addSubview(callButton)
     }
     
@@ -122,22 +179,18 @@ class Pure1v1UserCell: UICollectionViewCell {
         let bottom = 47.0
         contentImageView.frame = CGRect(x: 15, y: top, width: self.aui_width - 30, height: self.aui_height - bottom - top)
         gradientLayer.frame = CGRect(x: 0, y: contentImageView.aui_height - 254, width: contentImageView.aui_width, height: 254)
-        let wh = 32.0
-        avatarView.frame = CGRect(x: 15, y: contentImageView.aui_height - 40 - wh, width: wh, height: wh)
-        avatarView.layer.cornerRadius = wh / 2
-        avatarView.clipsToBounds = true
         
         liveAnimationView.aui_tl = CGPoint(x: 11, y: 10)
         liveGradientLayer.frame = liveAnimationView.frame
         
         callButton.aui_size = CGSize(width: 76, height: 76)
         callButton.aui_right = contentImageView.aui_width - 15
-        callButton.aui_centerY = avatarView.aui_centerY
+        callButton.aui_bottom = contentImageView.aui_height - 20
         
+        let userViewHeight = 60.0
+        remoteUserView.frame = CGRect(x: 0.0, y: contentImageView.aui_height - userViewHeight - 15, width: callButton.aui_left, height: userViewHeight)
         
-        nameLabel.aui_left = avatarView.aui_right + 10
-        nameLabel.aui_size = CGSize(width: callButton.aui_left - nameLabel.aui_left - 10, height: avatarView.aui_height)
-        nameLabel.aui_centerY = avatarView.aui_centerY
+        localUserView.frame = CGRect(x: 0.0, y: remoteUserView.aui_top - userViewHeight - 15, width: remoteUserView.aui_width, height: userViewHeight)
     }
     
     @objc func _callAction() {

@@ -16,6 +16,8 @@
 "user_list_waitting"="等待其他用户";
 "user_list_nodata_tips"="欢迎来到声网1V1私密房，目前暂无其它用户入场，你可邀约朋友入场体验。";
 "user_list_refresh_tips"="用户列表已刷新";
+"user_list_cell_local_user"="本人信息";
+"user_list_cell_remote_user"="对端信息";
 "call_not_init"="网络异常";
 "call_state_caller_waitting"="等待对方接受";
 "call_state_callee_waitting"="邀请你私密视频连线";
