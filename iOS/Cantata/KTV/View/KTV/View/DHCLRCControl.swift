@@ -8,6 +8,11 @@
 import UIKit
 import AgoraLyricsScore
 
+@objc public protocol DHCLrcControlDelegate: NSObjectProtocol {
+    func didLrcViewDragedTo(pos: Int, score: Int, totalScore: Int)
+    func didLrcViewScorllFinished(with score: Int, totalScore: Int, lineScore: Int, lineIndex:Int)
+}
+
 class RankModel: NSObject {
     @objc var userName: String?
     @objc var poster: String?
@@ -61,6 +66,11 @@ class DHCLRCControl: UIView {
     private var resultView: UIView! //结算界面
     private var noSongLabel: UILabel!
     private var chorusNumBtn: UIButton!
+    private var totalLines: Int = 0
+    private var totalScore: Int = 0
+    private var totalCount: Int = 0
+    private var currentLoadLrcPath: String?
+    @objc public weak var lrcDelegate: DHCLrcControlDelegate?
     weak var delegate: DHCGameDelegate?
     private var downloadManager = AgoraDownLoadManager()
     public var controlState: DHCGameState = .noSong {
@@ -207,33 +217,33 @@ class DHCLRCControl: UIView {
 
         pauseBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 34, height: 40))
         pauseBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "暂停", image: UIImage.sceneImage(name: "ktv_pause_icon", bundleName: "DHCResource")!, spacing: 0, for: .selected)
+        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "暂停", image: UIImage.sceneImage(name: "ktv_pause_resumeicon", bundleName: "DHCResource")!, spacing: 0, for: .selected)
         pauseBtn.setVerticalLayoutWithCenterAlignment(title: "播放", image: UIImage.sceneImage(name: "ktv_pause_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         pauseBtn.addTarget(self, action: #selector(pause), for: .touchUpInside)
         addSubview(pauseBtn)
         
         nextBtn = UIButton(frame: CGRect(x: 74, y: self.bounds.maxY - 50, width: 34, height: 40))
         nextBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-        pauseBtn.addTarget(self, action: #selector(nextSong), for: .touchUpInside)
+        nextBtn.addTarget(self, action: #selector(nextSong), for: .touchUpInside)
         nextBtn.setVerticalLayoutWithCenterAlignment(title: "切歌", image: UIImage.sceneImage(name: "ktv_playNext_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         addSubview(nextBtn)
         
         originBtn = UIButton(frame: CGRect(x: self.bounds.width - 54, y: self.bounds.maxY - 50, width: 34, height: 40))
         originBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-        pauseBtn.addTarget(self, action: #selector(trackChange), for: .touchUpInside)
+        originBtn.addTarget(self, action: #selector(trackChange), for: .touchUpInside)
         originBtn.setVerticalLayoutWithCenterAlignment(title: "原唱", image: UIImage.sceneImage(name: "original", bundleName: "DHCResource")!, spacing: 0, for: .selected)
         originBtn.setVerticalLayoutWithCenterAlignment(title: "伴奏", image: UIImage.sceneImage(name: "acc", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         addSubview(originBtn)
         
         effectBtn = UIButton(frame: CGRect(x: self.bounds.width - 108, y: self.bounds.maxY - 50, width: 34, height: 40))
         effectBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-        pauseBtn.addTarget(self, action: #selector(effectChange), for: .touchUpInside)
+        effectBtn.addTarget(self, action: #selector(effectChange), for: .touchUpInside)
         effectBtn.setVerticalLayoutWithCenterAlignment(title: "调音", image: UIImage.sceneImage(name: "ktv_subtitle_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         addSubview(effectBtn)
         
         leaveChorusBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 50, height: 40))
         leaveChorusBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-        pauseBtn.addTarget(self, action: #selector(leaveChorus), for: .touchUpInside)
+        leaveChorusBtn.addTarget(self, action: #selector(leaveChorus), for: .touchUpInside)
         leaveChorusBtn.setVerticalLayoutWithCenterAlignment(title: "退出合唱", image: UIImage.sceneImage(name: "ic_leave_chorus", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         addSubview(leaveChorusBtn)
         leaveChorusBtn.isHidden = true
@@ -248,7 +258,7 @@ class DHCLRCControl: UIView {
     @objc private func pause( btn: UIButton) {
         guard let delegate = self.delegate else {return}
         btn.isSelected = !btn.isSelected
-        delegate.didGameEventChanged(with: btn.isSelected ? .play : .pause)
+        delegate.didGameEventChanged(with: btn.isSelected ? .pause : .play)
     }
     
     @objc private func nextSong( btn: UIButton) {
@@ -258,6 +268,7 @@ class DHCLRCControl: UIView {
     
     @objc private func trackChange( btn: UIButton) {
         guard let delegate = self.delegate else {return}
+        btn.isSelected = !btn.isSelected
         delegate.didGameEventChanged(with: btn.isSelected ? .origin : .acc)
     }
     
@@ -305,7 +316,15 @@ class DHCLRCControl: UIView {
 
 extension DHCLRCControl: KaraokeDelegate {
     func onKaraokeView(view: KaraokeView, didFinishLineWith model: LyricLineModel, score: Int, cumulativeScore: Int, lineIndex: Int, lineCount: Int) {
-        
+        totalLines = lineCount
+        totalScore += score
+        guard let delegate = lrcDelegate else {
+            return
+        }
+        delegate.didLrcViewScorllFinished(with: totalScore,
+                                          totalScore: lineCount * 100,
+                                          lineScore: score,
+                                          lineIndex: lineIndex)
     }
 }
 
@@ -351,11 +370,18 @@ extension DHCLRCControl: KTVLrcViewDelegate {
     }
     
     func resetLrcData(with url: String) {
+        guard currentLoadLrcPath != url else {
+            return
+        }
         let musicUrl = URL(fileURLWithPath: url)
         guard let data = try? Data(contentsOf: musicUrl),
               let model = KaraokeView.parseLyricData(data: data) else {
             return
         }
+        currentLoadLrcPath = url
+        totalCount = model.lines.count
+        totalLines = 0
+        totalScore = 0
         lrcView?.setLyricData(data: model)
         musicNameBtn.setTitle("\(model.name)-\(model.singer)", for: .normal)
         musicNameBtn.isHidden = false

@@ -1492,7 +1492,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
             self.localPlayerPosition = Date().milListamp
             print("localPlayerPosition:playerKit:openCompleted \(localPlayerPosition)")
             self.playerDuration = TimeInterval(mediaPlayer?.getDuration() ?? 0)
-            playerKit.selectMultiAudioTrack(0, publishTrackIndex: 0)
+            playerKit.selectMultiAudioTrack(1, publishTrackIndex: 1)
             if isMainSinger() { //主唱播放，通过同步消息“setLrcTime”通知伴唱play
                 playerKit.play()
             }

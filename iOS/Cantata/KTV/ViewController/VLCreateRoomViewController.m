@@ -6,7 +6,7 @@
 #import "VLCreateRoomViewController.h"
 #import <AgoraRtcKit/AgoraRtcKit.h>
 #import "VLCreateRoomView.h"
-#import "VLKTVViewController.h"
+//#import "VLKTVViewController.h"
 #import "VLAddRoomModel.h"
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"

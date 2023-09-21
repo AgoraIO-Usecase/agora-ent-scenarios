@@ -17,11 +17,15 @@
                 <rect key="frame" x="0.0" y="0.0" width="671" height="60"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5dF-d7-JW1">
-                        <rect key="frame" x="607" y="13" width="44" height="34"/>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5dF-d7-JW1">
+                        <rect key="frame" x="626" y="17.666666666666668" width="25" height="25.000000000000004"/>
                         <color key="backgroundColor" red="0.08235294118" green="0.12549019610000001" blue="0.3921568627" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <state key="normal" title="Button"/>
-                        <buttonConfiguration key="configuration" style="plain" image="leaveChorus.png"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="25" id="Sxu-Hn-c2R"/>
+                            <constraint firstAttribute="width" constant="25" id="n2t-N1-yDO"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal" image="leaveChorus.png"/>
                     </button>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="NP8-GT-2jI">
                         <rect key="frame" x="20" y="15" width="30" height="30"/>
@@ -54,7 +58,7 @@
                     </button>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gzX-fB-XGY">
                         <rect key="frame" x="120" y="50" width="0.0" height="0.0"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <nil key="highlightedColor"/>
                     </label>
@@ -66,8 +70,8 @@
                     <constraint firstItem="5QP-j2-tBr" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="Faq-jq-ePy"/>
                     <constraint firstItem="5QP-j2-tBr" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="PLM-WV-l1f"/>
                     <constraint firstItem="ZqM-7s-K7v" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="PeZ-k0-C2X"/>
-                    <constraint firstAttribute="trailing" secondItem="5dF-d7-JW1" secondAttribute="trailing" constant="20" id="WS5-Wt-9XI"/>
                     <constraint firstAttribute="bottom" secondItem="gzX-fB-XGY" secondAttribute="bottom" constant="10" id="ixJ-fA-vaG"/>
+                    <constraint firstAttribute="trailing" secondItem="5dF-d7-JW1" secondAttribute="trailing" constant="20" id="l1d-uj-FaM"/>
                     <constraint firstItem="gzX-fB-XGY" firstAttribute="leading" secondItem="ZqM-7s-K7v" secondAttribute="trailing" constant="10" id="mtG-yc-VEP"/>
                     <constraint firstItem="86d-TS-x49" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="pLW-tI-0hX"/>
                     <constraint firstItem="86d-TS-x49" firstAttribute="leading" secondItem="ZqM-7s-K7v" secondAttribute="trailing" constant="10" id="tzS-FH-wNz"/>
@@ -76,6 +80,14 @@
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="gradeLabel" destination="gzX-fB-XGY" id="VWr-Co-sAD"/>
+                <outlet property="headImgView" destination="ZqM-7s-K7v" id="bf5-40-c47"/>
+                <outlet property="leaveBtn" destination="5dF-d7-JW1" id="MoF-vd-TCX"/>
+                <outlet property="levelImgview" destination="NP8-GT-2jI" id="nR4-cm-DDa"/>
+                <outlet property="levelLabel" destination="5QP-j2-tBr" id="t6C-a6-hgL"/>
+                <outlet property="nameLabel" destination="86d-TS-x49" id="9bv-o4-VZu"/>
+            </connections>
             <point key="canvasLocation" x="406.87022900763355" y="0.0"/>
         </tableViewCell>
     </objects>
