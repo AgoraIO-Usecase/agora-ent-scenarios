@@ -64,7 +64,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         adapter.scenes = mutableListOf<SceneInfo>()
         adapter.appInfo = AppInfo(
             this.getString(R.string.app_about_name),
-            "20230110-3.3.0-" + RtcEngine.getSdkVersion(),
+            "20230922-3.3.0-" + RtcEngine.getSdkVersion(),
             servicePhone,
             webSite
         )
