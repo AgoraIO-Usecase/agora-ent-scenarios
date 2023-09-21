@@ -9,7 +9,6 @@ import Foundation
 import AgoraRtcKit
 import AgoraRtmKit
 
-private let kRetryCount: Int = 3
 private let kCallTimeoutInterval = 15.0
 
 private let kCurrentMessageVersion = "1.0"
@@ -67,10 +66,7 @@ public class CallApiImpl: NSObject {
     /// 当前状态
     private var state: CallStateType = .idle {
         didSet {
-            if oldValue == state {
-                return
-            }
-            
+            if oldValue == state { return }
             switch state {
             case .calling:
                 //开启定时器，如果超时无响应，调用no response
@@ -266,7 +262,7 @@ extension CallApiImpl {
         }
     }
     
-    private func _prepareForCall(prepareConfig: PrepareConfig, retryCount: Int = kRetryCount, completion: ((NSError?) -> ())?) {
+    private func _prepareForCall(prepareConfig: PrepareConfig, completion: ((NSError?) -> ())?) {
         if state == .prepared {
             let reason = "is already in 'prepared' state"
             callWarningPrint(reason)
@@ -301,6 +297,7 @@ extension CallApiImpl {
             guard let self = self else { return }
             rtmError = err
             self.callWarningPrint("prepareForCall[\(tag)] rtmInitialize completion: \(err?.localizedDescription ?? "success")")
+            self._notifyEvent(event: err == nil ? .rtmSetupSuccessed : .rtmSetupFailed, elapsed: Int(-date.timeIntervalSinceNow * 1000))
             group.leave()
         }
         
@@ -309,30 +306,24 @@ extension CallApiImpl {
             _joinRTC(roomId: tokenConfig?.roomId ?? "", token: tokenConfig?.rtcToken ?? "", joinOnly: true) { err in
                 rtcError = err
                 self.callWarningPrint("prepareForCall[\(tag)] joinRTC completion: \(err?.localizedDescription ?? "success")")
+                self._notifyEvent(event: err == nil ? .joinRTCSuccessed : .joinRTCFailed, elapsed: Int(-date.timeIntervalSinceNow * 1000))
                 group.leave()
             }
         }
         
         group.notify(queue: DispatchQueue.main) { [weak self] in
             guard let self = self else {return}
+            self.isPreparing = false
             if let err = rtmError ?? rtcError {
-                if retryCount <= 1 {
-                    self.isPreparing = false
-                    completion?(err)
-                    self._notifyState(state: .failed,
-                                      stateReason: err == rtmError ? .rtmSetupFailed : .joinRTCFailed,
-                                      eventReason: err.localizedDescription)
-                } else {
-                    self.isPreparing = false
-                    self._prepareForCall(prepareConfig: prepareConfig, retryCount: retryCount - 1, completion: completion)
-                    self._notifyEvent(event: .rtmSetupSuccessed)
-                }
+                completion?(err)
+                self._notifyState(state: .failed,
+                                  stateReason: err == rtmError ? .rtmSetupFailed : .joinRTCFailed,
+                                  eventReason: err.localizedDescription)
                 return
             }
             self.preparedTs = self._getNtpTimeInMs()
-            self.isPreparing = false
-            self._notifyState(state: .prepared, elapsed: Int(-date.timeIntervalSinceNow * 1000))
             completion?(nil)
+            self._notifyState(state: .prepared, elapsed: Int(-date.timeIntervalSinceNow * 1000))
         }
     }
     
@@ -374,10 +365,9 @@ extension CallApiImpl {
     
     private func _joinRTCAndNotify(roomId: String,
                                    token: String,
-                                   retryCount: Int = 3,
                                    joinOnly: Bool = false,
                                    completion: ((NSError?) -> ())? = nil) {
-        _joinRTC(roomId: roomId, token: token, retryCount: retryCount, joinOnly: joinOnly) {[weak self] err in
+        _joinRTC(roomId: roomId, token: token, joinOnly: joinOnly) {[weak self] err in
             guard let self = self else { return }
             if let err = err {
                 let errReason = err.localizedDescription
@@ -393,7 +383,6 @@ extension CallApiImpl {
     //加入RTC频道
     private func _joinRTC(roomId: String,
                           token: String,
-                          retryCount: Int = 3,
                           joinOnly: Bool = false,
                           completion: ((NSError?) -> ())?) {
         guard let config = self.config else {
@@ -458,11 +447,7 @@ extension CallApiImpl {
             }
             
             self.rtcConnection = nil
-            if retryCount <= 1 {
-                completion?(error)
-            } else {
-                self._joinRTCAndNotify(roomId: roomId, token: token, retryCount: retryCount - 1, completion: completion)
-            }
+            completion?(error)
         }
         let date = Date()
         firstFrameCompletion = { [weak self] in
@@ -611,7 +596,6 @@ extension CallApiImpl {
         messageManager?.sendMessage(roomId: roomId, fromRoomId: fromRoomId, message: message) { error in
             completion?(error, message)
         }
-        _notifyEvent(event: .localRejected)
     }
     
     private func _hangup(roomId: String, completion: ((NSError?, [String: Any]) -> ())? = nil) {
@@ -846,7 +830,7 @@ extension CallApiImpl: CallApiProtocol {
         
         _notifyState(state: .calling, eventInfo: message)
         _notifyEvent(event: .onCalling)
-        
+
         callingRoomId = roomId
         callingUserId = remoteUserId
         //不等响应即加入频道，加快join速度，失败则leave
@@ -868,7 +852,6 @@ extension CallApiImpl: CallApiProtocol {
         let message: [String: Any] = _messageDic(action: .cancelCall)
         messageManager?.sendMessage(roomId: roomId, fromRoomId: fromRoomId, message: message) { err in
         }
-        
         _notifyState(state: .prepared, stateReason: .localCancel)
         _notifyEvent(event: .localCancel)
     }
@@ -993,22 +976,15 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         callPrint("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
-        guard callingUserId == uid, let roomId = callingRoomId, let config = config else {
-            return
-        }
-        
+        guard callingUserId == uid, let roomId = callingRoomId, let config = config else { return }
         self.timeProfiling(message: "5.呼叫-对端[\(uid)] 加入房间")
         self._setupRemoteVideo(roomId: roomId, uid: uid, canvasView: config.remoteView)
-        
         _notifyEvent(event: .remoteJoin, elapsed: _getNtpTimeInMs() - (callTs ?? 0))
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
         callPrint("didOfflineOfUid: \(uid)")
-        guard callingUserId == uid else {
-            return
-        }
-        
+        guard callingUserId == uid else { return }
         _notifyEvent(event: .remoteLeave)
     }
     
@@ -1020,13 +996,10 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
 
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
         callPrint("join RTC channel, didJoinChannel: \(uid), channel: \(channel) elapsed: \(elapsed)")
-        guard uid == config?.userId ?? 0 else {
-            return
-        }
+        guard uid == config?.userId ?? 0 else { return }
         isChannelJoined = true
         joinRtcCompletion?(nil)
         joinRtcCompletion = nil
-        
         _notifyEvent(event: .localJoin, elapsed: _getNtpTimeInMs() - (callTs ?? 0))
     }
     
@@ -1086,7 +1059,6 @@ extension CallApiImpl {
             (element as? CallApiListenerProtocol)?.callDebugInfo?(message: message)
         }
         guard delegates.count == 0 else {return}
-    
         debugPrint("[CallApi]\(message)")
     }
 
