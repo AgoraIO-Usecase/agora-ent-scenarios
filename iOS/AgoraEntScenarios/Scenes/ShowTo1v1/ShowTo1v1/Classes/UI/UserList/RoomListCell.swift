@@ -56,13 +56,13 @@ class RoomUserInfoView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        let avatarOffset = roomNameLabel.attributedText == nil ? 0.0 : 20
         
-        let wh = 32.0
         titleLabel.sizeToFit()
         titleLabel.frame = CGRect(origin: CGPoint(x: 15, y: 0), size: titleLabel.size)
         
-        avatarView.frame = CGRect(x: 15, y: aui_height - wh - avatarOffset, width: wh, height: wh)
+        let wh = 32.0
+        let avatartViewTop = roomNameLabel.attributedText == nil ? aui_height - wh : 30
+        avatarView.frame = CGRect(x: 15, y: avatartViewTop, width: wh, height: wh)
         avatarView.layer.cornerRadius = wh / 2
         avatarView.clipsToBounds = true
         
@@ -218,7 +218,7 @@ class RoomListCell: UICollectionViewCell {
         liveTagView.aui_tl = CGPoint(x: 11, y: 10)
         
         
-        let remoteUserViewHeight = 80.0
+        let remoteUserViewHeight = 100.0
         remoteUserView.frame = CGRect(x: 0.0, y: contentImageView.aui_height - remoteUserViewHeight - 15, width: callButton.aui_left, height: remoteUserViewHeight)
         
         let localUserViewHeight = 60.0
