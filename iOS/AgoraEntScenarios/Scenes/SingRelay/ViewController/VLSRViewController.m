@@ -1416,15 +1416,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     kWeakSelf(self);
     [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
         if(flag == YES){
-            [weakself.SRApi stopSing];
             [weakself removeCurrentSongWithSync:YES];
-            [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"MICOWNERINDEX"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
             weakself.isNowMicMuted = true;
             [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:weakself.isNowMicMuted completion:^(NSError * err) {
                 
             }];
-            
+            [weakself resetGameData];
+            [weakself.scoreArray removeAllObjects];
             weakself.gameModel.status = SingRelayStatusWaiting;
             if([weakself isRoomOwner]){
 ////                //房主把分数给到服务端
@@ -2022,6 +2020,7 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
          2.观众是等待状态
          */
         self.statusView.state = [self isRoomOwner] ? SBGStateOwnerOrderMusic : SBGStateAudienceWating;
+        [self resetGameData];
     } else if(gameModel.status == SingRelayStatusStarted){
         /**
          1.嗨唱开始
@@ -2039,24 +2038,25 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
                                                             completion:^(NSError * error) {
         }];
     } else if(gameModel.status == SingRelayStatusEnded){
-        [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"MICOWNERINDEX"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        [_bottomView setAudioBtnEnabled:true];
-        self.chooseArray = [NSMutableArray arrayWithObjects:@(NO), @(NO), @(NO), @(NO), @(NO), nil];
-        self.currentUserNo = self.seatsArray.firstObject.userNo;
-        self.nextWinNo = nil;
-        self.segmentScore = 0;
-        self.segmentCount = 0;
-        self.sumScore = 0;
-        self.cosingerLoadCount = 0;
-        self.MainSingerPlayFlag = false;
-        self.hasCountDown = false;
-        self.currentIndex = 0;
-        [self.SRApi stopSing];
-        [self.statusView resetLrcView];
-        [self.SRApi switchSingerRoleWithNewRole:SRSingRoleAudience onSwitchRoleState:^(SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
-
-        }];
+//        [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"MICOWNERINDEX"];
+//        [[NSUserDefaults standardUserDefaults] synchronize];
+//        [_bottomView setAudioBtnEnabled:true];
+//        self.chooseArray = [NSMutableArray arrayWithObjects:@(NO), @(NO), @(NO), @(NO), @(NO), nil];
+//        self.currentUserNo = self.seatsArray.firstObject.userNo;
+//        self.nextWinNo = nil;
+//        self.segmentScore = 0;
+//        self.segmentCount = 0;
+//        self.sumScore = 0;
+//        self.cosingerLoadCount = 0;
+//        self.MainSingerPlayFlag = false;
+//        self.hasCountDown = false;
+//        self.currentIndex = 0;
+//        [self.SRApi stopSing];
+//        [self.statusView resetLrcView];
+//        [self.SRApi switchSingerRoleWithNewRole:SRSingRoleAudience onSwitchRoleState:^(SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
+//
+//        }];
+        [self resetGameData];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.statusView hideNextMicOwner];
             NSArray *mergeModels = mergeModelsWithSameUserIds(self.scoreArray);
@@ -2067,6 +2067,27 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
         });
 
     }
+}
+
+-(void)resetGameData {
+    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"MICOWNERINDEX"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [_bottomView setAudioBtnEnabled:true];
+    self.chooseArray = [NSMutableArray arrayWithObjects:@(NO), @(NO), @(NO), @(NO), @(NO), nil];
+    self.currentUserNo = self.seatsArray.firstObject.userNo;
+    self.nextWinNo = nil;
+    self.segmentScore = 0;
+    self.segmentCount = 0;
+    self.sumScore = 0;
+    self.cosingerLoadCount = 0;
+    self.MainSingerPlayFlag = false;
+    self.hasCountDown = false;
+    self.currentIndex = 0;
+    [self.SRApi stopSing];
+    [self.statusView resetLrcView];
+    [self.SRApi switchSingerRoleWithNewRole:SRSingRoleAudience onSwitchRoleState:^(SRSwitchRoleState state, SRSwitchRoleFailReason reason) {
+
+    }];
 }
 
 // 组合：合并相同 user id 的模型 -> 按分数排序 -> 分配索引
