@@ -237,7 +237,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 dispatchGroup.enter()
                 NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ad",
                                                      uid: "\(UserInfo.userId)",
-                                                     tokenGeneratorType: .token007,
+                                                     tokenGeneratorType: .token006,
                                                      tokenTypes: [.rtc]) { tokenMap in
                     tokenMap2 = tokenMap
                     dispatchGroup.leave()
@@ -246,7 +246,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 dispatchGroup.enter()
                 NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")",
                                                      uid: "2023",
-                                                     tokenGeneratorType: .token007,
+                                                     tokenGeneratorType: .token006,
                                                      tokenTypes: [.rtc]) { tokenMap in
                     tokenMap3 = tokenMap
                     dispatchGroup.leave()
@@ -320,7 +320,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 self?.roomNo = channelName
                 
                 let playerRTCUid = UserInfo.userId//VLUserCenter.user.agoraPlayerRTCUid
-                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
+                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:], tokenMap3:[Int: String] = [:]
                 
                 let dispatchGroup = DispatchGroup()
                 dispatchGroup.enter()
@@ -333,11 +333,20 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 }
                 
                 dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ex",
-                                                     uid: "\(playerRTCUid)",
+                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ad",
+                                                     uid: "\(UserInfo.userId)",
                                                      tokenGeneratorType: .token006,
                                                      tokenTypes: [.rtc]) { tokenMap in
                     tokenMap2 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.enter()
+                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")",
+                                                     uid: "2023",
+                                                     tokenGeneratorType: .token006,
+                                                     tokenTypes: [.rtc]) { tokenMap in
+                    tokenMap3 = tokenMap
                     dispatchGroup.leave()
                 }
                 
@@ -346,7 +355,8 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     guard let self = self,
                           let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
                           let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
-                          let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
+                          let audienceToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue],
+                          let rtcPlayerToken = tokenMap3[NetworkManager.AgoraTokenType.rtc.rawValue]
                     else {
                         _hideLoadingIfNeed()
                         agoraAssert(tokenMap1.count == 2, "rtcToken == nil || rtmToken == nil")
@@ -358,6 +368,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
+                    VLUserCenter.user.audienceChannelToken = audienceToken
                     self._autoOnSeatIfNeed { seatArray in
                         agoraPrint("joinRoom _autoOnSeatIfNeed cost: \(-date.timeIntervalSinceNow * 1000) ms")
                         _hideLoadingIfNeed()
@@ -473,6 +484,35 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     finished: completion)
     }
 
+    public func updateSeatScoreStatus(with score: Int,
+                                   completion: @escaping (Error?) -> Void) {
+        guard let seatInfo = self.seatMap
+            .filter({ $0.value.userNo == VLUserCenter.user.id })
+            .first?.value else {
+            agoraAssert("open video seat not found")
+            completion(nil)
+            return
+        }
+        
+        seatInfo.score = score
+        _updateSeat(seatInfo: seatInfo,
+                    finished: completion)
+    }
+    
+    public func updateSongEndStatus(with inputModel: KTVRemoveSongInputModel, completion: @escaping (Error?) -> Void) {
+        guard let topSong = songList.first,
+              let song = songList.filter({ $0.objectId == inputModel.objectId }).first
+        else {
+            agoraAssert("make song to top not found! \(inputModel.songNo)")
+            completion(nil)
+            return
+        }
+
+        
+        _updateChooseSong(songInfo: song) { error in
+            completion(error)
+        }
+    }
     
     // MARK: choose songs
     public func removeSong(with inputModel: KTVRemoveSongInputModel,

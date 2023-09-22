@@ -50,8 +50,17 @@ class DHCResultView: UIView {
     private lazy var nextBtn: UIButton = { //下一首歌提示
         let btn = UIButton()
         btn.setTitle("下一首", for: .normal)
+        if let image = UIImage.sceneImage(name: "next", bundleName: "DHCResource") {
+            let resizedImage = image.resizableImage(withCapInsets: UIEdgeInsets.zero, resizingMode: .stretch)
+            btn.setBackgroundImage(resizedImage, for: .normal)
+            btn.contentMode = .scaleAspectFill
+        }
+
+        btn.addTarget(self, action: #selector(nextSong), for: .touchUpInside)
         return btn
      }()
+    
+    var nextBlock: (()->Void)?
     
     @objc public var dataSource: [SubRankModel]? {
         didSet {
@@ -69,13 +78,42 @@ class DHCResultView: UIView {
     }
     
     private func layoutUI() {
-        
+
+        self.addSubview(resultTitleLabel)
+        self.addSubview(totalScoreLabel)
+        self.addSubview(tableView)
+        addSubview(nextBtn)
+        addSubview(nextLabel)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        resultTitleLabel.frame = CGRect(x: (ScreenWidth - 100)/2.0, y: 20, width: 100, height: 20)
+        totalScoreLabel.frame = CGRect(x: (ScreenWidth - 300)/2.0, y: 60, width: 300, height: 40)
+        tableView.frame = CGRect(x: 0, y: 120, width: ScreenWidth, height: 300)
+        nextLabel.frame = CGRect(x:(ScreenWidth - 100)/2.0, y: 500, width: 100, height: 20)
+        nextBtn.frame = CGRect(x: (ScreenWidth - 122)/2.0, y: 450, width: 122, height: 38)
+    }
+    
+    public func setResultData(with totalScore: Int, models:[SubRankModel], musicStr: String, isRoomOwner: Bool) {
+        self.dataSource = models
+        totalScoreLabel.text = "\(totalScore)"
+        nextLabel.isHidden = musicStr.count == 0
+        if musicStr.count > 0 {
+            nextLabel.text = "\(musicStr)"
+        }
+        nextBtn.isHidden = !isRoomOwner
+    }
+    
+    @objc func nextSong() {
+        guard let block = nextBlock else {return}
+        block()
     }
 }
 
 extension DHCResultView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (dataSource?.count ?? 3) + 1
+        return dataSource?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

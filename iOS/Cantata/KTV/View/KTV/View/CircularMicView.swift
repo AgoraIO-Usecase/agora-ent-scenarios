@@ -38,11 +38,7 @@ class ChorusMicView: UIView {
     
     private func updateAllMics(with seatArray: [VLRoomSeatModel]) {
         for i in seatArray {
-            guard let headUrl = i.headUrl else {return}
-            let index = i.seatIndex
-            guard let micView = self.viewWithTag(1000 + index) as? MicView else {return}
-            micView.updateMicName(i.name ?? "")
-            micView.updateMicImage(with: headUrl)
+            updateMics(with: i)
         }
     }
     
@@ -76,7 +72,7 @@ class ChorusMicView: UIView {
             //设置gif图片为 centralMicView.gradeImageView的背景图
             let bundlePath = Bundle.main.path(forResource: "DHCResource", ofType: "bundle") ?? ""
             let bundle = Bundle(path: bundlePath)
-            centralMicView.gradeImageView.setGifImage(fromBundle: bundle!, named: "excellent@3x")
+            centralMicView.gradeImageView.setGifImage(fromBundle: bundle!, named: "excellent")
             centralMicView.gradeImageView
             let random = nonzeroRandom(in: 5...15)
             centralMicView.addFloatingAnimation(random, random)

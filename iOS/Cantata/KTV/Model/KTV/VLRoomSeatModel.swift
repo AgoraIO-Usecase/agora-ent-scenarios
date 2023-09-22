@@ -26,6 +26,8 @@ import AgoraCommon
     @objc public var isAudioMuted: Int = 0
     /// 是否开启视频
     @objc public var isVideoMuted: Int = 0
+    
+    @objc public var score: Int = 0
     /// 新增, 判断当前歌曲是否是自己点的
     @objc public var isOwner: Bool = false
 
@@ -50,6 +52,7 @@ import AgoraCommon
         self.isAudioMuted = seatInfo?.isAudioMuted ?? 0
         self.isVideoMuted = seatInfo?.isVideoMuted ?? 0
         self.chorusSongCode = seatInfo?.chorusSongCode
+        self.score = seatInfo?.score ?? 0
     }
 
 }

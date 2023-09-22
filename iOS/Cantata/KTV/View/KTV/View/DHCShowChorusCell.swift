@@ -50,7 +50,7 @@ class DHCShowChorusCell: UITableViewCell {
         }
         leaveBtn.isHidden = !model.isRoomOwner || model.isMaster
         levelLabel.text = "\(model.level)"
-        gradeLabel.text = "\(model.num)"
+        gradeLabel.text = "当前 \(model.num) 分"
         nameLabel.setTitle("\(model.name)", for: .normal)
         nameLabel.setImage(model.isMaster ? UIImage.sceneImage(name: "dhc_mainSinger", bundleName: "DHCResource") : nil, for: .normal)
         headImgView.sd_setImage(with: NSURL(string: model.headIcon) as URL?)

@@ -26,20 +26,19 @@ class DHCScoreCell: UITableViewCell {
     
     var score: SubRankModel = SubRankModel() {
         didSet {
-            indexLabel.text = "\(score.index)"
+            indexLabel.text = "\(score.index + 1)"
             if let userName = score.userName {
                 nameLabel.text = score.userName == "" ? "暂无上榜" : userName
             } else {
                 nameLabel.text = "暂无上榜"
             }
-            sbgCountLabel.text = score.songNum == 0 ? "-" : "\(score.songNum)段"
-            gradeLabel.text = score.songNum == 0 ? "-" : "\(score.score)分"
-            if(score.index == 1){
-                iconView.image = UIImage.sceneImage(name: "sbg-rank1")
+            gradeLabel.text = "\(score.score)分"
+            if(score.index == 0){
+                iconView.image = UIImage.sceneImage(name: "sbg-rank1", bundleName: "DHCResource")
+            } else if score.index == 1 {
+                iconView.image = UIImage.sceneImage(name: "sbg-rank2", bundleName: "DHCResource")
             } else if score.index == 2 {
-                iconView.image = UIImage.sceneImage(name: "sbg-rank2")
-            } else if score.index == 3 {
-                iconView.image = UIImage.sceneImage(name: "sbg-rank3")
+                iconView.image = UIImage.sceneImage(name: "sbg-rank3", bundleName: "DHCResource")
             }
             headIcon.isHidden = score.poster == ""
             headIcon.sd_setImage(with: URL(string: score.poster ?? ""))
@@ -85,12 +84,12 @@ class DHCScoreCell: UITableViewCell {
         nameLabel.font = UIFont.systemFont(ofSize: 10)
         self.contentView.addSubview(nameLabel)
 
-        sbgCountLabel = UILabel()
-        sbgCountLabel.textColor = .white
-        sbgCountLabel.backgroundColor = .clear
-        sbgCountLabel.font = UIFont.systemFont(ofSize: 10)
-        sbgCountLabel.textAlignment = .center
-        self.contentView.addSubview(sbgCountLabel)
+//        sbgCountLabel = UILabel()
+//        sbgCountLabel.textColor = .white
+//        sbgCountLabel.backgroundColor = .clear
+//        sbgCountLabel.font = UIFont.systemFont(ofSize: 10)
+//        sbgCountLabel.textAlignment = .center
+//        self.contentView.addSubview(sbgCountLabel)
         
         gradeLabel = UILabel()
         gradeLabel.textColor = .white
@@ -111,7 +110,7 @@ class DHCScoreCell: UITableViewCell {
         indexLabel.frame = CGRect(x: basicWidth / 2.0 - 18, y: 5, width: 36, height: 28)
         headIcon.frame = CGRect(x: basicWidth + 20, y: 7, width: 24, height: 24)
         nameLabel.frame = CGRect(x:headIcon.frame.maxX + 12, y: 5, width: 60, height: 28)
-        sbgCountLabel.frame = CGRect(x:basicWidth * 3, y: 5, width: basicWidth, height: 28)
+//        sbgCountLabel.frame = CGRect(x:basicWidth * 3, y: 5, width: basicWidth, height: 28)
         gradeLabel.frame = CGRect(x:basicWidth * 4, y: 5, width: basicWidth, height: 28)
     }
 

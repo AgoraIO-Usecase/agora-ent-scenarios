@@ -9,8 +9,8 @@ import UIKit
 import AgoraLyricsScore
 
 @objc public protocol DHCLrcControlDelegate: NSObjectProtocol {
-    func didLrcViewDragedTo(pos: Int, score: Int, totalScore: Int)
     func didLrcViewScorllFinished(with score: Int, totalScore: Int, lineScore: Int, lineIndex:Int)
+    func didLrcViewDragedTo(pos: Int, score: Int, totalScore: Int)
 }
 
 class RankModel: NSObject {
@@ -37,6 +37,7 @@ public enum DHCGameEvent: Int {
     case origin
     case acc
     case showChorus
+    case resultNext
 }
 
 public enum DHCGameState: Int {
@@ -47,7 +48,6 @@ public enum DHCGameState: Int {
     case joinChorus //加入合唱
     case beforeJoinChorus //加入合唱loading的时候
     case nextSong //下一首 结算
-    case nextGame //下一轮 结算
 }
 
 public protocol DHCGameDelegate: NSObjectProtocol {
@@ -57,13 +57,14 @@ public protocol DHCGameDelegate: NSObjectProtocol {
 class DHCLRCControl: UIView {
     @objc public var lrcView: KaraokeView!
     private var musicNameBtn: UIButton!
+    private var scoreLabel: UILabel!
     private var pauseBtn: UIButton!
     private var nextBtn: UIButton!
     private var originBtn: UIButton! //原唱/伴奏
     private var effectBtn: UIButton! //调音
     private var joinChorusBtn: UIButton! //加入合唱
     private var leaveChorusBtn: UIButton! //离开合唱
-    private var resultView: UIView! //结算界面
+    private var resultView: DHCResultView! //结算界面
     private var noSongLabel: UILabel!
     private var chorusNumBtn: UIButton!
     private var totalLines: Int = 0
@@ -87,6 +88,8 @@ class DHCLRCControl: UIView {
                 noSongLabel.isHidden = false
                 lrcView.isHidden = true
                 chorusNumBtn.isHidden = true
+                scoreLabel.isHidden = true
+                resultView.isHidden = true
             case .ownerSing:
                 pauseBtn.isHidden = false
                 nextBtn.isHidden = false
@@ -98,6 +101,8 @@ class DHCLRCControl: UIView {
                 noSongLabel.isHidden = true
                 lrcView.isHidden = false
                 chorusNumBtn.isHidden = false
+                scoreLabel.isHidden = false
+                resultView.isHidden = true
             case .chorusSing:
                 pauseBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -109,6 +114,8 @@ class DHCLRCControl: UIView {
                 noSongLabel.isHidden = true
                 lrcView.isHidden = false
                 chorusNumBtn.isHidden = false
+                scoreLabel.isHidden = false
+                resultView.isHidden = true
             case .ownerChorus:
                 pauseBtn.isHidden = false
                 nextBtn.isHidden = false
@@ -120,6 +127,8 @@ class DHCLRCControl: UIView {
                 noSongLabel.isHidden = true
                 lrcView.isHidden = false
                 chorusNumBtn.isHidden = false
+                scoreLabel.isHidden = false
+                resultView.isHidden = true
             case .joinChorus:
                 pauseBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -132,6 +141,8 @@ class DHCLRCControl: UIView {
                 noSongLabel.isHidden = true
                 lrcView.isHidden = false
                 chorusNumBtn.isHidden = false
+                scoreLabel.isHidden = false
+                resultView.isHidden = true
             case .beforeJoinChorus:
                 pauseBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -144,6 +155,8 @@ class DHCLRCControl: UIView {
                 noSongLabel.isHidden = true
                 lrcView.isHidden = false
                 chorusNumBtn.isHidden = false
+                scoreLabel.isHidden = false
+                resultView.isHidden = true
             case .nextSong:
                 pauseBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -155,17 +168,8 @@ class DHCLRCControl: UIView {
                 noSongLabel.isHidden = true
                 lrcView.isHidden = true
                 chorusNumBtn.isHidden = true
-            case .nextGame:
-                pauseBtn.isHidden = true
-                nextBtn.isHidden = true
-                originBtn.isHidden = true
-                effectBtn.isHidden = true
-                joinChorusBtn.isHidden = true
-                leaveChorusBtn.isHidden = true
-                musicNameBtn.isHidden = true
-                noSongLabel.isHidden = true
-                lrcView.isHidden = true
-                chorusNumBtn.isHidden = true
+                scoreLabel.isHidden = true
+                resultView.isHidden = false
             }
         }
     }
@@ -196,6 +200,13 @@ class DHCLRCControl: UIView {
         chorusNumBtn.addTarget(self, action: #selector(showChorus), for: .touchUpInside)
         addSubview(chorusNumBtn)
         
+        scoreLabel = UILabel(frame: CGRect(x: self.bounds.width - 160, y: 0, width: 60, height: 30))
+        scoreLabel.textColor = .white
+        scoreLabel.font = UIFont.systemFont(ofSize: 13)
+        scoreLabel.textAlignment = .right
+        addSubview(scoreLabel)
+        setScore(with: 0)
+        
         noSongLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 50))
         noSongLabel.center = self.center
         noSongLabel.text = "当前无人点歌，\n快选择歌曲一起合唱吧!"
@@ -211,7 +222,7 @@ class DHCLRCControl: UIView {
         lrcView.lyricsView.textNormalColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
         lrcView.lyricsView.textHighlightedColor = UIColor(hexString: "#EEFF25")!
         lrcView.lyricsView.lyricLineSpacing = 6
-        lrcView.lyricsView.draggable = false
+        lrcView.lyricsView.draggable = true
         lrcView.delegate = self
         addSubview(lrcView!)
 
@@ -253,6 +264,14 @@ class DHCLRCControl: UIView {
         joinChorusBtn.setImage(UIImage.sceneImage(name: "join", bundleName: "DHCResource"), for: .normal)
         joinChorusBtn.setImage(UIImage.sceneImage(name: "ic_join_chorus_loading", bundleName: "DHCResource"), for: .selected)
         addSubview(joinChorusBtn)
+        
+        resultView = DHCResultView()
+        resultView.frame = CGRect(x: 0, y: 0, width: ScreenWidth, height: 600)
+        resultView.nextBlock = {[weak self] in
+            guard let self = self, let delegate = self.delegate else {return}
+            delegate.didGameEventChanged(with: .resultNext)
+        }
+        addSubview(resultView)
     }
     
     @objc private func pause( btn: UIButton) {
@@ -291,6 +310,11 @@ class DHCLRCControl: UIView {
         guard let delegate = self.delegate else {return}
         delegate.didGameEventChanged(with: .showChorus)
     }
+    
+    public func resetStatus() {
+        pauseBtn.isSelected = false
+        originBtn.isSelected = false
+    }
 
     public func updateButtonLayout(button: UIButton, title: String, image: UIImage, imageInsets: UIEdgeInsets, x: CGFloat, y: CGFloat) {
         let titleAttributedString = NSAttributedString(string: title)
@@ -325,6 +349,16 @@ extension DHCLRCControl: KaraokeDelegate {
                                           totalScore: lineCount * 100,
                                           lineScore: score,
                                           lineIndex: lineIndex)
+    }
+    
+    func onKaraokeView(view: KaraokeView, didDragTo position: Int) {
+        totalScore = view.scoringView.getCumulativeScore()
+        guard let delegate = lrcDelegate else {
+            return
+        }
+        delegate.didLrcViewDragedTo(pos: position,
+                                    score: totalScore,
+                                    totalScore: totalCount * 100)
     }
 }
 
@@ -394,7 +428,14 @@ extension DHCLRCControl: KTVLrcViewDelegate {
     public func setChoursNum(with count: Int) {
         chorusNumBtn.setTitle("\(count)人合唱中", for: .normal)
     }
+    
+    public func setScore(with score: Int) {
+        scoreLabel.text = "\(score) 总分"
+    }
 
+    public func setResultData(with totalScore: Int, models:[SubRankModel], musicStr: String, isRoomOwner: Bool) {
+        resultView.setResultData(with: totalScore, models: models, musicStr: musicStr, isRoomOwner: isRoomOwner)
+    }
 }
 
 extension UIButton {

@@ -966,10 +966,12 @@ extension KTVApiImpl {
             apiConfig?.engine?.setParameters("{\"che.audio.filter_streams\":\((gaintConfig?.topN ?? 0) - 1)}")
         }
         
-        guard let token = apiConfig?.chorusChannelToken else {return}
-        // 加入演唱频道
-       let ret = apiConfig?.engine?.joinChannelEx(byToken: token, connection: singChannelConnection ?? AgoraRtcConnection(), delegate: self, mediaOptions: singChannelMediaOptions)
+        guard let token = apiConfig?.chorusChannelToken, let singConnection = singChannelConnection else {return}
         
+        
+        // 加入演唱频道
+       let ret = apiConfig?.engine?.joinChannelEx(byToken: token, connection: singConnection, delegate: self, mediaOptions: singChannelMediaOptions)
+       let res = apiConfig?.engine?.enableAudioVolumeIndicationEx(50, smooth: 10, reportVad: true, connection: singConnection)
         switch newRole {
             case .leadSinger:
                 // 更新音频配置
@@ -1084,6 +1086,7 @@ extension KTVApiImpl: AgoraRtcEngineDelegate {
         getEventHander { delegate in
             delegate.onChorusChannelAudioVolumeIndication(speakers: speakers, totalVolume: totalVolume)
         }
+        didKTVAPIReceiveAudioVolumeIndication(with: speakers, totalVolume: totalVolume)
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {

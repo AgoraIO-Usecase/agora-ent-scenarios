@@ -73,7 +73,17 @@ import AgoraCommon
     ///   - completion: 完成回调
     func updateSeatVideoMuteStatus(with muted: Bool, completion: @escaping (Error?) -> Void)
     
-    // choose songs
+    /// 修改麦位对应的分数
+    /// - Parameters:
+    ///   - score: 对应麦位的实时分数
+    ///   - completion: 完成回调
+    func updateSeatScoreStatus(with score: Int, completion: @escaping (Error?) -> Void)
+    
+    /// 修改歌曲结束状态
+    /// - Parameters:
+    ///   - isEnd: 歌曲结束状态
+    ///   - completion: 完成回调
+    func updateSongEndStatus(with isEnd: Bool, completion: @escaping (Error?) -> Void)
     
     /// 删除选中歌曲
     /// - Parameters:

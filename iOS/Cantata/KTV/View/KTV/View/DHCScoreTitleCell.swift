@@ -37,7 +37,7 @@ class DHCScoreTitleCell: UITableViewCell {
         self.contentView.addSubview(playerLabel)
         
         scoreLabel = UILabel()
-        scoreLabel.text = "总分"
+        scoreLabel.text = "个人得分"
         scoreLabel.textAlignment = .center
         scoreLabel.textColor = .white
         scoreLabel.font = UIFont.systemFont(ofSize: 10)

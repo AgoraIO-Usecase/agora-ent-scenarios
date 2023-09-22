@@ -39,6 +39,8 @@ import AgoraCommon
     
     @objc public var objectId: String?
     
+    @objc public var musicEnded: Bool = false
+    
     @objc public func isSongOwner() -> Bool {
         if VLUserCenter.user.id == self.userNo {
             return true
