@@ -529,7 +529,7 @@ extension CallApiImpl {
     private func _reportMethod(event: String, label: String = "") {
         let msgId = "scenarioAPI"
         let category = "3_iOS_0.2.0"
-        callPrint("_reportMethod event\(event)")
+        callPrint("_reportMethod event: \(event)")
         if isChannelJoined {
             _sendCustomReportMessage(msgId: msgId, category: category, event: event, label: label, value: 0)
             return
