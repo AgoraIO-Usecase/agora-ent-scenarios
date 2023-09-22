@@ -199,7 +199,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
         }
         ShowRobotService.shared.startCloudPlayers()
         showLogger.info("willDisplay[\(room.roomId)]: \(idx)/\(indexPath.row)  cache vc count: \(self.children.count)", context: kPagesVCTag)
-        vc.loadingType = .joined
+        vc.updateLoadingType(playState: .joined, roomId: room.roomId)
         currentVC = vc
         self.view.endEditing(true)
     }
@@ -215,7 +215,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
             return
         }
         showLogger.info("didEndDisplaying[\(room.roomId)]: \(idx)/\(indexPath.row)  cache vc count: \(self.children.count)", context: kPagesVCTag)
-        vc.loadingType = .prejoined
+        vc.updateLoadingType(playState: .prejoined, roomId: room.roomId)
         self.view.endEditing(true)
     }
     
