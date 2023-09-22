@@ -33,12 +33,11 @@ class ShowLiveViewController: UIViewController {
         }
     }
     
-    var loadingType: RoomStatus = .prejoined {
+    private var loadingType: RoomStatus = .prejoined {
         didSet {
             if loadingType == oldValue {
                 return
             }
-            updateLoadingType(playState: loadingType)
             remoteVideoWidth = nil
             currentMode = nil
         }
@@ -313,7 +312,7 @@ class ShowLiveViewController: UIViewController {
         showMsg.message = text
         showMsg.createAt = Date().millionsecondSince1970()
         
-        serviceImp?.sendChatMessage(message: showMsg) { error in
+        serviceImp?.sendChatMessage(roomId: roomId, message: showMsg) { error in
         }
     }
 }
@@ -346,7 +345,7 @@ extension ShowLiveViewController {
                     }
                 } else {
                     self._subscribeServiceEvent()
-                    self.updateLoadingType(playState: self.loadingType)
+                    self.updateLoadingType(playState: .joined, roomId: roomId)
                 }
             }
         } else {
@@ -362,18 +361,18 @@ extension ShowLiveViewController {
         AppContext.unloadShowServiceImp(room.roomId)
     }
     
-
-    func updateLoadingType(playState: RoomStatus) {
+    
+    func updateLoadingType(playState: RoomStatus, roomId: String) {
         ShowAgoraKitManager.shared.updateLoadingType(roomId: roomId, channelId: roomId, playState: playState)
         if let targetRoomId = currentInteraction?.roomId, targetRoomId != roomId {
             ShowAgoraKitManager.shared.updateLoadingType(roomId: roomId, channelId: targetRoomId, playState: playState)
         }
         if playState == .joined {
-            serviceImp?.initRoom { error in }
+            serviceImp?.initRoom(roomId: roomId) { error in }
         } else if playState == .prejoined {
-            serviceImp?.deinitRoom { error in }
+            serviceImp?.deinitRoom(roomId: roomId) { error in }
         } else {}
-        
+        loadingType = playState
         updateRemoteCavans()
     }
     
@@ -690,7 +689,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                                               uid: uid,
                                                               canvasView: self.liveView.canvasView.remoteView)
                     }else{
-                        self.updateLoadingType(playState: self.loadingType)
+                        self.updateLoadingType(playState: self.loadingType, roomId: self.roomId)
                     }
                 }
                 liveView.canvasView.canvasType = .pk
@@ -923,7 +922,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
                 self?.dismiss(animated: true)
             }
         }else {
-            updateLoadingType(playState: .idle)
+            updateLoadingType(playState: .idle, roomId: roomId)
             dismiss(animated: true)
         }
     }
