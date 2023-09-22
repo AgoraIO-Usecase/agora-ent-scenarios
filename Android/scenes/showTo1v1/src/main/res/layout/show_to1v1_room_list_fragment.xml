@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:background="@color/black">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivBackground"
@@ -28,7 +29,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="220dp"
             android:layout_gravity="bottom"
             android:scaleType="fitXY"
             android:src="@drawable/show_to1v1_cover_gradient" />
@@ -89,21 +90,30 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_marginEnd="30dp"
-            android:layout_marginBottom="81dp"
+            android:layout_marginBottom="41dp"
             android:src="@drawable/show_to1v1_room_item_call"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="@string/show_to1v1_linking_title"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/ivUserAvatar"
+            app:layout_constraintStart_toStartOf="@+id/ivUserAvatar" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivUserAvatar"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginStart="16dp"
-            android:layout_marginBottom="76dp"
+            android:layout_marginBottom="20dp"
             android:src="@drawable/show_to1v1_room_item_icon_sample"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/ivConnect" />
+            app:layout_constraintBottom_toBottomOf="@+id/ivConnect"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvUserName"
@@ -121,7 +131,7 @@
             android:id="@+id/tvRoomName"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="10dp"
             android:drawableStart="@drawable/show_to1v1_subtract"
             android:drawablePadding="9dp"
             android:ellipsize="end"
@@ -131,6 +141,38 @@
             app:layout_constraintStart_toStartOf="@id/ivUserAvatar"
             app:layout_constraintTop_toBottomOf="@id/ivUserAvatar"
             tools:text="房间主题房间主题房间主题房间主题房间主题" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="@string/show_to1v1_current_title"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/ivCurrentAvatar"
+            app:layout_constraintStart_toStartOf="@+id/ivCurrentAvatar" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivCurrentAvatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="40dp"
+            android:src="@drawable/show_to1v1_room_item_icon_sample"
+            app:layout_constraintBottom_toTopOf="@+id/ivUserAvatar"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvCurrentName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="@+id/ivCurrentAvatar"
+            app:layout_constraintStart_toEndOf="@+id/ivCurrentAvatar"
+            app:layout_constraintTop_toTopOf="@+id/ivCurrentAvatar"
+            tools:text="Chatro" />
 
         <androidx.cardview.widget.CardView
             android:layout_width="109dp"

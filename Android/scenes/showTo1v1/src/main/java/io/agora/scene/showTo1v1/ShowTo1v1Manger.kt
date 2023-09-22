@@ -13,6 +13,7 @@ import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import io.agora.scene.showTo1v1.callAPI.CallConfig
 import io.agora.scene.showTo1v1.callAPI.CallMode
@@ -21,7 +22,9 @@ import io.agora.scene.showTo1v1.callAPI.CallTokenConfig
 import io.agora.scene.showTo1v1.callAPI.ICallApi
 import io.agora.scene.showTo1v1.callAPI.ICallApiListener
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 
 class ShowTo1v1Manger constructor() {
 
@@ -44,6 +47,8 @@ class ShowTo1v1Manger constructor() {
         fun getImpl(): ShowTo1v1Manger {
             return instance
         }
+
+        val scheduledThreadPool: ExecutorService = Executors.newSingleThreadExecutor()
     }
 
     private val workingExecutor = Executors.newSingleThreadExecutor()
@@ -66,7 +71,7 @@ class ShowTo1v1Manger constructor() {
                     userId = UserManager.getInstance().user.id.toString(),
                     userName = UserManager.getInstance().user.name,
                     avatar = UserManager.getInstance().user.headUrl,
-                    createdAt = System.currentTimeMillis()
+                    createdAt = TimeUtils.currentTimeMillis()
                 )
             }
             return innerCurrentUser!!
@@ -142,11 +147,10 @@ class ShowTo1v1Manger constructor() {
         }
     }
 
-    fun deInitialize(listener: ICallApiListener) {
+    fun deInitialize() {
         mCallApi.deinitialize {
             isCallApiInit = false
         }
-        mCallApi.removeListener(listener)
     }
 
     fun renewTokens(callback: ((Boolean)) -> Unit) {
@@ -204,14 +208,14 @@ class ShowTo1v1Manger constructor() {
             if (innerRtcEngine == null) {
                 val config = RtcEngineConfig()
                 config.mContext = AgoraApplication.the()
-                config.mAppId = io.agora.scene.base.BuildConfig.AGORA_APP_ID
+                config.mAppId = BuildConfig.AGORA_APP_ID
                 config.mEventHandler = object : IRtcEngineEventHandler() {
                     override fun onError(err: Int) {
                         super.onError(err)
                         Log.d("RtcEngine", "Rtc Error code:$err, msg:" + RtcEngine.getErrorDescription(err))
                     }
                 }
-                innerRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
+                innerRtcEngine = (RtcEngineEx.create(config) as RtcEngineEx).apply {
                     enableVideo()
                 }
             }

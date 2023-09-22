@@ -6,6 +6,7 @@ import android.os.Looper
 import android.os.SystemClock
 import android.view.TextureView
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner

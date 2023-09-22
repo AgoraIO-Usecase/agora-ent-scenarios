@@ -43,7 +43,6 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         }
     }
 
-    private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
     private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
     private val mRtcVideoSwitcher by lazy { mShowTo1v1Manger.mVideoSwitcher }
@@ -84,8 +83,10 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     override fun initView() {
         super.initView()
+        val currentUser = mShowTo1v1Manger.mCurrentUser
         binding.tvUserName.text = mRoomInfo.userName
         binding.tvRoomName.text = mRoomInfo.roomName
+        binding.tvCurrentName.text = currentUser.userName
         context?.let { context ->
             var resourceId: Int
             try {
@@ -104,6 +105,11 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
                 .error(R.mipmap.userimage)
                 .transform(CenterCropRoundCornerTransform(100))
                 .into(binding.ivUserAvatar)
+            GlideApp.with(this)
+                .load(currentUser.avatar)
+                .error(R.mipmap.userimage)
+                .transform(CenterCropRoundCornerTransform(100))
+                .into(binding.ivCurrentAvatar)
             Glide.with(this)
                 .asGif()
                 .load(R.drawable.show_to1v1_wave_living)

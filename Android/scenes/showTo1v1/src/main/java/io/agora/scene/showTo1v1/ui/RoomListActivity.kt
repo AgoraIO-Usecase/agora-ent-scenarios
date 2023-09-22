@@ -38,7 +38,7 @@ import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 
-class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBinding>(), ICallApiListener,
+class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBinding>(),
     RoomListFragment.OnFragmentListener {
 
     companion object {
@@ -94,7 +94,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     override fun onResume() {
         super.onResume()
-        Log.d(TAG, "onResume")
+        Log.d(TAG, "RoomList onResume")
         mVpFragments[mCurrLoadPosition]?.onResumePage()
     }
 
@@ -105,17 +105,17 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     override fun onPause() {
         super.onPause()
-        Log.d(TAG, "onPause")
+        Log.d(TAG, "RoomList onPause")
     }
 
     override fun onStop() {
         super.onStop()
-        Log.d(TAG, "onStop")
+        Log.d(TAG, "RoomList onStop")
     }
 
     override fun onRestart() {
         super.onRestart()
-        Log.d(TAG, "onRestart")
+        Log.d(TAG, "RoomList onRestart")
     }
 
     private var guided = SPUtil.getBoolean(kRoomListSwipeGuide, false)
@@ -140,14 +140,16 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         binding.emptyInclude.layoutCreateRoom.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
                 Log.d(TAG, "click create room empty")
-                mShowTo1v1Manger.deInitialize(this@RoomListActivity)
+                mCallApi.removeListener(callApiListener)
+                mShowTo1v1Manger.deInitialize()
                 RoomCreateActivity.launch(this@RoomListActivity)
             }
         })
         binding.layoutCreateRoom2.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
                 Log.d(TAG, "click create room")
-                mShowTo1v1Manger.deInitialize(this@RoomListActivity)
+                mCallApi.removeListener(callApiListener)
+                mShowTo1v1Manger.deInitialize()
                 RoomCreateActivity.launch(this@RoomListActivity)
             }
         })
@@ -266,7 +268,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         val anim = AnimationUtils.loadAnimation(this, R.anim.show_to1v1_center_rotation)
         binding.titleView.rightIcon.startAnimation(anim)
         binding.titleView.rightIcon.isEnabled = false
+
         mService.getRoomList(completion = { error, roomList ->
+            mCurrLoadPosition = POSITION_NONE
+            // 强制离开所有频道
             mLoadConnection = false
             mRoomInfoList.clear()
             mRoomInfoList.addAll(roomList)
@@ -299,15 +304,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     override fun onDestroy() {
         super.onDestroy()
         mVpFragments[mCurrLoadPosition]?.stopLoadPage(false)
-        mShowTo1v1Manger.deInitialize(this)
+        mCallApi.removeListener(callApiListener)
+        mShowTo1v1Manger.destroy()
     }
 
-    private fun reInitCallApi(roomId: String, callback: () -> Unit) {
-        mCallApi.addListener(this)
-        mShowTo1v1Manger.reInitCallApi(CallRole.CALLER, roomId, callback = {
-            callback.invoke()
-        })
-    }
 
     private var toggleVideoRun: Runnable? = null
     private var toggleAudioRun: Runnable? = null
@@ -347,10 +347,12 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         mRoomInfo = roomInfo
         if (needCall) {
             toggleSelfVideo(true) {
-                reInitCallApi(roomInfo.roomId, callback = {
+                mShowTo1v1Manger.reInitCallApi(CallRole.CALLER, roomInfo.roomId, callback = {
+                    mCallApi.addListener(callApiListener)
                     mCallApi.call(roomInfo.roomId, roomInfo.getIntUserId(), completion = {
-                        if (it!=null){
-                            mShowTo1v1Manger.deInitialize(this@RoomListActivity)
+                        if (it != null) {
+                            mCallApi.removeListener(callApiListener)
+                            mShowTo1v1Manger.deInitialize()
                         }
                     })
                 })
@@ -359,13 +361,13 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
             }
         } else {
-            mCallApi.removeListener(this)
+            mCallApi.removeListener(callApiListener)
             RoomDetailActivity.launch(this, false, roomInfo)
         }
     }
 
     override fun onPermissionDined(permission: String?) {
-        PermissionLeakDialog(this).show(permission, {  }) { launchAppSetting(permission) }
+        PermissionLeakDialog(this).show(permission, { }) { launchAppSetting(permission) }
     }
 
     override fun onFragmentViewCreated() {
@@ -385,69 +387,77 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         mCallDialog = dialog
     }
 
-    override fun onCallStateChanged(
-        state: CallStateType, stateReason: CallReason, eventReason: String, elapsed: Long, eventInfo: Map<String, Any>
-    ) {
-        val publisher = eventInfo[CallApiImpl.kPublisher] ?: mShowTo1v1Manger.mCurrentUser.userId
-        if (publisher != mShowTo1v1Manger.mCurrentUser.userId) return
-        mCallState = state
-        Log.d(TAG,"_notifyState RooList state:${state.name},stateReason:${stateReason.name}")
-        when (state) {
-            CallStateType.Prepared -> {
-                if (stateReason == CallReason.CallingTimeout  || stateReason == CallReason.RemoteRejected) {
-                    mShowTo1v1Manger.mRemoteUser = null
-                    ToastUtils.showToast(getString(R.string.show_to1v1_no_answer))
+    private val callApiListener = object : ICallApiListener {
+
+        override fun tokenPrivilegeWillExpire() {
+            super.tokenPrivilegeWillExpire()
+            mShowTo1v1Manger.renewTokens {}
+        }
+
+        override fun onCallStateChanged(
+            state: CallStateType,
+            stateReason: CallReason,
+            eventReason: String,
+            elapsed: Long,
+            eventInfo: Map<String, Any>
+        ) {
+            val publisher = eventInfo[CallApiImpl.kPublisher] ?: mShowTo1v1Manger.mCurrentUser.userId
+            if (publisher != mShowTo1v1Manger.mCurrentUser.userId) return
+            mCallState = state
+            Log.d(TAG, "_notifyState RooList state:${state.name},stateReason:${stateReason.name}")
+            when (state) {
+                CallStateType.Prepared -> {
+                    if (stateReason == CallReason.CallingTimeout || stateReason == CallReason.RemoteRejected) {
+                        mShowTo1v1Manger.mRemoteUser = null
+                        ToastUtils.showToast(getString(R.string.show_to1v1_no_answer))
+                        mCallDialog?.let {
+                            if (it.isShowing) it.dismiss()
+                            mCallDialog = null
+                        }
+                    }
+                }
+
+                CallStateType.Calling -> {
+                    val fromUserId = eventInfo[CallApiImpl.kFromUserId] as? Int ?: 0
+                    val fromRoomId = eventInfo[CallApiImpl.kFromRoomId] as? String ?: ""
+                    val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
+                    // 触发状态的用户是自己才处理
+                    if (mShowTo1v1Manger.mCurrentUser.userId == toUserId.toString()) {
+                        // 收到大哥拨打电话
+                        // nothing
+                    } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {
+                        // 大哥拨打电话
+                        mShowTo1v1Manger.mConnectedChannelId = fromRoomId
+                        val remoteUser = mRoomInfoList.firstOrNull {
+                            it.userId == toUserId.toString()
+                        } ?: return
+                        mShowTo1v1Manger.mRemoteUser = remoteUser
+                        onCallSend(remoteUser)
+                    }
+                }
+
+                CallStateType.Connecting -> mCallDialog?.updateCallState(CallDialogState.Connecting)
+                CallStateType.Connected -> {
                     mCallDialog?.let {
                         if (it.isShowing) it.dismiss()
                         mCallDialog = null
                     }
+                    mRoomInfo?.let { roomInfo ->
+                        mCallApi.removeListener(this)
+                        RoomDetailActivity.launch(this@RoomListActivity, true, roomInfo)
+                    }
                 }
-            }
 
-            CallStateType.Calling -> {
-                val fromUserId = eventInfo[CallApiImpl.kFromUserId] as? Int ?: 0
-                val fromRoomId = eventInfo[CallApiImpl.kFromRoomId] as? String ?: ""
-                val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
-                // 触发状态的用户是自己才处理
-                if (mShowTo1v1Manger.mCurrentUser.userId == toUserId.toString()) {
-                    // 收到大哥拨打电话
-                    // nothing
-                } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {
-                    // 大哥拨打电话
-                    mShowTo1v1Manger.mConnectedChannelId = fromRoomId
-                    val remoteUser = mRoomInfoList.firstOrNull {
-                        it.userId == toUserId.toString()
-                    } ?: return
-                    mShowTo1v1Manger.mRemoteUser = remoteUser
-                    onCallSend(remoteUser)
+                CallStateType.Failed -> {
+                    mCallDialog?.let {
+                        if (it.isShowing) it.dismiss()
+                        mCallDialog = null
+                    }
+                    mShowTo1v1Manger.mRemoteUser = null
+                    ToastUtils.showToast(eventReason)
                 }
-            }
-
-            CallStateType.Connecting -> mCallDialog?.updateCallState(CallDialogState.Connecting)
-            CallStateType.Connected -> {
-                mCallDialog?.let {
-                    if (it.isShowing) it.dismiss()
-                    mCallDialog = null
-                }
-                mRoomInfo?.let { roomInfo ->
-                    mCallApi.removeListener(this)
-                    RoomDetailActivity.launch(this, true, roomInfo)
-                }
-            }
-
-            CallStateType.Failed -> {
-                mCallDialog?.let {
-                    if (it.isShowing) it.dismiss()
-                    mCallDialog = null
-                }
-                mShowTo1v1Manger.mRemoteUser = null
-                ToastUtils.showToast(eventReason)
             }
         }
-    }
 
-    override fun tokenPrivilegeWillExpire() {
-        super.tokenPrivilegeWillExpire()
-        mShowTo1v1Manger.renewTokens {}
     }
 }

@@ -158,6 +158,16 @@ interface ICallApiListener {
     /** token快要过期了(需要外部获取新token调用renewToken更新)
      */
     fun tokenPrivilegeWillExpire() {}
+
+    /** 打印的日志回调
+     *  @param message: <#message description#>
+     */
+    fun callDebugInfo(message: String) {}
+
+    /** 打印的日志回调
+     *  @param message: <#message description#>
+     */
+    fun callDebugWarning(message: String) {}
 }
 
 data class AGError(
@@ -239,18 +249,16 @@ interface ICallApi {
 
     /** 被叫拒绝通话，调用后主叫会收到onReject
      *
-     * @param roomId 频道号
      * @param remoteUserId 呼叫的用户id
      * @param reason 拒绝原因
      * @param completion
      */
-    fun reject(roomId: String, remoteUserId: Int, reason: String?, completion: ((AGError?) -> Unit)?)
+    fun reject(remoteUserId: Int, reason: String?, completion: ((AGError?) -> Unit)?)
 
     /** 结束通话，调用后被叫会收到onHangup
-     * @param roomId 频道号
      * @param completion
      */
-    fun hangup(roomId: String, completion: ((AGError?) -> Unit)?)
+    fun hangup(userId: Int, completion: ((AGError?) -> Unit)?)
 
     /** 获取callId，callId为通话过程中消息的标识，通过argus可以查询到从呼叫到通话的耗时和状态变迁的时间戳
      * @return callId，非呼叫到通话之外的消息为空
