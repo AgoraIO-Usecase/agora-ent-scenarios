@@ -14,11 +14,7 @@ import AgoraRtcKit
 
 private let kShowGuideAlreadyKey = "already_show_guide"
 class Pure1v1UserListViewController: UIViewController {
-    var userInfo: Pure1v1UserInfo? {
-        didSet {
-            callVC.currentUser = userInfo
-        }
-    }
+    var userInfo: Pure1v1UserInfo?
     
     private var calleeTokenConfig: Pure1v1CalleeTokenConfig = Pure1v1CalleeTokenConfig()
     
@@ -62,6 +58,9 @@ class Pure1v1UserListViewController: UIViewController {
         naviBar.refreshButton.isHidden = true
         naviBar.refreshButton.isHidden = false
         _refreshAction()
+        
+        callVC.currentUser = userInfo
+        listView.localUserInfo = userInfo
         
         _setupCallApi()
     }

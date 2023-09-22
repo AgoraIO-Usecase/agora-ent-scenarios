@@ -16,6 +16,8 @@ class Pure1v1UserPagingListView: UIView {
         }
     }
     
+    var localUserInfo: Pure1v1UserInfo?
+    
     private lazy var collectionView: UICollectionView = {
         // 列表
         let layout = UICollectionViewFlowLayout()
@@ -103,6 +105,7 @@ extension Pure1v1UserPagingListView: UICollectionViewDataSource, UICollectionVie
         
         let user = userList[realCellIndex(with: indexPath.row)]
         cell.userInfo = user
+        cell.localUserInfo = localUserInfo
         cell.callClosure = { [weak self] user in
             self?.callClosure?(user)
         }
