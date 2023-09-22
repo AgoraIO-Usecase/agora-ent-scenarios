@@ -32,18 +32,14 @@ PODS:
   - AgoraRtcEngine_Special_iOS (4.1.1.147)
   - AgoraSyncManager (2.1.0):
     - SocketRocket
-  - Alamofire (5.8.0)
-  - AUIKitCore/UI (0.5.3-beta):
-    - Agora_Chat_iOS
+  - AUIKitCore/UI (0.5.4-beta):
     - AgoraLyricsScore
-    - Alamofire
     - MJRefresh
     - ScoreEffectUI
     - SDWebImage (~> 4.4.8)
     - SwiftTheme
     - SwiftyBeaver (~> 1.9.5)
     - YYModel
-    - Zip
   - Bugly (2.5.93)
   - BytedEffect (4.3.0):
     - SSZipArchive
@@ -109,7 +105,7 @@ DEPENDENCIES:
   - AgoraLyricsScore (= 1.1.1-beta-3)
   - AgoraRtcEngine_Special_iOS (= 4.1.1.147)
   - AgoraSyncManager (~> 2.1.0)
-  - AUIKitCore/UI (= 0.5.3-beta)
+  - AUIKitCore/UI (= 0.5.4-beta)
   - Bugly (= 2.5.93)
   - BytedEffect (from `bytedEffect.podspec`)
   - Cantata (from `Cantata.podspec`)
@@ -146,7 +142,6 @@ SPEC REPOS:
     - AgoraLyricsScore
     - AgoraRtcEngine_Special_iOS
     - AgoraSyncManager
-    - Alamofire
     - Bugly
     - HWWeakTimer
     - JXCategoryView
@@ -192,8 +187,7 @@ SPEC CHECKSUMS:
   AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
   AgoraRtcEngine_Special_iOS: 3428f19a20422295817e3083e6fcc92a86576ea7
   AgoraSyncManager: caa8e0a80d1247bac95f9a869d400878d5081a3d
-  Alamofire: 0e92e751b3e9e66d7982db43919d01f313b8eb91
-  AUIKitCore: 76de641e0b2ddc86d97499c4bf1ff11129d5e098
+  AUIKitCore: 3df3f6866c853b1a3439f915049ccef656a515d5
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   BytedEffect: 74b0bd8150ff1ab9c443d210a7ff7eb49ad3da44
   Cantata: 3d6c0473ce64cdb723ad30f3e8e3e4723384521e
@@ -223,6 +217,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 4f2c3ab6d352dff625e51dcd0c4dec0ad67e9c22
+PODFILE CHECKSUM: ba32aa6dbb43fd1a62d6425d7486fb3a363b8e4b
 
 COCOAPODS: 1.12.1
