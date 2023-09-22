@@ -111,6 +111,7 @@ class Pure1v1UserListViewController: UIViewController {
 
 extension Pure1v1UserListViewController {
     private func _initCallAPI(tokenConfig: CallTokenConfig) {
+        pure1v1Print("_initCallAPI")
         let config = CallConfig()
         config.role = .caller  // Pure 1v1 can only be set as the caller
         config.mode = .pure1v1
@@ -123,8 +124,14 @@ extension Pure1v1UserListViewController {
         if let userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any] {
             config.userExtension = userExtension
         }
+        callApi.deinitialize {
+        }
         callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
             guard let self = self else {return}
+            if let error = error {
+                AUIToast.show(text: error.localizedDescription)
+                return
+            }
             // Requires active call to prepareForCall
             let prepareConfig = PrepareConfig.calleeConfig()
             self.callApi.prepareForCall(prepareConfig: prepareConfig) { err in
@@ -150,6 +157,7 @@ extension Pure1v1UserListViewController {
     }
     
     private func _call(user: Pure1v1UserInfo) {
+        pure1v1Print("_call with state:\(callState.rawValue)")
         if callState == .idle {
             _setupCallApi()
             AUIToast.show(text: "call_not_init".pure1v1Localization())
