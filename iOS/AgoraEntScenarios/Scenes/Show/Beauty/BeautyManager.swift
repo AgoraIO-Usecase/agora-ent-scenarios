@@ -156,5 +156,8 @@ class BeautyManager: NSObject {
             SenseBeautyManager.shareManager.destroy()
         }
         BeautyManager._sharedManager = nil
+        ShowAgoraKitManager.shared.enableVirtualBackground(isOn: false,
+                                                           greenCapacity: 0)
+        ShowAgoraKitManager.shared.seVirtualtBackgoundImage(imagePath: nil, isOn: false)
     }
 }
