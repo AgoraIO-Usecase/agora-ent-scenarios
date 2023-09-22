@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
     <string name="pure1v1_room_list_title">1V1私密房</string>
+    <string name="pure1v1_room_list_local_info">本人信息</string>
+    <string name="pure1v1_room_list_remote_info">对端信息</string>
     <string name="pure1v1_room_list_refresh">用户列表已刷新</string>
     <string name="pure1v1_room_list_local_offline">本地用户已掉线请重试</string>
     <string name="pure1v1_room_list_empty_title">等待其它用户入场</string>

@@ -89,29 +89,77 @@
             app:layout_constraintBottom_toBottomOf="parent"
             />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivUserAvatar"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="20dp"
-            android:src="@drawable/pure1v1_room_item_icon_sample"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/ivConnect"
-            app:layout_constraintBottom_toBottomOf="@+id/ivConnect"
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvLocalInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textColor="@color/white"
+            android:textSize="14dp"
+            android:text="@string/pure1v1_room_list_local_info"
+            app:layout_constraintStart_toStartOf="@+id/ivLocalAvatar"
+            app:layout_constraintBottom_toTopOf="@+id/ivLocalAvatar"
             />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvUserName"
+            android:id="@+id/tvLocalName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:textColor="@color/white"
             android:textSize="20dp"
             android:text="@string/pure1v1_room_list_title"
-            app:layout_constraintStart_toEndOf="@+id/ivUserAvatar"
-            app:layout_constraintTop_toTopOf="@+id/ivUserAvatar"
-            app:layout_constraintBottom_toBottomOf="@+id/ivUserAvatar"
+            app:layout_constraintStart_toEndOf="@+id/ivLocalAvatar"
+            app:layout_constraintTop_toTopOf="@+id/ivLocalAvatar"
+            app:layout_constraintBottom_toBottomOf="@+id/ivLocalAvatar"
             />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivLocalAvatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/pure1v1_room_item_icon_sample"
+            app:layout_constraintStart_toStartOf="@id/tvRemoteInfo"
+            app:layout_constraintBottom_toTopOf="@+id/tvRemoteInfo"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRemoteInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textColor="@color/white"
+            android:textSize="14dp"
+            android:text="@string/pure1v1_room_list_remote_info"
+            app:layout_constraintStart_toStartOf="@+id/ivRemoteAvatar"
+            app:layout_constraintBottom_toTopOf="@+id/ivRemoteAvatar"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRemoteName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            android:text="@string/pure1v1_room_list_title"
+            app:layout_constraintStart_toEndOf="@+id/ivRemoteAvatar"
+            app:layout_constraintTop_toTopOf="@+id/ivRemoteAvatar"
+            app:layout_constraintBottom_toBottomOf="@+id/ivRemoteAvatar"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivRemoteAvatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/pure1v1_room_item_icon_sample"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/ivConnect"
+            app:layout_constraintBottom_toBottomOf="@+id/ivConnect"
+            />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

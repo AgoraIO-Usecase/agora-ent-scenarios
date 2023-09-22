@@ -180,7 +180,7 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
 
     private fun onHangup() {
         CallServiceManager.instance.remoteUser?.let { userInfo ->
-            CallServiceManager.instance.callApi?.hangup(userInfo.getRoomId()) {
+            CallServiceManager.instance.callApi?.hangup(userInfo.userId.toInt()) {
             }
         }
         binding.vDragWindow1.canvasContainer.removeAllViews()

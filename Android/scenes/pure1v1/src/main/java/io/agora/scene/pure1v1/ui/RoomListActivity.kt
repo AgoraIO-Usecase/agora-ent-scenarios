@@ -224,7 +224,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
                 val remoteUser = CallServiceManager.instance.remoteUser
                 if (remoteUser != null && remoteUser.userId != fromUserId.toString())  {
-                    CallServiceManager.instance.callApi?.reject(fromRoomId, fromUserId, "already calling") { err ->
+                    CallServiceManager.instance.callApi?.reject(fromUserId, "already calling") { err ->
                     }
                     return
                 }
@@ -259,7 +259,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                             }, false)
                         }
                         override fun onReceiveViewDidClickReject() {
-                            CallServiceManager.instance.callApi?.reject(fromRoomId, fromUserId, "reject by user") {
+                            CallServiceManager.instance.callApi?.reject(fromUserId, "reject by user") {
                             }
                         }
                     })
@@ -417,8 +417,15 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 .into(holder.binding.ivLiving)
             Glide.with(context)
                 .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
-                .into(holder.binding.ivUserAvatar)
-            holder.binding.tvUserName.text = userInfo.userName
+                .into(holder.binding.ivRemoteAvatar)
+            holder.binding.tvRemoteName.text = userInfo.userName
+            CallServiceManager.instance.localUser?.let { localUserInfo ->
+                Glide.with(context)
+                    .load(localUserInfo.avatar).apply(RequestOptions.circleCropTransform())
+                    .into(holder.binding.ivLocalAvatar)
+                holder.binding.tvLocalName.text = localUserInfo.userName
+            }
+
             holder.binding.ivConnectBG.breathAnim()
         }
 

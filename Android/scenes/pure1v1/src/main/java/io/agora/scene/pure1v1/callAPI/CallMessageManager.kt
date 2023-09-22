@@ -89,6 +89,7 @@ class CallMessageManager(
     private val mHandler = Handler(Looper.getMainLooper())
 
     fun logout() {
+        Log.d(TAG, "logout")
         rtmClient.logout(object : ResultCallback<Void> {
             override fun onSuccess(responseInfo: Void?) {}
             override fun onFailure(errorInfo: ErrorInfo?) {}
@@ -114,7 +115,7 @@ class CallMessageManager(
                 rtmInitialize(prepareConfig, tokenConfig, completion)
             }
         } else if (isLoginedRTM && prepareConfig.autoSubscribeRTM) {
-            _subscribeRTM(tokenConfig) { error ->
+            _subscribeRTM(config.userId.toString()) { error ->
                 if (error != null) {
                     completion.invoke(error)
                 } else {
@@ -151,22 +152,21 @@ class CallMessageManager(
         })
     }
 
-    /// 发送频道消息
-    /// - Parameters:
-    ///   - roomId: 往哪个频道发送消息
-    ///   - fromRoomId: 哪个频道发送的，用来给对端发送回执
-    ///   - message: 发送的消息字典
-    ///   - retryCount: 重试次数
-    ///   - completion: <#completion description#>
-    fun sendMessage(roomId: String, fromRoomId: String, message: Map<String, Any>, retryCount: Int = 3,completion: ((AGError?)-> Unit)?) {
+    /** 发送频道消息
+     * @param userId: 往哪个用户发送消息
+     * @param fromRoomId: 哪个频道发送的，用来给对端发送回执
+     * @param message: 发送的消息字典
+     * @param completion: <#completion description#>
+     */
+    fun sendMessage(userId: String, fromUserId: String, message: Map<String, Any>, completion: ((AGError?)-> Unit)?) {
         messageId += 1
         messageId %= Int.MAX_VALUE
         val map = message.toMutableMap()
         val msgId = messageId
         map[kMessageId] = msgId
-        map[kReceiptsRoomIdKey] = fromRoomId
-        require(fromRoomId.isNotEmpty()) { "kReceiptsRoomIdKey is empty" }
-        _sendMessage(roomId, map, retryCount, completion)
+        map[kReceiptsRoomIdKey] = fromUserId
+        require(fromUserId.isNotEmpty()) { "kReceiptsRoomIdKey is empty" }
+        _sendMessage(userId, map, completion)
     }
 
     private fun _createRtmClient(): RtmClient {
@@ -182,15 +182,11 @@ class CallMessageManager(
         rtmConfig.eventListener = this
         return RtmClient.create(rtmConfig)
     }
-    /// 根据策略订阅频道消息
-    /// - Parameters:
-    ///   - roomId: 频道号
-    ///   - completion: <#completion description#>
-    private fun _subscribeRTM(tokenConfig: CallTokenConfig?, completion: ((AGError?) -> Unit)?) {
-        val roomId = tokenConfig?.roomId ?: run {
-            completion?.invoke(AGError("channelName is Empty", -1))
-            return
-        }
+    /** 根据策略订阅频道消息
+     *  @param userId: 频道号
+     *  @param completion: <#completion description#>
+     */
+    private fun _subscribeRTM(userId: String, completion: ((AGError?) -> Unit)?) {
         /*
          移除所有的presence，所有缓存由调用的业务服务器去控制
          订阅自己频道的message，用来收消息
@@ -199,19 +195,18 @@ class CallMessageManager(
         options.withMessage = true
         options.withMetadata = false
         options.withPresence = false
-        _subscribe(roomId, options, completion)
+        _subscribe(userId, options, completion)
     }
 
-    /// 发送回执消息
-    /// - Parameters:
-    ///   - roomId: 回执消息发往的频道
-    ///   - messageId: 回执的消息id
-    ///   - retryCount: 重试次数
-    ///   - completion: <#completion description#>
-    private fun _sendReceipts(roomId: String, messageId: Int, retryCount: Int = 3, completion: ((AGError?)-> Unit)? = null) {
+    /** 发送回执消息
+     * @param roomId: 回执消息发往的频道
+     * @param messageId: 回执的消息id
+     * @param completion: <#completion description#>
+     */
+    private fun _sendReceipts(roomId: String, messageId: Int, completion: ((AGError?)-> Unit)? = null) {
         val message = mutableMapOf<String, Any>()
         message[kReceiptsKey] = messageId
-        Log.d(TAG, "_sendReceipts to $roomId, message: $message, retryCount: $retryCount")
+        Log.d(TAG, "_sendReceipts to $roomId, message: $message")
         val json = Gson().toJson(message)
         val options = PublishOptions()
         rtmClient.publish(roomId, json.toByteArray(), options, object : ResultCallback<Void> {
@@ -220,27 +215,23 @@ class CallMessageManager(
                 completion?.invoke(null)
             }
             override fun onFailure(errorInfo: ErrorInfo?) {
-                if (retryCount <= 1) {
-                    val msg = errorInfo?.errorReason ?: "error"
-                    val errorCode = RtmConstants.RtmErrorCode.getValue(errorInfo?.errorCode)
-                    completion?.invoke(AGError(msg, errorCode))
-                } else {
-                    _sendReceipts(roomId, messageId, retryCount - 1, completion)
-                }
+                val msg = errorInfo?.errorReason ?: "error"
+                val errorCode = RtmConstants.RtmErrorCode.getValue(errorInfo?.errorCode)
+                completion?.invoke(AGError(msg, errorCode))
             }
         })
     }
 
-    private fun _sendMessage(roomId: String, message: Map<String, Any>, retryCount: Int = 3, completion:((AGError?)->Unit)?) {
-        if (roomId.isEmpty()) {
+    private fun _sendMessage(userId: String, message: Map<String, Any>, completion:((AGError?)->Unit)?) {
+        if (userId.isEmpty()) {
             completion?.invoke(AGError("send message fail! roomId is empty", -1))
             return
         }
-        Log.d(TAG, "_sendMessage to '$roomId', message: $message, retryCount: $retryCount")
+        Log.d(TAG, "_sendMessage to '$userId', message: $message")
         val msgId = message[kMessageId] as? Int ?: 0
         val json = Gson().toJson(message)
         val options = PublishOptions()
-        rtmClient.publish(roomId, json.toByteArray(), options, object : ResultCallback<Void> {
+        rtmClient.publish(userId, json.toByteArray(), options, object : ResultCallback<Void> {
             override fun onSuccess(p0: Void?) {
                 completion?.invoke(null)
                 receiptsQueue.firstOrNull { it.messageId == msgId }?.let {
@@ -254,7 +245,7 @@ class CallMessageManager(
                 receiptInfo.checkReceiptsFail = { info ->
                     if (info.retryTimes > 0) {
                         Log.d(TAG, "retry send message ------------")
-                        _sendMessage(roomId, message, completion = completion)
+                        _sendMessage(userId, message, completion = completion)
                     } else {
                         val messageInfo = info.messageInfo ?: emptyMap()
                         Log.d(TAG, "get receipts fail, msg: $messageInfo")
@@ -268,12 +259,8 @@ class CallMessageManager(
             }
 
             override fun onFailure(errorInfo: ErrorInfo?) {
-                if (retryCount <= 1) {
-                    val msg = errorInfo?.errorReason ?: "error"
-                    completion?.invoke(AGError(msg, -1))
-                } else {
-                    _sendMessage(roomId, message, retryCount - 1, completion)
-                }
+                val msg = errorInfo?.errorReason ?: "error"
+                completion?.invoke(AGError(msg, -1))
             }
         })
     }
