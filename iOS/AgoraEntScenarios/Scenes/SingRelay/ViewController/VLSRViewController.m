@@ -1425,7 +1425,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 
             }];
             
-            weakself.gameModel.status = SingRelayStatusEnded;
+            weakself.gameModel.status = SingRelayStatusWaiting;
             if([weakself isRoomOwner]){
 ////                //房主把分数给到服务端
 //                weakself.gameModel.rank = [weakself convertScoreArrayToRank];
