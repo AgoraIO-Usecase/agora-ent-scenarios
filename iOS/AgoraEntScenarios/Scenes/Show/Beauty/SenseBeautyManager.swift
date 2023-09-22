@@ -72,7 +72,6 @@ class SenseBeautyManager: NSObject {
     
     func setStyle(path: String?, key: String?, value: CGFloat) {
         guard let path = path, !path.isEmpty, let key = key else { return }
-        processor.removeStickerId(styleId)
         processor.addStylePath(path, groupId: key == "Makeup_ALL" ? 0 : 1, strength: value) { [weak self] stickerId in
             guard let self = self else { return }
             self.styleId = stickerId
