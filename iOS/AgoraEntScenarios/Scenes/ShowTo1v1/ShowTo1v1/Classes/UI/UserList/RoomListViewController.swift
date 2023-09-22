@@ -36,11 +36,7 @@ extension CallTokenConfig {
 
 private let kShowGuideAlreadyKey = "already_show_guide_show1v1"
 class RoomListViewController: UIViewController {
-    var userInfo: ShowTo1v1UserInfo? {
-        didSet {
-            callVC.currentUser = userInfo
-        }
-    }
+    var userInfo: ShowTo1v1UserInfo?
     
     private weak var callDialog: ShowTo1v1Dialog?
     private var connectedUserId: UInt?
@@ -133,6 +129,9 @@ class RoomListViewController: UIViewController {
         naviBar.refreshButton.isHidden = true
         naviBar.refreshButton.isHidden = false
         _refreshAction()
+        
+        callVC.currentUser = userInfo
+        listView.localUserInfo = userInfo
         
         _setupAPI()
     }
