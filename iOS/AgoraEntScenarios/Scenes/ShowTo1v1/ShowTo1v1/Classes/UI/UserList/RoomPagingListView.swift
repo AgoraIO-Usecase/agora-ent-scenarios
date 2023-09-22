@@ -19,6 +19,7 @@ class RoomPagingListView: UIView {
             reloadData()
         }
     }
+    var localUserInfo: ShowTo1v1UserInfo?
     
     weak var delegate: UICollectionViewDelegate? {
         didSet {
@@ -133,6 +134,7 @@ extension RoomPagingListView: UICollectionViewDataSource, UICollectionViewDelega
         
         let roomInfo = roomList[realCellIndex(with: indexPath.row)]
         cell.roomInfo = roomInfo
+        cell.localUserInfo = localUserInfo
         cell.callClosure = { [weak self] room in
             self?.callClosure?(room)
         }
