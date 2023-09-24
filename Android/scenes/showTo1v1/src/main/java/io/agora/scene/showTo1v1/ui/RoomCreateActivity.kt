@@ -26,7 +26,6 @@ import java.util.Random
 class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBinding>() {
 
     companion object {
-        private const val TAG = "ShowTo1v1_RoomCreateActivity"
 
         fun launch(context: Context) {
             val intent = Intent(context, RoomCreateActivity::class.java)

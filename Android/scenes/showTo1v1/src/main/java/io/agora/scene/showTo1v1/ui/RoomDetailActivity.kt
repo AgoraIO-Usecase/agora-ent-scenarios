@@ -1,5 +1,10 @@
 package io.agora.scene.showTo1v1.ui
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,9 +16,6 @@ import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
-import android.view.animation.ScaleAnimation
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -68,7 +70,6 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
-import java.util.concurrent.ThreadPoolExecutor
 
 fun Int.number2K(): String {
     if (this < 1000) return this.toString()
@@ -81,7 +82,7 @@ fun Int.number2K(): String {
 class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBinding>() {
 
     companion object {
-        private const val TAG = "ShowTo1v1_List"
+        const val TAG = "ShowTo1v1_List"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
         private const val EXTRA_ROOM_CALL_CONNECTED = "callConnected"
         private const val ContentInspectName = "ShowTo1v1"
@@ -136,12 +137,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         ChannelMediaOptions()
     }
 
-    private val timerRoomEndRun = Runnable {
-        ToastUtils.showToast(R.string.show_to1v1_end_tips)
-        Log.d(TAG, "timer end!")
-        onBackPressed()
-    }
-
     private val dataFormat by lazy {
         SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT") }
     }
@@ -173,7 +168,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         val roomLeftTime = ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt)
         if (roomLeftTime > 0) {
-            mainHandler.postDelayed(timerRoomEndRun, roomLeftTime)
             initRtcEngine()
             initServiceWithJoinRoom()
 
@@ -281,9 +275,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             binding.layoutCallPrivatelyBg.isVisible = !mCallConnected
             binding.layoutCallPrivately.isVisible = !mCallConnected
             binding.includeComeSoonView.root.isVisible = true
-            if (!mCallConnected) {
-                binding.layoutCallPrivatelyBg.breathAnim()
-            }
         }
         var resourceId: Int
         try {
@@ -421,15 +412,15 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             "show"
         )
 
-//        if (!isRoomOwner && mRtcEngine.queryDeviceScore() < 75) {
-//            // 低端机观众加入频道前默认开启硬解（解决看高分辨率卡顿问题），但是在410分支硬解码会带来200ms的秒开耗时增加
-//            mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
-//            // 低端机观众加入频道前默认开启下行零拷贝，下行零拷贝和超分有冲突， 低端机默认关闭超分
-//            mRtcEngine.setParameters("\"rtc.video.decoder_out_byte_frame\": true")
-//        } else {
-//            // 主播加入频道前默认关闭硬解
-//            mRtcEngine.setParameters("{\"che.hardware_decoding\": 0}")
-//        }
+        if (!isRoomOwner && mRtcEngine.queryDeviceScore() < 75) {
+            // 低端机观众加入频道前默认开启硬解（解决看高分辨率卡顿问题），但是在410分支硬解码会带来200ms的秒开耗时增加
+            mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
+            // 低端机观众加入频道前默认开启下行零拷贝，下行零拷贝和超分有冲突， 低端机默认关闭超分
+            mRtcEngine.setParameters("\"rtc.video.decoder_out_byte_frame\": true")
+        } else {
+            // 主播加入频道前默认关闭硬解
+            mRtcEngine.setParameters("{\"che.hardware_decoding\": 0}")
+        }
 
         mainChannelMediaOptions.clientRoleType =
             if (isRoomOwner) Constants.CLIENT_ROLE_BROADCASTER else Constants.CLIENT_ROLE_AUDIENCE
@@ -523,14 +514,39 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
 
             override fun onRoomTimeUp() {
+                ToastUtils.showToast(R.string.show_to1v1_end_tips)
                 onBackPressed()
             }
         })
     }
 
     override fun onPause() {
+        stopCallAnimator()
         super.onPause()
         Log.d(TAG, "RoomDetail onPause")
+    }
+
+
+    private var callAnimatorSet: AnimatorSet? = null
+
+    private fun startCallAnimator() {
+        if (callAnimatorSet == null) {
+            callAnimatorSet = binding.layoutCallPrivatelyBg.breathAnim()
+        }
+        callAnimatorSet?.cancel()
+        callAnimatorSet?.start()
+    }
+
+    private fun stopCallAnimator() {
+        callAnimatorSet?.cancel()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!isRoomOwner && binding.layoutCallPrivatelyBg.isVisible) {
+            startCallAnimator()
+        }
+        Log.d(TAG, "RoomDetail onResume")
     }
 
     override fun onStop() {
@@ -549,24 +565,25 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
+        if (isGoingFinish) return
+        isGoingFinish = true
+        stopCallAnimator()
         Log.d(TAG, "RoomDetail onBackPressed")
         mRtcEngine.removeHandlerEx(mainRtcListener, mMainRtcConnection)
-        mainHandler.removeCallbacks(timerRoomEndRun)
         mainHandler.removeCallbacks(timerRoomRun)
         mainHandler.removeCallbacks(connectedRun)
         mainHandler.removeCallbacksAndMessages(null)
 
-        if (isGoingFinish) return
+
         mCallApi.removeListener(callApiListener)
         if (isRoomOwner) {
             mShowTo1v1Manger.deInitialize()
         } else {
             onHangup()
         }
-        isGoingFinish = true
+
         destroy()
-        Log.d(TAG, "RoomDetail11 onBackPressed")
-        super.onBackPressed()
     }
 
     private fun destroy() {
@@ -586,150 +603,79 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         mainChannelMediaOptions.publishCameraTrack = isRoomOwner && publish
         mainChannelMediaOptions.autoSubscribeVideo = publish
         mainChannelMediaOptions.autoSubscribeAudio = publish
-        val startTime = System.currentTimeMillis()
         mRtcEngine.updateChannelMediaOptionsEx(mainChannelMediaOptions, mMainRtcConnection)
-        Log.d(TAG, "publishMedia:$publish cost：${System.currentTimeMillis() - startTime}")
-    }
-
-    private fun updateCallState(state: CallStateType) {
-        if (isGoingFinish) return
-        mCallState = state
-        mDashboardFragment?.updateCallState(mCallState)
-        when (mCallState) {
-            CallStateType.Calling -> {
-                publishMedia(false)
-                setupVideoView(false)
-            }
-
-            CallStateType.Prepared,
-            CallStateType.Idle,
-            CallStateType.Failed -> {
-                mTimeLinkAt = 0
-
-                publishMedia(true)
-                setupVideoView(true)
-
-                if (!isRoomOwner) {
-                    binding.layoutCallPrivatelyBg.isVisible = true
-                    binding.layoutCallPrivately.isVisible = true
-                    binding.layoutCallPrivatelyBg.breathAnim()
-                }
-                binding.layoutNumCount.isVisible = true
-                binding.ivHangup.isVisible = false
-                binding.tvHangup.isVisible = false
-                binding.layoutCallingTop.isInvisible = true
-                binding.layoutRoomTop.isInvisible = false
-                binding.layoutCall.isVisible = false
-                if (exchanged) {
-                    // 恢复默认窗口
-                    exchangeDragWindow()
-                }
-
-                animateConnectedViewClose()
-            }
-
-            CallStateType.Connected -> {
-                mTimeLinkAt = System.currentTimeMillis()
-                if (exchanged) {
-                    binding.vDragBigWindow.setSmallType(true)
-                    binding.vDragSmallWindow.setSmallType(false)
-                } else {
-                    binding.vDragBigWindow.setSmallType(false)
-                    binding.vDragSmallWindow.setSmallType(true)
-                }
-
-                // 默认远端都是大窗, 本地是小窗
-                if (binding.vDragBigWindow.canvasContainer.contains(mShowTo1v1Manger.mRemoteVideoView)) {
-
-                } else {
-                    (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
-                    if (binding.vDragBigWindow.canvasContainer.childCount > 0) {
-                        binding.vDragBigWindow.canvasContainer.removeAllViews()
-                    }
-                    binding.vDragBigWindow.canvasContainerAddView(mShowTo1v1Manger.mRemoteVideoView)
-                }
-                mShowTo1v1Manger.mRemoteUser?.let {
-                    binding.vDragBigWindow.setUserName(it.userName)
-                    // 左上角是大窗的房间和昵称
-                    binding.tvCallingNickname.text = it.userName
-                    binding.tvCallingUid.text = it.userId
-                    GlideApp.with(this)
-                        .load(it.avatar)
-                        .error(R.mipmap.userimage)
-                        .transform(CenterCropRoundCornerTransform(100))
-                        .into(binding.ivCallingAvatar)
-                }
-
-                if (binding.vDragSmallWindow.canvasContainer.contains(mShowTo1v1Manger.mLocalVideoView)) {
-
-                } else {
-                    (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
-                    if (binding.vDragSmallWindow.canvasContainer.childCount > 0) {
-                        binding.vDragSmallWindow.canvasContainer.removeAllViews()
-                    }
-                    binding.vDragSmallWindow.canvasContainerAddView(mShowTo1v1Manger.mLocalVideoView)
-                }
-                mShowTo1v1Manger.mCurrentUser.let {
-                    binding.vDragSmallWindow.setUserName(it.userName)
-                }
-                binding.llVideoContainer.isVisible = false
-                binding.layoutCall.isVisible = true
-                binding.layoutCallingTop.isInvisible = false
-
-                binding.layoutRoomTop.isInvisible = true
-                binding.layoutNumCount.isVisible = false
-                binding.ivHangup.isVisible = true
-                binding.tvHangup.isVisible = true
-                if (isRoomOwner) {
-                    animateConnectedView()
-                    mShowTo1v1Manger.mRemoteUser?.let {
-                        GlideApp.with(this)
-                            .load(it.avatar)
-                            .error(R.mipmap.userimage)
-                            .transform(CenterCropRoundCornerTransform(100))
-                            .into(binding.includeConnectedView.ivUserAvatar)
-                        binding.includeConnectedView.tvNickname.text = it.userName
-                    }
-                    binding.includeConnectedView.root.isVisible = true
-//                    mainHandler.postDelayed(connectedRun, 5000)
-                } else {
-                    binding.layoutCallPrivatelyBg.isVisible = false
-                    binding.layoutCallPrivately.isVisible = false
-                    binding.layoutCallPrivatelyBg.clearAnimation()
-                }
-            }
-
-            else -> {}
-        }
     }
 
     private val connectedRun = Runnable {
         animateConnectedViewClose()
     }
 
+    // 连接打开动画
+    private var openAnimator: Animator? = null
+
+    private fun animateConnectedViewOpen() {
+        if (binding.includeConnectedView.root.isVisible) return
+        openAnimator?.cancel() // 停止之前的动画
+        binding.includeConnectedView.root.isVisible = true
+        openAnimator = createOpenAnimator().apply {
+            start()
+        }
+    }
+
+    private fun createOpenAnimator(): AnimatorSet {
+        val alphaAnim = ObjectAnimator.ofFloat(binding.includeConnectedView.root, "alpha", 0.5f, 1.0f).apply {
+            duration = 200
+        }
+
+        val translationYAnim = ObjectAnimator.ofFloat(
+            binding.includeConnectedView.root,
+            "translationY",
+            -binding.includeConnectedView.root.height.toFloat(),
+            0f
+        ).apply {
+            duration = 500
+        }
+
+        return AnimatorSet().apply {
+            playTogether(alphaAnim, translationYAnim)
+        }
+    }
+
+    private var closeAnimator: Animator? = null
+
     private fun animateConnectedViewClose() {
         if (!binding.includeConnectedView.root.isVisible) return
         binding.includeConnectedView.root.isVisible = false
 
-        val anim = AnimationUtils.loadAnimation(this, R.anim.show_to1v1_slide_to_top)
-        anim.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {
-            }
+        closeAnimator?.cancel() // 停止之前的动画
 
-            override fun onAnimationEnd(animation: Animation?) {
-                binding.includeConnectedView.root.isVisible = false
-            }
-
-            override fun onAnimationRepeat(animation: Animation?) {
-            }
-        })
-        binding.includeConnectedView.root.startAnimation(anim)
+        closeAnimator = createCloseAnimator().apply {
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    binding.includeConnectedView.root.isVisible = false
+                }
+            })
+            start()
+        }
     }
 
-    private fun animateConnectedView() {
-        binding.includeConnectedView.root.isVisible = true
-        val anim = AnimationUtils.loadAnimation(this, R.anim.show_to1v1_slide_from_top)
-        binding.includeConnectedView.root.startAnimation(anim)
+    private fun createCloseAnimator(): AnimatorSet {
+        val alphaAnim = ObjectAnimator.ofFloat(binding.includeConnectedView.root, "alpha", 1.0f, 0.5f).apply {
+            duration = 200
+        }
+
+        val translationYAnim = ObjectAnimator.ofFloat(
+            binding.includeConnectedView.root,
+            "translationY",
+            0f,
+            -binding.includeConnectedView.root.height.toFloat()
+        ).apply {
+            duration = 500
+        }
+
+        return AnimatorSet().apply {
+            playTogether(alphaAnim, translationYAnim)
+        }
     }
 
     private var exchanged = false
@@ -928,9 +874,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         channelName, uid, AudioModeration.AgoraChannelType.broadcast,
                         "ShowTo1v1"
                     )
-
-                    // todo workaround 1v1 视频没有渲染，展示 dialog 后会重新渲染 view
-//                onShowSettingDialog(false)
                 }
 
                 CallStateType.Failed -> {
@@ -941,16 +884,130 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             Log.d(TAG, "RoomDetail state222:$state cost：${System.currentTimeMillis() - time}")
         }
     }
+
+    private fun updateCallState(state: CallStateType) {
+        if (isGoingFinish) return
+        mCallState = state
+        mDashboardFragment?.updateCallState(mCallState)
+        when (mCallState) {
+            CallStateType.Calling -> {
+                publishMedia(false)
+                setupVideoView(false)
+            }
+
+            CallStateType.Prepared,
+            CallStateType.Idle,
+            CallStateType.Failed -> {
+                mTimeLinkAt = 0
+
+                publishMedia(true)
+                setupVideoView(true)
+
+                if (!isRoomOwner && !isGoingFinish) {
+                    binding.layoutCallPrivatelyBg.isVisible = true
+                    binding.layoutCallPrivately.isVisible = true
+                    startCallAnimator()
+                    Log.d(TAG, "room detail breathAnim")
+                }
+                binding.layoutNumCount.isVisible = true
+                binding.ivHangup.isVisible = false
+                binding.tvHangup.isVisible = false
+                binding.layoutCallingTop.isInvisible = true
+                binding.layoutRoomTop.isInvisible = false
+                binding.layoutCall.isVisible = false
+                if (exchanged) {
+                    // 恢复默认窗口
+                    exchangeDragWindow()
+                }
+
+                animateConnectedViewClose()
+            }
+
+            CallStateType.Connected -> {
+                mTimeLinkAt = TimeUtils.currentTimeMillis()
+                if (exchanged) {
+                    binding.vDragBigWindow.setSmallType(true)
+                    binding.vDragSmallWindow.setSmallType(false)
+                } else {
+                    binding.vDragBigWindow.setSmallType(false)
+                    binding.vDragSmallWindow.setSmallType(true)
+                }
+
+                // 默认远端都是大窗, 本地是小窗
+                (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
+                if (binding.vDragBigWindow.canvasContainer.childCount > 0) {
+                    binding.vDragBigWindow.canvasContainer.removeAllViews()
+                }
+                binding.vDragBigWindow.canvasContainerAddView(mShowTo1v1Manger.mRemoteVideoView)
+                mShowTo1v1Manger.mRemoteUser?.let {
+                    binding.vDragBigWindow.setUserName(it.userName)
+                    // 左上角是大窗的房间和昵称
+                    binding.tvCallingNickname.text = it.userName
+                    binding.tvCallingUid.text = it.userId
+                    GlideApp.with(this)
+                        .load(it.avatar)
+                        .error(R.mipmap.userimage)
+                        .transform(CenterCropRoundCornerTransform(100))
+                        .into(binding.ivCallingAvatar)
+                }
+
+                (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
+                if (binding.vDragSmallWindow.canvasContainer.childCount > 0) {
+                    binding.vDragSmallWindow.canvasContainer.removeAllViews()
+                }
+                binding.vDragSmallWindow.canvasContainerAddView(mShowTo1v1Manger.mLocalVideoView)
+                mShowTo1v1Manger.mCurrentUser.let {
+                    binding.vDragSmallWindow.setUserName(it.userName)
+                }
+                binding.llVideoContainer.isVisible = false
+                binding.layoutCall.isVisible = true
+                binding.layoutCallingTop.isInvisible = false
+
+                binding.layoutRoomTop.isInvisible = true
+                binding.layoutNumCount.isVisible = false
+                binding.ivHangup.isVisible = true
+                binding.tvHangup.isVisible = true
+                if (isRoomOwner) {
+                    animateConnectedViewOpen()
+                    mShowTo1v1Manger.mRemoteUser?.let {
+                        GlideApp.with(this)
+                            .load(it.avatar)
+                            .error(R.mipmap.userimage)
+                            .transform(CenterCropRoundCornerTransform(100))
+                            .into(binding.includeConnectedView.ivUserAvatar)
+                        binding.includeConnectedView.tvNickname.text = it.userName
+                    }
+                    mainHandler.postDelayed(connectedRun, 5000)
+                } else {
+                    binding.layoutCallPrivatelyBg.isVisible = false
+                    binding.layoutCallPrivately.isVisible = false
+                    stopCallAnimator()
+                }
+            }
+
+            else -> {}
+        }
+    }
 }
 
-private fun View.breathAnim() {
-    val scaleAnima = ScaleAnimation(
-        0.9f, 1f, 0.8f, 1f,
-        Animation.RELATIVE_TO_SELF, 0.5f,
-        Animation.RELATIVE_TO_SELF, 0.5f
-    )
-    scaleAnima.duration = 800
-    scaleAnima.repeatCount = Animation.INFINITE
-    scaleAnima.repeatMode = Animation.REVERSE
-    this.startAnimation(scaleAnima)
+private fun View.breathAnim(): AnimatorSet {
+    val scaleXAnima = ObjectAnimator.ofFloat(this, "scaleX", 0.9f, 1f)
+        .apply {
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            duration = 800
+        }
+
+    val scaleYAnima = ObjectAnimator.ofFloat(this, "scaleY", 0.8f, 1f)
+        .apply {
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            duration = 800
+        }
+    val animatorSet = AnimatorSet().apply {
+        playTogether(scaleXAnima, scaleYAnima)
+        start()
+    }
+
+    return animatorSet
 }

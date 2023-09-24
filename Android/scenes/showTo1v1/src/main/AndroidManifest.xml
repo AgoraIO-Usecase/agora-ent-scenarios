@@ -18,13 +18,11 @@
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/def_theme" />
-
         <activity
             android:name=".ui.RoomCreateActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/def_theme" />
-
         <activity
             android:name=".ui.RoomDetailActivity"
             android:exported="false"

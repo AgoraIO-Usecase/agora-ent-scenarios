@@ -1,5 +1,8 @@
 package io.agora.scene.showTo1v1.ui.fragment
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -23,7 +26,6 @@ import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
-import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 import io.agora.scene.showTo1v1.ui.RoomListActivity
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.widget.utils.BlurTransformation
@@ -33,7 +35,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     companion object {
 
-        private const val TAG = "ShowTo1v1_List"
+        const val TAG = "ShowTo1v1_List"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
         fun newInstance(romInfo: ShowTo1v1RoomInfo) = RoomListFragment().apply {
@@ -110,10 +112,10 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
                 .error(R.mipmap.userimage)
                 .transform(CenterCropRoundCornerTransform(100))
                 .into(binding.ivCurrentAvatar)
-            Glide.with(this)
-                .asGif()
-                .load(R.drawable.show_to1v1_wave_living)
-                .into(binding.ivLiving)
+//            Glide.with(this)
+//                .asGif()
+//                .load(R.drawable.show_to1v1_wave_living)
+//                .into(binding.ivLiving)
         }
         binding.ivConnect.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
@@ -127,7 +129,32 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
                 onFragmentListener?.onFragmentClickCall(false, mRoomInfo)
             }
         })
-        binding.ivConnectBG.breathAnim()
+    }
+
+    private var connectAnimatorSet: AnimatorSet? = null
+
+    private fun startConnectAnimator() {
+        if (connectAnimatorSet == null) {
+            connectAnimatorSet = binding.ivConnectBG.breathAnim()
+        }
+        connectAnimatorSet?.cancel()
+        connectAnimatorSet?.start()
+    }
+
+    private fun stopConnectAnimator(){
+        connectAnimatorSet?.cancel()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "fragment onResume ${mRoomInfo.roomId}")
+        startConnectAnimator()
+    }
+
+    override fun onPause() {
+        stopConnectAnimator()
+        Log.d(TAG, "fragment onPause ${mRoomInfo.roomId}")
+        super.onPause()
     }
 
     private fun onBackPressed() {
@@ -163,8 +190,6 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
         initRtcEngine(isScrolling)
 
-
-        // setupRemoteVideo
         activity?.let {
             mRtcVideoSwitcher.setupRemoteVideo(
                 mMainRtcConnection,
@@ -248,14 +273,23 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     }
 }
 
-private fun View.breathAnim() {
-    val scaleAnima = ScaleAnimation(
-        0.8f, 1f, 0.8f, 1f,
-        Animation.RELATIVE_TO_SELF, 0.5f,
-        Animation.RELATIVE_TO_SELF, 0.5f
-    )
-    scaleAnima.duration = 800
-    scaleAnima.repeatCount = Animation.INFINITE
-    scaleAnima.repeatMode = Animation.REVERSE
-    this.startAnimation(scaleAnima)
+private fun View.breathAnim(): AnimatorSet {
+    val scaleXAnima = ObjectAnimator.ofFloat(this, "scaleX", 0.8f, 1f)
+        .apply {
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            duration = 800
+        }
+
+    val scaleYAnima = ObjectAnimator.ofFloat(this, "scaleY", 0.8f, 1f)
+        .apply {
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            duration = 800
+        }
+
+    val animatorSet = AnimatorSet().apply {
+        playTogether(scaleXAnima, scaleYAnima)
+    }
+    return animatorSet
 }

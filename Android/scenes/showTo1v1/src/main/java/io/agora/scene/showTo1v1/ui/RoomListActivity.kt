@@ -1,13 +1,17 @@
 package io.agora.scene.showTo1v1.ui
 
+import android.animation.Animator
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import android.view.animation.AnimationUtils
+import android.view.animation.LinearInterpolator
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -79,6 +83,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             if (it) {
                 fetchRoomList()
             }
+        }
+
+        Looper.getMainLooper().setMessageLogging{ msg ->
+            Log.v("test","looper message = $msg")
         }
     }
 
@@ -265,8 +273,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     }
 
     private fun fetchRoomList() {
-        val anim = AnimationUtils.loadAnimation(this, R.anim.show_to1v1_center_rotation)
-        binding.titleView.rightIcon.startAnimation(anim)
+        animateLoadingIcon()
         binding.titleView.rightIcon.isEnabled = false
 
         mService.getRoomList(completion = { error, roomList ->
@@ -280,8 +287,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
             binding.root.postDelayed({
                 binding.titleView.rightIcon.isEnabled = true
-                binding.titleView.rightIcon.clearAnimation()
-//                mVpFragments[mCurrLoadPosition]?.onResumePage()
+                rotateAnimator?.cancel()
             }, 500)
             mayShowGuideView()
         })
@@ -310,16 +316,11 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
 
     private var toggleVideoRun: Runnable? = null
-    private var toggleAudioRun: Runnable? = null
 
     override fun getPermissions() {
         toggleVideoRun?.let {
             it.run()
             toggleVideoRun = null
-        }
-        toggleAudioRun?.let {
-            it.run()
-            toggleAudioRun = null
         }
     }
 
@@ -332,18 +333,8 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         }
     }
 
-    private fun toggleSelfAudio(isOpen: Boolean, callback: () -> Unit) {
-        if (isOpen) {
-            toggleAudioRun = Runnable {
-                callback.invoke()
-            }
-            requestRecordPermission(true)
-        } else {
-            callback.invoke()
-        }
-    }
-
     override fun onFragmentClickCall(needCall: Boolean, roomInfo: ShowTo1v1RoomInfo) {
+
         mRoomInfo = roomInfo
         if (needCall) {
             toggleSelfVideo(true) {
@@ -356,9 +347,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                         }
                     })
                 })
-            }
-            toggleSelfAudio(true) {
-
             }
         } else {
             mCallApi.removeListener(callApiListener)
@@ -459,5 +447,23 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             }
         }
 
+    }
+
+    private fun createRotateAnimator(): ObjectAnimator {
+        return ObjectAnimator.ofFloat(binding.titleView.rightIcon, View.ROTATION, 0f, 360f).apply {
+            duration = 1200
+            interpolator = LinearInterpolator()
+            repeatCount = ValueAnimator.INFINITE
+        }
+    }
+
+    private var rotateAnimator: Animator? = null
+
+    private fun animateLoadingIcon() {
+        if (rotateAnimator?.isRunning == true) return // 判断动画是否正在运行
+        rotateAnimator?.cancel() // 停止之前的动画
+        rotateAnimator = createRotateAnimator().apply {
+            start()
+        }
     }
 }
