@@ -172,7 +172,7 @@ class ShowTo1v1Manger constructor() {
                 mCallTokenConfig.rtcToken = rtcToken
                 mCallTokenConfig.rtmToken = rtmToken
                 setupGeneralToken(rtcToken)
-//                mCallApi.renewToken(mCallTokenConfig)
+                mCallApi.renewToken(mCallTokenConfig)
                 callback.invoke(true)
             },
             failure = {

@@ -335,4 +335,10 @@
             android:textSize="14sp" />
     </LinearLayout>
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupHangup"
+        app:constraint_referenced_ids="ivHangup,tvHangup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

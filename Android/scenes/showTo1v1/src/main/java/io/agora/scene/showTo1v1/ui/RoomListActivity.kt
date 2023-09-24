@@ -84,10 +84,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 fetchRoomList()
             }
         }
-
-        Looper.getMainLooper().setMessageLogging{ msg ->
-            Log.v("test","looper message = $msg")
-        }
     }
 
     private fun setOnApplyWindowInsetsListener() {
@@ -103,7 +99,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     override fun onResume() {
         super.onResume()
         Log.d(TAG, "RoomList onResume")
-        mVpFragments[mCurrLoadPosition]?.onResumePage()
+
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -122,6 +118,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     }
 
     override fun onRestart() {
+        mVpFragments[mCurrLoadPosition]?.onResumePage()
         super.onRestart()
         Log.d(TAG, "RoomList onRestart")
     }
@@ -143,7 +140,11 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         super.initView(savedInstanceState)
         binding.titleView.setLeftClick { finish() }
         binding.titleView.setRightIconClick {
-            fetchRoomList()
+            mShowTo1v1Manger.renewTokens {
+                if (it) {
+                    fetchRoomList()
+                }
+            }
         }
         binding.emptyInclude.layoutCreateRoom.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
@@ -196,7 +197,12 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             mCurrLoadPosition = binding.viewPager2.currentItem
             Log.d(TAG, "after setCurrentItem mCurrLoadPosition:$mCurrLoadPosition")
         } else {
-            mFragmentAdapter?.notifyDataSetChanged()
+            mFragmentAdapter?.let {
+                it.notifyDataSetChanged()
+                binding.viewPager2.currentItem = 0
+                mCurrLoadPosition = binding.viewPager2.currentItem
+            }
+
         }
     }
 
@@ -392,7 +398,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             val publisher = eventInfo[CallApiImpl.kPublisher] ?: mShowTo1v1Manger.mCurrentUser.userId
             if (publisher != mShowTo1v1Manger.mCurrentUser.userId) return
             mCallState = state
-            Log.d(TAG, "_notifyState RooList state:${state.name},stateReason:${stateReason.name}")
+            Log.d(TAG, "RooList state:${state.name},stateReason:${stateReason.name},eventReason:${eventReason}")
             when (state) {
                 CallStateType.Prepared -> {
                     if (stateReason == CallReason.CallingTimeout || stateReason == CallReason.RemoteRejected) {

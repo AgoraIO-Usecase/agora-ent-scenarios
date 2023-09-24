@@ -21,7 +21,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.contains
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -559,6 +558,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         Log.d(TAG, "RoomDetail onRestart")
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        Log.d(TAG, "RoomDetail onWindowFocusChanged hasFocus:$hasFocus")
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "RoomDetail onDestroy")
@@ -620,6 +624,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         openAnimator = createOpenAnimator().apply {
             start()
         }
+        mainHandler.postDelayed(connectedRun, 5000)
     }
 
     private fun createOpenAnimator(): AnimatorSet {
@@ -645,7 +650,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     private fun animateConnectedViewClose() {
         if (!binding.includeConnectedView.root.isVisible) return
-        binding.includeConnectedView.root.isVisible = false
 
         closeAnimator?.cancel() // 停止之前的动画
 
@@ -801,8 +805,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         ) {
             val publisher = eventInfo[CallApiImpl.kPublisher] ?: mShowTo1v1Manger.mCurrentUser.userId
             if (publisher != mShowTo1v1Manger.mCurrentUser.userId) return
-            val time = System.currentTimeMillis()
-            Log.d(TAG, "RoomDetail state111:$state")
+            Log.d(TAG, "RoomDetail state:${state.name},stateReason:${stateReason.name},eventReason:${eventReason}")
             updateCallState(state)
             when (state) {
                 CallStateType.Prepared -> {
@@ -881,7 +884,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     ToastUtils.showToast(eventReason)
                 }
             }
-            Log.d(TAG, "RoomDetail state222:$state cost：${System.currentTimeMillis() - time}")
         }
     }
 
@@ -907,13 +909,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     binding.layoutCallPrivatelyBg.isVisible = true
                     binding.layoutCallPrivately.isVisible = true
                     startCallAnimator()
-                    Log.d(TAG, "room detail breathAnim")
                 }
                 binding.layoutNumCount.isVisible = true
-                binding.ivHangup.isVisible = false
-                binding.tvHangup.isVisible = false
-                binding.layoutCallingTop.isInvisible = true
-                binding.layoutRoomTop.isInvisible = false
+                binding.groupHangup.isVisible = false
+                binding.layoutCallingTop.isVisible = false
+                binding.layoutRoomTop.isVisible = true
                 binding.layoutCall.isVisible = false
                 if (exchanged) {
                     // 恢复默认窗口
@@ -961,14 +961,14 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 }
                 binding.llVideoContainer.isVisible = false
                 binding.layoutCall.isVisible = true
-                binding.layoutCallingTop.isInvisible = false
+                binding.layoutCallingTop.isVisible = true
 
-                binding.layoutRoomTop.isInvisible = true
+                binding.layoutRoomTop.isVisible = false
                 binding.layoutNumCount.isVisible = false
-                binding.ivHangup.isVisible = true
-                binding.tvHangup.isVisible = true
+                binding.groupHangup.isVisible = true
+
+
                 if (isRoomOwner) {
-                    animateConnectedViewOpen()
                     mShowTo1v1Manger.mRemoteUser?.let {
                         GlideApp.with(this)
                             .load(it.avatar)
@@ -977,12 +977,20 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                             .into(binding.includeConnectedView.ivUserAvatar)
                         binding.includeConnectedView.tvNickname.text = it.userName
                     }
-                    mainHandler.postDelayed(connectedRun, 5000)
+                    mainHandler.postDelayed({
+                        animateConnectedViewOpen()
+                    },1000)
                 } else {
                     binding.layoutCallPrivatelyBg.isVisible = false
                     binding.layoutCallPrivately.isVisible = false
                     stopCallAnimator()
                 }
+                mainLooper.queue.addIdleHandler {
+                    Log.d(TAG, "animateConnectedViewOpen -- queueIdle -- 1")
+                    // workaround
+                    onShowSettingDialog(false)
+                    false
+                };
             }
 
             else -> {}
