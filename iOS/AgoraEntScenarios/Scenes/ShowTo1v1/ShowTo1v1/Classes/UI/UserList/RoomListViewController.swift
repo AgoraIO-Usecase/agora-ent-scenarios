@@ -378,16 +378,16 @@ extension RoomListViewController {
                     group.leave()
                 }
                 guard let self = self else {return}
-                self.createRoomDialog?.isUserInteractionEnabled = true
-                self.createRoomDialog?.isLoading = false
                 if let error = error {
                     AUIToast.show(text: error.localizedDescription)
                     return
                 }
                 createRoomInfo = roomInfo
-                CreateRoomDialog.hidden()
             }
             group.notify(queue: DispatchQueue.main) {[weak self] in
+                self?.createRoomDialog?.isUserInteractionEnabled = true
+                self?.createRoomDialog?.isLoading = false
+                CreateRoomDialog.hidden()
                 guard let roomInfo = createRoomInfo else {return}
                 guard success1 else {
                     self?.service.leaveRoom(roomInfo: roomInfo, completion: { err in
