@@ -39,7 +39,6 @@ class ShowTo1v1ServiceImp: NSObject {
     private var userList: [ShowTo1v1UserInfo] = []
     
     private var refreshRoomListClosure: (([ShowTo1v1RoomInfo])->Void)?
-    private var joinRoomClosure: ((Error?)->())?
     
     convenience init(appId: String, user: ShowTo1v1UserInfo?) {
         self.init()
@@ -169,7 +168,6 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     
     func joinRoom(roomInfo:ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void) {
         let reqId = NSString.withUUID()
-        self.joinRoomClosure = completion
         initScene(reqId) {[weak self] rid, error in
             guard reqId == rid else {return}
             if let error = error {
@@ -190,21 +188,20 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
                         }
                         self._subscribeUsersChanged(channelName: roomInfo.roomId)
                         self.subscribeRoomStatusChanged(channelName: roomInfo.roomId)
-                        self.joinRoomClosure?(nil)
-                        self.joinRoomClosure = nil
+                        completion(nil)
                     }
                 } fail: {[weak self] error in
                     showTo1v1Print("joinRoom fail2: \(error.localizedDescription)")
                     mainTreadTask {
-                        self?.joinRoomClosure?(error)
-                        self?.joinRoomClosure = nil
+                        completion(error)
                     }
                 }
             }) {[weak self] error in
                 showTo1v1Print("joinRoom fail3: \(error.localizedDescription)")
+                self?.leaveRoom(roomInfo: roomInfo) { err in
+                }
                 mainTreadTask {
-                    self?.joinRoomClosure?(error)
-                    self?.joinRoomClosure = nil
+                    completion(error)
                 }
             }
         }
