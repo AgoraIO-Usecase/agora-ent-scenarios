@@ -232,6 +232,8 @@ class ShowTo1v1Manger constructor() {
         }
 
     fun destroy() {
+        mRemoteUser = null
+        mConnectedChannelId = null
         isCallApiInit = false
         mCallApi.deinitialize {}
         innerCurrentUser = null
