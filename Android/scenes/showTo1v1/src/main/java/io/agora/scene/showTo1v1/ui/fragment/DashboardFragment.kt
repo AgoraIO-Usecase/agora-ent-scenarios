@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
+import io.agora.scene.base.manager.UserManager
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.scene.showTo1v1.callAPI.CallStateType
@@ -82,6 +83,23 @@ class DashboardFragment : Fragment() {
             }
         } else {
             mRtcEngine.removeHandlerEx(showTo1v1RtcListener, mShowTo1v1RtcConnection)
+        }
+        if (::binding.isInitialized) {
+            if (mCallState != CallStateType.Connected && mRoomInfo.userId != UserManager.getInstance().user.id.toString()) {
+                binding.tvEncodeResolution.text = getString(R.string.show_to1v1_dashboard_encode_resolution, "--")
+                binding.tvStatisticEncodeFPS.text = getString(R.string.show_to1v1_dashboard_encode_fps, "--")
+                binding.tvStatisticUpBitrate.text = getString(R.string.show_to1v1_dashboard_up_bitrate, "--")
+                binding.tvStatisticUpLossPackage.text = getString(R.string.show_to1v1_dashboard_up_loss_package, "--")
+                binding.tvStatisticUpNet.text = getString(R.string.show_to1v1_dashboard_up_net_speech, "--")
+            }
+            if (mCallState != CallStateType.Connected && mRoomInfo.userId == UserManager.getInstance().user.id.toString()) {
+                binding.tvReceiveResolution.text = getString(R.string.show_to1v1_dashboard_receive_resolution, "--")
+                binding.tvStatisticReceiveFPS.text = getString(R.string.show_to1v1_dashboard_receive_fps, "--")
+                binding.tvStatisticDownBitrate.text = getString(R.string.show_to1v1_dashboard_down_bitrate, "--")
+                binding.tvStatisticDownLossPackage.text = getString(R.string.show_to1v1_dashboard_down_loss_package, "--")
+                binding.tvStatisticDownNet.text = getString(R.string.show_to1v1_dashboard_down_net_speech, "--")
+                binding.tvStatisticDownDelay.text = getString(R.string.show_to1v1_dashboard_delay, "--")
+            }
         }
     }
 
@@ -257,12 +275,10 @@ class DashboardFragment : Fragment() {
         // 上行码率、下行码率
         upBitrate: Int? = null, downBitrate: Int? = null
     ) {
-        Log.d("tastt", "refreshDashboardInfo1")
         activity ?: return
         if (!isBoardVisible) {
             return
         }
-        Log.d("tastt", "refreshDashboardInfo2")
         // 编码分辨率
         encodeVideoSize?.let {
             binding.tvEncodeResolution.text =
