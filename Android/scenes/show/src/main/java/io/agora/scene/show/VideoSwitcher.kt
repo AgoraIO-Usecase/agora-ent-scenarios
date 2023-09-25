@@ -98,4 +98,6 @@ interface VideoSwitcher {
      */
     fun adjustAudioMixingVolume(connection: RtcConnection, volume: Int)
 
+    fun getFirstVideoFrameTime(): Long
+
 }

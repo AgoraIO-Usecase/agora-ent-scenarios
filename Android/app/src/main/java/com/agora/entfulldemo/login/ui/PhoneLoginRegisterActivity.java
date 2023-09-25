@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppActivityPhoneLoginBinding;
 import com.agora.entfulldemo.login.LoginViewModel;
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -101,13 +102,13 @@ public class PhoneLoginRegisterActivity extends BaseViewBindingActivity<AppActiv
                     showSwipeCaptchaDialog();
                 }
             } else {
-                ToastUtils.showToast("请同意我们的隐私政策与用户协议");
+                ToastUtils.showToast(R.string.app_agree_tip);
             }
         });
         getBinding().tvSendVCode.setOnClickListener(view -> {
             String account = getBinding().etAccounts.getText().toString();
             if (!StringUtils.checkPhoneNum(account)) {
-                ToastUtils.showToast("请输入正确手机号");
+                ToastUtils.showToast(R.string.app_input_phonenum_tip);
             } else {
                 phoneLoginViewModel.requestSendVCode(account);
             }
@@ -164,10 +165,10 @@ public class PhoneLoginRegisterActivity extends BaseViewBindingActivity<AppActiv
     private boolean checkAccount() {
         String account = getBinding().etAccounts.getText().toString();
         if (!StringUtils.checkPhoneNum(account)) {
-            ToastUtils.showToast("请输入正确手机号");
+            ToastUtils.showToast(R.string.app_input_phonenum_tip);
             return false;
         } else if (TextUtils.isEmpty(getBinding().etVCode.getText().toString())) {
-            ToastUtils.showToast("请输入验证码");
+            ToastUtils.showToast(R.string.app_input_vcode_tip);
         }
         return true;
     }

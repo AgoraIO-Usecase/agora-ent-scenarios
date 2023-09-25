@@ -23,7 +23,8 @@ import java.util.*
 /**
  * 高级设置弹窗
  */
-class AdvanceSettingDialog constructor(context: Context,val rtcConnection: RtcConnection) : BottomFullDialog(context) {
+class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcConnection) :
+    BottomFullDialog(context) {
 
     companion object {
         private const val ITEM_ID_SWITCH_BASE = 0x00000001
@@ -33,6 +34,7 @@ class AdvanceSettingDialog constructor(context: Context,val rtcConnection: RtcCo
         const val ITEM_ID_SWITCH_VIDEO_NOISE_REDUCE = ITEM_ID_SWITCH_BASE + 4
         const val ITEM_ID_SWITCH_BITRATE_SAVE = ITEM_ID_SWITCH_BASE + 5
         const val ITEM_ID_SWITCH_EAR_BACK = ITEM_ID_SWITCH_BASE + 6
+        const val ITEM_ID_SWITCH_BITRATE = ITEM_ID_SWITCH_BASE + 7
 
         private const val ITEM_ID_SEEKBAR_BASE = ITEM_ID_SWITCH_BASE shl 8
         const val ITEM_ID_SEEKBAR_BITRATE = ITEM_ID_SEEKBAR_BASE + 1
@@ -55,7 +57,7 @@ class AdvanceSettingDialog constructor(context: Context,val rtcConnection: RtcCo
         )
     }
 
-    private data class TabPage(
+    private data class TabPage constructor(
         val viewType: Int,
         @StringRes val title: Int
     )
@@ -81,6 +83,10 @@ class AdvanceSettingDialog constructor(context: Context,val rtcConnection: RtcCo
         put(
             ITEM_ID_SWITCH_EAR_BACK,
             VideoSetting.getCurrBroadcastSetting().audio.inEarMonitoring.toInt()
+        )
+        put(
+            ITEM_ID_SWITCH_BITRATE,
+            VideoSetting.getCurrBroadcastSetting().video.bitRateStandard.toInt()
         )
         put(ITEM_ID_SEEKBAR_BITRATE, VideoSetting.getCurrBroadcastSetting().video.bitRate)
         put(
@@ -147,11 +153,13 @@ class AdvanceSettingDialog constructor(context: Context,val rtcConnection: RtcCo
                         LayoutInflater.from(parent.context), parent, false
                     )
                 )
+
                 VIEW_TYPE_AUDIO_SETTING -> BindingViewHolder(
                     ShowSettingAdvanceAudioBinding.inflate(
                         LayoutInflater.from(parent.context), parent, false
                     )
                 )
+
                 else -> throw RuntimeException("Not support viewType: $viewType")
             }
 
@@ -160,9 +168,11 @@ class AdvanceSettingDialog constructor(context: Context,val rtcConnection: RtcCo
                     VIEW_TYPE_VIDEO_SETTING -> (holder as? BindingViewHolder<*>)?.binding?.let {
                         updateVideoSettingView(it as ShowSettingAdvanceVideoBinding)
                     }
+
                     VIEW_TYPE_AUDIO_SETTING -> (holder as? BindingViewHolder<*>)?.binding?.let {
                         updateAudioSettingView(it as ShowSettingAdvanceAudioBinding)
                     }
+
                     else -> throw RuntimeException("Can not find position support viewType. position: $position")
                 }
             }
@@ -260,10 +270,12 @@ class AdvanceSettingDialog constructor(context: Context,val rtcConnection: RtcCo
             R.string.show_setting_advance_encode_framerate_tip,
             VideoSetting.FrameRateList.map { "${it.fps} fps" }
         )
-        setupSeekbarItem(
+        setupSwitchAndSeekbarItem(
+            ITEM_ID_SWITCH_BITRATE,
             ITEM_ID_SEEKBAR_BITRATE,
             binding.bitrate,
             R.string.show_setting_advance_bitrate,
+            R.string.show_setting_advance_bitrate_tips,
             "%d kbps",
             200, 4000
         )
@@ -368,7 +380,7 @@ class AdvanceSettingDialog constructor(context: Context,val rtcConnection: RtcCo
                 }
             }
         }
-        binding.slider.addOnSliderTouchListener(object: Slider.OnSliderTouchListener {
+        binding.slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
             @SuppressLint("RestrictedApi")
             override fun onStartTrackingTouch(slider: Slider) {
 
@@ -376,13 +388,93 @@ class AdvanceSettingDialog constructor(context: Context,val rtcConnection: RtcCo
 
             @SuppressLint("RestrictedApi")
             override fun onStopTrackingTouch(slider: Slider) {
-                if(changed){
+                if (changed) {
                     onSeekbarChanged(itemId, slider.value.toInt())
                     changed = false
                 }
             }
         })
+    }
 
+    /**
+     * 带开关，带进度条的 item
+     * 开关关闭，进度条隐藏
+     *
+     * @param itemIdSwitch 开关 itemId
+     * @param itemIdSeekbar 进度条 itemId
+     */
+    private fun setupSwitchAndSeekbarItem(
+        itemIdSwitch: Int,
+        itemIdSeekbar: Int,
+        binding: ShowSettingAdvanceItemSwitchSeekbarBinding,
+        @StringRes title: Int,
+        @StringRes tip: Int,
+        valueFormat: String,
+        fromValue: Int,
+        toValue: Int
+    ) {
+        binding.root.isVisible = itemInVisibleMap[itemIdSwitch]?.not() ?: true
+        binding.tvTitle.text = context.getString(title)
+        binding.ivTip.visibility = if (tip == -1) View.GONE else View.VISIBLE
+        binding.ivTip.setOnClickListener {
+            ToastDialog(context).showTip(context.getString(tip))
+        }
+        binding.switchCompat.setOnCheckedChangeListener(null)
+        binding.switchCompat.isChecked = (defaultItemValues[itemIdSwitch] ?: 0) > 0
+        onSwitchChanged(itemIdSwitch, binding.switchCompat.isChecked)
+        binding.switchCompat.setOnCheckedChangeListener { btn, isChecked ->
+            if (checkPresetMode()) {
+                btn.isChecked = !isChecked
+            } else {
+                defaultItemValues[itemIdSwitch] = if (isChecked) 1 else 0
+                onSwitchChanged(itemIdSwitch, isChecked)
+                binding.slider.visibility = if (isChecked) View.GONE else View.VISIBLE
+                binding.tvValue.visibility = if (isChecked) View.GONE else View.VISIBLE
+                if (!isChecked) { // 关闭时候设置推荐默认值
+                    binding.slider.value =
+                        VideoSetting.getRecommendBroadcastSetting().video.bitRate.toFloat()
+                    binding.tvValue.text =
+                        String.format(Locale.US, valueFormat, binding.slider.value.toInt())
+                }
+            }
+        }
+
+        binding.slider.visibility = if (binding.switchCompat.isChecked) View.GONE else View.VISIBLE
+        binding.tvValue.visibility = if (binding.switchCompat.isChecked) View.GONE else View.VISIBLE
+        binding.slider.valueFrom = fromValue.toFloat()
+        binding.slider.valueTo = toValue.toFloat()
+        val defaultValue = defaultItemValues[itemIdSeekbar]?.toFloat() ?: fromValue.toFloat()
+        binding.slider.value = defaultValue
+        binding.tvValue.text = String.format(Locale.US, valueFormat, binding.slider.value.toInt())
+        binding.slider.clearOnChangeListeners()
+        binding.slider.clearOnSliderTouchListeners()
+        onSeekbarChanged(itemIdSeekbar, defaultValue.toInt())
+        var changed = false
+        binding.slider.addOnChangeListener { status, nValue, fromUser ->
+            if (fromUser) {
+                if (checkPresetMode()) {
+                    binding.slider.value = defaultValue
+                } else {
+                    binding.tvValue.text = String.format(Locale.US, valueFormat, nValue.toInt())
+                    defaultItemValues[itemIdSeekbar] = nValue.toInt()
+                    changed = true
+                }
+            }
+        }
+        binding.slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+            @SuppressLint("RestrictedApi")
+            override fun onStartTrackingTouch(slider: Slider) {
+
+            }
+
+            @SuppressLint("RestrictedApi")
+            override fun onStopTrackingTouch(slider: Slider) {
+                if (changed) {
+                    onSeekbarChanged(itemIdSeekbar, slider.value.toInt())
+                    changed = false
+                }
+            }
+        })
     }
 
     private fun checkPresetMode(): Boolean {
@@ -403,23 +495,39 @@ class AdvanceSettingDialog constructor(context: Context,val rtcConnection: RtcCo
             ITEM_ID_SWITCH_VIDEO_NOISE_REDUCE -> VideoSetting.updateBroadcastSetting(videoDenoiser = isChecked)
             ITEM_ID_SWITCH_BITRATE_SAVE -> VideoSetting.updateBroadcastSetting(PVC = isChecked)
             ITEM_ID_SWITCH_EAR_BACK -> VideoSetting.updateBroadcastSetting(inEarMonitoring = isChecked)
+            ITEM_ID_SWITCH_BITRATE -> VideoSetting.updateBroadcastSetting(bitRateStandard = isChecked)
         }
     }
 
     private fun onSeekbarChanged(itemId: Int, value: Int) {
         when (itemId) {
-            ITEM_ID_SEEKBAR_BITRATE -> VideoSetting.updateBroadcastSetting(bitRate = value)
+            ITEM_ID_SEEKBAR_BITRATE -> VideoSetting.updateBroadcastSetting(
+                bitRate = value
+            )
+
             ITEM_ID_SEEKBAR_VOCAL_VOLUME -> VideoSetting.updateBroadcastSetting(
                 recordingSignalVolume = value
             )
-            ITEM_ID_SEEKBAR_MUSIC_VOLUME -> VideoSetting.updateBroadcastSetting(rtcConnection, audioMixingVolume = value)
+
+            ITEM_ID_SEEKBAR_MUSIC_VOLUME -> VideoSetting.updateBroadcastSetting(
+                rtcConnection,
+                audioMixingVolume = value
+            )
         }
     }
 
     private fun onSelectorChanged(itemId: Int, index: Int) {
+        if (index < 0) return
         when (itemId) {
-            ITEM_ID_SELECTOR_RESOLUTION -> VideoSetting.updateBroadcastSetting(encoderResolution = VideoSetting.ResolutionList[index], captureResolution = VideoSetting.ResolutionList[index])
-            ITEM_ID_SELECTOR_FRAME_RATE -> VideoSetting.updateBroadcastSetting(captureResolution = VideoSetting.ResolutionList[index], frameRate = VideoSetting.FrameRateList[index])
+            ITEM_ID_SELECTOR_RESOLUTION -> VideoSetting.updateBroadcastSetting(
+                encoderResolution = VideoSetting.ResolutionList[index],
+                captureResolution = VideoSetting.ResolutionList[index]
+            )
+
+            ITEM_ID_SELECTOR_FRAME_RATE -> VideoSetting.updateBroadcastSetting(
+                captureResolution = VideoSetting.ResolutionList[index],
+                frameRate = VideoSetting.FrameRateList[index]
+            )
         }
     }
 }

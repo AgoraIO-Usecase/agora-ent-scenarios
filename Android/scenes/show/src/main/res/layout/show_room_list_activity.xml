@@ -10,7 +10,6 @@
         android:id="@+id/title_view"
         style="@style/title_view"
         app:ctv_centerText="@string/show_app_name"
-        app:ctv_rightText="@string/show_setting_audience"
         tools:ignore="MissingConstraints" />
 
 

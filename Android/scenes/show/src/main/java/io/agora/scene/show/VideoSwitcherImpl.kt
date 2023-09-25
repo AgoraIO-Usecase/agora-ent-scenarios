@@ -18,7 +18,7 @@ import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.utils.ToastUtils
 import java.util.*
 
-class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
+class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     private val tag = "VideoSwitcherImpl"
     private var preloadCount = 3
 
@@ -30,6 +30,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
     private val preLoadRun = Runnable { preloadChannels() }
+    private var quickStartTime = 0L
 
     override fun setPreloadCount(count: Int) {
         preloadCount = count
@@ -64,9 +65,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         mediaOptions: ChannelMediaOptions,
         eventListener: VideoSwitcher.IChannelEventListener
     ) {
-
-
-        connectionsJoined.firstOrNull{ it.isSameChannel(connection)}
+        connectionsJoined.firstOrNull { it.isSameChannel(connection) }
             ?.let {
                 ShowLogger.d(tag, "joinChannel joined connection=$it")
                 it.rtcEventHandler?.setEventListener(eventListener)
@@ -133,7 +132,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         }
 
         if (connectionsPreloaded.size > preloadCount) {
-            connectionsPreloaded.iterator().let { connIterator->
+            connectionsPreloaded.iterator().let { connIterator ->
                 while (connIterator.hasNext()) {
                     val next = connIterator.next()
                     if (connPreLoaded.none { next.isSameChannel(it) }) {
@@ -149,10 +148,10 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     override fun leaveChannel(connection: RtcConnection, force: Boolean): Boolean {
         connectionsJoined.firstOrNull { it.isSameChannel(connection) }
             ?.let { conn ->
-                if (force){
+                if (force) {
                     leaveRtcChannel(conn)
                     connectionsJoined.remove(conn)
-                }else{
+                } else {
                     val options = conn.mediaOptions
                     options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
                     options.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
@@ -183,7 +182,6 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         connection: RtcConnection,
         container: VideoSwitcher.VideoCanvasContainer
     ) {
-
         remoteVideoCanvasList.firstOrNull {
             it.connection.isSameChannel(connection) && it.uid == container.uid && it.renderMode == container.renderMode && it.lifecycleOwner == container.lifecycleOwner
         }?.let {
@@ -213,10 +211,10 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         }
 
         var connectionWrap = connectionsJoined.firstOrNull { it.isSameChannel(connection) }
-        if(connectionWrap == null){
+        if (connectionWrap == null) {
             connectionWrap = connectionsPreloaded.firstOrNull { it.isSameChannel(connection) }
         }
-        if(connectionWrap == null){
+        if (connectionWrap == null) {
             connectionWrap = RtcConnectionWrap(connection)
         }
         val remoteVideoCanvasWrap = RemoteVideoCanvasWrap(
@@ -226,7 +224,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             container.renderMode,
             container.uid
         )
-        if(connectionWrap.rtcEventHandler?.isJoinChannelSuccess == true){
+        if (connectionWrap.rtcEventHandler?.isJoinChannelSuccess == true) {
             rtcEngine.setupRemoteVideoEx(
                 remoteVideoCanvasWrap,
                 connectionWrap
@@ -275,13 +273,13 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         // 从缓存里取MediaPlayer，如不存在则重新创建
         // val mediaPlayer = rtcEngine.createMediaPlayer()
         val mediaPlayer = connectionWrap.audioMixingPlayer ?: rtcEngine.createMediaPlayer().apply {
-            registerPlayerObserver(object : IMediaPlayerObserver{
+            registerPlayerObserver(object : IMediaPlayerObserver {
                 override fun onPlayerStateChanged(
                     state: io.agora.mediaplayer.Constants.MediaPlayerState?,
                     error: io.agora.mediaplayer.Constants.MediaPlayerError?
                 ) {
-                    if(error == io.agora.mediaplayer.Constants.MediaPlayerError.PLAYER_ERROR_NONE){
-                        if(state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED){
+                    if (error == io.agora.mediaplayer.Constants.MediaPlayerError.PLAYER_ERROR_NONE) {
+                        if (state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
                             play()
                         }
                     }
@@ -345,7 +343,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         // channelMediaOptions.publishMediaPlayerId = mediaPlayer.getId()
         // channelMediaOptions.publishMediaPlayerAudioTrack = true
         // rtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, connection)
-        if(!loopbackOnly){
+        if (!loopbackOnly) {
             val mediaOptions = connectionWrap.mediaOptions
             mediaOptions.publishMediaPlayerId = mediaPlayer.mediaPlayerId
             // TODO: 没开启麦克风权限情况下，publishMediaPlayerAudioTrack = true 会自动停止音频播放
@@ -377,6 +375,10 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         connectionWrap.audioMixingPlayer?.adjustPublishSignalVolume(volume)
     }
 
+    override fun getFirstVideoFrameTime(): Long {
+        return quickStartTime
+    }
+
     private fun leaveRtcChannel(connection: RtcConnectionWrap) {
         val options = LeaveChannelOptions()
         options.stopAllEffect = false
@@ -398,41 +400,40 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         eventListener: VideoSwitcher.IChannelEventListener? = null
     ) {
         val joinChannelTime = SystemClock.elapsedRealtime()
-        ShowLogger.d(
-            tag,
-            "joinChannel start : channelId=${connection.channelId}, uid=${connection.localUid}"
-        )
-        TokenGenerator.generateToken(
-            connection.channelId, connection.localUid.toString(),
-            TokenGenerator.TokenGeneratorType.token006,
-            TokenGenerator.AgoraTokenType.rtc,
-            success = {
-                ShowLogger.d(
-                    tag,
-                    "joinChannel generate token : channel ${connection.channelId} token success cost time : ${SystemClock.elapsedRealtime() - joinChannelTime} ms"
-                )
-                val eventHandler =
-                    RtcEngineEventHandlerImpl(joinChannelTime, connection)
-                eventHandler.setEventListener(eventListener)
-                connection.rtcEventHandler = eventHandler
-                val ret = rtcEngine.joinChannelEx(it, connection, connection.mediaOptions, eventHandler)
-                ShowLogger.d(
-                    tag,
-                    "joinChannel joinChannelEx ret : channel=${connection.channelId} code=$ret, message=${
-                        RtcEngine.getErrorDescription(
-                            ret
-                        )
-                    }"
-                )
-            },
-            failure = {
-                ShowLogger.e(tag, it, "joinChannel generate token failed")
-                ToastUtils.showToast(it!!.message)
-                eventListener?.onTokenGenerateFailedException?.invoke(it)
-            })
+        ShowLogger.d(tag, "joinChannelEx start : channelId=${connection.channelId}, uid=${connection.localUid}")
+        val generalToken = RtcEngineInstance.generalToken()
+        if (generalToken.isNotEmpty()) {
+            val eventHandler = RtcEngineEventHandlerImpl(joinChannelTime, connection)
+            eventHandler.setEventListener(eventListener)
+            connection.rtcEventHandler = eventHandler
+            val ret = rtcEngine.joinChannelEx(generalToken, connection, connection.mediaOptions, eventHandler)
+            ShowLogger.d(tag, "joinChannelEx ret:channel=${connection.channelId} uid=${connection.localUid} code=$ret")
+        } else {
+            TokenGenerator.generateToken("", connection.localUid.toString(),
+                TokenGenerator.TokenGeneratorType.token007,
+                TokenGenerator.AgoraTokenType.rtc,
+                success = {
+                    ShowLogger.d(
+                        tag,
+                        "joinChannelEx generate token : channel ${connection.channelId} uid=${connection.localUid} token success cost " +
+                                "time : ${SystemClock.elapsedRealtime() - joinChannelTime} ms"
+                    )
+                    RtcEngineInstance.setupGeneralToken(it)
+                    val eventHandler = RtcEngineEventHandlerImpl(joinChannelTime, connection)
+                    eventHandler.setEventListener(eventListener)
+                    connection.rtcEventHandler = eventHandler
+                    val ret = rtcEngine.joinChannelEx(it, connection, connection.mediaOptions, eventHandler)
+                    ShowLogger.d(tag, "joinChannelEx ret : channel=${connection.channelId} code=$ret")
+                },
+                failure = {
+                    ShowLogger.e(tag, it, "joinChannelEx generate token failed")
+                    ToastUtils.showToast(it!!.message)
+                    eventListener?.onTokenGenerateFailedException?.invoke(it)
+                })
+        }
     }
 
-    inner class LocalVideoCanvasWrap(
+    inner class LocalVideoCanvasWrap constructor(
         val lifecycleOwner: LifecycleOwner,
         view: View,
         renderMode: Int,
@@ -441,7 +442,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
 
         init {
             lifecycleOwner.lifecycle.addObserver(this)
-            if(localVideoCanvas != this){
+            if (localVideoCanvas != this) {
                 localVideoCanvas?.release()
                 localVideoCanvas = this
             }
@@ -454,7 +455,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             }
         }
 
-        fun release(){
+        fun release() {
             lifecycleOwner.lifecycle.removeObserver(this)
             view = null
             rtcEngine.setupLocalVideo(this)
@@ -463,12 +464,12 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
 
     }
 
-    inner class RtcConnectionWrap(connection: RtcConnection) :
+    inner class RtcConnectionWrap constructor(connection: RtcConnection) :
         RtcConnection(connection.channelId, connection.localUid) {
 
         var mediaOptions = ChannelMediaOptions()
-        var rtcEventHandler : RtcEngineEventHandlerImpl? = null
-        var audioMixingPlayer : IMediaPlayer? = null
+        var rtcEventHandler: RtcEngineEventHandlerImpl? = null
+        var audioMixingPlayer: IMediaPlayer? = null
 
         fun isSameChannel(connection: RtcConnection?) =
             connection != null && channelId == connection.channelId && localUid == connection.localUid
@@ -480,7 +481,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
 
     }
 
-    inner class RemoteVideoCanvasWrap(
+    inner class RemoteVideoCanvasWrap constructor(
         val connection: RtcConnectionWrap,
         val lifecycleOwner: LifecycleOwner,
         view: View,
@@ -500,7 +501,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             }
         }
 
-        fun release(){
+        fun release() {
             lifecycleOwner.lifecycle.removeObserver(this)
             view = null
             rtcEngine.setupRemoteVideoEx(this, connection)
@@ -510,7 +511,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     }
 
 
-    inner class RtcEngineEventHandlerImpl(
+    inner class RtcEngineEventHandlerImpl constructor(
         private val joinChannelTime: Long,
         private val connection: RtcConnection,
     ) : IRtcEngineEventHandler() {
@@ -627,6 +628,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             ) {
                 val durationFromSubscribe = SystemClock.elapsedRealtime() - subscribeMediaTime
                 val durationFromJoiningRoom = SystemClock.elapsedRealtime() - joinChannelTime
+                quickStartTime = durationFromSubscribe
                 ShowLogger.d(
                     tag,
                     "video cost time : channel=${connection.channelId}, uid=$uid, durationFromJoiningRoom=$durationFromJoiningRoom, durationFromSubscribe=$durationFromSubscribe "

@@ -246,6 +246,67 @@
 
         </TableRow>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/show_statistic_else"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvQuickStartTime"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_quick_start_time" />
+
+            <TextView
+                android:id="@+id/tvStatisticDeviceGrade"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_device_grade" />
+        </TableRow>
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvStatisticSR"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_sr" />
+
+            <TextView
+                android:id="@+id/tvStatisticPVC"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_pvc" />
+        </TableRow>
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvStatisticLowStream"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_low_stream" />
+
+            <TextView
+                android:id="@+id/tvStatisticSVC"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_svc" />
+
+        </TableRow>
+
     </TableLayout>
 
     <ImageView
