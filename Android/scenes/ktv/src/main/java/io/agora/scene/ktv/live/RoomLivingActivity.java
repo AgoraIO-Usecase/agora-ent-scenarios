@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
@@ -545,6 +546,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d("KKKKK","onResume");
         KTVLogger.d("ktv", "onResume() " + isBlackDarkStatus());
         setDarkStatusIcon(isBlackDarkStatus());
     }
@@ -796,6 +798,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     @Override
     protected void onStop() {
         super.onStop();
+        Log.d("KKKKK","onStop");
         roomLivingViewModel.onStop();
     }
 
@@ -872,6 +875,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d("KKKKK","onDestroy");
         roomLivingViewModel.release();
     }
 
