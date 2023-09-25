@@ -30,7 +30,6 @@ import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION
-import io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE
 import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.component.AgoraApplication
@@ -93,10 +92,7 @@ class LiveDetailFragment : Fragment() {
 
     val mRoomInfo by lazy { (arguments?.getParcelable(EXTRA_ROOM_DETAIL_INFO) as? ShowRoomDetailModel)!! }
     private val mBinding by lazy {
-        ShowLiveDetailFragmentBinding.inflate(
-            LayoutInflater.from(
-                requireContext()
-            )
+        ShowLiveDetailFragmentBinding.inflate(LayoutInflater.from(requireContext())
         )
     }
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
@@ -558,6 +554,53 @@ class LiveDetailFragment : Fragment() {
         topBinding.tvStatisticDownNet.isVisible = !isAudioOnlyMode
         downLinkBps?.let { topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, (it / 8192).toString()) }
         if (topBinding.tvStatisticDownNet.text.isEmpty()) topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, "--")
+        // 秒开时间
+        topBinding.tvQuickStartTime.isVisible = true
+        if (isRoomOwner) {
+            topBinding.tvQuickStartTime.text = getString(R.string.show_statistic_quick_start_time, "--")
+        } else {
+            topBinding.tvQuickStartTime.text = getString(R.string.show_statistic_quick_start_time, mRtcVideoSwitcher.getFirstVideoFrameTime())
+        }
+        // 机型等级
+        topBinding.tvStatisticDeviceGrade.isVisible = true
+        val score = mRtcEngine.queryDeviceScore()
+        if (score >= 85) {
+            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_high))
+        } else if (score >= 60) {
+            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_medium))
+        } else {
+            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_low))
+        }
+        // 超分开关
+        topBinding.tvStatisticSR.isVisible = true
+        if (isRoomOwner) {
+            topBinding.tvStatisticSR.text = getString(R.string.show_statistic_sr, "--")
+        } else {
+            topBinding.tvStatisticSR.text = getString(R.string.show_statistic_sr, if (VideoSetting.getCurrAudienceEnhanceSwitch()) "开" else "关")
+        }
+        // pvc开关
+        topBinding.tvStatisticPVC.isVisible = true
+        if (isRoomOwner) {
+            topBinding.tvStatisticPVC.text = getString(R.string.show_statistic_pvc, if (VideoSetting.getCurrBroadcastSetting().video.PVC) "开" else "关")
+        } else {
+            topBinding.tvStatisticPVC.text = getString(R.string.show_statistic_pvc, "--")
+        }
+
+        // 小流开关
+        topBinding.tvStatisticLowStream.isVisible = true
+        if (isRoomOwner) {
+            topBinding.tvStatisticLowStream.text = getString(R.string.show_statistic_low_stream, if (VideoSetting.getCurrLowStreamSetting() == null) "关" else "开")
+        } else {
+            topBinding.tvStatisticLowStream.text = getString(R.string.show_statistic_low_stream, "--")
+        }
+
+        // svc开关
+        topBinding.tvStatisticSVC.isVisible = true
+        if (isRoomOwner) {
+            topBinding.tvStatisticSVC.text = getString(R.string.show_statistic_svc, if (VideoSetting.getCurrLowStreamSetting()?.SVC == true) "开" else "关")
+        } else {
+            topBinding.tvStatisticSVC.text = getString(R.string.show_statistic_svc, "--")
+        }
     }
 
     private fun refreshViewDetailLayout(status: Int) {
@@ -676,8 +719,6 @@ class LiveDetailFragment : Fragment() {
 
     private fun showAdvanceSettingDialog() {
         AdvanceSettingDialog(requireContext(), mMainRtcConnection).apply {
-            setItemShowTextOnly(AdvanceSettingDialog.ITEM_ID_SWITCH_QUALITY_ENHANCE, true)
-            setItemShowTextOnly(AdvanceSettingDialog.ITEM_ID_SWITCH_BITRATE_SAVE, true)
             show()
         }
     }
@@ -887,7 +928,7 @@ class LiveDetailFragment : Fragment() {
         mLinkInvitationCountDownLatch = object : CountDownTimer(15 * 1000 - 1, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 dialog.getButton(DialogInterface.BUTTON_NEGATIVE).text =
-                    "取消(" + millisUntilFinished / 1000 + "s)"
+                    "${getString(R.string.show_setting_cancel)}(" + millisUntilFinished / 1000 + "s)"
             }
 
             override fun onFinish() {
@@ -1007,18 +1048,21 @@ class LiveDetailFragment : Fragment() {
     //================== Service Operation ===============
 
     private fun initServiceWithJoinRoom() {
-        mService.joinRoom(mRoomInfo.roomId, {
-            initService()
-        }, {
-            if ((it as? RoomException)?.currRoomNo == mRoomInfo.roomId) {
-                runOnUiThread {
-                    destroy()
-                     // 进房Error
-                    showLivingEndLayout() // 进房Error
-                    ShowLogger.d("showLivingEndLayout","join room error!:${it.message}")
+        mService.joinRoom(mRoomInfo.roomId,
+            success = {
+                mService.sendChatMessage(mRoomInfo.roomId, getString(R.string.show_live_chat_coming))
+                initService()
+            },
+            error = {
+                if ((it as? RoomException)?.currRoomNo == mRoomInfo.roomId) {
+                    runOnUiThread {
+                        destroy()
+                        // 进房Error
+                        showLivingEndLayout() // 进房Error
+                        ShowLogger.d("showLivingEndLayout", "join room error!:${it.message}")
+                    }
                 }
-            }
-        })
+            })
     }
 
     private fun initService() {
@@ -1118,7 +1162,6 @@ class LiveDetailFragment : Fragment() {
             }
         }
 
-        mService.sendChatMessage(mRoomInfo.roomId, getString(R.string.show_live_chat_coming))
         mService.subscribePKInvitationChanged(mRoomInfo.roomId) { status, info ->
             mService.getAllPKUserList({ roomList ->
                 mService.getAllPKInvitationList(mRoomInfo.roomId, true, { invitationList ->
@@ -1274,7 +1317,7 @@ class LiveDetailFragment : Fragment() {
                 }
             },
             onRemoteVideoStats = { stats ->
-                setEnhance(stats)
+                //setEnhance(stats)
                 // 连麦观众
                 val isLinkingAudience = isRoomOwner && isLinking() && stats.uid.toString() == interactionInfo?.userId
                 if (stats.uid == mRoomInfo.ownerId.toInt() || isLinkingAudience) {
@@ -1283,7 +1326,8 @@ class LiveDetailFragment : Fragment() {
                             downBitrate = stats.receivedBitrate,
                             receiveFPS = stats.decoderOutputFrameRate,
                             downLossPackage = stats.packetLossRate,
-                            receiveVideoSize = Size(stats.width, stats.height)
+                            receiveVideoSize = Size(stats.width, stats.height),
+                            downDelay = stats.delay
                         )
                     }
                 }
@@ -1295,8 +1339,7 @@ class LiveDetailFragment : Fragment() {
                     runOnUiThread {
                         refreshStatisticInfo(
                             audioBitrate = stats.receivedBitrate,
-                            audioLossPackage = stats.audioLossRate,
-                            downDelay = stats.networkTransportDelay,
+                            audioLossPackage = stats.audioLossRate
                         )
                     }
                 }
@@ -1439,7 +1482,7 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun destroyRtcEngine(): Boolean {
-        return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection,true)
+        return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection,false)
     }
 
     private fun enableLocalAudio(enable: Boolean) {
@@ -1471,6 +1514,14 @@ class LiveDetailFragment : Fragment() {
             AudioModeration.AgoraChannelType.broadcast,
             "show"
         )
+
+        if (!isRoomOwner && mRtcEngine.queryDeviceScore() < 60) {
+            // 低端机观众加入频道前默认开启硬解码
+            mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
+        } else {
+            // 主播加入频道前默认开启软解码
+            mRtcEngine.setParameters("{\"che.hardware_decoding\": 0}")
+        }
 
         val channelMediaOptions = ChannelMediaOptions()
         channelMediaOptions.clientRoleType =
@@ -1674,13 +1725,14 @@ class LiveDetailFragment : Fragment() {
     private fun updatePKingMode() {
         val eventListener = VideoSwitcher.IChannelEventListener(
             onRemoteVideoStats = { stats ->
-                setEnhance(stats)
+                //setEnhance(stats)
                 activity?.runOnUiThread {
                     refreshStatisticInfo(
                         downBitrate = stats.receivedBitrate,
                         receiveFPS = stats.decoderOutputFrameRate,
                         downLossPackage = stats.packetLossRate,
-                        receiveVideoSize = Size(stats.width, stats.height)
+                        receiveVideoSize = Size(stats.width, stats.height),
+                        downDelay = stats.delay
                     )
                 }
             },
@@ -1688,8 +1740,7 @@ class LiveDetailFragment : Fragment() {
                 activity?.runOnUiThread {
                     refreshStatisticInfo(
                         audioBitrate = stats.receivedBitrate,
-                        audioLossPackage = stats.audioLossRate,
-                        downDelay = stats.networkTransportDelay,
+                        audioLossPackage = stats.audioLossRate
                     )
                 }
             },

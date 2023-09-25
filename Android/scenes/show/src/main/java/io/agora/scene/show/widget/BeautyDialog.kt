@@ -25,7 +25,7 @@ import io.agora.scene.show.databinding.ShowWidgetBeautyDialogTopBinding
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 
-class BeautyDialog(context: Context) : BottomDarkDialog(context) {
+class BeautyDialog constructor(context: Context) : BottomDarkDialog(context) {
 
     private data class ItemInfo(val id: Int, @StringRes val name: Int, @DrawableRes val icon: Int)
     private data class GroupInfo(
@@ -328,11 +328,9 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
         mTopBinding.root.isVisible = false
         mTopBinding.ivCompare.setOnClickListener {
             beautyProcessor?.apply {
-                setEnable(!isEnable())
+                setBeautyEnable(!isBeautyEnable())
             }
         }
-
-
     }
 
     // 修改绿幕开关
