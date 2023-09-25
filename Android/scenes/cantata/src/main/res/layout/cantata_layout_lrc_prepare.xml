@@ -2,6 +2,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:background="@drawable/cantata_mv_bg"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <androidx.cardview.widget.CardView
@@ -12,7 +13,7 @@
         app:cardCornerRadius="@dimen/cantata_space_small"
         app:cardElevation="0dp"
         app:contentPadding="@dimen/cantata_space_normal"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="80dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">

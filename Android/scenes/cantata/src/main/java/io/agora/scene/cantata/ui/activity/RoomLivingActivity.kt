@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.agora.rtc2.Constants
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.event.NetWorkEvent
@@ -106,7 +107,10 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
                 mRoomLivingViewModel.initViewModel()
             }
         }
-        binding.tvRoomName.text = mRoomLivingViewModel.mRoomInfoLiveData.value?.roomName
+        mRoomLivingViewModel.mRoomInfoLiveData.value?.apply {
+            binding.tvRoomName.text = roomName
+        }
+
         binding.ivChatroomMore.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
                 TopFunctionDialog(this@RoomLivingActivity).show()

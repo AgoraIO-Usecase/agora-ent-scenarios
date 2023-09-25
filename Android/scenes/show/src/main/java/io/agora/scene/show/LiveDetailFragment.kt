@@ -1709,7 +1709,9 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.autoSubscribeAudio = true
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
             channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+            val startTime = System.currentTimeMillis()
             mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
+            Log.d("zhangw","cost ${System.currentTimeMillis()-startTime}")
             activity?.let {
                 mRtcVideoSwitcher.setupRemoteVideo(
                     rtcConnection,
@@ -1738,10 +1740,12 @@ class LiveDetailFragment : Fragment() {
         (activity as? LiveDetailActivity)?.let {
             it.toggleSelfVideo(true) { hasPermission ->
                 if (hasPermission) {
+                    val startTime = System.currentTimeMillis()
                     mRtcEngine.updateChannelMediaOptionsEx(
                         channelMediaOptions,
                         mMainRtcConnection
                     )
+                    Log.d("zhangw","cost ${System.currentTimeMillis()-startTime}")
                 }
             }
         }
@@ -1808,7 +1812,10 @@ class LiveDetailFragment : Fragment() {
                     (activity as LiveDetailActivity).toggleSelfVideo(true, callback = {
                         if (it){
                             // 有权限
+                            val startTime = System.currentTimeMillis()
+
                             mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
+                            Log.d("zhangw","cost ${System.currentTimeMillis()-startTime}")
                             val context = activity ?: return@toggleSelfVideo
                             mRtcVideoSwitcher.setupRemoteVideo(
                                 rtcConnection,

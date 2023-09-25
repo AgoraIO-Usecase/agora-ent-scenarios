@@ -8,6 +8,13 @@
     android:background="@color/bg_color_blue_31"
     tools:context=".ui.activity.RoomLivingActivity">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horizontal80"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8"/>
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tbChatroomTop"
         android:layout_width="match_parent"
@@ -21,10 +28,10 @@
             android:id="@+id/clRoomTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
             android:background="@drawable/cantata_detail_top_view_bg"
             android:paddingHorizontal="5dp"
             android:paddingVertical="4dp"
-            android:layout_marginStart="15dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -32,11 +39,11 @@
                 android:id="@+id/ivOwnerAvatar"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:src="@mipmap/portrait01"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:src="@drawable/cantata_bg_oval_black20"
-                app:layout_constraintDimensionRatio="1:1"
                 app:shapeAppearance="@style/ui_widget_roundStyle"
                 app:strokeColor="@android:color/transparent"
                 tools:src="@mipmap/portrait01" />
@@ -69,12 +76,12 @@
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="1dp"
                 android:layout_height="0dp"
-                app:layout_constraintStart_toEndOf="@+id/tvUserOnline"
-                app:dividerColor="@color/white_80_percent"
                 android:layout_marginStart="5dp"
-                app:layout_constraintTop_toTopOf="@id/tvUserOnline"
+                android:orientation="vertical"
+                app:dividerColor="@color/white_80_percent"
                 app:layout_constraintBottom_toBottomOf="@id/tvUserOnline"
-                android:orientation="vertical"/>
+                app:layout_constraintStart_toEndOf="@+id/tvUserOnline"
+                app:layout_constraintTop_toTopOf="@id/tvUserOnline" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/ivNetStatus"
@@ -91,11 +98,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="22dp"
-                android:textSize="12sp"
+                android:text="@string/cantata_net_status_good"
                 android:textColor="@color/white_80_percent"
-                app:layout_constraintTop_toBottomOf="@id/tvRoomName"
+                android:textSize="12sp"
                 app:layout_constraintStart_toEndOf="@id/tvUserOnline"
-                android:text="@string/cantata_net_status_good"/>
+                app:layout_constraintTop_toBottomOf="@id/tvRoomName" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -103,18 +110,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
+            android:paddingVertical="16dp"
             android:paddingStart="12dp"
             android:paddingEnd="16dp"
-            android:paddingVertical="16dp"
             android:src="@mipmap/icon_close" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivChatroomMore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="end"
             android:paddingHorizontal="12dp"
             android:paddingVertical="16dp"
-            android:layout_gravity="end"
             android:src="@mipmap/icon_more" />
 
     </androidx.appcompat.widget.Toolbar>
@@ -145,11 +152,18 @@
     <io.agora.scene.cantata.ui.widget.lrcView.LrcControlView
         android:id="@+id/lrcControlView"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="0dp"
         android:layout_marginTop="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tbChatroomTop"/>
+        app:layout_constraintBottom_toBottomOf="@+id/horizontal80"
+        app:layout_constraintTop_toBottomOf="@id/tbChatroomTop" />
+
+    <io.agora.scene.cantata.ui.widget.chorusView.ChorusMicView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@id/lrcControlView"
+        app:layout_constraintDimensionRatio="1:1" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivResultBg"
@@ -249,10 +263,4 @@
         android:visibility="visible"
         app:constraint_referenced_ids="iBtnChooseSong,cbMic"
         tools:visibility="visible" />
-
-    <io.agora.scene.cantata.ui.widget.chorusView.ChorusMicView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintBottom_toBottomOf="@id/lrcControlView"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

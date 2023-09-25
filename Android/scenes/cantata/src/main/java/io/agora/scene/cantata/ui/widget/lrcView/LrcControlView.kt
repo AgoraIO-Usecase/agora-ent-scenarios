@@ -57,7 +57,6 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
     }
     var karaokeView: KaraokeView? = null
     var cumulativeScoreInPercentage = 0
-    private var mComboControl: ComboControl? = null
     val lyricsView: LyricsView
         get() = mBinding.ilActive.lyricsView
 
@@ -258,7 +257,6 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
 
     fun setMusic(mMusic: RoomSelSongModel) {
         karaokeView?.reset()
-        mComboControl?.reset(mBinding)
         mBinding.tvMusicName.text = mMusic.songName + "-" + mMusic.singer
         mBinding.tvCumulativeScore.text =
             String.format(resources.getString(R.string.cantata_score_formatter), "0")
@@ -290,102 +288,6 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
             resources.getString(R.string.cantata_score_formatter),
             "" + cumulativeScore.toInt()
         )
-        if (mComboControl == null) {
-            mComboControl = ComboControl()
-        }
-        mComboControl?.checkAndShowCombos(mBinding, score.toInt(), cumulativeScore.toInt())
-    }
-
-    class ComboControl {
-        private var mComboIconDrawable: GifDrawable? = null
-        private var mNumberOfCombos = 0
-        fun reset(binding: CantataLayoutLrcControlViewBinding) {
-            mNumberOfCombos = 0
-            binding.comboView.root.visibility = INVISIBLE
-        }
-
-        fun checkAndShowCombos(binding: CantataLayoutLrcControlViewBinding, score: Int, cumulativeScore: Int) {
-            binding.comboView.root.visibility = VISIBLE
-            showComboAnimation(binding.comboView.root, score)
-        }
-
-        private var mComboOfLastTime = 0 // Only for showComboAnimation
-        private fun showComboAnimation(comboView: View, score: Int) {
-            var comboIconRes = 0
-            if (score >= 90) {
-                comboIconRes = R.drawable.cantata_combo_excellent
-            } else if (score >= 75) {
-                comboIconRes = R.drawable.cantata_combo_good
-            } else if (score >= 60) {
-                comboIconRes = R.drawable.cantata_combo_fair
-            }
-            val comboIcon = comboView.findViewById<ImageView>(R.id.combo_icon)
-            val comboText = comboView.findViewById<TextView>(R.id.combo_text)
-            val sameWithLastTime = comboIconRes == mComboOfLastTime
-            mComboOfLastTime = comboIconRes
-            if (comboIconRes > 0) {
-                if (sameWithLastTime) {
-                    mNumberOfCombos++
-                } else {
-                    mNumberOfCombos = 1
-                }
-                val options = RequestOptions().diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                val outlineSpan = OutlineSpan(
-                    Color.parseColor("#368CFF"), 10f
-                )
-                Glide.with(comboView.context).asGif().load(comboIconRes).apply(options)
-                    .addListener(object : RequestListener<GifDrawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any,
-                            target: Target<GifDrawable>,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            return true
-                        }
-
-                        override fun onResourceReady(
-                            resource: GifDrawable,
-                            model: Any,
-                            target: Target<GifDrawable>,
-                            dataSource: DataSource,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            mComboIconDrawable = resource
-                            resource.registerAnimationCallback(object : Animatable2Compat.AnimationCallback() {
-                                override fun onAnimationStart(drawable: Drawable) {
-                                    super.onAnimationStart(drawable)
-                                }
-
-                                override fun onAnimationEnd(drawable: Drawable) {
-                                    super.onAnimationEnd(drawable)
-                                    comboText.alpha = 0f
-                                    comboIcon.visibility = INVISIBLE
-                                    comboText.visibility = INVISIBLE
-                                    mComboIconDrawable!!.unregisterAnimationCallback(this)
-                                }
-                            })
-                            resource.setLoopCount(1)
-                            comboIcon.visibility = VISIBLE
-                            comboText.alpha = 0f
-                            comboText.visibility =
-                                if (mNumberOfCombos == 1) INVISIBLE else VISIBLE // Per request from product team, do not show `+X` view for first one
-                            if (mNumberOfCombos != 1) {
-                                val text = "x$mNumberOfCombos"
-                                val spannable = SpannableString(text)
-                                spannable.setSpan(outlineSpan, 0, text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                                comboText.text = spannable
-                                comboText.animate().alpha(1f).setDuration(500).setStartDelay(0).start()
-                            }
-                            return false
-                        }
-                    }).into(comboIcon)
-            } else {
-                mNumberOfCombos = 0
-                comboIcon.visibility = INVISIBLE
-                comboText.visibility = INVISIBLE
-            }
-        }
     }
 
     private val onClickJackingListener = object : OnClickJackingListener() {
