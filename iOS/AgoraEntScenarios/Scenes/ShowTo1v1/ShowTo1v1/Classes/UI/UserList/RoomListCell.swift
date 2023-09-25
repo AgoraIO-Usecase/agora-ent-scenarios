@@ -70,8 +70,8 @@ class RoomUserInfoView: UIView {
         nameLabel.aui_size = CGSize(width: aui_width - nameLabel.aui_left - 10, height: avatarView.aui_height)
         nameLabel.aui_centerY = avatarView.aui_centerY
         
-        roomNameLabel.sizeToFit()
         roomNameLabel.aui_tl = CGPoint(x: avatarView.aui_left, y: avatarView.aui_bottom + 14)
+        roomNameLabel.aui_size = CGSize(width: aui_width - roomNameLabel.aui_left - 10, height: 20)
     }
     
     func setInfo(title: String, avatarUrl: String, avatarName: String, roomName: String? = nil) {
