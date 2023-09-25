@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import io.agora.rtm.RtmClient
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
@@ -199,11 +200,11 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         } else {
             mFragmentAdapter?.let {
                 it.notifyDataSetChanged()
-                binding.viewPager2.currentItem = 0
+                binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2, false)
                 mCurrLoadPosition = binding.viewPager2.currentItem
             }
-
         }
+        Log.d(TAG,"RtmClient.getSdkVersion() ${RtmClient.getSdkVersion()}")
     }
 
     private val onPageChangeCallback = object : OnPageChangeCallback() {
