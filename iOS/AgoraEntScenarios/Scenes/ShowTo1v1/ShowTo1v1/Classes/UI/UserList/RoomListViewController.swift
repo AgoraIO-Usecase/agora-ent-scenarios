@@ -38,6 +38,7 @@ private let kShowGuideAlreadyKey = "already_show_guide_show1v1"
 class RoomListViewController: UIViewController {
     var userInfo: ShowTo1v1UserInfo?
     
+    private weak var preJoinRoom: ShowTo1v1RoomInfo?
     private weak var callDialog: ShowTo1v1Dialog?
     private var connectedUserId: UInt?
     private weak var createRoomDialog: CreateRoomDialog?
@@ -64,25 +65,30 @@ class RoomListViewController: UIViewController {
             guard let roomInfo = roomInfo, let self = self else {return}
             var success1: Bool = false
             var success2: Bool = false
-            let group = DispatchGroup()
-            group.enter()
+            
+            self.preJoinRoom = roomInfo
+            
             self.renewTokens { success in
                 success1 = success
-                group.leave()
+                if success1, success2 {
+                    self._showBroadcasterVC(roomInfo: roomInfo)
+                }
             }
-            group.enter()
-            self.service.joinRoom(roomInfo: roomInfo, completion: { err in
+            
+            self.service.joinRoom(roomInfo: roomInfo, completion: {[weak self] err in
+                guard let self = self else {return}
                 success2 = err == nil ? true : false
-                group.leave()
                 if let error = err {
-                    AUIToast.show(text: error.localizedDescription)
+                    if self.preJoinRoom?.roomId == roomInfo.roomId {
+                        self.navigationController?.popToViewController(self, animated: false)
+                        AUIToast.show(text: error.localizedDescription)
+                    }
                     return
                 }
+                if success1, success2 {
+                    self._showBroadcasterVC(roomInfo: roomInfo)
+                }
             })
-            group.notify(queue: DispatchQueue.main) {[weak self] in
-                guard success1, success2 else {return}
-                self?._showBroadcasterVC(roomInfo: roomInfo)
-            }
         }
         return listView
     }()
@@ -355,9 +361,9 @@ extension RoomListViewController {
                 AUIToast.show(text: "create_room_name_empty_tips".showTo1v1Localization())
                 return
             }
+            self.preJoinRoom = nil
             self.createRoomDialog?.isUserInteractionEnabled = false
             self.createRoomDialog?.isLoading = true
-            
             var success1: Bool = false
             var createRoomInfo: ShowTo1v1RoomInfo? = nil
             let group = DispatchGroup()
