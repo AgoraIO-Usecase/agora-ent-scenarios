@@ -1,4 +1,4 @@
-package io.agora.scene.showTo1v1.callAPI
+package io.agora.callapi
 
 import android.content.Context
 import android.os.Handler
@@ -6,6 +6,10 @@ import android.os.Looper
 import android.util.Log
 import com.google.gson.Gson
 import io.agora.rtm2.*
+import io.agora.scene.showTo1v1.callAPI.AGError
+import io.agora.scene.showTo1v1.callAPI.CallConfig
+import io.agora.scene.showTo1v1.callAPI.CallTokenConfig
+import io.agora.scene.showTo1v1.callAPI.PrepareConfig
 import org.json.JSONObject
 
 /// 回执的消息队列对象
@@ -47,9 +51,10 @@ private class CallQueueInfo {
 }
 
 interface CallMessageListener {
-    /** 回执没有收到
-     */
+    /** 回执没有收到*/
     fun onMissReceipts(message: Map<String, Any>)
+    fun debugInfo(message: String)
+    fun debugWarning(message: String)
 }
 
 class CallMessageManager(
@@ -89,7 +94,7 @@ class CallMessageManager(
     private val mHandler = Handler(Looper.getMainLooper())
 
     fun logout() {
-        Log.d(TAG, "logout")
+        callMessagePrint("logout")
         rtmClient.logout(object : ResultCallback<Void> {
             override fun onSuccess(responseInfo: Void?) {}
             override fun onFailure(errorInfo: ErrorInfo?) {}
@@ -98,6 +103,7 @@ class CallMessageManager(
     }
 
     fun rtmInitialize(prepareConfig: PrepareConfig, tokenConfig: CallTokenConfig?, completion: (AGError?) -> Unit) {
+        callMessagePrint("_rtmInitialize")
         this.prepareConfig = prepareConfig
         this.tokenConfig = tokenConfig
         val rtmToken = tokenConfig?.rtmToken ?: run {
@@ -134,7 +140,7 @@ class CallMessageManager(
         if (!isLoginedRTM) {
             val prepareConfig = prepareConfig
             if (prepareConfig != null && prepareConfig.autoJoinRTC) {
-                Log.e(TAG, "renewToken need to reinit")
+                callMessagePrint("renewToken need to reinit")
                 rtmClient.logout(object : ResultCallback<Void> {
                     override fun onSuccess(responseInfo: Void?) {}
                     override fun onFailure(errorInfo: ErrorInfo?) {}
@@ -146,6 +152,7 @@ class CallMessageManager(
         }
         rtmClient.renewToken(rtmToken, object : ResultCallback<Void> {
             override fun onSuccess(responseInfo: Void?) {
+                callMessagePrint("rtm renewToken")
             }
             override fun onFailure(errorInfo: ErrorInfo?) {
             }
@@ -174,10 +181,10 @@ class CallMessageManager(
         rtmConfig.userId = config.userId.toString()
         rtmConfig.appId = config.appId
         if (rtmConfig.userId.isEmpty()) {
-            Log.e(TAG, "userId is empty")
+            callWarningPrint("userId is empty")
         }
         if (rtmConfig.appId.isEmpty()) {
-            Log.e(TAG, "appId is empty")
+            callWarningPrint("appId is empty")
         }
         rtmConfig.eventListener = this
         return RtmClient.create(rtmConfig)
@@ -206,18 +213,18 @@ class CallMessageManager(
     private fun _sendReceipts(roomId: String, messageId: Int, completion: ((AGError?)-> Unit)? = null) {
         val message = mutableMapOf<String, Any>()
         message[kReceiptsKey] = messageId
-        Log.d(TAG, "_sendReceipts to $roomId, message: $message")
+        callMessagePrint("_sendReceipts to $roomId, message: $message")
         val json = Gson().toJson(message)
         val options = PublishOptions()
         rtmClient.publish(roomId, json.toByteArray(), options, object : ResultCallback<Void> {
             override fun onSuccess(responseInfo: Void?) {
-                Log.d(TAG, "_sendReceipts cost ${System.currentTimeMillis()} ms")
-                completion?.invoke(null)
+                callMessagePrint("_sendReceipts cost ${System.currentTimeMillis()} ms")
+                runOnUiThread { completion?.invoke(null) }
             }
             override fun onFailure(errorInfo: ErrorInfo?) {
                 val msg = errorInfo?.errorReason ?: "error"
                 val errorCode = RtmConstants.RtmErrorCode.getValue(errorInfo?.errorCode)
-                completion?.invoke(AGError(msg, errorCode))
+                runOnUiThread { completion?.invoke(AGError(msg, errorCode)) }
             }
         })
     }
@@ -227,13 +234,15 @@ class CallMessageManager(
             completion?.invoke(AGError("send message fail! roomId is empty", -1))
             return
         }
-        Log.d(TAG, "_sendMessage to '$userId', message: $message")
+        callMessagePrint("_sendMessage to '$userId', message: $message")
         val msgId = message[kMessageId] as? Int ?: 0
         val json = Gson().toJson(message)
         val options = PublishOptions()
+        val startTime = System.currentTimeMillis()
         rtmClient.publish(userId, json.toByteArray(), options, object : ResultCallback<Void> {
             override fun onSuccess(p0: Void?) {
-                completion?.invoke(null)
+                callMessagePrint("publish cost ${System.currentTimeMillis() - startTime} ms")
+                runOnUiThread { completion?.invoke(null) }
                 receiptsQueue.firstOrNull { it.messageId == msgId }?.let {
                     it.checkReceipt()
                     return
@@ -244,11 +253,9 @@ class CallMessageManager(
                 receiptInfo.callback = completion
                 receiptInfo.checkReceiptsFail = { info ->
                     if (info.retryTimes > 0) {
-                        Log.d(TAG, "retry send message ------------")
                         _sendMessage(userId, message, completion = completion)
                     } else {
                         val messageInfo = info.messageInfo ?: emptyMap()
-                        Log.d(TAG, "get receipts fail, msg: $messageInfo")
                         receiptsQueue.filter {it.messageId == msgId}.forEach { it.finish() }
                         receiptsQueue.removeAll { it.messageId == msgId }
                         listener?.onMissReceipts(messageInfo)
@@ -260,29 +267,27 @@ class CallMessageManager(
 
             override fun onFailure(errorInfo: ErrorInfo?) {
                 val msg = errorInfo?.errorReason ?: "error"
-                completion?.invoke(AGError(msg, -1))
+                callWarningPrint("_sendMessage: fail: $msg")
+                runOnUiThread { completion?.invoke(AGError(msg, -1)) }
             }
         })
     }
 
     private fun _subscribe(channelName: String, option: SubscribeOptions, completion: ((AGError?) -> Unit)?) {
-        Log.d(TAG, "will subscribe[$channelName] message: ${option.withMessage} presence: ${option.withPresence}")
+        callMessagePrint("will subscribe[$channelName] message: ${option.withMessage} presence: ${option.withPresence}")
         rtmClient.unsubscribe(channelName, object: ResultCallback<Void> {
-            override fun onSuccess(responseInfo: Void?) {
-            }
-            override fun onFailure(errorInfo: ErrorInfo?) {
-            }
+            override fun onSuccess(responseInfo: Void?) {}
+            override fun onFailure(errorInfo: ErrorInfo?) {}
         })
         rtmClient.subscribe(channelName, option, object: ResultCallback<Void> {
             override fun onSuccess(responseInfo: Void?) {
-                Log.d(TAG, "subscribe[$channelName] finished = success")
-                completion?.invoke(null)
+                callMessagePrint("subscribe[$channelName] finished = success")
+                runOnUiThread { completion?.invoke(null) }
             }
             override fun onFailure(errorInfo: ErrorInfo?) {
                 val msg = errorInfo?.errorReason ?: "error"
                 val errorCode = RtmConstants.RtmErrorCode.getValue(errorInfo?.errorCode)
-                Log.d(TAG, "subscribe[$channelName] finished = failed: $msg")
-                completion?.invoke(AGError(msg, errorCode))
+                runOnUiThread { completion?.invoke(AGError(msg, errorCode)) }
             }
         })
     }
@@ -292,7 +297,7 @@ class CallMessageManager(
             completion(null)
             return
         }
-        Log.d(TAG, "will login")
+        callMessagePrint("will login")
         loginSuccess = completion
         rtmClient.logout(object : ResultCallback<Void?> {
             override fun onSuccess(responseInfo: Void?) {}
@@ -300,38 +305,40 @@ class CallMessageManager(
         })
         val ret = rtmClient.login(token, object : ResultCallback<Void?> {
             override fun onSuccess(p0: Void?) {
-                Log.d(TAG, "login success")
+                callMessagePrint("login completion")
                 isLoginedRTM = true
-                completion(null)
+                runOnUiThread { completion(null) }
             }
 
             override fun onFailure(p0: ErrorInfo?) {
-                Log.d(TAG, "login failed: ${p0?.errorCode}")
+                callMessagePrint("login completion: ${p0?.errorCode}")
                 isLoginedRTM = false
-                completion(p0)
+                runOnUiThread { completion(p0) }
             }
         })
-
-        Log.d(TAG, "login ret: $ret")
     }
     //MARK: AgoraRtmClientDelegate
     override fun onConnectionStateChange(channelName: String?,
                                          state: RtmConstants.RtmConnectionState?,
                                          reason: RtmConstants.RtmConnectionChangeReason?) {
-        Log.d(TAG, "rtm connectionStateChanged: $state reason: $reason")
-        if (reason == RtmConstants.RtmConnectionChangeReason.TOKEN_EXPIRED) {
-            rtmListener?.onTokenPrivilegeWillExpire(channelName)
+        callMessagePrint("rtm connectionStateChanged: $state reason: $reason")
+        runOnUiThread {
+            if (reason == RtmConstants.RtmConnectionChangeReason.TOKEN_EXPIRED) {
+                rtmListener?.onTokenPrivilegeWillExpire(channelName)
+            }
         }
     }
     override fun onTokenPrivilegeWillExpire(channelName: String?) {
-        Log.d(TAG, "rtm onTokenPrivilegeWillExpire[${channelName ?: "nil"}]")
-        rtmListener?.onTokenPrivilegeWillExpire(channelName)
+        callMessagePrint("rtm onTokenPrivilegeWillExpire[${channelName ?: "nil"}]")
+        runOnUiThread {
+            rtmListener?.onTokenPrivilegeWillExpire(channelName)
+        }
     }
 
     override fun onMessageEvent(event: MessageEvent?) {
         val message = event?.message?.data as? ByteArray ?: return
         val jsonString = String(message, Charsets.UTF_8)
-        Log.d(TAG, "on event message: $jsonString")
+        callMessagePrint("on event message: $jsonString")
         val map = jsonStringToMap(jsonString)
         val messageId = map[kMessageId] as? Int
         val receiptsRoomId = map[kReceiptsRoomIdKey] as? String
@@ -339,16 +346,21 @@ class CallMessageManager(
         if (receiptsRoomId != null && messageId != null) {
             _sendReceipts(receiptsRoomId, messageId)
         } else if (receiptsId != null) {
-            Log.d(TAG, "recv receipts $receiptsId")
+            callMessagePrint("recv receipts $receiptsId")
             receiptsQueue.filter {it.messageId == receiptsId}.forEach { it.finish() }
             receiptsQueue.removeAll { it.messageId == receiptsId }
-            Log.d(TAG, "receiptsQueue.removeAll $receiptsId ${receiptsQueue.count()}")
+        } else {
+            callWarningPrint("on event message parse fail, ${event.message.type} ${event.message.data}")
         }
-        rtmListener?.onMessageEvent(event)
+        runOnUiThread {
+            rtmListener?.onMessageEvent(event)
+        }
     }
 
     override fun onPresenceEvent(event: PresenceEvent?) {
-        rtmListener?.onPresenceEvent(event)
+        runOnUiThread {
+            rtmListener?.onPresenceEvent(event)
+        }
     }
 
     override fun onTopicEvent(event: TopicEvent?) {}
@@ -363,6 +375,29 @@ class CallMessageManager(
             map[key] = json.get(key)
         }
         return map
+    }
+
+    private fun callMessagePrint(message: String) {
+        val tag = "[MessageManager]"
+        listener?.debugInfo("$tag$message)")
+        if (listener == null) {
+            Log.d(TAG, "[CallApi]$tag $message)")
+        }
+    }
+
+    private fun callWarningPrint(message: String) {
+        val tag = "[MessageManager]"
+        listener?.debugWarning("$tag$message")
+        if (listener == null) {
+            Log.d(TAG, "[CallApi][Warning]$tag$message")
+        }
+    }
+    private fun runOnUiThread(runnable: Runnable) {
+        if (Thread.currentThread() == Looper.getMainLooper().thread) {
+            runnable.run()
+        } else {
+            mHandler.post(runnable)
+        }
     }
 }
 

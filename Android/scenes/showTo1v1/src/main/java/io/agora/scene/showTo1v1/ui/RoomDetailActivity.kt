@@ -455,21 +455,21 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         if (isRoomOwner) {
             if (publish) {
-                binding.textureVideo.isVisible = true
+//                binding.textureVideo.isVisible = true
                 mRtcEngine.setupLocalVideo(VideoCanvas(binding.textureVideo, VideoCanvas.RENDER_MODE_HIDDEN, 0))
             } else {
-                binding.textureVideo.isVisible = false
+//                binding.textureVideo.isVisible = false
                 mRtcEngine.setupLocalVideo(VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, 0))
             }
         } else {
             if (publish) {
-                binding.textureVideo.isVisible = true
+//                binding.textureVideo.isVisible = true
                 mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(binding.textureVideo, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
                     mMainRtcConnection
                 )
             } else {
-                binding.textureVideo.isVisible = false
+//                binding.textureVideo.isVisible = false
                 mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
                     mMainRtcConnection
@@ -907,6 +907,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 binding.layoutCallingTop.isVisible = false
                 binding.layoutRoomTop.isVisible = true
                 binding.layoutCall.isVisible = false
+                binding.textureVideo.isVisible = true
                 if (exchanged) {
                     // 恢复默认窗口
                     exchangeDragWindow()
@@ -985,7 +986,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     // workaround
                     onShowSettingDialog(false)
                     false
-                };
+                }
             }
 
             else -> {}

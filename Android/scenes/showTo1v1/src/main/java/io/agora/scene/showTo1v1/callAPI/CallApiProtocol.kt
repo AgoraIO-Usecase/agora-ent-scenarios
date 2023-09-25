@@ -182,11 +182,9 @@ interface ICallApi {
             return instance
         }
 
-
         private val instance by lazy {
             CallApiImpl(AgoraApplication.the())
         }
-
     }
 
     /** 初始化配置 */
