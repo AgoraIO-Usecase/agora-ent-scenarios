@@ -48,7 +48,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         binding.rvAboutUs.adapter = adapter
         if (BuildConfig.APPLICATION_ID == kChatRoomAppID) {
             setupChatRoomAppInfo()
-        } else if (BuildConfig.APPLICATION_ID == kFullAppID) {
+        } else {
             setupFullAppInfo()
         }
         setupDebugMode()
@@ -112,12 +112,13 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 )
             )
         }
+        val versionTime = "20230530-"
         if (scenes.size == 1) {
             adapter.scenes = mutableListOf()
             val scene = scenes[0]
             adapter.appInfo = AppInfo(
                 scene.name,
-                scene.version,
+                versionTime + scene.version + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
@@ -125,7 +126,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             adapter.scenes = scenes
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_about_name),
-                "20230530-" + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
+                versionTime + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
