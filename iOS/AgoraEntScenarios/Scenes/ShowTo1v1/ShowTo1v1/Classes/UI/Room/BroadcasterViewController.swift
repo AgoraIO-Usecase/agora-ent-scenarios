@@ -112,6 +112,12 @@ class BroadcasterViewController: BaseRoomViewController {
         joinRTCChannel()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        realTimeView.cleanLocalDescription()
+        realTimeView.cleanRemoteDescription()
+    }
+    
     private func joinRTCChannel() {
         guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.userId) else {return}
         if currentUser.userId == roomInfo.userId {

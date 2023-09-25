@@ -60,6 +60,7 @@ class ShowRealTimeDataView: UIView {
     }
     
     func cleanRemoteDescription(){
+        receiveStatsInfo = ShowStatisticsInfo(type: .remote(ShowStatisticsInfo.RemoteInfo()))
         let localLeftStr = sendStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
         let localRightStr = sendStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
         let remoteLeftStr = receiveStatsInfo?.cleanRemoteDescription().0 ?? ""
@@ -69,6 +70,7 @@ class ShowRealTimeDataView: UIView {
     }
     
     func cleanLocalDescription(){
+        sendStatsInfo = ShowStatisticsInfo(type: .local(ShowStatisticsInfo.LocalInfo()))
         let localLeftStr = sendStatsInfo?.cleanLocalDescription().0 ?? ""
         let localRightStr = sendStatsInfo?.cleanLocalDescription().1 ?? ""
         let remoteLeftStr = receiveStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
