@@ -203,7 +203,7 @@ class RoomListCell: UICollectionViewCell {
         bgImageView.frame = contentView.bounds
         blurView.frame = bgImageView.bounds
         let top = UIDevice.current.aui_SafeDistanceTop + 51
-        let bottom = 47.0
+        let bottom = 82.0
         contentImageView.frame = CGRect(x: 15, y: top, width: self.aui_width - 30, height: self.aui_height - bottom - top)
         gradientLayer.frame = CGRect(x: 0, y: contentImageView.aui_height - 254, width: contentImageView.aui_width, height: 254)
         
