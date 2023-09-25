@@ -484,7 +484,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             if (error == null) { // success
 
             } else { //failed
-
+                ToastUtils.showToast(getString(R.string.show_to1v1_end_tips))
+                onBackPressed()
             }
         })
         mService.subscribeListener(object : ShowTo1v1ServiceListenerProtocol {
