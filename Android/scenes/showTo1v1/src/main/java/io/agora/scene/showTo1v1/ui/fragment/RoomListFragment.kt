@@ -112,10 +112,10 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
                 .error(R.mipmap.userimage)
                 .transform(CenterCropRoundCornerTransform(100))
                 .into(binding.ivCurrentAvatar)
-//            Glide.with(this)
-//                .asGif()
-//                .load(R.drawable.show_to1v1_wave_living)
-//                .into(binding.ivLiving)
+            Glide.with(this)
+                .asGif()
+                .load(R.drawable.show_to1v1_wave_living)
+                .into(binding.ivLiving)
         }
         binding.ivConnect.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {

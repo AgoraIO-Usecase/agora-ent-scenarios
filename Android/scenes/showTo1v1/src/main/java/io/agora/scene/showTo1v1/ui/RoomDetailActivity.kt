@@ -7,12 +7,17 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
+import android.graphics.PixelFormat
+import android.graphics.SurfaceTexture
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.SurfaceHolder
+import android.view.SurfaceView
 import android.view.TextureView
+import android.view.TextureView.SurfaceTextureListener
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -154,7 +159,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     private var mTimeLinkAt: Long = 0
 
     // 秀场 textureView
-    private val mShowTextureView by lazy { TextureView(this) }
+//    private val mShowTextureView by lazy { SurfaceView(this) }
     override fun getViewBinding(inflater: LayoutInflater): ShowTo1v1CallDetailActivityBinding {
         return ShowTo1v1CallDetailActivityBinding.inflate(inflater)
     }
@@ -450,36 +455,21 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         if (isRoomOwner) {
             if (publish) {
-                binding.llVideoContainer.isVisible = true
-                if (binding.llVideoContainer.contains(mShowTextureView)) {
-                    mRtcEngine.setupLocalVideo(VideoCanvas(mShowTextureView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
-                    return
-                } else {
-                    (mShowTextureView.parent as? ViewGroup)?.removeView(mShowTextureView)
-                    mRtcEngine.setupLocalVideo(VideoCanvas(mShowTextureView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
-                    binding.llVideoContainer.addView(mShowTextureView)
-                }
+                binding.textureVideo.isVisible = true
+                mRtcEngine.setupLocalVideo(VideoCanvas(binding.textureVideo, VideoCanvas.RENDER_MODE_HIDDEN, 0))
             } else {
+                binding.textureVideo.isVisible = false
                 mRtcEngine.setupLocalVideo(VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, 0))
             }
         } else {
             if (publish) {
-                binding.llVideoContainer.isVisible = true
-                if (binding.llVideoContainer.contains(mShowTextureView)) {
-                    mRtcEngine.setupRemoteVideoEx(
-                        VideoCanvas(mShowTextureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
-                        mMainRtcConnection
-                    )
-                    return
-                } else {
-                    (mShowTextureView.parent as? ViewGroup)?.removeView(mShowTextureView)
-                    mRtcEngine.setupRemoteVideoEx(
-                        VideoCanvas(mShowTextureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
-                        mMainRtcConnection
-                    )
-                    binding.llVideoContainer.addView(mShowTextureView)
-                }
+                binding.textureVideo.isVisible = true
+                mRtcEngine.setupRemoteVideoEx(
+                    VideoCanvas(binding.textureVideo, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
+                    mMainRtcConnection
+                )
             } else {
+                binding.textureVideo.isVisible = false
                 mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
                     mMainRtcConnection
@@ -586,7 +576,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         } else {
             onHangup()
         }
-
+        mShowTo1v1Manger.mRemoteUser = null
+        mShowTo1v1Manger.mConnectedChannelId = null
         destroy()
     }
 
@@ -950,6 +941,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         .transform(CenterCropRoundCornerTransform(100))
                         .into(binding.ivCallingAvatar)
                 }
+                if (mShowTo1v1Manger.mRemoteUser == null){
+                    Log.d(TAG,"Connected but remoteUser is null")
+                }
 
                 (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
                 if (binding.vDragSmallWindow.canvasContainer.childCount > 0) {
@@ -959,7 +953,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 mShowTo1v1Manger.mCurrentUser.let {
                     binding.vDragSmallWindow.setUserName(it.userName)
                 }
-                binding.llVideoContainer.isVisible = false
+                binding.textureVideo.isVisible = false
                 binding.layoutCall.isVisible = true
                 binding.layoutCallingTop.isVisible = true
 
@@ -979,7 +973,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     }
                     mainHandler.postDelayed({
                         animateConnectedViewOpen()
-                    },1000)
+                    },500)
                 } else {
                     binding.layoutCallPrivatelyBg.isVisible = false
                     binding.layoutCallPrivately.isVisible = false

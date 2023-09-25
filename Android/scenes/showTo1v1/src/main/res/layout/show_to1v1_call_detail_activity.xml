@@ -22,11 +22,15 @@
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/layoutTop" />
 
-    <FrameLayout
-        android:id="@+id/llVideoContainer"
+<!--    <FrameLayout-->
+<!--        android:id="@+id/llVideoContainer"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:orientation="vertical" />-->
+    <TextureView
+        android:id="@+id/textureVideo"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" />
+        android:layout_height="match_parent"/>
 
     <FrameLayout
         android:id="@+id/layoutCall"
