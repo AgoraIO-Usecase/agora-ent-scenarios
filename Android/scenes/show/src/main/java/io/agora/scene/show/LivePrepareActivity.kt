@@ -2,6 +2,7 @@ package io.agora.scene.show
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.res.AssetManager
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
@@ -108,11 +109,17 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 }
             }
         )
-        if (mRtcEngine.queryDeviceScore() < 75) {
-            // 低端机默认关闭美颜
-            mBeautyProcessor.setBeautyEnable(false)
-        } else {
+        var licenseExists = false
+        try { // 美颜license是否存在
+            this.assets.open("LICENSE").use { inputStream ->
+                licenseExists = true
+            }
+        } catch (_: Exception) {}
+        // 低端机 或 无证书则关闭美颜
+        if (mRtcEngine.queryDeviceScore() >= 75 && licenseExists) {
             mBeautyProcessor.setBeautyEnable(true)
+        } else {
+            mBeautyProcessor.setBeautyEnable(false)
         }
         mBeautyProcessor.getSenseTimeBeautyAPI().setupLocalVideo(SurfaceView(this).apply {
             binding.flVideoContainer.addView(this)

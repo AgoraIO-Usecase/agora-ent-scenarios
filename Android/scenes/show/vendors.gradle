@@ -1,0 +1,35 @@
+apply plugin: 'de.undercouch.download'
+
+task downloadVendorLibs {
+    def destFile = new File(buildDir, 'vendors.zip')
+    download {
+        src 'https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/release/show/vendor_aars.zip'
+        dest destFile
+        overwrite false
+    }
+    def fileTree = zipTree(destFile)
+    def HardwareBuffer = fileTree.getFiles().find {
+        it.name.contains("HardwareBuffer")
+    }
+    def SenseArSourceManager = fileTree.getFiles().find {
+        it.name.contains("SenseArSourceManager")
+    }
+    def STMobileJNI = fileTree.getFiles().find {
+        it.name.contains("STMobileJNI")
+    }
+    println "HardwareBuffer path= $HardwareBuffer.absolutePath"
+    println "SenseArSourceManager path= $SenseArSourceManager.absolutePath"
+    println "STMobileJNI path= $STMobileJNI.parentFile.absolutePath"
+    copy {
+        from HardwareBuffer
+        into 'aars/HardwareBuffer'
+    }
+    copy {
+        from SenseArSourceManager
+        into 'aars/SenseArSourceManager'
+    }
+    copy {
+        from STMobileJNI
+        into 'aars/STMobileJNI'
+    }
+}

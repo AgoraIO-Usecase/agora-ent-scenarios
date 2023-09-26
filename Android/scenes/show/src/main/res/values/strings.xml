@@ -241,6 +241,7 @@
     <string name="show_broadcast_header">开播建议：</string>
     <string name="show_broadcast_tips">请确保开播环境网络状态良好\n上行带宽>=3M</string>
     <string name="show_beauty_tips">为保证最佳体验，已默认关闭AI高级美颜\n如需体验请手动打开</string>
+    <string name="show_beauty_license_disable">美颜授权已失效，请联系开发者更新license</string>
     <string name="show_network_quailty">目标观众的网络状况</string>
     <string name="show_network_quailty_tips">针对目标投放地区的网络状况的视频策略</string>
     <string name="show_network_quailty_good">较好</string>
