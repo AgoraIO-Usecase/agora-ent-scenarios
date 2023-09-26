@@ -177,7 +177,8 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
             }
             
             let params = roomInfo.yy_modelToJSONObject() as? [String: Any]
-            let scene = Scene(id: roomInfo.roomId, userId: roomInfo.userId, isOwner: false, property: params)
+            let isOwner = roomInfo.userId == self?.user?.userId ? true : false
+            let scene = Scene(id: roomInfo.roomId, userId: roomInfo.userId, isOwner: isOwner, property: params)
             self?.manager.createScene(scene: scene, success: {[weak self] in
                 guard let self = self else {return}
                 self.manager.joinScene(sceneId: roomInfo.roomId) { sceneRef in
