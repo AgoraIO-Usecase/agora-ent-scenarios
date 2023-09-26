@@ -77,7 +77,7 @@
         self.maxValue = max;
         self.currentValue = current;
         [self initSubViews];
-        self.inputTipsLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"RemoteVolumeTipsFormat"), min, max];
+        self.inputTipsLabel.text = [NSString stringWithFormat:[@"RemoteVolumeTipsFormat" toSceneLocalizationWithBundleName:@"DHCResource"], min, max];
         [self addSubViewConstraints];
     }
     

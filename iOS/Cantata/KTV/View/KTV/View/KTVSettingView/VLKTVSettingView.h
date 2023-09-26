@@ -6,7 +6,7 @@
 #import "VLBaseView.h"
 @class VLKTVSettingModel;
 
-typedef enum : NSUInteger {
+typedef NS_ENUM(NSInteger, VLKTVValueDidChangedType) {
     VLKTVValueDidChangedTypeEar = 0,      // 耳返
     VLKTVValueDidChangedTypeMV,           // MV
     VLKTVValueDidChangedRiseFall,         // 升降调
@@ -14,11 +14,11 @@ typedef enum : NSUInteger {
     VLKTVValueDidChangedTypeAcc,          // 伴奏
     VLKTVValueDidChangedTypeRemoteValue,  //远端音量
     VLKTVValueDidChangedTypeListItem      // 列表
-} VLKTVValueDidChangedType;
+} ;
 
 @protocol VLKTVSettingViewDelegate <NSObject>
 
-- (void)settingViewSettingChanged:(VLKTVSettingModel *)setting valueDidChangedType:(VLKTVValueDidChangedType)type;
+- (void)settingViewSettingChanged:(VLKTVSettingModel *)setting valueDidChangedType:(NSInteger)type;
 
 @end
 

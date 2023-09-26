@@ -160,6 +160,10 @@ private func agoraPrint(_ message: String) {
         }
         
         initTimer()
+        apiConfig?.engine?.setDelegateEx(self, connection: singChannelConnection ?? AgoraRtcConnection())
+        startSyncPitch()
+        startSyncScore()
+        startSyncCloudConvergenceStatus()
     }
     
     required init?(coder: NSCoder) {

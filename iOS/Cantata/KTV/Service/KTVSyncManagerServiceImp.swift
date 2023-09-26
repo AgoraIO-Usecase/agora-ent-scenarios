@@ -454,6 +454,13 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         completion(nil)
     }
     
+    public func leaveSeatWithoutRemoveSong(with inputModel: KTVOutSeatInputModel, completion: @escaping (Error?) -> Void) {
+        let seatInfo = seatMap["\(inputModel.seatIndex)"]!
+        _removeSeat(seatInfo: seatInfo) { error in
+        }
+        completion(nil)
+    }
+    
     public func updateSeatAudioMuteStatus(with muted: Bool,
                                    completion: @escaping (Error?) -> Void) {
         guard let seatInfo = self.seatMap
@@ -499,7 +506,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     finished: completion)
     }
     
-    public func updateSongEndStatus(with inputModel: KTVRemoveSongInputModel, completion: @escaping (Error?) -> Void) {
+    public func updateSongEndStatus(with musicEnd: Bool, inputModel: KTVRemoveSongInputModel, completion: @escaping (Error?) -> Void) {
         guard let topSong = songList.first,
               let song = songList.filter({ $0.objectId == inputModel.objectId }).first
         else {
@@ -508,7 +515,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             return
         }
 
-        
+        song.musicEnded = musicEnd
         _updateChooseSong(songInfo: song) { error in
             completion(error)
         }
@@ -1025,14 +1032,16 @@ extension KTVSyncManagerServiceImp {
                 completion(self._getInitSeats())
                 return
             }
+            
+            completion(self._getInitSeats())
 
             // add master to first seat
-            let targetSeatInfo = self._getUserSeatInfo(seatIndex: 0)
-            targetSeatInfo.isAudioMuted = 0
-            targetSeatInfo.isMaster = true
-            self._addSeatInfo(seatInfo: targetSeatInfo) { error in
-                completion(self._getInitSeats())
-            }
+//            let targetSeatInfo = self._getUserSeatInfo(seatIndex: 0)
+//            targetSeatInfo.isAudioMuted = 0
+//            targetSeatInfo.isMaster = true
+//            self._addSeatInfo(seatInfo: targetSeatInfo) { error in
+//                completion(self._getInitSeats())
+//            }
         }
     }
     

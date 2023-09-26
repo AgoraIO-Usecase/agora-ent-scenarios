@@ -10,7 +10,7 @@
 #import "AESMacro.h"
 #import "UIView+VL.h"
 #import "VLEffectView.h"
-
+#import "VLEarSettingView.h"
 @implementation LSTPopView (DHCModal)
 
 #pragma mark private method
@@ -171,8 +171,8 @@
 
 //控制台
 + (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
-                               settingView:(VLKTVSettingView*)settingView
-                               withDelegate:(id<VLKTVSettingViewDelegate>)delegate {
+                               settingView:(nullable VLKTVSettingView*)settingView
+                               withDelegate:(id)delegate {
     VLKTVSettingView* _settingView = settingView ? settingView : [[VLKTVSettingView alloc] initWithSetting:nil];
     _settingView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 300);
     _settingView.backgroundColor = UIColorMakeWithHex(@"#152164");
@@ -182,6 +182,21 @@
     LSTPopView* popView = [self _createKTVPopContainerWithContentView:_settingView
                                                        withParentView:parentView];
     popView.isAvoidKeyboard = NO;
+    [popView pop];
+    
+    return popView;
+}
+
+//弹出耳返视图
++ (LSTPopView*)popEarSettingViewWithParentView:(UIView*)parentView
+                                   isEarOn:(BOOL)isEarOn
+                                           vol:(CGFloat)vol
+                                  withDelegate:(id)delegate {
+    CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;
+    VLEarSettingView *earView = [[VLEarSettingView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) isEarOn:isEarOn vol:vol withDelegate:delegate];
+    
+    LSTPopView* popView = [self _createKTVPopContainerWithContentView:earView
+                                                       withParentView:parentView];
     [popView pop];
     
     return popView;

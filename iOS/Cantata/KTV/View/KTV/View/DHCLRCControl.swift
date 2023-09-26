@@ -7,7 +7,7 @@
 
 import UIKit
 import AgoraLyricsScore
-
+import AUIKitCore
 @objc public protocol DHCLrcControlDelegate: NSObjectProtocol {
     func didLrcViewScorllFinished(with score: Int, totalScore: Int, lineScore: Int, lineIndex:Int)
     func didLrcViewDragedTo(pos: Int, score: Int, totalScore: Int)
@@ -71,6 +71,7 @@ class DHCLRCControl: UIView {
     private var totalScore: Int = 0
     private var totalCount: Int = 0
     private var currentLoadLrcPath: String?
+    private var loadingView: AUIKaraokeLoadingView!
     @objc public weak var lrcDelegate: DHCLrcControlDelegate?
     weak var delegate: DHCGameDelegate?
     private var downloadManager = AgoraDownLoadManager()
@@ -272,6 +273,10 @@ class DHCLRCControl: UIView {
             delegate.didGameEventChanged(with: .resultNext)
         }
         addSubview(resultView)
+
+        loadingView = AUIKaraokeLoadingView(frame: CGRectMake(0, 30, self.bounds.width, 110))
+        addSubview(loadingView)
+        loadingView.isHidden = true
     }
     
     @objc private func pause( btn: UIButton) {
@@ -314,6 +319,20 @@ class DHCLRCControl: UIView {
     public func resetStatus() {
         pauseBtn.isSelected = false
         originBtn.isSelected = false
+        lrcView.reset()
+        musicNameBtn.isHidden = true
+        musicNameBtn.setTitle("", for: .normal)
+    }
+    
+    public func updateLoadingView(with progress: Int) {
+        DispatchQueue.main.async {[weak self] in
+            if progress == 100 {
+                self?.loadingView.isHidden = true
+            } else {
+                self?.loadingView.isHidden = false
+                self?.loadingView.setProgress(progress)
+            }
+        }
     }
 
     public func updateButtonLayout(button: UIButton, title: String, image: UIImage, imageInsets: UIEdgeInsets, x: CGFloat, y: CGFloat) {

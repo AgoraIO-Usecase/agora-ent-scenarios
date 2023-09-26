@@ -40,6 +40,25 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
     }
     
     public func onSelectSong(view: AUIJukeBoxView, tabIndex: Int, index: Int) {
+        //先判断自己是否在麦位上
+        if getCurrentUserMicSeat() == nil {
+            let count = seatsArray?.count ?? 0
+            for i in 0..<count {
+                let seat = seatsArray?[i]
+                let rtcUid = seat?.rtcUid ?? ""
+                if rtcUid == "" {
+                    self.enterSeat(withIndex: i) {[weak self] error in
+                        guard let self = self else {return}
+                        if let error = error {
+                            return
+                        }
+                        selectSong(index, tabIndex: tabIndex)
+                    }
+                    
+                    return
+                }
+            }
+        }
         selectSong(index, tabIndex: tabIndex)
     }
     
@@ -311,22 +330,23 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
         inputModel.songNo = model.songCode
         inputModel.songName = model.name
         inputModel.singer = model.singer
+        inputModel.imageUrl = model.poster
         AppContext.ktvServiceImp()?.chooseSong(with: inputModel, completion: { err in
             if err == nil {
-                let addModel: AUIChooseMusicModel = AUIChooseMusicModel()
-                addModel.songCode = model.songCode
-                addModel.name = model.name
-                addModel.singer = model.singer
-                addModel.poster = model.poster
-                addModel.duration = model.duration
-                
-                let owner = AUIUserThumbnailInfo()
-                owner.userId = VLUserCenter.user.id
-                addModel.owner = owner
-                self.addedMusicList.append(addModel)
-                self._notifySongDidAdded(song: addModel)
-                self.jukeBoxView.addedMusicTableView.reloadData()
-                self.jukeBoxView.allMusicTableView.reloadData()
+//                let addModel: AUIChooseMusicModel = AUIChooseMusicModel()
+//                addModel.songCode = model.songCode
+//                addModel.name = model.name
+//                addModel.singer = model.singer
+//                addModel.poster = model.poster
+//                addModel.duration = model.duration
+//
+//                let owner = AUIUserThumbnailInfo()
+//                owner.userId = VLUserCenter.user.id
+//                addModel.owner = owner
+//                self.addedMusicList.append(addModel)
+//                self._notifySongDidAdded(song: addModel)
+//                self.jukeBoxView.addedMusicTableView.reloadData()
+//                self.jukeBoxView.allMusicTableView.reloadData()
             }
         })
     }
@@ -342,10 +362,12 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
                 removeModel.objectId = i.objectId
                 AppContext.ktvServiceImp()?.removeSong(with: removeModel, completion: { err in
                     if err == nil {
-                        self.addedMusicList.remove(at: index)
-                        self._notifySongDidRemove(song: song)
-                        self.jukeBoxView.addedMusicTableView.reloadData()
-                        self.jukeBoxView.allMusicTableView.reloadData()
+//                        if self.addedMusicList.count != 0 {
+//                            self.addedMusicList.remove(at: index)
+//                        }
+//                        self._notifySongDidRemove(song: song)
+//                        self.jukeBoxView.addedMusicTableView.reloadData()
+//                        self.jukeBoxView.allMusicTableView.reloadData()
                     }
                 })
             }

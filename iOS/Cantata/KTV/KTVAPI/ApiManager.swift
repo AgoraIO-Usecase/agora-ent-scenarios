@@ -24,10 +24,10 @@ class ApiManager {
         
         do {
             let acquireOjb = try JSONSerialization.data(withJSONObject: [
-                "instanceId": String(Date().timeIntervalSince1970),
+                "instanceId": "\(Int(Date().milListamp))",
                 "testIp": testIp
             ])
-            
+
             let url = getTokenUrl(domain: domain, appId: AppContext.shared.appId)
             guard let requestUrl = URL(string: url) else {return ""}
             var request = URLRequest(url: requestUrl)

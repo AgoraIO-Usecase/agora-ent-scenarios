@@ -172,7 +172,7 @@
 //控制台
 + (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
                                settingView:(VLKTVSettingView*)settingView
-                               withDelegate:(id<VLKTVSettingViewDelegate>)delegate {
+                               withDelegate:(id)delegate {
     VLKTVSettingView* _settingView = settingView ? settingView : [[VLKTVSettingView alloc] initWithSetting:nil];
     _settingView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 300);
     _settingView.backgroundColor = UIColorMakeWithHex(@"#152164");

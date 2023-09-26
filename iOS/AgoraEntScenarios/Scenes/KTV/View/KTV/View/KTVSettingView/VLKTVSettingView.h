@@ -26,7 +26,7 @@ typedef enum : NSUInteger {
 
 - (instancetype)initWithSetting:(VLKTVSettingModel *)setting;
 
-@property (nonatomic, weak) id <VLKTVSettingViewDelegate> delegate;
+@property (nonatomic, weak) id delegate;
 
 - (void)setIsEarOn:(BOOL)isEarOn;
 - (void)setAccValue:(float)accValue;

@@ -90,9 +90,7 @@
         listModel.name = outputModel.name;
         listModel.bgOption = 0;
         listModel.creatorNo = VLUserCenter.user.id;
-        CantataMainViewController *VC = [[CantataMainViewController alloc]init];
-        VC.roomModel = listModel;
-        VC.seatsArray = outputModel.seatsArray;
+        UIViewController *VC = [ViewControllerFactory createCustomViewControllerWithTitle:listModel seatsArray:outputModel.seatsArray];
         [weakSelf.navigationController pushViewController:VC animated:YES];
     }];
 }

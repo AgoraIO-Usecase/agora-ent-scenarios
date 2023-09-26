@@ -46,7 +46,7 @@
 
 - (void)commonUI {
     [self setBackgroundImage:@"online_list_BgIcon"];
-    [self setNaviTitleName:KTVLocalizedString(@"ktv_online_ktv")];
+    [self setNaviTitleName:[@"ktv_cantata" toSceneLocalizationWithBundleName:@"DHCResource"]];
     if ([VLUserCenter center].isLogin) {
         [self setBackBtn];
     }
@@ -64,18 +64,18 @@
     [self.view addSubview:listView];
 }
 
-- (BOOL)checkIsLogin {
-#if DEBUG
-#else
-#warning  fix it by  chenpan
-    if (![VLUserCenter center].isLogin) {
-        VLLoginViewController *loginVC = [[VLLoginViewController alloc] init];
-        [self.navigationController pushViewController:loginVC animated:YES];
-        return NO;
-    }
-#endif
-    return YES;
-}
+//- (BOOL)checkIsLogin {
+//#if DEBUG
+//#else
+//#warning  fix it by  chenpan
+//    if (![VLUserCenter center].isLogin) {
+//        VLLoginViewController *loginVC = [[VLLoginViewController alloc] init];
+//        [self.navigationController pushViewController:loginVC animated:YES];
+//        return NO;
+//    }
+//#endif
+//    return YES;
+//}
 
 #pragma mark - Public Methods
 
@@ -90,7 +90,8 @@
 
 #pragma mark - deleagate
 - (void)createBtnAction {
-    if (![self checkIsLogin]) return;
+    //cp todo
+    //if (![self checkIsLogin]) return;
     
     VLCreateRoomViewController *createRoomVC = [[VLCreateRoomViewController alloc]init];
     [self.navigationController pushViewController:createRoomVC animated:YES];
@@ -98,7 +99,8 @@
 }
 
 - (void)listItemClickAction:(VLRoomListModel *)listModel {
-    if (![self checkIsLogin]) return;
+    //cp todo
+    //if (![self checkIsLogin]) return;
      
     if (listModel.isPrivate) {
         NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"ktv_cancel"),KTVLocalizedString(@"ktv_confirm"), nil];
@@ -131,10 +133,8 @@
         }
         
         listModel.creatorNo = outputModel.creatorNo;
-        CantataMainViewController *ktvVC = [[CantataMainViewController alloc]init];
-        ktvVC.roomModel = listModel;
-        ktvVC.seatsArray = outputModel.seatsArray;
-        [weakSelf.navigationController pushViewController:ktvVC animated:YES];
+        UIViewController *VC = [ViewControllerFactory createCustomViewControllerWithTitle:listModel seatsArray:outputModel.seatsArray];
+        [weakSelf.navigationController pushViewController:VC animated:YES];
     }];
 
 }

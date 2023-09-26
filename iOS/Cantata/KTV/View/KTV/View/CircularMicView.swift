@@ -37,15 +37,21 @@ class ChorusMicView: UIView {
     }
     
     private func updateAllMics(with seatArray: [VLRoomSeatModel]) {
-        for i in seatArray {
-            updateMics(with: i)
+        for (index, value) in seatArray.enumerated() {
+            updateMics(with: value, index: index)
         }
     }
     
-    public func updateMics(with model: VLRoomSeatModel) {
-        guard let micView = self.viewWithTag(1000 + model.seatIndex) as? MicView else {return}
-        micView.updateMicName(model.name?.count ?? 0 > 0 ? model.name! :  "\(model.seatIndex)号麦")
+    public func updateMics(with model: VLRoomSeatModel, index: Int) {
+        guard let micView = self.viewWithTag(1000 + index) as? MicView else {return}
+        micView.updateMicName(model.name?.count ?? 0 > 0 ? model.name! :  "\(index)号麦")
         micView.updateMicImage(with: model.headUrl?.count ?? 0 > 0 ? model.headUrl! : "")
+    }
+    
+    public func releaseMic(with index: Int) {
+        guard let micView = self.viewWithTag(1000 + index) as? MicView else {return}
+        micView.updateMicName("\(index)号麦")
+        micView.updateMicImage(with: "")
     }
 
     private func addBGView() {

@@ -19,7 +19,7 @@
 
 - (void)setupView {
     UILabel *introduceLabel = [[UILabel alloc]initWithFrame:CGRectMake(30, 0, SCREEN_WIDTH-60, 90)];
-    NSString *introduceStr = KTVLocalizedString(@"ktv_create_tips1");
+    NSString *introduceStr = [@"ktv_create_tips1" toSceneLocalizationWithBundleName:@"DHCResource"];
     introduceLabel.attributedText = [self attributedString:introduceStr fontSize:14 lineSpace:4 wordSpace:0];
     introduceLabel.textAlignment = NSTextAlignmentCenter;
     introduceLabel.numberOfLines = 0;

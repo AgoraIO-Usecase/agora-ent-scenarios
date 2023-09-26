@@ -113,12 +113,15 @@ VLKTVRemoteVolumeViewDelegate
 #pragma mark - VLKTVSwitcherViewDelegate
 
 - (void)switcherView:(VLKTVSwitcherView *)switcherView on:(BOOL)on {
-    VLKTVValueDidChangedType type;
+   // VLKTVValueDidChangedType type;
+    NSInteger type;
     if (switcherView == self.soundSwitcher) {
         self.setting.soundOn = on;
-        type = VLKTVValueDidChangedTypeEar;
+        //type = VLKTVValueDidChangedTypeEar;
+        type = 0;
     } else {
-        type = VLKTVValueDidChangedTypeMV;
+        //type = VLKTVValueDidChangedTypeMV;
+        type = 1;
         self.setting.mvOn = on;
     }
     if ([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]) {
@@ -129,14 +132,17 @@ VLKTVRemoteVolumeViewDelegate
 #pragma mark - VLKTVSliderViewDelegate
 
 - (void)sliderView:(VLKTVSliderView *)sliderView valueChanged:(float)value {
-    VLKTVValueDidChangedType type;
+    //VLKTVValueDidChangedType type;
+    NSInteger type = 0;
     if (sliderView == self.soundSlider) {
         NSLog(@"value:%f", value);
         self.setting.soundValue = value;
-        type = VLKTVValueDidChangedTypeSound;
+       // type = VLKTVValueDidChangedTypeSound;
+        type = 3;
     } else {
         self.setting.accValue = value;
-        type = VLKTVValueDidChangedTypeAcc;
+       // type = VLKTVValueDidChangedTypeAcc;
+        type = 4;
     }
     if ([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]) {
         [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:type];
@@ -165,7 +171,7 @@ VLKTVRemoteVolumeViewDelegate
 - (void)view:(VLKTVRemoteVolumeView *)view remoteVolumeValueChanged:(int)value {
     self.setting.remoteVolume = value;
     if ([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]) {
-        [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:VLKTVValueDidChangedTypeRemoteValue];
+        [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:5];
     }
 }
 

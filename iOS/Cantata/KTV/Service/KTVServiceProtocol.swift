@@ -55,11 +55,17 @@ import AgoraCommon
     ///   - completion: 完成回调
     func enterSeat(with inputModel: KTVOnSeatInputModel, completion: @escaping (Error?) -> Void)
     
-    /// 下麦
+    /// 下麦删除所有歌曲
     /// - Parameters:
     ///   - inputModel: 输入模型
     ///   - completion: 完成回调
     func leaveSeat(with inputModel: KTVOutSeatInputModel, completion: @escaping (Error?) -> Void)
+    
+    /// 下麦但是只删除当前歌曲
+    /// - Parameters:
+    ///   - inputModel: 输入模型
+    ///   - completion: 完成回调
+    func leaveSeatWithoutRemoveSong(with inputModel: KTVOutSeatInputModel, completion: @escaping (Error?) -> Void)
     
     /// 设置麦位声音
     /// - Parameters:
@@ -83,7 +89,7 @@ import AgoraCommon
     /// - Parameters:
     ///   - isEnd: 歌曲结束状态
     ///   - completion: 完成回调
-    func updateSongEndStatus(with isEnd: Bool, completion: @escaping (Error?) -> Void)
+    func updateSongEndStatus(with musicEnd: Bool, inputModel: KTVRemoveSongInputModel, completion: @escaping (Error?) -> Void)
     
     /// 删除选中歌曲
     /// - Parameters:

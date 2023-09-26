@@ -59,8 +59,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 //控制台
 + (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
-                               settingView:(VLKTVSettingView*)settingView
-                               withDelegate:(id<VLKTVSettingViewDelegate>)delegate;
+                               settingView:(nullable VLKTVSettingView*)settingView
+                               withDelegate:(id)delegate;
+
+//弹出耳返视图
++ (LSTPopView*)popEarSettingViewWithParentView:(UIView*)parentView
+                                   isEarOn:(BOOL)isEarOn
+                                           vol:(CGFloat)vol
+                                  withDelegate:(id)delegate;
+
 @end
 
 NS_ASSUME_NONNULL_END
