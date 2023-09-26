@@ -36,9 +36,9 @@ class CallSendDialog(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding.ivHangup.setOnClickListener {
+        binding.ivHangup.setOnClickListener(DebouncedOnClickListener {
             onClickHangup()
-        }
+        })
         binding.tvUserName.text = userInfo.userName
         Glide.with(context)
             .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
