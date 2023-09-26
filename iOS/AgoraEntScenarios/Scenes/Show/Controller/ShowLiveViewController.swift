@@ -33,15 +33,11 @@ class ShowLiveViewController: UIViewController {
         }
     }
     
-    var loadingType: RoomStatus = .prejoined {
+    private var loadingType: RoomStatus = .prejoined {
         didSet {
             if loadingType == oldValue {
                 return
             }
-            if (loadingType == .joined) {// 秒开计时
-                ShowAgoraKitManager.shared.callTimestampStart(clean: false, roomId: room?.roomId)
-            }
-            updateLoadingType(playState: loadingType)
             remoteVideoWidth = nil
             currentMode = nil
         }
@@ -256,7 +252,7 @@ class ShowLiveViewController: UIViewController {
     }
         
     private func setupUI(){
-        view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
+        view.layer.contents = UIImage.show_sceneImage(name: "show_live_room_bg")?.cgImage
         navigationController?.isNavigationBarHidden = true
         liveView.room = room
         view.addSubview(liveView)
@@ -316,7 +312,7 @@ class ShowLiveViewController: UIViewController {
         showMsg.message = text
         showMsg.createAt = Date().millionsecondSince1970()
         
-        serviceImp?.sendChatMessage(message: showMsg) { error in
+        serviceImp?.sendChatMessage(roomId: roomId, message: showMsg) { error in
         }
     }
 }
@@ -349,7 +345,7 @@ extension ShowLiveViewController {
                     }
                 } else {
                     self._subscribeServiceEvent()
-                    self.updateLoadingType(playState: self.loadingType)
+                    self.updateLoadingType(playState: .joined, roomId: roomId)
                 }
             }
         } else {
@@ -365,18 +361,18 @@ extension ShowLiveViewController {
         AppContext.unloadShowServiceImp(room.roomId)
     }
     
-
-    func updateLoadingType(playState: RoomStatus) {
+    
+    func updateLoadingType(playState: RoomStatus, roomId: String) {
         ShowAgoraKitManager.shared.updateLoadingType(roomId: roomId, channelId: roomId, playState: playState)
         if let targetRoomId = currentInteraction?.roomId, targetRoomId != roomId {
             ShowAgoraKitManager.shared.updateLoadingType(roomId: roomId, channelId: targetRoomId, playState: playState)
         }
         if playState == .joined {
-            serviceImp?.initRoom { error in }
+            serviceImp?.initRoom(roomId: roomId) { error in }
         } else if playState == .prejoined {
-            serviceImp?.deinitRoom { error in }
+            serviceImp?.deinitRoom(roomId: roomId) { error in }
         } else {}
-        
+        loadingType = playState
         updateRemoteCavans()
     }
     
@@ -671,6 +667,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _onStartInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
+            view.layer.contents = UIImage.show_sceneImage(name: "show_live_pk_bg")?.cgImage
             self.muteLocalVideo = false
             self.muteLocalAudio = false
             let interactionRoomId = interaction.roomId
@@ -692,7 +689,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                                               uid: uid,
                                                               canvasView: self.liveView.canvasView.remoteView)
                     }else{
-                        self.updateLoadingType(playState: self.loadingType)
+                        self.updateLoadingType(playState: self.loadingType, roomId: self.roomId)
                     }
                 }
                 liveView.canvasView.canvasType = .pk
@@ -733,6 +730,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _onStopInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
+            view.layer.contents = UIImage.show_sceneImage(name: "show_live_room_bg")?.cgImage
             ShowAgoraKitManager.shared.removeRtcDelegate(delegate: self, roomId: interaction.roomId)
             
             self.muteLocalVideo = false
@@ -828,9 +826,6 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
             }
         }
         panelPresenter.updateVideoStats(stats)
-        if let ts = ShowAgoraKitManager.shared.callTimestampEnd(roomId) {
-            panelPresenter.updateTimestamp(ts)
-        }
         throttleRefreshRealTimeInfo()
     }
     
@@ -871,9 +866,9 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
             if state == .decoding /*2*/,
                ( reason == .remoteUnmuted /*6*/ || reason == .localUnmuted /*4*/ || reason == .localMuted /*3*/ )   {
                 showLogger.info("show first frame (\(channelId))", context: kShowLogBaseContext)
-                if let ts = ShowAgoraKitManager.shared.callTimestampEnd(channelId) {
+                if let ts = ShowAgoraKitManager.shared.callTimestampEnd() {
                     self.panelPresenter.updateTimestamp(ts)
-                    self.throttleRefreshRealTimeInfo()
+                    self.refreshRealTimeInfo()
                 }
             }
         }
@@ -927,7 +922,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
                 self?.dismiss(animated: true)
             }
         }else {
-            updateLoadingType(playState: .idle)
+            updateLoadingType(playState: .idle, roomId: roomId)
             dismiss(animated: true)
         }
     }
@@ -995,18 +990,22 @@ extension ShowLiveViewController {
             guard let `self` = self else {
                 return
             }
-            DispatchQueue.main.async {
-                var receive = true
-                var send = true
-                if self.role == .broadcaster && self.interactionStatus != .pking && self.interactionStatus != .onSeat {
-                    receive = false
-                }
-                if self.role == .audience && self.currentInteraction?.userId != VLUserCenter.user.id {
-                    send = false
-                }
-                let data = self.panelPresenter.generatePanelData(send: send, receive: receive, audience: (self.role == .audience))
-                self.realTimeView.update(left: data.left, right: data.right)
+            self.refreshRealTimeInfo()
+        }
+    }
+    
+    private func refreshRealTimeInfo() {
+        DispatchQueue.main.async {
+            var receive = true
+            var send = true
+            if self.role == .broadcaster && self.interactionStatus != .pking && self.interactionStatus != .onSeat {
+                receive = false
             }
+            if self.role == .audience && self.currentInteraction?.userId != VLUserCenter.user.id {
+                send = false
+            }
+            let data = self.panelPresenter.generatePanelData(send: send, receive: receive, audience: (self.role == .audience))
+            self.realTimeView.update(left: data.left, right: data.right)
         }
     }
 }

@@ -78,7 +78,6 @@ class ShowAgoraKitManager: NSObject {
     }
     // 退出已加入的频道和子频道
     func leaveAllRoom() {
-        cleanTimestampMap()
         videoLoader?.cleanCache()
         if let p = player {
             engine?.destroyMediaPlayer(p)
@@ -240,33 +239,24 @@ class ShowAgoraKitManager: NSObject {
     }
     
     // 耗时计算
-    private var savedTimestampMap: [String: Date] = [String: Date]()
-    
-    func callTimestampStart(clean: Bool, roomId: String?) {
-        guard let roomId = roomId else {return}
+    private var callTimeStampsSaved: Date?
+    private var callTimestampEndSaved: TimeInterval?
+
+    func callTimestampStart() {
         showLogger.info("callTimeStampsSaved  : start")
-        if (clean) {
-            savedTimestampMap[roomId] = nil
-        }
-        if savedTimestampMap[roomId] == nil {
-            showLogger.info("callTimeStampsSaved  : saved")
-            savedTimestampMap[roomId] = Date()
-        }
+        callTimeStampsSaved = Date()
     }
     
-    func callTimestampEnd(_ roomId: String?) -> TimeInterval? {
-        guard let roomId = roomId else {return nil}
-        showLogger.info("callTimeStampsSaved  : end called")
-        guard let saved = savedTimestampMap[roomId] else {
-            return nil
+    func callTimestampEnd() -> TimeInterval? {
+        guard let saved = callTimeStampsSaved else {
+            showLogger.info("callTimeStampsSaved  : end no value")
+            return callTimestampEndSaved
         }
-        showLogger.info("callTimeStampsSaved  : end value")
-        savedTimestampMap[roomId] = nil
-        return -saved.timeIntervalSinceNow * 1000
-    }
-    
-    private func cleanTimestampMap(){
-        savedTimestampMap.removeAll()
+        let value = -saved.timeIntervalSinceNow * 1000
+        callTimeStampsSaved = nil
+        callTimestampEndSaved = value
+        showLogger.info("callTimeStampsSaved  : end value \(value)")
+        return value
     }
     
     //MARK: public sdk method
@@ -361,7 +351,6 @@ class ShowAgoraKitManager: NSObject {
         options.audienceLatencyLevel = role == .audience ? .lowLatency : .ultraLowLatency
         updateChannelEx(channelId:channelId, options: options)
         if "\(uid)" == VLUserCenter.user.id {
-            videoLoader?.leaveChannelWithout(roomId: channelId)
             if role == .broadcaster {
                 setupLocalVideo(uid: uid, canvasView: canvasView)
             } else {
@@ -486,7 +475,6 @@ class ShowAgoraKitManager: NSObject {
             videoCanvas.view = canvasView
             videoCanvas.renderMode = .hidden
             let ret = engine?.setupRemoteVideoEx(videoCanvas, connection: connection)
-                    
             showLogger.info("setupRemoteVideoEx ret = \(ret ?? -1), uid:\(uid) localuid: \(UserInfo.userId) channelId: \(channelId)", context: kShowLogBaseContext)
             return
         }

@@ -101,24 +101,16 @@ class ShowRoomListVC: UIViewController {
     }
     
     private func joinRoom(_ room: ShowRoomListModel){
-        ShowAgoraKitManager.shared.callTimestampStart(clean: true, roomId: room.roomId)
+        ShowAgoraKitManager.shared.callTimestampStart()
         ShowAgoraKitManager.shared.setupAudienceProfile()
         ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .joined)
         
-        let vc = ShowLivePagesViewController()
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .fullScreen
         if room.ownerId == VLUserCenter.user.id {
-            AppContext.showServiceImp(room.roomId)?.joinRoom(room: room) {[weak self] error, model in
-                if let error = error {
-                    ToastView.show(text: error.localizedDescription)
-                    return
-                }
-                vc.roomList = [room]
-                vc.focusIndex = 0
-                self?.present(nc, animated: true)
-            }
+            ToastView.show(text: "show_join_own_room_error".show_localized)
         } else {
+            let vc = ShowLivePagesViewController()
+            let nc = UINavigationController(rootViewController: vc)
+            nc.modalPresentationStyle = .fullScreen
             vc.roomList = roomList.filter({ $0.ownerId != VLUserCenter.user.id })
             vc.focusIndex = vc.roomList?.firstIndex(where: { $0.roomId == room.roomId }) ?? 0
             self.present(nc, animated: true)
@@ -218,7 +210,7 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         showLogger.info("didSelectItemAt: \(indexPath.row)", context: "collectionView")
-        if (AppContext.shared.rtcToken != nil) {
+        if let token = AppContext.shared.rtcToken, token.count > 0 {
             let room = roomList[indexPath.item]
             joinRoom(room)
         } else {
