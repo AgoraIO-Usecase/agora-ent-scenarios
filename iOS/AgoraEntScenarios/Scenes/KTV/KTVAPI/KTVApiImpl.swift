@@ -22,7 +22,7 @@ enum KTVSongMode: Int {
 }
 
 private func agoraPrint(_ message: String) {
-   // KTVLog.info(text: message, tag: "KTVApi")
+    KTVLog.info(text: message, tag: "KTVApi")
 }
 
 @objc class KTVApiImpl: NSObject{
@@ -122,7 +122,7 @@ private func agoraPrint(_ message: String) {
             contentCenterConfiguration.maxCacheSize = UInt(config.maxCacheSize)
             if config.isDebugMode {
                 //如果这一块报错为contentCenterConfiguration没有mccDomain这个属性 说明该版本不支持这个 可以注释掉这行代码。完全不影响
-                contentCenterConfiguration.mccDomain = "api-test.agora.io"
+               // contentCenterConfiguration.mccDomain = "api-test.agora.io"
             }
             mcc = AgoraMusicContentCenter.sharedContentCenter(config: contentCenterConfiguration)
             mcc?.register(self)
@@ -478,6 +478,33 @@ extension KTVApiImpl {
             }
             
             stateCallBack(.success, .none)
+        } else if oldRole == .coSinger && newRole == .leadSinger {
+            self.singerRole = .leadSinger
+            self.syncNewLeadSinger(with: apiConfig?.localUid ?? 0)
+            apiConfig?.engine?.muteRemoteAudioStream(UInt(songConfig?.mainSingerUid ?? 0), mute: false)
+            songConfig?.mainSingerUid = apiConfig?.localUid ?? 0
+            
+            apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":false}")
+            apiConfig?.engine?.setParameters("{\"che.audio.neteq.enable_stable_playout\":false}")
+            apiConfig?.engine?.setParameters("{\"che.audio.custom_bitrate\": 80000}")
+            
+            var mediaOption = AgoraRtcChannelMediaOptions()
+            mediaOption.publishMediaPlayerId = Int(mediaPlayer?.getMediaPlayerId() ?? 0)
+            mediaOption.publishMediaPlayerAudioTrack = true
+            apiConfig?.engine?.updateChannel(with: mediaOption)
+            
+            var mediaOption2 = AgoraRtcChannelMediaOptions()
+            mediaOption2.autoSubscribeAudio = false
+            mediaOption2.autoSubscribeVideo = false
+            mediaOption2.publishMicrophoneTrack = true
+            mediaOption2.enableAudioRecordingOrPlayout = false
+            mediaOption2.clientRoleType = .broadcaster
+            apiConfig?.engine?.updateChannelEx(with: mediaOption2, connection: subChorusConnection ?? AgoraRtcConnection())
+            getEventHander { delegate in
+                delegate.onSingerRoleChanged(oldRole: .coSinger, newRole: .leadSinger)
+            }
+            
+            stateCallBack(.success, .none)
         } else {
             stateCallBack(.fail, .noPermission)
             agoraPrint("Error！You can not switch role from \(oldRole.rawValue) to \(newRole.rawValue)!")
@@ -814,6 +841,15 @@ extension KTVApiImpl {
         apiConfig?.engine?.setParameters("{\"che.audio.md.enable\": false)}")
     }
 
+    private func syncNewLeadSinger(with uid: Int) {
+        let dict = [
+            "cmd": "syncNewLeadSinger",
+            "uid":uid
+        ] as [String : Any]
+        sendStreamMessageWithDict(dict) { _ in
+            
+        }
+    }
 }
 
 // rtc的代理回调
@@ -883,7 +919,6 @@ extension KTVApiImpl {
     }
     
     @objc public func didKTVAPIReceiveStreamMessageFrom(uid: NSInteger, streamId: NSInteger, data: Data) {
-        sendCustomMessage(with: "didKTVAPIReceiveStreamMessageFrom", label: "uid:\(uid),streamId:\(streamId),data:\(data.base64EncodedString())")
         let role = singerRole
         guard let dict = dataToDictionary(data: data), let cmd = dict["cmd"] as? String else { return }
         
@@ -894,6 +929,8 @@ extension KTVApiImpl {
             handlePlayerStateCommand(dict: dict, role: role)
         case "setVoicePitch":
             handleSetVoicePitchCommand(dict: dict, role: role)
+        case "syncNewLeadSinger":
+            handleCosingerToLeadSinger(with: dict)
         default:
             break
         }
@@ -908,7 +945,7 @@ extension KTVApiImpl {
                 let ntpTime = dict["ntp"] as? Int,
                 let songId = dict["songIdentifier"] as? String
         else { return }
-        print("realTime:\(realPosition) position:\(position) lastNtpTime:\(lastNtpTime) ntpTime:\(ntpTime) ntpGap:\(ntpTime - self.lastNtpTime) ")
+        agoraPrint("realTime:\(realPosition) position:\(position) lastNtpTime:\(lastNtpTime) ntpTime:\(ntpTime) ntpGap:\(ntpTime - self.lastNtpTime) ")
         //如果接收到的歌曲和自己本地的歌曲不一致就不更新进度
 //        guard songCode == self.songCode else {
 //            agoraPrint("local songCode[\(songCode)] is not equal to recv songCode[\(self.songCode)] role: \(singerRole.rawValue)")
@@ -984,10 +1021,23 @@ extension KTVApiImpl {
             let time = dict["time"] as? Int64 ?? 0
             agoraPrint("checkNtp, diff:\(threshold), localNtp:\(getNtpTimeInMs()), localPosition:\(localPosition), audioPlayoutDelay:\(audioPlayoutDelay), remoteDiff:\(String(describing: ntpTime - Int(time)))")
             if abs(threshold) > 50 {
+                print("expectPosition:\(expectPosition)")
                  mediaPlayer?.seek(toPosition: expectPosition)
             }
         }
         
+    }
+    
+    private func handleCosingerToLeadSinger(with dict: [String: Any]) {
+        if dict["cmd"] as! String == "syncNewLeadSinger" {
+            if self.singerRole == .coSinger {
+                apiConfig?.engine?.muteRemoteAudioStream(UInt(songConfig?.mainSingerUid ?? 0), mute: false)
+                    let mainSingerUid = dict["uid"] as? Int ?? 0
+                    songConfig?.mainSingerUid = mainSingerUid
+                    let ret = apiConfig?.engine?.muteRemoteAudioStream(UInt(mainSingerUid), mute: true)
+                    print("ret:\(ret)")
+            }
+        }
     }
 
     private func handleAudienceRole(dict: [String: Any]) {
@@ -1020,7 +1070,6 @@ extension KTVApiImpl {
     }
 
     @objc public func didKTVAPILocalAudioStats(stats: AgoraRtcLocalAudioStats) {
-        sendCustomMessage(with: "didKTVAPILocalAudioStats", label: "delay:\(stats.audioPlayoutDelay)")
         if useCustomAudioSource == true {return}
         audioPlayoutDelay = Int(stats.audioPlayoutDelay)
     }
@@ -1241,6 +1290,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
                                       // "songCode": self.songCode
            ]
            agoraPrint("position_ms:\(position_ms), ntp:\(getNtpTimeInMs()), delta:\(self.getNtpTimeInMs() - position_ms), autoPlayoutDelay:\(self.audioPlayoutDelay)")
+           print("autoPlayoutDelay:\(self.audioPlayoutDelay)")
            sendStreamMessageWithDict(dict, success: nil)
        }
    }
@@ -1256,7 +1306,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
             self.localPlayerPosition = Date().milListamp
             print("localPlayerPosition:playerKit:openCompleted \(localPlayerPosition)")
             self.playerDuration = TimeInterval(mediaPlayer?.getDuration() ?? 0)
-            playerKit.selectAudioTrack(1)
+            playerKit.selectMultiAudioTrack(1, publishTrackIndex: 0)
             if isMainSinger() { //主唱播放，通过同步消息“setLrcTime”通知伴唱play
                 playerKit.play()
             }

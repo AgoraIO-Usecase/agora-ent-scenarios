@@ -13,21 +13,30 @@
 @property (nonatomic,strong) UILabel *selLabel;
 @property (nonatomic,strong) UIImageView *selCoverImg;
 @property (nonatomic, assign) NSInteger selectIndex;
+@property (nonatomic, assign) BOOL UIUpdateAble;
 @end
 
 @implementation VLVoiceShowView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLVoiceShowViewDelegate>)delegate imgSource:(NSArray *)imgSource nameSource:(NSArray *)nameSource selectIndex:(NSInteger)selectIndex {
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLVoiceShowViewDelegate>)delegate imgSource:(NSArray *)imgSource nameSource:(NSArray *)nameSource userNoArray: (NSArray *)userNoArray selectUserNo:(nonnull NSString *)selectUserNo UIUpdateAble:(BOOL)UIUpdateAble {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;
-        self.selectIndex = selectIndex;
-        [self layoutUIWithDataSource: imgSource nameSource:nameSource selectIndex:selectIndex];
+       // self.selectIndex = selectIndex;
+        self.UIUpdateAble = UIUpdateAble;
+        [self layoutUIWithDataSource: imgSource nameSource:nameSource selectUserNo:selectUserNo userNoArray:userNoArray];
     }
     return self;
 }
 
--(void)layoutUIWithDataSource:(NSArray *)imgSource nameSource:(NSArray *)nameSource selectIndex:(NSInteger)selectIndex {
+-(void)layoutUIWithDataSource:(NSArray *)imgSource nameSource:(NSArray *)nameSource selectUserNo:(NSString *)selectUserNo userNoArray:(NSArray *)userNoArray{
+    NSInteger realIndex = -1;
+    for(int i=0;i<nameSource.count;i++){
+        if([selectUserNo isEqualToString:userNoArray[i]]){
+            realIndex = i;
+        }
+    }
+    
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
     titleLabel.text = KTVLocalizedString(@"设置人声");
     titleLabel.font = UIFontMake(18);
@@ -48,9 +57,9 @@
         titleLabel.text = nameSource[i];
         titleLabel.tag = 1000 + i;
         titleLabel.textAlignment = NSTextAlignmentCenter;
-        titleLabel.textColor = i == selectIndex ? [UIColor whiteColor] : [UIColor lightGrayColor];
+        titleLabel.textColor = i == realIndex ? [UIColor whiteColor] : [UIColor lightGrayColor];
         titleLabel.tag = i;
-        if(i == selectIndex){
+        if(i == realIndex){
             self.selLabel = titleLabel;
         }
         titleLabel.font = [UIFont systemFontOfSize:12];
@@ -66,8 +75,8 @@
         UIImageView *coverImgView = [[UIImageView alloc]initWithFrame:CGRectMake(ix, iy, width, imgHeight)];
         coverImgView.image = [UIImage sceneImageWithName:@"ktv_selIcon"];
         coverImgView.tag = 300 + i;
-        coverImgView.hidden = i != selectIndex;
-        if(i == selectIndex){
+        coverImgView.hidden = i != realIndex;
+        if(i == realIndex){
             self.selCoverImg = coverImgView;
         }
         [self addSubview:coverImgView];
@@ -83,18 +92,13 @@
 }
 
 -(void)click:(UIButton *)btn {
-    if(btn.tag - 200 == _selectIndex){
-        return;
-    }
     
-    if(_selectIndex != -1){//已有人声突出
+    if(self.UIUpdateAble == false){
         if([self.delegate respondsToSelector:@selector(voiceItemClickAction:)]){
             [self.delegate voiceItemClickAction:-1];
             return;
         }
     }
-    
-    _selectIndex = btn.tag - 200;
     self.selLabel.textColor = [UIColor lightGrayColor];
     self.selCoverImg.hidden = true;
     

@@ -74,7 +74,9 @@ NS_ASSUME_NONNULL_BEGIN
                                          showView:(VLVoiceShowView*)showView
                                    imgSource:(NSArray *)imgSource
                                     nameSource:(NSArray *)nameSource
-                                  selectIndex:(NSInteger)index
+                                  selectUserNo:(NSString *)selectUserNo
+                                  userNoArray:(NSArray *)userNoArray
+                                 UIUpdateAble:(BOOL)UIUpdateAble
                                       withDelegate:(id<VLVoiceShowViewDelegate>)delegate;
 
 
