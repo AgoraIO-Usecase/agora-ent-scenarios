@@ -206,7 +206,7 @@ public class STRenderKit {
                     case MESSAGE_NEED_CHANGE_STICKER:
                         String sticker = (String) msg.obj;
                         mCurrentSticker = sticker;
-                        int packageId1 = mSTMobileEffectNative.changePackage(mCurrentSticker);
+                        int packageId1 = mSTMobileEffectNative.addPackage(mCurrentSticker);
                         Log.d(TAG, "ST_XCZ STMobileEffectNative changePackage sticker=" + mCurrentSticker + ",packageId=" + packageId1);
 
                         Log.d(TAG, "change_package: packageId1:" + packageId1);
@@ -331,13 +331,23 @@ public class STRenderKit {
     }
 
     public void setStyle(String stylePath, float filterStrength, float makeupStrength){
-        cleanStyle();
-
-        int packageId = mSTMobileEffectNative.addPackage(stylePath);
-        //updateHumanActionDetectConfig(); // TODO
+        int packageId = -1;
+        Iterator<Map.Entry<Integer, String>> iterator = mCurrentStyleMaps.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<Integer, String> entry = iterator.next();
+            if (entry.getValue().equals(stylePath)) {
+                packageId = entry.getKey();
+            } else {
+                mSTMobileEffectNative.removeEffect(entry.getKey());
+                iterator.remove();
+            }
+        }
+        if(packageId == -1){
+            packageId = mSTMobileEffectNative.addPackage(stylePath);
+            mCurrentStyleMaps.put(packageId, stylePath);
+        }
         setPackageBeautyGroupStrength(packageId, STEffectBeautyGroup.EFFECT_BEAUTY_GROUP_FILTER, filterStrength);
         setPackageBeautyGroupStrength(packageId, STEffectBeautyGroup.EFFECT_BEAUTY_GROUP_MAKEUP, makeupStrength);
-        mCurrentStyleMaps.put(packageId, stylePath);
     }
 
     public void release() {
