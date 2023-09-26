@@ -7,7 +7,7 @@
 #import "VLFontUtils.h"
 #import "MenuUtils.h"
 @import Masonry;
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @interface VLLoginInputPhoneView()
 
@@ -94,7 +94,7 @@
 - (UILabel *)titleLabel {
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
-        _titleLabel.text = AGLocalizedString(@"手机号");
+        _titleLabel.text = AGLocalizedString(@"app_mobile_number");
         _titleLabel.textColor = UIColorMakeWithHex(@"#979CBB");
         _titleLabel.font = VLUIFontMake(15);
     }

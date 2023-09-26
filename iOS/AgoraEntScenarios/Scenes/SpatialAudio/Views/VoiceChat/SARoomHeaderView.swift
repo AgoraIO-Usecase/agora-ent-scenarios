@@ -61,13 +61,12 @@ class SARoomHeaderView: UIView {
         self.giftBtn.snp.updateConstraints { make in
             make.width.greaterThanOrEqualTo(gift_count >= 100 ? 50 : 40)
         }
-        soundSetLabel.text = "Beginner's Guide".localized_spatial()
+        soundSetLabel.text = "spatial_beginner_guide".spatial_localized()
         updateGiftList(with: room)
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
     }
 
@@ -85,7 +84,7 @@ class SARoomHeaderView: UIView {
 
         addSubview(moreBtn)
         
-        iconImgView.layer.cornerRadius = 16~
+        iconImgView.layer.cornerRadius = 16
         iconImgView.layer.masksToBounds = true
         addSubview(iconImgView)
 
@@ -100,7 +99,7 @@ class SARoomHeaderView: UIView {
         addSubview(titleLabel)
 
         totalCountLabel.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.2)
-        totalCountLabel.layer.cornerRadius = 13~
+        totalCountLabel.layer.cornerRadius = 13
         totalCountLabel.text = "0"
         totalCountLabel.font = UIFont.systemFont(ofSize: 11)
         totalCountLabel.textColor = .white
@@ -108,25 +107,25 @@ class SARoomHeaderView: UIView {
         totalCountLabel.layer.masksToBounds = true
         addSubview(totalCountLabel)
 
-        rankFBtn.layer.cornerRadius = 13~
+        rankFBtn.layer.cornerRadius = 13
         rankFBtn.layer.masksToBounds = true
         rankFBtn.addTargetFor(self, action: #selector(rankClick), for: .touchUpInside)
         addSubview(rankFBtn)
         rankFBtn.isHidden = true
 
-        rankSBtn.layer.cornerRadius = 13~
+        rankSBtn.layer.cornerRadius = 13
         rankSBtn.layer.masksToBounds = true
         rankSBtn.addTargetFor(self, action: #selector(rankClick), for: .touchUpInside)
         addSubview(rankSBtn)
         rankSBtn.isHidden = true
 
-        rankTBtn.layer.cornerRadius = 13~
+        rankTBtn.layer.cornerRadius = 13
         rankTBtn.layer.masksToBounds = true
         rankTBtn.addTargetFor(self, action: #selector(rankClick), for: .touchUpInside)
         addSubview(rankTBtn)
         rankTBtn.isHidden = true
 
-        configView.layer.cornerRadius = 11~
+        configView.layer.cornerRadius = 11
         configView.layer.masksToBounds = true
         configView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1)
         addSubview(configView)
@@ -149,7 +148,7 @@ class SARoomHeaderView: UIView {
         soundClickBtn.vm_expandSize(size: 20)
 
         giftBtn.layer.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1).cgColor
-        giftBtn.layer.cornerRadius = 11~
+        giftBtn.layer.cornerRadius = 11
         giftBtn.setImage(UIImage.sceneImage(name: "liwu"), for: .normal)
         giftBtn.setTitle(" 0", for: .normal)
         giftBtn.titleLabel?.font = UIFont.systemFont(ofSize: 10)
@@ -157,15 +156,15 @@ class SARoomHeaderView: UIView {
         addSubview(giftBtn)
 
         lookBtn.layer.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1).cgColor
-        lookBtn.layer.cornerRadius = 11~
-        lookBtn.titleLabel?.font = UIFont.systemFont(ofSize: 10)~
+        lookBtn.layer.cornerRadius = 11
+        lookBtn.titleLabel?.font = UIFont.systemFont(ofSize: 10)
         lookBtn.setTitle(" 0", for: .normal)
         lookBtn.isUserInteractionEnabled = false
         lookBtn.setImage(UIImage(named: "guankan"), for: .normal)
         addSubview(lookBtn)
 
         noticeView.layer.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1).cgColor
-        noticeView.layer.cornerRadius = 11~
+        noticeView.layer.cornerRadius = 11
         addSubview(noticeView)
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(click))
@@ -177,7 +176,7 @@ class SARoomHeaderView: UIView {
         noticeView.addSubview(imgView)
 
         let notiLabel = UILabel()
-        notiLabel.text = sceneLocalized("Notice")
+        notiLabel.text = "spatial_voice_notice".spatial_localized()
         notiLabel.font = UIFont.systemFont(ofSize: 12)
         notiLabel.textColor = .white
         noticeView.addSubview(notiLabel)
@@ -186,29 +185,29 @@ class SARoomHeaderView: UIView {
         arrowImgView.image = UIImage.sceneImage(name: "icons／outlined／arrow_right")
         noticeView.addSubview(arrowImgView)
 
-        let isHairScreen = SwiftyFitsize.isFullScreen
+        let isHairScreen =  Screen.isFullScreen
         backBtn.snp.makeConstraints { make in
             make.trailing.equalTo(-15)
-            make.top.equalTo(isHairScreen ? 54~ : 54~ - 25)
+            make.top.equalTo(isHairScreen ? 54 : 54 - 25)
         }
 
         iconImgView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(12)
             make.centerY.equalTo(self.backBtn)
-            make.width.height.equalTo(32~)
+            make.width.height.equalTo(32)
         }
 
         roomLabel.snp.makeConstraints { make in
             make.left.equalTo(self.iconImgView.snp.right).offset(8)
             make.height.equalTo(20)
-            make.width.lessThanOrEqualTo(150~)
+            make.width.lessThanOrEqualTo(150)
             make.top.equalTo(self.iconImgView)
         }
 
         titleLabel.snp.makeConstraints { make in
             make.left.equalTo(self.iconImgView.snp.right).offset(8)
             make.height.equalTo(14)
-            make.width.lessThanOrEqualTo(150~)
+            make.width.lessThanOrEqualTo(150)
             make.bottom.equalTo(self.iconImgView)
         }
 
@@ -221,13 +220,13 @@ class SARoomHeaderView: UIView {
         totalCountLabel.snp.makeConstraints { make in
             make.right.equalTo(moreBtn.snp.left).offset(-10)
             make.centerY.equalTo(self.backBtn)
-            make.width.height.equalTo(26~)
+            make.width.height.equalTo(26)
         }
 
         soundImgView.snp.makeConstraints { make in
-            make.top.equalTo(isHairScreen ? 98~ : 98~ - 25)
+            make.top.equalTo(isHairScreen ? 98 : 98 - 25)
             make.right.equalTo(self.snp.right).offset(-15)
-            make.width.height.equalTo(10~)
+            make.width.height.equalTo(10)
         }
 
         soundSetLabel.snp.makeConstraints { make in
@@ -237,7 +236,7 @@ class SARoomHeaderView: UIView {
 
         configView.snp.makeConstraints { make in
             make.right.equalTo(self.snp.right).offset(19)
-            make.height.equalTo(22~)
+            make.height.equalTo(22)
             make.left.equalTo(soundSetLabel.snp.left).offset(-9)
             make.centerY.equalTo(soundImgView)
         }
@@ -250,37 +249,37 @@ class SARoomHeaderView: UIView {
             make.left.equalTo(self.snp.left).offset(15)
             make.centerY.equalTo(self.configView)
             make.width.greaterThanOrEqualTo(50)
-            make.height.equalTo(22~)
+            make.height.equalTo(22)
         }
 
         lookBtn.snp.makeConstraints { make in
             make.left.equalTo(self.giftBtn.snp.right).offset(5)
             make.centerY.equalTo(self.configView)
             make.width.greaterThanOrEqualTo(40)
-            make.height.equalTo(22~)
+            make.height.equalTo(22)
         }
 
         noticeView.snp.makeConstraints { make in
             make.left.equalTo(self.lookBtn.snp.right).offset(5)
             make.centerY.equalTo(self.configView)
-            make.height.equalTo(22~)
+            make.height.equalTo(22)
         }
 
         imgView.snp.makeConstraints { make in
             make.left.equalTo(self.noticeView).offset(5)
             make.centerY.equalTo(self.noticeView)
-            make.width.height.equalTo(15~)
+            make.width.height.equalTo(15)
         }
 
         arrowImgView.snp.makeConstraints { make in
-            make.right.equalTo(self.noticeView).offset(-5~)
+            make.right.equalTo(self.noticeView).offset(-5)
             make.centerY.equalTo(self.noticeView)
-            make.width.height.equalTo(10~)
+            make.width.height.equalTo(10)
         }
 
         notiLabel.snp.makeConstraints { make in
-            make.left.equalTo(imgView.snp.right).offset(5~)
-            make.right.equalTo(arrowImgView.snp.left).offset(-5~)
+            make.left.equalTo(imgView.snp.right).offset(5)
+            make.right.equalTo(arrowImgView.snp.left).offset(-5)
             make.centerY.equalTo(self.noticeView)
         }
 

@@ -15,9 +15,9 @@ class SA3DRtcView: UIView {
     private var rtcUserView: SA3DMoveUserView = .init()
 
     private var lastPoint: CGPoint = .zero
-    private var lastPrePoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275~)
-    private var lastCenterPoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275~)
-    private var lastMovedPoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275~)
+    private var lastPrePoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275)
+    private var lastCenterPoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275)
+    private var lastMovedPoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275)
 
     private var panGesture: UIPanGestureRecognizer?
     private var lastTime: CFAbsoluteTime = CFAbsoluteTimeGetCurrent()
@@ -46,7 +46,6 @@ class SA3DRtcView: UIView {
     init(rtcKit: SARTCManager?) {
         super.init(frame: .zero)
         self.rtcKit = rtcKit
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
         rtcKit?.setupSpatialAudio()
         rtcKit?.playerDelegate = self
@@ -228,7 +227,7 @@ class SA3DRtcView: UIView {
         }
         rtcUserView.snp.makeConstraints { make in
             make.center.equalTo(self)
-            make.width.height.equalTo(150~)
+            make.width.height.equalTo(150)
         }
         
         panGesture = UIPanGestureRecognizer(target: self, action: #selector(pan(pan:)))
@@ -298,14 +297,14 @@ extension SA3DRtcView {
     private func checkEdgeRange(point: CGPoint) -> CGPoint {
         var moveCenter: CGPoint = point
         // 处理边界
-        if moveCenter.x <= 50~ {
-            moveCenter.x = 50~
+        if moveCenter.x <= 50 {
+            moveCenter.x = 50
         }
         if moveCenter.y <= frame.origin.y - rtcUserView.height * 0.5 {
             moveCenter.y = frame.origin.y - rtcUserView.height * 0.5
         }
-        if moveCenter.x >= frame.size.width - 50~ {
-            moveCenter.x = frame.size.width - 50~
+        if moveCenter.x >= frame.size.width - 50 {
+            moveCenter.x = frame.size.width - 50
         }
 
         if moveCenter.y >= frame.height - rtcUserView.height * 0.5 {
@@ -459,9 +458,9 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if indexPath.item != 3 {
-            return CGSize(width: bounds.size.width / 3.0, height: 150~)
+            return CGSize(width: bounds.size.width / 3.0, height: 150)
         } else {
-            return CGSize(width: bounds.size.width, height: bounds.size.height - 300~)
+            return CGSize(width: bounds.size.width, height: bounds.size.height - 300)
         }
     }
 
@@ -495,7 +494,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 if let mic_info = micInfos?[6] {
                     cell.tag = 206
                     let member: SAUser = SAUser()
-                    member.name = "Agora Red".localized_spatial()
+                    member.name = "spatial_voice_agora_red".spatial_localized()
                     member.portrait = "red"
                     mic_info.member = member
                     cell.setArrowInfo(imageName: "sa_downleft_arrow", margin: 6)
@@ -508,7 +507,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 if let mic_info = micInfos?[3] {
                     cell.tag = 203
                     let member: SAUser = SAUser()
-                    member.name = "Agora Blue".localized_spatial()
+                    member.name = "spatial_voice_agora_blue".spatial_localized()
                     member.portrait = "blue"
                     mic_info.member = member
                     cell.setArrowInfo(imageName: "sa_upright_arrow", margin: -6)

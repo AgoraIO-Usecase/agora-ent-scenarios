@@ -20,7 +20,7 @@ public class VoiceRoomAudienceCell: UITableViewCell {
     lazy var userName: UILabel = .init(frame: CGRect(x: self.avatar.frame.maxX + 9, y: self.avatar.center.y - 8, width: self.contentView.frame.width - self.avatar.frame.maxX - 95, height: 16)).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x333333)).text("UserName")
 
     lazy var operation: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.contentView.frame.width - 75, y: self.avatar.center.y - 15, width: 60, height: 30)).title("Kick".localized(), .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(.white, .normal).setGradient([UIColor(0x219BFF), UIColor(0x345DFF)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).cornerRadius(15).addTargetFor(self, action: #selector(kick), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: self.contentView.frame.width - 75, y: self.avatar.center.y - 15, width: 60, height: 30)).title("voice_kick".voice_localized(), .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(.white, .normal).setGradient([UIColor(0x219BFF), UIColor(0x345DFF)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).cornerRadius(15).addTargetFor(self, action: #selector(kick), for: .touchUpInside)
     }()
 
     override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -29,7 +29,7 @@ public class VoiceRoomAudienceCell: UITableViewCell {
         operation.layer.shadowColor = UIColor(red: 0, green: 0.55, blue: 0.98, alpha: 0.2).cgColor
         operation.layer.shadowOffset = CGSize(width: 0, height: 4)
         operation.layer.shadowRadius = 8
-        operation.setBackgroundImage(UIImage("blue_btn_bg")?.resizableImage(withCapInsets: UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20), resizingMode: .stretch), for: .normal)
+        operation.setBackgroundImage(UIImage.sceneImage(name: "blue_btn_bg", bundleName: "VoiceChatRoomResource")?.resizableImage(withCapInsets: UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20), resizingMode: .stretch), for: .normal)
     }
 
     @available(*, unavailable)

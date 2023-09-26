@@ -28,13 +28,13 @@ let page_size = 15
 
     private var currentUser: VLLoginModel?
 
-    private lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage("roomList")!)
+    private lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage.sceneImage(name: "roomList", bundleName: "VoiceChatRoomResource")!)
 
     private lazy var container: VoiceRoomPageContainer = {
         VoiceRoomPageContainer(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: ScreenHeight - ZNavgationHeight - 10 - CGFloat(ZBottombarHeight) - 30), viewControllers: [self.normal]).backgroundColor(.clear)
     }()
 
-    private lazy var create: VRRoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage("blur")!).backgroundColor(.clear)
+    private lazy var create: VRRoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage.sceneImage(name: "blur", bundleName: "VoiceChatRoomResource")!).backgroundColor(.clear)
     
     private var initialError: AgoraChatError?
     
@@ -55,21 +55,17 @@ let page_size = 15
     override public func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        navigation.title.text = LanguageManager.localValue(key: "Agora Chat Room")
+        navigation.title.text = LanguageManager.localValue(key: "voice_app_name")
     }
     
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-        guard let imKey = KeyCenter.IMAppKey,
-              let imCID = KeyCenter.IMClientId,
-              let imCS = KeyCenter.IMClientSecret,
-              !imKey.isEmpty, !imCID.isEmpty, !imCS.isEmpty
-        else {
+        guard let imKey = KeyCenter.IMAppKey, !imKey.isEmpty else {
             navigationController?.popViewController(animated: true)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                SVProgressHUD.showError(withStatus: "voice_im_key_empty_error".localized())
+                SVProgressHUD.showError(withStatus: "voice_im_key_empty_error".voice_localized())
             }
             return
         }
@@ -102,6 +98,11 @@ let page_size = 15
         VoiceRoomUserInfo.shared.currentRoomOwner = nil
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
+    
+    deinit {
+        VoiceRoomIMManager.shared?.logoutIM()
+        VoiceRoomIMManager.shared = nil
+    }
 }
 
 extension VRRoomsViewController {
@@ -125,7 +126,7 @@ extension VRRoomsViewController {
                             }
                         } else {
                             self?.loginError = error
-                            self?.view.makeToast("login failed!".localized(), point: CGPoint(x: ScreenWidth/2.0, y: ScreenHeight/2.0), title: nil, image: nil, completion: nil)
+                            self?.view.makeToast("login failed!".voice_localized(), point: CGPoint(x: ScreenWidth/2.0, y: ScreenHeight/2.0), title: nil, image: nil, completion: nil)
                         }
                     })
                 }
@@ -181,7 +182,7 @@ extension VRRoomsViewController {
                             }
                         }
                     } else {
-                        self.view.makeToast("Incorrect Password".localized())
+                        self.view.makeToast("voice_incorrect_password".voice_localized())
                     }
                 }
                 vc.dismiss(animated: true)
@@ -207,7 +208,7 @@ extension VRRoomsViewController {
     }
 
     private func loginIMThenPush(room: VRRoomEntity) {
-        SVProgressHUD.show(withStatus: "Loading".localized())
+        SVProgressHUD.show(withStatus: "voice_loading".voice_localized())
         NetworkManager.shared.generateToken(channelName: room.channel_id ?? "", uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
             VLUserCenter.user.agoraRTCToken = token ?? ""
             ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in

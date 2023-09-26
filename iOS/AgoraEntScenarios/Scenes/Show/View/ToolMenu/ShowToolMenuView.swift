@@ -13,7 +13,6 @@ enum ShowToolMenuType: CaseIterable {
     case camera
     case mic
     case real_time_data
-    case HD
     case setting
     case mute_mic
     case end_pk
@@ -24,7 +23,6 @@ enum ShowToolMenuType: CaseIterable {
         case .camera: return "show_camera"
         case .mic, .mute_mic: return "show_mic"
         case .real_time_data: return "show_realtime"
-        case .HD: return "show_hd"
         case .setting: return "show_setting"
         case .end_pk: return "show_end_pk"
         }
@@ -40,21 +38,20 @@ enum ShowToolMenuType: CaseIterable {
     
     var title: String {
         switch self {
-        case .switch_camera: return "翻转镜头".show_localized
-        case .camera: return "摄像头开".show_localized
-        case .mic: return "麦克风开".show_localized
-        case .real_time_data: return "实时数据".show_localized
-        case .HD: return "画质".show_localized
-        case .setting: return "高级设置".show_localized
-        case .mute_mic: return "静音".show_localized
-        case .end_pk: return "结束连麦".show_localized
+        case .switch_camera: return "show_setting_switch_camera".show_localized
+        case .camera: return "show_setting_video_on".show_localized
+        case .mic: return "show_setting_mic_on".show_localized
+        case .real_time_data: return "show_setting_statistic".show_localized
+        case .setting: return "show_setting_advance_setting".show_localized
+        case .mute_mic: return "show_setting_mute".show_localized
+        case .end_pk: return "show_setting_end_mic_seat".show_localized
         }
     }
     var selectedTitle: String? {
         switch self {
-        case .camera: return "摄像头关".show_localized
-        case .mic: return "麦克风关".show_localized
-        case .mute_mic: return "取消静音".show_localized
+        case .camera: return "show_setting_video_off".show_localized
+        case .mic: return "show_setting_mic_off".show_localized
+        case .mute_mic: return "show_setting_unmute".show_localized
         default: return title
         }
     }
@@ -116,9 +113,9 @@ class ShowToolMenuView: UIView {
             case .idle_broadcaster:
                 updateToolType(type: [.switch_camera, .camera, .mic, .real_time_data, .setting])
             case .pking:
-                updateToolType(type: [.switch_camera, .camera, .mute_mic, .end_pk])
+                updateToolType(type: [.switch_camera, .camera, .mute_mic, .end_pk, .real_time_data])
             case .managerMic:
-                updateToolType(type: [.mute_mic, .end_pk])
+                updateToolType(type: [.mute_mic, .end_pk, .real_time_data])
             case .idle_audience:
                 updateToolType(type: [.real_time_data, .setting])
             }

@@ -8,8 +8,6 @@
 import UIKit
 import ZSwiftBaseLib
 
-let chatViewWidth = ScreenWidth * (287 / 375.0)
-
 public class VoiceRoomChatView: UIView, UITableViewDelegate, UITableViewDataSource {
     var likeAction: ((UIButton) -> Void)?
 
@@ -36,7 +34,7 @@ public class VoiceRoomChatView: UIView, UITableViewDelegate, UITableViewDataSour
         addSubViews([blurView, likeView, emitter])
         blurView.layer.mask = gradientLayer
         blurView.addSubview(chatView)
-        likeView.setImage(UIImage("unlike"), for: .normal)
+        likeView.setImage(UIImage.sceneImage(name: "unlike", bundleName: "VoiceChatRoomResource"), for: .normal)
         chatView.bounces = false
         chatView.allowsSelection = false
     }

@@ -7,7 +7,7 @@
 #import "VLAddRoomModel.h"
 #import "VLMacroDefine.h"
 #import "VLToast.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 #import "MenuUtils.h"
 #import "AgoraEntScenarios-Swift.h"
 
@@ -48,13 +48,13 @@
     UILabel *roomTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(40, iconImgView.bottom+VLREALVALUE_WIDTH(40), 70, 20)];
     roomTitleLabel.font = UIFontMake(14);
     roomTitleLabel.textColor = UIColorMakeWithHex(@"#000000");
-    roomTitleLabel.text = AGLocalizedString(@"房间标题");
+    roomTitleLabel.text = AGLocalizedString(@"ktv_room_title");
     [self addSubview:roomTitleLabel];
     
 //    QMUIButton *randomBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_randomIcon"]
 //                                                             title:KTVLocalizedString(@"随机")];
     UIButton *randomBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [randomBtn setTitle:KTVLocalizedString(@"随机") forState:UIControlStateNormal];
+    [randomBtn setTitle:KTVLocalizedString(@"ktv_random") forState:UIControlStateNormal];
     [randomBtn setImage:[UIImage sceneImageWithName:@"online_create_randomIcon"] forState:UIControlStateNormal];
 //    randomBtn.imagePosition = QMUIButtonImagePositionLeft;
     randomBtn.spacingBetweenImageAndTitle = 3;
@@ -84,12 +84,12 @@
     UILabel *secretLabel = [[UILabel alloc]initWithFrame:CGRectMake(40, inputBgView.bottom+VLREALVALUE_WIDTH(30), 100, 20)];
     secretLabel.font = UIFontMake(14);
     secretLabel.textColor = UIColorMakeWithHex(@"#000000");
-    secretLabel.text = KTVLocalizedString(@"房间是否加密");
+    secretLabel.text = KTVLocalizedString(@"ktv_room_is_encryption");
     [secretLabel sizeToFit];
     [self addSubview:secretLabel];
 
     UIButton *publicBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [publicBtn setTitle:KTVLocalizedString(@"公开") forState:UIControlStateNormal];
+    [publicBtn setTitle:KTVLocalizedString(@"ktv_open") forState:UIControlStateNormal];
     [publicBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
     publicBtn.frame = CGRectMake(secretLabel.left-3, secretLabel.bottom+13, 58, 24);
     publicBtn.spacingBetweenImageAndTitle = 3;
@@ -106,7 +106,7 @@
     [publicBtn sizeToFit];
     
     UIButton *screatBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [screatBtn setTitle:KTVLocalizedString(@"加密") forState:UIControlStateNormal];
+    [screatBtn setTitle:KTVLocalizedString(@"ktv_encryption") forState:UIControlStateNormal];
     [screatBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
     screatBtn.frame = CGRectMake(publicBtn.right+40, publicBtn.top, 58, 24);
     screatBtn.spacingBetweenImageAndTitle = 3;
@@ -126,7 +126,7 @@
     self.screatView.hidden = YES;
     [self addSubview:self.screatView];
 
-    VRVerifyCodeView *pwdView = [[VRVerifyCodeView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH-80, 55) codeNumbers:4 space:10 padding:10];
+    VerifyCodeView *pwdView = [[VerifyCodeView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH-80, 55) codeNumbers:4 space:10 padding:10];
     pwdView.inputFinish = ^(NSString * _Nonnull pwd) {
         weakSelf.addRoomModel.password = pwd;
     };
@@ -135,7 +135,7 @@
     UILabel *setLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 55+12, 150, 17)];
     setLabel.font = UIFontMake(12);
     setLabel.textColor = UIColorMakeWithHex(@"#FA396A");
-    setLabel.text = KTVLocalizedString(@"请设置4位数房间密码");
+    setLabel.text = KTVLocalizedString(@"ktv_please_input_4_pwd");
     [setLabel sizeToFit];
     [self.screatView addSubview:setLabel];
     
@@ -143,7 +143,7 @@
     createBtn.layer.cornerRadius = 24;
     createBtn.layer.masksToBounds = YES;
     [createBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
-    [createBtn setTitle:KTVLocalizedString(@"创建") forState:UIControlStateNormal];
+    [createBtn setTitle:KTVLocalizedString(@"ktv_create") forState:UIControlStateNormal];
     createBtn.titleLabel.font = UIFontBoldMake(16.0);
     createBtn.adjustsImageWhenHighlighted = NO;
     [createBtn addTarget:self action:@selector(createBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
@@ -155,7 +155,7 @@
     UILabel *topLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-160)*0.5+5, createBtn.top-20-30, 160, 17)];
     topLabel.font = UIFontMake(12);
     topLabel.textColor = UIColorMakeWithHex(@"#6C7192");
-    topLabel.text = KTVLocalizedString(@"本应用为测试产品，请勿商用");
+    topLabel.text = KTVLocalizedString(@"ktv_create_tips2");
     [self addSubview:topLabel];
     
     UIImageView *tipImgView = [[UIImageView alloc]initWithFrame:CGRectMake(topLabel.left-16, topLabel.centerY-7.5, 16, 15)];
@@ -166,7 +166,7 @@
     bottomLabel.font = UIFontMake(12);
     bottomLabel.textAlignment = NSTextAlignmentCenter;
     bottomLabel.textColor = UIColorMakeWithHex(@"#6C7192");
-    bottomLabel.text = KTVLocalizedString(@"单次K歌最长20分钟，每个房间最多8人");
+    bottomLabel.text = KTVLocalizedString(@"ktv_create_tips3");
     [self addSubview:bottomLabel];
     
     [self randomBtnClickEvent];
@@ -182,7 +182,7 @@
 
 - (void)createBtnClickEvent {
     if (!(self.inputTF.text.length > 0)) {
-        [VLToast toast:KTVLocalizedString(@"请输入标题")];
+        [VLToast toast:KTVLocalizedString(@"ktv_insert_title")];
     }
     self.addRoomModel.name = self.inputTF.text;
     if (self.delegate && [self.delegate respondsToSelector:@selector(createBtnAction:)]) {

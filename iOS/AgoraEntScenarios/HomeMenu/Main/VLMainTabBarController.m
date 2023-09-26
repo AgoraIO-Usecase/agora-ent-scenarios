@@ -10,7 +10,7 @@
 #import "VLMacroDefine.h"
 #import "BaseNavigationController.h"
 #import "MenuUtils.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @interface VLMainTabBarController ()<CALayerDelegate, UITabBarControllerDelegate>
 @property (nonatomic, assign) NSInteger doubleCount;
@@ -81,13 +81,13 @@
 
 - (UITabBarItem*)tabBarItemsWithIndex:(NSUInteger)index {
     NSArray* tabBarItems = @[
-        [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"首页")
+        [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"app_title_home")
                                       image:[self tabbarImageWithImageNamed:@"Tab_home_normal"]
                               selectedImage:[self tabbarImageWithImageNamed:@"Tab_home_sel"]],
       //  [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"发现")
 //                                      image:[self tabbarImageWithImageNamed:@"Tab_discovery_normal"]
 //                              selectedImage:[self tabbarImageWithImageNamed:@"Tab_discovery_sel"]],
-        [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"我的")
+        [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"app_title_mine")
                                       image:[self tabbarImageWithImageNamed:@"Tab_mine_normal"]
                               selectedImage:[self tabbarImageWithImageNamed:@"Tab_mine_sel"]]
     ];

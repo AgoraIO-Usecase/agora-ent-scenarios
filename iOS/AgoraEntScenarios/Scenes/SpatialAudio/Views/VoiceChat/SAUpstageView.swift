@@ -44,7 +44,7 @@ class SAUpstageView: UIView {
         addSubview(titleLabel)
 
         canBtn.frame = CGRect(x: 30, y: 115, width: 150, height: 40)
-        canBtn.setTitle("Cancel", for: .normal)
+        canBtn.setTitle("spatial_voice_cancel".spatial_localized(), for: .normal)
         canBtn.setTitleColor(.black, for: .normal)
         canBtn.backgroundColor = UIColor(red: 239 / 255.0, green: 244 / 255.0, blue: 1, alpha: 1)
         canBtn.addTargetFor(self, action: #selector(can), for: .touchUpInside)
@@ -53,7 +53,7 @@ class SAUpstageView: UIView {
         addSubview(canBtn)
 
         subBtn.frame = CGRect(x: ScreenWidth - 180, y: 115, width: 150, height: 40)
-        subBtn.setTitle("Submit", for: .normal)
+        subBtn.setTitle("spatial_voice_submit".voice_localized(), for: .normal)
         subBtn.addTargetFor(self, action: #selector(sub), for: .touchUpInside)
         subBtn.setTitleColor(.white, for: .normal)
         addSubview(subBtn)

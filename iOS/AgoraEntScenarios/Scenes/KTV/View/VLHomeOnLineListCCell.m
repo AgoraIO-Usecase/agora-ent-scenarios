@@ -4,11 +4,10 @@
 //
 
 #import "VLHomeOnLineListCCell.h"
-#import "VLRoomListModel.h"
 #import "VLHotSpotBtn.h"
 #import "VLMacroDefine.h"
 #import "VLFontUtils.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import Masonry;
 
 @interface VLHomeOnLineListCCell()
@@ -68,7 +67,7 @@
     self.joinBtn.layer.cornerRadius = 12;
     [self.joinBtn setBackgroundColor:UIColorWhite];
     self.joinBtn.layer.masksToBounds = YES;
-    [self.joinBtn setTitle:KTVLocalizedString(@"加入") forState:UIControlStateNormal];
+    [self.joinBtn setTitle:KTVLocalizedString(@"ktv_join") forState:UIControlStateNormal];
     [self.joinBtn setTitleColor:UIColorMakeWithHex(@"#009FFF") forState:UIControlStateNormal];
     self.joinBtn.titleLabel.font = VLUIFontMake(12);
     self.joinBtn.userInteractionEnabled = false;

@@ -24,7 +24,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
     public var directionType: SA3DUserDirectionType = .AgoraChatRoom3DUserDirectionTypeDown {
         didSet {
             rtcUserView.snp.updateConstraints { make in
-                make.top.equalTo(self.contentView).offset(directionType == .AgoraChatRoom3DUserDirectionTypeUp ? 0~ : 40~)
+                make.top.equalTo(self.contentView).offset(directionType == .AgoraChatRoom3DUserDirectionTypeUp ? 0 : 40)
             }
             contentView.layoutIfNeeded()
         }
@@ -42,13 +42,13 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true
             rtcUserView.bgIconView.isHidden = false
-            rtcUserView.bgIconView.image = UIImage("icons／solid／add")
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
         case 0:
             rtcUserView.iconView.isHidden = false
             rtcUserView.micView.isHidden = false
             rtcUserView.micView.setState(.on)
             rtcUserView.bgIconView.isHidden = true
-            rtcUserView.nameBtn.setImage(UIImage(""), for: .normal)
+            rtcUserView.nameBtn.setImage(UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"), for: .normal)
         case 1:
             // 需要区分有用户还是没有用户
             bgIcon = mic.member == nil ? "icons／solid／mute" : ""
@@ -58,7 +58,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             } else {
                 rtcUserView.micView.isHidden = true
             }
-            rtcUserView.bgIconView.image = UIImage(bgIcon)
+            rtcUserView.bgIconView.image = UIImage.spatial_image(bgIcon)
             rtcUserView.bgIconView.isHidden = mic.member != nil
         case 2:
             bgIcon = mic.member == nil ? "icons／solid／mute" : ""
@@ -68,18 +68,18 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             } else {
                 rtcUserView.micView.isHidden = true
             }
-            rtcUserView.bgIconView.image = UIImage(bgIcon)
+            rtcUserView.bgIconView.image = UIImage.spatial_image(bgIcon)
             rtcUserView.bgIconView.isHidden = mic.member != nil
         case 3:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true
-            rtcUserView.bgIconView.image = UIImage("icons／solid／lock")
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
             rtcUserView.bgIconView.isHidden = false
         case 4:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = false
             rtcUserView.micView.setState(.forbidden)
-            rtcUserView.bgIconView.image = UIImage("icons／solid／lock")
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
             rtcUserView.bgIconView.isHidden = false
         case 5:
             rtcUserView.iconView.isHidden = true
@@ -99,9 +99,9 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
         if status != 5 && status != -2 {
             rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: nil)
         } else {
-            rtcUserView.iconView.image = UIImage(mic.member?.portrait ?? "")
+            rtcUserView.iconView.image = UIImage.spatial_image(mic.member?.portrait ?? "")
         }
-        rtcUserView.nameBtn.setImage(UIImage((mic.mic_index == 0 || mic.mic_index == 3 || mic.mic_index == 6) ? "Landlord" : ""), for: .normal)
+        rtcUserView.nameBtn.setImage(UIImage.spatial_image((mic.mic_index == 0 || mic.mic_index == 3 || mic.mic_index == 6) ? "Landlord" : ""), for: .normal)
         let title = mic.status == -1 ? "\(mic.mic_index)" : (mic.member?.name ?? "\(mic.mic_index)")
         rtcUserView.nameBtn.setTitle(title, for: .normal)
     }
@@ -119,7 +119,6 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
     }
 
@@ -138,7 +137,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
 
         rtcUserView.snp.makeConstraints { make in
             make.left.right.bottom.equalTo(self.contentView)
-            make.top.equalTo(self.contentView).offset(-20~)
+            make.top.equalTo(self.contentView).offset(-20)
         }
         layoutIfNeeded()
         
