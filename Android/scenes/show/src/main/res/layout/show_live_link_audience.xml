@@ -63,7 +63,7 @@
         android:textSize="14sp"
         android:textColor="@color/black"
         android:layout_marginTop="20dp"
-        android:text="待上麦队列"
+        android:text="@string/show_get_in_line"
         app:layout_constraintTop_toBottomOf="@id/textLinking"/>
 
     <com.scwang.smart.refresh.layout.SmartRefreshLayout

@@ -15,10 +15,8 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import io.agora.rtc2.RtcConnection
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.BaseViewBindingActivity
-import io.agora.scene.base.manager.UserManager
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
 import io.agora.scene.show.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.show.service.ShowRoomDetailModel
@@ -66,8 +64,6 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
             true
         )
     }
-
-    private val mVideoSwitcher by lazy { RtcEngineInstance.videoSwitcher }
 
     private val POSITION_NONE = -1
     private val vpFragments = SparseArray<LiveDetailFragment>()
@@ -148,15 +144,15 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         TokenGenerator.expireSecond =
             ROOM_AVAILABLE_DURATION / 1000 + 10 // 20min + 10s，加10s防止临界条件下报token无效
 
-        // 设置预加载
+//        // 设置预加载
         val preloadCount = 3
-        mVideoSwitcher.setPreloadCount(preloadCount)
-        mVideoSwitcher.preloadConnections(mRoomInfoList.map {
-            RtcConnection(
-                it.roomId,
-                UserManager.getInstance().user.id.toInt()
-            )
-        })
+//        mVideoSwitcher.setPreloadCount(preloadCount)
+//        mVideoSwitcher.preloadConnections(mRoomInfoList.map {
+//            RtcConnection(
+//                it.roomId,
+//                UserManager.getInstance().user.id.toInt()
+//            )
+//        })
 
         // 设置vp当前页面外的页面数
         binding.viewPager2.offscreenPageLimit = preloadCount - 2
@@ -188,24 +184,21 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
                 private var lastOffset = 0f
                 private var scrollStatus: Int = ViewPager2.SCROLL_STATE_IDLE
 
-                private var hasPageSelected = false
-
                 override fun onPageScrollStateChanged(state: Int) {
                     super.onPageScrollStateChanged(state)
-                    Log.d(TAG, "PageChange onPageScrollStateChanged state=$state hasPageSelected=$hasPageSelected")
+                    Log.d(TAG, "PageChange onPageScrollStateChanged state=$state")
                     when(state){
-                        ViewPager2.SCROLL_STATE_SETTLING -> binding.viewPager2.isUserInputEnabled = false
+                        ViewPager2.SCROLL_STATE_SETTLING -> {
+                            binding.viewPager2.isUserInputEnabled = false
+                        }
                         ViewPager2.SCROLL_STATE_IDLE -> {
                             binding.viewPager2.isUserInputEnabled = true
-                            if(!hasPageSelected){
-                                if(preLoadPosition != POSITION_NONE){
-                                    vpFragments[preLoadPosition]?.stopLoadPage()
-                                }
-                                vpFragments[currLoadPosition]?.reLoadPage()
-                                preLoadPosition = POSITION_NONE
-                                lastOffset = 0f
+                            if(preLoadPosition != POSITION_NONE){
+                                vpFragments[preLoadPosition]?.stopLoadPage(true)
                             }
-                            hasPageSelected = false
+                            vpFragments[currLoadPosition]?.reLoadPage()
+                            preLoadPosition = POSITION_NONE
+                            lastOffset = 0f
                         }
                     }
                     scrollStatus = state
@@ -217,7 +210,7 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
                     positionOffsetPixels: Int
                 ) {
                     super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                    Log.d(TAG, "PageChange onPageScrolled positionOffset=$positionOffset")
+                    Log.d(TAG, "PageChange onPageScrolled positionOffset=$positionOffset, scrollStatus=$scrollStatus, preLoadPosition=$preLoadPosition")
                     if (scrollStatus == ViewPager2.SCROLL_STATE_DRAGGING) {
                         if (lastOffset > 0f) {
                             val isMoveUp = (positionOffset - lastOffset) > 0
@@ -242,20 +235,20 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
                     if (currLoadPosition != POSITION_NONE) {
                         if (preLoadPosition != POSITION_NONE) {
                             if (position == preLoadPosition) {
-                                vpFragments[currLoadPosition]?.stopLoadPage()
+                                vpFragments[currLoadPosition]?.stopLoadPage(true)
                             } else {
-                                vpFragments[preLoadPosition]?.stopLoadPage()
+                                vpFragments[preLoadPosition]?.stopLoadPage(true)
                                 vpFragments[currLoadPosition]?.reLoadPage()
                             }
-                        } else if (currLoadPosition != position) {
-                            vpFragments[currLoadPosition]?.stopLoadPage()
+                        }
+                        if (currLoadPosition != position) {
+                            vpFragments[currLoadPosition]?.stopLoadPage(true)
                             vpFragments[position]?.startLoadPageSafely()
                         }
                     }
                     currLoadPosition = position
                     preLoadPosition = POSITION_NONE
                     lastOffset = 0f
-                    hasPageSelected = true
                 }
 
             })
@@ -268,14 +261,13 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         }
     }
 
-
-    override fun onDestroy() {
-        super.onDestroy()
-        vpFragments[currLoadPosition]?.stopLoadPage()
+    override fun finish() {
+        vpFragments[currLoadPosition]?.stopLoadPage(false)
         VideoSetting.resetBroadcastSetting()
         VideoSetting.resetAudienceSetting()
         TokenGenerator.expireSecond = -1
         RtcEngineInstance.beautyProcessor.reset()
-        RtcEngineInstance.destroy()
+        RtcEngineInstance.cleanCache()
+        super.finish()
     }
 }
