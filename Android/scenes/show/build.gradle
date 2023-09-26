@@ -2,7 +2,7 @@ ext { ktv_is_modular = false }
 apply from: 'vendors.gradle'
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_SHOW = "3.2.0"
+final def VERSION_SCENE_SHOW = "3.2.1"
 
 android {
     defaultConfig {
