@@ -6,7 +6,6 @@
 //
 
 #import "AgoraEntScenarios-Swift.h"
-#import "KTVServiceProtocol.h"
 @import AgoraRtcKit;
 NS_ASSUME_NONNULL_BEGIN
 

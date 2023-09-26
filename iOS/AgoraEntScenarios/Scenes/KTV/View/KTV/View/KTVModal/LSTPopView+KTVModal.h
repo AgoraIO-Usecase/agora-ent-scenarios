@@ -8,7 +8,6 @@
 #import <LSTPopView/LSTPopView.h>
 #import "VLPopMoreSelView.h"
 #import "VLPopSelBgView.h"
-#import "VLRoomSeatModel.h"
 #import "VLDropOnLineView.h"
 #import "VLAudioEffectPicker.h"
 #import "VLBadNetWorkView.h"

@@ -11,7 +11,7 @@ import ZSwiftBaseLib
 import AgoraChat.AgoraChatError
 import AgoraSyncManager
 
-private let cSceneId = "scene_chatRoom_3.0.0"
+private let kSceneId = "scene_chatRoom_3.0.1"
 
 
 private func agoraPrint(_ message: String) {
@@ -701,7 +701,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             return
         }
         SyncUtil.reset()
-        SyncUtil.initSyncManager(sceneId: cSceneId) {
+        SyncUtil.initSyncManager(sceneId: kSceneId) {
 //            guard let self = self else {
 //                return
 //            }
@@ -751,7 +751,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     func limitError() -> VoiceRoomError {
         let error = VoiceRoomError()
         error.code = "403"
-        error.message = "Members reach limit!".localized()
+        error.message = "voice_members_reach_limit".voice_localized()
         return error
     }
 

@@ -17,7 +17,7 @@ def all_pods
 #  pod 'MBProgressHUD', '~> 1.1.0'
   pod 'SVProgressHUD', '2.2.5'
   # 加载图片
-  pod 'SDWebImage', '~> 4.2'
+  pod 'SDWebImage', '4.4.8'
   pod 'SDWebImageAPNGCoder'
   # Model
   pod 'YYModel', '1.0.4'
@@ -32,23 +32,23 @@ def all_pods
   pod 'JXCategoryView', '1.6.1'
 
   # 火山美颜
-#  pod 'BytedEffect', :path => 'bytedEffect.podspec'
+  pod 'BytedEffect', :path => 'bytedEffect.podspec'
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
   
-  pod 'AgoraSyncManager', '~> 2.0.8'
+  pod 'AgoraSyncManager', '2.1.1'
 
-#  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 # pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
-  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.142'
+  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.16'
 
+  pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
 
   #ThirdParty
   pod 'HWWeakTimer', '1.0'
   pod 'LSTPopView', '0.3.10'
-  pod 'SocketRocket', '0.6.0'
+  pod 'SocketRocket', '0.7.0'
   pod 'Agora-Scene-Utils', '1.1.0'
   
   #歌词组件

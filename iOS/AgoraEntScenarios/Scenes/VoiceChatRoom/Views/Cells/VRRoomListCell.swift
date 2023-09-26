@@ -12,7 +12,7 @@ import ZSwiftBaseLib
 public final class VRRoomListCell: UITableViewCell {
     var entity = VRRoomEntity()
 
-    lazy var background: UIImageView = .init(frame: CGRect(x: 20, y: 15, width: ScreenWidth - 40, height: self.frame.height - 15)).image(UIImage("normal_room") ?? UIImage()).backgroundColor(.clear)
+    lazy var background: UIImageView = .init(frame: CGRect(x: 20, y: 15, width: ScreenWidth - 40, height: self.frame.height - 15)).image(UIImage.sceneImage(name: "normal_room", bundleName: "VoiceChatRoomResource") ?? UIImage()).backgroundColor(.clear)
 
     lazy var accessSymbol: UIButton = .init(type: .custom).frame(CGRect(x: 0, y: 0, width: 68, height: 24)).font(UIFont.systemFont(ofSize: 10, weight: .regular)).backgroundColor(.clear)
 
@@ -22,7 +22,7 @@ public final class VRRoomListCell: UITableViewCell {
 
     lazy var seenCount: UIButton = .init(type: .custom).frame(CGRect(x: self.roomName.frame.minX - 10, y: self.background.frame.height - 36, width: 55, height: 16)).isUserInteractionEnabled(false).font(UIFont.systemFont(ofSize: 10, weight: .regular))
 
-    lazy var entryRoom: UIButton = .init(type: .custom).frame(CGRect(x: self.background.frame.width - 72, y: self.background.frame.height - 40, width: 56, height: 24)).font(UIFont.systemFont(ofSize: 12, weight: .semibold)).backgroundColor(.clear).title(LanguageManager.localValue(key: "Enter"), .normal)
+    lazy var entryRoom: UIButton = .init(type: .custom).frame(CGRect(x: self.background.frame.width - 72, y: self.background.frame.height - 40, width: 56, height: 24)).font(UIFont.systemFont(ofSize: 12, weight: .semibold)).backgroundColor(.clear).title(LanguageManager.localValue(key: "voice_enter"), .normal)
 
     lazy var entryBlur: UIView = .init(frame: self.entryRoom.frame).backgroundColor(UIColor(white: 1, alpha: 0.3)).cornerRadius(self.entryRoom.frame.height / 2.0)
 
@@ -38,7 +38,7 @@ public final class VRRoomListCell: UITableViewCell {
         seenCount.titleEdgeInsets(UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5))
         ownerName.titleLabel?.lineBreakMode(.byTruncatingTail)
         ownerName.imageView?.contentMode = .scaleAspectFit
-        seenCount.setImage(UIImage("person_in_circle"), for: .normal)
+        seenCount.setImage(UIImage.sceneImage(name: "person_in_circle", bundleName: "VoiceChatRoomResource"), for: .normal)
         seenCount.imageView?.contentMode = .scaleAspectFit
         seenCount.contentHorizontalAlignment = .left
         seenCount.titleLabel?.lineBreakMode(.byTruncatingTail)
@@ -53,8 +53,8 @@ public final class VRRoomListCell: UITableViewCell {
     func setupViewsAttributes(room: VRRoomEntity) {
         entity = room
         if let show = room.is_private, show == true {
-            accessSymbol.set(image: UIImage("suo"), title: LanguageManager.localValue(key: "Private"), titlePosition: .right, additionalSpacing: 5, state: .normal)
-            accessSymbol.setBackgroundImage(UIImage("securityType"), for: .normal)
+            accessSymbol.set(image: UIImage.sceneImage(name: "suo", bundleName: "VoiceChatRoomResource"), title: LanguageManager.localValue(key: "voice_private"), titlePosition: .right, additionalSpacing: 5, state: .normal)
+            accessSymbol.setBackgroundImage(UIImage.sceneImage(name: "securityType", bundleName: "VoiceChatRoomResource"), for: .normal)
             accessSymbol.isHidden = false
         } else {
             accessSymbol.isHidden = true
@@ -62,15 +62,15 @@ public final class VRRoomListCell: UITableViewCell {
         roomName.text = room.name
         ownerName.setTitle("\(room.owner?.name ?? "")", for: .normal)
         seenCount.setTitle("\(UInt64(room.member_count ?? 0))", for: .normal)
-        ownerName.setImage(UIImage(room.owner?.portrait ?? ""), for: .normal)
+        ownerName.setImage(UIImage.voice_image(room.owner?.portrait ?? ""), for: .normal)
         ownerName.setImage(UIImage(named: "mine_avatar_placeHolder"), for: .normal)
         ownerName.imageView?.sd_setImage(with: URL(string: room.owner?.portrait ?? ""), completed: { image, error, type, url in
             self.ownerName.setImage(image, for: .normal)
         })
         print("avatar: \(room.owner?.portrait ?? "")")
-        var image = UIImage("normal_room")
+        var image = UIImage.sceneImage(name: "normal_room", bundleName: "VoiceChatRoomResource")
         if (room.type ?? 0) == 1 {
-            image = UIImage("specific_room")
+            image = UIImage.sceneImage(name: "specific_room", bundleName: "VoiceChatRoomResource")
         }
         background.image = image
     }

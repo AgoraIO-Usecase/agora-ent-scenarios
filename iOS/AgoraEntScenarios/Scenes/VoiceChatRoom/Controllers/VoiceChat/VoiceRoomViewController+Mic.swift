@@ -99,7 +99,7 @@ extension VoiceRoomViewController {
          */
         if let mic = roomInfo?.mic_info?[index] {
             if mic.status == 2 && isOwner == false {
-                view.makeToast("Banned".localized())
+                view.makeToast("voice_banned".voice_localized())
                 return
             }
         }
@@ -119,7 +119,7 @@ extension VoiceRoomViewController {
     func changeMic(from: Int, to: Int) {
         if let mic: VRRoomMic = roomInfo?.mic_info?[to] {
             if mic.status == 3 || mic.status == 4 {
-                view.makeToast("Mic Closed".localized())
+                view.makeToast("voice_mic_closed".voice_localized())
                 return
             }
         }
@@ -141,8 +141,8 @@ extension VoiceRoomViewController {
 
 
     func showMuteView(with index: Int) {
-        let isHairScreen = SwiftyFitsize.isFullScreen
-        let muteView = VMMuteView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34))
+        let isHairScreen =  Screen.isFullScreen
+        let muteView = VMMuteView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264 : 264 - 34))
         guard let mic_info = roomInfo?.mic_info?[index] else { return }
         muteView.isOwner = isOwner
         muteView.micInfo = mic_info
@@ -156,7 +156,7 @@ extension VoiceRoomViewController {
                 self?.unmuteLocal(with: index)
             }
         }
-        let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34)), custom: muteView)
+        let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: isHairScreen ? 264 : 264 - 34)), custom: muteView)
         presentViewController(vc)
     }
 

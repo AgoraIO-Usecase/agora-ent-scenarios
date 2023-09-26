@@ -8,12 +8,14 @@
 import Foundation
 import UIKit
 
-//#if DEBUG
-//
-//#else
-//public extension UIImage {
-//    convenience init?(_ bundleResourceName: String) {
-//        self.init(named: bundleResourceName, in: Bundle.voiceRoomBundle, with: nil)
-//    }
-//}
-//#endif
+public extension UIImage {
+    
+    static func spatial_image(_ named: String) -> UIImage? {
+        if #available(iOS 13.0, *) {
+            return self.init(named: named, in: Bundle.spatial, with: nil)
+        } else {
+            return self.init(named: named, in: Bundle.spatial, compatibleWith: nil)
+        }
+    }
+
+}

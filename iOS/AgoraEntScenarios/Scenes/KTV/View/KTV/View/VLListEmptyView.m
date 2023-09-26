@@ -5,7 +5,7 @@
 
 #import "VLListEmptyView.h"
 #import "VLMacroDefine.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @implementation VLListEmptyView
 
@@ -19,7 +19,7 @@
 
 - (void)setupView {
     UILabel *introduceLabel = [[UILabel alloc]initWithFrame:CGRectMake(30, 0, SCREEN_WIDTH-60, 90)];
-    NSString *introduceStr = KTVLocalizedString(@"欢迎来到声网在线K歌房，\n 美声音效、歌词同步、打分等九大场景轻松还原\n线下K歌体验，超高音质，以歌会友，一起\n来体验吧！");
+    NSString *introduceStr = KTVLocalizedString(@"ktv_create_tips1");
     introduceLabel.attributedText = [self attributedString:introduceStr fontSize:14 lineSpace:4 wordSpace:0];
     introduceLabel.textAlignment = NSTextAlignmentCenter;
     introduceLabel.numberOfLines = 0;

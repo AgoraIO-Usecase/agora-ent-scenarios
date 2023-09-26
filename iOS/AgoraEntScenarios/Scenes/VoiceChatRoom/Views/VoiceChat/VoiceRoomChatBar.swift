@@ -67,8 +67,8 @@ public class VoiceRoomChatBar: UIView, UICollectionViewDelegate, UICollectionVie
             datas = ["mic", "handuphard", "eq"]
         }
         addSubViews([chatRaiser, toolBar])
-        chatRaiser.setImage(UIImage("chatraise"), for: .normal)
-        chatRaiser.setTitle(" " + "Let's Chat!".localized(), for: .normal)
+        chatRaiser.setImage(UIImage.sceneImage(name: "chatraise", bundleName: "VoiceChatRoomResource"), for: .normal)
+        chatRaiser.setTitle(" " + "voice_let's_chat!".voice_localized(), for: .normal)
         chatRaiser.titleEdgeInsets = UIEdgeInsets(top: chatRaiser.titleEdgeInsets.top, left: 10, bottom: chatRaiser.titleEdgeInsets.bottom, right: 10)
         chatRaiser.imageEdgeInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 80)
         chatRaiser.contentHorizontalAlignment = .left
@@ -83,7 +83,7 @@ public class VoiceRoomChatBar: UIView, UICollectionViewDelegate, UICollectionVie
             pop.cornerRadius = 12
             pop.shouldConsiderCutoutTapSeparately = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                pop.show(customView: UILabel(frame: CGRect(x: 0, y: 0, width: 140, height: 31)).text(LanguageManager.localValue(key: "Try Best Agora Sound")).font(.systemFont(ofSize: 12, weight: .regular)).textAlignment(.center).backgroundColor(UIColor(0x0CA5FD)).textColor(.white), direction: .up, in: self, from: CGRect(x: self.frame.width - (style == .normal ? 110 : 55), y: self.toolBar.visibleCells[2].frame.origin.y, width: self.toolBar.visibleCells[2].frame.width, height: self.toolBar.visibleCells[2].frame.height))
+                pop.show(customView: UILabel(frame: CGRect(x: 0, y: 0, width: 140, height: 31)).text("voice_try_best_agora_sound".voice_localized()).font(.systemFont(ofSize: 12, weight: .regular)).textAlignment(.center).backgroundColor(UIColor(0x0CA5FD)).textColor(.white), direction: .up, in: self, from: CGRect(x: self.frame.width - (style == .normal ? 110 : 55), y: self.toolBar.visibleCells[2].frame.origin.y, width: self.toolBar.visibleCells[2].frame.width, height: self.toolBar.visibleCells[2].frame.height))
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
                 pop.hide()
@@ -165,7 +165,7 @@ extension VoiceRoomChatBar {
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VoiceRoomChatBarCell", for: indexPath) as? VoiceRoomChatBarCell
-        cell?.icon.image = UIImage(datas[indexPath.row])
+        cell?.icon.image = UIImage.voice_image(datas[indexPath.row])
         if indexPath.row == 1, creator, handsState != .selected {
             cell?.redDot.isHidden = false
         } else {

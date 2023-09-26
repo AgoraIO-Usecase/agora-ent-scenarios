@@ -4,8 +4,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "VLRoomSelSongModel.h"
-#import "KTVServiceProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @class VLSongList;

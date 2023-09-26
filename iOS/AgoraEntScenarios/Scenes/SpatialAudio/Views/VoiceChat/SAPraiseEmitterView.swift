@@ -36,7 +36,7 @@ public class SAPraiseEmitterView: UIView, CAAnimationDelegate {
             deleteLayers.removeAll { $0 == shipLayer }
         } else {
             shipLayer = CALayer()
-            shipLayer?.contents = UIImage(images[Int(count) % images.count])?.cgImage
+            shipLayer?.contents = UIImage.spatial_image(images[Int(count) % images.count])?.cgImage
             shipLayer?.contentsScale = UIScreen.main.scale
             shipLayer?.frame = CGRect(x: bounds.width / 2.0, y: bounds.height, width: 40, height: 40)
             shipLayer?.transform = CATransform3DRotate(CATransform3DIdentity, CGFloat(Double.pi / 2.0), 0, 0, 1)
