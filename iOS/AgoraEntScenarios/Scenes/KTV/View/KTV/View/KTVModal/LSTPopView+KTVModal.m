@@ -180,10 +180,12 @@
                                          showView:(VLVoiceShowView*)showView
                                    imgSource:(NSArray *)imgSource
                                     nameSource:(NSArray *)nameSource
-                                  selectIndex:(NSInteger)index
+                                  selectUserNo:(NSString *)selectUserNo
+                                  userNoArray:(NSArray *)userNoArray
+                                 UIUpdateAble:(BOOL)UIUpdateAble
                                       withDelegate:(id<VLVoiceShowViewDelegate>)delegate {
     CGFloat popViewH = 88+17+ (imgSource.count > 4 ? 200 : 100)+kSafeAreaBottomHeight;
-    VLVoiceShowView* voiceView = [[VLVoiceShowView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:delegate imgSource:imgSource nameSource:nameSource selectIndex:index
+    VLVoiceShowView* voiceView = [[VLVoiceShowView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:delegate imgSource:imgSource nameSource:nameSource userNoArray:userNoArray selectUserNo:selectUserNo UIUpdateAble:UIUpdateAble
                                                                                              ];
     LSTPopView* popView = [self _createKTVPopContainerWithContentView:voiceView
                                                        withParentView:parentView];

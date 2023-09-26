@@ -126,6 +126,8 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) BOOL voiceShowHasSeted;
 @property (nonatomic, assign) BOOL aecState; //AIAEC开关
 @property (nonatomic, assign) NSInteger aecLevel; //AEC等级
+@property (nonatomic, assign) NSString *selectUserNo;
+@property (nonatomic, strong) UIButton *testButton;
 @end
 
 @implementation VLKTVViewController
@@ -139,6 +141,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [super viewDidLoad];
     self.view.backgroundColor = UIColor.blackColor;
     self.selectedVoiceShowIndex = -1;
+    self.selectUserNo = @"";
     self.checkType = checkAuthTypeAll;
 
     [self subscribeServiceEvent];
@@ -194,6 +197,13 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     
     self.earValue = 100;
     
+    //测试使用
+    _testButton = [[UIButton alloc]initWithFrame:CGRectMake((SCREEN_WIDTH - 60)/2.0, SCREEN_HEIGHT - 60, 60, 40)];
+    _testButton.backgroundColor = [UIColor redColor];
+    [_testButton addTarget:self action:@selector(testCosinger) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_testButton];
+    [_testButton setHidden:true];
+    
     if(AppContext.shared.isDebugMode){
         //如果开启了debug模式
         UIButton *debugBtn = [[UIButton alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 200, 80, 80)];
@@ -205,6 +215,11 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         [debugBtn addTarget:self action:@selector(showDebug) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:debugBtn];
     }
+}
+
+-(void)testCosinger{
+    [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleLeadSinger onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+    }];
 }
 
 -(void)showDebug {
@@ -404,18 +419,22 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     NSArray *array = [self getChorusSingerArrayWithSeatArray:self.seatsArray];
     NSMutableArray *nameArray = [NSMutableArray array];
     NSMutableArray *imgArray = [NSMutableArray array];
+    NSMutableArray *userNoArray = [NSMutableArray array];
     if(array.count > 1){
         for(int i=0;i<array.count;i++){
             VLRoomSeatModel *model = array[i];
             [nameArray addObject:model.name];
             [imgArray addObject:model.headUrl];
+            [userNoArray addObject:model.userNo];
         }
     }
     if(array.count == 0){
         NSLog(@"没有唱歌的人");
     }
+    
+    NSString *userNo = self.selectedVoiceShowIndex == -2 ? @"" : self.selectUserNo;
     LSTPopView* popView =
-    [LSTPopView popVoiceShowViewWithParentView:self.view showView:self.voiceShowView imgSource:imgArray nameSource:nameArray selectIndex:self.selectedVoiceShowIndex  withDelegate:self];
+    [LSTPopView popVoiceShowViewWithParentView:self.view showView:self.voiceShowView imgSource:imgArray nameSource:nameArray  selectUserNo:userNo userNoArray:userNoArray UIUpdateAble:self.selectedVoiceShowIndex != -2 withDelegate:self];
     self.voiceShowView = (VLVoiceShowView*)popView.currCustomView;
 }
 
@@ -719,6 +738,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)loadAndPlaySong{
     self.voiceShowHasSeted = false;
     self.selectedVoiceShowIndex = -1;
+    self.selectUserNo = @"";
     self.currentSelectEffect = 0;
     [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
     
@@ -998,7 +1018,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
-
 //设置人声突出
 -(void)checkVoiceShowEffect:(NSInteger)index {
     VLRoomSeatModel *model = [self getChorusSingerArrayWithSeatArray:self.seatsArray][index];
@@ -1084,6 +1103,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
+    if(AppContext.shared.isDebugMode){
+        [self.RTCkit setParameters: @"{\"che.audio.neteq.dump_level\": 1}"];
+    }
     
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:50 smooth:10 reportVad:true];
@@ -1679,7 +1701,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     }
     self.voiceShowHasSeted = true;
-    self.selectedVoiceShowIndex = ItemIndex;
+    self.selectUserNo = self.seatsArray[ItemIndex].userNo;
     [self checkVoiceShowEffect: ItemIndex];
 }
 
@@ -1958,6 +1980,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.MVView changeBgViewByModel:choosedBgModel];
 }
 
+-(void)setVoiceShowHasSeted:(BOOL)voiceShowHasSeted {
+    _voiceShowHasSeted = voiceShowHasSeted;
+}
+
+-(void)setSelectedVoiceShowIndex:(NSInteger)selectedVoiceShowIndex {
+    _selectedVoiceShowIndex = selectedVoiceShowIndex;
+}
+
 - (void)setSeatsArray:(NSArray<VLRoomSeatModel *> *)seatsArray {
     _seatsArray = seatsArray;
     
@@ -1965,9 +1995,55 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     
     //判断突出人声的人是否退出合唱
-    if([self getChorusSingerArrayWithSeatArray:self.seatsArray].count >= 1 && self.selectedVoiceShowIndex != -1){
-        BOOL flag = [self checkIfCosingerWith:self.selectedVoiceShowIndex];
-        if(!flag && self.selectedVoiceShowIndex != -2 && ![self isRoomOwner]){//表示突出的人退出合唱
+//    if([self getChorusSingerArrayWithSeatArray:self.seatsArray].count >= 1 && ![self.selectUserNo isEqualToString:@""] ){
+//        BOOL flag = [self checkIfCosingerWith:self.selectedVoiceShowIndex];
+//        if (self.selectedVoiceShowIndex >= 0 ){
+//            VLRoomSeatModel *model = seatsArray[self.selectedVoiceShowIndex];
+//            if(!flag && self.selectedVoiceShowIndex != -2 && self.singRole == KTVSingRoleSoloSinger){//表示突出的人退出合唱
+//                [VLToast toast:@"人声突出功能已失效，请重设"];
+//                self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
+//                [self.MVView setPerViewAvatar:@""];
+//            }
+//        }
+//    }
+//
+//    if([self isRoomOwner]){
+//        [self.MVView setPerViewHidden:[self getChorusSingerArrayWithSeatArray:_seatsArray].count < 2];
+//        if(self.selSongsArray.count == 0 || (self.voiceShowHasSeted == true && self.selectedVoiceShowIndex == -2) ){
+//            [self.MVView setPerViewAvatar:@""];
+//        }
+//    }
+    
+    //如果退出合唱的人的userNo不存在了说明他退出人生突出了
+    if((![self.selectUserNo isEqualToString:@""] && self.selectUserNo != nil) && self.selectedVoiceShowIndex != -2){
+        //看下麦位上有没有这个人 如果没有就说明它下麦了
+        BOOL flag = false;
+        for(int i = 0;i<seatsArray.count;i++){
+           if([seatsArray[i].userNo isEqualToString:self.selectUserNo] && [seatsArray[i].chorusSongCode isEqualToString:@""] && ![self.selectUserNo isEqualToString:seatsArray.firstObject.userNo]){//退出合唱了
+               flag = true;
+               break;
+           }
+        }
+        if(flag == true && [self isRoomOwner]){// 已下麦
+            [VLToast toast:@"人声突出功能已失效，请重设"];
+            self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
+            [self.MVView setPerViewAvatar:@""];
+        }
+        
+        BOOL offline = false;
+        for(int i = 0;i<seatsArray.count;i++){
+           if([seatsArray[i].userNo isEqualToString:self.selectUserNo]){//直接下麦了
+               offline = true;
+               break;
+           }
+        }
+        if(offline == false && [self isRoomOwner]){// 已下麦
+            [VLToast toast:@"人声突出功能已失效，请重设"];
+            self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
+            [self.MVView setPerViewAvatar:@""];
+        }
+        
+        if([self.selectUserNo isEqualToString:seatsArray.firstObject.userNo] && ([self getChorusNumWithSeatArray:seatsArray] < 1 || (self.singRole == KTVSingRoleAudience && [self isRoomOwner]))){
             [VLToast toast:@"人声突出功能已失效，请重设"];
             self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
             [self.MVView setPerViewAvatar:@""];
@@ -1976,7 +2052,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     if([self isRoomOwner]){
         [self.MVView setPerViewHidden:[self getChorusSingerArrayWithSeatArray:_seatsArray].count < 2];
-        if(self.selSongsArray.count == 0){
+        if(self.selSongsArray.count == 0 || (self.voiceShowHasSeted == true && self.selectedVoiceShowIndex == -2) ){
             [self.MVView setPerViewAvatar:@""];
         }
     }

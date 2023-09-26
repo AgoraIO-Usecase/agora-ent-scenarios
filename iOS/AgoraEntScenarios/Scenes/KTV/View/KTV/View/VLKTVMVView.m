@@ -180,8 +180,8 @@
     _karaokeView.scoringView.viewHeight = 60;
     _karaokeView.scoringView.topSpaces = 5;
    // _karaokeView.lyricsView.textSelectedColor = [UIColor colorWithHexString:@"#33FFFFFF"];
-    _karaokeView.lyricsView.textNormalColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.5];
-    _karaokeView.lyricsView.textHighlightedColor = [UIColor colorWithHexString:@"#FF8AB4"];
+    _karaokeView.lyricsView.inactiveLineTextColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.5];
+    _karaokeView.lyricsView.activeLinePlayedTextColor = [UIColor colorWithHexString:@"#FF8AB4"];
     _karaokeView.lyricsView.lyricLineSpacing = 6;
    // _karaokeView.scoringView.showDebugView = true;
     _karaokeView.backgroundImage = [UIImage imageNamed:@"ktv_top_bgIcon"];

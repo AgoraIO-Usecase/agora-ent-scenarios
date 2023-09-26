@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLVoiceShowView : UIView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLVoiceShowViewDelegate>)delegate imgSource:(NSArray *)imgSource nameSource:(NSArray *)nameSource selectIndex:(NSInteger)selectIndex;
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLVoiceShowViewDelegate>)delegate imgSource:(NSArray *)imgSource nameSource:(NSArray *)nameSource userNoArray: (NSArray *)userNoArray selectUserNo:(NSString *)selectUserNo UIUpdateAble:(BOOL)UIUpdateAble;
 -(void)setSelectedIndex:(NSInteger)index;
 
 @end
