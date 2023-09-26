@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -15,6 +16,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.rtc2.video.SegmentationProperty
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.utils.FileUtils
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.R
 import io.agora.scene.show.RtcEngineInstance
 import io.agora.scene.show.beauty.*
@@ -327,8 +329,11 @@ class BeautyDialog constructor(context: Context) : BottomDarkDialog(context) {
 
         mTopBinding.root.isVisible = false
         mTopBinding.ivCompare.setOnClickListener {
-            beautyProcessor?.apply {
-                setBeautyEnable(!isBeautyEnable())
+            if (beautyProcessor != null) {
+                val old = beautyProcessor?.isBeautyEnable() ?: true
+                beautyProcessor?.setBeautyEnable(!old)
+            } else {
+                ToastUtils.showToast(R.string.show_beauty_license_disable)
             }
         }
     }
@@ -346,7 +351,11 @@ class BeautyDialog constructor(context: Context) : BottomDarkDialog(context) {
     }
 
     fun setBeautyProcessor(processor: IBeautyProcessor) {
-        this.beautyProcessor = processor
+        try { // 美颜license是否存在
+            context.assets.open("LICENSE").use { inputStream ->
+                this.beautyProcessor = processor
+            }
+        } catch (_: Exception) {}
     }
 
     private fun refreshTopLayout(groupId: Int, itemId: Int) {
