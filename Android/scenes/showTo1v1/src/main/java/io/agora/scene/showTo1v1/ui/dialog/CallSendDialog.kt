@@ -26,8 +26,6 @@ class CallSendDialog constructor(
 
     private var listener: CallSendDialogListener? = null
 
-    private var callState = CallDialogState.None
-
     init {
         setContentView(binding.root)
     }
@@ -52,9 +50,6 @@ class CallSendDialog constructor(
     }
 
     override fun updateCallState(state: CallDialogState) {
-        if (callState != state) {
-            callState = state
-        }
     }
 
     private fun onClickHangup() {

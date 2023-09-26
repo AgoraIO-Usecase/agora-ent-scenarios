@@ -431,7 +431,11 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     }
                 }
 
-                CallStateType.Connecting -> mCallDialog?.updateCallState(CallDialogState.Connecting)
+                CallStateType.Connecting ->{
+                    if (stateReason==CallReason.LocalAccepted||stateReason==CallReason.RemoteAccepted){
+                        Log.d(TAG,"call Connecting LocalAccepted or RemoteAccepted")
+                    }
+                }
                 CallStateType.Connected -> {
                     mCallDialog?.let {
                         if (it.isShowing) it.dismiss()

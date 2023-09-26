@@ -7,17 +7,11 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
-import android.graphics.PixelFormat
-import android.graphics.SurfaceTexture
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.SurfaceHolder
-import android.view.SurfaceView
-import android.view.TextureView
-import android.view.TextureView.SurfaceTextureListener
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -25,7 +19,6 @@ import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.contains
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -60,7 +53,6 @@ import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import io.agora.scene.showTo1v1.ui.dialog.CallDetailSettingDialog
 import io.agora.scene.showTo1v1.ui.dialog.CallDialog
-import io.agora.scene.showTo1v1.ui.dialog.CallDialogState
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
 import io.agora.scene.showTo1v1.ui.fragment.DashboardFragment
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
@@ -202,6 +194,18 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
+        // 默认远端都是大窗, 本地是小窗
+        (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
+        if (binding.vDragBigWindow.canvasContainer.childCount > 0) {
+            binding.vDragBigWindow.canvasContainer.removeAllViews()
+        }
+        binding.vDragBigWindow.canvasContainerAddView(mShowTo1v1Manger.mRemoteVideoView)
+        (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
+        if (binding.vDragSmallWindow.canvasContainer.childCount > 0) {
+            binding.vDragSmallWindow.canvasContainer.removeAllViews()
+        }
+        binding.vDragSmallWindow.canvasContainerAddView(mShowTo1v1Manger.mLocalVideoView)
+
         Glide.with(this)
             .load(mRoomInfo.avatar).apply(RequestOptions.circleCropTransform())
             .into(binding.ivUserAvatar)
@@ -262,7 +266,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         binding.includeConnectedView.root.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
                 Log.d(TAG, "click close connection view")
-                mainHandler.removeCallbacks(connectedRun)
+                mainHandler.removeCallbacks(connectedViewCloseRun)
                 animateConnectedViewClose()
             }
 
@@ -455,21 +459,17 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         if (isRoomOwner) {
             if (publish) {
-//                binding.textureVideo.isVisible = true
                 mRtcEngine.setupLocalVideo(VideoCanvas(binding.textureVideo, VideoCanvas.RENDER_MODE_HIDDEN, 0))
             } else {
-//                binding.textureVideo.isVisible = false
                 mRtcEngine.setupLocalVideo(VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, 0))
             }
         } else {
             if (publish) {
-//                binding.textureVideo.isVisible = true
                 mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(binding.textureVideo, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
                     mMainRtcConnection
                 )
             } else {
-//                binding.textureVideo.isVisible = false
                 mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(null, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.getIntUserId()),
                     mMainRtcConnection
@@ -567,7 +567,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         Log.d(TAG, "RoomDetail onBackPressed")
         mRtcEngine.removeHandlerEx(mainRtcListener, mMainRtcConnection)
         mainHandler.removeCallbacks(timerRoomRun)
-        mainHandler.removeCallbacks(connectedRun)
+        mainHandler.removeCallbacks(connectedViewCloseRun)
         mainHandler.removeCallbacksAndMessages(null)
 
 
@@ -602,7 +602,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         mRtcEngine.updateChannelMediaOptionsEx(mainChannelMediaOptions, mMainRtcConnection)
     }
 
-    private val connectedRun = Runnable {
+    private val connectedViewCloseRun = Runnable {
         animateConnectedViewClose()
     }
 
@@ -616,7 +616,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         openAnimator = createOpenAnimator().apply {
             start()
         }
-        mainHandler.postDelayed(connectedRun, 5000)
     }
 
     private fun createOpenAnimator(): AnimatorSet {
@@ -856,7 +855,12 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     }
                 }
 
-                CallStateType.Connecting -> mCallDialog?.updateCallState(CallDialogState.Connecting)
+                CallStateType.Connecting -> {
+                    if (stateReason == CallReason.LocalAccepted || stateReason == CallReason.RemoteAccepted) {
+                        Log.d(TAG, "call Connecting LocalAccepted or RemoteAccepted")
+                    }
+                }
+
                 CallStateType.Connected -> {
                     finishCallDialog()
                     // 开启鉴黄鉴暴
@@ -925,13 +929,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     binding.vDragBigWindow.setSmallType(false)
                     binding.vDragSmallWindow.setSmallType(true)
                 }
-
-                // 默认远端都是大窗, 本地是小窗
-                (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
-                if (binding.vDragBigWindow.canvasContainer.childCount > 0) {
-                    binding.vDragBigWindow.canvasContainer.removeAllViews()
-                }
-                binding.vDragBigWindow.canvasContainerAddView(mShowTo1v1Manger.mRemoteVideoView)
                 mShowTo1v1Manger.mRemoteUser?.let {
                     binding.vDragBigWindow.setUserName(it.userName)
                     // 左上角是大窗的房间和昵称
@@ -943,15 +940,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         .transform(CenterCropRoundCornerTransform(100))
                         .into(binding.ivCallingAvatar)
                 }
-                if (mShowTo1v1Manger.mRemoteUser == null){
-                    Log.d(TAG,"Connected but remoteUser is null")
+                if (mShowTo1v1Manger.mRemoteUser == null) {
+                    Log.d(TAG, "Connected but remoteUser is null")
                 }
-
-                (mShowTo1v1Manger.mLocalVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mLocalVideoView)
-                if (binding.vDragSmallWindow.canvasContainer.childCount > 0) {
-                    binding.vDragSmallWindow.canvasContainer.removeAllViews()
-                }
-                binding.vDragSmallWindow.canvasContainerAddView(mShowTo1v1Manger.mLocalVideoView)
                 mShowTo1v1Manger.mCurrentUser.let {
                     binding.vDragSmallWindow.setUserName(it.userName)
                 }
@@ -963,7 +954,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 binding.layoutNumCount.isVisible = false
                 binding.groupHangup.isVisible = true
 
-
                 if (isRoomOwner) {
                     mShowTo1v1Manger.mRemoteUser?.let {
                         GlideApp.with(this)
@@ -973,20 +963,19 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                             .into(binding.includeConnectedView.ivUserAvatar)
                         binding.includeConnectedView.tvNickname.text = it.userName
                     }
-                    mainHandler.postDelayed({
-                        animateConnectedViewOpen()
-                    },500)
+                    animateConnectedViewOpen()
+                    mainHandler.postDelayed(connectedViewCloseRun, 5000)
                 } else {
                     binding.layoutCallPrivatelyBg.isVisible = false
                     binding.layoutCallPrivately.isVisible = false
                     stopCallAnimator()
                 }
-                mainLooper.queue.addIdleHandler {
-                    Log.d(TAG, "animateConnectedViewOpen -- queueIdle -- 1")
-                    // workaround
-                    onShowSettingDialog(false)
-                    false
-                }
+//                mainLooper.queue.addIdleHandler {
+//                    Log.d(TAG, "animateConnectedViewOpen -- queueIdle -- 1")
+//                    // workaround
+//                    onShowSettingDialog(false)
+//                    false
+//                }
             }
 
             else -> {}
