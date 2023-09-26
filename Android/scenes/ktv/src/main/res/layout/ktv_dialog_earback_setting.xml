@@ -118,7 +118,7 @@
     <View
         android:id="@+id/vSettingMark"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="60dp"
         android:elevation="0.5dp"
         android:background="@color/ktv_dialog_bg_blue"
         android:alpha="0.7"
@@ -259,7 +259,7 @@
         android:layout_height="140dp"
         android:elevation="2dp"
         android:background="@color/ktv_dialog_bg_blue"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:layout_constraintTop_toTopOf="@+id/cvPing"
         />
 
@@ -272,6 +272,7 @@
         android:layout_marginRight="12sp"
         android:layout_marginBottom="20sp"
         android:alpha="0.2"
+        android:visibility="gone"
         app:cardElevation="0dp"
         app:cardBackgroundColor="#08062F"
         app:cardCornerRadius="8sp"
@@ -287,6 +288,7 @@
         android:textColor="@color/white_60_percent"
         android:textSize="13sp"
         android:text="耳返延时"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="@+id/cvPing"
         app:layout_constraintTop_toTopOf="@+id/cvPing" />
 
@@ -297,6 +299,7 @@
         android:layout_marginStart="8dp"
         android:textSize="11sp"
         android:text="请对着耳麦说话，测试实时耳返延时"
+        android:visibility="gone"
         android:textColor="@color/white_60_percent"
         app:layout_constraintStart_toStartOf="@+id/cvPing"
         app:layout_constraintTop_toBottomOf="@+id/tvPingTitle" />
@@ -309,6 +312,7 @@
         android:textColor="#6d7291"
         android:gravity="center"
         android:text="105ms"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="@id/cvPing"
         app:layout_constraintEnd_toEndOf="@+id/cvPing"
         app:layout_constraintTop_toBottomOf="@+id/tvPingInfo" />
@@ -324,6 +328,7 @@
         android:progressDrawable="@drawable/ktv_ear_ping_progress"
         android:max="150"
         android:progress="105"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/cvPing"
         app:layout_constraintTop_toBottomOf="@+id/tvPing"
         />
