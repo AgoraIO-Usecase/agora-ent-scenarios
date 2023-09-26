@@ -47,13 +47,13 @@ class CallReceiveDialog(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding.ivAccept.setOnClickListener {
+        binding.ivAccept.setOnClickListener(DebouncedOnClickListener {
             listener?.onReceiveViewDidClickAccept()
             dismiss()
-        }
-        binding.ivReject.setOnClickListener {
+        })
+        binding.ivReject.setOnClickListener(DebouncedOnClickListener {
             onClickReject()
-        }
+        })
         binding.tvUserName.text = userInfo.userName
         Glide.with(context)
             .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())

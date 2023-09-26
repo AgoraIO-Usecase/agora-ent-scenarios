@@ -1,6 +1,8 @@
 package io.agora.scene.pure1v1.ui
 
 import android.Manifest
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -11,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.animation.Animation
+import android.view.animation.AnimationSet
 import android.view.animation.AnimationUtils
 import android.view.animation.ScaleAnimation
 import android.widget.Toast
@@ -443,14 +446,15 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         }
 
         private fun View.breathAnim() {
-            val scaleAnima = ScaleAnimation(
-                0.8f, 1f, 0.8f, 1f,
-                Animation.RELATIVE_TO_SELF, 0.5f,
-                Animation.RELATIVE_TO_SELF, 0.5f)
-            scaleAnima.duration = 800
-            scaleAnima.repeatCount = Animation.INFINITE
-            scaleAnima.repeatMode = Animation.REVERSE
-            this.startAnimation(scaleAnima)
+            val animator = ObjectAnimator.ofPropertyValuesHolder(
+                this,
+                PropertyValuesHolder.ofFloat("scaleX", 0.8f, 1f, 0.8f),
+                PropertyValuesHolder.ofFloat("scaleY", 0.8f, 1f, 0.8f)
+            )
+            animator.repeatCount = ObjectAnimator.INFINITE
+            animator.repeatMode = ObjectAnimator.REVERSE
+            animator.duration = 1600
+            animator.start()
         }
     }
 
