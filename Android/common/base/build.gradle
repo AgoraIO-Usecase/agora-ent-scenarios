@@ -4,22 +4,11 @@ plugins {
     id 'kotlin-kapt'
 }
 
-if (project.property("AGORA_APP_ID").toString().isEmpty() ||
-        project.property("AGORA_APP_CERTIFICATE").toString().isEmpty()) {
+if (project.property("AGORA_APP_ID").toString().isEmpty()) {
     throw new GradleException("请在 gradle.properties 中配置完整的 Agora ID 和 Certificate")
 }
 
-def versionCtrl = new File(rootProject.projectDir.absolutePath + File.separator + "versionCtrl.properties")
-def properties = new Properties()
-if (versionCtrl.exists()) {
-    versionCtrl.withReader('UTF-8') { reader ->
-        properties.load(reader)
-    }
-}
-final def VERSION_SCENE_VOICE = properties.getProperty("VERSION_SCENE_VOICE")
-final def VERSION_SCENE_SPATIAL_VOICE = properties.getProperty("VERSION_SCENE_SPATIAL_VOICE")
-final def VERSION_SCENE_KTV = properties.getProperty("VERSION_SCENE_KTV")
-final def VERSION_SCENE_SHOW = properties.getProperty("VERSION_SCENE_SHOW")
+//def localsdkPath = "3.0.1-sdk"
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
 
@@ -36,10 +25,6 @@ android {
 
         buildConfigField "String", "APP_VERSION_NAME", "\"${APP_VERSION_NAME}\""
         buildConfigField "String", "APP_VERSION_CODE", "\"${APP_VERSION_CODE}\""
-        buildConfigField "String", "VERSION_SCENE_VOICE", "\"${VERSION_SCENE_VOICE}\""
-        buildConfigField "String", "VERSION_SCENE_SPATIAL_VOICE", "\"${VERSION_SCENE_SPATIAL_VOICE}\""
-        buildConfigField "String", "VERSION_SCENE_KTV", "\"${VERSION_SCENE_KTV}\""
-        buildConfigField "String", "VERSION_SCENE_SHOW", "\"${VERSION_SCENE_SHOW}\""
 
         buildConfigField "String", "SERVER_HOST", "\"${SERVER_HOST}\""
         buildConfigField "String", "TOOLBOX_SERVER_HOST", "\"${TOOLBOX_SERVER_HOST}\""
@@ -47,12 +32,6 @@ android {
         buildConfigField "String", "AGORA_APP_ID", "\"${AGORA_APP_ID}\""
         buildConfigField "String", "AGORA_APP_CERTIFICATE", "\"${AGORA_APP_CERTIFICATE}\""
 
-        buildConfigField "String", "IM_APP_KEY", "\"${IM_APP_KEY}\""
-        buildConfigField "String", "IM_APP_CLIENT_ID", "\"${IM_APP_CLIENT_ID}\""
-        buildConfigField "String", "IM_APP_CLIENT_SECRET", "\"${IM_APP_CLIENT_SECRET}\""
-
-        buildConfigField "String", "CLOUD_PLAYER_KEY", "\"${CLOUD_PLAYER_KEY}\""
-        buildConfigField "String", "CLOUD_PLAYER_SECRET", "\"${CLOUD_PLAYER_SECRET}\""
     }
 
     buildTypes {
@@ -70,6 +49,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+//    sourceSets {
+//        main {
+//            jniLibs.srcDirs += "${localsdkPath}"
+//        }
+//    }
 }
 
 dependencies {
@@ -101,5 +86,6 @@ dependencies {
 
 //    api rootProject.ext.deps.rtm
     api rootProject.ext.deps.rtc
+    //api fileTree(dir: "${localsdkPath}", include: ['*.jar'])
     api rootProject.ext.deps.ok2curl
 }
