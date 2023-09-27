@@ -117,6 +117,8 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         }
         binding.ivConnect.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
+                // 自己创建的房间不让呼叫
+                if (mRoomInfo.userId == mShowTo1v1Manger.mCurrentUser.userId) return
                 onFragmentListener?.onFragmentClickCall(true, mRoomInfo)
             }
         })
