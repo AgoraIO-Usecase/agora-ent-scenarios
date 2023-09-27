@@ -34,7 +34,7 @@ class SBGAttributeView: UIView {
         contentView.addSubview(icon)
         
         endLabel = UILabel(frame: .zero)
-        endLabel.text = " 抢到麦"
+        endLabel.text = " 演唱"
         endLabel.textColor = .white
         contentView.addSubview(endLabel)
     }
@@ -45,7 +45,7 @@ class SBGAttributeView: UIView {
             return
         }
         icon.image = image
-        endLabel.text = " \(owner) 抢到麦"
+        endLabel.text = " \(owner) 演唱"
         let endWidth = textAutoWidth(text: endLabel.text ?? "", height: 25, fontSize: 18)
         let preWidth = textAutoWidth(text: preLabel.text ?? "", height: 25, fontSize: 18)
         let totalWidth = endWidth + preWidth + 25
