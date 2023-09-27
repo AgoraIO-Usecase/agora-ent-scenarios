@@ -153,7 +153,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             self._subscribeAll()
             guard !inited else {
                 self._fetchCreatePkInvitation()
-                self._getUserList(roomId: roomId) {[weak self] (err, list) in
+                self._getUserList(roomId: self.roomId) {[weak self] (err, list) in
                     self?.subscribeDelegate?.onUserCountChanged(userCount: list?.count ?? 0)
                 }
                 return

@@ -111,7 +111,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         )
         var licenseExists = false
         try { // 美颜license是否存在
-            this.assets.open("LICENSE").use { inputStream ->
+            this.assets.open("license/SenseME.lic").use { inputStream ->
                 licenseExists = true
             }
         } catch (_: Exception) {}
