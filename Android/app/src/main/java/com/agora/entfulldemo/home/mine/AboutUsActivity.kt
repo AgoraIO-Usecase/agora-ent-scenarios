@@ -3,7 +3,9 @@ package com.agora.entfulldemo.home.mine
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -29,9 +31,10 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val servicePhone = "400-632-6626"
     private val webSite = "https://www.shengwang.cn/"
 
+    private val kKtvRoomAppID = "io.agora.ktv"
     private val kChatRoomAppID = "io.agora.chatroom"
-    private val kSingBattleRoomAppID = "io.agora.singbattle"
     private val kFullAppID = "io.agora.AgoraVoice"
+    private val kSingBattleRoomAppID = "io.agora.singbattle"
     private val kShowRoomAppID = "io.agora.test.entfull"
 
     private var counts = 0
@@ -52,6 +55,8 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             setupChatRoomAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kFullAppID) {
             setupFullAppInfo()
+        } else if (BuildConfig.APPLICATION_ID == kKtvRoomAppID) {
+            setupKtvRoomAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kSingBattleRoomAppID) {
             setupSingBattleRoomAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kShowRoomAppID) {
@@ -60,6 +65,17 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         setupDebugMode()
         setupClickWebAction()
         setupClickPhoneAction()
+    }
+
+    // 设置K歌房App的信息
+    private fun setupKtvRoomAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        adapter.appInfo = AppInfo(
+            this.getString(R.string.app_about_name),
+            "20230926-" + VersionUtils.getVersion("io.agora.scene.ktv.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+            servicePhone,
+            webSite
+        )
     }
 
     // 设置语聊App的信息
@@ -219,7 +235,6 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         dialog.onButtonClickListener = object : OnButtonClickListener {
             override fun onLeftButtonClick() {}
             override fun onRightButtonClick() {
-                counts = 0
                 binding.tvDebugMode.visibility = View.GONE
                 AgoraApplication.the().enableDebugMode(false)
                 ToastUtils.showToast(R.string.app_debug_off)

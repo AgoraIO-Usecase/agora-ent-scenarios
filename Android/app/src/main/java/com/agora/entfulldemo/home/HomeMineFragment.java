@@ -57,7 +57,6 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
 
     @Override
     public void initView() {
-        String versionString = "20230530-" + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion();
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         mainViewModel.setLifecycleOwner(this);
     }

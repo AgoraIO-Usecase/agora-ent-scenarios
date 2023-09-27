@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_dialog_music_settings"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_full_blue_top_20"
@@ -28,20 +30,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ktv_music_menu_dialog_ear"
-            android:textColor="@color/def_text_grey_979" />
+            android:textColor="@color/white" />
 
-        <androidx.appcompat.widget.AppCompatCheckBox
+<!--        <androidx.appcompat.widget.AppCompatCheckBox-->
+<!--            android:id="@+id/switchEar"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="35dp"-->
+<!--            android:button="@drawable/cb_def_selector" />-->
+
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/switchEar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
-            android:button="@drawable/cb_def_selector" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="@string/ktv_please_use_headset"
+            android:layout_marginStart="240dp"
+            android:drawableRight="@mipmap/ktv_ic_arrow_riight"
+            android:drawablePadding="5dp"
+            android:text="关闭"
             android:textColor="@color/def_text_grey_6c7" />
     </LinearLayout>
 
@@ -97,19 +102,23 @@
             android:padding="6dp"
             android:src="@drawable/ic_tone_down" />
 
-        <io.agora.scene.widget.CustomVolumeSeekBarView
+        <androidx.appcompat.widget.AppCompatSeekBar
             android:id="@+id/changeToneView"
             android:layout_width="180dp"
-            android:layout_height="28dp"
-            android:layout_marginBottom="3dp"
-            android:clickable="false"
-            android:focusable="false"
-            tools:text="0" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/ktv_music_menu_dialog_vol1"
+            android:max="12"
+            android:min="-12"
+            android:progress="0"
+            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
+            android:thumb="@mipmap/ic_seekbar_btn" />
 
         <ImageButton
             android:id="@+id/btn_tone_up_dialog_setting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:background="@null"
             android:contentDescription="@string/ktv_tone_up"
             android:padding="6dp"
@@ -117,39 +126,60 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
         android:gravity="center"
         android:orientation="horizontal">
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"
             android:focusable="false"
             android:text="@string/ktv_music_menu_dialog_vol1"
-            android:textColor="#9BA2AB" />
+            android:textColor="@color/white" />
+
+        <ImageButton
+            android:id="@+id/btVol1Down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:background="@null"
+            android:contentDescription="@string/ktv_tone_down"
+            android:padding="6dp"
+            android:src="@drawable/ic_tone_down" />
 
         <androidx.appcompat.widget.AppCompatSeekBar
             android:id="@+id/sbVol1"
-            android:layout_width="match_parent"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="35dp"
             android:contentDescription="@string/ktv_music_menu_dialog_vol1"
             android:max="100"
             android:progress="20"
-            android:progressDrawable="@drawable/bg_seekbar_progress"
+            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
             android:thumb="@mipmap/ic_seekbar_btn" />
+
+        <ImageButton
+            android:id="@+id/btVol1Up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:background="@null"
+            android:contentDescription="@string/ktv_tone_up"
+            android:padding="6dp"
+            android:src="@drawable/ic_tone_up" />
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginVertical="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -159,18 +189,37 @@
             android:clickable="false"
             android:focusable="false"
             android:text="@string/ktv_music_menu_dialog_vol2"
-            android:textColor="#9BA2AB" />
+            android:textColor="@color/white" />
+
+        <ImageButton
+            android:id="@+id/btVol2Down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:background="@null"
+            android:contentDescription="@string/ktv_tone_down"
+            android:padding="6dp"
+            android:src="@drawable/ic_tone_down" />
 
         <androidx.appcompat.widget.AppCompatSeekBar
             android:id="@+id/sbVol2"
-            android:layout_width="match_parent"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
             android:contentDescription="@string/ktv_music_menu_dialog_vol2"
             android:max="100"
             android:progress="20"
-            android:progressDrawable="@drawable/bg_seekbar_progress"
+            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
             android:thumb="@mipmap/ic_seekbar_btn" />
+
+        <ImageButton
+            android:id="@+id/btVol2Up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:background="@null"
+            android:contentDescription="@string/ktv_tone_up"
+            android:padding="6dp"
+            android:src="@drawable/ic_tone_up" />
     </LinearLayout>
 
     <LinearLayout
@@ -188,7 +237,7 @@
             android:clickable="false"
             android:focusable="false"
             android:text="@string/ktv_music_menu_dialog_remote_volume"
-            android:textColor="#9BA2AB" />
+            android:textColor="@color/white" />
 
         <ImageButton
             android:id="@+id/btn_remote_volume_down_dialog_setting"
@@ -200,33 +249,41 @@
             android:padding="6dp"
             android:src="@drawable/ic_tone_down" />
 
-        <EditText
-            android:id="@+id/text_remote_volume"
-            style="@style/ktvBeautyInputStyle"
-            android:layout_width="wrap_content"
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/sbRemoteVol"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:hint="15"
-            android:textSize="16sp"
-            android:textColor="#9BA2AB"
-            android:autofillHints=""
-            android:inputType="" />
+            android:contentDescription="@string/ktv_music_menu_dialog_vol2"
+            android:max="100"
+            android:progress="40"
+            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
+            android:thumb="@mipmap/ic_seekbar_btn" />
 
         <ImageButton
             android:id="@+id/btn_remote_volume_up_dialog_setting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+
             android:background="@null"
             android:contentDescription="@string/ktv_remote_volume_up"
             android:padding="6dp"
             android:src="@drawable/ic_tone_up" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="@string/ktv_input_remote_volume"
-            android:textColor="@color/def_text_grey_6c7" />
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvVoiceEffectList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:overScrollMode="never"
+        android:maxHeight="345dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="1"
+        tools:itemCount="9"
+        tools:listitem="@layout/ktv_item_mv"/>
 
     <HorizontalScrollView
         android:layout_width="match_parent"
