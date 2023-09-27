@@ -12,7 +12,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:drawablePadding="@dimen/ktv_space_normal"
-        android:text="@string/ktv_room_list_empty"
+        android:text="@string/ktv_singbattle_room_list_empty"
         android:textColor="@color/ktv_list_empty"
         android:textSize="@dimen/ktv_list_empty_size"
         android:visibility="gone"

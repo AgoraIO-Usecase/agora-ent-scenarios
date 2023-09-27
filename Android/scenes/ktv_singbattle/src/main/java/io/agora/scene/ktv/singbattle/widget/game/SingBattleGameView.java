@@ -23,14 +23,14 @@ import java.util.List;
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.ktv.singbattle.KTVLogger;
 import io.agora.scene.ktv.singbattle.R;
-import io.agora.scene.ktv.singbattle.databinding.KtvLayoutGameViewBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleLayoutGameViewBinding;
 import io.agora.scene.ktv.singbattle.widget.rankList.RankItem;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 public class SingBattleGameView extends FrameLayout {
 
     private final String TAG = "SingBattleGameView_LOG";
-    protected KtvLayoutGameViewBinding mBinding;
+    protected KtvSingbattleLayoutGameViewBinding mBinding;
     private boolean isRoomOwner = false;
     private OnSingBattleGameEventListener mSingBattleGameEventListener;
 
@@ -54,7 +54,7 @@ public class SingBattleGameView extends FrameLayout {
     }
 
     private void init(Context context) {
-        mBinding = KtvLayoutGameViewBinding.inflate(LayoutInflater.from(context), this, true);
+        mBinding = KtvSingbattleLayoutGameViewBinding.inflate(LayoutInflater.from(context), this, true);
         //onGameWaitingStatus();
         initListener();
     }
@@ -118,12 +118,12 @@ public class SingBattleGameView extends FrameLayout {
         mBinding.ilRank.setVisibility(GONE);
         if (isRoomOwner) {
             mBinding.btGameAgain.setVisibility(GONE);
-            mBinding.ilIDLE.messageText.setText(R.string.ktv_game_room_owner_idle);
+            mBinding.ilIDLE.messageText.setText(R.string.ktv_singbattle_game_room_owner_idle);
             mBinding.ilIDLE.btChooseSong.setVisibility(View.VISIBLE);
             //mBinding.ilIDLE.btAutoSelectSong.setVisibility(View.VISIBLE);
             //mBinding.ilIDLE.btAutoSelectSong.setEnabled(true);
         } else {
-            mBinding.ilIDLE.messageText.setText(R.string.ktv_game_room_owner_choosing_song);
+            mBinding.ilIDLE.messageText.setText(R.string.ktv_singbattle_game_room_owner_choosing_song);
             mBinding.ilIDLE.btChooseSong.setVisibility(View.GONE);
             //mBinding.ilIDLE.btAutoSelectSong.setVisibility(View.GONE);
         }
@@ -133,7 +133,7 @@ public class SingBattleGameView extends FrameLayout {
     public void onGameStartStatus() {
         KTVLogger.d(TAG, "onGameStartStatus");
         if (mBinding == null) return;
-        mBinding.ilIDLE.messageText.setText(R.string.ktv_game_start);
+        mBinding.ilIDLE.messageText.setText(R.string.ktv_singbattle_game_start);
         mBinding.ilIDLE.btChooseSong.setVisibility(View.GONE);
         //mBinding.ilIDLE.btAutoSelectSong.setVisibility(View.GONE);
         startTimer();
@@ -187,7 +187,7 @@ public class SingBattleGameView extends FrameLayout {
     public void onNobodyGraspSong() {
         KTVLogger.d(TAG, "onNobodyGraspSong");
         if (mBinding == null) return;
-        mBinding.ilIDLE.messageText.setText(R.string.ktv_game_nobody_grasp);
+        mBinding.ilIDLE.messageText.setText(R.string.ktv_singbattle_game_nobody_grasp);
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
         mBinding.getRoot().postDelayed(() -> {

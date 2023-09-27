@@ -1,11 +1,17 @@
 ext { ktv_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
+final def VERSION_SCENE_SHOW = "3.2.0"
+
 android {
     defaultConfig {
-        if(isModular()){
+        if (isModular()) {
             applicationId "io.agora.scenes.show"
         }
+
+        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_SHOW}\""
+        buildConfigField "String", "CLOUD_PLAYER_KEY", "\"${CLOUD_PLAYER_KEY}\""
+        buildConfigField "String", "CLOUD_PLAYER_SECRET", "\"${CLOUD_PLAYER_SECRET}\""
     }
 }
 
@@ -13,6 +19,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(path: ":scenes:show:aars:SenseArSourceManager")
     implementation project(path: ":scenes:show:aars:STMobileJNI")
+    implementation project(path: ":scenes:show:aars:HardwareBuffer")
+
     implementation project(":common:base")
     implementation project(':common:ui-widget')
 

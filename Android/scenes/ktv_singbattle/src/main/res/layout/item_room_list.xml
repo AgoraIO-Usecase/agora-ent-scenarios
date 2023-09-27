@@ -65,7 +65,7 @@
         android:layout_marginBottom="12dp"
         android:background="@drawable/bg_def_button_white"
         android:gravity="center"
-        android:text="@string/ktv_join"
+        android:text="@string/ktv_singbattle_join"
         android:textColor="@color/blue_9F"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"

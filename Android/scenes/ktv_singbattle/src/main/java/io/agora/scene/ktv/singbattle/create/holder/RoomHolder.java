@@ -23,7 +23,7 @@ public class RoomHolder extends BaseRecyclerViewAdapter.BaseViewHolder<ItemRoomL
             GlideApp.with(mBinding.ivRoomCover.getContext()).load(data.getCoverRes())
                     .transform(new CenterCropRoundCornerTransform(40)).into(mBinding.ivRoomCover);
             mBinding.tvRoomName.setText(data.getName());
-            mBinding.tvPersonNum.setText(String.format("%d%s", data.getRoomPeopleNum(), itemView.getContext().getString(R.string.ktv_people)));
+            mBinding.tvPersonNum.setText(String.format("%d%s", data.getRoomPeopleNum(), itemView.getContext().getString(R.string.ktv_singbattle_people)));
             if (data.isPrivate()){
                 mBinding.ivLock.setVisibility(View.VISIBLE);
             } else{

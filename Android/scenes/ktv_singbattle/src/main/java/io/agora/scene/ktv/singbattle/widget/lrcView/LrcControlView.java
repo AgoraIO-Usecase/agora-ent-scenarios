@@ -51,8 +51,8 @@ import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.ZipUtils;
 import io.agora.scene.ktv.singbattle.KTVLogger;
 import io.agora.scene.ktv.singbattle.R;
-import io.agora.scene.ktv.singbattle.databinding.KtvLayoutLrcControlViewBinding;
-import io.agora.scene.ktv.singbattle.databinding.KtvLayoutLrcPrepareBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleLayoutLrcControlViewBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleLayoutLrcPrepareBinding;
 import io.agora.scene.ktv.singbattle.live.ILrcView;
 import io.agora.scene.ktv.singbattle.service.RoomSelSongModel;
 import io.agora.scene.widget.basic.OutlineSpan;
@@ -63,8 +63,8 @@ import io.agora.scene.widget.utils.UiUtils;
  */
 public class LrcControlView extends FrameLayout implements View.OnClickListener, ILrcView {
 
-    protected KtvLayoutLrcControlViewBinding mBinding;
-    protected KtvLayoutLrcPrepareBinding mPrepareBinding;
+    protected KtvSingbattleLayoutLrcControlViewBinding mBinding;
+    protected KtvSingbattleLayoutLrcPrepareBinding mPrepareBinding;
 
     protected KaraokeView mKaraokeView;
 
@@ -118,9 +118,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     private void init(Context context) {
-        mBinding = KtvLayoutLrcControlViewBinding.inflate(LayoutInflater.from(context), this, true);
+        mBinding = KtvSingbattleLayoutLrcControlViewBinding.inflate(LayoutInflater.from(context), this, true);
 
-        mPrepareBinding = KtvLayoutLrcPrepareBinding.bind(mBinding.getRoot());
+        mPrepareBinding = KtvSingbattleLayoutLrcPrepareBinding.bind(mBinding.getRoot());
 
         mBinding.ilIDLE.getRoot().setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
@@ -246,7 +246,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
 
         mBinding.ilActive.ivMusicStart.setIconResource(R.mipmap.ktv_ic_pause);
-        mBinding.ilActive.ivMusicStart.setText(R.string.ktv_room_player_pause);
+        mBinding.ilActive.ivMusicStart.setText(R.string.ktv_singbattle_room_player_pause);
     }
 
     public void startSingBattlePrepareTimeCount() {
@@ -282,7 +282,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
 
         mBinding.ilActive.ivMusicStart.setIconResource(R.drawable.ktv_ic_play);
-        mBinding.ilActive.ivMusicStart.setText(R.string.ktv_room_player_play);
+        mBinding.ilActive.ivMusicStart.setText(R.string.ktv_singbattle_room_player_play);
     }
 
     public void onIdleStatus() {
@@ -367,7 +367,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mComboControl.reset(mBinding);
         }
         mBinding.ivCumulativeScoreGrade.setVisibility(INVISIBLE);
-        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "0"));
+        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_singbattle_score_formatter), "0"));
         mBinding.gradeView.setScore(0, 0, 0);
 
         if (mMusic == null) return;
@@ -404,7 +404,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         mBinding.gradeView.setScore((int) score, (int) cumulativeScore, (int) totalScore);
 
-        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "" + (int) cumulativeScore));
+        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_singbattle_score_formatter), "" + (int) cumulativeScore));
         int gradeDrawable = mBinding.gradeView.getCumulativeDrawable();
         if (gradeDrawable == 0) {
             mBinding.ivCumulativeScoreGrade.setVisibility(INVISIBLE);
@@ -424,12 +424,12 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         private int mNumberOfCombos;
 
-        private void reset(KtvLayoutLrcControlViewBinding binding) {
+        private void reset(KtvSingbattleLayoutLrcControlViewBinding binding) {
             mNumberOfCombos = 0;
             binding.comboView.getRoot().setVisibility(INVISIBLE);
         }
 
-        private void checkAndShowCombos(KtvLayoutLrcControlViewBinding binding, int score, int cumulativeScore) {
+        private void checkAndShowCombos(KtvSingbattleLayoutLrcControlViewBinding binding, int score, int cumulativeScore) {
             binding.comboView.getRoot().setVisibility(VISIBLE);
 
             showComboAnimation(binding.comboView.getRoot(), score);

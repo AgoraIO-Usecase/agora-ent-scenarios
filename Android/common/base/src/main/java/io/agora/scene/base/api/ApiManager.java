@@ -45,9 +45,10 @@ public class ApiManager {
         }
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder().addInterceptor(chain -> {
                     Request.Builder builder = chain.request().newBuilder();
-                    builder.addHeader(NetConstants.HEADER_APP_OS, "android");
-                    builder.addHeader(NetConstants.HEADER_VERSION_NAME, BuildConfig.APP_VERSION_NAME);
-                    builder.addHeader(NetConstants.HEADER_VERSION_CODE, String.valueOf(BuildConfig.APP_VERSION_CODE));
+                    builder.addHeader(NetConstants.HEADER_PROJECT_NAME, "agora_ent_demo");  // "appProject" "agora_ent_demo"
+                    builder.addHeader(NetConstants.HEADER_APP_OS, "android");               // "appOs" "android"
+                    builder.addHeader(NetConstants.HEADER_VERSION_NAME, BuildConfig.APP_VERSION_NAME); // "versionName" "3.0.0"
+                    builder.addHeader(NetConstants.HEADER_VERSION_CODE, String.valueOf(BuildConfig.APP_VERSION_CODE)); // "versionCode" "5"
                     if (!TextUtils.isEmpty(token)) {
                         builder.addHeader(NetConstants.AUTHORIZATION, token);
                     } else {

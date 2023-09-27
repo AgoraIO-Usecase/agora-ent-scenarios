@@ -1018,7 +1018,7 @@ public class RoomLivingViewModel extends ViewModel {
             public void onContentInspectResult(int result) {
                 super.onContentInspectResult(result);
                 if (result > 1) {
-                    ToastUtils.showToast(R.string.ktv_content);
+                    ToastUtils.showToast(R.string.ktv_singbattle_content);
                 }
             }
 

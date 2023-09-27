@@ -7,74 +7,86 @@
 
 import UIKit
 
+protocol ShowSettingSliderCellDelegate: NSObjectProtocol {
+        
+    func onCellSliderValueChanged(value: Float, at index: IndexPath)
+}
+
 class ShowSettingSliderCell: ShowSettingBaseCell {
     
-    var sliderValueChangingAction: ((_ value: Float)->())?   // 正在变化
-    var sliderValueChangedAction: ((_ value: Float)->())?    // 变化结束
+    weak var delegate: ShowSettingSliderCellDelegate?
     
-    private var currentValue: Float = 0 {
-        didSet {
-            var limitValue = min(currentValue, slider.maximumValue)
-            limitValue = max(limitValue, slider.maximumValue)
-            valueLabel.text = String(format: "%.0f", slider.value)
-        }
-    }
+    var indexPath: IndexPath?
     
-    private lazy var valueLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .show_Ellipse5
-        label.font = .show_R_14
-        return label
-    }()
-
-    private lazy var slider: UISlider = {
-        let slider = UISlider()
-        slider.minimumTrackTintColor = .show_zi03
-        slider.maximumTrackTintColor = .show_Ellipse2
-        slider.addTarget(self, action: #selector(sliderValueDidChanged), for: .valueChanged)
-        slider.addTarget(self, action: #selector(sliderDidTouchUp), for: [.touchUpInside, .touchUpOutside, .touchDragExit])
-        return slider
-    }()
+    private var currentValue: Float = 0
+    
+    private let valueLabel = UILabel()
+    
+    private let slider = UISlider()
     
     override func createSubviews(){
         super.createSubviews()
         
-        contentView.addSubview(slider)
-        slider.snp.makeConstraints { make in
-            make.right.equalTo(-20)
-            make.centerY.equalTo(titleLabel)
-            make.width.equalTo(150)
-            make.height.equalTo(30)
-        }
-        
-        contentView.addSubview(valueLabel)
-        valueLabel.snp.makeConstraints { make in
-            make.right.equalTo(slider.snp.left).offset(-15)
-            make.centerY.equalTo(titleLabel)
-        }
+        createViews()
+        createConstrians()
     }
     
-    func setTitle(_ title: String, value: Float, minValue: Float, maxValue: Float,sliderValueChangingAction: ((_ value: Float)->())?,sliderValueChangedAction: ((_ value: Float)->())?) {
+    func setTitle(_ title: String, value: Float, minValue: Float, maxValue: Float) {
         titleLabel.text = title
+        slider.isHidden = false
+        valueLabel.isHidden = false
         slider.minimumValue = minValue
         slider.maximumValue = maxValue
         slider.value = value
+        valueLabel.text = String(format: "%.0f", slider.value)
         currentValue = value
-        self.sliderValueChangedAction = sliderValueChangedAction
-        self.sliderValueChangingAction = sliderValueChangingAction
     }
-}
-
-extension ShowSettingSliderCell {
     
     @objc private func sliderValueDidChanged() {
         currentValue = slider.value
-        self.sliderValueChangingAction?(slider.value)
+        valueLabel.text = String(format: "%.0f", slider.value)
     }
     
     @objc private func sliderDidTouchUp() {
         currentValue = slider.value
-        self.sliderValueChangedAction?(slider.value)
+        valueLabel.text = String(format: "%.0f", slider.value)
+        if let i = indexPath {
+            delegate?.onCellSliderValueChanged(value: slider.value, at: i)
+        }
+    }
+}
+
+private extension ShowSettingSliderCell {
+    
+    func createViews() {
+        detailButton.isHidden = true
+        
+        valueLabel.textColor = .show_Ellipse5
+        valueLabel.font = .show_R_14
+        contentView.addSubview(valueLabel)
+        
+        slider.minimumTrackTintColor = .show_zi03
+        slider.maximumTrackTintColor = .show_Ellipse2
+        slider.addTarget(self, action: #selector(sliderValueDidChanged), for: .valueChanged)
+        slider.addTarget(self, action: #selector(sliderDidTouchUp), for: [.touchUpInside, .touchUpOutside])
+        contentView.addSubview(slider)
+    }
+    
+    func createConstrians() {
+        titleLabel.snp.remakeConstraints { make in
+            make.top.equalTo(14)
+            make.left.equalTo(20)
+        }
+        slider.snp.makeConstraints { make in
+            make.right.equalTo(-20)
+            make.centerY.equalToSuperview()
+            make.width.equalTo(150)
+            make.height.equalTo(30)
+        }
+        valueLabel.snp.makeConstraints { make in
+            make.right.equalTo(slider.snp.left).offset(-15)
+            make.centerY.equalToSuperview()
+        }
     }
 }
 

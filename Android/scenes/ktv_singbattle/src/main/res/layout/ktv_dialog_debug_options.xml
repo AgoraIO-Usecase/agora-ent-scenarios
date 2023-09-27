@@ -103,7 +103,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ktv_music_menu_dialog_mv"
+            android:text="@string/ktv_singbattle_music_menu_dialog_mv"
             android:textColor="@color/def_text_grey_979" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
@@ -130,7 +130,7 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:focusable="false"
-            android:text="@string/ktv_music_menu_dialog_tone"
+            android:text="@string/ktv_singbattle_music_menu_dialog_tone"
             android:textColor="#9BA2AB" />
 
         <ImageButton
@@ -139,7 +139,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="23dp"
             android:background="@null"
-            android:contentDescription="@string/ktv_tone_down"
+            android:contentDescription="@string/ktv_singbattle_tone_down"
             android:padding="6dp"
             android:src="@drawable/ic_tone_down" />
 

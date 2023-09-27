@@ -356,6 +356,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         musicLoadStateListener: IMusicLoadStateListener
     ) {
         Log.d(TAG, "loadMusic called: songCode $songCode")
+        if (this.ktvApiConfig.type == KTVType.SingBattle) {
+            mMusicCenter.getSongSimpleInfo(songCode);
+        }
         // 设置到全局， 连续调用以最新的为准
         this.songMode = KTVSongMode.SONG_CODE
         this.songCode = songCode
@@ -426,7 +429,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
                         if (config.autoPlay) {
                             // 主唱自动播放歌曲
-                            switchSingerRole(KTVSingRole.SoloSinger, null)
+                            if (this.singerRole != KTVSingRole.LeadSinger) {
+                                switchSingerRole(KTVSingRole.SoloSinger, null)
+                            }
                             startSing(song, 0)
                         }
                     }
@@ -435,7 +440,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     Log.d(TAG, "loadMusic success")
                     if (config.autoPlay) {
                         // 主唱自动播放歌曲
-                        switchSingerRole(KTVSingRole.SoloSinger, null)
+                        if (this.singerRole != KTVSingRole.LeadSinger) {
+                            switchSingerRole(KTVSingRole.SoloSinger, null)
+                        }
                         startSing(song, 0)
                     }
                     musicLoadStateListener.onMusicLoadProgress(song, 100, MusicLoadStatus.COMPLETED, msg, lrcUrl)
@@ -464,7 +471,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         if (config.autoPlay) {
             // 主唱自动播放歌曲
-            switchSingerRole(KTVSingRole.SoloSinger, null)
+            if (this.singerRole != KTVSingRole.LeadSinger) {
+                switchSingerRole(KTVSingRole.SoloSinger, null)
+            }
             startSing(url, 0)
         }
     }
@@ -779,7 +788,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val curTime = System.currentTimeMillis()
                 val offset = curTime - lastReceivedTime
                 if (offset <= 1000) {
-                    val curTs = mReceivedPlayPosition + offset
+                    val curTs = mReceivedPlayPosition + offset + highStartTime
                     runOnMainThread {
                         lrcView?.onUpdatePitch(pitch.toFloat())
                         // (fix ENT-489)Make lyrics delay for 200ms
@@ -888,7 +897,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private fun getNtpTimeInMs(): Long {
         val currentNtpTime = mRtcEngine.ntpWallTimeInMs
         return if (currentNtpTime != 0L) {
-            currentNtpTime
+            currentNtpTime + 2208988800L * 1000
         } else {
             Log.e(TAG, "getNtpTimeInMs DeviceDelay is zero!!!")
             System.currentTimeMillis()
@@ -933,13 +942,14 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         mPlayer.play()
                     } else if (this.mediaPlayerState == MediaPlayerState.PLAYER_STATE_PLAYING) {
                         val localNtpTime = getNtpTimeInMs()
-                        val currentSystemTime = System.currentTimeMillis()
                         val localPosition =
-                            currentSystemTime - this.localPlayerSystemTime + this.localPlayerPosition // 当前副唱的播放时间
+                            localNtpTime - this.localPlayerSystemTime + this.localPlayerPosition // 当前副唱的播放时间
                         val expectPosition =
-                            localNtpTime - remoteNtp + position + audioPlayoutDelay // 期望主唱的播放时间
+                            localNtpTime - remoteNtp + position + audioPlayoutDelay // 实际主唱的播放时间
                         val diff = expectPosition - localPosition
-                        if ((diff > 80 || diff < -80) && expectPosition < duration) { //设置阈值为40ms，避免频繁seek
+                        Log.d(TAG,"play_status_seek: " + diff + "  localNtpTime: " + localNtpTime + "  expectPosition: " + expectPosition +
+                                "  localPosition: " + localPosition + "  ntp diff: " + (localNtpTime - remoteNtp))
+                        if ((diff > 50 || diff < -50) && expectPosition < duration) { //设置阈值为50ms，避免频繁seek
                             mPlayer.seek(expectPosition)
                         }
                     } else {
@@ -1103,17 +1113,22 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         callback(songCode, lyricUrl)
     }
 
+    private var highStartTime = 0L;
     override fun onSongSimpleInfoResult(
         requestId: String?,
         songCode: Long,
-        simpleInfo: String?,
+        simpleInfo: String,
         errorCode: Int
     ) {
-        //TODO("Not yet implemented")
-        if (errorCode == 2) {
-            // Token过期
-            ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
-        }
+        if (this.ktvApiConfig.type == KTVType.Normal) return
+        val jsonMsg = JSONObject(simpleInfo)
+        val format = jsonMsg.getJSONObject("format")
+        val highPart = format.getJSONArray("highPart")
+        val highStartTime = JSONObject(highPart[0].toString())
+        val time = highStartTime.getLong("highStartTime")
+        val endTime = highStartTime.getLong("highEndTime")
+        this.highStartTime = time
+        lrcView?.onHighPartTime(time, endTime)
     }
 
     // ------------------------ AgoraRtcMediaPlayerDelegate ------------------------
@@ -1157,14 +1172,14 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     // 同步播放进度
-    override fun onPositionChanged(position_ms: Long) {
+    override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
         localPlayerPosition = position_ms
-        localPlayerSystemTime = System.currentTimeMillis()
+        localPlayerSystemTime = timestamp_ms
 
         if ((this.singerRole == KTVSingRole.SoloSinger || this.singerRole == KTVSingRole.LeadSinger) && position_ms > audioPlayoutDelay) {
             val msg: MutableMap<String?, Any?> = HashMap()
             msg["cmd"] = "setLrcTime"
-            msg["ntp"] = getNtpTimeInMs()
+            msg["ntp"] = timestamp_ms
             msg["duration"] = duration
             msg["time"] =
                 position_ms - audioPlayoutDelay // "position-audioDeviceDelay" 是计算出当前播放的真实进度

@@ -7,7 +7,7 @@
 #import "VLMacroDefine.h"
 #import "NSString+Helper.h"
 #import "MenuUtils.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import Masonry;
 
 @interface VLEmptyView ()
@@ -86,7 +86,7 @@
     [self.button setTitle:buttonTitle forState:UIControlStateNormal];
 }
 - (void)buttonEvent {
-    if ([self.button.titleLabel.text isEqualToString:AGLocalizedString(@"点击重试")]) {
+    if ([self.button.titleLabel.text isEqualToString:AGLocalizedString(@"comm_try_again")]) {
         if (self.emptyViewButtonBlock) {
             self.emptyViewButtonBlock();
         }
@@ -112,7 +112,7 @@
     if (!_button) {
 //        _button = [[QMUIButton alloc] qmui_initWithImage:nil title:AGLocalizedString(@"返回")];
         _button = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_button setTitle:AGLocalizedString(@"返回") forState:UIControlStateNormal];
+        [_button setTitle:NSLocalizedString(@"app_about_karaoke", nil) forState:UIControlStateNormal];
         _button.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
         [_button addTarget:self action:@selector(buttonEvent) forControlEvents:UIControlEventTouchUpInside];
         [_button setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];

@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="@string/ktv_voice_effect"
+        android:text="@string/ktv_singbattle_voice_effect"
         android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -53,22 +53,22 @@
             <androidx.appcompat.widget.AppCompatRadioButton
                 android:id="@+id/rBtnEffect1"
                 style="@style/ktvSongEffectBtnStyle"
-                android:text="@string/ktv_song_effect_1" />
+                android:text="@string/ktv_singbattle_song_effect_1" />
 
             <androidx.appcompat.widget.AppCompatRadioButton
                 android:id="@+id/rBtnEffect2"
                 style="@style/ktvSongEffectBtnStyle"
-                android:text="@string/ktv_song_effect_2" />
+                android:text="@string/ktv_singbattle_song_effect_2" />
 
             <androidx.appcompat.widget.AppCompatRadioButton
                 android:id="@+id/rBtnEffect3"
                 style="@style/ktvSongEffectBtnStyle"
-                android:text="@string/ktv_song_effect_3" />
+                android:text="@string/ktv_singbattle_song_effect_3" />
 
             <androidx.appcompat.widget.AppCompatRadioButton
                 android:id="@+id/rBtnEffect4"
                 style="@style/ktvSongEffectBtnStyle"
-                android:text="@string/ktv_song_effect_4" />
+                android:text="@string/ktv_singbattle_song_effect_4" />
         </RadioGroup>
 
     </io.agora.scene.widget.CusHorizontalScrollView>
@@ -87,7 +87,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="39dp"
-        android:text="@string/ktv_start_electric_sound"
+        android:text="@string/ktv_singbattle_start_electric_sound"
         android:textColor="@color/def_text_grey_979"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -130,7 +130,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:text="@string/ktv_select_mode"
+        android:text="@string/ktv_singbattle_select_mode"
         android:textColor="@color/def_text_grey_979"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -158,7 +158,7 @@
         android:drawableEnd="@drawable/bg_cb_check_round_blue"
         android:enabled="false"
         android:paddingEnd="8dp"
-        android:text="@string/ktv_gentle_wind"
+        android:text="@string/ktv_singbattle_gentle_wind"
         android:textColor="@color/grey_to_white"
         app:layout_constraintBottom_toBottomOf="@id/ivBgSelect"
         app:layout_constraintStart_toStartOf="@id/ivBgSelect"
@@ -174,7 +174,7 @@
         android:enabled="false"
         android:gravity="center"
         android:paddingBottom="8dp"
-        android:text="@string/ktv_minor"
+        android:text="@string/ktv_singbattle_minor"
         android:textColor="@color/grey_to_white"
         app:layout_constraintEnd_toEndOf="@id/ivBgSelect"
         app:layout_constraintStart_toStartOf="@id/ivBgSelect"
@@ -189,7 +189,7 @@
         android:drawableStart="@drawable/bg_cb_check_round_blue"
         android:enabled="false"
         android:gravity="center"
-        android:text="@string/ktv_major"
+        android:text="@string/ktv_singbattle_major"
         android:textColor="@color/grey_to_white"
         app:layout_constraintBottom_toBottomOf="@id/ivBgSelect"
         app:layout_constraintEnd_toEndOf="@id/ivBgSelect"
@@ -201,7 +201,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:text="@string/ktv_select_starting_scale"
+        android:text="@string/ktv_singbattle_select_starting_scale"
         android:textColor="@color/def_text_grey_979"
         android:textSize="12sp"
         android:visibility="gone"
@@ -253,27 +253,27 @@
         <RadioButton
             android:id="@+id/rBtnA"
             style="@style/ktvScaleBtnStyle"
-            android:text="@string/ktv_effect_a" />
+            android:text="@string/ktv_singbattle_effect_a" />
 
         <RadioButton
             android:id="@+id/rBtnBb"
             style="@style/ktvScaleBtnStyle"
-            android:text="@string/ktv_effect_a_2" />
+            android:text="@string/ktv_singbattle_effect_a_2" />
 
         <RadioButton
             android:id="@+id/rBtnB"
             style="@style/ktvScaleBtnStyle"
-            android:text="@string/ktv_effect_b" />
+            android:text="@string/ktv_singbattle_effect_b" />
 
         <RadioButton
             android:id="@+id/rBtnC"
             style="@style/ktvScaleBtnStyle"
-            android:text="@string/ktv_effect_c" />
+            android:text="@string/ktv_singbattle_effect_c" />
 
         <RadioButton
             android:id="@+id/rBtnDD"
             style="@style/ktvScaleBtnStyle"
-            android:text="@string/ktv_effect_c_2" />
+            android:text="@string/ktv_singbattle_effect_c_2" />
     </RadioGroup>
 
     <RadioGroup
@@ -294,27 +294,27 @@
         <RadioButton
             android:id="@+id/rBtnD"
             style="@style/ktvScaleBtnStyle"
-            android:text="@string/ktv_effect_d" />
+            android:text="@string/ktv_singbattle_effect_d" />
 
         <RadioButton
             android:id="@+id/rBtnD2"
             style="@style/ktvScaleBtnStyle"
-            android:text="@string/ktv_effect_d_2" />
+            android:text="@string/ktv_singbattle_effect_d_2" />
 
         <RadioButton
             android:id="@+id/rBtnE"
             style="@style/ktvScaleBtnStyle"
-            android:text="@string/ktv_effect_e" />
+            android:text="@string/ktv_singbattle_effect_e" />
 
         <RadioButton
             android:id="@+id/rBtnF"
             style="@style/ktvScaleBtnStyle"
-            android:text="@string/ktv_effect_f" />
+            android:text="@string/ktv_singbattle_effect_f" />
 
         <RadioButton
             android:id="@+id/rBtnF2"
             style="@style/ktvScaleBtnStyle"
-            android:text="@string/ktv_effect_f_2" />
+            android:text="@string/ktv_singbattle_effect_f_2" />
     </RadioGroup>
 
     <RadioGroup
@@ -333,12 +333,12 @@
         <RadioButton
             android:id="@+id/rBtnG"
             style="@style/ktvScaleBtnStyle"
-            android:text="@string/ktv_effect_g" />
+            android:text="@string/ktv_singbattle_effect_g" />
 
         <RadioButton
             android:id="@+id/rBtnG2"
             style="@style/ktvScaleBtnStyle"
-            android:text="@string/ktv_effect_g_2" />
+            android:text="@string/ktv_singbattle_effect_g_2" />
 
     </RadioGroup>
 </androidx.constraintlayout.widget.ConstraintLayout>

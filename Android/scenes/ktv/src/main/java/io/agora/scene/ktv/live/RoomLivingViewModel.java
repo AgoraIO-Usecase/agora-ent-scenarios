@@ -38,6 +38,7 @@ import io.agora.rtc2.RtcEngineConfig;
 import io.agora.rtc2.RtcEngineEx;
 import io.agora.rtc2.video.ContentInspectConfig;
 import io.agora.rtc2.video.VideoCanvas;
+import io.agora.scene.base.AudioModeration;
 import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.TokenGenerator;
 import io.agora.scene.base.component.AgoraApplication;
@@ -899,7 +900,7 @@ public class RoomLivingViewModel extends ViewModel {
         KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus() called");
         if (mRtcEngine.getConnectionState() != getValue(CONNECTION_STATE_CONNECTED)) {
             joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
-            ToastUtils.showToast("加入合唱失败， reason：连接已断开");
+            ToastUtils.showToast(R.string.ktv_join_chorus_failed);
             return;
         }
 
@@ -940,7 +941,7 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void onMusicLoadFail(long songCode, @NonNull KTVLoadSongFailReason reason) {
-                ToastUtils.showToastLong("加入合唱失败， reason：" + reason);
+                ToastUtils.showToastLong(R.string.ktv_join_chorus_failed);
                 joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
             }
 
@@ -949,7 +950,7 @@ public class RoomLivingViewModel extends ViewModel {
                 ktvApiProtocol.switchSingerRole(KTVSingRole.CoSinger, new ISwitchRoleStateListener() {
                     @Override
                     public void onSwitchRoleFail(@NonNull SwitchRoleFailReason reason) {
-                        ToastUtils.showToastLong("加入合唱失败");
+                        ToastUtils.showToastLong(R.string.ktv_join_chorus_failed);
                         joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
                     }
 
@@ -974,7 +975,7 @@ public class RoomLivingViewModel extends ViewModel {
                             });
 
                         } else {
-                            ToastUtils.showToastLong("加入合唱失败, 已下麦");
+                            ToastUtils.showToastLong(R.string.ktv_join_chorus_failed);
                             ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
                             joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
                         }
@@ -1121,7 +1122,7 @@ public class RoomLivingViewModel extends ViewModel {
                 roomInfoLiveData.getValue().getRoomNo(),
                 UserManager.getInstance().getUser().id.intValue(),
                 roomInfoLiveData.getValue().getRoomNo() + "_ex",
-                roomInfoLiveData.getValue().getAgoraChorusToken(), 10)
+                roomInfoLiveData.getValue().getAgoraChorusToken(), 10, KTVType.Normal)
         );
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
@@ -1175,19 +1176,27 @@ public class RoomLivingViewModel extends ViewModel {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("sceneName", "ktv");
             jsonObject.put("id", UserManager.getInstance().getUser().id.toString());
+            jsonObject.put("userNo", UserManager.getInstance().getUser().userNo);
             contentInspectConfig.extraInfo = jsonObject.toString();
-            ContentInspectConfig.ContentInspectModule module1 = new ContentInspectConfig.ContentInspectModule();
-            module1.interval = 30;
-            module1.type = CONTENT_INSPECT_TYPE_SUPERVISE;
-            ContentInspectConfig.ContentInspectModule module2 = new ContentInspectConfig.ContentInspectModule();
-            module2.interval = 30;
-            module2.type = CONTENT_INSPECT_TYPE_MODERATION;
-            contentInspectConfig.modules = new ContentInspectConfig.ContentInspectModule[] { module1, module2 };
-            contentInspectConfig.moduleCount = 2;
+            ContentInspectConfig.ContentInspectModule module = new ContentInspectConfig.ContentInspectModule();
+            module.interval = 30;
+            module.type = CONTENT_INSPECT_TYPE_MODERATION;
+            contentInspectConfig.modules = new ContentInspectConfig.ContentInspectModule[] { module };
+            contentInspectConfig.moduleCount = 1;
             mRtcEngine.enableContentInspect(true, contentInspectConfig);
         } catch (JSONException e) {
             KTVLogger.e(TAG, e.toString());
         }
+
+        // ------------------ 开启语音鉴定服务 ------------------
+        AudioModeration.INSTANCE.moderationAudio(
+                roomInfoLiveData.getValue().getRoomNo(),
+                UserManager.getInstance().getUser().id,
+                AudioModeration.AgoraChannelType.rtc,
+                "ktv",
+                null,
+                null
+        );
 
         // ------------------ 初始化音乐播放设置面版 ------------------
         mDebugSetting = new KTVDebugSettingBean(new KTVDebugSettingsDialog.Callback() {
@@ -1451,7 +1460,7 @@ public class RoomLivingViewModel extends ViewModel {
             public void onMusicLoadSuccess(long songCode, @NonNull String lyricUrl) {
                 // 当前已被切歌
                 if (songPlayingLiveData.getValue() == null) {
-                    ToastUtils.showToastLong("load失败，当前已无歌曲");
+                    ToastUtils.showToastLong(R.string.ktv_load_failed_no_song);
                     return;
                 }
 
@@ -1469,7 +1478,7 @@ public class RoomLivingViewModel extends ViewModel {
             public void onMusicLoadFail(long songCode, @NonNull KTVLoadSongFailReason reason) {
                 // 当前已被切歌
                 if (songPlayingLiveData.getValue() == null) {
-                    ToastUtils.showToastLong("load失败，当前已无歌曲");
+                    ToastUtils.showToastLong(R.string.ktv_load_failed_no_song);
                     return;
                 }
 
@@ -1486,17 +1495,17 @@ public class RoomLivingViewModel extends ViewModel {
                     noLrcLiveData.postValue(true);
                 } else if (reason == KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL) {
                     // 歌曲加载失败 ，重试3次
-                    ToastUtils.showToastLong("歌曲加载失败");
+                    ToastUtils.showToastLong(R.string.ktv_load_failed);
                     retryTimes = retryTimes + 1;
                     if (retryTimes < 3) {
                         loadMusic(config, songCode);
                     } else {
                         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                        ToastUtils.showToastLong("已尝试三次，请自动切歌");
+                        ToastUtils.showToastLong(R.string.ktv_try);
                     }
                 } else if (reason == KTVLoadSongFailReason.CANCELED) {
                     // 当前已被切歌
-                    ToastUtils.showToastLong("load失败，当前已切换到另一首歌");
+                    ToastUtils.showToastLong(R.string.ktv_load_failed_another_song);
                 }
             }
         });

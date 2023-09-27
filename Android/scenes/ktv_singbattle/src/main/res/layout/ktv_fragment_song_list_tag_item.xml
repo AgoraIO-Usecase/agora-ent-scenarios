@@ -7,7 +7,7 @@
         android:id="@+id/ctv"
         style="@style/ktvSongRankBtnStyle"
         android:layout_weight="1"
-        android:text="@string/ktv_song_rank_2" />
+        android:text="@string/ktv_singbattle_song_rank_2" />
 
 </FrameLayout>
 

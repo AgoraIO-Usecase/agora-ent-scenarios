@@ -7,6 +7,7 @@
 
 import UIKit
 import ZSwiftBaseLib
+import SVProgressHUD
 
 public final class VoiceRoomAudiencesViewController: UITableViewController {
     
@@ -14,7 +15,7 @@ public final class VoiceRoomAudiencesViewController: UITableViewController {
     
     var kickClosure: ((VRUser?,VRRoomMic?) -> ())?
 
-    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "No audience yet", image: nil)
+    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "voice_no_audience_yet", image: nil)
 
     override public func viewDidLoad() {
         super.viewDidLoad()
@@ -70,24 +71,25 @@ extension VoiceRoomAudiencesViewController {
     }
     
     private func removeUser(user: VRUser) {
+        SVProgressHUD.show()
         VoiceRoomIMManager.shared?.kickUser(chat_uid: user.chat_uid ?? "", completion: { success in
+            SVProgressHUD.dismiss()
             if success {
                 var index = -1
-                var status = -1
+                var changeMic = VRRoomMic()
                 for mic in ChatRoomServiceImp.getSharedInstance().mics {
                     if mic.member?.chat_uid ?? "" == user.chat_uid ?? "" {
+                        changeMic = mic
                         index = mic.mic_index
-                        status = mic.status
                         break
                     }
                 }
-                if index > 0,var mic = ChatRoomServiceImp.getSharedInstance().mics[safe: index]  {
-                    mic.status = status
-                    mic.member = nil
-                    VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(index)":mic.kj.JSONString()], completion: { error in
+                if index > 0 {
+                    changeMic.member = nil
+                    VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(index)":changeMic.kj.JSONString()], completion: { error in
                         if error == nil {
                             if self.kickClosure != nil  {
-                                self.kickClosure!(user,mic)
+                                self.kickClosure!(user,changeMic)
                             }
                             self.removeUserFromUserList(user: user)
                         } else {

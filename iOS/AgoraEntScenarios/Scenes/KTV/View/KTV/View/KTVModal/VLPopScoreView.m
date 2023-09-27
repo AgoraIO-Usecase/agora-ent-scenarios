@@ -7,7 +7,7 @@
 #import "UIView+VL.h"
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import Masonry;
 
 @interface VLPopScoreView ()
@@ -95,7 +95,7 @@
         imageNamed = @"ktv_score_S";
     } else if (score >= 80 && score < 90) {
         imageNamed = @"ktv_score_A";
-    } else if (score >= 60 && score < 80) {
+    } else if (score >= 70 && score < 80) {
         imageNamed = @"ktv_score_B";
     } else {
         imageNamed = @"ktv_score_C";
@@ -132,7 +132,7 @@
 - (UILabel *)scoreTitleLabel {
     if (!_scoreTitleLabel) {
         _scoreTitleLabel = [[UILabel alloc] init];
-        _scoreTitleLabel.text = KTVLocalizedString(@"你的总分");
+        _scoreTitleLabel.text = KTVLocalizedString(@"ktv_score");
         _scoreTitleLabel.font = VLUIFontMake(14);
         _scoreTitleLabel.textColor = [UIColor whiteColor];
     }
@@ -177,7 +177,7 @@
         _confirmButton.layer.cornerRadius = 20;
         _confirmButton.layer.masksToBounds = YES;
         [_confirmButton setBackgroundColor:UIColorMakeWithHex(@"#345DFF")];
-        [_confirmButton setTitle:KTVLocalizedString(@"好的") forState:UIControlStateNormal];
+        [_confirmButton setTitle:KTVLocalizedString(@"ktv_ok") forState:UIControlStateNormal];
         _confirmButton.titleLabel.font = UIFontBoldMake(16);
         [_confirmButton setTitleColor:UIColorWhite forState:UIControlStateNormal];
         [_confirmButton addTarget:self action:@selector(click) forControlEvents:UIControlEventTouchUpInside];

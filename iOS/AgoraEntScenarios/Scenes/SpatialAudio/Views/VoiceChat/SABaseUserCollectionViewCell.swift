@@ -20,7 +20,6 @@ class SABaseUserCollectionViewCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
     }
 
@@ -57,7 +56,7 @@ class SABaseUserCollectionViewCell: UICollectionViewCell {
             rtcUserView.micView.isHidden = false
             rtcUserView.micView.setState(.on)
             rtcUserView.bgIconView.isHidden = true
-            rtcUserView.nameBtn.setImage(UIImage(""), for: .normal)
+            rtcUserView.nameBtn.setImage(UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"), for: .normal)
         case 1:
             // 需要区分有用户还是没有用户
             bgIcon = mic.member == nil ? "icons／solid／mute" : ""

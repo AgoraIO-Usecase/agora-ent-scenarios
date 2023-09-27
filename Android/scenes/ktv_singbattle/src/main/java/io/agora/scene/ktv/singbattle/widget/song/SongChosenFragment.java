@@ -76,7 +76,7 @@ public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmen
                     }
                 }
 
-                binding.tvChorus.setText(getString(R.string.ktv_song_ordering_person));
+                binding.tvChorus.setText(getString(R.string.ktv_singbattle_song_ordering_person));
             }
         }
     };

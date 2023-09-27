@@ -54,7 +54,6 @@ class AgoraChatRoomBaseAlienCollectionViewCell: UICollectionViewCell {
     public var clickVBlock: (() -> Void)?
     override init(frame: CGRect) {
         super.init(frame: frame)
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
     }
 
@@ -67,12 +66,12 @@ class AgoraChatRoomBaseAlienCollectionViewCell: UICollectionViewCell {
         cornerView.layer.cornerRadius = 33
         cornerView.layer.masksToBounds = true
         cornerView.layer.borderColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.2).cgColor
-        cornerView.layer.borderWidth = 1~
+        cornerView.layer.borderWidth = 1
         cornerView.backgroundColor = .clear
         contentView.addSubview(cornerView)
 
         blueAlienView.iconImgUrl = "blue"
-        blueAlienView.nameStr = LanguageManager.localValue(key: "blue")
+        blueAlienView.nameStr = LanguageManager.localValue(key: "voice_blue")
         blueAlienView.cellType = .AgoraChatRoomBaseUserCellTypeAlienNonActive
         blueAlienView.clickBlock = {
             guard let clickVBlock = self.clickVBlock else {
@@ -89,7 +88,7 @@ class AgoraChatRoomBaseAlienCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(blueCoverView)
 
         redAlienView.iconImgUrl = "red"
-        redAlienView.nameStr = LanguageManager.localValue(key: "red")
+        redAlienView.nameStr = LanguageManager.localValue(key: "voice_red")
         redAlienView.cellType = .AgoraChatRoomBaseUserCellTypeAlienNonActive
         redAlienView.clickBlock = {
             guard let clickVBlock = self.clickVBlock else {
@@ -99,7 +98,7 @@ class AgoraChatRoomBaseAlienCollectionViewCell: UICollectionViewCell {
         }
         contentView.addSubview(redAlienView)
 
-        linkView.image = UIImage("icons／solid／link")
+        linkView.image = UIImage.sceneImage(name: "icons／solid／link", bundleName: "VoiceChatRoomResource")
         contentView.addSubview(linkView)
 
         blueAlienView.micView.isHidden = true

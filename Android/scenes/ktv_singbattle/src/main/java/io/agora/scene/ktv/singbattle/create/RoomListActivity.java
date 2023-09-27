@@ -21,7 +21,7 @@ import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnItemClickListener;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.singbattle.create.holder.RoomHolder;
-import io.agora.scene.ktv.singbattle.databinding.ActivityRoomListBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleActivityRoomListBinding;
 import io.agora.scene.ktv.singbattle.databinding.ItemRoomListBinding;
 import io.agora.scene.ktv.singbattle.live.RoomLivingActivity;
 import io.agora.scene.ktv.singbattle.service.KTVServiceProtocol;
@@ -33,15 +33,15 @@ import io.agora.scene.widget.utils.UiUtils;
  * 房间列表
  */
 //@Route(path = PagePathConstant.pageKTVRoomList)
-public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBinding> {
+public class RoomListActivity extends BaseViewBindingActivity<KtvSingbattleActivityRoomListBinding> {
     private BaseRecyclerViewAdapter<ItemRoomListBinding, RoomListModel, RoomHolder> mAdapter;
     private RoomCreateViewModel roomCreateViewModel;
     private InputPasswordDialog inputPasswordDialog;
     private boolean isJoining = false;
 
     @Override
-    protected ActivityRoomListBinding getViewBinding(@NonNull LayoutInflater inflater) {
-        return ActivityRoomListBinding.inflate(inflater);
+    protected KtvSingbattleActivityRoomListBinding getViewBinding(@NonNull LayoutInflater inflater) {
+        return KtvSingbattleActivityRoomListBinding.inflate(inflater);
     }
 
     @Override

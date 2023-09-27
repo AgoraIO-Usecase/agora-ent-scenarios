@@ -53,7 +53,7 @@
         android:singleLine="true"
         android:textColor="@color/def_text_grey_979"
         android:textSize="12sp"
-        android:text="@string/ktv_song_ordering_person"
+        android:text="@string/ktv_singbattle_song_ordering_person"
         app:layout_constraintBottom_toBottomOf="@id/ivCover"
         app:layout_constraintEnd_toStartOf="@id/tvChooser"
         app:layout_constraintStart_toEndOf="@id/ivCover" />
@@ -76,7 +76,7 @@
         android:id="@+id/tvSing"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/ktv_room_sing2"
+        android:text="@string/ktv_singbattle_room_sing2"
         android:textColor="@color/blue_9F"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"

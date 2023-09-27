@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">声动互娱-嗨歌抢唱</string>
+    <string name="app_name">声动互娱</string>
     <string name="app_title_home">首页</string>
     <string name="app_title_find">发现</string>
     <string name="app_title_mine">我的</string>
@@ -16,7 +16,7 @@
     <string name="app_about_us">关于我们</string>
 
     <string name="app_please_input_account">请输入手机号</string>
-    <string name="app_error_pwd_tip">8-20个字符，包含大、小写字母和数字</string>
+    <string name="app_error_pwd_tip">8~20个字符，包含大、小写字母和数字</string>
     <string name="app_please_input_pwd">请输入密码</string>
     <string name="app_please_input_v_code">请输入验证码</string>
     <string name="app_forget_password">忘记密码</string>
@@ -52,9 +52,22 @@
     <string name="app_about_chat_room_spatial">语聊房-空间音频模式</string>
     <string name="app_about_karaoke">在线K歌</string>
     <string name="app_about_show">秀场直播</string>
+    <string name="app_about_singbattle">嗨歌抢唱</string>
     <string name="app_about_customer_service">联系客服</string>
     <string name="app_about_official_website">官网地址</string>
     <string name="app_about_phone_cancel">取消</string>
     <string name="app_mine_current_version">当前版本号：%s</string>
+
+    <string name="app_debug_open">Debug模式已打开</string>
+    <string name="app_debug_off">Debug模式已关闭</string>
+    <string name="app_exit_debug">确定退出Debug模式么？</string>
+    <string name="app_exit_debug_tip">退出debug模式后，设置页面将恢复成正常的设置页面哦～</string>
+    <string name="app_agree_tip">请同意我们的隐私政策与用户协议</string>
+    <string name="app_input_phonenum_tip">请输入正确手机号</string>
+    <string name="app_input_vcode_tip">请输入验证码</string>
+    <string name="app_vcode_wrong_tip">验证码错误</string>
+    <string name="app_login_success_tip">登陆成功</string>
+    <string name="app_vcode_send_success_tip">验证码发送成功</string>
+    <string name="app_edit_success">修改成功</string>
 
 </resources>

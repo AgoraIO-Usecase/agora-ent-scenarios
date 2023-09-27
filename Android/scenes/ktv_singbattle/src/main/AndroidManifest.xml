@@ -4,13 +4,13 @@
 
     <application>
         <activity
-            android:name="io.agora.scene.ktv.singbattle.create.RoomCreateActivity"
+            android:name=".create.RoomCreateActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="io.agora.scene.ktv.singbattle.create.RoomListActivity"
+            android:name=".create.RoomListActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="io.agora.scene.ktv.singbattle.live.RoomLivingActivity"
+            android:name=".live.RoomLivingActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
     </application>

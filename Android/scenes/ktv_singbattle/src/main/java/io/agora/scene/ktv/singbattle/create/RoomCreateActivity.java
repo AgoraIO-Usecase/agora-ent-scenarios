@@ -21,14 +21,14 @@ import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.singbattle.R;
-import io.agora.scene.ktv.singbattle.databinding.ActivityRoomCreateBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleActivityRoomCreateBinding;
 import io.agora.scene.ktv.singbattle.live.RoomLivingActivity;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 /**
  * 创建房间
  */
-public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCreateBinding> {
+public class RoomCreateActivity extends BaseViewBindingActivity<KtvSingbattleActivityRoomCreateBinding> {
     /**
      * 当前选中的是第几个输入框
      */
@@ -39,8 +39,8 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
     private RoomCreateViewModel roomCreateViewModel;
 
     @Override
-    protected ActivityRoomCreateBinding getViewBinding(@NonNull LayoutInflater inflater) {
-        return ActivityRoomCreateBinding.inflate(inflater);
+    protected KtvSingbattleActivityRoomCreateBinding getViewBinding(@NonNull LayoutInflater inflater) {
+        return KtvSingbattleActivityRoomCreateBinding.inflate(inflater);
     }
 
     @Override
@@ -147,7 +147,7 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
 
         getBinding().btnCreate.setOnClickListener(view -> {
             if (getBinding().cbUnOpen.isChecked() && !isAllInput()) {
-                ToastUtils.showToast(getString(R.string.ktv_please_input_4_pwd));
+                ToastUtils.showToast(getString(R.string.ktv_singbattle_please_input_4_pwd));
             } else {
                 String code =
                         getBinding().etCode1.getText().toString()
@@ -155,9 +155,9 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
                                 + getBinding().etCode3.getText()
                                 + getBinding().etCode4.getText();
                 if (TextUtils.isEmpty(getBinding().etRoomName.getText())) {
-                    ToastUtils.showToast(getString(R.string.ktv_please_input_room_name));
+                    ToastUtils.showToast(getString(R.string.ktv_singbattle_please_input_room_name));
                 } else if (code.length() > 4) {
-                    ToastUtils.showToast(getString(R.string.ktv_please_input_4_pwd));
+                    ToastUtils.showToast(getString(R.string.ktv_singbattle_please_input_4_pwd));
                 } else {
                     getBinding().btnCreate.setEnabled(false);
                     createRoom(code);
@@ -183,7 +183,7 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
         showLoadingView();
         String roomName = getBinding().etRoomName.getText().toString();
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.ktv_please_input_room_name);
+            ToastUtils.showToast(R.string.ktv_singbattle_please_input_room_name);
             return;
         }
         String userNo = UserManager.getInstance().getUser().id.toString();

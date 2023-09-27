@@ -51,12 +51,12 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     
     /// 初始化房间信息
     /// - Parameter completion: <#completion description#>
-    func initRoom(completion: @escaping (NSError?) -> Void)
+    func initRoom(roomId: String?, completion: @escaping (NSError?) -> Void)
     
     
     /// 释放初始化房间信息
     /// - Parameter completion: <#completion description#>
-    func deinitRoom(completion: @escaping (NSError?) -> Void)
+    func deinitRoom(roomId: String?, completion: @escaping (NSError?) -> Void)
     
     
     /// 获取当前房间所有用户
@@ -65,9 +65,11 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     
     /// 发送聊天消息
     /// - Parameters:
-    ///   - message: <#message description#>
-    ///   - completion: <#completion description#>
-    func sendChatMessage(message: ShowMessage,
+    ///   - roomId: roomId description
+    ///   - message: message description
+    ///   - completion: completion description
+    func sendChatMessage(roomId: String?,
+                         message: ShowMessage,
                          completion: ((NSError?) -> Void)?)
     
     

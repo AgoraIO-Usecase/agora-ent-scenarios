@@ -22,10 +22,11 @@
 #import "VLUserCenter.h"
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
+#import "VLAlert.h"
 #import "AttributedTextView.h"
 @import Masonry;
-@import LEEAlert;
+@import YYCategories;
 @import SDWebImage;
 
 @interface VLLoginViewController () <VLLoginInputVerifyCodeViewDelegate, VLPrivacyCustomViewDelegate,VLPopImageVerifyViewDelegate, UITextViewDelegate>
@@ -48,7 +49,7 @@
     _policyAgreed = NO;
     
     [self setBackgroundImage:@"home_bg_image"];
-    [self setNaviTitleName:AGLocalizedString(@"声网")];
+    [self setNaviTitleName:AGLocalizedString(@"agora")];
     [self setupViews];
     [self setupLayout];
 }
@@ -60,9 +61,9 @@
 
 - (void)showAlertPrivacyView
 {
-    if(_policyAgreed == NO) {
-        [self alertPrivacyAlertView:0];
-    }
+    //if(_policyAgreed == NO) {
+     [self alertPrivacyAlertView:_policyAgreed];
+    //}
 }
 
 - (void)setupViews {
@@ -99,7 +100,7 @@
         make.width.height.mas_equalTo(24);
         make.top.mas_equalTo(self.verifyView.mas_bottom).offset(20);
     }];
-
+    
     [self.textView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(self.agreeButton.mas_right).offset(5);
         make.right.mas_equalTo(self.view.mas_right).offset(-20);
@@ -129,27 +130,7 @@
 }
 
 - (void)alertPrivacyAlertView:(int)pass {
-    kWeakSelf(self)
-    [LEEAlert alert].config
-    .LeeMaxWidth(300)
-    .LeeMaxHeight(380)
-    .LeeHeaderColor([UIColor whiteColor])
-    .LeeAddTitle(^(UILabel * _Nonnull label) {
-        label.text = AGLocalizedString(@"个人信息保护指引");
-        label.textColor = UIColorMakeWithHex(@"#040925");
-        label.font = VLUIFontMake(16);
-    })
-    .LeeItemInsets(UIEdgeInsetsMake(20, 10, 10, 0))
-    .LeeAddCustomView(^(LEECustomView *custom) {
-        kStrongSelf(self)
-        self.privacyCustomView = [self getPrivacyCustomView:pass];
-        custom.view = self.privacyCustomView;
-        custom.view.superview.layer.masksToBounds = NO;
-        custom.positionType = LEECustomViewPositionTypeCenter;
-    })
-    // 想为哪一项设置间距范围 直接在其后面设置即可 ()
-    .LeeItemInsets(UIEdgeInsetsMake(10, 10, 20, 10))
-    .LeeShow();
+   [self showPrivacyViewWith:pass];
 }
 
 #pragma mark - Public Methods
@@ -167,41 +148,13 @@
     
 }
 
-#pragma mark - VLPrivacyCustomViewDelegate
-
-- (void)privacyCustomViewDidClick:(VLPrivacyClickType)type {
-    switch (type) {
-        case VLPrivacyClickTypeAgree:
-            self.agreeButton.selected = NO;
-            _policyAgreed = NO;
-            [self closePrivaxyAlertView];
-            break;
-        case VLPrivacyClickTypeDisagree:
-            self.agreeButton.selected = NO;
-            if(self.privacyCustomView.pass == 0) {
-                self.privacyCustomView = nil;
-                [self alertPrivacyAlertView:1];
-            }
-            else if(self.privacyCustomView.pass != 0) {
-                exit(0);
-            }
-            break;
-        case VLPrivacyClickTypePrivacy:
-            [self pushToWebView:kURLPathH5Privacy];
-            [self closePrivaxyAlertView];
-            break;
-        case VLPrivacyClickTypeUserAgreement:
-            [self pushToWebView:kURLPathH5UserAgreement];
-            [self closePrivaxyAlertView];
-            break;
-        default:
-            break;
+- (void)privacyCustomViewDidChange:(bool)agree {
+    if(agree == true){
+        _policyAgreed = NO;
+    } else {
+        _policyAgreed = YES;
+        [self showPrivacyViewWith: _policyAgreed];
     }
-}
-
-- (void)closePrivaxyAlertView {
-    [LEEAlert closeWithCompletionBlock:^{
-    }];
 }
 
 #pragma mark - VLLoginInputVerifyCodeViewDelegate
@@ -235,7 +188,7 @@
 -(BOOL)checkVerifyCode {
     
     if (_verifyView.isVerifyCodeSent == NO || [_verifyView.verifyCode isEqualToString:@""] || !_verifyView.verifyCode) {
-        [VLToast toast:AGLocalizedString(@"请输入验证码")];
+        [VLToast toast:AGLocalizedString(@"app_please_input_v_code")];
         return NO;
     }
     return YES;
@@ -243,7 +196,7 @@
 
 -(BOOL)checkPrivacyAgree {
     if (!self.agreeButton.selected) {
-        [VLToast toast:AGLocalizedString(@"请您认真阅读用户协议及隐私政策的条款内容，同意后可开始使用我们的服务")];
+        [VLToast toast:AGLocalizedString(@"app_agree_tip")];
         return NO;
     }
     return YES;
@@ -251,15 +204,13 @@
 
 -(BOOL)checkPhoneNo {
     if ([_phoneView.phoneNo isEqualToString:@""] || !_phoneView.phoneNo) {
-        [VLToast toast:AGLocalizedString(@"请输入手机号")];
+        [VLToast toast:AGLocalizedString(@"app_please_input_account")];
         return NO;
     }
-    
-    if (![NSString isValidateTelNumber:_phoneView.phoneNo]) {
-        [VLToast toast:AGLocalizedString(@"手机号码格式错误")];
+    if (_phoneView.phoneNo.length != 11) {
+        [VLToast toast:AGLocalizedString(@"invalid_phone_number")];
         return NO;
     }
-    
     return YES;
 }
 
@@ -319,12 +270,12 @@
         }
         else {
             dispatch_main_async_safe(^{
-                [VLToast toast:AGLocalizedString(@"验证码校验失败，请重试")];
+                [VLToast toast:AGLocalizedString(@"validate_failed")];
             })
         }
     } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
         dispatch_main_async_safe(^{
-            [VLToast toast:AGLocalizedString(@"验证码校验失败，请重试")];
+            [VLToast toast:AGLocalizedString(@"validate_failed")];
         })
     }];
 }
@@ -336,7 +287,7 @@
         _appNameLabel = [[UILabel alloc] init];
         _appNameLabel.font = VLUIFontBoldMake(26);
         _appNameLabel.textColor = UIColorMakeWithHex(@"#040925");
-        _appNameLabel.text = AGLocalizedString(@"欢迎体验声网服务");
+        _appNameLabel.text = AGLocalizedString(@"app_welcome_experience");
     }
     return _appNameLabel;
 }
@@ -366,19 +317,10 @@
     return _agreeButton;
 }
 
-- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction {
-    if([URL isEqual:[NSURL URLWithString:@"0"]]){
-        [self navigatorToWebviewOfUserProtocol];
-    } else {
-        [self navigatorToWebviewOfPrivacyProtocol];
-    }
-    return YES;
-}
-
 - (UIButton *)loginButton {
     if (!_loginButton) {
         _loginButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_loginButton setTitle:AGLocalizedString(@"登录") forState:UIControlStateNormal];
+        [_loginButton setTitle:AGLocalizedString(@"app_login") forState:UIControlStateNormal];
         [_loginButton addTarget:self action:@selector(loginClick:) forControlEvents:UIControlEventTouchUpInside];
         [_loginButton setBackgroundColor:UIColorMakeWithHex(@"#345DFF")];
         CAGradientLayer *gl = [CAGradientLayer layer];
@@ -403,12 +345,73 @@
             _privacyCustomView.frame = CGRectMake(0, 0, 250, 260);
         }
         else {
-            _privacyCustomView.frame = CGRectMake(0, 0, 250, 100);
+            _privacyCustomView.frame = CGRectMake(0, 0, 250, 120);
         }
         _privacyCustomView.backgroundColor = [UIColor whiteColor];
         _privacyCustomView.delegate = self;
     }
     return _privacyCustomView;
+}
+
+-(void)showPrivacyViewWith:(int)pass {
+    NSString *textString =  pass == 0 ?  AGLocalizedString(@"privacy_protection_tip1") : AGLocalizedString(@"privacy_protection_tip2");
+            NSRange range1 = pass == 0 ? NSMakeRange(72, 4) : NSMakeRange(3, 4);
+            NSRange range2 = pass == 0 ? NSMakeRange(79, 4) : NSMakeRange(10, 4);
+            NSRange range3 = NSMakeRange(203, 4);
+            NSRange range4 = NSMakeRange(210, 4);
+    NSArray *arrayTitles = pass == 0 ? [[NSArray alloc]initWithObjects:@"用户协议",@"隐私政策",@"用户协议",@"隐私政策", nil] : [[NSArray alloc]initWithObjects:@"用户协议",@"隐私政策", nil];
+            NSMutableArray *ranges = [[NSMutableArray alloc]init];
+    if(pass == 0){
+        [ranges addObject:[NSValue valueWithRange:range1]];
+        [ranges addObject:[NSValue valueWithRange:range2]];
+        [ranges addObject:[NSValue valueWithRange:range3]];
+        [ranges addObject:[NSValue valueWithRange:range4]];
+    } else {
+        [ranges addObject:[NSValue valueWithRange:range1]];
+        [ranges addObject:[NSValue valueWithRange:range2]];
+    }
+    
+    CGRect rect = CGRectMake(0, 0, UIScreen.mainScreen.bounds.size.width, pass == 0 ? 260 : 120);
+    NSString *confirmTitle, *cancelTitle;
+    if(pass == 0) {
+        cancelTitle = AGLocalizedString(@"disagree");
+        confirmTitle = AGLocalizedString(@"agree");
+    }
+    else {
+        cancelTitle = AGLocalizedString(@"disagree_and_exit");
+        confirmTitle = AGLocalizedString(@"agree_and_goon");
+    }
+    NSArray *array = [[NSArray alloc]initWithObjects:cancelTitle,confirmTitle, nil];
+    kWeakSelf(self)
+    [[VLAlert shared] showAttributeAlertWithFrame:rect title:AGLocalizedString(@"personal_information") text:textString AttributedStringS:arrayTitles ranges:ranges textColor:UIColorMakeWithHex(@"#6C7192") attributeTextColor:UIColorMakeWithHex(@"#009FFF") buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+        [[VLAlert shared] dismiss];
+        if(pass == 0){
+            [weakself privacyCustomViewDidChange:flag];
+        } else {
+            if(flag == false){
+                exit(0);
+            }
+        }
+        
+    } linkCompletion:^(NSString *tag) {
+        [[VLAlert shared] dismiss];
+        if([tag isEqualToString:@"0"] || [tag isEqualToString:@"2"]){
+            [weakself navigatorToWebviewOfUserProtocol];
+        } else {
+            [weakself navigatorToWebviewOfPrivacyProtocol];
+        }
+    }];
+    
+}
+
+- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction {
+    NSURL *url = [NSURL URLWithString:@"0"];
+    if([url isEqual:URL]){
+        [self navigatorToWebviewOfUserProtocol];
+    } else {
+        [self navigatorToWebviewOfPrivacyProtocol];
+    }
+    return YES;
 }
 
 @end

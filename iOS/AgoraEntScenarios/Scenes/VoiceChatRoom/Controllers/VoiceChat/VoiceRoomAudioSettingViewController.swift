@@ -19,7 +19,17 @@ class VoiceRoomAudioSettingViewController: UIViewController {
     public var tableView: UITableView = .init()
     public var isAudience: Bool = false
     public var isPrivate: Bool = false
-    public var isTouchAble: Bool = false
+    public var isTouchAble: Bool = false {
+        willSet {
+            self.detailVC?.isTouchAble = newValue
+        }
+    }
+    var selTag: Int? {
+        willSet {
+            self.detailVC?.selTag = newValue
+        }
+    }
+    weak var detailVC: VoiceRoomAudioSettingDetailViewController?
     private let swIdentifier = "switch"
     private let slIdentifier = "slider"
     private let nIdentifier = "normal"
@@ -27,7 +37,7 @@ class VoiceRoomAudioSettingViewController: UIViewController {
 //    private var settingName: [String] = ["\(LanguageManager.localValue(key: "blue")) & \(LanguageManager.localValue(key: "red"))", LanguageManager.localValue(key: "Robot Volume"), LanguageManager.localValue(key: "Best Sound"), "AINS", "Spatial Audio"]
 //    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
     
-    private var settingName: [String] = [LanguageManager.localValue(key: "AINS"),LanguageManager.localValue(key: "AIAEC"),LanguageManager.localValue(key: "AGC"),LanguageManager.localValue(key: "Agora Blue & Red Bot"), LanguageManager.localValue(key: "Robot Volume"), LanguageManager.localValue(key: "Best Agora Sound"), "Spatial Audio"]
+    private var settingName: [String] = [LanguageManager.localValue(key: "voice_AINS"),LanguageManager.localValue(key: "voice_AIAEC"),LanguageManager.localValue(key: "voice_AGC"),LanguageManager.localValue(key: "voice_agora_blue_and_red_bot"), LanguageManager.localValue(key: "voice_robot_volume"), LanguageManager.localValue(key: "voice_best_agora_sound"), "voice_spatial_audio".voice_localized()]
     
     
     
@@ -68,7 +78,7 @@ class VoiceRoomAudioSettingViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
+//        VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
     }
     
     private func layoutUI() {
@@ -81,12 +91,12 @@ class VoiceRoomAudioSettingViewController: UIViewController {
         view.addSubview(cover)
 
         lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20, y: 8, width: 40, height: 4)
-        lineImgView.image = UIImage("pop_indicator")
+        lineImgView.image = UIImage.sceneImage(name: "pop_indicator", bundleName: "VoiceChatRoomResource")
         view.addSubview(lineImgView)
 
         titleLabel.frame = CGRect(x: ScreenWidth / 2.0 - 60, y: 30, width: 120, height: 30)
         titleLabel.textAlignment = .center
-        titleLabel.text = LanguageManager.localValue(key: "Audio Settings")
+        titleLabel.text = LanguageManager.localValue(key: "voice_audio_settings")
         titleLabel.textColor = UIColor(red: 0.016, green: 0.035, blue: 0.145, alpha: 1)
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(titleLabel)
@@ -101,7 +111,7 @@ class VoiceRoomAudioSettingViewController: UIViewController {
         tableView.tableFooterView = UIView()
         tableView.isScrollEnabled = false
 
-        tableView.separatorColor = UIColor.HexColor(hex: 0xF6F6F6, alpha: 1)
+        tableView.separatorColor = UIColor(hex: 0xF6F6F6, alpha: 1)
 
         if #available(iOS 15.0, *) {
             tableView.sectionHeaderTopPadding = 0
@@ -145,39 +155,39 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 32))
             headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 2, width: 300, height: 30))
-            titleLabel.text = LanguageManager.localValue(key: "Personal audio Settings")
+            titleLabel.text = LanguageManager.localValue(key: "voice_personal_audio_settings")
             
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
             headerView.addSubview(titleLabel)
             return headerView
         } else  if section == 1{
-            let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: LanguageManager.localValue(key: "Bot Settings"))
+            let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: LanguageManager.localValue(key: "voice_bot_settings"))
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 32))
             headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 2, width: width, height: 30))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-            titleLabel.text = LanguageManager.localValue(key: "Bot Settings")
+            titleLabel.text = LanguageManager.localValue(key: "voice_bot_settings")
             headerView.addSubview(titleLabel)
 
             let imgView: UIImageView = .init(frame: CGRect(x: width + 30, y: 6, width: 30, height: 20))
-            imgView.image = UIImage("new")
+            imgView.image = UIImage.sceneImage(name: "new", bundleName: "VoiceChatRoomResource")
             headerView.addSubview(imgView)
 
             return headerView
         } else if section == 2 {
-            let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: LanguageManager.localValue(key: "Room Audio Settings"))
+            let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: LanguageManager.localValue(key: "voice_room_audio_settings"))
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 32))
             headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 2, width: width, height: 30))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-            titleLabel.text = LanguageManager.localValue(key: "Room Audio Settings")
+            titleLabel.text = LanguageManager.localValue(key: "voice_room_audio_settings")
             headerView.addSubview(titleLabel)
 
             let imgView: UIImageView = .init(frame: CGRect(x: width + 30, y: 6, width: 30, height: 20))
-            imgView.image = UIImage("new")
+            imgView.image = UIImage.sceneImage(name: "new", bundleName: "VoiceChatRoomResource")
             headerView.addSubview(imgView)
 
             return headerView
@@ -195,17 +205,17 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             headerView.addSubview(titleLabel)
             return headerView
         } else {
-            let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: LanguageManager.localValue(key: "ACEQ"))
+            let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: LanguageManager.localValue(key: "voice_ACEQ"))
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 32))
             headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 2, width: width, height: 30))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-            titleLabel.text = LanguageManager.localValue(key: "ACEQ")
+            titleLabel.text = LanguageManager.localValue(key: "voice_ACEQ")
             headerView.addSubview(titleLabel)
 
             let imgView: UIImageView = .init(frame: CGRect(x: width + 30, y: 6, width: 30, height: 20))
-            imgView.image = UIImage("new")
+            imgView.image =UIImage.sceneImage(name: "new")
             headerView.addSubview(imgView)
 
             return headerView
@@ -224,39 +234,39 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
 
             guard !settingImage.isEmpty else { return cell}
 
-            cell.iconView.image = UIImage(settingImage[0 + indexPath.row])
+            cell.iconView.image = UIImage.voice_image(settingImage[0 + indexPath.row])
             cell.titleLabel.text = settingName[0 + indexPath.row]
             if indexPath.row == 0 {
                 //cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
                 switch ains_state {
                 case .high:
-                    cell.contentLabel.text = "High".localized()
+                    cell.contentLabel.text = "voice_High".voice_localized()
                 case .mid:
-                    cell.contentLabel.text = "Medium".localized()
+                    cell.contentLabel.text = "voice_Medium".voice_localized()
                 case .off:
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "voice_off".voice_localized()
                 }
                 
                 
             } else if indexPath.row == 1 {
                 if roomInfo?.room?.turn_AIAEC == true {
-                    cell.contentLabel.text = "On".localized()
+                    cell.contentLabel.text = "voice_on".voice_localized()
                 } else {
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "voice_off".voice_localized()
                 }
             } else if indexPath.row == 2 {
                 if roomInfo?.room?.turn_AGC == true {
-                    cell.contentLabel.text = "On".localized()
+                    cell.contentLabel.text = "voice_on".voice_localized()
                 } else {
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "voice_off".voice_localized()
                 }
             } else {
-                cell.contentLabel.text = "Other".localized()
+                cell.contentLabel.text = "Other".voice_localized()
 
             }
 //            else {
 //                if roomInfo?.room?.t
-//                cell.contentLabel.text = "Off".localized()
+//                cell.contentLabel.text = "voice_off".localized()
 //
 //            }
 //            else if indexPath.row == 1 {
@@ -266,7 +276,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
 //                case .mid:
 //                    cell.contentLabel.text = "Middle".localized()
 //                case .off:
-//                    cell.contentLabel.text = "Off".localized()
+//                    cell.contentLabel.text = "voice_off".localized()
 //                }
 //            }
             return cell
@@ -280,11 +290,11 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 } else if indexPath.row == 1 {
                     switch ains_state {
                     case .high:
-                        cell.contentLabel.text = "High".localized()
+                        cell.contentLabel.text = "voice_High".localized()
                     case .mid:
                         cell.contentLabel.text = "Middle".localized()
                     case .off:
-                        cell.contentLabel.text = "Off".localized()
+                        cell.contentLabel.text = "voice_off".localized()
                     }
                 }
                 return cell
@@ -320,7 +330,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             if indexPath.row == 0 {
                 let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
                 guard !settingImage.isEmpty else { return cell}
-                cell.iconView.image = UIImage(settingImage[3])
+                cell.iconView.image = UIImage.voice_image(settingImage[3])
                 cell.titleLabel.text = settingName[3]
                 cell.swith.alpha = isAudience ? 0.5 : 1
                 cell.swith.isUserInteractionEnabled = !isAudience
@@ -336,7 +346,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 let cell: VMSliderTableViewCell = tableView.dequeueReusableCell(withIdentifier: slIdentifier) as! VMSliderTableViewCell
                 guard !settingImage.isEmpty else { return cell}
 
-                cell.iconView.image = UIImage(settingImage[4])
+                cell.iconView.image = UIImage.voice_image(settingImage[4])
                 cell.titleLabel.text = settingName[4]
                 cell.isAudience = isAudience
                 cell.selectionStyle = .none
@@ -359,7 +369,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             }
             guard !settingImage.isEmpty else { return cell}
 
-            cell.iconView.image = UIImage(settingImage[5])
+            cell.iconView.image = UIImage.voice_image(settingImage[5])
             cell.titleLabel.text = settingName[5]
       
 
@@ -368,11 +378,11 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             } else if indexPath.row == 1 {
                 switch ains_state {
                 case .high:
-                    cell.contentLabel.text = "High".localized()
+                    cell.contentLabel.text = "voice_High".voice_localized()
                 case .mid:
-                    cell.contentLabel.text = "Medium".localized()
+                    cell.contentLabel.text = "voice_Medium".voice_localized()
                 case .off:
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "voice_off".voice_localized()
                 }
             }
             return cell
@@ -445,6 +455,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         }
         tableViewHeight = heightType.rawValue - 70
         let detailVC: VoiceRoomAudioSettingDetailViewController = VoiceRoomAudioSettingDetailViewController()
+        self.detailVC = detailVC
         detailVC.roomInfo = roomInfo
         detailVC.isAudience = isAudience
         detailVC.soundEffect = roomInfo?.room?.sound_effect ?? 1
@@ -512,18 +523,18 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
     }
     
     private func getSoundType(with index: Int) -> String {
-        var soundType: String = "Social Chat".localized()
+        var soundType: String = "voice_social_chat".voice_localized()
         switch index {
         case 1:
-            soundType = "Social Chat".localized()
+            soundType = "voice_social_chat".voice_localized()
         case 2:
-            soundType = "Karaoke".localized()
+            soundType = "voice_karaoke".voice_localized()
         case 3:
-            soundType = "Gaming Buddy".localized()
+            soundType = "voice_gaming_buddy".voice_localized()
         case 4:
-            soundType = "Professional Podcaster".localized()
+            soundType = "voice_professional_podcaster".voice_localized()
         default:
-            soundType = "Social Chat".localized()
+            soundType = "voice_social_chat".voice_localized()
         }
         return soundType
     }

@@ -18,14 +18,14 @@ import java.util.List;
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.singbattle.R;
-import io.agora.scene.ktv.singbattle.databinding.KtvDialogChooseSongBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogChooseSongBinding;
 import io.agora.scene.ktv.singbattle.live.listener.SongActionListenerImpl;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
  * 点歌菜单
  */
-public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSongBinding> {
+public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialogChooseSongBinding> {
 
     private OnSongActionListener chooseSongListener;
 

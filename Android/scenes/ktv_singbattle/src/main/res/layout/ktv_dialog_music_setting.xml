@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
-        android:text="@string/ktv_music_menu_dialog_title"
+        android:text="@string/ktv_singbattle_music_menu_dialog_title"
         android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -27,7 +27,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ktv_music_menu_dialog_ear"
+            android:text="@string/ktv_singbattle_music_menu_dialog_ear"
             android:textColor="@color/def_text_grey_979" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
@@ -41,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="@string/ktv_please_use_headset"
+            android:text="@string/ktv_singbattle_please_use_headset"
             android:textColor="@color/def_text_grey_6c7" />
     </LinearLayout>
 
@@ -57,7 +57,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ktv_music_menu_dialog_mv"
+            android:text="@string/ktv_singbattle_music_menu_dialog_mv"
             android:textColor="@color/def_text_grey_979" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
@@ -84,7 +84,7 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:focusable="false"
-            android:text="@string/ktv_music_menu_dialog_tone"
+            android:text="@string/ktv_singbattle_music_menu_dialog_tone"
             android:textColor="#9BA2AB" />
 
         <ImageButton
@@ -93,7 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="23dp"
             android:background="@null"
-            android:contentDescription="@string/ktv_tone_down"
+            android:contentDescription="@string/ktv_singbattle_tone_down"
             android:padding="6dp"
             android:src="@drawable/ic_tone_down" />
 
@@ -111,7 +111,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
-            android:contentDescription="@string/ktv_tone_up"
+            android:contentDescription="@string/ktv_singbattle_tone_up"
             android:padding="6dp"
             android:src="@drawable/ic_tone_up" />
     </LinearLayout>
@@ -129,7 +129,7 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:focusable="false"
-            android:text="@string/ktv_music_menu_dialog_vol1"
+            android:text="@string/ktv_singbattle_music_menu_dialog_vol1"
             android:textColor="#9BA2AB" />
 
         <androidx.appcompat.widget.AppCompatSeekBar
@@ -138,7 +138,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="35dp"
-            android:contentDescription="@string/ktv_music_menu_dialog_vol1"
+            android:contentDescription="@string/ktv_singbattle_music_menu_dialog_vol1"
             android:max="100"
             android:progress="20"
             android:progressDrawable="@drawable/bg_seekbar_progress"
@@ -158,7 +158,7 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:focusable="false"
-            android:text="@string/ktv_music_menu_dialog_vol2"
+            android:text="@string/ktv_singbattle_music_menu_dialog_vol2"
             android:textColor="#9BA2AB" />
 
         <androidx.appcompat.widget.AppCompatSeekBar
@@ -166,7 +166,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="35dp"
-            android:contentDescription="@string/ktv_music_menu_dialog_vol2"
+            android:contentDescription="@string/ktv_singbattle_music_menu_dialog_vol2"
             android:max="100"
             android:progress="20"
             android:progressDrawable="@drawable/bg_seekbar_progress"
@@ -187,7 +187,7 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:focusable="false"
-            android:text="@string/ktv_music_menu_dialog_remote_volume"
+            android:text="@string/ktv_singbattle_music_menu_dialog_remote_volume"
             android:textColor="#9BA2AB" />
 
         <ImageButton
@@ -196,7 +196,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:background="@null"
-            android:contentDescription="@string/ktv_remote_volume_down"
+            android:contentDescription="@string/ktv_singbattle_remote_volume_down"
             android:padding="6dp"
             android:src="@drawable/ic_tone_down" />
 
@@ -216,7 +216,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
-            android:contentDescription="@string/ktv_remote_volume_up"
+            android:contentDescription="@string/ktv_singbattle_remote_volume_up"
             android:padding="6dp"
             android:src="@drawable/ic_tone_up" />
 
@@ -224,7 +224,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="@string/ktv_input_remote_volume"
+            android:text="@string/ktv_singbattle_input_remote_volume"
             android:textColor="@color/def_text_grey_6c7" />
     </LinearLayout>
 
