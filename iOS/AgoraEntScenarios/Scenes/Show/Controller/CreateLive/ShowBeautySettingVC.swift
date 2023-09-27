@@ -242,8 +242,13 @@ extension ShowBeautySettingVC {
     
     // 点击对比按钮
     @objc private func didClickCompareButton(sender: UIButton){
-        sender.isSelected = !sender.isSelected
-        BeautyManager.shareManager.isEnableBeauty = sender.isSelected
+        if let _ = Bundle.main.path(forResource: "SENSEME.lic", ofType: nil) {
+            // 存在美颜证书
+            sender.isSelected = !sender.isSelected
+            BeautyManager.shareManager.isEnableBeauty = sender.isSelected
+        } else {
+            ToastView.show(text: "show_beauty_license_disable".show_localized)
+        }
     }
 }
 
