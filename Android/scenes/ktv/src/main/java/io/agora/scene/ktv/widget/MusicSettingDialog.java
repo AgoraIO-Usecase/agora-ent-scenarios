@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -14,19 +15,34 @@ import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.GridLayoutManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
+import io.agora.scene.base.component.BaseRecyclerViewAdapter;
+import io.agora.scene.base.component.BaseViewBindingFragment;
+import io.agora.scene.base.component.OnItemClickListener;
 import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.ktv.R;
+import io.agora.scene.ktv.bean.EffectVoiceBean;
 import io.agora.scene.ktv.databinding.KtvDialogMusicSettingBinding;
+import io.agora.scene.ktv.databinding.KtvItemEffectvoiceBinding;
+import io.agora.scene.ktv.live.fragment.dialog.BeautyVoiceFragment;
+import io.agora.scene.ktv.live.fragment.dialog.EarBackFragment;
+import io.agora.scene.ktv.live.holder.EffectVoiceHolder;
+import io.agora.scene.widget.DividerDecoration;
 
 /**
  * 控制台
  */
-public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogMusicSettingBinding> {
+public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogMusicSettingBinding> implements OnItemClickListener<EffectVoiceBean> {
     public static final String TAG = "MusicSettingDialog";
     private MusicSettingBean mSetting;
     private Boolean isPause = false;
+    private BaseRecyclerViewAdapter<KtvItemEffectvoiceBinding, EffectVoiceBean, EffectVoiceHolder> adapter;
 
     public MusicSettingDialog(MusicSettingBean mSetting, boolean isPause) {
         this.mSetting = mSetting;
@@ -78,33 +94,44 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
 
         // 升降调
         tuningTone(null);
-        mBinding.switchEar.setChecked(this.mSetting.isEar());
+        //mBinding.switchEar.setChecked(this.mSetting.isEar());
 
         mBinding.sbVol1.setProgress(this.mSetting.getVolMic());
         mBinding.sbVol2.setProgress(this.mSetting.getVolMusic());
 
-        mBinding.changeToneView.currentPitch = getCurrentPitch(mSetting.getToneValue());
+        mBinding.changeToneView.setProgress(getCurrentPitch(mSetting.getToneValue()));
         setSoundMode();
         mBinding.btnToneDownDialogSetting.setOnClickListener(v -> tuningTone(false));
         mBinding.btnToneUpDialogSetting.setOnClickListener(v -> tuningTone(true));
 
         if (isPause) {
-            mBinding.textRemoteVolume.setEnabled(false);
+            mBinding.sbRemoteVol.setEnabled(false);
             mBinding.btnRemoteVolumeUpDialogSetting.setEnabled(false);
             mBinding.btnRemoteVolumeDownDialogSetting.setEnabled(false);
-            mBinding.textRemoteVolume.setText("" + 100);
+            mBinding.sbRemoteVol.setProgress(100);
         } else {
-            mBinding.textRemoteVolume.setEnabled(true);
+            mBinding.sbRemoteVol.setEnabled(true);
             mBinding.btnRemoteVolumeUpDialogSetting.setEnabled(true);
             mBinding.btnRemoteVolumeDownDialogSetting.setEnabled(true);
-            mBinding.textRemoteVolume.setText("" + this.mSetting.getRemoteVolume());
+            mBinding.sbRemoteVol.setProgress(this.mSetting.getRemoteVolume());
         }
 
-        mBinding.switchEar.setOnCheckedChangeListener((buttonView, isChecked) -> this.mSetting.setEar(isChecked));
+        //mBinding.switchEar.setOnCheckedChangeListener((buttonView, isChecked) -> this.mSetting.setEar(isChecked));
+        if (this.mSetting.isEar()) {
+            mBinding.switchEar.setText("开启");
+        } else {
+            mBinding.switchEar.setText("关闭");
+        }
+        mBinding.switchEar.setOnClickListener(this::showEarBackPage);
+
+        mBinding.btVol1Down.setOnClickListener(v -> tuningMicVolume(false));
+        mBinding.btVol1Up.setOnClickListener(v -> tuningMicVolume(true));
         mBinding.sbVol1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mSetting.setVolMic(i);
+                if (seekBar.isPressed()) {
+                    mSetting.setVolMic(i);
+                }
             }
 
             @Override
@@ -117,10 +144,15 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
 
             }
         });
+
+        mBinding.btVol2Down.setOnClickListener(v -> tuningMusicVolume(false));
+        mBinding.btVol2Up.setOnClickListener(v -> tuningMusicVolume(true));
         mBinding.sbVol2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mSetting.setVolMusic(i);
+                if (seekBar.isPressed()) {
+                    mSetting.setVolMusic(i);
+                }
             }
 
             @Override
@@ -136,42 +168,51 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         mBinding.btnRemoteVolumeDownDialogSetting.setOnClickListener(v -> {
             int volume = mSetting.getRemoteVolume();
             int newVolume = volume - 1;
-            mBinding.textRemoteVolume.setText("" + newVolume);
+            mBinding.sbRemoteVol.setProgress(newVolume);
         });
         mBinding.btnRemoteVolumeUpDialogSetting.setOnClickListener(v -> {
             int volume = mSetting.getRemoteVolume();
             int newVolume = volume + 1;
-            mBinding.textRemoteVolume.setText("" + newVolume);
+            mBinding.sbRemoteVol.setProgress(newVolume);
         });
-        mBinding.textRemoteVolume.addTextChangedListener(new TextWatcher() {
+        mBinding.sbRemoteVol.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if (editable != null && editable.length() > 0) {
-                    String text = editable.toString();
-                    int newVolume = Integer.parseInt(text);
-                    if (newVolume < 0) {
-                        newVolume = 0;
-                    } else if (newVolume > 100) {
-                        newVolume = 100;
-                    }
-                    mSetting.setRemoteVolume(newVolume);
-                    mBinding.textRemoteVolume.setHint("" + newVolume);
-                } else {
-                    mSetting.setRemoteVolume(15);
-                    mBinding.textRemoteVolume.setHint("" + 15);
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if (seekBar.isPressed()) {
+                    mSetting.setRemoteVolume(i);
+                    mBinding.sbRemoteVol.setProgress(i);
                 }
             }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
         });
+
+        List<EffectVoiceBean> list = new ArrayList<>();
+        list.add(new EffectVoiceBean(0, R.mipmap.bg_sound_mode_1, "原声"));
+        list.add(new EffectVoiceBean(1, R.mipmap.bg_sound_mode_2, "KTV"));
+        list.add(new EffectVoiceBean(2, R.mipmap.bg_sound_mode_3, "演唱会"));
+        list.add(new EffectVoiceBean(3, R.mipmap.bg_sound_mode_4, "录音棚"));
+        list.add(new EffectVoiceBean(4, R.mipmap.bg_sound_mode_1, "留声机"));
+        list.add(new EffectVoiceBean(5, R.mipmap.bg_sound_mode_2, "空旷"));
+        list.add(new EffectVoiceBean(6, R.mipmap.bg_sound_mode_3, "空灵"));
+        list.add(new EffectVoiceBean(7, R.mipmap.bg_sound_mode_4, "流行"));
+        list.add(new EffectVoiceBean(8, R.mipmap.bg_sound_mode_1, "R&B"));
+        for (EffectVoiceBean item : list) {
+            item.setSelect(mSetting.getEffect() == item.getId());
+        }
+
+        adapter = new BaseRecyclerViewAdapter<>(list, this, EffectVoiceHolder.class);
+
+        mBinding.rvVoiceEffectList.setAdapter(adapter);
+        mBinding.rvVoiceEffectList.addItemDecoration(new DividerDecoration(10, 20, 0));
     }
 
     private void setSoundMode() {
@@ -206,6 +247,14 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         ((RadioButton) mBinding.radioGroup.getChildAt(mSetting.getEffect())).setChecked(true);
     }
 
+    private void showEarBackPage(View v) {
+        mBinding.getRoot().removeAllViews();
+        BaseViewBindingFragment<?> earBackFragment = new EarBackFragment(mSetting);
+        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+        ft.add(mBinding.getRoot().getId(), earBackFragment, EarBackFragment.TAG);
+        ft.commit();
+    }
+
     /**
      * IMediaPlayer.java
      * /**
@@ -225,11 +274,9 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         int newToneValue = this.mSetting.getToneValue();
         if (toneUp != null) {
             if (toneUp) {
-                mBinding.changeToneView.currentPitchPlus();
                 newToneValue += 2;
             } else {
                 newToneValue -= 2;
-                mBinding.changeToneView.currentPitchMinus();
             }
             if (newToneValue > 12)
                 newToneValue = 12;
@@ -239,18 +286,65 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
 
             if (newToneValue != this.mSetting.getToneValue())
                 this.mSetting.setToneValue(newToneValue);
+            }
+        mBinding.changeToneView.setProgress(newToneValue);
+    }
+
+    private void tuningMicVolume(Boolean volumeUp) {
+        int newVocalVolume = this.mSetting.getVolMic();
+        if (volumeUp) {
+            newVocalVolume += 1;
+        } else {
+            newVocalVolume -= 1;
         }
-//        mBinding.textToneDialogSetting.setText(String.valueOf(newToneValue));
+        if (newVocalVolume > 100)
+            newVocalVolume = 100;
+
+        if (newVocalVolume < 0)
+            newVocalVolume = 0;
+        if (newVocalVolume != this.mSetting.getVolMic()) {
+            this.mSetting.setVolMic(newVocalVolume);
+        }
+        mBinding.sbVol1.setProgress(newVocalVolume);
+    }
+
+    private void tuningMusicVolume(Boolean volumeUp) {
+        int newMusicVolume = this.mSetting.getVolMusic();
+        if (volumeUp) {
+            newMusicVolume += 1;
+        } else {
+            newMusicVolume -= 1;
+        }
+        if (newMusicVolume > 100)
+            newMusicVolume = 100;
+
+        if (newMusicVolume < 0)
+            newMusicVolume = 0;
+        if (newMusicVolume != this.mSetting.getVolMusic()) {
+            this.mSetting.setVolMusic(newMusicVolume);
+        }
+        mBinding.sbVol2.setProgress(newMusicVolume);
     }
 
     public void onStopPlayer() {
-        mBinding.textRemoteVolume.setHint("" + 100);
+        mBinding.sbRemoteVol.setProgress(100);
     }
 
     public void onResumePlayer() {
-        mBinding.textRemoteVolume.setHint("" + this.mSetting.getRemoteVolume());
+        mBinding.sbRemoteVol.setProgress(this.mSetting.getRemoteVolume());
     }
 
+    @Override
+    public void onItemClick(@NonNull EffectVoiceBean data, View view, int position, long viewType) {
+        OnItemClickListener.super.onItemClick(data, view, position, viewType);
+        Log.d(TAG, "onItemClick    " + position);
+
+        for (int i = 0; i < adapter.dataList.size(); i++) {
+            adapter.dataList.get(i).setSelect(i == position);
+            adapter.notifyItemChanged(i);
+        }
+        mSetting.setEffect(data.getId());
+    }
 
     public interface Callback {
         void onEarChanged(boolean isEar);
@@ -268,5 +362,21 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         void onToneChanged(int newToneValue);
 
         void onRemoteVolumeChanged(int volume);
+
+        void onProfessionalModeChanged(boolean enable);
+
+        void onAECLevelChanged(int level);
+
+        void onLowLatencyModeChanged(boolean enable);
+
+        void onEarBackVolumeChanged(int volume);
+
+        void onEarBackModeChanged(int mode);
+
+        void onAINSModeChanged(int mode);
+
+        void onAIAECChanged(boolean enable);
+
+        void onAIAECStrengthSelect(int strength);
     }
 }
