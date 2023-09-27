@@ -1331,7 +1331,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         self.segmentScore = 0;
         self.segmentCount = 0;
         self.currentUserNo = self.nextWinNo ? self.nextWinNo : self.seatsArray.firstObject.userNo;
-     //   self.isNowMicMuted = ![self.currentUserNo isEqualToString:VLUserCenter.user.id];
+        self.isNowMicMuted = ![self.currentUserNo isEqualToString:VLUserCenter.user.id];
         
         //开麦
         [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:self.isNowMicMuted
@@ -1418,25 +1418,62 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(flag == YES){
             [weakself.SRApi stopSing];
             [weakself removeCurrentSongWithSync:YES];
-            [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"MICOWNERINDEX"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            weakself.isNowMicMuted = true;
-            [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:weakself.isNowMicMuted completion:^(NSError * err) {
+            [weakself reNewAllData];
+            self.gameModel.status = SingRelayStatusWaiting;
+            self.statusView.state = [self isRoomOwner] ? SBGStateOwnerOrderMusic : SBGStateAudienceWating;
+            [[AppContext srServiceImp] innerUpdateSingRelayInfo:self.gameModel completion:^(NSError * error) {
                 
             }];
-            
-            weakself.gameModel.status = SingRelayStatusEnded;
-            if([weakself isRoomOwner]){
-////                //房主把分数给到服务端
-//                weakself.gameModel.rank = [weakself convertScoreArrayToRank];
-//                NSLog(@"model: %@", weakself.gameModel.rank);
-                [[AppContext srServiceImp] innerUpdateSingRelayInfo:weakself.gameModel completion:^(NSError * err) {
-
-                }];
-            }
+//            [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"MICOWNERINDEX"];
+//            [[NSUserDefaults standardUserDefaults] synchronize];
+//            weakself.isNowMicMuted = true;
+//            [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:weakself.isNowMicMuted completion:^(NSError * err) {
+//
+//            }];
+//
+//            weakself.gameModel.status = SingRelayStatusEnded;
+//            if([weakself isRoomOwner]){
+//////                //房主把分数给到服务端
+////                weakself.gameModel.rank = [weakself convertScoreArrayToRank];
+////                NSLog(@"model: %@", weakself.gameModel.rank);
+//                [[AppContext srServiceImp] innerUpdateSingRelayInfo:weakself.gameModel completion:^(NSError * err) {
+//
+//                }];
+//            }
         }
         [[VLAlert shared] dismiss];
     }];
+}
+
+-(void)reNewAllData {
+
+  [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"MICOWNERINDEX"];
+  [[NSUserDefaults standardUserDefaults] synchronize];
+  self.isNowMicMuted = true;
+  [[AppContext srServiceImp] updateSeatAudioMuteStatusWith:self.isNowMicMuted completion:^(NSError * err) {
+      
+  }];
+
+  [_bottomView setAudioBtnEnabled:true];
+  self.chooseArray = [NSMutableArray arrayWithObjects:@(NO), @(NO), @(NO), @(NO), @(NO), nil];
+  self.currentUserNo = self.seatsArray.firstObject.userNo;
+  self.nextWinNo = nil;
+  self.segmentScore = 0;
+  self.segmentCount = 0;
+  self.sumScore = 0;
+  self.cosingerLoadCount = 0;
+  self.MainSingerPlayFlag = false;
+  self.hasCountDown = false;
+  self.currentIndex = 0;
+  [self.SRApi stopSing];
+  [self.statusView resetLrcView];
+  [self.SRApi switchSingerRoleWithNewRole:SRSingRoleAudience onSwitchRoleState:^(SRSwitchRoleState state, SRSwitchRoleFailReason reason)     {
+
+  }];
+  dispatch_async(dispatch_get_main_queue(), ^{
+      [self.statusView hideNextMicOwner];
+      [self.scoreArray removeAllObjects];
+  });
 }
 
 -(void)startGame{//开始游戏 随机选歌
@@ -2021,6 +2058,9 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
          1.房主是选歌状态
          2.观众是等待状态
          */
+        if(![self isRoomOwner]){
+            [self reNewAllData];
+        }
         self.statusView.state = [self isRoomOwner] ? SBGStateOwnerOrderMusic : SBGStateAudienceWating;
     } else if(gameModel.status == SingRelayStatusStarted){
         /**
