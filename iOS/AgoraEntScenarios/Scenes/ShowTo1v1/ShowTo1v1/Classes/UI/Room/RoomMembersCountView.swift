@@ -80,5 +80,6 @@ class RoomMembersCountView: UIView {
             make.centerX.equalToSuperview()
             make.bottom.equalTo(-4)
         }
+        count = 1
     }
 }
