@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="105dp"
+    android:layout_height="78dp"
+    android:layout_marginEnd="15dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivCover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearance="@style/ktv_cornerTinyStyle"
+        tools:src="@mipmap/ktv_music_background1" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivSelected"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/bg_select_cover"
+        app:layout_constraintBottom_toBottomOf="@id/ivCover"
+        app:layout_constraintEnd_toEndOf="@id/ivCover"
+        app:layout_constraintStart_toStartOf="@id/ivCover"
+        app:layout_constraintTop_toTopOf="@id/ivCover" />
+</androidx.constraintlayout.widget.ConstraintLayout>

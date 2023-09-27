@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_full_blue_top_20"
+    tools:theme="@style/Theme.MaterialComponents"
+    android:paddingBottom="50dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBackIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="9dp"
+        android:src="@mipmap/back_empty_white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/ktv_singbattle_voice_effect"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <io.agora.scene.widget.CusHorizontalScrollView
+        android:id="@+id/hScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginTop="28dp"
+        android:paddingHorizontal="5dp"
+        android:scrollbars="none"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivBackIcon">
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/rBtnEffect1"
+                style="@style/ktvSongEffectBtnStyle"
+                android:text="@string/ktv_singbattle_song_effect_1" />
+
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/rBtnEffect2"
+                style="@style/ktvSongEffectBtnStyle"
+                android:text="@string/ktv_singbattle_song_effect_2" />
+
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/rBtnEffect3"
+                style="@style/ktvSongEffectBtnStyle"
+                android:text="@string/ktv_singbattle_song_effect_3" />
+
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/rBtnEffect4"
+                style="@style/ktvSongEffectBtnStyle"
+                android:text="@string/ktv_singbattle_song_effect_4" />
+        </RadioGroup>
+
+    </io.agora.scene.widget.CusHorizontalScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="13dp"
+        android:background="@color/def_text_color_040"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hScrollView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="39dp"
+        android:text="@string/ktv_singbattle_start_electric_sound"
+        android:textColor="@color/def_text_grey_979"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hScrollView" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cbStartElectricSound"
+        android:layout_width="50dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="89dp"
+        android:layout_marginTop="34dp"
+        android:button="@drawable/cb_def_selector"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hScrollView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/cbAudioDumpText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="150dp"
+        android:layout_marginTop="39dp"
+        android:text="Audio Dump"
+        android:textColor="@color/def_text_grey_979"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hScrollView" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cbStartAudioDump"
+        android:layout_width="50dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="240dp"
+        android:layout_marginTop="34dp"
+        android:button="@drawable/cb_def_selector"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hScrollView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/ktv_singbattle_select_mode"
+        android:textColor="@color/def_text_grey_979"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cbStartElectricSound" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBgSelect"
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:layout_marginTop="37dp"
+        android:background="@drawable/bg_round_black"
+        android:padding="56dp"
+        android:src="@drawable/bg_round_blue_empty"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cbStartElectricSound" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cbGentleWind"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="11dp"
+        android:button="@null"
+        android:checked="true"
+        android:drawableEnd="@drawable/bg_cb_check_round_blue"
+        android:enabled="false"
+        android:paddingEnd="8dp"
+        android:text="@string/ktv_singbattle_gentle_wind"
+        android:textColor="@color/grey_to_white"
+        app:layout_constraintBottom_toBottomOf="@id/ivBgSelect"
+        app:layout_constraintStart_toStartOf="@id/ivBgSelect"
+        app:layout_constraintTop_toTopOf="@id/ivBgSelect" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cbMinor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:button="@null"
+        android:drawableBottom="@drawable/bg_cb_check_round_blue"
+        android:enabled="false"
+        android:gravity="center"
+        android:paddingBottom="8dp"
+        android:text="@string/ktv_singbattle_minor"
+        android:textColor="@color/grey_to_white"
+        app:layout_constraintEnd_toEndOf="@id/ivBgSelect"
+        app:layout_constraintStart_toStartOf="@id/ivBgSelect"
+        app:layout_constraintTop_toTopOf="@id/ivBgSelect" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cbMajor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="11dp"
+        android:button="@null"
+        android:drawableStart="@drawable/bg_cb_check_round_blue"
+        android:enabled="false"
+        android:gravity="center"
+        android:text="@string/ktv_singbattle_major"
+        android:textColor="@color/grey_to_white"
+        app:layout_constraintBottom_toBottomOf="@id/ivBgSelect"
+        app:layout_constraintEnd_toEndOf="@id/ivBgSelect"
+        app:layout_constraintTop_toTopOf="@id/ivBgSelect"
+        tools:ignore="RtlSymmetry" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/ktv_singbattle_select_starting_scale"
+        android:textColor="@color/def_text_grey_979"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivBgSelect" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivRoundBG"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_round_button"
+        app:layout_constraintBottom_toBottomOf="@id/ivBgSelect"
+        app:layout_constraintEnd_toEndOf="@id/ivBgSelect"
+        app:layout_constraintStart_toStartOf="@id/ivBgSelect"
+        app:layout_constraintTop_toTopOf="@id/ivBgSelect" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="52dp"
+        android:layout_marginEnd="4dp"
+        android:visibility="gone"
+        app:chipSpacingHorizontal="24dp"
+        app:chipSpacingVertical="20dp"
+        app:flow_maxElementsWrap="3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivBgSelect"
+        app:selectionRequired="true"
+        app:singleSelection="true" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="52dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="207dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivBgSelect"
+        tools:visibility="visible">
+
+        <RadioButton
+            android:id="@+id/rBtnA"
+            style="@style/ktvScaleBtnStyle"
+            android:text="@string/ktv_singbattle_effect_a" />
+
+        <RadioButton
+            android:id="@+id/rBtnBb"
+            style="@style/ktvScaleBtnStyle"
+            android:text="@string/ktv_singbattle_effect_a_2" />
+
+        <RadioButton
+            android:id="@+id/rBtnB"
+            style="@style/ktvScaleBtnStyle"
+            android:text="@string/ktv_singbattle_effect_b" />
+
+        <RadioButton
+            android:id="@+id/rBtnC"
+            style="@style/ktvScaleBtnStyle"
+            android:text="@string/ktv_singbattle_effect_c" />
+
+        <RadioButton
+            android:id="@+id/rBtnDD"
+            style="@style/ktvScaleBtnStyle"
+            android:text="@string/ktv_singbattle_effect_c_2" />
+    </RadioGroup>
+
+    <RadioGroup
+        android:id="@+id/radioGroup2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="207dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/radioGroup1"
+        tools:visibility="visible">
+
+        <RadioButton
+            android:id="@+id/rBtnD"
+            style="@style/ktvScaleBtnStyle"
+            android:text="@string/ktv_singbattle_effect_d" />
+
+        <RadioButton
+            android:id="@+id/rBtnD2"
+            style="@style/ktvScaleBtnStyle"
+            android:text="@string/ktv_singbattle_effect_d_2" />
+
+        <RadioButton
+            android:id="@+id/rBtnE"
+            style="@style/ktvScaleBtnStyle"
+            android:text="@string/ktv_singbattle_effect_e" />
+
+        <RadioButton
+            android:id="@+id/rBtnF"
+            style="@style/ktvScaleBtnStyle"
+            android:text="@string/ktv_singbattle_effect_f" />
+
+        <RadioButton
+            android:id="@+id/rBtnF2"
+            style="@style/ktvScaleBtnStyle"
+            android:text="@string/ktv_singbattle_effect_f_2" />
+    </RadioGroup>
+
+    <RadioGroup
+        android:id="@+id/radioGroup3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="207dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@id/radioGroup2"
+        app:layout_constraintTop_toBottomOf="@id/radioGroup2"
+        tools:visibility="visible">
+
+        <RadioButton
+            android:id="@+id/rBtnG"
+            style="@style/ktvScaleBtnStyle"
+            android:text="@string/ktv_singbattle_effect_g" />
+
+        <RadioButton
+            android:id="@+id/rBtnG2"
+            style="@style/ktvScaleBtnStyle"
+            android:text="@string/ktv_singbattle_effect_g_2" />
+
+    </RadioGroup>
+</androidx.constraintlayout.widget.ConstraintLayout>

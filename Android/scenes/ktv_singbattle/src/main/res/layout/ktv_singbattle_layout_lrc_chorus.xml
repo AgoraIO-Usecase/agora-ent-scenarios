@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:background="@mipmap/ktv_mv_default">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvMusicName2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="55dp"
+        android:drawableStart="@mipmap/ic_music_name"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="退后-周杰伦" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvWaitingTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="@string/ktv_singbattle_room_time_wait_join_chorus"
+        android:textColor="#CCFFFFFF"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@id/btChorus"
+        app:layout_constraintTop_toBottomOf="@id/tvMusicName2" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvWaitingTimeCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="7dp"
+        android:text="00:00"
+        android:textColor="#FFE960"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvWaitingTime"
+        app:layout_constraintStart_toEndOf="@id/tvWaitingTime"
+        app:layout_constraintTop_toTopOf="@id/tvWaitingTime" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btChorus"
+        style="@style/def_btn_full"
+        android:layout_width="129dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="30dp"
+        android:paddingHorizontal="10dp"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvWaitingTime"
+        tools:text="@string/ktv_singbattle_music_join_chorus" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

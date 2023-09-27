@@ -30,6 +30,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val webSite = "https://www.shengwang.cn/"
 
     private val kChatRoomAppID = "io.agora.chatroom"
+    private val kSingBattleRoomAppID = "io.agora.singbattle"
     private val kFullAppID = "io.agora.AgoraVoice"
     private val kShowRoomAppID = "io.agora.test.entfull"
 
@@ -51,6 +52,8 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             setupChatRoomAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kFullAppID) {
             setupFullAppInfo()
+        } else if (BuildConfig.APPLICATION_ID == kSingBattleRoomAppID) {
+            setupSingBattleRoomAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kShowRoomAppID) {
             setupShowRoomAppInfo()
         }
@@ -77,12 +80,23 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         adapter.scenes = mutableListOf<SceneInfo>()
         if (VersionUtils.getVersion("io.agora.scene.show.BuildConfig").isNotEmpty()) {
             adapter.appInfo = AppInfo(
-                this.getString(R.string.app_about_name),
+                this.getString(R.string.app_about_show),
                 "20230915-" + VersionUtils.getVersion("io.agora.scene.show.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
         }
+    }
+
+    // 设置抢唱App的信息
+    private fun setupSingBattleRoomAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        adapter.appInfo = AppInfo(
+            this.getString(R.string.app_about_singbattle),
+            "20230520-" + VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig") + RtcEngine.getSdkVersion(),
+            servicePhone,
+            webSite
+        )
     }
 
     // 设置综合App的信息
@@ -117,6 +131,14 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 SceneInfo(
                     this.getString(R.string.app_about_show),
                     "ZB-" + VersionUtils.getVersion("io.agora.scene.show.BuildConfig")
+                )
+            )
+        }
+        if (VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_singbattle),
+                    "HGQC-" + VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig")
                 )
             )
         }
