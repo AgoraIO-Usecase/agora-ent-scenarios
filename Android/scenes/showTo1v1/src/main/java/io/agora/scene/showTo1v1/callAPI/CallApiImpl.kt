@@ -439,7 +439,6 @@ class CallApiImpl(
         reportInfoList.forEach { info ->
             _sendCustomReportMessage(info.msgId, info.category, info.event, info.label, info.value)
         }
-        Log.d(TAG,"reportInfoList.size ${reportInfoList.size} currentThread ${Thread.currentThread()}")
         reportInfoList.clear()
     }
     private fun _reportCostEvent(type: CallCostType) {
@@ -744,7 +743,7 @@ class CallApiImpl(
         _notifyState(CallStateType.Calling, eventInfo = message)
         _notifyEvent(CallEvent.OnCalling)
 
-        callingRoomId = roomId
+        callingRoomId = fromRoomId
         callingUserId = remoteUserId
         //不等响应即加入频道，加快join速度，失败则leave
         _joinRTCAndNotify(fromRoomId, tokenConfig?.rtcToken ?: "") { error ->
@@ -901,7 +900,7 @@ class CallApiImpl(
         _notifyEvent(CallEvent.RemoteJoin, _getNtpTimeInMs() - (callTs ?: 0))
     }
     override fun onUserOffline(uid: Int, reason: Int) {
-        callPrint("didOfflineOfUid: $uid")
+        callPrint("didOfflineOfUid: $uid $reason")
         if (callingUserId != uid) {
             return
         }
@@ -969,8 +968,8 @@ class CallApiImpl(
         delegates.forEach { listener ->
             listener.callDebugInfo(message)
         }
-        if (delegates.size == 0) else {return}
         Log.d(TAG, "[CallApi]$message")
+        if (delegates.size == 0) else {return}
     }
 
     private fun callWarningPrint(message: String) {

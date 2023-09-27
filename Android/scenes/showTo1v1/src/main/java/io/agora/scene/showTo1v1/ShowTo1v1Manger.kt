@@ -148,8 +148,10 @@ class ShowTo1v1Manger constructor() {
     }
 
     fun deInitialize() {
+        // 防止 deinitialize 失败，提前置 false
+        isCallApiInit = false
         mCallApi.deinitialize {
-            isCallApiInit = false
+
         }
     }
 

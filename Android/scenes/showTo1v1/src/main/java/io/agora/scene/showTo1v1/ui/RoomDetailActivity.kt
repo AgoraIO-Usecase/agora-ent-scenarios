@@ -168,13 +168,16 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             initServiceWithJoinRoom()
 
             // 被呼叫需要重新初始化 callApi
-            mCallApi.addListener(callApiListener)
             if (isRoomOwner) {
-                mShowTo1v1Manger.reInitCallApi(CallRole.CALLEE, mRoomInfo.roomId) {}
+                mShowTo1v1Manger.reInitCallApi(CallRole.CALLEE, mRoomInfo.roomId) {
+                    mCallApi.addListener(callApiListener)
+                }
             } else if (mCallConnected) {
-                //
+                mCallApi.addListener(callApiListener)
             } else {
-                mShowTo1v1Manger.reInitCallApi(CallRole.CALLER, mRoomInfo.roomId) {}
+                mShowTo1v1Manger.reInitCallApi(CallRole.CALLER, mRoomInfo.roomId) {
+                    mCallApi.addListener(callApiListener)
+                }
             }
             mainHandler.post(timerRoomRun)
         } else {
