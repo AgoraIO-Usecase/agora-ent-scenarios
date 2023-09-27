@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/superLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/avatar_item_room_speaker"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearance="@style/ktv_roundStyle"
+        tools:src="@mipmap/ktv_ic_seat" />
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRoomOwner"
+        android:layout_width="34dp"
+        android:layout_height="12dp"
+        android:background="@mipmap/ic_home_owner"
+        android:gravity="center"
+        android:text="@string/ktv_singbattle_room_owner"
+        android:textColor="@color/white"
+        android:textSize="8sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/avatar_item_room_speaker"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="SmallSp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="#99FFFFFF"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/avatar_item_room_speaker" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvZC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:drawableStart="@mipmap/ic_zc"
+        android:drawablePadding="2dp"
+        android:text="@string/ktv_singbattle_zc"
+        android:textColor="@color/white"
+        android:textSize="8sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvUserName"
+        tools:ignore="SmallSp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvHC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:drawableStart="@mipmap/ic_hc"
+        android:drawablePadding="2dp"
+        android:text="@string/ktv_singbattle_chorus"
+        android:textColor="@color/white"
+        android:textSize="8sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvUserName"
+        tools:ignore="SmallSp" />
+
+    <FrameLayout
+        android:id="@+id/flVideoContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearance="@style/ktv_roundStyle"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivMute"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_round_black_t30"
+        android:padding="15dp"
+        android:src="@mipmap/ic_has_mute"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/avatar_item_room_speaker"
+        app:layout_constraintEnd_toEndOf="@id/avatar_item_room_speaker"
+        app:layout_constraintStart_toStartOf="@id/avatar_item_room_speaker"
+        app:layout_constraintTop_toTopOf="@id/avatar_item_room_speaker" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

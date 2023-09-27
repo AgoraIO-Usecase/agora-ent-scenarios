@@ -16,12 +16,14 @@
 * 秀场直播
     * [Android](Android/scenes/show)
     * [iOS](iOS/AgoraEntScenarios/Scenes/Show)
+* 嗨歌抢唱
+    * [Android](Android/scenes/ktv_singbattle)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/SBG)
 
 >
 > Demo 效果:
 >
 > <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/entFullDemo_1.png" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/entFullDemo_2.png" width="300" height="640">
-
 ## 1.2 运行示例
 * 运行 K 歌房项目，请参考以下流程
     * [Android](Android/scenes/ktv)
@@ -35,6 +37,9 @@
 * 运行秀场直播项目，请参考以下流程
     * [Android](Android/scenes/show)
     * [iOS](iOS/AgoraEntScenarios/Scenes/Show)
+* 运行嗨歌抢唱项目，请参考以下流程
+    * [Android](Android/scenes/ktv_singbattle)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/SBG)
 
 # 2. FAQ
 

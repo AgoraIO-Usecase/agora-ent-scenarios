@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_full_blue_top_20">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBackIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="9dp"
+        android:src="@mipmap/back_empty_white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/ktv_singbattle_beauty_voice"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivBackIcon">
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginVertical="25dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rBtnBeautyNoting"
+                style="@style/ktvBeautyBtnStyle"
+                android:checked="true"
+                android:drawableTop="@drawable/bg_rbtn_def_nothing"
+                android:text="@string/ktv_singbattle_def_nothing" />
+
+            <RadioButton
+                android:id="@+id/rBtnBigMan"
+                style="@style/ktvBeautyBtnStyle"
+                android:drawableTop="@drawable/bg_rbtn_big_man"
+                android:text="@string/ktv_singbattle_room_big_man" />
+
+            <RadioButton
+                android:id="@+id/rBtnSmallMan"
+                style="@style/ktvBeautyBtnStyle"
+                android:drawableTop="@drawable/bg_rbtn_small_man"
+                android:text="@string/ktv_singbattle_room_small_man" />
+
+            <RadioButton
+                android:id="@+id/rBtnBigWoman"
+                style="@style/ktvBeautyBtnStyle"
+                android:drawableTop="@drawable/bg_rbtn_big_woman"
+                android:text="@string/ktv_singbattle_room_big_woman" />
+
+            <RadioButton
+                android:id="@+id/rBtnSmallWoman"
+                style="@style/ktvBeautyBtnStyle"
+                android:drawableTop="@drawable/bg_rbtn_small_woman"
+                android:text="@string/ktv_singbattle_room_small_woman" />
+        </RadioGroup>
+    </HorizontalScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

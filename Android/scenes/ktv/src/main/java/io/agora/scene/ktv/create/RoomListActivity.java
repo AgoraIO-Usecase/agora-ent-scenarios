@@ -32,7 +32,7 @@ import io.agora.scene.widget.utils.UiUtils;
 /**
  * 房间列表
  */
-@Route(path = PagePathConstant.pageKTVRoomList)
+//@Route(path = PagePathConstant.pageKTVRoomList)
 public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBinding> {
     private BaseRecyclerViewAdapter<ItemRoomListBinding, RoomListModel, RoomHolder> mAdapter;
     private RoomCreateViewModel roomCreateViewModel;
