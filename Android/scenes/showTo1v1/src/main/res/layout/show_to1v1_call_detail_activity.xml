@@ -200,12 +200,14 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <ImageButton
             android:id="@+id/ivClose"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:elevation="2dp"
             android:padding="6dp"
+            android:scaleType="fitXY"
+            android:background="@android:color/transparent"
             android:src="@drawable/show_to1v1_detail_close"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -248,13 +250,15 @@
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <ImageButton
         android:id="@+id/ivHangup"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginBottom="64dp"
         android:src="@drawable/show_to1v1_call_hangup"
+        android:scaleType="fitXY"
         android:visibility="gone"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -272,12 +276,14 @@
         app:layout_constraintStart_toStartOf="@id/ivHangup"
         app:layout_constraintTop_toBottomOf="@id/ivHangup" />
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <ImageButton
         android:id="@+id/ivSetting"
         android:layout_width="38dp"
         android:layout_height="38dp"
         android:layout_marginEnd="15dp"
+        android:scaleType="fitXY"
         android:layout_marginBottom="34dp"
+        android:background="@android:color/transparent"
         android:src="@drawable/show_to1v1_room_detail_setting"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -292,13 +298,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <ImageButton
             android:id="@+id/ivDashboardClose"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:layout_gravity="end"
             android:elevation="2dp"
             android:padding="10dp"
+            android:scaleType="fitXY"
+            android:background="@android:color/transparent"
             android:src="@drawable/show_to1v1_dashboard_close" />
     </FrameLayout>
 

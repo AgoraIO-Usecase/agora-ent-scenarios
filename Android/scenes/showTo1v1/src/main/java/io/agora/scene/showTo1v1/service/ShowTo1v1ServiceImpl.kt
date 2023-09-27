@@ -286,7 +286,9 @@ class ShowTo1v1ServiceImpl constructor(
                     }
                     currentRoomUserList.clear()
                     currentRoomUserList.addAll(ret)
-                    mShowTo1v1ServiceListener?.onUserListDidChanged(currentRoomUserList)
+                    runOnMainThread{
+                        mShowTo1v1ServiceListener?.onUserListDidChanged(currentRoomUserList)
+                    }
                     completion.invoke(null, ret)
                 }
 
@@ -309,7 +311,9 @@ class ShowTo1v1ServiceImpl constructor(
                         objIdOfUserId[roomId] = result.id
                         if (currentRoomUserList.find { it.userId == addUser.userId } != null) return@let
                         currentRoomUserList.add(addUser)
-                        mShowTo1v1ServiceListener?.onUserListDidChanged(currentRoomUserList)
+                        runOnMainThread{
+                            mShowTo1v1ServiceListener?.onUserListDidChanged(currentRoomUserList)
+                        }
                     }
                     completion.invoke(result!!.id, null)
                 }

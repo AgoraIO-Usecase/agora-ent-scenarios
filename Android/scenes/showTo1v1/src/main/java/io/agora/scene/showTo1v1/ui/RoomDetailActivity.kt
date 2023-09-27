@@ -964,6 +964,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         binding.includeConnectedView.tvNickname.text = it.userName
                     }
                     animateConnectedViewOpen()
+                    mainHandler.removeCallbacks(connectedViewCloseRun)
                     mainHandler.postDelayed(connectedViewCloseRun, 5000)
                 } else {
                     binding.layoutCallPrivatelyBg.isVisible = false

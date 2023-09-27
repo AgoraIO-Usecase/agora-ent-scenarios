@@ -437,7 +437,7 @@ class CallApiImpl(
     }
     private fun _flushReport() {
         reportInfoList.forEach { info ->
-//            _sendCustomReportMessage(info.msgId, info.category, info.event, info.label, info.value)
+            _sendCustomReportMessage(info.msgId, info.category, info.event, info.label, info.value)
         }
         Log.d(TAG,"reportInfoList.size ${reportInfoList.size} currentThread ${Thread.currentThread()}")
         reportInfoList.clear()
