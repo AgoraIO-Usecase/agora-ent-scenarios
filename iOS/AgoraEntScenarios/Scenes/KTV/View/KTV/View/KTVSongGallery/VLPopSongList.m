@@ -7,7 +7,7 @@
 #import "VLSelectedSongList.h"
 #import "VLSongList.h"
 #import "VLHotSpotBtn.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @interface VLPopSongList ()<VLSelectedSongListDelegate,VLSongListDelegate>
 
@@ -84,15 +84,20 @@
     }else{
         self.choosedCountLabel.hidden = YES;
     }
+
     self.selsectSongView.selSongsArray = selSongsArray;
     self.choosedSongView.selSongsArray = selSongsArray;
+
+//    [self.choosedSongView setSelSongsUIWithArray:selSongsArray];
+//    [self.selsectSongView setSelSongArrayWith: selSongsArray];
+
     self.choosedCountLabel.text = [NSString stringWithFormat:@"%d",(int)selSongsArray.count];
 }
 
 - (VLHotSpotBtn *)dianGeBtn {
     if (!_dianGeBtn) {
         _dianGeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(30, 20, 34, 22)];
-        [_dianGeBtn setTitle:KTVLocalizedString(@"点歌") forState:UIControlStateNormal];
+        [_dianGeBtn setTitle:KTVLocalizedString(@"ktv_order_song") forState:UIControlStateNormal];
         _dianGeBtn.titleLabel.font = UIFontBoldMake(16);
         [_dianGeBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
         _dianGeBtn.tag = 0;
@@ -105,7 +110,7 @@
 - (VLHotSpotBtn *)choosedBtn {
     if (!_choosedBtn) {
         _choosedBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(_dianGeBtn.right+28, 20, 34, 22)];
-        [_choosedBtn setTitle:KTVLocalizedString(@"已点") forState:UIControlStateNormal];
+        [_choosedBtn setTitle:KTVLocalizedString(@"ktv_room_chosen_song_list") forState:UIControlStateNormal];
         _choosedBtn.titleLabel.font = UIFontMake(14);
         [_choosedBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
         _choosedBtn.tag = 1;

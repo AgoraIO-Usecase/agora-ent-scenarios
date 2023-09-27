@@ -6,20 +6,12 @@
 //
 
 #import "AgoraEntScenarios-Swift.h"
-#import "KTVServiceProtocol.h"
 @import AgoraRtcKit;
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AppContext (KTV)<AgoraMusicContentCenterEventDelegate, AgoraRtcMediaPlayerDelegate>
+@interface AppContext (KTV)
 
-@property (nonatomic, nullable) AgoraMusicContentCenter* agoraMcc;
-@property (nonatomic, nullable) id<AgoraRtcMediaPlayerDelegate> agoraRtcMediaPlayer;
-
-- (void)registerEventDelegate:(id<AgoraMusicContentCenterEventDelegate>)delegate;
-- (void)unregisterEventDelegate:(id<AgoraMusicContentCenterEventDelegate>)delegate;
-- (void)registerPlayerEventDelegate:(id<AgoraRtcMediaPlayerDelegate>)delegate;
-- (void)unregisterPlayerEventDelegate:(id<AgoraRtcMediaPlayerDelegate>)delegate;
-
+@property (nonatomic, nullable) KTVApiImpl* ktvAPI;
 + (void)setupKtvConfig;
 
 /// get service imp instance,  thread unsafe

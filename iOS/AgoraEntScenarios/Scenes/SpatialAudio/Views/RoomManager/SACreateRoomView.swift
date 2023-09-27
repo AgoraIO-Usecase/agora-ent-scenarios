@@ -9,8 +9,8 @@ import UIKit
 import ZSwiftBaseLib
 
 public class SACreateRoomView: UIView, SAHorizontalCardsDelegate, SAHorizontalCardsDataSource {
-    private let datas = [["title": sceneLocalized("SA MODE"), "detail": sceneLocalized("SA MODE DETAIL") + "\n" + sceneLocalized(""), "image": "sa_mode"]]
-//    ,["title":sceneLocalized( "Spatial Audio Mode Room"),"detail":sceneLocalized( "Power natural conversations that make people feel like they're 'in the room' together"),"image":"sa_mode"]
+    private let datas = [["title": "spatial_SA_MODE".spatial_localized(), "detail": "spatial_SA_MODE_DETAIL".spatial_localized() + "\n" + sceneLocalized(""), "image": "sa_mode"]]
+//    ,["title":sceneLocalized( "spatial_voice_audio_mode_room"),"detail":sceneLocalized( "Power natural conversations that make people feel like they're 'in the room' together"),"image":"sa_mode"]
 
     var velocity = CGPoint.zero
 
@@ -23,7 +23,7 @@ public class SACreateRoomView: UIView, SAHorizontalCardsDelegate, SAHorizontalCa
 
     var createAction: (() -> Void)?
 
-    lazy var menuBar: SARoomMenuBar = .init(frame: CGRect(x: 20, y: 0, width: ScreenWidth - 40, height: 42), items: SARoomMenuBar.entities1, indicatorImage: UIImage("indicator")!, indicatorFrame: CGRect(x: 0, y: 42 - 8, width: 14, height: 8)).backgroundColor(.clear)
+    lazy var menuBar: SARoomMenuBar = .init(frame: CGRect(x: 20, y: 0, width: ScreenWidth - 40, height: 42), items: SARoomMenuBar.entities1, indicatorImage:UIImage.sceneImage(name: "indicator", bundleName: "VoiceChatRoomResource")!, indicatorFrame: CGRect(x: 0, y: 42 - 8, width: 14, height: 8)).backgroundColor(.clear)
 
     lazy var audioEffectCards: SAHorizontalCardsView = {
         let cards = SAHorizontalCardsView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: self.cardHeight))
@@ -62,16 +62,16 @@ public class SACreateRoomView: UIView, SAHorizontalCardsDelegate, SAHorizontalCa
 public extension SACreateRoomView {
     private func refreshBottom(index: Int) {
 //        if index > 0 {
-            roomInput.create.setTitle(sceneLocalized( "Go Live"), for: .normal)
+        roomInput.create.setTitle("spatial_voice_go_live".spatial_localized(), for: .normal)
 //        } else {
-//            roomInput.create.setTitle(sceneLocalized( "Next"), for: .normal)
+//            roomInput.create.setTitle(sceneLocalized( "spatial_voice_next"), for: .normal)
 //        }
     }
 
     @objc private func randomRoomName() {
-        var namePrefix = sceneLocalized( "Chat Room")
+        var namePrefix = "spatial_voice_chat_room".spatial_localized()
         if idx == 1 {
-            namePrefix = sceneLocalized( "Spatial Audio Mode Room")
+            namePrefix = "spatial_voice_audio_mode_room".spatial_localized()
         }
         roomInput.roomNameField.text = namePrefix + "-" + Date().z.dateString("MMdd") + "-\((1...100).randomElement() ?? 1)"
         roomInput.name = roomInput.roomNameField.text ?? ""
@@ -88,7 +88,7 @@ public extension SACreateRoomView {
                     createAction!()
                 }
             } else {
-                makeToast("4 Digit Password Required", point: center, title: nil, image: nil, completion: nil)
+                makeToast("spatial_voice_4_digit_password_required".spatial_localized(), point: center, title: nil, image: nil, completion: nil)
             }
         }
     }
@@ -108,7 +108,7 @@ public extension SACreateRoomView {
 
     func horizontalCardsView(_: SAHorizontalCardsView, viewForIndex index: Int) -> SAHorizontalCardView {
         let card = SAHorizontalCardView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 32, height: cardHeight)).backgroundColor(.clear).cornerRadius(25)
-        guard let title = datas[index]["title"], let detail = datas[index]["detail"], let image = UIImage(datas[index]["image"]!) else { return card }
+        guard let title = datas[index]["title"], let detail = datas[index]["detail"], let image = UIImage.spatial_image(datas[index]["image"]!) else { return card }
         return SASoundTypeCard(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40, height: cardHeight), title: title, note: detail, background: image).cornerRadius(25)
     }
 

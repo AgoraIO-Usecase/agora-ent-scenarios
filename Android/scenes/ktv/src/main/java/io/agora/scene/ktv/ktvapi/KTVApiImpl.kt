@@ -391,6 +391,30 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             this.singerRole = newRole
             ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
             switchRoleStateListener?.onSwitchRoleSuccess()
+        } else if (this.singerRole == KTVSingRole.CoSinger && newRole == KTVSingRole.LeadSinger) {
+            // 9、CoSinger -》LeadSinger
+            this.singerRole = newRole
+            syncNewLeadSinger(ktvApiConfig.localUid)
+            mRtcEngine.muteRemoteAudioStream(mainSingerUid, false)
+            mainSingerUid = ktvApiConfig.localUid
+
+            mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":false}")
+            mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":false}")
+            mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 80000}")
+
+            val channelMediaOption = ChannelMediaOptions()
+            channelMediaOption.autoSubscribeAudio = true
+            channelMediaOption.publishMediaPlayerId = mPlayer.mediaPlayerId
+            channelMediaOption.publishMediaPlayerAudioTrack = true
+            mRtcEngine.updateChannelMediaOptions(channelMediaOption)
+
+            val channelMediaOption1 = ChannelMediaOptions()
+            channelMediaOption.autoSubscribeAudio = false
+            channelMediaOption.autoSubscribeVideo = false
+            channelMediaOption.publishMicrophoneTrack = true
+            channelMediaOption.enableAudioRecordingOrPlayout = false
+            channelMediaOption.clientRoleType = CLIENT_ROLE_BROADCASTER
+            mRtcEngine.updateChannelMediaOptionsEx(channelMediaOption1, subChorusConnection)
         } else {
             switchRoleStateListener?.onSwitchRoleFail(SwitchRoleFailReason.NO_PERMISSION)
             Log.e(TAG, "Error！You can not switch role from $singerRole to $newRole!")
@@ -833,55 +857,53 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             token,
             rtcConnection,
             channelMediaOption,
-            null)
-
-        val handler = object : IRtcEngineEventHandler() {
-                override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
-                    Log.d(TAG, "onJoinChannel2Success: channel:$channel, uid:$uid")
-                    if (isRelease) return
-                    super.onJoinChannelSuccess(channel, uid, elapsed)
-                    if (newRole == KTVSingRole.LeadSinger) {
-                        mainSingerHasJoinChannelEx = true
-                    }
-                    onJoinChorus2ndChannelCallback(0)
-                    mRtcEngine.enableAudioVolumeIndicationEx(50, 10, true, rtcConnection)
+            object : IRtcEngineEventHandler() {
+            override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
+                Log.d(TAG, "onJoinChannel2Success: channel:$channel, uid:$uid")
+                if (isRelease) return
+                super.onJoinChannelSuccess(channel, uid, elapsed)
+                if (newRole == KTVSingRole.LeadSinger) {
+                    mainSingerHasJoinChannelEx = true
                 }
+                onJoinChorus2ndChannelCallback(0)
+                mRtcEngine.enableAudioVolumeIndicationEx(50, 10, true, rtcConnection)
+            }
 
-                override fun onLeaveChannel(stats: RtcStats?) {
-                    Log.d(TAG, "onLeaveChannel2")
-                    if (isRelease) return
-                    super.onLeaveChannel(stats)
-                    if (newRole == KTVSingRole.LeadSinger) {
-                        mainSingerHasJoinChannelEx = false
-                    }
-                }
-
-                override fun onError(err: Int) {
-                    super.onError(err)
-                    if (isRelease) return
-                    if (err == ERR_JOIN_CHANNEL_REJECTED) {
-                        Log.e(TAG, "joinChorus2ndChannel failed: ERR_JOIN_CHANNEL_REJECTED")
-                        onJoinChorus2ndChannelCallback(ERR_JOIN_CHANNEL_REJECTED)
-                    } else if (err == ERR_LEAVE_CHANNEL_REJECTED) {
-                        Log.e(TAG, "leaveChorus2ndChannel failed: ERR_LEAVE_CHANNEL_REJECTED")
-                    }
-                }
-
-                override fun onTokenPrivilegeWillExpire(token: String?) {
-                    super.onTokenPrivilegeWillExpire(token)
-                    ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
-                }
-
-                override fun onAudioVolumeIndication(
-                    speakers: Array<out AudioVolumeInfo>?,
-                    totalVolume: Int
-                ) {
-                    super.onAudioVolumeIndication(speakers, totalVolume)
-                    ktvApiEventHandlerList.forEach { it.onChorusChannelAudioVolumeIndication(speakers, totalVolume) }
+            override fun onLeaveChannel(stats: RtcStats?) {
+                Log.d(TAG, "onLeaveChannel2")
+                if (isRelease) return
+                super.onLeaveChannel(stats)
+                if (newRole == KTVSingRole.LeadSinger) {
+                    mainSingerHasJoinChannelEx = false
                 }
             }
-        handlerEx = handler
-        mRtcEngine.addHandlerEx(handler, rtcConnection)
+
+            override fun onError(err: Int) {
+                super.onError(err)
+                if (isRelease) return
+                if (err == ERR_JOIN_CHANNEL_REJECTED) {
+                    Log.e(TAG, "joinChorus2ndChannel failed: ERR_JOIN_CHANNEL_REJECTED")
+                    onJoinChorus2ndChannelCallback(ERR_JOIN_CHANNEL_REJECTED)
+                } else if (err == ERR_LEAVE_CHANNEL_REJECTED) {
+                    Log.e(TAG, "leaveChorus2ndChannel failed: ERR_LEAVE_CHANNEL_REJECTED")
+                }
+            }
+
+            override fun onTokenPrivilegeWillExpire(token: String?) {
+                super.onTokenPrivilegeWillExpire(token)
+                ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
+            }
+
+            override fun onAudioVolumeIndication(
+                speakers: Array<out AudioVolumeInfo>?,
+                totalVolume: Int
+            ) {
+                super.onAudioVolumeIndication(speakers, totalVolume)
+                ktvApiEventHandlerList.forEach { it.onChorusChannelAudioVolumeIndication(speakers, totalVolume) }
+            }
+        })
+        //handlerEx = handler
+        //mRtcEngine.addHandlerEx(handler, rtcConnection)
 
         if (ret != 0) {
             Log.e(TAG, "joinChorus2ndChannel failed: $ret")
@@ -894,13 +916,22 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     private fun leaveChorus2ndChannel(role: KTVSingRole) {
-        mRtcEngine.removeHandlerEx(handlerEx, subChorusConnection)
+        //mRtcEngine.removeHandlerEx(handlerEx, subChorusConnection)
         if (role == KTVSingRole.LeadSinger) {
             mRtcEngine.leaveChannelEx(subChorusConnection)
         } else if (role == KTVSingRole.CoSinger) {
             mRtcEngine.leaveChannelEx(subChorusConnection)
             mRtcEngine.muteRemoteAudioStream(mainSingerUid, false)
         }
+    }
+
+    // ------------------ 同步新主唱 --------------------
+    private fun syncNewLeadSinger(uid: Int) {
+        val msg: MutableMap<String?, Any?> = java.util.HashMap()
+        msg["cmd"] = "syncNewLeadSinger"
+        msg["uid"] = uid
+        val jsonMsg = JSONObject(msg)
+        sendStreamMessageWithJsonObject(jsonMsg) {}
     }
 
     // ------------------ 歌词播放、同步 ------------------
@@ -1135,6 +1166,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val pitch = jsonMsg.getDouble("pitch")
                 if (this.singerRole == KTVSingRole.Audience) {
                     this.pitch = pitch
+                }
+            } else if (jsonMsg.getString("cmd") == "syncNewLeadSinger") {
+                if (singerRole == KTVSingRole.CoSinger) {
+                    mRtcEngine.muteRemoteAudioStream(mainSingerUid, false)
+                    mainSingerUid = jsonMsg.getInt("uid")
+                    mRtcEngine.muteRemoteAudioStream(mainSingerUid, true)
                 }
             }
         } catch (exp: JSONException) {

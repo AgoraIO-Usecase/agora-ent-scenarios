@@ -12,40 +12,38 @@ dependencyResolutionManagement {
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
     }
 }
-def versionCtrl = new File(rootProject.projectDir.absolutePath + File.separator + "versionCtrl.properties")
-def properties = new Properties()
-if (versionCtrl.exists()) {
-    versionCtrl.withReader('UTF-8') { reader ->
-        properties.load(reader)
-    }
-}
-
-final def isVoiceEmpty = properties.getProperty("VERSION_SCENE_VOICE").isEmpty()
-final def isSpatialVoiceEmpty = properties.getProperty("VERSION_SCENE_SPATIAL_VOICE").isEmpty()
-final def isKTVEmpty = properties.getProperty("VERSION_SCENE_KTV").isEmpty()
-final def isShowEmpty = properties.getProperty("VERSION_SCENE_SHOW").isEmpty()
 
 rootProject.name = "AgoraEntFullDemo"
 include ':app'
 include ':common:base'
 include ':common:ui-widget'
 
-if (!isKTVEmpty) {
-    include ':scenes:ktv'
-}
+/*
+ * 在线K歌房
+ */
+include ':scenes:ktv'
 
-//if (!isVoiceEmpty) {
-//    include ':scenes:voice'
-//    include ':scenes:voice:common'
-//}
-//
-//if (!isSpatialVoiceEmpty) {
-//    include ':scenes:voice_spatial'
-//    include ':scenes:voice_spatial:common'
-//}
+/*
+ * 嗨歌抢唱
+ */
+include ':scenes:ktv_singbattle'
 
-//if(!isShowEmpty){
-//    include ':scenes:show'
-//    include ':scenes:show:aars:SenseArSourceManager'
-//    include ':scenes:show:aars:STMobileJNI'
-//}
+/*
+ * 语聊房
+ */
+include ':scenes:voice'
+include ':scenes:voice:common'
+
+/*
+ * 空间音频语聊房
+ */
+include ':scenes:voice_spatial'
+include ':scenes:voice_spatial:common'
+
+/*
+ * 秀场直播
+ */
+include ':scenes:show'
+include ':scenes:show:aars:SenseArSourceManager'
+include ':scenes:show:aars:STMobileJNI'
+include ':scenes:show:aars:HardwareBuffer'

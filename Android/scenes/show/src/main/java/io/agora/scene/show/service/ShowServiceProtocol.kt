@@ -217,4 +217,7 @@ interface ShowServiceProtocol {
     // 订阅重连事件
     fun subscribeReConnectEvent(roomId: String, onReconnect: () -> Unit)
 
+    // 启动机器人
+    fun startCloudPlayer()
+
 }

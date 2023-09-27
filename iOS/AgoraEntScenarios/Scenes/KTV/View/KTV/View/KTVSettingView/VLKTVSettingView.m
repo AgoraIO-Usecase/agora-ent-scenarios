@@ -10,7 +10,7 @@
 #import "VLKTVKindsView.h"
 #import "VLKTVRemoteVolumeView.h"
 #import "VLFontUtils.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import Masonry;
 
 @interface VLKTVSettingView() <
@@ -39,8 +39,8 @@ VLKTVRemoteVolumeViewDelegate
         [self configData:setting];
         [self initSubViews];
         [self addSubViewConstraints];
-        self.soundSlider.value = 0.25;
-        self.accSlider.value = 0.25;
+        self.soundSlider.value = 1.0;
+        self.accSlider.value = 0.5;
     }
     return self;
 }
@@ -131,6 +131,7 @@ VLKTVRemoteVolumeViewDelegate
 - (void)sliderView:(VLKTVSliderView *)sliderView valueChanged:(float)value {
     VLKTVValueDidChangedType type;
     if (sliderView == self.soundSlider) {
+        NSLog(@"value:%f", value);
         self.setting.soundValue = value;
         type = VLKTVValueDidChangedTypeSound;
     } else {
@@ -173,7 +174,7 @@ VLKTVRemoteVolumeViewDelegate
 - (UILabel *)titleLabel {
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
-        _titleLabel.text = KTVLocalizedString(@"控制台");
+        _titleLabel.text = KTVLocalizedString(@"ktv_music_menu_dialog_title");
         _titleLabel.font = VLUIFontMake(16);
         _titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     }
@@ -183,8 +184,8 @@ VLKTVRemoteVolumeViewDelegate
 - (VLKTVSwitcherView *)soundSwitcher {
     if (!_soundSwitcher) {
         _soundSwitcher = [[VLKTVSwitcherView alloc] init];
-        _soundSwitcher.titleLabel.text = KTVLocalizedString(@"耳返");
-        _soundSwitcher.subText = KTVLocalizedString(@"请插入耳机使用耳返功能");
+        _soundSwitcher.titleLabel.text = KTVLocalizedString(@"ktv_music_menu_dialog_ear");
+        _soundSwitcher.subText = KTVLocalizedString(@"ktv_please_use_headset");
         _soundSwitcher.delegate = self;
     }
     return _soundSwitcher;
@@ -193,7 +194,7 @@ VLKTVRemoteVolumeViewDelegate
 - (VLKTVTonesView *)tonesView {
     if (!_tonesView) {
         _tonesView = [[VLKTVTonesView alloc] initWithMaxLevel:12 currentLevel:6];
-        _tonesView.titleLabel.text = KTVLocalizedString(@"升降调");
+        _tonesView.titleLabel.text = KTVLocalizedString(@"ktv_music_menu_dialog_tone");
         _tonesView.delegate = self;
     }
     return _tonesView;
@@ -202,7 +203,7 @@ VLKTVRemoteVolumeViewDelegate
 - (VLKTVSliderView *)soundSlider {
     if (!_soundSlider) {
         _soundSlider = [[VLKTVSliderView alloc] initWithMax:1 min:0];
-        _soundSlider.titleLabel.text = KTVLocalizedString(@"音量");
+        _soundSlider.titleLabel.text = KTVLocalizedString(@"ktv_music_menu_dialog_vol1");
         _soundSlider.delegate = self;
     }
     return _soundSlider;
@@ -211,7 +212,7 @@ VLKTVRemoteVolumeViewDelegate
 - (VLKTVSliderView *)accSlider {
     if (!_accSlider) {
         _accSlider = [[VLKTVSliderView alloc] initWithMax:1 min:0];
-        _accSlider.titleLabel.text = KTVLocalizedString(@"伴奏");
+        _accSlider.titleLabel.text = KTVLocalizedString(@"ktv_music_menu_dialog_vol2");
         _accSlider.delegate = self;
     }
     return _accSlider;
@@ -219,9 +220,10 @@ VLKTVRemoteVolumeViewDelegate
 
 - (VLKTVRemoteVolumeView*)remoteVolumeView {
     if (!_remoteVolumeView) {
-        _remoteVolumeView = [[VLKTVRemoteVolumeView alloc] initWithMin:0 withMax:100 withCurrent:15];
-        _remoteVolumeView.titleLabel.text = KTVLocalizedString(@"RemoteVolume");
+        _remoteVolumeView = [[VLKTVRemoteVolumeView alloc] initWithMin:0 withMax:100 withCurrent:40];
+        _remoteVolumeView.titleLabel.text = KTVLocalizedString(@"ktv_music_menu_dialog_remote_volume");
         _remoteVolumeView.delegate = self;
+        _setting.remoteVolume = 40;
     }
     return _remoteVolumeView;
 }
@@ -244,6 +246,11 @@ VLKTVRemoteVolumeViewDelegate
 - (void)setAccValue:(float)accValue {
     self.setting.accValue = accValue;
     self.accSlider.value = accValue;
+}
+
+-(void)setIspause:(BOOL)isPause{
+    _remoteVolumeView.userInteractionEnabled = !isPause;
+    [_remoteVolumeView setCurrent:isPause ? 100 : self.setting.remoteVolume];
 }
 
 @end

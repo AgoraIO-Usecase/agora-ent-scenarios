@@ -16,7 +16,6 @@ private let Debug2TFCellID = "Debug2TFCellID"
 class ShowDebugSettingVC: UIViewController {
     
     var isBroadcastor = true // 频道外
-    var settingManager: ShowAgoraKitManager?
     
     private let transDelegate = ShowPresentTransitioningDelegate()
     private lazy var dataArray: [Any] = {
@@ -61,12 +60,13 @@ class ShowDebugSettingVC: UIViewController {
         naviBar.backgroundColor = .white
         view.addSubview(naviBar)
         
-//        let saveButtonItem = ShowBarButtonItem(title: "show_advanced_setting_presetting_save".show_localized, target: self, action: #selector(didClickSaveButton))
-//        naviBar.rightItems = [saveButtonItem]
+        let saveButtonItem = ShowBarButtonItem(title: "show_advanced_setting_debugsetting_private".show_localized, target: self, action: #selector(didClickSaveButton))
+        naviBar.rightItems = [saveButtonItem]
     }
     
     @objc private func didClickSaveButton() {
-        navigationController?.popViewController(animated: true)
+        let vc = ShowDebugPrivateParamsVC()
+        self.present(vc, animated: true)
     }
     
     private func setUpUI(){
@@ -79,12 +79,8 @@ class ShowDebugSettingVC: UIViewController {
     }
     
     private func createBroadcastorDataArray() -> [Any] {
-        guard let settingManager = settingManager else {
-            return createAudienceDataArray()
-        }
+        let settingManager = ShowAgoraKitManager.shared
         return [
-            settingManager.debug1TFModelForKey(.captureFrameRate),
-            settingManager.debug2TFModelForKey(.captureVideoSize),
             settingManager.debug1TFModelForKey(.encodeFrameRate),
             settingManager.debug2TFModelForKey(.encodeVideoSize),
             settingManager.debug1TFModelForKey(.bitRate),
@@ -109,7 +105,7 @@ class ShowDebugSettingVC: UIViewController {
         ]
     }
 }
-
+// MARK: - TableView Call Back
 extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -120,9 +116,9 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
         let model = dataArray[indexPath.row]
         if let tf1Model = model as? ShowDebug1TFModel {
             let cell = tableView.dequeueReusableCell(withIdentifier: Debug1TFCellID, for: indexPath) as! ShowDebugSetting1TFCell
-            cell.setTitle(tf1Model.title, value: tf1Model.tfText, unit: tf1Model.unitText) {[weak self] textField in
+            cell.setTitle(tf1Model.title, value: tf1Model.tfText, unit: tf1Model.unitText) { textField in
                 tf1Model.tfText = textField.text
-                self?.settingManager?.updateDebugProfileFor1TFMode(tf1Model)
+                ShowAgoraKitManager.shared.updateDebugProfileFor1TFMode(tf1Model)
             } beginEditing: {
                 tableView.scrollToRow(at: indexPath, at: .top, animated: true)
             }
@@ -131,12 +127,12 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
         
         if let tf2Model = model as? ShowDebug2TFModel {
             let cell = tableView.dequeueReusableCell(withIdentifier: Debug2TFCellID, for: indexPath) as! ShowDebugSetting2TFCell
-            cell.setTitle(tf2Model.title, value1: tf2Model.tf1Text, value2: tf2Model.tf2Text, separator: tf2Model.separatorText) {[weak self] textField in
+            cell.setTitle(tf2Model.title, value1: tf2Model.tf1Text, value2: tf2Model.tf2Text, separator: tf2Model.separatorText) { textField in
                 tf2Model.tf1Text = textField.text
-                self?.settingManager?.updateDebugProfileFor2TFModel(tf2Model)
-            } tf2DidEndEditing: { [weak self] textField in
+                ShowAgoraKitManager.shared.updateDebugProfileFor2TFModel(tf2Model)
+            } tf2DidEndEditing: { textField in
                 tf2Model.tf2Text = textField.text
-                self?.settingManager?.updateDebugProfileFor2TFModel(tf2Model)
+                ShowAgoraKitManager.shared.updateDebugProfileFor2TFModel(tf2Model)
             } beginEditing: {
                 tableView.scrollToRow(at: indexPath, at: .top, animated: true)
             }
@@ -163,9 +159,9 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
                 vc.title = data.title
                 vc.defaultSelectedIndex = data.intValue
                 vc.dataArray = data.items
-                vc.didSelectedIndex = {[weak self] index in
+                vc.didSelectedIndex = { index in
                     data.writeValue(index)
-                    self?.settingManager?.updateSettingForDebugkey(data)
+                    ShowAgoraKitManager.shared.updateSettingForDebugkey(data)
                     tableView.reloadData()
                 }
                 self?.present(vc, animated: true, completion: {
@@ -186,7 +182,7 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
 extension ShowDebugSettingVC {
     func changeValue(_ value: Any, forSettingKey key: ShowDebugSettingKey) {
         key.writeValue(value)
-        settingManager?.updateSettingForDebugkey(key)
+        ShowAgoraKitManager.shared.updateSettingForDebugkey(key)
         tableView.reloadData()
     }
 }

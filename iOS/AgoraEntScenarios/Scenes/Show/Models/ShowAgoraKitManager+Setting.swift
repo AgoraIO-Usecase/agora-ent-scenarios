@@ -8,8 +8,10 @@
 import Foundation
 import AgoraRtcKit
 
-// 标记是否已经打开过
-private let hasOpenedKey = "hasOpenKey"
+enum ShowMode {
+    case single // 单主播模式
+    case pk // pk模式
+}
 
 private let fpsItems: [AgoraVideoFrameRate] = [
     .fps1,
@@ -21,349 +23,376 @@ private let fpsItems: [AgoraVideoFrameRate] = [
     .fps60
 ]
 
+// 超分倍数
+enum SRType: Int {
+    case none = -1
+    case x1 = 6
+    case x1_33 = 7
+    case x1_5 = 8
+    case x2 = 3
+    case x_sharpen = 11
+    case x_superQuality = 20
+}
+
+class ShowRTCParams {
+    // 自动设置数据
+    var suggested = true
+    
+    var sr = false
+    var srType: SRType = .x1_33
+    var dualStream: AgoraSimulcastStreamConfig?
+    var pvc = false
+    var svc = false
+    var musicVolume: Int = 30
+    var recordingSignalVolume: Int = 80
+}
+
+// MARK: - Extension
 extension ShowAgoraKitManager {
     
-    // 超分倍数
-    enum SRType: Int {
-        case none = -1
-        case x1 = 6
-        case x1_33 = 7
-        case x1_5 = 8
-        case x2 = 3
-        case x_sharpen = 11
+    func setupAudienceProfile() {
+        setSuperResolutionOn(true)
+        setPVCon(false)
+        _presetValuesWith(encodeSize: ._360x640, fps: .fps15, bitRate: 0, h265On: true)
     }
     
-    private var dimensionsItems: [CGSize] {
-        ShowAgoraVideoDimensions.allCases.map({$0.sizeValue})
-    }
-    
-    private var captureDimensionsItems: [CGSize] {
-        ShowAgoraCaptureVideoDimensions.allCases.map({$0.sizeValue})
-    }
-    
-    // 默认设置
-    func defaultSetting() {
-        // 默认音量设置
-        ShowSettingKey.recordingSignalVolume.writeValue(80)
-        ShowSettingKey.musincVolume.writeValue(30)
-        let hasOpened = UserDefaults.standard.bool(forKey: hasOpenedKey)
-        // 第一次进入房间的时候设置
-        if hasOpened == false {
-            updatePresetForType(.show_medium, mode: .single)
-            UserDefaults.standard.set(true, forKey: hasOpenedKey)
-        }
-        updateSettingForkey(.lowlightEnhance)
-        updateSettingForkey(.colorEnhance)
-        updateSettingForkey(.videoEncodeSize)
-        updateSettingForkey(.beauty)
-        updateSettingForkey(.PVC)
-        updateSettingForkey(.SR)
-        updateSettingForkey(.earmonitoring)
-        updateSettingForkey(.recordingSignalVolume)
-        updateSettingForkey(.musincVolume)
-        updateSettingForkey(.audioBitRate)
-        updateSettingForkey(.captureVideoSize)
-        updateSettingForkey(.FPS)
-        updateSettingForkey(.videoBitRate)
+    func setupBroadcasterProfile() {
+        setSuperResolutionOn(false)
+        setPVCon(false)
+        updateVideoProfileForMode(.single)
     }
     
     /// 设置超分 不保存数据
     /// - Parameters:
     ///   - isOn: 开关
     ///   - srType: 默认1.5倍
-    func setSuperResolutionOn(_ isOn: Bool, srType:SRType = .none) {
+    func setDebugSuperResolutionOn(_ isOn: Bool, srType:SRType = .none) {
         // 避免重复设置
-        if isOn == self.srIsOn && srType == self.srType {
+        if isOn == self.rtcParam.sr && srType == self.rtcParam.srType {
             return
         }
-        self.srIsOn = isOn
-        self.srType = srType
+        self.rtcParam.sr = isOn
+        self.rtcParam.srType = srType
         if srType == .none {
-            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
+            engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
         }else{
-            agoraKit.setParameters("{\"rtc.video.sr_type\":\(srType.rawValue)}")
-            agoraKit.setParameters("{\"rtc.video.sr_max_wh\":\(921600)}")
+            engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
+            engine?.setParameters("{\"rtc.video.sr_type\":\(srType.rawValue)}")
+            engine?.setParameters("{\"rtc.video.sr_max_wh\":\(921598)}")
             // enabled要放在srType之后 否则修改超分倍数可能不会立即生效
-            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
+            engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
         }
-        showLogger.info("----- setSuperResolutionOn\(ShowSettingKey.SR.boolValue)  srType: \(srType)")
     }
     
-    func setDefaultSuperResolutionForAudienceType(presetType: ShowPresetType) {
-        var srType = SRType.none
-        switch presetType {
-        case .quality_medium, .quality_high:
-            srType = .x1_5
-        default:
-            break
-        }
-        setSuperResolutionOn(ShowSettingKey.SR.boolValue, srType: srType)
-    }
-    
-    /// 设置超分倍数
+    /// 设置超分 不保存数据
     /// - Parameters:
-    ///   - presetType: 预设类型
-    ///   - videoWidth: 编码分辨率的宽
-    func setSuperResolutionForAudienceType(presetType: ShowPresetType, videoWidth:Int, mode: ShowMode) {
-        var srType: SRType = .x1_33
-        switch presetType {
-        case .unknown,.show_low, .show_medium, .show_high:
-        break
-        case .quality_low:
-            srType = .none
-        case .quality_medium:
-            switch mode {
-            case .single:
-                if videoWidth <= 540 {
-                    srType = .x1_33
-                } else if videoWidth == 720 {
-                    srType = .x1_5
-                } else {
-                    srType = .none
-                }
-            case .pk:
-                srType = .x1_33
-            }
-        case .quality_high:
-            switch mode {
-            case .single:
-                if videoWidth <= 360 {
-                    srType = .x2
-                }else if videoWidth <= 540 {
-                    srType = .x1_33
-                }else if videoWidth == 720 {
-                    srType = .x1_5
-                }else {
-                    srType = .none
-                }
-            case .pk:
-                srType = .x1_33
-            }
-        case .base_low, .base_medium, .base_high:
-            srType = .none
+    ///   - isOn: 开关
+    func setSuperResolutionOn(_ isOn: Bool) {
+        self.rtcParam.sr = isOn
+        engine?.setParameters("{\"rtc.video.sr_max_wh\":\(921598)}")
+        engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
+    }
+    /// 设置PVC
+    /// - Parameters:
+    ///   - isOn: 开关
+    func setPVCon(_ isOn: Bool) {
+        self.rtcParam.pvc = isOn
+        engine?.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
+    }
+    /// 设置降噪
+    /// - Parameters:
+    ///   - isOn: 开关
+    func setDenoiserOn(_ isOn: Bool) {
+        let option = AgoraVideoDenoiserOptions()
+        switch deviceLevel {
+        case .high:
+            option.mode = .manual
+            option.level = .strength
+        case .medium:
+            option.mode = .manual
+            option.level = .highQuality
+        case .low:
+            option.mode = .manual
+            option.level = .fast
         }
-        setSuperResolutionOn(ShowSettingKey.SR.boolValue, srType: srType)
+        engine?.setVideoDenoiserOptions(isOn, options: option)
     }
     
-    /// 选择采集分辨率
-    /// - Parameter index: 索引
-    func selectCaptureVideoDimensions(index: Int) {
-//        setCaptureVideoDimensions(captureDimensionsItems[index])
-//        ShowSettingKey.captureVideoSize.writeValue(index)
+    /** 设置小流参数
+     */
+    private func setSimulcastStream(isOn: Bool, dimensions: CGSize = CGSizeMake(360, 640), fps: Int32 = 5, bitrate: Int = 680, svc: Bool = false) {
+        if isOn {
+            let config = AgoraSimulcastStreamConfig()
+            config.dimensions = dimensions
+            config.framerate = fps
+            config.kBitrate = Int32(bitrate)
+            rtcParam.dualStream = config
+            rtcParam.svc = svc
+        } else {
+            rtcParam.dualStream = nil
+            rtcParam.svc = false
+        }
+    }
+    /** 应用小流设置
+     * 在joinChannel成功之后主播应用之前对小流的配置
+     */
+    func applySimulcastStream(connection: AgoraRtcConnection) {
+        guard let simulcastConfig = rtcParam.dualStream else {
+            engine?.setDualStreamModeEx(.disableSimulcastStream,
+                                        streamConfig: AgoraSimulcastStreamConfig(),
+                                        connection: connection)
+            return
+        }
+        // 小流SVC 开关
+        if (rtcParam.svc) {
+            engine?.setParameters("{\"che.video.minor_stream_num_temporal_layers\": 2}")
+            engine?.setParameters("{\"rtc.video.high_low_video_ratio_enabled\": true}")
+            engine?.setParameters("{\"che.video.enable_264_fix_svc_nego\": false}")
+            engine?.setParameters("{\"rtc.video.low_stream_enable_hw_encoder\": false}")
+        } else {
+            engine?.setParameters("{\"rtc.video.high_low_video_ratio_enabled\": false}")
+        }
+        engine?.setDualStreamModeEx(.enableSimulcastStream, streamConfig: simulcastConfig, connection: connection)
     }
     
     // 预设模式
-    private func _presetValuesWith(encodeSize: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool, captureSize: ShowAgoraCaptureVideoDimensions, cache: Bool = true) {
-        if cache {
-            ShowSettingKey.videoEncodeSize.writeValue(dimensionsItems.firstIndex(of: encodeSize.sizeValue))
-            ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: fps))
-            ShowSettingKey.videoBitRate.writeValue(bitRate)
-            ShowSettingKey.H265.writeValue(h265On)
-            ShowSettingKey.captureVideoSize.writeValue(captureDimensionsItems.firstIndex(of: captureSize.sizeValue))
-            ShowSettingKey.lowlightEnhance.writeValue(false)
-            ShowSettingKey.colorEnhance.writeValue(false)
-            ShowSettingKey.videoDenoiser.writeValue(false)
-            ShowSettingKey.PVC.writeValue(false)
-            
-            updateSettingForkey(.videoEncodeSize)
-            updateSettingForkey(.videoBitRate)
-            updateSettingForkey(.FPS)
-            updateSettingForkey(.H265)
-            updateSettingForkey(.lowlightEnhance)
-            updateSettingForkey(.colorEnhance)
-            updateSettingForkey(.videoDenoiser)
-            updateSettingForkey(.PVC)
-            updateSettingForkey(.captureVideoSize)
-            updateCameraCaptureConfiguration()
-        }else {
-            videoEncoderConfig.dimensions = encodeSize.sizeValue
-            videoEncoderConfig.frameRate = fps
-            videoEncoderConfig.bitrate = Int(bitRate)
-            captureConfig.dimensions = captureSize.sizeValue
-            captureConfig.frameRate = Int32(fps.rawValue)
-            agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
-            setH265On(h265On)
-        }
-       
-    }
-    
-    /// 设置观众端画质增强
-    private func _setQualityEnable(_ isOn: Bool){
-        ShowSettingKey.SR.writeValue(isOn)
-    }
-    
-    private func _resetPresetValues() {
+    private func _presetValuesWith(encodeSize: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool) {
+        ShowSettingKey.videoEncodeSize.writeValue(ShowAgoraVideoDimensions.values().firstIndex(of: encodeSize.sizeValue))
+        ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: fps))
+        ShowSettingKey.videoBitRate.writeValue(bitRate)
+        ShowSettingKey.H265.writeValue(h265On)
+        ShowSettingKey.lowlightEnhance.writeValue(false)
+        ShowSettingKey.colorEnhance.writeValue(false)
+        ShowSettingKey.videoDenoiser.writeValue(false)
+        
         updateSettingForkey(.videoEncodeSize)
         updateSettingForkey(.videoBitRate)
         updateSettingForkey(.FPS)
-        updateSettingForkey(.captureVideoSize)
+        updateSettingForkey(.H265)
+        updateSettingForkey(.lowlightEnhance)
+        updateSettingForkey(.colorEnhance)
+        updateSettingForkey(.videoDenoiser)
+        updateSettingForkey(.recordingSignalVolume)
     }
 
-    func updatePresetForType(_ type: ShowPresetType, mode: ShowMode, cache: Bool = true) {
-        switch type {
-        case .unknown:
-            break
-        case .show_low:
-            switch mode {
-            case .single:
-                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 1461, h265On: false, captureSize: ._1080P, cache: cache)
-            case .pk:
-                _presetValuesWith(encodeSize: ._360x640, fps: .fps15, bitRate: 700, h265On: false, captureSize: ._720P, cache: cache)
-            }
-            broadcastorMachineType = .low
-        case .show_medium:
-            switch mode {
-            case .single:
-                _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 1800, h265On: true, captureSize: ._720P, cache: cache)
-            case .pk:
-                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P, cache: cache)
-            }
-            broadcastorMachineType = .medium
-        case .show_high:
-            
-            switch mode {
-            case .single:
-                _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 2099, h265On: true, captureSize: ._720P, cache: cache)
-            case .pk:
-                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P, cache: cache)
-            }
-            broadcastorMachineType = .high
-        case .quality_low:
-            _setQualityEnable(false)
-        case .quality_medium:
-            _setQualityEnable(true)
-        case .quality_high:
-            _setQualityEnable(true)
-        case .base_low:
-            _setQualityEnable(false)
-        case .base_medium:
-            _setQualityEnable(false)
-        case .base_high:
-            _setQualityEnable(false)
-        }
-    }
-    
     /// 更新配置信息 该设置不会保存到本地
     /// - Parameters:
     ///   - mode: 秀场交互类型
-    func updateVideoProfileForMode(_ mode: ShowMode) {
-        switch broadcastorMachineType {
-        case .unknown:
-            break
-        case .low:
-            switch mode {
-            case .single:
-                _resetPresetValues()
-            case .pk:
-                updatePresetForType(.show_low, mode: .pk, cache: false)
-            }
-            
-        case .medium:
-            switch mode {
-            case .single:
-                _resetPresetValues()
-            case .pk:
-                updatePresetForType(.show_medium, mode: .pk, cache: false)
-            }
-            
-        case .high:
-            switch mode {
-            case .single:
-                _resetPresetValues()
-            case .pk:
-                updatePresetForType(.show_high, mode: .pk, cache: false)
-            }
+    func updateVideoProfileForMode(_ showMode: ShowMode) {
+        let machine = deviceLevel
+        let net = netCondition
+        let performance = performanceMode
+        
+        rtcParam.suggested = true
+        if (machine == .high && net == .good && performance == .smooth && showMode == .single) {
+            // 高端机，好网，清晰，单播
+            _presetValuesWith(encodeSize: ._1080x1920, fps: .fps24, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: false)
+        } else if (machine == .high && net == .good && performance == .fluent && showMode == .single) {
+            // 高端机，好网，流畅，单播
+            _presetValuesWith(encodeSize: ._1080x1920, fps: .fps24, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(540, 960), fps: 15, bitrate: 1100, svc: false)
+        } else if (machine == .high && net == .bad && performance == .smooth && showMode == .single) {
+            // 高端机，弱网，清晰，单播
+            _presetValuesWith(encodeSize: ._1080x1920, fps: .fps24, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: false)
+        } else if (machine == .high && net == .bad && performance == .fluent && showMode == .single) {
+            // 高端机，弱网，流畅，单播
+            _presetValuesWith(encodeSize: ._1080x1920, fps: .fps24, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, bitrate: 748, svc: true)
+        } else if (machine == .medium && net == .good && performance == .smooth && showMode == .single) {
+            // 中端机，好网，清晰，单播
+            _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: false)
+        } else if (machine == .medium && net == .good && performance == .fluent && showMode == .single) {
+            // 中端机，好网，流畅，单播
+            _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, bitrate: 680, svc: false)
+        } else if (machine == .medium && net == .bad && performance == .smooth && showMode == .single) {
+            // 中端机，弱网，清晰，单播
+            _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: false)
+        } else if (machine == .medium && net == .bad && performance == .fluent && showMode == .single) {
+            // 中端机，弱网，流畅，单播
+            _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, bitrate: 748, svc: true)
+        } else if (machine == .low && net == .good && performance == .smooth && showMode == .single) {
+            // 低端机，好网，清晰，单播
+            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: false)
+        } else if (machine == .low && net == .good && performance == .fluent && showMode == .single) {
+            // 低端机，好网，流畅，单播
+            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, bitrate: 680, svc: false)
+        } else if (machine == .low && net == .bad && performance == .smooth && showMode == .single) {
+            // 低端机，弱网，清晰，单播
+            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: false)
+        } else if (machine == .low && net == .bad && performance == .fluent && showMode == .single) {
+            // 低端机，弱网，流畅，单播
+            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, bitrate: 748, svc: true)
+        }
+        // pk
+        else if (machine == .high && net == .good && performance == .smooth && showMode == .pk) {
+            // 高端机，好网，清晰，pk
+            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: false)
+        } else if (machine == .high && net == .good && performance == .fluent && showMode == .pk) {
+            // 高端机，好网，流畅，pk
+            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, bitrate: 680, svc: false)
+        } else if (machine == .high && net == .bad && performance == .smooth && showMode == .pk) {
+            // 高端机，弱网，清晰，pk
+            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: false)
+        } else if (machine == .high && net == .bad && performance == .fluent && showMode == .pk) {
+            // 高端机，弱网，流畅，pk
+            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, bitrate: 680, svc: false)
+        } else if (machine == .medium && net == .good && performance == .smooth && showMode == .pk) {
+            // 中端机，好网，清晰，pk
+            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: false)
+        } else if (machine == .medium && net == .good && performance == .fluent && showMode == .pk) {
+            // 中端机，好网，流畅，pk
+            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, bitrate: 680, svc: false)
+        } else if (machine == .medium && net == .bad && performance == .smooth && showMode == .pk) {
+            // 中端机，弱网，清晰，pk
+            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: false)
+        } else if (machine == .medium && net == .bad && performance == .fluent && showMode == .pk) {
+            // 中端机，弱网，流畅，pk
+            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, bitrate: 680, svc: false)
+        } else if (machine == .low && net == .good && performance == .smooth && showMode == .pk) {
+            // 低端机，好网，清晰，pk
+            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: false)
+        } else if (machine == .low && net == .good && performance == .fluent && showMode == .pk) {
+            // 低端机，好网，流畅，pk
+            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, bitrate: 680, svc: false)
+        } else if (machine == .low && net == .bad && performance == .smooth && showMode == .pk) {
+            // 低端机，弱网，清晰，pk
+            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: false)
+        } else if (machine == .low && net == .bad && performance == .fluent && showMode == .pk) {
+            // 低端机，弱网，流畅，pk
+            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
+            setSimulcastStream(isOn: true, dimensions: CGSizeMake(360, 640), fps: 15, bitrate: 680, svc: false)
         }
     }
     
     /// 更新设置
     /// - Parameter key: 要更新的key
     func updateSettingForkey(_ key: ShowSettingKey, currentChannelId:String? = nil) {
-        let isOn = key.boolValue
-        let indexValue = key.intValue
-        let sliderValue = key.floatValue
-        
         switch key {
         case .lowlightEnhance:
-            agoraKit.setLowlightEnhanceOptions(isOn, options: AgoraLowlightEnhanceOptions())
+            let isOn = key.boolValue
+            engine?.setLowlightEnhanceOptions(isOn, options: AgoraLowlightEnhanceOptions())
         case .colorEnhance:
-            agoraKit.setColorEnhanceOptions(isOn, options: AgoraColorEnhanceOptions())
+            let isOn = key.boolValue
+            engine?.setColorEnhanceOptions(isOn, options: AgoraColorEnhanceOptions())
         case .videoDenoiser:
-            agoraKit.setVideoDenoiserOptions(isOn, options: AgoraVideoDenoiserOptions())
+            let isOn = key.boolValue
+            setDenoiserOn(isOn)
         case .beauty:
-            agoraKit.setBeautyEffectOptions(isOn, options: AgoraBeautyOptions())
+            let isOn = key.boolValue
+            engine?.setBeautyEffectOptions(isOn, options: AgoraBeautyOptions())
         case .PVC:
-            agoraKit.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
+            break
         case .SR:
-            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
-//            setSuperResolutionOn(isOn)
+            break
         case .BFrame:
-            
            break
         case .videoEncodeSize:
-            let index = indexValue % dimensionsItems.count
-            videoEncoderConfig.dimensions = dimensionsItems[index]
+            let indexValue = key.intValue
+            let dimensions = ShowAgoraVideoDimensions.values()
+            let index = indexValue % dimensions.count
+            let size = dimensions[index]
+            encoderConfig.dimensions = size
+            captureConfig.dimensions = size
+            
             if let currentChannelId = currentChannelId{
+                engine?.setCameraCapturerConfiguration(captureConfig)
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
-            }else{
-                agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            } else {
+                engine?.setCameraCapturerConfiguration(captureConfig)
+                engine?.setVideoEncoderConfiguration(encoderConfig)
             }
         case .videoBitRate:
-            videoEncoderConfig.bitrate = Int(sliderValue)
+            let sliderValue = key.floatValue
+            encoderConfig.bitrate = Int(sliderValue)
             if let currentChannelId = currentChannelId {
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }else{
-                agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+                engine?.setVideoEncoderConfiguration(encoderConfig)
             }
         case .FPS:
+            let indexValue = key.intValue
             let index = indexValue % fpsItems.count
-            videoEncoderConfig.frameRate = fpsItems[index]
+            encoderConfig.frameRate = fpsItems[index]
+            // 采集帧率
+            captureConfig.frameRate = Int32(fpsItems[index].rawValue)
+            engine?.setCameraCapturerConfiguration(captureConfig)
             if let currentChannelId = currentChannelId {
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }else{
-                agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+                engine?.setVideoEncoderConfiguration(encoderConfig)
             }
-            // 采集帧率
-            captureConfig.frameRate = Int32(fpsItems[index].rawValue)
-            
         case .H265:
-            setH265On(isOn)
+            let isOn = key.boolValue
+            encoderConfig.codecType = isOn ? .H265 : .H264
+            if let channelId = currentChannelId {
+                updateVideoEncoderConfigurationForConnenction(currentChannelId: channelId)
+            }
         case .earmonitoring:
-            agoraKit.enable(inEarMonitoring: isOn)
+            let isOn = key.boolValue
+            engine?.enable(inEarMonitoring: isOn)
         case .recordingSignalVolume:
-            agoraKit.adjustRecordingSignalVolume(Int(sliderValue))
-        case .musincVolume:
-            agoraKit.adjustAudioMixingVolume(Int(sliderValue))
+            let value = rtcParam.recordingSignalVolume
+            engine?.adjustRecordingSignalVolume(value)
+        case .musicVolume:
+            let value = rtcParam.musicVolume
+            engine?.adjustAudioMixingVolume(value)
         case .audioBitRate:
             break
-        case .captureVideoSize:
-            let index = indexValue % captureDimensionsItems.count
-            captureConfig.dimensions = captureDimensionsItems[index]
         }
     }
 
 }
-
-private let kBroadcastorMachineType = "kBroadcastorMachineType"
-
+// MARK: - Presetting options
 extension ShowAgoraKitManager {
-    enum MachineType: Int {
-        case unknown = 0
-        case high
-        case medium
-        case low
+    // 预设值：网络状况
+    enum NetCondition: Int {
+        // 好
+        case good
+        // 差
+        case bad
     }
     
-    // 选择的主播端机型
-    var broadcastorMachineType: MachineType {
-        set {
-            UserDefaults.standard.set(newValue.rawValue, forKey: kBroadcastorMachineType)
-        }
-        get {
-            if let value = UserDefaults.standard.value(forKey: kBroadcastorMachineType) as? Int {
-                return MachineType(rawValue: value) ?? .unknown
+    // 预设值：性能策略
+    enum PerformanceMode: Int {
+        // 清晰策略
+        case smooth
+        // 流畅策略
+        case fluent
+    }
+    
+    // 预设值：设备状况
+    enum DeviceLevel: Int {
+        case low = 0
+        case medium
+        case high
+        
+        func description() -> String {
+            switch self {
+            case .high:     return "show_setting_device_level_high".show_localized
+            case .medium:   return "show_setting_device_level_mediu".show_localized
+            case .low:      return "show_setting_device_level_low".show_localized
             }
-            return .unknown
         }
     }
 }

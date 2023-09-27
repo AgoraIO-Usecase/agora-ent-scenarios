@@ -1,5 +1,8 @@
 package io.agora.scene.base
 
+import android.util.Log
+import com.moczul.ok2curl.CurlInterceptor
+import com.moczul.ok2curl.logger.Logger
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -14,6 +17,11 @@ object TokenGenerator {
         val builder = OkHttpClient.Builder()
         if (BuildConfig.DEBUG) {
             builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+                .addInterceptor(CurlInterceptor(object : Logger {
+                    override fun log(message: String) {
+                        Log.d("CurlInterceptor", message)
+                    }
+                }))
         }
         builder.build()
     }
@@ -74,15 +82,15 @@ object TokenGenerator {
         postBody.put("appId", BuildConfig.AGORA_APP_ID)
         postBody.put("appCertificate", BuildConfig.AGORA_APP_CERTIFICATE)
         postBody.put("channelName", channelName)
-        postBody.put("expire", if(expireSecond > 0) expireSecond else 1500)
+        postBody.put("expire", if (expireSecond > 0) expireSecond else 60 * 60 * 24)
         postBody.put("src", "Android")
         postBody.put("ts", System.currentTimeMillis().toString() + "")
         postBody.put("type", tokenType.value)
         postBody.put("uid", uid + "")
 
         val request = Request.Builder().url(
-            if (genType == TokenGeneratorType.token006) "https://service.agora.io/toolbox/v2/token006/generate"
-            else "https://service.agora.io/toolbox/v2/token/generate"
+            if (genType == TokenGeneratorType.token006) "${BuildConfig.TOOLBOX_SERVER_HOST}/v2/token006/generate"
+            else "${BuildConfig.TOOLBOX_SERVER_HOST}/v2/token/generate"
         ).addHeader("Content-Type", "application/json").post(postBody.toString().toRequestBody()).build()
         val execute = okHttpClient.newCall(request).execute()
         if (execute.isSuccessful) {

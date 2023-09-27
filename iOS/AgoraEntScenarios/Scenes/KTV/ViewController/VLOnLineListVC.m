@@ -6,9 +6,6 @@
 #import "VLOnLineListVC.h"
 #import "VLHomeOnLineListView.h"
 #import "VLKTVViewController.h"
-//#import "AgoraRtm.h"
-#import "VLRoomListModel.h"
-#import "VLRoomSeatModel.h"
 
 #import "VLPopScoreView.h"
 #import "VLLoginViewController.h"
@@ -19,8 +16,8 @@
 #import "VLURLPathConfig.h"
 #import "VLToast.h"
 #import "AppContext+KTV.h"
-#import "KTVMacro.h"
-@import LEEAlert;
+#import "AESMacro.h"
+#import "VLAlert.h"
 
 @interface VLOnLineListVC ()<VLHomeOnLineListViewDelegate/*,AgoraRtmDelegate*/,VLPopScoreViewDelegate>
 
@@ -49,7 +46,7 @@
 
 - (void)commonUI {
     [self setBackgroundImage:@"online_list_BgIcon"];
-    [self setNaviTitleName:KTVLocalizedString(@"在线K歌房")];
+    [self setNaviTitleName:KTVLocalizedString(@"ktv_online_ktv")];
     if ([VLUserCenter center].isLogin) {
         [self setBackBtn];
     }
@@ -100,55 +97,12 @@
     if (![self checkIsLogin]) return;
      
     if (listModel.isPrivate) {
-        __block UITextField *TF = nil;
-        
-        [LEEAlert alert].config
-        .LeeTitle(KTVLocalizedString(@"输入密码"))
-        .LeeAddTextField(^(UITextField *textField) {
-            textField.placeholder = KTVLocalizedString(@"请输入房间密码");
-            textField.textColor = UIColorBlack;
-            textField.clearButtonMode=UITextFieldViewModeWhileEditing;
-            textField.font = UIFontMake(15);
-            textField.keyboardType = UIKeyboardTypeNumberPad;
-            [textField becomeFirstResponder];
-            TF = textField; //赋值
-        })
-        .LeeAddAction(^(LEEAction *action) {
-            action.type = LEEActionTypeCancel;
-            action.title = @"取消";
-            action.titleColor = UIColorMakeWithHex(@"#000000");
-            action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-            action.cornerRadius = 20;
-            action.height = 40;
-            action.font = UIFontBoldMake(16);
-            action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-            action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-            action.clickBlock = ^{
-                
-            };
-        })
-        .LeeAddAction(^(LEEAction *action) {
-            VL(weakSelf);
-            action.type = LEEActionTypeCancel;
-            action.title = KTVLocalizedString(@"确认");
-            action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-            action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-            action.cornerRadius = 20;
-            action.height = 40;
-            action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-            action.font = UIFontBoldMake(16);
-            action.clickBlock = ^{
-                [weakSelf joinInRoomWithModel:listModel withInPutText:TF.text];
-            };
-        })
-        .leeShouldActionClickClose(^(NSInteger index){
-            // 是否可以关闭回调, 当即将关闭时会被调用 根据返回值决定是否执行关闭处理
-            // 这里演示了与输入框非空校验结合的例子
-            BOOL result = ![TF.text isEqualToString:@""];
-            result = index == 1 ? result : YES;
-            return result;
-        })
-        .LeeShow();
+        NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"ktv_cancel"),KTVLocalizedString(@"ktv_confirm"), nil];
+        VL(weakSelf);
+        [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:KTVLocalizedString(@"ktv_input_pwd") message:@"" placeHolder:KTVLocalizedString(@"ktv_pls_input_pwd") type:ALERTYPETEXTFIELD buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+            [weakSelf joinInRoomWithModel:listModel withInPutText:text];
+            [[VLAlert shared] dismiss];
+        }];
     }else{
         [self joinInRoomWithModel:listModel withInPutText:@""];
     }
@@ -166,8 +120,7 @@
     inputModel.password = inputText;
 
     VL(weakSelf);
-    [[AppContext ktvServiceImp] joinRoomWithInput:inputModel
-                                       completion:^(NSError * error, KTVJoinRoomOutputModel * outputModel) {
+    [[AppContext ktvServiceImp] joinRoomWith:inputModel completion:^(NSError * _Nullable error, KTVJoinRoomOutputModel * _Nullable outputModel) {
         if (error != nil) {
             [VLToast toast:error.description];
             return;
@@ -179,6 +132,7 @@
         ktvVC.seatsArray = outputModel.seatsArray;
         [weakSelf.navigationController pushViewController:ktvVC animated:YES];
     }];
+
 }
 
 //- (NSArray *)configureSeatsWithArray:(NSArray *)seatsArray songArray:(NSArray *)songArray {

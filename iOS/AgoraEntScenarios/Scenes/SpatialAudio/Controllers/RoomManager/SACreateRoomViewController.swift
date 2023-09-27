@@ -11,7 +11,7 @@ import ZSwiftBaseLib
 import AgoraChat
 
 public final class SACreateRoomViewController: SABaseViewController {
-    lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage("roomList")!)
+    lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage.sceneImage(name: "roomList", bundleName: "VoiceChatRoomResource")!)
 
     lazy var container: SACreateRoomView = .init(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: ScreenHeight - ZNavgationHeight))
 
@@ -20,14 +20,13 @@ public final class SACreateRoomViewController: SABaseViewController {
         // Do any additional setup after loading the view.
         view.addSubViews([background, container])
         view.bringSubviewToFront(navigation)
-        navigation.title.text = sceneLocalized( "Create Room")
+        navigation.title.text = "spatial_voice_create_room".spatial_localized()
         container.createAction = { [weak self] in
             guard let self = self else { return }
             print("idx:\(self.container.idx)")
             Throttler.throttle(queue:.main,delay: 1,shouldRunLatest: true) {
                 self.goLive()
             }
-
         }
     }
     
@@ -77,7 +76,7 @@ extension SACreateRoomViewController {
     
     private func entryRoom() {
 //        AgoraChatClient.shared().logout(false)
-        SVProgressHUD.show(withStatus: "Loading".localized())
+        SVProgressHUD.show(withStatus: "spatial_voice_loading".spatial_localized())
         self.view.window?.isUserInteractionEnabled = false
 //        let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
         let entity = self.createEntity()
@@ -108,7 +107,7 @@ extension SACreateRoomViewController {
                             if let room = room,error == nil {
                                 self.entryRoom(room: room)
                             } else {
-                                SVProgressHUD.showError(withStatus: "Create failed!".localized())
+                                SVProgressHUD.showError(withStatus: "spatial_voice_create_failed".spatial_localized())
                             }
                         }
 //                    }else {
@@ -123,7 +122,7 @@ extension SACreateRoomViewController {
 
     private func goLive() {
         if container.roomInput.name.isEmpty {
-            view.makeToast("No Room Name".localized(), point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("spatial_voice_no_room_name".spatial_localized(), point: view.center, title: nil, image: nil, completion: nil)
         }
         entryRoom()
     }

@@ -5,11 +5,9 @@
 
 #import "VLMicSeatList.h"
 #import "VLMicSeatCell.h"
-#import "VLRoomSeatModel.h"
-#import "VLRoomSelSongModel.h"
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import YYCategories;
 @import SDWebImage;
 
@@ -18,6 +16,7 @@
 @property(nonatomic, weak) id <VLMicSeatListDelegate>delegate;
 
 @property (nonatomic, strong) UICollectionView *personCollectionView;
+@property (nonatomic, copy) NSString *currentPlayingSongCode;
 @end
 
 @implementation VLMicSeatList
@@ -37,13 +36,13 @@
     flowLayOut.scrollDirection = UICollectionViewScrollDirectionVertical;
     
     CGFloat itemW = VLREALVALUE_WIDTH(54);
-    CGFloat middleMargin = (SCREEN_WIDTH-2*27-4*itemW)/3.0;
+    CGFloat middleMargin = (SCREEN_WIDTH - 40 - 2*27 - 4*itemW)/3.0;
     CGFloat itemH = VLREALVALUE_WIDTH(54)+33;
     flowLayOut.itemSize = CGSizeMake(itemW, itemH);
     flowLayOut.minimumInteritemSpacing = middleMargin;
     flowLayOut.minimumLineSpacing = 15;
     
-    self.personCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, itemH*2+15) collectionViewLayout:flowLayOut];
+    self.personCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(20, 0, SCREEN_WIDTH - 40, itemH*2+15) collectionViewLayout:flowLayOut];
     self.personCollectionView.dataSource = self;
     self.personCollectionView.delegate = self;
     self.personCollectionView.alwaysBounceVertical = true;
@@ -51,7 +50,6 @@
     self.personCollectionView.showsVerticalScrollIndicator = false;
     self.personCollectionView.backgroundColor = UIColorClear;
     self.personCollectionView.scrollEnabled = NO;
-    self.personCollectionView.contentInset = UIEdgeInsetsMake(0, 27, 0, 27);
     if (@available(iOS 11, *)) {
         self.personCollectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     }
@@ -69,8 +67,7 @@
     [self.personCollectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:seatIndex inSection:0]]];
 }
 
-- (void)updateIfNeeded
-{
+- (void)updateIfNeeded {
     [self.personCollectionView reloadData];
 }
 
@@ -105,7 +102,7 @@
         cell.nickNameLabel.textColor = UIColorMakeWithHex(@"#AEABD0");
         cell.avatarImgView.layer.borderColor = UIColorClear.CGColor;
     }
-    cell.roomerLabel.text = KTVLocalizedString(@"房主");
+    cell.roomerLabel.text = KTVLocalizedString(@"ktv_room_owner");
     if (seatModel.headUrl.length > 0) {
         [cell.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.headUrl]];
     }else{
@@ -115,10 +112,11 @@
     
     cell.muteImgView.hidden = !seatModel.isAudioMuted;
     
-    if(seatModel.isJoinedChorus)
+    if([seatModel.chorusSongCode isEqualToString:self.currentPlayingSongCode]){
         cell.joinChorusBtn.hidden = NO;
-    else
+    } else {
         cell.joinChorusBtn.hidden = YES;
+    }
     
     if (seatModel.rtcUid == nil) {
         cell.muteImgView.hidden = YES;
@@ -137,16 +135,6 @@
     return cell;
 }
 
-
-//- (AgoraRtcChannelMediaOptions *)mediaOption {
-//    if (!_mediaOption) {
-//        _mediaOption = [[AgoraRtcChannelMediaOptions alloc] init];
-//        _mediaOption.autoSubscribeAudio = [AgoraRtcBoolOptional of:YES];
-//        _mediaOption.autoSubscribeVideo = [AgoraRtcBoolOptional of:YES];
-//    }
-//    return _mediaOption;
-//}
-
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     VLRoomSeatModel *roomSeatModel = self.roomSeatsArray[indexPath.row];
     if (self.delegate && [self.delegate respondsToSelector:@selector(onVLRoomPersonView:seatItemTappedWithModel:atIndex:)]) {
@@ -155,39 +143,55 @@
 }
 
 - (void)updateSingBtnWithChoosedSongArray:(NSArray *)choosedSongArray {
-    BOOL hasChanged = NO;
+    NSMutableSet* changeSet = [NSMutableSet set];
+    if(choosedSongArray.count == 0){
+        self.currentPlayingSongCode = @"0";
+    }
     if (choosedSongArray.count > 0) {
         VLRoomSelSongModel *songModel = choosedSongArray.firstObject;
+        self.currentPlayingSongCode = songModel.chorusSongId;
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
             BOOL isOwner = [seatModel.userNo isEqualToString:songModel.userNo];
-            BOOL isJoinedChorus = [seatModel.userNo isEqualToString:songModel.chorusNo];
             if (isOwner != seatModel.isOwner) {
                 seatModel.isOwner = isOwner;
-                hasChanged = YES;
+                [changeSet addObject:@(seatModel.seatIndex)];
             }
-            if (isJoinedChorus != seatModel.isJoinedChorus) {
-                seatModel.isJoinedChorus = isJoinedChorus;
-                hasChanged = YES;
+            //检查麦上用户
+            BOOL needtoJoinChorus = [seatModel.chorusSongCode isEqualToString:[songModel chorusSongId]];
+//            cell.joinsttus
+            NSIndexPath *path = [NSIndexPath indexPathForRow:seatModel.seatIndex inSection:0];
+            VLMicSeatCell* cell = [self.personCollectionView cellForItemAtIndexPath:path];
+            if (needtoJoinChorus != !cell.joinChorusBtn.isHidden){
+                //            if (![seatModel.chorusSongCode isEqualToString:[songModel chorusSongId]] && seatModel.chorusSongCode) {
+                // seatModel.chorusSongCode = @"";
+                [changeSet addObject:@(seatModel.seatIndex)];
             }
+//            }
+            NSLog(@"seat: %@--%@--%li", seatModel.chorusSongCode, songModel.chorusSongId, seatModel.seatIndex);
+            
         }
     }else{
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
             if (seatModel.isOwner) {
                 seatModel.isOwner = NO;
-                hasChanged = YES;
+                [changeSet addObject:@(seatModel.seatIndex)];
             }
-            if (seatModel.isJoinedChorus) {
-                seatModel.isJoinedChorus = NO;
-                hasChanged = YES;
+            if (seatModel.chorusSongCode.length > 0) {
+               // seatModel.chorusSongCode = @"";
+                [changeSet addObject:@(seatModel.seatIndex)];
             }
         }
     }
     
-    if (!hasChanged) {
+    if (changeSet.count == 0) {
         return;
     }
-    [self.personCollectionView reloadData];
+    
+    NSMutableArray* indexPaths = [NSMutableArray array];
+    for (NSNumber * index in changeSet) {
+        [indexPaths addObject:[NSIndexPath indexPathForRow:[index integerValue] inSection:0]];
+    }
+    [self.personCollectionView reloadItemsAtIndexPaths:indexPaths];
 }
-
 
 @end

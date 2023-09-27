@@ -6,7 +6,7 @@
 //
 
 #import "VLKTVRemoteVolumeView.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import Masonry;
 
 @interface VLKTVRemoteVolumeView() <UITextFieldDelegate>
@@ -89,6 +89,10 @@
     [self addSubview:self.reduceButton];
     [self addSubview:self.addButton];
     [self addSubview:self.inputTipsLabel];
+}
+
+-(void)setCurrent:(int)current{
+    self.inputField.text = [NSString stringWithFormat:@"%i", current];
 }
 
 - (void)addSubViewConstraints {

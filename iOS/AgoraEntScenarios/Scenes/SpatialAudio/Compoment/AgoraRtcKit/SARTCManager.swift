@@ -250,7 +250,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
                 blueMediaPlayer?.stop()
                 delegate?.reportAlien?(with: .ended, musicType: musicType)
             } else {
-                let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized() : "EN"
+                let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "spatial_voice_lau".spatial_localized() : "EN"
                 musicPath = musicPath.replacingOccurrences(of: "CN", with: lanuagePath)
                 print("musicPath:\(musicPath)")
                 if musicPath.contains("-B-") {
@@ -271,15 +271,9 @@ public let kMPK_RTC_UID_SA: UInt = 1
     // init rtc
     private let rtcKit: AgoraRtcEngineKit = AgoraRtcEngineKit.sharedEngine(withAppId: KeyCenter.AppId, delegate: nil)
 
-    /**
-     * 设置RTC角色
-     * @param role RMCRoleType
-     */
-    @objc public func setClientRole(role: SARtcType.ASRoleType) {
-        rtcKit.setClientRole(role == .audience ? .audience : .broadcaster)
+    func setClientRole(role: SARtcType.ASRoleType) {
         self.role = role
     }
-
 
     /**
      * 加入语聊房
@@ -293,11 +287,16 @@ public let kMPK_RTC_UID_SA: UInt = 1
         rtcKit.delegate = self
         rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
         rtcKit.setChannelProfile(.liveBroadcasting)
-
+        
         rtcKit.setAudioProfile(.musicHighQuality)
         rtcKit.setAudioScenario(.gameStreaming)
+        let mediaOption = AgoraRtcChannelMediaOptions()
+        mediaOption.autoSubscribeAudio = true
+        mediaOption.clientRoleType = .broadcaster
+        mediaOption.publishMicrophoneTrack = role != .audience
+
         rtcKit.setParameters("{\"che.audio.start_debug_recording\":\"all\"}")
-        let code: Int32 = rtcKit.joinChannel(byToken: token, channelId: channelName, info: nil, uid: UInt(rtcUid ?? 0))
+        let code = rtcKit.joinChannel(byToken: token, channelId: channelName, uid: UInt(rtcUid ?? 0), mediaOptions: mediaOption)
         return code
     }
     
@@ -307,7 +306,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
         let localSpatialConfig = AgoraLocalSpatialAudioConfig()
         localSpatialConfig.rtcEngine = rtcKit
         localSpatial = AgoraLocalSpatialAudioKit.sharedLocalSpatialAudio(with: localSpatialConfig)
-        localSpatial?.muteLocalAudioStream(false)
+//        localSpatial?.muteLocalAudioStream(false)
 //        localSpatial?.muteAllRemoteAudioStreams(false)
         localSpatial?.setAudioRecvRange(recvRange)
         localSpatial?.setMaxAudioRecvCount(6)
@@ -410,7 +409,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
      */
     public func playMusic(with type: SARtcType.VMMUSIC_TYPE, isPlay: Bool) {
         if isPlay {
-            let lanuage = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized() : "EN"
+            let lanuage = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "spatial_voice_lau".spatial_localized() : "EN"
             let redPath = "https://download.agora.io/demo/test/spatial-\(lanuage)-red.wav"
             let bluePath = "https://download.agora.io/demo/test/spatial-\(lanuage)-blue.wav"
             blueMediaPlayer?.open(bluePath, startPos: 0)
@@ -456,7 +455,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
         } else if type == .ainsOff {
             path = SAConfig.NoneSound[index]
         }
-        let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized_spatial() : "EN"
+        let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "spatial_voice_lau".spatial_localized() : "EN"
         path = path.replacingOccurrences(of: "CN", with: lanuagePath)
         rtcKit.startAudioMixing(path, loopback: false, cycle: 1)
     }
@@ -489,7 +488,9 @@ public let kMPK_RTC_UID_SA: UInt = 1
      */
     @discardableResult
     public func muteLocalAudioStream(mute: Bool) -> Int32 {
-        return rtcKit.muteLocalAudioStream(mute)
+        let mediaOption = AgoraRtcChannelMediaOptions()
+        mediaOption.publishMicrophoneTrack = !mute
+        return rtcKit.updateChannel(with: mediaOption)
     }
 
     /**
@@ -499,7 +500,9 @@ public let kMPK_RTC_UID_SA: UInt = 1
      */
     @discardableResult
     public func muteLocalVideoStream(mute: Bool) -> Int32 {
-        return rtcKit.muteLocalVideoStream(mute)
+        let mediaOption = AgoraRtcChannelMediaOptions()
+        mediaOption.publishCameraTrack = !mute
+        return rtcKit.updateChannel(with: mediaOption)
     }
 
     /**

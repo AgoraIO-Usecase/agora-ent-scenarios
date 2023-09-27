@@ -9,17 +9,17 @@ import SVProgressHUD
 import UIKit
 import ZSwiftBaseLib
 
-public final class VRCreateRoomViewController: VRBaseViewController {
-    lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage("roomList")!)
+final class VRCreateRoomViewController: VRBaseViewController {
+    lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage.sceneImage(name: "roomList", bundleName: "VoiceChatRoomResource")!)
 
     lazy var container: VRCreateRoomView = .init(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: ScreenHeight - ZNavgationHeight))
 
-    override public func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.addSubViews([background, container])
         view.bringSubviewToFront(navigation)
-        navigation.title.text = LanguageManager.localValue(key: "Create Room")
+        navigation.title.text = LanguageManager.localValue(key: "voice_create_room")
         container.createAction = { [weak self] in
             guard let self = self else { return }
             print("idx:\(self.container.idx)")
@@ -47,13 +47,13 @@ extension VRCreateRoomViewController {
 
     private func goLive() {
         if container.roomInput.name.isEmpty {
-            view.makeToast("No Room Name".localized(), point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("voice_no_room_name".voice_localized(), point: view.center, title: nil, image: nil, completion: nil)
         }
         SVProgressHUD.show()
         VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .createRoom(()), params: ["name": container.roomInput.name, "is_private": container.roomInput.code.isEmpty, "password": container.roomInput.code, "type": container.idx, "allow_free_join_mic": false, "sound_effect": 1], classType: VRRoomInfo.self) { info, error in
             SVProgressHUD.dismiss()
             if error == nil, info != nil {
-                self.view.makeToast("Room Created".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
+                self.view.makeToast("voice_room_created".voice_localized(), point: self.view.center, title: nil, image: nil, completion: nil)
                 let vc = VoiceRoomViewController(info: info!)
                 self.navigationController?.pushViewController(vc, animated: true)
             } else {
@@ -63,7 +63,7 @@ extension VRCreateRoomViewController {
     }
 
     private func entryRoom() {
-        SVProgressHUD.show(withStatus: "Loading".localized())
+        SVProgressHUD.show(withStatus: "voice_loading".voice_localized())
         VoiceRoomIMManager.shared?.loginIM(userName: VoiceRoomUserInfo.shared.user?.chat_uid ?? "", token: VLUserCenter.user.im_token, completion: { userName, error in
             SVProgressHUD.dismiss()
             if error == nil {

@@ -34,6 +34,8 @@ let SYNC_SCENE_SHOPPING_INFO = "shoppingInfo"
 let APP_SCENARIO: Int = 100
 let SERVICE_TYPE: Int = 12
 
+let chatViewWidth = ScreenWidth * (287 / 375.0)
+
 enum UserInfo {
     static var userId: String {
         return VLUserCenter.user.id
@@ -50,4 +52,12 @@ enum UserInfo {
 //    static var uid: String {
 //        "\(userId)"
 //    }
+}
+
+
+enum AgoraScene: String {
+    case KTV
+    case ChatRoom
+    case LiveShow
+    case SpatialAudioChatRoom
 }

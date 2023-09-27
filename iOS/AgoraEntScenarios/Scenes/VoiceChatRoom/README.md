@@ -1,7 +1,10 @@
 # 语聊房
 
 > 本文档主要介绍如何快速跑通 语聊房 示例工程
-
+> 
+> Demo 效果:
+> 
+> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/voiceRoom_1.png" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/voiceRoom_2.png" width="300" height="640">
 ---
 
 ## 1. 环境准备
@@ -62,6 +65,7 @@
   static let AppId: String = 声网AppID
   static let Certificate: String? = 声网App证书
   
+  普通语聊房需要配置IM Key
     static var IMAppKey: String? = 环信AppKey
     static var IMClientId: String? = 环信ClientId
     static var IMClientSecret: String? = 环信ClientSecret

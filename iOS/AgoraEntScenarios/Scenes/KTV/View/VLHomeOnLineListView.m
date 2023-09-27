@@ -5,12 +5,12 @@
 
 #import "VLHomeOnLineListView.h"
 #import "VLHomeOnLineListCCell.h"
-#import "VLRoomListModel.h"
 #import "VLListEmptyView.h"
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 #import "AppContext+KTV.h"
+@import MJRefresh;
 
 @interface VLHomeOnLineListView ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
@@ -22,7 +22,7 @@
 
 @property (nonatomic, assign) NSInteger        page;
 @property (nonatomic, strong) VLListEmptyView *emptyView;
-@property (nonatomic, strong) UIRefreshControl *refreshControl;
+
 @end
 
 @implementation VLHomeOnLineListView
@@ -41,10 +41,13 @@
     [self addSubview:self.listCollectionView];
     [self addSubview:self.createBtn];
     
-    _refreshControl = [[UIRefreshControl alloc]init];
-    self.listCollectionView.refreshControl = _refreshControl;
-    [_refreshControl addTarget:self action:@selector(loadData) forControlEvents:UIControlEventValueChanged];
-
+    self.listCollectionView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf getRoomListIfRefresh:YES];
+    }];
+    
+    self.listCollectionView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
+        [weakSelf getRoomListIfRefresh:NO];
+    }];
 }
 
 -(void)loadData {
@@ -55,26 +58,41 @@
 - (void)getRoomListIfRefresh:(BOOL)ifRefresh {
     self.page = ifRefresh ? 0 : self.page;
     
-    [[AppContext ktvServiceImp] getRoomListWithPage:self.page
+    [[AppContext ktvServiceImp] getRoomListWith:self.page
                                          completion:^(NSError * error, NSArray<VLRoomListModel *> * roomArray) {
         if (error != nil) {
-            [self.listCollectionView.refreshControl endRefreshing];
+            [self.listCollectionView.mj_header endRefreshing];
+            [self.listCollectionView.mj_footer endRefreshing];
             return;
         }
         
-        [self.listCollectionView.refreshControl endRefreshing];
+        [self.listCollectionView.mj_header endRefreshing];
         self.page += 1;
         NSArray *array = roomArray;
         
         if (ifRefresh) {
             [self.roomListModeArray removeAllObjects];
-            self.roomListModeArray = array.mutableCopy;
+            NSMutableArray *filteredArray = [NSMutableArray arrayWithArray:array.mutableCopy];
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"objectId != nil"];
+            [filteredArray filterUsingPredicate:predicate];
+            self.roomListModeArray = filteredArray;
+            if (array.count > 0) {
+                self.listCollectionView.mj_footer.hidden = NO;
+            }else{
+                self.listCollectionView.mj_footer.hidden = YES;
+            }
         }else{
             for (VLRoomListModel *model in array) {
                 [self.roomListModeArray addObject:model];
             }
         }
         [self.listCollectionView reloadData];
+        if (array.count < 10) {
+            [self.listCollectionView.mj_footer endRefreshing];
+            self.listCollectionView.mj_footer.hidden = YES;
+        }else{
+            [self.listCollectionView.mj_footer endRefreshing];
+        }
         if(self.roomListModeArray.count > 0) {
             self.emptyView.hidden = YES;
         }
@@ -94,15 +112,23 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    VL(weakSelf);
+  //  VL(weakSelf);
     VLHomeOnLineListCCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[VLHomeOnLineListCCell className] forIndexPath:indexPath];
     cell.listModel = self.roomListModeArray[indexPath.row];
-    cell.joinBtnClickBlock = ^(VLRoomListModel *model) {
-        if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(listItemClickAction:)]) {
-            [weakSelf.delegate listItemClickAction:model];
-        }
-    };
     return cell;
+}
+
+static long lastClickTime = 0;
+static const int INTERVAL = 1000; // 时间间隔为1秒
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    VLRoomListModel *listModel = self.roomListModeArray[indexPath.row];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(listItemClickAction:)]) {
+        long currentTime = [[NSDate date] timeIntervalSince1970] * 1000;
+        if (currentTime - lastClickTime > INTERVAL) { // 执行点击事件
+            [self.delegate listItemClickAction:listModel];
+            lastClickTime = currentTime;
+        }
+    }
 }
 
 
@@ -151,7 +177,7 @@
 //        _createBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_list_addIcon"]
 //                                                      title:KTVLocalizedString(@"创建房间")];
         _createBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_createBtn setTitle:KTVLocalizedString(@"创建房间") forState:UIControlStateNormal];
+        [_createBtn setTitle:KTVLocalizedString(@"ktv_create_room") forState:UIControlStateNormal];
         [_createBtn setImage:[UIImage sceneImageWithName:@"online_list_addIcon"] forState:UIControlStateNormal];
         _createBtn.frame = CGRectMake((SCREEN_WIDTH-195)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-48-kTopNavHeight, 195, 48);
         _createBtn.layer.cornerRadius = 24;
