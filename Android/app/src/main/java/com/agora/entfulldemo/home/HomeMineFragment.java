@@ -99,20 +99,6 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
         getBinding().tvDataSharing.setOnClickListener(view -> {
             PagePilotManager.pageWebView("https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/libraries.html");
         });
-        getBinding().tvCollectionChecklist.setOnClickListener(view -> {
-            //开发服：http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest-dev/index.html
-            //正式服：http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest/index.html
-            StringBuilder stringBuilder =  new StringBuilder("http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest/index.html")
-                    .append("?userNo=").append(UserManager.getInstance().getUser().userNo)
-                    .append("&appId=").append(io.agora.scene.base.BuildConfig.AGORA_APP_ID)
-                    .append("&projectId=").append("agora_ent_demo")
-//                    .append("&sceneId=").append("-1")
-                    .append("&token=").append(UserManager.getInstance().getUser().token);
-            PagePilotManager.pageWebView(stringBuilder.toString());
-        });
-        getBinding().tvDataSharing.setOnClickListener(view -> {
-            PagePilotManager.pageWebView("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/libraries.html");
-        });
 
         getBinding().tvLogout.setOnClickListener(view -> {
             showLogoutDialog();

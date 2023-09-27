@@ -99,7 +99,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 showPresetDialog()
             }
         }
-
         mBeautyProcessor.initialize(
             rtcEngine = mRtcEngine,
             captureMode = CaptureMode.Agora,
