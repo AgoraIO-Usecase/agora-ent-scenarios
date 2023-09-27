@@ -413,13 +413,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         val uid = UserManager.getInstance().user.id
         val channelName = mRoomInfo.roomId
 
-        AudioModeration.moderationAudio(
-            channelName,
-            uid,
-            AudioModeration.AgoraChannelType.broadcast,
-            "show"
-        )
-
         if (!isRoomOwner && mRtcEngine.queryDeviceScore() < 75) {
             // 低端机观众加入频道前默认开启硬解（解决看高分辨率卡顿问题），但是在410分支硬解码会带来200ms的秒开耗时增加
             mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
@@ -513,7 +506,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     override fun onPause() {
         stopCallAnimator()
         super.onPause()
-        Log.d(TAG, "RoomDetail onPause")
     }
 
 
@@ -536,27 +528,22 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         if (!isRoomOwner && binding.layoutCallPrivatelyBg.isVisible) {
             startCallAnimator()
         }
-        Log.d(TAG, "RoomDetail onResume")
     }
 
     override fun onStop() {
         super.onStop()
-        Log.d(TAG, "RoomDetail onStop")
     }
 
     override fun onRestart() {
         super.onRestart()
-        Log.d(TAG, "RoomDetail onRestart")
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        Log.d(TAG, "RoomDetail onWindowFocusChanged hasFocus:$hasFocus")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG, "RoomDetail onDestroy")
     }
 
     override fun onBackPressed() {

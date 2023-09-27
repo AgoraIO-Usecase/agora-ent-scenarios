@@ -99,29 +99,20 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     override fun onResume() {
         super.onResume()
-        Log.d(TAG, "RoomList onResume")
 
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        Log.d(TAG, "onNewIntent")
     }
 
     override fun onPause() {
         super.onPause()
-        Log.d(TAG, "RoomList onPause")
     }
 
     override fun onStop() {
         super.onStop()
-        Log.d(TAG, "RoomList onStop")
     }
 
     override fun onRestart() {
         mVpFragments[mCurrLoadPosition]?.onResumePage()
         super.onRestart()
-        Log.d(TAG, "RoomList onRestart")
     }
 
     private var guided = SPUtil.getBoolean(kRoomListSwipeGuide, false)
@@ -149,7 +140,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         }
         binding.emptyInclude.layoutCreateRoom.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click create room empty")
                 mCallApi.removeListener(callApiListener)
                 mShowTo1v1Manger.deInitialize()
                 RoomCreateActivity.launch(this@RoomListActivity)
@@ -157,7 +147,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         })
         binding.layoutCreateRoom2.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click create room")
                 mCallApi.removeListener(callApiListener)
                 mShowTo1v1Manger.deInitialize()
                 RoomCreateActivity.launch(this@RoomListActivity)
@@ -180,7 +169,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 override fun createFragment(position: Int): Fragment {
                     val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
                     return RoomListFragment.newInstance(roomInfo).also {
-                        Log.d(TAG, "createFragment position:$position")
                         mVpFragments[position] = it
                     }
                 }
@@ -196,7 +184,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             binding.viewPager2.registerOnPageChangeCallback(onPageChangeCallback)
             binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2, false)
             mCurrLoadPosition = binding.viewPager2.currentItem
-            Log.d(TAG, "after setCurrentItem mCurrLoadPosition:$mCurrLoadPosition")
         } else {
             mFragmentAdapter?.let {
                 it.notifyDataSetChanged()
@@ -204,7 +191,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 mCurrLoadPosition = binding.viewPager2.currentItem
             }
         }
-        Log.d(TAG,"RtmClient.getSdkVersion() ${RtmClient.getSdkVersion()}")
     }
 
     private val onPageChangeCallback = object : OnPageChangeCallback() {
@@ -216,7 +202,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
         override fun onPageScrollStateChanged(state: Int) {
             super.onPageScrollStateChanged(state)
-            Log.d(TAG, "PageChange onPageScrollStateChanged state=$state")
             when (state) {
                 ViewPager2.SCROLL_STATE_SETTLING -> binding.viewPager2.isUserInputEnabled = false
                 ViewPager2.SCROLL_STATE_IDLE -> {
@@ -238,7 +223,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
             super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-//            Log.d(TAG, "PageChange onPageScrolled positionOffset=$positionOffset, scrollStatus=$scrollStatus, preLoadPosition=$preLoadPosition")
             if (scrollStatus == ViewPager2.SCROLL_STATE_DRAGGING) {
                 if (lastOffset > 0f) {
                     val isMoveUp = (positionOffset - lastOffset) > 0
@@ -256,10 +240,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
-            Log.d(
-                TAG,
-                "PageChange onPageSelected position=$position,currLoadPosition=$mCurrLoadPosition,preLoadPosition=$preLoadPosition"
-            )
             if (mCurrLoadPosition != POSITION_NONE) {
                 if (preLoadPosition != POSITION_NONE) {
                     if (position == preLoadPosition) {

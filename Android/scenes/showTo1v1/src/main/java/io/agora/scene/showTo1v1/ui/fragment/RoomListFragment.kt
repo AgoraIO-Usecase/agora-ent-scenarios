@@ -9,8 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.ScaleAnimation
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
@@ -119,13 +117,11 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         }
         binding.ivConnect.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click call")
                 onFragmentListener?.onFragmentClickCall(true, mRoomInfo)
             }
         })
         binding.layoutVideoContainer.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click video container")
                 onFragmentListener?.onFragmentClickCall(false, mRoomInfo)
             }
         })
@@ -162,7 +158,6 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     }
 
     fun startLoadPageSafely() {
-        Log.d(TAG, "Fragment PageLoad startLoadPageSafely, roomId=${mRoomInfo.roomId}")
         isPageLoaded = true
         activity ?: return
         startLoadPage(true)
@@ -174,8 +169,6 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     }
 
     fun onResumePage() {
-        Log.d(TAG, "onResumePage, roomId=${mRoomInfo.roomId}")
-
         activity?.let {
             mRtcVideoSwitcher.setupRemoteVideo(
                 mMainRtcConnection,
@@ -185,7 +178,6 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     }
 
     private fun startLoadPage(isScrolling: Boolean) {
-        Log.d(TAG, "Fragment PageLoad start load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = true
 
         initRtcEngine(isScrolling)
