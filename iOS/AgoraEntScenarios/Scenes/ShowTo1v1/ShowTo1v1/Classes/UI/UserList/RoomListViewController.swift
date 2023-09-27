@@ -301,6 +301,7 @@ extension RoomListViewController {
     }
     
     private func _call(room: ShowTo1v1RoomInfo) {
+        if room.userId == userInfo?.userId {return}
         if self.tokenConfig.tokenIsEmpty() {
             renewTokens { success in
                 self._call(room: room)
