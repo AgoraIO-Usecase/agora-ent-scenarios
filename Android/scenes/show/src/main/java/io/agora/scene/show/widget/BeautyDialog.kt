@@ -352,7 +352,7 @@ class BeautyDialog constructor(context: Context) : BottomDarkDialog(context) {
 
     fun setBeautyProcessor(processor: IBeautyProcessor) {
         try { // 美颜license是否存在
-            context.assets.open("LICENSE").use { inputStream ->
+            context.assets.open("license/SenseME.lic").use { inputStream ->
                 this.beautyProcessor = processor
             }
         } catch (_: Exception) {}
