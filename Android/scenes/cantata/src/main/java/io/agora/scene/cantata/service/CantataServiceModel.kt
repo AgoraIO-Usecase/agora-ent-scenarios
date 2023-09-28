@@ -1,6 +1,7 @@
 package io.agora.scene.cantata.service
 
 import io.agora.scene.base.R
+import java.io.Serializable
 
 data class RoomListModel constructor(
     val roomNo: String = "",
@@ -46,9 +47,9 @@ data class RoomSeatModel constructor(
     val chorusSongCode: String = "",// 是否合唱
     val isAudioMuted: Int,// 是否静音
     val isVideoMuted: Int,// 是否开启视频
-) : java.io.Serializable {
+) : Serializable {
 
-    companion object{
+    companion object {
         val MUTED_VALUE_TRUE = 1
 
         val MUTED_VALUE_FALSE = 0
@@ -90,7 +91,7 @@ data class JoinRoomOutputModel constructor(
     val agoraRTCToken: String,
     val agoraChorusToken: String,
     val createdAt: String
-) : java.io.Serializable
+) : Serializable
 
 
 data class ChangeMVCoverInputModel constructor(
@@ -126,10 +127,10 @@ data class RoomSelSongModel constructor(
     val isOriginal: Int = 0, //是否原唱
 
     // 排序字段
-    val status : Int, // 0 未开始 1.已唱 2.正在唱
+    val status: Int, // 0 未开始 1.已唱 2.正在唱
     val createAt: Long,
     val pinAt: Double
-){
+) {
     companion object {
         val STATUS_IDLE = 0
         val STATUS_PLAYED = 1

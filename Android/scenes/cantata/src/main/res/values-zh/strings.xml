@@ -156,4 +156,5 @@
     <string name="cantata_join_chorus_failed">加入合唱失败</string>
 
     <string name="cantata_user_online">%s在线</string>
+    <string name="cantata_singing_user">正在合唱用户(%d)</string>
 </resources>

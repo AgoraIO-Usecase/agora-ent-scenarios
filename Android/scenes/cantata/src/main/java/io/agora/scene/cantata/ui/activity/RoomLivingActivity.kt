@@ -10,12 +10,11 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.agora.rtc2.Constants
-import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.event.NetWorkEvent
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.base.utils.LiveDataUtils
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataActivityRoomLivingBinding
@@ -34,6 +33,8 @@ import io.agora.scene.cantata.ui.viewmodel.RoomLivingViewModel
 import io.agora.scene.cantata.ui.widget.LrcActionListenerImpl
 import io.agora.scene.cantata.ui.widget.OnClickJackingListener
 import io.agora.scene.cantata.ui.widget.lrcView.LrcControlView
+import io.agora.scene.cantata.ui.widget.song.SongActionListenerImpl
+import io.agora.scene.cantata.ui.widget.song.SongDialog
 import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
@@ -66,6 +67,10 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     private var musicSettingDialog: MusicSettingDialog? = null
     private var mChangeMusicDialog: CommonDialog? = null
     private var mUserLeaveSeatMenuDialog: UserLeaveSeatMenuDialog? = null
+
+    // 点歌台
+    private var mChooseSongDialog: SongDialog? = null
+    private var showChooseSongDialogTag = false
 
     private var toggleAudioRun: Runnable? = null
 
@@ -138,8 +143,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
         binding.iBtnChooseSong.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                // TODO()
-                ToastUtils.showToast("click 点歌")
+                showChooseSongDialog()
             }
         })
         binding.btnOK.setOnClickListener(object : OnClickJackingListener() {
@@ -549,4 +553,41 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mUserLeaveSeatMenuDialog?.show()
     }
 
+    private fun showChooseSongDialog() {
+        if (showChooseSongDialogTag) return
+        showChooseSongDialogTag = true
+        if (mChooseSongDialog == null) {
+            mChooseSongDialog = SongDialog()
+            mChooseSongDialog?.setChosenControllable(mRoomLivingViewModel.isRoomOwner())
+            showLoadingView()
+            LiveDataUtils.observerThenRemove<LinkedHashMap<Int, String>>(
+                this, mRoomLivingViewModel.getSongTypes()
+            ) { typeMap: LinkedHashMap<Int, String> ->
+                val chooseSongListener: SongActionListenerImpl = SongActionListenerImpl(
+                    this,
+                    mRoomLivingViewModel,
+                    filterSongTypeMap(typeMap),
+                    false
+                )
+                mChooseSongDialog?.setChooseSongTabsTitle(
+                    chooseSongListener.getSongTypeTitles(this),
+                    chooseSongListener.songTypeList,
+                    0
+                )
+                mChooseSongDialog?.setChooseSongListener(chooseSongListener)
+                hideLoadingView()
+                if (mChooseSongDialog?.isAdded == false) {
+                    mRoomLivingViewModel.getSongChosenList()
+                    mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
+                }
+                binding.root.post { showChooseSongDialogTag = false }
+            }
+            return
+        }
+        if (mChooseSongDialog?.isAdded == false) {
+            mRoomLivingViewModel.getSongChosenList()
+            mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
+        }
+        binding.root.post { showChooseSongDialogTag = false }
+    }
 }
