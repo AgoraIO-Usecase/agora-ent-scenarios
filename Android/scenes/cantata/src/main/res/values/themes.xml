@@ -17,4 +17,15 @@
         <item name="android:gravity">center_vertical</item>
         <item name="android:textSize">18sp</item>
     </style>
+
+    <style name="cantataSongRankBtnStyle">
+        <item name="android:layout_width">76dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_marginStart">3dp</item>
+        <item name="android:layout_marginEnd">3dp</item>
+        <item name="android:button">@null</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/grey_to_white</item>
+        <item name="android:textSize">12sp</item>
+    </style>
 </resources>

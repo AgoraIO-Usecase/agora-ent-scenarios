@@ -587,7 +587,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
      * 获取歌曲类型
      * @return map key: 类型名称，value: 类型值
      */
-    fun getSongTypes(): LiveData<LinkedHashMap<Int, String>>? {
+    fun getSongTypes(): LiveData<LinkedHashMap<Int, String>> {
         CantataLogger.d(TAG, "RoomLivingViewModel.getSongTypes() called")
         val liveData = MutableLiveData<LinkedHashMap<Int, String>>()
         mKtvApi.fetchMusicCharts { requestId, status, list ->
@@ -618,7 +618,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     /**
      * 获取歌曲列表
      */
-    fun getSongList(type: Int, page: Int): LiveData<List<RoomSelSongModel>>? {
+    fun getSongList(type: Int, page: Int): LiveData<List<RoomSelSongModel>> {
         // 从RTC中获取歌曲列表
         CantataLogger.d(TAG, "RoomLivingViewModel.getSongList() called, type:$type page:$page")
         val liveData: MutableLiveData<List<RoomSelSongModel>> = MutableLiveData<List<RoomSelSongModel>>()
