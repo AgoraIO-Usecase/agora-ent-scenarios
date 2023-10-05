@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <resources>
     <string name="voice_app_name">声网语聊房</string>
     <string name="voice_app_agora_chatroom">声网语聊房</string>
@@ -132,6 +131,16 @@
     <string name="voice_room_disclaimer_email">若您有任何疑问，请联系support@agora.io</string>
     <string name="voice_chatroom_notice">公告</string>
     <string name="voice_chatroom_settings_host_only">仅房主可操作</string>
+    <string name="voice_chatroom_settings_bgm_title">背景音乐(%d)</string>
+    <string name="voice_chatroom_settings_earback_title">耳返</string>
+    <string name="voice_chatroom_settings_earback_on">开启耳返</string>
+    <string name="voice_chatroom_settings_earback_forbidden_toast">仅上麦用户可以使用耳返</string>
+    <string name="voice_chatroom_settings_earback_tip">&#160;&#160;开启耳返可实时听到自己的声音，唱歌的时候及时调整</string>
+    <string name="voice_chatroom_settings_earback_waring">&#160;&#160;使用耳返必须插入耳机，当前未检测到耳机</string>
+    <string name="voice_chatroom_settings_earback_setting">耳返设置</string>
+    <string name="voice_chatroom_settings_earback_volume">耳返音量</string>
+    <string name="voice_chatroom_settings_earback_ping">耳返延时</string>
+    <string name="voice_chatroom_settings_earback_ping_tips">请对着耳麦说话，测试实时耳返延时</string>
     <string name="voice_chatroom_own_audio_settings">个人音效设置</string>
     <string name="voice_chatroom_audio_settings">音效设置</string>
     <string name="voice_chatroom_bot_settings">机器人设置</string>
@@ -142,6 +151,8 @@
     <string name="voice_chatroom_noise_suppression">AI降噪</string>
     <string name="voice_chatroom_aiaec">AI回声消除</string>
     <string name="voice_chatroom_aiagc">人声自动增益</string>
+    <string name="voice_chatroom_ear_back">耳返</string>
+    <string name="voice_chatroom_bgm">背景音乐</string>
     <string name="voice_chatroom_aiaec_audition">AIAEC试听</string>
     <string name="voice_chatroom_aiagc_audition">AGC试听</string>
     <string name="voice_chatroom_audition_before">之前</string>
@@ -161,6 +172,7 @@
     <string name="voice_chatroom_voice_blur">⼈声模糊</string>
     <string name="voice_chatroom_sound_selection">最佳⾳效</string>
     <string name="voice_chatroom_only_host_can_change_best_sound">只有房主可以更改最佳⾳效</string>
+    <string name="voice_chatroom_only_host_bgm">只有房主可以更改背景音乐</string>
     <string name="voice_chatroom_sound_selection_tips">切换其他最佳⾳效需退出房间</string>
     <string name="voice_chatroom_current_sound_selection">当前最佳⾳效</string>
     <string name="voice_chatroom_other_sound_selection">其他最佳⾳效</string>

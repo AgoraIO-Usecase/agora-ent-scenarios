@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="room_has_close">房主已解散房间，请确认离开房间</string>
     <string name="confirm_to_dismiss_room">确认解散该房间吗？</string>
     <string name="confirm_to_exit_room">确认退出该房间吗？</string>

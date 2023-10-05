@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import android.util.Log
 import io.agora.CallBack
 import io.agora.ValueCallBack
 import io.agora.chat.ChatRoom
@@ -11,6 +12,7 @@ import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.*
 import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
+import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
 import io.agora.syncmanager.rtm.Sync.JoinSceneCallback
@@ -18,6 +20,9 @@ import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * @author create by zhangwei03
@@ -27,7 +32,11 @@ class VoiceSyncManagerServiceImp(
     private val errorHandler: ((Exception?) -> Unit)?
 ) : VoiceServiceProtocol {
 
+    private val TAG = "VC_SYNC_LOG"
+
     private val voiceSceneId = "scene_chatRoom_3.0.2"
+    private val kRoomBGMCollection = "room_bgm"
+    private var kRoomBGMId: String? = null
 
     private val roomChecker = RoomChecker(context)
 
@@ -222,6 +231,33 @@ class VoiceSyncManagerServiceImp(
                             "syncManager update onFail ${exception?.message}".logE()
                         }
                     })
+                    mSceneReference?.collection(kRoomBGMCollection)?.get(object: DataListCallback {
+                        override fun onSuccess(result: MutableList<IObject>?) {
+                            val item = result?.firstOrNull() ?: return
+                            val bgmInfo = item.toObject(VoiceBgmModel::class.java) ?: return
+                            kRoomBGMId = item.id
+                            Log.d(TAG, "kRoomBGMCollection get: $bgmInfo")
+                            GlobalScope.launch {
+                                delay(3500)
+                                remoteUpdateBGMInfo(bgmInfo)
+                            }
+                        }
+                        override fun onFail(exception: SyncManagerException?) {
+                        }
+                    })
+                    mSceneReference?.collection(kRoomBGMCollection)?.subscribe(object : Sync.EventListener {
+                        override fun onUpdated(item: IObject?) {
+                            Log.d(TAG, "kRoomBGMCollection updated callback: $item")
+                            val bgmInfo = item?.toObject(VoiceBgmModel::class.java) ?: return
+                            remoteUpdateBGMInfo(bgmInfo)
+                        }
+                        override fun onCreated(item: IObject?) {
+                            kRoomBGMId = item?.id
+                            Log.d(TAG, "kRoomBGMCollection created callback: $item")
+                        }
+                        override fun onDeleted(item: IObject?) {}
+                        override fun onSubscribeError(ex: SyncManagerException?) {}
+                    })
                     completion.invoke(VoiceServiceProtocol.ERR_OK, curRoomInfo)
 
                     if (TextUtils.equals(curRoomInfo.owner?.userId, VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
@@ -238,7 +274,12 @@ class VoiceSyncManagerServiceImp(
             })
         }
     }
-
+    private fun remoteUpdateBGMInfo(info: VoiceBgmModel) {
+        val song = info.songName
+        val singer = info.singerName
+        val isOrigin = info.isOrigin
+        AgoraRtcEngineController.get().bgmManager().remoteUpdateBGMInfo(song, singer, isOrigin)
+    }
     /**
      * 离开房间
      * @param roomId 房间id
@@ -682,6 +723,35 @@ class VoiceSyncManagerServiceImp(
                 completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
             }
         })
+    }
+
+    override fun updateBGMInfo(info: VoiceBgmModel, completion: (error: Int) -> Unit) {
+        if (mSceneReference == null) {
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED)
+            return
+        }
+        if (kRoomBGMId != null) {
+            mSceneReference?.collection(kRoomBGMCollection)?.update(kRoomBGMId, info, object: Sync.Callback {
+                override fun onSuccess() {
+                    Log.d(TAG, "kRoomBGMCollection update: $kRoomBGMId")
+                    completion.invoke(VoiceServiceProtocol.ERR_OK)
+                }
+                override fun onFail(exception: SyncManagerException?) {
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED)
+                }
+            })
+        } else {
+            mSceneReference?.collection(kRoomBGMCollection)?.add(info, object: Sync.DataItemCallback{
+                override fun onSuccess(result: IObject?) {
+                    Log.d(TAG, "kRoomBGMCollection add: $result")
+                    kRoomBGMId = result?.id
+                    completion.invoke(VoiceServiceProtocol.ERR_OK)
+                }
+                override fun onFail(exception: SyncManagerException?) {
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED)
+                }
+            })
+        }
     }
 
     /**

@@ -9,7 +9,7 @@
             <!--进度条的圆角-->
             <corners android:radius="2dp" />
             <!--未加载的进度区域颜色-->
-            <solid android:color="#787880" />
+            <solid android:color="#33787880" />
         </shape>
     </item>
     <!--已经加载完的进度的区域-->

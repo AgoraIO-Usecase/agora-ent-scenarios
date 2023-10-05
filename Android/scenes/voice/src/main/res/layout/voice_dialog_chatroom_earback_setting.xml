@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:theme="@style/Theme.AppCompat"
+    android:background="@drawable/voice_bg_rect_top_radius20_white">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/voice_bg_rect_top_radius20_gradient_white"
+        app:layout_constraintTop_toTopOf="@+id/ivBottomSheetTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/mtBottomSheetTitle"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBottomSheetTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:src="@drawable/voice_icon_room_rectangle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/mtBottomSheetTitle"
+        style="@style/voice_bottom_sheet_title_style"
+        android:text="@string/voice_chatroom_settings_earback_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvOpenSwitch"
+        style="@style/voice_bottom_sheet_text_style"
+        android:layout_marginStart="20dp"
+        android:text="@string/voice_chatroom_settings_earback_on"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cbSwitch"
+        android:layout_width="45dp"
+        android:layout_height="28dp"
+        style="@style/voice_bottom_sheet_checkbox"
+        android:checked="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvOpenSwitch"
+        app:layout_constraintBottom_toBottomOf="@+id/tvOpenSwitch" />
+
+    <com.google.android.material.divider.MaterialDivider
+        style="@style/voice_bottom_sheet_divider_style"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvOpenSwitch" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:textColor="@color/voice_dark_grey_color_979cbb"
+        android:drawableStart="@drawable/voice_icon_room_setting_introduce"
+        android:textSize="@dimen/voice_sp_12"
+        android:textAlignment="textStart"
+        android:text="@string/voice_chatroom_settings_earback_tip"
+        app:layout_constraintTop_toBottomOf="@+id/tvOpenSwitch"
+        />
+    
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvSetting"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginTop="16dp"
+        android:paddingLeft="@dimen/voice_sp_20"
+        android:gravity="center_vertical"
+        android:text="耳返设置"
+        android:background="@color/voice_color_f7f8fb"
+        android:textColor="@color/voice_dark_grey_color_6c7192"
+        app:layout_constraintTop_toBottomOf="@+id/tvTips"
+        />
+
+    <View
+        android:id="@+id/vSettingMark"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:elevation="0.5dp"
+        android:background="@color/voice_transparent"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@+id/tvSetting" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:alpha="0.3"
+        app:layout_constraintTop_toBottomOf="@+id/tvSetting">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvVolumeTitle"
+            style="@style/voice_bottom_sheet_text_style"
+            android:layout_marginStart="20dp"
+            android:text="@string/voice_chatroom_settings_earback_volume"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvVolume"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:textColor="#6D7291"
+            android:textSize="@dimen/voice_sp_14"
+            android:gravity="end"
+            android:text="100"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvVolumeTitle"
+            app:layout_constraintBottom_toBottomOf="@+id/tvVolumeTitle" />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/slVolume"
+            style="@style/voice_bottom_sheet_progress"
+            android:layout_width="160dp"
+            android:layout_height="40dp"
+            android:progress="50"
+            app:layout_constraintTop_toTopOf="@+id/tvVolumeTitle"
+            app:layout_constraintEnd_toStartOf="@id/tvVolume"
+            app:layout_constraintBottom_toBottomOf="@id/tvVolumeTitle"
+            />
+
+        <com.google.android.material.divider.MaterialDivider
+            style="@style/voice_bottom_sheet_divider_style"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvVolumeTitle" />
+
+            <!--        注掉的代码是耳返模式，等sdk支持完善后添加上 -->
+<!--        <androidx.appcompat.widget.AppCompatTextView-->
+<!--            android:id="@+id/tvMode"-->
+<!--            style="@style/voice_bottom_sheet_text_style"-->
+<!--            android:layout_marginStart="20dp"-->
+<!--            android:text="耳返模式"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/tvVolumeTitle" />-->
+
+<!--        <RadioGroup-->
+<!--            android:id="@+id/rgMode"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="28dp"-->
+<!--            android:layout_marginRight="20dp"-->
+<!--            android:padding="2dp"-->
+<!--            android:background="@drawable/voice_ear_back_mode_radius"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:gravity="center"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/tvMode"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/tvMode"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            >-->
+<!--            <RadioButton-->
+<!--                android:id="@+id/tvModeAuto"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="24dp"-->
+<!--                android:paddingLeft="10dp"-->
+<!--                android:paddingRight="10dp"-->
+<!--                android:textColor="@color/voice_ear_back_mode_selector"-->
+<!--                android:background="@drawable/voice_ear_back_mode_selector"-->
+<!--                android:gravity="center"-->
+<!--                android:button="@null"-->
+<!--                android:checked="true"-->
+<!--                android:text="自动"-->
+<!--                app:layout_constraintTop_toTopOf="@+id/tvModeOboe"-->
+<!--                app:layout_constraintBottom_toBottomOf="@+id/tvModeOboe"-->
+<!--                app:layout_constraintEnd_toStartOf="@+id/tvModeOboe"-->
+<!--                />-->
+<!--            <RadioButton-->
+<!--                android:id="@+id/tvModeOpenSL"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="24dp"-->
+<!--                android:paddingLeft="10dp"-->
+<!--                android:paddingRight="10dp"-->
+<!--                android:textColor="@color/voice_ear_back_mode_selector"-->
+<!--                android:background="@drawable/voice_ear_back_mode_selector"-->
+<!--                android:gravity="center"-->
+<!--                android:button="@null"-->
+<!--                android:checked="false"-->
+<!--                android:text="强制OpenSL"-->
+<!--                app:layout_constraintTop_toTopOf="@+id/tvModeOboe"-->
+<!--                app:layout_constraintBottom_toBottomOf="@+id/tvModeOboe"-->
+<!--                app:layout_constraintEnd_toStartOf="@+id/tvModeOboe"-->
+<!--                />-->
+<!--            <RadioButton-->
+<!--                android:id="@+id/tvModeOboe"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="24dp"-->
+<!--                android:paddingLeft="10dp"-->
+<!--                android:paddingRight="10dp"-->
+<!--                android:textColor="@color/voice_ear_back_mode_selector"-->
+<!--                android:background="@drawable/voice_ear_back_mode_selector"-->
+<!--                android:gravity="center"-->
+<!--                android:button="@null"-->
+<!--                android:checked="false"-->
+<!--                android:text="强制Oboe"-->
+<!--                app:layout_constraintTop_toTopOf="@+id/tvMode"-->
+<!--                app:layout_constraintBottom_toBottomOf="@+id/tvMode"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                />-->
+<!--        </RadioGroup>-->
+
+<!--        <com.google.android.material.divider.MaterialDivider-->
+<!--            style="@style/voice_bottom_sheet_divider_style"-->
+<!--            android:layout_marginStart="20dp"-->
+<!--            android:layout_marginEnd="20dp"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/tvMode" />-->
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/vPingMark"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginTop="@dimen/voice_sp_8"
+        android:elevation="2dp"
+        android:background="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@+id/clSetting" />
+    
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvPing"
+        android:layout_width="match_parent"
+        android:layout_height="111dp"
+        android:layout_marginTop="@dimen/voice_sp_12"
+        android:layout_marginLeft="@dimen/voice_sp_12"
+        android:layout_marginRight="@dimen/voice_sp_12"
+        android:layout_marginBottom="@dimen/voice_sp_20"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="#FAFBFC"
+        app:cardCornerRadius="@dimen/voice_sp_8"
+        app:layout_constraintTop_toBottomOf="@+id/clSetting" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPingTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/voice_color_3c4267"
+        android:textSize="@dimen/voice_sp_13"
+        android:text="@string/voice_chatroom_settings_earback_ping"
+        app:layout_constraintStart_toStartOf="@+id/cvPing"
+        app:layout_constraintTop_toTopOf="@+id/cvPing" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPingInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textSize="@dimen/voice_sp_11"
+        android:text="@string/voice_chatroom_settings_earback_ping_tips"
+        android:textColor="@color/voice_color_979cbb"
+        app:layout_constraintStart_toStartOf="@+id/cvPing"
+        app:layout_constraintTop_toBottomOf="@+id/tvPingTitle" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textColor="#6d7291"
+        android:gravity="center"
+        android:text="60ms"
+        app:layout_constraintStart_toStartOf="@id/cvPing"
+        app:layout_constraintEnd_toEndOf="@+id/cvPing"
+        app:layout_constraintTop_toBottomOf="@+id/tvPingInfo" />
+
+    <ProgressBar
+        android:id="@+id/pbPing"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_marginTop="@dimen/voice_space_8dp"
+        android:layout_marginLeft="28dp"
+        android:layout_marginRight="28dp"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:progressDrawable="@drawable/voice_ear_back_ping_progress"
+        android:max="150"
+        android:progress="60"
+        app:layout_constraintEnd_toEndOf="@+id/cvPing"
+        app:layout_constraintTop_toBottomOf="@+id/tvPing"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
