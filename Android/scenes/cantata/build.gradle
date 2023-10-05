@@ -32,4 +32,7 @@ dependencies {
 
     implementation rootProject.ext.deps.syncManager
 
+    // agora
+    implementation 'io.agora:authentication:1.6.1'
+
 }

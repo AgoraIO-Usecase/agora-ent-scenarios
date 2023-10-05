@@ -195,7 +195,7 @@ class CantataSyncManagerServiceImp(
                     currRoomNo = inputModel.roomNo
 
                     TokenGenerator.generateTokens(
-                        currRoomNo,
+                        currRoomNo + "_ad",
                         UserManager.getInstance().user.id.toString(),
                         TokenGenerator.TokenGeneratorType.token006,
                         arrayOf(
@@ -212,6 +212,7 @@ class CantataSyncManagerServiceImp(
                                     completion.invoke(addUserError, null)
                                     return@innerAddUserIfNeed
                                 }
+                                innerSubscribeSeats {}
                                 innerAutoOnSeatIfNeed { error, seats ->
                                     if (error != null) {
                                         completion.invoke(error, null)
@@ -219,35 +220,47 @@ class CantataSyncManagerServiceImp(
                                     }
 
                                     TokenGenerator.generateToken(
-                                        currRoomNo + "_ex",
+                                        currRoomNo,
                                         UserManager.getInstance().user.id.toString(),
                                         TokenGenerator.TokenGeneratorType.token006,
                                         TokenGenerator.AgoraTokenType.rtc,
                                         { chorusToken ->
-                                            val kTVJoinRoomOutputModel = JoinRoomOutputModel(
-                                                cacheRoom.name,
-                                                inputModel.roomNo,
-                                                cacheRoom.creatorNo,
-                                                cacheRoom.bgOption,
-                                                seats,
-                                                userSize,
-                                                rtmToken,
-                                                rtcToken,
-                                                chorusToken,
-                                                cacheRoom.createdAt
-                                            )
-                                            runOnMainThread {
-                                                completion.invoke(null, kTVJoinRoomOutputModel)
-                                                isJoined = true
-                                            }
+                                            TokenGenerator.generateToken(
+                                                currRoomNo,
+                                                "2023",
+                                                TokenGenerator.TokenGeneratorType.token006,
+                                                TokenGenerator.AgoraTokenType.rtc,
+                                                { musicToken ->
+                                                    val kTVJoinRoomOutputModel = JoinRoomOutputModel(
+                                                        cacheRoom.name,
+                                                        inputModel.roomNo,
+                                                        cacheRoom.creatorNo,
+                                                        cacheRoom.bgOption,
+                                                        seats,
+                                                        userSize,
+                                                        rtmToken,
+                                                        rtcToken,
+                                                        chorusToken,
+                                                        musicToken,
+                                                        cacheRoom.createdAt
+                                                    )
+                                                    runOnMainThread {
+                                                        completion.invoke(null, kTVJoinRoomOutputModel)
+                                                        isJoined = true
+                                                    }
 
-                                            // 重置体验时间事件
-                                            mainHandler.removeCallbacks(timerRoomEndRun)
-                                            // 定时删除房间
-                                            val expireLeftTime =
-                                                ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - cacheRoom.createdAt.toLong())
-                                            CantataLogger.d(TAG, "expireLeftTime: $expireLeftTime")
-                                            mainHandler.postDelayed(timerRoomEndRun, expireLeftTime)
+                                                    // 重置体验时间事件
+                                                    mainHandler.removeCallbacks(timerRoomEndRun)
+                                                    // 定时删除房间
+                                                    val expireLeftTime =
+                                                        ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - cacheRoom.createdAt.toLong())
+                                                    CantataLogger.d(TAG, "expireLeftTime: $expireLeftTime")
+                                                    mainHandler.postDelayed(timerRoomEndRun, expireLeftTime)
+                                                },
+                                                {
+                                                    completion.invoke(it, null)
+                                                }
+                                            )
                                         },
                                         {
                                             completion.invoke(it, null)
@@ -984,7 +997,6 @@ class CantataSyncManagerServiceImp(
                 completion.invoke(err, null)
                 return@innerGetSeatInfo
             }
-            var hasMaster = false
             val outList = ArrayList<RoomSeatModel>()
             seatMap.forEach {
                 it.value?.let { seat ->
@@ -995,40 +1007,9 @@ class CantataSyncManagerServiceImp(
                             seat
                         )
                     }
-                    if (seat.isMaster) {
-                        hasMaster = true
-                    }
                 }
             }
-            if (!hasMaster && cacheRoom.creatorNo == UserManager.getInstance().user.id.toString()) {
-                val targetSeatInfo = RoomSeatModel(
-                    roomMap[currRoomNo]?.creatorNo == UserManager.getInstance().user.id.toString(),
-                    UserManager.getInstance().user.headUrl,
-                    UserManager.getInstance().user.id.toString(),
-                    UserManager.getInstance().user.id.toString(),
-                    UserManager.getInstance().user.name,
-                    0,
-                    "",
-                    RoomSeatModel.MUTED_VALUE_FALSE,
-                    RoomSeatModel.MUTED_VALUE_TRUE
-                )
-                innerAddSeatInfo(targetSeatInfo) { error ->
-                    if (error != null) {
-                        completion.invoke(error, null)
-                        return@innerAddSeatInfo
-                    }
-                    outList.add(targetSeatInfo)
-                    runOnMainThread{
-                        seatListChangeSubscriber?.invoke(
-                            CantataServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
-                            targetSeatInfo
-                        )
-                        completion.invoke(null, outList)
-                    }
-                }
-            } else {
-                completion.invoke(null, outList)
-            }
+            completion.invoke(null, outList)
         }
     }
 

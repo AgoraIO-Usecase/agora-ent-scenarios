@@ -25,19 +25,21 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.cantata.R
+import io.agora.scene.cantata.ktvapi.GiantChorusConfiguration
 import io.agora.scene.cantata.ktvapi.IKTVApiEventHandler
 import io.agora.scene.cantata.ktvapi.ILrcView
 import io.agora.scene.cantata.ktvapi.IMusicLoadStateListener
 import io.agora.scene.cantata.ktvapi.ISwitchRoleStateListener
 import io.agora.scene.cantata.ktvapi.KTVApiConfig
-import io.agora.scene.cantata.ktvapi.KTVApiImpl
 import io.agora.scene.cantata.ktvapi.KTVLoadMusicConfiguration
 import io.agora.scene.cantata.ktvapi.KTVLoadMusicMode
 import io.agora.scene.cantata.ktvapi.KTVLoadSongFailReason
+import io.agora.scene.cantata.ktvapi.KTVMusicType
 import io.agora.scene.cantata.ktvapi.KTVSingRole
 import io.agora.scene.cantata.ktvapi.KTVType
 import io.agora.scene.cantata.ktvapi.MusicLoadStatus
 import io.agora.scene.cantata.ktvapi.SwitchRoleFailReason
+import io.agora.scene.cantata.ktvapi.createKTVApi
 import io.agora.scene.cantata.service.CantataServiceProtocol
 import io.agora.scene.cantata.service.ChooseSongInputModel
 import io.agora.scene.cantata.service.JoinRoomOutputModel
@@ -90,7 +92,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     private val mCantataServiceProtocol = CantataServiceProtocol.getImplInstance()
 
-    private val mKtvApi = KTVApiImpl()
+    private val mKtvApi by lazy { createKTVApi() }
 
     // loading dialog
     private val _loadingDialogVisible = MutableLiveData(false)
@@ -177,10 +179,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     fun initViewModel() {
-        if (isRoomOwner()) {
-            mKtvApi.setMicStatus(true)
-            mIsOnSeat = true
-        }
         initRTCPlayer()
         initRoom()
         initSeats()
@@ -260,6 +258,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                             roomInfo.agoraRTMToken,
                             roomInfo.agoraRTCToken,
                             roomInfo.agoraChorusToken,
+                            roomInfo.agoraMusicToken,
                             roomInfo.createdAt
                         )
                     )
@@ -385,7 +384,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     updateVolumeStatus(false)
                     val songPlayingData: RoomSelSongModel = mSongPlayingLiveData.value ?: return@subscribeSeatList
                     if (roomSeat.chorusSongCode == songPlayingData.songNo + songPlayingData.createAt) {
-                        mKtvApi.switchSingerRole(KTVSingRole.Audience, null)
+                        mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
                         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
                     }
                 }
@@ -399,10 +398,10 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         if (songPlayingData.userNo == UserManager.getInstance().user.id.toString()) {
             if (isJoin) {
                 // 有人加入合唱
-                mKtvApi.switchSingerRole(KTVSingRole.LeadSinger, null)
+                mKtvApi.switchSingerRole2(KTVSingRole.LeadSinger, null)
             } else {
                 // 最后一人退出合唱
-                mKtvApi.switchSingerRole(KTVSingRole.SoloSinger, null)
+                mKtvApi.switchSingerRole2(KTVSingRole.SoloSinger, null)
             }
         }
     }
@@ -854,7 +853,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 }
 
                 override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
-                    mKtvApi.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
+                    mKtvApi.switchSingerRole2(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
                         override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
                             ToastUtils.showToastLong(R.string.cantata_join_chorus_failed)
                             mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
@@ -879,7 +878,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                                 }
                             } else {
                                 ToastUtils.showToastLong(R.string.cantata_join_chorus_failed)
-                                mKtvApi.switchSingerRole(KTVSingRole.Audience, null)
+                                mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
                                 mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
                             }
                         }
@@ -899,7 +898,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 if (e == null) {
                     // success
                     CantataLogger.d(TAG, "RoomLivingViewModel.leaveChorus() called")
-                    mKtvApi.switchSingerRole(KTVSingRole.Audience, null)
+                    mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
                     mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
                 } else {
                     // failure
@@ -909,7 +908,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 null
             }
         } else {
-            mKtvApi.switchSingerRole(KTVSingRole.Audience, null)
+            mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
             mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
         }
     }
@@ -1014,10 +1013,17 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 BuildConfig.AGORA_APP_ID,
                 mRoomInfoLiveData.value!!.agoraRTMToken,
                 mRtcEngine!!,
-                mRoomInfoLiveData.value!!.roomNo,
+                mRoomInfoLiveData.value!!.roomNo + "_ad",
                 UserManager.getInstance().user.id.toInt(),
-                mRoomInfoLiveData.value!!.roomNo + "_ex",
-                mRoomInfoLiveData.value!!.agoraChorusToken, 10, KTVType.Normal
+                mRoomInfoLiveData.value!!.roomNo,
+                mRoomInfoLiveData.value!!.agoraChorusToken, 10, KTVType.Cantata,
+                KTVMusicType.SONG_CODE
+            ),
+            GiantChorusConfiguration(
+                mRoomInfoLiveData.value!!.agoraRTCToken,
+                2023,
+                mRoomInfoLiveData.value!!.agoraMusicToken,
+                6
             )
         )
 
@@ -1064,7 +1070,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             setClientRole(if (mIsOnSeat) Constants.CLIENT_ROLE_BROADCASTER else Constants.CLIENT_ROLE_AUDIENCE)
             val ret = joinChannel(
                 mRoomInfoLiveData.value!!.agoraRTCToken,
-                mRoomInfoLiveData.value!!.roomNo,
+                mRoomInfoLiveData.value!!.roomNo + "_ad",
                 null,
                 UserManager.getInstance().user.id.toInt()
             )
@@ -1179,7 +1185,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mRetryTimes = 0
         mAudioTrackMode = KTVPlayerTrackMode.Acc
         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_IDLE)
-        mKtvApi.switchSingerRole(KTVSingRole.Audience, null)
+        mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
     }
 
     // ------------------ 歌曲开始播放 ------------------
@@ -1195,7 +1201,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             loadMusic(
                 KTVLoadMusicConfiguration(
                     music.songNo,
-                    true,
+                    false,
                     mainSingerUid,
                     KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
                 ), songCode
@@ -1254,6 +1260,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     ToastUtils.showToastLong(R.string.cantata_load_failed_no_song)
                     return
                 }
+
+                mKtvApi.switchSingerRole2(KTVSingRole.LeadSinger, null)
+                mKtvApi.startSing(songCode, 0)
 
                 // 重置settings
                 mRetryTimes = 0

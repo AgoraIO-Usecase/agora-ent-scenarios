@@ -90,6 +90,7 @@ data class JoinRoomOutputModel constructor(
     val agoraRTMToken: String,
     val agoraRTCToken: String,
     val agoraChorusToken: String,
+    val agoraMusicToken: String,
     val createdAt: String
 ) : Serializable
 
