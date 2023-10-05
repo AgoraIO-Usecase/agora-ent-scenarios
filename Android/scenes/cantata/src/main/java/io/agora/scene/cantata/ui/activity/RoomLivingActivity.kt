@@ -17,6 +17,7 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.LiveDataUtils
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.cantata.R
+import io.agora.scene.cantata.api.ApiManager
 import io.agora.scene.cantata.databinding.CantataActivityRoomLivingBinding
 import io.agora.scene.cantata.service.JoinRoomOutputModel
 import io.agora.scene.cantata.service.RoomSeatModel
@@ -38,6 +39,7 @@ import io.agora.scene.cantata.ui.widget.song.SongDialog
 import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import java.util.concurrent.Executors
 
 class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBinding>() {
 
@@ -73,6 +75,8 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     private var showChooseSongDialogTag = false
 
     private var toggleAudioRun: Runnable? = null
+
+    private val scheduledThreadPool = Executors.newScheduledThreadPool(5)
 
     override fun getPermissions() {
         toggleAudioRun?.let {
@@ -121,6 +125,12 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
                 TopFunctionDialog(this@RoomLivingActivity).show()
             }
         })
+
+        if (mRoomLivingViewModel.isRoomOwner()) {
+            scheduledThreadPool.execute {
+                ApiManager.getInstance().fetchStartCloud(mRoomLivingViewModel.mRoomInfoLiveData.value!!.roomNo, 9527)
+            }
+        }
     }
 
     override fun initListener() {
@@ -197,7 +207,6 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         // 麦位相关
         mRoomLivingViewModel.mSeatLocalLiveData.observe(this) { seatModel: RoomSeatModel? ->
             val isOnSeat = seatModel != null && seatModel.seatIndex >= 0
-            binding.groupBottomView.isVisible = isOnSeat
             val isAudioChecked = seatModel != null && seatModel.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE
             binding.cbMic.isChecked = isAudioChecked
             binding.lrcControlView.onSeat(seatModel != null)
@@ -421,6 +430,11 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
 
     override fun onDestroy() {
         super.onDestroy()
+        if (mRoomLivingViewModel.isRoomOwner()) {
+            scheduledThreadPool.execute {
+                ApiManager.getInstance().fetchStopCloud()
+            }
+        }
         mRoomLivingViewModel.release()
     }
 
