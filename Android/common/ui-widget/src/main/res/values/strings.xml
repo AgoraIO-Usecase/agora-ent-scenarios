@@ -6,6 +6,7 @@
     <string name="confirm_to_exit_room">确认退出该房间吗？</string>
     <string name="exit_room">退出房间</string>
     <string name="dismiss_room">解散房间</string>
+
     <string name="cancel">取消</string>
     <string name="close">关闭</string>
     <string name="agree">同意</string>
@@ -25,6 +26,9 @@
     <string name="send_v_code">发送验证码</string>
     <string name="i_agree">我已阅读并同意</string>
     <string name="ktv_online">在线K歌房</string>
+
+    <string name="ktv_singbattle_online">嗨歌抢唱</string>
+
     <string name="time_up_exit_room">您已体验超过20分钟，当前房间已过期，请退出重新创建房间</string>
     <string name="expire_exit_room">当前房间已过期，请退出</string>
 
@@ -39,5 +43,7 @@
     <string name="comm_permission_leak_other_title">You do not have the required permissions to run</string>
     <string name="comm_permission_leak_other_content">Please open the required permissions to run in the settings</string>
     <string name="comm_setting">setups</string>
+
+    <string name="comm_try_again">请重试</string>
 
 </resources>

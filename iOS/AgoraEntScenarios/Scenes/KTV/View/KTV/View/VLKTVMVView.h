@@ -4,35 +4,39 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "VLRoomSelSongModel.h"
+#import "AgoraEntScenarios-swift.h"
+@import ScoreEffectUI;
 @import AgoraLyricsScore;
 
 NS_ASSUME_NONNULL_BEGIN
 @class VLKTVSelBgModel;
 
+//加入为伴唱状态
 typedef enum : NSUInteger {
-    VLKTVMVViewActionTypeSetParam = 0,  // 设置参数
-    VLKTVMVViewActionTypeMVPlay,    // play
-    VLKTVMVViewActionTypeMVPause,   // parse
-    VLKTVMVViewActionTypeMVNext,     // 播放下一首
-    VLKTVMVViewActionTypeSingOrigin, //原唱
-    VLKTVMVViewActionTypeSingAcc   // 伴奏
-    
-} VLKTVMVViewActionType;
+    KTVJoinCoSingerStateIdle = 0,         //无按钮
+    KTVJoinCoSingerStateWaitingForJoin,   //按钮显示:加入合唱
+    KTVJoinCoSingerStateJoinNow,          //按钮显示:加入中
+    KTVJoinCoSingerStateWaitingForLeave,   //按钮显示:退出合唱
+} KTVJoinCoSingerState;
 
 typedef enum : NSUInteger {
-    VLKTVMVViewSingActionTypeSolo = 0,  // 独唱
-    VLKTVMVViewSingActionTypeJoinChorus,    // 加入合唱
-} VLKTVMVViewSingActionType;
+    VLKTVMVViewStateIdle = 0,
+    VLKTVMVViewStateLoading,
+    VLKTVMVViewStateLoadFail,
+} VLKTVMVLoadingState;
+
+typedef enum : NSUInteger {
+    VLKTVMVViewActionTypeSetParam = 0,  // 设置参数
+    VLKTVMVViewActionTypeMVPlay,     // play
+    VLKTVMVViewActionTypeMVPause,    // parse
+    VLKTVMVViewActionTypeMVNext,     // 播放下一首
+    VLKTVMVViewActionTypeSingOrigin, // 原唱
+    VLKTVMVViewActionTypeSingAcc,    // 伴奏
+    VLKTVMVViewActionTypeRetryLrc    // 歌曲重试
+} VLKTVMVViewActionType;
 
 @class VLKTVMVView;
 @protocol VLKTVMVViewDelegate <NSObject>
-
-//- (BOOL)ktvIsMyselfOnSeat;
-//
-//- (void)ktvNotifyUserNotOnSeat;
-
-- (void)onKTVMVView:(VLKTVMVView*)view chorusSingAction:(VLKTVMVViewSingActionType)singType;
 
 - (void)onKTVMVView:(VLKTVMVView*)view btnTappedWithActionType:(VLKTVMVViewActionType)type;
 
@@ -40,11 +44,21 @@ typedef enum : NSUInteger {
 /// @param score 分数
 - (void)onKTVMVView:(VLKTVMVView*)view scoreDidUpdate:(int)score;
 
+-(void)didJoinChours;
+
+-(void)didLeaveChours;
+
 @end
 
 @interface VLKTVMVView : UIView
-
-@property (nonatomic, strong) AgoraLrcScoreView *lrcView;
+@property (nonatomic, assign) VLKTVMVLoadingState loadingType;
+@property (nonatomic, assign) KTVJoinCoSingerState joinCoSingerState;   //加入合唱状态
+@property (nonatomic, assign) NSInteger loadingProgress;
+@property (nonatomic, strong) KaraokeView *karaokeView;
+@property (nonatomic, strong) GradeView *gradeView;
+@property (nonatomic, strong) IncentiveView *incentiveView;
+@property (nonatomic, strong) LineScoreView *lineScoreView;
+@property (nonatomic, strong) UIButton *joinChorusBtn;
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVMVViewDelegate>)delegate;
 
@@ -55,46 +69,28 @@ typedef enum : NSUInteger {
 /// @param state 状态
 - (void)updateMVPlayerState:(VLKTVMVViewActionType)state;
 
-//- (void)setVoicePitch:(NSArray <NSNumber *> *)pitch;
-
-- (void)setChorusOptViewHidden;
 
 @property (nonatomic, strong) UIImageView *bgImgView;
 
-///// 收到倒计时消息 (只有上麦)
-///// @param countDown 倒计时 <= 0 时候不处理
-///// @param onSeat 是否是上麦状态
-///// @param currentSong 当前歌曲
-//- (void)receiveCountDown:(int)countDown onSeat:(BOOL)onSeat currentSong:(VLRoomSelSongModel *)currentSong;
-//
 /// 当前用户上麦下麦
-/// @param onSeat 当前用户上麦下麦
 /// @param song 歌曲信息
-- (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song onSeat:(BOOL)onSeat;
+/// @param role 当前用户角色
+- (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song role:(KTVSingRole)role;
 
 //- (void)cleanMusicText;
 - (int)getSongScore;
 - (void)setSongScore:(int)score;
 - (int)getAvgSongScore;
 
-- (void)setPlayerViewsHidden:(BOOL)hidden nextButtonHidden:(BOOL)nextButtonHidden;
+//- (void)setPlayerViewsHidden:(BOOL)hidden nextButtonHidden:(BOOL)nextButtonHidden;
 - (void)setOriginBtnState:(VLKTVMVViewActionType)type;
-- (void)setCoundDown:(NSInteger)seconds;
 
 #pragma mark - 歌词相关
 
-/// 加载歌词链接
-/// @param lrcURL 链接
-- (void)loadLrcURL:(NSString *)lrcURL;
-
-/// 开始滚动歌词
-- (void)start;
-/// 停止滚动歌词
-- (void)stop;
-/// 重置歌词界面
+/// 重置分数
 - (void)reset;
-///滚动到指定位置
-- (void)scrollToTime:(NSTimeInterval)time;
+
+-(void)setBotViewHidden:(BOOL)isHidden;
 
 @end
 

@@ -137,6 +137,7 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         }
         if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mPermissionArray = new PermissionItem[1];
+            mPermissionArray[0] = new PermissionItem(Manifest.permission.READ_EXTERNAL_STORAGE, PERM_REQID_RDSTORAGE);
             for (PermissionItem item : mPermissionArray) {
                 item.granted = true;
             }
@@ -166,6 +167,7 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         }
         if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mPermissionArray = new PermissionItem[1];
+            mPermissionArray[0] = new PermissionItem(Manifest.permission.CAMERA, PERM_REQID_CAMERA);
             for (PermissionItem item : mPermissionArray) {
                 item.granted = true;
             }
@@ -196,6 +198,7 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         }
         if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mPermissionArray = new PermissionItem[1];
+            mPermissionArray[0] = new PermissionItem(Manifest.permission.RECORD_AUDIO, PERM_REQID_RECORD_AUDIO);
             for (PermissionItem item : mPermissionArray) {
                 item.granted = true;
             }

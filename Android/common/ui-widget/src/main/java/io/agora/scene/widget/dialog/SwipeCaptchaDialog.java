@@ -51,7 +51,7 @@ public class SwipeCaptchaDialog extends BaseDialog<DialogSwipeCaptchaBinding> {
 
             @Override
             public void matchFailed(SwipeCaptchaView swipeCaptchaView) {
-                ToastUtils.showToast("请重试");
+                ToastUtils.showToast(R.string.comm_try_again);
                 createCaptcha();
             }
         });
@@ -108,10 +108,10 @@ public class SwipeCaptchaDialog extends BaseDialog<DialogSwipeCaptchaBinding> {
 
     @Override
     protected void setGravity() {
-        getWindow().setLayout(
-                UiUtil.dp2px(295),
-                UiUtil.dp2px(365)
-        );
+//        getWindow().setLayout(
+//                UiUtil.dp2px(295),
+//                UiUtil.dp2px(365)
+//        );
         getWindow().getAttributes().gravity = Gravity.CENTER;
     }
 }

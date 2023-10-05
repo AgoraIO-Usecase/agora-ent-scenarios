@@ -442,6 +442,5 @@
             app:layout_constraintEnd_toStartOf="@+id/tvLogo"
             app:layout_constraintTop_toTopOf="@+id/tvLogo"
             />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

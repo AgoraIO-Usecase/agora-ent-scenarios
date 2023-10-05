@@ -22,13 +22,13 @@ import AgoraChat
 
     private var currentUser: VLLoginModel?
 
-    private lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage("roomList")!)
+    private lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage.sceneImage(name: "roomList", bundleName: "VoiceChatRoomResource")!)
 
     private lazy var container: SAPageContainer = {
         SAPageContainer(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: ScreenHeight - ZNavgationHeight - 10 - CGFloat(ZBottombarHeight) - 30), viewControllers: [self.normal]).backgroundColor(.clear)
     }()
 
-    private lazy var create: SARoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage("blur")!).backgroundColor(.clear)
+    private lazy var create: SARoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage.sceneImage(name: "blur", bundleName: "VoiceChatRoomResource")!).backgroundColor(.clear)
     
     private var initialError: AgoraChatError?
     private var isDestory: Bool = false
@@ -49,7 +49,7 @@ import AgoraChat
     override public func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        navigation.title.text = sceneLocalized( "Agora Chat Room")
+        navigation.title.text = "spatial_voice_app_name".spatial_localized()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -105,6 +105,7 @@ extension SARoomsViewController {
 
     private func entryRoom(room: SARoomEntity) {
         if room.is_private ?? false {
+            self.normal.roomList.isUserInteractionEnabled = true
             let width = ScreenWidth - 75
             let height = (ScreenWidth - 63 - 3 * 16) / 4.0 + 177
             var component = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth,
@@ -123,7 +124,7 @@ extension SARoomsViewController {
                     if room.roomPassword == alert.code {
                         self.loginIMThenPush(room: room)
                     } else {
-                        self.view.makeToast("Incorrect Password".localized())
+                        self.view.makeToast("spatial_voice_incorrect_password".spatial_localized())
                     }
                 }
                 vc.dismiss(animated: true)
@@ -134,7 +135,7 @@ extension SARoomsViewController {
     }
 
     private func loginIMThenPush(room: SARoomEntity) {
-        SVProgressHUD.show(withStatus: "Loading".localized())
+        SVProgressHUD.show(withStatus: "spatial_voice_loading".spatial_localized())
         AppContext.saServiceImp().joinRoom(room.room_id ?? "") { [weak self] error, room_entity, robot in
             SVProgressHUD.dismiss()
             guard let self = self else {return}

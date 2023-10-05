@@ -4,11 +4,10 @@
 //
 
 #import "VLHomeOnLineListCCell.h"
-#import "VLRoomListModel.h"
 #import "VLHotSpotBtn.h"
 #import "VLMacroDefine.h"
 #import "VLFontUtils.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import Masonry;
 
 @interface VLHomeOnLineListCCell()
@@ -18,9 +17,8 @@
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) UIImageView *onListIconView;
 @property (nonatomic, strong) UILabel *countLabel;
-@property (nonatomic, strong) VLHotSpotBtn *joinBtn;
+@property (nonatomic, strong) UIButton *joinBtn;
 @property (nonatomic, strong) UIImageView *lockImgView;
-
 
 @end
 
@@ -33,13 +31,11 @@
     }
     return self;
 }
+
 #pragma mark - Intial Methods
 - (void)setupView {
 
     self.bgImgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 12, self.width, self.height-12)];
-    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(joinBtnClickEvent)];
-    [self.bgImgView addGestureRecognizer:tapGesture];
-    self.bgImgView.userInteractionEnabled = YES;
     [self.contentView addSubview:self.bgImgView];
     
     self.iconImgView = [[UIImageView alloc]initWithFrame:CGRectMake(12, -12, 84, 84)];
@@ -67,19 +63,15 @@
     self.countLabel.textColor = UIColorMakeWithHex(@"#6C7192");
     [self.contentView addSubview:self.countLabel];
     
-    self.joinBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(self.width-10-44, self.bgImgView.bottom-12-24, 44, 24)];
+    self.joinBtn = [[UIButton alloc]initWithFrame:CGRectMake(self.width-10-44, self.bgImgView.bottom-12-24, 44, 24)];
     self.joinBtn.layer.cornerRadius = 12;
     [self.joinBtn setBackgroundColor:UIColorWhite];
     self.joinBtn.layer.masksToBounds = YES;
-    [self.joinBtn setTitle:KTVLocalizedString(@"加入") forState:UIControlStateNormal];
+    [self.joinBtn setTitle:KTVLocalizedString(@"ktv_join") forState:UIControlStateNormal];
     [self.joinBtn setTitleColor:UIColorMakeWithHex(@"#009FFF") forState:UIControlStateNormal];
     self.joinBtn.titleLabel.font = VLUIFontMake(12);
-    [self.joinBtn addTarget:self action:@selector(joinBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
+    self.joinBtn.userInteractionEnabled = false;
     [self.contentView addSubview:self.joinBtn];
-}
-
-- (void)joinBtnClickEvent {
-    self.joinBtnClickBlock(self.listModel);
 }
 
 - (void)setListModel:(VLRoomListModel *)listModel {

@@ -8,16 +8,16 @@ import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.beauty.IBeautyProcessor
 import io.agora.scene.show.beauty.sensetime.BeautySenseTimeImpl
 import io.agora.scene.show.debugSettings.DebugSettingModel
+import io.agora.scene.show.videoSwitcherAPI.VideoSwitcher
 import java.util.concurrent.Executors
 
 object RtcEngineInstance {
 
     val videoEncoderConfiguration = VideoEncoderConfiguration().apply {
-        orientationMode = VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT
+        orientationMode = VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_ADAPTIVE
     }
     val virtualBackgroundSource = VirtualBackgroundSource().apply {
         backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR
@@ -25,7 +25,7 @@ object RtcEngineInstance {
     val videoCaptureConfiguration = CameraCapturerConfiguration(CameraCapturerConfiguration.CaptureFormat()).apply {
         followEncodeDimensionRatio = false
     }
-    val debugSettingModel = DebugSettingModel().apply {  }
+    val debugSettingModel = DebugSettingModel().apply { }
 
     private val workingExecutor = Executors.newSingleThreadExecutor()
 
@@ -38,6 +38,15 @@ object RtcEngineInstance {
             return innerBeautyProcessor!!
         }
 
+    // 万能通用 token ,进入房间列表默认获取万能 token
+    private var generalToken: String = ""
+
+    fun setupGeneralToken(generalToken: String) {
+        this.generalToken = generalToken
+    }
+
+    fun generalToken(): String = generalToken
+
     private var innerRtcEngine: RtcEngineEx? = null
     val rtcEngine: RtcEngineEx
         get() {
@@ -48,35 +57,27 @@ object RtcEngineInstance {
                 config.mEventHandler = object : IRtcEngineEventHandler() {
                     override fun onError(err: Int) {
                         super.onError(err)
-                        ToastUtils.showToast(
+                        ShowLogger.d(
+                            "RtcEngineInstance",
                             "Rtc Error code:$err, msg:" + RtcEngine.getErrorDescription(err)
                         )
                     }
                 }
                 innerRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
-                    registerVideoFrameObserver(beautyProcessor)
                     enableVideo()
                 }
             }
             return innerRtcEngine!!
         }
 
-    private var innerVideoSwitcher: VideoSwitcher? = null
-    val videoSwitcher: VideoSwitcher
-        get() {
-            if (innerVideoSwitcher == null) {
-                innerVideoSwitcher = VideoSwitcherImpl(rtcEngine)
-            }
-            return innerVideoSwitcher!!
-        }
+    fun cleanCache() {
+        VideoSwitcher.getImplInstance(rtcEngine).unloadConnections()
+    }
+
 
     fun destroy() {
-        innerVideoSwitcher?.let {
-            it.unloadConnections()
-            innerVideoSwitcher = null
-        }
         innerRtcEngine?.let {
-            workingExecutor.execute { RtcEngine.destroy() }
+            workingExecutor.execute { RtcEngineEx.destroy() }
             innerRtcEngine = null
         }
         innerBeautyProcessor?.let { processor ->

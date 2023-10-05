@@ -1,28 +1,32 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<resources><string name="app_name">Agora Social Entertainment-Voice</string>
-    <string name="app_title_home">Home page</string>
-    <string name="app_title_find">uncovers</string>
-    <string name="app_title_mine">my</string>
-    <string name="app_action_settings">setups</string>
-    <string name="app_exit">quit</string>
-    <string name="app_user_agreement">User Agreement</string>
-    <string name="app_privacy_agreement">Privacy policy</string>
-    <string name="app_personal_info_collection_checklist">Personal information collection list</string>
-    <string name="app_third_party_info_data_sharing">Third-party information and data sharing</string>
-    <string name="app_and">and</string>
-    <string name="app_confirm_deletion">Confirm the deletion?</string>
-    <string name="app_about_us">About Us</string>
-    <string name="app_please_input_account">Please enter your phone number</string>
-    <string name="app_error_pwd_tip">The value contains 8 to 20 characters, including large, lowercase, and digits</string>
-    <string name="app_please_input_pwd">Please enter a password</string>
-    <string name="app_please_input_v_code">Please enter the verification code</string>
-    <string name="app_forget_password">I forgot my password</string>
-    <string name="app_login">Log in</string>
-    <string name="app_finish">fulfilment</string>
-    <string name="app_register_account">Sign up for an account</string>
-    <string name="app_welcome_experience">Welcome to the Agora service</string>
-    <string name="app_mobile_number">Cell phone number</string>
-    <string name="app_v_code">Verification code</string>
+<resources>
+    <string name="app_name">声动互娱-K歌</string>
+    <string name="app_title_home">首页</string>
+    <string name="app_title_find">发现</string>
+    <string name="app_title_mine">我的</string>
+    <string name="app_action_settings">设置</string>
+
+    <string name="app_exit">退出</string>
+    <string name="app_user_agreement">用户协议</string>
+    <string name="app_privacy_agreement">隐私政策</string>
+    <string name="app_personal_info_collection_checklist">个人信息收集清单</string>
+    <string name="app_third_party_info_data_sharing">第三方信息数据共享</string>
+    <string name="app_and">及</string>
+
+    <string name="app_confirm_deletion">确认删除？</string>
+    <string name="app_about_us">关于我们</string>
+
+    <string name="app_please_input_account">请输入手机号</string>
+    <string name="app_error_pwd_tip">8~20个字符，包含大、小写字母和数字</string>
+    <string name="app_please_input_pwd">请输入密码</string>
+    <string name="app_please_input_v_code">请输入验证码</string>
+    <string name="app_forget_password">忘记密码</string>
+    <string name="app_login">登录</string>
+    <string name="app_finish">完成</string>
+    <string name="app_register_account">注册账号</string>
+    <string name="app_welcome_experience">欢迎体验声网服务</string>
+    <string name="app_mobile_number">手机号</string>
+    <string name="app_v_code">验证码</string>
+
     <string name="app_plus_86">+86</string>
     <string name="app_logout">sign out</string>
     <string name="app_logoff_account">Cancelling an account</string>
@@ -41,11 +45,26 @@
     <string name="app_about_version">version number</string>
     <string name="app_about_scene_version">Scene version number</string>
     <string name="app_about_chat_room">Chat Room</string>
-    <string name="app_about_chat_room_spatial">Language chat room - Spatial Audio mode</string>
-    <string name="app_about_karaoke">Online K-songs</string>
-    <string name="app_about_show">Live broadcast of the show</string>
-    <string name="app_about_customer_service">Contact Customer Service</string>
-    <string name="app_about_official_website">Official website address</string>
+    <string name="app_about_chat_room_spatial">Chat Room SA Mode</string>
+    <string name="app_about_karaoke">Karaoke</string>
+    <string name="app_about_show">Show</string>
+    <string name="app_about_singbattle">SingBattle</string>
+    <string name="app_about_customer_service">Customer Service</string>
+    <string name="app_about_official_website">Official Website</string>
     <string name="app_about_phone_cancel">Cancel</string>
-    <string name="app_mine_current_version">Current version number: %s</string>
+    <string name="app_mine_current_version">Version %s</string>
+
+    <string name="app_debug_open">Debug模式已打开</string>
+    <string name="app_debug_off">Debug模式已关闭</string>
+    <string name="app_exit_debug">确定退出Debug模式么？</string>
+    <string name="app_exit_debug_tip">退出debug模式后，设置页面将恢复成正常的设置页面哦～</string>
+    <string name="app_agree_tip">请同意我们的隐私政策与用户协议</string>
+    <string name="app_input_phonenum_tip">请输入正确手机号</string>
+    <string name="app_input_vcode_tip">请输入验证码</string>
+    <string name="app_vcode_wrong_tip">验证码错误</string>
+    <string name="app_login_success_tip">登陆成功</string>
+    <string name="app_vcode_send_success_tip">验证码发送成功</string>
+    <string name="app_edit_success">修改成功</string>
+
+
 </resources>

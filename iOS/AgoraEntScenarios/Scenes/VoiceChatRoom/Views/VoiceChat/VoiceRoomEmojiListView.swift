@@ -31,8 +31,8 @@ public class VoiceRoomEmojiListView: UIView, UICollectionViewDelegate, UICollect
     override public init(frame: CGRect) {
         super.init(frame: frame)
         addSubViews([emojiList, deleteEmoji, separaLine])
-        deleteEmoji.setImage(UIImage("backspace_clr"), for: .normal)
-        deleteEmoji.setImage(UIImage("backspace"), for: .disabled)
+        deleteEmoji.setImage(UIImage.sceneImage(name: "backspace_clr", bundleName: "VoiceChatRoomResource"), for: .normal)
+        deleteEmoji.setImage(UIImage.sceneImage(name: "backspace", bundleName: "VoiceChatRoomResource"), for: .disabled)
         deleteEmoji.isEnabled = false
         deleteEmoji.isUserInteractionEnabled = false
     }
@@ -56,7 +56,7 @@ public extension VoiceRoomEmojiListView {
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VoiceRoomEmojiCell", for: indexPath) as? VoiceRoomEmojiCell
-        cell?.icon.image = UIImage(VoiceRoomEmojiManager.shared.emojis[indexPath.row])
+        cell?.icon.image = UIImage.voice_image(VoiceRoomEmojiManager.shared.emojis[indexPath.row])
         return cell ?? VoiceRoomEmojiCell()
     }
 

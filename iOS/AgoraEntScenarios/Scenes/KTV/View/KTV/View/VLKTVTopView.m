@@ -4,9 +4,8 @@
 //
 
 #import "VLKTVTopView.h"
-#import "VLRoomListModel.h"
 #import "VLHotSpotBtn.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @interface VLKTVTopView ()
 
@@ -37,6 +36,15 @@
     [closeBtn addTarget:self action:@selector(closeBtnEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:closeBtn];
     
+    UIButton *moreButton = [[UIButton alloc] init];
+    [moreButton setImage:[UIImage sceneImageWithName:@"icon_live_more" bundleName:@"VoiceChatRoomResource"] forState:(UIControlStateNormal)];
+    [moreButton addTarget:self action:@selector(moreBtnEvent:) forControlEvents:(UIControlEventTouchUpInside)];
+    [self addSubview:moreButton];
+    moreButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [[moreButton.trailingAnchor constraintEqualToAnchor:closeBtn.leadingAnchor constant:-15]setActive:YES];
+    [[moreButton.centerYAnchor constraintEqualToAnchor:closeBtn.centerYAnchor]setActive:YES];
+    [[moreButton.widthAnchor constraintEqualToConstant:24]setActive:YES];
+    
     self.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(logoImgView.right+5, logoImgView.centerY-11, 120, 22)];
     self.titleLabel.font = UIFontBoldMake(16);
     self.titleLabel.textColor = UIColorWhite;
@@ -45,15 +53,18 @@
 //    self.networkStatusBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"]
 //                                                             title:KTVLocalizedString(@"本机网络好")];
     self.networkStatusBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.networkStatusBtn setTitle:KTVLocalizedString(@"本机网络好") forState:UIControlStateNormal];
+    [self.networkStatusBtn setTitle:KTVLocalizedString(@"ktv_net_status_good") forState:UIControlStateNormal];
     [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
-    self.networkStatusBtn.frame = CGRectMake(closeBtn.left-15-75, closeBtn.top, 75, 20);
+//    self.networkStatusBtn.frame = CGRectMake(closeBtn.left-15-75, closeBtn.top, 75, 20);
 //    self.networkStatusBtn.imagePosition = QMUIButtonImagePositionLeft;
     self.networkStatusBtn.spacingBetweenImageAndTitle = 4;
     self.networkStatusBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
     [self.networkStatusBtn setTitleColor:UIColorMakeWithHex(@"#979CBB") forState:UIControlStateNormal];
     self.networkStatusBtn.titleLabel.font = UIFontMake(10.0);
     [self addSubview:self.networkStatusBtn];
+    self.networkStatusBtn.translatesAutoresizingMaskIntoConstraints = NO;
+    [[self.networkStatusBtn.trailingAnchor constraintEqualToAnchor:moreButton.leadingAnchor constant:-10]setActive:YES];
+    [[self.networkStatusBtn.centerYAnchor constraintEqualToAnchor:moreButton.centerYAnchor]setActive:YES];
     
     self.countLabel = [[UILabel alloc]initWithFrame:CGRectMake(logoImgView.left, logoImgView.bottom+10, 120, 14)];
     self.countLabel.font = UIFontMake(10);
@@ -68,13 +79,23 @@
     }
 }
 
+- (void)moreBtnEvent: (id)sender {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLKTVTopView:closeBtnTapped:)]) {
+        [self.delegate onVLKTVTopView:self moreBtnTapped:sender];
+    }
+}
+
 - (void)setListModel:(VLRoomListModel *)listModel {
     _listModel = listModel;
     self.titleLabel.text = listModel.name;
+    NSString *roomCountPre = KTVLocalizedString(@"ktv_room_count");
+    
     if (listModel.roomPeopleNum) {
-        self.countLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"当前在线人数：%@"), listModel.roomPeopleNum];
+        NSString *roomCountString = [NSString stringWithFormat:@"%@:%@", roomCountPre, listModel.roomPeopleNum];
+        self.countLabel.text = roomCountString;
     }else{
-        self.countLabel.text = KTVLocalizedString(@"当前在线人数：1");
+        NSString *roomCountString = [NSString stringWithFormat:@"%@:%i", roomCountPre, 1];
+        self.countLabel.text = roomCountString;
     }
 }
 
@@ -83,19 +104,19 @@
 {
     if(quality == 0) {
         [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
-        [self.networkStatusBtn setTitle:KTVLocalizedString(@"本机网络好") forState:UIControlStateNormal];
+        [self.networkStatusBtn setTitle:KTVLocalizedString(@"ktv_net_status_good") forState:UIControlStateNormal];
     }
     else if (quality == 1) {
         [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_okIcon"] forState:UIControlStateNormal];
-        [self.networkStatusBtn setTitle:KTVLocalizedString(@"本机网络良") forState:UIControlStateNormal];
+        [self.networkStatusBtn setTitle:KTVLocalizedString(@"ktv_net_status_m") forState:UIControlStateNormal];
     }
     else if(quality == 2) {
         [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_badIcon"] forState:UIControlStateNormal];
-        [self.networkStatusBtn setTitle:KTVLocalizedString(@"本机网络差") forState:UIControlStateNormal];
+        [self.networkStatusBtn setTitle:KTVLocalizedString(@"ktv_net_status_low") forState:UIControlStateNormal];
     }
     else {
         [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
-        [self.networkStatusBtn setTitle:KTVLocalizedString(@"本机网络好") forState:UIControlStateNormal];
+        [self.networkStatusBtn setTitle:KTVLocalizedString(@"ktv_net_status_good") forState:UIControlStateNormal];
     }
 }
 

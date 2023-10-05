@@ -61,14 +61,17 @@ class AlertManager: NSObject {
             view.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
         }
         if vc == nil {
-//            vc = BaseViewController()
             vc = UIViewController()
             vc?.view.layer.contents = nil
             vc?.view.backgroundColor = UIColor.clear
             vc?.view.addSubview(containerView)
             vc?.modalPresentationStyle = .custom
-            UIViewController.cl_topViewController()?.present(vc!, animated: false) {
-                showAlertPostion(alertPostion: alertPostion, view: view)
+            if let topVC = UIViewController.cl_topViewController() {
+                topVC.present(vc!, animated: false) {
+                    showAlertPostion(alertPostion: alertPostion, view: view)
+                }
+            } else {
+                vc = nil
             }
         } else {
             showAlertPostion(alertPostion: alertPostion, view: view)
@@ -152,6 +155,7 @@ class AlertManager: NSObject {
             }
         }, completion: { _ in
             if all || viewCache.isEmpty {
+                viewCache.removeAll()
                 vc?.dismiss(animated: false, completion: completion)
                 vc = nil
             } else {

@@ -9,7 +9,7 @@ Pod::Spec.new do |spec|
    spec.platform      = :ios
    spec.source        = { :git => "" }
    spec.source_files = 'SenseLib/**/*.{h,m}'
-   spec.resources = "SenseLib/**/*.zip", "SenseLib/filter_style/*.model", 
+   spec.resources = "SenseLib/**/*.zip", "SenseLib/filter_style/*.model", "SenseLib/*.lic", 
    spec.library = "z"
    spec.vendored_libraries = "SenseLib/**/*.a"
    spec.resource_bundles    = {"SenseLib" => "SenseLib/**/*.bundle"}

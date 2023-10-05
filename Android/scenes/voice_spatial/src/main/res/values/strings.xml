@@ -143,9 +143,9 @@
     <string name="voice_chatroom_aiaec">AIAEC</string>
     <string name="voice_chatroom_aiagc">AGC</string>
     <string name="voice_chatroom_turnon_aiaec">Turn on AIAEC</string>
-    <string name="voice_chatroom_aiaec_introduce">When you turn on accompaniment singing, AIAEC can greatly improve your singing effect. It is strongly recommended that you turn it on when singing</string>
+    <string name="voice_chatroom_aiaec_introduce">&#160;&#160;&#160;&#160;When you turn on accompaniment singing, AIAEC can greatly improve your singing effect. It is strongly recommended that you turn it on when singing</string>
     <string name="voice_chatroom_turnon_aiagc">Turn on AGC</string>
-    <string name="voice_chatroom_aiagc_introduce">After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing</string>
+    <string name="voice_chatroom_aiagc_introduce">&#160;&#160;&#160;&#160;After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing</string>
     <string name="voice_chatroom_spatial_audio">Spatial Audio</string>
     <string name="voice_chatroom_only_host_can_change_robot">Only host can change the robot settings</string>
     <string name="voice_chatroom_agora_blue">Agora Blue Bot</string>

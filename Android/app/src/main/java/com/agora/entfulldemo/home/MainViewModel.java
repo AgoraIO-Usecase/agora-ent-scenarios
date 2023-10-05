@@ -6,6 +6,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.agora.entfulldemo.R;
+
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -90,7 +92,7 @@ public class MainViewModel extends BaseRequestViewModel {
 
                             @Override
                             public void onSuccess(BaseResponse<User> data) {
-                                ToastUtils.showToast("修改成功");
+                                ToastUtils.showToast(R.string.app_edit_success);
                                 getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
                                 if (!TextUtils.isEmpty(name)) {
                                     UserManager.getInstance().getUser().name = name;

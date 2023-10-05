@@ -23,12 +23,10 @@ KEYCENTER_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/KeyCenter.swift"
 
 # 打包环境
 CONFIGURATION='Release'
-CER_NAME="EntFull_Dis"
 result=$(echo ${method} | grep "development")
 if [[ ! -z "$result" ]]
 then
     CONFIGURATION='Debug'
-    CER_NAME="EntFull_Dev"
 fi
 
 #工程文件路径
@@ -86,12 +84,12 @@ cd ${WORKSPACE}
 # 压缩archive
 7za a -tzip "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" "${ARCHIVE_PATH}"
 
-sh sign "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" --type xcarchive --plist "${PLIST_PATH}"
+sh export "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" --project AES --plist "${PLIST_PATH}"
 
 PAYLOAD_PATH="${TARGET_NAME}_${BUILD_NUMBER}_Payload"
 # 上传IPA
 mkdir "${PAYLOAD_PATH}"
-mv "${TARGET_NAME}_${BUILD_NUMBER}_${CER_NAME}.ipa" "${PAYLOAD_PATH}"
+mv "${TARGET_NAME}_${BUILD_NUMBER}.ipa" "${PAYLOAD_PATH}"
 7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r "${PAYLOAD_PATH}"
 python3 artifactory_utils.py --action=upload_file --file="${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
 
@@ -103,8 +101,8 @@ echo "Debug info ***"
 ls $WORKSPACE
 
 # 删除文件
-rm -rf "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive"
-rm -rf "*.zip"
+rm -rf ${TARGET_NAME}_${BUILD_NUMBER}.xcarchive
+rm -rf *.zip
 rm -rf ${PAYLOAD_PATH}
 
 ls $WORKSPACE

@@ -60,7 +60,7 @@ class ShowBeautySettingVC: UIViewController {
         }
         compareButton.addTarget(self, action: #selector(didClickCompareButton(sender:)), for: .touchUpInside)
         compareButton.backgroundColor = UIColor(hex: "#000000", alpha: 0.25)
-        compareButton.isSelected = true
+        compareButton.isSelected = BeautyManager.shareManager.isEnableBeauty
         compareButton.cornerRadius(18)
         return compareButton
     }()
@@ -105,9 +105,7 @@ class ShowBeautySettingVC: UIViewController {
         segmentedView.indicators = [self.indicator]
         return segmentedView
     }()
-    
-    private lazy var agoraKitManager = ShowAgoraKitManager()
-    
+        
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         modalPresentationStyle = .overCurrentContext
@@ -215,12 +213,12 @@ class ShowBeautySettingVC: UIViewController {
             ShowAgoraKitManager.isOpenGreen = isOn
             slider.isHidden = !isOn
             if ShowAgoraKitManager.isBlur {
-                agoraKitManager.enableVirtualBackground(isOn: true,
-                                                        greenCapacity: slider.value)
+                ShowAgoraKitManager.shared.enableVirtualBackground(isOn: true,
+                                                                   greenCapacity: slider.value)
             } else {
-                agoraKitManager.seVirtualtBackgoundImage(imagePath: "show_live_mritual_bg",
-                                                         isOn: true,
-                                                         greenCapacity: slider.value)
+                ShowAgoraKitManager.shared.seVirtualtBackgoundImage(imagePath: "show_live_mritual_bg",
+                                                                    isOn: true,
+                                                                    greenCapacity: slider.value)
             }
         }
         if sender.isOn == true {

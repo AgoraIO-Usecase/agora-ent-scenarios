@@ -56,7 +56,7 @@ public extension SAEmojiListView {
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VoiceRoomEmojiCell", for: indexPath) as? SAEmojiCell
-        cell?.icon.image = UIImage(SAEmojiManager.shared.emojis[indexPath.row])
+        cell?.icon.image = UIImage.spatial_image(SAEmojiManager.shared.emojis[indexPath.row])
         return cell ?? SAEmojiCell()
     }
 

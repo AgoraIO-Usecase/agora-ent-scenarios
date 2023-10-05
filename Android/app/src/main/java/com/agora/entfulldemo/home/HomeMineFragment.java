@@ -46,11 +46,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
     private MainViewModel mainViewModel;
     private SelectPhotoFromDialog selectPhotoFromDialog;
     private EditNameDialog editNameDialog;
-
     private CommonDialog debugModeDialog;
-    private int counts = 0;
-    private final long debugModeOpenTime = 2000;
-    private long beginTime = 0;
 
     @NonNull
     @Override
@@ -61,11 +57,8 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
 
     @Override
     public void initView() {
-        String versionString = "20230530-" + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion();
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         mainViewModel.setLifecycleOwner(this);
-        getBinding().tvVersion.setText(getString(R.string.app_mine_current_version, versionString));
-        getBinding().tvVersion.setVisibility(View.GONE);
     }
 
     @SuppressLint("SetTextI18n")
@@ -89,7 +82,21 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             PagePilotManager.pageWebView("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/service.html");
         });
         getBinding().tvPrivacyAgreement.setOnClickListener(view -> {
-            PagePilotManager.pageWebView("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/privacy.html");
+            PagePilotManager.pageWebView("https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/privacy.html");
+        });
+        getBinding().tvCollectionChecklist.setOnClickListener(view -> {
+            //开发服：http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest-dev/index.html
+            //正式服：http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest/index.html
+            StringBuilder stringBuilder =  new StringBuilder("http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest/index.html")
+                    .append("?userNo=").append(UserManager.getInstance().getUser().userNo)
+                    .append("&appId=").append(io.agora.scene.base.BuildConfig.AGORA_APP_ID)
+                    .append("&projectId=").append("agora_ent_demo")
+//                    .append("&sceneId=").append("-1")
+                    .append("&token=").append(UserManager.getInstance().getUser().token);
+            PagePilotManager.pageWebView(stringBuilder.toString());
+        });
+        getBinding().tvDataSharing.setOnClickListener(view -> {
+            PagePilotManager.pageWebView("https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/libraries.html");
         });
         getBinding().tvCollectionChecklist.setOnClickListener(view -> {
             //开发服：http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest-dev/index.html
@@ -128,22 +135,6 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
         });
         getBinding().ivUserAvatar.setOnClickListener(view -> {
             ((MainActivity) requireActivity()).requestReadStoragePermission(true);
-        });
-        getBinding().tvVersion.setOnClickListener(v -> {
-            if (counts == 0) {
-                beginTime = System.currentTimeMillis();
-            }
-            counts++;
-            if (counts == 5) {
-                if (System.currentTimeMillis() - beginTime > debugModeOpenTime) {
-                    counts = 0;
-                    return;
-                }
-                counts = 0;
-                getBinding().tvDebugMode.setVisibility(View.VISIBLE);
-                AgoraApplication.the().enableDebugMode(true);
-                ToastUtils.showToast("Debug模式已打开");
-            }
         });
         getBinding().tvDebugMode.setOnClickListener(v -> showDebugModeCloseDialog());
         if (AgoraApplication.the().isDebugModeOpen()) {
@@ -283,8 +274,8 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
     private void showDebugModeCloseDialog() {
         if (debugModeDialog == null) {
             debugModeDialog = new CommonDialog(requireContext());
-            debugModeDialog.setDialogTitle("确定退出Debug模式么？");
-            debugModeDialog.setDescText("退出debug模式后， 设置页面将恢复成正常的设置页面哦～");
+            debugModeDialog.setDialogTitle(getString(R.string.app_exit_debug));
+            debugModeDialog.setDescText(getString(R.string.app_exit_debug_tip));
             debugModeDialog.setDialogBtnText(getString(R.string.cancel), getString(R.string.app_exit));
             debugModeDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
@@ -293,10 +284,9 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
 
                 @Override
                 public void onRightButtonClick() {
-                    counts = 0;
                     getBinding().tvDebugMode.setVisibility(View.GONE);
                     AgoraApplication.the().enableDebugMode(false);
-                    ToastUtils.showToast("Debug模式已关闭");
+                    ToastUtils.showToast(R.string.app_debug_off);
                 }
             });
         }

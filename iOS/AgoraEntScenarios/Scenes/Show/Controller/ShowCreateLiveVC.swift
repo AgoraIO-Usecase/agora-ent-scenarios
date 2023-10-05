@@ -7,23 +7,12 @@
 
 import UIKit
 import AgoraRtcKit
-
-private let kBroadcastorHasShowPreset = "kBroadcastorHasShowPreset"
+import SVProgressHUD
 
 class ShowCreateLiveVC: UIViewController {
 
     private var createView: ShowCreateLiveView!
     private var localView: UIView!
-    
-    lazy var agoraKitManager: ShowAgoraKitManager = {
-        let manager = ShowAgoraKitManager()
-        if AppContext.shared.isDebugMode {
-            manager.debugDefaultBroadcastorSetting()
-        }else{
-            manager.defaultSetting()
-        }
-        return manager
-    }()
         
     private lazy var beautyVC = ShowBeautySettingVC()
     
@@ -31,25 +20,17 @@ class ShowCreateLiveVC: UIViewController {
         showLogger.info("deinit-- ShowCreateLiveVC")
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        showLogger.info("init-- ShowCreateLiveVC")
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
-//        agoraKitManager.defaultSetting()
-        agoraKitManager.startPreview(canvasView: localView)
         configNaviBar()
-        if !UserDefaults.standard.bool(forKey: kBroadcastorHasShowPreset) {
-            showPreset()
-            UserDefaults.standard.set(true, forKey: kBroadcastorHasShowPreset)
+        
+        // 美颜设置
+        if let e = ShowAgoraKitManager.shared.engine {
+            BeautyManager.shareManager.configBeautyAPIWithRtcEngine(engine: e)
         }
+        ShowAgoraKitManager.shared.startPreview(canvasView: self.localView)
+        ShowNetStateSelectViewController.showInViewController(self)
     }
     
     func configNaviBar() {
@@ -76,7 +57,6 @@ class ShowCreateLiveVC: UIViewController {
     }
     
     private func setUpUI() {
-        
         // 画布
         localView = UIView()
         view.addSubview(localView)
@@ -92,7 +72,6 @@ class ShowCreateLiveVC: UIViewController {
             make.edges.equalToSuperview()
         }
         
-//        beautyVC.transitioningDelegate = transDelegate
         beautyVC.dismissed = { [weak self] in
             self?.createView.hideBottomViews = false
         }
@@ -106,19 +85,19 @@ class ShowCreateLiveVC: UIViewController {
     }
     
     private func showPreset() {
-        let vc = ShowPresettingVC()
-        vc.didSelectedPresetType = {[weak self] type, modeName in
-            self?.agoraKitManager.updatePresetForType(type, mode: .single)
-            let text1 = "show_presetting_update_toast1".show_localized
-            let text2 = "show_presetting_update_toast2".show_localized
-            ToastView.show(text: "\(text1)\"\(modeName)\"\(text2)")
+        if AppContext.shared.isDebugMode {
+            let vc = ShowDebugSettingVC()
+            vc.isBroadcastor = true
+            self.navigationController?.pushViewController(vc, animated: true)
+        } else {
+            ShowNetStateSelectViewController.showInViewController(self)
         }
-        present(vc, animated: true)
     }
     
     @objc func didClickCancelButton(){
         BeautyManager.shareManager.destroy()
-        agoraKitManager.cleanCapture()
+        ShowAgoraKitManager.shared.cleanCapture()
+        ShowBeautyFaceVC.resetData()
         dismiss(animated: true)
     }
 }
@@ -126,46 +105,16 @@ class ShowCreateLiveVC: UIViewController {
 extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     
     func onClickSettingBtnAction() {
-//        let vc = ShowAdvancedSettingVC()
-//        vc.mode = .signle
-//        vc.isBroadcaster = true
-//        vc.isOutside = true
-//        vc.settingManager = agoraKitManager
-//        self.navigationController?.pushViewController(vc, animated: true)
-        if AppContext.shared.isDebugMode {
-            let vc = ShowDebugSettingVC()
-            vc.isBroadcastor = true
-            vc.settingManager = agoraKitManager
-            self.navigationController?.pushViewController(vc, animated: true)
-        }else{
-            showPreset()
-        }
+        showPreset()
     }
     
     func onClickCameraBtnAction() {
-//        agoraKit?.switchCamera()
-        agoraKitManager.switchCamera()
+        ShowAgoraKitManager.shared.switchCamera()
     }
     
     func onClickBeautyBtnAction() {
         createView.hideBottomViews = true
         present(beautyVC, animated: true)
-    }
-    
-    func onClickQualityBtnAction() {
-        createView.hideBottomViews = true
-        let vc = ShowSelectQualityVC()
-//        vc.defalutSelectIndex = selectedResolution
-        present(vc, animated: true)
-        vc.dismissed = { [weak self] in
-            self?.createView.hideBottomViews = false
-        }
-        vc.selectedItem = {[weak self] resolution,index in
-            guard let wSelf = self else { return }
-//            wSelf.selectedResolution = index
-//            wSelf.agoraKitManager.setCaptureVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
-            wSelf.agoraKitManager.selectCaptureVideoDimensions(index: index)
-        }
     }
     
     func onClickStartBtnAction() {
@@ -180,15 +129,17 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         }
         
         let roomId = createView.roomNo
-        AppContext.showServiceImp(createView.roomNo).createRoom(roomName: roomName,
+        SVProgressHUD.show()
+        AppContext.showServiceImp(createView.roomNo)?.createRoom(roomName: roomName,
                                                                 roomId: roomId,
                                                                 thumbnailId: createView.roomBg) { [weak self] err, detailModel in
-//            liveVC.agoraKit = self?.agoraKitManager.agoraKit
+            SVProgressHUD.dismiss()
+            if err != nil {
+                ToastView.show(text: err!.localizedDescription)
+            }
             guard let wSelf = self, let detailModel = detailModel else { return }
             let liveVC = ShowLivePagesViewController()
-            liveVC.agoraKitManager = wSelf.agoraKitManager
             liveVC.roomList = [detailModel]
-//            liveVC.selectedResolution = wSelf.selectedResolution
             liveVC.focusIndex = liveVC.roomList?.firstIndex(where: { $0.roomId == roomId }) ?? 0
             
             wSelf.navigationController?.pushViewController(liveVC, animated: false)

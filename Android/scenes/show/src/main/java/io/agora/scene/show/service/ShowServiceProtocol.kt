@@ -16,7 +16,9 @@ interface ShowServiceProtocol {
     companion object {
         private val instance by lazy {
             ShowSyncManagerServiceImpl(AgoraApplication.the()){
-                ToastUtils.showToast(it.message)
+                if (it.message != "action error") {
+                    ToastUtils.showToast(it.message)
+                }
             }
         }
 
@@ -214,5 +216,8 @@ interface ShowServiceProtocol {
 
     // 订阅重连事件
     fun subscribeReConnectEvent(roomId: String, onReconnect: () -> Unit)
+
+    // 启动机器人
+    fun startCloudPlayer()
 
 }

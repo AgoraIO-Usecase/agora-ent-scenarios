@@ -1,5 +1,6 @@
 package io.agora.scene.base
 
+import io.agora.scene.base.manager.UserManager
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -51,10 +52,12 @@ object AudioModeration {
 
         val payload = JSONObject()
         payload.put("id", uid)
+        payload.put("userNo", UserManager.getInstance().user.userNo)
+        payload.put("userName", UserManager.getInstance().user.name)
         payload.put("sceneName", sceneName)
         postBody.put("payload", payload.toString())
 
-        val request = Request.Builder().url("https://toolbox.bj2.agoralab.co/v1/moderation/audio"
+        val request = Request.Builder().url("${BuildConfig.TOOLBOX_SERVER_HOST}/v1/moderation/audio"
         ).addHeader("Content-Type", "application/json").post(postBody.toString().toRequestBody()).build()
         val execute = okHttpClient.newCall(request).execute()
         if (execute.isSuccessful) {

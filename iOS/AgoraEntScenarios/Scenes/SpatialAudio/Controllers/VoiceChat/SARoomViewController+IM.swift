@@ -25,10 +25,10 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     func onRobotUpdate(robotInfo: SARobotAudioInfo) {
         roomInfo?.robotInfo = robotInfo
         rtckit.updatePlayerVolume(value: Double(robotInfo.robot_volume))
-        guard roomInfo?.mic_info != nil else { return }
+        guard let mic_info = roomInfo?.mic_info, mic_info.isEmpty == false else { return }
         //update user robot
-        guard let red_mic: SARoomMic = roomInfo?.mic_info![6] else { return }
-        guard let blue_mic: SARoomMic = roomInfo?.mic_info![3] else { return }
+        let red_mic: SARoomMic = mic_info[6]
+        let blue_mic: SARoomMic = mic_info[3]
 
         red_mic.status = robotInfo.use_robot ? 5 : -2
         blue_mic.status = robotInfo.use_robot ? 5 : -2
@@ -94,7 +94,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
     
     func onReceiveSeatRequest(roomId: String, applicant: SAApply) {
-        self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: true)
+        self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: isOwner)
     }
 
     func onReceiveSeatRequestRejected(roomId: String, chat_uid: String) {
@@ -130,7 +130,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
         self.roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
 //        self.roomInfo?.room?.member_list?.append(user)
 //        AppContext.saTmpServiceImp().userList = self.roomInfo?.room?.member_list ?? []
-        self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
+        self.convertShowText(userName: user.name ?? "", content: "spatial_voice_joined".spatial_localized(), joined: true)
     }
     
     func onRobotVolumeUpdated(roomId: String, volume: String) {
@@ -246,7 +246,9 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
             sRtcView.updateUser(last)
         } else {
             if let first = mics.first {
-                let status = (first.member?.mic_status == .mute && first.member?.uid == VLUserCenter.user.id) ? 1 : (first.status == 3 ? -1 : first.status)
+                // 查询自己有没有在麦上
+                let seatUser = AppContext.saTmpServiceImp().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
+                let status = ((first.member?.mic_status == .mute && first.member?.uid == VLUserCenter.user.id) || (seatUser != nil && seatUser?.status != -1)) ? 1 : (first.status == 3 ? -1 : first.status)
                 let mic_index = first.mic_index
                 //刷新底部✋🏻状态
                 if !isOwner && first.mic_index != 0  {
@@ -268,17 +270,13 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                     }
                 }
                 if !isOwner {
-                    var state: SAChatBarState = .selected
-                    if status == 0 || status == -1  {
-                        state = .unSelected
-                    } else {
-                        state = .selected
-                    }
+                    let state: SAChatBarState = ((seatUser != nil && seatUser?.member?.mic_status == .mute) || seatUser?.status == 1 || seatUser?.status == 2 || seatUser?.status == 4) ? .selected : .unSelected
                     if first.member != nil && first.mic_index != 0 {
                         self.chatBar.refresh(event: .mic, state: state, asCreator: isOwner)
                     }
                     if mic_index == local_index && (status == -1 || status == 3 || status == 4 || status == 2) {
                         local_index = nil
+                        self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: isOwner)
                     }
                 } else {
                     if let index = AppContext.saTmpServiceImp().micApplys.firstIndex(where: { $0.member?.uid ?? "" == first.member?.uid ?? ""
@@ -297,9 +295,9 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                 if let host: SAUser = roomInfo?.room?.owner {
                     if host.uid == fromId && status == -1 {
                         AppContext.saTmpServiceImp().userList.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
-                        view.makeToast("Removed Stage".localized())
+                        view.makeToast("spatial_voice_removed_stage".spatial_localized())
                     }  else {
-//                        local_index = nil
+                        rtckit.muteLocalAudioStream(mute: seatUser == nil)
                         self.refreshApplicants(chat_uid: fromId)
                     }
                 } else {
@@ -316,14 +314,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                     let cp_uid: String = first.member?.uid ?? ""
                     if local_uid == cp_uid {
                         local_index = mic_index
-                        self.rtckit.setClientRole(role: (isOwner || status == 0) ? .owner : .audience)
-                        //如果当前是0的状态  就设置成主播
-                        self.rtckit.muteLocalAudioStream(mute: status != 0)
-                    }
-                } else {
-                    if local_index == nil || mic_index == local_index {
-                        rtckit.setClientRole(role: isOwner ? .owner : .audience)
-                        rtckit.muteLocalAudioStream(mute: isOwner ? false : true)
+                        rtckit.muteLocalAudioStream(mute: first.status == 2 || first.member?.mic_status == .mute)
                     }
                 }
                 
@@ -350,9 +341,6 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                                               body: AgoraChatTextMessageBody(text: text),
                                               ext: ["userName": SAUserInfo.shared.user?.name ?? ""]))
         SAIMManager.shared?.sendMessage(roomId: roomId, text: text, ext: ["userName": userName]) { message, error in
-            if error != nil,error?.code == .moderationFailed {
-                self.view.makeToast("Content prohibited".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
-            }
         }
     }
 

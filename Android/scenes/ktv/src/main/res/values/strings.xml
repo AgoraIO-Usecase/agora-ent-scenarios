@@ -60,11 +60,11 @@
     <string name="ktv_leave_title">关闭歌房</string>
     <string name="ktv_leave_msg">关闭歌房后所有成员将被移除房间</string>
     <string name="ktv_music_menu_dialog_title">控制台</string>
-    <string name="ktv_music_menu_dialog_ear">耳返</string>
+    <string name="ktv_music_menu_dialog_ear">耳返设置</string>
     <string name="ktv_music_menu_dialog_tone">升降调</string>
     <string name="ktv_music_menu_dialog_remote_volume">远端音量</string>
-    <string name="ktv_music_menu_dialog_vol1">音量</string>
-    <string name="ktv_music_menu_dialog_vol2">伴奏</string>
+    <string name="ktv_music_menu_dialog_vol1">人声音量</string>
+    <string name="ktv_music_menu_dialog_vol2">伴奏音量</string>
     <string name="ktv_music_menu_dialog_effect">效果</string>
     <string name="ktv_song_rank_1">热歌榜</string>
     <string name="ktv_song_rank_2">嗨唱推荐</string>
@@ -104,6 +104,7 @@
     <string name="ktv_your_score">你的得分</string>
     <string name="ktv_room_count">当前在线人数：%s</string>
     <string name="ktv_zc">主唱</string>
+    <string name="ktv_hc">合唱</string>
     <string name="ktv_song_ordering_person">点唱：</string>
     <string name="ktv_song_ordering_person_chorus">合唱：</string>
     <string name="ktv_people">人</string>
@@ -113,6 +114,14 @@
     <string name="ktv_voice_effect">音效</string>
     <string name="ktv_camera">摄像头</string>
     <string name="ktv_leave_chorus">退出合唱</string>
+    <string name="ktv_voice_highlight">突出人声</string>
+    <string name="ktv_voice_profile">配置</string>
+    <string name="ktv_voice_professional">专业主播</string>
+    <string name="ktv_voice_quality">音质</string>
+    <string name="ktv_voice_AINS">降低背景噪音</string>
+    <string name="ktv_low_latency">低延迟模式</string>
+    <string name="ktv_AIAEC_switcher">AIAEC 开关（beta）</string>
+    <string name="ktv_AIAEC_strength">AIAEC 强度选择（beta）</string>
 
     <!--    Content Description-->
     <string name="ktv_toggle_mic">麦克风启用或静音</string>
@@ -145,5 +154,13 @@
     <string name="ktv_skip_prelude">跳过前奏</string>
     <string name="ktv_skip_postlude">跳过尾奏</string>
     <string name="ktv_onseat_toast">加入合唱前，您需要先上麦</string>
+    <string name="ktv_load_failed_no_song">"加载失败，当前已无歌曲"</string>
+    <string name="ktv_load_failed">歌曲加载失败</string>
+    <string name="ktv_try">已尝试三次，请自动切歌</string>
+    <string name="ktv_load_failed_another_song">"加载失败，当前已切换到另一首歌"</string>
+    <string name="ktv_too_fast">操作太频繁</string>
+    <string name="ktv_lrc_failed">歌词加载失败</string>
+    <string name="ktv_retry">点击重试</string>
+    <string name="ktv_join_chorus_failed">加入合唱失败</string>
 
 </resources>

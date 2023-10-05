@@ -17,7 +17,7 @@ public class VoiceRoomApplyUsersViewController: UITableViewController {
     
     var agreeApply:((VRRoomMic) -> Void)?
     
-    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "No one raised hands yet", image: nil).backgroundColor(.white)
+    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "voice_no_one_raised_hands_yet", image: nil).backgroundColor(.white)
 
     public convenience init(roomId: String) {
         self.init()
@@ -88,7 +88,7 @@ extension VoiceRoomApplyUsersViewController {
                 self.agreeApply!(mic)
             }
             self.tableView.reloadData()
-            let warningMessage = (error == nil ? "Agree success!".localized():"Agree failed!".localized())
+            let warningMessage = (error == nil ? "voice_agree_success".voice_localized():"voice_agree_failed".voice_localized())
             self.view.makeToast(warningMessage)
         })
     }

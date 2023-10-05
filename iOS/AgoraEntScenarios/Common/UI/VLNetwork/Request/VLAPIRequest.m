@@ -11,6 +11,7 @@
 #import "VLUserCenter.h"
 #import "NSString+Helper.h"
 #import "MenuUtils.h"
+#import "NSObject+JKAppInfo.h"
 @import AFNetworking;
 @import YYModel;
 @import SVProgressHUD;
@@ -49,6 +50,18 @@ static AFHTTPSessionManager *_sessionManager;
     _sessionManager.responseSerializer = response;
     _sessionManager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json", @"text/html", @"text/json", @"text/plain", @"text/javascript", @"text/xml", @"image/*", @"image/png",@"image/jpeg",nil];
     [_sessionManager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    
+    /*
+     
+     public let kAppProjectName = "appProject"
+     public let kAppProjectValue = "agora_ent_demo"
+     public let kAppOS = "appOs"
+     public let kAppOSValue = "iOS"
+     public let kAppVersion = "versionName"
+     */
+    [_sessionManager.requestSerializer setValue:@"agora_ent_demo" forHTTPHeaderField:@"appProject"];
+    [_sessionManager.requestSerializer setValue:@"iOS" forHTTPHeaderField:@"appOs"];
+    [_sessionManager.requestSerializer setValue:[self jk_version] forHTTPHeaderField:@"versionName"];
 }
 
 #pragma mark--网络请求
@@ -300,7 +313,7 @@ static AFHTTPSessionManager *_sessionManager;
 
 #pragma mark - 处理token失效后切换登录界面
 + (void)setLoginVC {
-    [VLToast toast:AGLocalizedString(@"Token已失效，请重新登录")];
+    [VLToast toast:AGLocalizedString(@"app_expire")];
     // TODO: goto login page
     [[VLUserCenter center] logout];
     [[UIApplication sharedApplication].delegate.window configRootViewController];
