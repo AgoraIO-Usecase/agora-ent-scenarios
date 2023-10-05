@@ -11,7 +11,7 @@ import androidx.core.view.isVisible
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogAudioSettingBinding
 import io.agora.scene.voice.model.constructor.RoomAudioSettingsConstructor
-import io.agora.voice.common.constant.ConfigConstants
+import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.voice.common.constant.ConfigConstants.DISABLE_ALPHA
 import io.agora.voice.common.constant.ConfigConstants.ENABLE_ALPHA
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
@@ -44,11 +44,6 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
 
         binding?.apply {
             setOnApplyWindowInsets(root)
-            if (audioSettingsInfo.roomType == ConfigConstants.RoomType.Common_Chatroom) {
-                ivSpatialAudio.isVisible = false
-                mtSpatialAudio.isVisible = false
-                mtSpatialAudioArrow.isVisible = false
-            }
             if (audioSettingsInfo.enable) {
                 mcbAgoraBot.alpha = ENABLE_ALPHA
                 pbAgoraBotVolume.alpha = ENABLE_ALPHA
@@ -72,6 +67,8 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             updateAIAECView()
             updateAIAGCView()
             updateBotStateView()
+            updateBGMView()
+            updateEarBackState()
 
             mcbAgoraBot.setOnCheckedChangeListener { button, isChecked ->
                 if (!button.isPressed) return@setOnCheckedChangeListener
@@ -95,14 +92,14 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             mtAGCArrow.setOnClickListener {
                 audioSettingsListener?.onAGC(audioSettingsInfo.isAIAGCOn, audioSettingsInfo.enable)
             }
-//            mtVoiceChanger.setOnClickListener {
-//                audioSettingsListener?.onVoiceChanger(audioSettingsInfo.voiceChangerMode, audioSettingsInfo.enable)
-//            }
+            tvInEarArrow.setOnClickListener {
+                audioSettingsListener?.onEarBackSetting()
+            }
+            tvBGMArrow.setOnClickListener {
+                audioSettingsListener?.onBGMSetting()
+            }
             mtBestSoundEffectArrow.setOnClickListener {
                 audioSettingsListener?.onSoundEffect(audioSettingsInfo.soundSelection, audioSettingsInfo.enable)
-            }
-            mtSpatialAudioArrow.setOnClickListener {
-                audioSettingsListener?.onSpatialAudio(audioSettingsInfo.spatialOpen, audioSettingsInfo.enable)
             }
             pbAgoraBotVolume.onStopTrackingTouch {
                 it?.progress?.let { progress ->
@@ -148,6 +145,23 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
         }
     }
 
+    fun updateBGMView() {
+        val params = AgoraRtcEngineController.get().bgmManager().params
+        if (params.song.isNotEmpty()) {
+            binding?.tvBGMArrow?.text = "${params.song}-${params.singer}"
+        } else {
+            binding?.tvBGMArrow?.text = ""
+        }
+    }
+
+    fun updateEarBackState() {
+        if (AgoraRtcEngineController.get().earBackManager()?.params?.isOn == true) {
+            binding?.tvInEarArrow?.text = view?.context?.getString(R.string.voice_chatroom_on)
+        } else {
+            binding?.tvInEarArrow?.text = view?.context?.getString(R.string.voice_chatroom_off)
+        }
+    }
+
     /**
      * 更新机器人ui
      */
@@ -183,9 +197,11 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
         /**人声自动增益*/
         fun onAGC(isOn: Boolean, isEnable: Boolean)
 
-        /**变声*/
-        fun onVoiceChanger(mode: Int, isEnable: Boolean)
+        /**耳返设置*/
+        fun onEarBackSetting()
 
+        /** BGM 设置*/
+        fun onBGMSetting()
         /**机器人开关*/
         fun onBotCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
 
@@ -194,8 +210,5 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
 
         /**最佳音效*/
         fun onSoundEffect(soundSelectionType: Int, isEnable: Boolean)
-
-        /**空间音频*/
-        fun onSpatialAudio(isOpen: Boolean, isEnable: Boolean)
     }
 }

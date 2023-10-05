@@ -63,6 +63,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
     /**room viewModel*/
     private lateinit var roomLivingViewModel: VoiceRoomLivingViewModel
     private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
+    private var isActivityStop = false
 
     /**
      * 代理头部view以及麦位view
@@ -87,6 +88,16 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
     override fun getViewBinding(inflater: LayoutInflater): VoiceSpatialActivityChatroomBinding {
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         return VoiceSpatialActivityChatroomBinding.inflate(inflater)
+    }
+
+    override fun onStop() {
+        isActivityStop = true
+        super.onStop()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        isActivityStop = false
     }
 
     override fun onDestroy() {
@@ -451,6 +462,9 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
             override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
                 super.onFragmentStopped(fm, f)
+                if (isActivityStop) {
+                    return
+                }
                 if (f is BottomSheetDialogFragment) {
                     val lastFragment = dialogFragments.lastOrNull()
                     if (lastFragment == f) {
