@@ -26,6 +26,7 @@ import io.agora.scene.cantata.ktvapi.ILrcView
 import io.agora.scene.cantata.ktvapi.IMusicLoadStateListener
 import io.agora.scene.cantata.ktvapi.ISwitchRoleStateListener
 import io.agora.scene.cantata.ktvapi.KTVApiConfig
+import io.agora.scene.cantata.ktvapi.KTVApiImpl
 import io.agora.scene.cantata.ktvapi.KTVLoadMusicConfiguration
 import io.agora.scene.cantata.ktvapi.KTVLoadMusicMode
 import io.agora.scene.cantata.ktvapi.KTVLoadSongFailReason
@@ -48,6 +49,8 @@ import io.agora.scene.cantata.service.RoomSelSongModel
 import io.agora.scene.cantata.service.ScoringAlgoControlModel
 import io.agora.scene.cantata.service.ScoringAverageModel
 import io.agora.scene.cantata.ui.dialog.MusicSettingBean
+import io.agora.scene.cantata.ui.dialog.MusicSettingCallback
+import io.agora.scene.cantata.ui.dialog.MusicSettingDialog
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -126,16 +129,19 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     val mPlayerMusicStatusLiveData = MutableLiveData<PlayerMusicStatus>()
 
-    val mJoinChorusStatusLiveData: MutableLiveData<JoinChorusStatus> = MutableLiveData<JoinChorusStatus>()
-    val mNoLrcLiveData: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+    val mJoinChorusStatusLiveData = MutableLiveData<JoinChorusStatus>()
+    val mNoLrcLiveData = MutableLiveData<Boolean>()
 
-    val mPlayerMusicOpenDurationLiveData: MutableLiveData<Long> = MutableLiveData<Long>()
+    val mPlayerMusicOpenDurationLiveData = MutableLiveData<Long>()
     val mPlayerMusicPlayCompleteLiveData: MutableLiveData<ScoringAverageModel> = MutableLiveData<ScoringAverageModel>()
-    val mPlayerMusicCountDownLiveData: MutableLiveData<Int> = MutableLiveData<Int>()
-    val mNetworkStatusLiveData = MutableLiveData<NetWorkEvent>()
+    val mPlayerMusicCountDownLiveData = MutableLiveData<Int>()
+    val mNetworkStatusLiveData: MutableLiveData<NetWorkEvent> = MutableLiveData<NetWorkEvent>()
 
     val mScoringAlgoControlLiveData: MutableLiveData<ScoringAlgoControlModel> =
         MutableLiveData<ScoringAlgoControlModel>()
+
+    // 合唱人数
+    val mPlayerNumLiveData = MutableLiveData<Int>()
 
     /**
      * Rtc引擎
@@ -217,7 +223,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mCantataServiceProtocol.getSeatStatusList { e: Exception?, data: List<RoomSeatModel>? ->
             if (e == null && data != null) {
                 CantataLogger.d(TAG, "getSeatStatusList: return$data")
-                mSeatListLiveData.setValue(data)
+                mSeatListLiveData.postValue(data)
             }
         }
     }
@@ -288,7 +294,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     // ======================= 麦位相关 =======================
-    fun initSeats() {
+    private fun initSeats() {
         val roomInfo: JoinRoomOutputModel = mRoomInfoLiveData.value
             ?: throw java.lang.RuntimeException("The roomInfo must be not null before initSeats method calling!")
         val seatsArray: List<RoomSeatModel> = roomInfo.seatsArray ?: emptyList()
@@ -312,7 +318,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             }
         }
         if (mSeatLocalLiveData.value == null) {
-            mSeatLocalLiveData.setValue(null)
+            mSeatLocalLiveData.value = null
         }
         mCantataServiceProtocol.subscribeSeatList { ktvSubscribe: CantataServiceProtocol.KTVSubscribe,
                                                     roomSeatModel: RoomSeatModel? ->
@@ -922,6 +928,11 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
     }
 
+    // 点击合唱
+    fun clickChorusUser() {
+
+    }
+
     /**
      * 设置歌词view
      */
@@ -1094,7 +1105,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             module.type = ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION
             contentInspectConfig.modules = arrayOf(module)
             contentInspectConfig.moduleCount = 1
-            mRtcEngine!!.enableContentInspect(true, contentInspectConfig)
+            mRtcEngine?.enableContentInspect(true, contentInspectConfig)
         } catch (e: JSONException) {
             CantataLogger.e(TAG, e.toString())
         }
@@ -1108,6 +1119,89 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             null,
             null
         )
+        // ------------------ 初始化音乐播放设置面版 ------------------
+        mMusicSetting = MusicSettingBean(
+            false,
+            100,
+            50,
+            0,
+            object : MusicSettingCallback {
+                override fun onEarChanged(isEar: Boolean) {
+                    val isMuted: Int = mSeatLocalLiveData.value!!.isAudioMuted
+                    if (isMuted == 1) {
+                        mIsOpnEar = isEar
+                        return
+                    }
+                    mRtcEngine?.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NONE)
+                }
+
+                override fun onMicVolChanged(vol: Int) {
+                    setMicVolume(vol)
+                }
+
+                override fun onMusicVolChanged(vol: Int) {
+                    setMusicVolume(vol)
+                }
+
+                override fun onEffectChanged(effect: Int) {
+                    setAudioEffectPreset(getEffectIndex(effect))
+                }
+
+                override fun onBeautifierPresetChanged(effect: Int) {
+                    mRtcEngine?.let { rtcEngine ->
+                        when (effect) {
+                            0 -> {
+                                rtcEngine.setVoiceBeautifierParameters(Constants.VOICE_BEAUTIFIER_OFF, 0, 0)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 2)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
+                            }
+
+                            1 -> {
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 2)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
+                            }
+
+                            2 -> {
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
+                            }
+
+                            3 -> {
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
+                            }
+
+                            4 -> rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
+                            else -> {}
+                        }
+                    }
+                }
+
+                override fun setAudioEffectParameters(param1: Int, param2: Int) {
+                    mRtcEngine?.let { rtcEngine ->
+                        if (param1 == 0) {
+                            rtcEngine.setAudioEffectParameters(Constants.VOICE_CONVERSION_OFF, param1, param2)
+                        } else {
+                            rtcEngine.setAudioEffectParameters(Constants.PITCH_CORRECTION, param1, param2)
+                        }
+                    }
+                }
+
+                override fun onToneChanged(newToneValue: Int) {
+                    mKtvApi.getMediaPlayer().setAudioPitch(newToneValue)
+                }
+
+                override fun onRemoteVolumeChanged(volume: Int) {
+                    val ktvApiImpl: KTVApiImpl = mKtvApi as KTVApiImpl
+                    ktvApiImpl.remoteVolume = volume
+                    mRtcEngine?.adjustPlaybackSignalVolume(volume)
+                }
+            })
     }
 
     private fun setAudioEffectPreset(effect: Int) {
@@ -1359,29 +1453,31 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     // ------------------ 歌词组件相关 ------------------
     fun syncSingleLineScore(score: Int, cumulativeScore: Int, index: Int, total: Int) {
-        if (mRtcEngine == null) return
-        val msg: MutableMap<String?, Any?> = HashMap()
-        msg["cmd"] = "singleLineScore"
-        msg["score"] = score
-        msg["index"] = index
-        msg["cumulativeScore"] = cumulativeScore
-        msg["total"] = total
-        val jsonMsg = JSONObject(msg)
-        val ret = mRtcEngine!!.sendStreamMessage(mStreamId, jsonMsg.toString().toByteArray())
-        if (ret < 0) {
-            CantataLogger.e(TAG, "syncSingleLineScore() sendStreamMessage called returned: $ret")
+        mRtcEngine?.let { rtcEngine ->
+            val msg: MutableMap<String?, Any?> = HashMap()
+            msg["cmd"] = "singleLineScore"
+            msg["score"] = score
+            msg["index"] = index
+            msg["cumulativeScore"] = cumulativeScore
+            msg["total"] = total
+            val jsonMsg = JSONObject(msg)
+            val ret = rtcEngine.sendStreamMessage(mStreamId, jsonMsg.toString().toByteArray())
+            if (ret < 0) {
+                CantataLogger.e(TAG, "syncSingleLineScore() sendStreamMessage called returned: $ret")
+            }
         }
     }
 
     fun syncSingingAverageScore(score: Double) {
-        if (mRtcEngine == null) return
-        val msg: MutableMap<String?, Any?> = HashMap()
-        msg["cmd"] = "SingingScore"
-        msg["score"] = score
-        val jsonMsg = JSONObject(msg)
-        val ret = mRtcEngine!!.sendStreamMessage(mStreamId, jsonMsg.toString().toByteArray())
-        if (ret < 0) {
-            CantataLogger.e(TAG, "syncSingingAverageScore() sendStreamMessage called returned: $ret")
+        mRtcEngine?.let { rtcEngine ->
+            val msg: MutableMap<String?, Any?> = HashMap()
+            msg["cmd"] = "SingingScore"
+            msg["score"] = score
+            val jsonMsg = JSONObject(msg)
+            val ret = rtcEngine.sendStreamMessage(mStreamId, jsonMsg.toString().toByteArray())
+            if (ret < 0) {
+                CantataLogger.e(TAG, "syncSingingAverageScore() sendStreamMessage called returned: $ret")
+            }
         }
     }
 }

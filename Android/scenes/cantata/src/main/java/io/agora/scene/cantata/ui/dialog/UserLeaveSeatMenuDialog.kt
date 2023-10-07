@@ -29,12 +29,12 @@ class UserLeaveSeatMenuDialog constructor(context: Context) : BaseDialog<Cantata
         setCanceledOnTouchOutside(true)
         window?.setWindowAnimations(R.style.popup_window_style_bottom)
         binding?.apply {
-            btSeatoff.setOnClickListener(object :OnClickJackingListener(){
+            btSeatoff.setOnClickListener(object :OnClickJackingListener{
                 override fun onClickJacking(view: View) {
                     seatOff(view)
                 }
             })
-            btLeaveChorus.setOnClickListener(object :OnClickJackingListener(){
+            btLeaveChorus.setOnClickListener(object :OnClickJackingListener{
                 override fun onClickJacking(view: View) {
                     leaveChorus(view)
                 }

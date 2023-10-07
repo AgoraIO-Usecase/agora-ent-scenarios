@@ -8,6 +8,11 @@ import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 
 class ChorusSingerDialog : BaseBottomSheetDialogFragment<CantataDialogSingingUserBinding>() {
+
+    companion object {
+        const val TAG = "ChorusSingerDialog"
+    }
+
     private val mAdapter: BindingSingleAdapter<RoomSeatModel, CantataItemSingingUserBinding> =
         object : BindingSingleAdapter<RoomSeatModel, CantataItemSingingUserBinding>() {
             override fun onBindViewHolder(holder: BindingViewHolder<CantataItemSingingUserBinding>, position: Int) {
