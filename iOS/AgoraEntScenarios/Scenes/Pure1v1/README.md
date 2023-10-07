@@ -108,6 +108,7 @@
   包含场景内用户的加入和退出，用户列表的获取等，相关协议请参考: [Pure1v1ServiceProtocol.swift](Pure1v1/Classes/Service/Pure1v1ServiceProtocol.swift)， 相关协议的实现请参考[Pure1v1ServiceImp.swift](Pure1v1/Classes/Service/Pure1v1ServiceImp.swift)
 
 
+
 ## 4. FAQ
 
 ### 如何获取声网APPID
