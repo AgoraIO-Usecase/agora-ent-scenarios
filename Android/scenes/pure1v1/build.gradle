@@ -68,3 +68,5 @@ dependencies {
     implementation rootProject.ext.deps.gson
     implementation rootProject.ext.deps.syncManager
 }
+
+apply from: 'rtm.gradle'
