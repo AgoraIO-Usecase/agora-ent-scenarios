@@ -833,6 +833,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         Log.d(TAG, "joinChorus: $newRole")
         val singChannelMediaOptions = ChannelMediaOptions()
         singChannelMediaOptions.autoSubscribeAudio = true
+        singChannelMediaOptions.publishMicrophoneTrack = true
+        singChannelMediaOptions.clientRoleType = CLIENT_ROLE_BROADCASTER
         if (newRole == KTVSingRole.LeadSinger) {
             // 主唱不参加TopN
             singChannelMediaOptions.isAudioFilterable = false
@@ -874,7 +876,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 mpkConnection = rtcConnection
 
                 mRtcEngine.joinChannelEx(
-                        ktvApiConfig.chorusChannelToken,
+                        giantChorusConfig.musicChannelToken,
                         mpkConnection,
                         options,
                         object : IRtcEngineEventHandler() {

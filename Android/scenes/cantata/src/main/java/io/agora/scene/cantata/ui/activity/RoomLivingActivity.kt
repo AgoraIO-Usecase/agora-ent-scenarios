@@ -15,15 +15,12 @@ import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.event.NetWorkEvent
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.LiveDataUtils
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.api.ApiManager
 import io.agora.scene.cantata.databinding.CantataActivityRoomLivingBinding
-import io.agora.scene.cantata.service.JoinRoomOutputModel
-import io.agora.scene.cantata.service.RoomSeatModel
-import io.agora.scene.cantata.service.RoomSelSongModel
-import io.agora.scene.cantata.service.ScoringAlgoControlModel
-import io.agora.scene.cantata.service.ScoringAverageModel
+import io.agora.scene.cantata.service.*
 import io.agora.scene.cantata.ui.dialog.CantataCommonDialog
 import io.agora.scene.cantata.ui.dialog.MusicSettingDialog
 import io.agora.scene.cantata.ui.dialog.UserLeaveSeatMenuDialog
@@ -39,6 +36,7 @@ import io.agora.scene.cantata.ui.widget.song.SongDialog
 import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.utils.UiUtils
 import java.util.concurrent.Executors
 
 class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBinding>() {
@@ -128,7 +126,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
 
         if (mRoomLivingViewModel.isRoomOwner()) {
             scheduledThreadPool.execute {
-                ApiManager.getInstance().fetchStartCloud(mRoomLivingViewModel.mRoomInfoLiveData.value!!.roomNo, 9527)
+                ApiManager.getInstance().fetchStartCloud(mRoomLivingViewModel.mRoomInfoLiveData.value!!.roomNo, 20232023)
             }
         }
     }
@@ -213,23 +211,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
         mRoomLivingViewModel.mSeatListLiveData.observe(this) { seatModels: List<RoomSeatModel>? ->
             seatModels ?: return@observe
-            var chorusNowNum = 0
-            for (seatModel in seatModels) {
-                mRoomLivingViewModel.mSongPlayingLiveData.value?.let { songPlaying ->
-                    if (seatModel.chorusSongCode == songPlaying.songNo + songPlaying.createAt) {
-                        chorusNowNum++
-                    }
-                }
-            }
-            if (mRoomLivingViewModel.mChorusNum == 0 && chorusNowNum > 0) {
-                // 有人加入合唱
-                mRoomLivingViewModel.soloSingerJoinChorusMode(true)
-            } else if (mRoomLivingViewModel.mChorusNum > 0 && chorusNowNum == 0) {
-                // 最后一人退出合唱
-                mRoomLivingViewModel.soloSingerJoinChorusMode(false)
-            }
-            mRoomLivingViewModel.mChorusNum = chorusNowNum
-
+            // TODO 前8个默认占座
             if (seatModels.size == 9) {
                 binding.lrcControlView.onSeat(true)
             } else if (seatModels.size < 9) {

@@ -7,13 +7,8 @@ import androidx.lifecycle.ViewModel
 import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.musiccontentcenter.Music
-import io.agora.rtc2.ChannelMediaOptions
-import io.agora.rtc2.Constants
-import io.agora.rtc2.IRtcEngineEventHandler
+import io.agora.rtc2.*
 import io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE
-import io.agora.rtc2.RtcEngine
-import io.agora.rtc2.RtcEngineConfig
-import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
 import io.agora.scene.base.AudioModeration
@@ -293,8 +288,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     // ======================= 麦位相关 =======================
-
-    // ======================= 麦位相关 =======================
     fun initSeats() {
         val roomInfo: JoinRoomOutputModel = mRoomInfoLiveData.value
             ?: throw java.lang.RuntimeException("The roomInfo must be not null before initSeats method calling!")
@@ -388,20 +381,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
                     }
                 }
-            }
-        }
-    }
-
-    fun soloSingerJoinChorusMode(isJoin: Boolean) {
-        val songPlayingData = mSongPlayingLiveData.value ?: return
-        val seatListData = mSeatListLiveData.value ?: return
-        if (songPlayingData.userNo == UserManager.getInstance().user.id.toString()) {
-            if (isJoin) {
-                // 有人加入合唱
-                mKtvApi.switchSingerRole2(KTVSingRole.LeadSinger, null)
-            } else {
-                // 最后一人退出合唱
-                mKtvApi.switchSingerRole2(KTVSingRole.SoloSinger, null)
             }
         }
     }
@@ -894,6 +873,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     fun leaveChorus() {
         CantataLogger.d(TAG, "RoomLivingViewModel.leaveChorus() called")
         if (mIsOnSeat) {
+            // 下麦
+            mSeatLocalLiveData.value?.let { leaveSeat(it) }
+            // 离开合唱
             mCantataServiceProtocol.leaveChorus { e: Exception? ->
                 if (e == null) {
                     // success
@@ -1068,11 +1050,31 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             )
             enableAudioVolumeIndication(50, 10, true)
             setClientRole(if (mIsOnSeat) Constants.CLIENT_ROLE_BROADCASTER else Constants.CLIENT_ROLE_AUDIENCE)
-            val ret = joinChannel(
+            val options = ChannelMediaOptions()
+            options.autoSubscribeAudio = true
+            val ret = joinChannelEx(
                 mRoomInfoLiveData.value!!.agoraRTCToken,
-                mRoomInfoLiveData.value!!.roomNo + "_ad",
-                null,
-                UserManager.getInstance().user.id.toInt()
+                RtcConnection(mRoomInfoLiveData.value!!.roomNo + "_ad", UserManager.getInstance().user.id.toInt()),
+                options,
+                object : IRtcEngineEventHandler() {
+                    override fun onNetworkQuality(uid: Int, txQuality: Int, rxQuality: Int) {
+                        // 网络状态回调, 本地user uid = 0
+                        if (uid == 0) {
+                            mNetworkStatusLiveData.postValue(NetWorkEvent(txQuality, rxQuality))
+                        }
+                    }
+
+                    override fun onContentInspectResult(result: Int) {
+                        super.onContentInspectResult(result)
+                        if (result > 1) {
+                            ToastUtils.showToast(R.string.cantata_content)
+                        }
+                    }
+
+                    override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray) {
+                        mKtvApi.setAudienceStreamMessage(uid, streamId, data)
+                    }
+                }
             )
             if (ret != Constants.ERR_OK) {
                 CantataLogger.e(TAG, "joinRTC() called error: $ret")
@@ -1186,6 +1188,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mAudioTrackMode = KTVPlayerTrackMode.Acc
         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_IDLE)
         mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
+
+        // 歌曲结束自动下麦
+        mSeatLocalLiveData.value?.let { leaveSeat(it) }
     }
 
     // ------------------ 歌曲开始播放 ------------------
@@ -1197,6 +1202,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         val songCode: Long = music.songNo.toLong()
         val mainSingerUid: Int = music.userNo.toInt()
         if (isOwnSong) {
+            // 主唱上麦位置
+            haveSeat(0)
             // 主唱加载歌曲
             loadMusic(
                 KTVLoadMusicConfiguration(
@@ -1204,7 +1211,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     false,
                     mainSingerUid,
                     KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
-                ), songCode
+                ), songCode, true
             )
         } else {
             if (mSeatLocalLiveData.value != null &&
@@ -1217,7 +1224,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                         false,
                         mainSingerUid,
                         KTVLoadMusicMode.LOAD_LRC_ONLY
-                    ), songCode
+                    ), songCode, false
                 )
                 // 加入合唱
                 innerJoinChorus(music.songNo)
@@ -1229,7 +1236,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                         false,
                         mainSingerUid,
                         KTVLoadMusicMode.LOAD_LRC_ONLY
-                    ), songCode
+                    ), songCode, false
                 )
             }
         }
@@ -1242,7 +1249,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
     }
 
-    private fun loadMusic(config: KTVLoadMusicConfiguration, songCode: Long) {
+    private fun loadMusic(config: KTVLoadMusicConfiguration, songCode: Long, isOwnSong: Boolean) {
         mKtvApi.loadMusic(songCode, config, object : IMusicLoadStateListener {
             override fun onMusicLoadProgress(
                 songCode: Long,
@@ -1261,8 +1268,10 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     return
                 }
 
-                mKtvApi.switchSingerRole2(KTVSingRole.LeadSinger, null)
-                mKtvApi.startSing(songCode, 0)
+                if (isOwnSong) {
+                    mKtvApi.switchSingerRole2(KTVSingRole.LeadSinger, null)
+                    mKtvApi.startSing(songCode, 0)
+                }
 
                 // 重置settings
                 mRetryTimes = 0
@@ -1294,7 +1303,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     ToastUtils.showToastLong(R.string.cantata_load_failed)
                     mRetryTimes += 1
                     if (mRetryTimes < 3) {
-                        loadMusic(config, songCode)
+                        loadMusic(config, songCode, isOwnSong)
                     } else {
                         mPlayerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING)
                         ToastUtils.showToastLong(R.string.cantata_try)
@@ -1313,10 +1322,10 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         loadMusic(
             KTVLoadMusicConfiguration(
                 songPlayingModel.songNo,
-                true,
+                false,
                 songPlayingModel.userNo!!.toInt(),
                 KTVLoadMusicMode.LOAD_LRC_ONLY
-            ), songPlayingModel.songNo.toLong()
+            ), songPlayingModel.songNo.toLong(), true
         )
     }
 
