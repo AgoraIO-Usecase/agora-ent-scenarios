@@ -95,7 +95,7 @@
 │               │    └── CallViewController.swift  1v1通话控制器
 │               └── UserList   房间列表页面相关
 │                    └── RoomListViewController.swift  房间列表控制器
-└── ShowTo1v1.podspec  1v1私密房场景的podspec文件，支持通过Cocoapods一键集成场景
+└── ShowTo1v1.podspec  秀场转1v1私密房场景的podspec文件，支持通过Cocoapods一键集成场景
 ```
 
 ### 3.3 功能介绍
