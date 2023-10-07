@@ -436,24 +436,7 @@ class CantataSyncManagerServiceImp(
     }
 
     override fun autoOnSeat(completion: (error: Exception?) -> Unit) {
-        val list = mutableListOf<Int>(0, 1, 2, 3, 4, 5, 6, 7)
-        seatMap.forEach {
-            it.value?.let { seat ->
-                list.removeIf { index ->
-                    index == seat.seatIndex
-                }
-                if (seat.userNo == UserManager.getInstance().user.id.toString()) {
-                    completion.invoke(null)
-                    return
-                }
-            }
-        }
-        if (list.isEmpty()) {
-            completion.invoke(java.lang.Exception("麦位已满，请在他人下麦后重试"))
-        } else {
-            val seatInfo = innerGenUserSeatInfo(list[0])
-            innerAddSeatInfo(seatInfo, completion)
-        }
+        innerAddSeatInfo(innerGenUserSeatInfo(1), completion)
     }
 
     override fun outSeat(
