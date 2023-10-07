@@ -17,7 +17,7 @@
     * [Android](Android/scenes/show)
     * [iOS](iOS/AgoraEntScenarios/Scenes/Show)
 * 秀场转1v1私密房
-    * [Android](Android/scenes/pure1v1)
+    * [Android](Android/scenes/showTo1v1)
     * [iOS](iOS/AgoraEntScenarios/Scenes/ShowTo1v1)
 
 >
@@ -39,7 +39,7 @@
     * [Android](Android/scenes/show)
     * [iOS](iOS/AgoraEntScenarios/Scenes/Show)
 * 运行秀场转1v1私密房项目，请参考以下流程
-    * [Android](Android/scenes/pure1v1)
+    * [Android](Android/scenes/showTo1v1)
     * [iOS](iOS/AgoraEntScenarios/Scenes/ShowTo1v1)
 
 # 2. FAQ
