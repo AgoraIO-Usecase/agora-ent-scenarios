@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clContent"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/show_to1v1_setting_dialog_card">
+
+        <LinearLayout
+            android:id="@+id/llDashboard"
+            android:layout_width="83dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="20dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center"
+                android:src="@drawable/show_to1v1_detail_setting_dashboard" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:gravity="center"
+                android:text="@string/show_to1v1_dashboard_item"
+                android:textColor="#C6C4DD"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
