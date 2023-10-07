@@ -4,7 +4,7 @@
 > 
 > Demo 效果:
 > 
-> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/showRoom_1.png" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/showRoom_2.png" width="300" height="640">
+> <img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide1.png" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide2.png" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide3.png" width="300" height="640">
 ---
 
 ## 1. 环境准备
@@ -106,6 +106,7 @@
 
 - 场景内用户管理
   包含场景内用户的加入和退出，用户列表的获取等，相关协议请参考: [Pure1v1ServiceProtocol.swift](Pure1v1/Classes/Service/Pure1v1ServiceProtocol.swift)， 相关协议的实现请参考[Pure1v1ServiceImp.swift](Pure1v1/Classes/Service/Pure1v1ServiceImp.swift)
+
 
 
 ## 4. FAQ
