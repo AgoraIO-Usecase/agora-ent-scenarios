@@ -4,7 +4,7 @@
 > 
 > Demo 效果:
 > 
-> <img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide1.png" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide2.png" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide3.png" width="300" height="640">
+> <img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide1.jpg" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide2.jpg" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide3.jpg" width="300" height="640">
 ---
 
 ## 1. 环境准备
@@ -83,7 +83,7 @@
 │   └── Pure1v1
 │       ├── Resources 
 │       │   └────Pure1v1.bundle  1v1私密房资源文件，包括图片和国际化文案
-│       └── Classes  歌词下载工具类文件
+│       └── Classes
 │           ├── Core  基础模块，包括日志、UI相关的扩展等
 │           ├── Service   用户管理逻辑模块  
 │           │   ├── Pure1v1Model.swift    用户管理模型
