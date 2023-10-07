@@ -362,7 +362,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         private var lrcUrl: String? = null
 
 
-        override fun onDownloadLrcData(url: String?) {
+    override fun onDownloadLrcData(url: String?) {
             lrcUrl = url
             downloadAndSetLrcData()
         }

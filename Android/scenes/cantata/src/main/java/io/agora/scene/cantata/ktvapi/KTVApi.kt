@@ -5,6 +5,7 @@ import io.agora.mediaplayer.IMediaPlayer
 import io.agora.musiccontentcenter.IAgoraMusicContentCenter
 import io.agora.musiccontentcenter.Music
 import io.agora.musiccontentcenter.MusicChartInfo
+import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 
@@ -15,7 +16,18 @@ import io.agora.rtc2.RtcEngine
  */
 enum class KTVType(val value: Int)  {
     Normal(0),
-    SingBattle(1)
+    SingBattle(1),
+    Cantata(2)
+}
+
+/**
+ * KTV歌曲类型
+ * @param SONG_CODE mcc版权歌单songCode
+ * @param SONG_URL 本地歌曲地址url
+ */
+enum class KTVMusicType(val value: Int) {
+    SONG_CODE(0),
+    SONG_URL(1)
 }
 
 /**
@@ -161,7 +173,7 @@ abstract class IKTVApiEventHandler {
      * @param isLocal 本地还是主唱端的 Player 信息
      */
     open fun onMusicPlayerStateChanged(
-        state: Constants.MediaPlayerState, error: Constants.MediaPlayerError, isLocal: Boolean
+            state: Constants.MediaPlayerState, error: Constants.MediaPlayerError, isLocal: Boolean
     ) {
     }
 
@@ -183,8 +195,8 @@ abstract class IKTVApiEventHandler {
      * @param totalVolume 总音量
      */
     open fun onChorusChannelAudioVolumeIndication(
-        speakers: Array<out IRtcEngineEventHandler.AudioVolumeInfo>?,
-        totalVolume: Int) {}
+            speakers: Array<out IRtcEngineEventHandler.AudioVolumeInfo>?,
+            totalVolume: Int) {}
 }
 
 /**
@@ -199,16 +211,24 @@ abstract class IKTVApiEventHandler {
  * @param maxCacheSize 最大缓存歌曲数
  * @param type KTV场景
  */
-data class KTVApiConfig(
-    val appId: String,
-    val rtmToken: String,
-    val engine: RtcEngine,
-    val channelName: String,
-    val localUid: Int,
-    val chorusChannelName: String,
-    val chorusChannelToken: String,
-    val maxCacheSize: Int = 10,
-    val type: KTVType = KTVType.Normal
+data class KTVApiConfig constructor(
+        val appId: String,
+        val rtmToken: String,
+        val engine: RtcEngine,
+        val channelName: String,
+        val localUid: Int,
+        val chorusChannelName: String,
+        val chorusChannelToken: String,
+        val maxCacheSize: Int = 10,
+        val type: KTVType = KTVType.Normal,
+        val musicType: KTVMusicType = KTVMusicType.SONG_CODE
+)
+
+data class GiantChorusConfiguration constructor(
+        val audienceChannelToken: String,
+        val musicStreamUid: Int,
+        val musicChannelToken: String,
+        val topN: Int = 0
 )
 
 /**
@@ -219,18 +239,23 @@ data class KTVApiConfig(
  * @param mainSingerUid 主唱的 Uid，如果是伴唱，伴唱需要根据这个信息 mute 主频道主唱的声音
  */
 data class KTVLoadMusicConfiguration(
-    val songIdentifier: String,
-    val autoPlay: Boolean = false,
-    val mainSingerUid: Int,
-    val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
+        val songIdentifier: String,
+        val autoPlay: Boolean = false,
+        val mainSingerUid: Int,
+        val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
 )
+
+/**
+ * 获取 KTVApi 实例
+ */
+fun createKTVApi(): KTVApi = KTVApiImpl()
 
 interface KTVApi {
     /**
      * 初始化内部变量/缓存数据，并注册相应的监听，必须在其他KTVApi调用前调用initialize初始化KTVApi
      * @param config 初始化KTVApi的配置
      */
-    fun initialize(config: KTVApiConfig)
+    fun initialize(config: KTVApiConfig, giantChorusConfig: GiantChorusConfiguration?)
 
     /**
      * 更新ktvapi内部使用的streamId，每次加入频道需要更新内部streamId
@@ -255,13 +280,18 @@ interface KTVApi {
     fun release()
 
     /**
+     * 开启关闭专业模式
+     */
+    fun enableProfessionalStreamerMode(enable: Boolean)
+
+    /**
      * 收到 IKTVApiEventHandler.onTokenPrivilegeWillExpire 回调时需要主动调用方法更新Token
      * @param rtmToken musicContentCenter模块需要的rtm token
      * @param chorusChannelRtcToken 合唱需要的频道rtc token
      */
     fun renewToken(
-        rtmToken: String,
-        chorusChannelRtcToken: String
+            rtmToken: String,
+            chorusChannelRtcToken: String
     )
 
     /**
@@ -269,11 +299,11 @@ interface KTVApi {
      * @param onMusicChartResultListener 榜单列表回调
      */
     fun fetchMusicCharts(
-        onMusicChartResultListener: (
-            requestId: String?, // TODO 不需要？
-            status: Int,        // status=2 时token过期
-            list: Array<out MusicChartInfo>?
-        ) -> Unit
+            onMusicChartResultListener: (
+                    requestId: String?, // TODO 不需要？
+                    status: Int,        // status=2 时token过期
+                    list: Array<out MusicChartInfo>?
+            ) -> Unit
     )
 
     /**
@@ -285,18 +315,18 @@ interface KTVApi {
      * @param onMusicCollectionResultListener 歌曲列表回调
      */
     fun searchMusicByMusicChartId(
-        musicChartId: Int,
-        page: Int,
-        pageSize: Int,
-        jsonOption: String,
-        onMusicCollectionResultListener: (
-            requestId: String?,  // TODO 不需要？
-            status: Int,         // status=2 时token过期
+            musicChartId: Int,
             page: Int,
             pageSize: Int,
-            total: Int,
-            list: Array<out Music>?
-        ) -> Unit
+            jsonOption: String,
+            onMusicCollectionResultListener: (
+                    requestId: String?,  // TODO 不需要？
+                    status: Int,         // status=2 时token过期
+                    page: Int,
+                    pageSize: Int,
+                    total: Int,
+                    list: Array<out Music>?
+            ) -> Unit
     )
 
     /**
@@ -307,17 +337,17 @@ interface KTVApi {
      * @param onMusicCollectionResultListener 歌曲列表回调
      */
     fun searchMusicByKeyword(
-        keyword: String,
-        page: Int, pageSize: Int,
-        jsonOption: String,
-        onMusicCollectionResultListener: (
-            requestId: String?,  // TODO 不需要？
-            status: Int,         // status=2 时token过期
-            page: Int,
-            pageSize: Int,
-            total: Int,
-            list: Array<out Music>?
-        ) -> Unit
+            keyword: String,
+            page: Int, pageSize: Int,
+            jsonOption: String,
+            onMusicCollectionResultListener: (
+                    requestId: String?,  // TODO 不需要？
+                    status: Int,         // status=2 时token过期
+                    page: Int,
+                    pageSize: Int,
+                    total: Int,
+                    list: Array<out Music>?
+            ) -> Unit
     )
 
     /**
@@ -335,9 +365,9 @@ interface KTVApi {
      * loadMusic成功后switchSingerRole(CoSinger)
      */
     fun loadMusic(
-        songCode: Long,
-        config: KTVLoadMusicConfiguration,
-        musicLoadStateListener: IMusicLoadStateListener
+            songCode: Long,
+            config: KTVLoadMusicConfiguration,
+            musicLoadStateListener: IMusicLoadStateListener
     )
 
     /**
@@ -354,9 +384,37 @@ interface KTVApi {
      * loadMusic成功后switchSingerRole(CoSinger)
      */
     fun loadMusic(
-        url: String,
-        config: KTVLoadMusicConfiguration
+            url: String,
+            config: KTVLoadMusicConfiguration
     )
+
+    /**
+     * 加载歌曲，同时只能为一首歌loadSong，同步调用， 一般使用此loadSong是歌曲已经preload成功（url为本地文件地址）
+     * @param config 加载歌曲配置，config.autoPlay = true，默认播放url1
+     * @param url1 歌曲地址1
+     * @param url2 歌曲地址2
+     *
+     *
+     * 推荐调用：
+     * 歌曲开始时：
+     * 主唱 loadMusic(KTVLoadMusicConfiguration(autoPlay=true, mode=LOAD_MUSIC_AND_LRC, url, mainSingerUid)) switchSingerRole(SoloSinger)
+     * 观众 loadMusic(KTVLoadMusicConfiguration(autoPlay=false, mode=LOAD_LRC_ONLY, url, mainSingerUid))
+     * 加入合唱时：
+     * 准备加入合唱者：loadMusic(KTVLoadMusicConfiguration(autoPlay=false, mode=LOAD_MUSIC_ONLY, url, mainSingerUid))
+     * loadMusic成功后switchSingerRole(CoSinger)
+     */
+    fun load2Music(
+            url1: String,
+            url2: String,
+            config: KTVLoadMusicConfiguration
+    )
+
+    /**
+     * 多文件切换播放资源
+     * @param url 需要切换的播放资源，需要为 load2Music 中 参数 url1，url2 中的一个
+     * @param syncPts 是否同步切换前后的起始播放位置: true 同步，false 不同步，从 0 开始
+     */
+    fun switchPlaySrc(url: String, syncPts: Boolean)
 
     /**
      * 异步切换演唱身份，结果会通过回调通知业务层
@@ -374,8 +432,14 @@ interface KTVApi {
      * 8、LeadSinger -》Audience 以领唱的身份结束歌曲时
      */
     fun switchSingerRole(
-        newRole: KTVSingRole,
-        switchRoleStateListener: ISwitchRoleStateListener?
+            newRole: KTVSingRole,
+            switchRoleStateListener: ISwitchRoleStateListener?
+    )
+
+
+    fun switchSingerRole2(
+            newRole: KTVSingRole,
+            switchRoleStateListener: ISwitchRoleStateListener?
     )
 
     /**
@@ -430,6 +494,14 @@ interface KTVApi {
      * @param audioPlayoutDelay 音频帧处理和播放的时间差
      */
     fun setAudioPlayoutDelay(audioPlayoutDelay: Int)
+
+    /**
+     * 设置演唱的分数，推荐使用歌词组建回调的单句得分
+     * @param score 演唱分数
+     */
+    fun setSingingScore(score: Int)
+
+    fun setAudienceStreamMessage(uid: Int, streamId: Int, data: ByteArray?)
 
     /**
      * 获取mpk实例

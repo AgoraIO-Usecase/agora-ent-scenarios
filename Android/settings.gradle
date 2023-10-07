@@ -23,24 +23,27 @@ include ':common:ui-widget'
  */
 include ':scenes:ktv'
 
-/*
- * 语聊房
- */
-include ':scenes:voice'
-include ':scenes:voice:common'
+///*
+// * 语聊房
+// */
+//include ':scenes:voice'
+//include ':scenes:voice:common'
+//
+///*187
+// * 空间音频语聊房
+// */
+//include ':scenes:voice_spatial'
+//include ':scenes:voice_spatial:common'
+//
+///*
+// * 秀场直播
+// */
+//include ':scenes:show'
+//include ':scenes:show:aars:SenseArSourceManager'
+//include ':scenes:show:aars:STMobileJNI'
+//include ':scenes:show:aars:HardwareBuffer'
 
 /*
- * 空间音频语聊房
+ * 大合唱
  */
-include ':scenes:voice_spatial'
-include ':scenes:voice_spatial:common'
-
-/*
- * 秀场直播
- */
-include ':scenes:show'
-include ':scenes:show:aars:SenseArSourceManager'
-include ':scenes:show:aars:STMobileJNI'
-include ':scenes:show:aars:HardwareBuffer'
-
 include ':scenes:cantata'
