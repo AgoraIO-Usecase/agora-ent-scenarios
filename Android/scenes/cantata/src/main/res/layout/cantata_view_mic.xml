@@ -13,21 +13,22 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearance="@style/ui_widget_roundStyle"
-        tools:src="@drawable/cantata_ic_seat" />
+        android:src="@drawable/cantata_ic_seat" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:ellipsize="end"
         android:maxLines="1"
+        android:paddingTop="3dp"
         android:textColor="#99FFFFFF"
         android:textSize="12sp"
-        tools:text="@string/cantata_zc"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivUserAvatar" />
+        app:layout_constraintTop_toBottomOf="@+id/ivUserAvatar"
+        tools:text="@string/cantata_zc"
+        tools:textColor="@color/black" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/horizontal60"

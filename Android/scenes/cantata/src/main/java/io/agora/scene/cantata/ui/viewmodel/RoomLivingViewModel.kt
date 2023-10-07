@@ -238,7 +238,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         val roomInfo: JoinRoomOutputModel = mRoomInfoLiveData.value
             ?: throw RuntimeException("The roomInfo must be not null before initSeats method calling!")
         mRoomUserCountLiveData.postValue(roomInfo.roomPeopleNum)
-        mCantataServiceProtocol.subscribeRoomStatus { ktvSubscribe: CantataServiceProtocol.KTVSubscribe,
+        mCantataServiceProtocol.subscribeRoomStatusChanged { ktvSubscribe: CantataServiceProtocol.KTVSubscribe,
                                                       vlRoomListModel: RoomListModel? ->
             if (ktvSubscribe == CantataServiceProtocol.KTVSubscribe.KTVSubscribeDeleted) {
                 CantataLogger.d(TAG, "subscribeRoomStatus KTVSubscribeDeleted")
@@ -246,7 +246,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             } else if (ktvSubscribe == CantataServiceProtocol.KTVSubscribe.KTVSubscribeUpdated) {
                 // 当房间内状态发生改变时触发
                 CantataLogger.d(TAG, "subscribeRoomStatus KTVSubscribeUpdated")
-                vlRoomListModel ?: return@subscribeRoomStatus
+                vlRoomListModel ?: return@subscribeRoomStatusChanged
                 if (vlRoomListModel.bgOption != roomInfo.bgOption) {
                     mRoomInfoLiveData.postValue(
                         JoinRoomOutputModel(
@@ -424,7 +424,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
      */
     fun leaveSeat(seatModel: RoomSeatModel) {
         CantataLogger.d(TAG, "RoomLivingViewModel.leaveSeat() called")
-        mCantataServiceProtocol.outSeat(
+        mCantataServiceProtocol.leaveSeat(
             OutSeatInputModel(
                 seatModel.userNo,
                 seatModel.rtcUid,
@@ -507,7 +507,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     // ======================= 歌曲相关 =======================
     fun initSongs() {
-        mCantataServiceProtocol.subscribeChooseSong { ktvSubscribe: CantataServiceProtocol.KTVSubscribe?,
+        mCantataServiceProtocol.subscribeChooseSongChanged { ktvSubscribe: CantataServiceProtocol.KTVSubscribe?,
                                                       songModel: RoomSelSongModel? ->
             // 歌曲信息发生变化时，重新获取歌曲列表动作
             CantataLogger.d(TAG, "subscribeChooseSong updateSongs")
@@ -790,19 +790,19 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
         if (!mIsOnSeat) {
             // 不在麦上， 自动上麦
-            mCantataServiceProtocol.autoOnSeat { err: Exception? ->
-                if (err == null) {
-                    mIsOnSeat = true
-                    //自动开麦
-                    mMainChannelMediaOption.publishMicrophoneTrack = true
-                    mMainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-                    mRtcEngine?.updateChannelMediaOptions(mMainChannelMediaOption)
-                    innerJoinChorus(musicModel.songNo)
-                } else {
-                    mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
-                    ToastUtils.showToast(err.message)
-                }
-            }
+//            mCantataServiceProtocol.onSeat() { err: Exception? ->
+//                if (err == null) {
+//                    mIsOnSeat = true
+//                    //自动开麦
+//                    mMainChannelMediaOption.publishMicrophoneTrack = true
+//                    mMainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
+//                    mRtcEngine?.updateChannelMediaOptions(mMainChannelMediaOption)
+//                    innerJoinChorus(musicModel.songNo)
+//                } else {
+//                    mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
+//                    ToastUtils.showToast(err.message)
+//                }
+//            }
         } else {
             // 在麦上，直接加入合唱
             innerJoinChorus(musicModel.songNo)

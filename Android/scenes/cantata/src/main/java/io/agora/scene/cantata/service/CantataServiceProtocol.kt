@@ -58,9 +58,9 @@ interface CantataServiceProtocol {
     fun changeMVCover(inputModel: ChangeMVCoverInputModel, completion: (error: Exception?) -> Unit)
 
     /**
-     * room status did changed
+     * 订阅房间状态变化
      */
-    fun subscribeRoomStatus(changedBlock: (KTVSubscribe, RoomListModel?) -> Unit)
+    fun subscribeRoomStatusChanged(changedBlock: (KTVSubscribe, RoomListModel?) -> Unit)
 
     /**
      * user count did changed
@@ -82,35 +82,30 @@ interface CantataServiceProtocol {
      */
     fun onSeat(inputModel: OnSeatInputModel, completion: (error: Exception?) -> Unit)
 
-    fun autoOnSeat(completion: (error: Exception?) -> Unit)
-
     /**
      * 下麦
      */
-    fun outSeat(
-        inputModel: OutSeatInputModel, completion: (error: Exception?) -> Unit
-    )
+    fun leaveSeat(inputModel: OutSeatInputModel, completion: (error: Exception?) -> Unit)
+
+    /**
+     * 下麦但是只删除当前歌曲
+     */
+    fun leaveSeatWithoutRemoveSong(inputModel: OutSeatInputModel,completion: (error: Exception?) -> Unit)
 
     /**
      * 设置麦位静音
      */
-    fun updateSeatAudioMuteStatus(
-        mute: Boolean, completion: (error: Exception?) -> Unit
-    )
+    fun updateSeatAudioMuteStatus(mute: Boolean, completion: (error: Exception?) -> Unit)
 
     /**
      * 打开麦位摄像头
      */
-    fun updateSeatVideoMuteStatus(
-        mute: Boolean, completion: (error: Exception?) -> Unit
-    )
+    fun updateSeatVideoMuteStatus(mute: Boolean, completion: (error: Exception?) -> Unit)
 
     /**
-     * seat list did changed
+     * 定位麦位变化
      */
-    fun subscribeSeatList(
-        changedBlock: (KTVSubscribe, RoomSeatModel?) -> Unit
-    )
+    fun subscribeSeatList(changedBlock: (KTVSubscribe, RoomSeatModel?) -> Unit)
 
     // =================== 歌曲相关 =========================
 
@@ -150,24 +145,17 @@ interface CantataServiceProtocol {
     /**
      * 加入合唱
      */
-    fun joinChorus(
-        inputModel: RoomSelSongModel,
-        completion: (error: Exception?) -> Unit
-    )
+    fun joinChorus(inputModel: RoomSelSongModel, completion: (error: Exception?) -> Unit)
 
     /**
      * 合唱者离开合唱
      */
-    fun leaveChorus(
-        completion: (error: Exception?) -> Unit
-    )
+    fun leaveChorus(completion: (error: Exception?) -> Unit)
 
     /**
-     * song did changed
+     * 订阅歌曲变化
      */
-    fun subscribeChooseSong(
-        changedBlock: (KTVSubscribe, RoomSelSongModel?) -> Unit
-    )
+    fun subscribeChooseSongChanged(changedBlock: (KTVSubscribe, RoomSelSongModel?) -> Unit)
 
     // =================== 断网重连相关 =========================
 

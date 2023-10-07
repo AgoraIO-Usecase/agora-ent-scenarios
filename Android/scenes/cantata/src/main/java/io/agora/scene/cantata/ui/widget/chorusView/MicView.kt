@@ -11,6 +11,7 @@ import android.view.animation.Animation
 import android.view.animation.PathInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat
 import com.bumptech.glide.Glide
@@ -59,8 +60,8 @@ class MicView @JvmOverloads constructor(
             .into(mBinding.ivUserAvatar)
     }
 
-    fun updateMicName(name: String) {
-        mBinding.tvUserName.text = name
+    fun getMicTextView(): TextView {
+        return mBinding.tvUserName
     }
 
     fun reset() {
