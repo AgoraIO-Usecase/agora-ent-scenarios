@@ -1,5 +1,6 @@
 package io.agora.scene.show.beauty.sensetime;
 
+import static io.agora.beautyapi.sensetime.SenseTimeBeautyAPIKt.createSenseTimeBeautyAPI;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_CLARITY;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_CONTRAST;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_SATURATION;
@@ -29,189 +30,79 @@ import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_HUAHU
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_NONE;
 
 import android.content.Context;
-import android.graphics.Matrix;
-import android.opengl.GLES11Ext;
-import android.opengl.GLES20;
+import android.util.Log;
 
-import com.sensetime.effects.STRenderer;
-import com.sensetime.effects.utils.FileUtils;
-import com.sensetime.stmobile.STCommonNative;
+import androidx.annotation.NonNull;
+
 import com.sensetime.stmobile.params.STEffectBeautyType;
 
 import java.io.File;
-import java.nio.ByteBuffer;
 
-import io.agora.base.TextureBufferHelper;
 import io.agora.base.VideoFrame;
-import io.agora.base.internal.video.EglBase;
-import io.agora.base.internal.video.YuvHelper;
-import io.agora.scene.show.ShowLogger;
+import io.agora.beautyapi.sensetime.CaptureMode;
+import io.agora.beautyapi.sensetime.Config;
+import io.agora.beautyapi.sensetime.ErrorCode;
+import io.agora.beautyapi.sensetime.IEventCallback;
+import io.agora.beautyapi.sensetime.SenseTimeBeautyAPI;
+import io.agora.beautyapi.sensetime.utils.STRenderKit;
+import io.agora.beautyapi.sensetime.utils.utils.FileUtils;
+import io.agora.rtc2.RtcEngine;
+import io.agora.rtc2.video.IVideoFrameObserver;
 import io.agora.scene.show.beauty.BeautyCache;
 import io.agora.scene.show.beauty.IBeautyProcessor;
 
 public class BeautySenseTimeImpl extends IBeautyProcessor {
 
     private final Context mContext;
-    private STRenderer mSTRenderer;
-
-
-    private TextureBufferHelper textureBufferHelper;
-
-    private boolean isFrontCamera = true;
-    private EglBase.Context mEglBaseContext;
-    private ByteBuffer mNV21Buffer;
-    private byte[] mNV21ByteArray;
-
+    private STRenderKit mSTRenderer;
     private volatile boolean sdkIsInit = false;
     private volatile boolean isReleased = false;
+
     private volatile boolean shouldMirror = false;
 
+    @Override
+    public void initialize(@NonNull RtcEngine rtcEngine, @NonNull CaptureMode captureMode, boolean statsEnable, @NonNull IEventCallback eventCallback) {
+        getSenseTimeBeautyAPI().initialize(new Config(rtcEngine, mSTRenderer, eventCallback, captureMode, 1000, statsEnable));
+    }
+
+    private SenseTimeBeautyAPI innerSenseTimeApi;
+
+    @NonNull
+    @Override
+    public SenseTimeBeautyAPI getSenseTimeBeautyAPI() {
+        if (innerSenseTimeApi == null) {
+            innerSenseTimeApi = createSenseTimeBeautyAPI();
+        }
+        return innerSenseTimeApi;
+    }
 
     public BeautySenseTimeImpl(Context context) {
         mContext = context.getApplicationContext();
+        if (!sdkIsInit) {
+            mSTRenderer = new STRenderKit(mContext, null);
+            sdkIsInit = true;
+            restore();
+        }
+    }
+
+    @Override
+    public void setBeautyEnable(boolean beautyEnable) {
+        super.setBeautyEnable(beautyEnable);
+        getSenseTimeBeautyAPI().enable(beautyEnable);
     }
 
     @Override
     public void release() {
         super.release();
-        isReleased = true;
-        if (textureBufferHelper != null) {
-            textureBufferHelper.invoke(() -> {
-                unInitST();
-                return null;
-            });
-            try {
-                textureBufferHelper.dispose();
-            } catch (Exception e) {
-                ShowLogger.e("IBeautyProcessor", e, "");
-            }
-            textureBufferHelper = null;
+        if (innerSenseTimeApi != null) {
+            innerSenseTimeApi.release();
+            innerSenseTimeApi = null;
         }
-        sdkIsInit = false;
-        mEglBaseContext = null;
-    }
-
-    private void initST() {
         if (sdkIsInit) {
-            return;
+            mSTRenderer.release();
+            sdkIsInit = false;
         }
-        mSTRenderer = new STRenderer(mContext);
-        sdkIsInit = true;
-        restore();
-    }
-
-    private void unInitST() {
-        if (!sdkIsInit) {
-            return;
-        }
-        mSTRenderer.release();
-        sdkIsInit = false;
-    }
-
-    @Override
-    public boolean onCaptureVideoFrame(int type,VideoFrame videoFrame) {
-        if (!isEnable() || isReleased) {
-            shouldMirror = videoFrame.getSourceType() == VideoFrame.SourceType.kFrontCamera;
-            return true;
-        }
-        shouldMirror = false;
-        VideoFrame.Buffer buffer = videoFrame.getBuffer();
-        // 获取NV21数据
-        VideoFrame.I420Buffer i420Buffer = buffer.toI420();
-        if (i420Buffer == null) {
-            return false;
-        }
-        int nv21Size = (buffer.getWidth() * buffer.getHeight() * 3 + 1) / 2;
-        if (mNV21Buffer == null || mNV21Buffer.capacity() != nv21Size) {
-            mNV21Buffer = ByteBuffer.allocateDirect(nv21Size);
-            mNV21ByteArray = new byte[nv21Size];
-        }
-        mNV21Buffer.clear();
-        mNV21Buffer.position(0);
-
-        YuvHelper.I420ToNV12(i420Buffer.getDataY(), i420Buffer.getStrideY(),
-                i420Buffer.getDataV(), i420Buffer.getStrideV(),
-                i420Buffer.getDataU(), i420Buffer.getStrideV(),
-                mNV21Buffer,
-                buffer.getWidth(), buffer.getHeight());
-        mNV21Buffer.position(0);
-        mNV21Buffer.get(mNV21ByteArray);
-        i420Buffer.release();
-
-        int texture = -1;
-        Matrix transformMatrix = new Matrix();
-        if (buffer instanceof VideoFrame.TextureBuffer) {
-            // 使用双输入处理
-            VideoFrame.TextureBuffer textureBuffer = (VideoFrame.TextureBuffer) buffer;
-
-            if (textureBufferHelper == null) {
-                mEglBaseContext = textureBuffer.getEglBaseContext();
-                textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", mEglBaseContext);
-                textureBufferHelper.invoke(() -> {
-                    initST();
-                    return null;
-                });
-            } else if (mEglBaseContext == null) {
-                textureBufferHelper.invoke(() -> {
-                    unInitST();
-                    return null;
-                });
-                try {
-                    textureBufferHelper.dispose();
-                } catch (Exception e) {
-                    ShowLogger.e("IBeautyProcessor", e, "");
-                }
-                textureBufferHelper = null;
-                return false;
-            }
-
-            texture = textureBufferHelper.invoke(() ->
-                    mSTRenderer.preProcess(buffer.getWidth(), buffer.getHeight(), videoFrame.getRotation(),
-                            mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21,
-                            textureBuffer.getTextureId(),
-                            textureBuffer.getType() == VideoFrame.TextureBuffer.Type.RGB ? GLES20.GL_TEXTURE_2D : GLES11Ext.GL_TEXTURE_EXTERNAL_OES));
-            transformMatrix = textureBuffer.getTransformMatrix();
-        }
-        else {
-            // 使用单输入处理
-            if (textureBufferHelper == null) {
-                mEglBaseContext = null;
-                textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", mEglBaseContext);
-                textureBufferHelper.invoke(() -> {
-                    initST();
-                    return null;
-                });
-            }
-            texture = textureBufferHelper.invoke(() ->
-                    mSTRenderer.preProcess(buffer.getWidth(), buffer.getHeight(), videoFrame.getRotation(), mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21));
-            transformMatrix = new Matrix();
-        }
-
-        boolean isFront = videoFrame.getSourceType() == VideoFrame.SourceType.kFrontCamera;
-        if (isFrontCamera != isFront) {
-            isFrontCamera = isFront;
-            return false;
-        }
-
-        if (texture < 0) {
-            return false;
-        }
-
-        if (isReleased) {
-            return false;
-        }
-        VideoFrame.TextureBuffer newBuffer = textureBufferHelper.wrapTextureBuffer(
-                buffer.getWidth(),
-                buffer.getHeight(),
-                VideoFrame.TextureBuffer.Type.RGB,
-                texture, transformMatrix);
-        videoFrame.replaceBuffer(newBuffer, videoFrame.getRotation(), videoFrame.getTimestampNs());
-        return true;
-    }
-
-    @Override
-    public boolean getMirrorApplied() {
-        return shouldMirror;
+        isReleased = true;
     }
 
     @Override
@@ -219,7 +110,6 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         if (!sdkIsInit || isReleased) {
             return;
         }
-
         mSTRenderer.setBeautyMode(STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH, STEffectBeautyType.SMOOTH2_MODE);
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_SMOOTH));
         mSTRenderer.setBeautyMode(STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN, STEffectBeautyType.WHITENING3_MODE);
@@ -273,7 +163,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         } else if (itemId == ITEM_ID_EFFECT_CWEI) {
             setStyleItem("style_lightly" + File.separator + "wanneng.zip", intensity);
         } else if (itemId == ITEM_ID_EFFECT_NONE) {
-            mSTRenderer.cleanStyle();
+            //mSTRenderer.cleanStyle();
         }
     }
 
@@ -284,7 +174,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         }
 
         if (itemId == ITEM_ID_STICKER_NONE) {
-            mSTRenderer.removeStickers();
+            //mSTRenderer.removeStickers();
         } else if (itemId == ITEM_ID_STICKER_HUAHUA) {
             setStickerItem("sticker_face_shape" + File.separator + "lianxingface.zip");
         }
@@ -297,7 +187,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         String fileName = split[1];
         String path = FileUtils.getFilePath(mContext, className + File.separator + fileName);
         FileUtils.copyFileIfNeed(mContext, fileName, className);
-        mSTRenderer.setStyle(path, strength, strength);
+        //mSTRenderer.setStyle(path, strength, strength);
     }
 
     private void setFilterItem(String filterPath, float strength) {
@@ -336,5 +226,60 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         }
     }
 
+    @Override
+    public boolean onCaptureVideoFrame(int type, VideoFrame videoFrame) {
+        if (videoFrame == null) return false;
+        shouldMirror = false;
 
+        int ret = getSenseTimeBeautyAPI().onFrame(videoFrame);
+        if (ret == ErrorCode.ERROR_OK.getValue()) {
+            return true;
+        } else if (ret == ErrorCode.ERROR_FRAME_SKIPPED.getValue()) {
+            return false;
+        } else {
+            shouldMirror = videoFrame.getSourceType() == VideoFrame.SourceType.kFrontCamera;
+            return true;
+        }
+    }
+
+    @Override
+    public boolean onPreEncodeVideoFrame(int type, VideoFrame videoFrame) {
+        return false;
+    }
+
+    @Override
+    public boolean onMediaPlayerVideoFrame(VideoFrame videoFrame, int mediaPlayerId) {
+        return false;
+    }
+
+    @Override
+    public boolean onRenderVideoFrame(String channelId, int uid, VideoFrame videoFrame) {
+        return false;
+    }
+
+    @Override
+    public int getVideoFrameProcessMode() {
+        return IVideoFrameObserver.PROCESS_MODE_READ_WRITE;
+    }
+
+    @Override
+    public int getVideoFormatPreference() {
+        return IVideoFrameObserver.VIDEO_PIXEL_DEFAULT;
+    }
+
+    @Override
+    public boolean getRotationApplied() {
+        return false;
+    }
+
+
+    @Override
+    public boolean getMirrorApplied() {
+        return shouldMirror;
+    }
+
+    @Override
+    public int getObservedFramePosition() {
+        return IVideoFrameObserver.POSITION_POST_CAPTURER;
+    }
 }

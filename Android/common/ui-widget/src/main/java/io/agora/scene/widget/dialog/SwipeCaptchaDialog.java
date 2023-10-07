@@ -51,7 +51,7 @@ public class SwipeCaptchaDialog extends BaseDialog<DialogSwipeCaptchaBinding> {
 
             @Override
             public void matchFailed(SwipeCaptchaView swipeCaptchaView) {
-                ToastUtils.showToast("请重试");
+                ToastUtils.showToast(R.string.comm_try_again);
                 createCaptcha();
             }
         });

@@ -576,7 +576,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mBinding.ilActive.ivSkipPostlude.setVisibility(INVISIBLE);
         } else if (v == mBinding.ilActive.ivJoinChorusBtn) {
             if (UiUtils.isFastClick(2000)) {
-                ToastUtils.showToast("操作太频繁");
+                ToastUtils.showToast(R.string.ktv_too_fast);
                 return;
             }
             mOnKaraokeActionListener.onJoinChorus();
