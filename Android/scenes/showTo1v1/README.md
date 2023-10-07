@@ -61,7 +61,7 @@ AGORA_APP_CERTIFICATE=（从声网console获取）
 
 - 用户列表业务 -- 房间管理及用户列表获取：
   - 场景的房间管理类，在内部对创建用户、移除用户、获取用户列表[ShowTo1v1ServiceImpl](src/main/java/io/agora/scene/showTo1v1/service/ShowTo1v1ServiceImpl.kt)
-- 1v1私密房业务 -- 拨打、接通、拒接、挂断：
+- 秀场转1v1私密房业务 -- 拨打、自动接通、超时挂断、挂断：
   - 业务创建与准备：程序在这里进行1v1私密房之前的准备，以接收和响应其他客户端的呼叫 [ShowTo1v1Manger](src/main/java/io/agora/scene/showTo1v1/ShowTo1v1Manger.kt)
   - 业务核心代码：程序在这里处理1v1私密房场景的核心逻辑，开发者可以复用这里的逻辑接入自己的业务 [callAPI](src/main/java/io/agora/scene/showTo1v1/callAPI)
 - Activities：
@@ -69,7 +69,7 @@ AGORA_APP_CERTIFICATE=（从声网console获取）
   - 创建房间: 用户可以在这个界面创建直播房间 [RoomCreateActivity](src/main/java/io/agora/scene/showTo1v1/ui/RoomCreateActivity.kt)
   - 通话界面：秀场1v1私密房单主播直播界面，观众点击呼叫可以进行双向音视频互通[RoomDetailActivity](src/main/java/io/agora/scene/showTo1v1/ui/RoomDetailActivity.kt)
 - 数据面板及参数展示：
-  - 显示秀场转1v1私密房互通时RTC SDK在互通时的视频及网络状况参数：[DashboardFragment](src/main/java/io/agora/scene/showTo1v1/ui/fragment/DashboardFragment.kt)
+  - 显示秀场转1v1私密房互通时RTC SDK在单主播直播/互通时的视频及网络状况参数：[DashboardFragment](src/main/java/io/agora/scene/showTo1v1/ui/fragment/DashboardFragment.kt)
 
 ---
 
