@@ -46,7 +46,7 @@ include ':common:ui-widget'
 /*
  * 1V1私密房
  */
-include ':scenes:pure1v1'
+//include ':scenes:pure1v1'
 
 
-
+include ':scenes:showTo1v1'
