@@ -44,9 +44,12 @@ data class RoomSeatModel constructor(
     val rtcUid: String,// 座位上用户id，与rtc的userId一致
     val name: String,// 座位上用户昵称
     val seatIndex: Int,// 座位编号
-    val chorusSongCode: String = "",// 是否合唱
-    val isAudioMuted: Int,// 是否静音
-    val isVideoMuted: Int,// 是否开启视频
+    var chorusSongCode: String = "",// 是否合唱
+    var isAudioMuted: Int,// 是否静音
+    var isVideoMuted: Int,// 是否开启视频
+    val score:Int,
+    val isOwner:Boolean = false
+
 ) : Serializable {
 
     companion object {

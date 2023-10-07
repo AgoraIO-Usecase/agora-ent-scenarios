@@ -159,12 +159,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/horizontal80"
         app:layout_constraintTop_toBottomOf="@id/tbChatroomTop" />
 
-    <io.agora.scene.cantata.ui.widget.chorusView.ChorusMicView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@id/lrcControlView"
-        app:layout_constraintDimensionRatio="1:1" />
-
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivResultBg"
         android:layout_width="match_parent"

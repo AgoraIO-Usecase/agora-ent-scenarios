@@ -2,15 +2,16 @@ package io.agora.scene.cantata.ui.widget.chorusView
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Point
 import android.graphics.PointF
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.TypedValue
-import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.appcompat.widget.ViewUtils
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.service.RoomSeatModel
 import java.lang.Math.PI
@@ -36,18 +37,15 @@ class ChorusMicView @JvmOverloads constructor(
     defStyle: Int = 0
 ) : ViewGroup(context, attrs, defStyle) {
 
-//    private val mBinding: CantataViewChorusBinding by lazy {
-//        CantataViewChorusBinding.inflate(LayoutInflater.from(context), this, true)
-//    }
-
     private val topMicCount: Int = 9 // 默认多少个 mic
-    private val centralMicSize: Float = 100.0f.dp // 中间大麦位的大小
-    private val sideMicSize: Float = 50.0f // 周边麦位的大小
+    private val centralMicSize: Float = 96.0f.dp // 中间大麦位的大小
+    private val sideMicSize: Float = 48.0f.dp // 周边麦位的大小
     private val floatingAnimationDuration: Long = 1500 // 麦位浮动动画的持续时间
 
+    private var bgView: ImageView? = null
     private var centralMicView: MicView? = null // 中间大麦位视图
     private val sideMicViews: MutableList<MicView> = mutableListOf() // 周边麦位视图数组
-    private val boundaryInset: Float = 20.0f // 边界缩进值
+    private val boundaryInset: Float = 20.0f.dp // 边界缩进值
 
     private val random by lazy {
         Random(System.nanoTime())
@@ -67,12 +65,15 @@ class ChorusMicView @JvmOverloads constructor(
     }
 
     private fun addBGView() {
-        val bgView = ImageView(context)
-
-        bgView.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.cantata_seat_bg))
-        bgView.scaleType = ImageView.ScaleType.CENTER
-        val layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-        addView(bgView, layoutParams)
+        bgView = ImageView(context).apply {
+            setImageDrawable(ContextCompat.getDrawable(context, R.drawable.cantata_seat_bg))
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+        }
+        bgView?.let {
+            val bgSize = Resources.getSystem().displayMetrics.widthPixels
+            val layoutParams = LayoutParams(bgSize, bgSize)
+            addView(it, layoutParams)
+        }
     }
 
     private fun setupMicViews() {
@@ -81,10 +82,17 @@ class ChorusMicView @JvmOverloads constructor(
             clickBlock = { index ->
                 delegate?.didChorusMicViewClicked(index)
             }
-            updateMicName("admin")
+            getMicTextView().apply {
+                text = "admin"
+                setTextColor(ResourcesCompat.getColor(resources, R.color.white, null))
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+            }
             tag = 1000
         }
-        centralMicView?.let { addView(it) }
+        centralMicView?.let {
+            val layoutParams = LayoutParams(centralMicSize.toInt(), LayoutParams.WRAP_CONTENT)
+            addView(it, layoutParams)
+        }
 
         // 添加周边麦位视图
         for (i in 0 until topMicCount - 1) {
@@ -92,10 +100,15 @@ class ChorusMicView @JvmOverloads constructor(
                 clickBlock = { index ->
                     delegate?.didChorusMicViewClicked(index)
                 }
-                updateMicName("${i + 1}号麦")
+                getMicTextView().apply {
+                    text = context.getString(R.string.cantata_seat_index, i + 1)
+                    setTextColor(ResourcesCompat.getColor(resources, R.color.white_80_percent, null))
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 8f)
+                }
             }
+            val layoutParams = LayoutParams(sideMicSize.toInt(), LayoutParams.WRAP_CONTENT)
             sideMicViews.add(micView)
-            addView(micView)
+            addView(micView, layoutParams)
         }
     }
 
@@ -110,13 +123,23 @@ class ChorusMicView @JvmOverloads constructor(
 
     private fun layoutChildren() {
         val centerPoint = PointF(measuredWidth.toFloat() / 2f, measuredHeight.toFloat() / 2f)
+        bgView?.let {
+            val bgViewWidth = it.measuredWidth
+            val bgViewHeight = it.measuredHeight
+            val left = (centerPoint.x - bgViewWidth / 2).toInt()
+            val top = (centerPoint.y - bgViewHeight / 2 - 30.0f.dp).toInt()
+            val right = (centerPoint.x + bgViewWidth / 2).toInt()
+            val bottom = (centerPoint.y + bgViewHeight / 2 + 30.0f.dp).toInt()
+            it.layout(left, top, right, bottom)
+        }
 
         // 布局中间大麦位视图
         centralMicView?.let {
+            val seatTextViewHeight = it.getMicTextView().measuredHeight
             val left = (centerPoint.x - centralMicSize / 2).toInt()
-            val top = ((centerPoint.y - centralMicSize / 2) - 10).toInt()
+            val top = (centerPoint.y - centralMicSize / 2).toInt()
             val right = (centerPoint.x + centralMicSize / 2).toInt()
-            val bottom = ((centerPoint.y + centralMicSize / 2) + 20).toInt()
+            val bottom = ((centerPoint.y + centralMicSize / 2) + seatTextViewHeight).toInt()
             it.layout(left, top, right, bottom)
         }
 
@@ -138,8 +161,14 @@ class ChorusMicView @JvmOverloads constructor(
                 val x = centerPoint.x + radius * cos(angle.toDouble()).toFloat()
                 val y = centerPoint.y + radius * sin(angle.toDouble()).toFloat()
 
+                val seatTextViewHeight = sideMicViews[i].getMicTextView().measuredHeight
                 val micFrame =
-                    RectF(x - sideMicSize / 2, y - sideMicSize / 2 - 10, x + sideMicSize / 2, y + sideMicSize / 2 + 20)
+                    RectF(
+                        x - sideMicSize / 2,
+                        y - sideMicSize / 2,
+                        x + sideMicSize / 2,
+                        y + sideMicSize / 2 + seatTextViewHeight
+                    )
 
                 if (isMicRectFValid(micFrame)) {
                     isValidPosition = true
@@ -151,8 +180,8 @@ class ChorusMicView @JvmOverloads constructor(
                             micFrame.bottom.toInt()
                         )
                         // 添加浮动效果
-                        val randomX = nonzeroRandom(-20f..20f)
-                        val randomY = nonzeroRandom(-20f..20f)
+                        val randomX = nonzeroRandom((-20f).dp..20f.dp)
+                        val randomY = nonzeroRandom((-20f).dp..20f.dp)
                         it.addFloatingAnimation(randomX, randomY)
                         it.tag = 1001 + i
                     }
@@ -167,15 +196,19 @@ class ChorusMicView @JvmOverloads constructor(
             val headUrl = roomSeat.headUrl
             val index = roomSeat.seatIndex
             val micView = findMicViewWithTag(1000 + index) ?: return
-            micView.updateMicName(roomSeat.name)
+            micView.getMicTextView().apply {
+                text = roomSeat.name.ifEmpty { context.getString(R.string.cantata_seat_index, roomSeat.seatIndex) }
+            }
             micView.updateMicImage(headUrl)
         }
     }
 
-    fun updateMics(model: RoomSeatModel) {
-        val micView = findMicViewWithTag(1000 + model.seatIndex) ?: return
-        micView.updateMicName(model.name.ifEmpty { "${model.seatIndex}号麦" })
-        micView.updateMicImage(model.headUrl)
+    fun updateMics(roomSeat: RoomSeatModel) {
+        val micView = findMicViewWithTag(1000 + roomSeat.seatIndex) ?: return
+        micView.getMicTextView().apply {
+            text = roomSeat.name.ifEmpty { context.getString(R.string.cantata_seat_index, roomSeat.seatIndex) }
+        }
+        micView.updateMicImage(roomSeat.headUrl)
     }
 
 

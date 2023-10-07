@@ -18,7 +18,7 @@ import kotlin.random.Random
  *
  *
  */
-class CantataSyncManagerServiceImp(
+class CantataSyncManagerServiceImp constructor(
     private val context: Context,
     private val errorHandler: ((Exception?) -> Unit)?
 ) : CantataServiceProtocol {
@@ -69,7 +69,7 @@ class CantataSyncManagerServiceImp(
     private var currRoomNo: String = ""
 
     // time limit
-    private val ROOM_AVAILABLE_DURATION : Long = 20 * 60 * 1000 // 20min
+    private val ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000 // 20min
     private val timerRoomEndRun = Runnable {
         runOnMainThread {
             CantataLogger.d(TAG, "time up exit room!")
@@ -400,7 +400,7 @@ class CantataSyncManagerServiceImp(
             })
     }
 
-    override fun subscribeRoomStatus(changedBlock: (CantataServiceProtocol.KTVSubscribe, RoomListModel?) -> Unit) {
+    override fun subscribeRoomStatusChanged(changedBlock: (CantataServiceProtocol.KTVSubscribe, RoomListModel?) -> Unit) {
         roomStatusSubscriber = changedBlock
     }
 
@@ -420,10 +420,7 @@ class CantataSyncManagerServiceImp(
         innerGetSeatInfo(completion)
     }
 
-    override fun onSeat(
-        inputModel: OnSeatInputModel,
-        completion: (error: Exception?) -> Unit
-    ) {
+    override fun onSeat(inputModel: OnSeatInputModel, completion: (error: Exception?) -> Unit) {
         seatMap.forEach {
             it.value?.let { seat ->
                 if (seat.userNo == UserManager.getInstance().user.id.toString()) {
@@ -435,18 +432,20 @@ class CantataSyncManagerServiceImp(
         innerAddSeatInfo(seatInfo, completion)
     }
 
-    override fun autoOnSeat(completion: (error: Exception?) -> Unit) {
-        innerAddSeatInfo(innerGenUserSeatInfo(1), completion)
-    }
-
-    override fun outSeat(
-        inputModel: OutSeatInputModel,
-        completion: (error: Exception?) -> Unit
-    ) {
+    override fun leaveSeat(inputModel: OutSeatInputModel, completion: (error: Exception?) -> Unit) {
         val seatInfo = seatMap[inputModel.userOnSeat.toString()]
         if (seatInfo != null) {
             // 移除歌曲
             innerRemoveAllUsersChooseSong(seatInfo.userNo)
+            // 移除座位
+            innerRemoveSeat(seatInfo) {}
+        }
+        completion(null)
+    }
+
+    override fun leaveSeatWithoutRemoveSong(inputModel: OutSeatInputModel, completion: (error: Exception?) -> Unit) {
+        val seatInfo = seatMap[inputModel.userOnSeat.toString()]
+        if (seatInfo != null) {
             // 移除座位
             innerRemoveSeat(seatInfo) {}
         }
@@ -458,17 +457,22 @@ class CantataSyncManagerServiceImp(
             if (it.value?.userNo == UserManager.getInstance().user.id.toString()) {
                 val originSeatInfo = it.value
                 if (originSeatInfo != null) {
-                    val seatInfo = RoomSeatModel(
-                        originSeatInfo.isMaster,
-                        originSeatInfo.headUrl,
-                        originSeatInfo.userNo,
-                        originSeatInfo.rtcUid,
-                        originSeatInfo.name,
-                        originSeatInfo.seatIndex,
-                        originSeatInfo.chorusSongCode,
-                        if (mute) RoomSeatModel.MUTED_VALUE_TRUE else RoomSeatModel.MUTED_VALUE_FALSE, // update this
-                        originSeatInfo.isVideoMuted
-                    )
+                    val seatInfo = originSeatInfo.copy()
+                    seatInfo.isAudioMuted =
+                        if (mute) RoomSeatModel.MUTED_VALUE_TRUE else RoomSeatModel.MUTED_VALUE_FALSE
+//                    val seatInfo = RoomSeatModel(
+//                        isMaster = originSeatInfo.isMaster,
+//                        headUrl = originSeatInfo.headUrl,
+//                        userNo = originSeatInfo.userNo,
+//                        rtcUid = originSeatInfo.rtcUid,
+//                        name = originSeatInfo.name,
+//                        seatIndex = originSeatInfo.seatIndex,
+//                        chorusSongCode = originSeatInfo.chorusSongCode,
+//                        isAudioMuted = if (mute) RoomSeatModel.MUTED_VALUE_TRUE else RoomSeatModel.MUTED_VALUE_FALSE, // update this
+//                        isVideoMuted = originSeatInfo.isVideoMuted,
+//                        score = 0,
+//                        isOwner = originSeatInfo.isOwner
+//                    )
                     innerUpdateSeat(seatInfo, completion)
                 }
             }
@@ -483,17 +487,22 @@ class CantataSyncManagerServiceImp(
             if (it.value?.userNo == UserManager.getInstance().user.id.toString()) {
                 val originSeatInfo = it.value
                 if (originSeatInfo != null) {
-                    val seatInfo = RoomSeatModel(
-                        originSeatInfo.isMaster,
-                        originSeatInfo.headUrl,
-                        originSeatInfo.userNo,
-                        originSeatInfo.rtcUid,
-                        originSeatInfo.name,
-                        originSeatInfo.seatIndex,
-                        originSeatInfo.chorusSongCode,
-                        originSeatInfo.isAudioMuted,
-                        if (mute) 1 else 0// update this
-                    )
+                    val seatInfo = originSeatInfo.copy()
+                    seatInfo.isVideoMuted =
+                        if (mute) RoomSeatModel.MUTED_VALUE_TRUE else RoomSeatModel.MUTED_VALUE_FALSE
+//                    val seatInfo = RoomSeatModel(
+//                        isMaster = originSeatInfo.isMaster,
+//                        headUrl = originSeatInfo.headUrl,
+//                        userNo = originSeatInfo.userNo,
+//                        rtcUid = originSeatInfo.rtcUid,
+//                        name = originSeatInfo.name,
+//                        seatIndex = originSeatInfo.seatIndex,
+//                        chorusSongCode = originSeatInfo.chorusSongCode,
+//                        isAudioMuted = originSeatInfo.isAudioMuted,
+//                        isVideoMuted = if (mute) 1 else 0,// update this
+//                        score = originSeatInfo.score,
+//                        isOwner = originSeatInfo.isOwner
+//                    )
                     innerUpdateSeat(seatInfo, completion)
                 }
             }
@@ -675,17 +684,22 @@ class CantataSyncManagerServiceImp(
                 list.forEach { seat ->
                     if (seat.userNo == UserManager.getInstance().user.id.toString()) {
                         // 座位 joinSing -> true
-                        val seatInfo = RoomSeatModel(
-                            seat.isMaster,
-                            seat.headUrl,
-                            seat.userNo,
-                            seat.rtcUid,
-                            seat.name,
-                            seat.seatIndex,
-                            inputModel.songNo + inputModel.createAt,
-                            RoomSeatModel.MUTED_VALUE_FALSE,
-                            seat.isVideoMuted
-                        )
+                        val seatInfo = seat.copy()
+                        seatInfo.chorusSongCode = inputModel.songNo + inputModel.createAt
+                        seatInfo.isAudioMuted = RoomSeatModel.MUTED_VALUE_FALSE
+//                        val seatInfo = RoomSeatModel(
+//                            isMaster = seat.isMaster,
+//                            headUrl = seat.headUrl,
+//                            userNo = seat.userNo,
+//                            rtcUid = seat.rtcUid,
+//                            name = seat.name,
+//                            seatIndex = seat.seatIndex,
+//                            chorusSongCode = inputModel.songNo + inputModel.createAt,
+//                            isAudioMuted = RoomSeatModel.MUTED_VALUE_FALSE,
+//                            isVideoMuted = seat.isVideoMuted,
+//                            score = seat.score,
+//                            isOwner = seat.isOwner
+//                        )
                         innerUpdateSeat(seatInfo, completion)
                     }
                 }
@@ -700,24 +714,29 @@ class CantataSyncManagerServiceImp(
             if (it.value?.userNo == UserManager.getInstance().user.id.toString()) {
                 val originSeatInfo = it.value
                 if (originSeatInfo != null) {
-                    val seatInfo = RoomSeatModel(
-                        originSeatInfo.isMaster,
-                        originSeatInfo.headUrl,
-                        originSeatInfo.userNo,
-                        originSeatInfo.rtcUid,
-                        originSeatInfo.name,
-                        originSeatInfo.seatIndex,
-                        "",
-                        RoomSeatModel.MUTED_VALUE_TRUE,
-                        originSeatInfo.isVideoMuted
-                    )
+                    val seatInfo = originSeatInfo.copy()
+                    seatInfo.chorusSongCode = ""
+                    seatInfo.isAudioMuted = RoomSeatModel.MUTED_VALUE_TRUE
+//                    val seatInfo = RoomSeatModel(
+//                        isMaster =  originSeatInfo.isMaster,
+//                        headUrl = originSeatInfo.headUrl,
+//                        userNo = originSeatInfo.userNo,
+//                        rtcUid = originSeatInfo.rtcUid,
+//                        name = originSeatInfo.name,
+//                        seatIndex = originSeatInfo.seatIndex,
+//                         chorusSongCode = "",
+//                        isAudioMuted =RoomSeatModel.MUTED_VALUE_TRUE,
+//                        isVideoMuted = originSeatInfo.isVideoMuted,
+//                        score = originSeatInfo.score,
+//                        isOwner = originSeatInfo.isOwner
+//                    )
                     innerUpdateSeat(seatInfo, completion)
                 }
             }
         }
     }
 
-    override fun subscribeChooseSong(changedBlock: (CantataServiceProtocol.KTVSubscribe, RoomSelSongModel?) -> Unit) {
+    override fun subscribeChooseSongChanged(changedBlock: (CantataServiceProtocol.KTVSubscribe, RoomSelSongModel?) -> Unit) {
         chooseSongSubscriber = changedBlock
     }
 
@@ -758,7 +777,7 @@ class CantataSyncManagerServiceImp(
             object : Callback {
                 override fun onSuccess() {
                     syncUtilsInited = true
-                    runOnMainThread{
+                    runOnMainThread {
                         complete.invoke()
                     }
                 }
@@ -773,7 +792,7 @@ class CantataSyncManagerServiceImp(
                 runOnMainThread {
                     // 判断当前房间是否还存在
                     val oldRoomInfo = roomMap[currRoomNo]
-                    if(oldRoomInfo != null){
+                    if (oldRoomInfo != null) {
                         getRoomList { _, _ ->
                             val roomInfo = roomMap[currRoomNo]
                             if (roomInfo == null) {
@@ -960,15 +979,17 @@ class CantataSyncManagerServiceImp(
 
     private fun innerGenUserSeatInfo(seatIndex: Int): RoomSeatModel {
         return RoomSeatModel(
-            roomMap[currRoomNo]?.creatorNo == UserManager.getInstance().user.id.toString(),
-            UserManager.getInstance().user.headUrl,
-            UserManager.getInstance().user.id.toString(),
-            UserManager.getInstance().user.id.toString(),
-            UserManager.getInstance().user.name,
-            seatIndex,
-            "",
-            RoomSeatModel.MUTED_VALUE_TRUE,
-            RoomSeatModel.MUTED_VALUE_TRUE
+            isMaster = roomMap[currRoomNo]?.creatorNo == UserManager.getInstance().user.id.toString(),
+            headUrl = UserManager.getInstance().user.headUrl,
+            userNo = UserManager.getInstance().user.id.toString(),
+            rtcUid = UserManager.getInstance().user.id.toString(),
+            name = UserManager.getInstance().user.name,
+            seatIndex = seatIndex,
+            chorusSongCode = "",
+            isAudioMuted = RoomSeatModel.MUTED_VALUE_TRUE,
+            isVideoMuted = RoomSeatModel.MUTED_VALUE_TRUE,
+            score = 0,
+            isOwner = false
         )
     }
 
@@ -1082,7 +1103,7 @@ class CantataSyncManagerServiceImp(
 
                 if (seatMap.containsKey(obj.seatIndex.toString())) {
                     seatMap[obj.seatIndex.toString()] = obj
-                    runOnMainThread{
+                    runOnMainThread {
                         seatListChangeSubscriber?.invoke(
                             CantataServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
                             obj
@@ -1090,7 +1111,7 @@ class CantataSyncManagerServiceImp(
                     }
                 } else {
                     seatMap[obj.seatIndex.toString()] = obj
-                    runOnMainThread{
+                    runOnMainThread {
                         seatListChangeSubscriber?.invoke(
                             CantataServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
                             obj
@@ -1106,7 +1127,7 @@ class CantataSyncManagerServiceImp(
                     entry.value?.let { seat ->
                         if (objIdOfSeatIndex[seat.seatIndex] == item.id) {
                             seatMap.remove(entry.key)
-                            runOnMainThread{
+                            runOnMainThread {
                                 seatListChangeSubscriber?.invoke(
                                     CantataServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
                                     seat
@@ -1131,8 +1152,10 @@ class CantataSyncManagerServiceImp(
     private fun innerSortChooseSongList(): List<RoomSelSongModel> {
         val list = ArrayList<RoomSelSongModel>(songChosenList)
         val playingList = list.filter { it.status == RoomSelSongModel.STATUS_PLAYING }
-        val pinList = list.filter { it.pinAt > 0 && it.status != RoomSelSongModel.STATUS_PLAYING }.sortedBy { it.pinAt * -1 }
-        val normalList = list.filter { it.pinAt <= 0 && it.status != RoomSelSongModel.STATUS_PLAYING }.sortedBy { it.createAt }
+        val pinList =
+            list.filter { it.pinAt > 0 && it.status != RoomSelSongModel.STATUS_PLAYING }.sortedBy { it.pinAt * -1 }
+        val normalList =
+            list.filter { it.pinAt <= 0 && it.status != RoomSelSongModel.STATUS_PLAYING }.sortedBy { it.createAt }
 
         val out = ArrayList<RoomSelSongModel>()
         out.addAll(playingList)
