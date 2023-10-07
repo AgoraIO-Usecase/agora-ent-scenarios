@@ -4,7 +4,7 @@
 >
 > Demo 效果:
 >
-> <img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/android/liveto1v1/sample_roomlist.png" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/android/liveto1v1/sample_createroom.png" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/android/liveto1v1/sample_show_live.png" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/android/liveto1v1/sample_show_call.png" width="300" height="640">
+> <img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/android/liveto1v1/sample_roomlist.png" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/android/liveto1v1/sample_show_live.png" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/android/liveto1v1/sample_show_call.png" width="300" height="640">
 ---
 
 ## 1. 环境准备
