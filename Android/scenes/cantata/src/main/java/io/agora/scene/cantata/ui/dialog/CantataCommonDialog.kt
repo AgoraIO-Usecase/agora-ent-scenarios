@@ -16,13 +16,13 @@ class CantataCommonDialog constructor(context: Context) : BaseDialog<CantataDial
 
     override fun initView() {
         binding?.apply {
-            btnLeft.setOnClickListener(object :OnClickJackingListener(){
+            btnLeft.setOnClickListener(object :OnClickJackingListener{
                 override fun onClickJacking(view: View) {
                     getOnButtonClickListener().onLeftButtonClick()
                     dismiss()
                 }
             })
-            btnRight.setOnClickListener(object :OnClickJackingListener(){
+            btnRight.setOnClickListener(object :OnClickJackingListener{
                 override fun onClickJacking(view: View) {
                     getOnButtonClickListener().onRightButtonClick()
                     dismiss()

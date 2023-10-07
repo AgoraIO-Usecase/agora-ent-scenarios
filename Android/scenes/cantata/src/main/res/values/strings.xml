@@ -157,4 +157,5 @@
 
     <string name="cantata_user_online">%s在线</string>
     <string name="cantata_singing_user">正在合唱用户(%d)</string>
+    <string name="cantata_on_chorus_user">%d人合唱中</string>
 </resources>

@@ -28,6 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cantata_music_menu_dialog_ear"
+            android:textSize="14sp"
             android:textColor="@color/def_text_grey_979" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
@@ -42,6 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:text="@string/cantata_please_use_headset"
+            android:textSize="12sp"
             android:textColor="@color/def_text_grey_6c7" />
     </LinearLayout>
 
@@ -58,6 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cantata_music_menu_dialog_mv"
+            android:textSize="14sp"
             android:textColor="@color/def_text_grey_979" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
@@ -84,6 +87,7 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:focusable="false"
+            android:textSize="14sp"
             android:text="@string/cantata_music_menu_dialog_tone"
             android:textColor="#9BA2AB" />
 
@@ -130,6 +134,7 @@
             android:clickable="false"
             android:focusable="false"
             android:text="@string/cantata_music_menu_dialog_vol1"
+            android:textSize="14sp"
             android:textColor="#9BA2AB" />
 
         <androidx.appcompat.widget.AppCompatSeekBar
@@ -137,7 +142,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="35dp"
+            android:layout_marginStart="30dp"
             android:contentDescription="@string/cantata_music_menu_dialog_vol1"
             android:max="100"
             android:progress="20"
@@ -159,13 +164,14 @@
             android:clickable="false"
             android:focusable="false"
             android:text="@string/cantata_music_menu_dialog_vol2"
+            android:textSize="14sp"
             android:textColor="#9BA2AB" />
 
         <androidx.appcompat.widget.AppCompatSeekBar
             android:id="@+id/sbVol2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
+            android:layout_marginStart="30dp"
             android:contentDescription="@string/cantata_music_menu_dialog_vol2"
             android:max="100"
             android:progress="20"
@@ -187,6 +193,7 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:focusable="false"
+            android:textSize="14sp"
             android:text="@string/cantata_music_menu_dialog_remote_volume"
             android:textColor="#9BA2AB" />
 
@@ -224,6 +231,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:textSize="12sp"
             android:text="@string/cantata_input_remote_volume"
             android:textColor="@color/def_text_grey_6c7" />
     </LinearLayout>

@@ -22,6 +22,7 @@ import io.agora.scene.cantata.api.ApiManager
 import io.agora.scene.cantata.databinding.CantataActivityRoomLivingBinding
 import io.agora.scene.cantata.service.*
 import io.agora.scene.cantata.ui.dialog.CantataCommonDialog
+import io.agora.scene.cantata.ui.dialog.ChorusSingerDialog
 import io.agora.scene.cantata.ui.dialog.MusicSettingDialog
 import io.agora.scene.cantata.ui.dialog.UserLeaveSeatMenuDialog
 import io.agora.scene.cantata.ui.viewmodel.JoinChorusStatus
@@ -67,6 +68,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     private var musicSettingDialog: MusicSettingDialog? = null
     private var mChangeMusicDialog: CommonDialog? = null
     private var mUserLeaveSeatMenuDialog: UserLeaveSeatMenuDialog? = null
+    private var mChorusSingerDialog: ChorusSingerDialog? = null
 
     // 点歌台
     private var mChooseSongDialog: SongDialog? = null
@@ -118,7 +120,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             binding.tvRoomName.text = roomName
         }
 
-        binding.ivChatroomMore.setOnClickListener(object : OnClickJackingListener() {
+        binding.ivChatroomMore.setOnClickListener(object : OnClickJackingListener {
             override fun onClickJacking(view: View) {
                 TopFunctionDialog(this@RoomLivingActivity).show()
             }
@@ -126,14 +128,15 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
 
         if (mRoomLivingViewModel.isRoomOwner()) {
             scheduledThreadPool.execute {
-                ApiManager.getInstance().fetchStartCloud(mRoomLivingViewModel.mRoomInfoLiveData.value!!.roomNo, 20232023)
+                ApiManager.getInstance()
+                    .fetchStartCloud(mRoomLivingViewModel.mRoomInfoLiveData.value!!.roomNo, 20232023)
             }
         }
     }
 
     override fun initListener() {
         super.initListener()
-        binding.ivChatroomBack.setOnClickListener(object : OnClickJackingListener() {
+        binding.ivChatroomBack.setOnClickListener(object : OnClickJackingListener {
             override fun onClickJacking(view: View) {
                 mRoomLivingViewModel.exitRoom()
             }
@@ -149,12 +152,12 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
                 mRoomLivingViewModel.toggleMic(false)
             }
         }
-        binding.iBtnChooseSong.setOnClickListener(object : OnClickJackingListener() {
+        binding.iBtnChooseSong.setOnClickListener(object : OnClickJackingListener {
             override fun onClickJacking(view: View) {
                 showChooseSongDialog()
             }
         })
-        binding.btnOK.setOnClickListener(object : OnClickJackingListener() {
+        binding.btnOK.setOnClickListener(object : OnClickJackingListener {
             override fun onClickJacking(view: View) {
                 binding.groupResult.isVisible = false
             }
@@ -170,6 +173,11 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             override fun onChangeMusicClick() {
                 super.onChangeMusicClick()
                 showChangeMusicDialog()
+            }
+
+            override fun onChorusUserClick() {
+                super.onChorusUserClick()
+                showChorusSingerDialog()
             }
         }
         binding.lrcControlView.setOnLrcClickListener(lrcActionListenerImpl)
@@ -504,6 +512,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
     }
 
+    // 切歌
     private fun showChangeMusicDialog() {
         if (mChangeMusicDialog == null) {
             mChangeMusicDialog = CommonDialog(this).apply {
@@ -523,6 +532,12 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             }
         }
         mChangeMusicDialog?.show()
+    }
+
+    // 合唱
+    private fun showChorusSingerDialog() {
+        mChorusSingerDialog = ChorusSingerDialog()
+        mChorusSingerDialog?.show(supportFragmentManager, ChorusSingerDialog.TAG)
     }
 
     /**
