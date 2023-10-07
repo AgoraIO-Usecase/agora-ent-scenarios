@@ -4,7 +4,7 @@
 > 
 > Demo 效果:
 > 
-> <img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide1.png" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide2.png" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide3.png" width="300" height="640">
+> <img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide1.jpg" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide2.jpg" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/private1v1_ios_guide3.jpg" width="300" height="640">
 ---
 
 ## 1. 环境准备
