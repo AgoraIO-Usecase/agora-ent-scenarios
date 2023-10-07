@@ -289,7 +289,7 @@ extension RoomListViewController {
     
     private func _createRtcEngine() ->AgoraRtcEngineKit {
         let config = AgoraRtcEngineConfig()
-        config.appId = showTo1v1AppCertificate!
+        config.appId = showTo1v1AppId!
         config.channelProfile = .liveBroadcasting
         config.audioScenario = .gameStreaming
         config.areaCode = .global
