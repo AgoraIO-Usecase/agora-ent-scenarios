@@ -66,8 +66,8 @@ class ScreenSlidePageFragment : Fragment() {
         )
         val itemCount = mRankListAdapter.itemCount
         for (i in 0 until itemCount) {
-            val item = mRankListAdapter.getItem(i)
-            if (item!!.songNo == songItem.songNo) {
+            val item = mRankListAdapter.getItem(i)?:continue
+            if (item.songNo == songItem.songNo) {
                 item.isChosen = isChosen
                 mRankListAdapter.notifyItemChanged(i)
                 break
