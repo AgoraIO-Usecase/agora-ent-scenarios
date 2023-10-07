@@ -15,9 +15,9 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import io.agora.beautyapi.sensetime.*
 import io.agora.rtc2.Constants
 import io.agora.rtc2.video.CameraCapturerConfiguration
-import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.TimeUtils
@@ -26,6 +26,7 @@ import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
 import io.agora.scene.show.debugSettings.DebugSettingDialog
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.widget.BeautyDialog
+import io.agora.scene.show.widget.DevicePresetDialog
 import io.agora.scene.show.widget.PictureQualityDialog
 import io.agora.scene.show.widget.PresetDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
@@ -90,14 +91,29 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         }
         binding.tvSetting.setOnClickListener {
             if (AgoraApplication.the().isDebugModeOpen) {
-                showDebugModeDialog()
+                showDevicePresetDialog()
             } else {
                 showPresetDialog()
             }
         }
+        mBeautyProcessor.initialize(
+            rtcEngine = mRtcEngine,
+            captureMode = CaptureMode.Custom,
+            statsEnable = true,
+            eventCallback = object : IEventCallback {
+                override fun onBeautyStats(stats: BeautyStats) {
+                }
+            }
+        )
+        mBeautyProcessor.setBeautyEnable(true)
+        mBeautyProcessor.getSenseTimeBeautyAPI().setupLocalVideo(SurfaceView(this).apply {
+            binding.flVideoContainer.addView(this)
+        }, Constants.RENDER_MODE_HIDDEN)
+
         toggleVideoRun = Runnable {
             mBeautyProcessor.reset()
             initRtcEngine()
+            //getDeviceScoreAndUpdateVideoProfile()
             showPresetDialog()
         }
         requestCameraPermission(true)
@@ -118,7 +134,8 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         }
     }
 
-    private fun showPresetDialog() = PresetDialog(this).show()
+    private fun showPresetDialog() = PresetDialog(this, mRtcEngine.queryDeviceScore()).show()
+    private fun showDevicePresetDialog() = DevicePresetDialog(this, mRtcEngine.queryDeviceScore()).show()
     private fun showDebugModeDialog() = DebugSettingDialog(this).show()
 
     override fun onResume() {
@@ -134,13 +151,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
     private fun initRtcEngine() {
-        val videoCanvas = VideoCanvas(SurfaceView(this).apply {
-            binding.flVideoContainer.addView(this)
-        })
-        videoCanvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
-        mRtcEngine.setupLocalVideo(
-            videoCanvas
-        )
         val cacheQualityResolution = PictureQualityDialog.getCacheQualityResolution()
         mRtcEngine.setCameraCapturerConfiguration(
             CameraCapturerConfiguration(
@@ -151,7 +161,21 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 )
             )
         )
-        mRtcEngine.startPreview()
+//        mRtcEngine.startPreview()
+    }
+
+    private fun getDeviceScoreAndUpdateVideoProfile() {
+        val deviceScore = mRtcEngine.queryDeviceScore()
+        if (deviceScore >= 85) {
+            ToastUtils.showToast("高端机：$deviceScore")
+            VideoSetting.updateBroadcastSetting(VideoSetting.DeviceLevel.High)
+        } else if (deviceScore >= 60) {
+            ToastUtils.showToast("中端机：$deviceScore")
+            VideoSetting.updateBroadcastSetting(VideoSetting.DeviceLevel.Medium)
+        } else {
+            ToastUtils.showToast("低端机：$deviceScore")
+            VideoSetting.updateBroadcastSetting(VideoSetting.DeviceLevel.Low)
+        }
     }
 
     private fun showPictureQualityDialog() {
@@ -208,9 +232,11 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
 
-    private fun getRandomRoomId() = (Random(TimeUtils.currentTimeMillis()).nextInt(10000) + 100000).toString()
+    private fun getRandomRoomId() =
+        (Random(TimeUtils.currentTimeMillis()).nextInt(10000) + 100000).toString()
 
-    private fun getRandomThumbnailId() = Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
+    private fun getRandomThumbnailId() =
+        Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
 
     @DrawableRes
     private fun getThumbnailIcon(thumbnailId: String) = when (thumbnailId) {

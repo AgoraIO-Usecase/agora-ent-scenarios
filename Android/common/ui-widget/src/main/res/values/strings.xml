@@ -47,4 +47,6 @@
     <string name="comm_permission_leak_other_content">Please turn on the permission required to run in the settings.</string>
     <string name="comm_setting">Setting</string>
 
+    <string name="comm_try_again">请重试</string>
+
 </resources>

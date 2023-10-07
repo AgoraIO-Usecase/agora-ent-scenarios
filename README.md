@@ -16,6 +16,9 @@
 * 秀场直播
     * [Android](Android/scenes/show)
     * [iOS](iOS/AgoraEntScenarios/Scenes/Show)
+* 1v1私密房
+    * [Android](Android/scenes/pure1v1)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/Pure1v1)
 
 >
 > Demo 效果:
@@ -35,6 +38,9 @@
 * 运行秀场直播项目，请参考以下流程
     * [Android](Android/scenes/show)
     * [iOS](iOS/AgoraEntScenarios/Scenes/Show)
+* 运行1v1私密房项目，请参考以下流程
+    * [Android](Android/scenes/pure1v1)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/Pure1v1)
 
 # 2. FAQ
 

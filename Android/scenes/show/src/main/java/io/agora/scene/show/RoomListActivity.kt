@@ -2,17 +2,22 @@ package io.agora.scene.show
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import io.agora.scene.base.Constant
+import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowRoomItemBinding
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
-import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
 import io.agora.scene.show.widget.OnPresetAudienceDialogCallBack
 import io.agora.scene.show.widget.PresetAudienceDialog
 import io.agora.scene.widget.basic.BindingSingleAdapter
@@ -25,10 +30,15 @@ class RoomListActivity : AppCompatActivity() {
     private lateinit var mRoomAdapter: BindingSingleAdapter<ShowRoomDetailModel, ShowRoomItemBinding>
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
 
+    private val roomDetailModelList = mutableListOf<ShowRoomDetailModel>()
+
+    private var isFirstLoad = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, true)
         setContentView(mBinding.root)
+        fetchService()
         initView()
     }
 
@@ -46,13 +56,44 @@ class RoomListActivity : AppCompatActivity() {
             }
         }
         mBinding.rvRooms.adapter = mRoomAdapter
+        mBinding.rvRooms.addOnScrollListener(object : OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) { // 停止状态
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val firstVisibleItem = layoutManager.findFirstVisibleItemPosition() // 第一个可见 item
+                    val lastVisibleItem = layoutManager.findLastVisibleItemPosition()  // 最后一个可见 item
+                    Log.d("RoomListActivity", "firstVisible $firstVisibleItem, lastVisible $lastVisibleItem")
+                    val firstPreloadPosition = if (firstVisibleItem - 7 < 0) 0 else firstVisibleItem - 7
+                    val lastPreloadPosition = if (firstPreloadPosition + 19 >= roomDetailModelList.size)
+                        roomDetailModelList.size - 1 else firstPreloadPosition + 19
+                    preloadChannels(firstPreloadPosition, lastPreloadPosition)
+                }
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+            }
+        })
 
         mBinding.smartRefreshLayout.setEnableLoadMore(false)
         mBinding.smartRefreshLayout.setEnableRefresh(true)
         mBinding.smartRefreshLayout.setOnRefreshListener {
             mService.getRoomList(
-                { runOnUiThread { updateList(it) } },
-                { runOnUiThread { updateList(emptyList()) } })
+                success = {
+                    roomDetailModelList.clear()
+                    roomDetailModelList.addAll(it)
+                    if (isFirstLoad) {
+                        preloadChannels()
+                        isFirstLoad = false
+                    }
+                    updateList(it)
+                },
+                error = {
+                    updateList(emptyList())
+                }
+            )
         }
         mBinding.smartRefreshLayout.autoRefresh()
 
@@ -71,7 +112,12 @@ class RoomListActivity : AppCompatActivity() {
         mBinding.smartRefreshLayout.finishRefresh()
     }
 
-    private fun updateRoomItem(list: List<ShowRoomDetailModel>, position: Int, binding: ShowRoomItemBinding, roomInfo: ShowRoomDetailModel) {
+    private fun updateRoomItem(
+        list: List<ShowRoomDetailModel>,
+        position: Int,
+        binding: ShowRoomItemBinding,
+        roomInfo: ShowRoomDetailModel
+    ) {
         binding.tvRoomName.text = roomInfo.roomName
         binding.tvRoomId.text = getString(R.string.show_room_id, roomInfo.roomId)
         binding.tvUserCount.text = getString(R.string.show_user_count, roomInfo.roomUserCount)
@@ -89,19 +135,23 @@ class RoomListActivity : AppCompatActivity() {
 
     private fun goLiveDetailActivity(list: List<ShowRoomDetailModel>, position: Int, roomInfo: ShowRoomDetailModel) {
         // 进房前设置一些必要的设置
-        if (!SPUtil.getBoolean(Constant.IS_SET_SETTING, false)) {
-            PresetAudienceDialog(this, false).apply {
-                callBack = object : OnPresetAudienceDialogCallBack {
-                    override fun onClickConfirm() {
-                        SPUtil.putBoolean(Constant.IS_SET_SETTING, true)
-                        goLiveDetailActivity(list, position, roomInfo)
-                    }
-                }
-                show()
-            }
-            return
+        VideoSetting.setCurrAudienceEnhanceSwitch(true)
+        VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_AUTO)
+        val deviceScore = RtcEngineInstance.rtcEngine.queryDeviceScore()
+        val deviceLevel = if (deviceScore >= 85) {
+            VideoSetting.DeviceLevel.High
+        } else if (deviceScore >= 60) {
+            VideoSetting.DeviceLevel.Medium
+        } else {
+            VideoSetting.DeviceLevel.Low
         }
-        LiveDetailActivity.launch(this, ArrayList(list), position, roomInfo.ownerId != UserManager.getInstance().user.id.toString())
+        VideoSetting.updateBroadcastSetting(deviceLevel = deviceLevel, isByAudience = true)
+        LiveDetailActivity.launch(
+            this,
+            ArrayList(list),
+            position,
+            roomInfo.ownerId != UserManager.getInstance().user.id.toString()
+        )
     }
 
     private fun showAudienceSetting() {
@@ -112,5 +162,54 @@ class RoomListActivity : AppCompatActivity() {
         super.onDestroy()
         mService.destroy()
         RtcEngineInstance.destroy()
+        RtcEngineInstance.setupGeneralToken("")
+    }
+
+
+    private fun fetchService() {
+        //启动机器人
+        mService.startCloudPlayer()
+        val localUId = UserManager.getInstance().user.id.toInt()
+        //获取token
+        TokenGenerator.generateToken("", localUId.toString(),
+            TokenGenerator.TokenGeneratorType.token007,
+            TokenGenerator.AgoraTokenType.rtc,
+            success = {
+                RtcEngineInstance.setupGeneralToken(it)
+                preloadChannels()
+                ShowLogger.d("RoomListActivity", "generateToken success：$it， uid：$localUId")
+            },
+            failure = {
+                ShowLogger.e("RoomListActivity", it, "generateToken failure：$it")
+                ToastUtils.showToast(it?.message ?: "generate token failure")
+            })
+    }
+
+    private fun preloadChannels() {
+        val generalToken = RtcEngineInstance.generalToken()
+        if (roomDetailModelList.isNotEmpty() && generalToken.isNotEmpty()) {
+            // sdk 最多 preload 20个频道，超过 20 个，sdk 内部维护最新的 20 个频道预加载
+            roomDetailModelList.take(20).forEach { room ->
+                val ret = RtcEngineInstance.rtcEngine.preloadChannel(
+                    generalToken, room.roomId, UserManager.getInstance().user.id.toInt()
+                )
+                Log.d("RoomListActivity", "call rtc sdk preloadChannel ${room.roomId} ret:$ret")
+            }
+        }
+    }
+
+    private fun preloadChannels(from: Int, to: Int) {
+        val generalToken = RtcEngineInstance.generalToken()
+        if (roomDetailModelList.isNotEmpty() && generalToken.isNotEmpty()) {
+            val size = roomDetailModelList.size
+            for (i in from until to + 1) {
+                if (i >= size) return
+                val room = roomDetailModelList[i]
+                val ret = RtcEngineInstance.rtcEngine.preloadChannel(
+                    generalToken, room.roomId, UserManager.getInstance().user.id.toInt()
+                )
+                Log.d("RoomListActivity", "call rtc sdk preloadChannel ${room.roomId} ret:$ret")
+            }
+        }
     }
 }

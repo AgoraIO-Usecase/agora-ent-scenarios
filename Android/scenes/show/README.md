@@ -66,6 +66,8 @@ if(!isShowEmpty){
   > 
   > - 将SenseArSourceManager-release.aar放在**scenes/show/aars/SenseArSourceManager**目录下
   > 
+  > - HardwareBuffer-release.aar放在**scenes/show/aars/HardwareBuffer**目录下
+  > 
   > - 将SDK里的资源文件复制到**scenes/show/src/main/assets** 目录下。这个项目用到的资源文件列举如下：
   >   
   >   - license/SenseME.lic : 证书资源

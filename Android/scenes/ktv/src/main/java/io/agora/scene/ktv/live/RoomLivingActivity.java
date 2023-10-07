@@ -191,11 +191,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     RoomSelSongModel songModel = roomLivingViewModel.songPlayingLiveData.getValue();
                     if (songModel != null) {
                         if (item.getUserNo().equals(songModel.getUserNo())) {
-                            binding.tvZC.setText("主唱");
+                            binding.tvZC.setText(R.string.ktv_zc);
                             binding.tvHC.setVisibility(View.GONE);
                             binding.tvZC.setVisibility(View.VISIBLE);
                         } else if (item.getChorusSongCode() != null && !item.getUserNo().equals(songModel.getUserNo()) && item.getChorusSongCode().equals(songModel.getSongNo() + songModel.getCreateAt())) {
-                            binding.tvHC.setText("合唱");
+                            binding.tvHC.setText(R.string.ktv_hc);
                             binding.tvZC.setVisibility(View.GONE);
                             binding.tvHC.setVisibility(View.VISIBLE);
                         } else {
@@ -754,7 +754,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     private void showChangeMusicDialog() {
         if (UiUtils.isFastClick(2000)) {
-            ToastUtils.showToast("操作太频繁");
+            ToastUtils.showToast("Too fast");
             return;
         }
         if (changeMusicDialog == null) {

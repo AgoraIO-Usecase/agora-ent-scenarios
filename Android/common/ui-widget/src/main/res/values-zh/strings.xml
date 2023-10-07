@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="room_has_close">房主已解散房间，请确认离开房间</string>
+    <string name="confirm_to_dismiss_room">确认解散该房间吗？</string>
+    <string name="confirm_to_exit_room">确认退出该房间吗？</string>
+    <string name="exit_room">退出房间</string>
+    <string name="dismiss_room">解散房间</string>
+
+    <string name="cancel">取消</string>
+    <string name="close">关闭</string>
+    <string name="agree">同意</string>
+    <string name="disagree">不同意</string>
+    <string name="confirm">确认</string>
+
+    <string name="edit_name">修改昵称</string>
+    <string name="input_edit_name">请输入昵称</string>
+    <string name="input_password">请输入房间密码</string>
+
+    <string name="i_know">我知道了</string>
+
+    <string name="avatar">头像</string>
+
+    <string name="select_from_album">相册中选择</string>
+    <string name="photograph">拍照</string>
+    <string name="complete_validation">完成验证</string>
+    <string name="drag_complete">拖动下方滑块完成拼图</string>
+
+    <string name="privacy_protection_tip1">声动互娱软件是一款用于向声网客户展示产品使用效果的测试产品，仅用于测试产品的功能、性能和可用性，而非提供给大众使用的正式产品。\n1.我们将依据《用户协议》及《隐私政策》来帮助您了解我们在收集、使用、存储您个人信息的情况以及您享有的相关权利。\n2.在您使用本测试软件时，我们将收集您的设备信息、日志信息等，同时根据不同使用场景，你可以授予我们获取您设备的麦克风权限、摄像头权限等信息。\n\n您可通过阅读完整的《用户协议》及《隐私政策》来了解详细信息。</string>
+    <string name="privacy_protection_tip2">同意 用户协议 及 隐私政策 后，声动互娱才能为您提供协作服务。</string>
+
+    <string name="send_v_code">发送验证码</string>
+    <string name="i_agree">我已阅读并同意</string>
+    <string name="ktv_online">在线K歌房</string>
+
+    <string name="time_up_exit_room">您已体验超过20分钟，当前房间已过期，请退出重新创建房间</string>
+    <string name="expire_exit_room">当前房间已过期，请退出</string>
+
     <string name="report_room">举报</string>
     <string name="report_room_success">举报成功</string>
 
@@ -13,5 +48,6 @@
     <string name="comm_permission_leak_other_title">没有运行所需权限</string>
     <string name="comm_permission_leak_other_content">请在设置中打开运行所需权限</string>
     <string name="comm_setting">设置</string>
+    <string name="comm_try_again">请重试</string>
 
 </resources>

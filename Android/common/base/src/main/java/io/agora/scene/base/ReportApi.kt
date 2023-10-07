@@ -29,31 +29,31 @@ object ReportApi {
 
     // 进入场景
     @JvmStatic
-    fun reportEnter(repostScene: AgoraScene, success: ((Boolean) -> Unit), failure: ((Exception?) -> Unit)? = null) {
-        report("entryScene", repostScene, success, failure)
+    fun reportEnter(sceneName: String, success: ((Boolean) -> Unit), failure: ((Exception?) -> Unit)? = null) {
+        report("entryScene", sceneName, success, failure)
     }
 
     private fun report(
-        eventName: String, repostScene: AgoraScene,
+        eventName: String, sceneName: String,
         success: ((Boolean) -> Unit)? = null, failure: ((Exception?) -> Unit)? = null
     ) {
         scope.launch(Dispatchers.Main) {
             try {
-                success?.invoke(fetchReport(eventName, repostScene))
+                success?.invoke(fetchReport(eventName, sceneName))
             } catch (e: Exception) {
                 failure?.invoke(e)
             }
         }
     }
 
-    private suspend fun fetchReport(eventName: String, repostScene: AgoraScene) = withContext(Dispatchers.IO) {
+    private suspend fun fetchReport(eventName: String, sceneName: String) = withContext(Dispatchers.IO) {
 
         val postBody = JSONObject()
         val ptsObject = JSONObject().apply {
             put("m", "event")
             put("ls", JSONObject().apply {
                 put("name", eventName)
-                put("project", repostScene.name)
+                put("project", sceneName)
                 put("version", BuildConfig.APP_VERSION_NAME)
                 put("platform", "Android")
                 put("model", Build.MODEL)
