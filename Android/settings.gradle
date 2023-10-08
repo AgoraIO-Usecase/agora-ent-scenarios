@@ -47,3 +47,7 @@ include ':scenes:show'
 include ':scenes:show:aars:SenseArSourceManager'
 include ':scenes:show:aars:STMobileJNI'
 include ':scenes:show:aars:HardwareBuffer'
+/*
+ * 1V1私密房
+ */
+include ':scenes:pure1v1'

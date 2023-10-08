@@ -19,6 +19,9 @@
 * 嗨歌抢唱
     * [Android](Android/scenes/ktv_singbattle)
     * [iOS](iOS/AgoraEntScenarios/Scenes/SBG)
+* 1v1私密房
+    * [Android](Android/scenes/pure1v1)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/Pure1v1)
 
 >
 > Demo 效果:
@@ -40,6 +43,9 @@
 * 运行嗨歌抢唱项目，请参考以下流程
     * [Android](Android/scenes/ktv_singbattle)
     * [iOS](iOS/AgoraEntScenarios/Scenes/SBG)
+* 运行1v1私密房项目，请参考以下流程
+    * [Android](Android/scenes/pure1v1)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/Pure1v1)
 
 # 2. FAQ
 

@@ -37,6 +37,7 @@
     <string name="app_meta_live">Meta Live</string>
     <string name="app_meta_chatting">Yuanyu chat</string>
     <string name="app_interactive_games">interactive game</string>
+    <string name="app_one_to_one">1V1PrivateRoom</string>
     <string name="app_coming_soon">Stay tuned</string>
     <string name="app_voice_chat_spatial">Spatial Audio</string>
     <string name="app_voice_chat_spatialTip">— Spatial Audio mode</string>
@@ -49,6 +50,7 @@
     <string name="app_about_karaoke">Karaoke</string>
     <string name="app_about_show">Show</string>
     <string name="app_about_singbattle">SingBattle</string>
+    <string name="app_about_pure1v1">1v1PrivateVideoChat</string>
     <string name="app_about_customer_service">Customer Service</string>
     <string name="app_about_official_website">Official Website</string>
     <string name="app_about_phone_cancel">Cancel</string>
