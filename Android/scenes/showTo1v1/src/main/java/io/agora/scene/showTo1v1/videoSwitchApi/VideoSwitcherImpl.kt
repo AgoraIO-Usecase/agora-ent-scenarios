@@ -170,6 +170,15 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
         return true
     }
 
+    override fun resetRemoteVideo(connection: RtcConnection, container: VideoSwitcher.VideoCanvasContainer) {
+        remoteVideoCanvasList.firstOrNull {
+            it.connection.channelId == connection.channelId && it.uid == container.uid && it.renderMode == container.renderMode && it.lifecycleOwner == container.lifecycleOwner
+        }?.let {
+            it.release()
+            setupRemoteVideo(connection, container)
+        }
+    }
+
     override fun setupRemoteVideo(
         connection: RtcConnection,
         container: VideoSwitcher.VideoCanvasContainer
@@ -182,7 +191,6 @@ class VideoSwitcherImpl constructor(private val rtcEngine: RtcEngineEx) : VideoS
             if (viewIndex == container.viewIndex) {
                 ShowTo1v1Logger.d("hugo", "setupRemoteVideoEx111")
                 rtcEngine.setupRemoteVideoEx(it, it.connection)
-                videoView.requestLayout()
                 return
             }
             it.release()

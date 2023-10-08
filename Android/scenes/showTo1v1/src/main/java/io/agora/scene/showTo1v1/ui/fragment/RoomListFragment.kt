@@ -179,6 +179,15 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         }
     }
 
+    fun onResetPage(){
+        activity?.let {
+            mRtcVideoSwitcher.resetRemoteVideo(
+                mMainRtcConnection,
+                VideoSwitcher.VideoCanvasContainer(it, binding.layoutVideoContainer, mRoomInfo.userId.toInt())
+            )
+        }
+    }
+
     private fun startLoadPage(isScrolling: Boolean) {
         isPageLoaded = true
 

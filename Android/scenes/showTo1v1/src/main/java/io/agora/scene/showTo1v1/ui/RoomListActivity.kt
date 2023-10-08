@@ -58,7 +58,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
 
     private var mFragmentAdapter: FragmentStateAdapter? = null
-    private val mRoomInfoList = mutableListOf<ShowTo1v1RoomInfo>()
+    private var mRoomInfoList = mutableListOf<ShowTo1v1RoomInfo>()
 
     private val mVpFragments = SparseArray<RoomListFragment>()
     private var mCurrLoadPosition = POSITION_NONE
@@ -156,7 +156,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     }
 
     private fun initOrUpdateViewPage() {
-        if (mFragmentAdapter == null && mRoomInfoList.size > 0) {
+        if (mRoomInfoList.size > 0) {
             // 设置预加载
             val preloadCount = 3
             binding.viewPager2.offscreenPageLimit = preloadCount - 2
@@ -185,11 +185,14 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2, false)
             mCurrLoadPosition = binding.viewPager2.currentItem
         } else {
-            mFragmentAdapter?.let {
-                it.notifyDataSetChanged()
-                binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2, false)
-                mCurrLoadPosition = binding.viewPager2.currentItem
-            }
+//            mFragmentAdapter?.let {
+//                it.notifyDataSetChanged()
+//                binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2, false)
+//                mCurrLoadPosition = binding.viewPager2.currentItem
+//                binding.viewPager2.postDelayed({
+//                    mVpFragments[mCurrLoadPosition]?.onResetPage()
+//                }, 500)
+//            }
         }
     }
 
@@ -264,12 +267,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         binding.titleView.rightIcon.isEnabled = false
 
         mService.getRoomList(completion = { error, roomList ->
-            mCurrLoadPosition = POSITION_NONE
-            // 强制离开所有频道
-            mLoadConnection = false
             mRoomInfoList.clear()
             mRoomInfoList.addAll(roomList)
             updateListView()
+            resetViewpage()
             initOrUpdateViewPage()
             ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
             binding.root.postDelayed({
@@ -278,6 +279,13 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             }, 500)
             mayShowGuideView()
         })
+    }
+
+    private fun resetViewpage(){
+        mVpFragments.clear()
+        mCurrLoadPosition = POSITION_NONE
+        mLoadConnection = false
+        binding.viewPager2.unregisterOnPageChangeCallback(onPageChangeCallback)
     }
 
     private fun updateListView() {
