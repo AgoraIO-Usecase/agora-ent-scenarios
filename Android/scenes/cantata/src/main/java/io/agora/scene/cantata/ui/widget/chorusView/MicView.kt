@@ -21,11 +21,12 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.transition.Transition
 import io.agora.scene.base.GlideApp
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataViewMicBinding
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 import kotlin.math.pow
 
 class MicView @JvmOverloads constructor(
@@ -53,11 +54,17 @@ class MicView @JvmOverloads constructor(
             mBinding.ivUserAvatar.setImageResource(R.drawable.cantata_ic_seat)
             return
         }
-        GlideApp.with(this)
+        GlideApp.with(mBinding.ivUserAvatar.context)
             .load(url)
             .error(R.mipmap.userimage)
-            .transform(CenterCropRoundCornerTransform(100))
-            .into(mBinding.ivUserAvatar)
+            .into(object : CustomTarget<Drawable>() {
+                override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                    mBinding.ivUserAvatar.setImageDrawable(resource)
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
+                }
+            })
     }
 
     fun getMicTextView(): TextView {

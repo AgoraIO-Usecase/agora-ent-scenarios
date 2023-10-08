@@ -21,12 +21,12 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
-        android:paddingTop="3dp"
         android:textColor="#99FFFFFF"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivUserAvatar"
+        app:layout_constraintBottom_toBottomOf="parent"
         tools:text="@string/cantata_zc"
         tools:textColor="@color/black" />
 
