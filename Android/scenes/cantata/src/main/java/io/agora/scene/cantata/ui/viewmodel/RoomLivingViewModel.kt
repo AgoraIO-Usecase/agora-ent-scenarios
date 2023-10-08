@@ -301,7 +301,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mSeatListLiveData.postValue(seatsArray)
         for (roomSeatModel in seatsArray) {
             if (roomSeatModel.userNo == UserManager.getInstance().user.id.toString()) {
-                mSeatLocalLiveData.setValue(roomSeatModel)
+                mSeatLocalLiveData.postValue(roomSeatModel)
                 mIsOnSeat = true
                 if (mRtcEngine != null) {
                     mMainChannelMediaOption.publishCameraTrack =
@@ -317,9 +317,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 break
             }
         }
-        if (mSeatLocalLiveData.value == null) {
-            mSeatLocalLiveData.value = null
-        }
+//        if (mSeatLocalLiveData.value == null) {
+//            mSeatLocalLiveData.value = null
+//        }
         mCantataServiceProtocol.subscribeSeatListChanged { ktvSubscribe: CantataServiceProtocol.KTVSubscribe,
                                                     roomSeatModel: RoomSeatModel? ->
             val roomSeat = roomSeatModel ?: return@subscribeSeatListChanged
@@ -331,7 +331,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
                 mSeatListLiveData.postValue(value)
                 if (roomSeat.userNo == UserManager.getInstance().user.id.toString()) {
-                    mSeatLocalLiveData.setValue(roomSeat)
+                    mSeatLocalLiveData.postValue(roomSeat)
                     updateVolumeStatus(roomSeat.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE)
                 }
             } else if (ktvSubscribe == CantataServiceProtocol.KTVSubscribe.KTVSubscribeUpdated) {
@@ -351,7 +351,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     value.add(index, roomSeat)
                     mSeatListLiveData.postValue(value)
                     if (roomSeat.userNo == UserManager.getInstance().user.id.toString()) {
-                        mSeatLocalLiveData.value = roomSeat
+                        mSeatLocalLiveData.postValue(roomSeat)
                         updateVolumeStatus(roomSeat.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE)
                     }
                 }
