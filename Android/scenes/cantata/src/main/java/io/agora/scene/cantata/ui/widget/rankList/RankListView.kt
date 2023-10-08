@@ -10,17 +10,19 @@ import io.agora.scene.cantata.databinding.CantataLayoutGameRankListViewBinding
 import java.text.DecimalFormat
 import java.text.NumberFormat
 
-class RankListView constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     FrameLayout(context, attrs, defStyleAttr) {
-    private lateinit var mBinding: CantataLayoutGameRankListViewBinding
     private val mAdapter = RankListAdapter()
+
+    private val mBinding: CantataLayoutGameRankListViewBinding by lazy {
+        CantataLayoutGameRankListViewBinding.inflate(LayoutInflater.from(context), this, true)
+    }
 
     init {
         init(context)
     }
 
     private fun init(context: Context) {
-        mBinding = CantataLayoutGameRankListViewBinding.inflate(LayoutInflater.from(context), this, true)
         mBinding.rvRankList.adapter = mAdapter
     }
 
