@@ -15,7 +15,6 @@ import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.event.NetWorkEvent
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.LiveDataUtils
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.api.ApiManager
@@ -37,7 +36,6 @@ import io.agora.scene.cantata.ui.widget.song.SongDialog
 import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
-import io.agora.scene.widget.utils.UiUtils
 import java.util.concurrent.Executors
 
 class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBinding>() {
@@ -317,7 +315,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
                 }
                 binding.groupResult.visibility = View.VISIBLE
                 if (binding.lrcControlView.role == LrcControlView.Role.Singer) {
-                    mRoomLivingViewModel.syncSingingAverageScore(sc.toDouble())
+//                    mRoomLivingViewModel.syncSingingAverageScore(sc.toDouble())
                 }
             } else {
                 if (binding.lrcControlView.role != LrcControlView.Role.Listener) return@observe
@@ -339,6 +337,9 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
         mRoomLivingViewModel.mNetworkStatusLiveData.observe(this) { netWorkStatus: NetWorkEvent ->
             setNetWorkStatus(netWorkStatus.txQuality, netWorkStatus.rxQuality)
+        }
+        mRoomLivingViewModel.mRoundRankListLiveData.observe(this){ showRank:Boolean ->
+            binding.rankListView.isVisible = showRank
         }
     }
 

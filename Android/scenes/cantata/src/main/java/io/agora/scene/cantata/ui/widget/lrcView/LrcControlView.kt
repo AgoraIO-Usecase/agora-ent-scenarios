@@ -112,15 +112,18 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
                 index: Int,
                 total: Int
             ) {
-                if (mRole == Role.Singer) {
+//                if (mRole == Role.Singer) {
+//                    mOnKaraokeActionListener?.onLineFinished(line, score, cumulativeScore, index, total)
+//                } else if (mRole == Role.CoSinger) {
+//                    chorusScore += score
+//                    updateScore(
+//                        score.toDouble(), chorusScore.toDouble(),
+//                        /** Workaround(Hai_Guo) */
+//                        (total * 100).toDouble()
+//                    )
+//                }
+                if (mRole == Role.Singer || mRole == Role.CoSinger) {
                     mOnKaraokeActionListener?.onLineFinished(line, score, cumulativeScore, index, total)
-                } else if (mRole == Role.CoSinger) {
-                    chorusScore += score
-                    updateScore(
-                        score.toDouble(), chorusScore.toDouble(),
-                        /** Workaround(Hai_Guo) */
-                        (total * 100).toDouble()
-                    )
                 }
             }
         })
@@ -450,11 +453,11 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
 
     fun onReceiveSingleLineScore(score: Int, index: Int, cumulativeScore: Int, total: Int) {
         if (mRole == Role.Listener) {
-            updateScore(
-                score.toDouble(), cumulativeScore.toDouble(),
-                /** Workaround(Hai_Guo) */
-                total.toDouble()
-            )
+//            updateScore(
+//                score.toDouble(), cumulativeScore.toDouble(),
+//                /** Workaround(Hai_Guo) */
+//                total.toDouble()
+//            )
         }
     }
 

@@ -103,7 +103,12 @@ interface CantataServiceProtocol {
     fun updateSeatVideoMuteStatus(mute: Boolean, completion: (error: Exception?) -> Unit)
 
     /**
-     * 定位麦位变化
+     * 更新麦位分数
+     */
+    fun updateSeatScoreStatus(score:Int,completion: (error: Exception?) -> Unit)
+
+    /**
+     * 订阅麦位变化
      */
     fun subscribeSeatListChanged(changedBlock: (KTVSubscribe, RoomSeatModel?) -> Unit)
 

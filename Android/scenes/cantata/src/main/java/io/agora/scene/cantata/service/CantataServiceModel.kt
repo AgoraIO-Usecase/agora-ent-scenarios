@@ -47,7 +47,7 @@ data class RoomSeatModel constructor(
     var chorusSongCode: String = "",// 是否合唱
     var isAudioMuted: Int,// 是否静音
     var isVideoMuted: Int,// 是否开启视频
-    val score:Int,
+    var score:Int,
     val isOwner:Boolean = false
 
 ) : Serializable {
