@@ -11,7 +11,7 @@
         android:id="@+id/ivChorusNum"
         android:layout_width="36dp"
         android:layout_height="wrap_content"
-        android:src="@drawable/cantata_num_one"
+        android:src="@drawable/cantata_rank_one"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
