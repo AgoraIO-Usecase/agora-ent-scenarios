@@ -320,12 +320,12 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         if (mSeatLocalLiveData.value == null) {
             mSeatLocalLiveData.value = null
         }
-        mCantataServiceProtocol.subscribeSeatList { ktvSubscribe: CantataServiceProtocol.KTVSubscribe,
+        mCantataServiceProtocol.subscribeSeatListChanged { ktvSubscribe: CantataServiceProtocol.KTVSubscribe,
                                                     roomSeatModel: RoomSeatModel? ->
-            val roomSeat = roomSeatModel ?: return@subscribeSeatList
+            val roomSeat = roomSeatModel ?: return@subscribeSeatListChanged
             if (ktvSubscribe == CantataServiceProtocol.KTVSubscribe.KTVSubscribeCreated) {
                 CantataLogger.d(TAG, "subscribeRoomStatus KTVSubscribeCreated")
-                val oValue: List<RoomSeatModel> = mSeatListLiveData.value ?: return@subscribeSeatList
+                val oValue: List<RoomSeatModel> = mSeatListLiveData.value ?: return@subscribeSeatListChanged
                 val value: MutableList<RoomSeatModel> = ArrayList(oValue)
                 value.add(roomSeat)
 
@@ -336,7 +336,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 }
             } else if (ktvSubscribe == CantataServiceProtocol.KTVSubscribe.KTVSubscribeUpdated) {
                 CantataLogger.d(TAG, "subscribeRoomStatus KTVSubscribeUpdated")
-                val oValue: List<RoomSeatModel> = mSeatListLiveData.value ?: return@subscribeSeatList
+                val oValue: List<RoomSeatModel> = mSeatListLiveData.value ?: return@subscribeSeatListChanged
                 val value: MutableList<RoomSeatModel> = ArrayList<RoomSeatModel>(oValue)
                 var index = -1
                 for (i in value.indices) {
@@ -357,7 +357,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 }
             } else if (ktvSubscribe == CantataServiceProtocol.KTVSubscribe.KTVSubscribeDeleted) {
                 CantataLogger.d(TAG, "subscribeRoomStatus KTVSubscribeDeleted")
-                val oValue: List<RoomSeatModel> = mSeatListLiveData.value ?: return@subscribeSeatList
+                val oValue: List<RoomSeatModel> = mSeatListLiveData.value ?: return@subscribeSeatListChanged
                 val value: MutableList<RoomSeatModel> = ArrayList(oValue)
                 val iterator: MutableIterator<RoomSeatModel> = value.iterator()
                 while (iterator.hasNext()) {
@@ -381,7 +381,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     }
 
                     updateVolumeStatus(false)
-                    val songPlayingData: RoomSelSongModel = mSongPlayingLiveData.value ?: return@subscribeSeatList
+                    val songPlayingData: RoomSelSongModel = mSongPlayingLiveData.value ?: return@subscribeSeatListChanged
                     if (roomSeat.chorusSongCode == songPlayingData.songNo + songPlayingData.createAt) {
                         mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
                         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
@@ -782,7 +782,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             ToastUtils.showToast(R.string.cantata_join_chorus_failed)
             return
         }
-        val musicModel: RoomSelSongModel? = mSongPlayingLiveData.getValue()
+        val musicModel: RoomSelSongModel? = mSongPlayingLiveData.value
         if (musicModel == null) {
             CantataLogger.e(TAG, "RoomLivingViewModel.joinChorus() failed, no song playing now")
             mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
