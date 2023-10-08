@@ -124,6 +124,11 @@ interface CantataServiceProtocol {
     )
 
     /**
+     * 标记歌曲已唱完-》显示结算页面
+     */
+    fun markSongEnded(inputModel: RoomSelSongModel, completion: (error: Exception?) -> Unit)
+
+    /**
      * 点歌
      */
     fun chooseSong(

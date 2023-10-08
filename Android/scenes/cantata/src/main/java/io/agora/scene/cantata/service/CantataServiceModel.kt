@@ -133,7 +133,8 @@ data class RoomSelSongModel constructor(
     // 排序字段
     val status: Int, // 0 未开始 1.已唱 2.正在唱
     val createAt: Long,
-    val pinAt: Double
+    val pinAt: Double,
+    val musicEnded: Boolean = false
 ) {
     companion object {
         val STATUS_IDLE = 0
