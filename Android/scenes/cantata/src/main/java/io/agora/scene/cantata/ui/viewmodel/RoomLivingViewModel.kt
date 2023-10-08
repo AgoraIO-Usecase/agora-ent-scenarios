@@ -1,5 +1,6 @@
 package io.agora.scene.cantata.ui.viewmodel
 
+import android.os.Build
 import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -50,9 +51,10 @@ import io.agora.scene.cantata.service.ScoringAlgoControlModel
 import io.agora.scene.cantata.service.ScoringAverageModel
 import io.agora.scene.cantata.ui.dialog.MusicSettingBean
 import io.agora.scene.cantata.ui.dialog.MusicSettingCallback
-import io.agora.scene.cantata.ui.dialog.MusicSettingDialog
+import io.agora.scene.cantata.ui.widget.rankList.RankItem
 import org.json.JSONException
 import org.json.JSONObject
+import java.util.concurrent.atomic.AtomicInteger
 
 class LineScore {
     var score = 0
@@ -142,6 +144,11 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     // 合唱人数
     val mPlayerNumLiveData = MutableLiveData<Int>()
+
+    // 是否显示结算页面
+    val mRoundRankListLiveData = MutableLiveData<Boolean>()
+
+    private val mRankMap: Map<String, RankItem> = mutableMapOf()
 
     /**
      * Rtc引擎
@@ -239,7 +246,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             ?: throw RuntimeException("The roomInfo must be not null before initSeats method calling!")
         mRoomUserCountLiveData.postValue(roomInfo.roomPeopleNum)
         mCantataServiceProtocol.subscribeRoomStatusChanged { ktvSubscribe: CantataServiceProtocol.KTVSubscribe,
-                                                      vlRoomListModel: RoomListModel? ->
+                                                             vlRoomListModel: RoomListModel? ->
             if (ktvSubscribe == CantataServiceProtocol.KTVSubscribe.KTVSubscribeDeleted) {
                 CantataLogger.d(TAG, "subscribeRoomStatus KTVSubscribeDeleted")
                 mRoomDeleteLiveData.postValue(true)
@@ -321,7 +328,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 //            mSeatLocalLiveData.value = null
 //        }
         mCantataServiceProtocol.subscribeSeatListChanged { ktvSubscribe: CantataServiceProtocol.KTVSubscribe,
-                                                    roomSeatModel: RoomSeatModel? ->
+                                                           roomSeatModel: RoomSeatModel? ->
             val roomSeat = roomSeatModel ?: return@subscribeSeatListChanged
             if (ktvSubscribe == CantataServiceProtocol.KTVSubscribe.KTVSubscribeCreated) {
                 CantataLogger.d(TAG, "subscribeRoomStatus KTVSubscribeCreated")
@@ -381,7 +388,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     }
 
                     updateVolumeStatus(false)
-                    val songPlayingData: RoomSelSongModel = mSongPlayingLiveData.value ?: return@subscribeSeatListChanged
+                    val songPlayingData: RoomSelSongModel =
+                        mSongPlayingLiveData.value ?: return@subscribeSeatListChanged
                     if (roomSeat.chorusSongCode == songPlayingData.songNo + songPlayingData.createAt) {
                         mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
                         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
@@ -508,7 +516,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     // ======================= 歌曲相关 =======================
     fun initSongs() {
         mCantataServiceProtocol.subscribeChooseSongChanged { ktvSubscribe: CantataServiceProtocol.KTVSubscribe?,
-                                                      songModel: RoomSelSongModel? ->
+                                                             songModel: RoomSelSongModel? ->
             // 歌曲信息发生变化时，重新获取歌曲列表动作
             CantataLogger.d(TAG, "subscribeChooseSong updateSongs")
             onSongChanged()
@@ -1040,6 +1048,13 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                             mPlayerMusicPlayCompleteLiveData.postValue(ScoringAverageModel(true, 0))
                             mPlayerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET)
                         }
+                        mSongPlayingLiveData.value?.let { roomSelSongModel ->
+                            if (roomSelSongModel.userNo == UserManager.getInstance().user.userNo) {
+                                mCantataServiceProtocol.markSongEnded(roomSelSongModel, completion = {
+                                    mRoundRankListLiveData.postValue(true)
+                                })
+                            }
+                        }
                     }
 
                     else -> {}
@@ -1480,4 +1495,48 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             }
         }
     }
+
+    /**
+     * 演唱者唱完一句更新麦位中 score 数据
+     */
+    fun updateSeatScoreStatus(score: Int, cumulativeScore: Int) {
+        mCantataServiceProtocol.updateSeatScoreStatus(cumulativeScore){ e->
+            if (e == null) {
+                // success
+                CantataLogger.d(TAG, "RoomLivingViewModel.updateSeatScoreStatus() success")
+                // TODO:  
+            } else {
+                // failure
+                CantataLogger.e(TAG, "RoomLivingViewModel.updateSeatScoreStatus() failed:${e.message}")
+                ToastUtils.showToast(e.message)
+            }
+        }
+    }
+
+    fun getRankList(): List<RankItem>? {
+        val rankItemList: MutableList<RankItem> = java.util.ArrayList<RankItem>()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val i = AtomicInteger()
+            mRankMap.forEach { (uid: String?, model: RankItem) ->
+                val item = RankItem()
+                item.rank = i.get()
+                item.userName = model.userName
+                item.score = model.score
+                item.poster = model.poster
+                rankItemList.add(item)
+                i.getAndIncrement()
+            }
+        }
+        sortRank(rankItemList)
+        return rankItemList
+    }
+
+    private fun sortRank(list: List<RankItem>) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            list.sortedWith { o1: RankItem, o2: RankItem ->
+                return@sortedWith o2.score - o1.score //score大的在前面
+            }
+        }
+    }
+
 }

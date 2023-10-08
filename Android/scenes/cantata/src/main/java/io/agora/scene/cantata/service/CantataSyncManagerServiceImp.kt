@@ -460,19 +460,7 @@ class CantataSyncManagerServiceImp constructor(
                     val seatInfo = originSeatInfo.copy()
                     seatInfo.isAudioMuted =
                         if (mute) RoomSeatModel.MUTED_VALUE_TRUE else RoomSeatModel.MUTED_VALUE_FALSE
-//                    val seatInfo = RoomSeatModel(
-//                        isMaster = originSeatInfo.isMaster,
-//                        headUrl = originSeatInfo.headUrl,
-//                        userNo = originSeatInfo.userNo,
-//                        rtcUid = originSeatInfo.rtcUid,
-//                        name = originSeatInfo.name,
-//                        seatIndex = originSeatInfo.seatIndex,
-//                        chorusSongCode = originSeatInfo.chorusSongCode,
-//                        isAudioMuted = if (mute) RoomSeatModel.MUTED_VALUE_TRUE else RoomSeatModel.MUTED_VALUE_FALSE, // update this
-//                        isVideoMuted = originSeatInfo.isVideoMuted,
-//                        score = 0,
-//                        isOwner = originSeatInfo.isOwner
-//                    )
+
                     innerUpdateSeat(seatInfo, completion)
                 }
             }
@@ -490,19 +478,20 @@ class CantataSyncManagerServiceImp constructor(
                     val seatInfo = originSeatInfo.copy()
                     seatInfo.isVideoMuted =
                         if (mute) RoomSeatModel.MUTED_VALUE_TRUE else RoomSeatModel.MUTED_VALUE_FALSE
-//                    val seatInfo = RoomSeatModel(
-//                        isMaster = originSeatInfo.isMaster,
-//                        headUrl = originSeatInfo.headUrl,
-//                        userNo = originSeatInfo.userNo,
-//                        rtcUid = originSeatInfo.rtcUid,
-//                        name = originSeatInfo.name,
-//                        seatIndex = originSeatInfo.seatIndex,
-//                        chorusSongCode = originSeatInfo.chorusSongCode,
-//                        isAudioMuted = originSeatInfo.isAudioMuted,
-//                        isVideoMuted = if (mute) 1 else 0,// update this
-//                        score = originSeatInfo.score,
-//                        isOwner = originSeatInfo.isOwner
-//                    )
+
+                    innerUpdateSeat(seatInfo, completion)
+                }
+            }
+        }
+    }
+
+    override fun updateSeatScoreStatus(score: Int, completion: (error: Exception?) -> Unit) {
+        seatMap.forEach {
+            if (it.value?.userNo == UserManager.getInstance().user.id.toString()) {
+                val originSeatInfo = it.value
+                if (originSeatInfo != null) {
+                    val seatInfo = originSeatInfo.copy()
+                    seatInfo.score = score
                     innerUpdateSeat(seatInfo, completion)
                 }
             }
@@ -651,26 +640,6 @@ class CantataSyncManagerServiceImp constructor(
         songChosenList.removeAt(indexOf)
         val removeAt = objIdOfSongNo.removeAt(indexOf)
 
-//        if (isSingingSong) {
-//            seatMap.forEach {
-//                val originSeatInfo = it.value
-//                if (originSeatInfo != null) {
-//                    val seatInfo = RoomSeatModel(
-//                        originSeatInfo.isMaster,
-//                        originSeatInfo.headUrl,
-//                        originSeatInfo.userNo,
-//                        originSeatInfo.rtcUid,
-//                        originSeatInfo.name,
-//                        originSeatInfo.seatIndex,
-//                        "",
-//                        originSeatInfo.isAudioMuted,
-//                        originSeatInfo.isVideoMuted
-//                    )
-//                    innerUpdateSeat(seatInfo, completion)
-//                }
-//            }
-//        }
-
         //net request and notify others
         innerRemoveChooseSong(removeAt) {
             completion.invoke(it)
@@ -731,19 +700,6 @@ class CantataSyncManagerServiceImp constructor(
                         val seatInfo = seat.copy()
                         seatInfo.chorusSongCode = inputModel.songNo + inputModel.createAt
                         seatInfo.isAudioMuted = RoomSeatModel.MUTED_VALUE_FALSE
-//                        val seatInfo = RoomSeatModel(
-//                            isMaster = seat.isMaster,
-//                            headUrl = seat.headUrl,
-//                            userNo = seat.userNo,
-//                            rtcUid = seat.rtcUid,
-//                            name = seat.name,
-//                            seatIndex = seat.seatIndex,
-//                            chorusSongCode = inputModel.songNo + inputModel.createAt,
-//                            isAudioMuted = RoomSeatModel.MUTED_VALUE_FALSE,
-//                            isVideoMuted = seat.isVideoMuted,
-//                            score = seat.score,
-//                            isOwner = seat.isOwner
-//                        )
                         innerUpdateSeat(seatInfo, completion)
                     }
                 }
@@ -761,19 +717,7 @@ class CantataSyncManagerServiceImp constructor(
                     val seatInfo = originSeatInfo.copy()
                     seatInfo.chorusSongCode = ""
                     seatInfo.isAudioMuted = RoomSeatModel.MUTED_VALUE_TRUE
-//                    val seatInfo = RoomSeatModel(
-//                        isMaster =  originSeatInfo.isMaster,
-//                        headUrl = originSeatInfo.headUrl,
-//                        userNo = originSeatInfo.userNo,
-//                        rtcUid = originSeatInfo.rtcUid,
-//                        name = originSeatInfo.name,
-//                        seatIndex = originSeatInfo.seatIndex,
-//                         chorusSongCode = "",
-//                        isAudioMuted =RoomSeatModel.MUTED_VALUE_TRUE,
-//                        isVideoMuted = originSeatInfo.isVideoMuted,
-//                        score = originSeatInfo.score,
-//                        isOwner = originSeatInfo.isOwner
-//                    )
+
                     innerUpdateSeat(seatInfo, completion)
                 }
             }
