@@ -37,6 +37,7 @@ import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataLayoutLrcControlViewBinding
 import io.agora.scene.cantata.databinding.CantataLayoutLrcPrepareBinding
 import io.agora.scene.cantata.ktvapi.ILrcView
+import io.agora.scene.cantata.service.RoomSeatModel
 import io.agora.scene.cantata.service.RoomSelSongModel
 import io.agora.scene.cantata.ui.widget.OnClickJackingListener
 import io.agora.scene.widget.basic.OutlineSpan
@@ -455,6 +456,10 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
                 total.toDouble()
             )
         }
+    }
+
+    fun updateMicSeatModels(list: List<RoomSeatModel>?) {
+        mBinding.ilActive.chorusMicView.seatArray = list
     }
 
     interface OnKaraokeEventListener {

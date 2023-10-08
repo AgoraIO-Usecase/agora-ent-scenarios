@@ -289,6 +289,7 @@
         app:constraint_referenced_ids="bgd_control_layout_lrc,switchOriginal,ivMusicMenu,ivMusicStart,ivChangeSong,ivSkipPostlude,ivSkipPrelude" />
 
     <io.agora.scene.cantata.ui.widget.chorusView.ChorusMicView
+        android:id="@+id/chorusMicView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/ivJoinChorusBtn"

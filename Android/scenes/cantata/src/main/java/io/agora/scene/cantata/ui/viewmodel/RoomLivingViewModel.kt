@@ -1253,10 +1253,10 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     fun musicToggleOriginal() {
         mAudioTrackMode = if (mAudioTrackMode == KTVPlayerTrackMode.Origin) {
-            mKtvApi.getMediaPlayer().selectAudioTrack(1)
+            mKtvApi.getMediaPlayer().selectMultiAudioTrack(0, 0)
             KTVPlayerTrackMode.Acc
         } else {
-            mKtvApi.getMediaPlayer().selectAudioTrack(0)
+            mKtvApi.getMediaPlayer().selectMultiAudioTrack(1, 0)
             KTVPlayerTrackMode.Origin
         }
     }
