@@ -220,6 +220,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mRoomLivingViewModel.mSeatListLiveData.observe(this) { seatModels: List<RoomSeatModel>? ->
             seatModels ?: return@observe
             // TODO 前8个默认占座
+            binding.lrcControlView.updateMicSeatModels(seatModels)
             if (seatModels.size == 9) {
                 binding.lrcControlView.onSeat(true)
             } else if (seatModels.size < 9) {

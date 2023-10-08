@@ -18,10 +18,10 @@ include ':app'
 include ':common:base'
 include ':common:ui-widget'
 
-/*
- * 在线K歌房
- */
-include ':scenes:ktv'
+///*
+// * 在线K歌房
+// */
+//include ':scenes:ktv'
 
 ///*
 // * 语聊房
