@@ -5,6 +5,7 @@ import android.content.res.Resources
 import android.graphics.PointF
 import android.graphics.RectF
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -13,10 +14,8 @@ import androidx.core.content.res.ResourcesCompat
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.service.RoomSeatModel
 import java.lang.Math.PI
-import java.lang.Math.cos
-import java.lang.Math.sin
-import java.util.Random
 import kotlin.math.min
+import kotlin.random.Random
 
 interface ChorusMicViewDelegate {
     fun didChorusMicViewClicked(index: Int)
@@ -35,19 +34,19 @@ class ChorusMicView @JvmOverloads constructor(
     defStyle: Int = 0
 ) : ViewGroup(context, attrs, defStyle) {
 
+    private val TAG = "ChorusMicView"
+
     private val topMicCount: Int = 9 // 默认多少个 mic
-    private val centralMicSize: Float = 96.0f.dp // 中间大麦位的大小
-    private val sideMicSize: Float = 48.0f.dp // 周边麦位的大小
+    private val centralMicWidth: Float = 96.0f.dp // 中间大麦位宽度
+    private val centralMicHeight: Float = 120.0f.dp // 中间大麦位高度
+    private val sideMicWidth: Float = 48.0f.dp // 周边麦位的宽度
+    private val sideMicHeight: Float = 68.0f.dp // 周边麦位的高度
     private val floatingAnimationDuration: Long = 1500 // 麦位浮动动画的持续时间
 
     private var bgView: ImageView? = null
     private var centralMicView: MicView? = null // 中间大麦位视图
     private val sideMicViews: MutableList<MicView> = mutableListOf() // 周边麦位视图数组
     private val boundaryInset: Float = 20.0f.dp // 边界缩进值
-
-    private val random by lazy {
-        Random(System.nanoTime())
-    }
 
     var seatArray: List<RoomSeatModel>? = null
         set(value) {
@@ -88,7 +87,7 @@ class ChorusMicView @JvmOverloads constructor(
             tag = 1000
         }
         centralMicView?.let {
-            val layoutParams = LayoutParams(centralMicSize.toInt(), LayoutParams.WRAP_CONTENT)
+            val layoutParams = LayoutParams(centralMicWidth.toInt(), centralMicHeight.toInt())
             addView(it, layoutParams)
         }
 
@@ -104,7 +103,7 @@ class ChorusMicView @JvmOverloads constructor(
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 8f)
                 }
             }
-            val layoutParams = LayoutParams(sideMicSize.toInt(), LayoutParams.WRAP_CONTENT)
+            val layoutParams = LayoutParams(sideMicWidth.toInt(), sideMicHeight.toInt())
             sideMicViews.add(micView)
             addView(micView, layoutParams)
         }
@@ -117,6 +116,7 @@ class ChorusMicView @JvmOverloads constructor(
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         layoutChildren()
+        Log.d(TAG, "onLayout")
     }
 
     private fun layoutChildren() {
@@ -133,63 +133,65 @@ class ChorusMicView @JvmOverloads constructor(
 
         // 布局中间大麦位视图
         centralMicView?.let {
-            val seatTextViewHeight = it.getMicTextView().measuredHeight
-            val left = (centerPoint.x - centralMicSize / 2).toInt()
-            val top = (centerPoint.y - centralMicSize / 2).toInt()
-            val right = (centerPoint.x + centralMicSize / 2).toInt()
-            val bottom = ((centerPoint.y + centralMicSize / 2) + seatTextViewHeight).toInt()
-            it.layout(left, top, right, bottom)
+            val micRectF = RectF(
+                centerPoint.x - centralMicWidth / 2,
+                centerPoint.y - centralMicWidth / 2,
+                centerPoint.x + centralMicWidth / 2,
+                centerPoint.y - centralMicWidth / 2 + centralMicHeight
+            )
+            it.layout(micRectF.left.toInt(), micRectF.top.toInt(), micRectF.right.toInt(), micRectF.bottom.toInt())
         }
 
         // 布局周边麦位视图
         val maxRadius =
-            min(measuredWidth, measuredHeight) / 2 - centralMicSize - sideMicSize - boundaryInset * 2 // 考虑到边界缩进值
-        val minRadius = centralMicSize + sideMicSize + boundaryInset * 2 // 考虑到边界缩进值
+            min(measuredWidth, measuredHeight) / 2 - centralMicWidth - sideMicWidth - boundaryInset * 2 // 考虑到边界缩进值
+        val minRadius = centralMicWidth + sideMicWidth + boundaryInset * 2 // 考虑到边界缩进值
         val radiusRange = minOf(minRadius, maxRadius)..maxOf(minRadius, maxRadius)
 
         for (i in 0 until sideMicViews.size) {
             val angle = i.toFloat() * 2 * PI.toFloat() / sideMicViews.size // 计算每个麦位的角度
 
             var isValidPosition = false
+            val micView = sideMicViews[i]
 
             while (!isValidPosition) {
                 val radius = randomFloatInRange(radiusRange) // 在最小半径和最大半径范围内随机生成麦位的半径
 
                 // 计算麦位视图的位置
-                val x = centerPoint.x + radius * cos(angle.toDouble()).toFloat()
-                val y = centerPoint.y + radius * sin(angle.toDouble()).toFloat()
+                val x = centerPoint.x + radius * kotlin.math.cos(angle.toDouble()).toFloat()
+                val y = centerPoint.y + radius * kotlin.math.sin(angle.toDouble()).toFloat()
 
-                val seatTextViewHeight = sideMicViews[i].getMicTextView().measuredHeight
-                val micFrame =
-                    RectF(
-                        x - sideMicSize / 2,
-                        y - sideMicSize / 2,
-                        x + sideMicSize / 2,
-                        y + sideMicSize / 2 + seatTextViewHeight
-                    )
+                val micRectF = RectF(
+                    x - sideMicWidth / 2,
+                    y - sideMicWidth / 2,
+                    x + sideMicWidth / 2,
+                    y - sideMicWidth / 2 + sideMicHeight
+                )
 
-                if (isMicRectFValid(micFrame)) {
+                if (isMicRectFValid(micRectF)) {
                     isValidPosition = true
-                    sideMicViews[i].let {
-                        it.layout(
-                            micFrame.left.toInt(),
-                            micFrame.top.toInt(),
-                            micFrame.right.toInt(),
-                            micFrame.bottom.toInt()
-                        )
-                        // 添加浮动效果
-                        val randomX = nonzeroRandom((-20f).dp..20f.dp)
-                        val randomY = nonzeroRandom((-20f).dp..20f.dp)
-                        it.addFloatingAnimation(randomX, randomY)
-                        it.tag = 1001 + i
-                    }
+                    micView.layout(
+                        micRectF.left.toInt(),
+                        micRectF.top.toInt(),
+                        micRectF.right.toInt(),
+                        micRectF.bottom.toInt()
+                    )
                 }
             }
+
+            // 添加浮动效果
+            val randomX = nonzeroRandom((-20f).dp..20f.dp)
+            val randomY = nonzeroRandom((-20f).dp..20f.dp)
+            micView.addFloatingAnimation(randomX, randomY)
+            micView.tag = 1001 + i
+
+            Log.d(TAG, "addFloatingAnimation")
         }
     }
 
 
     private fun updateAllMics(seatArray: List<RoomSeatModel>) {
+        Log.d(TAG, "updateAllMics ${seatArray.size}")
         for (roomSeat in seatArray) {
             val headUrl = roomSeat.headUrl
             val index = roomSeat.seatIndex
@@ -229,10 +231,13 @@ class ChorusMicView @JvmOverloads constructor(
     }
 
     private fun randomFloatInRange(range: ClosedFloatingPointRange<Float>): Float {
-        return range.start + random.nextFloat() * (range.endInclusive - range.start)
+        val randomRadius = Random.nextDouble(range.start.toDouble(), range.endInclusive.toDouble())
+        return randomRadius.toFloat()
     }
 
     private fun isMicRectFValid(rectF: RectF): Boolean {
+        var isValid = true
+        val tempRectF = RectF(rectF.left, rectF.top, rectF.right, rectF.bottom)
         for (existingMicView in sideMicViews) {
             val existingViewRect = RectF(
                 existingMicView.left.toFloat(),
@@ -240,9 +245,11 @@ class ChorusMicView @JvmOverloads constructor(
                 existingMicView.right.toFloat(),
                 existingMicView.bottom.toFloat()
             )
-            if (rectF.intersect(existingViewRect)) {
+            if (tempRectF.intersect(existingViewRect)) {
+                Log.d(TAG, "rectF.isMicRectFValid false1 $existingMicView")
                 return false
             }
+            Log.d(TAG, "rectF.isMicRectFValid true1 $existingMicView")
         }
 
         centralMicView?.let { centralMicView ->
@@ -252,16 +259,20 @@ class ChorusMicView @JvmOverloads constructor(
                 centralMicView.right.toFloat(),
                 centralMicView.bottom.toFloat()
             )
-            if (rectF.intersect(centralViewRect)) {
+            if (tempRectF.intersect(centralViewRect)) {
+                Log.d(TAG, "rectF.isMicRectFValid false2 $centralMicView")
                 return false
             }
+            Log.d(TAG, "rectF.isMicRectFValid true2 $centralMicView")
         }
 
-        if (rectF.left < boundaryInset || rectF.top < boundaryInset ||
-            rectF.right > width - boundaryInset || rectF.bottom > height - boundaryInset
+        if (tempRectF.left < boundaryInset || tempRectF.top < boundaryInset ||
+            tempRectF.right > width - boundaryInset || tempRectF.bottom > height - boundaryInset
         ) {
+            Log.d(TAG, "rectF.isMicRectFValid false3")
             return false
         }
+        Log.d(TAG, "rectF.isMicRectFValid true3")
         return true
     }
 
