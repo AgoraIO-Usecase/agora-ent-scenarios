@@ -130,7 +130,7 @@
     <string name="cantata_search">搜索</string>
     <string name="cantata_confirm">确定</string>
     <string name="cantata_cancel">取消</string>
-    <string name="cantata_error_permisstion">需要相应权限，请打开</string>
+    <string name="cantata_error_permission">需要相应权限，请打开</string>
     <string name="cantata_room_list_title">歌房</string>
     <string name="cantata_room_list_empty">请创建一个歌房</string>
     <string name="cantata_create_room_name_label">歌房名称</string>
@@ -159,4 +159,11 @@
     <string name="cantata_singing_user">正在合唱用户(%d)</string>
     <string name="cantata_on_chorus_user">%d人合唱中</string>
     <string name="cantata_seat_index">%d号麦</string>
+    <string name="cantata_round_score">本轮总分</string>
+    <string name="cantata_rank">排名</string>
+    <string name="cantata_player">玩家</string>
+    <string name="cantata_player_score">个人得分</string>
+    <string name="cantata_next_song">下一首：%s</string>
+    <string name="cantata_score1">%d分</string>
+    <string name="cantata_not_on_the_list">暂无上榜</string>
 </resources>

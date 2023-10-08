@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.8"/>
+        app:layout_constraintGuide_percent="0.8" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tbChatroomTop"
@@ -154,10 +154,18 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/horizontal80"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/horizontal80"
         app:layout_constraintTop_toBottomOf="@id/tbChatroomTop" />
+
+    <io.agora.scene.cantata.ui.widget.rankList.RankListView
+        android:id="@+id/rankListView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/lrcControlView"
+        app:layout_constraintTop_toTopOf="@+id/lrcControlView" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivResultBg"

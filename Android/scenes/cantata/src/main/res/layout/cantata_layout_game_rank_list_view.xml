@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/cantata_mv_bg"
+    android:orientation="vertical"
+    tools:layout_height="400dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRoundTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"
+        android:text="@string/cantata_round_score"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRoundScore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="34sp"
+        app:layout_constraintTop_toBottomOf="@+id/tvRoundTitle"
+        tools:text="65,432" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:alpha="0.6"
+        android:background="@color/white_20_percent"
+        app:layout_constraintTop_toBottomOf="@+id/tvRoundScore" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRoundRank"
+        android:layout_width="36dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="17dp"
+        android:paddingVertical="8dp"
+        android:text="@string/cantata_rank"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvRoundScore" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="80dp"
+        android:gravity="center"
+        android:text="@string/cantata_player"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/tvRoundRank"
+        app:layout_constraintStart_toEndOf="@id/tvRoundRank"
+        app:layout_constraintTop_toTopOf="@+id/tvRoundRank" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/vertical75"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.75" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/cantata_player_score"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/tvRoundRank"
+        app:layout_constraintStart_toStartOf="@+id/vertical75"
+        app:layout_constraintTop_toTopOf="@+id/tvRoundRank" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvRankList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:overScrollMode="never"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tvNextSong"
+        app:layout_constraintTop_toBottomOf="@+id/tvRoundRank"
+        tools:listitem="@layout/cantata_item_rank_list" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvNextSong"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingVertical="8dp"
+        android:text="@string/cantata_next_song"
+        android:textColor="@color/white_60_percent"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
