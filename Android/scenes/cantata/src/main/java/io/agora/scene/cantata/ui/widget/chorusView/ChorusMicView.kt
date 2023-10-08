@@ -7,9 +7,7 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.appcompat.widget.ViewUtils
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import io.agora.scene.cantata.R

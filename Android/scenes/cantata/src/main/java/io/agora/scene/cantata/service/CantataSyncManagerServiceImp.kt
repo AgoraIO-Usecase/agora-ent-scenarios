@@ -509,7 +509,7 @@ class CantataSyncManagerServiceImp constructor(
         }
     }
 
-    override fun subscribeSeatList(changedBlock: (CantataServiceProtocol.KTVSubscribe, RoomSeatModel?) -> Unit) {
+    override fun subscribeSeatListChanged(changedBlock: (CantataServiceProtocol.KTVSubscribe, RoomSeatModel?) -> Unit) {
         seatListChangeSubscriber = changedBlock
     }
 

@@ -242,6 +242,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
                 binding.lrcControlView.role = LrcControlView.Role.Listener
                 binding.lrcControlView.onIdleStatus()
             }
+            mChooseSongDialog?.resetChosenSongList(SongActionListenerImpl.transSongModel(models))
         }
         mRoomLivingViewModel.mSongPlayingLiveData.observe(this) { model: RoomSelSongModel? ->
             if (model == null) {

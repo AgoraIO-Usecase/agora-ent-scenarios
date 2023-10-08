@@ -105,7 +105,7 @@ interface CantataServiceProtocol {
     /**
      * 定位麦位变化
      */
-    fun subscribeSeatList(changedBlock: (KTVSubscribe, RoomSeatModel?) -> Unit)
+    fun subscribeSeatListChanged(changedBlock: (KTVSubscribe, RoomSeatModel?) -> Unit)
 
     // =================== 歌曲相关 =========================
 
