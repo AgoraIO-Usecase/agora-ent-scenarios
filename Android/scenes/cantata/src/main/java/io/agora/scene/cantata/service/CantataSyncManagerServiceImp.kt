@@ -535,7 +535,8 @@ class CantataSyncManagerServiceImp constructor(
 
             status = RoomSelSongModel.STATUS_IDLE,
             createAt = System.currentTimeMillis().toLong(),
-            pinAt = 0.0
+            pinAt = 0.0,
+            musicEnded = false
         )
         //net request and notify others
         innerAddChooseSongInfo(song, completion)
@@ -576,7 +577,8 @@ class CantataSyncManagerServiceImp constructor(
 
             status = targetSong.status,
             createAt = targetSong.createAt,
-            pinAt = System.currentTimeMillis().toDouble()
+            pinAt = System.currentTimeMillis().toDouble(),
+            musicEnded = targetSong.musicEnded
         )
         songChosenList[indexOf] = newSong
 
@@ -618,7 +620,8 @@ class CantataSyncManagerServiceImp constructor(
 
             status = RoomSelSongModel.STATUS_PLAYING,
             createAt = targetSong.createAt,
-            pinAt = targetSong.pinAt
+            pinAt = targetSong.pinAt,
+            musicEnded = targetSong.musicEnded
         )
         songChosenList[indexOf] = newSong
 
@@ -670,6 +673,47 @@ class CantataSyncManagerServiceImp constructor(
 
         //net request and notify others
         innerRemoveChooseSong(removeAt) {
+            completion.invoke(it)
+        }
+    }
+
+    override fun markSongEnded(inputModel: RoomSelSongModel, completion: (error: Exception?) -> Unit) {
+        if (songChosenList.size <= 0) {
+            completion.invoke(RuntimeException("The chosen song list is empty!"))
+            return
+        }
+
+        val filter = songChosenList.filter { it.songNo == inputModel.songNo }
+        val targetSong = filter.getOrNull(0)
+        if (targetSong == null) {
+            completion.invoke(RuntimeException("The song no not found!"))
+            return
+        }
+        if (targetSong.status == RoomSelSongModel.STATUS_PLAYING) {
+            completion.invoke(RuntimeException("The song is playing now!"))
+            return
+        }
+
+        val indexOf = songChosenList.indexOf(targetSong)
+        val newSong = RoomSelSongModel(
+            targetSong.songName,
+            targetSong.songNo,
+            targetSong.singer,
+            targetSong.imageUrl,
+
+            userNo = targetSong.userNo,
+            name = targetSong.name,
+            isOriginal = targetSong.isOriginal,
+
+            status = targetSong.status,
+            createAt = targetSong.createAt,
+            pinAt = targetSong.pinAt,
+            musicEnded = true
+        )
+        songChosenList[indexOf] = newSong
+
+
+        innerDidPlaySong(objIdOfSongNo[indexOf], newSong) {
             completion.invoke(it)
         }
     }

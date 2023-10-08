@@ -1580,7 +1580,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 duration = mPlayer.duration
                 this.localPlayerPosition = 0
                 // 伴奏
-                mPlayer.selectMultiAudioTrack(0, 0)
+                mPlayer.selectMultiAudioTrack(1, 1)
                 if (this.singerRole == KTVSingRole.SoloSinger ||
                         this.singerRole == KTVSingRole.LeadSinger
                 ) {
