@@ -106,6 +106,8 @@ interface VideoSwitcher {
      */
     fun setupRemoteVideo(connection: RtcConnection, container: VideoCanvasContainer)
 
+    fun resetRemoteVideo(connection: RtcConnection, container: VideoCanvasContainer)
+
     /**
      * 获取秒开耗时
      */
