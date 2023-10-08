@@ -351,6 +351,7 @@ extension KTVApiImpl: KTVApiDelegate {
                 let channelMediaOption = AgoraRtcChannelMediaOptions()
                 channelMediaOption.token = chorusChannelRtcToken
                 apiConfig?.engine?.updateChannelEx(with: channelMediaOption, connection: subChorusConnection)
+                apiConfig?.chorusChannelToken = chorusChannelRtcToken
             }
         }
 

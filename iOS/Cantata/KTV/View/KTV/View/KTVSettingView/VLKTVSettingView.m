@@ -23,6 +23,7 @@ VLKTVRemoteVolumeViewDelegate
 
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) VLKTVSwitcherView *soundSwitcher;
+@property (nonatomic, strong) VLKTVSwitcherView *IMSwitcher;
 @property (nonatomic, strong) VLKTVTonesView *tonesView;
 @property (nonatomic, strong) VLKTVSliderView *soundSlider;
 @property (nonatomic, strong) VLKTVSliderView *accSlider;
@@ -65,6 +66,7 @@ VLKTVRemoteVolumeViewDelegate
     [self addSubview:self.soundSlider];
     [self addSubview:self.accSlider];
     [self addSubview:self.remoteVolumeView];
+    [self addSubview:self.IMSwitcher];
 //    [self addSubview:self.kindsView];
 }
 
@@ -103,6 +105,11 @@ VLKTVRemoteVolumeViewDelegate
         make.height.mas_equalTo(22);
     }];
     
+    [self.IMSwitcher mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.mas_equalTo(self);
+        make.top.mas_equalTo(self.remoteVolumeView.mas_bottom).offset(16);
+    }];
+    
 //    [self.kindsView mas_makeConstraints:^(MASConstraintMaker *make) {
 //        make.top.mas_equalTo(self.remoteVolumeView.mas_bottom).offset(35);
 //        make.left.right.mas_equalTo(self);
@@ -117,11 +124,12 @@ VLKTVRemoteVolumeViewDelegate
     NSInteger type;
     if (switcherView == self.soundSwitcher) {
         self.setting.soundOn = on;
-        //type = VLKTVValueDidChangedTypeEar;
-        type = 0;
+        type = VLKTVValueDidChangedTypeEar;
+    } else if (switcherView == self.IMSwitcher) {
+        self.setting.imMode = on ? 1 : 0;
+        type = VLKTVValueDidChangedTypeIMMode;
     } else {
-        //type = VLKTVValueDidChangedTypeMV;
-        type = 1;
+        type = VLKTVValueDidChangedTypeMV;
         self.setting.mvOn = on;
     }
     if ([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]) {
@@ -137,12 +145,10 @@ VLKTVRemoteVolumeViewDelegate
     if (sliderView == self.soundSlider) {
         NSLog(@"value:%f", value);
         self.setting.soundValue = value;
-       // type = VLKTVValueDidChangedTypeSound;
-        type = 3;
+        type = VLKTVValueDidChangedTypeSound;
     } else {
         self.setting.accValue = value;
-       // type = VLKTVValueDidChangedTypeAcc;
-        type = 4;
+        type = VLKTVValueDidChangedTypeAcc;
     }
     if ([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]) {
         [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:type];
@@ -195,6 +201,15 @@ VLKTVRemoteVolumeViewDelegate
         _soundSwitcher.delegate = self;
     }
     return _soundSwitcher;
+}
+
+- (VLKTVSwitcherView *)IMSwitcher {
+    if (!_IMSwitcher) {
+        _IMSwitcher = [[VLKTVSwitcherView alloc] init];
+        _IMSwitcher.titleLabel.text = KTVLocalizedString(@"沉浸模式");
+        _IMSwitcher.delegate = self;
+    }
+    return _IMSwitcher;
 }
 
 - (VLKTVTonesView *)tonesView {
@@ -259,6 +274,11 @@ VLKTVRemoteVolumeViewDelegate
     [_remoteVolumeView setCurrent:isPause ? 100 : self.setting.remoteVolume];
 }
 
+-(void)setIMMode:(int)mode{
+    _IMSwitcher.on = mode == 1;
+}
+
+
 @end
 
 @implementation VLKTVSettingModel
@@ -269,6 +289,7 @@ VLKTVRemoteVolumeViewDelegate
     self.toneValue = 0;
     self.soundValue = 0.0;
     self.accValue = 0.0;
+    self.imMode = 0;
     self.kindIndex = kKindUnSelectedIdentifier;
 }
 

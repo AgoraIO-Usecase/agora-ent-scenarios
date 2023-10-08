@@ -13,12 +13,13 @@ typedef NS_ENUM(NSInteger, VLKTVValueDidChangedType) {
     VLKTVValueDidChangedTypeSound,        // 声音
     VLKTVValueDidChangedTypeAcc,          // 伴奏
     VLKTVValueDidChangedTypeRemoteValue,  //远端音量
-    VLKTVValueDidChangedTypeListItem      // 列表
+    VLKTVValueDidChangedTypeListItem,     // 列表
+    VLKTVValueDidChangedTypeIMMode //沉浸模式
 } ;
 
 @protocol VLKTVSettingViewDelegate <NSObject>
 
-- (void)settingViewSettingChanged:(VLKTVSettingModel *)setting valueDidChangedType:(NSInteger)type;
+- (void)settingViewSettingChanged:(VLKTVSettingModel *)setting valueDidChangedType:(VLKTVValueDidChangedType)type;
 
 @end
 
@@ -31,6 +32,7 @@ typedef NS_ENUM(NSInteger, VLKTVValueDidChangedType) {
 - (void)setIsEarOn:(BOOL)isEarOn;
 - (void)setAccValue:(float)accValue;
 -(void)setIspause:(BOOL)isPause;
+-(void)setIMMode:(int)mode;
 @end
 
 @interface VLKTVSettingModel : NSObject
@@ -44,6 +46,7 @@ typedef NS_ENUM(NSInteger, VLKTVValueDidChangedType) {
 @property (nonatomic, assign) float accValue;
 @property (nonatomic, assign) NSInteger toneValue;
 @property (nonatomic, assign) int remoteVolume;
+@property (nonatomic, assign) int imMode;
 
 
 /// list选项

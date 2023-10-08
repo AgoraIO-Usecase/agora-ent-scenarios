@@ -16,11 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLDropOnLineView : UIView
 
 @property (nonatomic, strong) VLRoomSeatModel *seatModel;
-#if DEBUG
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id)delegate;
-#else
+
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLDropOnLineViewDelegate>)delegate;
-#endif
+
 @end
 
 NS_ASSUME_NONNULL_END

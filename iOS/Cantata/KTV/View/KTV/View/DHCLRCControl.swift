@@ -218,7 +218,7 @@ class DHCLRCControl: UIView {
         addSubview(noSongLabel)
         noSongLabel.isHidden = true
         
-        lrcView = KaraokeView(frame: CGRectMake(0, 30, self.bounds.width, 110), loggers: [FileLogger()])
+        lrcView = KaraokeView(frame: CGRectMake(0, 30, self.bounds.width, bounds.size.height - 30 - 50 - 340), loggers: [FileLogger()])
         lrcView.scoringEnabled = false
         lrcView.lyricsView.textNormalColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
         lrcView.lyricsView.textHighlightedColor = UIColor(hexString: "#EEFF25")!
@@ -322,6 +322,7 @@ class DHCLRCControl: UIView {
         lrcView.reset()
         musicNameBtn.isHidden = true
         musicNameBtn.setTitle("", for: .normal)
+        currentLoadLrcPath = nil
     }
     
     public func updateLoadingView(with progress: Int) {
@@ -394,6 +395,7 @@ extension DHCLRCControl: KTVLrcViewDelegate {
         //开始歌词下载
         startDownloadLrc(with: url) {[weak self] url in
             guard let self = self, let url = url else {return}
+            print("获取地址:\(url)")
             self.resetLrcData(with: url)
         }
     }
@@ -416,6 +418,7 @@ extension DHCLRCControl: KTVLrcViewDelegate {
                 return
             }
             path = lrcurl
+            print("获取地址本地:\(path)")
         } failure: {
             callBack(nil)
             print("歌词解析失败")
@@ -438,6 +441,7 @@ extension DHCLRCControl: KTVLrcViewDelegate {
         lrcView?.setLyricData(data: model)
         musicNameBtn.setTitle("\(model.name)-\(model.singer)", for: .normal)
         musicNameBtn.isHidden = false
+        print("获取地址解析:\(url)")
     }
     
     func onHighPartTime(highStartTime: Int, highEndTime: Int) {

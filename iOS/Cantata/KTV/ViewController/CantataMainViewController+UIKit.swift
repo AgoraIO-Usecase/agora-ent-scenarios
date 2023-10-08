@@ -311,7 +311,7 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
     
     public func _notifySongDidAdded(song: AUIChooseMusicModel) {
         addedMusicSet.add(song.songCode)
-        if isRoomOwner ?? false == true {
+        if isRoomOwner == true {
             deleteEnableSet.add(song.songCode)
             pinEnableSet.add(song.songCode)
         } else if song.owner?.userId == VLUserCenter.user.id {
@@ -331,7 +331,11 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
         inputModel.songName = model.name
         inputModel.singer = model.singer
         inputModel.imageUrl = model.poster
+        
+        if beforeAddSet.contains(model.songCode) {return}
+        beforeAddSet.add(model.songCode)
         AppContext.ktvServiceImp()?.chooseSong(with: inputModel, completion: { err in
+            self.beforeAddSet.remove(inputModel.songNo)
             if err == nil {
 //                let addModel: AUIChooseMusicModel = AUIChooseMusicModel()
 //                addModel.songCode = model.songCode
@@ -349,9 +353,11 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
 //                self.jukeBoxView.allMusicTableView.reloadData()
             }
         })
+        
     }
     
     public func removeSong(_ index: Int) {
+        print("我要删除歌曲了")
         let song = self.addedMusicList[index]
         let removeModel = KTVRemoveSongInputModel()
         removeModel.songNo = song.songCode
@@ -370,6 +376,7 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
 //                        self.jukeBoxView.allMusicTableView.reloadData()
                     }
                 })
+                return
             }
         }
     }

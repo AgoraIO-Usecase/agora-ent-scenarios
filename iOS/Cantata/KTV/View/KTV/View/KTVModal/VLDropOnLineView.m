@@ -72,9 +72,9 @@
 
 - (void)dropLineBtnClickEvent {
     // cp todo
-   // if (self.delegate && [self.delegate respondsToSelector:@selector(onVLDropOnLineView:action:)]) {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLDropOnLineView:action:)]) {
         [self.delegate onVLDropOnLineView:self action:self.seatModel];
-    //}
+    }
 }
 
 - (void)setSeatModel:(VLRoomSeatModel *)seatModel {
