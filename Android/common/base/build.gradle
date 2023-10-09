@@ -8,7 +8,6 @@ if (project.property("AGORA_APP_ID").toString().isEmpty()) {
     throw new GradleException("请在 gradle.properties 中配置完整的 Agora ID 和 Certificate")
 }
 
-def localsdkPath = "3.0.1-sdk"
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
 
@@ -47,12 +46,6 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    sourceSets {
-        main {
-            jniLibs.srcDirs += "${localsdkPath}"
-        }
     }
 }
 
