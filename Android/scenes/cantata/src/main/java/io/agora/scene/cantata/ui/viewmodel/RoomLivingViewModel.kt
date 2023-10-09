@@ -302,22 +302,11 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 mSeatLocalLiveData.postValue(roomSeatModel)
                 mIsOnSeat = true
                 if (mRtcEngine != null) {
-                    mMainChannelMediaOption.publishCameraTrack =
-                        roomSeatModel.isVideoMuted == RoomSeatModel.MUTED_VALUE_FALSE
-                    mMainChannelMediaOption.publishMicrophoneTrack = true
-                    mMainChannelMediaOption.enableAudioRecordingOrPlayout = true
-                    mMainChannelMediaOption.autoSubscribeVideo = true
-                    mMainChannelMediaOption.autoSubscribeAudio = true
-                    mMainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-                    mRtcEngine?.updateChannelMediaOptions(mMainChannelMediaOption)
                     updateVolumeStatus(roomSeatModel.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE)
                 }
                 break
             }
         }
-//        if (mSeatLocalLiveData.value == null) {
-//            mSeatLocalLiveData.value = null
-//        }
         mCantataServiceProtocol.subscribeSeatListChanged { ktvSubscribe: CantataServiceProtocol.KTVSubscribe,
                                                            roomSeatModel: RoomSeatModel? ->
             val roomSeat = roomSeatModel ?: return@subscribeSeatListChanged
@@ -368,20 +357,11 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 if (roomSeat.userNo == UserManager.getInstance().user.id.toString()) {
                     mSeatLocalLiveData.postValue(null)
                     mIsOnSeat = false
-                    mRtcEngine?.let {
-                        mMainChannelMediaOption.publishCameraTrack = false
-                        mMainChannelMediaOption.publishMicrophoneTrack = false
-                        mMainChannelMediaOption.enableAudioRecordingOrPlayout = true
-                        mMainChannelMediaOption.autoSubscribeVideo = true
-                        mMainChannelMediaOption.autoSubscribeAudio = true
-                        mMainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-                        it.updateChannelMediaOptions(mMainChannelMediaOption)
-                    }
 
                     updateVolumeStatus(false)
                     val songPlayingData: RoomSelSongModel =
                         mSongPlayingLiveData.value ?: return@subscribeSeatListChanged
-                    if (roomSeat.chorusSongCode == songPlayingData.songNo + songPlayingData.createAt) {
+                    if (roomSeat.userNo != songPlayingData.userNo) {
                         mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
                         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
                     }
@@ -400,16 +380,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 // success
                 CantataLogger.d(TAG, "RoomLivingViewModel.haveSeat() success")
                 mIsOnSeat = true
-                mRtcEngine?.let {
-                    mMainChannelMediaOption.publishCameraTrack = false
-                    mMainChannelMediaOption.publishMicrophoneTrack = true
-                    mMainChannelMediaOption.enableAudioRecordingOrPlayout = true
-                    mMainChannelMediaOption.autoSubscribeVideo = true
-                    mMainChannelMediaOption.autoSubscribeAudio = true
-                    mMainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-                    it.updateChannelMediaOptions(mMainChannelMediaOption)
-                }
-                toggleMic(false)
+                toggleMic(true)
             } else {
                 // failure
                 CantataLogger.e(TAG, "RoomLivingViewModel.haveSeat() failed: " + e.message)
@@ -437,8 +408,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 CantataLogger.d(TAG, "RoomLivingViewModel.leaveSeat() success")
                 if (seatModel.userNo == UserManager.getInstance().user.id.toString()) {
                     mIsOnSeat = false
-                    mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
-                    mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
                 }
                 mSongPlayingLiveData.value?.let { songPlayingData ->
                     val isJoinChorus = seatModel.chorusSongCode == songPlayingData.songNo + songPlayingData.createAt
@@ -474,6 +443,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     private fun updateVolumeStatus(isUnMute: Boolean) {
+        CantataLogger.d(TAG, "RoomLivingViewModel.updateVolumeStatus() isUnMute:$isUnMute")
         mKtvApi.setMicStatus(isUnMute)
         if (!isUnMute) {
             if (mMusicSetting?.isEar() == true) {
@@ -876,24 +846,10 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         if (mIsOnSeat) {
             // 下麦
             mSeatLocalLiveData.value?.let { leaveSeat(it) }
-//            // 离开合唱
-//            mCantataServiceProtocol.leaveChorus { e: Exception? ->
-//                if (e == null) {
-//                    // success
-//                    CantataLogger.d(TAG, "RoomLivingViewModel.leaveChorus() called")
-//                    mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
-//                    mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
-//                } else {
-//                    // failure
-//                    CantataLogger.e(TAG, "RoomLivingViewModel.leaveChorus() failed:${e.message}")
-//                    ToastUtils.showToast(e.message)
-//                }
-//                null
-//            }
-        } else {
-            mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
-            mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
         }
+        // 离开合唱
+        mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
+        mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
     }
 
     /**
@@ -1106,7 +1062,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             0,
             object : MusicSettingCallback {
                 override fun onEarChanged(isEar: Boolean) {
-                    val isMuted: Int = mSeatLocalLiveData.value!!.isAudioMuted
+                    val isMuted: Int = if (mSeatLocalLiveData.value != null) mSeatLocalLiveData.value!!.isAudioMuted else return
                     if (isMuted == 1) {
                         mIsOpnEar = isEar
                         return

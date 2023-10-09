@@ -197,7 +197,7 @@ class ChorusMicView @JvmOverloads constructor(
         }
         micView.updateMicImage(leadSingerModel.headUrl)
 
-        for (i in 0 until childCount) {
+        for (i in 0 until  topMicCount - 1) {
             if (seatArray.size > i) {
                 val micView1 = findMicViewWithTag(1000 + i + 1) ?: return
                 micView1.getMicTextView().apply {

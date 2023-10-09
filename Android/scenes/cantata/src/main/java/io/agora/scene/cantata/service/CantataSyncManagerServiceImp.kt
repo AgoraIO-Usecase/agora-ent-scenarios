@@ -974,7 +974,7 @@ class CantataSyncManagerServiceImp constructor(
             name = UserManager.getInstance().user.name,
             seatIndex = seatIndex,
             chorusSongCode = "",
-            isAudioMuted = RoomSeatModel.MUTED_VALUE_TRUE,
+            isAudioMuted = RoomSeatModel.MUTED_VALUE_FALSE,
             isVideoMuted = RoomSeatModel.MUTED_VALUE_TRUE,
             score = 0,
             isOwner = false
