@@ -148,7 +148,6 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         if (isMineOwner) {
             mBinding.ilActive.ivChangeSong.visibility = VISIBLE
         }
-        //onSelfLeavedChorus()
     }
 
     fun onSelfJoinedChorusFailed() {
@@ -164,17 +163,6 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         mBinding.ilActive.ivMusicMenu.visibility = INVISIBLE
         mBinding.ilActive.ivJoinChorusBtn.visibility = VISIBLE
         mBinding.ilActive.ivLeaveChorus.visibility = INVISIBLE
-        onUserLeaveChorus()
-    }
-
-    fun onUserJoinedChorus() {
-        // TODO:
-        mBinding.tvCoNumber.text = resources.getString(R.string.cantata_on_chorus_user, 0)
-    }
-
-    fun onUserLeaveChorus() {
-        // TODO:
-        mBinding.tvCoNumber.text = resources.getString(R.string.cantata_on_chorus_user,  0)
     }
 
     private var isOnSeat = false
@@ -284,8 +272,8 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     // 更新合唱人数
-    fun updateChorusNumber(seatModel: List<RoomSeatModel>){
-        mBinding.tvCoNumber.text = resources.getString(R.string.cantata_on_chorus_user,seatModel.size)
+    fun updateChorusNumber(seatModel: List<RoomSeatModel>) {
+        mBinding.tvCoNumber.text = resources.getString(R.string.cantata_on_chorus_user, seatModel.size)
     }
 
 
@@ -456,16 +444,6 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         lrcUrl = null
         mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
         mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
-    }
-
-    fun onReceiveSingleLineScore(score: Int, index: Int, cumulativeScore: Int, total: Int) {
-        if (mRole == Role.Listener) {
-//            updateScore(
-//                score.toDouble(), cumulativeScore.toDouble(),
-//                /** Workaround(Hai_Guo) */
-//                total.toDouble()
-//            )
-        }
     }
 
     fun updateMicSeatModels(list: List<RoomSeatModel>?) {

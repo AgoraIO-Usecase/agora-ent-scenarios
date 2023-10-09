@@ -1,10 +1,14 @@
 package io.agora.scene.cantata.ui.widget.rankList
 
 import android.content.Context
+import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataLayoutGameRankListViewBinding
 import java.text.DecimalFormat
@@ -12,11 +16,14 @@ import java.text.NumberFormat
 
 class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     FrameLayout(context, attrs, defStyleAttr) {
+
     private val mAdapter = RankListAdapter()
 
     private val mBinding: CantataLayoutGameRankListViewBinding by lazy {
         CantataLayoutGameRankListViewBinding.inflate(LayoutInflater.from(context), this, true)
     }
+
+    private var mCountDownLatch: CountDownTimer? = null
 
     private val  numberFormat: NumberFormat by lazy {
         DecimalFormat("#,###")
@@ -53,12 +60,34 @@ class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
         val formattedNumber = numberFormat.format(totalScore)
         mBinding.tvRoundScore.text = formattedNumber
+
+        // TODO:
+        updateNextSong("Test")
     }
 
     fun updateNextSong(songName: String?) {
         mBinding.tvNextSong.isGone = songName.isNullOrEmpty()
+        mBinding.tvNextSongCountdown.isGone = songName.isNullOrEmpty()
         songName?.let {
             mBinding.tvNextSong.text = context.getString(R.string.cantata_next_song, it)
+            startTimer()
         }
+
+    }
+
+    private fun startTimer(){
+        mCountDownLatch?.cancel()
+        mCountDownLatch = object : CountDownTimer((10 * 1000).toLong(), 999) {
+            override fun onTick(millisUntilFinished: Long) {
+                val second = (millisUntilFinished / 1000).toInt()
+                if (second <= 9) {
+                    mBinding.tvNextSongCountdown.text = resources.getString(R.string.cantata_next_countdown,second)
+                }
+            }
+
+            override fun onFinish() {
+                isVisible = false
+            }
+        }.start();
     }
 }

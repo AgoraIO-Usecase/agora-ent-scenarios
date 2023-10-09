@@ -164,6 +164,7 @@
     <string name="cantata_player">玩家</string>
     <string name="cantata_player_score">个人得分</string>
     <string name="cantata_next_song">下一首：%s</string>
+    <string name="cantata_next_countdown">下一首 %ds</string>
     <string name="cantata_score1">%d分</string>
     <string name="cantata_current_score">当前 %s 分</string>
     <string name="cantata_not_on_the_list">暂无上榜</string>
