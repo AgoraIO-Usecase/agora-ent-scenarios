@@ -899,6 +899,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 }
             }
         })
+        mRtcEngine.enableAudioVolumeIndicationEx(50, 10, true, singChannelRtcConnection)
 
         when (newRole) {
             KTVSingRole.LeadSinger -> {
