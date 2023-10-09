@@ -37,13 +37,6 @@ open class LrcActionListenerImpl constructor(
     }
 
     override fun onLineFinished(line: LyricsLineModel?, score: Int, cumulativeScore: Int, index: Int, total: Int) {
-//        mLrcControlView.updateScore(
-//            score.toDouble(), cumulativeScore.toDouble(),
-//            /** Workaround(Hai_Guo) */
-//            (total * 100).toDouble()
-//        )
-//        mViewModel.syncSingleLineScore(score, cumulativeScore, index, total * 100)
-
         mViewModel.updateSeatScoreStatus(score, cumulativeScore)
     }
 
