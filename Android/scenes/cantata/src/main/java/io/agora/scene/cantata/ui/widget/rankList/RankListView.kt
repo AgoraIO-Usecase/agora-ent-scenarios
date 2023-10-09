@@ -33,7 +33,7 @@ class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeS
             for (i in 0 until 3 - list.size) {
                 val emptyItem = RankItem()
                 emptyItem.score = -1
-                emptyItem.songNum = -1
+                //emptyItem.songNum = -1
                 emptyItem.userName = context.getString(R.string.cantata_not_on_the_list)
                 emptyItem.poster = ""
                 newList.add(emptyItem)
