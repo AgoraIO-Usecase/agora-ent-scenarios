@@ -188,7 +188,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         mBinding.ilActive.downloadLrcFailedView.visibility = INVISIBLE
         mBinding.ilActive.downloadLrcFailedBtn.visibility = INVISIBLE
         if (mRole == Role.Singer) {
-            mBinding.ilActive.lyricsView.enableDragging(false)
+            mBinding.ilActive.lyricsView.enableDragging(true)
             mBinding.ilActive.ivMusicStart.visibility = VISIBLE
             mBinding.ilActive.switchOriginal.visibility = VISIBLE
             mBinding.ilActive.ivMusicMenu.visibility = VISIBLE

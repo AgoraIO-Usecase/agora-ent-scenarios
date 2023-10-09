@@ -23,7 +23,7 @@ class CantataSyncManagerServiceImp constructor(
     private val errorHandler: ((Exception?) -> Unit)?
 ) : CantataServiceProtocol {
     private val TAG = "KTV_Service_LOG"
-    private val kSceneId = "scene_grand_chorus_3.8.0"
+    private val kSceneId = "scene_ktv_3.8.0"
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"
     private val kCollectionIdUser = "userCollection"
@@ -656,10 +656,6 @@ class CantataSyncManagerServiceImp constructor(
         val targetSong = filter.getOrNull(0)
         if (targetSong == null) {
             completion.invoke(RuntimeException("The song no not found!"))
-            return
-        }
-        if (targetSong.status == RoomSelSongModel.STATUS_PLAYING) {
-            completion.invoke(RuntimeException("The song is playing now!"))
             return
         }
 
