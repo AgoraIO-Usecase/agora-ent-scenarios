@@ -452,11 +452,22 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         } else if (this.singerRole == KTVSingRole.LeadSinger && newRole == KTVSingRole.Audience) {
             // 4、LeadSinger -》Audience
             stopSing()
-            leaveChorus(singerRole)
+            leaveChorus2(singerRole)
 
-            this.singerRole = newRole
-            ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
-            switchRoleStateListener?.onSwitchRoleSuccess()
+            // 加入观众频道
+            mRtcEngine.joinChannelEx(giantChorusConfig.audienceChannelToken, RtcConnection(ktvApiConfig.channelName, ktvApiConfig.localUid), ChannelMediaOptions(), object : IRtcEngineEventHandler() {
+                override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
+                    super.onJoinChannelSuccess(channel, uid, elapsed)
+                    singerRole = newRole
+                    ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
+                    switchRoleStateListener?.onSwitchRoleSuccess()
+                }
+
+                override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
+                    super.onStreamMessage(uid, streamId, data)
+                    dealWithStreamMessage(uid, streamId, data)
+                }
+            })
         } else {
             switchRoleStateListener?.onSwitchRoleFail(SwitchRoleFailReason.NO_PERMISSION)
             Log.e(TAG, "Error！You can not switch role from $singerRole to $newRole!")
