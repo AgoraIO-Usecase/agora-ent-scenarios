@@ -435,8 +435,8 @@ class CantataSyncManagerServiceImp constructor(
     override fun leaveSeat(inputModel: OutSeatInputModel, completion: (error: Exception?) -> Unit) {
         val seatInfo = seatMap[inputModel.userOnSeat.toString()]
         if (seatInfo != null) {
-            // 移除歌曲
-            innerRemoveAllUsersChooseSong(seatInfo.userNo)
+//            // 移除歌曲
+//            innerRemoveAllUsersChooseSong(seatInfo.userNo)
             // 移除座位
             innerRemoveSeat(seatInfo) {}
         }

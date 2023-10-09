@@ -5,8 +5,14 @@
     android:id="@+id/superLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_color_blue_31"
+    android:background="@drawable/bg_app_def_dark"
     tools:context=".ui.activity.RoomLivingActivity">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/ktv_room_bg" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/horizontal80"
@@ -133,7 +139,8 @@
         android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
         android:button="@null"
-        android:checked="true"
+        android:checked="false"
+        android:enabled="false"
         android:drawableStart="@drawable/bg_cb_mic_status"
         android:padding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"

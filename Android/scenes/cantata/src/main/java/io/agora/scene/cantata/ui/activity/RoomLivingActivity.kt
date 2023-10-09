@@ -212,6 +212,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mRoomLivingViewModel.mSeatLocalLiveData.observe(this) { seatModel: RoomSeatModel? ->
             val isOnSeat = seatModel != null && seatModel.seatIndex >= 0
             val isAudioChecked = seatModel != null && seatModel.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE
+            binding.cbMic.isEnabled = seatModel != null
             binding.cbMic.isChecked = isAudioChecked
             binding.lrcControlView.onSeat(seatModel != null)
         }

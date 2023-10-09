@@ -31,6 +31,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
 
     private val kChatRoomAppID = "io.agora.chatroom"
     private val kFullAppID = "io.agora.AgoraVoice"
+    private val kCantataAppID = "io.agora.cantata"
 
     private var counts = 0
     private val debugModeOpenTime: Long = 2000
@@ -50,6 +51,8 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             setupChatRoomAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kFullAppID) {
             setupFullAppInfo()
+        } else if (BuildConfig.APPLICATION_ID == kCantataAppID) {
+            setupCantataAppInfo()
         }
         setupDebugMode()
         setupClickWebAction()
@@ -63,6 +66,19 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_about_name),
                 "20230110-" + VersionUtils.getVersion("io.agora.scene.voice.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+                servicePhone,
+                webSite
+            )
+        }
+    }
+
+    // 设置大合唱App的信息
+    private fun setupCantataAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        if (VersionUtils.getVersion("io.agora.scene.cantata.BuildConfig").isNotEmpty()) {
+            adapter.appInfo = AppInfo(
+                this.getString(R.string.app_name),
+                "20231030-" + VersionUtils.getVersion("io.agora.scene.cantata.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
