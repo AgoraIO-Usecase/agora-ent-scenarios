@@ -485,6 +485,10 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                         // 当前有已点歌曲, 且更新歌曲和之前歌曲非同一首
                         CantataLogger.d(TAG, "RoomLivingViewModel.onSongChanged() single or first chorus")
                         mSongPlayingLiveData.postValue(songPlaying)
+                    } else if (!value.musicEnded && songPlaying.musicEnded) {
+                        // 音乐结束
+                        CantataLogger.d(TAG, "RoomLivingViewModel.onSongChanged() music ended")
+                        mRoundRankListLiveData.postValue(true)
                     }
                 } else {
                     CantataLogger.d(TAG, "RoomLivingViewModel.onSongChanged() return is emptyList")
@@ -963,7 +967,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                         mSongPlayingLiveData.value?.let { roomSelSongModel ->
                             if (roomSelSongModel.userNo == UserManager.getInstance().user.id.toString()) {
                                 mCantataServiceProtocol.markSongEnded(roomSelSongModel, completion = {
-                                    mRoundRankListLiveData.postValue(true)
+                                    //mRoundRankListLiveData.postValue(true)
                                 })
                             }
                         }
