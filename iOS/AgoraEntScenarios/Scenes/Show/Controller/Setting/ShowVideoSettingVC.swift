@@ -174,6 +174,18 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
                     self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
                 }
                 return cell
+            } else if data == .SR {
+                let cell = tableView.dequeueReusableCell(withIdentifier: kSwitchCell, for: indexPath) as! ShowSettingSwitchCell
+                let value = ShowAgoraKitManager.shared.rtcParam.sr
+                cell.setTitle(data.title, enable:true, isOn: value) {[weak self] isOn in
+                    self?.barrierValueChange(complete: {
+                        ShowAgoraKitManager.shared.rtcParam.sr = isOn
+                        ShowAgoraKitManager.shared.updateSettingForkey(.SR, currentChannelId: self?.currentChannelId)
+                    })
+                } detailButtonAction: {[weak self] in
+                    self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
+                }
+                return cell
             }
         }
         return UITableViewCell()

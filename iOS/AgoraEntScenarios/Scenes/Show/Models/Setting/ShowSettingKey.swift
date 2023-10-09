@@ -170,7 +170,7 @@ enum ShowSettingKey: String, CaseIterable {
         case .PVC:
             return .custom
         case .SR:
-            return .aSwitch
+            return .custom
         case .BFrame:
             return .aSwitch
         case .videoEncodeSize:

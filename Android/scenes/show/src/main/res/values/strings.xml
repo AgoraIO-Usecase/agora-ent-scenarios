@@ -94,14 +94,22 @@
     <string name="show_statistic_up_net_speech">上行网络: %s KB/s</string>
     <string name="show_statistic_down_net_speech">下行网络: %s KB/s</string>
     <string name="show_statistic_resolution">分辨率: %s</string>
-    <string name="show_statistic_up">上行</string>
+    <string name="show_statistic_up">发送端</string>
     <string name="show_statistic_encode_resolution">编码分辨率: %s</string>
     <string name="show_statistic_encode_fps">编码帧率: %s fps</string>
     <string name="show_statistic_up_loss_package">上行丢包率: %s ％</string>
-    <string name="show_statistic_down">下行</string>
+    <string name="show_statistic_down">接收端</string>
     <string name="show_statistic_receive_resolution">接收分辨率: %s</string>
     <string name="show_statistic_receive_fps">接收帧率: %s fps</string>
     <string name="show_statistic_down_loss_package">下行丢包率: %s ％</string>
+    <string name="show_statistic_else">其他</string>
+    <string name="show_statistic_quick_start_time">秒开耗时：%s ms</string>
+    <string name="show_device_grade">机型等级：%s</string>
+    <string name="show_statistic_sr">超分开关：%s</string>
+    <string name="show_statistic_h265">H265开关：%s</string>
+    <string name="show_statistic_pvc">pvc开关：%s</string>
+    <string name="show_statistic_low_stream">小流开关：%s</string>
+    <string name="show_statistic_svc">svc开关：%s</string>
     <string name="show_music_effect_beauty_voice_zhongxin">中性</string>
     <string name="show_music_effect_beauty_voice_wenzhong">稳重</string>
     <string name="show_music_effect_beauty_voice_mohuan">魔幻</string>
@@ -126,10 +134,14 @@
     <string name="show_link_is_stopped">连麦已断开哦</string>
     <string name="show_interacting">互动中</string>
     <string name="show_tip1">主播正忙，已拒绝你的邀请</string>
+    <string name="show_to_the_audience">对观众%s</string>
+    <string name="show_link_to">与观众 %s 连麦中</string>
+    <string name="show_get_in_line">待上麦队列</string>
 
 
 
     <!-- pk   -->
+    <string name="show_pk_to">与主播 %s PK中</string>
     <string name="show_pking_request_message">PK邀请</string>
     <string name="show_online_boardcaster">在线主播</string>
     <string name="show_pking">正在pk</string>
@@ -166,12 +178,13 @@
     <string name="show_setting_advance_dark_enhance_tip">打开该开关后，将自动对暗光下的图像进行处理，通过智能补光等措施增加一定的清晰度和亮度，最终实现图像质量提升</string>
     <string name="show_setting_advance_video_noise_reduce">视频降噪</string>
     <string name="show_setting_advance_video_noise_reduce_tip">打开该开关后，将自动去除视频中的噪点，使视频画面看起来更加的清晰</string>
-    <string name="show_setting_advance_bitrate_save">码率节省</string>
+    <string name="show_setting_advance_bitrate_save">pvc</string>
     <string name="show_setting_advance_bitrate_save_tip">打开开关后，将自动实现在同等画质情况下降低码率的效果</string>
     <string name="show_setting_advance_resolution">分辨率</string>
     <string name="show_setting_advance_encode_resolution">编码分辨率</string>
     <string name="show_setting_advance_encode_resolution_tip">修改编码分辨率后，请在观众端查看画质变化效果</string>
-    <string name="show_setting_advance_bitrate">码率</string>
+    <string name="show_setting_advance_bitrate">码率自适应</string>
+    <string name="show_setting_advance_bitrate_tips">自适应开关打开后，算法将结合当前的分辨率和帧率自动为您匹配合适码率</string>
     <string name="show_setting_advance_ear_back">耳返</string>
     <string name="show_setting_advance_ear_back_tip">耳返</string>
     <string name="show_setting_advance_vocal_volume">人声音量</string>
@@ -197,7 +210,8 @@
     <string name="show_setting_audience">观众设置</string>
     <string name="show_living_end_title">直播结束</string>
     <string name="show_living_end_back_room_list">返回房间列表</string>
-    <string name="show_live_chat_coming">来了</string>
+    <string name="show_live_chat_coming">加入房间</string>
+    <string name="show_live_chat_leaving">离开房间</string>
     <string name="show_live_end_room_or_not">是否结束直播?</string>
     <string name="show_setting_opened">已打开</string>
     <string name="show_setting_closed">已关闭</string>
@@ -224,6 +238,22 @@
     <string name="show_beauty_green_screen_tip">为了保证虚拟背景最佳效果，请确认实际环境已搭建绿幕，否则虚拟背景不生效哦</string>
     <string name="show_live_detail_living_end">直播已结束</string>
     <string name="show_live_detail_try_to_move">滑动换个主播试试看</string>
+    <string name="show_broadcast_header">开播建议：</string>
+    <string name="show_broadcast_tips">请确保开播环境网络状态良好\n上行带宽>=3M</string>
+    <string name="show_beauty_tips">为保证最佳体验，已默认关闭AI高级美颜\n如需体验请手动打开</string>
+    <string name="show_beauty_license_disable">美颜授权已失效，请联系开发者更新license</string>
+    <string name="show_network_quailty">目标观众的网络状况</string>
+    <string name="show_network_quailty_tips">针对目标投放地区的网络状况的视频策略</string>
+    <string name="show_network_quailty_good">较好</string>
+    <string name="show_network_quailty_good_tag">网络状况稳定通畅</string>
+    <string name="show_network_quailty_normal">不稳定</string>
+    <string name="show_network_quailty_normal_tag">网络状况不通畅</string>
+    <string name="show_video_quailty">画质</string>
+    <string name="show_video_quailty_smooth">流畅优先</string>
+    <string name="show_video_quailty_clear">高清优先</string>
+    <string name="show_video_quailty_tips">针对不同目标观众端的画质适配策略</string>
+    <string name="show_audience_sr_tips">低端机不建议打开，后台已默认关闭超分</string>
+    <string name="show_broadcaster_bad_exit">检测到上次直播异常退出，请重新创建直播间开播</string>
 
     <string-array name="show_encoder">
         <item>硬编码</item>

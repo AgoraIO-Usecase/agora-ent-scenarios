@@ -18,9 +18,7 @@ class ShowLivePagesViewController: ViewController {
     private var currentVC: ShowLiveViewController?
     
     let agoraKitManager = ShowAgoraKitManager.shared
-    
-//    fileprivate var roomVCMap: [String: ShowLiveViewController] = [:]
-    
+        
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0
@@ -42,11 +40,7 @@ class ShowLivePagesViewController: ViewController {
     deinit {
         showLogger.info("deinit-- ShowLivePagesViewController", context: kPagesVCTag)
         ShowAgoraKitManager.shared.leaveAllRoom()
-        // TODO: 放到ShowLiveViewController里做
-//        self.roomVCMap.forEach { (key: String, value: ShowLiveViewController) in
-//            value.leaveRoom()
-//            AppContext.unloadShowServiceImp(key)
-//        }
+        AppContext.unloadShowServiceImp()
     }
     
     override func viewDidLoad() {
@@ -163,11 +157,6 @@ extension ShowLivePagesViewController {
     }
 }
 
-//MARK: live vc cache
-extension ShowLiveViewController {
-    
-}
-
 let kShowLiveRoomViewTag = 12345
 //MARK: UICollectionViewDelegate & UICollectionViewDataSource
 extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -208,8 +197,9 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
 //            assert(false, "room at index \(idx) not found")
             return
         }
+        ShowRobotService.shared.startCloudPlayers()
         showLogger.info("willDisplay[\(room.roomId)]: \(idx)/\(indexPath.row)  cache vc count: \(self.children.count)", context: kPagesVCTag)
-        vc.loadingType = .joined
+        vc.updateLoadingType(playState: .joined, roomId: room.roomId)
         currentVC = vc
         self.view.endEditing(true)
     }
@@ -225,7 +215,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
             return
         }
         showLogger.info("didEndDisplaying[\(room.roomId)]: \(idx)/\(indexPath.row)  cache vc count: \(self.children.count)", context: kPagesVCTag)
-        vc.loadingType = .prejoined
+        vc.updateLoadingType(playState: .prejoined, roomId: room.roomId)
         self.view.endEditing(true)
     }
     
@@ -238,6 +228,10 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
         showLogger.info("scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)", context: kPagesVCTag)
         
         scroll(to: toIndex)
+    }
+    
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        ShowAgoraKitManager.shared.callTimestampStart()
     }
     
     private func _getVisibleCellTuple() -> (Int?, UICollectionViewCell?) {

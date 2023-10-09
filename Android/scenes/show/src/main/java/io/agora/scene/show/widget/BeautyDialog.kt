@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -15,6 +16,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.rtc2.video.SegmentationProperty
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.utils.FileUtils
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.R
 import io.agora.scene.show.RtcEngineInstance
 import io.agora.scene.show.beauty.*
@@ -25,7 +27,7 @@ import io.agora.scene.show.databinding.ShowWidgetBeautyDialogTopBinding
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 
-class BeautyDialog(context: Context) : BottomDarkDialog(context) {
+class BeautyDialog constructor(context: Context) : BottomDarkDialog(context) {
 
     private data class ItemInfo(val id: Int, @StringRes val name: Int, @DrawableRes val icon: Int)
     private data class GroupInfo(
@@ -327,12 +329,13 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
 
         mTopBinding.root.isVisible = false
         mTopBinding.ivCompare.setOnClickListener {
-            beautyProcessor?.apply {
-                setEnable(!isEnable())
+            if (beautyProcessor != null) {
+                val old = beautyProcessor?.isBeautyEnable() ?: true
+                beautyProcessor?.setBeautyEnable(!old)
+            } else {
+                ToastUtils.showToast(R.string.show_beauty_license_disable)
             }
         }
-
-
     }
 
     // 修改绿幕开关
@@ -348,7 +351,11 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
     }
 
     fun setBeautyProcessor(processor: IBeautyProcessor) {
-        this.beautyProcessor = processor
+        try { // 美颜license是否存在
+            context.assets.open("license/SenseME.lic").use { inputStream ->
+                this.beautyProcessor = processor
+            }
+        } catch (_: Exception) {}
     }
 
     private fun refreshTopLayout(groupId: Int, itemId: Int) {

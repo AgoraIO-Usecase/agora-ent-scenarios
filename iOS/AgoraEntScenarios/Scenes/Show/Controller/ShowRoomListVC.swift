@@ -36,11 +36,9 @@ class ShowRoomListVC: UIViewController {
         didSet {
             collectionView.reloadData()
             emptyView.isHidden = roomList.count > 0
-            preLoadVisibleItems()
         }
     }
     
-    // 自定义导航栏
     private let naviBar = ShowNavigationBar()
     
     private var needUpdateAudiencePresetType = false
@@ -63,13 +61,12 @@ class ShowRoomListVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        AppContext.shared.sceneImageBundleName = "showResource"
         createViews()
         createConstrains()
-        // 提前启动rtc engine
         ShowAgoraKitManager.shared.prepareEngine()
         ShowRobotService.shared.startCloudPlayers()
         preGenerateToken()
-        // 获取设备性能
         checkDevice()
     }
     
@@ -79,7 +76,6 @@ class ShowRoomListVC: UIViewController {
         fetchRoomList()
     }
     
-    // 点击创建按钮
     @objc private func didClickCreateButton(){
         let preVC = ShowCreateLiveVC()
         let preNC = UINavigationController(rootViewController: preVC)
@@ -94,9 +90,9 @@ class ShowRoomListVC: UIViewController {
     
     private func checkDevice() {
          let score = ShowAgoraKitManager.shared.engine?.queryDeviceScore() ?? 0
-        if (score < 75) {// (0, 75)
+        if (score < 85) {// (0, 85)
             ShowAgoraKitManager.shared.deviceLevel = .low
-        } else if (score < 90) {// (75, 90)
+        } else if (score < 90) {// [85, 90)
             ShowAgoraKitManager.shared.deviceLevel = .medium
         } else {// (> 90)
             ShowAgoraKitManager.shared.deviceLevel = .high
@@ -104,24 +100,17 @@ class ShowRoomListVC: UIViewController {
         ShowAgoraKitManager.shared.deviceScore = Int(score)
     }
     
-    // 加入房间
     private func joinRoom(_ room: ShowRoomListModel){
-        ShowAgoraKitManager.shared.callTimestampStart(clean: true)
+        ShowAgoraKitManager.shared.callTimestampStart()
+        ShowAgoraKitManager.shared.setupAudienceProfile()
+        ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .joined)
         
-        let vc = ShowLivePagesViewController()
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .fullScreen
         if room.ownerId == VLUserCenter.user.id {
-            AppContext.showServiceImp(room.roomId)?.joinRoom(room: room) {[weak self] error, model in
-                if let error = error {
-                    ToastView.show(text: error.localizedDescription)
-                    return
-                }
-                vc.roomList = [room]
-                vc.focusIndex = 0
-                self?.present(nc, animated: true)
-            }
+            ToastView.show(text: "show_join_own_room_error".show_localized)
         } else {
+            let vc = ShowLivePagesViewController()
+            let nc = UINavigationController(rootViewController: vc)
+            nc.modalPresentationStyle = .fullScreen
             vc.roomList = roomList.filter({ $0.ownerId != VLUserCenter.user.id })
             vc.focusIndex = vc.roomList?.firstIndex(where: { $0.roomId == room.roomId }) ?? 0
             self.present(nc, animated: true)
@@ -133,7 +122,7 @@ class ShowRoomListVC: UIViewController {
             guard let self = self else {return}
             self.refreshControl.endRefreshing()
             if let error = error {
-                ToastView.show(text: error.localizedDescription)
+                LogUtil.log(error.localizedDescription)
                 return
             }
             let list = roomList ?? []
@@ -141,9 +130,9 @@ class ShowRoomListVC: UIViewController {
             self.preLoadVisibleItems()
         }
     }
-    // 预先加载RTC
+    
     private func preLoadVisibleItems() {
-        guard let token = AppContext.shared.rtcToken, roomList.count > 0 else {
+        guard let token = AppContext.shared.rtcToken, token.count > 0, roomList.count > 0 else {
             return
         }
         let firstItem = collectionView.indexPathsForVisibleItems.first?.item ?? 0
@@ -160,7 +149,7 @@ class ShowRoomListVC: UIViewController {
         }
         ShowAgoraKitManager.shared.preloadRoom(preloadRoomList: preloadRoomList)
     }
-    // 预先获取万能token
+
     private func preGenerateToken() {
         AppContext.shared.rtcToken = nil
         NetworkManager.shared.generateToken(
@@ -200,14 +189,33 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
     func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
         showLogger.info("didHighlightItemAt: \(indexPath.row)", context: "collectionView")
         let room = roomList[indexPath.item]
-        ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .prejoined)
-        preloadRoom = room
+        if let token = AppContext.shared.rtcToken, token.count > 0 {
+            ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .prejoined)
+            preloadRoom = room
+        } else { // fetch token when token is not exist
+            NetworkManager.shared.generateToken(
+                channelName: "",
+                uid: "\(UserInfo.userId)",
+                tokenType: .token007,
+                type: .rtc,
+                expire: 24 * 60 * 60
+            ) { token in
+                guard let rtcToken = token else {
+                    return
+                }
+                AppContext.shared.rtcToken = rtcToken
+            }
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         showLogger.info("didSelectItemAt: \(indexPath.row)", context: "collectionView")
-        let room = roomList[indexPath.item]
-        joinRoom(room)
+        if let token = AppContext.shared.rtcToken, token.count > 0 {
+            let room = roomList[indexPath.item]
+            joinRoom(room)
+        } else {
+            ToastView.show(text: "Token is not exit, try again!")
+        }
     }
     
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
@@ -224,7 +232,6 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
 // MARK: - Creations
 extension ShowRoomListVC {
     private func createViews(){
-        // 背景图
         backgroundView.image = UIImage.show_sceneImage(name: "show_list_Bg")
         view.addSubview(backgroundView)
         
@@ -235,11 +242,9 @@ extension ShowRoomListVC {
         collectionView.refreshControl = self.refreshControl
         view.addSubview(collectionView)
         
-        // 空列表
         emptyView.isHidden = true
         collectionView.addSubview(emptyView)
         
-        // 创建房间按钮
         createButton.setTitleColor(.white, for: .normal)
         createButton.setTitle("room_list_create_room".show_localized, for: .normal)
         createButton.setImage(UIImage.show_sceneImage(name: "show_create_add"), for: .normal)

@@ -44,7 +44,7 @@
 
             <include
                 android:id="@+id/bitrate"
-                layout="@layout/show_setting_advance_item_seekbar"/>
+                layout="@layout/show_setting_advance_item_switch_seekbar"/>
 
 
         </LinearLayout>

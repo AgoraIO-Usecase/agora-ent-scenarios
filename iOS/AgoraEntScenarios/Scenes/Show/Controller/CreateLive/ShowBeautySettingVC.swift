@@ -60,7 +60,7 @@ class ShowBeautySettingVC: UIViewController {
         }
         compareButton.addTarget(self, action: #selector(didClickCompareButton(sender:)), for: .touchUpInside)
         compareButton.backgroundColor = UIColor(hex: "#000000", alpha: 0.25)
-        compareButton.isSelected = true
+        compareButton.isSelected = BeautyManager.shareManager.isEnableBeauty
         compareButton.cornerRadius(18)
         return compareButton
     }()
@@ -242,8 +242,13 @@ extension ShowBeautySettingVC {
     
     // 点击对比按钮
     @objc private func didClickCompareButton(sender: UIButton){
-        sender.isSelected = !sender.isSelected
-        BeautyManager.shareManager.isEnableBeauty = sender.isSelected
+        if let _ = Bundle.main.path(forResource: "SENSEME.lic", ofType: nil) {
+            // 存在美颜证书
+            sender.isSelected = !sender.isSelected
+            BeautyManager.shareManager.isEnableBeauty = sender.isSelected
+        } else {
+            ToastView.show(text: "show_beauty_license_disable".show_localized)
+        }
     }
 }
 

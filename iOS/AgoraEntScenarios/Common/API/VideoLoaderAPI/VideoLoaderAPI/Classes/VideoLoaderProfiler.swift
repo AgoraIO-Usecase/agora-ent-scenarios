@@ -31,7 +31,8 @@ class VideoLoaderProfiler: NSObject, AgoraRtcEngineDelegate {
         DispatchQueue.main.async {
             if state == .decoding /*2*/,
                ( reason == .remoteUnmuted /*6*/ || reason == .localUnmuted /*4*/ || reason == .localMuted /*3*/ )   {
-                self.printClosure?("room[\(roomId)] show first frame! cost: \(cost) ms")
+
+                self.printClosure?("room[\(roomId)] show first frame cost: \(cost) ms")
             }
         }
     }

@@ -12,7 +12,7 @@ import io.agora.scene.show.widget.BottomDarkDialog
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 
-class LiveLinkAudienceSettingsDialog(context: Context) : BottomDarkDialog(context) {
+class LiveLinkAudienceSettingsDialog constructor(context: Context) : BottomDarkDialog(context) {
     companion object {
         const val ITEM_ID_MIC = 1
         const val ITEM_ID_STOP_LINK = 2
@@ -142,7 +142,7 @@ class LiveLinkAudienceSettingsDialog(context: Context) : BottomDarkDialog(contex
     }
 
     fun setAudienceInfo(userName : String) {
-        mBinding.userName.text = "对观众$userName"
+        mBinding.userName.text = context.getString(R.string.show_to_the_audience,userName)
     }
 
     fun setOnItemActivateChangedListener(listener: (dialog: LiveLinkAudienceSettingsDialog, itemId: Int, activated: Boolean)->Unit) {

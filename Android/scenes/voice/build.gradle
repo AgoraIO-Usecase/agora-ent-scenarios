@@ -3,6 +3,7 @@ ext {
 }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
+final def VERSION_SCENE_VOICE = "2.1.0"
 android {
     defaultConfig {
         if(voice_is_modular){
@@ -16,6 +17,11 @@ android {
             // 设置支持的SO库架构
             abiFilters 'arm64-v8a' //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
         }
+
+        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_VOICE}\""
+        buildConfigField "String", "IM_APP_KEY", "\"${IM_APP_KEY}\""
+        buildConfigField "String", "IM_APP_CLIENT_ID", "\"${IM_APP_CLIENT_ID}\""
+        buildConfigField "String", "IM_APP_CLIENT_SECRET", "\"${IM_APP_CLIENT_SECRET}\""
     }
     sourceSets {
         main {

@@ -129,7 +129,8 @@ class ShowAgoraKitManager: NSObject {
                                      "traceId": NSString.withUUID().md5(),
                                      "src": "iOS",
                                      "payload": JSONObject.toJsonString(dict: userInfo) ?? ""]
-        NetworkManager.shared.postRequest(urlString: "https://service.agora.io/toolbox/v1/moderation/audio",
+        let baseURL = KeyCenter.baseServerUrl ?? ""
+        NetworkManager.shared.postRequest(urlString: "\(baseURL)v1/moderation/audio",
                                           params: parasm) { response in
             showLogger.info("response === \(response)")
         } failure: { errr in
@@ -223,7 +224,7 @@ class ShowAgoraKitManager: NSObject {
     func renewToken(channelId: String) {
         showLogger.info("renewToken with channelId: \(channelId)",
                         context: kShowLogBaseContext)
-        NetworkManager.shared.generateToken(channelName: channelId,
+        NetworkManager.shared.generateToken(channelName: "",
                                             uid: UserInfo.userId,
                                             tokenType: .token007,
                                             type: .rtc) {[weak self] token in
@@ -240,25 +241,23 @@ class ShowAgoraKitManager: NSObject {
     
     // 耗时计算
     private var callTimeStampsSaved: Date?
-    func callTimestampStart(clean: Bool) {
-        print("callTimeStampsSaved  : start")
-        if (clean) {
-            callTimeStampsSaved = nil
-        }
-        if callTimeStampsSaved == nil {
-            print("callTimeStampsSaved  : saved")
-            callTimeStampsSaved = Date()
-        }
+    private var callTimestampEndSaved: TimeInterval?
+
+    func callTimestampStart() {
+        showLogger.info("callTimeStampsSaved  : start")
+        callTimeStampsSaved = Date()
     }
     
     func callTimestampEnd() -> TimeInterval? {
-        print("callTimeStampsSaved  : end called")
         guard let saved = callTimeStampsSaved else {
-            return nil
+            showLogger.info("callTimeStampsSaved  : end no value")
+            return callTimestampEndSaved
         }
-        print("callTimeStampsSaved  : end value")
+        let value = -saved.timeIntervalSinceNow * 1000
         callTimeStampsSaved = nil
-        return -saved.timeIntervalSinceNow * 1000
+        callTimestampEndSaved = value
+        showLogger.info("callTimeStampsSaved  : end value \(value)")
+        return value
     }
     
     //MARK: public sdk method
@@ -355,14 +354,46 @@ class ShowAgoraKitManager: NSObject {
         options.audienceLatencyLevel = role == .audience ? .lowLatency : .ultraLowLatency
         updateChannelEx(channelId:channelId, options: options)
         if "\(uid)" == VLUserCenter.user.id {
-            videoLoader?.leaveChannelWithout(roomId: channelId)
-            setupLocalVideo(uid: uid, canvasView: canvasView)
+            if role == .broadcaster {
+                setupLocalVideo(uid: uid, canvasView: canvasView)
+            } else {
+                cleanCapture()
+            }
         } else {
             setupRemoteVideo(channelId: channelId, uid: uid, canvasView: canvasView)
         }
     }
     
-
+    func updateMediaOptions(publishCamera: Bool) {
+        let mediaOptions = AgoraRtcChannelMediaOptions()
+        mediaOptions.publishCameraTrack = publishCamera
+        mediaOptions.publishMicrophoneTrack = false
+        mediaOptions.clientRoleType = publishCamera ? .broadcaster : .audience
+        engine?.updateChannel(with: mediaOptions)
+    }
+    func updateMediaOptionsEx(channelId: String, publishCamera: Bool, publishMic: Bool = false) {
+        let mediaOptions = AgoraRtcChannelMediaOptions()
+        mediaOptions.publishCameraTrack = publishCamera
+        mediaOptions.publishMicrophoneTrack = publishMic
+        mediaOptions.autoSubscribeAudio = publishMic
+        mediaOptions.autoSubscribeVideo = publishCamera
+        mediaOptions.clientRoleType = publishCamera ? .broadcaster : .audience
+        let uid = Int(VLUserCenter.user.id) ?? 0
+        let connection = AgoraRtcConnection(channelId: channelId, localUid: uid)
+        engine?.updateChannelEx(with: mediaOptions, connection: connection)
+    }
+    
+    /// 设置编码分辨率
+    /// - Parameter size: 分辨率
+    func setVideoDimensions(_ size: CGSize){
+        guard let engine = engine else {
+            assert(true, "rtc engine not initlized")
+            return
+        }
+        encoderConfig.dimensions = CGSize(width: size.width, height: size.height)
+        engine.setVideoEncoderConfiguration(encoderConfig)
+    }
+    
     func cleanCapture() {
         guard let engine = engine else {
             assert(true, "rtc engine not initlized")
@@ -401,7 +432,7 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         
-        NetworkManager.shared.generateToken(channelName: targetChannelId,
+        NetworkManager.shared.generateToken(channelName: "",
                                             uid: VLUserCenter.user.id,
                                             tokenType: .token007,
                                             type: .rtc) {[weak self] token in
@@ -435,8 +466,8 @@ class ShowAgoraKitManager: NSObject {
         engine.setupLocalVideo(canvas)
         engine.startPreview()
         engine.setDefaultAudioRouteToSpeakerphone(true)
-        engine.enableAudio()
-        engine.enableVideo()
+        engine.enableLocalAudio(true)
+        engine.enableLocalVideo(true)
         showLogger.info("setupLocalVideo target uid:\(uid), user uid\(UserInfo.userId)", context: kShowLogBaseContext)
     }
     
@@ -447,7 +478,7 @@ class ShowAgoraKitManager: NSObject {
             videoCanvas.view = canvasView
             videoCanvas.renderMode = .hidden
             let ret = engine?.setupRemoteVideoEx(videoCanvas, connection: connection)
-                    
+            
             showLogger.info("setupRemoteVideoEx ret = \(ret ?? -1), uid:\(uid) localuid: \(UserInfo.userId) channelId: \(channelId)", context: kShowLogBaseContext)
             return
         }
