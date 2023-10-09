@@ -1,5 +1,10 @@
 package io.agora.scene.cantata.ui.dialog
 
+interface EarPhoneCallback {
+    fun onHasEarPhoneChanged(hasEarPhone: Boolean)
+    fun onEarMonitorDelay(earsBackDelay: Int)
+}
+
 class MusicSettingBean constructor(
     private var isEar: Boolean,
     private var volMic: Int,
@@ -18,9 +23,7 @@ class MusicSettingBean constructor(
             mCallback.onBeautifierPresetChanged(beautifier)
         }
     var audioEffectParams1 = 0
-        private set
     var audioEffectParams2 = 0
-        private set
     var remoteVolume = 40
         set(newValue) {
             field = newValue
@@ -71,4 +74,14 @@ class MusicSettingBean constructor(
         toneValue = newToneValue
         mCallback.onToneChanged(newToneValue)
     }
+
+    var earBackVolume = 100 // 耳返音量
+
+    var earBackMode = 0 // 耳返模式：0(自动), 1(强制OpenSL), 2(强制Oboe)
+
+    var hasEarPhone = false // 是否有耳机
+
+    var earBackDelay = 0 // 耳返延迟
+
+    var mEarPhoneCallback: EarPhoneCallback? = null
 }

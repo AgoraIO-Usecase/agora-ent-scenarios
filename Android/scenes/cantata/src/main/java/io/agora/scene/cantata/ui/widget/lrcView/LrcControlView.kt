@@ -2,29 +2,15 @@ package io.agora.scene.cantata.ui.widget.lrcView
 
 import android.content.Context
 import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.drawable.Drawable
-import android.text.Spannable
-import android.text.SpannableString
 import android.text.TextUtils
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.palette.graphics.Palette
-import androidx.vectordrawable.graphics.drawable.Animatable2Compat
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.gif.GifDrawable
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
 import io.agora.karaoke_view.v11.KaraokeEvent
 import io.agora.karaoke_view.v11.KaraokeView
 import io.agora.karaoke_view.v11.LyricsView
@@ -40,7 +26,6 @@ import io.agora.scene.cantata.ktvapi.ILrcView
 import io.agora.scene.cantata.service.RoomSeatModel
 import io.agora.scene.cantata.service.RoomSelSongModel
 import io.agora.scene.cantata.ui.widget.OnClickJackingListener
-import io.agora.scene.widget.basic.OutlineSpan
 import io.agora.scene.widget.utils.UiUtils
 import java.io.File
 
@@ -49,6 +34,11 @@ import java.io.File
  */
 class LrcControlView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     FrameLayout(context, attrs, defStyleAttr), ILrcView, OnClickJackingListener {
+
+    private companion object{
+        private const val TAG = "LrcControlView"
+    }
+
     private val mBinding: CantataLayoutLrcControlViewBinding by lazy {
         CantataLayoutLrcControlViewBinding.inflate(LayoutInflater.from(context), this, true)
     }
@@ -57,7 +47,6 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         CantataLayoutLrcPrepareBinding.bind(mBinding.root)
     }
     var karaokeView: KaraokeView? = null
-    var cumulativeScoreInPercentage = 0
     val lyricsView: LyricsView
         get() = mBinding.ilActive.lyricsView
 
@@ -113,6 +102,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
                 index: Int,
                 total: Int
             ) {
+                Log.d(TAG, "onLineFinished $score $cumulativeScore $index $total")
                 if (mRole == Role.Singer || mRole == Role.CoSinger) {
                     mOnKaraokeActionListener?.onLineFinished(line, score, cumulativeScore, index, total)
                 }

@@ -20,7 +20,10 @@ import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.api.ApiManager
 import io.agora.scene.cantata.databinding.CantataActivityRoomLivingBinding
-import io.agora.scene.cantata.service.*
+import io.agora.scene.cantata.service.JoinRoomOutputModel
+import io.agora.scene.cantata.service.RoomSeatModel
+import io.agora.scene.cantata.service.RoomSelSongModel
+import io.agora.scene.cantata.service.ScoringAlgoControlModel
 import io.agora.scene.cantata.ui.dialog.CantataCommonDialog
 import io.agora.scene.cantata.ui.dialog.ChorusSingerDialog
 import io.agora.scene.cantata.ui.dialog.MusicSettingDialog
@@ -475,6 +478,11 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             )
             musicSettingDialog?.show(supportFragmentManager, MusicSettingDialog.TAG)
         }
+    }
+
+    fun closeMusicSettingsDialog() {
+        setDarkStatusIcon(isBlackDarkStatus)
+        musicSettingDialog?.dismiss()
     }
 
     // 切歌

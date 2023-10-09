@@ -60,11 +60,11 @@
     <string name="cantata_leave_title">关闭歌房</string>
     <string name="cantata_leave_msg">关闭歌房后所有成员将被移除房间</string>
     <string name="cantata_music_menu_dialog_title">控制台</string>
-    <string name="cantata_music_menu_dialog_ear">耳返</string>
+    <string name="cantata_music_menu_dialog_ear">耳返设置</string>
     <string name="cantata_music_menu_dialog_tone">升降调</string>
-    <string name="cantata_music_menu_dialog_vol1">音量</string>
+    <string name="cantata_music_menu_dialog_vol1">人声音量</string>
     <string name="cantata_music_menu_dialog_remote_volume">远端音量</string>
-    <string name="cantata_music_menu_dialog_vol2">伴奏</string>
+    <string name="cantata_music_menu_dialog_vol2">伴奏音量</string>
     <string name="cantata_music_menu_dialog_effect">效果</string>
     <string name="cantata_song_rank_1">热歌榜</string>
     <string name="cantata_song_rank_2">嗨唱推荐</string>
@@ -168,4 +168,7 @@
     <string name="cantata_score1">%d分</string>
     <string name="cantata_current_score">当前 %s 分</string>
     <string name="cantata_not_on_the_list">暂无上榜</string>
+    <string name="cantata_switch_open">开启</string>
+    <string name="cantata_switch_close">关闭</string>
+    <string name="cantata_earback_tips">开启耳返可实时听到自己的声音，唱歌的时候及时调整</string>
 </resources>
