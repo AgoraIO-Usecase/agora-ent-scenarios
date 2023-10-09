@@ -34,15 +34,15 @@ class ShowAgoraKitManager: NSObject {
 //    var matrixCoefficientsExt: Int?
 //    var videoFullrangeExt: Int?
     
-//    let encoderConfig = AgoraVideoEncoderConfiguration()
+    let encoderConfig = AgoraVideoEncoderConfiguration()
     
-//    public lazy var captureConfig: AgoraCameraCapturerConfiguration = {
-//        let config = AgoraCameraCapturerConfiguration()
-//        config.followEncodeDimensionRatio = true
-//        config.cameraDirection = .front
-//        config.frameRate = 15
-//        return config
-//    }()
+    public lazy var captureConfig: AgoraCameraCapturerConfiguration = {
+        let config = AgoraCameraCapturerConfiguration()
+        config.followEncodeDimensionRatio = true
+        config.cameraDirection = .front
+        config.frameRate = 15
+        return config
+    }()
     
     public var engine: AgoraRtcEngineKit?
     
