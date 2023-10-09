@@ -266,7 +266,6 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         videoCanvas.view = container.container
         videoCanvas.renderMode = .hidden
         let ret = engine.setupRemoteVideoEx(videoCanvas, connection: connection)
-                
         apiPrint("renderVideo[\(connection.channelId)] ret = \(ret), uid:\(roomInfo.uid) localuid: \(localUid) ")
     }
     
