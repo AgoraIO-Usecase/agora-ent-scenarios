@@ -41,7 +41,7 @@ object ScenesConstructor {
                 AgoraScenes.SingBattleGame,
                 "io.agora.scene.ktv.singbattle.create.RoomListActivity",
                 context.getString(R.string.ktv_singbattle_online),
-                R.mipmap.bg_btn_home6,
+                R.mipmap.bg_btn_home4,
                 0,
                 true
             ),
