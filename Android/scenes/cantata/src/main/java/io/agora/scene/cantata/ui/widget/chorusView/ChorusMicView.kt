@@ -48,12 +48,6 @@ class ChorusMicView @JvmOverloads constructor(
     private val sideMicViews: MutableList<MicView> = mutableListOf() // 周边麦位视图数组
     private val boundaryInset: Float = 20.0f.dp // 边界缩进值
 
-    var seatArray: List<RoomSeatModel>? = null
-        set(value) {
-            field = value
-            value?.let { updateAllMics(it) }
-        }
-
     var delegate: ChorusMicViewDelegate? = null
 
     init {
@@ -195,16 +189,28 @@ class ChorusMicView @JvmOverloads constructor(
     }
 
 
-    private fun updateAllMics(seatArray: List<RoomSeatModel>) {
+     fun updateAllMics(leadSingerModel: RoomSeatModel, seatArray: List<RoomSeatModel>) {
         Log.d(TAG, "updateAllMics ${seatArray.size}")
-        for (roomSeat in seatArray) {
-            val headUrl = roomSeat.headUrl
-            val index = roomSeat.seatIndex
-            val micView = findMicViewWithTag(1000 + index) ?: return
-            micView.getMicTextView().apply {
-                text = roomSeat.name.ifEmpty { context.getString(R.string.cantata_seat_index, roomSeat.seatIndex) }
+        val micView = findMicViewWithTag(1000) ?: return
+        micView.getMicTextView().apply {
+            text = leadSingerModel.name.ifEmpty { context.getString(R.string.cantata_seat_index, leadSingerModel.seatIndex) }
+        }
+        micView.updateMicImage(leadSingerModel.headUrl)
+
+        for (i in 0 until childCount) {
+            if (seatArray.size > i) {
+                val micView1 = findMicViewWithTag(1000 + i + 1) ?: return
+                micView1.getMicTextView().apply {
+                    text = seatArray[i].name.ifEmpty { context.getString(R.string.cantata_seat_index, i) }
+                }
+                micView1.updateMicImage(seatArray[i].headUrl)
+            } else {
+                val micView1 = findMicViewWithTag(1000 + i + 1) ?: return
+                micView1.getMicTextView().apply {
+                    text = context.getString(R.string.cantata_seat_index, (i + 1))
+                }
+                micView1.updateMicImage("")
             }
-            micView.updateMicImage(headUrl)
         }
     }
 
