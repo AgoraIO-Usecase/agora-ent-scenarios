@@ -113,16 +113,6 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
                 index: Int,
                 total: Int
             ) {
-//                if (mRole == Role.Singer) {
-//                    mOnKaraokeActionListener?.onLineFinished(line, score, cumulativeScore, index, total)
-//                } else if (mRole == Role.CoSinger) {
-//                    chorusScore += score
-//                    updateScore(
-//                        score.toDouble(), chorusScore.toDouble(),
-//                        /** Workaround(Hai_Guo) */
-//                        (total * 100).toDouble()
-//                    )
-//                }
                 if (mRole == Role.Singer || mRole == Role.CoSinger) {
                     mOnKaraokeActionListener?.onLineFinished(line, score, cumulativeScore, index, total)
                 }
@@ -262,18 +252,9 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, 0)
     }
 
-    fun setCountDown(time: Int) {
-
-    }
-
     // 更新总分
     fun updateLocalCumulativeScore(seatModel: RoomSeatModel?) {
         mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, seatModel?.score ?: 0)
-    }
-
-    // 更新合唱人数
-    fun updateChorusNumber(seatModel: List<RoomSeatModel>) {
-        mBinding.tvCoNumber.text = resources.getString(R.string.cantata_on_chorus_user, seatModel.size)
     }
 
 
@@ -290,14 +271,6 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
             mBinding.ilActive.lyricsView.setCurrentLineTextColor(defaultColor)
         }
         mBinding.clActive.setBackgroundResource(resId)
-    }
-
-    fun updateScore(score: Double, cumulativeScore: Double, perfectScore: Double) {
-        cumulativeScoreInPercentage = (cumulativeScore / perfectScore * 100).toInt()
-        mBinding.tvCumulativeScore.text =
-            resources.getString(
-                R.string.cantata_score_formatter, cumulativeScore.toInt()
-            )
     }
 
     override fun onClickJacking(v: View) {

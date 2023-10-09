@@ -26,13 +26,15 @@
 
         <TextView
             android:id="@+id/tvMusicName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:drawableStart="@mipmap/ic_music_name"
-            android:gravity="center"
+            android:gravity="start|center_vertical"
             android:textColor="@android:color/white"
             android:textSize="13sp"
+            android:ellipsize="end"
+            app:layout_constraintEnd_toStartOf="@+id/tvCumulativeScore"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="花海" />
