@@ -897,6 +897,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             override fun onAudioRouteChanged(routing: Int) { // 0\2\5 earPhone
                 audioRouting = routing
                 processAudioProfessionalProfile()
+                ktvApiEventHandlerList.forEach {
+                    it.onAudioRouteChanged(routing)
+                }
             }
 
             // 用于检测收发流状态
