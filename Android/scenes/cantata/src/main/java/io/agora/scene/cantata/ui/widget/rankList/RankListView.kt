@@ -36,6 +36,11 @@ class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
     private fun init(context: Context) {
         mBinding.rvRankList.adapter = mAdapter
+        mBinding.tvNextSongCountdown.setOnClickListener {
+            mCountDownLatch?.cancel()
+            onNextSongClickCallback?.invoke()
+            isVisible = false
+        }
     }
 
     fun resetRankList(list: List<RankItem>, nextSongName: String?) {
@@ -86,8 +91,8 @@ class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeS
             }
 
             override fun onFinish() {
-                isVisible = false
                 onNextSongClickCallback?.invoke()
+                isVisible = false
             }
         }.start()
     }
