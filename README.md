@@ -23,6 +23,10 @@
     * [Android](Android/scenes/pure1v1)
     * [iOS](iOS/AgoraEntScenarios/Scenes/Pure1v1)
 
+* 秀场转1v1私密房
+    * [Android](Android/scenes/showTo1v1)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/ShowTo1v1)
+
 >
 > Demo 效果:
 >
@@ -46,6 +50,9 @@
 * 运行1v1私密房项目，请参考以下流程
     * [Android](Android/scenes/pure1v1)
     * [iOS](iOS/AgoraEntScenarios/Scenes/Pure1v1)
+* 运行秀场转1v1私密房项目，请参考以下流程
+    * [Android](Android/scenes/showTo1v1)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/ShowTo1v1)
 
 # 2. FAQ
 

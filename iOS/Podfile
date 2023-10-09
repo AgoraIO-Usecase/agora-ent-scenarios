@@ -36,17 +36,16 @@ def all_pods
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
   
-  pod 'AgoraSyncManager', '2.1.1'
+  pod 'AgoraSyncManager', '2.1.2'
 
 #  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
-# pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
   pod 'AgoraRtcEngine_Special_iOS', '4.1.1.17'
 
   pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
-  pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
-
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
+  pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
+  pod 'ShowTo1v1', :path => 'AgoraEntScenarios/Scenes/ShowTo1v1'
 
   #ThirdParty
   pod 'HWWeakTimer', '1.0'

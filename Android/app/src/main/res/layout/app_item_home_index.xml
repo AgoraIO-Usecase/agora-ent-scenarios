@@ -34,7 +34,7 @@
         android:layout_marginStart="22dp"
         android:layout_marginTop="25dp"
         android:textColor="@color/white"
-        android:textSize="22sp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@id/ivScenesBg"
         app:layout_constraintTop_toTopOf="@id/ivScenesBg"
         tools:text="@string/ktv_online" />
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             tools:text="@string/app_voice_chat_spatialTip"
             android:textColor="@color/white"
-            android:textSize="14sp" />
+            android:textSize="13sp" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvUnActive"
