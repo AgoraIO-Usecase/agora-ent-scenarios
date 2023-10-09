@@ -21,8 +21,12 @@
     <string name="photograph">拍照</string>
     <string name="complete_validation">完成验证</string>
     <string name="drag_complete">拖动下方滑块完成拼图</string>
+
+    <string name="agreement_page_title">个人信息保护指引</string>
     <string name="privacy_protection_tip1">声动互娱软件是一款用于向声网客户展示产品使用效果的测试产品，仅用于测试产品的功能、性能和可用性，而非提供给大众使用的正式产品。\n1.我们将依据《用户协议》及《隐私政策》来帮助您了解我们在收集、使用、存储您个人信息的情况以及您享有的相关权利。\n2.在您使用本测试软件时，我们将收集您的设备信息、日志信息等，同时根据不同使用场景，你可以授予我们获取您设备的麦克风权限、摄像头权限等信息。\n\n您可通过阅读完整的《用户协议》及《隐私政策》来了解详细信息。</string>
     <string name="privacy_protection_tip2">同意 用户协议 及 隐私政策 后，声动互娱才能为您提供协作服务。</string>
+    <string name="privacy_protection_notice">选择“同意”，体验声动互娱完整功能</string>
+
     <string name="send_v_code">发送验证码</string>
     <string name="i_agree">我已阅读并同意</string>
     <string name="ktv_online">在线K歌房</string>

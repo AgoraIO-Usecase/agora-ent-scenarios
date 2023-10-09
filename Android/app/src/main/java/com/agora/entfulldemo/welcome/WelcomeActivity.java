@@ -18,8 +18,6 @@ import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.base.manager.PagePilotManager;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.SPUtil;
-import io.agora.scene.widget.dialog.UserAgreementDialog;
-import io.agora.scene.widget.dialog.UserAgreementDialog2;
 
 @Route(path = PagePathConstant.pageWelcome)
 public class WelcomeActivity extends BaseViewBindingActivity<AppActivityWelcomeBinding> {
