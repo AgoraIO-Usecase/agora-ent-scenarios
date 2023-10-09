@@ -42,6 +42,7 @@
         android:paddingHorizontal="10dp"
         android:paddingVertical="4dp"
         android:layout_marginTop="42dp"
+        app:enableDragging="true"
         app:currentLineHighlightedTextColor="@color/pink_b4"
         app:currentLineTextColor="@color/white"
         app:currentLineTextSize="18sp"

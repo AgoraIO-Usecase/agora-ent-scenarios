@@ -139,6 +139,7 @@ class ChorusSingerDialog constructor(
     }
 
     fun updateAllData() {
-        mAdapter.resetAll(seatModelList)
+        val list = seatModelList.sortedByDescending { it.score }
+        mAdapter.resetAll(list)
     }
 }

@@ -24,6 +24,7 @@ class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeS
     }
 
     private var mCountDownLatch: CountDownTimer? = null
+    var onNextSongClickCallback: (() -> Unit)? = null
 
     private val  numberFormat: NumberFormat by lazy {
         DecimalFormat("#,###")
@@ -37,7 +38,7 @@ class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeS
         mBinding.rvRankList.adapter = mAdapter
     }
 
-    fun resetRankList(list: List<RankItem>) {
+    fun resetRankList(list: List<RankItem>, nextSongName: String?) {
         val newList: MutableList<RankItem> = ArrayList()
         newList.addAll(list)
         if (list.size < 3) {
@@ -61,18 +62,17 @@ class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeS
         val formattedNumber = numberFormat.format(totalScore)
         mBinding.tvRoundScore.text = formattedNumber
 
-        // TODO:
-        updateNextSong("Test")
+        updateNextSong(nextSongName)
     }
 
-    fun updateNextSong(songName: String?) {
-        mBinding.tvNextSong.isGone = songName.isNullOrEmpty()
-        mBinding.tvNextSongCountdown.isGone = songName.isNullOrEmpty()
-        songName?.let {
-            mBinding.tvNextSong.text = context.getString(R.string.cantata_next_song, it)
-            startTimer()
+    private fun updateNextSong(songName: String?) {
+        if (songName == null) {
+            mBinding.tvNextSong.visibility = GONE
+        } else {
+            mBinding.tvNextSong.visibility = VISIBLE
+            mBinding.tvNextSong.text = context.getString(R.string.cantata_next_song, songName)
         }
-
+        startTimer()
     }
 
     private fun startTimer(){
@@ -87,7 +87,8 @@ class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
             override fun onFinish() {
                 isVisible = false
+                onNextSongClickCallback?.invoke()
             }
-        }.start();
+        }.start()
     }
 }

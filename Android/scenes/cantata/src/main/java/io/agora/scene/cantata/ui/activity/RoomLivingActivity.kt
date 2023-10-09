@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.agora.rtc2.Constants
+import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.event.NetWorkEvent
@@ -263,9 +264,9 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
                 binding.lrcControlView.onPauseStatus()
             } else if (status == PlayerMusicStatus.ON_LRC_RESET) {
                 binding.lrcControlView.lyricsView.reset()
-                if (binding.lrcControlView.role == LrcControlView.Role.Singer) {
-                    mRoomLivingViewModel.changeMusic()
-                }
+//                if (binding.lrcControlView.role == LrcControlView.Role.Singer) {
+//                    mRoomLivingViewModel.changeMusic()
+//                }
             } else if (status == PlayerMusicStatus.ON_CHANGING_START) {
                 binding.lrcControlView.isEnabled = false
             } else if (status == PlayerMusicStatus.ON_CHANGING_END) {
@@ -300,7 +301,19 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mRoomLivingViewModel.mRoundRankListLiveData.observe(this) { showRank: Boolean ->
             binding.rankListView.isVisible = showRank
             if (showRank) {
-                binding.rankListView.resetRankList(mRoomLivingViewModel.getRankList() ?: emptyList())
+                if (mRoomLivingViewModel.mSongsOrderedLiveData.value != null && mRoomLivingViewModel.mSongsOrderedLiveData.value!!.size > 1) {
+                    val nextName = mRoomLivingViewModel.mSongsOrderedLiveData.value!!.get(1).songName + "-" + mRoomLivingViewModel.mSongsOrderedLiveData.value!!.get(1).singer
+                    binding.rankListView.resetRankList(mRoomLivingViewModel.getRankList() ?: emptyList(), nextName)
+                } else {
+                    binding.rankListView.resetRankList(mRoomLivingViewModel.getRankList() ?: emptyList(), null)
+                }
+            }
+        }
+        binding.rankListView.onNextSongClickCallback = {
+            mRoomLivingViewModel.mSongPlayingLiveData.value?.let {
+                if (it.userNo == UserManager.getInstance().user.id.toString()) {
+                    mRoomLivingViewModel.changeMusic()
+                }
             }
         }
     }
