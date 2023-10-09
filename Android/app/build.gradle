@@ -36,6 +36,9 @@ dependencies {
     if (isProjectLibrary(':scenes:show')) {
         runtimeOnly project(':scenes:show')
     }
+    if (isProjectLibrary(':scenes:pure1v1')) {
+        runtimeOnly project(':scenes:pure1v1')
+    }
 
     //glide 图片加载
     api rootProject.ext.deps.glide
