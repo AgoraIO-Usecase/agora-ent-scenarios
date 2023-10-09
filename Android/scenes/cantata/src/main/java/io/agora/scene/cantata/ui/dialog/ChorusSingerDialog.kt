@@ -1,7 +1,9 @@
 package io.agora.scene.cantata.ui.dialog
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isGone
@@ -21,6 +23,7 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 
 class ChorusSingerDialog constructor(
+    private val isRoomOwner: Boolean,
     private val selSongModel: RoomSelSongModel?,
     private val seatModelList: List<RoomSeatModel>
 ) :
@@ -44,52 +47,77 @@ class ChorusSingerDialog constructor(
                 val binding: CantataItemSingingUserBinding = holder.binding
                 when (position) {
                     0 -> {
-                        binding.ivChorusNum.setImageResource(R.drawable.cantata_rank_one)
-                        binding.ivChorusNum.visibility = View.VISIBLE
-                        binding.tvChorusNum.visibility = View.INVISIBLE
+                        binding.ivSingerNum.setImageResource(R.drawable.cantata_rank_one)
+                        binding.ivSingerNum.visibility = View.VISIBLE
+                        binding.tvSingerNum.visibility = View.INVISIBLE
                     }
 
                     1 -> {
-                        binding.ivChorusNum.setImageResource(R.drawable.cantata_rank_two)
-                        binding.ivChorusNum.visibility = View.VISIBLE
-                        binding.tvChorusNum.visibility = View.INVISIBLE
+                        binding.ivSingerNum.setImageResource(R.drawable.cantata_rank_two)
+                        binding.ivSingerNum.visibility = View.VISIBLE
+                        binding.tvSingerNum.visibility = View.INVISIBLE
                     }
 
                     2 -> {
-                        binding.ivChorusNum.setImageResource(R.drawable.cantata_rank_three)
-                        binding.ivChorusNum.visibility = View.VISIBLE
-                        binding.tvChorusNum.visibility = View.INVISIBLE
+                        binding.ivSingerNum.setImageResource(R.drawable.cantata_rank_three)
+                        binding.ivSingerNum.visibility = View.VISIBLE
+                        binding.tvSingerNum.visibility = View.INVISIBLE
                     }
 
                     else -> {
-                        binding.tvChorusNum.text = "${(position + 1)}"
-                        binding.ivChorusNum.visibility = View.INVISIBLE
-                        binding.tvChorusNum.visibility = View.VISIBLE
+                        binding.tvSingerNum.text = "${(position + 1)}"
+                        binding.ivSingerNum.visibility = View.INVISIBLE
+                        binding.tvSingerNum.visibility = View.VISIBLE
                     }
                 }
-                binding.tvUserName.text = item.name
+                binding.tvSingerName.text = item.name
                 if (item.score == -1) {
-                    binding.tvChorusScore.text = "-"
+                    binding.tvSingerScore.text = "-"
                 } else {
                     val scoreStr = numberFormat.format(item.score)
-                    binding.tvChorusScore.text =
+                    binding.tvSingerScore.text =
                         binding.root.context.getString(R.string.cantata_current_score, scoreStr)
                 }
+                context?.let {
+                    if (selSongModel?.userNo == item.userNo) {
+                        binding.tvSingerName.setCompoundDrawablesRelative(
+                            it.getDrawable(R.drawable.cantata_main_singer_ic)?.apply {
+                                setBounds(0, 0, intrinsicWidth, intrinsicHeight)
+                            },
+                            null, null, null
+                        )
+                    } else {
+                        binding.tvSingerName.setCompoundDrawablesRelative(null, null, null, null)
+                    }
+                }
+
                 if (item.headUrl == "") {
-                    binding.ivUserAvatar.setImageResource(R.mipmap.userimage)
+                    binding.ivSingerAvatar.setImageResource(R.mipmap.userimage)
                 } else {
                     GlideApp.with(mBinding.root)
                         .load(item.headUrl)
                         .error(R.mipmap.userimage)
                         .transform(CenterCropRoundCornerTransform(100))
-                        .into(binding.ivUserAvatar)
+                        .into(binding.ivSingerAvatar)
                 }
-                binding.btnKicking.isGone = selSongModel?.userNo == item.userNo
+                binding.btnKicking.isGone = isRoomOwner
                 binding.btnKicking.setOnClickListener(object : OnClickJackingListener {
                     override fun onClickJacking(view: View) {
                         onKickingCallback?.invoke(item)
                     }
                 })
+            }
+
+            override fun onCreateViewHolder(
+                parent: ViewGroup,
+                viewType: Int
+            ): BindingViewHolder<CantataItemSingingUserBinding> {
+                return BindingViewHolder(
+                    CantataItemSingingUserBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent, false
+                    )
+                )
             }
         }
 
@@ -110,7 +138,7 @@ class ChorusSingerDialog constructor(
         mBinding.tvTitle.text = mBinding.root.context.getString(R.string.cantata_singing_user, seatModelList.size)
     }
 
-    fun updateAllData(){
+    fun updateAllData() {
         mAdapter.resetAll(seatModelList)
     }
 }
