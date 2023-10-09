@@ -155,7 +155,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         // 注册回调
         mPlayer.registerPlayerObserver(this)
-        mRtcEngine.addHandlerEx(this, singChannelRtcConnection)
         setKTVParameters()
         startDisplayLrc()
         startSyncPitch()
@@ -657,7 +656,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         // 导唱
         mPlayer.setPlayerOption("enable_multi_audio_track", 1)
         (mPlayer as IAgoraMusicPlayer).open(songCode, startPos)
-        mPlayer.setLoopCount(-1)
     }
 
     override fun startSing(url: String, startPos: Long) {
@@ -848,6 +846,57 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                 super.onJoinChannelSuccess(channel, uid, elapsed)
                 Log.d(TAG, "singChannel onJoinChannelSuccess: $newRole")
+            }
+
+            override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
+                super.onStreamMessage(uid, streamId, data)
+                dealWithStreamMessage(uid, streamId, data)
+            }
+
+            override fun onAudioVolumeIndication(speakers: Array<out AudioVolumeInfo>?, totalVolume: Int) {
+                val allSpeakers = speakers ?: return
+                // VideoPitch 回调, 用于同步各端音准
+                if (singerRole != KTVSingRole.Audience) {
+                    for (info in allSpeakers) {
+                        if (info.uid == 0) {
+                            pitch =
+                                if (mediaPlayerState == MediaPlayerState.PLAYER_STATE_PLAYING && isOnMicOpen) {
+                                    info.voicePitch
+                                } else {
+                                    0.0
+                                }
+                        }
+                    }
+                }
+            }
+
+            // 用于合唱校准
+            override fun onLocalAudioStats(stats: LocalAudioStats?) {
+                if (useCustomAudioSource) return
+                val audioState = stats ?: return
+                audioPlayoutDelay = audioState.audioPlayoutDelay
+            }
+
+            // 用于检测耳机状态
+            override fun onAudioRouteChanged(routing: Int) { // 0\2\5 earPhone
+                audioRouting = routing
+                processAudioProfessionalProfile()
+            }
+
+            // 用于检测收发流状态
+            override fun onAudioPublishStateChanged(
+                channel: String?,
+                oldState: Int,
+                newState: Int,
+                elapseSinceLastState: Int
+            ) {
+                Log.d(TAG, "onAudioPublishStateChanged: oldState: $oldState, newState: $newState")
+                if (newState == 3) {
+                    isPublishAudio = true
+                    processAudioProfessionalProfile()
+                } else if (newState == 1) {
+                    isPublishAudio = false
+                }
             }
         })
 
@@ -1323,16 +1372,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     // ------------------------ AgoraRtcEvent ------------------------
-    override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
-        dealWithStreamMessage(uid, streamId, data)
-    }
-
     private fun dealWithStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
         val jsonMsg: JSONObject
         val messageData = data ?: return
         try {
             val strMsg = String(messageData)
             jsonMsg = JSONObject(strMsg)
+            if (!jsonMsg.has("cmd")) return
             if (jsonMsg.getString("cmd") == "setLrcTime") { //同步歌词
                 val position = jsonMsg.getLong("time")
                 val realPosition = jsonMsg.getLong("realTime")
@@ -1428,52 +1474,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             }
         } catch (exp: JSONException) {
             Log.e(TAG, "onStreamMessage:$exp")
-        }
-    }
-
-    override fun onAudioVolumeIndication(speakers: Array<out AudioVolumeInfo>?, totalVolume: Int) {
-        val allSpeakers = speakers ?: return
-        // VideoPitch 回调, 用于同步各端音准
-        if (this.singerRole != KTVSingRole.Audience) {
-            for (info in allSpeakers) {
-                if (info.uid == 0) {
-                    pitch =
-                            if (this.mediaPlayerState == MediaPlayerState.PLAYER_STATE_PLAYING && isOnMicOpen) {
-                                info.voicePitch
-                            } else {
-                                0.0
-                            }
-                }
-            }
-        }
-    }
-
-    // 用于合唱校准
-    override fun onLocalAudioStats(stats: LocalAudioStats?) {
-        if (useCustomAudioSource) return
-        val audioState = stats ?: return
-        audioPlayoutDelay = audioState.audioPlayoutDelay
-    }
-
-    // 用于检测耳机状态
-    override fun onAudioRouteChanged(routing: Int) { // 0\2\5 earPhone
-        this.audioRouting = routing
-        processAudioProfessionalProfile()
-    }
-
-    // 用于检测收发流状态
-    override fun onAudioPublishStateChanged(
-            channel: String?,
-            oldState: Int,
-            newState: Int,
-            elapseSinceLastState: Int
-    ) {
-        Log.d(TAG, "onAudioPublishStateChanged: oldState: $oldState, newState: $newState")
-        if (newState == 3) {
-            this.isPublishAudio = true
-            processAudioProfessionalProfile()
-        } else if (newState == 1) {
-            this.isPublishAudio = false
         }
     }
 

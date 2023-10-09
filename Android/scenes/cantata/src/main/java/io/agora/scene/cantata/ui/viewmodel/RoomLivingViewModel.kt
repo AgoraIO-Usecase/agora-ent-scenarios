@@ -783,7 +783,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
      */
     fun joinChorus() {
         CantataLogger.d(TAG, "RoomLivingViewModel.joinChorus() called")
-        if (mRtcEngine!!.connectionState != CONNECTION_STATE_TYPE.getValue(CONNECTION_STATE_TYPE.CONNECTION_STATE_CONNECTED)) {
+        if (mRtcEngine!!.getConnectionStateEx(RtcConnection(mRoomInfoLiveData.value!!.roomNo + "_ad", UserManager.getInstance().user.id.toInt())) != CONNECTION_STATE_TYPE.getValue(CONNECTION_STATE_TYPE.CONNECTION_STATE_CONNECTED)) {
             mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
             ToastUtils.showToast(R.string.cantata_join_chorus_failed)
             return
@@ -796,19 +796,19 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
         if (!mIsOnSeat) {
             // 不在麦上， 自动上麦
-//            mCantataServiceProtocol.onSeat() { err: Exception? ->
-//                if (err == null) {
-//                    mIsOnSeat = true
-//                    //自动开麦
-//                    mMainChannelMediaOption.publishMicrophoneTrack = true
-//                    mMainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-//                    mRtcEngine?.updateChannelMediaOptions(mMainChannelMediaOption)
-//                    innerJoinChorus(musicModel.songNo)
-//                } else {
-//                    mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
-//                    ToastUtils.showToast(err.message)
-//                }
-//            }
+            mCantataServiceProtocol.onSeat(OnSeatInputModel(0)) { err: Exception? ->
+                if (err == null) {
+                    mIsOnSeat = true
+                    //自动开麦
+                    mMainChannelMediaOption.publishMicrophoneTrack = true
+                    mMainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
+                    mRtcEngine?.updateChannelMediaOptions(mMainChannelMediaOption)
+                    innerJoinChorus(musicModel.songNo)
+                } else {
+                    mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
+                    ToastUtils.showToast(err.message)
+                }
+            }
         } else {
             // 在麦上，直接加入合唱
             innerJoinChorus(musicModel.songNo)

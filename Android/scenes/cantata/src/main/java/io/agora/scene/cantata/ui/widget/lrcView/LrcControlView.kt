@@ -135,10 +135,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     fun onSelfJoinedChorus() {
-        mBinding.tvCumulativeScore.text = String.format(
-            resources.getString(R.string.cantata_score_formatter),
-            "" + chorusScore
-        )
+        mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, chorusScore)
         mRole = Role.CoSinger
         mBinding.ilActive.ivMusicStart.visibility = INVISIBLE
         mBinding.ilActive.switchOriginal.visibility = VISIBLE
@@ -151,7 +148,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         if (isMineOwner) {
             mBinding.ilActive.ivChangeSong.visibility = VISIBLE
         }
-        onSelfLeavedChorus()
+        //onSelfLeavedChorus()
     }
 
     fun onSelfJoinedChorusFailed() {
@@ -160,7 +157,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     fun onSelfLeavedChorus() {
-        mBinding.tvCumulativeScore.text = String.format(resources.getString(R.string.cantata_score_formatter), "" + 0)
+        mBinding.tvCumulativeScore.text = String.format(resources.getString(R.string.cantata_score_formatter), 0)
         mRole = Role.Listener
         mBinding.ilActive.ivMusicStart.visibility = GONE
         mBinding.ilActive.switchOriginal.visibility = INVISIBLE
