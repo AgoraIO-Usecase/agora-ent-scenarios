@@ -15,6 +15,7 @@ import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.event.NetWorkEvent
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.LiveDataUtils
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.api.ApiManager
@@ -215,6 +216,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             binding.cbMic.isEnabled = seatModel != null
             binding.cbMic.isChecked = isAudioChecked
             binding.lrcControlView.onSeat(seatModel != null)
+            binding.lrcControlView.updateLocalCumulativeScore(seatModel)
         }
         mRoomLivingViewModel.mSeatListLiveData.observe(this) { seatModels: List<RoomSeatModel>? ->
             seatModels ?: return@observe
@@ -339,8 +341,11 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mRoomLivingViewModel.mNetworkStatusLiveData.observe(this) { netWorkStatus: NetWorkEvent ->
             setNetWorkStatus(netWorkStatus.txQuality, netWorkStatus.rxQuality)
         }
-        mRoomLivingViewModel.mRoundRankListLiveData.observe(this){ showRank:Boolean ->
+        mRoomLivingViewModel.mRoundRankListLiveData.observe(this) { showRank: Boolean ->
             binding.rankListView.isVisible = showRank
+            if (showRank) {
+                binding.rankListView.resetRankList(mRoomLivingViewModel.getRankList() ?: emptyList())
+            }
         }
     }
 
@@ -540,8 +545,15 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
 
     // 合唱
     private fun showChorusSingerDialog() {
-        mChorusSingerDialog = ChorusSingerDialog()
+
+        val seatList = mRoomLivingViewModel.mSeatListLiveData.value ?: emptyList()
+        val songModel = mRoomLivingViewModel.mSongPlayingLiveData.value
+        mChorusSingerDialog = ChorusSingerDialog(songModel, seatList)
         mChorusSingerDialog?.show(supportFragmentManager, ChorusSingerDialog.TAG)
+        mChorusSingerDialog?.onKickingCallback = {
+            ToastUtils.showToast("on kicking ${it.name}")
+        }
+        mChorusSingerDialog?.updateAllData()
     }
 
     /**

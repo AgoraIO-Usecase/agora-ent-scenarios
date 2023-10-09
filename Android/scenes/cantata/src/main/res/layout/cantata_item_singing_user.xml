@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="64dp"
     android:orientation="vertical"
+    tools:background="@color/black_30_percent"
     android:paddingHorizontal="16dp">
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -69,4 +70,14 @@
         android:textSize="12sp"
         tools:text="当前分数 6,122 分"
         app:layout_constraintTop_toBottomOf="@+id/horizontal50"/>
+
+    <ImageButton
+        android:id="@+id/btnKicking"
+        android:background="@null"
+        android:src="@drawable/cantata_icon_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

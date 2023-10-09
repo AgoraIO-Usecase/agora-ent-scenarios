@@ -109,7 +109,7 @@
     <string name="cantata_song_ordering_person_chorus">合唱：</string>
     <string name="cantata_people">人</string>
     <string name="cantata_music_menu_dialog_mv">MV</string>
-    <string name="cantata_score_formatter">%s 总分</string>
+    <string name="cantata_score_formatter">%d 总分</string>
     <string name="cantata_beauty_voice">美声</string>
     <string name="cantata_voice_effect">音效</string>
     <string name="cantata_camera">摄像头</string>
@@ -165,5 +165,6 @@
     <string name="cantata_player_score">个人得分</string>
     <string name="cantata_next_song">下一首：%s</string>
     <string name="cantata_score1">%d分</string>
+    <string name="cantata_current_score">当前 %s 分</string>
     <string name="cantata_not_on_the_list">暂无上榜</string>
 </resources>

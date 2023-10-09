@@ -95,6 +95,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         mBinding.ilActive.ivJoinChorusBtn.setOnClickListener(this)
         mBinding.ilActive.ivLeaveChorus.setOnClickListener(this)
         mBinding.ilActive.downloadLrcFailedBtn.setOnClickListener(this)
+        mBinding.tvCoNumber.setOnClickListener(this)
         karaokeView?.setKaraokeEvent(object : KaraokeEvent {
             override fun onDragTo(view: KaraokeView, position: Long) {
                 mOnKaraokeActionListener?.onDragTo(position)
@@ -171,12 +172,12 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
 
     fun onUserJoinedChorus() {
         // TODO:
-        mBinding.tvCoNumber.text = String.format(resources.getString(R.string.cantata_on_chorus_user), "" + 0)
+        mBinding.tvCoNumber.text = resources.getString(R.string.cantata_on_chorus_user, 0)
     }
 
     fun onUserLeaveChorus() {
         // TODO:
-        mBinding.tvCoNumber.text = String.format(resources.getString(R.string.cantata_on_chorus_user), "" + 0)
+        mBinding.tvCoNumber.text = resources.getString(R.string.cantata_on_chorus_user,  0)
     }
 
     private var isOnSeat = false
@@ -273,12 +274,21 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
     fun setMusic(mMusic: RoomSelSongModel) {
         karaokeView?.reset()
         mBinding.tvMusicName.text = mMusic.songName + "-" + mMusic.singer
-        mBinding.tvCumulativeScore.text =
-            String.format(resources.getString(R.string.cantata_score_formatter), "0")
+        mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, 0)
     }
 
     fun setCountDown(time: Int) {
 
+    }
+
+    // 更新总分
+    fun updateLocalCumulativeScore(seatModel: RoomSeatModel?) {
+        mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, seatModel?.score ?: 0)
+    }
+
+    // 更新合唱人数
+    fun updateChorusNumber(seatModel: List<RoomSeatModel>){
+        mBinding.tvCoNumber.text = resources.getString(R.string.cantata_on_chorus_user,seatModel.size)
     }
 
 
@@ -299,10 +309,10 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
 
     fun updateScore(score: Double, cumulativeScore: Double, perfectScore: Double) {
         cumulativeScoreInPercentage = (cumulativeScore / perfectScore * 100).toInt()
-        mBinding.tvCumulativeScore.text = String.format(
-            resources.getString(R.string.cantata_score_formatter),
-            "" + cumulativeScore.toInt()
-        )
+        mBinding.tvCumulativeScore.text =
+            resources.getString(
+                R.string.cantata_score_formatter, cumulativeScore.toInt()
+            )
     }
 
     override fun onClickJacking(v: View) {
@@ -463,6 +473,8 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
 
     fun updateMicSeatModels(list: List<RoomSeatModel>?) {
         mBinding.ilActive.chorusMicView.seatArray = list
+
+        mBinding.tvCoNumber.text = resources.getString(R.string.cantata_on_chorus_user, list?.size ?: 0)
     }
 
     interface OnKaraokeEventListener {

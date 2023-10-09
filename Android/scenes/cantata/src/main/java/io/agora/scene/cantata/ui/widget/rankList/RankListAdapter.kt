@@ -47,11 +47,11 @@ class RankListAdapter : BindingSingleAdapter<RankItem, CantataItemRankListBindin
         } else {
             mBinding.tvScore.text = mBinding.tvScore.context.getString(R.string.cantata_score1, item.score)
         }
-        if (item.poster == "") {
+        if (item.avatar == "") {
             mBinding.ivHeader.visibility = View.INVISIBLE
         } else {
             GlideApp.with(mBinding.root)
-                .load(item.poster)
+                .load(item.avatar)
                 .error(R.mipmap.userimage)
                 .transform(CenterCropRoundCornerTransform(100))
                 .into(mBinding.ivHeader)
