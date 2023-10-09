@@ -1,9 +1,12 @@
 package io.agora.scene.cantata.ui.widget.rankList
 
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import io.agora.scene.base.GlideApp
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataItemRankListBinding
+import io.agora.scene.cantata.databinding.CantataItemSingingUserBinding
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
@@ -56,5 +59,17 @@ class RankListAdapter : BindingSingleAdapter<RankItem, CantataItemRankListBindin
                 .transform(CenterCropRoundCornerTransform(100))
                 .into(mBinding.ivHeader)
         }
+    }
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): BindingViewHolder<CantataItemRankListBinding> {
+        return BindingViewHolder(
+            CantataItemRankListBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent, false
+            )
+        )
     }
 }

@@ -121,9 +121,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     val mSongsOrderedLiveData: MutableLiveData<List<RoomSelSongModel>> = MutableLiveData<List<RoomSelSongModel>>()
     val mSongPlayingLiveData: MutableLiveData<RoomSelSongModel> = MutableLiveData<RoomSelSongModel>()
 
-
-    val mMainSingerScoreLiveData: MutableLiveData<LineScore> = MutableLiveData<LineScore>()
-
     /**
      * Player/RTC信息
      */
@@ -135,15 +132,11 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     val mNoLrcLiveData = MutableLiveData<Boolean>()
 
     val mPlayerMusicOpenDurationLiveData = MutableLiveData<Long>()
-    val mPlayerMusicPlayCompleteLiveData: MutableLiveData<ScoringAverageModel> = MutableLiveData<ScoringAverageModel>()
     val mPlayerMusicCountDownLiveData = MutableLiveData<Int>()
     val mNetworkStatusLiveData: MutableLiveData<NetWorkEvent> = MutableLiveData<NetWorkEvent>()
 
     val mScoringAlgoControlLiveData: MutableLiveData<ScoringAlgoControlModel> =
         MutableLiveData<ScoringAlgoControlModel>()
-
-    // 合唱人数
-    val mPlayerNumLiveData = MutableLiveData<Int>()
 
     // 是否显示结算页面
     val mRoundRankListLiveData = MutableLiveData<Boolean>()
@@ -773,7 +766,13 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
      */
     fun joinChorus() {
         CantataLogger.d(TAG, "RoomLivingViewModel.joinChorus() called")
-        if (mRtcEngine!!.getConnectionStateEx(RtcConnection(mRoomInfoLiveData.value!!.roomNo + "_ad", UserManager.getInstance().user.id.toInt())) != CONNECTION_STATE_TYPE.getValue(CONNECTION_STATE_TYPE.CONNECTION_STATE_CONNECTED)) {
+        if (mRtcEngine!!.getConnectionStateEx(
+                RtcConnection(
+                    mRoomInfoLiveData.value!!.roomNo + "_ad",
+                    UserManager.getInstance().user.id.toInt()
+                )
+            ) != CONNECTION_STATE_TYPE.getValue(CONNECTION_STATE_TYPE.CONNECTION_STATE_CONNECTED)
+        ) {
             mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
             ToastUtils.showToast(R.string.cantata_join_chorus_failed)
             return
@@ -962,28 +961,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             }
 
             override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray) {
-                val jsonMsg: JSONObject
-                try {
-                    val strMsg = String(data)
-                    jsonMsg = JSONObject(strMsg)
-                    if (jsonMsg.getString("cmd") == "singleLineScore") {
-                        val score = jsonMsg.getInt("score")
-                        val index = jsonMsg.getInt("index")
-                        val cumulativeScore = jsonMsg.getInt("cumulativeScore")
-                        val total = jsonMsg.getInt("total")
-                        val lineScore: LineScore = LineScore()
-                        lineScore.score = score
-                        lineScore.index = index
-                        lineScore.cumulativeScore = cumulativeScore
-                        lineScore.total = total
-                        mMainSingerScoreLiveData.postValue(lineScore)
-                    } else if (jsonMsg.getString("cmd") == "SingingScore") {
-                        val score = jsonMsg.getDouble("score").toFloat()
-                        mPlayerMusicPlayCompleteLiveData.postValue(ScoringAverageModel(false, score.toInt()))
-                    }
-                } catch (exp: JSONException) {
-                    CantataLogger.e(TAG, "onStreamMessage:$exp")
-                }
+
             }
         }
         config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING
@@ -1033,11 +1011,10 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
                     MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
                         if (isLocal) {
-                            mPlayerMusicPlayCompleteLiveData.postValue(ScoringAverageModel(true, 0))
                             mPlayerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET)
                         }
                         mSongPlayingLiveData.value?.let { roomSelSongModel ->
-                            if (roomSelSongModel.userNo == UserManager.getInstance().user.userNo) {
+                            if (roomSelSongModel.userNo == UserManager.getInstance().user.id.toString()) {
                                 mCantataServiceProtocol.markSongEnded(roomSelSongModel, completion = {
                                     mRoundRankListLiveData.postValue(true)
                                 })
@@ -1454,40 +1431,11 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     // ------------------ 歌词组件相关 ------------------
-    fun syncSingleLineScore(score: Int, cumulativeScore: Int, index: Int, total: Int) {
-        mRtcEngine?.let { rtcEngine ->
-            val msg: MutableMap<String?, Any?> = HashMap()
-            msg["cmd"] = "singleLineScore"
-            msg["score"] = score
-            msg["index"] = index
-            msg["cumulativeScore"] = cumulativeScore
-            msg["total"] = total
-            val jsonMsg = JSONObject(msg)
-            val ret = rtcEngine.sendStreamMessage(mStreamId, jsonMsg.toString().toByteArray())
-            if (ret < 0) {
-                CantataLogger.e(TAG, "syncSingleLineScore() sendStreamMessage called returned: $ret")
-            }
-        }
-    }
-
-    fun syncSingingAverageScore(score: Double) {
-        mRtcEngine?.let { rtcEngine ->
-            val msg: MutableMap<String?, Any?> = HashMap()
-            msg["cmd"] = "SingingScore"
-            msg["score"] = score
-            val jsonMsg = JSONObject(msg)
-            val ret = rtcEngine.sendStreamMessage(mStreamId, jsonMsg.toString().toByteArray())
-            if (ret < 0) {
-                CantataLogger.e(TAG, "syncSingingAverageScore() sendStreamMessage called returned: $ret")
-            }
-        }
-    }
-
     /**
      * 演唱者唱完一句更新麦位中 score 数据
      */
     fun updateSeatScoreStatus(score: Int, cumulativeScore: Int) {
-        mCantataServiceProtocol.updateSeatScoreStatus(cumulativeScore){ e->
+        mCantataServiceProtocol.updateSeatScoreStatus(cumulativeScore) { e ->
             if (e == null) {
                 // success
                 CantataLogger.d(TAG, "RoomLivingViewModel.updateSeatScoreStatus() success")
@@ -1502,7 +1450,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     fun getRankList(): List<RankItem>? {
         val rankItemList: MutableList<RankItem> = mutableListOf()
-        val seatList :List<RoomSeatModel> = mSeatListLiveData.value?: emptyList()
+        val seatList: List<RoomSeatModel> = mSeatListLiveData.value ?: emptyList()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             seatList.forEach { model ->
                 val item = RankItem()

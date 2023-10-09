@@ -26,7 +26,6 @@ import io.agora.scene.cantata.ui.dialog.ChorusSingerDialog
 import io.agora.scene.cantata.ui.dialog.MusicSettingDialog
 import io.agora.scene.cantata.ui.dialog.UserLeaveSeatMenuDialog
 import io.agora.scene.cantata.ui.viewmodel.JoinChorusStatus
-import io.agora.scene.cantata.ui.viewmodel.LineScore
 import io.agora.scene.cantata.ui.viewmodel.PlayerMusicStatus
 import io.agora.scene.cantata.ui.viewmodel.RoomLivingViewModel
 import io.agora.scene.cantata.ui.widget.LrcActionListenerImpl
@@ -156,11 +155,6 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
                 showChooseSongDialog()
             }
         })
-        binding.btnOK.setOnClickListener(object : OnClickJackingListener {
-            override fun onClickJacking(view: View) {
-                binding.groupResult.isVisible = false
-            }
-        })
         val lrcActionListenerImpl: LrcActionListenerImpl = object : LrcActionListenerImpl(
             this, mRoomLivingViewModel, binding.lrcControlView
         ) {
@@ -235,14 +229,6 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
 
         // 歌词相关
-        mRoomLivingViewModel.mMainSingerScoreLiveData.observe(this) { score: LineScore ->
-            binding.lrcControlView.onReceiveSingleLineScore(
-                score.score,
-                score.index,
-                score.cumulativeScore,
-                score.total
-            )
-        }
         mRoomLivingViewModel.mSongsOrderedLiveData.observe(this) { models: List<RoomSelSongModel>? ->
             if (models.isNullOrEmpty()) {
                 // songs empty
@@ -307,38 +293,6 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
         mRoomLivingViewModel.mPlayerMusicOpenDurationLiveData.observe(this) { duration: Long ->
             binding.lrcControlView.lyricsView.setDuration(duration)
-        }
-        mRoomLivingViewModel.mPlayerMusicPlayCompleteLiveData.observe(this) { score: ScoringAverageModel ->
-            if (score.isLocal) {
-                val sc: Int = binding.lrcControlView.cumulativeScoreInPercentage
-                binding.tvResultScore.text = sc.toString()
-                if (sc >= 90) {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_s)
-                } else if (sc >= 80) {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_a)
-                } else if (sc >= 70) {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_b)
-                } else {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_c)
-                }
-                binding.groupResult.visibility = View.VISIBLE
-                if (binding.lrcControlView.role == LrcControlView.Role.Singer) {
-//                    mRoomLivingViewModel.syncSingingAverageScore(sc.toDouble())
-                }
-            } else {
-                if (binding.lrcControlView.role != LrcControlView.Role.Listener) return@observe
-                binding.tvResultScore.text = score.score.toString()
-                if (score.score >= 90) {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_s)
-                } else if (score.score >= 80) {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_a)
-                } else if (score.score >= 70) {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_b)
-                } else {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_c)
-                }
-                binding.groupResult.visibility = View.VISIBLE
-            }
         }
         mRoomLivingViewModel.mPlayerMusicCountDownLiveData.observe(this) { time: Int ->
             binding.lrcControlView.setCountDown(time)
@@ -550,10 +504,10 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
 
     // 合唱
     private fun showChorusSingerDialog() {
-
+        val isRoomOwner = mRoomLivingViewModel.isRoomOwner()
         val seatList = mRoomLivingViewModel.mSeatListLiveData.value ?: emptyList()
         val songModel = mRoomLivingViewModel.mSongPlayingLiveData.value
-        mChorusSingerDialog = ChorusSingerDialog(songModel, seatList)
+        mChorusSingerDialog = ChorusSingerDialog(isRoomOwner, songModel, seatList)
         mChorusSingerDialog?.show(supportFragmentManager, ChorusSingerDialog.TAG)
         mChorusSingerDialog?.onKickingCallback = {
             ToastUtils.showToast("on kicking ${it.name}")

@@ -37,23 +37,23 @@
     <io.agora.karaoke_view.v11.LyricsView
         android:id="@+id/lyricsView"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="160dp"
         android:background="#00000000"
         android:paddingHorizontal="10dp"
         android:paddingVertical="4dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="42dp"
         app:currentLineHighlightedTextColor="@color/pink_b4"
         app:currentLineTextColor="@color/white"
-        app:currentLineTextSize="16sp"
+        app:currentLineTextSize="18sp"
         app:labelWhenNoLyrics=" "
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:lineSpacing="6dp"
+        app:lineSpacing="8dp"
         app:paddingTop="2dp"
         app:startOfVerseIndicatorPaddingTop="6dp"
         app:startOfVerseIndicatorRadius="4dp"
         app:textGravity="center"
-        app:textSize="14sp" />
+        app:textSize="15sp" />
 
     <View
         android:id="@+id/bgd_control_layout_lrc"

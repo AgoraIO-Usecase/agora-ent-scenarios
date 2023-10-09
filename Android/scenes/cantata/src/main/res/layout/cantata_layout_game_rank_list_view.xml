@@ -105,4 +105,18 @@
         android:textColor="@color/white_60_percent"
         android:textSize="11sp"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvNextSongCountdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="下一首 10s"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:background="@drawable/cantata_gradient_btn_bg"
+        app:layout_constraintBottom_toTopOf="@+id/tvNextSong"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
