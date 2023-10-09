@@ -88,7 +88,7 @@ public class STLicenseUtils {
 
         // license文件为空,则直接返回
         if (sb.toString().length() == 0) {
-            LogUtils.e(TAG, "read license data error");
+            io.agora.beautyapi.sensetime.utils.utils.LogUtils.e(TAG, "read license data error");
             return false;
         }
 
@@ -105,7 +105,7 @@ public class STLicenseUtils {
         String activateCode = sp.getString(PREF_ACTIVATE_CODE, null);
         Integer error = new Integer(-1);
         if (activateCode == null|| (STMobileAuthentificationNative.checkActiveCodeFromBuffer(context, licenseBuffer, licenseBuffer.length(), activateCode, activateCode.length()) != 0)) {
-            LogUtils.e(TAG, "activeCode: " + (activateCode == null));
+            io.agora.beautyapi.sensetime.utils.utils.LogUtils.e(TAG, "activeCode: " + (activateCode == null));
             if(isOnlineLicense){
                 activateCode = STMobileAuthentificationNative.generateActiveCodeFromBufferOnline(context, licenseBuffer, licenseBuffer.length());
             }else{
@@ -117,11 +117,11 @@ public class STLicenseUtils {
                 editor.commit();
                 return true;
             }
-            LogUtils.e(TAG, "generate license error: " + error);
+            io.agora.beautyapi.sensetime.utils.utils.LogUtils.e(TAG, "generate license error: " + error);
             return false;
         }
 
-        LogUtils.e(TAG, "activeCode: " + activateCode);
+        io.agora.beautyapi.sensetime.utils.utils.LogUtils.e(TAG, "activeCode: " + activateCode);
 
         return true;
     }
@@ -151,7 +151,7 @@ public class STLicenseUtils {
         String activateCode = sp.getString(PREF_ACTIVATE_CODE, null);
         Integer error = new Integer(-1);
         if (activateCode == null|| (STMobileAuthentificationNative.checkActiveCodeFromBuffer(context, licenseBuffer, licenseBuffer.length(), activateCode, activateCode.length()) != 0)) {
-            LogUtils.e(TAG, "activeCode: " + (activateCode == null));
+            io.agora.beautyapi.sensetime.utils.utils.LogUtils.e(TAG, "activeCode: " + (activateCode == null));
             if(isOnlineLicense){
                 activateCode = STMobileAuthentificationNative.generateActiveCodeFromBufferOnline(context, licenseBuffer, licenseBuffer.length());
             }else{
@@ -163,11 +163,11 @@ public class STLicenseUtils {
                 editor.commit();
                 return true;
             }
-            LogUtils.e(TAG, "generate license error: " + error);
+            io.agora.beautyapi.sensetime.utils.utils.LogUtils.e(TAG, "generate license error: " + error);
             return false;
         }
 
-        LogUtils.e(TAG, "activeCode: " + activateCode);
+        io.agora.beautyapi.sensetime.utils.utils.LogUtils.e(TAG, "activeCode: " + activateCode);
 
         return true;
     }
@@ -175,7 +175,7 @@ public class STLicenseUtils {
     //从服务器拉取License文件，并检查授权
     public static boolean checkLicenseFromServer(final Context context){
         if (!NetworkUtils.isNetworkAvailable(context)) {
-            LogUtils.d(TAG, "无网情况下，拉取sdk缓存License文件，激活License授权");
+            io.agora.beautyapi.sensetime.utils.utils.LogUtils.d(TAG, "无网情况下，拉取sdk缓存License文件，激活License授权");
             byte[] licData = SenseArMaterialService.shareInstance().getLicenseData();
 
             if(licData != null){
@@ -188,11 +188,11 @@ public class STLicenseUtils {
             return STLicenseUtils.checkLicenseFromBuffer(context, licData, false);
         }
 
-        SenseArMaterialService.shareInstance().authorizeWithAppId(context, Constants.APPID, Constants.APPKEY, new SenseArMaterialService.OnAuthorizedListener() {
+        SenseArMaterialService.shareInstance().authorizeWithAppId(context, io.agora.beautyapi.sensetime.utils.utils.Constants.APPID, Constants.APPKEY, new SenseArMaterialService.OnAuthorizedListener() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "current Thread" + Thread.currentThread().getName());
-                LogUtils.d(TAG, "鉴权成功！");
+                io.agora.beautyapi.sensetime.utils.utils.LogUtils.d(TAG, "鉴权成功！");
                 //鉴权成功后，可以获取远程的lic 文件数据,用来checkLicense
                 byte[] licData = SenseArMaterialService.shareInstance().getLicenseData();
 
