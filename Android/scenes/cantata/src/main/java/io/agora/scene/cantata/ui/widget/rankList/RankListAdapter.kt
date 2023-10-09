@@ -15,21 +15,21 @@ class RankListAdapter : BindingSingleAdapter<RankItem, CantataItemRankListBindin
         when (position) {
             0 -> {
                 mBinding.itemRoot.setBackgroundResource(R.drawable.cantata_game_rank_list_1_background)
-                mBinding.ivRoundRank.setBackgroundResource(R.drawable.cantata_rank_one)
+                mBinding.ivRoundRank.setImageResource(R.drawable.cantata_rank_one)
                 mBinding.ivRoundRank.visibility = View.VISIBLE
                 mBinding.tvRoundRank.visibility = View.INVISIBLE
             }
 
             1 -> {
                 mBinding.itemRoot.setBackgroundResource(R.drawable.cantata_game_rank_list_2_background)
-                mBinding.ivRoundRank.setBackgroundResource(R.drawable.cantata_rank_two)
+                mBinding.ivRoundRank.setImageResource(R.drawable.cantata_rank_two)
                 mBinding.ivRoundRank.visibility = View.VISIBLE
                 mBinding.tvRoundRank.visibility = View.INVISIBLE
             }
 
             2 -> {
                 mBinding.itemRoot.setBackgroundResource(R.drawable.cantata_game_rank_list_3_background)
-                mBinding.ivRoundRank.setBackgroundResource(R.drawable.cantata_rank_three)
+                mBinding.ivRoundRank.setImageResource(R.drawable.cantata_rank_three)
                 mBinding.ivRoundRank.visibility = View.VISIBLE
                 mBinding.tvRoundRank.visibility = View.INVISIBLE
             }
