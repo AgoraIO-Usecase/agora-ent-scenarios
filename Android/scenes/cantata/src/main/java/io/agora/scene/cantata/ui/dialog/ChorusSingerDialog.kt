@@ -100,7 +100,7 @@ class ChorusSingerDialog constructor(
                         .transform(CenterCropRoundCornerTransform(100))
                         .into(binding.ivSingerAvatar)
                 }
-                binding.btnKicking.isGone = isRoomOwner
+                binding.btnKicking.isGone = (!isRoomOwner || selSongModel?.userNo == item.userNo)
                 binding.btnKicking.setOnClickListener(object : OnClickJackingListener {
                     override fun onClickJacking(view: View) {
                         onKickingCallback?.invoke(item)

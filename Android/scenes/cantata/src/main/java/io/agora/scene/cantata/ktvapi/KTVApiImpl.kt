@@ -443,6 +443,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
                     switchRoleStateListener?.onSwitchRoleSuccess()
                 }
+
+                override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
+                    super.onStreamMessage(uid, streamId, data)
+                    dealWithStreamMessage(uid, streamId, data)
+                }
             })
         } else if (this.singerRole == KTVSingRole.LeadSinger && newRole == KTVSingRole.Audience) {
             // 4、LeadSinger -》Audience
