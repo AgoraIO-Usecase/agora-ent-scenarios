@@ -180,6 +180,10 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
         mBinding.rvVoiceEffectList.adapter = mEffectAdapter
         mBinding.rvVoiceEffectList.addItemDecoration(DividerDecoration(10, 20, 0))
 
+        mBinding.cbSwitch.isChecked = mSetting.enjoyingMode
+        mBinding.cbSwitch.setOnCheckedChangeListener { _, b ->
+            mSetting.enjoyingMode = b
+        }
     }
 
     private fun setSoundMode() {

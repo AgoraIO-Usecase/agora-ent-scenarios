@@ -24,7 +24,7 @@ class MusicSettingBean constructor(
         }
     var audioEffectParams1 = 0
     var audioEffectParams2 = 0
-    var remoteVolume = 40
+    var remoteVolume = 30
         set(newValue) {
             field = newValue
             mCallback.onRemoteVolumeChanged(newValue)
@@ -80,8 +80,25 @@ class MusicSettingBean constructor(
     var earBackMode = 0 // 耳返模式：0(自动), 1(强制OpenSL), 2(强制Oboe)
 
     var hasEarPhone = false // 是否有耳机
+        set(hasEarPhone) {
+            field = hasEarPhone
+            mEarPhoneCallback?.onHasEarPhoneChanged(hasEarPhone)
+        }
 
     var earBackDelay = 0 // 耳返延迟
+        set(value) {
+            field = value
+            mCallback.onEarBackVolumeChanged(value)
+        }
 
     var mEarPhoneCallback: EarPhoneCallback? = null
+        set(value) {
+            field = value
+        }
+
+    var enjoyingMode: Boolean = false
+        set(value) {
+            field = value
+            mCallback.onEnjoyingModeEnabled(value)
+        }
 }

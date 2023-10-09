@@ -462,6 +462,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             // 歌曲信息发生变化时，重新获取歌曲列表动作
             CantataLogger.d(TAG, "subscribeChooseSong updateSongs")
             onSongChanged()
+            mSeatListLiveData.postValue(mSeatListLiveData.value)
         }
 
         // 获取初始歌曲列表
@@ -976,6 +977,14 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     else -> {}
                 }
             }
+
+            override fun onAudioRouteChanged(routing: Int) {
+                super.onAudioRouteChanged(routing)
+                CantataLogger.d(TAG, "onAudioRouteChanged, routing:$routing");
+                mMusicSetting?.let {
+                    it.hasEarPhone = routing == 0 || routing == 2 || routing == 5 || routing == 6
+                }
+            }
         })
 
         mKtvApi.renewInnerDataStreamId()
@@ -1130,6 +1139,20 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     val ktvApiImpl: KTVApiImpl = mKtvApi as KTVApiImpl
                     ktvApiImpl.remoteVolume = volume
                     mRtcEngine?.adjustPlaybackSignalVolume(volume)
+                }
+
+                override fun onEarBackVolumeChanged(volume: Int) {
+                    mRtcEngine?.setInEarMonitoringVolume(volume)
+                }
+
+                override fun onEnjoyingModeEnabled(enable: Boolean) {
+                    if (enable) {
+                        mRtcEngine?.adjustPlaybackSignalVolume(0)
+                    } else {
+                        mMusicSetting?.let {
+                            mRtcEngine?.adjustPlaybackSignalVolume(it.remoteVolume)
+                        }
+                    }
                 }
             })
     }

@@ -269,6 +269,40 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvOpenSwitch"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="沉浸模式"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/cbSwitch"
+            android:layout_width="45dp"
+            android:layout_height="28dp"
+            android:checked="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvOpenSwitch"
+            app:layout_constraintBottom_toBottomOf="@+id/tvOpenSwitch"
+            android:button="@drawable/cb_def_selector" />
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvVoiceEffectList"
         android:layout_width="match_parent"
