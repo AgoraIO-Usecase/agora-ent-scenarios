@@ -18,6 +18,10 @@ class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeS
         CantataLayoutGameRankListViewBinding.inflate(LayoutInflater.from(context), this, true)
     }
 
+    private val  numberFormat: NumberFormat by lazy {
+        DecimalFormat("#,###")
+    }
+
     init {
         init(context)
     }
@@ -35,7 +39,7 @@ class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeS
                 emptyItem.score = -1
                 //emptyItem.songNum = -1
                 emptyItem.userName = context.getString(R.string.cantata_not_on_the_list)
-                emptyItem.poster = ""
+                emptyItem.avatar = ""
                 newList.add(emptyItem)
             }
         }
@@ -46,7 +50,7 @@ class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeS
                 totalScore += rankItem.score
             }
         }
-        val numberFormat: NumberFormat = DecimalFormat("#,###")
+
         val formattedNumber = numberFormat.format(totalScore)
         mBinding.tvRoundScore.text = formattedNumber
     }

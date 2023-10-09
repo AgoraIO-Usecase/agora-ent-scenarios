@@ -148,8 +148,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     // 是否显示结算页面
     val mRoundRankListLiveData = MutableLiveData<Boolean>()
 
-    private val mRankMap: Map<String, RankItem> = mutableMapOf()
-
     /**
      * Rtc引擎
      */
@@ -1514,17 +1512,15 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     fun getRankList(): List<RankItem>? {
-        val rankItemList: MutableList<RankItem> = java.util.ArrayList<RankItem>()
+        val rankItemList: MutableList<RankItem> = mutableListOf()
+        val seatList :List<RoomSeatModel> = mSeatListLiveData.value?: emptyList()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val i = AtomicInteger()
-            mRankMap.forEach { (uid: String?, model: RankItem) ->
+            seatList.forEach { model ->
                 val item = RankItem()
-                item.rank = i.get()
-                item.userName = model.userName
+                item.userName = model.name
                 item.score = model.score
-                item.poster = model.poster
+                item.avatar = model.headUrl
                 rankItemList.add(item)
-                i.getAndIncrement()
             }
         }
         sortRank(rankItemList)
