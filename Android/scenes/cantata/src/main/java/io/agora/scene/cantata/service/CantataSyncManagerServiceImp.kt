@@ -433,7 +433,7 @@ class CantataSyncManagerServiceImp constructor(
     }
 
     override fun leaveSeat(inputModel: OutSeatInputModel, completion: (error: Exception?) -> Unit) {
-        val seatInfo = seatMap[inputModel.userOnSeat.toString()]
+        val seatInfo = seatMap[inputModel.userId]
         if (seatInfo != null) {
 //            // 移除歌曲
 //            innerRemoveAllUsersChooseSong(seatInfo.userNo)
@@ -444,7 +444,7 @@ class CantataSyncManagerServiceImp constructor(
     }
 
     override fun leaveSeatWithoutRemoveSong(inputModel: OutSeatInputModel, completion: (error: Exception?) -> Unit) {
-        val seatInfo = seatMap[inputModel.userOnSeat.toString()]
+        val seatInfo = seatMap[inputModel.userId]
         if (seatInfo != null) {
             // 移除座位
             innerRemoveSeat(seatInfo) {}
@@ -1012,11 +1012,11 @@ class CantataSyncManagerServiceImp constructor(
                 val ret = ArrayList<RoomSeatModel>()
                 result?.forEach {
                     val obj = it.toObject(RoomSeatModel::class.java)
-                    objIdOfSeatIndex[obj.seatIndex] = it.id
+                    objIdOfSeatIndex[obj.rtcUid.toInt()] = it.id
                     ret.add(obj)
 
                     // 储存在本地map中
-                    seatMap[obj.seatIndex.toString()] = obj
+                    seatMap[obj.rtcUid] = obj
                 }
                 runOnMainThread { completion.invoke(null, ret) }
             }
@@ -1031,7 +1031,7 @@ class CantataSyncManagerServiceImp constructor(
         seatInfo: RoomSeatModel,
         completion: (error: Exception?) -> Unit
     ) {
-        val objectId = objIdOfSeatIndex[seatInfo.seatIndex] ?: return
+        val objectId = objIdOfSeatIndex[seatInfo.rtcUid.toInt()] ?: return
         mSceneReference?.collection(kCollectionIdSeatInfo)
             ?.update(objectId, seatInfo, object : Callback {
                 override fun onSuccess() {
@@ -1048,7 +1048,7 @@ class CantataSyncManagerServiceImp constructor(
         seatInfo: RoomSeatModel,
         completion: (error: Exception?) -> Unit
     ) {
-        val objectId = objIdOfSeatIndex[seatInfo.seatIndex] ?: return
+        val objectId = objIdOfSeatIndex[seatInfo.rtcUid.toInt()] ?: return
         mSceneReference?.collection(kCollectionIdSeatInfo)
             ?.delete(objectId, object : Callback {
                 override fun onSuccess() {
@@ -1087,10 +1087,10 @@ class CantataSyncManagerServiceImp constructor(
 
             override fun onUpdated(item: IObject?) {
                 val obj = item?.toObject(RoomSeatModel::class.java) ?: return
-                objIdOfSeatIndex[obj.seatIndex] = item.id
+                objIdOfSeatIndex[obj.rtcUid.toInt()] = item.id
 
-                if (seatMap.containsKey(obj.seatIndex.toString())) {
-                    seatMap[obj.seatIndex.toString()] = obj
+                if (seatMap.containsKey(obj.rtcUid)) {
+                    seatMap[obj.rtcUid] = obj
                     runOnMainThread {
                         seatListChangeSubscriber?.invoke(
                             CantataServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
@@ -1098,7 +1098,7 @@ class CantataSyncManagerServiceImp constructor(
                         )
                     }
                 } else {
-                    seatMap[obj.seatIndex.toString()] = obj
+                    seatMap[obj.rtcUid] = obj
                     runOnMainThread {
                         seatListChangeSubscriber?.invoke(
                             CantataServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
@@ -1113,7 +1113,7 @@ class CantataSyncManagerServiceImp constructor(
 
                 seatMap.forEach { entry ->
                     entry.value?.let { seat ->
-                        if (objIdOfSeatIndex[seat.seatIndex] == item.id) {
+                        if (objIdOfSeatIndex[seat.rtcUid.toInt()] == item.id) {
                             seatMap.remove(entry.key)
                             runOnMainThread {
                                 seatListChangeSubscriber?.invoke(

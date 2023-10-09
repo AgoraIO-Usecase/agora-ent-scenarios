@@ -468,8 +468,8 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         }
     }
 
-    fun updateMicSeatModels(list: List<RoomSeatModel>?) {
-        mBinding.ilActive.chorusMicView.seatArray = list
+    fun updateMicSeatModels(leadSingerModel: RoomSeatModel, list: List<RoomSeatModel>) {
+        mBinding.ilActive.chorusMicView.updateAllMics(leadSingerModel, list)
 
         mBinding.tvCoNumber.text = resources.getString(R.string.cantata_on_chorus_user, list?.size ?: 0)
     }

@@ -345,7 +345,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 val value: MutableList<RoomSeatModel> = ArrayList<RoomSeatModel>(oValue)
                 var index = -1
                 for (i in value.indices) {
-                    if (value[i].seatIndex == roomSeat.seatIndex) {
+                    if (value[i].rtcUid == roomSeat.rtcUid) {
                         index = i
                         break
                     }
@@ -444,18 +444,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 CantataLogger.d(TAG, "RoomLivingViewModel.leaveSeat() success")
                 if (seatModel.userNo == UserManager.getInstance().user.id.toString()) {
                     mIsOnSeat = false
-                    if (seatModel.isAudioMuted == RoomSeatModel.MUTED_VALUE_TRUE) {
-                        if (mRtcEngine != null) {
-                            mMainChannelMediaOption.publishCameraTrack = false
-                            mMainChannelMediaOption.publishMicrophoneTrack = false
-                            mMainChannelMediaOption.enableAudioRecordingOrPlayout = true
-                            mMainChannelMediaOption.autoSubscribeVideo = true
-                            mMainChannelMediaOption.autoSubscribeAudio = true
-                            mMainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-                            mRtcEngine?.updateChannelMediaOptions(mMainChannelMediaOption)
-                        }
-                        updateVolumeStatus(false)
-                    }
+                    mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
+                    mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
                 }
                 mSongPlayingLiveData.value?.let { songPlayingData ->
                     val isJoinChorus = seatModel.chorusSongCode == songPlayingData.songNo + songPlayingData.createAt
@@ -887,20 +877,20 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         if (mIsOnSeat) {
             // 下麦
             mSeatLocalLiveData.value?.let { leaveSeat(it) }
-            // 离开合唱
-            mCantataServiceProtocol.leaveChorus { e: Exception? ->
-                if (e == null) {
-                    // success
-                    CantataLogger.d(TAG, "RoomLivingViewModel.leaveChorus() called")
-                    mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
-                    mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
-                } else {
-                    // failure
-                    CantataLogger.e(TAG, "RoomLivingViewModel.leaveChorus() failed:${e.message}")
-                    ToastUtils.showToast(e.message)
-                }
-                null
-            }
+//            // 离开合唱
+//            mCantataServiceProtocol.leaveChorus { e: Exception? ->
+//                if (e == null) {
+//                    // success
+//                    CantataLogger.d(TAG, "RoomLivingViewModel.leaveChorus() called")
+//                    mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
+//                    mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
+//                } else {
+//                    // failure
+//                    CantataLogger.e(TAG, "RoomLivingViewModel.leaveChorus() failed:${e.message}")
+//                    ToastUtils.showToast(e.message)
+//                }
+//                null
+//            }
         } else {
             mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
             mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
