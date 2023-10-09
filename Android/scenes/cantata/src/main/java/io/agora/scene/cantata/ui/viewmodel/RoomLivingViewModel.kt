@@ -54,14 +54,6 @@ import io.agora.scene.cantata.ui.dialog.MusicSettingCallback
 import io.agora.scene.cantata.ui.widget.rankList.RankItem
 import org.json.JSONException
 import org.json.JSONObject
-import java.util.concurrent.atomic.AtomicInteger
-
-class LineScore {
-    var score = 0
-    var index = 0
-    var cumulativeScore = 0
-    var total = 0
-}
 
 enum class PlayerMusicStatus {
     ON_PREPARE,
@@ -132,7 +124,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     val mNoLrcLiveData = MutableLiveData<Boolean>()
 
     val mPlayerMusicOpenDurationLiveData = MutableLiveData<Long>()
-    val mPlayerMusicCountDownLiveData = MutableLiveData<Int>()
     val mNetworkStatusLiveData: MutableLiveData<NetWorkEvent> = MutableLiveData<NetWorkEvent>()
 
     val mScoringAlgoControlLiveData: MutableLiveData<ScoringAlgoControlModel> =

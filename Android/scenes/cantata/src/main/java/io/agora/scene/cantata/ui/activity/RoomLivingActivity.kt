@@ -289,9 +289,6 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mRoomLivingViewModel.mPlayerMusicOpenDurationLiveData.observe(this) { duration: Long ->
             binding.lrcControlView.lyricsView.setDuration(duration)
         }
-        mRoomLivingViewModel.mPlayerMusicCountDownLiveData.observe(this) { time: Int ->
-            binding.lrcControlView.setCountDown(time)
-        }
         mRoomLivingViewModel.mNetworkStatusLiveData.observe(this) { netWorkStatus: NetWorkEvent ->
             setNetWorkStatus(netWorkStatus.txQuality, netWorkStatus.rxQuality)
         }
