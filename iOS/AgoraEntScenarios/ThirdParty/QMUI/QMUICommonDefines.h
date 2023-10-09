@@ -104,7 +104,7 @@
 
 #pragma mark - 方法-创建器
 
-#define UIImageMake(img) [UIImage imageNamed:img]
+#define UIImageMake(img) ([UIImage imageWithContentsOfFile:img] ? : [UIImage imageNamed:img])
 
 /// 字体相关的宏，用于快速创建一个字体对象，更多创建宏可查看 UIFont+QMUI.h
 #define UIFontMake(size) [UIFont systemFontOfSize:size]

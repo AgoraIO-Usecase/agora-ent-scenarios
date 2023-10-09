@@ -33,6 +33,7 @@
     <string name="app_meta_live">元直播</string>
     <string name="app_meta_chatting">元语聊</string>
     <string name="app_interactive_games">互动游戏</string>
+    <string name="app_one_to_one">1V1私密房</string>
     <string name="app_coming_soon">敬请期待</string>
     <string name="app_voice_chat_spatial">空间音频</string>
     <string name="app_voice_chat_spatialTip">—空间音频模式</string>
@@ -45,7 +46,7 @@
     <string name="app_about_karaoke">在线K歌</string>
     <string name="app_about_show">秀场直播</string>
     <string name="app_about_singbattle">嗨歌抢唱</string>
-
+    <string name="app_about_pure1v1">1v1私密房</string>
     <string name="app_about_customer_service">联系客服</string>
     <string name="app_about_official_website">官网地址</string>
     <string name="app_about_phone_cancel">取消</string>

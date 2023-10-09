@@ -123,7 +123,7 @@ public class FileUtils {
                     file.createNewFile();
                     InputStream in = context.getApplicationContext().getAssets().open(fileName);
                     if (in == null) {
-                        LogUtils.e("copyMode", "the src is not existed");
+                        io.agora.beautyapi.sensetime.utils.utils.LogUtils.e("copyMode", "the src is not existed");
                         return false;
                     }
                     OutputStream out = new FileOutputStream(file);
@@ -157,7 +157,7 @@ public class FileUtils {
 
                     InputStream in = context.getAssets().open(className + File.separator + fileName);
                     if (in == null) {
-                        LogUtils.e("copyMode", "the src is not existed");
+                        io.agora.beautyapi.sensetime.utils.utils.LogUtils.e("copyMode", "the src is not existed");
                         return false;
                     }
                     OutputStream out = new FileOutputStream(file);

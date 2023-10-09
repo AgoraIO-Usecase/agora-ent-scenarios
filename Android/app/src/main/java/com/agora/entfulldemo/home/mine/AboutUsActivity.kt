@@ -53,14 +53,14 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         binding.rvAboutUs.adapter = adapter
         if (BuildConfig.APPLICATION_ID == kChatRoomAppID) {
             setupChatRoomAppInfo()
-        } else if (BuildConfig.APPLICATION_ID == kFullAppID) {
-            setupFullAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kKtvRoomAppID) {
             setupKtvRoomAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kSingBattleRoomAppID) {
             setupSingBattleRoomAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kShowRoomAppID) {
             setupShowRoomAppInfo()
+        } else {
+            setupFullAppInfo()
         }
         setupDebugMode()
         setupClickWebAction()
@@ -158,12 +158,21 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 )
             )
         }
+        if (VersionUtils.getVersion("io.agora.scene.pure1v1.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_pure1v1),
+                    VersionUtils.getVersion("io.agora.scene.pure1v1.BuildConfig")
+                )
+            )
+        }
+        val versionTime = "20230530-"
         if (scenes.size == 1) {
             adapter.scenes = mutableListOf()
             val scene = scenes[0]
             adapter.appInfo = AppInfo(
                 scene.name,
-                scene.version,
+                versionTime + scene.version + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
@@ -171,7 +180,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             adapter.scenes = scenes
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_about_name),
-                "20230530-" + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
+                versionTime + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
