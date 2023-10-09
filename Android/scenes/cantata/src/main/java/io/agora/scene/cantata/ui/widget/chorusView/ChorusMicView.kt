@@ -276,13 +276,13 @@ class ChorusMicView @JvmOverloads constructor(
             }
             Log.d(TAG, "rectF.isMicRectFValid true2 $centralMicView")
         }
-
-        if (tempRectF.left < boundaryInset || tempRectF.top < boundaryInset ||
-            tempRectF.right > width - boundaryInset || tempRectF.bottom > height - boundaryInset
-        ) {
-            Log.d(TAG, "rectF.isMicRectFValid false3")
-            return false
-        }
+        // TODO workaround
+//        if (tempRectF.left < boundaryInset || tempRectF.top < boundaryInset ||
+//            tempRectF.right > width - boundaryInset || tempRectF.bottom > height - boundaryInset
+//        ) {
+//            Log.d(TAG, "rectF.isMicRectFValid false3")
+//            return false
+//        }
         Log.d(TAG, "rectF.isMicRectFValid true3")
         return true
     }

@@ -508,6 +508,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mChorusSingerDialog?.show(supportFragmentManager, ChorusSingerDialog.TAG)
         mChorusSingerDialog?.onKickingCallback = {
             ToastUtils.showToast("on kicking ${it.name}")
+            mRoomLivingViewModel.leaveSeat(it)
         }
         mChorusSingerDialog?.updateAllData()
     }
