@@ -216,11 +216,11 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             seatModels ?: return@observe
             CantataLogger.d(TAG, "mSeatListLiveData: $seatModels")
             // TODO 前8个默认占座
-//            if (mRoomLivingViewModel.mSongsOrderedLiveData.value?.size != 0) {
-//                val seat = seatModels.filter { it.rtcUid == mRoomLivingViewModel.mSongsOrderedLiveData.value?.get(0)?.userNo }.getOrNull(0) ?: return@observe
-//                val seats = seatModels.filter { it.rtcUid != mRoomLivingViewModel.mSongsOrderedLiveData.value?.get(0)?.userNo }
-//                binding.lrcControlView.updateMicSeatModels(seat, seats)
-//            }
+            if (mRoomLivingViewModel.mSongsOrderedLiveData.value?.size != 0) {
+                val seat = seatModels.filter { it.rtcUid == mRoomLivingViewModel.mSongsOrderedLiveData.value?.get(0)?.userNo }.getOrNull(0) ?: return@observe
+                val seats = seatModels.filter { it.rtcUid != mRoomLivingViewModel.mSongsOrderedLiveData.value?.get(0)?.userNo }
+                binding.lrcControlView.updateMicSeatModels(seat, seats)
+            }
             if (seatModels.size == 9) {
                 binding.lrcControlView.onSeat(true)
             } else if (seatModels.size < 9) {
