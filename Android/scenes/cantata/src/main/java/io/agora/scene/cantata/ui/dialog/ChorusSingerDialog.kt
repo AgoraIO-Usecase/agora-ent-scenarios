@@ -44,19 +44,19 @@ class ChorusSingerDialog constructor(
                 val binding: CantataItemSingingUserBinding = holder.binding
                 when (position) {
                     0 -> {
-                        binding.ivChorusNum.setBackgroundResource(R.drawable.cantata_rank_one)
+                        binding.ivChorusNum.setImageResource(R.drawable.cantata_rank_one)
                         binding.ivChorusNum.visibility = View.VISIBLE
                         binding.tvChorusNum.visibility = View.INVISIBLE
                     }
 
                     1 -> {
-                        binding.ivChorusNum.setBackgroundResource(R.drawable.cantata_rank_two)
+                        binding.ivChorusNum.setImageResource(R.drawable.cantata_rank_two)
                         binding.ivChorusNum.visibility = View.VISIBLE
                         binding.tvChorusNum.visibility = View.INVISIBLE
                     }
 
                     2 -> {
-                        binding.ivChorusNum.setBackgroundResource(R.drawable.cantata_rank_three)
+                        binding.ivChorusNum.setImageResource(R.drawable.cantata_rank_three)
                         binding.ivChorusNum.visibility = View.VISIBLE
                         binding.tvChorusNum.visibility = View.INVISIBLE
                     }
@@ -82,7 +82,7 @@ class ChorusSingerDialog constructor(
                         .load(item.headUrl)
                         .error(R.mipmap.userimage)
                         .transform(CenterCropRoundCornerTransform(100))
-                        .into(binding.ivChorusNum)
+                        .into(binding.ivUserAvatar)
                 }
                 binding.btnKicking.isGone = selSongModel?.userNo == item.userNo
                 binding.btnKicking.setOnClickListener(object : OnClickJackingListener {

@@ -114,12 +114,17 @@ class ChorusMicView @JvmOverloads constructor(
         measureChildren(widthMeasureSpec, heightMeasureSpec)
     }
 
+
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         layoutChildren()
-        Log.d(TAG, "onLayout")
+        Log.d(TAG, "onLayout layoutChildren")
     }
 
+    private var onLayoutComplete = false
+
     private fun layoutChildren() {
+        if (onLayoutComplete) return
+        onLayoutComplete = true
         val centerPoint = PointF(measuredWidth.toFloat() / 2f, measuredHeight.toFloat() / 2f)
         bgView?.let {
             val bgViewWidth = it.measuredWidth
