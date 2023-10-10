@@ -5,13 +5,14 @@
     android:id="@+id/superLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/cantata_room_bg"
     tools:context=".ui.activity.RoomLivingActivity">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/cantata_room_bg" />
+<!--    <androidx.appcompat.widget.AppCompatImageView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:scaleType="centerCrop"-->
+<!--        android:src="@drawable/cantata_room_bg" />-->
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/horizontal80"
