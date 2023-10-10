@@ -197,6 +197,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         // Android Only
         mRtcEngine.setParameters("{\"che.audio.enable_estimated_device_delay\":false}")
+
+        // TopN
+        mRtcEngine.setParameters("{\"rtc.use_audio4\": true}")
     }
 
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
@@ -439,9 +442,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             mRtcEngine.joinChannelEx(giantChorusConfig.audienceChannelToken, RtcConnection(ktvApiConfig.channelName, ktvApiConfig.localUid), ChannelMediaOptions(), object : IRtcEngineEventHandler() {
                 override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                     super.onJoinChannelSuccess(channel, uid, elapsed)
-                    singerRole = newRole
-                    ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
-                    switchRoleStateListener?.onSwitchRoleSuccess()
                 }
 
                 override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
@@ -449,6 +449,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     dealWithStreamMessage(uid, streamId, data)
                 }
             })
+
+            singerRole = newRole
+            ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
+            switchRoleStateListener?.onSwitchRoleSuccess()
         } else if (this.singerRole == KTVSingRole.LeadSinger && newRole == KTVSingRole.Audience) {
             // 4、LeadSinger -》Audience
             stopSing()
@@ -458,9 +462,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             mRtcEngine.joinChannelEx(giantChorusConfig.audienceChannelToken, RtcConnection(ktvApiConfig.channelName, ktvApiConfig.localUid), ChannelMediaOptions(), object : IRtcEngineEventHandler() {
                 override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                     super.onJoinChannelSuccess(channel, uid, elapsed)
-                    singerRole = newRole
-                    ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
-                    switchRoleStateListener?.onSwitchRoleSuccess()
                 }
 
                 override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
@@ -468,6 +469,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     dealWithStreamMessage(uid, streamId, data)
                 }
             })
+
+            singerRole = newRole
+            ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
+            switchRoleStateListener?.onSwitchRoleSuccess()
         } else {
             switchRoleStateListener?.onSwitchRoleFail(SwitchRoleFailReason.NO_PERMISSION)
             Log.e(TAG, "Error！You can not switch role from $singerRole to $newRole!")

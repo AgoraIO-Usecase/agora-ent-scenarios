@@ -301,13 +301,14 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mCantataServiceProtocol.subscribeSeatListChanged { ktvSubscribe: CantataServiceProtocol.KTVSubscribe,
                                                            roomSeatModel: RoomSeatModel? ->
             val roomSeat = roomSeatModel ?: return@subscribeSeatListChanged
+            onMicSeatChange()
             if (ktvSubscribe == CantataServiceProtocol.KTVSubscribe.KTVSubscribeCreated) {
                 CantataLogger.d(TAG, "subscribeRoomStatus KTVSubscribeCreated")
                 val oValue: List<RoomSeatModel> = mSeatListLiveData.value ?: return@subscribeSeatListChanged
                 val value: MutableList<RoomSeatModel> = ArrayList(oValue)
                 value.add(roomSeat)
 
-                mSeatListLiveData.postValue(value)
+                //mSeatListLiveData.postValue(value)
                 if (roomSeat.userNo == UserManager.getInstance().user.id.toString()) {
                     mSeatLocalLiveData.value = roomSeat
                     updateVolumeStatus(roomSeat.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE)
@@ -327,7 +328,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     value[index] = roomSeat
                     value.removeAt(index)
                     value.add(index, roomSeat)
-                    mSeatListLiveData.value = value
+                    //mSeatListLiveData.value = value
                     if (roomSeat.userNo == UserManager.getInstance().user.id.toString()) {
                         mSeatLocalLiveData.value = roomSeat
                         updateVolumeStatus(roomSeat.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE)
@@ -344,7 +345,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                         iterator.remove()
                     }
                 }
-                mSeatListLiveData.value = value
+                //mSeatListLiveData.value = value
                 if (roomSeat.userNo == UserManager.getInstance().user.id.toString()) {
                     mSeatLocalLiveData.value = null
                     mIsOnSeat = false
@@ -357,6 +358,14 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
                     }
                 }
+            }
+        }
+    }
+
+    private fun onMicSeatChange() {
+        mCantataServiceProtocol.getSeatStatusList { e, list ->
+            if (e == null && list != null) {
+                mSeatListLiveData.value = list
             }
         }
     }
@@ -456,7 +465,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
 
     // ======================= 歌曲相关 =======================
-    fun initSongs() {
+    private fun initSongs() {
         mCantataServiceProtocol.subscribeChooseSongChanged { ktvSubscribe: CantataServiceProtocol.KTVSubscribe?,
                                                              songModel: RoomSelSongModel? ->
             // 歌曲信息发生变化时，重新获取歌曲列表动作

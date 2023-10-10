@@ -213,7 +213,6 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             val isAudioChecked = seatModel != null && seatModel.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE
             binding.cbMic.isEnabled = seatModel != null
             binding.cbMic.isChecked = isAudioChecked
-            binding.lrcControlView.onSeat(seatModel != null)
             binding.lrcControlView.updateLocalCumulativeScore(seatModel)
         }
         mRoomLivingViewModel.mSeatListLiveData.observe(this) { seatModels: List<RoomSeatModel>? ->
@@ -224,11 +223,6 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
                 val seat = seatModels.filter { it.rtcUid == mRoomLivingViewModel.mSongsOrderedLiveData.value?.get(0)?.userNo }.getOrNull(0) ?: return@observe
                 val seats = seatModels.filter { it.rtcUid != mRoomLivingViewModel.mSongsOrderedLiveData.value?.get(0)?.userNo }
                 binding.lrcControlView.updateMicSeatModels(seat, seats)
-            }
-            if (seatModels.size == 9) {
-                binding.lrcControlView.onSeat(true)
-            } else if (seatModels.size < 9) {
-                binding.lrcControlView.onSeat(false)
             }
         }
 
@@ -342,6 +336,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     }
 
     private fun onMusicChanged(music: RoomSelSongModel) {
+        CantataLogger.d(TAG, "onMusicChanged called")
         mRoomLivingViewModel.resetMusicStatus()
         binding.lrcControlView.setMusic(music)
         if (UserManager.getInstance().user.id.toString() == music.userNo) {

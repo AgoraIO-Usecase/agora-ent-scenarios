@@ -145,11 +145,6 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         mBinding.ilActive.ivLeaveChorus.visibility = INVISIBLE
     }
 
-    private var isOnSeat = false
-    fun onSeat(isOnSeat: Boolean) {
-        this.isOnSeat = isOnSeat
-    }
-
     private var isMineOwner = false
     fun onPrepareStatus(isMineOwner: Boolean) {
         chorusScore = 0
