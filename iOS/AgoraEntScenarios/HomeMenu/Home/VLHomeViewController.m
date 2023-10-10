@@ -10,6 +10,7 @@
 #import "MenuUtils.h"
 #import "AESMacro.h"
 #import "VLToast.h"
+#import "VLSBGOnLineListVC.h"
 
 @import Pure1v1;
 @import ShowTo1v1;
@@ -51,7 +52,7 @@
 
 - (void)itemClickAction:(int)tagValue {
 
-    NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow", @"Pure1v1", @"ShowTo1v1"];
+    NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow", @"", @"Pure1v1", @"ShowTo1v1"];
     [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
     [[NetworkManager shared] reportDeviceInfoWithSceneName:sceneNames[tagValue]];
     [[NetworkManager shared] reportUserBehaviorWithSceneName:sceneNames[tagValue]];
@@ -76,6 +77,10 @@
             [self.navigationController pushViewController:roomVc animated:YES];
         } break;
         case 4: {
+            VLSBGOnLineListVC *listVC = [[VLSBGOnLineListVC alloc]init];
+            [self.navigationController pushViewController:listVC animated:YES];
+        } break;
+        case 5: {
             Pure1v1UserInfo* userInfo = [Pure1v1UserInfo new];
             userInfo.userId = VLUserCenter.user.id;
             userInfo.userName = VLUserCenter.user.name;
@@ -85,7 +90,7 @@
                                          appCertificate:KeyCenter.Certificate
                                                userInfo:userInfo];
         } break;
-        case 5: {
+        case 6: {
             ShowTo1v1UserInfo* userInfo = [ShowTo1v1UserInfo new];
             userInfo.userId = VLUserCenter.user.id;
             userInfo.userName = VLUserCenter.user.name;

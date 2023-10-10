@@ -9,7 +9,6 @@
 * 语聊房
     * [Android](Android/scenes/voice)
     * [iOS](iOS/AgoraEntScenarios/Scenes/VoiceChatRoom)
-
 * 空间音频语聊房
     * [Android](Android/scenes/voice_spatial)
     * [iOS](iOS/AgoraEntScenarios/Scenes/SpatialAudio)
@@ -22,7 +21,6 @@
 * 1v1私密房
     * [Android](Android/scenes/pure1v1)
     * [iOS](iOS/AgoraEntScenarios/Scenes/Pure1v1)
-
 * 秀场转1v1私密房
     * [Android](Android/scenes/showTo1v1)
     * [iOS](iOS/AgoraEntScenarios/Scenes/ShowTo1v1)

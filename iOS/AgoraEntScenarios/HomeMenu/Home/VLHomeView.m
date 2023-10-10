@@ -109,6 +109,12 @@
                 @"titleStr":NSLocalizedString(@"app_show_live", nil),
                 @"subTitleStr":@""
             },
+            @{
+                @"bgImgStr":@"home_SBG_bg",
+                @"iconImgStr":@"",
+                @"titleStr":AGLocalizedString(@""),
+                @"subTitleStr":@""
+            },
             [Pure1v1Context thumbnailInfo],
             [ShowTo1v1Context thumbnailInfo]
         ];
