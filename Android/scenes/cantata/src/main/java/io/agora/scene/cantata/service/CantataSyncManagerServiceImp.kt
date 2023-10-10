@@ -1044,6 +1044,8 @@ class CantataSyncManagerServiceImp constructor(
         seatInfo: RoomSeatModel,
         completion: (error: Exception?) -> Unit
     ) {
+        objIdOfSeatIndex.remove(seatInfo.seatIndex)
+        seatMap.remove(seatInfo.seatIndex.toString())
         val objectId = objIdOfSeatIndex[seatInfo.rtcUid.toInt()] ?: return
         mSceneReference?.collection(kCollectionIdSeatInfo)
             ?.delete(objectId, object : Callback {
