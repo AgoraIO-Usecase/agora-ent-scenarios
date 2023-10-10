@@ -13,6 +13,8 @@
 
 #define BASICVCINDEX 100
 
+#define BASICVCINDEX 100
+
 @interface VLSelectedSongList ()<
 JXCategoryViewDelegate,
 JXCategoryListContainerViewDelegate,

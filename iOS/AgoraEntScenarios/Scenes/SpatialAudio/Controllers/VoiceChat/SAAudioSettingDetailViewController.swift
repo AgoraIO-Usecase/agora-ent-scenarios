@@ -187,11 +187,16 @@ extension SAAudioSettingDetailViewController: UITableViewDelegate, UITableViewDa
             } else {
                 return 54
             }
-        case .AIAEC:
-            return 54
-        case .AGC:
-            return 54
-        case .Spatial:
+//        case .AIAEC:
+//            return 54
+//        case .AGC:
+//            return 54
+//        case .Spatial:
+//            return 54
+//        case .InEar:
+//            return 54
+//        case .Music:
+        default:
             return 54
         }
     }

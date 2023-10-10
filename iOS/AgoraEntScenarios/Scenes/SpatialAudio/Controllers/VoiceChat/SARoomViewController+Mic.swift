@@ -71,6 +71,12 @@ extension SARoomViewController {
     // 下麦
     func leaveMic(with index: Int) {
         chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
+        // 查询自己有没有在麦上
+        let seatUser = AppContext.saTmpServiceImp().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
+        // 如果是闭麦状态, 先要恢复状态
+        if seatUser != nil, seatUser?.member?.mic_status == .mute, let index = seatUser?.mic_index {
+            unmuteLocal(with: index)
+        }
         AppContext.saServiceImp().leaveMic(mic_index: index) {[weak self] error, mic in
             guard let self = self else {return}
             if error == nil,let mic = mic {

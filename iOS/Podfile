@@ -58,7 +58,7 @@ def all_pods
   pod 'AgoraLyricsScore', '1.1.1-beta-3'
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'cc0951f11f5fa6113ec2b9df2a509efa881d5bd7'
 #  pod 'AgoraLyricsScore', :path => '../../AgoraLyricsScore/AgoraLyricsScore.podspec'
-#  pod 'AgoraRtm_iOS', '1.5.1'
+
   pod 'Zip'
   pod 'MJRefresh'
   
@@ -89,18 +89,10 @@ target 'AgoraEntScenarios' do
   all_pods
 end
 
-#post_install do |installer|
-#  installer.pods_project.targets.each do |target|
-#    target.build_configurations.each do |config|
-#      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
-#    end
-#  end
-#end
-
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
       shell_script_path = "Pods/Target Support Files/#{target.name}/#{target.name}-frameworks.sh"
       if File::exists?(shell_script_path)
         shell_script_input_lines = File.readlines(shell_script_path)
@@ -114,6 +106,5 @@ post_install do |installer|
     end
   end
 end
-
 
 system("./libs/setup_podspec.sh")
