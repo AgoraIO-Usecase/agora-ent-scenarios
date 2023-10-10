@@ -109,7 +109,7 @@
     <string name="cantata_song_ordering_person_chorus">合唱：</string>
     <string name="cantata_people">人</string>
     <string name="cantata_music_menu_dialog_mv">MV</string>
-    <string name="cantata_score_formatter">%d 总分</string>
+    <string name="cantata_score_formatter">%s 总分</string>
     <string name="cantata_beauty_voice">美声</string>
     <string name="cantata_voice_effect">音效</string>
     <string name="cantata_camera">摄像头</string>

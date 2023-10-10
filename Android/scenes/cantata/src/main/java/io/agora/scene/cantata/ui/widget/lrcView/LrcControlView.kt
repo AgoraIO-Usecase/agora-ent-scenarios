@@ -28,6 +28,8 @@ import io.agora.scene.cantata.service.RoomSelSongModel
 import io.agora.scene.cantata.ui.widget.OnClickJackingListener
 import io.agora.scene.widget.utils.UiUtils
 import java.io.File
+import java.text.DecimalFormat
+import java.text.NumberFormat
 
 /**
  * 歌词控制View
@@ -37,6 +39,10 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
 
     private companion object{
         private const val TAG = "LrcControlView"
+    }
+
+    private val  mScoreFormat: NumberFormat by lazy {
+        DecimalFormat("#,###")
     }
 
     private val mBinding: CantataLayoutLrcControlViewBinding by lazy {
@@ -71,7 +77,6 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         super.onDetachedFromWindow()
     }
 
-    private var chorusScore = 0
     private fun initListener() {
         mBinding.ilActive.switchOriginal.setOnClickListener(this)
         mBinding.ilActive.ivMusicMenu.setOnClickListener(this)
@@ -115,7 +120,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     fun onSelfJoinedChorus() {
-        mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, chorusScore)
+        mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, "0")
         mRole = Role.CoSinger
         mBinding.ilActive.ivMusicStart.visibility = INVISIBLE
         mBinding.ilActive.switchOriginal.visibility = VISIBLE
@@ -147,7 +152,6 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
 
     private var isMineOwner = false
     fun onPrepareStatus(isMineOwner: Boolean) {
-        chorusScore = 0
         this.isMineOwner = isMineOwner
         mBinding.ilIdle.root.visibility = GONE
         mBinding.clActive.visibility = VISIBLE
@@ -234,12 +238,13 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
     fun setMusic(mMusic: RoomSelSongModel) {
         karaokeView?.reset()
         mBinding.tvMusicName.text = mMusic.songName + "-" + mMusic.singer
-        mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, 0)
+        mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, "0")
     }
 
     // 更新总分
     fun updateLocalCumulativeScore(seatModel: RoomSeatModel?) {
-        mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, seatModel?.score ?: 0)
+        val formattedScore = mScoreFormat.format(seatModel?.score ?: 0)
+        mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, formattedScore)
     }
 
 
@@ -407,8 +412,20 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
 
     fun updateMicSeatModels(leadSingerModel: RoomSeatModel, list: List<RoomSeatModel>) {
         mBinding.ilActive.chorusMicView.updateAllMics(leadSingerModel, list)
-
         mBinding.tvCoNumber.text = resources.getString(R.string.cantata_on_chorus_user, (list.size + 1))
+    }
+
+    fun updateAllSeatScore( list: List<RoomSeatModel>){
+        if (mRole == Role.Listener){ // 观众计算总分
+            var totalScore = 0
+            list.forEach {  roomSeat ->
+                if (roomSeat.score >= 0) {
+                    totalScore += roomSeat.score
+                }
+            }
+            val formattedScore = mScoreFormat.format(totalScore)
+            mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, formattedScore)
+        }
     }
 
     interface OnKaraokeEventListener {

@@ -224,6 +224,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
                 val seats = seatModels.filter { it.rtcUid != mRoomLivingViewModel.mSongsOrderedLiveData.value?.get(0)?.userNo }
                 binding.lrcControlView.updateMicSeatModels(seat, seats)
             }
+            binding.lrcControlView.updateAllSeatScore(seatModels)
         }
 
         // 歌词相关
