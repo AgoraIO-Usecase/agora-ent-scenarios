@@ -309,7 +309,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
                 mSeatListLiveData.postValue(value)
                 if (roomSeat.userNo == UserManager.getInstance().user.id.toString()) {
-                    mSeatLocalLiveData.postValue(roomSeat)
+                    mSeatLocalLiveData.value = roomSeat
                     updateVolumeStatus(roomSeat.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE)
                 }
             } else if (ktvSubscribe == CantataServiceProtocol.KTVSubscribe.KTVSubscribeUpdated) {
@@ -327,9 +327,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     value[index] = roomSeat
                     value.removeAt(index)
                     value.add(index, roomSeat)
-                    mSeatListLiveData.postValue(value)
+                    mSeatListLiveData.value = value
                     if (roomSeat.userNo == UserManager.getInstance().user.id.toString()) {
-                        mSeatLocalLiveData.postValue(roomSeat)
+                        mSeatLocalLiveData.value = roomSeat
                         updateVolumeStatus(roomSeat.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE)
                     }
                 }
@@ -344,9 +344,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                         iterator.remove()
                     }
                 }
-                mSeatListLiveData.postValue(value)
+                mSeatListLiveData.value = value
                 if (roomSeat.userNo == UserManager.getInstance().user.id.toString()) {
-                    mSeatLocalLiveData.postValue(null)
+                    mSeatLocalLiveData.value = null
                     mIsOnSeat = false
 
                     updateVolumeStatus(false)
@@ -436,16 +436,16 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     private fun updateVolumeStatus(isUnMute: Boolean) {
         CantataLogger.d(TAG, "RoomLivingViewModel.updateVolumeStatus() isUnMute:$isUnMute")
         mKtvApi.setMicStatus(isUnMute)
-        if (!isUnMute) {
-            if (mMusicSetting?.isEar() == true) {
-                mIsOpnEar = true
-                mMusicSetting?.setEar(false)
-            } else {
-                mIsOpnEar = false
-            }
-        } else {
-            mMusicSetting?.setEar(mIsOpnEar)
-        }
+//        if (!isUnMute) {
+//            if (mMusicSetting?.isEar() == true) {
+//                mIsOpnEar = true
+//                mMusicSetting?.setEar(false)
+//            } else {
+//                mIsOpnEar = false
+//            }
+//        } else {
+//            mMusicSetting?.setEar(mIsOpnEar)
+//        }
 
         // 静音时将本地采集音量改为0
         mRtcEngine?.let {
@@ -915,6 +915,14 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray) {
 
             }
+
+            override fun onAudioRouteChanged(routing: Int) {
+                super.onAudioRouteChanged(routing)
+                CantataLogger.d(TAG, "onAudioRouteChanged, routing:$routing");
+                mMusicSetting?.let {
+                    it.hasEarPhone = routing == 0 || routing == 2 || routing == 5 || routing == 6
+                }
+            }
         }
         config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING
         config.mAudioScenario = Constants.AUDIO_SCENARIO_CHORUS
@@ -975,14 +983,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     }
 
                     else -> {}
-                }
-            }
-
-            override fun onAudioRouteChanged(routing: Int) {
-                super.onAudioRouteChanged(routing)
-                CantataLogger.d(TAG, "onAudioRouteChanged, routing:$routing");
-                mMusicSetting?.let {
-                    it.hasEarPhone = routing == 0 || routing == 2 || routing == 5 || routing == 6
                 }
             }
         })
@@ -1250,7 +1250,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         val mainSingerUid: Int = music.userNo.toInt()
         if (isOwnSong) {
             // 主唱上麦位置
-            haveSeat(0)
+
+            //haveSeat(0)
             // 主唱加载歌曲
             loadMusic(
                 KTVLoadMusicConfiguration(

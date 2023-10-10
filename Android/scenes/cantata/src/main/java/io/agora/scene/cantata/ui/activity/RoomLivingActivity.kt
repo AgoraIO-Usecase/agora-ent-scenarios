@@ -218,7 +218,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
         mRoomLivingViewModel.mSeatListLiveData.observe(this) { seatModels: List<RoomSeatModel>? ->
             seatModels ?: return@observe
-            CantataLogger.d(TAG, "mSeatListLiveData: $seatModels")
+            CantataLogger.d(TAG, "mSeatListLiveData: $seatModels， mSongsOrderedLiveData：${mRoomLivingViewModel.mSongsOrderedLiveData.value}")
             // TODO 前8个默认占座
             if (mRoomLivingViewModel.mSongsOrderedLiveData.value?.size != 0) {
                 val seat = seatModels.filter { it.rtcUid == mRoomLivingViewModel.mSongsOrderedLiveData.value?.get(0)?.userNo }.getOrNull(0) ?: return@observe
@@ -240,6 +240,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
                 binding.lrcControlView.onIdleStatus()
             }
             mChooseSongDialog?.resetChosenSongList(SongActionListenerImpl.transSongModel(models))
+            mRoomLivingViewModel.mSeatListLiveData.postValue(mRoomLivingViewModel.mSeatListLiveData.value)
         }
         mRoomLivingViewModel.mSongPlayingLiveData.observe(this) { model: RoomSelSongModel? ->
             if (model == null) {
@@ -349,6 +350,12 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             binding.lrcControlView.role = LrcControlView.Role.Listener
         }
         mRoomLivingViewModel.musicStartPlay(music)
+
+        if (music.userNo == UserManager.getInstance().user.id.toString()) {
+            binding.lrcControlView.postDelayed({
+                mRoomLivingViewModel.haveSeat(0)
+            }, 200)
+        }
     }
 
     private fun filterSongTypeMap(typeMap: LinkedHashMap<Int, String>): LinkedHashMap<Int, String> {
