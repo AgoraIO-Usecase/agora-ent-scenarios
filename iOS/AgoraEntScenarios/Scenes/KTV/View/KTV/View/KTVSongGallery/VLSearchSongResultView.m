@@ -197,8 +197,8 @@ UITableViewDelegate
     inputModel.songNo = model.songNo;
 //    inputModel.songUrl = model.songUrl;
     inputModel.singer = model.singer;
-    [[AppContext ktvServiceImp] chooseSongWith:inputModel
-                                         completion:^(NSError * error) {
+    [[AppContext ktvServiceImp] chooseSongWithInputModel:inputModel
+                                              completion:^(NSError * error) {
         if (error != nil) {
             return;
         }

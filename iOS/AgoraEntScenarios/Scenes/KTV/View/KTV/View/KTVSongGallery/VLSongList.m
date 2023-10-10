@@ -93,8 +93,8 @@
     KTVMakeSongTopInputModel* inputModel = [KTVMakeSongTopInputModel new];
     inputModel.songNo = model.songNo;
     inputModel.objectId = model.objectId;
-    [[AppContext ktvServiceImp] pinSongWith:inputModel
-                                      completion:^(NSError * error) {
+    [[AppContext ktvServiceImp] pinSongWithInputModel:inputModel
+                                           completion:^(NSError * error) {
     }];
 }
 
@@ -102,8 +102,8 @@
     KTVRemoveSongInputModel* inputModel = [KTVRemoveSongInputModel new];
     inputModel.songNo = model.songNo;
     inputModel.objectId = model.objectId;
-    [[AppContext ktvServiceImp] removeSongWith:inputModel
-                                         completion:^(NSError * error) {
+    [[AppContext ktvServiceImp] removeSongWithInputModel:inputModel
+                                              completion:^(NSError * error) {
         if (error != nil) {
             return;
         }

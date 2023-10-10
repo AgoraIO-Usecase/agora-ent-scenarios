@@ -11,6 +11,7 @@
 #import "VLKTVRemoteVolumeView.h"
 #import "VLFontUtils.h"
 #import "AESMacro.h"
+#import "EffectCollectionViewCell.h"
 @import Masonry;
 
 @interface VLKTVSettingView() <
@@ -18,7 +19,9 @@ VLKTVSwitcherViewDelegate,
 VLKTVSliderViewDelegate,
 VLKTVKindsViewDelegate,
 VLKTVTonesViewDelegate,
-VLKTVRemoteVolumeViewDelegate
+VLKTVRemoteVolumeViewDelegate,
+UICollectionViewDelegate,
+UICollectionViewDataSource
 >
 
 @property (nonatomic, strong) UILabel *titleLabel;
@@ -26,10 +29,14 @@ VLKTVRemoteVolumeViewDelegate
 @property (nonatomic, strong) VLKTVTonesView *tonesView;
 @property (nonatomic, strong) VLKTVSliderView *soundSlider;
 @property (nonatomic, strong) VLKTVSliderView *accSlider;
+@property (nonatomic, strong) VLKTVSliderView *remoteSlider;
 @property (nonatomic, strong) VLKTVKindsView *kindsView;
 @property (nonatomic, strong) VLKTVRemoteVolumeView* remoteVolumeView;
 @property (nonatomic, strong, readonly) VLKTVSettingModel *setting;
-
+@property (nonatomic, strong) UICollectionView *collectionView;
+@property (nonatomic, assign) CGFloat cellWidth;
+@property (nonatomic, strong) NSArray *effectImgs;
+@property (nonatomic, strong) NSArray *titles;
 @end
 
 @implementation VLKTVSettingView
@@ -41,6 +48,11 @@ VLKTVRemoteVolumeViewDelegate
         [self addSubViewConstraints];
         self.soundSlider.value = 1.0;
         self.accSlider.value = 0.5;
+        self.remoteSlider.value = 0.3;
+        self.setting.remoteVolume = 40;
+        self.cellWidth = (CGRectGetWidth([UIScreen mainScreen].bounds) - 48) / 4.0;
+        self.titles = @[@"原声", @"KTV",@"演唱会", @"录音棚", @"留声机", @"空旷", @"空灵", @"流行",@"R&B"];
+        self.effectImgs = @[@"ktv_console_setting1",@"ktv_console_setting2",@"ktv_console_setting3",@"ktv_console_setting4"];
     }
     return self;
 }
@@ -56,6 +68,7 @@ VLKTVRemoteVolumeViewDelegate
     self.soundSwitcher.on = self.setting.soundOn;
     self.soundSlider.value = self.setting.soundValue;
     self.accSlider.value = self.setting.accValue;
+    self.remoteSlider.value = self.setting.remoteValue;
 }
 
 - (void)initSubViews {
@@ -64,7 +77,9 @@ VLKTVRemoteVolumeViewDelegate
 //    [self addSubview:self.tonesView];
     [self addSubview:self.soundSlider];
     [self addSubview:self.accSlider];
-    [self addSubview:self.remoteVolumeView];
+    [self addSubview:self.remoteSlider];
+    [self addSubview:self.collectionView];
+   // [self addSubview:self.remoteVolumeView];
 //    [self addSubview:self.kindsView];
 }
 
@@ -97,11 +112,23 @@ VLKTVRemoteVolumeViewDelegate
         make.height.mas_equalTo(22);
     }];
     
-    [self.remoteVolumeView mas_makeConstraints:^(MASConstraintMaker *make) {
+    [self.remoteSlider mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.mas_equalTo(self);
         make.top.mas_equalTo(self.accSlider.mas_bottom).offset(25);
         make.height.mas_equalTo(22);
     }];
+    
+    [self.collectionView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.mas_equalTo(self);
+        make.top.mas_equalTo(self.remoteSlider.mas_bottom).offset(10);
+        make.height.mas_equalTo(78);
+    }];
+    
+//    [self.remoteVolumeView mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.left.right.mas_equalTo(self);
+//        make.top.mas_equalTo(self.remoteSlider.mas_bottom).offset(25);
+//        make.height.mas_equalTo(22);
+//    }];
     
 //    [self.kindsView mas_makeConstraints:^(MASConstraintMaker *make) {
 //        make.top.mas_equalTo(self.remoteVolumeView.mas_bottom).offset(35);
@@ -134,12 +161,60 @@ VLKTVRemoteVolumeViewDelegate
         NSLog(@"value:%f", value);
         self.setting.soundValue = value;
         type = VLKTVValueDidChangedTypeSound;
-    } else {
+    } else if (sliderView == self.accSlider){
         self.setting.accValue = value;
         type = VLKTVValueDidChangedTypeAcc;
+    } else {
+        self.setting.remoteVolume = value ;
+        type = VLKTVValueDidChangedTypeRemoteValue;
     }
     if ([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]) {
         [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:type];
+    }
+}
+
+#pragma mark - collectionViewDelegate
+
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+    return 1;
+}
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    return self.titles.count; //设置cell数量
+}
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    EffectCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"EffectCollectionViewCell" forIndexPath:indexPath];
+    cell.bgImageView.image = [UIImage sceneImageWithName:self.effectImgs[indexPath.item % 4]];
+    cell.titleLabel.text = self.titles[indexPath.item];
+    cell.layer.cornerRadius = 5;
+    cell.layer.masksToBounds = true;
+    if(self.setting.selectEffect == indexPath.item){
+        cell.layer.borderColor = [UIColor blueColor].CGColor;
+        cell.layer.borderWidth = 2;
+    } else {
+        cell.layer.borderWidth = 0;
+    }
+    return cell;
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    return CGSizeMake(self.cellWidth, 54); //设置cell大小
+}
+
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
+    return 12; //设置上下间距
+}
+
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
+    return 12; //设置左右间距
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    self.setting.selectEffect = indexPath.item;
+    [self.collectionView reloadData];
+    if([self.delegate respondsToSelector:@selector(settingViewEffectChoosed:)]){
+        [self.delegate settingViewEffectChoosed:indexPath.item];
     }
 }
 
@@ -212,21 +287,47 @@ VLKTVRemoteVolumeViewDelegate
 - (VLKTVSliderView *)accSlider {
     if (!_accSlider) {
         _accSlider = [[VLKTVSliderView alloc] initWithMax:1 min:0];
+        _accSlider.accessibilityIdentifier = @"ktv_room_setting_acc_slider_id";
         _accSlider.titleLabel.text = KTVLocalizedString(@"ktv_music_menu_dialog_vol2");
         _accSlider.delegate = self;
     }
     return _accSlider;
 }
 
-- (VLKTVRemoteVolumeView*)remoteVolumeView {
-    if (!_remoteVolumeView) {
-        _remoteVolumeView = [[VLKTVRemoteVolumeView alloc] initWithMin:0 withMax:100 withCurrent:40];
-        _remoteVolumeView.titleLabel.text = KTVLocalizedString(@"ktv_music_menu_dialog_remote_volume");
-        _remoteVolumeView.delegate = self;
-        _setting.remoteVolume = 40;
+
+- (VLKTVSliderView *)remoteSlider {
+    if (!_remoteSlider) {
+        _remoteSlider = [[VLKTVSliderView alloc] initWithMax:1 min:0];
+        _remoteSlider.titleLabel.text = KTVLocalizedString(@"ktv_music_menu_dialog_remote_volume");
+        _remoteSlider.delegate = self;
     }
-    return _remoteVolumeView;
+    return _remoteSlider;
 }
+
+-(UICollectionView *)collectionView {
+    if(!_collectionView){
+            UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc]init];
+            layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+            self.collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+            self.collectionView.dataSource = self;
+            self.collectionView.delegate = self;
+            self.collectionView.backgroundColor = [UIColor clearColor];
+            self.collectionView.showsHorizontalScrollIndicator = NO;
+            self.collectionView.contentInset = UIEdgeInsetsMake(12, 12, 12, 12);
+            [self.collectionView registerClass:[EffectCollectionViewCell class] forCellWithReuseIdentifier:@"EffectCollectionViewCell"];
+    }
+    return _collectionView;
+}
+
+//- (VLKTVRemoteVolumeView*)remoteVolumeView {
+//    if (!_remoteVolumeView) {
+//        _remoteVolumeView = [[VLKTVRemoteVolumeView alloc] initWithMin:0 withMax:100 withCurrent:40];
+//        _remoteVolumeView.titleLabel.text = KTVLocalizedString(@"RemoteVolume");
+//        _remoteVolumeView.delegate = self;
+//        _setting.remoteVolume = 40;
+//    }
+//    return _remoteVolumeView;
+//}
 
 - (VLKTVKindsView *)kindsView {
     if (!_kindsView) {
@@ -249,8 +350,13 @@ VLKTVRemoteVolumeViewDelegate
 }
 
 -(void)setIspause:(BOOL)isPause{
-    _remoteVolumeView.userInteractionEnabled = !isPause;
-    [_remoteVolumeView setCurrent:isPause ? 100 : self.setting.remoteVolume];
+    _remoteSlider.userInteractionEnabled = !isPause;
+    _remoteSlider.value = isPause ? 1 : self.setting.remoteVolume / 100.0;
+}
+
+- (void)setSelectEffect:(NSInteger)index{
+    self.setting.selectEffect = index;
+    
 }
 
 @end
@@ -263,6 +369,7 @@ VLKTVRemoteVolumeViewDelegate
     self.toneValue = 0;
     self.soundValue = 0.0;
     self.accValue = 0.0;
+    self.remoteValue = 0.0;
     self.kindIndex = kKindUnSelectedIdentifier;
 }
 

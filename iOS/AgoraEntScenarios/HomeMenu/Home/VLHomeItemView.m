@@ -89,6 +89,7 @@
     _itemModel = itemModel;
     self.bgImgView.image = UIImageMake(itemModel.bgImgStr);
     self.titleLabel.text = itemModel.titleStr;
+    self.titleLabel.accessibilityIdentifier = itemModel.iconImgStr;
     self.subTitleLabel.text = itemModel.subTitleStr;
     [self.subTitleLabel sizeToFit];
     self.itemImgView.image = UIImageMake(itemModel.iconImgStr);

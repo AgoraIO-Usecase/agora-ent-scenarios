@@ -70,6 +70,7 @@ UITextFieldDelegate
     [bgView addSubview:searchIcon];
     
     self.searchTF = [[UITextField alloc] initWithFrame:CGRectMake(searchIcon.right+8, 5, self.width-40-15-18-6-15, 30)];
+    self.searchTF.accessibilityIdentifier = @"ktv_search_song_textfield_id";
     self.searchTF.textColor = UIColorMakeWithHex(@"#979CBB");
     self.searchTF.placeholder = KTVLocalizedString(@"ktv_dialog_music_list_search_hint");
     self.searchTF.font = UIFontMake(15);

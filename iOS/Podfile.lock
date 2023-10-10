@@ -16,7 +16,7 @@ PODS:
     - AFNetworking/NSURLSession
   - Agora-Scene-Utils (1.1.0)
   - Agora_Chat_iOS (1.0.8)
-  - AgoraLyricsScore (1.1.1-beta-3)
+  - AgoraLyricsScore (1.1.2)
   - AgoraRtcEngine_Special_iOS (4.1.1.17)
   - AgoraRtm_iOS (2.1.4)
   - AgoraSyncManager (2.1.2):
@@ -51,7 +51,7 @@ PODS:
     - SwiftyBeaver
     - YYCategories
     - YYModel
-  - ScoreEffectUI (1.0.1)
+  - ScoreEffectUI (1.0.2)
   - SDWebImage (4.4.8):
     - SDWebImage/Core (= 4.4.8)
   - SDWebImage/Core (4.4.8)
@@ -98,7 +98,7 @@ DEPENDENCIES:
   - AFNetworking (= 4.0.1)
   - Agora-Scene-Utils (= 1.1.0)
   - Agora_Chat_iOS (= 1.0.8)
-  - AgoraLyricsScore (= 1.1.1-beta-3)
+  - AgoraLyricsScore (= 1.1.2)
   - AgoraRtcEngine_Special_iOS (= 4.1.1.17)
   - AgoraSyncManager (= 2.1.2)
   - Bugly (= 2.5.93)
@@ -113,7 +113,7 @@ DEPENDENCIES:
   - MJRefresh
   - Protobuf (= 3.22.1)
   - Pure1v1 (from `AgoraEntScenarios/Scenes/Pure1v1`)
-  - ScoreEffectUI (= 1.0.1)
+  - ScoreEffectUI (= 1.0.2)
   - SDWebImage (= 4.4.8)
   - SDWebImageAPNGCoder
   - SenseLib (from `sense.podspec`)
@@ -181,7 +181,7 @@ SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
-  AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
+  AgoraLyricsScore: 0c3e6b701dfe036ba26ba208fc65c3b65ecaeb06
   AgoraRtcEngine_Special_iOS: 5b3106aad2d76959393cc6497affe83dbdc926a0
   AgoraRtm_iOS: 11b767ee81a7202dcf09e045cd2d359b5abbc965
   AgoraSyncManager: 4e2f2e64db24dd0839e12a64b475c7e094347dd2
@@ -199,7 +199,7 @@ SPEC CHECKSUMS:
   MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
   Pure1v1: a29e30be7dfe87afdda85cfd5b8845e719c29d3f
-  ScoreEffectUI: 1a3bbd83b17cfef1c16a3a4eede2854f89c9eb10
+  ScoreEffectUI: bf1195b4d41a73d43c236450b5d7f958989844aa
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
   SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
@@ -216,6 +216,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 47cf33d60a5a49b1486554e44bc90c680ab5e4da
+PODFILE CHECKSUM: 848a3a0da2e115f5e0f6c34ba26f5877bbd061ba
 
 COCOAPODS: 1.12.1

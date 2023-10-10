@@ -86,8 +86,14 @@
 #pragma mark - delegate
 
 - (void)textFieldDidChange:(UITextField *)textField {
-    if (textField.text.length > 11) {
-        textField.text = [textField.text substringToIndex:11];
+    textField.text = [self truncateStringToElevenCharacters:textField.text];
+}
+
+- (NSString *)truncateStringToElevenCharacters:(NSString *)string {
+    if (string.length > 11) {
+        return [string substringToIndex:11];
+    } else {
+        return string;
     }
 }
 

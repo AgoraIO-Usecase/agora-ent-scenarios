@@ -9,7 +9,7 @@
 #define AESMacro_h
 
 @import YYCategories;
-#import "AgoraEntScenarios-swift.h"
+#import "AgoraEntScenarios-Swift.h"
 #import "QMUICommonDefines.h"
 #import "VLDeviceUtils.h"
 #import "QMUIHelper.h"

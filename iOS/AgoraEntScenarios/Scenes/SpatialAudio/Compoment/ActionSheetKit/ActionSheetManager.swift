@@ -51,10 +51,10 @@ struct ActionSheetSectionModel {
 }
 
 class ActionSheetManager: UIView {
-    var didCellItemClosure: ((IndexPath) -> Void)?
-    var didSliderValueChangeClosure: ((IndexPath, Double) -> Void)?
-    var didSwitchValueChangeClosure: ((IndexPath, Bool) -> Void)?
-    var didSegmentValueChangeClosure: ((IndexPath, String, Int) -> Void)?
+    @objc var didCellItemClosure: ((IndexPath) -> Void)?
+    @objc var didSliderValueChangeClosure: ((IndexPath, Double) -> Void)?
+    @objc var didSwitchValueChangeClosure: ((IndexPath, Bool) -> Void)?
+    @objc var didSegmentValueChangeClosure: ((IndexPath, String, Int) -> Void)?
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .grouped)
@@ -148,11 +148,11 @@ class ActionSheetManager: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func title(title: String) -> ActionSheetManager {
+    @objc func title(title: String) -> ActionSheetManager {
         titleLabel.text = title
         return self
     }
-    func sectionHeader(iconName: String? = nil,
+    @objc func sectionHeader(iconName: String? = nil,
                        title: String?,
                        desc: String?) -> ActionSheetManager {
         if rows.isEmpty && !dataArray.isEmpty {
@@ -181,9 +181,10 @@ class ActionSheetManager: UIView {
         insertEmptyHeaderData()
         return self
     }
-    func tipsCell(iconName: String? = nil,
-                  title: String?,
-                  titleColor: UIColor? = nil) -> ActionSheetManager {
+    
+    @objc func tipsCell(iconName: String? = nil,
+                        title: String?,
+                        titleColor: UIColor? = nil) -> ActionSheetManager {
         let model = ActionSheetModel()
         model.title = title
         model.titleColor = titleColor
@@ -193,7 +194,7 @@ class ActionSheetManager: UIView {
         insertEmptyHeaderData()
         return self
     }
-    func switchCell(iconName: String? = nil,
+    @objc func switchCell(iconName: String? = nil,
                     title: String?,
                     isOn: Bool = false,
                     isEnabel: Bool = true) -> ActionSheetManager {
@@ -207,7 +208,7 @@ class ActionSheetManager: UIView {
         insertEmptyHeaderData()
         return self
     }
-    func sliderCell(iconName: String? = nil,
+    @objc func sliderCell(iconName: String? = nil,
                     title: String?,
                     value: Double,
                     isEnable: Bool = true) -> ActionSheetManager {
@@ -283,7 +284,7 @@ class ActionSheetManager: UIView {
         tableView.reloadData()
     }
     
-    func config() {
+    @objc func config() {
         let preCount = rows.last ?? 0
         let count = dataArray.count - preCount
         rows.append(count)
@@ -340,7 +341,8 @@ class ActionSheetManager: UIView {
             (vc as? SABaseViewController)?.sa_navigationViewController(nav)
         }
     }
-    func show_voice() {
+    
+    @objc func show_voice() {
         isVoice = true
         guard let vc = UIViewController.cl_topViewController() else { return }
         let vcs = vc.navigationController?.viewControllers ?? []

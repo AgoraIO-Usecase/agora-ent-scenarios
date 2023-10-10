@@ -19,7 +19,7 @@ typedef enum : NSUInteger {
 @protocol VLKTVSettingViewDelegate <NSObject>
 
 - (void)settingViewSettingChanged:(VLKTVSettingModel *)setting valueDidChangedType:(VLKTVValueDidChangedType)type;
-
+- (void)settingViewEffectChoosed:(NSInteger)effectIndex;
 @end
 
 @interface VLKTVSettingView : VLBaseView
@@ -31,6 +31,7 @@ typedef enum : NSUInteger {
 - (void)setIsEarOn:(BOOL)isEarOn;
 - (void)setAccValue:(float)accValue;
 -(void)setIspause:(BOOL)isPause;
+-(void)setSelectEffect:(NSInteger)index;
 @end
 
 @interface VLKTVSettingModel : NSObject
@@ -42,9 +43,10 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) BOOL mvOn;
 @property (nonatomic, assign) float soundValue;
 @property (nonatomic, assign) float accValue;
+@property (nonatomic, assign) float remoteValue;
 @property (nonatomic, assign) NSInteger toneValue;
 @property (nonatomic, assign) int remoteVolume;
-
+@property (nonatomic, assign) NSInteger selectEffect;
 
 /// list选项
 @property (nonatomic, assign) NSInteger kindIndex;

@@ -58,7 +58,7 @@
 - (void)getRoomListIfRefresh:(BOOL)ifRefresh {
     self.page = ifRefresh ? 0 : self.page;
     
-    [[AppContext ktvServiceImp] getRoomListWith:self.page
+    [[AppContext ktvServiceImp] getRoomListWithPage:self.page
                                          completion:^(NSError * error, NSArray<VLRoomListModel *> * roomArray) {
         if (error != nil) {
             [self.listCollectionView.mj_header endRefreshing];
@@ -178,6 +178,7 @@ static const int INTERVAL = 1000; // 时间间隔为1秒
 //                                                      title:KTVLocalizedString(@"创建房间")];
         _createBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_createBtn setTitle:KTVLocalizedString(@"ktv_create_room") forState:UIControlStateNormal];
+        _createBtn.accessibilityIdentifier = @"ktv_create_button_id";
         [_createBtn setImage:[UIImage sceneImageWithName:@"online_list_addIcon"] forState:UIControlStateNormal];
         _createBtn.frame = CGRectMake((SCREEN_WIDTH-195)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-48-kTopNavHeight, 195, 48);
         _createBtn.layer.cornerRadius = 24;

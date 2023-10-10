@@ -69,8 +69,8 @@
 //    intputModel.userNo = VLUserCenter.user.id;
     VL(weakSelf);
     self.view.userInteractionEnabled = NO;
-    [[AppContext ktvServiceImp] createRoomWith:intputModel
-                                         completion:^(NSError * error, KTVCreateRoomOutputModel * outputModel) {
+    [[AppContext ktvServiceImp] createRoomWithInputModel:intputModel
+                                              completion:^(NSError * error, KTVCreateRoomOutputModel * outputModel) {
         weakSelf.view.userInteractionEnabled = YES;
         if (error != nil) {
             [VLToast toast:error.description];

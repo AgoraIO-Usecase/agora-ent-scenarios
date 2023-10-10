@@ -57,7 +57,7 @@ class Pure1v1CallViewController: UIViewController {
     }()
     private lazy var hangupButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage.sceneImage(name: "call_reject"), for: .normal)
+        button.setImage(UIImage.scene1v1Image(name: "call_reject"), for: .normal)
         button.addTarget(self, action: #selector(_hangupAction), for: .touchUpInside)
         return button
     }()
