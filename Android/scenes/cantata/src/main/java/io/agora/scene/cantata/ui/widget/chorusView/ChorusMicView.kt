@@ -2,6 +2,7 @@ package io.agora.scene.cantata.ui.widget.chorusView
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.RectF
 import android.util.AttributeSet
@@ -59,7 +60,7 @@ class ChorusMicView @JvmOverloads constructor(
 
     private fun addBGView() {
         bgView = ImageView(context).apply {
-            setImageDrawable(ContextCompat.getDrawable(context, R.drawable.cantata_seat_bg))
+            setImageResource(R.drawable.cantata_seat_bg)
             scaleType = ImageView.ScaleType.CENTER_INSIDE
         }
         bgView?.let {
@@ -145,9 +146,8 @@ class ChorusMicView @JvmOverloads constructor(
 
         // 布局周边麦位视图
         val maxRadius =
-            min(measuredWidth, measuredHeight) / 2 - centralMicHeight/2 - sideMicHeight - boundaryInset * 2 //
-        // 考虑到边界缩进值
-        val minRadius = centralMicHeight/2 + sideMicHeight + boundaryInset * 2 // 考虑到边界缩进值
+            min(measuredWidth, measuredHeight) / 2 - centralMicHeight / 2 - sideMicHeight - boundaryInset * 2 //考虑到边界缩进值
+        val minRadius = centralMicHeight / 2 + sideMicHeight + boundaryInset * 2 // 考虑到边界缩进值
         val radiusRange = min(minRadius, maxRadius)..max(minRadius, maxRadius)
 
         for (i in 0 until sideMicViews.size) {
