@@ -1,6 +1,5 @@
 package io.agora.scene.cantata.ui.viewmodel
 
-import android.os.Build
 import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -48,7 +47,6 @@ import io.agora.scene.cantata.service.RoomListModel
 import io.agora.scene.cantata.service.RoomSeatModel
 import io.agora.scene.cantata.service.RoomSelSongModel
 import io.agora.scene.cantata.service.ScoringAlgoControlModel
-import io.agora.scene.cantata.service.ScoringAverageModel
 import io.agora.scene.cantata.ui.dialog.MusicSettingBean
 import io.agora.scene.cantata.ui.dialog.MusicSettingCallback
 import io.agora.scene.cantata.ui.widget.rankList.RankItem
@@ -1075,7 +1073,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             0,
             object : MusicSettingCallback {
                 override fun onEarChanged(isEar: Boolean) {
-                    val isMuted: Int = if (mSeatLocalLiveData.value != null) mSeatLocalLiveData.value!!.isAudioMuted else return
+                    val isMuted: Int =
+                        if (mSeatLocalLiveData.value != null) mSeatLocalLiveData.value!!.isAudioMuted else return
                     if (isMuted == 1) {
                         mIsOpnEar = isEar
                         return
@@ -1432,28 +1431,16 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
     }
 
-    fun getRankList(): List<RankItem>? {
+    fun getRankList(): List<RankItem> {
         val rankItemList: MutableList<RankItem> = mutableListOf()
         val seatList: List<RoomSeatModel> = mSeatListLiveData.value ?: emptyList()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            seatList.forEach { model ->
-                val item = RankItem()
-                item.userName = model.name
-                item.score = model.score
-                item.avatar = model.headUrl
-                rankItemList.add(item)
-            }
+        seatList.forEach { model ->
+            val item = RankItem()
+            item.userName = model.name
+            item.score = model.score
+            item.avatar = model.headUrl
+            rankItemList.add(item)
         }
-        sortRank(rankItemList)
-        return rankItemList
+        return rankItemList.sortedByDescending { it.score }
     }
-
-    private fun sortRank(list: List<RankItem>) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            list.sortedWith { o1: RankItem, o2: RankItem ->
-                return@sortedWith o2.score - o1.score //score大的在前面
-            }
-        }
-    }
-
 }
