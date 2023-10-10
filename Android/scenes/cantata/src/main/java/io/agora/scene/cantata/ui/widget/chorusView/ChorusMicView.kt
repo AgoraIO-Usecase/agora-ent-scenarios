@@ -14,7 +14,10 @@ import androidx.core.content.res.ResourcesCompat
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.service.RoomSeatModel
 import java.lang.Math.PI
+import kotlin.math.cos
+import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sin
 import kotlin.random.Random
 
 interface ChorusMicViewDelegate {
@@ -36,17 +39,16 @@ class ChorusMicView @JvmOverloads constructor(
 
     private val TAG = "ChorusMicView"
 
-    private val topMicCount: Int = 9 // 默认多少个 mic
+    private val topMicCount: Int = 8 // 默认多少个周边 mic
     private val centralMicWidth: Float = 96.0f.dp // 中间大麦位宽度
     private val centralMicHeight: Float = 120.0f.dp // 中间大麦位高度
     private val sideMicWidth: Float = 48.0f.dp // 周边麦位的宽度
     private val sideMicHeight: Float = 68.0f.dp // 周边麦位的高度
-    private val floatingAnimationDuration: Long = 1500 // 麦位浮动动画的持续时间
 
     private var bgView: ImageView? = null
     private var centralMicView: MicView? = null // 中间大麦位视图
     private val sideMicViews: MutableList<MicView> = mutableListOf() // 周边麦位视图数组
-    private val boundaryInset: Float = 20.0f.dp // 边界缩进值
+    private val boundaryInset: Float = 24.0f.dp // 边界缩进值
 
     var delegate: ChorusMicViewDelegate? = null
 
@@ -86,7 +88,7 @@ class ChorusMicView @JvmOverloads constructor(
         }
 
         // 添加周边麦位视图
-        for (i in 0 until topMicCount - 1) {
+        for (i in 0 until topMicCount) {
             val micView = MicView(context).apply {
                 clickBlock = { index ->
                     delegate?.didChorusMicViewClicked(index)
@@ -124,9 +126,9 @@ class ChorusMicView @JvmOverloads constructor(
             val bgViewWidth = it.measuredWidth
             val bgViewHeight = it.measuredHeight
             val left = (centerPoint.x - bgViewWidth / 2).toInt()
-            val top = (centerPoint.y - bgViewHeight / 2 - 30.0f.dp).toInt()
+            val top = (centerPoint.y - bgViewHeight / 2).toInt()
             val right = (centerPoint.x + bgViewWidth / 2).toInt()
-            val bottom = (centerPoint.y + bgViewHeight / 2 + 30.0f.dp).toInt()
+            val bottom = (centerPoint.y + bgViewHeight / 2).toInt()
             it.layout(left, top, right, bottom)
         }
 
@@ -143,9 +145,10 @@ class ChorusMicView @JvmOverloads constructor(
 
         // 布局周边麦位视图
         val maxRadius =
-            min(measuredWidth, measuredHeight) / 2 - centralMicWidth - sideMicWidth - boundaryInset * 2 // 考虑到边界缩进值
-        val minRadius = centralMicWidth + sideMicWidth + boundaryInset * 2 // 考虑到边界缩进值
-        val radiusRange = minOf(minRadius, maxRadius)..maxOf(minRadius, maxRadius)
+            min(measuredWidth, measuredHeight) / 2 - centralMicHeight/2 - sideMicHeight - boundaryInset * 2 //
+        // 考虑到边界缩进值
+        val minRadius = centralMicHeight/2 + sideMicHeight + boundaryInset * 2 // 考虑到边界缩进值
+        val radiusRange = min(minRadius, maxRadius)..max(minRadius, maxRadius)
 
         for (i in 0 until sideMicViews.size) {
             val angle = i.toFloat() * 2 * PI.toFloat() / sideMicViews.size // 计算每个麦位的角度
@@ -157,8 +160,8 @@ class ChorusMicView @JvmOverloads constructor(
                 val radius = randomFloatInRange(radiusRange) // 在最小半径和最大半径范围内随机生成麦位的半径
 
                 // 计算麦位视图的位置
-                val x = centerPoint.x + radius * kotlin.math.cos(angle.toDouble()).toFloat()
-                val y = centerPoint.y + radius * kotlin.math.sin(angle.toDouble()).toFloat()
+                val x = centerPoint.x + radius * cos(angle.toDouble()).toFloat()
+                val y = centerPoint.y + radius * sin(angle.toDouble()).toFloat()
 
                 val micRectF = RectF(
                     x - sideMicWidth / 2,
@@ -189,15 +192,20 @@ class ChorusMicView @JvmOverloads constructor(
     }
 
 
-     fun updateAllMics(leadSingerModel: RoomSeatModel, seatArray: List<RoomSeatModel>) {
+    fun updateAllMics(leadSingerModel: RoomSeatModel, seatArray: List<RoomSeatModel>) {
         Log.d(TAG, "updateAllMics ${seatArray.size}")
         val micView = findMicViewWithTag(1000) ?: return
         micView.getMicTextView().apply {
-            text = leadSingerModel.name.ifEmpty { context.getString(R.string.cantata_seat_index, leadSingerModel.seatIndex) }
+            text = leadSingerModel.name.ifEmpty {
+                context.getString(
+                    R.string.cantata_seat_index,
+                    leadSingerModel.seatIndex
+                )
+            }
         }
         micView.updateMicImage(leadSingerModel.headUrl)
 
-        for (i in 0 until  topMicCount - 1) {
+        for (i in 0 until topMicCount) {
             if (seatArray.size > i) {
                 val micView1 = findMicViewWithTag(1000 + i + 1) ?: return
                 micView1.getMicTextView().apply {
@@ -258,10 +266,11 @@ class ChorusMicView @JvmOverloads constructor(
             )
             if (tempRectF.intersect(existingViewRect)) {
                 Log.d(TAG, "rectF.isMicRectFValid false1 $existingMicView")
-                return false
+                isValid = false
+                break
             }
-            Log.d(TAG, "rectF.isMicRectFValid true1 $existingMicView")
         }
+        if (!isValid) return false
 
         centralMicView?.let { centralMicView ->
             val centralViewRect = RectF(
@@ -272,19 +281,18 @@ class ChorusMicView @JvmOverloads constructor(
             )
             if (tempRectF.intersect(centralViewRect)) {
                 Log.d(TAG, "rectF.isMicRectFValid false2 $centralMicView")
-                return false
+                isValid = false
             }
-            Log.d(TAG, "rectF.isMicRectFValid true2 $centralMicView")
         }
+        if (!isValid) return false
         // TODO workaround
-//        if (tempRectF.left < boundaryInset || tempRectF.top < boundaryInset ||
-//            tempRectF.right > width - boundaryInset || tempRectF.bottom > height - boundaryInset
-//        ) {
-//            Log.d(TAG, "rectF.isMicRectFValid false3")
-//            return false
-//        }
-        Log.d(TAG, "rectF.isMicRectFValid true3")
-        return true
+        if (tempRectF.left < boundaryInset || tempRectF.top < boundaryInset ||
+            tempRectF.right > measuredWidth - boundaryInset || tempRectF.bottom > measuredHeight - boundaryInset
+        ) {
+            Log.d(TAG, "rectF.isMicRectFValid false3")
+            isValid = false
+        }
+        return isValid
     }
 
 }
