@@ -2,22 +2,32 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@mipmap/bg_app_def_white"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@mipmap/bg_app_def_white">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivAppLogo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="100dp"
+        android:src="@drawable/app_welcome_app_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="@string/app_agreement_page_title"
-        android:textStyle="bold"
         android:textColor="@color/black"
         android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toBottomOf="@id/ivAppLogo" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/tvContent"
@@ -25,7 +35,7 @@
         android:layout_height="0dp"
         android:layout_marginVertical="10dp"
         android:overScrollMode="never"
-        app:layout_constraintBottom_toTopOf="@id/btnAgree"
+        app:layout_constraintBottom_toTopOf="@id/tvAgreeTips"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvTitle">
@@ -34,10 +44,10 @@
             android:id="@+id/tvProtection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
+            android:paddingHorizontal="20dp"
             android:textColor="@color/black"
             android:textSize="14sp"
+            android:lineSpacingExtra="2dp"
             tools:text="textView1" />
     </androidx.core.widget.NestedScrollView>
 
@@ -46,8 +56,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5"
-        />
+        app:layout_constraintGuide_percent="0.5" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnDisagree"
@@ -55,14 +64,13 @@
         android:layout_height="48dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="40dp"
-        android:gravity="center"
-        android:textColor="#303553"
         android:background="@drawable/app_agreement_button_negative"
-        android:textSize="16sp"
+        android:gravity="center"
         android:text="@string/disagree"
-        app:layout_constraintEnd_toStartOf="@+id/gl50"
+        android:textColor="#303553"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintEnd_toStartOf="@+id/gl50" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnAgree"
@@ -70,25 +78,24 @@
         android:layout_height="48dp"
         android:layout_marginStart="10dp"
         android:layout_marginBottom="40dp"
-        android:gravity="center"
-        android:textColor="@color/white"
         android:background="@drawable/app_agreement_button_ok"
-        android:textSize="16sp"
+        android:gravity="center"
         android:text="@string/agree"
-        app:layout_constraintStart_toEndOf="@+id/gl50"
+        android:textColor="@color/white"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintStart_toEndOf="@+id/gl50" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvAgreeTips"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
+        android:text="@string/app_agreement_protection_notice"
         android:textColor="#979CBB"
         android:textSize="12sp"
-        android:text="@string/app_agreement_protection_notice"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/btnAgree"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

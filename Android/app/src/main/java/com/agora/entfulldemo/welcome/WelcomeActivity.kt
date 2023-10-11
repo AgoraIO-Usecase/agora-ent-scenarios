@@ -17,7 +17,6 @@ import io.agora.scene.base.utils.SPUtil
 @Route(path = PagePathConstant.pageWelcome)
 class WelcomeActivity : BaseViewBindingActivity<AppActivityWelcomeBinding>() {
     private var userAgreementDialog: UserAgreementDialog? = null
-    private var userAgreementDialog2: UserAgreementDialog2? = null
     override fun getViewBinding(inflater: LayoutInflater): AppActivityWelcomeBinding {
         return AppActivityWelcomeBinding.inflate(inflater)
     }
@@ -36,43 +35,22 @@ class WelcomeActivity : BaseViewBindingActivity<AppActivityWelcomeBinding>() {
      */
     private fun showUserAgreementDialog() {
         if (userAgreementDialog == null) {
-            userAgreementDialog = UserAgreementDialog(this)
-            userAgreementDialog!!.onButtonClickListener = object : OnButtonClickListener {
-                override fun onLeftButtonClick() {
-                    showUserAgreementDialog2()
-                    userAgreementDialog!!.dismiss()
-                }
+            userAgreementDialog = UserAgreementDialog(this).apply {
+                onButtonClickListener = object : OnButtonClickListener {
+                    override fun onLeftButtonClick() {
+                        dismiss()
+                        finish()
+                    }
 
-                override fun onRightButtonClick() {
-                    PagePilotManager.pageLogin()
-                    userAgreementDialog!!.dismiss()
-                    finish()
+                    override fun onRightButtonClick() {
+                        PagePilotManager.pageLogin()
+                        dismiss()
+                        finish()
+                    }
                 }
             }
         }
-        userAgreementDialog!!.show()
-    }
-
-    /**
-     * 显示用户协议 隐私政策对话框
-     */
-    private fun showUserAgreementDialog2() {
-        if (userAgreementDialog2 == null) {
-            userAgreementDialog2 = UserAgreementDialog2(this)
-            userAgreementDialog2!!.onButtonClickListener = object : OnButtonClickListener {
-                override fun onLeftButtonClick() {
-                    userAgreementDialog2!!.dismiss()
-                    finish()
-                }
-
-                override fun onRightButtonClick() {
-                    PagePilotManager.pageLogin()
-                    userAgreementDialog2!!.dismiss()
-                    finish()
-                }
-            }
-        }
-        userAgreementDialog2!!.show()
+        userAgreementDialog?.show()
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

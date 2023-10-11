@@ -28,11 +28,9 @@ class UserAgreementDialog(context: Context) : BaseDialog<AppDialogUserAgreementB
         binding.btnDisagree.setOnClickListener { view -> getOnButtonClickListener().onLeftButtonClick() }
         val spanColor = ForegroundColorSpan(ContextCompat.getColor(context, R.color.blue_9F))
         // 1
-        val spannable1 =
-            SpannableStringBuilder(context.getString(R.string.app_agreement_protection_tip1))
+        val spannable1 = SpannableStringBuilder(context.getString(R.string.app_agreement_protection_tip1))
         // 2
-        val spannable2 =
-            SpannableStringBuilder(context.getString(R.string.app_agreement_protection_tip2))
+        val spannable2 = SpannableStringBuilder(context.getString(R.string.app_agreement_protection_tip2))
         val protocolClickableSpan1: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 PagePilotManager.pageWebView(URLStatics.userAgreementURL)
@@ -55,8 +53,7 @@ class UserAgreementDialog(context: Context) : BaseDialog<AppDialogUserAgreementB
         )
 
         // 3
-        val spannable3 =
-            SpannableStringBuilder(context.getString(R.string.app_agreement_protection_tip3))
+        val spannable3 = SpannableStringBuilder(context.getString(R.string.app_agreement_protection_tip3))
         spannable3.setSpan(
             LeadingMarginSpan.Standard(0, 32),
             0,
@@ -65,8 +62,7 @@ class UserAgreementDialog(context: Context) : BaseDialog<AppDialogUserAgreementB
         )
 
         // 4
-        val spannable4 =
-            SpannableStringBuilder(context.getString(R.string.app_agreement_protection_tip4))
+        val spannable4 = SpannableStringBuilder(context.getString(R.string.app_agreement_protection_tip4))
         val protocolClickableSpan3: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 PagePilotManager.pageWebView(URLStatics.userAgreementURL)
@@ -82,8 +78,7 @@ class UserAgreementDialog(context: Context) : BaseDialog<AppDialogUserAgreementB
         spannable4.setSpan(protocolClickableSpan4, 16, 22, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
         spannable4.setSpan(spanColor, 16, 22, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
         // 5
-        val spannable5 =
-            SpannableStringBuilder(context.getString(R.string.app_agreement_protection_tip5))
+        val spannable5 = SpannableStringBuilder(context.getString(R.string.app_agreement_protection_tip5))
         val boldSpan = StyleSpan(Typeface.BOLD)
         spannable5.setSpan(boldSpan, 0, spannable5.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         val finalText = TextUtils.concat(
