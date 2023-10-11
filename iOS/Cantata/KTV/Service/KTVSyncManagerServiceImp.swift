@@ -10,7 +10,7 @@ import YYCategories
 import SVProgressHUD
 import AgoraCommon
 
-private let kSceneId = "scene_ktv_3.0.1"
+private let kSceneId = "scene_ktv_3.8.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
@@ -445,7 +445,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
 
     public func leaveSeat(with inputModel: KTVOutSeatInputModel,
                    completion: @escaping (Error?) -> Void) {
-        let seatInfo = seatMap["\(inputModel.seatIndex)"]!
+        let seatInfo = seatMap["\(inputModel.userNo)"]!
         _removeSeat(seatInfo: seatInfo) { error in
         }
         
@@ -454,9 +454,8 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         completion(nil)
     }
     
-    public func leaveSeatWithoutRemoveSong(with inputModel: KTVOutSeatInputModel, completion: @escaping (Error?) -> Void) {
-        let seatInfo = seatMap["\(inputModel.seatIndex)"]!
-        _removeSeat(seatInfo: seatInfo) { error in
+    public func leaveSeatWithoutRemoveSong(with seatModel: VLRoomSeatModel, completion: @escaping (Error?) -> Void) {
+        _removeSeat(seatInfo: seatModel) { error in
         }
         completion(nil)
     }
@@ -1010,6 +1009,9 @@ extension KTVSyncManagerServiceImp {
                 return
             }
             
+            completion(list)
+            return
+            
             //TODO: _getSeatInfo will callback if remove seat invoke
             guard self.seatMap.count == 0 else {
                 return
@@ -1028,6 +1030,7 @@ extension KTVSyncManagerServiceImp {
                 }
                 return
             }
+
             guard VLUserCenter.user.ifMaster else {
                 completion(self._getInitSeats())
                 return
@@ -1169,7 +1172,7 @@ extension KTVSyncManagerServiceImp {
                  success: {[weak self] obj in
                 agoraPrint("imp seat add success...")
                 seatInfo.objectId = obj.getId()
-                self?.seatMap["\(seatInfo.seatIndex)"] = seatInfo
+                self?.seatMap["\(seatInfo.rtcUid)"] = seatInfo
                 finished(nil)
             }, fail: { error in
                 agoraPrint("imp seat add fail...")
@@ -1194,7 +1197,7 @@ extension KTVSyncManagerServiceImp {
                 else {
                     return
                 }
-                self.seatMap["\(model.seatIndex)"] = model
+                self.seatMap["\(model.rtcUid)"] = model
                 self.seatListDidChanged?(.created, model)
             }, onUpdated: { [weak self] object in
                 agoraPrint("imp seat subscribe onupdated... [\(object.getId())]")
@@ -1204,7 +1207,7 @@ extension KTVSyncManagerServiceImp {
                 else {
                     return
                 }
-                self.seatMap["\(model.seatIndex)"] = model
+                self.seatMap["\(model.rtcUid)"] = model
                 self.seatListDidChanged?(.updated, model)
             }, onDeleted: { [weak self] object in
                 agoraPrint("imp seat subscribe ondeleted... [\(object.getId())]")
@@ -1218,7 +1221,9 @@ extension KTVSyncManagerServiceImp {
                 }
                 let seat = VLRoomSeatModel()
                 seat.seatIndex = origSeat.seatIndex
-                self.seatMap["\(origSeat.seatIndex)"] = seat
+                seat.userNo = origSeat.userNo
+                seat.chorusSongCode = origSeat.chorusSongCode
+                self.seatMap["\(origSeat.rtcUid)"] = seat
                 self.seatListDidChanged?(.deleted, seat)
             }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)

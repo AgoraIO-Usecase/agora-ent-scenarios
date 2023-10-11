@@ -67,10 +67,26 @@ class DHCLRCControl: UIView {
     private var resultView: DHCResultView! //结算界面
     private var noSongLabel: UILabel!
     private var chorusNumBtn: UIButton!
+    private var progress: Int = 0
     private var totalLines: Int = 0
     private var totalScore: Int = 0
     private var totalCount: Int = 0
     private var currentLoadLrcPath: String?
+    
+    @objc public var skipCallBack: ((Int, Bool) -> Void)?
+
+    private var skipBtn: KTVSkipView!
+    private var lyricModel: LyricModel?
+    private var hasShowPreludeEndPosition = false
+    private var hasShowEndPosition = false
+    private var hasShowOnce: Bool = false
+    @objc public var isMainSinger: Bool = false {
+        didSet {
+            if isMainSinger {return}
+            skipBtn.isHidden = true
+        }
+    }
+    
     private var loadingView: AUIKaraokeLoadingView!
     @objc public weak var lrcDelegate: DHCLrcControlDelegate?
     weak var delegate: DHCGameDelegate?
@@ -91,6 +107,7 @@ class DHCLRCControl: UIView {
                 chorusNumBtn.isHidden = true
                 scoreLabel.isHidden = true
                 resultView.isHidden = true
+                skipBtn.isHidden = true
             case .ownerSing:
                 pauseBtn.isHidden = false
                 nextBtn.isHidden = false
@@ -104,6 +121,7 @@ class DHCLRCControl: UIView {
                 chorusNumBtn.isHidden = false
                 scoreLabel.isHidden = false
                 resultView.isHidden = true
+                skipBtn.isHidden = false
             case .chorusSing:
                 pauseBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -117,12 +135,13 @@ class DHCLRCControl: UIView {
                 chorusNumBtn.isHidden = false
                 scoreLabel.isHidden = false
                 resultView.isHidden = true
+                skipBtn.isHidden = true
             case .ownerChorus:
-                pauseBtn.isHidden = false
+                pauseBtn.isHidden = true
                 nextBtn.isHidden = false
-                originBtn.isHidden = false
-                effectBtn.isHidden = false
-                joinChorusBtn.isHidden = true
+                originBtn.isHidden = true
+                effectBtn.isHidden = true
+                joinChorusBtn.isHidden = false
                 leaveChorusBtn.isHidden = true
                 musicNameBtn.isHidden = false
                 noSongLabel.isHidden = true
@@ -130,6 +149,7 @@ class DHCLRCControl: UIView {
                 chorusNumBtn.isHidden = false
                 scoreLabel.isHidden = false
                 resultView.isHidden = true
+                skipBtn.isHidden = true
             case .joinChorus:
                 pauseBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -144,6 +164,7 @@ class DHCLRCControl: UIView {
                 chorusNumBtn.isHidden = false
                 scoreLabel.isHidden = false
                 resultView.isHidden = true
+                skipBtn.isHidden = true
             case .beforeJoinChorus:
                 pauseBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -158,6 +179,7 @@ class DHCLRCControl: UIView {
                 chorusNumBtn.isHidden = false
                 scoreLabel.isHidden = false
                 resultView.isHidden = true
+                skipBtn.isHidden = true
             case .nextSong:
                 pauseBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -171,7 +193,9 @@ class DHCLRCControl: UIView {
                 chorusNumBtn.isHidden = true
                 scoreLabel.isHidden = true
                 resultView.isHidden = false
+                skipBtn.isHidden = true
             }
+            nextBtn.frame = CGRect(x: pauseBtn.isHidden ? 20 : 74, y: self.bounds.maxY - 50, width: 34, height: 40)
         }
     }
     
@@ -277,6 +301,30 @@ class DHCLRCControl: UIView {
         loadingView = AUIKaraokeLoadingView(frame: CGRectMake(0, 30, self.bounds.width, 110))
         addSubview(loadingView)
         loadingView.isHidden = true
+        
+        setupSkipBtn()
+    }
+    
+    private func setupSkipBtn() {
+        let frame = CGRect(x: centerX - 61, y: self.bounds.maxY - 50 , width: 122, height: 38)
+        skipBtn = KTVSkipView(frame: frame) { [weak self] type in
+            guard let self = self,
+                  let duration = self.lyricModel?.duration,
+                  let preludeEndPosition = self.lyricModel?.preludeEndPosition else {
+                return
+            }
+            var pos = preludeEndPosition - 2000
+            if self.progress >= duration - 500 {
+                pos = duration - 500
+                self.skipCallBack?(pos, true)
+            } else {
+                self.skipCallBack?(pos, false)
+            }
+            self.hasShowOnce = true
+            self.skipBtn.isHidden = true
+        }
+        addSubview(skipBtn)
+        skipBtn.isHidden = true
     }
     
     @objc private func pause( btn: UIButton) {
@@ -356,6 +404,23 @@ class DHCLRCControl: UIView {
         button.frame = CGRect(x: x, y: y, width: buttonWidth, height: buttonHeight)
         button.setAttributedTitleWithImage(title: title, image: image, imageInsets: imageInsets)
     }
+    
+    @objc public func hideSkipView(flag: Bool) {
+        skipBtn.isHidden = flag
+    }
+
+    @objc public func showPreludeEnd() {
+        if hasShowOnce {return}
+        //显示跳过前奏
+        skipBtn.setSkipType(.prelude)
+        skipBtn.isHidden = false
+        hasShowEndPosition = false
+        hasShowPreludeEndPosition = false
+    }
+    
+    @objc public func resetShowOnce() {
+        hasShowOnce = false
+    }
 }
 
 extension DHCLRCControl: KaraokeDelegate {
@@ -388,7 +453,28 @@ extension DHCLRCControl: KTVLrcViewDelegate {
     }
     
     func onUpdateProgress(progress: Int) {
-        lrcView.setProgress(progress: progress)
+        self.progress = progress
+        lrcView?.setProgress(progress: progress)
+        guard let model = lyricModel else {
+            return
+        }
+        let preludeEndPosition = model.preludeEndPosition
+        let duration = model.duration - 500
+        if progress > model.duration {
+            return
+        }
+        if !isMainSinger {
+            return
+        }
+        if preludeEndPosition < progress && !hasShowPreludeEndPosition {
+            skipBtn.isHidden = true
+            hasShowPreludeEndPosition = true
+            hasShowOnce = true
+        } else if duration < progress && !hasShowEndPosition {
+            skipBtn.setSkipType(.epilogue)
+            skipBtn.isHidden = false
+            hasShowEndPosition = true
+        }
     }
     
     func onDownloadLrcData(url: String) {
@@ -435,6 +521,7 @@ extension DHCLRCControl: KTVLrcViewDelegate {
             return
         }
         currentLoadLrcPath = url
+        lyricModel = model
         totalCount = model.lines.count
         totalLines = 0
         totalScore = 0

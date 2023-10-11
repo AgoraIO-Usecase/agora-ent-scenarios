@@ -65,7 +65,7 @@ import AgoraCommon
     /// - Parameters:
     ///   - inputModel: 输入模型
     ///   - completion: 完成回调
-    func leaveSeatWithoutRemoveSong(with inputModel: KTVOutSeatInputModel, completion: @escaping (Error?) -> Void)
+    func leaveSeatWithoutRemoveSong(with seatModel: VLRoomSeatModel, completion: @escaping (Error?) -> Void)
     
     /// 设置麦位声音
     /// - Parameters:

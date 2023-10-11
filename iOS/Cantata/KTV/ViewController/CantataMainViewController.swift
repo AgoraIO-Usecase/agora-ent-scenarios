@@ -220,6 +220,11 @@ extension CantataMainViewController {
         lrcControlView.lrcDelegate = self
         lrcControlView.controlState = .noSong
         lrcControlView.backgroundColor = .clear
+        lrcControlView.skipCallBack = {[weak self] time, flag in
+            guard let self = self else {return}
+            let seekTime = flag ? (self.ktvApi.getMusicPlayer()?.getDuration() ?? 800) - 800 : time
+            self.ktvApi.seekSing(time: seekTime)
+        }
         mainBgView.addSubview(lrcControlView)
         
         //麦位
@@ -231,6 +236,7 @@ extension CantataMainViewController {
         
         botView = VLBottomView(frame: CGRect(x: 0, y: ScreenHeight - CGFloat(ZBottombarHeight) - 50, width: ScreenWidth, height: 50))
         botView.delegate = self
+        botView.audioBtn.isUserInteractionEnabled = false
         view.addSubview(botView)
         
         jukeBoxView.aui_size = CGSize(width: ScreenWidth, height: 562)
@@ -289,6 +295,7 @@ extension CantataMainViewController {
         self.ktvApi = KTVApiImpl(config: apiConfig, giantConfig: giantConfig)
         self.ktvApi.renewInnerDataStreamId()
         self.ktvApi.setLrcView(view: lrcControlView)
+        
         self.ktvApi.setMicStatus(isOnMicOpen: !self.isNowMicMuted)
         self.ktvApi.addEventHandler(ktvApiEventHandler: self)
     }
@@ -300,8 +307,8 @@ extension CantataMainViewController {
     }
     
     private func loadAndPlaySong() {
-        
         chorusMicView.isHidden = false
+        lrcControlView.resetShowOnce()
         self.isIMMode = 0
         guard let model = self.selSongArray?.first else {return}
         markSong(with: model)
@@ -310,19 +317,12 @@ extension CantataMainViewController {
 
         let seatModel = getCurrentUserMicSeat()
         if seatModel == nil {
-            guard let seatArray = self.seatsArray else {return}
-            
-            for i in 0..<seatArray.count {
-                let seat = seatArray[i]
-                let rtcUid = seat.rtcUid ?? ""
-                if rtcUid == "" && role == .leadSinger {
-                    self.enterSeat(withIndex: i) {[weak self] error in
-                        guard let self = self else {return}
-                        if let error = error {
-                            return
-                        }
+            if role == .leadSinger {
+                self.enterSeat(withIndex:0) {[weak self] error in
+                    guard let self = self else {return}
+                    if let error = error {
+                        return
                     }
-                    break
                 }
             }
         }
@@ -331,7 +331,7 @@ extension CantataMainViewController {
             self.lrcControlView.controlState = .ownerSing
             self.checkEnterSeatAudioAuthorized()
         } else {
-            self.lrcControlView.controlState = .joinChorus
+            self.lrcControlView.controlState = isRoomOwner ? .ownerChorus : .joinChorus
         }
 
         //获取合唱用户
@@ -370,14 +370,14 @@ extension CantataMainViewController {
         self.lrcControlView.controlState = .beforeJoinChorus
         //没有上麦需要先上麦
         if model == nil {
-            guard let seatArray = self.seatsArray else {return}
-            
-            for i in 1..<seatArray.count {
-                let seat = seatArray[i]
-                let rtcUid = seat.rtcUid ?? ""
-                if rtcUid == "" {
+//            guard let seatArray = self.seatsArray else {return}
+//
+//            for i in 1..<seatArray.count {
+//                let seat = seatArray[i]
+//                let rtcUid = seat.rtcUid ?? ""
+//                if rtcUid == "" {
                 // cp todo    KTVLogError("before enterSeat error")
-                    self.enterSeat(withIndex: i) {[weak self] error in
+                    self.enterSeat(withIndex: 0) {[weak self] error in
                         guard let self = self else {return}
                         if let error = error {
                             // cp todo  KTVLogError("enterSeat error: \(error.localizedDescription)")
@@ -388,14 +388,14 @@ extension CantataMainViewController {
                         self.joinChorus()
                     }
                     
-                    return
-                }
-            }
-            
-            VLToast.toast("麦位已满，请在他人下麦后重试")
-            return
+//                    return
+//                }
+//            }
+//
+//            VLToast.toast("麦位已满，请在他人下麦后重试")
+//            return
         }
-        joinChorus()
+       // joinChorus()
     }
     
     private func joinChorus() {
@@ -678,19 +678,30 @@ extension CantataMainViewController {
 //            AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self) { granted in
 //                guard granted else { return }
                 var preSongCode = String()
-                guard let model = self.getUserSeatInfo(with: UInt(seatModel.seatIndex)) else {
-                    assertionFailure("model == nil")
-                    return
-                }
 
                 if status == .created {
-                    model.reset(with: seatModel)
+                    self.seatsArray?.append(seatModel)
                 } else if( status == .updated) {
-                    model.reset(with: seatModel)
+                    //如果没有这个userNo就是新增
+                    var flag = false
+                    if let seatsArray = self.seatsArray {
+                        for i in seatsArray {
+                            if i.userNo == seatModel.userNo {
+                                flag = true
+                            }
+                        }
+                    }
+                    if flag == true {
+                        //更新麦位数据
+                        self.updateModel(withId: seatModel)
+                    } else {
+                        self.seatsArray?.append(seatModel)
+                    }
+
                 } else if status == .deleted {
                     // 下麦消息
                     // 下麦重置占位模型
-                    if let preUserNo = model.userNo, let preCode = model.chorusSongCode {
+                    if let model = self.getUserSeatInfo(with: seatModel.userNo), let preUserNo = model.userNo, let preCode = model.chorusSongCode {
                         //如果自己不是房主 并且之前是合唱 但是现在不是合唱了 需要主动退出合唱
                         if VLUserCenter.user.id == preUserNo {
                             if self.isStringValid(preCode) == true {
@@ -701,46 +712,21 @@ extension CantataMainViewController {
                         }
                     }
                     
-                    model.reset(with: nil)
+                    var deleteIndex = 0
+                    if let seatArray = self.seatsArray,let index = seatArray.firstIndex(where: { $0.userNo == seatModel.userNo }) {
+                        deleteIndex = index
+                    }
+                    self.seatsArray?.remove(at: deleteIndex)
                     
                     self.cosingerDegree = 0
                     self.lrcControlView.setScore(with: 0)
                 }
-                
-//                var seatIndex = 0
-//                if status == .deleted {
-//                    let chorusArray = self.makeChorusArray()
-//                    for (index,value) in chorusArray.enumerated() {
-//                        if value.userNo == model.userNo {
-//                            seatIndex = index
-//                        }
-//                    }
-//                }
-
-                self.seatsArray?[model.seatIndex] = model
                 
                 if status == .updated && self.singerRole == .audience {//
                     let totalScore = self.seatsArray?.reduce(0, { (result, seatModel) -> Int in
                         return result + seatModel.score
                     })
                     self.lrcControlView.setScore(with: totalScore ?? 0)
-                }
-                
-//                self.isOnMicSeat = self.checkIsOnMicSeat()
-//                self.isBrodCaster = self.checkIsOnMicSeat()
-//
-//                if let currentModel = self.getCurrentUserMicSeat() {
-//                    self.isNowMicMuted = currentModel.isAudioMuted == 1
-//                } else {
-//                    self.isNowMicMuted = true
-//                }
-                
-                if status == .created {
-                    
-                } else if status == .updated {
-                    
-                } else if status == .deleted {
-                    
                 }
                 
                 self.botView.updateMicState(!self.isNowMicMuted)
@@ -861,6 +847,14 @@ extension CantataMainViewController {
         }
     }
     
+    private func updateModel(withId seatModel: VLRoomSeatModel) {
+        guard let seatsArray = self.seatsArray else {return}
+        if let index = seatsArray.firstIndex(where: { $0.userNo == seatModel.userNo }) {
+            // 找到模型并修改相应属性
+            self.seatsArray?[index] = seatModel
+        }
+    }
+    
     private func updateSongView(with selSongArray: [VLRoomSelSongModel]) {
         /*
          1.先删除之前的所有数据
@@ -902,10 +896,10 @@ extension CantataMainViewController {
     /// 根据麦位索引获取麦位
     /// - Parameter seatIndex: 麦位索引
     /// - Returns: 对应的麦位信息模型
-    func getUserSeatInfo(with seatIndex: UInt) -> VLRoomSeatModel? {
+    func getUserSeatInfo(with userNo: String?) -> VLRoomSeatModel? {
         guard let seatsArray = self.seatsArray else {return nil}
         for model in seatsArray {
-            if model.seatIndex == seatIndex {
+            if model.userNo == userNo {
                 return model
             }
         }
@@ -956,14 +950,7 @@ extension CantataMainViewController {
     //下麦
     func leaveSeat(with seatModel: VLRoomSeatModel, completion:@escaping ((Error?) -> Void)) {
 
-        let inputModel = KTVOutSeatInputModel()
-        inputModel.userNo = seatModel.userNo
-        inputModel.userId = seatModel.rtcUid
-        inputModel.userName = seatModel.name
-        inputModel.userHeadUrl = seatModel.headUrl
-        inputModel.seatIndex = seatModel.seatIndex
-
-        AppContext.ktvServiceImp()?.leaveSeatWithoutRemoveSong(with: inputModel, completion: { err in
+        AppContext.ktvServiceImp()?.leaveSeatWithoutRemoveSong(with: seatModel, completion: { err in
             completion(err)
         })
         
@@ -1251,6 +1238,9 @@ extension CantataMainViewController {
             let nextSong = songArray[1]
             musicStr = "\(nextSong.songName ?? "")-\(nextSong.singer ?? "")"
         }
+        
+        //按照分数排序
+        rankModels.sort { $0.score > $1.score }
         self.lrcControlView.setResultData(with: totalScore, models: rankModels, musicStr: musicStr, isRoomOwner: isRoomOwner)
     }
     
@@ -1400,6 +1390,8 @@ extension CantataMainViewController: KTVApiEventHandlerDelegate {
     
     public func onSingerRoleChanged(oldRole: KTVSingRole, newRole: KTVSingRole) {
         self.singerRole = newRole
+        self.botView.audioBtn.isUserInteractionEnabled = self.singerRole != .audience
+        self.lrcControlView.isMainSinger = (self.singerRole == .leadSinger || self.singerRole == .soloSinger)
     }
     
     public func onChorusChannelAudioVolumeIndication(speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
@@ -1425,6 +1417,16 @@ extension CantataMainViewController: KTVApiEventHandlerDelegate {
         if(self.singerRole == .coSinger){
             self.isPause = (isLocal && state == .paused);
         }
+        
+        if state == .playing {
+            if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
+                self.lrcControlView.showPreludeEnd()
+            }
+        } else if state == .paused {
+            if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
+                self.lrcControlView.hideSkipView(flag: true)
+            }
+        }
     }
     
     public func onTokenPrivilegeWillExpire() {
@@ -1437,6 +1439,8 @@ extension CantataMainViewController: KTVApiEventHandlerDelegate {
 extension CantataMainViewController: ChorusMicViewDelegate {
     func didChorusMicViewClicked(with index: Int) {
         print("\(index)clicked")
+        
+        return
         /*
          1.判断当前麦位信息
          2.判断是否是自己
@@ -1508,6 +1512,7 @@ extension CantataMainViewController: VLBottomViewDelegate {
     }
     
     public func didBottomViewAudioStateChangeTo(enable: Bool) {
+        
         //开关麦位
         if self.isNowMicMuted {
             AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self) { flag in

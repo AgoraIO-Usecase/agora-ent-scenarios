@@ -41,24 +41,24 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
     
     public func onSelectSong(view: AUIJukeBoxView, tabIndex: Int, index: Int) {
         //先判断自己是否在麦位上
-        if getCurrentUserMicSeat() == nil {
-            let count = seatsArray?.count ?? 0
-            for i in 0..<count {
-                let seat = seatsArray?[i]
-                let rtcUid = seat?.rtcUid ?? ""
-                if rtcUid == "" {
-                    self.enterSeat(withIndex: i) {[weak self] error in
-                        guard let self = self else {return}
-                        if let error = error {
-                            return
-                        }
-                        selectSong(index, tabIndex: tabIndex)
-                    }
-                    
-                    return
-                }
-            }
-        }
+//        if getCurrentUserMicSeat() == nil {
+//            let count = seatsArray?.count ?? 0
+//            for i in 0..<count {
+//                let seat = seatsArray?[i]
+//                let rtcUid = seat?.rtcUid ?? ""
+//                if rtcUid == "" {
+//                    self.enterSeat(withIndex: i) {[weak self] error in
+//                        guard let self = self else {return}
+//                        if let error = error {
+//                            return
+//                        }
+//                        selectSong(index, tabIndex: tabIndex)
+//                    }
+//
+//                    return
+//                }
+//            }
+//        }
         selectSong(index, tabIndex: tabIndex)
     }
     

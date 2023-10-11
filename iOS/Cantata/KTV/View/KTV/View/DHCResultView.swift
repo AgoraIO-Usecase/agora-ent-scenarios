@@ -98,7 +98,7 @@ class DHCResultView: UIView {
     }
     
     public func setResultData(with totalScore: Int, models:[SubRankModel], musicStr: String, isRoomOwner: Bool) {
-        self.dataSource = models
+        
         totalScoreLabel.text = "\(totalScore)"
         nextLabel.isHidden = musicStr.count == 0
         if musicStr.count > 0 {
@@ -122,6 +122,9 @@ class DHCResultView: UIView {
                 self.nextSong()
             }
         }
+        
+        self.dataSource = models
+        tableView.reloadData()
     }
     
     @objc func nextSong() {
@@ -133,7 +136,7 @@ class DHCResultView: UIView {
 
 extension DHCResultView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dataSource?.count ?? 0
+        return (dataSource?.count ?? 0) + 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

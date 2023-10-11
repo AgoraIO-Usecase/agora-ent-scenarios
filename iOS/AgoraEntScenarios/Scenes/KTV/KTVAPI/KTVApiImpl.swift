@@ -214,6 +214,7 @@ private func agoraPrint(_ message: String) {
         engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
         engine.setParameters("{\"che.audio.ans.noise_gate\": 20}")
+        engine.setParameters("{\"rtc.use_audio4\": true}")
     }
     
     func renewInnerDataStreamId() {
