@@ -41,7 +41,7 @@ class VLRoomSeatModel: VLBaseModel {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc func reset(with seatInfo: VLRoomSeatModel?) {
+    @objc func reset(seatInfo: VLRoomSeatModel?) {
         self.isMaster = seatInfo?.isMaster ?? false
         self.headUrl = seatInfo?.headUrl ?? ""
         self.name = seatInfo?.name ?? ""

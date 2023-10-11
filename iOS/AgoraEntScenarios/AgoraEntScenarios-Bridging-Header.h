@@ -6,9 +6,13 @@
 #import "VLUserCenter.h"
 #import "VLBaseModel.h"
 #import "VLLoginModel.h"
+
+#import "SBGServiceProtocol.h"
+#import "SBGServiceModel.h"
+#import "VLSBGRoomSelSongModel.h"
+
 #import "VLHomeItemView.h"
 #import "VLHomeItemModel.h"
-#import "VLLoginModel.h"
 #import "BaseViewController.h"
 //#import "AEACategoryView.h"
 //#import "AEAListContainerView.h"

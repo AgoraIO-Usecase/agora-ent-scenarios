@@ -47,7 +47,28 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.d(tag,"onResume")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(tag,"onStop")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.d(tag,"onRestart")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(tag,"onDestroy")
+    }
+
     override fun onBackPressed() {
+        Log.d(tag,"onBackPressed")
         onHangup()
         super.onBackPressed()
     }

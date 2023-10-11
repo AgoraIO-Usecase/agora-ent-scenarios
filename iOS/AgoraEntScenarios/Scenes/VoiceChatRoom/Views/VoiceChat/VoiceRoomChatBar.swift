@@ -28,7 +28,7 @@ import ZSwiftBaseLib
 
 public class VoiceRoomChatBar: UIView, UICollectionViewDelegate, UICollectionViewDataSource {
     public var events: ((VoiceRoomChatBarEvents) -> Void)?
-
+    public var micStateChangeClosure: ((VoiceRoomChatBarState) -> Void)?
     public var creator = false
 
     var handsState: VoiceRoomChatBarState = .unSelected
@@ -110,6 +110,8 @@ extension VoiceRoomChatBar {
         case .mic:
             refreshMicState(state: state)
             toolBar.reloadItems(at: [IndexPath(row: 0, section: 0)])
+            micStateChangeClosure?(state)
+            
         case .handsUp:
             handsState = state
             var idx = 0

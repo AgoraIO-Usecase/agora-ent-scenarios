@@ -6,5 +6,5 @@
   
 */
 
-CFBundleDisplayName = "1v1PrivateVideoChat";
+CFBundleDisplayName = "LiveToPrivateVideo";
 NSMicrophoneUsageDescription = "When you are chatting/singing/live broadcasting, Agora Entertainment needs to apply for microphone access";

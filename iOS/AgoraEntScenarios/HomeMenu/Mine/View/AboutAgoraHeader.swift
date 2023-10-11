@@ -36,9 +36,9 @@ final class AboutAgoraHeader: UIView {
             .textColor(UIColor(0x979CBB))
             .textAlignment(.center)
             .backgroundColor(.white)
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(onTapVersionLabel(_:)))
-        tap.numberOfTapsRequired = 5;
+        label.accessibilityIdentifier = "user_center_app_version_id"
+        let tap = UILongPressGestureRecognizer(target: self, action: #selector(onTapVersionLabel(_:)))
+        tap.minimumPressDuration = 3;
         label.addGestureRecognizer(tap)
         label.isUserInteractionEnabled = true
         return label

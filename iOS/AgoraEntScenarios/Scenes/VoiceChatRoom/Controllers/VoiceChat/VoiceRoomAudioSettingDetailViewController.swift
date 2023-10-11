@@ -11,7 +11,9 @@ public enum TV_TYPE_HEIGHT: CGFloat {
     case ANS = 920
     case AEC = 455
     case AGC = 454
+    case InEar = 400
     case EFFECT = 921
+    case Music = 500
 }
 
 class VoiceRoomAudioSettingDetailViewController: UIViewController {
@@ -160,10 +162,10 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
 
         view.addSubview(cover)
 
-        backBtn.frame = CGRect(x: 10, y: 30, width: 20, height: 30)
         backBtn.setImage(UIImage.sceneImage(name: "back", bundleName: "VoiceChatRoomResource"), for: .normal)
         backBtn.addTargetFor(self, action: #selector(back), for: .touchUpInside)
         view.addSubview(backBtn)
+        backBtn.translatesAutoresizingMaskIntoConstraints = false
 
         lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20, y: 8, width: 40, height: 4)
         lineImgView.image = UIImage.sceneImage(name: "pop_indicator", bundleName: "VoiceChatRoomResource")
@@ -175,6 +177,9 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
         titleLabel.textColor = UIColor(hex: 0x040925, alpha: 1)
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(titleLabel)
+        
+        backBtn.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
+        backBtn.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
 
         tableView.frame = .zero
         tableView.registerCell(VMSwitchTableViewCell.self, forCellReuseIdentifier: swIdentifier)
@@ -237,6 +242,10 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
         case .AGC:
             return 54
         case .Spatial:
+            return 54
+        case .InEar:
+            return 54
+        case .Music:
             return 54
         }
     }
@@ -471,14 +480,20 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
              }
              return cell
 
-             
-             
-//             let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
-//             cell.isNoiseSet = true
-//             cell.titleLabel.text = AIAECSettingName[indexPath.row]
+         } else if settingType == .InEar {
+             let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
+             cell.titleLabel.text = AIAECSettingName[indexPath.row]
+             cell.selectionStyle = .none
+             cell.swith.isOn = roomInfo?.room?.turn_AIAEC ?? false
+             cell.useRobotBlock = { [weak self] flag in
+                 guard let turnAIAECBlock = self?.turnAIAECBlock else { return }
+                 turnAIAECBlock(flag)
+//                 guard let backBlock = self?.backBlock else {return}
+//                 backBlock();
+             }
+             return cell
 
-//             return cell
-         } else if settingType == .AGC {
+         }  else if settingType == .AGC {
              let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
              cell.titleLabel.text = AGCSettingName[indexPath.row]
              cell.selectionStyle = .none

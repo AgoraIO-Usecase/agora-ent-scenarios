@@ -14,7 +14,7 @@ extension VoiceRoomViewController {
     
     func showEQView() {
         //更新为不等高弹窗视图 全都是控制器 方便业务更新
-        let audioSetVC: VoiceRoomAudioSettingViewController = VoiceRoomAudioSettingViewController()
+        let audioSetVC: VoiceRoomAudioSettingViewController = VoiceRoomAudioSettingViewController(rtcKit: rtckit)
         audioSetVC.roomInfo = roomInfo
         audioSetVC.isAudience = !isOwner
         audioSetVC.ains_state = ains_state
@@ -34,6 +34,25 @@ extension VoiceRoomViewController {
 
         audioSetVC.volBlock = { [weak self] vol in
             self?.updateVolume(vol)
+        }
+        
+        audioSetVC.turnInearBlock = { [weak self] isOn in
+            self?.rtckit.enableinearmonitoring(enable: isOn)
+        }
+        audioSetVC.setInEarVolumnBlock = { [weak self] value in
+            self?.rtckit.setInEarMonitoringVolume(with: value)
+        }
+        audioSetVC.setInEarModeBlock = { [weak self] mode in
+            self?.rtckit.setInEarMode(with: mode)
+        }
+        audioSetVC.backgroundMusicPlaying = { [weak self] model in
+            guard let self = self else { return }
+            self.musicView.isHidden = false
+            self.musicView.setupMusic(model: model, isOrigin: self.roomInfo?.room?.musicIsOrigin ?? true)
+        }
+        audioSetVC.onClickAccompanyButtonClosure = { [weak self] isOrigin in
+            self?.musicView.updateOriginButtonStatus(isOrigin: isOrigin)
+            self?.rtckit.selectPlayerTrackMode(isOrigin: isOrigin)
         }
         
         audioSetVC.selBlock = { [weak self] state in
@@ -115,7 +134,7 @@ extension VoiceRoomViewController {
         }
         
         let presentView: VoiceRoomPresentView = VoiceRoomPresentView.shared
-        presentView.showView(with: CGRect(x: 0, y: 0, width: ScreenWidth, height: 500), vc: audioSetVC, maxHeight: 500)
+        presentView.showView(with: CGRect(x: 0, y: 0, width: ScreenWidth, height: 500), vc: audioSetVC, maxHeight: 660)
         view.addSubview(presentView)
         
     }
@@ -148,7 +167,6 @@ extension VoiceRoomViewController {
     
     func micMuteManager(mic: VRRoomMic) {
         let mute = (mic.status > 0 || mic.member?.micStatus == 0) && mic.member?.uid == VLUserCenter.user.id
-        self.rtckit.setClientRole(role: mute ? .audience : .owner)
         self.rtckit.muteLocalAudioStream(mute: mute)
         self.chatBar.refresh(event: .mic, state: mute ? .selected : .unSelected, asCreator: false)
     }
@@ -283,7 +301,6 @@ extension VoiceRoomViewController {
                     mute = false
                 }
                 self.rtckit.muteLocalAudioStream(mute: mute)
-                self.rtckit.setClientRole(role: mute ? .audience:.owner)
                 self.rtcView.updateUser(mic!)
             } else {
                 self.view.makeToast("Mute local mic failed!")
@@ -295,8 +312,12 @@ extension VoiceRoomViewController {
         let audience = VoiceRoomAudiencesViewController()
         let contributes = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [VoiceRoomGiftersViewController(roomId: roomInfo?.room?.room_id ?? ""),audience], titles: ["voice_contribution_list".voice_localized(),"voice_audience".voice_localized()], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
         audience.kickClosure = { [weak self] user,mic in
-            if mic != nil{
-                self?.rtcView.updateUser(mic!)
+            if let mic = mic{
+                ChatRoomServiceImp.getSharedInstance().kickOff(mic_index: mic.mic_index) { error, mic in
+                    if error == nil, let mic = mic {
+                        self?.rtcView.updateUser(mic)
+                    }
+                }
             }
         }
         let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 420)), custom: contributes)

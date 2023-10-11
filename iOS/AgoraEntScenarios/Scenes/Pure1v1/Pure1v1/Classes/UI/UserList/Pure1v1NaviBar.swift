@@ -14,18 +14,18 @@ enum NaviBarStyle: Int {
     func backImage() -> UIImage? {
         switch self {
         case .dark:
-            return UIImage.sceneImage(name: "navi_back_black")
+            return UIImage.scene1v1Image(name: "navi_back_black")
         default:
-            return UIImage.sceneImage(name: "navi_back_white")
+            return UIImage.scene1v1Image(name: "navi_back_white")
         }
     }
     
     func refreshImage() -> UIImage? {
         switch self {
         case .dark:
-            return UIImage.sceneImage(name: "navi_refresh_black")
+            return UIImage.scene1v1Image(name: "navi_refresh_black")
         default:
-            return UIImage.sceneImage(name: "navi_refresh_white")
+            return UIImage.scene1v1Image(name: "navi_refresh_white")
         }
     }
     

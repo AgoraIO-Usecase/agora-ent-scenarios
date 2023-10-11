@@ -8,7 +8,6 @@
 import Foundation
 import AgoraLyricsScore
 
-
 private func agoraPrint(_ message: String) {
     KTVLog.info(text: message, tag: "KTVLrcControl")
 }

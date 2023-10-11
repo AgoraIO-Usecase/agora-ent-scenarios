@@ -209,8 +209,8 @@ class LiveToolViewCell: UICollectionViewCell {
     func setToolData(item: Any?) {
         guard let model = item as? ShowToolMenuModel else { return }
         self.model = model
-        iconButton.setImage(UIImage.sceneImage(name: model.imageName), for: .normal)
-        iconButton.setImage(UIImage.sceneImage(name: model.selectedImageName), for: .selected)
+        iconButton.setImage(UIImage.scene1v1Image(name: model.imageName), for: .normal)
+        iconButton.setImage(UIImage.scene1v1Image(name: model.selectedImageName), for: .selected)
         iconButton.isSelected = model.isSelected
         titleLabel.text = model.isSelected ? model.type.title : model.type.title
     }
