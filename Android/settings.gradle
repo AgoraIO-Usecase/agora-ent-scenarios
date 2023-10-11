@@ -52,4 +52,7 @@ include ':scenes:show:aars:HardwareBuffer'
  */
 include ':scenes:pure1v1'
 
-include ':scenes:showTo1v1'
+/**
+ * 秀场转1V1私密房 使用了 addHandlerEx 4.1.1.16 版本没有，暂时注掉
+ */
+//include ':scenes:showTo1v1'
