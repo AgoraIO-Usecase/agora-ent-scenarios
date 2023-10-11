@@ -34,6 +34,7 @@
     <string name="app_meta_chatting">元语聊</string>
     <string name="app_interactive_games">互动游戏</string>
     <string name="app_one_to_one">1V1私密房</string>
+    <string name="app_show_to_1v1">秀场转1V1私密房</string>
     <string name="app_coming_soon">敬请期待</string>
     <string name="app_voice_chat_spatial">空间音频</string>
     <string name="app_voice_chat_spatialTip">—空间音频模式</string>

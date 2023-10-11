@@ -122,10 +122,11 @@ class VMEQSettingView: UIView, UITextViewDelegate {
 
         addSubview(cover)
 
-        backBtn.frame = CGRect(x: 10, y: 30, width: 20, height: 30)
+//        backBtn.frame = CGRect(x: 10, y: 30, width: 20, height: 30)
         backBtn.setImage(UIImage.sceneImage(name: "back", bundleName: "VoiceChatRoomResource"), for: .normal)
         backBtn.addTargetFor(self, action: #selector(back), for: .touchUpInside)
         addSubview(backBtn)
+        backBtn.translatesAutoresizingMaskIntoConstraints = false
 
         lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20, y: 8, width: 40, height: 4)
         lineImgView.image = UIImage.sceneImage(name: "pop_indicator", bundleName: "VoiceChatRoomResource")
@@ -137,6 +138,8 @@ class VMEQSettingView: UIView, UITextViewDelegate {
         titleLabel.textColor = UIColor(hex: 0x040925, alpha: 1)
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         addSubview(titleLabel)
+        backBtn.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
+        backBtn.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
 
         tableView.frame = CGRect(x: 0, y: 70, width: ScreenWidth, height: 280)
         tableView.registerCell(VMSwitchTableViewCell.self, forCellReuseIdentifier: swIdentifier)
@@ -199,6 +202,10 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
         case .AGC:
             return 54
         case .Spatial:
+            return 54
+        case .InEar:
+            return 54
+        case .Music:
             return 54
         }
     }

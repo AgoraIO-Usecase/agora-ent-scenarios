@@ -68,6 +68,7 @@
     [self.joinBtn setBackgroundColor:UIColorWhite];
     self.joinBtn.layer.masksToBounds = YES;
     [self.joinBtn setTitle:KTVLocalizedString(@"ktv_join") forState:UIControlStateNormal];
+    self.joinBtn.accessibilityIdentifier = @"ktv_join_room_button_id";
     [self.joinBtn setTitleColor:UIColorMakeWithHex(@"#009FFF") forState:UIControlStateNormal];
     self.joinBtn.titleLabel.font = VLUIFontMake(12);
     self.joinBtn.userInteractionEnabled = false;

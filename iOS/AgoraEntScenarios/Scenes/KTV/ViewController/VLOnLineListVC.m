@@ -120,7 +120,7 @@
     inputModel.password = inputText;
 
     VL(weakSelf);
-    [[AppContext ktvServiceImp] joinRoomWith:inputModel completion:^(NSError * _Nullable error, KTVJoinRoomOutputModel * _Nullable outputModel) {
+    [[AppContext ktvServiceImp] joinRoomWithInputModel:inputModel completion:^(NSError * _Nullable error, KTVJoinRoomOutputModel * _Nullable outputModel) {
         if (error != nil) {
             [VLToast toast:error.description];
             return;

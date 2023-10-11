@@ -23,7 +23,7 @@ class Pure1v1UserNoDataView: UIView {
     
     private lazy var noDataImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage.sceneImage(name: "user_empty")
+        imageView.image = UIImage.scene1v1Image(name: "user_empty")
         return imageView
     }()
     

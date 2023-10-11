@@ -10,7 +10,7 @@
 #import "AESMacro.h"
 #import "UIView+VL.h"
 #import "VLEffectView.h"
-
+#import "VLEarSettingView.h"
 @implementation LSTPopView (KTVModal)
 
 #pragma mark private method
@@ -147,6 +147,68 @@
     return popView;
 }
 
+//弹出专业主播
++ (LSTPopView*)popVoicePerViewWithParentView:(UIView*)parentView
+                              isProfessional: (BOOL) isProfessional
+                                    aecState:(BOOL)state
+                                    aecLevel:(NSInteger)level
+                                     isDelay: (BOOL) isDelay
+                                    volGrade:(NSInteger)volGrade
+                                       grade:(NSInteger)grade
+                                    isRoomOwner: (BOOL) isRoomOwner
+                                         perView:(VLVoicePerShowView*)perView
+                                      withDelegate:(id<VLVoicePerShowViewDelegate>)delegate {
+    VLVoicePerShowView* voiceView = [[VLVoicePerShowView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, isRoomOwner ? 440 : 360)
+                                                                                            isProfessional:isProfessional
+                                                                                            aecState:state
+                                                                                            aecLevel:level
+                                                                                            isDelay:isDelay
+                                                                                            isRoomOwner:isRoomOwner
+                                                                                            volGrade:volGrade
+                                                                                            aecGrade:grade
+                                                                                            withDelegate:delegate ];
+    
+    LSTPopView* popView = [self _createKTVPopContainerWithContentView:voiceView
+                                                       withParentView:parentView];
+    [popView pop];
+    
+    return popView;
+}
+
+//弹出人声突出
++ (LSTPopView*)popVoiceShowViewWithParentView:(UIView*)parentView
+                                         showView:(VLVoiceShowView*)showView
+                                   imgSource:(NSArray *)imgSource
+                                    nameSource:(NSArray *)nameSource
+                                  selectUserNo:(NSString *)selectUserNo
+                                  userNoArray:(NSArray *)userNoArray
+                                 UIUpdateAble:(BOOL)UIUpdateAble
+                                      withDelegate:(id<VLVoiceShowViewDelegate>)delegate {
+    CGFloat popViewH = 88+17+ (imgSource.count > 4 ? 200 : 100)+kSafeAreaBottomHeight;
+    VLVoiceShowView* voiceView = [[VLVoiceShowView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:delegate imgSource:imgSource nameSource:nameSource userNoArray:userNoArray selectUserNo:selectUserNo UIUpdateAble:UIUpdateAble
+                                                                                             ];
+    LSTPopView* popView = [self _createKTVPopContainerWithContentView:voiceView
+                                                       withParentView:parentView];
+    [popView pop];
+    
+    return popView;
+}
+
+//弹出耳返视图
++ (LSTPopView*)popEarSettingViewWithParentView:(UIView*)parentView
+                                   isEarOn:(BOOL)isEarOn
+                                           vol:(CGFloat)vol
+                                      withDelegate:(id<VLEarSettingViewViewDelegate>)delegate {
+    CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;
+    VLEarSettingView *earView = [[VLEarSettingView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) isEarOn:isEarOn vol:vol withDelegate:delegate];
+    
+    LSTPopView* popView = [self _createKTVPopContainerWithContentView:earView
+                                                       withParentView:parentView];
+    [popView pop];
+    
+    return popView;
+}
+
 //网络差视图
 + (LSTPopView*)popBadNetWrokTipViewWithParentView:(UIView*)parentView
                                      withDelegate:(id<VLBadNetWorkViewDelegate>)delegate {
@@ -174,7 +236,7 @@
                                settingView:(VLKTVSettingView*)settingView
                                withDelegate:(id<VLKTVSettingViewDelegate>)delegate {
     VLKTVSettingView* _settingView = settingView ? settingView : [[VLKTVSettingView alloc] initWithSetting:nil];
-    _settingView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 300);
+    _settingView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 340);
     _settingView.backgroundColor = UIColorMakeWithHex(@"#152164");
     [_settingView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
     _settingView.delegate = delegate;
@@ -182,6 +244,20 @@
     LSTPopView* popView = [self _createKTVPopContainerWithContentView:_settingView
                                                        withParentView:parentView];
     popView.isAvoidKeyboard = NO;
+    [popView pop];
+    
+    return popView;
+}
+
+//弹出DebugView
++ (LSTPopView*)popDebugViewWithParentView:(UIView*)parentView
+                                   isDebugMode:(BOOL)isDebugMode
+                             withDelegate:(id<VLDebugViewDelegate>)delegate {
+    CGFloat popViewH = 480;
+    VLDebugView *debugView = [[VLDebugView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) isDumpMode:isDebugMode withDelegate:delegate];
+    
+    LSTPopView* popView = [self _createKTVPopContainerWithContentView:debugView
+                                                       withParentView:parentView];
     [popView pop];
     
     return popView;

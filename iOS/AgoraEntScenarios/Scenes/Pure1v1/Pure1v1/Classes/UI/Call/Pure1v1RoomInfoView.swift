@@ -56,7 +56,7 @@ class Pure1v1RoomInfoView: UIView {
     // 直播标识
     private lazy var indicatorImageView: UIView = {
         let imageView = UIImageView()
-        imageView.image = UIImage.sceneImage(name: "call_connect")
+        imageView.image = UIImage.scene1v1Image(name: "call_connect")
         return imageView
     }()
     

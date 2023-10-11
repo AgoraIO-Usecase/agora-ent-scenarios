@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -30,6 +31,9 @@ import kotlin.jvm.internal.Intrinsics;
 public final class CommonTitleView extends ConstraintLayout {
     private ViewCommonTitleBinding binding;
 
+    public ImageView getRightIcon(){
+        return binding.ivRightIcon;
+    }
     private final void initView(AttributeSet attrs, int defStyleAttr) {
         Context var10000 = this.getContext();
         Intrinsics.checkNotNullExpressionValue(var10000, "context");

@@ -23,7 +23,7 @@ public class Pure1v1UserInfo: NSObject {
     
     func bgImage() ->UIImage? {
         let uid = UInt(userId) ?? 0
-        let image = UIImage.sceneImage(name: "user_bg\(uid % 9 + 1)")
+        let image = UIImage.scene1v1Image(name: "user_bg\(uid % 9 + 1)")
         return image
     }
 }

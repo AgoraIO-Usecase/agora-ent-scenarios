@@ -9,7 +9,7 @@ import UIKit
 
 private let kDialogAnimationDuration = 0.3
 class Pure1v1Dialog: UIView {
-    private lazy var iconView = UIImageView(image: UIImage.sceneImage(name: "dialog_icon"))
+    private lazy var iconView = UIImageView(image: UIImage.scene1v1Image(name: "dialog_icon"))
     private lazy var gradientLayer: CAGradientLayer = {
         let layer = CAGradientLayer()
         layer.colors = [
@@ -177,7 +177,7 @@ class Pure1v1CallerDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage.sceneImage(name: "call_reject"), for: .normal)
+        button.setImage(UIImage.scene1v1Image(name: "call_reject"), for: .normal)
         button.addTarget(self, action: #selector(_cancelAction), for: .touchUpInside)
         return button
     }()
@@ -328,7 +328,7 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
     
     private lazy var rejectButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage.sceneImage(name: "call_reject"), for: .normal)
+        button.setImage(UIImage.scene1v1Image(name: "call_reject"), for: .normal)
         button.setTitle("call_title_reject".pure1v1Localization(), for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.addTarget(self, action: #selector(_rejectAction), for: .touchUpInside)
@@ -338,7 +338,7 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
     
     private lazy var acceptButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage.sceneImage(name: "call_accept"), for: .normal)
+        button.setImage(UIImage.scene1v1Image(name: "call_accept"), for: .normal)
         button.setTitle("call_title_accept".pure1v1Localization(), for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.addTarget(self, action: #selector(_acceptAction), for: .touchUpInside)
@@ -356,7 +356,7 @@ class Pure1v1CalleeDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
         
         let textAttr = NSAttributedString(string: "call_usage_tips".pure1v1Localization())
         let attach = NSTextAttachment()
-        attach.image = UIImage.sceneImage(name: "icon_notice")
+        attach.image = UIImage.scene1v1Image(name: "icon_notice")
         let imageSize = CGSize(width: 14, height: 14)
         attach.bounds = CGRect(origin: CGPoint(x: 0, y: (label.font.capHeight - imageSize.height).rounded() / 2), size: imageSize)
         let imgAttr = NSAttributedString(attachment: attach)

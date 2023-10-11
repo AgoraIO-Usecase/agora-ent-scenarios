@@ -6,7 +6,7 @@
   
 */
 
-"app_name"="声动互娱-秀场体验版";
+"app_name"="声动互娱";
 "app_title_home"="首页";
 "app_title_find"="发现";
 "app_title_mine"="我的";
@@ -51,13 +51,15 @@
 "app_voice_chat_spatialTip"="—空间音频模式";
 
 "app_about_app"="关于声动互娱";
-"app_about_name"="声动互娱-秀场体验版";
+"app_about_name"="声动互娱";
 "app_about_version"="版本号";
 "app_about_scene_version"="场景版本号";
 "app_about_chat_room"="语聊房";
 "app_about_chat_room_spatial"="语聊房-空间音频模式";
 "app_about_karaoke"="在线K歌";
 "app_about_show"="秀场直播";
+"app_about_1v1"="1v1私密房";
+"app_about_live_to_1v1"="秀场转1v1私密房";
 "app_about_customer_service"="联系客服";
 "app_about_official_website"="官网地址";
 "app_about_phone_cancel"="取消";

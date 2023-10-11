@@ -53,6 +53,7 @@
 - (void)setIconImageName:(NSString *)imgStr title:(NSString *)title {
     self.iconImgView.image = UIImageMake(imgStr);
     self.itemTitleLabel.text = title;
+    self.itemTitleLabel.accessibilityIdentifier = imgStr;
 }
 
 @end

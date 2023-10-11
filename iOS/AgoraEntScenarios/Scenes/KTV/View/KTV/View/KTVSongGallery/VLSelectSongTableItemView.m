@@ -207,8 +207,8 @@ UITableViewDelegate
 //    inputModel.songUrl = model.songUrl;
     inputModel.imageUrl = model.imageUrl;
     inputModel.singer = model.singer;
-    [[AppContext ktvServiceImp] chooseSongWith:inputModel
-                                         completion:^(NSError * error) {
+    [[AppContext ktvServiceImp] chooseSongWithInputModel:inputModel
+                                              completion:^(NSError * error) {
         if (error != nil) {
             [self dianGeFailedWithModel:model];
             return;

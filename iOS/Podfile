@@ -1,6 +1,6 @@
 source 'https://github.com/CocoaPods/Specs.git'
 
-platform :ios, '12.0'
+platform :ios, '13.0'
 inhibit_all_warnings!
 #plugin 'cocoapods-pod-sign'
 #skip_pod_bundle_sign # 用来跳过Xcode对bundle资源的签名
@@ -36,14 +36,16 @@ def all_pods
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
   
-  pod 'AgoraSyncManager', '2.1.1'
+  pod 'AgoraSyncManager', '2.1.2'
 
-#  pod 'sdk', :path => 'sdk.podspec'
+#  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
-# pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
-  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.16'
+  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.17'
 
+  pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
+  pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
+  pod 'ShowTo1v1', :path => 'AgoraEntScenarios/Scenes/ShowTo1v1'
 
   #ThirdParty
   pod 'HWWeakTimer', '1.0'
@@ -52,11 +54,11 @@ def all_pods
   pod 'Agora-Scene-Utils', '1.1.0'
   
   #歌词组件
-  pod "ScoreEffectUI", '1.0.1'
-  pod 'AgoraLyricsScore', '1.1.1-beta-3'
+  pod "ScoreEffectUI", '1.0.2'
+  pod 'AgoraLyricsScore', '1.1.2'
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'cc0951f11f5fa6113ec2b9df2a509efa881d5bd7'
 #  pod 'AgoraLyricsScore', :path => '../../AgoraLyricsScore/AgoraLyricsScore.podspec'
-  pod 'AgoraRtm_iOS', '1.5.1'
+
   pod 'Zip'
   pod 'MJRefresh'
   
@@ -87,18 +89,10 @@ target 'AgoraEntScenarios' do
   all_pods
 end
 
-#post_install do |installer|
-#  installer.pods_project.targets.each do |target|
-#    target.build_configurations.each do |config|
-#      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
-#    end
-#  end
-#end
-
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
       shell_script_path = "Pods/Target Support Files/#{target.name}/#{target.name}-frameworks.sh"
       if File::exists?(shell_script_path)
         shell_script_input_lines = File.readlines(shell_script_path)
@@ -112,6 +106,5 @@ post_install do |installer|
     end
   end
 end
-
 
 system("./libs/setup_podspec.sh")
