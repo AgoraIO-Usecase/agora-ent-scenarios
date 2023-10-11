@@ -670,6 +670,12 @@ public class RoomLivingViewModel extends ViewModel {
                             model.partNum = partNum;
                             graspStatusMutableLiveData.postValue(model);
                         }
+
+                        if (isGaming && value == null) {
+                            RoomSelSongModel song = data.get(0);
+                            songPlayingLiveData.postValue(song);
+                            relayList = SongModel.INSTANCE.getSongPartListWithSongCode(song.getSongNo());
+                        }
                     } else {
                         KTVLogger.d(TAG, "RoomLivingViewModel.onSongChanged() return is emptyList");
                         songPlayingLiveData.postValue(null);
@@ -689,11 +695,12 @@ public class RoomLivingViewModel extends ViewModel {
     /**
      * 开始播放歌曲
      */
+    boolean isGaming = false;
     public void onSongPlaying() {
         KTVLogger.d(TAG, "RoomLivingViewModel.onSongPlaying()");
+        isGaming = true;
         if (singRelayGameStatusMutableLiveData.getValue() == GameStatus.ON_START) {
             if (songsOrderedLiveData.getValue() != null && songsOrderedLiveData.getValue().size() > 0){
-                RoomSelSongModel value = songPlayingLiveData.getValue();
                 RoomSelSongModel songPlaying = songsOrderedLiveData.getValue().get(0);
 
                 songPlayingLiveData.postValue(songPlaying);
@@ -722,8 +729,6 @@ public class RoomLivingViewModel extends ViewModel {
             KTVLogger.e(TAG, "RoomLivingViewModel.changeMusic() failed, no song is playing now!");
             return;
         }
-
-        //ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, "", null);
 
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_START);
         ktvServiceProtocol.removeSong(true, new RemoveSongInputModel(
@@ -1096,6 +1101,7 @@ public class RoomLivingViewModel extends ViewModel {
             KTVLogger.d(TAG, "subscribeSingRelayGame: " + ktvSubscribe + " " + gameModel);
             if (gameModel.getStatus() == SingRelayGameStatus.waitting.getValue()) {
                 singRelayGameStatusMutableLiveData.postValue(GameStatus.ON_WAITING);
+                isGaming = false;
             } else if (gameModel.getStatus() == SingRelayGameStatus.started.getValue()) {
                 singRelayGameStatusMutableLiveData.postValue(GameStatus.ON_START);
                 rankMap.clear();
