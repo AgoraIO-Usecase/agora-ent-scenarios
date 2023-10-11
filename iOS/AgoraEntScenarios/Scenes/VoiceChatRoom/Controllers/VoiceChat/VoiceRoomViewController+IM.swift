@@ -258,7 +258,6 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 } else {
                     if local_index == nil || mic_index == local_index {
                         if status == 2 {
-                            rtckit.setClientRole(role: .audience)
                             rtckit.muteLocalAudioStream(mute: true)
                             chatBar.refresh(event: .mic, state: .selected, asCreator: false)
                         }
@@ -293,6 +292,8 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 roomInfo?.mic_info = ChatRoomServiceImp.getSharedInstance().mics
                 rtcView.updateUser(first)
                 refreshApplicants(chat_uid: fromId)
+                let seatUser = ChatRoomServiceImp.getSharedInstance().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
+                rtckit.enableinearmonitoring(enable: seatUser == nil ? false : roomInfo?.room?.turn_InEar ?? false)
             }
         }
     }

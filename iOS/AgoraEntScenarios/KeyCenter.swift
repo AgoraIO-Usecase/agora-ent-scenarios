@@ -36,8 +36,7 @@ class KeyCenter: NSObject {
      进入声网控制台(https://console.agora.io/)，创建一个带证书鉴权的项目，进入项目配置页，即可看到APP证书。
      注意：如果项目没有开启证书鉴权，这个字段留空。
      */
-    static let Certificate: String? = nil
-
+    static let Certificate: String? = <#YOUR Certificate#>
     /**
      Token.
      Agora provides Temporary Access Token to join the spatial channel with APP ID which enable App Certificate.
@@ -63,7 +62,8 @@ class KeyCenter: NSObject {
      如需使用语聊房场景，需要设置该参数。
      详见获取环信即时通讯IM的信息(http://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E8%8E%B7%E5%8F%96%E7%8E%AF%E4%BF%A1%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF-im-%E7%9A%84%E4%BF%A1%E6%81%AF)。
      */
-    static var IMAppKey: String? = <# You IM App Key #>
+    
+    static var IMAppKey: String? = ""
     
     /**
      EaseMob Client ID.
@@ -76,7 +76,7 @@ class KeyCenter: NSObject {
      详见 环信即时通讯云控制台(https://console.easemob.com/user/login/)的应用详情页面。
      */
     
-    static var IMClientId: String? = nil
+    static var IMClientId: String? = ""
     
     /**
      EaseMob Client Secret.
@@ -89,7 +89,7 @@ class KeyCenter: NSObject {
      详见 环信即时通讯云控制台( https://console.easemob.com/user/login/ )的应用详情页面。
      */
     
-    static var IMClientSecret: String? = nil
+    static var IMClientSecret: String? = ""
   
     static let CloudPlayerKey: String? = nil
     static let CloudPlayerSecret: String? = nil

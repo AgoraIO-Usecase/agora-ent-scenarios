@@ -11,12 +11,13 @@ import ZSwiftBaseLib
 import AgoraChat.AgoraChatError
 import AgoraSyncManager
 
-private let kSceneId = "scene_chatRoom_3.0.1"
+private let kSceneId = "scene_chatRoom_3.1.0"
 
 
 private func agoraPrint(_ message: String) {
     voiceLogger.info(message, context: "Service")
 }
+let roomBGMKey = "room_bgm"
 
 let voiceLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "VoiceChat"))
 public class ChatRoomServiceImp: NSObject {
@@ -198,7 +199,29 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
 
 //MARK: ChatRoomServiceProtocol
 extension ChatRoomServiceImp: ChatRoomServiceProtocol {
-
+    func fetchRoomBGM(roomId: String?, completion: @escaping (String?, String?, Bool) -> Void) {
+        SyncUtil.scene(id: roomId ?? "")?.get(key: roomBGMKey, success: { object in
+            let singerName = object?.toDict()["singerName"] as? String
+            let isOrigin = object?.toDict()["isOrigin"] as? Bool
+            let songName = object?.toDict()["songName"] as? String
+            completion(songName, singerName, isOrigin ?? false)
+        })
+    }
+    
+    func updateRoomBGM(songName: String?, singerName: String?, isOrigin: Bool) {
+        let params = ["songName": songName ?? "", "singerName": singerName ?? "", "isOrigin": !isOrigin] as [String : Any]
+        SyncUtil.scene(id: roomId ?? "")?.update(key: roomBGMKey, data: params)
+    }
+    
+    func subscribeRoomBGMChange(roomId: String?, completion: @escaping (String?, String?, Bool) -> Void) {
+        SyncUtil.scene(id: roomId ?? "")?.subscribe(key: roomBGMKey, onUpdated: { object in
+            let singerName = object.toDict()["singerName"] as? String
+            let isOrigin = object.toDict()["isOrigin"] as? Bool
+            let songName = object.toDict()["songName"] as? String
+            completion(songName, singerName, isOrigin ?? false)
+        })
+    }
+    
     func updateAnnouncement(content: String, completion: @escaping (Bool) -> Void) {
         VoiceRoomIMManager.shared?.updateAnnouncement(content: content, completion: completion)
     }
@@ -777,13 +800,47 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                isOwner: true,
                                property: params) {[weak self] result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
-                completion(nil,model)
                 self?.roomId = room.room_id
                 self?._startCheckExpire()
                 //添加鉴黄接口
                 NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: .voice) { msg in
                     agoraPrint("\(msg == nil ? "开启鉴黄成功" : "开启鉴黄失败")")
                 }
+                
+                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
+                let dispatchGroup = DispatchGroup()
+                dispatchGroup.enter()
+                NetworkManager.shared.generateTokens(channelName: room.room_id ?? "",
+                                                     uid: "\(UserInfo.userId)",
+                                                     tokenGeneratorType: .token006,
+                                                     tokenTypes: [.rtc, .rtm]) { tokenMap in
+                    tokenMap1 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.enter()
+                NetworkManager.shared.generateTokens(channelName: "\(room.room_id ?? "")_ex",
+                                                     uid: "\(UserInfo.userId)",
+                                                     tokenGeneratorType: .token006,
+                                                     tokenTypes: [.rtc]) { tokenMap in
+                    tokenMap2 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.notify(queue: .main){
+                    guard let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
+                          let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
+                          let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
+                    else {
+                        completion(nil, nil)
+                        return
+                    }
+                    VLUserCenter.user.agoraRTCToken = rtcToken
+                    VLUserCenter.user.agoraRTMToken = rtmToken
+                    VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
+                    completion(nil, model)
+                }
+                
             } fail: { error in
                 completion(error, nil)
             }
@@ -813,24 +870,47 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     updateRoom.click_count = (updateRoom.click_count ?? 0) + 1
                     let params = updateRoom.kj.JSONObject()
                     
-                    //获取IM信息
-//                    let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
-//                    self.initIM(with: room.name ?? "", type: <#T##Int#>,chatId: updateRoom.chatroom_id, channelId: updateRoom.channel_id ?? "",imUid: imId, pwd: "12345678") { im_token, chat_uid, chatroom_id in
-//                        VLUserCenter.user.im_token = im_token
-//                        VLUserCenter.user.chat_uid = chat_uid
-//
-//                    }
-                    completion(nil, updateRoom)
                     initScene{
                         SyncUtil.joinScene(id: roomId,
                                            userId: VLUserCenter.user.id,
                                            isOwner: VLUserCenter.user.id == room.owner?.uid,
                                            property: params) {[weak self] result in
-//                            let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
-                            self?.roomId = roomId
-                            self?._startCheckExpire()
-//                            completion(nil, model)
-                            //TODO(chenpan): without callback
+
+                            var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
+                            let dispatchGroup = DispatchGroup()
+                            dispatchGroup.enter()
+                            NetworkManager.shared.generateTokens(channelName: room.room_id ?? "",
+                                                                 uid: "\(UserInfo.userId)",
+                                                                 tokenGeneratorType: .token006,
+                                                                 tokenTypes: [.rtc, .rtm]) { tokenMap in
+                                tokenMap1 = tokenMap
+                                dispatchGroup.leave()
+                            }
+                            
+                            dispatchGroup.enter()
+                            NetworkManager.shared.generateTokens(channelName: "\(room.room_id ?? "")_ex",
+                                                                 uid: "\(UserInfo.userId)",
+                                                                 tokenGeneratorType: .token006,
+                                                                 tokenTypes: [.rtc]) { tokenMap in
+                                tokenMap2 = tokenMap
+                                dispatchGroup.leave()
+                            }
+                            
+                            dispatchGroup.notify(queue: .main){
+                                guard let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
+                                      let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
+                                      let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
+                                else {
+                                    completion(nil, nil)
+                                    return
+                                }
+                                VLUserCenter.user.agoraRTCToken = rtcToken
+                                VLUserCenter.user.agoraRTMToken = rtmToken
+                                VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
+                                self?.roomId = roomId
+                                self?._startCheckExpire()
+                                completion(nil, updateRoom)
+                            }
                         } fail: { error in
                             completion(error, nil)
                         }

@@ -20,7 +20,7 @@ class Pure1v1GuideView: UIView {
     }()
     private lazy var imageView: UIImageView = {
        let view = UIImageView()
-        view.image = UIImage.sceneImage(name: "guide_finger")
+        view.image = UIImage.scene1v1Image(name: "guide_finger")
         return view
     }()
     override init(frame: CGRect) {

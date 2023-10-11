@@ -5,7 +5,7 @@
 //  Created by wushengtao on 2022/10/21.
 //
 
-#import "AgoraEntScenarios-Swift.h"
+#import "AgoraEntScenarios-swift.h"
 @import AgoraRtcKit;
 NS_ASSUME_NONNULL_BEGIN
 

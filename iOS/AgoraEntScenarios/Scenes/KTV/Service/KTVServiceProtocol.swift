@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import AgoraRtmKit
 
 @objc enum KTVServiceNetworkStatus: Int {
     case connecting = 0 // 连接中
@@ -29,19 +28,19 @@ import AgoraRtmKit
     /// - Parameters:
     ///   - page: 页码
     ///   - completion: 完成回调
-    func getRoomList(with page: UInt, completion: @escaping (Error?, [VLRoomListModel]?) -> Void)
+    func getRoomList(page: UInt, completion: @escaping (Error?, [VLRoomListModel]?) -> Void)
     
     /// 创建房间
     /// - Parameters:
     ///   - inputModel: 输入模型
     ///   - completion: 完成回调
-    func createRoom(with inputModel: KTVCreateRoomInputModel, completion: @escaping (Error?, KTVCreateRoomOutputModel?) -> Void)
+    func createRoom(inputModel: KTVCreateRoomInputModel, completion: @escaping (Error?, KTVCreateRoomOutputModel?) -> Void)
     
     /// 加入房间
     /// - Parameters:
     ///   - inputModel: 输入模型
     ///   - completion: 完成回调
-    func joinRoom(with inputModel: KTVJoinRoomInputModel, completion: @escaping (Error?, KTVJoinRoomOutputModel?) -> Void)
+    func joinRoom(inputModel: KTVJoinRoomInputModel, completion: @escaping (Error?, KTVJoinRoomOutputModel?) -> Void)
     
     /// 离开房间
     /// - Parameter completion: 完成回调
@@ -53,25 +52,25 @@ import AgoraRtmKit
     /// - Parameters:
     ///   - inputModel: 输入模型
     ///   - completion: 完成回调
-    func enterSeat(with inputModel: KTVOnSeatInputModel, completion: @escaping (Error?) -> Void)
+    func enterSeat(inputModel: KTVOnSeatInputModel, completion: @escaping (Error?) -> Void)
     
     /// 下麦
     /// - Parameters:
     ///   - inputModel: 输入模型
     ///   - completion: 完成回调
-    func leaveSeat(with inputModel: KTVOutSeatInputModel, completion: @escaping (Error?) -> Void)
+    func leaveSeat(inputModel: KTVOutSeatInputModel, completion: @escaping (Error?) -> Void)
     
     /// 设置麦位声音
     /// - Parameters:
     ///   - muted: 是否关闭声音，YES: 关闭声音，NO: 开启声音
     ///   - completion: 完成回调
-    func updateSeatAudioMuteStatus(with muted: Bool, completion: @escaping (Error?) -> Void)
+    func updateSeatAudioMuteStatus(muted: Bool, completion: @escaping (Error?) -> Void)
     
     /// 打开麦位摄像头
     /// - Parameters:
     ///   - muted: 是否关闭摄像头，YES: 关闭摄像头，NO: 开启摄像头
     ///   - completion: 完成回调
-    func updateSeatVideoMuteStatus(with muted: Bool, completion: @escaping (Error?) -> Void)
+    func updateSeatVideoMuteStatus(muted: Bool, completion: @escaping (Error?) -> Void)
     
     // choose songs
     
@@ -79,7 +78,7 @@ import AgoraRtmKit
     /// - Parameters:
     ///   - inputModel: 输入模型
     ///   - completion: 完成回调
-    func removeSong(with inputModel: KTVRemoveSongInputModel, completion: @escaping (Error?) -> Void)
+    func removeSong(inputModel: KTVRemoveSongInputModel, completion: @escaping (Error?) -> Void)
     
     /// 获取选择歌曲列表
     /// - Parameter completion: 完成回调
@@ -89,19 +88,19 @@ import AgoraRtmKit
     /// - Parameters:
     ///   - inputModel: 输入模型
     ///   - completion: 完成回调
-    func markSongDidPlay(with inputModel: VLRoomSelSongModel, completion: @escaping (Error?) -> Void)
+    func markSongDidPlay(inputModel: VLRoomSelSongModel, completion: @escaping (Error?) -> Void)
     
     /// 点歌
     /// - Parameters:
     ///   - inputModel: 输入模型
     ///   - completion: 完成回调
-    func chooseSong(with inputModel: KTVChooseSongInputModel, completion: @escaping (Error?) -> Void)
+    func chooseSong(inputModel: KTVChooseSongInputModel, completion: @escaping (Error?) -> Void)
     
     /// 置顶歌曲
     /// - Parameters:
     ///   - inputModel: 输入模型
     ///   - completion: 完成回调
-    func pinSong(with inputModel: KTVMakeSongTopInputModel, completion: @escaping (Error?) -> Void)
+    func pinSong(inputModel: KTVMakeSongTopInputModel, completion: @escaping (Error?) -> Void)
     
     // lyrics
     
@@ -109,7 +108,7 @@ import AgoraRtmKit
     /// - Parameters:
     ///   - inputModel: 输入模型
     ///   - completion: 完成回调
-    func joinChorus(with inputModel: KTVJoinChorusInputModel, completion: @escaping (Error?) -> Void)
+    func joinChorus(inputModel: KTVJoinChorusInputModel, completion: @escaping (Error?) -> Void)
     
     /// 伴唱取消合唱
     /// - Parameter completion: 完成回调
@@ -122,37 +121,37 @@ import AgoraRtmKit
     /// - Parameters:
     ///   - inputModel: 输入模型
     ///   - completion: 完成回调
-    func changeMVCover(with inputModel: KTVChangeMVCoverInputModel, completion: @escaping (Error?) -> Void)
+    func changeMVCover(inputModel: KTVChangeMVCoverInputModel, completion: @escaping (Error?) -> Void)
     
     // subscribe
     
     /// 订阅用户变化
     /// - Parameter changedBlock: 变化回调
-    func subscribeUserListCountChanged(with changedBlock: @escaping (UInt) -> Void)
+    func subscribeUserListCountChanged(changedBlock: @escaping (UInt) -> Void)
     
     /// 用户属性变化
     /// - Parameter changedBlock: 变化回调
-    func subscribeUserChanged(with changedBlock: @escaping (KTVSubscribe, VLLoginModel) -> Void)
+    func subscribeUserChanged(changedBlock: @escaping (KTVSubscribe, VLLoginModel) -> Void)
     
     /// 订阅麦位变化
     /// - Parameter changedBlock: 变化回调
-    func subscribeSeatListChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomSeatModel) -> Void)
+    func subscribeSeatListChanged(changedBlock: @escaping (KTVSubscribe, VLRoomSeatModel) -> Void)
     
     /// 订阅房间状态变化
     /// - Parameter changedBlock: 变化回调
-    func subscribeRoomStatusChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomListModel) -> Void)
+    func subscribeRoomStatusChanged(changedBlock: @escaping (KTVSubscribe, VLRoomListModel) -> Void)
     
     /// 订阅选中歌曲变化
     /// - Parameter changedBlock: 变化回调
-    func subscribeChooseSongChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomSelSongModel, [VLRoomSelSongModel]) -> Void)
+    func subscribeChooseSongChanged(changedBlock: @escaping (KTVSubscribe, VLRoomSelSongModel, [VLRoomSelSongModel]) -> Void)
     
     /// 订阅网络状态变化
     /// - Parameter changedBlock: 变化回调
-    func subscribeNetworkStatusChanged(with changedBlock: @escaping (KTVServiceNetworkStatus) -> Void)
+    func subscribeNetworkStatusChanged(changedBlock: @escaping (KTVServiceNetworkStatus) -> Void)
     
     /// 订阅房间过期
     /// - Parameter changedBlock: 变化回调
-    func subscribeRoomWillExpire(with changedBlock: @escaping () -> Void)
+    func subscribeRoomWillExpire(changedBlock: @escaping () -> Void)
     
     /// 取消全部订阅
     func unsubscribeAll()

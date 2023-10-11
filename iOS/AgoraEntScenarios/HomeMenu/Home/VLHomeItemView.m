@@ -47,9 +47,9 @@
 
 - (UILabel *)titleLabel {
     if (!_titleLabel) {
-        _titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(22, VLREALVALUE_WIDTH(25), self.width-44, 30)];
-        _titleLabel.font = [UIFont fontWithName:@"PingFangSC" size:22];
-        _titleLabel.font = [UIFont systemFontOfSize:18 weight:UIFontWeightSemibold];
+        _titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(21, VLREALVALUE_WIDTH(25), self.width-42, 30)];
+        _titleLabel.font = [UIFont fontWithName:@"PingFangSC" size:16];
+        _titleLabel.adjustsFontSizeToFitWidth = YES;
         _titleLabel.textColor = UIColorMakeWithHex(@"#FFFFFF");
     }
     return _titleLabel;
@@ -89,7 +89,9 @@
     _itemModel = itemModel;
     self.bgImgView.image = UIImageMake(itemModel.bgImgStr);
     self.titleLabel.text = itemModel.titleStr;
+    self.titleLabel.accessibilityIdentifier = itemModel.iconImgStr;
     self.subTitleLabel.text = itemModel.subTitleStr;
+    [self.subTitleLabel sizeToFit];
     self.itemImgView.image = UIImageMake(itemModel.iconImgStr);
     self.subTitleBgView.hidden = !itemModel.subTitleStr.length;
     

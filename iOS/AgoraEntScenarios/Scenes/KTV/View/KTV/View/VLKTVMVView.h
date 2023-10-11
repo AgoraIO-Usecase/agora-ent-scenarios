@@ -32,6 +32,7 @@ typedef enum : NSUInteger {
     VLKTVMVViewActionTypeMVNext,     // 播放下一首
     VLKTVMVViewActionTypeSingOrigin, // 原唱
     VLKTVMVViewActionTypeSingAcc,    // 伴奏
+    VLKTVMVViewActionTypeSingLead,   //导唱
     VLKTVMVViewActionTypeRetryLrc    // 歌曲重试
 } VLKTVMVViewActionType;
 
@@ -48,6 +49,8 @@ typedef enum : NSUInteger {
 
 -(void)didLeaveChours;
 
+-(void)didShowVoiceChooseView;
+
 @end
 
 @interface VLKTVMVView : UIView
@@ -59,7 +62,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) IncentiveView *incentiveView;
 @property (nonatomic, strong) LineScoreView *lineScoreView;
 @property (nonatomic, strong) UIButton *joinChorusBtn;
-
+@property (nonatomic, assign) BOOL isOriginLeader;
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVMVViewDelegate>)delegate;
 
 //更改背景
@@ -91,6 +94,10 @@ typedef enum : NSUInteger {
 - (void)reset;
 
 -(void)setBotViewHidden:(BOOL)isHidden;
+
+-(void)setPerViewHidden:(BOOL)isHidden;
+
+-(void)setPerViewAvatar:(NSString *)url;
 
 @end
 

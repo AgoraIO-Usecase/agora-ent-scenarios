@@ -37,7 +37,7 @@ class Pure1v1TouchWaveView: UIControl {
     
     private lazy var contentImageView: UIImageView = {
         let view = UIImageView()
-        view.image = UIImage.sceneImage(name: "live_linklive")
+        view.image = UIImage.scene1v1Image(name: "live_linklive")
         return view
     }()
     
