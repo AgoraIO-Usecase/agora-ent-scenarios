@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigationLogin"
+    app:startDestination="@+id/fragmentAdvertise">
+
+    <fragment
+        android:id="@+id/fragmentAdvertise"
+        android:name="com.agora.entfulldemo.login.LoginAdvertiseFragment"
+        tools:layout="@layout/app_fragment_login_advertise" />
+
+    <fragment
+        android:id="@+id/fragmentPhoneInput"
+        android:name="com.agora.entfulldemo.login.LoginPhoneInputFragment"
+        tools:layout="@layout/app_fragment_login_phone_input" />
+
+    <fragment
+        android:id="@+id/fragmentVerify"
+        android:name="com.agora.entfulldemo.login.LoginVerifyFragment"
+        tools:layout="@layout/app_fragment_login_verify" />
+
+</navigation>

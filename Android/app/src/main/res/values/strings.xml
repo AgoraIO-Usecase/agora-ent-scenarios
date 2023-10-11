@@ -1,5 +1,25 @@
 <resources>
     <string name="app_name">声动互娱</string>
+
+    <string name="app_agreement_page_title">个人信息保护指引</string>
+    <string name="app_agreement_protection_tip1">声动互娱软件是一款用于向声网客户展示产品使用效果的测试产品，仅用于测试产品的功能、性能和可用性，而非提供给大众使用的正式产品。</string>
+    <string name="app_agreement_protection_tip2">1.我们将依据《用户协议》及《隐私政策》来帮助您了解我们在收集、使用、存储您个人信息的情况以及您享有的相关权利。</string>
+    <string name="app_agreement_protection_tip3">2.在您使用本测试软件时，我们将收集您的设备信息、日志信息等，同时根据不同使用场景，你可以授予我们获取您设备的麦克风权限、摄像头权限等信息。</string>
+    <string name="app_agreement_protection_tip4">您可通过阅读完整的《用户协议》及《隐私政策》来了解详细信息。</string>
+    <string name="app_agreement_protection_tip5">提示您注意：当您点击“同意”时，视为您已阅读并愿意接受《用户协议》和《隐私政策》的所有内容。当您点击“不同意”时，将无法体验声动互娱的完整功能。</string>
+    <string name="app_agreement_protection_notice">选择“同意”，体验声动互娱完整功能</string>
+    <string name="app_agreement_protection_alert">同意 用户协议 及 隐私政策 后，声动互娱才能为您提供协作服务。</string>
+
+    <string name="app_login_phone_login">手机号登录</string>
+    <string name="app_login_i_agree">我已阅读并同意</string>
+    <string name="app_login_user_agreement">《用户协议》</string>
+    <string name="app_login_privacy_agreement">《隐私政策》</string>
+    <string name="app_login_agreement_and">及</string>
+    <string name="app_login_phone_input_title">注册/登录</string>
+    <string name="app_login_phone_input_info">若手机号未注册，登录后会自动注册。</string>
+    <string name="app_login_phone_input_input">请输入手机号</string>
+    <string name="app_login_phone_input_next">获取验证码</string>
+
     <string name="app_title_home">首页</string>
     <string name="app_title_find">发现</string>
     <string name="app_title_mine">我的</string>
@@ -10,12 +30,11 @@
     <string name="app_privacy_agreement">隐私政策</string>
     <string name="app_personal_info_collection_checklist">个人信息收集清单</string>
     <string name="app_third_party_info_data_sharing">第三方信息数据共享</string>
-    <string name="app_and">及</string>
+
 
     <string name="app_confirm_deletion">确认删除？</string>
     <string name="app_about_us">关于我们</string>
 
-    <string name="app_please_input_account">请输入手机号</string>
     <string name="app_error_pwd_tip">8~20个字符，包含大、小写字母和数字</string>
     <string name="app_please_input_pwd">请输入密码</string>
     <string name="app_please_input_v_code">请输入验证码</string>
@@ -23,8 +42,7 @@
     <string name="app_login">登录</string>
     <string name="app_finish">完成</string>
     <string name="app_register_account">注册账号</string>
-    <string name="app_welcome_experience">欢迎体验声网服务</string>
-    <string name="app_mobile_number">手机号</string>
+
     <string name="app_v_code">验证码</string>
 
     <string name="app_plus_86">+86</string>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/bg_app_def_white">
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cvIAgree"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:layout_marginLeft="55dp"
+        android:button="@drawable/bg_cb_check_status_def"
+        android:text="@string/app_login_i_agree"
+        android:textColor="@color/def_text_grey_979"
+        android:checked="true"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvUserAgreement"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="@string/app_login_user_agreement"
+        android:textColor="@color/blue_2e"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/cvIAgree"
+        app:layout_constraintStart_toEndOf="@id/cvIAgree"
+        app:layout_constraintTop_toTopOf="@id/cvIAgree" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvAnd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:button="@drawable/bg_cb_check_status_def"
+        android:text="@string/app_login_agreement_and"
+        android:textColor="@color/def_text_grey_979"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvUserAgreement"
+        app:layout_constraintStart_toEndOf="@id/tvUserAgreement"
+        app:layout_constraintTop_toTopOf="@id/tvUserAgreement" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPrivacyAgreement"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="@string/app_login_privacy_agreement"
+        android:textColor="@color/blue_2e"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvAnd"
+        app:layout_constraintStart_toEndOf="@id/tvAnd"
+        app:layout_constraintTop_toTopOf="@id/tvAnd" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnLogin"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginBottom="25dp"
+        android:background="@drawable/bg_def_button_solid"
+        android:text="@string/app_login_phone_login"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/cvIAgree" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,8 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import io.agora.scene.base.component.BaseDialog;
 import io.agora.scene.base.manager.PagePilotManager;
+
+import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppDialogUserAgreementBinding;
-import io.agora.scene.widget.R;
 
 public class UserAgreementDialog2 extends BaseDialog<AppDialogUserAgreementBinding> {
     public UserAgreementDialog2(@NonNull Context context) {
@@ -50,7 +51,7 @@ public class UserAgreementDialog2 extends BaseDialog<AppDialogUserAgreementBindi
 
 
         ForegroundColorSpan spanColor = new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_9F));
-        SpannableStringBuilder spannable = new SpannableStringBuilder(getContext().getString(R.string.privacy_protection_tip2));
+        SpannableStringBuilder spannable = new SpannableStringBuilder(getContext().getString(R.string.app_agreement_protection_alert));
         spannable.setSpan(protocolClickableSpan1, 3, 7, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannable.setSpan(spanColor, 3, 7, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 

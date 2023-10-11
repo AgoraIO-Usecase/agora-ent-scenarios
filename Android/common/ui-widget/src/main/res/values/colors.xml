@@ -10,6 +10,7 @@
     <color name="def_text_color_white">#EFF4FF</color>
     <color name="def_text_color_040">#040925</color>
     <color name="def_text_color_3c4">#3C4267</color>
+    <color name="def_text_grey_edf">#EDF2F9</color>
     <color name="def_text_grey_979">#979CBB</color>
     <color name="def_text_grey_6c7">#6C7192</color>
     <color name="black_57">#575757</color>
@@ -43,6 +44,7 @@
     <color name="green_6d">#6DD400</color>
     <color name="blue_9F">#009FFF</color>
     <color name="blue_15">#156EF3</color>
+    <color name="blue_2e">#2E6CF6</color>
     <color name="yellow_e7">#F7B500</color>
     <color name="yellow_f7">#F7B500</color>
     <color name="yellow_60">#FFE960</color>
