@@ -470,8 +470,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_LRC_RESET) {
                 getBinding().lrcControlView.getLyricsView().reset();
                 getBinding().lrcControlView.getLyricsView().reset();
-                //TODO
-                //getBinding().singRelayGameView.onSongFinish(0);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_START) {
                 getBinding().lrcControlView.setEnabled(false);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_END) {
@@ -741,7 +739,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 public void onRightButtonClick() {
                     setDarkStatusIcon(isBlackDarkStatus());
                     roomLivingViewModel.toggleMic(false);
-                    getBinding().singRelayGameView.onSongFinish();
                     roomLivingViewModel.resetMusicStatus();
                     if (roomLivingViewModel.isRoomOwner()) {
                         roomLivingViewModel.changeMusic();

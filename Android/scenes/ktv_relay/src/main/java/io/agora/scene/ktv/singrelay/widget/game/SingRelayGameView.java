@@ -132,6 +132,7 @@ public class SingRelayGameView extends FrameLayout {
     public void onGameWaitingStatus() {
         KTVLogger.d(TAG, "onGameWaitingStatus");
         if (mBinding == null) return;
+        partNum = 1;
         mBinding.ilRank.setVisibility(GONE);
         mBinding.ilIDLE.ivGameTips.setVisibility(View.VISIBLE);
         mBinding.ilIDLE.tvSongTab.setVisibility(View.GONE);
