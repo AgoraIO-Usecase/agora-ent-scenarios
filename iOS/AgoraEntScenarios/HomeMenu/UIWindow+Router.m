@@ -20,7 +20,6 @@
     } else {
         rootVC = [[VLLoginViewController alloc] init];
     }
-    BaseNavigationController *navi = [[BaseNavigationController alloc] initWithRootViewController:rootVC];
-    self.rootViewController = navi;
+    self.rootViewController = rootVC;
 }
 @end
