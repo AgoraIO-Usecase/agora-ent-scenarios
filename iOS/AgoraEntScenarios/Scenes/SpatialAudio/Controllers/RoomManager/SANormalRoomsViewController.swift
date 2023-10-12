@@ -50,7 +50,7 @@ extension SANormalRoomsViewController {
             guard let self = self else {return}
             self.roomList.refreshControl?.endRefreshing()
             if error == nil {
-                guard let rooms = rooms else {return}
+                guard let rooms = rooms?.filter({ $0.room_id != nil }) else {return}
                 let roomsEntity: SARoomsEntity = SARoomsEntity()
                 roomsEntity.rooms = rooms
                 roomsEntity.total = rooms.count

@@ -5,7 +5,7 @@
 //  Created by zhaoyongqiang on 2023/5/22.
 //
 
-import UIKit
+import AVFoundation
 
 class HeadSetUtil: NSObject {
     private static var headsetStatusCallBack: ((Bool) -> Void)?

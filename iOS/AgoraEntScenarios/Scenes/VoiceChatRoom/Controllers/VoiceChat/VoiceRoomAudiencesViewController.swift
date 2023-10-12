@@ -100,7 +100,7 @@ extension VoiceRoomAudiencesViewController {
                 } else {
                     self.removeUserFromUserList(user: user)
                     if self.kickClosure != nil  {
-                        self.kickClosure!(user,nil)
+                        self.kickClosure!(user, nil)
                     }
                 }
             }

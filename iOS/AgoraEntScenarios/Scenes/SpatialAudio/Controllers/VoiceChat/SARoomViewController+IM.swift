@@ -94,6 +94,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
     
     func onReceiveSeatRequest(roomId: String, applicant: SAApply) {
+        guard isOwner else { return }
         self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: isOwner)
     }
 
@@ -248,10 +249,17 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
             if let first = mics.first {
                 // 查询自己有没有在麦上
                 let seatUser = AppContext.saTmpServiceImp().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
-                let status = ((first.member?.mic_status == .mute && first.member?.uid == VLUserCenter.user.id) || (seatUser != nil && seatUser?.status != -1)) ? 1 : (first.status == 3 ? -1 : first.status)
+                var status = first.status
+                if seatUser == nil, status == 2 || status == 3 || status == 4 {
+                    status = -1
+                } else if (first.member?.mic_status == .mute && first.member?.uid == VLUserCenter.user.id) || (seatUser != nil && seatUser?.status != -1) {
+                    status = 1
+                } else if seatUser != nil {
+                    status = seatUser?.status ?? -1
+                }
                 let mic_index = first.mic_index
                 //刷新底部✋🏻状态
-                if !isOwner && first.mic_index != 0  {
+                if !isOwner && first.mic_index != 0 {
                     refreshHandsUp(status: status)
                 }
                 //将userList中的上麦用户做标记，便于后续过滤

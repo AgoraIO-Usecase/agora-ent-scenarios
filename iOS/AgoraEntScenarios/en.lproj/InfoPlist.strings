@@ -6,5 +6,5 @@
   
 */
 
-CFBundleDisplayName = "AgoraEntertainment";
+CFBundleDisplayName = "AgoraEntertainment-Voice";
 NSMicrophoneUsageDescription = "When you are chatting/singing/live broadcasting, Agora Entertainment needs to apply for microphone access";

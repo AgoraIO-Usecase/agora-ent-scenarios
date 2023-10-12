@@ -55,6 +55,7 @@ class VoiceRoomViewController: VRBaseViewController {
         view.onClickAccompanyButtonClosure = { [weak self] isOrigin in
             self?.roomInfo?.room?.musicIsOrigin = isOrigin
             self?.musicView.updateOriginButtonStatus(isOrigin: isOrigin)
+            self?.rtckit.selectPlayerTrackMode(isOrigin: isOrigin)
         }
         return view
     }()
@@ -70,13 +71,25 @@ class VoiceRoomViewController: VRBaseViewController {
             guard let self = self, self.isOwner == true else { return }
             self.musicListView.show_present()
         }
+        view.onUpdateBGMClosure = { [weak self] model in
+            guard let self = self, self.isOwner == false else { return }
+            self.roomInfo?.room?.backgroundMusic = model
+        }
         return view
     }()
     var isShowPreSentView: Bool = false
     var rtckit: VoiceRoomRTCManager = VoiceRoomRTCManager.getSharedInstance()
     var isOwner: Bool = false
     var ains_state: AINS_STATE = .mid
-    var local_index: Int?
+    var local_index: Int? {
+        didSet {
+            if local_index == nil {
+                self.rtckit.setClientRole(role: .audience)
+            } else {
+                self.rtckit.setClientRole(role: .owner)
+            }
+        }
+    }
     var vmType: VMMUSIC_TYPE = .social
     var isHeaderBack = false
 

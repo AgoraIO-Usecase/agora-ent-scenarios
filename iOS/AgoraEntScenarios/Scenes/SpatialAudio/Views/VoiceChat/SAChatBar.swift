@@ -146,6 +146,7 @@ extension SAChatBar {
         case .disable:
             break
         }
+        toolBar.reloadData()
     }
 
     private func refreshHandsState(state: SAChatBarState, idx: Int) {
@@ -157,6 +158,7 @@ extension SAChatBar {
         case .disable:
             datas[idx] = "handuphard-1"
         }
+        toolBar.reloadData()
     }
 
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
