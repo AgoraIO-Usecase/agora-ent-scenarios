@@ -6,16 +6,27 @@
     android:layout_height="match_parent"
     android:background="@mipmap/bg_app_def_white">
 
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginVertical="20dp"
+        android:background="@null"
+        android:src="@mipmap/back_empty"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvAppName"
+        android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
         android:layout_marginTop="142dp"
-        android:textColor="@color/def_text_color_040"
-        android:textStyle="bold"
-        android:textSize="30sp"
         android:text="@string/app_login_phone_input_title"
+        android:textColor="@color/def_text_color_040"
+        android:textSize="30sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -25,19 +36,20 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/app_login_phone_input_info"
-        android:textColor="@color/def_text_grey_979"
+        android:textColor="@color/def_text_grey_869"
         android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="@id/tvAppName"
-        app:layout_constraintTop_toBottomOf="@id/tvAppName" />
+        app:layout_constraintStart_toStartOf="@id/tvTitle"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/llInput"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:orientation="horizontal"
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="40dp"
         android:background="@drawable/app_login_input_border_on"
+        android:orientation="horizontal"
+        android:padding="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvPageInfo">
@@ -45,35 +57,36 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/plus86"
             android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/app_login_input_border_left"
             android:gravity="center"
-            android:maxLines="1"
             android:maxLength="11"
+            android:maxLines="1"
             android:text="@string/app_plus_86"
             android:textColor="@color/def_text_color_040"
             android:textSize="15sp"
-            />
+            app:layout_constraintStart_toStartOf="parent" />
+
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/etAccounts"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginEnd="12dp"
             android:layout_weight="1"
-            android:paddingLeft="12dp"
-            android:elevation="-1dp"
             android:background="@color/white"
             android:hint="@string/app_login_phone_input_input"
             android:inputType="phone"
+            android:textColor="@color/def_text_color_040"
+            android:paddingHorizontal="12dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvPageInfo"
+            app:layout_constraintStart_toEndOf="@+id/plus86"
             tools:ignore="RtlSymmetry"
-            tools:text="12345678901"
-            />
+            tools:text="12345678901" />
+
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/iBtnClearAccount"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginRight="12dp"
             android:background="@null"
             android:src="@mipmap/close"
             android:visibility="gone"
@@ -81,7 +94,7 @@
             app:layout_constraintEnd_toEndOf="@id/etAccounts"
             app:layout_constraintTop_toTopOf="@id/etAccounts"
             tools:visibility="visible" />
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnVerify"

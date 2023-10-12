@@ -8,12 +8,30 @@
     <fragment
         android:id="@+id/fragmentAdvertise"
         android:name="com.agora.entfulldemo.login.LoginAdvertiseFragment"
-        tools:layout="@layout/app_fragment_login_advertise" />
+        tools:layout="@layout/app_fragment_login_advertise" >
+
+        <action
+            android:id="@+id/action_fragmentAdvertise_to_fragmentPhoneInput"
+            app:destination="@id/fragmentPhoneInput"
+            app:enterAnim="@anim/fragment_slide_in_right"
+            app:exitAnim="@anim/fragment_slide_out_left"
+            app:popEnterAnim="@anim/fragment_slide_in_left"
+            app:popExitAnim="@anim/fragment_slide_out_right" />
+    </fragment>
 
     <fragment
         android:id="@+id/fragmentPhoneInput"
         android:name="com.agora.entfulldemo.login.LoginPhoneInputFragment"
-        tools:layout="@layout/app_fragment_login_phone_input" />
+        tools:layout="@layout/app_fragment_login_phone_input" >
+
+        <action
+            android:id="@+id/action_fragmentPhoneInput_to_fragmentVerify"
+            app:destination="@id/fragmentVerify"
+            app:enterAnim="@anim/fragment_slide_in_right"
+            app:exitAnim="@anim/fragment_slide_out_left"
+            app:popEnterAnim="@anim/fragment_slide_in_left"
+            app:popExitAnim="@anim/fragment_slide_out_right" />
+    </fragment>
 
     <fragment
         android:id="@+id/fragmentVerify"

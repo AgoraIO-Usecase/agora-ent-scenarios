@@ -18,7 +18,7 @@ import com.agora.entfulldemo.home.constructor.URLStatics
 import io.agora.scene.base.component.BaseDialog
 import io.agora.scene.base.manager.PagePilotManager
 
-class UserAgreementDialog(context: Context) : BaseDialog<AppDialogUserAgreementBinding>(context) {
+class UserAgreementDialog constructor(context: Context) : BaseDialog<AppDialogUserAgreementBinding>(context) {
     override fun getViewBinding(inflater: LayoutInflater): AppDialogUserAgreementBinding {
         return AppDialogUserAgreementBinding.inflate(inflater)
     }
