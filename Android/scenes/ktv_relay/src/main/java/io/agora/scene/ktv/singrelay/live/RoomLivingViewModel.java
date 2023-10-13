@@ -402,6 +402,7 @@ public class RoomLivingViewModel extends ViewModel {
         }
 
         ktvServiceProtocol.subscribeSeatList((ktvSubscribe, roomSeatModel) -> {
+            onMicSeatChange();
             if (ktvSubscribe == KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated) {
                 KTVLogger.d(TAG, "subscribeRoomStatus KTVSubscribeCreated");
                 List<RoomSeatModel> oValue = seatListLiveData.getValue();
@@ -410,7 +411,7 @@ public class RoomLivingViewModel extends ViewModel {
                 }
                 List<RoomSeatModel> value = new ArrayList<>(oValue);
                 value.add(roomSeatModel);
-                seatListLiveData.postValue(value);
+                //seatListLiveData.postValue(value);
 
                 if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                     seatLocalLiveData.setValue(roomSeatModel);
@@ -434,7 +435,7 @@ public class RoomLivingViewModel extends ViewModel {
                 if (index != -1) {
                     value.remove(index);
                     value.add(index, roomSeatModel);
-                    seatListLiveData.setValue(value);
+                    //seatListLiveData.setValue(value);
 
                     if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                         seatLocalLiveData.setValue(roomSeatModel);
@@ -456,7 +457,7 @@ public class RoomLivingViewModel extends ViewModel {
                         iterator.remove();
                     }
                 }
-                seatListLiveData.setValue(value);
+                //seatListLiveData.setValue(value);
 
                 if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                     seatLocalLiveData.setValue(null);
@@ -476,6 +477,15 @@ public class RoomLivingViewModel extends ViewModel {
                     }
                     updateVolumeStatus(false);
                 }
+            }
+            return null;
+        });
+    }
+
+    private void onMicSeatChange() {
+        ktvServiceProtocol.getSeatStatusList((e, list) -> {
+            if (e == null) {
+                seatListLiveData.setValue(list);
             }
             return null;
         });
