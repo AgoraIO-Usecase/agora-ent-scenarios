@@ -32,6 +32,31 @@
     <string name="app_login_regain_code">重新获取验证码</string>
     <string name="app_login_count_down">%d s</string>
 
+    <string name="app_home_full_scene">全部玩法</string>
+    <string name="app_home_scene_ktv">在线K歌房</string>
+    <string name="app_home_scene_voice">语聊房</string>
+    <string name="app_home_scene_live">直播</string>
+    <string name="app_home_scene_ktv_solo_chorus">独唱&amp;合唱</string>
+    <string name="app_home_scene_ktv_solo_chorus_tips">超低延迟真合唱</string>
+    <string name="app_home_scene_ktv_sing_battle">抢唱</string>
+    <string name="app_home_scene_ktv_sing_battle_tips">热歌高潮片段</string>
+    <string name="app_home_scene_ktv_cantata">大合唱</string>
+    <string name="app_home_scene_ktv_cantata_tips">最高支持128人</string>
+    <string name="app_home_scene_ktv_sing_relay">接唱</string>
+    <string name="app_home_scene_ktv_sing_relay_tips">歌曲接龙</string>
+    <string name="app_home_scene_voice_chatroom">语聊房</string>
+    <string name="app_home_scene_voice_chatroom_tips">更沉浸、更有\n趣、更动听</string>
+    <string name="app_home_scene_voice_spatial">语聊房-空\n间音频版</string>
+    <string name="app_home_scene_voice_spatial_tips">方位感和空间感</string>
+    <string name="app_home_scene_live_show">秀场</string>
+    <string name="app_home_scene_live_show_tips">描述描述描述描</string>
+    <string name="app_home_scene_live_pure1v1">纯1v1私密\n房</string>
+    <string name="app_home_scene_live_pure1v1_tips">描述描述描述描</string>
+    <string name="app_home_scene_live_multiplayer">多人团战</string>
+    <string name="app_home_scene_live_multiplayer_tips">描述描述描述描</string>
+    <string name="app_home_scene_live_show1v1">秀场转1v1\n私密房</string>
+    <string name="app_home_scene_live_show1v1_tips">描述描述描述描</string>
+
     <string name="app_title_home">首页</string>
     <string name="app_title_find">发现</string>
     <string name="app_title_mine">我的</string>
