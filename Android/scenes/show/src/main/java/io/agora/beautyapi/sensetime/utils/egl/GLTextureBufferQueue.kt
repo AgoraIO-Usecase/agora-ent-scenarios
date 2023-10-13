@@ -25,8 +25,8 @@
 package io.agora.beautyapi.sensetime.utils.egl
 
 import android.opengl.GLES20
-import android.util.Log
 import android.util.Size
+import io.agora.beautyapi.sensetime.utils.LogUtils
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class GLTextureBufferQueue(
@@ -83,27 +83,36 @@ class GLTextureBufferQueue(
                 cacheTextureOuts[cacheIndex] = out
             }
 
+            var flipV = true
+            var flipH = false
             glFrameBuffer.textureId = out.textureId
             glFrameBuffer.setSize(out.width, out.height)
             glFrameBuffer.resetTransform()
             glFrameBuffer.setRotation(iN.rotation)
             if (iN.transform != null) {
                 glFrameBuffer.setTexMatrix(iN.transform)
-                glFrameBuffer.setFlipH(iN.isFrontCamera)
+                flipH = iN.isFrontCamera
             } else {
-                glFrameBuffer.setFlipH(!iN.isFrontCamera)
+                flipH = !iN.isFrontCamera
             }
-            glFrameBuffer.setFlipV(true)
+            if(iN.isMirror){
+                flipH = !flipH
+            }
+            if(iN.rotation == 0 || iN.rotation == 180){
+                flipV = !flipV
+                flipH = !flipH
+            }
+            glFrameBuffer.setFlipH(flipH)
+            glFrameBuffer.setFlipV(flipV)
             glFrameBuffer.process(iN.textureId, iN.textureType)
             GLES20.glFinish()
             out.index = cacheIndex
             textureIdQueue.offer(out)
-            Log.e(TAG, "TextureIdQueue enqueue index=$cacheIndex, size=$size")
             cacheIndex = (cacheIndex + 1) % cacheCount
             size++
 
         } else {
-            Log.e(TAG, "TextureIdQueue is full!!")
+            LogUtils.e(TAG, "TextureIdQueue is full!!")
         }
 
         return size
@@ -112,7 +121,6 @@ class GLTextureBufferQueue(
     fun dequeue(): TextureOut? {
         val size = textureIdQueue.size
         val poll = textureIdQueue.poll()
-        Log.e(TAG, "TextureIdQueue dequeue index=${poll?.index}, size=$size")
         return poll
     }
 
@@ -141,6 +149,7 @@ class GLTextureBufferQueue(
         val height: Int,
         val rotation: Int,
         val isFrontCamera: Boolean,
+        val isMirror: Boolean,
         val transform: FloatArray?
     )
 
