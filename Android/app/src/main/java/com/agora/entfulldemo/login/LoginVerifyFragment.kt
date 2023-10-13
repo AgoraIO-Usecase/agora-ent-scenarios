@@ -88,6 +88,7 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
         mLoginViewModel.mRequestLoginLiveData.observe(this) {
             if (it) {
                 PagePilotManager.pageMainHome()
+                mCountDownTimerUtils?.cancel()
                 activity?.finish()
             } else {
                 binding.tvCodeError.isVisible = true
