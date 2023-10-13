@@ -70,6 +70,12 @@ class LoginPhoneInputFragment : BaseViewBindingFragment<AppFragmentLoginPhoneInp
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d("zhangw", "LoginPhoneInputFragment onDestroyView")
+        mLoginViewModel.clearDispose()
+    }
+
     override fun initListener() {
         super.initListener()
         activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
@@ -123,7 +129,7 @@ class LoginPhoneInputFragment : BaseViewBindingFragment<AppFragmentLoginPhoneInp
         super.requestData()
         mLoginViewModel.mRequestCodeLiveData.observe(this) {
             if (it) {
-                Log.d("zhangw", "mRequestCodeLiveData true")
+                Log.d("zhangw", "LoginPhoneInputFragment mRequestCodeLiveData true")
                 if (findNavController().currentDestination?.id == R.id.fragmentPhoneInput) {
                     findNavController().navigate(R.id.action_fragmentPhoneInput_to_fragmentVerify, Bundle().apply {
                         putString(Key_Account, mLoginViewModel.getPhone())

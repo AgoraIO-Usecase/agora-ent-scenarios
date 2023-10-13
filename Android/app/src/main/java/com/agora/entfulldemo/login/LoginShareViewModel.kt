@@ -98,4 +98,8 @@ class LoginShareViewModel : BaseRequestViewModel() {
                 }
             )
     }
+
+    override fun clearDispose() {
+        super.clearDispose()
+    }
 }

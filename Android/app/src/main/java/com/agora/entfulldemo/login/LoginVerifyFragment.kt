@@ -33,8 +33,14 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
         return AppFragmentLoginVerifyBinding.inflate(inflater)
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        Log.d("zhangw", "LoginVerifyFragment onCreateView")
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("zhangw", "LoginVerifyFragment onViewCreated")
         setOnApplyWindowInsetsListener(binding.root)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             context?.mainLooper?.queue?.addIdleHandler {
@@ -46,6 +52,12 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
                 false
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d("zhangw", "LoginVerifyFragment onDestroyView")
+        mLoginViewModel.clearDispose()
     }
 
     override fun initListener() {
@@ -60,8 +72,7 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
         binding.etCode.setOnTextChangeListener {
             if (it.length >= binding.etCode.textLength) {
                 hideKeyboard()
-                // TODO: 验证码
-                mLoginViewModel.requestLogin(mAccounts, "999999")
+                mLoginViewModel.requestLogin(mAccounts, it)
             }
         }
         binding.btnBack.setOnClickListener(object : OnFastClickListener() {
@@ -97,6 +108,7 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
         }
         mLoginViewModel.mRequestCodeLiveData.observe(this) {
             if (it) {
+                Log.d("zhangw", "LoginVerifyFragment mRequestCodeLiveData true")
                 enableRegainCodeView(false)
                 mCountDownTimerUtils?.cancel()
                 mCountDownTimerUtils?.start()
