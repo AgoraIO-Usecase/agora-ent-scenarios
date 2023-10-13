@@ -45,7 +45,7 @@
             android:configChanges="orientation|keyboardHidden|navigation|screenSize"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.agora.entfulldemo.login.ui.PhoneLoginRegisterActivity"
+            android:name="com.agora.entfulldemo.login.LoginActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name="com.agora.entfulldemo.webview.WebViewActivity"
