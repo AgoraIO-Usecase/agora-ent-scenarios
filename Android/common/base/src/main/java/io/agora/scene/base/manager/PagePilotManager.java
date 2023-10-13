@@ -12,6 +12,12 @@ public class PagePilotManager {
                 .navigation();
     }
 
+    public static void pageLogin() {
+        ARouter.getInstance()
+                .build(PagePathConstant.pageLogin)
+                .navigation();
+    }
+
     public static void pageMainHome() {
         ARouter.getInstance()
                 .build(PagePathConstant.pageMainHome)
@@ -28,15 +34,6 @@ public class PagePilotManager {
     public static void pageAboutUs() {
         ARouter.getInstance()
                 .build(PagePathConstant.pageAboutUs)
-                .navigation();
-    }
-
-    /**
-     * 手机号登录注册
-     */
-    public static void pagePhoneLoginRegister() {
-        ARouter.getInstance()
-                .build(PagePathConstant.pagePhoneLoginRegister)
                 .navigation();
     }
 

@@ -1,10 +1,17 @@
 package io.agora.scene.base.component;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 public abstract class BaseFragment extends Fragment {
@@ -34,6 +41,33 @@ public abstract class BaseFragment extends Fragment {
     }
 
     public void requestData() {
+    }
+
+    protected void setOnApplyWindowInsetsListener(View view) {
+        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+            Insets inset = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            view.setPaddingRelative(inset.left, inset.top, inset.right, inset.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
+    }
+
+    protected void hideKeyboard() {
+        Activity context = getActivity();
+        if (context == null) return;
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        if (context.getWindow().getAttributes().softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
+            if (context.getCurrentFocus() != null) {
+                imm.hideSoftInputFromWindow(context.getCurrentFocus().getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
+            }
+        }
+    }
+
+    protected void showKeyboard(EditText editText) {
+        Activity context = getActivity();
+        if (context == null) return;
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(editText, 0);
     }
 
 }

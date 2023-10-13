@@ -301,6 +301,7 @@ extension VoiceRoomViewController {
                     mute = false
                 }
                 self.rtckit.muteLocalAudioStream(mute: mute)
+                self.rtckit.setClientRole(role: mute ? .audience:.owner)
                 self.rtcView.updateUser(mic!)
             } else {
                 self.view.makeToast("Mute local mic failed!")
