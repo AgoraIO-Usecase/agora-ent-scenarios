@@ -392,7 +392,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [[AppContext srServiceImp] innerSubscribeSingRelayInfoWithCompletion:^(SRSubscribe status, SingRelayModel * model, NSError * error) {
         if(error == nil){
             weakSelf.gameModel = model;
-            NSLog(@"sync State:%li", model.status);
             if(![weakSelf isOnMicSeat]){
                 [weakSelf.requestOnLineView setTipHidden:model.status == SingRelayStatusStarted];
             }
