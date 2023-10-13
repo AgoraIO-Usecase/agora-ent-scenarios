@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@mipmap/bg_app_def_white"
     android:paddingTop="20dp"
-    tools:context=".home.HomeIndexFragment">
+    tools:context=".home.HomeFindFragment">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="wrap_content"
