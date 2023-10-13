@@ -62,7 +62,7 @@ public class VerifyCodeView: UIView {
         NotificationCenter.default.removeObserver(self)
     }
 
-    func initSubviews() {
+    private func initSubviews() {
         // 每个验证码框宽度
         let itemWidth = CGFloat(frame.width - padding * 2 - spacing * (CGFloat(inputTextNum) - 1)) / CGFloat(inputTextNum)
         for i in 0..<inputTextNum {
@@ -163,15 +163,18 @@ extension VerifyCodeView: UITextFieldDelegate {
                 codeView.setNum(num: inputStr[String.Index(utf16Offset: i, in: inputStr)].description)
                 codeView.setBottomLineFocus(isFocus: true)
                 codeView.setCursorStatus(true)
+                codeView.layer.borderWidth = 0
             } else {
                 if inputStr.count == 0, i == 0 {
                     codeView.setCursorStatus(false)
                     codeView.setBottomLineFocus(isFocus: true)
                     codeView.setNum(num: nil)
+                    codeView.layer.borderWidth = 2.0
                 } else {
                     codeView.setCursorStatus(i != inputStr.count)
                     codeView.setNum(num: nil)
                     codeView.setBottomLineFocus(isFocus: i == inputStr.count)
+                    codeView.layer.borderWidth = i == inputStr.count ? 2.0 : 0.0
                 }
             }
         }

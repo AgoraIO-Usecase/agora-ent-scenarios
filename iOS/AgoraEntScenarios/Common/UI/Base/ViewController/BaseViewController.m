@@ -38,6 +38,8 @@
 #pragma mark - Life Cycle Methods
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.view.backgroundColor = [UIColor colorWithHexString:@"#F5F8FF"];
+    [self setBackgroundImage:@"home_bg_image"];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

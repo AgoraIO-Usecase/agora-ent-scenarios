@@ -88,7 +88,7 @@
         [ranges addObject:[NSValue valueWithRange:range2]];
         [ranges addObject:[NSValue valueWithRange:range3]];
         [ranges addObject:[NSValue valueWithRange:range4]];
-        _textView = [[AttributedTextView alloc]initWithFrame:CGRectZero text: textString AttributedStringS:array ranges:ranges textColor:UIColorMakeWithHex(@"#6C7192") attributeTextColor:UIColorMakeWithHex(@"#009FFF")];
+        _textView = [[AttributedTextView alloc]initWithFrame:CGRectZero text: textString font: [UIFont systemFontOfSize:14] AttributedStringS:array ranges:ranges textColor:UIColorMakeWithHex(@"#6C7192") attributeTextColor:UIColorMakeWithHex(@"#009FFF")];
         _textView .delegate = self;
     }
     return _textView;

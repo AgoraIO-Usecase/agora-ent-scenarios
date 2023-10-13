@@ -124,7 +124,7 @@
     NSMutableArray *ranges = [[NSMutableArray alloc]init];
     [ranges addObject:[NSValue valueWithRange:range1]];
     [ranges addObject:[NSValue valueWithRange:range2]];
-    _textView = [[AttributedTextView alloc]initWithFrame:CGRectZero text: textString AttributedStringS:array ranges:ranges textColor:UIColorMakeWithHex(@"#6C7192") attributeTextColor:UIColorMakeWithHex(@"#009FFF")];
+    _textView = [[AttributedTextView alloc]initWithFrame:CGRectZero text: textString font: [UIFont systemFontOfSize:14] AttributedStringS:array ranges:ranges textColor:UIColorMakeWithHex(@"#6C7192") attributeTextColor:UIColorMakeWithHex(@"#009FFF")];
     _textView .delegate = self;
     [self.view addSubview:_textView];
 }
@@ -161,18 +161,6 @@
 
 - (void)verifyCodeViewDidClickSendVerifyCode:(UIButton *)sender{
     if (![self checkPhoneNo]) return;
-
-    NSDictionary *param = @{
-        @"phone":self.phoneView.phoneNo
-    };
-    [VLAPIRequest getRequestURL:kURLPathVerifyCode parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-        if (response.code == 0) {
-            [self.verifyView startTime:sender];
-        } else {
-            [VLToast toast:response.message];
-        }
-    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-    }];
 }
 
 #pragma mark - Action
@@ -219,11 +207,11 @@
 }
 
 - (void)navigatorToWebviewOfUserProtocol{
-    [self pushToWebView:kURLPathH5UserAgreement];
+//    [self pushToWebView:kURLPathH5UserAgreement];
 }
 
 - (void)navigatorToWebviewOfPrivacyProtocol{
-    [self pushToWebView:kURLPathH5Privacy];
+//    [self pushToWebView:kURLPathH5Privacy];
 }
 
 - (void)pushToWebView:(NSString *)url {
