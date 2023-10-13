@@ -2,7 +2,6 @@ package io.agora.scene.show
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.res.AssetManager
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
@@ -109,14 +108,8 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 }
             }
         )
-        var licenseExists = false
-        try { // 美颜license是否存在
-            this.assets.open("license/SenseME.lic").use { inputStream ->
-                licenseExists = true
-            }
-        } catch (_: Exception) {}
         // 低端机 或 无证书则关闭美颜
-        if (mRtcEngine.queryDeviceScore() >= 75 && licenseExists) {
+        if (mRtcEngine.queryDeviceScore() >= 75) {
             mBeautyProcessor.setBeautyEnable(true)
         } else {
             mBeautyProcessor.setBeautyEnable(false)
