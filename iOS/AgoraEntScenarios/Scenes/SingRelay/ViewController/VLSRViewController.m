@@ -1719,7 +1719,9 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
 #pragma mark VLDropOnLineViewDelegate
 - (void)onVLDropOnLineView:(VLSRDropOnLineView *)view action:(VLSRRoomSeatModel *)seatModel {
     [self leaveSeatWithSeatModel:seatModel withCompletion:^(NSError *error) {
-        self.statusView.state = SBGStateAudienceWating;
+        if(seatModel.userNo == VLUserCenter.user.id){
+            self.statusView.state = SBGStateAudienceWating;
+        }
         [[LSTPopView getPopViewWithCustomView:view] dismiss];
     }];
 }

@@ -41,7 +41,7 @@ def all_pods
 #  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'sdk', :path => 'sdk.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
- pod 'AgoraRtcEngine_Special_iOS', '4.1.1.16'
+ pod 'AgoraRtcEngine_Special_iOS', '4.1.1.17'
 #  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.147'
 
 
