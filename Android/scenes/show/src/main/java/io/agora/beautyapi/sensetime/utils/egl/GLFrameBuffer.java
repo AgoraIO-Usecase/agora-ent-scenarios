@@ -6,7 +6,6 @@ import android.opengl.GLES20;
 
 import io.agora.base.internal.video.GlRectDrawer;
 import io.agora.base.internal.video.RendererCommon;
-import io.agora.beautyapi.sensetime.utils.utils.GlUtil;
 
 public class GLFrameBuffer {
 
