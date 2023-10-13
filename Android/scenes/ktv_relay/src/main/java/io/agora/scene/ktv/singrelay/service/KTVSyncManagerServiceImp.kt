@@ -852,9 +852,9 @@ class KTVSyncManagerServiceImp(
                     // 判断当前房间是否还存在
                     val oldRoomInfo = roomMap[currRoomNo]
                     if(oldRoomInfo != null){
-                        getRoomList { _, _ ->
+                        getRoomList { e, _ ->
                             val roomInfo = roomMap[currRoomNo]
-                            if (roomInfo == null) {
+                            if (e != null && roomInfo == null) {
                                 runOnMainThread {
                                     roomStatusSubscriber?.invoke(
                                         KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
