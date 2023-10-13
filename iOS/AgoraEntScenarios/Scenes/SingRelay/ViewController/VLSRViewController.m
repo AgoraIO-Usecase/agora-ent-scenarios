@@ -392,6 +392,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [[AppContext srServiceImp] innerSubscribeSingRelayInfoWithCompletion:^(SRSubscribe status, SingRelayModel * model, NSError * error) {
         if(error == nil){
             weakSelf.gameModel = model;
+            NSLog(@"sync State:%li", model.status);
             if(![weakSelf isOnMicSeat]){
                 [weakSelf.requestOnLineView setTipHidden:model.status == SingRelayStatusStarted];
             }
@@ -1719,7 +1720,9 @@ NSArray<SubRankModel *> *mergeModelsWithSameUserIds(NSArray<SubRankModel *> *mod
 #pragma mark VLDropOnLineViewDelegate
 - (void)onVLDropOnLineView:(VLSRDropOnLineView *)view action:(VLSRRoomSeatModel *)seatModel {
     [self leaveSeatWithSeatModel:seatModel withCompletion:^(NSError *error) {
-        self.statusView.state = SBGStateAudienceWating;
+        if(seatModel.userNo == VLUserCenter.user.id){
+            self.statusView.state = SBGStateAudienceWating;
+        }
         [[LSTPopView getPopViewWithCustomView:view] dismiss];
     }];
 }
