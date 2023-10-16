@@ -98,7 +98,7 @@
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_api_ios.png)
 >
-> 抢麦接唱 场景化 API 是一个帮助您快速集成声网 抢麦接唱 能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**SRApi**](SRApi/SRApi.swift) 来定义协议，通过 [**SRApiImp**](SRApi/SRApiImp.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网抢麦接唱能力
+> 抢麦接唱 场景化 API 是一个帮助您快速集成声网 抢麦接唱 能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**SRApi**](SRAPI/SRApi.swift) 来定义协议，通过 [**SRApiImp**](SRAPI/SRApiImp.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网抢麦接唱能力
 >
 > * 拉取歌单
 >
