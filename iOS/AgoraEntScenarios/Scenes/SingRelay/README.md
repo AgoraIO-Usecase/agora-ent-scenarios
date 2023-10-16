@@ -98,7 +98,7 @@
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_api_ios.png)
 >
-> 抢麦接唱 场景化 API 是一个帮助您快速集成声网 抢麦接唱 能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**SRApi**](SRAPI/SRApi.swift) 来定义协议，通过 [**SRApiImp**](SRAPI/SRApiImp.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网抢麦接唱能力
+> 抢麦接唱 场景化 API 是一个帮助您快速集成声网 抢麦接唱 能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**SRApi**](SRAPI/SRApi.swift) 来定义协议，通过 [**SRApiImp**](SRAPI/SRApiImp.swift) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网抢麦接唱能力
 >
 > * 拉取歌单
 >
@@ -250,13 +250,13 @@
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_service_ios.png)
 >
-> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过 [**SRServiceProtocol**](Service/SRServiceProtocol.h) 来定义协议，通过 [**SRSyncManagerServiceImp**](Service/SRSyncManagerServiceImp.swift) 来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
+> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过 [**SRServiceProtocol**](Service/SRServiceProtocol.swift) 来定义协议，通过 [**SRSyncManagerServiceImp**](Service/SRSyncManagerServiceImp.swift) 来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
 >
 > - 房间管理
 >
 >   包含了房间的创建和房间列表的获取
 >
->   相关代码请参考：[**SRServiceModel**](Service/SRServiceModel.h)，分别依赖 [**SRServiceProtocol**](Service/SRServiceProtocol.kt) 的下列方法去交互
+>   相关代码请参考：[**SRServiceModel**](Service/SRServiceModel.h)，分别依赖 [**SRServiceProtocol**](Service/SRServiceProtocol.swift) 的下列方法去交互
 >
 >   ```Swift
 >   - (void)getRoomListWithPage:(NSUInteger)page
