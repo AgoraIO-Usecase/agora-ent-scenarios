@@ -160,7 +160,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="10dp"
-        android:src="@mipmap/ic_join_chorus_loading"
+        android:src="@drawable/cantata_join_chorus_loading"
         android:clickable="false"
         android:visibility="invisible"
         app:layout_constraintTop_toTopOf="@id/ivJoinChorusBtn"
