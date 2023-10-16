@@ -34,7 +34,14 @@ class SoundTypeFragment constructor(private val soundCardSetting: SoundCardSetti
 
         setupSoundTypes()
         binding.rvSoundType.layoutManager = LinearLayoutManager(this.context)
-        adapter = SoundPresetsAdapter(soundTypes, 0) { index ->
+
+        var index = -1
+        for ((i, item) in soundTypes.withIndex()) {
+            if (item.type == soundCardSetting.presetSound()) {
+                index = i
+            }
+        }
+        adapter = SoundPresetsAdapter(soundTypes, index) { index ->
             val soundType = soundTypes[index].type
             soundCardSetting.setPresetSound(soundType) {}
             adapter?.notifyDataSetChanged()

@@ -168,7 +168,7 @@
     <string name="ktv_sound_card_mic_type">麦克风类型%d</string>
     <string name="ktv_external_mircrophone">default 外置麦克风</string>
     <string name="ktv_sound_card_switch">虚拟声卡开关</string>
-    <string name="ktv_sound_card_error">当前无法使用虚拟声卡，请链接有线输入设备</string>
+    <string name="ktv_sound_card_error">当前无法使用虚拟声卡，请连接优先输入设备！</string>
     <string name="ktv_sound_card_supports">目前支持以下设备： \n1.有线耳机 \n2.有线麦克风</string>
     <string name="ktv_virtual_sound_card_switch">虚拟声卡开关</string>
     <string name="ktv_preset_sound">预设音效</string>

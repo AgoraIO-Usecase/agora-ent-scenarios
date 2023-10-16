@@ -304,7 +304,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:drawableStart="@mipmap/ic_tip"
+        android:drawableStart="@mipmap/ktv_ic_tips_mark_red"
         android:drawablePadding="5dp"
         android:layout_marginTop="20dp"
         android:text="@string/ktv_sound_card_error"
@@ -330,7 +330,7 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         app:constraint_referenced_ids="tvSoundCardError,tvSoundCardSupport"
-        tools:visibility="invisible" />
+        tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/groupSoundCardSettings"
@@ -340,6 +340,6 @@
         app:constraint_referenced_ids="
         clSoundCardParams,
         mtSoundCardSwitch, mcbSoundCardSwitch, dvSoundCardSwitch"
-        tools:visibility="visible" />
+        tools:visibility="invisible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
