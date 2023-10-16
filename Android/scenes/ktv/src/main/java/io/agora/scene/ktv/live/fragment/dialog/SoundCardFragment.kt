@@ -70,8 +70,8 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
         super.initView()
         binding?.apply {
             if (true) {
-                groupSoundCardSwitch.visibility = View.VISIBLE
-                groupSoundCardSettings.visibility = if (soundCardSetting.isEnable()) View.VISIBLE else View.INVISIBLE
+                groupSoundCardSettings.visibility = View.VISIBLE
+                clSoundCardParams.visibility = if (soundCardSetting.isEnable()) View.VISIBLE else View.INVISIBLE
                 groupSoundCardAbnormal.isVisible = false
                 mcbSoundCardSwitch.isChecked = soundCardSetting.isEnable()
                 if (soundCardSetting.isEnable()) {
@@ -80,8 +80,8 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                     setupPresetView(soundCardSetting.presetValue())
                 }
             } else {
-                groupSoundCardSwitch.visibility = View.INVISIBLE
                 groupSoundCardSettings.visibility = View.INVISIBLE
+                clSoundCardParams.visibility = if (soundCardSetting.isEnable()) View.VISIBLE else View.INVISIBLE
                 groupSoundCardAbnormal.visibility = View.VISIBLE
                 mcbSoundCardSwitch.isChecked = false
             }
@@ -91,9 +91,9 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
             }
             mcbSoundCardSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
                 if (isChecked) {
-                    groupSoundCardSettings.visibility = View.VISIBLE
+                    clSoundCardParams.visibility = View.VISIBLE
                 } else {
-                    groupSoundCardSettings.visibility = View.INVISIBLE
+                    clSoundCardParams.visibility = View.INVISIBLE
                 }
                 soundCardSetting.enable(isChecked, force = true, callback = {
                     if (isChecked) {
@@ -176,19 +176,16 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
         }
     }
 
-
     private fun setHeadPhonePlugin(isPlug: Boolean) {
         if (isPlugIn != isPlug) {
             isPlugIn = isPlug
             if (isPlugIn) {
                 // 插入有线耳机
-                binding.groupSoundCardSwitch.visibility = View.VISIBLE
                 binding.groupSoundCardSettings.visibility = View.VISIBLE
                 binding.groupSoundCardAbnormal.visibility = View.INVISIBLE
                 binding.mcbSoundCardSwitch.isChecked = soundCardSetting.isEnable()
             } else {
                 // 未插入有线耳机
-                binding.groupSoundCardSwitch.visibility = View.INVISIBLE
                 binding.groupSoundCardSettings.visibility = View.INVISIBLE
                 binding.groupSoundCardAbnormal.visibility = View.VISIBLE
                 binding.mcbSoundCardSwitch.isChecked = false
