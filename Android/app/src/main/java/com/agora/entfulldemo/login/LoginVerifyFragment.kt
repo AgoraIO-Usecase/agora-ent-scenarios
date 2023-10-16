@@ -66,7 +66,7 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
             override fun handleOnBackPressed() {
                 mCountDownTimerUtils?.cancel()
                 mLoginViewModel.mRequestCodeLiveData.postValue(false)
-                findNavController().popBackStack(R.id.fragmentPhoneInput,false)
+                findNavController().popBackStack()
             }
         })
         binding.etCode.setOnTextChangeListener {
@@ -110,6 +110,7 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
             if (it) {
                 Log.d("zhangw", "LoginVerifyFragment mRequestCodeLiveData true")
                 enableRegainCodeView(false)
+                binding.tvCodeError.isVisible = false
                 mCountDownTimerUtils?.cancel()
                 mCountDownTimerUtils?.start()
             }
