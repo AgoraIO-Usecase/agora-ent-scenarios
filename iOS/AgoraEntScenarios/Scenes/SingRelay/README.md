@@ -277,7 +277,7 @@
 >
 >   点歌、已点歌曲删除、已点歌曲置顶、切歌等状态的同步
 >
->   歌曲列表菜单：请参考  [**VLPopSongList**]((View/SingRelay/SRSongGallery/VLPopSongList.m))
+>   歌曲列表菜单：请参考  [**VLPopSongList**]((View/SingRelay/View/SRSongGallery/VLPopSongList.m))
 >
 > 
 >
