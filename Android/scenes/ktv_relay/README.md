@@ -1,10 +1,10 @@
-# 嗨歌抢唱
+# 抢麦接唱
 
-> 本文档主要介绍如何快速跑通 <mark> 嗨歌抢唱 </mark> 示例工程
+> 本文档主要介绍如何快速跑通 <mark> 抢麦接唱 </mark> 示例工程
 >
 > Demo 效果:
 > 
-> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/singBattle/singBattleRoom_1.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/singBattle/singBattleRoom_2.jpg" width="300" height="640">
+> <img src="https://download.agora.io/demo/release/SingRelayRoom_1.png" width="300" height="640"><img src="https://download.agora.io/demo/release/SingRelayRoom_2.png" width="300" height="640">
 ---
 
 ## 1. 环境准备
@@ -54,7 +54,7 @@
 
 ### 3.1 概述
 
-> **嗨歌抢唱**项目是声网嗨歌抢唱场景的开源代码，开发者可以获取并添加到您的 APP 工程里，本源码会伴随声动互娱 Demo 同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
+> **抢麦接唱**项目是声网抢麦接唱场景的开源代码，开发者可以获取并添加到您的 APP 工程里，本源码会伴随声动互娱 Demo 同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
 
 ### 3.2 项目文件结构简介
 
@@ -67,6 +67,7 @@
 │   │       │                       ├── bean           #数据类
 │   │       │                       ├── create         #房间列表模块
 │   │       │                       ├── debugSettings  #debug页面模块
+│   │       │                       ├── ktvapi         #KTV场景化api
 │   │       │                       ├── live           #房间内业务逻辑模块
 │   │       │                       ├── service        #网络模块
 │   │       │                       ├── widget         #UI模块
@@ -108,7 +109,7 @@
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/KTVSamplePicture5.png)
 >
-> K歌房场景化API是一个帮助您快速集成声网K歌房能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**KTVApi**](src/main/java/io/agora/scene/ktv/live/KTVApi.kt) 来定义协议，通过 [**KTVApiImp**](src/main/java/io/agora/scene/ktv/live/KTVApiImp.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
+> K歌房场景化API是一个帮助您快速集成声网K歌房能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**KTVApi**](src/main/java/io/agora/scene/ktv/singrelay/ktvapi/KTVApi.kt) 来定义协议，通过 [**KTVApiImp**](src/main/java/io/agora/scene/ktv/singrelay/ktvapi/KTVApiImp.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
 >
 > * 拉取歌单
 >
@@ -290,7 +291,7 @@
 >
 >   包含了房间的创建和房间列表的获取
 >
->   相关代码请参考：[**RoomCreateViewModel**](src/main/java/io/agora/scene/ktv/create/RoomCreateViewModel.java)，分别依赖 [**KTVServiceProtocol**](src/main/java/io/agora/scene/ktv/service/KTVServiceProtocol.kt) 的下列方法去交互
+>   相关代码请参考：[**RoomCreateViewModel**](src/main/java/io/agora/scene/ktv/singrelay/create/RoomCreateViewModel.java)，分别依赖 [**KTVServiceProtocol**](src/main/java/io/agora/scene/ktv/singrelay/service/KTVServiceProtocol.kt) 的下列方法去交互
 >
 >   ```kotlin
 >   fun getRoomList(completion: (error: Exception?, list: List<RoomListModel>?) -> Unit)
@@ -312,7 +313,7 @@
 >
 >   点歌、已点歌曲删除、已点歌曲置顶、切歌等状态的同步
 >
->   歌曲列表菜单：请参考 [**RoomLivingActivity#showChooseSongDialog**]((src/main/java/io/agora/scene/ktv/live/RoomLivingViewModel.java))
+>   歌曲列表菜单：请参考 [**RoomLivingActivity#showChooseSongDialog**]((src/main/java/io/agora/scene/ktv/singrelay/live/RoomLivingViewModel.java))
 >
 >   
 >
@@ -322,7 +323,7 @@
 >
 >   声网最佳美声
 >
->    实现参考 [**MusicSettingDialog#Callback**](src/main/java/io/agora/scene/ktv/widget/MusicSettingDialog.java)里的**onEffectChanged**实现
+>    实现参考 [**MusicSettingDialog#Callback**](src/main/java/io/agora/scene/ktv/singrelay/widget/MusicSettingDialog.java)里的**onEffectChanged**实现
 
 ---
 
