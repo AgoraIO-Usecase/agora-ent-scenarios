@@ -55,7 +55,7 @@
 
 ### 3.1 概述
 
-> **在线K歌房**项目是声网在线 K 歌房场景的开源代码，开发者可以获取并添加到您的 APP 工程里，本源码会伴随声动互娱 Demo 同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
+> **抢麦接唱**项目是声网在线 抢麦接唱场景的开源代码，开发者可以获取并添加到您的 APP 工程里，本源码会伴随声动互娱 Demo 同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
 
 ### 3.2 项目文件结构简介
 
@@ -73,7 +73,7 @@
 │   │       └── SRSyncManagerServiceImp.swift #抢麦接唱里面用到的service实现
 │   │   └────ViewController          #抢麦接唱里面用到的控制器
 │   │       ├── VLSRViewController.m #抢麦接唱主控制器
-│   │   └────SRAPI          #抢麦接唱里面KTVAPI
+│   │   └────SRAPI          #抢麦接唱里面SRAPI
 │   │       ├── SRApi.swift #SRAPI的声明
 │   │       └── SRApiImpl.swift #SRAPI的实现
 │   │   └────SRResource         #抢麦接唱里面用到的图片资源文件和国际化文件
@@ -88,7 +88,7 @@
 
 ### 3.3 功能介绍
 
-> 在线K歌房场景目前已涵盖以下功能，您可以参考注释按需从代码中调用
+> 抢麦接唱场景目前已涵盖以下功能，您可以参考注释按需从代码中调用
 >
 > 场景功能代码根目录 **AgoraEntScenarios/AgoraEntScenarios/scenes/SingRelay**
 >
@@ -98,7 +98,7 @@
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_api_ios.png)
 >
-> 抢麦接唱 场景化 API 是一个帮助您快速集成声网 抢麦接唱 能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**SRApi**](SRApi/SRApi.swift) 来定义协议，通过 [**SRApiImp**](SRApi/SRApiImp.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
+> 抢麦接唱 场景化 API 是一个帮助您快速集成声网 抢麦接唱 能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**SRApi**](SRApi/SRApi.swift) 来定义协议，通过 [**SRApiImp**](SRApi/SRApiImp.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网抢麦接唱能力
 >
 > * 拉取歌单
 >
@@ -222,17 +222,17 @@
 >   ~~~swift
 >   @objc public protocol SRLrcViewDelegate: NSObjectProtocol {
 >       /**
->        * ktvApi内部更新音高pitch时会主动调用此方法将pitch值传给你的歌词组件
+>        * SRApi内部更新音高pitch时会主动调用此方法将pitch值传给你的歌词组件
 >        * @param pitch 音高值
 >        */
 >        func onUpdatePitch(pitch: Float)
 >       /**
->        * ktvApi内部更新音乐播放进度progress时会主动调用此方法将进度值progress传给你的歌词组件，50ms回调一次
+>        * srApi内部更新音乐播放进度progress时会主动调用此方法将进度值progress传给你的歌词组件，50ms回调一次
 >        * @param progress 歌曲播放的真实进度 50ms回调一次
 >        */
 >        func onUpdateProgress(progress: Int)
 >        /**
->        * ktvApi获取到歌词地址时会主动调用此方法将歌词地址url传给你的歌词组件，您需要在这个回调内完成歌词的下载
+>        * SRApi获取到歌词地址时会主动调用此方法将歌词地址url传给你的歌词组件，您需要在这个回调内完成歌词的下载
 >        */
 >        func onDownloadLrcData(url: String)
 >   }
