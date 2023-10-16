@@ -286,11 +286,11 @@
 > * 音效、美声
 >   声网最佳音效
 >
->    实现参考  [**VLSRViewContolller**](viewController/VLSRViewController.m) 里的 **effectItemClickAction** 实现
+>    实现参考  [**VLSRViewContolller**](ViewController/VLSRViewController.m) 里的 **effectItemClickAction** 实现
 >
 >   声网最佳美声
 >
->    实现参考  [**VLSRViewContolller**](viewController/VLSRViewController.m) 里的 **onVLChooseBelcantoView** 实现
+>    实现参考  [**VLSRViewContolller**](ViewController/VLSRViewController.m) 里的 **onVLChooseBelcantoView** 实现
 
 ---
 
