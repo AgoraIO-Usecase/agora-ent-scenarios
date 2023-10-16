@@ -250,13 +250,13 @@
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_service_ios.png)
 >
-> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过 [**SRServiceProtocol**](service/SRServiceProtocol.h) 来定义协议，通过 [**SRSyncManagerServiceImp**](service/SRSyncManagerServiceImp.swift) 来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
+> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过 [**SRServiceProtocol**](Service/SRServiceProtocol.h) 来定义协议，通过 [**SRSyncManagerServiceImp**](Service/SRSyncManagerServiceImp.swift) 来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
 >
 > - 房间管理
 >
 >   包含了房间的创建和房间列表的获取
 >
->   相关代码请参考：[**SRServiceModel**](service/SRServiceModel.h)，分别依赖 [**SRServiceProtocol**](service/SRServiceProtocol.kt) 的下列方法去交互
+>   相关代码请参考：[**SRServiceModel**](Service/SRServiceModel.h)，分别依赖 [**SRServiceProtocol**](Service/SRServiceProtocol.kt) 的下列方法去交互
 >
 >   ```Swift
 >   - (void)getRoomListWithPage:(NSUInteger)page
