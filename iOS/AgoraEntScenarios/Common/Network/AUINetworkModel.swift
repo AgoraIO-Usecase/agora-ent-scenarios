@@ -13,12 +13,12 @@ public enum AUINetworkMethod: Int {
     case get = 0
     case post
     
-    func getAfMethod() -> HTTPMethod {
+    func getAfMethod() -> Alamofire.HTTPMethod {
         switch self {
         case .get:
-            return HTTPMethod.get
+            return Alamofire.HTTPMethod.get
         case .post:
-            return HTTPMethod.post
+            return Alamofire.HTTPMethod.post
         }
     }
 }
