@@ -10,6 +10,7 @@ data class RoomListModel constructor(
     val isPrivate: Boolean = false,
     val password: String = "",
     val creatorNo: String = "",
+    val creatorAvatar: String = "",
     val createdAt: String = System.currentTimeMillis().toString(),
 
     /**
@@ -83,6 +84,7 @@ data class JoinRoomOutputModel constructor(
     val roomName: String,
     val roomNo: String,
     val creatorNo: String,
+    val creatorAvatar: String, // 创建人头像
     val bgOption: String,
     val seatsArray: List<RoomSeatModel>?,
     /**
