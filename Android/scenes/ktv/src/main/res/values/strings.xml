@@ -187,7 +187,8 @@
     <string name="ktv_gain_adjust">增益调节</string>
     <string name="ktv_gain_adjust_tips">调节声音信号的增益倍数</string>
     <string name="ktv_sound_mic_phone_type">麦克风类型</string>
-    <string name="ktv_sound_mic_phone_type_tips">选择更适合你当前麦克风的预设参数</string>
+    <string name="ktv_sound_mic_phone_type_tips">选择麦克风的预设参数</string>
     <string name="ktv_sound_preset_type">预设音效</string>
+    <string name="ktv_sound_preset_off">关闭</string>
 
 </resources>

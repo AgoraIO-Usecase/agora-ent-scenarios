@@ -37,6 +37,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btnClose"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="5dp"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:text="@string/cancel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSoundType"
         android:layout_width="match_parent"
@@ -48,25 +62,4 @@
         app:layout_constraintTop_toBottomOf="@id/mtBottomSheetTitle"
         />
 
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/dvBottom"
-        android:layout_width="match_parent"
-        android:layout_height="8dp"
-        android:layout_marginTop="6dp"
-        android:background="@color/bg_color_blue_31_t20"
-        app:layout_constraintTop_toBottomOf="@id/rvSoundType"
-        />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/btnClose"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:gravity="center"
-        android:textSize="16sp"
-        android:textColor="@color/white"
-        android:text="@string/cancel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dvBottom"
-        />
 </androidx.constraintlayout.widget.ConstraintLayout>

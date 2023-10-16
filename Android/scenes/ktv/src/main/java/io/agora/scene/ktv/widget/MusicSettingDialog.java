@@ -30,18 +30,13 @@ import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.bean.EffectVoiceBean;
 import io.agora.scene.ktv.databinding.KtvDialogMusicSettingBinding;
 import io.agora.scene.ktv.databinding.KtvItemEffectvoiceBinding;
-import io.agora.scene.ktv.live.AgoraPresetSound;
-import io.agora.scene.ktv.live.fragment.dialog.BeautyVoiceFragment;
 import io.agora.scene.ktv.live.fragment.dialog.EarBackFragment;
-import io.agora.scene.ktv.live.fragment.dialog.MicTypeFragment;
 import io.agora.scene.ktv.live.fragment.dialog.SoundCardFragment;
 import io.agora.scene.ktv.live.fragment.dialog.SoundCardSettingBean;
 import io.agora.scene.ktv.live.fragment.dialog.SoundTypeFragment;
 import io.agora.scene.ktv.live.holder.EffectVoiceHolder;
 import io.agora.scene.widget.DividerDecoration;
-import kotlin.UInt;
 import kotlin.Unit;
-
 /**
  * 控制台
  */
@@ -274,24 +269,12 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
     private void showSoundCardPage(View v){
         mBinding.getRoot().removeAllViews();
         SoundCardFragment soundCardFragment = new SoundCardFragment(mSoundCardSetting);
-        soundCardFragment.setOnClickMicType(() -> {
-            showMicTypeSelectPage();
-            return Unit.INSTANCE;
-        });
         soundCardFragment.setOnClickSoundCardType(() -> {
             showSoundTypeSelectPage();
             return Unit.INSTANCE;
         });
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
         ft.add(mBinding.getRoot().getId(), soundCardFragment, SoundCardFragment.TAG);
-        ft.commit();
-    }
-
-    private void showMicTypeSelectPage() {
-        mBinding.getRoot().removeAllViews();
-        BaseViewBindingFragment<?> micTypeFragment = new MicTypeFragment(mSoundCardSetting);
-        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
-        ft.add(mBinding.getRoot().getId(), micTypeFragment, SoundCardFragment.TAG);
         ft.commit();
     }
 

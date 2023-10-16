@@ -1,6 +1,5 @@
 package io.agora.scene.ktv.live.fragment.dialog
 
-import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -11,16 +10,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.SeekBar
 import androidx.core.view.isVisible
-import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvDialogSoundCardBinding
 import io.agora.scene.ktv.live.AgoraPresetSound
-import io.agora.scene.ktv.live.PresetSoundModel
 import io.agora.scene.ktv.live.RoomLivingActivity
 
 class SoundCardFragment constructor(private val soundCardSetting: SoundCardSettingBean) :
@@ -38,8 +33,6 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
     var mOnSoundCardChange: (() -> Unit)? = null
 
     var onClickSoundCardType: (() -> Unit)? = null
-
-    var onClickMicType: (() -> Unit)? = null
 
     init {
         soundCardSetting.setEarPhoneCallback(object : EarPhoneCallback {
@@ -69,16 +62,20 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
     override fun initView() {
         super.initView()
         binding?.apply {
-            if (true) {
+            if (isPlugIn) {
                 groupSoundCardSettings.visibility = View.VISIBLE
-                clSoundCardParams.visibility = if (soundCardSetting.isEnable()) View.VISIBLE else View.INVISIBLE
-                groupSoundCardAbnormal.isVisible = false
-                mcbSoundCardSwitch.isChecked = soundCardSetting.isEnable()
                 if (soundCardSetting.isEnable()) {
                     setupPresetSoundView(soundCardSetting.presetSound())
                     setupGainView(soundCardSetting.gainValue())
                     setupPresetView(soundCardSetting.presetValue())
+                    vPramsMark.visibility = View.INVISIBLE
+                    clSoundCardParams.alpha = 1f
+                } else {
+                    vPramsMark.visibility = View.VISIBLE
+                    clSoundCardParams.alpha = 0.4f
                 }
+                groupSoundCardAbnormal.isVisible = false
+                mcbSoundCardSwitch.isChecked = soundCardSetting.isEnable()
             } else {
                 groupSoundCardSettings.visibility = View.INVISIBLE
                 clSoundCardParams.visibility = if (soundCardSetting.isEnable()) View.VISIBLE else View.INVISIBLE
@@ -91,9 +88,11 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
             }
             mcbSoundCardSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
                 if (isChecked) {
-                    clSoundCardParams.visibility = View.VISIBLE
+                    vPramsMark.visibility = View.INVISIBLE
+                    clSoundCardParams.alpha = 1f
                 } else {
-                    clSoundCardParams.visibility = View.INVISIBLE
+                    vPramsMark.visibility = View.VISIBLE
+                    clSoundCardParams.alpha = 0.4f
                 }
                 soundCardSetting.enable(isChecked, force = true, callback = {
                     if (isChecked) {
@@ -105,26 +104,33 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                 })
             }
             pbGainAdjustValue.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                }
-
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {}
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {
                     seekBar?.progress?.let { progress ->
                         val gainValue: Float = progress / 10.0f
-                        mtGainAdjustValue.text = gainValue.toString()
+                        tvGainAdjustValue.text = gainValue.toString()
                         soundCardSetting.setGainValue(gainValue)
                     }
                 }
             })
-            mtMicTypeSelect.setOnClickListener {
-                onClickMicType?.invoke()
+            vPramsMark.setOnClickListener {
+                // 空实现阻挡事件传递
             }
             tvSoundTypeSelect.setOnClickListener {
                 onClickSoundCardType?.invoke()
             }
+            pbMicType.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {}
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                    seekBar?.progress?.let { value ->
+                        val micType = value - 1
+                        tvMicType.text = if (micType == -1) getString(R.string.ktv_sound_preset_off) else micType.toString()
+                        soundCardSetting.setPresetValue(micType)
+                    }
+                }
+            })
         }
     }
 
@@ -135,13 +141,15 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
     private fun setupGainView(gainValue: Float) {
         binding?.apply {
             pbGainAdjustValue.progress = (gainValue * 10).toInt()
-            mtGainAdjustValue.text = gainValue.toString()
+            tvGainAdjustValue.text = gainValue.toString()
         }
     }
 
     private fun setupPresetView(presetValue: Int) {
         binding?.apply {
-            mtMicTypeSelect.text = presetValue.toString()
+            val sliderValue = presetValue + 1
+            pbMicType.progress = sliderValue
+            tvMicType.text = if (presetValue == -1) getString(R.string.ktv_sound_preset_off) else presetValue.toString()
         }
     }
 
@@ -169,8 +177,7 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                     tvSoundTypeSelect.text = text
                 }
                 AgoraPresetSound.Sound2006 -> {
-                    val text =
-                        "${getString(R.string.ktv_preset_sound_shaoyu)}（${getString(R.string.ktv_preset_sound_shaoyu_tips)}）"
+                    val text = "${getString(R.string.ktv_preset_sound_shaoyu)}（${getString(R.string.ktv_preset_sound_shaoyu_tips)}）"
                     tvSoundTypeSelect.text = text
                 }
                 else -> {
