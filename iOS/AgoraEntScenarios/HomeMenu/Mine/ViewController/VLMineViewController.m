@@ -333,23 +333,50 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 /// 获取用户信息
 - (void)loadRequestUserInfoRequest {
     NSDictionary *param = @{@"userNo":VLUserCenter.user.userNo ?: @""};
-    [VLAPIRequest getRequestURL:kURLPathGetUserInfo parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-        if (response.code == 0) {
-//            VLLoginModel *userInfo = [VLLoginModel vj_modelWithDictionary:response.data];
+//    [VLAPIRequest getRequestURL:kURLPathGetUserInfo parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
+//        if (response.code == 0) {
+////            VLLoginModel *userInfo = [VLLoginModel vj_modelWithDictionary:response.data];
+//        }
+//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
+//
+//    }];
+    
+    VLGetUserInfoNetworkModel *model = [VLGetUserInfoNetworkModel new];
+    model.userNo = VLUserCenter.user.userNo ?: @"";
+    [model requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
+        VLResponseData *response = data;
+        if (response.code && response.code.integerValue == 0) {
+            NSLog(@"获取成功");
+        }else{
+            [VLToast toast:response.message];
         }
-    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-        
     }];
 }
 
 - (void)loadUpdateUserIconRequest:(NSString *)iconUrl image:(UIImage *)image{
-    NSDictionary *param = @{
-        @"userNo" : VLUserCenter.user.userNo ?: @"",
-        @"headUrl" : iconUrl ?: @""
-    };
+//    NSDictionary *param = @{
+//        @"userNo" : VLUserCenter.user.userNo ?: @"",
+//        @"headUrl" : iconUrl ?: @""
+//    };
     
-    [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-        if (response.code == 0) {
+//    [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
+//        if (response.code == 0) {
+//            [VLToast toast:AGLocalizedString(@"app_edit_success")];
+//            [self.mineView refreseAvatar:image];
+//            VLUserCenter.user.headUrl = iconUrl;
+//            [[VLUserCenter center] storeUserInfo:VLUserCenter.user];
+//        }else{
+//            [VLToast toast:response.message];
+//        }
+//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
+//    }];
+    
+    VLUploadUserInfoNetworkModel *model = [VLUploadUserInfoNetworkModel new];
+    model.userNo = VLUserCenter.user.userNo ?: @"";
+    model.headUrl = iconUrl ?: @"";
+    [model requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
+        VLResponseData *response = data;
+        if (response.code && response.code.integerValue == 0) {
             [VLToast toast:AGLocalizedString(@"app_edit_success")];
             [self.mineView refreseAvatar:image];
             VLUserCenter.user.headUrl = iconUrl;
@@ -357,18 +384,33 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         }else{
             [VLToast toast:response.message];
         }
-    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
     }];
 }
 
 
 - (void)loadUpdateNickNameRequest:(NSString *)nickName {
-    NSDictionary *param = @{
-        @"userNo" : VLUserCenter.user.userNo ?: @"",
-        @"name" : nickName ?: @""
-    };
-    [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-        if (response.code == 0) {
+//    NSDictionary *param = @{
+//        @"userNo" : VLUserCenter.user.userNo ?: @"",
+//        @"name" : nickName ?: @""
+//    };
+//    [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
+//        if (response.code == 0) {
+//            [VLToast toast:AGLocalizedString(@"app_edit_success")];
+//            [self.mineView refreseNickName:nickName];
+//            VLUserCenter.user.name = nickName;
+//            [[VLUserCenter center] storeUserInfo:VLUserCenter.user];
+//        }else{
+//            [VLToast toast:response.message];
+//        }
+//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
+//    }];
+    
+    VLUploadUserInfoNetworkModel *model = [VLUploadUserInfoNetworkModel new];
+    model.userNo = VLUserCenter.user.userNo ?: @"";
+    model.name = nickName ?: @"";
+    [model requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
+        VLResponseData *response = data;
+        if (response.code && response.code.integerValue == 0) {
             [VLToast toast:AGLocalizedString(@"app_edit_success")];
             [self.mineView refreseNickName:nickName];
             VLUserCenter.user.name = nickName;
@@ -376,7 +418,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         }else{
             [VLToast toast:response.message];
         }
-    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
     }];
 }
 
@@ -402,12 +443,22 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
         action.font = UIFontBoldMake(16);
         action.clickBlock = ^{
-            NSDictionary *param = @{@"userNo":VLUserCenter.user.userNo ?: @""};
-            [VLAPIRequest getRequestURL:kURLPathDestroyUser parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-                if (response.code == 0) {
+//            NSDictionary *param = @{@"userNo":VLUserCenter.user.userNo ?: @""};
+//            [VLAPIRequest getRequestURL:kURLPathDestroyUser parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
+//                if (response.code == 0) {
+//                    [weakSelf userLogout];
+//                }
+//            } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
+//            }];
+            VLDetoryUserInfoNetworkModel *model = [VLDetoryUserInfoNetworkModel new];
+            model.userNo = VLUserCenter.user.userNo ?: @"";
+            [model requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
+                VLResponseData *response = data;
+                if (response.code && response.code.integerValue == 0) {
                     [weakSelf userLogout];
+                }else{
+                    [VLToast toast:response.message];
                 }
-            } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
             }];
         };
     })
