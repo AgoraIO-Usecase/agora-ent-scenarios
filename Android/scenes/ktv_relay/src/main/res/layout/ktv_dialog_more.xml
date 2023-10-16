@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_dialog_more"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_full_blue_top_20"
+    android:gravity="center"
+    android:orientation="horizontal">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/ktv_more_actions"
+        android:textColor="@color/def_text_color_white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/iBtnBeautyVoice"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="68dp"
+        android:layout_marginBottom="64dp"
+        android:background="@drawable/bg_round_black"
+        android:src="@mipmap/ic_bel_canto"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/iBtnEffectVoice"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/ktv_beauty_voice"
+        android:textColor="@color/def_text_grey_6c7"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/iBtnBeautyVoice"
+        app:layout_constraintStart_toStartOf="@id/iBtnBeautyVoice"
+        app:layout_constraintTop_toBottomOf="@id/iBtnBeautyVoice" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/iBtnEffectVoice"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="69dp"
+        android:layout_marginBottom="64dp"
+        android:background="@drawable/bg_round_black"
+        android:src="@mipmap/ic_beauty_voice"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/iBtnMV"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/ktv_voice_effect"
+        android:textColor="@color/def_text_grey_6c7"
+        app:layout_constraintEnd_toEndOf="@id/iBtnEffectVoice"
+        app:layout_constraintStart_toStartOf="@id/iBtnEffectVoice"
+        app:layout_constraintTop_toBottomOf="@id/iBtnEffectVoice" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/iBtnMV"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="68dp"
+        android:background="@drawable/bg_round_black"
+        android:src="@mipmap/ic_camera_on"
+        app:layout_constraintBottom_toBottomOf="@id/iBtnEffectVoice"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iBtnEffectVoice"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/ktv_song_background"
+        android:textColor="@color/def_text_grey_6c7"
+        app:layout_constraintEnd_toEndOf="@id/iBtnMV"
+        app:layout_constraintStart_toStartOf="@id/iBtnMV"
+        app:layout_constraintTop_toBottomOf="@id/iBtnMV" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
