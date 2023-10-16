@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.agora.rtc2.Constants
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
@@ -40,6 +41,7 @@ import io.agora.scene.cantata.ui.widget.song.SongDialog
 import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 import java.util.concurrent.Executors
 
 class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBinding>() {
@@ -120,6 +122,10 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
         mRoomLivingViewModel.mRoomInfoLiveData.value?.apply {
             binding.tvRoomName.text = roomName
+            GlideApp.with(binding.ivOwnerAvatar.context).load(creatorAvatar)
+                .error(R.mipmap.userimage)
+                .transform(CenterCropRoundCornerTransform(100))
+                .into(binding.ivOwnerAvatar)
         }
 
         binding.ivChatroomMore.setOnClickListener(object : OnClickJackingListener {
@@ -300,11 +306,13 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mRoomLivingViewModel.mRoundRankListLiveData.observe(this) { showRank: Boolean ->
             binding.rankListView.isVisible = showRank
             if (showRank) {
-                if (mRoomLivingViewModel.mSongsOrderedLiveData.value != null && mRoomLivingViewModel.mSongsOrderedLiveData.value!!.size > 1) {
-                    val nextName = mRoomLivingViewModel.mSongsOrderedLiveData.value!!.get(1).songName + "-" + mRoomLivingViewModel.mSongsOrderedLiveData.value!!.get(1).singer
-                    binding.rankListView.resetRankList(mRoomLivingViewModel.getRankList() ?: emptyList(), nextName)
+                // 对齐 iOS 只有房主有下一首按钮
+                if (mRoomLivingViewModel.isRoomOwner() && mRoomLivingViewModel.mSongsOrderedLiveData.value != null &&
+                        mRoomLivingViewModel.mSongsOrderedLiveData.value!!.size > 1) {
+                    val nextName = mRoomLivingViewModel.mSongsOrderedLiveData.value!![1].songName + "-" + mRoomLivingViewModel.mSongsOrderedLiveData.value!![1].singer
+                    binding.rankListView.resetRankList(mRoomLivingViewModel.getRankList(), nextName)
                 } else {
-                    binding.rankListView.resetRankList(mRoomLivingViewModel.getRankList() ?: emptyList(), null)
+                    binding.rankListView.resetRankList(mRoomLivingViewModel.getRankList(), null)
                 }
             }
         }
@@ -346,6 +354,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             binding.lrcControlView.role = LrcControlView.Role.Listener
         }
         mRoomLivingViewModel.musicStartPlay(music)
+        binding.rankListView.isVisible = false
 
         if (music.userNo == UserManager.getInstance().user.id.toString()) {
             binding.lrcControlView.postDelayed({

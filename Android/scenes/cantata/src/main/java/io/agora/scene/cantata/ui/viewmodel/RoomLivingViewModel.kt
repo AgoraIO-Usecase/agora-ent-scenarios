@@ -240,6 +240,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                             roomInfo.roomName,
                             roomInfo.roomNo,
                             roomInfo.creatorNo,
+                            roomInfo.creatorAvatar,
                             vlRoomListModel.bgOption,
                             roomInfo.seatsArray,
                             roomInfo.roomPeopleNum,
@@ -853,6 +854,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         // 离开合唱
         mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
+        mMusicSetting?.setEar(false)
     }
 
     /**

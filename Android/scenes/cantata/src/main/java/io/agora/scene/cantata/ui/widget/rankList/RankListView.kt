@@ -73,11 +73,13 @@ class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeS
     private fun updateNextSong(songName: String?) {
         if (songName == null) {
             mBinding.tvNextSong.visibility = GONE
+            mBinding.tvNextSongCountdown.visibility = GONE
         } else {
             mBinding.tvNextSong.visibility = VISIBLE
             mBinding.tvNextSong.text = context.getString(R.string.cantata_next_song, songName)
+            mBinding.tvNextSongCountdown.visibility = VISIBLE
+            startTimer()
         }
-        startTimer()
     }
 
     private fun startTimer(){

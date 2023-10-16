@@ -137,6 +137,7 @@ class CantataSyncManagerServiceImp constructor(
                 isPrivate = inputModel.isPrivate != 0,
                 password = inputModel.password,
                 creatorNo = UserManager.getInstance().user.id.toString(),
+                creatorAvatar = UserManager.getInstance().user.headUrl,
                 bgOption = "0",
             )
             val scene = Scene()
@@ -235,6 +236,7 @@ class CantataSyncManagerServiceImp constructor(
                                                         cacheRoom.name,
                                                         inputModel.roomNo,
                                                         cacheRoom.creatorNo,
+                                                        cacheRoom.creatorAvatar,
                                                         cacheRoom.bgOption,
                                                         seats,
                                                         userSize,
@@ -379,6 +381,7 @@ class CantataSyncManagerServiceImp constructor(
                         roomInfo.isPrivate,
                         roomInfo.password,
                         roomInfo.creatorNo,
+                        roomInfo.creatorAvatar,
                         roomInfo.createdAt,
                         inputModel.mvIndex.toString(),
                         roomInfo.roomPeopleNum
@@ -941,6 +944,7 @@ class CantataSyncManagerServiceImp constructor(
                         roomInfo.isPrivate,
                         roomInfo.password,
                         roomInfo.creatorNo,
+                        roomInfo.creatorAvatar,
                         roomInfo.createdAt,
                         roomInfo.bgOption,
                         count
