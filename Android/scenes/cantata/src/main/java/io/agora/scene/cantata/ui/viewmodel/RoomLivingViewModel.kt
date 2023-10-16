@@ -854,6 +854,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         // 离开合唱
         mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
+        mMusicSetting?.setEar(false)
     }
 
     /**
