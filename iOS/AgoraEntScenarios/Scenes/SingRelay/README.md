@@ -90,7 +90,7 @@
 
 > 在线K歌房场景目前已涵盖以下功能，您可以参考注释按需从代码中调用
 >
-> 场景功能代码根目录 **AgoraEntScenarios/AgoraEntScenarios/scenes/SR**
+> 场景功能代码根目录 **AgoraEntScenarios/AgoraEntScenarios/scenes/SingRelay**
 >
 > ---
 >
