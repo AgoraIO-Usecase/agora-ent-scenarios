@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 定义左半圆形形状 -->
+    <corners android:topLeftRadius="270dp"
+        android:bottomLeftRadius="270dp"
+        android:topRightRadius="270dp"
+        android:bottomRightRadius="270dp"/>
+
+    <!-- 定义边框 -->
+    <stroke
+        android:width="1px"
+        android:startColor="#FF9E45"
+        android:endColor="#479EFF"
+        android:type="linear"/>
+
+    <solid android:color="#6604A5FF"/>
+
+</shape>
