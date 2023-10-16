@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <resources>
     <string name="voice_app_name">Agora Chat Room</string>
     <string name="voice_app_agora_chatroom">Agora Chat Room</string>
@@ -132,6 +131,16 @@
     <string name="voice_room_disclaimer_email">If you have any query, please feel free to contact support@agora.io</string>
     <string name="voice_chatroom_notice">Notice</string>
     <string name="voice_chatroom_settings_host_only">Host Only</string>
+    <string name="voice_chatroom_settings_bgm_title">背景音乐(%d)</string>
+    <string name="voice_chatroom_settings_earback_title">耳返</string>
+    <string name="voice_chatroom_settings_earback_on">开启耳返</string>
+    <string name="voice_chatroom_settings_earback_forbidden_toast">仅上麦用户可以使用耳返</string>
+    <string name="voice_chatroom_settings_earback_tip">&#160;&#160;开启耳返可实时听到自己的声音，唱歌的时候及时调整</string>
+    <string name="voice_chatroom_settings_earback_waring">&#160;&#160;使用耳返必须插入耳机，当前未检测到耳机</string>
+    <string name="voice_chatroom_settings_earback_setting">耳返设置</string>
+    <string name="voice_chatroom_settings_earback_volume">耳返音量</string>
+    <string name="voice_chatroom_settings_earback_ping">耳返延时</string>
+    <string name="voice_chatroom_settings_earback_ping_tips">请对着耳麦说话，测试实时耳返延时</string>
     <string name="voice_chatroom_own_audio_settings">Personal Audio Settings</string>
     <string name="voice_chatroom_audio_settings">Audio Settings</string>
     <string name="voice_chatroom_bot_settings">Bot Settings</string>
@@ -142,6 +151,8 @@
     <string name="voice_chatroom_noise_suppression">Noise Suppression</string>
     <string name="voice_chatroom_aiaec">AIAEC</string>
     <string name="voice_chatroom_aiagc">AGC</string>
+    <string name="voice_chatroom_ear_back">In-Ear Monitor</string>
+    <string name="voice_chatroom_bgm">Background Music</string>
     <string name="voice_chatroom_aiaec_audition">AIAEC Audition</string>
     <string name="voice_chatroom_aiagc_audition">AGC Audition</string>
     <string name="voice_chatroom_audition_before">Before</string>
@@ -161,6 +172,7 @@
     <string name="voice_chatroom_voice_blur">Voice blur</string>
     <string name="voice_chatroom_sound_selection">Sound Selection</string>
     <string name="voice_chatroom_only_host_can_change_best_sound">Only host can change Best Agora Sound</string>
+    <string name="voice_chatroom_only_host_bgm">Only host can change BGM</string>
     <string name="voice_chatroom_sound_selection_tips">Switching other Agora Sound Selection need to exit the chatroom.</string>
     <string name="voice_chatroom_current_sound_selection">Current Sound Selection</string>
     <string name="voice_chatroom_other_sound_selection">Other Sound Selection</string>
@@ -172,7 +184,7 @@
     <string name="voice_chatroom_gaming_buddy_introduce">This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice.</string>
     <string name="voice_chatroom_professional_broadcaster">Professional podcaster</string>
     <string name="voice_chatroom_professional_broadcaster_introduce">This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The Agora stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market.</string>
-    <string name="voice_chatroom_sound_selection_more">Need more Agora Sound Selection or custom sound. Visit &lt;font color=\'#3C4267\'&gt;&lt;strong&gt;&lt;u&gt;www.agora.io.&lt;/u&gt;&lt;/strong&gt;&lt;/font&gt;<![CDATA[]]></string>
+    <string name="voice_chatroom_sound_selection_more">Need more Agora Sound Selection or custom sound. Visit <![CDATA[<font color=\'#3C4267\'><strong><u>www.agora.io.</u></strong></font>]]></string>
     <string name="voice_chatroom_ains_settings">AINS Settings</string>
     <string name="voice_chatroom_your_ains">Your AINS</string>
     <string name="voice_chatroom_agora_blue_bot_ains">Agora Blue Bot AINS</string>

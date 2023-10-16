@@ -3,7 +3,9 @@ package com.agora.entfulldemo.home.mine
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -29,9 +31,12 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val servicePhone = "400-632-6626"
     private val webSite = "https://www.shengwang.cn/"
 
+    private val kKtvRoomAppID = "io.agora.ktv"
     private val kChatRoomAppID = "io.agora.chatroom"
     private val kFullAppID = "io.agora.AgoraVoice"
     private val kSingRelayAppID = "io.agora.singrelay"
+    private val kSingBattleRoomAppID = "io.agora.singbattle"
+    private val kShowRoomAppID = "io.agora.test.entfull"
 
     private var counts = 0
     private val debugModeOpenTime: Long = 2000
@@ -49,14 +54,31 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         binding.rvAboutUs.adapter = adapter
         if (BuildConfig.APPLICATION_ID == kChatRoomAppID) {
             setupChatRoomAppInfo()
-        } else if (BuildConfig.APPLICATION_ID == kFullAppID) {
-            setupFullAppInfo()
+        } else if (BuildConfig.APPLICATION_ID == kKtvRoomAppID) {
+            setupKtvRoomAppInfo()
+        } else if (BuildConfig.APPLICATION_ID == kSingBattleRoomAppID) {
+            setupSingBattleRoomAppInfo()
+        } else if (BuildConfig.APPLICATION_ID == kShowRoomAppID) {
+            setupShowRoomAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kSingRelayAppID) {
             setupSingRelayAppInfo()
+        } else {
+            setupFullAppInfo()
         }
         setupDebugMode()
         setupClickWebAction()
         setupClickPhoneAction()
+    }
+
+    // 设置K歌房App的信息
+    private fun setupKtvRoomAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        adapter.appInfo = AppInfo(
+            this.getString(R.string.app_about_name),
+            "20230926-" + VersionUtils.getVersion("io.agora.scene.ktv.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+            servicePhone,
+            webSite
+        )
     }
 
     // 设置语聊App的信息
@@ -77,12 +99,36 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         adapter.scenes = mutableListOf<SceneInfo>()
         if (VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig").isNotEmpty()) {
             adapter.appInfo = AppInfo(
-                this.getString(R.string.app_name),
+                this.getString(R.string.app_sing_relay),
                 "20230830-" + VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
         }
+    }
+
+    // 设置秀场直播App的信息
+    private fun setupShowRoomAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        if (VersionUtils.getVersion("io.agora.scene.show.BuildConfig").isNotEmpty()) {
+            adapter.appInfo = AppInfo(
+                this.getString(R.string.app_about_show),
+                "20230915-" + VersionUtils.getVersion("io.agora.scene.show.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+                servicePhone,
+                webSite
+            )
+        }
+    }
+
+    // 设置抢唱App的信息
+    private fun setupSingBattleRoomAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        adapter.appInfo = AppInfo(
+            this.getString(R.string.app_about_singbattle),
+            "20230520-" + VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig") + RtcEngine.getSdkVersion(),
+            servicePhone,
+            webSite
+        )
     }
 
     // 设置综合App的信息
@@ -120,12 +166,37 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 )
             )
         }
+        if (VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_singbattle),
+                    "HGQC-" + VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig")
+                )
+            )
+        }
+        if (VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_sing_relay),
+                    "QMJC-" + VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig")
+                )
+            )
+        }
+        if (VersionUtils.getVersion("io.agora.scene.pure1v1.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_pure1v1),
+                    VersionUtils.getVersion("io.agora.scene.pure1v1.BuildConfig")
+                )
+            )
+        }
+        val versionTime = "20230530-"
         if (scenes.size == 1) {
             adapter.scenes = mutableListOf()
             val scene = scenes[0]
             adapter.appInfo = AppInfo(
                 scene.name,
-                scene.version,
+                versionTime + scene.version + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
@@ -133,7 +204,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             adapter.scenes = scenes
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_about_name),
-                "20230530-" + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
+                versionTime + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
@@ -197,7 +268,6 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         dialog.onButtonClickListener = object : OnButtonClickListener {
             override fun onLeftButtonClick() {}
             override fun onRightButtonClick() {
-                counts = 0
                 binding.tvDebugMode.visibility = View.GONE
                 AgoraApplication.the().enableDebugMode(false)
                 ToastUtils.showToast(R.string.app_debug_off)

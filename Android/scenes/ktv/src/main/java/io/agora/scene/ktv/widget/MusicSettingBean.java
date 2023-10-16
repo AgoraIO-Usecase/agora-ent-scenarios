@@ -2,7 +2,7 @@ package io.agora.scene.ktv.widget;
 
 public class MusicSettingBean {
     private final MusicSettingDialog.Callback mCallback;
-    private boolean isEar;
+    private EarPhoneCallback mEarPhoneCallback;
     private int volMic;
     private int volMusic;
     private int effect;
@@ -10,7 +10,27 @@ public class MusicSettingBean {
     private int toneValue;
     private int audioEffectParams1 = 0;
     private int audioEffectParams2 = 0;
-    private int remoteVolume = 40;
+    private int remoteVolume = 30;
+    private boolean professionalMode = false; // 专业模式
+    private int aecLevel = 0; // 0(16K),1(24K),2(48K)
+    private boolean lowLatencyMode = false;  // 低延时模式
+
+    // 耳返设置
+    private boolean isEar; // 耳返开关
+    private int earBackVolume = 100; // 耳返音量
+    private int earBackMode = 0; // 耳返模式：0(自动), 1(强制OpenSL), 2(强制Oboe)
+    private boolean hasEarPhone = false; // 是否有耳机
+    private int earBackDelay = 0; // 耳返延迟
+
+    // 人声突出
+    private String highLighterUid = "";
+
+    // 背景音降噪
+    private int ainsMode = 0; // 背景音降噪：0(关闭), 1(中), 2(高)
+
+    // AIAEC
+    private boolean aiaecOpen = false;
+    private int mAIAECStrength = 0;
 
 
     public MusicSettingBean(boolean isEar, int volMic, int volMusic, int toneValue, MusicSettingDialog.Callback mCallback) {
@@ -23,6 +43,10 @@ public class MusicSettingBean {
 
     public MusicSettingDialog.Callback getCallback() {
         return mCallback;
+    }
+
+    public void setEarPhoneCallback(EarPhoneCallback callback) {
+        this.mEarPhoneCallback = callback;
     }
 
     public boolean isEar() {
@@ -57,8 +81,13 @@ public class MusicSettingBean {
     }
 
     public void setEffect(int effect) {
+        if (this.effect == effect) return;
         this.effect = effect;
         this.mCallback.onEffectChanged(effect);
+    }
+
+    public void updateEffect(int effect) {
+        this.effect = effect;
     }
 
     public int getBeautifier() {
@@ -98,5 +127,103 @@ public class MusicSettingBean {
     public void setRemoteVolume(int newValue) {
         this.remoteVolume = newValue;
         this.mCallback.onRemoteVolumeChanged(newValue);
+    }
+
+    public boolean getProfessionalMode() { return professionalMode; }
+
+    public void setProfessionalMode(boolean mode) {
+        this.professionalMode = mode;
+        this.mCallback.onProfessionalModeChanged(mode);
+    }
+
+    public int getAECLevel() { return aecLevel; }
+
+    public void setAECLevel(int level) {
+        this.aecLevel = level;
+        this.mCallback.onAECLevelChanged(level);
+    }
+
+    public boolean getLowLatencyMode() { return lowLatencyMode; }
+
+    public void setLowLatencyMode(boolean mode) {
+        this.lowLatencyMode = mode;
+        this.mCallback.onLowLatencyModeChanged(mode);
+    }
+
+    public int getEarBackVolume() {
+        return earBackVolume;
+    }
+    public void setEarBackVolume(int volume) {
+        this.earBackVolume = volume;
+        this.mCallback.onEarBackVolumeChanged(volume);
+    }
+
+    public int getEarBackMode() {
+        return earBackMode;
+    }
+
+    public void setEarBackMode(int mode) {
+        this.earBackMode = mode;
+        this.mCallback.onEarBackModeChanged(mode);
+    }
+
+    public boolean hasEarPhone() {
+        return hasEarPhone;
+    }
+
+    public void setHasEarPhone(boolean hasEarPhone) {
+        this.hasEarPhone = hasEarPhone;
+        if (mEarPhoneCallback != null) {
+            mEarPhoneCallback.onHasEarPhoneChanged(hasEarPhone);
+        }
+    }
+
+    public int getEarBackDelay() {
+        return earBackDelay;
+    }
+
+    public void setEarBackDelay(int earBackDelay) {
+        this.earBackDelay = earBackDelay;
+        if (mEarPhoneCallback != null) {
+            mEarPhoneCallback.onEarMonitorDelay(earBackDelay);
+        }
+    }
+
+    public String getHighLighterUid() {
+        return highLighterUid;
+    }
+
+    public void setHighLighterUid(String uid) {
+        this.highLighterUid = uid;
+    }
+
+    public interface EarPhoneCallback {
+        void onHasEarPhoneChanged(boolean hasEarPhone);
+        void onEarMonitorDelay(int earsBackDelay);
+    }
+
+    public int getAinsMode() {
+        return ainsMode;
+    }
+
+    public void setAinsMode(int mode) {
+        this.ainsMode = mode;
+        mCallback.onAINSModeChanged(mode);
+    }
+
+    public boolean isAIAECOpen() {
+        return aiaecOpen;
+    }
+
+    public void setAIAECMode(boolean open) {
+        this.aiaecOpen = open;
+        this.mCallback.onAIAECChanged(open);
+    }
+
+    public int getAIAECStrength() { return mAIAECStrength; }
+
+    public void setAIAECStrength(int strength) {
+        this.mAIAECStrength = strength;
+        this.mCallback.onAIAECStrengthSelect(strength);
     }
 }

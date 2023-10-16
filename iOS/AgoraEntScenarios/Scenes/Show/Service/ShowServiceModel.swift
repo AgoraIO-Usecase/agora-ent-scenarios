@@ -38,8 +38,8 @@ import Foundation
     var toastTitle: String {
         switch self {
         case .idle: return ""
-        case .onSeat: return "连麦已断开哦".show_localized
-        case .pking: return "PK已断开哦".show_localized
+        case .onSeat: return "show_end_broadcasting".show_localized
+        case .pking: return "show_end_pk".show_localized
         }
     }
     

@@ -18,7 +18,12 @@ final class AboutAgoraHeader: UIView {
     var delegate: AboutAgoraHeaderDelegate?
     
     private lazy var icon: UIImageView = {
-        UIImageView(frame: CGRect(x: self.frame.width/2.0-37, y: 42, width: 74, height: 74)).backgroundColor(.white).image(UIImage(named: "app_icon")!)
+        let imageView = UIImageView(frame: CGRect(x: self.frame.width/2.0-37, y: 42, width: 74, height: 74))
+        imageView.image = UIImage(named: "app_icon")
+        imageView.cornerRadius(16)
+        imageView.layer.borderWidth = 1
+        imageView.layer.borderColor = UIColor(red: 240/255.0, green: 240/255.0, blue: 240/255.0, alpha: 1).cgColor
+        return imageView
     }()
     
     private lazy var appName: UILabel = {
@@ -31,9 +36,9 @@ final class AboutAgoraHeader: UIView {
             .textColor(UIColor(0x979CBB))
             .textAlignment(.center)
             .backgroundColor(.white)
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(onTapVersionLabel(_:)))
-        tap.numberOfTapsRequired = 5;
+        label.accessibilityIdentifier = "user_center_app_version_id"
+        let tap = UILongPressGestureRecognizer(target: self, action: #selector(onTapVersionLabel(_:)))
+        tap.minimumPressDuration = 3;
         label.addGestureRecognizer(tap)
         label.isUserInteractionEnabled = true
         return label

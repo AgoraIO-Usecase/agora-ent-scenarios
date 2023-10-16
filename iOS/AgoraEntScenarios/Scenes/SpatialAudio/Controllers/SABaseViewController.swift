@@ -33,7 +33,7 @@ import SVProgressHUD
     public func setupNavigationAttributes() {
         navigation.title.isHidden = !showTitle
         navigation.title.textColor = titleColor
-        navigation.back.setImage(UIImage(backImageName), for: .normal)
+        navigation.back.setImage(UIImage.spatial_image(backImageName), for: .normal)
         navigation.backgroundColor = navBackgroundColor
     }
     

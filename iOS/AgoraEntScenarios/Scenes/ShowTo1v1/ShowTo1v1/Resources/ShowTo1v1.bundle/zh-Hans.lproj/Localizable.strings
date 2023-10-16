@@ -1,0 +1,68 @@
+/* 
+  Localizable.strings
+  AgoraScene_iOS
+
+  Created by 朱继超 on 2022/9/19.
+  
+*/
+
+
+"authorized_microphone_fail"="麦克风权限未设置,请设置麦克风权限";
+"authorized_camera_fail"="摄像头权限未设置,请设置摄像头权限";
+"authorized_title"="提示";
+"authorized_ok"="确定";
+"authorized_cancel"="取消";
+
+"user_list_title"="秀场转1V1私密房";
+"room_list_refresh_tips"="房间列表已刷新";
+"call_not_init"="网络异常";
+"call_state_connecting"="连接中";
+"call_broadcaster_private"="Call privately";
+"user_list_waitting"="暂无主播在线，你来创建一个吧！";
+"user_list_create_room"="创建房间";
+"user_list_create"="创建";
+"user_list_creating"="创建中";
+"user_list_live_tag"="Live";
+"user_list_user_leave"="Come back soon";
+"user_list_nodata_tips"="欢迎来到声网1V1私密房，目前暂无主播开播，你可以叫上你的朋友一起来体验我们的场景功能。";
+"create_room_tips"="填写房间名称，吸引更多观众";
+"create_room_title"="房间名称";
+"create_room_random"="随机";
+"create_room_name_empty_tips"="房间名称不能为空";
+"call_usage_tips"=" 本产品仅用于功能体验，单次直播时长不超过20mins";
+"call_toast_hangup"="对方结束连线";
+"setting_statistic" = "实时数据";
+"call_user_empty_tips"="Hi，我暂时有事，很快回来...";
+"call_user_busy_tips"="我很快回来，一会再连线我把";
+"call_content_inspect_warning"="监测到当前内容存在违规行为";
+"call_connected_toast_tips"="呼入，已自动接听...";
+"user_list_cell_local_user"="本人信息";
+"user_list_cell_remote_user"="对端信息";
+
+
+"show_statistic_bitrate" = "码率";
+"show_statistic_delay" = "延迟";
+"show_statistic_receive_title" = "接收";
+"show_statistic_send_title" = "发送";
+"show_statistic_receive_resolution" = "接收分辨率";
+"show_statistic_up_net_speech" = "上行网络";
+"show_setting_advance_framerate" = "帧率";
+"show_statistic_receive_fps" = "接收帧率";
+"show_statistic_down_loss_package" = "下行丢包率";
+"show_statistic_up_loss_package" = "上行丢包率";
+"show_statistic_up_bitrate" = "发送码率";
+"show_statistic_encode_resolution" = "编码分辨率";
+"show_advance_setting_FPS_title" = "编码帧率";
+"show_statistic_loss_package" = "丢包率";
+"show_statistic_down_net_speech" = "下行网络";
+
+"show_create_room_name1"="小可爱是我呀";
+"show_create_room_name2"="我是你的小可爱";
+"show_create_room_name3"="一往情深";
+"show_create_room_name4"="情不知所起";
+"show_create_room_name5"="沪上挖掘机";
+"show_create_room_name6"="张江推土机";
+"show_create_room_name7"="川沙妲己痴迷粉丝";
+"show_create_room_name8"="疯狂星期几";
+"show_create_room_name9"="小黄鸭";
+"show_create_room_name10"="西二旗老板娘";

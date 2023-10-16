@@ -86,7 +86,6 @@ class SA3DMoveUserView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
     }
 
@@ -99,7 +98,7 @@ class SA3DMoveUserView: UIView {
         addSubview(animateContainerView)
         animateContainerView.addSubview(animateImageView)
         
-        bgView.layer.cornerRadius = 40~
+        bgView.layer.cornerRadius = 40
         bgView.layer.masksToBounds = true
         bgView.backgroundColor = UIColor(white: 1, alpha: 0.3)
         addSubview(bgView)
@@ -109,12 +108,12 @@ class SA3DMoveUserView: UIView {
         bgView.isUserInteractionEnabled = true
 
         bgIconView.image = UIImage.sceneImage(name: "icons／solid／add")
-        bgIconView.layer.cornerRadius = 15~
+        bgIconView.layer.cornerRadius = 15
         bgIconView.layer.masksToBounds = true
         addSubview(bgIconView)
 
         avatarImageView.image = UIImage(named: "")
-        avatarImageView.layer.cornerRadius = 37~
+        avatarImageView.layer.cornerRadius = 37
         avatarImageView.layer.masksToBounds = true
         addSubview(avatarImageView)
         
@@ -123,15 +122,15 @@ class SA3DMoveUserView: UIView {
         addSubview(micView)
 
         nameBtn.setTitleColor(.white, for: .normal)
-        nameBtn.titleLabel?.font = UIFont.systemFont(ofSize: 11)~
+        nameBtn.titleLabel?.font = UIFont.systemFont(ofSize: 11)
         nameBtn.setTitle("", for: .normal)
         nameBtn.isUserInteractionEnabled = false
         addSubview(nameBtn)
         
         bgView.snp.makeConstraints { make in
             make.centerX.equalTo(self)
-            make.top.equalTo(self).offset(40~)
-            make.width.height.equalTo(82~)
+            make.top.equalTo(self).offset(40)
+            make.width.height.equalTo(82)
         }
         
         animateContainerView.snp.makeConstraints { make in
@@ -147,13 +146,13 @@ class SA3DMoveUserView: UIView {
         bgIconView.snp.makeConstraints { make in
             make.centerX.equalTo(self)
             make.centerY.equalTo(self.bgView)
-            make.width.height.equalTo(30~)
+            make.width.height.equalTo(30)
         }
 
         avatarImageView.snp.makeConstraints { make in
             make.centerX.equalTo(self)
-            make.top.equalTo(self).offset(44~)
-            make.width.height.equalTo(74~)
+            make.top.equalTo(self).offset(44)
+            make.width.height.equalTo(74)
         }
         
         icon3dImageView.snp.makeConstraints { make in
@@ -162,15 +161,15 @@ class SA3DMoveUserView: UIView {
         }
 
         micView.snp.makeConstraints { make in
-            make.right.equalTo(self.avatarImageView).offset(5~)
-            make.width.height.equalTo(18~)
-            make.bottom.equalTo(self.avatarImageView.snp.bottom).offset(-5~)
+            make.right.equalTo(self.avatarImageView).offset(5)
+            make.width.height.equalTo(18)
+            make.bottom.equalTo(self.avatarImageView.snp.bottom).offset(-5)
         }
 
         nameBtn.snp.makeConstraints { make in
             make.centerX.equalTo(self)
-            make.top.equalTo(self.avatarImageView.snp.bottom).offset(10~)
-            make.height.equalTo(20~)
+            make.top.equalTo(self.avatarImageView.snp.bottom).offset(10)
+            make.height.equalTo(20)
         }
     }
 

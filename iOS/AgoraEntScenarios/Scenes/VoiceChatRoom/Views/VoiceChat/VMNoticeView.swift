@@ -21,7 +21,7 @@ class VMNoticeView: UIView {
     private var limLabel: UILabel = .init()
     private var editBtn: UIButton = .init()
 
-    private let placeHolder: String = "Announce to chatroom, 140 character limit.".localized()
+    private let placeHolder: String = "voice_announce_to_chatroom_140_character_limit".voice_localized()
 
     var resBlock: ((Bool, String?) -> Void)?
 
@@ -45,7 +45,7 @@ class VMNoticeView: UIView {
 
     var noticeStr: String = "" {
         didSet {
-            let notice = noticeStr.count == 0 ? "Welcome".localized() : noticeStr
+            let notice = noticeStr.count == 0 ? "voice_welcome".voice_localized() : noticeStr
             tv.text = notice
             limLabel.text = "\(notice.count)/140"
         }
@@ -71,11 +71,11 @@ class VMNoticeView: UIView {
         addSubview(cover)
 
         lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20, y: 8, width: 40, height: 4)
-        lineImgView.image = UIImage("pop_indicator")
+        lineImgView.image = UIImage.sceneImage(name: "pop_indicator", bundleName: "VoiceChatRoomResource")
         addSubview(lineImgView)
 
         canBtn.frame = CGRect(x: 15, y: 18, width: 68, height: 30)
-        canBtn.setTitle(LanguageManager.localValue(key: "Cancel"), for: .normal)
+        canBtn.setTitle(LanguageManager.localValue(key: "voice_cancel"), for: .normal)
         canBtn.setTitleColor(.lightGray, for: .normal)
         canBtn.font(UIFont.systemFont(ofSize: 13))
         canBtn.addTargetFor(self, action: #selector(can), for: .touchUpInside)
@@ -94,20 +94,20 @@ class VMNoticeView: UIView {
         subBtn.layer.addSublayer(gl)
 
         subBtn.setTitleColor(.white, for: .normal)
-        subBtn.setTitle(LanguageManager.localValue(key: "Post"), for: .normal)
+        subBtn.setTitle(LanguageManager.localValue(key: "voice_post"), for: .normal)
         subBtn.font(UIFont.systemFont(ofSize: 13))
         subBtn.addTargetFor(self, action: #selector(sub), for: .touchUpInside)
         addSubview(subBtn)
 
         titleLabel.frame = CGRect(x: ScreenWidth / 2.0 - 40, y: 22, width: 80, height: 22)
         titleLabel.textAlignment = .center
-        titleLabel.text = LanguageManager.localValue(key: "Notice")
+        titleLabel.text = LanguageManager.localValue(key: "voice_notice")
         titleLabel.textColor = .black
         titleLabel.font = UIFont.systemFont(ofSize: 16)
         addSubview(titleLabel)
 
         tv.frame = CGRect(x: 10, y: 60, width: ScreenWidth - 20, height: 160)
-        tv.text = "Welcome".localized()
+        tv.text = "voice_welcome".voice_localized()
         tv.setPlaceholder(text: placeHolder)
         tv.textColor = UIColor(red: 0.235, green: 0.257, blue: 0.403, alpha: 1)
         tv.font = UIFont.systemFont(ofSize: 14)
@@ -122,12 +122,12 @@ class VMNoticeView: UIView {
         addSubview(limLabel)
         limLabel.isHidden = true
 
-        let isHairScreen = SwiftyFitsize.isFullScreen
+        let isHairScreen =  Screen.isFullScreen
         editBtn.frame = CGRect(x: 20, y: bounds.size.height - (isHairScreen ? 87 : 53), width: bounds.size.width - 40, height: 48)
-        editBtn.setTitle(LanguageManager.localValue(key: "Edit"), for: .normal)
+        editBtn.setTitle(LanguageManager.localValue(key: "voice_edit"), for: .normal)
         editBtn.font(UIFont.systemFont(ofSize: 16))
         editBtn.setTitleColor(.white, for: .normal)
-        let image = UIImage("blue_btn_bg")?.resizableImage(withCapInsets: UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16), resizingMode: .stretch)
+        let image = UIImage.sceneImage(name: "blue_btn_bg", bundleName: "VoiceChatRoomResource")?.resizableImage(withCapInsets: UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16), resizingMode: .stretch)
         editBtn.setBackgroundImage(image, for: .normal)
         editBtn.addTargetFor(self, action: #selector(edit), for: .touchUpInside)
         addSubview(editBtn)
@@ -173,15 +173,3 @@ extension VMNoticeView: UITextViewDelegate {
     }
 }
 
-extension UITextView {
-    func setPlaceholder(text: String) {
-        let placeholderLabel = UILabel()
-        placeholderLabel.numberOfLines = 0
-        placeholderLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        placeholderLabel.textColor = UIColor(red: 0.593, green: 0.612, blue: 0.732, alpha: 1)
-        placeholderLabel.text = text
-        placeholderLabel.sizeToFit()
-        addSubview(placeholderLabel)
-        setValue(placeholderLabel, forKeyPath: "_placeholderLabel")
-    }
-}

@@ -1,7 +1,7 @@
 ext { ktv_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_KTV = "2.3.1"
+final def VERSION_SCENE_KTV = "3.3.0"
 android {
     defaultConfig {
         if(isModular()){

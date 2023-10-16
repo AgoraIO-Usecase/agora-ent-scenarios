@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.agora.scene.ktv.singbattle">
+
+    <application>
+        <activity
+            android:name=".create.RoomCreateActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".create.RoomListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".live.RoomLivingActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+    </application>
+</manifest>

@@ -89,10 +89,11 @@ class GLTextureBufferQueue(
             glFrameBuffer.setRotation(iN.rotation)
             if (iN.transform != null) {
                 glFrameBuffer.setTexMatrix(iN.transform)
-                glFrameBuffer.setFlipH(!iN.isFrontCamera)
-            } else {
                 glFrameBuffer.setFlipH(iN.isFrontCamera)
+            } else {
+                glFrameBuffer.setFlipH(!iN.isFrontCamera)
             }
+            glFrameBuffer.setFlipV(true)
             glFrameBuffer.process(iN.textureId, iN.textureType)
             GLES20.glFinish()
             out.index = cacheIndex

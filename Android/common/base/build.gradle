@@ -30,7 +30,6 @@ android {
 
         buildConfigField "String", "AGORA_APP_ID", "\"${AGORA_APP_ID}\""
         buildConfigField "String", "AGORA_APP_CERTIFICATE", "\"${AGORA_APP_CERTIFICATE}\""
-
     }
 
     buildTypes {

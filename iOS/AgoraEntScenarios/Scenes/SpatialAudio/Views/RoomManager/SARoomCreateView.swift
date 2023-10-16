@@ -25,7 +25,7 @@ public class SARoomCreateView: UIImageView {
         createContainer.layer.shadowColor = UIColor(red: 0, green: 0.55, blue: 0.98, alpha: 0.2).cgColor
         createContainer.layer.shadowOpacity = 1
         isUserInteractionEnabled = true
-        createRoom.set(image: UIImage("add"), title: sceneLocalized( "Create Room"), titlePosition: .right, additionalSpacing: 7, state: .normal)
+        createRoom.set(image:UIImage.sceneImage(name: "add", bundleName: "VoiceChatRoomResource"), title: "spatial_voice_create_room".spatial_localized(), titlePosition: .right, additionalSpacing: 7, state: .normal)
         createRoom.setGradient([UIColor(red: 0.13, green: 0.61, blue: 1, alpha: 1), UIColor(red: 0.2, green: 0.37, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)])
     }
 

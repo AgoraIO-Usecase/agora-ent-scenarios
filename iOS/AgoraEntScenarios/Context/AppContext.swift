@@ -65,10 +65,6 @@ import Bugly
         return KeyCenter.AppId
     }
 
-    @objc func appCertificate() -> String? {
-        return KeyCenter.Certificate
-    }
-
     @objc func appHostUrl() -> String {
         return KeyCenter.HostUrl
     }

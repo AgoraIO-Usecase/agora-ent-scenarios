@@ -172,6 +172,8 @@ class DebugSettingDialog constructor(context: Context) : BottomFullDialog(contex
         mBinding.pvcSwitchCompat.setOnCheckedChangeListener { _, isOpen ->
             RtcEngineInstance.debugSettingModel.pvcEnabled = isOpen
             RtcEngineInstance.rtcEngine.setParameters("{\"rtc.video.enable_pvc\":$isOpen}")
+            RtcEngineInstance.rtcEngine.setParameters("{\"rtc.video.pvc_max_support_resolution\": 2073600}")
+            RtcEngineInstance.rtcEngine.setParameters("{\"rtc.video.maxCosttime4AIExt\": {\"pvc_max\": 20}}")
             ShowLogger.d(TAG, "rtc.video.enable_pvc: $isOpen")
         }
 

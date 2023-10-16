@@ -25,7 +25,7 @@ public class VRRoomCreateView: UIImageView {
         createContainer.layer.shadowColor = UIColor(red: 0, green: 0.55, blue: 0.98, alpha: 0.2).cgColor
         createContainer.layer.shadowOpacity = 1
         isUserInteractionEnabled = true
-        createRoom.set(image: UIImage("add"), title: LanguageManager.localValue(key: "Create Room"), titlePosition: .right, additionalSpacing: 7, state: .normal)
+        createRoom.set(image:UIImage.sceneImage(name: "add", bundleName: "VoiceChatRoomResource"), title: LanguageManager.localValue(key: "voice_create_room"), titlePosition: .right, additionalSpacing: 7, state: .normal)
         createRoom.setGradient([UIColor(red: 0.13, green: 0.61, blue: 1, alpha: 1), UIColor(red: 0.2, green: 0.37, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)])
     }
 
@@ -41,14 +41,3 @@ public class VRRoomCreateView: UIImageView {
     }
 }
 
-extension UIView {
-    @discardableResult
-    func setGradient(_ colors: [UIColor], _ points: [CGPoint]) -> Self {
-        let gradientColors: [CGColor] = colors.map { $0.cgColor }
-        let startPoint = points[0]
-        let endPoint = points[1]
-        let gradientLayer = CAGradientLayer().colors(gradientColors).startPoint(startPoint).endPoint(endPoint).frame(bounds).backgroundColor(UIColor.clear.cgColor)
-        layer.insertSublayer(gradientLayer, at: 0)
-        return self
-    }
-}

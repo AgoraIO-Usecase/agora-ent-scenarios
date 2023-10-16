@@ -10,7 +10,7 @@
 #import "AgoraEntScenarios-Swift.h"
 #import "AppContext+KTV.h"
 #import "VLMacroDefine.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 typedef void (^actionSuccess)(BOOL ifSuccess);
 
@@ -65,6 +65,13 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     [dianGeBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     dianGeBtn.tag = VLKTVBottomBtnClickTypeChoose;
     [self addSubview:dianGeBtn];
+    
+    VLHotSpotBtn *voiceShowBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(moreBtn.right + 14 , (self.height-24)*0.5, 24, 24)];
+    [voiceShowBtn setImage:[UIImage sceneImageWithName:@"ktv_moreItem_icon"] forState:UIControlStateNormal];
+    [voiceShowBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
+    voiceShowBtn.tag = VLKTVBottomBtnClickTypeShowVoice;
+    [self addSubview:voiceShowBtn];
+    voiceShowBtn.hidden = YES;
     
     for (VLRoomSeatModel *info in self.seatsArray) {
         if ([info.rtcUid integerValue] == [VLUserCenter.user.id integerValue]) {

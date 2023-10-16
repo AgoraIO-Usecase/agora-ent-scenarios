@@ -11,12 +11,13 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.show.beauty.IBeautyProcessor
 import io.agora.scene.show.beauty.sensetime.BeautySenseTimeImpl
 import io.agora.scene.show.debugSettings.DebugSettingModel
+import io.agora.scene.show.videoSwitcherAPI.VideoSwitcher
 import java.util.concurrent.Executors
 
 object RtcEngineInstance {
 
     val videoEncoderConfiguration = VideoEncoderConfiguration().apply {
-        orientationMode = VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT
+        orientationMode = VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_ADAPTIVE
     }
     val virtualBackgroundSource = VirtualBackgroundSource().apply {
         backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR
@@ -63,29 +64,20 @@ object RtcEngineInstance {
                     }
                 }
                 innerRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
-                    registerVideoFrameObserver(beautyProcessor)
                     enableVideo()
                 }
             }
             return innerRtcEngine!!
         }
 
-    private var innerVideoSwitcher: VideoSwitcher? = null
-    val videoSwitcher: VideoSwitcher
-        get() {
-            if (innerVideoSwitcher == null) {
-                innerVideoSwitcher = VideoSwitcherImpl(rtcEngine)
-            }
-            return innerVideoSwitcher!!
-        }
+    fun cleanCache() {
+        VideoSwitcher.getImplInstance(rtcEngine).unloadConnections()
+    }
+
 
     fun destroy() {
-        innerVideoSwitcher?.let {
-            it.unloadConnections()
-            innerVideoSwitcher = null
-        }
         innerRtcEngine?.let {
-            workingExecutor.execute { RtcEngine.destroy() }
+            workingExecutor.execute { RtcEngineEx.destroy() }
             innerRtcEngine = null
         }
         innerBeautyProcessor?.let { processor ->

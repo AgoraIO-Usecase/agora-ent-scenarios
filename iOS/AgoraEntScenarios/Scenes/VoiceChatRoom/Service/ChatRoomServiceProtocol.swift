@@ -24,11 +24,11 @@ public enum updateRoomState {
     func errorDesc() -> String {
         switch self {
         case .removed:
-            return "You were kicked off from the room"
+            return "voice_you_were_kicked_off_from_the_room"
         case .destroyed:
-            return "This room has been dissolved by the host"
+            return "voice_this_room_has_been_dissolved_by_the_host"
         case .offLined:
-            return "you were offline!"
+            return "voice_you_were_offline"
         default:
             return ""
         }
@@ -288,4 +288,20 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// Description 更新机器人音量
     /// - Parameter value: 音量值
     func updateRobotVolume(value: Int,completion: @escaping (Error?) -> Void)
+    
+    /// Description 获取房间背景音乐
+    /// - Parameter roomId:房间id
+    /// - Parameter completion:回调
+    func fetchRoomBGM(roomId: String?, completion: @escaping (_ songName: String?, _ singerName: String?, _ isPlaying: Bool) -> Void)
+    
+    /// Description 更新房间背景音乐
+    /// - Parameter songName:歌名
+    /// - Parameter singerName:歌手
+    /// - Parameter isOrigin: 是否在播放
+    func updateRoomBGM(songName: String?, singerName: String?, isOrigin: Bool)
+    
+    /// Description 监听房间背景音乐变化
+    /// - Parameter roomId:房间id
+    /// - Parameter completion:回调
+    func subscribeRoomBGMChange(roomId: String?, completion: @escaping (_ songName: String?, _ singerName: String?, _ isPlaying: Bool) -> Void)
 }

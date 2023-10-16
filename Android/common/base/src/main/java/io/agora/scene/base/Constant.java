@@ -30,6 +30,9 @@ public class Constant {
     // 当前观众设备等级（高、中、低）
     public static final String CURR_AUDIENCE_DEVICE_LEVEL = "currAudienceDeviceLevel";
 
+    // 当前主播设置网络登记（好、普通）
+    public static final String CURR_BROADCAST_NETWORK_LEVEL = "currBroadcastNetworkLevel";
+
     // 观众看播设置
     public static final String CURR_AUDIENCE_PLAY_SETTING = "currAudiencePlaySetting";
 
@@ -38,6 +41,9 @@ public class Constant {
 
     // xxx
     public static final String CURR_BROADCAST_SETTING = "currBroadcastSetting";
+
+    // xxx
+    public static final String CURR_LOW_STREAM_SETTING = "currLowStreamSetting";
 
     // xxx
     public static final String CURR_AUDIENCE_SETTING = "currAudienceSetting";

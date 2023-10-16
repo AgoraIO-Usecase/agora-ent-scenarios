@@ -436,11 +436,11 @@ class BeautyProcessor : IBeautyProcessor {
     override fun reset() {
         mFaceDetector.reset()
         glTextureBufferQueue.reset()
-        if (beautyOutTextureId == -1) {
+        if (beautyOutTextureId != -1) {
             GLES20.glDeleteTextures(1, intArrayOf(beautyOutTextureId), 0)
             beautyOutTextureId = -1
         }
-        if (finalOutTextureId == -1) {
+        if (finalOutTextureId != -1) {
             GLES20.glDeleteTextures(1, intArrayOf(finalOutTextureId), 0)
             finalOutTextureId = -1
         }

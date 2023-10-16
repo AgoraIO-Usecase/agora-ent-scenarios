@@ -1,0 +1,104 @@
+package io.agora.scene.ktv.singbattle.live.fragment.dialog;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import io.agora.scene.base.component.BaseRecyclerViewAdapter;
+import io.agora.scene.base.component.BaseViewBindingFragment;
+import io.agora.scene.base.component.OnItemClickListener;
+import io.agora.scene.ktv.singbattle.R;
+import io.agora.scene.ktv.singbattle.bean.EffectVoiceBean;
+import io.agora.scene.ktv.singbattle.databinding.FragmentEffectVoice2Binding;
+import io.agora.scene.ktv.singbattle.databinding.FragmentEffectVoiceBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvItemEffectvoiceBinding;
+import io.agora.scene.ktv.singbattle.live.RoomLivingViewModel;
+import io.agora.scene.ktv.singbattle.live.holder.EffectVoiceHolder;
+import io.agora.scene.ktv.singbattle.live.holder.MVHolder;
+import io.agora.scene.ktv.singbattle.widget.MusicSettingBean;
+import io.agora.scene.widget.DividerDecoration;
+
+/**
+ * ---------------------------------------------------------------------------------------------
+ * 功能描述:
+ * ---------------------------------------------------------------------------------------------
+ * 时　　间: 2023/3/1
+ * ---------------------------------------------------------------------------------------------
+ * 代码创建: Leo
+ * ---------------------------------------------------------------------------------------------
+ * 代码备注:
+ * ---------------------------------------------------------------------------------------------
+ **/
+public class EffectVoiceFragment2 extends BaseViewBindingFragment<FragmentEffectVoice2Binding> implements OnItemClickListener<EffectVoiceBean> {
+
+    // TAG
+    public static final String TAG = EffectVoiceFragment2.class.getSimpleName();
+    // xxx
+    private final MusicSettingBean mSetting;
+    // RecyclerViewAdapter
+    private BaseRecyclerViewAdapter<KtvItemEffectvoiceBinding, EffectVoiceBean, EffectVoiceHolder> adapter;
+
+    public EffectVoiceFragment2(MusicSettingBean mSetting) {
+        this.mSetting = mSetting;
+    }
+
+    @Override
+    protected FragmentEffectVoice2Binding getViewBinding(LayoutInflater inflater, ViewGroup container) {
+        return FragmentEffectVoice2Binding.inflate(inflater);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        List<EffectVoiceBean> list = new ArrayList<>();
+
+
+        list.add(new EffectVoiceBean(0, R.mipmap.bg_sound_mode_1, "原声"));
+        list.add(new EffectVoiceBean(1, R.mipmap.bg_sound_mode_2, "KTV"));
+        list.add(new EffectVoiceBean(2, R.mipmap.bg_sound_mode_3, "演唱会"));
+        list.add(new EffectVoiceBean(3, R.mipmap.bg_sound_mode_4, "录音棚"));
+        list.add(new EffectVoiceBean(4, R.mipmap.bg_sound_mode_1, "留声机"));
+        list.add(new EffectVoiceBean(5, R.mipmap.bg_sound_mode_2, "空旷"));
+        list.add(new EffectVoiceBean(6, R.mipmap.bg_sound_mode_3, "空灵"));
+        list.add(new EffectVoiceBean(7, R.mipmap.bg_sound_mode_4, "流行"));
+        list.add(new EffectVoiceBean(8, R.mipmap.bg_sound_mode_1, "R&B"));
+        for (EffectVoiceBean item : list) {
+            item.setSelect(mSetting.getEffect() == item.getId());
+        }
+
+        adapter = new BaseRecyclerViewAdapter<>(list, this, EffectVoiceHolder.class);
+        getBinding().mRecyclerView.setAdapter(adapter);
+
+        getBinding().mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+
+        getBinding().mRecyclerView.addItemDecoration(new DividerDecoration(3));
+
+        getBinding().mRecyclerView.setItemAnimator(null);
+
+
+    }
+
+    @Override
+    public void onItemClick(@NonNull EffectVoiceBean data, View view, int position, long viewType) {
+        OnItemClickListener.super.onItemClick(data, view, position, viewType);
+        Log.e("liu0223", "onItemClick    " + position);
+
+        for (int i = 0; i < adapter.dataList.size(); i++) {
+            adapter.dataList.get(i).setSelect(i == position);
+            adapter.notifyItemChanged(i);
+        }
+        mSetting.setEffect(data.getId());
+    }
+
+
+}

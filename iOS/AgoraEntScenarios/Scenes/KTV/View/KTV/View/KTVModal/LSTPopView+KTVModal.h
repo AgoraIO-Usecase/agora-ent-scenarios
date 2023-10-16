@@ -8,14 +8,18 @@
 #import <LSTPopView/LSTPopView.h>
 #import "VLPopMoreSelView.h"
 #import "VLPopSelBgView.h"
-#import "VLRoomSeatModel.h"
 #import "VLDropOnLineView.h"
 #import "VLAudioEffectPicker.h"
 #import "VLBadNetWorkView.h"
 #import "VLPopSongList.h"
 #import "VLEffectView.h"
 #import "VLKTVSettingView.h"
-
+#import "VLVoiceShowView.h"
+#import "VLVoicePerShowView.h"
+#import "VLVoiceShowView.h"
+#import "VLVoicePerShowView.h"
+#import "VLEarSettingView.h"
+#import "VLDebugView.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LSTPopView (KTVModal)
@@ -63,6 +67,40 @@ NS_ASSUME_NONNULL_BEGIN
 + (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
                                settingView:(VLKTVSettingView*)settingView
                                withDelegate:(id<VLKTVSettingViewDelegate>)delegate;
+
+//弹出人声突出
++ (LSTPopView*)popVoiceShowViewWithParentView:(UIView*)parentView
+                                         showView:(VLVoiceShowView*)showView
+                                   imgSource:(NSArray *)imgSource
+                                    nameSource:(NSArray *)nameSource
+                                  selectUserNo:(NSString *)selectUserNo
+                                  userNoArray:(NSArray *)userNoArray
+                                 UIUpdateAble:(BOOL)UIUpdateAble
+                                      withDelegate:(id<VLVoiceShowViewDelegate>)delegate;
+
+
++ (LSTPopView*)popVoicePerViewWithParentView:(UIView*)parentView
+                              isProfessional: (BOOL) isProfessional
+                                    aecState:(BOOL)state
+                                    aecLevel:(NSInteger)level
+                                     isDelay: (BOOL) isDelay
+                                    volGrade:(NSInteger)volGrade
+                                       grade:(NSInteger)grade
+                                    isRoomOwner: (BOOL) isRoomOwner
+                                         perView:(VLVoicePerShowView*)perView
+                                      withDelegate:(id<VLVoicePerShowViewDelegate>)delegate;
+
+//弹出耳返视图
++ (LSTPopView*)popEarSettingViewWithParentView:(UIView*)parentView
+                                   isEarOn:(BOOL)isEarOn
+                                           vol:(CGFloat)vol
+                                  withDelegate:(id<VLEarSettingViewViewDelegate>)delegate;
+
+//弹出DebugView
++ (LSTPopView*)popDebugViewWithParentView:(UIView*)parentView
+                                   isDebugMode:(BOOL)isDebugMode
+                                  withDelegate:(id<VLDebugViewDelegate>)delegate;
+
 @end
 
 NS_ASSUME_NONNULL_END

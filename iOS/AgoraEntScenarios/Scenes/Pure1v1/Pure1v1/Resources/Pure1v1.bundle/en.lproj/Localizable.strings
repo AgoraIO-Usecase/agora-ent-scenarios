@@ -1,0 +1,48 @@
+/* 
+  Localizable.strings
+  AgoraScene_iOS
+
+  Created by 朱继超 on 2022/9/19.
+  
+*/
+
+"authorized_microphone_fail"="麦克风权限未设置,请设置麦克风权限";
+"authorized_camera_fail"="摄像头权限未设置,请设置摄像头权限";
+"authorized_title"="提示";
+"authorized_ok"="确定";
+"authorized_cancel"="取消";
+
+"user_list_title"="1v1私密房";
+"user_list_waitting"="等待其他用户";
+"user_list_nodata_tips"="欢迎来到声网1V1私密房，目前暂无其它用户入场，你可邀约朋友入场体验。";
+"user_list_refresh_tips"="用户列表已刷新";
+"user_list_cell_local_user"="本人信息";
+"user_list_cell_remote_user"="对端信息";
+"call_not_init"="网络异常";
+"call_state_caller_waitting"="等待对方接受";
+"call_state_callee_waitting"="邀请你私密视频连线";
+"call_state_connecting"="连接中";
+"call_title_accept"="立即接受";
+"call_title_reject"="拒绝";
+"call_usage_tips"=" 本产品仅用于功能体验，单次直播时长不超过20mins";
+"call_toast_hangup"="对方结束连线";
+"call_toast_reject"="对方已拒绝";
+
+"call_content_inspect_warning"="监测到当前内容存在违规行为";
+
+"setting_statistic" = "实时数据";
+"show_statistic_bitrate" = "码率";
+"show_statistic_delay" = "延迟";
+"show_statistic_receive_title" = "接收";
+"show_statistic_send_title" = "发送";
+"show_statistic_receive_resolution" = "接收分辨率";
+"show_statistic_up_net_speech" = "上行网络";
+"show_setting_advance_framerate" = "帧率";
+"show_statistic_receive_fps" = "接收帧率";
+"show_statistic_down_loss_package" = "下行丢包率";
+"show_statistic_up_loss_package" = "上行丢包率";
+"show_statistic_up_bitrate" = "发送码率";
+"show_statistic_encode_resolution" = "编码分辨率";
+"show_advance_setting_FPS_title" = "编码帧率";
+"show_statistic_loss_package" = "丢包率";
+"show_statistic_down_net_speech" = "下行网络";

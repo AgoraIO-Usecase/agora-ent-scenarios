@@ -26,7 +26,7 @@ public class MVFragment extends BaseViewBindingFragment<FragmentDialogMvBinding>
     private int index;
     public static final List<Integer> exampleBackgrounds = new ArrayList<>(
             Arrays.asList(
-                    R.mipmap.mvbg4,
+                    R.mipmap.mvbg0,
                     R.mipmap.mvbg8,
                     R.mipmap.mvbg2,
                     R.mipmap.mvbg7,

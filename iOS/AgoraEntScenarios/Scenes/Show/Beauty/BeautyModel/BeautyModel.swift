@@ -37,7 +37,7 @@ class BeautyModel: BeautyBaseModel {
     static func createBeautyData() -> [BeautyModel] {
         var dataArray = [BeautyModel]()
         var model = BeautyModel()
-        model.name = "无"
+        model.name = "show_beauty_item_none".show_localized
         model.icon = "show_beauty_none"
         dataArray.append(model)
         
@@ -51,7 +51,7 @@ class BeautyModel: BeautyBaseModel {
             model.key = "103"
             model.value = 0.55
         }
-        model.name = "磨皮".show_localized
+        model.name = "show_beauty_item_beauty_smooth".show_localized
         model.icon = "meiyan_icon_mopi"
         model.isSelected = true
         dataArray.append(model)
@@ -66,7 +66,7 @@ class BeautyModel: BeautyBaseModel {
             model.key = "101"
             model.value = 0.2
         }
-        model.name = "美白".show_localized
+        model.name = "show_beauty_item_beauty_whiten".show_localized
         model.icon = "meiyan_icon_meibai"
         dataArray.append(model)
         
@@ -81,7 +81,7 @@ class BeautyModel: BeautyBaseModel {
             model.key = "201"
             model.value = 0.4
         }
-        model.name = "瘦脸".show_localized
+        model.name = "show_beauty_item_beauty_overall".show_localized
         model.icon = "meiyan_icon_shoulian"
         dataArray.append(model)
         
@@ -96,7 +96,7 @@ class BeautyModel: BeautyBaseModel {
             model.key = "318"
             model.value = 0
         }
-        model.name = "瘦颧骨".show_localized
+        model.name = "show_beauty_item_beauty_cheekbone".show_localized
         model.icon = "meiyan_icon_shouquangu"
         dataArray.append(model)
         
@@ -111,7 +111,7 @@ class BeautyModel: BeautyBaseModel {
             model.key = "202"
             model.value = 0.3
         }
-        model.name = "大眼".show_localized
+        model.name = "show_beauty_item_beauty_eye".show_localized
         model.icon = "meiyan_icon_dayan"
         dataArray.append(model)
         
@@ -126,7 +126,7 @@ class BeautyModel: BeautyBaseModel {
             model.key = "306"
             model.value = 0
         }
-        model.name = "瘦鼻".show_localized
+        model.name = "show_beauty_item_beauty_nose".show_localized
         model.icon = "meiyan_icon_shoubi"
         dataArray.append(model)
         
@@ -140,7 +140,7 @@ class BeautyModel: BeautyBaseModel {
             model.key = "303"
             model.value = 0
         }
-        model.name = "下巴".show_localized
+        model.name = "show_beauty_item_beauty_chin".show_localized
         model.icon = "meiyan_icon_xiaba"
         model.enableNegative = true
         dataArray.append(model)
@@ -156,7 +156,7 @@ class BeautyModel: BeautyBaseModel {
             model.key = "320"
             model.value = 0
         }
-        model.name = "下颌骨".show_localized
+        model.name = "show_beauty_item_beauty_jawbone".show_localized
         model.icon = "meiyan_icon_xiahegu"
         dataArray.append(model)
         
@@ -170,7 +170,7 @@ class BeautyModel: BeautyBaseModel {
             model.key = "304"
             model.value = 0
         }
-        model.name = "额头".show_localized
+        model.name = "show_beauty_item_beauty_forehead".show_localized
         model.icon = "meiyan_icon_etou"
         model.enableNegative = true
         dataArray.append(model)
@@ -185,7 +185,7 @@ class BeautyModel: BeautyBaseModel {
             model.key = "309"
             model.value = 0
         }
-        model.name = "嘴型".show_localized
+        model.name = "show_beauty_item_beauty_mouth".show_localized
         model.icon = "meiyan_icon_zuixing"
         model.enableNegative = true
         dataArray.append(model)
@@ -200,7 +200,7 @@ class BeautyModel: BeautyBaseModel {
             model.key = "317"
             model.value = 0
         }
-        model.name = "美牙".show_localized
+        model.name = "show_beauty_item_beauty_teeth".show_localized
         model.icon = "meiyan_icon_meiya"
         dataArray.append(model)
         
@@ -210,7 +210,7 @@ class BeautyModel: BeautyBaseModel {
     static func createStyleData() -> [BeautyModel] {
         var dataArray = [BeautyModel]()
         var model = BeautyModel()
-        model.name = "无"
+        model.name = "show_beauty_item_none".show_localized
         model.icon = "show_beauty_none"
         model.isSelected = true
         dataArray.append(model)
@@ -220,7 +220,7 @@ class BeautyModel: BeautyBaseModel {
             model.path = "/style_makeup/baixi"
             model.key = "Makeup_ALL"
             model.value = 0.6
-            model.name = "白皙".show_localized
+            model.name = "show_beauty_item_effect_baixi".show_localized
             model.icon = "meiyan_fgz_baixi"
             dataArray.append(model)
             
@@ -228,7 +228,7 @@ class BeautyModel: BeautyBaseModel {
             model.path = "/style_makeup/tianmei"
             model.key = "Makeup_ALL"
             model.value = 0.6
-            model.name = "甜美".show_localized
+            model.name = "show_beauty_item_effect_tianmei".show_localized
             model.icon = "meiyan_fgz_tianmei"
             dataArray.append(model)
             
@@ -236,7 +236,7 @@ class BeautyModel: BeautyBaseModel {
             model.path = "/style_makeup/cwei"
             model.key = "Makeup_ALL"
             model.value = 0.6
-            model.name = "C位".show_localized
+            model.name = "show_beauty_item_effect_cwei".show_localized
             model.icon = "meiyan_fgz_cwei"
             dataArray.append(model)
             
@@ -244,7 +244,7 @@ class BeautyModel: BeautyBaseModel {
             model.path = "/style_makeup/yuanqi"
             model.key = "Makeup_ALL"
             model.value = 0.6
-            model.name = "元气".show_localized
+            model.name = "show_beauty_item_effect_yuanqi".show_localized
             model.icon = "meiyan_fgz_yuanqi"
             dataArray.append(model)
             
@@ -253,7 +253,7 @@ class BeautyModel: BeautyBaseModel {
             model.path = "qise.zip"
             model.key = "Makeup_ALL"
             model.value = 0.5
-            model.name = "C位".show_localized
+            model.name = "show_beauty_item_effect_cwei".show_localized
             model.icon = "meiyan_fgz_cwei"
             dataArray.append(model)
             
@@ -261,7 +261,7 @@ class BeautyModel: BeautyBaseModel {
             model.key = "Makeup_ALL"
             model.path = "wanneng.zip"
             model.value = 0.5
-            model.name = "元气".show_localized
+            model.name = "show_beauty_item_effect_yuanqi".show_localized
             model.icon = "meiyan_fgz_yuanqi"
             dataArray.append(model)
         }
@@ -273,7 +273,7 @@ class BeautyModel: BeautyBaseModel {
         var dataArray = [BeautyModel]()
         if beautyType == .byte {
             var model = BeautyModel()
-            model.name = "无"
+            model.name = "show_beauty_item_none".show_localized
             model.icon = "show_beauty_none"
             model.isSelected = true
             dataArray.append(model)
@@ -281,70 +281,70 @@ class BeautyModel: BeautyBaseModel {
             model = BeautyModel()
             model.path = "Filter_02_14"
             model.value = 0.4
-            model.name = "奶油".show_localized
+            model.name = "show_beauty_item_filter_cream".show_localized
             model.icon = "meiyan_lj_naiyou"
             dataArray.append(model)
             
             model = BeautyModel()
             model.path = "Filter_07_06"
             model.value = 0.4
-            model.name = "马卡龙".show_localized
+            model.name = "show_beauty_item_filter_mokalong".show_localized
             model.icon = "meiyan_lj_makalong"
             dataArray.append(model)
             
             model = BeautyModel()
             model.path = "Filter_03_20"
             model.value = 0.4
-            model.name = "氧气".show_localized
+            model.name = "show_beauty_item_filter_oxgen".show_localized
             model.icon = "meiyan_lj_yangqi"
             dataArray.append(model)
             
             model = BeautyModel()
             model.path = "Filter_11_09"
             model.value = 0.4
-            model.name = "物语".show_localized
+            model.name = "show_beauty_item_filter_wuyu".show_localized
             model.icon = "meiyan_lj_wuyu"
             dataArray.append(model)
             
             model = BeautyModel()
             model.path = "Filter_31_Po9"
             model.value = 0.4
-            model.name = "海边人像".show_localized
+            model.name = "show_beauty_item_filter_po9".show_localized
             model.icon = "meiyan_lj_haibian"
             dataArray.append(model)
             
             model = BeautyModel()
             model.path = "Filter_05_10"
             model.value = 0.4
-            model.name = "洛丽塔".show_localized
+            model.name = "show_beauty_item_filter_lolita".show_localized
             model.icon = "meiyan_lj_luolita"
             dataArray.append(model)
             
             model = BeautyModel()
             model.path = "Filter_06_03"
             model.value = 0.4
-            model.name = "蜜桃".show_localized
+            model.name = "show_beauty_item_filter_mitao".show_localized
             model.icon = "meiyan_lj_mitao"
             dataArray.append(model)
             
             model = BeautyModel()
             model.path = "Filter_09_19"
             model.value = 0.4
-            model.name = "樱花".show_localized
+            model.name = "show_beauty_item_filter_yinhua".show_localized
             model.icon = "meiyan_lj_yinghua"
             dataArray.append(model)
             
             model = BeautyModel()
             model.path = "Filter_12_08"
             model.value = 0.4
-            model.name = "北海道".show_localized
+            model.name = "show_beauty_item_filter_beihaidao".show_localized
             model.icon = "meiyan_lj_beihaidao"
             dataArray.append(model)
             
             model = BeautyModel()
             model.path = "Filter_45_S3"
             model.value = 0.4
-            model.name = "旅途".show_localized
+            model.name = "show_beauty_item_filter_s3".show_localized
             model.icon = "meiyan_lj_lvtu"
             dataArray.append(model)
         }
@@ -355,33 +355,33 @@ class BeautyModel: BeautyBaseModel {
         var dataArray = [BeautyModel]()
         if beautyType == .byte {
             var model = BeautyModel()
-            model.name = "无"
+            model.name = "show_beauty_item_none".show_localized
             model.icon = "show_beauty_none"
             model.isSelected = true
             dataArray.append(model)
             
             model = BeautyModel()
             model.path = "huahua"
-            model.name = "花花".show_localized
+            model.name = "show_beauty_item_sticker_huahua".show_localized
             model.icon = "meiyan_lj_naiyou"
             dataArray.append(model)
             
             model = BeautyModel()
             model.path = "wochaotian"
-            model.name = "我超甜".show_localized
+            model.name = "show_beauty_item_sticker_huahua".show_localized
             model.icon = "meiyan_lj_makalong"
             dataArray.append(model)
             
         } else if beautyType == .sense {
             var model = BeautyModel()
-            model.name = "无"
+            model.name = "show_beauty_item_none".show_localized
             model.icon = "show_beauty_none"
             model.isSelected = true
             dataArray.append(model)
             
             model = BeautyModel()
             model.path = "lianxingface.zip"
-            model.name = "花花".show_localized
+            model.name = "show_beauty_item_sticker_huahua".show_localized
             model.icon = "meiyan_lj_naiyou"
             dataArray.append(model)
         }
@@ -392,13 +392,13 @@ class BeautyModel: BeautyBaseModel {
         var dataArray = [BeautyModel]()
         if beautyType == .sense {
             var model = BeautyModel()
-            model.name = "无"
+            model.name = "show_beauty_item_none".show_localized
             model.icon = "show_beauty_none"
             model.isSelected = true
             dataArray.append(model)
             
             model = BeautyModel()
-            model.name = "对比度".show_localized
+            model.name = "show_beauty_item_adjust_contrast".show_localized
             model.icon = "show_beauty_ic_adjust_contrast"
             model.path = ""
             model.key = "601"
@@ -406,7 +406,7 @@ class BeautyModel: BeautyBaseModel {
             dataArray.append(model)
             
             model = BeautyModel()
-            model.name = "饱和度".show_localized
+            model.name = "show_beauty_item_adjust_saturation".show_localized
             model.icon = "show_beauty_ic_adjust_saturation"
             model.path = ""
             model.key = "602"
@@ -414,7 +414,7 @@ class BeautyModel: BeautyBaseModel {
             dataArray.append(model)
             
             model = BeautyModel()
-            model.name = "锐化".show_localized
+            model.name = "show_beauty_item_adjust_sharpen".show_localized
             model.icon = "show_beauty_ic_adjust_sharp"
             model.path = ""
             model.key = "603"
@@ -422,7 +422,7 @@ class BeautyModel: BeautyBaseModel {
             dataArray.append(model)
             
             model = BeautyModel()
-            model.name = "清晰度".show_localized
+            model.name = "show_beauty_item_adjust_clarity".show_localized
             model.icon = "show_beauty_ic_adjust_clear"
             model.path = ""
             model.key = "604"
@@ -435,7 +435,7 @@ class BeautyModel: BeautyBaseModel {
     static func createBackgroundData() -> [BeautyModel] {
         var dataArray = [BeautyModel]()
         var model = BeautyModel()
-        model.name = "无"
+        model.name = "show_beauty_item_none".show_localized
         model.icon = "show_beauty_none"
         model.isSelected = true
         dataArray.append(model)
@@ -444,14 +444,14 @@ class BeautyModel: BeautyBaseModel {
         model.key = "blur"
         model.path = "xuhua"
         model.value = 0.5
-        model.name = "虚化".show_localized
+        model.name = "show_beauty_item_beauty_xuhua".show_localized
         model.icon = "show_bg_blur"
         dataArray.append(model)
         
         model = BeautyModel()
         model.key = "show_live_mritual_bg"
         model.path = "show_live_mritual_bg"
-        model.name = "蜜桃".show_localized
+        model.name = "show_beauty_item_filter_mitao".show_localized
         model.icon = "show_bg_peach"
         model.value = 0.5
         dataArray.append(model)

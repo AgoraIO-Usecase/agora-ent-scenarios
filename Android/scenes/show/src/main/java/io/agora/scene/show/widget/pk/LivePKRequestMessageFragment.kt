@@ -85,7 +85,9 @@ class LivePKRequestMessageFragment : BaseFragment() {
         if (status == ShowInteractionStatus.pking.value) {
             binding.textPking.isVisible = true
             binding.iBtnStopPK.isVisible = true
-            binding.textPking.text = getString(R.string.show_pk_to, userName)
+            if (isAdded) {
+                binding.textPking.text = getString(R.string.show_pk_to, userName)
+            }
         } else if (status == null) {
             binding.iBtnStopPK.isVisible = false
             binding.textPking.isVisible = false

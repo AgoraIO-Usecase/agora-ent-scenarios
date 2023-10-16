@@ -94,6 +94,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
     
     func onReceiveSeatRequest(roomId: String, applicant: SAApply) {
+        guard isOwner else { return }
         self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: isOwner)
     }
 
@@ -130,7 +131,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
         self.roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
 //        self.roomInfo?.room?.member_list?.append(user)
 //        AppContext.saTmpServiceImp().userList = self.roomInfo?.room?.member_list ?? []
-        self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
+        self.convertShowText(userName: user.name ?? "", content: "spatial_voice_joined".spatial_localized(), joined: true)
     }
     
     func onRobotVolumeUpdated(roomId: String, volume: String) {
@@ -248,10 +249,17 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
             if let first = mics.first {
                 // 查询自己有没有在麦上
                 let seatUser = AppContext.saTmpServiceImp().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
-                let status = ((first.member?.mic_status == .mute && first.member?.uid == VLUserCenter.user.id) || (seatUser != nil && seatUser?.status != -1)) ? 1 : (first.status == 3 ? -1 : first.status)
+                var status = first.status
+                if seatUser == nil, status == 2 || status == 3 || status == 4 {
+                    status = -1
+                } else if (first.member?.mic_status == .mute && first.member?.uid == VLUserCenter.user.id) || (seatUser != nil && seatUser?.status != -1) {
+                    status = 1
+                } else if seatUser != nil {
+                    status = seatUser?.status ?? -1
+                }
                 let mic_index = first.mic_index
                 //刷新底部✋🏻状态
-                if !isOwner && first.mic_index != 0  {
+                if !isOwner && first.mic_index != 0 {
                     refreshHandsUp(status: status)
                 }
                 //将userList中的上麦用户做标记，便于后续过滤
@@ -295,7 +303,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                 if let host: SAUser = roomInfo?.room?.owner {
                     if host.uid == fromId && status == -1 {
                         AppContext.saTmpServiceImp().userList.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
-                        view.makeToast("Removed Stage".localized())
+                        view.makeToast("spatial_voice_removed_stage".spatial_localized())
                     }  else {
                         rtckit.muteLocalAudioStream(mute: seatUser == nil)
                         self.refreshApplicants(chat_uid: fromId)
@@ -341,9 +349,6 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                                               body: AgoraChatTextMessageBody(text: text),
                                               ext: ["userName": SAUserInfo.shared.user?.name ?? ""]))
         SAIMManager.shared?.sendMessage(roomId: roomId, text: text, ext: ["userName": userName]) { message, error in
-            if error != nil,error?.code == .moderationFailed {
-                self.view.makeToast("Content prohibited".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
-            }
         }
     }
 

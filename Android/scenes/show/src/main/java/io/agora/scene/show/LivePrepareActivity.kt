@@ -2,6 +2,7 @@ package io.agora.scene.show
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.res.AssetManager
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
@@ -17,9 +18,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import io.agora.beautyapi.sensetime.*
 import io.agora.rtc2.Constants
+import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
@@ -63,7 +66,9 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         binding.tvRoomId.text = getString(R.string.show_room_id, mRoomId)
         binding.etRoomName.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                mInputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    mInputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
+                }
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
@@ -97,15 +102,25 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         }
         mBeautyProcessor.initialize(
             rtcEngine = mRtcEngine,
-            captureMode = CaptureMode.Custom,
+            captureMode = CaptureMode.Agora,
             statsEnable = true,
             eventCallback = object : IEventCallback {
                 override fun onBeautyStats(stats: BeautyStats) {
-                    ShowLogger.d("hugo", "BeautyStats stats = $stats")
                 }
             }
         )
-        mBeautyProcessor.setBeautyEnable(true)
+        var licenseExists = false
+        try { // 美颜license是否存在
+            this.assets.open("license/SenseME.lic").use { inputStream ->
+                licenseExists = true
+            }
+        } catch (_: Exception) {}
+        // 低端机 或 无证书则关闭美颜
+        if (mRtcEngine.queryDeviceScore() >= 75 && licenseExists) {
+            mBeautyProcessor.setBeautyEnable(true)
+        } else {
+            mBeautyProcessor.setBeautyEnable(false)
+        }
         mBeautyProcessor.getSenseTimeBeautyAPI().setupLocalVideo(SurfaceView(this).apply {
             binding.flVideoContainer.addView(this)
         }, Constants.RENDER_MODE_HIDDEN)
@@ -113,6 +128,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         toggleVideoRun = Runnable {
             mBeautyProcessor.reset()
             initRtcEngine()
+            //getDeviceScoreAndUpdateVideoProfile()
             showPresetDialog()
         }
         requestCameraPermission(true)
@@ -133,7 +149,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         }
     }
 
-    private fun showPresetDialog() = PresetDialog(this).show()
+    private fun showPresetDialog() = PresetDialog(this, mRtcEngine.queryDeviceScore(), RtcConnection(mRoomId, UserManager.getInstance().user.id.toInt())).show()
     private fun showDebugModeDialog() = DebugSettingDialog(this).show()
 
     override fun onResume() {

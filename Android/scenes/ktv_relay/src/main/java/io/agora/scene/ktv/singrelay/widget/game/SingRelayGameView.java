@@ -16,7 +16,7 @@ import java.util.List;
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.ktv.singrelay.R;
-import io.agora.scene.ktv.singrelay.databinding.KtvLayoutGameViewBinding;
+import io.agora.scene.ktv.singrelay.databinding.KtvSingrelayLayoutGameViewBinding;
 import io.agora.scene.ktv.singrelay.widget.lrcView.LrcControlView;
 import io.agora.scene.ktv.singrelay.widget.rankList.RankItem;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
@@ -27,7 +27,7 @@ import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 public class SingRelayGameView extends FrameLayout {
 
     private final String TAG = "SingRelayGameView_LOG";
-    protected KtvLayoutGameViewBinding mBinding;
+    protected KtvSingrelayLayoutGameViewBinding mBinding;
     private boolean isRoomOwner = false;
     private OnSingRelayGameEventListener mSingRelayGameEventListener;
     private int partNum = 1;
@@ -52,7 +52,7 @@ public class SingRelayGameView extends FrameLayout {
     }
 
     private void init(Context context) {
-        mBinding = KtvLayoutGameViewBinding.inflate(LayoutInflater.from(context), this, true);
+        mBinding = KtvSingrelayLayoutGameViewBinding.inflate(LayoutInflater.from(context), this, true);
         initListener();
     }
 

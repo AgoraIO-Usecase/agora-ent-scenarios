@@ -20,7 +20,7 @@
 #import "MenuUtils.h"
 #import <Photos/Photos.h>
 #import "AgoraEntScenarios-Swift.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import Masonry;
 @import LEEAlert;
 
@@ -41,7 +41,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setBackgroundImage:@"home_bg_image"];
-    [self setNaviTitleName:AGLocalizedString(@"声网")];
+    [self setNaviTitleName:AGLocalizedString(@"agora")];
     [self setUpUI];
 }
 
@@ -133,9 +133,9 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     __block UITextField *TF = nil;
 
     [LEEAlert alert].config
-    .LeeTitle(AGLocalizedString(@"修改昵称"))
+    .LeeTitle(AGLocalizedString(@"edit_name"))
     .LeeAddTextField(^(UITextField *textField) {
-        textField.placeholder = AGLocalizedString(@"请输入昵称");
+        textField.placeholder = AGLocalizedString(@"input_edit_name");
         textField.textColor = UIColorBlack;
         textField.clearButtonMode=UITextFieldViewModeWhileEditing;
         textField.font = UIFontMake(15);
@@ -147,7 +147,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     })
     .LeeAddAction(^(LEEAction *action) {
         action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"Cancel");
+        action.title = AGLocalizedString(@"cancel");
         action.titleColor = UIColorMakeWithHex(@"#000000");
         action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
         action.cornerRadius = 20;
@@ -162,7 +162,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     .LeeAddAction(^(LEEAction *action) {
         VL(weakSelf);
         action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"Confirm");
+        action.title = AGLocalizedString(@"confirm");
         action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
         action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
         action.cornerRadius = 20;
@@ -193,15 +193,15 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 }
 
 - (void)showAlert {
-    UIAlertController *vc = [UIAlertController alertControllerWithTitle:AGLocalizedString(@"声动互娱”想访问您的相册")
-                                                                message:AGLocalizedString(@"声网需要您开启相册访问功能，读取照片上传头像")
+    UIAlertController *vc = [UIAlertController alertControllerWithTitle:AGLocalizedString(@"app_need_request_photo")
+                                                                message:AGLocalizedString(@"app_need_request_photo and upload avatar")
                                                          preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action1 = [UIAlertAction actionWithTitle:AGLocalizedString(@"不允许")
+    UIAlertAction *action1 = [UIAlertAction actionWithTitle:AGLocalizedString(@"not_allowed")
                                                       style:UIAlertActionStyleDefault
                                                     handler:^(UIAlertAction * _Nonnull action) {
         [self setLibraryAccess:NO];
     }];
-    UIAlertAction *action2 = [UIAlertAction actionWithTitle:AGLocalizedString(@"好")
+    UIAlertAction *action2 = [UIAlertAction actionWithTitle:AGLocalizedString(@"requset_ok")
                                                       style:UIAlertActionStyleDefault
                                                     handler:^(UIAlertAction * _Nonnull action) {
         [self setLibraryAccess:YES];
@@ -219,28 +219,28 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     [LEEAlert actionsheet].config
     .LeeAddAction(^(LEEAction * _Nonnull action) {
         action.type = LEEActionTypeDefault;
-        action.title = AGLocalizedString(@"上传头像");
+        action.title = AGLocalizedString(@"app_upload_avatar");
         action.height = 20;
         action.titleColor = [UIColor whiteColor];
         action.font = VLUIFontMake(14);
     })
     .LeeAddAction(^(LEEAction * _Nonnull action) {
         action.type = LEEActionTypeDefault;
-        action.title = AGLocalizedString(@"拍照上传");
+        action.title = AGLocalizedString(@"take_photo_and_upload");
         action.clickBlock = ^{
             [weakself requestAuthorizationForCamera];
         };
     })
     .LeeAddAction(^(LEEAction * _Nonnull action) {
         action.type = LEEActionTypeDefault;
-        action.title = AGLocalizedString(@"本地相册上传");
+        action.title = AGLocalizedString(@"local_upload");
         action.clickBlock = ^{
             [weakself requestAuthorizationForPhotoLibrary];
         };
     })
     .LeeAddAction(^(LEEAction * _Nonnull action) {
         action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"取消");
+        action.title = AGLocalizedString(@"cancel");
         action.clickBlock = ^{
         };
     })
@@ -285,11 +285,11 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 
 - (void)presentviewcontrollerWithSourceType:(UIImagePickerControllerSourceType)sourceType {
     if (sourceType == UIImagePickerControllerSourceTypePhotoLibrary && ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
-        [VLToast toast:AGLocalizedString(@"相册不可用")];
+        [VLToast toast:AGLocalizedString(@"comm_permission_leak_sdcard_title")];
         return ;
     }
     if (sourceType == UIImagePickerControllerSourceTypeCamera && ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        [VLToast toast:AGLocalizedString(@"相机不可用")];
+        [VLToast toast:AGLocalizedString(@"comm_permission_leak_camera_title")];
         return ;
     }
     UIImagePickerController *controller = [[UIImagePickerController alloc]init];
@@ -350,7 +350,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     
     [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
         if (response.code == 0) {
-            [VLToast toast:AGLocalizedString(@"修改成功")];
+            [VLToast toast:AGLocalizedString(@"app_edit_success")];
             [self.mineView refreseAvatar:image];
             VLUserCenter.user.headUrl = iconUrl;
             [[VLUserCenter center] storeUserInfo:VLUserCenter.user];
@@ -369,7 +369,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     };
     [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
         if (response.code == 0) {
-            [VLToast toast:AGLocalizedString(@"修改成功")];
+            [VLToast toast:AGLocalizedString(@"app_edit_success")];
             [self.mineView refreseNickName:nickName];
             VLUserCenter.user.name = nickName;
             [[VLUserCenter center] storeUserInfo:VLUserCenter.user];
@@ -385,15 +385,15 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     
     [LEEAlert alert].config
     .LeeAddTitle(^(UILabel *label) {
-        label.text = AGLocalizedString(@"确定注销账号？");
+        label.text = AGLocalizedString(@"app_logoff_account");
         label.textColor = UIColorMakeWithHex(@"#040925");
         label.font = UIFontBoldMake(16);
     })
-    .LeeContent(AGLocalizedString(@"注销账号后，您将暂时无法使用该账号体验我们的服务，真的要注销吗？"))
+    .LeeContent(AGLocalizedString(@"logout_tips"))
     .LeeAddAction(^(LEEAction *action) {
         VL(weakSelf);
         action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"注销");
+        action.title = AGLocalizedString(@"app_logoff");
         action.titleColor = UIColorMakeWithHex(@"#000000");
         action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
         action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -413,7 +413,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     })
     .LeeAddAction(^(LEEAction *action) {
         action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"取消");
+        action.title = AGLocalizedString(@"cancel");
         action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
         action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
         action.cornerRadius = 20;
@@ -432,15 +432,15 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 - (void)loadLogoutUserRequest {
     [LEEAlert alert].config
     .LeeAddTitle(^(UILabel *label) {
-        label.text = AGLocalizedString(@"确定退出登录?");
+        label.text = AGLocalizedString(@"confirm_logout");
         label.textColor = UIColorMakeWithHex(@"#040925");
         label.font = UIFontBoldMake(16);
     })
-    .LeeContent(AGLocalizedString(@"退出登陆后，我们还会继续保留您的账户数据，记得再来体验哦～"))
+    .LeeContent(AGLocalizedString(@"logout_tips"))
     .LeeAddAction(^(LEEAction *action) {
         VL(weakSelf);
         action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"退出");
+        action.title = AGLocalizedString(@"app_exit");
         action.titleColor = UIColorMakeWithHex(@"#000000");
         action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
         action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -462,7 +462,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     })
     .LeeAddAction(^(LEEAction *action) {
         action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"取消");
+        action.title = AGLocalizedString(@"cancel");
         action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
         action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
         action.cornerRadius = 20;
@@ -480,15 +480,15 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 - (void)closeOffDebugMode {
     [LEEAlert alert].config
     .LeeAddTitle(^(UILabel *label) {
-        label.text = AGLocalizedString(@"确定退出Debug模式么？");
+        label.text = AGLocalizedString(@"app_exit_debug");
         label.textColor = UIColorMakeWithHex(@"#040925");
         label.font = UIFontBoldMake(16);
     })
-    .LeeContent(AGLocalizedString(@"退出debug模式后，设置页面将恢复成正常的设置页面哦~"))
+    .LeeContent(AGLocalizedString(@"app_exit_debug_tip"))
     .LeeAddAction(^(LEEAction *action) {
         VL(weakSelf);
         action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"确定");
+        action.title = AGLocalizedString(@"confirm");
         action.titleColor = UIColorMakeWithHex(@"#000000");
         action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
         action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -503,7 +503,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     })
     .LeeAddAction(^(LEEAction *action) {
         action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"取消");
+        action.title = AGLocalizedString(@"cancel");
         action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
         action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
         action.cornerRadius = 20;

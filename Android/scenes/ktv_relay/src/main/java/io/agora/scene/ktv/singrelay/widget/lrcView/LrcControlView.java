@@ -53,8 +53,8 @@ import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.ZipUtils;
 import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.ktv.singrelay.R;
-import io.agora.scene.ktv.singrelay.databinding.KtvLayoutLrcControlViewBinding;
-import io.agora.scene.ktv.singrelay.databinding.KtvLayoutLrcPrepareBinding;
+import io.agora.scene.ktv.singrelay.databinding.KtvSingrelayLayoutLrcControlViewBinding;
+import io.agora.scene.ktv.singrelay.databinding.KtvSingrelayLayoutLrcPrepareBinding;
 import io.agora.scene.ktv.singrelay.ktvapi.ILrcView;
 import io.agora.scene.ktv.singrelay.service.RankModel;
 import io.agora.scene.ktv.singrelay.service.RoomSelSongModel;
@@ -66,8 +66,8 @@ import io.agora.scene.widget.utils.UiUtils;
  */
 public class LrcControlView extends FrameLayout implements View.OnClickListener, ILrcView {
 
-    protected KtvLayoutLrcControlViewBinding mBinding;
-    protected KtvLayoutLrcPrepareBinding mPrepareBinding;
+    protected KtvSingrelayLayoutLrcControlViewBinding mBinding;
+    protected KtvSingrelayLayoutLrcPrepareBinding mPrepareBinding;
 
     protected KaraokeView mKaraokeView;
 
@@ -127,9 +127,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     private void init(Context context) {
-        mBinding = KtvLayoutLrcControlViewBinding.inflate(LayoutInflater.from(context), this, true);
+        mBinding = KtvSingrelayLayoutLrcControlViewBinding.inflate(LayoutInflater.from(context), this, true);
 
-        mPrepareBinding = KtvLayoutLrcPrepareBinding.bind(mBinding.getRoot());
+        mPrepareBinding = KtvSingrelayLayoutLrcPrepareBinding.bind(mBinding.getRoot());
 
         mBinding.ilIDLE.getRoot().setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
@@ -436,12 +436,12 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         private int mNumberOfCombos;
 
-        private void reset(KtvLayoutLrcControlViewBinding binding) {
+        private void reset(KtvSingrelayLayoutLrcControlViewBinding binding) {
             mNumberOfCombos = 0;
             binding.comboView.getRoot().setVisibility(INVISIBLE);
         }
 
-        private void checkAndShowCombos(KtvLayoutLrcControlViewBinding binding, int score, int cumulativeScore) {
+        private void checkAndShowCombos(KtvSingrelayLayoutLrcControlViewBinding binding, int score, int cumulativeScore) {
             binding.comboView.getRoot().setVisibility(VISIBLE);
 
             showComboAnimation(binding.comboView.getRoot(), score);

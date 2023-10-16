@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:background="@mipmap/ktv_game_background"
+    tools:layout_height="320dp">
+
+    <TextView
+        android:id="@+id/tvSongTab"
+        android:layout_width="41dp"
+        android:layout_height="20dp"
+        android:background="@drawable/ktv_skip_btn_bg"
+        android:gravity="center"
+        android:text="1/8"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <io.agora.scene.ktv.singbattle.widget.lrcView.LrcControlView
+        android:id="@+id/lrcControlView"
+        android:layout_width="match_parent"
+        android:layout_height="275dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="36dp"
+        android:background="@drawable/bg_music_player_view"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

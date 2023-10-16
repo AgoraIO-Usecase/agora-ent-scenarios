@@ -21,14 +21,14 @@ import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.singrelay.R;
-import io.agora.scene.ktv.singrelay.databinding.ActivityRoomCreateBinding;
+import io.agora.scene.ktv.singrelay.databinding.KtvSingrelayActivityRoomCreateBinding;
 import io.agora.scene.ktv.singrelay.live.RoomLivingActivity;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 /**
  * 创建房间
  */
-public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCreateBinding> {
+public class RoomCreateActivity extends BaseViewBindingActivity<KtvSingrelayActivityRoomCreateBinding> {
     /**
      * 当前选中的是第几个输入框
      */
@@ -39,8 +39,8 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
     private RoomCreateViewModel roomCreateViewModel;
 
     @Override
-    protected ActivityRoomCreateBinding getViewBinding(@NonNull LayoutInflater inflater) {
-        return ActivityRoomCreateBinding.inflate(inflater);
+    protected KtvSingrelayActivityRoomCreateBinding getViewBinding(@NonNull LayoutInflater inflater) {
+        return KtvSingrelayActivityRoomCreateBinding.inflate(inflater);
     }
 
     @Override

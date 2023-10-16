@@ -5,7 +5,6 @@
 
 #import <UIKit/UIKit.h>
 #import "JXCategoryListContainerView.h"
-#import "KTVServiceProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @class VLRoomListModel;

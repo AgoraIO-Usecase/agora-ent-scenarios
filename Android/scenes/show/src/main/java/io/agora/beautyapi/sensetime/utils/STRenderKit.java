@@ -37,6 +37,7 @@ import com.sensetime.stmobile.STMobileAnimalNative;
 import com.sensetime.stmobile.STMobileEffectNative;
 import com.sensetime.stmobile.STMobileEffectParams;
 import com.sensetime.stmobile.STMobileHumanActionNative;
+import com.sensetime.stmobile.params.STEffectBeautyGroup;
 import com.sensetime.stmobile.params.STEffectBeautyType;
 import com.sensetime.stmobile.params.STHumanActionParamsType;
 
@@ -45,7 +46,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import io.agora.beautyapi.sensetime.utils.processor.IBeautyProcessor;
 import io.agora.beautyapi.sensetime.utils.processor.IBeautyProcessorKt;
@@ -80,6 +83,7 @@ public class STRenderKit {
     private IBeautyProcessor mProcessor;
     private String mCurrentSticker;
     private final LinkedHashMap<Integer, String> mCurrentStickerMaps = new LinkedHashMap<>();
+    private final LinkedHashMap<Integer, String> mCurrentStyleMaps = new LinkedHashMap<>();
 
     private boolean isSensorEnable;
     private final String mResourcePath;
@@ -202,7 +206,7 @@ public class STRenderKit {
                     case MESSAGE_NEED_CHANGE_STICKER:
                         String sticker = (String) msg.obj;
                         mCurrentSticker = sticker;
-                        int packageId1 = mSTMobileEffectNative.changePackage(mCurrentSticker);
+                        int packageId1 = mSTMobileEffectNative.addPackage(mCurrentSticker);
                         Log.d(TAG, "ST_XCZ STMobileEffectNative changePackage sticker=" + mCurrentSticker + ",packageId=" + packageId1);
 
                         Log.d(TAG, "change_package: packageId1:" + packageId1);
@@ -292,6 +296,13 @@ public class STRenderKit {
         mChangeStickerManagerHandler.sendMessage(msg);
     }
 
+    public void removeStickers(){
+        Set<Map.Entry<Integer, String>> entries = new LinkedHashSet<>(mCurrentStickerMaps.entrySet());
+        for (Map.Entry<Integer, String> entry : entries) {
+            removeSticker(entry.getKey());
+        }
+    }
+
     public void removeSticker(String path) {
         int packageId = -1;
         for (Map.Entry<Integer, String> entry : mCurrentStickerMaps.entrySet()) {
@@ -310,6 +321,33 @@ public class STRenderKit {
         if (result == 0) {
             mCurrentStickerMaps.remove(packageId);
         }
+    }
+
+    public void cleanStyle(){
+        for (Integer packageId : mCurrentStyleMaps.keySet()) {
+            mSTMobileEffectNative.removeEffect(packageId);
+        }
+        mCurrentStyleMaps.clear();
+    }
+
+    public void setStyle(String stylePath, float filterStrength, float makeupStrength){
+        int packageId = -1;
+        Iterator<Map.Entry<Integer, String>> iterator = mCurrentStyleMaps.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<Integer, String> entry = iterator.next();
+            if (entry.getValue().equals(stylePath)) {
+                packageId = entry.getKey();
+            } else {
+                mSTMobileEffectNative.removeEffect(entry.getKey());
+                iterator.remove();
+            }
+        }
+        if(packageId == -1){
+            packageId = mSTMobileEffectNative.addPackage(stylePath);
+            mCurrentStyleMaps.put(packageId, stylePath);
+        }
+        setPackageBeautyGroupStrength(packageId, STEffectBeautyGroup.EFFECT_BEAUTY_GROUP_FILTER, filterStrength);
+        setPackageBeautyGroupStrength(packageId, STEffectBeautyGroup.EFFECT_BEAUTY_GROUP_MAKEUP, makeupStrength);
     }
 
     public void release() {

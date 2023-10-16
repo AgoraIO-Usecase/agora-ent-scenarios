@@ -20,12 +20,12 @@ public extension String {
         let result = UnsafeMutablePointer<CUnsignedChar>.allocate(capacity: digestLen)
 //        CC_SHA256(str!, strLen, result)
         CC_MD5(str!, strLen, result)
-        result.deallocate()
 
         let hash = NSMutableString()
         for i in 0..<digestLen {
             hash.appendFormat("%02x", result[i])
         }
+        result.deallocate()
         let value = hash as String
         return value // [1, 16]
     }
@@ -86,5 +86,23 @@ extension String {
             return String(format: "%02d%@%02d%@%02d%@", hour, h, minTime, m, second, s)
         }
         return String(format: "%02d%@%02d%@", minTime, m, second, s)
+    }
+}
+
+public extension NSAttributedString {
+    func toString() -> String {
+        let result = NSMutableAttributedString(attributedString: self)
+        var replaceList: [(NSRange, String)] = []
+        result.enumerateAttribute(.accessibilityTextCustom, in: NSRange(location: 0, length: result.length), using: { value, range, _ in
+            if let value = value as? String {
+                for i in range.location..<range.location + range.length {
+                    replaceList.append((NSRange(location: i, length: 1), value))
+                }
+            }
+        })
+        for i in replaceList.reversed() {
+            result.replaceCharacters(in: i.0, with: i.1)
+        }
+        return result.string
     }
 }

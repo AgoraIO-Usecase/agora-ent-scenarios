@@ -1,7 +1,7 @@
 package io.agora.scene.show.debugSettings
 
 data class DebugSettingModel(
-    var pvcEnabled: Boolean = true,
+    var pvcEnabled: Boolean = false,
     var autoFocusFaceModeEnabled: Boolean = true,
     var exposurePositionX: Float? = null,
     var exposurePositionY: Float? = null,

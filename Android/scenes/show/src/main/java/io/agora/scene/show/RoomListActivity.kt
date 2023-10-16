@@ -1,24 +1,29 @@
 package io.agora.scene.show
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
-import io.agora.scene.base.Constant
+import io.agora.rtc2.ChannelMediaOptions
+import io.agora.rtc2.Constants
+import io.agora.rtc2.RtcConnection
+import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowRoomItemBinding
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
-import io.agora.scene.show.widget.OnPresetAudienceDialogCallBack
+import io.agora.scene.show.videoSwitcherAPI.VideoSwitcher
 import io.agora.scene.show.widget.PresetAudienceDialog
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
@@ -29,6 +34,8 @@ class RoomListActivity : AppCompatActivity() {
     private val mBinding by lazy { ShowRoomListActivityBinding.inflate(LayoutInflater.from(this)) }
     private lateinit var mRoomAdapter: BindingSingleAdapter<ShowRoomDetailModel, ShowRoomItemBinding>
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
+    private val mRtcVideoSwitcher by lazy { VideoSwitcher.getImplInstance(mRtcEngine) }
+    private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
 
     private val roomDetailModelList = mutableListOf<ShowRoomDetailModel>()
 
@@ -38,8 +45,14 @@ class RoomListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, true)
         setContentView(mBinding.root)
-        fetchService()
+        //启动机器人
+        mService.startCloudPlayer()
+        //获取万能token
+        fetchUniversalToken ({
+            preloadChannels()
+        })
         initView()
+        initVideoSettings()
     }
 
     private fun initView() {
@@ -110,8 +123,19 @@ class RoomListActivity : AppCompatActivity() {
         mRoomAdapter.resetAll(data)
 
         mBinding.smartRefreshLayout.finishRefresh()
+
+        // 设置预加载
+        val preloadCount = 3
+        mRtcVideoSwitcher.setPreloadCount(preloadCount)
+        mRtcVideoSwitcher.preloadConnections(data.map {
+            RtcConnection(
+                it.roomId,
+                UserManager.getInstance().user.id.toInt()
+            )
+        })
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun updateRoomItem(
         list: List<ShowRoomDetailModel>,
         position: Int,
@@ -122,8 +146,65 @@ class RoomListActivity : AppCompatActivity() {
         binding.tvRoomId.text = getString(R.string.show_room_id, roomInfo.roomId)
         binding.tvUserCount.text = getString(R.string.show_user_count, roomInfo.roomUserCount)
         binding.ivCover.setImageResource(roomInfo.getThumbnailIcon())
-        binding.root.setOnClickListener {
-            goLiveDetailActivity(list, position, roomInfo)
+
+        binding.root.setOnTouchListener { v, event ->
+            val rtcConnection =
+                RtcConnection(roomInfo.roomId, UserManager.getInstance().user.id.toInt())
+            val isRoomOwner = roomInfo.ownerId == UserManager.getInstance().user.id.toString()
+            if (isRoomOwner) {
+                if (event!!.action == MotionEvent.ACTION_UP) {
+                    ToastUtils.showToast(R.string.show_broadcaster_bad_exit)
+                }
+            } else {
+                when (event!!.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        mRtcVideoSwitcher.preloadConnections(list.map {
+                            RtcConnection(
+                                it.roomId,
+                                UserManager.getInstance().user.id.toInt()
+                            )
+                        })
+                        if (RtcEngineInstance.generalToken() == "") {
+                            fetchUniversalToken({
+                            }, {
+                                ToastUtils.showToast("Fetch Token Failed")
+                            })
+                        } else {
+                            if (mRtcEngine.queryDeviceScore() < 75) {
+                                mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
+                                mRtcEngine.setParameters("{\"rtc.video.decoder_out_byte_frame\": true}")
+                            }
+                            val channelMediaOptions = ChannelMediaOptions()
+                            channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+                            channelMediaOptions.autoSubscribeVideo = true
+                            channelMediaOptions.autoSubscribeAudio = true
+                            channelMediaOptions.publishCameraTrack = false
+                            channelMediaOptions.publishMicrophoneTrack = false
+                            // 如果是观众 把 ChannelMediaOptions 的 audienceLatencyLevel 设置为 AUDIENCE_LATENCY_LEVEL_LOW_LATENCY（超低延时）
+                            channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+                            mRtcVideoSwitcher.joinChannel(
+                                rtcConnection,
+                                channelMediaOptions,
+                                RtcEngineInstance.generalToken(),
+                                null,
+                                true
+                            )
+                            mRtcVideoSwitcher.preJoinChannel(rtcConnection)
+                            mRtcEngine.adjustUserPlaybackSignalVolumeEx(roomInfo.ownerId.toInt(), 0, rtcConnection)
+                            mService.startCloudPlayer()
+                        }
+                    }
+                    MotionEvent.ACTION_CANCEL -> {
+                        mRtcVideoSwitcher.leaveChannel(rtcConnection, true)
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        if (RtcEngineInstance.generalToken() != "") {
+                            goLiveDetailActivity(list, position, roomInfo)
+                        }
+                    }
+                }
+            }
+            true
         }
     }
 
@@ -135,18 +216,6 @@ class RoomListActivity : AppCompatActivity() {
 
     private fun goLiveDetailActivity(list: List<ShowRoomDetailModel>, position: Int, roomInfo: ShowRoomDetailModel) {
         // 进房前设置一些必要的设置
-        if (!SPUtil.getBoolean(Constant.IS_SET_SETTING, false)) {
-            PresetAudienceDialog(this, false).apply {
-                callBack = object : OnPresetAudienceDialogCallBack {
-                    override fun onClickConfirm() {
-                        SPUtil.putBoolean(Constant.IS_SET_SETTING, true)
-                        goLiveDetailActivity(list, position, roomInfo)
-                    }
-                }
-                show()
-            }
-            return
-        }
         LiveDetailActivity.launch(
             this,
             ArrayList(list),
@@ -162,27 +231,30 @@ class RoomListActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         mService.destroy()
+        mRtcVideoSwitcher.unloadConnections()
+        VideoSwitcher.release()
         RtcEngineInstance.destroy()
         RtcEngineInstance.setupGeneralToken("")
     }
 
-
-    private fun fetchService() {
-        //启动机器人
-        mService.startCloudPlayer()
-        val localUId = UserManager.getInstance().user.id.toInt()
-        //获取token
+    // 获取万能token
+    private fun fetchUniversalToken(
+        success: () -> Unit,
+        error: ((Exception?) -> Unit)? = null
+    ) {
+        val localUId = UserManager.getInstance().user.id
         TokenGenerator.generateToken("", localUId.toString(),
             TokenGenerator.TokenGeneratorType.token007,
             TokenGenerator.AgoraTokenType.rtc,
             success = {
-                RtcEngineInstance.setupGeneralToken(it)
-                preloadChannels()
                 ShowLogger.d("RoomListActivity", "generateToken success：$it， uid：$localUId")
+                RtcEngineInstance.setupGeneralToken(it)
+                success.invoke()
             },
             failure = {
                 ShowLogger.e("RoomListActivity", it, "generateToken failure：$it")
                 ToastUtils.showToast(it?.message ?: "generate token failure")
+                error?.invoke(it)
             })
     }
 
@@ -212,5 +284,25 @@ class RoomListActivity : AppCompatActivity() {
                 Log.d("RoomListActivity", "call rtc sdk preloadChannel ${room.roomId} ret:$ret")
             }
         }
+    }
+
+    private fun initVideoSettings() {
+        val deviceScore = RtcEngineInstance.rtcEngine.queryDeviceScore()
+        val deviceLevel = if (deviceScore >= 90) {
+            VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_AUTO)
+            VideoSetting.setCurrAudienceEnhanceSwitch(true)
+            VideoSetting.DeviceLevel.High
+        } else if (deviceScore >= 75) {
+            VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_AUTO)
+            VideoSetting.setCurrAudienceEnhanceSwitch(true)
+            VideoSetting.DeviceLevel.Medium
+        } else {
+            VideoSetting.setCurrAudienceEnhanceSwitch(false)
+            VideoSetting.DeviceLevel.Low
+        }
+        VideoSetting.updateBroadcastSetting(
+            deviceLevel = deviceLevel,
+            isByAudience = true
+        )
     }
 }

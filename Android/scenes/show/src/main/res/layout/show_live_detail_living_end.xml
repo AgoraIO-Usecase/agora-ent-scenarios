@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:fitsSystemWindows="true"
-    android:background="#141650">
+    android:background="#141650"
+    android:paddingTop="@dimen/base_status_height">
 
     <TextView
         android:id="@+id/tvLivingEnd"

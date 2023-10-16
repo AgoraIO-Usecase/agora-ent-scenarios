@@ -25,7 +25,7 @@ public class SAEmptyView: UIView {
             emptyImage = image!
         }
         addSubViews([self.image, text])
-        text.text = title.localized()
+        text.text = title.spatial_localized()
     }
 
     @available(*, unavailable)

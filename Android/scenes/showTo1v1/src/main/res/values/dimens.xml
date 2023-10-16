@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="show_to1v1_drag_view_width">110.0dp</dimen>
+    <dimen name="show_to1v1_drag_view_height">160.0dp</dimen>
+    <dimen name="show_to1v1_room_list_guide_width">14.0dp</dimen>
+    <dimen name="show_to1v1_room_list_guide_height">136.0dp</dimen>
+</resources>

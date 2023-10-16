@@ -36,12 +36,12 @@ class AgoraChatRoomBaseRtcUserView: UIView {
             case .AgoraChatRoomBaseUserCellTypeAdd:
                 iconView.isHidden = true
                 micView.isHidden = true
-                bgIconView.image = UIImage("icons／solid／add")
+                bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeMute:
                 iconView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.forbidden)
-                bgIconView.image = UIImage("icons／solid／mute")
+                bgIconView.image = UIImage.sceneImage(name: "icons／solid／mute", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeForbidden:
                 iconView.isHidden = false
                 micView.isHidden = false
@@ -49,29 +49,29 @@ class AgoraChatRoomBaseRtcUserView: UIView {
             case .AgoraChatRoomBaseUserCellTypeLock:
                 iconView.isHidden = true
                 micView.isHidden = true
-                bgIconView.image = UIImage("icons／solid／lock")
+                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeNormalUser:
                 iconView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.on)
-                nameBtn.setImage(UIImage(""), for: .normal)
+                nameBtn.setImage(UIImage.sceneImage(name: ""), for: .normal)
             case .AgoraChatRoomBaseUserCellTypeMuteAndLock:
                 iconView.isHidden = true
                 micView.isHidden = false
                 micView.setState(.forbidden)
-                bgIconView.image = UIImage("icons／solid／lock")
+                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeAlienNonActive:
                 iconView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.on)
                 micView.isHidden = true
-                nameBtn.setImage(UIImage("guanfang"), for: .normal)
+                nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), for: .normal)
                 coverView.isHidden = false
                 activeButton.isHidden = false
             case .AgoraChatRoomBaseUserCellTypeAlienActive:
                 iconView.isHidden = false
                 micView.isHidden = true
-                nameBtn.setImage(UIImage("guanfang"), for: .normal)
+                nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), for: .normal)
                 coverView.isHidden = true
                 activeButton.isHidden = true
             }
@@ -80,13 +80,13 @@ class AgoraChatRoomBaseRtcUserView: UIView {
 
     public var iconImgUrl: String = "" {
         didSet {
-            iconView.image = UIImage(iconImgUrl)
+            iconView.image = UIImage.voice_image(iconImgUrl)
         }
     }
 
     public var ownerIcon: String = "" {
         didSet {
-            nameBtn.setImage(UIImage(ownerIcon), for: .normal)
+            nameBtn.setImage(UIImage.voice_image(ownerIcon), for: .normal)
         }
     }
 
@@ -102,9 +102,9 @@ class AgoraChatRoomBaseRtcUserView: UIView {
         }
     }
 
-    public var iconWidth: CGFloat = 60~ {
+    public var iconWidth: CGFloat = 60 {
         didSet {
-            self.iconView.layer.cornerRadius = (iconWidth / 2.0)~
+            self.iconView.layer.cornerRadius = (iconWidth / 2.0)
             self.iconView.layer.masksToBounds = true
             self.iconView.snp.updateConstraints { make in
                 make.width.height.equalTo(iconWidth)
@@ -143,7 +143,6 @@ class AgoraChatRoomBaseRtcUserView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
     }
 
@@ -158,12 +157,12 @@ class AgoraChatRoomBaseRtcUserView: UIView {
         bgView.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)
         addSubview(bgView)
 
-        bgIconView.image = UIImage("icons／solid／add")
+        bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
         bgIconView.layer.cornerRadius = 15
         bgIconView.layer.masksToBounds = true
         bgView.addSubview(bgIconView)
 
-        iconView.image = UIImage("avatar1")
+        iconView.image = UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource")
         iconView.layer.cornerRadius = 30
         iconView.layer.masksToBounds = true
         bgView.addSubview(iconView)
@@ -183,9 +182,9 @@ class AgoraChatRoomBaseRtcUserView: UIView {
 
         activeButton.layer.cornerRadius = 8
         activeButton.layer.masksToBounds = true
-        activeButton.setTitle(LanguageManager.localValue(key: "active"), for: .normal)
+        activeButton.setTitle(LanguageManager.localValue(key: "voice_active"), for: .normal)
         activeButton.setTitleColor(.white, for: .normal)
-        activeButton.setBackgroundImage(UIImage("active"), for: .normal)
+        activeButton.setBackgroundImage(UIImage.sceneImage(name: "active", bundleName: "VoiceChatRoomResource"), for: .normal)
         activeButton.titleLabel?.font = UIFont.systemFont(ofSize: 9)
         activeButton.addTargetFor(self, action: #selector(active), for: .touchUpInside)
         addSubview(activeButton)

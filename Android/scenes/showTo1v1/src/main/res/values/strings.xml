@@ -1,0 +1,59 @@
+<resources>
+    <string name="show_to1v1_name">秀场转1v1私密房</string>
+    <string name="show_to1v1_room_list_empty_title">暂无主播在线，你来创建一个吧！</string>
+    <string name="show_to1v1_room_list_empty_content">欢迎来到声网1V1私密房，目前暂无主播开播，你可以叫上你的朋友一起来体验我们的场景功能。</string>
+    <string name="show_to1v1_create_room">创建房间</string>
+    <string name="show_to1v1_room_name">房间名称</string>
+    <string name="show_to1v1_random">随机</string>
+    <string name="show_to1v1_room_name_hint">填写房间名称，吸引更多观众</string>
+    <string name="show_to1v1_room_name_empty_tips">请输入房间名</string>
+    <string name="show_to1v1_room_list_refreshed">列表已刷新</string>
+    <string name="show_to1v1_create_room_tips">本产品仅用于功能体验，单次直播时长不超过20mins</string>
+    <string name="show_to1v1_create">创建</string>
+    <string name="show_to1v1_creating">创建中…</string>
+    <string name="show_to1v1_come_soon">Come back soon</string>
+    <string name="show_to1v1_hangup">结束连线</string>
+    <string name="show_to1v1_call_privately">Call privately</string>
+    <string name="show_to1v1_call_connecting">连接中…</string>
+    <string name="show_to1v1_call_dialog_info">本产品仅用于功能体验，单次直播时长不超过20mins</string>
+    <string name="show_to1v1_dashboard_item">实时数据</string>
+    <string name="show_to1v1_end_linking_tips">对方结束连线</string>
+    <string name="show_to1v1_end_tips">直播结束</string>
+    <string name="show_to1v1_no_answer">我很快回来，一会再连线我吧</string>
+    <string name="show_to1v1_auto_connected">呼入，已自动接听…</string>
+    <string name="show_to1v1_come_soon1">Hi，我暂时有事，很快回来…</string>
+    <string name="show_to1v1_current_title">本人信息</string>
+    <string name="show_to1v1_linking_title">对端信息</string>
+
+    <!--    dashboard-->
+    <string name="show_to1v1_dashboard_bitrate">码率: %s kbps</string>
+    <string name="show_to1v1_dashboard_up_bitrate">发送码率: %s kbps</string>
+    <string name="show_to1v1_dashboard_down_bitrate">接收码率: %s kbps</string>
+    <string name="show_to1v1_dashboard_fps">帧率: %s fps</string>
+    <string name="show_to1v1_dashboard_delay">延迟: %s ms</string>
+    <string name="show_to1v1_dashboard_loss_package">丢包率: %s ％</string>
+    <string name="show_to1v1_dashboard_up_net_speech">上行网络: %s KB/s</string>
+    <string name="show_to1v1_dashboard_down_net_speech">下行网络: %s KB/s</string>
+    <string name="show_to1v1_dashboard_resolution">分辨率: %s</string>
+    <string name="show_to1v1_dashboard_up">发送端</string>
+    <string name="show_to1v1_dashboard_encode_resolution">编码分辨率: %s</string>
+    <string name="show_to1v1_dashboard_encode_fps">编码帧率: %s fps</string>
+    <string name="show_to1v1_dashboard_up_loss_package">上行丢包率: %s ％</string>
+    <string name="show_to1v1_dashboard_down">接收端</string>
+    <string name="show_to1v1_dashboard_receive_resolution">接收分辨率: %s</string>
+    <string name="show_to1v1_dashboard_receive_fps">接收帧率: %s fps</string>
+    <string name="show_to1v1_dashboard_down_loss_package">下行丢包率: %s ％</string>
+
+    <string-array name="show_to1v1_room_name">
+        <item>小可爱是我呀</item>
+        <item>我是你的小可爱</item>
+        <item>一往情深</item>
+        <item>情不知所起</item>
+        <item>沪上挖掘机</item>
+        <item>张江推土机</item>
+        <item>川沙妲己痴迷粉丝</item>
+        <item>疯狂星期几</item>
+        <item>小黄鸭</item>
+        <item>西二旗老板娘</item>
+    </string-array>
+</resources>

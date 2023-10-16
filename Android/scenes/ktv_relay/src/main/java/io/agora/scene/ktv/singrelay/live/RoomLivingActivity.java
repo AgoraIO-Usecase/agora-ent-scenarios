@@ -36,8 +36,8 @@ import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.singrelay.R;
-import io.agora.scene.ktv.singrelay.databinding.KtvActivityRoomLivingBinding;
 import io.agora.scene.ktv.singrelay.databinding.KtvItemRoomSpeakerBinding;
+import io.agora.scene.ktv.singrelay.databinding.KtvSingrelayActivityRoomLivingBinding;
 import io.agora.scene.ktv.singrelay.debugSettings.KTVDebugSettingsDialog;
 import io.agora.scene.ktv.singrelay.live.fragment.dialog.MVFragment;
 import io.agora.scene.ktv.singrelay.live.listener.LrcActionListenerImpl;
@@ -62,7 +62,7 @@ import io.agora.scene.widget.utils.UiUtils;
 /**
  * 房间主页
  */
-public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomLivingBinding> {
+public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActivityRoomLivingBinding> {
     private static final String EXTRA_ROOM_INFO = "roomInfo";
 
     private RoomLivingViewModel roomLivingViewModel;
@@ -86,8 +86,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     @Override
-    protected KtvActivityRoomLivingBinding getViewBinding(@NonNull LayoutInflater inflater) {
-        return KtvActivityRoomLivingBinding.inflate(inflater);
+    protected KtvSingrelayActivityRoomLivingBinding getViewBinding(@NonNull LayoutInflater inflater) {
+        return KtvSingrelayActivityRoomLivingBinding.inflate(inflater);
     }
 
     @Override

@@ -1,0 +1,61 @@
+apply plugin: 'de.undercouch.download'
+
+android {
+    sourceSets {
+        main {
+            jniLibs.srcDirs += "libs"
+        }
+    }
+}
+
+dependencies {
+    api files('libs/agora-rtm-sdk.jar'){
+        builtBy "copyRtmJar2lib"
+    }
+}
+
+task downloadRtmLibs {
+    def destFile = new File(buildDir, 'rtm.zip')
+    download {
+        src 'https://download.agora.io/rtm2/release/Agora_RTM_JAVA_SDK_for_Android_v214.zip'
+        dest destFile
+        overwrite false
+    }
+    def fileTree = zipTree(destFile)
+    def rtcJar = fileTree.getFiles().find {
+        it.name.contains("agora-rtm-sdk.jar")
+    }
+    println "rtcJar path= $rtcJar.parentFile.absolutePath"
+    copy {
+        from rtcJar.parentFile
+        exclude "high_level_api/**"
+        into 'libs'
+    }
+}
+task unzipRtmJar(type: Copy, dependsOn: ['downloadRtmLibs']) {
+    copy {
+        from "libs/agora-rtm-sdk.jar"
+        into 'third-party/'
+    }
+    delete('libs/agora-rtm-sdk.jar')
+    from zipTree('third-party/agora-rtm-sdk.jar')
+    exclude "io/agora/base/internal/**"
+    into ("$buildDir/libs/agora-rtm-sdk-new")
+}
+task jarRtm(type: Jar, dependsOn: ['unzipRtmJar']){
+    baseName 'agora-rtm-sdk'
+    version ''
+    from("$buildDir/libs/agora-rtm-sdk-new")
+}
+task copyRtmJar2lib(type: Copy, dependsOn:["jarRtm"]){
+    from "$buildDir/libs/agora-rtm-sdk.jar"
+    into "libs/"
+}
+task cleanRtm(type: Delete){
+    delete('third-party')
+    delete('libs/arm64-v8a/libagora-rtm-sdk.so')
+    delete('libs/armeabi-v7a/libagora-rtm-sdk.so')
+    delete('libs/x86/libagora-rtm-sdk.so')
+    delete('libs/x86_64/libagora-rtm-sdk.so')
+    delete('libs/agora-rtm-sdk.jar')
+}

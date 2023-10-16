@@ -13,12 +13,7 @@ class ShowBeautyFaceVC: UIViewController {
     var selectedItemClosure: ((_ value: CGFloat, _ isHiddenSldier: Bool, _ isShowSegSwitch: Bool) -> Void)?
     
     var defalutSelectIndex = 0
-   
-    lazy var agoraKitManager: ShowAgoraKitManager = {
-        let manager = ShowAgoraKitManager()
-        return manager
-    }()
-    
+       
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -33,12 +28,12 @@ class ShowBeautyFaceVC: UIViewController {
         collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
-    static let beautyData = BeautyModel.createBeautyData()
-    static let styleData = BeautyModel.createStyleData()
-    static let adjustData = BeautyModel.createAdjustData()
-    static let filterData = BeautyModel.createFilterData()
-    static let stickerData = BeautyModel.createStickerData()
-    static let backgroundData = BeautyModel.createBackgroundData()
+    static var beautyData = BeautyModel.createBeautyData()
+    static var styleData = BeautyModel.createStyleData()
+    static var adjustData = BeautyModel.createAdjustData()
+    static var filterData = BeautyModel.createFilterData()
+    static var stickerData = BeautyModel.createStickerData()
+    static var backgroundData = BeautyModel.createBackgroundData()
      
     private lazy var dataArray: [BeautyModel] = {
         switch type {
@@ -75,6 +70,15 @@ class ShowBeautyFaceVC: UIViewController {
     
     func reloadData() {
         collectionView.reloadData()
+    }
+    
+    static func resetData(){
+        beautyData = BeautyModel.createBeautyData()
+        styleData = BeautyModel.createStyleData()
+        adjustData = BeautyModel.createAdjustData()
+        filterData = BeautyModel.createFilterData()
+        stickerData = BeautyModel.createStickerData()
+        backgroundData = BeautyModel.createBackgroundData()
     }
     
     private func setBeautyHandler(value: CGFloat, isReset: Bool) {
@@ -114,19 +118,19 @@ class ShowBeautyFaceVC: UIViewController {
             if model.path == nil {
                 ShowAgoraKitManager.isOpenGreen = false
                 ShowAgoraKitManager.isBlur = false
-                agoraKitManager.enableVirtualBackground(isOn: false)
-                agoraKitManager.seVirtualtBackgoundImage(imagePath: nil,
-                                                         isOn: false)
+                ShowAgoraKitManager.shared.enableVirtualBackground(isOn: false)
+                ShowAgoraKitManager.shared.seVirtualtBackgoundImage(imagePath: nil,
+                                                                    isOn: false)
             } else if model.path == "xuhua" {
                 ShowAgoraKitManager.isBlur = true
-                agoraKitManager.enableVirtualBackground(isOn: true,
-                                                        greenCapacity: Float(value))
+                ShowAgoraKitManager.shared.enableVirtualBackground(isOn: true,
+                                                                   greenCapacity: Float(value))
                 
             } else {
                 ShowAgoraKitManager.isBlur = false
-                agoraKitManager.seVirtualtBackgoundImage(imagePath: model.key,
-                                                         isOn: true,
-                                                         greenCapacity: Float(value))
+                ShowAgoraKitManager.shared.seVirtualtBackgoundImage(imagePath: model.key,
+                                                                    isOn: true,
+                                                                    greenCapacity: Float(value))
             }
         }
     }

@@ -49,9 +49,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     func notifyHorizontalTextCarousel(gift: VoiceRoomGiftEntity) {
         let string = NSAttributedString {
             AttributedText("\(gift.userName ?? "" ) ").font(.systemFont(ofSize: 12, weight: .semibold)).foregroundColor(Color(white: 1, alpha: 0.74))
-            AttributedText("gifts".localized()).font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(.white)
+            AttributedText("voice_gifts".voice_localized()).font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(.white)
             AttributedText(" \(VoiceRoomUserInfo.shared.currentRoomOwner?.name ?? "") ").font(.systemFont(ofSize: 12, weight: .semibold)).foregroundColor(Color(white: 1, alpha: 0.74))
-            AttributedText("a rocket".localized()).font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(.white)
+            AttributedText("voice_rocket".voice_localized()).font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(.white)
         }
         
         let text = HorizontalTextCarousel(frame: CGRect(x: 15, y: self.headerView.frame.maxY-10, width: 0, height: 20)).cornerRadius(10)
@@ -96,11 +96,11 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             
         }
         self.headerView.updateHeader(with: self.roomInfo?.room)
-        self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
+        self.convertShowText(userName: user.name ?? "", content: "voice_joined".voice_localized(), joined: true)
     }
     
     func onAnnouncementChanged(roomId: String, content: String) {
-        self.view.makeToast("Voice room announcement changed!".localized(), point: toastPoint, title: nil, image: nil, completion: nil)
+        self.view.makeToast("voice_room_announcement_changed".voice_localized(), point: toastPoint, title: nil, image: nil, completion: nil)
         self.roomInfo?.room?.announcement = content
     }
     
@@ -231,7 +231,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                             self.local_index = nil
                         }
                         ChatRoomServiceImp.getSharedInstance().userList?.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
-                        view.makeToast("You were removed from stage".localized())
+                        view.makeToast("voice_you_were_removed_from_stage".voice_localized())
                         self.refreshHandsUp(status: -1)
                     }  else {
                         self.refreshApplicants(chat_uid: fromId)
@@ -258,7 +258,6 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 } else {
                     if local_index == nil || mic_index == local_index {
                         if status == 2 {
-                            rtckit.setClientRole(role: .audience)
                             rtckit.muteLocalAudioStream(mute: true)
                             chatBar.refresh(event: .mic, state: .selected, asCreator: false)
                         }
@@ -293,6 +292,8 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 roomInfo?.mic_info = ChatRoomServiceImp.getSharedInstance().mics
                 rtcView.updateUser(first)
                 refreshApplicants(chat_uid: fromId)
+                let seatUser = ChatRoomServiceImp.getSharedInstance().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
+                rtckit.enableinearmonitoring(enable: seatUser == nil ? false : roomInfo?.room?.turn_InEar ?? false)
             }
         }
     }
@@ -313,7 +314,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         showMessage(message: AgoraChatMessage(conversationID: roomId, body: AgoraChatTextMessageBody(text: text), ext: ["userName": VoiceRoomUserInfo.shared.user?.name ?? ""]))
         VoiceRoomIMManager.shared?.sendMessage(roomId: roomId, text: text, ext: ["userName": userName]) { message, error in
             if error != nil,error?.code == .moderationFailed {
-                self.view.makeToast("Content prohibited".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+                self.view.makeToast("voice_content_prohibited".voice_localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
             }
         }
     }

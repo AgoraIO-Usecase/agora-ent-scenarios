@@ -18,7 +18,7 @@ public class SAApplyCell: UITableViewCell {
 
     lazy var userName: UILabel = .init(frame: CGRect(x: self.avatar.frame.maxX + 9, y: self.avatar.center.y - 8, width: self.contentView.frame.width - self.avatar.frame.maxX - 95 - 16, height: 16)).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x333333)).text("UserName")
 
-    lazy var operation: UIButton = .init(type: .custom).frame(CGRect(x: self.contentView.frame.width - 91, y: self.avatar.center.y - 15, width: 76, height: 30)).title("Accept", .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(.white, .normal).addTargetFor(self, action: #selector(apply), for: .touchUpInside)
+    lazy var operation: UIButton = .init(type: .custom).frame(CGRect(x: self.contentView.frame.width - 91, y: self.avatar.center.y - 15, width: 76, height: 30)).title("spatial_voice_accept".voice_localized(), .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(.white, .normal).addTargetFor(self, action: #selector(apply), for: .touchUpInside)
 
     override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -44,7 +44,7 @@ public class SAApplyCell: UITableViewCell {
         user = item
         userName.text = item?.member?.name
         avatar.sd_setImage(with: URL(string: item?.member?.portrait ?? "")!, placeholderImage: nil)
-        operation.setTitle(item?.member?.invited == true ? sceneLocalized("Accepted") : sceneLocalized("Accept"), for: .normal)
+        operation.setTitle(item?.member?.invited == true ? "spatial_voice_accepted".spatial_localized() : "spatial_voice_accept".spatial_localized(), for: .normal)
         operation.setBackgroundImage(item?.member?.invited == true ? nil : UIImage.sceneImage(name:"blue_btn_bg"), for: .normal)
         var color = UIColor.white
         if item?.member?.invited == true {

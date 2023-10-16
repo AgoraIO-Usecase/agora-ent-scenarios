@@ -7,7 +7,7 @@
 #import "VLFontUtils.h"
 #import "MenuUtils.h"
 @import Masonry;
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @interface VLLoginInputPhoneView()
 
@@ -86,15 +86,21 @@
 #pragma mark - delegate
 
 - (void)textFieldDidChange:(UITextField *)textField {
-    if (textField.text.length > 11) {
-        textField.text = [textField.text substringToIndex:11];
+    textField.text = [self truncateStringToElevenCharacters:textField.text];
+}
+
+- (NSString *)truncateStringToElevenCharacters:(NSString *)string {
+    if (string.length > 11) {
+        return [string substringToIndex:11];
+    } else {
+        return string;
     }
 }
 
 - (UILabel *)titleLabel {
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
-        _titleLabel.text = AGLocalizedString(@"手机号");
+        _titleLabel.text = AGLocalizedString(@"app_mobile_number");
         _titleLabel.textColor = UIColorMakeWithHex(@"#979CBB");
         _titleLabel.font = VLUIFontMake(15);
     }

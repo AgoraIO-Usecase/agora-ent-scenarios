@@ -116,7 +116,7 @@ if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
     mv "${PWD}/${unzip_name}/libs" "${PWD}/iOS"
 
     # 修改podfile文件
-    python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} 'sdk'
+    python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} 'AgoraRtcEngine_iOS'
 fi
 
 if [[ ! -z ${beauty_sources} && "${beauty_sources}" != 'none' ]]; then

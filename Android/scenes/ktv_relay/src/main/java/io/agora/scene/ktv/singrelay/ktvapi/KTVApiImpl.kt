@@ -735,9 +735,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             token,
             rtcConnection,
             channelMediaOption,
-            null)
-
-        val handler = object : IRtcEngineEventHandler() {
+            object : IRtcEngineEventHandler() {
                 override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                     Log.d(TAG, "onJoinChannel2Success: channel:$channel, uid:$uid")
                     if (isRelease) return
@@ -782,8 +780,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     ktvApiEventHandlerList.forEach { it.onChorusChannelAudioVolumeIndication(speakers, totalVolume) }
                 }
             }
-        handlerEx = handler
-        mRtcEngine.addHandlerEx(handler, subChorusConnection)
+        )
+//        handlerEx = handler
+//        mRtcEngine.addHandlerEx(handler, subChorusConnection)
 
         if (ret != 0) {
             Log.e(TAG, "joinChorus2ndChannel failed: $ret")
@@ -796,7 +795,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     private fun leaveChorus2ndChannel(role: KTVSingRole) {
-        mRtcEngine.removeHandlerEx(handlerEx, subChorusConnection)
+        //mRtcEngine.removeHandlerEx(handlerEx, subChorusConnection)
         if (role == KTVSingRole.LeadSinger) {
             mRtcEngine.leaveChannelEx(subChorusConnection)
         } else if (role == KTVSingRole.CoSinger) {

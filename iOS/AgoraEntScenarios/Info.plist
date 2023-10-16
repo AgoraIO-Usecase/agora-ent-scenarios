@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key> CFBundleDisplayName</key>
-	<string>声动互娱 - K歌</string>
+	<string>声动互娱</string>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

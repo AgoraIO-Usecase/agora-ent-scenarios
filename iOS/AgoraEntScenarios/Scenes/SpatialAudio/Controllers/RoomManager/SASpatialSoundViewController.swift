@@ -13,7 +13,7 @@ public class SASpatialSoundViewController: UIViewController {
 
     public var totalCountClosure: ((Int) -> Void)?
 
-    lazy var empty: SAEmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "No Chat Room yet", image: nil)
+    lazy var empty: SAEmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "spatial_voice_no_chat_room_yet".spatial_localized(), image: nil)
 
     lazy var roomList: SARoomListView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), style: .plain)
 
@@ -39,7 +39,7 @@ extension SASpatialSoundViewController {
     }
 
     @objc private func fetchRooms(cursor: String) {
-        SABusinessRequest.shared.sendGETRequest(api: .fetchRoomList(cursor: cursor, pageSize: page_size, type: 1), params: [:], classType: SARoomsEntity.self) { rooms, error in
+        SABusinessRequest.shared.sendGETRequest(api: .fetchRoomList(cursor: cursor, pageSize: sa_page_size, type: 1), params: [:], classType: SARoomsEntity.self) { rooms, error in
             self.roomList.refreshControl?.endRefreshing()
             if error == nil {
                 guard let total = rooms?.total else { return }

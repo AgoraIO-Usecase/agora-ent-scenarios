@@ -20,7 +20,7 @@ class ShowSyncManagerServiceImpl constructor(
     private val errorHandler: (Exception) -> Unit
 ) : ShowServiceProtocol {
     private val TAG = "ShowSyncManagerServiceImpl"
-    private val kSceneId = "scene_show_3.0.1"
+    private val kSceneId = "scene_show_3.2.0"
     private val kCollectionIdUser = "userCollection"
     private val kCollectionIdMessage = "show_message_collection"
     private val kCollectionIdSeatApply = "show_seat_apply_collection"
@@ -30,11 +30,11 @@ class ShowSyncManagerServiceImpl constructor(
 
     private val kRobotAvatars = listOf("https://download.agora.io/demo/release/bot1.png")
     private val kRobotUid = 2000000001
-    private val kRobotVideoRoomIds = arrayListOf(2023004, 2023005, 2023006)
+    private val kRobotVideoRoomIds = arrayListOf(2023001, 2023002, 2023003)
     private val kRobotVideoStreamUrls = arrayListOf(
-        "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/release/show/video/bot4.mp4",
-        "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/release/show/video/bot5.mp4",
-        "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/release/show/video/bot6.mp4"
+        "https://download.agora.io/demo/test/agora_test_video_10.mp4",
+        "https://download.agora.io/demo/test/agora_test_video_11.mp4",
+        "https://download.agora.io/demo/test/agora_test_video_12.mp4"
     )
 
     @Volatile
@@ -85,8 +85,10 @@ class ShowSyncManagerServiceImpl constructor(
 
     override fun destroy() {
         if (syncInitialized) {
-            roomInfoControllers.forEach {
-                cleanRoomInfoController(it)
+            synchronized(roomInfoControllers){
+                roomInfoControllers.forEach {
+                    cleanRoomInfoController(it)
+                }
             }
             roomInfoControllers.clear()
             roomMap.clear()
@@ -457,16 +459,20 @@ class ShowSyncManagerServiceImpl constructor(
         infoController.onReconnectSubscriber = null
 
         infoController.sceneReference?.let { ref ->
-            infoController.eventListeners.forEach {
-                ref.unsubscribe(it)
+            synchronized(infoController.eventListeners) {
+                infoController.eventListeners.forEach {
+                    ref.unsubscribe(it)
+                }
             }
         }
         infoController.eventListeners.clear()
         infoController.sceneReference = null
 
         infoController.pkSceneReference?.let { ref ->
-            infoController.pkEventListeners.forEach {
-                ref.unsubscribe(it)
+            synchronized(infoController.pkEventListeners){
+                infoController.pkEventListeners.forEach {
+                    ref.unsubscribe(it)
+                }
             }
         }
         infoController.pkEventListeners.clear()
@@ -776,7 +782,7 @@ class ShowSyncManagerServiceImpl constructor(
             ShowInteractionStatus.onSeat.value,
             muteAudio = false,
             ownerMuteAudio = false,
-            createdAt = 0.0 //TODO
+            createdAt = TimeUtils.currentTimeMillis().toDouble()
         )
         innerCreateInteraction(roomId, interaction, { }, { })
     }
@@ -916,7 +922,7 @@ class ShowSyncManagerServiceImpl constructor(
             ShowRoomRequestStatus.accepted.value,
             userMuteAudio = false,
             fromUserMuteAudio = false,
-            createAt = targetInvitation.createAt
+            createAt = TimeUtils.currentTimeMillis().toDouble()
         )
 
         val indexOf = roomInfoController.pKInvitationList.indexOf(targetInvitation)
@@ -1965,8 +1971,10 @@ class ShowSyncManagerServiceImpl constructor(
                 val invitation = roomInfoController.pKCompetitorInvitationList[index]
 
                 val sceneReference = roomInfoController.pkSceneReference ?: return
-                roomInfoController.pkEventListeners.forEach {
-                    sceneReference.unsubscribe(it)
+                synchronized(roomInfoController.pkEventListeners) {
+                    roomInfoController.pkEventListeners.forEach {
+                        sceneReference.unsubscribe(it)
+                    }
                 }
 
                 roomInfoController.pkSceneReference = null

@@ -10,14 +10,11 @@ import AgoraRtcKit
 
 enum ShowDebug1TFSettingKey: String {
     
-    case captureFrameRate = "采集帧率"
     case encodeFrameRate = "编码帧率"
     case bitRate = "码率"
     
     var unit: String {
         switch self {
-        case .captureFrameRate:
-            return "fps"
         case .encodeFrameRate:
             return "fps"
         case .bitRate:
@@ -27,15 +24,12 @@ enum ShowDebug1TFSettingKey: String {
 }
 
 enum ShowDebug2TFSettingKey: String {
-    case captureVideoSize = "采集分辨率"
     case encodeVideoSize = "编码分辨率"
     case exposureRange = "曝光区域"
     case colorSpace = "颜色空间"
     
     var separator: String {
         switch self {
-        case .captureVideoSize:
-            return "x"
         case .encodeVideoSize:
             return "x"
         case .exposureRange:
@@ -47,14 +41,6 @@ enum ShowDebug2TFSettingKey: String {
 }
 
 extension ShowAgoraKitManager {
-    
-    private var debugDimensionsItems: [CGSize] {
-        ShowAgoraVideoDimensions.allCases.map({$0.sizeValue})
-    }
-    
-    private var debugCaptureDimensionsItems: [CGSize] {
-        ShowAgoraCaptureVideoDimensions.allCases.map({$0.sizeValue})
-    }
     
     private var debugEncodeItems: [Bool] {
         ShowAgoraEncode.allCases.map({$0.encodeValue})
@@ -73,14 +59,10 @@ extension ShowAgoraKitManager {
     }
     
     func debugDefaultBroadcastorSetting() {
-        captureConfig.dimensions = CGSize(width: 720, height: 1280)
-        captureConfig.frameRate = 15
-        updateCameraCaptureConfiguration()
-        
-        videoEncoderConfig.dimensions = CGSize(width: 720, height: 1280)
-        videoEncoderConfig.frameRate = .fps15
-        videoEncoderConfig.bitrate = 1800
-        agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+        encoderConfig.dimensions = CGSize(width: 1920, height: 1080)
+        encoderConfig.frameRate = .fps15
+        encoderConfig.bitrate = 1800
+        engine?.setVideoEncoderConfiguration(encoderConfig)
         
         setExposureRange()
         setColorSpace()
@@ -117,12 +99,10 @@ extension ShowAgoraKitManager {
     func debug1TFModelForKey(_ key: ShowDebug1TFSettingKey) -> ShowDebug1TFModel {
         var originalValue = ""
         switch key {
-        case .captureFrameRate:
-            originalValue = "\(captureConfig.frameRate)"
         case .encodeFrameRate:
-            originalValue = "\(videoEncoderConfig.frameRate.rawValue)"
+            originalValue = "\(encoderConfig.frameRate.rawValue)"
         case .bitRate:
-            originalValue = "\(videoEncoderConfig.bitrate)"
+            originalValue = "\(encoderConfig.bitrate)"
         }
         return ShowDebug1TFModel(title: key.rawValue, tfText: originalValue, unitText: key.unit)
     }
@@ -130,12 +110,9 @@ extension ShowAgoraKitManager {
     func debug2TFModelForKey(_ key: ShowDebug2TFSettingKey) -> ShowDebug2TFModel{
         var text1 = "", text2 = ""
         switch key {
-        case .captureVideoSize:
-            text1 = "\(Int(captureConfig.dimensions.width))"
-            text2 = "\(Int(captureConfig.dimensions.height))"
         case .encodeVideoSize:
-            text1 = "\(Int(videoEncoderConfig.dimensions.width))"
-            text2 = "\(Int(videoEncoderConfig.dimensions.height))"
+            text1 = "\(Int(encoderConfig.dimensions.width))"
+            text2 = "\(Int(encoderConfig.dimensions.height))"
         case .exposureRange:
             if let exposureRangeX = exposureRangeX {
                 text1 = "\(exposureRangeX)"
@@ -158,30 +135,22 @@ extension ShowAgoraKitManager {
         guard let text = model.tfText else { return }
         guard let title = model.title, let key =  ShowDebug1TFSettingKey(rawValue: title) else { return }
         switch key {
-        case .captureFrameRate:
-            guard let value = Int32(text) else {
-                showLogger.info("***Debug*** 采集帧率参数为空 ")
-                return
-            }
-            captureConfig.frameRate = value
-            updateCameraCaptureConfiguration()
-            showLogger.info("***Debug*** setCameraCapturerConfiguration.captureFrameRate = \(captureConfig.frameRate) ")
         case .encodeFrameRate:
             guard let value = Int(text), let fps = AgoraVideoFrameRate(rawValue: value) else {
                 showLogger.info("***Debug*** 编码帧率参数为空 ")
                 return
             }
-            videoEncoderConfig.frameRate = fps
-            agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
-            showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeFrameRate = \(videoEncoderConfig.frameRate) ")
+            encoderConfig.frameRate = fps
+            engine?.setVideoEncoderConfiguration(encoderConfig)
+            showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeFrameRate = \(encoderConfig.frameRate) ")
         case .bitRate:
             guard let value = Int(text) else {
                 showLogger.info("***Debug*** 码率参数为空")
                 return
             }
-            videoEncoderConfig.bitrate = value
-            agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
-            showLogger.info("***Debug*** setVideoEncoderConfiguration.bitrate = \(videoEncoderConfig.bitrate) ")
+            encoderConfig.bitrate = value
+            engine?.setVideoEncoderConfiguration(encoderConfig)
+            showLogger.info("***Debug*** setVideoEncoderConfiguration.bitrate = \(encoderConfig.bitrate) ")
         }
     }
     
@@ -191,14 +160,10 @@ extension ShowAgoraKitManager {
         guard let value1 = Int(text1), let value2 = Int(text2) else {return}
         guard value1 > 0, value2 > 0 else { return }
         switch key {
-        case .captureVideoSize:
-            captureConfig.dimensions = CGSize(width: value1, height: value2)
-            updateCameraCaptureConfiguration()
-            showLogger.info("***Debug*** setCameraCapturerConfiguration.captureVideoSize = \(captureConfig.dimensions) ")
         case .encodeVideoSize:
-            videoEncoderConfig.dimensions = CGSize(width: value1, height: value2)
-            agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
-            showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeVideoSize = \(videoEncoderConfig.dimensions) ")
+            encoderConfig.dimensions = CGSize(width: value1, height: value2)
+            engine?.setVideoEncoderConfiguration(encoderConfig)
+            showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeVideoSize = \(encoderConfig.dimensions) ")
         case .exposureRange:
             exposureRangeX = value1
             exposureRangeY = value2
@@ -218,37 +183,36 @@ extension ShowAgoraKitManager {
         
         switch key {
         case .lowlightEnhance:
-            agoraKit.setLowlightEnhanceOptions(isOn, options: AgoraLowlightEnhanceOptions())
+            engine?.setLowlightEnhanceOptions(isOn, options: AgoraLowlightEnhanceOptions())
         case .colorEnhance:
-            agoraKit.setColorEnhanceOptions(isOn, options: AgoraColorEnhanceOptions())
+            engine?.setColorEnhanceOptions(isOn, options: AgoraColorEnhanceOptions())
         case .videoDenoiser:
-            agoraKit.setVideoDenoiserOptions(isOn, options: AgoraVideoDenoiserOptions())
+            engine?.setVideoDenoiserOptions(isOn, options: AgoraVideoDenoiserOptions())
         case .PVC:
-            agoraKit.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
+            engine?.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
         case .focusFace:
-            agoraKit.setCameraAutoFocusFaceModeEnabled(isOn)
+            engine?.setCameraAutoFocusFaceModeEnabled(isOn)
             showLogger.info("***Debug*** setCameraAutoFocusFaceModeEnabled  \(isOn)")
         case .encode:
             let index = indexValue % debugEncodeItems.count
-            agoraKit.setParameters("{\"engine.video.enable_hw_encoder\":\"\(debugEncodeItems[index])\"}")
+            engine?.setParameters("{\"engine.video.enable_hw_encoder\":\"\(debugEncodeItems[index])\"}")
             showLogger.info("***Debug*** engine.video.enable_hw_encoder  \(debugEncodeItems[index])")
         case .codeCType:
             let index = indexValue % debugCodeCTypeItems.count
-            agoraKit.setParameters("{\"engine.video.codec_type\":\"\(debugCodeCTypeItems[index])\"}")
+            engine?.setParameters("{\"engine.video.codec_type\":\"\(debugCodeCTypeItems[index])\"}")
             showLogger.info("***Debug*** engine.video.codec_type  \(debugCodeCTypeItems[index])")
 
         case .mirror, .renderMode:
             let index = ShowDebugSettingKey.renderMode.intValue % debugRenderModeItems.count
             let mirrorIsOn = ShowDebugSettingKey.mirror.boolValue
-            agoraKit.setLocalRenderMode(debugRenderModeItems[index], mirror: mirrorIsOn ? .enabled : .disabled)
+            engine?.setLocalRenderMode(debugRenderModeItems[index], mirror: mirrorIsOn ? .enabled : .disabled)
             showLogger.info("***Debug*** setLocalRenderMode  mirror = \(mirrorIsOn ? AgoraVideoMirrorMode.enabled : AgoraVideoMirrorMode.disabled), rendermode = \(debugRenderModeItems[index])")
         case .debugSR, .debugSrType:
             let srIsOn = ShowDebugSettingKey.debugSR.boolValue
             let index = ShowDebugSettingKey.debugSrType.intValue % debugSrTypeItems.count
-            setSuperResolutionOn(srIsOn, srType: debugSrTypeItems[index])
-            showLogger.info("***Debug*** setSuperResolutionOn  srIsOn = \(srIsOn), srType = \(debugSrTypeItems[index])")
+            setDebugSuperResolutionOn(srIsOn, srType: debugSrTypeItems[index])
         case .debugPVC:
-            agoraKit.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
+            engine?.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
             showLogger.info("***Debug*** rtc.video.enable_pvc \(isOn)")
         }
     }
@@ -258,15 +222,15 @@ extension ShowAgoraKitManager {
     
     private func setExposureRange() {
         if let x = exposureRangeX, let y = exposureRangeY {
-            agoraKit.setCameraExposurePosition(CGPoint(x: x, y: y))
+            engine?.setCameraExposurePosition(CGPoint(x: x, y: y))
             showLogger.info("***Debug*** setCameraExposurePosition = \(CGPoint(x: x, y: y)) ")
         }
     }
     
     private func setColorSpace(){
         if let v1 = videoFullrangeExt, let v2 = matrixCoefficientsExt {
-            agoraKit.setParameters("{\"che.video.videoFullrangeExt\":\(v1)}")
-            agoraKit.setParameters("{\"che.video.matrixCoefficientsExt\":\(v2)}")
+            engine?.setParameters("{\"che.video.videoFullrangeExt\":\(v1)}")
+            engine?.setParameters("{\"che.video.matrixCoefficientsExt\":\(v2)}")
             showLogger.info("***Debug*** {\"che.video.videoFullrangeExt\":\(v1)} {\"che.video.matrixCoefficientsExt\":\(v2)} ")
         }
     }
@@ -305,7 +269,7 @@ enum ShowDebugSettingKey: String, CaseIterable {
         case .videoDenoiser:
             return "show_advance_setting_videoDenoiser_title".show_localized
         case .PVC:
-            return "show_advance_setting_PVC_title".show_localized
+            return "PVC"
         case .focusFace:
             return "人脸对焦"
         case .encode:

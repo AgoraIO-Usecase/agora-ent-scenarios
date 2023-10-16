@@ -4,7 +4,7 @@
 //
 
 #import "VLMineTCell.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @interface VLMineTCell ()
 @end
@@ -53,6 +53,7 @@
 - (void)setIconImageName:(NSString *)imgStr title:(NSString *)title {
     self.iconImgView.image = UIImageMake(imgStr);
     self.itemTitleLabel.text = title;
+    self.itemTitleLabel.accessibilityIdentifier = imgStr;
 }
 
 @end

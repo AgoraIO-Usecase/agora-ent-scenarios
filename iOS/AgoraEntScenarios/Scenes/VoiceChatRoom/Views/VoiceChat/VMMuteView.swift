@@ -50,7 +50,7 @@ class VMMuteView: UIView {
             sepView.isHidden = isOwner
             roleBtn.isHidden = !isOwner
             muteBtn.frame = isOwner ? CGRect(x: 0, y: 170, width: bounds.size.width, height: 40) : CGRect(x: bounds.size.width / 2.0, y: 170, width: bounds.size.width / 2.0, height: 40)
-            iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage("mine_avatar_placeHolder"))
+            iconView.sd_setImage(with: URL(string: iconStr), placeholderImage:UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"))
             if m_type == 0 {
                 iconView.isHidden = false
                 nameLabel.text = username
@@ -61,7 +61,7 @@ class VMMuteView: UIView {
                 iconView.isHidden = false
 //                micView.isHidden = false
 //                micView.setState(.forbidden)
-                muteBtn.setTitle(LanguageManager.localValue(key: "Unmute"), for: .normal)
+                muteBtn.setTitle(LanguageManager.localValue(key: "voice_unmute"), for: .normal)
                 nameLabel.text = username
             }
         }
@@ -89,21 +89,21 @@ class VMMuteView: UIView {
         addSubview(cover)
 
         lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20, y: 8, width: 40, height: 4)
-        lineImgView.image = UIImage("pop_indicator")
+        lineImgView.image = UIImage.sceneImage(name: "pop_indicator", bundleName: "VoiceChatRoomResource")
         addSubview(lineImgView)
 
         bgView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
-        bgView.backgroundColor = UIColor.HexColor(hex: 0xdad9e9, alpha: 1)
+        bgView.backgroundColor = UIColor(hex: 0xdad9e9, alpha: 1)
         bgView.layer.cornerRadius = 32
         bgView.layer.masksToBounds = true
         addSubview(bgView)
 
         addView.frame = CGRect(x: ScreenWidth / 2 - 11, y: 61, width: 22, height: 22)
-        addView.image = UIImage("icons／solid／add")
+        addView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
         addSubview(addView)
 
         iconView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
-        iconView.image = UIImage("avatar1")
+        iconView.image = UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource")
         iconView.layer.cornerRadius = 32
         iconView.layer.masksToBounds = true
         addSubview(iconView)
@@ -111,21 +111,21 @@ class VMMuteView: UIView {
 
         nameLabel.frame = CGRect(x: ScreenWidth / 2.0 - 100, y: 110, width: 200, height: 20)
         nameLabel.text = ""
-        nameLabel.textColor = UIColor.HexColor(hex: 0x333333, alpha: 1)
+        nameLabel.textColor = UIColor(hex: 0x333333, alpha: 1)
         nameLabel.font = UIFont.systemFont(ofSize: 14, weight: .bold)
         nameLabel.textAlignment = .center
         addSubview(nameLabel)
 
         roleBtn.frame = CGRect(x: ScreenWidth / 2.0 - 50, y: 135, width: 100, height: 20)
-        roleBtn.setImage(UIImage("Landlord"), for: .normal)
-        roleBtn.setTitle(" \(LanguageManager.localValue(key: "host"))", for: .normal)
+        roleBtn.setImage(UIImage.sceneImage(name: "Landlord", bundleName: "VoiceChatRoomResource"), for: .normal)
+        roleBtn.setTitle(" \(LanguageManager.localValue(key: "voice_host"))", for: .normal)
         roleBtn.setTitleColor(UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1), for: .normal)
         roleBtn.font(UIFont.systemFont(ofSize: 11))
         addSubview(roleBtn)
         roleBtn.isHidden = true
 
         lineView.frame = CGRect(x: 0, y: 160, width: ScreenWidth, height: 1)
-        lineView.backgroundColor = UIColor.HexColor(hex: 0x979797, alpha: 0.12)
+        lineView.backgroundColor = UIColor(hex: 0x979797, alpha: 0.12)
         addSubview(lineView)
 
 //        micView.frame = CGRect(x: self.bounds.size.width / 2.0 + 10, y: 85, width: 20, height: 20)
@@ -136,7 +136,7 @@ class VMMuteView: UIView {
 
         leaveBtn.frame = CGRect(x: 0, y: 170, width: ScreenWidth / 2.0, height: 40)
         leaveBtn.setTitleColor(UIColor(red: 21 / 255.0, green: 110 / 255.0, blue: 243 / 255.0, alpha: 1), for: .normal)
-        leaveBtn.setTitle(LanguageManager.localValue(key: "Off-Stage"), for: .normal)
+        leaveBtn.setTitle(LanguageManager.localValue(key: "voice_off_stage"), for: .normal)
         leaveBtn.font(UIFont.systemFont(ofSize: 14))
         leaveBtn.tag = 400
         leaveBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
@@ -144,7 +144,7 @@ class VMMuteView: UIView {
 
         muteBtn.frame = CGRect(x: ScreenWidth / 2, y: 170, width: ScreenWidth / 2.0, height: 40)
         muteBtn.setTitleColor(UIColor(red: 21 / 255.0, green: 110 / 255.0, blue: 243 / 255.0, alpha: 1), for: .normal)
-        muteBtn.setTitle(LanguageManager.localValue(key: "Mute"), for: .normal)
+        muteBtn.setTitle(LanguageManager.localValue(key: "voice_mute"), for: .normal)
         muteBtn.font(UIFont.systemFont(ofSize: 14))
         muteBtn.tag = 401
         muteBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)

@@ -5,10 +5,9 @@ import io.agora.beautyapi.sensetime.CaptureMode
 import io.agora.beautyapi.sensetime.IEventCallback
 import io.agora.beautyapi.sensetime.SenseTimeBeautyAPI
 import io.agora.rtc2.RtcEngine
-import io.agora.rtc2.video.IVideoFrameObserver
 import java.util.concurrent.Executors
 
-abstract class IBeautyProcessor : IVideoFrameObserver {
+abstract class IBeautyProcessor {
     private val workerExecutor = Executors.newSingleThreadExecutor()
 
     @Volatile

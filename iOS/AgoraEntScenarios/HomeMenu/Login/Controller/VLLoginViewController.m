@@ -22,7 +22,7 @@
 #import "VLUserCenter.h"
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 #import "VLAlert.h"
 #import "AttributedTextView.h"
 @import Masonry;
@@ -49,7 +49,7 @@
     _policyAgreed = NO;
     
     [self setBackgroundImage:@"home_bg_image"];
-    [self setNaviTitleName:AGLocalizedString(@"声网")];
+    [self setNaviTitleName:AGLocalizedString(@"agora")];
     [self setupViews];
     [self setupLayout];
 }
@@ -188,7 +188,7 @@
 -(BOOL)checkVerifyCode {
     
     if (_verifyView.isVerifyCodeSent == NO || [_verifyView.verifyCode isEqualToString:@""] || !_verifyView.verifyCode) {
-        [VLToast toast:AGLocalizedString(@"请输入验证码")];
+        [VLToast toast:AGLocalizedString(@"app_please_input_v_code")];
         return NO;
     }
     return YES;
@@ -196,7 +196,7 @@
 
 -(BOOL)checkPrivacyAgree {
     if (!self.agreeButton.selected) {
-        [VLToast toast:AGLocalizedString(@"请您认真阅读用户协议及隐私政策的条款内容，同意后可开始使用我们的服务")];
+        [VLToast toast:AGLocalizedString(@"app_agree_tip")];
         return NO;
     }
     return YES;
@@ -204,11 +204,11 @@
 
 -(BOOL)checkPhoneNo {
     if ([_phoneView.phoneNo isEqualToString:@""] || !_phoneView.phoneNo) {
-        [VLToast toast:AGLocalizedString(@"请输入手机号")];
+        [VLToast toast:AGLocalizedString(@"app_please_input_account")];
         return NO;
     }
     if (_phoneView.phoneNo.length != 11) {
-        [VLToast toast:AGLocalizedString(@"手机号码格式错误")];
+        [VLToast toast:AGLocalizedString(@"invalid_phone_number")];
         return NO;
     }
     return YES;
@@ -270,12 +270,12 @@
         }
         else {
             dispatch_main_async_safe(^{
-                [VLToast toast:AGLocalizedString(@"验证码校验失败，请重试")];
+                [VLToast toast:AGLocalizedString(@"validate_failed")];
             })
         }
     } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
         dispatch_main_async_safe(^{
-            [VLToast toast:AGLocalizedString(@"验证码校验失败，请重试")];
+            [VLToast toast:AGLocalizedString(@"validate_failed")];
         })
     }];
 }
@@ -287,7 +287,7 @@
         _appNameLabel = [[UILabel alloc] init];
         _appNameLabel.font = VLUIFontBoldMake(26);
         _appNameLabel.textColor = UIColorMakeWithHex(@"#040925");
-        _appNameLabel.text = AGLocalizedString(@"欢迎体验声网服务");
+        _appNameLabel.text = AGLocalizedString(@"app_welcome_experience");
     }
     return _appNameLabel;
 }
@@ -320,7 +320,7 @@
 - (UIButton *)loginButton {
     if (!_loginButton) {
         _loginButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_loginButton setTitle:AGLocalizedString(@"登录") forState:UIControlStateNormal];
+        [_loginButton setTitle:AGLocalizedString(@"app_login") forState:UIControlStateNormal];
         [_loginButton addTarget:self action:@selector(loginClick:) forControlEvents:UIControlEventTouchUpInside];
         [_loginButton setBackgroundColor:UIColorMakeWithHex(@"#345DFF")];
         CAGradientLayer *gl = [CAGradientLayer layer];
@@ -354,7 +354,7 @@
 }
 
 -(void)showPrivacyViewWith:(int)pass {
-    NSString *textString =  pass == 0 ?  AGLocalizedString(@"声动互娱软件是一款用于向声网客户展示产品使用效果的测试产品，仅用于测试产品的功能、性能和可用性，而非提供给大众使用的正式产品。\n1.我们将依据《用户协议》及《隐私政策》来帮助您了解我们在收集、使用、存储您个人信息的情况以及您享有的相关权利。\n2.在您使用本测试软件时，我们将收集您的设备信息、日志信息等，同时根据不同使用场景，你可以授予我们获取您设备的麦克风权限、摄像头权限等信息。\n\n您可通过阅读完整的《用户协议》及《隐私政策》来了解详细信息。") : AGLocalizedString(@"同意 用户协议 及 隐私政策 后，声动互娱才能为您提供协作服务。");
+    NSString *textString =  pass == 0 ?  AGLocalizedString(@"privacy_protection_tip1") : AGLocalizedString(@"privacy_protection_tip2");
             NSRange range1 = pass == 0 ? NSMakeRange(72, 4) : NSMakeRange(3, 4);
             NSRange range2 = pass == 0 ? NSMakeRange(79, 4) : NSMakeRange(10, 4);
             NSRange range3 = NSMakeRange(203, 4);
@@ -374,16 +374,16 @@
     CGRect rect = CGRectMake(0, 0, UIScreen.mainScreen.bounds.size.width, pass == 0 ? 260 : 120);
     NSString *confirmTitle, *cancelTitle;
     if(pass == 0) {
-        cancelTitle = AGLocalizedString(@"不同意");
-        confirmTitle = AGLocalizedString(@"同意");
+        cancelTitle = AGLocalizedString(@"disagree");
+        confirmTitle = AGLocalizedString(@"agree");
     }
     else {
-        cancelTitle = AGLocalizedString(@"不同意并退出");
-        confirmTitle = AGLocalizedString(@"同意并继续");
+        cancelTitle = AGLocalizedString(@"disagree_and_exit");
+        confirmTitle = AGLocalizedString(@"agree_and_goon");
     }
     NSArray *array = [[NSArray alloc]initWithObjects:cancelTitle,confirmTitle, nil];
     kWeakSelf(self)
-    [[VLAlert shared] showAttributeAlertWithFrame:rect title:@"个人信息保护指引" text:textString AttributedStringS:arrayTitles ranges:ranges textColor:UIColorMakeWithHex(@"#6C7192") attributeTextColor:UIColorMakeWithHex(@"#009FFF") buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+    [[VLAlert shared] showAttributeAlertWithFrame:rect title:AGLocalizedString(@"personal_information") text:textString AttributedStringS:arrayTitles ranges:ranges textColor:UIColorMakeWithHex(@"#6C7192") attributeTextColor:UIColorMakeWithHex(@"#009FFF") buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
         [[VLAlert shared] dismiss];
         if(pass == 0){
             [weakself privacyCustomViewDidChange:flag];

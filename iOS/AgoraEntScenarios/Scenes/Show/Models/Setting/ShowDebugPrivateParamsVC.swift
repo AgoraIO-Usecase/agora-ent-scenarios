@@ -9,7 +9,6 @@ import UIKit
 
 class ShowDebugPrivateParamsVC: UIViewController {
     
-    var settingManager: ShowAgoraKitManager?
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
     
@@ -48,12 +47,12 @@ class ShowDebugPrivateParamsVC: UIViewController {
     
     @objc private func didClickSaveButton() {
         let text = textView.text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard text.count > 0, let agoraKit = settingManager?.agoraKit else {
+        guard text.count > 0, let engine = ShowAgoraKitManager.shared.engine else {
             ToastView.show(text: "不能为空")
             return
         }
 //        settingManager?.privateParams = text
-        let ret = agoraKit.setParameters(text)
+        let ret = engine.setParameters(text)
         if ret != 0 {
             ToastView.show(text: "error: \(ret)")
             return
