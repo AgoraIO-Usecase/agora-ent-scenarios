@@ -62,24 +62,24 @@ static VLAlert *_alert = nil;
 }
 
 -(void)showAttributeAlertWithFrame:(CGRect)frame title:(NSString * _Nullable)title text:(NSString *)text AttributedStringS:(NSArray *)strings ranges:(NSArray *)ranges textColor:(UIColor *)textColor attributeTextColor:(UIColor * )attributeTextColor buttonTitles:(NSArray *)buttonTitles completion:(OnCallback _Nullable)completion linkCompletion:(linkCallback _Nullable)linkCompletion{
-        [self layoutUI];
-        self.alertType = ALERTYPEATTRIBUTE;
-        self.completion = completion;
-        self.linkCompletion = linkCompletion;
-        self.textField.hidden = true;
-        self.titleLabel.text = title;
-        self.mesLabel.hidden = true;
-        self.textView.hidden = true;
-        self.attributeMessage = text;
-        
-        self.attrView = [[AttributedTextView alloc]initWithFrame:CGRectZero text:text AttributedStringS:strings ranges:ranges textColor:textColor attributeTextColor:attributeTextColor];
-        [self.alertView addSubview:self.attrView];
-        self.attrView.delegate = self;
+    [self layoutUI];
+    self.alertType = ALERTYPEATTRIBUTE;
+    self.completion = completion;
+    self.linkCompletion = linkCompletion;
+    self.textField.hidden = true;
+    self.titleLabel.text = title;
+    self.mesLabel.hidden = true;
+    self.textView.hidden = true;
+    self.attributeMessage = text;
     
-        [self.cancleBtn setTitle:buttonTitles[0] forState:UIControlStateNormal];
-        [self.confirmBtn setTitle:buttonTitles[1] forState:UIControlStateNormal];
-
-        [UIApplication.sharedApplication.delegate.window addSubview:self];
+    self.attrView = [[AttributedTextView alloc]initWithFrame:CGRectZero text:text font: [UIFont systemFontOfSize:14] AttributedStringS:strings ranges:ranges textColor:textColor attributeTextColor:attributeTextColor];
+    [self.alertView addSubview:self.attrView];
+    self.attrView.delegate = self;
+    
+    [self.cancleBtn setTitle:buttonTitles[0] forState:UIControlStateNormal];
+    [self.confirmBtn setTitle:buttonTitles[1] forState:UIControlStateNormal];
+    
+    [UIApplication.sharedApplication.delegate.window addSubview:self];
 }
 
 -(void)layoutUI {
@@ -177,9 +177,9 @@ static VLAlert *_alert = nil;
     self.textField.frame = CGRectMake(10, 0, self.alertView.bounds.size.width - 50, 40);
     self.attrView.frame = CGRectMake(20, 62, self.alertView.bounds.size.width - 40, attrTVHeight);
     
-    CGFloat btnW = (self.alertView.bounds.size.width - 40 - 50) * 0.5;
+    CGFloat btnW = (self.alertView.bounds.size.width - 40 - 30) * 0.5;
     self.cancleBtn.frame = CGRectMake(20, contentHeight - 60, btnW, 40);
-    self.confirmBtn.frame = CGRectMake( self.alertType == ALERTYPECONFIRM ? 20 : 20 + 50 + btnW, contentHeight - 60, self.alertType == ALERTYPECONFIRM ? self.alertView.bounds.size.width - 40 : btnW, 40);
+    self.confirmBtn.frame = CGRectMake( self.alertType == ALERTYPECONFIRM ? 20 : 20 + 30 + btnW, contentHeight - 60, self.alertType == ALERTYPECONFIRM ? self.alertView.bounds.size.width - 40 : btnW, 40);
 }
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField{

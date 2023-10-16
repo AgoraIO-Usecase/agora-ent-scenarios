@@ -38,6 +38,8 @@
 #pragma mark - Life Cycle Methods
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.view.backgroundColor = [UIColor colorWithHexString:@"#F5F8FF"];
+    [self setBackgroundImage:@"home_bg_image"];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -136,7 +138,7 @@
  info.plist文件中，View controller-based status bar appearance项设为YES，
  则View controller对status bar的设置优先级高于application的设置。
  为NO则以application的设置为准，view controller的prefersStatusBarHidden方法无效，是根本不会被调用的。
- 
+
  @return true false
  */
 - (BOOL)prefersStatusBarHidden {

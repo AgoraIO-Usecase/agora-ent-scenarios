@@ -11,7 +11,6 @@
 #import "VLSBGRoomSeatModel.h"
 
 #import "VLSBGPopScoreView.h"
-#import "VLLoginViewController.h"
 #import "VLSBGCreateRoomViewController.h"
 #import "LSTPopView.h"
 #import "VLUserCenter.h"
@@ -21,6 +20,7 @@
 #import "AppContext+SBG.h"
 #import "SBGMacro.h"
 #import "VLAlert.h"
+#import "AgoraEntScenarios-Swift.h"
 
 @interface VLSBGOnLineListVC ()<VLSBGHomeOnLineListViewDelegate/*,AgoraRtmDelegate*/,VLSBGPopScoreViewDelegate>
 
@@ -69,7 +69,7 @@
 
 - (BOOL)checkIsLogin {
     if (![VLUserCenter center].isLogin) {
-        VLLoginViewController *loginVC = [[VLLoginViewController alloc] init];
+        VLLoginController *loginVC = [[VLLoginController alloc] init];
         [self.navigationController pushViewController:loginVC animated:YES];
         return NO;
     }
