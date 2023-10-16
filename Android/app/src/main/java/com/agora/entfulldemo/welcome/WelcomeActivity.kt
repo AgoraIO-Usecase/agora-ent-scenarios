@@ -17,6 +17,7 @@ import io.agora.scene.base.utils.SPUtil
 @Route(path = PagePathConstant.pageWelcome)
 class WelcomeActivity : BaseViewBindingActivity<AppActivityWelcomeBinding>() {
     private var userAgreementDialog: UserAgreementDialog? = null
+    private var userAgreementDialog2: UserAgreementDialog2? = null
     override fun getViewBinding(inflater: LayoutInflater): AppActivityWelcomeBinding {
         return AppActivityWelcomeBinding.inflate(inflater)
     }
@@ -39,7 +40,7 @@ class WelcomeActivity : BaseViewBindingActivity<AppActivityWelcomeBinding>() {
                 onButtonClickListener = object : OnButtonClickListener {
                     override fun onLeftButtonClick() {
                         dismiss()
-                        finish()
+                        showUserAgreementDialog2()
                     }
 
                     override fun onRightButtonClick() {
@@ -51,6 +52,29 @@ class WelcomeActivity : BaseViewBindingActivity<AppActivityWelcomeBinding>() {
             }
         }
         userAgreementDialog?.show()
+    }
+
+    /**
+     * 显示用户协议 隐私政策对话框
+     */
+    private fun showUserAgreementDialog2(){
+        if (userAgreementDialog2 == null) {
+            userAgreementDialog2 = UserAgreementDialog2(this).apply {
+                onButtonClickListener = object : OnButtonClickListener {
+                    override fun onLeftButtonClick() {
+                        dismiss()
+                        finish()
+                    }
+
+                    override fun onRightButtonClick() {
+                        PagePilotManager.pageLogin()
+                        dismiss()
+                        finish()
+                    }
+                }
+            }
+        }
+        userAgreementDialog2?.show()
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
