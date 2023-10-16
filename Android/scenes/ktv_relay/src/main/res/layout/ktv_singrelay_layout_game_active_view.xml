@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:background="@mipmap/ktv_game_background"
+    tools:layout_height="320dp">
+
+    <TextView
+        android:id="@+id/tvSongTab"
+        android:layout_width="41dp"
+        android:layout_height="20dp"
+        android:background="@drawable/ktv_skip_btn_bg"
+        android:gravity="center"
+        android:text="@string/ktv_tips"
+        android:textColor="@color/white"
+        android:textSize="10sp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvSongNumTab"
+        android:layout_width="41dp"
+        android:layout_height="20dp"
+        android:background="@drawable/ktv_skip_btn_bg"
+        android:gravity="center"
+        android:text="1/5"
+        android:textColor="@color/white"
+        android:textSize="10sp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toEndOf="@+id/tvSongTab"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/ivGameTips"
+        android:layout_width="0dp"
+        android:layout_height="110dp"
+        android:background="@mipmap/ktv_game_tips"
+        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="10dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/winnerTips"
+        android:layout_width="180dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="6dp"
+        android:orientation="horizontal"
+        android:background="@drawable/ktv_relay_game_winner_bg"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@+id/tvSongNumTab"
+        app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/ktv_relay_winner_pic"
+            android:layout_gravity="center"
+            android:layout_marginStart="2dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="3dp"
+            android:text="@string/ktv_next_round"
+            android:textSize="12dp"
+            android:textColor="@color/white"/>
+        <ImageView
+            android:id="@+id/ivWinnerHeader"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="3dp"
+            tools:background="@mipmap/ktv_ic_song_default"/>
+        <TextView
+            android:id="@+id/ivWinnerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="3dp"
+            android:textSize="12dp"
+            android:textColor="@color/white"/>
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/messageText"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="@mipmap/ktv_game_idle_text_background"
+        android:text="@string/ktv_game_room_owner_idle"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+    </androidx.appcompat.widget.AppCompatTextView>
+
+    <LinearLayout
+        android:id="@+id/tvBattleResultView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="@+id/messageText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/messageText"
+        tools:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:text="下段由 "/>
+
+        <ImageView
+            android:id="@+id/ivHeader"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            tools:background="@mipmap/ktv_ic_song_default"/>
+
+        <TextView
+            android:id="@+id/tvBattleResultName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:text="演唱"/>
+
+    </LinearLayout>
+
+    <io.agora.scene.ktv.singrelay.widget.lrcView.LrcControlView
+        android:id="@+id/lrcControlView"
+        android:layout_width="match_parent"
+        android:layout_height="275dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="36dp"
+        android:background="@drawable/bg_music_player_view"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
