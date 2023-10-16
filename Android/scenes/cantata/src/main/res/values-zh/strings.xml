@@ -102,7 +102,7 @@
     <string name="cantata_room_big_woman">大房间(女)</string>
     <string name="cantata_room_small_woman">小房间(女)</string>
     <string name="cantata_your_score">你的得分</string>
-    <string name="cantata_room_count">当前在线人数：%s</string>
+    <string name="cantata_room_count">%d在线</string>
     <string name="cantata_zc">主唱</string>
     <string name="cantata_hc">合唱</string>
     <string name="cantata_song_ordering_person">点唱：</string>
