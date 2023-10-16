@@ -495,6 +495,9 @@ class RoomObservableViewDelegate constructor(
                 override fun onEarBackSetting() {
                     onEarBackSettingDialog()
                 }
+                override fun onVirtualSoundCardSetting() {
+                    onVirtualSoundCardSettingDialog()
+                }
                 override fun onBGMSetting() {
                     onBGMSettingDialog()
                 }
@@ -657,6 +660,11 @@ class RoomObservableViewDelegate constructor(
             roomAudioSettingDialog?.updateEarBackState()
         }
         dialog.show(activity.supportFragmentManager, "mtBGMSetting")
+    }
+    /** 耳返设置弹框
+     */
+    fun onVirtualSoundCardSettingDialog() {
+
     }
     /** 背景音乐设置弹框
      */

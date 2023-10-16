@@ -95,6 +95,9 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             tvInEarArrow.setOnClickListener {
                 audioSettingsListener?.onEarBackSetting()
             }
+            tvSoundCardArrow.setOnClickListener {
+                audioSettingsListener?.onVirtualSoundCardSetting()
+            }
             tvBGMArrow.setOnClickListener {
                 audioSettingsListener?.onBGMSetting()
             }
@@ -199,6 +202,8 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
 
         /**耳返设置*/
         fun onEarBackSetting()
+        /**耳返设置*/
+        fun onVirtualSoundCardSetting()
 
         /** BGM 设置*/
         fun onBGMSetting()

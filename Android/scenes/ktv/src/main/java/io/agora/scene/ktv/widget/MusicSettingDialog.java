@@ -30,22 +30,26 @@ import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.bean.EffectVoiceBean;
 import io.agora.scene.ktv.databinding.KtvDialogMusicSettingBinding;
 import io.agora.scene.ktv.databinding.KtvItemEffectvoiceBinding;
-import io.agora.scene.ktv.live.fragment.dialog.BeautyVoiceFragment;
 import io.agora.scene.ktv.live.fragment.dialog.EarBackFragment;
+import io.agora.scene.ktv.live.fragment.dialog.SoundCardFragment;
+import io.agora.scene.ktv.live.fragment.dialog.SoundCardSettingBean;
+import io.agora.scene.ktv.live.fragment.dialog.SoundTypeFragment;
 import io.agora.scene.ktv.live.holder.EffectVoiceHolder;
 import io.agora.scene.widget.DividerDecoration;
-
+import kotlin.Unit;
 /**
  * 控制台
  */
 public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogMusicSettingBinding> implements OnItemClickListener<EffectVoiceBean> {
     public static final String TAG = "MusicSettingDialog";
     private MusicSettingBean mSetting;
+    private SoundCardSettingBean mSoundCardSetting;
     private Boolean isPause = false;
     private BaseRecyclerViewAdapter<KtvItemEffectvoiceBinding, EffectVoiceBean, EffectVoiceHolder> adapter;
 
-    public MusicSettingDialog(MusicSettingBean mSetting, boolean isPause) {
+    public MusicSettingDialog(MusicSettingBean mSetting,SoundCardSettingBean mSoundCardSetting, boolean isPause) {
         this.mSetting = mSetting;
+        this.mSoundCardSetting = mSoundCardSetting;
         this.isPause = isPause;
     }
 
@@ -123,6 +127,13 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
             mBinding.switchEar.setText("关闭");
         }
         mBinding.switchEar.setOnClickListener(this::showEarBackPage);
+
+        if (this.mSoundCardSetting.isEnable()) {
+            mBinding.switchSoundCard.setText("开启");
+        } else {
+            mBinding.switchSoundCard.setText("关闭");
+        }
+        mBinding.switchSoundCard.setOnClickListener(this::showSoundCardPage);
 
         mBinding.btVol1Down.setOnClickListener(v -> tuningMicVolume(false));
         mBinding.btVol1Up.setOnClickListener(v -> tuningMicVolume(true));
@@ -255,6 +266,26 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         ft.commit();
     }
 
+    private void showSoundCardPage(View v){
+        mBinding.getRoot().removeAllViews();
+        SoundCardFragment soundCardFragment = new SoundCardFragment(mSoundCardSetting);
+        soundCardFragment.setOnClickSoundCardType(() -> {
+            showSoundTypeSelectPage();
+            return Unit.INSTANCE;
+        });
+        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+        ft.add(mBinding.getRoot().getId(), soundCardFragment, SoundCardFragment.TAG);
+        ft.commit();
+    }
+
+    private void showSoundTypeSelectPage() {
+        mBinding.getRoot().removeAllViews();
+        BaseViewBindingFragment<?> soundTypeFragment = new SoundTypeFragment(mSoundCardSetting);
+        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+        ft.add(mBinding.getRoot().getId(), soundTypeFragment, SoundCardFragment.TAG);
+        ft.commit();
+    }
+
     /**
      * IMediaPlayer.java
      * /**
@@ -286,7 +317,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
 
             if (newToneValue != this.mSetting.getToneValue())
                 this.mSetting.setToneValue(newToneValue);
-            }
+        }
         mBinding.changeToneView.setProgress(newToneValue);
     }
 
