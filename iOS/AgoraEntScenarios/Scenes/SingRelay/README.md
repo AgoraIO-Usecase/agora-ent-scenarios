@@ -256,7 +256,7 @@
 >
 >   包含了房间的创建和房间列表的获取
 >
->   相关代码请参考：[**SRServiceModel**](Service/SRServiceModel.h)，分别依赖 [**SRServiceProtocol**](Service/SRServiceProtocol.swift) 的下列方法去交互
+>   相关代码请参考：[**SRServiceModel**](Service/SRServiceModel.swift)，分别依赖 [**SRServiceProtocol**](Service/SRServiceProtocol.swift) 的下列方法去交互
 >
 >   ```Swift
 >   - (void)getRoomListWithPage:(NSUInteger)page
