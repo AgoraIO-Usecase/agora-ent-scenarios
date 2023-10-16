@@ -87,6 +87,7 @@ class ShowCreateLiveVC: UIViewController {
     private func showPreset() {
         if AppContext.shared.isDebugMode {
             let vc = ShowDebugSettingVC()
+            vc.engine = ShowAgoraKitManager.shared.engine
             vc.isBroadcastor = true
             self.navigationController?.pushViewController(vc, animated: true)
         } else {
@@ -107,6 +108,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     func onClickSettingBtnAction() {
         if AppContext.shared.isDebugMode {
             let vc = ShowDebugSettingVC()
+            vc.engine = ShowAgoraKitManager.shared.engine
             vc.isBroadcastor = true
             self.navigationController?.pushViewController(vc, animated: true)
         }else{

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AgoraRtcKit
 
 private let SwitchCellID = "SwitchCellID"
 private let SliderCellID = "SliderCellID"
@@ -16,6 +17,11 @@ private let Debug2TFCellID = "Debug2TFCellID"
 class ShowDebugSettingVC: UIViewController {
     
     var isBroadcastor = true // 频道外
+    var engine: AgoraRtcEngineKit! {
+        didSet{
+            ShowDebugAgoraKitManager.shared.engine = engine
+        }
+    }
     
     private let transDelegate = ShowPresentTransitioningDelegate()
     private lazy var dataArray: [Any] = {

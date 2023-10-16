@@ -326,6 +326,8 @@ extension ShowAgoraKitManager {
             let dimensions = ShowAgoraVideoDimensions.values()
             let index = indexValue % dimensions.count
             let size = dimensions[index]
+            let encoderConfig = getEncoderConfig()
+            let captureConfig = getCaptureConfig()
             encoderConfig.dimensions = size
             captureConfig.dimensions = size
             
@@ -338,6 +340,7 @@ extension ShowAgoraKitManager {
             }
         case .videoBitRate:
             let sliderValue = key.floatValue
+            let encoderConfig = getEncoderConfig()
             encoderConfig.bitrate = Int(sliderValue)
             if let currentChannelId = currentChannelId {
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
@@ -347,6 +350,8 @@ extension ShowAgoraKitManager {
         case .FPS:
             let indexValue = key.intValue
             let index = indexValue % fpsItems.count
+            let encoderConfig = getEncoderConfig()
+            let captureConfig = getCaptureConfig()
             encoderConfig.frameRate = fpsItems[index]
             // 采集帧率
             captureConfig.frameRate = Int32(fpsItems[index].rawValue)
@@ -358,6 +363,7 @@ extension ShowAgoraKitManager {
             }
         case .H265:
             let isOn = key.boolValue
+            let encoderConfig = getEncoderConfig()
             encoderConfig.codecType = isOn ? .H265 : .H264
             if let channelId = currentChannelId {
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: channelId)

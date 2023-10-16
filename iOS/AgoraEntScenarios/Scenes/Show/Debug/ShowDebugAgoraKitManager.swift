@@ -51,7 +51,9 @@ class ShowDebugAgoraKitManager {
     
     static let shared = ShowDebugAgoraKitManager()
     
-    let encoderConfig = AgoraVideoEncoderConfiguration()
+    private lazy var encoderConfig :AgoraVideoEncoderConfiguration = {
+        getEncoderConfig()
+    }()
     
     public var engine: AgoraRtcEngineKit?
     
@@ -61,7 +63,7 @@ class ShowDebugAgoraKitManager {
     var videoFullrangeExt: Int?
     
     private init() {
-        engine = AgoraRtcEngineKit.sharedEngine(with: AgoraRtcEngineConfig(), delegate: nil)
+//        engine = AgoraRtcEngineKit.sharedEngine(with: AgoraRtcEngineConfig(), delegate: nil)
     }
     
     private func engineConfig() -> AgoraRtcEngineConfig {
@@ -289,6 +291,20 @@ extension ShowDebugAgoraKitManager {
         UserDefaults.standard.set(encoderConfig.frameRate.rawValue, forKey: kEncodeFPS)
         UserDefaults.standard.set(encoderConfig.bitrate, forKey: kEncodeBitrate)
         UserDefaults.standard.synchronize()
+    }
+    
+    func getEncoderConfig() ->AgoraVideoEncoderConfiguration{
+        let encoderConfig = AgoraVideoEncoderConfiguration()
+        if let encodeWidth: CGFloat = UserDefaults.standard.value(forKey: kEncodeWidth) as? CGFloat ,let encodeHeight: CGFloat = UserDefaults.standard.value(forKey: kEncodeHeight) as? CGFloat {
+            encoderConfig.dimensions = CGSize(width: encodeWidth, height: encodeHeight)
+        }
+        if let fps: Int = UserDefaults.standard.value(forKey: kEncodeFPS) as? Int {
+            encoderConfig.frameRate =  AgoraVideoFrameRate(rawValue: fps) ?? .fps15
+        }
+        if let bitrate: Int = UserDefaults.standard.value(forKey: kEncodeBitrate) as? Int {
+            encoderConfig.bitrate = bitrate
+        }
+        return encoderConfig
     }
 }
 

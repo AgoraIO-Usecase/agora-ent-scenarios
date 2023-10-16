@@ -34,15 +34,15 @@ class ShowAgoraKitManager: NSObject {
 //    var matrixCoefficientsExt: Int?
 //    var videoFullrangeExt: Int?
     
-    let encoderConfig = AgoraVideoEncoderConfiguration()
-    
-    public lazy var captureConfig: AgoraCameraCapturerConfiguration = {
-        let config = AgoraCameraCapturerConfiguration()
-        config.followEncodeDimensionRatio = true
-        config.cameraDirection = .front
-        config.frameRate = 15
-        return config
-    }()
+//    let encoderConfig = AgoraVideoEncoderConfiguration()
+//
+//    public lazy var captureConfig: AgoraCameraCapturerConfiguration = {
+//        let config = AgoraCameraCapturerConfiguration()
+//        config.followEncodeDimensionRatio = true
+//        config.cameraDirection = .front
+//        config.frameRate = 15
+//        return config
+//    }()
     
     public var engine: AgoraRtcEngineKit?
     
@@ -390,6 +390,7 @@ class ShowAgoraKitManager: NSObject {
             assert(true, "rtc engine not initlized")
             return
         }
+        let encoderConfig = getEncoderConfig()
         encoderConfig.dimensions = CGSize(width: size.width, height: size.height)
         engine.setVideoEncoderConfiguration(encoderConfig)
     }
