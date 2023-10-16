@@ -13,6 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 import io.agora.media.RtcTokenBuilder;
 import io.agora.scene.base.BuildConfig;
+import io.agora.scene.base.utils.ToastUtils;
+import io.agora.scene.cantata.CantataLogger;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -51,6 +53,7 @@ public class ApiManager {
             .build();
 
     public String fetchCloudToken() {
+        CantataLogger.d(TAG, "fetchCloudToken");
         String token = "";
         try {
             JSONObject acquireOjb = new JSONObject();
@@ -82,9 +85,11 @@ public class ApiManager {
     }
 
     public void fetchStartCloud(String mainChannel, int cloudRtcUid) {
+        CantataLogger.d(TAG, "fetchStartCloud, mainChannel: " + mainChannel + " cloudRtcUid: " + cloudRtcUid);
         String token = fetchCloudToken();
         if (token.isEmpty()) {
             Log.e(TAG, "云端合流uid 请求报错 token is null");
+            ToastUtils.showToastLong("云端合流服务开启失败，请重新创建房间");
             return;
         } else {
             tokenName = token;
@@ -144,6 +149,9 @@ public class ApiManager {
                 if (jsonUid.has("taskId")) {
                     taskId = jsonUid.getString("taskId");
                 }
+                ToastUtils.showToastLong("云端合流服务开启成功");
+            } else {
+                ToastUtils.showToastLong("云端合流服务开启失败，请重新创建房间");
             }
         } catch (Exception e) {
             Log.e(TAG, "云端合流uid 请求报错 " + e.getMessage());
@@ -154,6 +162,7 @@ public class ApiManager {
     }
 
     public void fetchStopCloud() {
+        CantataLogger.d(TAG, "fetchStopCloud");
         if (taskId.isEmpty() || tokenName.isEmpty()) {
             Log.e(TAG, "云端合流任务停止失败 taskId || tokenName is null");
             return;
@@ -190,19 +199,6 @@ public class ApiManager {
     private String deleteTaskUrl(String domain, String appid, String taskid, String tokenName) {
         return String.format("%s/v1/projects/%s/rtsc/cloud-transcoder/tasks/%s?builderToken=%s", domain, appid, taskid, tokenName);
     }
-
-//    private String getRtcToken(String channelId, int uid) {
-//        String rtcToken = "";
-//        try {
-//            rtcToken = new RtcTokenBuilder().buildTokenWithUid(
-//                    BuildConfig.RTC_APP_ID, BuildConfig.RTC_APP_CERT, channelId, uid,
-//                    RtcTokenBuilder.Role.Role_Publisher, 0
-//            );
-//        } catch (Exception e) {
-//            Log.e("getRtcToken", "rtc token build error " + e.getMessage());
-//        }
-//        return rtcToken;
-//    }
 
     private String getBasicAuth() {
         // 拼接客户 ID 和客户密钥并使用 base64 编码

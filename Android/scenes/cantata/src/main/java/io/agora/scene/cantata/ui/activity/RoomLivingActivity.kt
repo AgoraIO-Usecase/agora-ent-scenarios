@@ -71,7 +71,6 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     private var mTimeUpExitDialog: CantataCommonDialog? = null
     private var musicSettingDialog: MusicSettingDialog? = null
     private var mChangeMusicDialog: CommonDialog? = null
-    private var mUserLeaveSeatMenuDialog: UserLeaveSeatMenuDialog? = null
     private var mChorusSingerDialog: ChorusSingerDialog? = null
 
     // 点歌台
@@ -311,6 +310,9 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
                         mRoomLivingViewModel.mSongsOrderedLiveData.value!!.size > 1) {
                     val nextName = mRoomLivingViewModel.mSongsOrderedLiveData.value!![1].songName + "-" + mRoomLivingViewModel.mSongsOrderedLiveData.value!![1].singer
                     binding.rankListView.resetRankList(mRoomLivingViewModel.getRankList(), nextName)
+                } else if (mRoomLivingViewModel.isRoomOwner() && mRoomLivingViewModel.mSongsOrderedLiveData.value != null &&
+                        mRoomLivingViewModel.mSongsOrderedLiveData.value!!.size == 1) {
+                    binding.rankListView.resetRankList(mRoomLivingViewModel.getRankList(), "")
                 } else {
                     binding.rankListView.resetRankList(mRoomLivingViewModel.getRankList(), null)
                 }
@@ -541,34 +543,10 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mChorusSingerDialog = ChorusSingerDialog(isRoomOwner, songModel, seatList)
         mChorusSingerDialog?.show(supportFragmentManager, ChorusSingerDialog.TAG)
         mChorusSingerDialog?.onKickingCallback = {
-            ToastUtils.showToast("on kicking ${it.name}")
             mRoomLivingViewModel.leaveSeat(it)
+            mChorusSingerDialog?.dismiss()
         }
         mChorusSingerDialog?.updateAllData()
-    }
-
-    /**
-     * 下麦提示
-     */
-    private fun showUserLeaveSeatMenuDialog(seatModel: RoomSeatModel) {
-        if (mUserLeaveSeatMenuDialog == null) {
-            mUserLeaveSeatMenuDialog = UserLeaveSeatMenuDialog(this).apply {
-                onButtonClickListener = object : OnButtonClickListener {
-                    override fun onLeftButtonClick() {
-                        setDarkStatusIcon(isBlackDarkStatus)
-                        mRoomLivingViewModel.leaveChorus()
-                    }
-
-                    override fun onRightButtonClick() {
-                        setDarkStatusIcon(isBlackDarkStatus)
-                        mRoomLivingViewModel.leaveSeat(seatModel)
-                    }
-                }
-                setAgoraMember(seatModel.name, seatModel.headUrl)
-            }
-        }
-
-        mUserLeaveSeatMenuDialog?.show()
     }
 
     private fun showChooseSongDialog() {

@@ -757,25 +757,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
             return
         }
-        if (!mIsOnSeat) {
-            // 不在麦上， 自动上麦
-            mCantataServiceProtocol.onSeat(OnSeatInputModel(0)) { err: Exception? ->
-                if (err == null) {
-                    mIsOnSeat = true
-                    //自动开麦
-                    mMainChannelMediaOption.publishMicrophoneTrack = true
-                    mMainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-                    mRtcEngine?.updateChannelMediaOptions(mMainChannelMediaOption)
-                    innerJoinChorus(musicModel.songNo)
-                } else {
-                    mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
-                    ToastUtils.showToast(err.message)
-                }
-            }
-        } else {
-            // 在麦上，直接加入合唱
-            innerJoinChorus(musicModel.songNo)
-        }
+
+        innerJoinChorus(musicModel.songNo)
     }
 
     private fun innerJoinChorus(songCode: String) {
@@ -817,23 +800,18 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                             if (mIsOnSeat) {
                                 // 成为合唱成功
                                 mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
-
-                                val inputModel = mSongPlayingLiveData.value ?: return
-                                // 麦位UI 同步
-                                mCantataServiceProtocol.joinChorus(inputModel) { e: Exception? ->
-                                    if (e == null) {
-                                        // success
-                                        CantataLogger.d(TAG, "RoomLivingViewModel.joinChorus() success")
+                            } else {
+                                // 不在麦上， 自动上麦
+                                mCantataServiceProtocol.onSeat(OnSeatInputModel(0)) { err: Exception? ->
+                                    if (err == null) {
+                                        mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
+                                        mIsOnSeat = true
                                     } else {
-                                        // failure
-                                        CantataLogger.e(TAG, "RoomLivingViewModel.joinChorus() failed:${e.message}")
-                                        ToastUtils.showToast(e.message)
+                                        ToastUtils.showToastLong(R.string.cantata_join_chorus_failed)
+                                        mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
+                                        mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
                                     }
                                 }
-                            } else {
-                                ToastUtils.showToastLong(R.string.cantata_join_chorus_failed)
-                                mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
-                                mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
                             }
                         }
                     })
