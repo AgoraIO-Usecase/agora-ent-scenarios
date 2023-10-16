@@ -14,13 +14,6 @@
 <!--        android:scaleType="centerCrop"-->
 <!--        android:src="@drawable/cantata_room_bg" />-->
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/horizontal80"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.8" />
-
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tbChatroomTop"
         android:layout_width="match_parent"
@@ -160,8 +153,7 @@
         android:id="@+id/lrcControlView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
-        app:layout_constraintBottom_toBottomOf="@+id/horizontal80"
+        app:layout_constraintDimensionRatio="1:1.4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tbChatroomTop" />
