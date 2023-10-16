@@ -34,6 +34,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val kKtvRoomAppID = "io.agora.ktv"
     private val kChatRoomAppID = "io.agora.chatroom"
     private val kFullAppID = "io.agora.AgoraVoice"
+    private val kSingRelayAppID = "io.agora.singrelay"
     private val kSingBattleRoomAppID = "io.agora.singbattle"
     private val kShowRoomAppID = "io.agora.test.entfull"
 
@@ -59,6 +60,8 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             setupSingBattleRoomAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kShowRoomAppID) {
             setupShowRoomAppInfo()
+        } else if (BuildConfig.APPLICATION_ID == kSingRelayAppID) {
+            setupSingRelayAppInfo()
         } else {
             setupFullAppInfo()
         }
@@ -85,6 +88,19 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_about_name),
                 "20230110-" + VersionUtils.getVersion("io.agora.scene.voice.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+                servicePhone,
+                webSite
+            )
+        }
+    }
+
+    // 设置接唱App的信息
+    private fun setupSingRelayAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        if (VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig").isNotEmpty()) {
+            adapter.appInfo = AppInfo(
+                this.getString(R.string.app_sing_relay),
+                "20230830-" + VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
@@ -155,6 +171,14 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 SceneInfo(
                     this.getString(R.string.app_about_singbattle),
                     "HGQC-" + VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig")
+                )
+            )
+        }
+        if (VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_sing_relay),
+                    "QMJC-" + VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig")
                 )
             )
         }

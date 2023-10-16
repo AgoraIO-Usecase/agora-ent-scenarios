@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_full_blue_top_20"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:text="Debug Settings"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="音频dump"
+            android:textColor="@color/def_text_grey_979" />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/dumpAudio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="35dp"
+            android:button="@drawable/cb_def_selector" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="audio dump"
+            android:textColor="@color/def_text_grey_6c7" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="打分难度"
+            android:textColor="@color/def_text_grey_979" />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/scoring_level_tune"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:max="100"
+            android:min="0"
+            android:progress="10" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="打分补偿"
+            android:textColor="@color/def_text_grey_979" />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/scoring_offset_tune"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:max="100"
+            android:min="-100"
+            android:progress="0" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ktv_music_menu_dialog_mv"
+            android:textColor="@color/def_text_grey_979" />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/switchMV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="42dp"
+            android:button="@drawable/cb_def_selector" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
+            android:text="@string/ktv_music_menu_dialog_tone"
+            android:textColor="#9BA2AB" />
+
+        <ImageButton
+            android:id="@+id/btn_tone_down_dialog_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="23dp"
+            android:background="@null"
+            android:contentDescription="@string/ktv_tone_down"
+            android:padding="6dp"
+            android:src="@drawable/ic_tone_down" />
+
+        <io.agora.scene.widget.CustomVolumeSeekBarView
+            android:id="@+id/changeToneView"
+            android:layout_width="180dp"
+            android:layout_height="28dp"
+            android:layout_marginBottom="3dp"
+            android:clickable="false"
+            android:focusable="false"
+            tools:text="0" />
+
+        <ImageButton
+            android:id="@+id/btn_tone_up_dialog_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="audio dump"
+            android:padding="6dp"
+            android:src="@drawable/ic_tone_up" />
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        android:visibility="gone">
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="20dp" />
+</LinearLayout>

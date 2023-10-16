@@ -24,6 +24,9 @@ dependencies {
     if (isProjectLibrary(':scenes:ktv')) {
         runtimeOnly project(':scenes:ktv')
     }
+    if (isProjectLibrary(':scenes:ktv_relay')) {
+        runtimeOnly project(':scenes:ktv_relay')
+    }
     if (isProjectLibrary(':scenes:ktv_singbattle')) {
         runtimeOnly project(':scenes:ktv_singbattle')
     }

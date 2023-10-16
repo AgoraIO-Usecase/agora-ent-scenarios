@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="72dp"
         android:layout_marginTop="42dp"
-        android:src="@mipmap/app_welcome_app_logo"
+        android:src="@mipmap/app_ic_launcher"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
