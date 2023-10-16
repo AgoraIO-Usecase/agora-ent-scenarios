@@ -27,7 +27,6 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
     BaseViewBindingFragment<KtvDialogSoundCardBinding>() {
 
     companion object {
-
         const val TAG: String = "SoundCardFragment"
     }
 
@@ -38,36 +37,9 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
 
     var mOnSoundCardChange: (() -> Unit)? = null
 
-    private fun appContext(): Application = AgoraApplication.the()
+    var onClickSoundCardType: (() -> Unit)? = null
 
-    private val presetSoundArray: Array<PresetSoundModel> = arrayOf(
-        PresetSoundModel(
-            AgoraPresetSound.DaShu, appContext().getString(R.string.ktv_preset_sound_dashu),
-            appContext().getString(R.string.ktv_preset_sound_dashu_tips), io.agora.scene.base.R.mipmap.portrait01
-        ),
-        PresetSoundModel(
-            AgoraPresetSound.Mum, appContext().getString(R.string.ktv_preset_sound_mum),
-            appContext().getString(R.string.ktv_preset_sound_mum_tips), io.agora.scene.base.R.mipmap.portrait01
-        ),
-        PresetSoundModel(
-            AgoraPresetSound.QingShu, appContext().getString(R.string.ktv_preset_sound_qingshu),
-            appContext().getString(R.string.ktv_preset_sound_qingshu_tips), io.agora.scene.base.R.mipmap.portrait01
-        ),
-        PresetSoundModel(
-            AgoraPresetSound.YuMa, appContext().getString(R.string.ktv_preset_sound_yuma),
-            appContext().getString(R.string.ktv_preset_sound_yuma_tips), io.agora.scene.base.R.mipmap.portrait01
-        ),
-        PresetSoundModel(
-            AgoraPresetSound.QingNian, appContext().getString(R.string.ktv_preset_sound_qingnian),
-            appContext().getString(R.string.ktv_preset_sound_qingnian_tips), io.agora.scene.base.R.mipmap.portrait01
-        ),
-        PresetSoundModel(
-            AgoraPresetSound.ShaoYu, appContext().getString(R.string.ktv_preset_sound_shaoyu),
-            appContext().getString(R.string.ktv_preset_sound_shaoyu_tips), io.agora.scene.base.R.mipmap.portrait01
-        )
-    )
-
-    private var curPresetSoundModel = presetSoundArray[0]
+    var onClickMicType: (() -> Unit)? = null
 
     init {
         soundCardSetting.setEarPhoneCallback(object : EarPhoneCallback {
@@ -97,7 +69,7 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
     override fun initView() {
         super.initView()
         binding?.apply {
-            if (isPlugIn) {
+            if (true) {
                 groupSoundCardSwitch.visibility = View.VISIBLE
                 groupSoundCardSettings.visibility = if (soundCardSetting.isEnable()) View.VISIBLE else View.INVISIBLE
                 groupSoundCardAbnormal.isVisible = false
@@ -146,43 +118,12 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                         soundCardSetting.setGainValue(gainValue)
                     }
                 }
-
             })
-            pbMircoPhoneTypeValue.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                }
-
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                    seekBar?.progress?.let { progress ->
-                        val presetValue: Int = progress
-                        mtMircoPhoneTypeValue.text = presetValue.toString()
-                        soundCardSetting.setPresetValue(presetValue)
-                    }
-                }
-
-            })
-            val context = spinnerPresetSound.context
-            spinnerPresetSound.adapter =
-                ArrayAdapter(context, android.R.layout.simple_list_item_1, presetSoundArray)
-            spinnerPresetSound.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                    val presetSoundModel = presetSoundArray[position]
-                    if (curPresetSoundModel == presetSoundModel) return
-                    curPresetSoundModel = presetSoundModel
-                    spinnerPresetSound.setSelection(-1)
-                    soundCardSetting.setPresetSound(curPresetSoundModel.type, callback = {
-                        setupPresetSoundView(soundCardSetting.presetSound())
-                        setupGainView(soundCardSetting.gainValue())
-                        setupPresetView(soundCardSetting.presetValue())
-                    })
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                    // nothing
-                }
+            mtMicTypeSelect.setOnClickListener {
+                onClickMicType?.invoke()
+            }
+            tvSoundTypeSelect.setOnClickListener {
+                onClickSoundCardType?.invoke()
             }
         }
     }
@@ -200,42 +141,36 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
 
     private fun setupPresetView(presetValue: Int) {
         binding?.apply {
-            pbMircoPhoneTypeValue.progress = presetValue
-            mtMircoPhoneTypeValue.text = presetValue.toString()
+            mtMicTypeSelect.text = presetValue.toString()
         }
     }
 
     private fun setupPresetSoundView(presetSound: AgoraPresetSound) {
         binding?.apply {
             when (presetSound) {
-                AgoraPresetSound.DaShu -> {
-                    mtPresetSoundType.setText(R.string.ktv_preset_sound_dashu)
-                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_dashu_tips)
+                AgoraPresetSound.Sound2001 -> {
+                    val text = "${R.string.ktv_preset_sound_dashu}（${R.string.ktv_preset_sound_dashu_tips}）"
+                    tvSoundType.text = text
                 }
-
-                AgoraPresetSound.Mum -> {
-                    mtPresetSoundType.setText(R.string.ktv_preset_sound_mum)
-                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_mum_tips)
+                AgoraPresetSound.Sound2002 -> {
+                    val text = "${R.string.ktv_preset_sound_mum}（${R.string.ktv_preset_sound_mum_tips}）"
+                    tvSoundType.text = text
                 }
-
-                AgoraPresetSound.QingShu -> {
-                    mtPresetSoundType.setText(R.string.ktv_preset_sound_qingshu)
-                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_qingshu_tips)
+                AgoraPresetSound.Sound2003 -> {
+                    val text = "${R.string.ktv_preset_sound_qingshu}（${R.string.ktv_preset_sound_qingshu_tips}）"
+                    tvSoundType.text = text
                 }
-
-                AgoraPresetSound.YuMa -> {
-                    mtPresetSoundType.setText(R.string.ktv_preset_sound_yuma)
-                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_yuma_tips)
+                AgoraPresetSound.Sound2004 -> {
+                    val text = "${R.string.ktv_preset_sound_yuma}（${R.string.ktv_preset_sound_yuma_tips}）"
+                    tvSoundType.text = text
                 }
-
-                AgoraPresetSound.QingNian -> {
-                    mtPresetSoundType.setText(R.string.ktv_preset_sound_qingnian)
-                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_qingnian_tips)
+                AgoraPresetSound.Sound2005 -> {
+                    val text = "${R.string.ktv_preset_sound_qingnian}（${R.string.ktv_preset_sound_qingnian_tips}）"
+                    tvSoundType.text = text
                 }
-
-                AgoraPresetSound.ShaoYu -> {
-                    mtPresetSoundType.setText(R.string.ktv_preset_sound_shaoyu)
-                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_shaoyu_tips)
+                AgoraPresetSound.Sound2006 -> {
+                    val text = "${R.string.ktv_preset_sound_shaoyu}（${R.string.ktv_preset_sound_shaoyu_tips}）"
+                    tvSoundType.text = text
                 }
             }
         }
@@ -251,7 +186,6 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                 binding.groupSoundCardSettings.visibility = View.VISIBLE
                 binding.groupSoundCardAbnormal.visibility = View.INVISIBLE
                 binding.mcbSoundCardSwitch.isChecked = soundCardSetting.isEnable()
-
             } else {
                 // 未插入有线耳机
                 binding.groupSoundCardSwitch.visibility = View.INVISIBLE

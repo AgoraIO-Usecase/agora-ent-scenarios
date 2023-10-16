@@ -33,10 +33,14 @@ import io.agora.scene.ktv.databinding.KtvItemEffectvoiceBinding;
 import io.agora.scene.ktv.live.AgoraPresetSound;
 import io.agora.scene.ktv.live.fragment.dialog.BeautyVoiceFragment;
 import io.agora.scene.ktv.live.fragment.dialog.EarBackFragment;
+import io.agora.scene.ktv.live.fragment.dialog.MicTypeFragment;
 import io.agora.scene.ktv.live.fragment.dialog.SoundCardFragment;
 import io.agora.scene.ktv.live.fragment.dialog.SoundCardSettingBean;
+import io.agora.scene.ktv.live.fragment.dialog.SoundTypeFragment;
 import io.agora.scene.ktv.live.holder.EffectVoiceHolder;
 import io.agora.scene.widget.DividerDecoration;
+import kotlin.UInt;
+import kotlin.Unit;
 
 /**
  * 控制台
@@ -269,9 +273,33 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
 
     private void showSoundCardPage(View v){
         mBinding.getRoot().removeAllViews();
-        BaseViewBindingFragment<?> soundCardFragment = new SoundCardFragment(mSoundCardSetting);
+        SoundCardFragment soundCardFragment = new SoundCardFragment(mSoundCardSetting);
+        soundCardFragment.setOnClickMicType(() -> {
+            showMicTypeSelectPage();
+            return Unit.INSTANCE;
+        });
+        soundCardFragment.setOnClickSoundCardType(() -> {
+            showSoundTypeSelectPage();
+            return Unit.INSTANCE;
+        });
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
         ft.add(mBinding.getRoot().getId(), soundCardFragment, SoundCardFragment.TAG);
+        ft.commit();
+    }
+
+    private void showMicTypeSelectPage() {
+        mBinding.getRoot().removeAllViews();
+        BaseViewBindingFragment<?> micTypeFragment = new MicTypeFragment(mSoundCardSetting);
+        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+        ft.add(mBinding.getRoot().getId(), micTypeFragment, SoundCardFragment.TAG);
+        ft.commit();
+    }
+
+    private void showSoundTypeSelectPage() {
+        mBinding.getRoot().removeAllViews();
+        BaseViewBindingFragment<?> soundTypeFragment = new SoundTypeFragment(mSoundCardSetting);
+        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+        ft.add(mBinding.getRoot().getId(), soundTypeFragment, SoundCardFragment.TAG);
         ft.commit();
     }
 

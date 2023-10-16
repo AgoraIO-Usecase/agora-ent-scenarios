@@ -164,11 +164,12 @@
     <string name="ktv_join_chorus_failed">加入合唱失败</string>
 
     <string name="ktv_virtual_sound_card">虚拟声卡</string>
-    <string name="ktv_input_device">输入设备</string>
+    <string name="ktv_input_device">麦克风类型</string>
+    <string name="ktv_sound_card_mic_type">麦克风类型%d</string>
     <string name="ktv_external_mircrophone">default 外置麦克风</string>
     <string name="ktv_sound_card_switch">虚拟声卡开关</string>
     <string name="ktv_sound_card_error">当前无法使用虚拟声卡，请链接有线输入设备</string>
-    <string name="ktv_sound_card_supports">虚拟声卡目前已支持输入设备清单如下： \n1.有线耳机 \n2.有线麦克风</string>
+    <string name="ktv_sound_card_supports">目前支持以下设备： \n1.有线耳机 \n2.有线麦克风</string>
     <string name="ktv_virtual_sound_card_switch">虚拟声卡开关</string>
     <string name="ktv_preset_sound">预设音效</string>
     <string name="ktv_preset_sound_dashu">大叔音</string>
@@ -184,8 +185,9 @@
     <string name="ktv_preset_sound_shaoyu">少御音</string>
     <string name="ktv_preset_sound_shaoyu_tips">女声唱歌3：醇厚 | 饱满</string>
     <string name="ktv_gain_adjust">增益调节</string>
-    <string name="ktv_gain_adjust_tips">减少声音信号的增益倍数</string>
-    <string name="ktv_mircrophone_type">麦克风类型</string>
-    <string name="ktv_mircrophone_type_tips">选择一套更适合当前麦克风的预设参数</string>
+    <string name="ktv_gain_adjust_tips">调节声音信号的增益倍数</string>
+    <string name="ktv_sound_mic_phone_type">麦克风类型</string>
+    <string name="ktv_sound_mic_phone_type_tips">选择更适合你当前麦克风的预设参数</string>
+    <string name="ktv_sound_preset_type">预设音效</string>
 
 </resources>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:theme="@style/Theme.AppCompat"
+    android:paddingBottom="24dp"
+    android:background="@drawable/bg_full_blue_top_20">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_full_blue_top_20"
+        app:layout_constraintTop_toTopOf="@+id/ivBottomSheetTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/mtBottomSheetTitle"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBottomSheetTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/mtBottomSheetTitle"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textSize="18sp"
+        android:text="@string/ktv_sound_mic_phone_type"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMicType"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mtBottomSheetTitle"
+        tools:listitem="@layout/ktv_dialog_mic_type_layout" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/dvBottom"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="@color/bg_color_blue_31_t20"
+        app:layout_constraintTop_toBottomOf="@id/rvMicType"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btnClose"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:text="@string/cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rvMicType"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

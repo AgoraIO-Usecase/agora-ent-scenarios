@@ -16,18 +16,22 @@ data class PresetSoundModel constructor(
 }
 
 enum class AgoraPresetSound constructor(
-    val gainValue: Float,
     val presetValue: Int,
+    val gainValue: Float,
     val gender: Int,
     val effect: Int,
 ) {
-    DaShu(gainValue = 1.0f, presetValue = 4, gender = 0, effect = 2),
-    Mum(gainValue = 1.0f, presetValue = 4, gender = 1, effect = 2),
-    QingShu(gainValue = 1.0f, presetValue = 4, gender = 0, effect = 3),
-    YuMa(gainValue = 1.0f, presetValue = 4, gender = 1, effect = 3),
-    QingNian(gainValue = 1.0f, presetValue = 4, gender = 0, effect = 4),
-    ShaoYu(gainValue = 1.0f, presetValue = 4, gender = 1, effect = 4),
-    Close(gainValue = -1.0f, presetValue = -1, gender = -1, effect = -1)
+    Close(-1,-1f,-1,-1),
+    Sound1001(4,1f,0,0),
+    Sound1002(4,1f,0,1),
+    Sound1003(4,1f,1,0),
+    Sound1004(4,1f,1,1),
+    Sound2001(4,1f,0,2),
+    Sound2002(4,1f,1,2),
+    Sound2003(4,1f,0,3),
+    Sound2004(4,1f,1,3),
+    Sound2005(4,1f,0,4),
+    Sound2006(4,1f,1,4)
 }
 
 class AgoraSoundCardManager constructor(private val rtcEngineEx: RtcEngineEx) {
@@ -54,8 +58,7 @@ class AgoraSoundCardManager constructor(private val rtcEngineEx: RtcEngineEx) {
     fun enable(enable: Boolean, force: Boolean, callback: () -> Unit) {
         if (this.isEnable != enable || force) {
             this.isEnable = enable
-            presetSound = if (isEnable) AgoraPresetSound.DaShu else AgoraPresetSound.Close
-
+            presetSound = if (isEnable) AgoraPresetSound.Sound1001 else AgoraPresetSound.Close
             gainValue = presetSound.gainValue
             presetValue = presetSound.presetValue
             gender = presetSound.gender
