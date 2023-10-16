@@ -240,6 +240,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                             roomInfo.roomName,
                             roomInfo.roomNo,
                             roomInfo.creatorNo,
+                            roomInfo.creatorAvatar,
                             vlRoomListModel.bgOption,
                             roomInfo.seatsArray,
                             roomInfo.roomPeopleNum,

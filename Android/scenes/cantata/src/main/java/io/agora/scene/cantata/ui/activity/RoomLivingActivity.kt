@@ -122,10 +122,10 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
         mRoomLivingViewModel.mRoomInfoLiveData.value?.apply {
             binding.tvRoomName.text = roomName
-            // TODO: room owner avatar
-//            GlideApp.with(binding.ivOwnerAvatar.context).load(getCoverRes(bgOption))
-//                .transform(CenterCropRoundCornerTransform(100))
-//                .into(binding.ivOwnerAvatar)
+            GlideApp.with(binding.ivOwnerAvatar.context).load(creatorAvatar)
+                .error(R.mipmap.userimage)
+                .transform(CenterCropRoundCornerTransform(100))
+                .into(binding.ivOwnerAvatar)
         }
 
         binding.ivChatroomMore.setOnClickListener(object : OnClickJackingListener {
