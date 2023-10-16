@@ -354,6 +354,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             binding.lrcControlView.role = LrcControlView.Role.Listener
         }
         mRoomLivingViewModel.musicStartPlay(music)
+        binding.rankListView.isVisible = false
 
         if (music.userNo == UserManager.getInstance().user.id.toString()) {
             binding.lrcControlView.postDelayed({
