@@ -7,20 +7,19 @@
 
 #import "UIWindow+Router.h"
 #import "BaseNavigationController.h"
-#import "VLLoginViewController.h"
 #import "VLMainTabBarController.h"
 #import "VLUserCenter.h"
 #import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 
 @implementation UIWindow (Router)
 - (void)configRootViewController {
-    UIViewController* rootVC = nil;
     if ([VLUserCenter center].isLogin) {
-        rootVC = [[VLMainTabBarController alloc] init];
+        self.rootViewController = [[VLMainTabBarController alloc] init];
     } else {
-        rootVC = [[VLLoginViewController alloc] init];
+        VLLoginController *rootVC = [[VLLoginController alloc] init];
+        BaseNavigationController *nav = [[BaseNavigationController alloc] initWithRootViewController:rootVC];
+        self.rootViewController = nav;
     }
-    BaseNavigationController *navi = [[BaseNavigationController alloc] initWithRootViewController:rootVC];
-    self.rootViewController = navi;
 }
 @end
