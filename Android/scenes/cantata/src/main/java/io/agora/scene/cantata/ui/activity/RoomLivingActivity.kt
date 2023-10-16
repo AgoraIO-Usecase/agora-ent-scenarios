@@ -204,7 +204,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             }
         }
         mRoomLivingViewModel.mRoomUserCountLiveData.observe(this) { count ->
-            binding.tvUserOnline.text = getString(R.string.cantata_room_count, count.toString())
+            binding.tvUserOnline.text = getString(R.string.cantata_room_count, count)
         }
         mRoomLivingViewModel.mRoomTimeUpLiveData.observe(this) { isTimeUp ->
             if (mRoomLivingViewModel.release() && isTimeUp) {
@@ -318,7 +318,8 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
         binding.rankListView.onNextSongClickCallback = {
             mRoomLivingViewModel.mSongPlayingLiveData.value?.let {
-                if (it.userNo == UserManager.getInstance().user.id.toString()) {
+                // 只有房主能点击下一首歌
+                if (mRoomLivingViewModel.isRoomOwner()){
                     mRoomLivingViewModel.changeMusic()
                 }
             }
