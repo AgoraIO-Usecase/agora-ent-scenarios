@@ -149,28 +149,32 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
         binding?.apply {
             when (presetSound) {
                 AgoraPresetSound.Sound2001 -> {
-                    val text = "${R.string.ktv_preset_sound_dashu}（${R.string.ktv_preset_sound_dashu_tips}）"
-                    tvSoundType.text = text
+                    val text = "${getString(R.string.ktv_preset_sound_dashu)}（${getString(R.string.ktv_preset_sound_dashu_tips)}）"
+                    tvSoundTypeSelect.text = text
                 }
                 AgoraPresetSound.Sound2002 -> {
-                    val text = "${R.string.ktv_preset_sound_mum}（${R.string.ktv_preset_sound_mum_tips}）"
-                    tvSoundType.text = text
+                    val text = "${getString(R.string.ktv_preset_sound_mum)}（${getString(R.string.ktv_preset_sound_mum_tips)}）"
+                    tvSoundTypeSelect.text = text
                 }
                 AgoraPresetSound.Sound2003 -> {
-                    val text = "${R.string.ktv_preset_sound_qingshu}（${R.string.ktv_preset_sound_qingshu_tips}）"
-                    tvSoundType.text = text
+                    val text = "${getString(R.string.ktv_preset_sound_qingshu)}（${getString(R.string.ktv_preset_sound_qingshu_tips)}）"
+                    tvSoundTypeSelect.text = text
                 }
                 AgoraPresetSound.Sound2004 -> {
-                    val text = "${R.string.ktv_preset_sound_yuma}（${R.string.ktv_preset_sound_yuma_tips}）"
-                    tvSoundType.text = text
+                    val text = "${getString(R.string.ktv_preset_sound_yuma)}（${getString(R.string.ktv_preset_sound_yuma_tips)}）"
+                    tvSoundTypeSelect.text = text
                 }
                 AgoraPresetSound.Sound2005 -> {
-                    val text = "${R.string.ktv_preset_sound_qingnian}（${R.string.ktv_preset_sound_qingnian_tips}）"
-                    tvSoundType.text = text
+                    val text = "${getString(R.string.ktv_preset_sound_qingnian)}（${getString(R.string.ktv_preset_sound_qingnian_tips)}）"
+                    tvSoundTypeSelect.text = text
                 }
                 AgoraPresetSound.Sound2006 -> {
-                    val text = "${R.string.ktv_preset_sound_shaoyu}（${R.string.ktv_preset_sound_shaoyu_tips}）"
-                    tvSoundType.text = text
+                    val text =
+                        "${getString(R.string.ktv_preset_sound_shaoyu)}（${getString(R.string.ktv_preset_sound_shaoyu_tips)}）"
+                    tvSoundTypeSelect.text = text
+                }
+                else -> {
+                    tvSoundTypeSelect.text = ""
                 }
             }
         }

@@ -138,7 +138,7 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tvSoundTypeSelect"
             android:layout_height="48dp"
-            android:layout_width="120dp"
+            android:layout_width="220dp"
             android:layout_marginEnd="20dp"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"

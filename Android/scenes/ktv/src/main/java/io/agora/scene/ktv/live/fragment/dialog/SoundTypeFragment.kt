@@ -34,8 +34,9 @@ class SoundTypeFragment constructor(private val soundCardSetting: SoundCardSetti
 
         setupSoundTypes()
         binding.rvSoundType.layoutManager = LinearLayoutManager(this.context)
-        adapter = SoundPresetsAdapter(soundTypes, 0) { value ->
-            soundCardSetting.setPresetValue(value)
+        adapter = SoundPresetsAdapter(soundTypes, 0) { index ->
+            val soundType = soundTypes[index].type
+            soundCardSetting.setPresetSound(soundType) {}
             adapter?.notifyDataSetChanged()
         }
         binding.rvSoundType.adapter = adapter
@@ -113,6 +114,10 @@ private class SoundPresetsAdapter(
         holder.checkBox.visibility = if (selectedIndex == position) View.VISIBLE else View.INVISIBLE
         holder.borderView.visibility = if (selectedIndex == position) View.VISIBLE else View.INVISIBLE
         holder.ivAvatar.setImageResource(data.resId)
+        holder.itemView.setOnClickListener {
+            selectedIndex = position
+            onDidSelectIndex?.invoke(position)
+        }
     }
 
     override fun getItemCount(): Int {
