@@ -109,7 +109,7 @@
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/KTVSamplePicture5.png)
 >
-> K歌房场景化API是一个帮助您快速集成声网K歌房能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**KTVApi**](src/main/java/io/agora/scene/ktv/singrelay/ktvapi/KTVApi.kt) 来定义协议，通过 [**KTVApiImp**](src/main/java/io/agora/scene/ktv/singrelay/ktvapi/KTVApiImp.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
+> K歌房场景化API是一个帮助您快速集成声网K歌房能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**KTVApi**](src/main/java/io/agora/scene/ktv/singrelay/ktvapi/KTVApi.kt) 来定义协议，通过 [**KTVApiImpl**](src/main/java/io/agora/scene/ktv/singrelay/ktvapi/KTVApiImpl.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
 >
 > * 拉取歌单
 >
@@ -285,7 +285,7 @@
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/KTVSamplePicture6.png)
 >
-> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过 [**KTVServiceProtocol**](src/main/java/io/agora/scene/ktv/service/KTVServiceProtocol.kt) 来定义协议，通过 [**KTVSyncManagerServiceImp**](src/main/java/io/agora/scene/ktv/service/KTVSyncManagerServiceImp.kt) 来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
+> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过 [**KTVServiceProtocol**](src/main/java/io/agora/scene/ktv/singrelay/service/KTVServiceProtocol.kt) 来定义协议，通过 [**KTVSyncManagerServiceImp**](src/main/java/io/agora/scene/ktv/singrelay/service/KTVSyncManagerServiceImp.kt) 来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
 >
 > - 房间管理
 >
