@@ -19,6 +19,7 @@ public class VRSpatialSoundViewController: UIViewController {
 
     override public func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
         view.addSubViews([empty, roomList])
         // Do any additional setup after loading the view.
         roomListEvent()
