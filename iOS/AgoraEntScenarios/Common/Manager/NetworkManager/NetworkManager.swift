@@ -126,12 +126,12 @@ class NetworkManager:NSObject {
     }
 
     @objc
-    func generateToken(channelName: String,
-                       uid: String,
-                       tokenType: TokenGeneratorType,
-                       type: AgoraTokenType,
-                       expire: UInt = 1500,
-                       success: @escaping (String?) -> Void)
+    public func generateToken(channelName: String,
+                              uid: String,
+                              tokenType: TokenGeneratorType,
+                              type: AgoraTokenType,
+                              expire: UInt = 1500,
+                              success: @escaping (String?) -> Void)
     {
         let params = ["appCertificate": KeyCenter.Certificate ?? "",
                       "appId": KeyCenter.AppId,

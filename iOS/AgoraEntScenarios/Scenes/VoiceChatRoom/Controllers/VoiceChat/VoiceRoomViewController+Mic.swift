@@ -64,14 +64,12 @@ extension VoiceRoomViewController {
 
     // 下麦
     func leaveMic(with index: Int) {
-        chatBar.refresh(event: .mic, state: .selected, asCreator: false)
         ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: index) { error, mic in
             if error == nil,let mic = mic {
                 self.rtcView.updateUser(mic)
-                self.rtckit.setClientRole(role: .audience)
                 self.local_index = nil
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: self.isOwner)
-                self.chatBar.refresh(event: .mic, state: .selected, asCreator: self.isOwner)
+                self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: self.isOwner)
             }
         }
         
@@ -84,6 +82,7 @@ extension VoiceRoomViewController {
             if error == nil,let mic = mic {
                 self.chatBar.refresh(event: .mic, state: .selected, asCreator: false)
                 self.rtckit.muteLocalAudioStream(mute: true)
+                self.rtckit.setClientRole(role: .audience)
                 self.rtcView.updateUser(mic)
             } else {
                 self.view.makeToast("\(error?.localizedDescription ?? "")",point: self.toastPoint, title: nil, image: nil, completion: nil)
@@ -109,6 +108,7 @@ extension VoiceRoomViewController {
                 if mic.member?.micStatus ?? 0 == 1 {
                     self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
                 }
+                self.rtckit.setClientRole(role: .owner)
                 self.rtckit.muteLocalAudioStream(mute: false)
                 self.rtcView.updateUser(mic)
             }
@@ -180,7 +180,6 @@ extension VoiceRoomViewController {
             if error == nil,let mic = mic {
                 self.rtcView.updateUser(mic)
                 self.local_index = mic.mic_index
-                self.rtckit.setClientRole(role: .owner)
                 self.chatBar.refresh(event: .handsUp, state: .disable, asCreator: self.isOwner)
                 self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: self.isOwner)
                 self.rtckit.muteLocalAudioStream(mute: mic.status != 0)

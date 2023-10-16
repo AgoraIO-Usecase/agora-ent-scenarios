@@ -14,6 +14,7 @@
 #import "VLMacroDefine.h"
 #import "AESMacro.h"
 @import Masonry;
+@import SDWebImage;
 
 @interface VLKTVMVView () <VLKTVMVIdleViewDelegate, KaraokeDelegate>
 
@@ -32,7 +33,8 @@
 @property (nonatomic, strong) VLHotSpotBtn *pauseBtn; /// 暂停播放
 @property (nonatomic, strong) VLHotSpotBtn *nextButton; /// 下一首
 
-@property (nonatomic, strong) UIButton *originBtn;  /// 原唱按钮
+//@property (nonatomic, strong) UIButton *originBtn;  /// 原唱按钮
+@property (nonatomic, strong) UIButton *trackBtn;  /// track按钮
 @property (nonatomic, strong) VLHotSpotBtn *settingBtn; /// 设置参数按钮
 @property (nonatomic, strong) VLKTVMVIdleView *idleView;//没有人演唱视图
 
@@ -45,6 +47,9 @@
 @property (nonatomic, assign) BOOL isPlayAccompany;
 @property (nonatomic, strong) UIButton *leaveChorusBtn;
 @property (nonatomic, strong) UIView *BotView;
+@property (nonatomic, assign) VLKTVMVViewActionType actionType;
+@property (nonatomic, strong) UIView *perShowView;//突出人声视图
+@property (nonatomic, strong) UIImageView *iconView;
 @end
 
 @implementation VLKTVMVView
@@ -54,19 +59,24 @@
         self.delegate = delegate;
         [self setupView];
         self.currentTime = 0;
+        self.actionType = VLKTVMVViewActionTypeSingAcc;
     }
     return self;
 }
 
 #pragma setter
 - (void)setIsPlayAccompany:(BOOL)isPlayAccompany {
-    [self.originBtn setSelected:!isPlayAccompany];
-    [self _refreshOriginButton];
+    [self.trackBtn setSelected:!isPlayAccompany];
+   // [self _refreshOriginButton];
     
     VLKTVMVViewActionType targetOrigin = isPlayAccompany ? VLKTVMVViewActionTypeSingAcc : VLKTVMVViewActionTypeSingOrigin;
     if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
         [self.delegate onKTVMVView:self btnTappedWithActionType:targetOrigin];
     }
+}
+
+-(void)setOriginType:(BOOL)isLeader{
+    _isOriginLeader = isLeader;
 }
 
 - (void)setLoadingType:(VLKTVMVLoadingState)loadingType {
@@ -170,8 +180,8 @@
     _karaokeView.scoringView.viewHeight = 60;
     _karaokeView.scoringView.topSpaces = 5;
    // _karaokeView.lyricsView.textSelectedColor = [UIColor colorWithHexString:@"#33FFFFFF"];
-    _karaokeView.lyricsView.textNormalColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.5];
-    _karaokeView.lyricsView.textHighlightedColor = [UIColor colorWithHexString:@"#FF8AB4"];
+    _karaokeView.lyricsView.inactiveLineTextColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.5];
+    _karaokeView.lyricsView.activeLinePlayedTextColor = [UIColor colorWithHexString:@"#FF8AB4"];
     _karaokeView.lyricsView.lyricLineSpacing = 6;
    // _karaokeView.scoringView.showDebugView = true;
     _karaokeView.backgroundImage = [UIImage imageNamed:@"ktv_top_bgIcon"];
@@ -197,11 +207,11 @@
     [self updateBtnLayout:self.nextButton];
     [self.BotView addSubview:self.nextButton];
     
-    self.originBtn.frame = CGRectMake(self.width-20-48, 0, 34, 54);
-    [self updateBtnLayout:self.originBtn];
-    [self.BotView addSubview:self.originBtn];
+    self.trackBtn.frame = CGRectMake(self.width-20-48, 0, 34, 54);
+    [self updateBtnLayout:self.trackBtn];
+    [self.BotView addSubview:self.trackBtn];
     
-    self.settingBtn.frame = CGRectMake(_originBtn.left-10-34, 0, 34, 54);
+    self.settingBtn.frame = CGRectMake(_trackBtn.left-10-34, 0, 34, 54);
     [self updateBtnLayout:self.settingBtn];
     [self.BotView addSubview:self.settingBtn];
     
@@ -230,6 +240,41 @@
     [self updateBtnLayout:self.leaveChorusBtn];
     [self.BotView addSubview:self.leaveChorusBtn];
     _joinChorusBtn.hidden = _leaveChorusBtn.hidden = YES;
+    
+    _perShowView = [[UIView alloc]initWithFrame:CGRectMake(0, self.bounds.size.height / 2.0 - 12, 80, 24)];
+    _perShowView.backgroundColor = [UIColor colorWithRed:8/255.0 green:6/255.0 blue:47/255.0 alpha:0.3];
+    CAShapeLayer *maskLayer = [CAShapeLayer layer];
+    UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:_perShowView.bounds
+                                                   byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight
+                                                         cornerRadii:CGSizeMake(10.f, 10.f)];
+    maskLayer.path = path.CGPath;
+    _perShowView.layer.mask = maskLayer;
+    [self addSubview:_perShowView];
+    
+    UILabel *perLabel = [[UILabel alloc]initWithFrame:CGRectMake(8, 6, 45, 12)];
+    perLabel.text = @"突出人声";
+    perLabel.font = [UIFont systemFontOfSize:11];
+    perLabel.textColor = [UIColor whiteColor];
+    [_perShowView addSubview:perLabel];
+    
+    _iconView = [[UIImageView alloc]initWithFrame:CGRectMake(57, 2, 20, 20)];
+    _iconView.image = [UIImage sceneImageWithName:@"ktv_showVoice"];
+    [_perShowView addSubview:_iconView];
+    _perShowView.hidden = true;
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(voiceChoose)];
+    _perShowView.userInteractionEnabled = true;
+    [_perShowView addGestureRecognizer:tap];
+}
+
+-(void)voiceChoose{
+    if([self.delegate respondsToSelector:@selector(didShowVoiceChooseView)]){
+        [self.delegate didShowVoiceChooseView];
+    }
+}
+
+-(void)setPerViewHidden:(BOOL)isHidden {
+    _perShowView.hidden = isHidden;
 }
 
 -(void)setBotViewHidden:(BOOL)isHidden{
@@ -249,16 +294,15 @@
       CGFloat totalHeight = imageSize.height + titleSize.height;
     button.imageEdgeInsets = UIEdgeInsetsMake(- (totalHeight - imageSize.height + spacing), 0.0, 15.0, - titleSize.width);
     button.titleEdgeInsets = UIEdgeInsetsMake(0, - imageSize.width, - (totalHeight - titleSize.height + spacing), 0);
-
 }
 
 - (void)_refreshOriginButton {
-    if (self.originBtn.selected) {
-        [self.originBtn setTitle:KTVLocalizedString(@"ktv_room_original") forState:UIControlStateNormal];
-        [self.originBtn setTitle:KTVLocalizedString(@"ktv_room_original") forState:UIControlStateSelected];
-    } else {
-        [self.originBtn setTitle:KTVLocalizedString(@"ktv_room_original") forState:UIControlStateNormal];
-        [self.originBtn setTitle:KTVLocalizedString(@"ktv_room_original") forState:UIControlStateSelected];
+    if(self.actionType == VLKTVMVViewActionTypeSingAcc){
+        [self.trackBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
+    } else if (self.actionType == VLKTVMVViewActionTypeSingLead) {
+        [self.trackBtn setTitle:KTVLocalizedString(@"导唱") forState:UIControlStateHighlighted];
+    } else if (self.actionType == VLKTVMVViewActionTypeSingOrigin) {
+        [self.trackBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
     }
     [self setNeedsLayout];
 }
@@ -398,7 +442,7 @@
             playButtonHidden:(BOOL)playButtonHidden {
     self.pauseBtn.hidden = playButtonHidden;
     self.nextButton.hidden = nextButtonHidden;
-    self.originBtn.hidden = hidden;
+    self.trackBtn.hidden = hidden;
     self.settingBtn.hidden = hidden;
 }
 
@@ -434,16 +478,53 @@
     });
 }
 
+-(void)setPerViewAvatar:(NSString *)url {
+    if([url isEqualToString:@""]){
+        _iconView.image = [UIImage sceneImageWithName:@"ktv_showVoice"];
+    } else {
+        [_iconView sd_setImageWithURL:[NSURL URLWithString:url]];
+    }
+}
+
 #pragma mark - 合唱代理
 - (void)setOriginBtnState:(VLKTVMVViewActionType)type
 {
-    _originBtn.selected = type == VLKTVMVViewActionTypeSingOrigin ? YES : NO;
-    [self _refreshOriginButton];
+    switch (type) {
+        case VLKTVMVViewActionTypeSingOrigin:
+            _trackBtn.selected = YES;
+            [_trackBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
+            [self.trackBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_origin"] forState:UIControlStateSelected];
+            break;
+        case VLKTVMVViewActionTypeSingLead:
+            _trackBtn.selected = NO;
+            [_trackBtn setTitle:KTVLocalizedString(@"导唱") forState:UIControlStateNormal];
+            [self.trackBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_origin"] forState:UIControlStateNormal];
+            break;
+        case VLKTVMVViewActionTypeSingAcc:
+            _trackBtn.selected = NO;
+            [_trackBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
+            [self.trackBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_acc"] forState:UIControlStateNormal];
+            break;
+        default:
+            break;
+    }
 }
 
 - (void)originClick:(UIButton *)button {
-    BOOL targetState = !button.selected;
-    VLKTVMVViewActionType targetOrigin = targetState ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc;
+    VLKTVMVViewActionType targetOrigin = VLKTVMVViewActionTypeSingAcc;
+    if(self.isOriginLeader){
+        if(self.actionType == VLKTVMVViewActionTypeSingOrigin){
+            targetOrigin = VLKTVMVViewActionTypeSingAcc;
+        } else if(self.actionType == VLKTVMVViewActionTypeSingLead) {
+            targetOrigin = VLKTVMVViewActionTypeSingOrigin;
+        } else if(self.actionType == VLKTVMVViewActionTypeSingAcc) {
+            targetOrigin = VLKTVMVViewActionTypeSingLead;
+        }
+    } else {
+        button.selected = !button.isSelected;
+        targetOrigin = button.isSelected ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc;
+    }
+    self.actionType = targetOrigin;
     [self setOriginBtnState:targetOrigin];
     
     if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
@@ -527,26 +608,27 @@
     return _nextButton;
 }
 
-- (UIButton *)originBtn {
-    if (!_originBtn) {
-        _originBtn.spacingBetweenImageAndTitle = 2;
-        _originBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_originBtn setTitle:KTVLocalizedString(@"ktv_room_original") forState:UIControlStateNormal];
-        _originBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
-        _originBtn.titleLabel.font = UIFontMake(10.0);
-        [self.originBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [self.originBtn setImage:[UIImage sceneImageWithName:@"acc"] forState:UIControlStateNormal];
-        [self.originBtn setImage:[UIImage sceneImageWithName:@"original"] forState:UIControlStateSelected];
-        _originBtn.selected = NO;
-        [_originBtn addTarget:self action:@selector(originClick:) forControlEvents:UIControlEventTouchUpInside];
+
+- (VLHotSpotBtn *)trackBtn {
+    if (!_trackBtn) {
+        _trackBtn = [[VLHotSpotBtn alloc] init];
+        [self.trackBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.trackBtn.titleLabel.font = UIFontMake(10.0);
+        [self.trackBtn setTitle:@"导唱" forState:UIControlStateNormal];
+        [self.trackBtn setTitle:@"原唱" forState:UIControlStateSelected];
+        [_trackBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_acc"] forState:UIControlStateSelected];
+        [_trackBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_origin"] forState:UIControlStateNormal];
+        _trackBtn.selected = NO;
+        [_trackBtn addTarget:self action:@selector(originClick:) forControlEvents:UIControlEventTouchUpInside];
     }
-    return _originBtn;
+    return _trackBtn;
 }
 
 - (VLHotSpotBtn *)settingBtn {
     if (!_settingBtn) {
         _settingBtn = [[VLHotSpotBtn alloc] init];
         [_settingBtn setImage:[UIImage sceneImageWithName:@"ktv_subtitle_icon"] forState:UIControlStateNormal];
+        _settingBtn.accessibilityIdentifier = @"ktv_room_setting_button_id";
         [self.settingBtn setTitle:KTVLocalizedString(@"ktv_room_player_tweak") forState:UIControlStateNormal];
         [self.settingBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.settingBtn.titleLabel.font = UIFontMake(10.0);

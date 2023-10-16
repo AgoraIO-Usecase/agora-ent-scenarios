@@ -43,11 +43,53 @@ class VoiceRoomViewController: VRBaseViewController {
 
     var preView: VMPresentView!
     private lazy var noticeView = VMNoticeView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 230))
+    private lazy var musicListView: VoiceMusicListView = {
+        let view = VoiceMusicListView(rtcKit: rtckit,
+                                      currentMusic: roomInfo?.room?.backgroundMusic,
+                                      isOrigin: roomInfo?.room?.musicIsOrigin ?? true,
+                                      roomInfo: roomInfo)
+        view.backgroundMusicPlaying = { [weak self] model in
+            self?.roomInfo?.room?.backgroundMusic = model
+            self?.musicView.setupMusic(model: model, isOrigin: self?.roomInfo?.room?.musicIsOrigin ?? true)
+        }
+        view.onClickAccompanyButtonClosure = { [weak self] isOrigin in
+            self?.roomInfo?.room?.musicIsOrigin = isOrigin
+            self?.musicView.updateOriginButtonStatus(isOrigin: isOrigin)
+            self?.rtckit.selectPlayerTrackMode(isOrigin: isOrigin)
+        }
+        return view
+    }()
+    public lazy var musicView: VoiceMusicPlayingView = {
+        let view = VoiceMusicPlayingView(isOwner: isOwner)
+        view.isHidden = true
+        view.onClickAccompanyButtonClosure = { [weak self] isOrigin in
+            self?.roomInfo?.room?.musicIsOrigin = isOrigin
+            view.updateOriginButtonStatus(isOrigin: isOrigin)
+            self?.rtckit.selectPlayerTrackMode(isOrigin: isOrigin)
+        }
+        view.onClickBGMClosure = { [weak self] model in
+            guard let self = self, self.isOwner == true else { return }
+            self.musicListView.show_present()
+        }
+        view.onUpdateBGMClosure = { [weak self] model in
+            guard let self = self, self.isOwner == false else { return }
+            self.roomInfo?.room?.backgroundMusic = model
+        }
+        return view
+    }()
     var isShowPreSentView: Bool = false
     var rtckit: VoiceRoomRTCManager = VoiceRoomRTCManager.getSharedInstance()
     var isOwner: Bool = false
     var ains_state: AINS_STATE = .mid
-    var local_index: Int?
+    var local_index: Int? {
+        didSet {
+            if local_index == nil {
+                self.rtckit.setClientRole(role: .audience)
+            } else {
+                self.rtckit.setClientRole(role: .owner)
+            }
+        }
+    }
     var vmType: VMMUSIC_TYPE = .social
     var isHeaderBack = false
 
@@ -97,6 +139,8 @@ class VoiceRoomViewController: VRBaseViewController {
         
         if isOwner {
             checkAudioAuthorized()
+        } else {
+            musicView.eventHandler(roomId: roomInfo?.room?.room_id)
         }
     }
     
@@ -130,9 +174,11 @@ extension VoiceRoomViewController {
         let rtcUid = VLUserCenter.user.id
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
+        rtckit.playerDelegate = self
         
         if isOwner {
             checkEnterSeatAudioAuthorized()
+            rtckit.initMusicControlCenter()
         }
 
         var rtcJoinSuccess = false
@@ -317,6 +363,12 @@ extension VoiceRoomViewController {
         }
         view.addSubview(rtcView)
 
+        view.addSubview(musicView)
+        musicView.snp.makeConstraints { make in
+            make.trailing.equalToSuperview()
+            make.top.equalTo(headerView.snp.bottom).offset(-13)
+        }
+        
         if let entity = roomInfo?.room {
             rtcView.isHidden = entity.type == 1
             headerView.updateHeader(with: entity)
@@ -573,6 +625,10 @@ extension VoiceRoomViewController {
             default: break
             }
         }
+        chatBar.micStateChangeClosure = { [weak self] state in
+            guard let self = self else { return }
+            self.rtckit.enableinearmonitoring(enable: state == .selected ? false : self.roomInfo?.room?.turn_InEar ?? false)
+        }
     }
 
     
@@ -653,6 +709,32 @@ extension VoiceRoomViewController {
             detailStr = "voice_chatroom_professional_broadcaster_introduce".voice_localized()
         }
         return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40)
+    }
+}
+
+extension VoiceRoomViewController: VMMusicPlayerDelegate {
+    func didMPKChangedTo(state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+        if !rtckit.backgroundMusics.isEmpty  {
+            if state == .playBackAllLoopsCompleted {
+                let music = roomInfo?.room?.backgroundMusic
+                var index = (rtckit.backgroundMusics.firstIndex(where: { $0.songCode == music?.songCode }) ?? 0) + 1
+                index = index < rtckit.backgroundMusics.count ? index : 0
+                let musicModel = rtckit.backgroundMusics[index]
+                let model = VoiceMusicModel()
+                model.songCode = musicModel.songCode
+                model.name = musicModel.name
+                model.singer = musicModel.singer
+                roomInfo?.room?.backgroundMusic = model
+                rtckit.playMusic(songCode: model.songCode)
+                DispatchQueue.main.async {
+                    self.musicView.setupMusic(model: model, isOrigin: self.roomInfo?.room?.musicIsOrigin ?? false)
+                }
+            } else if state == .paused {
+                roomInfo?.room?.backgroundMusic?.status = .pause
+            } else if state == .playing {
+                rtckit.selectPlayerTrackMode(isOrigin: roomInfo?.room?.musicIsOrigin ?? true)
+            }
+        }
     }
 }
 

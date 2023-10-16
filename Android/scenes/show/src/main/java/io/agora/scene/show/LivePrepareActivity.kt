@@ -108,11 +108,11 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 }
             }
         )
-        if (mRtcEngine.queryDeviceScore() < 75) {
-            // 低端机默认关闭美颜
-            mBeautyProcessor.setBeautyEnable(false)
-        } else {
+        // 低端机 或 无证书则关闭美颜
+        if (mRtcEngine.queryDeviceScore() >= 75) {
             mBeautyProcessor.setBeautyEnable(true)
+        } else {
+            mBeautyProcessor.setBeautyEnable(false)
         }
         mBeautyProcessor.getSenseTimeBeautyAPI().setupLocalVideo(SurfaceView(this).apply {
             binding.flVideoContainer.addView(this)

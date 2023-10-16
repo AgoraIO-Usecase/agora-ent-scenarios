@@ -54,7 +54,7 @@ extension UIImage {
         return nil
     }
     
-    @objc static func sceneImage(name: String) -> UIImage? {
+    static func scene1v1Image(name: String) -> UIImage? {
         guard let imagePath = UIImage.sceneImagePath(name: "Image/\(name)", bundleName: "Pure1v1") else {
             return nil
         }

@@ -1,5 +1,62 @@
 <resources>
     <string name="app_name">声动互娱</string>
+
+    <string name="app_agreement_page_title">个人信息保护指引</string>
+    <string name="app_agreement_protection_tip1">声动互娱软件是一款用于向声网客户展示产品使用效果的测试产品，仅用于测试产品的功能、性能和可用性，而非提供给大众使用的正式产品。</string>
+    <string name="app_agreement_protection_tip2">1.我们将依据《用户协议》及《隐私政策》来帮助您了解我们在收集、使用、存储您个人信息的情况以及您享有的相关权利。</string>
+    <string name="app_agreement_protection_tip3">2.在您使用本测试软件时，我们将收集您的设备信息、日志信息等，同时根据不同使用场景，你可以授予我们获取您设备的麦克风权限、摄像头权限等信息。</string>
+    <string name="app_agreement_protection_tip4">您可通过阅读完整的《用户协议》及《隐私政策》来了解详细信息。</string>
+    <string name="app_agreement_protection_tip5">提示您注意：当您点击“同意”时，视为您已阅读并愿意接受《用户协议》和《隐私政策》的所有内容。当您点击“不同意”时，将无法体验声动互娱的完整功能。</string>
+    <string name="app_agreement_protection_notice">选择“同意”，体验声动互娱完整功能</string>
+    <string name="app_agreement_protection_alert">同意 用户协议 及 隐私政策 后，声动互娱才能为您提供协作服务。</string>
+    <string name="app_agreement_the_user_agreement_and_privacy_policy">请同意用户协议和隐私政策</string>
+    <string name="app_guide_chatroom">声动语聊</string>
+    <string name="app_guide_chatroom_introduce">搭载声网最佳音效实践、最新音频技术的语聊房 带来更沉浸、更易用、更有趣的语聊体验</string>
+    <string name="app_guide_ktv">在线K歌房</string>
+    <string name="app_guide_ktv_introduce">一站式接入 20W+ 正版 K 歌热门曲库，灵活接入各类娱乐社交场景，激活多样 K 歌互动玩法</string>
+    <string name="app_guide_live">直播超级画质</string>
+    <string name="app_guide_live_introduce">视频『高清』升级，人更美、物更真，体验更流畅，为直播变现增添更多 buff</string>
+
+    <string name="app_login_phone_login">手机号登录</string>
+    <string name="app_login_i_agree">我已阅读并同意</string>
+    <string name="app_login_user_agreement">《用户协议》</string>
+    <string name="app_login_privacy_agreement">《隐私政策》</string>
+    <string name="app_login_agreement_and">及</string>
+    <string name="app_login_phone_input_title">注册/登录</string>
+    <string name="app_login_phone_input_info">若手机号未注册，登录后会自动注册。</string>
+    <string name="app_login_phone_input_input">请输入手机号</string>
+    <string name="app_login_phone_input_next">获取验证码</string>
+    <string name="app_login_phone_input_code">输入验证码</string>
+    <string name="app_login_phone_input_code_info">已发送验证码至 +%1s %2s</string>
+    <string name="app_login_code_wrong_tip">验证码输入错误</string>
+    <string name="app_login_regain_code">重新获取验证码</string>
+    <string name="app_login_count_down">%d s</string>
+
+    <string name="app_home_full_scene">全部玩法</string>
+    <string name="app_home_scene_ktv">在线K歌房</string>
+    <string name="app_home_scene_voice">语聊房</string>
+    <string name="app_home_scene_live">直播</string>
+    <string name="app_home_scene_ktv_solo_chorus">独唱&amp;合唱</string>
+    <string name="app_home_scene_ktv_solo_chorus_tips">超低延迟真合唱</string>
+    <string name="app_home_scene_ktv_sing_battle">抢唱</string>
+    <string name="app_home_scene_ktv_sing_battle_tips">热歌高潮片段</string>
+    <string name="app_home_scene_ktv_cantata">大合唱</string>
+    <string name="app_home_scene_ktv_cantata_tips">最高支持128人</string>
+    <string name="app_home_scene_ktv_sing_relay">接唱</string>
+    <string name="app_home_scene_ktv_sing_relay_tips">歌曲接龙</string>
+    <string name="app_home_scene_voice_chatroom">语聊房</string>
+    <string name="app_home_scene_voice_chatroom_tips">语聊房</string>
+    <string name="app_home_scene_voice_spatial">语聊房-空\n间音频版</string>
+    <string name="app_home_scene_voice_spatial_tips">方位感和空间感</string>
+    <string name="app_home_scene_live_show">秀场</string>
+    <string name="app_home_scene_live_show_tips">描述描述描述描</string>
+    <string name="app_home_scene_live_pure1v1">纯1v1私密\n房</string>
+    <string name="app_home_scene_live_pure1v1_tips">描述描述描述描</string>
+    <string name="app_home_scene_live_multiplayer">多人团战</string>
+    <string name="app_home_scene_live_multiplayer_tips">描述描述描述描</string>
+    <string name="app_home_scene_live_show1v1">秀场转1v1\n私密房</string>
+    <string name="app_home_scene_live_show1v1_tips">描述描述描述描</string>
+
     <string name="app_title_home">首页</string>
     <string name="app_title_find">发现</string>
     <string name="app_title_mine">我的</string>
@@ -34,9 +91,11 @@
     <string name="app_meta_chatting">元语聊</string>
     <string name="app_interactive_games">互动游戏</string>
     <string name="app_one_to_one">1V1私密房</string>
+    <string name="app_show_to_1v1">秀场转1V1私密房</string>
     <string name="app_coming_soon">敬请期待</string>
     <string name="app_voice_chat_spatial">空间音频</string>
     <string name="app_voice_chat_spatialTip">—空间音频模式</string>
+    <string name="app_sing_relay">抢麦接唱</string>
     <string name="app_about_app">关于声动互娱</string>
     <string name="app_about_name">声动互娱</string>
     <string name="app_about_version">版本号</string>
@@ -57,11 +116,13 @@
     <string name="app_exit_debug">确定退出Debug模式么？</string>
     <string name="app_exit_debug_tip">退出debug模式后，设置页面将恢复成正常的设置页面哦～</string>
     <string name="app_agree_tip">请同意我们的隐私政策与用户协议</string>
-    <string name="app_input_phonenum_tip">请输入正确手机号</string>
+    <string name="app_input_phonenum_tip">请输入正确的手机号</string>
     <string name="app_input_vcode_tip">请输入验证码</string>
     <string name="app_vcode_wrong_tip">验证码错误</string>
     <string name="app_login_success_tip">登陆成功</string>
+    <string name="app_login_failed_tip">登陆失败</string>
     <string name="app_vcode_send_success_tip">验证码发送成功</string>
+    <string name="app_vcode_send_failed_tip">验证码发送失败</string>
     <string name="app_edit_success">修改成功</string>
 
 </resources>

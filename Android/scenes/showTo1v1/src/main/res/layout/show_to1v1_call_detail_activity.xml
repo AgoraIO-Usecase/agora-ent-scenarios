@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/text_color_66">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivRoomCover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
+    <include
+        android:id="@+id/includeComeSoonView"
+        layout="@layout/show_to1v1_room_come_soon_view"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="15dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/layoutTop" />
+
+<!--    <FrameLayout-->
+<!--        android:id="@+id/llVideoContainer"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:orientation="vertical" />-->
+    <TextureView
+        android:id="@+id/textureVideo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <FrameLayout
+        android:id="@+id/layoutCall"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <io.agora.scene.showTo1v1.ui.view.CallDraggableView
+            android:id="@+id/vDragBigWindow"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="end" />
+
+        <io.agora.scene.showTo1v1.ui.view.CallDraggableView
+            android:id="@+id/vDragSmallWindow"
+            android:layout_width="@dimen/show_to1v1_drag_view_width"
+            android:layout_height="@dimen/show_to1v1_drag_view_height"
+            android:layout_gravity="end"
+            android:layout_marginTop="126dp"
+            android:layout_marginEnd="25dp" />
+    </FrameLayout>
+
+    <!--    头部-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutTop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvRoomInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginStart="15dp"
+            android:backgroundTint="@color/black_20_percent"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="-1dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutRoomTop"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                tools:visibility="invisible">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivUserAvatar"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="5dp"
+                    android:src="@drawable/show_to1v1_room_item_icon_sample"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvRoomName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="3dp"
+                    android:ellipsize="end"
+                    android:maxLength="14"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toEndOf="@+id/ivUserAvatar"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="房间名称" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvNickname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="3dp"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/ivUserAvatar"
+                    tools:text="用户昵称" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvRoomNum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tvNickname"
+                    tools:text="000000" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="15dp"
+                    android:drawableStart="@drawable/show_to1v1_dot"
+                    android:drawablePadding="3dp"
+                    android:gravity="center"
+                    android:text="00:00:00"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/tvRoomNum" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutCallingTop"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                tools:visibility="visible"
+                android:visibility="invisible">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivCallingAvatar"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="5dp"
+                    android:src="@drawable/show_to1v1_room_item_icon_sample"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCallingNickname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="3dp"
+                    android:ellipsize="end"
+                    android:maxLength="14"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toEndOf="@+id/ivCallingAvatar"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="用户昵称" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCallingUid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/tvCallingNickname"
+                    tools:text="000000" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCallingTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="15dp"
+                    android:drawableStart="@drawable/show_to1v1_room_detail_connection"
+                    android:drawablePadding="3dp"
+                    android:gravity="center"
+                    android:text="00:00:00"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/tvCallingUid" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <ImageButton
+            android:id="@+id/ivClose"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:elevation="2dp"
+            android:padding="6dp"
+            android:scaleType="fitXY"
+            android:background="@android:color/transparent"
+            android:src="@drawable/show_to1v1_detail_close"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/layoutNumCount"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="15dp"
+            android:background="@drawable/show_to1v1_black20_corner"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/ivClose"
+            app:layout_constraintEnd_toStartOf="@id/ivClose"
+            app:layout_constraintTop_toTopOf="@id/ivClose">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/show_to1v1_icon_count" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNumCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textColor="@color/white"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <include
+        android:id="@+id/includeConnectedView"
+        layout="@layout/show_to1v1_room_auto_connected_view"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/ivHangup"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="64dp"
+        android:src="@drawable/show_to1v1_call_hangup"
+        android:scaleType="fitXY"
+        android:visibility="gone"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvHangup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/show_to1v1_hangup"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/ivHangup"
+        app:layout_constraintStart_toStartOf="@id/ivHangup"
+        app:layout_constraintTop_toBottomOf="@id/ivHangup" />
+
+    <ImageButton
+        android:id="@+id/ivSetting"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginEnd="15dp"
+        android:scaleType="fitXY"
+        android:layout_marginBottom="34dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/show_to1v1_room_detail_setting"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/flDashboard"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="120dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/ivDashboardClose"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="end"
+            android:elevation="2dp"
+            android:padding="10dp"
+            android:scaleType="fitXY"
+            android:background="@android:color/transparent"
+            android:src="@drawable/show_to1v1_dashboard_close" />
+    </FrameLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/layoutCallPrivatelyBg"
+        android:layout_width="157dp"
+        android:layout_height="54dp"
+        android:orientation="horizontal"
+        android:src="@drawable/show_to1v1_room_detail_call_bg"
+        app:layout_constraintBottom_toBottomOf="@+id/layoutCallPrivately"
+        app:layout_constraintEnd_toEndOf="@+id/layoutCallPrivately"
+        app:layout_constraintStart_toStartOf="@+id/layoutCallPrivately"
+        app:layout_constraintTop_toTopOf="@+id/layoutCallPrivately" />
+
+    <LinearLayout
+        android:id="@+id/layoutCallPrivately"
+        android:layout_width="141dp"
+        android:layout_height="38dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/show_to1v1_room_detail_call"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@id/ivSetting"
+        app:layout_constraintEnd_toStartOf="@id/ivSetting"
+        app:layout_constraintTop_toTopOf="@id/ivSetting">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/show_to1v1_linking" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="@string/show_to1v1_call_privately"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupHangup"
+        app:constraint_referenced_ids="ivHangup,tvHangup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

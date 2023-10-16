@@ -8,7 +8,6 @@
 #import "VLKTVViewController.h"
 
 #import "VLPopScoreView.h"
-#import "VLLoginViewController.h"
 #import "VLCreateRoomViewController.h"
 #import "LSTPopView.h"
 #import "VLUserCenter.h"
@@ -18,6 +17,7 @@
 #import "AppContext+KTV.h"
 #import "AESMacro.h"
 #import "VLAlert.h"
+#import "AgoraEntScenarios-Swift.h"
 
 @interface VLOnLineListVC ()<VLHomeOnLineListViewDelegate/*,AgoraRtmDelegate*/,VLPopScoreViewDelegate>
 
@@ -66,7 +66,7 @@
 
 - (BOOL)checkIsLogin {
     if (![VLUserCenter center].isLogin) {
-        VLLoginViewController *loginVC = [[VLLoginViewController alloc] init];
+        VLLoginController *loginVC = [[VLLoginController alloc] init];
         [self.navigationController pushViewController:loginVC animated:YES];
         return NO;
     }
@@ -120,7 +120,7 @@
     inputModel.password = inputText;
 
     VL(weakSelf);
-    [[AppContext ktvServiceImp] joinRoomWith:inputModel completion:^(NSError * _Nullable error, KTVJoinRoomOutputModel * _Nullable outputModel) {
+    [[AppContext ktvServiceImp] joinRoomWithInputModel:inputModel completion:^(NSError * _Nullable error, KTVJoinRoomOutputModel * _Nullable outputModel) {
         if (error != nil) {
             [VLToast toast:error.description];
             return;

@@ -39,5 +39,21 @@
 
     <style name="app_Theme.AgoraKTV.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="app_corner16Style">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="app_TabLayoutTextSelected">
+        <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="app_TabLayoutTextUnSelected">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/def_text_grey_303</item>
+    </style>
 
 </resources>

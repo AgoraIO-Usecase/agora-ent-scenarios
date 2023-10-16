@@ -13,11 +13,6 @@ import SVProgressHUD
 class VRBaseViewController: UIViewController {
     lazy var navigation: BaseNavigationView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ZNavgationHeight))
 
-    override public func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.navigationBar.isHidden = true
-    }
-
     override public func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.

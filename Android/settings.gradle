@@ -29,6 +29,11 @@ include ':scenes:ktv'
 include ':scenes:ktv_singbattle'
 
 /*
+ * 抢麦接唱
+ */
+include ':scenes:ktv_relay'
+
+/*
  * 语聊房
  */
 include ':scenes:voice'
@@ -47,7 +52,13 @@ include ':scenes:show'
 include ':scenes:show:aars:SenseArSourceManager'
 include ':scenes:show:aars:STMobileJNI'
 include ':scenes:show:aars:HardwareBuffer'
+
 /*
  * 1V1私密房
  */
 include ':scenes:pure1v1'
+
+/**
+ * 秀场转1V1私密房 使用了 addHandlerEx 4.1.1.16 版本没有，暂时注掉
+ */
+//include ':scenes:showTo1v1'

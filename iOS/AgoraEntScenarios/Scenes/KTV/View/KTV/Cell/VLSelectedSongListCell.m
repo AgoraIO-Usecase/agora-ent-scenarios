@@ -53,6 +53,7 @@
     [self.chooseBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
     self.chooseBtn.titleLabel.font = UIFontMake(12.0);
     [self.chooseBtn setTitle:KTVLocalizedString(@"ktv_room_choose_song") forState:UIControlStateNormal];
+    self.chooseBtn.accessibilityIdentifier = @"ktv_choose_song_button_id";
     [self.chooseBtn setBackgroundColor:UIColorMakeWithHex(@"#2753FF")];
     self.chooseBtn.layer.cornerRadius = 14;
     self.chooseBtn.layer.masksToBounds = YES;

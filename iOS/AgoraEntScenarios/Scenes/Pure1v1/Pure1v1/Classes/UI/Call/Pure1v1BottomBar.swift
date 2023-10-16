@@ -16,7 +16,7 @@ class Pure1v1RoomBottomBar: UIView {
     // 设置
     private lazy var settingButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage.sceneImage(name: "live_setting"), for: .normal)
+        button.setImage(UIImage.scene1v1Image(name: "live_setting"), for: .normal)
         button.addTarget(self, action: #selector(didClickSettingButton), for: .touchUpInside)
         return button
     }()

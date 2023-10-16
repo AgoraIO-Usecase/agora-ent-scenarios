@@ -180,7 +180,9 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         guard let rtcEngine = self.config?.rtcEngine else {return}
         apiPrint("preloadRoom: \(preloadRoomList.count)")
         preloadRoomList.forEach { roomInfo in
-            rtcEngine.preloadChannel(byToken: roomInfo.token, channelId: roomInfo.channelName, uid: roomInfo.uid)
+            if let uid = config?.userId {
+                rtcEngine.preloadChannel(byToken: roomInfo.token, channelId: roomInfo.channelName, uid: uid)
+            }
         }
     }
     
@@ -266,7 +268,6 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         videoCanvas.view = container.container
         videoCanvas.renderMode = .hidden
         let ret = engine.setupRemoteVideoEx(videoCanvas, connection: connection)
-                
         apiPrint("renderVideo[\(connection.channelId)] ret = \(ret), uid:\(roomInfo.uid) localuid: \(localUid) ")
     }
     
