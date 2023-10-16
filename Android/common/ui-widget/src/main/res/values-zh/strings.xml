@@ -9,7 +9,9 @@
     <string name="cancel">取消</string>
     <string name="close">关闭</string>
     <string name="agree">同意</string>
+    <string name="agree1">同意并继续</string>
     <string name="disagree">不同意</string>
+    <string name="disagree1">不同意并退出</string>
     <string name="confirm">确认</string>
 
     <string name="edit_name">修改昵称</string>

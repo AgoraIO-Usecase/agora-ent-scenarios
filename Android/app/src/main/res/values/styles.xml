@@ -14,4 +14,14 @@
         <attr name="app_waitInputColor" format="color" />
         <attr name="app_isWaitInput" format="boolean" />
     </declare-styleable>
+
+    <style name="app_def_et_phone_input">
+        <item name="android:singleLine">true</item>
+        <item name="android:maxLength">11</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColorHint">@color/def_text_grey_C9C</item>
+        <item name="android:textColor">@color/def_text_color_040</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">14sp</item>
+    </style>
 </resources>
