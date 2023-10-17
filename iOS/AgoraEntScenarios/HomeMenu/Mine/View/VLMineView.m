@@ -79,7 +79,6 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 
 - (void)keyboardWillHide:(NSNotification *)notification {
     self.editBtn.hidden = NO;
-    self.nickNameTF.userInteractionEnabled = NO;
 }
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -103,14 +102,14 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 }
 
 - (void)editButtonClickEvent {
-    self.nickNameTF.userInteractionEnabled = !self.nickNameTF.userInteractionEnabled;
-    if (self.nickNameTF.userInteractionEnabled) {
+    if (!self.nickNameTF.isFirstResponder) {
         [self.nickNameTF becomeFirstResponder];
     } else {
         [self.nickNameTF resignFirstResponder];
     }
-    self.editBtn.hidden = self.nickNameTF.userInteractionEnabled;
+    self.editBtn.hidden = self.nickNameTF.isFirstResponder;
 }
+
 - (void)loadUpdateNickNameRequest:(NSString *)nickName {
     NSDictionary *param = @{
         @"userNo" : VLUserCenter.user.userNo ?: @"",
@@ -198,9 +197,17 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
         return YES;
     }
     [self loadUpdateNickNameRequest:textField.text];
-    textField.userInteractionEnabled = NO;
     [textField resignFirstResponder];
     return YES;
+}
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField {
+    self.editBtn.hidden = YES;
+    // 全选文字
+    UITextPosition *endDocument = textField.endOfDocument;
+    UITextPosition *end = [textField positionFromPosition:endDocument offset:0];
+    UITextPosition *start = [textField positionFromPosition:end offset:-textField.text.length];
+    textField.selectedTextRange = [textField textRangeFromPosition:start toPosition:end];
 }
 
 - (UIView *)mineTopView {
@@ -238,7 +245,6 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
         _nickNameTF.translatesAutoresizingMaskIntoConstraints = NO;
         _nickNameTF.returnKeyType = UIReturnKeyDone;
         _nickNameTF.delegate = self;
-        _nickNameTF.userInteractionEnabled = NO;
     }
     return _nickNameTF;
 }
@@ -269,7 +275,8 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
         _mineTable.dataSource = self;
         _mineTable.delegate = self;
         _mineTable.backgroundColor = [UIColor clearColor];
-        _mineTable.separatorStyle = UITableViewCellSeparatorStyleNone;
+        _mineTable.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+        _mineTable.separatorColor = [UIColor colorWithHexString:@"#F2F2F6"];
         [_mineTable registerClass:[VLMineTCell class] forCellReuseIdentifier:kDefaultCellID];
         [_mineTable registerClass:[VLMineSwitchCell class] forCellReuseIdentifier:kSwitchCellID];
         _mineTable.translatesAutoresizingMaskIntoConstraints = NO;
@@ -297,8 +304,6 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
         tempArray = @[[VLMineCellModel modelWithItemImg:@"" title:NSLocalizedString(@"app_about_us", nil) clickType:VLMineViewClickTypeAboutUS],
                       [VLMineCellModel modelWithItemImg:@"" title:NSLocalizedString(@"app_submit_feedback", nil) clickType:VLMineViewClickTypSubmitFeedback]];
         [_dataArray addObject:tempArray];
-//            [VLMineCellModel modelWithItemImg:@"mine_logout_icon" title:NSLocalizedString(@"app_logout", nil)],
-//            [VLMineCellModel modelWithItemImg:@"mine_quit_icon" title:NSLocalizedString(@"app_logoff_account", nil)],
     }
     return _dataArray;
 }

@@ -19,7 +19,8 @@ class VLMineAccountViewController: BaseViewController {
         tableView.backgroundColor = .clear
         tableView.estimatedSectionFooterHeight = 0
         tableView.estimatedSectionHeaderHeight = 0
-        tableView.separatorStyle = .none
+        tableView.separatorStyle = .singleLine
+        tableView.separatorColor = UIColor(hex: "#F2F2F6", alpha: 1.0)
         tableView.showsVerticalScrollIndicator = false
 
         return tableView
