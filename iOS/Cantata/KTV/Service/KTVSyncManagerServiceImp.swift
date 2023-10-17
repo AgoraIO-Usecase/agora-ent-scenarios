@@ -200,6 +200,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         roomInfo.roomPeopleNum = "0"
         roomInfo.icon = inputModel.icon
         roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+        roomInfo.creatorAvatar = inputModel.creatorAvatar
 
         let params = mapConvert(model: roomInfo)
 
@@ -278,6 +279,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                         output.name = inputModel.name
                         output.roomNo = roomInfo.roomNo ?? ""
                         output.seatsArray = seatArray
+                        output.creatorAvatar = inputModel.creatorAvatar
                         completion(nil, output)
                     }
                     self._addUserIfNeed()
@@ -439,6 +441,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     public func enterSeat(with inputModel: KTVOnSeatInputModel,
                    completion: @escaping (Error?) -> Void) {
         let seatInfo = _getUserSeatInfo(seatIndex: Int(inputModel.seatIndex))
+        seatInfo.isAudioMuted = 0
         _addSeatInfo(seatInfo: seatInfo,
                      finished: completion)
     }

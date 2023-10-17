@@ -59,7 +59,7 @@ class CantataMainViewController: BaseViewController{
     private var rtcDataStreamId: Int = 0
     private var isOnMicSeat: Bool = false
     private var chorusMicView: ChorusMicView!
-    private var topView: VLKTVTopView!
+    private var topView: DHCVLKTVTopView!
     private var botView: VLBottomView!
     private var lrcControlView: DHCLRCControl!
     private var isBrodCaster: Bool = false
@@ -69,7 +69,7 @@ class CantataMainViewController: BaseViewController{
     private var connection: AgoraRtcConnection?
     //沉浸模式
     private var isIMMode: Int = 0
-    
+    private var isLeavingChorus: Bool = false
     private var isNowMicMuted: Bool = false {
         didSet {
             guard let _ = self.ktvApi, let _ = self.RtcKit, let _ = self.botView else {return}
@@ -105,7 +105,7 @@ class CantataMainViewController: BaseViewController{
                 let isSongOwner = VLUserCenter.user.id == topSong.userId
                 var top = topSong
                 top.status = AUIPlayStatus.playing.rawValue
-                top.switchable = isSongOwner
+                top.switchEnable = isSongOwner
                 self.addedMusicList[0] = top
                 self.jukeBoxView.addedMusicTableView.reloadData()
             }
@@ -195,7 +195,7 @@ extension CantataMainViewController {
         let kStatusBarHeight: CGFloat = isIPhonex ? 44.0 : 20
 
         //头部布局
-        topView = VLKTVTopView(frame: CGRect(x: 0, y: Int(kStatusBarHeight), width: Int(ScreenWidth), height: 60), with: self)
+        topView = DHCVLKTVTopView(frame: CGRect(x: 0, y: Int(kStatusBarHeight), width: Int(ScreenWidth), height: 60), with: self)
         view.addSubview(topView)
         if let model = self.roomModel {
             topView.listModel = model
@@ -326,13 +326,6 @@ extension CantataMainViewController {
                 }
             }
         }
-        
-        if VLUserCenter.user.id == model.userNo {
-            self.lrcControlView.controlState = .ownerSing
-            self.checkEnterSeatAudioAuthorized()
-        } else {
-            self.lrcControlView.controlState = isRoomOwner ? .ownerChorus : .joinChorus
-        }
 
         //获取合唱用户
         guard let seatsArray = self.seatsArray else {return}
@@ -357,10 +350,17 @@ extension CantataMainViewController {
                 print("switch failed:\(role)----\(state.rawValue)")
             }
         }
+        
+        if VLUserCenter.user.id == model.userNo {
+            self.lrcControlView.controlState = .ownerSing
+            //self.checkEnterSeatAudioAuthorized()
+        } else {
+            self.lrcControlView.controlState = isRoomOwner ? .ownerChorus : .joinChorus
+        }
     }
     
     public func checkChorus() {
-        guard let conn = self.connection else {return}
+ //       guard let conn = self.connection else {return}
 //        if self.RtcKit.getConnectionStateEx(conn) != .connected {
 //            VLToast.toast("加入合唱失败，reson:连接已断开")
 //            return
@@ -446,9 +446,9 @@ extension CantataMainViewController {
                 }
 
                 // 开麦
-                AppContext.ktvServiceImp()?.updateSeatAudioMuteStatus(with: false) { error in
-                    // completion block
-                }
+//                AppContext.ktvServiceImp()?.updateSeatAudioMuteStatus(with: false) { error in
+//                    // completion block
+//                }
             }
         }
 
@@ -708,6 +708,12 @@ extension CantataMainViewController {
                                 self.leaveSeat()
                                 self.removeSongAndReloadStatus()
                                 self.lrcControlView.controlState = .joinChorus
+                                DispatchQueue.main.async {
+                                    if self.isLeavingChorus == false {
+                                        VLToast.toast("您已被踢下麦")
+                                    }
+                                    self.isLeavingChorus = false
+                                }
                             }
                         }
                     }
@@ -963,7 +969,7 @@ extension CantataMainViewController {
         AppContext.ktvServiceImp()?.enterSeat(with: seatModel, completion: { err in
             completion(err)
         })
-        checkEnterSeatAudioAuthorized()
+       // checkEnterSeatAudioAuthorized()
     }
     
     private func updateRTCOption(with model: VLRoomSeatModel) {
@@ -1122,7 +1128,7 @@ extension CantataMainViewController {
                 //让他下麦 然后用户自己监听自己的麦位 退出合唱
                 guard let seatModel = seatArray.filter{$0.userNo == userNo}.first else {return}
                 leaveSeat(with: seatModel) { err in
-                    
+                    DHCPresentView.shared.dismiss()
                 }
             }
         }
@@ -1341,6 +1347,7 @@ extension CantataMainViewController: DHCGameDelegate {
         } else if event == .origin {//原唱
             self.ktvApi.getMusicPlayer()?.selectMultiAudioTrack(0, publishTrackIndex: 1)
         } else if event == .leave {//退出合唱
+            self.isLeavingChorus = true
             leaveSeat()
             self.lrcControlView.controlState = .joinChorus
             self.ktvApi.switchSingerRole2(newRole: .audience, stateCallBack: { state, reason in
@@ -1480,9 +1487,9 @@ extension CantataMainViewController: ChorusMicViewDelegate {
 }
 
 //头部视图代理
-extension CantataMainViewController: VLKTVTopViewDelegate {
+extension CantataMainViewController: DHCVLKTVTopViewDelegate {
     
-    public func onVLKTVTopView(_ view: VLKTVTopView, closeBtnTapped sender: Any) {
+    public func onVLKTVTopView(_ view: DHCVLKTVTopView, closeBtnTapped sender: Any) {
         let title = VLUserCenter.user.ifMaster ? "ktv_disband_room".toSceneLocalization(bundleName: "DHCResource") : "ktv_exit_room".toSceneLocalization(bundleName: "DHCResource")
         let message = VLUserCenter.user.ifMaster ? "ktv_confirm_disband_room".toSceneLocalization(bundleName: "DHCResource") : "ktv_confirm_exit_room".toSceneLocalization(bundleName: "DHCResource")
         let array = ["ktv_cancel".toSceneLocalization(bundleName: "DHCResource"), "ktv_confirm".toSceneLocalization(bundleName: "DHCResource")]
@@ -1494,7 +1501,7 @@ extension CantataMainViewController: VLKTVTopViewDelegate {
         }
     }
 
-    public func onVLKTVTopView(_ view: VLKTVTopView, moreBtnTapped sender: Any) {
+    public func onVLKTVTopView(_ view: DHCVLKTVTopView, moreBtnTapped sender: Any) {
         let dialog = AUiMoreDialog(frame: UIScreen.main.bounds)
 
         if let keyWindow = UIApplication.shared.keyWindow {

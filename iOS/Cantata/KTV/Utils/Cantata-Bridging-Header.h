@@ -8,3 +8,5 @@
 #ifndef Cantata_Bridging_Header_h
 #define Cantata_Bridging_Header_h
 #endif /* Cantata_Bridging_Header_h */
+
+#import "VLKTVTopView.h"

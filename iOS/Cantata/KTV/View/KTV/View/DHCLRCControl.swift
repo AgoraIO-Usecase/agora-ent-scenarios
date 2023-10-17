@@ -368,6 +368,7 @@ class DHCLRCControl: UIView {
         pauseBtn.isSelected = false
         originBtn.isSelected = false
         lrcView.reset()
+        skipBtn.setSkipType(.prelude)
         musicNameBtn.isHidden = true
         musicNameBtn.setTitle("", for: .normal)
         currentLoadLrcPath = nil

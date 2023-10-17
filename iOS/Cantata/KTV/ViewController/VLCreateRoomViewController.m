@@ -66,6 +66,7 @@
     intputModel.name = [NSString stringWithFormat:@"%@",roomModel.name];
     intputModel.password = roomModel.password.length > 0 ? [NSString stringWithFormat:@"%@",roomModel.password] : @"";
     intputModel.soundEffect = @"0";
+    intputModel.creatorAvatar = VLUserCenter.user.headUrl;
 //    intputModel.userNo = VLUserCenter.user.id;
     VL(weakSelf);
     self.view.userInteractionEnabled = NO;
@@ -89,6 +90,7 @@
         listModel.roomNo = outputModel.roomNo;
         listModel.name = outputModel.name;
         listModel.bgOption = 0;
+        listModel.creatorAvatar = outputModel.creatorAvatar;
         listModel.creatorNo = VLUserCenter.user.id;
         UIViewController *VC = [ViewControllerFactory createCustomViewControllerWithTitle:listModel seatsArray:outputModel.seatsArray];
         [weakSelf.navigationController pushViewController:VC animated:YES];

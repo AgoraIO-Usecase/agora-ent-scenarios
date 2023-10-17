@@ -13,12 +13,14 @@ import Foundation
     @objc public var name: String?
     @objc public var password: String?
     @objc public var soundEffect: String?
+    @objc public var creatorAvatar: String?
     //@objc var userNo: String?
 }
 
 public class KTVCreateRoomOutputModel: NSObject {
     @objc public var name: String?
     @objc public var roomNo: String?
+    @objc public var creatorAvatar: String?
     @objc public var seatsArray: [VLRoomSeatModel]?
 }
 
