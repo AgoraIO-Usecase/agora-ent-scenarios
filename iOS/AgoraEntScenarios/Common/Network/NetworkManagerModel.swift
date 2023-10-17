@@ -56,12 +56,13 @@ open class NMCommonNetworkModel: AUINetworkModel {
 @objcMembers
 open class NMGenerateTokennNetworkModel: NMCommonNetworkModel {
     
-    public var appCertificate: String?
-    public var appId: String?
+    private let appCertificate: String? = KeyCenter.Certificate
+    private let appId: String? = KeyCenter.AppId
+    private let src = "iOS"
+    private let ts: String? = "".timeStamp
+    
     public var channelName: String?
     public var expire: NSNumber?
-    public var src: String?
-    public var ts: String?
     public var type: NSNumber?
     public var uid: String?
     
@@ -120,21 +121,22 @@ open class NMGenerateIMConfigNetworkModelUserParmas: NSObject {
 
 @objcMembers
 open class NMGenerateIMConfigNetworkModelIMParmas: NSObject {
-    var appKey: String?
-    var clientId: String?
-    var clientSecret: String?
+    private var appKey: String? = KeyCenter.IMAppKey
+    private var clientId: String? = KeyCenter.IMClientId
+    private var clientSecret: String? = KeyCenter.IMClientSecret
 }
 
 
 @objcMembers
 open class NMGenerateIMConfigNetworkModel: NMCommonNetworkModel {
     
-    var appId: String?
+    private let appId =  KeyCenter.AppId
+    private let src = "iOS"
+    private let traceId: String? = NSString.withUUID().md5()
+    
     var chat: NMGenerateIMConfigNetworkModelChatParams?
-    var src = "iOS"
     var im: NMGenerateIMConfigNetworkModelIMParmas?
     var payload: String?
-    var traceId: String?
     var user: NMGenerateIMConfigNetworkModelUserParmas?
     var type: NSNumber?
     
@@ -158,11 +160,12 @@ open class NMGenerateIMConfigNetworkModel: NMCommonNetworkModel {
 @objcMembers
 open class NMVoiceIdentifyNetworkModel: NMCommonNetworkModel {
    
-    var appId: String?
+    private let appId = KeyCenter.AppId
+    private let src = "iOS"
+    private let traceId = UUID().uuidString.md5Encrypt
+    
     var channelName: String?
     var channelType: NSNumber?
-    var src = "iOS"
-    var traceId = NSString.withUUID().md5() ?? ""
     var payload: String?
     
     public override init() {
@@ -175,16 +178,20 @@ open class NMVoiceIdentifyNetworkModel: NMCommonNetworkModel {
 @objcMembers
 open class NMStartCloudPlayerNetworkModel: NMCommonNetworkModel {
     
-    var appId: String?
+    private let appId: String = KeyCenter.AppId
+    private let appCert = KeyCenter.Certificate ?? ""
+    private let traceId = NSString.withUUID().md5() ?? ""
+    private let region = "cn"
+    private let src = "iOS"
+    
+    private lazy var basicAuth: String = {
+        createBasicAuth(key: KeyCenter.CloudPlayerKey ?? "", password: KeyCenter.CloudPlayerSecret ?? "")
+    }()
+    
     var channelName: String?
-    var appCert: String?
-    var basicAuth: String?
     var uid: String?
     var robotUid: NSNumber?
-    var region = "cn"
     var streamUrl: String?
-    var src = "iOS"
-    var traceId = NSString.withUUID().md5() ?? ""
 
     public override init() {
         super.init()
@@ -196,11 +203,12 @@ open class NMStartCloudPlayerNetworkModel: NMCommonNetworkModel {
 @objcMembers
 open class NMCloudPlayerHeartbeatNetworkModel: NMCommonNetworkModel {
     
-    var appId: String?
+    private let appId = KeyCenter.AppId
+    private let src = "iOS"
+    private let traceId = NSString.withUUID().md5() ?? ""
+    
     var channelName: String?
     var uid: String?
-    var src = "iOS"
-    var traceId = NSString.withUUID().md5() ?? ""
     
     public override init() {
         super.init()
@@ -213,8 +221,8 @@ open class NMCloudPlayerHeartbeatNetworkModel: NMCommonNetworkModel {
 @objcMembers
 open class NMReportSceneClickNetworkModel: NMCommonNetworkModel {
     
-    var src: String = "agora_ent_demo"
-    var ts: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
+    private let src: String = "agora_ent_demo"
+    private let ts: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
     var sign: String?
     var pts: [[String: Any]]?
          
@@ -242,9 +250,9 @@ open class NMReportSceneClickNetworkModel: NMCommonNetworkModel {
 @objcMembers
 open class NMReportDeviceInfoNetworkModel: NMCommonNetworkModel {
     
-    var appVersion = UIApplication.shared.appVersion ?? ""
-    var model = UIDevice.current.machineModel ?? ""
-    var platform = "iOS"
+    private let appVersion = UIApplication.shared.appVersion ?? ""
+    private let model = UIDevice.current.machineModel ?? ""
+    private let platform = "iOS"
     
     public init(sceneId: String, userNo: String, appId: String) {
         super.init()

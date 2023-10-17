@@ -108,3 +108,52 @@ open class VLDetoryUserInfoNetworkModel: VLCommonNetworkModel {
         method = .get
     }
 }
+
+@objcMembers
+open class VLUploadImageNetworkModel: AUIUploadNetworkModel {
+    
+    public var image: UIImage! {
+        didSet{
+            fileData = image.jpegData(compressionQuality: 1.0)
+        }
+    }
+    
+    public override init() {
+        super.init()
+        interfaceName = "/api-login/upload"
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMddHHmmss"
+        let time = formatter.string(from: Date())
+        name = "file"
+        fileName = "\(time)\(arc4random() % 1000).jpg"
+        mimeType = "image/jpg"
+    }
+    
+    public override func getHeaders() -> HTTPHeaders {
+        var headers = super.getHeaders()
+        headers.add(HTTPHeader(name: "Authorization", value: getToken()))
+        return headers
+    }
+    
+    public override func parse(data: Data?) throws -> Any {
+        var dic: Any? = nil
+        do {
+            try dic = super.parse(data: data)
+        } catch let err {
+            throw err
+        }
+        guard let dic = dic as? [String: Any] else {
+            throw AUICommonError.networkParseFail.toNSError()
+        }
+        let rooms = dic.kj.model(VLResponseData.self)
+        return rooms
+    }
+    
+    func getToken() -> String {
+        if VLUserCenter.shared().isLogin() {
+            return VLUserCenter.user.token
+        }
+        return ""
+    }
+}

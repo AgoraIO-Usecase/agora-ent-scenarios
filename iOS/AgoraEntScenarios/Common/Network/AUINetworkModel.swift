@@ -64,5 +64,26 @@ open class AUINetworkModel: NSObject {
         
         return dic
     }
+    
+    public func createBasicAuth(key: String, password: String) -> String {
+        let loginString = String(format: "%@:%@", key, password)
+        guard let loginData = loginString.data(using: String.Encoding.utf8) else {
+            return ""
+        }
+        let base64LoginString = loginData.base64EncodedString()
+        return base64LoginString
+    }
 }
 
+
+@objcMembers
+open class AUIUploadNetworkModel: AUINetworkModel {
+    public var fileData: Data!
+    public var name: String!
+    public var fileName: String?
+    public var mimeType: String?
+    
+    public func upload(progress:((Float) -> Void)? = nil ,completion: ((Error?, Any?)->())?) {
+        AUINetworking.shared.upload(model: self, progress: progress, completion: completion)
+    }
+}

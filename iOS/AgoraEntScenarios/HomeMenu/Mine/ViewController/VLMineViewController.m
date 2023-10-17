@@ -572,6 +572,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 /// 上传图片
 /// @param image 图片
 - (void)uploadHeadImageWithImage:(UIImage *)image {
+    /*
     [VLAPIRequest uploadImageURL:kURLPathUploadImage showHUD:YES appendKey:@"file" images:@[image] success:^(VLResponseDataModel * _Nonnull response) {
         if (response.code == 0) {
             VLUploadImageResModel *model = [VLUploadImageResModel vj_modelWithDictionary:response.data];
@@ -581,6 +582,21 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
             [VLToast toast:response.message];
         }
     } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
+    }];
+     */
+    
+    VLUploadImageNetworkModel *uploadModel = [VLUploadImageNetworkModel new];
+    uploadModel.image = image;
+    
+    [uploadModel uploadWithProgress:nil completion:^(NSError * _Nullable err, id _Nullable responseObject) {
+        VLResponseData *response = responseObject;
+        if (response.code == 0) {
+            VLUploadImageResModel *model = [VLUploadImageResModel vj_modelWithDictionary:response.data];
+            [self loadUpdateUserIconRequest:model.url image:image];
+            [VLToast toast:response.message];
+        } else {
+            [VLToast toast:response.message];
+        }
     }];
 }
 

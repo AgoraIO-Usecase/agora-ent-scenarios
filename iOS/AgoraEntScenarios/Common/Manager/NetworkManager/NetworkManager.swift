@@ -83,15 +83,6 @@ class NetworkManager:NSObject {
         return KeyCenter.baseServerUrl ?? ""
     }
     
-    private func basicAuth(key: String, password: String) -> String {
-        let loginString = String(format: "%@:%@", key, password)
-        guard let loginData = loginString.data(using: String.Encoding.utf8) else {
-            return ""
-        }
-        let base64LoginString = loginData.base64EncodedString()
-        return base64LoginString
-    }
-    
     /// get tokens
     /// - Parameters:
     ///   - channelName: <#channelName description#>
@@ -162,12 +153,8 @@ class NetworkManager:NSObject {
          */
         
         let model: NMGenerateTokennNetworkModel = tokenType == .token006 ? NMGenerate006TokennNetworkModel() : NMGenerate007TokennNetworkModel()
-        model.appCertificate = KeyCenter.Certificate ?? ""
-        model.appId = KeyCenter.AppId
         model.expire = NSNumber(value: expire)
-        model.src = "iOS"
         model.channelName = channelName
-        model.ts = "".timeStamp
         model.type = NSNumber(value: type.rawValue)
         model.uid = uid
         model.request { error, token in
@@ -259,18 +246,13 @@ class NetworkManager:NSObject {
         userParamsModel.nickname = nickName
       
         let imConfigModel = NMGenerateIMConfigNetworkModelIMParmas()
-        imConfigModel.appKey = KeyCenter.IMAppKey
-        imConfigModel.clientId = KeyCenter.IMClientId
-        imConfigModel.clientSecret = KeyCenter.IMClientSecret
         
         let payload: String = getPlayloadWithSceneType(.voice) ?? ""
         
         let networkModel = NMGenerateIMConfigNetworkModel()
-        networkModel.appId = KeyCenter.AppId
         networkModel.chat = chatParamsModel
         networkModel.im = imConfigModel
         networkModel.payload = payload
-        networkModel.traceId = NSString.withUUID().md5()
         networkModel.user = userParamsModel
         networkModel.type = NSNumber(value: type)
         
@@ -309,10 +291,8 @@ class NetworkManager:NSObject {
         })
          */
         let model = NMVoiceIdentifyNetworkModel()
-        model.appId =  KeyCenter.AppId
         model.channelName = channelName
         model.channelType = NSNumber(value: channelType)
-        model.traceId = UUID().uuidString.md5Encrypt
         model.payload = payload
         model.request { error, data in
             let data = data as? [String: Any]
@@ -367,14 +347,10 @@ class NetworkManager:NSObject {
         */
         
         let model = NMStartCloudPlayerNetworkModel()
-        model.appId = KeyCenter.AppId
-        model.appCert = KeyCenter.Certificate ?? ""
-        model.basicAuth = basicAuth(key: KeyCenter.CloudPlayerKey ?? "", password: KeyCenter.CloudPlayerSecret ?? "")
         model.channelName = channelName
         model.uid = uid
         model.robotUid = NSNumber(value: robotUid)
         model.streamUrl = streamUrl
-        model.traceId = NSString.withUUID().md5() ?? ""
         
         model.request { error, data in
             let data = data as? [String: Any]
@@ -406,7 +382,6 @@ class NetworkManager:NSObject {
         })
          */
         let model = NMCloudPlayerHeartbeatNetworkModel()
-        model.appId = KeyCenter.AppId
         model.channelName = channelName
         model.uid = uid
         model.request { error, data in
