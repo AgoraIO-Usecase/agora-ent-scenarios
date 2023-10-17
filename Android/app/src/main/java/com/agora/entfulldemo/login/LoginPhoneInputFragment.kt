@@ -3,16 +3,15 @@ package com.agora.entfulldemo.login;
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.text.method.DigitsKeyListener
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentLoginPhoneInputBinding
@@ -123,6 +122,8 @@ class LoginPhoneInputFragment : BaseViewBindingFragment<AppFragmentLoginPhoneInp
                 binding.etAccounts.setText("")
             }
         })
+
+        setAccountStatus()
     }
 
     override fun requestData() {
@@ -151,5 +152,10 @@ class LoginPhoneInputFragment : BaseViewBindingFragment<AppFragmentLoginPhoneInp
             }
         }
         mSwipeCaptchaDialog?.show()
+    }
+
+    private fun setAccountStatus() {
+        //手机号登录
+        binding.etAccounts.keyListener = DigitsKeyListener.getInstance("1234567890")
     }
 }

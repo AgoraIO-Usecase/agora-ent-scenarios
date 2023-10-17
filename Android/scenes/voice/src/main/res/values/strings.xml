@@ -152,6 +152,7 @@
     <string name="voice_chatroom_aiaec">AIAEC</string>
     <string name="voice_chatroom_aiagc">AGC</string>
     <string name="voice_chatroom_ear_back">In-Ear Monitor</string>
+    <string name="voice_chatroom_sound_card">虚拟声卡</string>
     <string name="voice_chatroom_bgm">Background Music</string>
     <string name="voice_chatroom_aiaec_audition">AIAEC Audition</string>
     <string name="voice_chatroom_aiagc_audition">AGC Audition</string>
