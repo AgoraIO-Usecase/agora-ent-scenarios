@@ -221,8 +221,9 @@ static AFHTTPSessionManager *_sessionManager;
     
     // 设置公共参数
     NSDictionary *paramenter = [self setCommonParamenter:json];
-    UIWindow *window = [UIApplication sharedApplication].delegate.window;
     if (show) [SVProgressHUD show];
+    [_sessionManager.requestSerializer setValue:[self getToken] forHTTPHeaderField:@"Authorization"];
+
     NSURLSessionDataTask *sessionTask = [_sessionManager POST:url parameters:paramenter headers:@{} constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
         for (int i = 0; i < images.count; i++) {
             // 图片压缩
