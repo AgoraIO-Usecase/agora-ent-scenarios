@@ -1,177 +1,191 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/bg_app_def_white"
-    android:paddingTop="20dp">
+    android:background="@mipmap/bg_app_def_white">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="声网"
-        android:textColor="@color/def_text_color_040"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/userBg"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="110dp"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="62dp"
-        android:background="@drawable/bg_full_radius_white_10"
-        android:paddingVertical="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivUserAvatar"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginStart="20dp"
-            android:src="@mipmap/userimage"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvUserMobile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="6dp"
-            android:textColor="@color/def_text_color_040"
-            android:textSize="18sp"
-            app:layout_constraintStart_toEndOf="@id/ivUserAvatar"
-            app:layout_constraintTop_toTopOf="@id/ivUserAvatar" />
+            <LinearLayout
+                android:id="@+id/layoutUserInfo"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvUserID"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="6dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:textColor="@color/def_text_grey_6c7"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@id/ivUserAvatar"
-            app:layout_constraintStart_toStartOf="@id/tvUserMobile" />
+                android:minHeight="144dp">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivToEdit"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginEnd="15dp"
-            android:src="@mipmap/ic_edit"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tvUserMobile" />
+                <LinearLayout
+                    android:id="@+id/userBg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:minHeight="144dp"
+                    android:orientation="vertical">
 
-        <View
-            android:id="@+id/vToEdit"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/ivUserAvatar"
-            app:layout_constraintEnd_toEndOf="@id/ivToEdit"
-            app:layout_constraintStart_toEndOf="@id/ivUserAvatar"
-            app:layout_constraintTop_toTopOf="@id/ivUserAvatar" />
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivUserAvatar"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@mipmap/portrait01"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/inputNickname"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:background="@null"
+                        app:endIconDrawable="@drawable/app_ic_edit"
+                        app:endIconMode="custom">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etNickname"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:gravity="center"
+                            android:imeOptions="actionDone"
+                            android:inputType="text"
+                            android:maxLength="12"
+                            android:textColor="@color/def_text_color_040"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            tools:text="忧郁的草莓奶昔" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvUserPhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:textColor="@color/def_text_grey_6c7"
+                        android:textSize="14sp"
+                        tools:text="138****5678" />
+                </LinearLayout>
+            </LinearLayout>
 
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/clBtnList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/bg_full_radius_white_10"
-        android:paddingVertical="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/userBg">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_full_white_r16"
+                android:orientation="vertical">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvUserAgreement"
-            style="@style/app_tv_mine_style"
-            android:drawableStart="@mipmap/ic_user_center1"
-            android:text="@string/app_user_agreement"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="MissingConstraints" />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvMineAccount"
+                    style="@style/app_tv_mine_style"
+                    android:text="@string/app_mine_accounts" />
+            </LinearLayout>
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvPrivacyAgreement"
-            style="@style/app_tv_mine_style"
-            android:layout_marginTop="1dp"
-            android:drawableStart="@mipmap/ic_user_center2"
-            android:text="@string/app_privacy_agreement"
-            app:layout_constraintTop_toBottomOf="@id/tvUserAgreement"
-            tools:ignore="MissingConstraints" />
+            <LinearLayout
+                android:id="@+id/clBtnList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_full_white_r16"
+                android:orientation="vertical">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvCollectionChecklist"
-            style="@style/app_tv_mine_style"
-            android:layout_marginTop="1dp"
-            android:drawableStart="@mipmap/ic_user_center2"
-            android:text="@string/app_personal_info_collection_checklist"
-            app:layout_constraintTop_toBottomOf="@id/tvPrivacyAgreement"
-            tools:ignore="MissingConstraints" />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvUserAgreement"
+                    style="@style/app_tv_mine_style"
+                    android:text="@string/app_user_agreement" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvDataSharing"
-            style="@style/app_tv_mine_style"
-            android:layout_marginTop="1dp"
-            android:drawableStart="@mipmap/ic_user_center2"
-            android:text="@string/app_third_party_info_data_sharing"
-            app:layout_constraintTop_toBottomOf="@id/tvCollectionChecklist"
-            tools:ignore="MissingConstraints" />
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:orientation="horizontal"
+                    app:dividerColor="@color/def_diver_grey_F2F" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvAbout"
-            style="@style/app_tv_mine_style"
-            android:layout_marginTop="1dp"
-            android:drawableStart="@mipmap/ic_user_center3"
-            android:text="@string/app_about_us"
-            app:layout_constraintTop_toBottomOf="@id/tvDataSharing"
-            tools:ignore="MissingConstraints" />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvPrivacyAgreement"
+                    style="@style/app_tv_mine_style"
+                    android:text="@string/app_privacy_agreement" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvLogout"
-            style="@style/app_tv_mine_style"
-            android:layout_marginTop="1dp"
-            android:drawableStart="@mipmap/ic_user_center4"
-            android:text="@string/app_logout"
-            app:layout_constraintTop_toBottomOf="@id/tvAbout"
-            tools:ignore="MissingConstraints" />
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:orientation="horizontal"
+                    app:dividerColor="@color/def_diver_grey_F2F" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvLogoffAccount"
-            style="@style/app_tv_mine_style"
-            android:layout_marginTop="1dp"
-            android:drawableStart="@mipmap/ic_user_center5"
-            android:text="@string/app_logoff_account"
-            app:layout_constraintTop_toBottomOf="@id/tvLogout"
-            tools:ignore="MissingConstraints" />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvDataSharing"
+                    style="@style/app_tv_mine_style"
+                    android:text="@string/app_third_party_info_data_sharing" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvDebugMode"
-            style="@style/app_tv_mine_style"
-            android:layout_marginTop="1dp"
-            android:drawableStart="@mipmap/ic_user_center6"
-            android:text="@string/app_debug_mode"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/tvLogoffAccount"
-            tools:ignore="MissingConstraints" />
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:orientation="horizontal"
+                    app:dividerColor="@color/def_diver_grey_F2F" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCollectionChecklist"
+                    style="@style/app_tv_mine_style"
+                    android:text="@string/app_personal_info_collection_checklist" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:orientation="horizontal"
+                    app:dividerColor="@color/def_diver_grey_F2F" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvDebugMode"
+                    style="@style/app_tv_mine_style"
+                    android:text="@string/app_debug_mode"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/bg_full_white_r16"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvAbout"
+                    style="@style/app_tv_mine_style"
+                    android:text="@string/app_about_us" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:orientation="horizontal"
+                    app:dividerColor="@color/def_diver_grey_F2F" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvFeedback"
+                    style="@style/app_tv_mine_style"
+                    android:text="@string/app_submit_feedback" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</FrameLayout>
+

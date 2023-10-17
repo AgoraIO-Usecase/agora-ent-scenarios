@@ -61,16 +61,17 @@
     <string name="app_title_find">发现</string>
     <string name="app_title_mine">我的</string>
     <string name="app_action_settings">设置</string>
-
-    <string name="app_exit">退出</string>
+    <string name="app_mine_accounts">我的账号</string>
     <string name="app_user_agreement">用户协议</string>
     <string name="app_privacy_agreement">隐私政策</string>
+    <string name="app_third_party_info_data_sharing">三方信息共享清单</string>
     <string name="app_personal_info_collection_checklist">个人信息收集清单</string>
-    <string name="app_third_party_info_data_sharing">第三方信息数据共享</string>
-    <string name="app_and">及</string>
-
-    <string name="app_confirm_deletion">确认删除？</string>
     <string name="app_about_us">关于我们</string>
+    <string name="app_submit_feedback">提交反馈</string>
+
+    <string name="app_exit">退出</string>
+    <string name="app_and">及</string>
+    <string name="app_confirm_deletion">确认删除？</string>
 
     <string name="app_please_input_account">请输入手机号</string>
     <string name="app_error_pwd_tip">8~20个字符，包含大、小写字母和数字</string>
@@ -87,6 +88,7 @@
     <string name="app_plus_86">+86</string>
     <string name="app_logout">退出登录</string>
     <string name="app_logoff_account">注销账号</string>
+    <string name="app_logoff_account_tips">注销后，您将无法使用当前账号体验我们的服务，请谨慎考虑</string>
     <string name="app_debug_mode">开发者模式</string>
     <string name="app_logoff">注销</string>
 

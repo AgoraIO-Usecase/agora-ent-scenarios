@@ -50,7 +50,10 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
         val scenesType = arguments?.getString(Key_Scene_Type, HomeScenesType.Full.name) ?: HomeScenesType.Full.name
         mHomeScenesType = HomeScenesType.valueOf(scenesType)
         mainViewModel.setLifecycleOwner(this)
-        mainViewModel.requestReportDevice(UserManager.getInstance().user.userNo, "")
+        UserManager.getInstance().user?.let { user ->
+            mainViewModel.requestReportDevice(user.userNo, "")
+        }
+
         val cxt = context ?: return
         val scenesModels = ScenesConstructor.buildScene(cxt, mHomeScenesType)
         val homeIndexAdapter = BaseRecyclerViewAdapter(scenesModels, object : OnItemClickListener<HomeSceneModel?> {
@@ -58,14 +61,10 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
                 if (UiUtils.isFastClick(2000)) return
                 if (scenesModel.active) {
                     reportEnter(scenesModel)
-                    mainViewModel.requestReportDevice(
-                        UserManager.getInstance().user.userNo,
-                        scenesModel.scene.name
-                    )
-                    mainViewModel.requestReportAction(
-                        UserManager.getInstance().user.userNo,
-                        scenesModel.scene.name
-                    )
+                    UserManager.getInstance().user?.let { user ->
+                        mainViewModel.requestReportDevice(user.userNo, "")
+                        mainViewModel.requestReportAction(user.userNo, scenesModel.scene.name)
+                    }
                     goScene(scenesModel)
                 }
             }
