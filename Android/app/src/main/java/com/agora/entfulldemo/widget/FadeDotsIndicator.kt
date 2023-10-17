@@ -1,10 +1,8 @@
 package com.agora.entfulldemo.widget
 
 import android.content.Context
-import android.content.res.Resources
 import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +10,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.agora.entfulldemo.R
@@ -22,13 +21,16 @@ class FadeDotsIndicator @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val dots = ArrayList<ImageView>()
+    private val darkDots = ArrayList<ImageView>()
     private var dotsClickable: Boolean = false
     private var currentDot: Int = -1
 
     private val dotsSize: Float
     private val dotsSpacing: Float
     private val dotsCornerRadius: Float
+
+    // 循环滑动，头尾给加一个数据，需要隐藏
+    private var cyclicSliding: Boolean = false
 
     private val linearLayout = LinearLayout(context)
 
@@ -52,10 +54,15 @@ class FadeDotsIndicator @JvmOverloads constructor(
 
     private fun refreshDotsCount() {
         pager?.let {
-            if (dots.size < it.count) {
-                addDots(it.count - dots.size)
-            } else if (dots.size > it.count) {
-                removeDots(dots.size - it.count)
+            if (darkDots.size < it.count) {
+                addDots(it.count - darkDots.size)
+            } else if (darkDots.size > it.count) {
+                removeDots(darkDots.size - it.count)
+            }
+            // 循环滑动，头尾隐藏
+            if (cyclicSliding) {
+                linearLayout[0]?.alpha = 0f
+                linearLayout[it.count - 1]?.alpha = 0f
             }
         }
     }
@@ -72,26 +79,29 @@ class FadeDotsIndicator @JvmOverloads constructor(
         }
     }
 
-    fun addDot(index: Int) {
+    private fun addDot(index: Int) {
         val dot = LayoutInflater.from(context).inflate(R.layout.app_view_fade_dots_indicator, this, false)
         dot.layoutDirection = View.LAYOUT_DIRECTION_LTR
-        val strokeView = dot.findViewById<ImageView>(R.id.dot_stroke)
-        setUpDotCornerRadiusView(strokeView)
+        val dotLight = dot.findViewById<ImageView>(R.id.dotLight)
+        setUpDotCornerRadiusView(dotLight)
 
-        val imageView = dot.findViewById<ImageView>(R.id.dot)
+        val imageView = dot.findViewById<ImageView>(R.id.dotDark)
         setUpDotCornerRadiusView(imageView)
         setUpDotAlpha(index, imageView)
 
         dot.setOnClickListener {
             pager?.let { pager ->
+                // 循环滑动，头尾不可点击
+                if (cyclicSliding) {
+                    if (index == 0 || index == pager.count) return@setOnClickListener
+                }
                 if (dotsClickable && index < pager.count) {
                     pager.setCurrentItem(index, true)
                 }
             }
 
         }
-
-        dots.add(imageView)
+        darkDots.add(imageView)
         linearLayout.addView(dot)
     }
 
@@ -119,7 +129,7 @@ class FadeDotsIndicator @JvmOverloads constructor(
 
     fun removeDot(index: Int) {
         linearLayout.removeViewAt(childCount - 1)
-        dots.removeAt(dots.size - 1)
+        darkDots.removeAt(darkDots.size - 1)
     }
 
     fun refreshDots() {
@@ -143,8 +153,8 @@ class FadeDotsIndicator @JvmOverloads constructor(
     }
 
     private fun refreshDotsColors() {
-        for (i in dots.indices) {
-            setUpDotAlpha(i, dots[i])
+        for (i in darkDots.indices) {
+            setUpDotAlpha(i, darkDots[i])
         }
     }
 
@@ -161,7 +171,8 @@ class FadeDotsIndicator @JvmOverloads constructor(
     }
 
     // PUBLIC METHODS
-    fun setViewPager2(viewPager2: ViewPager2) {
+    fun setViewPager2(viewPager2: ViewPager2, cyclicSliding: Boolean = false) {
+        this.cyclicSliding = cyclicSliding
         viewPager2.adapter?.let { adapter ->
             adapter.registerAdapterDataObserver(object :
                 RecyclerView.AdapterDataObserver() {
@@ -202,8 +213,8 @@ class FadeDotsIndicator @JvmOverloads constructor(
                             if (position + 1 >= count || position == -1) {
                                 return
                             }
-                            dots[position].alpha = 1 - positionOffset
-                            dots[position + 1].alpha = positionOffset
+                            darkDots[position].alpha = 1 - positionOffset
+                            darkDots[position + 1].alpha = positionOffset
                         }
 
                         override fun onPageScrollStateChanged(state: Int) {
