@@ -792,16 +792,18 @@ extension CantataMainViewController {
                 
                 //如果删除的是当前歌曲就需要下麦切换成观众
                 guard let selSongArray = self.selSongArray, let topSong = selSongArray.first else {return}
-                if songInfo.songNo == topSong.songNo && self.singerRole != .audience{
+                if songInfo.songNo == topSong.songNo {
                     guard let leaveModel = getCurrentUserMicSeat() else {return}
                     
                     leaveSeat(with: leaveModel) { err in
                         
                     }
                     
-                    self.ktvApi.switchSingerRole2(newRole: .audience, stateCallBack: { state, reason in
-                        self.singerRole = .audience
-                    })
+                    if self.singerRole != .audience {
+                        self.ktvApi.switchSingerRole2(newRole: .audience, stateCallBack: { state, reason in
+                            self.singerRole = .audience
+                        })
+                    }
                 
                 }
                 
