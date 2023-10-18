@@ -1181,16 +1181,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 override fun onEarBackVolumeChanged(volume: Int) {
                     mRtcEngine?.setInEarMonitoringVolume(volume)
                 }
-
-                override fun onEnjoyingModeEnabled(enable: Boolean) {
-                    if (enable) {
-                        mRtcEngine?.adjustPlaybackSignalVolume(0)
-                    } else {
-                        mMusicSetting?.let {
-                            mRtcEngine?.adjustPlaybackSignalVolume(it.remoteVolume)
-                        }
-                    }
-                }
             })
     }
 
@@ -1203,14 +1193,15 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     private fun getEffectIndex(index: Int): Int {
         when (index) {
             0 -> return Constants.AUDIO_EFFECT_OFF
-            1 -> return Constants.ROOM_ACOUSTICS_KTV
-            2 -> return Constants.ROOM_ACOUSTICS_VOCAL_CONCERT
-            3 -> return Constants.ROOM_ACOUSTICS_STUDIO
-            4 -> return Constants.ROOM_ACOUSTICS_PHONOGRAPH
-            5 -> return Constants.ROOM_ACOUSTICS_SPACIAL
-            6 -> return Constants.ROOM_ACOUSTICS_ETHEREAL
-            7 -> return Constants.STYLE_TRANSFORMATION_POPULAR
-            8 -> return Constants.STYLE_TRANSFORMATION_RNB
+            1 -> return Constants.ROOM_ACOUSTICS_CHORUS
+            2 -> return Constants.ROOM_ACOUSTICS_KTV
+            3 -> return Constants.ROOM_ACOUSTICS_VOCAL_CONCERT
+            4 -> return Constants.ROOM_ACOUSTICS_STUDIO
+            5 -> return Constants.ROOM_ACOUSTICS_PHONOGRAPH
+            6 -> return Constants.ROOM_ACOUSTICS_SPACIAL
+            7 -> return Constants.ROOM_ACOUSTICS_ETHEREAL
+            8 -> return Constants.STYLE_TRANSFORMATION_POPULAR
+            9 -> return Constants.STYLE_TRANSFORMATION_RNB
         }
         // 原声
         return Constants.AUDIO_EFFECT_OFF
@@ -1272,6 +1263,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mAudioTrackMode = KTVPlayerTrackMode.Acc
         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_IDLE)
         mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
+
+        //mMusicSetting?.enjoyingMode = false
 
         // 歌曲结束自动下麦
         mSeatLocalLiveData.value?.let { leaveSeat(it) }

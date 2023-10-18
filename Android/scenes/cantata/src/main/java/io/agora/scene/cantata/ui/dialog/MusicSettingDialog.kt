@@ -124,13 +124,19 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
 
         mBinding.btnRemoteVolumeDownDialogSetting.setOnClickListener { v: View? ->
             val volume = mSetting.remoteVolume
-            val newVolume = volume - 1
+            var newVolume = volume - 1
+            if (newVolume < 0) newVolume = 0
             mBinding.sbRemoteVol.progress = newVolume
+            mSetting.remoteVolume = newVolume
+            mBinding.cbSwitch.isChecked = newVolume == 0
         }
         mBinding.btnRemoteVolumeUpDialogSetting.setOnClickListener { v: View? ->
             val volume = mSetting.remoteVolume
-            val newVolume = volume + 1
+            var newVolume = volume + 1
+            if (newVolume > 100) newVolume = 100
             mBinding.sbRemoteVol.progress = newVolume
+            mSetting.remoteVolume = newVolume
+            mBinding.cbSwitch.isChecked = newVolume == 0
         }
 
         mBinding.sbRemoteVol.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
@@ -138,6 +144,7 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
                 if (seekBar.isPressed) {
                     mSetting.remoteVolume = i
                     mBinding.sbRemoteVol.progress = i
+                    mBinding.cbSwitch.isChecked = i == 0
                 }
             }
 
@@ -147,14 +154,15 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
 
         val list: MutableList<EffectVoiceBean> = ArrayList()
         list.add(EffectVoiceBean(0, R.mipmap.bg_sound_mode_1, "原声"))
-        list.add(EffectVoiceBean(1, R.mipmap.bg_sound_mode_2, "KTV"))
-        list.add(EffectVoiceBean(2, R.mipmap.bg_sound_mode_3, "演唱会"))
-        list.add(EffectVoiceBean(3, R.mipmap.bg_sound_mode_4, "录音棚"))
-        list.add(EffectVoiceBean(4, R.mipmap.bg_sound_mode_1, "留声机"))
-        list.add(EffectVoiceBean(5, R.mipmap.bg_sound_mode_2, "空旷"))
-        list.add(EffectVoiceBean(6, R.mipmap.bg_sound_mode_3, "空灵"))
-        list.add(EffectVoiceBean(7, R.mipmap.bg_sound_mode_4, "流行"))
-        list.add(EffectVoiceBean(8, R.mipmap.bg_sound_mode_1, "R&B"))
+        list.add(EffectVoiceBean(1, R.mipmap.bg_sound_mode_2, "大合唱"))
+        list.add(EffectVoiceBean(2, R.mipmap.bg_sound_mode_3, "KTV"))
+        list.add(EffectVoiceBean(3, R.mipmap.bg_sound_mode_4, "演唱会"))
+        list.add(EffectVoiceBean(4, R.mipmap.bg_sound_mode_1, "录音棚"))
+        list.add(EffectVoiceBean(5, R.mipmap.bg_sound_mode_2, "留声机"))
+        list.add(EffectVoiceBean(6, R.mipmap.bg_sound_mode_3, "空旷"))
+        list.add(EffectVoiceBean(7, R.mipmap.bg_sound_mode_4, "空灵"))
+        list.add(EffectVoiceBean(8, R.mipmap.bg_sound_mode_1, "流行"))
+        list.add(EffectVoiceBean(9, R.mipmap.bg_sound_mode_2, "R&B"))
         for (item in list) {
             item.setSelect(mSetting.effect == item.id)
         }
@@ -180,9 +188,16 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
         mBinding.rvVoiceEffectList.adapter = mEffectAdapter
         mBinding.rvVoiceEffectList.addItemDecoration(DividerDecoration(10, 20, 0))
 
-        mBinding.cbSwitch.isChecked = mSetting.enjoyingMode
-        mBinding.cbSwitch.setOnCheckedChangeListener { _, b ->
-            mSetting.enjoyingMode = b
+        mBinding.cbSwitch.isChecked = mSetting.remoteVolume == 0
+        mBinding.cbSwitch.setOnCheckedChangeListener { buttonView, ischecked ->
+            if (!buttonView.isPressed) return@setOnCheckedChangeListener
+            if (ischecked) {
+                mBinding.sbRemoteVol.progress = 0
+                mSetting.remoteVolume = 0
+            } else {
+                mBinding.sbRemoteVol.progress = 30
+                mSetting.remoteVolume = 30
+            }
         }
     }
 
@@ -194,9 +209,9 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
             radioButton.text = stringArray[i]
             if (i % 4 == 0) {
                 radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode4)
-            } else if (i % 3 == 0) {
+            } else if (i % 4 == 1) {
                 radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode3)
-            } else if (i % 2 == 0) {
+            } else if (i % 4 == 2) {
                 radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode2)
             } else {
                 radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode1)
@@ -293,8 +308,6 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
     fun onResumePlayer() {
         mBinding.sbRemoteVol.progress = mSetting.remoteVolume
     }
-
-
 }
 
 class EffectVoiceHolder constructor(mBinding: CantataItemEffectvoiceBinding) :
