@@ -349,7 +349,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
 
     private fun onMusicChanged(music: RoomSelSongModel) {
         CantataLogger.d(TAG, "onMusicChanged called")
-        mRoomLivingViewModel.resetMusicStatus()
+        //mRoomLivingViewModel.resetMusicStatus()
         binding.lrcControlView.setMusic(music)
         if (UserManager.getInstance().user.id.toString() == music.userNo) {
             binding.lrcControlView.role = LrcControlView.Role.Singer

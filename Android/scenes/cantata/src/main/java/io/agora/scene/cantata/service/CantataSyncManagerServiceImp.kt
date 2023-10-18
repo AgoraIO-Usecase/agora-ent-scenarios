@@ -1203,11 +1203,11 @@ class CantataSyncManagerServiceImp constructor(
                 objIdOfSongNo.addAll(retObjId)
 
                 val sortList = innerSortChooseSongList()
-                completion.invoke(null, sortList)
+                runOnMainThread { completion.invoke(null, sortList) }
             }
 
             override fun onFail(exception: SyncManagerException?) {
-                completion.invoke(exception, null)
+                runOnMainThread { completion.invoke(exception, null) }
             }
         })
     }
