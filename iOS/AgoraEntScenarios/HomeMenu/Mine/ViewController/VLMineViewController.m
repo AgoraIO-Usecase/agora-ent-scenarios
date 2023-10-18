@@ -590,13 +590,11 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     
     [uploadModel uploadWithProgress:nil completion:^(NSError * _Nullable err, id _Nullable responseObject) {
         VLResponseData *response = responseObject;
-        if (response.code == 0) {
+        if (response.code.intValue == 0) {
             VLUploadImageResModel *model = [VLUploadImageResModel vj_modelWithDictionary:response.data];
             [self loadUpdateUserIconRequest:model.url image:image];
-            [VLToast toast:response.message];
-        } else {
-            [VLToast toast:response.message];
         }
+        [VLToast toast:response.message];
     }];
 }
 

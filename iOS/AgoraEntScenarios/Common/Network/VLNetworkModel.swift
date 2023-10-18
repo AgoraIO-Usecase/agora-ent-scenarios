@@ -83,16 +83,11 @@ open class VLUploadUserInfoNetworkModel: VLCommonNetworkModel {
 @objcMembers
 open class VLGetUserInfoNetworkModel: VLCommonNetworkModel {
     
-    public var userNo: String? {
-        didSet{
-            if let userNo = userNo{
-                interfaceName = "/api-login/users/getUserInfo?userNo=\(userNo)"
-            }
-        }
-    }
+    public var userNo: String?
     
     public override init() {
         super.init()
+        interfaceName = "/api-login/users/getUserInfo"
         method = .get
     }
 }
@@ -111,6 +106,8 @@ open class VLDetoryUserInfoNetworkModel: VLCommonNetworkModel {
 
 @objcMembers
 open class VLUploadImageNetworkModel: AUIUploadNetworkModel {
+    
+    public var url: String?
     
     public var image: UIImage! {
         didSet{
@@ -146,8 +143,8 @@ open class VLUploadImageNetworkModel: AUIUploadNetworkModel {
         guard let dic = dic as? [String: Any] else {
             throw AUICommonError.networkParseFail.toNSError()
         }
-        let rooms = dic.kj.model(VLResponseData.self)
-        return rooms
+        let response = dic.kj.model(VLResponseData.self)
+        return response
     }
     
     func getToken() -> String {
@@ -157,3 +154,30 @@ open class VLUploadImageNetworkModel: AUIUploadNetworkModel {
         return ""
     }
 }
+
+@objcMembers
+open class VLLoginNetworkModel: VLCommonNetworkModel {
+    
+    public var phone: String?
+    public var code: String?
+    
+    public override init() {
+        super.init()
+        interfaceName = "/api-login/users/login"
+        method = .get
+    }
+}
+
+
+@objcMembers
+open class VLVerifyCodeNetworkModel: VLCommonNetworkModel {
+    
+    public var phone: String?
+   
+    public override init() {
+        super.init()
+        interfaceName = "/api-login/users/verificationCode"
+        method = .get
+    }
+}
+
