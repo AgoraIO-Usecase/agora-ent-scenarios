@@ -134,7 +134,7 @@
         android:button="@null"
         android:checked="false"
         android:enabled="false"
-        android:drawableStart="@drawable/bg_cb_mic_status"
+        android:background="@drawable/bg_cb_mic_status"
         android:padding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

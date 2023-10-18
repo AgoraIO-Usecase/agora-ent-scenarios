@@ -50,7 +50,6 @@ class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeS
             for (i in 0 until 3 - list.size) {
                 val emptyItem = RankItem()
                 emptyItem.score = -1
-                //emptyItem.songNum = -1
                 emptyItem.userName = context.getString(R.string.cantata_not_on_the_list)
                 emptyItem.avatar = ""
                 newList.add(emptyItem)
@@ -77,13 +76,12 @@ class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeS
         } else if (songName == "") {
             mBinding.tvNextSong.visibility = GONE
             mBinding.tvNextSongCountdown.visibility = VISIBLE
-            startTimer()
         } else {
             mBinding.tvNextSong.visibility = VISIBLE
             mBinding.tvNextSong.text = context.getString(R.string.cantata_next_song, songName)
             mBinding.tvNextSongCountdown.visibility = VISIBLE
-            startTimer()
         }
+        startTimer()
     }
 
     private fun startTimer(){

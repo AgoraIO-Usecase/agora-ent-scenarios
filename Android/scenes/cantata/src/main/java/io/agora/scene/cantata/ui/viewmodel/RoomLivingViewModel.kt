@@ -283,18 +283,37 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     // ======================= 麦位相关 =======================
     private fun initSeats() {
-        val roomInfo: JoinRoomOutputModel = mRoomInfoLiveData.value
-            ?: throw java.lang.RuntimeException("The roomInfo must be not null before initSeats method calling!")
-        val seatsArray: List<RoomSeatModel> = roomInfo.seatsArray ?: emptyList()
-        mSeatListLiveData.postValue(seatsArray)
-        for (roomSeatModel in seatsArray) {
-            if (roomSeatModel.userNo == UserManager.getInstance().user.id.toString()) {
-                mSeatLocalLiveData.postValue(roomSeatModel)
-                mIsOnSeat = true
-                if (mRtcEngine != null) {
-                    updateVolumeStatus(roomSeatModel.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE)
+//        val roomInfo: JoinRoomOutputModel = mRoomInfoLiveData.value
+//            ?: throw java.lang.RuntimeException("The roomInfo must be not null before initSeats method calling!")
+//        val seatsArray: List<RoomSeatModel> = roomInfo.seatsArray ?: emptyList()
+//        mSeatListLiveData.postValue(seatsArray)
+//        for (roomSeatModel in seatsArray) {
+//            if (roomSeatModel.userNo == UserManager.getInstance().user.id.toString()) {
+//                mSeatLocalLiveData.postValue(roomSeatModel)
+//                mIsOnSeat = true
+//                if (mRtcEngine != null) {
+//                    updateVolumeStatus(roomSeatModel.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE)
+//                }
+//                break
+//            }
+//        }
+        mCantataServiceProtocol.getSeatStatusList { e, list ->
+            if (e == null && list != null) {
+                mSeatListLiveData.value = list
+                for (roomSeatModel in list) {
+                    if (roomSeatModel.userNo == UserManager.getInstance().user.id.toString()) {
+                        mSeatLocalLiveData.postValue(roomSeatModel)
+                        mIsOnSeat = true
+                        if (mRtcEngine != null) {
+                            updateVolumeStatus(roomSeatModel.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE)
+                        }
+
+                        mSongPlayingLiveData.value?.let {
+                            innerJoinChorus(it.songNo, it.userNo?.toInt())
+                        }
+                        break
+                    }
                 }
-                break
             }
         }
         mCantataServiceProtocol.subscribeSeatListChanged { ktvSubscribe: CantataServiceProtocol.KTVSubscribe,
@@ -474,7 +493,36 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
 
         // 获取初始歌曲列表
-        onSongChanged()
+        mCantataServiceProtocol.getChoosedSongsList { e: Exception?, data: List<RoomSelSongModel>? ->
+            if (e == null && data != null) {
+                // success
+                CantataLogger.d(TAG, "RoomLivingViewModel.onSongChanged() success")
+                mSongsOrderedLiveData.postValue(data)
+                if (data.isNotEmpty()) {
+                    val value: RoomSelSongModel? = mSongPlayingLiveData.value
+                    val songPlaying: RoomSelSongModel = data[0]
+                    if (value == null && !songPlaying.musicEnded) {
+                        // 无已点歌曲， 直接将列表第一个设置为当前播放歌曲
+                        CantataLogger.d(TAG, "RoomLivingViewModel.onSongChanged() chosen song list is empty")
+                        mSongPlayingLiveData.value = songPlaying
+                        if (mIsOnSeat && songPlaying.userNo?.equals(UserManager.getInstance().user.id.toString()) != true) {
+                            innerJoinChorus(songPlaying.songNo, songPlaying.userNo?.toInt())
+                        }
+                    } else if (songPlaying.musicEnded) {
+                        // 音乐结束
+                        CantataLogger.d(TAG, "RoomLivingViewModel.onSongChanged() music ended")
+                        mRoundRankListLiveData.postValue(true)
+                    }
+                }
+                mSeatListLiveData.postValue(mSeatListLiveData.value)
+            } else {
+                // failed
+                if (e != null) {
+                    CantataLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed:${e.message}")
+                    ToastUtils.showToast(e.message)
+                }
+            }
+        }
     }
 
     private fun onSongChanged() {
@@ -493,6 +541,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     } else if (value.songNo != songPlaying.songNo) {
                         // 当前有已点歌曲, 且更新歌曲和之前歌曲非同一首
                         CantataLogger.d(TAG, "RoomLivingViewModel.onSongChanged() single or first chorus")
+                        resetMusicStatus()
                         mSongPlayingLiveData.postValue(songPlaying)
                     } else if (!value.musicEnded && songPlaying.musicEnded) {
                         // 音乐结束
@@ -758,11 +807,11 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             return
         }
 
-        innerJoinChorus(musicModel.songNo)
+        innerJoinChorus(musicModel.songNo, musicModel.userNo?.toInt())
     }
 
-    private fun innerJoinChorus(songCode: String) {
-        val mainSingerUid = mSongPlayingLiveData.value?.userNo?.toInt() ?: return
+    private fun innerJoinChorus(songCode: String, uid: Int?) {
+        val mainSingerUid = uid ?: return
         mKtvApi.loadMusic(songCode.toLong(),
             KTVLoadMusicConfiguration(
                 songCode,
@@ -1237,9 +1286,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         val songCode: Long = music.songNo.toLong()
         val mainSingerUid: Int = music.userNo.toInt()
         if (isOwnSong) {
-            // 主唱上麦位置
-
-            //haveSeat(0)
             // 主唱加载歌曲
             loadMusic(
                 KTVLoadMusicConfiguration(
@@ -1263,7 +1309,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     ), songCode, false
                 )
                 // 加入合唱
-                innerJoinChorus(music.songNo)
+                innerJoinChorus(music.songNo, music.userNo.toInt())
             } else {
                 // 观众
                 loadMusic(

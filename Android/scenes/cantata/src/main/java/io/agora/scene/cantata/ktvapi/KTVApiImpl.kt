@@ -200,6 +200,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         // TopN
         mRtcEngine.setParameters("{\"rtc.use_audio4\": true}")
+
+        mRtcEngine.setParameters("{\"rtc.max_audio_metadata_length\": 200}")
     }
 
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
@@ -918,6 +920,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 } else if (newState == 1) {
                     isPublishAudio = false
                 }
+            }
+
+            override fun onAudioMetadataReceived(uid: Int, data: ByteArray?) {
+                super.onAudioMetadataReceived(uid, data)
+                dealWithStreamMessage(uid, 0, data)
             }
         })
         mRtcEngine.enableAudioVolumeIndicationEx(50, 10, true, singChannelRtcConnection)
@@ -1646,6 +1653,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             msg["songIdentifier"] = songIdentifier
             msg["forward"] = true
             val jsonMsg = JSONObject(msg)
+            // TODO ret = -2
+            //val ret = mRtcEngine.sendAudioMetadataEx(jsonMsg.toString().toByteArray(), singChannelRtcConnection)
+            // TODO ret = 0
+            //mRtcEngine.sendStreamMessageEx(innerDataStreamId, jsonMsg.toString().toByteArray(), singChannelRtcConnection)
+            //Log.d(TAG, "sendAudioMetadataEx ret: $ret， length：${jsonMsg.toString().toByteArray().size}")
             sendStreamMessageWithJsonObject(jsonMsg) {}
         }
 
