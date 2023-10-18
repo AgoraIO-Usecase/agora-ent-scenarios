@@ -39,14 +39,13 @@ open class VLCommonNetworkModel: AUINetworkModel {
     }
   
     
-    public override func getHeaders() -> HTTPHeaders {
+    public override func getHeaders() -> [String: String] {
         var headers = super.getHeaders()
-        headers.add(HTTPHeader(name: "Authorization", value: getToken()))
-        headers.add(HTTPHeader(name: "Content-Type", value: "application/json"))
-        headers.add(HTTPHeader(name: "appProject", value: "agora_ent_demo"))
-        headers.add(HTTPHeader(name: "appOs", value: "iOS"))
-        headers.add(HTTPHeader(name: "versionName", value: UIApplication.shared.appVersion ?? ""))
-        
+        headers["Authorization"] = getToken()
+        headers["Content-Type"] = "application/json"
+        headers["appProject"] = "agora_ent_demo"
+        headers["appOs"] = "iOS"
+        headers["versionName"] = UIApplication.shared.appVersion ?? ""
         return headers
     }
     
@@ -127,9 +126,9 @@ open class VLUploadImageNetworkModel: AUIUploadNetworkModel {
         mimeType = "image/jpg"
     }
     
-    public override func getHeaders() -> HTTPHeaders {
+    public override func getHeaders() -> [String: String] {
         var headers = super.getHeaders()
-        headers.add(HTTPHeader(name: "Authorization", value: getToken()))
+        headers["Authorization"] =  getToken()
         return headers
     }
     

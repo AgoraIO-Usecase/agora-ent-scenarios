@@ -23,18 +23,17 @@ open class NMCommonNetworkModel: AUINetworkModel {
         }
         return ""
     }
-  
     
-    public override func getHeaders() -> HTTPHeaders {
+    public override func getHeaders() -> [String : String] {
         var headers = super.getHeaders()
-        headers.add(HTTPHeader(name: "Content-Type", value: "application/json"))
-        headers.add(HTTPHeader(name: "X-LC-Id", value: "fkUjxadPMmvYF3F3BI4uvmjo-gzGzoHsz"))
-        headers.add(HTTPHeader(name: "X-LC-Key", value: "QAvFS62IOR28GfSFQO5ze45s"))
-        headers.add(HTTPHeader(name: "X-LC-Session", value: "qmdj8pdidnmyzp0c7yqil91oc"))
-        headers.add(HTTPHeader(name: kAppProjectName, value: kAppProjectValue))
-        headers.add(HTTPHeader(name: kAppOS, value: kAppOSValue))
-        headers.add(HTTPHeader(name: kAppVersion, value: UIApplication.shared.appVersion ?? ""))
-        headers.add(HTTPHeader(name: "Authorization", value: getToken()))
+        headers["Content-Type"] = "application/json"
+        headers["X-LC-Id"] = "fkUjxadPMmvYF3F3BI4uvmjo-gzGzoHsz"
+        headers["X-LC-Key"] = "QAvFS62IOR28GfSFQO5ze45s"
+        headers["X-LC-Session"] = "qmdj8pdidnmyzp0c7yqil91oc"
+        headers[kAppProjectName] = kAppProjectValue
+        headers[kAppOS] = kAppOSValue
+        headers[kAppVersion] = UIApplication.shared.appVersion ?? ""
+        headers["Authorization"] = getToken()
         return headers
     }
     

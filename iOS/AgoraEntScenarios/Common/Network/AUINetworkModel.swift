@@ -6,19 +6,19 @@
 //
 
 import Foundation
-import Alamofire
+//import Alamofire
 import YYModel
 
 public enum AUINetworkMethod: Int {
     case get = 0
     case post
     
-    func getAfMethod() -> Alamofire.HTTPMethod {
+    func getAfMethod() -> String {
         switch self {
         case .get:
-            return Alamofire.HTTPMethod.get
+            return "GET"
         case .post:
-            return Alamofire.HTTPMethod.post
+            return "POST"
         }
     }
 }
@@ -34,16 +34,17 @@ open class AUINetworkModel: NSObject {
         return ["uniqueId", "host", "interfaceName", "method"]
     }
     
-    public func getHeaders() -> HTTPHeaders {
-        var headers = HTTPHeaders()
-        let header = HTTPHeader(name: "Content-Type", value: "application/json")
-        headers.add(header)
-        return headers
+    public func getHeaders() -> [String: String] {
+        return ["Content-Type": "application/json"]
     }
     
-    public func getParameters() -> Parameters? {
-        let param = self.yy_modelToJSONObject() as? Parameters
+    public func getParameters() -> [String: Any]? {
+        let param = self.yy_modelToJSONObject() as? [String: Any]
         return param
+    }
+    
+    public func getHttpBody() -> Data? {
+        return self.yy_modelToJSONData()
     }
     
     public func request(completion: ((Error?, Any?)->())?) {
