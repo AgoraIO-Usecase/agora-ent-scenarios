@@ -10,5 +10,4 @@ interface MusicSettingCallback {
     fun onToneChanged(newToneValue: Int)
     fun onRemoteVolumeChanged(volume: Int)
     fun onEarBackVolumeChanged(volume: Int)
-    fun onEnjoyingModeEnabled(enable: Boolean)
 }

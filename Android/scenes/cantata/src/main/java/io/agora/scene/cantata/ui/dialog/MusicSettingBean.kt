@@ -76,6 +76,10 @@ class MusicSettingBean constructor(
     }
 
     var earBackVolume = 100 // 耳返音量
+        set(value) {
+            field = value
+            mCallback.onEarBackVolumeChanged(value)
+        }
 
     var earBackMode = 0 // 耳返模式：0(自动), 1(强制OpenSL), 2(强制Oboe)
 
@@ -88,17 +92,10 @@ class MusicSettingBean constructor(
     var earBackDelay = 0 // 耳返延迟
         set(value) {
             field = value
-            mCallback.onEarBackVolumeChanged(value)
         }
 
     var mEarPhoneCallback: EarPhoneCallback? = null
         set(value) {
             field = value
-        }
-
-    var enjoyingMode: Boolean = false
-        set(value) {
-            field = value
-            mCallback.onEnjoyingModeEnabled(value)
         }
 }
