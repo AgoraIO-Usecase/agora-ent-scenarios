@@ -173,20 +173,26 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dvSoundType" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvGainAdjustValue"
-            android:layout_height="wrap_content"
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etGainAdjust"
+            android:layout_height="18dp"
             android:layout_width="30dp"
             android:layout_marginEnd="20dp"
             android:textColor="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:background="@drawable/ktv_edit_text_selector"
+            android:gravity="center"
+            android:maxLines="1"
+            android:inputType="numberDecimal"
+            android:imeOptions="actionDone"
+            android:textSize="13sp"
             tools:text="3.1f"
-            android:gravity="end"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/dvSoundType"
-            app:layout_constraintBottom_toBottomOf="@id/dvGainAdjust"/>
+            app:layout_constraintBottom_toBottomOf="@id/dvGainAdjust"
+            />
 
         <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/pbGainAdjustValue"
+            android:id="@+id/pbGainAdjust"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -196,9 +202,9 @@
             tools:progress="10"
             android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
             android:thumb="@mipmap/ic_seekbar_btn"
-            app:layout_constraintEnd_toStartOf="@id/tvGainAdjustValue"
-            app:layout_constraintBottom_toBottomOf="@id/tvGainAdjustValue"
-            app:layout_constraintTop_toTopOf="@id/tvGainAdjustValue"
+            app:layout_constraintEnd_toStartOf="@id/etGainAdjust"
+            app:layout_constraintBottom_toBottomOf="@id/etGainAdjust"
+            app:layout_constraintTop_toTopOf="@id/etGainAdjust"
             app:layout_constraintStart_toEndOf="@+id/mtGainAdjustTips"
             />
 
@@ -246,6 +252,7 @@
             android:layout_marginEnd="20dp"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="13sp"
             tools:text="12"
             android:gravity="end"
             app:layout_constraintTop_toTopOf="@id/dvGainAdjust"
@@ -261,7 +268,7 @@
             tools:progress="10"
             android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
             android:thumb="@mipmap/ic_seekbar_btn"
-            app:layout_constraintStart_toStartOf="@+id/pbGainAdjustValue"
+            app:layout_constraintStart_toStartOf="@+id/pbGainAdjust"
             app:layout_constraintEnd_toStartOf="@id/tvMicType"
             app:layout_constraintTop_toTopOf="@id/tvMicType"
             app:layout_constraintBottom_toBottomOf="@id/tvMicType"
@@ -304,7 +311,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:drawableStart="@mipmap/ic_tip"
+        android:drawableStart="@mipmap/ktv_ic_tips_mark_red"
         android:drawablePadding="5dp"
         android:layout_marginTop="20dp"
         android:text="@string/ktv_sound_card_error"

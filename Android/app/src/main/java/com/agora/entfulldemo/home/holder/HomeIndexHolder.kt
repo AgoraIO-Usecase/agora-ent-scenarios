@@ -12,7 +12,10 @@ import io.agora.scene.base.component.BaseRecyclerViewAdapter
 class HomeIndexHolder(mBinding: AppItemHomeIndexBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<AppItemHomeIndexBinding, ScenesModel?>(mBinding) {
 
-    override fun binding(scensModel: ScenesModel?, selectedIndex: Int) {
+    override fun binding(
+        scensModel: ScenesModel?,
+        selectedIndex: Int
+    ) {
         scensModel?.apply {
             mBinding.tvUnActive.isGone = active
             mBinding.tvScenesName.text = name

@@ -72,7 +72,7 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
         binding.titleBar.setOnBackPressListener{
             finish()
         }
-        binding.bottomLayout.setOnClickListener {
+        binding.btnCreateRoom.setOnClickListener {
             if (FastClickTools.isFastClick(it)) return@setOnClickListener
             startActivity(Intent(this@VoiceRoomListActivity, VoiceRoomCreateActivity::class.java))
         }

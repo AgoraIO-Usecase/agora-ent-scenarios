@@ -49,16 +49,6 @@ public final class CommonTitleView extends ConstraintLayout {
             var12.setVisibility(View.VISIBLE);
         }
 
-        this.binding.ivBackIcon.setOnClickListener((View.OnClickListener) (new View.OnClickListener() {
-            public final void onClick(View it) {
-                Context var10000 = CommonTitleView.this.getContext();
-                if (var10000 == null) {
-                    throw new NullPointerException("null cannot be cast to non-null type android.app.Activity");
-                } else {
-                    ((Activity) var10000).finish();
-                }
-            }
-        }));
         boolean isHideLeftImage = typedArray.getBoolean(R.styleable.titleView_ctv_hideLeftImage, false);
         if (isHideLeftImage) {
             var12 = this.binding.ivBackIcon;

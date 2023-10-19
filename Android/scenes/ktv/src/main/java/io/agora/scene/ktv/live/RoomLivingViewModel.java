@@ -72,7 +72,7 @@ import io.agora.scene.ktv.ktvapi.KTVSingRole;
 import io.agora.scene.ktv.ktvapi.KTVType;
 import io.agora.scene.ktv.ktvapi.MusicLoadStatus;
 import io.agora.scene.ktv.ktvapi.SwitchRoleFailReason;
-import io.agora.scene.ktv.live.fragment.dialog.SoundCardSettingBean;
+import io.agora.scene.ktv.widget.soundcard.SoundCardSettingBean;
 import io.agora.scene.ktv.service.ChangeMVCoverInputModel;
 import io.agora.scene.ktv.service.ChooseSongInputModel;
 import io.agora.scene.ktv.service.JoinRoomOutputModel;
@@ -87,9 +87,6 @@ import io.agora.scene.ktv.service.ScoringAlgoControlModel;
 import io.agora.scene.ktv.service.ScoringAverageModel;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
-import kotlin.jvm.functions.Function4;
 
 public class RoomLivingViewModel extends ViewModel {
 

@@ -3,7 +3,6 @@
     <string name="voice_app_name">Agora Chat Room</string>
     <string name="voice_app_agora_chatroom">Agora Chat Room</string>
     <string name="voice_app_agora_chatroom_copy_right">Powered by Agora.io</string>
-    <string name="voice_agora_chat_room_create">Create Room</string>
     <string name="voice_room_list_title_name">Agora Chat Room</string>
     <string name="voice_spatial_room_list_title_name">Spatial Audio Mode Room</string>
     <string name="voice_tab_layout_all">All</string>

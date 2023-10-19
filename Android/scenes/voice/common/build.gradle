@@ -40,6 +40,8 @@ dependencies {
     api rootProject.ext.deps.material
     api rootProject.ext.deps.databinding_runtime
     api rootProject.ext.deps.gson
+    api rootProject.ext.deps.header_classics
+    api rootProject.ext.deps.layout_kernel
     // glide
     kapt rootProject.ext.deps.glide_compiler
     api rootProject.ext.deps.glide

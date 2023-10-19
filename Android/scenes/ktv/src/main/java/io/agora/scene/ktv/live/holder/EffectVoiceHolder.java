@@ -8,7 +8,6 @@ import androidx.annotation.Nullable;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.ktv.bean.EffectVoiceBean;
 import io.agora.scene.ktv.databinding.KtvItemEffectvoiceBinding;
-import io.agora.scene.ktv.databinding.KtvItemMvBinding;
 
 /**
  * ---------------------------------------------------------------------------------------------
