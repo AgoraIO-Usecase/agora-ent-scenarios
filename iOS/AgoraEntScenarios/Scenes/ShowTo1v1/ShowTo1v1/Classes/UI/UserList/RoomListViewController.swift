@@ -43,7 +43,6 @@ class RoomListViewController: UIViewController {
     private var connectedUserId: UInt?
     private weak var createRoomDialog: CreateRoomDialog?
     private let tokenConfig: CallTokenConfig = CallTokenConfig()
-    private var videoLoaderApi: IVideoLoaderApi = VideoLoaderApiImpl()
     private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
     private var callState: CallStateType = .idle
     private lazy var callVC: CallViewController = CallViewController()
@@ -55,8 +54,7 @@ class RoomListViewController: UIViewController {
         return view
     }()
     private lazy var listView: RoomPagingListView = {
-        let listView = RoomPagingListView(frame: self.view.bounds)
-        listView.delegate = self
+        let listView = RoomPagingListView(frame: self.view.bounds, localUserInfo: userInfo!)
         listView.callClosure = { [weak self] roomInfo in
             guard let roomInfo = roomInfo else {return}
             self?._call(room: roomInfo)
@@ -137,7 +135,6 @@ class RoomListViewController: UIViewController {
         _refreshAction()
         
         callVC.currentUser = userInfo
-        listView.localUserInfo = userInfo
         
         _setupAPI()
     }
@@ -157,32 +154,6 @@ class RoomListViewController: UIViewController {
     }
 }
 
-extension RoomListViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let cell = cell as? RoomListCell, let room = cell.roomInfo else {return}
-        let roomInfo = room.createRoomInfo(token: tokenConfig.rtcToken)
-        videoLoaderApi.switchRoomState(newState: .joined, roomInfo: roomInfo, tagId: roomInfo.channelName)
-        let container = VideoCanvasContainer()
-        container.uid = roomInfo.uid
-        container.container = cell.canvasView
-        videoLoaderApi.renderVideo(roomInfo: roomInfo, container: container)
-        guard let connection = videoLoaderApi.getConnectionMap()[room.roomId] else {return}
-        let options = AgoraRtcChannelMediaOptions()
-        options.autoSubscribeAudio = false
-        rtcEngine.updateChannelEx(with: options, connection: connection)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let cell = cell as? RoomListCell, let room = cell.roomInfo else {return}
-        let roomInfo = room.createRoomInfo(token: tokenConfig.rtcToken)
-        videoLoaderApi.switchRoomState(newState: .prejoined, roomInfo: roomInfo, tagId: roomInfo.channelName)
-        let container = VideoCanvasContainer()
-        container.uid = roomInfo.uid
-        container.container = nil
-        videoLoaderApi.renderVideo(roomInfo: roomInfo, container: container)
-    }
-}
-
 extension RoomListViewController {
     private func renewTokens(completion: ((Bool)->Void)?) {
         guard let userInfo = userInfo else {
@@ -195,7 +166,7 @@ extension RoomListViewController {
         NetworkManager.shared.generateTokens(appId: showTo1v1AppId!,
                                              appCertificate: showTo1v1AppCertificate!,
                                              channelName: ""/*tokenConfig.roomId*/,
-                                             uid: userInfo.userId,
+                                             uid: userInfo.uid,
                                              tokenGeneratorType: .token007,
                                              tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
             guard let self = self else {return}
@@ -207,6 +178,10 @@ extension RoomListViewController {
             }
             self.tokenConfig.rtcToken = rtcToken
             self.tokenConfig.rtmToken = rtmToken
+            self.listView.roomList.forEach { info in
+                info.token = rtcToken
+            }
+            self.listView.roomList = self.listView.roomList
             debugInfo("renewTokens success")
             completion?(true)
         }
@@ -224,9 +199,8 @@ extension RoomListViewController {
         
         let config = VideoLoaderConfig()
         config.rtcEngine = rtcEngine
-        config.userId = UInt(userInfo.userId) ?? 0
-        videoLoaderApi.setup(config: config)
-        videoLoaderApi.addListener(listener: self)
+        VideoLoaderApiImpl.shared.setup(config: config)
+        VideoLoaderApiImpl.shared.addListener(listener: self)
         
         callVC.rtcEngine = rtcEngine
     }
@@ -301,7 +275,7 @@ extension RoomListViewController {
     }
     
     private func _call(room: ShowTo1v1RoomInfo) {
-        if room.userId == userInfo?.userId {return}
+        if room.uid == userInfo?.uid {return}
         if self.tokenConfig.tokenIsEmpty() {
             renewTokens { success in
                 self._call(room: room)
@@ -336,15 +310,18 @@ extension RoomListViewController {
             self.naviBar.stopRefreshAnimation()
             let roomList = list
             let oldList = self.listView.roomList
+            roomList.forEach { info in
+                info.token = self.tokenConfig.rtcToken
+            }
             self.listView.roomList = roomList
             self._showGuideIfNeed()
             self.naviBar.style = roomList.count > 0 ? .light : .dark
-            self.videoLoaderApi.cleanCache()
+            VideoLoaderApiImpl.shared.cleanCache()
             oldList.forEach { info in
-                self.videoLoaderApi.removeRTCListener(roomId: info.roomId, listener: self)
+                VideoLoaderApiImpl.shared.removeRTCListener(anchorId: info.roomId, listener: self)
             }
             roomList.forEach { info in
-                self.videoLoaderApi.addRTCListener(roomId: info.roomId, listener: self)
+                VideoLoaderApiImpl.shared.addRTCListener(anchorId: info.roomId, listener: self)
             }
             
             self.rtcEngine(self.rtcEngine, tokenPrivilegeWillExpire: "")
@@ -407,7 +384,7 @@ extension RoomListViewController {
     }
     
     private func _showBroadcasterVC(roomInfo: ShowTo1v1RoomInfo) {
-        let isBroadcaster = roomInfo.userId == userInfo?.userId
+        let isBroadcaster = roomInfo.uid == userInfo?.uid
         if isBroadcaster {
             self._reinitCalleeAPI(room: roomInfo) {[weak self] err in
                 if let _ = err {
@@ -422,7 +399,6 @@ extension RoomListViewController {
         }
         
         let vc = BroadcasterViewController()
-        vc.videoLoader = self.videoLoaderApi
         vc.callApi = self.callApi
         vc.currentUser = self.userInfo
         vc.roomInfo = roomInfo
@@ -458,7 +434,7 @@ extension RoomListViewController: CallApiListenerProtocol {
                             eventReason: String,
                             elapsed: Int,
                             eventInfo: [String : Any]) {
-        let currentUid = userInfo?.userId ?? ""
+        let currentUid = userInfo?.uid ?? ""
         let publisher = eventInfo[kPublisher] as? String ?? currentUid
         guard publisher == currentUid else {
             return
@@ -487,7 +463,7 @@ extension RoomListViewController: CallApiListenerProtocol {
                 connectedUserId = fromUserId
                 
                 //被叫不一定在userList能查到，需要从callapi里读取发送用户的user extension
-                var user: ShowTo1v1UserInfo? = listView.roomList.first {$0.userId == "\(fromUserId)"}
+                var user: ShowTo1v1UserInfo? = listView.roomList.first {$0.uid == "\(fromUserId)"}
                 if let userDic = (eventInfo[kFromUserExtension] as? [String: Any]) {
                     user = ShowTo1v1UserInfo.yy_model(with: userDic) as! ShowTo1v1UserInfo
                 }
@@ -503,7 +479,7 @@ extension RoomListViewController: CallApiListenerProtocol {
             } else if currentUid == "\(fromUserId)" {
                 connectedUserId = toUserId
                 //主叫userlist一定会有，因为需要点击
-                if let user = listView.roomList.first {$0.userId == "\(toUserId)"} {
+                if let user = listView.roomList.first {$0.uid == "\(toUserId)"} {
                     let dialog = CallerDialog.show(user: user)
                     dialog?.cancelClosure = {[weak self] in
                         self?.callApi.cancelCall(completion: { err in
@@ -550,7 +526,7 @@ extension RoomListViewController: CallApiListenerProtocol {
 }
 
 extension RoomListViewController: IVideoLoaderApiListener {
-    func onStateDidChange(newState: RoomStatus, oldState: RoomStatus, channelName: String) {
+    func onStateDidChange(newState: AnchorState, oldState: AnchorState, channelName: String) {
     }
     
     func debugInfo(_ message: String) {
@@ -584,7 +560,7 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
             self.callApi.renewToken(with: self.tokenConfig)
             
             //renew videoloader
-            self.videoLoaderApi.getConnectionMap().forEach { (channelId, connection) in
+            VideoLoaderApiImpl.shared.getConnectionMap().forEach { (channelId, connection) in
                 let mediaOptions = AgoraRtcChannelMediaOptions()
                 mediaOptions.token = self.tokenConfig.rtcToken
                 let ret = self.rtcEngine.updateChannelEx(with: mediaOptions, connection: connection)

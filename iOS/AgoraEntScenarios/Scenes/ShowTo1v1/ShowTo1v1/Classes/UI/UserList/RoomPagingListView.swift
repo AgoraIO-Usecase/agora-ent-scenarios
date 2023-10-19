@@ -7,8 +7,60 @@
 
 import Foundation
 import CallAPI
+import VideoLoaderAPI
 
 class CollectionViewDelegateProxy: CallApiProxy, UICollectionViewDelegate {}
+
+
+class ShowCycleRoomArray: AGRoomArray {
+    private var halfCount: Int = 9999999
+    fileprivate func fakeCellCount() -> Int {
+        return roomList.count > 1 ? roomList.count + halfCount * 2 : roomList.count
+    }
+    
+    required init(roomList: [IVideoLoaderRoomInfo]?) {
+        super.init(roomList: roomList)
+        let count = max(roomList?.count ?? 0, 1)
+        halfCount = (9999999 / count) * count
+    }
+
+    fileprivate func realCellIndex(with fakeIndex: Int) -> Int {
+        if fakeCellCount() < 2 {
+            return fakeIndex
+        }
+
+        let realCount = roomList.count
+        let offset = halfCount
+        var realIndex = fakeIndex + realCount * max(1 + offset / realCount, 2) - offset
+        realIndex = realIndex % realCount
+
+        return realIndex
+    }
+
+    fileprivate func fakeCellIndex(with realIndex: Int) -> Int {
+        if fakeCellCount() < 2 {
+            return realIndex
+        }
+
+        let offset = halfCount
+        let fakeIndex = realIndex + offset
+
+        return fakeIndex
+    }
+    
+    override subscript(index: Int) -> IVideoLoaderRoomInfo? {
+        let realIndex = realCellIndex(with: index)
+        if realIndex < roomList.count && realIndex >= 0 {
+            return roomList[realIndex]
+        } else {
+            return nil
+        }
+    }
+    
+    override func count() -> Int {
+        return fakeCellCount()
+    }
+}
 
 class RoomPagingListView: UIView {
     var callClosure: ((ShowTo1v1RoomInfo?)->())?
@@ -16,26 +68,21 @@ class RoomPagingListView: UIView {
     var roomList: [ShowTo1v1RoomInfo] = [] {
         didSet {
             self.isHidden = roomList.count == 0 ? true : false
+            delegateHandler.roomList = ShowCycleRoomArray(roomList: roomList)
             reloadData()
         }
     }
-    var localUserInfo: ShowTo1v1UserInfo?
+    private var localUserInfo: ShowTo1v1UserInfo!
     
-    weak var delegate: UICollectionViewDelegate? {
-        didSet {
-            if let delegate = oldValue {
-                proxy.removeListener(delegate)
-            }
-            
-            guard let delegate = delegate else {return}
-            proxy.addListener(delegate)
+    private lazy var delegateHandler: ShowLivePagesSlicingDelegateHandler = {
+        let handler = ShowLivePagesSlicingDelegateHandler(localUid: self.localUserInfo.getUIntUserId() ?? 0, needPrejoin: true)
+        handler.videoSlicingType = .visible
+        handler.audioSlicingType = .never
+        handler.onRequireRenderVideo = { [weak self] (info, cell, indexPath) in
+            guard let cell = cell as? RoomListCell else { return nil }
+            return cell.canvasView
         }
-    }
-    
-    private lazy var proxy: CollectionViewDelegateProxy = {
-        let proxy = CollectionViewDelegateProxy()
-        proxy.addListener(self)
-        return proxy
+        return handler
     }()
     
     lazy var collectionView: UICollectionView = {
@@ -49,7 +96,7 @@ class RoomPagingListView: UIView {
         collectionView.scrollsToTop = false
         collectionView.backgroundColor = .clear
         collectionView.register(RoomListCell.self, forCellWithReuseIdentifier: NSStringFromClass(RoomListCell.self))
-        collectionView.delegate = proxy
+        collectionView.delegate = delegateHandler
         collectionView.dataSource = self
         collectionView.isPagingEnabled = true
         collectionView.showsVerticalScrollIndicator = false
@@ -59,8 +106,9 @@ class RoomPagingListView: UIView {
         return collectionView
     }()
     
-    override init(frame: CGRect) {
+    required init(frame: CGRect, localUserInfo: ShowTo1v1UserInfo) {
         super.init(frame: frame)
+        self.localUserInfo = localUserInfo
         _loadSubview()
     }
     
@@ -86,53 +134,15 @@ class RoomPagingListView: UIView {
     }
 }
 
-private let kPageCacheHalfCount = 5000
-extension RoomPagingListView {
-    fileprivate func fakeCellCount() -> Int {
-        guard roomList.count > 1 else {
-            return roomList.count
-        }
-        return roomList.count + kPageCacheHalfCount * 2
-    }
-    
-    fileprivate func realCellIndex(with fakeIndex: Int) -> Int {
-        if fakeCellCount() < 3 {
-            return fakeIndex
-        }
-        
-        let realCount = roomList.count
-        let offset = kPageCacheHalfCount
-        var realIndex = fakeIndex + realCount * max(1 + offset / realCount, 2) - offset
-        realIndex = realIndex % realCount
-        
-        return realIndex
-    }
-    
-    fileprivate func fakeCellIndex(with realIndex: Int) -> Int {
-        if fakeCellCount() < 3 {
-            return realIndex
-        }
-        
-        let offset = kPageCacheHalfCount
-        let fakeIndex = realIndex + offset
-        
-        return fakeIndex
-    }
-    
-    private func scroll(to index: Int) {
-        collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredVertically, animated: false)
-    }
-}
-
-extension RoomPagingListView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension RoomPagingListView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return fakeCellCount()
+        return delegateHandler.roomList?.count() ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(RoomListCell.self), for: indexPath) as! RoomListCell
         
-        let roomInfo = roomList[realCellIndex(with: indexPath.row)]
+        let roomInfo = delegateHandler.roomList?[indexPath.row] as? ShowTo1v1RoomInfo
         cell.roomInfo = roomInfo
         cell.localUserInfo = localUserInfo
         cell.callClosure = { [weak self] room in
@@ -141,17 +151,29 @@ extension RoomPagingListView: UICollectionViewDataSource, UICollectionViewDelega
         cell.tapClosure = { [weak self] room in
             self?.tapClosure?(room)
         }
-        showTo1v1Print("load user: \(roomInfo.userName) \(realCellIndex(with: indexPath.row)) / \(indexPath.row)")
+        showTo1v1Print("load user: \(roomInfo?.userName ?? "") \(indexPath.row)")
         return cell
     }
-    
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        let currentIndex = Int(scrollView.contentOffset.y / scrollView.height)
-        if currentIndex > 0, currentIndex < fakeCellCount() - 1 {return}
-        let realIndex = realCellIndex(with: currentIndex)
-        let toIndex = fakeCellIndex(with: realIndex)
-        showTo1v1Print("collectionView scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)")
-
-        scroll(to: toIndex)
-    }
  }
+
+
+class ShowLivePagesSlicingDelegateHandler: AGCollectionSlicingDelegateHandler {
+    private func scroll(to index: Int) {
+        guard let collectionView = scrollView as? UICollectionView else {return}
+        collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredVertically, animated: false)
+    }
+    
+    override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        super.scrollViewDidEndDecelerating(scrollView)
+        let currentIndex = Int(scrollView.contentOffset.y / scrollView.height)
+        if currentIndex > 0, currentIndex < (roomList?.count() ?? 0) - 1 {return}
+        let toIndex = currentIndex
+        if let cycleArray = roomList as? ShowCycleRoomArray {
+            let realIndex = cycleArray.realCellIndex(with: toIndex)
+            let fakeIndex = cycleArray.fakeCellIndex(with: realIndex)
+            showTo1v1Print("collectionView scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)")
+
+            scroll(to: toIndex)
+        }
+    }
+}

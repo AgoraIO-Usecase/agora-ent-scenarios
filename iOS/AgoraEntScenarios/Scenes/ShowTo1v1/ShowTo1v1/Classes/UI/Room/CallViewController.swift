@@ -83,7 +83,7 @@ class CallViewController: BaseRoomViewController {
             
             roomInfoView.setRoomInfo(avatar: targetUser?.avatar ?? "",
                                      name: targetUser?.userName ?? "",
-                                     id: targetUser?.userId ?? "")
+                                     id: targetUser?.uid ?? "")
         } else {
             remoteCanvasView.layer.cornerRadius = 20
             localCanvasView.layer.cornerRadius = 0
@@ -96,7 +96,7 @@ class CallViewController: BaseRoomViewController {
             
             roomInfoView.setRoomInfo(avatar: currentUser?.avatar ?? "",
                                      name: currentUser?.userName ?? "",
-                                     id: currentUser?.userId ?? "")
+                                     id: currentUser?.uid ?? "")
         }
     }
     
@@ -115,7 +115,7 @@ class CallViewController: BaseRoomViewController {
     }
     
     @objc private func _hangupAction() {
-        callApi?.hangup(userId: UInt(targetUser?.userId ?? "") ?? 0) { err in
+        callApi?.hangup(userId: UInt(targetUser?.uid ?? "") ?? 0) { err in
         }
         guard navigationController?.viewControllers.contains(self) ?? false else {return}
         navigationController?.popViewController(animated: false)
@@ -141,15 +141,15 @@ extension CallViewController {
                             eventReason: String,
                             elapsed: Int,
                             eventInfo: [String : Any]) {
-        let publisher = eventInfo[kPublisher] as? String ?? currentUser?.userId
-        guard publisher == currentUser?.userId else {
+        let publisher = eventInfo[kPublisher] as? String ?? currentUser?.uid
+        guard publisher == currentUser?.uid else {
             return
         }
         
         switch state {
         case .connected:
             var channelId: String?
-            if roomInfo?.userId == currentUser?.userId {
+            if roomInfo?.uid == currentUser?.uid {
                 //房主找对端
                 channelId = targetUser?.get1V1ChannelId()
                 
@@ -161,7 +161,7 @@ extension CallViewController {
             //鉴权
             if let channelId = channelId,
                let userInfo = currentUser,
-               let uid = UInt(userInfo.userId) {
+               let uid = UInt(userInfo.uid) {
                 let connection = AgoraRtcConnection()
                 connection.channelId = channelId
                 connection.localUid = uid

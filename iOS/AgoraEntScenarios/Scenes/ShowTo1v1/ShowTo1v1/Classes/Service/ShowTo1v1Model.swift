@@ -10,7 +10,7 @@ import VideoLoaderAPI
 
 @objcMembers
 public class ShowTo1v1UserInfo: NSObject {
-    public var userId: String = ""
+    public var uid: String = ""
     public var userName: String = ""
     public var avatar: String = ""
     
@@ -18,12 +18,16 @@ public class ShowTo1v1UserInfo: NSObject {
     
     var objectId: String = ""
     
+    static func modelCustomPropertyMapper() -> [String : Any]? {
+        return ["uid": "userId"]
+    }
+    
     func getUIntUserId() -> UInt {
-        return UInt(userId) ?? 0
+        return UInt(uid) ?? 0
     }
     
     func get1V1ChannelId() ->String {
-        return "1v1_\(userId)_\(createdAt)"
+        return "1v1_\(uid)_\(createdAt)"
     }
     
     func bgImage() ->UIImage? {
@@ -37,13 +41,26 @@ public class ShowTo1v1UserInfo: NSObject {
 public class ShowTo1v1RoomInfo: ShowTo1v1UserInfo {
     public var roomId: String = ""
     public var roomName: String = ""
-    
-    
-    func createRoomInfo(token: String) -> RoomInfo {
-        let room = RoomInfo()
+    public var token: String = ""
+}
+
+extension ShowTo1v1RoomInfo: IVideoLoaderRoomInfo {
+    public var anchorInfoList: [VideoLoaderAPI.AnchorInfo] {
+        guard token.count > 0 && getUIntUserId() > 0 else {return []}
+        let room = AnchorInfo()
         room.uid = getUIntUserId()
         room.channelName = roomId
         room.token = token
-        return room
+        return [room]
     }
+    
+    public func channelName() -> String {
+        return roomId
+    }
+    
+    public func userId() -> String {
+        return self.uid
+    }
+    
+    
 }

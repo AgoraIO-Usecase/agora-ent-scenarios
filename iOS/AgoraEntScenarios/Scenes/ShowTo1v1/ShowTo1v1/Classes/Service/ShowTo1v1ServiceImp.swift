@@ -123,7 +123,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
             return
         }
         let roomInfo = ShowTo1v1RoomInfo()
-        roomInfo.userId = user.userId
+        roomInfo.uid = user.uid
         roomInfo.userName = user.userName
         roomInfo.avatar = user.avatar
         roomInfo.roomName = roomName
@@ -138,7 +138,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
             }
             
             let params = roomInfo.yy_modelToJSONObject() as? [String: Any]
-            let scene = Scene(id: roomInfo.roomId, userId: roomInfo.userId, isOwner: true, property: params)
+            let scene = Scene(id: roomInfo.roomId, userId: roomInfo.uid, isOwner: true, property: params)
             self?.manager.createScene(scene: scene, success: {[weak self] in
                 guard let self = self else {return}
                 self.manager.joinScene(sceneId: roomInfo.roomId) { sceneRef in
@@ -177,8 +177,8 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
             }
             
             let params = roomInfo.yy_modelToJSONObject() as? [String: Any]
-            let isOwner = roomInfo.userId == self?.user?.userId ? true : false
-            let scene = Scene(id: roomInfo.roomId, userId: roomInfo.userId, isOwner: isOwner, property: params)
+            let isOwner = roomInfo.uid == self?.user?.uid ? true : false
+            let scene = Scene(id: roomInfo.roomId, userId: roomInfo.uid, isOwner: isOwner, property: params)
             self?.manager.createScene(scene: scene, success: {[weak self] in
                 guard let self = self else {return}
                 self.manager.joinScene(sceneId: roomInfo.roomId) { sceneRef in
@@ -211,7 +211,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     func leaveRoom(roomInfo: ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void) {
         self._removeUser(channelName: roomInfo.roomId) { err in
         }
-        if roomInfo.userId == user?.userId {
+        if roomInfo.uid == user?.uid {
             sceneRefs[roomInfo.roomId]?.deleteScenes()
         } else {
             manager.leaveScene(roomId: roomInfo.roomId)
@@ -272,7 +272,7 @@ extension ShowTo1v1ServiceImp {
                 return
             }
             // current user already add
-            if self.userList.contains(where: { $0.userId == self.user?.userId }) {
+            if self.userList.contains(where: { $0.uid == self.user?.uid }) {
                 finished(nil)
                 return
             }
@@ -294,7 +294,7 @@ extension ShowTo1v1ServiceImp {
                     return
                 }
                 
-                if self.userList.contains(where: { $0.userId == model.userId }) {
+                if self.userList.contains(where: { $0.uid == model.uid }) {
                     return
                 }
                 
@@ -308,7 +308,7 @@ extension ShowTo1v1ServiceImp {
     
     private func _removeUser(channelName: String, completion: @escaping (NSError?) -> Void) {
         guard let scene = sceneRefs[channelName],
-              let objectId = userList.filter({ $0.userId == self.user?.userId }).first?.objectId else {
+              let objectId = userList.filter({ $0.uid == self.user?.uid }).first?.objectId else {
             showTo1v1Print("_removeUser objectId = nil")
             return
         }
@@ -338,7 +338,7 @@ extension ShowTo1v1ServiceImp {
                            defer{
                                self.listener?.onUserListDidChanged(userList: self.userList)
                            }
-                           if self.userList.contains(where: { $0.userId == model.userId }) {
+                           if self.userList.contains(where: { $0.uid == model.uid }) {
                                return
                            }
                            self.userList.append(model)
