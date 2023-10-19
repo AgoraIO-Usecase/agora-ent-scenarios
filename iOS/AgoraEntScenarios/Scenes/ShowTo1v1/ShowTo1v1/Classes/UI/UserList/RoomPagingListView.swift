@@ -15,7 +15,7 @@ class CollectionViewDelegateProxy: CallApiProxy, UICollectionViewDelegate {}
 class ShowCycleRoomArray: AGRoomArray {
     private var halfCount: Int = 9999999
     fileprivate func fakeCellCount() -> Int {
-        return roomList.count > 2 ? roomList.count + halfCount * 2 : roomList.count
+        return roomList.count > 1 ? roomList.count + halfCount * 2 : roomList.count
     }
     
     required init(roomList: [IVideoLoaderRoomInfo]?) {
@@ -25,7 +25,7 @@ class ShowCycleRoomArray: AGRoomArray {
     }
 
     fileprivate func realCellIndex(with fakeIndex: Int) -> Int {
-        if fakeCellCount() < 3 {
+        if fakeCellCount() < 2 {
             return fakeIndex
         }
 
@@ -38,7 +38,7 @@ class ShowCycleRoomArray: AGRoomArray {
     }
 
     fileprivate func fakeCellIndex(with realIndex: Int) -> Int {
-        if fakeCellCount() < 3 {
+        if fakeCellCount() < 2 {
             return realIndex
         }
 
