@@ -17,17 +17,30 @@
     </style>
 
     <style name="app_tv_mine_style">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/def_text_color_040</item>
-        <item name="android:paddingStart">15dp</item>
-        <item name="android:paddingEnd">15dp</item>
-        <item name="android:drawablePadding">16dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">52dp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/def_text_grey_303</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:drawableEnd">@mipmap/arrow_right</item>
-        <item name="layout_constraintEnd_toEndOf">parent</item>
-        <item name="layout_constraintStart_toStartOf">parent</item>
+        <item name="android:drawableEnd">@drawable/app_arrow_right</item>
+    </style>
+
+    <style name="app_tv_mine_w_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/def_text_grey_303</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="app_tv_mine_hint_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/def_text_grey_979</item>
+        <item name="android:gravity">center_vertical</item>
     </style>
 
     <style name="app_Theme.AgoraKTV.NoActionBar">
@@ -39,5 +52,21 @@
 
     <style name="app_Theme.AgoraKTV.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="app_corner16Style">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="app_TabLayoutTextSelected">
+        <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="app_TabLayoutTextUnSelected">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/def_text_grey_303</item>
+    </style>
 
 </resources>

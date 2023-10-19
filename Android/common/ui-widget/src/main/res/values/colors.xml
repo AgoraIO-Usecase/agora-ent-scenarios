@@ -10,8 +10,14 @@
     <color name="def_text_color_white">#EFF4FF</color>
     <color name="def_text_color_040">#040925</color>
     <color name="def_text_color_3c4">#3C4267</color>
+    <color name="def_text_grey_edf">#EDF2F9</color>
     <color name="def_text_grey_979">#979CBB</color>
     <color name="def_text_grey_6c7">#6C7192</color>
+    <color name="def_text_grey_869">#86909C</color>
+    <color name="def_text_grey_303">#303553</color>
+    <color name="def_text_grey_6F7">#6F738B</color>
+    <color name="def_text_grey_C9C">#C9CDD4</color>
+    <color name="def_diver_grey_F2F">#F2F2F6</color>
     <color name="black_57">#575757</color>
     <color name="black_08">#080F38</color>
     <color name="black_3d">#3d3f46</color>
@@ -43,12 +49,14 @@
     <color name="green_6d">#6DD400</color>
     <color name="blue_9F">#009FFF</color>
     <color name="blue_15">#156EF3</color>
+    <color name="blue_2e">#2E6CF6</color>
     <color name="yellow_e7">#F7B500</color>
     <color name="yellow_f7">#F7B500</color>
     <color name="yellow_60">#FFE960</color>
     <color name="red_e0">#E02020</color>
     <color name="red_fa">#FA396A</color>
     <color name="red_f7">#F74747</color>
+    <color name="red_f3">#FF3B30</color>
     <color name="pink_b4">#FF8AB4</color>
     <color name="orange_e6">#e69138</color>
 
@@ -61,6 +69,7 @@
     <color name="black_20_percent">#33000000</color>
     <color name="black_30_percent">#4D000000</color>
     <color name="black_50_percent">#80000000</color>
+    <color name="black_60_percent">#99000000</color>
     <color name="black_70_percent">#B3000000</color>
     <color name="black_80_percent">#CC000000</color>
     <color name="blue">#ff26b5ff</color>

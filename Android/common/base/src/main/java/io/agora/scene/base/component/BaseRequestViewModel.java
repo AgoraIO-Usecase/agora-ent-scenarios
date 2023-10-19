@@ -35,6 +35,13 @@ public class BaseRequestViewModel extends BaseViewModel {
         }
     }
 
+    public void clearDispose(){
+        if (mCompositeDisposable != null) {
+            mCompositeDisposable.clear();
+            mCompositeDisposable = null;
+        }
+    }
+
     protected boolean isNeedEventBus() {
         return false;
     }
