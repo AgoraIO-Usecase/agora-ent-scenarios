@@ -70,8 +70,9 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
             // 获取根布局可见区域的高度
             val initialWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
             view.viewTreeObserver.addOnGlobalLayoutListener {
+                val tempWindow = activity?.window ?: return@addOnGlobalLayoutListener
                 val currentWindowHeight =
-                    Rect().apply { activity!!.window.decorView.getWindowVisibleDisplayFrame(this) }.height()
+                    Rect().apply { tempWindow.decorView.getWindowVisibleDisplayFrame(this) }.height()
                 // 判断键盘高度来确定键盘的显示状态
                 if (currentWindowHeight < initialWindowHeight) {
                     if (lastKeyBoard) return@addOnGlobalLayoutListener
