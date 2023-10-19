@@ -125,7 +125,7 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
             
         case .show_private_one_v_one:
             let userInfo = ShowTo1v1UserInfo()
-            userInfo.userId = VLUserCenter.user.id
+            userInfo.uid = VLUserCenter.user.id
             userInfo.userName = VLUserCenter.user.name
             userInfo.avatar = VLUserCenter.user.headUrl
             ShowTo1v1Context.showScene(viewController: self,
