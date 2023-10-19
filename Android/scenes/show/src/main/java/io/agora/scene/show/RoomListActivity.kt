@@ -1,12 +1,16 @@
 package io.agora.scene.show
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,11 +19,10 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcConnection
-import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.show.databinding.ShowRoomItemBinding
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
@@ -32,7 +35,7 @@ import io.agora.scene.widget.utils.StatusBarUtil
 class RoomListActivity : AppCompatActivity() {
 
     private val mBinding by lazy { ShowRoomListActivityBinding.inflate(LayoutInflater.from(this)) }
-    private lateinit var mRoomAdapter: BindingSingleAdapter<ShowRoomDetailModel, ShowRoomItemBinding>
+    private val mAdapter: RoomListAdapter? = null
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
     private val mRtcVideoSwitcher by lazy { VideoSwitcher.getImplInstance(mRtcEngine) }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
@@ -60,15 +63,15 @@ class RoomListActivity : AppCompatActivity() {
         mBinding.titleView.setRightIconClick {
             showAudienceSetting()
         }
-        mRoomAdapter = object : BindingSingleAdapter<ShowRoomDetailModel, ShowRoomItemBinding>() {
-            override fun onBindViewHolder(
-                holder: BindingViewHolder<ShowRoomItemBinding>,
-                position: Int
-            ) {
-                updateRoomItem(mDataList, position, holder.binding, getItem(position) ?: return)
-            }
-        }
-        mBinding.rvRooms.adapter = mRoomAdapter
+//        mRoomAdapter = object : BindingSingleAdapter<ShowRoomDetailModel, ShowRoomItemBinding>() {
+//            override fun onBindViewHolder(
+//                holder: BindingViewHolder<ShowRoomItemBinding>,
+//                position: Int
+//            ) {
+//                updateRoomItem(mDataList, position, holder.binding, getItem(position) ?: return)
+//            }
+//        }
+//        mBinding.rvRooms.adapter = mRoomAdapter
         mBinding.rvRooms.addOnScrollListener(object : OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
@@ -109,18 +112,15 @@ class RoomListActivity : AppCompatActivity() {
             )
         }
         mBinding.smartRefreshLayout.autoRefresh()
-
         mBinding.btnCreateRoom.setOnClickListener { goLivePrepareActivity() }
-        mBinding.btnCreateRoom2.setOnClickListener { goLivePrepareActivity() }
     }
 
     private fun updateList(data: List<ShowRoomDetailModel>) {
         mBinding.tvTips1.isVisible = data.isEmpty()
         mBinding.ivBgMobile.isVisible = data.isEmpty()
-        mBinding.btnCreateRoom2.isVisible = data.isEmpty()
         mBinding.btnCreateRoom.isVisible = data.isNotEmpty()
         mBinding.rvRooms.isVisible = data.isNotEmpty()
-        mRoomAdapter.resetAll(data)
+//        mRoomAdapter.resetAll(data)
 
         mBinding.smartRefreshLayout.finishRefresh()
 
@@ -139,73 +139,72 @@ class RoomListActivity : AppCompatActivity() {
     private fun updateRoomItem(
         list: List<ShowRoomDetailModel>,
         position: Int,
-        binding: ShowRoomItemBinding,
         roomInfo: ShowRoomDetailModel
     ) {
-        binding.tvRoomName.text = roomInfo.roomName
-        binding.tvRoomId.text = getString(R.string.show_room_id, roomInfo.roomId)
-        binding.tvUserCount.text = getString(R.string.show_user_count, roomInfo.roomUserCount)
-        binding.ivCover.setImageResource(roomInfo.getThumbnailIcon())
-
-        binding.root.setOnTouchListener { v, event ->
-            val rtcConnection =
-                RtcConnection(roomInfo.roomId, UserManager.getInstance().user.id.toInt())
-            val isRoomOwner = roomInfo.ownerId == UserManager.getInstance().user.id.toString()
-            if (isRoomOwner) {
-                if (event!!.action == MotionEvent.ACTION_UP) {
-                    ToastUtils.showToast(R.string.show_broadcaster_bad_exit)
-                }
-            } else {
-                when (event!!.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        mRtcVideoSwitcher.preloadConnections(list.map {
-                            RtcConnection(
-                                it.roomId,
-                                UserManager.getInstance().user.id.toInt()
-                            )
-                        })
-                        if (RtcEngineInstance.generalToken() == "") {
-                            fetchUniversalToken({
-                            }, {
-                                ToastUtils.showToast("Fetch Token Failed")
-                            })
-                        } else {
-                            if (mRtcEngine.queryDeviceScore() < 75) {
-                                mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
-                                mRtcEngine.setParameters("{\"rtc.video.decoder_out_byte_frame\": true}")
-                            }
-                            val channelMediaOptions = ChannelMediaOptions()
-                            channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-                            channelMediaOptions.autoSubscribeVideo = true
-                            channelMediaOptions.autoSubscribeAudio = true
-                            channelMediaOptions.publishCameraTrack = false
-                            channelMediaOptions.publishMicrophoneTrack = false
-                            // 如果是观众 把 ChannelMediaOptions 的 audienceLatencyLevel 设置为 AUDIENCE_LATENCY_LEVEL_LOW_LATENCY（超低延时）
-                            channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
-                            mRtcVideoSwitcher.joinChannel(
-                                rtcConnection,
-                                channelMediaOptions,
-                                RtcEngineInstance.generalToken(),
-                                null,
-                                true
-                            )
-                            mRtcVideoSwitcher.preJoinChannel(rtcConnection)
-                            mRtcEngine.adjustUserPlaybackSignalVolumeEx(roomInfo.ownerId.toInt(), 0, rtcConnection)
-                            mService.startCloudPlayer()
-                        }
-                    }
-                    MotionEvent.ACTION_CANCEL -> {
-                        mRtcVideoSwitcher.leaveChannel(rtcConnection, true)
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        if (RtcEngineInstance.generalToken() != "") {
-                            goLiveDetailActivity(list, position, roomInfo)
-                        }
-                    }
-                }
-            }
-            true
-        }
+//        binding.tvRoomName.text = roomInfo.roomName
+//        binding.tvRoomId.text = getString(R.string.show_room_id, roomInfo.roomId)
+//        binding.tvUserCount.text = getString(R.string.show_user_count, roomInfo.roomUserCount)
+//        binding.ivCover.setImageResource(roomInfo.getThumbnailIcon())
+//
+//        binding.root.setOnTouchListener { v, event ->
+//            val rtcConnection =
+//                RtcConnection(roomInfo.roomId, UserManager.getInstance().user.id.toInt())
+//            val isRoomOwner = roomInfo.ownerId == UserManager.getInstance().user.id.toString()
+//            if (isRoomOwner) {
+//                if (event!!.action == MotionEvent.ACTION_UP) {
+//                    ToastUtils.showToast(R.string.show_broadcaster_bad_exit)
+//                }
+//            } else {
+//                when (event!!.action) {
+//                    MotionEvent.ACTION_DOWN -> {
+//                        mRtcVideoSwitcher.preloadConnections(list.map {
+//                            RtcConnection(
+//                                it.roomId,
+//                                UserManager.getInstance().user.id.toInt()
+//                            )
+//                        })
+//                        if (RtcEngineInstance.generalToken() == "") {
+//                            fetchUniversalToken({
+//                            }, {
+//                                ToastUtils.showToast("Fetch Token Failed")
+//                            })
+//                        } else {
+//                            if (mRtcEngine.queryDeviceScore() < 75) {
+//                                mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
+//                                mRtcEngine.setParameters("{\"rtc.video.decoder_out_byte_frame\": true}")
+//                            }
+//                            val channelMediaOptions = ChannelMediaOptions()
+//                            channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+//                            channelMediaOptions.autoSubscribeVideo = true
+//                            channelMediaOptions.autoSubscribeAudio = true
+//                            channelMediaOptions.publishCameraTrack = false
+//                            channelMediaOptions.publishMicrophoneTrack = false
+//                            // 如果是观众 把 ChannelMediaOptions 的 audienceLatencyLevel 设置为 AUDIENCE_LATENCY_LEVEL_LOW_LATENCY（超低延时）
+//                            channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+//                            mRtcVideoSwitcher.joinChannel(
+//                                rtcConnection,
+//                                channelMediaOptions,
+//                                RtcEngineInstance.generalToken(),
+//                                null,
+//                                true
+//                            )
+//                            mRtcVideoSwitcher.preJoinChannel(rtcConnection)
+//                            mRtcEngine.adjustUserPlaybackSignalVolumeEx(roomInfo.ownerId.toInt(), 0, rtcConnection)
+//                            mService.startCloudPlayer()
+//                        }
+//                    }
+//                    MotionEvent.ACTION_CANCEL -> {
+//                        mRtcVideoSwitcher.leaveChannel(rtcConnection, true)
+//                    }
+//                    MotionEvent.ACTION_UP -> {
+//                        if (RtcEngineInstance.generalToken() != "") {
+//                            goLiveDetailActivity(list, position, roomInfo)
+//                        }
+//                    }
+//                }
+//            }
+//            true
+//        }
     }
 
     private fun goLivePrepareActivity() {
@@ -304,5 +303,69 @@ class RoomListActivity : AppCompatActivity() {
             deviceLevel = deviceLevel,
             isByAudience = true
         )
+    }
+
+    private class RoomListAdapter constructor(
+        private var mList: List<ShowRoomDetailModel>?,
+        private val mContext: Context,
+        private val mOnItemClick: ((ShowRoomDetailModel, View) -> Unit)? = null
+    ) : RecyclerView.Adapter<RoomListAdapter.ViewHolder?>() {
+
+        fun setDataList(list: List<ShowRoomDetailModel>?) {
+            mList = list
+            notifyDataSetChanged()
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view: View =
+                LayoutInflater.from(mContext).inflate(R.layout.show_item_room_list, parent, false)
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val num = position % 5
+            val resId: Int = mContext.resources.getIdentifier(
+                "voice_img_room_item_bg_$num",
+                "drawable",
+                mContext.packageName
+            )
+            holder.ivBackground.setImageResource(resId)
+            val data: ShowRoomDetailModel = mList!![position]
+//            GlideApp.with(holder.ivAvatar.context).load(data.owner?.portrait)
+//                .into(holder.ivAvatar)
+//            holder.tvRoomName.text = data.roomName
+//            holder.tvPersonNum.text = mContext.getString(R.string.show_user_count, data.roomUserCount)
+//            holder.tvUserName.text = data.owner?.nickName ?: ""
+//            if (data.isPrivate) {
+//                holder.ivLock.visibility = View.VISIBLE
+//            } else {
+//                holder.ivLock.visibility = View.GONE
+//            }
+            holder.itemView.setOnClickListener { view ->
+                mOnItemClick?.invoke(data, view)
+            }
+        }
+
+        override fun getItemCount(): Int {
+            return mList?.size ?: 0
+        }
+
+        private inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            var ivBackground: ImageView
+            var ivAvatar: ImageView
+            var ivLock: ImageView
+            var tvRoomName: TextView
+            var tvUserName: TextView
+            var tvPersonNum: TextView
+
+            init {
+                ivBackground = itemView.findViewById(R.id.ivBackground)
+                ivAvatar = itemView.findViewById(R.id.ivAvatar)
+                ivLock = itemView.findViewById(R.id.ivLock)
+                tvRoomName = itemView.findViewById(R.id.tvRoomName)
+                tvUserName = itemView.findViewById(R.id.tvUserName)
+                tvPersonNum = itemView.findViewById(R.id.tvPersonNum)
+            }
+        }
     }
 }
