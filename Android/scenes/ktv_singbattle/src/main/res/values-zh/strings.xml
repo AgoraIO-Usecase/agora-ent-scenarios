@@ -4,6 +4,7 @@
     <string name="ktv_singbattle_score">评分</string>
     <string name="ktv_singbattle_loading">加载中…</string>
     <string name="ktv_singbattle_create_room">创建房间</string>
+    <string name="ktv_singbattle_people_count">%d人</string>
     <string name="ktv_singbattle_room_title">房间标题</string>
     <string name="ktv_singbattle_random">随机</string>
     <string name="ktv_singbattle_room_is_encryption">房间是否加密</string>
@@ -153,6 +154,5 @@
     <string name="ktv_singbattle_game_room_owner_choosing_song">房主点歌中，游戏即将开始</string>
     <string name="ktv_singbattle_game_start">嗨唱开始</string>
     <string name="ktv_singbattle_game_nobody_grasp">本轮无人演唱 \n 即将播放下一首</string>
-
 
 </resources>

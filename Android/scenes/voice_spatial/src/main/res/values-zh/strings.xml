@@ -3,7 +3,6 @@
     <string name="voice_app_name">声网语聊房</string>
     <string name="voice_app_agora_chatroom">声网语聊房</string>
     <string name="voice_app_agora_chatroom_copy_right">Powered by Agora.io</string>
-    <string name="voice_agora_chat_room_create">创建聊天室</string>
     <string name="voice_room_list_title_name">声网语聊房</string>
     <string name="voice_spatial_room_list_title_name">空间音频语聊房</string>
     <string name="voice_tab_layout_all">全部</string>
