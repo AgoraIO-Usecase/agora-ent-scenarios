@@ -107,6 +107,20 @@
     <string name="app_feedback_success">提交成功，感谢反馈</string>
     <string name="app_feedback_call_customer_service">如您的问题比较紧急，请致电客服</string>
     <string name="app_feedback_contact_the_customer_service">联系客服</string>
+    <string name="app_find_scenario_solution">场景解决方案</string>
+    <string name="app_find_integrated_document">集成文档</string>
+    <string name="app_find_ktv">在线K歌房</string>
+    <string name="app_find_ktv_tips">一站式接入海量正版曲库，灵活接入各类娱乐社交场景</string>
+    <string name="app_find_chatroom">声动语聊</string>
+    <string name="app_find_chatroom_tips">更纯净、更动听、更沉浸、更好玩的语聊互动体验</string>
+    <string name="app_find_live">直播</string>
+    <string name="app_find_live_tips">视频『高清』升级，人更美、物更真，体验更流畅</string>
+    <string name="app_find_ai_engine">凤鸣AI引擎</string>
+    <string name="app_find_ai_denoise">凤鸣AI降噪</string>
+    <string name="app_find_ai_denoise_tips">让实时互动远离干扰,实现纯净声音体验</string>
+    <string name="app_find_ai_spatial">凤鸣空间音频</string>
+    <string name="app_find_ai_spatial_tips">身临其境的实时音频互动体验</string>
+    <string name="app_find_search_agora_music">点击检索\n声网曲库</string>
 
     <string name="app_voice_chat">语聊房</string>
     <string name="app_show_live">秀场直播</string>
