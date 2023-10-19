@@ -3,21 +3,26 @@ package com.agora.entfulldemo.home
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Rect
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.FileProvider
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentHomeMineBinding
 import com.agora.entfulldemo.home.constructor.URLStatics
-import com.agora.entfulldemo.widget.dp
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.Constant
 import io.agora.scene.base.GlideApp
-import io.agora.scene.base.PagePathConstant
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.ISingleCallback
@@ -26,11 +31,9 @@ import io.agora.scene.base.component.OnFastClickListener
 import io.agora.scene.base.manager.PagePilotManager
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.FileUtils
-import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.UriUtils
 import io.agora.scene.widget.dialog.CommonDialog
-import io.agora.scene.widget.dialog.EditNameDialog
 import io.agora.scene.widget.dialog.SelectPhotoFromDialog
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 import io.agora.scene.widget.utils.ImageCompressUtil
@@ -47,11 +50,55 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
         ViewModelProvider(this)[MainViewModel::class.java]
     }
 
+    private val mMainHandler: Handler by lazy {
+        Handler(Looper.getMainLooper())
+    }
+
     private var selectPhotoFromDialog: SelectPhotoFromDialog? = null
-    private var editNameDialog: EditNameDialog? = null
     private var debugModeDialog: CommonDialog? = null
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AppFragmentHomeMineBinding {
         return AppFragmentHomeMineBinding.inflate(inflater)
+    }
+
+    //防止多次回调
+    private var lastKeyBoard = false
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setOnApplyWindowInsetsListener(binding.root)
+        activity?.window?.let { window ->
+            // 获取根布局可见区域的高度
+            val initialWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
+            view.viewTreeObserver.addOnGlobalLayoutListener {
+                val tempWindow = activity?.window ?: return@addOnGlobalLayoutListener
+                val currentWindowHeight =
+                    Rect().apply { tempWindow.decorView.getWindowVisibleDisplayFrame(this) }.height()
+                // 判断键盘高度来确定键盘的显示状态
+                if (currentWindowHeight < initialWindowHeight) {
+                    if (lastKeyBoard) return@addOnGlobalLayoutListener
+                    lastKeyBoard = true
+                    binding.etNickname.selectAll()
+                    // 软键盘可见
+                    Log.d("zhangw", "current: $currentWindowHeight, initial: $initialWindowHeight, show: true")
+                    binding.ivEditNickname.isVisible = false
+
+                } else {
+                    if (!lastKeyBoard) return@addOnGlobalLayoutListener
+                    lastKeyBoard = false
+                    // 软键盘已收起
+                    Log.d("zhangw", "current: $currentWindowHeight, initial: $initialWindowHeight, show: false")
+                    binding.ivEditNickname.isVisible = true
+                    binding.etNickname.clearComposingText()
+                    binding.etNickname.clearFocus()
+                    val newName = binding.etNickname.text.toString()
+                    if (newName.isEmpty()) {
+                        binding.etNickname.setText(UserManager.getInstance().user.name)
+                    } else if (newName != UserManager.getInstance().user.name) {
+                        mainViewModel.requestEditUserInfo(null, newName, null)
+                    }
+                }
+            }
+        }
     }
 
     override fun initView() {
@@ -63,7 +110,10 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
         mainViewModel.iSingleCallback = ISingleCallback { type: Int, o: Any? ->
             if (type == Constant.CALLBACK_TYPE_USER_INFO_CHANGE) {
                 val user = UserManager.getInstance().user
-                GlideApp.with(this).load(user.headUrl).error(R.mipmap.userimage)
+                GlideApp.with(this)
+                    .load(user.headUrl)
+                    .placeholder(R.mipmap.userimage)
+                    .error(R.mipmap.userimage)
                     .transform(CenterCropRoundCornerTransform(999))
                     .into(binding.ivUserAvatar)
                 binding.tvUserPhone.text = user.mobile
@@ -74,7 +124,7 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
                 PagePilotManager.pageWelcome()
             }
         }
-        binding.tvMineAccount.setOnClickListener(object :OnFastClickListener(){
+        binding.tvMineAccount.setOnClickListener(object : OnFastClickListener() {
             override fun onClickJacking(view: View) {
                 PagePilotManager.pageMineAccount()
             }
@@ -107,22 +157,17 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
                 PagePilotManager.pageWebView(URLStatics.dataSharingURL)
             }
         })
-        binding.tvAbout.setOnClickListener(object :OnFastClickListener(){
+        binding.tvAbout.setOnClickListener(object : OnFastClickListener() {
             override fun onClickJacking(view: View) {
                 PagePilotManager.pageAboutUs()
             }
         })
-        binding.etNickname.setOnClickListener { view: View? ->
-            val cxt = context ?: return@setOnClickListener
-            if (editNameDialog == null) {
-                editNameDialog = EditNameDialog(cxt)
-                editNameDialog?.iSingleCallback = ISingleCallback { type: Int, o: Any? ->
-                    if (type == 0) {
-                        mainViewModel.requestEditUserInfo(null, o as String?, null)
-                    }
-                }
-            }
-            editNameDialog?.show()
+        binding.etNickname.setOnFocusChangeListener { v, hasFocus ->
+            Log.d("zhangw", "etNickname setOnFocusChangeListener hasFocus $hasFocus")
+        }
+        binding.ivEditNickname.setOnClickListener {
+            binding.etNickname.requestFocus()
+            showKeyboard(binding.etNickname)
         }
         binding.ivUserAvatar.setOnClickListener { view: View? ->
             (requireActivity() as MainActivity).requestReadStoragePermission(
@@ -135,7 +180,7 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
         }
     }
 
-    var mTempPhotoPath: String? = null
+    private var mTempPhotoPath: String? = null
     private fun showSelectPhotoFromDialog() {
         val cxt = context ?: return
         if (selectPhotoFromDialog == null) {
@@ -214,7 +259,6 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
     }
 
 
-
     private fun showDebugModeCloseDialog() {
         if (debugModeDialog == null) {
             debugModeDialog = CommonDialog(requireContext())
@@ -232,6 +276,4 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
         }
         debugModeDialog?.show()
     }
-
-
 }
