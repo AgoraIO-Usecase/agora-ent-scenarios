@@ -194,9 +194,9 @@ class VLFeedbackViewController: VLBaseViewController {
     }
     
     private func submitFeedbackData(imageUrls: [String]?, logUrl: String?) {
-        var images: [Int: String] = [:]
+        var images: [String: String] = [:]
         imageUrls?.enumerated().forEach({
-            images[$0.offset + 1] = $0.element
+            images["\($0.offset + 1)"] = $0.element
         })
         let params = ["screenshotURLs": images,
                       "tags": selectedTags ?? [],

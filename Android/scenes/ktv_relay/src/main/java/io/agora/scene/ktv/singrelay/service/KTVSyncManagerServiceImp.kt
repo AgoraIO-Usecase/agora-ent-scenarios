@@ -377,6 +377,8 @@ class KTVSyncManagerServiceImp(
                         roomInfo.isPrivate,
                         roomInfo.password,
                         roomInfo.creatorNo,
+                        roomInfo.creatorName,
+                        roomInfo.creatorAvatar,
                         roomInfo.createdAt,
                         inputModel.mvIndex.toString(),
                         roomInfo.roomPeopleNum
@@ -1016,6 +1018,8 @@ class KTVSyncManagerServiceImp(
                         roomInfo.isPrivate,
                         roomInfo.password,
                         roomInfo.creatorNo,
+                        roomInfo.creatorName,
+                        roomInfo.creatorAvatar,
                         roomInfo.createdAt,
                         roomInfo.bgOption,
                         count

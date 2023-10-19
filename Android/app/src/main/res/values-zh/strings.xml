@@ -68,6 +68,7 @@
     <string name="app_personal_info_collection_checklist">个人信息收集清单</string>
     <string name="app_about_us">关于我们</string>
     <string name="app_submit_feedback">提交反馈</string>
+    <string name="app_debug_mode">开发者模式</string>
 
     <string name="app_exit">退出</string>
     <string name="app_and">及</string>
@@ -85,11 +86,15 @@
     <string name="app_mobile_number">手机号</string>
     <string name="app_v_code">验证码</string>
     <string name="app_plus_86">+86</string>
-    <string name="app_logout">退出登录</string>
+
+    <string name="app_logout_account">退出登录</string>
     <string name="app_logoff_account">注销账号</string>
-    <string name="app_logoff">注销</string>
     <string name="app_logoff_account_tips">注销后，您将无法使用当前账号体验我们的服务，请谨慎考虑</string>
-    <string name="app_debug_mode">开发者模式</string>
+    <string name="app_logoff_confirm">确认注销</string>
+    <string name="app_logoff_cancel">暂不注销</string>
+    <string name="app_logout_confirm">退出登录</string>
+    <string name="app_logout_cancel">\u3000取消\u3000</string>
+    <string name="app_logout_account_tips">退出登录后，我们将保留您的数据信息，期待下次与您相遇</string>
 
     <string name="app_voice_chat">语聊房</string>
     <string name="app_show_live">秀场直播</string>
