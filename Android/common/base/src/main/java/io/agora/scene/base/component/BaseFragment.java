@@ -51,16 +51,13 @@ public abstract class BaseFragment extends Fragment {
         });
     }
 
-    protected void hideKeyboard() {
+    protected void hideKeyboard(EditText editText) {
+        editText.clearFocus();
         Activity context = getActivity();
         if (context == null) return;
+        // 隐藏软键盘
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        if (context.getWindow().getAttributes().softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
-            if (context.getCurrentFocus() != null) {
-                imm.hideSoftInputFromWindow(context.getCurrentFocus().getWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
-            }
-        }
+        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
     }
 
     protected void showKeyboard(EditText editText) {
