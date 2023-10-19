@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
 import io.agora.scene.base.component.BaseDialog;
@@ -56,6 +57,14 @@ public class CommonDialog extends BaseDialog<DialogCommonBinding> {
         } else {
             getBinding().btnRight.setText(rightText);
         }
+    }
+
+    public void setDialogLeftBtnTextColor(@ColorInt int color){
+        getBinding().btnLeft.setTextColor(color);
+    }
+
+    public void setDialogRightBtnTextColor(@ColorInt int color){
+        getBinding().btnRight.setTextColor(color);
     }
 
     @Override

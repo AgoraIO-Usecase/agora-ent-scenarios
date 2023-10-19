@@ -23,10 +23,9 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center"
-
                 android:minHeight="144dp">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/userBg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -38,44 +37,52 @@
                         android:id="@+id/ivUserAvatar"
                         android:layout_width="80dp"
                         android:layout_height="80dp"
-                        android:src="@mipmap/portrait01"
+                        tools:src="@mipmap/portrait01"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/inputNickname"
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/etNickname"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="20dp"
                         android:background="@null"
-                        app:endIconDrawable="@drawable/app_ic_edit"
-                        app:endIconMode="custom">
+                        android:gravity="center"
+                        android:imeOptions="actionDone"
+                        android:inputType="text"
+                        android:maxLength="12"
+                        android:textColor="@color/def_text_color_040"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="12dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/ivUserAvatar"
+                        tools:text="忧郁的草莓奶昔" />
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etNickname"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@null"
-                            android:gravity="center"
-                            android:imeOptions="actionDone"
-                            android:inputType="text"
-                            android:maxLength="12"
-                            android:textColor="@color/def_text_color_040"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            tools:text="忧郁的草莓奶昔" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivEditNickname"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:src="@drawable/app_ic_edit"
+                        app:layout_constraintBottom_toBottomOf="@+id/etNickname"
+                        app:layout_constraintStart_toEndOf="@+id/etNickname"
+                        app:layout_constraintTop_toTopOf="@+id/etNickname" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tvUserPhone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
                         android:maxLines="1"
                         android:textColor="@color/def_text_grey_6c7"
                         android:textSize="14sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/etNickname"
                         tools:text="138****5678" />
-                </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>
 
 

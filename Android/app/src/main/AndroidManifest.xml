@@ -43,6 +43,7 @@
         <activity
             android:name="com.agora.entfulldemo.home.MainActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
             android:screenOrientation="portrait" />
         <activity
             android:name="com.agora.entfulldemo.login.LoginActivity"
