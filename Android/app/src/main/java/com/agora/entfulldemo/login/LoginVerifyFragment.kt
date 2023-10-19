@@ -71,7 +71,7 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
         })
         binding.etCode.setOnTextChangeListener {
             if (it.length >= binding.etCode.textLength) {
-                hideKeyboard()
+                hideKeyboard(binding.etCode)
                 mLoginViewModel.requestLogin(mAccounts, it)
             }
         }
