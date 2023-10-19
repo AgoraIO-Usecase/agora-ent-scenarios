@@ -14,7 +14,7 @@ typedef NS_ENUM(NSInteger, VLNavigationBarStatus) {
     VLNavigationBarStatusRight
 };
 
-@interface BaseViewController : UIViewController
+@interface VLBaseViewController : UIViewController
 @property (nonatomic, strong) VLEmptyView *vlEmptyView;
 @property (nonatomic, assign, readwrite) BOOL statusBarHidden;
 
@@ -25,6 +25,8 @@ typedef NS_ENUM(NSInteger, VLNavigationBarStatus) {
 - (void)configNavigationBar:(UINavigationBar *)navigationBar;
 
 - (void)setBackgroundImage:(NSString *)imageName;
+
+- (void)hiddenBackgroundImage;
 
 - (void)setNaviTitleName:(NSString *)titleStr;
 

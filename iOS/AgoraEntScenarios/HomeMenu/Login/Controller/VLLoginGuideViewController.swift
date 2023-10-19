@@ -7,7 +7,7 @@
 
 import UIKit
 
-class VLLoginGuideViewController: BaseViewController {
+class VLLoginGuideViewController: VLBaseViewController {
     private lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .horizontal

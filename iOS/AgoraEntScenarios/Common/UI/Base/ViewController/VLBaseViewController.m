@@ -3,12 +3,12 @@
 //  VoiceOnLine
 //
 
-#import "BaseViewController.h"
+#import "VLBaseViewController.h"
 #import "VLMacroDefine.h"
 #import "VLHotSpotBtn.h"
 #import "AESMacro.h"
 
-@interface BaseViewController ()
+@interface VLBaseViewController ()
 
 @property (nonatomic, strong) UIImageView *backGroundImgView;
 @property (nonatomic, strong) UILabel *titleLabel;
@@ -16,7 +16,7 @@
 
 @end
 
-@implementation BaseViewController
+@implementation VLBaseViewController
 
 - (void)dealloc {
     [self hideVLEmptyView];
@@ -77,6 +77,10 @@
 - (void)setBackgroundImage:(NSString *)imageName {
     [self.view addSubview:self.backGroundImgView];
     self.backGroundImgView.image = UIImageMake(imageName) ? : [UIImage sceneImageWithName:imageName];
+}
+
+- (void)hiddenBackgroundImage {
+    self.backGroundImgView.hidden = YES;
 }
 
 - (void)setNaviTitleName:(NSString *)titleStr {
