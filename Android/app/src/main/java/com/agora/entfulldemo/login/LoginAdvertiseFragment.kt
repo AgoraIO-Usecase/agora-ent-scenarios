@@ -6,9 +6,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentLoginAdvertiseBinding
@@ -91,7 +89,10 @@ class LoginAdvertiseFragment : BaseViewBindingFragment<AppFragmentLoginAdvertise
 
 class AdvertiseHolder constructor(mBinding: AppItemGuideLayoutBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<AppItemGuideLayoutBinding, AdvertiseModel>(mBinding) {
-    override fun binding(data: AdvertiseModel?, selectedIndex: Int) {
+    override fun binding(
+        data: AdvertiseModel?,
+        selectedIndex: Int
+    ) {
         data ?: return
         mBinding.ivGuide.setImageResource(data.drawableId)
         mBinding.tvGuideTitle.setText(data.titleId)
