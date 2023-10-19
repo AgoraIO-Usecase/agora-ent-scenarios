@@ -52,6 +52,12 @@ public class PagePilotManager {
                 .navigation();
     }
 
+    public static void pageFeedback() {
+        ARouter.getInstance()
+                .build(PagePathConstant.pageFeedback)
+                .navigation();
+    }
+
     /**
      * 房间列表
      */
