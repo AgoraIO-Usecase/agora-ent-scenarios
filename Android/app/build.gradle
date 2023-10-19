@@ -70,4 +70,6 @@ dependencies {
 
     implementation rootProject.ext.deps.gson
     implementation rootProject.ext.deps.bugly
+    implementation rootProject.ext.deps.flexbox
+
 }

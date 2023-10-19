@@ -162,6 +162,11 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
                 PagePilotManager.pageAboutUs()
             }
         })
+        binding.tvFeedback.setOnClickListener(object :OnFastClickListener(){
+            override fun onClickJacking(view: View) {
+                PagePilotManager.pageFeedback()
+            }
+        })
         binding.etNickname.setOnFocusChangeListener { v, hasFocus ->
             Log.d("zhangw", "etNickname setOnFocusChangeListener hasFocus $hasFocus")
         }

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F8FF">
+
+    <io.agora.scene.widget.CommonTitleView
+        android:id="@+id/titleView"
+        style="@style/title_view"
+        app:ctv_centerText="@string/app_submit_feedback"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFeedbackReason"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="14dp"
+        app:layoutManager="com.google.android.flexbox.FlexboxLayoutManager"
+        app:layout_constraintTop_toBottomOf="@+id/titleView"
+        tools:listitem="@layout/app_item_feedback_reason" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvFeedbackDescribe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/app_feedback_describe"
+        android:textColor="@color/def_text_grey_303"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rvFeedbackReason" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvReasonContentCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:text="0/200"
+        android:textColor="@color/def_text_grey_979"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvFeedbackDescribe"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvFeedbackDescribe" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutInput"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_full_white_r16"
+        android:orientation="vertical"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tvFeedbackDescribe">
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etFeedbackReason"
+            android:layout_width="match_parent"
+            android:layout_height="132dp"
+            android:background="@null"
+            android:gravity="top"
+            android:hint="@string/app_feedback_input_tips"
+            android:maxLength="200"
+            android:textColor="@color/def_text_grey_303"
+            android:textSize="14sp"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivFeedback1"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/app_feedback_add"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:shapeAppearance="@style/app_corner12Style" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivFeedback2"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/app_feedback_add"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@id/ivFeedback1"
+            app:layout_constraintStart_toEndOf="@+id/ivFeedback1"
+            app:shapeAppearance="@style/app_corner12Style" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivFeedback3"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/app_feedback_add"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@id/ivFeedback2"
+            app:layout_constraintStart_toEndOf="@+id/ivFeedback2"
+            app:shapeAppearance="@style/app_corner12Style" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cvIAgree"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:button="@drawable/bg_cb_check_status_def"
+        android:checked="true"
+        android:text="@string/app_feedback_upload"
+        android:textColor="@color/def_text_grey_979"
+        android:textSize="12sp"
+        app:layout_constraintTop_toBottomOf="@+id/layoutInput" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/app_bg_button_blue_solid_r12"
+        android:text="@string/app_feedback_submit"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cvIAgree" />
+
+    <LinearLayout
+        android:id="@+id/layoutFeedbackSuccess"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#F5F8FF"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="160dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleView">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_feedback_success"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/app_feedback_call_customer_service"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvServiceNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/bg_color_blue_31"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:text="PhoneNumb" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupFeedback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="rvFeedbackReason,tvFeedbackDescribe,tvReasonContentCount,
+layoutInput,cvIAgree,btnSubmit"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
