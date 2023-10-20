@@ -162,7 +162,7 @@ class LoginAdvertiseFragment : BaseViewBindingFragment<AppFragmentLoginAdvertise
                         if (currentItem + 1 == mAdvertiseAdapter.itemCount - 1) {
                             setCurrentItem(1, false)
                         } else if (currentItem + 1 < mAdvertiseAdapter.itemCount - 1) {
-                            setCurrentItem(currentItem + 1, false)
+                            setCurrentItem(currentItem + 1, true)
                         }
                     }
                 }
