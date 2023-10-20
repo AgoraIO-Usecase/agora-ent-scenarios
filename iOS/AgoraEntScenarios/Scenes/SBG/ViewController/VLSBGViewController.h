@@ -3,14 +3,14 @@
 //  VoiceOnLine
 //
 
-#import "BaseViewController.h"
+#import "VLBaseViewController.h"
 #import "SBGServiceProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @class VLSBGRoomListModel;
 @class VLSBGRoomSeatModel;
 
-@interface VLSBGViewController : BaseViewController
+@interface VLSBGViewController : VLBaseViewController
 
 @property (nonatomic, strong) VLSBGRoomListModel *roomModel;
 //麦位数组

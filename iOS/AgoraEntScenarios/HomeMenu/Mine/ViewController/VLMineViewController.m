@@ -95,6 +95,10 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         case VLMineViewClickTypeDebug:
             [self closeOffDebugMode];
         case VLMineViewClickTypSubmitFeedback:
+        {
+            VLFeedbackViewController *feedbackVC = [[VLFeedbackViewController alloc] init];
+            [self.navigationController pushViewController:feedbackVC animated:YES];
+        }
             break;
         default:
             break;

@@ -3,12 +3,12 @@
 //  VoiceOnLine
 //
 
-#import "BaseViewController.h"
+#import "VLBaseViewController.h"
 #import "AgoraEntScenarios-Swift.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCreateRoomViewController : BaseViewController
+@interface VLCreateRoomViewController : VLBaseViewController
 
 @end
 

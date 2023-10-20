@@ -8,7 +8,7 @@
 import UIKit
 import LSTPopView
 
-class VLRegisterViewController: BaseViewController {
+class VLRegisterViewController: VLBaseViewController {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "注册/登录"

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class VLVerifyCodeViewController: BaseViewController {
+class VLVerifyCodeViewController: VLBaseViewController {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "输入验证码"

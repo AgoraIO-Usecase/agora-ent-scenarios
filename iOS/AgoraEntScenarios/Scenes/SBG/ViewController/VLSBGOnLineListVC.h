@@ -3,11 +3,11 @@
 //  VoiceOnLine
 //
 
-#import "BaseViewController.h"
+#import "VLBaseViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLSBGOnLineListVC : BaseViewController
+@interface VLSBGOnLineListVC : VLBaseViewController
 
 @end
 

@@ -13,7 +13,7 @@
 #import "VLOnLineListVC.h"
 #import "VLSBGOnLineListVC.h"
 
-#import "BaseViewController.h"
+#import "VLBaseViewController.h"
 //#import "AEACategoryView.h"
 //#import "AEAListContainerView.h"
 @import YYModel;
@@ -28,5 +28,5 @@
 #import "VLPopImageVerifyView.h"
 #import "VLAPIRequest.h"
 #import "VLAlert.h"
-
+#import "VLUploadImageResModel.h"
 

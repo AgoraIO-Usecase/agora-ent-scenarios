@@ -80,6 +80,8 @@ def all_pods
   #bugly
   pod 'Bugly','2.5.93'
   
+  pod 'HXPhotoPicker/Lite'
+  
   
   #need to remove
 #  pod 'MJRefresh'

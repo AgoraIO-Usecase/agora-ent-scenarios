@@ -32,6 +32,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark--上传文件
 
++ (NSURLSessionDataTask *)uploadFileURL:(NSString *)url
+                                showHUD:(BOOL)show
+                              appendKey:(NSString *)key
+                               filePath:(NSString *)filePath
+                                success:(completeBlock_success)success
+                                failure:(errorBlock_fail)failure;
+
 + (__kindof NSURLSessionDataTask *)uploadFileRoute:(NSString *)route
                                             method:(NSString *)method
                                       parameters:(id)json
