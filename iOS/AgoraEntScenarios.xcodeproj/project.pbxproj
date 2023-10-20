@@ -4355,6 +4355,7 @@
 				DD619A8D29E3E247008F63E4 /* SAPositionInfo.swift in Sources */,
 				E3735CAE2A5E8DDD004737EF /* KTVSkipView.swift in Sources */,
 				DD619A9829E3E247008F63E4 /* SAHelpViewController.swift in Sources */,
+				DD84178029090C520026B624 /* VLDiscoveryHeaderView.m in Sources */,
 				E74F81A02ADD1A4D009CA280 /* VLMineAccountCell.swift in Sources */,
 				DD619A9A29E3E247008F63E4 /* SAInviteUsersController.swift in Sources */,
 				DD9EBFFC2AD5512400B4551F /* VREmptyView.swift in Sources */,

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Rect
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -151,15 +150,20 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
                 PagePilotManager.pageWebView(stringBuilder.toString())
             }
         })
-        binding.tvDataSharing.setOnClickListener(object : OnFastClickListener() {
+        binding.tvThirdDataSharing.setOnClickListener(object : OnFastClickListener() {
 
             override fun onClickJacking(view: View) {
-                PagePilotManager.pageWebView(URLStatics.dataSharingURL)
+                PagePilotManager.pageWebView(URLStatics.thirdDataSharingURL)
             }
         })
         binding.tvAbout.setOnClickListener(object : OnFastClickListener() {
             override fun onClickJacking(view: View) {
                 PagePilotManager.pageAboutUs()
+            }
+        })
+        binding.tvFeedback.setOnClickListener(object :OnFastClickListener(){
+            override fun onClickJacking(view: View) {
+                PagePilotManager.pageFeedback()
             }
         })
         binding.etNickname.setOnFocusChangeListener { v, hasFocus ->

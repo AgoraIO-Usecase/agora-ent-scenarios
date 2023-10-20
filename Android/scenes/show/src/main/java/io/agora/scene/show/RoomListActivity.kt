@@ -1,12 +1,15 @@
 package io.agora.scene.show
 
-import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,24 +18,21 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcConnection
-import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.show.databinding.ShowRoomItemBinding
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.videoSwitcherAPI.VideoSwitcher
 import io.agora.scene.show.widget.PresetAudienceDialog
-import io.agora.scene.widget.basic.BindingSingleAdapter
-import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.utils.StatusBarUtil
 
 class RoomListActivity : AppCompatActivity() {
 
     private val mBinding by lazy { ShowRoomListActivityBinding.inflate(LayoutInflater.from(this)) }
-    private lateinit var mRoomAdapter: BindingSingleAdapter<ShowRoomDetailModel, ShowRoomItemBinding>
+    private var mAdapter: RoomListAdapter? = null
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
     private val mRtcVideoSwitcher by lazy { VideoSwitcher.getImplInstance(mRtcEngine) }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
@@ -60,94 +60,7 @@ class RoomListActivity : AppCompatActivity() {
         mBinding.titleView.setRightIconClick {
             showAudienceSetting()
         }
-        mRoomAdapter = object : BindingSingleAdapter<ShowRoomDetailModel, ShowRoomItemBinding>() {
-            override fun onBindViewHolder(
-                holder: BindingViewHolder<ShowRoomItemBinding>,
-                position: Int
-            ) {
-                updateRoomItem(mDataList, position, holder.binding, getItem(position) ?: return)
-            }
-        }
-        mBinding.rvRooms.adapter = mRoomAdapter
-        mBinding.rvRooms.addOnScrollListener(object : OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) { // 停止状态
-                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                    val firstVisibleItem = layoutManager.findFirstVisibleItemPosition() // 第一个可见 item
-                    val lastVisibleItem = layoutManager.findLastVisibleItemPosition()  // 最后一个可见 item
-                    Log.d("RoomListActivity", "firstVisible $firstVisibleItem, lastVisible $lastVisibleItem")
-                    val firstPreloadPosition = if (firstVisibleItem - 7 < 0) 0 else firstVisibleItem - 7
-                    val lastPreloadPosition = if (firstPreloadPosition + 19 >= roomDetailModelList.size)
-                        roomDetailModelList.size - 1 else firstPreloadPosition + 19
-                    preloadChannels(firstPreloadPosition, lastPreloadPosition)
-                }
-            }
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-            }
-        })
-
-        mBinding.smartRefreshLayout.setEnableLoadMore(false)
-        mBinding.smartRefreshLayout.setEnableRefresh(true)
-        mBinding.smartRefreshLayout.setOnRefreshListener {
-            mService.getRoomList(
-                success = {
-                    roomDetailModelList.clear()
-                    roomDetailModelList.addAll(it)
-                    if (isFirstLoad) {
-                        preloadChannels()
-                        isFirstLoad = false
-                    }
-                    updateList(it)
-                },
-                error = {
-                    updateList(emptyList())
-                }
-            )
-        }
-        mBinding.smartRefreshLayout.autoRefresh()
-
-        mBinding.btnCreateRoom.setOnClickListener { goLivePrepareActivity() }
-        mBinding.btnCreateRoom2.setOnClickListener { goLivePrepareActivity() }
-    }
-
-    private fun updateList(data: List<ShowRoomDetailModel>) {
-        mBinding.tvTips1.isVisible = data.isEmpty()
-        mBinding.ivBgMobile.isVisible = data.isEmpty()
-        mBinding.btnCreateRoom2.isVisible = data.isEmpty()
-        mBinding.btnCreateRoom.isVisible = data.isNotEmpty()
-        mBinding.rvRooms.isVisible = data.isNotEmpty()
-        mRoomAdapter.resetAll(data)
-
-        mBinding.smartRefreshLayout.finishRefresh()
-
-        // 设置预加载
-        val preloadCount = 3
-        mRtcVideoSwitcher.setPreloadCount(preloadCount)
-        mRtcVideoSwitcher.preloadConnections(data.map {
-            RtcConnection(
-                it.roomId,
-                UserManager.getInstance().user.id.toInt()
-            )
-        })
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun updateRoomItem(
-        list: List<ShowRoomDetailModel>,
-        position: Int,
-        binding: ShowRoomItemBinding,
-        roomInfo: ShowRoomDetailModel
-    ) {
-        binding.tvRoomName.text = roomInfo.roomName
-        binding.tvRoomId.text = getString(R.string.show_room_id, roomInfo.roomId)
-        binding.tvUserCount.text = getString(R.string.show_user_count, roomInfo.roomUserCount)
-        binding.ivCover.setImageResource(roomInfo.getThumbnailIcon())
-
-        binding.root.setOnTouchListener { v, event ->
+        mAdapter = RoomListAdapter(null, this) { roomInfo, view, position, event ->
             val rtcConnection =
                 RtcConnection(roomInfo.roomId, UserManager.getInstance().user.id.toInt())
             val isRoomOwner = roomInfo.ownerId == UserManager.getInstance().user.id.toString()
@@ -158,7 +71,7 @@ class RoomListActivity : AppCompatActivity() {
             } else {
                 when (event!!.action) {
                     MotionEvent.ACTION_DOWN -> {
-                        mRtcVideoSwitcher.preloadConnections(list.map {
+                        mRtcVideoSwitcher.preloadConnections(roomDetailModelList.map {
                             RtcConnection(
                                 it.roomId,
                                 UserManager.getInstance().user.id.toInt()
@@ -199,13 +112,74 @@ class RoomListActivity : AppCompatActivity() {
                     }
                     MotionEvent.ACTION_UP -> {
                         if (RtcEngineInstance.generalToken() != "") {
-                            goLiveDetailActivity(list, position, roomInfo)
+                            goLiveDetailActivity(roomDetailModelList, position, roomInfo)
                         }
                     }
                 }
             }
-            true
         }
+        mBinding.rvRooms.adapter = mAdapter
+        mBinding.rvRooms.addOnScrollListener(object : OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) { // 停止状态
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val firstVisibleItem = layoutManager.findFirstVisibleItemPosition() // 第一个可见 item
+                    val lastVisibleItem = layoutManager.findLastVisibleItemPosition()  // 最后一个可见 item
+                    Log.d("RoomListActivity", "firstVisible $firstVisibleItem, lastVisible $lastVisibleItem")
+                    val firstPreloadPosition = if (firstVisibleItem - 7 < 0) 0 else firstVisibleItem - 7
+                    val lastPreloadPosition = if (firstPreloadPosition + 19 >= roomDetailModelList.size)
+                        roomDetailModelList.size - 1 else firstPreloadPosition + 19
+                    preloadChannels(firstPreloadPosition, lastPreloadPosition)
+                }
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+            }
+        })
+
+        mBinding.smartRefreshLayout.setEnableLoadMore(false)
+        mBinding.smartRefreshLayout.setEnableRefresh(true)
+        mBinding.smartRefreshLayout.setOnRefreshListener {
+            mService.getRoomList(
+                success = {
+                    roomDetailModelList.clear()
+                    roomDetailModelList.addAll(it)
+                    if (isFirstLoad) {
+                        preloadChannels()
+                        isFirstLoad = false
+                    }
+                    updateList(it)
+                },
+                error = {
+                    updateList(emptyList())
+                }
+            )
+        }
+        mBinding.smartRefreshLayout.autoRefresh()
+        mBinding.btnCreateRoom.setOnClickListener { goLivePrepareActivity() }
+    }
+
+    private fun updateList(data: List<ShowRoomDetailModel>) {
+        mBinding.tvTips1.isVisible = data.isEmpty()
+        mBinding.ivBgMobile.isVisible = data.isEmpty()
+        mBinding.btnCreateRoom.isVisible = data.isNotEmpty()
+        mBinding.rvRooms.isVisible = data.isNotEmpty()
+        mAdapter?.setDataList(data)
+
+        mBinding.smartRefreshLayout.finishRefresh()
+
+        // 设置预加载
+        val preloadCount = 3
+        mRtcVideoSwitcher.setPreloadCount(preloadCount)
+        mRtcVideoSwitcher.preloadConnections(data.map {
+            RtcConnection(
+                it.roomId,
+                UserManager.getInstance().user.id.toInt()
+            )
+        })
     }
 
     private fun goLivePrepareActivity() {
@@ -304,5 +278,66 @@ class RoomListActivity : AppCompatActivity() {
             deviceLevel = deviceLevel,
             isByAudience = true
         )
+    }
+
+    private class RoomListAdapter constructor(
+        private var mList: List<ShowRoomDetailModel>?,
+        private val mContext: Context,
+        private val mOnItemClick: ((ShowRoomDetailModel, View, Int, MotionEvent) -> Unit)? = null
+    ) : RecyclerView.Adapter<RoomListAdapter.ViewHolder?>() {
+
+        fun setDataList(list: List<ShowRoomDetailModel>?) {
+            mList = list
+            notifyDataSetChanged()
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view: View =
+                LayoutInflater.from(mContext).inflate(R.layout.show_item_room_list, parent, false)
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val num = position % 5
+            val resId: Int = mContext.resources.getIdentifier(
+                "show_img_room_item_bg_$num",
+                "mipmap",
+                mContext.packageName
+            )
+            holder.ivBackground.setImageResource(resId)
+            val data: ShowRoomDetailModel = mList!![position]
+            GlideApp.with(holder.ivAvatar.context).load(data.ownerAvatar)
+                .into(holder.ivAvatar)
+            holder.tvRoomName.text = data.roomName
+            holder.tvPersonNum.text = mContext.getString(R.string.show_user_count, data.roomUserCount)
+            holder.tvUserName.text = mContext.getString(R.string.show_room_id, data.roomId)
+            holder.ivLock.visibility = View.GONE
+            holder.itemView.setOnTouchListener { view, event ->
+                mOnItemClick?.invoke(data, view, position, event)
+                true
+            }
+        }
+
+        override fun getItemCount(): Int {
+            return mList?.size ?: 0
+        }
+
+        private inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            var ivBackground: ImageView
+            var ivAvatar: ImageView
+            var ivLock: ImageView
+            var tvRoomName: TextView
+            var tvUserName: TextView
+            var tvPersonNum: TextView
+
+            init {
+                ivBackground = itemView.findViewById(R.id.ivBackground)
+                ivAvatar = itemView.findViewById(R.id.ivAvatar)
+                ivLock = itemView.findViewById(R.id.ivLock)
+                tvRoomName = itemView.findViewById(R.id.tvRoomName)
+                tvUserName = itemView.findViewById(R.id.tvUserName)
+                tvPersonNum = itemView.findViewById(R.id.tvPersonNum)
+            }
+        }
     }
 }
