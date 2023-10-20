@@ -41,7 +41,7 @@ class VLDiscoverCell: UICollectionViewCell {
     }()
     private lazy var docuButton: UIButton = {
         let button = UIButton()
-        button.setTitle("集成文档", for: .normal)
+        button.setTitle(NSLocalizedString("discover_document_title", comment: ""), for: .normal)
         button.setTitleColor(UIColor(hex: "#2E6CF6", alpha: 1.0), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 13)
         button.setImage(UIImage(named: "discover_document"), for: .normal)

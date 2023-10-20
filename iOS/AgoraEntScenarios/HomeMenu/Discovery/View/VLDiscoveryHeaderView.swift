@@ -67,8 +67,4 @@ extension VLDiscoveryHeaderView: WKScriptMessageHandler, WKNavigationDelegate, W
             print("redirectUrl == \(redirectUrl), index == \(index)")
         }
     }
-    
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print("加载完成")
-    }
 }

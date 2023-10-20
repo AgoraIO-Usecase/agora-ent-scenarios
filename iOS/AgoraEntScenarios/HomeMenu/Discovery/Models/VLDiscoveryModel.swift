@@ -31,23 +31,23 @@ struct VLDiscoveryModel {
         dataArray.append(sesstionModel)
         
         sesstionModel = VLDiscoveryModel()
-        sesstionModel.title = "场景解决方案"
-        sesstionModel.items = [VLDiscoveryItemModel(title: "在线K歌房",
-                                                    desc: "一站式接入海量正版曲库，灵活接入各类娱乐社交场景",
+        sesstionModel.title = NSLocalizedString("discover_scene_scheme", comment: "")
+        sesstionModel.items = [VLDiscoveryItemModel(title: NSLocalizedString("ktv_online", comment: ""),
+                                                    desc: NSLocalizedString("discover_ktv_scene_desc", comment: ""),
                                                     iconName: "discover_ktv",
                                                     documentUrl: "https://docportal.shengwang.cn/cn/online-ktv/landing-page?platform=iOS",
                                                     schemeUrl: "https://www.shengwang.cn/solution/online-karaoke/",
                                                     type: .ktv,
                                                     layoutType: .side),
-                               VLDiscoveryItemModel(title: "声动语聊",
-                                                    desc: "更纯净、更动听、更沉浸、更好玩的语聊互动体验",
+                               VLDiscoveryItemModel(title: NSLocalizedString("discover_voice_chat_scene_title", comment: ""),
+                                                    desc: NSLocalizedString("discover_voice_chat_scene_desc", comment: ""),
                                                     iconName: "discover_voice",
                                                     documentUrl: "https://docportal.shengwang.cn/cn/chatroom/landing-page?platform=iOS",
                                                     schemeUrl: "https://www.shengwang.cn/solution/voicechat/",
                                                     type: .voice,
                                                     layoutType: .full),
-                               VLDiscoveryItemModel(title: "直播",
-                                                    desc: "视频『高清』升级，人更美、物更真，体验更流畅",
+                               VLDiscoveryItemModel(title: NSLocalizedString("discover_live_scene_title", comment: ""),
+                                                    desc: NSLocalizedString("discover_live_scene_desc", comment: ""),
                                                     iconName: "discover_live",
                                                     documentUrl: "https://docportal.shengwang.cn/cn/showroom/landing-page?platform=iOS",
                                                     schemeUrl: "https://www.shengwang.cn/solution/hd-video/",
@@ -56,16 +56,16 @@ struct VLDiscoveryModel {
         dataArray.append(sesstionModel)
         
         sesstionModel = VLDiscoveryModel()
-        sesstionModel.title = "凤鸣AI引擎"
-        sesstionModel.items = [VLDiscoveryItemModel(title: "凤鸣AI降噪",
-                                                    desc: "让实时互动远离干扰,实现纯净声音体验",
+        sesstionModel.title = NSLocalizedString("discover_AI_Engine", comment: "")
+        sesstionModel.items = [VLDiscoveryItemModel(title: NSLocalizedString("discover_AI_denoise", comment: ""),
+                                                    desc: NSLocalizedString("discover_AI_denoise_desc", comment: ""),
                                                     iconName: "discover_ai",
                                                     documentUrl: nil,
                                                     schemeUrl: "https://www.shengwang.cn/AI-denoiser/",
                                                     type: .ai,
                                                     layoutType: .half),
-                               VLDiscoveryItemModel(title: "凤鸣空间音频",
-                                                    desc: "身临其境的实时音频互动体验",
+                               VLDiscoveryItemModel(title: NSLocalizedString("discover_spetial_voice", comment: ""),
+                                                    desc: NSLocalizedString("discover_spetial_voice_desc", comment: ""),
                                                     iconName: "discover_ai",
                                                     documentUrl: nil,
                                                     schemeUrl: "https://www.shengwang.cn/3D-spatial/",
