@@ -7,26 +7,26 @@
 
 import Foundation
 
-enum SkipActionType: Int {
+enum KTVSkipActionType: Int {
     case down = 0
     case cancel = 1
 }
 
-enum SkipType: Int {
+enum KTVSkipType: Int {
     case prelude = 0
     case epilogue = 1
 }
 
-typealias OnSkipCallback = (SkipActionType) -> Void
+typealias KTVOnSkipCallback = (KTVSkipActionType) -> Void
 
 class KTVSkipView: UIView {
     
     private var bgView: UIView!
     private var skipBtn: UIButton!
     private var canCelBtn: UIButton!
-    private var completion: OnSkipCallback?
+    private var completion: KTVOnSkipCallback?
     
-    init(frame: CGRect, completion: OnSkipCallback?) {
+    init(frame: CGRect, completion: KTVOnSkipCallback?) {
         super.init(frame: frame)
         self.completion = completion
         setupUI()
@@ -59,13 +59,13 @@ class KTVSkipView: UIView {
         bgView.addSubview(canCelBtn)
     }
         
-    func setSkipType(_ type: SkipType) {
+    func setSkipType(_ type: KTVSkipType) {
         let title = type == .prelude ? "跳过前奏" : "跳过尾奏"
         skipBtn.setTitle(title, for: .normal)
     }
     
     @objc private func skip(_ btn: UIButton) {
-        let actionType: SkipActionType = (btn.tag == 200) ? .down : .cancel
+        let actionType: KTVSkipActionType = (btn.tag == 200) ? .down : .cancel
         completion?(actionType)
     }
     

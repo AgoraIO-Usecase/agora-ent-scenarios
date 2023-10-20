@@ -103,7 +103,9 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         case .snatch_singing:
             let vc = VLSBGOnLineListVC()
             navigationController?.pushViewController(vc, animated: true)
-        
+        case .relay:
+            let vc = VLSROnLineListVC()
+            navigationController?.pushViewController(vc, animated: true)
         case .voice_chat:
             let vc = VRRoomsViewController(user: VLUserCenter.user)
             navigationController?.pushViewController(vc, animated: true)

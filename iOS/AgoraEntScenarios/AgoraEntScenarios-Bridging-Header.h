@@ -12,6 +12,7 @@
 #import "VLSBGRoomSelSongModel.h"
 #import "VLOnLineListVC.h"
 #import "VLSBGOnLineListVC.h"
+#import "VLSROnLineListVC.h"
 
 #import "BaseViewController.h"
 //#import "AEACategoryView.h"

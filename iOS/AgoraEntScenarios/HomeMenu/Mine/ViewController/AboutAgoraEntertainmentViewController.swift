@@ -16,6 +16,7 @@ import AgoraRtcKit
                               ["title": NSLocalizedString("app_about_official_website", comment: ""),
                                "detail":"https://www.shengwang.cn"]],
                   "sectionName": ""],
+                 //TODO(chenpan): scene name of 3.5.0
                  ["contents": [["title": NSLocalizedString("app_voice_chat", comment: ""), "detail":"YL-2.1.0"],
                                ["title": NSLocalizedString("app_about_chat_room_spatial", comment: ""), "detail":"YLKJ-2.1.0"],
                                ["title": NSLocalizedString("app_about_karaoke", comment: ""),"detail":"KTV-2.3.0"],

@@ -20,6 +20,7 @@ enum HomeContentType: Int {
     case snatch_singing
     case chorus
     case continue_singing
+    case relay
     case voice_chat
     case spatial_voice
     case show
@@ -33,6 +34,7 @@ enum HomeContentType: Int {
         case .snatch_singing: return "KTV"
         case .chorus: return "KTV"
         case .continue_singing: return "KTV"
+        case .relay: return "KTV"
         case .voice_chat: return "ChatRoom"
         case .spatial_voice: return "SpatialAudioChatRoom"
         case .show: return "LiveShow"
@@ -87,7 +89,9 @@ struct HomeContentSesionModel {
         var contentArray = [createContentModel(title: "独唱&合唱", desc: "超低延迟真合唱", imageName: "home_ktv_solo", type: .solo),
                             createContentModel(title: "抢唱", desc: "热歌高潮片段", imageName: "home_ktv_snatch_singing", type: .snatch_singing),
                             createContentModel(title: "大合唱", desc: "最高支持128人", imageName: "home_ktv_chorus", type: .chorus),
-                            createContentModel(title: "接唱", desc: "歌曲接龙", imageName: "home_ktv_continue_singing", type: .continue_singing)]
+                            createContentModel(title: "接唱", desc: "歌曲接龙", imageName: "home_ktv_continue_singing", type: .continue_singing),
+                            //TODO(chenpan): rename
+                            createContentModel(title: "Relay", desc: "-", imageName: "home_ktv_continue_singing", type: .continue_singing)]
         model.contentModels = contentArray
         dataArray.append(model)
         

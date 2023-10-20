@@ -54,7 +54,7 @@ extension ShowAgoraKitManager {
         ShowAgoraRenderMode.allCases.map({$0.modeValue})
     }
     
-    private var debugSrTypeItems: [SRType] {
+    private var debugSrTypeItems: [ShowSRType] {
         ShowAgoraSRType.allCases.map({$0.typeValue})
     }
     

@@ -24,7 +24,7 @@ private let fpsItems: [AgoraVideoFrameRate] = [
 ]
 
 // 超分倍数
-enum SRType: Int {
+enum ShowSRType: Int {
     case none = -1
     case x1 = 6
     case x1_33 = 7
@@ -39,7 +39,7 @@ class ShowRTCParams {
     var suggested = true
     
     var sr = false
-    var srType: SRType = .x1_33
+    var srType: ShowSRType = .x1_33
     var dualStream: AgoraSimulcastStreamConfig?
     var pvc = false
     var svc = false
@@ -66,7 +66,7 @@ extension ShowAgoraKitManager {
     /// - Parameters:
     ///   - isOn: 开关
     ///   - srType: 默认1.5倍
-    func setDebugSuperResolutionOn(_ isOn: Bool, srType:SRType = .none) {
+    func setDebugSuperResolutionOn(_ isOn: Bool, srType:ShowSRType = .none) {
         // 避免重复设置
         if isOn == self.rtcParam.sr && srType == self.rtcParam.srType {
             return
