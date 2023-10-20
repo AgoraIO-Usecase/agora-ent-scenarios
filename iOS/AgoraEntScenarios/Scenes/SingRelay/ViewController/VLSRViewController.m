@@ -838,6 +838,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
         
         [weakSelf.SRApi startSingWithSongCode:songCode startPos:0];
+        //TODO(chenpan):去除所有nslog
         NSLog(@"before switch role, load music success");
         [weakSelf.SRApi switchSingerRoleWithNewRole:role
                                    onSwitchRoleState:^( SRSwitchRoleState state, SRSwitchRoleFailReason reason) {

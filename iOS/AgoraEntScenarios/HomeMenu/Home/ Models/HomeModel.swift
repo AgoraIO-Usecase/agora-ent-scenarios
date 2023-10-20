@@ -91,7 +91,7 @@ struct HomeContentSesionModel {
                             createContentModel(title: "大合唱", desc: "最高支持128人", imageName: "home_ktv_chorus", type: .chorus),
                             createContentModel(title: "接唱", desc: "歌曲接龙", imageName: "home_ktv_continue_singing", type: .continue_singing),
                             //TODO(chenpan): rename
-                            createContentModel(title: "Relay", desc: "-", imageName: "home_ktv_continue_singing", type: .continue_singing)]
+                            createContentModel(title: "抢麦接唱", desc: "-", imageName: "home_ktv_continue_singing", type: .relay)]
         model.contentModels = contentArray
         dataArray.append(model)
         

@@ -402,8 +402,8 @@ class VLSRStatusView: UIView {
         return btn
     }()
     
-    var attributeView: SBGAttributeView = {
-        let attrView = SBGAttributeView()
+    var attributeView: SRAttributeView = {
+        let attrView = SRAttributeView()
         return attrView
     }()
    // sr_next_warning
@@ -474,8 +474,8 @@ class VLSRStatusView: UIView {
     
     private lazy var tableView: UITableView = { //分数的tableView
         let tableView = UITableView()
-        tableView.registerCell(SBGScoreTitleCell.self, forCellReuseIdentifier: "title")
-        tableView.registerCell(SBGScoreCell.self, forCellReuseIdentifier: "score")
+        tableView.registerCell(SRScoreTitleCell.self, forCellReuseIdentifier: "title")
+        tableView.registerCell(SRScoreCell.self, forCellReuseIdentifier: "score")
         tableView.dataSource = self
         tableView.delegate = self
         tableView.backgroundColor = .clear
@@ -734,13 +734,12 @@ extension VLSRStatusView: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row == 0 {
-            let cell : SBGScoreTitleCell = tableView.dequeueReusableCell(withIdentifier: "title") as! SBGScoreTitleCell
+            let cell : SRScoreTitleCell = tableView.dequeueReusableCell(withIdentifier: "title") as! SRScoreTitleCell
             return cell
         } else {
-            let cell : SBGScoreCell = tableView.dequeueReusableCell(withIdentifier: "score") as! SBGScoreCell
+            let cell : SRScoreCell = tableView.dequeueReusableCell(withIdentifier: "score") as! SRScoreCell
             if let model: SRSubRankModel = dataSource?[indexPath.row - 1] {
-                //TODO(chenpan)
-//                cell.score = model
+                cell.score = model
             }
             return cell
         }
