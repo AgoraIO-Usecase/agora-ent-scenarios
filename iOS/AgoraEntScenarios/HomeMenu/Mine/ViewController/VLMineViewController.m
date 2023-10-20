@@ -41,7 +41,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setBackgroundImage:@"home_bg_image"];
-    [self setNaviTitleName:AGLocalizedString(@"agora")];
     [self setUpUI];
 }
 
@@ -61,6 +60,11 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 
 - (void)mineViewDidCick:(VLMineViewClickType)type {
     switch (type) {
+        case VLMineViewClickTypeMyAccount: {
+            VLMineAccountViewController *vc = [[VLMineAccountViewController alloc] init];
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+            break;
         case VLMineViewClickTypeUserProtocol:
             [self pushWebView:kURLPathH5UserAgreement];
             break;
@@ -88,23 +92,17 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         case VLMineViewClickTypeAboutUS:
             [self about];
             break;
-        case VLMineViewClickTypeLogout:
-            [self loadLogoutUserRequest];
-            break;
-        case VLMineViewClickTypeDestroyAccount:
-            [self loadDestoryUserRequest];
-            break;
         case VLMineViewClickTypeDebug:
             [self closeOffDebugMode];
+        case VLMineViewClickTypSubmitFeedback:
+            break;
         default:
             break;
     }
 }
 
 - (void)mineViewDidCickUser:(VLMineViewUserClickType)type {
-    if (type == VLMineViewUserClickTypeNickName) {
-        [self showUpdateNickNameAlert];
-    } else if (type == VLMineViewUserClickTypeAvatar) {
+    if (type == VLMineViewUserClickTypeAvatar) {
         [self showUploadPicAlter];
     }
 }
@@ -120,69 +118,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     VC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:VC animated:YES];
 }
-
-- (void)userLogout {
-    [[VLUserCenter center] logout];
-//    [[VLGlobalHelper app] configRootViewController];
-    [UIApplication.sharedApplication.delegate.window configRootViewController];
-}
-
-- (void)showUpdateNickNameAlert {
-
-//    VL(weakSelf);
-    __block UITextField *TF = nil;
-
-    [LEEAlert alert].config
-    .LeeTitle(AGLocalizedString(@"edit_name"))
-    .LeeAddTextField(^(UITextField *textField) {
-        textField.placeholder = AGLocalizedString(@"input_edit_name");
-        textField.textColor = UIColorBlack;
-        textField.clearButtonMode=UITextFieldViewModeWhileEditing;
-        textField.font = UIFontMake(15);
-        if (VLUserCenter.user.name.length > 0) {
-            textField.text = VLUserCenter.user.name;
-        }
-        [textField becomeFirstResponder];
-        TF = textField; //赋值
-    })
-    .LeeAddAction(^(LEEAction *action) {
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"cancel");
-        action.titleColor = UIColorMakeWithHex(@"#000000");
-        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.font = UIFontBoldMake(16);
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.clickBlock = ^{
-            
-        };
-    })
-    .LeeAddAction(^(LEEAction *action) {
-        VL(weakSelf);
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"confirm");
-        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.font = UIFontBoldMake(16);
-        action.clickBlock = ^{
-            [weakSelf loadUpdateNickNameRequest:TF.text];
-        };
-    })
-    .leeShouldActionClickClose(^(NSInteger index){
-        // 是否可以关闭回调, 当即将关闭时会被调用 根据返回值决定是否执行关闭处理
-        // 这里演示了与输入框非空校验结合的例子
-        BOOL result = ![TF.text isEqualToString:@""];
-        result = index == 1 ? result : YES;
-        return result;
-    })
-    .LeeShow();
-}
-
 
 - (BOOL)getLibraryAccess {
     return [NSUserDefaults.standardUserDefaults boolForKey:@"LibraryAccess"];
@@ -359,122 +294,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         }
     } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
     }];
-}
-
-
-- (void)loadUpdateNickNameRequest:(NSString *)nickName {
-    NSDictionary *param = @{
-        @"userNo" : VLUserCenter.user.userNo ?: @"",
-        @"name" : nickName ?: @""
-    };
-    [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-        if (response.code == 0) {
-            [VLToast toast:AGLocalizedString(@"app_edit_success")];
-            [self.mineView refreseNickName:nickName];
-            VLUserCenter.user.name = nickName;
-            [[VLUserCenter center] storeUserInfo:VLUserCenter.user];
-        }else{
-            [VLToast toast:response.message];
-        }
-    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-    }];
-}
-
-// 注销账号
-- (void)loadDestoryUserRequest {
-    
-    [LEEAlert alert].config
-    .LeeAddTitle(^(UILabel *label) {
-        label.text = AGLocalizedString(@"app_logoff_account");
-        label.textColor = UIColorMakeWithHex(@"#040925");
-        label.font = UIFontBoldMake(16);
-    })
-    .LeeContent(AGLocalizedString(@"logout_tips"))
-    .LeeAddAction(^(LEEAction *action) {
-        VL(weakSelf);
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"app_logoff");
-        action.titleColor = UIColorMakeWithHex(@"#000000");
-        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.font = UIFontBoldMake(16);
-        action.clickBlock = ^{
-            NSDictionary *param = @{@"userNo":VLUserCenter.user.userNo ?: @""};
-            [VLAPIRequest getRequestURL:kURLPathDestroyUser parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-                if (response.code == 0) {
-                    [weakSelf userLogout];
-                }
-            } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-            }];
-        };
-    })
-    .LeeAddAction(^(LEEAction *action) {
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"cancel");
-        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.font = UIFontBoldMake(16);
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.borderColor = UIColorMakeWithHex(@"#2753FF");
-        action.clickBlock = ^{
-            // 取消点击事件Block
-        };
-    })
-    .LeeShow();
-}
-
-// 退出登录
-- (void)loadLogoutUserRequest {
-    [LEEAlert alert].config
-    .LeeAddTitle(^(UILabel *label) {
-        label.text = AGLocalizedString(@"confirm_logout");
-        label.textColor = UIColorMakeWithHex(@"#040925");
-        label.font = UIFontBoldMake(16);
-    })
-    .LeeContent(AGLocalizedString(@"logout_tips"))
-    .LeeAddAction(^(LEEAction *action) {
-        VL(weakSelf);
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"app_exit");
-        action.titleColor = UIColorMakeWithHex(@"#000000");
-        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.font = UIFontBoldMake(16);
-        action.clickBlock = ^{
-            [weakSelf userLogout];
-            return;
-//            NSDictionary *param = @{@"userNo" : VLUserCenter.user.userNo ?: @""};
-//            [VLAPIRequest getRequestURL:kURLPathLogout parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-//                if (response.code == 0) {
-//                    [self userLogout];
-//                }
-//            } failure:^(NSError * _Nullable error) {
-//            }];
-        };
-    })
-    .LeeAddAction(^(LEEAction *action) {
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"cancel");
-        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.font = UIFontBoldMake(16);
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.borderColor = UIColorMakeWithHex(@"#2753FF");
-        action.clickBlock = ^{
-            // 取消点击事件Block
-        };
-    })
-    .LeeShow();
 }
 
 - (void)closeOffDebugMode {

@@ -15,7 +15,7 @@ class HomeContentViewController: UIViewController {
     @objc var changeToNavigationBarAlpha: ((CGFloat) -> Void)?
     private lazy var flowLayout: UICollectionViewFlowLayout = {
        let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.itemSize = CGSize(width: ((Screen.width - 40 - 15) * 0.5).fit, height: 80.fit)
+        flowLayout.itemSize = CGSize(width: (Screen.width - 40.fit - 15.fit) * 0.5, height: 80.fit)
         return flowLayout
     }()
     private lazy var collectionView: UICollectionView = {
@@ -49,6 +49,12 @@ class HomeContentViewController: UIViewController {
         setupUI()
     }
     
+    @objc
+    func getScrollToPostion() {
+        var delta = collectionView.contentOffset.y / Screen.kNavHeight
+        delta = CGFloat.maximum(delta, 0)
+        changeToNavigationBarAlpha?(delta)
+    }
 
     private func setupUI() {
         view.backgroundColor = .clear
@@ -150,7 +156,7 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        UIEdgeInsets(top: 16, left: 20, bottom: 0, right: 20)
+        UIEdgeInsets(top: 16.fit, left: 20.fit, bottom: (dataArray?.count ?? 0) - 1 == section ? 20.fit : 0, right: 20.fit)
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

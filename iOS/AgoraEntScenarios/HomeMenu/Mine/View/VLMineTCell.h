@@ -11,11 +11,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong) NSDictionary *dict;
 
-@property (nonatomic, strong) UIImageView *iconImgView;
 @property (nonatomic, strong) UILabel *itemTitleLabel;
 @property (nonatomic, strong) UIImageView *arrowImgView;
 
-- (void)setIconImageName:(NSString *)imgStr title:(NSString *)title;
+- (void)setTitle:(NSString *)title;
 
 @end
 
