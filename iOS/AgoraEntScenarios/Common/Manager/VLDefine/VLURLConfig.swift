@@ -16,4 +16,8 @@ enum VLURLConfig {
     static let kURLPathFeedback = "/api-login/feedback/upload" //反馈
     static let kURLPathH5UserAgreement = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/service.html"
     static let kURLPathH5Privacy = "https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/privacy.html"
+    
+    //H5
+    static let kURLPathH5Discover = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover-dev/index.html" // 发现
+    static let kURLPathH5ktv_feedback = "https://www.shengwang.cn/ktv_feedback" // K 歌曲库检索
 }

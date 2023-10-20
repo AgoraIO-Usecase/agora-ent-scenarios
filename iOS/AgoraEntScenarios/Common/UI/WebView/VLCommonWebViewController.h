@@ -11,6 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSString *urlString;
 
+@property (nonatomic, assign) BOOL isShowSystemWebButton;
+
 - (void)injectMethod:(NSString *)method;
 
 - (void)evaluateJS: (NSString *)js;
