@@ -670,6 +670,9 @@
 		E74F81962AD922A7009CA280 /* VLRegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F81952AD922A7009CA280 /* VLRegisterViewController.swift */; };
 		E74F81982AD930F4009CA280 /* VLVerifyCodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F81972AD930F4009CA280 /* VLVerifyCodeViewController.swift */; };
 		E74F819A2AD932C8009CA280 /* VLURLConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F81992AD932C8009CA280 /* VLURLConfig.swift */; };
+		E74F819E2ADD189B009CA280 /* VLMineAccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F819D2ADD189B009CA280 /* VLMineAccountViewController.swift */; };
+		E74F81A02ADD1A4D009CA280 /* VLMineAccountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F819F2ADD1A4D009CA280 /* VLMineAccountCell.swift */; };
+		E74F81A22ADD1F28009CA280 /* VLMineAccountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1572,6 +1575,9 @@
 		E74F81952AD922A7009CA280 /* VLRegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLRegisterViewController.swift; sourceTree = "<group>"; };
 		E74F81972AD930F4009CA280 /* VLVerifyCodeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLVerifyCodeViewController.swift; sourceTree = "<group>"; };
 		E74F81992AD932C8009CA280 /* VLURLConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLURLConfig.swift; sourceTree = "<group>"; };
+		E74F819D2ADD189B009CA280 /* VLMineAccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineAccountViewController.swift; sourceTree = "<group>"; };
+		E74F819F2ADD1A4D009CA280 /* VLMineAccountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineAccountCell.swift; sourceTree = "<group>"; };
+		E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineAccountModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2653,6 +2659,7 @@
 			children = (
 				DD3610CE29B70F3800CE7984 /* VLMineCellModel.h */,
 				DD3610CF29B70F3800CE7984 /* VLMineCellModel.m */,
+				E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */,
 				DD8416C029090C520026B624 /* VLUploadImageResModel.h */,
 				DD8416C129090C520026B624 /* VLUploadImageResModel.m */,
 			);
@@ -2666,10 +2673,11 @@
 				DD619C0729E3E84C008F63E4 /* ContactInfoCell.swift */,
 				DD619C0529E3E84C008F63E4 /* SceneVersionCell.swift */,
 				DD3610CC29B70F3300CE7984 /* VLMineSwitchCell.swift */,
-				DD8416C329090C520026B624 /* VLMineView.m */,
-				DD8416C429090C520026B624 /* VLMineTCell.m */,
 				DD8416C529090C520026B624 /* VLMineView.h */,
+				DD8416C329090C520026B624 /* VLMineView.m */,
 				DD8416C629090C520026B624 /* VLMineTCell.h */,
+				DD8416C429090C520026B624 /* VLMineTCell.m */,
+				E74F819F2ADD1A4D009CA280 /* VLMineAccountCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2680,6 +2688,7 @@
 				DD619C0329E3E81D008F63E4 /* AboutAgoraEntertainmentViewController.swift */,
 				DD8416C829090C520026B624 /* VLMineViewController.h */,
 				DD8416C929090C520026B624 /* VLMineViewController.m */,
+				E74F819D2ADD189B009CA280 /* VLMineAccountViewController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -4452,6 +4461,7 @@
 				DD619A9D29E3E247008F63E4 /* SAAudiencesViewController.swift in Sources */,
 				DD619AE729E3E247008F63E4 /* SACreateRoomView.swift in Sources */,
 				DD619A9729E3E247008F63E4 /* SAAudioSettingViewController.swift in Sources */,
+				E74F81A22ADD1F28009CA280 /* VLMineAccountModel.swift in Sources */,
 				DD0292CB295BF0DC00485225 /* VLSongListCell.m in Sources */,
 				DD36109929B70CDC00CE7984 /* ShowCunstomNaviBar.swift in Sources */,
 				DD84177F29090C520026B624 /* UIWindow+Router.m in Sources */,
@@ -4481,6 +4491,7 @@
 				E3735CAE2A5E8DDD004737EF /* KTVSkipView.swift in Sources */,
 				DD619A9829E3E247008F63E4 /* SAHelpViewController.swift in Sources */,
 				DD84178029090C520026B624 /* VLDiscoveryHeaderView.m in Sources */,
+				E74F81A02ADD1A4D009CA280 /* VLMineAccountCell.swift in Sources */,
 				DD619A9A29E3E247008F63E4 /* SAInviteUsersController.swift in Sources */,
 				DD9EBFFC2AD5512400B4551F /* VREmptyView.swift in Sources */,
 				DD9EBFBC2AD5512300B4551F /* VRSpatialSoundViewController.swift in Sources */,
@@ -4698,6 +4709,7 @@
 				DD3610C929B70CDC00CE7984 /* AppContext+Show.swift in Sources */,
 				DD619AE229E3E247008F63E4 /* SAHorizontalCardView.swift in Sources */,
 				E74F81982AD930F4009CA280 /* VLVerifyCodeViewController.swift in Sources */,
+				E74F819E2ADD189B009CA280 /* VLMineAccountViewController.swift in Sources */,
 				DDA199FF28FFE579009D3E61 /* NSString+Helper.m in Sources */,
 				DD9EBFF02AD5512400B4551F /* VMSwitchTableViewCell.swift in Sources */,
 				DD36106029B70CDC00CE7984 /* UIView+Show.swift in Sources */,

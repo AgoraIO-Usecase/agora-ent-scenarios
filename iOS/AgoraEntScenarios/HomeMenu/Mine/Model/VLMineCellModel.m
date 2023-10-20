@@ -21,4 +21,13 @@
     return  model;
 }
 
++ (instancetype)modelWithItemImg:(NSString *)itemImgStr title:(NSString *)title clickType:(VLMineViewClickType)clickType {
+    VLMineCellModel *model = [VLMineCellModel new];
+    model.itemImgStr = itemImgStr;
+    model.titleStr = title;
+    model.style = VLMineCellStyleDefault;
+    model.clickType = clickType;
+    return  model;
+}
+
 @end

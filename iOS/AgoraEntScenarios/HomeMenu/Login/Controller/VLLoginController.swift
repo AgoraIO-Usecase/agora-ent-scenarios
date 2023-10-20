@@ -127,7 +127,7 @@ class VLLoginController: BaseViewController {
         let textString = NSLocalizedString("privacy_protection_tip2", comment: "")
         let range1 = NSRange(location: 3, length: 4)
         let range2 = NSRange(location: 10, length: 4)
-        let arrayTitles = ["用户协议", "隐私政策"]
+        let arrayTitles = [NSLocalizedString("app_user_agreement", comment: ""), NSLocalizedString("app_privacy_agreement", comment: "")]
         VLAlert.shared().showAttributeAlert(withFrame: CGRect(origin: .zero, size: CGSize(width: Screen.width, height: 120)),
                                             title: NSLocalizedString("personal_information", comment: ""),
                                             text: textString,

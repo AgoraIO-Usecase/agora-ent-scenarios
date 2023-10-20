@@ -122,7 +122,7 @@
 
 // 点击选中或者滚动选中都会调用该方法。适用于只关心选中事件，不关心具体是点击还是滚动选中的。
 - (void)categoryView:(JXCategoryBaseView *)categoryView didSelectedItemAtIndex:(NSInteger)index {
-    
+    [self.dataArray[index].vc getScrollToPostion];
 }
 
 // 点击选中的情况才会调用该方法
