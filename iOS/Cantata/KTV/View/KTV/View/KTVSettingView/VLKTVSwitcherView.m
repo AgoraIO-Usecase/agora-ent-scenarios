@@ -10,8 +10,8 @@
 
 @interface VLKTVSwitcherView()
 
-@property (nonatomic, strong) UISwitch *switcher;
-@property (nonatomic, strong) UILabel *subLabel;
+@property (nonatomic, strong) UIImageView *rightIcon;
+@property (nonatomic, strong) UIButton *coverBtn;
 
 @end
 
@@ -27,46 +27,48 @@
 }
 
 - (void)initSubViews {
-    [self addSubview:self.switcher];
+    [self addSubview:self.rightIcon];
     [self addSubview:self.subLabel];
+    [self addSubview:self.coverBtn];
+    
+    self.swich = [[UISwitch alloc]init];
+    [self.swich addTarget:self action:@selector(click) forControlEvents:UIControlEventValueChanged];
+    [self addSubview:self.swich];
 }
 
 - (void)addSubViewConstraints {
-    [self.switcher mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.bottom.mas_equalTo(self);
-        make.left.mas_equalTo(79);
+    
+    [self.rightIcon mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(self).offset(-8);
+        make.centerY.mas_equalTo(self);
+        make.width.mas_equalTo(@(16));
+        make.height.mas_equalTo(@(16));
     }];
     
     [self.subLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerY.mas_equalTo(self);
-        make.left.mas_equalTo(self.switcher.mas_right).offset(10);
+        make.right.mas_equalTo(self.rightIcon.mas_left).offset(-10);
     }];
     
+    [self.swich mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.mas_equalTo(self);
+        make.right.mas_equalTo(self.rightIcon.mas_left).offset(-10);
+    }];
+    
+    [self.coverBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.top.bottom.mas_equalTo(self);
+    }];
+  
+}
+
+-(void)setModeOn:(BOOL)flag{
+    _modeOn = flag;
+    self.swich.on = flag;
 }
 
 - (void)setOn:(BOOL)on {
     _on = on;
-    self.switcher.on = on;
-}
-
-- (void)setSubText:(NSString *)subText {
-    _subText = subText;
-    self.subLabel.text = _subText;
-}
-
-- (void)valueChanged:(UISwitch *)switcher {
-    if ([self.delegate respondsToSelector:@selector(switcherView:on:)]) {
-        [self.delegate switcherView:self on:switcher.on];
-    }
-}
-
-- (UISwitch *)switcher {
-    if (!_switcher) {
-        _switcher = [[UISwitch alloc] init];
-        _switcher.onTintColor = UIColorMakeWithHex(@"#009FFF");
-        [_switcher addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventValueChanged];
-    }
-    return _switcher;
+    self.subLabel.text = _on ? @"开启" : @"关闭";
 }
 
 - (UILabel *)subLabel {
@@ -76,6 +78,30 @@
         _subLabel.textColor = UIColorMakeWithHex(@"#6C7192");
     }
     return _subLabel;
+}
+
+-(UIImageView *)rightIcon {
+    if(!_rightIcon){
+        _rightIcon = [[UIImageView alloc]init];
+        _rightIcon.image = [UIImage sceneImageWithName:@"ktv_arrow_right"];
+    }
+    return _rightIcon;
+}
+
+-(UIButton *)coverBtn {
+    if(!_coverBtn){
+        _coverBtn = [[UIButton alloc]init];
+        _coverBtn.backgroundColor = [UIColor clearColor];
+        [_coverBtn addTarget:self action:@selector(click) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _coverBtn;
+}
+
+-(void)click {
+    self.modeOn = _swich.on;
+    if([_delegate respondsToSelector:@selector(switcherView:on:)]){
+        [self.delegate switcherView:self on:self.modeOn];
+    }
 }
 
 @end

@@ -413,10 +413,12 @@ class DHCLRCControl: UIView {
     @objc public func showPreludeEnd() {
         if hasShowOnce {return}
         //显示跳过前奏
-        skipBtn.setSkipType(.prelude)
-        skipBtn.isHidden = false
-        hasShowEndPosition = false
-        hasShowPreludeEndPosition = false
+        DispatchQueue.main.async {
+            self.skipBtn.setSkipType(.prelude)
+            self.skipBtn.isHidden = false
+            self.hasShowEndPosition = false
+            self.hasShowPreludeEndPosition = false
+        }
     }
     
     @objc public func resetShowOnce() {

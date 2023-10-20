@@ -86,14 +86,20 @@
 //            [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
 //        }];
         //处理座位信息
-        VLRoomListModel *listModel = [[VLRoomListModel alloc]init];
-        listModel.roomNo = outputModel.roomNo;
-        listModel.name = outputModel.name;
-        listModel.bgOption = 0;
-        listModel.creatorAvatar = outputModel.creatorAvatar;
-        listModel.creatorNo = VLUserCenter.user.id;
-        UIViewController *VC = [ViewControllerFactory createCustomViewControllerWithTitle:listModel seatsArray:outputModel.seatsArray];
-        [weakSelf.navigationController pushViewController:VC animated:YES];
+        UIViewController *topViewController = self.navigationController.viewControllers.lastObject;
+        if(![topViewController isMemberOfClass:[VLCreateRoomViewController class]]){
+            return;
+        }
+        if (error == nil) {
+            VLRoomListModel *listModel = [[VLRoomListModel alloc]init];
+            listModel.roomNo = outputModel.roomNo;
+            listModel.name = outputModel.name;
+            listModel.bgOption = 0;
+            listModel.creatorAvatar = outputModel.creatorAvatar;
+            listModel.creatorNo = VLUserCenter.user.id;
+            UIViewController *VC = [ViewControllerFactory createCustomViewControllerWithTitle:listModel seatsArray:outputModel.seatsArray];
+            [weakSelf.navigationController pushViewController:VC animated:YES];
+        }
     }];
 }
 

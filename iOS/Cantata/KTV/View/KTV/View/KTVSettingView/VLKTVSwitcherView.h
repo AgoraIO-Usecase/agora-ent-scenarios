@@ -22,6 +22,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) BOOL on;
 
+@property (nonatomic, assign) BOOL modeOn;//IMMode
+
+@property (nonatomic, strong) UISwitch *swich;
+
+@property (nonatomic, strong) UILabel *subLabel;
+
 @end
 
 NS_ASSUME_NONNULL_END

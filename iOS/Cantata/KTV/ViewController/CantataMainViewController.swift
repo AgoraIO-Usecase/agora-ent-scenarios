@@ -32,7 +32,8 @@ class CantataMainViewController: BaseViewController{
                 if let oldSongs = oldValue {
                     let oldFirst = oldSongs.first
                     let newFirst = newSongs.first
-                    if oldFirst?.songNo != newFirst?.songNo{
+                    if ((oldFirst?.songNo != newFirst?.songNo) || (oldFirst?.status == .playing && newFirst?.status == .idle))
+                    {
                         loadAndPlaySong()
                     }
                 } else {
@@ -54,7 +55,7 @@ class CantataMainViewController: BaseViewController{
     public var singerRole: KTVSingRole = .audience
     public var isRoomOwner: Bool = false
     private var isEarOn: Bool = false
-    
+    private var selectedEffectIndex: Int = 0
     private var isEnterSeatNotFirst: Bool = false
     private var rtcDataStreamId: Int = 0
     private var isOnMicSeat: Bool = false
@@ -63,7 +64,7 @@ class CantataMainViewController: BaseViewController{
     private var botView: VLBottomView!
     private var lrcControlView: DHCLRCControl!
     private var isBrodCaster: Bool = false
-    private var settingView: VLKTVSettingView?
+    private var settingView: DHCVLKTVSettingView?
     public var searchKeyWord: String?
     private var loadMusicCallBack:((Bool, String)->Void)?
     private var connection: AgoraRtcConnection?
@@ -126,9 +127,10 @@ class CantataMainViewController: BaseViewController{
     public var deleteEnableSet: NSMutableSet = NSMutableSet()
     private var cosingerDegree: Int = 0
     private var isPause: Bool = false
-    private var earValue: Double = 0
-    private var soundValue: Int = 0
-    private var playoutVolume: Int = 0 {
+    private var earValue: Double = 100
+    private var soundValue: Int = 100
+    private var isNetWorkBad: Bool = false
+    private var playoutVolume: Int = 50 {
         didSet {
             self.ktvApi.getMusicPlayer()?.adjustPlayoutVolume(Int32(playoutVolume))
             self.ktvApi.getMusicPlayer()?.adjustPublishSignalVolume(Int32(playoutVolume))
@@ -137,20 +139,20 @@ class CantataMainViewController: BaseViewController{
     }
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
+        layoutUI()
         isRoomOwner = VLUserCenter.user.ifMaster
         if isRoomOwner {
             guard let roomNo = roomModel?.roomNo else {return}
             ApiManager.shared.fetchStartCloud(mainChannel: roomNo, cloudRtcUid: 232425)
         }
         subscribeServiceEvent()
-        layoutUI()
         loadRtc()
     }
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         UIViewController.popGestureClose(self)
+        
     }
 
     public override func viewDidAppear(_ animated: Bool) {
@@ -284,6 +286,7 @@ extension CantataMainViewController {
 //        }
 //
         botView.updateMicState(!isNowMicMuted)
+        
     }
     
     private func loadKtvApi() {
@@ -344,7 +347,7 @@ extension CantataMainViewController {
    
         }
         
-        self.ktvApi.loadMusic(songCode: Int(model.songNo ?? "") ?? 0, config: config, onMusicLoadStateListener: self)
+        self.ktvApi?.loadMusic(songCode: Int(model.songNo ?? "") ?? 0, config: config, onMusicLoadStateListener: self)
         self.ktvApi.switchSingerRole2(newRole: role) { state, reason in
             if state != .success {
                 print("switch failed:\(role)----\(state.rawValue)")
@@ -403,6 +406,8 @@ extension CantataMainViewController {
         guard let selSongArray = self.selSongArray, let model = selSongArray.first as? VLRoomSelSongModel else {
             return
         }
+        
+        self.RtcKit.setParameters("{\"rtc.use_audio4\": true}")
 
         let role: KTVSingRole = .coSinger
         let songConfig = KTVSongConfiguration()
@@ -613,22 +618,24 @@ extension CantataMainViewController {
     private func makeChorusArray() -> [VLRoomSeatModel] {
         //生成麦位展示的数据
         guard let seatArray = self.seatsArray, let topSong = self.selSongArray?.first else {return []}
-        var chorusArray = getChorusSingerArray(with: seatArray)
-        let topSeat = chorusArray.first
-        //如果当前歌曲是房主演唱，房主就是第一位，否则第一位就是演唱者，然后其他人顺延
-        if topSong.userNo != topSeat?.userNo {
-           // let ownerSeat = seatArray.filter { $0.userNo == topSong.userNo && isStringValid(topSong.userNo) && isStringValid($0.userNo) }
-            chorusArray = seatArray.filter { $0.userNo != topSong.userNo}
-            //chorusArray.insert(contentsOf: ownerSeat, at: 0)
-        }
+
+        var micArray = [VLRoomSeatModel]()
+        let topSeat = seatArray.first
+        //如果当前歌曲不是第一位演唱 那么第一位就是点歌人，然后其他人顺延
+        var hostArray = seatArray.filter { $0.userNo == topSong.userNo}
+        var chorusArray = seatArray.filter { $0.userNo != topSong.userNo}
+        
+        micArray.append(contentsOf: hostArray)
+        micArray.append(contentsOf: chorusArray)
+        
         //如果chorusArray的个数小于8就补齐8个
-        if chorusArray.count < 8 {
-            let count = 8 - chorusArray.count
+        if micArray.count < 8 {
+            let count = 8 - micArray.count
             for i in 0..<count {
-                chorusArray.append(VLRoomSeatModel())
+                micArray.append(VLRoomSeatModel())
             }
         }
-        return chorusArray
+        return micArray
     }
 }
 
@@ -704,7 +711,7 @@ extension CantataMainViewController {
                     if let model = self.getUserSeatInfo(with: seatModel.userNo), let preUserNo = model.userNo, let preCode = model.chorusSongCode {
                         //如果自己不是房主 并且之前是合唱 但是现在不是合唱了 需要主动退出合唱
                         if VLUserCenter.user.id == preUserNo {
-                            if self.isStringValid(preCode) == true {
+                            if self.isStringValid(preCode) == true && self.selSongArray?.count ?? 0 > 0 {
                                 self.leaveSeat()
                                 self.removeSongAndReloadStatus()
                                 self.lrcControlView.controlState = .joinChorus
@@ -722,7 +729,10 @@ extension CantataMainViewController {
                     if let seatArray = self.seatsArray,let index = seatArray.firstIndex(where: { $0.userNo == seatModel.userNo }) {
                         deleteIndex = index
                     }
-                    self.seatsArray?.remove(at: deleteIndex)
+                    
+                    if deleteIndex < self.seatsArray?.count ?? 0 {
+                        self.seatsArray?.remove(at: deleteIndex)
+                    }
                     
                     self.cosingerDegree = 0
                     self.lrcControlView.setScore(with: 0)
@@ -836,11 +846,12 @@ extension CantataMainViewController {
 
         AppContext.ktvServiceImp()?.subscribeNetworkStatusChanged {[weak self] status in
             guard let self = self else {return}
+            self.isNetWorkBad = status != .open
             if status != .open {
-                // [VLToast toast:[NSString stringWithFormat:@"network changed: %ld", status]]
+                VLToast.toast("网络中断，请切歌重试")
                 return
             }
-            self.subscribeServiceEvent()
+           // self.subscribeServiceEvent()
            // self._fetchServiceAllData()
         }
 
@@ -1110,6 +1121,11 @@ extension CantataMainViewController {
             }
 
             self.selSongArray = songArray
+            //判断一下如果在麦位上就给他加入合唱
+            if let micSeat = self.getCurrentUserMicSeat() {
+                self.chorusMicView.seatArray = self.seatsArray
+                self.joinChorus()
+            }
         }
     }
     
@@ -1253,7 +1269,7 @@ extension CantataMainViewController {
     }
     
     func isStringValid(_ str: String?) -> Bool {
-        if let string = str, !string.isEmpty {
+        if let string = str, !string.isEmpty, string.count > 0 {
             return true
         } else {
             return false
@@ -1262,9 +1278,10 @@ extension CantataMainViewController {
     
     private func showSettingView() {
         let popView = LSTPopView.popSettingView(withParentView: self.view, settingView: self.settingView, withDelegate: self)
-        self.settingView = popView.currCustomView as? VLKTVSettingView
+        self.settingView = popView.currCustomView as? DHCVLKTVSettingView
+        self.settingView?.setIsEarOn(self.isEarOn)
         self.settingView?.setIspause(self.isPause)
-        self.settingView?.setIMMode(Int32(isIMMode))
+        self.settingView?.setIMMode((Int32(isIMMode) != 0))
     }
 }
 
@@ -1335,6 +1352,10 @@ extension CantataMainViewController: DHCGameDelegate {
         } else if event == .showChorus {//显示演唱者列表
             showChorusListView()
         } else if event == .next {//切歌
+            if isNetWorkBad {
+                VLToast.toast("网络异常，请检查网络")
+                return
+            }
             changeToNextSong()
         } else if event == .play {//播放
             self.ktvApi.getMusicPlayer()?.play()
@@ -1532,6 +1553,12 @@ extension CantataMainViewController: VLBottomViewDelegate {
         AppContext.ktvServiceImp()?.updateSeatAudioMuteStatus(with: self.isNowMicMuted, completion: { err in
             self.RtcKit.adjustRecordingSignalVolume(self.isNowMicMuted ? 0 : 100)
         })
+        
+        if self.isEarOn && self.isNowMicMuted {
+            self.isEarOn = false
+            self.settingView?.setIsEarOn(false)
+            self.RtcKit.enable(inEarMonitoring: self.isEarOn, includeAudioFilters: .none)
+        }
     }
 
 }
@@ -1567,47 +1594,64 @@ extension CantataMainViewController: VLDropOnLineViewDelegate {
 
 }
 
-extension CantataMainViewController: VLKTVSettingViewDelegate {
-    func settingViewSettingChanged(_ setting: VLKTVSettingModel!, valueDidChangedType type: VLKTVValueDidChangedType) {
-        if type == .typeEar {
+extension CantataMainViewController: DHCVLKTVSettingViewDelegate, VLEarSettingViewViewDelegate{
+    func settingViewEffectChoosed(_ effectIndex: Int) {
+        self.selectedEffectIndex = effectIndex
+        let effects: [AgoraAudioEffectPreset] = [
+            .off,
+            .roomAcousticsChorus,
+            .roomAcousticsKTV,
+            .roomAcousVocalConcer,
+            .roomAcousStudio,
+            .roomAcousPhonograph,
+            .roomAcousSpatial,
+            .roomAcousEthereal,
+            .styleTransformationPopular,
+            .styleTransformationRnb
+        ]
+        self.RtcKit.setAudioEffectPreset(effects[effectIndex])
+    }
+    
+    func settingViewSettingChanged(_ setting: VLKTVSettingModel!, valueDidChangedType type: DHCVLKTVValueDidChangedType) {
+        if type == DHCVLKTVValueDidChangedTypeEar {
             showEarSettingView()
-        } else if type == .typeSound {
-            let value = Int(setting.soundValue * 100)
+        } else if type == DHCVLKTVValueDidChangedTypeSound {
+            let value = Int(setting.soundValue)
             if self.soundValue != value {
                 self.RtcKit.adjustRecordingSignalVolume(value)
                 self.soundValue = value;
             }
-        } else if type == .typeAcc {
-            let value = setting.accValue * 100
+        } else if type == DHCVLKTVValueDidChangedTypeAcc {
+            let value = Int(setting.accValue)
             if(self.playoutVolume != Int(value)){
                 self.playoutVolume = Int(value);
             }
-        } else if type == .typeRemoteValue {
+        } else if type == DHCVLKTVValueDidChangedTypeRemoteValue {
             let value = Int(setting.remoteVolume)
             self.RtcKit.adjustPlaybackSignalVolume(value)
-        } else if type == .typeIMMode {
+        } else if type == DHCVLKTVValueDidChangedTypeIMMode {
             let value = Int(setting.imMode)
             self.isIMMode = value
-            self.RtcKit.adjustPlaybackSignalVolume(value == 1 ? 0 : 30)
         }
     }
-
+    
     private func showEarSettingView() {
-        LSTPopView.popEarSettingView(withParentView: self.view, isEarOn: self.isEarOn, vol: CGFloat(self.earValue), withDelegate: self)
+        LSTPopView.popEarSettingView(withParentView: self.view, isEarOn: self.isEarOn, vol: CGFloat(self.earValue), with: self)
     }
     
     public func onVLKTVEarSettingViewValueChanged(_ value: Double) {
         //耳返音量
-        if self.earValue == value {
+        let changeVol = Double(Int(value * 100))
+        if self.earValue == changeVol {
             return
         }
-        self.earValue = value
-        self.RtcKit.setInEarMonitoringVolume(Int(value))
+        self.earValue = changeVol
+        self.RtcKit.setInEarMonitoringVolume(Int(changeVol))
     }
     
-    public func onVLKTVEarSettingViewSwitchChanged(_ flag:Bool) {
-        //耳返开关
-        self.isEarOn =  flag
+    func onVLKTVEarSettingViewSwitchChanged(_ flag: Bool) {
+        self.isEarOn = flag;
+        self.settingView?.setIsEarOn(flag)
         self.RtcKit.enable(inEarMonitoring: flag, includeAudioFilters: .none)
     }
     

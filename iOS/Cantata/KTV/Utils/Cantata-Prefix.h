@@ -38,7 +38,6 @@
 #define VLKTVSwitcherView Prefix(VLKTVSwitcherView)
 #define VLHomeOnLineListView Prefix(VLHomeOnLineListView)
 #define VLKTVMVIdleView Prefix(VLKTVMVIdleView)
-#define VLKTVSettingView Prefix(VLKTVSettingView)
 #define VLKTVTonesView Prefix(VLKTVTonesView)
 #define VLKTVTopView Prefix(VLKTVTopView)
 #define VLKTVViewController Prefix(VLKTVViewController)
@@ -55,9 +54,8 @@
 #define VLSelectedSongList Prefix(VLSelectedSongList)
 #define VLSelectedSongListCell Prefix(VLSelectedSongListCell)
 #define VLSelectSongTableItemView Prefix(VLSelectSongTableItemView)
-
+#define VLEarSettingView Prefix(VLEarSettingView)
 #define VLKTVKindsView Prefix(VLKTVKindsView)
-#define VLKTVSettingView Prefix(VLKTVSettingView)
 #define VLMicSeatList Prefix(VLMicSeatList)
 #define VLPopScoreView Prefix(VLPopScoreView)
 #define VLSongList Prefix(VLSongList)

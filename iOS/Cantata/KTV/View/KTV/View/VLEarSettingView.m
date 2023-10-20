@@ -25,7 +25,7 @@
 @end
 @implementation VLEarSettingView
 
-- (instancetype)initWithFrame:(CGRect)frame isEarOn:(BOOL)isEarOn vol:(CGFloat)vol withDelegate:(id)delegate {
+- (instancetype)initWithFrame:(CGRect)frame isEarOn:(BOOL)isEarOn vol:(CGFloat)vol withDelegate:(id<VLEarSettingViewViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
         [self initSubViews];
         [self addSubViewConstraints];
@@ -183,9 +183,9 @@
     }
 }
 
-//-(void)setSliderValue:(float)sliderValue {
-//    _sliderValue = sliderValue;
-//}
+-(void)setSliderValue:(float)sliderValue {
+    _sliderValue = sliderValue;
+}
 
 - (void)sliderView:(VLKTVSliderView *)sliderView valueChanged:(float)value{
     self.sliderValue = value ;

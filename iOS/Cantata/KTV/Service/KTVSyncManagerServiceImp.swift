@@ -1012,18 +1012,20 @@ extension KTVSyncManagerServiceImp {
                 return
             }
             
+            guard self.seatMap.count == 0 else {
+                return
+            }
+
+            
+            list.forEach { seat in
+                self.seatMap["\(seat.rtcUid)"] = seat
+            }
+            
             completion(list)
             return
             
             //TODO: _getSeatInfo will callback if remove seat invoke
-            guard self.seatMap.count == 0 else {
-                return
-            }
             
-            list.forEach { seat in
-                self.seatMap["\(seat.seatIndex)"] = seat
-            }
-
             // update seat info (user avater/nick name did changed) if seat existed
             if let seat = self.seatMap.filter({ $0.value.userNo == VLUserCenter.user.id }).first?.value {
                 let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.seatIndex, model: seat)

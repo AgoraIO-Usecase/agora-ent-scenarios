@@ -1129,7 +1129,7 @@ extension KTVApiImpl {
     @objc public func didKTVAPIReceiveStreamMessageFrom(uid: NSInteger, streamId: NSInteger, data: Data) {
         let role = singerRole
         guard let dict = dataToDictionary(data: data), let cmd = dict["cmd"] as? String else { return }
-        
+        print("recv dict:\(dict)")
         switch cmd {
         case "setLrcTime":
             handleSetLrcTimeCommand(dict: dict, role: role)
@@ -1494,6 +1494,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         agoraPrint("agoraRtcMediaPlayer didChangedToState: \(state.rawValue) \(self.songCode)")
         if isRelease {return}
+        self.playerState = state
         if state == .openCompleted {
             self.localPlayerPosition = Date().milListamp
             print("localPlayerPosition:playerKit:openCompleted \(localPlayerPosition)")
@@ -1518,7 +1519,6 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         if isMainSinger() {
             syncPlayState(state: state, error: error)
         }
-        self.playerState = state
         agoraPrint("recv state with player callback : \(state.rawValue)")
         if state == .playBackAllLoopsCompleted && singerRole == .coSinger {//可能存在伴唱不返回allloopbackComplete状态 这个状态通过主唱的playerState来同步
             return

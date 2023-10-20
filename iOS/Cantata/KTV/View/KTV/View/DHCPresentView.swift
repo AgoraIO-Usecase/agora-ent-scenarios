@@ -100,6 +100,13 @@ class DHCPresentView: UIView, UIGestureRecognizerDelegate {
         print(rect)
     }
     
+    @objc public func update(_ height: CGFloat) {
+        UIView.animate(withDuration: 0.5) {
+            let rect = CGRect(x: 0, y: UIScreen.main.bounds.height - height, width: self.mainView.frame.width, height: height)
+            self.mainView.frame = rect
+        }
+    }
+    
     @objc func push(with vc: UIViewController, frame: CGRect, maxHeight: CGFloat) {
         frames.append(frame)
         maxHeights.append(maxHeight)

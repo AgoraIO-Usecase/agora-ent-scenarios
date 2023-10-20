@@ -241,6 +241,7 @@ VLKTVRemoteVolumeViewDelegate
 {
     self.setting.soundOn = isEarOn;
     self.soundSwitcher.on = isEarOn;
+    self.soundSwitcher.subText = isEarOn ? @"开启" : @"关闭";
 }
 
 - (void)setAccValue:(float)accValue {

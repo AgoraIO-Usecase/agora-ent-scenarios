@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)onVLKTVEarSettingViewSwitchChanged:(BOOL)flag;
 @end
 @interface VLEarSettingView : VLBaseView
-- (instancetype)initWithFrame:(CGRect)frame isEarOn:(BOOL)isEarOn vol:(CGFloat)vol withDelegate:(id)delegate;
+- (instancetype)initWithFrame:(CGRect)frame isEarOn:(BOOL)isEarOn vol:(CGFloat)vol withDelegate:(id<VLEarSettingViewViewDelegate>)delegate;
 @property (nonatomic, weak) id <VLEarSettingViewViewDelegate> delegate;
 @end
 

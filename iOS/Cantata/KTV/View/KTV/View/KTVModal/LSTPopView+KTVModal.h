@@ -12,8 +12,8 @@
 #import "VLAudioEffectPicker.h"
 #import "VLBadNetWorkView.h"
 #import "VLEffectView.h"
-#import "VLKTVSettingView.h"
-
+#import "DHCVLKTVSettingView.h"
+#import "VLEarSettingView.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LSTPopView (KTVModal)
@@ -59,14 +59,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 //控制台
 + (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
-                               settingView:(nullable VLKTVSettingView*)settingView
+                               settingView:(nullable DHCVLKTVSettingView*)settingView
                                withDelegate:(id)delegate;
 
 //弹出耳返视图
 + (LSTPopView*)popEarSettingViewWithParentView:(UIView*)parentView
                                    isEarOn:(BOOL)isEarOn
                                            vol:(CGFloat)vol
-                                  withDelegate:(id)delegate;
+                                  withDelegate:(id<VLEarSettingViewViewDelegate>)delegate;
 
 @end
 
