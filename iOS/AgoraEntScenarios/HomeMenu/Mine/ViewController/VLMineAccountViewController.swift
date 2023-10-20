@@ -8,7 +8,7 @@
 import UIKit
 
 @objc
-class VLMineAccountViewController: BaseViewController {
+class VLMineAccountViewController: VLBaseViewController {
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.translatesAutoresizingMaskIntoConstraints = false

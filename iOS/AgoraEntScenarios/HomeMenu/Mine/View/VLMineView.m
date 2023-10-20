@@ -57,8 +57,8 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
     [self.mineTopView addSubview:self.nickNameTF];
     [self.mineTopView addSubview:self.IDLabel];
     [self.mineTopView addSubview:self.editBtn];
-    [self.avatarImgView.widthAnchor constraintEqualToConstant:VLREALVALUE_WIDTH(60)].active = YES;
-    [self.avatarImgView.heightAnchor constraintEqualToConstant:VLREALVALUE_WIDTH(60)].active = YES;
+    [self.avatarImgView.widthAnchor constraintEqualToConstant:VLREALVALUE_WIDTH(80)].active = YES;
+    [self.avatarImgView.heightAnchor constraintEqualToConstant:VLREALVALUE_WIDTH(80)].active = YES;
     [self.avatarImgView.centerXAnchor constraintEqualToAnchor:self.mineTopView.centerXAnchor].active = YES;
     [self.avatarImgView.bottomAnchor constraintEqualToAnchor:self.mineTopView.centerYAnchor constant:0].active = YES;
     
@@ -96,7 +96,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
         height += 16.0 + self.dataArray[i].count * VLREALVALUE_WIDTH(58);
     }
     height = self.frame.size.height - height - 20;
-    height = height < 150 ? 150 : height;
+    height = height < 155 ? 155 : height;
     self.mineTopView.frame = CGRectMake(0, 0, SCREEN_WIDTH, height);
     [self.mineTable reloadData];
 }
@@ -221,7 +221,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 - (UIImageView *)avatarImgView {
     if (!_avatarImgView) {
         _avatarImgView = [[UIImageView alloc] init];
-        _avatarImgView.layer.cornerRadius = VLREALVALUE_WIDTH(60)*0.5;
+        _avatarImgView.layer.cornerRadius = VLREALVALUE_WIDTH(80)*0.5;
         _avatarImgView.layer.masksToBounds = YES;
         _avatarImgView.userInteractionEnabled = YES;
         _avatarImgView.contentMode = UIViewContentModeScaleAspectFit;

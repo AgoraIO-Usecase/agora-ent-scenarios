@@ -13,7 +13,6 @@ static NSString * const kChoosedSongListChangedNotification = @"choosedSongListC
 #pragma mark - API
 static NSString * const kURLPathUploadImage = @"/api-login/upload"; //上传图片
 static NSString * const kURLPathGetUserInfo = @"/api-login/users/getUserInfo"; //获取用户信息
-static NSString * const kURLPathLogin = @"/api-login/users/login"; // 登录
 static NSString * const kURLPathLogout = @"/api-login/users/logout"; // 退出登录 （接口文档未完成）
 static NSString * const kURLPathUploadUserInfo = @"/api-login/users/update";  //修改用户信息
 
