@@ -2,6 +2,7 @@ package com.agora.entfulldemo.home
 
 import android.content.pm.ActivityInfo
 import android.graphics.Color
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import com.agora.entfulldemo.home.constructor.URLStatics
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnFastClickListener
 import io.agora.scene.base.manager.PagePilotManager
+import io.agora.scene.base.manager.UserManager
 
 class HomeFindFragment : BaseViewBindingFragment<AppFragmentHomeFindBinding>() {
     private var fullscreenContainer: FrameLayout? = null
@@ -21,8 +23,14 @@ class HomeFindFragment : BaseViewBindingFragment<AppFragmentHomeFindBinding>() {
         return AppFragmentHomeFindBinding.inflate(inflater)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+//        setOnApplyWindowInsetsListener(binding.root)
+    }
+
     override fun initView() {
-        binding.webView.loadUrl("file:///android_asset/index.html")
+//        binding.webView.loadUrl("file:///android_asset/index.html")
+        loadBannerWeb()
     }
 
     override fun initListener() {
@@ -72,6 +80,13 @@ class HomeFindFragment : BaseViewBindingFragment<AppFragmentHomeFindBinding>() {
                 PagePilotManager.pageWebView(URLStatics.findAISpatialURL)
             }
         })
+    }
+
+    private fun loadBannerWeb(){
+        val stringBuilder =
+            StringBuilder(URLStatics.findBannerURL)
+                .append("?token=").append(UserManager.getInstance().user.token)
+        binding.webView.loadUrl(stringBuilder.toString())
     }
 
     private inner class MyWebChromeClient : WebChromeClient() {

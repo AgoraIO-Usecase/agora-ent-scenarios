@@ -9,6 +9,9 @@ class URLStatics {
         const val collectionChecklistURL = "http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest/index.html"
         const val thirdDataSharingURL = "https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/libraries.html"
 
+        //开发服：https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover-dev/index.html
+        //正式服：https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover/index.html
+        const val findBannerURL = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover-dev/index.html"
         const val findKtvSearchURL = "https://www.shengwang.cn/ktv_feedback/"
         const val findScenarioKtvURL = "https://www.shengwang.cn/solution/online-karaoke/"
         const val findDocKtvURL = "https://docportal.shengwang.cn/cn/online-ktv/landing-page?platform=Android"
