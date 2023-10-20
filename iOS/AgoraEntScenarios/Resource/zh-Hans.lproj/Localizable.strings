@@ -13,6 +13,7 @@
 "app_action_settings"="设置";
 
 "app_exit"="退出";
+"app_my_account"="我的账号";
 "app_user_agreement"="用户协议";
 "app_privacy_agreement"="隐私政策";
 "app_personal_info_collection_checklist"="个人信息收集清单";
@@ -21,6 +22,7 @@
 
 "app_confirm_deletion"="确认删除？";
 "app_about_us"="关于我们";
+"app_submit_feedback" = "提交反馈";
 
 "app_please_input_account"="请输入手机号";
 "app_error_pwd_tip"="8~20个字符，包含大、小写字母和数字";
@@ -36,8 +38,11 @@
 
 "app_plus_86"="+86";
 "app_logout"="退出登录";
+"app_logout_desc"="退出登录后，我们将保留您的数据信息，期待下次与您相遇";
 "app_logoff_account"="注销账号";
-"app_logoff"="注销";
+"app_logooff_account_desc" = "注销后，您将无法使用当前账号体验我们的服务，请谨慎考虑";
+"app_logoff"="确认注销";
+"app_not_logoff"="暂不注销";
 "app_debug_mode"="开发者模式";
 
 "app_voice_chat"="语聊房";
