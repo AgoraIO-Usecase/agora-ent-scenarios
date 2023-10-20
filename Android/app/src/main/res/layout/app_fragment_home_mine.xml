@@ -134,7 +134,7 @@
                     app:dividerColor="@color/def_diver_grey_F2F" />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tvDataSharing"
+                    android:id="@+id/tvThirdDataSharing"
                     style="@style/app_tv_mine_style"
                     android:text="@string/app_third_party_info_data_sharing" />
 
