@@ -4,11 +4,10 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import io.agora.rtc2.Constants
-import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.RtcEngineEx
 
 /**
- *
+ * 视频流管理模块
  */
 interface VideoLoader {
 
@@ -107,25 +106,4 @@ interface VideoLoader {
      * @param container 视频渲染的容器，内部会把view显示在容器的指定区域
      */
     fun renderVideo(anchorInfo: AnchorInfo, localUid: Int, container: VideoCanvasContainer)
-
-    /**
-     * 开启混音
-     *
-     * @param filePath 文件路径，assets下文件以/assets/开头
-     * @param loopbackOnly 是否仅本地播放，true: 仅本地播放不推给远端，false: 本地播放并推给远端
-     * @param cycle ≥ 0: 播放次数。-1: 无限循环播放。
-     *
-     */
-    fun startAudioMixing(connection: RtcConnection, filePath: String, loopbackOnly: Boolean, cycle: Int)
-
-    /**
-     * 停止混音
-     */
-    fun stopAudioMixing(connection: RtcConnection)
-
-    /**
-     * 调整音乐音量
-     * @param volume 0～100
-     */
-    fun adjustAudioMixingVolume(connection: RtcConnection, volume: Int)
 }

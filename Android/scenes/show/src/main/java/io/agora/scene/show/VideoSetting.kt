@@ -9,7 +9,6 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.GsonUtil
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.show.videoLoaderAPI.VideoLoader
 
 object VideoSetting {
 
@@ -845,7 +844,6 @@ object VideoSetting {
         ShowLogger.d("VideoSettings", "updateRTCBroadcastSetting, frameRate:$frameRate")
         val rtcEngine = RtcEngineInstance.rtcEngine
         val videoEncoderConfiguration = RtcEngineInstance.videoEncoderConfiguration
-        val videoLoaderApi = VideoLoader.getImplInstance(rtcEngine)
         h265?.let {
             if (!isJoinedRoom) {
                 // 只能在加入房间前设置，否则rtc sdk会崩溃
@@ -923,7 +921,7 @@ object VideoSetting {
         }
         audioMixingVolume?.let {
             if (rtcConnection != null) {
-                videoLoaderApi.adjustAudioMixingVolume(rtcConnection, it)
+                //videoLoaderApi.adjustAudioMixingVolume(rtcConnection, it)
             } else {
                 rtcEngine.adjustAudioMixingVolume(it)
             }

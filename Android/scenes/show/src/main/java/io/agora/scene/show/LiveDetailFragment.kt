@@ -23,6 +23,10 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import io.agora.mediaplayer.IMediaPlayer
+import io.agora.mediaplayer.IMediaPlayerObserver
+import io.agora.mediaplayer.data.PlayerUpdatedInfo
+import io.agora.mediaplayer.data.SrcInfo
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
@@ -53,6 +57,7 @@ import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowRoomRequestStatus
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.service.ShowUser
+import io.agora.scene.show.videoLoaderAPI.AnchorState
 import io.agora.scene.show.videoLoaderAPI.OnPageScrollEventHandler
 import io.agora.scene.show.videoLoaderAPI.VideoLoader
 import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
@@ -782,7 +787,9 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun showAdvanceSettingDialog() {
-        AdvanceSettingDialog(requireContext(), mMainRtcConnection).apply {
+        AdvanceSettingDialog(requireContext(), mMainRtcConnection) { volume ->
+            adjustAudioMixingVolume(volume)
+        }.apply {
             setItemShowTextOnly(AdvanceSettingDialog.ITEM_ID_SWITCH_QUALITY_ENHANCE, true)
             setItemShowTextOnly(AdvanceSettingDialog.ITEM_ID_SWITCH_BITRATE_SAVE, true)
             show()
@@ -834,16 +841,16 @@ class LiveDetailFragment : Fragment() {
         mMusicEffectDialog.setOnItemSelectedListener { musicEffectDialog, itemId ->
             when (itemId) {
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_NONE -> {
-                    mRtcVideoLoaderApi.stopAudioMixing(mMainRtcConnection)
+                    stopAudioMixing()
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY -> {
-                    mRtcVideoLoaderApi.startAudioMixing(mMainRtcConnection, "/assets/happy.mp3", false, -1)
+                    startAudioMixing("/assets/happy.mp3", false, -1)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_ROMANTIC -> {
-                    mRtcVideoLoaderApi.startAudioMixing(mMainRtcConnection, "/assets/romantic.mp3", false, -1)
+                    startAudioMixing("/assets/romantic.mp3", false, -1)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY2 -> {
-                    mRtcVideoLoaderApi.startAudioMixing(mMainRtcConnection, "/assets/relax.mp3", false, -1)
+                    startAudioMixing("/assets/relax.mp3", false, -1)
                 }
 
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_ORIGINAL -> {
@@ -1612,6 +1619,7 @@ class LiveDetailFragment : Fragment() {
         if (isRoomOwner) {
             mRtcEngine.stopPreview()
             mRtcEngine.leaveChannelEx(mMainRtcConnection)
+            mMediaPlayer?.destroy()
         }
         return true
     }
@@ -2120,5 +2128,103 @@ class LiveDetailFragment : Fragment() {
             mRtcEngine.setupLocalVideo(this)
             localVideoCanvas = null
         }
+    }
+
+    // 播放音乐相关接口
+    private var mMediaPlayer: IMediaPlayer? = null
+    private fun startAudioMixing(
+        filePath: String,
+        loopbackOnly: Boolean,
+        cycle: Int
+    ) {
+        val mediaPlayer = mMediaPlayer ?: mRtcEngine.createMediaPlayer().apply {
+            registerPlayerObserver(object : IMediaPlayerObserver {
+                override fun onPlayerStateChanged(
+                    state: io.agora.mediaplayer.Constants.MediaPlayerState?,
+                    error: io.agora.mediaplayer.Constants.MediaPlayerError?
+                ) {
+                    if(error == io.agora.mediaplayer.Constants.MediaPlayerError.PLAYER_ERROR_NONE){
+                        if(state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED){
+                            play()
+                        }
+                    }
+                }
+
+                override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
+
+                }
+
+                override fun onPlayerEvent(
+                    eventCode: io.agora.mediaplayer.Constants.MediaPlayerEvent?,
+                    elapsedTime: Long,
+                    message: String?
+                ) {
+
+                }
+
+                override fun onMetaData(
+                    type: io.agora.mediaplayer.Constants.MediaPlayerMetadataType?,
+                    data: ByteArray?
+                ) {
+
+                }
+
+                override fun onPlayBufferUpdated(playCachedBuffer: Long) {
+
+                }
+
+                override fun onPreloadEvent(
+                    src: String?,
+                    event: io.agora.mediaplayer.Constants.MediaPlayerPreloadEvent?
+                ) {
+
+                }
+
+                override fun onAgoraCDNTokenWillExpire() {
+
+                }
+
+                override fun onPlayerSrcInfoChanged(from: SrcInfo?, to: SrcInfo?) {
+
+                }
+
+                override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {
+
+                }
+
+                override fun onAudioVolumeIndication(volume: Int) {
+
+                }
+            })
+        }
+        mMediaPlayer = mediaPlayer
+        mediaPlayer.stop()
+        mediaPlayer.open(filePath, 0)
+        mediaPlayer.setLoopCount(if (cycle >= 0) 0 else Int.MAX_VALUE)
+
+        if (!loopbackOnly) {
+            val mediaOptions = ChannelMediaOptions()
+            mediaOptions.publishMediaPlayerId = mediaPlayer.mediaPlayerId
+            // TODO: 没开启麦克风权限情况下，publishMediaPlayerAudioTrack = true 会自动停止音频播放
+            mediaOptions.publishMediaPlayerAudioTrack = true
+            mRtcEngine.updateChannelMediaOptionsEx(mediaOptions, mMainRtcConnection)
+        }
+    }
+
+    private fun stopAudioMixing() {
+        // 停止播放，拿到connection对应的MediaPlayer并停止释放
+        mMediaPlayer?.stop()
+
+        // 停止推流，使用updateChannelMediaOptionEx
+        val mediaOptions = ChannelMediaOptions()
+        if (mediaOptions.isPublishMediaPlayerAudioTrack) {
+            mediaOptions.publishMediaPlayerAudioTrack = false
+            mRtcEngine.updateChannelMediaOptionsEx(mediaOptions, mMainRtcConnection)
+        }
+    }
+
+    private fun adjustAudioMixingVolume(volume: Int) {
+        mMediaPlayer?.adjustPlayoutVolume(volume)
+        mMediaPlayer?.adjustPublishSignalVolume(volume)
     }
 }

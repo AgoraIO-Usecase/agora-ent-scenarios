@@ -6,10 +6,6 @@ import android.view.TextureView
 import android.view.View
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import io.agora.mediaplayer.IMediaPlayer
-import io.agora.mediaplayer.IMediaPlayerObserver
-import io.agora.mediaplayer.data.PlayerUpdatedInfo
-import io.agora.mediaplayer.data.SrcInfo
 import io.agora.rtc2.*
 import io.agora.rtc2.video.VideoCanvas
 import java.util.*
@@ -339,8 +335,6 @@ class VideoLoaderImpl constructor(private val rtcEngine: RtcEngineEx) : VideoLoa
     inner class RtcConnectionWrap constructor(connection: RtcConnection) :
         RtcConnection(connection.channelId, connection.localUid) {
 
-        var audioMixingPlayer : IMediaPlayer? = null
-
         fun isSameChannel(connection: RtcConnection?) =
             connection != null && channelId == connection.channelId && localUid == connection.localUid
 
@@ -375,134 +369,6 @@ class VideoLoaderImpl constructor(private val rtcEngine: RtcEngineEx) : VideoLoa
             lifecycleOwner.lifecycle.removeObserver(this)
             view = null
             remoteVideoCanvasList.remove(this)
-        }
-    }
-
-    // TODO
-    override fun startAudioMixing(
-        connection: RtcConnection,
-        filePath: String,
-        loopbackOnly: Boolean,
-        cycle: Int
-    ) {
-        // 判断connetion是否加入了频道，即connectionsJoined是否包含，不包含则直接返回
-        anchorStateMap.forEach {
-            if (it.key.isSameChannel(connection) && it.value == AnchorState.JOINED) {
-                val connectionWrap = it.key
-                // 播放使用MPK，rtcEngine.createMediaPlayer
-                // 使用一个Map缓存起来key:RtcConnection, value:MediaPlayer
-                // 从缓存里取MediaPlayer，如不存在则重新创建
-                // val mediaPlayer = rtcEngine.createMediaPlayer()
-                val mediaPlayer = connectionWrap.audioMixingPlayer ?: rtcEngine.createMediaPlayer().apply {
-                    registerPlayerObserver(object : IMediaPlayerObserver {
-                        override fun onPlayerStateChanged(
-                            state: io.agora.mediaplayer.Constants.MediaPlayerState?,
-                            error: io.agora.mediaplayer.Constants.MediaPlayerError?
-                        ) {
-                            if(error == io.agora.mediaplayer.Constants.MediaPlayerError.PLAYER_ERROR_NONE){
-                                if(state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED){
-                                    play()
-                                }
-                            }
-                        }
-
-                        override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
-
-                        }
-
-                        override fun onPlayerEvent(
-                            eventCode: io.agora.mediaplayer.Constants.MediaPlayerEvent?,
-                            elapsedTime: Long,
-                            message: String?
-                        ) {
-
-                        }
-
-                        override fun onMetaData(
-                            type: io.agora.mediaplayer.Constants.MediaPlayerMetadataType?,
-                            data: ByteArray?
-                        ) {
-
-                        }
-
-                        override fun onPlayBufferUpdated(playCachedBuffer: Long) {
-
-                        }
-
-                        override fun onPreloadEvent(
-                            src: String?,
-                            event: io.agora.mediaplayer.Constants.MediaPlayerPreloadEvent?
-                        ) {
-
-                        }
-
-                        override fun onAgoraCDNTokenWillExpire() {
-
-                        }
-
-                        override fun onPlayerSrcInfoChanged(from: SrcInfo?, to: SrcInfo?) {
-
-                        }
-
-                        override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {
-
-                        }
-
-                        override fun onAudioVolumeIndication(volume: Int) {
-
-                        }
-                    })
-                }
-                connectionWrap.audioMixingPlayer = mediaPlayer
-                mediaPlayer.stop()
-                mediaPlayer.open(filePath, 0)
-                mediaPlayer.setLoopCount(if (cycle >= 0) 0 else Int.MAX_VALUE)
-
-                // 开始推流，使用updateChannelMediaOptionEx
-                // 使用一个Map缓存ChannelMediaOptions--key:RtcConnection, value:ChannelMediaOptions
-                // val channelMediaOptions = ChannelMediaOptions()
-                // channelMediaOptions.publishMediaPlayerId = mediaPlayer.getId()
-                // channelMediaOptions.publishMediaPlayerAudioTrack = true
-                // rtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, connection)
-                if(!loopbackOnly){
-                    val mediaOptions = ChannelMediaOptions()
-                    mediaOptions.publishMediaPlayerId = mediaPlayer.mediaPlayerId
-                    // TODO: 没开启麦克风权限情况下，publishMediaPlayerAudioTrack = true 会自动停止音频播放
-                    mediaOptions.publishMediaPlayerAudioTrack = true
-                    rtcEngine.updateChannelMediaOptionsEx(mediaOptions, connectionWrap)
-                }
-            }
-        }
-    }
-
-    override fun stopAudioMixing(connection: RtcConnection) {
-        // 判断connetion是否加入了频道，即connectionsJoined是否包含，不包含则直接返回
-        anchorStateMap.forEach {
-            if (it.key.isSameChannel(connection) && it.value == AnchorState.JOINED) {
-                val connectionWrap =
-                    it.key
-
-                // 停止播放，拿到connection对应的MediaPlayer并停止释放
-                connectionWrap.audioMixingPlayer?.stop()
-
-                // 停止推流，使用updateChannelMediaOptionEx
-                val mediaOptions = ChannelMediaOptions()
-                if (mediaOptions.isPublishMediaPlayerAudioTrack) {
-                    mediaOptions.publishMediaPlayerAudioTrack = false
-                    rtcEngine.updateChannelMediaOptionsEx(mediaOptions, connectionWrap)
-                }
-            }
-        }
-    }
-
-    override fun adjustAudioMixingVolume(connection: RtcConnection, volume: Int) {
-        anchorStateMap.forEach {
-            if (it.key.isSameChannel(connection) && it.value == AnchorState.JOINED) {
-                val connectionWrap =
-                    it.key
-                connectionWrap.audioMixingPlayer?.adjustPlayoutVolume(volume)
-                connectionWrap.audioMixingPlayer?.adjustPublishSignalVolume(volume)
-            }
         }
     }
 }
