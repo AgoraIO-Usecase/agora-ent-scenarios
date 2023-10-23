@@ -62,9 +62,9 @@ extension VLDiscoveryHeaderView: WKScriptMessageHandler, WKNavigationDelegate, W
     
         if method == "jumpToWebview" {
             let redirectUrl = (dict?["redirectUrl"] as? String) ?? ""
-            let index = (dict?["index"] as? Int) ?? -1
-            
-            print("redirectUrl == \(redirectUrl), index == \(index)")
+            let webViewVC = VLCommonWebViewController()
+            webViewVC.urlString = redirectUrl
+            UIViewController.cl_topViewController()?.navigationController?.pushViewController(webViewVC, animated: true)
         }
     }
 }
