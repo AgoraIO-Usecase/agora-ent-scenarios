@@ -34,7 +34,7 @@ class VLDiscoveryHeaderView: UICollectionReusableView {
     private func setupUI() {
         addSubview(webView)
         webView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        webView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        webView.topAnchor.constraint(equalTo: topAnchor, constant: 12.fit).isActive = true
         webView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         webView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         injectMethod(method: "JSBridge")

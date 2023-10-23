@@ -73,12 +73,12 @@ extension VLDiscoveyrViewController: UICollectionViewDelegate, UICollectionViewD
         guard let model = dataArray[indexPath.section].items?[indexPath.item] else { return .zero }
         switch model.layoutType {
         case .full, .side: return CGSize(width: (Screen.width - 40.fit), height: 100.fit)
-        case .half: return CGSize(width: (Screen.width - 40.fit - 13.fit) * 0.5, height: 100.fit)
+        case .half: return CGSize(width: (Screen.width - 40.fit - 16.fit) * 0.5, height: 100.fit)
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        UIEdgeInsets(top: 12.fit, left: 20.fit, bottom: 12.fit, right: 20.fit)
+        UIEdgeInsets(top: 12.fit, left: 20.fit, bottom: section == 0 ? 0 : 12.fit, right: 20.fit)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
@@ -90,7 +90,7 @@ extension VLDiscoveyrViewController: UICollectionViewDelegate, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        section == 0 ? CGSize(width: Screen.width, height: 225.fit) : CGSize(width: Screen.width, height: 20.fit)
+        section == 0 ? CGSize(width: Screen.width, height: 225.fit) : CGSize(width: Screen.width, height: 17.fit)
     }
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
