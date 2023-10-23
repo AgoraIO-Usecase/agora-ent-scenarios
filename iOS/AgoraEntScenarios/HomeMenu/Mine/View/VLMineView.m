@@ -73,7 +73,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 
 - (void)refreseUserInfo:(VLLoginModel *)loginModel {
     self.nickNameLabel.text = loginModel.name;
-    [self.avatarImgView sd_setImageWithURL:[NSURL URLWithString:loginModel.headUrl] placeholderImage:[UIImage imageNamed:@"mine_avatar_placeHolder"]];
+    [self.avatarImgView autoResizeWithAliyunUrlString:loginModel.headUrl placeholderImage:[UIImage imageNamed:@"mine_avatar_placeHolder"]];
     if (loginModel.userNo.length > 0) {
         self.IDLabel.text = [NSString stringWithFormat:@"ID: %@",loginModel.userNo];
     }

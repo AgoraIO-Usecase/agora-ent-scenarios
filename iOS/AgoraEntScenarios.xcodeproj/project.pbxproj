@@ -18,6 +18,7 @@
 		A84EEA742ADD297800258F55 /* ShowDebugSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A84EEA6F2ADD297800258F55 /* ShowDebugSettingVC.swift */; };
 		A84EEA752ADD297800258F55 /* ShowDebugPrivateParamsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A84EEA702ADD297800258F55 /* ShowDebugPrivateParamsVC.swift */; };
 		A84EEA762ADD297800258F55 /* ShowDebug1TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A84EEA712ADD297800258F55 /* ShowDebug1TFModel.swift */; };
+		A89C929C2AE66BE700B5E8B4 /* UIImageView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89C929B2AE66BE700B5E8B4 /* UIImageView+Extension.swift */; };
 		AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */; };
 		ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */; };
 		ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */; };
@@ -708,6 +709,7 @@
 		A84EEA6F2ADD297800258F55 /* ShowDebugSettingVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugSettingVC.swift; sourceTree = "<group>"; };
 		A84EEA702ADD297800258F55 /* ShowDebugPrivateParamsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugPrivateParamsVC.swift; sourceTree = "<group>"; };
 		A84EEA712ADD297800258F55 /* ShowDebug1TFModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebug1TFModel.swift; sourceTree = "<group>"; };
+		A89C929B2AE66BE700B5E8B4 /* UIImageView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+Extension.swift"; sourceTree = "<group>"; };
 		AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRobotService.swift; sourceTree = "<group>"; };
 		ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingBitrateCell.swift; sourceTree = "<group>"; };
 		ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNetStateSelectViewController.swift; sourceTree = "<group>"; };
@@ -3530,6 +3532,7 @@
 				E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */,
 				DD619B0B29E3E262008F63E4 /* UIViewToastExtension.swift */,
 				DD619B0529E3E262008F63E4 /* Notification+Presentation.swift */,
+				A89C929B2AE66BE700B5E8B4 /* UIImageView+Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -4404,6 +4407,7 @@
 				DD619A9129E3E247008F63E4 /* SpatialAudioServiceModel.swift in Sources */,
 				DD9EBED02AD5492600B4551F /* VLSBGTonesView.m in Sources */,
 				DD36106429B70CDC00CE7984 /* ShowAgoraKitManager.swift in Sources */,
+				A89C929C2AE66BE700B5E8B4 /* UIImageView+Extension.swift in Sources */,
 				E3735C932A5E7E75004737EF /* BEResourceHelper.m in Sources */,
 				DD619A6529E3E247008F63E4 /* SABusinessRequest.swift in Sources */,
 				E3735CA12A5E7E75004737EF /* FUBeautyRender.m in Sources */,
