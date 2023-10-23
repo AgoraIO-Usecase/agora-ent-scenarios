@@ -110,7 +110,7 @@ open class VLUploadImageNetworkModel: AUIUploadNetworkModel {
     
     public var image: UIImage! {
         didSet{
-            fileData = image.jpegData(compressionQuality: 1.0)
+            fileData = image.jpegData(compressionQuality: 0.5)
         }
     }
     

@@ -84,6 +84,34 @@ open class AUIUploadNetworkModel: AUINetworkModel {
     public var fileName: String?
     public var mimeType: String?
     
+    
+    public lazy var  boundary: String = {
+        UUID().uuidString
+    }()
+    
+    public override func getHeaders() -> [String: String] {
+        var headers = super.getHeaders()
+        let contentType = "multipart/form-data; boundary=\(boundary)"
+        headers["Content-Type"] = contentType
+        return headers
+    }
+    
+    public func multipartData() -> Data {
+        // 创建HTTP请求体
+        var data = Data()
+        guard let name = name, let fileName = fileName, let fileData = fileData else {
+            return data
+        }
+        // 添加数据
+        data.append("\r\n--\(boundary)\r\n".data(using: .utf8)!)
+        data.append("Content-Disposition: form-data; name=\"\(name)\"; filename=\"\(fileName)\"\r\n".data(using: .utf8)!)
+        data.append("Content-Type: \(mimeType!)\r\n\r\n".data(using: .utf8)!)
+        data.append(fileData)
+        // Multipart结束标记
+        data.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+        return data
+    }
+    
     public func upload(progress:((Float) -> Void)? = nil ,completion: ((Error?, Any?)->())?) {
         AUINetworking.shared.upload(model: self, progress: progress, completion: completion)
     }

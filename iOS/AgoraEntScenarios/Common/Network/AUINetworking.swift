@@ -76,7 +76,7 @@ open class AUINetworking: NSObject {
         }
         
         if let uploadModel = model as? AUIUploadNetworkModel {
-            let uploadTask = URLSession.shared.uploadTask(with: urlRequest, from: uploadModel.fileData, completionHandler: handleResponse)
+            let uploadTask = URLSession.shared.uploadTask(with: urlRequest, from: uploadModel.multipartData(), completionHandler: handleResponse)
             uploadTask.resume()
             reqMap[model.uniqueId] = (uploadTask, model)
         } else {
