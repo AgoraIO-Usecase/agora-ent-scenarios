@@ -150,6 +150,30 @@
 "validate_failed" = "验证码校验失败，请重试";
 "after_send_tip" = "秒后可重新发送";
 
+"home_category_title_all" = "全部玩法";
+"home_category_title_ktv" = "在线K歌房";
+"home_category_title_voiceChat" = "语聊房";
+"home_category_title_live" = "直播";
+"home_content_item_ktv_title_solo" = "独唱&合唱";
+"home_content_item_ktv_desc_solo" = "超低延迟真合唱";
+"home_content_item_ktv_title_snatchsinging" = "抢唱";
+"home_content_item_ktv_desc_snatchsinging" = "热歌高潮片段";
+"home_content_item_ktv_title_cantata" = "大合唱";
+"home_content_item_ktv_desc_cantata" = "最高支持128人";
+"home_content_item_ktv_title_takesong" = "接唱";
+"home_content_item_ktv_desc_takesong" = "歌曲接龙";
+"home_content_item_voice_desc_immersive" = "更沉浸、更有趣、更动听";
+"home_content_item_voice_title_spatial" = "语聊房-空间音频版";
+"home_content_item_voice_desc_spatial" = "方位感和空间感";
+"home_content_item_live_title_show" = "秀场";
+"home_content_item_live_desc_show" = "描述描述描述";
+"home_content_item_live_title_1v1_private" = "1v1私密房";
+"home_content_item_live_desc_1v1_private" = "描述描述描述";
+"home_content_item_live_title_multiple" = "多人团战";
+"home_content_item_live_desc_multiple" = "敬请期待";
+"home_content_item_live_title_show_1v1_private" = "秀场转1v1私密房";
+"home_content_item_live_desc_show_1v1_private" = "描述描述描述";
+
 "feedback_tags_flashback" = "闪退";
 "feedback_tags_audioStuck" = "音频卡顿";
 "feedback_tags_videoStuck" = "视频卡顿";
@@ -177,3 +201,4 @@
 "discover_spetial_voice" = "凤鸣空间音频";
 "discover_spetial_voice_desc" = "身临其境的实时音频互动体验";
 "discover_document_title" = "集成文档";
+
