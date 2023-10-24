@@ -137,11 +137,10 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                 val initialWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
                 root.viewTreeObserver.addOnGlobalLayoutListener {
                     Handler(Looper.getMainLooper()).postDelayed({
-                        val currentWindowHeight = Rect().apply { activity!!.window.decorView.getWindowVisibleDisplayFrame(this) }.height()
+                        val currentWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
                         if (currentWindowHeight < initialWindowHeight) {
                             Log.d(TAG, "current: $currentWindowHeight, initial: $initialWindowHeight, show: true")
                         } else {
-                            Log.d(TAG, "current: $currentWindowHeight, initial: $initialWindowHeight, show: hide")
                             var value = 1f
                             try {
                                 val input = etGainAdjust.text.toString()
