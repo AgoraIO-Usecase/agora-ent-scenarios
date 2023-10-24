@@ -8,7 +8,7 @@
 import UIKit
 
 @objc
-class VLLoginController: BaseViewController {
+class VLLoginController: VLBaseViewController {
     private lazy var iconImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "login_icon"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
