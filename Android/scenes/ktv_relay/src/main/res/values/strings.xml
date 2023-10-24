@@ -7,9 +7,6 @@
     <string name="ktv_people_count">%d人</string>
     <string name="ktv_room_title">房间名称</string>
     <string name="ktv_random">随机</string>
-    <string name="ktv_room_is_encryption">房间是否加密</string>
-    <string name="ktv_open">公开</string>
-    <string name="ktv_encryption">加密</string>
     <string name="ktv_room_name_hint">填写房间名称，吸引更多观众</string>
     <string name="ktv_please_input_4_pwd">请设置4位数房间密码</string>
     <string name="ktv_room_pwd">房间密码</string>
@@ -131,15 +128,7 @@
     <string name="ktv_search">搜索</string>
     <string name="ktv_confirm">确定</string>
     <string name="ktv_cancel">取消</string>
-    <string name="ktv_error_permisstion">需要相应权限，请打开</string>
-    <string name="ktv_room_list_title">歌房</string>
-    <string name="ktv_room_list_empty">请创建一个歌房</string>
-    <string name="ktv_create_room_name_label">歌房名称</string>
-    <string name="ktv_create_room_name_label2">本应用为测试产品，请勿商用。单次直播最长10分钟，每个频道最多10人。</string>
-    <string name="ktv_create_button">创建</string>
-    <string name="ktv_dialog_join_msg">准备中，请等待…</string>
-    <string name="ktv_permission_alert">缺少运行所需的必要权限，是否确认申请？</string>
-    <string name="ktv_permission_refused">运行此功能需要的必要权限未被授予。</string>
+    <string name="ktv_song_list_empty">歌单暂无数据</string>
     <string name="ktv_network_unavailable">未检测到可用网络，确认继续？</string>
     <string name="ktv_no_lrc">暂无歌词 </string>
     <string name="ktv_content">监测到当前内容存在违规行为</string>

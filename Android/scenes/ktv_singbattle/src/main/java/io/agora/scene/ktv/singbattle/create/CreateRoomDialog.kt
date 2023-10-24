@@ -115,7 +115,7 @@ class CreateRoomDialog(
                 dismiss()
                 RoomLivingActivity.launch(context, out)
             } else {
-                // 创建房间失败
+                // 加入房间失败
             }
         }
         roomCreateViewModel.createRoomResult.observe(this) { out: CreateRoomOutputModel? ->

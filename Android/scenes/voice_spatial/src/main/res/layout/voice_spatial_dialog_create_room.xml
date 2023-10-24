@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root_dialog_more"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="20dp"
@@ -39,7 +38,7 @@
             android:layout_marginStart="20dp"
             android:textColor="#303553"
             android:textSize="12sp"
-            android:text="@string/ktv_singbattle_create_room_tips"
+            android:text="@string/voice_create_room_tips"
             />
 
     </androidx.cardview.widget.CardView>
@@ -54,7 +53,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:drawableStart="@mipmap/ic_random"
         android:drawablePadding="3dp"
-        android:text="@string/ktv_singbattle_random"
+        android:text="@string/voice_random"
         android:textColor="#3C4267"
         android:textSize="14sp"
         />
@@ -65,7 +64,7 @@
         android:layout_marginStart="20dp"
         android:textColor="@color/black"
         android:textSize="14sp"
-        android:text="@string/ktv_singbattle_room_title"
+        android:text="@string/voice_room_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/btnRandom" />
 
@@ -80,11 +79,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:padding="12dp"
         android:background="@drawable/create_room_et_selector"
-        android:hint="@string/ktv_singbattle_room_name_hint"
+        android:hint="@string/voice_room_name_hint"
         android:imeOptions="actionDone"
         android:singleLine="true"
         android:maxLines="1"
-        android:maxLength="11"
+        android:maxLength="15"
         android:gravity="start|center"
         android:textColor="#040925"
         android:textColorHint="#979CBB"
@@ -100,7 +99,7 @@
         app:layout_constraintTop_toBottomOf="@+id/etRoomName"
         app:layout_constraintStart_toStartOf="parent"
         android:textColor="#3C4267"
-        android:text="@string/ktv_singbattle_room_pwd"
+        android:text="@string/voice_room_pwd"
         />
 
     <androidx.appcompat.widget.AppCompatCheckBox
@@ -124,7 +123,7 @@
         app:layout_constraintTop_toTopOf="@id/tvPassword"
         app:layout_constraintBottom_toBottomOf="@id/tvPassword"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/ktv_singbattle_please_input_4_pwd"
+        android:text="@string/voice_please_input_4_pwd"
         android:textSize="12dp"
         android:textColor="#FA396A"
         android:visibility="gone"
@@ -182,7 +181,7 @@
         android:gravity="center"
         android:textColor="@color/white"
         android:textSize="16sp"
-        android:text="@string/ktv_singbattle_create_room"
+        android:text="@string/voice_create_room"
         android:background="@drawable/create_room_btn_blue"
         app:layout_constraintTop_toBottomOf="@+id/etCode1"
         app:layout_constraintStart_toStartOf="parent"

@@ -36,7 +36,6 @@ class CreateRoomDialog(
 
     private var window: Window? = null
     private var loadingView: View? = null
-
     /** 输入历史记录 */
     private var oldInput = ""
 
@@ -115,7 +114,7 @@ class CreateRoomDialog(
                 dismiss()
                 RoomLivingActivity.launch(context, out)
             } else {
-                // 创建房间失败
+                // 加入房间失败
             }
         }
         roomCreateViewModel.createRoomResult.observe(this) { out: CreateRoomOutputModel? ->

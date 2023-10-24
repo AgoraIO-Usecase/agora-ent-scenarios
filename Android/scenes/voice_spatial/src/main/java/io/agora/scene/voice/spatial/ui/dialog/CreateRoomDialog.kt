@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.singrelay.create
+package io.agora.scene.voice.spatial.ui.dialog
 
 import android.annotation.SuppressLint
 import android.app.Dialog
@@ -16,23 +16,29 @@ import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.lifecycle.ViewModelProvider
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
-import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.ktv.singrelay.R
-import io.agora.scene.ktv.singrelay.databinding.KtvRelayDialogCreateRoomBinding
-import io.agora.scene.ktv.singrelay.live.RoomLivingActivity
-import io.agora.scene.ktv.singrelay.service.CreateRoomOutputModel
-import io.agora.scene.ktv.singrelay.service.JoinRoomOutputModel
+import io.agora.scene.voice.spatial.R
+import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogCreateRoomBinding
+import io.agora.scene.voice.spatial.model.VoiceRoomModel
+import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
+import io.agora.scene.voice.spatial.ui.activity.ChatroomLiveActivity
+import io.agora.scene.voice.spatial.viewmodel.VoiceCreateViewModel
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.net.Resource
+import io.agora.voice.common.ui.IParserSource
+import io.agora.voice.common.utils.ToastTools
+import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.roundToInt
 
 class CreateRoomDialog(
     private val context: Context,
-): BaseBottomSheetDialogFragment<KtvRelayDialogCreateRoomBinding>() {
+): BaseBottomSheetDialogFragment<VoiceSpatialDialogCreateRoomBinding>(), IParserSource {
 
     /** 当前选中的是第几个输入框*/
     private var currentPosition = 0
 
-    private lateinit var roomCreateViewModel: RoomCreateViewModel
+    private lateinit var roomCreateViewModel: VoiceCreateViewModel
 
     private var window: Window? = null
     private var loadingView: View? = null
@@ -48,9 +54,9 @@ class CreateRoomDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        roomCreateViewModel = ViewModelProvider(this)[RoomCreateViewModel::class.java]
+        roomCreateViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
         // 用户提示颜色
-        val spannableString = SpannableString(getString(R.string.ktv_create_room_tips))
+        val spannableString = SpannableString(getString(R.string.voice_create_room_tips))
         spannableString.setSpan(ForegroundColorSpan(Color.parseColor("#FA396A")), 77, 118, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         mBinding.tvTips.text = spannableString
         // 随机名称
@@ -109,51 +115,74 @@ class CreateRoomDialog(
             }
         }
 
-        roomCreateViewModel.joinRoomResult.observe(this) { out: JoinRoomOutputModel? ->
-            hideLoadingView()
-            if (out != null) {
-                dismiss()
-                RoomLivingActivity.launch(context, out)
-            } else {
-                // 加入房间失败
-            }
-        }
-        roomCreateViewModel.createRoomResult.observe(this) { out: CreateRoomOutputModel? ->
-            if (out != null) {
-                roomCreateViewModel.joinRoom(out.roomNo, out.password)
-            } else {
-                hideLoadingView()
-                mBinding.btnCreateRoom.isEnabled = true
-            }
-        }
+        roomCreateViewModel.createRoomObservable().observe(this) { response: Resource<VoiceRoomModel> ->
+            parseResource(response, object : OnResourceParseCallback<VoiceRoomModel>() {
+                override fun onSuccess(voiceRoomModel: VoiceRoomModel?) {
+                    voiceRoomModel?.let { roomCreateViewModel.joinRoom(it.roomId) }
+                }
 
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    hideLoadingView()
+                    when (code) {
+                        VoiceServiceProtocol.ERR_LOGIN_ERROR -> {
+                            activity?.let { ToastTools.show(it, getString(R.string.voice_room_login_exception)) }
+                        }
+                        VoiceServiceProtocol.ERR_ROOM_NAME_INCORRECT -> {
+                            activity?.let { ToastTools.show(it, getString(R.string.voice_room_name_rule)) }
+                        }
+                        else -> {
+                            activity?.let { ToastTools.show(it, getString(R.string.voice_room_create_error)) }
+                        }
+                    }
+                }
+            })
+        }
+        roomCreateViewModel.joinRoomObservable().observe(this) { response: Resource<VoiceRoomModel> ->
+            parseResource(response, object : OnResourceParseCallback<VoiceRoomModel>() {
+                override fun onSuccess(result: VoiceRoomModel?) {
+                    hideLoadingView()
+                    val a = activity
+                    if (result != null && a != null) {
+                        ChatroomLiveActivity.startActivity(a, result)
+                    }
+                    dismiss()
+                }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    hideLoadingView()
+                }
+            })
+        }
     }
 
     private fun randomName() {
-        mBinding.etRoomName.setText(
-            resources.getStringArray(R.array.ktv_roomName)[Random().nextInt(21)]
-        )
+        val date = Date()
+        val month = SimpleDateFormat("MM").format(date) //获取月份
+        val day = SimpleDateFormat("dd").format(date) //获取分钟
+        val roomName = getString(R.string.voice_room_create_chat_3d_room) + "-" + month + day + "-" + (Math.random() * 999 + 1).roundToInt()
+        mBinding.etRoomName.setText(roomName)
     }
 
     private fun createRoom() {
         val roomName = mBinding.etRoomName.text.toString()
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.ktv_please_input_room_name)
+            ToastUtils.showToast(R.string.voice_please_input_room_name)
             return
         }
         val isPrivate = mBinding.cbPassword.isChecked
-        val password = (mBinding.etCode1.text.toString()
+        var password = (mBinding.etCode1.text.toString()
                 + mBinding.etCode2.text
                 + mBinding.etCode3.text
                 + mBinding.etCode4.text)
         if (isPrivate && password.length < 4) {
-            ToastUtils.showToast(getString(R.string.ktv_please_input_4_pwd))
+            ToastUtils.showToast(getString(R.string.voice_please_input_4_pwd))
             return
         }
-        val userNo = UserManager.getInstance().user.id.toString()
-        val numPrivate = if (isPrivate) 1 else 0
+        if (!isPrivate) { password = "" }
         showLoadingView()
-        roomCreateViewModel.createRoom(numPrivate, roomName, password, userNo, "1")
+        roomCreateViewModel.createSpatialRoom(roomName, 0, password)
     }
 
     private fun showLoadingView() {
