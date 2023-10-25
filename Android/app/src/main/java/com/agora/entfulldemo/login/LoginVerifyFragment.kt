@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentLoginVerifyBinding
+import io.agora.scene.base.Constant
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnFastClickListener
 import io.agora.scene.base.manager.PagePilotManager
@@ -65,7 +66,6 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
         activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 mCountDownTimerUtils?.cancel()
-                mLoginViewModel.mRequestCodeLiveData.postValue(false)
                 findNavController().popBackStack()
             }
         })
@@ -78,7 +78,6 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
         binding.btnBack.setOnClickListener(object : OnFastClickListener() {
             override fun onClickJacking(view: View) {
                 mCountDownTimerUtils?.cancel()
-                mLoginViewModel.mRequestCodeLiveData.postValue(false)
                 findNavController().popBackStack()
             }
         })
@@ -96,25 +95,22 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
         mAccounts = arguments?.getString(LoginPhoneInputFragment.Key_Account, "") ?: ""
         binding.tvPageInfo.text = getString(R.string.app_login_phone_input_code_info, mAreaCode, mAccounts)
         mLoginViewModel.setPhone(mAccounts)
-        mLoginViewModel.mRequestLoginLiveData.removeObservers(this)
-        mLoginViewModel.mRequestLoginLiveData.observe(this) {
-            if (it) {
-                mCountDownTimerUtils?.cancel()
-                activity?.finish()
-                PagePilotManager.pageMainHome()
-            } else {
-                binding.tvCodeError.isVisible = true
-                binding.etCode.setText("")
-            }
-        }
-        mLoginViewModel.mRequestCodeLiveData.removeObservers(this)
-        mLoginViewModel.mRequestCodeLiveData.observe(this) {
-            if (it) {
-                Log.d("zhangw", "LoginVerifyFragment mRequestCodeLiveData true")
+        mLoginViewModel.setISingleCallback { type: Int, data: Any? ->
+            if (type == Constant.CALLBACK_TYPE_LOGIN_REQUEST_CODE_SUCCESS) {
+                Log.d("zhangw", "LoginVerifyFragment requestCode success")
                 enableRegainCodeView(false)
                 binding.tvCodeError.isVisible = false
                 mCountDownTimerUtils?.cancel()
                 mCountDownTimerUtils?.start()
+            }else if (type ==Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS){
+                Log.d("zhangw", "LoginVerifyFragment login success")
+                mCountDownTimerUtils?.cancel()
+                activity?.finish()
+                PagePilotManager.pageMainHome()
+            }else if (type ==Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL){
+                Log.d("zhangw", "LoginVerifyFragment login failed")
+                binding.tvCodeError.isVisible = true
+                binding.etCode.setText("")
             }
         }
         mCountDownTimerUtils = object : CountDownTimer(60000, 1000) {
