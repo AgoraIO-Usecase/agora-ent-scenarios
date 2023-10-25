@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.agora.entfulldemo.R
@@ -21,8 +20,9 @@ import io.agora.scene.base.manager.PagePilotManager
 
 class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBinding>() {
 
-    private val mLoginViewModel: LoginShareViewModel by activityViewModels()
-
+    private val mLoginViewModel: LoginViewModel by lazy {
+        ViewModelProvider(this)[LoginViewModel::class.java]
+    }
 
     private var mAreaCode = ""
     private var mAccounts = ""
@@ -96,16 +96,18 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
         mAccounts = arguments?.getString(LoginPhoneInputFragment.Key_Account, "") ?: ""
         binding.tvPageInfo.text = getString(R.string.app_login_phone_input_code_info, mAreaCode, mAccounts)
         mLoginViewModel.setPhone(mAccounts)
+        mLoginViewModel.mRequestLoginLiveData.removeObservers(this)
         mLoginViewModel.mRequestLoginLiveData.observe(this) {
             if (it) {
-                PagePilotManager.pageMainHome()
                 mCountDownTimerUtils?.cancel()
                 activity?.finish()
+                PagePilotManager.pageMainHome()
             } else {
                 binding.tvCodeError.isVisible = true
                 binding.etCode.setText("")
             }
         }
+        mLoginViewModel.mRequestCodeLiveData.removeObservers(this)
         mLoginViewModel.mRequestCodeLiveData.observe(this) {
             if (it) {
                 Log.d("zhangw", "LoginVerifyFragment mRequestCodeLiveData true")

@@ -13,7 +13,7 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
 import io.reactivex.disposables.Disposable
 
-class LoginShareViewModel : BaseRequestViewModel() {
+class LoginViewModel : BaseRequestViewModel() {
 
     val mRequestCodeLiveData: MutableLiveData<Boolean> = MutableLiveData()
     val mRequestLoginLiveData: MutableLiveData<Boolean> = MutableLiveData()
@@ -91,9 +91,9 @@ class LoginShareViewModel : BaseRequestViewModel() {
                         if (t != null) {
                             ToastUtils.showToast(t.message)
                         } else {
-                            ToastUtils.showToast(R.string.app_vcode_send_success_tip)
+                            ToastUtils.showToast(R.string.app_vcode_send_failed_tip)
                         }
-                        mRequestCodeLiveData.value = (false)
+                        mRequestCodeLiveData.postValue(false)
                     }
                 }
             )

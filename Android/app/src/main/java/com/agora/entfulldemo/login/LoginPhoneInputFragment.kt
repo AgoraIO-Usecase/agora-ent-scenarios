@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isGone
 import androidx.core.widget.doAfterTextChanged
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentLoginPhoneInputBinding
@@ -30,7 +30,9 @@ class LoginPhoneInputFragment : BaseViewBindingFragment<AppFragmentLoginPhoneInp
         const val Key_Account = "key_account"
     }
 
-    private val mLoginViewModel: LoginShareViewModel by activityViewModels()
+    private val mLoginViewModel: LoginViewModel by lazy {
+        ViewModelProvider(this)[LoginViewModel::class.java]
+    }
 
     private var mSwipeCaptchaDialog: SwipeCaptchaDialog? = null
 
@@ -128,6 +130,7 @@ class LoginPhoneInputFragment : BaseViewBindingFragment<AppFragmentLoginPhoneInp
 
     override fun requestData() {
         super.requestData()
+        mLoginViewModel.mRequestCodeLiveData.removeObservers(this)
         mLoginViewModel.mRequestCodeLiveData.observe(this) {
             if (it) {
                 Log.d("zhangw", "LoginPhoneInputFragment mRequestCodeLiveData true")

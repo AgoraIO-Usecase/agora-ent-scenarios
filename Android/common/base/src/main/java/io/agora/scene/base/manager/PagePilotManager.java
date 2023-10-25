@@ -17,7 +17,7 @@ public class PagePilotManager {
     public static void pageWelcomeClear() {
         ARouter.getInstance()
                 .build(PagePathConstant.pageWelcome)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
+                .withFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
                 .navigation();
     }
 
