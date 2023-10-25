@@ -14,7 +14,8 @@ extension UIImageView {
     ///   - urlString: 阿里云上的图片地址
     ///   - placeholderImage: 占位图
     @objc func autoResizeWithAliyunUrlString(_ urlString: String, placeholderImage: UIImage?){
-        let newUrlString = String(format: "\(urlString)?x-oss-process=image/resize,w_%.f,h_%.f", self.bounds.size.width * 3, self.bounds.size.height * 3)
+        let screenScale = UIScreen.screenScale()
+        let newUrlString = String(format: "\(urlString)?x-oss-process=image/resize,w_%.f,h_%.f", self.bounds.size.width * screenScale, self.bounds.size.height * screenScale)
         if let url = URL(string: newUrlString) {
             sd_setImage(with: url, placeholderImage: placeholderImage)
         }
