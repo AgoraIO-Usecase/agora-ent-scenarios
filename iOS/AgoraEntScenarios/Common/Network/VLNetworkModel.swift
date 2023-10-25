@@ -110,7 +110,7 @@ open class VLUploadImageNetworkModel: AUIUploadNetworkModel {
     
     public var image: UIImage! {
         didSet{
-            fileData = image.jpegData(compressionQuality: 1)
+            fileData = image.resetSizeOfImageData(maxSize: 1024)
         }
     }
     

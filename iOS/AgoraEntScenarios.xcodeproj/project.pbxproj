@@ -19,6 +19,7 @@
 		A84EEA752ADD297800258F55 /* ShowDebugPrivateParamsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A84EEA702ADD297800258F55 /* ShowDebugPrivateParamsVC.swift */; };
 		A84EEA762ADD297800258F55 /* ShowDebug1TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A84EEA712ADD297800258F55 /* ShowDebug1TFModel.swift */; };
 		A89C929C2AE66BE700B5E8B4 /* UIImageView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89C929B2AE66BE700B5E8B4 /* UIImageView+Extension.swift */; };
+		A89C929E2AE9031600B5E8B4 /* UIImage+Resize.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89C929D2AE9031600B5E8B4 /* UIImage+Resize.swift */; };
 		AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */; };
 		ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */; };
 		ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */; };
@@ -710,6 +711,7 @@
 		A84EEA702ADD297800258F55 /* ShowDebugPrivateParamsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugPrivateParamsVC.swift; sourceTree = "<group>"; };
 		A84EEA712ADD297800258F55 /* ShowDebug1TFModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebug1TFModel.swift; sourceTree = "<group>"; };
 		A89C929B2AE66BE700B5E8B4 /* UIImageView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+Extension.swift"; sourceTree = "<group>"; };
+		A89C929D2AE9031600B5E8B4 /* UIImage+Resize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Resize.swift"; sourceTree = "<group>"; };
 		AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRobotService.swift; sourceTree = "<group>"; };
 		ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingBitrateCell.swift; sourceTree = "<group>"; };
 		ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNetStateSelectViewController.swift; sourceTree = "<group>"; };
@@ -3523,6 +3525,7 @@
 		DDA1991728FFE579009D3E61 /* Extension */ = {
 			isa = PBXGroup;
 			children = (
+				A89C929D2AE9031600B5E8B4 /* UIImage+Resize.swift */,
 				DD64C68B295C142A00EAB750 /* UIButton+EntLayout.swift */,
 				DDA1991828FFE579009D3E61 /* UIColor+Extension.swift */,
 				DDA1991928FFE579009D3E61 /* String+Extension.swift */,
@@ -4486,6 +4489,7 @@
 				DD9EBFA62AD5512300B4551F /* VRRoomEntity.swift in Sources */,
 				DD9EBFA42AD5512300B4551F /* VoiceRoomGiftEntity.swift in Sources */,
 				DDA199E028FFE579009D3E61 /* VLEmptyView.m in Sources */,
+				A89C929E2AE9031600B5E8B4 /* UIImage+Resize.swift in Sources */,
 				DD9EBED62AD5492600B4551F /* VLSBGMVIdleView.m in Sources */,
 				DD619A9529E3E247008F63E4 /* SAAlertViewController.swift in Sources */,
 				DD9EBFA92AD5512300B4551F /* VoiceRoomChatModel.swift in Sources */,

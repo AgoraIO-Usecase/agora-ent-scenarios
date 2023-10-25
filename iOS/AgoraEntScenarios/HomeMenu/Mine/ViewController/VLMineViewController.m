@@ -318,7 +318,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 #pragma mark - UIImagePickerControllerDelegate
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     [picker dismissViewControllerAnimated:YES completion:^{
-        UIImage *image = info[UIImagePickerControllerEditedImage];
+        UIImage *image = info[UIImagePickerControllerOriginalImage];
         [self uploadHeadImageWithImage:image];
     }];
 }
@@ -586,16 +586,17 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
      */
     
     VLUploadImageNetworkModel *uploadModel = [VLUploadImageNetworkModel new];
-    uploadModel.image = image;
-    
-    [uploadModel uploadWithProgress:nil completion:^(NSError * _Nullable err, id _Nullable responseObject) {
-        VLResponseData *response = responseObject;
-        if (response.code.intValue == 0) {
-            VLUploadImageResModel *model = [VLUploadImageResModel vj_modelWithDictionary:response.data];
-            [self loadUpdateUserIconRequest:model.url image:image];
-        }
-        [VLToast toast:response.message];
-    }];
+    dispatch_sync(dispatch_get_global_queue(0, 0), ^{
+        uploadModel.image = image;
+        [uploadModel uploadWithProgress:nil completion:^(NSError * _Nullable err, id _Nullable responseObject) {
+            VLResponseData *response = responseObject;
+            if (response.code.intValue == 0) {
+                VLUploadImageResModel *model = [VLUploadImageResModel vj_modelWithDictionary:response.data];
+                [self loadUpdateUserIconRequest:model.url image:image];
+            }
+            [VLToast toast:response.message];
+        }];
+    });
 }
 
 // 连续点击事件
