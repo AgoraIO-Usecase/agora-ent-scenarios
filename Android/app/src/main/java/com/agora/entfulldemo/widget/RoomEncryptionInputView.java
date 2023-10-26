@@ -16,6 +16,8 @@ import com.agora.entfulldemo.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.agora.scene.base.utils.UiUtil;
+
 public class RoomEncryptionInputView extends AppCompatEditText {
     private static String TAG = RoomEncryptionInputView.class.getName();
     private Paint sidePaint, backPaint, textPaint;
@@ -179,8 +181,8 @@ public class RoomEncryptionInputView extends AppCompatEditText {
             if (isPwd) {
                 canvas.drawCircle(rectFS.get(j).centerX(), rectFS.get(j).centerY(), Circle, textPaint);
             } else {
-                canvas.drawText(mText.substring(j, j + 1), rectFS.get(j).centerX() - textSize / 2,
-                        rectFS.get(j).centerY() + textSize / 2, textPaint);
+                canvas.drawText(mText.substring(j, j + 1), rectFS.get(j).centerX() - textSize / 2 + StrokeWidth,
+                        rectFS.get(j).centerY() + textSize / 2 - StrokeWidth, textPaint);
             }
         }
     }
