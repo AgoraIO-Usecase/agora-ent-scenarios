@@ -44,6 +44,8 @@ class AgoraRtcEngineController {
 
     private var mEarBackManager: AgoraEarBackManager? = null
 
+    private var mSoundCardManager: AgoraSoundCardManager? = null
+
     private var mRtmToken = ""
 
     private var micVolumeListener: RtcMicVolumeListener? = null
@@ -97,6 +99,10 @@ class AgoraRtcEngineController {
 
     fun earBackManager(): AgoraEarBackManager? {
         return mEarBackManager
+    }
+
+    fun soundCardManager(): AgoraSoundCardManager? {
+        return mSoundCardManager
     }
 
     private fun initRtcEngine(context: Context): Boolean {
@@ -170,6 +176,7 @@ class AgoraRtcEngineController {
                 return false
             }
             mEarBackManager = AgoraEarBackManager(rtcEngine!!)
+            mSoundCardManager = AgoraSoundCardManager(rtcEngine!!)
             return true
         }
     }
@@ -391,6 +398,7 @@ class AgoraRtcEngineController {
         mBgmManager = null
 
         mEarBackManager = null
+        mSoundCardManager = null
 
         if (mediaPlayer != null) {
             mediaPlayer?.unRegisterPlayerObserver(firstMediaPlayerObserver)

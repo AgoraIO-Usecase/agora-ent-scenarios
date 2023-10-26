@@ -79,8 +79,8 @@
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/btnCreateRoom"
-        android:layout_width="160dp"
-        android:layout_height="70dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:gravity="center"
         android:backgroundTint="@android:color/transparent"

@@ -1122,8 +1122,8 @@ public class RoomLivingViewModel extends ViewModel {
                     return;
                 }
                 if (mRtcEngine != null) {
-//                    mRtcEngine.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NONE);
-                    mRtcEngine.enableInEarMonitoring(isEar, (1 << 1 | 1 << 2));
+                    mRtcEngine.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NONE);
+//                    mRtcEngine.enableInEarMonitoring(isEar, (1 << 1 | 1 << 2));
                 }
             }
 

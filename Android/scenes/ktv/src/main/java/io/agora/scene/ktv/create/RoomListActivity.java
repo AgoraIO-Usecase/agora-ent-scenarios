@@ -1,7 +1,6 @@
 package io.agora.scene.ktv.create;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,7 +84,7 @@ public class RoomListActivity extends BaseViewBindingActivity<KtvActivityRoomLis
             if (UiUtils.isFastClick(2000)) {
                 return;
             }
-            startActivity(new Intent(this, RoomCreateActivity.class));
+            new CreateRoomDialog(this).show(getSupportFragmentManager(), "CreateRoomDialog");
         });
         roomCreateViewModel.roomModelList.observe(this, vlRoomListModels -> {
             hideLoadingView();
