@@ -25,7 +25,7 @@ public enum AUINetworkMethod: Int {
 
 @objcMembers
 open class AUINetworkModel: NSObject {
-    public let uniqueId: String = UUID().uuidString
+    public var uniqueId: String = UUID().uuidString
     public var host: String = KeyCenter.HostUrl
     public var interfaceName: String?
     public var method: AUINetworkMethod = .post

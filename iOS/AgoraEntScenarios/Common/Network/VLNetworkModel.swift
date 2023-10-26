@@ -7,7 +7,7 @@
 
 import Foundation
 import KakaJSON
-import Alamofire
+//import Alamofire
 
 @objcMembers
 open class VLResponseData: NSObject, Convertible {

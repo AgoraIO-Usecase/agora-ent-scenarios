@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Alamofire
+//import Alamofire
 
 open class AUINetworking: NSObject {
     static let shared: AUINetworking = AUINetworking()
@@ -39,38 +39,46 @@ open class AUINetworking: NSObject {
         }
         
         let handleResponse: ((Data?,URLResponse?,Error?) ->Void) = { data, response, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    showLogger.error("request fail: \(error)", context: "AUINetworking")
+            if let error = error {
+                showLogger.error("request fail: \(error)", context: "AUINetworking")
+                DispatchQueue.main.async {
                     completion?(error, nil)
-                    return
                 }
-                
-                guard let data = data else {
-                    showLogger.error("parse fail: data empty", context: "AUINetworking")
+                return
+            }
+            
+            guard let data = data else {
+                showLogger.error("parse fail: data empty", context: "AUINetworking")
+                DispatchQueue.main.async {
                     completion?(AUICommonError.httpError((response as? HTTPURLResponse)?.statusCode ?? -1, "http error").toNSError(), nil)
-                    return
                 }
-                
-                self.reqMap[model.uniqueId] = nil
-                
-                var obj: Any? = nil
-                do {
-                    try obj = model.parse(data: data)
-                } catch let err {
-                    showLogger.error("parse fail throw: \(err.localizedDescription)", context: "AUINetworking")
-                    showLogger.error("parse fail: \(String(data: data, encoding: .utf8) ?? "nil")", context: "AUINetworking")
+                return
+            }
+            
+            self.reqMap[model.uniqueId] = nil
+            
+            var obj: Any? = nil
+            do {
+                try obj = model.parse(data: data)
+            } catch let err {
+                showLogger.error("parse fail throw: \(err.localizedDescription)", context: "AUINetworking")
+                showLogger.error("parse fail: \(String(data: data, encoding: .utf8) ?? "nil")", context: "AUINetworking")
+                DispatchQueue.main.async {
                     completion?(err, nil)
-                    return
                 }
-                
-                guard let obj = obj else {
-                    showLogger.error("parse fail: \(String(data: data, encoding: .utf8) ?? "nil")", context: "AUINetworking")
+                return
+            }
+            
+            guard let obj = obj else {
+                showLogger.error("parse fail: \(String(data: data, encoding: .utf8) ?? "nil")", context: "AUINetworking")
+                DispatchQueue.main.async {
                     completion?(AUICommonError.networkParseFail.toNSError(), nil)
-                    return
                 }
-                
-                showLogger.error("request success \(String(data: data, encoding: .utf8) ?? "nil")", context: "AUINetworking")
+                return
+            }
+            
+            showLogger.error("request success \(String(data: data, encoding: .utf8) ?? "nil")", context: "AUINetworking")
+            DispatchQueue.main.async {
                 completion?(nil, obj)
             }
         }

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Alamofire
+//import Alamofire
 
 @objcMembers
 open class NMCommonNetworkModel: AUINetworkModel {
@@ -55,10 +55,10 @@ open class NMCommonNetworkModel: AUINetworkModel {
 @objcMembers
 open class NMGenerateTokennNetworkModel: NMCommonNetworkModel {
     
-    private let appCertificate: String? = KeyCenter.Certificate
-    private let appId: String? = KeyCenter.AppId
-    private let src = "iOS"
-    private let ts: String? = "".timeStamp
+    var appCertificate: String? = KeyCenter.Certificate
+    var appId: String? = KeyCenter.AppId
+    var src: String = "iOS"
+    var ts: String? = "".timeStamp
     
     public var channelName: String?
     public var expire: NSNumber?
@@ -129,9 +129,9 @@ open class NMGenerateIMConfigNetworkModelIMParmas: NSObject {
 @objcMembers
 open class NMGenerateIMConfigNetworkModel: NMCommonNetworkModel {
     
-    private let appId =  KeyCenter.AppId
-    private let src = "iOS"
-    private let traceId: String? = NSString.withUUID().md5()
+    var appId: String? =  KeyCenter.AppId
+    var src: String? = "iOS"
+    var traceId: String? = NSString.withUUID().md5()
     
     var chat: NMGenerateIMConfigNetworkModelChatParams?
     var im: NMGenerateIMConfigNetworkModelIMParmas?
@@ -159,9 +159,9 @@ open class NMGenerateIMConfigNetworkModel: NMCommonNetworkModel {
 @objcMembers
 open class NMVoiceIdentifyNetworkModel: NMCommonNetworkModel {
    
-    private let appId = KeyCenter.AppId
-    private let src = "iOS"
-    private let traceId = UUID().uuidString.md5Encrypt
+    private var appId: String? = KeyCenter.AppId
+    private var src: String? = "iOS"
+    private var traceId: String? = UUID().uuidString.md5Encrypt
     
     var channelName: String?
     var channelType: NSNumber?
@@ -177,13 +177,13 @@ open class NMVoiceIdentifyNetworkModel: NMCommonNetworkModel {
 @objcMembers
 open class NMStartCloudPlayerNetworkModel: NMCommonNetworkModel {
     
-    private let appId: String = KeyCenter.AppId
-    private let appCert = KeyCenter.Certificate ?? ""
-    private let traceId = NSString.withUUID().md5() ?? ""
-    private let region = "cn"
-    private let src = "iOS"
+    var appId: String? = KeyCenter.AppId
+    var appCert: String? = KeyCenter.Certificate ?? ""
+    var traceId: String? = NSString.withUUID().md5() ?? ""
+    var region: String? = "cn"
+    var src: String? = "iOS"
     
-    private lazy var basicAuth: String = {
+    lazy var basicAuth: String? = {
         createBasicAuth(key: KeyCenter.CloudPlayerKey ?? "", password: KeyCenter.CloudPlayerSecret ?? "")
     }()
     
@@ -202,9 +202,9 @@ open class NMStartCloudPlayerNetworkModel: NMCommonNetworkModel {
 @objcMembers
 open class NMCloudPlayerHeartbeatNetworkModel: NMCommonNetworkModel {
     
-    private let appId = KeyCenter.AppId
-    private let src = "iOS"
-    private let traceId = NSString.withUUID().md5() ?? ""
+    var appId: String? = KeyCenter.AppId
+    var src: String? = "iOS"
+    var traceId: String? = NSString.withUUID().md5() ?? ""
     
     var channelName: String?
     var uid: String?
@@ -220,8 +220,8 @@ open class NMCloudPlayerHeartbeatNetworkModel: NMCommonNetworkModel {
 @objcMembers
 open class NMReportSceneClickNetworkModel: NMCommonNetworkModel {
     
-    private let src: String = "agora_ent_demo"
-    private let ts: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
+    var src: String? = "agora_ent_demo"
+    var ts: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
     var sign: String?
     var pts: [[String: Any]]?
          
@@ -249,9 +249,9 @@ open class NMReportSceneClickNetworkModel: NMCommonNetworkModel {
 @objcMembers
 open class NMReportDeviceInfoNetworkModel: NMCommonNetworkModel {
     
-    private let appVersion = UIApplication.shared.appVersion ?? ""
-    private let model = UIDevice.current.machineModel ?? ""
-    private let platform = "iOS"
+    var appVersion: String? = UIApplication.shared.appVersion ?? ""
+    var model: String? = UIDevice.current.machineModel ?? ""
+    var platform: String? = "iOS"
     
     public init(sceneId: String, userNo: String, appId: String) {
         super.init()
