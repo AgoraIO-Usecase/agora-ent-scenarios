@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="84dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:theme="@style/Theme.AppCompat">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvCornerRatio"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="12dp"
+        app:cardBackgroundColor="@color/bg_color_blue_31"
+        app:cardElevation="0dp"
+        />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="1dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/voice_img_sound_card_item_on"
+            android:scaleType="fitXY"
+            />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvAvatar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="25dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="0dp"
+        android:backgroundTint="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPresetName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:textColor="#3C4267"
+        android:textSize="13sp"
+        android:text="text"
+        app:layout_constraintStart_toEndOf="@+id/cvAvatar"
+        app:layout_constraintTop_toTopOf="@+id/cvAvatar"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPresetInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="5dp"
+        android:gravity="center"
+        android:textColor="#6F738B"
+        android:textSize="13sp"
+        android:text="text"
+        app:layout_constraintStart_toEndOf="@+id/cvAvatar"
+        app:layout_constraintBottom_toBottomOf="@+id/cvAvatar"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivCheckBox"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_marginEnd="25dp"
+        android:background="@drawable/voice_check_box_selected"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

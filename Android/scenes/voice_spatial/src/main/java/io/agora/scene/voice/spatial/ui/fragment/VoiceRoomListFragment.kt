@@ -218,7 +218,8 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
                 mContext.packageName
             )
             holder.ivBackground.setImageResource(resId)
-            val data: VoiceRoomModel = mList!![position]
+            val list = mList ?: return
+            val data: VoiceRoomModel = list[position]
             GlideApp.with(holder.ivAvatar.context).load(data.owner?.portrait)
                 .into(holder.ivAvatar)
             holder.tvRoomName.text = data.roomName

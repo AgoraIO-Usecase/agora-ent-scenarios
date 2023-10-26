@@ -4,9 +4,6 @@
 
     <application>
         <activity
-            android:name="io.agora.scene.ktv.singrelay.create.RoomCreateActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name="io.agora.scene.ktv.singrelay.create.RoomListActivity"
             android:screenOrientation="portrait" />
         <activity

@@ -1,6 +1,5 @@
 package io.agora.scene.voice.ui.activity
 
-import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.TypedValue
@@ -22,6 +21,7 @@ import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceAgoraRoomListLayoutBinding
 import io.agora.scene.voice.global.VoiceConfigManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
+import io.agora.scene.voice.ui.dialog.CreateRoomDialog
 import io.agora.scene.voice.ui.fragment.VoiceRoomListFragment
 import io.agora.voice.common.ui.BaseUiActivity
 import io.agora.voice.common.utils.*
@@ -74,7 +74,7 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
         }
         binding.btnCreateRoom.setOnClickListener {
             if (FastClickTools.isFastClick(it)) return@setOnClickListener
-            startActivity(Intent(this@VoiceRoomListActivity, VoiceRoomCreateActivity::class.java))
+            CreateRoomDialog(this).show(supportFragmentManager, "CreateRoomDialog")
         }
         binding.agoraTabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {

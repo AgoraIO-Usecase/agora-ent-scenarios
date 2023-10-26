@@ -19,7 +19,7 @@ import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ToastTools
 import io.agora.voice.common.utils.onStopTrackingTouch
 
-class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAudioSettingBinding>() {
+class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBinding>() {
 
     companion object {
         const val KEY_AUDIO_SETTINGS_INFO = "audio_settings"
@@ -204,7 +204,6 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
         fun onEarBackSetting()
         /**耳返设置*/
         fun onVirtualSoundCardSetting()
-
         /** BGM 设置*/
         fun onBGMSetting()
         /**机器人开关*/

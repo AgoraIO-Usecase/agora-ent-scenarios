@@ -4,9 +4,6 @@
 
     <application>
         <activity
-            android:name=".create.RoomCreateActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".create.RoomListActivity"
             android:screenOrientation="portrait" />
         <activity
