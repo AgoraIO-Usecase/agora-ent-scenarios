@@ -160,8 +160,26 @@ static AFHTTPSessionManager *_sessionManager;
 }
 
 #pragma mark--上传文件
++ (NSURLSessionDataTask *)uploadFileURL:(NSString *)url
+                                showHUD:(BOOL)show
+                              appendKey:(NSString *)key
+                               filePath:(NSString *)filePath
+                                success:(completeBlock_success)success
+                                failure:(errorBlock_fail)failure {
+    return [self uploadFileRoute:@""
+                          method:url
+                         showHUD:show
+                      parameters:@{}
+                            name:key
+                        filePath:filePath
+                   progressBlock:nil
+                   completeBlock:success
+                      errorBlock:failure];
+}
+
 + (__kindof NSURLSessionDataTask *)uploadFileRoute:(NSString *)route
                                             method:(NSString *)method
+                                           showHUD:(BOOL)show
                                         parameters:(id)json
                                               name:(NSString *)name
                                           filePath:(NSString *)filePath
@@ -172,19 +190,24 @@ static AFHTTPSessionManager *_sessionManager;
     NSString *url = [self doRoute:route andMethod:method];
     url = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
     if (json == nil) json = @{};
-    
+    if (show) [SVProgressHUD show];
     NSURLSessionDataTask *sessionTask = [_sessionManager POST:url parameters:json headers:@{} constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
-        NSError *error = nil;
-        [formData appendPartWithFileURL:[NSURL URLWithString:filePath] name:name error:&error];
-        error ? [self requestError:errorBlock error:error task:nil] : nil;
+        NSData *fileData = [NSData dataWithContentsOfFile:filePath];
+        [formData appendPartWithFileData:fileData
+                                    name:name
+                                fileName:[NSString stringWithFormat:@"%@",filePath.lastPathComponent]
+                                mimeType:[NSString stringWithFormat:@"text/plain"]];
+        
     } progress:^(NSProgress * _Nonnull uploadProgress) {
         //上传进度
         [self requestProgress:progressBlock value:uploadProgress];
 
     } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        if (show) [SVProgressHUD dismiss];
         [self requestSuccess:completeBlock object:responseObject method:method task:task];
 
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        if (show) [SVProgressHUD dismiss];
         [self requestError:errorBlock error:error task:task];
 
     }];

@@ -99,9 +99,9 @@
     [self.naviView.heightAnchor constraintEqualToConstant: totalHeight].active = YES;
     
     [self.view addSubview:self.myCategoryView];
-    [self.myCategoryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [self.myCategoryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:16].active = YES;
     [self.myCategoryView.bottomAnchor constraintEqualToAnchor:self.naviView.bottomAnchor].active = YES;
-    [self.myCategoryView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    [self.myCategoryView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-80].active = YES;
     [self.myCategoryView.heightAnchor constraintEqualToConstant:44].active = YES;
     
     [self.view addSubview:self.listContainerView];
@@ -122,7 +122,7 @@
 
 // 点击选中或者滚动选中都会调用该方法。适用于只关心选中事件，不关心具体是点击还是滚动选中的。
 - (void)categoryView:(JXCategoryBaseView *)categoryView didSelectedItemAtIndex:(NSInteger)index {
-    
+    [self.dataArray[index].vc getScrollToPostion];
 }
 
 // 点击选中的情况才会调用该方法

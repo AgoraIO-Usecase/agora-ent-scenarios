@@ -8,78 +8,6 @@ import com.agora.entfulldemo.R
  */
 object ScenesConstructor {
 
-
-    @JvmStatic
-    fun buildData(context: Context): List<ScenesModel> {
-        return mutableListOf(
-            ScenesModel(
-                AgoraScenes.ChatRoom,
-                "io.agora.scene.voice.ui.activity.VoiceRoomListActivity",
-                context.getString(R.string.app_voice_chat),
-                R.mipmap.bg_btn_home3,
-                R.mipmap.bg_btn_home_chat,
-                true
-            ),
-            ScenesModel(
-                AgoraScenes.SpatialAudioChatRoom,
-                "io.agora.scene.voice.spatial.ui.activity.VoiceRoomListActivity",
-                context.getString(R.string.app_voice_chat),
-                R.mipmap.bg_btn_home5,
-                0,
-                true,
-                context.getString(R.string.app_voice_chat_spatialTip)
-            ),
-            ScenesModel(
-                AgoraScenes.KTV,
-                "io.agora.scene.ktv.create.RoomListActivity",
-                context.getString(R.string.ktv_online),
-                R.mipmap.bg_btn_home1,
-                R.mipmap.bg_btn_home_ktv,
-                true
-            ),
-            ScenesModel(
-                AgoraScenes.SingBattleGame,
-                "io.agora.scene.ktv.singbattle.create.RoomListActivity",
-                context.getString(R.string.ktv_singbattle_online),
-                R.mipmap.bg_btn_home4,
-                0,
-                true
-            ),
-            ScenesModel(
-                AgoraScenes.SingRelayGame,
-                "io.agora.scene.ktv.singrelay.create.RoomListActivity",
-                context.getString(R.string.app_sing_relay),
-                R.mipmap.bg_btn_singrelay,
-                0,
-                true
-            ),
-            ScenesModel(
-                AgoraScenes.LiveShow,
-                "io.agora.scene.show.RoomListActivity",
-                context.getString(R.string.app_show_live),
-                R.mipmap.bg_btn_home2,
-                R.mipmap.bg_btn_home_live,
-                true
-            ),
-            ScenesModel(
-                AgoraScenes.OneToOne,
-                "io.agora.scene.pure1v1.ui.RoomListActivity",
-                context.getString(R.string.app_one_to_one),
-                R.mipmap.bg_btn_home6,
-                R.mipmap.bg_btn_home_pure1v1,
-                true
-            ),
-            ScenesModel(
-                AgoraScenes.ShowTo1v1,
-                "io.agora.scene.showTo1v1.ui.RoomListActivity",
-                context.getString(R.string.app_show_to_1v1),
-                R.mipmap.bg_btn_home7,
-                R.mipmap.bg_btn_home_showto1v1,
-                true
-            )
-        )
-    }
-
     // ktv-独唱&合唱
     private const val ktvSoloChorusClazz = "io.agora.scene.ktv.create.RoomListActivity"
 
@@ -90,7 +18,7 @@ object ScenesConstructor {
     private const val ktvCantataClazz = ""
 
     // ktv-接唱
-    private const val ktvSingRelayClazz = ""
+    private const val ktvSingRelayClazz = "io.agora.scene.ktv.singrelay.create.RoomListActivity"
 
     // 语聊房-普通版
     private const val voiceChatroomClazz = "io.agora.scene.voice.ui.activity.VoiceRoomListActivity"

@@ -16,6 +16,8 @@
     <color name="def_text_grey_869">#86909C</color>
     <color name="def_text_grey_303">#303553</color>
     <color name="def_text_grey_6F7">#6F738B</color>
+    <color name="def_text_grey_C9C">#C9CDD4</color>
+    <color name="def_diver_grey_F2F">#F2F2F6</color>
     <color name="black_57">#575757</color>
     <color name="black_08">#080F38</color>
     <color name="black_3d">#3d3f46</color>
@@ -54,6 +56,7 @@
     <color name="red_e0">#E02020</color>
     <color name="red_fa">#FA396A</color>
     <color name="red_f7">#F74747</color>
+    <color name="red_f3">#FF3B30</color>
     <color name="pink_b4">#FF8AB4</color>
     <color name="orange_e6">#e69138</color>
 

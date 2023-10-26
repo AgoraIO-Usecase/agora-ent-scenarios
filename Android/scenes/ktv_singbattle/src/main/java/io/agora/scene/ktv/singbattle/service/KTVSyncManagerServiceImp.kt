@@ -145,6 +145,8 @@ class KTVSyncManagerServiceImp(
                 isPrivate = inputModel.isPrivate != 0,
                 password = inputModel.password,
                 creatorNo = UserManager.getInstance().user.id.toString(),
+                creatorName = UserManager.getInstance().user.name,
+                creatorAvatar = UserManager.getInstance().user.headUrl,
                 bgOption = "0",
             )
             val scene = Scene()
@@ -375,6 +377,8 @@ class KTVSyncManagerServiceImp(
                         roomInfo.isPrivate,
                         roomInfo.password,
                         roomInfo.creatorNo,
+                        roomInfo.creatorName,
+                        roomInfo.creatorAvatar,
                         roomInfo.createdAt,
                         inputModel.mvIndex.toString(),
                         roomInfo.roomPeopleNum
@@ -1055,6 +1059,8 @@ class KTVSyncManagerServiceImp(
                         roomInfo.isPrivate,
                         roomInfo.password,
                         roomInfo.creatorNo,
+                        roomInfo.creatorName,
+                        roomInfo.creatorAvatar,
                         roomInfo.createdAt,
                         roomInfo.bgOption,
                         count

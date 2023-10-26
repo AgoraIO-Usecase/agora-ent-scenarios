@@ -5,12 +5,12 @@
 #import <UIKit/UIKit.h>
 #import "VLMainTabBarController.h"
 #import "VLHomeViewController.h"
-#import "VLDiscoveryViewController.h"
 #import "VLMineViewController.h"
 #import "VLMacroDefine.h"
 #import "BaseNavigationController.h"
 #import "MenuUtils.h"
 #import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 
 @interface VLMainTabBarController ()<CALayerDelegate, UITabBarControllerDelegate>
 @property (nonatomic, assign) NSInteger doubleCount;
@@ -53,7 +53,7 @@
                                                           initWithRootViewController:homeViewController];
     homeViewController.tabBarItem = [self tabBarItemsWithIndex:0];
     
-    VLDiscoveryViewController *discoveryVC = [[VLDiscoveryViewController alloc] init];
+    VLDiscoveyrViewController *discoveryVC = [[VLDiscoveyrViewController alloc] init];
     discoveryVC.hidesBottomBarWhenPushed = NO;
     BaseNavigationController *discoveryNavigationController = [[BaseNavigationController alloc]
                                                   initWithRootViewController:discoveryVC];

@@ -13,6 +13,7 @@
 "app_action_settings"="设置";
 
 "app_exit"="退出";
+"app_my_account"="我的账号";
 "app_user_agreement"="用户协议";
 "app_privacy_agreement"="隐私政策";
 "app_personal_info_collection_checklist"="个人信息收集清单";
@@ -21,6 +22,7 @@
 
 "app_confirm_deletion"="确认删除？";
 "app_about_us"="关于我们";
+"app_submit_feedback" = "提交反馈";
 
 "app_please_input_account"="请输入手机号";
 "app_error_pwd_tip"="8~20个字符，包含大、小写字母和数字";
@@ -36,8 +38,11 @@
 
 "app_plus_86"="+86";
 "app_logout"="退出登录";
+"app_logout_desc"="退出登录后，我们将保留您的数据信息，期待下次与您相遇";
 "app_logoff_account"="注销账号";
-"app_logoff"="注销";
+"app_logooff_account_desc" = "注销后，您将无法使用当前账号体验我们的服务，请谨慎考虑";
+"app_logoff"="确认注销";
+"app_not_logoff"="暂不注销";
 "app_debug_mode"="开发者模式";
 
 "app_voice_chat"="语聊房";
@@ -145,3 +150,30 @@
 "validate_failed" = "验证码校验失败，请重试";
 "after_send_tip" = "秒后可重新发送";
 
+"feedback_tags_flashback" = "闪退";
+"feedback_tags_audioStuck" = "音频卡顿";
+"feedback_tags_videoStuck" = "视频卡顿";
+"feedback_tags_abnormal_communication" = "通信异常";
+"feedback_tags_functional_recommendations" = "功能建议";
+"feedback_tags_other" = "其它";
+"feedback_desc" = "描述";
+"feedback_textView_placeholder" = "您的意见将帮助我们更快成长";
+"feedback_upload_log_tips" = "同时上传本机声动互娱通话日志";
+"feedback_submit" = "提交";
+"feedback_tags_tips" = "请至少选择一个反馈类型再提交";
+"feedback_upload_image_fail" = "图片上传失败";
+"feedback_result_tips" = "提交成功，感谢反馈";
+"feedback_result_desc" = "如您的问题比较紧急，请致电客服";
+
+"discover_scene_scheme" = "场景解决方案";
+"discover_ktv_scene_desc" = "一站式接入海量正版曲库，灵活接入各类娱乐社交场景";
+"discover_voice_chat_scene_title" = "声动语聊";
+"discover_voice_chat_scene_desc" = "更纯净、更动听、更沉浸、更好玩的语聊互动体验";
+"discover_live_scene_title" = "直播";
+"discover_live_scene_desc" = "视频『高清』升级，人更美、物更真，体验更流畅";
+"discover_AI_Engine" = "凤鸣AI引擎";
+"discover_AI_denoise" = "凤鸣AI降噪";
+"discover_AI_denoise_desc" = "让实时互动远离干扰,实现纯净声音体验";
+"discover_spetial_voice" = "凤鸣空间音频";
+"discover_spetial_voice_desc" = "身临其境的实时音频互动体验";
+"discover_document_title" = "集成文档";

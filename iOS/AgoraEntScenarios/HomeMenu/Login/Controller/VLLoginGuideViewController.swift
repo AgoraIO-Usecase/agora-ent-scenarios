@@ -7,7 +7,7 @@
 
 import UIKit
 
-class VLLoginGuideViewController: BaseViewController {
+class VLLoginGuideViewController: VLBaseViewController {
     private lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .horizontal
@@ -61,7 +61,6 @@ class VLLoginGuideViewController: BaseViewController {
         button.setImage(UIImage(named: "icon_privacy_select_button"), for: .selected)
         button.imageEdgeInsets(UIEdgeInsets(top: 0, left: -15, bottom: 0, right: 0))
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.isSelected = true
         button.addTarget(self, action: #selector(onClickAgreeButton(sender:)), for: .touchUpInside)
         return button
     }()

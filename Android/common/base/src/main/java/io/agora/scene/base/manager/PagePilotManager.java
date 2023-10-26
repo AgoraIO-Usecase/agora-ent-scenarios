@@ -1,5 +1,7 @@
 package io.agora.scene.base.manager;
 
+import android.content.Intent;
+
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import io.agora.scene.base.Constant;
@@ -9,6 +11,13 @@ public class PagePilotManager {
     public static void pageWelcome() {
         ARouter.getInstance()
                 .build(PagePathConstant.pageWelcome)
+                .navigation();
+    }
+
+    public static void pageWelcomeClear() {
+        ARouter.getInstance()
+                .build(PagePathConstant.pageWelcome)
+                .withFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
                 .navigation();
     }
 
@@ -34,6 +43,18 @@ public class PagePilotManager {
     public static void pageAboutUs() {
         ARouter.getInstance()
                 .build(PagePathConstant.pageAboutUs)
+                .navigation();
+    }
+
+    public static void pageMineAccount() {
+        ARouter.getInstance()
+                .build(PagePathConstant.pageMineAccount)
+                .navigation();
+    }
+
+    public static void pageFeedback() {
+        ARouter.getInstance()
+                .build(PagePathConstant.pageFeedback)
                 .navigation();
     }
 

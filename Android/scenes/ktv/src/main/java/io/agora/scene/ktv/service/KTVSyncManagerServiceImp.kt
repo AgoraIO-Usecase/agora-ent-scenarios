@@ -1,9 +1,11 @@
 package io.agora.scene.ktv.service
 
 import android.content.Context
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import androidx.annotation.RequiresApi
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.manager.UserManager
@@ -23,7 +25,7 @@ class KTVSyncManagerServiceImp(
     private val errorHandler: ((Exception?) -> Unit)?
 ) : KTVServiceProtocol {
     private val TAG = "KTV_Service_LOG"
-    private val kSceneId = "scene_ktv_3.0.2"
+    private val kSceneId = "scene_ktv_4.0.0"
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"
     private val kCollectionIdUser = "userCollection"
@@ -137,6 +139,8 @@ class KTVSyncManagerServiceImp(
                 isPrivate = inputModel.isPrivate != 0,
                 password = inputModel.password,
                 creatorNo = UserManager.getInstance().user.id.toString(),
+                creatorName = UserManager.getInstance().user.name,
+                creatorAvatar = UserManager.getInstance().user.headUrl,
                 bgOption = "0",
             )
             val scene = Scene()
@@ -366,6 +370,8 @@ class KTVSyncManagerServiceImp(
                         roomInfo.isPrivate,
                         roomInfo.password,
                         roomInfo.creatorNo,
+                        roomInfo.creatorName,
+                        roomInfo.creatorAvatar,
                         roomInfo.createdAt,
                         inputModel.mvIndex.toString(),
                         roomInfo.roomPeopleNum
@@ -422,6 +428,7 @@ class KTVSyncManagerServiceImp(
         innerAddSeatInfo(seatInfo, completion)
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun autoOnSeat(completion: (error: Exception?) -> Unit) {
         val list = mutableListOf<Int>(0, 1, 2, 3, 4, 5, 6, 7)
         seatMap.forEach {
@@ -942,6 +949,8 @@ class KTVSyncManagerServiceImp(
                         roomInfo.isPrivate,
                         roomInfo.password,
                         roomInfo.creatorNo,
+                        roomInfo.creatorName,
+                        roomInfo.creatorAvatar,
                         roomInfo.createdAt,
                         roomInfo.bgOption,
                         count
