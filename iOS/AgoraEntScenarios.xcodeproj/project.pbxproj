@@ -635,6 +635,7 @@
 		E71685752AE61BB700C2915C /* EffectsLicense.m in Sources */ = {isa = PBXBuildFile; fileRef = E71685622AE61BB700C2915C /* EffectsLicense.m */; };
 		E71685762AE61BB800C2915C /* EFMotionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E71685662AE61BB700C2915C /* EFMotionManager.m */; };
 		E71685772AE61BB800C2915C /* EffectsCommonObject.m in Sources */ = {isa = PBXBuildFile; fileRef = E71685682AE61BB700C2915C /* EffectsCommonObject.m */; };
+		E71685792AEA4A7700C2915C /* ShowThumnbnailCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E71685782AEA4A7700C2915C /* ShowThumnbnailCanvasView.swift */; };
 		E74F817B2AD68338009CA280 /* HomeContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F817A2AD68338009CA280 /* HomeContentViewController.swift */; };
 		E74F81812AD7C7D3009CA280 /* HomeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F81802AD7C7D3009CA280 /* HomeModel.swift */; };
 		E74F81832AD7D9A7009CA280 /* HomeContentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F81822AD7D9A7009CA280 /* HomeContentViewCell.swift */; };
@@ -1512,6 +1513,7 @@
 		E71685692AE61BB700C2915C /* EFGlobalSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EFGlobalSingleton.h; sourceTree = "<group>"; };
 		E716856A2AE61BB700C2915C /* VideoProcessingManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoProcessingManager.h; sourceTree = "<group>"; };
 		E716856B2AE61BB700C2915C /* EffectsProcess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsProcess.h; sourceTree = "<group>"; };
+		E71685782AEA4A7700C2915C /* ShowThumnbnailCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowThumnbnailCanvasView.swift; sourceTree = "<group>"; };
 		E74F817A2AD68338009CA280 /* HomeContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeContentViewController.swift; sourceTree = "<group>"; };
 		E74F81802AD7C7D3009CA280 /* HomeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeModel.swift; sourceTree = "<group>"; };
 		E74F81822AD7D9A7009CA280 /* HomeContentViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeContentViewCell.swift; sourceTree = "<group>"; };
@@ -2090,6 +2092,7 @@
 				DD36103929B70CDC00CE7984 /* ShowChatInputView.swift */,
 				DD36103A29B70CDC00CE7984 /* ShowRoomChatCell.swift */,
 				DD36103B29B70CDC00CE7984 /* ShowRoomInfoView.swift */,
+				E71685782AEA4A7700C2915C /* ShowThumnbnailCanvasView.swift */,
 			);
 			path = Live;
 			sourceTree = "<group>";
@@ -4143,6 +4146,7 @@
 				E74F81812AD7C7D3009CA280 /* HomeModel.swift in Sources */,
 				E71685502AE6167A00C2915C /* BEGLTexture.m in Sources */,
 				DDA199F428FFE579009D3E61 /* String+Extension.swift in Sources */,
+				E71685792AEA4A7700C2915C /* ShowThumnbnailCanvasView.swift in Sources */,
 				DD9EBF9A2AD5512300B4551F /* Xcode14.m in Sources */,
 				E357355C29EFD74A009D54E1 /* KTVLrcControl.swift in Sources */,
 				DD3610BF29B70CDC00CE7984 /* ShowSettingActionSheetCell.swift in Sources */,

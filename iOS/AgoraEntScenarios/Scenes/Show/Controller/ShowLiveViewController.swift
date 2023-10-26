@@ -132,6 +132,12 @@ class ShowLiveViewController: UIViewController {
         }
     }
     
+    private lazy var thumnbnailCanvasView: ShowThumnbnailCanvasView = {
+        let view = ShowThumnbnailCanvasView(frame: view.bounds)
+        view.isHidden = true
+        return view
+    }()
+    
     //interaction list
     private var interactionList: [ShowInteractionInfo]? {
         didSet {
@@ -273,6 +279,7 @@ class ShowLiveViewController: UIViewController {
         
     private func setupUI(){
         view.layer.contents = UIImage.show_sceneImage(name: "show_live_room_bg")?.cgImage
+        view.addSubview(thumnbnailCanvasView)
         navigationController?.isNavigationBarHidden = true
         liveView.room = room
         view.addSubview(liveView)
@@ -982,8 +989,12 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
             self.muteLocalVideo = selected
             if selected {
                 ShowAgoraKitManager.shared.engine?.stopPreview()
+                self.thumnbnailCanvasView.isHidden = false
             } else {
                 ShowAgoraKitManager.shared.engine?.startPreview()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    self.thumnbnailCanvasView.isHidden = true
+                }
             }
         }
     }
