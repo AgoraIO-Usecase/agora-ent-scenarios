@@ -33,6 +33,10 @@ class BeautyModel: BeautyBaseModel {
     var key: String?
     /// 特效强度 （0~1）
     var value: CGFloat = 0
+    /// 最小值
+    var min: Float = 0
+    /// 最大值
+    var max: Float = 1
     
     static func createBeautyData() -> [BeautyModel] {
         var dataArray = [BeautyModel]()
@@ -50,6 +54,7 @@ class BeautyModel: BeautyBaseModel {
             model.path = ""
             model.key = "103"
             model.value = 0.55
+            model.max = 1.5
         }
         model.name = "show_beauty_item_beauty_smooth".show_localized
         model.icon = "meiyan_icon_mopi"
@@ -65,6 +70,7 @@ class BeautyModel: BeautyBaseModel {
             model.path = ""
             model.key = "101"
             model.value = 0.2
+            model.max = 1.5
         }
         model.name = "show_beauty_item_beauty_whiten".show_localized
         model.icon = "meiyan_icon_meibai"
