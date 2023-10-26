@@ -54,7 +54,6 @@ class BeautyModel: BeautyBaseModel {
             model.path = ""
             model.key = "103"
             model.value = 0.55
-            model.max = 1.5
         }
         model.name = "show_beauty_item_beauty_smooth".show_localized
         model.icon = "meiyan_icon_mopi"
@@ -70,7 +69,6 @@ class BeautyModel: BeautyBaseModel {
             model.path = ""
             model.key = "101"
             model.value = 0.2
-            model.max = 1.5
         }
         model.name = "show_beauty_item_beauty_whiten".show_localized
         model.icon = "meiyan_icon_meibai"
