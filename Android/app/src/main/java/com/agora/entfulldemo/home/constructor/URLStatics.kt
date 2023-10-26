@@ -2,7 +2,7 @@ package com.agora.entfulldemo.home.constructor
 
 class URLStatics {
     companion object {
-        const val userAgreementURL = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/privacy/service.html"
+        const val userAgreementURL = "https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/service.html"
         const val privacyAgreementURL = "https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/privacy.html"
         //开发服：http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest-dev/index.html
         //正式服：http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest/index.html

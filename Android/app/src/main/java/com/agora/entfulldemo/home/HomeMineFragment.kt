@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.text.InputFilter
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -37,6 +38,8 @@ import io.agora.scene.widget.dialog.SelectPhotoFromDialog
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 import io.agora.scene.widget.utils.ImageCompressUtil
 import java.io.File
+import java.util.Arrays
+
 
 class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
 
@@ -182,6 +185,7 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
         if (AgoraApplication.the().isDebugModeOpen) {
             binding.tvDebugMode.visibility = View.VISIBLE
         }
+        binding.etNickname.filters = arrayOf(mInputFilter)
     }
 
     private var mTempPhotoPath: String? = null
@@ -279,5 +283,36 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
             }
         }
         debugModeDialog?.show()
+    }
+
+    // 昵称限制 10 个字符
+    private val maxLen = 10
+    private val mInputFilter = InputFilter { source, start, end, dest, dstart, dend ->
+        var dindex = 0
+        var count = 0
+        while (count <= maxLen && dindex < dest.length) {
+            val c = dest[dindex++]
+            count = if (c.code < 128) {
+                count + 1
+            } else {
+                count + 2
+            }
+        }
+        if (count > maxLen) {
+            return@InputFilter dest.subSequence(0, dindex - 1)
+        }
+        var sindex = 0
+        while (count <= maxLen && sindex < source.length) {
+            val c = source[sindex++]
+            count = if (c.code < 128) {
+                count + 1
+            } else {
+                count + 2
+            }
+        }
+        if (count > maxLen) {
+            sindex--
+        }
+        source.subSequence(0, sindex)
     }
 }

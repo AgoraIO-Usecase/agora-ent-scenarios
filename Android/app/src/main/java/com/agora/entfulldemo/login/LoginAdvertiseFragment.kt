@@ -81,7 +81,13 @@ class LoginAdvertiseFragment : BaseViewBindingFragment<AppFragmentLoginAdvertise
         super.initListener()
         binding.btnLogin.setOnClickListener(object : OnFastClickListener() {
             override fun onClickJacking(view: View) {
-                findNavController().navigate(R.id.action_fragmentAdvertise_to_fragmentPhoneInput)
+                if (binding.cvIAgree.isChecked){
+                    findNavController().navigate(R.id.action_fragmentAdvertise_to_fragmentPhoneInput)
+                }else{
+                    binding.tvAgreementTips.isVisible = true
+                    mMainHandler.removeCallbacks(mCloseAgreementTipsTask)
+                    mMainHandler.postDelayed(mCloseAgreementTipsTask, 3000L)
+                }
             }
         })
         binding.tvUserAgreement.setOnClickListener(object : OnFastClickListener() {
@@ -95,16 +101,12 @@ class LoginAdvertiseFragment : BaseViewBindingFragment<AppFragmentLoginAdvertise
             }
         })
         binding.cvIAgree.setOnCheckedChangeListener { _, isChecked ->
-            mMainHandler.removeCallbacks(mCloseAgreementTipsTask)
+
             if (isChecked) {
-                binding.btnLogin.isEnabled = true
                 binding.tvAgreementTips.isVisible = false
                 binding.btnLogin.alpha = 1.0f
             } else {
-                binding.btnLogin.isEnabled = false
-                binding.tvAgreementTips.isVisible = true
                 binding.btnLogin.alpha = 0.6f
-                mMainHandler.postDelayed(mCloseAgreementTipsTask, 3000L)
             }
         }
         binding.cvIAgree.isChecked = false
@@ -162,7 +164,7 @@ class LoginAdvertiseFragment : BaseViewBindingFragment<AppFragmentLoginAdvertise
                         if (currentItem + 1 == mAdvertiseAdapter.itemCount - 1) {
                             setCurrentItem(1, false)
                         } else if (currentItem + 1 < mAdvertiseAdapter.itemCount - 1) {
-                            setCurrentItem(currentItem + 1, false)
+                            setCurrentItem(currentItem + 1, true)
                         }
                     }
                 }

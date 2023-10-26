@@ -50,7 +50,7 @@
                         android:gravity="center"
                         android:imeOptions="actionDone"
                         android:inputType="text"
-                        android:maxLength="12"
+                        android:maxLength="10"
                         android:textColor="@color/def_text_color_040"
                         android:textSize="18sp"
                         android:textStyle="bold"

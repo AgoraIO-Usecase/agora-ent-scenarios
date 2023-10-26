@@ -2,6 +2,7 @@ package com.agora.entfulldemo.login
 
 import androidx.lifecycle.MutableLiveData
 import com.agora.entfulldemo.R
+import io.agora.scene.base.Constant
 import io.agora.scene.base.api.ApiException
 import io.agora.scene.base.api.ApiManager
 import io.agora.scene.base.api.ApiSubscriber
@@ -13,10 +14,7 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
 import io.reactivex.disposables.Disposable
 
-class LoginShareViewModel : BaseRequestViewModel() {
-
-    val mRequestCodeLiveData: MutableLiveData<Boolean> = MutableLiveData()
-    val mRequestLoginLiveData: MutableLiveData<Boolean> = MutableLiveData()
+class LoginViewModel : BaseRequestViewModel() {
 
     /**
      * 登录
@@ -26,7 +24,7 @@ class LoginShareViewModel : BaseRequestViewModel() {
      */
     fun requestLogin(account: String, vCode: String?) {
         if (account != phone) {
-            mRequestLoginLiveData.postValue(false)
+            iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL,null)
             ToastUtils.showToast(R.string.app_vcode_wrong_tip)
             return
         }
@@ -41,7 +39,7 @@ class LoginShareViewModel : BaseRequestViewModel() {
                         ToastUtils.showToast(R.string.app_login_success_tip)
                         ApiManager.token = data.data!!.token
                         UserManager.getInstance().saveUserInfo(data.data)
-                        mRequestLoginLiveData.postValue(true)
+                        iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS,null)
                     }
 
 
@@ -51,7 +49,7 @@ class LoginShareViewModel : BaseRequestViewModel() {
                         } else {
                             ToastUtils.showToast(R.string.app_login_failed_tip)
                         }
-                        mRequestLoginLiveData.postValue(false)
+                        iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL,null)
                     }
                 }
             )
@@ -84,16 +82,16 @@ class LoginShareViewModel : BaseRequestViewModel() {
 
                     override fun onSuccess(t: BaseResponse<String>?) {
                         ToastUtils.showToast(R.string.app_vcode_send_success_tip)
-                        mRequestCodeLiveData.postValue(true)
+                        iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_CODE_SUCCESS,null)
                     }
 
                     override fun onFailure(t: ApiException?) {
                         if (t != null) {
                             ToastUtils.showToast(t.message)
                         } else {
-                            ToastUtils.showToast(R.string.app_vcode_send_success_tip)
+                            ToastUtils.showToast(R.string.app_vcode_send_failed_tip)
                         }
-                        mRequestCodeLiveData.value = (false)
+                        iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_CODE_FAIL,null)
                     }
                 }
             )
