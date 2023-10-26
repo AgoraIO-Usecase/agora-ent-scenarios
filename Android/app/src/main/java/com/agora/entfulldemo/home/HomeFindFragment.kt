@@ -1,13 +1,19 @@
 package com.agora.entfulldemo.home
 
+import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.JavascriptInterface
+import android.webkit.JsPromptResult
 import android.webkit.WebChromeClient
 import android.webkit.WebChromeClient.CustomViewCallback
+import android.webkit.WebView
 import android.widget.FrameLayout
 import com.agora.entfulldemo.databinding.AppFragmentHomeFindBinding
 import com.agora.entfulldemo.home.constructor.URLStatics
@@ -15,6 +21,7 @@ import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnFastClickListener
 import io.agora.scene.base.manager.PagePilotManager
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.widget.CustomWebView.MyWebViewClient
 
 class HomeFindFragment : BaseViewBindingFragment<AppFragmentHomeFindBinding>() {
     private var fullscreenContainer: FrameLayout? = null
@@ -82,14 +89,41 @@ class HomeFindFragment : BaseViewBindingFragment<AppFragmentHomeFindBinding>() {
         })
     }
 
+    @SuppressLint("JavascriptInterface")
     private fun loadBannerWeb(){
         val stringBuilder =
             StringBuilder(URLStatics.findBannerURL)
                 .append("?token=").append(UserManager.getInstance().user.token)
+
         binding.webView.loadUrl(stringBuilder.toString())
+        binding.webView.webViewClient = object : MyWebViewClient() {
+            override fun onPageFinished(view: WebView, url: String) {
+                super.onPageFinished(view, url)
+                binding.webView.addJavascriptInterface(object : Any() {
+
+                    @SuppressLint("JavascriptInterface")
+                    @JavascriptInterface
+                    fun jumpToWebview(params: String?) {
+                        Log.d("zhangw","params:$params")
+                    }
+                }, "JSBridge")
+            }
+        }
     }
 
     private inner class MyWebChromeClient : WebChromeClient() {
+
+        override fun onJsPrompt(
+            view: WebView?,
+            url: String?,
+            message: String?,
+            defaultValue: String?,
+            result: JsPromptResult?
+        ): Boolean {
+            Log.d("zhangw","onJsPrompt:$url,$message,$defaultValue,$result")
+            return super.onJsPrompt(view, url, message, defaultValue, result)
+        }
+
         override fun onHideCustomView() {
             //退出全屏
             hideCustomView()
