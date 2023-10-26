@@ -318,7 +318,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 #pragma mark - UIImagePickerControllerDelegate
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     [picker dismissViewControllerAnimated:YES completion:^{
-        UIImage *image = info[UIImagePickerControllerOriginalImage];
+        UIImage *image = info[UIImagePickerControllerEditedImage];
         [self uploadHeadImageWithImage:image];
     }];
 }
