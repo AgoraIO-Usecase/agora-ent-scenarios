@@ -175,13 +175,13 @@
 "home_content_item_voice_title_spatial" = "语聊房-空间音频版";
 "home_content_item_voice_desc_spatial" = "方位感和空间感";
 "home_content_item_live_title_show" = "秀场";
-"home_content_item_live_desc_show" = "描述描述描述";
+"home_content_item_live_desc_show" = "高清流畅人更美";
 "home_content_item_live_title_1v1_private" = "1v1私密房";
-"home_content_item_live_desc_1v1_private" = "描述描述描述";
+"home_content_item_live_desc_1v1_private" = "秒接通&秒出图";
 "home_content_item_live_title_multiple" = "多人团战";
 "home_content_item_live_desc_multiple" = "敬请期待";
 "home_content_item_live_title_show_1v1_private" = "秀场转1v1私密房";
-"home_content_item_live_desc_show_1v1_private" = "描述描述描述";
+"home_content_item_live_desc_show_1v1_private" = "秒转场&秒接通";
 
 "feedback_tags_flashback" = "闪退";
 "feedback_tags_audioStuck" = "音频卡顿";
