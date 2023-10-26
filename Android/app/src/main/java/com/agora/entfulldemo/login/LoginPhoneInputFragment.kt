@@ -11,14 +11,18 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isGone
 import androidx.core.widget.doAfterTextChanged
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentLoginPhoneInputBinding
 import com.agora.entfulldemo.widget.dp
+import io.agora.scene.base.Constant
 import io.agora.scene.base.component.BaseViewBindingFragment
+import io.agora.scene.base.component.ISingleCallback
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.component.OnFastClickListener
+import io.agora.scene.base.manager.PagePilotManager
+import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.StringUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.widget.dialog.SwipeCaptchaDialog
@@ -30,7 +34,9 @@ class LoginPhoneInputFragment : BaseViewBindingFragment<AppFragmentLoginPhoneInp
         const val Key_Account = "key_account"
     }
 
-    private val mLoginViewModel: LoginShareViewModel by activityViewModels()
+    private val mLoginViewModel: LoginViewModel by lazy {
+        ViewModelProvider(this)[LoginViewModel::class.java]
+    }
 
     private var mSwipeCaptchaDialog: SwipeCaptchaDialog? = null
 
@@ -128,9 +134,9 @@ class LoginPhoneInputFragment : BaseViewBindingFragment<AppFragmentLoginPhoneInp
 
     override fun requestData() {
         super.requestData()
-        mLoginViewModel.mRequestCodeLiveData.observe(this) {
-            if (it) {
-                Log.d("zhangw", "LoginPhoneInputFragment mRequestCodeLiveData true")
+        mLoginViewModel.setISingleCallback { type: Int, data: Any? ->
+            if (type == Constant.CALLBACK_TYPE_LOGIN_REQUEST_CODE_SUCCESS) {
+                Log.d("zhangw", "LoginPhoneInputFragment requestCode success")
                 if (findNavController().currentDestination?.id == R.id.fragmentPhoneInput) {
                     findNavController().navigate(R.id.action_fragmentPhoneInput_to_fragmentVerify, Bundle().apply {
                         putString(Key_Account, mLoginViewModel.getPhone())

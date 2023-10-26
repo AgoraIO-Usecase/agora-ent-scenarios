@@ -44,9 +44,9 @@ class WelcomeActivity : BaseViewBindingActivity<AppActivityWelcomeBinding>() {
                     }
 
                     override fun onRightButtonClick() {
-                        PagePilotManager.pageLogin()
                         dismiss()
                         finish()
+                        PagePilotManager.pageLogin()
                     }
                 }
             }
@@ -67,9 +67,9 @@ class WelcomeActivity : BaseViewBindingActivity<AppActivityWelcomeBinding>() {
                     }
 
                     override fun onRightButtonClick() {
-                        PagePilotManager.pageLogin()
                         dismiss()
                         finish()
+                        PagePilotManager.pageLogin()
                     }
                 }
             }
@@ -93,8 +93,8 @@ class WelcomeActivity : BaseViewBindingActivity<AppActivityWelcomeBinding>() {
             if (!SPUtil.getBoolean(Constant.IS_AGREE, false)) {
                 showUserAgreementDialog()
             } else {
-                PagePilotManager.pageLogin()
                 finish()
+                PagePilotManager.pageLogin()
             }
         }
     }

@@ -156,8 +156,8 @@
     <string name="app_input_phonenum_tip">请输入正确的手机号</string>
     <string name="app_input_vcode_tip">请输入验证码</string>
     <string name="app_vcode_wrong_tip">验证码错误</string>
-    <string name="app_login_success_tip">登陆成功</string>
-    <string name="app_login_failed_tip">登陆失败</string>
+    <string name="app_login_success_tip">登录成功</string>
+    <string name="app_login_failed_tip">登录失败</string>
     <string name="app_vcode_send_success_tip">验证码发送成功</string>
     <string name="app_vcode_send_failed_tip">验证码发送失败</string>
     <string name="app_edit_success">修改成功</string>

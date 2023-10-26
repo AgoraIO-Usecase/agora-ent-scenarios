@@ -84,7 +84,7 @@ class MineAccountActivity : BaseViewBindingActivity<AppActivityMineAccountBindin
                     override fun onRightButtonClick() {
                         SPUtil.putBoolean(Constant.IS_AGREE, false)
                         UserManager.getInstance().logout()
-                        finish()
+                        this@MineAccountActivity.finishAffinity()
                         PagePilotManager.pageWelcomeClear()
                     }
                 }
