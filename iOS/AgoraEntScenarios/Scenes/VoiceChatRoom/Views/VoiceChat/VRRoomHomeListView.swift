@@ -29,18 +29,6 @@ class VRRoomHomeListView: UIView {
     
     private func layoutUI() {
         
-        let titleLabel = UILabel(frame: CGRect(x: (bounds.width - 100)/2.0, y: ZStatusBarHeight + 20, width: 100, height: 20))
-        titleLabel.text = "语聊房"
-        titleLabel.font = UIFont.systemFont(ofSize: 17)
-        titleLabel.textAlignment = .center
-        self.addSubview(titleLabel)
-        
-        let backBtn = UIButton(frame: CGRect(x: 20, y: ZStatusBarHeight + 20, width: 12, height: 20))
-        backBtn.addTarget(self, action: #selector(back), for: .touchUpInside)
-        backBtn.setBackgroundImage( UIImage.sceneImage(name: "vr_back"), for: .normal)
-        backBtn.extendedTouchArea = UIEdgeInsets(top: -20, left: -20, bottom: -20, right: -20)
-        self.addSubview(backBtn)
-        
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .vertical
         let middleMargin: CGFloat = 10
@@ -50,9 +38,9 @@ class VRRoomHomeListView: UIView {
         flowLayout.minimumInteritemSpacing = middleMargin
         flowLayout.minimumLineSpacing = middleMargin // 修改为 middleMargin，使得两个项目显示在一行中
         
-        collectionView = UICollectionView(frame: CGRect(x: 0, y: ZNavgationHeight + 20, width: bounds.width, height: bounds.height - ZNavgationHeight - 20), collectionViewLayout: flowLayout)
+        collectionView = UICollectionView(frame: CGRect(x: 0, y: 20, width: bounds.width, height: bounds.height - 20), collectionViewLayout: flowLayout)
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-        collectionView.backgroundColor = .white
+        collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(VRRoomHomeListCell.self, forCellWithReuseIdentifier: "home")

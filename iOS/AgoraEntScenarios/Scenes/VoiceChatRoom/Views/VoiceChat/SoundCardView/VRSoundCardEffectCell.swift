@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SoundCardEffectCell: UITableViewCell {
+class VRSoundCardEffectCell: UITableViewCell {
 
     var titleLabel: UILabel!
     var detailLabel: UILabel!

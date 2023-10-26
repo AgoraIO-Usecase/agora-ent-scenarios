@@ -7,7 +7,7 @@
 
 import Foundation
 
-@objc class SoundCardSettingView: UIView {
+@objc class VRSoundCardSettingView: UIView {
     var headIconView: UIView!
     var headTitleLabel: UILabel!
     var noSoundCardView: UIView!
@@ -53,8 +53,8 @@ import Foundation
         tableView.dataSource = self
         tableView.delegate = self
         tableView.registerCell(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        tableView.registerCell(SoundCardMicCell.self, forCellReuseIdentifier: "mic")
-        tableView.registerCell(SoundCardSwitchCell.self, forCellReuseIdentifier: "switch")
+        tableView.registerCell(VRSoundCardMicCell.self, forCellReuseIdentifier: "mic")
+        tableView.registerCell(VRSoundCardSwitchCell.self, forCellReuseIdentifier: "switch")
         self.addSubview(tableView)
         
         coverView = UIView()
@@ -115,14 +115,14 @@ import Foundation
         
         noSoundCardView.isHidden = true
         
-        let flag = KTVHeadSetUtil.hasSoundCard()
-        self.noSoundCardView.isHidden = flag
-        self.tableView.isHidden = !flag
-
-        KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
-            self?.noSoundCardView.isHidden = flag
-            self?.tableView.isHidden = !flag
-        }
+//        let flag = KTVHeadSetUtil.hasSoundCard()
+//        self.noSoundCardView.isHidden = flag
+//        self.tableView.isHidden = !flag
+//
+//        KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
+//            self?.noSoundCardView.isHidden = flag
+//            self?.tableView.isHidden = !flag
+//        }
     }
     
     required init?(coder: NSCoder) {
@@ -180,7 +180,7 @@ import Foundation
     
 }
 
-extension SoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
+extension VRSoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 5
     }
@@ -228,7 +228,7 @@ extension SoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
             cell.selectionStyle = .none
             return cell
         } else if indexPath.row == 3 {
-            let cell: SoundCardSwitchCell = tableView.dequeueReusableCell(withIdentifier: "switch", for: indexPath) as! SoundCardSwitchCell
+            let cell: VRSoundCardSwitchCell = tableView.dequeueReusableCell(withIdentifier: "switch", for: indexPath) as! VRSoundCardSwitchCell
             cell.selectionStyle = .none
             cell.slider.value = Float(1/4.0 * gainValue)
             cell.numLable.text = String(format: "%.1f",gainValue)
@@ -239,7 +239,7 @@ extension SoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
             }
             return cell
         } else {
-            let cell: SoundCardMicCell = tableView.dequeueReusableCell(withIdentifier: "mic", for: indexPath) as! SoundCardMicCell
+            let cell: VRSoundCardMicCell = tableView.dequeueReusableCell(withIdentifier: "mic", for: indexPath) as! VRSoundCardMicCell
             cell.accessoryType = .none
             cell.selectionStyle = .none
             let text = self.typeValue > 0 ? "\(self.typeValue)" : "关闭"

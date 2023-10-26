@@ -7,17 +7,14 @@
 
 import Foundation
 
-class SoundCardEffectView: UIView {
+class VRSoundCardMicTypeView: UIView {
     var headIconView: UIView!
     var headTitleLabel: UILabel!
     var tableView: UITableView!
     var botView: UIView!
     var cancleView: UIButton!
     var sepView: UIView!
-    let voiceArray: [String] = ["大叔音", "妈音", "青叔音", "御妈音", "青年音", "少御音"]
-    let descArray: [String] = ["高混响|KTV", "高混响|KTV", "明亮|磁性", "明亮|磁性", "低沉|温暖",  "醇厚|饱满"]
-    let imgArray: [String] = ["ktv-1", "ktv-2", "ktv-3", "ktv-4", "ktv-5", "ktv-6"]
-    @objc var effectType: Int = 0
+    @objc var micType: Int = 0
     @objc var clickBlock: ((Int)->Void)?
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -38,7 +35,7 @@ class SoundCardEffectView: UIView {
         self.addSubview(headIconView)
         
         headTitleLabel = UILabel()
-        headTitleLabel.text = "预设音效"
+        headTitleLabel.text = "麦克风类型"
         headTitleLabel.textAlignment = .center
         headTitleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         self.addSubview(headTitleLabel)
@@ -46,12 +43,13 @@ class SoundCardEffectView: UIView {
         tableView = UITableView()
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.registerCell(SoundCardEffectCell.self, forCellReuseIdentifier: "cell")
+        tableView.registerCell(SoundCardMicTypeCell.self, forCellReuseIdentifier: "cell")
+        tableView.tableFooterView = UIView()
         self.addSubview(tableView)
         
-//        sepView = UIView()
-//        sepView.backgroundColor = UIColor(red: 245/255.0, green: 244/255.0, blue: 246/255.0, alpha: 1)
-//        self.addSubview(sepView)
+        sepView = UIView()
+        sepView.backgroundColor = UIColor(red: 245/255.0, green: 244/255.0, blue: 246/255.0, alpha: 1)
+        self.addSubview(sepView)
         
         cancleView = UIButton()
         cancleView.titleLabel?.font = UIFont.systemFont(ofSize: 15)
@@ -70,10 +68,10 @@ class SoundCardEffectView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         headIconView.frame = CGRect(x: (self.bounds.width - 38)/2.0, y: 8, width: 38, height: 4)
-        headTitleLabel.frame = CGRect(x: (self.bounds.width - 80)/2.0, y: 30, width: 80, height: 22)
-        tableView.frame = CGRect(x: 0, y: headTitleLabel.frame.maxY + 10, width: self.bounds.width, height: 350)
-       // sepView.frame = CGRect(x: 0, y: self.bounds.height - 70, width: self.bounds.width, height: 10)
-        cancleView.frame = CGRect(x: 10, y: 26, width: 50, height: 30)
+        headTitleLabel.frame = CGRect(x: (self.bounds.width - 100)/2.0, y: 30, width: 100, height: 22)
+        tableView.frame = CGRect(x: 0, y: headTitleLabel.frame.maxY + 10, width: self.bounds.width, height: 420)
+        sepView.frame = CGRect(x: 0, y: self.bounds.height - 70, width: self.bounds.width, height: 10)
+        cancleView.frame = CGRect(x: 0, y: self.bounds.height - 60, width: self.bounds.width, height: 50)
     }
     
     @objc private func cancel() {
@@ -82,33 +80,30 @@ class SoundCardEffectView: UIView {
     }
 }
 
-extension SoundCardEffectView: UITableViewDelegate, UITableViewDataSource {
+extension VRSoundCardMicTypeView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 6
+        return 5
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 70
+        return 48
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! SoundCardEffectCell
-        cell.selectionStyle = .none
-        cell.titleLabel.text = voiceArray[indexPath.row]
-        cell.detailLabel.text = descArray[indexPath.row]
-        cell.imgView.image = UIImage.sceneImage(name: imgArray[indexPath.row])
-        cell.setIsSelected(indexPath.row == self.effectType)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! VRSoundCardMicTypeCell
+        let text = indexPath.row > 0 ? "\(indexPath.row)" : ""
+        cell.titleLabel.text = "麦克风类型\(text)"
+        cell.setIsSelected(self.micType == indexPath.row)
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if self.effectType == indexPath.row {
+        if self.micType == indexPath.row {
             return
         }
-        self.effectType = indexPath.row
+        self.micType = indexPath.row
         tableView.reloadData()
         guard let block = clickBlock else {return}
         block(indexPath.row)
     }
 }
-

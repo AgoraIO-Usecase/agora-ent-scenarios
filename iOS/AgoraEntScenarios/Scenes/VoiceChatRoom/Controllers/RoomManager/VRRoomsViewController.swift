@@ -56,8 +56,8 @@ let page_size = 15
     override public func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        navigation.isHidden = true
-      //  navigation.title.text = LanguageManager.localValue(key: "voice_app_name")
+        //navigation.isHidden = true
+        navigation.title.text = LanguageManager.localValue(key: "voice_app_name")
     }
     
     
@@ -75,13 +75,13 @@ let page_size = 15
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationController?.navigationBar.isHidden = true
+      //  self.navigationController?.navigationBar.isHidden = true
         isDestory = true
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        self.navigationController?.navigationBar.isHidden = false
+      //  self.navigationController?.navigationBar.isHidden = false
         if isDestory {
             destory()
         }

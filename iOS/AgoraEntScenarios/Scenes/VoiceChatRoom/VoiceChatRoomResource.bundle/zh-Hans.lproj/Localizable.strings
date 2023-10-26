@@ -167,6 +167,7 @@
 "voice_im_key_empty_error" = "参数非法，请检查 KeyCenter.swift中的 ’IMAppKey’";
 "voice_AIAEC" = "AI回声消除";
 "voice_AGC" = "人声自动增益";
+"voice_SoundCard" = "虚拟声卡";
 "voice_agora_blue_and_red_bot" = "声蓝羽&声红颜";
 "voice_room_audio_settings" = "房间音效设置";
 "voice_turn_on_AIAEC" = "开启AI回声消除";

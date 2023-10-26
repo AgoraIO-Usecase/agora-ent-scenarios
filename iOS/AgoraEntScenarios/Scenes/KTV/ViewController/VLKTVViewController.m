@@ -592,7 +592,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     } else {
         index = 4;
     }
-    [self.RTCkit setParameters:[NSString stringWithFormat:@"{\"che.audio.virtual_soundcard\":{\"preset\":%ld,\"gain\":%f,\"gender\":%d,\"effect\":%d}}", (long)value, self.gainValue, self.effectType/2 == 0 ? 0 : 1, index]];
+    [self.RTCkit setParameters:[NSString stringWithFormat:@"{\"che.audio.virtual_soundcard\":{\"preset\":%ld,\"gain\":%@,\"gender\":%d,\"effect\":%d}}", (long)value, self.gainValue, self.effectType/2 == 0 ? 0 : 1, index]];
 }
 
 - (void)didUpdateSoundSetting:(BOOL)isEnabled{
@@ -1728,6 +1728,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         weakself.gainValue = formattedString;
         [weakself didUpdateGainValue:formattedString];
     };
+    
+    self.soundSettingView.typeBlock = ^(NSInteger index) {
+        weakself.typeValue = index;
+        [weakself didUpdateTypeValue:index];
+    };
+    
     self.soundSettingView.soundCardBlock = ^(BOOL flag) {
         weakself.soundOpen = flag;
         [weakself didUpdateSoundSetting:flag];

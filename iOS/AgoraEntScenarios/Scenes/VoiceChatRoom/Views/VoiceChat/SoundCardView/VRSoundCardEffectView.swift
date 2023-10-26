@@ -7,7 +7,7 @@
 
 import Foundation
 
-class SoundCardEffectView: UIView {
+class VRSoundCardEffectView: UIView {
     var headIconView: UIView!
     var headTitleLabel: UILabel!
     var tableView: UITableView!
@@ -82,7 +82,7 @@ class SoundCardEffectView: UIView {
     }
 }
 
-extension SoundCardEffectView: UITableViewDelegate, UITableViewDataSource {
+extension VRSoundCardEffectView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 6
     }

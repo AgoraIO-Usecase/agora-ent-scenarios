@@ -38,7 +38,7 @@ class SRRoomHomeListView: UIView {
         
         collectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height), collectionViewLayout: flowLayout)
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-        collectionView.backgroundColor = .white
+        collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(SRRoomHomeListCell.self, forCellWithReuseIdentifier: "home")

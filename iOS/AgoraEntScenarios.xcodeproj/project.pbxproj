@@ -609,6 +609,13 @@
 		E34B45F32AE91EA70082D334 /* SRCreateRoomPresentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34B45F22AE91EA70082D334 /* SRCreateRoomPresentView.swift */; };
 		E34B45F52AE922950082D334 /* SRRoomHomeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34B45F42AE922950082D334 /* SRRoomHomeListView.swift */; };
 		E34B45F72AE92E910082D334 /* SRRoomHomeListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34B45F62AE92E910082D334 /* SRRoomHomeListCell.swift */; };
+		E34B46002AEA5CAD0082D334 /* VRSoundCardSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34B45F92AEA5CAD0082D334 /* VRSoundCardSwitchCell.swift */; };
+		E34B46012AEA5CAD0082D334 /* VRSoundCardEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34B45FA2AEA5CAD0082D334 /* VRSoundCardEffectView.swift */; };
+		E34B46022AEA5CAD0082D334 /* VRSoundCardEffectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34B45FB2AEA5CAD0082D334 /* VRSoundCardEffectCell.swift */; };
+		E34B46032AEA5CAD0082D334 /* VRSoundCardSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34B45FC2AEA5CAD0082D334 /* VRSoundCardSettingView.swift */; };
+		E34B46042AEA5CAD0082D334 /* VRSoundCardMicTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34B45FD2AEA5CAD0082D334 /* VRSoundCardMicTypeCell.swift */; };
+		E34B46052AEA5CAD0082D334 /* VRSoundCardMicTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34B45FE2AEA5CAD0082D334 /* VRSoundCardMicTypeView.swift */; };
+		E34B46062AEA5CAD0082D334 /* VRSoundCardMicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34B45FF2AEA5CAD0082D334 /* VRSoundCardMicCell.swift */; };
 		E357353E29EFD631009D54E1 /* VLAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E357353C29EFD631009D54E1 /* VLAlert.m */; };
 		E357353F29EFD631009D54E1 /* VLKTVAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E357353D29EFD631009D54E1 /* VLKTVAlert.m */; };
 		E357354629EFD719009D54E1 /* VLOnLineListVC.m in Sources */ = {isa = PBXBuildFile; fileRef = E357354129EFD718009D54E1 /* VLOnLineListVC.m */; };
@@ -1492,6 +1499,13 @@
 		E34B45F22AE91EA70082D334 /* SRCreateRoomPresentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SRCreateRoomPresentView.swift; sourceTree = "<group>"; };
 		E34B45F42AE922950082D334 /* SRRoomHomeListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SRRoomHomeListView.swift; sourceTree = "<group>"; };
 		E34B45F62AE92E910082D334 /* SRRoomHomeListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SRRoomHomeListCell.swift; sourceTree = "<group>"; };
+		E34B45F92AEA5CAD0082D334 /* VRSoundCardSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRSoundCardSwitchCell.swift; sourceTree = "<group>"; };
+		E34B45FA2AEA5CAD0082D334 /* VRSoundCardEffectView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRSoundCardEffectView.swift; sourceTree = "<group>"; };
+		E34B45FB2AEA5CAD0082D334 /* VRSoundCardEffectCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRSoundCardEffectCell.swift; sourceTree = "<group>"; };
+		E34B45FC2AEA5CAD0082D334 /* VRSoundCardSettingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRSoundCardSettingView.swift; sourceTree = "<group>"; };
+		E34B45FD2AEA5CAD0082D334 /* VRSoundCardMicTypeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRSoundCardMicTypeCell.swift; sourceTree = "<group>"; };
+		E34B45FE2AEA5CAD0082D334 /* VRSoundCardMicTypeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRSoundCardMicTypeView.swift; sourceTree = "<group>"; };
+		E34B45FF2AEA5CAD0082D334 /* VRSoundCardMicCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRSoundCardMicCell.swift; sourceTree = "<group>"; };
 		E357353A29EFD631009D54E1 /* VLAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLAlert.h; sourceTree = "<group>"; };
 		E357353B29EFD631009D54E1 /* VLKTVAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVAlert.h; sourceTree = "<group>"; };
 		E357353C29EFD631009D54E1 /* VLAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAlert.m; sourceTree = "<group>"; };
@@ -3295,6 +3309,7 @@
 		DD9EBF452AD5512300B4551F /* VoiceChat */ = {
 			isa = PBXGroup;
 			children = (
+				E34B45F82AEA5CAD0082D334 /* SoundCardView */,
 				E34B45EC2AE8FE7B0082D334 /* VoiceCreateRoomView.swift */,
 				E3C772692AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift */,
 				DD9EBF462AD5512300B4551F /* VoiceRoomApplyAlert.swift */,
@@ -3751,6 +3766,20 @@
 				DD1603432963CAFD00182A04 /* AgoraEntLog.swift */,
 			);
 			path = Context;
+			sourceTree = "<group>";
+		};
+		E34B45F82AEA5CAD0082D334 /* SoundCardView */ = {
+			isa = PBXGroup;
+			children = (
+				E34B45F92AEA5CAD0082D334 /* VRSoundCardSwitchCell.swift */,
+				E34B45FA2AEA5CAD0082D334 /* VRSoundCardEffectView.swift */,
+				E34B45FB2AEA5CAD0082D334 /* VRSoundCardEffectCell.swift */,
+				E34B45FC2AEA5CAD0082D334 /* VRSoundCardSettingView.swift */,
+				E34B45FD2AEA5CAD0082D334 /* VRSoundCardMicTypeCell.swift */,
+				E34B45FE2AEA5CAD0082D334 /* VRSoundCardMicTypeView.swift */,
+				E34B45FF2AEA5CAD0082D334 /* VRSoundCardMicCell.swift */,
+			);
+			path = SoundCardView;
 			sourceTree = "<group>";
 		};
 		E357354929EFD74A009D54E1 /* KTVAPI */ = {
@@ -4247,6 +4276,7 @@
 				DD619AC129E3E247008F63E4 /* SA3DUserCollectionViewCell.swift in Sources */,
 				DDA199E328FFE579009D3E61 /* VLLocalWebViewController.m in Sources */,
 				DD9EC0012AD5512400B4551F /* VRSoundEffectsList.swift in Sources */,
+				E34B46052AEA5CAD0082D334 /* VRSoundCardMicTypeView.swift in Sources */,
 				DD619AB029E3E247008F63E4 /* SAGiftView.swift in Sources */,
 				DD619AA029E3E247008F63E4 /* SAAllRoomsViewController.swift in Sources */,
 				DD619AC629E3E247008F63E4 /* SABaseRtcUserView.swift in Sources */,
@@ -4346,6 +4376,7 @@
 				E36DA3CC2AD7D8D2001A040F /* SoundCardMicCell.swift in Sources */,
 				DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */,
 				DD9EBEB22AD5492600B4551F /* SBGLrcControl.swift in Sources */,
+				E34B46002AEA5CAD0082D334 /* VRSoundCardSwitchCell.swift in Sources */,
 				DD9EBF992AD5512300B4551F /* VoiceRoomPageContainer.swift in Sources */,
 				E357356029EFD74A009D54E1 /* AgoraLrcModel.swift in Sources */,
 				DD0292E0295BF0DC00485225 /* VLAudienceIndicator.m in Sources */,
@@ -4379,6 +4410,7 @@
 				DD9EBEB02AD5492600B4551F /* LyricsCutter.swift in Sources */,
 				DD3610BD29B70CDC00CE7984 /* ShowPresettingCell.swift in Sources */,
 				E357355F29EFD74A009D54E1 /* AgoraRequestTask.swift in Sources */,
+				E34B46032AEA5CAD0082D334 /* VRSoundCardSettingView.swift in Sources */,
 				DD84178929090C520026B624 /* VLMainTabBarController.m in Sources */,
 				DD619AD829E3E247008F63E4 /* SANorSetTableViewCell.swift in Sources */,
 				DD619A7329E3E247008F63E4 /* UIViewController+SAPresentation.swift in Sources */,
@@ -4411,6 +4443,7 @@
 				DD9EBFA12AD5512300B4551F /* VoiceRoomRTCManager.swift in Sources */,
 				DDA19A0828FFE579009D3E61 /* GCDTimer.swift in Sources */,
 				DD9EBFDF2AD5512300B4551F /* VoiceRoomGiftsView.swift in Sources */,
+				E34B46022AEA5CAD0082D334 /* VRSoundCardEffectCell.swift in Sources */,
 				DD0292D3295BF0DC00485225 /* VLSearchEmptyView.m in Sources */,
 				E3735C962A5E7E75004737EF /* BEHttpRequestProvider.mm in Sources */,
 				DD619AA629E3E247008F63E4 /* SARoomListCell.swift in Sources */,
@@ -4592,6 +4625,7 @@
 				E34B45ED2AE8FE7B0082D334 /* VoiceCreateRoomView.swift in Sources */,
 				E3735CB22A5FA5E0004737EF /* KTVServiceProtocol.swift in Sources */,
 				DDA199FC28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m in Sources */,
+				E34B46042AEA5CAD0082D334 /* VRSoundCardMicTypeCell.swift in Sources */,
 				DD9EBF9D2AD5512300B4551F /* String + Extension.swift in Sources */,
 				DD36108929B70CDC00CE7984 /* ShowRoomListVC.swift in Sources */,
 				DD36108F29B70CDC00CE7984 /* ShowBeautyFaceVC.swift in Sources */,
@@ -4622,6 +4656,7 @@
 				DD619AB629E3E247008F63E4 /* SA3DMoveUserView.swift in Sources */,
 				E357356929EFD8B5009D54E1 /* VLEffectView.m in Sources */,
 				DD619A7829E3E247008F63E4 /* SAPresentationController.swift in Sources */,
+				E34B46062AEA5CAD0082D334 /* VRSoundCardMicCell.swift in Sources */,
 				DD9EBECE2AD5492600B4551F /* VLSBGSwitcherView.m in Sources */,
 				DDA19A0928FFE579009D3E61 /* DeviceAssistant.swift in Sources */,
 				DD84178F29090C520026B624 /* VLPrivacyCustomView.m in Sources */,
@@ -4639,6 +4674,7 @@
 				DD9EBFC72AD5512300B4551F /* VoiceRoomSendGiftCell.swift in Sources */,
 				DD619AD129E3E247008F63E4 /* SASwitchTableViewCell.swift in Sources */,
 				DD9EBEDB2AD5492600B4551F /* VLSBGSearchSongResultView.m in Sources */,
+				E34B46012AEA5CAD0082D334 /* VRSoundCardEffectView.swift in Sources */,
 				DD3610A529B70CDC00CE7984 /* ShowCreateLiveView.swift in Sources */,
 				DD0292D9295BF0DC00485225 /* VLDropOnLineView.m in Sources */,
 				DD0292D4295BF0DC00485225 /* VLKTVMVIdleView.m in Sources */,

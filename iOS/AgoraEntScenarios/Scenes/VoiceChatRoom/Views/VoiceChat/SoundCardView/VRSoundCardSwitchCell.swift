@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SoundCardSwitchCell: UITableViewCell {
+class VRSoundCardSwitchCell: UITableViewCell {
     var titleLabel: UILabel!
     var detailLabel: UILabel!
     var numLable: UITextField!
@@ -108,7 +108,7 @@ class SoundCardSwitchCell: UITableViewCell {
 
 }
 
-extension SoundCardSwitchCell: UITextFieldDelegate {
+extension VRSoundCardSwitchCell: UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
             // 在此处执行输入结束后的操作
             if let text = textField.text {

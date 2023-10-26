@@ -142,11 +142,13 @@ class VoiceCreateRoomView: UIView {
         let createBtn = UIButton()
         createBtn.layer.cornerRadius = 5
         createBtn.layer.masksToBounds = true
-        createBtn.setBackgroundImage(UIImage.sceneImage(name: "createRoom", bundleName: "VoiceChatRoomResource"), for: .normal)
+   //     createBtn.setBackgroundImage(UIImage.sceneImage(name: "createRoom", bundleName: "VoiceChatRoomResource"), for: .normal)
+        createBtn.setTitle(LanguageManager.localValue(key: "voice_create_room"), for: .normal)
         createBtn.setTitleColor(UIColor(hexString: "#FFFFFF"), for: .normal)
         createBtn.accessibilityIdentifier = "ktv_create_room_button_id"
         createBtn.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .bold)
         createBtn.adjustsImageWhenHighlighted = false
+        createBtn.contentMode = .scaleAspectFit
         createBtn.addTarget(self, action: #selector(createBtnClickEvent), for: .touchUpInside)
         createBtn.backgroundColor = UIColor(hexString: "#2753FF")
         self.addSubview(createBtn)
@@ -154,7 +156,7 @@ class VoiceCreateRoomView: UIView {
         createBtn.mas_makeConstraints { make in
             make?.left.equalTo()(self.mas_left)?.offset()(30)
             make?.right.equalTo()(self.mas_right)?.offset()(-30)
-            make?.height.equalTo()(40)
+            make?.height.equalTo()(48)
             make?.bottom.equalTo()(self.mas_bottom)?.offset()(-20)
         }
         

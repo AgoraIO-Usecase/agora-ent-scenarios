@@ -171,6 +171,7 @@
 "voice_content_prohibited" = "Content prohibited";
 "voice_AIAEC" = "AIAEC";
 "voice_AGC" = "AGC";
+"voice_SoundCard" = "虚拟声卡";
 "voice_agora_blue_and_red_bot" = "Agora Blue & Red Bot";
 "voice_room_audio_settings" = "Room Audio Settings";
 "voice_the_current_microphone_has_been_muted" = "The current microphone has been muted";

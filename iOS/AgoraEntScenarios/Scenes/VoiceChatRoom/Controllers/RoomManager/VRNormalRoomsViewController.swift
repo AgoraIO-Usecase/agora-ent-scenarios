@@ -15,11 +15,11 @@ public class VRNormalRoomsViewController: UIViewController {
     
     lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 200, width: ScreenWidth, height: self.view.frame.height - 10 - 30), title: "voice_room_nobody", image: nil)
 
-    lazy var roomList: VRRoomHomeListView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: self.view.frame.height - 30))
+    lazy var roomList: VRRoomHomeListView = .init(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: self.view.frame.height - 30 - ZNavgationHeight))
     
     override public func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = .white
+        self.view.backgroundColor = .clear
         view.addSubViews([roomList, empty])
         refresh()
         
@@ -35,19 +35,19 @@ public class VRNormalRoomsViewController: UIViewController {
         }
         
         roomList.backBlock = {[weak self] in
-            
+            self?.navigationController?.popViewController(animated: true)
         }
     }
     
     override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationController?.navigationBar.isHidden = true
+       // self.navigationController?.navigationBar.isHidden = true
         self.refresh()
     }
     
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.navigationController?.navigationBar.isHidden = false
+      //  self.navigationController?.navigationBar.isHidden = false
     }
     
 }

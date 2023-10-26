@@ -19,6 +19,7 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     public var tableView: UITableView = .init()
     public var isAudience: Bool = false
     public var isPrivate: Bool = false
+    public var isSoundOpen: Bool = false
     public var isTouchAble: Bool = false {
         willSet {
             self.detailVC?.isTouchAble = newValue
@@ -42,6 +43,7 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
                                          LanguageManager.localValue(key: "voice_AIAEC"),
                                          LanguageManager.localValue(key: "voice_AGC"),
                                          LanguageManager.localValue(key: "In-Ear Monitor"),
+                                         LanguageManager.localValue(key: "voice_SoundCard"),
                                          LanguageManager.localValue(key: "voice_agora_blue_and_red_bot"),
                                          LanguageManager.localValue(key: "voice_robot_volume"),
                                          LanguageManager.localValue(key: "voice_best_agora_sound"),
@@ -52,6 +54,7 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
                                           "AIAEC",
                                           "AGC",
                                           "InEar",
+                                          "icon-park-solid_people-speak",
                                           "jiqi",
                                           "icons／set／laba",
                                           "icons／set／zuijia",
@@ -260,7 +263,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
-            return 4
+            return 5
         } else if section == 1 {
             return 2
         } else {
@@ -385,10 +388,12 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 }
             } else if indexPath.row == 3 {
                 if roomInfo?.room?.turn_InEar == true {
-                    cell.contentLabel.text = "On".voice_localized()
+                    cell.contentLabel.text = "voice_on".voice_localized()
                 } else {
-                    cell.contentLabel.text = "Off".voice_localized()
+                    cell.contentLabel.text = "voice_off".voice_localized()
                 }
+            } else if indexPath.row == 4 {
+                cell.contentLabel.text = self.isSoundOpen ? "voice_on".voice_localized() : "voice_off".voice_localized()
             } else {
                 cell.contentLabel.text = "Other".voice_localized()
 
@@ -507,6 +512,13 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         } else if indexPath.section == 1 {
             return
         }
+        
+        //处理虚拟声卡的业务
+        if indexPath.section == 0 && indexPath.row == 4 {
+            
+            return
+        }
+        
         tableViewHeight = heightType.rawValue - 70
         let detailVC: VoiceRoomAudioSettingDetailViewController = VoiceRoomAudioSettingDetailViewController()
         self.detailVC = detailVC
