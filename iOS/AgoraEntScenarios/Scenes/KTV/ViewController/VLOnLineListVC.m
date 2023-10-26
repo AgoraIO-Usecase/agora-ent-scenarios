@@ -18,6 +18,7 @@
 #import "AppContext+KTV.h"
 #import "AESMacro.h"
 #import "VLAlert.h"
+#import "AgoraEntScenarios-Swift.h"
 
 @interface VLOnLineListVC ()<VLHomeOnLineListViewDelegate/*,AgoraRtmDelegate*/,VLPopScoreViewDelegate>
 
@@ -89,8 +90,18 @@
     if (![self checkIsLogin]) return;
     
     VLCreateRoomViewController *createRoomVC = [[VLCreateRoomViewController alloc]init];
-    [self.navigationController pushViewController:createRoomVC animated:YES];
-
+    createRoomVC.createRoomBlock = ^(CGFloat height) {
+        [[KTVCreateRoomPresentView shared] update:height];
+    };
+    
+    kWeakSelf(self);
+    createRoomVC.createRoomVCBlock = ^(UIViewController *vc) {
+        [[KTVCreateRoomPresentView shared] dismiss];
+        [weakself.navigationController pushViewController:vc animated:true];
+    };
+    KTVCreateRoomPresentView *presentView = [KTVCreateRoomPresentView shared];
+    [presentView showViewWith:CGRectMake(0, SCREEN_HEIGHT - 330, SCREEN_WIDTH, 330) vc:createRoomVC];
+    [self.view addSubview:presentView];
 }
 
 - (void)listItemClickAction:(VLRoomListModel *)listModel {

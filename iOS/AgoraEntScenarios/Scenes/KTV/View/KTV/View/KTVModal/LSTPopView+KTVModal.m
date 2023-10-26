@@ -209,6 +209,38 @@
     return popView;
 }
 
+//弹出虚拟声卡视图
++ (LSTPopView*)popSoundCardViewWithParentView:(UIView*)parentView
+                                soundCardView:(UIView *)soundCardView
+                                    soundOpen:(BOOL)isOpen
+                                    gainValue:(double)gain
+                                    typeValue:(NSInteger)type
+                                   effectType:(NSInteger)effect
+{
+    CGFloat popViewH = 400+kSafeAreaBottomHeight;
+
+    [soundCardView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
+    soundCardView.frame = CGRectMake(0, 0, SCREEN_WIDTH, popViewH);
+    LSTPopView* popView = [self _createKTVPopContainerWithContentView:soundCardView
+                                                       withParentView:parentView];
+    [popView pop];
+    
+    return popView;
+}
+
++ (LSTPopView*)popSoundCardViewWithParentView:(UIView*)parentView
+                                soundCardView:(UIView *)soundCardView
+{
+    CGFloat popViewH = 500+kSafeAreaBottomHeight;
+    [soundCardView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
+    soundCardView.frame = CGRectMake(0, 0, SCREEN_WIDTH, popViewH);
+    LSTPopView* popView = [self _createKTVPopContainerWithContentView:soundCardView
+                                                       withParentView:parentView];
+    [popView pop];
+    
+    return popView;
+}
+
 //网络差视图
 + (LSTPopView*)popBadNetWrokTipViewWithParentView:(UIView*)parentView
                                      withDelegate:(id<VLBadNetWorkViewDelegate>)delegate {

@@ -125,6 +125,12 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) NSInteger aecLevel; //AEC等级
 @property (nonatomic, assign) NSString *selectUserNo;
 @property (nonatomic, strong) UIButton *testButton;
+@property (nonatomic, assign) BOOL soundOpen;
+@property (nonatomic, copy)  NSString *gainValue;
+@property (nonatomic, assign) NSInteger typeValue;
+@property (nonatomic, assign) NSInteger effectType;
+@property (nonatomic, strong) SoundCardSettingView *soundSettingView;
+@property (nonatomic, strong) LSTPopView *popSoundSettingView;
 @end
 
 @implementation VLKTVViewController
@@ -139,16 +145,20 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     self.view.backgroundColor = UIColor.blackColor;
     self.selectedVoiceShowIndex = -1;
     self.selectUserNo = @"";
+    self.soundOpen = false;
+    self.gainValue = @"1.0";
+    self.effectType = 0;
+    self.typeValue = 4;
     self.checkType = checkAuthTypeAll;
 
     [self subscribeServiceEvent];
     
     // setup view
-    [self setBackgroundImage:@"ktv_room_bg"];
+    [self setBackgroundImage:@"bg-main"];
     
-    UIView *bgView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
-    bgView.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.6);
-    [self.view addSubview:bgView];
+//    UIView *bgView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
+//    bgView.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.6);
+//    [self.view addSubview:bgView];
     //头部视图
     VLKTVTopView *topView = [[VLKTVTopView alloc]initWithFrame:CGRectMake(0, kStatusBarHeight, SCREEN_WIDTH, 60) withDelegate:self];
     [self.view addSubview:topView];
@@ -166,7 +176,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     
     //MV视图(显示歌词...)
     CGFloat mvViewTop = topView.bottom;
-    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(15, mvViewTop, SCREEN_WIDTH - 30, musicHeight * 0.5) withDelegate:self];
+    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(0, mvViewTop, SCREEN_WIDTH, musicHeight * 0.5) withDelegate:self];
     [self.view addSubview:self.MVView];
     
     //房间麦位视图
@@ -302,10 +312,10 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             //切换背景
             
             //mv bg / room member count did changed
-            VLKTVSelBgModel* selBgModel = [VLKTVSelBgModel new];
-            selBgModel.imageName = [NSString stringWithFormat:@"ktv_mvbg%ld", roomInfo.bgOption];
-            selBgModel.isSelect = YES;
-            weakSelf.choosedBgModel = selBgModel;
+//            VLKTVSelBgModel* selBgModel = [VLKTVSelBgModel new];
+//            selBgModel.imageName = [NSString stringWithFormat:@"ktv_mvbg%ld", roomInfo.bgOption];
+//            selBgModel.isSelect = YES;
+//            weakSelf.choosedBgModel = selBgModel;
         } else if (status == KTVSubscribeDeleted) {
             //房主关闭房间
             if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.id]) {
@@ -556,6 +566,74 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     NSCharacterSet *numberSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789"];
     NSRange range = [string rangeOfCharacterFromSet:numberSet.invertedSet];
     return (range.location == NSNotFound);
+}
+
+- (void)didUpdateGainValue:(NSString *)value{
+    self.gainValue = value;
+    int index = 0;
+    if (self.effectType < 2) {
+        index = 2;
+    } else if (self.effectType < 4) {
+        index = 3;
+    } else {
+        index = 4;
+    }
+    
+    [self.RTCkit setParameters:[NSString stringWithFormat:@"{\"che.audio.virtual_soundcard\":{\"preset\":%ld,\"gain\":%@,\"gender\":%d,\"effect\":%d}}", (long)self.typeValue, value, self.effectType/2 == 0 ? 0 : 1, index]];
+}
+
+- (void)didUpdateTypeValue:(NSInteger)value{
+    self.typeValue = value;
+    int index = 0;
+    if (self.effectType < 2) {
+        index = 2;
+    } else if (self.effectType < 4) {
+        index = 3;
+    } else {
+        index = 4;
+    }
+    [self.RTCkit setParameters:[NSString stringWithFormat:@"{\"che.audio.virtual_soundcard\":{\"preset\":%ld,\"gain\":%f,\"gender\":%d,\"effect\":%d}}", (long)value, self.gainValue, self.effectType/2 == 0 ? 0 : 1, index]];
+}
+
+- (void)didUpdateSoundSetting:(BOOL)isEnabled{
+    self.soundOpen = isEnabled;
+    [self.settingView setUseSoundCard:isEnabled];
+    if (isEnabled) {
+        self.gainValue = @"1.0";
+        self.effectType = 0;
+        self.typeValue = 4;
+        [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":2}}"];
+    } else {
+        [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":-1,\"gain\":-1.0,\"gender\":-1,\"effect\":-1}}"];
+    }
+}
+
+- (void)didUpdateEffectValue:(NSInteger)value{
+    self.gainValue = @"1.0";
+    self.effectType = value;
+    self.typeValue = 4;
+    switch (value) {
+        case 0:
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":2}}"];
+            break;
+        case 1:
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":2}}"];
+            break;
+        case 2:
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":3}}"];
+            break;
+        case 3:
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":3}}"];
+            break;
+        case 4:
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":4}}"];
+            break;
+        case 5:
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":4}}"];
+            break;
+        default:
+            break;
+    }
 }
 
 #pragma mark - rtc callbacks
@@ -1592,6 +1670,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self showEarSettingView];
     } else if (type == VLKTVValueDidChangedTypeMV) { // MV
         
+    } else if (type == VLKTVValueDidChangedTypeSoundCard) { // 虚拟声卡
+        [self showSoundCardView];
     } else if (type == VLKTVValueDidChangedRiseFall) { // 升降调
         // 调整当前播放的媒体资源的音调
         // 按半音音阶调整本地播放的音乐文件的音调，默认值为 0，即不调整音调。取值范围为 [-12,12]，每相邻两个值的音高距离相差半音。取值的绝对值越大，音调升高或降低得越多
@@ -1621,8 +1701,80 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 -(void)showEarSettingView {
-   // LSTPopView* popChooseSongView =
     [LSTPopView popEarSettingViewWithParentView:self.view isEarOn:_isEarOn vol:self.earValue withDelegate:self];
+}
+
+-(void)showSoundCardView {
+    self.soundSettingView = [[SoundCardSettingView alloc] init];
+    self.soundSettingView.soundOpen = self.soundOpen;
+    self.soundSettingView.gainValue = [self.gainValue floatValue];
+    self.soundSettingView.effectType = self.effectType;
+    self.soundSettingView.typeValue = self.typeValue;
+    kWeakSelf(self);
+    self.soundSettingView.clicKBlock = ^(NSInteger index) {
+        if(index == 2){
+            //音效设置
+            [weakself showSoundEffectView];
+        } else if (index == 4) {
+            //麦克风设置
+            [weakself showSoundMicTypeView];
+        }
+    };
+    self.soundSettingView.gainBlock = ^(float gain) {
+        NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+        [formatter setRoundingMode:NSNumberFormatterRoundHalfUp];
+        [formatter setMaximumFractionDigits:1];
+        NSString *formattedString = [formatter stringFromNumber:@(gain)];
+        weakself.gainValue = formattedString;
+        [weakself didUpdateGainValue:formattedString];
+    };
+    self.soundSettingView.soundCardBlock = ^(BOOL flag) {
+        weakself.soundOpen = flag;
+        [weakself didUpdateSoundSetting:flag];
+    };
+   self.popSoundSettingView = [LSTPopView popSoundCardViewWithParentView:self.view soundCardView:self.soundSettingView];
+}
+
+-(void)showSoundEffectView {
+    SoundCardEffectView *effectView = [[SoundCardEffectView alloc]init];
+    effectView.effectType = self.effectType;
+    LSTPopView* popEffectView = [LSTPopView popSoundCardViewWithParentView:self.view soundCardView:effectView];
+    kWeakSelf(self);
+    effectView.clickBlock = ^(NSInteger index) {
+        [LSTPopView removePopView:popEffectView];
+        //根据不同的音效设置不同的参数 同时更新设置界面UI
+        if(index >= 0){
+            weakself.effectType = index;
+            [weakself didUpdateEffectValue:index];
+            [LSTPopView removePopView:self.popSoundSettingView];
+            [weakself showSoundCardView];
+        } else if (index == -2){
+//            [weakself.soundSettingView setSoundOpen:false];
+//            [LSTPopView removePopView:self.popSoundSettingView];
+//            [weakself showSoundCardView];
+        }
+    };
+}
+
+-(void)showSoundMicTypeView {
+    SoundCardMicTypeView *micTypeView = [[SoundCardMicTypeView alloc]init];
+    micTypeView.micType = self.typeValue;
+    LSTPopView* popMicView = [LSTPopView popSoundCardViewWithParentView:self.view soundCardView:micTypeView];
+    kWeakSelf(self);
+    micTypeView.clickBlock = ^(NSInteger index) {
+        [LSTPopView removePopView:popMicView];
+        //根据不同的音效设置不同的参数 同时更新设置界面UI
+        if(index >= 0){
+            weakself.typeValue = index;
+            [weakself didUpdateTypeValue:index];
+            [LSTPopView removePopView:self.popSoundSettingView];
+            [weakself showSoundCardView];
+        }  else if (index == -2){
+//            [weakself.soundSettingView setSoundOpen:false];
+//            [LSTPopView removePopView:self.popSoundSettingView];
+//            [weakself showSoundCardView];
+        }
+    };
 }
 
 - (void)settingViewEffectChoosed:(NSInteger)effectIndex {
