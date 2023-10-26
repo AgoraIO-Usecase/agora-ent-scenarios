@@ -15,7 +15,6 @@ import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceActivitySoundSelectionLayoutBinding
 import io.agora.scene.voice.global.VoiceBuddyFactory
-import io.agora.scene.voice.global.VoiceConfigManager.getLifecycleCallbacks
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.SoundSelectionBean
 import io.agora.scene.voice.model.VoiceRoomModel
@@ -213,26 +212,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
             dismissLoading()
             "apex-wt VoiceRoomSoundSelectionActivity :${it.memberCount}".logD()
             ChatroomLiveActivity.startActivity(this, it)
-            // todo 优化
-            finishCreateActivity()
             finish()
-        }
-    }
-
-    /**
-     * 结束创建activity
-     */
-    private fun finishCreateActivity() {
-        val lifecycleCallbacks = getLifecycleCallbacks()
-        val activities = lifecycleCallbacks.activityList
-        if (activities == null || activities.isEmpty()) {
-            finish()
-            return
-        }
-        for (activity in activities) {
-            if (activity !== lifecycleCallbacks.current() && activity is VoiceRoomCreateActivity) {
-                activity.finish()
-            }
         }
     }
 
