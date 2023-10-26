@@ -20,6 +20,7 @@
 		A84EEA762ADD297800258F55 /* ShowDebug1TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A84EEA712ADD297800258F55 /* ShowDebug1TFModel.swift */; };
 		A89C929C2AE66BE700B5E8B4 /* UIImageView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89C929B2AE66BE700B5E8B4 /* UIImageView+Extension.swift */; };
 		A89C929E2AE9031600B5E8B4 /* UIImage+Resize.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89C929D2AE9031600B5E8B4 /* UIImage+Resize.swift */; };
+		A89C92A52AEA607600B5E8B4 /* VLBaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = A89C92A32AEA607600B5E8B4 /* VLBaseModel.m */; };
 		AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */; };
 		ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */; };
 		ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */; };
@@ -558,10 +559,6 @@
 		DDA199E628FFE579009D3E61 /* UIButton+Font.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198F628FFE579009D3E61 /* UIButton+Font.m */; };
 		DDA199E728FFE579009D3E61 /* VLFontUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198F728FFE579009D3E61 /* VLFontUtils.m */; };
 		DDA199E828FFE579009D3E61 /* UITextField+Font.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198F928FFE579009D3E61 /* UITextField+Font.m */; };
-		DDA199E928FFE579009D3E61 /* VLResponseDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198FE28FFE579009D3E61 /* VLResponseDataModel.m */; };
-		DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1990128FFE579009D3E61 /* VLBaseModel.m */; };
-		DDA199EB28FFE579009D3E61 /* VLRequestRoute.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1990428FFE579009D3E61 /* VLRequestRoute.m */; };
-		DDA199EC28FFE579009D3E61 /* VLAPIRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1990628FFE579009D3E61 /* VLAPIRequest.m */; };
 		DDA199ED28FFE579009D3E61 /* VLBaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1990B28FFE579009D3E61 /* VLBaseView.m */; };
 		DDA199EE28FFE579009D3E61 /* VLUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1990C28FFE579009D3E61 /* VLUIView.m */; };
 		DDA199EF28FFE579009D3E61 /* VLBaseTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1990E28FFE579009D3E61 /* VLBaseTableView.m */; };
@@ -712,6 +709,8 @@
 		A84EEA712ADD297800258F55 /* ShowDebug1TFModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebug1TFModel.swift; sourceTree = "<group>"; };
 		A89C929B2AE66BE700B5E8B4 /* UIImageView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+Extension.swift"; sourceTree = "<group>"; };
 		A89C929D2AE9031600B5E8B4 /* UIImage+Resize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Resize.swift"; sourceTree = "<group>"; };
+		A89C92A12AEA607600B5E8B4 /* VLBaseModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLBaseModel.h; sourceTree = "<group>"; };
+		A89C92A32AEA607600B5E8B4 /* VLBaseModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLBaseModel.m; sourceTree = "<group>"; };
 		AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRobotService.swift; sourceTree = "<group>"; };
 		ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingBitrateCell.swift; sourceTree = "<group>"; };
 		ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNetStateSelectViewController.swift; sourceTree = "<group>"; };
@@ -1392,16 +1391,6 @@
 		DDA198F728FFE579009D3E61 /* VLFontUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFontUtils.m; sourceTree = "<group>"; };
 		DDA198F828FFE579009D3E61 /* VLDeviceUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLDeviceUtils.h; sourceTree = "<group>"; };
 		DDA198F928FFE579009D3E61 /* UITextField+Font.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextField+Font.m"; sourceTree = "<group>"; };
-		DDA198FC28FFE579009D3E61 /* VLNetworkConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLNetworkConfig.h; sourceTree = "<group>"; };
-		DDA198FE28FFE579009D3E61 /* VLResponseDataModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLResponseDataModel.m; sourceTree = "<group>"; };
-		DDA198FF28FFE579009D3E61 /* VLBaseModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLBaseModel.h; sourceTree = "<group>"; };
-		DDA1990028FFE579009D3E61 /* VLResponseDataModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLResponseDataModel.h; sourceTree = "<group>"; };
-		DDA1990128FFE579009D3E61 /* VLBaseModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLBaseModel.m; sourceTree = "<group>"; };
-		DDA1990328FFE579009D3E61 /* VLAPIRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLAPIRequest.h; sourceTree = "<group>"; };
-		DDA1990428FFE579009D3E61 /* VLRequestRoute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLRequestRoute.m; sourceTree = "<group>"; };
-		DDA1990528FFE579009D3E61 /* VLRequestRoute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLRequestRoute.h; sourceTree = "<group>"; };
-		DDA1990628FFE579009D3E61 /* VLAPIRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAPIRequest.m; sourceTree = "<group>"; };
-		DDA1990728FFE579009D3E61 /* VLBaseHander.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLBaseHander.h; sourceTree = "<group>"; };
 		DDA1990A28FFE579009D3E61 /* VLBaseTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLBaseTableView.h; sourceTree = "<group>"; };
 		DDA1990B28FFE579009D3E61 /* VLBaseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLBaseView.m; sourceTree = "<group>"; };
 		DDA1990C28FFE579009D3E61 /* VLUIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLUIView.m; sourceTree = "<group>"; };
@@ -1661,6 +1650,15 @@
 				A84EEA712ADD297800258F55 /* ShowDebug1TFModel.swift */,
 			);
 			path = Debug;
+			sourceTree = "<group>";
+		};
+		A89C929F2AEA607600B5E8B4 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				A89C92A12AEA607600B5E8B4 /* VLBaseModel.h */,
+				A89C92A32AEA607600B5E8B4 /* VLBaseModel.m */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		BB900992214759253213A82C /* Frameworks */ = {
@@ -3445,42 +3443,9 @@
 		DDA198FA28FFE579009D3E61 /* VLNetwork */ = {
 			isa = PBXGroup;
 			children = (
-				DDA198FB28FFE579009D3E61 /* Configure */,
-				DDA198FD28FFE579009D3E61 /* Model */,
-				DDA1990228FFE579009D3E61 /* Request */,
+				A89C929F2AEA607600B5E8B4 /* Model */,
 			);
 			path = VLNetwork;
-			sourceTree = "<group>";
-		};
-		DDA198FB28FFE579009D3E61 /* Configure */ = {
-			isa = PBXGroup;
-			children = (
-				DDA198FC28FFE579009D3E61 /* VLNetworkConfig.h */,
-			);
-			path = Configure;
-			sourceTree = "<group>";
-		};
-		DDA198FD28FFE579009D3E61 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				DDA198FE28FFE579009D3E61 /* VLResponseDataModel.m */,
-				DDA198FF28FFE579009D3E61 /* VLBaseModel.h */,
-				DDA1990028FFE579009D3E61 /* VLResponseDataModel.h */,
-				DDA1990128FFE579009D3E61 /* VLBaseModel.m */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		DDA1990228FFE579009D3E61 /* Request */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1990328FFE579009D3E61 /* VLAPIRequest.h */,
-				DDA1990428FFE579009D3E61 /* VLRequestRoute.m */,
-				DDA1990528FFE579009D3E61 /* VLRequestRoute.h */,
-				DDA1990628FFE579009D3E61 /* VLAPIRequest.m */,
-				DDA1990728FFE579009D3E61 /* VLBaseHander.h */,
-			);
-			path = Request;
 			sourceTree = "<group>";
 		};
 		DDA1990828FFE579009D3E61 /* Base */ = {
@@ -4200,7 +4165,6 @@
 				DD36105E29B70CDC00CE7984 /* ShowThrottle.swift in Sources */,
 				DD9EBED72AD5492600B4551F /* VLSBGTopView.m in Sources */,
 				DD619A6B29E3E247008F63E4 /* SAVerifyCodeView.swift in Sources */,
-				DDA199E928FFE579009D3E61 /* VLResponseDataModel.m in Sources */,
 				DD0292E5295BF0DC00485225 /* VLKTVKindsCell.m in Sources */,
 				DD9EBED52AD5492600B4551F /* VLSBGRemoteVolumeView.m in Sources */,
 				DD9EBEAF2AD5492600B4551F /* SBGNetworkManager.swift in Sources */,
@@ -4211,6 +4175,7 @@
 				E3735C972A5E7E75004737EF /* BEPixelBufferInfo.m in Sources */,
 				DD0292C5295BF0DC00485225 /* VLSongItmModel.m in Sources */,
 				DD9EBE1A2AD5354000B4551F /* HeadSetManager.m in Sources */,
+				A89C92A52AEA607600B5E8B4 /* VLBaseModel.m in Sources */,
 				DDA199EF28FFE579009D3E61 /* VLBaseTableView.m in Sources */,
 				DD619AC529E3E247008F63E4 /* SAGifterCell.swift in Sources */,
 				E3735C9D2A5E7E75004737EF /* BeautyLoad.m in Sources */,
@@ -4394,7 +4359,6 @@
 				DD3610C029B70CDC00CE7984 /* ShowSettingHeaderView.swift in Sources */,
 				E74F817B2AD68338009CA280 /* HomeContentViewController.swift in Sources */,
 				DD9EBFC52AD5512300B4551F /* BaseNavigationView.swift in Sources */,
-				DDA199EC28FFE579009D3E61 /* VLAPIRequest.m in Sources */,
 				DD9EBFA12AD5512300B4551F /* VoiceRoomRTCManager.swift in Sources */,
 				DDA19A0828FFE579009D3E61 /* GCDTimer.swift in Sources */,
 				DD9EBFDF2AD5512300B4551F /* VoiceRoomGiftsView.swift in Sources */,
@@ -4567,7 +4531,6 @@
 				DD619ADB29E3E247008F63E4 /* SAChatBar.swift in Sources */,
 				DD9EBEE92AD5492600B4551F /* SBGLrcNameView.swift in Sources */,
 				DDA19A0028FFE579009D3E61 /* NSString+Emoji.m in Sources */,
-				DDA199EB28FFE579009D3E61 /* VLRequestRoute.m in Sources */,
 				DD619A9329E3E247008F63E4 /* SABaseViewController.swift in Sources */,
 				DD9EBED12AD5492600B4551F /* VLSBGSliderView.m in Sources */,
 				DD9EBFE32AD5512300B4551F /* VMSoundSelTableViewCell.swift in Sources */,
@@ -4715,7 +4678,6 @@
 				DD9EBFEE2AD5512400B4551F /* VoiceRoomAlertContainer.swift in Sources */,
 				DD619A9C29E3E247008F63E4 /* SAGiftersViewController.swift in Sources */,
 				E3735C9C2A5E7E75004737EF /* BundleUtil.m in Sources */,
-				DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */,
 				DD619ABA29E3E247008F63E4 /* SAAudioSettingView.swift in Sources */,
 				DD9EBE1B2AD5354000B4551F /* KTVLog.swift in Sources */,
 				E3735CB42A5FA785004737EF /* VLRoomListModel.swift in Sources */,

@@ -15,7 +15,7 @@
 #import "VLURLPathConfig.h"
 #import "VLFontUtils.h"
 #import "VLToast.h"
-#import "VLAPIRequest.h"
+//#import "VLAPIRequest.h"
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
 #import <Photos/Photos.h>

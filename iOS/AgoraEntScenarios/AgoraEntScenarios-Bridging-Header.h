@@ -26,7 +26,7 @@
 #import "AttributedTextView.h"
 #import "VLCommonWebViewController.h"
 #import "VLPopImageVerifyView.h"
-#import "VLAPIRequest.h"
+//#import "VLAPIRequest.h"
 #import "VLAlert.h"
 
 
