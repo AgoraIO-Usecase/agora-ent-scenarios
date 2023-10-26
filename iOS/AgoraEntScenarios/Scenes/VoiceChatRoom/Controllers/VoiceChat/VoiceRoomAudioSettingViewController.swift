@@ -393,6 +393,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 cell.contentLabel.text = "Other".voice_localized()
 
             }
+            cell.accessibilityIdentifier = "voice_chat_room_audio_setting_\(indexPath.section)_\(indexPath.row)"
             return cell
         } else if indexPath.section == 1 {
             if indexPath.row == 0 {

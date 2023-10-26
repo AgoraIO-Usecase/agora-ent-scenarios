@@ -71,6 +71,7 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
         super.init(frame: frame)
         isUserInteractionEnabled = true
         addSubViews([roomName, randomName, roomBackground, roomNameField, roomEncryption, publicChoice, privateChoice, pinCode, warnMessage, timeLimit, createContainer, create])
+        roomNameField.accessibilityIdentifier = "voice_chat_create_room_name_tf"
         timeLimit.titleLabel?.numberOfLines = 0
         createContainer.layer.cornerRadius = 24
         createContainer.layer.shadowRadius = 8
@@ -92,6 +93,7 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
         create.layer.shadowOpacity = 1
         create.layer.shadowRadius = 8
         create.layer.shadowOffset = CGSize(width: 0, height: 4)
+        create.titleLabel?.accessibilityIdentifier = "voice_chat_create_room_next_btn"
         warnMessage.isHidden = true
     }
 

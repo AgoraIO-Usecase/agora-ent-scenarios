@@ -27,6 +27,7 @@ public class VRRoomCreateView: UIImageView {
         isUserInteractionEnabled = true
         createRoom.set(image:UIImage.sceneImage(name: "add", bundleName: "VoiceChatRoomResource"), title: LanguageManager.localValue(key: "voice_create_room"), titlePosition: .right, additionalSpacing: 7, state: .normal)
         createRoom.setGradient([UIColor(red: 0.13, green: 0.61, blue: 1, alpha: 1), UIColor(red: 0.2, green: 0.37, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)])
+        createRoom.titleLabel?.accessibilityIdentifier = "voice_chat_create_room_button_title"
     }
 
     @available(*, unavailable)

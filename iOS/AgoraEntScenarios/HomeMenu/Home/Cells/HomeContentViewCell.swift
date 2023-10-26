@@ -46,6 +46,7 @@ class HomeContentViewCell: UICollectionViewCell {
         backgroundImageView.image = UIImage(named: model?.imageName ?? "home_ktv_solo")
         titleLabel.text = model?.title
         descLabel.text = model?.desc
+        titleLabel.accessibilityIdentifier = "home_cell_\(model?.imageName ?? "")"
     }
     
     private func setupUI() {
