@@ -120,9 +120,9 @@ open class NMGenerateIMConfigNetworkModelUserParmas: NSObject {
 
 @objcMembers
 open class NMGenerateIMConfigNetworkModelIMParmas: NSObject {
-    private var appKey: String? = KeyCenter.IMAppKey
-    private var clientId: String? = KeyCenter.IMClientId
-    private var clientSecret: String? = KeyCenter.IMClientSecret
+    var appKey: String? = KeyCenter.IMAppKey
+    var clientId: String? = KeyCenter.IMClientId
+    var clientSecret: String? = KeyCenter.IMClientSecret
 }
 
 
@@ -159,9 +159,9 @@ open class NMGenerateIMConfigNetworkModel: NMCommonNetworkModel {
 @objcMembers
 open class NMVoiceIdentifyNetworkModel: NMCommonNetworkModel {
    
-    private var appId: String? = KeyCenter.AppId
-    private var src: String? = "iOS"
-    private var traceId: String? = UUID().uuidString.md5Encrypt
+    var appId: String? = KeyCenter.AppId
+    var src: String? = "iOS"
+    var traceId: String? = UUID().uuidString.md5Encrypt
     
     var channelName: String?
     var channelType: NSNumber?
@@ -170,6 +170,19 @@ open class NMVoiceIdentifyNetworkModel: NMCommonNetworkModel {
     public override init() {
         super.init()
         interfaceName = "v1/moderation/audio"
+    }
+    
+    public override func parse(data: Data?) throws -> Any {
+        guard let data = data,
+              let dic = try? JSONSerialization.jsonObject(with: data) else {
+            throw AUICommonError.networkParseFail.toNSError()
+        }
+        
+        if let dic = (dic as? [String: Any]), let code = dic["code"] as? Int, code != 0 {
+            let message = dic["message"] as? String ?? ""
+            throw AUICommonError.httpError(code, message).toNSError()
+        }
+        return dic
     }
    
 }
@@ -195,6 +208,20 @@ open class NMStartCloudPlayerNetworkModel: NMCommonNetworkModel {
     public override init() {
         super.init()
         interfaceName = "v1/cloud-player/start"
+    }
+    
+    public override func parse(data: Data?) throws -> Any {
+        guard let data = data,
+              let dic = try? JSONSerialization.jsonObject(with: data) else {
+            throw AUICommonError.networkParseFail.toNSError()
+        }
+        
+        if let dic = (dic as? [String: Any]), let code = dic["code"] as? Int, code != 0 {
+            let message = dic["message"] as? String ?? ""
+            throw AUICommonError.httpError(code, message).toNSError()
+        }
+        
+        return dic
     }
    
 }
@@ -259,6 +286,21 @@ open class NMReportDeviceInfoNetworkModel: NMCommonNetworkModel {
         interfaceName = "/api-login/report/device?userNo=\(userNo)&sceneId=\(sceneId)&appId=\(appId)&projectId=agora_ent_demo"
     }
     
+    public override func parse(data: Data?) throws -> Any {
+        guard let data = data,
+              let dic = try? JSONSerialization.jsonObject(with: data) else {
+            throw AUICommonError.networkParseFail.toNSError()
+        }
+        
+        if let dic = (dic as? [String: Any]), let code = dic["code"] as? Int, code != 0 {
+            let message = dic["message"] as? String ?? ""
+            throw AUICommonError.httpError(code, message).toNSError()
+        }
+        
+        return dic
+    }
+    
+    
 }
 
 @objcMembers
@@ -271,6 +313,19 @@ open class NMReportUserBehaviorNetworkModel: NMCommonNetworkModel {
         host = KeyCenter.HostUrl
         interfaceName = "/api-login/report/action?userNo=\(userNo)&sceneId=\(sceneId)&appId=\(appId)&projectId=agora_ent_demo"
         action = sceneId
+    }
+    
+    public override func parse(data: Data?) throws -> Any {
+        guard let data = data,
+              let dic = try? JSONSerialization.jsonObject(with: data) else {
+            throw AUICommonError.networkParseFail.toNSError()
+        }
+        
+        if let dic = (dic as? [String: Any]), let code = dic["code"] as? Int, code != 0 {
+            let message = dic["message"] as? String ?? ""
+            throw AUICommonError.httpError(code, message).toNSError()
+        }
+        return dic
     }
     
 }
