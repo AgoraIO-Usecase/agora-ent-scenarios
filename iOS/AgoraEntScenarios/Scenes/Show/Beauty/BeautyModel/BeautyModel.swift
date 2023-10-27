@@ -33,6 +33,10 @@ class BeautyModel: BeautyBaseModel {
     var key: String?
     /// 特效强度 （0~1）
     var value: CGFloat = 0
+    /// 最小值
+    var min: Float = 0
+    /// 最大值
+    var max: Float = 1
     
     static func createBeautyData() -> [BeautyModel] {
         var dataArray = [BeautyModel]()

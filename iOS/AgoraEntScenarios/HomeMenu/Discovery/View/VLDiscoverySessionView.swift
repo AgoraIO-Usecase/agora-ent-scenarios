@@ -32,6 +32,6 @@ class VLDiscoverySessionView: UICollectionReusableView {
     private func setupUI() {
         addSubview(titleLabel)
         titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 36).isActive = true
-        titleLabel.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
     }
 }

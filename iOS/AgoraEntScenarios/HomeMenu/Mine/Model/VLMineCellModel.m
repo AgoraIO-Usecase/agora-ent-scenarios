@@ -13,11 +13,16 @@
     return [self modelWithItemImg:itemImgStr title:title style:VLMineCellStyleDefault];
 }
 
-+ (instancetype)modelWithItemImg:(NSString *)itemImgStr title:(NSString *)title style: (VLMineCellStyle) style {
++ (instancetype)modelWithItemImg:(NSString *)itemImgStr title:(NSString *)title style: (VLMineCellStyle)style {
+    return [self modelWithItemImg:itemImgStr title:title style:style clickType:(VLMineViewClickTypeNone)];
+}
+
++ (instancetype)modelWithItemImg:(NSString *)itemImgStr title:(NSString *)title style: (VLMineCellStyle)style clickType:(VLMineViewClickType)clickType {
     VLMineCellModel *model = [VLMineCellModel new];
     model.itemImgStr = itemImgStr;
     model.titleStr = title;
     model.style = style;
+    model.clickType = clickType;
     return  model;
 }
 

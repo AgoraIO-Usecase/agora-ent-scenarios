@@ -11,7 +11,7 @@ import LSTPopView
 class VLRegisterViewController: VLBaseViewController {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "注册/登录"
+        label.text = NSLocalizedString("app_register_account", comment: "")
         label.textColor = UIColor(hex: "#1D2129", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 30)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -19,7 +19,7 @@ class VLRegisterViewController: VLBaseViewController {
     }()
     private lazy var descLabel: UILabel = {
         let label = UILabel()
-        label.text = "若手机号未注册，登录后会自动注册。"
+        label.text = NSLocalizedString("app_register_account_tips", comment: "")
         label.textColor = UIColor(hex: "#86909C", alpha: 1.0)
         label.font = .systemFont(ofSize: 14)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -46,7 +46,7 @@ class VLRegisterViewController: VLBaseViewController {
     private lazy var textField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.placeholder = "请输入手机号"
+        textField.placeholder = NSLocalizedString("app_please_input_account", comment: "")
         textField.textColor = .black
         textField.backgroundColor = UIColor(hex: "#FFFFFF", alpha: 1.0)
         textField.leftViewMode = .always
@@ -60,7 +60,7 @@ class VLRegisterViewController: VLBaseViewController {
     }()
     private lazy var verifyCodeButton: UIButton = {
         let button = UIButton()
-        button.setTitle("获取验证码", for: .normal)
+        button.setTitle(NSLocalizedString("app_login_get_verify_code", comment: ""), for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16)
         button.translatesAutoresizingMaskIntoConstraints = false

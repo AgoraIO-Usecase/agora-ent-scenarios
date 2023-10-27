@@ -31,7 +31,9 @@ class ShowEmptyView: UIView {
         }
         
         descLabel = UILabel()
-        descLabel.textColor = .show_empty_desc
+        descLabel.textColor = UIColor(hex: "#6F738B", alpha: 1.0)
+        descLabel.numberOfLines = 0
+        descLabel.textAlignment = .center
         descLabel.font = .show_R_14
         descLabel.text = "room_list_empty_desc".show_localized
         addSubview(descLabel)

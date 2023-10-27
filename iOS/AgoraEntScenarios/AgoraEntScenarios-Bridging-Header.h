@@ -18,7 +18,6 @@
 //#import "AEAListContainerView.h"
 @import YYModel;
 
-#import "BEFrameProcessor.h"
 #import "VideoProcessingManager.h"
 #import "BeautyAPI.h"
 #import "BytesBeautyRender.h"

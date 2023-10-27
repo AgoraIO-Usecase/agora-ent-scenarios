@@ -33,7 +33,13 @@ class ShowBeautySettingVC: UIViewController {
     var selectedItem: ((_ item: String)->())?
     var dismissed: (()->())?
     
-    private var slider: UISlider!
+    private lazy var slider: UISlider = {
+        let slider = UISlider()
+        slider.minimumTrackTintColor = .show_zi03
+        slider.maximumTrackTintColor = .show_slider_tint
+        slider.addTarget(self, action: #selector(onTapSliderHandler(sender:)), for: .valueChanged)
+        return slider
+    }()
     private let titles = ShowBeautyFaceVCType.allCases.filter({
         if BeautyModel.beautyType == .byte {
             return $0 != .adjust
@@ -118,7 +124,7 @@ class ShowBeautySettingVC: UIViewController {
 
     private var beautyFaceVC: ShowBeautyFaceVC? {
         didSet {
-            beautyFaceVC?.selectedItemClosure = { [weak self] value, isHiddenValue, isShowSegSwitch in
+            beautyFaceVC?.selectedItemClosure = { [weak self] min, max, value, isHiddenValue, isShowSegSwitch in
                 guard let self = self else { return }
                 self.slider.isHidden = isShowSegSwitch ? !ShowAgoraKitManager.isOpenGreen : isHiddenValue
                 self.compareButton.isHidden = isShowSegSwitch ? true : isHiddenValue
@@ -126,6 +132,8 @@ class ShowBeautySettingVC: UIViewController {
                 self.segSwitch.isOn = isShowSegSwitch == false ? ShowAgoraKitManager.isOpenGreen : self.segSwitch.isOn
                 self.segLabel.isHidden = !isShowSegSwitch
                 self.slider.setValue(Float(value), animated: true)
+                self.slider.minimumValue = min
+                self.slider.maximumValue = max
             }
             beautyFaceVC?.reloadData()
         }
@@ -141,10 +149,6 @@ class ShowBeautySettingVC: UIViewController {
         view.backgroundColor = .clear
         
         // slider
-        slider = UISlider()
-        slider.minimumTrackTintColor = .show_zi03
-        slider.maximumTrackTintColor = .show_slider_tint
-        slider.addTarget(self, action: #selector(onTapSliderHandler(sender:)), for: .valueChanged)
         view.addSubview(slider)
         slider.snp.makeConstraints { make in
             make.left.equalTo(22)

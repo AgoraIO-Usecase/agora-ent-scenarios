@@ -7,6 +7,7 @@
 
 #import "BytesBeautyRender.h"
 
+
 @interface BytesBeautyRender ()
 
 @property (nonatomic, strong) NSMutableArray *bytesNodes;
@@ -15,18 +16,20 @@
 
 @implementation BytesBeautyRender
 
-#if __has_include("BEImageUtils.h") && __has_include("BEFrameProcessor.h")
-- (BEFrameProcessor *)frameProcessor {
-    if (_frameProcessor == nil) {
-        EAGLContext *context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-        [EAGLContext setCurrentContext:context];
-        _frameProcessor = [[BEFrameProcessor alloc]initWithContext:context resourceDelegate:nil];
-        _frameProcessor.processorResult = BECVPixelBuffer;
-        [_frameProcessor setEffectOn:YES];
-        [_frameProcessor updateComposerNodes:self.bytesNodes];
+#if __has_include("BEImageUtils.h") && __has_include("BEEffectManager.h")
+- (BEEffectManager *)effectManager {
+    if (_effectManager == nil) {
+        _effectManager = [[BEEffectManager alloc] initWithResourceProvider:[BEEffectResourceHelper new] licenseProvider:[BELicenseHelper shareInstance]];
+#if __has_include(BytesMoudle)
+        int ret = [_effectManager initTask];
+        if (ret == BEF_RESULT_SUC){
+            [_effectManager updateComposerNodes:self.bytesNodes];
+        }
+#endif
     }
-    return _frameProcessor;
+    return _effectManager;
 }
+
 - (BEImageUtils *)imageUtils {
     if (_imageUtils == nil) {
         _imageUtils = [[BEImageUtils alloc] init];
@@ -44,20 +47,70 @@
 
 - (void)destroy { 
 #if __has_include(BytesMoudle)
-    _frameProcessor = nil;
+    [_effectManager destroyTask];
+    [_effectManager cleanPipeline];
+    _effectManager = nil;
     _imageUtils = nil;
 #endif
 }
 
-- (nonnull CVPixelBufferRef)onCapture:(nonnull CVPixelBufferRef)pixelBuffer { 
+- (nonnull CVPixelBufferRef)onCapture:(nonnull CVPixelBufferRef)pixelBuffer {
 #if __has_include(BytesMoudle)
-    pixelBuffer = [self.imageUtils transforCVPixelBufferToCVPixelBuffer:pixelBuffer outputFormat:BE_BGRA];
-    CVPixelBufferRef px = [self.frameProcessor process: pixelBuffer
-                                               timeStamp: [NSDate date].timeIntervalSince1970].pixelBuffer;
-    return px;
+    double timeStamp = [[NSDate date] timeIntervalSince1970];
+    BEPixelBufferInfo *pixelBufferInfo = [self.imageUtils getCVPixelBufferInfo:pixelBuffer];
+    if (pixelBufferInfo.format != BE_BGRA) {
+        pixelBuffer = [self.imageUtils transforCVPixelBufferToCVPixelBuffer:pixelBuffer
+                                                               outputFormat:pixelBufferInfo.format];
+    }
+    
+    if ([self getDeviceOrientation] != BEF_AI_CLOCKWISE_ROTATE_0) {
+        pixelBuffer = [self.imageUtils rotateCVPixelBuffer:pixelBuffer rotation:BEF_AI_CLOCKWISE_ROTATE_0];
+    }
+    id<BEGLTexture> texture = [self.imageUtils transforCVPixelBufferToTexture:pixelBuffer];
+    BEPixelBufferGLTexture *outTexture = nil;
+
+    outTexture = [self.imageUtils getOutputPixelBufferGLTextureWithWidth:texture.width
+                                                                  height:texture.height
+                                                                  format:pixelBufferInfo.format
+                                                            withPipeline:self.effectManager.usePipeline];
+    
+    int ret = [self.effectManager processTexture:texture.texture
+                                   outputTexture:outTexture.texture
+                                           width:pixelBufferInfo.width
+                                          height:pixelBufferInfo.height
+                                          rotate:[self getDeviceOrientation]
+                                       timeStamp:timeStamp];
+    if (ret != BEF_RESULT_SUC) {
+        outTexture = texture;
+    }
+    return [(BEPixelBufferGLTexture *)outTexture pixelBuffer];
+#else
+    return pixelBuffer;
 #endif
-    return nil;
 }
+
+#if __has_include(BytesMoudle)
+- (bef_ai_rotate_type)getDeviceOrientation {
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    switch (orientation) {
+        case UIDeviceOrientationPortrait:
+            return BEF_AI_CLOCKWISE_ROTATE_0;
+
+        case UIDeviceOrientationPortraitUpsideDown:
+            return BEF_AI_CLOCKWISE_ROTATE_180;
+
+        case UIDeviceOrientationLandscapeLeft:
+            return BEF_AI_CLOCKWISE_ROTATE_270;
+
+        case UIDeviceOrientationLandscapeRight:
+            return BEF_AI_CLOCKWISE_ROTATE_90;
+
+        default:
+            return BEF_AI_CLOCKWISE_ROTATE_0;
+    }
+}
+#endif
+
 #if __has_include(<AgoraRtcKit/AgoraRtcKit.h>)
 - (AgoraVideoFormat)getVideoFormatPreference {
     return AgoraVideoFormatCVPixelBGRA;
@@ -66,33 +119,33 @@
 
 - (void)reset { 
 #if __has_include(BytesMoudle)
-    [self.frameProcessor updateComposerNodeIntensity:@"/beauty_IOS_lite" key:@"whiten" intensity:0];
-    [self.frameProcessor updateComposerNodeIntensity:@"/beauty_IOS_lite" key:@"smooth" intensity:0];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Overall" intensity:0];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Zoom_Cheekbone" intensity:0];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Eye" intensity:0];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Nose" intensity:0];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Chin" intensity:0];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Zoom_Jawbone" intensity:0];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Forehead" intensity:0];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_ZoomMouth" intensity:0];
-    [self.frameProcessor updateComposerNodeIntensity:@"/beauty_4Items" key:@"BEF_BEAUTY_WHITEN_TEETH" intensity:0];
+    [self.effectManager updateComposerNodeIntensity:@"/beauty_IOS_lite" key:@"whiten" intensity:0];
+    [self.effectManager updateComposerNodeIntensity:@"/beauty_IOS_lite" key:@"smooth" intensity:0];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Overall" intensity:0];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Zoom_Cheekbone" intensity:0];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Eye" intensity:0];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Nose" intensity:0];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Chin" intensity:0];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Zoom_Jawbone" intensity:0];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Forehead" intensity:0];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_ZoomMouth" intensity:0];
+    [self.effectManager updateComposerNodeIntensity:@"/beauty_4Items" key:@"BEF_BEAUTY_WHITEN_TEETH" intensity:0];
 #endif
 }
 
 - (void)setBeautyPreset { 
 #if __has_include(BytesMoudle)
-    [self.frameProcessor updateComposerNodeIntensity:@"/beauty_IOS_lite" key:@"whiten" intensity:0.2];
-    [self.frameProcessor updateComposerNodeIntensity:@"/beauty_IOS_lite" key:@"smooth" intensity:0.3];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Overall" intensity:0.15];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Zoom_Cheekbone" intensity:0.3];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Eye" intensity:0.15];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Nose" intensity:0.15];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Chin" intensity:0.46];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Zoom_Jawbone" intensity:0.46];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Forehead" intensity:0.4];
-    [self.frameProcessor updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_ZoomMouth" intensity:0.16];
-    [self.frameProcessor updateComposerNodeIntensity:@"/beauty_4Items" key:@"BEF_BEAUTY_WHITEN_TEETH" intensity:0.2];
+    [self.effectManager updateComposerNodeIntensity:@"/beauty_IOS_lite" key:@"whiten" intensity:0.2];
+    [self.effectManager updateComposerNodeIntensity:@"/beauty_IOS_lite" key:@"smooth" intensity:0.3];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Overall" intensity:0.15];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Zoom_Cheekbone" intensity:0.3];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Eye" intensity:0.15];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Nose" intensity:0.15];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Chin" intensity:0.46];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Zoom_Jawbone" intensity:0.46];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Forehead" intensity:0.4];
+    [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_ZoomMouth" intensity:0.16];
+    [self.effectManager updateComposerNodeIntensity:@"/beauty_4Items" key:@"BEF_BEAUTY_WHITEN_TEETH" intensity:0.2];
 #endif
 }
 
@@ -101,15 +154,15 @@
     if (isSelected) {
         if (![self.bytesNodes containsObject:@"/style_makeup/qise"]) {
             [self.bytesNodes addObject:@"/style_makeup/qise"];
-            [self.frameProcessor updateComposerNodes:self.bytesNodes];
+            [self.effectManager updateComposerNodes:self.bytesNodes];
         }
-        [self.frameProcessor updateComposerNodeIntensity:@"/style_makeup/qise" key:@"Makeup_ALL" intensity:0.6];
+        [self.effectManager updateComposerNodeIntensity:@"/style_makeup/qise" key:@"Makeup_ALL" intensity:0.6];
     } else {
         if ([self.bytesNodes containsObject:@"/style_makeup/qise"]) {
             [self.bytesNodes removeObject:@"/style_makeup/qise"];
-            [self.frameProcessor updateComposerNodes:self.bytesNodes];
+            [self.effectManager updateComposerNodes:self.bytesNodes];
         }
-        [self.frameProcessor updateComposerNodeIntensity:@"/style_makeup/qise" key:@"Makeup_ALL" intensity:0];
+        [self.effectManager updateComposerNodeIntensity:@"/style_makeup/qise" key:@"Makeup_ALL" intensity:0];
     }
 #endif
 }
@@ -117,9 +170,9 @@
 - (void)setSticker:(BOOL)isSelected { 
 #if __has_include(BytesMoudle)
     if (isSelected) {
-        [self.frameProcessor setStickerPath:@"matting_bg"];
+        [self.effectManager setStickerPath:@"matting_bg"];
     } else {
-        [self.frameProcessor setStickerPath:@""];
+        [self.effectManager setStickerPath:@""];
     }
 #endif
 }

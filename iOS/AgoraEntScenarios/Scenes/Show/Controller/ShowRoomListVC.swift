@@ -23,7 +23,7 @@ class ShowRoomListVC: UIViewController {
         let layout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         let itemWidth = (Screen.width - 15 - 20 * 2) * 0.5
-        layout.itemSize = CGSize(width: itemWidth, height: 234.0 / 160.0 * itemWidth)
+        layout.itemSize = CGSize(width: itemWidth, height: itemWidth)
         return UICollectionView(frame: .zero, collectionViewLayout: layout)
     }()
         
@@ -170,10 +170,12 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: ShowRoomListCell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(ShowRoomListCell.self), for: indexPath) as! ShowRoomListCell
         let room = roomList[indexPath.item]
-        cell.setBgImge((room.thumbnailId?.isEmpty ?? true) ? "0" : room.thumbnailId ?? "0",
+        cell.setBgImge("\(indexPath.item % 5)",
                        name: room.roomName,
                        id: room.roomId,
-                       count: room.roomUserCount)
+                       count: room.roomUserCount,
+                       avatarUrl: room.ownerAvatar,
+                       isPrivate: false)
         cell.ag_addPreloadTap(roomInfo: room, localUid: delegateHandler.localUid) {[weak self] state in
             if AppContext.shared.rtcToken?.count ?? 0 == 0 {
                 if state == .began {
@@ -209,15 +211,7 @@ extension ShowRoomListVC {
         emptyView.isHidden = true
         collectionView.addSubview(emptyView)
         
-        createButton.setTitleColor(.white, for: .normal)
-        createButton.setTitle("room_list_create_room".show_localized, for: .normal)
-        createButton.setImage(UIImage.show_sceneImage(name: "show_create_add"), for: .normal)
-        createButton.imageEdgeInsets(UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5))
-        createButton.titleEdgeInsets(UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 0))
-        createButton.backgroundColor = .show_btn_bg
-        createButton.titleLabel?.font = .show_btn_title
-        createButton.layer.cornerRadius = 48 * 0.5
-        createButton.layer.masksToBounds = true
+        createButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_create_add_bg"), for: .normal)
         createButton.addTarget(self, action: #selector(didClickCreateButton), for: .touchUpInside)
         view.addSubview(createButton)
         
@@ -240,8 +234,6 @@ extension ShowRoomListVC {
         createButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.bottom.equalToSuperview().offset(-max(Screen.safeAreaBottomHeight(), 10))
-            make.height.equalTo(48)
-            make.width.equalTo(195)
         }
     }
 }

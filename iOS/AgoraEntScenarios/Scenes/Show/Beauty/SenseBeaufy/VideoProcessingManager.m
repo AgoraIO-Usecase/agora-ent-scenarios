@@ -70,7 +70,6 @@
 - (void)addStylePath: (NSString *)stylePath groupId: (int)groudId strength: (CGFloat)strength callBack:(void (^)(int))callback {
 #if __has_include("st_mobile_common.h")
     if (self.stickerId && [stylePath isEqualToString:self.stickerPath]) {
-        NSLog(@"value == %f", strength);
         if (groudId == 0) {
             [self.effectsProcess setPackageId:self.stickerId groupType:EFFECT_BEAUTY_GROUP_MAKEUP strength:strength];
         } else {
@@ -145,27 +144,22 @@
                                     pixelBuffer:&_outputPixelBuffer
                                       cvTexture:&_outputCVTexture];
     }
-#endif
-#if __has_include("st_mobile_common.h")
     st_mobile_human_action_t detectResult;
     memset(&detectResult, 0, sizeof(st_mobile_human_action_t));
     st_result_t ret = [self.effectsProcess detectWithPixelBuffer:pixelBuffer
                                                           rotate:[self getRotateType]
                                                   cameraPosition:AVCaptureDevicePositionFront
                                                      humanAction:&detectResult
-                                                    animalResult:nil
-                                                     animalCount:nil];
+                                                    animalResult:nil];
     if (ret != ST_OK) {
         NSLog(@"人脸检测失败");
         CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
         return pixelBuffer;
     }
-
     [self.effectsProcess renderPixelBuffer:pixelBuffer
                                     rotate:[self getRotateType]
                                humanAction:detectResult
                               animalResult:nil
-                               animalCount:0
                                 outTexture:self->_outTexture
                             outPixelFormat:ST_PIX_FMT_BGRA8888
                                    outData:nil];

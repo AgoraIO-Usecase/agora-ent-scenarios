@@ -51,22 +51,22 @@ class HomeModel: NSObject {
     static func createData() -> [HomeModel] {
         var dataArray = [HomeModel]()
         let homeModel = HomeModel()
-        homeModel.title = "全部玩法"
+        homeModel.title = NSLocalizedString("home_category_title_all", comment: "")
         homeModel.vc = HomeContentViewController(type: .all)
         dataArray.append(homeModel)
         
         let ktvModel = HomeModel()
-        ktvModel.title = "在线K歌房"
+        ktvModel.title = NSLocalizedString("home_category_title_ktv", comment: "")
         ktvModel.vc = HomeContentViewController(type: .ktv)
         dataArray.append(ktvModel)
         
         let voiceModel = HomeModel()
-        voiceModel.title = "语聊房"
+        voiceModel.title = NSLocalizedString("home_category_title_voiceChat", comment: "")
         voiceModel.vc = HomeContentViewController(type: .voice_chat)
         dataArray.append(voiceModel)
         
         let liveModel = HomeModel()
-        liveModel.title = "直播"
+        liveModel.title = NSLocalizedString("home_category_title_live", comment: "")
         liveModel.vc = HomeContentViewController(type: .live)
         dataArray.append(liveModel)
         
@@ -83,33 +83,49 @@ struct HomeContentSesionModel {
         var dataArray = [HomeContentSesionModel]()
         var model = HomeContentSesionModel()
         model.type = .ktv
-        model.title = "在线K歌房"
-        var contentArray = [createContentModel(title: "独唱&合唱", desc: "超低延迟真合唱", imageName: "home_ktv_solo", type: .solo),
-                            createContentModel(title: "抢唱", desc: "热歌高潮片段", imageName: "home_ktv_snatch_singing", type: .snatch_singing),
-                            createContentModel(title: "大合唱", desc: "最高支持128人", imageName: "home_ktv_chorus", type: .chorus),
-                            createContentModel(title: "接唱", desc: "歌曲接龙", imageName: "home_ktv_continue_singing", type: .continue_singing)]
+        model.title = NSLocalizedString("home_category_title_ktv", comment: "")
+        var contentArray = [createContentModel(title: NSLocalizedString("home_content_item_ktv_title_solo", comment: ""),
+                                               desc: NSLocalizedString("home_content_item_ktv_desc_solo", comment: ""),
+                                               imageName: "home_ktv_solo", type: .solo),
+                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_snatchsinging", comment: ""),
+                                               desc: NSLocalizedString("home_content_item_ktv_desc_snatchsinging", comment: ""),
+                                               imageName: "home_ktv_snatch_singing", type: .snatch_singing),
+                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_cantata", comment: ""),
+                                               desc: NSLocalizedString("home_content_item_ktv_desc_cantata", comment: ""),
+                                               imageName: "home_ktv_chorus", type: .chorus),
+                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_takesong", comment: ""),
+                                               desc: NSLocalizedString("home_content_item_ktv_desc_takesong", comment: ""),
+                                               imageName: "home_ktv_continue_singing", type: .continue_singing)]
         model.contentModels = contentArray
         dataArray.append(model)
         
         model = HomeContentSesionModel()
         model.type = .voice_chat
-        model.title = "语聊房"
-        contentArray = [createContentModel(title: "语聊房", desc: "更沉浸、更有趣、更动听", imageName: "home_voice_chat", type: .voice_chat),
-                        createContentModel(title: "语聊房-空间音频版", desc: "方位感和空间感", imageName: "home_voice_spatial_chat", type: .spatial_voice)]
+        model.title = NSLocalizedString("home_category_title_voiceChat", comment: "")
+        contentArray = [createContentModel(title: NSLocalizedString("home_category_title_voiceChat", comment: ""),
+                                           desc: NSLocalizedString("home_content_item_voice_desc_immersive", comment: ""),
+                                           imageName: "home_voice_chat", type: .voice_chat),
+                        createContentModel(title: NSLocalizedString("home_content_item_voice_title_spatial", comment: ""),
+                                           desc: NSLocalizedString("home_content_item_voice_desc_spatial", comment: ""),
+                                           imageName: "home_voice_spatial_chat", type: .spatial_voice)]
         model.contentModels = contentArray
         dataArray.append(model)
         
         model = HomeContentSesionModel()
-        model.title = "直播"
+        model.title = NSLocalizedString("home_category_title_live", comment: "")
         model.type = .live
-        contentArray = [createContentModel(title: "秀场", desc: "描述描述描述描", imageName: "home_live_show", type: .show),
-                        createContentModel(title: "1v1私密房", desc: "描述描述描述描", imageName: "home_live_1v1", type: .one_v_one),
-                        createContentModel(title: "多人团战",
-                                           desc: "敬请期待",
+        contentArray = [createContentModel(title: NSLocalizedString("home_content_item_live_title_show", comment: ""),
+                                           desc: NSLocalizedString("home_content_item_live_desc_show", comment: ""),
+                                           imageName: "home_live_show", type: .show),
+                        createContentModel(title: NSLocalizedString("home_content_item_live_title_1v1_private", comment: ""),
+                                           desc: NSLocalizedString("home_content_item_live_desc_1v1_private", comment: ""),
+                                           imageName: "home_live_1v1", type: .one_v_one),
+                        createContentModel(title: NSLocalizedString("home_content_item_live_title_multiple", comment: ""),
+                                           desc: NSLocalizedString("home_content_item_live_desc_multiple", comment: ""),
                                            imageName: "home_live_multiple",
                                            type: .multiple),
-                        createContentModel(title: "秀场转1v1私密房",
-                                           desc: "描述描述描述描",
+                        createContentModel(title: NSLocalizedString("home_content_item_live_title_show_1v1_private", comment: ""),
+                                           desc: NSLocalizedString("home_content_item_live_desc_show_1v1_private", comment: ""),
                                            imageName: "home_live_show_private_one_v_one",
                                            type: .show_private_one_v_one)]
         model.contentModels = contentArray

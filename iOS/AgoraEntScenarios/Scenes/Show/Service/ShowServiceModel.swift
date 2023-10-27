@@ -73,7 +73,9 @@ class ShowRoomListModel: ShowBaseInfo, IVideoLoaderRoomInfo {
         get {
             let anchorInfo = AnchorInfo()
             anchorInfo.channelName = roomId
-            anchorInfo.uid = UInt(ownerId)!
+            if !ownerId.isEmpty {
+                anchorInfo.uid = UInt(ownerId)!
+            }
             anchorInfo.token = AppContext.shared.rtcToken ?? ""
             
             return [anchorInfo] + interactionAnchorInfoList

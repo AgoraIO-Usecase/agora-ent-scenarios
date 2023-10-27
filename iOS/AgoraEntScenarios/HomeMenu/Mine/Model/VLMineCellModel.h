@@ -26,6 +26,8 @@ typedef enum : NSUInteger {
 
 + (instancetype)modelWithItemImg:(NSString *)itemImgStr title:(NSString *)title style: (VLMineCellStyle)style;
 
++ (instancetype)modelWithItemImg:(NSString *)itemImgStr title:(NSString *)title style: (VLMineCellStyle)style clickType:(VLMineViewClickType)clickType;
+
 + (instancetype)modelWithItemImg:(NSString *)itemImgStr title:(NSString *)title clickType: (VLMineViewClickType)clickType;
 
 @end

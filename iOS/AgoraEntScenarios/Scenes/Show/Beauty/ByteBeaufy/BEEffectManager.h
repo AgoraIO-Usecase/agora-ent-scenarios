@@ -12,9 +12,9 @@
 #import <OpenGLES/ES2/glext.h>
 #import <UIKit/UIKit.h>
 #import "BELicenseHelper.h"
-#if __has_include("bef_effect_ai_api.h")
-#import "bef_effect_ai_api.h"
-#import "bef_effect_ai_message_define.h"
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
+#import <effect-sdk/bef_effect_ai_api.h>
+#import <effect-sdk/bef_effect_ai_message_define.h>
 #endif
 #import "BEImageUtils.h"
 
@@ -28,8 +28,8 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
     BEEffectPart_2      = 2,
     BEEffectPart_3      = 3,
     BEEffectPart_4      = 4,
-    BEEffectPart_5      = 5,   //全局染发
-    BEEffectPart_6      = 6,   //清除染发效果
+    BEEffectPart_5      = 5,   // {zh} 全局染发 {en} Global hair color
+    BEEffectPart_6      = 6,   // {zh} 清除染发效果 {en} Clear hair color effect
 };
 
 @protocol BEEffectManagerDelegate <NSObject>
@@ -68,6 +68,9 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 @property (nonatomic, strong) id<BEEffectResourceProvider> provider;
 @property (nonatomic, strong) id<BELicenseProvider> licenseProvider;
 @property (nonatomic, weak) id<BEEffectManagerDelegate> delegate;
+@property (nonatomic, strong) NSString *resourcePath;
+@property (atomic, weak) dispatch_queue_t renderQueue;
+
 
 //   {zh} / @brief 构造函数     {en} /@brief constructor
 //   {zh} / @details 需要传入一个 BEEffectResourceProvider 实现，用于提供各种素材的路径，和一个BELicenseProvider的实现，用于获取license     {en} /@details need to pass in a BEEffectResourceProvider implementation to provide the path of various materials, and a BELicenseProvider implementation to get license
@@ -75,7 +78,7 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 //   {zh} / @param provider 特效资源文件获取类     {en} /@param provider effect resource file acquisition class
 - (instancetype)initWithResourceProvider:(id<BEEffectResourceProvider>)resourceProvider licenseProvider:(id<BELicenseProvider>)licenseProvider;
 
-#if __has_include("bef_effect_ai_api.h")
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 //   {zh} / @brief 初始化 SDK     {en} /@brief initialization SDK
 - (bef_effect_result_t)initTask;
 
@@ -91,7 +94,7 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 
 //   {zh} / @brief 销毁 SDK     {en} /@brief SDK destruction
 - (bef_effect_result_t)destroyTask;
-
+#endif
 //   {zh} / @brief 设置licenseProvider     {en} /@Briefly set licenseProvider
 //   {zh} / @param licenseProvider 传入一个licenseProvider的实现用于license的获取     {en} /@param licenseProvider is a BELicenseProvider implementation to provide the path of license,
 
@@ -101,8 +104,8 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 //   {zh} / @param path 相对路径     {en} /@param path relative path
 - (void)setFilterPath:(NSString *) path;
 
-/// @brief 设置滤镜绝对路径
-/// @param path 滤镜素材的文件路径，绝对路径
+// {zh} / @brief 设置滤镜绝对路径 {en} /@Brief Set the absolute path of the filter
+// {zh} / @param path 滤镜素材的文件路径，绝对路径 {en} /@Param path The file path of the filter material, absolute path
 - (void)setFilterAbsolutePath:(NSString *)path;
 
 //   {zh} / @brief 设置滤镜强度     {en} /@Briefly set filter strength
@@ -151,6 +154,7 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 //   {zh} / @param intensity 强度 0-1     {en} /@param intensity 0-1
 - (void)updateComposerNodeIntensity:(NSString *)node key:(NSString *)key intensity:(float)intensity;
 
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 // {zh} / @brief 处理触摸事件 {en} Handle touch events briefly
 // {zh} / @param eventCode 触摸事件类型 {en} /@param eventCode touch event type
 // {zh} / @param x 触摸位置 {en} @Param x touch position
@@ -239,6 +243,16 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 - (BOOL)sendCaptureMessage;
 
 - (UIImage*)getCapturedImageWithKey:(const char*) key;
+
+// {zh} / @brief 开启或关闭强制人脸检测 {en} /@brief Enable or disable forced face detection
+// {zh} /detection YES 开启人脸检测 NO关闭人脸检测 {en} /detection YES on face detection NO off face detection
+- (void)forcedFaceDetection:(BOOL)detection;
+
+// change default settings
++ (void)setUse3buffer:(bool)use;
++ (void)setUsePipeline:(bool)use;
++ (bool)use3buffer;
++ (bool)usePipeline;
 
 @end
 

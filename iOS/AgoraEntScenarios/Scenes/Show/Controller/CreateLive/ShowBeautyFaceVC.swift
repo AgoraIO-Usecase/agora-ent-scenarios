@@ -10,7 +10,7 @@ import JXCategoryView
 
 class ShowBeautyFaceVC: UIViewController {
     
-    var selectedItemClosure: ((_ value: CGFloat, _ isHiddenSldier: Bool, _ isShowSegSwitch: Bool) -> Void)?
+    var selectedItemClosure: ((_ min: Float, _ max: Float, _ value: CGFloat, _ isHiddenSldier: Bool, _ isShowSegSwitch: Bool) -> Void)?
     
     var defalutSelectIndex = 0
        
@@ -169,7 +169,7 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         let model = dataArray[indexPath.item]
         cell.setupModel(model: model)
         if model.isSelected {
-            selectedItemClosure?(model.value, model.key == nil, type == .background && indexPath.item > 0)
+            selectedItemClosure?(model.min, model.max, model.value, model.key == nil, type == .background && indexPath.item > 0)
             defalutSelectIndex = indexPath.item
         }
         return cell
@@ -189,10 +189,10 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         collectionView.reloadItems(at: [IndexPath(item: indexPath.item, section: 0)])
         
         if type == .sticker {
-            selectedItemClosure?(0, true, false)
+            selectedItemClosure?(model.min, model.max, 0 , true, false)
             return
         }
-        selectedItemClosure?(model.value, model.path == nil, type == .background && model.value > 0)
+        selectedItemClosure?(model.min, model.max, model.value, model.path == nil, type == .background && model.value > 0)
     }
 }
 

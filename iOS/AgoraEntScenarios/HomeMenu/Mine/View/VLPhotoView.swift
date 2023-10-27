@@ -22,6 +22,7 @@ class VLPhotoView: UIView {
         collectionView.register(VLPhotoViewAddCell.self, forCellWithReuseIdentifier: "ResultAddViewCellID")
         collectionView.dragDelegate = self
         collectionView.dropDelegate = self
+        collectionView.backgroundColor = .clear
         collectionView.dragInteractionEnabled = true
         return collectionView
     }()

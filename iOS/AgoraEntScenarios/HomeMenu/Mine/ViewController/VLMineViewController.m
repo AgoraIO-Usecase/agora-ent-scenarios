@@ -54,6 +54,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self loadRequestUserInfoRequest];
+    [self.mineView refreshTableView];
 }
 
 #pragma mark - VLMineViewDelegate
@@ -94,6 +95,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
             break;
         case VLMineViewClickTypeDebug:
             [self closeOffDebugMode];
+            break;
         case VLMineViewClickTypSubmitFeedback:
         {
             VLFeedbackViewController *feedbackVC = [[VLFeedbackViewController alloc] init];
@@ -354,12 +356,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         }
     } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
     }];
-}
-
-// 连续点击事件
-- (void)didTapedVersionLabel {
-    [AppContext shared].isDebugMode = YES;
-    [self.mineView refreshTableView];
 }
 
 #pragma mark - Public Methods

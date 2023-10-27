@@ -7,7 +7,7 @@
 
 #define FURenderMoudle <FURenderKit/FURenderKit.h>
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #if __has_include("FUManager.h")
 #import "FUManager.h"
 #endif
@@ -24,6 +24,20 @@ NS_ASSUME_NONNULL_BEGIN
 #if __has_include("FUManager.h")
 @property (nonatomic, strong) FUManager *fuManager;
 #endif
+
+- (void)setBeautyWithPath: (NSString *)path key: (NSString *)key value: (float)value;
+
+- (void)setStyleWithPath: (NSString *)path key: (NSString *)key value: (float)value;
+
+- (void)setStickerWithPath: (NSString *)path;
+
+- (void)reset;
+
+- (void)resetStyle;
+
+- (void)resetSticker;
+
+- (void)destroy;
 
 @end
 
