@@ -49,7 +49,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 - (void)setupView {
     [self addSubview:self.mineTable];
     [self.mineTable.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:20].active = YES;
-    [self.mineTable.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
+    [self.mineTable.topAnchor constraintEqualToAnchor:self.topAnchor constant:kStatusBarHeight].active = YES;
     [self.mineTable.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-20].active = YES;
     [self.mineTable.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
     
@@ -57,13 +57,14 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
     [self.mineTopView addSubview:self.nickNameTF];
     [self.mineTopView addSubview:self.IDLabel];
     [self.mineTopView addSubview:self.editBtn];
-    [self.avatarImgView.widthAnchor constraintEqualToConstant:VLREALVALUE_WIDTH(80)].active = YES;
-    [self.avatarImgView.heightAnchor constraintEqualToConstant:VLREALVALUE_WIDTH(80)].active = YES;
+    [self.avatarImgView.widthAnchor constraintEqualToConstant:80].active = YES;
+    [self.avatarImgView.heightAnchor constraintEqualToConstant:80].active = YES;
     [self.avatarImgView.centerXAnchor constraintEqualToAnchor:self.mineTopView.centerXAnchor].active = YES;
-    [self.avatarImgView.bottomAnchor constraintEqualToAnchor:self.mineTopView.centerYAnchor constant:0].active = YES;
+    [self.avatarImgView.bottomAnchor constraintEqualToAnchor:self.mineTopView.centerYAnchor constant:5].active = YES;
     
     [self.nickNameTF.centerXAnchor constraintEqualToAnchor:self.mineTopView.centerXAnchor].active = YES;
-    [self.nickNameTF.topAnchor constraintEqualToAnchor:self.avatarImgView.bottomAnchor constant:12].active = YES;
+    [self.nickNameTF.topAnchor constraintEqualToAnchor:self.avatarImgView.bottomAnchor constant:6].active = YES;
+    [self.nickNameTF.heightAnchor constraintEqualToConstant:28].active = YES;
     
     [self.editBtn.centerYAnchor constraintEqualToAnchor:self.nickNameTF.centerYAnchor].active = YES;
     [self.editBtn.leadingAnchor constraintEqualToAnchor:self.nickNameTF.trailingAnchor constant:5].active = YES;
@@ -87,16 +88,27 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 - (void)setupData {
     BOOL developIsOn = [AppContext shared].isDebugMode;
     if (developIsOn) {
-        VLMineCellModel *model = [VLMineCellModel modelWithItemImg:@"mine_debug_icon" title:NSLocalizedString(@"app_debug_mode", nil) style:VLMineCellStyleSwitch];
+        VLMineCellModel *model = [VLMineCellModel modelWithItemImg:@"mine_debug_icon"
+                                                             title:NSLocalizedString(@"app_debug_mode", nil)
+                                                             style:VLMineCellStyleSwitch
+                                                         clickType:(VLMineViewClickTypeDebug)];
         [self.dataArray addObject:@[model]];
+    } else {
+        for (VLMineCellModel *model in self.dataArray.lastObject) {
+            if (model.clickType == VLMineViewClickTypeDebug) {
+                [self.dataArray removeLastObject];
+                break;
+            }
+        }
     }
     
     CGFloat height = 0;
     for (int i = 0; i < self.dataArray.count; i++) {
-        height += 16.0 + self.dataArray[i].count * VLREALVALUE_WIDTH(58);
+        height += 16.0 + self.dataArray[i].count * VLREALVALUE_WIDTH(52);
     }
-    height = self.frame.size.height - height - 20;
-    height = height < 155 ? 155 : height;
+    [self layoutIfNeeded];
+    height = self.mineTable.frame.size.height - height;
+    height = height < 156 ? 156 : height;
     self.mineTopView.frame = CGRectMake(0, 0, SCREEN_WIDTH, height);
     [self.mineTable reloadData];
 }
@@ -173,7 +185,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return VLREALVALUE_WIDTH(58);
+    return VLREALVALUE_WIDTH(52);
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
@@ -221,7 +233,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 - (UIImageView *)avatarImgView {
     if (!_avatarImgView) {
         _avatarImgView = [[UIImageView alloc] init];
-        _avatarImgView.layer.cornerRadius = VLREALVALUE_WIDTH(80)*0.5;
+        _avatarImgView.layer.cornerRadius = 80*0.5;
         _avatarImgView.layer.masksToBounds = YES;
         _avatarImgView.userInteractionEnabled = YES;
         _avatarImgView.contentMode = UIViewContentModeScaleAspectFit;
@@ -284,6 +296,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
         _mineTable.estimatedSectionHeaderHeight = 0;
         _mineTable.tableHeaderView = self.mineTopView;
         _mineTable.showsVerticalScrollIndicator = NO;
+        _mineTable.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag;
     }
     return _mineTable;
 }

@@ -16,20 +16,20 @@ struct VLLoginGudieModel {
         var dataArray = [VLLoginGudieModel]()
         var model = VLLoginGudieModel()
         model.imageName = "login_gudie_1"
-        model.title = "声动语聊"
-        model.desc = "搭载声网最佳音效实践、最新音频技术的语聊房 带来更沉浸、更易用、更有趣的语聊体验"
+        model.title = NSLocalizedString("app_login_guide_title1", comment: "")
+        model.desc = NSLocalizedString("app_login_guide_desc1", comment: "")
         dataArray.append(model)
         
         model = VLLoginGudieModel()
         model.imageName = "login_gudie_2"
-        model.title = "在线K歌房"
-        model.desc = "一站式接入 20W+ 正版 K 歌热门曲库，灵活接入各类娱乐社交场景，激活多样 K 歌互动玩法"
+        model.title = NSLocalizedString("app_login_guide_title2", comment: "")
+        model.desc = NSLocalizedString("app_login_guide_desc2", comment: "")
         dataArray.append(model)
         
         model = VLLoginGudieModel()
         model.imageName = "login_gudie_3"
-        model.title = "直播超级画质"
-        model.desc = "视频『高清』升级，人更美、物更真，体验更流畅，为直播变现增添更多 buff"
+        model.title = NSLocalizedString("app_login_guide_title3", comment: "")
+        model.desc = NSLocalizedString("app_login_guide_desc3", comment: "")
         dataArray.append(model)
         
         return dataArray

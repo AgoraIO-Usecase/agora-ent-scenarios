@@ -9,7 +9,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef enum : NSUInteger {
-    VLMineViewClickTypeMyAccount = 0,      // 我的账号
+    VLMineViewClickTypeNone = 0,           // None
+    VLMineViewClickTypeMyAccount,          // 我的账号
     VLMineViewClickTypeUserProtocol,       // 用户协议
     VLMineViewClickTypePrivacyProtocol,    // 隐私政策
     VLMineViewClickTypePersonInfo,         // 个人信息
