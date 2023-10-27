@@ -171,4 +171,5 @@
     <string name="cantata_switch_open">开启</string>
     <string name="cantata_switch_close">关闭</string>
     <string name="cantata_earback_tips">开启耳返可实时听到自己的声音，唱歌的时候及时调整</string>
+    <string name="cantata_kick_off">您已被踢下麦</string>
 </resources>

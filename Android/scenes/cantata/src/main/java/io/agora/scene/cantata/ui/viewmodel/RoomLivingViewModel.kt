@@ -365,6 +365,11 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 }
                 //mSeatListLiveData.value = value
                 if (roomSeat.userNo == UserManager.getInstance().user.id.toString()) {
+                    if (!leaveSeatBySelf) {
+                        ToastUtils.showToast(R.string.cantata_kick_off)
+                    } else {
+                        leaveSeatBySelf = false
+                    }
                     mSeatLocalLiveData.value = null
                     mIsOnSeat = false
 
@@ -412,6 +417,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
      */
     fun leaveSeat(seatModel: RoomSeatModel) {
         CantataLogger.d(TAG, "RoomLivingViewModel.leaveSeat() called")
+        if (seatModel.userNo == UserManager.getInstance().user.id.toString()) {
+            leaveSeatBySelf = true
+        }
         mCantataServiceProtocol.leaveSeat(
             OutSeatInputModel(
                 seatModel.userNo,
@@ -789,17 +797,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
      */
     fun joinChorus() {
         CantataLogger.d(TAG, "RoomLivingViewModel.joinChorus() called")
-        if (mRtcEngine!!.getConnectionStateEx(
-                RtcConnection(
-                    mRoomInfoLiveData.value!!.roomNo + "_ad",
-                    UserManager.getInstance().user.id.toInt()
-                )
-            ) != CONNECTION_STATE_TYPE.getValue(CONNECTION_STATE_TYPE.CONNECTION_STATE_CONNECTED)
-        ) {
-            mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
-            ToastUtils.showToast(R.string.cantata_join_chorus_failed)
-            return
-        }
         val musicModel: RoomSelSongModel? = mSongPlayingLiveData.value
         if (musicModel == null) {
             CantataLogger.e(TAG, "RoomLivingViewModel.joinChorus() failed, no song playing now")
@@ -849,11 +846,13 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                             if (mIsOnSeat) {
                                 // 成为合唱成功
                                 mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
+                                mAudioTrackMode = KTVPlayerTrackMode.Acc
                             } else {
                                 // 不在麦上， 自动上麦
                                 mCantataServiceProtocol.onSeat(OnSeatInputModel(0)) { err: Exception? ->
                                     if (err == null) {
                                         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
+                                        mAudioTrackMode = KTVPlayerTrackMode.Acc
                                         mIsOnSeat = true
                                     } else {
                                         ToastUtils.showToastLong(R.string.cantata_join_chorus_failed)
@@ -872,6 +871,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     /**
      * 退出合唱
      */
+    private var leaveSeatBySelf = false
     fun leaveChorus() {
         CantataLogger.d(TAG, "RoomLivingViewModel.leaveChorus() called")
         if (mIsOnSeat) {

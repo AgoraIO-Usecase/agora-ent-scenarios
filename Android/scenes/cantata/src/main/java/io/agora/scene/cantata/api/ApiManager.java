@@ -1,17 +1,12 @@
 package io.agora.scene.cantata.api;
 
-import android.util.Log;
-
-import androidx.annotation.NonNull;
 import com.moczul.ok2curl.CurlInterceptor;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
-import io.agora.media.RtcTokenBuilder;
 import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.cantata.CantataLogger;
@@ -49,7 +44,7 @@ public class ApiManager {
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-            .addInterceptor(new CurlInterceptor(s -> Log.d(TAG, s)))
+            .addInterceptor(new CurlInterceptor(s -> CantataLogger.d(TAG, s)))
             .build();
 
     public String fetchCloudToken() {
@@ -67,19 +62,19 @@ public class ApiManager {
                     .build();
 
             Response responseToken = okHttpClient.newCall(request).execute();
-            Log.d(TAG, responseToken.toString());
+            CantataLogger.d(TAG, responseToken.toString());
             if (responseToken.isSuccessful()) {
                 ResponseBody body = responseToken.body();
                 assert body != null;
                 String bodyString = body.string();
-                Log.d(TAG, bodyString);
+                CantataLogger.d(TAG, bodyString);
                 JSONObject jsonToken = new JSONObject(bodyString);
                 if (jsonToken.has("tokenName")) {
                     token = jsonToken.getString("tokenName");
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, "getToken error " + e.getMessage());
+            CantataLogger.e(TAG, "getToken error " + e.getMessage());
         }
         return token;
     }
@@ -88,7 +83,7 @@ public class ApiManager {
         CantataLogger.d(TAG, "fetchStartCloud, mainChannel: " + mainChannel + " cloudRtcUid: " + cloudRtcUid);
         String token = fetchCloudToken();
         if (token.isEmpty()) {
-            Log.e(TAG, "云端合流uid 请求报错 token is null");
+            CantataLogger.e(TAG, "云端合流uid 请求报错 token is null");
             ToastUtils.showToastLong("云端合流服务开启失败，请重新创建房间");
             return;
         } else {
@@ -105,7 +100,7 @@ public class ApiManager {
                     .put("rtc", inputRetObj);
             transcoderObj.put("audioInputs", new JSONArray().put(intObj));
 
-            transcoderObj.put("idleTimeout", 30);
+            transcoderObj.put("idleTimeout", 300);
 
             JSONObject audioOptionObj = new JSONObject()
                     .put("profileType", "AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO")
@@ -139,12 +134,12 @@ public class ApiManager {
                     .build();
 
             Response responseStart = okHttpClient.newCall(request).execute();
-            Log.d(TAG, responseStart.toString());
+            CantataLogger.d(TAG, responseStart.toString());
             if (responseStart.isSuccessful()) {
                 ResponseBody body = responseStart.body();
                 assert body != null;
                 String bodyString = body.string();
-                Log.d(TAG, bodyString);
+                CantataLogger.d(TAG, bodyString);
                 JSONObject jsonUid = new JSONObject(bodyString);
                 if (jsonUid.has("taskId")) {
                     taskId = jsonUid.getString("taskId");
@@ -154,7 +149,7 @@ public class ApiManager {
                 ToastUtils.showToastLong("云端合流服务开启失败，请重新创建房间");
             }
         } catch (Exception e) {
-            Log.e(TAG, "云端合流uid 请求报错 " + e.getMessage());
+            CantataLogger.e(TAG, "云端合流uid 请求报错 " + e.getMessage());
         }
         if (!taskId.isEmpty()) {
             this.taskId = taskId;
@@ -164,7 +159,7 @@ public class ApiManager {
     public void fetchStopCloud() {
         CantataLogger.d(TAG, "fetchStopCloud");
         if (taskId.isEmpty() || tokenName.isEmpty()) {
-            Log.e(TAG, "云端合流任务停止失败 taskId || tokenName is null");
+            CantataLogger.e(TAG, "云端合流任务停止失败 taskId || tokenName is null");
             return;
         }
         try {
@@ -175,15 +170,15 @@ public class ApiManager {
                     .delete()
                     .build();
             Response response = okHttpClient.newCall(request).execute();
-            Log.d(TAG, response.toString());
+            CantataLogger.d(TAG, response.toString());
             if (response.isSuccessful()) {
                 ResponseBody body = response.body();
                 assert body != null;
                 String bodyString = body.string();
-                Log.d(TAG, bodyString);
+                CantataLogger.d(TAG, bodyString);
             }
         } catch (Exception e) {
-            Log.e(TAG, "云端合流任务停止失败 " + e.getMessage());
+            CantataLogger.e(TAG, "云端合流任务停止失败 " + e.getMessage());
         }
     }
 
