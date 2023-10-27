@@ -10,7 +10,7 @@ import UIKit
 class VLVerifyCodeViewController: VLBaseViewController {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "输入验证码"
+        label.text = NSLocalizedString("app_please_input_v_code", comment: "")
         label.textColor = UIColor(hex: "#1D2129", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 30)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -38,8 +38,8 @@ class VLVerifyCodeViewController: VLBaseViewController {
     }()
     private lazy var sendCodeButton: UIButton = {
         let button = UIButton()
-        button.setTitle("重新获取验证码 60s", for: .normal)
-        button.setTitle("重新获取验证码", for: .selected)
+        button.setTitle("\(NSLocalizedString("app_login_verify_code_retry", comment: "")) 60s", for: .normal)
+        button.setTitle(NSLocalizedString("app_login_verify_code_retry", comment: ""), for: .selected)
         button.setTitleColor(UIColor(hex: "#86909C", alpha: 1.0), for: .normal)
         button.setTitleColor(UIColor(hex: "#2E6CF6", alpha: 1.0), for: .selected)
         button.titleLabel?.font = .systemFont(ofSize: 16)
@@ -49,7 +49,7 @@ class VLVerifyCodeViewController: VLBaseViewController {
     }()
     private lazy var tipsLabel: UILabel = {
         let label = UILabel()
-        label.text = "验证码输入错误"
+        label.text = NSLocalizedString("app_login_verify_code_error", comment: "")
         label.textColor = UIColor(hex: "#FA396A", alpha: 1.0)
         label.font = .systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -63,7 +63,7 @@ class VLVerifyCodeViewController: VLBaseViewController {
     
     init(phoneNumber: String?) {
         super.init(nibName: nil, bundle: nil)
-        descLabel.text = "已发送验证码至 +86 \(phoneNumber ?? "")"
+        descLabel.text = "\(NSLocalizedString("app_login_verify_code_send", comment: "")) +86 \(phoneNumber ?? "")"
         self.phoneNumber = phoneNumber
     }
     
@@ -87,7 +87,7 @@ class VLVerifyCodeViewController: VLBaseViewController {
         timer = Timer(timeInterval: 1, repeats: true, block: { [weak self] t in
             guard let self = self else { return }
             self.count -= 1
-            self.sendCodeButton.setTitle("重新获取验证码 \(self.count)s", for: .normal)
+            self.sendCodeButton.setTitle("\(NSLocalizedString("app_login_verify_code_retry", comment: "")) \(self.count)s", for: .normal)
             self.sendCodeButton.isSelected = self.count <= 0
             if self.count <= 0 {
                 t.invalidate()

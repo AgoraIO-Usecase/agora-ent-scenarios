@@ -19,6 +19,8 @@ import io.agora.beautyapi.sensetime.*
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
+import io.agora.rtc2.video.SegmentationProperty
+import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
@@ -168,6 +170,9 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 )
             )
         )
+        // reset virtual background config
+        RtcEngineInstance.virtualBackgroundSource.backgroundSourceType = 0
+        RtcEngineInstance.rtcEngine.enableVirtualBackground(false, VirtualBackgroundSource(), SegmentationProperty())
 //        mRtcEngine.startPreview()
     }
 

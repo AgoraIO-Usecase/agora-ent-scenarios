@@ -157,7 +157,6 @@ public class RoomLivingViewModel extends ViewModel {
 
     final MutableLiveData<Long> playerMusicOpenDurationLiveData = new MutableLiveData<>();
     final MutableLiveData<ScoringAverageModel> playerMusicPlayCompleteLiveData = new MutableLiveData<>();
-    final MutableLiveData<Integer> playerMusicCountDownLiveData = new MutableLiveData<>();
     final MutableLiveData<NetWorkEvent> networkStatusLiveData = new MutableLiveData<>();
 
     final MutableLiveData<ScoringAlgoControlModel> scoringAlgoControlLiveData = new MutableLiveData<>();
@@ -339,25 +338,6 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
-            }
-            return null;
-        });
-    }
-
-    /**
-     * 设置背景
-     */
-    public void setMV_BG(int bgPosition) {
-        KTVLogger.d(TAG, "RoomLivingViewModel.setMV_BG() called: " + bgPosition);
-        ktvServiceProtocol.changeMVCover(new ChangeMVCoverInputModel(bgPosition), e -> {
-            if (e == null) {
-                // success
-                // do nothing for the subscriber will callback the new room info.
-                KTVLogger.d(TAG, "RoomLivingViewModel.setMV_BG() success");
-            } else {
-                // failure
-                KTVLogger.e(TAG, "RoomLivingViewModel.setMV_BG() failed: " + e.getMessage());
                 ToastUtils.showToast(e.getMessage());
             }
             return null;
