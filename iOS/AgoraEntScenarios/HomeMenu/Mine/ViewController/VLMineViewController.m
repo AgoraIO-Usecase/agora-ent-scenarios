@@ -286,6 +286,8 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         VLResponseData *response = data;
         if (response.code && response.code.integerValue == 0) {
             NSLog(@"获取成功");
+            [[VLUserCenter center] storeUserInfo:VLUserCenter.user];
+            [self.mineView refreseUserInfo:VLUserCenter.user];
         }else{
             [VLToast toast:response.message];
         }

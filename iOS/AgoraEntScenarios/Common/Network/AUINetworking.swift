@@ -40,7 +40,7 @@ open class AUINetworking: NSObject {
         
         let handleResponse: ((Data?,URLResponse?,Error?) ->Void) = { data, response, error in
             if let error = error {
-                showLogger.error("request fail: \(error), curl: \(urlRequest.cURL())", context: "AUINetworking")
+                agoraEnt_error("request fail: \(error), curl: \(urlRequest.cURL())", tag: "AUINetworking")
                 DispatchQueue.main.async {
                     completion?(error, nil)
                 }
@@ -48,7 +48,7 @@ open class AUINetworking: NSObject {
             }
             
             guard let data = data else {
-                showLogger.error("parse fail: data empty,curl: \(urlRequest.cURL())", context: "AUINetworking")
+                agoraEnt_error("parse fail: data empty,curl: \(urlRequest.cURL())", tag: "AUINetworking")
                 DispatchQueue.main.async {
                     completion?(AUICommonError.httpError((response as? HTTPURLResponse)?.statusCode ?? -1, "http error").toNSError(), nil)
                 }
@@ -61,8 +61,8 @@ open class AUINetworking: NSObject {
             do {
                 try obj = model.parse(data: data)
             } catch let err {
-                showLogger.error("parse fail throw: , curl: \(urlRequest.cURL()) \(err.localizedDescription)", context: "AUINetworking")
-                showLogger.error("parse fail: \(String(data: data, encoding: .utf8) ?? "nil"),curl: \(urlRequest.cURL())", context: "AUINetworking")
+                agoraEnt_error("parse fail throw: , curl: \(urlRequest.cURL()) \(err.localizedDescription)", tag: "AUINetworking")
+                agoraEnt_error("parse fail: \(String(data: data, encoding: .utf8) ?? "nil"),curl: \(urlRequest.cURL())", tag: "AUINetworking")
                 DispatchQueue.main.async {
                     completion?(err, nil)
                 }
@@ -70,14 +70,14 @@ open class AUINetworking: NSObject {
             }
             
             guard let obj = obj else {
-                showLogger.error("parse fail: \(String(data: data, encoding: .utf8) ?? "nil"), curl: \(urlRequest.cURL())", context: "AUINetworking")
+                agoraEnt_error("parse fail: \(String(data: data, encoding: .utf8) ?? "nil"), curl: \(urlRequest.cURL())", tag: "AUINetworking")
                 DispatchQueue.main.async {
                     completion?(AUICommonError.networkParseFail.toNSError(), nil)
                 }
                 return
             }
             
-            showLogger.error("request success \(String(data: data, encoding: .utf8) ?? "nil")", context: "AUINetworking")
+            agoraEnt_info("request success \(String(data: data, encoding: .utf8) ?? "nil")", tag: "AUINetworking")
             DispatchQueue.main.async {
                 completion?(nil, obj)
             }

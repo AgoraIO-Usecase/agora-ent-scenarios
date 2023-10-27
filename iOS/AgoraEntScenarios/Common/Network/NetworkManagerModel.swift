@@ -37,18 +37,6 @@ open class NMCommonNetworkModel: AUINetworkModel {
         return headers
     }
     
-    public override func parse(data: Data?) throws -> Any {
-        var dic: Any? = nil
-        do {
-            try dic = super.parse(data: data)
-        } catch let err {
-            throw err
-        }
-        guard let dic = dic as? [String: Any], let data = dic["data"] as? [String: Any] else {
-            throw AUICommonError.networkParseFail.toNSError()
-        }
-        return data
-    }
 }
 
 
@@ -70,7 +58,17 @@ open class NMGenerateTokennNetworkModel: NMCommonNetworkModel {
     }
     
     public override func parse(data: Data?) throws -> Any {
-        guard let dic = try? super.parse(data: data) as? [String : Any], let token = dic["token"] else {
+        var dic: Any? = nil
+        do {
+            try dic = super.parse(data: data)
+        } catch let err {
+            throw err
+        }
+        guard let dic = dic as? [String: Any], let data = dic["data"] as? [String: Any] else {
+            throw AUICommonError.networkParseFail.toNSError()
+        }
+        
+        guard let token = data["token"] else {
             throw AUICommonError.networkParseFail.toNSError()
         }
         return token
@@ -171,19 +169,6 @@ open class NMVoiceIdentifyNetworkModel: NMCommonNetworkModel {
         super.init()
         interfaceName = "v1/moderation/audio"
     }
-    
-    public override func parse(data: Data?) throws -> Any {
-        guard let data = data,
-              let dic = try? JSONSerialization.jsonObject(with: data) else {
-            throw AUICommonError.networkParseFail.toNSError()
-        }
-        
-        if let dic = (dic as? [String: Any]), let code = dic["code"] as? Int, code != 0 {
-            let message = dic["message"] as? String ?? ""
-            throw AUICommonError.httpError(code, message).toNSError()
-        }
-        return dic
-    }
    
 }
 
@@ -208,20 +193,6 @@ open class NMStartCloudPlayerNetworkModel: NMCommonNetworkModel {
     public override init() {
         super.init()
         interfaceName = "v1/cloud-player/start"
-    }
-    
-    public override func parse(data: Data?) throws -> Any {
-        guard let data = data,
-              let dic = try? JSONSerialization.jsonObject(with: data) else {
-            throw AUICommonError.networkParseFail.toNSError()
-        }
-        
-        if let dic = (dic as? [String: Any]), let code = dic["code"] as? Int, code != 0 {
-            let message = dic["message"] as? String ?? ""
-            throw AUICommonError.httpError(code, message).toNSError()
-        }
-        
-        return dic
     }
    
 }
@@ -256,7 +227,7 @@ open class NMReportSceneClickNetworkModel: NMCommonNetworkModel {
         super.init()
         host = "https://report-ad.agoralab.co/"
         interfaceName = "v1/report"
-        sign = "src=\(src)&ts=\(ts)".md5Encrypt
+        sign = "src=\(src ?? "agora_ent_demo")&ts=\(ts)".md5Encrypt
     }
     
     func setProject(_ project: String){
@@ -286,21 +257,6 @@ open class NMReportDeviceInfoNetworkModel: NMCommonNetworkModel {
         interfaceName = "/api-login/report/device?userNo=\(userNo)&sceneId=\(sceneId)&appId=\(appId)&projectId=agora_ent_demo"
     }
     
-    public override func parse(data: Data?) throws -> Any {
-        guard let data = data,
-              let dic = try? JSONSerialization.jsonObject(with: data) else {
-            throw AUICommonError.networkParseFail.toNSError()
-        }
-        
-        if let dic = (dic as? [String: Any]), let code = dic["code"] as? Int, code != 0 {
-            let message = dic["message"] as? String ?? ""
-            throw AUICommonError.httpError(code, message).toNSError()
-        }
-        
-        return dic
-    }
-    
-    
 }
 
 @objcMembers
@@ -313,19 +269,6 @@ open class NMReportUserBehaviorNetworkModel: NMCommonNetworkModel {
         host = KeyCenter.HostUrl
         interfaceName = "/api-login/report/action?userNo=\(userNo)&sceneId=\(sceneId)&appId=\(appId)&projectId=agora_ent_demo"
         action = sceneId
-    }
-    
-    public override func parse(data: Data?) throws -> Any {
-        guard let data = data,
-              let dic = try? JSONSerialization.jsonObject(with: data) else {
-            throw AUICommonError.networkParseFail.toNSError()
-        }
-        
-        if let dic = (dic as? [String: Any]), let code = dic["code"] as? Int, code != 0 {
-            let message = dic["message"] as? String ?? ""
-            throw AUICommonError.httpError(code, message).toNSError()
-        }
-        return dic
     }
     
 }

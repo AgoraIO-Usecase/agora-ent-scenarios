@@ -17,6 +17,7 @@
 		A84EEA742ADD297800258F55 /* ShowDebugSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A84EEA6F2ADD297800258F55 /* ShowDebugSettingVC.swift */; };
 		A84EEA752ADD297800258F55 /* ShowDebugPrivateParamsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A84EEA702ADD297800258F55 /* ShowDebugPrivateParamsVC.swift */; };
 		A84EEA762ADD297800258F55 /* ShowDebug1TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A84EEA712ADD297800258F55 /* ShowDebug1TFModel.swift */; };
+		A851C5D62AEBAEC500071F88 /* AgoraEntCommonLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = A851C5D52AEBAEC500071F88 /* AgoraEntCommonLogger.swift */; };
 		A89C929C2AE66BE700B5E8B4 /* UIImageView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89C929B2AE66BE700B5E8B4 /* UIImageView+Extension.swift */; };
 		A89C929E2AE9031600B5E8B4 /* UIImage+Resize.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89C929D2AE9031600B5E8B4 /* UIImage+Resize.swift */; };
 		A89C92A52AEA607600B5E8B4 /* VLBaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = A89C92A32AEA607600B5E8B4 /* VLBaseModel.m */; };
@@ -692,6 +693,7 @@
 		A84EEA6F2ADD297800258F55 /* ShowDebugSettingVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugSettingVC.swift; sourceTree = "<group>"; };
 		A84EEA702ADD297800258F55 /* ShowDebugPrivateParamsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugPrivateParamsVC.swift; sourceTree = "<group>"; };
 		A84EEA712ADD297800258F55 /* ShowDebug1TFModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebug1TFModel.swift; sourceTree = "<group>"; };
+		A851C5D52AEBAEC500071F88 /* AgoraEntCommonLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraEntCommonLogger.swift; sourceTree = "<group>"; };
 		A89C929B2AE66BE700B5E8B4 /* UIImageView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+Extension.swift"; sourceTree = "<group>"; };
 		A89C929D2AE9031600B5E8B4 /* UIImage+Resize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Resize.swift"; sourceTree = "<group>"; };
 		A89C92A12AEA607600B5E8B4 /* VLBaseModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLBaseModel.h; sourceTree = "<group>"; };
@@ -1597,6 +1599,7 @@
 		A82006D02A9EF7E800FC18CA /* Network */ = {
 			isa = PBXGroup;
 			children = (
+				A851C5D52AEBAEC500071F88 /* AgoraEntCommonLogger.swift */,
 				A82006D52A9EF9B000FC18CA /* AUIError.swift */,
 				A82006D32A9EF80800FC18CA /* AUINetworking.swift */,
 				A82006D12A9EF7FD00FC18CA /* AUINetworkModel.swift */,
@@ -4324,6 +4327,7 @@
 				DD619A6F29E3E247008F63E4 /* SAFlipHorizontalAnimation.swift in Sources */,
 				DD9EBEDE2AD5492600B4551F /* VLSBGPopSongList.m in Sources */,
 				DDA19A0C28FFE579009D3E61 /* SyncUtil.swift in Sources */,
+				A851C5D62AEBAEC500071F88 /* AgoraEntCommonLogger.swift in Sources */,
 				DD0292E3295BF0DC00485225 /* VLKTVTonesView.m in Sources */,
 				DD9EBEC62AD5492600B4551F /* VLSBGMVView.m in Sources */,
 				DD9EBEE12AD5492600B4551F /* VLSBGListEmptyView.m in Sources */,
