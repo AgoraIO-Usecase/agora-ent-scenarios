@@ -16,17 +16,17 @@ class VLLoginController: VLBaseViewController {
     }()
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "个人信息保护指引"
+        label.text = NSLocalizedString("personal_information", comment: "")
         label.textColor = UIColor(hex: "#000000", alpha: 1.0)
         label.font = UIFont.systemFont(ofSize: 20, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     private lazy var textView: AttributedTextView = {
-        let userProtocol = "《用户协议》"
-        let privacyPolicy = "《隐私政策》"
-        let tips = "\n\n提示您注意：当您点击“同意”时，视为您已阅读并愿意接受\(userProtocol)和\(privacyPolicy)的所有内容。当您点击“不同意”时，将无法体验声动互娱的完整功能。"
-        let string = "声动互娱软件是一款用于向声网客户展示产品使用效果的测试产品，仅用于测试产品的功能、性能和可用性，而非提供给大众使用的正式产品。\n\n 1.我们将依据\(userProtocol)及\(privacyPolicy)来帮助您了解我们在收集、使用、存储您个人信息的情况以及您享有的相关权利。\n 2.在您使用本测试软件时，我们将收集您的设备信息、日志信息等，同时根据不同使用场景，你可以授予我们获取您设备的麦克风权限、摄像头权限等信息。\n\n您可通过阅读完整的《用户协议》及《隐私政策》来了解详细信息。"
+        let userProtocol = "《\(NSLocalizedString("app_user_agreement", comment: ""))》"
+        let privacyPolicy = "《\(NSLocalizedString("app_privacy_agreement", comment: ""))》"
+        let tips = NSLocalizedString("app_user_info_tips", comment: "")
+        let string = NSLocalizedString("app_user_info_desc", comment: "")
         
         let attrs = NSMutableAttributedString(string: tips, attributes: [.font: UIFont.systemFont(ofSize: 14, weight: .medium)])
         
@@ -53,7 +53,7 @@ class VLLoginController: VLBaseViewController {
     }()
     private lazy var descLabel: UILabel = {
         let label = UILabel()
-        label.text = "选择“同意”，体验声动互娱完整功能"
+        label.text = NSLocalizedString("app_user_info_choice_agree_tips", comment: "")
         label.textColor = UIColor(hex: "#979CBB", alpha: 1.0)
         label.font = .systemFont(ofSize: 12)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -61,7 +61,7 @@ class VLLoginController: VLBaseViewController {
     }()
     private lazy var notAgreeButton: UIButton = {
         let button = UIButton()
-        button.setTitle("不同意", for: .normal)
+        button.setTitle(NSLocalizedString("disagree", comment: ""), for: .normal)
         button.setTitleColor(UIColor(hex: "#303553", alpha: 1.0), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 15)
         button.backgroundColor = UIColor(hex: "#08062F", alpha: 0.05)
@@ -72,7 +72,7 @@ class VLLoginController: VLBaseViewController {
     }()
     private lazy var agreeButton: UIButton = {
         let button = UIButton()
-        button.setTitle("同意", for: .normal)
+        button.setTitle(NSLocalizedString("agree", comment: ""), for: .normal)
         button.setTitleColor(UIColor(hex: "#FFFFFF", alpha: 1.0), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 15)
         button.backgroundColor = UIColor(hex: "#2E6CF6", alpha: 1.0)

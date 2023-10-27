@@ -403,9 +403,9 @@ extension ActionSheetManager: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let section = indexPath.section >= sectionArray.count ? indexPath.section - 1 : indexPath.section
+        let section = indexPath.section > sectionArray.count ? indexPath.section - 1 : indexPath.section
         let model = sectionArray.count > 0 ? sectionArray[section][indexPath.row] : dataArray[indexPath.row]
-        model.isHiddenLine = indexPath.row == sectionArray[section].count - 1
+        model.isHiddenLine = indexPath.row == (sectionArray.count > 0 ? sectionArray[section].count - 1 : dataArray.count - 1)
         switch model.cellType {
         case .text:
             let cell = tableView.dequeueReusableCell(withIdentifier: model.cellIdentifier, for: indexPath) as! ActionSheetTextCell
