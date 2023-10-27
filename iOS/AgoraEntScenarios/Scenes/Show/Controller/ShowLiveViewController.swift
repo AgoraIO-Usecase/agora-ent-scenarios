@@ -864,13 +864,20 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
             return
         }
         let title = info.interactStatus == .onSeat ? "show_seat_with_audience_end_seat_title".show_localized : "show_pking_with_broadcastor_end_pk_title".show_localized
-        let okTitle = info.interactStatus == .onSeat ? "show_setting_end_mic_seat".show_localized : "show_setting_end_pk".show_localized
-        let alertVC = UIAlertController(title: title+":\(info.userName ?? "")", message: nil, preferredStyle: .alert)
-        let ok = UIAlertAction(title: okTitle, style: .destructive) { _ in
+        let alertVC = UIAlertController(title: title+"\(info.userName ?? "")", message: nil, preferredStyle: .alert)
+        let ok = UIAlertAction(title: "show_setting_end_pk".show_localized, style: .destructive) { _ in
             self.serviceImp?.stopInteraction(interaction: info) { _ in
             }
         }
         alertVC.addAction(ok)
+        if info.interactStatus == .onSeat {
+            let actionTitle = info.muteAudio ? "show_setting_mic_on".show_localized : "show_setting_mic_off".show_localized
+            let micAction = UIAlertAction(title: actionTitle, style: .default) { _ in
+                self.serviceImp?.muteAudio(mute: !info.muteAudio, userId: info.userId) { err in
+                }
+            }
+            alertVC.addAction(micAction)
+        }
         present(alertVC, animated: true)
     }
     
