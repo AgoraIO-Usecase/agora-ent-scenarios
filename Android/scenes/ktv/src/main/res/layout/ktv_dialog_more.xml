@@ -79,7 +79,7 @@
         android:background="@drawable/bg_round_black"
         android:src="@mipmap/ic_beauty_voice"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/iBtnMV"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -92,25 +92,5 @@
         app:layout_constraintEnd_toEndOf="@id/iBtnProfile"
         app:layout_constraintStart_toStartOf="@id/iBtnProfile"
         app:layout_constraintTop_toBottomOf="@id/iBtnProfile" />
-
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/iBtnMV"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:background="@drawable/bg_round_black"
-        android:src="@mipmap/ic_camera_on"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/iBtnProfile"
-        app:layout_constraintTop_toTopOf="@+id/iBtnProfile" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/ktv_song_background"
-        android:textColor="@color/def_text_grey_6c7"
-        app:layout_constraintEnd_toEndOf="@id/iBtnMV"
-        app:layout_constraintStart_toStartOf="@id/iBtnMV"
-        app:layout_constraintTop_toBottomOf="@id/iBtnMV" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
