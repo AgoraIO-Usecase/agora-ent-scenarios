@@ -62,6 +62,30 @@ class SoundPresetTypeDialog: BaseSheetDialog<VoiceDialogSoundPresetTypeBinding>(
     private fun setupSoundTypes() {
         soundTypes = listOf(
             PresetSoundModel(
+                AgoraPresetSound.Sound1001,
+                getString(R.string.voice_preset_sound_qingshu1),
+                getString(R.string.voice_preset_sound_qingshu1_tips),
+                R.drawable.voice_ic_sound_card_1001
+            ),
+            PresetSoundModel(
+                AgoraPresetSound.Sound1002,
+                getString(R.string.voice_preset_sound_shaoyu1),
+                getString(R.string.voice_preset_sound_shaoyu1_tips),
+                R.drawable.voice_ic_sound_card_1002
+            ),
+            PresetSoundModel(
+                AgoraPresetSound.Sound1003,
+                getString(R.string.voice_preset_sound_qingnian1),
+                getString(R.string.voice_preset_sound_qingnian1_tips),
+                R.drawable.voice_ic_sound_card_1003
+            ),
+            PresetSoundModel(
+                AgoraPresetSound.Sound1004,
+                getString(R.string.voice_preset_sound_shaoluo),
+                getString(R.string.voice_preset_sound_shaoluo_tips),
+                R.drawable.voice_ic_sound_card_1004
+            ),
+            PresetSoundModel(
                 AgoraPresetSound.Sound2001,
                 getString(R.string.voice_preset_sound_dashu),
                 getString(R.string.voice_preset_sound_dashu_tips),

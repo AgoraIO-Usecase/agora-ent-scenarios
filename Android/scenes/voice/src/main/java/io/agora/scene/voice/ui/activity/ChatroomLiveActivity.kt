@@ -489,8 +489,6 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                 }
             }
         ).setUpInitAdapter()
-        binding.cTopView.setTitleMaxWidth()
-//        roomObservableDelegate.onRoomModel(voiceRoomModel)
         binding.cTopView.setOnLiveTopClickListener(object : OnLiveTopClickListener {
             override fun onClickBack(view: View) {
                 onBackPressed()

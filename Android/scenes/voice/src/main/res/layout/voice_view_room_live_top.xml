@@ -7,92 +7,40 @@
     tools:background="@color/voice_dark_grey_color_6c7192">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/tbChatroomTop"
+        android:id="@+id/tbRoomTop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         app:contentInsetStart="0dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="">
-
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/ivChatroomOwner"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:scaleType="centerCrop"
-            android:layout_marginStart="12dp"
-            android:src="@drawable/voice_bg_oval_black20"
-            app:layout_constraintDimensionRatio="1:1"
-            app:shapeAppearance="@style/voice_seat_roundStyle" />
-
-        <LinearLayout
-            android:id="@+id/llTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="10dp"
-            android:orientation="vertical">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/mtChatroomName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="@color/voice_white"
-                android:textSize="@dimen/voice_sp_15"
-                tools:text="Susan Star" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/mtChatroomOwnerName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="@color/voice_white_80"
-                android:textSize="@dimen/voice_sp_10"
-                tools:text="Chatroom-0728-001" />
-        </LinearLayout>
+        app:title=""
+        tools:layout_editor_absoluteX="0dp">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivChatroomBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
+            android:paddingVertical="16dp"
             android:paddingStart="12dp"
             android:paddingEnd="16dp"
-            android:paddingVertical="16dp"
             android:src="@drawable/voice_icon_close" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivChatroomMore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="end"
             android:paddingHorizontal="12dp"
             android:paddingVertical="16dp"
-            android:layout_gravity="end"
             android:src="@drawable/voice_icon_more" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/mtChatroomMembers"
-            android:layout_width="wrap_content"
-            android:layout_height="26dp"
-            android:minWidth="26dp"
-            android:layout_gravity="end"
-            android:layout_marginEnd="2dp"
-            android:background="@drawable/voice_bg_rect_radius13_black20"
-            android:gravity="center"
-            android:paddingHorizontal="2dp"
-            android:textColor="@color/voice_white"
-            android:textSize="@dimen/voice_sp_10"
-            tools:text="9k" />
 
         <LinearLayout
             android:id="@+id/llChatroomMemberRank"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="2dp"
             android:layout_gravity="end"
+            android:layout_marginEnd="2dp"
             android:orientation="horizontal">
 
             <com.google.android.material.imageview.ShapeableImageView
@@ -103,9 +51,9 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/voice_bg_oval_black20"
                 android:visibility="gone"
-                tools:visibility="visible"
                 app:layout_constraintDimensionRatio="1:1"
-                app:shapeAppearance="@style/voice_seat_roundStyle" />
+                app:shapeAppearance="@style/voice_seat_roundStyle"
+                tools:visibility="visible" />
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/ivChatroomMember2"
@@ -132,36 +80,105 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/mtChatroomGifts"
+    <View
+        android:id="@+id/vRoomInfo"
+        android:layout_width="190dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tbRoomTop"
+        app:layout_constraintBottom_toBottomOf="@+id/tbRoomTop"
+        android:background="@drawable/voice_rect_r999_black08062f"
+        android:orientation="vertical"
+        />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivChatroomOwner"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        app:layout_constraintStart_toStartOf="@id/vRoomInfo"
+        app:layout_constraintTop_toTopOf="@+id/vRoomInfo"
+        app:layout_constraintBottom_toBottomOf="@+id/vRoomInfo"
+        android:scaleType="centerCrop"
+        android:src="@drawable/voice_bg_oval_black20"
+        app:layout_constraintDimensionRatio="1:1"
+        app:shapeAppearance="@style/voice_seat_roundStyle"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRoomName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        app:layout_constraintTop_toTopOf="@+id/vRoomInfo"
+        app:layout_constraintStart_toEndOf="@+id/ivChatroomOwner"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/voice_white"
+        android:textSize="@dimen/voice_sp_15"
+        tools:text="Susan Star"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvOnLineCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        app:layout_constraintTop_toBottomOf="@+id/tvRoomName"
+        app:layout_constraintStart_toEndOf="@+id/ivChatroomOwner"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/voice_white_80"
+        android:textSize="@dimen/voice_sp_10"
+        tools:text="Chatroom-0728-001"
+        />
+
+    <View
+        android:id="@+id/vTopDivider"
+        android:layout_width="0.5dp"
+        android:layout_height="8dp"
+        android:layout_marginStart="4dp"
+        app:layout_constraintTop_toTopOf="@+id/tvOnLineCount"
+        app:layout_constraintBottom_toBottomOf="@+id/tvOnLineCount"
+        app:layout_constraintStart_toEndOf="@+id/tvOnLineCount"
+        android:background="@color/voice_white_30"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvClickCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        app:layout_constraintTop_toBottomOf="@+id/tvRoomName"
+        app:layout_constraintStart_toEndOf="@+id/vTopDivider"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/voice_white_80"
+        android:textSize="@dimen/voice_sp_10"
+        tools:text="1234"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRoomNotice"
         style="@style/voice_top_text_style"
         android:layout_marginStart="12dp"
-        android:drawableStart="@drawable/voice_icon_room_gift"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tbChatroomTop"
-        tools:text="2000" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/mtChatroomWatch"
-        style="@style/voice_top_text_style"
-        android:layout_marginStart="5dp"
-        android:drawableStart="@drawable/voice_icon_room_watch"
-        app:layout_constraintBottom_toBottomOf="@+id/mtChatroomGifts"
-        app:layout_constraintStart_toEndOf="@+id/mtChatroomGifts"
-        app:layout_constraintTop_toTopOf="@+id/mtChatroomGifts"
-        tools:text="1000" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/mtChatroomNotice"
-        style="@style/voice_top_text_style"
-        android:layout_marginStart="5dp"
-        android:drawableStart="@drawable/voice_icon_room_notice"
-        android:drawableEnd="@drawable/voice_icon_room_notice_arrow_right"
+        android:drawableStart="@drawable/voice_ic_room_notice"
+        android:gravity="center_vertical"
         android:text="@string/voice_chatroom_notice"
-        app:layout_constraintBottom_toBottomOf="@+id/mtChatroomGifts"
-        app:layout_constraintStart_toEndOf="@+id/mtChatroomWatch"
-        app:layout_constraintTop_toTopOf="@+id/mtChatroomGifts"
-        tools:text="Notice" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tbRoomTop"
+         />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/mtChatroomGifts"
+        style="@style/voice_top_text_style"
+        android:layout_marginStart="5dp"
+        android:drawableStart="@drawable/voice_ic_room_gift"
+        android:gravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/tvRoomNotice"
+        app:layout_constraintStart_toEndOf="@+id/tvRoomNotice"
+        app:layout_constraintTop_toTopOf="@+id/tvRoomNotice"
+        tools:text="2000" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/glChatroom67"
@@ -170,21 +187,12 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.67" />
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/mtChatroomAgoraSound"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/voice_bg_rect_left_radius13_black20"
-        android:drawableEnd="@drawable/voice_icon_room_notice_arrow_right"
-        android:drawablePadding="2dp"
-        android:gravity="center_vertical"
-        android:paddingStart="10dp"
-        android:paddingTop="3dp"
-        android:paddingEnd="15dp"
-        android:paddingBottom="3dp"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRoomType"
+        style="@style/voice_top_text_style"
+        android:layout_marginEnd="12dp"
+        android:drawableStart="@drawable/voice_ic_room_descr"
         android:text="@string/voice_chatroom_social_chat"
-        android:textColor="@color/voice_white"
-        android:textSize="@dimen/voice_sp_10"
         app:layout_constraintBottom_toBottomOf="@+id/mtChatroomGifts"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/mtChatroomGifts" />
@@ -197,7 +205,7 @@
         android:layout_marginTop="14dp"
         android:src="@drawable/voice_icon_room_bgm_on"
         android:visibility="invisible"
-        app:layout_constraintTop_toBottomOf="@+id/mtChatroomAgoraSound"
+        app:layout_constraintTop_toBottomOf="@+id/tvRoomType"
         app:layout_constraintEnd_toEndOf="parent"
         />
 
