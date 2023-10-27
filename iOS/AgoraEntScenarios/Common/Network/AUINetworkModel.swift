@@ -52,7 +52,7 @@ open class AUINetworkModel: NSObject {
     }
     
     
-    public func parse(data: Data?) throws -> Any  {
+    public func parse(data: Data?) throws -> Any?  {
         guard let data = data,
               let dic = try? JSONSerialization.jsonObject(with: data) else {
             throw AUICommonError.networkParseFail.toNSError()

@@ -49,7 +49,7 @@ open class VLCommonNetworkModel: AUINetworkModel {
         return headers
     }
     
-    public override func parse(data: Data?) throws -> Any {
+    public override func parse(data: Data?) throws -> Any? {
         var dic: Any? = nil
         do {
             try dic = super.parse(data: data)
@@ -132,7 +132,7 @@ open class VLUploadImageNetworkModel: AUIUploadNetworkModel {
         return headers
     }
     
-    public override func parse(data: Data?) throws -> Any {
+    public override func parse(data: Data?) throws -> Any? {
         var dic: Any? = nil
         do {
             try dic = super.parse(data: data)

@@ -37,6 +37,19 @@ open class NMCommonNetworkModel: AUINetworkModel {
         return headers
     }
     
+    public override func parse(data: Data?) throws -> Any? {
+        var dic: Any? = nil
+        do {
+            try dic = super.parse(data: data)
+        } catch let err {
+            throw err
+        }
+        guard let dic = dic as? [String: Any] else {
+            throw AUICommonError.networkParseFail.toNSError()
+        }
+        return dic["data"]
+    }
+    
 }
 
 
@@ -57,18 +70,9 @@ open class NMGenerateTokennNetworkModel: NMCommonNetworkModel {
         super.init()
     }
     
-    public override func parse(data: Data?) throws -> Any {
-        var dic: Any? = nil
-        do {
-            try dic = super.parse(data: data)
-        } catch let err {
-            throw err
-        }
-        guard let dic = dic as? [String: Any], let data = dic["data"] as? [String: Any] else {
-            throw AUICommonError.networkParseFail.toNSError()
-        }
-        
-        guard let token = data["token"] else {
+    public override func parse(data: Data?) throws -> Any? {
+        let data = try? super.parse(data: data) as? [String: Any]
+        guard let token = data?["token"] as? String else {
             throw AUICommonError.networkParseFail.toNSError()
         }
         return token
