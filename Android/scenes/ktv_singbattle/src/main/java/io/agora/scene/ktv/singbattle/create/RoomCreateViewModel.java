@@ -35,7 +35,6 @@ public class RoomCreateViewModel extends AndroidViewModel {
     public void loadRooms() {
         ktvServiceProtocol.getRoomList((e, vlRoomListModels) -> {
             if (e != null) {
-                ToastUtils.showToast(e.getMessage());
                 roomModelList.postValue(null);
                 return null;
             }
