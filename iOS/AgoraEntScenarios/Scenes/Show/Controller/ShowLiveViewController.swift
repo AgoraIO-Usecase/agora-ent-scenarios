@@ -132,6 +132,12 @@ class ShowLiveViewController: UIViewController {
         }
     }
     
+    private lazy var thumnbnailCanvasView: ShowThumnbnailCanvasView = {
+        let view = ShowThumnbnailCanvasView(frame: view.bounds)
+        view.isHidden = true
+        return view
+    }()
+    
     //interaction list
     private var interactionList: [ShowInteractionInfo]? {
         didSet {
@@ -273,6 +279,7 @@ class ShowLiveViewController: UIViewController {
         
     private func setupUI(){
         view.layer.contents = UIImage.show_sceneImage(name: "show_live_room_bg")?.cgImage
+        view.addSubview(thumnbnailCanvasView)
         navigationController?.isNavigationBarHidden = true
         liveView.room = room
         view.addSubview(liveView)
@@ -856,12 +863,15 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
         if role == .audience, info.userId != VLUserCenter.user.id {
             return
         }
-        let menuVC = ShowToolMenuViewController()
-        menuVC.type = ShowMenuType.managerMic
-        menuVC.selectedMap = [.mute_mic: info.muteAudio]
-        menuVC.menuTitle = "对观众\(info.userName ?? "")"
-        menuVC.delegate = self
-        present(menuVC, animated: true)
+        let title = info.interactStatus == .onSeat ? "show_seat_with_audience_end_seat_title".show_localized : "show_pking_with_broadcastor_end_pk_title".show_localized
+        let okTitle = info.interactStatus == .onSeat ? "show_setting_end_mic_seat".show_localized : "show_setting_end_pk".show_localized
+        let alertVC = UIAlertController(title: title+":\(info.userName ?? "")", message: nil, preferredStyle: .alert)
+        let ok = UIAlertAction(title: okTitle, style: .destructive) { _ in
+            self.serviceImp?.stopInteraction(interaction: info) { _ in
+            }
+        }
+        alertVC.addAction(ok)
+        present(alertVC, animated: true)
     }
     
     func onClickSendMsgButton(text: String) {
@@ -928,7 +938,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
             settingMenuVC.type = role == .broadcaster ? .idle_broadcaster : .idle_audience
         }else{
             settingMenuVC.type = role == .broadcaster ? .pking : (currentInteraction?.userId == VLUserCenter.user.id ? .pking : .idle_audience)
-            settingMenuVC.menuTitle = "show_setting_menu_on_pk_title".show_localized
+            settingMenuVC.menuTitle = currentInteraction?.interactStatus == .pking ? "show_setting_menu_on_pk_title".show_localized : "show_setting_menu_on_seat_title".show_localized
         }
         present(settingMenuVC, animated: true)
     }
@@ -979,8 +989,12 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
             self.muteLocalVideo = selected
             if selected {
                 ShowAgoraKitManager.shared.engine?.stopPreview()
+                self.thumnbnailCanvasView.isHidden = false
             } else {
                 ShowAgoraKitManager.shared.engine?.startPreview()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    self.thumnbnailCanvasView.isHidden = true
+                }
             }
         }
     }

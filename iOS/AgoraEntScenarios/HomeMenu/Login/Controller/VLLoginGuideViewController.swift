@@ -37,7 +37,7 @@ class VLLoginGuideViewController: VLBaseViewController {
     }()
     private lazy var loginButton: UIButton = {
         let button = UIButton()
-        button.setTitle("手机号登录", for: .normal)
+        button.setTitle("\(NSLocalizedString("app_mobile_number", comment: ""))\(NSLocalizedString("app_login", comment: ""))", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -45,6 +45,7 @@ class VLLoginGuideViewController: VLBaseViewController {
         button.setContentHuggingPriority(.defaultHigh, for: .vertical)
         button.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         button.addTarget(self, action: #selector(onClickLoginButton), for: .touchUpInside)
+        button.alpha = 0.5
         return button
     }()
     private lazy var agreeContainerView: UIView = {
@@ -54,7 +55,7 @@ class VLLoginGuideViewController: VLBaseViewController {
     }()
     private lazy var agreeButton: UIButton = {
         let button = UIButton()
-        button.setTitle("我已阅读并同意", for: .normal)
+        button.setTitle(NSLocalizedString("i_agree", comment: ""), for: .normal)
         button.setTitleColor(UIColor(hex: "#979CBB", alpha: 1.0), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 13)
         button.setImage(UIImage(named: "icon_privacy_noselect_button"), for: .normal)
@@ -65,9 +66,9 @@ class VLLoginGuideViewController: VLBaseViewController {
         return button
     }()
     private lazy var textView: AttributedTextView = {
-        let userProtocol = "《用户协议》"
-        let privacyPolicy = "《隐私政策》"
-        let string = "\(userProtocol)和\(privacyPolicy)"
+        let userProtocol = "《\(NSLocalizedString("app_user_agreement", comment: ""))》"
+        let privacyPolicy = "《\(NSLocalizedString("app_privacy_agreement", comment: ""))》"
+        let string = NSLocalizedString("app_login_guide_privacy_tips", comment: "")
         let userIndexs = string.indices(of: userProtocol)
         let range1 = NSRange(location: userIndexs.first ?? 0, length: userProtocol.count)
         let privacyIndexs = string.indices(of: privacyPolicy)
@@ -153,7 +154,7 @@ class VLLoginGuideViewController: VLBaseViewController {
     @objc
     private func onClickLoginButton() {
         if agreeButton.isSelected == false {
-            ToastView.show(text: "请同意用户协议和隐私政策", postion: .bottom, duration: 3.0)
+            ToastView.show(text: NSLocalizedString("app_login_guide_agree_tips", comment: ""), postion: .bottom, duration: 3.0)
             return
         }
         let registerVC = VLRegisterViewController()

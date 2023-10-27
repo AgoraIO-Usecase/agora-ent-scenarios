@@ -12,6 +12,7 @@ class VLDiscoverCell: UICollectionViewCell {
         let imageView = UIImageView(image: UIImage(named: "discover_cell_bg"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.isUserInteractionEnabled = true
+        imageView.contentMode = .scaleAspectFill
         imageView.cornerRadius(16.fit)
         imageView.layer.borderWidth = 0.5
         imageView.layer.borderColor = UIColor(hex: "#CCCCCC", alpha: 0.8).cgColor
@@ -52,7 +53,7 @@ class VLDiscoverCell: UICollectionViewCell {
     }()
     private lazy var musicButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "discover_music_bg"), for: .normal)
+        button.setBackgroundImage(UIImage(named: "discover_music_bg"), for: .normal)
         button.imageView?.contentMode = .scaleAspectFill
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(onClickMusicButton), for: .touchUpInside)

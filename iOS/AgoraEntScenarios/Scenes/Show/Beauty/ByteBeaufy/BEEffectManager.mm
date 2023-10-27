@@ -1,49 +1,35 @@
-//
 //  BEEffectManager.m
 //  Core
-//
-//  Created by qun on 2021/5/17.
-//
+
 
 #import "BEEffectManager.h"
-#if __has_include("bef_effect_ai_api.h")
-#import "bef_effect_ai_api.h"
-#import "bef_effect_ai_message_define.h"
-#import "bef_effect_ai_error_code_format.h"
-#import "bef_effect_ai_version.h"
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
+#import <effect-sdk/bef_effect_ai_api.h>
+#import <effect-sdk/bef_effect_ai_message_define.h>
+#import <effect-sdk/bef_effect_ai_error_code_format.h>
+#import <effect-sdk/bef_effect_ai_version.h>
 #endif
+#import "BETimeRecoder.h"
 #import "Core.h"
+#import "BEImageUtils.h"
+#import "BEGLUtils.h"
+
+#define EFFECT_LOG_ENABLED
 
 #ifdef EFFECT_LOG_ENABLED
-typedef enum {
-    BEF_LOG_LEVEL_NONE = 0,
-    BEF_LOG_LEVEL_DEFAULT = 1,
-    BEF_LOG_LEVEL_VERBOSE  = 2,
-    BEF_LOG_LEVEL_DEBUG = 3,
-    BEF_LOG_LEVEL_INFO = 4,
-    BEF_LOG_LEVEL_WARN = 5,
-    BEF_LOG_LEVEL_ERROR = 6,
-    BEF_LOG_LEVEL_FATAL = 7,
-    BEF_LOG_LEVEL_SILENT = 8,
-}bef_log_level;
-#if __has_include("bef_effect_ai_api.h")
-BEF_SDK_API void bef_effect_set_log_level(bef_effect_handle_t handle, bef_log_level logLevel);
-BEF_SDK_API typedef int(*logFileFuncPointer)(int logLevel, const char* msg);
-BEF_SDK_API bef_effect_result_t bef_effect_set_log_to_local_func(logFileFuncPointer pfunc);
-#endif
+
 int effectLogCallback(int logLevel, const char* msg) {
     printf("[EffectSDK] %s\n", msg);
     return 0;
 }
 #endif
 
-static const bool USE_PIPELINE = YES;
+static bool USE_PIPELINE = YES;
+static bool USE_3_BUFFER = NO;
 
-#define BE_LOAD_RESOURCE_TIMEOUT true
-
-#if __has_include("bef_effect_ai_api.h")
+#define BE_LOAD_RESOURCE_TIMEOUT false
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 @interface BEEffectManager () <RenderMsgDelegate> {
-#if __has_include("bef_effect_ai_api.h")
     bef_effect_handle_t         _handle;
     BOOL                        _effectOn;
     
@@ -54,12 +40,16 @@ static const bool USE_PIPELINE = YES;
     bef_ai_face_mask_info       *_faceMaskInfo;
     bef_ai_mouth_mask_info      *_mouthMaskInfo;
     bef_ai_teeth_mask_info      *_teethMaskInfo;
-#endif
+    EAGLContext                 *_glContext;
+    
 #if BE_LOAD_RESOURCE_TIMEOUT
     NSMutableSet<NSString *>    *_existResourcePathes;
     BOOL                        _needLoadResource;
-#endif
 }
+#else
+}
+#endif
+
 @end
 #endif
 
@@ -71,8 +61,8 @@ static const bool USE_PIPELINE = YES;
 
 - (instancetype)initWithResourceProvider:(id<BEEffectResourceProvider>)resourceProvider licenseProvider:(id<BELicenseProvider>)licenseProvider {
     self = [super init];
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     if (self) {
-#if __has_include("bef_effect_ai_api.h")
         _faceInfo = nil;
         _handInfo = nil;
         _skeletonInfo = nil;
@@ -83,33 +73,41 @@ static const bool USE_PIPELINE = YES;
 #if BE_LOAD_RESOURCE_TIMEOUT
         _existResourcePathes = [NSMutableSet set];
         _needLoadResource = NO;
+        _renderQueue = nil;
 #endif
         self.provider = resourceProvider;
         self.licenseProvider = licenseProvider;
-#endif
     }
+#endif
     return self;
 }
 
 - (int)initTask {
-#if __has_include("bef_effect_ai_api.h")
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     _effectOn = true;
+    _glContext = [EAGLContext currentContext];
+    if (_glContext == nil) {
+        _glContext = [BEGLUtils createContextWithDefaultAPI:kEAGLRenderingAPIOpenGLES3];
+    }
+    if ([EAGLContext currentContext] != _glContext) {
+        [EAGLContext setCurrentContext: _glContext];
+    }
     int ret = 0;
     ret = bef_effect_ai_create(&_handle);
     CHECK_RET_AND_RETURN(bef_effect_ai_create, ret)
 #ifdef EFFECT_LOG_ENABLED
-    bef_effect_set_log_level(_handle, 1);
-    bef_effect_set_log_to_local_func(effectLogCallback);
+    bef_effect_ai_set_log_level(BEF_AI_LOG_LEVEL_WARN);
+    bef_effect_ai_set_log_callback(effectLogCallback);
 #endif
     if (self.licenseProvider.licenseMode == OFFLINE_LICENSE) {
-        ret = bef_effect_ai_check_license(_handle, self.licenseProvider.licensePath);
+        ret = bef_effect_ai_check_license(_handle, [self.licenseProvider licensePath:BEF_EFFECT]);
         CHECK_RET_AND_RETURN(bef_effect_ai_check_license, ret)
     }
     else if (self.licenseProvider.licenseMode == ONLINE_LICENSE){
         if (![self.licenseProvider checkLicenseResult: @"getLicensePath"])
             return self.licenseProvider.errorCode;
-        NSLog(@"licensePath == %s",  self.licenseProvider.licensePath);
-        ret = bef_effect_ai_check_online_license(_handle, self.licenseProvider.licensePath);
+
+        ret = bef_effect_ai_check_online_license(_handle, [self.licenseProvider licensePath:BEF_EFFECT]);
         CHECK_RET_AND_RETURN(bef_effect_ai_check_online_license, ret)
     }
 
@@ -119,21 +117,26 @@ static const bool USE_PIPELINE = YES;
     CHECK_RET_AND_RETURN(bef_effect_ai_set_render_api, ret)
     ret = bef_effect_ai_use_builtin_sensor(_handle, YES);
     CHECK_RET_AND_RETURN(bef_effect_ai_use_builtin_sensor, ret)
-    NSLog(@"modelDirPath == %s",  self.provider.modelDirPath);
     ret = bef_effect_ai_init(_handle, 10, 10, self.provider.modelDirPath, "");
     CHECK_RET_AND_RETURN(bef_effect_ai_init, ret)
+    
+    ret = bef_effect_ai_use_3buffer(_handle, USE_3_BUFFER);
+    CHECK_RET_AND_RETURN(bef_effect_ai_use_3buffer, ret);
+    
     _msgDelegateManager = [[IRenderMsgDelegateManager alloc] init];
     [self addMsgHandler:self];
     return ret;
 #else
-    return -1;
+    return 0;
 #endif
 }
 
 - (int)destroyTask {
-#if __has_include("bef_effect_ai_api.h")
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     [self removeMsgHandler:self];
     bef_effect_ai_destroy(_handle);
+    [_msgDelegateManager destoryDelegate];
+    _msgDelegateManager = nil;
     free(_faceInfo);
     free(_handInfo);
     free(_skeletonInfo);
@@ -143,36 +146,45 @@ static const bool USE_PIPELINE = YES;
 #endif
     return 0;
 }
-#if __has_include("bef_effect_ai_api.h")
+
 #pragma mark - public
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 - (bef_effect_result_t)processTexture:(GLuint)texture outputTexture:(GLuint)outputTexture width:(int)width height:(int)height rotate:(bef_ai_rotate_type)rotate timeStamp:(double)timeStamp {
 #if BE_LOAD_RESOURCE_TIMEOUT
-    if (_needLoadResource) {
-        _needLoadResource = NO;
-        [self loadResource:-1];
+    if (_renderQueue) {
+        if (_needLoadResource) {
+            _needLoadResource = NO;
+            [self loadResource:-1];
+        }
     }
 #endif
-    if (_handle) {
-        bef_effect_result_t ret = bef_effect_ai_set_width_height(_handle, width, height);
-        CHECK_RET_AND_RETURN(bef_effect_ai_set_width_height, ret);
-        ret = bef_effect_ai_set_orientation(_handle, rotate);
-        CHECK_RET_AND_RETURN(bef_effect_ai_set_orientation, ret);
-        ret = bef_effect_ai_algorithm_texture(_handle, texture, timeStamp);
-        CHECK_RET_AND_RETURN(bef_effect_ai_algorithm_texture, ret);
-        ret = bef_effect_ai_process_texture(_handle, texture, outputTexture, timeStamp);
-        CHECK_RET_AND_RETURN(bef_effect_ai_process_texture, ret);
-        return ret;
+    if ([[EAGLContext currentContext] sharegroup] != [_glContext sharegroup]) {
+        NSLog(@"effectsar init and process are not run in the same glContext");
+        [EAGLContext setCurrentContext:_glContext];
     }
-    return 0;
+
+    RECORD_TIME(totalProcess)
+    bef_effect_result_t ret = bef_effect_ai_set_width_height(_handle, width, height);
+    CHECK_RET_AND_RETURN(bef_effect_ai_set_width_height, ret)
+    ret = bef_effect_ai_set_orientation(_handle, rotate);
+    CHECK_RET_AND_RETURN(bef_effect_ai_set_orientation, ret)
+    RECORD_TIME(algorithmProcess)
+    ret = bef_effect_ai_algorithm_texture(_handle, texture, timeStamp);
+    STOP_TIME(algorithmProcess)
+    CHECK_RET_AND_RETURN(bef_effect_ai_algorithm_texture, ret)
+    RECORD_TIME(effectProcess)
+    ret = bef_effect_ai_process_texture(_handle, texture, outputTexture, timeStamp);
+    STOP_TIME(effectProcess)
+    CHECK_RET_AND_RETURN(bef_effect_ai_process_texture, ret)
+    STOP_TIME(totalProcess)
+    return ret;
 }
 
 - (void) setFilterPath:(NSString *)path {
-    if ([self be_empty:path]) {
+    if (![self be_empty:path]) {
         path = [self.provider filterPath:path];
     }
-    if (path == nil) {
-        return;
-    }
+    
     bef_effect_result_t status = BEF_RESULT_SUC;
     status = bef_effect_ai_set_color_filter_v2(_handle, [path UTF8String]);
 
@@ -194,7 +206,7 @@ static const bool USE_PIPELINE = YES;
 }
 
 - (void)setStickerPath:(NSString *)path {
-    if ([self be_empty:path]) {
+    if (![self be_empty:path]) {
         path = [self.provider stickerPath:path];
     }
     
@@ -223,7 +235,6 @@ static const bool USE_PIPELINE = YES;
 - (void)releaseEffectManager {
     bef_effect_ai_destroy(_handle);
 }
-#endif
 
 - (void)updateComposerNodes:(NSArray<NSString *> *)nodes {
     [self updateComposerNodes:nodes withTags:nil];
@@ -234,7 +245,7 @@ static const bool USE_PIPELINE = YES;
         NSLog(@"bef_effect_ai_composer_set_nodes error: count of tags must equal to nodes");
         return;
     }
-#if __has_include("bef_effect_ai_api.h")
+    
 #if BE_LOAD_RESOURCE_TIMEOUT
     for (NSString *node in nodes) {
         if (![_existResourcePathes containsObject:node]) {
@@ -244,7 +255,6 @@ static const bool USE_PIPELINE = YES;
     }
     [_existResourcePathes removeAllObjects];
     [_existResourcePathes addObjectsFromArray:nodes];
-#endif
 #endif
 
     NSMutableArray<NSString *> *paths = [NSMutableArray arrayWithCapacity:nodes.count];
@@ -285,7 +295,7 @@ static const bool USE_PIPELINE = YES;
         
         count++;
     }
-#if __has_include("bef_effect_ai_api.h")
+    
     bef_effect_result_t result = BEF_RESULT_SUC;
     if (tags == nil) {
         result = bef_effect_ai_composer_set_nodes(_handle, (const char **)nodesPath, count);
@@ -295,7 +305,7 @@ static const bool USE_PIPELINE = YES;
     if (result != BEF_RESULT_SUC) {
         NSLog(@"bef_effect_ai_composer_set_nodes error: %d", result);
     }
-#endif
+    
     for (int i = 0; i < count; i++) {
         free(nodesPath[i]);
         if (tags != nil) {
@@ -307,13 +317,15 @@ static const bool USE_PIPELINE = YES;
         free(nodeTags);
     }
 
-#if __has_include("bef_effect_ai_api.h")
 #if BE_LOAD_RESOURCE_TIMEOUT
-    if (_needLoadResource) {
-        [self loadResource:-1];
-        _needLoadResource = NO;
+    if (_renderQueue) {
+        dispatch_async(_renderQueue, ^{
+            if (self->_needLoadResource) {
+                [self loadResource:-1];
+                self->_needLoadResource = NO;
+            }
+        });
     }
-#endif
 #endif
 }
 
@@ -327,7 +339,6 @@ static const bool USE_PIPELINE = YES;
         return;
     }
     
-#if __has_include("bef_effect_ai_api.h")
 #if BE_LOAD_RESOURCE_TIMEOUT
     for (NSString *node in nodes) {
         if (![_existResourcePathes containsObject:node]) {
@@ -337,11 +348,16 @@ static const bool USE_PIPELINE = YES;
     }
     [_existResourcePathes addObjectsFromArray:nodes];
 #endif
-#endif
 
     NSMutableArray<NSString *> *paths = [NSMutableArray arrayWithCapacity:nodes.count];
     for (int i = 0; i < nodes.count; i++) {
-        [paths addObject:[self.provider composerNodePath:nodes[i]]];
+        if ([self.resourcePath isEqualToString:@"sticker"]) {
+            [paths addObject:[self.provider stickerPath:nodes[i]]];
+        }
+        else {
+            [paths addObject:[self.provider composerNodePath:nodes[i]]];
+        }
+        
     }
     nodes = paths;
     
@@ -377,7 +393,7 @@ static const bool USE_PIPELINE = YES;
         
         count++;
     }
-#if __has_include("bef_effect_ai_api.h")
+    
     bef_effect_result_t result = BEF_RESULT_SUC;
     if (tags == nil) {
         result = bef_effect_ai_composer_append_nodes(_handle, (const char **)nodesPath, count);
@@ -387,7 +403,6 @@ static const bool USE_PIPELINE = YES;
     if (result != BEF_RESULT_SUC) {
         NSLog(@"bef_effect_ai_composer_set_nodes error: %d", result);
     }
-#endif
     
     for (int i = 0; i < count; i++) {
         free(nodesPath[i]);
@@ -400,28 +415,33 @@ static const bool USE_PIPELINE = YES;
         free(nodeTags);
     }
 
-#if __has_include("bef_effect_ai_api.h")
 #if BE_LOAD_RESOURCE_TIMEOUT
-    if (_needLoadResource) {
-        [self loadResource:-1];
-        _needLoadResource = NO;
+    if (_renderQueue) {
+        dispatch_async(_renderQueue, ^{
+            if (self->_needLoadResource) {
+                [self loadResource:-1];
+                self->_needLoadResource = NO;
+            }
+        });
     }
-#endif
 #endif
 }
 
 - (void)removeComposerNodes:(NSArray<NSString *> *)nodes {
-#if __has_include("bef_effect_ai_api.h")
 #if BE_LOAD_RESOURCE_TIMEOUT
     for (NSString *node in nodes) {
         [_existResourcePathes removeObject:node];
     }
 #endif
-#endif
 
     NSMutableArray<NSString *> *paths = [NSMutableArray arrayWithCapacity:nodes.count];
     for (int i = 0; i < nodes.count; i++) {
-        [paths addObject:[self.provider composerNodePath:nodes[i]]];
+        if ([self.resourcePath isEqualToString:@"sticker"]) {
+            [paths addObject:[self.provider stickerPath:nodes[i]]];
+        }
+        else {
+            [paths addObject:[self.provider composerNodePath:nodes[i]]];
+        }
     }
     nodes = paths;
     
@@ -445,13 +465,13 @@ static const bool USE_PIPELINE = YES;
         
         count++;
     }
-#if __has_include("bef_effect_ai_api.h")
+    
     bef_effect_result_t result = BEF_RESULT_SUC;
     result = bef_effect_ai_composer_remove_nodes(_handle, (const char **)nodesPath, count);
     if (result != BEF_RESULT_SUC) {
         NSLog(@"bef_effect_ai_composer_set_nodes error: %d", result);
     }
-#endif
+    
     for (int i = 0; i < count; i++) {
         free(nodesPath[i]);
     }
@@ -459,16 +479,20 @@ static const bool USE_PIPELINE = YES;
 }
 
 - (void)updateComposerNodeIntensity:(NSString *)node key:(NSString *)key intensity:(float)intensity {
-//    node = [self.provider composerNodePath:node];
-#if __has_include("bef_effect_ai_api.h")
+    
+    if ([self.resourcePath isEqualToString:@"sticker"]) {
+        node = [self.provider stickerPath:node];
+    }
+    else {
+        node = [self.provider composerNodePath:node];
+    }
+    
     bef_effect_result_t result = bef_effect_ai_composer_update_node(_handle, (const char *)[node UTF8String], (const char *)[key UTF8String], intensity);
     CHECK_RET_AND_RETURN_RESULT(bef_effect_ai_composer_update_node, result, ;)
-#endif
 }
 
 - (NSArray<NSString *> *)availableFeatures {
     //Dynamic lookup feature availability
-#if __has_include("bef_effect_ai_api.h")
     int feature_len = 60;
     char features[feature_len][BEF_EFFECT_FEATURE_LEN];
     int *pf = &feature_len;
@@ -489,21 +513,14 @@ static const bool USE_PIPELINE = YES;
         }
         return @[];
     }
-#else
-    return @[];
-#endif
 }
 
 - (NSString *)sdkVersion {
-#if __has_include("bef_effect_ai_api.h")
     char version[20];
     bef_effect_ai_get_version(version, 20);
     return [NSString stringWithUTF8String:version];
-#else
-    return @"";
-#endif
 }
-#if __has_include("bef_effect_ai_api.h")
+
 - (void)setFrontCamera:(BOOL)frontCamera {
     _frontCamera = frontCamera;
     bef_effect_result_t ret = bef_effect_ai_set_camera_device_position(_handle, frontCamera ? bef_ai_camera_position_front : bef_ai_camera_position_back);
@@ -660,9 +677,7 @@ static const bool USE_PIPELINE = YES;
 }
 
 - (void)loadResource:(int)timeout {
-    if (_handle && timeout > 0) {
-        bef_effect_ai_load_resource_with_timeout(_handle, timeout);
-    }
+    bef_effect_ai_load_resource_with_timeout(_handle, timeout);
 }
 
 - (void)addMsgHandler:(id<RenderMsgDelegate>)handler
@@ -689,13 +704,13 @@ static const bool USE_PIPELINE = YES;
         buf.format = BE_RGBA;
         BEImageUtils* imageUtils = [BEImageUtils new];
         UIImage* img = [imageUtils transforBufferToUIImage:buf];
-        //由于img的数据地址与buffer一样，需要深拷贝结果图
+        // {zh} 由于img的数据地址与buffer一样，需要深拷贝结果图 {en} Since the data address of img is the same as that of buffer, deep copy of the result graph is required
         UIGraphicsBeginImageContext(img.size);
         [img drawInRect:CGRectMake(0, 0, img.size.width, img.size.height)];
         UIImage *copiedImage = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
         
-        //释放贴纸内部buffer
+        // {zh} 释放贴纸内部buffer {en} Release sticker internal buffer
         bef_effect_ai_release_captured_image(_handle, pImage);
         return copiedImage;
     }
@@ -705,7 +720,23 @@ static const bool USE_PIPELINE = YES;
 
 #pragma mark - RenderMsgDelegate
 - (BOOL)msgProc:(unsigned int)unMsgID arg1:(int)nArg1 arg2:(int)nArg2 arg3:(const char *)cArg3 {
-    BELog(@"message received, type: %d, arg: %d, %d, %s", unMsgID, nArg1, nArg2, cArg3);
+    NSString* str = [NSString stringWithFormat:@"%u", unMsgID];
+    switch(unMsgID) {
+        case BEF_MSG_TYPE_LICENSE_CHECK:
+            str = @"BEF_MSG_TYPE_LICENSE_CHECK";
+            break;
+        case BEF_MSG_TYPE_MODEL_MISS:
+            str = @"BEF_MSG_TYPE_MODEL_MISS";
+            break;
+        case RENDER_MSG_TYPE_RESOURCE:
+            str = @"RENDER_MSG_TYPE_RESOURCE";
+            break;
+        case BEF_MSG_TYPE_EFFECT_INIT:
+            str = @"BEF_MSG_TYPE_EFFECT_INIT";
+            break;
+        default:break;
+    }
+    NSLog(@"message received, type: %s, arg: %d, %d, %s", [str UTF8String], nArg1, nArg2, cArg3);
     [self.delegate msgProc:unMsgID arg1:nArg1 arg2:nArg2 arg3:cArg3];
     return NO;
 }
@@ -723,7 +754,6 @@ static const bool USE_PIPELINE = YES;
     }
     return bef_ai_render_api_gles30;
 }
-#endif
 
 - (BOOL)sethairColorByPart:(BEEffectPart)partIndex r:(CGFloat)r g:(CGFloat)g b:(CGFloat)b a:(CGFloat)a {
     NSDictionary *param = [[NSDictionary alloc] initWithObjectsAndKeys:
@@ -733,19 +763,35 @@ static const bool USE_PIPELINE = YES;
                            [NSString stringWithFormat:@"%.3f",a],@"a", nil];
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:param options:NSJSONWritingPrettyPrinted error:nil];
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-#if __has_include("bef_effect_ai_api.h")
     return [self sendMsg:BEEffectHairColor arg1:0 arg2:partIndex arg3:[jsonString UTF8String]];
-#else
-    return NO;
-#endif
 }
 
 - (BOOL)sendCaptureMessage {
-#if __has_include("bef_effect_ai_api.h")
     return [self sendMsg:BEEffectTakingPictures arg1:1 arg2:0 arg3:0];
-#else
-    return NO;
-#endif
 }
 
+// {zh} / @brief 开启或关闭强制人脸检测 {en} /@brief Enable or disable forced face detection
+// {zh} /detection YES 开启人脸检测 NO关闭人脸检测 {en} /detection YES on face detection NO off face detection
+- (void)forcedFaceDetection:(BOOL)detection
+{
+    bef_effect_result_t ret = bef_effect_ai_set_algorithm_force_detect(_handle,detection);
+    CHECK_RET_AND_RETURN_RESULT(bef_effect_ai_set_algorithm_force_detect, ret, ;)
+}
+
++ (void)setUse3buffer:(bool)use {
+    USE_3_BUFFER = use;
+}
+
++ (void)setUsePipeline:(bool)use {
+    USE_PIPELINE = use;
+}
+
++ (bool)use3buffer {
+    return USE_3_BUFFER;
+}
+
++ (bool)usePipeline {
+    return USE_PIPELINE;
+}
+#endif
 @end
