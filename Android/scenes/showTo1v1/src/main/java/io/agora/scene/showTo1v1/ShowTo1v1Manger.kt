@@ -14,17 +14,14 @@ import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import io.agora.scene.showTo1v1.callAPI.CallConfig
 import io.agora.scene.showTo1v1.callAPI.CallMode
 import io.agora.scene.showTo1v1.callAPI.CallRole
 import io.agora.scene.showTo1v1.callAPI.CallTokenConfig
 import io.agora.scene.showTo1v1.callAPI.ICallApi
-import io.agora.scene.showTo1v1.callAPI.ICallApiListener
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
 
 class ShowTo1v1Manger constructor() {
 
@@ -224,15 +221,6 @@ class ShowTo1v1Manger constructor() {
             return innerRtcEngine!!
         }
 
-    private var innerVideoSwitcher: VideoSwitcher? = null
-    val mVideoSwitcher: VideoSwitcher
-        get() {
-            if (innerVideoSwitcher == null) {
-                innerVideoSwitcher = VideoSwitcher.getImplInstance(mRtcEngine)
-            }
-            return innerVideoSwitcher!!
-        }
-
     fun destroy() {
         mRemoteUser = null
         mConnectedChannelId = null
@@ -242,10 +230,6 @@ class ShowTo1v1Manger constructor() {
         innerCallTokenConfig = null
         innerLocalVideoView = null
         innerRemoteVideoView = null
-        innerVideoSwitcher?.let {
-            VideoSwitcher.release()
-            innerVideoSwitcher = null
-        }
         innerRtcEngine?.let {
             workingExecutor.execute { RtcEngine.destroy() }
             innerRtcEngine = null
