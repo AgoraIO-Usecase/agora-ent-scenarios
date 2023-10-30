@@ -36,6 +36,7 @@
     <string name="voice_room_tab_layout_count">(%1$s)</string>
     <string name="voice_room_online_count">%d在线</string>
     <string name="voice_room_click_count">%d观看</string>
+    <string name="voice_room_mic_number">%d号麦</string>
     <string name="voice_room_profile_update_name_fail">修改失败</string>
     <string name="voice_room_profile_update_name_suc">修改成功</string>
     <string name="voice_empty_invite_hands">暂无听众</string>
