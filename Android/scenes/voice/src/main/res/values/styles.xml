@@ -33,16 +33,14 @@
 
     <style name="voice_top_text_style">
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">24dp</item>
         <item name="android:drawablePadding">3dp</item>
         <item name="android:paddingStart">8dp</item>
         <item name="android:paddingEnd">8dp</item>
-        <item name="android:paddingTop">5dp</item>
-        <item name="android:paddingBottom">5dp</item>
         <item name="android:textColor">@color/voice_white</item>
         <item name="android:textSize">@dimen/voice_sp_12</item>
-        <item name="android:gravity">center</item>
-        <item name="android:background">@drawable/voice_bg_rect_radius13_black20</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">@drawable/voice_rect_r999_black08062f</item>
     </style>
 
     <style name="voice_bottom_sheet_title_style">

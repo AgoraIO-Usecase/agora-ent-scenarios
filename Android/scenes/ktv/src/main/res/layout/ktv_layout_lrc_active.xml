@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@mipmap/ktv_mv_default"
+    tools:background="@color/ktv_music_view_bg"
     tools:layout_height="280dp"
     tools:theme="@style/Theme.MaterialComponents.Light">
 
@@ -90,17 +90,17 @@
         android:paddingBottom="10dp"
         app:currentLineHighlightedTextColor="@color/pink_b4"
         app:currentLineTextColor="@color/white"
-        app:currentLineTextSize="16sp"
+        app:currentLineTextSize="18dp"
         app:labelWhenNoLyrics=" "
         app:layout_constraintBottom_toTopOf="@+id/bgd_control_layout_lrc"
         app:layout_constraintTop_toBottomOf="@+id/scoringView"
         app:layout_constraintVertical_bias="0.0"
-        app:lineSpacing="6dp"
+        app:lineSpacing="8dp"
         app:paddingTop="2dp"
         app:startOfVerseIndicatorPaddingTop="6dp"
         app:startOfVerseIndicatorRadius="4dp"
         app:textGravity="center"
-        app:textSize="14sp"
+        app:textSize="15dp"
         tools:layout_editor_absoluteX="-36dp" />
 
     <View

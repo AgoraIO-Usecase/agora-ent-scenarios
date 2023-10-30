@@ -1,0 +1,4 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@mipmap/ktv_ic_mic_on" android:state_checked="true" />
+    <item android:drawable="@mipmap/ktv_ic_mic_off" android:state_checked="false" />
+</selector>

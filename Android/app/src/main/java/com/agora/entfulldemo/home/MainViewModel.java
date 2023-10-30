@@ -22,6 +22,7 @@ import io.agora.scene.base.api.base.BaseResponse;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.bean.CommonBean;
 import io.agora.scene.base.component.BaseRequestViewModel;
+import io.agora.scene.base.event.UserCancellationEvent;
 import io.agora.scene.base.event.UserInfoChangeEvent;
 import io.agora.scene.base.event.UserLogoutEvent;
 import io.agora.scene.base.manager.UserManager;
@@ -45,6 +46,13 @@ public class MainViewModel extends BaseRequestViewModel {
     public void onEventMainThread(@Nullable UserLogoutEvent event) {
         if (getISingleCallback() != null) {
             getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_LOGOUT, null);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(@Nullable UserCancellationEvent event) {
+        if (getISingleCallback() != null) {
+            getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_CANCEL_ACCOUNTS, null);
         }
     }
 
@@ -148,6 +156,7 @@ public class MainViewModel extends BaseRequestViewModel {
 
                             @Override
                             public void onSuccess(BaseResponse<String> data) {
+                                UserManager.getInstance().cancel();
                                 getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_CANCEL_ACCOUNTS, null);
                             }
 

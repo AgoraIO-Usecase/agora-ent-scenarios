@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:cardBackgroundColor="@android:color/transparent"
-    app:cardCornerRadius="12dp"
     app:cardElevation="0dp"
     tools:layout_height="230dp"
     tools:theme="@style/Theme.MaterialComponents.Light">
@@ -25,7 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-            tools:background="@mipmap/ktv_mv_default"
+            android:background="@color/ktv_music_view_bg"
             tools:visibility="visible">
 
             <TextView
@@ -69,11 +68,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvMusicName" />
-
-            <include
-                android:id="@+id/ilChorus"
-                layout="@layout/ktv_layout_lrc_chorus"
-                android:visibility="gone" />
 
             <include
                 layout="@layout/ktv_layout_lrc_prepare"
