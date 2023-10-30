@@ -2,7 +2,6 @@ package io.agora.scene.show
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.res.AssetManager
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
@@ -20,6 +19,8 @@ import io.agora.beautyapi.sensetime.*
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
+import io.agora.rtc2.video.SegmentationProperty
+import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
@@ -109,14 +110,8 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 }
             }
         )
-        var licenseExists = false
-        try { // 美颜license是否存在
-            this.assets.open("license/SenseME.lic").use { inputStream ->
-                licenseExists = true
-            }
-        } catch (_: Exception) {}
         // 低端机 或 无证书则关闭美颜
-        if (mRtcEngine.queryDeviceScore() >= 75 && licenseExists) {
+        if (mRtcEngine.queryDeviceScore() >= 75) {
             mBeautyProcessor.setBeautyEnable(true)
         } else {
             mBeautyProcessor.setBeautyEnable(false)
@@ -175,6 +170,9 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 )
             )
         )
+        // reset virtual background config
+        RtcEngineInstance.virtualBackgroundSource.backgroundSourceType = 0
+        RtcEngineInstance.rtcEngine.enableVirtualBackground(false, VirtualBackgroundSource(), SegmentationProperty())
 //        mRtcEngine.startPreview()
     }
 

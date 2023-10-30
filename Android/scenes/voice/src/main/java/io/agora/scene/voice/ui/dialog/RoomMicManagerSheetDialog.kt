@@ -89,7 +89,7 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
             if (micInfo.member == null) { // 没人
                 binding?.mtChatroomMicTag?.isVisible = false
                 ivMicInnerIcon.isVisible = true
-                mtMicUsername.text = micInfo.micIndex.toString()
+                mtMicUsername.text = resources.getString(R.string.voice_room_mic_number, micInfo.micIndex + 1)
                 when (micInfo.micStatus) {
                     MicStatus.ForceMute -> {
                         ivMicTag.isVisible = false
@@ -106,7 +106,7 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
                     }
                     else -> {
                         ivMicTag.isVisible = false
-                        ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_add)
+                        ivMicInnerIcon.setImageResource(R.drawable.voice_ic_mic_empty)
                     }
                 }
             } else { // 有人

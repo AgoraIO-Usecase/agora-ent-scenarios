@@ -138,7 +138,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 }
             }
         }
-        binding.emptyInclude.layoutCreateRoom.setOnClickListener(object : OnClickJackingListener() {
+        binding.emptyInclude.btnCreateRoom.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
                 mCallApi.removeListener(callApiListener)
                 mShowTo1v1Manger.deInitialize()

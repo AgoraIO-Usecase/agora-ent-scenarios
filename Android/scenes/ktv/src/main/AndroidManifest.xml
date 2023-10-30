@@ -5,9 +5,6 @@
     <application>
 
         <activity
-            android:name="io.agora.scene.ktv.create.RoomCreateActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name="io.agora.scene.ktv.create.RoomListActivity"
             android:screenOrientation="portrait" />
         <activity

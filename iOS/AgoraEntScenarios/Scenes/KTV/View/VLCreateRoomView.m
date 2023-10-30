@@ -92,7 +92,7 @@
     UIView *inputBgView = [[UIView alloc] initWithFrame:CGRectMake(30, roomTitleLabel.bottom+15, SCREEN_WIDTH-60, 48)];
     inputBgView.layer.cornerRadius = 8;
     inputBgView.layer.masksToBounds = YES;
-    inputBgView.backgroundColor = UIColorMakeWithHex(@"#FFFFFF");
+    inputBgView.backgroundColor = UIColorMakeWithHex(@"#F5F8FF");
     [self addSubview:inputBgView];
 
     self.inputTF = [[UITextField alloc] initWithFrame:CGRectMake(30, 9, inputBgView.width - 60, 30)];

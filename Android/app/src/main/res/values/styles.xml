@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="app_encryption_input_style">
+        <attr name="app_strokeWidth" format="dimension" />
+        <attr name="app_checkedColor" format="color" />
+        <attr name="app_defaultColor" format="color" />
+        <attr name="app_textLength" format="integer" />
+        <attr name="app_backColor" format="color" />
+        <attr name="app_textColor" format="color" />
+        <attr name="app_circle" format="dimension" />
+        <attr name="app_round" format="dimension" />
+        <attr name="app_textSize" format="dimension" />
+        <attr name="app_isPwd" format="boolean" />
+        <attr name="app_waitInputColor" format="color" />
+        <attr name="app_isWaitInput" format="boolean" />
+    </declare-styleable>
+
+    <style name="app_def_et_phone_input">
+        <item name="android:singleLine">true</item>
+        <item name="android:maxLength">11</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColorHint">@color/def_text_grey_C9C</item>
+        <item name="android:textColor">@color/def_text_color_040</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+</resources>

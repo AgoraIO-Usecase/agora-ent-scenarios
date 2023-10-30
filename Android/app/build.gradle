@@ -24,6 +24,9 @@ dependencies {
     if (isProjectLibrary(':scenes:ktv')) {
         runtimeOnly project(':scenes:ktv')
     }
+    if (isProjectLibrary(':scenes:ktv_relay')) {
+        runtimeOnly project(':scenes:ktv_relay')
+    }
     if (isProjectLibrary(':scenes:ktv_singbattle')) {
         runtimeOnly project(':scenes:ktv_singbattle')
     }
@@ -67,4 +70,6 @@ dependencies {
 
     implementation rootProject.ext.deps.gson
     implementation rootProject.ext.deps.bugly
+    implementation rootProject.ext.deps.flexbox
+
 }

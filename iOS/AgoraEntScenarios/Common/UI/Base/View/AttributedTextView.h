@@ -10,7 +10,22 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface AttributedTextView : UITextView
--(instancetype)initWithFrame:(CGRect)frame text:(NSString *)text AttributedStringS:(NSArray *)strings ranges:(NSArray *)ranges textColor:(UIColor *)textColor attributeTextColor:(UIColor *)attributeTextColor;
+-(instancetype)initWithFrame:(CGRect)frame
+                        text:(NSString *)text
+                        font: (UIFont *)font
+           AttributedStringS:(NSArray *)strings
+                      ranges:(NSArray *)ranges
+                   textColor:(UIColor *)textColor
+          attributeTextColor:(UIColor *)attributeTextColor;
+
+-(instancetype)initWithFrame:(CGRect)frame
+                        text:(NSString *)text
+                        font: (UIFont *)font
+           AttributedStringS:(NSArray *)strings
+                      ranges:(NSArray *)ranges
+                   textColor:(UIColor *)textColor
+          attributeTextColor:(UIColor *)attributeTextColor
+                       attrs:(nullable NSMutableAttributedString *)attrs ;
 @end
 
 NS_ASSUME_NONNULL_END

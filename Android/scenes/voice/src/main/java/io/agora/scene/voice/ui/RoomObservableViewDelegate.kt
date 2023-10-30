@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentTransaction
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.scene.voice.R
@@ -26,6 +27,9 @@ import io.agora.scene.voice.ui.dialog.*
 import io.agora.scene.voice.ui.dialog.common.CommonFragmentAlertDialog
 import io.agora.scene.voice.ui.dialog.common.CommonFragmentContentDialog
 import io.agora.scene.voice.ui.dialog.common.CommonSheetAlertDialog
+import io.agora.scene.voice.ui.dialog.soundcard.SoundCardSettingDialog
+import io.agora.scene.voice.ui.dialog.soundcard.SoundCardSettingBean
+import io.agora.scene.voice.ui.dialog.soundcard.SoundPresetTypeDialog
 import io.agora.scene.voice.ui.widget.mic.IRoomMicView
 import io.agora.scene.voice.ui.widget.primary.ChatPrimaryMenuView
 import io.agora.scene.voice.ui.widget.top.IRoomLiveTopView
@@ -495,6 +499,9 @@ class RoomObservableViewDelegate constructor(
                 override fun onEarBackSetting() {
                     onEarBackSettingDialog()
                 }
+                override fun onVirtualSoundCardSetting() {
+                    onVirtualSoundCardSettingDialog()
+                }
                 override fun onBGMSetting() {
                     onBGMSettingDialog()
                 }
@@ -657,6 +664,16 @@ class RoomObservableViewDelegate constructor(
             roomAudioSettingDialog?.updateEarBackState()
         }
         dialog.show(activity.supportFragmentManager, "mtBGMSetting")
+    }
+    /** 耳返设置弹框
+     */
+    fun onVirtualSoundCardSettingDialog() {
+        val dialog = SoundCardSettingDialog()
+        dialog.onClickSoundCardType = {
+            val preset = SoundPresetTypeDialog()
+            preset.show(activity.supportFragmentManager, SoundPresetTypeDialog.TAG)
+        }
+        dialog.show(activity.supportFragmentManager, SoundCardSettingDialog.TAG)
     }
     /** 背景音乐设置弹框
      */

@@ -46,8 +46,9 @@ abstract class IBeautyProcessor {
         BeautyCache.restoreByOperation(this)
     }
 
-    open fun setBeautyEnable(enable: Boolean) {
+    open fun setBeautyEnable(enable: Boolean):Boolean {
         isBeautyEnable = enable
+        return true
     }
 
     fun isBeautyEnable() = isBeautyEnable

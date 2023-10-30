@@ -25,19 +25,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self commonUI];
+    self.view.backgroundColor = [UIColor whiteColor];
     [self setUpUI];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 }
 
-- (void)commonUI {
-    [self setBackgroundImage:@"online_list_BgIcon"];
-}
-
-#pragma mark - Public Methods
-- (void)configNavigationBar:(UINavigationBar *)navigationBar {
-    [super configNavigationBar:navigationBar];
-}
 - (BOOL)preferredNavigationBarHidden {
     return true;
 }

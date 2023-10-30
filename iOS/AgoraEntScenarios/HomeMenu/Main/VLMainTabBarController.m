@@ -5,12 +5,12 @@
 #import <UIKit/UIKit.h>
 #import "VLMainTabBarController.h"
 #import "VLHomeViewController.h"
-#import "VLDiscoveryViewController.h"
 #import "VLMineViewController.h"
 #import "VLMacroDefine.h"
 #import "BaseNavigationController.h"
 #import "MenuUtils.h"
 #import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 
 @interface VLMainTabBarController ()<CALayerDelegate, UITabBarControllerDelegate>
 @property (nonatomic, assign) NSInteger doubleCount;
@@ -53,20 +53,21 @@
                                                           initWithRootViewController:homeViewController];
     homeViewController.tabBarItem = [self tabBarItemsWithIndex:0];
     
-//    VLDiscoveryViewController *discoveryVC = [[VLDiscoveryViewController alloc] init];
-//    discoveryVC.hidesBottomBarWhenPushed = NO;
-//    BaseNavigationController *discoveryNavigationController = [[BaseNavigationController alloc]
-//                                                  initWithRootViewController:discoveryVC];
-//    discoveryVC.tabBarItem = [self tabBarItemsWithIndex:1];
+    VLDiscoveyrViewController *discoveryVC = [[VLDiscoveyrViewController alloc] init];
+    discoveryVC.hidesBottomBarWhenPushed = NO;
+    BaseNavigationController *discoveryNavigationController = [[BaseNavigationController alloc]
+                                                  initWithRootViewController:discoveryVC];
+    discoveryVC.tabBarItem = [self tabBarItemsWithIndex:1];
 
     VLMineViewController *mineViewController = [[VLMineViewController alloc] init];
     mineViewController.hidesBottomBarWhenPushed = NO;
     BaseNavigationController *mineNavigationController = [[BaseNavigationController alloc]
                                                    initWithRootViewController:mineViewController];
-    mineViewController.tabBarItem = [self tabBarItemsWithIndex:1];
+    mineViewController.tabBarItem = [self tabBarItemsWithIndex:2];
 
    NSArray *viewControllers = @[
        homeNavigationController,
+       discoveryNavigationController,
        mineNavigationController,
    ];
    return viewControllers;
@@ -84,9 +85,9 @@
         [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"app_title_home")
                                       image:[self tabbarImageWithImageNamed:@"Tab_home_normal"]
                               selectedImage:[self tabbarImageWithImageNamed:@"Tab_home_sel"]],
-      //  [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"发现")
-//                                      image:[self tabbarImageWithImageNamed:@"Tab_discovery_normal"]
-//                              selectedImage:[self tabbarImageWithImageNamed:@"Tab_discovery_sel"]],
+        [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"app_title_find")
+                                      image:[self tabbarImageWithImageNamed:@"Tab_discovery_normal"]
+                              selectedImage:[self tabbarImageWithImageNamed:@"Tab_discovery_sel"]],
         [[UITabBarItem alloc] initWithTitle:AGLocalizedString(@"app_title_mine")
                                       image:[self tabbarImageWithImageNamed:@"Tab_mine_normal"]
                               selectedImage:[self tabbarImageWithImageNamed:@"Tab_mine_sel"]]

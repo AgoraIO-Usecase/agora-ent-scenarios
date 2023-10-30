@@ -10,7 +10,7 @@ import Foundation
 typealias SRCreateRoomBlock = (CGFloat) -> Void
 typealias SRCreateRoomVCBlock = (String, String) -> Void
 
-class SRCreateViewController: BaseViewController, SRCreateRoomViewDelegate {
+class SRCreateViewController: UIViewController, SRCreateRoomViewDelegate {
     var createRoomBlock: SRCreateRoomBlock?
     var createRoomVCBlock: SRCreateRoomVCBlock?
     var isRoomPrivate: Bool = false
@@ -19,22 +19,10 @@ class SRCreateViewController: BaseViewController, SRCreateRoomViewDelegate {
     override func viewDidLoad() {
             super.viewDidLoad()
             view.backgroundColor = .white
-            commonUI()
             setUpUI()
             NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         }
-        
-        func commonUI() {
-            setBackgroundImage("online_list_BgIcon")
-        }
-        
-        // MARK: - Public Methods
-        
-        override func configNavigationBar(_ navigationBar: UINavigationBar) {
-            super.configNavigationBar(navigationBar)
-        }
-        
-        
+
         func createBtnAction(_ roomModel: VRRoomEntity) {  //房主创建
             if roomModel.is_private && roomModel.roomPassword.count != 4 {
                 return

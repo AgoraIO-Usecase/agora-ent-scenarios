@@ -10,7 +10,7 @@ import ZSwiftBaseLib
 
 class VRVerifyCodeNumberView: UIView {
     /// 光标颜色
-    var cursorColor = UIColor(0x009FFF)
+    var cursorColor = UIColor(0x4E5969)
 
     lazy var numLabel: UILabel = .init(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)).textAlignment(.center).font(.systemFont(ofSize: 18)).textColor(.darkText)
 

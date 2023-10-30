@@ -63,9 +63,9 @@ extension CallApiImpl {
     
     /// 语音审核
     func moderationAudio(appId: String, channelName: String, user: ShowTo1v1UserInfo) {
-        let userInfo = ["id": user.userId ?? "",
+        let userInfo = ["id": user.uid ?? "",
                         "sceneName": "showTo1v1",
-                        "userNo": user.userId,
+                        "userNo": user.uid,
                         "userName": user.userName] as NSDictionary
         let parasm: [String: Any] = ["appId": appId,
                                      "channelName": channelName,
