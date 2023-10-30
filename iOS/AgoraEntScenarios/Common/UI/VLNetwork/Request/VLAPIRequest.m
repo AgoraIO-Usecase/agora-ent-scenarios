@@ -75,7 +75,7 @@ static AFHTTPSessionManager *_sessionManager;
 }
 
 
-+ (void)requestRoute:(NSString *)route showHUD:(BOOL)show method:(NSString *)method parameter:(id)json requestType:(VLRequestType)type progressBlock:(progressBlock)progressBlock completeBlock:(completeBlock_success)completeBlock errorBlock:(errorBlock_fail)errorBlock {
++ (void)requestRoute:(NSString *)route showHUD:(BOOL)show method:(NSString *)method parameter:(id)json requestType:(VLRequestType)type progressBlock:(nullable progressBlock)progressBlock completeBlock:(completeBlock_success)completeBlock errorBlock:(errorBlock_fail)errorBlock {
     NSString *url = [self doRoute:route andMethod:method];
     url = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
     if (json == nil) json = @{};
@@ -130,19 +130,15 @@ static AFHTTPSessionManager *_sessionManager;
     url = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
     if (json == nil) json = @{};
     
-    NSURLSessionDataTask *sessionTask;
     //设置请求头
     [_sessionManager.requestSerializer setValue:[self getToken] forHTTPHeaderField:@"Authorization"];
-
+    
     if (type == VLRequestTypeGet) {
         // GET
         NSDictionary *paramenter = [self setCommonParamenter:json];
-
-        sessionTask = [_sessionManager GET:url parameters:paramenter headers:@{} progress:^(NSProgress * _Nonnull downloadProgress) {
+        [_sessionManager GET:url parameters:paramenter headers:@{} progress:^(NSProgress * _Nonnull downloadProgress) {
             [self requestProgress:progressBlock value:downloadProgress];
         } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-//            NSString *resultStr = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
-//            UIImage *image = [UIImage imageWithData:responseObject];
             [self requestImageSuccess:completeBlock object:responseObject method:method task:task];
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             NSLog(@"GET REQUEST ERROR\n,url=%@\n,error=%@",task.currentRequest.URL,error);
@@ -235,7 +231,7 @@ static AFHTTPSessionManager *_sessionManager;
                                            fileNames:(NSArray<NSString *> *)fileNames
                                           imageScale:(CGFloat)imageScale
                                            imageType:(NSString *)imageType
-                                       progressBlock:(progressBlock)progressBlock
+                                       progressBlock:(nullable progressBlock)progressBlock
                                        completeBlock:(completeBlock_success)completeBlock
                                           errorBlock:(errorBlock_fail)errorBlock{
     NSString *url = [self doRoute:route andMethod:method];
@@ -245,6 +241,8 @@ static AFHTTPSessionManager *_sessionManager;
     // 设置公共参数
     NSDictionary *paramenter = [self setCommonParamenter:json];
     if (show) [SVProgressHUD show];
+    [_sessionManager.requestSerializer setValue:[self getToken] forHTTPHeaderField:@"Authorization"];
+
     NSURLSessionDataTask *sessionTask = [_sessionManager POST:url parameters:paramenter headers:@{} constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
         for (int i = 0; i < images.count; i++) {
             // 图片压缩

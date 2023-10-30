@@ -7,6 +7,7 @@ import org.greenrobot.eventbus.EventBus;
 import io.agora.scene.base.Constant;
 import io.agora.scene.base.api.ApiManager;
 import io.agora.scene.base.api.model.User;
+import io.agora.scene.base.event.UserCancellationEvent;
 import io.agora.scene.base.event.UserInfoChangeEvent;
 import io.agora.scene.base.utils.GsonUtil;
 import io.agora.scene.base.utils.SPUtil;
@@ -37,6 +38,11 @@ public final class UserManager {
 
     public void logout() {
         writeUserInfoToPrefs(true);
+    }
+
+    public void cancel() {
+        logout();
+        EventBus.getDefault().post(new UserCancellationEvent());
     }
 
     private void writeUserInfoToPrefs(boolean isLogOut) {

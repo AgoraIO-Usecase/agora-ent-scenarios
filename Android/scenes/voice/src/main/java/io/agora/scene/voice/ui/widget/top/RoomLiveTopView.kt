@@ -44,7 +44,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         binding = VoiceViewRoomLiveTopBinding.bind(root)
         binding.ivChatroomBack.setOnClickListener(this)
         binding.llChatroomMemberRank.setOnClickListener(this)
-        binding.tvOnLineCount.setOnClickListener(this)
+        binding.vRoomInfo.setOnClickListener(this)
         binding.tvRoomNotice.setOnClickListener(this)
         binding.tvRoomType.setOnClickListener(this)
         binding.tvClickCount.setOnClickListener(this)
@@ -188,7 +188,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             // 排行榜
             binding.llChatroomMemberRank.id -> onLiveTopClickListener?.onClickRank(v, 0)
             // 成员列表
-            binding.tvOnLineCount.id -> onLiveTopClickListener?.onClickRank(v, 1)
+            binding.vRoomInfo.id -> onLiveTopClickListener?.onClickRank(v, 1)
             // 更多
             binding.ivChatroomMore.id -> onLiveTopClickListener?.onClickMore(v)
             // bgm
