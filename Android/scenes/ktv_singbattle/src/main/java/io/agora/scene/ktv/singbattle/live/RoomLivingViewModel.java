@@ -1498,15 +1498,13 @@ public class RoomLivingViewModel extends ViewModel {
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
 
         boolean isOwnSong;
-        String jsonOption;
         if (music.getWinnerNo().equals("")) {
             isOwnSong = Objects.equals(music.getUserNo(), UserManager.getInstance().getUser().id.toString());
-            jsonOption = "{\"format\":{\"highPart\":0}}";
         } else {
             isOwnSong = Objects.equals(music.getWinnerNo(), UserManager.getInstance().getUser().id.toString());
-            jsonOption = "{\"format\":{\"highPartIndex\":0}}";
         }
 
+        String jsonOption = "{\"format\":{\"highPart\":0}}";
         long songCode = Long.parseLong(music.getSongNo());
         int mainSingerUid = Integer.parseInt(music.getUserNo());
         Long newSongCode = ktvApiProtocol.getMusicContentCenter().getInternalSongCode(songCode, jsonOption);
