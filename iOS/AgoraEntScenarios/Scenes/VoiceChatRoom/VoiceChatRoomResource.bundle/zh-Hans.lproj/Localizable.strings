@@ -5,7 +5,7 @@
   Created by 朱继超 on 2022/9/19.
   
 */
-//<<<<<<< HEAD
+//
 "voice_app_name"="声网语聊房";
 "voice_app_all"="全部";
 "voice_chat_room"="语聊房";
@@ -125,6 +125,7 @@
 "voice_other_sound" = "其他最佳音效";
 "voice_otherSound" = "切换其他最佳音效需退出房间";
 "voice_prompt" = "提醒";
+"voice_mic_num" = "号麦";
 "voice_add_bot" = "添加机器人体验最佳音效？";
 "voice_exit_room" = "离开并重新创建一个新的语聊房?";
 "voice_AINS_AI_noise_suppression" = "AINS: AI降噪";
@@ -148,6 +149,8 @@
 "voice_cancel_apply_failed" = "取消申请失败!";
 "voice_join_IM_failed" = "加入聊天室失败";
 "voice_room_welcome" = "欢迎来到声网语聊房！房间内严禁色情、赌博或暴力内容。";
+"voice_room_nobody" = "欢迎来到声网语聊房！\n搭载声网最佳音效实践、最新音频技术的语聊房\n带来更沉浸、更易用、更有趣的语聊体验";
+"voice_create_tips" = "本应用为测试产品，仅用于功能体验，请勿商用。单次使用时长不超过20分钟，过时房问将自动解散。为配合相关部门监管要求，严禁色情、辱骂、暴恐、涉政等违规内容。警惕电信诈骗，请勿在使用过程中进行货款申请和网银转账！国家反诈专用号码：96110";
 "voice_agree_success" = "同意上麦成功!";
 "voice_agree_failed" = "同意上麦失败!";
 "voice_invitation_sent" = "邀请已发送!";
@@ -165,6 +168,7 @@
 "voice_im_key_empty_error" = "参数非法，请检查 KeyCenter.swift中的 ’IMAppKey’";
 "voice_AIAEC" = "AI回声消除";
 "voice_AGC" = "人声自动增益";
+"voice_SoundCard" = "虚拟声卡";
 "voice_agora_blue_and_red_bot" = "声蓝羽&声红颜";
 "voice_room_audio_settings" = "房间音效设置";
 "voice_turn_on_AIAEC" = "开启AI回声消除";

@@ -106,10 +106,10 @@ class ShowAgoraKitManager: NSObject {
         config.extraInfo = jsonStr
         let module = AgoraContentInspectModule()
         module.interval = 30
-        module.type = .imageModeration
-        config.modules = [module]
-        let ret = engine?.enableContentInspectEx(enable, config: config, connection: connection)
-        showLogger.info("setupContentInspectConfig: \(ret ?? -1)")
+//        module.type = .imageModeration
+//        config.modules = [module]
+//        let ret = engine?.enableContentInspectEx(enable, config: config, connection: connection)
+//        showLogger.info("setupContentInspectConfig: \(ret ?? -1)")
     }
     
     /// 语音审核

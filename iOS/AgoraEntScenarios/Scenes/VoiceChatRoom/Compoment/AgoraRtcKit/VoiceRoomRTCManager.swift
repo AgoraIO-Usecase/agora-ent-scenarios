@@ -343,6 +343,11 @@ public let kMPK_RTC_UID: UInt = 1
         rtcKit.setParameters("{\"che.audio.md.enable\":false}")
 
     }
+    
+    public func setParameters(with string: String) {
+        rtcKit.setParameters(string)
+    }
+    
     /**
      * 加载RTC
      */

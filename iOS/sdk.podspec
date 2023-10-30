@@ -8,7 +8,7 @@ Pod::Spec.new do |spec|
    spec.author        = { "Agora Lab" => "developer@agora.io" }
    spec.platform      = :ios
    spec.source        = { :git => "" }
-   spec.vendored_frameworks = "libs/*.framework"
+   spec.vendored_frameworks = "libs/*.xcframework"
    spec.requires_arc  = true
    spec.ios.deployment_target  = '9.0'
  end
